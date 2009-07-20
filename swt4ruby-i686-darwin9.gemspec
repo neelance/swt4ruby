@@ -1,7 +1,7 @@
 --- !ruby/object:Gem::Specification 
 name: swt4ruby
 version: !ruby/object:Gem::Version 
-  version: 1.0.4
+  version: 1.0.5
 platform: i686-darwin9
 authors: []
 
