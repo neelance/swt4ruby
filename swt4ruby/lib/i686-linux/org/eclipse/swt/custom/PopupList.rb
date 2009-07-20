@@ -296,7 +296,7 @@ module Org::Eclipse::Swt::Custom
             @list.select(index)
             break
           end
-          ((i += 1) - 1)
+          i += 1
         end
       end
     end

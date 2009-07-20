@@ -130,7 +130,7 @@ module Org::Eclipse::Swt::Browser
               result[0] = i - 1
               break
             end
-            ((i += 1) - 1)
+            i += 1
           end
           shell.close
         end
@@ -164,21 +164,21 @@ module Org::Eclipse::Swt::Browser
         buttons[1].set_text(button0)
         buttons[1].add_listener(SWT::Selection, listener)
         buttons[1].set_layout_data(GridData.new(GridData::FILL_HORIZONTAL))
-        ((button_count += 1) - 1)
+        button_count += 1
       end
       if (!(button1).nil?)
         buttons[2] = Button.new(composite, SWT::PUSH)
         buttons[2].set_text(button1)
         buttons[2].add_listener(SWT::Selection, listener)
         buttons[2].set_layout_data(GridData.new(GridData::FILL_HORIZONTAL))
-        ((button_count += 1) - 1)
+        button_count += 1
       end
       if (!(button2).nil?)
         buttons[3] = Button.new(composite, SWT::PUSH)
         buttons[3].set_text(button2)
         buttons[3].add_listener(SWT::Selection, listener)
         buttons[3].set_layout_data(GridData.new(GridData::FILL_HORIZONTAL))
-        ((button_count += 1) - 1)
+        button_count += 1
       end
       layout.attr_num_columns = button_count
       default_button = buttons[default_index + 1]

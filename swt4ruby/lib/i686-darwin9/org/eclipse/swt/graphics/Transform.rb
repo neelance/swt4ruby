@@ -381,7 +381,7 @@ module Org::Eclipse::Swt::Graphics
         OS._cgpoint_apply_affine_transform(point, @handle, point)
         point_array[j] = point.attr_x
         point_array[j + 1] = point.attr_y
-        ((i += 1) - 1)
+        i += 1
         j += 2
       end
     end

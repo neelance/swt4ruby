@@ -720,7 +720,7 @@ module Org::Eclipse::Swt::Widgets
             if ((info.attr_dw_item_data).equal?(item.attr_id))
               break
             end
-            ((index += 1) - 1)
+            index += 1
           end
           if (!(info.attr_dw_item_data).equal?(item.attr_id))
             error(SWT::ERROR_ITEM_NOT_REMOVED)
@@ -765,7 +765,7 @@ module Org::Eclipse::Swt::Widgets
       i = 0
       while i < items.attr_length
         items[i].fix_menus(new_parent)
-        ((i += 1) - 1)
+        i += 1
       end
       @parent.remove_menu(self)
       new_parent.add_menu(self)
@@ -1022,7 +1022,7 @@ module Org::Eclipse::Swt::Widgets
         while i < count
           OS._send_message(@hwnd_cb, OS::TB_GETBUTTON, i, lp_button)
           result[i] = self.attr_display.get_menu_item(lp_button.attr_id_command)
-          ((i += 1) - 1)
+          i += 1
         end
         return result
       end
@@ -1044,7 +1044,7 @@ module Org::Eclipse::Swt::Widgets
         if (!(item).nil?)
           items[((count += 1) - 1)] = item
         end
-        ((index += 1) - 1)
+        index += 1
       end
       if ((count).equal?(items.attr_length))
         return items
@@ -1066,7 +1066,7 @@ module Org::Eclipse::Swt::Widgets
         info = MENUITEMINFO.new
         info.attr_cb_size = MENUITEMINFO.attr_sizeof
         while (OS._get_menu_item_info(handle, count, true, info))
-          ((count += 1) - 1)
+          count += 1
         end
         return count
       end
@@ -1082,7 +1082,7 @@ module Org::Eclipse::Swt::Widgets
         i = 0
         while i < length_ - 1
           result = result + (items[i].get_name_text).to_s + ", "
-          ((i += 1) - 1)
+          i += 1
         end
         result = result + (items[length_ - 1].get_name_text).to_s
       end
@@ -1188,7 +1188,7 @@ module Org::Eclipse::Swt::Widgets
           if ((popups[i]).equal?(self))
             return true
           end
-          ((i += 1) - 1)
+          i += 1
         end
       end
       shell = get_shell
@@ -1272,7 +1272,7 @@ module Org::Eclipse::Swt::Widgets
         if ((info.attr_dw_item_data).equal?(item.attr_id))
           return index
         end
-        ((index += 1) - 1)
+        index += 1
       end
       return -1
     end
@@ -1350,7 +1350,7 @@ module Org::Eclipse::Swt::Widgets
             item.release(false)
           end
         end
-        ((i += 1) - 1)
+        i += 1
       end
       super(destroy)
     end
@@ -1745,7 +1745,7 @@ module Org::Eclipse::Swt::Widgets
             break
           end
         end
-        ((i += 1) - 1)
+        i += 1
       end
       # Bug in Windows.  If a menu contains items that have
       # images and can be checked, Windows does not include
@@ -1778,7 +1778,7 @@ module Org::Eclipse::Swt::Widgets
                 OS._set_menu_item_info(@handle, item.attr_id, false, info)
               end
             end
-            ((i_ += 1) - 1)
+            i_ += 1
           end
         end
       end
@@ -1827,7 +1827,7 @@ module Org::Eclipse::Swt::Widgets
         info.attr_f_mask = OS::MIIM_BITMAP
         info.attr_hbmp_item = OS::HBMMENU_CALLBACK
         OS._set_menu_item_info(@handle, index, true, info)
-        ((index += 1) - 1)
+        index += 1
       end
       redraw
     end

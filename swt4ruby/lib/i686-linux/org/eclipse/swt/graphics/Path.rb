@@ -761,7 +761,7 @@ module Org::Eclipse::Swt::Graphics
           dispose
           SWT.error(SWT::ERROR_INVALID_ARGUMENT)
         end
-        ((i += 1) - 1)
+        i += 1
       end
     end
     

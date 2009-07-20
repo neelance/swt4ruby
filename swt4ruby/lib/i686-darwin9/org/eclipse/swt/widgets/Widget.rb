@@ -352,13 +352,13 @@ module Org::Eclipse::Swt::Widgets
                 break
               end
               if (!OS._is_control_visible(child))
-                ((i += 1) - 1)
+                i += 1
                 next
               end
               OS._get_control_region(child, RJava.cast_to_short(OS.attr_k_control_structure_meta_part), temp_rgn)
               OS._hiview_convert_region(temp_rgn, child, root)
               OS._union_rgn(temp_rgn, child_rgn, child_rgn)
-              ((i += 1) - 1)
+              i += 1
             end
           end
           last_control = temp_control
@@ -627,10 +627,10 @@ module Org::Eclipse::Swt::Widgets
               mask_data[mask_offset + (x >> 3)] &= ~(1 << (7 - (x & 0x7)))
             end
             offset += 4
-            ((x += 1) - 1)
+            x += 1
           end
           mask_offset += mask_bpl
-          ((y += 1) - 1)
+          y += 1
         end
         OS.memmove(icon_ptr[0] + PixMap.attr_sizeof + 2 * BitMap.attr_sizeof + 4, mask_data, mask_data.attr_length)
       end
@@ -753,9 +753,9 @@ module Org::Eclipse::Swt::Widgets
           while x < width
             mask_data[((mask_offset += 1) - 1)] = src_data[offset]
             offset += 4
-            ((x += 1) - 1)
+            x += 1
           end
-          ((y += 1) - 1)
+          y += 1
         end
         OS.memmove(mask_ptr[0], mask_data, mask_data.attr_length)
       end
@@ -892,10 +892,10 @@ module Org::Eclipse::Swt::Widgets
             next
           end
           if ((buffer[i]).equal?(Character.new(?&.ord)))
-            ((i += 1) - 1)
+            i += 1
             next
           end
-          ((j -= 1) + 1)
+          j -= 1
         end
       end
       return j
@@ -1977,7 +1977,7 @@ module Org::Eclipse::Swt::Widgets
           if (send_key_event(type, event))
             chars[((count += 1) - 1)] = chars[i]
           end
-          ((i += 1) - 1)
+          i += 1
         end
         if ((count).equal?(0))
           return false

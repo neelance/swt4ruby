@@ -300,7 +300,7 @@ module Org::Eclipse::Swt::Ole::Win32
         w_param_flags = Array.typed(::Java::Short).new(1) { 0 }
         COM._move_memory(w_param_flags, funcdesc.attr_lprgelemdesc_param + i * COM._elemdesc_sizeof + COM._typedesc_sizeof + OS::PTR_SIZEOF, 2)
         data.attr_args[i].attr_flags = w_param_flags[0]
-        ((i += 1) - 1)
+        i += 1
       end
       data.attr_return_type = funcdesc.attr_elemdesc_func_tdesc_vt
       if ((data.attr_return_type).equal?(OLE::VT_PTR))
@@ -522,7 +522,7 @@ module Org::Eclipse::Swt::Ole::Win32
         while i >= 0
           rgvarg[i].get_data(p_disp_params.attr_rgvarg + offset)
           offset += VARIANT.attr_sizeof
-          ((i -= 1) + 1)
+          i -= 1
         end
       end
       # if arguments have ids, store the ids in rgdispidNamedArgs
@@ -534,7 +534,7 @@ module Org::Eclipse::Swt::Ole::Win32
         while i > 0
           COM._move_memory(p_disp_params.attr_rgdispid_named_args + offset, Array.typed(::Java::Int).new([rgdispid_named_args[i - 1]]), 4)
           offset += 4
-          ((i -= 1) + 1)
+          i -= 1
         end
       end
       # invoke the method
@@ -562,7 +562,7 @@ module Org::Eclipse::Swt::Ole::Win32
         while i < length
           COM._variant_clear(p_disp_params.attr_rgvarg + offset)
           offset += VARIANT.attr_sizeof
-          ((i += 1) - 1)
+          i += 1
         end
         OS._global_free(p_disp_params.attr_rgvarg)
       end
@@ -718,7 +718,7 @@ module Org::Eclipse::Swt::Ole::Win32
         if (((rgvarg[i].get_type & COM::VT_BYREF)).equal?(COM::VT_BYREF))
           dw_flags = COM::DISPATCH_PROPERTYPUTREF
         end
-        ((i += 1) - 1)
+        i += 1
       end
       p_var_result = Variant.new
       result = invoke(disp_id_member, dw_flags, rgvarg, rgdispid_named_args, p_var_result)

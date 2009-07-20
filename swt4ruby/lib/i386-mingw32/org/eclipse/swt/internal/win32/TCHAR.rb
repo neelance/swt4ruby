@@ -95,7 +95,7 @@ module Org::Eclipse::Swt::Internal::Win32
         @bytes = Array.typed(::Java::Byte).new(@byte_count = char_count * 2 + (terminate ? 1 : 0)) { 0 }
         @byte_count = OS._wide_char_to_multi_byte(cp, 0, chars, char_count, @bytes, @byte_count, nil, nil)
         if (terminate)
-          ((@byte_count += 1) - 1)
+          @byte_count += 1
         end
       end
     end
@@ -132,7 +132,7 @@ module Org::Eclipse::Swt::Internal::Win32
           if ((@chars[i]).equal?(Character.new(?\0.ord)))
             return i
           end
-          ((i += 1) - 1)
+          i += 1
         end
         return @chars.attr_length
       else
@@ -141,7 +141,7 @@ module Org::Eclipse::Swt::Internal::Win32
           if ((@bytes[i]).equal?(Character.new(?\0.ord)))
             return i
           end
-          ((i += 1) - 1)
+          i += 1
         end
         return @byte_count
       end

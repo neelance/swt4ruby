@@ -456,7 +456,7 @@ module Org::Eclipse::Swt::Widgets
         if (rect_bottom > y_max)
           y_max = rect_bottom
         end
-        ((i += 1) - 1)
+        i += 1
       end
       return Rectangle.new(x_min, y_min, x_max - x_min, y_max - y_min)
     end
@@ -485,7 +485,7 @@ module Org::Eclipse::Swt::Widgets
             height = 100
           end
           result[i] = Rectangle.new(x, y, width, height)
-          ((i += 1) - 1)
+          i += 1
         end
       end
       return result
@@ -505,7 +505,7 @@ module Org::Eclipse::Swt::Widgets
           rect1.attr_right = rect.attr_x + rect.attr_width + band_width * 2
           rect1.attr_bottom = rect.attr_y + rect.attr_height + band_width * 2
           OS._redraw_window(@hwnd_transparent, rect1, 0, OS::RDW_INVALIDATE)
-          ((i += 1) - 1)
+          i += 1
         end
         return
       end
@@ -535,7 +535,7 @@ module Org::Eclipse::Swt::Widgets
         OS._pat_blt(h_dc, rect.attr_x, rect.attr_y + band_width, band_width, rect.attr_height - (band_width * 2), OS::PATINVERT)
         OS._pat_blt(h_dc, rect.attr_x + rect.attr_width - band_width, rect.attr_y + band_width, band_width, rect.attr_height - (band_width * 2), OS::PATINVERT)
         OS._pat_blt(h_dc, rect.attr_x, rect.attr_y + rect.attr_height - band_width, rect.attr_width, band_width, OS::PATINVERT)
-        ((i += 1) - 1)
+        i += 1
       end
       if (stippled)
         OS._select_object(h_dc, old_brush)
@@ -563,7 +563,7 @@ module Org::Eclipse::Swt::Widgets
       while i < @rectangles.attr_length
         current = @rectangles[i]
         result[i] = Rectangle.new(current.attr_x, current.attr_y, current.attr_width, current.attr_height)
-        ((i += 1) - 1)
+        i += 1
       end
       return result
     end
@@ -608,7 +608,7 @@ module Org::Eclipse::Swt::Widgets
       while i < @rectangles.attr_length
         @rectangles[i].attr_x += x_change
         @rectangles[i].attr_y += y_change
-        ((i += 1) - 1)
+        i += 1
       end
     end
     
@@ -856,7 +856,7 @@ module Org::Eclipse::Swt::Widgets
             while i < @proportions.attr_length
               proportion = @proportions[i]
               proportion.attr_x = 100 - proportion.attr_x - proportion.attr_width
-              ((i += 1) - 1)
+              i += 1
             end
           end
         end
@@ -875,7 +875,7 @@ module Org::Eclipse::Swt::Widgets
               while i < @proportions.attr_length
                 proportion = @proportions[i]
                 proportion.attr_x = 100 - proportion.attr_x - proportion.attr_width
-                ((i += 1) - 1)
+                i += 1
               end
             end
           end
@@ -896,7 +896,7 @@ module Org::Eclipse::Swt::Widgets
             while i < @proportions.attr_length
               proportion = @proportions[i]
               proportion.attr_y = 100 - proportion.attr_y - proportion.attr_height
-              ((i += 1) - 1)
+              i += 1
             end
           end
         end
@@ -915,7 +915,7 @@ module Org::Eclipse::Swt::Widgets
               while i < @proportions.attr_length
                 proportion = @proportions[i]
                 proportion.attr_y = 100 - proportion.attr_y - proportion.attr_height
-                ((i += 1) - 1)
+                i += 1
               end
             end
           end
@@ -943,7 +943,7 @@ module Org::Eclipse::Swt::Widgets
       while i < @rectangles.attr_length
         proportion = @proportions[i]
         new_rects[i] = Rectangle.new(proportion.attr_x * @bounds.attr_width / 100 + @bounds.attr_x, proportion.attr_y * @bounds.attr_height / 100 + @bounds.attr_y, proportion.attr_width * @bounds.attr_width / 100, proportion.attr_height * @bounds.attr_height / 100)
-        ((i += 1) - 1)
+        i += 1
       end
       @rectangles = new_rects
     end
@@ -994,7 +994,7 @@ module Org::Eclipse::Swt::Widgets
           error(SWT::ERROR_NULL_ARGUMENT)
         end
         @rectangles[i] = Rectangle.new(current.attr_x, current.attr_y, current.attr_width, current.attr_height)
-        ((i += 1) - 1)
+        i += 1
       end
       @proportions = compute_proportions(rectangles)
     end
@@ -1076,7 +1076,7 @@ module Org::Eclipse::Swt::Widgets
             OS._pat_blt(h_dc, rect.attr_x, rect.attr_y + band_width, band_width, rect.attr_height - (band_width * 2), OS::PATCOPY)
             OS._pat_blt(h_dc, rect.attr_x + rect.attr_width - band_width, rect.attr_y + band_width, band_width, rect.attr_height - (band_width * 2), OS::PATCOPY)
             OS._pat_blt(h_dc, rect.attr_x, rect.attr_y + rect.attr_height - band_width, rect.attr_width, band_width, OS::PATCOPY)
-            ((i += 1) - 1)
+            i += 1
           end
           OS._select_object(h_dc, old_brush)
           if (@stippled)
@@ -1144,7 +1144,7 @@ module Org::Eclipse::Swt::Widgets
         while i < @rectangles.attr_length
           current = @rectangles[i]
           rects_to_erase[i] = Rectangle.new(current.attr_x, current.attr_y, current.attr_width, current.attr_height)
-          ((i += 1) - 1)
+          i += 1
         end
         event = Event.new
         event.attr_x = @old_x + x_change
@@ -1179,7 +1179,7 @@ module Org::Eclipse::Swt::Widgets
                   draw = true
                   break
                 end
-                ((i_ += 1) - 1)
+                i_ += 1
               end
             end
           else
@@ -1220,7 +1220,7 @@ module Org::Eclipse::Swt::Widgets
                   draw = true
                   break
                 end
-                ((i_ += 1) - 1)
+                i_ += 1
               end
             end
           else
@@ -1271,7 +1271,7 @@ module Org::Eclipse::Swt::Widgets
         while i < @rectangles.attr_length
           current = @rectangles[i]
           rects_to_erase[i] = Rectangle.new(current.attr_x, current.attr_y, current.attr_width, current.attr_height)
-          ((i += 1) - 1)
+          i += 1
         end
         event = Event.new
         event.attr_x = new_x
@@ -1309,7 +1309,7 @@ module Org::Eclipse::Swt::Widgets
                   draw = true
                   break
                 end
-                ((i_ += 1) - 1)
+                i_ += 1
               end
             end
           else
@@ -1358,7 +1358,7 @@ module Org::Eclipse::Swt::Widgets
                   draw = true
                   break
                 end
-                ((i_ += 1) - 1)
+                i_ += 1
               end
             end
           else

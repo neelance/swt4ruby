@@ -356,7 +356,7 @@ module Org::Eclipse::Swt::Widgets
       # find next available id
       id = 0
       while (id < @items.attr_length && !(@items[id]).nil?)
-        ((id += 1) - 1)
+        id += 1
       end
       if ((id).equal?(@items.attr_length))
         new_items = Array.typed(TreeItem).new(@items.attr_length + 4) { nil }
@@ -818,7 +818,7 @@ module Org::Eclipse::Swt::Widgets
                 if ((types[j]).equal?(OS._g_type_string))
                   OS.g_free((ptr[0]))
                 end
-                ((j += 1) - 1)
+                j += 1
               end
               j_ = 0
               while j_ < model_length - FIRST_COLUMN
@@ -827,7 +827,7 @@ module Org::Eclipse::Swt::Widgets
                 if ((types[j_]).equal?(OS._g_type_string))
                   OS.g_free((ptr[0]))
                 end
-                ((j_ += 1) - 1)
+                j_ += 1
               end
             end
           else
@@ -849,7 +849,7 @@ module Org::Eclipse::Swt::Widgets
             OS.gtk_tree_store_remove(old_model, old_item)
             OS.g_free(old_item)
           end
-          ((i += 1) - 1)
+          i += 1
         end
       end
       OS.g_free(iter)
@@ -871,15 +871,15 @@ module Org::Eclipse::Swt::Widgets
           j = 0
           while j < CELL_TYPES
             used_columns[column_index + j] = true
-            ((j += 1) - 1)
+            j += 1
           end
-          ((i += 1) - 1)
+          i += 1
         end
         while (model_index < model_length)
           if (!used_columns[model_index])
             break
           end
-          ((model_index += 1) - 1)
+          model_index += 1
         end
         if ((model_index).equal?(model_length))
           # long
@@ -1090,7 +1090,7 @@ module Org::Eclipse::Swt::Widgets
               item.attr_cell_font = temp
             end
           end
-          ((i += 1) - 1)
+          i += 1
         end
       end
     end
@@ -1204,7 +1204,7 @@ module Org::Eclipse::Swt::Widgets
             custom_draw = @columns[i].attr_custom_draw
             break
           end
-          ((i += 1) - 1)
+          i += 1
         end
       end
       if (!((self.attr_style & SWT::VIRTUAL)).equal?(0) || custom_draw || @owner_draw)
@@ -1302,7 +1302,7 @@ module Org::Eclipse::Swt::Widgets
         if ((@columns[index]).equal?(column))
           break
         end
-        ((index += 1) - 1)
+        index += 1
       end
       if ((index).equal?(@column_count))
         return
@@ -1357,7 +1357,7 @@ module Org::Eclipse::Swt::Widgets
               end
             end
           end
-          ((i += 1) - 1)
+          i += 1
         end
         if ((index).equal?(0))
           # first column must be left aligned and must show check box
@@ -1463,7 +1463,7 @@ module Org::Eclipse::Swt::Widgets
           column.set_tool_tip_text(old_shell, nil)
           column.set_tool_tip_text(new_shell, column.attr_tool_tip_text)
         end
-        ((i += 1) - 1)
+        i += 1
       end
     end
     
@@ -1611,7 +1611,7 @@ module Org::Eclipse::Swt::Widgets
               order[((i += 1) - 1)] = j
               break
             end
-            ((j += 1) - 1)
+            j += 1
           end
         end
         temp = OS.g_list_next(temp)
@@ -1753,7 +1753,7 @@ module Org::Eclipse::Swt::Widgets
             OS.gtk_widget_size_request(button_handle, requisition)
             height = Math.max(height, requisition.attr_height)
           end
-          ((i += 1) - 1)
+          i += 1
         end
         return height
       end
@@ -1936,7 +1936,7 @@ module Org::Eclipse::Swt::Widgets
           h = Array.typed(::Java::Int).new(1) { 0 }
           OS.gtk_tree_view_column_cell_get_size(column, nil, nil, nil, w, h)
           height = Math.max(height, h[0])
-          ((i += 1) - 1)
+          i += 1
         end
         OS.g_free(iter)
         return height
@@ -1976,7 +1976,7 @@ module Org::Eclipse::Swt::Widgets
         i = 0
         while i < length
           result[i] = __get_item(parent, i)
-          ((i += 1) - 1)
+          i += 1
         end
       else
         i = 0
@@ -2053,7 +2053,7 @@ module Org::Eclipse::Swt::Widgets
           pixbuf_renderer = renderer
           break
         end
-        ((i += 1) - 1)
+        i += 1
       end
       OS.g_list_free(list)
       return pixbuf_renderer
@@ -2086,7 +2086,7 @@ module Org::Eclipse::Swt::Widgets
         i = 0
         while i < result.attr_length
           result[i] = @items[self.attr_display.attr_tree_selection[i]]
-          ((i += 1) - 1)
+          i += 1
         end
         return result
       end
@@ -2111,10 +2111,10 @@ module Org::Eclipse::Swt::Widgets
           iter = OS.g_malloc(OS._gtk_tree_iter_sizeof)
           if (OS.gtk_tree_model_get_iter(@model_handle, iter, data))
             tree_selection[length] = __get_item(iter)
-            ((length += 1) - 1)
+            length += 1
           end
           OS.g_free(iter)
-          ((i += 1) - 1)
+          i += 1
         end
         OS.g_list_free(list)
         if (length < count)
@@ -2209,7 +2209,7 @@ module Org::Eclipse::Swt::Widgets
           text_renderer = renderer
           break
         end
-        ((i += 1) - 1)
+        i += 1
       end
       OS.g_list_free(list)
       return text_renderer
@@ -2641,7 +2641,7 @@ module Org::Eclipse::Swt::Widgets
         if ((@columns[i]).equal?(column))
           return i
         end
-        ((i += 1) - 1)
+        i += 1
       end
       return -1
     end
@@ -2699,7 +2699,7 @@ module Org::Eclipse::Swt::Widgets
         if (!(label_handle).equal?(0) && mnemonic_hit(label_handle, key))
           return true
         end
-        ((i += 1) - 1)
+        i += 1
       end
       return false
     end
@@ -2713,7 +2713,7 @@ module Org::Eclipse::Swt::Widgets
         if (!(label_handle).equal?(0) && mnemonic_match(label_handle, key))
           return true
         end
-        ((i += 1) - 1)
+        i += 1
       end
       return false
     end
@@ -2745,7 +2745,7 @@ module Org::Eclipse::Swt::Widgets
         while i < @column_count
           column = @columns[i]
           create_renderers(column.attr_handle, column.attr_model_index, (i).equal?(0), column.attr_style)
-          ((i += 1) - 1)
+          i += 1
         end
       end
     end
@@ -2812,7 +2812,7 @@ module Org::Eclipse::Swt::Widgets
           if (!(item).nil? && !item.is_disposed)
             item.release(false)
           end
-          ((i += 1) - 1)
+          i += 1
         end
         @items = nil
       end
@@ -2823,7 +2823,7 @@ module Org::Eclipse::Swt::Widgets
           if (!(column).nil? && !column.is_disposed)
             column.release(false)
           end
-          ((i += 1) - 1)
+          i += 1
         end
         @columns = nil
       end
@@ -2879,7 +2879,7 @@ module Org::Eclipse::Swt::Widgets
           OS.gtk_tree_store_remove(@model_handle, iter)
           OS.g_signal_handlers_unblock_matched(selection, OS::G_SIGNAL_MATCH_DATA, 0, 0, 0, 0, CHANGED)
         end
-        ((i += 1) - 1)
+        i += 1
       end
       OS.g_free(iter)
     end
@@ -2899,7 +2899,7 @@ module Org::Eclipse::Swt::Widgets
         if (!(item).nil? && !item.is_disposed)
           item.release(false)
         end
-        ((i += 1) - 1)
+        i += 1
       end
       @items = Array.typed(TreeItem).new(4) { nil }
       # long
@@ -3016,7 +3016,7 @@ module Org::Eclipse::Swt::Widgets
                 column_index = i
                 break
               end
-              ((i += 1) - 1)
+              i += 1
             end
           end
           if (hooks(SWT::MeasureItem))
@@ -3087,7 +3087,7 @@ module Org::Eclipse::Swt::Widgets
             column_index = i
             break
           end
-          ((i += 1) - 1)
+          i += 1
         end
       end
       if (!(item).nil?)
@@ -3277,7 +3277,7 @@ module Org::Eclipse::Swt::Widgets
             @columns[i].attr_custom_draw = false
           end
         end
-        ((i += 1) - 1)
+        i += 1
       end
       @first_custom_draw = false
     end
@@ -3349,13 +3349,13 @@ module Org::Eclipse::Swt::Widgets
           OS.gtk_tree_store_append(@model_handle, iter, parent_iter)
           OS.gtk_tree_store_set(@model_handle, iter, ID_COLUMN, -1, -1)
           OS.g_free(iter)
-          ((i += 1) - 1)
+          i += 1
         end
       else
         i = item_count
         while i < count
           TreeItem.new(self, parent_iter, SWT::NONE, i, true)
-          ((i += 1) - 1)
+          i += 1
         end
       end
       if (!is_virtual)
@@ -3526,7 +3526,7 @@ module Org::Eclipse::Swt::Widgets
           error(SWT::ERROR_INVALID_ARGUMENT)
         end
         seen[index] = true
-        ((i += 1) - 1)
+        i += 1
       end
       # long
       base_column = 0
@@ -3536,7 +3536,7 @@ module Org::Eclipse::Swt::Widgets
         column = @columns[order[i_]].attr_handle
         OS.gtk_tree_view_move_column_after(self.attr_handle, column, base_column)
         base_column = column
-        ((i_ += 1) - 1)
+        i_ += 1
       end
     end
     
@@ -3550,7 +3550,7 @@ module Org::Eclipse::Swt::Widgets
         if (!(columns[i]).nil?)
           columns[i].set_font_description(font)
         end
-        ((i += 1) - 1)
+        i += 1
       end
     end
     
@@ -3701,14 +3701,14 @@ module Org::Eclipse::Swt::Widgets
       while i < length
         item = items[i]
         if ((item).nil?)
-          ((i += 1) - 1)
+          i += 1
           next
         end
         if (item.is_disposed)
           break
         end
         if (!(item.attr_parent).equal?(self))
-          ((i += 1) - 1)
+          i += 1
           next
         end
         # long
@@ -3720,7 +3720,7 @@ module Org::Eclipse::Swt::Widgets
         OS.gtk_tree_selection_select_iter(selection, item.attr_handle)
         OS.gtk_tree_path_free(path)
         first = false
-        ((i += 1) - 1)
+        i += 1
       end
       OS.g_signal_handlers_unblock_matched(selection, OS::G_SIGNAL_MATCH_DATA, 0, 0, 0, 0, CHANGED)
       if (fix_column)
@@ -3901,7 +3901,7 @@ module Org::Eclipse::Swt::Widgets
         if (OS.gtk_tree_view_column_get_visible(column))
           return false
         end
-        ((i += 1) - 1)
+        i += 1
       end
       # long
       first_column = OS.gtk_tree_view_get_column(self.attr_handle, 0)
@@ -3943,7 +3943,7 @@ module Org::Eclipse::Swt::Widgets
         while i < indices.attr_length
           OS.gtk_tree_path_append_index(temp_path, indices[i])
           OS.gtk_tree_view_expand_row(self.attr_handle, temp_path, false)
-          ((i += 1) - 1)
+          i += 1
         end
         OS.gtk_tree_path_free(temp_path)
       end

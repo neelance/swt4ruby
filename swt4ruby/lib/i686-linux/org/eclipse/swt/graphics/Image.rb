@@ -411,10 +411,10 @@ module Org::Eclipse::Swt::Graphics
                 line[offset + 1] = one_green
                 line[offset + 2] = one_blue
               end
-              ((x += 1) - 1)
+              x += 1
             end
             OS.memmove(pixels + (y * stride), line, stride)
-            ((y += 1) - 1)
+            y += 1
           end
         when SWT::IMAGE_GRAY
           line = Array.typed(::Java::Byte).new(stride) { 0 }
@@ -429,10 +429,10 @@ module Org::Eclipse::Swt::Graphics
               blue = line[offset + 2] & 0xff
               intensity = ((red + red + green + green + green + green + green + blue) >> 3)
               line[offset] = line[offset + 1] = line[offset + 2] = intensity
-              ((x += 1) - 1)
+              x += 1
             end
             OS.memmove(pixels + (y * stride), line, stride)
-            ((y += 1) - 1)
+            y += 1
           end
         end
         # Copy data back to destination pixmap
@@ -736,10 +736,10 @@ module Org::Eclipse::Swt::Graphics
               while x < width
                 @alpha_data[y * width + x] = line[x * 4 + 3]
                 line[x * 4 + 3] = 0xff
-                ((x += 1) - 1)
+                x += 1
               end
               OS.memmove(pixels + (y * stride), line, stride)
-              ((y += 1) - 1)
+              y += 1
             end
             create_alpha_mask(width, height)
           end
@@ -791,7 +791,7 @@ module Org::Eclipse::Swt::Graphics
             while y < height
               System.arraycopy(@alpha_data, width * y, line, 0, width)
               OS.memmove(gdk_image.attr_mem + (gdk_image.attr_bpl * y), line, gdk_image.attr_bpl)
-              ((y += 1) - 1)
+              y += 1
             end
           end
           OS.gdk_draw_image(@mask, gc, image_ptr, 0, 0, 0, 0, width, height)
@@ -823,7 +823,7 @@ module Org::Eclipse::Swt::Graphics
       while i < mask_data.attr_length
         s = data[i]
         mask_data[i] = (((s & 0x80) >> 7) | ((s & 0x40) >> 5) | ((s & 0x20) >> 3) | ((s & 0x10) >> 1) | ((s & 0x8) << 1) | ((s & 0x4) << 3) | ((s & 0x2) << 5) | ((s & 0x1) << 7))
-        ((i += 1) - 1)
+        i += 1
       end
       mask_data = ImageData.convert_pad(mask_data, mask.attr_width, mask.attr_height, mask.attr_depth, mask.attr_scanline_pad, 1)
       return OS.gdk_bitmap_create_from_data(0, mask_data, mask.attr_width, mask.attr_height)
@@ -883,13 +883,13 @@ module Org::Eclipse::Swt::Graphics
               temp = line[offset1]
               line[offset1] = line[offset1 + 2]
               line[offset1 + 2] = temp
-              ((x += 1) - 1)
+              x += 1
               offset1 += 4
             end
             OS.memmove(offset, line, stride)
             offset += stride
             mask_offset += mask_stride
-            ((y += 1) - 1)
+            y += 1
           end
           OS.g_object_unref(mask_pixbuf)
         else
@@ -913,12 +913,12 @@ module Org::Eclipse::Swt::Graphics
                 line[offset1 + 0] = b
                 line[offset1 + 1] = g
                 line[offset1 + 2] = r
-                ((x += 1) - 1)
+                x += 1
                 offset1 += 4
               end
               OS.memmove(offset, line, stride)
               offset += stride
-              ((y += 1) - 1)
+              y += 1
             end
           else
             if (!(@alpha_data).nil?)
@@ -942,12 +942,12 @@ module Org::Eclipse::Swt::Graphics
                   line[offset1 + 0] = b
                   line[offset1 + 1] = g
                   line[offset1 + 2] = r
-                  ((x += 1) - 1)
+                  x += 1
                   offset1 += 4
                 end
                 OS.memmove(offset, line, stride)
                 offset += stride
-                ((y += 1) - 1)
+                y += 1
               end
             else
               # long
@@ -962,12 +962,12 @@ module Org::Eclipse::Swt::Graphics
                   temp = line[offset1]
                   line[offset1] = line[offset1 + 2]
                   line[offset1 + 2] = temp
-                  ((x += 1) - 1)
+                  x += 1
                   offset1 += 4
                 end
                 OS.memmove(offset, line, stride)
                 offset += stride
-                ((y += 1) - 1)
+                y += 1
               end
             end
           end
@@ -1153,7 +1153,7 @@ module Org::Eclipse::Swt::Graphics
           if ((gdk_image.attr_bpl).equal?(bpl))
             break
           end
-          ((mask_pad += 1) - 1)
+          mask_pad += 1
         end
         # Make mask scanline pad equals to 2
         data.attr_mask_pad = 2
@@ -1164,7 +1164,7 @@ module Org::Eclipse::Swt::Graphics
           while i < mask_data.attr_length
             b = mask_data[i]
             mask_data[i] = (((b & 0x1) << 7) | ((b & 0x2) << 5) | ((b & 0x4) << 3) | ((b & 0x8) << 1) | ((b & 0x10) >> 1) | ((b & 0x20) >> 3) | ((b & 0x40) >> 5) | ((b & 0x80) >> 7))
-            ((i += 1) - 1)
+            i += 1
           end
         end
         data.attr_mask_data = mask_data
@@ -1282,13 +1282,13 @@ module Org::Eclipse::Swt::Graphics
           while i < rgbs.attr_length
             rgb = rgbs[i]
             if ((rgb).nil?)
-              ((i += 1) - 1)
+              i += 1
               next
             end
             src_reds[i] = rgb.attr_red
             src_greens[i] = rgb.attr_green
             src_blues[i] = rgb.attr_blue
-            ((i += 1) - 1)
+            i += 1
           end
           ImageData.blit(ImageData::BLIT_SRC, image.attr_data, image.attr_depth, image.attr_bytes_per_line, image.get_byte_order, 0, 0, width, height, src_reds, src_greens, src_blues, ImageData::ALPHA_OPAQUE, nil, 0, 0, 0, buffer, 24, stride, ImageData::MSB_FIRST, 0, 0, width, height, 0xff0000, 0xff00, 0xff, false, false)
         end

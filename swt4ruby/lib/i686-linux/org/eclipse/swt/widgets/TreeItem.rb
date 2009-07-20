@@ -388,7 +388,7 @@ module Org::Eclipse::Swt::Widgets
         i = Tree::CHECKED_COLUMN
         while i < column_count
           OS.gtk_tree_store_set(@parent.attr_model_handle, self.attr_handle, i, 0, -1)
-          ((i += 1) - 1)
+          i += 1
         end
         # Bug in GTK.  When using fixed-height-mode,
         # row changes do not cause the row to be repainted.  The fix is to
@@ -1871,7 +1871,7 @@ module Org::Eclipse::Swt::Widgets
       i = 0
       while i < images.attr_length
         set_image(i, images[i])
-        ((i += 1) - 1)
+        i += 1
       end
     end
     
@@ -1964,7 +1964,7 @@ module Org::Eclipse::Swt::Widgets
         if (!(string).nil?)
           set_text(i, string)
         end
-        ((i += 1) - 1)
+        i += 1
       end
     end
     

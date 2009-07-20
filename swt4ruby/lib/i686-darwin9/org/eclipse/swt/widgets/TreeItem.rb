@@ -1116,7 +1116,7 @@ module Org::Eclipse::Swt::Widgets
           i = 0
           while i < @parent.attr_column_count
             OS._update_data_browser_items(parent_handle, parent_id, ids.attr_length, ids, OS.attr_k_data_browser_item_no_property, @parent.attr_columns[i].attr_id)
-            ((i += 1) - 1)
+            i += 1
           end
         end
       else
@@ -1184,7 +1184,7 @@ module Org::Eclipse::Swt::Widgets
         if (!(item).nil? && !item.is_disposed)
           item.dispose
         end
-        ((i -= 1) + 1)
+        i -= 1
       end
     end
     
@@ -1536,7 +1536,7 @@ module Org::Eclipse::Swt::Widgets
       i = 0
       while i < images.attr_length
         set_image(i, images[i])
-        ((i += 1) - 1)
+        i += 1
       end
     end
     
@@ -1642,7 +1642,7 @@ module Org::Eclipse::Swt::Widgets
         if (!(string).nil?)
           set_text(i, string)
         end
-        ((i += 1) - 1)
+        i += 1
       end
     end
     

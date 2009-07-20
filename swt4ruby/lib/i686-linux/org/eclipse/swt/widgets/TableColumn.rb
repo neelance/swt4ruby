@@ -539,7 +539,7 @@ module Org::Eclipse::Swt::Widgets
           if (!(item).nil? && item.attr_cached)
             width = Math.max(width, @parent.calculate_width(self.attr_handle, item.attr_handle))
           end
-          ((i += 1) - 1)
+          i += 1
         end
       else
         # long

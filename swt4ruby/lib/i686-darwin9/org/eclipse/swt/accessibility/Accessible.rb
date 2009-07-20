@@ -260,7 +260,7 @@ module Org::Eclipse::Swt::Accessibility
         while i < @accessible_control_listeners.size
           listener = @accessible_control_listeners.element_at(i)
           listener.get_child_at_point(event)
-          ((i += 1) - 1)
+          i += 1
         end
         if (!(event.attr_accessible).nil?)
           OS._set_event_parameter(the_event, OS.attr_k_event_param_accessible_child, OS.attr_type_cftype_ref, 4, Array.typed(::Java::Int).new([event.attr_accessible.attr_axuielementref]))
@@ -303,7 +303,7 @@ module Org::Eclipse::Swt::Accessibility
         while i < @accessible_control_listeners.size
           listener = @accessible_control_listeners.element_at(i)
           listener.get_focus(event)
-          ((i += 1) - 1)
+          i += 1
         end
         # The application can optionally answer an accessible.
         if (!(event.attr_accessible).nil?)
@@ -356,7 +356,7 @@ module Org::Eclipse::Swt::Accessibility
         while i < length
           string_ref = OS._cfarray_get_value_at_index(string_array_ref, i)
           os_all_attributes[i] = string_ref_to_string(string_ref)
-          ((i += 1) - 1)
+          i += 1
         end
         # Add our list of supported attributes to the array.
         # Make sure each attribute name is not already in the array before appending.
@@ -367,7 +367,7 @@ module Org::Eclipse::Swt::Accessibility
             OS._cfarray_append_value(string_array_ref, string_ref)
             OS._cfrelease(string_ref)
           end
-          ((i_ += 1) - 1)
+          i_ += 1
         end
         if (@accessible_text_listeners.size > 0)
           i__ = 0
@@ -377,7 +377,7 @@ module Org::Eclipse::Swt::Accessibility
               OS._cfarray_append_value(string_array_ref, string_ref)
               OS._cfrelease(string_ref)
             end
-            ((i__ += 1) - 1)
+            i__ += 1
           end
         end
         code = OS.attr_no_err
@@ -392,7 +392,7 @@ module Org::Eclipse::Swt::Accessibility
         if ((array[i] == element))
           return true
         end
-        ((i += 1) - 1)
+        i += 1
       end
       return false
     end
@@ -516,7 +516,7 @@ module Org::Eclipse::Swt::Accessibility
       while i < @accessible_listeners.size
         listener = @accessible_listeners.element_at(i)
         listener.get_help(event)
-        ((i += 1) - 1)
+        i += 1
       end
       if (!(event.attr_result).nil?)
         string_ref[0] = string_to_string_ref(event.attr_result)
@@ -539,7 +539,7 @@ module Org::Eclipse::Swt::Accessibility
       while i < @accessible_control_listeners.size
         listener = @accessible_control_listeners.element_at(i)
         listener.get_role(event)
-        ((i += 1) - 1)
+        i += 1
       end
       if (!(event.attr_detail).equal?(-1))
         app_role = role_to_os(event.attr_detail)
@@ -567,7 +567,7 @@ module Org::Eclipse::Swt::Accessibility
       while i < @accessible_control_listeners.size
         listener = @accessible_control_listeners.element_at(i)
         listener.get_role(event)
-        ((i += 1) - 1)
+        i += 1
       end
       if (!(event.attr_detail).equal?(-1))
         app_role = role_to_os(event.attr_detail)
@@ -595,7 +595,7 @@ module Org::Eclipse::Swt::Accessibility
       while i < @accessible_control_listeners.size
         listener = @accessible_control_listeners.element_at(i)
         listener.get_role(event)
-        ((i += 1) - 1)
+        i += 1
       end
       if (!(event.attr_detail).equal?(-1))
         app_role = role_to_os(event.attr_detail)
@@ -639,7 +639,7 @@ module Org::Eclipse::Swt::Accessibility
       while i < @accessible_control_listeners.size
         listener = @accessible_control_listeners.element_at(i)
         listener.get_role(role_event)
-        ((i += 1) - 1)
+        i += 1
       end
       if (!(role_event.attr_detail).equal?(ACC::ROLE_LABEL))
         os_title_attribute = nil
@@ -657,7 +657,7 @@ module Org::Eclipse::Swt::Accessibility
         while i_ < @accessible_listeners.size
           listener = @accessible_listeners.element_at(i_)
           listener.get_name(event)
-          ((i_ += 1) - 1)
+          i_ += 1
         end
         if (!(event.attr_result).nil?)
           string_ref[0] = string_to_string_ref(event.attr_result)
@@ -684,7 +684,7 @@ module Org::Eclipse::Swt::Accessibility
         listener = @accessible_control_listeners.element_at(i)
         listener.get_role(event)
         listener.get_value(event)
-        ((i += 1) - 1)
+        i += 1
       end
       role = event.attr_detail
       value = event.attr_result
@@ -729,7 +729,7 @@ module Org::Eclipse::Swt::Accessibility
           while i_ < @accessible_listeners.size
             listener = @accessible_listeners.element_at(i_)
             listener.get_name(e)
-            ((i_ += 1) - 1)
+            i_ += 1
           end
           if (!(e.attr_result).nil?)
             string_ref = string_to_string_ref(e.attr_result)
@@ -769,7 +769,7 @@ module Org::Eclipse::Swt::Accessibility
       while i < @accessible_control_listeners.size
         listener = @accessible_control_listeners.element_at(i)
         listener.get_focus(event)
-        ((i += 1) - 1)
+        i += 1
       end
       # The application can optionally answer an accessible.
       if (!(event.attr_accessible).nil?)
@@ -830,7 +830,7 @@ module Org::Eclipse::Swt::Accessibility
         while i < @accessible_control_listeners.size
           listener = @accessible_control_listeners.element_at(i)
           listener.get_child_count(event)
-          ((i += 1) - 1)
+          i += 1
         end
         if ((event.attr_detail).equal?(0))
           code = OS.attr_no_err
@@ -840,7 +840,7 @@ module Org::Eclipse::Swt::Accessibility
             while i_ < @accessible_control_listeners.size
               listener = @accessible_control_listeners.element_at(i_)
               listener.get_children(event)
-              ((i_ += 1) - 1)
+              i_ += 1
             end
             app_children = event.attr_children
             if (!(app_children).nil? && app_children.attr_length > 0)
@@ -855,7 +855,7 @@ module Org::Eclipse::Swt::Accessibility
                   else
                     OS._cfarray_append_value(children, (child).attr_axuielementref)
                   end
-                  ((i__ += 1) - 1)
+                  i__ += 1
                 end
                 OS._set_event_parameter(the_event, OS.attr_k_event_param_accessible_attribute_value, OS.attr_type_cfmutable_array_ref, 4, Array.typed(::Java::Int).new([children]))
                 OS._cfrelease(children)
@@ -898,7 +898,7 @@ module Org::Eclipse::Swt::Accessibility
       while i < @accessible_control_listeners.size
         listener = @accessible_control_listeners.element_at(i)
         listener.get_location(event)
-        ((i += 1) - 1)
+        i += 1
       end
       if (!(event.attr_width).equal?(-1))
         os_position_attribute.attr_x = event.attr_x
@@ -924,7 +924,7 @@ module Org::Eclipse::Swt::Accessibility
       while i < @accessible_control_listeners.size
         listener = @accessible_control_listeners.element_at(i)
         listener.get_location(event)
-        ((i += 1) - 1)
+        i += 1
       end
       if (!(event.attr_width).equal?(-1))
         os_size_attribute.attr_x = event.attr_width
@@ -953,7 +953,7 @@ module Org::Eclipse::Swt::Accessibility
       while i < @accessible_listeners.size
         listener = @accessible_listeners.element_at(i)
         listener.get_description(event)
-        ((i += 1) - 1)
+        i += 1
       end
       if (!(event.attr_result).nil?)
         string_ref[0] = string_to_string_ref(event.attr_result)
@@ -976,7 +976,7 @@ module Org::Eclipse::Swt::Accessibility
       while i < @accessible_control_listeners.size
         listener = @accessible_control_listeners.element_at(i)
         listener.get_value(control_event)
-        ((i += 1) - 1)
+        i += 1
       end
       text_event = AccessibleTextEvent.new(self)
       text_event.attr_child_id = get_child_idfrom_event(the_event)
@@ -985,7 +985,7 @@ module Org::Eclipse::Swt::Accessibility
       while i_ < @accessible_text_listeners.size
         listener = @accessible_text_listeners.element_at(i_)
         listener.get_caret_offset(text_event)
-        ((i_ += 1) - 1)
+        i_ += 1
       end
       if (!(control_event.attr_result).nil? && !(text_event.attr_offset).equal?(-1))
         line_number = line_number_for_offset(control_event.attr_result, text_event.attr_offset)
@@ -1005,7 +1005,7 @@ module Org::Eclipse::Swt::Accessibility
       while i < @accessible_control_listeners.size
         listener = @accessible_control_listeners.element_at(i)
         listener.get_value(event)
-        ((i += 1) - 1)
+        i += 1
       end
       app_value = event.attr_result
       if (!(app_value).nil?)
@@ -1028,7 +1028,7 @@ module Org::Eclipse::Swt::Accessibility
         while i < @accessible_control_listeners.size
           listener = @accessible_control_listeners.element_at(i)
           listener.get_value(event)
-          ((i += 1) - 1)
+          i += 1
         end
         if (!(event.attr_result).nil?)
           range = range_for_line_number(line_number[0], event.attr_result)
@@ -1054,7 +1054,7 @@ module Org::Eclipse::Swt::Accessibility
       while i < @accessible_text_listeners.size
         listener = @accessible_text_listeners.element_at(i)
         listener.get_selection_range(event)
-        ((i += 1) - 1)
+        i += 1
       end
       offset = event.attr_offset
       length_ = event.attr_length
@@ -1067,7 +1067,7 @@ module Org::Eclipse::Swt::Accessibility
         while i_ < @accessible_control_listeners.size
           listener = @accessible_control_listeners.element_at(i_)
           listener.get_value(event2)
-          ((i_ += 1) - 1)
+          i_ += 1
         end
         app_value = event2.attr_result
         if (!(app_value).nil?)
@@ -1093,7 +1093,7 @@ module Org::Eclipse::Swt::Accessibility
       while i < @accessible_text_listeners.size
         listener = @accessible_text_listeners.element_at(i)
         listener.get_selection_range(event)
-        ((i += 1) - 1)
+        i += 1
       end
       if (!(event.attr_offset).equal?(-1))
         range = CFRange.new
@@ -1123,7 +1123,7 @@ module Org::Eclipse::Swt::Accessibility
           while i < @accessible_control_listeners.size
             listener = @accessible_control_listeners.element_at(i)
             listener.get_value(event)
-            ((i += 1) - 1)
+            i += 1
           end
           app_value = event.attr_result
           if (!(app_value).nil?)
@@ -1153,11 +1153,11 @@ module Org::Eclipse::Swt::Accessibility
               (i += 1)
             end
           end
-          ((line_number += 1) - 1)
+          line_number += 1
         when Character.new(?\n.ord)
-          ((line_number += 1) - 1)
+          line_number += 1
         end
-        ((i += 1) - 1)
+        i += 1
       end
       return line_number
     end
@@ -1175,7 +1175,7 @@ module Org::Eclipse::Swt::Accessibility
           if ((count).equal?(0))
             range.attr_location = i
           end
-          ((count += 1) - 1)
+          count += 1
         end
         if (line > line_number)
           break
@@ -1184,13 +1184,13 @@ module Org::Eclipse::Swt::Accessibility
         # FALL THROUGH
         when Character.new(?\r.ord)
           if (i + 1 < length_ && (text.char_at(i + 1)).equal?(Character.new(?\n.ord)))
-            ((i += 1) - 1)
+            i += 1
           end
-          ((line += 1) - 1)
+          line += 1
         when Character.new(?\n.ord)
-          ((line += 1) - 1)
+          line += 1
         end
-        ((i += 1) - 1)
+        i += 1
       end
       range.attr_length = count
       return range

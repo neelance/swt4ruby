@@ -76,7 +76,7 @@ module Org::Eclipse::Swt::Internal::Mozilla
           if ((callback_addresses[i]).equal?(0))
             SWT.error(SWT::ERROR_NO_MORE_CALLBACKS)
           end
-          ((i += 1) - 1)
+          i += 1
         end
       end
       # long

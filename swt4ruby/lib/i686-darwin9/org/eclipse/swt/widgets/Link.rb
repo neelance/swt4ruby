@@ -260,7 +260,7 @@ module Org::Eclipse::Swt::Widgets
       end
       out_metric = Array.typed(::Java::Int).new(1) { 0 }
       OS._get_theme_metric(OS.attr_k_theme_metric_focus_rect_outset, out_metric)
-      ((out_metric[0] -= 1) + 1)
+      out_metric[0] -= 1
       r = Rect.new
       rects = get_rectangles(@focus_index)
       i = 0
@@ -271,7 +271,7 @@ module Org::Eclipse::Swt::Widgets
         r.attr_right = RJava.cast_to_short((r.attr_left + rect.attr_width - (out_metric[0] * 2)))
         r.attr_bottom = RJava.cast_to_short((r.attr_top + rect.attr_height - (out_metric[0] * 2)))
         OS._draw_theme_focus_rect(r, true)
-        ((i += 1) - 1)
+        i += 1
       end
     end
     
@@ -306,7 +306,7 @@ module Org::Eclipse::Swt::Widgets
       while i < @offsets.attr_length
         point = @offsets[i]
         @layout.set_style(link_style, point.attr_x, point.attr_y)
-        ((i += 1) - 1)
+        i += 1
       end
       redraw
     end
@@ -329,11 +329,11 @@ module Org::Eclipse::Swt::Widgets
       point = @offsets[link_index]
       line_start = 1
       while (point.attr_x > line_offsets[line_start])
-        ((line_start += 1) - 1)
+        line_start += 1
       end
       line_end = 1
       while (point.attr_y > line_offsets[line_end])
-        ((line_end += 1) - 1)
+        line_end += 1
       end
       index = 0
       if ((line_start).equal?(line_end))
@@ -345,7 +345,7 @@ module Org::Eclipse::Swt::Widgets
           i = line_start
           while i < line_end - 1
             rects[((index += 1) - 1)] = @layout.get_line_bounds(i)
-            ((i += 1) - 1)
+            i += 1
           end
         end
       end
@@ -459,9 +459,9 @@ module Org::Eclipse::Swt::Widgets
             set_cursor(self.attr_display.get_system_cursor(SWT::CURSOR_HAND))
             return result
           end
-          ((i += 1) - 1)
+          i += 1
         end
-        ((j += 1) - 1)
+        j += 1
       end
       set_cursor(nil)
       return result
@@ -495,12 +495,12 @@ module Org::Eclipse::Swt::Widgets
         next_ = ((modifiers[0] & OS.attr_shift_key)).equal?(0)
         if (next_)
           if (@focus_index < @offsets.attr_length - 1)
-            ((@focus_index += 1) - 1)
+            @focus_index += 1
             redraw
           end
         else
           if (@focus_index > 0)
-            ((@focus_index -= 1) + 1)
+            @focus_index -= 1
             redraw
           end
         end
@@ -580,11 +580,11 @@ module Org::Eclipse::Swt::Widgets
         when 0
           if ((c).equal?(Character.new(?<.ord)))
             tag_start = index
-            ((state += 1) - 1)
+            state += 1
           end
         when 1
           if ((c).equal?(Character.new(?a.ord)))
-            ((state += 1) - 1)
+            state += 1
           end
         when 2
           case (c)
@@ -592,7 +592,7 @@ module Org::Eclipse::Swt::Widgets
             state = 7
           when Character.new(?>.ord)
             link_start = index + 1
-            ((state += 1) - 1)
+            state += 1
           else
             if (Character.is_whitespace(c))
             else
@@ -602,7 +602,7 @@ module Org::Eclipse::Swt::Widgets
         when 3
           if ((c).equal?(Character.new(?<.ord)))
             endtag_start = index
-            ((state += 1) - 1)
+            state += 1
           end
         when 4
           state = (c).equal?(Character.new(?/.ord)) ? state + 1 : 3
@@ -617,7 +617,7 @@ module Org::Eclipse::Swt::Widgets
             if ((@ids[link_index]).nil?)
               @ids[link_index] = String.new(buffer, link_start, endtag_start - link_start)
             end
-            ((link_index += 1) - 1)
+            link_index += 1
             start = tag_start = link_start = endtag_start = ref_start = index + 1
             state = 0
           else
@@ -633,7 +633,7 @@ module Org::Eclipse::Swt::Widgets
           state = (c).equal?(Character.new(?=.ord)) ? state + 1 : 0
         when 11
           if ((c).equal?(Character.new(?".ord)))
-            ((state += 1) - 1)
+            state += 1
             ref_start = index + 1
           else
             state = 0
@@ -648,7 +648,7 @@ module Org::Eclipse::Swt::Widgets
             state = 0
           else
             if ((c).equal?(Character.new(?=.ord)))
-              ((state += 1) - 1)
+              state += 1
             end
           end
         when 14
@@ -660,7 +660,7 @@ module Org::Eclipse::Swt::Widgets
         else
           state = 0
         end
-        ((index += 1) - 1)
+        index += 1
       end
       if (start < length_)
         tmp = parse_mnemonics(buffer, start, tag_start, result)
@@ -694,14 +694,14 @@ module Org::Eclipse::Swt::Widgets
         if ((buffer[index]).equal?(Character.new(?&.ord)))
           if (index + 1 < end_ && (buffer[index + 1]).equal?(Character.new(?&.ord)))
             result.append(buffer[index])
-            ((index += 1) - 1)
+            index += 1
           else
             mnemonic = result.length
           end
         else
           result.append(buffer[index])
         end
-        ((index += 1) - 1)
+        index += 1
       end
       return mnemonic
     end
@@ -739,9 +739,9 @@ module Org::Eclipse::Swt::Widgets
                   set_focus
                   return result
                 end
-                ((i += 1) - 1)
+                i += 1
               end
-              ((j += 1) - 1)
+              j += 1
             end
           end
         when SWT::MouseMove
@@ -774,7 +774,7 @@ module Org::Eclipse::Swt::Widgets
                 notify_listeners(SWT::Selection, event)
                 return result
               end
-              ((i += 1) - 1)
+              i += 1
             end
           end
         end
@@ -838,7 +838,7 @@ module Org::Eclipse::Swt::Widgets
       while i < @offsets.attr_length
         point = @offsets[i]
         @layout.set_style(link_style, point.attr_x, point.attr_y)
-        ((i += 1) - 1)
+        i += 1
       end
       # This code is intentionally commented. Mnemonics are
       # not drawn on the Macintosh.

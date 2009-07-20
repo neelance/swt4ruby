@@ -353,7 +353,7 @@ module Org::Eclipse::Swt::Dnd
                   self.attr_selected_data_type = event.attr_data_type
                   break
                 end
-                ((i += 1) - 1)
+                i += 1
               end
             end
             if (!(self.attr_selected_data_type).nil? && !((event.attr_detail & allowed_operations)).equal?(0))
@@ -532,7 +532,7 @@ module Org::Eclipse::Swt::Dnd
             @selected_data_type = allowed_data_types[i]
             break
           end
-          ((i += 1) - 1)
+          i += 1
         end
       end
       if (!(@selected_data_type).nil? && !((event.attr_detail & allowed_operations)).equal?(0))
@@ -561,7 +561,7 @@ module Org::Eclipse::Swt::Dnd
           new_data[data.attr_length] = buffer
           data = new_data
         end
-        ((i += 1) - 1)
+        i += 1
       end
       # Get Data in a Java format
       object = nil
@@ -573,7 +573,7 @@ module Org::Eclipse::Swt::Dnd
           object = transfer.native_to_java(@selected_data_type)
           break
         end
-        ((i_ += 1) - 1)
+        i_ += 1
       end
       if ((object).nil?)
         @selected_operation = DND::DROP_NONE
@@ -649,7 +649,7 @@ module Org::Eclipse::Swt::Dnd
             @selected_data_type = allowed_data_types[i]
             break
           end
-          ((i += 1) - 1)
+          i += 1
         end
       end
       if (!(@selected_data_type).nil? && !((allowed_operations & event.attr_detail)).equal?(0))
@@ -710,9 +710,9 @@ module Org::Eclipse::Swt::Dnd
         listener = listeners[i]
         if (listener.is_a?(DNDListener))
           drop_listeners[count] = (listener).get_event_listener
-          ((count += 1) - 1)
+          count += 1
         end
-        ((i += 1) - 1)
+        i += 1
       end
       if ((count).equal?(length))
         return drop_listeners
@@ -897,7 +897,7 @@ module Org::Eclipse::Swt::Dnd
                 unique = false
                 break
               end
-              ((k += 1) - 1)
+              k += 1
             end
             if (unique)
               if ((index).equal?(flavors.attr_length - 1))
@@ -908,9 +908,9 @@ module Org::Eclipse::Swt::Dnd
               flavors[(index += 1)] = the_type[0]
             end
           end
-          ((j += 1) - 1)
+          j += 1
         end
-        ((i += 1) - 1)
+        i += 1
       end
       if ((index).equal?(-1))
         return false
@@ -929,10 +929,10 @@ module Org::Eclipse::Swt::Dnd
               data_types[(index += 1)] = data
               break
             end
-            ((j += 1) - 1)
+            j += 1
           end
         end
-        ((i_ += 1) - 1)
+        i_ += 1
       end
       if ((index).equal?(-1))
         return false

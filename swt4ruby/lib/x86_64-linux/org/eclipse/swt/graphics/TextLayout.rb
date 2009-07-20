@@ -266,7 +266,7 @@ module Org::Eclipse::Swt::Graphics
           chars[pos + line_index * 2 + 1] = ZWNBS
           segments_text.get_chars(old_pos, pos, chars, old_pos + line_index * 2)
           old_pos = pos
-          ((line_index += 1) - 1)
+          line_index += 1
         end
         segments_text.get_chars(old_pos, segements_length, chars, old_pos + line_index * 2)
         buffer = Converter.wcs_to_mbcs(nil, chars, false)
@@ -281,9 +281,9 @@ module Org::Eclipse::Swt::Graphics
       while i < chars.attr_length
         c = chars[i]
         if ((c).equal?(LTR_MARK) || (c).equal?(RTL_MARK) || (c).equal?(ZWNBS) || (c).equal?(ZWS))
-          ((offset_count += 1) - 1)
+          offset_count += 1
         end
-        ((i += 1) - 1)
+        i += 1
       end
       @invalid_offsets = Array.typed(::Java::Int).new(offset_count) { 0 }
       offset_count = 0
@@ -293,7 +293,7 @@ module Org::Eclipse::Swt::Graphics
         if ((c).equal?(LTR_MARK) || (c).equal?(RTL_MARK) || (c).equal?(ZWNBS) || (c).equal?(ZWS))
           @invalid_offsets[((offset_count += 1) - 1)] = i_
         end
-        ((i_ += 1) - 1)
+        i_ += 1
       end
       strlen_ = OS.strlen(ptr)
       default_font = !(@font).nil? ? @font : self.attr_device.attr_system_font
@@ -302,7 +302,7 @@ module Org::Eclipse::Swt::Graphics
         style_item = @styles[i__]
         style = style_item.attr_style
         if ((style).nil?)
-          ((i__ += 1) - 1)
+          i__ += 1
           next
         end
         start = translate_offset(style_item.attr_start)
@@ -400,7 +400,7 @@ module Org::Eclipse::Swt::Graphics
           OS.memmove(attr, attribute, PangoAttribute.attr_sizeof)
           OS.pango_attr_list_insert(@attr_list, attr)
         end
-        ((i__ += 1) - 1)
+        i__ += 1
       end
       OS.pango_layout_set_attributes(@layout, @attr_list)
     end
@@ -425,7 +425,7 @@ module Org::Eclipse::Swt::Graphics
         coordinates[index + 1] = bottom
         coordinates[index + 2] = coordinates[index] + width / 2
         coordinates[index + 3] = top
-        ((i += 1) - 1)
+        i += 1
       end
       coordinates[length_ - 2] = left + (width * peaks)
       coordinates[length_ - 1] = bottom
@@ -602,7 +602,7 @@ module Org::Eclipse::Swt::Graphics
               OS.gdk_draw_rectangle(data.attr_drawable, gc.attr_handle, 1, line_x, line_y, width, height)
             end
           end
-          ((line_index += 1) - 1)
+          line_index += 1
         end while (line_index < line_count)
         OS.pango_layout_iter_free(iter)
         if (!(attrs[0]).equal?(0))
@@ -751,7 +751,7 @@ module Org::Eclipse::Swt::Graphics
       while i < @styles.attr_length - 1
         style = @styles[i].attr_style
         if ((style).nil?)
-          ((i += 1) - 1)
+          i += 1
           next
         end
         draw_border_ = !(style.attr_border_style).equal?(SWT::NONE)
@@ -760,7 +760,7 @@ module Org::Eclipse::Swt::Graphics
           j = i
           while j > 0 && style.is_adherent_border(@styles[j - 1].attr_style)
             start = @styles[j - 1].attr_start
-            ((j -= 1) + 1)
+            j -= 1
           end
           start = translate_offset(start)
           end_ = translate_offset(@styles[i + 1].attr_start - 1)
@@ -808,7 +808,7 @@ module Org::Eclipse::Swt::Graphics
                 j_ = 0
                 while j_ < cairo_dashes.attr_length
                   cairo_dashes[j_] = (width_).equal?(0) || (data.attr_line_style).equal?(SWT::LINE_CUSTOM) ? dashes[j_] : dashes[j_] * width_
-                  ((j_ += 1) - 1)
+                  j_ += 1
                 end
                 Cairo.cairo_set_dash(cairo, cairo_dashes, cairo_dashes.attr_length, 0)
               else
@@ -818,7 +818,7 @@ module Org::Eclipse::Swt::Graphics
               while j_ < n_rects[0]
                 OS.memmove(rect, rects[0] + (j_ * GdkRectangle.attr_sizeof), GdkRectangle.attr_sizeof)
                 Cairo.cairo_rectangle(cairo, rect.attr_x + 0.5, rect.attr_y + 0.5, rect.attr_width - 1, rect.attr_height - 1)
-                ((j_ += 1) - 1)
+                j_ += 1
               end
               Cairo.cairo_stroke(cairo)
             else
@@ -835,7 +835,7 @@ module Org::Eclipse::Swt::Graphics
                 j_ = 0
                 while j_ < dash_list.attr_length
                   dash_list[j_] = ((width_).equal?(0) || (data.attr_line_style).equal?(SWT::LINE_CUSTOM) ? dashes[j_] : dashes[j_] * width_)
-                  ((j_ += 1) - 1)
+                  j_ += 1
                 end
                 OS.gdk_gc_set_dashes(gdk_gc, 0, dash_list, dash_list.attr_length)
                 line_style = OS::GDK_LINE_ON_OFF_DASH
@@ -847,7 +847,7 @@ module Org::Eclipse::Swt::Graphics
               while j_ < n_rects[0]
                 OS.memmove(rect, rects[0] + (j_ * GdkRectangle.attr_sizeof), GdkRectangle.attr_sizeof)
                 OS.gdk_draw_rectangle(data.attr_drawable, gdk_gc, 0, rect.attr_x, rect.attr_y, rect.attr_width - 1, rect.attr_height - 1)
-                ((j_ += 1) - 1)
+                j_ += 1
               end
             end
             if (!(rects[0]).equal?(0))
@@ -868,7 +868,7 @@ module Org::Eclipse::Swt::Graphics
           j = i
           while j > 0 && style.is_adherent_underline(@styles[j - 1].attr_style)
             start = @styles[j - 1].attr_start
-            ((j -= 1) + 1)
+            j -= 1
           end
           start = translate_offset(start)
           end_ = translate_offset(@styles[i + 1].attr_start - 1)
@@ -980,7 +980,7 @@ module Org::Eclipse::Swt::Graphics
                   OS.gdk_draw_rectangle(data.attr_drawable, gdk_gc, 1, rect.attr_x, underline_y, rect.attr_width, underline_thickness)
                 end
               end
-              ((j_ += 1) - 1)
+              j_ += 1
             end
             if (!(rects[0]).equal?(0))
               OS.g_free(rects[0])
@@ -997,7 +997,7 @@ module Org::Eclipse::Swt::Graphics
           j = i
           while j > 0 && style.is_adherent_strikeout(@styles[j - 1].attr_style)
             start = @styles[j - 1].attr_start
-            ((j -= 1) + 1)
+            j -= 1
           end
           start = translate_offset(start)
           end_ = translate_offset(@styles[i + 1].attr_start - 1)
@@ -1071,7 +1071,7 @@ module Org::Eclipse::Swt::Graphics
               else
                 OS.gdk_draw_rectangle(data.attr_drawable, gdk_gc, 1, rect.attr_x, strikeout_y, rect.attr_width, strikeout_thickness)
               end
-              ((j_ += 1) - 1)
+              j_ += 1
             end
             if (!(rects[0]).equal?(0))
               OS.g_free(rects[0])
@@ -1079,7 +1079,7 @@ module Org::Eclipse::Swt::Graphics
             OS.gdk_region_destroy(rgn)
           end
         end
-        ((i += 1) - 1)
+        i += 1
       end
       if (!(gc_values).nil?)
         mask = OS::GDK_GC_FOREGROUND | OS::GDK_GC_LINE_WIDTH | OS::GDK_GC_LINE_STYLE | OS::GDK_GC_CAP_STYLE | OS::GDK_GC_JOIN_STYLE
@@ -1397,7 +1397,7 @@ module Org::Eclipse::Swt::Graphics
       i = 0
       while i < line_index
         OS.pango_layout_iter_next_line(iter)
-        ((i += 1) - 1)
+        i += 1
       end
       rect = PangoRectangle.new
       OS.pango_layout_iter_get_line_extents(iter, nil, rect)
@@ -1467,7 +1467,7 @@ module Org::Eclipse::Swt::Graphics
         if (OS.pango_layout_iter_get_index(iter) > byte_offset)
           break
         end
-        ((line += 1) - 1)
+        line += 1
       end
       OS.pango_layout_iter_free(iter)
       return line
@@ -1543,7 +1543,7 @@ module Org::Eclipse::Swt::Graphics
         # 64
         pos = RJava.cast_to_int(OS.g_utf8_pointer_to_offset(ptr, ptr + line.attr_start_index))
         offsets[i] = untranslate_offset(pos)
-        ((i += 1) - 1)
+        i += 1
       end
       offsets[line_count] = @text.length
       return offsets
@@ -1839,7 +1839,7 @@ module Org::Eclipse::Swt::Graphics
           result[((count += 1) - 1)] = @styles[i].attr_start
           result[((count += 1) - 1)] = @styles[i + 1].attr_start - 1
         end
-        ((i += 1) - 1)
+        i += 1
       end
       if (!(count).equal?(result.attr_length))
         new_result = Array.typed(::Java::Int).new(count) { 0 }
@@ -1937,7 +1937,7 @@ module Org::Eclipse::Swt::Graphics
         if (item.attr_start > offset)
           return @styles[i - 1].attr_style
         end
-        ((i += 1) - 1)
+        i += 1
       end
       return nil
     end
@@ -1963,7 +1963,7 @@ module Org::Eclipse::Swt::Graphics
         if (!(@styles[i].attr_style).nil?)
           result[((count += 1) - 1)] = @styles[i].attr_style
         end
-        ((i += 1) - 1)
+        i += 1
       end
       if (!(count).equal?(result.attr_length))
         new_result = Array.typed(TextStyle).new(count) { nil }
@@ -2276,7 +2276,7 @@ module Org::Eclipse::Swt::Graphics
             if (!(@segments[i]).equal?(segments[i]))
               break
             end
-            ((i += 1) - 1)
+            i += 1
           end
           if ((i).equal?(segments.attr_length))
             return
@@ -2316,10 +2316,10 @@ module Org::Eclipse::Swt::Graphics
       # 
       # NOTE that fix only LamAlef ligatures.
       if (start > 0 && is_alef(@text.char_at(start)) && is_lam(@text.char_at(start - 1)))
-        ((start -= 1) + 1)
+        start -= 1
       end
       if (end_ < length_ - 1 && is_lam(@text.char_at(end_)) && is_alef(@text.char_at(end_ + 1)))
-        ((end_ += 1) - 1)
+        end_ += 1
       end
       low = -1
       high = @styles.attr_length
@@ -2352,7 +2352,7 @@ module Org::Eclipse::Swt::Graphics
         if (@styles[modify_end + 1].attr_start > end_)
           break
         end
-        ((modify_end += 1) - 1)
+        modify_end += 1
       end
       if ((modify_start).equal?(modify_end))
         style_start = @styles[modify_start].attr_start
@@ -2378,10 +2378,10 @@ module Org::Eclipse::Swt::Graphics
         end
       end
       if ((start).equal?(@styles[modify_start].attr_start))
-        ((modify_start -= 1) + 1)
+        modify_start -= 1
       end
       if ((end_).equal?(@styles[modify_end + 1].attr_start - 1))
-        ((modify_end += 1) - 1)
+        modify_end += 1
       end
       new_length = @styles.attr_length + 1 - (modify_end - modify_start - 1)
       new_styles = Array.typed(StyleItem).new(new_length) { nil }
@@ -2418,7 +2418,7 @@ module Org::Eclipse::Swt::Graphics
             if (!(@tabs[i]).equal?(tabs[i]))
               break
             end
-            ((i += 1) - 1)
+            i += 1
           end
           if ((i).equal?(tabs.attr_length))
             return
@@ -2435,7 +2435,7 @@ module Org::Eclipse::Swt::Graphics
           i = 0
           while i < tabs.attr_length
             OS.pango_tab_array_set_tab(tab_array, i, OS::PANGO_TAB_LEFT, tabs[i])
-            ((i += 1) - 1)
+            i += 1
           end
           OS.pango_layout_set_tabs(@layout, tab_array)
           OS.pango_tab_array_free(tab_array)
@@ -2547,8 +2547,8 @@ module Org::Eclipse::Swt::Graphics
         if (offset < @invalid_offsets[i])
           break
         end
-        ((offset += 1) - 1)
-        ((i += 1) - 1)
+        offset += 1
+        i += 1
       end
       return offset
     end
@@ -2566,14 +2566,14 @@ module Org::Eclipse::Swt::Graphics
       i = 0
       while i < @invalid_offsets.attr_length
         if ((offset).equal?(@invalid_offsets[i]))
-          ((offset += 1) - 1)
-          ((i += 1) - 1)
+          offset += 1
+          i += 1
           next
         end
         if (offset < @invalid_offsets[i])
           return offset - i
         end
-        ((i += 1) - 1)
+        i += 1
       end
       return offset - @invalid_offsets.attr_length
     end

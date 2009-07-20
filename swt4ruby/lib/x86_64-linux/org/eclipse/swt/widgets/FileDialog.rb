@@ -201,7 +201,7 @@ module Org::Eclipse::Swt::Widgets
             end
           end
           current = OS.g_slist_next(current)
-          ((i += 1) - 1)
+          i += 1
         end
         if (!(write_pos).equal?(0) && !(write_pos).equal?(list_length))
           valid_file_names = Array.typed(String).new(write_pos) { nil }
@@ -261,7 +261,7 @@ module Org::Eclipse::Swt::Widgets
                 break
               end
             end
-            ((i += 1) - 1)
+            i += 1
           end
         end
       end
@@ -315,7 +315,7 @@ module Org::Eclipse::Swt::Widgets
         i = 0
         while i < list_length
           OS.gtk_tree_path_free(OS.g_list_nth_data(selected_list, i))
-          ((i += 1) - 1)
+          i += 1
         end
         OS.g_list_free(selected_list)
         if ((ptr[0]).equal?(0))
@@ -366,7 +366,7 @@ module Org::Eclipse::Swt::Widgets
         OS.memmove(name_ptr, names_ptr1, OS::PTR_SIZEOF)
         length_ = 0
         while (!(name_ptr[0]).equal?(0))
-          ((length_ += 1) - 1)
+          length_ += 1
           names_ptr1 += OS::PTR_SIZEOF
           OS.memmove(name_ptr, names_ptr1, OS::PTR_SIZEOF)
         end
@@ -387,7 +387,7 @@ module Org::Eclipse::Swt::Widgets
           @file_names[i] = name.substring(name.last_index_of(SEPARATOR) + 1)
           OS.g_free(utf16ptr)
           OS.g_free(utf8ptr)
-          ((i += 1) - 1)
+          i += 1
         end
         OS.g_strfreev(names_ptr)
       end
@@ -696,7 +696,7 @@ module Org::Eclipse::Swt::Widgets
             initial_filter = filter
           end
         end
-        ((i += 1) - 1)
+        i += 1
       end
       if (!(initial_filter).equal?(0))
         OS.gtk_file_chooser_set_filter(@handle, initial_filter)

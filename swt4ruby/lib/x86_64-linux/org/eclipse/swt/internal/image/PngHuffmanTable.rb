@@ -57,7 +57,7 @@ module Org::Eclipse::Swt::Internal::Image
       i = 0
       while i < @code_values.attr_length
         @code_values[i] = i
-        ((i += 1) - 1)
+        i += 1
       end
       # minCodesByLength[n] : The smallest Huffman code of length n + 1.
       # maxCodesByLength[n] : The largest Huffman code of length n + 1.
@@ -70,7 +70,7 @@ module Org::Eclipse::Swt::Internal::Image
         @code_length_info[i_].attr_base_index = 0
         @code_length_info[i_].attr_min = BAD_CODE
         @code_length_info[i_].attr_max = -1
-        ((i_ += 1) - 1)
+        i_ += 1
       end
     end
     
@@ -93,9 +93,9 @@ module Org::Eclipse::Swt::Internal::Image
           end
           lengths[j] = v
           @code_values[j] = code_values_temp
-          ((i += 1) - 1)
+          i += 1
         end
-        ((k += 1) - 1)
+        k += 1
       end
       # These values in these arrays correspond to the elements of the
       # "values" array. The Huffman code for codeValues[N] is codes[N]
@@ -106,14 +106,14 @@ module Org::Eclipse::Swt::Internal::Image
       i = 0
       while i < lengths.attr_length
         while (!(last_length).equal?(lengths[i]))
-          ((last_length += 1) - 1)
+          last_length += 1
           code <<= 1
         end
         if (!(last_length).equal?(0))
           codes[i] = code
-          ((code += 1) - 1)
+          code += 1
         end
-        ((i += 1) - 1)
+        i += 1
       end
       last = 0
       i_ = 0
@@ -126,7 +126,7 @@ module Org::Eclipse::Swt::Internal::Image
         if (!(last).equal?(0))
           @code_length_info[last - 1].attr_max = codes[i_]
         end
-        ((i_ += 1) - 1)
+        i_ += 1
       end
     end
     
@@ -138,7 +138,7 @@ module Org::Eclipse::Swt::Internal::Image
       # a prefix to the longer codeValues.
       while (codelength < MAX_CODE_LENGTH && code > @code_length_info[codelength].attr_max)
         code = ((code << 1) | stream.get_next_idat_bit)
-        ((codelength += 1) - 1)
+        codelength += 1
       end
       if (codelength >= MAX_CODE_LENGTH)
         stream.error

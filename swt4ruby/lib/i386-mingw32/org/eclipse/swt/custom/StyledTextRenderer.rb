@@ -426,13 +426,13 @@ module Org::Eclipse::Swt::Custom
           else
             @styles[((j += 1) - 1)] = new_style
           end
-          ((i += 1) - 1)
+          i += 1
         end
         style = @styles[j - 1]
         if (!(end_style).nil? && (style.attr_start + style.attr_length).equal?(end_style.attr_start) && end_style.similar_to(style))
           style.attr_length += end_style.attr_length
-          ((modify_end += 1) - 1)
-          ((merge_count += 1) - 1)
+          modify_end += 1
+          merge_count += 1
         end
         if (@style_count > modify_end)
           System.arraycopy(@styles, modify_start + merge_count, @styles, j, @style_count - modify_end)
@@ -465,7 +465,7 @@ module Org::Eclipse::Swt::Custom
           @max_width = @line_width[i]
           @max_width_line_index = i
         end
-        ((i += 1) - 1)
+        i += 1
       end
     end
     
@@ -506,7 +506,7 @@ module Org::Eclipse::Swt::Custom
                 break
               end
             end
-            ((i += 1) - 1)
+            i += 1
           end
           if (i < self.attr_line_count)
             display = self.attr_styled_text.get_display
@@ -549,7 +549,7 @@ module Org::Eclipse::Swt::Custom
             @lines[i] = nil
           end
         end
-        ((i += 1) - 1)
+        i += 1
       end
     end
     
@@ -567,7 +567,7 @@ module Org::Eclipse::Swt::Custom
             @lines[i] = nil
           end
         end
-        ((i += 1) - 1)
+        i += 1
       end
     end
     
@@ -582,7 +582,7 @@ module Org::Eclipse::Swt::Custom
         i = 0
         while i < new_styles.attr_length
           new_styles[i] = @styles[i].clone
-          ((i += 1) - 1)
+          i += 1
         end
         renderer.attr_style_count = @style_count
       end
@@ -591,7 +591,7 @@ module Org::Eclipse::Swt::Custom
         i = 0
         while i < new_lines.attr_length
           new_lines[i] = LineInfo.new(@lines[i])
-          ((i += 1) - 1)
+          i += 1
         end
         renderer.attr_line_count = @line_count
       end
@@ -623,7 +623,7 @@ module Org::Eclipse::Swt::Custom
           if ((@layouts[i]).equal?(layout))
             return
           end
-          ((i += 1) - 1)
+          i += 1
         end
       end
       layout.dispose
@@ -640,7 +640,7 @@ module Org::Eclipse::Swt::Custom
       if (!((bullet.attr_type & ST::BULLET_DOT)).equal?(0) && StyledText::IS_MOTIF)
         size = Math.max(4, (line_ascent + line_descent) / 4)
         if (((size & 1)).equal?(0))
-          ((size += 1) - 1)
+          size += 1
         end
         if ((color).nil?)
           display = @styled_text.get_display
@@ -746,7 +746,7 @@ module Org::Eclipse::Swt::Custom
             if (!(bullet_index).equal?(-1))
               break
             end
-            ((i += 1) - 1)
+            i += 1
           end
         end
       end
@@ -778,7 +778,7 @@ module Org::Eclipse::Swt::Custom
           line_ascent = metrics.get_ascent + metrics.get_leading
           @styled_text.paint_object(gc, point.attr_x + paint_x, point.attr_y + paint_y, line_ascent, metrics.get_descent, style, nil, 0)
         end
-        ((i += 1) - 1)
+        i += 1
       end
       dispose_text_layout(layout)
       return height
@@ -818,7 +818,7 @@ module Org::Eclipse::Swt::Custom
       i = 0
       while i < font_datas.attr_length
         font_datas[i].set_style(style)
-        ((i += 1) - 1)
+        i += 1
       end
       return font_datas
     end
@@ -843,7 +843,7 @@ module Org::Eclipse::Swt::Custom
           end
         end
         total_height += height
-        ((i += 1) - 1)
+        i += 1
       end
       return total_height + @styled_text.attr_top_margin + @styled_text.attr_bottom_margin
     end
@@ -886,7 +886,7 @@ module Org::Eclipse::Swt::Custom
         if (!(bullet.index_of(index)).equal?(-1))
           return bullet
         end
-        ((i += 1) - 1)
+        i += 1
       end
       return default_bullet
     end
@@ -1001,7 +1001,7 @@ module Org::Eclipse::Swt::Custom
           style = @styles[i]
           new_ranges[j] = style.attr_start
           new_ranges[j + 1] = style.attr_length
-          ((i += 1) - 1)
+          i += 1
           j += 2
         end
       end
@@ -1038,7 +1038,7 @@ module Org::Eclipse::Swt::Custom
             new_styles[j].attr_start = @ranges[i]
             new_styles[j].attr_length = @ranges[i + 1]
             i += 2
-            ((j += 1) - 1)
+            j += 1
           end
         else
           System.arraycopy(@styles, range_start >> 1, new_styles, 0, new_styles.attr_length)
@@ -1116,7 +1116,7 @@ module Org::Eclipse::Swt::Custom
                   @layouts[i].dispose
                 end
               end
-              ((i += 1) - 1)
+              i += 1
             end
           end
           if (!(@bullets).nil? && !(@bullets_indices).nil? && !(top_index).equal?(@top_index))
@@ -1130,7 +1130,7 @@ module Org::Eclipse::Swt::Custom
               i = start_index
               while i < @bullets.attr_length
                 @bullets[i] = nil
-                ((i += 1) - 1)
+                i += 1
               end
             else
               if (-delta < @bullets.attr_length)
@@ -1141,7 +1141,7 @@ module Org::Eclipse::Swt::Custom
               i = 0
               while i < end_index
                 @bullets[i] = nil
-                ((i += 1) - 1)
+                i += 1
               end
             end
           end
@@ -1202,7 +1202,7 @@ module Org::Eclipse::Swt::Custom
                 @styled_text.redraw
                 break
               end
-              ((i += 1) - 1)
+              i += 1
             end
           end
         end
@@ -1244,7 +1244,7 @@ module Org::Eclipse::Swt::Custom
               bullet = @bullets[i]
               break
             end
-            ((i += 1) - 1)
+            i += 1
           end
         end
         ranges = @ranges
@@ -1319,7 +1319,7 @@ module Org::Eclipse::Swt::Custom
             end
             layout.set_style(get_style_range(styles[i]), start, end_)
             last_offset = Math.max(last_offset, end_)
-            ((i += 1) - 1)
+            i += 1
           end
         end
       end
@@ -1368,9 +1368,9 @@ module Org::Eclipse::Swt::Custom
                       end
                       layout.set_style(new_style, j, j)
                     end
-                    ((j += 1) - 1)
+                    j += 1
                   end
-                  ((i += 1) - 1)
+                  i += 1
                 end
               else
                 start = composition_offset - line_offset
@@ -1407,7 +1407,7 @@ module Org::Eclipse::Swt::Custom
             height = line_height
             index = i
           end
-          ((i += 1) - 1)
+          i += 1
         end
         if (!(index).equal?(-1))
           metrics = layout.get_line_metrics(index)
@@ -1420,7 +1420,7 @@ module Org::Eclipse::Swt::Custom
                 @layouts[i_].set_ascent(@ascent)
                 @layouts[i_].set_descent(@descent)
               end
-              ((i_ += 1) - 1)
+              i_ += 1
             end
           end
           if (!(@styled_text.attr_vertical_scroll_offset).equal?(0))
@@ -1459,7 +1459,7 @@ module Org::Eclipse::Swt::Custom
           if (!(layout).nil?)
             layout.dispose
           end
-          ((i += 1) - 1)
+          i += 1
         end
         @layouts = nil
       end
@@ -1486,7 +1486,7 @@ module Org::Eclipse::Swt::Custom
       while i < end_line
         @line_width[i] = -1
         @line_height[i] = -1
-        ((i += 1) - 1)
+        i += 1
       end
       if (start_line <= @max_width_line_index && @max_width_line_index < end_line)
         @max_width = 0
@@ -1498,7 +1498,7 @@ module Org::Eclipse::Swt::Custom
               @max_width = @line_width[i_]
               @max_width_line_index = i_
             end
-            ((i_ += 1) - 1)
+            i_ += 1
           end
         end
       end
@@ -1551,7 +1551,7 @@ module Org::Eclipse::Swt::Custom
       i = 0
       while i < tabs
         tab_buffer.append(Character.new(?\s.ord))
-        ((i += 1) - 1)
+        i += 1
       end
       layout.set_text(tab_buffer.to_s)
       @tab_width = layout.get_bounds.attr_width
@@ -1575,7 +1575,7 @@ module Org::Eclipse::Swt::Custom
         end
         @lines[i].attr_flags |= ALIGNMENT
         @lines[i].attr_alignment = alignment
-        ((i += 1) - 1)
+        i += 1
       end
     end
     
@@ -1591,7 +1591,7 @@ module Org::Eclipse::Swt::Custom
         end
         @lines[i].attr_flags |= BACKGROUND
         @lines[i].attr_background = background
-        ((i += 1) - 1)
+        i += 1
       end
     end
     
@@ -1613,7 +1613,7 @@ module Org::Eclipse::Swt::Custom
         if ((bullet).equal?(@bullets[index]))
           break
         end
-        ((index += 1) - 1)
+        index += 1
       end
       if (!(bullet).nil?)
         if ((index).equal?(@bullets.attr_length))
@@ -1642,7 +1642,7 @@ module Org::Eclipse::Swt::Custom
         end
         @lines[i].attr_flags |= INDENT
         @lines[i].attr_indent = indent
-        ((i += 1) - 1)
+        i += 1
       end
     end
     
@@ -1658,7 +1658,7 @@ module Org::Eclipse::Swt::Custom
         end
         @lines[i].attr_flags |= JUSTIFY
         @lines[i].attr_justify = justify
-        ((i += 1) - 1)
+        i += 1
       end
     end
     
@@ -1674,7 +1674,7 @@ module Org::Eclipse::Swt::Custom
         end
         @lines[i].attr_flags |= SEGMENTS
         @lines[i].attr_segments = segments
-        ((i += 1) - 1)
+        i += 1
       end
     end
     
@@ -1704,7 +1704,7 @@ module Org::Eclipse::Swt::Custom
             if (@styles_set[index].similar_to(new_style))
               break
             end
-            ((index += 1) - 1)
+            index += 1
           end
           if ((index).equal?(@styles_set_count))
             if ((@styles_set_count).equal?(@styles_set.attr_length))
@@ -1715,7 +1715,7 @@ module Org::Eclipse::Swt::Custom
             @styles_set[((@styles_set_count += 1) - 1)] = new_style
           end
           tmp_styles[i] = @styles_set[index]
-          ((i += 1) - 1)
+          i += 1
         end
         new_styles = tmp_styles
       end
@@ -1736,7 +1736,7 @@ module Org::Eclipse::Swt::Custom
         while i < @style_count
           @ranges[((j += 1) - 1)] = @styles[i].attr_start
           @ranges[((j += 1) - 1)] = @styles[i].attr_length
-          ((i += 1) - 1)
+          i += 1
         end
       end
       if ((new_ranges).nil? && !(@ranges).nil?)
@@ -1746,7 +1746,7 @@ module Org::Eclipse::Swt::Custom
         while i < new_styles.attr_length
           new_ranges[((j += 1) - 1)] = new_styles[i].attr_start
           new_ranges[((j += 1) - 1)] = new_styles[i].attr_length
-          ((i += 1) - 1)
+          i += 1
         end
       end
       if (!(@ranges).nil?)
@@ -1831,19 +1831,19 @@ module Org::Eclipse::Swt::Custom
           new_start = new_style.attr_start
           new_end = new_start + new_style.attr_length
           if ((new_start).equal?(new_end))
-            ((i += 1) - 1)
+            i += 1
             next
           end
           modify_last = 0
           merge_count = 0
           while (modify_end < @style_count)
             if (new_start >= @styles[modify_start].attr_start + @styles[modify_start].attr_length)
-              ((modify_start += 1) - 1)
+              modify_start += 1
             end
             if (@styles[modify_end].attr_start + @styles[modify_end].attr_length > new_end)
               break
             end
-            ((modify_end += 1) - 1)
+            modify_end += 1
           end
           style = @styles[modify_start]
           if (style.attr_start < new_start && new_start < style.attr_start + style.attr_length)
@@ -1862,7 +1862,7 @@ module Org::Eclipse::Swt::Custom
           end
           grow = add_merge(merge_styles, merge_count, modify_start, modify_end + modify_last)
           modify_start = modify_end += grow
-          ((i += 1) - 1)
+          i += 1
         end
       end
     end
@@ -1908,12 +1908,12 @@ module Org::Eclipse::Swt::Custom
         i = start_line
         while i < end_index
           @line_width[i] = @line_height[i] = -1
-          ((i += 1) - 1)
+          i += 1
         end
         i_ = @line_count + delta
         while i_ < @line_count
           @line_width[i_] = @line_height[i_] = -1
-          ((i_ += 1) - 1)
+          i_ += 1
         end
         if (!(@layouts).nil?)
           layout_start_line = start_line - @top_index
@@ -1929,7 +1929,7 @@ module Org::Eclipse::Swt::Custom
                 @bullets[i__] = nil
               end
             end
-            ((i__ += 1) - 1)
+            i__ += 1
           end
           if (delta > 0)
             i___ = @layouts.attr_length - 1
@@ -1954,7 +1954,7 @@ module Org::Eclipse::Swt::Custom
                   end
                 end
               end
-              ((i___ -= 1) + 1)
+              i___ -= 1
             end
           else
             if (delta < 0)
@@ -1980,7 +1980,7 @@ module Org::Eclipse::Swt::Custom
                     end
                   end
                 end
-                ((i___ += 1) - 1)
+                i___ += 1
               end
             end
           end
@@ -1988,7 +1988,7 @@ module Org::Eclipse::Swt::Custom
         if (!(replace_line_count).equal?(0) || !(new_line_count).equal?(0))
           start_line_offset = @content.get_offset_at_line(start_line)
           if (!(start_line_offset).equal?(start))
-            ((start_line += 1) - 1)
+            start_line += 1
           end
           update_bullets(start_line, replace_line_count, new_line_count, true)
           if (!(@lines).nil?)
@@ -1998,12 +1998,12 @@ module Org::Eclipse::Swt::Custom
             i__ = start_line
             while i__ < end_index
               @lines[i__] = nil
-              ((i__ += 1) - 1)
+              i__ += 1
             end
             i___ = @line_count + delta
             while i___ < @line_count
               @lines[i___] = nil
-              ((i___ += 1) - 1)
+              i___ += 1
             end
           end
         end
@@ -2017,7 +2017,7 @@ module Org::Eclipse::Swt::Custom
               @max_width = @line_width[i__]
               @max_width_line_index = i__
             end
-            ((i__ += 1) - 1)
+            i__ += 1
           end
         end
       end
@@ -2045,15 +2045,15 @@ module Org::Eclipse::Swt::Custom
             @redraw_lines = new_redraw_bullets
           end
         end
-        ((i += 1) - 1)
+        i += 1
       end
       removed = 0
       i_ = 0
       while i_ < @bullets.attr_length
         if ((@bullets[i_].size).equal?(0))
-          ((removed += 1) - 1)
+          removed += 1
         end
-        ((i_ += 1) - 1)
+        i_ += 1
       end
       if (removed > 0)
         if ((removed).equal?(@bullets.attr_length))
@@ -2067,7 +2067,7 @@ module Org::Eclipse::Swt::Custom
             if (bullet.size > 0)
               new_bullets_list[((j += 1) - 1)] = bullet
             end
-            ((i__ += 1) - 1)
+            i__ += 1
           end
           @bullets = new_bullets_list
         end
@@ -2108,7 +2108,7 @@ module Org::Eclipse::Swt::Custom
             @ranges[modify_start + 1] = start - @ranges[modify_start]
             @styles[(modify_start >> 1) + 1] = @styles[modify_start >> 1]
             range_count += 2
-            ((@style_count += 1) - 1)
+            @style_count += 1
             modify_end += 4
           end
           if (!(offset).equal?(0))
@@ -2149,7 +2149,7 @@ module Org::Eclipse::Swt::Custom
         if ((modify_start).equal?(modify_end) && @styles[modify_start].attr_start < start && end_ < @styles[modify_end].attr_start + @styles[modify_end].attr_length)
           if ((new_char_count).equal?(0))
             @styles[modify_start].attr_length -= replace_char_count
-            ((modify_end += 1) - 1)
+            modify_end += 1
           else
             if (@style_count + 1 > @styles.attr_length)
               new_styles = Array.typed(StyleRange).new(@styles.attr_length + GROW) { nil }
@@ -2161,20 +2161,20 @@ module Org::Eclipse::Swt::Custom
             @styles[modify_start + 1].attr_length = @styles[modify_start].attr_start + @styles[modify_start].attr_length - end_
             @styles[modify_start + 1].attr_start = start + new_char_count
             @styles[modify_start].attr_length = start - @styles[modify_start].attr_start
-            ((@style_count += 1) - 1)
+            @style_count += 1
             modify_end += 2
           end
           if (!(offset).equal?(0))
             i = modify_end
             while i < @style_count
               @styles[i].attr_start += offset
-              ((i += 1) - 1)
+              i += 1
             end
           end
         else
           if (@styles[modify_start].attr_start < start && start < @styles[modify_start].attr_start + @styles[modify_start].attr_length)
             @styles[modify_start].attr_length = start - @styles[modify_start].attr_start
-            ((modify_start += 1) - 1)
+            modify_start += 1
           end
           if (modify_end < @style_count && @styles[modify_end].attr_start < end_ && end_ < @styles[modify_end].attr_start + @styles[modify_end].attr_length)
             @styles[modify_end].attr_length = @styles[modify_end].attr_start + @styles[modify_end].attr_length - end_
@@ -2184,7 +2184,7 @@ module Org::Eclipse::Swt::Custom
             i = modify_end
             while i < @style_count
               @styles[i].attr_start += offset
-              ((i += 1) - 1)
+              i += 1
             end
           end
           System.arraycopy(@styles, modify_end, @styles, modify_start, @style_count - modify_end)

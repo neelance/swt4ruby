@@ -378,7 +378,7 @@ module Org::Eclipse::Swt::Widgets
         while i < rects.attr_length
           rectangle = rects[i]
           gc.draw_focus(rectangle.attr_x, rectangle.attr_y, rectangle.attr_width, rectangle.attr_height)
-          ((i += 1) - 1)
+          i += 1
         end
       end
       if (hooks(SWT::Paint) || filters(SWT::Paint))
@@ -401,7 +401,7 @@ module Org::Eclipse::Swt::Widgets
         item.attr_state_mask = OS::LIS_ENABLED
         item.attr_state = enabled ? OS::LIS_ENABLED : 0
         while (!(OS._send_message(self.attr_handle, OS::LM_SETITEM, 0, item)).equal?(0))
-          ((item.attr_i_link += 1) - 1)
+          item.attr_i_link += 1
         end
       else
         link_style = TextStyle.new(nil, enabled ? @link_color : @disabled_color, nil)
@@ -410,7 +410,7 @@ module Org::Eclipse::Swt::Widgets
         while i < @offsets.attr_length
           point = @offsets[i]
           @layout.set_style(link_style, point.attr_x, point.attr_y)
-          ((i += 1) - 1)
+          i += 1
         end
         redraw
       end
@@ -522,11 +522,11 @@ module Org::Eclipse::Swt::Widgets
       point = @offsets[link_index]
       line_start = 1
       while (point.attr_x > line_offsets[line_start])
-        ((line_start += 1) - 1)
+        line_start += 1
       end
       line_end = 1
       while (point.attr_y > line_offsets[line_end])
-        ((line_end += 1) - 1)
+        line_end += 1
       end
       index = 0
       if ((line_start).equal?(line_end))
@@ -538,7 +538,7 @@ module Org::Eclipse::Swt::Widgets
           i = line_start
           while i < line_end - 1
             rects[((index += 1) - 1)] = @layout.get_line_bounds(i)
-            ((i += 1) - 1)
+            i += 1
           end
         end
       end
@@ -588,11 +588,11 @@ module Org::Eclipse::Swt::Widgets
         when 0
           if ((c).equal?(Character.new(?<.ord)))
             tag_start = index
-            ((state += 1) - 1)
+            state += 1
           end
         when 1
           if ((c).equal?(Character.new(?a.ord)))
-            ((state += 1) - 1)
+            state += 1
           end
         when 2
           case (c)
@@ -600,7 +600,7 @@ module Org::Eclipse::Swt::Widgets
             state = 7
           when Character.new(?>.ord)
             link_start = index + 1
-            ((state += 1) - 1)
+            state += 1
           else
             if (Character.is_whitespace(c))
             else
@@ -610,7 +610,7 @@ module Org::Eclipse::Swt::Widgets
         when 3
           if ((c).equal?(Character.new(?<.ord)))
             endtag_start = index
-            ((state += 1) - 1)
+            state += 1
           end
         when 4
           state = (c).equal?(Character.new(?/.ord)) ? state + 1 : 3
@@ -625,7 +625,7 @@ module Org::Eclipse::Swt::Widgets
             if ((@ids[link_index]).nil?)
               @ids[link_index] = String.new(buffer, link_start, endtag_start - link_start)
             end
-            ((link_index += 1) - 1)
+            link_index += 1
             start = tag_start = link_start = endtag_start = ref_start = index + 1
             state = 0
           else
@@ -641,7 +641,7 @@ module Org::Eclipse::Swt::Widgets
           state = (c).equal?(Character.new(?=.ord)) ? state + 1 : 0
         when 11
           if ((c).equal?(Character.new(?".ord)))
-            ((state += 1) - 1)
+            state += 1
             ref_start = index + 1
           else
             state = 0
@@ -656,7 +656,7 @@ module Org::Eclipse::Swt::Widgets
             state = 0
           else
             if ((c).equal?(Character.new(?=.ord)))
-              ((state += 1) - 1)
+              state += 1
             end
           end
         when 14
@@ -668,7 +668,7 @@ module Org::Eclipse::Swt::Widgets
         else
           state = 0
         end
-        ((index += 1) - 1)
+        index += 1
       end
       if (start < length_)
         tmp = parse_mnemonics(buffer, start, tag_start, result)
@@ -702,14 +702,14 @@ module Org::Eclipse::Swt::Widgets
         if ((buffer[index]).equal?(Character.new(?&.ord)))
           if (index + 1 < end_ && (buffer[index + 1]).equal?(Character.new(?&.ord)))
             result.append(buffer[index])
-            ((index += 1) - 1)
+            index += 1
           else
             mnemonic = result.length
           end
         else
           result.append(buffer[index])
         end
-        ((index += 1) - 1)
+        index += 1
       end
       return mnemonic
     end
@@ -822,7 +822,7 @@ module Org::Eclipse::Swt::Widgets
         while i < @offsets.attr_length
           point = @offsets[i]
           @layout.set_style(link_style, point.attr_x, point.attr_y)
-          ((i += 1) - 1)
+          i += 1
         end
         mnemonic_style = TextStyle.new(nil, nil, nil)
         mnemonic_style.attr_underline = true
@@ -832,7 +832,7 @@ module Org::Eclipse::Swt::Widgets
           if (!(mnemonic).equal?(-1))
             @layout.set_style(mnemonic_style, mnemonic, mnemonic)
           end
-          ((i_ += 1) - 1)
+          i_ += 1
         end
         redraw
       end
@@ -877,12 +877,12 @@ module Org::Eclipse::Swt::Widgets
           next_ = OS._get_key_state(OS::VK_SHIFT) >= 0
           if (next_)
             if (@focus_index < @offsets.attr_length - 1)
-              ((@focus_index += 1) - 1)
+              @focus_index += 1
               redraw
             end
           else
             if (@focus_index > 0)
-              ((@focus_index -= 1) + 1)
+              @focus_index -= 1
               redraw
             end
           end
@@ -925,7 +925,7 @@ module Org::Eclipse::Swt::Widgets
           if (!((item.attr_state & OS::LIS_FOCUSED)).equal?(0))
             index = item.attr_i_link
           end
-          ((item.attr_i_link += 1) - 1)
+          item.attr_i_link += 1
         end
         count = item.attr_i_link
         code = call_window_proc(self.attr_handle, OS::WM_GETDLGCODE, w_param, l_param)
@@ -1039,9 +1039,9 @@ module Org::Eclipse::Swt::Widgets
               @focus_index = @mouse_down_index = j
               return result
             end
-            ((i += 1) - 1)
+            i += 1
           end
-          ((j += 1) - 1)
+          j += 1
         end
       end
       return result
@@ -1071,7 +1071,7 @@ module Org::Eclipse::Swt::Widgets
             send_event(SWT::Selection, event)
             break
           end
-          ((i += 1) - 1)
+          i += 1
         end
       end
       @mouse_down_index = -1
@@ -1127,9 +1127,9 @@ module Org::Eclipse::Swt::Widgets
                 set_cursor(self.attr_display.get_system_cursor(SWT::CURSOR_HAND))
                 return result
               end
-              ((i += 1) - 1)
+              i += 1
             end
-            ((j += 1) - 1)
+            j += 1
           end
           set_cursor(nil)
         end

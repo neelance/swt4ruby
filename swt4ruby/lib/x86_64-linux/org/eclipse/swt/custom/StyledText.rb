@@ -754,7 +754,7 @@ module Org::Eclipse::Swt::Custom
                   @printer_renderer.set_style_ranges(event.attr_ranges, styles)
                 end
               end
-              ((i += 1) - 1)
+              i += 1
             end
           end
           screen_dpi = styled_text.get_display.get_dpi
@@ -779,7 +779,7 @@ module Org::Eclipse::Swt::Custom
             if (!(indent).equal?(0))
               @printer_renderer.set_line_indent(i, 1, indent * printer_dpi.attr_x / screen_dpi.attr_x)
             end
-            ((i += 1) - 1)
+            i += 1
           end
           styles = @printer_renderer.attr_styles
           i_ = 0
@@ -830,7 +830,7 @@ module Org::Eclipse::Swt::Custom
               metrics.attr_descent = metrics.attr_descent * printer_dpi.attr_y / screen_dpi.attr_y
               metrics.attr_width = metrics.attr_width * printer_dpi.attr_x / screen_dpi.attr_x
             end
-            ((i_ += 1) - 1)
+            i_ += 1
           end
           @line_spacing = styled_text.attr_line_spacing * printer_dpi.attr_y / screen_dpi.attr_y
           if (@print_options.attr_print_line_numbers)
@@ -855,7 +855,7 @@ module Org::Eclipse::Swt::Custom
             end
             printer_content.replace_text_range(insert_offset, 0, original.get_text_range(insert_offset, insert_end_offset - insert_offset))
             insert_offset = insert_end_offset
-            ((i += 1) - 1)
+            i += 1
           end
           return printer_content
         end
@@ -957,7 +957,7 @@ module Org::Eclipse::Swt::Custom
                   line_width = print_layout.get_bounds.attr_width
                   numbering_width = Math.max(numbering_width, line_width)
                 end
-                ((i += 1) - 1)
+                i += 1
               end
             else
               buffer = StringBuffer.new("0")
@@ -990,14 +990,14 @@ module Org::Eclipse::Swt::Custom
             else
               line_count = layout.get_line_count
               while (paragraph_bottom > page_bottom && line_count > 0)
-                ((line_count -= 1) + 1)
+                line_count -= 1
                 paragraph_bottom -= layout.get_line_bounds(line_count).attr_height + layout.get_spacing
               end
               if ((line_count).equal?(0))
                 # the whole paragraph goes to the next page
                 print_decoration(page, false, print_layout)
                 @printer.end_page
-                ((page += 1) - 1)
+                page += 1
                 if (page <= @end_page)
                   @printer.start_page
                   print_decoration(page, true, print_layout)
@@ -1013,7 +1013,7 @@ module Org::Eclipse::Swt::Custom
                 @gc.set_clipping(nil)
                 print_decoration(page, false, print_layout)
                 @printer.end_page
-                ((page += 1) - 1)
+                page += 1
                 if (page <= @end_page)
                   @printer.start_page
                   print_decoration(page, true, print_layout)
@@ -1027,7 +1027,7 @@ module Org::Eclipse::Swt::Custom
               end
             end
             @printer_renderer.dispose_text_layout(layout)
-            ((i += 1) - 1)
+            i += 1
           end
           if (page <= @end_page && paint_y > @client_area.attr_y)
             # close partial page
@@ -1063,7 +1063,7 @@ module Org::Eclipse::Swt::Custom
               print_decoration_segment(segment, i, page, header, layout)
               last_segment_index = segment_index + StyledTextPrintOptions::SEPARATOR.length
             end
-            ((i += 1) - 1)
+            i += 1
           end
         end
         
@@ -1339,7 +1339,7 @@ module Org::Eclipse::Swt::Custom
                 start = index + 1
               end
             end
-            ((index += 1) - 1)
+            index += 1
           end
           # write from the last escaped character to the end.
           # Fixes bug 21698.
@@ -1373,7 +1373,7 @@ module Org::Eclipse::Swt::Custom
             fd = (@font_table.element_at(i)).get_font_data[0]
             header.append(fd.get_name)
             header.append(";")
-            ((i += 1) - 1)
+            i += 1
           end
           header.append("}}\n{\\colortbl")
           i_ = 0
@@ -1386,7 +1386,7 @@ module Org::Eclipse::Swt::Custom
             header.append("\\blue")
             header.append(color.get_blue)
             header.append(";")
-            ((i_ += 1) - 1)
+            i_ += 1
           end
           # some RTF readers ignore the deff0 font tag. Explicitly
           # set the font for the whole document to work around this.
@@ -1520,7 +1520,7 @@ module Org::Eclipse::Swt::Custom
             end
             # skip over partial first line
             if (end_ < write_offset)
-              ((i += 1) - 1)
+              i += 1
               next
             end
             # style starts beyond line end or RTF write end
@@ -1587,7 +1587,7 @@ module Org::Eclipse::Swt::Custom
             end
             write("}")
             line_index = copy_end
-            ((i += 1) - 1)
+            i += 1
           end
           # write unstyled text at the end of the line
           if (line_index < line_end_offset)
@@ -2271,7 +2271,7 @@ module Org::Eclipse::Swt::Custom
             # client area or if space is available but not used (the latter should
             # never happen because we use claimBottomFreeSpace)
             if (full_line_visible_height < vertical_increment)
-              ((@top_index -= 1) + 1)
+              @top_index -= 1
             end
           else
             if (@top_index >= @content.get_line_count)
@@ -2306,7 +2306,7 @@ module Org::Eclipse::Swt::Custom
               break
             end
             delta += line_height
-            ((line_index -= 1) + 1)
+            line_index -= 1
           end
           if ((line_index).equal?(0) || -delta + @renderer.get_line_height(line_index) <= @client_area_height - @top_margin - @bottom_margin)
             @top_index = line_index
@@ -2420,7 +2420,7 @@ module Org::Eclipse::Swt::Custom
           if (is_fixed_line_height && height > max_height)
             break
           end
-          ((line_index += 1) - 1)
+          line_index += 1
         end
         if (is_fixed_line_height)
           height = line_count * @renderer.get_line_height
@@ -2999,7 +2999,7 @@ module Org::Eclipse::Swt::Custom
           # replace character at caret offset if the caret is not at the
           # end of the line
           if (event.attr_end < line_offset + line.length)
-            ((event.attr_end += 1) - 1)
+            event.attr_end += 1
           end
           event.attr_text = String.new(Array.typed(::Java::Char).new([key]))
         else
@@ -3146,14 +3146,14 @@ module Org::Eclipse::Swt::Custom
         layout_line_count = layout.get_line_count
         if ((line_index).equal?(layout_line_count - 1))
           last_line = (caret_line).equal?(line_count - 1)
-          ((caret_line += 1) - 1)
+          caret_line += 1
         else
           y = layout.get_line_bounds(line_index + 1).attr_y
         end
         @renderer.dispose_text_layout(layout)
       else
         last_line = (caret_line).equal?(line_count - 1)
-        ((caret_line += 1) - 1)
+        caret_line += 1
       end
       if (last_line)
         if (select)
@@ -3235,7 +3235,7 @@ module Org::Eclipse::Swt::Custom
         if ((line_index).equal?(0))
           first_line = (caret_line).equal?(0)
           if (!first_line)
-            ((caret_line -= 1) + 1)
+            caret_line -= 1
             y = @renderer.get_line_height(caret_line) - 1
           end
         else
@@ -3244,7 +3244,7 @@ module Org::Eclipse::Swt::Custom
         @renderer.dispose_text_layout(layout)
       else
         first_line = (caret_line).equal?(0)
-        ((caret_line -= 1) + 1)
+        caret_line -= 1
       end
       if (first_line)
         if (select)
@@ -3428,7 +3428,7 @@ module Org::Eclipse::Swt::Custom
                   height += bounds.attr_y
                   break
                 end
-                ((i += 1) - 1)
+                i += 1
               end
               @renderer.dispose_text_layout(layout)
             end
@@ -3446,7 +3446,7 @@ module Org::Eclipse::Swt::Custom
                 height = top_line_y + bounds.attr_y + bounds.attr_height
                 break
               end
-              ((i += 1) - 1)
+              i += 1
             end
             @renderer.dispose_text_layout(layout)
           else
@@ -3500,7 +3500,7 @@ module Org::Eclipse::Swt::Custom
             if (y >= bounds.attr_y + bounds.attr_height)
               break
             end
-            ((index -= 1) + 1)
+            index -= 1
           end
           if ((index).equal?(-1) && line_index > 0)
             bottom_offset = @content.get_offset_at_line(line_index - 1) + @content.get_line(line_index - 1).length
@@ -3542,7 +3542,7 @@ module Org::Eclipse::Swt::Custom
           if (y <= bounds.attr_y)
             break
           end
-          ((index += 1) - 1)
+          index += 1
         end
         if ((index).equal?(line_count))
           top_offset = @content.get_offset_at_line(line_index + 1)
@@ -3619,7 +3619,7 @@ module Org::Eclipse::Swt::Custom
                   height += line_height - (bounds.attr_y + bounds.attr_height)
                   break
                 end
-                ((i += 1) - 1)
+                i += 1
               end
               @renderer.dispose_text_layout(layout)
             end
@@ -3637,7 +3637,7 @@ module Org::Eclipse::Swt::Custom
                 height = @client_area_height - (top_line_y + bounds.attr_y)
                 break
               end
-              ((i += 1) - 1)
+              i += 1
             end
             @renderer.dispose_text_layout(layout)
           else
@@ -3744,7 +3744,7 @@ module Org::Eclipse::Swt::Custom
         show_caret
       else
         if (caret_line < @content.get_line_count - 1 && !is_single_line)
-          ((caret_line += 1) - 1)
+          caret_line += 1
           @caret_offset = @content.get_offset_at_line(caret_line)
           @caret_alignment = PREVIOUS_OFFSET_TRAILING
           show_caret
@@ -3765,7 +3765,7 @@ module Org::Eclipse::Swt::Custom
         show_caret
       else
         if (caret_line > 0)
-          ((caret_line -= 1) + 1)
+          caret_line -= 1
           line_offset = @content.get_offset_at_line(caret_line)
           @caret_offset = line_offset + @content.get_line(caret_line).length
           show_caret
@@ -3864,7 +3864,7 @@ module Org::Eclipse::Swt::Custom
       # word previous always comes from bottom line. when
       # wrapping lines, stay on bottom line when on line boundary
       if (@word_wrap && caret_line < @content.get_line_count - 1 && (@caret_offset).equal?(@content.get_offset_at_line(caret_line + 1)))
-        ((caret_line += 1) - 1)
+        caret_line += 1
       end
       show_caret
     end
@@ -4022,7 +4022,7 @@ module Org::Eclipse::Swt::Custom
           line_height = @renderer.get_line_height(bottom_index)
           if (line_pixel + line_height > client_area_height)
             if (get_line_pixel(bottom_index - 1) >= @top_margin)
-              ((bottom_index -= 1) + 1)
+              bottom_index -= 1
             end
           end
         end
@@ -4612,13 +4612,13 @@ module Org::Eclipse::Swt::Custom
         i = @top_index
         while i < line_index
           height += @renderer.get_line_height(i)
-          ((i += 1) - 1)
+          i += 1
         end
       else
         i = @top_index - 1
         while i >= line_index
           height -= @renderer.get_line_height(i)
-          ((i -= 1) + 1)
+          i -= 1
         end
       end
       return height + @top_margin
@@ -4779,7 +4779,7 @@ module Org::Eclipse::Swt::Custom
           level = 0
           offset = offset_in_line
           while (offset > 0 && Character.is_digit(line.char_at(offset)))
-            ((offset -= 1) + 1)
+            offset -= 1
           end
           if ((offset).equal?(0) && Character.is_digit(line.char_at(offset)))
             level = is_mirrored ? 1 : 0
@@ -4883,7 +4883,7 @@ module Org::Eclipse::Swt::Custom
         if (i < end_line)
           writer.write_line_delimiter(PlatformLineDelimiter)
         end
-        ((i += 1) - 1)
+        i += 1
       end
       if (end_ > end_line_offset + end_line_text.length)
         writer.write_line_delimiter(PlatformLineDelimiter)
@@ -5125,7 +5125,7 @@ module Org::Eclipse::Swt::Custom
           if (event.attr_segments[i] <= event.attr_segments[i - 1] || event.attr_segments[i] > line_length)
             SWT.error(SWT::ERROR_INVALID_ARGUMENT)
           end
-          ((i += 1) - 1)
+          i += 1
         end
         # ensure that last segment index is line end offset
         if (!(event.attr_segments[segment_count - 1]).equal?(line_length))
@@ -5160,7 +5160,7 @@ module Org::Eclipse::Swt::Custom
       k = 0
       count = 1
       while (k < styles.attr_length && (styles[k].attr_start).equal?(0) && (styles[k].attr_length).equal?(line_length))
-        ((k += 1) - 1)
+        k += 1
       end
       offsets = Array.typed(::Java::Int).new((styles.attr_length - k) * 2 + 2) { 0 }
       i = k
@@ -5175,17 +5175,17 @@ module Org::Eclipse::Swt::Custom
         else
           if (style_line_start > offsets[count - 1])
             offsets[count] = style_line_start
-            ((count += 1) - 1)
+            count += 1
           end
           offsets[count] = style_line_end
-          ((count += 1) - 1)
+          count += 1
         end
-        ((i += 1) - 1)
+        i += 1
       end
       # add offset for last non-colored segment in line, if any
       if (line_length > offsets[count - 1])
         offsets[count] = line_length
-        ((count += 1) - 1)
+        count += 1
       end
       if ((count).equal?(offsets.attr_length))
         return offsets
@@ -5482,7 +5482,7 @@ module Org::Eclipse::Swt::Custom
           height += @renderer.get_line_height
         end
         @renderer.dispose_text_layout(layout)
-        ((i += 1) - 1)
+        i += 1
       end
       rect = Rectangle.new(left, y, right - left, height)
       rect.attr_x += @left_margin - @horizontal_scroll_offset
@@ -5580,7 +5580,7 @@ module Org::Eclipse::Swt::Custom
         i = 0
         while i < @top_index
           height += @renderer.get_line_height(i)
-          ((i += 1) - 1)
+          i += 1
         end
         height -= @top_index_y
         @vertical_scroll_offset = height
@@ -5596,7 +5596,7 @@ module Org::Eclipse::Swt::Custom
         line_y = layout.get_line_bounds(line_index).attr_y
         caret_y = get_caret.get_location.attr_y - @top_margin - get_line_pixel(get_caret_line)
         if (line_y > caret_y)
-          ((line_index -= 1) + 1)
+          line_index -= 1
         end
       end
       return line_index
@@ -5623,13 +5623,13 @@ module Org::Eclipse::Swt::Custom
         return is_mirrored ? SWT::RIGHT : SWT::LEFT
       end
       if ((@caret_alignment).equal?(PREVIOUS_OFFSET_TRAILING) && offset > 0)
-        ((offset -= 1) + 1)
+        offset -= 1
       end
       if ((offset).equal?(line_length) && offset > 0)
-        ((offset -= 1) + 1)
+        offset -= 1
       end
       while (offset > 0 && Character.is_digit(line.char_at(offset)))
-        ((offset -= 1) + 1)
+        offset -= 1
       end
       if ((offset).equal?(0) && Character.is_digit(line.char_at(offset)))
         return is_mirrored ? SWT::RIGHT : SWT::LEFT
@@ -6339,7 +6339,7 @@ module Org::Eclipse::Swt::Custom
         i = start_line
         while y < end_y && i < line_count
           y += @renderer.draw_line(i, x, y, gc, background, foreground)
-          ((i += 1) - 1)
+          i += 1
         end
         if (y < end_y)
           gc.set_background(background)
@@ -6694,7 +6694,7 @@ module Org::Eclipse::Swt::Custom
             return siblings[i - 1]
           end
         end
-        ((i += 1) - 1)
+        i += 1
       end
       return nil
     end
@@ -6705,7 +6705,7 @@ module Org::Eclipse::Swt::Custom
       length_ = string.length
       begin
         while ((index < length_) && (!(string.char_at(index)).equal?(Character.new(?&.ord))))
-          ((index += 1) - 1)
+          index += 1
         end
         if ((index += 1) >= length_)
           return string
@@ -6713,7 +6713,7 @@ module Org::Eclipse::Swt::Custom
         if (!(string.char_at(index)).equal?(Character.new(?&.ord)))
           return string.substring(0, index - 1) + string.substring(index, length_)
         end
-        ((index += 1) - 1)
+        index += 1
       end while (index < length_)
       return string
     end
@@ -6730,7 +6730,7 @@ module Org::Eclipse::Swt::Custom
       length_ = string.length
       begin
         while (index < length_ && !(string.char_at(index)).equal?(Character.new(?&.ord)))
-          ((index += 1) - 1)
+          index += 1
         end
         if ((index += 1) >= length_)
           return Character.new(?\0.ord)
@@ -6738,7 +6738,7 @@ module Org::Eclipse::Swt::Custom
         if (!(string.char_at(index)).equal?(Character.new(?&.ord)))
           return Character.to_lower_case(string.char_at(index))
         end
-        ((index += 1) - 1)
+        index += 1
       end while (index < length_)
       return Character.new(?\0.ord)
     end
@@ -7182,7 +7182,7 @@ module Org::Eclipse::Swt::Custom
       while i < redraw_lines.attr_length
         line_index = redraw_lines[i]
         if (!(top_index <= line_index && line_index <= bottom_index))
-          ((i += 1) - 1)
+          i += 1
           next
         end
         width = -1
@@ -7198,7 +7198,7 @@ module Org::Eclipse::Swt::Custom
         height = @renderer.get_line_height(line_index)
         y = get_line_pixel(line_index)
         Canvas.instance_method(:redraw).bind(self).call(0, y, width, height, false)
-        ((i += 1) - 1)
+        i += 1
       end
     end
     
@@ -7604,7 +7604,7 @@ module Org::Eclipse::Swt::Custom
           child = children[i]
           rect = child.get_bounds
           child.set_location(rect.attr_x + delta_x, rect.attr_y + delta_y)
-          ((i += 1) - 1)
+          i += 1
         end
       end
     end
@@ -9109,7 +9109,7 @@ module Org::Eclipse::Swt::Custom
           end
           variable_height |= styles[i].is_variable_height
           last_offset = range_start + range_length
-          ((i += 1) - 1)
+          i += 1
         end
         if (variable_height)
           set_variable_line_height

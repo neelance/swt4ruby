@@ -1165,7 +1165,7 @@ module Org::Eclipse::Swt::Widgets
       i = 0
       while i < images.attr_length
         set_image(i, images[i])
-        ((i += 1) - 1)
+        i += 1
       end
     end
     
@@ -1272,7 +1272,7 @@ module Org::Eclipse::Swt::Widgets
         if (!(string).nil?)
           set_text(i, string)
         end
-        ((i += 1) - 1)
+        i += 1
       end
     end
     

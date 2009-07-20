@@ -141,14 +141,14 @@ module Org::Eclipse::Swt::Graphics
             values[index] = ptr1
             OS.memmove(values[index], buffer, sizes[index])
             ptr1 += sizes[index]
-            ((index += 1) - 1)
+            index += 1
             buffer[0] = OS._x2fix(font.attr_size)
             tags[index] = OS.attr_k_atsusize_tag
             sizes[index] = 4
             values[index] = ptr1
             OS.memmove(values[index], buffer, sizes[index])
             ptr1 += sizes[index]
-            ((index += 1) - 1)
+            index += 1
             if (synthesize)
               buffer1[0] = !((font.attr_style & OS.attr_italic)).equal?(0) ? 1 : 0
               tags[index] = OS.attr_k_atsuqditalic_tag
@@ -156,14 +156,14 @@ module Org::Eclipse::Swt::Graphics
               values[index] = ptr1
               OS.memmove(values[index], buffer1, sizes[index])
               ptr1 += sizes[index]
-              ((index += 1) - 1)
+              index += 1
               buffer1[0] = !((font.attr_style & OS.attr_bold)).equal?(0) ? 1 : 0
               tags[index] = OS.attr_k_atsuqdboldface_tag
               sizes[index] = 1
               values[index] = ptr1
               OS.memmove(values[index], buffer1, sizes[index])
               ptr1 += sizes[index]
-              ((index += 1) - 1)
+              index += 1
             end
           end
           underline_color = 0
@@ -175,7 +175,7 @@ module Org::Eclipse::Swt::Graphics
             values[index] = ptr1
             OS.memmove(values[index], buffer1, sizes[index])
             ptr1 += sizes[index]
-            ((index += 1) - 1)
+            index += 1
             if ((@style.attr_underline_style).equal?(SWT::UNDERLINE_DOUBLE))
               buffer2 = Array.typed(::Java::Short).new([OS.attr_k_atsustyle_double_line_count])
               tags[index] = OS.attr_k_atsustyle_underline_count_option_tag
@@ -183,7 +183,7 @@ module Org::Eclipse::Swt::Graphics
               values[index] = ptr1
               OS.memmove(values[index], buffer2, sizes[index])
               ptr1 += sizes[index]
-              ((index += 1) - 1)
+              index += 1
             end
             if (!(@style.attr_underline_color).nil?)
               buffer[0] = underline_color = OS._cgcolor_create(device.attr_colorspace, @style.attr_underline_color.attr_handle)
@@ -192,7 +192,7 @@ module Org::Eclipse::Swt::Graphics
               values[index] = ptr1
               OS.memmove(values[index], buffer, sizes[index])
               ptr1 += sizes[index]
-              ((index += 1) - 1)
+              index += 1
             end
           end
           if (!(@style).nil? && @style.attr_strikeout)
@@ -202,7 +202,7 @@ module Org::Eclipse::Swt::Graphics
             values[index] = ptr1
             OS.memmove(values[index], buffer1, sizes[index])
             ptr1 += sizes[index]
-            ((index += 1) - 1)
+            index += 1
             if (!(@style.attr_strikeout_color).nil?)
               buffer[0] = strikeout_color = OS._cgcolor_create(device.attr_colorspace, @style.attr_strikeout_color.attr_handle)
               tags[index] = OS.attr_k_atsustyle_strike_through_color_option_tag
@@ -210,7 +210,7 @@ module Org::Eclipse::Swt::Graphics
               values[index] = ptr1
               OS.memmove(values[index], buffer, sizes[index])
               ptr1 += sizes[index]
-              ((index += 1) - 1)
+              index += 1
             end
           end
           if (!(metrics).nil?)
@@ -220,28 +220,28 @@ module Org::Eclipse::Swt::Graphics
             values[index] = ptr1
             OS.memmove(values[index], buffer, sizes[index])
             ptr1 += sizes[index]
-            ((index += 1) - 1)
+            index += 1
             buffer[0] = OS._long2fix(metrics.attr_descent)
             tags[index] = OS.attr_k_atsudescent_tag
             sizes[index] = 4
             values[index] = ptr1
             OS.memmove(values[index], buffer, sizes[index])
             ptr1 += sizes[index]
-            ((index += 1) - 1)
+            index += 1
             buffer[0] = OS._long2fix(metrics.attr_width)
             tags[index] = OS.attr_k_atsuimpose_width_tag
             sizes[index] = 4
             values[index] = ptr1
             OS.memmove(values[index], buffer, sizes[index])
             ptr1 += sizes[index]
-            ((index += 1) - 1)
+            index += 1
             atsurgbalpha_color = Array.typed(::Java::Float).new([0, 0, 0, 0])
             tags[index] = OS.attr_k_atsurgbalpha_color_tag
             sizes[index] = 16
             values[index] = ptr1
             OS.memmove(values[index], atsurgbalpha_color, sizes[index])
             ptr1 += sizes[index]
-            ((index += 1) - 1)
+            index += 1
           end
           if (!(@style).nil? && !(@style.attr_rise).equal?(0))
             buffer[0] = OS._long2fix(@style.attr_rise)
@@ -250,7 +250,7 @@ module Org::Eclipse::Swt::Graphics
             values[index] = ptr1
             OS.memmove(values[index], buffer, sizes[index])
             ptr1 += sizes[index]
-            ((index += 1) - 1)
+            index += 1
           end
           if (!(foreground).nil? && (metrics).nil?)
             rgb = RGBColor.new
@@ -263,7 +263,7 @@ module Org::Eclipse::Swt::Graphics
             values[index] = ptr1
             OS.memmove(values[index], rgb, sizes[index])
             ptr1 += sizes[index]
-            ((index += 1) - 1)
+            index += 1
           end
           OS._atsuset_attributes(@atsu_style, tags.attr_length, tags, sizes, values)
           OS._dispose_ptr(ptr)
@@ -521,9 +521,9 @@ module Org::Eclipse::Swt::Graphics
       while i < chars.attr_length
         c = chars[i]
         if ((c).equal?(Character.new(?\n.ord)) || (c).equal?(Character.new(?\r.ord)))
-          ((break_count += 1) - 1)
+          break_count += 1
         end
-        ((i += 1) - 1)
+        i += 1
       end
       @hard_breaks = Array.typed(::Java::Int).new(break_count) { 0 }
       break_count = 0
@@ -534,13 +534,13 @@ module Org::Eclipse::Swt::Graphics
           chars[i_] = ZWS
           @hard_breaks[((break_count += 1) - 1)] = i_
         end
-        ((i_ += 1) - 1)
+        i_ += 1
       end
       if (!(@invalid_offsets).nil?)
         i__ = 0
         while i__ < @invalid_offsets.attr_length
-          ((@invalid_offsets[i__] += 1) - 1)
-          ((i__ += 1) - 1)
+          @invalid_offsets[i__] += 1
+          i__ += 1
         end
       else
         @invalid_offsets = Array.typed(::Java::Int).new(0) { 0 }
@@ -564,7 +564,7 @@ module Org::Eclipse::Swt::Graphics
         start = !(text_length).equal?(0) ? translate_offset(run.attr_start) : 0
         run_length = translate_offset(@styles[i__ + 1].attr_start) - start
         OS._atsuset_run_style(@layout, run.attr_atsu_style, start, run_length)
-        ((i__ += 1) - 1)
+        i__ += 1
       end
       ptr = OS._new_ptr(12)
       buffer = Array.typed(::Java::Int).new([OS._long2fix(@indent), 0, 0])
@@ -581,7 +581,7 @@ module Org::Eclipse::Swt::Graphics
       while i___ < @hard_breaks.attr_length - 1
         offset = @hard_breaks[i___]
         OS._atsuset_run_style(@layout, @indent_style, offset, 1)
-        ((i___ += 1) - 1)
+        i___ += 1
       end
       OS._atsuget_layout_control(@layout, OS.attr_k_atsuline_width_tag, 4, buffer, nil)
       wrap_width = buffer[0]
@@ -595,7 +595,7 @@ module Org::Eclipse::Swt::Graphics
         end
         OS._atsuset_soft_line_break(@layout, hard_break)
         start = hard_break
-        ((i____ += 1) - 1)
+        i____ += 1
       end
       OS._atsuget_soft_line_breaks(@layout, 0, OS.attr_k_atsuto_text_end, 0, nil, buffer)
       count = buffer[0]
@@ -648,7 +648,7 @@ module Org::Eclipse::Swt::Graphics
         end
         @line_height[i_____] = OS._fix2long(trapezoid.attr_lower_right_y) + @line_ascent[i_____] + @spacing
         start_ = line_break
-        ((i_____ += 1) - 1)
+        i_____ += 1
       end
     end
     
@@ -672,7 +672,7 @@ module Org::Eclipse::Swt::Graphics
         coordinates[index + 1] = bottom
         coordinates[index + 2] = coordinates[index] + width / 2
         coordinates[index + 3] = top
-        ((i += 1) - 1)
+        i += 1
       end
       coordinates[length_ - 2] = left + (width * peaks)
       coordinates[length_ - 1] = bottom
@@ -815,7 +815,7 @@ module Org::Eclipse::Swt::Graphics
         run = @styles[j]
         style = run.attr_style
         if ((style).nil? || (style.attr_background).nil?)
-          ((j += 1) - 1)
+          j += 1
           next
         end
         start = translate_offset(run.attr_start)
@@ -855,9 +855,9 @@ module Org::Eclipse::Swt::Graphics
           end
           line_y += @line_height[i]
           line_start = line_break
-          ((i += 1) - 1)
+          i += 1
         end
-        ((j += 1) - 1)
+        j += 1
       end
       selection_start = translate_offset(selection_start)
       selection_end = translate_offset(selection_end)
@@ -885,7 +885,7 @@ module Org::Eclipse::Swt::Graphics
                   hard_break = true
                   break
                 end
-                ((j_ += 1) - 1)
+                j_ += 1
               end
               if (hard_break)
                 if (selection_start <= end_ + 1 && end_ + 1 <= selection_end)
@@ -921,7 +921,7 @@ module Org::Eclipse::Swt::Graphics
         end
         draw_y += @line_height[i]
         start = line_break
-        ((i += 1) - 1)
+        i += 1
       end
       if (restore_color)
         set_layout_control(OS.attr_k_atsuline_highlight_cgcolor_tag, 0, 4)
@@ -932,7 +932,7 @@ module Org::Eclipse::Swt::Graphics
         run = @styles[j_]
         style = run.attr_style
         if ((style).nil?)
-          ((j_ += 1) - 1)
+          j_ += 1
           next
         end
         draw_underline = style.attr_underline && !(style.attr_underline_style).equal?(SWT::UNDERLINE_SINGLE) && !(style.attr_underline_style).equal?(SWT::UNDERLINE_DOUBLE)
@@ -940,7 +940,7 @@ module Org::Eclipse::Swt::Graphics
         draw_border = !(style.attr_border_style).equal?(SWT::NONE)
         draw_border = draw_border && ((j_ + 1).equal?(@styles.attr_length) || !style.is_adherent_border(@styles[j_ + 1].attr_style))
         if (!draw_underline && !draw_border)
-          ((j_ += 1) - 1)
+          j_ += 1
           next
         end
         end_ = j_ + 1 < @styles.attr_length ? translate_offset(@styles[j_ + 1].attr_start - 1) : length_
@@ -955,7 +955,7 @@ module Org::Eclipse::Swt::Graphics
             k = j_
             while k > 0 && style.is_adherent_underline(@styles[k - 1].attr_style)
               start_ = @styles[k - 1].attr_start
-              ((k -= 1) + 1)
+              k -= 1
             end
             start_ = translate_offset(start_)
             if (!(start_ > line_end || end_ < line_start))
@@ -1061,7 +1061,7 @@ module Org::Eclipse::Swt::Graphics
                     OS._cgcontext_move_to_point(gc.attr_handle, left, OS._fix2long(trapezoid.attr_upper_left_y))
                     OS._cgcontext_add_line_to_point(gc.attr_handle, right, OS._fix2long(trapezoid.attr_upper_right_y))
                   end
-                  ((k_ += 1) - 1)
+                  k_ += 1
                 end
                 OS.free(trapezoids_ptr)
                 OS._cgcontext_stroke_path(gc.attr_handle)
@@ -1074,7 +1074,7 @@ module Org::Eclipse::Swt::Graphics
             k = j_
             while k > 0 && style.is_adherent_border(@styles[k - 1].attr_style)
               start_ = @styles[k - 1].attr_start
-              ((k -= 1) + 1)
+              k -= 1
             end
             start_ = translate_offset(start_)
             if (!(start_ > line_end || end_ < line_start))
@@ -1098,7 +1098,7 @@ module Org::Eclipse::Swt::Graphics
                   OS._cgcontext_add_line_to_point(gc.attr_handle, OS._fix2long(trapezoid.attr_upper_right_x) - 1, upper_y)
                   OS._cgcontext_add_line_to_point(gc.attr_handle, OS._fix2long(trapezoid.attr_lower_right_x) - 1, lower_y)
                   OS._cgcontext_close_path(gc.attr_handle)
-                  ((k_ += 1) - 1)
+                  k_ += 1
                 end
                 OS.free(trapezoids_ptr)
                 width = 1
@@ -1137,9 +1137,9 @@ module Org::Eclipse::Swt::Graphics
           end
           line_y += @line_height[i_]
           line_start = line_break
-          ((i_ += 1) - 1)
+          i_ += 1
         end
-        ((j_ += 1) - 1)
+        j_ += 1
       end
       if (!(rgn).equal?(0))
         OS._dispose_rgn(rgn)
@@ -1155,7 +1155,7 @@ module Org::Eclipse::Swt::Graphics
       while i < @styles.attr_length
         run = @styles[i]
         run.free_style
-        ((i += 1) - 1)
+        i += 1
       end
       if (!(@indent_style).equal?(0))
         OS._atsudispose_style(@indent_style)
@@ -1240,7 +1240,7 @@ module Org::Eclipse::Swt::Graphics
         while i < @breaks.attr_length
           width = Math.max(width, @line_width[i])
           height += @line_height[i]
-          ((i += 1) - 1)
+          i += 1
         end
       end
       buffer = Array.typed(::Java::Int).new(1) { 0 }
@@ -1283,15 +1283,15 @@ module Org::Eclipse::Swt::Graphics
       while i < @hard_breaks.attr_length
         if ((start).equal?(@hard_breaks[i]))
           if (start > 0)
-            ((start -= 1) + 1)
+            start -= 1
           end
         end
         if ((end_).equal?(@hard_breaks[i]))
           if (end_ > 0)
-            ((end_ -= 1) + 1)
+            end_ -= 1
           end
         end
-        ((i += 1) - 1)
+        i += 1
       end
       rgn = OS._new_rgn
       rect = Rect.new
@@ -1317,7 +1317,7 @@ module Org::Eclipse::Swt::Graphics
         end
         line_y += @line_height[i_]
         line_start = line_break
-        ((i_ += 1) - 1)
+        i_ += 1
       end
       OS._dispose_rgn(rgn)
       return Rectangle.new(rect.attr_left, rect.attr_top, rect.attr_right - rect.attr_left, rect.attr_bottom - rect.attr_top)
@@ -1430,7 +1430,7 @@ module Org::Eclipse::Swt::Graphics
       i = 1
       while i < offsets.attr_length
         offsets[i] = untranslate_offset(@breaks[i - 1])
-        ((i += 1) - 1)
+        i += 1
       end
       return offsets
     end
@@ -1462,7 +1462,7 @@ module Org::Eclipse::Swt::Graphics
         if (line_break > offset)
           return i
         end
-        ((i += 1) - 1)
+        i += 1
       end
       return @breaks.attr_length - 1
     end
@@ -1490,7 +1490,7 @@ module Org::Eclipse::Swt::Graphics
       i = 0
       while i < line_index
         line_y += @line_height[i]
-        ((i += 1) - 1)
+        i += 1
       end
       line_x = @line_x[line_index]
       line_width = @line_width[line_index]
@@ -1584,11 +1584,11 @@ module Org::Eclipse::Swt::Graphics
         if ((offset).equal?(@hard_breaks[i]))
           trailing = true
           if (offset > 0)
-            ((offset -= 1) + 1)
+            offset -= 1
           end
           break
         end
-        ((i += 1) - 1)
+        i += 1
       end
       line_y = 0
       i_ = 0
@@ -1598,10 +1598,10 @@ module Org::Eclipse::Swt::Graphics
           break
         end
         line_y += @line_height[i_]
-        ((i_ += 1) - 1)
+        i_ += 1
       end
       if (trailing)
-        ((offset += 1) - 1)
+        offset += 1
       end
       caret = ATSUCaret.new
       OS._atsuoffset_to_position(@layout, offset, !trailing, caret, nil, nil)
@@ -1705,7 +1705,7 @@ module Org::Eclipse::Swt::Graphics
             invalid = true
             break
           end
-          ((i += 1) - 1)
+          i += 1
         end
       end while (invalid)
       return offset
@@ -1786,7 +1786,7 @@ module Org::Eclipse::Swt::Graphics
         end
         line_y += height
         start = line_break
-        ((line_index += 1) - 1)
+        line_index += 1
       end
       offset = Array.typed(::Java::Int).new([start])
       leading = Array.typed(::Java::Boolean).new(1) { false }
@@ -1795,15 +1795,15 @@ module Org::Eclipse::Swt::Graphics
         trailing[0] = (leading[0] ? 0 : 1)
       end
       if (!leading[0])
-        ((offset[0] -= 1) + 1)
+        offset[0] -= 1
       end
       i = 0
       while i < @hard_breaks.attr_length
         if ((offset[0]).equal?(@hard_breaks[i]))
-          ((offset[0] += 1) - 1)
+          offset[0] += 1
           break
         end
-        ((i += 1) - 1)
+        i += 1
       end
       offset[0] = untranslate_offset(offset[0])
       if (offset[0] > length_ - 1)
@@ -1875,7 +1875,7 @@ module Org::Eclipse::Swt::Graphics
           result[((count += 1) - 1)] = @styles[i].attr_start
           result[((count += 1) - 1)] = @styles[i + 1].attr_start - 1
         end
-        ((i += 1) - 1)
+        i += 1
       end
       if (!(count).equal?(result.attr_length))
         new_result = Array.typed(::Java::Int).new(count) { 0 }
@@ -1981,7 +1981,7 @@ module Org::Eclipse::Swt::Graphics
         if (item.attr_start > offset)
           return @styles[i - 1].attr_style
         end
-        ((i += 1) - 1)
+        i += 1
       end
       return nil
     end
@@ -2007,7 +2007,7 @@ module Org::Eclipse::Swt::Graphics
         if (!(@styles[i].attr_style).nil?)
           result[((count += 1) - 1)] = @styles[i].attr_style
         end
-        ((i += 1) - 1)
+        i += 1
       end
       if (!(count).equal?(result.attr_length))
         new_result = Array.typed(TextStyle).new(count) { nil }
@@ -2329,7 +2329,7 @@ module Org::Eclipse::Swt::Graphics
             if (!(@segments[i]).equal?(segments[i]))
               break
             end
-            ((i += 1) - 1)
+            i += 1
           end
           if ((i).equal?(segments.attr_length))
             return
@@ -2418,7 +2418,7 @@ module Org::Eclipse::Swt::Graphics
         if (@styles[modify_end + 1].attr_start > end_)
           break
         end
-        ((modify_end += 1) - 1)
+        modify_end += 1
       end
       if ((modify_start).equal?(modify_end))
         style_start = @styles[modify_start].attr_start
@@ -2444,10 +2444,10 @@ module Org::Eclipse::Swt::Graphics
         end
       end
       if ((start).equal?(@styles[modify_start].attr_start))
-        ((modify_start -= 1) + 1)
+        modify_start -= 1
       end
       if ((end_).equal?(@styles[modify_end + 1].attr_start - 1))
-        ((modify_end += 1) - 1)
+        modify_end += 1
       end
       new_length = @styles.attr_length + 1 - (modify_end - modify_start - 1)
       new_styles = Array.typed(StyleItem).new(new_length) { nil }
@@ -2484,7 +2484,7 @@ module Org::Eclipse::Swt::Graphics
             if (!(@tabs[i]).equal?(tabs[i]))
               break
             end
-            ((i += 1) - 1)
+            i += 1
           end
           if ((i).equal?(tabs.attr_length))
             return
@@ -2512,7 +2512,7 @@ module Org::Eclipse::Swt::Graphics
           tab.attr_tab_type = RJava.cast_to_short(OS.attr_k_atsuleft_tab)
           tab.attr_tab_position = OS._long2fix(tabs[i])
           OS.memmove(offset, tab, ATSUTab.attr_sizeof)
-          ((i += 1) - 1)
+          i += 1
           offset += ATSUTab.attr_sizeof
         end
         width = i - 2 >= 0 ? tabs[i - 1] - tabs[i - 2] : tabs[i - 1]
@@ -2521,7 +2521,7 @@ module Org::Eclipse::Swt::Graphics
             tab.attr_tab_type = RJava.cast_to_short(OS.attr_k_atsuleft_tab)
             tab.attr_tab_position += OS._long2fix(width)
             OS.memmove(offset, tab, ATSUTab.attr_sizeof)
-            ((i += 1) - 1)
+            i += 1
             offset += ATSUTab.attr_sizeof
           end
         end
@@ -2598,14 +2598,14 @@ module Org::Eclipse::Swt::Graphics
     typesig { [::Java::Int] }
     # Translate a client offset to an internal offset
     def translate_offset(offset)
-      ((offset += 1) - 1)
+      offset += 1
       i = 0
       while i < @invalid_offsets.attr_length
         if (offset < @invalid_offsets[i])
           break
         end
-        ((offset += 1) - 1)
-        ((i += 1) - 1)
+        offset += 1
+        i += 1
       end
       return offset
     end
@@ -2616,14 +2616,14 @@ module Org::Eclipse::Swt::Graphics
       i = 0
       while i < @invalid_offsets.attr_length
         if ((offset).equal?(@invalid_offsets[i]))
-          ((offset += 1) - 1)
-          ((i += 1) - 1)
+          offset += 1
+          i += 1
           next
         end
         if (offset < @invalid_offsets[i])
           return Math.max(0, offset - i - 1)
         end
-        ((i += 1) - 1)
+        i += 1
       end
       return Math.max(0, offset - @invalid_offsets.attr_length - 1)
     end

@@ -256,19 +256,19 @@ module Org::Eclipse::Swt::Custom
       i = 0
       while i < combo_events.attr_length
         self.add_listener(combo_events[i], @listener)
-        ((i += 1) - 1)
+        i += 1
       end
       text_events = Array.typed(::Java::Int).new([SWT::DefaultSelection, SWT::KeyDown, SWT::KeyUp, SWT::MenuDetect, SWT::Modify, SWT::MouseDown, SWT::MouseUp, SWT::MouseDoubleClick, SWT::MouseWheel, SWT::Traverse, SWT::FocusIn, SWT::Verify])
       i_ = 0
       while i_ < text_events.attr_length
         @text.add_listener(text_events[i_], @listener)
-        ((i_ += 1) - 1)
+        i_ += 1
       end
       arrow_events = Array.typed(::Java::Int).new([SWT::MouseDown, SWT::MouseUp, SWT::Selection, SWT::FocusIn])
       i__ = 0
       while i__ < arrow_events.attr_length
         @arrow.add_listener(arrow_events[i__], @listener)
-        ((i__ += 1) - 1)
+        i__ += 1
       end
       create_popup(nil, -1)
       init_accessible
@@ -521,7 +521,7 @@ module Org::Eclipse::Swt::Custom
       i = 0
       while i < items.attr_length
         text_width = Math.max(gc.string_extent(items[i]).attr_x, text_width)
-        ((i += 1) - 1)
+        i += 1
       end
       gc.dispose
       text_size = @text.compute_size(SWT::DEFAULT, SWT::DEFAULT, changed)
@@ -585,13 +585,13 @@ module Org::Eclipse::Swt::Custom
       i = 0
       while i < popup_events.attr_length
         @popup.add_listener(popup_events[i], @listener)
-        ((i += 1) - 1)
+        i += 1
       end
       list_events = Array.typed(::Java::Int).new([SWT::MouseUp, SWT::Selection, SWT::Traverse, SWT::KeyDown, SWT::KeyUp, SWT::FocusIn, SWT::Dispose])
       i_ = 0
       while i_ < list_events.attr_length
         @list.add_listener(list_events[i_], @listener)
-        ((i_ += 1) - 1)
+        i_ += 1
       end
       if (!(items).nil?)
         @list.set_items(items)
@@ -722,7 +722,7 @@ module Org::Eclipse::Swt::Custom
       length_ = string.length
       begin
         while (index < length_ && !(string.char_at(index)).equal?(Character.new(?&.ord)))
-          ((index += 1) - 1)
+          index += 1
         end
         if ((index += 1) >= length_)
           return Character.new(?\0.ord)
@@ -730,7 +730,7 @@ module Org::Eclipse::Swt::Custom
         if (!(string.char_at(index)).equal?(Character.new(?&.ord)))
           return Character.to_lower_case(string.char_at(index))
         end
-        ((index += 1) - 1)
+        index += 1
       end while (index < length_)
       return Character.new(?\0.ord)
     end
@@ -747,7 +747,7 @@ module Org::Eclipse::Swt::Custom
             return siblings[i - 1]
           end
         end
-        ((i += 1) - 1)
+        i += 1
       end
       return nil
     end
@@ -1920,7 +1920,7 @@ module Org::Eclipse::Swt::Custom
       length_ = string.length
       begin
         while ((index < length_) && (!(string.char_at(index)).equal?(Character.new(?&.ord))))
-          ((index += 1) - 1)
+          index += 1
         end
         if ((index += 1) >= length_)
           return string
@@ -1928,7 +1928,7 @@ module Org::Eclipse::Swt::Custom
         if (!(string.char_at(index)).equal?(Character.new(?&.ord)))
           return string.substring(0, index - 1) + string.substring(index, length_)
         end
-        ((index += 1) - 1)
+        index += 1
       end while (index < length_)
       return string
     end

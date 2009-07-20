@@ -392,7 +392,7 @@ module Org::Eclipse::Swt::Dnd
                   self.attr_selected_data_type = event.attr_data_type
                   break
                 end
-                ((i += 1) - 1)
+                i += 1
               end
             end
             if (!(self.attr_selected_data_type).nil? && !((event.attr_detail & allowed_operations)).equal?(0))
@@ -597,7 +597,7 @@ module Org::Eclipse::Swt::Dnd
             object = transfer.native_to_java(transfer_data)
             break
           end
-          ((i += 1) - 1)
+          i += 1
         end
       end
       if ((object).nil?)
@@ -643,7 +643,7 @@ module Org::Eclipse::Swt::Dnd
             @selected_data_type = allowed_data_types[i]
             break
           end
-          ((i += 1) - 1)
+          i += 1
         end
       end
       if (!(@selected_data_type).nil? && (((event.attr_detail & allowed_operations)).equal?(event.attr_detail)))
@@ -719,7 +719,7 @@ module Org::Eclipse::Swt::Dnd
             @selected_data_type = allowed_data_types[i]
             break
           end
-          ((i += 1) - 1)
+          i += 1
         end
       end
       if (!(@selected_data_type).nil? && !((allowed_operations & event.attr_detail)).equal?(0))
@@ -779,9 +779,9 @@ module Org::Eclipse::Swt::Dnd
         listener = listeners[i]
         if (listener.is_a?(DNDListener))
           drop_listeners[count] = (listener).get_event_listener
-          ((count += 1) - 1)
+          count += 1
         end
-        ((i += 1) - 1)
+        i += 1
       end
       if ((count).equal?(length))
         return drop_listeners
@@ -947,17 +947,17 @@ module Org::Eclipse::Swt::Dnd
             System.arraycopy(targets, 0, new_targets, 0, targets.attr_length)
             new_targets[targets.attr_length] = entry
             targets = new_targets
-            ((j += 1) - 1)
+            j += 1
           end
         end
-        ((i += 1) - 1)
+        i += 1
       end
       # long
       p_targets = OS.g_malloc(targets.attr_length * GtkTargetEntry.attr_sizeof)
       i_ = 0
       while i_ < targets.attr_length
         OS.memmove(p_targets + i_ * GtkTargetEntry.attr_sizeof, targets[i_], GtkTargetEntry.attr_sizeof)
-        ((i_ += 1) - 1)
+        i_ += 1
       end
       actions = op_to_os_op(get_style)
       if (@control.is_a?(Combo))
@@ -973,7 +973,7 @@ module Org::Eclipse::Swt::Dnd
       i__ = 0
       while i__ < targets.attr_length
         OS.g_free(targets[i__].attr_target)
-        ((i__ += 1) - 1)
+        i__ += 1
       end
     end
     
@@ -1039,9 +1039,9 @@ module Org::Eclipse::Swt::Dnd
             data_types = new_data_types
             break
           end
-          ((j += 1) - 1)
+          j += 1
         end
-        ((i += 1) - 1)
+        i += 1
       end
       if ((data_types.attr_length).equal?(0))
         return false

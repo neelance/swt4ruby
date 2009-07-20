@@ -348,7 +348,7 @@ module Org::Eclipse::Swt::Dnd
         if (!((clipboards & DND::SELECTION_CLIPBOARD)).equal?(0))
           selection_data = gtk_clipboard_wait_for_contents(self.attr_gtkprimaryclipboard, type_ids[i])
         end
-        ((i += 1) - 1)
+        i += 1
       end
       if ((selection_data).equal?(0))
         return nil
@@ -499,7 +499,7 @@ module Org::Eclipse::Swt::Dnd
         if ((data[i]).nil? || (data_types[i]).nil? || !data_types[i].validate(data[i]))
           DND.error(SWT::ERROR_INVALID_ARGUMENT)
         end
-        ((i += 1) - 1)
+        i += 1
       end
       proxy = ClipboardProxy.__get_instance(@display)
       if (!proxy.set_data(self, data, data_types, clipboards))
@@ -557,7 +557,7 @@ module Org::Eclipse::Swt::Dnd
         while i < types.attr_length
           result[i] = TransferData.new
           result[i].attr_type = types[i]
-          ((i += 1) - 1)
+          i += 1
         end
       end
       if (!((clipboards & DND::SELECTION_CLIPBOARD)).equal?(0))
@@ -575,7 +575,7 @@ module Org::Eclipse::Swt::Dnd
         while i < types.attr_length
           result[offset + i] = TransferData.new
           result[offset + i].attr_type = types[i]
-          ((i += 1) - 1)
+          i += 1
         end
       end
       return (result).nil? ? Array.typed(TransferData).new(0) { nil } : result
@@ -607,28 +607,28 @@ module Org::Eclipse::Swt::Dnd
         # int
         p_name = OS.gdk_atom_name(types1[i])
         if ((p_name).equal?(0))
-          ((i += 1) - 1)
+          i += 1
           next
         end
         buffer = Array.typed(::Java::Byte).new(OS.strlen(p_name)) { 0 }
         OS.memmove(buffer, p_name, buffer.attr_length)
         OS.g_free(p_name)
         result[((count += 1) - 1)] = "GTKCLIPBOARD " + (String.new(Converter.mbcs_to_wcs(nil, buffer))).to_s
-        ((i += 1) - 1)
+        i += 1
       end
       i_ = 0
       while i_ < types2.attr_length
         # int
         p_name = OS.gdk_atom_name(types2[i_])
         if ((p_name).equal?(0))
-          ((i_ += 1) - 1)
+          i_ += 1
           next
         end
         buffer = Array.typed(::Java::Byte).new(OS.strlen(p_name)) { 0 }
         OS.memmove(buffer, p_name, buffer.attr_length)
         OS.g_free(p_name)
         result[((count += 1) - 1)] = "GTKPRIMARYCLIPBOARD " + (String.new(Converter.mbcs_to_wcs(nil, buffer))).to_s
-        ((i_ += 1) - 1)
+        i_ += 1
       end
       if (count < result.attr_length)
         temp = Array.typed(String).new(count) { nil }

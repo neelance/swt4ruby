@@ -97,7 +97,7 @@ module Org::Eclipse::Swt::Internal::Image
       i = 0
       while i < length
         value |= (get_next_idat_bit << i)
-        ((i += 1) - 1)
+        i += 1
       end
       return value
     end
@@ -144,7 +144,7 @@ module Org::Eclipse::Swt::Internal::Image
           return i
         end
         buffer[off + i] = b
-        ((i += 1) - 1)
+        i += 1
       end
       return len
     end

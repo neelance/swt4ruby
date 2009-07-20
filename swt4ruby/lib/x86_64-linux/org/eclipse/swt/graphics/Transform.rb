@@ -389,7 +389,7 @@ module Org::Eclipse::Swt::Graphics
         Cairo.cairo_matrix_transform_point(@handle, dx, dy)
         point_array[j] = (dx[0]).to_f
         point_array[j + 1] = (dy[0]).to_f
-        ((i += 1) - 1)
+        i += 1
         j += 2
       end
     end

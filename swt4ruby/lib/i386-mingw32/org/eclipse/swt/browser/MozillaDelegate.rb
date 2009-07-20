@@ -62,7 +62,7 @@ module Org::Eclipse::Swt::Browser
         bytes = Array.typed(::Java::Byte).new(byte_count = chars.attr_length * 2 + (terminate ? 1 : 0)) { 0 }
         byte_count = OS._wide_char_to_multi_byte(OS::CP_ACP, 0, chars, chars.attr_length, bytes, byte_count, nil, nil)
         if (terminate)
-          ((byte_count += 1) - 1)
+          byte_count += 1
         else
           if (!(bytes.attr_length).equal?(byte_count))
             result = Array.typed(::Java::Byte).new(byte_count) { 0 }

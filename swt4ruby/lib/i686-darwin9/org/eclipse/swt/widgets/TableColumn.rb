@@ -403,7 +403,7 @@ module Org::Eclipse::Swt::Widgets
         if (!(item).nil? && item.attr_cached)
           width = Math.max(width, item.calculate_width(index, gc))
         end
-        ((i += 1) - 1)
+        i += 1
       end
       gc.dispose
       set_width(width + @parent.get_inset_width)
@@ -503,7 +503,7 @@ module Org::Eclipse::Swt::Widgets
         if ((column).equal?(self))
           moved = true
         end
-        ((i += 1) - 1)
+        i += 1
       end
     end
     

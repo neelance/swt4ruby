@@ -284,7 +284,7 @@ module Org::Eclipse::Swt::Layout
         if ((data).nil? || !data.attr_exclude)
           children[((count += 1) - 1)] = children[i]
         end
-        ((i += 1) - 1)
+        i += 1
       end
       if ((count).equal?(0))
         return Point.new(@margin_left + @margin_width * 2 + @margin_right, @margin_top + @margin_height * 2 + @margin_bottom)
@@ -317,7 +317,7 @@ module Org::Eclipse::Swt::Layout
         if (data.attr_grab_excess_vertical_space && data.attr_minimum_height > 0)
           data.attr_cache_height = Math.max(data.attr_cache_height, data.attr_minimum_height)
         end
-        ((i_ += 1) - 1)
+        i_ += 1
       end
       # Build the grid
       row = 0
@@ -342,13 +342,13 @@ module Org::Eclipse::Swt::Layout
             grid[row] = Array.typed(Control).new(column_count) { nil }
           end
           while (column < column_count && !(grid[row][column]).nil?)
-            ((column += 1) - 1)
+            column += 1
           end
           end_count = column + h_span
           if (end_count <= column_count)
             index = column
             while (index < end_count && (grid[row][index]).nil?)
-              ((index += 1) - 1)
+              index += 1
             end
             if ((index).equal?(end_count))
               break
@@ -357,7 +357,7 @@ module Org::Eclipse::Swt::Layout
           end
           if (column + h_span >= column_count)
             column = 0
-            ((row += 1) - 1)
+            row += 1
           end
         end
         j = 0
@@ -368,13 +368,13 @@ module Org::Eclipse::Swt::Layout
           k = 0
           while k < h_span
             grid[row + j][column + k] = child
-            ((k += 1) - 1)
+            k += 1
           end
-          ((j += 1) - 1)
+          j += 1
         end
         row_count = Math.max(row_count, row + v_span)
         column += h_span
-        ((i__ += 1) - 1)
+        i__ += 1
       end
       # Column widths
       available_width = width - @horizontal_spacing * (column_count - 1) - (@margin_left + @margin_width * 2 + @margin_right)
@@ -394,7 +394,7 @@ module Org::Eclipse::Swt::Layout
               widths[j] = Math.max(widths[j], w)
               if (data.attr_grab_excess_horizontal_space)
                 if (!expand_column[j])
-                  ((expand_count += 1) - 1)
+                  expand_count += 1
                 end
                 expand_column[j] = true
               end
@@ -405,7 +405,7 @@ module Org::Eclipse::Swt::Layout
               end
             end
           end
-          ((i___ += 1) - 1)
+          i___ += 1
         end
         i____ = 0
         while i____ < row_count
@@ -421,12 +421,12 @@ module Org::Eclipse::Swt::Layout
                 span_width += widths[j - k]
                 span_min_width += min_widths[j - k]
                 if (expand_column[j - k])
-                  ((span_expand_count += 1) - 1)
+                  span_expand_count += 1
                 end
-                ((k += 1) - 1)
+                k += 1
               end
               if (data.attr_grab_excess_horizontal_space && (span_expand_count).equal?(0))
-                ((expand_count += 1) - 1)
+                expand_count += 1
                 expand_column[j] = true
               end
               w = data.attr_cache_width + data.attr_horizontal_indent - span_width - (h_span - 1) * @horizontal_spacing
@@ -438,7 +438,7 @@ module Org::Eclipse::Swt::Layout
                   k_ = 0
                   while k_ < h_span
                     widths[last = j - k_] = Math.max(equal_width, widths[j - k_])
-                    ((k_ += 1) - 1)
+                    k_ += 1
                   end
                   if (last > -1)
                     widths[last] += remainder
@@ -455,7 +455,7 @@ module Org::Eclipse::Swt::Layout
                       if (expand_column[j - k_])
                         widths[last = j - k_] += delta
                       end
-                      ((k_ += 1) - 1)
+                      k_ += 1
                     end
                     if (last > -1)
                       widths[last] += remainder
@@ -478,7 +478,7 @@ module Org::Eclipse::Swt::Layout
                       if (expand_column[j - k_])
                         min_widths[last = j - k_] += delta
                       end
-                      ((k_ += 1) - 1)
+                      k_ += 1
                     end
                     if (last > -1)
                       min_widths[last] += remainder
@@ -488,9 +488,9 @@ module Org::Eclipse::Swt::Layout
               end
             end
           end
-          ((i____ += 1) - 1)
+          i____ += 1
         end
-        ((j += 1) - 1)
+        j += 1
       end
       if (@make_columns_equal_width)
         min_column_width = 0
@@ -499,14 +499,14 @@ module Org::Eclipse::Swt::Layout
         while i___ < column_count
           min_column_width = Math.max(min_column_width, min_widths[i___])
           column_width = Math.max(column_width, widths[i___])
-          ((i___ += 1) - 1)
+          i___ += 1
         end
         column_width = (width).equal?(SWT::DEFAULT) || (expand_count).equal?(0) ? column_width : Math.max(min_column_width, available_width / column_count)
         i____ = 0
         while i____ < column_count
           expand_column[i____] = expand_count > 0
           widths[i____] = column_width
-          ((i____ += 1) - 1)
+          i____ += 1
         end
       else
         if (!(width).equal?(SWT::DEFAULT) && expand_count > 0)
@@ -514,7 +514,7 @@ module Org::Eclipse::Swt::Layout
           i___ = 0
           while i___ < column_count
             total_width += widths[i___]
-            ((i___ += 1) - 1)
+            i___ += 1
           end
           c = expand_count
           delta = (available_width - total_width) / c
@@ -529,10 +529,10 @@ module Org::Eclipse::Swt::Layout
                 else
                   widths[j_] = min_widths[j_]
                   expand_column[j_] = false
-                  ((c -= 1) + 1)
+                  c -= 1
                 end
               end
-              ((j_ += 1) - 1)
+              j_ += 1
             end
             if (last > -1)
               widths[last] += remainder
@@ -552,9 +552,9 @@ module Org::Eclipse::Swt::Layout
                       while k < h_span
                         span_width += widths[j__ - k]
                         if (expand_column[j__ - k])
-                          ((span_expand_count += 1) - 1)
+                          span_expand_count += 1
                         end
-                        ((k += 1) - 1)
+                        k += 1
                       end
                       w = !data.attr_grab_excess_horizontal_space || (data.attr_minimum_width).equal?(SWT::DEFAULT) ? data.attr_cache_width : data.attr_minimum_width
                       w += data.attr_horizontal_indent - span_width - (h_span - 1) * @horizontal_spacing
@@ -570,7 +570,7 @@ module Org::Eclipse::Swt::Layout
                             if (expand_column[j__ - k_])
                               widths[last2 = j__ - k_] += delta2
                             end
-                            ((k_ += 1) - 1)
+                            k_ += 1
                           end
                           if (last2 > -1)
                             widths[last2] += remainder2
@@ -580,9 +580,9 @@ module Org::Eclipse::Swt::Layout
                     end
                   end
                 end
-                ((i____ += 1) - 1)
+                i____ += 1
               end
-              ((j__ += 1) - 1)
+              j__ += 1
             end
             if ((c).equal?(0))
               break
@@ -591,7 +591,7 @@ module Org::Eclipse::Swt::Layout
             i____ = 0
             while i____ < column_count
               total_width += widths[i____]
-              ((i____ += 1) - 1)
+              i____ += 1
             end
             delta = (available_width - total_width) / c
             remainder = (available_width - total_width) % c
@@ -617,7 +617,7 @@ module Org::Eclipse::Swt::Layout
                 k = 0
                 while k < h_span
                   current_width += widths[j_ - k]
-                  ((k += 1) - 1)
+                  k += 1
                 end
                 current_width += (h_span - 1) * @horizontal_spacing - data.attr_horizontal_indent
                 if ((!(current_width).equal?(data.attr_cache_width) && (data.attr_horizontal_alignment).equal?(SWT::FILL)) || (data.attr_cache_width > current_width))
@@ -640,9 +640,9 @@ module Org::Eclipse::Swt::Layout
                 end
               end
             end
-            ((i___ += 1) - 1)
+            i___ += 1
           end
-          ((j_ += 1) - 1)
+          j_ += 1
         end
       end
       # Row heights
@@ -663,7 +663,7 @@ module Org::Eclipse::Swt::Layout
               heights[i___] = Math.max(heights[i___], h)
               if (data.attr_grab_excess_vertical_space)
                 if (!expand_row[i___])
-                  ((expand_count += 1) - 1)
+                  expand_count += 1
                 end
                 expand_row[i___] = true
               end
@@ -674,7 +674,7 @@ module Org::Eclipse::Swt::Layout
               end
             end
           end
-          ((j_ += 1) - 1)
+          j_ += 1
         end
         j__ = 0
         while j__ < column_count
@@ -690,12 +690,12 @@ module Org::Eclipse::Swt::Layout
                 span_height += heights[i___ - k]
                 span_min_height += min_heights[i___ - k]
                 if (expand_row[i___ - k])
-                  ((span_expand_count += 1) - 1)
+                  span_expand_count += 1
                 end
-                ((k += 1) - 1)
+                k += 1
               end
               if (data.attr_grab_excess_vertical_space && (span_expand_count).equal?(0))
-                ((expand_count += 1) - 1)
+                expand_count += 1
                 expand_row[i___] = true
               end
               h = data.attr_cache_height + data.attr_vertical_indent - span_height - (v_span - 1) * @vertical_spacing
@@ -711,7 +711,7 @@ module Org::Eclipse::Swt::Layout
                     if (expand_row[i___ - k_])
                       heights[last = i___ - k_] += delta
                     end
-                    ((k_ += 1) - 1)
+                    k_ += 1
                   end
                   if (last > -1)
                     heights[last] += remainder
@@ -733,7 +733,7 @@ module Org::Eclipse::Swt::Layout
                       if (expand_row[i___ - k_])
                         min_heights[last = i___ - k_] += delta
                       end
-                      ((k_ += 1) - 1)
+                      k_ += 1
                     end
                     if (last > -1)
                       min_heights[last] += remainder
@@ -743,16 +743,16 @@ module Org::Eclipse::Swt::Layout
               end
             end
           end
-          ((j__ += 1) - 1)
+          j__ += 1
         end
-        ((i___ += 1) - 1)
+        i___ += 1
       end
       if (!(height).equal?(SWT::DEFAULT) && expand_count > 0)
         total_height = 0
         i____ = 0
         while i____ < row_count
           total_height += heights[i____]
-          ((i____ += 1) - 1)
+          i____ += 1
         end
         c = expand_count
         delta = (available_height - total_height) / c
@@ -767,10 +767,10 @@ module Org::Eclipse::Swt::Layout
               else
                 heights[i_____] = min_heights[i_____]
                 expand_row[i_____] = false
-                ((c -= 1) + 1)
+                c -= 1
               end
             end
-            ((i_____ += 1) - 1)
+            i_____ += 1
           end
           if (last > -1)
             heights[last] += remainder
@@ -790,9 +790,9 @@ module Org::Eclipse::Swt::Layout
                     while k < v_span
                       span_height += heights[i______ - k]
                       if (expand_row[i______ - k])
-                        ((span_expand_count += 1) - 1)
+                        span_expand_count += 1
                       end
-                      ((k += 1) - 1)
+                      k += 1
                     end
                     h = !data.attr_grab_excess_vertical_space || (data.attr_minimum_height).equal?(SWT::DEFAULT) ? data.attr_cache_height : data.attr_minimum_height
                     h += data.attr_vertical_indent - span_height - (v_span - 1) * @vertical_spacing
@@ -808,7 +808,7 @@ module Org::Eclipse::Swt::Layout
                           if (expand_row[i______ - k_])
                             heights[last2 = i______ - k_] += delta2
                           end
-                          ((k_ += 1) - 1)
+                          k_ += 1
                         end
                         if (last2 > -1)
                           heights[last2] += remainder2
@@ -818,9 +818,9 @@ module Org::Eclipse::Swt::Layout
                   end
                 end
               end
-              ((j_ += 1) - 1)
+              j_ += 1
             end
-            ((i______ += 1) - 1)
+            i______ += 1
           end
           if ((c).equal?(0))
             break
@@ -829,7 +829,7 @@ module Org::Eclipse::Swt::Layout
           i_______ = 0
           while i_______ < row_count
             total_height += heights[i_______]
-            ((i_______ += 1) - 1)
+            i_______ += 1
           end
           delta = (available_height - total_height) / c
           remainder = (available_height - total_height) % c
@@ -853,12 +853,12 @@ module Org::Eclipse::Swt::Layout
               k = 0
               while k < h_span
                 cell_width += widths[j_ + k]
-                ((k += 1) - 1)
+                k += 1
               end
               k_ = 0
               while k_ < v_span
                 cell_height += heights[i____ + k_]
-                ((k_ += 1) - 1)
+                k_ += 1
               end
               cell_width += @horizontal_spacing * (h_span - 1)
               child_x = grid_x + data.attr_horizontal_indent
@@ -888,29 +888,29 @@ module Org::Eclipse::Swt::Layout
               end
             end
             grid_x += widths[j_] + @horizontal_spacing
-            ((j_ += 1) - 1)
+            j_ += 1
           end
           grid_y += heights[i____] + @vertical_spacing
-          ((i____ += 1) - 1)
+          i____ += 1
         end
       end
       # clean up cache
       i____ = 0
       while i____ < flush_length
         flush[i____].attr_cache_width = flush[i____].attr_cache_height = -1
-        ((i____ += 1) - 1)
+        i____ += 1
       end
       total_default_width = 0
       total_default_height = 0
       i_____ = 0
       while i_____ < column_count
         total_default_width += widths[i_____]
-        ((i_____ += 1) - 1)
+        i_____ += 1
       end
       i______ = 0
       while i______ < row_count
         total_default_height += heights[i______]
-        ((i______ += 1) - 1)
+        i______ += 1
       end
       total_default_width += @horizontal_spacing * (column_count - 1) + @margin_left + @margin_width * 2 + @margin_right
       total_default_height += @vertical_spacing * (row_count - 1) + @margin_top + @margin_height * 2 + @margin_bottom

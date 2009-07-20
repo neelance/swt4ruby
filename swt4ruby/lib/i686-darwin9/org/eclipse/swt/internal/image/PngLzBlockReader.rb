@@ -170,7 +170,7 @@ module Org::Eclipse::Swt::Internal::Image
           read_next_block_header
           return get_next_byte
         end
-        ((@uncompressed_bytes_remaining -= 1) + 1)
+        @uncompressed_bytes_remaining -= 1
         return @stream.get_next_idat_byte
       else
         value = get_next_compressed_byte
@@ -213,9 +213,9 @@ module Org::Eclipse::Swt::Internal::Image
       if (@copy_bytes_remaining > 0)
         value = @window[@copy_index]
         @window[@window_index] = value
-        ((@copy_bytes_remaining -= 1) + 1)
-        ((@copy_index += 1) - 1)
-        ((@window_index += 1) - 1)
+        @copy_bytes_remaining -= 1
+        @copy_index += 1
+        @window_index += 1
         if ((@copy_index).equal?(@window.attr_length))
           @copy_index = 0
         end
@@ -227,7 +227,7 @@ module Org::Eclipse::Swt::Internal::Image
       value = @huffman_tables.get_next_literal_value(@stream)
       if (value < END_OF_COMPRESSED_BLOCK)
         @window[@window_index] = (value & 0xff)
-        ((@window_index += 1) - 1)
+        @window_index += 1
         if (@window_index >= @window.attr_length)
           @window_index = 0
         end

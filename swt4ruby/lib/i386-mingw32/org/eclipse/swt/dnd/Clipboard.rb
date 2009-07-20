@@ -382,7 +382,7 @@ module Org::Eclipse::Swt::Dnd
             data.attr_p_idata_object = ppv[0]
             return transfer.native_to_java(data)
           end
-          ((i += 1) - 1)
+          i += 1
         end
       ensure
         data_object._release
@@ -524,7 +524,7 @@ module Org::Eclipse::Swt::Dnd
         if ((data[i]).nil? || (data_types[i]).nil? || !data_types[i].validate(data[i]))
           DND.error(SWT::ERROR_INVALID_ARGUMENT)
         end
-        ((i += 1) - 1)
+        i += 1
       end
       if (((clipboards & DND::CLIPBOARD)).equal?(0))
         return
@@ -560,7 +560,7 @@ module Org::Eclipse::Swt::Dnd
     
     typesig { [] }
     def _add_ref
-      ((@ref_count += 1) - 1)
+      @ref_count += 1
       return @ref_count
     end
     
@@ -659,7 +659,7 @@ module Org::Eclipse::Swt::Dnd
         System.arraycopy(allowed_data_types, 0, new_allowed_data_types, 0, allowed_data_types.attr_length)
         System.arraycopy(formats, 0, new_allowed_data_types, allowed_data_types.attr_length, formats.attr_length)
         allowed_data_types = new_allowed_data_types
-        ((i += 1) - 1)
+        i += 1
       end
       enum_formatetc = OleEnumFORMATETC.new
       enum_formatetc._add_ref
@@ -667,7 +667,7 @@ module Org::Eclipse::Swt::Dnd
       i_ = 0
       while i_ < allowed_data_types.attr_length
         formats[i_] = allowed_data_types[i_].attr_formatetc
-        ((i_ += 1) - 1)
+        i_ += 1
       end
       # include the drop effect format to specify a copy operation
       dropeffect = FORMATETC.new
@@ -721,7 +721,7 @@ module Org::Eclipse::Swt::Dnd
           transfer_index = i
           break
         end
-        ((i += 1) - 1)
+        i += 1
       end
       if ((transfer_index).equal?(-1))
         return COM::DV_E_FORMATETC
@@ -750,7 +750,7 @@ module Org::Eclipse::Swt::Dnd
         if (@transfer_agents[i].is_supported_type(transfer_data))
           return COM::S_OK
         end
-        ((i += 1) - 1)
+        i += 1
       end
       return COM::DV_E_FORMATETC
     end
@@ -781,7 +781,7 @@ module Org::Eclipse::Swt::Dnd
     
     typesig { [] }
     def _release
-      ((@ref_count -= 1) + 1)
+      @ref_count -= 1
       if ((@ref_count).equal?(0))
         @data = Array.typed(Object).new(0) { nil }
         @transfer_agents = Array.typed(Transfer).new(0) { nil }
@@ -843,7 +843,7 @@ module Org::Eclipse::Swt::Dnd
         data[i] = TransferData.new
         data[i].attr_type = types[i].attr_cf_format
         data[i].attr_formatetc = types[i]
-        ((i += 1) - 1)
+        i += 1
       end
       return data
     end
@@ -931,7 +931,7 @@ module Org::Eclipse::Swt::Dnd
             names[i] = "UNKNOWN"
           end # $NON-NLS-1$
         end
-        ((i += 1) - 1)
+        i += 1
       end
       return names
     end

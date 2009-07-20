@@ -159,7 +159,7 @@ module Org::Eclipse::Swt::Internal::Image
       while i < num_colors
         colors[i] = RGB.new(bytes[bytes_offset + 2] & 0xff, bytes[bytes_offset + 1] & 0xff, bytes[bytes_offset] & 0xff)
         bytes_offset += 3
-        ((i += 1) - 1)
+        i += 1
       end
       return PaletteData.new(colors)
     end
@@ -179,7 +179,7 @@ module Org::Eclipse::Swt::Internal::Image
           bytes[offset + 1] = col.attr_green
           bytes[offset + 2] = col.attr_red
           offset += 3
-          ((i += 1) - 1)
+          i += 1
         end
         return bytes
       end
@@ -216,7 +216,7 @@ module Org::Eclipse::Swt::Internal::Image
               end
               buf_offset += bmp_bpl
               data_index -= image_bpl
-              ((i += 1) - 1)
+              i += 1
             end
             out.write(buf, 0, buf_offset)
             y += lines_per_buf
@@ -232,7 +232,7 @@ module Org::Eclipse::Swt::Internal::Image
               System.arraycopy(data, data_index, buf, buf_offset, bpl)
               buf_offset += bmp_bpl
               data_index -= image_bpl
-              ((i += 1) - 1)
+              i += 1
             end
             out.write(buf, 0, buf_offset)
             y += lines_per_buf
@@ -332,11 +332,11 @@ module Org::Eclipse::Swt::Internal::Image
           b = data[index + i1]
           data[index + i1] = data[index + i2]
           data[index + i2] = b
-          ((index += 1) - 1)
+          index += 1
         end
         i1 += stride
         i2 -= stride
-        ((i += 1) - 1)
+        i += 1
       end
     end
     

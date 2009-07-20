@@ -245,7 +245,7 @@ module Org::Eclipse::Swt::Custom
         else
           ratios[i] = 200
         end
-        ((i += 1) - 1)
+        i += 1
       end
       return ratios
     end
@@ -257,18 +257,18 @@ module Org::Eclipse::Swt::Custom
       i = 0
       while i < children.attr_length
         if (children[i].is_a?(Sash))
-          ((i += 1) - 1)
+          i += 1
           next
         end
         if (only_visible && !children[i].get_visible)
-          ((i += 1) - 1)
+          i += 1
           next
         end
         new_result = Array.typed(Control).new(result.attr_length + 1) { nil }
         System.arraycopy(result, 0, new_result, 0, result.attr_length)
         new_result[result.attr_length] = children[i]
         result = new_result
-        ((i += 1) - 1)
+        i += 1
       end
       return result
     end
@@ -283,7 +283,7 @@ module Org::Eclipse::Swt::Custom
           sash_index = i
           break
         end
-        ((i += 1) - 1)
+        i += 1
       end
       if ((sash_index).equal?(-1))
         return
@@ -398,7 +398,7 @@ module Org::Eclipse::Swt::Custom
         @sashes[i].set_background(@background)
         @sashes[i].set_foreground(@foreground)
         @sashes[i].add_listener(SWT::Selection, @sash_listener)
-        ((i += 1) - 1)
+        i += 1
       end
       layout(false)
     end
@@ -410,7 +410,7 @@ module Org::Eclipse::Swt::Custom
       i = 0
       while i < @sashes.attr_length
         @sashes[i].set_background(@background)
-        ((i += 1) - 1)
+        i += 1
       end
     end
     
@@ -421,7 +421,7 @@ module Org::Eclipse::Swt::Custom
       i = 0
       while i < @sashes.attr_length
         @sashes[i].set_foreground(@foreground)
-        ((i += 1) - 1)
+        i += 1
       end
     end
     
@@ -466,7 +466,7 @@ module Org::Eclipse::Swt::Custom
           i = 0
           while i < @sashes.attr_length
             @sashes[i].set_visible(true)
-            ((i += 1) - 1)
+            i += 1
           end
         end
         return
@@ -474,7 +474,7 @@ module Org::Eclipse::Swt::Custom
       i = 0
       while i < @sashes.attr_length
         @sashes[i].set_visible(false)
-        ((i += 1) - 1)
+        i += 1
       end
       @max_control = control
       layout(false)
@@ -528,7 +528,7 @@ module Org::Eclipse::Swt::Custom
           SWT.error(SWT::ERROR_INVALID_ARGUMENT)
         end
         total += weights[i]
-        ((i += 1) - 1)
+        i += 1
       end
       if ((total).equal?(0))
         SWT.error(SWT::ERROR_INVALID_ARGUMENT)
@@ -541,7 +541,7 @@ module Org::Eclipse::Swt::Custom
           c_array[i_].set_layout_data(data)
         end
         (data).attr_weight = ((weights[i_] << 16) + total - 1) / total
-        ((i_ += 1) - 1)
+        i_ += 1
       end
       layout(false)
     end

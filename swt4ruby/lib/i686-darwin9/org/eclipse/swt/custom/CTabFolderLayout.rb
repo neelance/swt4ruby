@@ -39,7 +39,7 @@ module Org::Eclipse::Swt::Custom
         else
           tab_w += items[i].preferred_width(gc, (i).equal?(folder.attr_selected_index), false)
         end
-        ((i += 1) - 1)
+        i += 1
       end
       gc.dispose
       tab_w += 3
@@ -70,7 +70,7 @@ module Org::Eclipse::Swt::Custom
           control_w = Math.max(control_w, size.attr_x)
           control_h = Math.max(control_h, size.attr_y)
         end
-        ((i_ += 1) - 1)
+        i_ += 1
       end
       min_width = Math.max(tab_w, control_w)
       min_height = (folder.attr_minimized) ? 0 : control_h

@@ -51,7 +51,7 @@ module Org::Eclipse::Swt::Browser
     
     typesig { [] }
     def _add_ref
-      ((@ref_count += 1) - 1)
+      @ref_count += 1
       return @ref_count
     end
     
@@ -189,7 +189,7 @@ module Org::Eclipse::Swt::Browser
     
     typesig { [] }
     def _release
-      ((@ref_count -= 1) + 1)
+      @ref_count -= 1
       # Note.  This instance lives as long as the download it is binded to.
       # Its reference count is expected to go down to 0 when the download
       # has completed or when it has been cancelled. E.g. when the user

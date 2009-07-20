@@ -338,7 +338,7 @@ module Org::Eclipse::Swt::Graphics
                 dash = @data.attr_line_dashes[i] / Math.max(1, width)
                 dashes[i] = dash
                 dashes[i + @data.attr_line_dashes.attr_length] = dash
-                ((i += 1) - 1)
+                i += 1
               end
             end
           end
@@ -475,7 +475,7 @@ module Org::Eclipse::Swt::Graphics
             i = 0
             while i < dashes.attr_length
               dashes[i] = RJava.cast_to_int(@data.attr_line_dashes[i])
-              ((i += 1) - 1)
+              i += 1
             end
           end
         end
@@ -732,7 +732,7 @@ module Org::Eclipse::Swt::Graphics
             if ((chars[index]).equal?(0))
               break
             end
-            ((index += 1) - 1)
+            index += 1
           end
           name = String.new(chars, 0, index)
           if (Compatibility.equals_ignore_case(name, "Courier"))
@@ -908,7 +908,7 @@ module Org::Eclipse::Swt::Graphics
       end
       if (!((@data.attr_style & SWT::MIRRORED)).equal?(0))
         if (!(@data.attr_line_width).equal?(0) && (@data.attr_line_width % 2).equal?(0))
-          ((x -= 1) + 1)
+          x -= 1
         end
       end
       # Feature in WinCE.  The function Arc is not present in the
@@ -931,7 +931,7 @@ module Org::Eclipse::Swt::Graphics
         while i <= arc_angle
           points[((index += 1) - 1)] = (Compatibility.cos(start_angle + i, width) + cte_x) >> 1
           points[((index += 1) - 1)] = (cte_y - Compatibility.sin(start_angle + i, height)) >> 1
-          ((i += 1) - 1)
+          i += 1
         end
         OS._polyline(@handle, points, points.attr_length / 2)
       else
@@ -1613,9 +1613,9 @@ module Org::Eclipse::Swt::Graphics
             OS._combine_rgn(rgn, rgn, temp_rgn, OS::RGN_OR)
             OS._delete_object(temp_rgn)
           end
-          ((x += 1) - 1)
+          x += 1
         end
-        ((y += 1) - 1)
+        y += 1
       end
       # Stretch the clipping mask if needed
       if (!(dest_width).equal?(src_width) || !(dest_height).equal?(src_height))
@@ -1954,8 +1954,8 @@ module Org::Eclipse::Swt::Graphics
       end
       if (!((@data.attr_style & SWT::MIRRORED)).equal?(0))
         if (!(@data.attr_line_width).equal?(0) && (@data.attr_line_width % 2).equal?(0))
-          ((x1 -= 1) + 1)
-          ((x2 -= 1) + 1)
+          x1 -= 1
+          x2 -= 1
         end
       end
       if (OS::IsWinCE)
@@ -2005,7 +2005,7 @@ module Org::Eclipse::Swt::Graphics
       end
       if (!((@data.attr_style & SWT::MIRRORED)).equal?(0))
         if (!(@data.attr_line_width).equal?(0) && (@data.attr_line_width % 2).equal?(0))
-          ((x -= 1) + 1)
+          x -= 1
         end
       end
       OS._ellipse(@handle, x, y, x + width + 1, y + height + 1)
@@ -2116,7 +2116,7 @@ module Org::Eclipse::Swt::Graphics
         if (!(@data.attr_line_width).equal?(0) && (@data.attr_line_width % 2).equal?(0))
           i = 0
           while i < point_array.attr_length
-            ((point_array[i] -= 1) + 1)
+            point_array[i] -= 1
             i += 2
           end
         end
@@ -2126,7 +2126,7 @@ module Org::Eclipse::Swt::Graphics
         if (!(@data.attr_line_width).equal?(0) && (@data.attr_line_width % 2).equal?(0))
           i = 0
           while i < point_array.attr_length
-            ((point_array[i] += 1) - 1)
+            point_array[i] += 1
             i += 2
           end
         end
@@ -2169,7 +2169,7 @@ module Org::Eclipse::Swt::Graphics
         if (!(@data.attr_line_width).equal?(0) && (@data.attr_line_width % 2).equal?(0))
           i = 0
           while i < point_array.attr_length
-            ((point_array[i] -= 1) + 1)
+            point_array[i] -= 1
             i += 2
           end
         end
@@ -2185,7 +2185,7 @@ module Org::Eclipse::Swt::Graphics
         if (!(@data.attr_line_width).equal?(0) && (@data.attr_line_width % 2).equal?(0))
           i = 0
           while i < point_array.attr_length
-            ((point_array[i] += 1) - 1)
+            point_array[i] += 1
             i += 2
           end
         end
@@ -2232,11 +2232,11 @@ module Org::Eclipse::Swt::Graphics
         # the pen was created with CreatePen() and its width is 0 or 1.
         if (@data.attr_line_width > 1)
           if (((@data.attr_line_width % 2)).equal?(1))
-            ((x += 1) - 1)
+            x += 1
           end
         else
           if (!(@data.attr_h_pen).equal?(0) && !(OS._get_object(@data.attr_h_pen, 0, 0)).equal?(LOGPEN.attr_sizeof))
-            ((x += 1) - 1)
+            x += 1
           end
         end
       end
@@ -2296,7 +2296,7 @@ module Org::Eclipse::Swt::Graphics
       end
       if (!((@data.attr_style & SWT::MIRRORED)).equal?(0))
         if (!(@data.attr_line_width).equal?(0) && (@data.attr_line_width % 2).equal?(0))
-          ((x -= 1) + 1)
+          x -= 1
         end
       end
       if (OS::IsWinCE)
@@ -2532,7 +2532,7 @@ module Org::Eclipse::Swt::Graphics
           rect.attr_bottom = y + size.attr_cy
           flags = OS::ETO_CLIPPED
         end
-        ((x -= 1) + 1)
+        x -= 1
       end
       if (!(rop2).equal?(OS::R2_XORPEN))
         OS._ext_text_out_w(@handle, x, y, flags, rect, buffer, length_, nil)
@@ -2872,7 +2872,7 @@ module Org::Eclipse::Swt::Graphics
         return
       end
       if (!((@data.attr_style & SWT::MIRRORED)).equal?(0))
-        ((x -= 1) + 1)
+        x -= 1
       end
       # Feature in WinCE.  The function Pie is not present in the
       # WinCE SDK.  The fix is to emulate it by using Polygon.
@@ -2895,7 +2895,7 @@ module Org::Eclipse::Swt::Graphics
         while i <= arc_angle
           points[((index += 1) - 1)] = (Compatibility.cos(start_angle + i, width) + cte_x) >> 1
           points[((index += 1) - 1)] = (cte_y - Compatibility.sin(start_angle + i, height)) >> 1
-          ((i += 1) - 1)
+          i += 1
         end
         if (draw_segments)
           points[0] = points[points.attr_length - 2] = cte_x >> 1
@@ -3100,7 +3100,7 @@ module Org::Eclipse::Swt::Graphics
         return
       end
       if (!((@data.attr_style & SWT::MIRRORED)).equal?(0))
-        ((x -= 1) + 1)
+        x -= 1
       end
       OS._ellipse(@handle, x, y, x + width + 1, y + height + 1)
     end
@@ -3178,7 +3178,7 @@ module Org::Eclipse::Swt::Graphics
       if (!((@data.attr_style & SWT::MIRRORED)).equal?(0))
         i = 0
         while i < point_array.attr_length
-          ((point_array[i] -= 1) + 1)
+          point_array[i] -= 1
           i += 2
         end
       end
@@ -3186,7 +3186,7 @@ module Org::Eclipse::Swt::Graphics
       if (!((@data.attr_style & SWT::MIRRORED)).equal?(0))
         i = 0
         while i < point_array.attr_length
-          ((point_array[i] += 1) - 1)
+          point_array[i] += 1
           i += 2
         end
       end
@@ -3281,7 +3281,7 @@ module Org::Eclipse::Swt::Graphics
         return
       end
       if (!((@data.attr_style & SWT::MIRRORED)).equal?(0))
-        ((x -= 1) + 1)
+        x -= 1
       end
       OS._round_rect(@handle, x, y, x + width + 1, y + height + 1, arc_width, arc_height)
     end
@@ -3909,7 +3909,7 @@ module Org::Eclipse::Swt::Graphics
       i = 0
       while i < line_dashes.attr_length
         line_dashes[i] = RJava.cast_to_int(@data.attr_line_dashes[i])
-        ((i += 1) - 1)
+        i += 1
       end
       return line_dashes
     end
@@ -4941,7 +4941,7 @@ module Org::Eclipse::Swt::Graphics
           if (!changed && !(line_dashes[i]).equal?(dash))
             changed = true
           end
-          ((i += 1) - 1)
+          i += 1
         end
         if (changed)
           new_dashes = Array.typed(::Java::Float).new(dashes.attr_length) { 0.0 }
@@ -5043,7 +5043,7 @@ module Org::Eclipse::Swt::Graphics
           if (!changed && !(line_dashes[i]).equal?(dash))
             changed = true
           end
-          ((i += 1) - 1)
+          i += 1
         end
         if (!changed)
           return
@@ -5052,7 +5052,7 @@ module Org::Eclipse::Swt::Graphics
         i_ = 0
         while i_ < dashes.attr_length
           @data.attr_line_dashes[i_] = dashes[i_]
-          ((i_ += 1) - 1)
+          i_ += 1
         end
         @data.attr_line_style = SWT::LINE_CUSTOM
       else

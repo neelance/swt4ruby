@@ -155,7 +155,7 @@ module Org::Eclipse::Swt::Layout
         size = compute_child_size(child, w, h, flush_cache)
         max_width = Math.max(max_width, size.attr_x)
         max_height = Math.max(max_height, size.attr_y)
-        ((i += 1) - 1)
+        i += 1
       end
       width = 0
       height = 0
@@ -259,7 +259,7 @@ module Org::Eclipse::Swt::Layout
           end
           child.set_bounds(x, y, child_width, height)
           x += child_width + @spacing
-          ((i += 1) - 1)
+          i += 1
         end
       else
         height -= (count - 1) * @spacing
@@ -280,7 +280,7 @@ module Org::Eclipse::Swt::Layout
           end
           child.set_bounds(x, y, width, child_height)
           y += child_height + @spacing
-          ((i += 1) - 1)
+          i += 1
         end
       end
     end

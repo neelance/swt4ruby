@@ -151,7 +151,7 @@ module Org::Eclipse::Swt::Widgets
             if (!(text[i]).equal?(Character.new(?&.ord)))
               text[((j += 1) - 1)] = text[i]
             end
-            ((i += 1) - 1)
+            i += 1
           end
           if (j < i)
             string = (String.new(text, 0, j)).to_s

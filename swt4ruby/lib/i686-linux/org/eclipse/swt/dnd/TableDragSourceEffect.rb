@@ -145,7 +145,7 @@ module Org::Eclipse::Swt::Dnd
           height = rect.attr_y + h[0] - yy[0]
           yy[i] = rect.attr_y
           hh[i] = h[0]
-          ((i += 1) - 1)
+          i += 1
         end
         # long
         source = OS.gdk_pixmap_new(OS._gdk_root_parent, width, height, -1)
@@ -166,7 +166,7 @@ module Org::Eclipse::Swt::Dnd
           OS.gdk_draw_drawable(source, gc_source, pixmaps[i_], 0, 0, 0, yy[i_] - yy[0], -1, -1)
           OS.gdk_draw_rectangle(mask, gc_mask, 1, 0, yy[i_] - yy[0], width, hh[i_])
           OS.g_object_unref(pixmaps[i_])
-          ((i_ += 1) - 1)
+          i_ += 1
         end
         OS.g_object_unref(gc_source)
         OS.g_object_unref(gc_mask)

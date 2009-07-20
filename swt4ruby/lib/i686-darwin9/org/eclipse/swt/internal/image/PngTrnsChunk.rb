@@ -142,7 +142,7 @@ module Org::Eclipse::Swt::Internal::Image
       i = 0
       while i < data_length
         alphas[i] = self.attr_reference[DATA_OFFSET + i]
-        ((i += 1) - 1)
+        i += 1
       end
       # Any palette entries which do not have a corresponding
       # alpha value in the tRNS chunk are spec'd to have an
@@ -150,7 +150,7 @@ module Org::Eclipse::Swt::Internal::Image
       j = i
       while j < alphas.attr_length
         alphas[j] = 255
-        ((j += 1) - 1)
+        j += 1
       end
       return alphas
     end

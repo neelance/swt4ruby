@@ -91,7 +91,7 @@ module Org::Eclipse::Swt::Internal::Image
           keys = new_keys
         end
         keys[keys_index] = tq
-        ((keys_index += 1) - 1)
+        keys_index += 1
       end
       new_keys = Array.typed(::Java::Int).new(keys_index) { 0 }
       System.arraycopy(keys, 0, new_keys, 0, keys_index)
@@ -111,7 +111,7 @@ module Org::Eclipse::Swt::Internal::Image
           i = 0
           while i < qk.attr_length
             qk[i] = self.attr_reference[ofs + i + 1] & 0xff
-            ((i += 1) - 1)
+            i += 1
           end
           ofs += 65
           total_length -= 65
@@ -120,7 +120,7 @@ module Org::Eclipse::Swt::Internal::Image
           while i < qk.attr_length
             idx = (i - 1) * 2
             qk[i] = (self.attr_reference[ofs + idx + 1] & 0xff) * 256 + (self.attr_reference[ofs + idx + 2] & 0xff)
-            ((i += 1) - 1)
+            i += 1
           end
           ofs += 129
           total_length -= 129
@@ -131,7 +131,7 @@ module Org::Eclipse::Swt::Internal::Image
           values = new_values
         end
         values[values_index] = qk
-        ((values_index += 1) - 1)
+        values_index += 1
       end
       new_values = Array.typed(::Java::Int).new(values_index) { 0 }
       System.arraycopy(values, 0, new_values, 0, values_index)
@@ -168,7 +168,7 @@ module Org::Eclipse::Swt::Internal::Image
               temp = 255
             end
             self.attr_reference[i] = temp
-            ((i += 1) - 1)
+            i += 1
           end
           ofs += 65
           total_length -= 65

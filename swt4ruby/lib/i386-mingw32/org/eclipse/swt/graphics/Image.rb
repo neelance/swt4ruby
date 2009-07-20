@@ -402,10 +402,10 @@ module Org::Eclipse::Swt::Graphics
                 new_data.attr_data[offset] = 2
               end
             end
-            ((offset += 1) - 1)
-            ((x += 1) - 1)
+            offset += 1
+            x += 1
           end
-          ((y += 1) - 1)
+          y += 1
         end
         init(new_data)
       when SWT::IMAGE_GRAY
@@ -425,7 +425,7 @@ module Org::Eclipse::Swt::Graphics
               intensity = (red + red + green + green + green + green + green + blue) >> 3
               color.attr_red = color.attr_green = color.attr_blue = intensity
             end
-            ((i += 1) - 1)
+            i += 1
           end
           new_data.attr_palette = PaletteData.new(rgbs)
         else
@@ -434,7 +434,7 @@ module Org::Eclipse::Swt::Graphics
           i = 0
           while i < rgbs.attr_length
             rgbs[i] = RGB.new(i, i, i)
-            ((i += 1) - 1)
+            i += 1
           end
           new_data = ImageData.new(rect.attr_width, rect.attr_height, 8, PaletteData.new(rgbs))
           new_data.attr_alpha = data.attr_alpha
@@ -474,10 +474,10 @@ module Org::Eclipse::Swt::Graphics
               else
                 new_data.attr_data[offset] = 254
               end
-              ((offset += 1) - 1)
-              ((x += 1) - 1)
+              offset += 1
+              x += 1
             end
-            ((y += 1) - 1)
+            y += 1
           end
         end
         init(new_data)
@@ -871,7 +871,7 @@ module Org::Eclipse::Swt::Graphics
                           transparent_pixel = i
                         end
                         rgbs[i] = RGB.new(((entries[i] & 0xff0000) >> 16), ((entries[i] & 0xff00) >> 8), ((entries[i] & 0xff) >> 0))
-                        ((i += 1) - 1)
+                        i += 1
                       end
                     when Gdip::PixelFormat16bppARGB1555, Gdip::PixelFormat16bppRGB555
                       palette_data = PaletteData.new(0x7c00, 0x3e0, 0x1f)
@@ -893,7 +893,7 @@ module Org::Eclipse::Swt::Graphics
                       while i < data.attr_length
                         alpha_data[j] = (!((data[i] & 0x80)).equal?(0) ? 255 : 0)
                         i += 2
-                        ((j += 1) - 1)
+                        j += 1
                       end
                     when Gdip::PixelFormat32bppARGB
                       alpha_data = Array.typed(::Java::Byte).new(width * height) { 0 }
@@ -902,7 +902,7 @@ module Org::Eclipse::Swt::Graphics
                       while i < data.attr_length
                         alpha_data[j] = data[i]
                         i += 4
-                        ((j += 1) - 1)
+                        j += 1
                       end
                     end
                     Gdip._bitmap_unlock_bits(bitmap, locked_bitmap_data)
@@ -952,7 +952,7 @@ module Org::Eclipse::Swt::Graphics
         i = 0
         while i < num_colors
           rgbs[i] = RGB.new(log_palette[i] & 0xff, log_palette[i + 1] & 0xff, log_palette[i + 2] & 0xff)
-          ((i += 1) - 1)
+          i += 1
         end
       end
       use_bitfields = OS::IsWinCE && ((depth).equal?(16) || (depth).equal?(32))
@@ -1028,7 +1028,7 @@ module Org::Eclipse::Swt::Graphics
           bmi[offset + 2] = rgbs[j].attr_red
           bmi[offset + 3] = 0
           offset += 4
-          ((j += 1) - 1)
+          j += 1
         end
       end
       # long
@@ -1568,7 +1568,7 @@ module Org::Eclipse::Swt::Graphics
           while i < num_colors
             rgbs[i] = RGB.new(bmi[src_index + 2] & 0xff, bmi[src_index + 1] & 0xff, bmi[src_index] & 0xff)
             src_index += 4
-            ((i += 1) - 1)
+            i += 1
           end
           palette = PaletteData.new(rgbs)
         else
@@ -1636,7 +1636,7 @@ module Org::Eclipse::Swt::Graphics
           i = 0
           while i < mask_data.attr_length
             mask_data[i] ^= -1
-            ((i += 1) - 1)
+            i += 1
           end
           # Make sure mask scanlinePad is 2
           mask_pad = 0
@@ -1647,7 +1647,7 @@ module Org::Eclipse::Swt::Graphics
             if ((calc_bpl).equal?(bpl))
               break
             end
-            ((mask_pad += 1) - 1)
+            mask_pad += 1
           end
           mask_data = ImageData.convert_pad(mask_data, width, height, 1, mask_pad, 2)
         end
@@ -1818,7 +1818,7 @@ module Org::Eclipse::Swt::Graphics
                 green = (color & 0xff00) >> 8
                 red = color & 0xff
                 rgbs[i] = RGB.new(red, green, blue)
-                ((i += 1) - 1)
+                i += 1
               end
               p_bits[0] = old_value
               OS._move_memory(bm.attr_bm_bits, p_bits, 1)
@@ -1830,7 +1830,7 @@ module Org::Eclipse::Swt::Graphics
               while i < rgbs.attr_length
                 rgbs[i] = RGB.new(colors[color_index + 2] & 0xff, colors[color_index + 1] & 0xff, colors[color_index] & 0xff)
                 color_index += 4
-                ((i += 1) - 1)
+                i += 1
               end
             end
           else
@@ -1839,7 +1839,7 @@ module Org::Eclipse::Swt::Graphics
             while i < num_colors
               rgbs[i] = RGB.new(bmi[src_index + 2] & 0xff, bmi[src_index + 1] & 0xff, bmi[src_index] & 0xff)
               src_index += 4
-              ((i += 1) - 1)
+              i += 1
             end
           end
           palette = PaletteData.new(rgbs)
@@ -2141,7 +2141,7 @@ module Org::Eclipse::Swt::Graphics
             bmi[offset + 2] = rgbs[j].attr_red
             bmi[offset + 3] = 0
             offset += 4
-            ((j += 1) - 1)
+            j += 1
           end
         end
         # long
@@ -2257,7 +2257,7 @@ module Org::Eclipse::Swt::Graphics
               i = new_rgbs.attr_length
               while i <= source.attr_transparent_pixel
                 rgbs[i] = RGB.new(0, 0, 0)
-                ((i += 1) - 1)
+                i += 1
               end
             else
               new_rgbs[source.attr_transparent_pixel] = black
@@ -2270,7 +2270,7 @@ module Org::Eclipse::Swt::Graphics
               if ((rgbs[black_index] == black))
                 break
               end
-              ((black_index += 1) - 1)
+              black_index += 1
             end
             if ((black_index).equal?(rgbs.attr_length))
               # We didn't find black in the palette, and there is no transparent
@@ -2305,10 +2305,10 @@ module Org::Eclipse::Swt::Graphics
               if ((mask_pixels[i]).equal?(0))
                 image_pixels[i] = black_index
               end
-              ((i += 1) - 1)
+              i += 1
             end
             image_data.set_pixels(0, y, source.attr_width, image_pixels, 0)
-            ((y += 1) - 1)
+            y += 1
           end
         end
         image_data.attr_mask_pad = mask.attr_scanline_pad

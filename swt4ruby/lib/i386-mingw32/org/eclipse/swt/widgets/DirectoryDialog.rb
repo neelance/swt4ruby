@@ -197,7 +197,7 @@ module Org::Eclipse::Swt::Widgets
               buffer[((index += 1) - 1)] = Character.new(?&.ord)
             end
             buffer[((index += 1) - 1)] = ch
-            ((i += 1) - 1)
+            i += 1
           end
           string = (String.new(buffer, 0, index)).to_s
         end

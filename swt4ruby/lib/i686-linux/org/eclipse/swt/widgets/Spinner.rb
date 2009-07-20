@@ -256,7 +256,7 @@ module Org::Eclipse::Swt::Widgets
       i = 0
       while i < digits
         adjustment.attr_upper *= 10
-        ((i += 1) - 1)
+        i += 1
       end
       string = String.value_of(RJava.cast_to_int(adjustment.attr_upper))
       if (digits > 0)
@@ -266,7 +266,7 @@ module Org::Eclipse::Swt::Widgets
         count = digits - string.length
         while (count >= 0)
           buffer.append("0")
-          ((count -= 1) + 1)
+          count -= 1
         end
         string = (buffer.to_s).to_s
       end
@@ -475,7 +475,7 @@ module Org::Eclipse::Swt::Widgets
       i = 0
       while i < digits
         value *= 10
-        ((i += 1) - 1)
+        i += 1
       end
       return RJava.cast_to_int((value > 0 ? value + 0.5 : value - 0.5))
     end
@@ -500,7 +500,7 @@ module Org::Eclipse::Swt::Widgets
       i = 0
       while i < digits
         value *= 10
-        ((i += 1) - 1)
+        i += 1
       end
       return RJava.cast_to_int((value > 0 ? value + 0.5 : value - 0.5))
     end
@@ -525,7 +525,7 @@ module Org::Eclipse::Swt::Widgets
       i = 0
       while i < digits
         value *= 10
-        ((i += 1) - 1)
+        i += 1
       end
       return RJava.cast_to_int((value > 0 ? value + 0.5 : value - 0.5))
     end
@@ -551,7 +551,7 @@ module Org::Eclipse::Swt::Widgets
       i = 0
       while i < digits
         value *= 10
-        ((i += 1) - 1)
+        i += 1
       end
       return RJava.cast_to_int((value > 0 ? value + 0.5 : value - 0.5))
     end
@@ -576,7 +576,7 @@ module Org::Eclipse::Swt::Widgets
       i = 0
       while i < digits
         value *= 10
-        ((i += 1) - 1)
+        i += 1
       end
       return RJava.cast_to_int((value > 0 ? value + 0.5 : value - 0.5))
     end
@@ -1101,7 +1101,7 @@ module Org::Eclipse::Swt::Widgets
       i = 0
       while i < digits
         new_value /= 10
-        ((i += 1) - 1)
+        i += 1
       end
       OS.g_signal_handlers_block_matched(self.attr_handle, OS::G_SIGNAL_MATCH_DATA, 0, 0, 0, 0, VALUE_CHANGED)
       OS.gtk_spin_button_set_increments(self.attr_handle, new_value, adjustment.attr_page_increment)
@@ -1131,7 +1131,7 @@ module Org::Eclipse::Swt::Widgets
       i = 0
       while i < digits
         new_value /= 10
-        ((i += 1) - 1)
+        i += 1
       end
       if (new_value <= adjustment.attr_lower)
         return
@@ -1164,7 +1164,7 @@ module Org::Eclipse::Swt::Widgets
       i = 0
       while i < digits
         new_value /= 10
-        ((i += 1) - 1)
+        i += 1
       end
       if (new_value >= adjustment.attr_upper)
         return
@@ -1199,7 +1199,7 @@ module Org::Eclipse::Swt::Widgets
       i = 0
       while i < digits
         new_value /= 10
-        ((i += 1) - 1)
+        i += 1
       end
       OS.g_signal_handlers_block_matched(self.attr_handle, OS::G_SIGNAL_MATCH_DATA, 0, 0, 0, 0, VALUE_CHANGED)
       OS.gtk_spin_button_set_increments(self.attr_handle, adjustment.attr_step_increment, new_value)
@@ -1225,7 +1225,7 @@ module Org::Eclipse::Swt::Widgets
       i = 0
       while i < digits
         new_value /= 10
-        ((i += 1) - 1)
+        i += 1
       end
       OS.g_signal_handlers_block_matched(self.attr_handle, OS::G_SIGNAL_MATCH_DATA, 0, 0, 0, 0, VALUE_CHANGED)
       OS.gtk_spin_button_set_value(self.attr_handle, new_value)
@@ -1298,7 +1298,7 @@ module Org::Eclipse::Swt::Widgets
       i = 0
       while i < diff
         factor *= 10
-        ((i += 1) - 1)
+        i += 1
       end
       if (digits > value)
         adjustment.attr_value *= factor
@@ -1358,7 +1358,7 @@ module Org::Eclipse::Swt::Widgets
       i = 0
       while i < digits
         factor *= 10
-        ((i += 1) - 1)
+        i += 1
       end
       OS.g_signal_handlers_block_matched(self.attr_handle, OS::G_SIGNAL_MATCH_DATA, 0, 0, 0, 0, VALUE_CHANGED)
       OS.gtk_spin_button_set_range(self.attr_handle, minimum / factor, maximum / factor)
@@ -1427,14 +1427,14 @@ module Org::Eclipse::Swt::Widgets
         adjustment = GtkAdjustment.new
         OS.memmove(adjustment, h_adjustment)
         if (adjustment.attr_lower < 0 && (string.char_at(0)).equal?(Character.new(?-.ord)))
-          ((index += 1) - 1)
+          index += 1
         end
       end
       while (index < string.length)
         if (!Character.is_digit(string.char_at(index)))
           break
         end
-        ((index += 1) - 1)
+        index += 1
       end
       event.attr_doit = (index).equal?(string.length)
       # It is possible (but unlikely), that application

@@ -71,7 +71,7 @@ module Org::Eclipse::Swt::Widgets
         if ((@images[index]).nil?)
           break
         end
-        ((index += 1) - 1)
+        index += 1
       end
       if ((index).equal?(@images.attr_length))
         new_images = Array.typed(Image).new(@images.attr_length + 4) { nil }
@@ -97,7 +97,7 @@ module Org::Eclipse::Swt::Widgets
         if (!(@pixbufs[index]).equal?(0))
           OS.g_object_unref(@pixbufs[index])
         end
-        ((index += 1) - 1)
+        index += 1
       end
       @images = nil
       @pixbufs = nil
@@ -124,7 +124,7 @@ module Org::Eclipse::Swt::Widgets
         if ((image).equal?(@images[index]))
           return index
         end
-        ((index += 1) - 1)
+        index += 1
       end
       return -1
     end
@@ -140,7 +140,7 @@ module Org::Eclipse::Swt::Widgets
         if ((pixbuf).equal?(@pixbufs[index]))
           return index
         end
-        ((index += 1) - 1)
+        index += 1
       end
       return -1
     end
@@ -179,7 +179,7 @@ module Org::Eclipse::Swt::Widgets
           @images[index] = nil
           @pixbufs[index] = 0
         end
-        ((index += 1) - 1)
+        index += 1
       end
     end
     
@@ -227,10 +227,10 @@ module Org::Eclipse::Swt::Widgets
             @pixbufs[index] = 0
           end
           if (!(@images[index]).nil?)
-            ((result += 1) - 1)
+            result += 1
           end
         end
-        ((index += 1) - 1)
+        index += 1
       end
       return result
     end

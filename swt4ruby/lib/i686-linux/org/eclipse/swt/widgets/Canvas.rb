@@ -412,7 +412,7 @@ module Org::Eclipse::Swt::Widgets
           if (Math.min(x + width, rect.attr_x + rect.attr_width) >= Math.max(x, rect.attr_x) && Math.min(y + height, rect.attr_y + rect.attr_height) >= Math.max(y, rect.attr_y))
             child.set_location(rect.attr_x + delta_x, rect.attr_y + delta_y)
           end
-          ((i += 1) - 1)
+          i += 1
         end
       end
       if (is_focus)

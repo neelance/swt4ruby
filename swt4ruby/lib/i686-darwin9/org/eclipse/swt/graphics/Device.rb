@@ -467,7 +467,7 @@ module Org::Eclipse::Swt::Graphics
             @errors[i] = nil
             return
           end
-          ((i += 1) - 1)
+          i += 1
         end
       end
     end
@@ -539,9 +539,9 @@ module Org::Eclipse::Swt::Graphics
           i = 0
           while i < length
             if (!(@objects[i]).nil?)
-              ((count += 1) - 1)
+              count += 1
             end
-            ((i += 1) - 1)
+            i += 1
           end
           index = 0
           data.attr_objects = Array.typed(Object).new(count) { nil }
@@ -551,9 +551,9 @@ module Org::Eclipse::Swt::Graphics
             if (!(@objects[i_]).nil?)
               data.attr_objects[index] = @objects[i_]
               data.attr_errors[index] = @errors[i_]
-              ((index += 1) - 1)
+              index += 1
             end
-            ((i_ += 1) - 1)
+            i_ += 1
           end
         end
       else
@@ -961,7 +961,7 @@ module Org::Eclipse::Swt::Graphics
             @errors[i] = JavaError.new
             return
           end
-          ((i += 1) - 1)
+          i += 1
         end
         new_objects = Array.typed(Object).new(@objects.attr_length + 128) { nil }
         System.arraycopy(@objects, 0, new_objects, 0, @objects.attr_length)

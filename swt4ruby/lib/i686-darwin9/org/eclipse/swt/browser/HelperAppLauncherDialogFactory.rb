@@ -49,7 +49,7 @@ module Org::Eclipse::Swt::Browser
     
     typesig { [] }
     def _add_ref
-      ((@ref_count += 1) - 1)
+      @ref_count += 1
       return @ref_count
     end
     
@@ -187,7 +187,7 @@ module Org::Eclipse::Swt::Browser
     
     typesig { [] }
     def _release
-      ((@ref_count -= 1) + 1)
+      @ref_count -= 1
       if ((@ref_count).equal?(0))
         dispose_cominterfaces
       end

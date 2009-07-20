@@ -195,7 +195,7 @@ module Org::Eclipse::Swt::Widgets
         if ((@items[index]).equal?(item))
           break
         end
-        ((index += 1) - 1)
+        index += 1
       end
       if ((index).equal?(@item_count))
         return
@@ -264,7 +264,7 @@ module Org::Eclipse::Swt::Widgets
         if (rect.contains(pt))
           return @items[i]
         end
-        ((i += 1) - 1)
+        i += 1
       end
       return nil
     end
@@ -353,7 +353,7 @@ module Org::Eclipse::Swt::Widgets
         if ((@items[i]).equal?(item))
           return i
         end
-        ((i += 1) - 1)
+        i += 1
       end
       return -1
     end
@@ -365,7 +365,7 @@ module Org::Eclipse::Swt::Widgets
       while i < @item_count
         item = @items[i]
         item.reset_visible_region(control)
-        ((i += 1) - 1)
+        i += 1
       end
     end
     
@@ -424,14 +424,14 @@ module Org::Eclipse::Swt::Widgets
       while i < @item_count
         size = sizes[i] = @items[i].compute_size
         item_height = Math.max(item_height, size.attr_y)
-        ((i += 1) - 1)
+        i += 1
       end
       i_ = 0
       while i_ < @item_count
         item = @items[i_]
         size = sizes[i_]
         if (wrap && !(i_).equal?(0) && x + size.attr_x > width)
-          ((rows += 1) - 1)
+          rows += 1
           x = margin_width
           y += y_spacing + item_height
         end
@@ -447,7 +447,7 @@ module Org::Eclipse::Swt::Widgets
         end
         x += x_spacing + size.attr_x
         max_x = Math.max(max_x, x)
-        ((i_ += 1) - 1)
+        i_ += 1
       end
       # TODO - tempporary code
       if (resize)
@@ -473,14 +473,14 @@ module Org::Eclipse::Swt::Widgets
       while i < @item_count
         size = sizes[i] = @items[i].compute_size
         item_width = Math.max(item_width, size.attr_x)
-        ((i += 1) - 1)
+        i += 1
       end
       i_ = 0
       while i_ < @item_count
         item = @items[i_]
         size = sizes[i_]
         if (wrap && !(i_).equal?(0) && y + size.attr_y > height)
-          ((cols += 1) - 1)
+          cols += 1
           x += x_spacing + item_width
           y = margin_height
         end
@@ -496,7 +496,7 @@ module Org::Eclipse::Swt::Widgets
         end
         y += y_spacing + size.attr_y
         max_y = Math.max(max_y, y)
-        ((i_ += 1) - 1)
+        i_ += 1
       end
       # TODO - tempporary code
       if (resize)
@@ -532,7 +532,7 @@ module Org::Eclipse::Swt::Widgets
           if (!(item).nil? && !item.is_disposed)
             item.release(false)
           end
-          ((i += 1) - 1)
+          i += 1
         end
         @item_count = 0
         @items = nil
@@ -549,7 +549,7 @@ module Org::Eclipse::Swt::Widgets
         if ((item.attr_control).equal?(control))
           item.set_control(nil)
         end
-        ((i += 1) - 1)
+        i += 1
       end
     end
     
@@ -563,7 +563,7 @@ module Org::Eclipse::Swt::Widgets
       while i < @item_count
         item = @items[i]
         item.set_background(color)
-        ((i += 1) - 1)
+        i += 1
       end
       redraw_widget(self.attr_handle, true)
     end
@@ -587,7 +587,7 @@ module Org::Eclipse::Swt::Widgets
       while i < @item_count
         item = @items[i]
         item.set_font_style(font)
-        ((i += 1) - 1)
+        i += 1
       end
       redraw_widget(self.attr_handle, true)
       relayout
@@ -603,7 +603,7 @@ module Org::Eclipse::Swt::Widgets
       while i < @item_count
         item = @items[i]
         item.set_foreground(color)
-        ((i += 1) - 1)
+        i += 1
       end
       redraw_widget(self.attr_handle, true)
     end

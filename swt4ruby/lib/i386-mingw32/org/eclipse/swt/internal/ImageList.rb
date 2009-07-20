@@ -103,7 +103,7 @@ module Org::Eclipse::Swt::Internal
         if ((@images[index]).nil?)
           break
         end
-        ((index += 1) - 1)
+        index += 1
       end
       if ((count).equal?(0))
         rect = image.get_bounds
@@ -346,9 +346,9 @@ module Org::Eclipse::Swt::Internal
         x = 0
         while x < mask.attr_width
           mask.set_pixel(x, y, (data.attr_alpha_data[((ap += 1) - 1)] & 0xff) <= 127 ? 1 : 0)
-          ((x += 1) - 1)
+          x += 1
         end
-        ((y += 1) - 1)
+        y += 1
       end
       # long
       h_mask = OS._create_bitmap(src_width, src_height, 1, 1, mask.attr_data)
@@ -488,7 +488,7 @@ module Org::Eclipse::Swt::Internal
             return i
           end
         end
-        ((i += 1) - 1)
+        i += 1
       end
       return -1
     end
@@ -598,10 +598,10 @@ module Org::Eclipse::Swt::Internal
             @images[i] = nil
           end
           if (!(@images[i]).nil?)
-            ((result += 1) - 1)
+            result += 1
           end
         end
-        ((i += 1) - 1)
+        i += 1
       end
       return result
     end

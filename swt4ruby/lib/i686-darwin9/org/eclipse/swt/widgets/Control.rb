@@ -760,7 +760,7 @@ module Org::Eclipse::Swt::Widgets
           if ((tab_list[index]).equal?(self))
             break
           end
-          ((index += 1) - 1)
+          index += 1
         end
         if ((index).equal?(tab_list.attr_length))
           if (is_tab_group)
@@ -778,7 +778,7 @@ module Org::Eclipse::Swt::Widgets
         if ((array[i] == element))
           return true
         end
-        ((i += 1) - 1)
+        i += 1
       end
       return false
     end
@@ -1053,7 +1053,7 @@ module Org::Eclipse::Swt::Widgets
         if (!(color1[i]).equal?(color2[i]))
           return false
         end
-        ((i += 1) - 1)
+        i += 1
       end
       return true
     end
@@ -1511,7 +1511,7 @@ module Org::Eclipse::Swt::Widgets
           index = i
           value = area
         end
-        ((i += 1) - 1)
+        i += 1
       end
       if (index >= 0)
         return monitors[index]
@@ -1528,7 +1528,7 @@ module Org::Eclipse::Swt::Widgets
           index = i_
           value = distance
         end
-        ((i_ += 1) - 1)
+        i_ += 1
       end
       return monitors[index]
     end
@@ -1560,7 +1560,7 @@ module Org::Eclipse::Swt::Widgets
       shell = get_shell
       control = self
       while (!(control).equal?(shell))
-        ((count += 1) - 1)
+        count += 1
         control = control.attr_parent
       end
       control = self
@@ -1862,7 +1862,7 @@ module Org::Eclipse::Swt::Widgets
           end
           index = 0
           while (index < @gcs.attr_length && !(@gcs[index]).nil?)
-            ((index += 1) - 1)
+            index += 1
           end
           if ((index).equal?(@gcs.attr_length))
             new_gcs = Array.typed(SwtGCData).new(@gcs.attr_length + 4) { nil }
@@ -1897,13 +1897,13 @@ module Org::Eclipse::Swt::Widgets
           end
           index = 0
           while (index < @gcs.attr_length && !(@gcs[index]).equal?(data))
-            ((index += 1) - 1)
+            index += 1
           end
           if (index < @gcs.attr_length)
             @gcs[index] = nil
             index = 0
             while (index < @gcs.attr_length && (@gcs[index]).nil?)
-              ((index += 1) - 1)
+              index += 1
             end
             if ((index).equal?(@gcs.attr_length))
               @gcs = nil
@@ -1930,14 +1930,14 @@ module Org::Eclipse::Swt::Widgets
       index = 0
       siblings = @parent.__get_children
       while (index < siblings.attr_length && !(siblings[index]).equal?(self))
-        ((index += 1) - 1)
+        index += 1
       end
       i = index
       while i < siblings.attr_length
         sibling = siblings[i]
         sibling.reset_visible_region(control)
         sibling.invalidate_children_visible_region(control)
-        ((i += 1) - 1)
+        i += 1
       end
       @parent.reset_visible_region(control)
     end
@@ -2007,7 +2007,7 @@ module Org::Eclipse::Swt::Widgets
             end
           end
         end
-        ((i += 1) - 1)
+        i += 1
       end
       return true
     end
@@ -2081,7 +2081,7 @@ module Org::Eclipse::Swt::Widgets
           if ((tab_list[i]).equal?(self))
             return true
           end
-          ((i += 1) - 1)
+          i += 1
         end
       end
       code = traversal_code(0, 0)
@@ -2100,7 +2100,7 @@ module Org::Eclipse::Swt::Widgets
           if ((tab_list[i]).equal?(self))
             return false
           end
-          ((i += 1) - 1)
+          i += 1
         end
       end
       code = traversal_code(0, 0)
@@ -2166,7 +2166,7 @@ module Org::Eclipse::Swt::Widgets
           range.attr_length = str_length
           OS._cfstring_get_characters(string_ref, range, buffer)
           os_attributes[i] = String.new(buffer)
-          ((i += 1) - 1)
+          i += 1
         end
         i_ = 0
         while i_ < attributes.attr_length
@@ -2178,7 +2178,7 @@ module Org::Eclipse::Swt::Widgets
             OS._cfarray_append_value(attributes_array_ref, string_ref)
             OS._cfrelease(string_ref)
           end
-          ((i_ += 1) - 1)
+          i_ += 1
         end
         code = OS.attr_no_err
       end
@@ -2847,7 +2847,7 @@ module Org::Eclipse::Swt::Widgets
           if ((children[index]).equal?(self))
             break
           end
-          ((index += 1) - 1)
+          index += 1
         end
         if (0 < index && (index + 1) < children.attr_length)
           next_ = children[index + 1]
@@ -3262,7 +3262,7 @@ module Org::Eclipse::Swt::Widgets
             data.attr_update_clip = true
             OS._copy_rgn(visible_rgn, data.attr_visible_rgn)
           end
-          ((i += 1) - 1)
+          i += 1
         end
         OS._dispose_rgn(visible_rgn)
       end
@@ -4166,7 +4166,7 @@ module Org::Eclipse::Swt::Widgets
           OS._hiview_set_drawing_enabled(@handle, false)
           invalidate_visible_region(@handle)
         end
-        ((@draw_count += 1) - 1)
+        @draw_count += 1
       end
     end
     
@@ -4388,14 +4388,14 @@ module Org::Eclipse::Swt::Widgets
         if ((children[index]).equal?(self))
           break
         end
-        ((index += 1) - 1)
+        index += 1
       end
       if (!(sibling).nil?)
         while (sibling_index < children.attr_length)
           if ((children[sibling_index]).equal?(sibling))
             break
           end
-          ((sibling_index += 1) - 1)
+          sibling_index += 1
         end
       end
       # remove "Labeled by" relationships that will no longer be valid
@@ -4438,7 +4438,7 @@ module Org::Eclipse::Swt::Widgets
       end
       if (!(old_next_index).equal?(-1))
         if (old_next_index <= index)
-          ((old_next_index -= 1) + 1)
+          old_next_index -= 1
         end
         # the last two conditions below ensure that duplicate relations are not hooked
         if (0 < old_next_index && !(old_next_index).equal?(index) && !(old_next_index).equal?(index + 1))
@@ -4464,7 +4464,7 @@ module Org::Eclipse::Swt::Widgets
             end
             j -= gap
           end
-          ((i += 1) - 1)
+          i += 1
         end
         gap /= 2
       end
@@ -4778,7 +4778,7 @@ module Org::Eclipse::Swt::Widgets
         if ((list[index]).equal?(group))
           break
         end
-        ((index += 1) - 1)
+        index += 1
       end
       # It is possible (but unlikely), that application
       # code could have disposed the widget in focus in
@@ -4810,7 +4810,7 @@ module Org::Eclipse::Swt::Widgets
         if ((children[index]).equal?(self))
           break
         end
-        ((index += 1) - 1)
+        index += 1
       end
       # It is possible (but unlikely), that application
       # code could have disposed the widget in focus in

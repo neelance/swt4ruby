@@ -221,7 +221,7 @@ module Org::Eclipse::Swt::Widgets
             end
             height += @spacing
             width = Math.max(width, item.get_preferred_width(h_theme, h_dc))
-            ((i += 1) - 1)
+            i += 1
           end
           if (!(h_current_font).equal?(0))
             OS._select_object(h_dc, old_font)
@@ -267,7 +267,7 @@ module Org::Eclipse::Swt::Widgets
       end
       System.arraycopy(@items, index, @items, index + 1, @item_count - index)
       @items[index] = item
-      ((@item_count += 1) - 1)
+      @item_count += 1
       if ((@focus_item).nil?)
         @focus_item = item
       end
@@ -301,7 +301,7 @@ module Org::Eclipse::Swt::Widgets
         if ((@items[index]).equal?(item))
           break
         end
-        ((index += 1) - 1)
+        index += 1
       end
       if ((index).equal?(@item_count))
         return
@@ -378,7 +378,7 @@ module Org::Eclipse::Swt::Widgets
       while i < @item_count
         item = @items[i]
         item.draw_item(gc, h_theme, clip_rect, (item).equal?(@focus_item) && draw_focus)
-        ((i += 1) - 1)
+        i += 1
       end
       if (!(h_current_font).equal?(0))
         OS._select_object(gc.attr_handle, old_font)
@@ -519,7 +519,7 @@ module Org::Eclipse::Swt::Widgets
         if ((@items[i]).equal?(item))
           return i
         end
-        ((i += 1) - 1)
+        i += 1
       end
       return -1
     end
@@ -549,7 +549,7 @@ module Org::Eclipse::Swt::Widgets
             y += item.attr_height
           end
           y += item.get_header_height + @spacing
-          ((i += 1) - 1)
+          i += 1
         end
         i_ = index
         while i_ < @item_count
@@ -559,7 +559,7 @@ module Org::Eclipse::Swt::Widgets
             y += item.attr_height
           end
           y += item.get_header_height + @spacing
-          ((i_ += 1) - 1)
+          i_ += 1
         end
       end
       if (set_scrollbar)
@@ -576,7 +576,7 @@ module Org::Eclipse::Swt::Widgets
           if (!(item).nil? && !item.is_disposed)
             item.release(false)
           end
-          ((i += 1) - 1)
+          i += 1
         end
         @items = nil
       end
@@ -667,7 +667,7 @@ module Org::Eclipse::Swt::Widgets
       info.attr_n_page = height
       info.attr_n_pos = Math.min(@y_current_scroll, info.attr_n_max)
       if (!(info.attr_n_page).equal?(0))
-        ((info.attr_n_page += 1) - 1)
+        info.attr_n_page += 1
       end
       OS._set_scroll_info(self.attr_handle, OS::SB_VERT, info, true)
     end
@@ -700,7 +700,7 @@ module Org::Eclipse::Swt::Widgets
         if (!(item.attr_width).equal?(width))
           item.set_bounds(0, 0, width, item.attr_height, false, true)
         end
-        ((i += 1) - 1)
+        i += 1
       end
       layout_items(0, true)
       OS._invalidate_rect(self.attr_handle, nil, true)
@@ -751,7 +751,7 @@ module Org::Eclipse::Swt::Widgets
         i = 0
         while i < @item_count
           @items[i].attr_y += update_y
-          ((i += 1) - 1)
+          i += 1
         end
       end
     end
@@ -841,7 +841,7 @@ module Org::Eclipse::Swt::Widgets
           force_focus
           break
         end
-        ((i += 1) - 1)
+        i += 1
       end
       return result
     end
@@ -884,7 +884,7 @@ module Org::Eclipse::Swt::Widgets
           item.redraw(false)
           break
         end
-        ((i += 1) - 1)
+        i += 1
       end
       return result
     end
@@ -907,7 +907,7 @@ module Org::Eclipse::Swt::Widgets
           item.attr_hover = hover
           item.redraw(false)
         end
-        ((i += 1) - 1)
+        i += 1
       end
       return result
     end
@@ -979,7 +979,7 @@ module Org::Eclipse::Swt::Widgets
             OS._set_cursor(h_cursor)
             return LRESULT::ONE
           end
-          ((i += 1) - 1)
+          i += 1
         end
       end
       return result
@@ -1010,7 +1010,7 @@ module Org::Eclipse::Swt::Widgets
         if (!(item.attr_width).equal?(width))
           item.set_bounds(0, 0, width, item.attr_height, false, true)
         end
-        ((i += 1) - 1)
+        i += 1
       end
       set_scrollbar
       OS._invalidate_rect(self.attr_handle, nil, true)
@@ -1034,7 +1034,7 @@ module Org::Eclipse::Swt::Widgets
         i = 0
         while i < @item_count
           @items[i].attr_y += update_y
-          ((i += 1) - 1)
+          i += 1
         end
       end
       return result

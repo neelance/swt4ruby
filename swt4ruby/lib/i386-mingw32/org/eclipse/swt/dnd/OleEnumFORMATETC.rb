@@ -63,7 +63,7 @@ module Org::Eclipse::Swt::Dnd
     
     typesig { [] }
     def _add_ref
-      ((@ref_count += 1) - 1)
+      @ref_count += 1
       return @ref_count
     end
     
@@ -198,8 +198,8 @@ module Org::Eclipse::Swt::Dnd
       i = 0
       while i < items.attr_length
         items[i] = @formats[@index]
-        ((@index += 1) - 1)
-        ((i += 1) - 1)
+        @index += 1
+        i += 1
       end
       return items
     end
@@ -224,7 +224,7 @@ module Org::Eclipse::Swt::Dnd
         i = 0
         while i < next_items.attr_length
           COM._move_memory(rgelt + i * FORMATETC.attr_sizeof, next_items[i], FORMATETC.attr_sizeof)
-          ((i += 1) - 1)
+          i += 1
         end
         if (!(pcelt_fetched).equal?(0))
           COM._move_memory(pcelt_fetched, Array.typed(::Java::Int).new([next_items.attr_length]), 4)
@@ -269,7 +269,7 @@ module Org::Eclipse::Swt::Dnd
     
     typesig { [] }
     def _release
-      ((@ref_count -= 1) + 1)
+      @ref_count -= 1
       if ((@ref_count).equal?(0))
         dispose_cominterfaces
         COM._co_free_unused_libraries

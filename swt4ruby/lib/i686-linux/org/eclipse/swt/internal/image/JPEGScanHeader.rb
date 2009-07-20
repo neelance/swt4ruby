@@ -81,7 +81,7 @@ module Org::Eclipse::Swt::Internal::Image
           @component_parameters = new_params
         end
         @component_parameters[cid] = Array.typed(::Java::Int).new([dc, ac])
-        ((i += 1) - 1)
+        i += 1
       end
     end
     
@@ -99,7 +99,7 @@ module Org::Eclipse::Swt::Internal::Image
         comp_params = comp_spec_params[i]
         self.attr_reference[ofs] = (i + 1)
         self.attr_reference[ofs + 1] = (comp_params[0] * 16 + comp_params[1])
-        ((i += 1) - 1)
+        i += 1
       end
     end
     

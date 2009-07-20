@@ -404,13 +404,13 @@ module Org::Eclipse::Swt::Widgets
       step = 2
       gc.draw_line(start_x, start_y, start_x + step, start_y + step)
       gc.draw_line(start_x, start_y + (2 * step), start_x + step, start_y + step)
-      ((start_x += 1) - 1)
+      start_x += 1
       gc.draw_line(start_x, start_y, start_x + step, start_y + step)
       gc.draw_line(start_x, start_y + (2 * step), start_x + step, start_y + step)
       start_x += 3
       gc.draw_line(start_x, start_y, start_x + step, start_y + step)
       gc.draw_line(start_x, start_y + (2 * step), start_x + step, start_y + step)
-      ((start_x += 1) - 1)
+      start_x += 1
       gc.draw_line(start_x, start_y, start_x + step, start_y + step)
       gc.draw_line(start_x, start_y + (2 * step), start_x + step, start_y + step)
       gc.dispose

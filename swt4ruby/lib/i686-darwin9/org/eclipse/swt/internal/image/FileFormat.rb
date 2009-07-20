@@ -114,7 +114,7 @@ module Org::Eclipse::Swt::Internal::Image
             rescue Exception => e
             end
           end
-          ((i += 1) - 1)
+          i += 1
         end
         if (!is_supported)
           SWT.error(SWT::ERROR_UNSUPPORTED_FORMAT)

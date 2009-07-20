@@ -456,7 +456,7 @@ module Org::Eclipse::Swt::Widgets
             end
             column_width = Math.max(column_width, event.attr_x + event.attr_width - header_rect.attr_left)
           end
-          ((i += 1) - 1)
+          i += 1
         end
         if (!(new_font).equal?(0))
           OS._select_object(h_dc, old_font)
@@ -543,7 +543,7 @@ module Org::Eclipse::Swt::Widgets
           if ((column).equal?(self))
             moved = true
           end
-          ((i += 1) - 1)
+          i += 1
         end
       end
     end

@@ -390,7 +390,7 @@ module Org::Eclipse::Swt::Graphics
             i = 0
             while i < cairo_dashes.attr_length
               cairo_dashes[i] = (width).equal?(0) || (@data.attr_line_style).equal?(SWT::LINE_CUSTOM) ? dashes[i] : dashes[i] * width
-              ((i += 1) - 1)
+              i += 1
             end
             Cairo.cairo_set_dash(cairo, cairo_dashes, cairo_dashes.attr_length, dashes_offset)
           else
@@ -488,7 +488,7 @@ module Org::Eclipse::Swt::Graphics
             i = 0
             while i < dash_list.attr_length
               dash_list[i] = ((width).equal?(0) || (@data.attr_line_style).equal?(SWT::LINE_CUSTOM) ? dashes[i] : dashes[i] * width)
-              ((i += 1) - 1)
+              i += 1
             end
             OS.gdk_gc_set_dashes(@handle, 0, dash_list, dash_list.attr_length)
           end
@@ -542,7 +542,7 @@ module Org::Eclipse::Swt::Graphics
         poly_rgn = OS.gdk_region_polygon(point_array, point_array.attr_length / 2, OS::GDK_EVEN_ODD_RULE)
         OS.gdk_region_union(new_rgn, poly_rgn)
         OS.gdk_region_destroy(poly_rgn)
-        ((i += 1) - 1)
+        i += 1
       end
       if (!(rects[0]).equal?(0))
         OS.g_free(rects[0])
@@ -1133,7 +1133,7 @@ module Org::Eclipse::Swt::Graphics
           x += 4
         end
         OS.memmove(pixels + (y * stride), line, stride)
-        ((y += 1) - 1)
+        y += 1
       end
       if (!(src_width).equal?(dest_width) || !(src_height).equal?(dest_height))
         # int
@@ -1201,10 +1201,10 @@ module Org::Eclipse::Swt::Graphics
                   if ((mask_line[x * 3]).equal?(0))
                     line[x * 4 + 3] = 0
                   end
-                  ((x += 1) - 1)
+                  x += 1
                 end
                 OS.memmove(offset, line, stride)
-                ((y += 1) - 1)
+                y += 1
               end
               OS.g_object_unref(mask_pixbuf)
               # int
@@ -1363,7 +1363,7 @@ module Org::Eclipse::Swt::Graphics
           x_rects[j + 1] = RJava.cast_to_short(rect.attr_y)
           x_rects[j + 2] = RJava.cast_to_short(rect.attr_width)
           x_rects[j + 3] = RJava.cast_to_short(rect.attr_height)
-          ((i += 1) - 1)
+          i += 1
           j += 4
         end
         OS._xrender_set_picture_clip_rectangles(x_display, dest_pict, translate_x, translate_y, x_rects, n_rects[0])
@@ -1647,7 +1647,7 @@ module Org::Eclipse::Swt::Graphics
       j = 2
       while i < count
         Cairo.cairo_line_to(cairo, point_array[j] + x_offset, point_array[j + 1] + y_offset)
-        ((i += 1) - 1)
+        i += 1
         j += 2
       end
       if (close)
@@ -2504,13 +2504,13 @@ module Org::Eclipse::Swt::Graphics
             next
           end
           if ((buffer[i]).equal?(Character.new(?&.ord)))
-            ((i += 1) - 1)
+            i += 1
             next
           end
           if ((mnemonic).equal?(-1))
             mnemonic = j
           end
-          ((j -= 1) + 1)
+          j -= 1
         end
       end
       while (j < buffer.attr_length)
@@ -3045,7 +3045,7 @@ module Org::Eclipse::Swt::Graphics
       i = 0
       while i < line_dashes.attr_length
         line_dashes[i] = RJava.cast_to_int(@data.attr_line_dashes[i])
-        ((i += 1) - 1)
+        i += 1
       end
       return line_dashes
     end
@@ -3689,7 +3689,7 @@ module Org::Eclipse::Swt::Graphics
           while i < n_rects[0]
             OS.memmove(rect, rects[0] + (i * GdkRectangle.attr_sizeof), GdkRectangle.attr_sizeof)
             Cairo.cairo_rectangle(cairo, rect.attr_x, rect.attr_y, rect.attr_width, rect.attr_height)
-            ((i += 1) - 1)
+            i += 1
           end
           if (!(rects[0]).equal?(0))
             OS.g_free(rects[0])
@@ -4140,7 +4140,7 @@ module Org::Eclipse::Swt::Graphics
           if (!changed && !(line_dashes[i]).equal?(dash))
             changed = true
           end
-          ((i += 1) - 1)
+          i += 1
         end
         if (changed)
           new_dashes = Array.typed(::Java::Float).new(dashes.attr_length) { 0.0 }
@@ -4242,7 +4242,7 @@ module Org::Eclipse::Swt::Graphics
           if (!changed && !(line_dashes[i]).equal?(dash))
             changed = true
           end
-          ((i += 1) - 1)
+          i += 1
         end
         if (!changed)
           return
@@ -4251,7 +4251,7 @@ module Org::Eclipse::Swt::Graphics
         i_ = 0
         while i_ < dashes.attr_length
           @data.attr_line_dashes[i_] = dashes[i_]
-          ((i_ += 1) - 1)
+          i_ += 1
         end
         @data.attr_line_style = SWT::LINE_CUSTOM
       else

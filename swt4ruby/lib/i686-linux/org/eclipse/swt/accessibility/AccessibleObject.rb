@@ -221,7 +221,7 @@ module Org::Eclipse::Swt::Accessibility
         i = 0
         while i < listeners.attr_length
           listeners[i].get_keyboard_shortcut(event)
-          ((i += 1) - 1)
+          i += 1
         end
         if ((event.attr_result).nil?)
           return parent_result
@@ -273,7 +273,7 @@ module Org::Eclipse::Swt::Accessibility
         i = 0
         while i < listeners.attr_length
           listeners[i].get_default_action(event)
-          ((i += 1) - 1)
+          i += 1
         end
         if ((event.attr_result).nil?)
           return parent_result
@@ -353,7 +353,7 @@ module Org::Eclipse::Swt::Accessibility
         i = 0
         while i < listeners.attr_length
           listeners[i].get_location(event)
-          ((i += 1) - 1)
+          i += 1
         end
         if ((coord_type).equal?(ATK::ATK_XY_WINDOW))
           # translate display -> control, for answering to the OS
@@ -434,7 +434,7 @@ module Org::Eclipse::Swt::Accessibility
         i = 0
         while i < listeners.attr_length
           listeners[i].get_location(event)
-          ((i += 1) - 1)
+          i += 1
         end
         if ((coord_type).equal?(ATK::ATK_XY_WINDOW))
           # translate display -> control, for answering to the OS
@@ -497,7 +497,7 @@ module Org::Eclipse::Swt::Accessibility
         i = 0
         while i < listeners.attr_length
           listeners[i].get_location(event)
-          ((i += 1) - 1)
+          i += 1
         end
         OS.memmove(width, Array.typed(::Java::Int).new([event.attr_width]), 4)
         OS.memmove(height, Array.typed(::Java::Int).new([event.attr_height]), 4)
@@ -558,7 +558,7 @@ module Org::Eclipse::Swt::Accessibility
         i = 0
         while i < listeners.attr_length
           listeners[i].get_child_at_point(event)
-          ((i += 1) - 1)
+          i += 1
         end
         if ((event.attr_child_id).equal?(object.attr_id))
           event.attr_child_id = ACC::CHILDID_SELF
@@ -642,7 +642,7 @@ module Org::Eclipse::Swt::Accessibility
         i = 0
         while i < listeners.attr_length
           listeners[i].get_description(event)
-          ((i += 1) - 1)
+          i += 1
         end
         if ((event.attr_result).nil?)
           return parent_result
@@ -691,7 +691,7 @@ module Org::Eclipse::Swt::Accessibility
         i = 0
         while i < listeners.attr_length
           listeners[i].get_name(event)
-          ((i += 1) - 1)
+          i += 1
         end
         if ((event.attr_result).nil?)
           return parent_result
@@ -736,7 +736,7 @@ module Org::Eclipse::Swt::Accessibility
         i = 0
         while i < listeners.attr_length
           listeners[i].get_child_count(event)
-          ((i += 1) - 1)
+          i += 1
         end
         return event.attr_detail
       end
@@ -808,7 +808,7 @@ module Org::Eclipse::Swt::Accessibility
           i = 0
           while i < listeners.attr_length
             listeners[i].get_role(event)
-            ((i += 1) - 1)
+            i += 1
           end
           if (!(event.attr_detail).equal?(-1))
             case (event.attr_detail)
@@ -945,7 +945,7 @@ module Org::Eclipse::Swt::Accessibility
         i = 0
         while i < listeners.attr_length
           listeners[i].get_state(event)
-          ((i += 1) - 1)
+          i += 1
         end
         if (!(event.attr_detail).equal?(-1))
           # Convert from win32 state values to atk state values
@@ -1029,7 +1029,7 @@ module Org::Eclipse::Swt::Accessibility
         i = 0
         while i < listeners.attr_length
           listeners[i].get_selection(event)
-          ((i += 1) - 1)
+          i += 1
         end
         accessible_object = object.get_child_by_id(event.attr_child_id)
         if (!(accessible_object).nil?)
@@ -1070,7 +1070,7 @@ module Org::Eclipse::Swt::Accessibility
         i = 0
         while i < listeners.attr_length
           listeners[i].get_selection(event)
-          ((i += 1) - 1)
+          i += 1
         end
         acc_obj = object.get_child_by_id(event.attr_child_id)
         if (!(acc_obj).nil?)
@@ -1116,7 +1116,7 @@ module Org::Eclipse::Swt::Accessibility
         i = 0
         while i < listeners.attr_length
           listeners[i].get_caret_offset(event)
-          ((i += 1) - 1)
+          i += 1
         end
         return event.attr_offset
       end
@@ -1208,7 +1208,7 @@ module Org::Eclipse::Swt::Accessibility
         i = 0
         while i < listeners.attr_length
           listeners[i].get_selection_range(event)
-          ((i += 1) - 1)
+          i += 1
         end
         return (event.attr_length).equal?(0) ? parent_result : 1
       end
@@ -1253,7 +1253,7 @@ module Org::Eclipse::Swt::Accessibility
         i = 0
         while i < listeners.attr_length
           listeners[i].get_selection_range(event)
-          ((i += 1) - 1)
+          i += 1
         end
         OS.memmove(start_offset, Array.typed(::Java::Int).new([event.attr_offset]), 4)
         OS.memmove(end_offset, Array.typed(::Java::Int).new([event.attr_offset + event.attr_length]), 4)
@@ -1321,7 +1321,7 @@ module Org::Eclipse::Swt::Accessibility
             case (RJava.cast_to_int(boundary_type))
             when ATK::ATK_TEXT_BOUNDARY_CHAR
               if (length_ > offset)
-                ((end_bounds += 1) - 1)
+                end_bounds += 1
               end
             when ATK::ATK_TEXT_BOUNDARY_WORD_START
               word_start1 = next_index_of_char(text, " !?.\n", offset - 1)
@@ -1499,7 +1499,7 @@ module Org::Eclipse::Swt::Accessibility
             case (RJava.cast_to_int(boundary_type))
             when ATK::ATK_TEXT_BOUNDARY_CHAR
               if (length_ > offset)
-                ((end_bounds += 1) - 1)
+                end_bounds += 1
               end
             when ATK::ATK_TEXT_BOUNDARY_WORD_START
               word_start1 = previous_index_of_not_char(text, " !?.\n", offset)
@@ -1569,7 +1569,7 @@ module Org::Eclipse::Swt::Accessibility
               start_bounds = previous_index_of_char(text, "\n", offset) + 1
               line_end2 = next_index_of_char(text, "\n", start_bounds)
               if (line_end2 < length_)
-                ((line_end2 += 1) - 1)
+                line_end2 += 1
               end
               end_bounds = line_end2
             when ATK::ATK_TEXT_BOUNDARY_LINE_END
@@ -1622,7 +1622,7 @@ module Org::Eclipse::Swt::Accessibility
             case (RJava.cast_to_int(boundary_type))
             when ATK::ATK_TEXT_BOUNDARY_CHAR
               if (length_ >= offset && offset > 0)
-                ((start_bounds -= 1) + 1)
+                start_bounds -= 1
               end
             when ATK::ATK_TEXT_BOUNDARY_WORD_START
               word_start1 = previous_index_of_char(text, " !?.\n", offset - 1)
@@ -1816,7 +1816,7 @@ module Org::Eclipse::Swt::Accessibility
       i = 0
       while i < control_listeners.attr_length
         control_listeners[i].get_value(event)
-        ((i += 1) - 1)
+        i += 1
       end
       return event.attr_result
     end
@@ -1860,7 +1860,7 @@ module Org::Eclipse::Swt::Accessibility
           if (!(index).equal?(-1))
             result = Math.min(result, index)
           end
-          ((i += 1) - 1)
+          i += 1
         end
         return result
       end
@@ -1874,7 +1874,7 @@ module Org::Eclipse::Swt::Accessibility
           if ((search_chars.index_of(current)).equal?(-1))
             break
           end
-          ((index += 1) - 1)
+          index += 1
         end
         return index
       end
@@ -1893,7 +1893,7 @@ module Org::Eclipse::Swt::Accessibility
           if (!(index).equal?(-1))
             result = Math.max(result, index)
           end
-          ((i += 1) - 1)
+          i += 1
         end
         return result
       end
@@ -1909,7 +1909,7 @@ module Org::Eclipse::Swt::Accessibility
           if ((search_chars.index_of(current)).equal?(-1))
             break
           end
-          ((index -= 1) + 1)
+          index -= 1
         end
         return index
       end
@@ -1992,7 +1992,7 @@ module Org::Eclipse::Swt::Accessibility
       i = 0
       while i < listeners.attr_length
         listeners[i].get_children(event)
-        ((i += 1) - 1)
+        i += 1
       end
       if (!(event.attr_children).nil? && event.attr_children.attr_length > 0)
         ids_to_keep = Vector.new(@children.size)
@@ -2017,7 +2017,7 @@ module Org::Eclipse::Swt::Accessibility
               # a non-ID value was given so don't set the ID
             end
             ids_to_keep.add_element(SwtLONG.new(object.attr_handle))
-            ((i_ += 1) - 1)
+            i_ += 1
           end
         else
           # an array of Accessible children was answered
@@ -2034,7 +2034,7 @@ module Org::Eclipse::Swt::Accessibility
               object.attr_index = ((child_index += 1) - 1)
               ids_to_keep.add_element(SwtLONG.new(object.attr_handle))
             end
-            ((i_ += 1) - 1)
+            i_ += 1
           end
         end
         # remove old children that were not provided as children anymore

@@ -240,7 +240,7 @@ module Org::Eclipse::Swt::Browser
           index = i
           break
         end
-        ((i += 1) - 1)
+        i += 1
       end
       if ((index).equal?(-1))
         return
@@ -267,7 +267,7 @@ module Org::Eclipse::Swt::Browser
           index = i
           break
         end
-        ((i += 1) - 1)
+        i += 1
       end
       if ((index).equal?(-1))
         return
@@ -294,7 +294,7 @@ module Org::Eclipse::Swt::Browser
           index = i
           break
         end
-        ((i += 1) - 1)
+        i += 1
       end
       if ((index).equal?(-1))
         return
@@ -321,7 +321,7 @@ module Org::Eclipse::Swt::Browser
           index = i
           break
         end
-        ((i += 1) - 1)
+        i += 1
       end
       if ((index).equal?(-1))
         return
@@ -348,7 +348,7 @@ module Org::Eclipse::Swt::Browser
           index = i
           break
         end
-        ((i += 1) - 1)
+        i += 1
       end
       if ((index).equal?(-1))
         return
@@ -375,7 +375,7 @@ module Org::Eclipse::Swt::Browser
           index = i
           break
         end
-        ((i += 1) - 1)
+        i += 1
       end
       if ((index).equal?(-1))
         return
@@ -402,7 +402,7 @@ module Org::Eclipse::Swt::Browser
           index = i
           break
         end
-        ((i += 1) - 1)
+        i += 1
       end
       if ((index).equal?(-1))
         return
@@ -444,7 +444,7 @@ module Org::Eclipse::Swt::Browser
         if ((KeyTable[i][0]).equal?(key))
           return KeyTable[i][1]
         end
-        ((i += 1) - 1)
+        i += 1
       end
       return 0
     end

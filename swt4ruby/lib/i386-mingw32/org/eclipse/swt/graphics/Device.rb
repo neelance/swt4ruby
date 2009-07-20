@@ -419,7 +419,7 @@ module Org::Eclipse::Swt::Graphics
             @errors[i] = nil
             return
           end
-          ((i += 1) - 1)
+          i += 1
         end
       end
     end
@@ -462,7 +462,7 @@ module Org::Eclipse::Swt::Graphics
         else
           @pixels[@n_fonts] = -log_font.attr_lf_height
         end
-        ((@n_fonts += 1) - 1)
+        @n_fonts += 1
       end
       return 1
     end
@@ -509,9 +509,9 @@ module Org::Eclipse::Swt::Graphics
           i = 0
           while i < length
             if (!(@objects[i]).nil?)
-              ((count += 1) - 1)
+              count += 1
             end
-            ((i += 1) - 1)
+            i += 1
           end
           index = 0
           data.attr_objects = Array.typed(Object).new(count) { nil }
@@ -521,9 +521,9 @@ module Org::Eclipse::Swt::Graphics
             if (!(@objects[i_]).nil?)
               data.attr_objects[index] = @objects[i_]
               data.attr_errors[index] = @errors[i_]
-              ((index += 1) - 1)
+              index += 1
             end
-            ((i_ += 1) - 1)
+            i_ += 1
           end
         end
       else
@@ -617,7 +617,7 @@ module Org::Eclipse::Swt::Graphics
       i = 0
       while i < @log_fonts.attr_length
         @log_fonts[i] = OS::IsUnicode ? LOGFONTW.new : LOGFONTA.new
-        ((i += 1) - 1)
+        i += 1
       end
       @n_fonts = 0
       # Enumerate
@@ -642,7 +642,7 @@ module Org::Eclipse::Swt::Graphics
           else
             OS._enum_font_families_a(h_dc, (lf).attr_lf_face_name, lp_enum_font_fam_proc, scalable ? 1 : 0)
           end
-          ((i_ += 1) - 1)
+          i_ += 1
         end
       else
         # Use the character encoding for the default locale
@@ -666,12 +666,12 @@ module Org::Eclipse::Swt::Graphics
           if ((fd == result[j]))
             break
           end
-          ((j += 1) - 1)
+          j += 1
         end
         if ((j).equal?(count))
           result[((count += 1) - 1)] = fd
         end
-        ((i_ += 1) - 1)
+        i_ += 1
       end
       if (!(count).equal?(result.attr_length))
         new_result = Array.typed(FontData).new(count) { nil }
@@ -895,7 +895,7 @@ module Org::Eclipse::Swt::Graphics
       while i < num_reserved / 2
         @color_ref_count[i] = 1
         @color_ref_count[num_entries - 1 - i] = 1
-        ((i += 1) - 1)
+        i += 1
       end
       internal_dispose__gc(h_dc, nil)
       @h_palette = OS._create_palette(log_palette)
@@ -990,7 +990,7 @@ module Org::Eclipse::Swt::Graphics
             @errors[i] = JavaError.new
             return
           end
-          ((i += 1) - 1)
+          i += 1
         end
         new_objects = Array.typed(Object).new(@objects.attr_length + 128) { nil }
         System.arraycopy(@objects, 0, new_objects, 0, @objects.attr_length)
@@ -1028,39 +1028,39 @@ module Org::Eclipse::Swt::Graphics
           while i < @objects.attr_length
             object = @objects[i]
             if (!(object).nil?)
-              ((object_count += 1) - 1)
+              object_count += 1
               if (object.is_a?(Color))
-                ((colors += 1) - 1)
+                colors += 1
               end
               if (object.is_a?(Cursor))
-                ((cursors += 1) - 1)
+                cursors += 1
               end
               if (object.is_a?(Font))
-                ((fonts += 1) - 1)
+                fonts += 1
               end
               if (object.is_a?(SwtGC))
-                ((gcs += 1) - 1)
+                gcs += 1
               end
               if (object.is_a?(Image))
-                ((images += 1) - 1)
+                images += 1
               end
               if (object.is_a?(Path))
-                ((paths += 1) - 1)
+                paths += 1
               end
               if (object.is_a?(Pattern))
-                ((patterns += 1) - 1)
+                patterns += 1
               end
               if (object.is_a?(Region))
-                ((regions += 1) - 1)
+                regions += 1
               end
               if (object.is_a?(TextLayout))
-                ((text_layouts += 1) - 1)
+                text_layouts += 1
               end
               if (object.is_a?(Transform))
-                ((transforms += 1) - 1)
+                transforms += 1
               end
             end
-            ((i += 1) - 1)
+            i += 1
           end
           if (!(object_count).equal?(0))
             string = "Summary: "
@@ -1103,7 +1103,7 @@ module Org::Eclipse::Swt::Graphics
               if (!(@errors[i_]).nil?)
                 @errors[i_].print_stack_trace(System.err)
               end
-              ((i_ += 1) - 1)
+              i_ += 1
             end
           end
         end

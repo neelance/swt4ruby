@@ -363,7 +363,7 @@ module Org::Eclipse::Swt::Widgets
       while index <= end_
         OS.gtk_tree_model_iter_nth_child(@model_handle, iter, 0, index)
         OS.gtk_tree_selection_unselect_iter(selection, iter)
-        ((index += 1) - 1)
+        index += 1
       end
       OS.g_signal_handlers_unblock_matched(selection, OS::G_SIGNAL_MATCH_DATA, 0, 0, 0, 0, CHANGED)
       OS.g_free(iter)
@@ -400,12 +400,12 @@ module Org::Eclipse::Swt::Widgets
       while i < indices.attr_length
         index = indices[i]
         if (index < 0 || index > count - 1)
-          ((i += 1) - 1)
+          i += 1
           next
         end
         OS.gtk_tree_model_iter_nth_child(@model_handle, iter, 0, index)
         OS.gtk_tree_selection_unselect_iter(selection, iter)
-        ((i += 1) - 1)
+        i += 1
       end
       OS.g_signal_handlers_unblock_matched(selection, OS::G_SIGNAL_MATCH_DATA, 0, 0, 0, 0, CHANGED)
       OS.g_free(iter)
@@ -618,7 +618,7 @@ module Org::Eclipse::Swt::Widgets
           OS.g_free(ptr[0])
           result[index] = String.new(Converter.mbcs_to_wcs(nil, buffer))
         end
-        ((index += 1) - 1)
+        index += 1
       end
       OS.g_free(iter)
       return result
@@ -646,7 +646,7 @@ module Org::Eclipse::Swt::Widgets
       i = 0
       while i < indices.attr_length
         result[i] = get_item(indices[i])
-        ((i += 1) - 1)
+        i += 1
       end
       return result
     end
@@ -719,7 +719,7 @@ module Org::Eclipse::Swt::Widgets
             OS.memmove(index, indices, 4)
             break
           end
-          ((i += 1) - 1)
+          i += 1
         end
         OS.g_list_free(list)
         return index[0]
@@ -781,9 +781,9 @@ module Org::Eclipse::Swt::Widgets
             index = Array.typed(::Java::Int).new(1) { 0 }
             OS.memmove(index, indices, 4)
             tree_selection[length] = index[0]
-            ((length += 1) - 1)
+            length += 1
           end
-          ((i += 1) - 1)
+          i += 1
         end
         OS.g_list_free(list)
         result = Array.typed(::Java::Int).new(length) { 0 }
@@ -1010,7 +1010,7 @@ module Org::Eclipse::Swt::Widgets
         if ((items[i] == string))
           return i
         end
-        ((i += 1) - 1)
+        i += 1
       end
       return -1
     end
@@ -1123,7 +1123,7 @@ module Org::Eclipse::Swt::Widgets
       while index >= start
         OS.gtk_tree_model_iter_nth_child(@model_handle, iter, 0, index)
         OS.gtk_list_store_remove(@model_handle, iter)
-        ((index -= 1) + 1)
+        index -= 1
       end
       OS.g_signal_handlers_unblock_matched(selection, OS::G_SIGNAL_MATCH_DATA, 0, 0, 0, 0, CHANGED)
       OS.g_free(iter)
@@ -1201,7 +1201,7 @@ module Org::Eclipse::Swt::Widgets
           OS.gtk_list_store_remove(@model_handle, iter)
           last = index
         end
-        ((i += 1) - 1)
+        i += 1
       end
       OS.g_signal_handlers_unblock_matched(selection, OS::G_SIGNAL_MATCH_DATA, 0, 0, 0, 0, CHANGED)
       OS.g_free(iter)
@@ -1331,7 +1331,7 @@ module Org::Eclipse::Swt::Widgets
           OS.gtk_tree_view_set_cursor(self.attr_handle, path, 0, false)
           OS.gtk_tree_path_free(path)
         end
-        ((index += 1) - 1)
+        index += 1
       end
       OS.g_signal_handlers_unblock_matched(selection, OS::G_SIGNAL_MATCH_DATA, 0, 0, 0, 0, CHANGED)
       OS.g_free(iter)
@@ -1377,7 +1377,7 @@ module Org::Eclipse::Swt::Widgets
       while i < length
         index = indices[i]
         if (!(0 <= index && index < count))
-          ((i += 1) - 1)
+          i += 1
           next
         end
         OS.gtk_tree_model_iter_nth_child(@model_handle, iter, 0, index)
@@ -1388,7 +1388,7 @@ module Org::Eclipse::Swt::Widgets
           OS.gtk_tree_view_set_cursor(self.attr_handle, path, 0, false)
           OS.gtk_tree_path_free(path)
         end
-        ((i += 1) - 1)
+        i += 1
       end
       OS.g_signal_handlers_unblock_matched(selection, OS::G_SIGNAL_MATCH_DATA, 0, 0, 0, 0, CHANGED)
       OS.g_free(iter)
@@ -1525,7 +1525,7 @@ module Org::Eclipse::Swt::Widgets
         if ((items[i]).nil?)
           error(SWT::ERROR_INVALID_ARGUMENT)
         end
-        ((i += 1) - 1)
+        i += 1
       end
       # long
       selection = OS.gtk_tree_view_get_selection(self.attr_handle)
@@ -1543,7 +1543,7 @@ module Org::Eclipse::Swt::Widgets
         buffer = Converter.wcs_to_mbcs(nil, string, true)
         OS.gtk_list_store_append(@model_handle, iter)
         OS.gtk_list_store_set(@model_handle, iter, TEXT_COLUMN, buffer, -1)
-        ((i_ += 1) - 1)
+        i_ += 1
       end
       OS.g_free(iter)
     end
@@ -1694,10 +1694,10 @@ module Org::Eclipse::Swt::Widgets
               select_focus_index(index)
               break
             end
-            ((index += 1) - 1)
+            index += 1
           end
         end
-        ((i += 1) - 1)
+        i += 1
       end
       show_selection
     end

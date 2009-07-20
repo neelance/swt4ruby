@@ -96,7 +96,7 @@ module Org::Eclipse::Swt::Internal::Image
           cnt = @input_stream.read(@buffers[index], offset, Math.min(n, CHUNK_SIZE - offset))
           n -= cnt
           @next += cnt
-          ((index += 1) - 1)
+          index += 1
           offset = 0
         end
       end
@@ -117,7 +117,7 @@ module Org::Eclipse::Swt::Internal::Image
           System.arraycopy(@buffers[index], offset, b, dest_next, cnt)
           n_cached -= cnt
           dest_next += cnt
-          ((index += 1) - 1)
+          index += 1
           offset = 0
         end
       end
@@ -139,7 +139,7 @@ module Org::Eclipse::Swt::Internal::Image
           n_missing -= cnt
           @next += cnt
           dest_next += cnt
-          ((index += 1) - 1)
+          index += 1
           offset = 0
         end
       end

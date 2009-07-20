@@ -501,7 +501,7 @@ module Org::Eclipse::Swt::Graphics
         if ((chars[index]).equal?(0))
           break
         end
-        ((index += 1) - 1)
+        index += 1
       end
       return String.new(chars, 0, index)
     end
@@ -658,7 +658,7 @@ module Org::Eclipse::Swt::Graphics
         i = 0
         while i < lf_face_name.attr_length
           lf_face_name[i] = 0
-          ((i += 1) - 1)
+          i += 1
         end
         System.arraycopy(buffer.attr_chars, 0, lf_face_name, 0, length_)
       else
@@ -666,7 +666,7 @@ module Org::Eclipse::Swt::Graphics
         i = 0
         while i < lf_face_name.attr_length
           lf_face_name[i] = 0
-          ((i += 1) - 1)
+          i += 1
         end
         System.arraycopy(buffer.attr_bytes, 0, lf_face_name, 0, length_)
       end

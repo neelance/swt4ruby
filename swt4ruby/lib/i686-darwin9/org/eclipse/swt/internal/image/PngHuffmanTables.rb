@@ -129,7 +129,7 @@ module Org::Eclipse::Swt::Internal::Image
       i = 0
       while i < code_length_codes
         length_codes[LengthCodeOrder[i]] = stream.get_next_idat_bits(3)
-        ((i += 1) - 1)
+        i += 1
       end
       code_lengths_table = PngHuffmanTable.new(length_codes)
       literal_lengths = read_lengths(stream, literals, code_lengths_table, LiteralTableSize)
@@ -147,7 +147,7 @@ module Org::Eclipse::Swt::Internal::Image
         if (value < 16)
           # Literal value
           lengths[index] = value
-          ((index += 1) - 1)
+          index += 1
         else
           if ((value).equal?(16))
             # Repeat the previous code 3-6 times.
@@ -155,8 +155,8 @@ module Org::Eclipse::Swt::Internal::Image
             i = 0
             while i < count
               lengths[index] = lengths[index - 1]
-              ((index += 1) - 1)
-              ((i += 1) - 1)
+              index += 1
+              i += 1
             end
           else
             if ((value).equal?(17))
@@ -165,8 +165,8 @@ module Org::Eclipse::Swt::Internal::Image
               i = 0
               while i < count
                 lengths[index] = 0
-                ((index += 1) - 1)
-                ((i += 1) - 1)
+                index += 1
+                i += 1
               end
             else
               if ((value).equal?(18))
@@ -175,8 +175,8 @@ module Org::Eclipse::Swt::Internal::Image
                 i = 0
                 while i < count
                   lengths[index] = 0
-                  ((index += 1) - 1)
-                  ((i += 1) - 1)
+                  index += 1
+                  i += 1
                 end
               else
                 stream.error

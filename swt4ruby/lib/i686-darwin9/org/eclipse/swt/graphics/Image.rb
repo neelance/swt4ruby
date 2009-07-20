@@ -354,10 +354,10 @@ module Org::Eclipse::Swt::Graphics
                 line[offset + 3] = one_blue
               end
               offset += 4
-              ((x += 1) - 1)
+              x += 1
             end
             OS.memmove(@data + (y * bpr), line, bpr)
-            ((y += 1) - 1)
+            y += 1
           end
         when SWT::IMAGE_GRAY
           line = Array.typed(::Java::Byte).new(bpr) { 0 }
@@ -373,10 +373,10 @@ module Org::Eclipse::Swt::Graphics
               intensity = ((red + red + green + green + green + green + green + blue) >> 3)
               line[offset + 1] = line[offset + 2] = line[offset + 3] = intensity
               offset += 4
-              ((x += 1) - 1)
+              x += 1
             end
             OS.memmove(@data + (y * bpr), line, bpr)
-            ((y += 1) - 1)
+            y += 1
           end
         end
       end
@@ -673,9 +673,9 @@ module Org::Eclipse::Swt::Graphics
               src_data[offset] = @alpha_data[alpha_offset]
               offset += 4
               alpha_offset += 1
-              ((x += 1) - 1)
+              x += 1
             end
-            ((y += 1) - 1)
+            y += 1
           end
         end
       end
@@ -809,10 +809,10 @@ module Org::Eclipse::Swt::Graphics
               mask_data[mask_offset + (x >> 3)] &= ~(1 << (7 - (x & 0x7)))
             end
             offset += 4
-            ((x += 1) - 1)
+            x += 1
           end
           mask_offset += mask_bpl
-          ((y += 1) - 1)
+          y += 1
         end
         data.attr_mask_data = mask_data
         data.attr_mask_pad = mask_pad
@@ -956,13 +956,13 @@ module Org::Eclipse::Swt::Graphics
         while i < rgbs.attr_length
           rgb = rgbs[i]
           if ((rgb).nil?)
-            ((i += 1) - 1)
+            i += 1
             next
           end
           src_reds[i] = rgb.attr_red
           src_greens[i] = rgb.attr_green
           src_blues[i] = rgb.attr_blue
-          ((i += 1) - 1)
+          i += 1
         end
         ImageData.blit(ImageData::BLIT_SRC, image.attr_data, image.attr_depth, image.attr_bytes_per_line, image.get_byte_order, 0, 0, width, height, src_reds, src_greens, src_blues, ImageData::ALPHA_OPAQUE, nil, 0, 0, 0, buffer, 32, bpr, ImageData::MSB_FIRST, 0, 0, width, height, 0xff0000, 0xff00, 0xff, false, false)
       end
@@ -1000,10 +1000,10 @@ module Org::Eclipse::Swt::Graphics
           while x < width
             buffer[offset] = !(((mask_data[mask_offset + (x >> 3)]) & (1 << (7 - (x & 0x7))))).equal?(0) ? 0xff : 0
             offset += 4
-            ((x += 1) - 1)
+            x += 1
           end
           mask_offset += mask_bpl
-          ((y += 1) - 1)
+          y += 1
         end
       else
         @type = SWT::BITMAP
@@ -1028,9 +1028,9 @@ module Org::Eclipse::Swt::Graphics
                 buffer[offset] = @alpha_data[alpha_offset]
                 offset += 4
                 alpha_offset += 1
-                ((x += 1) - 1)
+                x += 1
               end
-              ((y += 1) - 1)
+              y += 1
             end
           end
         end
@@ -1180,7 +1180,7 @@ module Org::Eclipse::Swt::Graphics
           j += 4
         end
         OS.memmove(@data + offset, line, bpl)
-        ((i += 1) - 1)
+        i += 1
         offset += bpl
       end
       @transparent_pixel = (new_red & 0xff) << 16 | (new_green & 0xff) << 8 | (new_blue & 0xff)

@@ -761,7 +761,7 @@ module Org::Eclipse::Swt::Widgets
         @tool_tips = Array.typed(ToolTip).new(4) { nil }
       end
       while (id < @tool_tips.attr_length && !(@tool_tips[id]).nil?)
-        ((id += 1) - 1)
+        id += 1
       end
       if ((id).equal?(@tool_tips.attr_length))
         new_tool_tips = Array.typed(ToolTip).new(@tool_tips.attr_length + 4) { nil }
@@ -882,7 +882,7 @@ module Org::Eclipse::Swt::Widgets
           if ((value).equal?(OS._get_sys_color(SYSTEM_COLORS[i])))
             return OS._get_sys_color_brush(SYSTEM_COLORS[i])
           end
-          ((i += 1) - 1)
+          i += 1
         end
       end
       if ((@brushes).nil?)
@@ -912,7 +912,7 @@ module Org::Eclipse::Swt::Widgets
             end
           end
         end
-        ((i += 1) - 1)
+        i += 1
       end
       length = @brushes.attr_length
       # long
@@ -1310,9 +1310,9 @@ module Org::Eclipse::Swt::Widgets
           shell = shell.attr_parent
         end while (!(shell).nil? && !(shell).equal?(self))
         if ((shell).equal?(self))
-          ((count += 1) - 1)
+          count += 1
         end
-        ((i += 1) - 1)
+        i += 1
       end
       index = 0
       result = Array.typed(Shell).new(count) { nil }
@@ -1325,7 +1325,7 @@ module Org::Eclipse::Swt::Widgets
         if ((shell).equal?(self))
           result[((index += 1) - 1)] = shells[i_]
         end
-        ((i_ += 1) - 1)
+        i_ += 1
       end
       return result
     end
@@ -1451,7 +1451,7 @@ module Org::Eclipse::Swt::Widgets
           if (!(@brushes[i]).equal?(0))
             OS._delete_object(@brushes[i])
           end
-          ((i += 1) - 1)
+          i += 1
         end
       end
       @brushes = nil
@@ -1466,7 +1466,7 @@ module Org::Eclipse::Swt::Widgets
         if (!(shell).nil? && !shell.is_disposed)
           shell.release(false)
         end
-        ((i += 1) - 1)
+        i += 1
       end
       if (!(@tool_tips).nil?)
         i_ = 0
@@ -1475,7 +1475,7 @@ module Org::Eclipse::Swt::Widgets
           if (!(tool_tip).nil? && !tool_tip.is_disposed)
             tool_tip.release(false)
           end
-          ((i_ += 1) - 1)
+          i_ += 1
         end
       end
       @tool_tips = nil
@@ -1634,7 +1634,7 @@ module Org::Eclipse::Swt::Widgets
         if (!(activate[index]).equal?(deactivate[index]))
           break
         end
-        ((index += 1) - 1)
+        index += 1
       end
       # It is possible (but unlikely), that application
       # code could have destroyed some of the widgets. If
@@ -2385,7 +2385,7 @@ module Org::Eclipse::Swt::Widgets
           b_vk = OS::VK_APP1
           while b_vk <= OS::VK_APP6
             OS._shset_app_key_wnd_assoc(b_vk, hwnd)
-            ((b_vk += 1) - 1)
+            b_vk += 1
           end
         end
         # Restore SIP state when window is activated

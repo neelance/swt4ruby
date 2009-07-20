@@ -285,7 +285,7 @@ module Org::Eclipse::Swt::Custom
       i = 0
       while i < events.attr_length
         add_listener(events[i], listener)
-        ((i += 1) - 1)
+        i += 1
       end
       @table_listener = Class.new(Listener.class == Class ? Listener : Object) do
         extend LocalClass
@@ -461,7 +461,7 @@ module Org::Eclipse::Swt::Custom
             if ((order[index]).equal?(column_index))
               break
             end
-            ((index += 1) - 1)
+            index += 1
           end
           if ((index).equal?(order.attr_length))
             index = 0
@@ -613,7 +613,7 @@ module Org::Eclipse::Swt::Custom
           if (rect.attr_y > client_rect.attr_y + client_rect.attr_height)
             return
           end
-          ((i += 1) - 1)
+          i += 1
         end
         if ((item).nil?)
           return
@@ -640,7 +640,7 @@ module Org::Eclipse::Swt::Custom
             new_column = @table.get_column(i)
             break
           end
-          ((i += 1) - 1)
+          i += 1
         end
         if ((new_column).nil?)
           if (((@table.get_style & SWT::FULL_SELECTION)).equal?(0))

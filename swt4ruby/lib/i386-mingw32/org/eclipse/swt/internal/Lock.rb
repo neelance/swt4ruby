@@ -48,7 +48,7 @@ module Org::Eclipse::Swt::Internal
       synchronized((self)) do
         current = JavaThread.current_thread
         if (!(@owner).equal?(current))
-          ((@wait_count += 1) - 1)
+          @wait_count += 1
           while (@count > 0)
             begin
               wait

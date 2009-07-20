@@ -261,7 +261,7 @@ module Org::Eclipse::Swt::Custom
       i = 0
       while i < events.attr_length
         add_listener(events[i], listener)
-        ((i += 1) - 1)
+        i += 1
       end
     end
     
@@ -285,7 +285,7 @@ module Org::Eclipse::Swt::Custom
           t = (i).to_f / (count).to_f
           polygon[2 * i] = RJava.cast_to_int((a0 + a1 * t + a2 * t * t + a3 * t * t * t))
           polygon[2 * i + 1] = RJava.cast_to_int((b0 + b1 * t + b2 * t * t + b3 * t * t * t))
-          ((i += 1) - 1)
+          i += 1
         end
         return polygon
       end
@@ -475,7 +475,7 @@ module Org::Eclipse::Swt::Custom
       while i < @curve.attr_length / 2
         line1[((index += 1) - 1)] = x + @curve[2 * i]
         line1[((index += 1) - 1)] = @curve[2 * i + 1]
-        ((i += 1) - 1)
+        i += 1
       end
       line1[((index += 1) - 1)] = x + @curve_width
       line1[((index += 1) - 1)] = 0
@@ -490,7 +490,7 @@ module Org::Eclipse::Swt::Custom
         while i_ < line1.attr_length / 2
           line2[index] = line1[((index += 1) - 1)] - 1
           line2[index] = line1[((index += 1) - 1)]
-          ((i_ += 1) - 1)
+          i_ += 1
         end
         line3 = Array.typed(::Java::Int).new(line1.attr_length) { 0 }
         index = 0
@@ -498,7 +498,7 @@ module Org::Eclipse::Swt::Custom
         while i__ < line1.attr_length / 2
           line3[index] = line1[((index += 1) - 1)] + 1
           line3[index] = line1[((index += 1) - 1)]
-          ((i__ += 1) - 1)
+          i__ += 1
         end
         from = border1.get_rgb
         to = background.get_rgb

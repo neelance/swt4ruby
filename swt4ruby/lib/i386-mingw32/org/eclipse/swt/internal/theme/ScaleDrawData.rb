@@ -93,7 +93,7 @@ module Org::Eclipse::Swt::Internal::Theme
             rect.attr_left = bounds.attr_x + TICS_MARGIN / 2
             rect.attr_right = rect.attr_left + tic_width
             if (!(sel).equal?(minimum) && !(sel).equal?(maximum))
-              ((rect.attr_left += 1) - 1)
+              rect.attr_left += 1
             end
             rect.attr_top = bounds.attr_y + margin_y + thumb_height / 2
             rect.attr_top += ((track_height - thumb_height) * (sel - minimum)) / Math.max(1, maximum - minimum)
@@ -104,7 +104,7 @@ module Org::Eclipse::Swt::Internal::Theme
             rect.attr_left = bounds.attr_x + TICS_MARGIN + thumb_width + 1
             rect.attr_right = rect.attr_left + tic_width
             if (!(sel).equal?(minimum) && !(sel).equal?(maximum))
-              ((rect.attr_right -= 1) + 1)
+              rect.attr_right -= 1
             end
             # TODO - why tics are ot drawn
             OS._draw_theme_background(h_theme, gc.attr_handle, OS::TKP_TICSVERT, 1, rect, nil)

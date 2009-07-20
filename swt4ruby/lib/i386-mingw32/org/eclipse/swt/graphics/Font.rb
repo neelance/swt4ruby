@@ -118,7 +118,7 @@ module Org::Eclipse::Swt::Graphics
         if ((fds[i]).nil?)
           SWT.error(SWT::ERROR_INVALID_ARGUMENT)
         end
-        ((i += 1) - 1)
+        i += 1
       end
       init(fds[0])
       init

@@ -279,7 +279,7 @@ module Org::Eclipse::Swt::Graphics
         color_copy.attr_blue = @handle.attr_blue
         color_copy.attr_pixel = @handle.attr_pixel
         self.attr_device.attr_gdk_colors[color_copy.attr_pixel] = color_copy
-        ((self.attr_device.attr_color_ref_count[color_copy.attr_pixel] += 1) - 1)
+        self.attr_device.attr_color_ref_count[color_copy.attr_pixel] += 1
       end
     end
     

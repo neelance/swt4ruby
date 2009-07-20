@@ -192,7 +192,7 @@ module Org::Eclipse::Swt::Widgets
             item.set_tool_tip_text(old_shell, nil)
             item.set_tool_tip_text(new_shell, item.attr_tool_tip_text)
           end
-          ((i += 1) - 1)
+          i += 1
         end
       end
     end
@@ -210,7 +210,7 @@ module Org::Eclipse::Swt::Widgets
         if (item.set_focus)
           return true
         end
-        ((i += 1) - 1)
+        i += 1
       end
       return super(focus_handle)
     end
@@ -263,7 +263,7 @@ module Org::Eclipse::Swt::Widgets
         if (items[i].get_bounds.contains(point))
           return items[i]
         end
-        ((i += 1) - 1)
+        i += 1
       end
       return nil
     end
@@ -319,7 +319,7 @@ module Org::Eclipse::Swt::Widgets
         data = OS.g_list_nth_data(list, i)
         widget = self.attr_display.get_widget(data)
         result[i] = widget
-        ((i += 1) - 1)
+        i += 1
       end
       OS.g_list_free(list)
       return result
@@ -363,7 +363,7 @@ module Org::Eclipse::Swt::Widgets
         if (items[index].has_focus)
           break
         end
-        ((index += 1) - 1)
+        index += 1
       end
       gdk_event = GdkEventKey.new
       OS.memmove(gdk_event, event_ptr, GdkEventKey.attr_sizeof)
@@ -417,7 +417,7 @@ module Org::Eclipse::Swt::Widgets
         if (item.has_focus)
           return true
         end
-        ((i += 1) - 1)
+        i += 1
       end
       return super
     end
@@ -450,7 +450,7 @@ module Org::Eclipse::Swt::Widgets
         if ((item).equal?(items[i]))
           return i
         end
-        ((i += 1) - 1)
+        i += 1
       end
       return -1
     end
@@ -465,7 +465,7 @@ module Org::Eclipse::Swt::Widgets
         if (!(label_handle).equal?(0) && mnemonic_hit(label_handle, key))
           return true
         end
-        ((i += 1) - 1)
+        i += 1
       end
       return false
     end
@@ -480,7 +480,7 @@ module Org::Eclipse::Swt::Widgets
         if (!(label_handle).equal?(0) && mnemonic_match(label_handle, key))
           return true
         end
-        ((i += 1) - 1)
+        i += 1
       end
       return false
     end
@@ -494,7 +494,7 @@ module Org::Eclipse::Swt::Widgets
         if (!(item).nil?)
           item.resize_control
         end
-        ((i += 1) - 1)
+        i += 1
       end
     end
     
@@ -507,7 +507,7 @@ module Org::Eclipse::Swt::Widgets
         if (!(item).nil? && !item.is_disposed)
           item.release(false)
         end
-        ((i += 1) - 1)
+        i += 1
       end
       super(destroy)
     end
@@ -531,7 +531,7 @@ module Org::Eclipse::Swt::Widgets
         if ((item.attr_control).equal?(control))
           item.set_control(nil)
         end
-        ((i += 1) - 1)
+        i += 1
       end
     end
     
@@ -552,7 +552,7 @@ module Org::Eclipse::Swt::Widgets
       i = 0
       while i < items.attr_length
         items[i].set_font_description(font)
-        ((i += 1) - 1)
+        i += 1
       end
       relayout
     end
@@ -564,7 +564,7 @@ module Org::Eclipse::Swt::Widgets
       i = 0
       while i < items.attr_length
         items[i].set_foreground_color(color)
-        ((i += 1) - 1)
+        i += 1
       end
     end
     
@@ -578,7 +578,7 @@ module Org::Eclipse::Swt::Widgets
       while i < items.attr_length
         new_string = !(string).nil? ? nil : items[i].attr_tool_tip_text
         shell.set_tool_tip_text(items[i].attr_handle, new_string)
-        ((i += 1) - 1)
+        i += 1
       end
     end
     

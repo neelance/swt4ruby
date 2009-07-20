@@ -156,7 +156,7 @@ module Org::Eclipse::Swt::Dnd
         ensure
           OS._cfrelease(cfstring)
         end
-        ((i += 1) - 1)
+        i += 1
       end
       transfer_data.attr_data = data
       transfer_data.attr_result = 0
@@ -225,7 +225,7 @@ module Org::Eclipse::Swt::Dnd
         ensure
           OS._cfrelease(url)
         end
-        ((i += 1) - 1)
+        i += 1
       end
       return file_names
     end
@@ -251,7 +251,7 @@ module Org::Eclipse::Swt::Dnd
         if ((strings[i]).nil? || (strings[i].length).equal?(0))
           return false
         end
-        ((i += 1) - 1)
+        i += 1
       end
       return true
     end

@@ -533,7 +533,7 @@ module Org::Eclipse::Swt::Custom
         if (!(item).nil?)
           return item
         end
-        ((i += 1) - 1)
+        i += 1
       end
       return nil
     end
@@ -605,7 +605,7 @@ module Org::Eclipse::Swt::Custom
         if ((@items[i]).equal?(item))
           return i
         end
-        ((i += 1) - 1)
+        i += 1
       end
       return -1
     end
@@ -626,7 +626,7 @@ module Org::Eclipse::Swt::Custom
       i = 0
       while i < @items.attr_length
         @items[i].expand_all(notify)
-        ((i += 1) - 1)
+        i += 1
       end
     end
     
@@ -641,8 +641,8 @@ module Org::Eclipse::Swt::Custom
         if (@items[i].attr_expanded)
           index += @items[i].visible_children_count
         end
-        ((index += 1) - 1)
-        ((i += 1) - 1)
+        index += 1
+        i += 1
       end
       return -1
     end
@@ -655,7 +655,7 @@ module Org::Eclipse::Swt::Custom
         if (@items[i].get_visible)
           count += 1 + @items[i].visible_children_count
         end
-        ((i += 1) - 1)
+        i += 1
       end
       return count
     end
@@ -668,7 +668,7 @@ module Org::Eclipse::Swt::Custom
       i = @items.attr_length - 1
       while i >= 0
         @items[i].dispose
-        ((i -= 1) + 1)
+        i -= 1
       end
       super
       if (!@parent.attr_in_dispose)
@@ -696,7 +696,7 @@ module Org::Eclipse::Swt::Custom
     def remove_item(item)
       index = 0
       while (index < @items.attr_length && !(@items[index]).equal?(item))
-        ((index += 1) - 1)
+        index += 1
       end
       if ((index).equal?(@items.attr_length))
         return
@@ -810,7 +810,7 @@ module Org::Eclipse::Swt::Custom
       i = 0
       while i < @items.attr_length
         @items[i].set_visible(expanded)
-        ((i += 1) - 1)
+        i += 1
       end
       image = expanded ? @parent.get_minus_image : @parent.get_plus_image
       @table_item.set_image(0, image)
@@ -1006,7 +1006,7 @@ module Org::Eclipse::Swt::Custom
           if (i < @images.attr_length && !(@images[i]).nil?)
             set_image(i, @images[i])
           end
-          ((i += 1) - 1)
+          i += 1
         end
         # display the children and the appropriate [+]/[-] symbol as required
         if (!(@items.attr_length).equal?(0))
@@ -1016,7 +1016,7 @@ module Org::Eclipse::Swt::Custom
             length = @items.attr_length
             while i_ < length
               @items[i_].set_visible(true)
-              ((i_ += 1) - 1)
+              i_ += 1
             end
           else
             @table_item.set_image(0, @parent.get_plus_image)
@@ -1027,7 +1027,7 @@ module Org::Eclipse::Swt::Custom
         length = @items.attr_length
         while i < length
           @items[i].set_visible(false)
-          ((i += 1) - 1)
+          i += 1
         end
         # remove row from table
         @table_item.dispose

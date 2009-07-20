@@ -1023,7 +1023,7 @@ module Org::Eclipse::Swt::Widgets
         if (!(self).equal?(child))
           child.set_radio_selection(false)
         end
-        ((i += 1) - 1)
+        i += 1
       end
       set_selection(true)
     end

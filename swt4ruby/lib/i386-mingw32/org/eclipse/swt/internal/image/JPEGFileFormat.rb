@@ -420,7 +420,7 @@ module Org::Eclipse::Swt::Internal::Image
           b_cb_table[i] = i * 32768 + 8388608
           g_cr_table[i] = i * -27439
           b_cr_table[i] = i * -5329
-          ((i += 1) - 1)
+          i += 1
         end
         const_set :RYTable, r_ytable
         const_set :GYTable, g_ytable
@@ -443,7 +443,7 @@ module Org::Eclipse::Swt::Internal::Image
           cb_btable[i_] = (58065 * x2 + 32768) >> 16
           cr_gtable[i_] = -23401 * x2
           cb_gtable[i_] = -11277 * x2 + 32768
-          ((i_ += 1) - 1)
+          i_ += 1
         end
         const_set :CrRTable, cr_rtable
         const_set :CbBTable, cb_btable
@@ -457,11 +457,11 @@ module Org::Eclipse::Swt::Internal::Image
         i__ = 1
         while i__ < n_bits_table.attr_length
           if (!(i__ < power2))
-            ((n_bits += 1) - 1)
+            n_bits += 1
             power2 *= 2
           end
           n_bits_table[i__] = n_bits
-          ((i__ += 1) - 1)
+          i__ += 1
         end
         const_set :NBitsTable, n_bits_table
       end
@@ -478,7 +478,7 @@ module Org::Eclipse::Swt::Internal::Image
       while i < @n_components
         frame_component = @frame_components[@component_ids[i]]
         @image_components[i] = Array.typed(::Java::Byte).new(frame_component[CW] * frame_component[CH]) { 0 }
-        ((i += 1) - 1)
+        i += 1
       end
       frame_component = @frame_components[@component_ids[ID_Y]]
       y_pos = 0
@@ -486,7 +486,7 @@ module Org::Eclipse::Swt::Internal::Image
         src_ofs = y_pos * src_width
         dst_ofs = y_pos * frame_component[CW]
         System.arraycopy(data_ycomp, src_ofs, @image_components[ID_Y], dst_ofs, src_width)
-        ((y_pos += 1) - 1)
+        y_pos += 1
       end
       frame_component = @frame_components[@component_ids[ID_CB]]
       y_pos_ = 0
@@ -501,14 +501,14 @@ module Org::Eclipse::Swt::Internal::Image
             ih = 0
             while ih < @max_h
               sum += data_cb_comp[src_index + ih] & 0xff
-              ((ih += 1) - 1)
+              ih += 1
             end
-            ((iv += 1) - 1)
+            iv += 1
           end
           @image_components[ID_CB][dest_row_index + x_pos] = (sum / vh_factor)
-          ((x_pos += 1) - 1)
+          x_pos += 1
         end
-        ((y_pos_ += 1) - 1)
+        y_pos_ += 1
       end
       frame_component = @frame_components[@component_ids[ID_CR]]
       y_pos__ = 0
@@ -523,14 +523,14 @@ module Org::Eclipse::Swt::Internal::Image
             ih = 0
             while ih < @max_h
               sum += data_cr_comp[src_index + ih] & 0xff
-              ((ih += 1) - 1)
+              ih += 1
             end
-            ((iv += 1) - 1)
+            iv += 1
           end
           @image_components[ID_CR][dest_row_index + x_pos] = (sum / vh_factor)
-          ((x_pos += 1) - 1)
+          x_pos += 1
         end
-        ((y_pos__ += 1) - 1)
+        y_pos__ += 1
       end
       i_comp = 0
       while i_comp < @n_components
@@ -551,9 +551,9 @@ module Org::Eclipse::Swt::Internal::Image
             i_ = 0
             while i_ < delta
               image_component[dst_ofs + i_] = data_value
-              ((i_ += 1) - 1)
+              i_ += 1
             end
-            ((y_pos___ += 1) - 1)
+            y_pos___ += 1
           end
         end
         if (compressed_height < component_height)
@@ -562,10 +562,10 @@ module Org::Eclipse::Swt::Internal::Image
           while y_pos___ <= component_height
             dst_ofs = (y_pos___ - 1) * component_width
             System.arraycopy(image_component, src_ofs, image_component, dst_ofs, component_width)
-            ((y_pos___ += 1) - 1)
+            y_pos___ += 1
           end
         end
-        ((i_comp += 1) - 1)
+        i_comp += 1
       end
     end
     
@@ -587,19 +587,19 @@ module Org::Eclipse::Swt::Internal::Image
         n = RYTable[r] + GYTable[g] + BYTable[b]
         y_comp[i] = (n >> 16)
         if ((n < 0) && (!((n & 0xffff)).equal?(0)))
-          ((y_comp[i] -= 1) + 1)
+          y_comp[i] -= 1
         end
         n = RCbTable[r] + GCbTable[g] + BCbTable[b]
         cb_comp[i] = (n >> 16)
         if ((n < 0) && (!((n & 0xffff)).equal?(0)))
-          ((cb_comp[i] -= 1) + 1)
+          cb_comp[i] -= 1
         end
         n = RCrTable[r] + GCrTable[g] + BCrTable[b]
         cr_comp[i] = (n >> 16)
         if ((n < 0) && (!((n & 0xffff)).equal?(0)))
-          ((cr_comp[i] -= 1) + 1)
+          cr_comp[i] -= 1
         end
-        ((i += 1) - 1)
+        i += 1
       end
       b_size = src_width * src_height
       data_ycomp = Array.typed(::Java::Byte).new(b_size) { 0 }
@@ -623,9 +623,9 @@ module Org::Eclipse::Swt::Internal::Image
           data_ycomp[dst_index + 1] = y_comp[value2]
           data_cb_comp[dst_index + 1] = cb_comp[value2]
           data_cr_comp[dst_index + 1] = cr_comp[value2]
-          ((x_pos += 1) - 1)
+          x_pos += 1
         end
-        ((y_pos += 1) - 1)
+        y_pos += 1
       end
       compress(image, data_ycomp, data_cb_comp, data_cr_comp)
     end
@@ -648,19 +648,19 @@ module Org::Eclipse::Swt::Internal::Image
         n = RYTable[r] + GYTable[g] + BYTable[b]
         y_comp[i] = (n >> 16)
         if ((n < 0) && (!((n & 0xffff)).equal?(0)))
-          ((y_comp[i] -= 1) + 1)
+          y_comp[i] -= 1
         end
         n = RCbTable[r] + GCbTable[g] + BCbTable[b]
         cb_comp[i] = (n >> 16)
         if ((n < 0) && (!((n & 0xffff)).equal?(0)))
-          ((cb_comp[i] -= 1) + 1)
+          cb_comp[i] -= 1
         end
         n = RCrTable[r] + GCrTable[g] + BCrTable[b]
         cr_comp[i] = (n >> 16)
         if ((n < 0) && (!((n & 0xffff)).equal?(0)))
-          ((cr_comp[i] -= 1) + 1)
+          cr_comp[i] -= 1
         end
-        ((i += 1) - 1)
+        i += 1
       end
       dst_width = image.attr_width
       dst_height = src_height
@@ -681,9 +681,9 @@ module Org::Eclipse::Swt::Internal::Image
           data_ycomp[dst_index] = y_comp[value]
           data_cb_comp[dst_index] = cb_comp[value]
           data_cr_comp[dst_index] = cr_comp[value]
-          ((x_pos += 1) - 1)
+          x_pos += 1
         end
-        ((y_pos += 1) - 1)
+        y_pos += 1
       end
       compress(image, data_ycomp, data_cb_comp, data_cr_comp)
     end
@@ -746,9 +746,9 @@ module Org::Eclipse::Swt::Internal::Image
             data_ycomp[dst_data_index] = ((RYTable[r] + GYTable[g] + BYTable[b]) >> 16)
             data_cb_comp[dst_data_index] = ((RCbTable[r] + GCbTable[g] + BCbTable[b]) >> 16)
             data_cr_comp[dst_data_index] = ((RCrTable[r] + GCrTable[g] + BCrTable[b]) >> 16)
-            ((x_pos += 1) - 1)
+            x_pos += 1
           end
-          ((y_pos += 1) - 1)
+          y_pos += 1
         end
       else
         y_pos = 0
@@ -766,9 +766,9 @@ module Org::Eclipse::Swt::Internal::Image
             data_ycomp[dst_data_index] = ((RYTable[r] + GYTable[g] + BYTable[b]) >> 16)
             data_cb_comp[dst_data_index] = ((RCbTable[r] + GCbTable[g] + BCbTable[b]) >> 16)
             data_cr_comp[dst_data_index] = ((RCrTable[r] + GCrTable[g] + BCrTable[b]) >> 16)
-            ((x_pos += 1) - 1)
+            x_pos += 1
           end
-          ((y_pos += 1) - 1)
+          y_pos += 1
         end
       end
       compress(image, data_ycomp, data_cb_comp, data_cr_comp)
@@ -798,11 +798,11 @@ module Org::Eclipse::Swt::Internal::Image
             y = 0
           end
           data[dest_index] = y
-          ((src_index += 1) - 1)
-          ((dest_index += 1) - 1)
-          ((j += 1) - 1)
+          src_index += 1
+          dest_index += 1
+          j += 1
         end
-        ((i += 1) - 1)
+        i += 1
       end
       return data
     end
@@ -878,10 +878,10 @@ module Org::Eclipse::Swt::Internal::Image
           rgb_data[dest_index + 1] = g
           rgb_data[dest_index + 2] = r
           dest_index += 3
-          ((src_index += 1) - 1)
-          ((i += 1) - 1)
+          src_index += 1
+          i += 1
         end
-        ((v += 1) - 1)
+        v += 1
       end
       return rgb_data
     end
@@ -905,7 +905,7 @@ module Org::Eclipse::Swt::Internal::Image
           k += r
           bits = receive(s)
           data_unit[ZigZag8x8[k]] = extend_by(bits, s)
-          ((k += 1) - 1)
+          k += 1
         end
       end
     end
@@ -913,7 +913,7 @@ module Org::Eclipse::Swt::Internal::Image
     typesig { [Array.typed(::Java::Int), ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int] }
     def decode_acfirst_coefficients(data_unit, i_comp, start, end_, approx_bit)
       if (@eobrun > 0)
-        ((@eobrun -= 1) + 1)
+        @eobrun -= 1
         return
       end
       s_params = @scan_header.attr_component_parameters[@component_ids[i_comp]]
@@ -934,7 +934,7 @@ module Org::Eclipse::Swt::Internal::Image
           k += r
           bits = receive(s)
           data_unit[ZigZag8x8[k]] = extend_by(bits, s) << approx_bit
-          ((k += 1) - 1)
+          k += 1
         end
       end
     end
@@ -951,9 +951,9 @@ module Org::Eclipse::Swt::Internal::Image
             if (!(data_unit[zz_index]).equal?(0))
               data_unit[zz_index] = refine_ac(data_unit[zz_index], approx_bit)
             end
-            ((k += 1) - 1)
+            k += 1
           end
-          ((@eobrun -= 1) + 1)
+          @eobrun -= 1
         else
           rs = decode_using_table(ac_table)
           r = rs >> 4
@@ -966,9 +966,9 @@ module Org::Eclipse::Swt::Internal::Image
                 if (!(data_unit[zz_index]).equal?(0))
                   data_unit[zz_index] = refine_ac(data_unit[zz_index], approx_bit)
                 else
-                  ((zeros += 1) - 1)
+                  zeros += 1
                 end
-                ((k += 1) - 1)
+                k += 1
               end
             else
               @eobrun = (1 << r) + receive(r)
@@ -981,9 +981,9 @@ module Org::Eclipse::Swt::Internal::Image
               if (!(data_unit[zz_index]).equal?(0))
                 data_unit[zz_index] = refine_ac(data_unit[zz_index], approx_bit)
               else
-                ((zeros += 1) - 1)
+                zeros += 1
               end
-              ((k += 1) - 1)
+              k += 1
               zz_index = ZigZag8x8[k]
             end
             if (!(bit).equal?(0))
@@ -991,7 +991,7 @@ module Org::Eclipse::Swt::Internal::Image
             else
               data_unit[zz_index] = -1 << approx_bit
             end
-            ((k += 1) - 1)
+            k += 1
           end
         end
       end
@@ -1046,7 +1046,7 @@ module Org::Eclipse::Swt::Internal::Image
       while i < data_unit.attr_length
         zz_index = ZigZag8x8[i]
         data_unit[zz_index] = data_unit[zz_index] * q_table[i]
-        ((i += 1) - 1)
+        i += 1
       end
     end
     
@@ -1072,7 +1072,7 @@ module Org::Eclipse::Swt::Internal::Image
       while i_comp < n_components_in_scan
         scan_component = i_comp
         while ((@scan_header.attr_component_parameters[@component_ids[scan_component]]).nil?)
-          ((scan_component += 1) - 1)
+          scan_component += 1
         end
         frame_component = @frame_components[@component_ids[scan_component]]
         hi = frame_component[HI]
@@ -1100,7 +1100,7 @@ module Org::Eclipse::Swt::Internal::Image
               i = 0
               while i < @data_unit.attr_length
                 @data_unit[i] = 0
-                ((i += 1) - 1)
+                i += 1
               end
             end
             if (!@progressive || @scan_header.is_dcprogressive_scan)
@@ -1130,11 +1130,11 @@ module Org::Eclipse::Swt::Internal::Image
               inverse_dct(@data_unit)
               store_data(@data_unit, scan_component, xmcu, ymcu, hi, ihi, vi, ivi)
             end
-            ((ihi += 1) - 1)
+            ihi += 1
           end
-          ((ivi += 1) - 1)
+          ivi += 1
         end
-        ((i_comp += 1) - 1)
+        i_comp += 1
       end
     end
     
@@ -1150,7 +1150,7 @@ module Org::Eclipse::Swt::Internal::Image
         # Non-interleaved.
         scan_component = 0
         while ((@scan_header.attr_component_parameters[@component_ids[scan_component]]).nil?)
-          ((scan_component += 1) - 1)
+          scan_component += 1
         end
         frame_component = @frame_components[@component_ids[scan_component]]
         hi = frame_component[HI]
@@ -1174,12 +1174,12 @@ module Org::Eclipse::Swt::Internal::Image
             if ((@restarts_to_go).equal?(0))
               process_restart_interval
             end
-            ((@restarts_to_go -= 1) + 1)
+            @restarts_to_go -= 1
           end
           decode_mcuat_xand_y(xmcu, ymcu, n_components_in_scan, first, start, end_, approx_bit)
-          ((xmcu += 1) - 1)
+          xmcu += 1
         end
-        ((ymcu += 1) - 1)
+        ymcu += 1
       end
     end
     
@@ -1193,7 +1193,7 @@ module Org::Eclipse::Swt::Internal::Image
       code = next_bit
       while (code > max_codes[i])
         code = code * 2 + next_bit
-        ((i += 1) - 1)
+        i += 1
       end
       j = val_ptrs[i] + code - min_codes[i]
       return huff_vals[j]
@@ -1240,7 +1240,7 @@ module Org::Eclipse::Swt::Internal::Image
         reset_output_buffer
       end
       @data_buffer[@buffer_current_position] = byte_value
-      ((@buffer_current_position += 1) - 1)
+      @buffer_current_position += 1
       if ((byte_value).equal?(-1))
         emit_byte(0)
       end
@@ -1255,13 +1255,13 @@ module Org::Eclipse::Swt::Internal::Image
       r = 0
       k = 1
       while (k < 64)
-        ((k += 1) - 1)
+        k += 1
         ac_value = data_unit[ZigZag8x8[k - 1]]
         if ((ac_value).equal?(0))
           if ((k).equal?(64))
             emit(eh_codes[0], eh_sizes[0] & 0xff)
           else
-            ((r += 1) - 1)
+            r += 1
           end
         else
           while (r > 15)
@@ -1328,11 +1328,11 @@ module Org::Eclipse::Swt::Internal::Image
             quantize_data(@data_unit, i_comp)
             encode_dccoefficients(@data_unit, i_comp)
             encode_accoefficients(@data_unit, i_comp)
-            ((ihi += 1) - 1)
+            ihi += 1
           end
-          ((ivi += 1) - 1)
+          ivi += 1
         end
-        ((i_comp += 1) - 1)
+        i_comp += 1
       end
     end
     
@@ -1343,9 +1343,9 @@ module Org::Eclipse::Swt::Internal::Image
         xmcu = 0
         while xmcu < @interleaved_mcu_cols
           encode_mcuat_xand_y(xmcu, ymcu)
-          ((xmcu += 1) - 1)
+          xmcu += 1
         end
-        ((ymcu += 1) - 1)
+        ymcu += 1
       end
       if (!(@current_bit_count).equal?(0))
         emit_byte(@current_byte)
@@ -1372,7 +1372,7 @@ module Org::Eclipse::Swt::Internal::Image
           dest = src.scaled_to(up_comp_width, up_comp_height)
           @image_components[i_comp] = dest.attr_data
         end
-        ((i_comp += 1) - 1)
+        i_comp += 1
       end
     end
     
@@ -1399,11 +1399,11 @@ module Org::Eclipse::Swt::Internal::Image
         col = 0
         while col < DCTSIZE
           data_unit[dest_index] = (comp_image[src_index + col] & 0xff) - 128
-          ((dest_index += 1) - 1)
-          ((col += 1) - 1)
+          dest_index += 1
+          col += 1
         end
         src_index += comp_width
-        ((i += 1) - 1)
+        i += 1
       end
     end
     
@@ -1432,12 +1432,12 @@ module Org::Eclipse::Swt::Internal::Image
         n = z1 + (tmp13 * FIX_0_765366865) + 1024
         data_unit[r_index + 2] = n >> 11
         if ((n < 0) && (!((n & 0x7ff)).equal?(0)))
-          ((data_unit[r_index + 2] -= 1) + 1)
+          data_unit[r_index + 2] -= 1
         end
         n = z1 + (tmp12 * (0 - FIX_1_847759065)) + 1024
         data_unit[r_index + 6] = n >> 11
         if ((n < 0) && (!((n & 0x7ff)).equal?(0)))
-          ((data_unit[r_index + 6] -= 1) + 1)
+          data_unit[r_index + 6] -= 1
         end
         # Odd part per figure 8 --- note paper omits factor of sqrt(2).
         # cK represents cos(K*pi/16).
@@ -1460,24 +1460,24 @@ module Org::Eclipse::Swt::Internal::Image
         n = tmp4 + z1 + z3 + 1024
         data_unit[r_index + 7] = n >> 11
         if ((n < 0) && (!((n & 0x7ff)).equal?(0)))
-          ((data_unit[r_index + 7] -= 1) + 1)
+          data_unit[r_index + 7] -= 1
         end
         n = tmp5 + z2 + z4 + 1024
         data_unit[r_index + 5] = n >> 11
         if ((n < 0) && (!((n & 0x7ff)).equal?(0)))
-          ((data_unit[r_index + 5] -= 1) + 1)
+          data_unit[r_index + 5] -= 1
         end
         n = tmp6 + z2 + z3 + 1024
         data_unit[r_index + 3] = n >> 11
         if ((n < 0) && (!((n & 0x7ff)).equal?(0)))
-          ((data_unit[r_index + 3] -= 1) + 1)
+          data_unit[r_index + 3] -= 1
         end
         n = tmp7 + z1 + z4 + 1024
         data_unit[r_index + 1] = n >> 11
         if ((n < 0) && (!((n & 0x7ff)).equal?(0)))
-          ((data_unit[r_index + 1] -= 1) + 1)
+          data_unit[r_index + 1] -= 1
         end
-        ((row += 1) - 1)
+        row += 1
       end
       # Pass 2: process columns.
       # Note that we must descale the results by a factor of 8 == 2**3,
@@ -1509,23 +1509,23 @@ module Org::Eclipse::Swt::Internal::Image
         n = tmp10 + tmp11 + 16
         data_unit[c0] = n >> 5
         if ((n < 0) && (!((n & 0x1f)).equal?(0)))
-          ((data_unit[c0] -= 1) + 1)
+          data_unit[c0] -= 1
         end
         n = tmp10 - tmp11 + 16
         data_unit[c4] = n >> 5
         if ((n < 0) && (!((n & 0x1f)).equal?(0)))
-          ((data_unit[c4] -= 1) + 1)
+          data_unit[c4] -= 1
         end
         z1 = (tmp12 + tmp13) * FIX_0_541196100
         n = z1 + (tmp13 * FIX_0_765366865) + 131072
         data_unit[c2] = n >> 18
         if ((n < 0) && (!((n & 0x3ffff)).equal?(0)))
-          ((data_unit[c2] -= 1) + 1)
+          data_unit[c2] -= 1
         end
         n = z1 + (tmp12 * (0 - FIX_1_847759065)) + 131072
         data_unit[c6] = n >> 18
         if ((n < 0) && (!((n & 0x3ffff)).equal?(0)))
-          ((data_unit[c6] -= 1) + 1)
+          data_unit[c6] -= 1
         end
         # Odd part per figure 8 --- note paper omits factor of sqrt(2).
         # cK represents cos(K*pi/16).
@@ -1548,24 +1548,24 @@ module Org::Eclipse::Swt::Internal::Image
         n = tmp4 + z1 + z3 + 131072
         data_unit[c7] = n >> 18
         if ((n < 0) && (!((n & 0x3ffff)).equal?(0)))
-          ((data_unit[c7] -= 1) + 1)
+          data_unit[c7] -= 1
         end
         n = tmp5 + z2 + z4 + 131072
         data_unit[c5] = n >> 18
         if ((n < 0) && (!((n & 0x3ffff)).equal?(0)))
-          ((data_unit[c5] -= 1) + 1)
+          data_unit[c5] -= 1
         end
         n = tmp6 + z2 + z3 + 131072
         data_unit[c3] = n >> 18
         if ((n < 0) && (!((n & 0x3ffff)).equal?(0)))
-          ((data_unit[c3] -= 1) + 1)
+          data_unit[c3] -= 1
         end
         n = tmp7 + z1 + z4 + 131072
         data_unit[c1] = n >> 18
         if ((n < 0) && (!((n & 0x3ffff)).equal?(0)))
-          ((data_unit[c1] -= 1) + 1)
+          data_unit[c1] -= 1
         end
-        ((col += 1) - 1)
+        col += 1
       end
     end
     
@@ -1608,7 +1608,7 @@ module Org::Eclipse::Swt::Internal::Image
         else
           @ac_huffman_tables[dht_table.get_table_identifier] = dht_table
         end
-        ((i += 1) - 1)
+        i += 1
       end
     end
     
@@ -1630,7 +1630,7 @@ module Org::Eclipse::Swt::Internal::Image
       while i < dqt_tables_keys.attr_length
         index = dqt_tables_keys[i]
         current_tables[index] = dqt_tables_values[i]
-        ((i += 1) - 1)
+        i += 1
       end
       @quantization_tables = current_tables
     end
@@ -1661,7 +1661,7 @@ module Org::Eclipse::Swt::Internal::Image
           i = r_index + 7
           while i >= r_index
             data_unit[i] = dc_val
-            ((i -= 1) + 1)
+            i -= 1
           end
         else
           # Even part: reverse the even part of the forward DCT.
@@ -1720,7 +1720,7 @@ module Org::Eclipse::Swt::Internal::Image
           data_unit[r_index + 3] = (tmp13 + tmp0 + 1024) >> 11
           data_unit[r_index + 4] = (tmp13 - tmp0 + 1024) >> 11
         end
-        ((row += 1) - 1)
+        row += 1
       end
       # Pass 2: process columns.
       # Note that we must descale the results by a factor of 8 == 2**3,
@@ -1805,7 +1805,7 @@ module Org::Eclipse::Swt::Internal::Image
           data_unit[c3] = (tmp13 + tmp0 + 131072) >> 18
           data_unit[c4] = (tmp13 - tmp0 + 131072) >> 18
         end
-        ((col += 1) - 1)
+        col += 1
       end
     end
     
@@ -1877,7 +1877,7 @@ module Org::Eclipse::Swt::Internal::Image
         if (@progressive)
           @data_units[i] = Array.typed(::Java::Int).new(buffer_size) { 0 }
         end
-        ((i += 1) - 1)
+        i += 1
       end
       # Process the tables preceding the scan header.
       process_tables
@@ -1896,7 +1896,7 @@ module Org::Eclipse::Swt::Internal::Image
         if (@progressive && self.attr_loader.has_listeners)
           image_data = create_image_data
           self.attr_loader.notify_listeners(ImageLoaderEvent.new(self.attr_loader, image_data, progressive_scan_count, false))
-          ((progressive_scan_count += 1) - 1)
+          progressive_scan_count += 1
         end
         # Unread any buffered data before looking for tables again.
         delta = 512 - @buffer_current_position - 1
@@ -1940,15 +1940,15 @@ module Org::Eclipse::Swt::Internal::Image
                   dequantize(@data_unit, i_comp)
                   inverse_dct(@data_unit)
                   store_data(@data_unit, i_comp, xmcu, ymcu, hi, ihi, vi, ivi)
-                  ((ihi += 1) - 1)
+                  ihi += 1
                 end
-                ((ivi += 1) - 1)
+                ivi += 1
               end
-              ((i_comp += 1) - 1)
+              i_comp += 1
             end
-            ((xmcu += 1) - 1)
+            xmcu += 1
           end
-          ((ymcu += 1) - 1)
+          ymcu += 1
         end
         @data_units = nil # release memory
       end
@@ -1967,7 +1967,7 @@ module Org::Eclipse::Swt::Internal::Image
     typesig { [] }
     def next_bit
       if (!(@current_bit_count).equal?(0))
-        ((@current_bit_count -= 1) + 1)
+        @current_bit_count -= 1
         @current_byte *= 2
         if (@current_byte > 255)
           @current_byte -= 256
@@ -1976,7 +1976,7 @@ module Org::Eclipse::Swt::Internal::Image
           return 0
         end
       end
-      ((@buffer_current_position += 1) - 1)
+      @buffer_current_position += 1
       if (@buffer_current_position >= 512)
         reset_input_buffer
         @buffer_current_position = 0
@@ -1993,8 +1993,8 @@ module Org::Eclipse::Swt::Internal::Image
       end
       if ((@current_byte).equal?(0xff))
         if ((next_byte).equal?(0))
-          ((@buffer_current_position += 1) - 1)
-          ((@current_bit_count -= 1) + 1)
+          @buffer_current_position += 1
+          @current_bit_count -= 1
           @current_byte *= 2
           if (@current_byte > 255)
             @current_byte -= 256
@@ -2012,7 +2012,7 @@ module Org::Eclipse::Swt::Internal::Image
           end
         end
       else
-        ((@current_bit_count -= 1) + 1)
+        @current_bit_count -= 1
         @current_byte *= 2
         if (@current_byte > 255)
           @current_byte -= 256
@@ -2026,7 +2026,7 @@ module Org::Eclipse::Swt::Internal::Image
     typesig { [] }
     def process_restart_interval
       begin
-        ((@buffer_current_position += 1) - 1)
+        @buffer_current_position += 1
         if (@buffer_current_position > 511)
           reset_input_buffer
           @buffer_current_position = 0
@@ -2034,7 +2034,7 @@ module Org::Eclipse::Swt::Internal::Image
         @current_byte = @data_buffer[@buffer_current_position] & 0xff
       end while (!(@current_byte).equal?(0xff))
       while ((@current_byte).equal?(0xff))
-        ((@buffer_current_position += 1) - 1)
+        @buffer_current_position += 1
         if (@buffer_current_position > 511)
           reset_input_buffer
           @buffer_current_position = 0
@@ -2044,7 +2044,7 @@ module Org::Eclipse::Swt::Internal::Image
       if (!(@current_byte).equal?(((RST0 + @next_restart_number) & 0xff)))
         SWT.error(SWT::ERROR_INVALID_IMAGE)
       end
-      ((@buffer_current_position += 1) - 1)
+      @buffer_current_position += 1
       if (@buffer_current_position > 511)
         reset_input_buffer
         @buffer_current_position = 0
@@ -2116,7 +2116,7 @@ module Org::Eclipse::Swt::Internal::Image
             data_unit[zz_index] = 0 - abs_data
           end
         end
-        ((i += 1) - 1)
+        i += 1
       end
     end
     
@@ -2126,7 +2126,7 @@ module Org::Eclipse::Swt::Internal::Image
       i = 0
       while i < n_bits
         v = v * 2 + next_bit
-        ((i += 1) - 1)
+        i += 1
       end
       return v
     end
@@ -2192,7 +2192,7 @@ module Org::Eclipse::Swt::Internal::Image
         i = 0
         while i < 256
           entries[i] = RGB.new(i, i, i)
-          ((i += 1) - 1)
+          i += 1
         end
         return PaletteData.new(entries)
       end
@@ -2239,11 +2239,11 @@ module Org::Eclipse::Swt::Internal::Image
             end
           end
           comp_image[dest_index + col] = x
-          ((src_index += 1) - 1)
-          ((col += 1) - 1)
+          src_index += 1
+          col += 1
         end
         dest_index += comp_width
-        ((i += 1) - 1)
+        i += 1
       end
     end
     
@@ -2265,7 +2265,7 @@ module Org::Eclipse::Swt::Internal::Image
       i = 0
       while i < jpeg_dqtkeys.attr_length
         @quantization_tables[jpeg_dqtkeys[i]] = jpeg_dqtvalues[i]
-        ((i += 1) - 1)
+        i += 1
       end
       lum_dqt = JPEGQuantizationTable.default_luminance_table
       lum_dqt.scale_by(@encoder_qfactor)
@@ -2274,7 +2274,7 @@ module Org::Eclipse::Swt::Internal::Image
       i_ = 0
       while i_ < jpeg_dqtkeys.attr_length
         @quantization_tables[jpeg_dqtkeys[i_]] = jpeg_dqtvalues[i_]
-        ((i_ += 1) - 1)
+        i_ += 1
       end
       if (!lum_dqt.write_to_stream(self.attr_output_stream))
         SWT.error(SWT::ERROR_IO)
@@ -2351,9 +2351,9 @@ module Org::Eclipse::Swt::Internal::Image
           else
             @ac_huffman_tables[huffman_table.get_table_identifier] = huffman_table
           end
-          ((j += 1) - 1)
+          j += 1
         end
-        ((i__ += 1) - 1)
+        i__ += 1
       end
       @preceding_dcs = Array.typed(::Java::Int).new(4) { 0 }
       @scan_header = JPEGScanHeader.new(Array.typed(::Java::Byte).new(14) { 0 })

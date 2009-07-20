@@ -2455,7 +2455,7 @@ module Org::Eclipse::Swt::Widgets
         i = 0
         while i < buffer.attr_length
           buffer[i] = @echo_character
-          ((i += 1) - 1)
+          i += 1
         end
       else
         @hidden_text = (nil).to_s

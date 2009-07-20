@@ -386,21 +386,21 @@ module Org::Eclipse::Swt::Dnd
                   while k < transfer_data.attr_data.attr_length
                     datum = transfer_data.attr_data[k]
                     OS._add_drag_item_flavor(the_drag[0], 1 + k, types[j], datum, datum.attr_length, 0)
-                    ((k += 1) - 1)
+                    k += 1
                   end
                 end
-                ((j += 1) - 1)
+                j += 1
               end
             end
           else
             j = 0
             while j < types.attr_length
               OS._add_drag_item_flavor(the_drag[0], 1, types[j], nil, 0, 0)
-              ((j += 1) - 1)
+              j += 1
             end
           end
         end
-        ((i += 1) - 1)
+        i += 1
       end
       OS._set_drag_send_proc(the_drag[0], self.attr_drag_send_data_proc.get_address, @control.attr_handle)
       the_region = 0
@@ -479,7 +479,7 @@ module Org::Eclipse::Swt::Dnd
           transfer = transfer_agent
           break
         end
-        ((i += 1) - 1)
+        i += 1
       end
       if ((transfer).nil?)
         return OS.attr_bad_drag_flavor_err
@@ -535,9 +535,9 @@ module Org::Eclipse::Swt::Dnd
         listener = listeners[i]
         if (listener.is_a?(DNDListener))
           drag_listeners[count] = (listener).get_event_listener
-          ((count += 1) - 1)
+          count += 1
         end
-        ((i += 1) - 1)
+        i += 1
       end
       if ((count).equal?(length))
         return drag_listeners

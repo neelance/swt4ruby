@@ -298,7 +298,7 @@ module Org::Eclipse::Swt::Widgets
             control.set_menu(nil)
             return
           end
-          ((index += 1) - 1)
+          index += 1
         end
         menu.fix_menus(new_decorations)
       end
@@ -492,7 +492,7 @@ module Org::Eclipse::Swt::Widgets
           if (!(menu).nil? && !menu.is_disposed)
             menu.dispose
           end
-          ((i += 1) - 1)
+          i += 1
         end
         menus = nil
       end
@@ -647,7 +647,7 @@ module Org::Eclipse::Swt::Widgets
         if ((images[i]).nil? || images[i].is_disposed)
           error(SWT::ERROR_INVALID_ARGUMENT)
         end
-        ((i += 1) - 1)
+        i += 1
       end
       @images = images
       if (!(self.attr_parent).nil?)
@@ -789,7 +789,7 @@ module Org::Eclipse::Swt::Widgets
       i = 0
       while i < length
         datas[i] = images[i].get_image_data
-        ((i += 1) - 1)
+        i += 1
       end
       gap = length / 2
       while gap > 0
@@ -807,7 +807,7 @@ module Org::Eclipse::Swt::Widgets
             end
             j -= gap
           end
-          ((i_ += 1) - 1)
+          i_ += 1
         end
         gap /= 2
       end

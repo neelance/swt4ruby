@@ -174,7 +174,7 @@ module Org::Eclipse::Swt::Dnd
                 length_ = i
                 break
               end
-              ((i += 1) - 1)
+              i += 1
             end
             return String.new(chars, 0, length_)
           ensure

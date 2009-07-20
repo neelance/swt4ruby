@@ -359,9 +359,9 @@ module Org::Eclipse::Swt::Widgets
               if (!((the_byte & mask)).equal?(0))
                 region.add(xoffset + x, yoffset + y, 1, 1)
               end
-              ((x += 1) - 1)
+              x += 1
             end
-            ((y += 1) - 1)
+            y += 1
           end
           OS.gtk_widget_realize(self.attr_handle)
           # long

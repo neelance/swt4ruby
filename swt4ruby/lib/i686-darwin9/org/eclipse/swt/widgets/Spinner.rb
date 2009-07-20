@@ -316,7 +316,7 @@ module Org::Eclipse::Swt::Widgets
         count = @digits - string.length
         while (count >= 0)
           buffer.append("0")
-          ((count -= 1) + 1)
+          count -= 1
         end
         string = (buffer.to_s).to_s
       end
@@ -599,7 +599,7 @@ module Org::Eclipse::Swt::Widgets
                 j = 0
                 while j < i
                   decimal_part = decimal_part + "0"
-                  ((j += 1) - 1)
+                  j += 1
                 end
               end
               whole_value = JavaInteger.parse_int(whole_part)
@@ -607,7 +607,7 @@ module Org::Eclipse::Swt::Widgets
               i = 0
               while i < @digits
                 whole_value *= 10
-                ((i += 1) - 1)
+                i += 1
               end
               value = whole_value + decimal_value
               if (string.starts_with("-"))
@@ -618,7 +618,7 @@ module Org::Eclipse::Swt::Widgets
               i = 0
               while i < @digits
                 value *= 10
-                ((i += 1) - 1)
+                i += 1
               end
             end
           else
@@ -1493,14 +1493,14 @@ module Org::Eclipse::Swt::Widgets
       if (string.length > 0)
         minimum = OS._get_control32bit_minimum(@button_handle)
         if (minimum < 0 && (string.char_at(0)).equal?(Character.new(?-.ord)))
-          ((index += 1) - 1)
+          index += 1
         end
       end
       while (index < string.length)
         if (!Character.is_digit(string.char_at(index)))
           break
         end
-        ((index += 1) - 1)
+        index += 1
       end
       event.attr_doit = (index).equal?(string.length)
       # It is possible (but unlikely), that application

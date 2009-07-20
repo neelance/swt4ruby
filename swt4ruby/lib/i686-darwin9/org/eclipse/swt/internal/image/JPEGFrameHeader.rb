@@ -157,7 +157,7 @@ module Org::Eclipse::Swt::Internal::Image
           comp_spec_params = new_params
         end
         comp_spec_params[ci] = comp_param
-        ((i += 1) - 1)
+        i += 1
       end
       x = get_samples_per_line
       y = get_number_of_lines
@@ -173,7 +173,7 @@ module Org::Eclipse::Swt::Internal::Image
         ds_height = round_up_to_multiple(comp_height, multiples[vi - 1])
         comp_param[3] = ds_width
         comp_param[4] = ds_height
-        ((i_ += 1) - 1)
+        i_ += 1
       end
       set_max_hfactor(hmax)
       set_max_vfactor(vmax)
@@ -208,7 +208,7 @@ module Org::Eclipse::Swt::Internal::Image
         if (vi > vmax)
           vmax = vi
         end
-        ((i += 1) - 1)
+        i += 1
       end
       x = get_samples_per_line
       y = get_number_of_lines
@@ -224,7 +224,7 @@ module Org::Eclipse::Swt::Internal::Image
         ds_height = round_up_to_multiple(comp_height, multiples[vi - 1])
         comp_param[3] = ds_width
         comp_param[4] = ds_height
-        ((i_ += 1) - 1)
+        i_ += 1
       end
       set_max_hfactor(hmax)
       set_max_vfactor(vmax)

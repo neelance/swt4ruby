@@ -254,9 +254,9 @@ module Org::Eclipse::Swt::Graphics
               end
             end
             offset += 4
-            ((x += 1) - 1)
+            x += 1
           end
-          ((y += 1) - 1)
+          y += 1
         end
         create_nscursor(hotspot_x, hotspot_y, data, source.attr_width, source.attr_height)
         return
@@ -284,9 +284,9 @@ module Org::Eclipse::Swt::Graphics
               max_x = Math.max(max_x, x)
               max_y = Math.max(max_y, y)
             end
-            ((x += 1) - 1)
+            x += 1
           end
-          ((y += 1) - 1)
+          y += 1
         end
         width = max_x - min_x + 1
         height = max_y - min_y + 1
@@ -326,13 +326,13 @@ module Org::Eclipse::Swt::Graphics
               d |= bit
             end
           end
-          ((x += 1) - 1)
+          x += 1
         end
         src_data[y * 2] = (d >> 8)
         src_data[y * 2 + 1] = (d & 0xff)
         mask_data[y * 2] = (m >> 8)
         mask_data[y * 2 + 1] = (m & 0xff)
-        ((y += 1) - 1)
+        y += 1
       end
       cursor.attr_hot_spot_h = RJava.cast_to_short(Math.max(0, Math.min(15, hotspot_x - min_x)))
       cursor.attr_hot_spot_v = RJava.cast_to_short(Math.max(0, Math.min(15, hotspot_y - min_y)))
@@ -429,13 +429,13 @@ module Org::Eclipse::Swt::Graphics
           while i < rgbs.attr_length
             rgb = rgbs[i]
             if ((rgb).nil?)
-              ((i += 1) - 1)
+              i += 1
               next
             end
             src_reds[i] = rgb.attr_red
             src_greens[i] = rgb.attr_green
             src_blues[i] = rgb.attr_blue
-            ((i += 1) - 1)
+            i += 1
           end
           ImageData.blit(ImageData::BLIT_SRC, source.attr_data, source.attr_depth, source.attr_bytes_per_line, source.get_byte_order, 0, 0, source.attr_width, source.attr_height, src_reds, src_greens, src_blues, ImageData::ALPHA_OPAQUE, nil, 0, 0, 0, data, 32, source.attr_width * 4, ImageData::MSB_FIRST, 0, 0, source.attr_width, source.attr_height, 0xff0000, 0xff00, 0xff, false, false)
         end
@@ -451,10 +451,10 @@ module Org::Eclipse::Swt::Graphics
             while x < source.attr_width
               data[offset] = !(((mask_data[mask_offset + (x >> 3)]) & (1 << (7 - (x & 0x7))))).equal?(0) ? 0xff : 0
               offset += 4
-              ((x += 1) - 1)
+              x += 1
             end
             mask_offset += mask_bpl
-            ((y += 1) - 1)
+            y += 1
           end
         else
           if (!(source.attr_alpha).equal?(-1))
@@ -499,13 +499,13 @@ module Org::Eclipse::Swt::Graphics
             while i < rgbs.attr_length
               rgb = rgbs[i]
               if ((rgb).nil?)
-                ((i += 1) - 1)
+                i += 1
                 next
               end
               src_reds[i] = rgb.attr_red
               src_greens[i] = rgb.attr_green
               src_blues[i] = rgb.attr_blue
-              ((i += 1) - 1)
+              i += 1
             end
             ImageData.blit(ImageData::BLIT_SRC, source.attr_data, source.attr_depth, source.attr_bytes_per_line, source.get_byte_order, 0, 0, source.attr_width, source.attr_height, src_reds, src_greens, src_blues, ImageData::ALPHA_OPAQUE, nil, 0, 0, 0, new_source.attr_data, new_source.attr_depth, new_source.attr_bytes_per_line, new_source.get_byte_order, 0, 0, new_source.attr_width, new_source.attr_height, new_reds, new_greens, new_blues, false, false)
           end
@@ -531,9 +531,9 @@ module Org::Eclipse::Swt::Graphics
                 max_x = Math.max(max_x, x)
                 max_y = Math.max(max_y, y)
               end
-              ((x += 1) - 1)
+              x += 1
             end
-            ((y += 1) - 1)
+            y += 1
           end
           width = max_x - min_x + 1
           height = max_y - min_y + 1
@@ -573,13 +573,13 @@ module Org::Eclipse::Swt::Graphics
                 m |= bit
               end
             end
-            ((x += 1) - 1)
+            x += 1
           end
           src_data[y * 2] = (d >> 8)
           src_data[y * 2 + 1] = (d & 0xff)
           mask_data[y * 2] = (m >> 8)
           mask_data[y * 2 + 1] = (m & 0xff)
-          ((y += 1) - 1)
+          y += 1
         end
         cursor.attr_hot_spot_h = RJava.cast_to_short(Math.max(0, Math.min(15, hotspot_x - min_x)))
         cursor.attr_hot_spot_v = RJava.cast_to_short(Math.max(0, Math.min(15, hotspot_y - min_y)))

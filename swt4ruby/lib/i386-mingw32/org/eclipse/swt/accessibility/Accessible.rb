@@ -789,13 +789,13 @@ module Org::Eclipse::Swt::Accessibility
     
     typesig { [] }
     def _add_ref
-      ((@ref_count += 1) - 1)
+      @ref_count += 1
       return @ref_count
     end
     
     typesig { [] }
     def _release
-      ((@ref_count -= 1) + 1)
+      @ref_count -= 1
       if ((@ref_count).equal?(0))
         if (!(@obj_iaccessible).nil?)
           @obj_iaccessible.dispose
@@ -840,7 +840,7 @@ module Org::Eclipse::Swt::Accessibility
       while i < @accessible_control_listeners.size
         listener = @accessible_control_listeners.element_at(i)
         listener.get_child_at_point(event)
-        ((i += 1) - 1)
+        i += 1
       end
       child_id = event.attr_child_id
       if ((child_id).equal?(ACC::CHILDID_NONE))
@@ -903,7 +903,7 @@ module Org::Eclipse::Swt::Accessibility
       while i < @accessible_control_listeners.size
         listener = @accessible_control_listeners.element_at(i)
         listener.get_location(event)
-        ((i += 1) - 1)
+        i += 1
       end
       OS._move_memory(px_left, Array.typed(::Java::Int).new([event.attr_x]), 4)
       OS._move_memory(py_top, Array.typed(::Java::Int).new([event.attr_y]), 4)
@@ -970,7 +970,7 @@ module Org::Eclipse::Swt::Accessibility
       while i < @accessible_control_listeners.size
         listener = @accessible_control_listeners.element_at(i)
         listener.get_child(event)
-        ((i += 1) - 1)
+        i += 1
       end
       accessible = event.attr_accessible
       if (!(accessible).nil?)
@@ -1006,7 +1006,7 @@ module Org::Eclipse::Swt::Accessibility
       while i < @accessible_control_listeners.size
         listener = @accessible_control_listeners.element_at(i)
         listener.get_child_count(event)
-        ((i += 1) - 1)
+        i += 1
       end
       COM._move_memory(pcount_children, Array.typed(::Java::Int).new([event.attr_detail]), 4)
       return COM::S_OK
@@ -1052,7 +1052,7 @@ module Org::Eclipse::Swt::Accessibility
       while i < @accessible_control_listeners.size
         listener = @accessible_control_listeners.element_at(i)
         listener.get_default_action(event)
-        ((i += 1) - 1)
+        i += 1
       end
       if ((event.attr_result).nil?)
         return code
@@ -1129,7 +1129,7 @@ module Org::Eclipse::Swt::Accessibility
                 if (i + 1 < column_count)
                   event.attr_result += ", "
                 end
-                ((i += 1) - 1)
+                i += 1
               end
             end
           end
@@ -1139,7 +1139,7 @@ module Org::Eclipse::Swt::Accessibility
       while i < @accessible_listeners.size
         listener = @accessible_listeners.element_at(i)
         listener.get_description(event)
-        ((i += 1) - 1)
+        i += 1
       end
       if ((event.attr_result).nil?)
         return code
@@ -1184,7 +1184,7 @@ module Org::Eclipse::Swt::Accessibility
       while i < @accessible_control_listeners.size
         listener = @accessible_control_listeners.element_at(i)
         listener.get_focus(event)
-        ((i += 1) - 1)
+        i += 1
       end
       accessible = event.attr_accessible
       if (!(accessible).nil?)
@@ -1251,7 +1251,7 @@ module Org::Eclipse::Swt::Accessibility
       while i < @accessible_listeners.size
         listener = @accessible_listeners.element_at(i)
         listener.get_help(event)
-        ((i += 1) - 1)
+        i += 1
       end
       if ((event.attr_result).nil?)
         return code
@@ -1320,7 +1320,7 @@ module Org::Eclipse::Swt::Accessibility
       while i < @accessible_listeners.size
         listener = @accessible_listeners.element_at(i)
         listener.get_keyboard_shortcut(event)
-        ((i += 1) - 1)
+        i += 1
       end
       if ((event.attr_result).nil?)
         return code
@@ -1373,7 +1373,7 @@ module Org::Eclipse::Swt::Accessibility
       while i < @accessible_listeners.size
         listener = @accessible_listeners.element_at(i)
         listener.get_name(event)
-        ((i += 1) - 1)
+        i += 1
       end
       if ((event.attr_result).nil?)
         return code
@@ -1449,7 +1449,7 @@ module Org::Eclipse::Swt::Accessibility
       while i < @accessible_control_listeners.size
         listener = @accessible_control_listeners.element_at(i)
         listener.get_role(event)
-        ((i += 1) - 1)
+        i += 1
       end
       role = role_to_os(event.attr_detail)
       COM._move_memory(pvar_role, Array.typed(::Java::Short).new([COM::VT_I4]), 2)
@@ -1494,7 +1494,7 @@ module Org::Eclipse::Swt::Accessibility
       while i < @accessible_control_listeners.size
         listener = @accessible_control_listeners.element_at(i)
         listener.get_selection(event)
-        ((i += 1) - 1)
+        i += 1
       end
       accessible = event.attr_accessible
       if (!(accessible).nil?)
@@ -1606,7 +1606,7 @@ module Org::Eclipse::Swt::Accessibility
       while i < @accessible_control_listeners.size
         listener = @accessible_control_listeners.element_at(i)
         listener.get_state(event)
-        ((i += 1) - 1)
+        i += 1
       end
       state = state_to_os(event.attr_detail)
       if (!((state & ACC::STATE_CHECKED)).equal?(0) && grayed)
@@ -1658,7 +1658,7 @@ module Org::Eclipse::Swt::Accessibility
       while i < @accessible_control_listeners.size
         listener = @accessible_control_listeners.element_at(i)
         listener.get_value(event)
-        ((i += 1) - 1)
+        i += 1
       end
       if ((event.attr_result).nil?)
         return code
@@ -1748,7 +1748,7 @@ module Org::Eclipse::Swt::Accessibility
         while i < @accessible_control_listeners.size
           listener = @accessible_control_listeners.element_at(i)
           listener.get_children(event)
-          ((i += 1) - 1)
+          i += 1
         end
         @variants = event.attr_children
       end
@@ -1768,8 +1768,8 @@ module Org::Eclipse::Swt::Accessibility
             else
               next_items[i] = child
             end
-            ((@enum_index += 1) - 1)
-            ((i += 1) - 1)
+            @enum_index += 1
+            i += 1
           end
         end
       end
@@ -1789,7 +1789,7 @@ module Org::Eclipse::Swt::Accessibility
             # long
             COM._move_memory(rgvar + i * VARIANT.attr_sizeof + 8, Array.typed(::Java::Int).new([accessible.attr_obj_iaccessible.get_address]), OS::PTR_SIZEOF)
           end
-          ((i += 1) - 1)
+          i += 1
         end
         if (!(pcelt_fetched).equal?(0))
           COM._move_memory(pcelt_fetched, Array.typed(::Java::Int).new([next_items.attr_length]), 4)

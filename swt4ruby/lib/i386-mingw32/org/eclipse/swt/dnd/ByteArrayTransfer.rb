@@ -137,7 +137,7 @@ module Org::Eclipse::Swt::Dnd
         data[i].attr_formatetc.attr_dw_aspect = COM::DVASPECT_CONTENT
         data[i].attr_formatetc.attr_lindex = -1
         data[i].attr_formatetc.attr_tymed = COM::TYMED_HGLOBAL
-        ((i += 1) - 1)
+        i += 1
       end
       return data
     end
@@ -154,7 +154,7 @@ module Org::Eclipse::Swt::Dnd
         if ((format.attr_cf_format).equal?(types[i]) && ((format.attr_dw_aspect & COM::DVASPECT_CONTENT)).equal?(COM::DVASPECT_CONTENT) && ((format.attr_tymed & COM::TYMED_HGLOBAL)).equal?(COM::TYMED_HGLOBAL))
           return true
         end
-        ((i += 1) - 1)
+        i += 1
       end
       return false
     end

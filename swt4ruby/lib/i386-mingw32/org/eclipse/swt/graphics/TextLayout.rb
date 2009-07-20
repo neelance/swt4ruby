@@ -555,7 +555,7 @@ module Org::Eclipse::Swt::Graphics
         run = @all_runs[i]
         OS._select_object(src_hdc, get_item_font(run))
         shape(src_hdc, run)
-        ((i += 1) - 1)
+        i += 1
       end
       log_attr = SCRIPT_LOGATTR.new
       properties = SCRIPT_PROPERTIES.new
@@ -582,7 +582,7 @@ module Org::Eclipse::Swt::Graphics
                   run.attr_width = @tabs[j] - line_width
                   break
                 end
-                ((j += 1) - 1)
+                j += 1
               end
               if ((j).equal?(tabs_length))
                 tab_x = @tabs[tabs_length - 1]
@@ -632,7 +632,7 @@ module Org::Eclipse::Swt::Graphics
               if (log_attr.attr_f_soft_break || log_attr.attr_f_white_space)
                 break
               end
-              ((start -= 1) + 1)
+              start -= 1
             end
             # Bug in Windows. For some reason Uniscribe sets the fSoftBreak flag for the first letter
             # after a letter with an accent. This cause a break line to be set in the middle of a word.
@@ -679,7 +679,7 @@ module Org::Eclipse::Swt::Graphics
             if (!log_attr.attr_f_white_space)
               break
             end
-            ((start += 1) - 1)
+            start += 1
           end
           if (0 < start && start < run.attr_length)
             new_run = StyleItem.new_local(self)
@@ -709,9 +709,9 @@ module Org::Eclipse::Swt::Graphics
         if (run.attr_line_break)
           line_start = i_ + 1
           line_width = run.attr_soft_break ? 0 : @indent
-          ((line_count += 1) - 1)
+          line_count += 1
         end
-        ((i_ += 1) - 1)
+        i_ += 1
       end
       line_width = 0
       @runs = Array.typed(StyleItem).new(line_count) { nil }
@@ -769,7 +769,7 @@ module Org::Eclipse::Swt::Graphics
                 item.attr_width = i_dx
               end
               new_line_width += item.attr_width
-              ((j += 1) - 1)
+              j += 1
             end
             line_width = new_line_width
           end
@@ -787,16 +787,16 @@ module Org::Eclipse::Swt::Graphics
           while j < @runs[line].attr_length
             @runs[line][j].attr_x = line_width
             line_width += @runs[line][j].attr_width
-            ((j += 1) - 1)
+            j += 1
           end
-          ((line += 1) - 1)
+          line += 1
           @line_y[line] = @line_y[line - 1] + ascent + descent + @line_spacing
           @line_offset[line] = last_offset
           line_run_count = line_width = 0
           ascent = Math.max(0, @ascent)
           descent = Math.max(0, @descent)
         end
-        ((i__ += 1) - 1)
+        i__ += 1
       end
       if (!(src_hdc).equal?(0))
         OS._delete_dc(src_hdc)
@@ -1080,11 +1080,11 @@ module Org::Eclipse::Swt::Graphics
           end
         end
         if (draw_x > clip.attr_x + clip.attr_width)
-          ((line += 1) - 1)
+          line += 1
           next
         end
         if (draw_x + @line_width[line] < clip.attr_x)
-          ((line += 1) - 1)
+          line += 1
           next
         end
         baseline = Math.max(0, @ascent)
@@ -1093,14 +1093,14 @@ module Org::Eclipse::Swt::Graphics
         while i < line_runs.attr_length
           baseline = Math.max(baseline, line_runs[i].attr_ascent)
           line_underline_pos = Math.min(line_underline_pos, line_runs[i].attr_underline_pos)
-          ((i += 1) - 1)
+          i += 1
         end
         alignment_x = draw_x
         i_ = 0
         while i_ < line_runs.attr_length
           run = line_runs[i_]
           if ((run.attr_length).equal?(0))
-            ((i_ += 1) - 1)
+            i_ += 1
             next
           end
           if (draw_x > clip.attr_x + clip.attr_width)
@@ -1172,7 +1172,7 @@ module Org::Eclipse::Swt::Graphics
             end
           end
           draw_x += run.attr_width
-          ((i_ += 1) - 1)
+          i_ += 1
         end
         border_clip = nil
         draw_x = alignment_x
@@ -1180,7 +1180,7 @@ module Org::Eclipse::Swt::Graphics
         while i__ < line_runs.attr_length
           run = line_runs[i__]
           if ((run.attr_length).equal?(0))
-            ((i__ += 1) - 1)
+            i__ += 1
             next
           end
           if (draw_x > clip.attr_x + clip.attr_width)
@@ -1234,7 +1234,7 @@ module Org::Eclipse::Swt::Graphics
                     new_type |= Gdip::PathPointTypeCloseSubpath
                   end
                   types[type_index] = new_type
-                  ((type_index += 1) - 1)
+                  type_index += 1
                 end
                 # long
                 path = Gdip._graphics_path_new(points, types, count, Gdip::FillModeAlternate)
@@ -1334,9 +1334,9 @@ module Org::Eclipse::Swt::Graphics
             end
           end
           draw_x += run.attr_width
-          ((i__ += 1) - 1)
+          i__ += 1
         end
-        ((line += 1) - 1)
+        line += 1
       end
       if (gdip)
         if (!(sel_brush).equal?(0))
@@ -1399,7 +1399,7 @@ module Org::Eclipse::Swt::Graphics
             i = index
             while i > 0 && style.is_adherent_underline(line[i - 1].attr_style)
               squiggly_x = x + line[i - 1].attr_x
-              ((i -= 1) + 1)
+              i -= 1
             end
             gstate = 0
             if ((clip_rect).nil?)
@@ -1476,7 +1476,7 @@ module Org::Eclipse::Swt::Graphics
             i = index
             while i > 0 && style.is_adherent_underline(line[i - 1].attr_style)
               squiggly_x = x + line[i - 1].attr_x
-              ((i -= 1) + 1)
+              i -= 1
             end
             state = OS._save_dc(graphics)
             if (!(clip_rect).nil?)
@@ -1609,7 +1609,7 @@ module Org::Eclipse::Swt::Graphics
         i = index
         while i > 0 && style.is_adherent_border(line[i - 1].attr_style)
           left = line[i - 1].attr_x
-          ((i -= 1) + 1)
+          i -= 1
         end
         if (advance)
           # long
@@ -1759,7 +1759,7 @@ module Org::Eclipse::Swt::Graphics
         coordinates[index + 1] = bottom
         coordinates[index + 2] = coordinates[index] + width / 2
         coordinates[index + 3] = top
-        ((i += 1) - 1)
+        i += 1
       end
       coordinates[length_ - 2] = left + (width * peaks)
       coordinates[length_ - 1] = bottom
@@ -1775,7 +1775,7 @@ module Org::Eclipse::Swt::Graphics
       while i < @all_runs.attr_length
         run = @all_runs[i]
         run.free
-        ((i += 1) - 1)
+        i += 1
       end
       @all_runs = nil
       @runs = nil
@@ -1838,7 +1838,7 @@ module Org::Eclipse::Swt::Graphics
         line = 0
         while line < @runs.attr_length
           width = Math.max(width, @line_width[line] + get_line_indent(line))
-          ((line += 1) - 1)
+          line += 1
         end
       end
       return Rectangle.new(0, 0, width, @line_y[@line_y.attr_length - 1])
@@ -1881,7 +1881,7 @@ module Org::Eclipse::Swt::Graphics
         run = @all_runs[i]
         run_end = run.attr_start + run.attr_length
         if (run_end <= start)
-          ((i += 1) - 1)
+          i += 1
           next
         end
         if (run.attr_start > end_)
@@ -1931,13 +1931,13 @@ module Org::Eclipse::Swt::Graphics
         end
         line_index = 0
         while (line_index < @runs.attr_length && @line_offset[line_index + 1] <= run.attr_start)
-          ((line_index += 1) - 1)
+          line_index += 1
         end
         left = Math.min(left, run_lead)
         right = Math.max(right, run_trail)
         top = Math.min(top, @line_y[line_index])
         bottom = Math.max(bottom, @line_y[line_index + 1] - @line_spacing)
-        ((i += 1) - 1)
+        i += 1
       end
       return Rectangle.new(left, top, right - left, bottom - top)
     end
@@ -2045,7 +2045,7 @@ module Org::Eclipse::Swt::Graphics
         if (@all_runs[i].attr_start > offset)
           return @all_runs[i - 1].attr_analysis.attr_s.attr_u_bidi_level
         end
-        ((i += 1) - 1)
+        i += 1
       end
       return !((@orientation & SWT::RIGHT_TO_LEFT)).equal?(0) ? 1 : 0
     end
@@ -2149,7 +2149,7 @@ module Org::Eclipse::Swt::Graphics
         if (@line_offset[line + 1] > offset)
           return line
         end
-        ((line += 1) - 1)
+        line += 1
       end
       return @runs.attr_length - 1
     end
@@ -2194,7 +2194,7 @@ module Org::Eclipse::Swt::Graphics
             leading = run.attr_leading
           end
           descent = Math.max(descent, run.attr_descent)
-          ((i += 1) - 1)
+          i += 1
         end
       end
       lptm.attr_tm_ascent = ascent
@@ -2222,7 +2222,7 @@ module Org::Eclipse::Swt::Graphics
       i = 0
       while i < offsets.attr_length
         offsets[i] = untranslate_offset(@line_offset[i])
-        ((i += 1) - 1)
+        i += 1
       end
       return offsets
     end
@@ -2257,7 +2257,7 @@ module Org::Eclipse::Swt::Graphics
         if (@line_offset[line + 1] > offset)
           break
         end
-        ((line += 1) - 1)
+        line += 1
       end
       line = Math.min(line, @runs.attr_length - 1)
       if ((offset).equal?(length_))
@@ -2470,7 +2470,7 @@ module Org::Eclipse::Swt::Graphics
         if (@line_y[line + 1] > y)
           break
         end
-        ((line += 1) - 1)
+        line += 1
       end
       line = Math.min(line, @runs.attr_length - 1)
       line_runs = @runs[line]
@@ -2593,7 +2593,7 @@ module Org::Eclipse::Swt::Graphics
           result[((count += 1) - 1)] = @styles[i].attr_start
           result[((count += 1) - 1)] = @styles[i + 1].attr_start - 1
         end
-        ((i += 1) - 1)
+        i += 1
       end
       if (!(count).equal?(result.attr_length))
         new_result = Array.typed(::Java::Int).new(count) { 0 }
@@ -2690,7 +2690,7 @@ module Org::Eclipse::Swt::Graphics
         if (@styles[i].attr_start > offset)
           return @styles[i - 1].attr_style
         end
-        ((i += 1) - 1)
+        i += 1
       end
       return nil
     end
@@ -2716,7 +2716,7 @@ module Org::Eclipse::Swt::Graphics
         if (!(@styles[i].attr_style).nil?)
           result[((count += 1) - 1)] = @styles[i].attr_style
         end
-        ((i += 1) - 1)
+        i += 1
       end
       if (!(count).equal?(result.attr_length))
         new_result = Array.typed(TextStyle).new(count) { nil }
@@ -2846,7 +2846,7 @@ module Org::Eclipse::Swt::Graphics
         item_limit = script_item.attr_i_char_pos
         style_limit = translate_offset(@styles[style_index + 1].attr_start)
         if (style_limit <= item_limit)
-          ((style_index += 1) - 1)
+          style_index += 1
           start = style_limit
           if (start < item_limit && 0 < start && start < end_)
             p_char = @segments_text.char_at(start - 1)
@@ -2858,7 +2858,7 @@ module Org::Eclipse::Swt::Graphics
           end
         end
         if (item_limit <= style_limit)
-          ((item_index += 1) - 1)
+          item_index += 1
           start = item_limit
         end
         item.attr_length = start - item.attr_start
@@ -2887,7 +2887,7 @@ module Org::Eclipse::Swt::Graphics
       i = 0
       while i < length_
         bidi_levels[i] = (runs[i].attr_analysis.attr_s.attr_u_bidi_level & 0x1f)
-        ((i += 1) - 1)
+        i += 1
       end
       # Feature in Windows.  If the orientation is RTL Uniscribe will
       # resolve the level of line breaks to 1, this can cause the line
@@ -2903,18 +2903,18 @@ module Org::Eclipse::Swt::Graphics
       i_ = 0
       while i_ < length_
         result[log2vis[i_]] = runs[i_]
-        ((i_ += 1) - 1)
+        i_ += 1
       end
       if (!((@orientation & SWT::RIGHT_TO_LEFT)).equal?(0))
         if (terminate)
-          ((length_ -= 1) + 1)
+          length_ -= 1
         end
         i__ = 0
         while i__ < length_ / 2
           tmp = result[i__]
           result[i__] = result[length_ - i__ - 1]
           result[length_ - i__ - 1] = tmp
-          ((i__ += 1) - 1)
+          i__ += 1
         end
       end
       return result
@@ -3145,7 +3145,7 @@ module Org::Eclipse::Swt::Graphics
             if (!(@segments[i]).equal?(segments[i]))
               break
             end
-            ((i += 1) - 1)
+            i += 1
           end
           if ((i).equal?(segments.attr_length))
             return
@@ -3234,7 +3234,7 @@ module Org::Eclipse::Swt::Graphics
         if (@styles[modify_end + 1].attr_start > end_)
           break
         end
-        ((modify_end += 1) - 1)
+        modify_end += 1
       end
       if ((modify_start).equal?(modify_end))
         style_start = @styles[modify_start].attr_start
@@ -3265,10 +3265,10 @@ module Org::Eclipse::Swt::Graphics
         end
       end
       if ((start).equal?(@styles[modify_start].attr_start))
-        ((modify_start -= 1) + 1)
+        modify_start -= 1
       end
       if ((end_).equal?(@styles[modify_end + 1].attr_start - 1))
-        ((modify_end += 1) - 1)
+        modify_end += 1
       end
       new_length = @styles_count + 1 - (modify_end - modify_start - 1)
       if (new_length > @styles.attr_length)
@@ -3309,7 +3309,7 @@ module Org::Eclipse::Swt::Graphics
             if (!(@tabs[i]).equal?(tabs[i]))
               break
             end
-            ((i += 1) - 1)
+            i += 1
           end
           if ((i).equal?(tabs.attr_length))
             return
@@ -3411,7 +3411,7 @@ module Org::Eclipse::Swt::Graphics
           if ((glyphs[i]).equal?(fp.attr_wg_default))
             break
           end
-          ((i += 1) - 1)
+          i += 1
         end
         if ((i).equal?(glyphs.attr_length))
           return true
@@ -3651,7 +3651,7 @@ module Org::Eclipse::Swt::Graphics
             offset += step
             break
           end
-          ((i += 1) - 1)
+          i += 1
         end
       end
       return offset
@@ -3689,8 +3689,8 @@ module Org::Eclipse::Swt::Graphics
       end
       i = 0
       while i < n_segments && offset - i >= @segments[i]
-        ((offset += 1) - 1)
-        ((i += 1) - 1)
+        offset += 1
+        i += 1
       end
       return offset
     end
@@ -3715,8 +3715,8 @@ module Org::Eclipse::Swt::Graphics
       end
       i = 0
       while i < n_segments && offset > @segments[i]
-        ((offset -= 1) + 1)
-        ((i += 1) - 1)
+        offset -= 1
+        i += 1
       end
       return offset
     end

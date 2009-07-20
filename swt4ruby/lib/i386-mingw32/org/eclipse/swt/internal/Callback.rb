@@ -274,7 +274,7 @@ module Org::Eclipse::Swt::Internal
         i = 0
         while i < arg_count
           signature += PTR_SIGNATURE
-          ((i += 1) - 1)
+          i += 1
         end
         signature += ")" + PTR_SIGNATURE # $NON-NLS-1$
         return signature

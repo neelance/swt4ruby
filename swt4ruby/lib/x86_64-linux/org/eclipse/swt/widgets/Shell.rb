@@ -957,7 +957,7 @@ module Org::Eclipse::Swt::Widgets
               shell = shells[i]
               break
             end
-            ((i += 1) - 1)
+            i += 1
           end
         end
         if (!(shell).nil?)
@@ -1217,9 +1217,9 @@ module Org::Eclipse::Swt::Widgets
           shell = shell.get_parent
         end while (!(shell).nil? && !(shell).equal?(self))
         if ((shell).equal?(self))
-          ((count += 1) - 1)
+          count += 1
         end
-        ((i += 1) - 1)
+        i += 1
       end
       index = 0
       result = Array.typed(Shell).new(count) { nil }
@@ -1232,7 +1232,7 @@ module Org::Eclipse::Swt::Widgets
         if ((shell).equal?(self))
           result[((index += 1) - 1)] = shells[i_]
         end
-        ((i_ += 1) - 1)
+        i_ += 1
       end
       return result
     end
@@ -1529,7 +1529,7 @@ module Org::Eclipse::Swt::Widgets
         if (!(activate[index]).equal?(deactivate[index]))
           break
         end
-        ((index += 1) - 1)
+        index += 1
       end
       # It is possible (but unlikely), that application
       # code could have destroyed some of the widgets. If
@@ -1961,7 +1961,7 @@ module Org::Eclipse::Swt::Widgets
       i = length_
       while i < chars.attr_length
         chars[i] = Character.new(?\s.ord)
-        ((i += 1) - 1)
+        i += 1
       end
       buffer = Converter.wcs_to_mbcs(nil, chars, true)
       OS.gtk_window_set_title(@shell_handle, buffer)
@@ -2296,7 +2296,7 @@ module Org::Eclipse::Swt::Widgets
             end
           end
         end
-        ((i += 1) - 1)
+        i += 1
       end
     end
     
@@ -2373,7 +2373,7 @@ module Org::Eclipse::Swt::Widgets
         if (!(shell).nil? && !shell.is_disposed)
           shell.release(false)
         end
-        ((i += 1) - 1)
+        i += 1
       end
       super(destroy)
     end

@@ -116,7 +116,7 @@ module Org::Eclipse::Swt::Dnd
           bmi[offset + 2] = rgbs[j].attr_red
           bmi[offset + 3] = 0
           offset += 4
-          ((j += 1) - 1)
+          j += 1
         end
       end
       # long
@@ -136,7 +136,7 @@ module Org::Eclipse::Swt::Dnd
           OS._move_memory(p_bit_dest, scanline, bytes_per_line)
           offset += bytes_per_line
           p_bit_dest -= bytes_per_line
-          ((i += 1) - 1)
+          i += 1
         end
       end
       transfer_data.attr_stgmedium = STGMEDIUM.new
@@ -218,7 +218,7 @@ module Org::Eclipse::Swt::Dnd
               OS._move_memory(p_dest_bits, p_source_bits, scanline)
               p_dest_bits += scanline
               p_source_bits -= scanline
-              ((i += 1) - 1)
+              i += 1
             end
           end
           image = Image.win32_new(nil, SWT::BITMAP, mem_dib)

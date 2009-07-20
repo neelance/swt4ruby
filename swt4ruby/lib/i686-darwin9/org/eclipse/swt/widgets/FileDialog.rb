@@ -372,7 +372,7 @@ module Org::Eclipse::Swt::Widgets
             if (!(ptr).equal?(0))
               OS._cfarray_append_value(extensions, ptr)
             end
-            ((i += 1) - 1)
+            i += 1
           end
           filter_callback = Callback.new(self, "filterProc", 4)
           filter_proc = filter_callback.get_address
@@ -485,7 +485,7 @@ module Org::Eclipse::Swt::Widgets
                   OS._cfrelease(full_string)
                   OS._cfrelease(url)
                 end
-                ((i += 1) - 1)
+                i += 1
               end
             end
             OS._dispose_ptr(data_ptr)
@@ -507,7 +507,7 @@ module Org::Eclipse::Swt::Widgets
         i = 0
         while i < count
           OS._cfrelease(OS._cfarray_get_value_at_index(extensions, i))
-          ((i += 1) - 1)
+          i += 1
         end
         OS._cfrelease(extensions)
       end

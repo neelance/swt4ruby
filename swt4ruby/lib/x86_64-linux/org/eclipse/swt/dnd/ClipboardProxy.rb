@@ -233,7 +233,7 @@ module Org::Eclipse::Swt::Dnd
           index = i
           break
         end
-        ((i += 1) - 1)
+        i += 1
       end
       if ((index).equal?(-1))
         return 0
@@ -272,9 +272,9 @@ module Org::Eclipse::Swt::Dnd
             System.arraycopy(entries, 0, tmp, 0, entries.attr_length)
             tmp[entries.attr_length] = entry
             entries = tmp
-            ((j += 1) - 1)
+            j += 1
           end
-          ((i += 1) - 1)
+          i += 1
         end
         p_targets_list = OS.g_malloc(GtkTargetEntry.attr_sizeof * entries.attr_length)
         offset = 0
@@ -282,7 +282,7 @@ module Org::Eclipse::Swt::Dnd
         while i_ < entries.attr_length
           OS.memmove(p_targets_list + offset, entries[i_], GtkTargetEntry.attr_sizeof)
           offset += GtkTargetEntry.attr_sizeof
-          ((i_ += 1) - 1)
+          i_ += 1
         end
         if (!((clipboards & DND::CLIPBOARD)).equal?(0))
           if (!(@active_clipboard).nil?)
@@ -322,7 +322,7 @@ module Org::Eclipse::Swt::Dnd
           if (!(entry.attr_target).equal?(0))
             OS.g_free(entry.attr_target)
           end
-          ((i__ += 1) - 1)
+          i__ += 1
         end
         if (!(p_targets_list).equal?(0))
           OS.g_free(p_targets_list)

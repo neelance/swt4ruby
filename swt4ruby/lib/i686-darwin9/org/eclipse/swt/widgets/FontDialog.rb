@@ -207,7 +207,7 @@ module Org::Eclipse::Swt::Widgets
                     break
                   end
                   value_offset = size[0]
-                  ((i += 1) - 1)
+                  i += 1
                 end
               end
             end
@@ -272,7 +272,7 @@ module Org::Eclipse::Swt::Widgets
       count = 0
       window = OS._get_previous_window(0)
       while (!(window).equal?(0))
-        ((count += 1) - 1)
+        count += 1
         window = OS._get_previous_window(window)
       end
       windows = Array.typed(::Java::Int).new(count) { 0 }
@@ -282,7 +282,7 @@ module Org::Eclipse::Swt::Widgets
       while (!(window).equal?(0))
         windows[count] = window
         visible[count] = OS._is_window_visible(window)
-        ((count += 1) - 1)
+        count += 1
         window = OS._get_previous_window(window)
       end
       OS._fpshow_hide_font_panel
@@ -300,7 +300,7 @@ module Org::Eclipse::Swt::Widgets
                 break
               end
             end
-            ((i += 1) - 1)
+            i += 1
           end
           if (!found)
             fonts_window = window

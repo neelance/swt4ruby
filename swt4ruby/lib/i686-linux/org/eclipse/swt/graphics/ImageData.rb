@@ -565,10 +565,10 @@ module Org::Eclipse::Swt::Graphics
           else
             row[i] = 1
           end
-          ((i += 1) - 1)
+          i += 1
         end
         mask.set_pixels(0, y, @width, row, 0)
-        ((y += 1) - 1)
+        y += 1
       end
       return mask
     end
@@ -663,7 +663,7 @@ module Org::Eclipse::Swt::Graphics
         i = start_index
         while i < end_index
           alphas[i] = 255
-          ((i += 1) - 1)
+          i += 1
         end
         return
       end
@@ -777,16 +777,16 @@ module Org::Eclipse::Swt::Graphics
         j = 0
         while j < get_width
           pixels[i] = @data[index]
-          ((i += 1) - 1)
-          ((src_x += 1) - 1)
+          i += 1
+          src_x += 1
           if (src_x >= @width)
-            ((src_y += 1) - 1)
+            src_y += 1
             index = src_y * @bytes_per_line
             src_x = 0
           else
-            ((index += 1) - 1)
+            index += 1
           end
-          ((j += 1) - 1)
+          j += 1
         end
         return
       when 4
@@ -794,38 +794,38 @@ module Org::Eclipse::Swt::Graphics
         if (((x & 0x1)).equal?(1))
           the_byte = @data[index] & 0xff
           pixels[i] = (the_byte & 0xf)
-          ((i += 1) - 1)
-          ((n -= 1) + 1)
-          ((src_x += 1) - 1)
+          i += 1
+          n -= 1
+          src_x += 1
           if (src_x >= @width)
-            ((src_y += 1) - 1)
+            src_y += 1
             index = src_y * @bytes_per_line
             src_x = 0
           else
-            ((index += 1) - 1)
+            index += 1
           end
         end
         while (n > 1)
           the_byte = @data[index] & 0xff
           pixels[i] = (the_byte >> 4)
-          ((i += 1) - 1)
-          ((n -= 1) + 1)
-          ((src_x += 1) - 1)
+          i += 1
+          n -= 1
+          src_x += 1
           if (src_x >= @width)
-            ((src_y += 1) - 1)
+            src_y += 1
             index = src_y * @bytes_per_line
             src_x = 0
           else
             pixels[i] = (the_byte & 0xf)
-            ((i += 1) - 1)
-            ((n -= 1) + 1)
-            ((src_x += 1) - 1)
+            i += 1
+            n -= 1
+            src_x += 1
             if (src_x >= @width)
-              ((src_y += 1) - 1)
+              src_y += 1
               index = src_y * @bytes_per_line
               src_x = 0
             else
-              ((index += 1) - 1)
+              index += 1
             end
           end
         end
@@ -842,11 +842,11 @@ module Org::Eclipse::Swt::Graphics
           offset = 3 - (src_x % 4)
           mask = 3 << (offset * 2)
           pixels[i] = ((the_byte & mask) >> (offset * 2))
-          ((i += 1) - 1)
-          ((n -= 1) + 1)
-          ((src_x += 1) - 1)
+          i += 1
+          n -= 1
+          src_x += 1
           if (src_x >= @width)
-            ((src_y += 1) - 1)
+            src_y += 1
             index = src_y * @bytes_per_line
             if (n > 0)
               the_byte = @data[index] & 0xff
@@ -854,7 +854,7 @@ module Org::Eclipse::Swt::Graphics
             src_x = 0
           else
             if ((offset).equal?(0))
-              ((index += 1) - 1)
+              index += 1
               the_byte = @data[index] & 0xff
             end
           end
@@ -870,11 +870,11 @@ module Org::Eclipse::Swt::Graphics
           else
             pixels[i] = 1
           end
-          ((i += 1) - 1)
-          ((n -= 1) + 1)
-          ((src_x += 1) - 1)
+          i += 1
+          n -= 1
+          src_x += 1
           if (src_x >= @width)
-            ((src_y += 1) - 1)
+            src_y += 1
             index = src_y * @bytes_per_line
             if (n > 0)
               the_byte = @data[index] & 0xff
@@ -882,7 +882,7 @@ module Org::Eclipse::Swt::Graphics
             src_x = 0
           else
             if ((mask).equal?(1))
-              ((index += 1) - 1)
+              index += 1
               if (n > 0)
                 the_byte = @data[index] & 0xff
               end
@@ -938,16 +938,16 @@ module Org::Eclipse::Swt::Graphics
         j = 0
         while j < get_width
           pixels[i] = ((@data[index] & 0xff) << 24) | ((@data[index + 1] & 0xff) << 16) | ((@data[index + 2] & 0xff) << 8) | (@data[index + 3] & 0xff)
-          ((i += 1) - 1)
-          ((src_x += 1) - 1)
+          i += 1
+          src_x += 1
           if (src_x >= @width)
-            ((src_y += 1) - 1)
+            src_y += 1
             index = src_y * @bytes_per_line
             src_x = 0
           else
             index += 4
           end
-          ((j += 1) - 1)
+          j += 1
         end
         return
       when 24
@@ -955,16 +955,16 @@ module Org::Eclipse::Swt::Graphics
         j = 0
         while j < get_width
           pixels[i] = ((@data[index] & 0xff) << 16) | ((@data[index + 1] & 0xff) << 8) | (@data[index + 2] & 0xff)
-          ((i += 1) - 1)
-          ((src_x += 1) - 1)
+          i += 1
+          src_x += 1
           if (src_x >= @width)
-            ((src_y += 1) - 1)
+            src_y += 1
             index = src_y * @bytes_per_line
             src_x = 0
           else
             index += 3
           end
-          ((j += 1) - 1)
+          j += 1
         end
         return
       when 16
@@ -972,16 +972,16 @@ module Org::Eclipse::Swt::Graphics
         j = 0
         while j < get_width
           pixels[i] = ((@data[index + 1] & 0xff) << 8) + (@data[index] & 0xff)
-          ((i += 1) - 1)
-          ((src_x += 1) - 1)
+          i += 1
+          src_x += 1
           if (src_x >= @width)
-            ((src_y += 1) - 1)
+            src_y += 1
             index = src_y * @bytes_per_line
             src_x = 0
           else
             index += 2
           end
-          ((j += 1) - 1)
+          j += 1
         end
         return
       when 8
@@ -989,16 +989,16 @@ module Org::Eclipse::Swt::Graphics
         j = 0
         while j < get_width
           pixels[i] = @data[index] & 0xff
-          ((i += 1) - 1)
-          ((src_x += 1) - 1)
+          i += 1
+          src_x += 1
           if (src_x >= @width)
-            ((src_y += 1) - 1)
+            src_y += 1
             index = src_y * @bytes_per_line
             src_x = 0
           else
-            ((index += 1) - 1)
+            index += 1
           end
-          ((j += 1) - 1)
+          j += 1
         end
         return
       when 4
@@ -1006,38 +1006,38 @@ module Org::Eclipse::Swt::Graphics
         if (((x & 0x1)).equal?(1))
           the_byte = @data[index] & 0xff
           pixels[i] = the_byte & 0xf
-          ((i += 1) - 1)
-          ((n -= 1) + 1)
-          ((src_x += 1) - 1)
+          i += 1
+          n -= 1
+          src_x += 1
           if (src_x >= @width)
-            ((src_y += 1) - 1)
+            src_y += 1
             index = src_y * @bytes_per_line
             src_x = 0
           else
-            ((index += 1) - 1)
+            index += 1
           end
         end
         while (n > 1)
           the_byte = @data[index] & 0xff
           pixels[i] = the_byte >> 4
-          ((i += 1) - 1)
-          ((n -= 1) + 1)
-          ((src_x += 1) - 1)
+          i += 1
+          n -= 1
+          src_x += 1
           if (src_x >= @width)
-            ((src_y += 1) - 1)
+            src_y += 1
             index = src_y * @bytes_per_line
             src_x = 0
           else
             pixels[i] = the_byte & 0xf
-            ((i += 1) - 1)
-            ((n -= 1) + 1)
-            ((src_x += 1) - 1)
+            i += 1
+            n -= 1
+            src_x += 1
             if (src_x >= @width)
-              ((src_y += 1) - 1)
+              src_y += 1
               index = src_y * @bytes_per_line
               src_x = 0
             else
-              ((index += 1) - 1)
+              index += 1
             end
           end
         end
@@ -1054,11 +1054,11 @@ module Org::Eclipse::Swt::Graphics
           offset = 3 - (src_x % 4)
           mask = 3 << (offset * 2)
           pixels[i] = ((the_byte & mask) >> (offset * 2))
-          ((i += 1) - 1)
-          ((n -= 1) + 1)
-          ((src_x += 1) - 1)
+          i += 1
+          n -= 1
+          src_x += 1
           if (src_x >= @width)
-            ((src_y += 1) - 1)
+            src_y += 1
             index = src_y * @bytes_per_line
             if (n > 0)
               the_byte = @data[index] & 0xff
@@ -1066,7 +1066,7 @@ module Org::Eclipse::Swt::Graphics
             src_x = 0
           else
             if ((offset).equal?(0))
-              ((index += 1) - 1)
+              index += 1
               the_byte = @data[index] & 0xff
             end
           end
@@ -1082,11 +1082,11 @@ module Org::Eclipse::Swt::Graphics
           else
             pixels[i] = 1
           end
-          ((i += 1) - 1)
-          ((n -= 1) + 1)
-          ((src_x += 1) - 1)
+          i += 1
+          n -= 1
+          src_x += 1
           if (src_x >= @width)
-            ((src_y += 1) - 1)
+            src_y += 1
             index = src_y * @bytes_per_line
             if (n > 0)
               the_byte = @data[index] & 0xff
@@ -1094,7 +1094,7 @@ module Org::Eclipse::Swt::Graphics
             src_x = 0
           else
             if ((mask).equal?(1))
-              ((index += 1) - 1)
+              index += 1
               if (n > 0)
                 the_byte = @data[index] & 0xff
               end
@@ -1385,16 +1385,16 @@ module Org::Eclipse::Swt::Graphics
         j = 0
         while j < put_width
           @data[index] = (pixels[i] & 0xff)
-          ((i += 1) - 1)
-          ((src_x += 1) - 1)
+          i += 1
+          src_x += 1
           if (src_x >= @width)
-            ((src_y += 1) - 1)
+            src_y += 1
             index = src_y * @bytes_per_line
             src_x = 0
           else
-            ((index += 1) - 1)
+            index += 1
           end
-          ((j += 1) - 1)
+          j += 1
         end
         return
       when 4
@@ -1407,17 +1407,17 @@ module Org::Eclipse::Swt::Graphics
           else
             @data[index] = ((@data[index] & 0xf0) | the_byte)
           end
-          ((i += 1) - 1)
-          ((n -= 1) + 1)
-          ((src_x += 1) - 1)
+          i += 1
+          n -= 1
+          src_x += 1
           if (src_x >= @width)
-            ((src_y += 1) - 1)
+            src_y += 1
             index = src_y * @bytes_per_line
             high = true
             src_x = 0
           else
             if (!high)
-              ((index += 1) - 1)
+              index += 1
             end
             high = !high
           end
@@ -1430,20 +1430,20 @@ module Org::Eclipse::Swt::Graphics
         while (n > 0)
           the_byte = pixels[i] & 0x3
           @data[index] = ((@data[index] & masks[offset]) | (the_byte << (offset * 2)))
-          ((i += 1) - 1)
-          ((n -= 1) + 1)
-          ((src_x += 1) - 1)
+          i += 1
+          n -= 1
+          src_x += 1
           if (src_x >= @width)
-            ((src_y += 1) - 1)
+            src_y += 1
             index = src_y * @bytes_per_line
             offset = 0
             src_x = 0
           else
             if ((offset).equal?(0))
-              ((index += 1) - 1)
+              index += 1
               offset = 3
             else
-              ((offset -= 1) + 1)
+              offset -= 1
             end
           end
         end
@@ -1457,16 +1457,16 @@ module Org::Eclipse::Swt::Graphics
           else
             @data[index] = ((@data[index] & 0xff) & (mask ^ -1))
           end
-          ((i += 1) - 1)
-          ((n -= 1) + 1)
-          ((src_x += 1) - 1)
+          i += 1
+          n -= 1
+          src_x += 1
           if (src_x >= @width)
-            ((src_y += 1) - 1)
+            src_y += 1
             index = src_y * @bytes_per_line
             src_x = 0
           else
             if ((mask).equal?(1))
-              ((index += 1) - 1)
+              index += 1
             end
           end
         end
@@ -1524,16 +1524,16 @@ module Org::Eclipse::Swt::Graphics
           @data[index + 1] = ((pixel >> 16) & 0xff)
           @data[index + 2] = ((pixel >> 8) & 0xff)
           @data[index + 3] = (pixel & 0xff)
-          ((i += 1) - 1)
-          ((src_x += 1) - 1)
+          i += 1
+          src_x += 1
           if (src_x >= @width)
-            ((src_y += 1) - 1)
+            src_y += 1
             index = src_y * @bytes_per_line
             src_x = 0
           else
             index += 4
           end
-          ((j += 1) - 1)
+          j += 1
         end
         return
       when 24
@@ -1544,16 +1544,16 @@ module Org::Eclipse::Swt::Graphics
           @data[index] = ((pixel >> 16) & 0xff)
           @data[index + 1] = ((pixel >> 8) & 0xff)
           @data[index + 2] = (pixel & 0xff)
-          ((i += 1) - 1)
-          ((src_x += 1) - 1)
+          i += 1
+          src_x += 1
           if (src_x >= @width)
-            ((src_y += 1) - 1)
+            src_y += 1
             index = src_y * @bytes_per_line
             src_x = 0
           else
             index += 3
           end
-          ((j += 1) - 1)
+          j += 1
         end
         return
       when 16
@@ -1563,16 +1563,16 @@ module Org::Eclipse::Swt::Graphics
           pixel = pixels[i]
           @data[index] = (pixel & 0xff)
           @data[index + 1] = ((pixel >> 8) & 0xff)
-          ((i += 1) - 1)
-          ((src_x += 1) - 1)
+          i += 1
+          src_x += 1
           if (src_x >= @width)
-            ((src_y += 1) - 1)
+            src_y += 1
             index = src_y * @bytes_per_line
             src_x = 0
           else
             index += 2
           end
-          ((j += 1) - 1)
+          j += 1
         end
         return
       when 8
@@ -1580,16 +1580,16 @@ module Org::Eclipse::Swt::Graphics
         j = 0
         while j < put_width
           @data[index] = (pixels[i] & 0xff)
-          ((i += 1) - 1)
-          ((src_x += 1) - 1)
+          i += 1
+          src_x += 1
           if (src_x >= @width)
-            ((src_y += 1) - 1)
+            src_y += 1
             index = src_y * @bytes_per_line
             src_x = 0
           else
-            ((index += 1) - 1)
+            index += 1
           end
-          ((j += 1) - 1)
+          j += 1
         end
         return
       when 4
@@ -1602,17 +1602,17 @@ module Org::Eclipse::Swt::Graphics
           else
             @data[index] = ((@data[index] & 0xf0) | the_byte)
           end
-          ((i += 1) - 1)
-          ((n -= 1) + 1)
-          ((src_x += 1) - 1)
+          i += 1
+          n -= 1
+          src_x += 1
           if (src_x >= @width)
-            ((src_y += 1) - 1)
+            src_y += 1
             index = src_y * @bytes_per_line
             high = true
             src_x = 0
           else
             if (!high)
-              ((index += 1) - 1)
+              index += 1
             end
             high = !high
           end
@@ -1625,20 +1625,20 @@ module Org::Eclipse::Swt::Graphics
         while (n > 0)
           the_byte = pixels[i] & 0x3
           @data[index] = ((@data[index] & masks[offset]) | (the_byte << (offset * 2)))
-          ((i += 1) - 1)
-          ((n -= 1) + 1)
-          ((src_x += 1) - 1)
+          i += 1
+          n -= 1
+          src_x += 1
           if (src_x >= @width)
-            ((src_y += 1) - 1)
+            src_y += 1
             index = src_y * @bytes_per_line
             offset = 3
             src_x = 0
           else
             if ((offset).equal?(0))
-              ((index += 1) - 1)
+              index += 1
               offset = 3
             else
-              ((offset -= 1) + 1)
+              offset -= 1
             end
           end
         end
@@ -1652,16 +1652,16 @@ module Org::Eclipse::Swt::Graphics
           else
             @data[index] = ((@data[index] & 0xff) & (mask ^ -1))
           end
-          ((i += 1) - 1)
-          ((n -= 1) + 1)
-          ((src_x += 1) - 1)
+          i += 1
+          n -= 1
+          src_x += 1
           if (src_x >= @width)
-            ((src_y += 1) - 1)
+            src_y += 1
             index = src_y * @bytes_per_line
             src_x = 0
           else
             if ((mask).equal?(1))
-              ((index += 1) - 1)
+              index += 1
             end
           end
         end
@@ -1686,7 +1686,7 @@ module Org::Eclipse::Swt::Graphics
           if (!(((mask >> i) & 0x1)).equal?(0))
             return i + 1
           end
-          ((i -= 1) + 1)
+          i -= 1
         end
         return 0
       end
@@ -1719,7 +1719,7 @@ module Org::Eclipse::Swt::Graphics
             end
             min_distance = distance
           end
-          ((j += 1) - 1)
+          j += 1
         end
         return nearest_pixel
       end
@@ -1739,7 +1739,7 @@ module Org::Eclipse::Swt::Graphics
             if ((rgbs[black_index] == palette.attr_colors[0]))
               break
             end
-            ((black_index += 1) - 1)
+            black_index += 1
           end
         end
         pixels = Array.typed(::Java::Int).new(mask.attr_width) { 0 }
@@ -1753,10 +1753,10 @@ module Org::Eclipse::Swt::Graphics
             else
               pixels[i] = 1
             end
-            ((i += 1) - 1)
+            i += 1
           end
           new_mask.set_pixels(0, y, mask.attr_width, pixels, 0)
-          ((y += 1) - 1)
+          y += 1
         end
         return new_mask
       end
@@ -1777,7 +1777,7 @@ module Org::Eclipse::Swt::Graphics
           System.arraycopy(data, src_index, new_data, dest_index, stride)
           src_index += bpl
           dest_index += new_bpl
-          ((y += 1) - 1)
+          y += 1
         end
         return new_data
       end

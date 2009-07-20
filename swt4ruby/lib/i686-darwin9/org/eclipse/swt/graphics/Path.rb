@@ -226,7 +226,7 @@ module Org::Eclipse::Swt::Graphics
             dispose
             SWT.error(SWT::ERROR_INVALID_ARGUMENT)
           end
-          ((i += 1) - 1)
+          i += 1
         end
         Cocoa.objc_msg_send(Cocoa::C_NSBezierPath, Cocoa::S_setDefaultFlatness, flatness)
         bezier_path = Cocoa.objc_msg_send(bezier_path, Cocoa::S_bezierPathByFlatteningPath)
@@ -253,7 +253,7 @@ module Org::Eclipse::Swt::Graphics
           when Cocoa::NSClosePathBezierPathElement
             close
           end
-          ((i_ += 1) - 1)
+          i_ += 1
         end
         OS.free(points_ptr)
       end
@@ -555,7 +555,7 @@ module Org::Eclipse::Swt::Graphics
         if (!(record.attr_glyph_id).equal?(OS.attr_k_atsdeleted_glyphcode))
           OS._atsuglyph_get_quadratic_paths(style, record.attr_glyph_id, new_path_proc, line_proc, curve_proc, close_path_proc, 0, status)
         end
-        ((i += 1) - 1)
+        i += 1
       end
       OS._cgpath_close_subpath(@handle)
       if (!(delta_ys[0]).equal?(0))
@@ -634,7 +634,7 @@ module Org::Eclipse::Swt::Graphics
           System.arraycopy(@point, 0, @points, @count, length_ * 2)
         end
       end
-      ((@type_count += 1) - 1)
+      @type_count += 1
       @count += length_ * 2
       return 0
     end
@@ -898,7 +898,7 @@ module Org::Eclipse::Swt::Graphics
           dispose
           SWT.error(SWT::ERROR_INVALID_ARGUMENT)
         end
-        ((i += 1) - 1)
+        i += 1
       end
     end
     

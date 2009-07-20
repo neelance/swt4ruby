@@ -205,7 +205,7 @@ module Org::Eclipse::Swt::Dnd
             s = string.substring(start, end_)
             begin
               fragment_start = JavaInteger.parse_int(s)
-              ((end_ += 1) - 1)
+              end_ += 1
             rescue NumberFormatException => e
               break
             end
@@ -216,7 +216,7 @@ module Org::Eclipse::Swt::Dnd
             s = string.substring(start, end_)
             begin
               fragment_end = JavaInteger.parse_int(s)
-              ((end_ += 1) - 1)
+              end_ += 1
             rescue NumberFormatException => e
               break
             end

@@ -253,7 +253,7 @@ module Org::Eclipse::Swt::Widgets
         while i < @item_count
           extent = gc.string_extent(@items[i])
           width = Math.max(width, extent.attr_x)
-          ((i += 1) - 1)
+          i += 1
         end
         gc.dispose
         width += EXTRA_WIDTH
@@ -435,7 +435,7 @@ module Org::Eclipse::Swt::Widgets
       i = 0
       while i < length
         ids[i] = end_ - i + 1
-        ((i += 1) - 1)
+        i += 1
       end
       deselect(ids, length)
     end
@@ -467,7 +467,7 @@ module Org::Eclipse::Swt::Widgets
       i = 0
       while i < length
         ids[i] = indices[length - i - 1] + 1
-        ((i += 1) - 1)
+        i += 1
       end
       deselect(ids, length)
     end
@@ -538,7 +538,7 @@ module Org::Eclipse::Swt::Widgets
             fix = true
           end
         end
-        ((i += 1) - 1)
+        i += 1
       end
       if (fix)
         select(selection, new_count, true)
@@ -701,7 +701,7 @@ module Org::Eclipse::Swt::Widgets
         while i < count
           OS.memmove(id, offset, 4)
           result[i] = @items[id[0] - 1]
-          ((i += 1) - 1)
+          i += 1
           offset -= 4
         end
         OS._hunlock(ptr)
@@ -782,8 +782,8 @@ module Org::Eclipse::Swt::Widgets
           temp = result[start]
           result[start] = result[end_] - 1
           result[end_] = temp - 1
-          ((start += 1) - 1)
-          ((end_ -= 1) + 1)
+          start += 1
+          end_ -= 1
         end
       end
       OS._dispose_handle(ptr)
@@ -995,7 +995,7 @@ module Org::Eclipse::Swt::Widgets
         if ((@items[i] == item))
           return i
         end
-        ((i += 1) - 1)
+        i += 1
       end
       return -1
     end
@@ -1028,7 +1028,7 @@ module Org::Eclipse::Swt::Widgets
         if ((@items[i] == string))
           return i
         end
-        ((i += 1) - 1)
+        i += 1
       end
       return -1
     end
@@ -1111,7 +1111,7 @@ module Org::Eclipse::Swt::Widgets
       i = 0
       while i < length_
         indices[i] = i + start
-        ((i += 1) - 1)
+        i += 1
       end
       remove(indices)
     end
@@ -1179,10 +1179,10 @@ module Org::Eclipse::Swt::Widgets
       i = 0
       while i < new_indices.attr_length
         if ((new_indices[i]).equal?(last))
-          ((duplicates += 1) - 1)
+          duplicates += 1
         end
         last = new_indices[i]
-        ((i += 1) - 1)
+        i += 1
       end
       id = Array.typed(::Java::Int).new(new_indices.attr_length - duplicates) { 0 }
       id_index = id.attr_length - 1
@@ -1199,7 +1199,7 @@ module Org::Eclipse::Swt::Widgets
           @items[@item_count] = nil
           last = index
         end
-        ((i_ += 1) - 1)
+        i_ += 1
       end
       if (!(OS._remove_data_browser_items(self.attr_handle, OS.attr_k_data_browser_no_item, id.attr_length, id, 0)).equal?(OS.attr_no_err))
         error(SWT::ERROR_ITEM_NOT_REMOVED)
@@ -1305,7 +1305,7 @@ module Org::Eclipse::Swt::Widgets
       i = 0
       while i < length_
         ids[i] = end_ - i + 1
-        ((i += 1) - 1)
+        i += 1
       end
       select(ids, length_, false)
     end
@@ -1348,7 +1348,7 @@ module Org::Eclipse::Swt::Widgets
         if (index >= 0 && index < @item_count)
           ids[((count += 1) - 1)] = index + 1
         end
-        ((i += 1) - 1)
+        i += 1
       end
       if (count > 0)
         select(ids, count, false)
@@ -1394,7 +1394,7 @@ module Org::Eclipse::Swt::Widgets
       i = 0
       while i < length_
         ids[i] = index_of(items[length_ - i - 1]) + 1
-        ((i += 1) - 1)
+        i += 1
       end
       select(ids, length_, false)
     end
@@ -1496,7 +1496,7 @@ module Org::Eclipse::Swt::Widgets
         if ((items[i]).nil?)
           error(SWT::ERROR_INVALID_ARGUMENT)
         end
-        ((i += 1) - 1)
+        i += 1
       end
       OS._remove_data_browser_items(self.attr_handle, OS.attr_k_data_browser_no_item, 0, nil, 0)
       if (!(OS._add_data_browser_items(self.attr_handle, OS.attr_k_data_browser_no_item, items.attr_length, nil, OS.attr_k_data_browser_item_no_property)).equal?(OS.attr_no_err))
@@ -1609,7 +1609,7 @@ module Org::Eclipse::Swt::Widgets
       i = 0
       while i < length_
         ids[i] = end_ - i + 1
-        ((i += 1) - 1)
+        i += 1
       end
       select(ids, length_, true)
       if (ids.attr_length > 0)
@@ -1655,7 +1655,7 @@ module Org::Eclipse::Swt::Widgets
         if (index >= 0 && index < @item_count)
           ids[((count += 1) - 1)] = index + 1
         end
-        ((i += 1) - 1)
+        i += 1
       end
       if (count > 0)
         select(ids, count, true)
@@ -1714,10 +1714,10 @@ module Org::Eclipse::Swt::Widgets
               ids = new_ids
             end
             ids[((count += 1) - 1)] = index + 1
-            ((index += 1) - 1)
+            index += 1
           end
         end
-        ((i += 1) - 1)
+        i += 1
       end
       if (count > 0)
         select(ids, count, true)

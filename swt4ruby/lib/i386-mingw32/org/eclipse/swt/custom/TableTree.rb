@@ -176,7 +176,7 @@ module Org::Eclipse::Swt::Custom
       i = 0
       while i < table_events.attr_length
         @table.add_listener(table_events[i], table_listener)
-        ((i += 1) - 1)
+        i += 1
       end
       listener = Class.new(Listener.class == Class ? Listener : Object) do
         extend LocalClass
@@ -207,7 +207,7 @@ module Org::Eclipse::Swt::Custom
       i_ = 0
       while i_ < events.attr_length
         add_listener(events[i_], listener)
-        ((i_ += 1) - 1)
+        i_ += 1
       end
     end
     
@@ -429,7 +429,7 @@ module Org::Eclipse::Swt::Custom
       i = 0
       while i < selection.attr_length
         result[i] = selection[i].get_data(ITEMID)
-        ((i += 1) - 1)
+        i += 1
       end
       return result
     end
@@ -542,7 +542,7 @@ module Org::Eclipse::Swt::Custom
         if ((item).equal?(@items[i]))
           return i
         end
-        ((i += 1) - 1)
+        i += 1
       end
       return -1
     end
@@ -557,7 +557,7 @@ module Org::Eclipse::Swt::Custom
       i = 0
       while i < @items.attr_length
         @items[i].dispose
-        ((i += 1) - 1)
+        i += 1
       end
       @in_dispose = false
       if (!(@plus_image).nil?)
@@ -651,7 +651,7 @@ module Org::Eclipse::Swt::Custom
         if (!(item).nil?)
           return item
         end
-        ((i += 1) - 1)
+        i += 1
       end
       return nil
     end
@@ -743,7 +743,7 @@ module Org::Eclipse::Swt::Custom
           end
           return
         end
-        ((i += 1) - 1)
+        i += 1
       end
     end
     
@@ -763,7 +763,7 @@ module Org::Eclipse::Swt::Custom
       i = @items.attr_length - 1
       while i >= 0
         @items[i].dispose
-        ((i -= 1) + 1)
+        i -= 1
       end
       @items = EMPTY_ITEMS
       set_redraw(true)
@@ -773,7 +773,7 @@ module Org::Eclipse::Swt::Custom
     def remove_item(item)
       index = 0
       while (index < @items.attr_length && !(@items[index]).equal?(item))
-        ((index += 1) - 1)
+        index += 1
       end
       if ((index).equal?(@items.attr_length))
         return
@@ -925,7 +925,7 @@ module Org::Eclipse::Swt::Custom
           expand_item(items[i])
         end
         table_items[i] = items[i].attr_table_item
-        ((i += 1) - 1)
+        i += 1
       end
       @table.set_selection(table_items)
     end

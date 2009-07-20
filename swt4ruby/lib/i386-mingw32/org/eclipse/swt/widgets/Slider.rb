@@ -597,7 +597,7 @@ module Org::Eclipse::Swt::Widgets
       OS._get_scroll_info(self.attr_handle, OS::SB_CTL, info)
       info.attr_n_page = value
       if (!(info.attr_n_page).equal?(0))
-        ((info.attr_n_page += 1) - 1)
+        info.attr_n_page += 1
       end
       _set_scroll_info(self.attr_handle, OS::SB_CTL, info, true)
     end
@@ -649,7 +649,7 @@ module Org::Eclipse::Swt::Widgets
       info.attr_n_max = maximum
       info.attr_n_page = thumb
       if (!(info.attr_n_page).equal?(0))
-        ((info.attr_n_page += 1) - 1)
+        info.attr_n_page += 1
       end
       _set_scroll_info(self.attr_handle, OS::SB_CTL, info, true)
     end

@@ -355,7 +355,7 @@ module Org::Eclipse::Swt::Widgets
           count = @digits - string.length
           while (count >= 0)
             buffer.append("0")
-            ((count -= 1) + 1)
+            count -= 1
           end
           string = (buffer.to_s).to_s
         end
@@ -616,7 +616,7 @@ module Org::Eclipse::Swt::Widgets
               j = 0
               while j < i
                 decimal_part = decimal_part + "0"
-                ((j += 1) - 1)
+                j += 1
               end
             end
             whole_value = JavaInteger.parse_int(whole_part)
@@ -624,7 +624,7 @@ module Org::Eclipse::Swt::Widgets
             i = 0
             while i < @digits
               whole_value *= 10
-              ((i += 1) - 1)
+              i += 1
             end
             value = whole_value + decimal_value
             if (string.starts_with("-"))
@@ -635,7 +635,7 @@ module Org::Eclipse::Swt::Widgets
             i = 0
             while i < @digits
               value *= 10
-              ((i += 1) - 1)
+              i += 1
             end
           end
         else
@@ -1030,7 +1030,7 @@ module Org::Eclipse::Swt::Widgets
         end
         udaccel.attr_n_inc = udaccel.attr_n_inc * value / first
         OS._move_memory(offset, udaccel, UDACCEL.attr_sizeof)
-        ((i += 1) - 1)
+        i += 1
       end
       OS._send_message(@hwnd_up_down, OS::UDM_SETACCEL, count, udaccels)
       OS._heap_free(h_heap, 0, udaccels)
@@ -1309,14 +1309,14 @@ module Org::Eclipse::Swt::Widgets
         min_ = Array.typed(::Java::Int).new(1) { 0 }
         OS._send_message(@hwnd_up_down, OS::UDM_GETRANGE32, min_, nil)
         if (min_[0] < 0 && (string.char_at(0)).equal?(Character.new(?-.ord)))
-          ((index += 1) - 1)
+          index += 1
         end
       end
       while (index < string.length)
         if (!Character.is_digit(string.char_at(index)))
           break
         end
-        ((index += 1) - 1)
+        index += 1
       end
       event.attr_doit = (index).equal?(string.length)
       if (!OS::IsUnicode && OS::IsDBLocale)

@@ -99,7 +99,7 @@ module Org::Eclipse::Swt::Dnd
       while i < file_names.attr_length
         all_files.append(file_names[i])
         all_files.append(CF_HDROP_SEPARATOR) # each name is null terminated
-        ((i += 1) - 1)
+        i += 1
       end
       buffer = TCHAR.new(0, all_files.to_s, true) # there is an extra null terminator at the very end
       dropfiles = DROPFILES.new
@@ -162,7 +162,7 @@ module Org::Eclipse::Swt::Dnd
         # Get file name and append it to string
         OS._drag_query_file(stgmedium.attr_union_field, i, lpsz_file, size)
         file_names[i] = lpsz_file.to_s(0, lpsz_file.strlen)
-        ((i += 1) - 1)
+        i += 1
       end
       OS._drag_finish(stgmedium.attr_union_field) # frees data associated with HDROP data
       return file_names
@@ -189,7 +189,7 @@ module Org::Eclipse::Swt::Dnd
         if ((strings[i]).nil? || (strings[i].length).equal?(0))
           return false
         end
-        ((i += 1) - 1)
+        i += 1
       end
       return true
     end

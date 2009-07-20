@@ -127,7 +127,7 @@ module Org::Eclipse::Swt::Dnd
         if (rect.attr_y > table_bottom)
           break
         end
-        ((i += 1) - 1)
+        i += 1
       end
       return nil
     end

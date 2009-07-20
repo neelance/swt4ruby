@@ -813,7 +813,7 @@ module Org::Eclipse::Swt::Widgets
       OS._get_scroll_info(hwnd, type, info)
       info.attr_n_page = value
       if (!(info.attr_n_page).equal?(0))
-        ((info.attr_n_page += 1) - 1)
+        info.attr_n_page += 1
       end
       _set_scroll_info(hwnd, type, info, true)
     end
@@ -865,7 +865,7 @@ module Org::Eclipse::Swt::Widgets
       info.attr_n_max = maximum
       info.attr_n_page = thumb
       if (!(info.attr_n_page).equal?(0))
-        ((info.attr_n_page += 1) - 1)
+        info.attr_n_page += 1
       end
       # long
       hwnd = hwnd_scroll_bar
@@ -914,7 +914,7 @@ module Org::Eclipse::Swt::Widgets
           # The fix is to increase and then decrease the
           # maximum, causing Windows to honour the flag.
           max = info.attr_n_max
-          ((info.attr_n_max += 1) - 1)
+          info.attr_n_max += 1
           OS._set_scroll_info(hwnd, type, info, false)
           info.attr_n_max = max
           OS._set_scroll_info(hwnd, type, info, true)

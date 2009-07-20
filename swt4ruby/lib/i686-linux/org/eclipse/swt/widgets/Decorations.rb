@@ -281,7 +281,7 @@ module Org::Eclipse::Swt::Widgets
           # long
           pixbuf = Display.create_pixbuf(image)
           pixbufs = OS.g_list_append(pixbufs, pixbuf)
-          ((i += 1) - 1)
+          i += 1
         end
       end
       OS.gtk_window_set_icon_list(top_handle, pixbufs)
@@ -311,7 +311,7 @@ module Org::Eclipse::Swt::Widgets
           @menus[i] = menu
           return
         end
-        ((i += 1) - 1)
+        i += 1
       end
       new_menus = Array.typed(Menu).new(@menus.attr_length + 4) { nil }
       new_menus[@menus.attr_length] = menu
@@ -426,7 +426,7 @@ module Org::Eclipse::Swt::Widgets
             control.set_menu(nil)
             return
           end
-          ((index += 1) - 1)
+          index += 1
         end
         menu.fix_menus(new_decorations)
       end
@@ -615,7 +615,7 @@ module Org::Eclipse::Swt::Widgets
           @menus[i] = nil
           return
         end
-        ((i += 1) - 1)
+        i += 1
       end
     end
     
@@ -633,7 +633,7 @@ module Org::Eclipse::Swt::Widgets
           if (!(menu).nil? && !menu.is_disposed)
             menu.dispose
           end
-          ((i += 1) - 1)
+          i += 1
         end
         @menus = nil
       end
@@ -769,7 +769,7 @@ module Org::Eclipse::Swt::Widgets
         if ((images[i]).nil? || images[i].is_disposed)
           error(SWT::ERROR_INVALID_ARGUMENT)
         end
-        ((i += 1) - 1)
+        i += 1
       end
       @images = images
       __set_images(images)
@@ -900,7 +900,7 @@ module Org::Eclipse::Swt::Widgets
       i = 0
       while i < length
         datas[i] = images[i].get_image_data
-        ((i += 1) - 1)
+        i += 1
       end
       gap = length / 2
       while gap > 0
@@ -918,7 +918,7 @@ module Org::Eclipse::Swt::Widgets
             end
             j -= gap
           end
-          ((i_ += 1) - 1)
+          i_ += 1
         end
         gap /= 2
       end

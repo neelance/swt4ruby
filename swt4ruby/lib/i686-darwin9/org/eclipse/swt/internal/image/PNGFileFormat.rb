@@ -139,10 +139,10 @@ module Org::Eclipse::Swt::Internal::Image
           i = 0
           while i < @alpha_palette.attr_length
             if (!((@alpha_palette[i] & 0xff)).equal?(255))
-              ((transparent_count += 1) - 1)
+              transparent_count += 1
               transparent_pixel = i
             end
-            ((i += 1) - 1)
+            i += 1
           end
           if ((transparent_count).equal?(0))
             @alpha_palette = nil
@@ -265,10 +265,10 @@ module Org::Eclipse::Swt::Internal::Image
             alpha_data[dest_alpha_index] = alpha
             src_index += 2
             dest_index += 3
-            ((dest_alpha_index += 1) - 1)
-            ((x += 1) - 1)
+            dest_alpha_index += 1
+            x += 1
           end
-          ((y += 1) - 1)
+          y += 1
         end
         image_data.attr_data = rgb_data
         image_data.attr_alpha_data = alpha_data
@@ -297,10 +297,10 @@ module Org::Eclipse::Swt::Internal::Image
             alpha_data[dest_alpha_index] = data[src_index + 3]
             src_index += 4
             dest_index += 3
-            ((dest_alpha_index += 1) - 1)
-            ((x += 1) - 1)
+            dest_alpha_index += 1
+            x += 1
           end
-          ((y += 1) - 1)
+          y += 1
         end
         image_data.attr_data = rgb_data
         image_data.attr_alpha_data = alpha_data
@@ -316,7 +316,7 @@ module Org::Eclipse::Swt::Internal::Image
           i = 0
           while i < pixel_data.attr_length
             alpha_data[i] = @alpha_palette[pixel_data[i] & 0xff]
-            ((i += 1) - 1)
+            i += 1
           end
           image_data.attr_alpha_data = alpha_data
         end
@@ -435,7 +435,7 @@ module Org::Eclipse::Swt::Internal::Image
             byte_offset = 0
             while byte_offset < bytes_per_pixel
               @data[data_offset + byte_offset] = current_row[row_offset + byte_offset]
-              ((byte_offset += 1) - 1)
+              byte_offset += 1
             end
             data_offset += (column_interval * bytes_per_pixel)
             row_offset += bytes_per_pixel
@@ -450,7 +450,7 @@ module Org::Eclipse::Swt::Internal::Image
           while i < bits_per_pixel
             value_mask <<= 1
             value_mask |= 1
-            ((i += 1) - 1)
+            i += 1
           end
           max_shift = 8 - bits_per_pixel
           byte_offset = 0
@@ -466,7 +466,7 @@ module Org::Eclipse::Swt::Internal::Image
               column += column_interval
               bit_offset -= bits_per_pixel
             end
-            ((byte_offset += 1) - 1)
+            byte_offset += 1
           end
         end
         current_row = ((current_row).equal?(row1)) ? row2 : row1
@@ -528,7 +528,7 @@ module Org::Eclipse::Swt::Internal::Image
         data_offset += aligned_bytes_per_row
         current_row = ((current_row).equal?(row1)) ? row2 : row1
         last_row = ((last_row).equal?(row1)) ? row2 : row1
-        ((row += 1) - 1)
+        row += 1
       end
       set_image_data_values(@data, @image_data)
     end
@@ -552,7 +552,7 @@ module Org::Eclipse::Swt::Internal::Image
           # byte compressedValue = (byte)(value * multiplier);
           compressed_value = source[source_index]
           destination[destination_index] = compressed_value
-          ((i += 1) - 1)
+          i += 1
         end
       end
       
@@ -585,7 +585,7 @@ module Org::Eclipse::Swt::Internal::Image
           current = row[i] & 0xff
           left = row[i - byte_offset] & 0xff
           row[i] = ((current + left) & 0xff)
-          ((i += 1) - 1)
+          i += 1
         end
       when PngIhdrChunk::FILTER_UP
         i = 0
@@ -593,7 +593,7 @@ module Org::Eclipse::Swt::Internal::Image
           current = row[i] & 0xff
           above = previous_row[i] & 0xff
           row[i] = ((current + above) & 0xff)
-          ((i += 1) - 1)
+          i += 1
         end
       when PngIhdrChunk::FILTER_AVERAGE
         i = 0
@@ -602,7 +602,7 @@ module Org::Eclipse::Swt::Internal::Image
           above = previous_row[i] & 0xff
           current = row[i] & 0xff
           row[i] = ((current + ((left + above) / 2)) & 0xff)
-          ((i += 1) - 1)
+          i += 1
         end
       when PngIhdrChunk::FILTER_PAETH
         i = 0
@@ -625,7 +625,7 @@ module Org::Eclipse::Swt::Internal::Image
           end
           current_value = row[i] & 0xff
           row[i] = ((current_value + preductor) & 0xff)
-          ((i += 1) - 1)
+          i += 1
         end
       end
     end

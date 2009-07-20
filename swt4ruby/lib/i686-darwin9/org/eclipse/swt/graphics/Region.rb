@@ -121,7 +121,7 @@ module Org::Eclipse::Swt::Graphics
       i = 1
       while i < point_array.attr_length / 2
         OS._line_to(RJava.cast_to_short(point_array[2 * i]), RJava.cast_to_short(point_array[2 * i + 1]))
-        ((i += 1) - 1)
+        i += 1
       end
       OS._line_to(RJava.cast_to_short(point_array[0]), RJava.cast_to_short(point_array[1]))
       OS._close_rgn(poly_rgn)
@@ -519,7 +519,7 @@ module Org::Eclipse::Swt::Graphics
       i = 1
       while i < point_array.attr_length / 2
         OS._line_to(RJava.cast_to_short(point_array[2 * i]), RJava.cast_to_short(point_array[2 * i + 1]))
-        ((i += 1) - 1)
+        i += 1
       end
       OS._line_to(RJava.cast_to_short(point_array[0]), RJava.cast_to_short(point_array[1]))
       OS._close_rgn(poly_rgn)

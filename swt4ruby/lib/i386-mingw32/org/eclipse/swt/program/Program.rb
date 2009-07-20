@@ -191,7 +191,7 @@ module Org::Eclipse::Swt::Program
             end
             extensions[((count += 1) - 1)] = extension
           end
-          ((dw_index += 1) - 1)
+          dw_index += 1
         end
         if (!(count).equal?(extensions.attr_length))
           new_extension = Array.typed(String).new(count) { nil }
@@ -299,7 +299,7 @@ module Org::Eclipse::Swt::Program
             end
             programs[((count += 1) - 1)] = program
           end
-          ((dw_index += 1) - 1)
+          dw_index += 1
         end
         if (!(count).equal?(programs.attr_length))
           new_programs = Array.typed(Program).new(count) { nil }
@@ -373,7 +373,7 @@ module Org::Eclipse::Swt::Program
           suffix = (@command.substring(i + ARGUMENTS[index].length, @command.length)).to_s
           break
         end
-        ((index += 1) - 1)
+        index += 1
       end
       if (append)
         file_name = " \"" + file_name + "\""

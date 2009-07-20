@@ -1405,12 +1405,12 @@ module Org::Eclipse::Swt::Widgets
         case (text[i])
         when Character.new(?&.ord)
           if (i + 1 < length_ && (text[i + 1]).equal?(Character.new(?&.ord)))
-            ((i += 1) - 1)
+            i += 1
           else
             if (replace)
               text[i] = Character.new(?_.ord)
             else
-              ((i += 1) - 1)
+              i += 1
             end
           end
         when Character.new(?_.ord)
@@ -1861,7 +1861,7 @@ module Org::Eclipse::Swt::Widgets
         if (event.attr_doit)
           chars[((count += 1) - 1)] = chars[index]
         end
-        ((index += 1) - 1)
+        index += 1
       end
       if (!(ptr).equal?(0))
         OS.gdk_event_free(ptr)

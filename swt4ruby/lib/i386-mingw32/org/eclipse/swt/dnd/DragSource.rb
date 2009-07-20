@@ -341,7 +341,7 @@ module Org::Eclipse::Swt::Dnd
     
     typesig { [] }
     def _add_ref
-      ((@ref_count += 1) - 1)
+      @ref_count += 1
       return @ref_count
     end
     
@@ -608,7 +608,7 @@ module Org::Eclipse::Swt::Dnd
           System.arraycopy(formats, 0, new_allowed_data_types, allowed_data_types.attr_length, formats.attr_length)
           allowed_data_types = new_allowed_data_types
         end
-        ((i += 1) - 1)
+        i += 1
       end
       enum_formatetc = OleEnumFORMATETC.new
       enum_formatetc._add_ref
@@ -616,7 +616,7 @@ module Org::Eclipse::Swt::Dnd
       i_ = 0
       while i_ < formats.attr_length
         formats[i_] = allowed_data_types[i_].attr_formatetc
-        ((i_ += 1) - 1)
+        i_ += 1
       end
       enum_formatetc.set_formats(formats)
       # long
@@ -667,7 +667,7 @@ module Org::Eclipse::Swt::Dnd
           transfer = transfer_agent
           break
         end
-        ((i += 1) - 1)
+        i += 1
       end
       if ((transfer).nil?)
         return COM::DV_E_FORMATETC
@@ -709,9 +709,9 @@ module Org::Eclipse::Swt::Dnd
         listener = listeners[i]
         if (listener.is_a?(DNDListener))
           drag_listeners[count] = (listener).get_event_listener
-          ((count += 1) - 1)
+          count += 1
         end
-        ((i += 1) - 1)
+        i += 1
       end
       if ((count).equal?(length))
         return drag_listeners
@@ -841,7 +841,7 @@ module Org::Eclipse::Swt::Dnd
         if (!(transfer).nil? && transfer.is_supported_type(transfer_data))
           return COM::S_OK
         end
-        ((i += 1) - 1)
+        i += 1
       end
       return COM::DV_E_FORMATETC
     end
@@ -878,7 +878,7 @@ module Org::Eclipse::Swt::Dnd
     
     typesig { [] }
     def _release
-      ((@ref_count -= 1) + 1)
+      @ref_count -= 1
       if ((@ref_count).equal?(0))
         dispose_cominterfaces
         COM._co_free_unused_libraries

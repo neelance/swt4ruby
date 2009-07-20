@@ -28,7 +28,7 @@ module Org::Eclipse::Swt::Internal::Image
       i = start_index
       while i < end_index
         data[i] = (255 - data[i - start_index])
-        ((i += 1) - 1)
+        i += 1
       end
       return data
     end
@@ -50,7 +50,7 @@ module Org::Eclipse::Swt::Internal::Image
           System.arraycopy(data, src_index, new_data, dest_index, new_bpl)
           src_index += bpl
           dest_index += new_bpl
-          ((y += 1) - 1)
+          y += 1
         end
         return new_data
       end
@@ -147,7 +147,7 @@ module Org::Eclipse::Swt::Internal::Image
       i = 0
       while i < icons.attr_length
         icons[i] = load_icon(headers[i])
-        ((i += 1) - 1)
+        i += 1
       end
       return icons
     end
@@ -187,7 +187,7 @@ module Org::Eclipse::Swt::Internal::Image
           headers[i][4] = self.attr_input_stream.read_short
           headers[i][5] = self.attr_input_stream.read_int
           headers[i][6] = self.attr_input_stream.read_int
-          ((i += 1) - 1)
+          i += 1
         end
       rescue IOException => e
         SWT.error(SWT::ERROR_IO, e)
@@ -326,7 +326,7 @@ module Org::Eclipse::Swt::Internal::Image
           bit_invert_data(buf, 0, bpl)
           self.attr_output_stream.write(buf, 0, dest_bpl)
           offset -= src_bpl
-          ((i += 1) - 1)
+          i += 1
         end
       rescue IOException => e
         SWT.error(SWT::ERROR_IO, e)
@@ -349,7 +349,7 @@ module Org::Eclipse::Swt::Internal::Image
           System.arraycopy(data, offset, buf, 0, bpl)
           self.attr_output_stream.write(buf, 0, dest_bpl)
           offset -= src_bpl
-          ((i += 1) - 1)
+          i += 1
         end
       rescue IOException => e
         SWT.error(SWT::ERROR_IO, e)

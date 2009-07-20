@@ -131,7 +131,7 @@ module Org::Eclipse::Swt::Graphics
         index = OS._get_nearest_palette_index(h_pal, @handle)
         color_ref_count = self.attr_device.attr_color_ref_count
         if (color_ref_count[index] > 0)
-          ((color_ref_count[index] -= 1) + 1)
+          color_ref_count[index] -= 1
         end
       end
       @handle = -1
@@ -264,7 +264,7 @@ module Org::Eclipse::Swt::Graphics
       OS._get_palette_entries(h_pal, index, 1, entry)
       if (((entry[0]).equal?(red)) && ((entry[1]).equal?(green)) && ((entry[2]).equal?(blue)))
         # Found the color. Increment the ref count and return
-        ((color_ref_count[index] += 1) - 1)
+        color_ref_count[index] += 1
         return
       end
       # Didn't find the color, allocate it now. Find the first free entry
@@ -274,7 +274,7 @@ module Org::Eclipse::Swt::Graphics
           index = i
           break
         end
-        ((i += 1) - 1)
+        i += 1
       end
       if ((i).equal?(color_ref_count.attr_length))
         # No free entries, use the closest one
@@ -285,7 +285,7 @@ module Org::Eclipse::Swt::Graphics
         entry = Array.typed(::Java::Byte).new([(red & 0xff), (green & 0xff), (blue & 0xff), 0])
         OS._set_palette_entries(h_pal, index, 1, entry)
       end
-      ((color_ref_count[index] += 1) - 1)
+      color_ref_count[index] += 1
     end
     
     typesig { [] }

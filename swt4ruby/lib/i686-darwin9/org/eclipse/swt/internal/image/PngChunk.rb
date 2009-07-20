@@ -93,9 +93,9 @@ module Org::Eclipse::Swt::Internal::Image
             else
               CRC_TABLE[i] = -0x12477ce0 ^ ((CRC_TABLE[i] >> 1) & 0x7fffffff)
             end
-            ((j += 1) - 1)
+            j += 1
           end
-          ((i += 1) - 1)
+          i += 1
         end
       end
     }
@@ -293,7 +293,7 @@ module Org::Eclipse::Swt::Internal::Image
       while i < stop
         index = (crc ^ @reference[i]) & 0xff
         crc = CRC_TABLE[index] ^ ((crc >> 8) & 0xffffff)
-        ((i += 1) - 1)
+        i += 1
       end
       return ~crc
     end
@@ -305,7 +305,7 @@ module Org::Eclipse::Swt::Internal::Image
         if (!(@reference[TYPE_OFFSET + i]).equal?(array[i]))
           return false
         end
-        ((i += 1) - 1)
+        i += 1
       end
       return true
     end
@@ -395,7 +395,7 @@ module Org::Eclipse::Swt::Internal::Image
         if (!((Character.new(?a.ord) <= c && c <= Character.new(?z.ord)) || (Character.new(?A.ord) <= c && c <= Character.new(?Z.ord))))
           SWT.error(SWT::ERROR_INVALID_IMAGE)
         end
-        ((i += 1) - 1)
+        i += 1
       end
       # The stored CRC must match the data's computed CRC.
       if (!check_crc)
@@ -424,7 +424,7 @@ module Org::Eclipse::Swt::Internal::Image
       i = 0
       while i < type.attr_length
         buffer.append(RJava.cast_to_char(type[i]))
-        ((i += 1) - 1)
+        i += 1
       end
       contribute_to_string(buffer)
       buffer.append("\n\tCRC: ")

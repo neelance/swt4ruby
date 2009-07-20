@@ -77,7 +77,7 @@ module Org::Eclipse::Swt::Internal::Ole::Win32
             end
           end
           callback_addresses[i] = self.attr_callbacks[i][arg_counts[i]].get_address
-          ((i += 1) - 1)
+          i += 1
         end
       end
       # long

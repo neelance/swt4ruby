@@ -317,7 +317,7 @@ module Org::Eclipse::Swt::Dnd
     
     typesig { [] }
     def _add_ref
-      ((@ref_count += 1) - 1)
+      @ref_count += 1
       return @ref_count
     end
     
@@ -472,7 +472,7 @@ module Org::Eclipse::Swt::Dnd
           @selected_data_type = allowed_data_types[i]
           break
         end
-        ((i += 1) - 1)
+        i += 1
       end
       @selected_operation = DND::DROP_NONE
       if (!(@selected_data_type).nil? && (!((allowed_operations & event.attr_detail)).equal?(0)))
@@ -543,7 +543,7 @@ module Org::Eclipse::Swt::Dnd
           @selected_data_type = allowed_data_types[i]
           break
         end
-        ((i += 1) - 1)
+        i += 1
       end
       @selected_operation = DND::DROP_NONE
       if (!(@selected_data_type).nil? && (((allowed_operations & event.attr_detail)).equal?(event.attr_detail)))
@@ -596,7 +596,7 @@ module Org::Eclipse::Swt::Dnd
           @selected_data_type = allowed_data_types[i]
           break
         end
-        ((i += 1) - 1)
+        i += 1
       end
       @selected_operation = DND::DROP_NONE
       if (!(@selected_data_type).nil? && ((allowed_operations & event.attr_detail)).equal?(event.attr_detail))
@@ -615,7 +615,7 @@ module Org::Eclipse::Swt::Dnd
           object = transfer.native_to_java(@selected_data_type)
           break
         end
-        ((i_ += 1) - 1)
+        i_ += 1
       end
       if ((object).nil?)
         @selected_operation = DND::DROP_NONE
@@ -677,9 +677,9 @@ module Org::Eclipse::Swt::Dnd
         listener = listeners[i]
         if (listener.is_a?(DNDListener))
           drop_listeners[count] = (listener).get_event_listener
-          ((count += 1) - 1)
+          count += 1
         end
-        ((i += 1) - 1)
+        i += 1
       end
       if ((count).equal?(length))
         return drop_listeners
@@ -806,7 +806,7 @@ module Org::Eclipse::Swt::Dnd
     
     typesig { [] }
     def _release
-      ((@ref_count -= 1) + 1)
+      @ref_count -= 1
       if ((@ref_count).equal?(0))
         dispose_cominterfaces
         COM._co_free_unused_libraries
@@ -932,7 +932,7 @@ module Org::Eclipse::Swt::Dnd
                   data_types = new_data_types
                   break
                 end
-                ((i += 1) - 1)
+                i += 1
               end
             end
           ensure

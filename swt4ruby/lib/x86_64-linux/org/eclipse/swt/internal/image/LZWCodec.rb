@@ -221,7 +221,7 @@ module Org::Eclipse::Swt::Internal::Image
           if (!(c).equal?(@end_code))
             oc = fc = c
             buf[buf_index] = c
-            ((buf_index += 1) - 1)
+            buf_index += 1
             if ((buf_index).equal?(@image_width))
               next_put_pixels(buf)
               buf_index = 0
@@ -232,33 +232,33 @@ module Org::Eclipse::Swt::Internal::Image
           if (code >= @current_slot)
             code = oc
             @stack[stack_index] = fc
-            ((stack_index += 1) - 1)
+            stack_index += 1
           end
           while (code >= @new_codes)
             @stack[stack_index] = @suffix[code]
-            ((stack_index += 1) - 1)
+            stack_index += 1
             code = @prefix[code]
           end
           @stack[stack_index] = code
-          ((stack_index += 1) - 1)
+          stack_index += 1
           if (@current_slot < @top_slot)
             fc = code
             @suffix[@current_slot] = fc
             @prefix[@current_slot] = oc
-            ((@current_slot += 1) - 1)
+            @current_slot += 1
             oc = c
           end
           if (@current_slot >= @top_slot)
             if (@code_size < 12)
               @code_mask = MASK_TABLE[@code_size]
-              ((@code_size += 1) - 1)
+              @code_size += 1
               @top_slot = @top_slot + @top_slot
             end
           end
           while (stack_index > 0)
-            ((stack_index -= 1) + 1)
+            stack_index -= 1
             buf[buf_index] = @stack[stack_index]
-            ((buf_index += 1) - 1)
+            buf_index += 1
             if ((buf_index).equal?(@image_width))
               next_put_pixels(buf)
               buf_index = 0
@@ -365,11 +365,11 @@ module Org::Eclipse::Swt::Internal::Image
         node.attr_prefix = current_prefix
         node.attr_suffix = pixel
         next_put_code(current_prefix)
-        ((@current_slot += 1) - 1)
+        @current_slot += 1
         # Off by one?
         if (@current_slot < 4096)
           if (@current_slot > @top_slot)
-            ((@code_size += 1) - 1)
+            @code_size += 1
             @code_mask = MASK_TABLE[@code_size - 1]
             @top_slot *= 2
           end
@@ -378,7 +378,7 @@ module Org::Eclipse::Swt::Internal::Image
           i = 0
           while i < @node_stack.attr_length
             @node_stack[i].attr_children = nil
-            ((i += 1) - 1)
+            i += 1
           end
           @code_size = @bits_per_pixel + 1
           @code_mask = MASK_TABLE[@code_size - 1]
@@ -436,7 +436,7 @@ module Org::Eclipse::Swt::Internal::Image
         node.attr_prefix = -1
         node.attr_suffix = i + 1
         @node_stack[i] = node
-        ((i += 1) - 1)
+        i += 1
       end
       @image_width = @image.attr_width
       @image_height = @image.attr_height
@@ -457,7 +457,7 @@ module Org::Eclipse::Swt::Internal::Image
             return @end_code
           end
         end
-        ((@block_index += 1) - 1)
+        @block_index += 1
         @current_byte = @block[@block_index] & 0xff
         @bits_left = 8
         code = @current_byte
@@ -477,7 +477,7 @@ module Org::Eclipse::Swt::Internal::Image
             return @end_code
           end
         end
-        ((@block_index += 1) - 1)
+        @block_index += 1
         @current_byte = @block[@block_index] & 0xff
         code += @current_byte << @bits_left
         @bits_left += 8
@@ -489,9 +489,9 @@ module Org::Eclipse::Swt::Internal::Image
     typesig { [] }
     # Answer the next pixel to encode in the image
     def next_pixel
-      ((@image_x += 1) - 1)
+      @image_x += 1
       if (@image_x > @image_width)
-        ((@image_y += 1) - 1)
+        @image_y += 1
         if (@image_y >= @image_height)
           return -1
         else
@@ -530,7 +530,7 @@ module Org::Eclipse::Swt::Internal::Image
           # We used the whole last byte, so get ready
           # for the next one.
           @bits_left = 8
-          ((@block_index += 1) - 1)
+          @block_index += 1
           if (@block_index >= @block_size)
             write_block
             @block_index = 1
@@ -541,7 +541,7 @@ module Org::Eclipse::Swt::Internal::Image
       end
       code_to_do = code_to_do >> @bits_left
       # Fill in any remaining whole bytes (i.e. not the last one!)
-      ((@block_index += 1) - 1)
+      @block_index += 1
       if (@block_index >= @block_size)
         write_block
         @block_index = 1
@@ -551,7 +551,7 @@ module Org::Eclipse::Swt::Internal::Image
         @block[@block_index] = @current_byte
         code_to_do = code_to_do >> 8
         code_bits_to_do -= 8
-        ((@block_index += 1) - 1)
+        @block_index += 1
         if (@block_index >= @block_size)
           write_block
           @block_index = 1
@@ -572,7 +572,7 @@ module Org::Eclipse::Swt::Internal::Image
         i = 0
         while i < @image_width
           @image.attr_data[start + i] = buf[i]
-          ((i += 1) - 1)
+          i += 1
         end
       else
         @image.set_pixels(0, @line, @image_width, buf, 0)
@@ -601,7 +601,7 @@ module Org::Eclipse::Swt::Internal::Image
           end
         end
         if (@line >= @image_height)
-          ((@pass += 1) - 1)
+          @pass += 1
           if ((@pass).equal?(2))
             @line = 4
           else
@@ -628,7 +628,7 @@ module Org::Eclipse::Swt::Internal::Image
           @line = 0
         end
       else
-        ((@line += 1) - 1)
+        @line += 1
       end
     end
     
@@ -641,7 +641,7 @@ module Org::Eclipse::Swt::Internal::Image
         if (@line + i < @image_height)
           @image.set_pixels(0, @line + i, @image_width, buf, 0)
         end
-        ((i += 1) - 1)
+        i += 1
       end
     end
     

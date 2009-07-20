@@ -130,7 +130,7 @@ module Org::Eclipse::Swt::Dnd
       while i < types.attr_length
         data[i] = TransferData.new
         data[i].attr_type = types[i]
-        ((i += 1) - 1)
+        i += 1
       end
       return data
     end
@@ -146,7 +146,7 @@ module Org::Eclipse::Swt::Dnd
         if ((transfer_data.attr_type).equal?(types[i]))
           return true
         end
-        ((i += 1) - 1)
+        i += 1
       end
       return false
     end

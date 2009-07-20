@@ -178,7 +178,7 @@ module Org::Eclipse::Swt::Internal::Win32
           i = 0
           while i < lp_proc_name.attr_length
             lp_proc_name[i] = name.char_at(i)
-            ((i += 1) - 1)
+            i += 1
           end
           # long
           dll_get_version = OS._get_proc_address(h_module, lp_proc_name)
@@ -206,7 +206,7 @@ module Org::Eclipse::Swt::Internal::Win32
           i = 0
           while i < lp_proc_name.attr_length
             lp_proc_name[i] = name.char_at(i)
-            ((i += 1) - 1)
+            i += 1
           end
           # long
           dll_get_version = OS._get_proc_address(h_module, lp_proc_name)

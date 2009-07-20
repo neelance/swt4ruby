@@ -106,59 +106,59 @@ module Org::Eclipse::Swt::Internal::Mozilla
       i = 0
       while i < 8
         @m0 = (@m0 << 4) + JavaInteger.parse_int(a_idstr.substring(i, i + 1), 16)
-        ((i += 1) - 1)
+        i += 1
       end
       if (!(a_idstr.char_at(((i += 1) - 1))).equal?(Character.new(?-.ord)))
         raise JavaError.new
       end
       while i < 13
         @m1 = RJava.cast_to_short(((@m1 << 4) + JavaInteger.parse_int(a_idstr.substring(i, i + 1), 16)))
-        ((i += 1) - 1)
+        i += 1
       end
       if (!(a_idstr.char_at(((i += 1) - 1))).equal?(Character.new(?-.ord)))
         raise JavaError.new
       end
       while i < 18
         @m2 = RJava.cast_to_short(((@m2 << 4) + JavaInteger.parse_int(a_idstr.substring(i, i + 1), 16)))
-        ((i += 1) - 1)
+        i += 1
       end
       if (!(a_idstr.char_at(((i += 1) - 1))).equal?(Character.new(?-.ord)))
         raise JavaError.new
       end
       while i < 21
         @m3[0] = ((@m3[0] << 4) + JavaInteger.parse_int(a_idstr.substring(i, i + 1), 16))
-        ((i += 1) - 1)
+        i += 1
       end
       while i < 23
         @m3[1] = ((@m3[1] << 4) + JavaInteger.parse_int(a_idstr.substring(i, i + 1), 16))
-        ((i += 1) - 1)
+        i += 1
       end
       if (!(a_idstr.char_at(((i += 1) - 1))).equal?(Character.new(?-.ord)))
         raise JavaError.new
       end
       while i < 26
         @m3[2] = ((@m3[2] << 4) + JavaInteger.parse_int(a_idstr.substring(i, i + 1), 16))
-        ((i += 1) - 1)
+        i += 1
       end
       while i < 28
         @m3[3] = ((@m3[3] << 4) + JavaInteger.parse_int(a_idstr.substring(i, i + 1), 16))
-        ((i += 1) - 1)
+        i += 1
       end
       while i < 30
         @m3[4] = ((@m3[4] << 4) + JavaInteger.parse_int(a_idstr.substring(i, i + 1), 16))
-        ((i += 1) - 1)
+        i += 1
       end
       while i < 32
         @m3[5] = ((@m3[5] << 4) + JavaInteger.parse_int(a_idstr.substring(i, i + 1), 16))
-        ((i += 1) - 1)
+        i += 1
       end
       while i < 34
         @m3[6] = ((@m3[6] << 4) + JavaInteger.parse_int(a_idstr.substring(i, i + 1), 16))
-        ((i += 1) - 1)
+        i += 1
       end
       while i < 36
         @m3[7] = ((@m3[7] << 4) + JavaInteger.parse_int(a_idstr.substring(i, i + 1), 16))
-        ((i += 1) - 1)
+        i += 1
       end
     end
     

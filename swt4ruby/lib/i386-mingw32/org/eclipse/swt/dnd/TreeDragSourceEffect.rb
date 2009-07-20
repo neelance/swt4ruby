@@ -194,7 +194,7 @@ module Org::Eclipse::Swt::Dnd
         i = 1
         while i < count
           bounds = bounds.union(selection[i].get_bounds(0))
-          ((i += 1) - 1)
+          i += 1
         end
         # long
         h_dc = OS._get_dc(tree.attr_handle)
@@ -218,7 +218,7 @@ module Org::Eclipse::Swt::Dnd
           image_list = OS._send_message(tree.attr_handle, OS::TVM_CREATEDRAGIMAGE, 0, selected.attr_handle)
           OS._image_list_draw(image_list, 0, h_dc1, cell.attr_x - bounds.attr_x, cell.attr_y - bounds.attr_y, OS::ILD_SELECTED)
           OS._image_list_destroy(image_list)
-          ((i_ += 1) - 1)
+          i_ += 1
         end
         OS._select_object(h_dc1, h_old_bitmap)
         OS._delete_dc(h_dc1)

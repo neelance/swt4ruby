@@ -229,7 +229,7 @@ module Org::Eclipse::Swt::Widgets
             row_width = 0
           end
           row_width += rb_band.attr_cx_ideal + get_margin(i)
-          ((i += 1) - 1)
+          i += 1
         end
         width = Math.max(width, row_width)
         if (redraw)
@@ -292,7 +292,7 @@ module Org::Eclipse::Swt::Widgets
       end
       id = 0
       while (id < @items.attr_length && !(@items[id]).nil?)
-        ((id += 1) - 1)
+        id += 1
       end
       if ((id).equal?(@items.attr_length))
         new_items = Array.typed(CoolItem).new(@items.attr_length + 4) { nil }
@@ -411,7 +411,7 @@ module Org::Eclipse::Swt::Widgets
         if ((@original_items[index]).equal?(item))
           break
         end
-        ((index += 1) - 1)
+        index += 1
       end
       length = @original_items.attr_length - 1
       new_originals = Array.typed(CoolItem).new(length) { nil }
@@ -565,13 +565,13 @@ module Org::Eclipse::Swt::Widgets
           if ((@original_items[index]).equal?(item))
             break
           end
-          ((index += 1) - 1)
+          index += 1
         end
         if ((index).equal?(@original_items.attr_length))
           error(SWT::ERROR_CANNOT_GET_ITEM)
         end
         indices[i] = index
-        ((i += 1) - 1)
+        i += 1
       end
       return indices
     end
@@ -603,7 +603,7 @@ module Org::Eclipse::Swt::Widgets
       while i < count
         OS._send_message(self.attr_handle, OS::RB_GETBANDINFO, i, rb_band)
         result[i] = @items[rb_band.attr_w_id]
-        ((i += 1) - 1)
+        i += 1
       end
       return result
     end
@@ -647,7 +647,7 @@ module Org::Eclipse::Swt::Widgets
         else
           sizes[i] = Point.new(rect.attr_right - rect.attr_left, rb_band.attr_cy_child)
         end
-        ((i += 1) - 1)
+        i += 1
       end
       return sizes
     end
@@ -668,7 +668,7 @@ module Org::Eclipse::Swt::Widgets
         if (!((rb_band.attr_f_style & OS::RBBS_BREAK)).equal?(0))
           return i - 1
         end
-        ((i += 1) - 1)
+        i += 1
       end
       return count - 1
     end
@@ -726,7 +726,7 @@ module Org::Eclipse::Swt::Widgets
         if (items[i].get_wrap)
           indices[((count += 1) - 1)] = i
         end
-        ((i += 1) - 1)
+        i += 1
       end
       result = Array.typed(::Java::Int).new(count) { 0 }
       System.arraycopy(indices, 0, result, 0, count)
@@ -804,7 +804,7 @@ module Org::Eclipse::Swt::Widgets
           if (!(item).nil? && !item.is_disposed)
             item.release(false)
           end
-          ((i += 1) - 1)
+          i += 1
         end
         @items = nil
       end
@@ -820,7 +820,7 @@ module Org::Eclipse::Swt::Widgets
         if (!(item).nil? && (item.attr_control).equal?(control))
           item.set_control(nil)
         end
-        ((i += 1) - 1)
+        i += 1
       end
     end
     
@@ -869,7 +869,7 @@ module Org::Eclipse::Swt::Widgets
       i = 0
       while i < count
         OS._send_message(self.attr_handle, OS::RB_SETBANDINFO, i, rb_band)
-        ((i += 1) - 1)
+        i += 1
       end
     end
     
@@ -951,7 +951,7 @@ module Org::Eclipse::Swt::Widgets
           error(SWT::ERROR_INVALID_ARGUMENT)
         end
         set[index] = true
-        ((i += 1) - 1)
+        i += 1
       end
       rb_band = REBARBANDINFO.new
       rb_band.attr_cb_size = REBARBANDINFO.attr_sizeof
@@ -978,7 +978,7 @@ module Org::Eclipse::Swt::Widgets
             resize_to_maximum_width(i_)
           end
         end
-        ((i_ += 1) - 1)
+        i_ += 1
       end
     end
     
@@ -1014,7 +1014,7 @@ module Org::Eclipse::Swt::Widgets
       while i < count
         OS._send_message(self.attr_handle, OS::RB_GETBANDINFO, i, rb_band)
         @items[rb_band.attr_w_id].set_size(sizes[i].attr_x, sizes[i].attr_y)
-        ((i += 1) - 1)
+        i += 1
       end
     end
     
@@ -1047,7 +1047,7 @@ module Org::Eclipse::Swt::Widgets
           rb_band.attr_f_style &= ~OS::RBBS_NOGRIPPER
         end
         OS._send_message(self.attr_handle, OS::RB_SETBANDINFO, i, rb_band)
-        ((i += 1) - 1)
+        i += 1
       end
     end
     
@@ -1076,7 +1076,7 @@ module Org::Eclipse::Swt::Widgets
         if (indices[i] < 0 || indices[i] >= count)
           error(SWT::ERROR_INVALID_RANGE)
         end
-        ((i += 1) - 1)
+        i += 1
       end
       set_redraw(false)
       items = get_items
@@ -1087,7 +1087,7 @@ module Org::Eclipse::Swt::Widgets
           resize_to_preferred_width(i_ - 1)
           item.set_wrap(false)
         end
-        ((i_ += 1) - 1)
+        i_ += 1
       end
       resize_to_maximum_width(count - 1)
       i__ = 0
@@ -1098,7 +1098,7 @@ module Org::Eclipse::Swt::Widgets
           item.set_wrap(true)
           resize_to_maximum_width(index - 1)
         end
-        ((i__ += 1) - 1)
+        i__ += 1
       end
       set_redraw(true)
     end

@@ -1358,7 +1358,7 @@ module Org::Eclipse::Swt::Widgets
         i = 0
         while i < count
           @cell_background[i] = -1
-          ((i += 1) - 1)
+          i += 1
         end
       end
       if ((@cell_background[index]).equal?(pixel))
@@ -1396,7 +1396,7 @@ module Org::Eclipse::Swt::Widgets
       state = tv_item.attr_state >> 12
       if (checked)
         if (!((state & 0x1)).equal?(0))
-          ((state += 1) - 1)
+          state += 1
         end
       else
         if (((state & 0x1)).equal?(0))
@@ -1587,7 +1587,7 @@ module Org::Eclipse::Swt::Widgets
                   end
                 end
                 h_item = OS._send_message(hwnd, OS::TVM_GETNEXTITEM, OS::TVGN_NEXTVISIBLE, h_item)
-                ((index += 1) - 1)
+                index += 1
               end
               fix_scroll = (index).equal?(count) && (h_item).equal?(h_bottom_item)
             end
@@ -1833,7 +1833,7 @@ module Org::Eclipse::Swt::Widgets
         i = 0
         while i < count
           @cell_foreground[i] = -1
-          ((i += 1) - 1)
+          i += 1
         end
       end
       if ((@cell_foreground[index]).equal?(pixel))
@@ -1924,7 +1924,7 @@ module Org::Eclipse::Swt::Widgets
       i = 0
       while i < images.attr_length
         set_image(i, images[i])
-        ((i += 1) - 1)
+        i += 1
       end
     end
     
@@ -2056,7 +2056,7 @@ module Org::Eclipse::Swt::Widgets
         if (!(string).nil?)
           set_text(i, string)
         end
-        ((i += 1) - 1)
+        i += 1
       end
     end
     

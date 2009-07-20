@@ -137,11 +137,11 @@ module Org::Eclipse::Swt::Custom
         new_lines = Array.typed(::Java::Int).new(size + Compatibility.pow2(@expand_exp)) { Array.typed(::Java::Int).new(2) { 0 } }
         System.arraycopy(@lines, 0, new_lines, 0, size)
         @lines = new_lines
-        ((@expand_exp += 1) - 1)
+        @expand_exp += 1
       end
       range = Array.typed(::Java::Int).new([start, length])
       @lines[@line_count] = range
-      ((@line_count += 1) - 1)
+      @line_count += 1
     end
     
     typesig { [::Java::Int, ::Java::Int, Array.typed(Array.typed(::Java::Int)), ::Java::Int] }
@@ -159,7 +159,7 @@ module Org::Eclipse::Swt::Custom
       new_lines = lines_array
       if ((count).equal?(size))
         new_lines = Array.typed(::Java::Int).new(size + Compatibility.pow2(@replace_expand_exp)) { Array.typed(::Java::Int).new(2) { 0 } }
-        ((@replace_expand_exp += 1) - 1)
+        @replace_expand_exp += 1
         System.arraycopy(lines_array, 0, new_lines, 0, size)
       end
       range = Array.typed(::Java::Int).new([start, length])
@@ -229,7 +229,7 @@ module Org::Eclipse::Swt::Custom
           if (i + 1 < text_length)
             ch = @text_store[i + 1]
             if ((ch).equal?(SWT::LF))
-              ((i += 1) - 1)
+              i += 1
             end
           end
           add_line_index(start, i - start + 1)
@@ -240,7 +240,7 @@ module Org::Eclipse::Swt::Custom
             start = i + 1
           end
         end
-        ((i += 1) - 1)
+        i += 1
       end
       add_line_index(start, i - start)
     end
@@ -341,21 +341,21 @@ module Org::Eclipse::Swt::Custom
             if (location + 1 < @text_store.attr_length)
               ch = @text_store[location + 1]
               if ((ch).equal?(SWT::LF))
-                ((i += 1) - 1)
+                i += 1
               end
             end
             indexed_lines = add_line_index(start, i - start + 1, indexed_lines, line_count)
-            ((line_count += 1) - 1)
+            line_count += 1
             start = i + 1
           else
             if ((ch).equal?(SWT::LF))
               indexed_lines = add_line_index(start, i - start + 1, indexed_lines, line_count)
-              ((line_count += 1) - 1)
+              line_count += 1
               start = i + 1
             end
           end
         end
-        ((i += 1) - 1)
+        i += 1
       end
       new_lines = Array.typed(::Java::Int).new(line_count + 1) { Array.typed(::Java::Int).new(2) { 0 } }
       System.arraycopy(indexed_lines, 0, new_lines, 0, line_count)
@@ -391,7 +391,7 @@ module Org::Eclipse::Swt::Custom
         i = 0
         while i < text.length
           @text_store[position + i] = text.char_at(i)
-          ((i += 1) - 1)
+          i += 1
         end
       end
       # figure out the number of new lines that have been inserted
@@ -415,14 +415,14 @@ module Org::Eclipse::Swt::Custom
       i = @line_count - 1
       while i > start_line
         @lines[i + num_new_lines] = @lines[i]
-        ((i -= 1) + 1)
+        i -= 1
       end
       # insert the new lines
       i_ = 0
       while i_ < num_new_lines
         new_lines[i_][0] += start_line_offset
         @lines[start_line + i_] = new_lines[i_]
-        ((i_ += 1) - 1)
+        i_ += 1
       end
       # update the last inserted line
       if (num_new_lines < new_lines.attr_length)
@@ -459,7 +459,7 @@ module Org::Eclipse::Swt::Custom
         i = @gap_line + 1
         while i < @line_count
           @lines[i][0] = @lines[i][0] - old_size
-          ((i += 1) - 1)
+          i += 1
         end
       end
       if (new_size < 0)
@@ -505,7 +505,7 @@ module Org::Eclipse::Swt::Custom
         i = @gap_line + 1
         while i < @line_count
           @lines[i][0] = @lines[i][0] + gap_length
-          ((i += 1) - 1)
+          i += 1
         end
       end
     end
@@ -537,19 +537,19 @@ module Org::Eclipse::Swt::Custom
             if (i + 1 < @text_store.attr_length)
               ch = @text_store[i + 1]
               if ((ch).equal?(SWT::LF))
-                ((i += 1) - 1)
-                ((count += 1) - 1)
+                i += 1
+                count += 1
               end
             end
-            ((line_count += 1) - 1)
+            line_count += 1
           else
             if ((ch).equal?(SWT::LF))
-              ((line_count += 1) - 1)
+              line_count += 1
             end
           end
-          ((count += 1) - 1)
+          count += 1
         end
-        ((i += 1) - 1)
+        i += 1
       end
       return line_count
     end
@@ -568,15 +568,15 @@ module Org::Eclipse::Swt::Custom
         ch = text.char_at(i)
         if ((ch).equal?(SWT::CR))
           if (i + 1 < length_ && (text.char_at(i + 1)).equal?(SWT::LF))
-            ((i += 1) - 1)
+            i += 1
           end
-          ((line_count += 1) - 1)
+          line_count += 1
         else
           if ((ch).equal?(SWT::LF))
-            ((line_count += 1) - 1)
+            line_count += 1
           end
         end
-        ((i += 1) - 1)
+        i += 1
       end
       return line_count
     end
@@ -607,7 +607,7 @@ module Org::Eclipse::Swt::Custom
       if (!gap_exists || (end_ < @gap_start) || (start >= @gap_end))
         # line is before or after the gap
         while ((length_ - 1 >= 0) && is_delimiter(@text_store[start + length_ - 1]))
-          ((length_ -= 1) + 1)
+          length_ -= 1
         end
         return String.new(@text_store, start, length_)
       else
@@ -618,7 +618,7 @@ module Org::Eclipse::Swt::Custom
         buf.append(@text_store, @gap_end, length_ - gap_length - (@gap_start - start))
         length_ = buf.length
         while ((length_ - 1 >= 0) && is_delimiter(buf.char_at(length_ - 1)))
-          ((length_ -= 1) + 1)
+          length_ -= 1
         end
         return buf.to_s.substring(0, length_)
       end
@@ -874,7 +874,7 @@ module Org::Eclipse::Swt::Custom
           @text_listeners.remove_element_at(i)
           break
         end
-        ((i += 1) - 1)
+        i += 1
       end
     end
     
@@ -935,7 +935,7 @@ module Org::Eclipse::Swt::Custom
       i = 0
       while i < @text_listeners.size
         (@text_listeners.element_at(i)).handle_event(event)
-        ((i += 1) - 1)
+        i += 1
       end
     end
     
@@ -997,13 +997,13 @@ module Org::Eclipse::Swt::Custom
           if (is_delimiter(ch))
             if (j + 1 < @text_store.attr_length)
               if ((ch).equal?(SWT::CR) && ((@text_store[j + 1]).equal?(SWT::LF)))
-                ((j += 1) - 1)
+                j += 1
               end
             end
             eol = true
           end
         end
-        ((j += 1) - 1)
+        j += 1
       end
       # update the line where the deletion started
       @lines[start_line][1] = (position - start_line_offset) + (j - position)
@@ -1017,7 +1017,7 @@ module Org::Eclipse::Swt::Custom
       i = end_line + 1
       while i < @line_count
         @lines[i - num_old_lines] = @lines[i]
-        ((i += 1) - 1)
+        i += 1
       end
       @line_count -= num_old_lines
       @gap_line = get_line_at_physical_offset(@gap_start)

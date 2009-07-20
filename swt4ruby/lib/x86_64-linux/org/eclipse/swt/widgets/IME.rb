@@ -229,7 +229,7 @@ module Org::Eclipse::Swt::Widgets
       i = 0
       while i < result.attr_length
         result[i] = @ranges[i] + @start_offset
-        ((i += 1) - 1)
+        i += 1
       end
       return result
     end
@@ -381,7 +381,7 @@ module Org::Eclipse::Swt::Widgets
           # int
           iterator = OS.pango_attr_list_get_iterator(pango_attrs[0])
           while (OS.pango_attr_iterator_next(iterator))
-            ((count += 1) - 1)
+            count += 1
           end
           OS.pango_attr_iterator_destroy(iterator)
           @ranges = Array.typed(::Java::Int).new(count * 2) { 0 }
@@ -442,7 +442,7 @@ module Org::Eclipse::Swt::Widgets
               end
             end
             OS.pango_attr_iterator_next(iterator)
-            ((i += 1) - 1)
+            i += 1
           end
           OS.pango_attr_iterator_destroy(iterator)
           OS.pango_attr_list_unref(pango_attrs[0])

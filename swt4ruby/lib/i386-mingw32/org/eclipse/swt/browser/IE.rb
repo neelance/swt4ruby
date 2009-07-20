@@ -602,7 +602,7 @@ module Org::Eclipse::Swt::Browser
               i = 0
               while i < self.attr_documents.attr_length
                 self.attr_documents[i].dispose
-                ((i += 1) - 1)
+                i += 1
               end
               self.attr_documents = nil
               self.attr_dom_listener = nil
@@ -662,7 +662,7 @@ module Org::Eclipse::Swt::Browser
               i = 0
               while i < self.attr_location_listeners.attr_length
                 self.attr_location_listeners[i].changing(new_event)
-                ((i += 1) - 1)
+                i += 1
               end
               doit = new_event.attr_doit && !self.attr_browser.is_disposed
               cancel = event.attr_arguments[6]
@@ -683,7 +683,7 @@ module Org::Eclipse::Swt::Browser
                   i_ = 0
                   while i_ < self.attr_documents.attr_length
                     self.attr_documents[i_].dispose
-                    ((i_ += 1) - 1)
+                    i_ += 1
                   end
                   self.attr_documents = Array.typed(OleAutomation).new(0) { nil }
                 end
@@ -793,7 +793,7 @@ module Org::Eclipse::Swt::Browser
                 i = 0
                 while i < self.attr_location_listeners.attr_length
                   self.attr_location_listeners[i].changed(location_event)
-                  ((i += 1) - 1)
+                  i += 1
                 end
                 if (self.attr_browser.is_disposed)
                   return
@@ -818,7 +818,7 @@ module Org::Eclipse::Swt::Browser
                   i_ = 0
                   while i_ < self.attr_progress_listeners.attr_length
                     self.attr_progress_listeners[i_].completed(progress_event)
-                    ((i_ += 1) - 1)
+                    i_ += 1
                   end
                 end
               end
@@ -851,7 +851,7 @@ module Org::Eclipse::Swt::Browser
               i = 0
               while i < self.attr_open_window_listeners.attr_length
                 self.attr_open_window_listeners[i].open(new_event)
-                ((i += 1) - 1)
+                i += 1
               end
               browser = nil
               if (!(new_event.attr_browser).nil? && new_event.attr_browser.attr_web_browser.is_a?(IE))
@@ -925,7 +925,7 @@ module Org::Eclipse::Swt::Browser
                 i = 0
                 while i < self.attr_visibility_window_listeners.attr_length
                   self.attr_visibility_window_listeners[i].show(new_event)
-                  ((i += 1) - 1)
+                  i += 1
                 end
                 self.attr_location = nil
                 self.attr_size = nil
@@ -933,7 +933,7 @@ module Org::Eclipse::Swt::Browser
                 i = 0
                 while i < self.attr_visibility_window_listeners.attr_length
                   self.attr_visibility_window_listeners[i].hide(new_event)
-                  ((i += 1) - 1)
+                  i += 1
                 end
               end
             when ProgressChange
@@ -950,7 +950,7 @@ module Org::Eclipse::Swt::Browser
                 i = 0
                 while i < self.attr_progress_listeners.attr_length
                   self.attr_progress_listeners[i].changed(new_event)
-                  ((i += 1) - 1)
+                  i += 1
                 end
               end
             when StatusTextChange
@@ -964,7 +964,7 @@ module Org::Eclipse::Swt::Browser
                 i = 0
                 while i < self.attr_status_text_listeners.attr_length
                   self.attr_status_text_listeners[i].changed(new_event)
-                  ((i += 1) - 1)
+                  i += 1
                 end
               end
             when TitleChange
@@ -978,7 +978,7 @@ module Org::Eclipse::Swt::Browser
                 i = 0
                 while i < self.attr_title_listeners.attr_length
                   self.attr_title_listeners[i].changed(new_event)
-                  ((i += 1) - 1)
+                  i += 1
                 end
               end
             when WindowClosing
@@ -1002,7 +1002,7 @@ module Org::Eclipse::Swt::Browser
                   i = 0
                   while i < self.attr_close_window_listeners.attr_length
                     self.attr_close_window_listeners[i].close(new_event)
-                    ((i += 1) - 1)
+                    i += 1
                   end
                   self.attr_browser.dispose
                 end
@@ -1054,7 +1054,7 @@ module Org::Eclipse::Swt::Browser
           i = 0
           while i < arguments.attr_length
             arguments[i].dispose
-            ((i += 1) - 1)
+            i += 1
           end
         end
         
@@ -1756,7 +1756,7 @@ module Org::Eclipse::Swt::Browser
           @site.remove_event_listener(document, guid, COM::DISPID_HTMLDOCUMENTEVENTS_ONDRAGEND, @dom_listener)
           @site.remove_event_listener(document, guid, COM::DISPID_HTMLDOCUMENTEVENTS_ONMOUSEOVER, @dom_listener)
           @site.remove_event_listener(document, guid, COM::DISPID_HTMLDOCUMENTEVENTS_ONMOUSEOUT, @dom_listener)
-          ((i += 1) - 1)
+          i += 1
         end
       end
     end

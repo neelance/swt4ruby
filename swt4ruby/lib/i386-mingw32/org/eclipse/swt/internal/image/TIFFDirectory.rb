@@ -266,12 +266,12 @@ module Org::Eclipse::Swt::Internal::Image
             j = 0
             while j < -n + 1
               dest[((dest_index += 1) - 1)] = value
-              ((j += 1) - 1)
+              j += 1
             end
-            ((src_index += 1) - 1)
+            src_index += 1
           else
             # Noop when n == -128
-            ((src_index += 1) - 1)
+            src_index += 1
           end
         end
       end
@@ -311,7 +311,7 @@ module Org::Eclipse::Swt::Internal::Image
       i = 0
       while i < values.attr_length
         values[i] = to_int(buffer, start + i * size, type)
-        ((i += 1) - 1)
+        i += 1
       end
     end
     
@@ -351,7 +351,7 @@ module Org::Eclipse::Swt::Internal::Image
         if (@loader.has_listeners)
           @loader.notify_listeners(ImageLoaderEvent.new(@loader, image, i, (i).equal?(length - 1)))
         end
-        ((i += 1) - 1)
+        i += 1
       end
     end
     
@@ -381,7 +381,7 @@ module Org::Eclipse::Swt::Internal::Image
         b = buffer[start_b + offset] & 0xff
         colors[i] = RGB.new(r, g, b)
         offset += 2
-        ((i += 1) - 1)
+        i += 1
       end
       return PaletteData.new(colors)
     end
@@ -397,7 +397,7 @@ module Org::Eclipse::Swt::Internal::Image
           value = 0xff - value
         end
         rgbs[i] = RGB.new(value, value, value)
-        ((i += 1) - 1)
+        i += 1
       end
       return PaletteData.new(rgbs)
     end
@@ -408,19 +408,19 @@ module Org::Eclipse::Swt::Internal::Image
       i = 0
       while i < bits_b
         blue_mask |= 1 << i
-        ((i += 1) - 1)
+        i += 1
       end
       green_mask = 0
       i_ = bits_b
       while i_ < bits_b + bits_g
         green_mask |= 1 << i_
-        ((i_ += 1) - 1)
+        i_ += 1
       end
       red_mask = 0
       i__ = bits_b + bits_g
       while i__ < bits_b + bits_g + bits_r
         red_mask |= 1 << i__
-        ((i__ += 1) - 1)
+        i__ += 1
       end
       return PaletteData.new(red_mask, green_mask, blue_mask)
     end
@@ -466,7 +466,7 @@ module Org::Eclipse::Swt::Internal::Image
         offsets[i] = offset
         counts[i] = strip_byte_size
         offset += strip_byte_size
-        ((i += 1) - 1)
+        i += 1
       end
       # The last strip may contain fewer rows
       mod = data.attr_length % strip_byte_size
@@ -491,7 +491,7 @@ module Org::Eclipse::Swt::Internal::Image
         color_map[i] = rgbs[i].attr_red << 8 | rgbs[i].attr_red
         color_map[i + offset_green] = rgbs[i].attr_green << 8 | rgbs[i].attr_green
         color_map[i + offset_blue] = rgbs[i].attr_blue << 8 | rgbs[i].attr_blue
-        ((i += 1) - 1)
+        i += 1
       end
       return color_map
     end
@@ -720,19 +720,19 @@ module Org::Eclipse::Swt::Internal::Image
         i = 0
         while i < 3
           @out.write_short(8)
-          ((i += 1) - 1)
+          i += 1
         end
       end
       if (cnt > 1)
         i_ = 0
         while i_ < cnt
           @out.write_int(strip_offsets[i_])
-          ((i_ += 1) - 1)
+          i_ += 1
         end
         i__ = 0
         while i__ < cnt
           @out.write_int(strip_byte_counts[i__])
-          ((i__ += 1) - 1)
+          i__ += 1
         end
       end
       # XResolution and YResolution set to 300 dpi
@@ -740,14 +740,14 @@ module Org::Eclipse::Swt::Internal::Image
       while i_ < 2
         @out.write_int(300)
         @out.write_int(1)
-        ((i_ += 1) - 1)
+        i_ += 1
       end
       # ColorMap
       if (is_color_map)
         i__ = 0
         while i__ < color_map.attr_length
           @out.write_short(color_map[i__])
-          ((i__ += 1) - 1)
+          i__ += 1
         end
       end
       # Image Data

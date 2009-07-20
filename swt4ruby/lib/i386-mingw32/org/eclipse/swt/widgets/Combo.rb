@@ -533,7 +533,7 @@ module Org::Eclipse::Swt::Widgets
                 width = Math.max(width, rect.attr_right - rect.attr_left)
               end
             end
-            ((i += 1) - 1)
+            i += 1
           end
         end
         if (!(new_font).equal?(0))
@@ -874,7 +874,7 @@ module Org::Eclipse::Swt::Widgets
       i = 0
       while i < count
         result[i] = get_item(i)
-        ((i += 1) - 1)
+        i += 1
       end
       return result
     end
@@ -1169,7 +1169,7 @@ module Org::Eclipse::Swt::Widgets
           if ((string == get_item(i)))
             return i
           end
-          ((i += 1) - 1)
+          i += 1
         end
         return -1
       end
@@ -1398,7 +1398,7 @@ module Org::Eclipse::Swt::Widgets
           OS._draw_text(h_dc, buffer, -1, rect, flags)
           new_width = Math.max(new_width, rect.attr_right - rect.attr_left)
         end
-        ((i += 1) - 1)
+        i += 1
       end
       if (!((self.attr_style & SWT::H_SCROLL)).equal?(0))
         if (!(new_font).equal?(0))
@@ -1853,7 +1853,7 @@ module Org::Eclipse::Swt::Widgets
         if ((items[i]).nil?)
           error(SWT::ERROR_INVALID_ARGUMENT)
         end
-        ((i += 1) - 1)
+        i += 1
       end
       rect = nil
       # long
@@ -1889,7 +1889,7 @@ module Org::Eclipse::Swt::Widgets
           OS._draw_text(h_dc, buffer, -1, rect, flags)
           new_width = Math.max(new_width, rect.attr_right - rect.attr_left)
         end
-        ((i_ += 1) - 1)
+        i_ += 1
       end
       if (!((self.attr_style & SWT::H_SCROLL)).equal?(0))
         if (!(new_font).equal?(0))
@@ -2018,7 +2018,7 @@ module Org::Eclipse::Swt::Widgets
             new_width = Math.max(new_width, rect.attr_right - rect.attr_left)
           end
         end
-        ((i += 1) - 1)
+        i += 1
       end
       if (!(new_font).equal?(0))
         OS._select_object(h_dc, old_font)
@@ -2376,9 +2376,9 @@ module Org::Eclipse::Swt::Widgets
           break
         end
         if (OS._is_dbcslead_byte(buffer[((mbcs_pos += 1) - 1)]))
-          ((mbcs_pos += 1) - 1)
+          mbcs_pos += 1
         end
-        ((wcs_count += 1) - 1)
+        wcs_count += 1
       end
       return mbcs_pos
     end

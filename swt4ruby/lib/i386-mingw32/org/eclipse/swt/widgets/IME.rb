@@ -317,7 +317,7 @@ module Org::Eclipse::Swt::Widgets
       i = 0
       while i < result.attr_length
         result[i] = @ranges[i] + @start_offset
-        ((i += 1) - 1)
+        i += 1
       end
       return result
     end
@@ -490,7 +490,7 @@ module Org::Eclipse::Swt::Widgets
                 event = Event.new
                 event.attr_character = c
                 @parent.send_event(SWT::KeyDown, event)
-                ((i += 1) - 1)
+                i += 1
               end
             end
           end
@@ -568,7 +568,7 @@ module Org::Eclipse::Swt::Widgets
                       style.attr_underline_style = attr.attr_f_bold_line ? UNDERLINE_IME_THICK : SWT::UNDERLINE_SINGLE
                     end
                   end
-                  ((i += 1) - 1)
+                  i += 1
                 end
               end
             end

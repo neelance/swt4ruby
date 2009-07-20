@@ -448,7 +448,7 @@ module Org::Eclipse::Swt::Printing
                 OS.memmove(page_range, page_ranges + i * page_range.attr_length * 4, page_range.attr_length * 4)
                 min = Math.min(min, page_range[0] + 1)
                 max = Math.max(max, page_range[1] + 1)
-                ((i += 1) - 1)
+                i += 1
               end
               OS.g_free(page_ranges)
               @start_page = (min).equal?(JavaInteger::MAX_VALUE) ? 1 : min
@@ -484,7 +484,7 @@ module Org::Eclipse::Swt::Printing
             @settings_data = Array.typed(::Java::Byte).new(1024) { 0 }
             OS.gtk_print_settings_foreach(settings, gtk_print_settings_func, 0)
             print_settings_callback.dispose
-            ((@index += 1) - 1) # extra null terminator after print_settings and before page_setup
+            @index += 1 # extra null terminator after print_settings and before page_setup
             # Save page_setup data as key/value pairs in otherData.
             # Note that page_setup properties must be stored and restored in the same order.
             store("orientation", OS.gtk_page_setup_get_orientation(page_setup)) # $NON-NLS-1$

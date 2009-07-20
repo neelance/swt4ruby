@@ -146,10 +146,10 @@ module Org::Eclipse::Swt::Internal::Image
       @bit_offset_dest = 0
       cnt = 0
       while (cnt < n_rows && decode_row)
-        ((cnt += 1) - 1)
+        cnt += 1
         # byte aligned
         if (@bit_offset_dest > 0)
-          ((@byte_offset_dest += 1) - 1)
+          @byte_offset_dest += 1
           @bit_offset_dest = 0
         end
       end
@@ -202,13 +202,13 @@ module Org::Eclipse::Swt::Internal::Image
               end
               break
             end
-            ((j += 1) - 1)
+            j += 1
           end
           if (found)
             break
           end
           @code = @code << 1 | get_next_bit
-          ((i += 1) - 1)
+          i += 1
         end
         if (!found)
           SWT.error(SWT::ERROR_INVALID_IMAGE)
@@ -219,9 +219,9 @@ module Org::Eclipse::Swt::Internal::Image
     typesig { [] }
     def get_next_bit
       value = (@src[@byte_offset_src] >> (7 - @bit_offset_src)) & 0x1
-      ((@bit_offset_src += 1) - 1)
+      @bit_offset_src += 1
       if (@bit_offset_src > 7)
-        ((@byte_offset_src += 1) - 1)
+        @byte_offset_src += 1
         @bit_offset_src = 0
       end
       return value
@@ -233,7 +233,7 @@ module Org::Eclipse::Swt::Internal::Image
       i = 0
       while i < cnt
         value = value << 1 | get_next_bit
-        ((i += 1) - 1)
+        i += 1
       end
       return value
     end
@@ -243,11 +243,11 @@ module Org::Eclipse::Swt::Internal::Image
       n = cnt
       while (@bit_offset_dest > 0 && @bit_offset_dest <= 7 && n > 0)
         @dest[@byte_offset_dest] = (value).equal?(1) ? (@dest[@byte_offset_dest] | (1 << (7 - @bit_offset_dest))) : (@dest[@byte_offset_dest] & ~(1 << (7 - @bit_offset_dest)))
-        ((n -= 1) + 1)
-        ((@bit_offset_dest += 1) - 1)
+        n -= 1
+        @bit_offset_dest += 1
       end
       if ((@bit_offset_dest).equal?(8))
-        ((@byte_offset_dest += 1) - 1)
+        @byte_offset_dest += 1
         @bit_offset_dest = 0
       end
       while (n >= 8)
@@ -256,8 +256,8 @@ module Org::Eclipse::Swt::Internal::Image
       end
       while (n > 0)
         @dest[@byte_offset_dest] = (value).equal?(1) ? (@dest[@byte_offset_dest] | (1 << (7 - @bit_offset_dest))) : (@dest[@byte_offset_dest] & ~(1 << (7 - @bit_offset_dest)))
-        ((n -= 1) + 1)
-        ((@bit_offset_dest += 1) - 1)
+        n -= 1
+        @bit_offset_dest += 1
       end
     end
     

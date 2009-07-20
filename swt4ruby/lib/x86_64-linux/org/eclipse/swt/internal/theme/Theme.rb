@@ -220,10 +220,10 @@ module Org::Eclipse::Swt::Internal::Theme
               if ((mask_line[x * 3]).equal?(0))
                 line[x * 4 + 3] = 0
               end
-              ((x += 1) - 1)
+              x += 1
             end
             OS.memmove(offset, line, stride)
-            ((y += 1) - 1)
+            y += 1
           end
           OS.g_object_unref(mask_pixbuf)
         else
@@ -248,10 +248,10 @@ module Org::Eclipse::Swt::Internal::Theme
               x = 0
               while x < w[0]
                 line[x * 4 + 3] = alpha[y * w[0] + x]
-                ((x += 1) - 1)
+                x += 1
               end
               OS.memmove(offset, line, stride)
-              ((y += 1) - 1)
+              y += 1
             end
           end
         end
@@ -493,7 +493,7 @@ module Org::Eclipse::Swt::Internal::Theme
         if (!(cur_gc[0]).equal?(0))
           OS.gdk_gc_set_clip_region(cur_gc[0], clipping)
         end
-        ((i += 1) - 1)
+        i += 1
       end
       OS.gtk_style_get_black_gc(style, cur_gc)
       if (!(cur_gc[0]).equal?(0))

@@ -1230,7 +1230,7 @@ module Org::Eclipse::Swt::Internal::Image
                     end
                     k += 15
                   end
-                  ((k += 1) - 1)
+                  k += 1
                 end
               else
                 # Section F.2.2.2: decode the AC coefficients
@@ -1293,10 +1293,10 @@ module Org::Eclipse::Swt::Internal::Image
                     end
                     k += 15
                   end
-                  ((k += 1) - 1)
+                  k += 1
                 end
               end
-              ((blkn += 1) - 1)
+              blkn += 1
             end
             # Completed MCU, so update state
             # BITREAD_SAVE_STATE(cinfo,entropy.bitstate);
@@ -1312,7 +1312,7 @@ module Org::Eclipse::Swt::Internal::Image
             entropy.attr_saved.attr_last_dc_val[3] = state.attr_last_dc_val[3]
           end
           # Account for restart interval (no-op if not using restarts)
-          ((entropy.attr_restarts_to_go -= 1) + 1)
+          entropy.attr_restarts_to_go -= 1
           return true
         end
         
@@ -1341,7 +1341,7 @@ module Org::Eclipse::Swt::Internal::Image
             jpeg_make_d_derived_tbl(cinfo, false, actbl, entropy.attr_ac_derived_tbls[actbl] = D_derived_tbl.new)
             # Initialize DC predictions to 0
             entropy.attr_saved.attr_last_dc_val[ci] = 0
-            ((ci += 1) - 1)
+            ci += 1
           end
           # Precalculate decoding info for each block in an MCU of this scan
           blkn = 0
@@ -1359,7 +1359,7 @@ module Org::Eclipse::Swt::Internal::Image
             else
               entropy.attr_dc_needed[blkn] = entropy.attr_ac_needed[blkn] = false
             end
-            ((blkn += 1) - 1)
+            blkn += 1
           end
           # Initialize bitread state variables
           entropy.attr_bitstate.attr_bits_left = 0
@@ -1386,7 +1386,7 @@ module Org::Eclipse::Swt::Internal::Image
           ci = 0
           while ci < cinfo.attr_comps_in_scan
             entropy.attr_saved.attr_last_dc_val[ci] = 0
-            ((ci += 1) - 1)
+            ci += 1
           end
           # Reset restart counter
           entropy.attr_restarts_to_go = cinfo.attr_restart_interval
@@ -1544,7 +1544,7 @@ module Org::Eclipse::Swt::Internal::Image
             if (!((((get_buffer >> (bits_left -= (1)))) & ((1 << (1)) - 1))).equal?(0))
               block[0] |= p1
             end
-            ((blkn += 1) - 1)
+            blkn += 1
           end
           # Completed MCU, so update state
           # BITREAD_SAVE_STATE(cinfo,entropy.bitstate);
@@ -1554,7 +1554,7 @@ module Org::Eclipse::Swt::Internal::Image
           entropy.attr_bitstate.attr_get_buffer = get_buffer
           entropy.attr_bitstate.attr_bits_left = bits_left
           # Account for restart interval (no-op if not using restarts)
-          ((entropy.attr_restarts_to_go -= 1) + 1)
+          entropy.attr_restarts_to_go -= 1
           return true
         end
         
@@ -1750,7 +1750,7 @@ module Org::Eclipse::Swt::Internal::Image
                     end
                     # reached target zero coefficient
                   end
-                  ((k += 1) - 1)
+                  k += 1
                 end while (k <= se)
                 if (!(s).equal?(0))
                   pos = self.attr_jpeg_natural_order[k]
@@ -1759,7 +1759,7 @@ module Org::Eclipse::Swt::Internal::Image
                   # Remember its position in case we have to suspend
                   newnz_pos[((num_newnz += 1) - 1)] = pos
                 end
-                ((k += 1) - 1)
+                k += 1
               end
             end
             if (eobrun > 0)
@@ -1795,10 +1795,10 @@ module Org::Eclipse::Swt::Internal::Image
                     end
                   end
                 end
-                ((k += 1) - 1)
+                k += 1
               end
               # Count one block completed in EOB run
-              ((eobrun -= 1) + 1)
+              eobrun -= 1
             end
             # Completed MCU, so update state
             # BITREAD_SAVE_STATE(cinfo,entropy.bitstate);
@@ -1811,7 +1811,7 @@ module Org::Eclipse::Swt::Internal::Image
             # only part of saved state we need
           end
           # Account for restart interval (no-op if not using restarts)
-          ((entropy.attr_restarts_to_go -= 1) + 1)
+          entropy.attr_restarts_to_go -= 1
           return true
           # undoit:
           # /* Re-zero any output coefficients that we made newly nonzero */
@@ -1855,7 +1855,7 @@ module Org::Eclipse::Swt::Internal::Image
             # There is always only one block per MCU
             if (eobrun > 0)
               # if it's a band of zeroes...
-              ((eobrun -= 1) + 1)
+              eobrun -= 1
             # ...process it now (we do nothing)
             else
               # BITREAD_LOAD_STATE(cinfo,entropy.bitstate);
@@ -1945,13 +1945,13 @@ module Org::Eclipse::Swt::Internal::Image
                       r = (((get_buffer >> (bits_left -= (r)))) & ((1 << (r)) - 1))
                       eobrun += r
                     end
-                    ((eobrun -= 1) + 1)
+                    eobrun -= 1
                     # this band is processed at this moment
                     break
                     # force end-of-band
                   end
                 end
-                ((k += 1) - 1)
+                k += 1
               end
               # BITREAD_SAVE_STATE(cinfo,entropy.bitstate);
               cinfo.attr_buffer = br_state.attr_buffer
@@ -1965,7 +1965,7 @@ module Org::Eclipse::Swt::Internal::Image
             # only part of saved state we need
           end
           # Account for restart interval (no-op if not using restarts)
-          ((entropy.attr_restarts_to_go -= 1) + 1)
+          entropy.attr_restarts_to_go -= 1
           return true
         end
         
@@ -2076,7 +2076,7 @@ module Org::Eclipse::Swt::Internal::Image
               state.attr_last_dc_val[ci] = s
               # Scale and output the coefficient (assumes jpeg_natural_order[0]=0)
               block[0] = RJava.cast_to_short((s << al))
-              ((blkn += 1) - 1)
+              blkn += 1
             end
             # Completed MCU, so update state
             # BITREAD_SAVE_STATE(cinfo,entropy.bitstate);
@@ -2093,7 +2093,7 @@ module Org::Eclipse::Swt::Internal::Image
             entropy.attr_saved.attr_last_dc_val[3] = state.attr_last_dc_val[3]
           end
           # Account for restart interval (no-op if not using restarts)
-          ((entropy.attr_restarts_to_go -= 1) + 1)
+          entropy.attr_restarts_to_go -= 1
           return true
         end
         
@@ -2113,7 +2113,7 @@ module Org::Eclipse::Swt::Internal::Image
           ci = 0
           while ci < cinfo.attr_comps_in_scan
             entropy.attr_saved.attr_last_dc_val[ci] = 0
-            ((ci += 1) - 1)
+            ci += 1
           end
           # Re-init EOB run count, too
           entropy.attr_saved.attr_eobrun = 0
@@ -2193,9 +2193,9 @@ module Org::Eclipse::Swt::Internal::Image
                 # WARNMS2(cinfo, JWRN_BOGUS_PROGRESSION, cindex, coefi);
               end
               coef_bit_ptr[coefi] = cinfo.attr_al
-              ((coefi += 1) - 1)
+              coefi += 1
             end
-            ((ci += 1) - 1)
+            ci += 1
           end
           # Select MCU decoding routine
           # if (cinfo.Ah == 0) {
@@ -2228,7 +2228,7 @@ module Org::Eclipse::Swt::Internal::Image
             end
             # Initialize DC predictions to 0
             entropy.attr_saved.attr_last_dc_val[ci] = 0
-            ((ci += 1) - 1)
+            ci += 1
           end
           # Initialize bitread state variables
           entropy.attr_bitstate.attr_bits_left = 0
@@ -2982,13 +2982,13 @@ module Org::Eclipse::Swt::Internal::Image
             # multiplier table all-zero; we'll be reading zeroes from the
             # coefficient controller's buffer anyway.
             if (!compptr.attr_component_needed || (idct.attr_cur_method[ci]).equal?(method))
-              ((ci += 1) - 1)
+              ci += 1
               next
             end
             qtbl = compptr.attr_quant_table
             if ((qtbl).nil?)
               # happens if no data yet for component
-              ((ci += 1) - 1)
+              ci += 1
               next
             end
             idct.attr_cur_method[ci] = method
@@ -3059,13 +3059,13 @@ module Org::Eclipse::Swt::Internal::Image
               i = 0
               while i < DCTSIZE2
                 ismtbl[i] = qtbl.attr_quantval[i]
-                ((i += 1) - 1)
+                i += 1
               end
             else
               error
               # ERREXIT(cinfo, JERR_NOT_COMPILED);
             end
-            ((ci += 1) - 1)
+            ci += 1
           end
         end
         
@@ -4137,7 +4137,7 @@ module Org::Eclipse::Swt::Internal::Image
             end
             # #endif
             coef.attr_whole_image[ci] = Array.typed(::Java::Short).new(RJava.cast_to_int(jround_up(compptr.attr_height_in_blocks, compptr.attr_v_samp_factor))) { Array.typed(::Java::Short).new(RJava.cast_to_int(jround_up(compptr.attr_width_in_blocks, compptr.attr_h_samp_factor))) { Array.typed(::Java::Short).new(DCTSIZE2) { 0 } } }
-            ((ci += 1) - 1)
+            ci += 1
           end
           # coef.consume_data = consume_data;
           coef.attr_decompress_data = DECOMPRESS_DATA
@@ -4335,7 +4335,7 @@ module Org::Eclipse::Swt::Internal::Image
         i = 0
         while i <= MAXJSAMPLE
           table[i + offset] = i
-          ((i += 1) - 1)
+          i += 1
         end
         offset += CENTERJSAMPLE
         # Point to where post-IDCT table starts
@@ -4343,7 +4343,7 @@ module Org::Eclipse::Swt::Internal::Image
         i = CENTERJSAMPLE
         while i < 2 * (MAXJSAMPLE + 1)
           table[i + offset] = MAXJSAMPLE
-          ((i += 1) - 1)
+          i += 1
         end
         # Second half of post-IDCT table
         System.arraycopy(cinfo.attr_sample_range_limit, cinfo.attr_sample_range_limit_offset, table, offset + (4 * (MAXJSAMPLE + 1) - CENTERJSAMPLE), CENTERJSAMPLE)
@@ -4373,8 +4373,8 @@ module Org::Eclipse::Swt::Internal::Image
           # Cb=>G value is scaled-up -0.34414 * x
           # We also add in ONE_HALF so that need not do it in inner loop
           cconvert.attr_cb_g_tab[i] = (RJava.cast_to_int((-(0.34414 * (1 << SCALEBITS) + 0.5))) * x + ONE_HALF)
-          ((i += 1) - 1)
-          ((x += 1) - 1)
+          i += 1
+          x += 1
         end
       end
       
@@ -4419,7 +4419,7 @@ module Org::Eclipse::Swt::Internal::Image
             ci = 1
             while ci < cinfo.attr_num_components
               cinfo.attr_comp_info[ci].attr_component_needed = false
-              ((ci += 1) - 1)
+              ci += 1
             end
           else
             error
@@ -4543,14 +4543,14 @@ module Org::Eclipse::Swt::Internal::Image
           i = 0
           while i < rgroup * (m + 2)
             xbuf0[i + xbuf0_offset] = xbuf1[i + xbuf1_offset] = buf[i]
-            ((i += 1) - 1)
+            i += 1
           end
           # In the second list, put the last four row groups in swapped order
           i = 0
           while i < rgroup * 2
             xbuf1[rgroup * (m - 2) + i + xbuf1_offset] = buf[rgroup * m + i]
             xbuf1[rgroup * m + i + xbuf1_offset] = buf[rgroup * (m - 2) + i]
-            ((i += 1) - 1)
+            i += 1
           end
           # The wraparound pointers at top and bottom will be filled later
           # (see set_wraparound_pointers, below).	Initially we want the "above"
@@ -4559,9 +4559,9 @@ module Org::Eclipse::Swt::Internal::Image
           i = 0
           while i < rgroup
             xbuf0[i - rgroup + xbuf0_offset] = xbuf0[0 + xbuf0_offset]
-            ((i += 1) - 1)
+            i += 1
           end
-          ((ci += 1) - 1)
+          ci += 1
         end
       end
       
@@ -4595,7 +4595,7 @@ module Org::Eclipse::Swt::Internal::Image
           offset += rgroup * (m + 4)
           main.attr_xbuffer_offset[1][ci] = offset
           main.attr_xbuffer[1][ci] = xbuf
-          ((ci += 1) - 1)
+          ci += 1
         end
       end
       
@@ -4632,7 +4632,7 @@ module Org::Eclipse::Swt::Internal::Image
           rgroup = (compptr.attr_v_samp_factor * compptr.attr_dct_scaled_size) / cinfo.attr_min_dct_scaled_size
           # height of a row group of component
           main.attr_buffer[ci] = Array.typed(::Java::Byte).new(rgroup * ngroups) { Array.typed(::Java::Byte).new(compptr.attr_width_in_blocks * compptr.attr_dct_scaled_size) { 0 } }
-          ((ci += 1) - 1)
+          ci += 1
         end
       end
       
@@ -4725,7 +4725,7 @@ module Org::Eclipse::Swt::Internal::Image
           if (need_buffer)
             upsample.attr_color_buf[ci] = Array.typed(::Java::Byte).new(cinfo.attr_max_v_samp_factor) { Array.typed(::Java::Byte).new(RJava.cast_to_int(jround_up(cinfo.attr_output_width, cinfo.attr_max_h_samp_factor))) { 0 } }
           end
-          ((ci += 1) - 1)
+          ci += 1
         end
       end
       
@@ -4744,9 +4744,9 @@ module Org::Eclipse::Swt::Internal::Image
           i = 0
           while i < DCTSIZE2
             coef_bit_ptr[ci][i] = -1
-            ((i += 1) - 1)
+            i += 1
           end
-          ((ci += 1) - 1)
+          ci += 1
         end
       end
       
@@ -4770,7 +4770,7 @@ module Org::Eclipse::Swt::Internal::Image
           compptr.attr_dct_table = Array.typed(::Java::Int).new(DCTSIZE2) { 0 }
           # Mark multiplier table not yet set up for any method
           idct.attr_cur_method[ci] = -1
-          ((ci += 1) - 1)
+          ci += 1
         end
       end
       
@@ -4837,11 +4837,11 @@ module Org::Eclipse::Swt::Internal::Image
             wsptr[DCTSIZE * 5 + wsptr_offset] = dcval
             wsptr[DCTSIZE * 6 + wsptr_offset] = dcval
             wsptr[DCTSIZE * 7 + wsptr_offset] = dcval
-            ((inptr_offset += 1) - 1)
+            inptr_offset += 1
             # advance pointers to next column
-            ((quantptr_offset += 1) - 1)
-            ((wsptr_offset += 1) - 1)
-            ((ctr -= 1) + 1)
+            quantptr_offset += 1
+            wsptr_offset += 1
+            ctr -= 1
             next
           end
           # Even part: reverse the even part of the forward DCT.
@@ -4915,11 +4915,11 @@ module Org::Eclipse::Swt::Internal::Image
           wsptr[DCTSIZE * 5 + wsptr_offset] = (((tmp12 - tmp1) + (1 << ((CONST_BITS - PASS1_BITS) - 1))) >> (CONST_BITS - PASS1_BITS))
           wsptr[DCTSIZE * 3 + wsptr_offset] = (((tmp13 + tmp0) + (1 << ((CONST_BITS - PASS1_BITS) - 1))) >> (CONST_BITS - PASS1_BITS))
           wsptr[DCTSIZE * 4 + wsptr_offset] = (((tmp13 - tmp0) + (1 << ((CONST_BITS - PASS1_BITS) - 1))) >> (CONST_BITS - PASS1_BITS))
-          ((inptr_offset += 1) - 1)
+          inptr_offset += 1
           # advance pointers to next column
-          ((quantptr_offset += 1) - 1)
-          ((wsptr_offset += 1) - 1)
-          ((ctr -= 1) + 1)
+          quantptr_offset += 1
+          wsptr_offset += 1
+          ctr -= 1
         end
         # Pass 2: process rows from work array, store into output array.
         # Note that we must descale the results by a factor of 8 == 2**3,
@@ -4953,7 +4953,7 @@ module Org::Eclipse::Swt::Internal::Image
             outptr[7 + outptr_offset] = dcval
             wsptr_offset += DCTSIZE
             # advance pointer to next row
-            ((ctr += 1) - 1)
+            ctr += 1
             next
           end
           # #endif
@@ -5027,7 +5027,7 @@ module Org::Eclipse::Swt::Internal::Image
           outptr[3 + outptr_offset] = range_limit[range_limit_offset + ((((tmp13 + tmp0) + (1 << ((CONST_BITS + PASS1_BITS + 3) - 1))) >> CONST_BITS + PASS1_BITS + 3) & RANGE_MASK)]
           outptr[4 + outptr_offset] = range_limit[range_limit_offset + ((((tmp13 - tmp0) + (1 << ((CONST_BITS + PASS1_BITS + 3) - 1))) >> CONST_BITS + PASS1_BITS + 3) & RANGE_MASK)]
           wsptr_offset += DCTSIZE
-          ((ctr += 1) - 1)
+          ctr += 1
         end
       end
       
@@ -5078,10 +5078,10 @@ module Org::Eclipse::Swt::Internal::Image
             if (!(coef_bits[coefi]).equal?(0))
               smoothing_useful = true
             end
-            ((coefi += 1) - 1)
+            coefi += 1
           end
           coef_bits_latch_offset += SAVED_COEFS
-          ((ci += 1) - 1)
+          ci += 1
         end
         return smoothing_useful
       end
@@ -5248,7 +5248,7 @@ module Org::Eclipse::Swt::Internal::Image
           inptr = input_array[((input_array_offset += 1) - 1)]
           outptr = output_array[((output_array_offset += 1) - 1)]
           System.arraycopy(inptr, 0, outptr, 0, count)
-          ((row -= 1) + 1)
+          row -= 1
         end
       end
       
@@ -5571,7 +5571,7 @@ module Org::Eclipse::Swt::Internal::Image
           end
           # code |= GET_BITS(1);
           code |= (((get_buffer >> (bits_left -= (1)))) & ((1 << (1)) - 1))
-          ((l += 1) - 1)
+          l += 1
         end
         # Unload the local registers
         state.attr_get_buffer = get_buffer
@@ -5615,9 +5615,9 @@ module Org::Eclipse::Swt::Internal::Image
               j = 0
               while j < blk.attr_length
                 blk[j] = 0
-                ((j += 1) - 1)
+                j += 1
               end
-              ((i += 1) - 1)
+              i += 1
             end
             if (!cinfo.attr_entropy.decode_mcu(cinfo, coef.attr_mcu_buffer))
               # Suspension forced; update state counters and exit
@@ -5637,7 +5637,7 @@ module Org::Eclipse::Swt::Internal::Image
               # Don't bother to IDCT an uninteresting component.
               if (!compptr.attr_component_needed)
                 blkn += compptr.attr_mcu_blocks
-                ((ci += 1) - 1)
+                ci += 1
                 next
               end
               # inverse_DCT = cinfo.idct.inverse_DCT[compptr.component_index];
@@ -5653,23 +5653,23 @@ module Org::Eclipse::Swt::Internal::Image
                   while xindex < useful_width
                     jpeg_idct_islow(cinfo, compptr, coef.attr_mcu_buffer[blkn + xindex], output_ptr, output_ptr_offset, output_col)
                     output_col += compptr.attr_dct_scaled_size
-                    ((xindex += 1) - 1)
+                    xindex += 1
                   end
                 end
                 blkn += compptr.attr_mcu_width
                 output_ptr_offset += compptr.attr_dct_scaled_size
-                ((yindex += 1) - 1)
+                yindex += 1
               end
-              ((ci += 1) - 1)
+              ci += 1
             end
-            ((mcu_col_num += 1) - 1)
+            mcu_col_num += 1
           end
           # Completed an MCU row, but perhaps not an iMCU row
           coef.attr_mcu_ctr = 0
-          ((yoffset += 1) - 1)
+          yoffset += 1
         end
         # Completed the iMCU row, advance counters for next one
-        ((cinfo.attr_output_i_mcu_row += 1) - 1)
+        cinfo.attr_output_i_mcu_row += 1
         if (((cinfo.attr_input_i_mcu_row) += 1) < cinfo.attr_total_i_mcu_rows)
           coef.start_i_mcu_row(cinfo)
           return JPEG_ROW_COMPLETED
@@ -5745,7 +5745,7 @@ module Org::Eclipse::Swt::Internal::Image
           compptr = cinfo.attr_comp_info[ci]
           # Don't bother to IDCT an uninteresting component.
           if (!compptr.attr_component_needed)
-            ((ci += 1) - 1)
+            ci += 1
             next
           end
           # Count non-dummy DCT block rows in this iMCU row.
@@ -5929,16 +5929,16 @@ module Org::Eclipse::Swt::Internal::Image
               dc5 = dc6
               dc7 = dc8
               dc8 = dc9
-              ((buffer_ptr_offset += 1) - 1)
-              ((prev_block_row_offset += 1) - 1)
-              ((next_block_row_offset += 1) - 1)
+              buffer_ptr_offset += 1
+              prev_block_row_offset += 1
+              next_block_row_offset += 1
               output_col += compptr.attr_dct_scaled_size
-              ((block_num += 1) - 1)
+              block_num += 1
             end
             output_ptr_offset += compptr.attr_dct_scaled_size
-            ((block_row += 1) - 1)
+            block_row += 1
           end
-          ((ci += 1) - 1)
+          ci += 1
         end
         if (((cinfo.attr_output_i_mcu_row) += 1) < cinfo.attr_total_i_mcu_rows)
           return JPEG_ROW_COMPLETED
@@ -5972,7 +5972,7 @@ module Org::Eclipse::Swt::Internal::Image
           compptr = cinfo.attr_comp_info[ci]
           # Don't bother to IDCT an uninteresting component.
           if (!compptr.attr_component_needed)
-            ((ci += 1) - 1)
+            ci += 1
             next
           end
           # Align the virtual buffer for this component.
@@ -6000,14 +6000,14 @@ module Org::Eclipse::Swt::Internal::Image
             block_num = 0
             while block_num < compptr.attr_width_in_blocks
               jpeg_idct_islow(cinfo, compptr, buffer_ptr[buffer_ptr_offset], output_ptr, output_ptr_offset, output_col)
-              ((buffer_ptr_offset += 1) - 1)
+              buffer_ptr_offset += 1
               output_col += compptr.attr_dct_scaled_size
-              ((block_num += 1) - 1)
+              block_num += 1
             end
             output_ptr_offset += compptr.attr_dct_scaled_size
-            ((block_row += 1) - 1)
+            block_row += 1
           end
-          ((ci += 1) - 1)
+          ci += 1
         end
         if (((cinfo.attr_output_i_mcu_row) += 1) < cinfo.attr_total_i_mcu_rows)
           return JPEG_ROW_COMPLETED
@@ -6056,9 +6056,9 @@ module Org::Eclipse::Swt::Internal::Image
           i = 0
           while i < rgroup * 2
             xbuf[rows_left + i + xbuf_offset] = xbuf[rows_left - 1 + xbuf_offset]
-            ((i += 1) - 1)
+            i += 1
           end
-          ((ci += 1) - 1)
+          ci += 1
         end
       end
       
@@ -6089,9 +6089,9 @@ module Org::Eclipse::Swt::Internal::Image
             xbuf1[i - rgroup + xbuf1_offset] = xbuf1[rgroup * (m + 1) + i + xbuf1_offset]
             xbuf0[rgroup * (m + 2) + i + xbuf0_offset] = xbuf0[i + xbuf0_offset]
             xbuf1[rgroup * (m + 2) + i + xbuf1_offset] = xbuf1[i + xbuf1_offset]
-            ((i += 1) - 1)
+            i += 1
           end
-          ((ci += 1) - 1)
+          ci += 1
         end
       end
       
@@ -6122,7 +6122,7 @@ module Org::Eclipse::Swt::Internal::Image
           # suspension forced, can do nothing more
           main.attr_buffer_full = true
           # OK, we have an iMCU row to work with
-          ((main.attr_i_mcu_row_ctr += 1) - 1)
+          main.attr_i_mcu_row_ctr += 1
           # count rows received
         end
         # Postprocessor typically will not swallow all the input data it is handed
@@ -6319,7 +6319,7 @@ module Org::Eclipse::Swt::Internal::Image
             end
             bits[i] = cinfo.attr_buffer[((cinfo.attr_bytes_offset += 1) - 1)]
             count += bits[i] & 0xff
-            ((i += 1) - 1)
+            i += 1
           end
           length -= 1 + 16
           # TRACEMS8(cinfo, 2, JTRC_HUFFBITS,
@@ -6340,7 +6340,7 @@ module Org::Eclipse::Swt::Internal::Image
               fill_input_buffer(cinfo)
             end
             huffval[i] = cinfo.attr_buffer[((cinfo.attr_bytes_offset += 1) - 1)]
-            ((i += 1) - 1)
+            i += 1
           end
           length -= count
           if (!((index & 0x10)).equal?(0))
@@ -6418,7 +6418,7 @@ module Org::Eclipse::Swt::Internal::Image
             end
             # We convert the zigzag-order table to natural array order.
             quant_ptr.attr_quantval[self.attr_jpeg_natural_order[i]] = RJava.cast_to_short(tmp)
-            ((i += 1) - 1)
+            i += 1
           end
           # if (cinfo.err.trace_level >= 2) {
           # for (i = 0; i < DCTSIZE2; i += 8) {
@@ -6570,7 +6570,7 @@ module Org::Eclipse::Swt::Internal::Image
             if ((cc).equal?(compptr.attr_component_id))
               break
             end
-            ((ci += 1) - 1)
+            ci += 1
           end
           if ((ci).equal?(cinfo.attr_num_components))
             error
@@ -6579,7 +6579,7 @@ module Org::Eclipse::Swt::Internal::Image
           cinfo.attr_cur_comp_info[i] = compptr
           compptr.attr_dc_tbl_no = (c >> 4) & 15
           compptr.attr_ac_tbl_no = (c) & 15
-          ((i += 1) - 1)
+          i += 1
         end
         # Collect the additional scan parameters Ss, Se, Ah/Al.
         if ((cinfo.attr_bytes_offset).equal?(cinfo.attr_bytes_in_buffer))
@@ -6602,7 +6602,7 @@ module Org::Eclipse::Swt::Internal::Image
         # Prepare to scan data & restart markers
         cinfo.attr_marker.attr_next_restart_num = 0
         # Count another SOS marker
-        ((cinfo.attr_input_scan_number += 1) - 1)
+        cinfo.attr_input_scan_number += 1
         return true
       end
       
@@ -6686,7 +6686,7 @@ module Org::Eclipse::Swt::Internal::Image
             fill_input_buffer(cinfo)
           end
           compptr.attr_quant_tbl_no = cinfo.attr_buffer[((cinfo.attr_bytes_offset += 1) - 1)] & 0xff
-          ((ci += 1) - 1)
+          ci += 1
         end
         cinfo.attr_marker.attr_saw_sof = true
         return true
@@ -6722,7 +6722,7 @@ module Org::Eclipse::Swt::Internal::Image
             when INT_UPSAMPLE
               int_upsample(cinfo, compptr, input_buf[ci], offset, upsample_.attr_color_buf, upsample_.attr_color_buf_offset, ci)
             end
-            ((ci += 1) - 1)
+            ci += 1
           end
           upsample_.attr_next_row_out = 0
         end
@@ -6757,7 +6757,7 @@ module Org::Eclipse::Swt::Internal::Image
         upsample_.attr_next_row_out += num_rows
         # When the buffer is emptied, declare this input row group consumed
         if (upsample_.attr_next_row_out >= cinfo.attr_max_v_samp_factor)
-          ((in_row_group_ctr[0] += 1) - 1)
+          in_row_group_ctr[0] += 1
         end
       end
       
@@ -6795,7 +6795,7 @@ module Org::Eclipse::Swt::Internal::Image
             outptr[((outptr_offset += 1) - 1)] = invalue
             outptr[((outptr_offset += 1) - 1)] = invalue
           end
-          ((inrow += 1) - 1)
+          inrow += 1
         end
       end
       
@@ -6823,7 +6823,7 @@ module Org::Eclipse::Swt::Internal::Image
             outptr[((outptr_offset += 1) - 1)] = invalue
           end
           jcopy_sample_rows(output_data, outrow, output_data, outrow + 1, 1, cinfo.attr_output_width)
-          ((inrow += 1) - 1)
+          inrow += 1
           outrow += 2
         end
       end
@@ -6853,13 +6853,13 @@ module Org::Eclipse::Swt::Internal::Image
             invalue = (inptr[((inptr_offset += 1) - 1)] & 0xff) * 3
             outptr[((outptr_offset += 1) - 1)] = ((invalue + (inptr[inptr_offset - 2] & 0xff) + 1) >> 2)
             outptr[((outptr_offset += 1) - 1)] = ((invalue + (inptr[inptr_offset] & 0xff) + 2) >> 2)
-            ((colctr -= 1) + 1)
+            colctr -= 1
           end
           # Special case for last column
           invalue = (inptr[inptr_offset] & 0xff)
           outptr[((outptr_offset += 1) - 1)] = ((invalue * 3 + (inptr[inptr_offset - 1] & 0xff) + 1) >> 2)
           outptr[((outptr_offset += 1) - 1)] = invalue
-          ((inrow += 1) - 1)
+          inrow += 1
         end
       end
       
@@ -6910,14 +6910,14 @@ module Org::Eclipse::Swt::Internal::Image
               outptr[((outptr_offset += 1) - 1)] = ((thiscolsum * 3 + nextcolsum + 7) >> 4)
               lastcolsum = thiscolsum
               thiscolsum = nextcolsum
-              ((colctr -= 1) + 1)
+              colctr -= 1
             end
             # Special case for last column
             outptr[((outptr_offset += 1) - 1)] = ((thiscolsum * 3 + lastcolsum + 8) >> 4)
             outptr[((outptr_offset += 1) - 1)] = ((thiscolsum * 4 + 7) >> 4)
-            ((v += 1) - 1)
+            v += 1
           end
-          ((inrow += 1) - 1)
+          inrow += 1
         end
       end
       
@@ -6951,14 +6951,14 @@ module Org::Eclipse::Swt::Internal::Image
             h = h_expand
             while h > 0
               outptr[((outptr_offset += 1) - 1)] = invalue
-              ((h -= 1) + 1)
+              h -= 1
             end
           end
           # Generate any additional output rows by duplicating the first one
           if (v_expand > 1)
             jcopy_sample_rows(output_data, outrow, output_data, outrow + 1, v_expand - 1, cinfo.attr_output_width)
           end
-          ((inrow += 1) - 1)
+          inrow += 1
           outrow += v_expand
         end
       end
@@ -6993,12 +6993,12 @@ module Org::Eclipse::Swt::Internal::Image
               outptr[outptr_offset] = inptr[((inptr_offset += 1) - 1)]
               # needn't bother with GETJSAMPLE() here
               outptr_offset += num_components
-              ((count -= 1) + 1)
+              count -= 1
             end
-            ((ci += 1) - 1)
+            ci += 1
           end
-          ((input_row += 1) - 1)
-          ((output_buf_offset += 1) - 1)
+          input_row += 1
+          output_buf_offset += 1
         end
       end
       
@@ -7022,7 +7022,7 @@ module Org::Eclipse::Swt::Internal::Image
             # We can dispense with GETJSAMPLE() here
             outptr[RGB_RED + outptr_offset] = outptr[RGB_GREEN + outptr_offset] = outptr[RGB_BLUE + outptr_offset] = inptr[col]
             outptr_offset += RGB_PIXELSIZE
-            ((col += 1) - 1)
+            col += 1
           end
         end
       end
@@ -7051,7 +7051,7 @@ module Org::Eclipse::Swt::Internal::Image
           inptr0 = input_buf[0][input_row + input_buf_offset[0]]
           inptr1 = input_buf[1][input_row + input_buf_offset[1]]
           inptr2 = input_buf[2][input_row + input_buf_offset[2]]
-          ((input_row += 1) - 1)
+          input_row += 1
           outptr = output_buf[((output_buf_offset += 1) - 1)]
           outptr_offset = 0
           col = 0
@@ -7064,7 +7064,7 @@ module Org::Eclipse::Swt::Internal::Image
             outptr[outptr_offset + RGB_GREEN] = range_limit[y + ((cbgtab[cb] + crgtab[cr] >> SCALEBITS)) + range_limit_offset]
             outptr[outptr_offset + RGB_BLUE] = range_limit[y + cbbtab[cb] + range_limit_offset]
             outptr_offset += RGB_PIXELSIZE
-            ((col += 1) - 1)
+            col += 1
           end
         end
       end
@@ -7147,7 +7147,7 @@ module Org::Eclipse::Swt::Internal::Image
             fill_input_buffer(cinfo)
           end
           b[i] = cinfo.attr_buffer[((cinfo.attr_bytes_offset += 1) - 1)]
-          ((i += 1) - 1)
+          i += 1
         end
         length -= numtoread
         # process it
@@ -7264,7 +7264,7 @@ module Org::Eclipse::Swt::Internal::Image
           cinfo.attr_arith_dc_l[i] = 0
           cinfo.attr_arith_dc_u[i] = 1
           cinfo.attr_arith_ac_k[i] = 5
-          ((i += 1) - 1)
+          i += 1
         end
         cinfo.attr_restart_interval = 0
         # Set initial assumptions for colorspace etc
@@ -7331,7 +7331,7 @@ module Org::Eclipse::Swt::Internal::Image
           error(SWT::ERROR_NOT_IMPLEMENTED)
           # (*cinfo.cquantize.finish_pass) (cinfo);
         end
-        ((master.attr_pass_number += 1) - 1)
+        master.attr_pass_number += 1
       end
       
       typesig { [Jpeg_decompress_struct] }
@@ -7516,11 +7516,11 @@ module Org::Eclipse::Swt::Internal::Image
                 xindex = 0
                 while xindex < compptr.attr_mcu_width
                   coef.attr_mcu_buffer[((blkn += 1) - 1)] = buffer_ptr[((buffer_ptr_offset += 1) - 1)]
-                  ((xindex += 1) - 1)
+                  xindex += 1
                 end
-                ((yindex += 1) - 1)
+                yindex += 1
               end
-              ((ci += 1) - 1)
+              ci += 1
             end
             # Try to fetch the MCU.
             if (!cinfo.attr_entropy.decode_mcu(cinfo, coef.attr_mcu_buffer))
@@ -7529,11 +7529,11 @@ module Org::Eclipse::Swt::Internal::Image
               coef.attr_mcu_ctr = mcu_col_num
               return JPEG_SUSPENDED
             end
-            ((mcu_col_num += 1) - 1)
+            mcu_col_num += 1
           end
           # Completed an MCU row, but perhaps not an iMCU row
           coef.attr_mcu_ctr = 0
-          ((yoffset += 1) - 1)
+          yoffset += 1
         end
         # Completed the iMCU row, advance counters for next one
         if (((cinfo.attr_input_i_mcu_row) += 1) < cinfo.attr_total_i_mcu_rows)
@@ -7630,7 +7630,7 @@ module Org::Eclipse::Swt::Internal::Image
           # We sync after each discarded byte so that a suspending data source
           # can discard the byte from its buffer.
           while (!(c).equal?(0xff))
-            ((cinfo.attr_marker.attr_discarded_bytes += 1) - 1)
+            cinfo.attr_marker.attr_discarded_bytes += 1
             if ((cinfo.attr_bytes_offset).equal?(cinfo.attr_bytes_in_buffer))
               fill_input_buffer(cinfo)
             end
@@ -7819,7 +7819,7 @@ module Org::Eclipse::Swt::Internal::Image
           # ERREXIT(cinfo, JERR_BAD_SAMPLING);
           cinfo.attr_max_h_samp_factor = Math.max(cinfo.attr_max_h_samp_factor, compptr.attr_h_samp_factor)
           cinfo.attr_max_v_samp_factor = Math.max(cinfo.attr_max_v_samp_factor, compptr.attr_v_samp_factor)
-          ((ci += 1) - 1)
+          ci += 1
         end
         # We initialize DCT_scaled_size and min_DCT_scaled_size to DCTSIZE.
         # In the full decompressor, this will be overridden by jdmaster.c;
@@ -7844,7 +7844,7 @@ module Org::Eclipse::Swt::Internal::Image
           compptr.attr_component_needed = true
           # Mark no quantization table yet saved for component
           compptr.attr_quant_table = nil
-          ((ci += 1) - 1)
+          ci += 1
         end
         # Compute number of fully interleaved MCU rows.
         cinfo.attr_total_i_mcu_rows = RJava.cast_to_int(jdiv_round_up(cinfo.attr_image_height, (cinfo.attr_max_v_samp_factor * DCTSIZE)))
@@ -7924,7 +7924,7 @@ module Org::Eclipse::Swt::Internal::Image
             while (((mcublks -= 1) + 1) > 0)
               cinfo.attr_mcu_membership[((cinfo.attr_blocks_in_mcu += 1) - 1)] = ci
             end
-            ((ci += 1) - 1)
+            ci += 1
           end
         end
       end
@@ -7940,7 +7940,7 @@ module Org::Eclipse::Swt::Internal::Image
           compptr = cinfo.attr_cur_comp_info[ci]
           # No work if we already saved Q-table for this component
           if (!(compptr.attr_quant_table).nil?)
-            ((ci += 1) - 1)
+            ci += 1
             next
           end
           # Make sure specified quantization table is present
@@ -7954,7 +7954,7 @@ module Org::Eclipse::Swt::Internal::Image
           System.arraycopy(cinfo.attr_quant_tbl_ptrs[qtblno].attr_quantval, 0, qtbl.attr_quantval, 0, qtbl.attr_quantval.attr_length)
           qtbl.attr_sent_table = cinfo.attr_quant_tbl_ptrs[qtblno].attr_sent_table
           compptr.attr_quant_table = qtbl
-          ((ci += 1) - 1)
+          ci += 1
         end
       end
       
@@ -8000,7 +8000,7 @@ module Org::Eclipse::Swt::Internal::Image
           while (!(((i -= 1) + 1)).equal?(0))
             huffsize[((p += 1) - 1)] = l
           end
-          ((l += 1) - 1)
+          l += 1
         end
         huffsize[p] = 0
         numsymbols = p
@@ -8012,7 +8012,7 @@ module Org::Eclipse::Swt::Internal::Image
         while (!((huffsize[p])).equal?(0))
           while (((huffsize[p])).equal?(si))
             huffcode[((p += 1) - 1)] = code
-            ((code += 1) - 1)
+            code += 1
           end
           # code is now 1 more than the last code used for codelength si; but
           # it must still fit in si bits, since no code is allowed to be all ones.
@@ -8021,7 +8021,7 @@ module Org::Eclipse::Swt::Internal::Image
           end
           # ERREXIT(cinfo, JERR_BAD_HUFF_TABLE);
           code <<= 1
-          ((si += 1) - 1)
+          si += 1
         end
         # Figure F.15: generate decoding tables for bit-sequential decoding
         p = 0
@@ -8038,7 +8038,7 @@ module Org::Eclipse::Swt::Internal::Image
             dtbl.attr_maxcode[l] = -1
             # -1 if no codes of this length
           end
-          ((l += 1) - 1)
+          l += 1
         end
         dtbl.attr_maxcode[17] = 0xfffff
         # ensures jpeg_huff_decode terminates
@@ -8050,7 +8050,7 @@ module Org::Eclipse::Swt::Internal::Image
         j = 0
         while j < dtbl.attr_look_nbits.attr_length
           dtbl.attr_look_nbits[j] = 0
-          ((j += 1) - 1)
+          j += 1
         end
         p = 0
         l = 1
@@ -8064,13 +8064,13 @@ module Org::Eclipse::Swt::Internal::Image
             while ctr > 0
               dtbl.attr_look_nbits[lookbits] = l
               dtbl.attr_look_sym[lookbits] = htbl.attr_huffval[p]
-              ((lookbits += 1) - 1)
-              ((ctr -= 1) + 1)
+              lookbits += 1
+              ctr -= 1
             end
-            ((i += 1) - 1)
-            ((p += 1) - 1)
+            i += 1
+            p += 1
           end
-          ((l += 1) - 1)
+          l += 1
         end
         # Validate symbols as being reasonable.
         # For AC tables, we make no check, but accept all byte values 0..255.
@@ -8084,7 +8084,7 @@ module Org::Eclipse::Swt::Internal::Image
             if (sym < 0 || sym > 15)
               error
             end
-            ((i += 1) - 1)
+            i += 1
           end
         end
       end
@@ -8341,7 +8341,7 @@ module Org::Eclipse::Swt::Internal::Image
           i = 0
           while i < colors.attr_length
             colors[i] = RGB.new(i, i, i)
-            ((i += 1) - 1)
+            i += 1
           end
           palette = PaletteData.new(colors)
         else

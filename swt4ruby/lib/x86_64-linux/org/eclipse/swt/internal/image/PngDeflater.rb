@@ -368,7 +368,7 @@ module Org::Eclipse::Swt::Internal::Image
             if (!(@in[position + i]).equal?(@in[match_position + i]))
               break
             end
-            ((i += 1) - 1)
+            i += 1
           end
           if (i >= MIN_LENGTH)
             if (i > best_match.attr_length)
@@ -425,7 +425,7 @@ module Org::Eclipse::Swt::Internal::Image
         if ((@next_window).equal?(WINDOW))
           @next_window = 0
         end
-        ((i += 1) - 1)
+        i += 1
       end
     end
     
@@ -438,12 +438,12 @@ module Org::Eclipse::Swt::Internal::Image
       i = 0
       while i < HASH
         @hashtable[i] = Link.new
-        ((i += 1) - 1)
+        i += 1
       end
       i_ = 0
       while i_ < WINDOW
         @window[i_] = Link.new
-        ((i_ += 1) - 1)
+        i_ += 1
       end
       @next_window = 0
       first_position = nil
@@ -562,7 +562,7 @@ module Org::Eclipse::Swt::Internal::Image
       i = 0
       while i < @in_length
         update_adler(@in[i])
-        ((i += 1) - 1)
+        i += 1
       end
       # store();
       # compressHuffmanOnly();

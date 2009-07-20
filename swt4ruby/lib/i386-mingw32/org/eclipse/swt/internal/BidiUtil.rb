@@ -267,7 +267,7 @@ module Org::Eclipse::Swt::Internal
         if (!OS::IsWinCE && OS::WIN32_VERSION >= OS._version(4, 10))
           if (!(OS._get_layout(gc.attr_handle)).equal?(0))
             reverse(render_dx)
-            ((render_dx[length - 1] -= 1) + 1) # fixes bug 40006
+            render_dx[length - 1] -= 1 # fixes bug 40006
             reverse(render_buffer)
           end
         end
@@ -399,7 +399,7 @@ module Org::Eclipse::Swt::Internal
           result.attr_lp_dx += length_ * 4
           result.attr_lp_class += length_
           result.attr_lp_glyphs += glyph_buffer2.attr_length * 2
-          ((i += 1) - 1)
+          i += 1
         end
         # Free the memory that was allocated.
         OS._heap_free(h_heap, 0, lp_glyphs)
@@ -492,7 +492,7 @@ module Org::Eclipse::Swt::Internal
           # segments without overlapping.
           result.attr_lp_order += length_ * 4
           result.attr_lp_class += length_
-          ((i += 1) - 1)
+          i += 1
         end
         # Free the memory that was allocated.
         OS._heap_free(h_heap, 0, lp_class)
@@ -629,7 +629,7 @@ module Org::Eclipse::Swt::Internal
           if (((id).equal?(LANG_ARABIC)) || ((id).equal?(LANG_HEBREW)))
             return true
           end
-          ((i += 1) - 1)
+          i += 1
         end
         return false
       end
@@ -676,7 +676,7 @@ module Org::Eclipse::Swt::Internal
               OS._activate_keyboard_layout(list[i], 0)
               return
             end
-            ((i += 1) - 1)
+            i += 1
           end
         else
           # get the list of active languages
@@ -691,7 +691,7 @@ module Org::Eclipse::Swt::Internal
               OS._activate_keyboard_layout(list[i], 0)
               return
             end
-            ((i += 1) - 1)
+            i += 1
           end
         end
       end
@@ -756,7 +756,7 @@ module Org::Eclipse::Swt::Internal
           tmp = char_array[i]
           char_array[i] = char_array[length_ - 1 - i]
           char_array[length_ - 1 - i] = tmp
-          ((i += 1) - 1)
+          i += 1
         end
       end
       
@@ -771,7 +771,7 @@ module Org::Eclipse::Swt::Internal
           tmp = int_array[i]
           int_array[i] = int_array[length_ - 1 - i]
           int_array[length_ - 1 - i] = tmp
-          ((i += 1) - 1)
+          i += 1
         end
       end
       
@@ -789,7 +789,7 @@ module Org::Eclipse::Swt::Internal
           i = 0
           while i < length_
             max_order = Math.max(max_order, order_array[i])
-            ((i += 1) - 1)
+            i += 1
           end
         end
         i = 0
@@ -798,7 +798,7 @@ module Org::Eclipse::Swt::Internal
             order_array[i] = max_order - order_array[i]
           end
           order_array[i] += glyph_count
-          ((i += 1) - 1)
+          i += 1
         end
       end
       

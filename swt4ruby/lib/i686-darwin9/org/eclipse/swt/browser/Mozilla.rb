@@ -1364,7 +1364,7 @@ module Org::Eclipse::Swt::Browser
           alias_method :initialize_anonymous, :initialize
         end.new_local(self))
       end
-      ((self.attr_browser_count += 1) - 1)
+      self.attr_browser_count += 1
       rc = XPCOM._ns_get_component_manager(result)
       if (!(rc).equal?(XPCOM::NS_OK))
         self.attr_browser.dispose
@@ -1599,7 +1599,7 @@ module Org::Eclipse::Swt::Browser
       i = 0
       while i < folder_events.attr_length
         self.attr_browser.add_listener(folder_events[i], @listener)
-        ((i += 1) - 1)
+        i += 1
       end
     end
     
@@ -2676,7 +2676,7 @@ module Org::Eclipse::Swt::Browser
         i = 0
         while i < folder_events.attr_length
           self.attr_browser.remove_listener(folder_events[i], @listener)
-          ((i += 1) - 1)
+          i += 1
         end
         @listener = nil
       end
@@ -2714,7 +2714,7 @@ module Org::Eclipse::Swt::Browser
       @delegate.on_dispose(@embed_handle)
       @delegate = nil
       @embed_handle = 0
-      ((self.attr_browser_count -= 1) + 1)
+      self.attr_browser_count -= 1
     end
     
     typesig { [] }
@@ -3101,7 +3101,7 @@ module Org::Eclipse::Swt::Browser
           unhook_domlisteners(target)
           target._release
           frame._release
-          ((i += 1) - 1)
+          i += 1
         end
       end
       frames._release
@@ -3231,13 +3231,13 @@ module Org::Eclipse::Swt::Browser
     
     typesig { [] }
     def _add_ref
-      ((@ref_count += 1) - 1)
+      @ref_count += 1
       return @ref_count
     end
     
     typesig { [] }
     def _release
-      ((@ref_count -= 1) + 1)
+      @ref_count -= 1
       if ((@ref_count).equal?(0))
         dispose_cominterfaces
       end
@@ -3392,7 +3392,7 @@ module Org::Eclipse::Swt::Browser
                 i = 0
                 while i < self.attr_status_text_listeners.attr_length
                   self.attr_status_text_listeners[i].changed(event)
-                  ((i += 1) - 1)
+                  i += 1
                 end
                 event2 = ProgressEvent.new(self.attr_browser)
                 event2.attr_display = self.attr_browser.get_display
@@ -3400,7 +3400,7 @@ module Org::Eclipse::Swt::Browser
                 i_ = 0
                 while i_ < self.attr_progress_listeners.attr_length
                   self.attr_progress_listeners[i_].completed(event2)
-                  ((i_ += 1) - 1)
+                  i_ += 1
                 end
               end
             end
@@ -3474,7 +3474,7 @@ module Org::Eclipse::Swt::Browser
       i = 0
       while i < self.attr_progress_listeners.attr_length
         self.attr_progress_listeners[i].changed(event)
-        ((i += 1) - 1)
+        i += 1
       end
       return XPCOM::NS_OK
     end
@@ -3553,7 +3553,7 @@ module Org::Eclipse::Swt::Browser
       i = 0
       while i < self.attr_location_listeners.attr_length
         self.attr_location_listeners[i].changed(event)
-        ((i += 1) - 1)
+        i += 1
       end
       return XPCOM::NS_OK
     end
@@ -3576,7 +3576,7 @@ module Org::Eclipse::Swt::Browser
       i = 0
       while i < self.attr_status_text_listeners.attr_length
         self.attr_status_text_listeners[i].changed(event)
-        ((i += 1) - 1)
+        i += 1
       end
       return XPCOM::NS_OK
     end
@@ -3606,7 +3606,7 @@ module Org::Eclipse::Swt::Browser
       i = 0
       while i < self.attr_status_text_listeners.attr_length
         self.attr_status_text_listeners[i].changed(event)
-        ((i += 1) - 1)
+        i += 1
       end
       return XPCOM::NS_OK
     end
@@ -3659,7 +3659,7 @@ module Org::Eclipse::Swt::Browser
       i = 0
       while i < self.attr_close_window_listeners.attr_length
         self.attr_close_window_listeners[i].close(new_event)
-        ((i += 1) - 1)
+        i += 1
       end
       # Note on Mozilla.  The DestroyBrowserWindow notification cannot be cancelled.
       # The browser widget cannot be used after this notification has been received.
@@ -3850,7 +3850,7 @@ module Org::Eclipse::Swt::Browser
             i = 0
             while i < self.attr_visibility_window_listeners.attr_length
               self.attr_visibility_window_listeners[i].show(event)
-              ((i += 1) - 1)
+              i += 1
             end
             @location = nil
             @size = nil
@@ -3860,7 +3860,7 @@ module Org::Eclipse::Swt::Browser
           i = 0
           while i < self.attr_visibility_window_listeners.attr_length
             self.attr_visibility_window_listeners[i].hide(event)
-            ((i += 1) - 1)
+            i += 1
           end
         end
       else
@@ -3898,7 +3898,7 @@ module Org::Eclipse::Swt::Browser
       i = 0
       while i < self.attr_title_listeners.attr_length
         self.attr_title_listeners[i].changed(event)
-        ((i += 1) - 1)
+        i += 1
       end
       return XPCOM::NS_OK
     end
@@ -4066,7 +4066,7 @@ module Org::Eclipse::Swt::Browser
           i = 0
           while i < self.attr_location_listeners.attr_length
             self.attr_location_listeners[i].changing(event)
-            ((i += 1) - 1)
+            i += 1
           end
           doit = event.attr_doit && !self.attr_browser.is_disposed
         end

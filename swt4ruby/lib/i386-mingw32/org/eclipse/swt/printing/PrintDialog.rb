@@ -317,7 +317,7 @@ module Org::Eclipse::Swt::Printing
           else
             shells[i] = nil
           end
-          ((i += 1) - 1)
+          i += 1
         end
       end
       data = nil
@@ -332,7 +332,7 @@ module Org::Eclipse::Swt::Printing
           if (!(shells[i]).nil? && !shells[i].is_disposed)
             shells[i].set_enabled(true)
           end
-          ((i += 1) - 1)
+          i += 1
         end
       end
       if (success)
@@ -354,7 +354,7 @@ module Org::Eclipse::Swt::Printing
           if ((buffer.tchar_at(driver_offset + i)).equal?(0))
             break
           end
-          ((i += 1) - 1)
+          i += 1
         end
         driver = buffer.to_s(driver_offset, i)
         device_offset = offsets[1]
@@ -363,7 +363,7 @@ module Org::Eclipse::Swt::Printing
           if ((buffer.tchar_at(device_offset + i)).equal?(0))
             break
           end
-          ((i += 1) - 1)
+          i += 1
         end
         device = buffer.to_s(device_offset, i)
         output_offset = offsets[2]
@@ -372,7 +372,7 @@ module Org::Eclipse::Swt::Printing
           if ((buffer.tchar_at(output_offset + i)).equal?(0))
             break
           end
-          ((i += 1) - 1)
+          i += 1
         end
         output = buffer.to_s(output_offset, i)
         # Create PrinterData object and set fields from PRINTDLG

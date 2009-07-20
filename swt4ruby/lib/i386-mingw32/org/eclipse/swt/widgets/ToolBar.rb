@@ -267,7 +267,7 @@ module Org::Eclipse::Swt::Widgets
           else
             width = Math.max(width, rect.attr_right)
           end
-          ((i += 1) - 1)
+          i += 1
         end
       else
         old_rect = RECT.new
@@ -400,7 +400,7 @@ module Org::Eclipse::Swt::Widgets
       end
       id = 0
       while (id < @items.attr_length && !(@items[id]).nil?)
-        ((id += 1) - 1)
+        id += 1
       end
       if ((id).equal?(@items.attr_length))
         new_items = Array.typed(ToolItem).new(@items.attr_length + 4) { nil }
@@ -527,7 +527,7 @@ module Org::Eclipse::Swt::Widgets
             item.update_images(enabled && item.get_enabled)
           end
         end
-        ((i += 1) - 1)
+        i += 1
       end
     end
     
@@ -603,7 +603,7 @@ module Org::Eclipse::Swt::Widgets
         if (rect.contains(point))
           return items[i]
         end
-        ((i += 1) - 1)
+        i += 1
       end
       return nil
     end
@@ -648,7 +648,7 @@ module Org::Eclipse::Swt::Widgets
       while i < count
         OS._send_message(self.attr_handle, OS::TB_GETBUTTON, i, lp_button)
         result[i] = @items[lp_button.attr_id_command]
-        ((i += 1) - 1)
+        i += 1
       end
       return result
     end
@@ -735,7 +735,7 @@ module Org::Eclipse::Swt::Widgets
                 break
               end
             end
-            ((i += 1) - 1)
+            i += 1
           end
           old_bits = OS._get_window_long(self.attr_handle, OS::GWL_STYLE)
           new_bits = old_bits
@@ -779,7 +779,7 @@ module Org::Eclipse::Swt::Widgets
           if (!(item).nil? && !((item.attr_style & SWT::DROP_DOWN)).equal?(0))
             break
           end
-          ((index += 1) - 1)
+          index += 1
         end
         if (index < @items.attr_length)
           # long
@@ -792,7 +792,7 @@ module Org::Eclipse::Swt::Widgets
           if (!(item).nil? && ((item.attr_style & SWT::SEPARATOR)).equal?(0))
             OS._send_message(self.attr_handle, OS::TB_SETBUTTONINFO, item.attr_id, info)
           end
-          ((i += 1) - 1)
+          i += 1
         end
       end
       i = 0
@@ -801,7 +801,7 @@ module Org::Eclipse::Swt::Widgets
         if (!(item).nil?)
           item.resize_control
         end
-        ((i += 1) - 1)
+        i += 1
       end
     end
     
@@ -854,7 +854,7 @@ module Org::Eclipse::Swt::Widgets
           if (!(item).nil? && !item.is_disposed)
             item.release(false)
           end
-          ((i += 1) - 1)
+          i += 1
         end
         @items = nil
       end
@@ -888,7 +888,7 @@ module Org::Eclipse::Swt::Widgets
         if (!(item).nil? && (item.attr_control).equal?(control))
           item.set_control(nil)
         end
-        ((i += 1) - 1)
+        i += 1
       end
     end
     
@@ -982,7 +982,7 @@ module Org::Eclipse::Swt::Widgets
               break
             end
           end
-          ((i += 1) - 1)
+          i += 1
         end
         if (has_image && !has_text)
           i_ = 0
@@ -1000,7 +1000,7 @@ module Org::Eclipse::Swt::Widgets
               end
               OS._send_message(self.attr_handle, OS::TB_SETBUTTONINFO, item.attr_id, info)
             end
-            ((i_ += 1) - 1)
+            i_ += 1
           end
         end
       end
@@ -1038,7 +1038,7 @@ module Org::Eclipse::Swt::Widgets
         if (!(item).nil? && !((item.attr_style & mask)).equal?(0))
           break
         end
-        ((index += 1) - 1)
+        index += 1
       end
       if ((index).equal?(@items.attr_length))
         OS._send_message(self.attr_handle, OS::TB_SETBITMAPSIZE, 0, 0)
@@ -1137,7 +1137,7 @@ module Org::Eclipse::Swt::Widgets
             break
           end
         end
-        ((index += 1) - 1)
+        index += 1
       end
       if ((index).equal?(@items.attr_length))
         return false
@@ -1253,7 +1253,7 @@ module Org::Eclipse::Swt::Widgets
             OS._send_message(self.attr_handle, OS::TB_SETSTATE, item.attr_id, fs_state)
           end
         end
-        ((i += 1) - 1)
+        i += 1
       end
       return result
     end
@@ -1507,7 +1507,7 @@ module Org::Eclipse::Swt::Widgets
           if (rect.attr_right > window_rect.attr_right - border * 2)
             break
           end
-          ((index += 1) - 1)
+          index += 1
         end
         # 64
         bits = RJava.cast_to_int(OS._send_message(self.attr_handle, OS::TB_GETEXTENDEDSTYLE, 0, 0))

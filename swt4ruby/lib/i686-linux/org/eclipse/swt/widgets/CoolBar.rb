@@ -211,7 +211,7 @@ module Org::Eclipse::Swt::Widgets
       i = 0
       while i < events.attr_length
         add_listener(events[i], listener)
-        ((i += 1) - 1)
+        i += 1
       end
     end
     
@@ -254,14 +254,14 @@ module Org::Eclipse::Swt::Widgets
           item = @items[row][i]
           row_width += item.attr_preferred_width
           row_height = Math.max(row_height, item.attr_preferred_height)
-          ((i += 1) - 1)
+          i += 1
         end
         height += row_height
         if (!flat && row > 0)
           height += ROW_SPACING
         end
         width = Math.max(width, row_width)
-        ((row += 1) - 1)
+        row += 1
       end
       wrap_items(get_width)
       if ((width).equal?(0))
@@ -298,9 +298,9 @@ module Org::Eclipse::Swt::Widgets
           if (bounds.contains(x, y))
             return item
           end
-          ((i += 1) - 1)
+          i += 1
         end
-        ((row += 1) - 1)
+        row += 1
       end
       return nil
     end
@@ -332,7 +332,7 @@ module Org::Eclipse::Swt::Widgets
         else
           index -= @items[row].attr_length
         end
-        ((row += 1) - 1)
+        row += 1
       end
       error(SWT::ERROR_INVALID_RANGE)
       return nil
@@ -375,7 +375,7 @@ module Org::Eclipse::Swt::Widgets
       while row < @items.attr_length
         System.arraycopy(@items[row], 0, result, offset, @items[row].attr_length)
         offset += @items[row].attr_length
-        ((row += 1) - 1)
+        row += 1
       end
       return result
     end
@@ -389,9 +389,9 @@ module Org::Eclipse::Swt::Widgets
           if ((@items[row][i] == item))
             return Point.new(i, row)
           end
-          ((i += 1) - 1)
+          i += 1
         end
-        ((row += 1) - 1)
+        row += 1
       end
       return Point.new(-1, -1)
     end
@@ -454,11 +454,11 @@ module Org::Eclipse::Swt::Widgets
           if ((@items[row][i] == item))
             return answer
           else
-            ((answer += 1) - 1)
+            answer += 1
           end
-          ((i += 1) - 1)
+          i += 1
         end
-        ((row += 1) - 1)
+        row += 1
       end
       return -1
     end
@@ -477,7 +477,7 @@ module Org::Eclipse::Swt::Widgets
         if (x < @items[row_index][index].internal_get_bounds.attr_x)
           break
         end
-        ((index += 1) - 1)
+        index += 1
       end
       if ((index).equal?(0))
         item.attr_wrap = true
@@ -552,7 +552,7 @@ module Org::Eclipse::Swt::Widgets
         if (index < item_count)
           while (i > @items[row].attr_length)
             i -= @items[row].attr_length
-            ((row += 1) - 1)
+            row += 1
           end
         else
           row = @items.attr_length - 1
@@ -606,7 +606,7 @@ module Org::Eclipse::Swt::Widgets
         if ((@original_items[index]).equal?(item))
           break
         end
-        ((index += 1) - 1)
+        index += 1
       end
       length = @original_items.attr_length - 1
       new_originals = Array.typed(CoolItem).new(length) { nil }
@@ -665,7 +665,7 @@ module Org::Eclipse::Swt::Widgets
       i = 0
       while i < index
         min_space_on_left += @items[row][i].internal_get_minimum_width
-        ((i += 1) - 1)
+        i += 1
       end
       x = Math.max(min_space_on_left, bounds.attr_x - pixels)
       left = @items[row][index - 1]
@@ -700,7 +700,7 @@ module Org::Eclipse::Swt::Widgets
       i = index
       while i < @items[row].attr_length
         min_space_on_right += @items[row][i].internal_get_minimum_width
-        ((i += 1) - 1)
+        i += 1
       end
       max_ = get_width - min_space_on_right
       x = Math.min(max_, bounds.attr_x + pixels)
@@ -782,9 +782,9 @@ module Org::Eclipse::Swt::Widgets
         j = 0
         while j < @items[i].attr_length
           @items[i][j].dispose
-          ((j += 1) - 1)
+          j += 1
         end
-        ((i += 1) - 1)
+        i += 1
       end
       @hover_cursor.dispose
       @drag_cursor.dispose
@@ -883,7 +883,7 @@ module Org::Eclipse::Swt::Widgets
             if (!(i).equal?(index))
               max_size -= @items[row][i].internal_get_minimum_width
             end
-            ((i += 1) - 1)
+            i += 1
           end
           if ((bounds.attr_width).equal?(max_size))
             # The item is at its maximum width. It should be resized to its minimum width.
@@ -916,7 +916,7 @@ module Org::Eclipse::Swt::Widgets
                   item = @items[row][i_]
                   item.attr_requested_width = Math.max(item.internal_get_minimum_width, CoolItem::MINIMUM_WIDTH)
                 end
-                ((i_ += 1) - 1)
+                i_ += 1
               end
               target.attr_requested_width = max_size
               layout_items
@@ -949,7 +949,7 @@ module Org::Eclipse::Swt::Widgets
           bounds = @items[row][i].internal_get_bounds
           rect = fix_rectangle(bounds.attr_x, bounds.attr_y, bounds.attr_width, bounds.attr_height)
           if (!clipping.intersects(rect))
-            ((i += 1) - 1)
+            i += 1
             next
           end
           native_gripper = false
@@ -981,7 +981,7 @@ module Org::Eclipse::Swt::Widgets
             rect = fix_rectangle(bounds.attr_x + 1, bounds.attr_y, bounds.attr_x + 1, bounds.attr_y + bounds.attr_height - 1)
             gc.draw_line(rect.attr_x, rect.attr_y, rect.attr_width, rect.attr_height)
           end
-          ((i += 1) - 1)
+          i += 1
         end
         if (!flat && row + 1 < @items.attr_length)
           # Draw row separator.
@@ -993,7 +993,7 @@ module Org::Eclipse::Swt::Widgets
           rect = fix_rectangle(0, separator_y + 1, stop_x, separator_y + 1)
           gc.draw_line(rect.attr_x, rect.attr_y, rect.attr_width, rect.attr_height)
         end
-        ((row += 1) - 1)
+        row += 1
       end
     end
     
@@ -1012,7 +1012,7 @@ module Org::Eclipse::Swt::Widgets
         if ((item.attr_control).equal?(control))
           item.set_control(nil)
         end
-        ((i += 1) - 1)
+        i += 1
       end
     end
     
@@ -1080,7 +1080,7 @@ module Org::Eclipse::Swt::Widgets
           item = @items[row][i]
           row_height = Math.max(row_height, item.internal_get_bounds.attr_height)
           available -= item.internal_get_minimum_width
-          ((i += 1) - 1)
+          i += 1
         end
         if (row > 0)
           y += row_spacing
@@ -1127,10 +1127,10 @@ module Org::Eclipse::Swt::Widgets
             internal_redraw(damage.attr_x, damage.attr_y, damage.attr_width, damage.attr_height)
           end
           x += new_width
-          ((i_ += 1) - 1)
+          i_ += 1
         end
         y += row_height
-        ((row += 1) - 1)
+        row += 1
       end
       return y
     end
@@ -1187,15 +1187,15 @@ module Org::Eclipse::Swt::Widgets
             if ((@original_items[index]).equal?(item))
               break
             end
-            ((index += 1) - 1)
+            index += 1
           end
           if ((index).equal?(@original_items.attr_length))
             error(SWT::ERROR_CANNOT_GET_ITEM)
           end
           indices[((count += 1) - 1)] = index
-          ((j += 1) - 1)
+          j += 1
         end
-        ((i += 1) - 1)
+        i += 1
       end
       return indices
     end
@@ -1214,7 +1214,7 @@ module Org::Eclipse::Swt::Widgets
       i = 0
       while i < set.attr_length
         set[i] = false
-        ((i += 1) - 1)
+        i += 1
       end
       i_ = 0
       while i_ < item_order.attr_length
@@ -1225,13 +1225,13 @@ module Org::Eclipse::Swt::Widgets
           error(SWT::ERROR_INVALID_ARGUMENT)
         end
         set[item_order[i_]] = true
-        ((i_ += 1) - 1)
+        i_ += 1
       end
       row = Array.typed(CoolItem).new(count) { nil }
       i__ = 0
       while i__ < count
         row[i__] = @original_items[item_order[i__]]
-        ((i__ += 1) - 1)
+        i__ += 1
       end
       @items = Array.typed(CoolItem).new(1) { Array.typed(CoolItem).new(count) { nil } }
       @items[0] = row
@@ -1255,7 +1255,7 @@ module Org::Eclipse::Swt::Widgets
       i = 0
       while i < items.attr_length
         sizes[i] = items[i].get_size
-        ((i += 1) - 1)
+        i += 1
       end
       return sizes
     end
@@ -1272,7 +1272,7 @@ module Org::Eclipse::Swt::Widgets
       i = 0
       while i < items.attr_length
         items[i].set_size(sizes[i])
-        ((i += 1) - 1)
+        i += 1
       end
     end
     
@@ -1327,7 +1327,7 @@ module Org::Eclipse::Swt::Widgets
           wrap_indices[((i += 1) - 1)] = next_wrap
         end
         next_wrap += @items[row].attr_length
-        ((row += 1) - 1)
+        row += 1
       end
       if (!(i).equal?(wrap_indices.attr_length))
         tmp = Array.typed(::Java::Int).new(i) { 0 }
@@ -1382,12 +1382,12 @@ module Org::Eclipse::Swt::Widgets
         if (indices[i] < 0 || indices[i] >= count)
           error(SWT::ERROR_INVALID_ARGUMENT)
         end
-        ((i += 1) - 1)
+        i += 1
       end
       i_ = 0
       while i_ < @original_items.attr_length
         @original_items[i_].attr_wrap = false
-        ((i_ += 1) - 1)
+        i_ += 1
       end
       i__ = 0
       while i__ < indices.attr_length
@@ -1400,9 +1400,9 @@ module Org::Eclipse::Swt::Widgets
           else
             index -= @items[row].attr_length
           end
-          ((row += 1) - 1)
+          row += 1
         end
-        ((i__ += 1) - 1)
+        i__ += 1
       end
       relayout
     end
@@ -1465,7 +1465,7 @@ module Org::Eclipse::Swt::Widgets
       while row < @items.attr_length
         System.arraycopy(@items[row], 0, items_visual, start, @items[row].attr_length)
         start += @items[row].attr_length
-        ((row += 1) - 1)
+        row += 1
       end
       new_items = Array.typed(CoolItem).new(item_count) { nil }
       row_count = 0
@@ -1488,17 +1488,17 @@ module Org::Eclipse::Swt::Widgets
             start = i
             row_width = item_width
           end
-          ((row_count += 1) - 1)
+          row_count += 1
         else
           row_width += item_width
         end
-        ((i += 1) - 1)
+        i += 1
       end
       if (start < item_count)
         count = item_count - start
         new_items[row_count] = Array.typed(CoolItem).new(count) { nil }
         System.arraycopy(items_visual, start, new_items[row_count], 0, count)
-        ((row_count += 1) - 1)
+        row_count += 1
       end
       if (!(new_items.attr_length).equal?(row_count))
         tmp = Array.typed(CoolItem).new(row_count) { nil }

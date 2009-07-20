@@ -89,7 +89,7 @@ module Org::Eclipse::Swt::Widgets
         if ((@items[index]).equal?(item))
           break
         end
-        ((index += 1) - 1)
+        index += 1
       end
       if ((index).equal?(@item_count))
         return
@@ -165,7 +165,7 @@ module Org::Eclipse::Swt::Widgets
           if (!(item).nil? && !item.is_disposed)
             item.release(false)
           end
-          ((i += 1) - 1)
+          i += 1
         end
         @items = nil
       end

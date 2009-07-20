@@ -191,7 +191,7 @@ module Org::Eclipse::Swt::Custom
       i = 0
       while i < EVENTS.attr_length
         parent.add_listener(EVENTS[i], @control_listener)
-        ((i += 1) - 1)
+        i += 1
       end
       @scrollbar_listener = Class.new(Listener.class == Class ? Listener : Object) do
         extend LocalClass
@@ -260,7 +260,7 @@ module Org::Eclipse::Swt::Custom
         i = 0
         while i < EVENTS.attr_length
           @parent.remove_listener(EVENTS[i], @control_listener)
-          ((i += 1) - 1)
+          i += 1
         end
         h_bar = @parent.get_horizontal_bar
         if (!(h_bar).nil?)

@@ -305,7 +305,7 @@ module Org::Eclipse::Swt::Widgets
       while i < items.attr_length
         item = items[i]
         item.add_accelerators(accel_group)
-        ((i += 1) - 1)
+        i += 1
       end
     end
     
@@ -432,7 +432,7 @@ module Org::Eclipse::Swt::Widgets
       i = 0
       while i < items.attr_length
         items[i].fix_menus(new_parent)
-        ((i += 1) - 1)
+        i += 1
       end
       @parent.remove_menu(self)
       new_parent.add_menu(self)
@@ -516,10 +516,10 @@ module Org::Eclipse::Swt::Widgets
       end
       count = OS.g_list_length(list)
       if (!(@im_separator).equal?(0))
-        ((count -= 1) + 1)
+        count -= 1
       end
       if (!(@im_item).equal?(0))
-        ((count -= 1) + 1)
+        count -= 1
       end
       if (!(0 <= index && index < count))
         error(SWT::ERROR_INVALID_RANGE)
@@ -552,10 +552,10 @@ module Org::Eclipse::Swt::Widgets
       count = OS.g_list_length(list)
       OS.g_list_free(list)
       if (!(@im_separator).equal?(0))
-        ((count -= 1) + 1)
+        count -= 1
       end
       if (!(@im_item).equal?(0))
-        ((count -= 1) + 1)
+        count -= 1
       end
       return count
     end
@@ -584,10 +584,10 @@ module Org::Eclipse::Swt::Widgets
       end
       count = OS.g_list_length(list)
       if (!(@im_separator).equal?(0))
-        ((count -= 1) + 1)
+        count -= 1
       end
       if (!(@im_item).equal?(0))
-        ((count -= 1) + 1)
+        count -= 1
       end
       items = Array.typed(MenuItem).new(count) { nil }
       index = 0
@@ -599,7 +599,7 @@ module Org::Eclipse::Swt::Widgets
         if (!(item).nil?)
           items[((index += 1) - 1)] = item
         end
-        ((i += 1) - 1)
+        i += 1
       end
       OS.g_list_free(list)
       if (!(index).equal?(items.attr_length))
@@ -619,7 +619,7 @@ module Org::Eclipse::Swt::Widgets
         i = 0
         while i < length - 1
           result = result + (items[i].get_name_text).to_s + ", "
-          ((i += 1) - 1)
+          i += 1
         end
         result = result + (items[length - 1].get_name_text).to_s
       end
@@ -720,7 +720,7 @@ module Org::Eclipse::Swt::Widgets
             if ((popups[i]).equal?(self))
               return true
             end
-            ((i += 1) - 1)
+            i += 1
           end
         end
       end
@@ -806,7 +806,7 @@ module Org::Eclipse::Swt::Widgets
         if ((items[i]).equal?(item))
           return i
         end
-        ((i += 1) - 1)
+        i += 1
       end
       return -1
     end
@@ -906,7 +906,7 @@ module Org::Eclipse::Swt::Widgets
         if (!(item).nil? && !item.is_disposed)
           item.release(false)
         end
-        ((i += 1) - 1)
+        i += 1
       end
       super(destroy)
     end
@@ -977,7 +977,7 @@ module Org::Eclipse::Swt::Widgets
       while i < items.attr_length
         item = items[i]
         item.remove_accelerators(accel_group)
-        ((i += 1) - 1)
+        i += 1
       end
     end
     

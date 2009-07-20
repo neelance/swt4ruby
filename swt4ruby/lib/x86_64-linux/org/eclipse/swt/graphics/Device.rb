@@ -597,7 +597,7 @@ module Org::Eclipse::Swt::Graphics
             @errors[i] = nil
             return
           end
-          ((i += 1) - 1)
+          i += 1
         end
       end
     end
@@ -613,7 +613,7 @@ module Org::Eclipse::Swt::Graphics
             if (!(device).nil? && (device.attr_x_display).equal?(x_display))
               return device
             end
-            ((i += 1) - 1)
+            i += 1
           end
           return nil
         end
@@ -627,7 +627,7 @@ module Org::Eclipse::Swt::Graphics
             if ((device).equal?(self.attr_devices[i]))
               self.attr_devices[i] = nil
             end
-            ((i += 1) - 1)
+            i += 1
           end
         end
       end
@@ -686,9 +686,9 @@ module Org::Eclipse::Swt::Graphics
           i = 0
           while i < length
             if (!(@objects[i]).nil?)
-              ((count += 1) - 1)
+              count += 1
             end
-            ((i += 1) - 1)
+            i += 1
           end
           index = 0
           data.attr_objects = Array.typed(Object).new(count) { nil }
@@ -698,9 +698,9 @@ module Org::Eclipse::Swt::Graphics
             if (!(@objects[i_]).nil?)
               data.attr_objects[index] = @objects[i_]
               data.attr_errors[index] = @errors[i_]
-              ((index += 1) - 1)
+              index += 1
             end
-            ((i_ += 1) - 1)
+            i_ += 1
           end
         end
       else
@@ -822,14 +822,14 @@ module Org::Eclipse::Swt::Graphics
             end
             fds[((n_fds += 1) - 1)] = data
             OS.pango_font_description_free(font_desc)
-            ((j += 1) - 1)
+            j += 1
           end
           OS.g_free(faces[0])
           if (!(face_name).nil?)
             break
           end
         end
-        ((i += 1) - 1)
+        i += 1
       end
       OS.g_free(families[0])
       OS.g_object_unref(context)
@@ -968,7 +968,7 @@ module Org::Eclipse::Swt::Graphics
               if (!(self.attr_devices[index]).nil?)
                 break
               end
-              ((index += 1) - 1)
+              index += 1
             end
             if ((index).equal?(self.attr_devices.attr_length))
               self.attr_xerror_callback = Callback.new(clazz, "XErrorProc", 2)
@@ -1002,7 +1002,7 @@ module Org::Eclipse::Swt::Graphics
           while i < @log_domains.attr_length
             log_domain = Converter.wcs_to_mbcs(nil, @log_domains[i], true)
             @handler_ids[i] = OS.g_log_set_handler(log_domain, flags, @log_proc, 0)
-            ((i += 1) - 1)
+            i += 1
           end
         end
       end
@@ -1139,7 +1139,7 @@ module Org::Eclipse::Swt::Graphics
             @errors[i] = JavaError.new
             return
           end
-          ((i += 1) - 1)
+          i += 1
         end
         new_objects = Array.typed(Object).new(@objects.attr_length + 128) { nil }
         System.arraycopy(@objects, 0, new_objects, 0, @objects.attr_length)
@@ -1162,7 +1162,7 @@ module Org::Eclipse::Swt::Graphics
               self.attr_devices[i] = device
               return
             end
-            ((i += 1) - 1)
+            i += 1
           end
           new_devices = Array.typed(Device).new(self.attr_devices.attr_length + 4) { nil }
           System.arraycopy(self.attr_devices, 0, new_devices, 0, self.attr_devices.attr_length)
@@ -1211,7 +1211,7 @@ module Org::Eclipse::Swt::Graphics
               (@color_ref_count[i] -= 1)
             end
           end
-          ((i += 1) - 1)
+          i += 1
         end
       end
       @gdk_colors = nil
@@ -1230,7 +1230,7 @@ module Org::Eclipse::Swt::Graphics
             OS.g_log_remove_handler(log_domain, @handler_ids[i])
             @handler_ids[i] = 0
           end
-          ((i += 1) - 1)
+          i += 1
         end
         @log_callback.dispose
         @log_callback = nil
@@ -1266,7 +1266,7 @@ module Org::Eclipse::Swt::Graphics
                 OS.g_log_remove_handler(log_domain, @handler_ids[i])
                 @handler_ids[i] = 0
               end
-              ((i += 1) - 1)
+              i += 1
             end
           end
         end
@@ -1281,7 +1281,7 @@ module Org::Eclipse::Swt::Graphics
             while i < @log_domains.attr_length
               log_domain = Converter.wcs_to_mbcs(nil, @log_domains[i], true)
               @handler_ids[i] = OS.g_log_set_handler(log_domain, flags, @log_proc, 0)
-              ((i += 1) - 1)
+              i += 1
             end
           end
         end

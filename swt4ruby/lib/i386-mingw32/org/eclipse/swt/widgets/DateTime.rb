@@ -375,7 +375,7 @@ module Org::Eclipse::Swt::Widgets
                 widest = i
               end
               height = Math.max(height, rect.attr_bottom - rect.attr_top)
-              ((i += 1) - 1)
+              i += 1
             end
             if (widest > 1)
               widest = widest * 1000 + widest * 100 + widest * 10 + widest
@@ -404,7 +404,7 @@ module Org::Eclipse::Swt::Widgets
                 widest = i_
               end
               height = Math.max(height, rect.attr_bottom - rect.attr_top)
-              ((i_ += 1) - 1)
+              i_ += 1
             end
             systime.attr_w_month = RJava.cast_to_short((widest + 1))
             # Determine the widest/tallest date string in the widest month of the widest year.
@@ -425,7 +425,7 @@ module Org::Eclipse::Swt::Widgets
               if (!((self.attr_style & SWT::SHORT)).equal?(0))
                 break
               end
-              ((i__ += 1) - 1)
+              i__ += 1
             end
           else
             if (!((self.attr_style & SWT::TIME)).equal?(0))
@@ -448,7 +448,7 @@ module Org::Eclipse::Swt::Widgets
                   widest = i
                 end
                 height = Math.max(height, rect.attr_bottom - rect.attr_top)
-                ((i += 1) - 1)
+                i += 1
               end
               systime.attr_w_hour = widest
               # Determine the widest/tallest minute and second string.
@@ -468,7 +468,7 @@ module Org::Eclipse::Swt::Widgets
                   widest = i_
                 end
                 height = Math.max(height, rect.attr_bottom - rect.attr_top)
-                ((i_ += 1) - 1)
+                i_ += 1
               end
               systime.attr_w_minute = widest
               systime.attr_w_second = widest
@@ -576,30 +576,30 @@ module Org::Eclipse::Swt::Widgets
           if ((ch).equal?(DAY_FORMAT_CONSTANT) && !in_quotes)
             end_ = start + 1
             while (end_ < length_ && (buffer.char_at(end_)).equal?(DAY_FORMAT_CONSTANT))
-              ((end_ += 1) - 1)
+              end_ += 1
             end
             ordering = get_short_date_format_ordering
             case (ordering)
             when MONTH_DAY_YEAR
               # skip the following separator
               while (end_ < length_ && !(buffer.char_at(end_)).equal?(YEAR_FORMAT_CONSTANT))
-                ((end_ += 1) - 1)
+                end_ += 1
               end
             when DAY_MONTH_YEAR
               # skip the following separator
               while (end_ < length_ && !(buffer.char_at(end_)).equal?(MONTH_FORMAT_CONSTANT))
-                ((end_ += 1) - 1)
+                end_ += 1
               end
             when YEAR_MONTH_DAY
               # skip the preceding separator
               while (start > 0 && !(buffer.char_at(start)).equal?(MONTH_FORMAT_CONSTANT))
-                ((start -= 1) + 1)
+                start -= 1
               end
             end
             break
           end
         end
-        ((start += 1) - 1)
+        start += 1
       end
       if (start < end_)
         buffer.delete(start, end_)
@@ -622,17 +622,17 @@ module Org::Eclipse::Swt::Widgets
           if ((ch).equal?(SECONDS_FORMAT_CONSTANT) && !in_quotes)
             end_ = start + 1
             while (end_ < length_ && (buffer.char_at(end_)).equal?(SECONDS_FORMAT_CONSTANT))
-              ((end_ += 1) - 1)
+              end_ += 1
             end
             # skip the preceding separator
             while (start > 0 && !(buffer.char_at(start)).equal?(MINUTES_FORMAT_CONSTANT))
-              ((start -= 1) + 1)
+              start -= 1
             end
-            ((start += 1) - 1)
+            start += 1
             break
           end
         end
-        ((start += 1) - 1)
+        start += 1
       end
       if (start < end_)
         buffer.delete(start, end_)

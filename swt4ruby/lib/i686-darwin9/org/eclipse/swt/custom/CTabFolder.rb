@@ -866,7 +866,7 @@ module Org::Eclipse::Swt::Custom
       i = 0
       while i < folder_events.attr_length
         add_listener(folder_events[i], @listener)
-        ((i += 1) - 1)
+        i += 1
       end
     end
     
@@ -1052,7 +1052,7 @@ module Org::Eclipse::Swt::Custom
           end
           outer[index] = shape[((index += 1) - 1)] + (left ? -1 : +1)
           outer[index] = shape[((index += 1) - 1)]
-          ((i += 1) - 1)
+          i += 1
         end
         from = line_rgb
         to = outer_rgb
@@ -1077,7 +1077,7 @@ module Org::Eclipse::Swt::Custom
           end
           inner[index] = shape[((index += 1) - 1)] + (left ? +1 : -1)
           inner[index] = shape[((index += 1) - 1)]
-          ((i += 1) - 1)
+          i += 1
         end
         from = line_rgb
         to = inner_rgb
@@ -1119,7 +1119,7 @@ module Org::Eclipse::Swt::Custom
       System.arraycopy(@items, index, new_items, index + 1, @items.attr_length - index)
       @items = new_items
       if (@selected_index >= index)
-        ((@selected_index += 1) - 1)
+        @selected_index += 1
       end
       new_priority = Array.typed(::Java::Int).new(@priority.attr_length + 1) { 0 }
       next_ = 0
@@ -1130,7 +1130,7 @@ module Org::Eclipse::Swt::Custom
           priority_index = ((next_ += 1) - 1)
         end
         new_priority[((next_ += 1) - 1)] = @priority[i] >= index ? @priority[i] + 1 : @priority[i]
-        ((i += 1) - 1)
+        i += 1
       end
       new_priority[priority_index] = index
       @priority = new_priority
@@ -1177,11 +1177,11 @@ module Org::Eclipse::Swt::Custom
       i = 0
       while i < @priority.attr_length
         if ((@priority[i]).equal?(index))
-          ((i += 1) - 1)
+          i += 1
           next
         end
         new_priority[((next_ += 1) - 1)] = @priority[i] > index ? @priority[i] - 1 : @priority[i]
-        ((i += 1) - 1)
+        i += 1
       end
       @priority = new_priority
       # move the selection if this item is selected
@@ -1195,7 +1195,7 @@ module Org::Eclipse::Swt::Custom
         end
       else
         if (@selected_index > index)
-          ((@selected_index -= 1) + 1)
+          @selected_index -= 1
         end
       end
       update_items
@@ -1266,7 +1266,7 @@ module Org::Eclipse::Swt::Custom
                   gradient_height = percents[i] * height / 100
                   gc.fill_gradient_rectangle(x, y + pos, width, gradient_height, true)
                   pos += gradient_height
-                  ((i -= 1) + 1)
+                  i -= 1
                 end
               else
                 last_color = colors[0]
@@ -1285,7 +1285,7 @@ module Org::Eclipse::Swt::Custom
                   gradient_height = percents[i] * height / 100
                   gc.fill_gradient_rectangle(x, y + pos, width, gradient_height, true)
                   pos += gradient_height
-                  ((i += 1) - 1)
+                  i += 1
                 end
                 if (pos < height)
                   gc.set_background(default_background)
@@ -1422,7 +1422,7 @@ module Org::Eclipse::Swt::Custom
       else
         show_count = 0
         while (show_count < @priority.attr_length && @items[@priority[show_count]].attr_showing)
-          ((show_count += 1) - 1)
+          show_count += 1
         end
         count = @items.attr_length - show_count
       end
@@ -1650,7 +1650,7 @@ module Org::Eclipse::Swt::Custom
           if ((@border_left).equal?(0))
             shape[index - 1] += 1
           end
-          ((i += 1) - 1)
+          i += 1
         end
         i_ = 0
         while i_ < right.attr_length / 2
@@ -1659,7 +1659,7 @@ module Org::Eclipse::Swt::Custom
           if ((@border_left).equal?(0))
             shape[index - 1] += 1
           end
-          ((i_ += 1) - 1)
+          i_ += 1
         end
         shape[((index += 1) - 1)] = x + width
         shape[((index += 1) - 1)] = y - @highlight_header
@@ -1681,13 +1681,13 @@ module Org::Eclipse::Swt::Custom
         while i < left.attr_length / 2
           shape[((index += 1) - 1)] = x + left[2 * i]
           shape[((index += 1) - 1)] = y + left[2 * i + 1]
-          ((i += 1) - 1)
+          i += 1
         end
         i_ = 0
         while i_ < right.attr_length / 2
           shape[((index += 1) - 1)] = x + width + right[2 * i_]
           shape[((index += 1) - 1)] = y + right[2 * i_ + 1]
-          ((i_ += 1) - 1)
+          i_ += 1
         end
         shape[((index += 1) - 1)] = x + width
         shape[((index += 1) - 1)] = y + height + @highlight_header + 1
@@ -1709,7 +1709,7 @@ module Org::Eclipse::Swt::Custom
           if (!(i).equal?(@selected_index) && event.get_bounds.intersects(@items[i].get_bounds))
             @items[i].on_paint(gc, false)
           end
-          ((i += 1) - 1)
+          i += 1
         end
       end
       # Draw selected tab
@@ -1816,7 +1816,7 @@ module Org::Eclipse::Swt::Custom
         if (rect.contains(pt))
           return item
         end
-        ((i += 1) - 1)
+        i += 1
       end
       return nil
     end
@@ -1863,7 +1863,7 @@ module Org::Eclipse::Swt::Custom
       length_ = string.length
       begin
         while (index < length_ && !(string.char_at(index)).equal?(Character.new(?&.ord)))
-          ((index += 1) - 1)
+          index += 1
         end
         if ((index += 1) >= length_)
           return Character.new(?\0.ord)
@@ -1871,7 +1871,7 @@ module Org::Eclipse::Swt::Custom
         if (!(string.char_at(index)).equal?(Character.new(?&.ord)))
           return Character.to_lower_case(string.char_at(index))
         end
-        ((index += 1) - 1)
+        index += 1
       end while (index < length_)
       return Character.new(?\0.ord)
     end
@@ -1882,7 +1882,7 @@ module Org::Eclipse::Swt::Custom
       length_ = string.length
       begin
         while ((index < length_) && (!(string.char_at(index)).equal?(Character.new(?&.ord))))
-          ((index += 1) - 1)
+          index += 1
         end
         if ((index += 1) >= length_)
           return string
@@ -1890,7 +1890,7 @@ module Org::Eclipse::Swt::Custom
         if (!(string.char_at(index)).equal?(Character.new(?&.ord)))
           return string.substring(0, index - 1) + string.substring(index, length_)
         end
-        ((index += 1) - 1)
+        index += 1
       end while (index < length_)
       return string
     end
@@ -2229,7 +2229,7 @@ module Org::Eclipse::Swt::Custom
         if ((@items[i]).equal?(item))
           return i
         end
-        ((i += 1) - 1)
+        i += 1
       end
       return -1
     end
@@ -2317,7 +2317,7 @@ module Org::Eclipse::Swt::Custom
               child_id = i
               break
             end
-            ((i += 1) - 1)
+            i += 1
           end
           if ((child_id).equal?(ACC::CHILDID_NONE))
             if (self.attr_show_chevron && self.attr_chevron_rect.contains(test_point))
@@ -2473,7 +2473,7 @@ module Org::Eclipse::Swt::Custom
           i = 0
           while i < child_id_count
             children[i] = i
-            ((i += 1) - 1)
+            i += 1
           end
           e.attr_children = children
         end
@@ -2562,7 +2562,7 @@ module Org::Eclipse::Swt::Custom
               end
               visible[((idx += 1) - 1)] = i
             end
-            ((i += 1) - 1)
+            i += 1
           end
           if (current + offset >= 0 && current + offset < idx)
             index = visible[current + offset]
@@ -2579,7 +2579,7 @@ module Org::Eclipse::Swt::Custom
               i_ = 0
               while i_ < @folder_listeners.attr_length
                 @folder_listeners[i_].show_list(e)
-                ((i_ += 1) - 1)
+                i_ += 1
               end
               if (e.attr_doit && !is_disposed)
                 show_list(@chevron_rect)
@@ -2616,7 +2616,7 @@ module Org::Eclipse::Swt::Custom
         if (!(@items[i]).nil?)
           @items[i].dispose
         end
-        ((i += 1) - 1)
+        i += 1
       end
       @selection_gradient_colors = nil
       @selection_gradient_percents = nil
@@ -2638,7 +2638,7 @@ module Org::Eclipse::Swt::Custom
             consume = true
             break
           end
-          ((i += 1) - 1)
+          i += 1
         end
       end
       if (consume)
@@ -2670,7 +2670,7 @@ module Org::Eclipse::Swt::Custom
             end
           end
         end
-        ((i += 1) - 1)
+        i += 1
       end
       return false
     end
@@ -2718,7 +2718,7 @@ module Org::Eclipse::Swt::Custom
             item.attr_close_image_state = NORMAL
             redraw(item.attr_close_rect.attr_x, item.attr_close_rect.attr_y, item.attr_close_rect.attr_width, item.attr_close_rect.attr_height, false)
           end
-          ((i += 1) - 1)
+          i += 1
         end
       when SWT::MouseDown
         if (@min_rect.contains(x, y))
@@ -2767,7 +2767,7 @@ module Org::Eclipse::Swt::Custom
             if (bounds.contains(x, y))
               item = @items[i]
             end
-            ((i += 1) - 1)
+            i += 1
           end
         end
         if (!(item).nil?)
@@ -2851,7 +2851,7 @@ module Org::Eclipse::Swt::Custom
             item.attr_close_image_state = NORMAL
             redraw(item.attr_close_rect.attr_x, item.attr_close_rect.attr_y, item.attr_close_rect.attr_width, item.attr_close_rect.attr_height, false)
           end
-          ((i += 1) - 1)
+          i += 1
         end
       when SWT::MouseUp
         if (!(event.attr_button).equal?(1))
@@ -2873,7 +2873,7 @@ module Org::Eclipse::Swt::Custom
           i = 0
           while i < @folder_listeners.attr_length
             @folder_listeners[i].show_list(e)
-            ((i += 1) - 1)
+            i += 1
           end
           if (e.attr_doit && !is_disposed)
             show_list(@chevron_rect)
@@ -2897,7 +2897,7 @@ module Org::Eclipse::Swt::Custom
             else
               @folder_listeners[i].minimize(e)
             end
-            ((i += 1) - 1)
+            i += 1
           end
           return
         end
@@ -2918,7 +2918,7 @@ module Org::Eclipse::Swt::Custom
             else
               @folder_listeners[i].maximize(e)
             end
-            ((i += 1) - 1)
+            i += 1
           end
           return
         end
@@ -2937,7 +2937,7 @@ module Org::Eclipse::Swt::Custom
             if (bounds.contains(x, y))
               item = @items[i]
             end
-            ((i += 1) - 1)
+            i += 1
           end
         end
         if (!(item).nil?)
@@ -2957,13 +2957,13 @@ module Org::Eclipse::Swt::Custom
             while j < @folder_listeners.attr_length
               listener = @folder_listeners[j]
               listener.close(e)
-              ((j += 1) - 1)
+              j += 1
             end
             j_ = 0
             while j_ < @tab_listeners.attr_length
               listener = @tab_listeners[j_]
               listener.item_closed(e)
-              ((j_ += 1) - 1)
+              j_ += 1
             end
             if (e.attr_doit)
               item.dispose
@@ -3018,7 +3018,7 @@ module Org::Eclipse::Swt::Custom
               end
               visible[((idx += 1) - 1)] = i
             end
-            ((i += 1) - 1)
+            i += 1
           end
           if (current + offset >= 0 && current + offset < idx)
             index = visible[current + offset]
@@ -3035,7 +3035,7 @@ module Org::Eclipse::Swt::Custom
               i_ = 0
               while i_ < @folder_listeners.attr_length
                 @folder_listeners[i_].show_list(e)
-                ((i_ += 1) - 1)
+                i_ += 1
               end
               if (e.attr_doit && !is_disposed)
                 show_list(@chevron_rect)
@@ -3177,7 +3177,7 @@ module Org::Eclipse::Swt::Custom
           index = i
           break
         end
-        ((i += 1) - 1)
+        i += 1
       end
       if ((index).equal?(-1))
         return
@@ -3222,7 +3222,7 @@ module Org::Eclipse::Swt::Custom
           index = i
           break
         end
-        ((i += 1) - 1)
+        i += 1
       end
       if ((index).equal?(-1))
         return
@@ -3340,7 +3340,7 @@ module Org::Eclipse::Swt::Custom
           if (i > 0 && percents[i] < percents[i - 1])
             SWT.error(SWT::ERROR_INVALID_ARGUMENT)
           end
-          ((i += 1) - 1)
+          i += 1
         end
         if (get_display.get_depth < 15)
           # Don't use gradients on low color displays
@@ -3362,7 +3362,7 @@ module Org::Eclipse::Swt::Custom
             if (!same)
               break
             end
-            ((i += 1) - 1)
+            i += 1
           end
           if (same)
             i_ = 0
@@ -3371,7 +3371,7 @@ module Org::Eclipse::Swt::Custom
               if (!same)
                 break
               end
-              ((i_ += 1) - 1)
+              i_ += 1
             end
           end
           if (same && (@gradient_vertical).equal?(vertical))
@@ -3717,7 +3717,7 @@ module Org::Eclipse::Swt::Custom
             item.attr_x = default_x
             item.attr_showing = false
           end
-          ((i += 1) - 1)
+          i += 1
         end
       else
         right_item_edge = get_right_item_edge
@@ -3731,7 +3731,7 @@ module Org::Eclipse::Swt::Custom
           if (!@simple && (@priority[i]).equal?(@selected_index))
             width += @curve_width - 2 * @curve_indent
           end
-          ((i += 1) - 1)
+          i += 1
         end
         x = 0
         default_x = get_display.get_bounds.attr_width + 10 # off screen
@@ -3763,7 +3763,7 @@ module Org::Eclipse::Swt::Custom
               x += @curve_width - 2 * @curve_indent
             end
           end
-          ((i_ += 1) - 1)
+          i_ += 1
         end
       end
       return changed
@@ -3840,7 +3840,7 @@ module Org::Eclipse::Swt::Custom
         if (min_width > tab_area_width)
           break
         end
-        ((i += 1) - 1)
+        i += 1
       end
       if (min_width > tab_area_width)
         # full compression required and a chevron
@@ -3860,7 +3860,7 @@ module Org::Eclipse::Swt::Custom
         while i_ < @items.attr_length
           max_widths[i_] = @items[i_].preferred_width(gc, (i_).equal?(@selected_index), false)
           max_width += max_widths[i_]
-          ((i_ += 1) - 1)
+          i_ += 1
         end
         if (max_width <= tab_area_width)
           # no compression required
@@ -3875,26 +3875,26 @@ module Org::Eclipse::Swt::Custom
             while i__ < @items.attr_length
               if (max_widths[i__] > min_widths[i__] + extra)
                 total_width += min_widths[i__] + extra
-                ((large += 1) - 1)
+                large += 1
               else
                 total_width += max_widths[i__]
               end
-              ((i__ += 1) - 1)
+              i__ += 1
             end
             if (total_width >= tab_area_width)
-              ((extra -= 1) + 1)
+              extra -= 1
               break
             end
             if ((large).equal?(0) || tab_area_width - total_width < large)
               break
             end
-            ((extra += 1) - 1)
+            extra += 1
           end
           widths = Array.typed(::Java::Int).new(@items.attr_length) { 0 }
           i__ = 0
           while i__ < @items.attr_length
             widths[i__] = Math.min(max_widths[i__], min_widths[i__] + extra)
-            ((i__ += 1) - 1)
+            i__ += 1
           end
         end
       end
@@ -3917,7 +3917,7 @@ module Org::Eclipse::Swt::Custom
             end
           end
         end
-        ((i_ += 1) - 1)
+        i_ += 1
       end
       return changed
     end
@@ -4097,12 +4097,12 @@ module Org::Eclipse::Swt::Custom
         i = @first_index
         while i < @items.attr_length
           @priority[((next_ += 1) - 1)] = i
-          ((i += 1) - 1)
+          i += 1
         end
         i_ = 0
         while i_ < idx
           @priority[((next_ += 1) - 1)] = i_
-          ((i_ += 1) - 1)
+          i_ += 1
         end
         if (update_items)
           redraw_tabs
@@ -4292,7 +4292,7 @@ module Org::Eclipse::Swt::Custom
           if (i > 0 && percents[i] < percents[i - 1])
             SWT.error(SWT::ERROR_INVALID_ARGUMENT)
           end
-          ((i += 1) - 1)
+          i += 1
         end
         # If the colors is exactly two more than percents then last is highlight
         # Keep track of *real* colorsLength (minus the highlight)
@@ -4325,7 +4325,7 @@ module Org::Eclipse::Swt::Custom
             if (!same)
               break
             end
-            ((i += 1) - 1)
+            i += 1
           end
           if (same)
             i_ = 0
@@ -4334,7 +4334,7 @@ module Org::Eclipse::Swt::Custom
               if (!same)
                 break
               end
-              ((i_ += 1) - 1)
+              i_ += 1
             end
           end
           if (same && (@selection_gradient_vertical).equal?(vertical))
@@ -4502,7 +4502,7 @@ module Org::Eclipse::Swt::Custom
         green = (to.attr_green * prop_to + from.attr_green * prop_from) / denom
         blue = (to.attr_blue * prop_to + from.attr_blue * prop_from) / denom
         @selection_highlight_gradient_colors_cache[i] = Color.new(get_display, red, green, blue)
-        ((i += 1) - 1)
+        i += 1
       end
     end
     
@@ -4514,7 +4514,7 @@ module Org::Eclipse::Swt::Custom
       i = 0
       while i < @selection_highlight_gradient_colors_cache.attr_length
         @selection_highlight_gradient_colors_cache[i].dispose
-        ((i += 1) - 1)
+        i += 1
       end
       @selection_highlight_gradient_colors_cache = nil
     end
@@ -4578,7 +4578,7 @@ module Org::Eclipse::Swt::Custom
             if (!(i).equal?(@selected_index) && (@items[i].attr_close_image_state).equal?(NORMAL))
               @items[i].attr_close_image_state = NONE
             end
-            ((i += 1) - 1)
+            i += 1
           end
         end
         rect_before = get_client_area
@@ -4785,7 +4785,7 @@ module Org::Eclipse::Swt::Custom
           idx = i
           break
         end
-        ((i += 1) - 1)
+        i += 1
       end
       if (@mru)
         # move to front of mru order
@@ -4814,7 +4814,7 @@ module Org::Eclipse::Swt::Custom
         i = 0
         while i < items.attr_length
           items[i].dispose
-          ((i += 1) - 1)
+          i += 1
         end
       end
       id = "CTabFolder_showList_Index" # $NON-NLS-1$
@@ -4822,7 +4822,7 @@ module Org::Eclipse::Swt::Custom
       while i < @items.attr_length
         tab = @items[i]
         if (tab.attr_showing)
-          ((i += 1) - 1)
+          i += 1
           next
         end
         item = MenuItem.new(@show_menu, SWT::NONE)
@@ -4849,7 +4849,7 @@ module Org::Eclipse::Swt::Custom
           private
           alias_method :initialize_anonymous, :initialize
         end.new_local(self))
-        ((i += 1) - 1)
+        i += 1
       end
       x = rect.attr_x
       y = rect.attr_y + rect.attr_height
@@ -4912,7 +4912,7 @@ module Org::Eclipse::Swt::Custom
             if (width > max_width)
               break
             end
-            ((i += 1) - 1)
+            i += 1
           end
           if (width > max_width)
             width = 0
@@ -4926,7 +4926,7 @@ module Org::Eclipse::Swt::Custom
                 break
               end
               first_index = i_
-              ((i_ -= 1) + 1)
+              i_ -= 1
             end
           else
             first_index = @priority[0]
@@ -4937,7 +4937,7 @@ module Org::Eclipse::Swt::Custom
               if (width >= max_width)
                 break
               end
-              ((i_ += 1) - 1)
+              i_ += 1
             end
             if (width < max_width)
               i__ = @priority[0] - 1
@@ -4950,7 +4950,7 @@ module Org::Eclipse::Swt::Custom
                   break
                 end
                 first_index = i__
-                ((i__ -= 1) + 1)
+                i__ -= 1
               end
             end
           end
@@ -4961,12 +4961,12 @@ module Org::Eclipse::Swt::Custom
           i = first_index
           while i < @items.attr_length
             @priority[((index += 1) - 1)] = i
-            ((i += 1) - 1)
+            i += 1
           end
           i_ = 0
           while i_ < first_index
             @priority[((index += 1) - 1)] = i_
-            ((i_ += 1) - 1)
+            i_ += 1
           end
         end
       end
@@ -5001,7 +5001,7 @@ module Org::Eclipse::Swt::Custom
           i = 0
           while i < @items.attr_length
             temp_height = Math.max(temp_height, @items[i].preferred_height(gc))
-            ((i += 1) - 1)
+            i += 1
           end
         end
         gc.dispose

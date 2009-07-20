@@ -1458,7 +1458,7 @@ module Org::Eclipse::Swt::Widgets
               item.attr_cached = false
             end
           end
-          ((i += 1) - 1)
+          i += 1
         end
         if (cleared)
           if ((@current_item).nil? && (self.attr_draw_count).equal?(0) && OS._is_window_visible(self.attr_handle))
@@ -1506,7 +1506,7 @@ module Org::Eclipse::Swt::Widgets
         if (!(0 <= indices[i] && indices[i] < count))
           error(SWT::ERROR_INVALID_RANGE)
         end
-        ((i += 1) - 1)
+        i += 1
       end
       lv_item = nil
       cleared = false
@@ -1542,7 +1542,7 @@ module Org::Eclipse::Swt::Widgets
             OS._send_message(self.attr_handle, OS::LVM_REDRAWITEMS, index, index)
           end
         end
-        ((i_ += 1) - 1)
+        i_ += 1
       end
       if (cleared)
         set_scroll_width(nil, false)
@@ -1598,7 +1598,7 @@ module Org::Eclipse::Swt::Widgets
             item.attr_cached = false
           end
         end
-        ((i += 1) - 1)
+        i += 1
       end
       if (cleared)
         if ((@current_item).nil? && (self.attr_draw_count).equal?(0) && OS._is_window_visible(self.attr_handle))
@@ -1651,7 +1651,7 @@ module Org::Eclipse::Swt::Widgets
         i = 0
         while i < count
           width += OS._send_message(self.attr_handle, OS::LVM_GETCOLUMNWIDTH, i, 0)
-          ((i += 1) - 1)
+          i += 1
         end
         bits |= width & 0xffff
       end
@@ -1894,7 +1894,7 @@ module Org::Eclipse::Swt::Widgets
             item.attr_cell_font = temp
           end
         end
-        ((i += 1) - 1)
+        i += 1
       end
       # Insert the column into the columns array before inserting
       # it into the widget so that the column will be present when
@@ -1957,7 +1957,7 @@ module Org::Eclipse::Swt::Widgets
           while i_ < item_count
             lv_item.attr_i_item = i_
             OS._send_message(self.attr_handle, OS::LVM_SETITEM, 0, lv_item)
-            ((i_ += 1) - 1)
+            i_ += 1
           end
         end
       else
@@ -2102,7 +2102,7 @@ module Org::Eclipse::Swt::Widgets
           OS._send_message(self.attr_handle, OS::LVM_SETITEMSTATE, indices[i], lv_item)
           @ignore_select = false
         end
-        ((i += 1) - 1)
+        i += 1
       end
     end
     
@@ -2162,7 +2162,7 @@ module Org::Eclipse::Swt::Widgets
           @ignore_select = true
           OS._send_message(self.attr_handle, OS::LVM_SETITEMSTATE, i, lv_item)
           @ignore_select = false
-          ((i += 1) - 1)
+          i += 1
         end
       end
     end
@@ -2191,7 +2191,7 @@ module Org::Eclipse::Swt::Widgets
         if ((@columns[index]).equal?(column))
           break
         end
-        ((index += 1) - 1)
+        index += 1
       end
       # 64
       old_column = RJava.cast_to_int(OS._send_message(self.attr_handle, OS::LVM_GETSELECTEDCOLUMN, 0, 0))
@@ -2209,7 +2209,7 @@ module Org::Eclipse::Swt::Widgets
         if ((old_order[order_index]).equal?(index))
           break
         end
-        ((order_index += 1) - 1)
+        order_index += 1
       end
       @ignore_column_resize = true
       first = false
@@ -2277,7 +2277,7 @@ module Org::Eclipse::Swt::Widgets
           while i < item_count
             lv_item.attr_i_item = i
             OS._send_message(self.attr_handle, OS::LVM_SETITEM, 0, lv_item)
-            ((i += 1) - 1)
+            i += 1
           end
         end
       end
@@ -2355,7 +2355,7 @@ module Org::Eclipse::Swt::Widgets
             end
           end
         end
-        ((i += 1) - 1)
+        i += 1
       end
       if ((@column_count).equal?(0))
         set_scroll_width(nil, true)
@@ -2381,7 +2381,7 @@ module Org::Eclipse::Swt::Widgets
             new_index = old_order[i_] <= old_index ? old_order[i_] : old_order[i_] - 1
             new_order[((count += 1) - 1)] = new_index
           end
-          ((i_ += 1) - 1)
+          i_ += 1
         end
         OS._send_message(self.attr_handle, OS::LVM_GETCOLUMNORDERARRAY, @column_count, old_order)
         j = 0
@@ -2389,7 +2389,7 @@ module Org::Eclipse::Swt::Widgets
           if (!(old_order[j]).equal?(new_order[j]))
             break
           end
-          ((j += 1) - 1)
+          j += 1
         end
         if (!(j).equal?(new_order.attr_length))
           OS._send_message(self.attr_handle, OS::LVM_SETCOLUMNORDERARRAY, new_order.attr_length, new_order)
@@ -2403,14 +2403,14 @@ module Org::Eclipse::Swt::Widgets
         while i__ < new_order.attr_length
           new_columns[i__ - order_index] = @columns[new_order[i__]]
           new_columns[i__ - order_index].update_tool_tip(new_order[i__])
-          ((i__ += 1) - 1)
+          i__ += 1
         end
         i___ = 0
         while i___ < new_columns.attr_length
           if (!new_columns[i___].is_disposed)
             new_columns[i___].send_event(SWT::Move)
           end
-          ((i___ += 1) - 1)
+          i___ += 1
         end
       end
       # Remove the tool tip item for the header
@@ -2432,7 +2432,7 @@ module Org::Eclipse::Swt::Widgets
         if ((@items[index]).equal?(item))
           break
         end
-        ((index += 1) - 1)
+        index += 1
       end
       if ((index).equal?(count))
         return
@@ -2924,7 +2924,7 @@ module Org::Eclipse::Swt::Widgets
         i = 0
         while i < count
           result[i] = __get_item(i)
-          ((i += 1) - 1)
+          i += 1
         end
       else
         System.arraycopy(@items, 0, result, 0, count)
@@ -3302,7 +3302,7 @@ module Org::Eclipse::Swt::Widgets
         if ((@columns[i]).equal?(column))
           return i
         end
-        ((i += 1) - 1)
+        i += 1
       end
       return -1
     end
@@ -3347,7 +3347,7 @@ module Org::Eclipse::Swt::Widgets
           if ((@items[i]).equal?(item))
             return @last_index_of = i
           end
-          ((i += 1) - 1)
+          i += 1
         end
       else
         i = count - 1
@@ -3446,7 +3446,7 @@ module Org::Eclipse::Swt::Widgets
             if (!(item).nil? && !item.is_disposed)
               item.release(false)
             end
-            ((i += 1) - 1)
+            i += 1
           end
         end
         @items = nil
@@ -3458,7 +3458,7 @@ module Org::Eclipse::Swt::Widgets
           if (!column.is_disposed)
             column.release(false)
           end
-          ((i += 1) - 1)
+          i += 1
         end
         @columns = nil
       end
@@ -3546,7 +3546,7 @@ module Org::Eclipse::Swt::Widgets
           @items[count] = nil
           last = index
         end
-        ((i += 1) - 1)
+        i += 1
       end
       if ((count).equal?(0))
         set_table_empty
@@ -3636,13 +3636,13 @@ module Org::Eclipse::Swt::Widgets
           if ((code).equal?(0))
             break
           end
-          ((index += 1) - 1)
+          index += 1
         end
         System.arraycopy(@items, index, @items, start, count - index)
         i = count - (index - start)
         while i < count
           @items[i] = nil
-          ((i += 1) - 1)
+          i += 1
         end
         if (index <= end_)
           error(SWT::ERROR_ITEM_NOT_REMOVED)
@@ -3673,7 +3673,7 @@ module Org::Eclipse::Swt::Widgets
         if (!(item).nil? && !item.is_disposed)
           item.release(false)
         end
-        ((i += 1) - 1)
+        i += 1
       end
       # Feature in Windows 98.  When there are a large number
       # of columns and items in a table (>1000) where each
@@ -3878,7 +3878,7 @@ module Org::Eclipse::Swt::Widgets
           @ignore_select = true
           OS._send_message(self.attr_handle, OS::LVM_SETITEMSTATE, i, lv_item)
           @ignore_select = false
-          ((i += 1) - 1)
+          i += 1
         end
       end
     end
@@ -4728,7 +4728,7 @@ module Org::Eclipse::Swt::Widgets
         if (!(index).equal?(old_order[i]))
           reorder = true
         end
-        ((i += 1) - 1)
+        i += 1
       end
       if (reorder)
         old_rects = Array.typed(RECT).new(@column_count) { nil }
@@ -4736,7 +4736,7 @@ module Org::Eclipse::Swt::Widgets
         while i_ < @column_count
           old_rects[i_] = RECT.new
           OS._send_message(hwnd_header, OS::HDM_GETITEMRECT, i_, old_rects[i_])
-          ((i_ += 1) - 1)
+          i_ += 1
         end
         OS._send_message(self.attr_handle, OS::LVM_SETCOLUMNORDERARRAY, order.attr_length, order)
         # Bug in Windows.  When LVM_SETCOLUMNORDERARRAY is used to change
@@ -4756,7 +4756,7 @@ module Org::Eclipse::Swt::Widgets
               column.send_event(SWT::Move)
             end
           end
-          ((i__ += 1) - 1)
+          i__ += 1
         end
       end
     end
@@ -5132,7 +5132,7 @@ module Org::Eclipse::Swt::Widgets
             break
           end
         end
-        ((index += 1) - 1)
+        index += 1
       end
       if (index < item_count)
         error(SWT::ERROR_ITEM_NOT_REMOVED)
@@ -5156,7 +5156,7 @@ module Org::Eclipse::Swt::Widgets
         i = item_count
         while i < count
           @items[i] = TableItem.new(self, SWT::NONE, i, true)
-          ((i += 1) - 1)
+          i += 1
         end
       end
       if (!is_virtual)
@@ -5413,7 +5413,7 @@ module Org::Eclipse::Swt::Widgets
           if (!(item).nil?)
             break
           end
-          ((index += 1) - 1)
+          index += 1
         end
         # Bug in Windows.  When the width of the first column is
         # small but not zero, Windows draws '...' outside of the
@@ -5452,7 +5452,7 @@ module Org::Eclipse::Swt::Widgets
           # Windows to reserve the smallest possible space when an image
           # list is removed.  In this case, the scroll width must be one
           # pixel larger.
-          ((new_width += 1) - 1)
+          new_width += 1
         end
         new_width += INSET * 2
         # 64
@@ -6093,7 +6093,7 @@ module Org::Eclipse::Swt::Widgets
           if ((column.attr_id).equal?(hdr.attr_id_from))
             return column.attr_tool_tip_text
           end
-          ((i += 1) - 1)
+          i += 1
         end
       end
       return super(hdr)
@@ -6164,7 +6164,7 @@ module Org::Eclipse::Swt::Widgets
           lpti.attr_bottom = rect.attr_bottom
           OS._send_message(@header_tool_tip_handle, OS::TTM_ADDTOOL, 0, lpti)
         end
-        ((i += 1) - 1)
+        i += 1
       end
     end
     
@@ -6187,7 +6187,7 @@ module Org::Eclipse::Swt::Widgets
         if (@columns[index].attr_moveable)
           break
         end
-        ((index += 1) - 1)
+        index += 1
       end
       new_bits = index < @column_count ? OS::LVS_EX_HEADERDRAGDROP : 0
       OS._send_message(self.attr_handle, OS::LVM_SETEXTENDEDLISTVIEWSTYLE, OS::LVS_EX_HEADERDRAGDROP, new_bits)
@@ -6538,7 +6538,7 @@ module Org::Eclipse::Swt::Widgets
             if (!@columns[index].get_resizable)
               break
             end
-            ((index += 1) - 1)
+            index += 1
           end
           if (!(index).equal?(@column_count) || hooks(SWT::MeasureItem))
             new_columns = Array.typed(TableColumn).new(@column_count) { nil }
@@ -6549,7 +6549,7 @@ module Org::Eclipse::Swt::Widgets
               if (!column.is_disposed && column.get_resizable)
                 column.pack
               end
-              ((i += 1) - 1)
+              i += 1
             end
             return LRESULT::ZERO
           end
@@ -7059,7 +7059,7 @@ module Org::Eclipse::Swt::Widgets
               OS._map_window_points(hwnd_header, self.attr_handle, header_rect, 2)
               visible[i] = OS._intersect_rect(header_rect, rect, header_rect)
             end
-            ((i += 1) - 1)
+            i += 1
           end
           begin
             self.attr_display.attr_hwnd_parent = OS._get_parent(self.attr_handle)
@@ -7162,7 +7162,7 @@ module Org::Eclipse::Swt::Widgets
               OS._map_window_points(hwnd_header, self.attr_handle, header_rect, 2)
               visible[i] = OS._intersect_rect(header_rect, rect, header_rect)
             end
-            ((i += 1) - 1)
+            i += 1
           end
           begin
             self.attr_display.attr_hwnd_parent = OS._get_parent(self.attr_handle)
@@ -7388,7 +7388,7 @@ module Org::Eclipse::Swt::Widgets
             if ((plvfi.attr_i_sub_item).equal?(0))
               state = 1
               if (item.attr_checked)
-                ((state += 1) - 1)
+                state += 1
               end
               if (item.attr_grayed)
                 state += 2
@@ -7612,7 +7612,7 @@ module Org::Eclipse::Swt::Widgets
             while i < @column_count
               column = @columns[i]
               column.update_tool_tip(i)
-              ((i += 1) - 1)
+              i += 1
             end
           end
           @ignore_column_move = false
@@ -7659,7 +7659,7 @@ module Org::Eclipse::Swt::Widgets
                 if ((order[index]).equal?(phdn.attr_i_item))
                   break
                 end
-                ((index += 1) - 1)
+                index += 1
               end
               if ((index).equal?(order.attr_length))
                 index = 0
@@ -7676,7 +7676,7 @@ module Org::Eclipse::Swt::Widgets
                 if (!column.is_disposed)
                   column.post_event(SWT::Move)
                 end
-                ((i += 1) - 1)
+                i += 1
               end
             end
           end
@@ -7734,7 +7734,7 @@ module Org::Eclipse::Swt::Widgets
                     if ((next_column).equal?(column))
                       moved = true
                     end
-                    ((i += 1) - 1)
+                    i += 1
                   end
                 end
               end

@@ -100,12 +100,12 @@ module Org::Eclipse::Swt::Internal::Image
         raise IOException.new
       end
       if (@pos < @buf.attr_length)
-        ((@position += 1) - 1)
+        @position += 1
         return (@buf[((@pos += 1) - 1)] & 0xff)
       end
       c = @in.read
       if (!(c).equal?(-1))
-        ((@position += 1) - 1)
+        @position += 1
       end
       return c
     end

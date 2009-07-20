@@ -436,7 +436,7 @@ module Org::Eclipse::Swt::Widgets
         if ((@items[index]).equal?(item))
           break
         end
-        ((index += 1) - 1)
+        index += 1
       end
       if ((index).equal?(@item_count))
         return
@@ -583,7 +583,7 @@ module Org::Eclipse::Swt::Widgets
           if (!(item).nil? && !item.is_disposed)
             result[((index += 1) - 1)] = item
           end
-          ((i += 1) - 1)
+          i += 1
         end
       end
       if (!(index).equal?(result.attr_length))
@@ -603,7 +603,7 @@ module Org::Eclipse::Swt::Widgets
         i = 0
         while i < length - 1
           result = result + (items[i].get_name_text).to_s + ", "
-          ((i += 1) - 1)
+          i += 1
         end
         result = result + (items[length - 1].get_name_text).to_s
       end
@@ -709,7 +709,7 @@ module Org::Eclipse::Swt::Widgets
           if ((popups[i]).equal?(self))
             return true
           end
-          ((i += 1) - 1)
+          i += 1
         end
       end
       out_data = MenuTrackingData.new
@@ -1010,7 +1010,7 @@ module Org::Eclipse::Swt::Widgets
         if ((@items[i]).equal?(item))
           return i
         end
-        ((i += 1) - 1)
+        i += 1
       end
       return -1
     end
@@ -1070,7 +1070,7 @@ module Org::Eclipse::Swt::Widgets
         when Character.new(0x2303), Character.new(0x2325), Character.new(0x21E7), Character.new(0x2318)
           return index
         end
-        ((index -= 1) + 1)
+        index -= 1
       end
       return -1
     end
@@ -1084,7 +1084,7 @@ module Org::Eclipse::Swt::Widgets
           if (!(item).nil? && !item.is_disposed)
             item.release(false)
           end
-          ((i += 1) - 1)
+          i += 1
         end
         @items = nil
       end

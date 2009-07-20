@@ -231,7 +231,7 @@ module Org::Eclipse::Swt::Internal::Image
       while (total_length > 0)
         tc = (self.attr_reference[ofs] & 0xff) >> 4 # table class: AC (1) or DC (0)
         tid = self.attr_reference[ofs] & 0xf # table id: 0-1 baseline, 0-3 prog/ext
-        ((ofs += 1) - 1)
+        ofs += 1
         # Read the 16 count bytes and add them together to get the table size.
         count = 0
         i = 0
@@ -239,7 +239,7 @@ module Org::Eclipse::Swt::Internal::Image
           b_count = self.attr_reference[ofs + i] & 0xff
           bits[i] = b_count
           count += b_count
-          ((i += 1) - 1)
+          i += 1
         end
         ofs += 16
         total_length -= 17
@@ -248,7 +248,7 @@ module Org::Eclipse::Swt::Internal::Image
         i_ = 0
         while i_ < count
           huff_vals[i_] = self.attr_reference[ofs + i_] & 0xff
-          ((i_ += 1) - 1)
+          i_ += 1
         end
         ofs += count
         total_length -= count
@@ -265,10 +265,10 @@ module Org::Eclipse::Swt::Internal::Image
               huff_code_lengths = new_huff_code_lengths
             end
             huff_code_lengths[huff_code_lengths_index] = i__ + 1
-            ((huff_code_lengths_index += 1) - 1)
-            ((j += 1) - 1)
+            huff_code_lengths_index += 1
+            j += 1
           end
-          ((i__ += 1) - 1)
+          i__ += 1
         end
         # Truncate huffCodeLengths to the correct size.
         if (huff_code_lengths_index < huff_code_lengths.attr_length)
@@ -291,12 +291,12 @@ module Org::Eclipse::Swt::Internal::Image
               huff_codes = new_huff_codes
             end
             huff_codes[huff_codes_index] = code
-            ((huff_codes_index += 1) - 1)
-            ((code += 1) - 1)
-            ((p += 1) - 1)
+            huff_codes_index += 1
+            code += 1
+            p += 1
           end
           code *= 2
-          ((si += 1) - 1)
+          si += 1
         end
         # Truncate huffCodes to the correct size.
         if (huff_codes_index < huff_codes.attr_length)
@@ -320,7 +320,7 @@ module Org::Eclipse::Swt::Internal::Image
             k += b_size
             max_codes[i___] = huff_codes[k - 1]
           end
-          ((i___ += 1) - 1)
+          i___ += 1
         end
         # Calculate the eHuffman codes and lengths.
         e_huff_codes = Array.typed(::Java::Int).new(256) { 0 }
@@ -329,7 +329,7 @@ module Org::Eclipse::Swt::Internal::Image
         while i____ < huff_codes_index
           e_huff_codes[huff_vals[i____]] = huff_codes[i____]
           e_huff_size[huff_vals[i____]] = huff_code_lengths[i____]
-          ((i____ += 1) - 1)
+          i____ += 1
         end
         # Create the new JPEGHuffmanTable and add it to the allTables array.
         dht_table = JPEGHuffmanTable.new(self.attr_reference)
@@ -342,7 +342,7 @@ module Org::Eclipse::Swt::Internal::Image
         dht_table.attr_eh_codes = e_huff_codes
         dht_table.attr_eh_code_lengths = e_huff_size
         huff_tables[huff_table_count] = dht_table
-        ((huff_table_count += 1) - 1)
+        huff_table_count += 1
       end
       @all_tables = Array.typed(JPEGHuffmanTable).new(huff_table_count) { nil }
       System.arraycopy(huff_tables, 0, @all_tables, 0, huff_table_count)

@@ -325,7 +325,7 @@ module Org::Eclipse::Swt::Dnd
             return transfer.native_to_java(tdata)
           end
         end
-        ((i += 1) - 1)
+        i += 1
       end
       return nil # No data available for this transfer
     end
@@ -464,7 +464,7 @@ module Org::Eclipse::Swt::Dnd
         if ((data[i]).nil? || (data_types[i]).nil? || !data_types[i].validate(data[i]))
           DND.error(SWT::ERROR_INVALID_ARGUMENT)
         end
-        ((i += 1) - 1)
+        i += 1
       end
       if (((clipboards & DND::CLIPBOARD)).equal?(0))
         return
@@ -496,9 +496,9 @@ module Org::Eclipse::Swt::Dnd
           if (!(OS._put_scrap_flavor(@scrap, transfer_data.attr_type, 0, datum.attr_length, datum)).equal?(OS.attr_no_err))
             DND.error(DND::ERROR_CANNOT_SET_CLIPBOARD)
           end
-          ((j += 1) - 1)
+          j += 1
         end
-        ((i_ += 1) - 1)
+        i_ += 1
       end
     end
     
@@ -553,7 +553,7 @@ module Org::Eclipse::Swt::Dnd
       while i < types.attr_length
         result[i] = TransferData.new
         result[i].attr_type = types[i]
-        ((i += 1) - 1)
+        i += 1
       end
       return result
     end
@@ -586,7 +586,7 @@ module Org::Eclipse::Swt::Dnd
         sb.append(RJava.cast_to_char(((type & 0xff00) >> 8)))
         sb.append(RJava.cast_to_char(((type & 0xff) >> 0)))
         names[i] = sb.to_s
-        ((i += 1) - 1)
+        i += 1
       end
       return names
     end
@@ -610,7 +610,7 @@ module Org::Eclipse::Swt::Dnd
       i = 0
       while i < count[0]
         types[i] = info[i * 2]
-        ((i += 1) - 1)
+        i += 1
       end
       return types
     end

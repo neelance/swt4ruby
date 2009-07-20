@@ -1090,7 +1090,7 @@ module Org::Eclipse::Swt::Widgets
         i = 0
         while i < length_
           buffer[i] = chars[i]
-          ((i += 1) - 1)
+          i += 1
         end
         return buffer
       end
@@ -1102,7 +1102,7 @@ module Org::Eclipse::Swt::Widgets
           if ((self.attr_key_table[i][0]).equal?(key))
             return self.attr_key_table[i][1]
           end
-          ((i += 1) - 1)
+          i += 1
         end
         return 0
       end
@@ -1114,7 +1114,7 @@ module Org::Eclipse::Swt::Widgets
           if ((self.attr_key_table[i][1]).equal?(key))
             return self.attr_key_table[i][0]
           end
-          ((i += 1) - 1)
+          i += 1
         end
         return 0
       end
@@ -1262,7 +1262,7 @@ module Org::Eclipse::Swt::Widgets
           @menus[i] = menu
           return
         end
-        ((i += 1) - 1)
+        i += 1
       end
       new_menus = Array.typed(Menu).new(@menus.attr_length + 12) { nil }
       menu.attr_id = RJava.cast_to_short((ID_START + @menus.attr_length))
@@ -1282,14 +1282,14 @@ module Org::Eclipse::Swt::Widgets
         if ((@popups[i]).equal?(menu))
           return
         end
-        ((i += 1) - 1)
+        i += 1
       end
       index = 0
       while (index < length_)
         if ((@popups[index]).nil?)
           break
         end
-        ((index += 1) - 1)
+        index += 1
       end
       if ((index).equal?(length_))
         new_popups = Array.typed(Menu).new(length_ + 4) { nil }
@@ -1327,7 +1327,7 @@ module Org::Eclipse::Swt::Widgets
         i = @free_slot
         while i < length_ - 1
           new_index_table[i] = i + 1
-          ((i += 1) - 1)
+          i += 1
         end
         new_index_table[length_ - 1] = -1
         @index_table = new_index_table
@@ -1352,14 +1352,14 @@ module Org::Eclipse::Swt::Widgets
         if ((@dispose_window_list[i]).equal?(window))
           return
         end
-        ((i += 1) - 1)
+        i += 1
       end
       index = 0
       while (index < length_)
         if ((@dispose_window_list[index]).equal?(0))
           break
         end
-        ((index += 1) - 1)
+        index += 1
       end
       if ((index).equal?(length_))
         new_list = Array.typed(::Java::Int).new(length_ + 4) { 0 }
@@ -1473,7 +1473,7 @@ module Org::Eclipse::Swt::Widgets
         if ((@modal_shells[index]).nil?)
           return
         end
-        ((index += 1) - 1)
+        index += 1
       end
       if ((index).equal?(length_))
         return
@@ -1487,7 +1487,7 @@ module Org::Eclipse::Swt::Widgets
       i = 0
       while i < shells.attr_length
         shells[i].update_modal
-        ((i += 1) - 1)
+        i += 1
       end
     end
     
@@ -1543,7 +1543,7 @@ module Org::Eclipse::Swt::Widgets
       i = 0
       while i < pixel_count
         OS.memmove(data + (i * 4), mask_ptr[0] + i, 1)
-        ((i += 1) - 1)
+        i += 1
       end
       OS._hunlock(mask_handle)
       OS._hunlock(data_handle)
@@ -1768,7 +1768,7 @@ module Org::Eclipse::Swt::Widgets
                 SWT.error(SWT::ERROR_THREAD_INVALID_ACCESS)
               end
             end
-            ((i += 1) - 1)
+            i += 1
           end
         end
       end
@@ -1940,7 +1940,7 @@ module Org::Eclipse::Swt::Widgets
           menu.attr_modified = menu.attr_closed = false
           menu.attr_last_target = nil
         end
-        ((i += 1) - 1)
+        i += 1
       end
     end
     
@@ -2070,7 +2070,7 @@ module Org::Eclipse::Swt::Widgets
             if ((display).equal?(self.attr_displays[i]))
               self.attr_displays[i] = nil
             end
-            ((i += 1) - 1)
+            i += 1
           end
         end
       end
@@ -2120,7 +2120,7 @@ module Org::Eclipse::Swt::Widgets
           @dispose_list[i] = runnable
           return
         end
-        ((i += 1) - 1)
+        i += 1
       end
       new_dispose_list = Array.typed(Runnable).new(@dispose_list.attr_length + 4) { nil }
       System.arraycopy(@dispose_list, 0, new_dispose_list, 0, @dispose_list.attr_length)
@@ -2149,7 +2149,7 @@ module Org::Eclipse::Swt::Widgets
           if (!(@dispose_window_list[i]).equal?(0))
             OS._dispose_window(@dispose_window_list[i])
           end
-          ((i += 1) - 1)
+          i += 1
         end
         @dispose_window_list = nil
       end
@@ -2263,7 +2263,7 @@ module Org::Eclipse::Swt::Widgets
             if (!(display).nil? && (display.attr_thread).equal?(thread))
               return display
             end
-            ((i += 1) - 1)
+            i += 1
           end
           return nil
         end
@@ -2315,7 +2315,7 @@ module Org::Eclipse::Swt::Widgets
             return shell
           end
         end
-        ((i += 1) - 1)
+        i += 1
       end
       return nil
     end
@@ -2341,7 +2341,7 @@ module Org::Eclipse::Swt::Widgets
       i = 1
       while i < monitors.attr_length
         rect = rect.union(monitors[i].get_bounds)
-        ((i += 1) - 1)
+        i += 1
       end
       return rect
     end
@@ -2387,7 +2387,7 @@ module Org::Eclipse::Swt::Widgets
       i = 1
       while i < monitors.attr_length
         rect = rect.union(monitors[i].get_bounds)
-        ((i += 1) - 1)
+        i += 1
       end
       return rect
     end
@@ -2534,7 +2534,7 @@ module Org::Eclipse::Swt::Widgets
         if ((@keys[i] == key))
           return @values[i]
         end
-        ((i += 1) - 1)
+        i += 1
       end
       return nil
     end
@@ -2722,9 +2722,9 @@ module Org::Eclipse::Swt::Widgets
       while i < @menus.attr_length
         menu = @menus[i]
         if (!(menu).nil? && (menu.attr_parent).equal?(shell))
-          ((count += 1) - 1)
+          count += 1
         end
-        ((i += 1) - 1)
+        i += 1
       end
       index = 0
       result = Array.typed(Menu).new(count) { nil }
@@ -2734,7 +2734,7 @@ module Org::Eclipse::Swt::Widgets
         if (!(menu).nil? && (menu.attr_parent).equal?(shell))
           result[((index += 1) - 1)] = menu
         end
-        ((i_ += 1) - 1)
+        i_ += 1
       end
       return result
     end
@@ -2856,7 +2856,7 @@ module Org::Eclipse::Swt::Widgets
             if ((result[j]).equal?(widget))
               break
             end
-            ((j += 1) - 1)
+            j += 1
           end
           if ((j).equal?(index))
             if ((index).equal?(result.attr_length))
@@ -2867,7 +2867,7 @@ module Org::Eclipse::Swt::Widgets
             result[((index += 1) - 1)] = widget
           end
         end
-        ((i += 1) - 1)
+        i += 1
       end
       if ((index).equal?(result.attr_length))
         return result
@@ -3423,7 +3423,7 @@ module Org::Eclipse::Swt::Widgets
       i = 0
       while i < GROW_SIZE - 1
         @index_table[i] = i + 1
-        ((i += 1) - 1)
+        i += 1
       end
       @index_table[GROW_SIZE - 1] = -1
     end
@@ -3691,7 +3691,7 @@ module Org::Eclipse::Swt::Widgets
                 v_key = i
                 break
               end
-              ((i += 1) - 1)
+              i += 1
             end
             if ((v_key).equal?(-1))
               i_ = 0
@@ -3701,7 +3701,7 @@ module Org::Eclipse::Swt::Widgets
                   v_key = i_
                   break
                 end
-                ((i_ += 1) - 1)
+                i_ += 1
               end
             end
             if ((v_key).equal?(-1))
@@ -3786,7 +3786,7 @@ module Org::Eclipse::Swt::Widgets
         if ((@event_queue[index]).nil?)
           break
         end
-        ((index += 1) - 1)
+        index += 1
       end
       if ((index).equal?(length_))
         new_queue = Array.typed(Event).new(length_ + 4) { nil }
@@ -4279,7 +4279,7 @@ module Org::Eclipse::Swt::Widgets
               self.attr_displays[i] = display
               return
             end
-            ((i += 1) - 1)
+            i += 1
           end
           new_displays = Array.typed(Display).new(self.attr_displays.attr_length + 4) { nil }
           System.arraycopy(self.attr_displays, 0, new_displays, 0, self.attr_displays.attr_length)
@@ -4322,7 +4322,7 @@ module Org::Eclipse::Swt::Widgets
         if (!shell.is_disposed)
           shell.dispose
         end
-        ((i += 1) - 1)
+        i += 1
       end
       if (!(@tray).nil?)
         @tray.dispose
@@ -4336,7 +4336,7 @@ module Org::Eclipse::Swt::Widgets
           if (!(@dispose_list[i_]).nil?)
             @dispose_list[i_].run
           end
-          ((i_ += 1) - 1)
+          i_ += 1
         end
       end
       @dispose_list = nil
@@ -4367,7 +4367,7 @@ module Org::Eclipse::Swt::Widgets
           if (!(@timer_ids[i]).equal?(0) && !(@timer_ids[i]).equal?(-1))
             OS._remove_event_loop_timer(@timer_ids[i])
           end
-          ((i += 1) - 1)
+          i += 1
         end
       end
       @timer_ids = nil
@@ -4388,7 +4388,7 @@ module Org::Eclipse::Swt::Widgets
         if (!(@cursors[i]).nil?)
           @cursors[i].dispose
         end
-        ((i += 1) - 1)
+        i += 1
       end
       @cursors = nil
       # Release Dock image
@@ -4562,7 +4562,7 @@ module Org::Eclipse::Swt::Widgets
           @popups[i] = nil
           return
         end
-        ((i += 1) - 1)
+        i += 1
       end
     end
     
@@ -4764,7 +4764,7 @@ module Org::Eclipse::Swt::Widgets
             OS._dispose_rgn(inval_rgn)
           end
         end
-        ((i += 1) - 1)
+        i += 1
       end
       return true
     end
@@ -4811,7 +4811,7 @@ module Org::Eclipse::Swt::Widgets
           shell.redraw(true)
           shell.layout(true, true)
         end
-        ((i += 1) - 1)
+        i += 1
       end
       return true
     end
@@ -4833,7 +4833,7 @@ module Org::Eclipse::Swt::Widgets
             runnable.run
           end
         end
-        ((i += 1) - 1)
+        i += 1
       end
       return result
     end
@@ -5001,7 +5001,7 @@ module Org::Eclipse::Swt::Widgets
         end
         index = 0
         while (index < @keys.attr_length && !(@keys[index] == key))
-          ((index += 1) - 1)
+          index += 1
         end
         if ((index).equal?(@keys.attr_length))
           return
@@ -5033,7 +5033,7 @@ module Org::Eclipse::Swt::Widgets
           @values[i] = value
           return
         end
-        ((i += 1) - 1)
+        i += 1
       end
       new_keys = Array.typed(String).new(@keys.attr_length + 1) { nil }
       new_values = Array.typed(Object).new(@values.attr_length + 1) { nil }
@@ -5144,7 +5144,7 @@ module Org::Eclipse::Swt::Widgets
         if ((@modal_shells[index]).nil?)
           break
         end
-        ((index += 1) - 1)
+        index += 1
       end
       if ((index).equal?(length_))
         new_modal_shells = Array.typed(Shell).new(length_ + 4) { nil }
@@ -5156,7 +5156,7 @@ module Org::Eclipse::Swt::Widgets
       i = 0
       while i < shells.attr_length
         shells[i].update_modal
-        ((i += 1) - 1)
+        i += 1
       end
     end
     
@@ -5310,7 +5310,7 @@ module Org::Eclipse::Swt::Widgets
         if ((@timer_list[index]).equal?(runnable))
           break
         end
-        ((index += 1) - 1)
+        index += 1
       end
       if (!(index).equal?(@timer_list.attr_length))
         timer_id = @timer_ids[index]
@@ -5331,7 +5331,7 @@ module Org::Eclipse::Swt::Widgets
         if ((@timer_list[index]).nil?)
           break
         end
-        ((index += 1) - 1)
+        index += 1
       end
       if ((index).equal?(@timer_list.attr_length))
         new_timer_list = Array.typed(Runnable).new(@timer_list.attr_length + 4) { nil }
@@ -5409,7 +5409,7 @@ module Org::Eclipse::Swt::Widgets
         if (!shell.is_disposed)
           shell.update(true)
         end
-        ((i += 1) - 1)
+        i += 1
       end
       # This code is intentionally commented.
       # 
@@ -5444,7 +5444,7 @@ module Org::Eclipse::Swt::Widgets
           enabled = false
           break
         end
-        ((i += 1) - 1)
+        i += 1
       end
       if (enabled)
         OS._enable_menu_command(0, OS.attr_k_hicommand_quit)

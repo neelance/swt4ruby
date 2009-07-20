@@ -77,7 +77,7 @@ module Org::Eclipse::Swt::Internal
         index = 0
         start = 0
         while (index < length_ && Character.is_digit(version.char_at(index)))
-          ((index += 1) - 1)
+          index += 1
         end
         begin
           if (start < length_)
@@ -87,7 +87,7 @@ module Org::Eclipse::Swt::Internal
         end
         start = (index += 1)
         while (index < length_ && Character.is_digit(version.char_at(index)))
-          ((index += 1) - 1)
+          index += 1
         end
         begin
           if (start < length_)
@@ -97,7 +97,7 @@ module Org::Eclipse::Swt::Internal
         end
         start = (index += 1)
         while (index < length_ && Character.is_digit(version.char_at(index)))
-          ((index += 1) - 1)
+          index += 1
         end
         begin
           if (start < length_)

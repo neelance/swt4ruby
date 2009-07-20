@@ -395,7 +395,7 @@ module Org::Eclipse::Swt::Widgets
       day = first_day
       while day <= last_day
         draw_day(gc, cell_size, day)
-        ((day += 1) - 1)
+        day += 1
       end
     end
     
@@ -414,7 +414,7 @@ module Org::Eclipse::Swt::Widgets
         extent = gc.string_extent(day)
         gc.draw_string(day, x + (cell_size.attr_x - extent.attr_x) / 2, y + (cell_size.attr_y - extent.attr_y) / 2, true)
         x += cell_size.attr_x
-        ((i += 1) - 1)
+        i += 1
       end
       gc.draw_line(0, cell_size.attr_y - 1, client.attr_width, cell_size.attr_y - 1)
     end
@@ -531,7 +531,7 @@ module Org::Eclipse::Swt::Widgets
         extent = gc.string_extent(days[i])
         width = Math.max(width, extent.attr_x)
         height = Math.max(height, extent.attr_y)
-        ((i += 1) - 1)
+        i += 1
       end
       first_day = @calendar.get_minimum(Calendar::DAY_OF_MONTH)
       last_day = @calendar.get_maximum(Calendar::DAY_OF_MONTH)
@@ -540,7 +540,7 @@ module Org::Eclipse::Swt::Widgets
         extent = gc.string_extent(String.value_of(day))
         width = Math.max(width, extent.attr_x)
         height = Math.max(height, extent.attr_y)
-        ((day += 1) - 1)
+        day += 1
       end
       if (dispose)
         gc.dispose

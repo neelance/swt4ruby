@@ -321,7 +321,7 @@ module Org::Eclipse::Swt::Custom
       i = 0
       while i < events.attr_length
         add_listener(events[i], listener)
-        ((i += 1) - 1)
+        i += 1
       end
     end
     

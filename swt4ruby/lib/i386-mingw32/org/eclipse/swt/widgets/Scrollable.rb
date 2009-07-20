@@ -378,7 +378,7 @@ module Org::Eclipse::Swt::Widgets
           i = 0
           while i < count
             OS._send_message(self.attr_handle, msg, code, 0)
-            ((i += 1) - 1)
+            i += 1
           end
         end
         return LRESULT::ZERO

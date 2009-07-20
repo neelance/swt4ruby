@@ -227,14 +227,14 @@ module Org::Eclipse::Swt::Program
           index = 0
           while (desktop).equal?(DESKTOP_UNKNOWN) && index < property.attr_length
             if ((property[index]).equal?(OS::None))
-              ((index += 1) - 1)
+              index += 1
               next
             end
             # do not match atoms that do not exist
             if ((property[index]).equal?(cde) && cde_init(display))
               desktop = DESKTOP_CDE
             end
-            ((index += 1) - 1)
+            index += 1
           end
         end
         display.set_data(DESKTOP_DATA, desktop)
@@ -371,7 +371,7 @@ module Org::Eclipse::Swt::Program
               mime_type = type
               break
             end
-            ((index += 1) - 1)
+            index += 1
           end
         end
         return mime_type
@@ -427,7 +427,7 @@ module Org::Eclipse::Swt::Program
         while (s_index < cmd.length)
           # Trim initial white space of argument.
           while (s_index < cmd.length && Compatibility.is_whitespace(cmd.char_at(s_index)))
-            ((s_index += 1) - 1)
+            s_index += 1
           end
           if (s_index < cmd.length)
             # If the command is a quoted string
@@ -436,7 +436,7 @@ module Org::Eclipse::Swt::Program
               # This code currently does not handle escaped characters (e.g., " a\"b").
               e_index = s_index + 1
               while (e_index < cmd.length && !(cmd.char_at(e_index)).equal?(cmd.char_at(s_index)))
-                ((e_index += 1) - 1)
+                e_index += 1
               end
               if (e_index >= cmd.length)
                 # The terminating quote was not found
@@ -451,7 +451,7 @@ module Org::Eclipse::Swt::Program
               # Use white space for the delimiters.
               e_index = s_index
               while (e_index < cmd.length && !Compatibility.is_whitespace(cmd.char_at(e_index)))
-                ((e_index += 1) - 1)
+                e_index += 1
               end
               args.add_element(cmd.substring(s_index, e_index))
               s_index = e_index + 1
@@ -462,7 +462,7 @@ module Org::Eclipse::Swt::Program
         index = 0
         while index < args.size
           strings[index] = args.element_at(index)
-          ((index += 1) - 1)
+          index += 1
         end
         return strings
       end
@@ -529,7 +529,7 @@ module Org::Eclipse::Swt::Program
           file_arg = index
           args[index] = (value.substring(0, j)).to_s + file_name + (value.substring(j + 2)).to_s
         end
-        ((index += 1) - 1)
+        index += 1
       end
       # If a file name was given but the command did not have "%f"
       if ((file_name.length > 0) && (file_arg < 0))
@@ -537,7 +537,7 @@ module Org::Eclipse::Swt::Program
         index = 0
         while index < args.attr_length
           new_args[index] = args[index]
-          ((index += 1) - 1)
+          index += 1
         end
         new_args[args.attr_length] = file_name
         args = new_args
@@ -782,7 +782,7 @@ module Org::Eclipse::Swt::Program
             if (!extensions.contains(mime_exts.element_at(index)))
               extensions.add_element(mime_exts.element_at(index))
             end
-            ((index += 1) - 1)
+            index += 1
           end
         end
         # Return the list of extensions.
@@ -790,7 +790,7 @@ module Org::Eclipse::Swt::Program
         index = 0
         while index < extensions.size
           ext_strings[index] = extensions.element_at(index)
-          ((index += 1) - 1)
+          index += 1
         end
         return ext_strings
       end
@@ -840,7 +840,7 @@ module Org::Eclipse::Swt::Program
         index = 0
         while index < program_list.attr_length
           program_list[index] = programs.element_at(index)
-          ((index += 1) - 1)
+          index += 1
         end
         return program_list
       end

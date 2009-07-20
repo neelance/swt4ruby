@@ -692,7 +692,7 @@ module Org::Eclipse::Swt::Widgets
       index = 0
       items = @parent.get_items
       while (index < items.attr_length && !(items[index]).equal?(self))
-        ((index += 1) - 1)
+        index += 1
       end
       i = index - 1
       while (i >= 0 && items[i].set_radio_selection(false))
@@ -700,7 +700,7 @@ module Org::Eclipse::Swt::Widgets
       end
       j = index + 1
       while (j < items.attr_length && items[j].set_radio_selection(false))
-        ((j += 1) - 1)
+        j += 1
       end
       set_selection(true)
     end

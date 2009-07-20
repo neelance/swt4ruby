@@ -71,7 +71,7 @@ module Org::Eclipse::Swt::Internal::Image
         green = self.attr_reference[offset + 1] & 0xff
         blue = self.attr_reference[offset + 2] & 0xff
         rgbs[i] = RGB.new(red, green, blue)
-        ((i += 1) - 1)
+        i += 1
       end
       return PaletteData.new(rgbs)
     end
@@ -87,7 +87,7 @@ module Org::Eclipse::Swt::Internal::Image
         self.attr_reference[offset] = rgbs[i].attr_red
         self.attr_reference[offset + 1] = rgbs[i].attr_green
         self.attr_reference[offset + 2] = rgbs[i].attr_blue
-        ((i += 1) - 1)
+        i += 1
       end
     end
     

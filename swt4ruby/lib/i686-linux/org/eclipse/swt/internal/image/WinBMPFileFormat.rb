@@ -81,11 +81,11 @@ module Org::Eclipse::Swt::Internal::Image
           if ((src[sp + n]).equal?(src[sp + n + 1]))
             break
           end
-          ((n += 1) - 1)
+          n += 1
         end
         # if there is only one more byte in the scan line, include it
         if (n < 127 && (n).equal?(left))
-          ((n += 1) - 1)
+          n += 1
         end
         # store the intervening data
         case (n)
@@ -93,31 +93,31 @@ module Org::Eclipse::Swt::Internal::Image
         when 1
           # handled separately because 0,2 is a command
           dest[dp] = 2
-          ((dp += 1) - 1)
+          dp += 1
           # 1 byte == 2 pixels
           dest[dp] = src[sp]
-          ((dp += 1) - 1)
-          ((sp += 1) - 1)
+          dp += 1
+          sp += 1
           size += 2
         else
           dest[dp] = 0
-          ((dp += 1) - 1)
+          dp += 1
           dest[dp] = (n + n)
-          ((dp += 1) - 1)
+          dp += 1
           # n bytes = n*2 pixels
           i = n
           while i > 0
             dest[dp] = src[sp]
-            ((dp += 1) - 1)
-            ((sp += 1) - 1)
-            ((i -= 1) + 1)
+            dp += 1
+            sp += 1
+            i -= 1
           end
           size += 2 + n
           if (!((n & 1)).equal?(0))
             # pad to word
             dest[dp] = 0
-            ((dp += 1) - 1)
-            ((size += 1) - 1)
+            dp += 1
+            size += 1
           end
         end
         # find the length of the next run (up to 127) and store it
@@ -132,26 +132,26 @@ module Org::Eclipse::Swt::Internal::Image
             if (!(src[sp + n]).equal?(the_byte))
               break
             end
-            ((n += 1) - 1)
+            n += 1
           end
           dest[dp] = (n + n)
-          ((dp += 1) - 1)
+          dp += 1
           # n bytes = n*2 pixels
           dest[dp] = the_byte
-          ((dp += 1) - 1)
+          dp += 1
           sp += n
           size += 2
         end
       end
       # store the end of line or end of bitmap codes
       dest[dp] = 0
-      ((dp += 1) - 1)
+      dp += 1
       if (last)
         dest[dp] = 1
-        ((dp += 1) - 1)
+        dp += 1
       else
         dest[dp] = 0
-        ((dp += 1) - 1)
+        dp += 1
       end
       size += 2
       return size
@@ -178,11 +178,11 @@ module Org::Eclipse::Swt::Internal::Image
           if ((src[sp + n]).equal?(src[sp + n + 1]))
             break
           end
-          ((n += 1) - 1)
+          n += 1
         end
         # if there is only one more byte in the scan line, include it
         if ((n).equal?(left))
-          ((n += 1) - 1)
+          n += 1
         end
         # store the intervening data
         case (n)
@@ -191,44 +191,44 @@ module Org::Eclipse::Swt::Internal::Image
         when 2
           # handled separately because 0,2 is a command
           dest[dp] = 1
-          ((dp += 1) - 1)
+          dp += 1
           dest[dp] = src[sp]
-          ((dp += 1) - 1)
-          ((sp += 1) - 1)
+          dp += 1
+          sp += 1
           size += 2
           # handled separately because 0,1 is a command
           dest[dp] = 1
-          ((dp += 1) - 1)
+          dp += 1
           dest[dp] = src[sp]
-          ((dp += 1) - 1)
-          ((sp += 1) - 1)
+          dp += 1
+          sp += 1
           size += 2
         when 1
           # handled separately because 0,1 is a command
           dest[dp] = 1
-          ((dp += 1) - 1)
+          dp += 1
           dest[dp] = src[sp]
-          ((dp += 1) - 1)
-          ((sp += 1) - 1)
+          dp += 1
+          sp += 1
           size += 2
         else
           dest[dp] = 0
-          ((dp += 1) - 1)
+          dp += 1
           dest[dp] = n
-          ((dp += 1) - 1)
+          dp += 1
           i = n
           while i > 0
             dest[dp] = src[sp]
-            ((dp += 1) - 1)
-            ((sp += 1) - 1)
-            ((i -= 1) + 1)
+            dp += 1
+            sp += 1
+            i -= 1
           end
           size += 2 + n
           if (!((n & 1)).equal?(0))
             # pad to word
             dest[dp] = 0
-            ((dp += 1) - 1)
-            ((size += 1) - 1)
+            dp += 1
+            size += 1
           end
         end
         # find the length of the next run (up to 255) and store it
@@ -243,25 +243,25 @@ module Org::Eclipse::Swt::Internal::Image
             if (!(src[sp + n]).equal?(the_byte))
               break
             end
-            ((n += 1) - 1)
+            n += 1
           end
           dest[dp] = n
-          ((dp += 1) - 1)
+          dp += 1
           dest[dp] = the_byte
-          ((dp += 1) - 1)
+          dp += 1
           sp += n
           size += 2
         end
       end
       # store the end of line or end of bitmap codes
       dest[dp] = 0
-      ((dp += 1) - 1)
+      dp += 1
       if (last)
         dest[dp] = 1
-        ((dp += 1) - 1)
+        dp += 1
       else
         dest[dp] = 0
-        ((dp += 1) - 1)
+        dp += 1
       end
       size += 2
       return size
@@ -296,14 +296,14 @@ module Org::Eclipse::Swt::Internal::Image
       y = 0
       while (sp < se)
         len = src[sp] & 0xff
-        ((sp += 1) - 1)
+        sp += 1
         if ((len).equal?(0))
           len = src[sp] & 0xff
-          ((sp += 1) - 1)
+          sp += 1
           case (len)
           when 0
             # end of line
-            ((y += 1) - 1)
+            y += 1
             x = 0
             dp = y * stride
             if (dp > de)
@@ -315,9 +315,9 @@ module Org::Eclipse::Swt::Internal::Image
           when 2
             # delta
             x += src[sp] & 0xff
-            ((sp += 1) - 1)
+            sp += 1
             y += src[sp] & 0xff
-            ((sp += 1) - 1)
+            sp += 1
             dp = y * stride + x / 2
             if (dp > de)
               return -1
@@ -339,12 +339,12 @@ module Org::Eclipse::Swt::Internal::Image
             i = 0
             while i < len
               dest[dp] = src[sp]
-              ((dp += 1) - 1)
-              ((sp += 1) - 1)
-              ((i += 1) - 1)
+              dp += 1
+              sp += 1
+              i += 1
             end
             if (!((sp & 1)).equal?(0))
-              ((sp += 1) - 1)
+              sp += 1
             end
             # word align sp?
           end
@@ -355,15 +355,15 @@ module Org::Eclipse::Swt::Internal::Image
           x += len
           len = len / 2
           the_byte = src[sp]
-          ((sp += 1) - 1)
+          sp += 1
           if (len > (de - dp))
             return -1
           end
           i = 0
           while i < len
             dest[dp] = the_byte
-            ((dp += 1) - 1)
-            ((i += 1) - 1)
+            dp += 1
+            i += 1
           end
         end
       end
@@ -380,14 +380,14 @@ module Org::Eclipse::Swt::Internal::Image
       y = 0
       while (sp < se)
         len = src[sp] & 0xff
-        ((sp += 1) - 1)
+        sp += 1
         if ((len).equal?(0))
           len = src[sp] & 0xff
-          ((sp += 1) - 1)
+          sp += 1
           case (len)
           when 0
             # end of line
-            ((y += 1) - 1)
+            y += 1
             x = 0
             dp = y * stride
             if (dp > de)
@@ -399,9 +399,9 @@ module Org::Eclipse::Swt::Internal::Image
           when 2
             # delta
             x += src[sp] & 0xff
-            ((sp += 1) - 1)
+            sp += 1
             y += src[sp] & 0xff
-            ((sp += 1) - 1)
+            sp += 1
             dp = y * stride + x
             if (dp > de)
               return -1
@@ -417,27 +417,27 @@ module Org::Eclipse::Swt::Internal::Image
             i = 0
             while i < len
               dest[dp] = src[sp]
-              ((dp += 1) - 1)
-              ((sp += 1) - 1)
-              ((i += 1) - 1)
+              dp += 1
+              sp += 1
+              i += 1
             end
             if (!((sp & 1)).equal?(0))
-              ((sp += 1) - 1)
+              sp += 1
             end
             # word align sp?
             x += len
           end
         else
           the_byte = src[sp]
-          ((sp += 1) - 1)
+          sp += 1
           if (len > (de - dp))
             return -1
           end
           i = 0
           while i < len
             dest[dp] = the_byte
-            ((dp += 1) - 1)
-            ((i += 1) - 1)
+            dp += 1
+            i += 1
           end
           x += len
         end
@@ -610,7 +610,7 @@ module Org::Eclipse::Swt::Internal::Image
       while i < num_colors
         colors[i] = RGB.new(bytes[bytes_offset + 2] & 0xff, bytes[bytes_offset + 1] & 0xff, bytes[bytes_offset] & 0xff)
         bytes_offset += 4
-        ((i += 1) - 1)
+        i += 1
       end
       return PaletteData.new(colors)
     end
@@ -630,7 +630,7 @@ module Org::Eclipse::Swt::Internal::Image
           bytes[offset + 1] = col.attr_green
           bytes[offset + 2] = col.attr_red
           offset += 4
-          ((i += 1) - 1)
+          i += 1
         end
         return bytes
       end
@@ -667,7 +667,7 @@ module Org::Eclipse::Swt::Internal::Image
           buf2offset += line_size
           total_size += line_size
           src_offset -= image_bpl
-          ((y -= 1) + 1)
+          y -= 1
         end
         if (buf2offset > 0)
           out.write(buf2, 0, buf2offset)
@@ -710,7 +710,7 @@ module Org::Eclipse::Swt::Internal::Image
               end
               buf_offset += bmp_bpl
               data_index -= image_bpl
-              ((i += 1) - 1)
+              i += 1
             end
             out.write(buf, 0, buf_offset)
             y += lines_per_buf
@@ -726,7 +726,7 @@ module Org::Eclipse::Swt::Internal::Image
               System.arraycopy(data, data_index, buf, buf_offset, bpl)
               buf_offset += bmp_bpl
               data_index -= image_bpl
-              ((i += 1) - 1)
+              i += 1
             end
             out.write(buf, 0, buf_offset)
             y += lines_per_buf
@@ -836,11 +836,11 @@ module Org::Eclipse::Swt::Internal::Image
           b = data[index + i1]
           data[index + i1] = data[index + i2]
           data[index + i2] = b
-          ((index += 1) - 1)
+          index += 1
         end
         i1 += stride
         i2 -= stride
-        ((i += 1) - 1)
+        i += 1
       end
     end
     

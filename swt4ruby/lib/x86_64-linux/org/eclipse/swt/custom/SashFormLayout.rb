@@ -61,7 +61,7 @@ module Org::Eclipse::Swt::Custom
           end
           height = Math.max(height, size.attr_y)
         end
-        ((i += 1) - 1)
+        i += 1
       end
       # get the ratios
       ratios = Array.typed(::Java::Long).new(c_array.attr_length) { 0 }
@@ -77,7 +77,7 @@ module Org::Eclipse::Swt::Custom
           (data).attr_weight = ratios[i_] = ((200 << 16) + 999) / 1000
         end
         total += ratios[i_]
-        ((i_ += 1) - 1)
+        i_ += 1
       end
       if (ratios[max_index] > 0)
         sashwidth = sash_form.attr_sashes.attr_length > 0 ? sash_form.attr_sash_width + sash_form.attr_sashes[0].get_border_width * 2 : sash_form.attr_sash_width
@@ -124,7 +124,7 @@ module Org::Eclipse::Swt::Custom
           else
             controls[i].set_bounds(area)
           end
-          ((i += 1) - 1)
+          i += 1
         end
         return
       end
@@ -138,7 +138,7 @@ module Org::Eclipse::Swt::Custom
           new_sashes[i].set_background(sash_form.attr_background)
           new_sashes[i].set_foreground(sash_form.attr_foreground)
           new_sashes[i].add_listener(SWT::Selection, sash_form.attr_sash_listener)
-          ((i += 1) - 1)
+          i += 1
         end
         sash_form.attr_sashes = new_sashes
       end
@@ -147,7 +147,7 @@ module Org::Eclipse::Swt::Custom
           i = 0
           while i < sash_form.attr_sashes.attr_length
             sash_form.attr_sashes[i].dispose
-            ((i += 1) - 1)
+            i += 1
           end
           sash_form.attr_sashes = Array.typed(Sash).new(0) { nil }
         else
@@ -156,7 +156,7 @@ module Org::Eclipse::Swt::Custom
           i = controls.attr_length - 1
           while i < sash_form.attr_sashes.attr_length
             sash_form.attr_sashes[i].dispose
-            ((i += 1) - 1)
+            i += 1
           end
           sash_form.attr_sashes = new_sashes
         end
@@ -179,7 +179,7 @@ module Org::Eclipse::Swt::Custom
           (data).attr_weight = ratios[i] = ((200 << 16) + 999) / 1000
         end
         total += ratios[i]
-        ((i += 1) - 1)
+        i += 1
       end
       sashwidth = sashes.attr_length > 0 ? sash_form.attr_sash_width + sashes[0].get_border_width * 2 : sash_form.attr_sash_width
       if ((sash_form.get_orientation).equal?(SWT::HORIZONTAL))
@@ -194,7 +194,7 @@ module Org::Eclipse::Swt::Custom
           width = RJava.cast_to_int((ratios[i_] * (area.attr_width - sashes.attr_length * sashwidth) / total))
           controls[i_].set_bounds(x, area.attr_y, width, area.attr_height)
           x += width
-          ((i_ += 1) - 1)
+          i_ += 1
         end
         if (controls.attr_length > 1)
           sashes[sashes.attr_length - 1].set_bounds(x, area.attr_y, sashwidth, area.attr_height)
@@ -214,7 +214,7 @@ module Org::Eclipse::Swt::Custom
           height = RJava.cast_to_int((ratios[i_] * (area.attr_height - sashes.attr_length * sashwidth) / total))
           controls[i_].set_bounds(area.attr_x, y, area.attr_width, height)
           y += height
-          ((i_ += 1) - 1)
+          i_ += 1
         end
         if (controls.attr_length > 1)
           sashes[sashes.attr_length - 1].set_bounds(area.attr_x, y, area.attr_width, sashwidth)

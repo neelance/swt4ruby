@@ -240,7 +240,7 @@ module Org::Eclipse::Swt::Graphics
         s = data[i]
         source_data[i] = (((s & 0x80) >> 7) | ((s & 0x40) >> 5) | ((s & 0x20) >> 3) | ((s & 0x10) >> 1) | ((s & 0x8) << 1) | ((s & 0x4) << 3) | ((s & 0x2) << 5) | ((s & 0x1) << 7))
         source_data[i] = ~source_data[i]
-        ((i += 1) - 1)
+        i += 1
       end
       source_data = ImageData.convert_pad(source_data, source.attr_width, source.attr_height, source.attr_depth, source.attr_scanline_pad, 1)
       data = mask.attr_data
@@ -249,7 +249,7 @@ module Org::Eclipse::Swt::Graphics
         s = data[i_]
         mask_data[i_] = (((s & 0x80) >> 7) | ((s & 0x40) >> 5) | ((s & 0x20) >> 3) | ((s & 0x10) >> 1) | ((s & 0x8) << 1) | ((s & 0x4) << 3) | ((s & 0x2) << 5) | ((s & 0x1) << 7))
         mask_data[i_] = ~mask_data[i_]
-        ((i_ += 1) - 1)
+        i_ += 1
       end
       mask_data = ImageData.convert_pad(mask_data, mask.attr_width, mask.attr_height, mask.attr_depth, mask.attr_scanline_pad, 1)
       @handle = create_cursor(mask_data, source_data, source.attr_width, source.attr_height, hotspot_x, hotspot_y, true)
@@ -323,13 +323,13 @@ module Org::Eclipse::Swt::Graphics
             while i < rgbs.attr_length
               rgb = rgbs[i]
               if ((rgb).nil?)
-                ((i += 1) - 1)
+                i += 1
                 next
               end
               src_reds[i] = rgb.attr_red
               src_greens[i] = rgb.attr_green
               src_blues[i] = rgb.attr_blue
-              ((i += 1) - 1)
+              i += 1
             end
             ImageData.blit(ImageData::BLIT_SRC, source.attr_data, source.attr_depth, source.attr_bytes_per_line, source.get_byte_order, 0, 0, source.attr_width, source.attr_height, src_reds, src_greens, src_blues, ImageData::ALPHA_OPAQUE, nil, 0, 0, 0, buffer, 32, source.attr_width * 4, ImageData::MSB_FIRST, 0, 0, source.attr_width, source.attr_height, -0x1000000, 0xff0000, 0xff00, false, false)
           end
@@ -345,10 +345,10 @@ module Org::Eclipse::Swt::Graphics
               while x < source.attr_width
                 buffer[offset] = !(((mask_data[mask_offset + (x >> 3)]) & (1 << (7 - (x & 0x7))))).equal?(0) ? 0xff : 0
                 offset += 4
-                ((x += 1) - 1)
+                x += 1
               end
               mask_offset += mask_bpl
-              ((y += 1) - 1)
+              y += 1
             end
           else
             if (!(source.attr_alpha).equal?(-1))
@@ -396,13 +396,13 @@ module Org::Eclipse::Swt::Graphics
             while i < rgbs.attr_length
               rgb = rgbs[i]
               if ((rgb).nil?)
-                ((i += 1) - 1)
+                i += 1
                 next
               end
               src_reds[i] = rgb.attr_red
               src_greens[i] = rgb.attr_green
               src_blues[i] = rgb.attr_blue
-              ((i += 1) - 1)
+              i += 1
             end
             ImageData.blit(ImageData::BLIT_SRC, source.attr_data, source.attr_depth, source.attr_bytes_per_line, source.get_byte_order, 0, 0, source.attr_width, source.attr_height, src_reds, src_greens, src_blues, ImageData::ALPHA_OPAQUE, nil, 0, 0, 0, new_source.attr_data, new_source.attr_depth, new_source.attr_bytes_per_line, new_source.get_byte_order, 0, 0, new_source.attr_width, new_source.attr_height, new_reds, new_greens, new_blues, false, false)
           end
@@ -416,7 +416,7 @@ module Org::Eclipse::Swt::Graphics
         while i < data.attr_length
           s = data[i]
           source_data[i] = (((s & 0x80) >> 7) | ((s & 0x40) >> 5) | ((s & 0x20) >> 3) | ((s & 0x10) >> 1) | ((s & 0x8) << 1) | ((s & 0x4) << 3) | ((s & 0x2) << 5) | ((s & 0x1) << 7))
-          ((i += 1) - 1)
+          i += 1
         end
         source_data = ImageData.convert_pad(source_data, source.attr_width, source.attr_height, source.attr_depth, source.attr_scanline_pad, 1)
         data = mask.attr_data
@@ -424,7 +424,7 @@ module Org::Eclipse::Swt::Graphics
         while i_ < data.attr_length
           s = data[i_]
           mask_data[i_] = (((s & 0x80) >> 7) | ((s & 0x40) >> 5) | ((s & 0x20) >> 3) | ((s & 0x10) >> 1) | ((s & 0x8) << 1) | ((s & 0x4) << 3) | ((s & 0x2) << 5) | ((s & 0x1) << 7))
-          ((i_ += 1) - 1)
+          i_ += 1
         end
         mask_data = ImageData.convert_pad(mask_data, mask.attr_width, mask.attr_height, mask.attr_depth, mask.attr_scanline_pad, 1)
         @handle = create_cursor(source_data, mask_data, source.attr_width, source.attr_height, hotspot_x, hotspot_y, false)

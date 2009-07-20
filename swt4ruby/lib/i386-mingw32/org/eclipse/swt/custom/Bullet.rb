@@ -125,7 +125,7 @@ module Org::Eclipse::Swt::Custom
         i = 0
         while i < line_count
           @lines_indices[i] = start_line + i
-          ((i += 1) - 1)
+          i += 1
         end
       else
         modify_start = 0
@@ -133,14 +133,14 @@ module Org::Eclipse::Swt::Custom
           if (start_line <= @lines_indices[modify_start])
             break
           end
-          ((modify_start += 1) - 1)
+          modify_start += 1
         end
         modify_end = modify_start
         while (modify_end < @count)
           if (start_line + line_count <= @lines_indices[modify_end])
             break
           end
-          ((modify_end += 1) - 1)
+          modify_end += 1
         end
         new_size = modify_start + line_count + @count - modify_end
         if (new_size > @lines_indices.attr_length)
@@ -152,7 +152,7 @@ module Org::Eclipse::Swt::Custom
         i = 0
         while i < line_count
           @lines_indices[modify_start + i] = start_line + i
-          ((i += 1) - 1)
+          i += 1
         end
         @count = new_size
       end
@@ -165,7 +165,7 @@ module Org::Eclipse::Swt::Custom
         if ((@lines_indices[i]).equal?(line_index))
           return i
         end
-        ((i += 1) - 1)
+        i += 1
       end
       return -1
     end
@@ -194,13 +194,13 @@ module Org::Eclipse::Swt::Custom
             if (@lines_indices[j] >= end_line)
               break
             end
-            ((j += 1) - 1)
+            j += 1
           end
           if (update)
             k = j
             while k < @count
               @lines_indices[k] += delta
-              ((k += 1) - 1)
+              k += 1
             end
           end
           redraw_lines = Array.typed(::Java::Int).new(@count - j) { 0 }
@@ -209,12 +209,12 @@ module Org::Eclipse::Swt::Custom
           @count -= (j - i)
           return redraw_lines
         end
-        ((i += 1) - 1)
+        i += 1
       end
       i_ = 0
       while i_ < @count
         @lines_indices[i_] += delta
-        ((i_ += 1) - 1)
+        i_ += 1
       end
       return nil
     end

@@ -345,7 +345,7 @@ module Org::Eclipse::Swt::Layout
         if ((data).nil? || !data.attr_exclude)
           children[((count += 1) - 1)] = children[i]
         end
-        ((i += 1) - 1)
+        i += 1
       end
       if ((count).equal?(0))
         return Point.new(@margin_left + @margin_width * 2 + @margin_right, @margin_top + @margin_height * 2 + @margin_bottom)
@@ -360,7 +360,7 @@ module Org::Eclipse::Swt::Layout
           size = compute_size(child, flush_cache)
           child_width = Math.max(child_width, size.attr_x)
           child_height = Math.max(child_height, size.attr_y)
-          ((i_ += 1) - 1)
+          i_ += 1
         end
         max_height = child_height
       end
@@ -414,7 +414,7 @@ module Org::Eclipse::Swt::Layout
         end
         x += @spacing + child_width
         max_x = Math.max(max_x, x)
-        ((i_ += 1) - 1)
+        i_ += 1
       end
       max_x = Math.max(client_x + @margin_left + @margin_width, max_x - @spacing)
       if (!wrapped)
@@ -441,7 +441,7 @@ module Org::Eclipse::Swt::Layout
                   j = last
                   while j <= i__
                     wrap_x += bounds[j].attr_width + @spacing
-                    ((j += 1) - 1)
+                    j += 1
                   end
                   space = Math.max(0, (width - wrap_x) / (wrap_count + 1))
                   margin = Math.max(0, ((width - wrap_x) % (wrap_count + 1)) / 2)
@@ -458,11 +458,11 @@ module Org::Eclipse::Swt::Layout
                       bounds[j].attr_y += Math.max(0, (wraps[i__] - bounds[j].attr_height) / 2)
                     end
                   end
-                  ((j += 1) - 1)
+                  j += 1
                 end
                 last = i__ + 1
               end
-              ((i__ += 1) - 1)
+              i__ += 1
             end
           end
         end
@@ -481,7 +481,7 @@ module Org::Eclipse::Swt::Layout
             end
           end
           children[i__].set_bounds(bounds[i__])
-          ((i__ += 1) - 1)
+          i__ += 1
         end
       end
       return Point.new(max_x, y + max_height + @margin_bottom + @margin_height)
@@ -498,7 +498,7 @@ module Org::Eclipse::Swt::Layout
         if ((data).nil? || !data.attr_exclude)
           children[((count += 1) - 1)] = children[i]
         end
-        ((i += 1) - 1)
+        i += 1
       end
       if ((count).equal?(0))
         return Point.new(@margin_left + @margin_width * 2 + @margin_right, @margin_top + @margin_height * 2 + @margin_bottom)
@@ -513,7 +513,7 @@ module Org::Eclipse::Swt::Layout
           size = compute_size(child, flush_cache)
           child_width = Math.max(child_width, size.attr_x)
           child_height = Math.max(child_height, size.attr_y)
-          ((i_ += 1) - 1)
+          i_ += 1
         end
         max_width = child_width
       end
@@ -567,7 +567,7 @@ module Org::Eclipse::Swt::Layout
         end
         y += @spacing + child_height
         max_y = Math.max(max_y, y)
-        ((i_ += 1) - 1)
+        i_ += 1
       end
       max_y = Math.max(client_y + @margin_top + @margin_height, max_y - @spacing)
       if (!wrapped)
@@ -594,7 +594,7 @@ module Org::Eclipse::Swt::Layout
                   j = last
                   while j <= i__
                     wrap_y += bounds[j].attr_height + @spacing
-                    ((j += 1) - 1)
+                    j += 1
                   end
                   space = Math.max(0, (height - wrap_y) / (wrap_count + 1))
                   margin = Math.max(0, ((height - wrap_y) % (wrap_count + 1)) / 2)
@@ -611,11 +611,11 @@ module Org::Eclipse::Swt::Layout
                       bounds[j].attr_x += Math.max(0, (wraps[i__] - bounds[j].attr_width) / 2)
                     end
                   end
-                  ((j += 1) - 1)
+                  j += 1
                 end
                 last = i__ + 1
               end
-              ((i__ += 1) - 1)
+              i__ += 1
             end
           end
         end
@@ -634,7 +634,7 @@ module Org::Eclipse::Swt::Layout
             end
           end
           children[i__].set_bounds(bounds[i__])
-          ((i__ += 1) - 1)
+          i__ += 1
         end
       end
       return Point.new(x + max_width + @margin_right + @margin_width, max_y)

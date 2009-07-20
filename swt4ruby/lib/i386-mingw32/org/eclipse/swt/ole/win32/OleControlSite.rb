@@ -303,7 +303,7 @@ module Org::Eclipse::Swt::Ole::Win32
                     end
                   end
                 end
-                ((i += 1) - 1)
+                i += 1
               end
             end
             class_info._release
@@ -398,7 +398,7 @@ module Org::Eclipse::Swt::Ole::Win32
             break
           end
         end
-        ((i += 1) - 1)
+        i += 1
       end
       if (!(index).equal?(-1))
         @ole_event_sink[index].add_listener(event_id, listener)
@@ -580,7 +580,7 @@ module Org::Eclipse::Swt::Ole::Win32
         sink = @ole_event_sink[i]
         sink.disconnect
         sink._release
-        ((i += 1) - 1)
+        i += 1
       end
       @ole_event_sink = Array.typed(OleEventSink).new(0) { nil }
       @ole_event_sink_guid = Array.typed(GUID).new(0) { nil }
@@ -717,7 +717,7 @@ module Org::Eclipse::Swt::Ole::Win32
         if ((@site_property_ids[i]).equal?(disp_id))
           return @site_property_values[i]
         end
-        ((i += 1) - 1)
+        i += 1
       end
       return nil
     end
@@ -930,7 +930,7 @@ module Org::Eclipse::Swt::Ole::Win32
         i = 0
         while i < @site_property_ids.attr_length
           @site_property_values[i].dispose
-          ((i += 1) - 1)
+          i += 1
         end
         @site_property_ids = Array.typed(::Java::Int).new(0) { 0 }
         @site_property_values = Array.typed(Variant).new(0) { nil }
@@ -1058,7 +1058,7 @@ module Org::Eclipse::Swt::Ole::Win32
             return
           end
         end
-        ((i += 1) - 1)
+        i += 1
       end
     end
     
@@ -1154,7 +1154,7 @@ module Org::Eclipse::Swt::Ole::Win32
           end
           return
         end
-        ((i += 1) - 1)
+        i += 1
       end
       old_length = @site_property_ids.attr_length
       new_site_property_ids = Array.typed(::Java::Int).new(old_length + 1) { 0 }

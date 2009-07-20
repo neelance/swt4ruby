@@ -120,7 +120,7 @@ module Org::Eclipse::Swt::Internal::Image
         while i < num_grays
           intensity = ((i * 3) * 256 / n)
           colors[i] = RGB.new(intensity, intensity, intensity)
-          ((i += 1) - 1)
+          i += 1
         end
         return PaletteData.new(colors)
       end
@@ -476,7 +476,7 @@ module Org::Eclipse::Swt::Internal::Image
       i = 0
       while i < num_colors
         colors[i] = RGB.new(bytes[i * 3] & 0xff, bytes[i * 3 + 1] & 0xff, bytes[i * 3 + 2] & 0xff)
-        ((i += 1) - 1)
+        i += 1
       end
       return PaletteData.new(colors)
     end
@@ -518,12 +518,12 @@ module Org::Eclipse::Swt::Internal::Image
                 if (!((rgbs[j].attr_red).equal?(colors[j].attr_red) && (rgbs[j].attr_green).equal?(colors[j].attr_green) && (rgbs[j].attr_blue).equal?(colors[j].attr_blue)))
                   global_table = 0
                 end
-                ((j += 1) - 1)
+                j += 1
               end
             end
           end
         end
-        ((i += 1) - 1)
+        i += 1
       end
       begin
         # Step 3: Write the GIF89a Header and Logical Screen Descriptor.
@@ -595,7 +595,7 @@ module Org::Eclipse::Swt::Internal::Image
           SWT.error(SWT::ERROR_IO, e)
         end
         LZWCodec.new.encode(self.attr_output_stream, data[frame])
-        ((frame += 1) - 1)
+        frame += 1
       end
       # Step 10: Write GIF terminator.
       begin
@@ -648,7 +648,7 @@ module Org::Eclipse::Swt::Internal::Image
         bytes[offset + 1] = color.attr_green
         bytes[offset + 2] = color.attr_blue
         offset += 3
-        ((i += 1) - 1)
+        i += 1
       end
       begin
         self.attr_output_stream.write(bytes)

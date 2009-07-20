@@ -373,7 +373,7 @@ module Org::Eclipse::Swt::Widgets
           @menus[i] = menu
           return
         end
-        ((i += 1) - 1)
+        i += 1
       end
       new_menus = Array.typed(Menu).new(@menus.attr_length + 4) { nil }
       new_menus[@menus.attr_length] = menu
@@ -605,11 +605,11 @@ module Org::Eclipse::Swt::Widgets
               if ((menu).equal?(@menu_bar) && item.fill_accel(accel))
                 OS._move_memory(buffer1, accel, ACCEL.attr_sizeof)
                 System.arraycopy(buffer1, 0, buffer2, @n_accel * ACCEL.attr_sizeof, ACCEL.attr_sizeof)
-                ((@n_accel += 1) - 1)
+                @n_accel += 1
               end
             end
           end
-          ((i += 1) - 1)
+          i += 1
         end
       end
       if (OS::IsPPC)
@@ -620,7 +620,7 @@ module Org::Eclipse::Swt::Widgets
         accel.attr_cmd = RJava.cast_to_short(OS::IDOK)
         OS._move_memory(buffer1, accel, ACCEL.attr_sizeof)
         System.arraycopy(buffer1, 0, buffer2, @n_accel * ACCEL.attr_sizeof, ACCEL.attr_sizeof)
-        ((@n_accel += 1) - 1)
+        @n_accel += 1
       end
       if (!(@n_accel).equal?(0))
         @h_accel = OS._create_accelerator_table(buffer2, @n_accel)
@@ -681,7 +681,7 @@ module Org::Eclipse::Swt::Widgets
         if (!(menu).nil? && (h_menu).equal?(menu.attr_handle))
           return menu
         end
-        ((i += 1) - 1)
+        i += 1
       end
       return nil
     end
@@ -711,7 +711,7 @@ module Org::Eclipse::Swt::Widgets
             control.set_menu(nil)
             return
           end
-          ((index += 1) - 1)
+          index += 1
         end
         menu.fix_menus(new_decorations)
         destroy_accelerators
@@ -1028,7 +1028,7 @@ module Org::Eclipse::Swt::Widgets
           if (!(menu).nil? && !menu.is_disposed)
             menu.dispose
           end
-          ((i += 1) - 1)
+          i += 1
         end
         @menus = nil
       end
@@ -1064,7 +1064,7 @@ module Org::Eclipse::Swt::Widgets
           @menus[i] = nil
           return
         end
-        ((i += 1) - 1)
+        i += 1
       end
     end
     
@@ -1274,7 +1274,7 @@ module Org::Eclipse::Swt::Widgets
             i = 0
             while i < datas.attr_length
               datas[i] = images[i].get_image_data
-              ((i += 1) - 1)
+              i += 1
             end
             images = best_images
             sort(images, datas, OS._get_system_metrics(OS::SM_CXSMICON), OS._get_system_metrics(OS::SM_CYSMICON), depth)
@@ -1352,7 +1352,7 @@ module Org::Eclipse::Swt::Widgets
         if ((images[i]).nil? || images[i].is_disposed)
           error(SWT::ERROR_INVALID_ARGUMENT)
         end
-        ((i += 1) - 1)
+        i += 1
       end
       @images = images
       set_images(nil, images)
@@ -1625,7 +1625,7 @@ module Org::Eclipse::Swt::Widgets
               break
             end
           end
-          ((index += 1) - 1)
+          index += 1
         end
         if (!(index).equal?(new_count))
           OS._delete_menu(h_menu, index - 1, OS::MF_BYPOSITION)
@@ -1783,7 +1783,7 @@ module Org::Eclipse::Swt::Widgets
             end
             j -= gap
           end
-          ((i += 1) - 1)
+          i += 1
         end
         gap /= 2
       end
@@ -1859,7 +1859,7 @@ module Org::Eclipse::Swt::Widgets
         if ((children[index]).equal?(self))
           break
         end
-        ((index += 1) - 1)
+        index += 1
       end
       # It is possible (but unlikely), that application
       # code could have disposed the widget in focus in

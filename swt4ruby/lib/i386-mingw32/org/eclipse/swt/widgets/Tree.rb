@@ -831,7 +831,7 @@ module Org::Eclipse::Swt::Widgets
                   while j < @column_count
                     OS._send_message(@hwnd_header, OS::HDM_GETITEM, j, hd_item)
                     total_width += hd_item.attr_cxy
-                    ((j += 1) - 1)
+                    j += 1
                   end
                   if (total_width > client_rect.attr_right - client_rect.attr_left)
                     p_rect.attr_left = 0
@@ -899,8 +899,8 @@ module Org::Eclipse::Swt::Widgets
                 draw_item = draw_text = draw_background = true
                 rect = item.get_bounds(index, true, false, false, false, true, h_dc)
                 if (@lines_visible)
-                  ((rect.attr_right += 1) - 1)
-                  ((rect.attr_bottom += 1) - 1)
+                  rect.attr_right += 1
+                  rect.attr_bottom += 1
                 end
               end
             end
@@ -1093,7 +1093,7 @@ module Org::Eclipse::Swt::Widgets
                           while j < @column_count
                             OS._send_message(@hwnd_header, OS::HDM_GETITEM, j, hd_item)
                             total_width += hd_item.attr_cxy
-                            ((j += 1) - 1)
+                            j += 1
                           end
                           if (total_width > client_rect.attr_right - client_rect.attr_left)
                             p_rect.attr_left = 0
@@ -1340,7 +1340,7 @@ module Org::Eclipse::Swt::Widgets
         if (x > client_rect.attr_right)
           break
         end
-        ((i += 1) - 1)
+        i += 1
       end
       if (@lines_visible)
         if (!((self.attr_style & SWT::FULL_SELECTION)).equal?(0))
@@ -1686,9 +1686,9 @@ module Org::Eclipse::Swt::Widgets
           end
           # TODO - bug in Windows selection or SWT itemRect
           # if (selected)
-          ((item_rect.attr_right += 1) - 1)
+          item_rect.attr_right += 1
           if (@lines_visible)
-            ((item_rect.attr_bottom += 1) - 1)
+            item_rect.attr_bottom += 1
           end
           if (!(clip_rect).nil?)
             OS._intersect_clip_rect(h_dc, clip_rect.attr_left, clip_rect.attr_top, clip_rect.attr_right, clip_rect.attr_bottom)
@@ -1917,7 +1917,7 @@ module Org::Eclipse::Swt::Widgets
               OS._set_rect(rect, x, nmcd.attr_top, x + hd_item.attr_cxy, nmcd.attr_bottom)
               OS._draw_edge(h_dc, rect, OS::BDR_SUNKENINNER, OS::BF_RIGHT)
               x += hd_item.attr_cxy
-              ((i += 1) - 1)
+              i += 1
             end
           end
           height = 0
@@ -2288,7 +2288,7 @@ module Org::Eclipse::Swt::Widgets
             item.clear
             redraw_ = true
           end
-          ((i += 1) - 1)
+          i += 1
         end
         if (redraw_)
           OS._invalidate_rect(self.attr_handle, nil, true)
@@ -2343,7 +2343,7 @@ module Org::Eclipse::Swt::Widgets
         while i < @column_count
           OS._send_message(@hwnd_header, OS::HDM_GETITEM, i, hd_item)
           width += hd_item.attr_cxy
-          ((i += 1) - 1)
+          i += 1
         end
         rect = RECT.new
         OS._get_window_rect(@hwnd_header, rect)
@@ -2541,7 +2541,7 @@ module Org::Eclipse::Swt::Widgets
             item.attr_cell_font = temp
           end
         end
-        ((i += 1) - 1)
+        i += 1
       end
       System.arraycopy(@columns, index, @columns, index + 1, ((@column_count += 1) - 1) - index)
       @columns[index] = column
@@ -2630,7 +2630,7 @@ module Org::Eclipse::Swt::Widgets
       if (!(item).nil?)
         id = @last_id < @items.attr_length ? @last_id : 0
         while (id < @items.attr_length && !(@items[id]).nil?)
-          ((id += 1) - 1)
+          id += 1
         end
         if ((id).equal?(@items.attr_length))
           # Grow the array faster when redraw is off or the
@@ -2699,7 +2699,7 @@ module Org::Eclipse::Swt::Widgets
         end
       end
       if ((h_first_item).equal?(@h_first_index_of) && !(@item_count).equal?(-1))
-        ((@item_count += 1) - 1)
+        @item_count += 1
       end
       if ((h_item).equal?(0))
         # Bug in Windows.  When a child item is added to a parent item
@@ -2976,7 +2976,7 @@ module Org::Eclipse::Swt::Widgets
               tv_item.attr_h_item = item.attr_handle
               OS._send_message(self.attr_handle, OS::TVM_SETITEM, 0, tv_item)
             end
-            ((i += 1) - 1)
+            i += 1
           end
         end
         OS._set_window_long_ptr(self.attr_handle, OS::GWLP_WNDPROC, old_proc)
@@ -2993,7 +2993,7 @@ module Org::Eclipse::Swt::Widgets
         if ((@columns[index]).equal?(column))
           break
         end
-        ((index += 1) - 1)
+        index += 1
       end
       old_order = Array.typed(::Java::Int).new(@column_count) { 0 }
       OS._send_message(@hwnd_header, OS::HDM_GETORDERARRAY, @column_count, old_order)
@@ -3002,7 +3002,7 @@ module Org::Eclipse::Swt::Widgets
         if ((old_order[order_index]).equal?(index))
           break
         end
-        ((order_index += 1) - 1)
+        order_index += 1
       end
       header_rect = RECT.new
       OS._send_message(@hwnd_header, OS::HDM_GETITEMRECT, index, header_rect)
@@ -3073,7 +3073,7 @@ module Org::Eclipse::Swt::Widgets
             end
           end
         end
-        ((i += 1) - 1)
+        i += 1
       end
       # When the last column is deleted, show the horizontal
       # scroll bar.  Otherwise, left align the first column
@@ -3118,14 +3118,14 @@ module Org::Eclipse::Swt::Widgets
         while i_ < new_order.attr_length
           new_columns[i_ - order_index] = @columns[new_order[i_]]
           new_columns[i_ - order_index].update_tool_tip(new_order[i_])
-          ((i_ += 1) - 1)
+          i_ += 1
         end
         i__ = 0
         while i__ < new_columns.attr_length
           if (!new_columns[i__].is_disposed)
             new_columns[i__].send_event(SWT::Move)
           end
-          ((i__ += 1) - 1)
+          i__ += 1
         end
       end
       # Remove the tool tip item for the header
@@ -3362,7 +3362,7 @@ module Org::Eclipse::Swt::Widgets
             OS._select_object(h_dc, h_font)
           end
           if (!found)
-            ((index[0] += 1) - 1)
+            index[0] += 1
           end
         end
         if (!(new_font).equal?(0))
@@ -3412,7 +3412,7 @@ module Org::Eclipse::Swt::Widgets
         next_index = @last_index_of + 1
         while (!(h_next_item).equal?(0) && !(h_next_item).equal?(h_item))
           h_next_item = OS._send_message(self.attr_handle, OS::TVM_GETNEXTITEM, OS::TVGN_NEXT, h_next_item)
-          ((next_index += 1) - 1)
+          next_index += 1
         end
         if ((h_next_item).equal?(h_item))
           @h_last_index_of = h_next_item
@@ -3425,7 +3425,7 @@ module Org::Eclipse::Swt::Widgets
       h_next_item = h_first_item
       while (!(h_next_item).equal?(0) && !(h_next_item).equal?(h_item))
         h_next_item = OS._send_message(self.attr_handle, OS::TVM_GETNEXTITEM, OS::TVGN_NEXT, h_next_item)
-        ((index += 1) - 1)
+        index += 1
       end
       if ((h_next_item).equal?(h_item))
         @item_count = -1
@@ -3462,7 +3462,7 @@ module Org::Eclipse::Swt::Widgets
           return @h_last_index_of = OS._send_message(self.attr_handle, OS::TVM_GETNEXTITEM, OS::TVGN_PREVIOUS, @h_last_index_of)
         end
         if ((@last_index_of + 1).equal?(index))
-          ((@last_index_of += 1) - 1)
+          @last_index_of += 1
           return @h_last_index_of = OS._send_message(self.attr_handle, OS::TVM_GETNEXTITEM, OS::TVGN_NEXT, @h_last_index_of)
         end
         if (index < @last_index_of)
@@ -3483,7 +3483,7 @@ module Org::Eclipse::Swt::Widgets
           h_next_item = OS._send_message(self.attr_handle, OS::TVM_GETNEXTITEM, OS::TVGN_NEXT, @h_last_index_of)
           while (!(h_next_item).equal?(0) && next_index < index)
             h_next_item = OS._send_message(self.attr_handle, OS::TVM_GETNEXTITEM, OS::TVGN_NEXT, h_next_item)
-            ((next_index += 1) - 1)
+            next_index += 1
           end
           if ((index).equal?(next_index))
             @last_index_of = next_index
@@ -3497,7 +3497,7 @@ module Org::Eclipse::Swt::Widgets
       h_next_item = h_first_item
       while (!(h_next_item).equal?(0) && next_index < index)
         h_next_item = OS._send_message(self.attr_handle, OS::TVM_GETNEXTITEM, OS::TVGN_NEXT, h_next_item)
-        ((next_index += 1) - 1)
+        next_index += 1
       end
       if ((index).equal?(next_index))
         @item_count = -1
@@ -3606,7 +3606,7 @@ module Org::Eclipse::Swt::Widgets
           return h_item
         end
         h_item = h_next_item
-        ((index += 1) - 1)
+        index += 1
       end
       return h_item
     end
@@ -3884,7 +3884,7 @@ module Org::Eclipse::Swt::Widgets
       end
       while (!(h_first_item).equal?(0))
         h_first_item = OS._send_message(self.attr_handle, OS::TVM_GETNEXTITEM, OS::TVGN_NEXT, h_first_item)
-        ((count += 1) - 1)
+        count += 1
       end
       if ((h_item).equal?(@h_first_index_of))
         @item_count = count
@@ -3942,7 +3942,7 @@ module Org::Eclipse::Swt::Widgets
       h_item = h_tree_item
       while (!(h_item).equal?(0))
         h_item = OS._send_message(self.attr_handle, OS::TVM_GETNEXTITEM, OS::TVGN_NEXT, h_item)
-        ((count += 1) - 1)
+        count += 1
       end
       index = 0
       result = Array.typed(TreeItem).new(count) { nil }
@@ -4051,7 +4051,7 @@ module Org::Eclipse::Swt::Widgets
               # 64
               selection[index] = __get_item(h_item, RJava.cast_to_int(tv_item.attr_l_param))
             end
-            ((index += 1) - 1)
+            index += 1
           end
         else
           # 64
@@ -4063,7 +4063,7 @@ module Org::Eclipse::Swt::Widgets
               # 64
               selection[index] = __get_item(h_item, RJava.cast_to_int(tv_item.attr_l_param))
             end
-            ((index += 1) - 1)
+            index += 1
           end
         end
         if ((index).equal?(count))
@@ -4152,10 +4152,10 @@ module Org::Eclipse::Swt::Widgets
               if (count < guess.attr_length)
                 guess[count] = item
               end
-              ((count += 1) - 1)
+              count += 1
             end
           end
-          ((i += 1) - 1)
+          i += 1
         end
       end
       OS._set_window_long_ptr(self.attr_handle, OS::GWLP_WNDPROC, old_proc)
@@ -4245,10 +4245,10 @@ module Org::Eclipse::Swt::Widgets
               state = RJava.cast_to_int(OS._send_message(self.attr_handle, OS::TVM_GETITEMSTATE, h_item, OS::TVIS_SELECTED))
             end
             if (!((state & OS::TVIS_SELECTED)).equal?(0))
-              ((count += 1) - 1)
+              count += 1
             end
           end
-          ((i += 1) - 1)
+          i += 1
         end
       end
       OS._set_window_long_ptr(self.attr_handle, OS::GWLP_WNDPROC, old_proc)
@@ -4464,7 +4464,7 @@ module Org::Eclipse::Swt::Widgets
         if ((@columns[i]).equal?(column))
           return i
         end
-        ((i += 1) - 1)
+        i += 1
       end
       return -1
     end
@@ -4607,7 +4607,7 @@ module Org::Eclipse::Swt::Widgets
               end
             end
             h_item = OS._send_message(self.attr_handle, OS::TVM_GETNEXTITEM, OS::TVGN_NEXTVISIBLE, h_item)
-            ((index += 1) - 1)
+            index += 1
           end
         end
       end
@@ -4679,7 +4679,7 @@ module Org::Eclipse::Swt::Widgets
           if (!(item).nil? && !item.is_disposed)
             item.release(false)
           end
-          ((i += 1) - 1)
+          i += 1
         end
         @items = nil
       end
@@ -4690,7 +4690,7 @@ module Org::Eclipse::Swt::Widgets
           if (!(column).nil? && !column.is_disposed)
             column.release(false)
           end
-          ((i += 1) - 1)
+          i += 1
         end
         @columns = nil
       end
@@ -4751,7 +4751,7 @@ module Org::Eclipse::Swt::Widgets
         if (!(item).nil? && !item.is_disposed)
           item.release(false)
         end
-        ((i += 1) - 1)
+        i += 1
       end
       @ignore_deselect = @ignore_select = true
       redraw_ = (self.attr_draw_count).equal?(0) && OS._is_window_visible(self.attr_handle)
@@ -4905,7 +4905,7 @@ module Org::Eclipse::Swt::Widgets
       item_count = 0
       while (!(h_item).equal?(0) && item_count < count)
         h_item = OS._send_message(self.attr_handle, OS::TVM_GETNEXTITEM, OS::TVGN_NEXT, h_item)
-        ((item_count += 1) - 1)
+        item_count += 1
       end
       expanded = false
       tv_item = TVITEM.new
@@ -4950,7 +4950,7 @@ module Org::Eclipse::Swt::Widgets
           if (expanded)
             @ignore_shrink = false
           end
-          ((i += 1) - 1)
+          i += 1
         end
       else
         @shrink = true
@@ -4961,7 +4961,7 @@ module Org::Eclipse::Swt::Widgets
         i = item_count
         while i < count
           TreeItem.new(self, SWT::NONE, h_parent, OS::TVI_LAST, 0)
-          ((i += 1) - 1)
+          i += 1
         end
       end
       if (redraw_)
@@ -5172,7 +5172,7 @@ module Org::Eclipse::Swt::Widgets
             tv_item.attr_h_item = item.attr_handle
             OS._send_message(self.attr_handle, OS::TVM_SETITEM, 0, tv_item)
           end
-          ((i += 1) - 1)
+          i += 1
         end
       end
       OS._set_window_long_ptr(self.attr_handle, OS::GWLP_WNDPROC, old_proc)
@@ -5405,7 +5405,7 @@ module Org::Eclipse::Swt::Widgets
         if (!(index).equal?(old_order[i]))
           reorder = true
         end
-        ((i += 1) - 1)
+        i += 1
       end
       if (reorder)
         old_rects = Array.typed(RECT).new(@column_count) { nil }
@@ -5413,7 +5413,7 @@ module Org::Eclipse::Swt::Widgets
         while i_ < @column_count
           old_rects[i_] = RECT.new
           OS._send_message(@hwnd_header, OS::HDM_GETITEMRECT, i_, old_rects[i_])
-          ((i_ += 1) - 1)
+          i_ += 1
         end
         OS._send_message(@hwnd_header, OS::HDM_SETORDERARRAY, order.attr_length, order)
         OS._invalidate_rect(self.attr_handle, nil, true)
@@ -5431,7 +5431,7 @@ module Org::Eclipse::Swt::Widgets
               column.send_event(SWT::Move)
             end
           end
-          ((i__ += 1) - 1)
+          i__ += 1
         end
       end
     end
@@ -5692,7 +5692,7 @@ module Org::Eclipse::Swt::Widgets
         hd_item.attr_mask = OS::HDI_WIDTH
         OS._send_message(@hwnd_header, OS::HDM_GETITEM, i, hd_item)
         width += hd_item.attr_cxy
-        ((i += 1) - 1)
+        i += 1
       end
       set_scroll_width(Math.max(@scroll_width, width))
     end
@@ -5769,7 +5769,7 @@ module Org::Eclipse::Swt::Widgets
           if (!(item).nil? && (item.attr_handle).equal?(h_item))
             break
           end
-          ((index += 1) - 1)
+          index += 1
         end
         tv_item.attr_h_item = h_item
         OS._send_message(self.attr_handle, OS::TVM_GETITEM, 0, tv_item)
@@ -5928,7 +5928,7 @@ module Org::Eclipse::Swt::Widgets
               if ((items[index]).equal?(item))
                 break
               end
-              ((index += 1) - 1)
+              index += 1
             end
             tv_item.attr_h_item = item.attr_handle
             OS._send_message(self.attr_handle, OS::TVM_GETITEM, 0, tv_item)
@@ -5944,7 +5944,7 @@ module Org::Eclipse::Swt::Widgets
               end
             end
           end
-          ((i += 1) - 1)
+          i += 1
         end
       end
       OS._set_window_long_ptr(self.attr_handle, OS::GWLP_WNDPROC, old_proc)
@@ -6297,7 +6297,7 @@ module Org::Eclipse::Swt::Widgets
                 break
               end
             end
-            ((index += 1) - 1)
+            index += 1
           end
         end
         OS._set_window_long_ptr(self.attr_handle, OS::GWLP_WNDPROC, old_proc)
@@ -6388,7 +6388,7 @@ module Org::Eclipse::Swt::Widgets
           if ((column.attr_id).equal?(hdr.attr_id_from))
             return column.attr_tool_tip_text
           end
-          ((i += 1) - 1)
+          i += 1
         end
         return super(hdr)
       end
@@ -6481,7 +6481,7 @@ module Org::Eclipse::Swt::Widgets
           lpti.attr_bottom = rect.attr_bottom
           OS._send_message(@header_tool_tip_handle, OS::TTM_ADDTOOL, 0, lpti)
         end
-        ((i += 1) - 1)
+        i += 1
       end
     end
     
@@ -6512,7 +6512,7 @@ module Org::Eclipse::Swt::Widgets
             break
           end
         end
-        ((i += 1) - 1)
+        i += 1
       end
       # Feature in Windows.  When setting the same image list multiple
       # times, Windows does work making this operation slow.  The fix
@@ -6812,7 +6812,7 @@ module Org::Eclipse::Swt::Widgets
             OS._combine_rgn(h_rgn, h_rgn, rect_rgn, OS::RGN_OR)
             OS._delete_object(rect_rgn)
             rect.attr_bottom = item_rect.attr_bottom
-            ((i += 1) - 1)
+            i += 1
           end
           OS._get_rgn_box(h_rgn, rect)
           # Create resources
@@ -6900,7 +6900,7 @@ module Org::Eclipse::Swt::Widgets
             OS._send_message(self.attr_handle, OS::TVM_GETITEM, 0, tv_item)
             state = tv_item.attr_state >> 12
             if (!((state & 0x1)).equal?(0))
-              ((state += 1) - 1)
+              state += 1
             else
               (state -= 1)
             end
@@ -7047,7 +7047,7 @@ module Org::Eclipse::Swt::Widgets
                 if (!column.is_disposed && column.get_resizable)
                   column.pack
                 end
-                ((i += 1) - 1)
+                i += 1
               end
             end
           end
@@ -7283,7 +7283,7 @@ module Org::Eclipse::Swt::Widgets
             OS._send_message(self.attr_handle, OS::TVM_GETITEM, 0, tv_item)
             state = tv_item.attr_state >> 12
             if (!((state & 0x1)).equal?(0))
-              ((state += 1) - 1)
+              state += 1
             else
               (state -= 1)
             end
@@ -7476,7 +7476,7 @@ module Org::Eclipse::Swt::Widgets
           OS._send_message(self.attr_handle, OS::TVM_GETITEM, 0, tv_item)
           state = tv_item.attr_state >> 12
           if (!((state & 0x1)).equal?(0))
-            ((state += 1) - 1)
+            state += 1
           else
             (state -= 1)
           end
@@ -7718,7 +7718,7 @@ module Org::Eclipse::Swt::Widgets
                   tv_item.attr_h_item = item.attr_handle
                   OS._send_message(self.attr_handle, OS::TVM_SETITEM, 0, tv_item)
                 end
-                ((i += 1) - 1)
+                i += 1
               end
             end
             tv_item.attr_h_item = h_new_item
@@ -7927,7 +7927,7 @@ module Org::Eclipse::Swt::Widgets
           end
           (count -= 1)
         end
-        ((count += 1) - 1)
+        count += 1
         if (@items.attr_length > 4 && @items.attr_length - count > 3)
           length_ = Math.max(4, (count + 3) / 4 * 4)
           new_items = Array.typed(TreeItem).new(length_) { nil }
@@ -8710,7 +8710,7 @@ module Org::Eclipse::Swt::Widgets
             while i < @column_count
               column = @columns[i]
               column.update_tool_tip(i)
-              ((i += 1) - 1)
+              i += 1
             end
             update_image_list
           end
@@ -8742,7 +8742,7 @@ module Org::Eclipse::Swt::Widgets
                 if ((order[index]).equal?(phdn.attr_i_item))
                   break
                 end
-                ((index += 1) - 1)
+                index += 1
               end
               if ((index).equal?(order.attr_length))
                 index = 0
@@ -8767,7 +8767,7 @@ module Org::Eclipse::Swt::Widgets
                 if (!column.is_disposed)
                   column.post_event(SWT::Move)
                 end
-                ((i += 1) - 1)
+                i += 1
               end
             end
           end
@@ -8849,7 +8849,7 @@ module Org::Eclipse::Swt::Widgets
                   if ((next_column).equal?(column))
                     moved = true
                   end
-                  ((i += 1) - 1)
+                  i += 1
                 end
               end
             end

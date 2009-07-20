@@ -635,7 +635,7 @@ module Org::Eclipse::Swt::Widgets
           if ((tab_list[index]).equal?(self))
             break
           end
-          ((index += 1) - 1)
+          index += 1
         end
         if ((index).equal?(tab_list.attr_length))
           if (is_tab_group)
@@ -2186,7 +2186,7 @@ module Org::Eclipse::Swt::Widgets
         # long
         relation = ATK.atk_relation_set_get_relation(set, 0)
         ATK.atk_relation_set_remove(set, relation)
-        ((i += 1) - 1)
+        i += 1
       end
       OS.g_object_unref(set)
     end
@@ -2782,7 +2782,7 @@ module Org::Eclipse::Swt::Widgets
       shell = get_shell
       control = self
       while (!(control).equal?(shell))
-        ((count += 1) - 1)
+        count += 1
         control = control.attr_parent
       end
       control = self
@@ -3561,7 +3561,7 @@ module Org::Eclipse::Swt::Widgets
           if ((tab_list[i]).equal?(self))
             return true
           end
-          ((i += 1) - 1)
+          i += 1
         end
       end
       code = traversal_code(0, nil)
@@ -3580,7 +3580,7 @@ module Org::Eclipse::Swt::Widgets
           if ((tab_list[i]).equal?(self))
             return false
           end
-          ((i += 1) - 1)
+          i += 1
         end
       end
       code = traversal_code(0, nil)
@@ -3790,7 +3790,7 @@ module Org::Eclipse::Swt::Widgets
           if ((children[index]).equal?(self))
             break
           end
-          ((index += 1) - 1)
+          index += 1
         end
         if (0 < index && (index + 1) < children.attr_length)
           next_ = children[index + 1]
@@ -4729,14 +4729,14 @@ module Org::Eclipse::Swt::Widgets
           if ((children[index]).equal?(self))
             break
           end
-          ((index += 1) - 1)
+          index += 1
         end
         if (!(sibling).nil?)
           while (sibling_index < children.attr_length)
             if ((children[sibling_index]).equal?(sibling))
               break
             end
-            ((sibling_index += 1) - 1)
+            sibling_index += 1
           end
         end
         # remove "Labelled by" relationships that will no longer be valid
@@ -4853,7 +4853,7 @@ module Org::Eclipse::Swt::Widgets
         end
         if (!(old_next_index).equal?(-1))
           if (old_next_index <= index)
-            ((old_next_index -= 1) + 1)
+            old_next_index -= 1
           end
           # the last two conditions below ensure that duplicate relations are not hooked
           if (0 < old_next_index && !(old_next_index).equal?(index) && !(old_next_index).equal?(index + 1))
@@ -4935,7 +4935,7 @@ module Org::Eclipse::Swt::Widgets
             end
             j -= gap
           end
-          ((i += 1) - 1)
+          i += 1
         end
         gap /= 2
       end
@@ -5125,7 +5125,7 @@ module Org::Eclipse::Swt::Widgets
         if ((list[index]).equal?(group))
           break
         end
-        ((index += 1) - 1)
+        index += 1
       end
       # It is possible (but unlikely), that application
       # code could have disposed the widget in focus in
@@ -5157,7 +5157,7 @@ module Org::Eclipse::Swt::Widgets
         if ((children[index]).equal?(self))
           break
         end
-        ((index += 1) - 1)
+        index += 1
       end
       # It is possible (but unlikely), that application
       # code could have disposed the widget in focus in

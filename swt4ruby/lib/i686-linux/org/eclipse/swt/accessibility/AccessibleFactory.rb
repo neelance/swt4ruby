@@ -296,7 +296,7 @@ module Org::Eclipse::Swt::Accessibility
         i = 0
         while i < listeners.attr_length
           listeners[i].get_role(event)
-          ((i += 1) - 1)
+          i += 1
         end
         action = false
         hypertext = false
@@ -310,7 +310,7 @@ module Org::Eclipse::Swt::Accessibility
               action = true
               break
             end
-            ((i_ += 1) - 1)
+            i_ += 1
           end
           i__ = 0
           while i__ < HypertextRoles.attr_length
@@ -318,7 +318,7 @@ module Org::Eclipse::Swt::Accessibility
               hypertext = true
               break
             end
-            ((i__ += 1) - 1)
+            i__ += 1
           end
           i___ = 0
           while i___ < SelectionRoles.attr_length
@@ -326,7 +326,7 @@ module Org::Eclipse::Swt::Accessibility
               selection = true
               break
             end
-            ((i___ += 1) - 1)
+            i___ += 1
           end
           i____ = 0
           while i____ < TextRoles.attr_length
@@ -334,7 +334,7 @@ module Org::Eclipse::Swt::Accessibility
               text = true
               break
             end
-            ((i____ += 1) - 1)
+            i____ += 1
           end
         else
           action = hypertext = selection = text = true

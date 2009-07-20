@@ -419,7 +419,7 @@ module Org::Eclipse::Swt::Widgets
             max_ = Math.max(max_, calculate_width(item.attr_child_ids, index, gc, max_))
           end
         end
-        ((i += 1) - 1)
+        i += 1
       end
       return max_
     end
@@ -518,7 +518,7 @@ module Org::Eclipse::Swt::Widgets
         if ((column).equal?(self))
           moved = true
         end
-        ((i += 1) - 1)
+        i += 1
       end
     end
     

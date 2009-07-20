@@ -418,7 +418,7 @@ module Org::Eclipse::Swt::Ole::Win32
                                 break
                               end
                             end
-                            ((i += 1) - 1)
+                            i += 1
                           end
                         end
                       end
@@ -464,7 +464,7 @@ module Org::Eclipse::Swt::Ole::Win32
     # 
     # @return the current reference count
     def _add_ref
-      ((@ref_count += 1) - 1)
+      @ref_count += 1
       return @ref_count
     end
     
@@ -771,12 +771,12 @@ module Org::Eclipse::Swt::Ole::Win32
             if (OS._get_menu_item_info(h_menu, index, true, lpmii))
               if (OS._insert_menu_item(hmenu_shared, newindex, true, lpmii))
                 # keep track of the number of items
-                ((file_menu_count += 1) - 1)
-                ((newindex += 1) - 1)
+                file_menu_count += 1
+                newindex += 1
               end
             end
           end
-          ((i += 1) - 1)
+          i += 1
         end
       end
       # copy the menu item count information to the pointer
@@ -796,12 +796,12 @@ module Org::Eclipse::Swt::Ole::Win32
             if (OS._get_menu_item_info(h_menu, index, true, lpmii))
               if (OS._insert_menu_item(hmenu_shared, newindex, true, lpmii))
                 # keep track of the number of items
-                ((container_menu_count += 1) - 1)
-                ((newindex += 1) - 1)
+                container_menu_count += 1
+                newindex += 1
               end
             end
           end
-          ((i += 1) - 1)
+          i += 1
         end
       end
       # copy the menu item count information to the pointer
@@ -821,12 +821,12 @@ module Org::Eclipse::Swt::Ole::Win32
             if (OS._get_menu_item_info(h_menu, index, true, lpmii))
               if (OS._insert_menu_item(hmenu_shared, newindex, true, lpmii))
                 # keep track of the number of items
-                ((window_menu_count += 1) - 1)
-                ((newindex += 1) - 1)
+                window_menu_count += 1
+                newindex += 1
               end
             end
           end
-          ((i += 1) - 1)
+          i += 1
         end
       end
       # copy the menu item count information to the pointer
@@ -899,7 +899,7 @@ module Org::Eclipse::Swt::Ole::Win32
     # 
     # @return the current reference count
     def _release
-      ((@ref_count -= 1) + 1)
+      @ref_count -= 1
       if ((@ref_count).equal?(0))
         dispose_cominterfaces
         COM._co_free_unused_libraries
@@ -936,7 +936,7 @@ module Org::Eclipse::Swt::Ole::Win32
             id = get_menu_item_id(h_menu, index)
             ids.add_element(SwtLONG.new(id))
           end
-          ((i += 1) - 1)
+          i += 1
         end
       end
       if (!(@container_menu_items).nil?)
@@ -949,7 +949,7 @@ module Org::Eclipse::Swt::Ole::Win32
             id = get_menu_item_id(h_menu, index)
             ids.add_element(SwtLONG.new(id))
           end
-          ((i += 1) - 1)
+          i += 1
         end
       end
       if (!(@window_menu_items).nil?)
@@ -962,7 +962,7 @@ module Org::Eclipse::Swt::Ole::Win32
             id = get_menu_item_id(h_menu, index)
             ids.add_element(SwtLONG.new(id))
           end
-          ((i += 1) - 1)
+          i += 1
         end
       end
       index = OS._get_menu_item_count(hmenu_shared) - 1
@@ -973,7 +973,7 @@ module Org::Eclipse::Swt::Ole::Win32
         if (ids.contains(SwtLONG.new(id)))
           OS._remove_menu(hmenu_shared, i, OS::MF_BYPOSITION)
         end
-        ((i -= 1) + 1)
+        i -= 1
       end
       return COM::S_OK
     end

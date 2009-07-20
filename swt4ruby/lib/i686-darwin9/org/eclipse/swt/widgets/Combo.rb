@@ -486,7 +486,7 @@ module Org::Eclipse::Swt::Widgets
           width = Math.max(width, size.attr_x)
           OS._cfrelease(ptr[0])
         end
-        ((i += 1) - 1)
+        i += 1
       end
       metric = Array.typed(::Java::Int).new(1) { 0 }
       if (!((self.attr_style & SWT::READ_ONLY)).equal?(0))
@@ -796,7 +796,7 @@ module Org::Eclipse::Swt::Widgets
       i = 0
       while i < count
         result[i] = get_item(i)
-        ((i += 1) - 1)
+        i += 1
       end
       return result
     end
@@ -1079,7 +1079,7 @@ module Org::Eclipse::Swt::Widgets
         if ((string == get_item(i)))
           return i
         end
-        ((i += 1) - 1)
+        i += 1
       end
       return -1
     end
@@ -1450,7 +1450,7 @@ module Org::Eclipse::Swt::Widgets
         i = new_end
         while i >= start
           OS._hicombo_box_remove_item_at_index(self.attr_handle, i)
-          ((i -= 1) + 1)
+          i -= 1
         end
       end
     end
@@ -1502,7 +1502,7 @@ module Org::Eclipse::Swt::Widgets
           i = count - 1
           while i >= 0
             OS._hicombo_box_remove_item_at_index(self.attr_handle, i)
-            ((i -= 1) + 1)
+            i -= 1
           end
         end
       end
@@ -1797,7 +1797,7 @@ module Org::Eclipse::Swt::Widgets
         if ((items[i]).nil?)
           error(SWT::ERROR_INVALID_ARGUMENT)
         end
-        ((i += 1) - 1)
+        i += 1
       end
       remove_all
       if ((items.attr_length).equal?(0))
@@ -1828,7 +1828,7 @@ module Org::Eclipse::Swt::Widgets
         if (!(result).equal?(OS.attr_no_err))
           error(SWT::ERROR_ITEM_NOT_ADDED)
         end
-        ((i_ += 1) - 1)
+        i_ += 1
       end
     end
     

@@ -73,7 +73,7 @@ module Org::Eclipse::Swt::Custom
           end
         end
         busy_id = self.attr_next_busy_id
-        ((self.attr_next_busy_id += 1) - 1)
+        self.attr_next_busy_id += 1
         cursor = display.get_system_cursor(SWT::CURSOR_WAIT)
         shells = display.get_shells
         i = 0
@@ -83,7 +83,7 @@ module Org::Eclipse::Swt::Custom
             shells[i].set_cursor(cursor)
             shells[i].set_data(BUSYID_NAME, busy_id)
           end
-          ((i += 1) - 1)
+          i += 1
         end
         begin
           runnable.run
@@ -96,7 +96,7 @@ module Org::Eclipse::Swt::Custom
               shells[i_].set_cursor(nil)
               shells[i_].set_data(BUSYID_NAME, nil)
             end
-            ((i_ += 1) - 1)
+            i_ += 1
           end
         end
       end

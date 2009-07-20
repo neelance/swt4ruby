@@ -127,7 +127,7 @@ module Org::Eclipse::Swt::Internal::Ole::Win32
           COM._move_memory(pp_names + OS::PTR_SIZEOF * i, Array.typed(::Java::Int).new([p_name]), OS::PTR_SIZEOF)
           # keep track of the Global Memory so we can free it
           mem_tracker[i] = p_name
-          ((i += 1) - 1)
+          i += 1
         end
         return COM._vtbl_call(10, self.attr_address, pp_names, c_names, p_mem_id)
       ensure
@@ -135,7 +135,7 @@ module Org::Eclipse::Swt::Internal::Ole::Win32
         i_ = 0
         while i_ < mem_tracker.attr_length
           OS._heap_free(h_heap, 0, mem_tracker[i_])
-          ((i_ += 1) - 1)
+          i_ += 1
         end
         OS._heap_free(h_heap, 0, pp_names)
       end
@@ -168,7 +168,7 @@ module Org::Eclipse::Swt::Internal::Ole::Win32
             end
           end
           COM._sys_free_string(rg_bstr_names[i])
-          ((i += 1) - 1)
+          i += 1
         end
       end
       return rc

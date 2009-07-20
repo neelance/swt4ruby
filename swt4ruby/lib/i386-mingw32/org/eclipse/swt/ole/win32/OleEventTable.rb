@@ -50,7 +50,7 @@ module Org::Eclipse::Swt::Ole::Win32
           @handlers[i] = handler
           return
         end
-        ((i += 1) - 1)
+        i += 1
       end
       size = @types.attr_length
       new_types = Array.typed(::Java::Int).new(size + 4) { 0 }
@@ -73,7 +73,7 @@ module Org::Eclipse::Swt::Ole::Win32
         if ((@types[i]).equal?(event_type))
           return true
         end
-        ((i += 1) - 1)
+        i += 1
       end
       return false
     end
@@ -91,7 +91,7 @@ module Org::Eclipse::Swt::Ole::Win32
             listener.handle_event(event)
           end
         end
-        ((i += 1) - 1)
+        i += 1
       end
     end
     
@@ -107,7 +107,7 @@ module Org::Eclipse::Swt::Ole::Win32
           @handlers[i] = nil
           return
         end
-        ((i += 1) - 1)
+        i += 1
       end
     end
     
@@ -118,7 +118,7 @@ module Org::Eclipse::Swt::Ole::Win32
         if (!(@types[i]).equal?(0))
           return true
         end
-        ((i += 1) - 1)
+        i += 1
       end
       return false
     end

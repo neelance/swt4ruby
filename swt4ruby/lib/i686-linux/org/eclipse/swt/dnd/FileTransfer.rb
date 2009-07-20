@@ -98,12 +98,12 @@ module Org::Eclipse::Swt::Dnd
       while i < files.attr_length
         string = files[i]
         if ((string).nil?)
-          ((i += 1) - 1)
+          i += 1
           next
         end
         length_ = string.length
         if ((length_).equal?(0))
-          ((i += 1) - 1)
+          i += 1
           next
         end
         chars = CharArray.new(length_)
@@ -114,21 +114,21 @@ module Org::Eclipse::Swt::Dnd
         # long
         utf8ptr = OS.g_utf16_to_utf8(chars, chars.attr_length, nil, nil, error_)
         if (!(error_[0]).equal?(0) || (utf8ptr).equal?(0))
-          ((i += 1) - 1)
+          i += 1
           next
         end
         # long
         locale_ptr = OS.g_filename_from_utf8(utf8ptr, -1, nil, nil, error_)
         OS.g_free(utf8ptr)
         if (!(error_[0]).equal?(0) || (locale_ptr).equal?(0))
-          ((i += 1) - 1)
+          i += 1
           next
         end
         # long
         uri_ptr = OS.g_filename_to_uri(locale_ptr, 0, error_)
         OS.g_free(locale_ptr)
         if (!(error_[0]).equal?(0) || (uri_ptr).equal?(0))
-          ((i += 1) - 1)
+          i += 1
           next
         end
         length_ = OS.strlen(uri_ptr)
@@ -146,7 +146,7 @@ module Org::Eclipse::Swt::Dnd
         end
         System.arraycopy(temp, 0, new_buffer, offset, temp.attr_length)
         buffer = new_buffer
-        ((i += 1) - 1)
+        i += 1
       end
       if ((buffer.attr_length).equal?(0))
         return
@@ -199,7 +199,7 @@ module Org::Eclipse::Swt::Dnd
           files = new_files
           offset = i + 2
         end
-        ((i += 1) - 1)
+        i += 1
       end
       if (offset < temp.attr_length - 2)
         size = temp.attr_length - offset
@@ -225,14 +225,14 @@ module Org::Eclipse::Swt::Dnd
         locale_ptr = OS.g_filename_from_uri(files[i_], nil, error_)
         OS.g_free(files[i_])
         if (!(error_[0]).equal?(0) || (locale_ptr).equal?(0))
-          ((i_ += 1) - 1)
+          i_ += 1
           next
         end
         # long
         utf8ptr = OS.g_filename_to_utf8(locale_ptr, -1, nil, nil, error_)
         OS.g_free(locale_ptr)
         if (!(error_[0]).equal?(0) || (utf8ptr).equal?(0))
-          ((i_ += 1) - 1)
+          i_ += 1
           next
         end
         # long
@@ -251,7 +251,7 @@ module Org::Eclipse::Swt::Dnd
         System.arraycopy(file_names, 0, new_file_names, 0, file_names.attr_length)
         new_file_names[file_names.attr_length] = name
         file_names = new_file_names
-        ((i_ += 1) - 1)
+        i_ += 1
       end
       if ((file_names.attr_length).equal?(0))
         return nil
@@ -280,7 +280,7 @@ module Org::Eclipse::Swt::Dnd
         if ((strings[i]).nil? || (strings[i].length).equal?(0))
           return false
         end
-        ((i += 1) - 1)
+        i += 1
       end
       return true
     end

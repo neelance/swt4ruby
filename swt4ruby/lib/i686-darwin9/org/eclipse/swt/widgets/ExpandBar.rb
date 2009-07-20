@@ -268,7 +268,7 @@ module Org::Eclipse::Swt::Widgets
             end
             height += @spacing
             width = Math.max(width, item.get_preferred_width(gc))
-            ((i += 1) - 1)
+            i += 1
           end
           gc.dispose
         end
@@ -301,7 +301,7 @@ module Org::Eclipse::Swt::Widgets
       end
       System.arraycopy(@items, index, @items, index + 1, @item_count - index)
       @items[index] = item
-      ((@item_count += 1) - 1)
+      @item_count += 1
       if ((@focus_item).nil?)
         @focus_item = item
       end
@@ -319,7 +319,7 @@ module Org::Eclipse::Swt::Widgets
         if ((@items[index]).equal?(item))
           break
         end
-        ((index += 1) - 1)
+        index += 1
       end
       if ((index).equal?(@item_count))
         return
@@ -459,7 +459,7 @@ module Org::Eclipse::Swt::Widgets
         if ((@items[i]).equal?(item))
           return i
         end
-        ((i += 1) - 1)
+        i += 1
       end
       return -1
     end
@@ -475,7 +475,7 @@ module Org::Eclipse::Swt::Widgets
             y += item.attr_height
           end
           y += item.get_header_height + @spacing
-          ((i += 1) - 1)
+          i += 1
         end
         i_ = index
         while i_ < @item_count
@@ -485,7 +485,7 @@ module Org::Eclipse::Swt::Widgets
             y += item.attr_height
           end
           y += item.get_header_height + @spacing
-          ((i_ += 1) - 1)
+          i_ += 1
         end
       end
       if (set_scrollbar)
@@ -588,7 +588,7 @@ module Org::Eclipse::Swt::Widgets
         if (!(item.attr_width).equal?(width))
           item.set_bounds(0, 0, width, item.attr_height, false, true)
         end
-        ((i += 1) - 1)
+        i += 1
       end
       layout_items(0, true)
       redraw
@@ -618,7 +618,7 @@ module Org::Eclipse::Swt::Widgets
       i = 0
       while i < @item_count
         @items[i].dispose
-        ((i += 1) - 1)
+        i += 1
       end
       @items = nil
       @font = nil
@@ -682,7 +682,7 @@ module Org::Eclipse::Swt::Widgets
           force_focus
           break
         end
-        ((i += 1) - 1)
+        i += 1
       end
     end
     
@@ -713,7 +713,7 @@ module Org::Eclipse::Swt::Widgets
       while i < @item_count
         item = @items[i]
         item.draw_item(event.attr_gc, has_focus && (item).equal?(@focus_item))
-        ((i += 1) - 1)
+        i += 1
       end
     end
     
@@ -725,7 +725,7 @@ module Org::Eclipse::Swt::Widgets
       while i < @item_count
         item = @items[i]
         item.set_bounds(0, 0, width, item.attr_height, false, true)
-        ((i += 1) - 1)
+        i += 1
       end
       set_scrollbar
     end

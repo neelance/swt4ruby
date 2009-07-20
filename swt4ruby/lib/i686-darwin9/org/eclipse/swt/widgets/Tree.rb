@@ -344,7 +344,7 @@ module Org::Eclipse::Swt::Widgets
         if (!(@items[i]).nil?)
           @items[i].attr_width = -1
         end
-        ((i += 1) - 1)
+        i += 1
       end
     end
     
@@ -366,12 +366,12 @@ module Org::Eclipse::Swt::Widgets
               return new_ids
             end
           end
-          ((i += 1) - 1)
+          i += 1
         end
         next_ = @items.attr_length
         while (index < count)
           new_ids[((index += 1) - 1)] = next_ + 1
-          ((next_ += 1) - 1)
+          next_ += 1
         end
         return new_ids
       end
@@ -388,7 +388,7 @@ module Org::Eclipse::Swt::Widgets
             end
             reserved[used_id - 1] = true
           end
-          ((i += 1) - 1)
+          i += 1
         end
       end
       i = 0
@@ -408,11 +408,11 @@ module Org::Eclipse::Swt::Widgets
                 end
                 reserved[used_id - 1] = true
               end
-              ((j += 1) - 1)
+              j += 1
             end
           end
         end
-        ((i += 1) - 1)
+        i += 1
       end
       i_ = 0
       while i_ < reserved.attr_length
@@ -422,12 +422,12 @@ module Org::Eclipse::Swt::Widgets
             return new_ids
           end
         end
-        ((i_ += 1) - 1)
+        i_ += 1
       end
       next_ = reserved.attr_length
       while (index < count)
         new_ids[((index += 1) - 1)] = next_ + 1
-        ((next_ += 1) - 1)
+        next_ += 1
       end
       return new_ids
     end
@@ -447,7 +447,7 @@ module Org::Eclipse::Swt::Widgets
           if ((@child_ids[i]).equal?(id))
             return __get_item(nil, i)
           end
-          ((i += 1) - 1)
+          i += 1
         end
       end
       i = 0
@@ -460,10 +460,10 @@ module Org::Eclipse::Swt::Widgets
             if ((ids[j]).equal?(id))
               return __get_item(parent_item, j)
             end
-            ((j += 1) - 1)
+            j += 1
           end
         end
-        ((i += 1) - 1)
+        i += 1
       end
       return nil
     end
@@ -576,7 +576,7 @@ module Org::Eclipse::Swt::Widgets
             width = Math.max(width, calculate_width(item.attr_child_ids, gc, recurse, level + 1, level_indent))
           end
         end
-        ((i += 1) - 1)
+        i += 1
       end
       return width
     end
@@ -708,7 +708,7 @@ module Org::Eclipse::Swt::Widgets
             clear_all(item, true)
           end
         end
-        ((i += 1) - 1)
+        i += 1
       end
       if (update)
         OS._update_data_browser_items(self.attr_handle, 0, 0, nil, OS.attr_k_data_browser_item_no_property, OS.attr_k_data_browser_no_item)
@@ -779,7 +779,7 @@ module Org::Eclipse::Swt::Widgets
           i = 0
           while i < @column_count
             width += @columns[i].get_width
-            ((i += 1) - 1)
+            i += 1
           end
         else
           level_indent = DISCLOSURE_COLUMN_LEVEL_INDENT
@@ -1014,7 +1014,7 @@ module Org::Eclipse::Swt::Widgets
               item.attr_cell_font = temp
             end
           end
-          ((i += 1) - 1)
+          i += 1
         end
       end
     end
@@ -1052,7 +1052,7 @@ module Org::Eclipse::Swt::Widgets
       System.arraycopy(ids, index, ids, index + 1, ids.attr_length - index - 1)
       ids[index] = id
       if (!(parent_item).nil?)
-        ((parent_item.attr_item_count += 1) - 1)
+        parent_item.attr_item_count += 1
       end
       if ((parent_item).nil? || (parent_item.get_expanded))
         parent_id = (parent_item).nil? ? OS.attr_k_data_browser_no_item : parent_item.attr_id
@@ -1061,7 +1061,7 @@ module Org::Eclipse::Swt::Widgets
           System.arraycopy(ids, index + 1, ids, index, ids.attr_length - index - 1)
           error(SWT::ERROR_ITEM_NOT_ADDED)
         end
-        ((@visible_count += 1) - 1)
+        @visible_count += 1
       else
         # Bug in the Macintosh.  When the first child of a tree item is
         # added and the parent is not expanded, the parent does not
@@ -1184,7 +1184,7 @@ module Org::Eclipse::Swt::Widgets
         if ((@columns[index]).equal?(column))
           break
         end
-        ((index += 1) - 1)
+        index += 1
       end
       i = 0
       while i < @items.attr_length
@@ -1248,7 +1248,7 @@ module Org::Eclipse::Swt::Widgets
             end
           end
         end
-        ((i += 1) - 1)
+        i += 1
       end
       if ((@column_count).equal?(1))
         @column_id = column.attr_id
@@ -1282,7 +1282,7 @@ module Org::Eclipse::Swt::Widgets
       i_ = index
       while i_ < @column_count
         @columns[i_].send_event(SWT::Move)
-        ((i_ += 1) - 1)
+        i_ += 1
       end
     end
     
@@ -1295,7 +1295,7 @@ module Org::Eclipse::Swt::Widgets
         if (!(OS._remove_data_browser_items(self.attr_handle, parent_id, 1, Array.typed(::Java::Int).new([item.attr_id]), 0)).equal?(OS.attr_no_err))
           error(SWT::ERROR_ITEM_NOT_REMOVED)
         end
-        ((@visible_count -= 1) + 1)
+        @visible_count -= 1
         @ignore_expand = false
       end
       # Bug in the Macintosh.  When the last child of a tree item is
@@ -1333,7 +1333,7 @@ module Org::Eclipse::Swt::Widgets
           if ((@columns[column_index].attr_id).equal?(property))
             break
           end
-          ((column_index += 1) - 1)
+          column_index += 1
         end
         if ((column_index).equal?(@column_count))
           return OS.attr_no_err
@@ -1409,7 +1409,7 @@ module Org::Eclipse::Swt::Widgets
                   OS._set_rect_rgn(rgn, RJava.cast_to_short(rect.attr_right), RJava.cast_to_short(client_area.attr_y), RJava.cast_to_short((rect.attr_right + grid_width)), RJava.cast_to_short((client_area.attr_y + client_area.attr_height)))
                   OS._diff_rgn(region.attr_handle, rgn, region.attr_handle)
                 end
-                ((i += 1) - 1)
+                i += 1
               end
             end
           end
@@ -1740,7 +1740,7 @@ module Org::Eclipse::Swt::Widgets
           position[0] -= 1
         end
         order[position[0]] = i
-        ((i += 1) - 1)
+        i += 1
       end
       return order
     end
@@ -1973,7 +1973,7 @@ module Org::Eclipse::Swt::Widgets
               last_pos_column_id = column.attr_id
               break
             end
-            ((i += 1) - 1)
+            i += 1
           end
           if ((OS._get_data_browser_item_part_bounds(self.attr_handle, item.attr_id, last_pos_column_id, OS.attr_k_data_browser_property_enclosing_part, rect)).equal?(OS.attr_no_err))
             if (pt.attr_h > rect.attr_right)
@@ -1999,7 +1999,7 @@ module Org::Eclipse::Swt::Widgets
                     return item
                   end
                 end
-                ((j += 1) - 1)
+                j += 1
               end
               return nil
             end
@@ -2048,14 +2048,14 @@ module Org::Eclipse::Swt::Widgets
                       return item
                     end
                   end
-                  ((j += 1) - 1)
+                  j += 1
                 end
               end
               return nil
             end
           end
         end
-        ((i += 1) - 1)
+        i += 1
       end
       return nil
     end
@@ -2139,7 +2139,7 @@ module Org::Eclipse::Swt::Widgets
       i = 0
       while i < count
         result[i] = __get_item(parent_item, i)
-        ((i += 1) - 1)
+        i += 1
       end
       return result
     end
@@ -2245,7 +2245,7 @@ module Org::Eclipse::Swt::Widgets
         i = 0
         while i < count
           result[((index += 1) - 1)] = __get_item(id[count - i - 1], true)
-          ((i += 1) - 1)
+          i += 1
         end
         OS._hunlock(ptr)
         if ((index).equal?(result.attr_length))
@@ -2268,7 +2268,7 @@ module Org::Eclipse::Swt::Widgets
           if ((index).equal?(result.attr_length))
             return index
           end
-          ((i += 1) - 1)
+          i += 1
         end
         OS._hunlock(ptr)
       end
@@ -2405,7 +2405,7 @@ module Org::Eclipse::Swt::Widgets
                   break
                 end
                 start_x += width
-                ((i += 1) - 1)
+                i += 1
               end
             else
               item = nil
@@ -2425,7 +2425,7 @@ module Org::Eclipse::Swt::Widgets
                       column_index = i
                       break
                     end
-                    ((i += 1) - 1)
+                    i += 1
                   end
                 end
                 column_id = @last_hittest_column
@@ -2547,7 +2547,7 @@ module Org::Eclipse::Swt::Widgets
         if ((@columns[i]).equal?(column))
           return i
         end
-        ((i += 1) - 1)
+        i += 1
       end
       return -1
     end
@@ -2594,7 +2594,7 @@ module Org::Eclipse::Swt::Widgets
           if ((ids[i]).equal?(item.attr_id))
             return i
           end
-          ((i += 1) - 1)
+          i += 1
         end
       end
       return -1
@@ -2690,7 +2690,7 @@ module Org::Eclipse::Swt::Widgets
               resized = true
             end
           end
-          ((i += 1) - 1)
+          i += 1
         end
         property = Array.typed(::Java::Int).new(1) { 0 }
         OS._get_data_browser_sort_property(self.attr_handle, property)
@@ -2703,7 +2703,7 @@ module Org::Eclipse::Swt::Widgets
                 column.post_event((self.attr_display.attr_click_count).equal?(2) ? SWT::DefaultSelection : SWT::Selection)
                 break
               end
-              ((i_ += 1) - 1)
+              i_ += 1
             end
           end
           OS._set_data_browser_sort_property(self.attr_handle, 0)
@@ -2821,7 +2821,7 @@ module Org::Eclipse::Swt::Widgets
               if ((item).nil?)
                 ids[i] = 0
               end
-              ((i += 1) - 1)
+              i += 1
             end
           end
           @was_expanded = true
@@ -2855,9 +2855,9 @@ module Org::Eclipse::Swt::Widgets
           i = 0
           while i < item.attr_item_count
             if ((item.attr_child_ids[i]).equal?(0))
-              ((new_id_count += 1) - 1)
+              new_id_count += 1
             end
-            ((i += 1) - 1)
+            i += 1
           end
           if (new_id_count > 0)
             new_ids = __get_ids(new_id_count)
@@ -2867,7 +2867,7 @@ module Org::Eclipse::Swt::Widgets
               if ((item.attr_child_ids[i_]).equal?(0))
                 item.attr_child_ids[i_] = new_ids[((index += 1) - 1)]
               end
-              ((i_ += 1) - 1)
+              i_ += 1
             end
           end
           OS._add_data_browser_items(self.attr_handle, id, item.attr_item_count, item.attr_child_ids, OS.attr_k_data_browser_item_no_property)
@@ -2918,7 +2918,7 @@ module Org::Eclipse::Swt::Widgets
             if ((@columns[column_index].attr_id).equal?(item_info.attr_v0_column_property))
               break
             end
-            ((column_index += 1) - 1)
+            column_index += 1
           end
           if (!(column_index).equal?(@column_count) || (@column_count).equal?(0))
             id = item_info.attr_v0_item
@@ -3079,7 +3079,7 @@ module Org::Eclipse::Swt::Widgets
           index = i
           break
         end
-        ((i += 1) - 1)
+        i += 1
       end
       if (!(index).equal?(-1))
         System.arraycopy(ids, 0, ids, 0, index)
@@ -3087,7 +3087,7 @@ module Org::Eclipse::Swt::Widgets
         ids[ids.attr_length - 1] = 0
       end
       if (!(parent_item).nil?)
-        ((parent_item.attr_item_count -= 1) + 1)
+        parent_item.attr_item_count -= 1
         if ((parent_item.attr_item_count).equal?(0))
           parent_item.attr_child_ids = nil
         end
@@ -3108,7 +3108,7 @@ module Org::Eclipse::Swt::Widgets
             release_item(item, true)
           end
         end
-        ((i -= 1) + 1)
+        i -= 1
       end
     end
     
@@ -3120,7 +3120,7 @@ module Org::Eclipse::Swt::Widgets
         if (!(item).nil? && !item.is_disposed)
           item.release(false)
         end
-        ((i += 1) - 1)
+        i += 1
       end
       @items = nil
       @child_ids = nil
@@ -3131,7 +3131,7 @@ module Org::Eclipse::Swt::Widgets
           if (!(column).nil? && !column.is_disposed)
             column.release(false)
           end
-          ((i_ += 1) - 1)
+          i_ += 1
         end
         @columns = nil
       end
@@ -3172,7 +3172,7 @@ module Org::Eclipse::Swt::Widgets
         if (!(item).nil? && !item.is_disposed)
           item.release(false)
         end
-        ((i += 1) - 1)
+        i += 1
       end
       @items = Array.typed(TreeItem).new(4) { nil }
       @child_ids = nil
@@ -3433,7 +3433,7 @@ module Org::Eclipse::Swt::Widgets
         if (!(order[i]).equal?(old_order[i]))
           reorder = true
         end
-        ((i += 1) - 1)
+        i += 1
       end
       if (reorder)
         disclosure = Array.typed(::Java::Int).new(1) { 0 }
@@ -3453,7 +3453,7 @@ module Org::Eclipse::Swt::Widgets
           old_x[index] = x
           OS._get_data_browser_table_view_named_column_width(self.attr_handle, column.attr_id, width)
           x += width[0]
-          ((i_ += 1) - 1)
+          i_ += 1
         end
         x = 0
         new_x = Array.typed(::Java::Int).new(order.attr_length) { 0 }
@@ -3467,7 +3467,7 @@ module Org::Eclipse::Swt::Widgets
           new_x[index] = x
           OS._get_data_browser_table_view_named_column_width(self.attr_handle, column.attr_id, width)
           x += width[0]
-          ((i__ += 1) - 1)
+          i__ += 1
         end
         new_columns = Array.typed(TreeColumn).new(@column_count) { nil }
         System.arraycopy(@columns, 0, new_columns, 0, @column_count)
@@ -3479,7 +3479,7 @@ module Org::Eclipse::Swt::Widgets
               column.send_event(SWT::Move)
             end
           end
-          ((i___ += 1) - 1)
+          i___ += 1
         end
       end
     end
@@ -3496,7 +3496,7 @@ module Org::Eclipse::Swt::Widgets
         if (!(item).nil?)
           item.attr_width = -1
         end
-        ((i += 1) - 1)
+        i += 1
       end
       set_scroll_width(true)
     end
@@ -3574,12 +3574,12 @@ module Org::Eclipse::Swt::Widgets
             else
               if ((parent_item).nil? || parent_item.get_expanded)
                 remove_ids[remove_ids.attr_length - remove_count - 1] = id
-                ((remove_count += 1) - 1)
-                ((@visible_count -= 1) + 1)
+                remove_count += 1
+                @visible_count -= 1
               end
             end
           end
-          ((index -= 1) + 1)
+          index -= 1
         end
         if (!(remove_count).equal?(0) && !(remove_count).equal?(remove_ids.attr_length))
           tmp = Array.typed(::Java::Int).new(remove_count) { 0 }
@@ -3598,7 +3598,7 @@ module Org::Eclipse::Swt::Widgets
             last_index = i
             break
           end
-          ((i -= 1) + 1)
+          i -= 1
         end
         if (last_index < @items.attr_length - 4)
           length_ = Math.max(4, (last_index + 3) / 4 * 4)
@@ -3630,7 +3630,7 @@ module Org::Eclipse::Swt::Widgets
           i = item_count
           while i < count
             @items[i] = TreeItem.new(self, parent_item, SWT::NONE, i, true)
-            ((i += 1) - 1)
+            i += 1
           end
         else
           if ((parent_item).nil? || parent_item.get_expanded)
@@ -3878,7 +3878,7 @@ module Org::Eclipse::Swt::Widgets
           ids[((count += 1) - 1)] = items[i].attr_id
           show_item(items[i], false)
         end
-        ((i += 1) - 1)
+        i += 1
       end
       @ignore_select = true
       # Bug in the Macintosh.  When the DataBroswer selection flags includes
@@ -3907,7 +3907,7 @@ module Org::Eclipse::Swt::Widgets
             index = i_
             break
           end
-          ((i_ += 1) - 1)
+          i_ += 1
         end
         if (!(index).equal?(-1))
           show_item(items[index], true)
@@ -4071,7 +4071,7 @@ module Org::Eclipse::Swt::Widgets
         w = Array.typed(::Java::Short).new(1) { 0 }
         OS._get_data_browser_table_view_named_column_width(self.attr_handle, @columns[i].attr_id, w)
         x += w[0]
-        ((i += 1) - 1)
+        i += 1
       end
       # Get current scroll position
       top = Array.typed(::Java::Int).new(1) { 0 }
@@ -4124,7 +4124,7 @@ module Org::Eclipse::Swt::Widgets
       count = 0
       parent_item = item.attr_parent_item
       while (!(parent_item).nil? && !parent_item.__get_expanded)
-        ((count += 1) - 1)
+        count += 1
         parent_item = parent_item.attr_parent_item
       end
       index = 0

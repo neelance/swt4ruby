@@ -115,7 +115,7 @@ module Org::Eclipse::Swt::Ole::Win32
     
     typesig { [] }
     def _add_ref
-      ((@ref_count += 1) - 1)
+      @ref_count += 1
       return @ref_count
     end
     
@@ -224,7 +224,7 @@ module Org::Eclipse::Swt::Ole::Win32
           event_info[j] = Variant.new
           event_info[j].set_data(disp_params.attr_rgvarg + offset)
           offset = offset - size
-          ((j += 1) - 1)
+          j += 1
         end
       end
       event = OleEvent.new
@@ -283,7 +283,7 @@ module Org::Eclipse::Swt::Ole::Win32
     
     typesig { [] }
     def _release
-      ((@ref_count -= 1) + 1)
+      @ref_count -= 1
       if ((@ref_count).equal?(0))
         dispose_cominterfaces
       end

@@ -334,16 +334,16 @@ module Org::Eclipse::Swt::Printing
         while (self.attr_end < self.attr_settings_data.attr_length && !(self.attr_settings_data[self.attr_end]).equal?(0))
           self.attr_start = self.attr_end
           while (self.attr_end < self.attr_settings_data.attr_length && !(self.attr_settings_data[self.attr_end]).equal?(0))
-            ((self.attr_end += 1) - 1)
+            self.attr_end += 1
           end
-          ((self.attr_end += 1) - 1)
+          self.attr_end += 1
           key_buffer = Array.typed(::Java::Byte).new(self.attr_end - self.attr_start) { 0 }
           System.arraycopy(self.attr_settings_data, self.attr_start, key_buffer, 0, key_buffer.attr_length)
           self.attr_start = self.attr_end
           while (self.attr_end < self.attr_settings_data.attr_length && !(self.attr_settings_data[self.attr_end]).equal?(0))
-            ((self.attr_end += 1) - 1)
+            self.attr_end += 1
           end
-          ((self.attr_end += 1) - 1)
+          self.attr_end += 1
           value_buffer = Array.typed(::Java::Byte).new(self.attr_end - self.attr_start) { 0 }
           System.arraycopy(self.attr_settings_data, self.attr_start, value_buffer, 0, value_buffer.attr_length)
           OS.gtk_print_settings_set(settings, key_buffer, value_buffer)
@@ -351,7 +351,7 @@ module Org::Eclipse::Swt::Printing
             System.out.println((String.new(Converter.mbcs_to_wcs(nil, key_buffer))).to_s + ": " + (String.new(Converter.mbcs_to_wcs(nil, value_buffer))).to_s)
           end
         end
-        ((self.attr_end += 1) - 1) # skip extra null terminator
+        self.attr_end += 1 # skip extra null terminator
         # Retrieve stored page_setup data.
         # Note that page_setup properties must be stored (in PrintDialog) and restored (here) in the same order.
         OS.gtk_page_setup_set_orientation(page_setup, restore_int("orientation")) # $NON-NLS-1$
@@ -485,20 +485,20 @@ module Org::Eclipse::Swt::Printing
         # get key
         self.attr_start = self.attr_end
         while (self.attr_end < self.attr_settings_data.attr_length && !(self.attr_settings_data[self.attr_end]).equal?(0))
-          ((self.attr_end += 1) - 1)
+          self.attr_end += 1
         end
-        ((self.attr_end += 1) - 1)
+        self.attr_end += 1
         key_buffer = Array.typed(::Java::Byte).new(self.attr_end - self.attr_start) { 0 }
         System.arraycopy(self.attr_settings_data, self.attr_start, key_buffer, 0, key_buffer.attr_length)
         # get value
         self.attr_start = self.attr_end
         while (self.attr_end < self.attr_settings_data.attr_length && !(self.attr_settings_data[self.attr_end]).equal?(0))
-          ((self.attr_end += 1) - 1)
+          self.attr_end += 1
         end
         length = self.attr_end - self.attr_start
-        ((self.attr_end += 1) - 1)
+        self.attr_end += 1
         if (null_terminate)
-          ((length += 1) - 1)
+          length += 1
         end
         value_buffer = Array.typed(::Java::Byte).new(length) { 0 }
         System.arraycopy(self.attr_settings_data, self.attr_start, value_buffer, 0, length)

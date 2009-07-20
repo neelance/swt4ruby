@@ -345,7 +345,7 @@ module Org::Eclipse::Swt::Graphics
       while i < size_
         listener = @image_loader_listeners.element_at(i)
         listener.image_data_loaded(event)
-        ((i += 1) - 1)
+        i += 1
       end
     end
     

@@ -108,7 +108,7 @@ module Org::Eclipse::Swt::Custom
         size = children[i].compute_size(w_hint, h_hint, flush_cache)
         max_width = Math.max(size.attr_x, max_width)
         max_height = Math.max(size.attr_y, max_height)
-        ((i += 1) - 1)
+        i += 1
       end
       width = max_width + 2 * @margin_width
       height = max_height + 2 * @margin_height
@@ -138,7 +138,7 @@ module Org::Eclipse::Swt::Custom
       while i < children.attr_length
         children[i].set_bounds(rect)
         children[i].set_visible((children[i]).equal?(@top_control))
-        ((i += 1) - 1)
+        i += 1
       end
     end
     

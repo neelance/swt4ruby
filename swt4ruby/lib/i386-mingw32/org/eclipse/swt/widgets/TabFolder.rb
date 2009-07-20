@@ -321,7 +321,7 @@ module Org::Eclipse::Swt::Widgets
         if ((@items[index]).equal?(item))
           break
         end
-        ((index += 1) - 1)
+        index += 1
       end
       if ((index).equal?(count))
         return
@@ -564,7 +564,7 @@ module Org::Eclipse::Swt::Widgets
         if ((@items[i]).equal?(item))
           return i
         end
-        ((i += 1) - 1)
+        i += 1
       end
       return -1
     end
@@ -584,7 +584,7 @@ module Org::Eclipse::Swt::Widgets
           if ((@items[index].attr_control).equal?(child))
             break
           end
-          ((index += 1) - 1)
+          index += 1
         end
         if ((index).equal?(count))
           rect = child.get_bounds
@@ -595,7 +595,7 @@ module Org::Eclipse::Swt::Widgets
           width = Math.max(width, size.attr_x)
           height = Math.max(height, size.attr_y)
         end
-        ((i += 1) - 1)
+        i += 1
       end
       return Point.new(width, height)
     end
@@ -616,7 +616,7 @@ module Org::Eclipse::Swt::Widgets
             end
           end
         end
-        ((i += 1) - 1)
+        i += 1
       end
       return false
     end
@@ -632,7 +632,7 @@ module Org::Eclipse::Swt::Widgets
             return true
           end
         end
-        ((i += 1) - 1)
+        i += 1
       end
       return false
     end
@@ -648,7 +648,7 @@ module Org::Eclipse::Swt::Widgets
           if (!(item).nil? && !item.is_disposed)
             item.release(false)
           end
-          ((i += 1) - 1)
+          i += 1
         end
         @items = nil
       end
@@ -676,7 +676,7 @@ module Org::Eclipse::Swt::Widgets
         if ((item.attr_control).equal?(control))
           item.set_control(nil)
         end
-        ((i += 1) - 1)
+        i += 1
       end
     end
     

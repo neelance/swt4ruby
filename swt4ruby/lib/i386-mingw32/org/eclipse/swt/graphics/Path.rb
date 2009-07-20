@@ -548,7 +548,7 @@ module Org::Eclipse::Swt::Graphics
           close = !((gdip_types[index + 2] & Gdip::PathPointTypeCloseSubpath)).equal?(0)
           index += 3
         else
-          ((index += 1) - 1)
+          index += 1
         end
         if (close)
           types[((types_index += 1) - 1)] = SWT::PATH_CLOSE
@@ -605,7 +605,7 @@ module Org::Eclipse::Swt::Graphics
           dispose
           SWT.error(SWT::ERROR_INVALID_ARGUMENT)
         end
-        ((i += 1) - 1)
+        i += 1
       end
     end
     

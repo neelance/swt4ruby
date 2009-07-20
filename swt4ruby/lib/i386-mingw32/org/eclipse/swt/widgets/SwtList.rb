@@ -281,7 +281,7 @@ module Org::Eclipse::Swt::Widgets
                 width = Math.max(width, rect.attr_right - rect.attr_left)
               end
             end
-            ((i += 1) - 1)
+            i += 1
           end
           if (!(new_font).equal?(0))
             OS._select_object(h_dc, old_font)
@@ -361,7 +361,7 @@ module Org::Eclipse::Swt::Widgets
             OS._send_message(self.attr_handle, OS::LB_SETCURSEL, -1, 0)
             return
           end
-          ((i += 1) - 1)
+          i += 1
         end
         return
       end
@@ -371,7 +371,7 @@ module Org::Eclipse::Swt::Widgets
         if (!(index).equal?(-1))
           OS._send_message(self.attr_handle, OS::LB_SETSEL, 0, index)
         end
-        ((i += 1) - 1)
+        i += 1
       end
     end
     
@@ -589,7 +589,7 @@ module Org::Eclipse::Swt::Widgets
       i = 0
       while i < count
         result[i] = get_item(i)
-        ((i += 1) - 1)
+        i += 1
       end
       return result
     end
@@ -616,7 +616,7 @@ module Org::Eclipse::Swt::Widgets
       i = 0
       while i < indices.attr_length
         result[i] = get_item(indices[i])
-        ((i += 1) - 1)
+        i += 1
       end
       return result
     end
@@ -803,7 +803,7 @@ module Org::Eclipse::Swt::Widgets
           if ((string == get_item(i)))
             return i
           end
-          ((i += 1) - 1)
+          i += 1
         end
         return -1
       end
@@ -925,11 +925,11 @@ module Org::Eclipse::Swt::Widgets
             new_width = Math.max(new_width, rect.attr_right - rect.attr_left)
           end
           if (index < top_index)
-            ((top_count += 1) - 1)
+            top_count += 1
           end
           last = index
         end
-        ((i += 1) - 1)
+        i += 1
       end
       if (!((self.attr_style & SWT::H_SCROLL)).equal?(0))
         if (!(new_font).equal?(0))
@@ -1078,7 +1078,7 @@ module Org::Eclipse::Swt::Widgets
           OS._draw_text(h_dc, buffer, -1, rect, flags)
           new_width = Math.max(new_width, rect.attr_right - rect.attr_left)
         end
-        ((index += 1) - 1)
+        index += 1
       end
       if (!((self.attr_style & SWT::H_SCROLL)).equal?(0))
         if (!(new_font).equal?(0))
@@ -1207,7 +1207,7 @@ module Org::Eclipse::Swt::Widgets
         if (!(index).equal?(-1))
           select(index, false)
         end
-        ((i += 1) - 1)
+        i += 1
       end
       if (scroll)
         show_selection
@@ -1432,7 +1432,7 @@ module Org::Eclipse::Swt::Widgets
         if ((items[i]).nil?)
           error(SWT::ERROR_INVALID_ARGUMENT)
         end
-        ((i += 1) - 1)
+        i += 1
       end
       # long
       old_proc = OS._get_window_long_ptr(self.attr_handle, OS::GWLP_WNDPROC)
@@ -1474,7 +1474,7 @@ module Org::Eclipse::Swt::Widgets
           OS._draw_text(h_dc, buffer, -1, rect, flags)
           new_width = Math.max(new_width, rect.attr_right - rect.attr_left)
         end
-        ((index += 1) - 1)
+        index += 1
       end
       if (!((self.attr_style & SWT::H_SCROLL)).equal?(0))
         if (!(new_font).equal?(0))
@@ -1531,7 +1531,7 @@ module Org::Eclipse::Swt::Widgets
             new_width = Math.max(new_width, rect.attr_right - rect.attr_left)
           end
         end
-        ((i += 1) - 1)
+        i += 1
       end
       if (!(new_font).equal?(0))
         OS._select_object(h_dc, old_font)
@@ -1665,7 +1665,7 @@ module Org::Eclipse::Swt::Widgets
               show_selection
               return
             end
-            ((index += 1) - 1)
+            index += 1
           end
           if (!(local_focus).equal?(-1))
             focus_index = local_focus

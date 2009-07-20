@@ -362,7 +362,7 @@ module Org::Eclipse::Swt::Widgets
           filter_name = (@filter_names[i]).to_s
         end
         str_filter = str_filter + filter_name + (Character.new(?\0.ord)).to_s + (@filter_extensions[i]).to_s + (Character.new(?\0.ord)).to_s
-        ((i += 1) - 1)
+        i += 1
       end
       if ((@filter_extensions.attr_length).equal?(0))
         str_filter = str_filter + FILTER + (Character.new(?\0.ord)).to_s + FILTER + (Character.new(?\0.ord)).to_s
@@ -507,7 +507,7 @@ module Org::Eclipse::Swt::Widgets
             if ((ch).equal?(Character.new(?\\.ord)))
               n_file_offset = index + 1
             end
-            ((index += 1) - 1)
+            index += 1
           end
         end
         if (n_file_offset > 0)
@@ -524,7 +524,7 @@ module Org::Eclipse::Swt::Widgets
           begin
             end_ = start
             while (end_ < buffer.length && !(buffer.tchar_at(end_)).equal?(0))
-              ((end_ += 1) - 1)
+              end_ += 1
             end
             string = buffer.to_s(start, end_ - start)
             start = end_
@@ -537,7 +537,7 @@ module Org::Eclipse::Swt::Widgets
             if (((self.attr_style & SWT::MULTI)).equal?(0))
               break
             end
-            ((start += 1) - 1)
+            start += 1
           end while (start < buffer.length && !(buffer.tchar_at(start)).equal?(0))
           if (@file_names.attr_length > 0)
             @file_name = (@file_names[0]).to_s

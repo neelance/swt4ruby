@@ -323,7 +323,7 @@ module Org::Eclipse::Swt::Internal::Image
           color_type_is_valid = true
           break
         end
-        ((i += 1) - 1)
+        i += 1
       end
       if (!color_type_is_valid)
         SWT.error(SWT::ERROR_INVALID_IMAGE)
@@ -335,7 +335,7 @@ module Org::Eclipse::Swt::Internal::Image
           bit_depth_is_valid = true
           break
         end
-        ((i_ += 1) - 1)
+        i_ += 1
       end
       if (!bit_depth_is_valid)
         SWT.error(SWT::ERROR_INVALID_IMAGE)
@@ -487,7 +487,7 @@ module Org::Eclipse::Swt::Internal::Image
       while i <= max
         rgbs[i] = RGB.new(gray, gray, gray)
         gray += delta
-        ((i += 1) - 1)
+        i += 1
       end
       return PaletteData.new(rgbs)
     end

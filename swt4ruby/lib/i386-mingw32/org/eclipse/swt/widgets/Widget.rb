@@ -612,10 +612,10 @@ module Org::Eclipse::Swt::Widgets
             if (spaces)
               buffer[j] = Character.new(?\s.ord)
             end
-            ((j += 1) - 1)
-            ((i += 1) - 1)
+            j += 1
+            i += 1
           end
-          ((i += 1) - 1)
+          i += 1
         else
           buffer[((j += 1) - 1)] = buffer[((i += 1) - 1)]
         end

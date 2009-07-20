@@ -189,7 +189,7 @@ module Org::Eclipse::Swt::Graphics
           if ((@colors[i] == rgb))
             return i
           end
-          ((i += 1) - 1)
+          i += 1
         end
         # The RGB did not exist in the palette
         SWT.error(SWT::ERROR_INVALID_ARGUMENT)
@@ -246,7 +246,7 @@ module Org::Eclipse::Swt::Graphics
         if (!(((mask >> i) & 0x1)).equal?(0))
           return 7 - i
         end
-        ((i -= 1) + 1)
+        i -= 1
       end
       return 32
     end

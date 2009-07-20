@@ -805,7 +805,7 @@ module Org::Eclipse::Swt::Internal::Cocoa
         i = 0
         while i < length_
           buffer[i] = chars[i]
-          ((i += 1) - 1)
+          i += 1
         end
         return buffer
       end

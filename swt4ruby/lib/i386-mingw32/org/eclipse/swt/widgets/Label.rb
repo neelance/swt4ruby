@@ -323,9 +323,9 @@ module Org::Eclipse::Swt::Widgets
           if ((children[index]).equal?(self))
             break
           end
-          ((index += 1) - 1)
+          index += 1
         end
-        ((index += 1) - 1)
+        index += 1
         if (index < children.attr_length)
           if (children[index].set_focus)
             return true

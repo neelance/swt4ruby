@@ -178,7 +178,7 @@ module Org::Eclipse::Swt::Widgets
               end
               height += @spacing
               width = Math.max(width, item.get_preferred_width(gc))
-              ((i += 1) - 1)
+              i += 1
             end
             gc.dispose
           end
@@ -270,7 +270,7 @@ module Org::Eclipse::Swt::Widgets
       end
       System.arraycopy(@items, index, @items, index + 1, @item_count - index)
       @items[index] = item
-      ((@item_count += 1) - 1)
+      @item_count += 1
       if (OS::GTK_VERSION < OS._version(2, 4, 0))
         if ((@last_focus).nil?)
           @last_focus = item
@@ -293,7 +293,7 @@ module Org::Eclipse::Swt::Widgets
         if ((@items[index]).equal?(item))
           break
         end
-        ((index += 1) - 1)
+        index += 1
       end
       if ((index).equal?(@item_count))
         return
@@ -334,7 +334,7 @@ module Org::Eclipse::Swt::Widgets
           if (item.set_focus)
             return true
           end
-          ((i += 1) - 1)
+          i += 1
         end
       end
       return super(focus_handle)
@@ -349,7 +349,7 @@ module Org::Eclipse::Swt::Widgets
           if (item.has_focus)
             return true
           end
-          ((i += 1) - 1)
+          i += 1
         end
       end
       return super
@@ -469,7 +469,7 @@ module Org::Eclipse::Swt::Widgets
             force_focus
             break
           end
-          ((i += 1) - 1)
+          i += 1
         end
       end
       return super(widget, event)
@@ -516,7 +516,7 @@ module Org::Eclipse::Swt::Widgets
         while i < @item_count
           item = @items[i]
           item.draw_item(gc, has_focus_ && (item).equal?(@last_focus))
-          ((i += 1) - 1)
+          i += 1
         end
         gc.dispose
       end
@@ -568,7 +568,7 @@ module Org::Eclipse::Swt::Widgets
           if (@items[index].has_focus)
             break
           end
-          ((index += 1) - 1)
+          index += 1
         end
         gdk_event = GdkEventKey.new
         OS.memmove(gdk_event, event, GdkEventKey.attr_sizeof)
@@ -648,7 +648,7 @@ module Org::Eclipse::Swt::Widgets
         if ((@items[i]).equal?(item))
           return i
         end
-        ((i += 1) - 1)
+        i += 1
       end
       return -1
     end
@@ -662,7 +662,7 @@ module Org::Eclipse::Swt::Widgets
           if (!(item).nil?)
             item.resize_control(@y_current_scroll)
           end
-          ((i += 1) - 1)
+          i += 1
         end
       else
         if (index < @item_count)
@@ -674,7 +674,7 @@ module Org::Eclipse::Swt::Widgets
               y += item.attr_height
             end
             y += item.get_header_height + @spacing
-            ((i += 1) - 1)
+            i += 1
           end
           i_ = index
           while i_ < @item_count
@@ -684,7 +684,7 @@ module Org::Eclipse::Swt::Widgets
               y += item.attr_height
             end
             y += item.get_header_height + @spacing
-            ((i_ += 1) - 1)
+            i_ += 1
           end
         end
         if (set_scrollbar)
@@ -707,7 +707,7 @@ module Org::Eclipse::Swt::Widgets
         if (!(item).nil? && !item.is_disposed)
           item.release(false)
         end
-        ((i += 1) - 1)
+        i += 1
       end
       super(destroy)
     end
@@ -755,7 +755,7 @@ module Org::Eclipse::Swt::Widgets
               if (!(item.attr_width).equal?(new_width))
                 item.set_bounds(0, 0, new_width, item.attr_height, false, true)
               end
-              ((i += 1) - 1)
+              i += 1
             end
           end
         end
@@ -771,7 +771,7 @@ module Org::Eclipse::Swt::Widgets
         i = 0
         while i < @item_count
           @items[i].set_font_description(font)
-          ((i += 1) - 1)
+          i += 1
         end
         layout_items(0, true)
       end
@@ -784,7 +784,7 @@ module Org::Eclipse::Swt::Widgets
         i = 0
         while i < @item_count
           @items[i].set_foreground_color(color)
-          ((i += 1) - 1)
+          i += 1
         end
       end
     end
@@ -834,7 +834,7 @@ module Org::Eclipse::Swt::Widgets
       while i < @item_count
         item2 = @items[i]
         item2.set_bounds(0, 0, width, item2.attr_height, false, true)
-        ((i += 1) - 1)
+        i += 1
       end
     end
     
@@ -869,7 +869,7 @@ module Org::Eclipse::Swt::Widgets
             if (!(item.attr_width).equal?(width))
               item.set_bounds(0, 0, width, item.attr_height, false, true)
             end
-            ((i += 1) - 1)
+            i += 1
           end
         end
         layout_items(0, true)

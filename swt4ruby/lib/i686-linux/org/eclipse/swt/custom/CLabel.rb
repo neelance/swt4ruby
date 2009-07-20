@@ -327,7 +327,7 @@ module Org::Eclipse::Swt::Custom
       length_ = string.length
       begin
         while (index < length_ && !(string.char_at(index)).equal?(Character.new(?&.ord)))
-          ((index += 1) - 1)
+          index += 1
         end
         if ((index += 1) >= length_)
           return Character.new(?\0.ord)
@@ -335,7 +335,7 @@ module Org::Eclipse::Swt::Custom
         if (!(string.char_at(index)).equal?(Character.new(?&.ord)))
           return Character.to_lower_case(string.char_at(index))
         end
-        ((index += 1) - 1)
+        index += 1
       end while (index < length_)
       return Character.new(?\0.ord)
     end
@@ -517,9 +517,9 @@ module Org::Eclipse::Swt::Custom
           if ((children[index]).equal?(self))
             break
           end
-          ((index += 1) - 1)
+          index += 1
         end
-        ((index += 1) - 1)
+        index += 1
         if (index < children.attr_length)
           if (children[index].set_focus)
             event.attr_doit = true
@@ -562,7 +562,7 @@ module Org::Eclipse::Swt::Custom
           else
             extent.attr_x = Math.max(extent.attr_x, e.attr_x)
           end
-          ((i += 1) - 1)
+          i += 1
         end
         if ((@app_tool_tip_text).nil?)
           Canvas.instance_method(:set_tool_tip_text).bind(self).call(@text)
@@ -687,7 +687,7 @@ module Org::Eclipse::Swt::Custom
           end
           gc.draw_text(lines[i], line_x, line_y, self.attr_draw_flags)
           line_y += line_height
-          ((i += 1) - 1)
+          i += 1
         end
       end
     end
@@ -833,7 +833,7 @@ module Org::Eclipse::Swt::Custom
           if (i > 0 && percents[i] < percents[i - 1])
             SWT.error(SWT::ERROR_INVALID_ARGUMENT)
           end
-          ((i += 1) - 1)
+          i += 1
         end
       end
       # Are these settings the same as before?
@@ -847,7 +847,7 @@ module Org::Eclipse::Swt::Custom
             if (!same)
               break
             end
-            ((i += 1) - 1)
+            i += 1
           end
           if (same)
             i_ = 0
@@ -856,7 +856,7 @@ module Org::Eclipse::Swt::Custom
               if (!same)
                 break
               end
-              ((i_ += 1) - 1)
+              i_ += 1
             end
           end
           if (same && (@gradient_vertical).equal?(vertical))

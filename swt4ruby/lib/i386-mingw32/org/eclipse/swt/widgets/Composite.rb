@@ -140,7 +140,7 @@ module Org::Eclipse::Swt::Widgets
         return Array.typed(Control).new(0) { nil }
       end
       while (!(hwnd_child).equal?(0))
-        ((count += 1) - 1)
+        count += 1
         hwnd_child = OS._get_window(hwnd_child, OS::GW_HWNDNEXT)
       end
       children = Array.typed(Control).new(count) { nil }
@@ -170,9 +170,9 @@ module Org::Eclipse::Swt::Widgets
       i = 0
       while i < @tab_list.attr_length
         if (!@tab_list[i].is_disposed)
-          ((count += 1) - 1)
+          count += 1
         end
-        ((i += 1) - 1)
+        i += 1
       end
       if ((count).equal?(@tab_list.attr_length))
         return @tab_list
@@ -184,7 +184,7 @@ module Org::Eclipse::Swt::Widgets
         if (!@tab_list[i_].is_disposed)
           new_list[((index += 1) - 1)] = @tab_list[i_]
         end
-        ((i_ += 1) - 1)
+        i_ += 1
       end
       @tab_list = new_list
       return @tab_list
@@ -233,7 +233,7 @@ module Org::Eclipse::Swt::Widgets
         if (!ancestor)
           error(SWT::ERROR_INVALID_PARENT)
         end
-        ((i += 1) - 1)
+        i += 1
       end
       i_ = 0
       while i_ < changed.attr_length
@@ -246,7 +246,7 @@ module Org::Eclipse::Swt::Widgets
           child = composite
           composite = child.attr_parent
         end
-        ((i_ += 1) - 1)
+        i_ += 1
       end
     end
     
@@ -292,7 +292,7 @@ module Org::Eclipse::Swt::Widgets
           System.arraycopy(child_list, 0, new_result, result.attr_length, child_list.attr_length)
           result = new_result
         end
-        ((i += 1) - 1)
+        i += 1
       end
       return result
     end
@@ -426,7 +426,7 @@ module Org::Eclipse::Swt::Widgets
           System.arraycopy(menu_list, 0, new_result, result.attr_length, menu_list.attr_length)
           result = new_result
         end
-        ((i += 1) - 1)
+        i += 1
       end
       return result
     end
@@ -438,7 +438,7 @@ module Org::Eclipse::Swt::Widgets
       i = 0
       while i < children.attr_length
         children[i].fix_children(new_shell, old_shell, new_decorations, old_decorations, menus)
-        ((i += 1) - 1)
+        i += 1
       end
     end
     
@@ -451,9 +451,9 @@ module Org::Eclipse::Swt::Widgets
       i = 0
       while i < @tab_list.attr_length
         if ((@tab_list[i]).equal?(control))
-          ((count += 1) - 1)
+          count += 1
         end
-        ((i += 1) - 1)
+        i += 1
       end
       if ((count).equal?(0))
         return
@@ -468,7 +468,7 @@ module Org::Eclipse::Swt::Widgets
           if (!(@tab_list[i_]).equal?(control))
             new_list[((index += 1) - 1)] = @tab_list[i_]
           end
-          ((i_ += 1) - 1)
+          i_ += 1
         end
       end
       @tab_list = new_list
@@ -529,7 +529,7 @@ module Org::Eclipse::Swt::Widgets
       # long
       hwnd_child = OS._get_window(self.attr_handle, OS::GW_CHILD)
       while (!(hwnd_child).equal?(0))
-        ((count += 1) - 1)
+        count += 1
         hwnd_child = OS._get_window(hwnd_child, OS::GW_HWNDNEXT)
       end
       return count
@@ -570,9 +570,9 @@ module Org::Eclipse::Swt::Widgets
         i = 0
         while i < list.attr_length
           if (list[i].is_tab_group)
-            ((count += 1) - 1)
+            count += 1
           end
-          ((i += 1) - 1)
+          i += 1
         end
         tab_list = Array.typed(Control).new(count) { nil }
         index = 0
@@ -581,7 +581,7 @@ module Org::Eclipse::Swt::Widgets
           if (list[i_].is_tab_group)
             tab_list[((index += 1) - 1)] = list[i_]
           end
-          ((i_ += 1) - 1)
+          i_ += 1
         end
       end
       return tab_list
@@ -791,7 +791,7 @@ module Org::Eclipse::Swt::Widgets
         if (!ancestor)
           error(SWT::ERROR_INVALID_PARENT)
         end
-        ((i += 1) - 1)
+        i += 1
       end
       update_count = 0
       update = Array.typed(Composite).new(16) { nil }
@@ -814,12 +814,12 @@ module Org::Eclipse::Swt::Widgets
           child = update[((update_count += 1) - 1)] = composite
           composite = child.attr_parent
         end
-        ((i_ += 1) - 1)
+        i_ += 1
       end
       i__ = update_count - 1
       while i__ >= 0
         update[i__].update_layout(true, false)
-        ((i__ -= 1) + 1)
+        i__ -= 1
       end
     end
     
@@ -836,7 +836,7 @@ module Org::Eclipse::Swt::Widgets
         i = 0
         while i < children.attr_length
           children[i].mark_layout(changed, all)
-          ((i += 1) - 1)
+          i += 1
         end
       end
     end
@@ -851,7 +851,7 @@ module Org::Eclipse::Swt::Widgets
         rect = children[i].get_bounds
         width = Math.max(width, rect.attr_x + rect.attr_width)
         height = Math.max(height, rect.attr_y + rect.attr_height)
-        ((i += 1) - 1)
+        i += 1
       end
       return Point.new(width, height)
     end
@@ -865,7 +865,7 @@ module Org::Eclipse::Swt::Widgets
       i = 0
       while i < children.attr_length
         children[i].redraw_children
-        ((i += 1) - 1)
+        i += 1
       end
       return true
     end
@@ -904,7 +904,7 @@ module Org::Eclipse::Swt::Widgets
         if (!(child).nil? && !child.is_disposed)
           child.release(false)
         end
-        ((i += 1) - 1)
+        i += 1
       end
       super(destroy)
     end
@@ -983,7 +983,7 @@ module Org::Eclipse::Swt::Widgets
             _set_window_pos(wp.attr_hwnd, 0, wp.attr_x, wp.attr_y, wp.attr_cx, wp.attr_cy, wp.attr_flags)
           end
         end
-        ((i += 1) - 1)
+        i += 1
       end
       if (defer)
         return OS._end_defer_window_pos(hdwp)
@@ -1055,7 +1055,7 @@ module Org::Eclipse::Swt::Widgets
       i = 0
       while i < children.attr_length
         children[i].update_background_mode
-        ((i += 1) - 1)
+        i += 1
       end
     end
     
@@ -1092,7 +1092,7 @@ module Org::Eclipse::Swt::Widgets
         if (child.set_radio_focus)
           return true
         end
-        ((i += 1) - 1)
+        i += 1
       end
       i_ = 0
       while i_ < children.attr_length
@@ -1100,7 +1100,7 @@ module Org::Eclipse::Swt::Widgets
         if (child.set_fixed_focus)
           return true
         end
-        ((i_ += 1) - 1)
+        i_ += 1
       end
       return super
     end
@@ -1115,7 +1115,7 @@ module Org::Eclipse::Swt::Widgets
         if (child.set_radio_focus)
           return true
         end
-        ((i += 1) - 1)
+        i += 1
       end
       i_ = 0
       while i_ < children.attr_length
@@ -1123,7 +1123,7 @@ module Org::Eclipse::Swt::Widgets
         if (child.set_focus)
           return true
         end
-        ((i_ += 1) - 1)
+        i_ += 1
       end
       return super
     end
@@ -1172,7 +1172,7 @@ module Org::Eclipse::Swt::Widgets
           end
         end
       else
-        ((@layout_count += 1) - 1)
+        @layout_count += 1
       end
     end
     
@@ -1205,7 +1205,7 @@ module Org::Eclipse::Swt::Widgets
           if (!(control.attr_parent).equal?(self))
             error(SWT::ERROR_INVALID_PARENT)
           end
-          ((i += 1) - 1)
+          i += 1
         end
         new_list = Array.typed(Control).new(tab_list.attr_length) { nil }
         System.arraycopy(tab_list, 0, new_list, 0, tab_list.attr_length)
@@ -1251,7 +1251,7 @@ module Org::Eclipse::Swt::Widgets
         if (child.is_tab_item && child.set_radio_focus)
           return true
         end
-        ((i += 1) - 1)
+        i += 1
       end
       i_ = 0
       while i_ < children.attr_length
@@ -1259,7 +1259,7 @@ module Org::Eclipse::Swt::Widgets
         if (child.is_tab_item && !child.is_tab_group && child.set_tab_item_focus)
           return true
         end
-        ((i_ += 1) - 1)
+        i_ += 1
       end
       return false
     end
@@ -1298,7 +1298,7 @@ module Org::Eclipse::Swt::Widgets
           if (child.translate_mnemonic(event, control))
             return true
           end
-          ((i += 1) - 1)
+          i += 1
         end
       end
       return false
@@ -1332,7 +1332,7 @@ module Org::Eclipse::Swt::Widgets
         if (!((children[i].attr_state & PARENT_BACKGROUND)).equal?(0))
           children[i].update_background_color
         end
-        ((i += 1) - 1)
+        i += 1
       end
     end
     
@@ -1345,7 +1345,7 @@ module Org::Eclipse::Swt::Widgets
         if (!((children[i].attr_state & PARENT_BACKGROUND)).equal?(0))
           children[i].update_background_image
         end
-        ((i += 1) - 1)
+        i += 1
       end
     end
     
@@ -1356,7 +1356,7 @@ module Org::Eclipse::Swt::Widgets
       i = 0
       while i < children.attr_length
         children[i].update_background_mode
-        ((i += 1) - 1)
+        i += 1
       end
     end
     
@@ -1370,7 +1370,7 @@ module Org::Eclipse::Swt::Widgets
         if (!control.is_disposed)
           control.update_font(old_font, new_font)
         end
-        ((i += 1) - 1)
+        i += 1
       end
     end
     
@@ -1398,7 +1398,7 @@ module Org::Eclipse::Swt::Widgets
         i = 0
         while i < children.attr_length
           children[i].update_layout(resize, all)
-          ((i += 1) - 1)
+          i += 1
         end
       end
     end
@@ -1715,7 +1715,7 @@ module Org::Eclipse::Swt::Widgets
                 event.attr_height = rect.attr_bottom - rect.attr_top
                 event.attr_count = count - 1 - i
                 send_event(SWT::Paint, event)
-                ((i += 1) - 1)
+                i += 1
               end
             else
               if (((self.attr_style & (SWT::DOUBLE_BUFFERED | SWT::NO_BACKGROUND | SWT::TRANSPARENT))).equal?(0))

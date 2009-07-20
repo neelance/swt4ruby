@@ -139,10 +139,10 @@ module Org::Eclipse::Swt::Printing
               device_names = new_names
             end
             device_names[name_count] = buf.to_s(index, i - index)
-            ((name_count += 1) - 1)
+            name_count += 1
             index = i + 1
           end
-          ((i += 1) - 1)
+          i += 1
         end
         printer_list = Array.typed(PrinterData).new(name_count) { nil }
         p = 0
@@ -152,14 +152,14 @@ module Org::Eclipse::Swt::Printing
           if (OS._get_profile_string(self.attr_profile, TCHAR.new(0, device, true), null_buf, buf, length) > 0)
             comma_index = 0
             while (!(buf.tchar_at(comma_index)).equal?(Character.new(?,.ord)) && comma_index < length)
-              ((comma_index += 1) - 1)
+              comma_index += 1
             end
             if (comma_index < length)
               driver = (buf.to_s(0, comma_index)).to_s
             end
           end
           printer_list[p] = PrinterData.new(driver, device)
-          ((p += 1) - 1)
+          p += 1
         end
         return printer_list
       end
@@ -184,7 +184,7 @@ module Org::Eclipse::Swt::Printing
         end
         comma_index = 0
         while (!(buf.tchar_at(comma_index)).equal?(Character.new(?,.ord)) && comma_index < length)
-          ((comma_index += 1) - 1)
+          comma_index += 1
         end
         if (comma_index < length)
           device_name = (buf.to_s(0, comma_index)).to_s
@@ -193,7 +193,7 @@ module Org::Eclipse::Swt::Printing
         if (OS._get_profile_string(self.attr_profile, TCHAR.new(0, device_name, true), null_buf, buf, length) > 0)
           comma_index = 0
           while (!(buf.tchar_at(comma_index)).equal?(Character.new(?,.ord)) && comma_index < length)
-            ((comma_index += 1) - 1)
+            comma_index += 1
           end
           if (comma_index < length)
             driver = (buf.to_s(0, comma_index)).to_s

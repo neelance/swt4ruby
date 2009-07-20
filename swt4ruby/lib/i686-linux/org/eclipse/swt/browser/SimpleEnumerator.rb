@@ -62,14 +62,14 @@ module Org::Eclipse::Swt::Browser
       i = 0
       while i < values.attr_length
         values[i]._add_ref
-        ((i += 1) - 1)
+        i += 1
       end
       create_cominterfaces
     end
     
     typesig { [] }
     def _add_ref
-      ((@ref_count += 1) - 1)
+      @ref_count += 1
       return @ref_count
     end
     
@@ -174,7 +174,7 @@ module Org::Eclipse::Swt::Browser
         i = 0
         while i < @values.attr_length
           @values[i]._release
-          ((i += 1) - 1)
+          i += 1
         end
         @values = nil
       end
@@ -214,7 +214,7 @@ module Org::Eclipse::Swt::Browser
     
     typesig { [] }
     def _release
-      ((@ref_count -= 1) + 1)
+      @ref_count -= 1
       if ((@ref_count).equal?(0))
         dispose_cominterfaces
       end

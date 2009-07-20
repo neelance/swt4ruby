@@ -176,19 +176,19 @@ module Org::Eclipse::Swt::Program
                             end
                           end
                         end
-                        ((k += 1) - 1)
+                        k += 1
                       end
                       OS._cfrelease(apps)
                     end
                   end
-                  ((j += 1) - 1)
+                  j += 1
                 end
                 OS._cfrelease(utis)
               end
             end
             OS._cfrelease(ext)
           end
-          ((i += 1) - 1)
+          i += 1
         end
         count = 0
         programs = Array.typed(Program).new(bundles.size) { nil }
@@ -379,9 +379,9 @@ module Org::Eclipse::Swt::Program
           x = 0
           while x < 11
             result.set_pixel(x + 3, y + 1, p[y].char_at(x) - Character.new(?A.ord))
-            ((x += 1) - 1)
+            x += 1
           end
-          ((y += 1) - 1)
+          y += 1
         end
       end
       return result

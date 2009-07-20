@@ -531,7 +531,7 @@ module Org::Eclipse::Swt::Widgets
         if ((@field_names[i]).equal?(field_name))
           return i
         end
-        ((i += 1) - 1)
+        i += 1
       end
       return -1
     end
@@ -829,7 +829,7 @@ module Org::Eclipse::Swt::Widgets
           @current_field = i
           break
         end
-        ((i += 1) - 1)
+        i += 1
       end
       select_field(@current_field)
     end
@@ -1120,7 +1120,7 @@ module Org::Eclipse::Swt::Widgets
         else
           buffer.insert(0, Character.new(?\s.ord))
         end
-        ((i += 1) - 1)
+        i += 1
       end
       new_value = (buffer.to_s).to_s
       @ignore_verify = true
@@ -1367,7 +1367,7 @@ module Org::Eclipse::Swt::Widgets
         return -1
       end
       if ((field_name).equal?(Calendar::MONTH) && adjust)
-        ((new_value -= 1) + 1)
+        new_value -= 1
         if ((new_value).equal?(-1))
           new_value = max_
         end

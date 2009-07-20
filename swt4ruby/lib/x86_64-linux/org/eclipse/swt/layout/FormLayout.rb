@@ -349,7 +349,7 @@ module Org::Eclipse::Swt::Layout
           data.flush_cache
         end
         data.attr_cache_left = data.attr_cache_right = data.attr_cache_top = data.attr_cache_bottom = nil
-        ((i += 1) - 1)
+        i += 1
       end
       flush = nil
       bounds = nil
@@ -394,7 +394,7 @@ module Org::Eclipse::Swt::Layout
         else
           w = Math.max(compute_width(child, data, flush_cache), w)
         end
-        ((i_ += 1) - 1)
+        i_ += 1
       end
       i__ = 0
       while i__ < children.attr_length
@@ -411,7 +411,7 @@ module Org::Eclipse::Swt::Layout
         else
           h = Math.max(compute_height(child, data, flush_cache), h)
         end
-        ((i__ += 1) - 1)
+        i__ += 1
       end
       i___ = 0
       while i___ < children.attr_length
@@ -421,13 +421,13 @@ module Org::Eclipse::Swt::Layout
           data.attr_cache_width = data.attr_cache_height = -1
         end
         data.attr_cache_left = data.attr_cache_right = data.attr_cache_top = data.attr_cache_bottom = nil
-        ((i___ += 1) - 1)
+        i___ += 1
       end
       if (move)
         i____ = 0
         while i____ < children.attr_length
           children[i____].set_bounds(bounds[i____])
-          ((i____ += 1) - 1)
+          i____ += 1
         end
       end
       w += @margin_left + @margin_width * 2 + @margin_right

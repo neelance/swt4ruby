@@ -221,7 +221,7 @@ module Org::Eclipse::Swt::Internal::Image
         baos.write(rgbs[i].attr_red)
         baos.write(rgbs[i].attr_green)
         baos.write(rgbs[i].attr_blue)
-        ((i += 1) - 1)
+        i += 1
       end
       write_chunk(TAG_PLTE, baos.to_byte_array)
     end
@@ -241,9 +241,9 @@ module Org::Eclipse::Swt::Internal::Image
             pixel_value = @data.get_pixel(x, y)
             alpha_value = @data.get_alpha(x, y)
             alphas[pixel_value] = alpha_value
-            ((x += 1) - 1)
+            x += 1
           end
-          ((y += 1) - 1)
+          y += 1
         end
         baos.write(alphas, 0, alphas.attr_length)
       when SWT::TRANSPARENCY_PIXEL
@@ -270,7 +270,7 @@ module Org::Eclipse::Swt::Internal::Image
           i = 0
           while i < pixel
             padding[i] = 255
-            ((i += 1) - 1)
+            i += 1
           end
           padding[pixel] = 0
           baos.write(padding, 0, padding.attr_length)
@@ -296,9 +296,9 @@ module Org::Eclipse::Swt::Internal::Image
           x = 0
           while x < line_data.attr_length
             os.write(line_data[x])
-            ((x += 1) - 1)
+            x += 1
           end
-          ((y += 1) - 1)
+          y += 1
         end
       else
         line_data = Array.typed(::Java::Int).new(@width) { 0 }
@@ -335,9 +335,9 @@ module Org::Eclipse::Swt::Internal::Image
             if ((@color_type).equal?(6))
               os.write(alpha_data[x])
             end
-            ((x += 1) - 1)
+            x += 1
           end
-          ((y += 1) - 1)
+          y += 1
         end
       end
       os.flush

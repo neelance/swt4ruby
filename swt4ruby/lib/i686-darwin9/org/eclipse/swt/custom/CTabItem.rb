@@ -388,13 +388,13 @@ module Org::Eclipse::Swt::Custom
           while i < left.attr_length / 2
             shape[((index += 1) - 1)] = @x + left[2 * i]
             shape[((index += 1) - 1)] = @y + @height + left[2 * i + 1] - 1
-            ((i += 1) - 1)
+            i += 1
           end
           i_ = 0
           while i_ < right.attr_length / 2
             shape[((index += 1) - 1)] = @parent.attr_simple ? right_edge - 1 + right[2 * i_] : right_edge - @parent.attr_curve_indent + right[2 * i_]
             shape[((index += 1) - 1)] = @parent.attr_simple ? @y + @height + right[2 * i_ + 1] - 1 : @y + right[2 * i_ + 1] - 2
-            ((i_ += 1) - 1)
+            i_ += 1
           end
           shape[((index += 1) - 1)] = @parent.attr_simple ? right_edge - 1 : right_edge + @parent.attr_curve_width - @parent.attr_curve_indent
           shape[((index += 1) - 1)] = @y - 1
@@ -416,13 +416,13 @@ module Org::Eclipse::Swt::Custom
           while i < left.attr_length / 2
             shape[((index += 1) - 1)] = @x + left[2 * i]
             shape[((index += 1) - 1)] = @y + left[2 * i + 1]
-            ((i += 1) - 1)
+            i += 1
           end
           i_ = 0
           while i_ < right.attr_length / 2
             shape[((index += 1) - 1)] = @parent.attr_simple ? right_edge - 1 + right[2 * i_] : right_edge - @parent.attr_curve_indent + right[2 * i_]
             shape[((index += 1) - 1)] = @y + right[2 * i_ + 1]
-            ((i_ += 1) - 1)
+            i_ += 1
           end
           shape[((index += 1) - 1)] = @parent.attr_simple ? right_edge - 1 : right_edge + @parent.attr_curve_width - @parent.attr_curve_indent
           shape[((index += 1) - 1)] = @y + @height + 1
@@ -471,7 +471,7 @@ module Org::Eclipse::Swt::Custom
           if ((shape[2 * i + 1]).equal?(@y + @height + 1))
             shape[2 * i + 1] -= 1
           end
-          ((i += 1) - 1)
+          i += 1
         end
         inside = @parent.attr_selection_background.get_rgb
         if (!(@parent.attr_selection_bg_image).nil? || (!(@parent.attr_selection_gradient_colors).nil? && @parent.attr_selection_gradient_colors.attr_length > 1))
@@ -584,14 +584,14 @@ module Org::Eclipse::Swt::Custom
         last_color_index = raw_y - 1
         gc.set_foreground(gradients[last_color_index])
         gc.draw_point(last_x, last_y)
-        ((i += 1) - 1)
+        i += 1
       end
       # draw left vertical line highlight
       i_ = last_color_index
       while i_ < gradients_size
         gc.set_foreground(gradients[i_])
         gc.draw_point(last_x, 1 + ((last_y += 1) - 1))
-        ((i_ += 1) - 1)
+        i_ += 1
       end
       right_edge_offset = right_edge - @parent.attr_curve_indent
       # draw right swoop highlight up to diagonal portion
@@ -607,7 +607,7 @@ module Org::Eclipse::Swt::Custom
         end # can happen if tabs are unusually short and cut off the curve
         gc.set_foreground(gradients[last_color_index])
         gc.draw_point(last_x, last_y)
-        ((i__ += 1) - 1)
+        i__ += 1
       end
       # draw right diagonal line highlight
       i___ = last_color_index
@@ -617,7 +617,7 @@ module Org::Eclipse::Swt::Custom
         end # can happen if tabs are unusually short and cut off the curve
         gc.set_foreground(gradients[i___])
         gc.draw_point(1 + ((last_x += 1) - 1), 1 + ((last_y += 1) - 1))
-        ((i___ += 1) - 1)
+        i___ += 1
       end
       # draw right swoop highlight from diagonal portion to end
       i____ = 0
@@ -632,7 +632,7 @@ module Org::Eclipse::Swt::Custom
         end # can happen if tabs are unusually short and cut off the curve
         gc.set_foreground(gradients[last_color_index])
         gc.draw_point(last_x, last_y)
-        ((i____ += 1) - 1)
+        i____ += 1
       end
     end
     
@@ -651,7 +651,7 @@ module Org::Eclipse::Swt::Custom
         while i < right.attr_length / 2
           shape[((index += 1) - 1)] = start_x + right[2 * i]
           shape[((index += 1) - 1)] = @y + @height + right[2 * i + 1] - 1
-          ((i += 1) - 1)
+          i += 1
         end
         shape[((index += 1) - 1)] = start_x
         shape[((index += 1) - 1)] = @y - 1
@@ -663,7 +663,7 @@ module Org::Eclipse::Swt::Custom
         while i < right.attr_length / 2
           shape[((index += 1) - 1)] = start_x + right[2 * i]
           shape[((index += 1) - 1)] = @y + right[2 * i + 1]
-          ((i += 1) - 1)
+          i += 1
         end
         shape[((index += 1) - 1)] = start_x
         shape[((index += 1) - 1)] = @y + @height
@@ -697,7 +697,7 @@ module Org::Eclipse::Swt::Custom
         while i < left.attr_length / 2
           shape[((index += 1) - 1)] = @x + left[2 * i]
           shape[((index += 1) - 1)] = @y + @height + left[2 * i + 1] - 1
-          ((i += 1) - 1)
+          i += 1
         end
       else
         left = @parent.attr_simple ? CTabFolder::SIMPLE_UNSELECTED_INNER_CORNER : CTabFolder::TOP_LEFT_CORNER
@@ -709,7 +709,7 @@ module Org::Eclipse::Swt::Custom
         while i < left.attr_length / 2
           shape[((index += 1) - 1)] = @x + left[2 * i]
           shape[((index += 1) - 1)] = @y + left[2 * i + 1]
-          ((i += 1) - 1)
+          i += 1
         end
       end
       draw_border(gc, shape)

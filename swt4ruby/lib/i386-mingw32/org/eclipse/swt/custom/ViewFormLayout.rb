@@ -63,13 +63,13 @@ module Org::Eclipse::Swt::Custom
         size.attr_x = left_size.attr_x + center_size.attr_x + right_size.attr_x
         count = -1
         if (left_size.attr_x > 0)
-          ((count += 1) - 1)
+          count += 1
         end
         if (center_size.attr_x > 0)
-          ((count += 1) - 1)
+          count += 1
         end
         if (right_size.attr_x > 0)
-          ((count += 1) - 1)
+          count += 1
         end
         if (count > 0)
           size.attr_x += count * form.attr_horizontal_spacing
@@ -150,13 +150,13 @@ module Org::Eclipse::Swt::Custom
       min_top_width = left_size.attr_x + center_size.attr_x + right_size.attr_x + 2 * form.attr_margin_width + 2 * form.attr_highlight
       count = -1
       if (left_size.attr_x > 0)
-        ((count += 1) - 1)
+        count += 1
       end
       if (center_size.attr_x > 0)
-        ((count += 1) - 1)
+        count += 1
       end
       if (right_size.attr_x > 0)
-        ((count += 1) - 1)
+        count += 1
       end
       if (count > 0)
         min_top_width += count * form.attr_horizontal_spacing
@@ -221,7 +221,7 @@ module Org::Eclipse::Swt::Custom
       if (!(content).nil? && !content.is_disposed)
         if (!(left).nil? || !(right).nil? || !(center).nil?)
           form.attr_separator = y
-          ((y += 1) - 1)
+          y += 1
         end
         content.set_bounds(rect.attr_x + form.attr_margin_width + form.attr_highlight, y, rect.attr_width - 2 * form.attr_margin_width - 2 * form.attr_highlight, rect.attr_y + rect.attr_height - y - form.attr_margin_height - form.attr_highlight)
       end

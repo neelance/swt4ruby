@@ -57,9 +57,9 @@ module Org::Eclipse::Swt::Widgets
       i = 0
       while i < @types.attr_length
         if ((@types[i]).equal?(event_type))
-          ((count += 1) - 1)
+          count += 1
         end
-        ((i += 1) - 1)
+        i += 1
       end
       if ((count).equal?(0))
         return Array.typed(Listener).new(0) { nil }
@@ -71,7 +71,7 @@ module Org::Eclipse::Swt::Widgets
         if ((@types[i_]).equal?(event_type))
           result[((count += 1) - 1)] = @listeners[i_]
         end
-        ((i_ += 1) - 1)
+        i_ += 1
       end
       return result
     end
@@ -92,7 +92,7 @@ module Org::Eclipse::Swt::Widgets
         end
         (index -= 1)
       end
-      ((index += 1) - 1)
+      index += 1
       if ((index).equal?(length))
         new_types = Array.typed(::Java::Int).new(length + GROW_SIZE) { 0 }
         System.arraycopy(@types, 0, new_types, 0, length)
@@ -115,7 +115,7 @@ module Org::Eclipse::Swt::Widgets
         if ((@types[i]).equal?(event_type))
           return true
         end
-        ((i += 1) - 1)
+        i += 1
       end
       return false
     end
@@ -138,7 +138,7 @@ module Org::Eclipse::Swt::Widgets
               listener.handle_event(event)
             end
           end
-          ((i += 1) - 1)
+          i += 1
         end
       ensure
         compact = @level < 0
@@ -150,15 +150,15 @@ module Org::Eclipse::Swt::Widgets
             if (!(@types[i_]).equal?(0))
               @types[index] = @types[i_]
               @listeners[index] = @listeners[i_]
-              ((index += 1) - 1)
+              index += 1
             end
-            ((i_ += 1) - 1)
+            i_ += 1
           end
           i__ = index
           while i__ < @types.attr_length
             @types[i__] = 0
             @listeners[i__] = nil
-            ((i__ += 1) - 1)
+            i__ += 1
           end
         end
       end
@@ -173,9 +173,9 @@ module Org::Eclipse::Swt::Widgets
       i = 0
       while i < @types.attr_length
         if (!(@types[i]).equal?(0))
-          ((count += 1) - 1)
+          count += 1
         end
-        ((i += 1) - 1)
+        i += 1
       end
       return count
     end
@@ -207,7 +207,7 @@ module Org::Eclipse::Swt::Widgets
           remove(i)
           return
         end
-        ((i += 1) - 1)
+        i += 1
       end
     end
     
@@ -227,7 +227,7 @@ module Org::Eclipse::Swt::Widgets
             end
           end
         end
-        ((i += 1) - 1)
+        i += 1
       end
     end
     

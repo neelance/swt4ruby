@@ -147,7 +147,7 @@ module Org::Eclipse::Swt::Widgets
         i = 0
         while i < length_
           info.attr_prompt[i + 1] = self.attr_title.char_at(i)
-          ((i += 1) - 1)
+          i += 1
         end
       end
       @rgb = nil

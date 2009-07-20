@@ -533,7 +533,7 @@ module Org::Eclipse::Swt::Widgets
       rect.attr_x -= OS._loword(margins)
       rect.attr_width += OS._loword(margins) + OS._hiword(margins)
       if (!((self.attr_style & SWT::H_SCROLL)).equal?(0))
-        ((rect.attr_width += 1) - 1)
+        rect.attr_width += 1
       end
       if (!((self.attr_style & SWT::BORDER)).equal?(0))
         rect.attr_x -= 1
@@ -1372,7 +1372,7 @@ module Org::Eclipse::Swt::Widgets
           i = 0
           while i < delimiter_size
             buffer[((mbcs_size += 1) - 1)] = delimiter.char_at(i)
-            ((i += 1) - 1)
+            i += 1
           end
           wcs_size += delimiter_size
         end
@@ -1383,7 +1383,7 @@ module Org::Eclipse::Swt::Widgets
         end
         wcs_total += wcs_size
         mbcs_total += mbcs_size
-        ((line += 1) - 1)
+        line += 1
       end
       return wcs_total
     end
@@ -2216,7 +2216,7 @@ module Org::Eclipse::Swt::Widgets
           i = 0
           while i < delimiter_size
             buffer[((mbcs_size += 1) - 1)] = delimiter.char_at(i)
-            ((i += 1) - 1)
+            i += 1
           end
           wcs_size += delimiter_size
         end
@@ -2228,15 +2228,15 @@ module Org::Eclipse::Swt::Widgets
               return mbcs_total + index
             end
             if (OS._is_dbcslead_byte(buffer[((index += 1) - 1)]))
-              ((index += 1) - 1)
+              index += 1
             end
-            ((wcs_size += 1) - 1)
+            wcs_size += 1
           end
           return mbcs_total + mbcs_size
         end
         wcs_total += wcs_size
         mbcs_total += mbcs_size
-        ((line += 1) - 1)
+        line += 1
       end
       return mbcs_total
     end

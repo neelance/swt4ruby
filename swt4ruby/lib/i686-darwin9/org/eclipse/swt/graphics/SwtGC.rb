@@ -366,7 +366,7 @@ module Org::Eclipse::Swt::Graphics
           i = 0
           while i < lengths.attr_length
             lengths[i] = (width).equal?(0) || (@data.attr_line_style).equal?(SWT::LINE_CUSTOM) ? dashes[i] : dashes[i] * width
-            ((i += 1) - 1)
+            i += 1
           end
           OS._cgcontext_set_line_dash(@handle, @data.attr_line_dashes_offset, lengths, lengths.attr_length)
         else
@@ -579,7 +579,7 @@ module Org::Eclipse::Swt::Graphics
                   OS._cgimage_release(src_image)
                 end
               end
-              ((i += 1) - 1)
+              i += 1
             end
           end
         end
@@ -812,7 +812,7 @@ module Org::Eclipse::Swt::Graphics
       while i < TAB_COUNT
         tabs.attr_tab_position += OS._long2fix(tab_width)
         OS.memmove(offset, tabs, ATSUTab.attr_sizeof)
-        ((i += 1) - 1)
+        i += 1
         offset += ATSUTab.attr_sizeof
       end
       @data.attr_tabs = ptr
@@ -1652,7 +1652,7 @@ module Org::Eclipse::Swt::Graphics
           draw_text(x, y, start, line_break - start, flags)
           y += @data.attr_font_ascent + @data.attr_font_descent
           start = line_break
-          ((i += 1) - 1)
+          i += 1
         end
       else
         draw_text(x, y, 0, length_, flags)
@@ -1962,7 +1962,7 @@ module Org::Eclipse::Swt::Graphics
       i = 0
       while i < points.attr_length
         points[i] = point_array[i]
-        ((i += 1) - 1)
+        i += 1
       end
       OS._cgcontext_begin_path(@handle)
       OS._cgcontext_add_lines(@handle, points, points.attr_length / 2)
@@ -2655,7 +2655,7 @@ module Org::Eclipse::Swt::Graphics
       i = 0
       while i < line_dashes.attr_length
         line_dashes[i] = RJava.cast_to_int(@data.attr_line_dashes[i])
-        ((i += 1) - 1)
+        i += 1
       end
       return line_dashes
     end
@@ -3571,7 +3571,7 @@ module Org::Eclipse::Swt::Graphics
           if (!changed && !(line_dashes[i]).equal?(dash))
             changed = true
           end
-          ((i += 1) - 1)
+          i += 1
         end
         if (changed)
           new_dashes = Array.typed(::Java::Float).new(dashes.attr_length) { 0.0 }
@@ -3672,7 +3672,7 @@ module Org::Eclipse::Swt::Graphics
           if (!changed && !(line_dashes[i]).equal?(dash))
             changed = true
           end
-          ((i += 1) - 1)
+          i += 1
         end
         if (!changed)
           return
@@ -3681,7 +3681,7 @@ module Org::Eclipse::Swt::Graphics
         i_ = 0
         while i_ < dashes.attr_length
           @data.attr_line_dashes[i_] = dashes[i_]
-          ((i_ += 1) - 1)
+          i_ += 1
         end
         @data.attr_line_style = SWT::LINE_CUSTOM
       else
@@ -3813,17 +3813,17 @@ module Org::Eclipse::Swt::Graphics
                 next
               end
               if ((chars[i]).equal?(Character.new(?&.ord)))
-                ((i += 1) - 1)
+                i += 1
                 next
               end
-              ((j -= 1) + 1)
+              j -= 1
             end
           when Character.new(?\r.ord), Character.new(?\n.ord)
             if (!((flags & SWT::DRAW_DELIMITER)).equal?(0))
               if ((c).equal?(Character.new(?\r.ord)) && !(i).equal?(chars.attr_length) && (chars[i]).equal?(Character.new(?\n.ord)))
-                ((i += 1) - 1)
+                i += 1
               end
-              ((j -= 1) + 1)
+              j -= 1
               if ((breaks).nil?)
                 breaks = Array.typed(::Java::Int).new(4) { 0 }
               else
@@ -3854,7 +3854,7 @@ module Org::Eclipse::Swt::Graphics
         i = 0
         while i < break_count
           OS._atsuset_soft_line_break(layout, breaks[i])
-          ((i += 1) - 1)
+          i += 1
         end
       end
       font = @data.attr_font
@@ -4108,7 +4108,7 @@ module Org::Eclipse::Swt::Graphics
             width = Math.max(width, OS._fix2long(trapezoid.attr_lower_right_x) - OS._fix2long(trapezoid.attr_lower_left_x))
             height += OS._fix2long(trapezoid.attr_lower_right_y) - OS._fix2long(trapezoid.attr_upper_right_y)
             start = line_break
-            ((i += 1) - 1)
+            i += 1
           end
         else
           OS._atsuget_glyph_bounds(@data.attr_layout, 0, 0, 0, length_, RJava.cast_to_short(OS.attr_k_atsuse_device_origins), 1, trapezoid, nil)

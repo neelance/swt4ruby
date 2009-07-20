@@ -271,7 +271,7 @@ module Org::Eclipse::Swt::Browser
               if (is_session)
                 Cocoa.objc_msg_send(storage, Cocoa::S_deleteCookie, cookie)
               end
-              ((i += 1) - 1)
+              i += 1
             end
           end
           
@@ -675,10 +675,10 @@ module Org::Eclipse::Swt::Browser
               if (bounds.attr_height <= MIN_SIZE)
                 bounds.attr_height = MIN_SIZE
               end
-              ((bounds.attr_x += 1) - 1)
+              bounds.attr_x += 1
               # Note that the bounds needs to change
               OS._hiview_set_frame(@web_view_handle, bounds)
-              ((bounds.attr_x -= 1) + 1)
+              bounds.attr_x -= 1
               OS._hiview_set_frame(@web_view_handle, bounds)
             end
           end
@@ -795,10 +795,10 @@ module Org::Eclipse::Swt::Browser
               if (bounds.attr_height <= MIN_SIZE)
                 bounds.attr_height = MIN_SIZE
               end
-              ((bounds.attr_x += 1) - 1)
+              bounds.attr_x += 1
               # Note that the bounds needs to change
               OS._hiview_set_frame(@web_view_handle, bounds)
-              ((bounds.attr_x -= 1) + 1)
+              bounds.attr_x -= 1
               OS._hiview_set_frame(@web_view_handle, bounds)
             end
           end
@@ -1180,7 +1180,7 @@ module Org::Eclipse::Swt::Browser
         i = 0
         while i < self.attr_status_text_listeners.attr_length
           self.attr_status_text_listeners[i].changed(status_text)
-          ((i += 1) - 1)
+          i += 1
         end
       end
       location = LocationEvent.new(self.attr_browser)
@@ -1191,7 +1191,7 @@ module Org::Eclipse::Swt::Browser
       i = 0
       while i < self.attr_location_listeners.attr_length
         self.attr_location_listeners[i].changed(location)
-        ((i += 1) - 1)
+        i += 1
       end
     end
     
@@ -1261,7 +1261,7 @@ module Org::Eclipse::Swt::Browser
                 private
                 alias_method :initialize_anonymous, :initialize
               end.new_local(self))
-              ((i += 1) - 1)
+              i += 1
             end
           end
         end
@@ -1300,7 +1300,7 @@ module Org::Eclipse::Swt::Browser
             private
             alias_method :initialize_anonymous, :initialize
           end.new_local(self))
-          ((i += 1) - 1)
+          i += 1
         end
         # Feature on Safari.  The identifier is used here as a marker for the events
         # related to the top frame and the URL changes related to that top frame as
@@ -1421,7 +1421,7 @@ module Org::Eclipse::Swt::Browser
         i = 0
         while i < self.attr_title_listeners.attr_length
           self.attr_title_listeners[i].changed(new_event)
-          ((i += 1) - 1)
+          i += 1
         end
       end
     end
@@ -1502,7 +1502,7 @@ module Org::Eclipse::Swt::Browser
             private
             alias_method :initialize_anonymous, :initialize
           end.new_local(self))
-          ((i += 1) - 1)
+          i += 1
         end
         status_text = StatusTextEvent.new(self.attr_browser)
         status_text.attr_display = display
@@ -1511,7 +1511,7 @@ module Org::Eclipse::Swt::Browser
         i_ = 0
         while i_ < self.attr_status_text_listeners.attr_length
           self.attr_status_text_listeners[i_].changed(status_text)
-          ((i_ += 1) - 1)
+          i_ += 1
         end
       end
       location = LocationEvent.new(self.attr_browser)
@@ -1522,7 +1522,7 @@ module Org::Eclipse::Swt::Browser
       i = 0
       while i < self.attr_location_listeners.attr_length
         self.attr_location_listeners[i].changed(location)
-        ((i += 1) - 1)
+        i += 1
       end
     end
     
@@ -1601,7 +1601,7 @@ module Org::Eclipse::Swt::Browser
           private
           alias_method :initialize_anonymous, :initialize
         end.new_local(self))
-        ((i += 1) - 1)
+        i += 1
       end
       # Note.  numberWithInt uses autorelease.  The resulting object
       # does not need to be released.
@@ -1637,7 +1637,7 @@ module Org::Eclipse::Swt::Browser
         i = 0
         while i < self.attr_open_window_listeners.attr_length
           self.attr_open_window_listeners[i].open(new_event)
-          ((i += 1) - 1)
+          i += 1
         end
       end
       web_view = 0
@@ -1694,7 +1694,7 @@ module Org::Eclipse::Swt::Browser
       i = 0
       while i < self.attr_visibility_window_listeners.attr_length
         self.attr_visibility_window_listeners[i].show(new_event)
-        ((i += 1) - 1)
+        i += 1
       end
       @location = nil
       @size = nil
@@ -1771,7 +1771,7 @@ module Org::Eclipse::Swt::Browser
       i = 0
       while i < self.attr_close_window_listeners.attr_length
         self.attr_close_window_listeners[i].close(new_event)
-        ((i += 1) - 1)
+        i += 1
       end
       self.attr_browser.dispose
       if (parent.is_disposed)
@@ -1835,7 +1835,7 @@ module Org::Eclipse::Swt::Browser
       i = 0
       while i < self.attr_status_text_listeners.attr_length
         self.attr_status_text_listeners[i].changed(status_text)
-        ((i += 1) - 1)
+        i += 1
       end
     end
     
@@ -1873,7 +1873,7 @@ module Org::Eclipse::Swt::Browser
         i = 0
         while i < self.attr_status_text_listeners.attr_length
           self.attr_status_text_listeners[i].changed(status_text)
-          ((i += 1) - 1)
+          i += 1
         end
         return
       end
@@ -1900,7 +1900,7 @@ module Org::Eclipse::Swt::Browser
       i = 0
       while i < self.attr_status_text_listeners.attr_length
         self.attr_status_text_listeners[i].changed(status_text)
-        ((i += 1) - 1)
+        i += 1
       end
     end
     
@@ -1945,7 +1945,7 @@ module Org::Eclipse::Swt::Browser
           i = 0
           while i < self.attr_location_listeners.attr_length
             self.attr_location_listeners[i].changing(new_event)
-            ((i += 1) - 1)
+            i += 1
           end
           @changing_location = false
         end

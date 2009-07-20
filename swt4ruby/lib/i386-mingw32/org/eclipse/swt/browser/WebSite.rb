@@ -785,7 +785,7 @@ module Org::Eclipse::Swt::Browser
                   break
                 end
               end
-              ((i += 1) - 1)
+              i += 1
             end
           end
         end

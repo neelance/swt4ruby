@@ -505,7 +505,7 @@ module Org::Eclipse::Swt::Widgets
         if ((array[i] == element))
           return true
         end
-        ((i += 1) - 1)
+        i += 1
       end
       return false
     end
@@ -926,7 +926,7 @@ module Org::Eclipse::Swt::Widgets
           range.attr_length = str_length
           OS._cfstring_get_characters(string_ref, range, buffer)
           os_attributes[i] = String.new(buffer)
-          ((i += 1) - 1)
+          i += 1
         end
         i_ = 0
         while i_ < attributes.attr_length
@@ -938,7 +938,7 @@ module Org::Eclipse::Swt::Widgets
             OS._cfarray_append_value(attributes_array_ref, string_ref)
             OS._cfrelease(string_ref)
           end
-          ((i_ += 1) - 1)
+          i_ += 1
         end
         code = OS.attr_no_err
       end
@@ -1197,7 +1197,7 @@ module Org::Eclipse::Swt::Widgets
       index = 0
       items = @parent.get_items
       while (index < items.attr_length && !(items[index]).equal?(self))
-        ((index += 1) - 1)
+        index += 1
       end
       i = index - 1
       while (i >= 0 && items[i].set_radio_selection(false))
@@ -1205,7 +1205,7 @@ module Org::Eclipse::Swt::Widgets
       end
       j = index + 1
       while (j < items.attr_length && items[j].set_radio_selection(false))
-        ((j += 1) - 1)
+        j += 1
       end
       set_selection(true)
     end

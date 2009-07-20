@@ -232,7 +232,7 @@ module Org::Eclipse::Swt::Widgets
       i = 0
       while i < result.attr_length
         result[i] = @ranges[i] + @start_offset
-        ((i += 1) - 1)
+        i += 1
       end
       return result
     end
@@ -425,9 +425,9 @@ module Org::Eclipse::Swt::Widgets
                   first_selected_converted = range.attr_f_start
                 end
               end
-              ((j += 1) - 1)
+              j += 1
             end
-            ((i += 1) - 1)
+            i += 1
           end
         end
         OS._dispose_ptr(text_ranges)
@@ -467,7 +467,7 @@ module Org::Eclipse::Swt::Widgets
             event = Event.new
             event.attr_character = chars[i]
             @parent.send_key_event(SWT::KeyDown, event)
-            ((i += 1) - 1)
+            i += 1
           end
         end
       end

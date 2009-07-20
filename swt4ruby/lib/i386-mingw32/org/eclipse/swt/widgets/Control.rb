@@ -711,7 +711,7 @@ module Org::Eclipse::Swt::Widgets
           if ((tab_list[index]).equal?(self))
             break
           end
-          ((index += 1) - 1)
+          index += 1
         end
         if ((index).equal?(tab_list.attr_length))
           if (is_tab_group)
@@ -1123,7 +1123,7 @@ module Org::Eclipse::Swt::Widgets
       length_ = string.length
       begin
         while (index < length_ && !(string.char_at(index)).equal?(Character.new(?&.ord)))
-          ((index += 1) - 1)
+          index += 1
         end
         if ((index += 1) >= length_)
           return Character.new(?\0.ord)
@@ -1131,7 +1131,7 @@ module Org::Eclipse::Swt::Widgets
         if (!(string.char_at(index)).equal?(Character.new(?&.ord)))
           return string.char_at(index)
         end
-        ((index += 1) - 1)
+        index += 1
       end while (index < length_)
       return Character.new(?\0.ord)
     end
@@ -1229,7 +1229,7 @@ module Org::Eclipse::Swt::Widgets
           lpwp[i] = nil
           return
         end
-        ((i += 1) - 1)
+        i += 1
       end
     end
     
@@ -1597,7 +1597,7 @@ module Org::Eclipse::Swt::Widgets
       shell = get_shell
       control = self
       while (!(control).equal?(shell))
-        ((count += 1) - 1)
+        count += 1
         control = control.attr_parent
       end
       control = self
@@ -1982,7 +1982,7 @@ module Org::Eclipse::Swt::Widgets
           if ((tab_list[i]).equal?(self))
             return true
           end
-          ((i += 1) - 1)
+          i += 1
         end
       end
       bits = OS._get_window_long(@handle, OS::GWL_STYLE)
@@ -1998,7 +1998,7 @@ module Org::Eclipse::Swt::Widgets
           if ((tab_list[i]).equal?(self))
             return false
           end
-          ((i += 1) - 1)
+          i += 1
         end
       end
       bits = OS._get_window_long(@handle, OS::GWL_STYLE)
@@ -3010,7 +3010,7 @@ module Org::Eclipse::Swt::Widgets
             if ((lpwp[index]).nil?)
               break
             end
-            ((index += 1) - 1)
+            index += 1
           end
           if ((index).equal?(lpwp.attr_length))
             new_lpwp = Array.typed(WINDOWPOS).new(lpwp.attr_length + 4) { nil }
@@ -3684,7 +3684,7 @@ module Org::Eclipse::Swt::Widgets
             end
             j -= gap
           end
-          ((i += 1) - 1)
+          i += 1
         end
         gap /= 2
       end
@@ -4060,7 +4060,7 @@ module Org::Eclipse::Swt::Widgets
         if ((list[index]).equal?(group))
           break
         end
-        ((index += 1) - 1)
+        index += 1
       end
       # It is possible (but unlikely), that application
       # code could have disposed the widget in focus in
@@ -4092,7 +4092,7 @@ module Org::Eclipse::Swt::Widgets
         if ((children[index]).equal?(self))
           break
         end
-        ((index += 1) - 1)
+        index += 1
       end
       # It is possible (but unlikely), that application
       # code could have disposed the widget in focus in
@@ -5457,7 +5457,7 @@ module Org::Eclipse::Swt::Widgets
                         return LRESULT::ZERO
                       end
                     end
-                    ((i += 1) - 1)
+                    i += 1
                   end
                 end
               else
@@ -5537,7 +5537,7 @@ module Org::Eclipse::Swt::Widgets
     # long
     def _wm_windowposchanged(w_param, l_param)
       begin
-        ((self.attr_display.attr_resize_count += 1) - 1)
+        self.attr_display.attr_resize_count += 1
         # long
         code = call_window_proc(@handle, OS::WM_WINDOWPOSCHANGED, w_param, l_param)
         return (code).equal?(0) ? LRESULT::ZERO : LRESULT.new(code)

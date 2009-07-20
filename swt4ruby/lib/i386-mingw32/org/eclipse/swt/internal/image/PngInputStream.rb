@@ -95,7 +95,7 @@ module Org::Eclipse::Swt::Internal::Image
         return -1
       end
       b = @chunk.attr_reference[DATA_OFFSET + @offset] & 0xff
-      ((@offset += 1) - 1)
+      @offset += 1
       return b
     end
     

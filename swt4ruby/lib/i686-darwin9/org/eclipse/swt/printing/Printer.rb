@@ -131,7 +131,7 @@ module Org::Eclipse::Swt::Printing
             while i < count
               name = get_string(OS._cfarray_get_value_at_index(printer_list[0], i))
               result[i] = PrinterData.new(DRIVER, name)
-              ((i += 1) - 1)
+              i += 1
             end
             OS._cfrelease(printer_list[0])
           end

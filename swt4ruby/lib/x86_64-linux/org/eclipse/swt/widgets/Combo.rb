@@ -663,7 +663,7 @@ module Org::Eclipse::Swt::Widgets
               @button_handle = child_handle
               break
             end
-            ((i += 1) - 1)
+            i += 1
           end
           OS.g_list_free(list)
         end
@@ -879,7 +879,7 @@ module Org::Eclipse::Swt::Widgets
             OS.g_signal_connect_closure_by_id(event_handle, self.attr_display.attr_signal_ids[EVENT_AFTER], 0, self.attr_display.attr_closures[EVENT_AFTER], false)
           end
         end
-        ((i += 1) - 1)
+        i += 1
       end
       # int
       im_context_ = im_context
@@ -1200,7 +1200,7 @@ module Org::Eclipse::Swt::Widgets
           result = index
           break
         end
-        ((index += 1) - 1)
+        index += 1
         temp = OS.g_list_next(temp)
       end
       OS.g_list_free(children)
@@ -1368,7 +1368,7 @@ module Org::Eclipse::Swt::Widgets
               post_event(SWT::Selection)
               break
             end
-            ((i += 1) - 1)
+            i += 1
           end
         end
       end
@@ -1712,7 +1712,7 @@ module Org::Eclipse::Swt::Widgets
         if ((string == @items[i]))
           return i
         end
-        ((i += 1) - 1)
+        i += 1
       end
       return -1
     end
@@ -1893,7 +1893,7 @@ module Org::Eclipse::Swt::Widgets
         i = end_
         while i >= start
           OS.gtk_combo_box_remove_text(self.attr_handle, i)
-          ((i -= 1) + 1)
+          i -= 1
         end
       else
         selected = false
@@ -1908,7 +1908,7 @@ module Org::Eclipse::Swt::Widgets
           item = OS.g_list_nth_data(children, i)
           selected |= (OS._gtk_widget_state(item)).equal?(OS::GTK_STATE_SELECTED)
           items = OS.g_list_append(items, item)
-          ((i += 1) - 1)
+          i += 1
         end
         OS.gtk_list_remove_items(@list_handle, items)
         OS.g_list_free(items)
@@ -1964,7 +1964,7 @@ module Org::Eclipse::Swt::Widgets
         i = count - 1
         while i >= 0
           OS.gtk_combo_box_remove_text(self.attr_handle, i)
-          ((i -= 1) + 1)
+          i -= 1
         end
       else
         @ignore_select = true
@@ -2148,7 +2148,7 @@ module Org::Eclipse::Swt::Widgets
               # int
               widget = OS.gtk_bin_get_child(OS.g_list_nth_data(items_list, i))
               OS.gtk_widget_modify_font(widget, font)
-              ((i -= 1) + 1)
+              i -= 1
             end
             OS.g_list_free(items_list)
           end
@@ -2177,7 +2177,7 @@ module Org::Eclipse::Swt::Widgets
               # int
               widget = OS.gtk_bin_get_child(OS.g_list_nth_data(items_list, i))
               set_foreground_color(widget, color)
-              ((i -= 1) + 1)
+              i -= 1
             end
             OS.g_list_free(items_list)
           end
@@ -2253,7 +2253,7 @@ module Org::Eclipse::Swt::Widgets
         if ((items[i]).nil?)
           error(SWT::ERROR_INVALID_ARGUMENT)
         end
-        ((i += 1) - 1)
+        i += 1
       end
       count = @items.attr_length
       @items = Array.typed(String).new(items.attr_length) { nil }
@@ -2263,7 +2263,7 @@ module Org::Eclipse::Swt::Widgets
         i_ = count - 1
         while i_ >= 0
           OS.gtk_combo_box_remove_text(self.attr_handle, i_)
-          ((i_ -= 1) + 1)
+          i_ -= 1
         end
         i__ = 0
         while i__ < items.attr_length
@@ -2273,7 +2273,7 @@ module Org::Eclipse::Swt::Widgets
           if (!((self.attr_style & SWT::RIGHT_TO_LEFT)).equal?(0) && !(@popup_handle).equal?(0))
             OS.gtk_container_forall(@popup_handle, self.attr_display.attr_set_direction_proc, OS::GTK_TEXT_DIR_RTL)
           end
-          ((i__ += 1) - 1)
+          i__ += 1
         end
       else
         @lock_text = @ignore_select = true
@@ -2295,7 +2295,7 @@ module Org::Eclipse::Swt::Widgets
           OS.gtk_widget_set_direction(label, direction)
           OS.gtk_container_add(@list_handle, item)
           OS.gtk_widget_show(item)
-          ((i_ += 1) - 1)
+          i_ += 1
         end
         @lock_text = @ignore_select = false
         OS.gtk_entry_set_text(@entry_handle, Array.typed(::Java::Byte).new(1) { 0 })
@@ -2385,7 +2385,7 @@ module Org::Eclipse::Swt::Widgets
               # int
               widget = OS.gtk_bin_get_child(OS.g_list_nth_data(items_list, i))
               OS.gtk_widget_set_direction(widget, dir)
-              ((i -= 1) + 1)
+              i -= 1
             end
             OS.g_list_free(items_list)
           end
