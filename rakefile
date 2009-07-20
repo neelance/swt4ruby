@@ -1,0 +1,19 @@
+task :gemspec do
+  ["i686-linux", "x86_64-linux", "i686-darwin9", "i386-mingw32"].each do |platform|
+    File.open("swt4ruby-#{platform}.gemspec", "w") do |file|
+      file.write Gem::Specification.new { |s|
+        s.name = "swt4ruby"
+        s.version = "1.0.2"
+        s.platform = platform
+        s.files = ["swt4ruby.rb", "LICENSE"] + Dir.glob("swt4ruby/lib/#{platform}/**/*.*") + Dir.glob("swt4ruby/fix/**/*.*") + Dir.glob("swt4ruby/ext/#{platform}/**/*.*")
+        s.homepage = %q{http://github.com/neelance/swt4ruby/}
+        s.has_rdoc = true
+        s.rdoc_options = ["--charset=UTF-8"]
+        s.require_paths = ["."]
+        s.summary = "Converted Standart Window Toolkit (SWT)."
+        s.add_dependency "neelance-java2ruby"
+        s.add_dependency "neelance-jre4ruby"
+      }.to_yaml
+    end
+  end
+end
