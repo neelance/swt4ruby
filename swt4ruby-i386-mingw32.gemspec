@@ -1,7 +1,7 @@
 --- !ruby/object:Gem::Specification 
 name: swt4ruby
 version: !ruby/object:Gem::Version 
-  version: 1.0.6
+  version: 1.0.7
 platform: i386-mingw32
 authors: []
 
@@ -9,7 +9,7 @@ autorequire:
 bindir: bin
 cert_chain: []
 
-date: 2009-07-20 00:00:00 +02:00
+date: 2009-07-21 00:00:00 +02:00
 default_executable: 
 dependencies: 
 - !ruby/object:Gem::Dependency 
