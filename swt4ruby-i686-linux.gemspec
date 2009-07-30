@@ -1,7 +1,7 @@
 --- !ruby/object:Gem::Specification 
 name: swt4ruby
 version: !ruby/object:Gem::Version 
-  version: 1.0.7
+  version: 1.0.8
 platform: i686-linux
 authors: []
 
@@ -9,7 +9,7 @@ autorequire:
 bindir: bin
 cert_chain: []
 
-date: 2009-07-21 00:00:00 +02:00
+date: 2009-07-30 00:00:00 +02:00
 default_executable: 
 dependencies: 
 - !ruby/object:Gem::Dependency 
@@ -615,6 +615,8 @@ files:
 - swt4ruby/ext/i686-linux/libswt-mozilla-gcc3-gtk-3448.so
 has_rdoc: true
 homepage: http://github.com/neelance/swt4ruby/
+licenses: []
+
 post_install_message: 
 rdoc_options: 
 - --charset=UTF-8
@@ -635,9 +637,9 @@ required_rubygems_version: !ruby/object:Gem::Requirement
 requirements: []
 
 rubyforge_project: 
-rubygems_version: 1.3.1
+rubygems_version: 1.3.5
 signing_key: 
-specification_version: 2
+specification_version: 3
 summary: Converted Standart Window Toolkit (SWT).
 test_files: []
 
