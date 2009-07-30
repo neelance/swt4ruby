@@ -1,5 +1,5 @@
 --- !ruby/object:Gem::Specification 
-name: swt4ruby
+name: swt4ruby2
 version: !ruby/object:Gem::Version 
   version: 1.0.8
 platform: i686-linux
