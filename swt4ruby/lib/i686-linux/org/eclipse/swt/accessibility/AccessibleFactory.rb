@@ -117,62 +117,62 @@ module Org::Eclipse::Swt::Accessibility
       alias_method :attr_object_iface_definition=, :object_iface_definition=
       
       when_class_loaded do
-        const_set :AtkActionCB_get_keybinding, new_callback(AccessibleObject.class, "atkAction_get_keybinding", 2) # $NON-NLS-1$
-        const_set :AtkActionCB_get_name, new_callback(AccessibleObject.class, "atkAction_get_name", 2) # $NON-NLS-1$
-        const_set :AtkComponentCB_get_extents, new_callback(AccessibleObject.class, "atkComponent_get_extents", 6) # $NON-NLS-1$
-        const_set :AtkComponentCB_get_position, new_callback(AccessibleObject.class, "atkComponent_get_position", 4) # $NON-NLS-1$
-        const_set :AtkComponentCB_get_size, new_callback(AccessibleObject.class, "atkComponent_get_size", 4) # $NON-NLS-1$
-        const_set :AtkComponentCB_ref_accessible_at_point, new_callback(AccessibleObject.class, "atkComponent_ref_accessible_at_point", 4) # $NON-NLS-1$
-        const_set :AtkHypertextCB_get_link, new_callback(AccessibleObject.class, "atkHypertext_get_link", 2) # $NON-NLS-1$
-        const_set :AtkHypertextCB_get_n_links, new_callback(AccessibleObject.class, "atkHypertext_get_n_links", 1) # $NON-NLS-1$
-        const_set :AtkHypertextCB_get_link_index, new_callback(AccessibleObject.class, "atkHypertext_get_link_index", 2) # $NON-NLS-1$
-        const_set :AtkObjectCB_get_name, new_callback(AccessibleObject.class, "atkObject_get_name", 1) # $NON-NLS-1$
-        const_set :AtkObjectCB_get_description, new_callback(AccessibleObject.class, "atkObject_get_description", 1) # $NON-NLS-1$
-        const_set :AtkObjectCB_get_n_children, new_callback(AccessibleObject.class, "atkObject_get_n_children", 1) # $NON-NLS-1$
-        const_set :AtkObjectCB_get_role, new_callback(AccessibleObject.class, "atkObject_get_role", 1) # $NON-NLS-1$
-        const_set :AtkObjectCB_get_parent, new_callback(AccessibleObject.class, "atkObject_get_parent", 1) # $NON-NLS-1$
-        const_set :AtkObjectCB_ref_state_set, new_callback(AccessibleObject.class, "atkObject_ref_state_set", 1) # $NON-NLS-1$
-        const_set :AtkObjectCB_get_index_in_parent, new_callback(AccessibleObject.class, "atkObject_get_index_in_parent", 1) # $NON-NLS-1$
-        const_set :AtkObjectCB_ref_child, new_callback(AccessibleObject.class, "atkObject_ref_child", 2) # $NON-NLS-1$
-        const_set :AtkSelectionCB_is_child_selected, new_callback(AccessibleObject.class, "atkSelection_is_child_selected", 2) # $NON-NLS-1$
-        const_set :AtkSelectionCB_ref_selection, new_callback(AccessibleObject.class, "atkSelection_ref_selection", 2) # $NON-NLS-1$
-        const_set :AtkTextCB_get_caret_offset, new_callback(AccessibleObject.class, "atkText_get_caret_offset", 1) # $NON-NLS-1$
-        const_set :AtkTextCB_get_n_selections, new_callback(AccessibleObject.class, "atkText_get_n_selections", 1) # $NON-NLS-1$
-        const_set :AtkTextCB_get_selection, new_callback(AccessibleObject.class, "atkText_get_selection", 4) # $NON-NLS-1$
-        const_set :AtkTextCB_get_text, new_callback(AccessibleObject.class, "atkText_get_text", 3) # $NON-NLS-1$
-        const_set :AtkTextCB_get_text_after_offset, new_callback(AccessibleObject.class, "atkText_get_text_after_offset", 5) # $NON-NLS-1$
-        const_set :AtkTextCB_get_text_at_offset, new_callback(AccessibleObject.class, "atkText_get_text_at_offset", 5) # $NON-NLS-1$
-        const_set :AtkTextCB_get_text_before_offset, new_callback(AccessibleObject.class, "atkText_get_text_before_offset", 5) # $NON-NLS-1$
-        const_set :AtkTextCB_get_character_at_offset, new_callback(AccessibleObject.class, "atkText_get_character_at_offset", 2) # $NON-NLS-1$
-        const_set :AtkTextCB_get_character_count, new_callback(AccessibleObject.class, "atkText_get_character_count", 1) # $NON-NLS-1$
-        const_set :GObjectClass_finalize, new_callback(AccessibleObject.class, "gObjectClass_finalize", 1) # $NON-NLS-1$
-        const_set :GTypeInfo_base_init_type, new_callback(AccessibleFactory.class, "gTypeInfo_base_init_type", 1) # $NON-NLS-1$
+        const_set :AtkActionCB_get_keybinding, new_callback(AccessibleObject, "atkAction_get_keybinding", 2) # $NON-NLS-1$
+        const_set :AtkActionCB_get_name, new_callback(AccessibleObject, "atkAction_get_name", 2) # $NON-NLS-1$
+        const_set :AtkComponentCB_get_extents, new_callback(AccessibleObject, "atkComponent_get_extents", 6) # $NON-NLS-1$
+        const_set :AtkComponentCB_get_position, new_callback(AccessibleObject, "atkComponent_get_position", 4) # $NON-NLS-1$
+        const_set :AtkComponentCB_get_size, new_callback(AccessibleObject, "atkComponent_get_size", 4) # $NON-NLS-1$
+        const_set :AtkComponentCB_ref_accessible_at_point, new_callback(AccessibleObject, "atkComponent_ref_accessible_at_point", 4) # $NON-NLS-1$
+        const_set :AtkHypertextCB_get_link, new_callback(AccessibleObject, "atkHypertext_get_link", 2) # $NON-NLS-1$
+        const_set :AtkHypertextCB_get_n_links, new_callback(AccessibleObject, "atkHypertext_get_n_links", 1) # $NON-NLS-1$
+        const_set :AtkHypertextCB_get_link_index, new_callback(AccessibleObject, "atkHypertext_get_link_index", 2) # $NON-NLS-1$
+        const_set :AtkObjectCB_get_name, new_callback(AccessibleObject, "atkObject_get_name", 1) # $NON-NLS-1$
+        const_set :AtkObjectCB_get_description, new_callback(AccessibleObject, "atkObject_get_description", 1) # $NON-NLS-1$
+        const_set :AtkObjectCB_get_n_children, new_callback(AccessibleObject, "atkObject_get_n_children", 1) # $NON-NLS-1$
+        const_set :AtkObjectCB_get_role, new_callback(AccessibleObject, "atkObject_get_role", 1) # $NON-NLS-1$
+        const_set :AtkObjectCB_get_parent, new_callback(AccessibleObject, "atkObject_get_parent", 1) # $NON-NLS-1$
+        const_set :AtkObjectCB_ref_state_set, new_callback(AccessibleObject, "atkObject_ref_state_set", 1) # $NON-NLS-1$
+        const_set :AtkObjectCB_get_index_in_parent, new_callback(AccessibleObject, "atkObject_get_index_in_parent", 1) # $NON-NLS-1$
+        const_set :AtkObjectCB_ref_child, new_callback(AccessibleObject, "atkObject_ref_child", 2) # $NON-NLS-1$
+        const_set :AtkSelectionCB_is_child_selected, new_callback(AccessibleObject, "atkSelection_is_child_selected", 2) # $NON-NLS-1$
+        const_set :AtkSelectionCB_ref_selection, new_callback(AccessibleObject, "atkSelection_ref_selection", 2) # $NON-NLS-1$
+        const_set :AtkTextCB_get_caret_offset, new_callback(AccessibleObject, "atkText_get_caret_offset", 1) # $NON-NLS-1$
+        const_set :AtkTextCB_get_n_selections, new_callback(AccessibleObject, "atkText_get_n_selections", 1) # $NON-NLS-1$
+        const_set :AtkTextCB_get_selection, new_callback(AccessibleObject, "atkText_get_selection", 4) # $NON-NLS-1$
+        const_set :AtkTextCB_get_text, new_callback(AccessibleObject, "atkText_get_text", 3) # $NON-NLS-1$
+        const_set :AtkTextCB_get_text_after_offset, new_callback(AccessibleObject, "atkText_get_text_after_offset", 5) # $NON-NLS-1$
+        const_set :AtkTextCB_get_text_at_offset, new_callback(AccessibleObject, "atkText_get_text_at_offset", 5) # $NON-NLS-1$
+        const_set :AtkTextCB_get_text_before_offset, new_callback(AccessibleObject, "atkText_get_text_before_offset", 5) # $NON-NLS-1$
+        const_set :AtkTextCB_get_character_at_offset, new_callback(AccessibleObject, "atkText_get_character_at_offset", 2) # $NON-NLS-1$
+        const_set :AtkTextCB_get_character_count, new_callback(AccessibleObject, "atkText_get_character_count", 1) # $NON-NLS-1$
+        const_set :GObjectClass_finalize, new_callback(AccessibleObject, "gObjectClass_finalize", 1) # $NON-NLS-1$
+        const_set :GTypeInfo_base_init_type, new_callback(AccessibleFactory, "gTypeInfo_base_init_type", 1) # $NON-NLS-1$
         # Action interface
-        const_set :InitActionIfaceCB, new_callback(AccessibleFactory.class, "initActionIfaceCB", 1) # $NON-NLS-1$
+        const_set :InitActionIfaceCB, new_callback(AccessibleFactory, "initActionIfaceCB", 1) # $NON-NLS-1$
         interface_info = GInterfaceInfo.new
         interface_info.attr_interface_init = InitActionIfaceCB.get_address
         const_set :ActionIfaceDefinition, OS.g_malloc(GInterfaceInfo.attr_sizeof)
         OS.memmove(ActionIfaceDefinition, interface_info, GInterfaceInfo.attr_sizeof)
         # Component interface
-        const_set :InitComponentIfaceCB, new_callback(AccessibleFactory.class, "initComponentIfaceCB", 1) # $NON-NLS-1$
+        const_set :InitComponentIfaceCB, new_callback(AccessibleFactory, "initComponentIfaceCB", 1) # $NON-NLS-1$
         interface_info = GInterfaceInfo.new
         interface_info.attr_interface_init = InitComponentIfaceCB.get_address
         const_set :ComponentIfaceDefinition, OS.g_malloc(GInterfaceInfo.attr_sizeof)
         OS.memmove(ComponentIfaceDefinition, interface_info, GInterfaceInfo.attr_sizeof)
         # Hypertext interface
-        const_set :InitHypertextIfaceCB, new_callback(AccessibleFactory.class, "initHypertextIfaceCB", 1) # $NON-NLS-1$
+        const_set :InitHypertextIfaceCB, new_callback(AccessibleFactory, "initHypertextIfaceCB", 1) # $NON-NLS-1$
         interface_info = GInterfaceInfo.new
         interface_info.attr_interface_init = InitHypertextIfaceCB.get_address
         const_set :HypertextIfaceDefinition, OS.g_malloc(GInterfaceInfo.attr_sizeof)
         OS.memmove(HypertextIfaceDefinition, interface_info, GInterfaceInfo.attr_sizeof)
         # Selection interface
-        const_set :InitSelectionIfaceCB, new_callback(AccessibleFactory.class, "initSelectionIfaceCB", 1) # $NON-NLS-1$
+        const_set :InitSelectionIfaceCB, new_callback(AccessibleFactory, "initSelectionIfaceCB", 1) # $NON-NLS-1$
         interface_info = GInterfaceInfo.new
         interface_info.attr_interface_init = InitSelectionIfaceCB.get_address
         const_set :SelectionIfaceDefinition, OS.g_malloc(GInterfaceInfo.attr_sizeof)
         OS.memmove(SelectionIfaceDefinition, interface_info, GInterfaceInfo.attr_sizeof)
         # Text interface
-        const_set :InitTextIfaceCB, new_callback(AccessibleFactory.class, "initTextIfaceCB", 1) # $NON-NLS-1$
+        const_set :InitTextIfaceCB, new_callback(AccessibleFactory, "initTextIfaceCB", 1) # $NON-NLS-1$
         interface_info = GInterfaceInfo.new
         interface_info.attr_interface_init = InitTextIfaceCB.get_address
         const_set :TextIfaceDefinition, OS.g_malloc(GInterfaceInfo.attr_sizeof)
@@ -340,7 +340,7 @@ module Org::Eclipse::Swt::Accessibility
           action = hypertext = selection = text = true
         end
         swt_type_name = String.new(SWT_TYPE_PREFIX)
-        swt_type_name += (String.new(widget_type_name)).to_s
+        swt_type_name += RJava.cast_to_string(String.new(widget_type_name))
         if (action)
           swt_type_name += "Action"
         end # $NON-NLS-1$

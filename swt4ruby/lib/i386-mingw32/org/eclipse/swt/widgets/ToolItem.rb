@@ -461,7 +461,7 @@ module Org::Eclipse::Swt::Widgets
       super
       release_images
       @control = nil
-      @tool_tip_text = (nil).to_s
+      @tool_tip_text = RJava.cast_to_string(nil)
       @disabled_image = @hot_image = nil
       if (!(@disabled_image2).nil?)
         @disabled_image2.dispose

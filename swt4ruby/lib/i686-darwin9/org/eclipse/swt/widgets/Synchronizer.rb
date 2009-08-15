@@ -185,7 +185,7 @@ module Org::Eclipse::Swt::Widgets
           @sync_thread = lock.attr_thread
           begin
             lock.run
-          rescue Exception => t
+          rescue JavaThrowable => t
             lock.attr_throwable = t
             SWT.error(SWT::ERROR_FAILED_EXEC, t)
           ensure
@@ -212,7 +212,7 @@ module Org::Eclipse::Swt::Widgets
     # @see #asyncExec
     def sync_exec(runnable)
       lock = nil
-      synchronized((Device.class)) do
+      synchronized((Device)) do
         if ((@display).nil? || @display.is_disposed)
           SWT.error(SWT::ERROR_DEVICE_DISPOSED)
         end

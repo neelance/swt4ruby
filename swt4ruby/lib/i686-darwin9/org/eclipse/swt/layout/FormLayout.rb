@@ -441,29 +441,29 @@ module Org::Eclipse::Swt::Layout
     # 
     # @return a string representation of the layout
     def to_s
-      string = (get_name).to_s + " {"
+      string = RJava.cast_to_string(get_name) + " {"
       if (!(@margin_width).equal?(0))
-        string += "marginWidth=" + (@margin_width).to_s + " "
+        string += "marginWidth=" + RJava.cast_to_string(@margin_width) + " "
       end
       if (!(@margin_height).equal?(0))
-        string += "marginHeight=" + (@margin_height).to_s + " "
+        string += "marginHeight=" + RJava.cast_to_string(@margin_height) + " "
       end
       if (!(@margin_left).equal?(0))
-        string += "marginLeft=" + (@margin_left).to_s + " "
+        string += "marginLeft=" + RJava.cast_to_string(@margin_left) + " "
       end
       if (!(@margin_right).equal?(0))
-        string += "marginRight=" + (@margin_right).to_s + " "
+        string += "marginRight=" + RJava.cast_to_string(@margin_right) + " "
       end
       if (!(@margin_top).equal?(0))
-        string += "marginTop=" + (@margin_top).to_s + " "
+        string += "marginTop=" + RJava.cast_to_string(@margin_top) + " "
       end
       if (!(@margin_bottom).equal?(0))
-        string += "marginBottom=" + (@margin_bottom).to_s + " "
+        string += "marginBottom=" + RJava.cast_to_string(@margin_bottom) + " "
       end
       if (!(@spacing).equal?(0))
-        string += "spacing=" + (@spacing).to_s + " "
+        string += "spacing=" + RJava.cast_to_string(@spacing) + " "
       end
-      string = (string.trim).to_s
+      string = RJava.cast_to_string(string.trim)
       string += "}"
       return string
     end

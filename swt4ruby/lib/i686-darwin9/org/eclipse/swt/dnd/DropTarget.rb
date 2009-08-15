@@ -189,12 +189,12 @@ module Org::Eclipse::Swt::Dnd
       alias_method :attr_drag_receive_handler=, :drag_receive_handler=
       
       when_class_loaded do
-        self.attr_drag_tracking_handler = Callback.new(DropTarget.class, "DragTrackingHandler", 4) # $NON-NLS-1$
+        self.attr_drag_tracking_handler = Callback.new(DropTarget, "DragTrackingHandler", 4) # $NON-NLS-1$
         drag_tracking_handler_address = self.attr_drag_tracking_handler.get_address
         if ((drag_tracking_handler_address).equal?(0))
           SWT.error(SWT::ERROR_NO_MORE_CALLBACKS)
         end
-        self.attr_drag_receive_handler = Callback.new(DropTarget.class, "DragReceiveHandler", 3) # $NON-NLS-1$
+        self.attr_drag_receive_handler = Callback.new(DropTarget, "DragReceiveHandler", 3) # $NON-NLS-1$
         drag_receive_handler_address = self.attr_drag_receive_handler.get_address
         if ((drag_receive_handler_address).equal?(0))
           SWT.error(SWT::ERROR_NO_MORE_CALLBACKS)
@@ -495,7 +495,7 @@ module Org::Eclipse::Swt::Dnd
     typesig { [] }
     def check_subclass
       name = get_class.get_name
-      valid_name = DropTarget.class.get_name
+      valid_name = DropTarget.get_name
       if (!(valid_name == name))
         DND.error(SWT::ERROR_INVALID_SUBCLASS)
       end
@@ -543,7 +543,7 @@ module Org::Eclipse::Swt::Dnd
         return OS.attr_drag_not_accepted_err
       end
       # ask drag source for dropped data
-      data = Array.typed(::Java::Byte).new(0) { 0 }
+      data = Array.typed(Array.typed(::Java::Byte)).new(0) { nil }
       # locate all the items with data of the desired type
       num_items = Array.typed(::Java::Short).new(1) { 0 }
       OS._count_drag_items(the_drag, num_items)
@@ -556,7 +556,7 @@ module Org::Eclipse::Swt::Dnd
         if (size[0] > 0)
           buffer = Array.typed(::Java::Byte).new(size[0]) { 0 }
           OS._get_flavor_data(the_drag, the_item_ref[0], @selected_data_type.attr_type, buffer, size, 0)
-          new_data = Array.typed(::Java::Byte).new(data.attr_length + 1) { 0 }
+          new_data = Array.typed(Array.typed(::Java::Byte)).new(data.attr_length + 1) { nil }
           System.arraycopy(data, 0, new_data, 0, data.attr_length)
           new_data[data.attr_length] = buffer
           data = new_data

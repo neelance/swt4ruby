@@ -1290,7 +1290,7 @@ module Org::Eclipse::Swt::Browser
     
     typesig { [String] }
     def set_url(url)
-      @html = (nil).to_s
+      @html = RJava.cast_to_string(nil)
       # Bug in Internet Explorer.  For some reason, Navigating to an xml document before
       # a previous Navigate has completed will leave the Browser in a bad state if the
       # Navigate to the xml document does not complete.  This bad state causes a GP when

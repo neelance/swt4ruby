@@ -273,7 +273,7 @@ module Org::Eclipse::Swt::Graphics
       if (is_disposed)
         return "Pattern {*DISPOSED*}"
       end
-      return "Pattern {" + (@handle).to_s + "}"
+      return "Pattern {" + RJava.cast_to_string(@handle) + "}"
     end
     
     private

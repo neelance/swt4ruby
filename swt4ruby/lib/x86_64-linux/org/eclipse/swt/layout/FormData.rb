@@ -507,26 +507,26 @@ module Org::Eclipse::Swt::Layout
     # 
     # @return a string representation of the FormData object
     def to_s
-      string = (get_name).to_s + " {"
+      string = RJava.cast_to_string(get_name) + " {"
       if (!(@width).equal?(SWT::DEFAULT))
-        string += "width=" + (@width).to_s + " "
+        string += "width=" + RJava.cast_to_string(@width) + " "
       end
       if (!(@height).equal?(SWT::DEFAULT))
-        string += "height=" + (@height).to_s + " "
+        string += "height=" + RJava.cast_to_string(@height) + " "
       end
       if (!(@left).nil?)
-        string += "left=" + (@left).to_s + " "
+        string += "left=" + RJava.cast_to_string(@left) + " "
       end
       if (!(@right).nil?)
-        string += "right=" + (@right).to_s + " "
+        string += "right=" + RJava.cast_to_string(@right) + " "
       end
       if (!(@top).nil?)
-        string += "top=" + (@top).to_s + " "
+        string += "top=" + RJava.cast_to_string(@top) + " "
       end
       if (!(@bottom).nil?)
-        string += "bottom=" + (@bottom).to_s + " "
+        string += "bottom=" + RJava.cast_to_string(@bottom) + " "
       end
-      string = (string.trim).to_s
+      string = RJava.cast_to_string(string.trim)
       string += "}"
       return string
     end

@@ -63,7 +63,7 @@ module Org::Eclipse::Swt::Browser
     def to_s
       string = super
       # remove trailing '}'
-      return (string.substring(0, string.length - 1)).to_s + " current=" + (@current).to_s + " total=" + (@total).to_s + "}"
+      return RJava.cast_to_string(string.substring(0, string.length - 1)) + " current=" + RJava.cast_to_string(@current) + " total=" + RJava.cast_to_string(@total) + "}"
     end
     
     private

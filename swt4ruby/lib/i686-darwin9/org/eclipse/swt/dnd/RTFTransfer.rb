@@ -104,7 +104,7 @@ module Org::Eclipse::Swt::Dnd
         if ((num_chars).equal?(0))
           return
         end
-        transfer_data.attr_data = Array.typed(::Java::Byte).new(1) { 0 }
+        transfer_data.attr_data = Array.typed(Array.typed(::Java::Byte)).new(1) { nil }
         transfer_data.attr_data[0] = buffer
         transfer_data.attr_result = 0
       ensure

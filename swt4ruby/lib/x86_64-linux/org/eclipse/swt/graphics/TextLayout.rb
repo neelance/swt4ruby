@@ -58,7 +58,7 @@ module Org::Eclipse::Swt::Graphics
         
         typesig { [] }
         def to_s
-          return "StyleItem {" + (@start).to_s + ", " + (@style).to_s + "}"
+          return "StyleItem {" + RJava.cast_to_string(@start) + ", " + RJava.cast_to_string(@style) + "}"
         end
         
         typesig { [] }
@@ -435,7 +435,7 @@ module Org::Eclipse::Swt::Graphics
     typesig { [] }
     def destroy
       @font = nil
-      @text = (nil).to_s
+      @text = RJava.cast_to_string(nil)
       @styles = nil
       free_runs
       if (!(@layout).equal?(0))
@@ -2529,7 +2529,7 @@ module Org::Eclipse::Swt::Graphics
       if (is_disposed)
         return "TextLayout {*DISPOSED*}"
       end
-      return "TextLayout {" + (@layout).to_s + "}"
+      return "TextLayout {" + RJava.cast_to_string(@layout) + "}"
     end
     
     typesig { [::Java::Int] }

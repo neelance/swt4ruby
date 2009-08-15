@@ -200,7 +200,7 @@ module Org::Eclipse::Swt::Widgets
               range.attr_length = length_
               OS._cfstring_get_characters(dir_string, range, buffer)
               OS._cfrelease(dir_string)
-              @filter_path = (directory_path = (String.new(buffer)).to_s).to_s
+              @filter_path = RJava.cast_to_string(directory_path = RJava.cast_to_string(String.new(buffer)))
             end
             OS._dispose_ptr(data_ptr)
           end

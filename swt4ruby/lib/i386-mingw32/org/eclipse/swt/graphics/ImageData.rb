@@ -246,7 +246,7 @@ module Org::Eclipse::Swt::Graphics
     
     class_module.module_eval {
       # Arbitrary channel width data to 8-bit conversion table.
-      const_set_lazy(:ANY_TO_EIGHT) { Array.typed(::Java::Byte).new(9) { 0 } }
+      const_set_lazy(:ANY_TO_EIGHT) { Array.typed(Array.typed(::Java::Byte)).new(9) { nil } }
       const_attr_reader  :ANY_TO_EIGHT
       
       when_class_loaded do

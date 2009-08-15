@@ -100,7 +100,7 @@ module Org::Eclipse::Swt::Internal::Image
     
     typesig { [] }
     def get_quantization_tables_values
-      values = Array.typed(::Java::Int).new(4) { 0 }
+      values = Array.typed(Array.typed(::Java::Int)).new(4) { nil }
       values_index = 0
       total_length = get_segment_length - 2
       ofs = 4
@@ -126,14 +126,14 @@ module Org::Eclipse::Swt::Internal::Image
           total_length -= 129
         end
         if (values_index >= values.attr_length)
-          new_values = Array.typed(::Java::Int).new(values.attr_length + 4) { 0 }
+          new_values = Array.typed(Array.typed(::Java::Int)).new(values.attr_length + 4) { nil }
           System.arraycopy(values, 0, new_values, 0, values.attr_length)
           values = new_values
         end
         values[values_index] = qk
         values_index += 1
       end
-      new_values = Array.typed(::Java::Int).new(values_index) { 0 }
+      new_values = Array.typed(Array.typed(::Java::Int)).new(values_index) { nil }
       System.arraycopy(values, 0, new_values, 0, values_index)
       return new_values
     end

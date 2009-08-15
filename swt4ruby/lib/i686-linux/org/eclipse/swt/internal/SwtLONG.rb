@@ -34,7 +34,7 @@ module Org::Eclipse::Swt::Internal
     end
     
     typesig { [Object] }
-    def equals(object)
+    def ==(object)
       if ((object).equal?(self))
         return true
       end

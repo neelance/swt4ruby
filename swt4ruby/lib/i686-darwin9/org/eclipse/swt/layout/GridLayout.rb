@@ -324,7 +324,7 @@ module Org::Eclipse::Swt::Layout
       column = 0
       row_count = 0
       column_count = @num_columns
-      grid = Array.typed(Control).new(4) { Array.typed(Control).new(column_count) { nil } }
+      grid = Array.typed(Array.typed(Control)).new(4) { Array.typed(Control).new(column_count) { nil } }
       i__ = 0
       while i__ < count
         child = children[i__]
@@ -334,7 +334,7 @@ module Org::Eclipse::Swt::Layout
         while (true)
           last_row = row + v_span
           if (last_row >= grid.attr_length)
-            new_grid = Array.typed(Control).new(last_row + 4) { Array.typed(Control).new(column_count) { nil } }
+            new_grid = Array.typed(Array.typed(Control)).new(last_row + 4) { Array.typed(Control).new(column_count) { nil } }
             System.arraycopy(grid, 0, new_grid, 0, grid.attr_length)
             grid = new_grid
           end
@@ -933,38 +933,38 @@ module Org::Eclipse::Swt::Layout
     # 
     # @return a string representation of the layout
     def to_s
-      string = (get_name).to_s + " {"
+      string = RJava.cast_to_string(get_name) + " {"
       if (!(@num_columns).equal?(1))
-        string += "numColumns=" + (@num_columns).to_s + " "
+        string += "numColumns=" + RJava.cast_to_string(@num_columns) + " "
       end
       if (@make_columns_equal_width)
-        string += "makeColumnsEqualWidth=" + (@make_columns_equal_width).to_s + " "
+        string += "makeColumnsEqualWidth=" + RJava.cast_to_string(@make_columns_equal_width) + " "
       end
       if (!(@margin_width).equal?(0))
-        string += "marginWidth=" + (@margin_width).to_s + " "
+        string += "marginWidth=" + RJava.cast_to_string(@margin_width) + " "
       end
       if (!(@margin_height).equal?(0))
-        string += "marginHeight=" + (@margin_height).to_s + " "
+        string += "marginHeight=" + RJava.cast_to_string(@margin_height) + " "
       end
       if (!(@margin_left).equal?(0))
-        string += "marginLeft=" + (@margin_left).to_s + " "
+        string += "marginLeft=" + RJava.cast_to_string(@margin_left) + " "
       end
       if (!(@margin_right).equal?(0))
-        string += "marginRight=" + (@margin_right).to_s + " "
+        string += "marginRight=" + RJava.cast_to_string(@margin_right) + " "
       end
       if (!(@margin_top).equal?(0))
-        string += "marginTop=" + (@margin_top).to_s + " "
+        string += "marginTop=" + RJava.cast_to_string(@margin_top) + " "
       end
       if (!(@margin_bottom).equal?(0))
-        string += "marginBottom=" + (@margin_bottom).to_s + " "
+        string += "marginBottom=" + RJava.cast_to_string(@margin_bottom) + " "
       end
       if (!(@horizontal_spacing).equal?(0))
-        string += "horizontalSpacing=" + (@horizontal_spacing).to_s + " "
+        string += "horizontalSpacing=" + RJava.cast_to_string(@horizontal_spacing) + " "
       end
       if (!(@vertical_spacing).equal?(0))
-        string += "verticalSpacing=" + (@vertical_spacing).to_s + " "
+        string += "verticalSpacing=" + RJava.cast_to_string(@vertical_spacing) + " "
       end
-      string = (string.trim).to_s
+      string = RJava.cast_to_string(string.trim)
       string += "}"
       return string
     end

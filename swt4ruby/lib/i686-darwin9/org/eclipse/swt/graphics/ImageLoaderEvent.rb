@@ -93,7 +93,7 @@ module Org::Eclipse::Swt::Graphics
     # 
     # @return a string representation of the event
     def to_s
-      return "ImageLoaderEvent {source=" + (self.attr_source).to_s + " imageData=" + (@image_data).to_s + " incrementCount=" + (@increment_count).to_s + " endOfImage=" + (@end_of_image).to_s + "}" # $NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$
+      return "ImageLoaderEvent {source=" + RJava.cast_to_string(self.attr_source) + " imageData=" + RJava.cast_to_string(@image_data) + " incrementCount=" + RJava.cast_to_string(@increment_count) + " endOfImage=" + RJava.cast_to_string(@end_of_image) + "}" # $NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$
     end
     
     private

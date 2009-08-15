@@ -362,7 +362,7 @@ module Org::Eclipse::Swt::Internal::Image
       when COLOR_TYPE_RGB_WITH_ALPHA
         return "RGB with Alpha"
       else
-        return "Unknown - " + (@color_type).to_s
+        return "Unknown - " + RJava.cast_to_string(@color_type)
       end
     end
     

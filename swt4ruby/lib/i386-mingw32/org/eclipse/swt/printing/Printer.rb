@@ -155,7 +155,7 @@ module Org::Eclipse::Swt::Printing
               comma_index += 1
             end
             if (comma_index < length)
-              driver = (buf.to_s(0, comma_index)).to_s
+              driver = RJava.cast_to_string(buf.to_s(0, comma_index))
             end
           end
           printer_list[p] = PrinterData.new(driver, device)
@@ -187,7 +187,7 @@ module Org::Eclipse::Swt::Printing
           comma_index += 1
         end
         if (comma_index < length)
-          device_name = (buf.to_s(0, comma_index)).to_s
+          device_name = RJava.cast_to_string(buf.to_s(0, comma_index))
         end
         driver = "" # $NON-NLS-1$
         if (OS._get_profile_string(self.attr_profile, TCHAR.new(0, device_name, true), null_buf, buf, length) > 0)
@@ -196,7 +196,7 @@ module Org::Eclipse::Swt::Printing
             comma_index += 1
           end
           if (comma_index < length)
-            driver = (buf.to_s(0, comma_index)).to_s
+            driver = RJava.cast_to_string(buf.to_s(0, comma_index))
           end
         end
         return PrinterData.new(driver, device_name)

@@ -105,7 +105,7 @@ module Org::Eclipse::Swt::Widgets
     # @return <code>true</code> if the object is the same as this object and <code>false</code> otherwise
     # 
     # @see #hashCode()
-    def equals(object)
+    def ==(object)
       if ((object).equal?(self))
         return true
       end

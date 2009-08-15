@@ -79,7 +79,7 @@ module Org::Eclipse::Swt::Events
     def to_s
       string = super
       # remove trailing '}'
-      return (string.substring(0, string.length - 1)).to_s + " x=" + (@x).to_s + " y=" + (@y).to_s + " doit=" + (@doit).to_s + "}"
+      return RJava.cast_to_string(string.substring(0, string.length - 1)) + " x=" + RJava.cast_to_string(@x) + " y=" + RJava.cast_to_string(@y) + " doit=" + RJava.cast_to_string(@doit) + "}"
     end
     
     private

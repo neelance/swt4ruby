@@ -409,7 +409,7 @@ module Org::Eclipse::Swt::Widgets
     def release_widget
       super
       @parent = nil
-      @text = (nil).to_s
+      @text = RJava.cast_to_string(nil)
       @styles = nil
       @ranges = nil
     end
@@ -471,7 +471,7 @@ module Org::Eclipse::Swt::Widgets
             event.attr_detail = SWT::COMPOSITION_CHANGED
             event.attr_start = @start_offset
             event.attr_end = @start_offset + @text.length
-            event.attr_text = @text = (!(buffer).nil? ? buffer.to_s : "").to_s # $NON-NLS-1$
+            event.attr_text = @text = RJava.cast_to_string(!(buffer).nil? ? buffer.to_s : "") # $NON-NLS-1$
             @commit_count = @text.length
             send_event(SWT::ImeComposition, event)
             chars = @text
@@ -587,7 +587,7 @@ module Org::Eclipse::Swt::Widgets
         event.attr_detail = SWT::COMPOSITION_CHANGED
         event.attr_start = @start_offset
         event.attr_end = end_
-        event.attr_text = @text = (!(buffer).nil? ? buffer.to_s : "").to_s # $NON-NLS-1$
+        event.attr_text = @text = RJava.cast_to_string(!(buffer).nil? ? buffer.to_s : "") # $NON-NLS-1$
         send_event(SWT::ImeComposition, event)
         if ((@text.length).equal?(0))
           @start_offset = -1

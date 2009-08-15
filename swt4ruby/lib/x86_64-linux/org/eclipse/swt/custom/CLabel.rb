@@ -434,7 +434,7 @@ module Org::Eclipse::Swt::Custom
         define_method :get_keyboard_shortcut do |e|
           mnemonic = __find_mnemonic(@local_class_parent.attr_text)
           if (!(mnemonic).equal?(Character.new(?\0.ord)))
-            e.attr_result = "Alt+" + (mnemonic).to_s # $NON-NLS-1$
+            e.attr_result = "Alt+" + RJava.cast_to_string(mnemonic) # $NON-NLS-1$
           end
         end
         
@@ -495,9 +495,9 @@ module Org::Eclipse::Swt::Custom
       @gradient_colors = nil
       @gradient_percents = nil
       @background_image = nil
-      @text = (nil).to_s
+      @text = RJava.cast_to_string(nil)
       @image = nil
-      @app_tool_tip_text = (nil).to_s
+      @app_tool_tip_text = RJava.cast_to_string(nil)
     end
     
     typesig { [TraverseEvent] }
@@ -960,7 +960,7 @@ module Org::Eclipse::Swt::Custom
     typesig { [String] }
     def set_tool_tip_text(string)
       super(string)
-      @app_tool_tip_text = (Canvas.instance_method(:get_tool_tip_text).bind(self).call).to_s
+      @app_tool_tip_text = RJava.cast_to_string(Canvas.instance_method(:get_tool_tip_text).bind(self).call)
     end
     
     typesig { [SwtGC, String, ::Java::Int] }
@@ -1008,7 +1008,7 @@ module Org::Eclipse::Swt::Custom
           end
         end
       end
-      result = (mid).equal?(0) ? t : (t.substring(0, mid)).to_s + ELLIPSIS + (t.substring(validate_offset(layout, l - mid), l)).to_s
+      result = (mid).equal?(0) ? t : RJava.cast_to_string(t.substring(0, mid)) + ELLIPSIS + RJava.cast_to_string(t.substring(validate_offset(layout, l - mid), l))
       layout.dispose
       return result
     end

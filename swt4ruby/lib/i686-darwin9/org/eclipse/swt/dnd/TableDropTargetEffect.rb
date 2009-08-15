@@ -90,7 +90,7 @@ module Org::Eclipse::Swt::Dnd
       alias_method :attr_accept_drag_proc=, :accept_drag_proc=
       
       when_class_loaded do
-        self.attr_accept_drag_proc = Callback.new(TableDropTargetEffect.class, "AcceptDragProc", 5) # $NON-NLS-1$
+        self.attr_accept_drag_proc = Callback.new(TableDropTargetEffect, "AcceptDragProc", 5) # $NON-NLS-1$
         accept_drag_proc = self.attr_accept_drag_proc.get_address
         if ((accept_drag_proc).equal?(0))
           SWT.error(SWT::ERROR_NO_MORE_CALLBACKS)

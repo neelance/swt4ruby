@@ -208,7 +208,7 @@ module Org::Eclipse::Swt::Graphics
     # @return <code>true</code> if the object is the same as this object and <code>false</code> otherwise
     # 
     # @see #hashCode()
-    def equals(object)
+    def ==(object)
       if ((object).equal?(self))
         return true
       end
@@ -238,7 +238,7 @@ module Org::Eclipse::Swt::Graphics
     # 
     # @return a string representation of the <code>RGB</code>
     def to_s
-      return "RGB {" + (@red).to_s + ", " + (@green).to_s + ", " + (@blue).to_s + "}" # $NON-NLS-1$//$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+      return "RGB {" + RJava.cast_to_string(@red) + ", " + RJava.cast_to_string(@green) + ", " + RJava.cast_to_string(@blue) + "}" # $NON-NLS-1$//$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
     end
     
     private

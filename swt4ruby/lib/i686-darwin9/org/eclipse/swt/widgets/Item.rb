@@ -153,7 +153,7 @@ module Org::Eclipse::Swt::Widgets
     typesig { [] }
     def release_widget
       super
-      @text = (nil).to_s
+      @text = RJava.cast_to_string(nil)
       @image = nil
     end
     

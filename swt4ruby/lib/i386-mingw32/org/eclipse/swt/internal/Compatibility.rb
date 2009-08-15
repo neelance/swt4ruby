@@ -319,7 +319,7 @@ module Org::Eclipse::Swt::Internal
         end
         if (!(self.attr_msgs).nil?)
           begin
-            answer = (self.attr_msgs.get_string(key)).to_s
+            answer = RJava.cast_to_string(self.attr_msgs.get_string(key))
           rescue MissingResourceException => ex2
           end
         end
@@ -343,7 +343,7 @@ module Org::Eclipse::Swt::Internal
           begin
             formatter = MessageFormat.new("")
             formatter.apply_pattern(self.attr_msgs.get_string(key))
-            answer = (formatter.format(args)).to_s
+            answer = RJava.cast_to_string(formatter.format(args))
           rescue MissingResourceException => ex2
           end
         end

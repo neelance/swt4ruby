@@ -25,7 +25,7 @@ module Org::Eclipse::Swt::Internal
           # $NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
           begin
             Library.load_library("libXm.so.2", false) # $NON-NLS-1$
-          rescue Exception => ex
+          rescue JavaThrowable => ex
           end
         end
         Library.load_library("swt") # $NON-NLS-1$

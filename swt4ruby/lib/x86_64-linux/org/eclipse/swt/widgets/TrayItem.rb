@@ -217,7 +217,7 @@ module Org::Eclipse::Swt::Widgets
       if (!(screen).equal?(0))
         monitor = OS.gdk_screen_get_number(screen)
       end
-      tray_buffer = Converter.wcs_to_mbcs(nil, "_NET_SYSTEM_TRAY_S" + (monitor).to_s, true)
+      tray_buffer = Converter.wcs_to_mbcs(nil, "_NET_SYSTEM_TRAY_S" + RJava.cast_to_string(monitor), true)
       # int
       tray_atom = OS.gdk_atom_intern(tray_buffer, true)
       # int
@@ -423,7 +423,7 @@ module Org::Eclipse::Swt::Widgets
         @image_list.dispose
       end
       @image_list = nil
-      @tool_tip_text = (nil).to_s
+      @tool_tip_text = RJava.cast_to_string(nil)
     end
     
     typesig { [MenuDetectListener] }

@@ -658,7 +658,7 @@ module Org::Eclipse::Swt::Internal::Image
       end
       # TIFF recommends storing the data in strips of no more than 8 Ko
       data = @image.attr_data
-      strips = Array.typed(::Java::Int).new(2) { 0 }
+      strips = Array.typed(Array.typed(::Java::Int)).new(2) { nil }
       nbr_rows_per_strip = format_strips(row_byte_size, image_length, data, 8192, next_offset, extra_bytes, strips)
       strip_offsets = strips[0]
       strip_byte_counts = strips[1]

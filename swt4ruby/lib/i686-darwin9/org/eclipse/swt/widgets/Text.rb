@@ -299,7 +299,7 @@ module Org::Eclipse::Swt::Widgets
       end
       if (hooks(SWT::Verify) || filters(SWT::Verify))
         char_count = get_char_count
-        string = (verify_text(string, char_count, char_count, nil)).to_s
+        string = RJava.cast_to_string(verify_text(string, char_count, char_count, nil))
         if ((string).nil?)
           return
         end
@@ -1461,7 +1461,7 @@ module Org::Eclipse::Swt::Widgets
       end
       if (hooks(SWT::Verify) || filters(SWT::Verify))
         selection = get_selection
-        string = (verify_text(string, selection.attr_x, selection.attr_y, nil)).to_s
+        string = RJava.cast_to_string(verify_text(string, selection.attr_x, selection.attr_y, nil))
         if ((string).nil?)
           return
         end
@@ -1501,10 +1501,10 @@ module Org::Eclipse::Swt::Widgets
         if (!(@text_limit).equal?(LIMIT))
           char_count = old_text.length
           if (char_count - (selection.attr_y - selection.attr_x) + length_ > @text_limit)
-            string = (string.substring(0, @text_limit - char_count + (selection.attr_y - selection.attr_x))).to_s
+            string = RJava.cast_to_string(string.substring(0, @text_limit - char_count + (selection.attr_y - selection.attr_x)))
           end
         end
-        new_text = (old_text.substring(0, selection.attr_x)).to_s + string + (old_text.substring(selection.attr_y)).to_s
+        new_text = RJava.cast_to_string(old_text.substring(0, selection.attr_x)) + string + RJava.cast_to_string(old_text.substring(selection.attr_y))
         set_edit_text(new_text)
         set_selection(selection.attr_x + string.length)
       end
@@ -1727,7 +1727,7 @@ module Org::Eclipse::Swt::Widgets
       paste_ = true
       old_text = nil
       if (hooks(SWT::Verify) || filters(SWT::Verify))
-        old_text = (get_clipboard_text).to_s
+        old_text = RJava.cast_to_string(get_clipboard_text)
         if (!(old_text).nil?)
           selection = get_selection
           new_text = verify_text(old_text, selection.attr_x, selection.attr_y, nil)
@@ -1748,13 +1748,13 @@ module Org::Eclipse::Swt::Widgets
       if (paste_)
         if ((@txn_object).equal?(0))
           if ((old_text).nil?)
-            old_text = (get_clipboard_text).to_s
+            old_text = RJava.cast_to_string(get_clipboard_text)
           end
           insert_edit_text(old_text)
         else
           if (!(@text_limit).equal?(LIMIT))
             if ((old_text).nil?)
-              old_text = (get_clipboard_text).to_s
+              old_text = RJava.cast_to_string(get_clipboard_text)
             end
             set_txntext(OS.attr_k_txnuse_current_selection, OS.attr_k_txnuse_current_selection, old_text)
             OS._txnshow_selection(@txn_object, false)
@@ -1783,7 +1783,7 @@ module Org::Eclipse::Swt::Widgets
     def release_widget
       super
       @txn_object = 0
-      @hidden_text = (@message = (nil).to_s).to_s
+      @hidden_text = RJava.cast_to_string(@message = RJava.cast_to_string(nil))
     end
     
     typesig { [ModifyListener] }
@@ -1930,7 +1930,7 @@ module Org::Eclipse::Swt::Widgets
         if (!(event.attr_character).equal?(Character.new(?\t.ord)) && event.attr_character < 0x20)
           return true
         end
-        old_text = (String.new(Array.typed(::Java::Char).new([event.attr_character]))).to_s
+        old_text = RJava.cast_to_string(String.new(Array.typed(::Java::Char).new([event.attr_character])))
       end
       new_text = verify_text(old_text, start, end_, event)
       if ((new_text).nil?)
@@ -1969,7 +1969,7 @@ module Org::Eclipse::Swt::Widgets
       string_ref = OS._cfstring_create_with_characters(OS.attr_k_cfallocator_default, buffer, buffer.attr_length)
       OS._axnotification_hiobject_notify(string_ref, self.attr_handle, 0)
       OS._cfrelease(string_ref)
-      string = (OS.attr_k_axvalue_changed_notification).to_s
+      string = RJava.cast_to_string(OS.attr_k_axvalue_changed_notification)
       buffer = CharArray.new(string.length)
       string.get_chars(0, buffer.attr_length, buffer, 0)
       string_ref = OS._cfstring_create_with_characters(OS.attr_k_cfallocator_default, buffer, buffer.attr_length)
@@ -2431,7 +2431,7 @@ module Org::Eclipse::Swt::Widgets
         error(SWT::ERROR_NULL_ARGUMENT)
       end
       if (hooks(SWT::Verify) || filters(SWT::Verify))
-        string = (verify_text(string, 0, get_char_count, nil)).to_s
+        string = RJava.cast_to_string(verify_text(string, 0, get_char_count, nil))
         if ((string).nil?)
           return
         end
@@ -2458,7 +2458,7 @@ module Org::Eclipse::Swt::Widgets
           i += 1
         end
       else
-        @hidden_text = (nil).to_s
+        @hidden_text = RJava.cast_to_string(nil)
         buffer = CharArray.new(Math.min(string.length, @text_limit))
         string.get_chars(0, buffer.attr_length, buffer, 0)
       end

@@ -271,7 +271,7 @@ module Org::Eclipse::Swt::Graphics
       when_class_loaded do
         begin
           Class.for_name("org.eclipse.swt.widgets.Display")
-        rescue Exception => e
+        rescue JavaThrowable => e
         end
       end
       
@@ -346,7 +346,7 @@ module Org::Eclipse::Swt::Graphics
       @draw_pattern_proc = 0
       @axial_shading_proc = 0
       @release_proc = 0
-      synchronized((Device.class)) do
+      synchronized((Device)) do
         if (!(data).nil?)
           @debug = data.attr_debug
           @tracking = data.attr_tracking
@@ -439,7 +439,7 @@ module Org::Eclipse::Swt::Graphics
     # @see #destroy
     # @see #checkDevice
     def dispose
-      synchronized((Device.class)) do
+      synchronized((Device)) do
         if (is_disposed)
           return
         end
@@ -904,7 +904,7 @@ module Org::Eclipse::Swt::Graphics
     # 
     # @return <code>true</code> when the device is disposed and <code>false</code> otherwise
     def is_disposed
-      synchronized((Device.class)) do
+      synchronized((Device)) do
         return @disposed
       end
     end

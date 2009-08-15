@@ -73,7 +73,7 @@ module Org::Eclipse::Swt::Internal::Image
       begin
         byte_stream.write(@reference)
         return true
-      rescue Exception => e
+      rescue JavaException => e
         return false
       end
     end

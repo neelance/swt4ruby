@@ -318,7 +318,7 @@ module Org::Eclipse::Swt::Widgets
           buffer.append("0")
           count -= 1
         end
-        string = (buffer.to_s).to_s
+        string = RJava.cast_to_string(buffer.to_s)
       end
       buffer = CharArray.new(string.length)
       string.get_chars(0, buffer.attr_length, buffer, 0)
@@ -593,7 +593,7 @@ module Org::Eclipse::Swt::Widgets
               whole_part = !(start_index).equal?(index) ? string.substring(start_index, index) : "0"
               decimal_part = string.substring(index + 1)
               if (decimal_part.length > @digits)
-                decimal_part = (decimal_part.substring(0, @digits)).to_s
+                decimal_part = RJava.cast_to_string(decimal_part.substring(0, @digits))
               else
                 i = @digits - decimal_part.length
                 j = 0
@@ -1090,9 +1090,9 @@ module Org::Eclipse::Swt::Widgets
         if (!(event.attr_character).equal?(Character.new(?\t.ord)) && event.attr_character < 0x20)
           return true
         end
-        old_text = (String.new(Array.typed(::Java::Char).new([event.attr_character]))).to_s
+        old_text = RJava.cast_to_string(String.new(Array.typed(::Java::Char).new([event.attr_character])))
       end
-      new_text = (verify_text(old_text, start, end_, event)).to_s
+      new_text = RJava.cast_to_string(verify_text(old_text, start, end_, event))
       if ((new_text).nil?)
         return false
       end
@@ -1279,9 +1279,9 @@ module Org::Eclipse::Swt::Widgets
       if (set_text_)
         string = nil
         if ((@digits).equal?(0))
-          string = (String.value_of(value)).to_s
+          string = RJava.cast_to_string(String.value_of(value))
         else
-          string = (String.value_of(Math.abs(value))).to_s
+          string = RJava.cast_to_string(String.value_of(Math.abs(value)))
           decimal_separator = get_decimal_separator
           index = string.length - @digits
           buffer = StringBuffer.new
@@ -1300,7 +1300,7 @@ module Org::Eclipse::Swt::Widgets
             end
             buffer.append(string)
           end
-          string = (buffer.to_s).to_s
+          string = RJava.cast_to_string(buffer.to_s)
         end
         if (hooks(SWT::Verify) || filters(SWT::Verify))
           actual_size = Array.typed(::Java::Int).new(1) { 0 }
@@ -1310,7 +1310,7 @@ module Org::Eclipse::Swt::Widgets
             length_ = OS._cfstring_get_length(ptr[0])
             OS._cfrelease(ptr[0])
           end
-          string = (verify_text(string, 0, length_, nil)).to_s
+          string = RJava.cast_to_string(verify_text(string, 0, length_, nil))
           if ((string).nil?)
             return
           end
@@ -1336,7 +1336,7 @@ module Org::Eclipse::Swt::Widgets
     def set_text(string, start, end_, notify)
       if (notify)
         if (hooks(SWT::Verify) || filters(SWT::Verify))
-          string = (verify_text(string, start, end_, nil)).to_s
+          string = RJava.cast_to_string(verify_text(string, start, end_, nil))
           if ((string).nil?)
             return nil
           end
@@ -1486,7 +1486,7 @@ module Org::Eclipse::Swt::Widgets
         decimal_separator = get_decimal_separator
         index = string.index_of(decimal_separator)
         if (!(index).equal?(-1))
-          string = (string.substring(0, index) + string.substring(index + 1)).to_s
+          string = RJava.cast_to_string(string.substring(0, index) + string.substring(index + 1))
         end
         index = 0
       end

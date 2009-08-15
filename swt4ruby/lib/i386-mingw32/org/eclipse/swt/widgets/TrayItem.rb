@@ -380,7 +380,7 @@ module Org::Eclipse::Swt::Widgets
         @image2.dispose
       end
       @image2 = nil
-      @tool_tip_text = (nil).to_s
+      @tool_tip_text = RJava.cast_to_string(nil)
       icon_data = OS::IsUnicode ? NOTIFYICONDATAW.new : NOTIFYICONDATAA.new
       icon_data.attr_cb_size = NOTIFYICONDATA.attr_sizeof
       icon_data.attr_u_id = @id

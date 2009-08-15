@@ -2476,7 +2476,7 @@ module Org::Eclipse::Swt::Widgets
         # int
         ptr = OS.gtk_entry_get_text(@entry_handle)
         # 64
-        string = (verify_text(string, 0, RJava.cast_to_int(OS.g_utf8_strlen(ptr, -1)))).to_s
+        string = RJava.cast_to_string(verify_text(string, 0, RJava.cast_to_int(OS.g_utf8_strlen(ptr, -1))))
         if ((string).nil?)
           return
         end

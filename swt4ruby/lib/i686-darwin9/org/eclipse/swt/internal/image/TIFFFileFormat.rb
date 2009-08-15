@@ -37,7 +37,7 @@ module Org::Eclipse::Swt::Internal::Image
           return false
         end
         return true
-      rescue Exception => e
+      rescue JavaException => e
         return false
       end
     end

@@ -1741,7 +1741,7 @@ module Org::Eclipse::Swt::Widgets
           OS.gtk_text_buffer_paste_clipboard(@buffer_handle, clipboard, nil, OS.gtk_text_view_get_editable(self.attr_handle))
         end
       end
-      @message = (nil).to_s
+      @message = RJava.cast_to_string(nil)
     end
     
     typesig { [ModifyListener] }
@@ -2173,7 +2173,7 @@ module Org::Eclipse::Swt::Widgets
       # insertion of the text.  This is not wrong, but is inconsistent with other platforms.  The
       # fix is to block the firing of these events and fire them ourselves in a consistent manner.
       if (hooks(SWT::Verify) || filters(SWT::Verify))
-        string = (verify_text(string, 0, get_char_count)).to_s
+        string = RJava.cast_to_string(verify_text(string, 0, get_char_count))
         if ((string).nil?)
           return
         end

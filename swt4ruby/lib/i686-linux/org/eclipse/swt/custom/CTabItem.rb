@@ -263,7 +263,7 @@ module Org::Eclipse::Swt::Custom
       layout.set_text(text)
       end_ = layout.get_previous_offset(length_, SWT::MOVEMENT_CLUSTER)
       while (end_ > 0)
-        text = (text.substring(0, end_)).to_s
+        text = RJava.cast_to_string(text.substring(0, end_))
         l = gc.text_extent(text, FLAGS).attr_x
         if (l + ellipse_width <= width)
           break
@@ -284,8 +284,8 @@ module Org::Eclipse::Swt::Custom
       super
       @parent = nil
       @control = nil
-      @tool_tip_text = (nil).to_s
-      @shortened_text = (nil).to_s
+      @tool_tip_text = RJava.cast_to_string(nil)
+      @shortened_text = RJava.cast_to_string(nil)
       @font = nil
     end
     
@@ -518,7 +518,7 @@ module Org::Eclipse::Swt::Custom
         gc_font = gc.get_font
         gc.set_font((@font).nil? ? @parent.get_font : @font)
         if ((@shortened_text).nil? || !(@shortened_text_width).equal?(text_width))
-          @shortened_text = (shorten_text(gc, get_text, text_width)).to_s
+          @shortened_text = RJava.cast_to_string(shorten_text(gc, get_text, text_width))
           @shortened_text_width = text_width
         end
         extent = gc.text_extent(@shortened_text, FLAGS)
@@ -764,7 +764,7 @@ module Org::Eclipse::Swt::Custom
         gc_font = gc.get_font
         gc.set_font((@font).nil? ? @parent.get_font : @font)
         if ((@shortened_text).nil? || !(@shortened_text_width).equal?(text_width))
-          @shortened_text = (shorten_text(gc, get_text, text_width)).to_s
+          @shortened_text = RJava.cast_to_string(shorten_text(gc, get_text, text_width))
           @shortened_text_width = text_width
         end
         extent = gc.text_extent(@shortened_text, FLAGS)
@@ -960,21 +960,21 @@ module Org::Eclipse::Swt::Custom
       text = nil
       if (minimum)
         min_chars = @parent.attr_min_chars
-        text = ((min_chars).equal?(0) ? nil : get_text).to_s
+        text = RJava.cast_to_string((min_chars).equal?(0) ? nil : get_text)
         if (!(text).nil? && text.length > min_chars)
           if (use_ellipses)
             end_ = min_chars < ELLIPSIS.length + 1 ? min_chars : min_chars - ELLIPSIS.length
-            text = (text.substring(0, end_)).to_s
+            text = RJava.cast_to_string(text.substring(0, end_))
             if (min_chars > ELLIPSIS.length + 1)
               text += ELLIPSIS
             end
           else
             end_ = min_chars
-            text = (text.substring(0, end_)).to_s
+            text = RJava.cast_to_string(text.substring(0, end_))
           end
         end
       else
-        text = (get_text).to_s
+        text = RJava.cast_to_string(get_text)
       end
       if (!(text).nil?)
         if (w > 0)
@@ -1181,7 +1181,7 @@ module Org::Eclipse::Swt::Custom
         return
       end
       super(string)
-      @shortened_text = (nil).to_s
+      @shortened_text = RJava.cast_to_string(nil)
       @shortened_text_width = 0
       if (!@parent.update_tab_height(false))
         @parent.update_items

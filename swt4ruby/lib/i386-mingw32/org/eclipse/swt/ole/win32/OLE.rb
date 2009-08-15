@@ -846,67 +846,67 @@ module Org::Eclipse::Swt::Ole::Win32
         when ERROR_CANNOT_CREATE_FILE
           msg = ERROR_CANNOT_CREATE_FILE_MSG
           if (!(hresult).equal?(0))
-            msg += " result = " + (hresult).to_s
+            msg += " result = " + RJava.cast_to_string(hresult)
           end # $NON-NLS-1$
           raise SWTException.new(code, msg)
         when ERROR_CANNOT_CREATE_OBJECT
           msg = ERROR_CANNOT_CREATE_OBJECT_MSG
           if (!(hresult).equal?(0))
-            msg += " result = " + (hresult).to_s
+            msg += " result = " + RJava.cast_to_string(hresult)
           end # $NON-NLS-1$
           raise SWTException.new(code, msg) # $NON-NLS-1$
         when ERROR_CANNOT_OPEN_FILE
           msg = ERROR_CANNOT_OPEN_FILE_MSG
           if (!(hresult).equal?(0))
-            msg += " result = " + (hresult).to_s
+            msg += " result = " + RJava.cast_to_string(hresult)
           end # $NON-NLS-1$
           raise SWTException.new(code, msg)
         when ERROR_INTERFACE_NOT_FOUND
           msg = ERROR_INTERFACE_NOT_FOUND_MSG
           if (!(hresult).equal?(0))
-            msg += " result = " + (hresult).to_s
+            msg += " result = " + RJava.cast_to_string(hresult)
           end # $NON-NLS-1$
           raise SWTException.new(code, msg)
         when ERROR_INVALID_CLASSID
           msg = ERROR_INVALID_CLASSID_MSG
           if (!(hresult).equal?(0))
-            msg += " result = " + (hresult).to_s
+            msg += " result = " + RJava.cast_to_string(hresult)
           end # $NON-NLS-1$
           raise SWTException.new(code, msg)
         when ERROR_CANNOT_ACCESS_CLASSFACTORY
           msg = ERROR_CANNOT_ACCESS_CLASSFACTORY_MSG
           if (!(hresult).equal?(0))
-            msg += " result = " + (hresult).to_s
+            msg += " result = " + RJava.cast_to_string(hresult)
           end # $NON-NLS-1$
           raise SWTException.new(code, msg)
         when ERROR_CANNOT_CREATE_LICENSED_OBJECT
           msg = ERROR_CANNOT_CREATE_LICENSED_OBJECT_MSG
           if (!(hresult).equal?(0))
-            msg += " result = " + (hresult).to_s
+            msg += " result = " + RJava.cast_to_string(hresult)
           end # $NON-NLS-1$
           raise SWTException.new(code, msg)
         when ERROR_CANNOT_CHANGE_VARIANT_TYPE
           msg = ERROR_CANNOT_CHANGE_VARIANT_TYPE_MSG
           if (!(hresult).equal?(0))
-            msg += " result = " + (hresult).to_s
+            msg += " result = " + RJava.cast_to_string(hresult)
           end # $NON-NLS-1$
           raise SWTException.new(code, msg)
         when ERROR_APPLICATION_NOT_FOUND
           msg = ERROR_APPLICATION_NOT_FOUND_MSG
           if (!(hresult).equal?(0))
-            msg += " result = " + (hresult).to_s
+            msg += " result = " + RJava.cast_to_string(hresult)
           end # $NON-NLS-1$
           raise SWTException.new(code, msg)
         when ERROR_ACTION_NOT_PERFORMED
           msg = ERROR_ACTION_NOT_PERFORMED_MSG
           if (!(hresult).equal?(0))
-            msg += " result = " + (hresult).to_s
+            msg += " result = " + RJava.cast_to_string(hresult)
           end # $NON-NLS-1$
           raise SWTException.new(code, msg)
         when ERROR_OUT_OF_MEMORY
           msg = ERROR_ACTION_NOT_PERFORMED_MSG
           if (!(hresult).equal?(0))
-            msg += " result = " + (hresult).to_s
+            msg += " result = " + RJava.cast_to_string(hresult)
           end # $NON-NLS-1$
           raise SWTError.new(code, msg)
         end
@@ -977,7 +977,7 @@ module Org::Eclipse::Swt::Ole::Win32
             lp_data = TCHAR.new(0, length_)
             if ((OS._reg_query_value_ex(phk_result[0], nil, 0, nil, lp_data, lpcb_data)).equal?(0))
               length_ = Math.max(0, lp_data.length - 1)
-              result = (lp_data.to_s(0, length_)).to_s
+              result = RJava.cast_to_string(lp_data.to_s(0, length_))
             end
           end
         end
@@ -1013,7 +1013,7 @@ module Org::Eclipse::Swt::Ole::Win32
         if ((file).nil? || !file.exists || file.is_directory)
           return false
         end
-        return ((COM._stg_is_storage_file(((file.get_absolute_path).to_s + "\0").to_char_array)).equal?(COM::S_OK))
+        return ((COM._stg_is_storage_file((RJava.cast_to_string(file.get_absolute_path) + "\0").to_char_array)).equal?(COM::S_OK))
       end
     }
     

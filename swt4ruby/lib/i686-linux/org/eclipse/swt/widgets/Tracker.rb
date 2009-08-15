@@ -908,7 +908,7 @@ module Org::Eclipse::Swt::Widgets
           else
             begin
               JavaThread.sleep(50)
-            rescue Exception => ex
+            rescue JavaException => ex
             end
           end
         end

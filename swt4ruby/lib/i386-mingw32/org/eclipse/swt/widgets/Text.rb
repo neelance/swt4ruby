@@ -363,10 +363,10 @@ module Org::Eclipse::Swt::Widgets
       if ((string).nil?)
         error(SWT::ERROR_NULL_ARGUMENT)
       end
-      string = (Display.with_cr_lf(string)).to_s
+      string = RJava.cast_to_string(Display.with_cr_lf(string))
       length = OS._get_window_text_length(self.attr_handle)
       if (hooks(SWT::Verify) || filters(SWT::Verify))
-        string = (verify_text(string, length, length, nil)).to_s
+        string = RJava.cast_to_string(verify_text(string, length, length, nil))
         if ((string).nil?)
           return
         end
@@ -1309,12 +1309,12 @@ module Org::Eclipse::Swt::Widgets
       if ((string).nil?)
         error(SWT::ERROR_NULL_ARGUMENT)
       end
-      string = (Display.with_cr_lf(string)).to_s
+      string = RJava.cast_to_string(Display.with_cr_lf(string))
       if (hooks(SWT::Verify) || filters(SWT::Verify))
         start = Array.typed(::Java::Int).new(1) { 0 }
         end_ = Array.typed(::Java::Int).new(1) { 0 }
         OS._send_message(self.attr_handle, OS::EM_GETSEL, start, end_)
-        string = (verify_text(string, start[0], end_[0], nil)).to_s
+        string = RJava.cast_to_string(verify_text(string, start[0], end_[0], nil))
         if ((string).nil?)
           return
         end
@@ -1410,7 +1410,7 @@ module Org::Eclipse::Swt::Widgets
     typesig { [] }
     def release_widget
       super
-      @message = (nil).to_s
+      @message = RJava.cast_to_string(nil)
     end
     
     typesig { [ModifyListener] }
@@ -1624,7 +1624,7 @@ module Org::Eclipse::Swt::Widgets
         if (!(key).equal?(Character.new(?\t.ord)) && key < 0x20)
           return true
         end
-        old_text = (String.new(Array.typed(::Java::Char).new([key]))).to_s
+        old_text = RJava.cast_to_string(String.new(Array.typed(::Java::Char).new([key])))
       end
       new_text = verify_text(old_text, start[0], end_[0], event)
       if ((new_text).nil?)
@@ -1633,7 +1633,7 @@ module Org::Eclipse::Swt::Widgets
       if ((new_text).equal?(old_text))
         return true
       end
-      new_text = (Display.with_cr_lf(new_text)).to_s
+      new_text = RJava.cast_to_string(Display.with_cr_lf(new_text))
       buffer = TCHAR.new(get_code_page, new_text, true)
       OS._send_message(self.attr_handle, OS::EM_SETSEL, start[0], end_[0])
       # Feature in Windows.  When an edit control with ES_MULTILINE
@@ -2050,10 +2050,10 @@ module Org::Eclipse::Swt::Widgets
       if ((string).nil?)
         error(SWT::ERROR_NULL_ARGUMENT)
       end
-      string = (Display.with_cr_lf(string)).to_s
+      string = RJava.cast_to_string(Display.with_cr_lf(string))
       if (hooks(SWT::Verify) || filters(SWT::Verify))
         length_ = OS._get_window_text_length(self.attr_handle)
-        string = (verify_text(string, 0, length_, nil)).to_s
+        string = RJava.cast_to_string(verify_text(string, 0, length_, nil))
         if ((string).nil?)
           return
         end
@@ -2061,7 +2061,7 @@ module Org::Eclipse::Swt::Widgets
       # 64
       limit = RJava.cast_to_int(OS._send_message(self.attr_handle, OS::EM_GETLIMITTEXT, 0, 0)) & 0x7fffffff
       if (string.length > limit)
-        string = (string.substring(0, limit)).to_s
+        string = RJava.cast_to_string(string.substring(0, limit))
       end
       buffer = TCHAR.new(get_code_page, string, true)
       OS._set_window_text(self.attr_handle, buffer)
@@ -2612,7 +2612,7 @@ module Org::Eclipse::Swt::Widgets
         end
       when OS::WM_PASTE
         OS._send_message(self.attr_handle, OS::EM_GETSEL, start, end_)
-        new_text = (get_clipboard_text).to_s
+        new_text = RJava.cast_to_string(get_clipboard_text)
       when OS::EM_UNDO, OS::WM_UNDO
         if (!(OS._send_message(self.attr_handle, OS::EM_CANUNDO, 0, 0)).equal?(0))
           @ignore_modify = @ignore_character = true
@@ -2625,7 +2625,7 @@ module Org::Eclipse::Swt::Widgets
           if (!(length_).equal?(0) && !(new_start[0]).equal?(new_end[0]))
             buffer = TCHAR.new(get_code_page, length_ + 1)
             OS._get_window_text(self.attr_handle, buffer, length_ + 1)
-            new_text = (buffer.to_s(new_start[0], new_end[0] - new_start[0])).to_s
+            new_text = RJava.cast_to_string(buffer.to_s(new_start[0], new_end[0] - new_start[0]))
           else
             new_text = ""
           end
@@ -2635,7 +2635,7 @@ module Org::Eclipse::Swt::Widgets
       end
       if (!(new_text).nil?)
         old_text = new_text
-        new_text = (verify_text(new_text, start[0], end_[0], nil)).to_s
+        new_text = RJava.cast_to_string(verify_text(new_text, start[0], end_[0], nil))
         if ((new_text).nil?)
           return LRESULT::ZERO
         end
@@ -2643,7 +2643,7 @@ module Org::Eclipse::Swt::Widgets
           if (call)
             call_window_proc(self.attr_handle, msg, w_param, l_param)
           end
-          new_text = (Display.with_cr_lf(new_text)).to_s
+          new_text = RJava.cast_to_string(Display.with_cr_lf(new_text))
           buffer = TCHAR.new(get_code_page, new_text, true)
           # Feature in Windows.  When an edit control with ES_MULTILINE
           # style that does not have the WS_VSCROLL style is full (i.e.

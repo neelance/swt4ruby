@@ -132,7 +132,7 @@ module Org::Eclipse::Swt::Accessibility
       # $NON-NLS-1$
       # $NON-NLS-1$
       # $NON-NLS-1$
-      return "AccessibleControlEvent {childID=" + (@child_id).to_s + " accessible=" + (@accessible).to_s + " x=" + (@x).to_s + " y=" + (@y).to_s + " width=" + (@width).to_s + " height=" + (@height).to_s + " detail=" + (@detail).to_s + " result=" + @result + "}" # $NON-NLS-1$
+      return "AccessibleControlEvent {childID=" + RJava.cast_to_string(@child_id) + " accessible=" + RJava.cast_to_string(@accessible) + " x=" + RJava.cast_to_string(@x) + " y=" + RJava.cast_to_string(@y) + " width=" + RJava.cast_to_string(@width) + " height=" + RJava.cast_to_string(@height) + " detail=" + RJava.cast_to_string(@detail) + " result=" + @result + "}" # $NON-NLS-1$
     end
     
     private

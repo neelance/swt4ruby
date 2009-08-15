@@ -123,13 +123,13 @@ module Org::Eclipse::Swt::Dnd
         ensure
           OS._cfrelease(cfstring)
         end
-        transfer_data.attr_data = Array.typed(::Java::Byte).new(1) { 0 }
+        transfer_data.attr_data = Array.typed(Array.typed(::Java::Byte)).new(1) { nil }
         transfer_data.attr_data[0] = buffer
         transfer_data.attr_result = OS.attr_no_err
       when UTEXTID
         buffer = Array.typed(::Java::Byte).new(chars.attr_length * 2) { 0 }
         OS.memmove(buffer, chars, buffer.attr_length)
-        transfer_data.attr_data = Array.typed(::Java::Byte).new(1) { 0 }
+        transfer_data.attr_data = Array.typed(Array.typed(::Java::Byte)).new(1) { nil }
         transfer_data.attr_data[0] = buffer
         transfer_data.attr_result = OS.attr_no_err
       end

@@ -83,7 +83,7 @@ module Org::Eclipse::Swt::Graphics
     # @return <code>true</code> if the object is the same as this object and <code>false</code> otherwise
     # 
     # @see #hashCode()
-    def equals(object)
+    def ==(object)
       if ((object).equal?(self))
         return true
       end
@@ -113,7 +113,7 @@ module Org::Eclipse::Swt::Graphics
     # 
     # @return a string representation of the point
     def to_s
-      return "Point {" + (@x).to_s + ", " + (@y).to_s + "}" # $NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+      return "Point {" + RJava.cast_to_string(@x) + ", " + RJava.cast_to_string(@y) + "}" # $NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
     end
     
     private

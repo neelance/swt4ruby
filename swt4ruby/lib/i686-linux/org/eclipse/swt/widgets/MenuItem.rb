@@ -971,8 +971,8 @@ module Org::Eclipse::Swt::Widgets
       index = string.index_of(Character.new(?\t.ord))
       if (!(index).equal?(-1))
         is_rtl = !((@parent.attr_style & SWT::RIGHT_TO_LEFT)).equal?(0)
-        accel_string = ((is_rtl ? "" : "  ") + string.substring(index + 1, string.length) + (is_rtl ? "  " : "")).to_s
-        string = (string.substring(0, index)).to_s
+        accel_string = RJava.cast_to_string((is_rtl ? "" : "  ") + string.substring(index + 1, string.length) + (is_rtl ? "  " : ""))
+        string = RJava.cast_to_string(string.substring(0, index))
       end
       chars = fix_mnemonic(string)
       buffer = Converter.wcs_to_mbcs(nil, chars, true)

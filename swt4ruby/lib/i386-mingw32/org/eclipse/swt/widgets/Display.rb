@@ -1484,7 +1484,7 @@ module Org::Eclipse::Swt::Widgets
     # 
     # @see #syncExec
     def async_exec(runnable)
-      synchronized((Device.class)) do
+      synchronized((Device)) do
         if (is_disposed)
           error(SWT::ERROR_DEVICE_DISPOSED)
         end
@@ -1554,7 +1554,7 @@ module Org::Eclipse::Swt::Widgets
     class_module.module_eval {
       typesig { [JavaThread, ::Java::Boolean] }
       def check_display(thread, multiple)
-        synchronized((Device.class)) do
+        synchronized((Device)) do
           i = 0
           while i < self.attr_displays.attr_length
             if (!(self.attr_displays[i]).nil?)
@@ -2069,7 +2069,7 @@ module Org::Eclipse::Swt::Widgets
       
       typesig { [Display] }
       def deregister(display)
-        synchronized((Device.class)) do
+        synchronized((Device)) do
           i = 0
           while i < self.attr_displays.attr_length
             if ((display).equal?(self.attr_displays[i]))
@@ -2358,7 +2358,7 @@ module Org::Eclipse::Swt::Widgets
       # @param thread the user-interface thread
       # @return the display for the given thread
       def find_display(thread)
-        synchronized((Device.class)) do
+        synchronized((Device)) do
           i = 0
           while i < self.attr_displays.attr_length
             display = self.attr_displays[i]
@@ -2596,7 +2596,7 @@ module Org::Eclipse::Swt::Widgets
       # 
       # @return the default display
       def get_default
-        synchronized((Device.class)) do
+        synchronized((Device)) do
           if ((self.attr_default).nil?)
             self.attr_default = Display.new
           end
@@ -3272,7 +3272,7 @@ module Org::Eclipse::Swt::Widgets
     # <li>ERROR_DEVICE_DISPOSED - if the receiver has been disposed</li>
     # </ul>
     def get_sync_thread
-      synchronized((Device.class)) do
+      synchronized((Device)) do
         if (is_disposed)
           error(SWT::ERROR_DEVICE_DISPOSED)
         end
@@ -3538,7 +3538,7 @@ module Org::Eclipse::Swt::Widgets
     # <li>ERROR_DEVICE_DISPOSED - if the receiver has been disposed</li>
     # </ul>
     def get_thread
-      synchronized((Device.class)) do
+      synchronized((Device)) do
         if (is_disposed)
           error(SWT::ERROR_DEVICE_DISPOSED)
         end
@@ -3653,8 +3653,8 @@ module Org::Eclipse::Swt::Widgets
       # Remember the current thread id
       @thread_id = OS._get_current_thread_id
       # Use the character encoding for the default locale
-      @window_class = TCHAR.new(0, WindowName + (self.attr_window_class_count).to_s, true)
-      @window_shadow_class = TCHAR.new(0, WindowShadowName + (self.attr_window_class_count).to_s, true)
+      @window_class = TCHAR.new(0, WindowName + RJava.cast_to_string(self.attr_window_class_count), true)
+      @window_shadow_class = TCHAR.new(0, WindowShadowName + RJava.cast_to_string(self.attr_window_class_count), true)
       self.attr_window_class_count += 1
       # Register the SWT window class
       # long
@@ -4433,7 +4433,7 @@ module Org::Eclipse::Swt::Widgets
     # 
     # @since 3.0
     def post(event)
-      synchronized((Device.class)) do
+      synchronized((Device)) do
         if (is_disposed)
           error(SWT::ERROR_DEVICE_DISPOSED)
         end
@@ -4631,7 +4631,7 @@ module Org::Eclipse::Swt::Widgets
     class_module.module_eval {
       typesig { [Display] }
       def register(display)
-        synchronized((Device.class)) do
+        synchronized((Device)) do
           i = 0
           while i < self.attr_displays.attr_length
             if ((self.attr_displays[i]).nil?)
@@ -5510,7 +5510,7 @@ module Org::Eclipse::Swt::Widgets
         return
       end
       old_synchronizer = nil
-      synchronized((Device.class)) do
+      synchronized((Device)) do
         old_synchronizer = @synchronizer
         @synchronizer = synchronizer
       end
@@ -5594,7 +5594,7 @@ module Org::Eclipse::Swt::Widgets
     # @see #asyncExec
     def sync_exec(runnable)
       synchronizer = nil
-      synchronized((Device.class)) do
+      synchronized((Device)) do
         if (is_disposed)
           error(SWT::ERROR_DEVICE_DISPOSED)
         end
@@ -5822,7 +5822,7 @@ module Org::Eclipse::Swt::Widgets
     # 
     # @see #sleep
     def wake
-      synchronized((Device.class)) do
+      synchronized((Device)) do
         if (is_disposed)
           error(SWT::ERROR_DEVICE_DISPOSED)
         end
@@ -5918,7 +5918,7 @@ module Org::Eclipse::Swt::Widgets
         if (((@hit_count += 1) - 1) >= 1024)
           begin
             JavaThread.sleep(1)
-          rescue Exception => t
+          rescue JavaThrowable => t
           end
         end
       else

@@ -1876,7 +1876,7 @@ module Org::Eclipse::Swt::Widgets
     # 
     # @see #syncExec
     def async_exec(runnable)
-      synchronized((Device.class)) do
+      synchronized((Device)) do
         if (is_disposed)
           error(SWT::ERROR_DEVICE_DISPOSED)
         end
@@ -1943,7 +1943,7 @@ module Org::Eclipse::Swt::Widgets
     class_module.module_eval {
       typesig { [JavaThread, ::Java::Boolean] }
       def check_display(thread, multiple)
-        synchronized((Device.class)) do
+        synchronized((Device)) do
           i = 0
           while i < self.attr_displays.attr_length
             if (!(self.attr_displays[i]).nil?)
@@ -2136,12 +2136,12 @@ module Org::Eclipse::Swt::Widgets
         length = OS.strlen(ptr)
         buffer = Array.typed(::Java::Byte).new(length) { 0 }
         OS.memmove(buffer, ptr, length)
-        System.out.println("***WARNING: " + (String.new(Converter.mbcs_to_wcs(nil, buffer))).to_s) # $NON-NLS-1$
-        System.out.println("***WARNING: SWT requires GTK " + (MAJOR).to_s + "." + (MINOR).to_s + "." + (MICRO).to_s) # $NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+        System.out.println("***WARNING: " + RJava.cast_to_string(String.new(Converter.mbcs_to_wcs(nil, buffer)))) # $NON-NLS-1$
+        System.out.println("***WARNING: SWT requires GTK " + RJava.cast_to_string(MAJOR) + "." + RJava.cast_to_string(MINOR) + "." + RJava.cast_to_string(MICRO)) # $NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
         major = OS.gtk_major_version
         minor = OS.gtk_minor_version
         micro = OS.gtk_micro_version
-        System.out.println("***WARNING: Detected: " + (major).to_s + "." + (minor).to_s + "." + (micro).to_s) # $NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+        System.out.println("***WARNING: Detected: " + RJava.cast_to_string(major) + "." + RJava.cast_to_string(minor) + "." + RJava.cast_to_string(micro)) # $NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
       end
       if ((self.attr_fixed_type).equal?(0))
         type_name = Converter.wcs_to_mbcs(nil, "SwtFixed", true) # $NON-NLS-1$
@@ -2376,7 +2376,7 @@ module Org::Eclipse::Swt::Widgets
       
       typesig { [Display] }
       def deregister(display)
-        synchronized((Device.class)) do
+        synchronized((Device)) do
           i = 0
           while i < self.attr_displays.attr_length
             if ((display).equal?(self.attr_displays[i]))
@@ -2433,7 +2433,7 @@ module Org::Eclipse::Swt::Widgets
       # @param thread the user-interface thread
       # @return the display for the given thread
       def find_display(thread)
-        synchronized((Device.class)) do
+        synchronized((Device)) do
           i = 0
           while i < self.attr_displays.attr_length
             display = self.attr_displays[i]
@@ -3070,7 +3070,7 @@ module Org::Eclipse::Swt::Widgets
       # 
       # @return the default display
       def get_default
-        synchronized((Device.class)) do
+        synchronized((Device)) do
           if ((self.attr_default).nil?)
             self.attr_default = Display.new
           end
@@ -3436,7 +3436,7 @@ module Org::Eclipse::Swt::Widgets
     # <li>ERROR_DEVICE_DISPOSED - if the receiver has been disposed</li>
     # </ul>
     def get_sync_thread
-      synchronized((Device.class)) do
+      synchronized((Device)) do
         if (is_disposed)
           error(SWT::ERROR_DEVICE_DISPOSED)
         end
@@ -3757,7 +3757,7 @@ module Org::Eclipse::Swt::Widgets
     # <li>ERROR_DEVICE_DISPOSED - if the receiver has been disposed</li>
     # </ul>
     def get_thread
-      synchronized((Device.class)) do
+      synchronized((Device)) do
         if (is_disposed)
           error(SWT::ERROR_DEVICE_DISPOSED)
         end
@@ -4073,7 +4073,7 @@ module Org::Eclipse::Swt::Widgets
             if (length > 0)
               buffer2 = Array.typed(::Java::Byte).new(length) { 0 }
               OS.memmove(buffer2, ptr2, length)
-              @window_manager = (String.new(Converter.mbcs_to_wcs(nil, buffer2))).to_s
+              @window_manager = RJava.cast_to_string(String.new(Converter.mbcs_to_wcs(nil, buffer2)))
             end
           end
         end
@@ -4493,7 +4493,7 @@ module Org::Eclipse::Swt::Widgets
     # 
     # @since 3.0
     def post(event)
-      synchronized((Device.class)) do
+      synchronized((Device)) do
         if (is_disposed)
           error(SWT::ERROR_DEVICE_DISPOSED)
         end
@@ -4654,7 +4654,7 @@ module Org::Eclipse::Swt::Widgets
     class_module.module_eval {
       typesig { [Display] }
       def register(display)
-        synchronized((Device.class)) do
+        synchronized((Device)) do
           i = 0
           while i < self.attr_displays.attr_length
             if ((self.attr_displays[i]).nil?)
@@ -4910,7 +4910,7 @@ module Org::Eclipse::Swt::Widgets
       @widget_table = @modal_shells = nil
       @data = nil
       @values = @keys = nil
-      @window_manager = (nil).to_s
+      @window_manager = RJava.cast_to_string(nil)
       @event_table = @filter_table = nil
       @modal_dialog = nil
       @flush_rect = nil
@@ -5431,7 +5431,7 @@ module Org::Eclipse::Swt::Widgets
         return
       end
       old_synchronizer = nil
-      synchronized((Device.class)) do
+      synchronized((Device)) do
         old_synchronizer = @synchronizer
         @synchronizer = synchronizer
       end
@@ -5855,7 +5855,7 @@ module Org::Eclipse::Swt::Widgets
     # @see #asyncExec
     def sync_exec(runnable)
       synchronizer = nil
-      synchronized((Device.class)) do
+      synchronized((Device)) do
         if (is_disposed)
           error(SWT::ERROR_DEVICE_DISPOSED)
         end
@@ -5923,7 +5923,7 @@ module Org::Eclipse::Swt::Widgets
     # 
     # @see #sleep
     def wake
-      synchronized((Device.class)) do
+      synchronized((Device)) do
         if (is_disposed)
           error(SWT::ERROR_DEVICE_DISPOSED)
         end

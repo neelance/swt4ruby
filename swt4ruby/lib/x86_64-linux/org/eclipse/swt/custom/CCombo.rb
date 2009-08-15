@@ -1079,7 +1079,7 @@ module Org::Eclipse::Swt::Custom
           name = nil
           label = get_associated_label
           if (!(label).nil?)
-            name = (strip_mnemonic(label.get_text)).to_s
+            name = RJava.cast_to_string(strip_mnemonic(label.get_text))
           end
           e.attr_result = name
         end
@@ -1093,7 +1093,7 @@ module Org::Eclipse::Swt::Custom
             if (!(text).nil?)
               mnemonic = __find_mnemonic(text)
               if (!(mnemonic).equal?(Character.new(?\0.ord)))
-                shortcut = "Alt+" + (mnemonic).to_s # $NON-NLS-1$
+                shortcut = "Alt+" + RJava.cast_to_string(mnemonic) # $NON-NLS-1$
               end
             end
           end

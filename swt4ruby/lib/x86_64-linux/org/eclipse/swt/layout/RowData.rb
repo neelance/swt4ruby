@@ -131,17 +131,17 @@ module Org::Eclipse::Swt::Layout
     # 
     # @return a string representation of the RowData object
     def to_s
-      string = (get_name).to_s + " {"
+      string = RJava.cast_to_string(get_name) + " {"
       if (!(@width).equal?(SWT::DEFAULT))
-        string += "width=" + (@width).to_s + " "
+        string += "width=" + RJava.cast_to_string(@width) + " "
       end
       if (!(@height).equal?(SWT::DEFAULT))
-        string += "height=" + (@height).to_s + " "
+        string += "height=" + RJava.cast_to_string(@height) + " "
       end
       if (@exclude)
-        string += "exclude=" + (@exclude).to_s + " "
+        string += "exclude=" + RJava.cast_to_string(@exclude) + " "
       end
-      string = (string.trim).to_s
+      string = RJava.cast_to_string(string.trim)
       string += "}"
       return string
     end

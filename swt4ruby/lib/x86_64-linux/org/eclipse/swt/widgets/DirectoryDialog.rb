@@ -236,7 +236,7 @@ module Org::Eclipse::Swt::Widgets
               chars = CharArray.new(clength)
               OS.memmove(chars, utf16ptr, clength * 2)
               OS.g_free(utf16ptr)
-              answer = (String.new(chars)).to_s
+              answer = RJava.cast_to_string(String.new(chars))
               @filter_path = answer
             end
           end
@@ -338,9 +338,9 @@ module Org::Eclipse::Swt::Widgets
             if (!(os_answer).nil?)
               # remove trailing separator, unless root directory
               if (!(os_answer == SEPARATOR) && os_answer.ends_with(SEPARATOR))
-                os_answer = (os_answer.substring(0, os_answer.length - 1)).to_s
+                os_answer = RJava.cast_to_string(os_answer.substring(0, os_answer.length - 1))
               end
-              answer = (@filter_path = os_answer).to_s
+              answer = RJava.cast_to_string(@filter_path = os_answer)
             end
             OS.g_free(utf16ptr)
           end

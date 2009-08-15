@@ -1223,7 +1223,7 @@ module Org::Eclipse::Swt::Ole::Win32
             # get the unicode character array from the global memory and create a String
             buffer = CharArray.new((size + 1) / 2) # add one to avoid rounding errors
             COM._move_memory(buffer, h_mem[0], size)
-            @string_data = (String.new(buffer)).to_s
+            @string_data = RJava.cast_to_string(String.new(buffer))
           else
             @string_data = "" # $NON-NLS-1$
           end
@@ -1256,36 +1256,36 @@ module Org::Eclipse::Swt::Ole::Win32
     def to_s
       case (@type)
       when COM::VT_BOOL
-        return "VT_BOOL{" + (@boolean_data).to_s + "}"
+        return "VT_BOOL{" + RJava.cast_to_string(@boolean_data) + "}"
       when COM::VT_I1
-        return "VT_I1{" + (@byte_data).to_s + "}"
+        return "VT_I1{" + RJava.cast_to_string(@byte_data) + "}"
       when COM::VT_I2
-        return "VT_I2{" + (@short_data).to_s + "}"
+        return "VT_I2{" + RJava.cast_to_string(@short_data) + "}"
       when COM::VT_UI2
-        return "VT_UI2{" + (@char_data).to_s + "}"
+        return "VT_UI2{" + RJava.cast_to_string(@char_data) + "}"
       when COM::VT_I4
-        return "VT_I4{" + (@int_data).to_s + "}"
+        return "VT_I4{" + RJava.cast_to_string(@int_data) + "}"
       when COM::VT_I8
-        return "VT_I8{" + (@long_data).to_s + "}"
+        return "VT_I8{" + RJava.cast_to_string(@long_data) + "}"
       when COM::VT_R4
-        return "VT_R4{" + (@float_data).to_s + "}"
+        return "VT_R4{" + RJava.cast_to_string(@float_data) + "}"
       when COM::VT_R8
-        return "VT_R8{" + (@double_data).to_s + "}"
+        return "VT_R8{" + RJava.cast_to_string(@double_data) + "}"
       when COM::VT_BSTR
         return "VT_BSTR{" + @string_data + "}"
       when COM::VT_DISPATCH
-        return "VT_DISPATCH{" + (((@dispatch_data).nil? ? 0 : @dispatch_data.get_address)).to_s + "}"
+        return "VT_DISPATCH{" + RJava.cast_to_string(((@dispatch_data).nil? ? 0 : @dispatch_data.get_address)) + "}"
       when COM::VT_UNKNOWN
-        return "VT_UNKNOWN{" + (((@unknown_data).nil? ? 0 : @unknown_data.get_address)).to_s + "}"
+        return "VT_UNKNOWN{" + RJava.cast_to_string(((@unknown_data).nil? ? 0 : @unknown_data.get_address)) + "}"
       when COM::VT_EMPTY
         return "VT_EMPTY"
       when COM::VT_NULL
         return "VT_NULL"
       end
       if (!((@type & COM::VT_BYREF)).equal?(0))
-        return "VT_BYREF|" + ((@type & ~COM::VT_BYREF)).to_s + "{" + (@by_ref_ptr).to_s + "}"
+        return "VT_BYREF|" + RJava.cast_to_string((@type & ~COM::VT_BYREF)) + "{" + RJava.cast_to_string(@by_ref_ptr) + "}"
       end
-      return "Unsupported Type " + (@type).to_s
+      return "Unsupported Type " + RJava.cast_to_string(@type)
     end
     
     private

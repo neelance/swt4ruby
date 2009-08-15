@@ -2213,7 +2213,7 @@ module Org::Eclipse::Swt::Widgets
                 column = @columns[i]
                 width = column.attr_last_width
                 if (start_x <= x && x < start_x + width)
-                  tool_tip_text = (column.attr_tool_tip_text).to_s
+                  tool_tip_text = RJava.cast_to_string(column.attr_tool_tip_text)
                   rect.attr_left = RJava.cast_to_short(start_x)
                   rect.attr_top = RJava.cast_to_short(0)
                   rect.attr_right = RJava.cast_to_short((rect.attr_left + width))
@@ -2260,7 +2260,7 @@ module Org::Eclipse::Swt::Widgets
                   column_width = w[0]
                 end
                 if (width > column_width)
-                  tool_tip_text = (item.get_text(column_index)).to_s
+                  tool_tip_text = RJava.cast_to_string(item.get_text(column_index))
                   image = item.get_image(column_index)
                   image_width = !(image).nil? ? image.get_bounds.attr_width + get_gap : 0
                   style = (column).nil? ? SWT::LEFT : column.attr_style

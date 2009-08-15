@@ -68,7 +68,7 @@ module Org::Eclipse::Swt::Internal::Image
     # Used when decoding.
     def initialize_component_parameters
       comp_count = get_number_of_image_components
-      @component_parameters = Array.typed(::Java::Int).new(0) { 0 }
+      @component_parameters = Array.typed(Array.typed(::Java::Int)).new(0) { nil }
       i = 0
       while i < comp_count
         ofs = 5 + i * 2
@@ -76,7 +76,7 @@ module Org::Eclipse::Swt::Internal::Image
         dc = (self.attr_reference[ofs + 1] & 0xff) >> 4
         ac = self.attr_reference[ofs + 1] & 0xf
         if (@component_parameters.attr_length <= cid)
-          new_params = Array.typed(::Java::Int).new(cid + 1) { 0 }
+          new_params = Array.typed(Array.typed(::Java::Int)).new(cid + 1) { nil }
           System.arraycopy(@component_parameters, 0, new_params, 0, @component_parameters.attr_length)
           @component_parameters = new_params
         end

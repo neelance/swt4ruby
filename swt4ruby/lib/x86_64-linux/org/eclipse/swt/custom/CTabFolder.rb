@@ -2247,16 +2247,16 @@ module Org::Eclipse::Swt::Custom
           name = nil
           child_id = e.attr_child_id
           if (child_id >= 0 && child_id < self.attr_items.attr_length)
-            name = (strip_mnemonic(self.attr_items[child_id].get_text)).to_s
+            name = RJava.cast_to_string(strip_mnemonic(self.attr_items[child_id].get_text))
           else
             if ((child_id).equal?(self.attr_items.attr_length + CHEVRON_CHILD_ID))
-              name = (SWT.get_message("SWT_ShowList")).to_s # $NON-NLS-1$
+              name = RJava.cast_to_string(SWT.get_message("SWT_ShowList")) # $NON-NLS-1$
             else
               if ((child_id).equal?(self.attr_items.attr_length + MINIMIZE_CHILD_ID))
-                name = (self.attr_minimized ? SWT.get_message("SWT_Restore") : SWT.get_message("SWT_Minimize")).to_s # $NON-NLS-1$ //$NON-NLS-2$
+                name = RJava.cast_to_string(self.attr_minimized ? SWT.get_message("SWT_Restore") : SWT.get_message("SWT_Minimize")) # $NON-NLS-1$ //$NON-NLS-2$
               else
                 if ((child_id).equal?(self.attr_items.attr_length + MAXIMIZE_CHILD_ID))
-                  name = (self.attr_maximized ? SWT.get_message("SWT_Restore") : SWT.get_message("SWT_Maximize")).to_s # $NON-NLS-1$ //$NON-NLS-2$
+                  name = RJava.cast_to_string(self.attr_maximized ? SWT.get_message("SWT_Restore") : SWT.get_message("SWT_Maximize")) # $NON-NLS-1$ //$NON-NLS-2$
                 end
               end
             end
@@ -2269,10 +2269,10 @@ module Org::Eclipse::Swt::Custom
           help = nil
           child_id = e.attr_child_id
           if ((child_id).equal?(ACC::CHILDID_SELF))
-            help = (get_tool_tip_text).to_s
+            help = RJava.cast_to_string(get_tool_tip_text)
           else
             if (child_id >= 0 && child_id < self.attr_items.attr_length)
-              help = (self.attr_items[child_id].get_tool_tip_text).to_s
+              help = RJava.cast_to_string(self.attr_items[child_id].get_tool_tip_text)
             end
           end
           e.attr_result = help
@@ -2287,7 +2287,7 @@ module Org::Eclipse::Swt::Custom
             if (!(text).nil?)
               mnemonic = __find_mnemonic(text)
               if (!(mnemonic).equal?(Character.new(?\0.ord)))
-                shortcut = "Alt+" + (mnemonic).to_s # $NON-NLS-1$
+                shortcut = "Alt+" + RJava.cast_to_string(mnemonic) # $NON-NLS-1$
               end
             end
           end
@@ -2387,10 +2387,10 @@ module Org::Eclipse::Swt::Custom
           action = nil
           child_id = e.attr_child_id
           if (child_id >= 0 && child_id < self.attr_items.attr_length)
-            action = (SWT.get_message("SWT_Switch")).to_s # $NON-NLS-1$
+            action = RJava.cast_to_string(SWT.get_message("SWT_Switch")) # $NON-NLS-1$
           end
           if (child_id >= self.attr_items.attr_length && child_id < self.attr_items.attr_length + EXTRA_CHILD_ID_COUNT)
-            action = (SWT.get_message("SWT_Press")).to_s # $NON-NLS-1$
+            action = RJava.cast_to_string(SWT.get_message("SWT_Press")) # $NON-NLS-1$
           end
           e.attr_result = action
         end

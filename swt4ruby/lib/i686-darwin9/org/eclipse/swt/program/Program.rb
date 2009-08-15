@@ -411,7 +411,7 @@ module Org::Eclipse::Swt::Program
             range = CFRange.new
             range.attr_length = length_
             OS._cfstring_get_characters(name_ptr[0], range, buffer)
-            name = (String.new(buffer)).to_s
+            name = RJava.cast_to_string(String.new(buffer))
           end
           OS._cfrelease(name_ptr[0])
         end
@@ -431,7 +431,7 @@ module Org::Eclipse::Swt::Program
     # @return <code>true</code> if the object is the same as this object and <code>false</code> otherwise
     # 
     # @see #hashCode()
-    def equals(other)
+    def ==(other)
       if ((self).equal?(other))
         return true
       end

@@ -255,7 +255,7 @@ module Org::Eclipse::Swt::Printing
     typesig { [] }
     def check_subclass
       name = get_class.get_name
-      valid_name = PrintDialog.class.get_name
+      valid_name = PrintDialog.get_name
       if (!(valid_name == name))
         SWT.error(SWT::ERROR_INVALID_SUBCLASS)
       end

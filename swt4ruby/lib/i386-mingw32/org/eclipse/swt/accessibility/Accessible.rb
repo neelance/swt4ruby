@@ -1042,7 +1042,7 @@ module Org::Eclipse::Swt::Accessibility
         if (size_ > 0)
           buffer = CharArray.new((size_ + 1) / 2)
           COM._move_memory(buffer, p_default_action[0], size_)
-          os_default_action = (String.new(buffer)).to_s
+          os_default_action = RJava.cast_to_string(String.new(buffer))
         end
       end
       event = AccessibleControlEvent.new(self)
@@ -1057,7 +1057,7 @@ module Org::Eclipse::Swt::Accessibility
       if ((event.attr_result).nil?)
         return code
       end
-      data = ((event.attr_result).to_s + "\0").to_char_array
+      data = (RJava.cast_to_string(event.attr_result) + "\0").to_char_array
       # long
       ptr = COM._sys_alloc_string(data)
       # long
@@ -1096,7 +1096,7 @@ module Org::Eclipse::Swt::Accessibility
         if (size_ > 0)
           buffer = CharArray.new((size_ + 1) / 2)
           COM._move_memory(buffer, p_description[0], size_)
-          os_description = (String.new(buffer)).to_s
+          os_description = RJava.cast_to_string(String.new(buffer))
         end
       end
       event = AccessibleEvent.new(self)
@@ -1125,7 +1125,7 @@ module Org::Eclipse::Swt::Accessibility
               item = widget
               i = 1
               while i < column_count
-                event.attr_result += (tree.get_column(i).get_text).to_s + ": " + (item.get_text(i)).to_s
+                event.attr_result += RJava.cast_to_string(tree.get_column(i).get_text) + ": " + RJava.cast_to_string(item.get_text(i))
                 if (i + 1 < column_count)
                   event.attr_result += ", "
                 end
@@ -1144,7 +1144,7 @@ module Org::Eclipse::Swt::Accessibility
       if ((event.attr_result).nil?)
         return code
       end
-      data = ((event.attr_result).to_s + "\0").to_char_array
+      data = (RJava.cast_to_string(event.attr_result) + "\0").to_char_array
       # long
       ptr = COM._sys_alloc_string(data)
       # long
@@ -1241,7 +1241,7 @@ module Org::Eclipse::Swt::Accessibility
         if (size_ > 0)
           buffer = CharArray.new((size_ + 1) / 2)
           COM._move_memory(buffer, p_help[0], size_)
-          os_help = (String.new(buffer)).to_s
+          os_help = RJava.cast_to_string(String.new(buffer))
         end
       end
       event = AccessibleEvent.new(self)
@@ -1256,7 +1256,7 @@ module Org::Eclipse::Swt::Accessibility
       if ((event.attr_result).nil?)
         return code
       end
-      data = ((event.attr_result).to_s + "\0").to_char_array
+      data = (RJava.cast_to_string(event.attr_result) + "\0").to_char_array
       # long
       ptr = COM._sys_alloc_string(data)
       # long
@@ -1310,7 +1310,7 @@ module Org::Eclipse::Swt::Accessibility
         if (size_ > 0)
           buffer = CharArray.new((size_ + 1) / 2)
           COM._move_memory(buffer, p_keyboard_shortcut[0], size_)
-          os_keyboard_shortcut = (String.new(buffer)).to_s
+          os_keyboard_shortcut = RJava.cast_to_string(String.new(buffer))
         end
       end
       event = AccessibleEvent.new(self)
@@ -1325,7 +1325,7 @@ module Org::Eclipse::Swt::Accessibility
       if ((event.attr_result).nil?)
         return code
       end
-      data = ((event.attr_result).to_s + "\0").to_char_array
+      data = (RJava.cast_to_string(event.attr_result) + "\0").to_char_array
       # long
       ptr = COM._sys_alloc_string(data)
       # long
@@ -1363,7 +1363,7 @@ module Org::Eclipse::Swt::Accessibility
         if (size_ > 0)
           buffer = CharArray.new((size_ + 1) / 2)
           COM._move_memory(buffer, p_name[0], size_)
-          os_name = (String.new(buffer)).to_s
+          os_name = RJava.cast_to_string(String.new(buffer))
         end
       end
       event = AccessibleEvent.new(self)
@@ -1378,7 +1378,7 @@ module Org::Eclipse::Swt::Accessibility
       if ((event.attr_result).nil?)
         return code
       end
-      data = ((event.attr_result).to_s + "\0").to_char_array
+      data = (RJava.cast_to_string(event.attr_result) + "\0").to_char_array
       # long
       ptr = COM._sys_alloc_string(data)
       # long
@@ -1648,7 +1648,7 @@ module Org::Eclipse::Swt::Accessibility
         if (size_ > 0)
           buffer = CharArray.new((size_ + 1) / 2)
           COM._move_memory(buffer, p_value[0], size_)
-          os_value = (String.new(buffer)).to_s
+          os_value = RJava.cast_to_string(String.new(buffer))
         end
       end
       event = AccessibleControlEvent.new(self)
@@ -1663,7 +1663,7 @@ module Org::Eclipse::Swt::Accessibility
       if ((event.attr_result).nil?)
         return code
       end
-      data = ((event.attr_result).to_s + "\0").to_char_array
+      data = (RJava.cast_to_string(event.attr_result) + "\0").to_char_array
       # long
       ptr = COM._sys_alloc_string(data)
       # long

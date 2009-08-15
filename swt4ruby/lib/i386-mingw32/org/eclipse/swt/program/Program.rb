@@ -144,10 +144,10 @@ module Org::Eclipse::Swt::Program
           if (!(command).nil?)
             name = nil
             if ((name).nil?)
-              name = (assoc_query_string(OS::ASSOCSTR_FRIENDLYDOCNAME, key, false)).to_s
+              name = RJava.cast_to_string(assoc_query_string(OS::ASSOCSTR_FRIENDLYDOCNAME, key, false))
             end
             if ((name).nil?)
-              name = (assoc_query_string(OS::ASSOCSTR_FRIENDLYAPPNAME, key, false)).to_s
+              name = RJava.cast_to_string(assoc_query_string(OS::ASSOCSTR_FRIENDLYAPPNAME, key, false))
             end
             if ((name).nil?)
               name = ""
@@ -225,11 +225,11 @@ module Org::Eclipse::Swt::Program
                 if (!(length_).equal?(0))
                   lp_dst = TCHAR.new(0, length_)
                   OS._expand_environment_strings(lp_data, lp_dst, length_)
-                  result = (lp_dst.to_s(0, Math.max(0, length_ - 1))).to_s
+                  result = RJava.cast_to_string(lp_dst.to_s(0, Math.max(0, length_ - 1)))
                 end
               else
                 length_ = Math.max(0, lp_data.length - 1)
-                result = (lp_data.to_s(0, length_)).to_s
+                result = RJava.cast_to_string(lp_data.to_s(0, length_))
               end
             end
           end
@@ -369,8 +369,8 @@ module Org::Eclipse::Swt::Program
         i = @command.index_of(ARGUMENTS[index])
         if (!(i).equal?(-1))
           append = false
-          prefix = (@command.substring(0, i)).to_s
-          suffix = (@command.substring(i + ARGUMENTS[index].length, @command.length)).to_s
+          prefix = RJava.cast_to_string(@command.substring(0, i))
+          suffix = RJava.cast_to_string(@command.substring(i + ARGUMENTS[index].length, @command.length))
           break
         end
         index += 1
@@ -426,7 +426,7 @@ module Org::Eclipse::Swt::Program
       file_name = @icon_name
       index = @icon_name.index_of(Character.new(?,.ord))
       if (!(index).equal?(-1))
-        file_name = (@icon_name.substring(0, index)).to_s
+        file_name = RJava.cast_to_string(@icon_name.substring(0, index))
         icon_index = @icon_name.substring(index + 1, @icon_name.length).trim
         begin
           n_icon_index = JavaInteger.parse_int(icon_index)
@@ -436,7 +436,7 @@ module Org::Eclipse::Swt::Program
       length_ = file_name.length
       if (!(length_).equal?(0) && (file_name.char_at(0)).equal?(Character.new(?\".ord)))
         if ((file_name.char_at(length_ - 1)).equal?(Character.new(?\".ord)))
-          file_name = (file_name.substring(1, length_ - 1)).to_s
+          file_name = RJava.cast_to_string(file_name.substring(1, length_ - 1))
         end
       end
       # Use the character encoding for the default locale
@@ -475,7 +475,7 @@ module Org::Eclipse::Swt::Program
     # @return <code>true</code> if the object is the same as this object and <code>false</code> otherwise
     # 
     # @see #hashCode()
-    def equals(other)
+    def ==(other)
       if ((self).equal?(other))
         return true
       end

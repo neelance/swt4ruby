@@ -399,7 +399,7 @@ module Org::Eclipse::Swt::Widgets
       # fix is to add a space to both sides of the text.
       if (!((self.attr_style & SWT::RIGHT_TO_LEFT)).equal?(0))
         if (OS::COMCTL32_MAJOR < 6 || !OS._is_app_themed)
-          text = (OS._is_window_enabled(self.attr_handle) ? text : " " + text + " ").to_s
+          text = RJava.cast_to_string(OS._is_window_enabled(self.attr_handle) ? text : " " + text + " ")
         end
       end
       buffer = TCHAR.new(get_code_page, text, true)
@@ -967,7 +967,7 @@ module Org::Eclipse::Swt::Widgets
         @image2.dispose
       end
       @image2 = nil
-      @text = (nil).to_s
+      @text = RJava.cast_to_string(nil)
       @image = nil
     end
     

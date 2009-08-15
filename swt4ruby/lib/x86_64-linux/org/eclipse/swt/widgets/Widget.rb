@@ -2127,10 +2127,10 @@ module Org::Eclipse::Swt::Widgets
       if (!is_disposed)
         string = "*Wrong Thread*"
         if (is_valid_thread)
-          string = (get_name_text).to_s
+          string = RJava.cast_to_string(get_name_text)
         end
       end
-      return (get_name).to_s + " {" + string + "}"
+      return RJava.cast_to_string(get_name) + " {" + string + "}"
     end
     
     typesig { [] }

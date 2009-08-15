@@ -172,7 +172,7 @@ module Org::Eclipse::Swt::Printing
         if (!(printer_list[0]).equal?(0))
           count = OS._cfarray_get_count(printer_list[0])
           if (current_index[0] >= 0 && current_index[0] < count)
-            result = (get_string(OS._cfarray_get_value_at_index(printer_list[0], current_index[0]))).to_s
+            result = RJava.cast_to_string(get_string(OS._cfarray_get_value_at_index(printer_list[0], current_index[0])))
           end
           OS._cfrelease(printer_list[0])
         end

@@ -376,9 +376,9 @@ module Org::Eclipse::Swt::Browser
                 end_ = value.index_of(separator, start)
                 segment = nil
                 if ((end_).equal?(-1))
-                  segment = (value.substring(start)).to_s
+                  segment = RJava.cast_to_string(value.substring(start))
                 else
-                  segment = (value.substring(start, end_)).to_s
+                  segment = RJava.cast_to_string(value.substring(start, end_))
                 end
                 if (segment.length > 0)
                   segments.add_element(segment)
@@ -399,7 +399,7 @@ module Org::Eclipse::Swt::Browser
           # set the next value to the GRE path + "plugins"
           @plugin_dirs[((index += 1) - 1)] = @mozilla_path + PLUGINS_DIR
           # set the next value to the home directory + "/.mozilla/plugins"
-          @plugin_dirs[((index += 1) - 1)] = (System.get_property("user.home")).to_s + SEPARATOR_OS + USER_PLUGINS_DIR
+          @plugin_dirs[((index += 1) - 1)] = RJava.cast_to_string(System.get_property("user.home")) + SEPARATOR_OS + USER_PLUGINS_DIR
         end
         property_values = @plugin_dirs
       end
@@ -491,10 +491,10 @@ module Org::Eclipse::Swt::Browser
                       property_value = @profile_path
                     else
                       if ((property_name == XPCOM::NS_OS_HOME_DIR))
-                        property_value = (System.get_property("user.home")).to_s # $NON-NLS-1$
+                        property_value = RJava.cast_to_string(System.get_property("user.home")) # $NON-NLS-1$
                       else
                         if ((property_name == XPCOM::NS_OS_TEMP_DIR))
-                          property_value = (System.get_property("java.io.tmpdir")).to_s # $NON-NLS-1$
+                          property_value = RJava.cast_to_string(System.get_property("java.io.tmpdir")) # $NON-NLS-1$
                         else
                           if ((property_name == XPCOM::NS_GRE_DIR))
                             property_value = @mozilla_path

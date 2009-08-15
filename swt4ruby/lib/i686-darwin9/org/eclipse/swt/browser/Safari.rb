@@ -533,7 +533,7 @@ module Org::Eclipse::Swt::Browser
     
     typesig { [] }
     def back
-      @html = (nil).to_s
+      @html = RJava.cast_to_string(nil)
       return !(Cocoa.objc_msg_send(@web_view, Cocoa::S_goBack)).equal?(0)
     end
     
@@ -550,7 +550,7 @@ module Org::Eclipse::Swt::Browser
     
     typesig { [] }
     def forward
-      @html = (nil).to_s
+      @html = RJava.cast_to_string(nil)
       return !(Cocoa.objc_msg_send(@web_view, Cocoa::S_goForward)).equal?(0)
     end
     
@@ -682,7 +682,7 @@ module Org::Eclipse::Swt::Browser
               OS._hiview_set_frame(@web_view_handle, bounds)
             end
           end
-        end == :thrown or break
+        end
         case (event_kind)
         when OS.attr_k_event_raw_key_down
           # Bug in Safari. The WebView blocks the propagation of certain Carbon events
@@ -802,7 +802,7 @@ module Org::Eclipse::Swt::Browser
               OS._hiview_set_frame(@web_view_handle, bounds)
             end
           end
-        end == :thrown or break
+        end
         case (event_kind)
         when OS.attr_k_event_raw_key_down
           # Bug in Safari. The WebView blocks the propagation of certain Carbon events
@@ -1111,9 +1111,9 @@ module Org::Eclipse::Swt::Browser
     
     typesig { [String] }
     def set_url(url)
-      @html = (nil).to_s
+      @html = RJava.cast_to_string(nil)
       if (url.starts_with(PROTOCOL_FILE))
-        url = (url.substring(PROTOCOL_FILE.length)).to_s
+        url = RJava.cast_to_string(url.substring(PROTOCOL_FILE.length))
       end
       selector = Cocoa::S_fileURLWithPath
       is_http_url = !(url.index_of(Character.new(?/.ord))).equal?(0)
@@ -1144,7 +1144,7 @@ module Org::Eclipse::Swt::Browser
     
     typesig { [] }
     def stop
-      @html = (nil).to_s
+      @html = RJava.cast_to_string(nil)
       Cocoa.objc_msg_send(@web_view, Cocoa::S_stopLoading, 0)
     end
     
@@ -1865,7 +1865,7 @@ module Org::Eclipse::Swt::Browser
         if ((@last_hovered_link_url).nil?)
           return
         end
-        @last_hovered_link_url = (nil).to_s
+        @last_hovered_link_url = RJava.cast_to_string(nil)
         status_text = StatusTextEvent.new(self.attr_browser)
         status_text.attr_display = self.attr_browser.get_display
         status_text.attr_widget = self.attr_browser
@@ -1887,7 +1887,7 @@ module Org::Eclipse::Swt::Browser
         range = CFRange.new
         range.attr_length = length_
         OS._cfstring_get_characters(string_ptr, range, chars)
-        url_string = (String.new(chars)).to_s
+        url_string = RJava.cast_to_string(String.new(chars))
       end
       if ((url_string == @last_hovered_link_url))
         return

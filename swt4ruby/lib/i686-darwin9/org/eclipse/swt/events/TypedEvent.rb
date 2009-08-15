@@ -115,7 +115,7 @@ module Org::Eclipse::Swt::Events
     # 
     # @return a string representation of the event
     def to_s
-      return (get_name).to_s + "{" + (@widget).to_s + " time=" + (@time).to_s + " data=" + (@data).to_s + "}"
+      return RJava.cast_to_string(get_name) + "{" + RJava.cast_to_string(@widget) + " time=" + RJava.cast_to_string(@time) + " data=" + RJava.cast_to_string(@data) + "}"
     end
     
     private

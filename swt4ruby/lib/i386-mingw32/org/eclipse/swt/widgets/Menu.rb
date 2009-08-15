@@ -1081,10 +1081,10 @@ module Org::Eclipse::Swt::Widgets
       if (length_ > 0)
         i = 0
         while i < length_ - 1
-          result = result + (items[i].get_name_text).to_s + ", "
+          result = result + RJava.cast_to_string(items[i].get_name_text) + ", "
           i += 1
         end
-        result = result + (items[length_ - 1].get_name_text).to_s
+        result = result + RJava.cast_to_string(items[length_ - 1].get_name_text)
       end
       return result
     end

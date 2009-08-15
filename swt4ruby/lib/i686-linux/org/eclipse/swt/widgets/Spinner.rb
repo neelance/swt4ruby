@@ -268,7 +268,7 @@ module Org::Eclipse::Swt::Widgets
           buffer.append("0")
           count -= 1
         end
-        string = (buffer.to_s).to_s
+        string = RJava.cast_to_string(buffer.to_s)
       end
       buffer1 = Converter.wcs_to_mbcs(nil, string, false)
       # long
@@ -1417,7 +1417,7 @@ module Org::Eclipse::Swt::Widgets
         decimal_separator = get_decimal_separator
         index = string.index_of(decimal_separator)
         if (!(index).equal?(-1))
-          string = (string.substring(0, index) + string.substring(index + 1)).to_s
+          string = RJava.cast_to_string(string.substring(0, index) + string.substring(index + 1))
         end
         index = 0
       end

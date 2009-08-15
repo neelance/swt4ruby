@@ -369,7 +369,7 @@ module Org::Eclipse::Swt::Graphics
     # @return <code>true</code> if the object is the same as this object and <code>false</code> otherwise
     # 
     # @see #hashCode
-    def equals(object)
+    def ==(object)
       if ((object).equal?(self))
         return true
       end
@@ -416,7 +416,7 @@ module Org::Eclipse::Swt::Graphics
       if (is_disposed)
         return "Cursor {*DISPOSED*}"
       end
-      return "Cursor {" + (@handle).to_s + "}"
+      return "Cursor {" + RJava.cast_to_string(@handle) + "}"
     end
     
     class_module.module_eval {

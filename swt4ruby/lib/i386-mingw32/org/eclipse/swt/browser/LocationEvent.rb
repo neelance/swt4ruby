@@ -75,7 +75,7 @@ module Org::Eclipse::Swt::Browser
     def to_s
       string = super
       # remove trailing '}'
-      return (string.substring(0, string.length - 1)).to_s + " location=" + @location + " top=" + (@top).to_s + " doit=" + (@doit).to_s + "}"
+      return RJava.cast_to_string(string.substring(0, string.length - 1)) + " location=" + @location + " top=" + RJava.cast_to_string(@top) + " doit=" + RJava.cast_to_string(@doit) + "}"
     end
     
     private

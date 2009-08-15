@@ -359,13 +359,13 @@ module Org::Eclipse::Swt::Widgets
       while i < @filter_extensions.attr_length
         filter_name = @filter_extensions[i]
         if (i < @filter_names.attr_length)
-          filter_name = (@filter_names[i]).to_s
+          filter_name = RJava.cast_to_string(@filter_names[i])
         end
-        str_filter = str_filter + filter_name + (Character.new(?\0.ord)).to_s + (@filter_extensions[i]).to_s + (Character.new(?\0.ord)).to_s
+        str_filter = str_filter + filter_name + RJava.cast_to_string(Character.new(?\0.ord)) + RJava.cast_to_string(@filter_extensions[i]) + RJava.cast_to_string(Character.new(?\0.ord))
         i += 1
       end
       if ((@filter_extensions.attr_length).equal?(0))
-        str_filter = str_filter + FILTER + (Character.new(?\0.ord)).to_s + FILTER + (Character.new(?\0.ord)).to_s
+        str_filter = str_filter + FILTER + RJava.cast_to_string(Character.new(?\0.ord)) + FILTER + RJava.cast_to_string(Character.new(?\0.ord))
       end
       # Use the character encoding for the default locale
       buffer4 = TCHAR.new(0, str_filter, true)
@@ -515,7 +515,7 @@ module Org::Eclipse::Swt::Widgets
           prefix = TCHAR.new(0, n_file_offset - 1)
           byte_count2 = prefix.length * TCHAR.attr_sizeof
           OS._move_memory(prefix, lpstr_file, byte_count2)
-          @filter_path = (prefix.to_s(0, prefix.length)).to_s
+          @filter_path = RJava.cast_to_string(prefix.to_s(0, prefix.length))
           # Get each file from the buffer.  Files are delimited
           # by a NULL character with 2 NULL characters at the end.
           count = 0
@@ -540,7 +540,7 @@ module Org::Eclipse::Swt::Widgets
             start += 1
           end while (start < buffer.length && !(buffer.tchar_at(start)).equal?(0))
           if (@file_names.attr_length > 0)
-            @file_name = (@file_names[0]).to_s
+            @file_name = RJava.cast_to_string(@file_names[0])
           end
           separator = ""
           length_ = @filter_path.length

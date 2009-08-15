@@ -345,8 +345,8 @@ module Org::Eclipse::Swt::Layout
     # 
     # @return a string representation of the FormAttachment
     def to_s
-      string = !(@control).nil? ? @control.to_s : (@numerator).to_s + "/" + (@denominator).to_s
-      return "{y = (" + string + ((@offset >= 0 ? ")x + " + (@offset).to_s : ")x - " + ((-@offset)).to_s)).to_s + "}"
+      string = !(@control).nil? ? @control.to_s : RJava.cast_to_string(@numerator) + "/" + RJava.cast_to_string(@denominator)
+      return "{y = (" + string + RJava.cast_to_string((@offset >= 0 ? ")x + " + RJava.cast_to_string(@offset) : ")x - " + RJava.cast_to_string((-@offset)))) + "}"
     end
     
     private

@@ -188,7 +188,7 @@ module Org::Eclipse::Swt::Printing
         if (!OS.gtk_init_check(Array.typed(::Java::Long).new([0]), nil))
           SWT.error(SWT::ERROR_NO_HANDLES, nil, " [gtk_init_check() failed]")
         end
-        printer_callback = Callback.new(Printer.class, "GtkPrinterFunc_List", 2) # $NON-NLS-1$
+        printer_callback = Callback.new(Printer, "GtkPrinterFunc_List", 2) # $NON-NLS-1$
         # int
         gtk_printer_func_list = printer_callback.get_address
         if ((gtk_printer_func_list).equal?(0))
@@ -242,7 +242,7 @@ module Org::Eclipse::Swt::Printing
         if (!OS.gtk_init_check(Array.typed(::Java::Long).new([0]), nil))
           SWT.error(SWT::ERROR_NO_HANDLES, nil, " [gtk_init_check() failed]")
         end
-        printer_callback = Callback.new(Printer.class, "GtkPrinterFunc_Default", 2) # $NON-NLS-1$
+        printer_callback = Callback.new(Printer, "GtkPrinterFunc_Default", 2) # $NON-NLS-1$
         # int
         gtk_printer_func_default = printer_callback.get_address
         if ((gtk_printer_func_default).equal?(0))
@@ -348,7 +348,7 @@ module Org::Eclipse::Swt::Printing
           System.arraycopy(self.attr_settings_data, self.attr_start, value_buffer, 0, value_buffer.attr_length)
           OS.gtk_print_settings_set(settings, key_buffer, value_buffer)
           if (self.attr_debug)
-            System.out.println((String.new(Converter.mbcs_to_wcs(nil, key_buffer))).to_s + ": " + (String.new(Converter.mbcs_to_wcs(nil, value_buffer))).to_s)
+            System.out.println(RJava.cast_to_string(String.new(Converter.mbcs_to_wcs(nil, key_buffer))) + ": " + RJava.cast_to_string(String.new(Converter.mbcs_to_wcs(nil, value_buffer))))
           end
         end
         self.attr_end += 1 # skip extra null terminator
@@ -503,7 +503,7 @@ module Org::Eclipse::Swt::Printing
         value_buffer = Array.typed(::Java::Byte).new(length) { 0 }
         System.arraycopy(self.attr_settings_data, self.attr_start, value_buffer, 0, length)
         if (self.attr_debug)
-          System.out.println((String.new(Converter.mbcs_to_wcs(nil, key_buffer))).to_s + ": " + (String.new(Converter.mbcs_to_wcs(nil, value_buffer))).to_s)
+          System.out.println(RJava.cast_to_string(String.new(Converter.mbcs_to_wcs(nil, key_buffer))) + ": " + RJava.cast_to_string(String.new(Converter.mbcs_to_wcs(nil, value_buffer))))
         end
         return value_buffer
       end
@@ -793,7 +793,7 @@ module Org::Eclipse::Swt::Printing
       check_device
       resolution = OS.gtk_print_settings_get_resolution(@settings)
       if (self.attr_debug)
-        System.out.println("print_settings.resolution=" + (resolution).to_s)
+        System.out.println("print_settings.resolution=" + RJava.cast_to_string(resolution))
       end
       # TODO: Return 72 (1/72 inch = 1 point) until gtk bug 346245 is fixed
       # TODO: Fix this: gtk_print_settings_get_resolution returns 0? (see gtk bug 346252)

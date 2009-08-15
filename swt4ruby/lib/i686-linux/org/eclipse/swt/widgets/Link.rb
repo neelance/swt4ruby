@@ -674,7 +674,7 @@ module Org::Eclipse::Swt::Widgets
       @offsets = nil
       @ids = nil
       @mnemonics = nil
-      @text = (nil).to_s
+      @text = RJava.cast_to_string(nil)
     end
     
     typesig { [SelectionListener] }

@@ -143,7 +143,7 @@ module Org::Eclipse::Swt::Dnd
     # </ul>
     def check_subclass
       name = get_class.get_name
-      valid_name = Clipboard.class.get_name
+      valid_name = Clipboard.get_name
       if (!(valid_name == name))
         DND.error(SWT::ERROR_INVALID_SUBCLASS)
       end
@@ -613,7 +613,7 @@ module Org::Eclipse::Swt::Dnd
         buffer = Array.typed(::Java::Byte).new(OS.strlen(p_name)) { 0 }
         OS.memmove(buffer, p_name, buffer.attr_length)
         OS.g_free(p_name)
-        result[((count += 1) - 1)] = "GTKCLIPBOARD " + (String.new(Converter.mbcs_to_wcs(nil, buffer))).to_s
+        result[((count += 1) - 1)] = "GTKCLIPBOARD " + RJava.cast_to_string(String.new(Converter.mbcs_to_wcs(nil, buffer)))
         i += 1
       end
       i_ = 0
@@ -627,7 +627,7 @@ module Org::Eclipse::Swt::Dnd
         buffer = Array.typed(::Java::Byte).new(OS.strlen(p_name)) { 0 }
         OS.memmove(buffer, p_name, buffer.attr_length)
         OS.g_free(p_name)
-        result[((count += 1) - 1)] = "GTKPRIMARYCLIPBOARD " + (String.new(Converter.mbcs_to_wcs(nil, buffer))).to_s
+        result[((count += 1) - 1)] = "GTKPRIMARYCLIPBOARD " + RJava.cast_to_string(String.new(Converter.mbcs_to_wcs(nil, buffer)))
         i_ += 1
       end
       if (count < result.attr_length)

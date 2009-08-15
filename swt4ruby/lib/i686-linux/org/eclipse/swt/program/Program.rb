@@ -266,10 +266,10 @@ module Org::Eclipse::Swt::Program
         if (!(actions).nil?)
           index = actions.index_of("Open")
           if (!(index).equal?(-1))
-            action = (actions.substring(index, index + 4)).to_s
+            action = RJava.cast_to_string(actions.substring(index, index + 4))
           else
             index = actions.index_of(",")
-            action = (!(index).equal?(-1) ? actions.substring(0, index) : actions).to_s
+            action = RJava.cast_to_string(!(index).equal?(-1) ? actions.substring(0, index) : actions)
           end
         end
         return action
@@ -391,7 +391,7 @@ module Org::Eclipse::Swt::Program
       def cde_init(display)
         begin
           Library.load_library("swt-cde")
-        rescue Exception => e
+        rescue JavaThrowable => e
           return false
         end
         # Use the character encoding for the default locale
@@ -512,7 +512,7 @@ module Org::Eclipse::Swt::Program
           if (length_ > 0)
             buffer = Array.typed(::Java::Byte).new(length_) { 0 }
             OS.memmove(buffer, uri, length_)
-            file_name = (String.new(Converter.mbcs_to_wcs(nil, buffer))).to_s
+            file_name = RJava.cast_to_string(String.new(Converter.mbcs_to_wcs(nil, buffer)))
           end
           GNOME.g_free(uri)
         end
@@ -527,7 +527,7 @@ module Org::Eclipse::Swt::Program
         if (!(j).equal?(-1))
           value = args[index]
           file_arg = index
-          args[index] = (value.substring(0, j)).to_s + file_name + (value.substring(j + 2)).to_s
+          args[index] = RJava.cast_to_string(value.substring(0, j)) + file_name + RJava.cast_to_string(value.substring(j + 2))
         end
         index += 1
       end
@@ -559,7 +559,7 @@ module Org::Eclipse::Swt::Program
       end
       begin
         return ImageData.new(@icon_path)
-      rescue Exception => e
+      rescue JavaException => e
       end
       return nil
     end
@@ -606,7 +606,7 @@ module Org::Eclipse::Swt::Program
               extension_buffer = Array.typed(::Java::Byte).new(extension_length) { 0 }
               OS.memmove(extension_buffer, extension_ptr, extension_length)
               extension = String.new(Converter.mbcs_to_wcs(nil, extension_buffer))
-              extension = (Character.new(?..ord)).to_s + extension
+              extension = RJava.cast_to_string(Character.new(?..ord)) + extension
               extensions.add_element(extension)
               extension_element = GNOME.g_list_next(extension_element)
             end
@@ -635,7 +635,7 @@ module Org::Eclipse::Swt::Program
           if (length_ > 0)
             buffer = Array.typed(::Java::Byte).new(length_) { 0 }
             OS.memmove(buffer, type_name, length_)
-            mime_type = (String.new(Converter.mbcs_to_wcs(nil, buffer))).to_s
+            mime_type = RJava.cast_to_string(String.new(Converter.mbcs_to_wcs(nil, buffer)))
           end
         end
         return mime_type
@@ -690,7 +690,7 @@ module Org::Eclipse::Swt::Program
       def gnome_init
         begin
           return GNOME.gnome_vfs_init
-        rescue Exception => e
+        rescue JavaThrowable => e
           return false
         end
       end
@@ -728,9 +728,9 @@ module Org::Eclipse::Swt::Program
         mime_type = nil
         case (desktop)
         when DESKTOP_GNOME_24, DESKTOP_GNOME
-          mime_type = (gnome_get_mime_type(extension)).to_s
+          mime_type = RJava.cast_to_string(gnome_get_mime_type(extension))
         when DESKTOP_CDE
-          mime_type = (cde_get_mime_type(extension)).to_s
+          mime_type = RJava.cast_to_string(cde_get_mime_type(extension))
         end
         if ((mime_type).nil?)
           return nil
@@ -911,7 +911,7 @@ module Org::Eclipse::Swt::Program
     # @return <code>true</code> if the object is the same as this object and <code>false</code> otherwise
     # 
     # @see #hashCode()
-    def equals(other)
+    def ==(other)
       if ((self).equal?(other))
         return true
       end

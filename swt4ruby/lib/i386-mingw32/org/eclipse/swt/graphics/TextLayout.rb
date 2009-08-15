@@ -423,7 +423,7 @@ module Org::Eclipse::Swt::Graphics
         
         typesig { [] }
         def to_s
-          return "StyleItem {" + (@start).to_s + ", " + (@style).to_s + "}"
+          return "StyleItem {" + RJava.cast_to_string(@start) + ", " + RJava.cast_to_string(@style) + "}"
         end
         
         typesig { [] }
@@ -714,7 +714,7 @@ module Org::Eclipse::Swt::Graphics
         i_ += 1
       end
       line_width = 0
-      @runs = Array.typed(StyleItem).new(line_count) { nil }
+      @runs = Array.typed(Array.typed(StyleItem)).new(line_count) { nil }
       @line_offset = Array.typed(::Java::Int).new(line_count + 1) { 0 }
       @line_y = Array.typed(::Java::Int).new(line_count + 1) { 0 }
       @line_width = Array.typed(::Java::Int).new(line_count) { 0 }
@@ -810,8 +810,8 @@ module Org::Eclipse::Swt::Graphics
     def destroy
       free_runs
       @font = nil
-      @text = (nil).to_s
-      @segments_text = (nil).to_s
+      @text = RJava.cast_to_string(nil)
+      @segments_text = RJava.cast_to_string(nil)
       @tabs = nil
       @styles = nil
       @runs = nil
@@ -1779,7 +1779,7 @@ module Org::Eclipse::Swt::Graphics
       end
       @all_runs = nil
       @runs = nil
-      @segments_text = (nil).to_s
+      @segments_text = RJava.cast_to_string(nil)
     end
     
     typesig { [] }
@@ -2783,7 +2783,7 @@ module Org::Eclipse::Swt::Graphics
     typesig { [] }
     # Itemize the receiver text
     def itemize
-      @segments_text = (get_segments_text).to_s
+      @segments_text = RJava.cast_to_string(get_segments_text)
       length_ = @segments_text.length
       script_control = SCRIPT_CONTROL.new
       script_state = SCRIPT_STATE.new

@@ -99,7 +99,7 @@ module Org::Eclipse::Swt::Dnd
       end
       files = object
       transfer_data.attr_result = -1
-      data = Array.typed(::Java::Byte).new(files.attr_length) { 0 }
+      data = Array.typed(Array.typed(::Java::Byte)).new(files.attr_length) { nil }
       i = 0
       while i < data.attr_length
         file = JavaFile.new(files[i])

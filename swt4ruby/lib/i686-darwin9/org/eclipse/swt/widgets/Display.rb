@@ -1391,7 +1391,7 @@ module Org::Eclipse::Swt::Widgets
     # 
     # @see #syncExec
     def async_exec(runnable)
-      synchronized((Device.class)) do
+      synchronized((Device)) do
         if (is_disposed)
           error(SWT::ERROR_DEVICE_DISPOSED)
         end
@@ -1757,7 +1757,7 @@ module Org::Eclipse::Swt::Widgets
     class_module.module_eval {
       typesig { [JavaThread, ::Java::Boolean] }
       def check_display(thread, multiple)
-        synchronized((Device.class)) do
+        synchronized((Device)) do
           i = 0
           while i < self.attr_displays.attr_length
             if (!(self.attr_displays[i]).nil?)
@@ -1989,8 +1989,8 @@ module Org::Eclipse::Swt::Widgets
     typesig { [DeviceData] }
     def create_display(data)
       if (OS::VERSION < 0x1030)
-        System.out.println("***WARNING: SWT requires MacOS X version " + (10).to_s + "." + (3).to_s + " or greater") # $NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-        System.out.println("***WARNING: Detected: " + (JavaInteger.to_hex_string((OS::VERSION & 0xff00) >> 8)).to_s + "." + (JavaInteger.to_hex_string((OS::VERSION & 0xf0) >> 4)).to_s + "." + (JavaInteger.to_hex_string(OS::VERSION & 0xf)).to_s) # $NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+        System.out.println("***WARNING: SWT requires MacOS X version " + RJava.cast_to_string(10) + "." + RJava.cast_to_string(3) + " or greater") # $NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+        System.out.println("***WARNING: Detected: " + RJava.cast_to_string(JavaInteger.to_hex_string((OS::VERSION & 0xff00) >> 8)) + "." + RJava.cast_to_string(JavaInteger.to_hex_string((OS::VERSION & 0xf0) >> 4)) + "." + RJava.cast_to_string(JavaInteger.to_hex_string(OS::VERSION & 0xf))) # $NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
       end
       # Feature in the Macintosh.  On OS 10.2, it is necessary
       # to explicitly check in with the Process Manager and set
@@ -2007,7 +2007,7 @@ module Org::Eclipse::Swt::Widgets
       if ((OS._get_current_process(psn)).equal?(OS.attr_no_err))
         pid = OS.getpid
         buffer = nil
-        ptr = OS.getenv(ascii("APP_NAME_" + (pid).to_s)) # $NON-NLS-1$
+        ptr = OS.getenv(ascii("APP_NAME_" + RJava.cast_to_string(pid))) # $NON-NLS-1$
         if (!(ptr).equal?(0))
           buffer = Array.typed(::Java::Byte).new(OS.strlen(ptr) + 1) { 0 }
           OS.memmove(buffer, ptr, buffer.attr_length)
@@ -2035,7 +2035,7 @@ module Org::Eclipse::Swt::Widgets
         end
         OS._cpsenable_foreground_operation(psn, 0x3, 0x3c, 0x2c, 0x1103)
         OS._set_front_process(psn)
-        ptr = OS.getenv(ascii("APP_ICON_" + (pid).to_s)) # $NON-NLS-1$
+        ptr = OS.getenv(ascii("APP_ICON_" + RJava.cast_to_string(pid))) # $NON-NLS-1$
         if (!(ptr).equal?(0))
           image = read_image_ref(ptr)
           if (!(image).equal?(0))
@@ -2064,7 +2064,7 @@ module Org::Eclipse::Swt::Widgets
     class_module.module_eval {
       typesig { [Display] }
       def deregister(display)
-        synchronized((Device.class)) do
+        synchronized((Device)) do
           i = 0
           while i < self.attr_displays.attr_length
             if ((display).equal?(self.attr_displays[i]))
@@ -2256,7 +2256,7 @@ module Org::Eclipse::Swt::Widgets
       # @param thread the user-interface thread
       # @return the display for the given thread
       def find_display(thread)
-        synchronized((Device.class)) do
+        synchronized((Device)) do
           i = 0
           while i < self.attr_displays.attr_length
             display = self.attr_displays[i]
@@ -2488,7 +2488,7 @@ module Org::Eclipse::Swt::Widgets
       # 
       # @return the default display
       def get_default
-        synchronized((Device.class)) do
+        synchronized((Device)) do
           if ((self.attr_default).nil?)
             self.attr_default = Display.new
           end
@@ -2908,7 +2908,7 @@ module Org::Eclipse::Swt::Widgets
     # <li>ERROR_DEVICE_DISPOSED - if the receiver has been disposed</li>
     # </ul>
     def get_sync_thread
-      synchronized((Device.class)) do
+      synchronized((Device)) do
         if (is_disposed)
           error(SWT::ERROR_DEVICE_DISPOSED)
         end
@@ -3127,7 +3127,7 @@ module Org::Eclipse::Swt::Widgets
     # <li>ERROR_DEVICE_DISPOSED - if the receiver has been disposed</li>
     # </ul>
     def get_thread
-      synchronized((Device.class)) do
+      synchronized((Device)) do
         if (is_disposed)
           error(SWT::ERROR_DEVICE_DISPOSED)
         end
@@ -3646,7 +3646,7 @@ module Org::Eclipse::Swt::Widgets
     # 
     # @since 3.0
     def post(event)
-      synchronized((Device.class)) do
+      synchronized((Device)) do
         if (is_disposed)
           error(SWT::ERROR_DEVICE_DISPOSED)
         end
@@ -4272,7 +4272,7 @@ module Org::Eclipse::Swt::Widgets
     class_module.module_eval {
       typesig { [Display] }
       def register(display)
-        synchronized((Device.class)) do
+        synchronized((Device)) do
           i = 0
           while i < self.attr_displays.attr_length
             if ((self.attr_displays[i]).nil?)
@@ -5095,7 +5095,7 @@ module Org::Eclipse::Swt::Widgets
         return
       end
       old_synchronizer = nil
-      synchronized((Device.class)) do
+      synchronized((Device)) do
         old_synchronizer = @synchronizer
         @synchronizer = synchronizer
       end
@@ -5236,7 +5236,7 @@ module Org::Eclipse::Swt::Widgets
     # @see #asyncExec
     def sync_exec(runnable)
       synchronizer = nil
-      synchronized((Device.class)) do
+      synchronized((Device)) do
         if (is_disposed)
           error(SWT::ERROR_DEVICE_DISPOSED)
         end
@@ -5464,7 +5464,7 @@ module Org::Eclipse::Swt::Widgets
     # 
     # @see #sleep
     def wake
-      synchronized((Device.class)) do
+      synchronized((Device)) do
         if (is_disposed)
           error(SWT::ERROR_DEVICE_DISPOSED)
         end

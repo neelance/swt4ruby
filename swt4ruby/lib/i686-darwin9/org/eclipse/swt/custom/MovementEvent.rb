@@ -85,7 +85,7 @@ module Org::Eclipse::Swt::Custom
       @movement = 0
       super(e)
       @line_offset = e.attr_detail
-      @line_text = (e.attr_text).to_s
+      @line_text = RJava.cast_to_string(e.attr_text)
       @movement = e.attr_count
       @offset = e.attr_start
       @new_offset = e.attr_end

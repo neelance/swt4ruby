@@ -406,8 +406,8 @@ module Org::Eclipse::Swt::Browser
       end
       filename = dialog.open
       @files = dialog.get_file_names
-      @directory = (dialog.get_filter_path).to_s
-      @title = (@default_filename = (nil).to_s).to_s
+      @directory = RJava.cast_to_string(dialog.get_filter_path)
+      @title = RJava.cast_to_string(@default_filename = RJava.cast_to_string(nil))
       @masks = nil
       result = (filename).nil? ? self.attr_ns_ifile_picker.attr_return_cancel : self.attr_ns_ifile_picker.attr_return_ok
       XPCOM.memmove(_retval, Array.typed(::Java::Short).new([RJava.cast_to_short(result)]), 2)
@@ -429,8 +429,8 @@ module Org::Eclipse::Swt::Browser
       if (!(@directory).nil?)
         dialog.set_filter_path(@directory)
       end
-      @directory = (dialog.open).to_s
-      @title = (@default_filename = (nil).to_s).to_s
+      @directory = RJava.cast_to_string(dialog.open)
+      @title = RJava.cast_to_string(@default_filename = RJava.cast_to_string(nil))
       @files = @masks = nil
       return (@directory).nil? ? self.attr_ns_ifile_picker.attr_return_cancel : self.attr_ns_ifile_picker.attr_return_ok
     end
@@ -455,7 +455,7 @@ module Org::Eclipse::Swt::Browser
         filename += @directory + SEPARATOR
       end
       if (!(@files).nil? && @files.attr_length > 0)
-        filename += (@files[0]).to_s
+        filename += RJava.cast_to_string(@files[0])
       end
       path = NsEmbedString.new(filename)
       # int
@@ -490,7 +490,7 @@ module Org::Eclipse::Swt::Browser
       XPCOM.memmove(bytes, buffer, length)
       XPCOM.ns_embed_cstring_delete(pathname)
       chars = MozillaDelegate.mbcs_to_wcs(nil, bytes)
-      @directory = (String.new(chars)).to_s
+      @directory = RJava.cast_to_string(String.new(chars))
       return XPCOM::NS_OK
     end
     
@@ -542,7 +542,7 @@ module Org::Eclipse::Swt::Browser
     typesig { [::Java::Long] }
     # int
     def _set_default_string(a_default_string)
-      @default_filename = (parse_astring(a_default_string)).to_s
+      @default_filename = RJava.cast_to_string(parse_astring(a_default_string))
       return XPCOM::NS_OK
     end
     

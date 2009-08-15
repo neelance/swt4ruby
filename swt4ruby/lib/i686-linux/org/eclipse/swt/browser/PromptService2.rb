@@ -461,20 +461,20 @@ module Org::Eclipse::Swt::Browser
       # $NON-NLS-1$
       # $NON-NLS-1$
       when NsIPromptService::BUTTON_TITLE_CANCEL
-        label = (SWT.get_message("SWT_Cancel")).to_s
+        label = RJava.cast_to_string(SWT.get_message("SWT_Cancel"))
       when NsIPromptService::BUTTON_TITLE_NO
-        label = (SWT.get_message("SWT_No")).to_s
+        label = RJava.cast_to_string(SWT.get_message("SWT_No"))
       when NsIPromptService::BUTTON_TITLE_OK
-        label = (SWT.get_message("SWT_OK")).to_s
+        label = RJava.cast_to_string(SWT.get_message("SWT_OK"))
       when NsIPromptService::BUTTON_TITLE_SAVE
-        label = (SWT.get_message("SWT_Save")).to_s
+        label = RJava.cast_to_string(SWT.get_message("SWT_Save"))
       when NsIPromptService::BUTTON_TITLE_YES
-        label = (SWT.get_message("SWT_Yes")).to_s
+        label = RJava.cast_to_string(SWT.get_message("SWT_Yes"))
       when NsIPromptService::BUTTON_TITLE_IS_STRING
         length = XPCOM.strlen__prunichar(button_title)
         dest = CharArray.new(length)
         XPCOM.memmove(dest, button_title, length * 2)
-        label = (String.new(dest)).to_s
+        label = RJava.cast_to_string(String.new(dest))
       end
       return label
     end
@@ -611,7 +611,7 @@ module Org::Eclipse::Swt::Browser
         length = XPCOM.strlen__prunichar(a_check_msg)
         dest = CharArray.new(length)
         XPCOM.memmove(dest, a_check_msg, length * 2)
-        check_label = (String.new(dest)).to_s
+        check_label = RJava.cast_to_string(String.new(dest))
       end
       button0label = get_label(a_button_flags, NsIPromptService::BUTTON_POS_0, a_button0title)
       button1label = get_label(a_button_flags, NsIPromptService::BUTTON_POS_1, a_button1title)
@@ -659,12 +659,12 @@ module Org::Eclipse::Swt::Browser
         length = XPCOM.strlen__prunichar(a_dialog_title)
         dest = CharArray.new(length)
         XPCOM.memmove(dest, a_dialog_title, length * 2)
-        title_label = (String.new(dest)).to_s
+        title_label = RJava.cast_to_string(String.new(dest))
       end
       length = XPCOM.strlen__prunichar(a_text)
       dest = CharArray.new(length)
       XPCOM.memmove(dest, a_text, length * 2)
-      text_label = (String.new(dest)).to_s
+      text_label = RJava.cast_to_string(String.new(dest))
       # long
       # long
       value_addr = Array.typed(::Java::Int).new(1) { 0 }
@@ -680,7 +680,7 @@ module Org::Eclipse::Swt::Browser
         if (length > 0)
           dest = CharArray.new(length)
           XPCOM.memmove(dest, a_check_msg, length * 2)
-          check_label = (String.new(dest)).to_s
+          check_label = RJava.cast_to_string(String.new(dest))
         end
       end
       shell = (browser).nil? ? Shell.new : browser.get_shell
@@ -762,7 +762,7 @@ module Org::Eclipse::Swt::Browser
         length = XPCOM.strlen__prunichar(checkbox_label)
         dest = CharArray.new(length)
         XPCOM.memmove(dest, checkbox_label, length * 2)
-        check_label = (String.new(dest)).to_s
+        check_label = RJava.cast_to_string(String.new(dest))
         XPCOM.memmove(check_value, checkbox_value, 4)
         # PRBool
       end
@@ -831,7 +831,7 @@ module Org::Eclipse::Swt::Browser
       ns_uri._release
       message = nil
       if (realm.length > 0 && host.length > 0)
-        message = (Compatibility.get_message("SWT_Enter_Username_and_Password", Array.typed(String).new([realm, host]))).to_s # $NON-NLS-1$
+        message = RJava.cast_to_string(Compatibility.get_message("SWT_Enter_Username_and_Password", Array.typed(String).new([realm, host]))) # $NON-NLS-1$
       else
         message = "" # $NON-NLS-1$
       end
@@ -886,14 +886,14 @@ module Org::Eclipse::Swt::Browser
         length_ = XPCOM.strlen__prunichar(a_dialog_title)
         dest = CharArray.new(length_)
         XPCOM.memmove(dest, a_dialog_title, length_ * 2)
-        title_label = (String.new(dest)).to_s
+        title_label = RJava.cast_to_string(String.new(dest))
       else
-        title_label = (SWT.get_message("SWT_Authentication_Required")).to_s # $NON-NLS-1$
+        title_label = RJava.cast_to_string(SWT.get_message("SWT_Authentication_Required")) # $NON-NLS-1$
       end
       length_ = XPCOM.strlen__prunichar(a_text)
       dest = CharArray.new(length_)
       XPCOM.memmove(dest, a_text, length_ * 2)
-      text_label = (String.new(dest)).to_s
+      text_label = RJava.cast_to_string(String.new(dest))
       # long
       # long
       user_addr = Array.typed(::Java::Int).new(1) { 0 }
@@ -919,7 +919,7 @@ module Org::Eclipse::Swt::Browser
         if (length_ > 0)
           dest = CharArray.new(length_)
           XPCOM.memmove(dest, a_check_msg, length_ * 2)
-          check_label = (String.new(dest)).to_s
+          check_label = RJava.cast_to_string(String.new(dest))
         end
       end
       shell = (browser).nil? ? Shell.new : browser.get_shell

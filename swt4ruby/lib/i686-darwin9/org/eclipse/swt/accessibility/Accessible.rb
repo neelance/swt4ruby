@@ -507,7 +507,7 @@ module Org::Eclipse::Swt::Accessibility
       string_ref = Array.typed(::Java::Int).new(1) { 0 }
       if ((code).equal?(OS.attr_no_err))
         OS._get_event_parameter(the_event, OS.attr_k_event_param_accessible_attribute_value, OS.attr_type_cfstring_ref, nil, 4, nil, string_ref)
-        os_help_attribute = (string_ref_to_string(string_ref[0])).to_s
+        os_help_attribute = RJava.cast_to_string(string_ref_to_string(string_ref[0]))
       end
       event = AccessibleEvent.new(self)
       event.attr_child_id = get_child_idfrom_event(the_event)
@@ -545,7 +545,7 @@ module Org::Eclipse::Swt::Accessibility
         app_role = role_to_os(event.attr_detail)
         index = app_role.index_of(Character.new(?:.ord))
         if (!(index).equal?(-1))
-          app_role = (app_role.substring(0, index)).to_s
+          app_role = RJava.cast_to_string(app_role.substring(0, index))
         end
         string_ref = string_to_string_ref(app_role)
         if (!(string_ref).equal?(0))
@@ -573,7 +573,7 @@ module Org::Eclipse::Swt::Accessibility
         app_role = role_to_os(event.attr_detail)
         index = app_role.index_of(Character.new(?:.ord))
         if (!(index).equal?(-1))
-          app_role = (app_role.substring(index + 1)).to_s
+          app_role = RJava.cast_to_string(app_role.substring(index + 1))
           string_ref = string_to_string_ref(app_role)
           if (!(string_ref).equal?(0))
             OS._set_event_parameter(the_event, OS.attr_k_event_param_accessible_attribute_value, OS.attr_type_cfstring_ref, 4, Array.typed(::Java::Int).new([string_ref]))
@@ -602,8 +602,8 @@ module Org::Eclipse::Swt::Accessibility
         app_subrole = nil
         index = app_role.index_of(Character.new(?:.ord))
         if (!(index).equal?(-1))
-          app_subrole = (app_role.substring(index + 1)).to_s
-          app_role = (app_role.substring(0, index)).to_s
+          app_subrole = RJava.cast_to_string(app_role.substring(index + 1))
+          app_role = RJava.cast_to_string(app_role.substring(0, index))
         end
         string_ref1 = string_to_string_ref(app_role)
         if (!(string_ref1).equal?(0))
@@ -647,7 +647,7 @@ module Org::Eclipse::Swt::Accessibility
         if ((code).equal?(OS.attr_no_err))
           status = OS._get_event_parameter(the_event, OS.attr_k_event_param_accessible_attribute_value, OS.attr_type_cfstring_ref, nil, 4, nil, string_ref)
           if ((status).equal?(OS.attr_no_err))
-            os_title_attribute = (string_ref_to_string(string_ref[0])).to_s
+            os_title_attribute = RJava.cast_to_string(string_ref_to_string(string_ref[0]))
           end
         end
         event = AccessibleEvent.new(self)
@@ -943,7 +943,7 @@ module Org::Eclipse::Swt::Accessibility
       if ((code).equal?(OS.attr_no_err))
         status = OS._get_event_parameter(the_event, OS.attr_k_event_param_accessible_attribute_value, OS.attr_type_cfstring_ref, nil, 4, nil, string_ref)
         if ((status).equal?(OS.attr_no_err))
-          os_description_attribute = (string_ref_to_string(string_ref[0])).to_s
+          os_description_attribute = RJava.cast_to_string(string_ref_to_string(string_ref[0]))
         end
       end
       event = AccessibleEvent.new(self)

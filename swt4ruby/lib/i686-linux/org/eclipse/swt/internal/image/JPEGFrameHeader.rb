@@ -130,7 +130,7 @@ module Org::Eclipse::Swt::Internal::Image
     def initialize_component_parameters
       nf = get_number_of_image_components
       @component_identifiers = Array.typed(::Java::Int).new(nf) { 0 }
-      comp_spec_params = Array.typed(::Java::Int).new(0) { 0 }
+      comp_spec_params = Array.typed(Array.typed(::Java::Int)).new(0) { nil }
       hmax = 1
       vmax = 1
       i = 0
@@ -152,7 +152,7 @@ module Org::Eclipse::Swt::Internal::Image
         comp_param[1] = hi
         comp_param[2] = vi
         if (comp_spec_params.attr_length <= ci)
-          new_params = Array.typed(::Java::Int).new(ci + 1) { 0 }
+          new_params = Array.typed(Array.typed(::Java::Int)).new(ci + 1) { nil }
           System.arraycopy(comp_spec_params, 0, new_params, 0, comp_spec_params.attr_length)
           comp_spec_params = new_params
         end

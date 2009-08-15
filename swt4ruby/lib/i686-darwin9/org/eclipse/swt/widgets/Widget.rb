@@ -911,7 +911,7 @@ module Org::Eclipse::Swt::Widgets
         if (!(size[0]).equal?(0))
           buffer = CharArray.new(size[0] / 2)
           if ((OS._get_scrap_flavor_data(scrap[0], OS.attr_k_scrap_flavor_type_unicode, size, buffer)).equal?(OS.attr_no_err))
-            result = (String.new(buffer)).to_s
+            result = RJava.cast_to_string(String.new(buffer))
           end
         end
       else
@@ -928,7 +928,7 @@ module Org::Eclipse::Swt::Widgets
                   range = CFRange.new
                   range.attr_length = length
                   OS._cfstring_get_characters(cfstring, range, chars)
-                  result = (String.new(chars)).to_s
+                  result = RJava.cast_to_string(String.new(chars))
                 end
                 OS._cfrelease(cfstring)
               end
@@ -2446,10 +2446,10 @@ module Org::Eclipse::Swt::Widgets
       if (!is_disposed)
         string = "*Wrong Thread*"
         if (is_valid_thread)
-          string = (get_name_text).to_s
+          string = RJava.cast_to_string(get_name_text)
         end
       end
-      return (get_name).to_s + " {" + string + "}"
+      return RJava.cast_to_string(get_name) + " {" + string + "}"
     end
     
     typesig { [::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int] }

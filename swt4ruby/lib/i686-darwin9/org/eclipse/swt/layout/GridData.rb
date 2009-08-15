@@ -717,7 +717,7 @@ module Org::Eclipse::Swt::Layout
       when CENTER
         h_align = "GridData.CENTER"
       else
-        h_align = "Undefined " + (@horizontal_alignment).to_s
+        h_align = "Undefined " + RJava.cast_to_string(@horizontal_alignment)
       end
       v_align = ""
       case (@vertical_alignment)
@@ -738,45 +738,45 @@ module Org::Eclipse::Swt::Layout
       when CENTER
         v_align = "GridData.CENTER"
       else
-        v_align = "Undefined " + (@vertical_alignment).to_s
+        v_align = "Undefined " + RJava.cast_to_string(@vertical_alignment)
       end
-      string = (get_name).to_s + " {"
+      string = RJava.cast_to_string(get_name) + " {"
       string += "horizontalAlignment=" + h_align + " "
       if (!(@horizontal_indent).equal?(0))
-        string += "horizontalIndent=" + (@horizontal_indent).to_s + " "
+        string += "horizontalIndent=" + RJava.cast_to_string(@horizontal_indent) + " "
       end
       if (!(@horizontal_span).equal?(1))
-        string += "horizontalSpan=" + (@horizontal_span).to_s + " "
+        string += "horizontalSpan=" + RJava.cast_to_string(@horizontal_span) + " "
       end
       if (@grab_excess_horizontal_space)
-        string += "grabExcessHorizontalSpace=" + (@grab_excess_horizontal_space).to_s + " "
+        string += "grabExcessHorizontalSpace=" + RJava.cast_to_string(@grab_excess_horizontal_space) + " "
       end
       if (!(@width_hint).equal?(SWT::DEFAULT))
-        string += "widthHint=" + (@width_hint).to_s + " "
+        string += "widthHint=" + RJava.cast_to_string(@width_hint) + " "
       end
       if (!(@minimum_width).equal?(0))
-        string += "minimumWidth=" + (@minimum_width).to_s + " "
+        string += "minimumWidth=" + RJava.cast_to_string(@minimum_width) + " "
       end
       string += "verticalAlignment=" + v_align + " "
       if (!(@vertical_indent).equal?(0))
-        string += "verticalIndent=" + (@vertical_indent).to_s + " "
+        string += "verticalIndent=" + RJava.cast_to_string(@vertical_indent) + " "
       end
       if (!(@vertical_span).equal?(1))
-        string += "verticalSpan=" + (@vertical_span).to_s + " "
+        string += "verticalSpan=" + RJava.cast_to_string(@vertical_span) + " "
       end
       if (@grab_excess_vertical_space)
-        string += "grabExcessVerticalSpace=" + (@grab_excess_vertical_space).to_s + " "
+        string += "grabExcessVerticalSpace=" + RJava.cast_to_string(@grab_excess_vertical_space) + " "
       end
       if (!(@height_hint).equal?(SWT::DEFAULT))
-        string += "heightHint=" + (@height_hint).to_s + " "
+        string += "heightHint=" + RJava.cast_to_string(@height_hint) + " "
       end
       if (!(@minimum_height).equal?(0))
-        string += "minimumHeight=" + (@minimum_height).to_s + " "
+        string += "minimumHeight=" + RJava.cast_to_string(@minimum_height) + " "
       end
       if (@exclude)
-        string += "exclude=" + (@exclude).to_s + " "
+        string += "exclude=" + RJava.cast_to_string(@exclude) + " "
       end
-      string = (string.trim).to_s
+      string = RJava.cast_to_string(string.trim)
       string += "}"
       return string
     end

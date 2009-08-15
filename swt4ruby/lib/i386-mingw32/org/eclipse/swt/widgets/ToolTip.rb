@@ -367,7 +367,7 @@ module Org::Eclipse::Swt::Widgets
         @item.attr_tool_tip = nil
       end
       @item = nil
-      @text = (@message = (nil).to_s).to_s
+      @text = RJava.cast_to_string(@message = RJava.cast_to_string(nil))
     end
     
     typesig { [SelectionListener] }

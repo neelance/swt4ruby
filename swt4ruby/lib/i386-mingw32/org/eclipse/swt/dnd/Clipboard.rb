@@ -134,7 +134,7 @@ module Org::Eclipse::Swt::Dnd
     # </ul>
     def check_subclass
       name = get_class.get_name
-      valid_name = Clipboard.class.get_name
+      valid_name = Clipboard.get_name
       if (!(valid_name == name))
         DND.error(SWT::ERROR_INVALID_SUBCLASS)
       end
@@ -363,7 +363,7 @@ module Org::Eclipse::Swt::Dnd
       while (!(result).equal?(COM::S_OK) && ((retry_count += 1) - 1) < 10)
         begin
           JavaThread.sleep(50)
-        rescue Exception => t
+        rescue JavaThrowable => t
         end
         msg = MSG.new
         OS._peek_message(msg, 0, 0, 0, OS::PM_NOREMOVE | OS::PM_NOYIELD)
@@ -547,7 +547,7 @@ module Org::Eclipse::Swt::Dnd
       while (!(result).equal?(COM::S_OK) && ((retry_count += 1) - 1) < 10)
         begin
           JavaThread.sleep(50)
-        rescue Exception => t
+        rescue JavaThrowable => t
         end
         msg = MSG.new
         OS._peek_message(msg, 0, 0, 0, OS::PM_NOREMOVE | OS::PM_NOYIELD)

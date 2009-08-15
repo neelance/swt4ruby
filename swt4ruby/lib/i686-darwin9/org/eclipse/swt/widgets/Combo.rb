@@ -392,7 +392,7 @@ module Org::Eclipse::Swt::Widgets
       end
       if (hooks(SWT::Verify) || filters(SWT::Verify))
         set_text(@last_text, false)
-        new_text = (verify_text(new_text, 0, @last_text.length, nil)).to_s
+        new_text = RJava.cast_to_string(verify_text(new_text, 0, @last_text.length, nil))
         if ((new_text).nil?)
           return
         end
@@ -606,7 +606,7 @@ module Org::Eclipse::Swt::Widgets
       old_text = text.substring(start, end_)
       new_text = ""
       if (hooks(SWT::Verify) || filters(SWT::Verify))
-        new_text = (verify_text(new_text, start, end_, nil)).to_s
+        new_text = RJava.cast_to_string(verify_text(new_text, start, end_, nil))
         if ((new_text).nil?)
           return
         end
@@ -1275,7 +1275,7 @@ module Org::Eclipse::Swt::Widgets
       string_ref = OS._cfstring_create_with_characters(OS.attr_k_cfallocator_default, buffer, buffer.attr_length)
       OS._axnotification_hiobject_notify(string_ref, self.attr_handle, 0)
       OS._cfrelease(string_ref)
-      string = (OS.attr_k_axselected_text_changed_notification).to_s
+      string = RJava.cast_to_string(OS.attr_k_axselected_text_changed_notification)
       buffer = CharArray.new(string.length)
       string.get_chars(0, buffer.attr_length, buffer, 0)
       string_ref = OS._cfstring_create_with_characters(OS.attr_k_cfallocator_default, buffer, buffer.attr_length)
@@ -1304,7 +1304,7 @@ module Org::Eclipse::Swt::Widgets
         post_event(SWT::DefaultSelection)
       end
       result = OS._call_next_event_handler(next_handler, the_event)
-      @last_text = (get_text).to_s
+      @last_text = RJava.cast_to_string(get_text)
       return result
     end
     
@@ -1334,7 +1334,7 @@ module Org::Eclipse::Swt::Widgets
       right_text = text.substring(end_, text.length)
       new_text = get_clipboard_text
       if (hooks(SWT::Verify) || filters(SWT::Verify))
-        new_text = (verify_text(new_text, start, end_, nil)).to_s
+        new_text = RJava.cast_to_string(verify_text(new_text, start, end_, nil))
         if ((new_text).nil?)
           return
         end
@@ -1342,7 +1342,7 @@ module Org::Eclipse::Swt::Widgets
       if (!(@text_limit).equal?(LIMIT))
         char_count = text.length
         if (char_count - (end_ - start) + new_text.length > @text_limit)
-          new_text = (new_text.substring(0, @text_limit - char_count + (end_ - start))).to_s
+          new_text = RJava.cast_to_string(new_text.substring(0, @text_limit - char_count + (end_ - start)))
         end
       end
       set_text(left_text + new_text + right_text, false)
@@ -1661,9 +1661,9 @@ module Org::Eclipse::Swt::Widgets
           if (!(event.attr_character).equal?(Character.new(?\t.ord)) && event.attr_character < 0x20)
             return true
           end
-          old_text = (String.new(Array.typed(::Java::Char).new([event.attr_character]))).to_s
+          old_text = RJava.cast_to_string(String.new(Array.typed(::Java::Char).new([event.attr_character])))
         end
-        new_text = (verify_text(old_text, start, end_, event)).to_s
+        new_text = RJava.cast_to_string(verify_text(old_text, start, end_, event))
         if ((new_text).nil?)
           return false
         end
@@ -1948,7 +1948,7 @@ module Org::Eclipse::Swt::Widgets
     def set_text(string, notify)
       if (notify)
         if (hooks(SWT::Verify) || filters(SWT::Verify))
-          string = (verify_text(string, 0, get_char_count, nil)).to_s
+          string = RJava.cast_to_string(verify_text(string, 0, get_char_count, nil))
           if ((string).nil?)
             return
           end

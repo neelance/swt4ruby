@@ -274,7 +274,7 @@ module Org::Eclipse::Swt::Graphics
     # @return <code>true</code> if the object is the same as this object and <code>false</code> otherwise
     # 
     # @see #hashCode
-    def equals(object)
+    def ==(object)
       if ((object).equal?(self))
         return true
       end
@@ -324,7 +324,7 @@ module Org::Eclipse::Swt::Graphics
         if (!(range.attr_length).equal?(0))
           chars = CharArray.new(range.attr_length)
           OS._cfstring_get_characters(ptr, range, chars)
-          name = (String.new(chars)).to_s
+          name = RJava.cast_to_string(String.new(chars))
         end
         OS._cfrelease(ptr)
       end
@@ -491,7 +491,7 @@ module Org::Eclipse::Swt::Graphics
       if (is_disposed)
         return "Font {*DISPOSED*}"
       end
-      return "Font {" + (@handle).to_s + "}"
+      return "Font {" + RJava.cast_to_string(@handle) + "}"
     end
     
     private

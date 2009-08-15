@@ -646,34 +646,34 @@ module Org::Eclipse::Swt::Layout
     # 
     # @return a string representation of the layout
     def to_s
-      string = (get_name).to_s + " {"
-      string += "type=" + (((!(@type).equal?(SWT::HORIZONTAL)) ? "SWT.VERTICAL" : "SWT.HORIZONTAL")).to_s + " "
+      string = RJava.cast_to_string(get_name) + " {"
+      string += "type=" + RJava.cast_to_string(((!(@type).equal?(SWT::HORIZONTAL)) ? "SWT.VERTICAL" : "SWT.HORIZONTAL")) + " "
       if (!(@margin_width).equal?(0))
-        string += "marginWidth=" + (@margin_width).to_s + " "
+        string += "marginWidth=" + RJava.cast_to_string(@margin_width) + " "
       end
       if (!(@margin_height).equal?(0))
-        string += "marginHeight=" + (@margin_height).to_s + " "
+        string += "marginHeight=" + RJava.cast_to_string(@margin_height) + " "
       end
       if (!(@margin_left).equal?(0))
-        string += "marginLeft=" + (@margin_left).to_s + " "
+        string += "marginLeft=" + RJava.cast_to_string(@margin_left) + " "
       end
       if (!(@margin_top).equal?(0))
-        string += "marginTop=" + (@margin_top).to_s + " "
+        string += "marginTop=" + RJava.cast_to_string(@margin_top) + " "
       end
       if (!(@margin_right).equal?(0))
-        string += "marginRight=" + (@margin_right).to_s + " "
+        string += "marginRight=" + RJava.cast_to_string(@margin_right) + " "
       end
       if (!(@margin_bottom).equal?(0))
-        string += "marginBottom=" + (@margin_bottom).to_s + " "
+        string += "marginBottom=" + RJava.cast_to_string(@margin_bottom) + " "
       end
       if (!(@spacing).equal?(0))
-        string += "spacing=" + (@spacing).to_s + " "
+        string += "spacing=" + RJava.cast_to_string(@spacing) + " "
       end
-      string += "wrap=" + (@wrap).to_s + " "
-      string += "pack=" + (@pack).to_s + " "
-      string += "fill=" + (@fill).to_s + " "
-      string += "justify=" + (@justify).to_s + " "
-      string = (string.trim).to_s
+      string += "wrap=" + RJava.cast_to_string(@wrap) + " "
+      string += "pack=" + RJava.cast_to_string(@pack) + " "
+      string += "fill=" + RJava.cast_to_string(@fill) + " "
+      string += "justify=" + RJava.cast_to_string(@justify) + " "
+      string = RJava.cast_to_string(string.trim)
       string += "}"
       return string
     end

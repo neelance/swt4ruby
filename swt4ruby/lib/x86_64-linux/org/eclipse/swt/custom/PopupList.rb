@@ -265,7 +265,7 @@ module Org::Eclipse::Swt::Custom
         strings = @list.get_selection
         @shell.dispose
         if (!(strings.attr_length).equal?(0))
-          result = (strings[0]).to_s
+          result = RJava.cast_to_string(strings[0])
         end
       end
       return result

@@ -39,7 +39,7 @@ module Org::Eclipse::Swt::Internal::Image
         contents[3] = header[3]
         byte_stream.read(contents, 4, contents.attr_length - 4)
         self.attr_reference = contents
-      rescue Exception => e
+      rescue JavaException => e
         SWT.error(SWT::ERROR_IO, e)
       end
     end

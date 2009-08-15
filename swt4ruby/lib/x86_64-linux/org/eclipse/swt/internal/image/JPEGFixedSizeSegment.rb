@@ -38,7 +38,7 @@ module Org::Eclipse::Swt::Internal::Image
       self.attr_reference = Array.typed(::Java::Byte).new(fixed_size) { 0 }
       begin
         byte_stream.read(self.attr_reference)
-      rescue Exception => e
+      rescue JavaException => e
         SWT.error(SWT::ERROR_IO, e)
       end
     end

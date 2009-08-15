@@ -1212,11 +1212,11 @@ module Org::Eclipse::Swt::Widgets
               if (rect.attr_left < rect.attr_right)
                 string = nil
                 if ((index).equal?(0))
-                  string = (item.attr_text).to_s
+                  string = RJava.cast_to_string(item.attr_text)
                 else
                   strings = item.attr_strings
                   if (!(strings).nil?)
-                    string = (strings[index]).to_s
+                    string = RJava.cast_to_string(strings[index])
                   end
                 end
                 if (!(string).nil?)
@@ -6407,11 +6407,11 @@ module Org::Eclipse::Swt::Widgets
         if (find_cell(pt.attr_x, pt.attr_y, item, index, cell_rect, item_rect))
           text = nil
           if ((index[0]).equal?(0))
-            text = (item[0].attr_text).to_s
+            text = RJava.cast_to_string(item[0].attr_text)
           else
             strings = item[0].attr_strings
             if (!(strings).nil?)
-              text = (strings[index[0]]).to_s
+              text = RJava.cast_to_string(strings[index[0]])
             end
           end
           # TEMPORARY CODE
@@ -8353,11 +8353,11 @@ module Org::Eclipse::Swt::Widgets
           if (!((lptvdi.attr_mask & OS::TVIF_TEXT)).equal?(0))
             string = nil
             if ((index).equal?(0))
-              string = (item.attr_text).to_s
+              string = RJava.cast_to_string(item.attr_text)
             else
               strings = item.attr_strings
               if (!(strings).nil?)
-                string = (strings[index]).to_s
+                string = RJava.cast_to_string(strings[index])
               end
             end
             if (!(string).nil?)

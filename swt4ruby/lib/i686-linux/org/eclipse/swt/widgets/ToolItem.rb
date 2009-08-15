@@ -849,7 +849,7 @@ module Org::Eclipse::Swt::Widgets
       @parent = nil
       @control = nil
       @hot_image = @disabled_image = nil
-      @tool_tip_text = (nil).to_s
+      @tool_tip_text = RJava.cast_to_string(nil)
     end
     
     typesig { [SelectionListener] }

@@ -131,7 +131,7 @@ module Org::Eclipse::Swt::Widgets
       related_element = OS._axuielement_create_with_hiobject_and_identifier(control.focus_handle, 0)
       array = OS._cfarray_create_mutable(OS.attr_k_cfallocator_default, 1, 0)
       OS._cfarray_append_value(array, related_element)
-      string = (OS.attr_k_axserves_as_title_for_uielements_attribute).to_s # this LabelFor control
+      string = RJava.cast_to_string(OS.attr_k_axserves_as_title_for_uielements_attribute) # this LabelFor control
       buffer = CharArray.new(string.length)
       string.get_chars(0, buffer.attr_length, buffer, 0)
       string_ref = OS._cfstring_create_with_characters(OS.attr_k_cfallocator_default, buffer, buffer.attr_length)

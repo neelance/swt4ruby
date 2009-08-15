@@ -213,7 +213,7 @@ module Org::Eclipse::Swt::Graphics
         start = end_ + 1
         end_ = string.length
         if (start < end_)
-          @ats_name = (string.substring(start, end_)).to_s
+          @ats_name = RJava.cast_to_string(string.substring(start, end_))
         end
       end
     end
@@ -268,7 +268,7 @@ module Org::Eclipse::Swt::Graphics
     # @return <code>true</code> if the object is the same as this object and <code>false</code> otherwise
     # 
     # @see #hashCode
-    def equals(object)
+    def ==(object)
       if ((object).equal?(self))
         return true
       end
@@ -329,7 +329,7 @@ module Org::Eclipse::Swt::Graphics
       length_ = result.length
       if (length_ > 0)
         if ((result.char_at(length_ - 1)).equal?(sep))
-          result = (result.substring(0, length_ - 1)).to_s
+          result = RJava.cast_to_string(result.substring(0, length_ - 1))
         end
       end
       return result
@@ -417,7 +417,7 @@ module Org::Eclipse::Swt::Graphics
     # @param locale the <code>String</code> representing a Locale object
     # @see java.util.Locale#toString
     def set_locale(locale)
-      @lang = (@country = (@variant = (nil).to_s).to_s).to_s
+      @lang = RJava.cast_to_string(@country = RJava.cast_to_string(@variant = RJava.cast_to_string(nil)))
       if (!(locale).nil?)
         sep = Character.new(?_.ord)
         length_ = locale.length
@@ -433,13 +433,13 @@ module Org::Eclipse::Swt::Graphics
           end
         end
         if (first_sep > 0)
-          @lang = (locale.substring(0, first_sep)).to_s
+          @lang = RJava.cast_to_string(locale.substring(0, first_sep))
         end
         if (second_sep > first_sep + 1)
-          @country = (locale.substring(first_sep + 1, second_sep)).to_s
+          @country = RJava.cast_to_string(locale.substring(first_sep + 1, second_sep))
         end
         if (length_ > second_sep + 1)
-          @variant = (locale.substring(second_sep + 1)).to_s
+          @variant = RJava.cast_to_string(locale.substring(second_sep + 1))
         end
       end
     end
@@ -473,7 +473,7 @@ module Org::Eclipse::Swt::Graphics
         SWT.error(SWT::ERROR_NULL_ARGUMENT)
       end
       @name = name
-      @ats_name = (nil).to_s
+      @ats_name = RJava.cast_to_string(nil)
     end
     
     typesig { [::Java::Int] }
@@ -487,7 +487,7 @@ module Org::Eclipse::Swt::Graphics
     # @see #getStyle
     def set_style(style)
       @style = style
-      @ats_name = (nil).to_s
+      @ats_name = RJava.cast_to_string(nil)
     end
     
     typesig { [] }

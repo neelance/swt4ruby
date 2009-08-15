@@ -489,7 +489,7 @@ module Org::Eclipse::Swt::Widgets
         value = @text.get_text(start, end_ - 1)
         s = value.last_index_of(Character.new(?\s.ord))
         if (!(s).equal?(-1))
-          value = (value.substring(s + 1)).to_s
+          value = RJava.cast_to_string(value.substring(s + 1))
         end
         new_value = unformatted_int_value(field_name, value, (@character_count).equal?(0), @calendar.get_actual_maximum(field_name))
         if (!(new_value).equal?(-1))
@@ -548,18 +548,18 @@ module Org::Eclipse::Swt::Widgets
         s = @calendar.get(Calendar::SECOND)
         a = @calendar.get(Calendar::AM_PM)
         if (!((style & SWT::SHORT)).equal?(0))
-          return "" + ((h < 10 ? " " : "")).to_s + (h).to_s + ":" + ((m < 10 ? "0" : "")).to_s + (m).to_s + " " + (ampm[a]).to_s
+          return "" + RJava.cast_to_string((h < 10 ? " " : "")) + RJava.cast_to_string(h) + ":" + RJava.cast_to_string((m < 10 ? "0" : "")) + RJava.cast_to_string(m) + " " + RJava.cast_to_string(ampm[a])
         end
-        return "" + ((h < 10 ? " " : "")).to_s + (h).to_s + ":" + ((m < 10 ? "0" : "")).to_s + (m).to_s + ":" + ((s < 10 ? "0" : "")).to_s + (s).to_s + " " + (ampm[a]).to_s
+        return "" + RJava.cast_to_string((h < 10 ? " " : "")) + RJava.cast_to_string(h) + ":" + RJava.cast_to_string((m < 10 ? "0" : "")) + RJava.cast_to_string(m) + ":" + RJava.cast_to_string((s < 10 ? "0" : "")) + RJava.cast_to_string(s) + " " + RJava.cast_to_string(ampm[a])
       end
       # SWT.DATE
       y = @calendar.get(Calendar::YEAR)
       m = @calendar.get(Calendar::MONTH) + 1
       d = @calendar.get(Calendar::DAY_OF_MONTH)
       if (!((style & SWT::SHORT)).equal?(0))
-        return "" + ((m < 10 ? " " : "")).to_s + (m).to_s + "/" + (y).to_s
+        return "" + RJava.cast_to_string((m < 10 ? " " : "")) + RJava.cast_to_string(m) + "/" + RJava.cast_to_string(y)
       end
-      return "" + ((m < 10 ? " " : "")).to_s + (m).to_s + "/" + ((d < 10 ? " " : "")).to_s + (d).to_s + "/" + (y).to_s
+      return "" + RJava.cast_to_string((m < 10 ? " " : "")) + RJava.cast_to_string(m) + "/" + RJava.cast_to_string((d < 10 ? " " : "")) + RJava.cast_to_string(d) + "/" + RJava.cast_to_string(y)
     end
     
     typesig { [] }
@@ -661,7 +661,7 @@ module Org::Eclipse::Swt::Widgets
     
     typesig { [] }
     def get_name_text
-      return !((self.attr_style & SWT::TIME)).equal?(0) ? (get_hours).to_s + ":" + (get_minutes).to_s + ":" + (get_seconds).to_s : ((get_month + 1)).to_s + "/" + (get_day).to_s + "/" + (get_year).to_s
+      return !((self.attr_style & SWT::TIME)).equal?(0) ? RJava.cast_to_string(get_hours) + ":" + RJava.cast_to_string(get_minutes) + ":" + RJava.cast_to_string(get_seconds) : RJava.cast_to_string((get_month + 1)) + "/" + RJava.cast_to_string(get_day) + "/" + RJava.cast_to_string(get_year)
     end
     
     typesig { [] }
@@ -877,7 +877,7 @@ module Org::Eclipse::Swt::Widgets
         value = @text.get_text(start, end_ - 1)
         s = value.last_index_of(Character.new(?\s.ord))
         if (!(s).equal?(-1))
-          value = (value.substring(s + 1)).to_s
+          value = RJava.cast_to_string(value.substring(s + 1))
         end
         new_text = "" + value + new_text
       end
@@ -898,7 +898,7 @@ module Org::Eclipse::Swt::Widgets
           set_text_field(field_name, new_value, (@character_count).equal?(0), (@character_count).equal?(0))
         else
           if (new_text_length >= length)
-            new_text = (new_text.substring(new_text_length - length + 1)).to_s
+            new_text = RJava.cast_to_string(new_text.substring(new_text_length - length + 1))
             new_value = unformatted_int_value(field_name, new_text, (@character_count).equal?(0), max_)
             if (!(new_value).equal?(-1))
               @character_count = length - 1
@@ -1122,7 +1122,7 @@ module Org::Eclipse::Swt::Widgets
         end
         i += 1
       end
-      new_value = (buffer.to_s).to_s
+      new_value = RJava.cast_to_string(buffer.to_s)
       @ignore_verify = true
       @text.insert(new_value)
       @ignore_verify = false

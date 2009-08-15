@@ -1197,7 +1197,7 @@ module Org::Eclipse::Swt::Widgets
             i += 1
           end
           if (j < i)
-            string = (String.new(text, 0, j)).to_s
+            string = RJava.cast_to_string(String.new(text, 0, j))
           end
         end
         # Use the character encoding for the default locale

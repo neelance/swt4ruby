@@ -146,7 +146,7 @@ module Org::Eclipse::Swt::Dnd
       alias_method :attr_drag_send_data_proc=, :drag_send_data_proc=
       
       when_class_loaded do
-        self.attr_drag_send_data_proc = Callback.new(DragSource.class, "DragSendDataProc", 4) # $NON-NLS-1$
+        self.attr_drag_send_data_proc = Callback.new(DragSource, "DragSendDataProc", 4) # $NON-NLS-1$
         drag_send_data_proc_address = self.attr_drag_send_data_proc.get_address
         if ((drag_send_data_proc_address).equal?(0))
           SWT.error(SWT::ERROR_NO_MORE_CALLBACKS)
@@ -333,7 +333,7 @@ module Org::Eclipse::Swt::Dnd
     typesig { [] }
     def check_subclass
       name = get_class.get_name
-      valid_name = DragSource.class.get_name
+      valid_name = DragSource.get_name
       if (!(valid_name == name))
         DND.error(SWT::ERROR_INVALID_SUBCLASS)
       end

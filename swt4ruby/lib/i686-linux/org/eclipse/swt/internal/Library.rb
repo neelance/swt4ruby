@@ -60,7 +60,7 @@ module Org::Eclipse::Swt::Internal
       alias_method :attr_revision=, :revision=
       
       when_class_loaded do
-        const_set :SEPARATOR, (System.get_property("file.separator")).to_s
+        const_set :SEPARATOR, RJava.cast_to_string(System.get_property("file.separator"))
         const_set :JAVA_VERSION, parse_version(System.get_property("java.version"))
         const_set :SWT_VERSION, _swt_version(self.attr_major_version, self.attr_minor_version)
       end
@@ -136,7 +136,7 @@ module Org::Eclipse::Swt::Internal
         file = JavaFile.new(file_name)
         begin
           if (!file.exists)
-            is = Library.class.get_resource_as_stream("/" + mapped_name) # $NON-NLS-1$
+            is = Library.get_resource_as_stream("/" + mapped_name) # $NON-NLS-1$
             if (!(is).nil?)
               read = 0
               buffer = Array.typed(::Java::Byte).new(4096) { 0 }
@@ -150,7 +150,7 @@ module Org::Eclipse::Swt::Internal
                 # $NON-NLS-1$
                 begin
                   Runtime.get_runtime.exec(Array.typed(String).new(["chmod", "755", file_name])).wait_for # $NON-NLS-1$ //$NON-NLS-2$
-                rescue Exception => e
+                rescue JavaThrowable => e
                 end
               end
               if (load(file_name))
@@ -158,7 +158,7 @@ module Org::Eclipse::Swt::Internal
               end
             end
           end
-        rescue Exception => e
+        rescue JavaThrowable => e
           begin
             if (!(os).nil?)
               os.close
@@ -220,7 +220,7 @@ module Org::Eclipse::Swt::Internal
       def load_library(name, map_name)
         prop = System.get_property("sun.arch.data.model") # $NON-NLS-1$
         if ((prop).nil?)
-          prop = (System.get_property("com.ibm.vm.bitmode")).to_s
+          prop = RJava.cast_to_string(System.get_property("com.ibm.vm.bitmode"))
         end # $NON-NLS-1$
         if (!(prop).nil?)
           if (("32" == prop))
@@ -246,7 +246,7 @@ module Org::Eclipse::Swt::Internal
         if (map_name)
           version = System.get_property("swt.version") # $NON-NLS-1$
           if ((version).nil?)
-            version = "" + (self.attr_major_version).to_s # $NON-NLS-1$
+            version = "" + RJava.cast_to_string(self.attr_major_version) # $NON-NLS-1$
             # Force 3 digits in minor version number
             if (self.attr_minor_version < 10)
               version += "00" # $NON-NLS-1$
@@ -255,23 +255,23 @@ module Org::Eclipse::Swt::Internal
                 version += "0"
               end # $NON-NLS-1$
             end
-            version += (self.attr_minor_version).to_s
+            version += RJava.cast_to_string(self.attr_minor_version)
             # No "r" until first revision
             if (self.attr_revision > 0)
-              version += "r" + (self.attr_revision).to_s
+              version += "r" + RJava.cast_to_string(self.attr_revision)
             end # $NON-NLS-1$
           end
-          lib_name1 = name + "-" + (Platform::SWT_PLATFORM).to_s + "-" + version # $NON-NLS-1$ //$NON-NLS-2$
-          lib_name2 = name + "-" + (Platform::SWT_PLATFORM).to_s # $NON-NLS-1$
-          mapped_name1 = (System.map_library_name(lib_name1)).to_s
-          mapped_name2 = (System.map_library_name(lib_name2)).to_s
+          lib_name1 = name + "-" + RJava.cast_to_string(Platform::SWT_PLATFORM) + "-" + version # $NON-NLS-1$ //$NON-NLS-2$
+          lib_name2 = name + "-" + RJava.cast_to_string(Platform::SWT_PLATFORM) # $NON-NLS-1$
+          mapped_name1 = RJava.cast_to_string(System.map_library_name(lib_name1))
+          mapped_name2 = RJava.cast_to_string(System.map_library_name(lib_name2))
         else
-          lib_name1 = (lib_name2 = (mapped_name1 = (mapped_name2 = name).to_s).to_s).to_s
+          lib_name1 = RJava.cast_to_string(lib_name2 = RJava.cast_to_string(mapped_name1 = RJava.cast_to_string(mapped_name2 = name)))
         end
         # Try loading library from swt library path
         path = System.get_property("swt.library.path") # $NON-NLS-1$
         if (!(path).nil?)
-          path = (JavaFile.new(path).get_absolute_path).to_s
+          path = RJava.cast_to_string(JavaFile.new(path).get_absolute_path)
           if (load(path + SEPARATOR + mapped_name1))
             return
           end
@@ -288,8 +288,8 @@ module Org::Eclipse::Swt::Internal
         end
         # Try loading library from the tmp directory if swt library path is not specified
         if ((path).nil?)
-          path = (System.get_property("java.io.tmpdir")).to_s # $NON-NLS-1$
-          path = (JavaFile.new(path).get_absolute_path).to_s
+          path = RJava.cast_to_string(System.get_property("java.io.tmpdir")) # $NON-NLS-1$
+          path = RJava.cast_to_string(JavaFile.new(path).get_absolute_path)
           if (load(path + SEPARATOR + mapped_name1))
             return
           end

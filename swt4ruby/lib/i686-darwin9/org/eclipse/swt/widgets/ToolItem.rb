@@ -985,7 +985,7 @@ module Org::Eclipse::Swt::Widgets
         if ((attribute_name == OS.attr_k_axtitle_attribute) || (attribute_name == OS.attr_k_axdescription_attribute))
           accessible_text = @tool_tip_text
           if ((accessible_text).nil? || (accessible_text == ""))
-            accessible_text = (self.attr_text).to_s
+            accessible_text = RJava.cast_to_string(self.attr_text)
           end
           if (!((accessible_text).nil? || (accessible_text == "")))
             buffer = CharArray.new(accessible_text.length)
@@ -1152,7 +1152,7 @@ module Org::Eclipse::Swt::Widgets
       end
       @visible_rgn = 0
       @control = nil
-      @tool_tip_text = (nil).to_s
+      @tool_tip_text = RJava.cast_to_string(nil)
       self.attr_image = @disabled_image = @hot_image = nil
     end
     

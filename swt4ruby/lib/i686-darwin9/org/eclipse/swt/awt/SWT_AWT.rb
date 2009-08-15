@@ -130,7 +130,7 @@ module Org::Eclipse::Swt::Awt
           end
         rescue ClassNotFoundException => cne
           SWT.error(SWT::ERROR_NOT_IMPLEMENTED, cne)
-        rescue Exception => e
+        rescue JavaThrowable => e
           SWT.error(SWT::ERROR_UNSPECIFIED, e, " [Error while starting AWT]")
         end
         value = nil
@@ -138,7 +138,7 @@ module Org::Eclipse::Swt::Awt
         begin
           constructor = clazz.get_constructor(Array.typed(Class).new([Array]))
           value = constructor.new_instance(Array.typed(Object).new([Long.new(handle)]))
-        rescue Exception => e
+        rescue JavaThrowable => e
           SWT.error(SWT::ERROR_NOT_IMPLEMENTED, e)
         end
         frame = value

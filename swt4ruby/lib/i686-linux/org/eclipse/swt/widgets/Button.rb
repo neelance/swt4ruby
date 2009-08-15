@@ -687,7 +687,7 @@ module Org::Eclipse::Swt::Widgets
       end
       @image_list = nil
       @image = nil
-      @text = (nil).to_s
+      @text = RJava.cast_to_string(nil)
     end
     
     typesig { [SelectionListener] }

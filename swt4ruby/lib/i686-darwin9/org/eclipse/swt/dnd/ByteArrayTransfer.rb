@@ -167,7 +167,7 @@ module Org::Eclipse::Swt::Dnd
       orig = object
       buffer = Array.typed(::Java::Byte).new(orig.attr_length) { 0 }
       System.arraycopy(orig, 0, buffer, 0, orig.attr_length)
-      transfer_data.attr_data = Array.typed(::Java::Byte).new(1) { 0 }
+      transfer_data.attr_data = Array.typed(Array.typed(::Java::Byte)).new(1) { nil }
       transfer_data.attr_data[0] = buffer
       transfer_data.attr_result = 0
     end

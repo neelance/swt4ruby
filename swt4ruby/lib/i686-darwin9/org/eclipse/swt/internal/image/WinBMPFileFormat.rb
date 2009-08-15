@@ -453,7 +453,7 @@ module Org::Eclipse::Swt::Internal::Image
         stream.unread(header)
         info_header_size = (header[14] & 0xff) | ((header[15] & 0xff) << 8) | ((header[16] & 0xff) << 16) | ((header[17] & 0xff) << 24)
         return (header[0]).equal?(0x42) && (header[1]).equal?(0x4d) && info_header_size >= BMPHeaderFixedSize
-      rescue Exception => e
+      rescue JavaException => e
         return false
       end
     end
@@ -527,7 +527,7 @@ module Org::Eclipse::Swt::Internal::Image
       info_header = Array.typed(::Java::Byte).new(BMPHeaderFixedSize) { 0 }
       begin
         self.attr_input_stream.read(info_header)
-      rescue Exception => e
+      rescue JavaException => e
         SWT.error(SWT::ERROR_IO, e)
       end
       width = (info_header[4] & 0xff) | ((info_header[5] & 0xff) << 8) | ((info_header[6] & 0xff) << 16) | ((info_header[7] & 0xff) << 24)

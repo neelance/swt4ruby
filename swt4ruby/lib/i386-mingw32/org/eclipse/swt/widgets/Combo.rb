@@ -1655,7 +1655,7 @@ module Org::Eclipse::Swt::Widgets
         if (!(key).equal?(Character.new(?\t.ord)) && key < 0x20)
           return true
         end
-        old_text = (String.new(Array.typed(::Java::Char).new([key]))).to_s
+        old_text = RJava.cast_to_string(String.new(Array.typed(::Java::Char).new([key])))
       end
       new_text = verify_text(old_text, start[0], end_[0], event)
       if ((new_text).nil?)
@@ -2170,7 +2170,7 @@ module Org::Eclipse::Swt::Widgets
         limit = RJava.cast_to_int(OS._send_message(hwnd_text, OS::EM_GETLIMITTEXT, 0, 0)) & 0x7fffffff
       end
       if (string.length > limit)
-        string = (string.substring(0, limit)).to_s
+        string = RJava.cast_to_string(string.substring(0, limit))
       end
       buffer = TCHAR.new(get_code_page, string, true)
       if (OS._set_window_text(self.attr_handle, buffer))
@@ -2505,13 +2505,13 @@ module Org::Eclipse::Swt::Widgets
             else
               if (0 <= w_param && w_param < get_item_count)
                 # 64
-                new_text = (get_item(RJava.cast_to_int(w_param))).to_s
+                new_text = RJava.cast_to_string(get_item(RJava.cast_to_int(w_param)))
               end
             end
             if (!(new_text).nil? && !(new_text == old_text))
               length_ = OS._get_window_text_length(self.attr_handle)
               old_text = new_text
-              new_text = (verify_text(new_text, 0, length_, nil)).to_s
+              new_text = RJava.cast_to_string(verify_text(new_text, 0, length_, nil))
               if ((new_text).nil?)
                 return 0
               end
@@ -2836,7 +2836,7 @@ module Org::Eclipse::Swt::Widgets
         end
       when OS::WM_PASTE
         OS._send_message(hwnd_text, OS::EM_GETSEL, start, end_)
-        new_text = (get_clipboard_text).to_s
+        new_text = RJava.cast_to_string(get_clipboard_text)
       when OS::EM_UNDO, OS::WM_UNDO
         if (!(OS._send_message(hwnd_text, OS::EM_CANUNDO, 0, 0)).equal?(0))
           @ignore_modify = true
@@ -2849,7 +2849,7 @@ module Org::Eclipse::Swt::Widgets
           if (!(length_).equal?(0) && !(new_start[0]).equal?(new_end[0]))
             buffer = TCHAR.new(get_code_page, length_ + 1)
             OS._get_window_text(hwnd_text, buffer, length_ + 1)
-            new_text = (buffer.to_s(new_start[0], new_end[0] - new_start[0])).to_s
+            new_text = RJava.cast_to_string(buffer.to_s(new_start[0], new_end[0] - new_start[0]))
           else
             new_text = ""
           end
@@ -2862,11 +2862,11 @@ module Org::Eclipse::Swt::Widgets
         buffer = TCHAR.new(get_code_page, length_)
         byte_count = buffer.length * TCHAR.attr_sizeof
         OS._move_memory(buffer, l_param, byte_count)
-        new_text = (buffer.to_s(0, length_)).to_s
+        new_text = RJava.cast_to_string(buffer.to_s(0, length_))
       end
       if (!(new_text).nil?)
         old_text = new_text
-        new_text = (verify_text(new_text, start[0], end_[0], nil)).to_s
+        new_text = RJava.cast_to_string(verify_text(new_text, start[0], end_[0], nil))
         if ((new_text).nil?)
           return LRESULT::ZERO
         end

@@ -74,7 +74,7 @@ module Org::Eclipse::Swt::Accessibility
     # 
     # @return a string representation of the event
     def to_s
-      return "AccessibleEvent {childID=" + (@child_id).to_s + " result=" + @result + "}" # $NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+      return "AccessibleEvent {childID=" + RJava.cast_to_string(@child_id) + " result=" + @result + "}" # $NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
     end
     
     private

@@ -169,8 +169,8 @@ module Org::Eclipse::Swt::Widgets
       when_class_loaded do
         if (!OS::IsWinCE)
           if (OS::COMCTL32_VERSION < OS._version(MAJOR, MINOR))
-            System.out.println("***WARNING: SWT requires comctl32.dll version " + (MAJOR).to_s + "." + (MINOR).to_s + " or greater") # $NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-            System.out.println("***WARNING: Detected: " + (OS::COMCTL32_MAJOR).to_s + "." + (OS::COMCTL32_MINOR).to_s) # $NON-NLS-1$ //$NON-NLS-2$
+            System.out.println("***WARNING: SWT requires comctl32.dll version " + RJava.cast_to_string(MAJOR) + "." + RJava.cast_to_string(MINOR) + " or greater") # $NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+            System.out.println("***WARNING: Detected: " + RJava.cast_to_string(OS::COMCTL32_MAJOR) + "." + RJava.cast_to_string(OS::COMCTL32_MINOR)) # $NON-NLS-1$ //$NON-NLS-2$
           end
         end
         OS._init_common_controls
@@ -1559,10 +1559,10 @@ module Org::Eclipse::Swt::Widgets
       if (!is_disposed)
         string = "*Wrong Thread*" # $NON-NLS-1$
         if (is_valid_thread)
-          string = (get_name_text).to_s
+          string = RJava.cast_to_string(get_name_text)
         end
       end
-      return (get_name).to_s + " {" + string + "}" # $NON-NLS-1$ //$NON-NLS-2$
+      return RJava.cast_to_string(get_name) + " {" + string + "}" # $NON-NLS-1$ //$NON-NLS-2$
     end
     
     typesig { [::Java::Int, ::Java::Int, ::Java::Int] }

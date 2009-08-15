@@ -3270,7 +3270,7 @@ module Org::Eclipse::Swt
         error(code, nil)
       end
       
-      typesig { [::Java::Int, Exception] }
+      typesig { [::Java::Int, JavaThrowable] }
       # Throws an appropriate exception based on the passed in error code.
       # The <code>throwable</code> argument should be either null, or the
       # throwable which caused SWT to throw an exception.
@@ -3298,7 +3298,7 @@ module Org::Eclipse::Swt
         error(code, throwable, nil)
       end
       
-      typesig { [::Java::Int, Exception, String] }
+      typesig { [::Java::Int, JavaThrowable, String] }
       # Throws an appropriate exception based on the passed in error code.
       # The <code>throwable</code> argument should be either null, or the
       # throwable which caused SWT to throw an exception.

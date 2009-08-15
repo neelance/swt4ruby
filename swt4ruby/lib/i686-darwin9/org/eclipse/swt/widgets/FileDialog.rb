@@ -279,7 +279,7 @@ module Org::Eclipse::Swt::Widgets
                       return 1
                     end
                     if (filter.starts_with("*."))
-                      filter = (filter.substring(2)).to_s
+                      filter = RJava.cast_to_string(filter.substring(2))
                     end
                     if ((filter.to_lower_case == extension.to_lower_case))
                       return 1
@@ -364,7 +364,7 @@ module Org::Eclipse::Swt::Widgets
           while i < @filter_extensions.attr_length
             str = @filter_extensions[i]
             if (!(@filter_names).nil? && @filter_names.attr_length > i)
-              str = (@filter_names[i]).to_s
+              str = RJava.cast_to_string(@filter_names[i])
             end
             chars = CharArray.new(str.length)
             str.get_chars(0, chars.attr_length, chars, 0)
@@ -438,16 +438,16 @@ module Org::Eclipse::Swt::Widgets
                 path_url = OS._cfurlcreate_from_fsref(OS.attr_k_cfallocator_default, fs_ref)
                 # Filter path
                 path_string = OS._cfurlcopy_file_system_path(path_url, OS.attr_k_cfurlposixpath_style)
-                @filter_path = (get_string(path_string)).to_s
+                @filter_path = RJava.cast_to_string(get_string(path_string))
                 OS._cfrelease(path_string)
                 # Full path
                 full_url = OS._cfurlcreate_copy_appending_path_component(OS.attr_k_cfallocator_default, path_url, record.attr_save_file_name, false)
                 full_string = OS._cfurlcopy_file_system_path(full_url, OS.attr_k_cfurlposixpath_style)
-                full_path = (get_string(full_string)).to_s
+                full_path = RJava.cast_to_string(get_string(full_string))
                 OS._cfrelease(full_string)
                 OS._cfrelease(full_url)
                 # File name
-                @file_name = (@file_names[0] = get_string(record.attr_save_file_name)).to_s
+                @file_name = RJava.cast_to_string(@file_names[0] = get_string(record.attr_save_file_name))
                 OS._cfrelease(path_url)
               end
             else
@@ -466,12 +466,12 @@ module Org::Eclipse::Swt::Widgets
                   OS._cfrelease(path_url)
                   if ((i).equal?(0))
                     # Full path
-                    full_path = (get_string(full_string)).to_s
+                    full_path = RJava.cast_to_string(get_string(full_string))
                     # Filter path
                     @filter_path = path
                     # File name
                     file_string = OS._cfurlcopy_last_path_component(url)
-                    @file_name = (@file_names[0] = get_string(file_string)).to_s
+                    @file_name = RJava.cast_to_string(@file_names[0] = get_string(file_string))
                     OS._cfrelease(file_string)
                   else
                     if ((path == @filter_path))

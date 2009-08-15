@@ -733,7 +733,7 @@ module Org::Eclipse::Swt::Browser
       XPCOM.ns_embed_cstring_delete(a_path)
       filename = String.new(dest)
       separator = filename.last_index_of(System.get_property("file.separator")) # $NON-NLS-1$
-      filename = (filename.substring(separator + 1)).to_s
+      filename = RJava.cast_to_string(filename.substring(separator + 1))
       listener = Class.new(Listener.class == Class ? Listener : Object) do
         extend LocalClass
         include_class_members Download_1_8
@@ -770,10 +770,10 @@ module Org::Eclipse::Swt::Browser
       grid_layout.attr_margin_width = 15
       grid_layout.attr_vertical_spacing = 20
       @shell.set_layout(grid_layout)
-      msg = (Compatibility.get_message("SWT_Download_Location", Array.typed(Object).new([filename, url]))).to_s # $NON-NLS-1$
+      msg = RJava.cast_to_string(Compatibility.get_message("SWT_Download_Location", Array.typed(Object).new([filename, url]))) # $NON-NLS-1$
       Label.new(@shell, SWT::SIMPLE).set_text(msg)
       @status = Label.new(@shell, SWT::SIMPLE)
-      msg = (Compatibility.get_message("SWT_Download_Started")).to_s # $NON-NLS-1$
+      msg = RJava.cast_to_string(Compatibility.get_message("SWT_Download_Started")) # $NON-NLS-1$
       @status.set_text(msg)
       data = GridData.new
       data.attr_grab_excess_horizontal_space = true

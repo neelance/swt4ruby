@@ -38,7 +38,7 @@ module Org::Eclipse::Swt::Internal::Mozilla
       
       
       def callbacks
-        defined?(@@callbacks) ? @@callbacks : @@callbacks= Array.typed(Callback).new(MAX_VTABLE_LENGTH) { Array.typed(Callback).new(MAX_ARG_COUNT) { nil } }
+        defined?(@@callbacks) ? @@callbacks : @@callbacks= Array.typed(Array.typed(Callback)).new(MAX_VTABLE_LENGTH) { Array.typed(Callback).new(MAX_ARG_COUNT) { nil } }
       end
       alias_method :attr_callbacks, :callbacks
       
@@ -70,7 +70,7 @@ module Org::Eclipse::Swt::Internal::Mozilla
         length = arg_counts.attr_length
         while i < length
           if (((self.attr_callbacks[i][arg_counts[i]])).nil?)
-            self.attr_callbacks[i][arg_counts[i]] = Callback.new(get_class, "callback" + (i).to_s, arg_counts[i] + 1, true, XPCOM::NS_ERROR_FAILURE) # $NON-NLS-1$
+            self.attr_callbacks[i][arg_counts[i]] = Callback.new(get_class, "callback" + RJava.cast_to_string(i), arg_counts[i] + 1, true, XPCOM::NS_ERROR_FAILURE) # $NON-NLS-1$
           end
           callback_addresses[i] = self.attr_callbacks[i][arg_counts[i]].get_address
           if ((callback_addresses[i]).equal?(0))

@@ -932,8 +932,8 @@ module Org::Eclipse::Swt::Internal::Image
           @mcu_ctr = 0
           @mcu_vert_offset = 0
           @mcu_rows_per_i_mcu_row = 0
-          @mcu_buffer = Array.typed(::Java::Short).new(D_MAX_BLOCKS_IN_MCU) { 0 }
-          @whole_image = Array.typed(::Java::Short).new(MAX_COMPONENTS) { 0 }
+          @mcu_buffer = Array.typed(Array.typed(::Java::Short)).new(D_MAX_BLOCKS_IN_MCU) { nil }
+          @whole_image = Array.typed(Array.typed(Array.typed(Array.typed(::Java::Short)))).new(MAX_COMPONENTS) { nil }
           @coef_bits_latch = nil
           @workspace = nil
         end
@@ -2640,7 +2640,7 @@ module Org::Eclipse::Swt::Internal::Image
         typesig { [] }
         def initialize
           @need_context_rows = false
-          @color_buf = Array.typed(::Java::Byte).new(MAX_COMPONENTS) { 0 }
+          @color_buf = Array.typed(Array.typed(Array.typed(::Java::Byte))).new(MAX_COMPONENTS) { nil }
           @color_buf_offset = Array.typed(::Java::Int).new(MAX_COMPONENTS) { 0 }
           @methods = Array.typed(::Java::Int).new(MAX_COMPONENTS) { 0 }
           @next_row_out = 0
@@ -2838,12 +2838,12 @@ module Org::Eclipse::Swt::Internal::Image
         typesig { [] }
         def initialize
           @process_data = 0
-          @buffer = Array.typed(::Java::Byte).new(MAX_COMPONENTS) { 0 }
+          @buffer = Array.typed(Array.typed(Array.typed(::Java::Byte))).new(MAX_COMPONENTS) { nil }
           @buffer_offset = Array.typed(::Java::Int).new(MAX_COMPONENTS) { 0 }
           @buffer_full = false
           @rowgroup_ctr = Array.typed(::Java::Int).new(1) { 0 }
-          @xbuffer = Array.typed(::Java::Byte).new(2) { 0 }
-          @xbuffer_offset = Array.typed(::Java::Int).new(2) { 0 }
+          @xbuffer = Array.typed(Array.typed(Array.typed(Array.typed(::Java::Byte)))).new(2) { nil }
+          @xbuffer_offset = Array.typed(Array.typed(::Java::Int)).new(2) { nil }
           @whichptr = 0
           @context_state = 0
           @rowgroups_avail = 0
@@ -4136,7 +4136,7 @@ module Org::Eclipse::Swt::Internal::Image
               access_rows *= 3
             end
             # #endif
-            coef.attr_whole_image[ci] = Array.typed(::Java::Short).new(RJava.cast_to_int(jround_up(compptr.attr_height_in_blocks, compptr.attr_v_samp_factor))) { Array.typed(::Java::Short).new(RJava.cast_to_int(jround_up(compptr.attr_width_in_blocks, compptr.attr_h_samp_factor))) { Array.typed(::Java::Short).new(DCTSIZE2) { 0 } } }
+            coef.attr_whole_image[ci] = Array.typed(Array.typed(Array.typed(::Java::Short))).new(RJava.cast_to_int(jround_up(compptr.attr_height_in_blocks, compptr.attr_v_samp_factor))) { Array.typed(Array.typed(::Java::Short)).new(RJava.cast_to_int(jround_up(compptr.attr_width_in_blocks, compptr.attr_h_samp_factor))) { Array.typed(::Java::Short).new(DCTSIZE2) { 0 } } }
             ci += 1
           end
           # coef.consume_data = consume_data;
@@ -4148,7 +4148,7 @@ module Org::Eclipse::Swt::Internal::Image
           # #endif
         else
           # We only need a single-MCU buffer.
-          coef.attr_mcu_buffer = Array.typed(::Java::Short).new(D_MAX_BLOCKS_IN_MCU) { Array.typed(::Java::Short).new(DCTSIZE2) { 0 } }
+          coef.attr_mcu_buffer = Array.typed(Array.typed(::Java::Short)).new(D_MAX_BLOCKS_IN_MCU) { Array.typed(::Java::Short).new(DCTSIZE2) { 0 } }
           # coef.consume_data = dummy_consume_data;
           coef.attr_decompress_data = DECOMPRESS_ONEPASS
           coef.attr_coef_arrays = nil
@@ -4577,8 +4577,8 @@ module Org::Eclipse::Swt::Internal::Image
         xbuf = nil
         # Get top-level space for component array pointers.
         # We alloc both arrays with one call to save a few cycles.
-        main.attr_xbuffer[0] = Array.typed(::Java::Byte).new(cinfo.attr_num_components) { 0 }
-        main.attr_xbuffer[1] = Array.typed(::Java::Byte).new(cinfo.attr_num_components) { 0 }
+        main.attr_xbuffer[0] = Array.typed(Array.typed(Array.typed(::Java::Byte))).new(cinfo.attr_num_components) { nil }
+        main.attr_xbuffer[1] = Array.typed(Array.typed(Array.typed(::Java::Byte))).new(cinfo.attr_num_components) { nil }
         main.attr_xbuffer_offset[0] = Array.typed(::Java::Int).new(cinfo.attr_num_components) { 0 }
         main.attr_xbuffer_offset[1] = Array.typed(::Java::Int).new(cinfo.attr_num_components) { 0 }
         ci = 0
@@ -4588,7 +4588,7 @@ module Org::Eclipse::Swt::Internal::Image
           # height of a row group of component
           # Get space for pointer lists --- M+4 row groups in each list.
           # We alloc both pointer lists with one call to save a few cycles.
-          xbuf = Array.typed(::Java::Byte).new(2 * (rgroup * (m + 4))) { 0 }
+          xbuf = Array.typed(Array.typed(::Java::Byte)).new(2 * (rgroup * (m + 4))) { nil }
           offset = rgroup
           main.attr_xbuffer_offset[0][ci] = offset
           main.attr_xbuffer[0][ci] = xbuf
@@ -4631,7 +4631,7 @@ module Org::Eclipse::Swt::Internal::Image
           compptr = cinfo.attr_comp_info[ci]
           rgroup = (compptr.attr_v_samp_factor * compptr.attr_dct_scaled_size) / cinfo.attr_min_dct_scaled_size
           # height of a row group of component
-          main.attr_buffer[ci] = Array.typed(::Java::Byte).new(rgroup * ngroups) { Array.typed(::Java::Byte).new(compptr.attr_width_in_blocks * compptr.attr_dct_scaled_size) { 0 } }
+          main.attr_buffer[ci] = Array.typed(Array.typed(::Java::Byte)).new(rgroup * ngroups) { Array.typed(::Java::Byte).new(compptr.attr_width_in_blocks * compptr.attr_dct_scaled_size) { 0 } }
           ci += 1
         end
       end
@@ -4723,7 +4723,7 @@ module Org::Eclipse::Swt::Internal::Image
           end
           # ERREXIT(cinfo, JERR_FRACT_SAMPLE_NOTIMPL);
           if (need_buffer)
-            upsample.attr_color_buf[ci] = Array.typed(::Java::Byte).new(cinfo.attr_max_v_samp_factor) { Array.typed(::Java::Byte).new(RJava.cast_to_int(jround_up(cinfo.attr_output_width, cinfo.attr_max_h_samp_factor))) { 0 } }
+            upsample.attr_color_buf[ci] = Array.typed(Array.typed(::Java::Byte)).new(cinfo.attr_max_v_samp_factor) { Array.typed(::Java::Byte).new(RJava.cast_to_int(jround_up(cinfo.attr_output_width, cinfo.attr_max_h_samp_factor))) { 0 } }
           end
           ci += 1
         end
@@ -4737,7 +4737,7 @@ module Org::Eclipse::Swt::Internal::Image
         cinfo.attr_entropy = Phuff_entropy_decoder.new
         # entropy.pub.start_pass = start_pass_phuff_decoder;
         # Create progression status table
-        cinfo.attr_coef_bits = Array.typed(::Java::Int).new(cinfo.attr_num_components) { Array.typed(::Java::Int).new(DCTSIZE2) { 0 } }
+        cinfo.attr_coef_bits = Array.typed(Array.typed(::Java::Int)).new(cinfo.attr_num_components) { Array.typed(::Java::Int).new(DCTSIZE2) { 0 } }
         coef_bit_ptr = cinfo.attr_coef_bits
         ci = 0
         while ci < cinfo.attr_num_components
@@ -7799,7 +7799,7 @@ module Org::Eclipse::Swt::Internal::Image
         # ERREXIT1(cinfo, JERR_IMAGE_TOO_BIG, (unsigned int) JPEG_MAX_DIMENSION);
         # For now, precision must match compiled-in value...
         if (!(cinfo.attr_data_precision).equal?(BITS_IN_JSAMPLE))
-          error(" [data precision=" + (cinfo.attr_data_precision).to_s + "]")
+          error(" [data precision=" + RJava.cast_to_string(cinfo.attr_data_precision) + "]")
         end
         # ERREXIT1(cinfo, JERR_BAD_PRECISION, cinfo.data_precision);
         # Check that number of components won't exceed internal array sizes
@@ -8319,7 +8319,7 @@ module Org::Eclipse::Swt::Internal::Image
           stream.read(buffer)
           stream.unread(buffer)
           return ((buffer[0] & 0xff)).equal?(0xff) && ((buffer[1] & 0xff)).equal?(M_SOI)
-        rescue Exception => e
+        rescue JavaException => e
           return false
         end
       end
@@ -8349,7 +8349,7 @@ module Org::Eclipse::Swt::Internal::Image
         end
         scanline_pad = 4
         row_stride = (((cinfo.attr_output_width * cinfo.attr_out_color_components * 8 + 7) / 8) + (scanline_pad - 1)) / scanline_pad * scanline_pad
-        buffer = Array.typed(::Java::Byte).new(1) { Array.typed(::Java::Byte).new(row_stride) { 0 } }
+        buffer = Array.typed(Array.typed(::Java::Byte)).new(1) { Array.typed(::Java::Byte).new(row_stride) { 0 } }
         data = Array.typed(::Java::Byte).new(row_stride * cinfo.attr_output_height) { 0 }
         image_data = ImageData.internal_new(cinfo.attr_output_width, cinfo.attr_output_height, palette.attr_is_direct ? 24 : 8, palette, scanline_pad, data, 0, nil, nil, -1, -1, SWT::IMAGE_JPEG, 0, 0, 0, 0)
         if (cinfo.attr_buffered_image)

@@ -158,17 +158,17 @@ module Org::Eclipse::Swt::Custom
     # 
     # @return a string representation of the layout
     def to_s
-      string = (get_name).to_s + " {"
+      string = RJava.cast_to_string(get_name) + " {"
       if (!(@margin_width).equal?(0))
-        string += "marginWidth=" + (@margin_width).to_s + " "
+        string += "marginWidth=" + RJava.cast_to_string(@margin_width) + " "
       end
       if (!(@margin_height).equal?(0))
-        string += "marginHeight=" + (@margin_height).to_s + " "
+        string += "marginHeight=" + RJava.cast_to_string(@margin_height) + " "
       end
       if (!(@top_control).nil?)
-        string += "topControl=" + (@top_control).to_s + " "
+        string += "topControl=" + RJava.cast_to_string(@top_control) + " "
       end
-      string = (string.trim).to_s
+      string = RJava.cast_to_string(string.trim)
       string += "}"
       return string
     end

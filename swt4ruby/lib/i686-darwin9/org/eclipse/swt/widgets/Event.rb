@@ -264,7 +264,7 @@ module Org::Eclipse::Swt::Widgets
     # 
     # @return a string representation of the event
     def to_s
-      return "Event {type=" + (@type).to_s + " " + (@widget).to_s + " time=" + (@time).to_s + " data=" + (@data).to_s + " x=" + (@x).to_s + " y=" + (@y).to_s + " width=" + (@width).to_s + " height=" + (@height).to_s + " detail=" + (@detail).to_s + "}" # $NON-NLS-1$//$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$ //$NON-NLS-7$
+      return "Event {type=" + RJava.cast_to_string(@type) + " " + RJava.cast_to_string(@widget) + " time=" + RJava.cast_to_string(@time) + " data=" + RJava.cast_to_string(@data) + " x=" + RJava.cast_to_string(@x) + " y=" + RJava.cast_to_string(@y) + " width=" + RJava.cast_to_string(@width) + " height=" + RJava.cast_to_string(@height) + " detail=" + RJava.cast_to_string(@detail) + "}" # $NON-NLS-1$//$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$ //$NON-NLS-7$
     end
     
     typesig { [] }

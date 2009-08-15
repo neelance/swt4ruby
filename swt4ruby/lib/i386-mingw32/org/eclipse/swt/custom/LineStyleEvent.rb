@@ -126,7 +126,7 @@ module Org::Eclipse::Swt::Custom
       @styles = e.attr_styles
       @ranges = e.attr_ranges
       @line_offset = e.attr_detail
-      @line_text = (e.attr_text).to_s
+      @line_text = RJava.cast_to_string(e.attr_text)
       @alignment = e.attr_alignment
       @justify = e.attr_justify
       @indent = e.attr_indent

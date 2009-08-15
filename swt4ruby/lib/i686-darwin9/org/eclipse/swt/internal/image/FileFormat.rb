@@ -81,7 +81,7 @@ module Org::Eclipse::Swt::Internal::Image
       begin
         @input_stream = stream
         return load_from_byte_stream
-      rescue Exception => e
+      rescue JavaException => e
         if (e.is_a?(IOException))
           SWT.error(SWT::ERROR_IO, e)
         else
@@ -103,7 +103,7 @@ module Org::Eclipse::Swt::Internal::Image
         while i < FORMATS.attr_length
           if (!(FORMATS[i]).nil?)
             begin
-              clazz = Class.for_name(FORMAT_PACKAGE + (Character.new(?..ord)).to_s + (FORMATS[i]).to_s + FORMAT_SUFFIX)
+              clazz = Class.for_name(FORMAT_PACKAGE + RJava.cast_to_string(Character.new(?..ord)) + RJava.cast_to_string(FORMATS[i]) + FORMAT_SUFFIX)
               file_format = clazz.new_instance
               if (file_format.is_file_format(stream))
                 is_supported = true
@@ -111,7 +111,7 @@ module Org::Eclipse::Swt::Internal::Image
               end
             rescue ClassNotFoundException => e
               FORMATS[i] = nil
-            rescue Exception => e
+            rescue JavaException => e
             end
           end
           i += 1
@@ -139,9 +139,9 @@ module Org::Eclipse::Swt::Internal::Image
         stream = LEDataOutputStream.new(os)
         file_format = nil
         begin
-          clazz = Class.for_name(FORMAT_PACKAGE + (Character.new(?..ord)).to_s + (FORMATS[format]).to_s + FORMAT_SUFFIX)
+          clazz = Class.for_name(FORMAT_PACKAGE + RJava.cast_to_string(Character.new(?..ord)) + RJava.cast_to_string(FORMATS[format]) + FORMAT_SUFFIX)
           file_format = clazz.new_instance
-        rescue Exception => e
+        rescue JavaException => e
           SWT.error(SWT::ERROR_UNSUPPORTED_FORMAT)
         end
         if ((format).equal?(SWT::IMAGE_BMP_RLE))
@@ -169,10 +169,10 @@ module Org::Eclipse::Swt::Internal::Image
         @output_stream = stream
         unload_into_byte_stream(loader)
         @output_stream.flush
-      rescue Exception => e
+      rescue JavaException => e
         begin
           @output_stream.flush
-        rescue Exception => f
+        rescue JavaException => f
         end
         SWT.error(SWT::ERROR_IO, e)
       end

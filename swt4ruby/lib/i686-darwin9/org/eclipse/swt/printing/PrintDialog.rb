@@ -186,13 +186,13 @@ module Org::Eclipse::Swt::Printing
                 driver = Printer::DRIVER
                 case (dest_type[0])
                 when OS.attr_k_pmdestination_fax
-                  driver = (Printer::FAX_DRIVER).to_s
+                  driver = RJava.cast_to_string(Printer::FAX_DRIVER)
                 when OS.attr_k_pmdestination_file
-                  driver = (Printer::FILE_DRIVER).to_s
+                  driver = RJava.cast_to_string(Printer::FILE_DRIVER)
                 when OS.attr_k_pmdestination_preview
-                  driver = (Printer::PREVIEW_DRIVER).to_s
+                  driver = RJava.cast_to_string(Printer::PREVIEW_DRIVER)
                 when OS.attr_k_pmdestination_printer
-                  driver = (Printer::PRINTER_DRIVER).to_s
+                  driver = RJava.cast_to_string(Printer::PRINTER_DRIVER)
                 end
                 data = PrinterData.new(driver, name)
                 if ((dest_type[0]).equal?(OS.attr_k_pmdestination_file))
@@ -356,7 +356,7 @@ module Org::Eclipse::Swt::Printing
     typesig { [] }
     def check_subclass
       name = get_class.get_name
-      valid_name = PrintDialog.class.get_name
+      valid_name = PrintDialog.get_name
       if (!(valid_name == name))
         SWT.error(SWT::ERROR_INVALID_SUBCLASS)
       end

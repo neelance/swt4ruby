@@ -100,7 +100,7 @@ module Org::Eclipse::Swt::Dnd
     # </ul>
     def check_subclass
       name = get_class.get_name
-      valid_name = Clipboard.class.get_name
+      valid_name = Clipboard.get_name
       if (!(valid_name == name))
         DND.error(SWT::ERROR_INVALID_SUBCLASS)
       end
@@ -320,7 +320,7 @@ module Org::Eclipse::Swt::Dnd
           if ((OS._get_scrap_flavor_data(scrap[0], type, size, buffer)).equal?(OS.attr_no_err))
             tdata = TransferData.new
             tdata.attr_type = type
-            tdata.attr_data = Array.typed(::Java::Byte).new(1) { 0 }
+            tdata.attr_data = Array.typed(Array.typed(::Java::Byte)).new(1) { nil }
             tdata.attr_data[0] = buffer
             return transfer.native_to_java(tdata)
           end

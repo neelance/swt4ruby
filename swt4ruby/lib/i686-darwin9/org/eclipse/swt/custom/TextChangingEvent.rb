@@ -102,7 +102,7 @@ module Org::Eclipse::Swt::Custom
       @new_char_count = e.attr_new_char_count
       @replace_line_count = e.attr_replace_line_count
       @new_line_count = e.attr_new_line_count
-      @new_text = (e.attr_text).to_s
+      @new_text = RJava.cast_to_string(e.attr_text)
     end
     
     private

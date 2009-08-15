@@ -70,7 +70,9 @@ module Org::Eclipse::Swt::Graphics
   # @see <a href="http://www.eclipse.org/swt/">Sample code and further information</a>
   class Image < ImageImports.const_get :Resource
     include_class_members ImageImports
-    include Drawable
+    overload_protected {
+      include Drawable
+    }
     
     # specifies whether the receiver is a bitmap or an icon
     # (one of <code>SWT.BITMAP</code>, <code>SWT.ICON</code>)
@@ -1311,7 +1313,7 @@ module Org::Eclipse::Swt::Graphics
     # @return <code>true</code> if the object is the same as this object and <code>false</code> otherwise
     # 
     # @see #hashCode
-    def equals(object)
+    def ==(object)
       if ((object).equal?(self))
         return true
       end
@@ -2491,7 +2493,7 @@ module Org::Eclipse::Swt::Graphics
       if (is_disposed)
         return "Image {*DISPOSED*}"
       end
-      return "Image {" + (@handle).to_s + "}"
+      return "Image {" + RJava.cast_to_string(@handle) + "}"
     end
     
     class_module.module_eval {

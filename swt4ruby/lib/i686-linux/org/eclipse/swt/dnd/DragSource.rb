@@ -179,15 +179,15 @@ module Org::Eclipse::Swt::Dnd
       alias_method :attr_drag_data_delete=, :drag_data_delete=
       
       when_class_loaded do
-        self.attr_drag_get_data = Callback.new(DragSource.class, "DragGetData", 5) # $NON-NLS-1$
+        self.attr_drag_get_data = Callback.new(DragSource, "DragGetData", 5) # $NON-NLS-1$
         if ((self.attr_drag_get_data.get_address).equal?(0))
           SWT.error(SWT::ERROR_NO_MORE_CALLBACKS)
         end
-        self.attr_drag_end = Callback.new(DragSource.class, "DragEnd", 2) # $NON-NLS-1$
+        self.attr_drag_end = Callback.new(DragSource, "DragEnd", 2) # $NON-NLS-1$
         if ((self.attr_drag_end.get_address).equal?(0))
           SWT.error(SWT::ERROR_NO_MORE_CALLBACKS)
         end
-        self.attr_drag_data_delete = Callback.new(DragSource.class, "DragDataDelete", 2) # $NON-NLS-1$
+        self.attr_drag_data_delete = Callback.new(DragSource, "DragDataDelete", 2) # $NON-NLS-1$
         if ((self.attr_drag_data_delete.get_address).equal?(0))
           SWT.error(SWT::ERROR_NO_MORE_CALLBACKS)
         end
@@ -415,7 +415,7 @@ module Org::Eclipse::Swt::Dnd
     typesig { [] }
     def check_subclass
       name = get_class.get_name
-      valid_name = DragSource.class.get_name
+      valid_name = DragSource.get_name
       if (!(valid_name == name))
         DND.error(SWT::ERROR_INVALID_SUBCLASS)
       end

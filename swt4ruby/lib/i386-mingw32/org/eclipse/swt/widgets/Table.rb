@@ -5380,13 +5380,13 @@ module Org::Eclipse::Swt::Widgets
           # long
           h_font = -1
           if (!(item).nil?)
-            string = (item.attr_text).to_s
+            string = RJava.cast_to_string(item.attr_text)
             image_indent = Math.max(image_indent, item.attr_image_indent)
             h_font = item.font_handle(0)
           else
             if (!(@items[index]).nil?)
               table_item = @items[index]
-              string = (table_item.attr_text).to_s
+              string = RJava.cast_to_string(table_item.attr_text)
               image_indent = Math.max(image_indent, table_item.attr_image_indent)
               h_font = table_item.font_handle(0)
             end
@@ -7327,11 +7327,11 @@ module Org::Eclipse::Swt::Widgets
           if (!((plvfi.attr_mask & OS::LVIF_TEXT)).equal?(0))
             string = nil
             if ((plvfi.attr_i_sub_item).equal?(0))
-              string = (item.attr_text).to_s
+              string = RJava.cast_to_string(item.attr_text)
             else
               strings = item.attr_strings
               if (!(strings).nil?)
-                string = (strings[plvfi.attr_i_sub_item]).to_s
+                string = RJava.cast_to_string(strings[plvfi.attr_i_sub_item])
               end
             end
             if (!(string).nil?)

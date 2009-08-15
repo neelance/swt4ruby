@@ -159,7 +159,7 @@ module Org::Eclipse::Swt::Widgets
       @is_locked = false
       @in_dispose = false
       super(parent, check_style(style))
-      @items = Array.typed(CoolItem).new(0) { Array.typed(CoolItem).new(0) { nil } }
+      @items = Array.typed(Array.typed(CoolItem)).new(0) { Array.typed(CoolItem).new(0) { nil } }
       @original_items = Array.typed(CoolItem).new(0) { nil }
       @dragging = nil
       @is_locked = false
@@ -544,7 +544,7 @@ module Org::Eclipse::Swt::Widgets
         error(SWT::ERROR_INVALID_RANGE)
       end
       if ((@items.attr_length).equal?(0))
-        @items = Array.typed(CoolItem).new(1) { Array.typed(CoolItem).new(1) { nil } }
+        @items = Array.typed(Array.typed(CoolItem)).new(1) { Array.typed(CoolItem).new(1) { nil } }
         @items[0][0] = item
       else
         i = index
@@ -634,7 +634,7 @@ module Org::Eclipse::Swt::Widgets
       internal_redraw(old.attr_x, old.attr_y, CoolItem::MINIMUM_WIDTH, old.attr_height)
       if ((new_row_index).equal?(@items.attr_length))
         # Create a new bottom row for the item.
-        new_rows = Array.typed(CoolItem).new(@items.attr_length + 1) { nil }
+        new_rows = Array.typed(Array.typed(CoolItem)).new(@items.attr_length + 1) { nil }
         System.arraycopy(@items, 0, new_rows, 0, @items.attr_length)
         row = @items.attr_length
         new_rows[row] = Array.typed(CoolItem).new(1) { nil }
@@ -748,7 +748,7 @@ module Org::Eclipse::Swt::Widgets
       new_row_index = Math.max(0, old_row_index - 1)
       if ((old_row_index).equal?(0))
         # Create a new top row for the item.
-        new_rows = Array.typed(CoolItem).new(@items.attr_length + 1) { nil }
+        new_rows = Array.typed(Array.typed(CoolItem)).new(@items.attr_length + 1) { nil }
         System.arraycopy(@items, 0, new_rows, 1, @items.attr_length)
         new_rows[0] = Array.typed(CoolItem).new(1) { nil }
         new_rows[0][0] = item
@@ -1031,7 +1031,7 @@ module Org::Eclipse::Swt::Widgets
         @items[row_index] = new_row
         @items[row_index][0].attr_wrap = true
       else
-        new_rows = Array.typed(CoolItem).new(@items.attr_length - 1) { nil }
+        new_rows = Array.typed(Array.typed(CoolItem)).new(@items.attr_length - 1) { nil }
         System.arraycopy(@items, 0, new_rows, 0, row_index)
         System.arraycopy(@items, row_index + 1, new_rows, row_index, new_rows.attr_length - row_index)
         @items = new_rows
@@ -1233,7 +1233,7 @@ module Org::Eclipse::Swt::Widgets
         row[i__] = @original_items[item_order[i__]]
         i__ += 1
       end
-      @items = Array.typed(CoolItem).new(1) { Array.typed(CoolItem).new(count) { nil } }
+      @items = Array.typed(Array.typed(CoolItem)).new(1) { Array.typed(CoolItem).new(count) { nil } }
       @items[0] = row
     end
     
@@ -1467,7 +1467,7 @@ module Org::Eclipse::Swt::Widgets
         start += @items[row].attr_length
         row += 1
       end
-      new_items = Array.typed(CoolItem).new(item_count) { nil }
+      new_items = Array.typed(Array.typed(CoolItem)).new(item_count) { nil }
       row_count = 0
       row_width = 0
       start = 0
@@ -1501,7 +1501,7 @@ module Org::Eclipse::Swt::Widgets
         row_count += 1
       end
       if (!(new_items.attr_length).equal?(row_count))
-        tmp = Array.typed(CoolItem).new(row_count) { nil }
+        tmp = Array.typed(Array.typed(CoolItem)).new(row_count) { nil }
         System.arraycopy(new_items, 0, tmp, 0, row_count)
         @items = tmp
       else

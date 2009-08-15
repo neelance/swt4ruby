@@ -43,7 +43,9 @@ module Org::Eclipse::Swt::Widgets
   # @see <a href="http://www.eclipse.org/swt/">Sample code and further information</a>
   class Control < ControlImports.const_get :Widget
     include_class_members ControlImports
-    include Drawable
+    overload_protected {
+      include Drawable
+    }
     
     # the handle to the OS resource
     # (Warning: This field is platform dependent)
@@ -1384,7 +1386,7 @@ module Org::Eclipse::Swt::Widgets
             # Use the character encoding for the default locale
             buffer = TCHAR.new(0, byte_count / TCHAR.attr_sizeof)
             OS._move_memory(buffer, ptr, byte_count)
-            string = (buffer.to_s(0, buffer.strlen)).to_s
+            string = RJava.cast_to_string(buffer.to_s(0, buffer.strlen))
             OS._global_unlock(h_mem)
           end
         end
@@ -2431,7 +2433,7 @@ module Org::Eclipse::Swt::Widgets
       if (!(@tool_tip_text).nil?)
         set_tool_tip_text(get_shell, nil)
       end
-      @tool_tip_text = (nil).to_s
+      @tool_tip_text = RJava.cast_to_string(nil)
       if (!(@menu).nil? && !@menu.is_disposed)
         @menu.dispose
       end

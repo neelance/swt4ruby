@@ -132,7 +132,7 @@ module Org::Eclipse::Swt::Widgets
         buffer = TCHAR.new(0, length_)
         byte_count = buffer.length * TCHAR.attr_sizeof
         OS._move_memory(buffer, l_param, byte_count)
-        @directory_path = (buffer.to_s(0, length_)).to_s
+        @directory_path = RJava.cast_to_string(buffer.to_s(0, length_))
       end
       return 0
     end
@@ -199,7 +199,7 @@ module Org::Eclipse::Swt::Widgets
             buffer[((index += 1) - 1)] = ch
             i += 1
           end
-          string = (String.new(buffer, 0, index)).to_s
+          string = RJava.cast_to_string(String.new(buffer, 0, index))
         end
         # Use the character encoding for the default locale
         buffer = TCHAR.new(0, string, true)
@@ -221,7 +221,7 @@ module Org::Eclipse::Swt::Widgets
         old_modal = display.get_modal_dialog
         display.set_modal_dialog(self)
       end
-      @directory_path = (nil).to_s
+      @directory_path = RJava.cast_to_string(nil)
       lpbi = BROWSEINFO.new
       lpbi.attr_hwnd_owner = hwnd_owner
       lpbi.attr_lpsz_title = lpsz_title
@@ -271,7 +271,7 @@ module Org::Eclipse::Swt::Widgets
         # Use the character encoding for the default locale
         buffer = TCHAR.new(0, OS::MAX_PATH)
         if (OS._shget_path_from_idlist(lp_item_id_list, buffer))
-          @directory_path = (buffer.to_s(0, buffer.strlen)).to_s
+          @directory_path = RJava.cast_to_string(buffer.to_s(0, buffer.strlen))
           @filter_path = @directory_path
         end
       end

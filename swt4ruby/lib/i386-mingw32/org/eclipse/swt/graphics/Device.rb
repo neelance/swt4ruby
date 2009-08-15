@@ -186,7 +186,7 @@ module Org::Eclipse::Swt::Graphics
       when_class_loaded do
         begin
           Class.for_name("org.eclipse.swt.widgets.Display") # $NON-NLS-1$
-        rescue Exception => e
+        rescue JavaThrowable => e
         end
       end
       
@@ -245,7 +245,7 @@ module Org::Eclipse::Swt::Graphics
       @scripts = nil
       @gdip_token = nil
       @disposed = false
-      synchronized((Device.class)) do
+      synchronized((Device)) do
         if (!(data).nil?)
           @debug = data.attr_debug
           @tracking = data.attr_tracking
@@ -302,7 +302,7 @@ module Org::Eclipse::Swt::Graphics
         if ((Gdip._gdiplus_startup(token, input, 0)).equal?(0))
           @gdip_token = token
         end
-      rescue Exception => t
+      rescue JavaThrowable => t
         SWT.error(SWT::ERROR_NO_GRAPHICS_LIBRARY, t, " [GDI+ is required]") # $NON-NLS-1$
       ensure
         if (!OS::IsWinCE)
@@ -390,7 +390,7 @@ module Org::Eclipse::Swt::Graphics
     # @see #destroy
     # @see #checkDevice
     def dispose
-      synchronized((Device.class)) do
+      synchronized((Device)) do
         if (is_disposed)
           return
         end
@@ -692,7 +692,7 @@ module Org::Eclipse::Swt::Graphics
       if ((error_).equal?(0))
         return ""
       end # $NON-NLS-1$
-      return " [GetLastError=0x" + (JavaInteger.to_hex_string(error_)).to_s + "]" # $NON-NLS-1$ //$NON-NLS-2$
+      return " [GetLastError=0x" + RJava.cast_to_string(JavaInteger.to_hex_string(error_)) + "]" # $NON-NLS-1$ //$NON-NLS-2$
     end
     
     typesig { [] }
@@ -707,7 +707,7 @@ module Org::Eclipse::Swt::Graphics
       dw_flags = OS::FORMAT_MESSAGE_ALLOCATE_BUFFER | OS::FORMAT_MESSAGE_FROM_SYSTEM | OS::FORMAT_MESSAGE_IGNORE_INSERTS
       length = OS._format_message(dw_flags, 0, error_, OS::LANG_USER_DEFAULT, buffer, 0, 0)
       if ((length).equal?(0))
-        return " [GetLastError=0x" + (JavaInteger.to_hex_string(error_)).to_s + "]"
+        return " [GetLastError=0x" + RJava.cast_to_string(JavaInteger.to_hex_string(error_)) + "]"
       end # $NON-NLS-1$ //$NON-NLS-2$
       buffer1 = TCHAR.new(0, length)
       OS._move_memory(buffer1, buffer[0], length * TCHAR.attr_sizeof)
@@ -948,7 +948,7 @@ module Org::Eclipse::Swt::Graphics
     # 
     # @return <code>true</code> when the device is disposed and <code>false</code> otherwise
     def is_disposed
-      synchronized((Device.class)) do
+      synchronized((Device)) do
         return @disposed
       end
     end
@@ -1065,37 +1065,37 @@ module Org::Eclipse::Swt::Graphics
           if (!(object_count).equal?(0))
             string = "Summary: "
             if (!(colors).equal?(0))
-              string += (colors).to_s + " Color(s), "
+              string += RJava.cast_to_string(colors) + " Color(s), "
             end
             if (!(cursors).equal?(0))
-              string += (cursors).to_s + " Cursor(s), "
+              string += RJava.cast_to_string(cursors) + " Cursor(s), "
             end
             if (!(fonts).equal?(0))
-              string += (fonts).to_s + " Font(s), "
+              string += RJava.cast_to_string(fonts) + " Font(s), "
             end
             if (!(gcs).equal?(0))
-              string += (gcs).to_s + " GC(s), "
+              string += RJava.cast_to_string(gcs) + " GC(s), "
             end
             if (!(images).equal?(0))
-              string += (images).to_s + " Image(s), "
+              string += RJava.cast_to_string(images) + " Image(s), "
             end
             if (!(paths).equal?(0))
-              string += (paths).to_s + " Path(s), "
+              string += RJava.cast_to_string(paths) + " Path(s), "
             end
             if (!(patterns).equal?(0))
-              string += (patterns).to_s + " Pattern(s), "
+              string += RJava.cast_to_string(patterns) + " Pattern(s), "
             end
             if (!(regions).equal?(0))
-              string += (regions).to_s + " Region(s), "
+              string += RJava.cast_to_string(regions) + " Region(s), "
             end
             if (!(text_layouts).equal?(0))
-              string += (text_layouts).to_s + " TextLayout(s), "
+              string += RJava.cast_to_string(text_layouts) + " TextLayout(s), "
             end
             if (!(transforms).equal?(0))
-              string += (transforms).to_s + " Transforms(s), "
+              string += RJava.cast_to_string(transforms) + " Transforms(s), "
             end
             if (!(string.length).equal?(0))
-              string = (string.substring(0, string.length - 2)).to_s
+              string = RJava.cast_to_string(string.substring(0, string.length - 2))
               System.err.println(string)
             end
             i_ = 0

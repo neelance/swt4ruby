@@ -127,15 +127,15 @@ module Org::Eclipse::Swt::Dnd
       buffer.replace(start + max_length - temp.length, start + max_length, temp)
       # endHTML
       start = buffer.to_s.index_of(NUMBER, start)
-      temp = (JavaInteger.to_s(end_html)).to_s
+      temp = RJava.cast_to_string(JavaInteger.to_s(end_html))
       buffer.replace(start + max_length - temp.length, start + max_length, temp)
       # startFragment
       start = buffer.to_s.index_of(NUMBER, start)
-      temp = (JavaInteger.to_s(start_fragment)).to_s
+      temp = RJava.cast_to_string(JavaInteger.to_s(start_fragment))
       buffer.replace(start + max_length - temp.length, start + max_length, temp)
       # endFragment
       start = buffer.to_s.index_of(NUMBER, start)
-      temp = (JavaInteger.to_s(end_fragment)).to_s
+      temp = RJava.cast_to_string(JavaInteger.to_s(end_fragment))
       buffer.replace(start + max_length - temp.length, start + max_length, temp)
       buffer.append(PREFIX)
       buffer.append(string)
@@ -234,7 +234,7 @@ module Org::Eclipse::Swt::Dnd
           prefix = s.index_of(fox_start)
           if (!(prefix).equal?(-1))
             prefix += fox_start.length
-            s = (s.substring(prefix)).to_s
+            s = RJava.cast_to_string(s.substring(prefix))
           end
           return s
         ensure

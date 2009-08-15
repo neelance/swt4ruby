@@ -120,7 +120,7 @@ module Org::Eclipse::Swt::Awt
           # have been loaded already.
           begin
             System.load_library("jawt")
-          rescue Exception => e
+          rescue JavaThrowable => e
           end
           Library.load_library("swt-awt")
         end
@@ -142,7 +142,7 @@ module Org::Eclipse::Swt::Awt
             if (!(method).nil?)
               method.invoke(clazz, empty_object)
             end
-          rescue Exception => e
+          rescue JavaThrowable => e
           end
         end
       end
@@ -201,7 +201,7 @@ module Org::Eclipse::Swt::Awt
         # long
         handle = parent.attr_handle
         result = Array.typed(Frame).new(1) { nil }
-        exception = Array.typed(Exception).new(1) { nil }
+        exception = Array.typed(JavaThrowable).new(1) { nil }
         runnable = Class.new(Runnable.class == Class ? Runnable : Object) do
           extend LocalClass
           include_class_members SWT_AWT
@@ -217,7 +217,7 @@ module Org::Eclipse::Swt::Awt
               begin
                 class_name = !(self.attr_embedded_frame_class).nil? ? self.attr_embedded_frame_class : "sun.awt.windows.WEmbeddedFrame"
                 clazz = Class.for_name(class_name)
-              rescue Exception => e
+              rescue JavaThrowable => e
                 exception[0] = e
                 return
               end
@@ -228,11 +228,11 @@ module Org::Eclipse::Swt::Awt
                 constructor = clazz.get_constructor(Array.typed(Class).new([Array]))
                 # 64
                 value = constructor.new_instance(Array.typed(Object).new([RJava.cast_to_int(handle)]))
-              rescue Exception => e1
+              rescue JavaThrowable => e1
                 begin
                   constructor = clazz.get_constructor(Array.typed(Class).new([Array]))
                   value = constructor.new_instance(Array.typed(Object).new([Long.new(handle)]))
-                rescue Exception => e2
+                rescue JavaThrowable => e2
                   exception[0] = e2
                   return
                 end
@@ -252,7 +252,7 @@ module Org::Eclipse::Swt::Awt
                 field = clazz.get_declared_field("winGraphicsConfig")
                 field.set_accessible(true)
                 field.set(frame.get_peer, frame.get_graphics_configuration)
-              rescue Exception => e
+              rescue JavaThrowable => e
               end
               result[0] = frame
             ensure
@@ -386,7 +386,7 @@ module Org::Eclipse::Swt::Awt
                 define_method :run do
                   begin
                     frame.dispose
-                  rescue Exception => e_
+                  rescue JavaThrowable => e_
                   end
                 end
                 
@@ -423,7 +423,7 @@ module Org::Eclipse::Swt::Awt
                         if (!(method).nil?)
                           method.invoke(frame, Array.typed(Object).new([Boolean.new(true)]))
                         end
-                      rescue Exception => e_
+                      rescue JavaThrowable => e_
                       end
                     end
                   end
@@ -462,7 +462,7 @@ module Org::Eclipse::Swt::Awt
                         if (!(method).nil?)
                           method.invoke(frame, Array.typed(Object).new([Boolean.new(false)]))
                         end
-                      rescue Exception => e_
+                      rescue JavaThrowable => e_
                       end
                     end
                   end
@@ -561,7 +561,7 @@ module Org::Eclipse::Swt::Awt
         begin
           load_library
           handle = get_awthandle(parent)
-        rescue Exception => e
+        rescue JavaThrowable => e
           SWT.error(SWT::ERROR_NOT_IMPLEMENTED, e)
         end
         if ((handle).equal?(0))

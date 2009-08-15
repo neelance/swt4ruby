@@ -110,7 +110,7 @@ module Org::Eclipse::Swt::Events
     def to_s
       string = super
       # remove trailing '}'
-      return (string.substring(0, string.length - 1)).to_s + " button=" + (@button).to_s + " stateMask=" + (@state_mask).to_s + " x=" + (@x).to_s + " y=" + (@y).to_s + " count=" + (@count).to_s + "}"
+      return RJava.cast_to_string(string.substring(0, string.length - 1)) + " button=" + RJava.cast_to_string(@button) + " stateMask=" + RJava.cast_to_string(@state_mask) + " x=" + RJava.cast_to_string(@x) + " y=" + RJava.cast_to_string(@y) + " count=" + RJava.cast_to_string(@count) + "}"
     end
     
     private

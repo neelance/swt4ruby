@@ -422,7 +422,7 @@ module Org::Eclipse::Swt::Graphics
       end
       elements = Array.typed(::Java::Float).new(6) { 0.0 }
       get_elements(elements)
-      return "Transform {" + (elements[0]).to_s + "," + (elements[1]).to_s + "," + (elements[2]).to_s + "," + (elements[3]).to_s + "," + (elements[4]).to_s + "," + (elements[5]).to_s + "}"
+      return "Transform {" + RJava.cast_to_string(elements[0]) + "," + RJava.cast_to_string(elements[1]) + "," + RJava.cast_to_string(elements[2]) + "," + RJava.cast_to_string(elements[3]) + "," + RJava.cast_to_string(elements[4]) + "," + RJava.cast_to_string(elements[5]) + "}"
     end
     
     private

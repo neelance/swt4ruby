@@ -188,7 +188,7 @@ module Org::Eclipse::Swt::Internal
         when 4
           @signature = SIGNATURE_4
         else
-          @signature = (get_signature(arg_count)).to_s
+          @signature = RJava.cast_to_string(get_signature(arg_count))
         end
       end
       # Bind the address
@@ -228,7 +228,7 @@ module Org::Eclipse::Swt::Internal
         return
       end
       unbind(self)
-      @object = @method = (@signature = (nil).to_s).to_s
+      @object = @method = RJava.cast_to_string(@signature = RJava.cast_to_string(nil))
       @address = 0
     end
     

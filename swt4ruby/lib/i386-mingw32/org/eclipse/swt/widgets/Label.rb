@@ -348,7 +348,7 @@ module Org::Eclipse::Swt::Widgets
     typesig { [] }
     def release_widget
       super
-      @text = (nil).to_s
+      @text = RJava.cast_to_string(nil)
       @image = nil
     end
     
@@ -489,7 +489,7 @@ module Org::Eclipse::Swt::Widgets
           OS._set_window_long(self.attr_handle, OS::GWL_STYLE, new_bits)
         end
       end
-      string = (Display.with_cr_lf(string)).to_s
+      string = RJava.cast_to_string(Display.with_cr_lf(string))
       buffer = TCHAR.new(get_code_page, string, true)
       OS._set_window_text(self.attr_handle, buffer)
       # Bug in Windows.  For some reason, the HBRUSH that

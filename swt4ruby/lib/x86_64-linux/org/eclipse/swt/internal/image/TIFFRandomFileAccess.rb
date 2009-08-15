@@ -67,7 +67,7 @@ module Org::Eclipse::Swt::Internal::Image
       @buffers = nil
       @input_stream = stream
       @start = @current = @next = @input_stream.get_position
-      @buffers = Array.typed(::Java::Byte).new(LIST_SIZE) { 0 }
+      @buffers = Array.typed(Array.typed(::Java::Byte)).new(LIST_SIZE) { nil }
     end
     
     typesig { [::Java::Int] }
@@ -87,7 +87,7 @@ module Org::Eclipse::Swt::Internal::Image
         while (n > 0)
           if (index >= @buffers.attr_length)
             old_buffers = @buffers
-            @buffers = Array.typed(::Java::Byte).new(Math.max(index + 1, old_buffers.attr_length + LIST_SIZE)) { 0 }
+            @buffers = Array.typed(Array.typed(::Java::Byte)).new(Math.max(index + 1, old_buffers.attr_length + LIST_SIZE)) { nil }
             System.arraycopy(old_buffers, 0, @buffers, 0, old_buffers.attr_length)
           end
           if ((@buffers[index]).nil?)
@@ -128,7 +128,7 @@ module Org::Eclipse::Swt::Internal::Image
         while (n_missing > 0)
           if (index >= @buffers.attr_length)
             old_buffers = @buffers
-            @buffers = Array.typed(::Java::Byte).new(Math.max(index, old_buffers.attr_length + LIST_SIZE)) { 0 }
+            @buffers = Array.typed(Array.typed(::Java::Byte)).new(Math.max(index, old_buffers.attr_length + LIST_SIZE)) { nil }
             System.arraycopy(old_buffers, 0, @buffers, 0, old_buffers.attr_length)
           end
           if ((@buffers[index]).nil?)

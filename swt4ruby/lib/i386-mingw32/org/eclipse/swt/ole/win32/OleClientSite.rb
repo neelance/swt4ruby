@@ -368,7 +368,7 @@ module Org::Eclipse::Swt::Ole::Win32
         end
         # Is there an associated CLSID?
         @app_clsid = GUID.new
-        file_name = ((file.get_absolute_path).to_s + "\0").to_char_array
+        file_name = (RJava.cast_to_string(file.get_absolute_path) + "\0").to_char_array
         result = COM._get_class_file(file_name, @app_clsid)
         if (!(result).equal?(COM::S_OK))
           OLE.error(OLE::ERROR_INVALID_CLASSID, result)
@@ -489,7 +489,7 @@ module Org::Eclipse::Swt::Ole::Win32
           OLE.error(OLE::ERROR_INVALID_CLASSID)
         end
         # Are we opening this file with the preferred OLE object?
-        file_name = ((file.get_absolute_path).to_s + "\0").to_char_array
+        file_name = (RJava.cast_to_string(file.get_absolute_path) + "\0").to_char_array
         file_clsid = GUID.new
         COM._get_class_file(file_name, file_clsid)
         if (COM._is_equal_guid(@app_clsid, file_clsid))
@@ -1830,7 +1830,7 @@ module Org::Eclipse::Swt::Ole::Win32
       begin
         # long
         address = Array.typed(::Java::Int).new(1) { 0 }
-        path = ((file.get_absolute_path).to_s + "\0").to_char_array
+        path = (RJava.cast_to_string(file.get_absolute_path) + "\0").to_char_array
         mode = COM::STGM_TRANSACTED | COM::STGM_READWRITE | COM::STGM_SHARE_EXCLUSIVE | COM::STGM_CREATE
         result = COM._stg_create_docfile(path, mode, 0, address) # Does an AddRef if successful
         if (!(result).equal?(COM::S_OK))

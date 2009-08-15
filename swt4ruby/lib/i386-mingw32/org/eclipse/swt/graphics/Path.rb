@@ -674,7 +674,7 @@ module Org::Eclipse::Swt::Graphics
       if (is_disposed)
         return "Path {*DISPOSED*}"
       end
-      return "Path {" + (@handle).to_s + "}"
+      return "Path {" + RJava.cast_to_string(@handle) + "}"
     end
     
     private

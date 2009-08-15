@@ -123,7 +123,7 @@ module Org::Eclipse::Swt::Awt
           # have been loaded already.
           begin
             System.load_library("jawt")
-          rescue Exception => e
+          rescue JavaThrowable => e
           end
           Library.load_library("swt-awt")
         end
@@ -153,7 +153,7 @@ module Org::Eclipse::Swt::Awt
             if (!(method).nil?)
               method.invoke(clazz, empty_object)
             end
-          rescue Exception => e
+          rescue JavaThrowable => e
           end
         end
       end
@@ -218,7 +218,7 @@ module Org::Eclipse::Swt::Awt
         begin
           class_name = !(self.attr_embedded_frame_class).nil? ? self.attr_embedded_frame_class : "sun.awt.X11.XEmbeddedFrame"
           clazz = Class.for_name(class_name)
-        rescue Exception => e
+        rescue JavaThrowable => e
           SWT.error(SWT::ERROR_NOT_IMPLEMENTED, e, " [need JDK 1.5 or greater]")
         end
         initialize_swing
@@ -228,11 +228,11 @@ module Org::Eclipse::Swt::Awt
           constructor = clazz.get_constructor(Array.typed(Class).new([Array, Array]))
           # 64
           value = constructor.new_instance(Array.typed(Object).new([RJava.cast_to_int(handle), Boolean::TRUE]))
-        rescue Exception => e1
+        rescue JavaThrowable => e1
           begin
             constructor = clazz.get_constructor(Array.typed(Class).new([Array, Array]))
             value = constructor.new_instance(Array.typed(Object).new([Long.new(handle), Boolean::TRUE]))
-          rescue Exception => e2
+          rescue JavaThrowable => e2
             SWT.error(SWT::ERROR_NOT_IMPLEMENTED, e2)
           end
         end
@@ -248,7 +248,7 @@ module Org::Eclipse::Swt::Awt
           if (!(method).nil?)
             method.invoke(value, nil)
           end
-        rescue Exception => e
+        rescue JavaThrowable => e
         end
         shell_listener = Class.new(Listener.class == Class ? Listener : Object) do
           extend LocalClass
@@ -451,7 +451,7 @@ module Org::Eclipse::Swt::Awt
         begin
           load_library
           handle = get_awthandle(parent)
-        rescue Exception => e
+        rescue JavaThrowable => e
           SWT.error(SWT::ERROR_NOT_IMPLEMENTED, e)
         end
         if ((handle).equal?(0))

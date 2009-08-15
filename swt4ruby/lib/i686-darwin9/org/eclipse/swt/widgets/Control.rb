@@ -52,7 +52,9 @@ module Org::Eclipse::Swt::Widgets
   # @see <a href="http://www.eclipse.org/swt/">Sample code and further information</a>
   class Control < ControlImports.const_get :Widget
     include_class_members ControlImports
-    include Drawable
+    overload_protected {
+      include Drawable
+    }
     
     # the handle to the OS resource
     # (Warning: This field is platform dependent)
@@ -1038,7 +1040,7 @@ module Org::Eclipse::Swt::Widgets
     end
     
     typesig { [Array.typed(::Java::Float), Array.typed(::Java::Float)] }
-    def equals(color1, color2)
+    def ==(color1, color2)
       if ((color1).equal?(color2))
         return true
       end
@@ -3574,7 +3576,7 @@ module Org::Eclipse::Swt::Widgets
         end
       end
       background = !(color).nil? ? color.attr_handle : nil
-      if (equals(background, @background))
+      if (self.==(background, @background))
         return
       end
       @background = background
@@ -3962,7 +3964,7 @@ module Org::Eclipse::Swt::Widgets
         end
       end
       foreground = !(color).nil? ? color.attr_handle : nil
-      if (equals(foreground, @foreground))
+      if (self.==(foreground, @foreground))
         return
       end
       @foreground = foreground

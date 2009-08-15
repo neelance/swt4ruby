@@ -124,7 +124,7 @@ module Org::Eclipse::Swt
       if ((@throwable).nil?)
         return super
       end
-      return (super).to_s + " (" + (@throwable.to_s).to_s + ")" # $NON-NLS-1$ //$NON-NLS-2$
+      return RJava.cast_to_string(super) + " (" + RJava.cast_to_string(@throwable.to_s) + ")" # $NON-NLS-1$ //$NON-NLS-2$
     end
     
     typesig { [] }

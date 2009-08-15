@@ -246,25 +246,25 @@ module Org::Eclipse::Swt::Dnd
         when DND::ERROR_CANNOT_INIT_DRAG
           msg = DND::INIT_DRAG_MESSAGE
           if (!(hresult).equal?(0))
-            msg += " result = " + (hresult).to_s
+            msg += " result = " + RJava.cast_to_string(hresult)
           end # $NON-NLS-1$
           raise SWTError.new(code, msg)
         when DND::ERROR_CANNOT_INIT_DROP
           msg = DND::INIT_DROP_MESSAGE
           if (!(hresult).equal?(0))
-            msg += " result = " + (hresult).to_s
+            msg += " result = " + RJava.cast_to_string(hresult)
           end # $NON-NLS-1$
           raise SWTError.new(code, msg)
         when DND::ERROR_CANNOT_SET_CLIPBOARD
           msg = DND::CANNOT_SET_CLIPBOARD_MESSAGE
           if (!(hresult).equal?(0))
-            msg += " result = " + (hresult).to_s
+            msg += " result = " + RJava.cast_to_string(hresult)
           end # $NON-NLS-1$
           raise SWTError.new(code, msg)
         when DND::ERROR_INVALID_DATA
           msg = DND::INVALID_DATA_MESSAGE
           if (!(hresult).equal?(0))
-            msg += " result = " + (hresult).to_s
+            msg += " result = " + RJava.cast_to_string(hresult)
           end # $NON-NLS-1$
           raise SWTException.new(code, msg)
         end

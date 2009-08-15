@@ -672,8 +672,8 @@ module Org::Eclipse::Swt::Widgets
         OS.gtk_timeout_remove(@timer_id)
       end
       @timer_id = 0
-      @text = (nil).to_s
-      @message = (nil).to_s
+      @text = RJava.cast_to_string(nil)
+      @message = RJava.cast_to_string(nil)
       @border_polygon = nil
     end
     

@@ -296,7 +296,7 @@ module Org::Eclipse::Swt::Ole::Win32
         if (!(display.get_data(self.attr_hhook)).nil?)
           return
         end
-        callback = Callback.new(OleFrame.class, "getMsgProc", 3) # $NON-NLS-1$
+        callback = Callback.new(OleFrame, "getMsgProc", 3) # $NON-NLS-1$
         # long
         address = callback.get_address
         if ((address).equal?(0))

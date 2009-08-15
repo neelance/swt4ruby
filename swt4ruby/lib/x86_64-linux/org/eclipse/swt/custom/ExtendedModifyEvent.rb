@@ -61,7 +61,7 @@ module Org::Eclipse::Swt::Custom
       super(e)
       @start = e.attr_start
       @length = e.attr_end - e.attr_start
-      @replaced_text = (e.attr_text).to_s
+      @replaced_text = RJava.cast_to_string(e.attr_text)
     end
     
     private

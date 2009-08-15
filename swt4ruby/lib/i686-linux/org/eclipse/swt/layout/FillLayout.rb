@@ -291,18 +291,18 @@ module Org::Eclipse::Swt::Layout
     # 
     # @return a string representation of the layout
     def to_s
-      string = (get_name).to_s + " {"
-      string += "type=" + ((((@type).equal?(SWT::VERTICAL)) ? "SWT.VERTICAL" : "SWT.HORIZONTAL")).to_s + " "
+      string = RJava.cast_to_string(get_name) + " {"
+      string += "type=" + RJava.cast_to_string((((@type).equal?(SWT::VERTICAL)) ? "SWT.VERTICAL" : "SWT.HORIZONTAL")) + " "
       if (!(@margin_width).equal?(0))
-        string += "marginWidth=" + (@margin_width).to_s + " "
+        string += "marginWidth=" + RJava.cast_to_string(@margin_width) + " "
       end
       if (!(@margin_height).equal?(0))
-        string += "marginHeight=" + (@margin_height).to_s + " "
+        string += "marginHeight=" + RJava.cast_to_string(@margin_height) + " "
       end
       if (!(@spacing).equal?(0))
-        string += "spacing=" + (@spacing).to_s + " "
+        string += "spacing=" + RJava.cast_to_string(@spacing) + " "
       end
-      string = (string.trim).to_s
+      string = RJava.cast_to_string(string.trim)
       string += "}"
       return string
     end

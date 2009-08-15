@@ -172,7 +172,7 @@ module Org::Eclipse::Swt::Accessibility
       @is_lightweight = is_lightweight
       AccessibleObjects.put(SwtLONG.new(@handle), self)
       if (DEBUG)
-        System.out.println("new AccessibleObject: " + (@handle).to_s)
+        System.out.println("new AccessibleObject: " + RJava.cast_to_string(@handle))
       end
     end
     
@@ -386,7 +386,7 @@ module Org::Eclipse::Swt::Accessibility
       # int
       def atk_component_get_position(atk_object, x, y, coord_type)
         if (DEBUG)
-          System.out.println("-->atkComponent_get_position, object: " + (atk_object).to_s + " x: " + (x).to_s + " y: " + (y).to_s + " coord: " + (coord_type).to_s)
+          System.out.println("-->atkComponent_get_position, object: " + RJava.cast_to_string(atk_object) + " x: " + RJava.cast_to_string(x) + " y: " + RJava.cast_to_string(y) + " coord: " + RJava.cast_to_string(coord_type))
         end
         object = get_accessible_object(atk_object)
         if ((object).nil?)
@@ -661,7 +661,7 @@ module Org::Eclipse::Swt::Accessibility
       # int
       def atk_object_get_name(atk_object)
         if (DEBUG)
-          System.out.println("-->atkObject_get_name: " + (atk_object).to_s)
+          System.out.println("-->atkObject_get_name: " + RJava.cast_to_string(atk_object))
         end
         object = get_accessible_object(atk_object)
         if ((object).nil?)
@@ -710,7 +710,7 @@ module Org::Eclipse::Swt::Accessibility
       # int
       def atk_object_get_n_children(atk_object)
         if (DEBUG)
-          System.out.println("-->atkObject_get_n_children: " + (atk_object).to_s)
+          System.out.println("-->atkObject_get_n_children: " + RJava.cast_to_string(atk_object))
         end
         object = get_accessible_object(atk_object)
         if ((object).nil?)
@@ -770,7 +770,7 @@ module Org::Eclipse::Swt::Accessibility
       # int
       def atk_object_get_parent(atk_object)
         if (DEBUG)
-          System.out.println("-->atkObject_get_parent: " + (atk_object).to_s)
+          System.out.println("-->atkObject_get_parent: " + RJava.cast_to_string(atk_object))
         end
         object = get_accessible_object(atk_object)
         if ((object).nil?)
@@ -794,7 +794,7 @@ module Org::Eclipse::Swt::Accessibility
       # int
       def atk_object_get_role(atk_object)
         if (DEBUG)
-          System.out.println("-->atkObject_get_role: " + (atk_object).to_s)
+          System.out.println("-->atkObject_get_role: " + RJava.cast_to_string(atk_object))
         end
         object = get_accessible_object(atk_object)
         if ((object).nil?)
@@ -890,7 +890,7 @@ module Org::Eclipse::Swt::Accessibility
       # int
       def atk_object_ref_child(atk_object, index)
         if (DEBUG)
-          System.out.println("-->atkObject_ref_child: " + (index).to_s + " of: " + (atk_object).to_s)
+          System.out.println("-->atkObject_ref_child: " + RJava.cast_to_string(index) + " of: " + RJava.cast_to_string(atk_object))
         end
         object = get_accessible_object(atk_object)
         if ((object).nil?)
@@ -1267,7 +1267,7 @@ module Org::Eclipse::Swt::Accessibility
       # int
       def atk_text_get_text(atk_object, start_offset, end_offset)
         if (DEBUG)
-          System.out.println("-->atkText_get_text: " + (start_offset).to_s + "," + (end_offset).to_s)
+          System.out.println("-->atkText_get_text: " + RJava.cast_to_string(start_offset) + "," + RJava.cast_to_string(end_offset))
         end
         object = get_accessible_object(atk_object)
         if ((object).nil?)
@@ -1283,7 +1283,7 @@ module Org::Eclipse::Swt::Accessibility
           start_offset = Math.min(start_offset, end_offset)
           # 64
           # 64
-          text = (text.substring(RJava.cast_to_int(start_offset), RJava.cast_to_int(end_offset))).to_s
+          text = RJava.cast_to_string(text.substring(RJava.cast_to_int(start_offset), RJava.cast_to_int(end_offset)))
           bytes = Converter.wcs_to_mbcs(nil, text, true)
           # int
           result = OS.g_malloc(bytes.attr_length)
@@ -1461,7 +1461,7 @@ module Org::Eclipse::Swt::Accessibility
           end
           OS.memmove(start_offset, Array.typed(::Java::Int).new([start_bounds]), 4)
           OS.memmove(end_offset, Array.typed(::Java::Int).new([end_bounds]), 4)
-          text = (text.substring(start_bounds, end_bounds)).to_s
+          text = RJava.cast_to_string(text.substring(start_bounds, end_bounds))
           bytes = Converter.wcs_to_mbcs(nil, text, true)
           # int
           result = OS.g_malloc(bytes.attr_length)
@@ -1480,7 +1480,7 @@ module Org::Eclipse::Swt::Accessibility
       # int
       def atk_text_get_text_at_offset(atk_object, offset_value, boundary_type, start_offset, end_offset)
         if (DEBUG)
-          System.out.println("-->atkText_get_text_at_offset: " + (offset_value).to_s + " start: " + (start_offset).to_s + " end: " + (end_offset).to_s)
+          System.out.println("-->atkText_get_text_at_offset: " + RJava.cast_to_string(offset_value) + " start: " + RJava.cast_to_string(start_offset) + " end: " + RJava.cast_to_string(end_offset))
         end
         object = get_accessible_object(atk_object)
         if ((object).nil?)
@@ -1584,7 +1584,7 @@ module Org::Eclipse::Swt::Accessibility
           end
           OS.memmove(start_offset, Array.typed(::Java::Int).new([start_bounds]), 4)
           OS.memmove(end_offset, Array.typed(::Java::Int).new([end_bounds]), 4)
-          text = (text.substring(start_bounds, end_bounds)).to_s
+          text = RJava.cast_to_string(text.substring(start_bounds, end_bounds))
           bytes = Converter.wcs_to_mbcs(nil, text, true)
           # int
           result = OS.g_malloc(bytes.attr_length)
@@ -1711,7 +1711,7 @@ module Org::Eclipse::Swt::Accessibility
           end
           OS.memmove(start_offset, Array.typed(::Java::Int).new([start_bounds]), 4)
           OS.memmove(end_offset, Array.typed(::Java::Int).new([end_bounds]), 4)
-          text = (text.substring(start_bounds, end_bounds)).to_s
+          text = RJava.cast_to_string(text.substring(start_bounds, end_bounds))
           bytes = Converter.wcs_to_mbcs(nil, text, true)
           # int
           result = OS.g_malloc(bytes.attr_length)
@@ -1802,7 +1802,7 @@ module Org::Eclipse::Swt::Accessibility
             length_ = OS.strlen(parent_result)
             buffer = Array.typed(::Java::Byte).new(length_) { 0 }
             OS.memmove(buffer, parent_result, length_)
-            parent_text = (String.new(Converter.mbcs_to_wcs(nil, buffer))).to_s
+            parent_text = RJava.cast_to_string(String.new(Converter.mbcs_to_wcs(nil, buffer)))
           end
         end
       end
@@ -1885,7 +1885,7 @@ module Org::Eclipse::Swt::Accessibility
         if (start_index < 0)
           return result
         end
-        string = (string.substring(0, start_index)).to_s
+        string = RJava.cast_to_string(string.substring(0, start_index))
         i = 0
         while i < search_chars.length
           current = search_chars.char_at(i)
@@ -1918,7 +1918,7 @@ module Org::Eclipse::Swt::Accessibility
     typesig { [] }
     def release
       if (DEBUG)
-        System.out.println("AccessibleObject.release: " + (@handle).to_s)
+        System.out.println("AccessibleObject.release: " + RJava.cast_to_string(@handle))
       end
       @accessible = nil
       elements_ = @children.elements

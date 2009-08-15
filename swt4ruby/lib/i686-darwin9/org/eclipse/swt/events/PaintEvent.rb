@@ -111,7 +111,7 @@ module Org::Eclipse::Swt::Events
     def to_s
       string = super
       # remove trailing '}'
-      return (string.substring(0, string.length - 1)).to_s + " gc=" + (@gc).to_s + " x=" + (@x).to_s + " y=" + (@y).to_s + " width=" + (@width).to_s + " height=" + (@height).to_s + " count=" + (@count).to_s + "}"
+      return RJava.cast_to_string(string.substring(0, string.length - 1)) + " gc=" + RJava.cast_to_string(@gc) + " x=" + RJava.cast_to_string(@x) + " y=" + RJava.cast_to_string(@y) + " width=" + RJava.cast_to_string(@width) + " height=" + RJava.cast_to_string(@height) + " count=" + RJava.cast_to_string(@count) + "}"
     end
     
     private

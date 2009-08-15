@@ -427,7 +427,7 @@ module Org::Eclipse::Swt::Widgets
       y = cell_size.attr_y * 7
       gc.fill_rectangle(0, y, client.attr_width, cell_size.attr_y)
       gc.draw_line(0, y - 1, client.attr_width, y - 1)
-      str = (@format_symbols.get_short_months[@calendar.get(Calendar::MONTH)]).to_s + ", " + (@calendar.get(Calendar::YEAR)).to_s
+      str = RJava.cast_to_string(@format_symbols.get_short_months[@calendar.get(Calendar::MONTH)]) + ", " + RJava.cast_to_string(@calendar.get(Calendar::YEAR))
       extent = gc.string_extent(str)
       gc.draw_string(str, (cell_size.attr_x * 7 - extent.attr_x) / 2, y + (cell_size.attr_y - extent.attr_y) / 2, true)
     end
@@ -693,7 +693,7 @@ module Org::Eclipse::Swt::Widgets
     
     typesig { [] }
     def get_name_text
-      return !((self.attr_style & SWT::TIME)).equal?(0) ? (get_hours).to_s + ":" + (get_minutes).to_s + ":" + (get_seconds).to_s : ((get_month + 1)).to_s + "/" + (get_day).to_s + "/" + (get_year).to_s
+      return !((self.attr_style & SWT::TIME)).equal?(0) ? RJava.cast_to_string(get_hours) + ":" + RJava.cast_to_string(get_minutes) + ":" + RJava.cast_to_string(get_seconds) : RJava.cast_to_string((get_month + 1)) + "/" + RJava.cast_to_string(get_day) + "/" + RJava.cast_to_string(get_year)
     end
     
     typesig { [] }

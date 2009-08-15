@@ -97,7 +97,7 @@ module Org::Eclipse::Swt::Custom
       @segments = nil
       super(e)
       @line_offset = e.attr_detail
-      @line_text = (e.attr_text).to_s
+      @line_text = RJava.cast_to_string(e.attr_text)
     end
     
     private

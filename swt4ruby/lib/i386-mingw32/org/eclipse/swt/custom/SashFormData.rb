@@ -41,7 +41,7 @@ module Org::Eclipse::Swt::Custom
     # 
     # @return a string representation of the event
     def to_s
-      return (get_name).to_s + " {weight=" + (@weight).to_s + "}" # $NON-NLS-2$
+      return RJava.cast_to_string(get_name) + " {weight=" + RJava.cast_to_string(@weight) + "}" # $NON-NLS-2$
     end
     
     typesig { [] }

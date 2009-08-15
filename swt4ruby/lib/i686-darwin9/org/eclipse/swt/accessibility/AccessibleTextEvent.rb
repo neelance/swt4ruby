@@ -80,7 +80,7 @@ module Org::Eclipse::Swt::Accessibility
       # $NON-NLS-1$
       # $NON-NLS-1$
       # $NON-NLS-1$
-      return "AccessibleTextEvent {childID=" + (@child_id).to_s + " offset=" + (@offset).to_s + " length=" + (@length).to_s + "}" # $NON-NLS-1$
+      return "AccessibleTextEvent {childID=" + RJava.cast_to_string(@child_id) + " offset=" + RJava.cast_to_string(@offset) + " length=" + RJava.cast_to_string(@length) + "}" # $NON-NLS-1$
     end
     
     private

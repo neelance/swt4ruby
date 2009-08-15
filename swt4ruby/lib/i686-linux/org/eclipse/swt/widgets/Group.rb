@@ -279,7 +279,7 @@ module Org::Eclipse::Swt::Widgets
       if (!(@label_handle).equal?(0))
         OS.g_object_unref(@label_handle)
       end
-      @text = (nil).to_s
+      @text = RJava.cast_to_string(nil)
     end
     
     typesig { [GdkColor] }

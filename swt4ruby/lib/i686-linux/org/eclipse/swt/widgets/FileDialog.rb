@@ -167,7 +167,7 @@ module Org::Eclipse::Swt::Widgets
     typesig { [] }
     def compute_result_chooser_dialog
       # MULTI is only valid if the native dialog's action is Open
-      @full_path = (nil).to_s
+      @full_path = RJava.cast_to_string(nil)
       if (((self.attr_style & (SWT::SAVE | SWT::MULTI))).equal?(SWT::MULTI))
         # long
         list = OS.gtk_file_chooser_get_filenames(@handle)
@@ -196,7 +196,7 @@ module Org::Eclipse::Swt::Widgets
               chars = CharArray.new(clength)
               OS.memmove(chars, utf16ptr, clength * 2)
               OS.g_free(utf16ptr)
-              @full_path = (String.new(chars)).to_s
+              @full_path = RJava.cast_to_string(String.new(chars))
               @file_names[((write_pos += 1) - 1)] = @full_path.substring(@full_path.last_index_of(SEPARATOR) + 1)
             end
           end
@@ -229,7 +229,7 @@ module Org::Eclipse::Swt::Widgets
               chars = CharArray.new(clength)
               OS.memmove(chars, utf16ptr, clength * 2)
               OS.g_free(utf16ptr)
-              @full_path = (String.new(chars)).to_s
+              @full_path = RJava.cast_to_string(String.new(chars))
               @file_names = Array.typed(String).new(1) { nil }
               @file_names[0] = @full_path.substring(@full_path.last_index_of(SEPARATOR) + 1)
             end
@@ -267,8 +267,8 @@ module Org::Eclipse::Swt::Widgets
       end
       if (!(@full_path).nil?)
         separator_index = @full_path.last_index_of(SEPARATOR)
-        @file_name = (@full_path.substring(separator_index + 1)).to_s
-        @filter_path = (@full_path.substring(0, separator_index)).to_s
+        @file_name = RJava.cast_to_string(@full_path.substring(separator_index + 1))
+        @filter_path = RJava.cast_to_string(@full_path.substring(0, separator_index))
       end
       return @full_path
     end
@@ -351,8 +351,8 @@ module Org::Eclipse::Swt::Widgets
         return nil
       end
       answer = @full_path = os_answer
-      @file_name = (@full_path.substring(separator_index + 1)).to_s
-      @filter_path = (@full_path.substring(0, separator_index)).to_s
+      @file_name = RJava.cast_to_string(@full_path.substring(separator_index + 1))
+      @filter_path = RJava.cast_to_string(@full_path.substring(0, separator_index))
       if (((self.attr_style & SWT::MULTI)).equal?(0))
         @file_names = Array.typed(String).new([@file_name])
       else
@@ -531,7 +531,7 @@ module Org::Eclipse::Swt::Widgets
         display.set_modal_dialog(old_modal)
       end
       if ((response).equal?(OS::GTK_RESPONSE_OK))
-        answer = (compute_result_chooser_dialog).to_s
+        answer = RJava.cast_to_string(compute_result_chooser_dialog)
       end
       display.remove_idle_proc
       OS.gtk_widget_destroy(@handle)
@@ -577,7 +577,7 @@ module Org::Eclipse::Swt::Widgets
         display.set_modal_dialog(old_modal)
       end
       if ((response).equal?(OS::GTK_RESPONSE_OK))
-        answer = (compute_result_classic_dialog).to_s
+        answer = RJava.cast_to_string(compute_result_classic_dialog)
       end
       display.remove_idle_proc
       OS.gtk_widget_destroy(@handle)
@@ -701,7 +701,7 @@ module Org::Eclipse::Swt::Widgets
       if (!(initial_filter).equal?(0))
         OS.gtk_file_chooser_set_filter(@handle, initial_filter)
       end
-      @full_path = (nil).to_s
+      @full_path = RJava.cast_to_string(nil)
       @file_names = Array.typed(String).new(0) { nil }
     end
     
@@ -725,7 +725,7 @@ module Org::Eclipse::Swt::Widgets
       else
         string_buffer.append(@file_name)
       end
-      @full_path = (string_buffer.to_s).to_s
+      @full_path = RJava.cast_to_string(string_buffer.to_s)
       length_ = @full_path.length
       buffer = CharArray.new(length_ + 1)
       @full_path.get_chars(0, length_, buffer, 0)
@@ -742,7 +742,7 @@ module Org::Eclipse::Swt::Widgets
       if ((@filter_extensions).nil?)
         @filter_extensions = Array.typed(String).new(0) { nil }
       end
-      @full_path = (nil).to_s
+      @full_path = RJava.cast_to_string(nil)
       @file_names = Array.typed(String).new(0) { nil }
     end
     

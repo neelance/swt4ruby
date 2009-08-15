@@ -473,7 +473,7 @@ module Org::Eclipse::Swt::Internal::Image
       src_height = image.attr_height
       vh_factor = @max_v * @max_h
       frame_component = nil
-      @image_components = Array.typed(::Java::Byte).new(@n_components) { 0 }
+      @image_components = Array.typed(Array.typed(::Java::Byte)).new(@n_components) { nil }
       i = 0
       while i < @n_components
         frame_component = @frame_components[@component_ids[i]]
@@ -1622,7 +1622,7 @@ module Org::Eclipse::Swt::Internal::Image
       dqt = JPEGQuantizationTable.new(self.attr_input_stream)
       current_tables = @quantization_tables
       if ((current_tables).nil?)
-        current_tables = Array.typed(::Java::Int).new(4) { 0 }
+        current_tables = Array.typed(Array.typed(::Java::Int)).new(4) { nil }
       end
       dqt_tables_keys = dqt.get_quantization_tables_keys
       dqt_tables_values = dqt.get_quantization_tables_values
@@ -1815,7 +1815,7 @@ module Org::Eclipse::Swt::Internal::Image
         soi = JPEGStartOfImage.new(stream)
         stream.unread(soi.attr_reference)
         return soi.verify # we no longer check for appN
-      rescue Exception => e
+      rescue JavaException => e
         return false
       end
     end
@@ -1861,10 +1861,10 @@ module Org::Eclipse::Swt::Internal::Image
       @n_components = @frame_header.get_number_of_image_components
       @frame_components = @frame_header.attr_component_parameters
       @component_ids = @frame_header.attr_component_identifiers
-      @image_components = Array.typed(::Java::Byte).new(@n_components) { 0 }
+      @image_components = Array.typed(Array.typed(::Java::Byte)).new(@n_components) { nil }
       if (@progressive)
         # Progressive jpeg: need to keep all of the data units.
-        @data_units = Array.typed(::Java::Int).new(@n_components) { 0 }
+        @data_units = Array.typed(Array.typed(Array.typed(::Java::Int))).new(@n_components) { nil }
       else
         # Sequential jpeg: only need one data unit.
         @data_unit = Array.typed(::Java::Int).new(8 * 8) { 0 }
@@ -1875,7 +1875,7 @@ module Org::Eclipse::Swt::Internal::Image
         buffer_size = frame_component[CW] * frame_component[CH]
         @image_components[i] = Array.typed(::Java::Byte).new(buffer_size) { 0 }
         if (@progressive)
-          @data_units[i] = Array.typed(::Java::Int).new(buffer_size) { 0 }
+          @data_units[i] = Array.typed(Array.typed(::Java::Int)).new(buffer_size) { nil }
         end
         i += 1
       end
@@ -2213,7 +2213,7 @@ module Org::Eclipse::Swt::Internal::Image
           end
           delta = jpeg_segment.get_segment_length - 2
           byte_stream.skip(delta)
-        rescue Exception => e
+        rescue JavaException => e
           SWT.error(SWT::ERROR_IO, e)
         end
       end
@@ -2257,7 +2257,7 @@ module Org::Eclipse::Swt::Internal::Image
       if (!appn.write_to_stream(self.attr_output_stream))
         SWT.error(SWT::ERROR_IO)
       end
-      @quantization_tables = Array.typed(::Java::Int).new(4) { 0 }
+      @quantization_tables = Array.typed(Array.typed(::Java::Int)).new(4) { nil }
       chrom_dqt = JPEGQuantizationTable.default_chrominance_table
       chrom_dqt.scale_by(@encoder_qfactor)
       jpeg_dqtkeys = chrom_dqt.get_quantization_tables_keys
@@ -2289,20 +2289,20 @@ module Org::Eclipse::Swt::Internal::Image
       scan_params = nil
       if ((image.attr_depth).equal?(1))
         frame_length = 11
-        frame_params = Array.typed(::Java::Int).new(1) { 0 }
+        frame_params = Array.typed(Array.typed(::Java::Int)).new(1) { nil }
         frame_params[0] = Array.typed(::Java::Int).new([1, 1, 1, 0, 0])
-        scan_params = Array.typed(::Java::Int).new(1) { 0 }
+        scan_params = Array.typed(Array.typed(::Java::Int)).new(1) { nil }
         scan_params[0] = Array.typed(::Java::Int).new([0, 0])
         scan_length = 8
         @n_components = 1
         precision = 1
       else
         frame_length = 17
-        frame_params = Array.typed(::Java::Int).new(3) { 0 }
+        frame_params = Array.typed(Array.typed(::Java::Int)).new(3) { nil }
         frame_params[0] = Array.typed(::Java::Int).new([0, 2, 2, 0, 0])
         frame_params[1] = Array.typed(::Java::Int).new([1, 1, 1, 0, 0])
         frame_params[2] = Array.typed(::Java::Int).new([1, 1, 1, 0, 0])
-        scan_params = Array.typed(::Java::Int).new(3) { 0 }
+        scan_params = Array.typed(Array.typed(::Java::Int)).new(3) { nil }
         scan_params[0] = Array.typed(::Java::Int).new([0, 0])
         scan_params[1] = Array.typed(::Java::Int).new([1, 1])
         scan_params[2] = Array.typed(::Java::Int).new([1, 1])

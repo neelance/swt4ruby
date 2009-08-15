@@ -1055,11 +1055,11 @@ module Org::Eclipse::Swt::Custom
             segment_index = text.index_of(StyledTextPrintOptions::SEPARATOR, last_segment_index)
             segment = nil
             if ((segment_index).equal?(-1))
-              segment = (text.substring(last_segment_index)).to_s
+              segment = RJava.cast_to_string(text.substring(last_segment_index))
               print_decoration_segment(segment, i, page, header, layout)
               break
             else
-              segment = (text.substring(last_segment_index, segment_index)).to_s
+              segment = RJava.cast_to_string(text.substring(last_segment_index, segment_index))
               print_decoration_segment(segment, i, page, header, layout)
               last_segment_index = segment_index + StyledTextPrintOptions::SEPARATOR.length
             end
@@ -1083,7 +1083,7 @@ module Org::Eclipse::Swt::Custom
             buffer = StringBuffer.new(segment.substring(0, page_index))
             buffer.append(page)
             buffer.append(segment.substring(page_index + page_tag_length))
-            segment = (buffer.to_s).to_s
+            segment = RJava.cast_to_string(buffer.to_s)
           end
           if (segment.length > 0)
             layout.set_text(segment)
@@ -1293,7 +1293,7 @@ module Org::Eclipse::Swt::Custom
           if (os_name.starts_with(win_nt) && !(os_version).nil?)
             major_index = os_version.index_of(Character.new(?..ord))
             if (!(major_index).equal?(-1))
-              os_version = (os_version.substring(0, major_index)).to_s
+              os_version = RJava.cast_to_string(os_version.substring(0, major_index))
               begin
                 major_version = JavaInteger.parse_int(os_version)
               rescue NumberFormatException => exception
@@ -1358,7 +1358,7 @@ module Org::Eclipse::Swt::Custom
           # systems that don't support Unicode RTF.
           cpg = System.get_property("file.encoding").to_lower_case
           if (cpg.starts_with("cp") || cpg.starts_with("ms"))
-            cpg = (cpg.substring(2, cpg.length)).to_s
+            cpg = RJava.cast_to_string(cpg.substring(2, cpg.length))
             header.append("\\ansicpg")
             header.append(cpg)
           end
@@ -5664,11 +5664,11 @@ module Org::Eclipse::Swt::Custom
         new_offset = offset
         line_index = @content.get_line_count - 1
         line_offset = @content.get_offset_at_line(line_index)
-        line_text = (@content.get_line(line_index)).to_s
+        line_text = RJava.cast_to_string(@content.get_line(line_index))
       else
         line_index = @content.get_line_at_offset(offset)
         line_offset = @content.get_offset_at_line(line_index)
-        line_text = (@content.get_line(line_index)).to_s
+        line_text = RJava.cast_to_string(@content.get_line(line_index))
         line_length = line_text.length
         if ((offset).equal?(line_offset + line_length))
           new_offset = @content.get_offset_at_line(line_index + 1)
@@ -5690,11 +5690,11 @@ module Org::Eclipse::Swt::Custom
         new_offset = 0
         line_index = @content.get_line_at_offset(new_offset)
         line_offset = @content.get_offset_at_line(line_index)
-        line_text = (@content.get_line(line_index)).to_s
+        line_text = RJava.cast_to_string(@content.get_line(line_index))
       else
         line_index = @content.get_line_at_offset(offset)
         line_offset = @content.get_offset_at_line(line_index)
-        line_text = (@content.get_line(line_index)).to_s
+        line_text = RJava.cast_to_string(@content.get_line(line_index))
         if ((offset).equal?(line_offset))
           next_line_text = @content.get_line(line_index - 1)
           next_line_offset = @content.get_offset_at_line(line_index - 1)
@@ -6562,7 +6562,7 @@ module Org::Eclipse::Swt::Custom
           name = nil
           label = get_associated_label
           if (!(label).nil?)
-            name = (strip_mnemonic(label.get_text)).to_s
+            name = RJava.cast_to_string(strip_mnemonic(label.get_text))
           end
           e.attr_result = name
         end
@@ -6581,7 +6581,7 @@ module Org::Eclipse::Swt::Custom
             if (!(text).nil?)
               mnemonic = __find_mnemonic(text)
               if (!(mnemonic).equal?(Character.new(?\0.ord)))
-                shortcut = "Alt+" + (mnemonic).to_s # $NON-NLS-1$
+                shortcut = "Alt+" + RJava.cast_to_string(mnemonic) # $NON-NLS-1$
               end
             end
           end

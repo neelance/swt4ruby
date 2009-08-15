@@ -228,7 +228,7 @@ module Org::Eclipse::Swt::Browser
     def to_s
       string = super
       # remove trailing '}'
-      return (string.substring(0, string.length - 1)).to_s + " required=" + (@required).to_s + " browser=" + (@browser).to_s + " location=" + (@location).to_s + " size=" + (@size).to_s + " addressBar=" + (@address_bar).to_s + " menuBar=" + (@menu_bar).to_s + " statusBar=" + (@status_bar).to_s + " toolBar=" + (@tool_bar).to_s + "}"
+      return RJava.cast_to_string(string.substring(0, string.length - 1)) + " required=" + RJava.cast_to_string(@required) + " browser=" + RJava.cast_to_string(@browser) + " location=" + RJava.cast_to_string(@location) + " size=" + RJava.cast_to_string(@size) + " addressBar=" + RJava.cast_to_string(@address_bar) + " menuBar=" + RJava.cast_to_string(@menu_bar) + " statusBar=" + RJava.cast_to_string(@status_bar) + " toolBar=" + RJava.cast_to_string(@tool_bar) + "}"
     end
     
     private

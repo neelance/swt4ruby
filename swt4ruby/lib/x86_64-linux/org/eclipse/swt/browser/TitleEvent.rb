@@ -54,7 +54,7 @@ module Org::Eclipse::Swt::Browser
     def to_s
       string = super
       # remove trailing '}'
-      return (string.substring(0, string.length - 1)).to_s + " title=" + @title + "}"
+      return RJava.cast_to_string(string.substring(0, string.length - 1)) + " title=" + @title + "}"
     end
     
     private

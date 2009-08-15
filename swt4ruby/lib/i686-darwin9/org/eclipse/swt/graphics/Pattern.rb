@@ -420,7 +420,7 @@ module Org::Eclipse::Swt::Graphics
       if (is_disposed)
         return "Pattern {*DISPOSED*}"
       end
-      return "Pattern {" + (@jni_ref).to_s + "}"
+      return "Pattern {" + RJava.cast_to_string(@jni_ref) + "}"
     end
     
     private

@@ -473,7 +473,7 @@ module Org::Eclipse::Swt::Dnd
     typesig { [] }
     def check_subclass
       name = get_class.get_name
-      valid_name = DragSource.class.get_name
+      valid_name = DragSource.get_name
       if (!(valid_name == name))
         DND.error(SWT::ERROR_INVALID_SUBCLASS)
       end

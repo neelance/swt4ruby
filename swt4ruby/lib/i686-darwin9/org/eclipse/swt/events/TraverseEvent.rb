@@ -137,7 +137,7 @@ module Org::Eclipse::Swt::Events
     def to_s
       string = super
       # remove trailing '}'
-      return (string.substring(0, string.length - 1)).to_s + " detail=" + (@detail).to_s + "}"
+      return RJava.cast_to_string(string.substring(0, string.length - 1)) + " detail=" + RJava.cast_to_string(@detail) + "}"
     end
     
     private

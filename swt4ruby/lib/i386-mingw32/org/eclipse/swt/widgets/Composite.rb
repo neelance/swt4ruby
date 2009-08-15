@@ -1272,7 +1272,7 @@ module Org::Eclipse::Swt::Widgets
         # 64
         tool_tip = shell.find_tool_tip(RJava.cast_to_int(hdr.attr_id_from))
         if (!(tool_tip).nil?)
-          string = (tool_tip.attr_message).to_s
+          string = RJava.cast_to_string(tool_tip.attr_message)
           if ((string).nil? || (string.length).equal?(0))
             string = " "
           end
@@ -2069,7 +2069,7 @@ module Org::Eclipse::Swt::Widgets
             string = tool_tip_text(lpnmtdi)
             if (!(string).nil?)
               shell = get_shell
-              string = (Display.with_cr_lf(string)).to_s
+              string = RJava.cast_to_string(Display.with_cr_lf(string))
               chars = fix_mnemonic(string)
               # Ensure that the orientation of the tool tip matches
               # the orientation of the control.

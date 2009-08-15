@@ -45,7 +45,9 @@ module Org::Eclipse::Swt::Widgets
   # @see <a href="http://www.eclipse.org/swt/">Sample code and further information</a>
   class Control < ControlImports.const_get :Widget
     include_class_members ControlImports
-    include Drawable
+    overload_protected {
+      include Drawable
+    }
     
     # int
     attr_accessor :fixed_handle
@@ -2329,7 +2331,7 @@ module Org::Eclipse::Swt::Widgets
           else
             begin
               JavaThread.sleep(50)
-            rescue Exception => ex
+            rescue JavaException => ex
             end
           end
         end
@@ -3841,7 +3843,7 @@ module Org::Eclipse::Swt::Widgets
       end
       @menu = nil
       @cursor = nil
-      @tool_tip_text = (nil).to_s
+      @tool_tip_text = RJava.cast_to_string(nil)
       @layout_data = nil
       @accessible = nil
       @region = nil

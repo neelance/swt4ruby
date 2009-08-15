@@ -161,7 +161,7 @@ module Org::Eclipse::Swt::Opengl
     # 
     # @return a string representation of the data
     def to_s
-      return ((@double_buffer ? "doubleBuffer," : "") + (@stereo ? "stereo," : "")).to_s + "r:" + (@red_size).to_s + " g:" + (@green_size).to_s + " b:" + (@blue_size).to_s + " a:" + (@alpha_size).to_s + "," + "depth:" + (@depth_size).to_s + ",stencil:" + (@stencil_size).to_s + ",accum r:" + (@accum_red_size).to_s + "g:" + (@accum_green_size).to_s + "b:" + (@accum_blue_size).to_s + "a:" + (@accum_alpha_size).to_s + ",sampleBuffers:" + (@sample_buffers).to_s + ",samples:" + (@samples).to_s
+      return RJava.cast_to_string((@double_buffer ? "doubleBuffer," : "") + (@stereo ? "stereo," : "")) + "r:" + RJava.cast_to_string(@red_size) + " g:" + RJava.cast_to_string(@green_size) + " b:" + RJava.cast_to_string(@blue_size) + " a:" + RJava.cast_to_string(@alpha_size) + "," + "depth:" + RJava.cast_to_string(@depth_size) + ",stencil:" + RJava.cast_to_string(@stencil_size) + ",accum r:" + RJava.cast_to_string(@accum_red_size) + "g:" + RJava.cast_to_string(@accum_green_size) + "b:" + RJava.cast_to_string(@accum_blue_size) + "a:" + RJava.cast_to_string(@accum_alpha_size) + ",sampleBuffers:" + RJava.cast_to_string(@sample_buffers) + ",samples:" + RJava.cast_to_string(@samples)
     end
     
     typesig { [] }

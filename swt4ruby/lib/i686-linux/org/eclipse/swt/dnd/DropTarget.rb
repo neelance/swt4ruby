@@ -216,19 +216,19 @@ module Org::Eclipse::Swt::Dnd
       alias_method :attr_drag_drop=, :drag_drop=
       
       when_class_loaded do
-        self.attr_drag_motion = Callback.new(DropTarget.class, "Drag_Motion", 5) # $NON-NLS-1$
+        self.attr_drag_motion = Callback.new(DropTarget, "Drag_Motion", 5) # $NON-NLS-1$
         if ((self.attr_drag_motion.get_address).equal?(0))
           SWT.error(SWT::ERROR_NO_MORE_CALLBACKS)
         end
-        self.attr_drag_leave = Callback.new(DropTarget.class, "Drag_Leave", 3) # $NON-NLS-1$
+        self.attr_drag_leave = Callback.new(DropTarget, "Drag_Leave", 3) # $NON-NLS-1$
         if ((self.attr_drag_leave.get_address).equal?(0))
           SWT.error(SWT::ERROR_NO_MORE_CALLBACKS)
         end
-        self.attr_drag_data_received = Callback.new(DropTarget.class, "Drag_Data_Received", 7) # $NON-NLS-1$
+        self.attr_drag_data_received = Callback.new(DropTarget, "Drag_Data_Received", 7) # $NON-NLS-1$
         if ((self.attr_drag_data_received.get_address).equal?(0))
           SWT.error(SWT::ERROR_NO_MORE_CALLBACKS)
         end
-        self.attr_drag_drop = Callback.new(DropTarget.class, "Drag_Drop", 5) # $NON-NLS-1$
+        self.attr_drag_drop = Callback.new(DropTarget, "Drag_Drop", 5) # $NON-NLS-1$
         if ((self.attr_drag_drop.get_address).equal?(0))
           SWT.error(SWT::ERROR_NO_MORE_CALLBACKS)
         end
@@ -562,7 +562,7 @@ module Org::Eclipse::Swt::Dnd
     typesig { [] }
     def check_subclass
       name = get_class.get_name
-      valid_name = DropTarget.class.get_name
+      valid_name = DropTarget.get_name
       if (!(valid_name == name))
         DND.error(SWT::ERROR_INVALID_SUBCLASS)
       end

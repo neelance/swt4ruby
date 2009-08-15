@@ -653,19 +653,19 @@ module Org::Eclipse::Swt::Ole::Win32
           size = COM._sys_string_byte_len(excep_info.attr_bstr_description)
           buffer = CharArray.new((size + 1) / 2)
           COM._move_memory(buffer, excep_info.attr_bstr_description, size)
-          @exception_description = (String.new(buffer)).to_s
+          @exception_description = RJava.cast_to_string(String.new(buffer))
         else
           @exception_description = "OLE Automation Error Exception " # $NON-NLS-1$
           if (!(excep_info.attr_w_code).equal?(0))
-            @exception_description += "code = " + (excep_info.attr_w_code).to_s # $NON-NLS-1$
+            @exception_description += "code = " + RJava.cast_to_string(excep_info.attr_w_code) # $NON-NLS-1$
           else
             if (!(excep_info.attr_scode).equal?(0))
-              @exception_description += "code = " + (excep_info.attr_scode).to_s # $NON-NLS-1$
+              @exception_description += "code = " + RJava.cast_to_string(excep_info.attr_scode) # $NON-NLS-1$
             end
           end
         end
       else
-        @exception_description = "OLE Automation Error HResult : " + (h_result).to_s # $NON-NLS-1$
+        @exception_description = "OLE Automation Error HResult : " + RJava.cast_to_string(h_result) # $NON-NLS-1$
       end
       # cleanup EXCEPINFO struct
       if (!(excep_info.attr_bstr_description).equal?(0))

@@ -775,7 +775,7 @@ module Org::Eclipse::Swt::Widgets
     
     typesig { [] }
     def get_name_text
-      return !((self.attr_style & SWT::TIME)).equal?(0) ? (get_hours).to_s + ":" + (get_minutes).to_s + ":" + (get_seconds).to_s : ((get_month + 1)).to_s + "/" + (get_day).to_s + "/" + (get_year).to_s
+      return !((self.attr_style & SWT::TIME)).equal?(0) ? RJava.cast_to_string(get_hours) + ":" + RJava.cast_to_string(get_minutes) + ":" + RJava.cast_to_string(get_seconds) : RJava.cast_to_string((get_month + 1)) + "/" + RJava.cast_to_string(get_day) + "/" + RJava.cast_to_string(get_year)
     end
     
     typesig { [] }

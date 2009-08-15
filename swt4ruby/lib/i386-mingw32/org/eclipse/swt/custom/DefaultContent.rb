@@ -116,7 +116,7 @@ module Org::Eclipse::Swt::Custom
       @gap_line = -1
       @high_watermark = 300
       @low_watermark = 50
-      @lines = Array.typed(::Java::Int).new(50) { Array.typed(::Java::Int).new(2) { 0 } }
+      @lines = Array.typed(Array.typed(::Java::Int)).new(50) { Array.typed(::Java::Int).new(2) { 0 } }
       @line_count = 0
       @expand_exp = 1
       @replace_expand_exp = 1
@@ -134,7 +134,7 @@ module Org::Eclipse::Swt::Custom
       size = @lines.attr_length
       if ((@line_count).equal?(size))
         # expand the lines by powers of 2
-        new_lines = Array.typed(::Java::Int).new(size + Compatibility.pow2(@expand_exp)) { Array.typed(::Java::Int).new(2) { 0 } }
+        new_lines = Array.typed(Array.typed(::Java::Int)).new(size + Compatibility.pow2(@expand_exp)) { Array.typed(::Java::Int).new(2) { 0 } }
         System.arraycopy(@lines, 0, new_lines, 0, size)
         @lines = new_lines
         @expand_exp += 1
@@ -158,7 +158,7 @@ module Org::Eclipse::Swt::Custom
       size = lines_array.attr_length
       new_lines = lines_array
       if ((count).equal?(size))
-        new_lines = Array.typed(::Java::Int).new(size + Compatibility.pow2(@replace_expand_exp)) { Array.typed(::Java::Int).new(2) { 0 } }
+        new_lines = Array.typed(Array.typed(::Java::Int)).new(size + Compatibility.pow2(@replace_expand_exp)) { Array.typed(::Java::Int).new(2) { 0 } }
         @replace_expand_exp += 1
         System.arraycopy(lines_array, 0, new_lines, 0, size)
       end
@@ -324,7 +324,7 @@ module Org::Eclipse::Swt::Custom
     # @return a line indexes array where each line is identified by a start offset and
     # a length
     def index_lines(offset, length, num_lines)
-      indexed_lines = Array.typed(::Java::Int).new(num_lines) { Array.typed(::Java::Int).new(2) { 0 } }
+      indexed_lines = Array.typed(Array.typed(::Java::Int)).new(num_lines) { Array.typed(::Java::Int).new(2) { 0 } }
       start = 0
       line_count = 0
       i = 0
@@ -357,7 +357,7 @@ module Org::Eclipse::Swt::Custom
         end
         i += 1
       end
-      new_lines = Array.typed(::Java::Int).new(line_count + 1) { Array.typed(::Java::Int).new(2) { 0 } }
+      new_lines = Array.typed(Array.typed(::Java::Int)).new(line_count + 1) { Array.typed(::Java::Int).new(2) { 0 } }
       System.arraycopy(indexed_lines, 0, new_lines, 0, line_count)
       range = Array.typed(::Java::Int).new([start, i - start])
       new_lines[line_count] = range
@@ -790,7 +790,7 @@ module Org::Eclipse::Swt::Custom
       if (size - @line_count >= num_lines)
         return
       end
-      new_lines = Array.typed(::Java::Int).new(size + Math.max(10, num_lines)) { Array.typed(::Java::Int).new(2) { 0 } }
+      new_lines = Array.typed(Array.typed(::Java::Int)).new(size + Math.max(10, num_lines)) { Array.typed(::Java::Int).new(2) { 0 } }
       System.arraycopy(@lines, 0, new_lines, 0, size)
       @lines = new_lines
     end
@@ -973,7 +973,7 @@ module Org::Eclipse::Swt::Custom
       end_text = ""
       splitting_delimiter = false
       if (position + length_ < get_char_count)
-        end_text = (get_text_range(position + length_ - 1, 2)).to_s
+        end_text = RJava.cast_to_string(get_text_range(position + length_ - 1, 2))
         if (((end_text.char_at(0)).equal?(SWT::CR)) && ((end_text.char_at(1)).equal?(SWT::LF)))
           splitting_delimiter = true
         end

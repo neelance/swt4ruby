@@ -661,7 +661,7 @@ module Org::Eclipse::Swt::Internal::Image
         if ((size).equal?(-1))
           SWT.error(SWT::ERROR_INVALID_IMAGE)
         end
-      rescue Exception => e
+      rescue JavaException => e
         SWT.error(SWT::ERROR_IO, e)
       end
       return size
@@ -673,7 +673,7 @@ module Org::Eclipse::Swt::Internal::Image
     def write_block
       begin
         @output_stream.write(@block, 0, (@block[0] & 0xff) + 1)
-      rescue Exception => e
+      rescue JavaException => e
         SWT.error(SWT::ERROR_IO, e)
       end
     end

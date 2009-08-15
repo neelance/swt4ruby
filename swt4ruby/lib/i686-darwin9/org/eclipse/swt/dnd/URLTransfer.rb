@@ -101,7 +101,7 @@ module Org::Eclipse::Swt::Dnd
         if ((num_chars).equal?(0))
           return
         end
-        transfer_data.attr_data = Array.typed(::Java::Byte).new([buffer])
+        transfer_data.attr_data = Array.typed(Array.typed(::Java::Byte)).new([buffer])
         transfer_data.attr_result = 0
       ensure
         OS._cfrelease(cfstring)

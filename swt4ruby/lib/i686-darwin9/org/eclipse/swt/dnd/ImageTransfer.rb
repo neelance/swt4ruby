@@ -131,7 +131,7 @@ module Org::Eclipse::Swt::Dnd
       OS._hunlock(pict_handle)
       OS._kill_picture(pict_handle)
       image.dispose
-      transfer_data.attr_data = Array.typed(::Java::Byte).new([pict_data])
+      transfer_data.attr_data = Array.typed(Array.typed(::Java::Byte)).new([pict_data])
       transfer_data.attr_result = OS.attr_no_err
     end
     

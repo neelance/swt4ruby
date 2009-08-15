@@ -39,7 +39,7 @@ module Org::Eclipse::Swt::Internal::Ole::Win32
       
       
       def callbacks
-        defined?(@@callbacks) ? @@callbacks : @@callbacks= Array.typed(Callback).new(MAX_VTABLE_LENGTH) { Array.typed(Callback).new(MAX_ARG_COUNT) { nil } }
+        defined?(@@callbacks) ? @@callbacks : @@callbacks= Array.typed(Array.typed(Callback)).new(MAX_VTABLE_LENGTH) { Array.typed(Callback).new(MAX_ARG_COUNT) { nil } }
       end
       alias_method :attr_callbacks, :callbacks
       
@@ -71,7 +71,7 @@ module Org::Eclipse::Swt::Internal::Ole::Win32
         length = arg_counts.attr_length
         while i < length
           if (((self.attr_callbacks[i][arg_counts[i]])).nil?)
-            self.attr_callbacks[i][arg_counts[i]] = Callback.new(self.get_class, "callback" + (i).to_s, arg_counts[i] + 1, true, COM::E_FAIL) # $NON-NLS-1$
+            self.attr_callbacks[i][arg_counts[i]] = Callback.new(self.get_class, "callback" + RJava.cast_to_string(i), arg_counts[i] + 1, true, COM::E_FAIL) # $NON-NLS-1$
             if ((self.attr_callbacks[i][arg_counts[i]].get_address).equal?(0))
               SWT.error(SWT::ERROR_NO_MORE_CALLBACKS)
             end

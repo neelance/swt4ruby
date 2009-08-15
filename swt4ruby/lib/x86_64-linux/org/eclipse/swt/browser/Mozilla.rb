@@ -570,7 +570,7 @@ module Org::Eclipse::Swt::Browser
         if ((mozilla_path).nil?)
           begin
             Class.for_name("org.eclipse.swt.browser.XULRunnerInitializer") # $NON-NLS-1$
-            mozilla_path = (System.get_property(XULRUNNER_PATH)).to_s
+            mozilla_path = RJava.cast_to_string(System.get_property(XULRUNNER_PATH))
           rescue ClassNotFoundException => e
             # no fragment is providing this class, which is the typical case
           end
@@ -586,7 +586,7 @@ module Org::Eclipse::Swt::Browser
             # points at a GRE.
           end
         else
-          mozilla_path += SEPARATOR_OS + (@delegate.get_library_name).to_s
+          mozilla_path += SEPARATOR_OS + RJava.cast_to_string(@delegate.get_library_name)
           is_xulrunner = true
         end
         if (init_loaded)
@@ -628,7 +628,7 @@ module Org::Eclipse::Swt::Browser
             length = C.strlen(gre_buffer)
             bytes = Array.typed(::Java::Byte).new(length) { 0 }
             C.memmove(bytes, gre_buffer, length)
-            mozilla_path = (String.new(MozillaDelegate.mbcs_to_wcs(nil, bytes))).to_s
+            mozilla_path = RJava.cast_to_string(String.new(MozillaDelegate.mbcs_to_wcs(nil, bytes)))
             is_xulrunner = mozilla_path.length > 0
             # Test whether the detected XULRunner can be used as the GRE before loading swt's
             # XULRunner library.  If it cannot be used then fall back to attempting to use
@@ -642,7 +642,7 @@ module Org::Eclipse::Swt::Browser
               if (!(rc).equal?(XPCOM::NS_OK))
                 is_xulrunner = false
                 # failed
-                mozilla_path = (mozilla_path.substring(0, mozilla_path.last_index_of(SEPARATOR_OS))).to_s
+                mozilla_path = RJava.cast_to_string(mozilla_path.substring(0, mozilla_path.last_index_of(SEPARATOR_OS)))
                 if (Device.attr_debug)
                   System.out.println("cannot use detected XULRunner: " + mozilla_path)
                 end # $NON-NLS-1$
@@ -671,7 +671,7 @@ module Org::Eclipse::Swt::Browser
           self.attr_xpcomwas_glued = true
           # Remove the trailing xpcom lib name from mozillaPath because the
           # Mozilla.initialize and NS_InitXPCOM2 invocations require a directory name only.
-          mozilla_path = (mozilla_path.substring(0, mozilla_path.last_index_of(SEPARATOR_OS))).to_s
+          mozilla_path = RJava.cast_to_string(mozilla_path.substring(0, mozilla_path.last_index_of(SEPARATOR_OS)))
         else
           if (!((style & SWT::MOZILLA)).equal?(0))
             self.attr_browser.dispose
@@ -685,7 +685,7 @@ module Org::Eclipse::Swt::Browser
             length_ = C.strlen(ptr)
             buffer = Array.typed(::Java::Byte).new(length_) { 0 }
             C.memmove(buffer, ptr, length_)
-            mozilla_path = (String.new(MozillaDelegate.mbcs_to_wcs(nil, buffer))).to_s
+            mozilla_path = RJava.cast_to_string(String.new(MozillaDelegate.mbcs_to_wcs(nil, buffer)))
           else
             self.attr_browser.dispose
             SWT.error(SWT::ERROR_NO_HANDLES, nil, " [Unknown Mozilla path (MOZILLA_FIVE_HOME not set)]") # $NON-NLS-1$
@@ -740,7 +740,7 @@ module Org::Eclipse::Swt::Browser
           local_file._release
           if (!(rc).equal?(XPCOM::NS_OK))
             self.attr_browser.dispose
-            SWT.error(SWT::ERROR_NO_HANDLES, nil, " [MOZILLA_FIVE_HOME may not point at an embeddable GRE] [NS_InitEmbedding " + mozilla_path + " error " + (rc).to_s + "]") # $NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+            SWT.error(SWT::ERROR_NO_HANDLES, nil, " [MOZILLA_FIVE_HOME may not point at an embeddable GRE] [NS_InitEmbedding " + mozilla_path + " error " + RJava.cast_to_string(rc) + "]") # $NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
           end
           System.set_property(GRE_INITIALIZED, "true") # $NON-NLS-1$
           if (is_xulrunner)
@@ -760,7 +760,7 @@ module Org::Eclipse::Swt::Browser
               # indicates that JavaXPCOM has not been initialized yet
               file_class = Class.for_name("java.io.File") # $NON-NLS-1$
               method = clazz.get_method("initialize", Array.typed(Class).new([file_class])) # $NON-NLS-1$
-              constructor = file_class.get_declared_constructor(Array.typed(Class).new([String.class]))
+              constructor = file_class.get_declared_constructor(Array.typed(Class).new([String]))
               argument = constructor.new_instance(Array.typed(Object).new([mozilla_path]))
               method.invoke(mozilla, Array.typed(Object).new([argument]))
             end
@@ -893,7 +893,7 @@ module Org::Eclipse::Swt::Browser
           ptr = XPCOM.ns_embed_cstring_get(path)
           buffer = Array.typed(::Java::Byte).new(length_) { 0 }
           XPCOM.memmove(buffer, ptr, length_)
-          profile_path = (String.new(MozillaDelegate.mbcs_to_wcs(nil, buffer))).to_s + PROFILE_DIR
+          profile_path = RJava.cast_to_string(String.new(MozillaDelegate.mbcs_to_wcs(nil, buffer))) + PROFILE_DIR
           self.attr_location_provider.set_profile_path(profile_path)
           self.attr_location_provider.attr_is_xulrunner = is_xulrunner
           XPCOM.ns_embed_cstring_delete(path)
@@ -988,7 +988,7 @@ module Org::Eclipse::Swt::Browser
           length_ = XPCOM.strlen__prunichar(result[0])
           dest = CharArray.new(length_)
           XPCOM.memmove(dest, result[0], length_ * 2)
-          pref_locales = (String.new(dest)).to_s + TOKENIZER_LOCALE
+          pref_locales = RJava.cast_to_string(String.new(dest)) + TOKENIZER_LOCALE
         end
         result[0] = 0
         # construct the new locale preference value by prepending the
@@ -1010,22 +1010,22 @@ module Org::Eclipse::Swt::Browser
           end_ = pref_locales.index_of(TOKENIZER_LOCALE, start)
           token = nil
           if ((end_).equal?(-1))
-            token = (pref_locales.substring(start)).to_s
+            token = RJava.cast_to_string(pref_locales.substring(start))
           else
-            token = (pref_locales.substring(start, end_)).to_s
+            token = RJava.cast_to_string(pref_locales.substring(start, end_))
           end
           if (token.length > 0)
-            token = ((token + TOKENIZER_LOCALE).trim).to_s
+            token = RJava.cast_to_string((token + TOKENIZER_LOCALE).trim)
             # ensure that duplicate locale values are not added
             if ((new_locales.index_of(token)).equal?(-1))
               string_buffer.append(token)
             end
           end
         end while (!(end_).equal?(-1))
-        new_locales = (string_buffer.to_s).to_s
+        new_locales = RJava.cast_to_string(string_buffer.to_s)
         if (!(new_locales == pref_locales))
           # write the new locale value
-          new_locales = (new_locales.substring(0, new_locales.length - TOKENIZER_LOCALE.length)).to_s
+          new_locales = RJava.cast_to_string(new_locales.substring(0, new_locales.length - TOKENIZER_LOCALE.length))
           # remove trailing tokenizer
           length_ = new_locales.length
           char_buffer = CharArray.new(length_ + 1)
@@ -1080,7 +1080,7 @@ module Org::Eclipse::Swt::Browser
           length_ = XPCOM.strlen__prunichar(result[0])
           dest = CharArray.new(length_)
           XPCOM.memmove(dest, result[0], length_ * 2)
-          pref_charset = (String.new(dest)).to_s
+          pref_charset = RJava.cast_to_string(String.new(dest))
         end
         result[0] = 0
         new_charset = System.get_property("file.encoding") # $NON-NLS-1$
@@ -2592,7 +2592,7 @@ module Org::Eclipse::Swt::Browser
         clazz = Class.for_name("org.mozilla.xpcom.Mozilla") # $NON-NLS-1$
         method = clazz.get_method("getInstance", Array.typed(Class).new(0) { nil }) # $NON-NLS-1$
         mozilla = method.invoke(nil, Array.typed(Object).new(0) { nil })
-        method = clazz.get_method("wrapXPCOMObject", Array.typed(Class).new([Long::TYPE, String.class])) # $NON-NLS-1$
+        method = clazz.get_method("wrapXPCOMObject", Array.typed(Class).new([Long::TYPE, String])) # $NON-NLS-1$
         @web_browser_object = method.invoke(mozilla, Array.typed(Object).new([Long.new(@web_browser.get_address), NsIWebBrowser::NS_IWEBBROWSER_IID_STR]))
         # The following AddRef() is needed to offset the automatic Release() that
         # will be performed by JavaXPCOM when webBrowserObject is finalized.
@@ -2656,7 +2656,7 @@ module Org::Eclipse::Swt::Browser
     class_module.module_eval {
       typesig { [::Java::Int] }
       def error(code)
-        raise SWTError.new("XPCOM error " + (code).to_s) # $NON-NLS-1$
+        raise SWTError.new("XPCOM error " + RJava.cast_to_string(code)) # $NON-NLS-1$
       end
     }
     

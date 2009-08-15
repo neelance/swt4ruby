@@ -170,7 +170,7 @@ module Org::Eclipse::Swt::Graphics
     # @return <code>true</code> if the object is the same as this object and <code>false</code> otherwise
     # 
     # @see #hashCode()
-    def equals(object)
+    def ==(object)
       if ((object).equal?(self))
         return true
       end
@@ -331,7 +331,7 @@ module Org::Eclipse::Swt::Graphics
     # 
     # @return a string representation of the rectangle
     def to_s
-      return "Rectangle {" + (@x).to_s + ", " + (@y).to_s + ", " + (@width).to_s + ", " + (@height).to_s + "}" # $NON-NLS-1$//$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$
+      return "Rectangle {" + RJava.cast_to_string(@x) + ", " + RJava.cast_to_string(@y) + ", " + RJava.cast_to_string(@width) + ", " + RJava.cast_to_string(@height) + "}" # $NON-NLS-1$//$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$
     end
     
     typesig { [Rectangle] }

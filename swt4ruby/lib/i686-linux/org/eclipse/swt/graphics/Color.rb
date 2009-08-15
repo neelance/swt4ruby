@@ -141,7 +141,7 @@ module Org::Eclipse::Swt::Graphics
     # @return <code>true</code> if the object is the same as this object and <code>false</code> otherwise
     # 
     # @see #hashCode
-    def equals(object)
+    def ==(object)
       if ((object).equal?(self))
         return true
       end
@@ -305,7 +305,7 @@ module Org::Eclipse::Swt::Graphics
       if (is_disposed)
         return "Color {*DISPOSED*}"
       end
-      return "Color {" + (get_red).to_s + ", " + (get_green).to_s + ", " + (get_blue).to_s + "}"
+      return "Color {" + RJava.cast_to_string(get_red) + ", " + RJava.cast_to_string(get_green) + ", " + RJava.cast_to_string(get_blue) + "}"
     end
     
     private

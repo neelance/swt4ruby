@@ -146,7 +146,7 @@ module Org::Eclipse::Swt::Graphics
     # @return <code>true</code> if the object is the same as this object and <code>false</code> otherwise
     # 
     # @see #hashCode
-    def equals(object)
+    def ==(object)
       if ((object).equal?(self))
         return true
       end
@@ -310,7 +310,7 @@ module Org::Eclipse::Swt::Graphics
       if (is_disposed)
         return "Color {*DISPOSED*}"
       end # $NON-NLS-1$
-      return "Color {" + (get_red).to_s + ", " + (get_green).to_s + ", " + (get_blue).to_s + "}" # $NON-NLS-1$//$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+      return "Color {" + RJava.cast_to_string(get_red) + ", " + RJava.cast_to_string(get_green) + ", " + RJava.cast_to_string(get_blue) + "}" # $NON-NLS-1$//$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
     end
     
     class_module.module_eval {

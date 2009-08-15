@@ -447,7 +447,7 @@ module Org::Eclipse::Swt::Widgets
       event.attr_detail = SWT::COMPOSITION_CHANGED
       event.attr_start = @start_offset
       event.attr_end = end_
-      event.attr_text = @text = (String.new(chars, 0, length_[0] / 2)).to_s
+      event.attr_text = @text = RJava.cast_to_string(String.new(chars, 0, length_[0] / 2))
       @commit_count = !(fixed_length[0]).equal?(-1) ? fixed_length[0] / 2 : length_[0] / 2
       send_event(SWT::ImeComposition, event)
       if ((@commit_count).equal?(@text.length))
@@ -486,7 +486,7 @@ module Org::Eclipse::Swt::Widgets
     def release_widget
       super
       @parent = nil
-      @text = (nil).to_s
+      @text = RJava.cast_to_string(nil)
       @styles = nil
       @ranges = nil
     end

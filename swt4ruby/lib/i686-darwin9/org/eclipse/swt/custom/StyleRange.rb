@@ -31,7 +31,9 @@ module Org::Eclipse::Swt::Custom
   # @see <a href="http://www.eclipse.org/swt/">Sample code and further information</a>
   class StyleRange < StyleRangeImports.const_get :TextStyle
     include_class_members StyleRangeImports
-    include CloneableCompatibility
+    overload_protected {
+      include CloneableCompatibility
+    }
     
     # the start offset of the range, zero-based from the document start
     attr_accessor :start
@@ -123,7 +125,7 @@ module Org::Eclipse::Swt::Custom
     # @return <code>true</code> if the object is the same as this object and <code>false</code> otherwise
     # 
     # @see #hashCode()
-    def equals(object)
+    def ==(object)
       if ((object).equal?(self))
         return true
       end
@@ -202,7 +204,7 @@ module Org::Eclipse::Swt::Custom
     # @param style the object to compare with this object
     # @return true if the objects are similar, false otherwise
     def similar_to(style)
-      if (!TextStyle.instance_method(:equals).bind(self).call(style))
+      if (!TextStyle.instance_method(:==).bind(self).call(style))
         return false
       end
       if (!(@font_style).equal?(style.attr_font_style))
@@ -247,7 +249,7 @@ module Org::Eclipse::Swt::Custom
       end
       str = super
       index = str.index_of(Character.new(?{.ord))
-      str = (str.substring(index + 1)).to_s
+      str = RJava.cast_to_string(str.substring(index + 1))
       if (str.length > 1)
         buffer.append(", ")
       end

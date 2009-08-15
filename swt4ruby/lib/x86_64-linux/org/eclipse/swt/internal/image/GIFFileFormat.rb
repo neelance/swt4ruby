@@ -133,7 +133,7 @@ module Org::Eclipse::Swt::Internal::Image
         stream.read(signature)
         stream.unread(signature)
         return (signature[0]).equal?(Character.new(?G.ord)) && (signature[1]).equal?(Character.new(?I.ord)) && (signature[2]).equal?(Character.new(?F.ord))
-      rescue Exception => e
+      rescue JavaException => e
         return false
       end
     end
@@ -292,7 +292,7 @@ module Org::Eclipse::Swt::Internal::Image
           size = self.attr_input_stream.read
         end
         return comment
-      rescue Exception => e
+      rescue JavaException => e
         SWT.error(SWT::ERROR_IO, e)
         return nil
       end
@@ -321,7 +321,7 @@ module Org::Eclipse::Swt::Internal::Image
           size = self.attr_input_stream.read
         end
         return text
-      rescue Exception => e
+      rescue JavaException => e
         SWT.error(SWT::ERROR_IO, e)
         return nil
       end
@@ -354,7 +354,7 @@ module Org::Eclipse::Swt::Internal::Image
         # Read block terminator.
         self.attr_input_stream.read
         return control_block
-      rescue Exception => e
+      rescue JavaException => e
         SWT.error(SWT::ERROR_IO, e)
         return nil
       end
@@ -394,7 +394,7 @@ module Org::Eclipse::Swt::Internal::Image
           self.attr_loader.attr_repeat_count = @repeat_count
         end
         return data
-      rescue Exception => e
+      rescue JavaException => e
         SWT.error(SWT::ERROR_IO, e)
         return nil
       end

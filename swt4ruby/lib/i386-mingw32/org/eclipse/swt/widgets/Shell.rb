@@ -1512,7 +1512,7 @@ module Org::Eclipse::Swt::Widgets
         end
       end
       @last_active = nil
-      @tool_title = (@balloon_title = (nil).to_s).to_s
+      @tool_title = RJava.cast_to_string(@balloon_title = RJava.cast_to_string(nil))
     end
     
     typesig { [Menu] }

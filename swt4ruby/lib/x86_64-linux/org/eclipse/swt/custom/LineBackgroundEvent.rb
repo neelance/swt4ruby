@@ -61,7 +61,7 @@ module Org::Eclipse::Swt::Custom
       @line_background = nil
       super(e)
       @line_offset = e.attr_detail
-      @line_text = (e.attr_text).to_s
+      @line_text = RJava.cast_to_string(e.attr_text)
       @line_background = e.attr_line_background
     end
     

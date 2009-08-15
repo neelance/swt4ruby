@@ -661,14 +661,14 @@ module Org::Eclipse::Swt::Custom
       when ST::BULLET_DOT
         string = ("".to_u << 0x2022 << "")
       when ST::BULLET_NUMBER
-        string = (String.value_of(index)).to_s
+        string = RJava.cast_to_string(String.value_of(index))
       when ST::BULLET_LETTER_LOWER
-        string = (String.value_of(RJava.cast_to_char((index % 26 + 97)))).to_s
+        string = RJava.cast_to_string(String.value_of(RJava.cast_to_char((index % 26 + 97))))
       when ST::BULLET_LETTER_UPPER
-        string = (String.value_of(RJava.cast_to_char((index % 26 + 65)))).to_s
+        string = RJava.cast_to_string(String.value_of(RJava.cast_to_char((index % 26 + 65))))
       end
       if (!((bullet.attr_type & ST::BULLET_TEXT)).equal?(0))
-        string += (bullet.attr_text).to_s
+        string += RJava.cast_to_string(bullet.attr_text)
       end
       display = @styled_text.get_display
       layout = TextLayout.new(display)

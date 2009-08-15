@@ -74,7 +74,7 @@ module Org::Eclipse::Swt::Internal::Image
         stream.read(header)
         stream.unread(header)
         return (header[0]).equal?(0) && (header[1]).equal?(0) && (header[2]).equal?(1) && (header[3]).equal?(0)
-      rescue Exception => e
+      rescue JavaException => e
         return false
       end
     end
@@ -176,7 +176,7 @@ module Org::Eclipse::Swt::Internal::Image
     
     typesig { [::Java::Int] }
     def load_icon_headers(num_icons)
-      headers = Array.typed(::Java::Int).new(num_icons) { Array.typed(::Java::Int).new(7) { 0 } }
+      headers = Array.typed(Array.typed(::Java::Int)).new(num_icons) { Array.typed(::Java::Int).new(7) { 0 } }
       begin
         i = 0
         while i < num_icons
