@@ -413,7 +413,7 @@ module Org::Eclipse::Swt::Graphics
       end
       # TODO - see Windows
       gc.init_cairo
-      gc.check_gc(GC::LINE_CAP | GC::LINE_JOIN | GC::LINE_STYLE | GC::LINE_WIDTH)
+      gc.check_gc(SwtGC::LINE_CAP | SwtGC::LINE_JOIN | SwtGC::LINE_STYLE | SwtGC::LINE_WIDTH)
       result = false
       # int
       cairo = gc.attr_data.attr_cairo

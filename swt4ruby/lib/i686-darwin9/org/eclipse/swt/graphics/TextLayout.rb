@@ -788,7 +788,7 @@ module Org::Eclipse::Swt::Graphics
       if ((length_).equal?(0) && (flags).equal?(0))
         return
       end
-      gc.check_gc(GC::FOREGROUND_FILL)
+      gc.check_gc(SwtGC::FOREGROUND_FILL)
       if (gc.attr_data.attr_update_clip)
         gc.set_cgclipping
       end
@@ -1110,9 +1110,9 @@ module Org::Eclipse::Swt::Graphics
                 case (style.attr_border_style)
                 when SWT::BORDER_SOLID
                 when SWT::BORDER_DASH
-                  dashes = !(width).equal?(0) ? GC::LINE_DASH : GC::LINE_DASH_ZERO
+                  dashes = !(width).equal?(0) ? SwtGC::LINE_DASH : SwtGC::LINE_DASH_ZERO
                 when SWT::BORDER_DOT
-                  dashes = !(width).equal?(0) ? GC::LINE_DOT : GC::LINE_DOT_ZERO
+                  dashes = !(width).equal?(0) ? SwtGC::LINE_DOT : SwtGC::LINE_DOT_ZERO
                 end
                 OS._cgcontext_set_line_dash(gc.attr_handle, 0, dashes, !(dashes).nil? ? dashes.attr_length : 0)
                 color = nil

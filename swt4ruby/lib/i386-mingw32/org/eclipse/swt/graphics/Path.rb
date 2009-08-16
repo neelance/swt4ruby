@@ -413,7 +413,7 @@ module Org::Eclipse::Swt::Graphics
       end
       # TODO - should use GC transformation
       gc.init_gdip
-      gc.check_gc(GC::LINE_CAP | GC::LINE_JOIN | GC::LINE_STYLE | GC::LINE_WIDTH)
+      gc.check_gc(SwtGC::LINE_CAP | SwtGC::LINE_JOIN | SwtGC::LINE_STYLE | SwtGC::LINE_WIDTH)
       mode = (OS._get_poly_fill_mode(gc.attr_handle)).equal?(OS::WINDING) ? Gdip::FillModeWinding : Gdip::FillModeAlternate
       Gdip._graphics_path_set_fill_mode(@handle, mode)
       if (outline)

@@ -688,7 +688,7 @@ module Org::Eclipse::Swt::Graphics
       if (gc.is_disposed)
         SWT.error(SWT::ERROR_INVALID_ARGUMENT)
       end
-      gc.check_gc(GC::LINE_CAP | GC::LINE_JOIN | GC::LINE_STYLE | GC::LINE_WIDTH)
+      gc.check_gc(SwtGC::LINE_CAP | SwtGC::LINE_JOIN | SwtGC::LINE_STYLE | SwtGC::LINE_WIDTH)
       # TODO - see windows
       pixel = OS._new_ptr(4)
       if ((pixel).equal?(0))

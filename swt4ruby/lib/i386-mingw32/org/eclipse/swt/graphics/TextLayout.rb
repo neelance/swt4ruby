@@ -986,7 +986,7 @@ module Org::Eclipse::Swt::Graphics
       foreground_brush = 0
       state = 0
       if (gdip)
-        gc.check_gc(GC::FOREGROUND)
+        gc.check_gc(SwtGC::FOREGROUND)
         foreground_brush = gc.get_fg_brush
       else
         state = OS._save_dc(hdc)

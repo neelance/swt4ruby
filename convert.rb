@@ -16,10 +16,11 @@ controller.add_ruby_constant_name_hook do |converter, name|
 end
 
 controller.add_ruby_class_name_hook do |converter, package, names|
-  if names.size == 1 and %w{GC GCData Layout Monitor List LONG}.include?(names.first)
+  if %w{GC GCData Layout Monitor List LONG}.include?(names.first)
     name_parts = []
     name_parts << @package.ruby_name unless @package.nil? or @package.root?
-    name_parts << "Swt#{names.first}"
+    name_parts << "Swt#{names.shift}"
+    name_parts.concat names
     name_parts.join "::"
   else
     nil

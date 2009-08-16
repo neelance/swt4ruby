@@ -529,7 +529,7 @@ module Org::Eclipse::Swt::Graphics
       if (!(selection_background).nil? && selection_background.is_disposed)
         SWT.error(SWT::ERROR_INVALID_ARGUMENT)
       end
-      gc.check_gc(GC::FOREGROUND)
+      gc.check_gc(SwtGC::FOREGROUND)
       length_ = @text.length
       has_selection = selection_start <= selection_end && !(selection_start).equal?(-1) && !(selection_end).equal?(-1)
       data = gc.attr_data
@@ -796,9 +796,9 @@ module Org::Eclipse::Swt::Graphics
             case (style.attr_border_style)
             when SWT::BORDER_SOLID
             when SWT::BORDER_DASH
-              dashes = !(width_).equal?(0) ? GC::LINE_DASH : GC::LINE_DASH_ZERO
+              dashes = !(width_).equal?(0) ? SwtGC::LINE_DASH : SwtGC::LINE_DASH_ZERO
             when SWT::BORDER_DOT
-              dashes = !(width_).equal?(0) ? GC::LINE_DOT : GC::LINE_DOT_ZERO
+              dashes = !(width_).equal?(0) ? SwtGC::LINE_DOT : SwtGC::LINE_DOT_ZERO
             end
             if (!(cairo).equal?(0) && OS::GTK_VERSION >= OS._version(2, 8, 0))
               Cairo.cairo_set_source_rgba(cairo, (color.attr_red & 0xffff) / (0xffff).to_f, (color.attr_green & 0xffff) / (0xffff).to_f, (color.attr_blue & 0xffff) / (0xffff).to_f, data.attr_alpha / (0xff).to_f)
@@ -1084,7 +1084,7 @@ module Org::Eclipse::Swt::Graphics
       if (!(gc_values).nil?)
         mask = OS::GDK_GC_FOREGROUND | OS::GDK_GC_LINE_WIDTH | OS::GDK_GC_LINE_STYLE | OS::GDK_GC_CAP_STYLE | OS::GDK_GC_JOIN_STYLE
         OS.gdk_gc_set_values(gdk_gc, gc_values, mask)
-        data.attr_state &= ~GC::LINE_STYLE
+        data.attr_state &= ~SwtGC::LINE_STYLE
       end
       if (!(cairo).equal?(0) && OS::GTK_VERSION >= OS._version(2, 8, 0))
         Cairo.cairo_restore(cairo)
