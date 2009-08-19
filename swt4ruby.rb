@@ -53,6 +53,7 @@ class Swt4Ruby
         end
 
         def self.inherited(subcls)
+          class_inherited subcls
           subcls.when_class_loaded {
             subcls.extend SetterAliases
           }
