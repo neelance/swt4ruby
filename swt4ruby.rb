@@ -71,6 +71,12 @@ class Swt4Ruby
     end
   end
 
+  module NewGraphicsMethods
+    def new_image(*args, &block)
+      Org::Eclipse::Swt::Graphics::Image.new find_display, *args
+    end
+  end
+
   module NewWidgetMethods
     def new_browser(*styles, &block)
       Org::Eclipse::Swt::Browser::Browser.create find_composite, styles, &block
@@ -193,18 +199,9 @@ class Swt4Ruby
     end
   end
 
-  def self.app(&block)
+  def self.new_display(&block)
     display = Display.new
-    shell = Shell.new display
-    shell.set_layout GridLayout.new
-
-    shell.instance_eval &block
-
-    shell.pack
-    shell.open
-    until shell.is_disposed
-      display.read_and_dispatch or display.sleep
-    end
-    display.dispose
+    display.instance_eval &block if block
+    display
   end
 end

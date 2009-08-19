@@ -1,9 +1,10 @@
 class Org::Eclipse::Swt::Widgets::Widget
   extend Swt4Ruby::SetterAliases
   extend Swt4Ruby::CreateMethod
+  include Swt4Ruby::NewGraphicsMethods
 
-  def find_shell
-    get_shell
+  def find_display
+    get_display
   end
 
   def new_color_dialog(*styles, &block)
