@@ -1,7 +1,7 @@
 require "rjava"
 require "jre4ruby"
 
-Java::Lang::System.set_property "swt.library.path", "#{File.dirname(__FILE__)}/swt4ruby/ext/#{RUBY_PLATFORM}"
+Java::Lang::System.set_property "swt.library.path", File.expand_path("swt4ruby/ext/#{RUBY_PLATFORM}", File.dirname(__FILE__))
 
 lib_path = "#{File.dirname(__FILE__)}/swt4ruby/lib/#{RUBY_PLATFORM}"
 fix_path = "#{File.dirname(__FILE__)}/swt4ruby/fix"
