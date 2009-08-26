@@ -1,3 +1,5 @@
+require "rake/rdoctask"
+
 task :gemspec do
   File.open("swt4ruby.gemspec", "w") do |file|
     file.write Gem::Specification.new { |s|
@@ -5,8 +7,7 @@ task :gemspec do
       s.version = "1.0.8"
       s.files = ["swt4ruby.rb", "LICENSE"] + Dir.glob("swt4ruby/lib/**/*.*") + Dir.glob("swt4ruby/fix/**/*.*") + Dir.glob("swt4ruby/ext/**/*.*")
       s.homepage = %q{http://github.com/neelance/swt4ruby/}
-      s.has_rdoc = true
-      s.rdoc_options = ["--charset=UTF-8"]
+      s.has_rdoc = false
       s.require_paths = ["."]
       s.summary = "Converted Standart Window Toolkit (SWT)."
       s.add_dependency "neelance-java2ruby"
@@ -32,4 +33,10 @@ task :gemspec do
 #      }.to_yaml
 #    end
 #  end
+end
+
+Rake::RDocTask.new do |rd|
+  files = ["swt4ruby.rb"] + Dir.glob("swt4ruby/lib/i686-linux/**/*.*") + Dir.glob("swt4ruby/fix/**/*.*")
+  rd.rdoc_files.include(*files.select { |file| (file =~ /\.rb$/) && !(file =~ /\/internal\//) })
+  rd.rdoc_dir = "doc"
 end
