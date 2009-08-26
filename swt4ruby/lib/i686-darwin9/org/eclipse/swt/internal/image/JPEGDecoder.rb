@@ -898,13 +898,13 @@ module Org::Eclipse::Swt::Internal::Image
         alias_method :attr_workspace=, :workspace=
         undef_method :workspace=
         
-        typesig { [Jpeg_decompress_struct::self] }
+        typesig { [Jpeg_decompress_struct] }
         def start_input_pass(cinfo)
           cinfo.attr_input_i_mcu_row = 0
           start_i_mcu_row(cinfo)
         end
         
-        typesig { [Jpeg_decompress_struct::self] }
+        typesig { [Jpeg_decompress_struct] }
         # Reset within-iMCU-row counters for a new row (input side)
         def start_i_mcu_row(cinfo)
           coef = cinfo.attr_coef
@@ -945,12 +945,12 @@ module Org::Eclipse::Swt::Internal::Image
       const_set_lazy(:Jpeg_entropy_decoder) { Class.new do
         include_class_members JPEGDecoder
         
-        typesig { [Jpeg_decompress_struct::self] }
+        typesig { [Jpeg_decompress_struct] }
         def start_pass(cinfo)
           raise NotImplementedError
         end
         
-        typesig { [Jpeg_decompress_struct::self, Array.typed(Array.typed(::Java::Short))] }
+        typesig { [Jpeg_decompress_struct, Array.typed(Array.typed(::Java::Short))] }
         def decode_mcu(cinfo, mcu_data)
           raise NotImplementedError
         end
@@ -979,8 +979,8 @@ module Org::Eclipse::Swt::Internal::Image
         typesig { [] }
         def initialize
           @insufficient_data = false
-          @br_state_local = Bitread_working_state::self.class.new
-          @state_local = Savable_state::self.class.new
+          @br_state_local = Bitread_working_state.new
+          @state_local = Savable_state.new
         end
         
         private
@@ -1052,12 +1052,12 @@ module Org::Eclipse::Swt::Internal::Image
         alias_method :attr_ac_needed=, :ac_needed=
         undef_method :ac_needed=
         
-        typesig { [Jpeg_decompress_struct::self] }
+        typesig { [Jpeg_decompress_struct] }
         def start_pass(cinfo)
           start_pass_huff_decoder(cinfo)
         end
         
-        typesig { [Jpeg_decompress_struct::self, Array.typed(Array.typed(::Java::Short))] }
+        typesig { [Jpeg_decompress_struct, Array.typed(Array.typed(::Java::Short))] }
         def decode_mcu(cinfo, mcu_data)
           entropy = self
           blkn = 0
@@ -1316,7 +1316,7 @@ module Org::Eclipse::Swt::Internal::Image
           return true
         end
         
-        typesig { [Jpeg_decompress_struct::self] }
+        typesig { [Jpeg_decompress_struct] }
         def start_pass_huff_decoder(cinfo)
           entropy = self
           ci = 0
@@ -1337,8 +1337,8 @@ module Org::Eclipse::Swt::Internal::Image
             actbl = compptr.attr_ac_tbl_no
             # Compute derived values for Huffman tables
             # We may do this more than once for a table, but it's not expensive
-            jpeg_make_d_derived_tbl(cinfo, true, dctbl, entropy.attr_dc_derived_tbls[dctbl] = D_derived_tbl::self.class.new)
-            jpeg_make_d_derived_tbl(cinfo, false, actbl, entropy.attr_ac_derived_tbls[actbl] = D_derived_tbl::self.class.new)
+            jpeg_make_d_derived_tbl(cinfo, true, dctbl, entropy.attr_dc_derived_tbls[dctbl] = D_derived_tbl.new)
+            jpeg_make_d_derived_tbl(cinfo, false, actbl, entropy.attr_ac_derived_tbls[actbl] = D_derived_tbl.new)
             # Initialize DC predictions to 0
             entropy.attr_saved.attr_last_dc_val[ci] = 0
             ci += 1
@@ -1370,7 +1370,7 @@ module Org::Eclipse::Swt::Internal::Image
           entropy.attr_restarts_to_go = cinfo.attr_restart_interval
         end
         
-        typesig { [Jpeg_decompress_struct::self] }
+        typesig { [Jpeg_decompress_struct] }
         def process_restart(cinfo)
           entropy = self
           ci = 0
@@ -1412,12 +1412,12 @@ module Org::Eclipse::Swt::Internal::Image
           @dc_needed = nil
           @ac_needed = nil
           super()
-          @bitstate = Bitread_perm_state::self.class.new
-          @saved = Savable_state::self.class.new
-          @dc_derived_tbls = Array.typed(D_derived_tbl::self.class).new(NUM_HUFF_TBLS) { nil }
-          @ac_derived_tbls = Array.typed(D_derived_tbl::self.class).new(NUM_HUFF_TBLS) { nil }
-          @dc_cur_tbls = Array.typed(D_derived_tbl::self.class).new(D_MAX_BLOCKS_IN_MCU) { nil }
-          @ac_cur_tbls = Array.typed(D_derived_tbl::self.class).new(D_MAX_BLOCKS_IN_MCU) { nil }
+          @bitstate = Bitread_perm_state.new
+          @saved = Savable_state.new
+          @dc_derived_tbls = Array.typed(D_derived_tbl).new(NUM_HUFF_TBLS) { nil }
+          @ac_derived_tbls = Array.typed(D_derived_tbl).new(NUM_HUFF_TBLS) { nil }
+          @dc_cur_tbls = Array.typed(D_derived_tbl).new(D_MAX_BLOCKS_IN_MCU) { nil }
+          @ac_cur_tbls = Array.typed(D_derived_tbl).new(D_MAX_BLOCKS_IN_MCU) { nil }
           @dc_needed = Array.typed(::Java::Boolean).new(D_MAX_BLOCKS_IN_MCU) { false }
           @ac_needed = Array.typed(::Java::Boolean).new(D_MAX_BLOCKS_IN_MCU) { false }
         end
@@ -1473,12 +1473,12 @@ module Org::Eclipse::Swt::Internal::Image
         alias_method :attr_newnz_pos=, :newnz_pos=
         undef_method :newnz_pos=
         
-        typesig { [Jpeg_decompress_struct::self] }
+        typesig { [Jpeg_decompress_struct] }
         def start_pass(cinfo)
           start_pass_phuff_decoder(cinfo)
         end
         
-        typesig { [Jpeg_decompress_struct::self, Array.typed(Array.typed(::Java::Short))] }
+        typesig { [Jpeg_decompress_struct, Array.typed(Array.typed(::Java::Short))] }
         def decode_mcu(cinfo, mcu_data)
           is_dc_band = ((cinfo.attr_ss).equal?(0))
           if ((cinfo.attr_ah).equal?(0))
@@ -1496,7 +1496,7 @@ module Org::Eclipse::Swt::Internal::Image
           end
         end
         
-        typesig { [Jpeg_decompress_struct::self, Array.typed(Array.typed(::Java::Short))] }
+        typesig { [Jpeg_decompress_struct, Array.typed(Array.typed(::Java::Short))] }
         def decode_mcu__dc_refine(cinfo, mcu_data)
           entropy = self
           p1 = 1 << cinfo.attr_al
@@ -1558,7 +1558,7 @@ module Org::Eclipse::Swt::Internal::Image
           return true
         end
         
-        typesig { [Jpeg_decompress_struct::self, Array.typed(Array.typed(::Java::Short))] }
+        typesig { [Jpeg_decompress_struct, Array.typed(Array.typed(::Java::Short))] }
         def decode_mcu__ac_refine(cinfo, mcu_data)
           entropy = self
           se = cinfo.attr_se
@@ -1821,7 +1821,7 @@ module Org::Eclipse::Swt::Internal::Image
           # return false;
         end
         
-        typesig { [Jpeg_decompress_struct::self, Array.typed(Array.typed(::Java::Short))] }
+        typesig { [Jpeg_decompress_struct, Array.typed(Array.typed(::Java::Short))] }
         def decode_mcu__ac_first(cinfo, mcu_data)
           entropy = self
           se = cinfo.attr_se
@@ -1969,7 +1969,7 @@ module Org::Eclipse::Swt::Internal::Image
           return true
         end
         
-        typesig { [Jpeg_decompress_struct::self, Array.typed(Array.typed(::Java::Short))] }
+        typesig { [Jpeg_decompress_struct, Array.typed(Array.typed(::Java::Short))] }
         def decode_mcu__dc_first(cinfo, mcu_data)
           entropy = self
           al = cinfo.attr_al
@@ -2097,7 +2097,7 @@ module Org::Eclipse::Swt::Internal::Image
           return true
         end
         
-        typesig { [Jpeg_decompress_struct::self] }
+        typesig { [Jpeg_decompress_struct] }
         def process_restart(cinfo)
           entropy = self
           ci = 0
@@ -2129,7 +2129,7 @@ module Org::Eclipse::Swt::Internal::Image
           return true
         end
         
-        typesig { [Jpeg_decompress_struct::self] }
+        typesig { [Jpeg_decompress_struct] }
         def start_pass_phuff_decoder(cinfo)
           entropy = self
           is_dc_band = false
@@ -2218,11 +2218,11 @@ module Org::Eclipse::Swt::Internal::Image
               if ((cinfo.attr_ah).equal?(0))
                 # DC refinement needs no table
                 tbl = compptr.attr_dc_tbl_no
-                jpeg_make_d_derived_tbl(cinfo, true, tbl, entropy.attr_derived_tbls[tbl] = D_derived_tbl::self.class.new)
+                jpeg_make_d_derived_tbl(cinfo, true, tbl, entropy.attr_derived_tbls[tbl] = D_derived_tbl.new)
               end
             else
               tbl = compptr.attr_ac_tbl_no
-              jpeg_make_d_derived_tbl(cinfo, false, tbl, entropy.attr_derived_tbls[tbl] = D_derived_tbl::self.class.new)
+              jpeg_make_d_derived_tbl(cinfo, false, tbl, entropy.attr_derived_tbls[tbl] = D_derived_tbl.new)
               # remember the single active table
               entropy.attr_ac_derived_tbl = entropy.attr_derived_tbls[tbl]
             end
@@ -2250,9 +2250,9 @@ module Org::Eclipse::Swt::Internal::Image
           @ac_derived_tbl = nil
           @newnz_pos = nil
           super()
-          @bitstate = Bitread_perm_state::self.class.new
-          @saved = Savable_state::self.class.new
-          @derived_tbls = Array.typed(D_derived_tbl::self.class).new(NUM_HUFF_TBLS) { nil }
+          @bitstate = Bitread_perm_state.new
+          @saved = Savable_state.new
+          @derived_tbls = Array.typed(D_derived_tbl).new(NUM_HUFF_TBLS) { nil }
           @newnz_pos = Array.typed(::Java::Int).new(DCTSIZE2) { 0 }
         end
         
@@ -2530,7 +2530,7 @@ module Org::Eclipse::Swt::Internal::Image
         alias_method :attr_on_odd_row=, :on_odd_row=
         undef_method :on_odd_row=
         
-        typesig { [Jpeg_decompress_struct::self, ::Java::Boolean] }
+        typesig { [Jpeg_decompress_struct, ::Java::Boolean] }
         def start_pass(cinfo, is_pre_scan)
           error
         end
@@ -2628,7 +2628,7 @@ module Org::Eclipse::Swt::Internal::Image
         alias_method :attr_v_expand=, :v_expand=
         undef_method :v_expand=
         
-        typesig { [Jpeg_decompress_struct::self] }
+        typesig { [Jpeg_decompress_struct] }
         def start_pass(cinfo)
           upsample = cinfo.attr_upsample
           # Mark the conversion buffer empty
@@ -2802,7 +2802,7 @@ module Org::Eclipse::Swt::Internal::Image
         alias_method :attr_i_mcu_row_ctr=, :i_mcu_row_ctr=
         undef_method :i_mcu_row_ctr=
         
-        typesig { [Jpeg_decompress_struct::self, ::Java::Int] }
+        typesig { [Jpeg_decompress_struct, ::Java::Int] }
         # counts iMCU rows to detect image top/bot
         def start_pass(cinfo, pass_mode)
           main = cinfo.attr_main
@@ -2919,7 +2919,7 @@ module Org::Eclipse::Swt::Internal::Image
         alias_method :attr_cur_method=, :cur_method=
         undef_method :cur_method=
         
-        typesig { [Jpeg_decompress_struct::self] }
+        typesig { [Jpeg_decompress_struct] }
         def start_pass(cinfo)
           idct = cinfo.attr_idct
           ci = 0
@@ -3157,7 +3157,7 @@ module Org::Eclipse::Swt::Internal::Image
         alias_method :attr_cb_g_tab=, :cb_g_tab=
         undef_method :cb_g_tab=
         
-        typesig { [Jpeg_decompress_struct::self] }
+        typesig { [Jpeg_decompress_struct] }
         # => table for Cb to G conversion
         def start_pass(cinfo)
           # no work needed
@@ -3225,7 +3225,7 @@ module Org::Eclipse::Swt::Internal::Image
         alias_method :attr_next_row=, :next_row=
         undef_method :next_row=
         
-        typesig { [Jpeg_decompress_struct::self, ::Java::Int] }
+        typesig { [Jpeg_decompress_struct, ::Java::Int] }
         # index of next row to fill/empty in strip
         def start_pass(cinfo, pass_mode)
           post = cinfo.attr_post
@@ -4046,7 +4046,7 @@ module Org::Eclipse::Swt::Internal::Image
           @sample_range_limit = nil
           @sample_range_limit_offset = 0
           @comps_in_scan = 0
-          @cur_comp_info = Array.typed(Jpeg_component_info::self.class).new(MAX_COMPS_IN_SCAN) { nil }
+          @cur_comp_info = Array.typed(Jpeg_component_info).new(MAX_COMPS_IN_SCAN) { nil }
           @mcus_per_row = 0
           @mcu_rows_in_scan = 0
           @blocks_in_mcu = 0
