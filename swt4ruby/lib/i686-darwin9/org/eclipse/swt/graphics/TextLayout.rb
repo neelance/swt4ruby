@@ -61,7 +61,7 @@ module Org::Eclipse::Swt::Graphics
         alias_method :attr_atsu_style=, :atsu_style=
         undef_method :atsu_style=
         
-        typesig { [self::Device, self::Font] }
+        typesig { [class_self::Device, class_self::Font] }
         def create_style(device, default_font)
           if (!(@atsu_style).equal?(0))
             return

@@ -665,7 +665,7 @@ module Org::Eclipse::Swt::Custom
         alias_method :attr_print_margin=, :print_margin=
         undef_method :print_margin=
         
-        typesig { [self::StyledText, self::Printer, self::StyledTextPrintOptions] }
+        typesig { [class_self::StyledText, class_self::Printer, class_self::StyledTextPrintOptions] }
         # Creates an instance of <code>Printing</code>.
         # Copies the widget content and rendering data that needs
         # to be requested from listeners.
@@ -718,7 +718,7 @@ module Org::Eclipse::Swt::Custom
           cache_line_data(styled_text)
         end
         
-        typesig { [self::StyledText] }
+        typesig { [class_self::StyledText] }
         # Caches all line data that needs to be requested from a listener.
         # </p>
         # @param printerContent <code>StyledTextContent</code> to request
@@ -838,7 +838,7 @@ module Org::Eclipse::Swt::Custom
           end
         end
         
-        typesig { [self::StyledTextContent] }
+        typesig { [class_self::StyledTextContent] }
         # Copies the text of the specified <code>StyledTextContent</code>.
         # </p>
         # @param original the <code>StyledTextContent</code> to copy.
@@ -1039,7 +1039,7 @@ module Org::Eclipse::Swt::Custom
           end
         end
         
-        typesig { [::Java::Int, ::Java::Boolean, self::TextLayout] }
+        typesig { [::Java::Int, ::Java::Boolean, class_self::TextLayout] }
         # Print header or footer decorations.
         # 
         # @param page page number to print, if specified in the StyledTextPrintOptions header or footer.
@@ -1067,7 +1067,7 @@ module Org::Eclipse::Swt::Custom
           end
         end
         
-        typesig { [String, ::Java::Int, ::Java::Int, ::Java::Boolean, self::TextLayout] }
+        typesig { [String, ::Java::Int, ::Java::Int, ::Java::Boolean, class_self::TextLayout] }
         # Print one segment of a header or footer decoration.
         # Headers and footers have three different segments.
         # One each for left aligned, centered, and right aligned text.
@@ -1111,7 +1111,7 @@ module Org::Eclipse::Swt::Custom
           end
         end
         
-        typesig { [::Java::Int, ::Java::Int, SwtGC, self::Color, self::Color, self::TextLayout, self::TextLayout, ::Java::Int] }
+        typesig { [::Java::Int, ::Java::Int, SwtGC, class_self::Color, class_self::Color, class_self::TextLayout, class_self::TextLayout, ::Java::Int] }
         def print_line(x, y, gc, foreground, background, layout, print_layout, index)
           if (!(background).nil?)
             rect = layout.get_bounds
@@ -1244,7 +1244,7 @@ module Org::Eclipse::Swt::Custom
           end
         end
         
-        typesig { [self::Color, ::Java::Int] }
+        typesig { [class_self::Color, ::Java::Int] }
         # Returns the index of the specified color in the RTF color table.
         # 
         # @param color the color
@@ -1263,7 +1263,7 @@ module Org::Eclipse::Swt::Custom
           return index
         end
         
-        typesig { [self::Font] }
+        typesig { [class_self::Font] }
         # Returns the index of the specified color in the RTF color table.
         # 
         # @param color the color
@@ -1460,7 +1460,7 @@ module Org::Eclipse::Swt::Custom
           write("\\par ")
         end
         
-        typesig { [String, ::Java::Int, Array.typed(::Java::Int), Array.typed(self::StyleRange), self::Color, ::Java::Int, ::Java::Int, ::Java::Boolean] }
+        typesig { [String, ::Java::Int, Array.typed(::Java::Int), Array.typed(class_self::StyleRange), class_self::Color, ::Java::Int, ::Java::Int, ::Java::Boolean] }
         # Appends the specified line text to the RTF data.
         # <p>
         # Use the colors and font styles specified in "styles" and "lineBackground".

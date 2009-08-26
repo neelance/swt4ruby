@@ -710,7 +710,7 @@ module Org::Eclipse::Swt::Browser
                 runnable = Class.new(self.class::Runnable.class == Class ? self.class::Runnable : Object) do
                   extend LocalClass
                   include_class_members ole_listener_class
-                  include self::Runnable if self::Runnable.class == Module
+                  include class_self::Runnable if class_self::Runnable.class == Module
                   
                   typesig { [] }
                   define_method :run do
@@ -989,7 +989,7 @@ module Org::Eclipse::Swt::Browser
               self.attr_browser.get_display.async_exec(Class.new(self.class::Runnable.class == Class ? self.class::Runnable : Object) do
                 extend LocalClass
                 include_class_members ole_listener_class
-                include self::Runnable if self::Runnable.class == Module
+                include class_self::Runnable if class_self::Runnable.class == Module
                 
                 typesig { [] }
                 define_method :run do
