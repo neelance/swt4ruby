@@ -425,7 +425,7 @@ module Org::Eclipse::Swt::Browser
               e.attr_type = SWT::NONE
               OS._remove_event_handler(self.attr_window_bounds_handler)
               self.attr_window_bounds_handler = 0
-              e.attr_display.set_data(ADD_WIDGET_KEY, Array.typed(self.class::Object).new([self.attr_web_view_handle, nil]))
+              e.attr_display.set_data(ADD_WIDGET_KEY, Array.typed(Object).new([self.attr_web_view_handle, nil]))
               Cocoa.objc_msg_send(self.attr_web_view, Cocoa::S_setFrameLoadDelegate, 0)
               Cocoa.objc_msg_send(self.attr_web_view, Cocoa::S_setResourceLoadDelegate, 0)
               Cocoa.objc_msg_send(self.attr_web_view, Cocoa::S_setUIDelegate, 0)

@@ -2469,7 +2469,7 @@ module Org::Eclipse::Swt::Custom
         typesig { [AccessibleControlEvent] }
         define_method :get_children do |e|
           child_id_count = self.attr_items.attr_length + EXTRA_CHILD_ID_COUNT
-          children = Array.typed(self.class::Object).new(child_id_count) { nil }
+          children = Array.typed(Object).new(child_id_count) { nil }
           i = 0
           while i < child_id_count
             children[i] = i

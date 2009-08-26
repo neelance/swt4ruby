@@ -227,11 +227,11 @@ module Org::Eclipse::Swt::Awt
               begin
                 constructor = clazz.get_constructor(Array.typed(self.class::Class).new([Array]))
                 # 64
-                value = constructor.new_instance(Array.typed(self.class::Object).new([RJava.cast_to_int(handle)]))
+                value = constructor.new_instance(Array.typed(Object).new([RJava.cast_to_int(handle)]))
               rescue self.class::JavaThrowable => e1
                 begin
                   constructor = clazz.get_constructor(Array.typed(self.class::Class).new([Array]))
-                  value = constructor.new_instance(Array.typed(self.class::Object).new([self.class::Long.new(handle)]))
+                  value = constructor.new_instance(Array.typed(Object).new([self.class::Long.new(handle)]))
                 rescue self.class::JavaThrowable => e2
                   exception[0] = e2
                   return
@@ -421,7 +421,7 @@ module Org::Eclipse::Swt::Awt
                         clazz = frame.get_class
                         method = clazz.get_method("synthesizeWindowActivation", Array.typed(self.class::Class).new([Array]))
                         if (!(method).nil?)
-                          method.invoke(frame, Array.typed(self.class::Object).new([Boolean.new(true)]))
+                          method.invoke(frame, Array.typed(Object).new([Boolean.new(true)]))
                         end
                       rescue self.class::JavaThrowable => e_
                       end
@@ -460,7 +460,7 @@ module Org::Eclipse::Swt::Awt
                         clazz = frame.get_class
                         method = clazz.get_method("synthesizeWindowActivation", Array.typed(self.class::Class).new([Array]))
                         if (!(method).nil?)
-                          method.invoke(frame, Array.typed(self.class::Object).new([Boolean.new(false)]))
+                          method.invoke(frame, Array.typed(Object).new([Boolean.new(false)]))
                         end
                       rescue self.class::JavaThrowable => e_
                       end
