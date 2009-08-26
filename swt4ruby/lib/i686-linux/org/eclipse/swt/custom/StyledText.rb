@@ -1067,7 +1067,7 @@ module Org::Eclipse::Swt::Custom
           end
         end
         
-        typesig { [self::String, ::Java::Int, ::Java::Int, ::Java::Boolean, self::TextLayout] }
+        typesig { [String, ::Java::Int, ::Java::Int, ::Java::Boolean, self::TextLayout] }
         # Print one segment of a header or footer decoration.
         # Headers and footers have three different segments.
         # One each for left aligned, centered, and right aligned text.
@@ -1305,7 +1305,7 @@ module Org::Eclipse::Swt::Custom
           @write_unicode = !os_name.starts_with(win95) && !os_name.starts_with(win98) && !os_name.starts_with(win_me) && (!os_name.starts_with(win_nt) || major_version > 4)
         end
         
-        typesig { [self::String, ::Java::Int, ::Java::Int] }
+        typesig { [String, ::Java::Int, ::Java::Int] }
         # Appends the specified segment of "string" to the RTF data.
         # Copy from <code>start</code> up to, but excluding, <code>end</code>.
         # 
@@ -1397,7 +1397,7 @@ module Org::Eclipse::Swt::Custom
           write(header.to_s, 0)
         end
         
-        typesig { [self::String, ::Java::Int] }
+        typesig { [String, ::Java::Int] }
         # Appends the specified line text to the RTF data.  Lines will be formatted
         # using the styles queried from the LineStyleListener, if set, or those set
         # directly in the widget.
@@ -1445,7 +1445,7 @@ module Org::Eclipse::Swt::Custom
           write_styled_line(line, line_offset, ranges, styles, line_background, line_indent, line_alignment, line_justify)
         end
         
-        typesig { [self::String] }
+        typesig { [String] }
         # Appends the specified line delimiter to the RTF data.
         # 
         # @param lineDelimiter line delimiter to write as RTF.
@@ -1460,7 +1460,7 @@ module Org::Eclipse::Swt::Custom
           write("\\par ")
         end
         
-        typesig { [self::String, ::Java::Int, Array.typed(::Java::Int), Array.typed(self::StyleRange), self::Color, ::Java::Int, ::Java::Int, ::Java::Boolean] }
+        typesig { [String, ::Java::Int, Array.typed(::Java::Int), Array.typed(self::StyleRange), self::Color, ::Java::Int, ::Java::Int, ::Java::Boolean] }
         # Appends the specified line text to the RTF data.
         # <p>
         # Use the colors and font styles specified in "styles" and "lineBackground".
@@ -1698,13 +1698,13 @@ module Org::Eclipse::Swt::Custom
           return @buffer.to_s
         end
         
-        typesig { [self::String] }
+        typesig { [String] }
         # Appends the given string to the data.
         def write(string)
           @buffer.append(string)
         end
         
-        typesig { [self::String, ::Java::Int] }
+        typesig { [String, ::Java::Int] }
         # Inserts the given string to the data at the specified offset.
         # <p>
         # Do nothing if "offset" is < 0 or > getCharCount()
@@ -1731,7 +1731,7 @@ module Org::Eclipse::Swt::Custom
           @buffer.append(i)
         end
         
-        typesig { [self::String, ::Java::Int] }
+        typesig { [String, ::Java::Int] }
         # Appends the specified line text to the data.
         # 
         # @param line line text to write. Must not contain line breaks
@@ -1764,7 +1764,7 @@ module Org::Eclipse::Swt::Custom
           end
         end
         
-        typesig { [self::String] }
+        typesig { [String] }
         # Appends the specified line delimiter to the data.
         # 
         # @param lineDelimiter line delimiter to write

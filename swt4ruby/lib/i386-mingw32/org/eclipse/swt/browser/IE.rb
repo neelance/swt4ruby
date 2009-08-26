@@ -741,7 +741,7 @@ module Org::Eclipse::Swt::Browser
                       # when the IStream object is released. If the call fails, free the buffer
                       # hGlobal.
                       if ((OS._create_stream_on_hglobal(h_global, true, ppstm)).equal?(OS::S_OK))
-                        rgdispid = self.attr_auto.get_ids_of_names(Array.typed(self.class::String).new(["Document"])) # $NON-NLS-1$
+                        rgdispid = self.attr_auto.get_ids_of_names(Array.typed(String).new(["Document"])) # $NON-NLS-1$
                         p_var_result = self.attr_auto.get_property(rgdispid[0])
                         dispatch_document = p_var_result.get_dispatch
                         # long
@@ -910,7 +910,7 @@ module Org::Eclipse::Swt::Browser
                   # AddressBar in this case returns true even though it should not be
                   # set visible.  The workaround is to only query the value of AddressBar
                   # when OnToolBar FALSE has not been emitted.
-                  rgdispid = self.attr_auto.get_ids_of_names(Array.typed(self.class::String).new(["AddressBar"])) # $NON-NLS-1$
+                  rgdispid = self.attr_auto.get_ids_of_names(Array.typed(String).new(["AddressBar"])) # $NON-NLS-1$
                   p_var_result = self.attr_auto.get_property(rgdispid[0])
                   if (!(p_var_result).nil? && (p_var_result.get_type).equal?(OLE::VT_BOOL))
                     self.attr_address_bar = p_var_result.get_boolean
