@@ -277,7 +277,7 @@ module Org::Eclipse::Swt::Custom
         
         typesig { [Event] }
         define_method :handle_event do |event|
-          if (event.attr_widget.is_a?(Control))
+          if (event.attr_widget.is_a?(self.class::Control))
             control = event.attr_widget
             if (contains(control))
               show_control(control)

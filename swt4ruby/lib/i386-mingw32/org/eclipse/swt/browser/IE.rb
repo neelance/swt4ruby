@@ -654,7 +654,7 @@ module Org::Eclipse::Swt::Browser
             when BeforeNavigate2
               var_result = event.attr_arguments[1]
               url = var_result.get_string
-              new_event = LocationEvent.new(self.attr_browser)
+              new_event = self.class::LocationEvent.new(self.attr_browser)
               new_event.attr_display = self.attr_browser.get_display
               new_event.attr_widget = self.attr_browser
               new_event.attr_location = url
@@ -674,7 +674,7 @@ module Org::Eclipse::Swt::Browser
               if (doit)
                 var_result = event.attr_arguments[0]
                 dispatch = var_result.get_dispatch
-                variant = Variant.new(self.attr_auto)
+                variant = self.class::Variant.new(self.attr_auto)
                 top = variant.get_dispatch
                 is_top = (top.get_address).equal?(dispatch.get_address)
                 if (is_top)
@@ -685,7 +685,7 @@ module Org::Eclipse::Swt::Browser
                     self.attr_documents[i_].dispose
                     i_ += 1
                   end
-                  self.attr_documents = Array.typed(OleAutomation).new(0) { nil }
+                  self.attr_documents = Array.typed(self.class::OleAutomation).new(0) { nil }
                 end
               end
             when CommandStateChange
@@ -707,10 +707,10 @@ module Org::Eclipse::Swt::Browser
               url = var_result.get_string
               if (!(self.attr_html).nil? && (url == ABOUT_BLANK))
                 ole_listener_class = self.class
-                runnable = Class.new(Runnable.class == Class ? Runnable : Object) do
+                runnable = Class.new(self.class::Runnable.class == Class ? self.class::Runnable : Object) do
                   extend LocalClass
                   include_class_members ole_listener_class
-                  include Runnable if Runnable.class == Module
+                  include self::Runnable if self::Runnable.class == Module
                   
                   typesig { [] }
                   define_method :run do
@@ -741,7 +741,7 @@ module Org::Eclipse::Swt::Browser
                       # when the IStream object is released. If the call fails, free the buffer
                       # hGlobal.
                       if ((OS._create_stream_on_hglobal(h_global, true, ppstm)).equal?(OS::S_OK))
-                        rgdispid = self.attr_auto.get_ids_of_names(Array.typed(String).new(["Document"])) # $NON-NLS-1$
+                        rgdispid = self.attr_auto.get_ids_of_names(Array.typed(self.class::String).new(["Document"])) # $NON-NLS-1$
                         p_var_result = self.attr_auto.get_property(rgdispid[0])
                         dispatch_document = p_var_result.get_dispatch
                         # long
@@ -749,7 +749,7 @@ module Org::Eclipse::Swt::Browser
                         ppv_object = Array.typed(::Java::Int).new(1) { 0 }
                         result = dispatch_document._query_interface(COM::IIDIPersistStreamInit, ppv_object)
                         if ((result).equal?(OS::S_OK))
-                          persist_stream_init = IPersistStreamInit.new(ppv_object[0])
+                          persist_stream_init = self.class::IPersistStreamInit.new(ppv_object[0])
                           if ((persist_stream_init._init_new).equal?(OS::S_OK))
                             persist_stream_init._load(ppstm[0])
                           end
@@ -760,7 +760,7 @@ module Org::Eclipse::Swt::Browser
                         # did not increase the reference count for the enclosed interface.
                         # 
                         # dispatchDocument.Release();
-                        stream = IUnknown.new(ppstm[0])
+                        stream = self.class::IUnknown.new(ppstm[0])
                         stream._release
                       else
                         OS._global_free(h_global)
@@ -783,9 +783,9 @@ module Org::Eclipse::Swt::Browser
                   runnable.run
                 end
               else
-                variant = Variant.new(self.attr_auto)
+                variant = self.class::Variant.new(self.attr_auto)
                 top = variant.get_dispatch
-                location_event = LocationEvent.new(self.attr_browser)
+                location_event = self.class::LocationEvent.new(self.attr_browser)
                 location_event.attr_display = self.attr_browser.get_display
                 location_event.attr_widget = self.attr_browser
                 location_event.attr_location = url
@@ -812,7 +812,7 @@ module Org::Eclipse::Swt::Browser
                 if (!(self.attr_global_dispatch).equal?(0) && (dispatch.get_address).equal?(self.attr_global_dispatch))
                   # final document complete
                   self.attr_global_dispatch = 0
-                  progress_event = ProgressEvent.new(self.attr_browser)
+                  progress_event = self.class::ProgressEvent.new(self.attr_browser)
                   progress_event.attr_display = self.attr_browser.get_display
                   progress_event.attr_widget = self.attr_browser
                   i_ = 0
@@ -835,7 +835,7 @@ module Org::Eclipse::Swt::Browser
               end
               web_browser = var_result.get_automation
               var_result = event.attr_arguments[1]
-              variant = Variant.new(self.attr_auto)
+              variant = self.class::Variant.new(self.attr_auto)
               top = variant.get_dispatch
               is_top = (top.get_address).equal?(dispatch.get_address)
               hook_domlisteners(web_browser, is_top)
@@ -844,7 +844,7 @@ module Org::Eclipse::Swt::Browser
               cancel = event.attr_arguments[1]
               # long
               p_cancel = cancel.get_by_ref
-              new_event = WindowEvent.new(self.attr_browser)
+              new_event = self.class::WindowEvent.new(self.attr_browser)
               new_event.attr_display = self.attr_browser.get_display
               new_event.attr_widget = self.attr_browser
               new_event.attr_required = false
@@ -854,12 +854,12 @@ module Org::Eclipse::Swt::Browser
                 i += 1
               end
               browser = nil
-              if (!(new_event.attr_browser).nil? && new_event.attr_browser.attr_web_browser.is_a?(IE))
+              if (!(new_event.attr_browser).nil? && new_event.attr_browser.attr_web_browser.is_a?(self.class::IE))
                 browser = new_event.attr_browser.attr_web_browser
               end
               doit = !(browser).nil? && !browser.attr_browser.is_disposed
               if (doit)
-                variant = Variant.new(browser.attr_auto)
+                variant = self.class::Variant.new(browser.attr_auto)
                 i_dispatch = variant.get_dispatch
                 pp_disp = event.attr_arguments[0]
                 # long
@@ -899,7 +899,7 @@ module Org::Eclipse::Swt::Browser
             when OnVisible
               arg1 = event.attr_arguments[0]
               visible = arg1.get_boolean
-              new_event = WindowEvent.new(self.attr_browser)
+              new_event = self.class::WindowEvent.new(self.attr_browser)
               new_event.attr_display = self.attr_browser.get_display
               new_event.attr_widget = self.attr_browser
               if (visible)
@@ -910,7 +910,7 @@ module Org::Eclipse::Swt::Browser
                   # AddressBar in this case returns true even though it should not be
                   # set visible.  The workaround is to only query the value of AddressBar
                   # when OnToolBar FALSE has not been emitted.
-                  rgdispid = self.attr_auto.get_ids_of_names(Array.typed(String).new(["AddressBar"])) # $NON-NLS-1$
+                  rgdispid = self.attr_auto.get_ids_of_names(Array.typed(self.class::String).new(["AddressBar"])) # $NON-NLS-1$
                   p_var_result = self.attr_auto.get_property(rgdispid[0])
                   if (!(p_var_result).nil? && (p_var_result.get_type).equal?(OLE::VT_BOOL))
                     self.attr_address_bar = p_var_result.get_boolean
@@ -941,7 +941,7 @@ module Org::Eclipse::Swt::Browser
               n_progress = !(arg1.get_type).equal?(OLE::VT_I4) ? 0 : arg1.get_int # may be -1
               arg2 = event.attr_arguments[1]
               n_progress_max = !(arg2.get_type).equal?(OLE::VT_I4) ? 0 : arg2.get_int
-              new_event = ProgressEvent.new(self.attr_browser)
+              new_event = self.class::ProgressEvent.new(self.attr_browser)
               new_event.attr_display = self.attr_browser.get_display
               new_event.attr_widget = self.attr_browser
               new_event.attr_current = n_progress
@@ -957,7 +957,7 @@ module Org::Eclipse::Swt::Browser
               arg1 = event.attr_arguments[0]
               if ((arg1.get_type).equal?(OLE::VT_BSTR))
                 text = arg1.get_string
-                new_event = StatusTextEvent.new(self.attr_browser)
+                new_event = self.class::StatusTextEvent.new(self.attr_browser)
                 new_event.attr_display = self.attr_browser.get_display
                 new_event.attr_widget = self.attr_browser
                 new_event.attr_text = text
@@ -971,7 +971,7 @@ module Org::Eclipse::Swt::Browser
               arg1 = event.attr_arguments[0]
               if ((arg1.get_type).equal?(OLE::VT_BSTR))
                 title = arg1.get_string
-                new_event = TitleEvent.new(self.attr_browser)
+                new_event = self.class::TitleEvent.new(self.attr_browser)
                 new_event.attr_display = self.attr_browser.get_display
                 new_event.attr_widget = self.attr_browser
                 new_event.attr_title = title
@@ -986,17 +986,17 @@ module Org::Eclipse::Swt::Browser
               # Browser has a text field with an active caret.  As a workaround fire
               # the Close event and dispose the Browser in an async block.
               ole_listener_class = self.class
-              self.attr_browser.get_display.async_exec(Class.new(Runnable.class == Class ? Runnable : Object) do
+              self.attr_browser.get_display.async_exec(Class.new(self.class::Runnable.class == Class ? self.class::Runnable : Object) do
                 extend LocalClass
                 include_class_members ole_listener_class
-                include Runnable if Runnable.class == Module
+                include self::Runnable if self::Runnable.class == Module
                 
                 typesig { [] }
                 define_method :run do
                   if (self.attr_browser.is_disposed)
                     return
                   end
-                  new_event = WindowEvent.new(self.attr_browser)
+                  new_event = self.class::WindowEvent.new(self.attr_browser)
                   new_event.attr_display = self.attr_browser.get_display
                   new_event.attr_widget = self.attr_browser
                   i = 0
@@ -1023,25 +1023,25 @@ module Org::Eclipse::Swt::Browser
               COM._move_memory(p_cancel, Array.typed(::Java::Short).new([is_child_window ? COM::VARIANT_FALSE : COM::VARIANT_TRUE]), 2)
             when WindowSetHeight
               if ((self.attr_size).nil?)
-                self.attr_size = Point.new(0, 0)
+                self.attr_size = self.class::Point.new(0, 0)
               end
               arg1 = event.attr_arguments[0]
               self.attr_size.attr_y = arg1.get_int
             when WindowSetLeft
               if ((self.attr_location).nil?)
-                self.attr_location = Point.new(0, 0)
+                self.attr_location = self.class::Point.new(0, 0)
               end
               arg1 = event.attr_arguments[0]
               self.attr_location.attr_x = arg1.get_int
             when WindowSetTop
               if ((self.attr_location).nil?)
-                self.attr_location = Point.new(0, 0)
+                self.attr_location = self.class::Point.new(0, 0)
               end
               arg1 = event.attr_arguments[0]
               self.attr_location.attr_y = arg1.get_int
             when WindowSetWidth
               if ((self.attr_size).nil?)
-                self.attr_size = Point.new(0, 0)
+                self.attr_size = self.class::Point.new(0, 0)
               end
               arg1 = event.attr_arguments[0]
               self.attr_size.attr_x = arg1.get_int

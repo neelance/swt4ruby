@@ -279,7 +279,7 @@ module Org::Eclipse::Swt::Custom
           @segments = nil
         end
         
-        typesig { [LineInfo] }
+        typesig { [self::LineInfo] }
         def initialize(info)
           @flags = 0
           @background = nil

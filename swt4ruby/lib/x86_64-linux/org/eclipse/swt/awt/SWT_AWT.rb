@@ -260,14 +260,14 @@ module Org::Eclipse::Swt::Awt
             case (e.attr_type)
             when SWT::Deiconify
               listener_class = self.class
-              EventQueue.invoke_later(Class.new(Runnable.class == Class ? Runnable : Object) do
+              EventQueue.invoke_later(Class.new(self.class::Runnable.class == Class ? self.class::Runnable : Object) do
                 extend LocalClass
                 include_class_members listener_class
-                include Runnable if Runnable.class == Module
+                include self::Runnable if self::Runnable.class == Module
                 
                 typesig { [] }
                 define_method :run do
-                  frame.dispatch_event(WindowEvent.new(frame, WindowEvent::WINDOW_DEICONIFIED))
+                  frame.dispatch_event(self.class::WindowEvent.new(frame, WindowEvent::WINDOW_DEICONIFIED))
                 end
                 
                 typesig { [] }
@@ -280,14 +280,14 @@ module Org::Eclipse::Swt::Awt
               end.new_local(self))
             when SWT::Iconify
               listener_class = self.class
-              EventQueue.invoke_later(Class.new(Runnable.class == Class ? Runnable : Object) do
+              EventQueue.invoke_later(Class.new(self.class::Runnable.class == Class ? self.class::Runnable : Object) do
                 extend LocalClass
                 include_class_members listener_class
-                include Runnable if Runnable.class == Module
+                include self::Runnable if self::Runnable.class == Module
                 
                 typesig { [] }
                 define_method :run do
-                  frame.dispatch_event(WindowEvent.new(frame, WindowEvent::WINDOW_ICONIFIED))
+                  frame.dispatch_event(self.class::WindowEvent.new(frame, WindowEvent::WINDOW_ICONIFIED))
                 end
                 
                 typesig { [] }
@@ -326,10 +326,10 @@ module Org::Eclipse::Swt::Awt
               shell_.remove_listener(SWT::Iconify, shell_listener)
               parent.set_visible(false)
               listener_class = self.class
-              EventQueue.invoke_later(Class.new(Runnable.class == Class ? Runnable : Object) do
+              EventQueue.invoke_later(Class.new(self.class::Runnable.class == Class ? self.class::Runnable : Object) do
                 extend LocalClass
                 include_class_members listener_class
-                include Runnable if Runnable.class == Module
+                include self::Runnable if self::Runnable.class == Module
                 
                 typesig { [] }
                 define_method :run do
@@ -348,10 +348,10 @@ module Org::Eclipse::Swt::Awt
               if (Library::JAVA_VERSION >= Library._java_version(1, 6, 0))
                 client_area = parent.get_client_area
                 listener_class = self.class
-                EventQueue.invoke_later(Class.new(Runnable.class == Class ? Runnable : Object) do
+                EventQueue.invoke_later(Class.new(self.class::Runnable.class == Class ? self.class::Runnable : Object) do
                   extend LocalClass
                   include_class_members listener_class
-                  include Runnable if Runnable.class == Module
+                  include self::Runnable if self::Runnable.class == Module
                   
                   typesig { [] }
                   define_method :run do
@@ -392,10 +392,10 @@ module Org::Eclipse::Swt::Awt
             end
             client_area = parent.get_client_area
             runnable_class = self.class
-            EventQueue.invoke_later(Class.new(Runnable.class == Class ? Runnable : Object) do
+            EventQueue.invoke_later(Class.new(self.class::Runnable.class == Class ? self.class::Runnable : Object) do
               extend LocalClass
               include_class_members runnable_class
-              include Runnable if Runnable.class == Module
+              include self::Runnable if self::Runnable.class == Module
               
               typesig { [] }
               define_method :run do
@@ -466,10 +466,10 @@ module Org::Eclipse::Swt::Awt
           typesig { [ComponentEvent] }
           define_method :component_resized do |e|
             component_adapter_class = self.class
-            display.sync_exec(Class.new(Runnable.class == Class ? Runnable : Object) do
+            display.sync_exec(Class.new(self.class::Runnable.class == Class ? self.class::Runnable : Object) do
               extend LocalClass
               include_class_members component_adapter_class
-              include Runnable if Runnable.class == Module
+              include self::Runnable if self::Runnable.class == Module
               
               typesig { [] }
               define_method :run do

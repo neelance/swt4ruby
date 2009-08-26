@@ -161,10 +161,10 @@ module Org::Eclipse::Swt::Custom
           @runnable = nil
           super()
           tree_listener_class = self.class
-          @runnable = Class.new(Runnable.class == Class ? Runnable : Object) do
+          @runnable = Class.new(self.class::Runnable.class == Class ? self.class::Runnable : Object) do
             extend LocalClass
             include_class_members tree_listener_class
-            include Runnable if Runnable.class == Module
+            include self::Runnable if self::Runnable.class == Module
             
             typesig { [] }
             define_method :run do

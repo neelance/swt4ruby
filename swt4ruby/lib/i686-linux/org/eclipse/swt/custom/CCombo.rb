@@ -199,10 +199,10 @@ module Org::Eclipse::Swt::Custom
           end
           if ((get_shell).equal?(event.attr_widget))
             listener_class = self.class
-            get_display.async_exec(Class.new(Runnable.class == Class ? Runnable : Object) do
+            get_display.async_exec(Class.new(self.class::Runnable.class == Class ? self.class::Runnable : Object) do
               extend LocalClass
               include_class_members listener_class
-              include Runnable if Runnable.class == Module
+              include self::Runnable if self::Runnable.class == Module
               
               typesig { [] }
               define_method :run do

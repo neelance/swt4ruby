@@ -246,7 +246,7 @@ module Org::Eclipse::Swt::Ole::Win32
           
           typesig { [] }
           define_method :run do
-            if (last_focus[0].is_a?(OleClientSite) && !last_focus[0].is_disposed)
+            if (last_focus[0].is_a?(self.class::OleClientSite) && !last_focus[0].is_disposed)
               # ignore popup menus and dialogs
               # long
               hwnd = OS._get_focus
@@ -262,16 +262,16 @@ module Org::Eclipse::Swt::Ole::Win32
             end
             if ((last_focus[0]).nil? || last_focus[0].is_disposed || !last_focus[0].is_focus_control)
               current_focus = display.get_focus_control
-              if (current_focus.is_a?(OleFrame))
+              if (current_focus.is_a?(self.class::OleFrame))
                 frame = current_focus
                 current_focus = frame.get_current_document
               end
               if (!(last_focus[0]).equal?(current_focus))
-                event = Event.new
-                if (last_focus[0].is_a?(OleClientSite) && !last_focus[0].is_disposed)
+                event = self.class::Event.new
+                if (last_focus[0].is_a?(self.class::OleClientSite) && !last_focus[0].is_disposed)
                   last_focus[0].notify_listeners(SWT::FocusOut, event)
                 end
-                if (current_focus.is_a?(OleClientSite) && !current_focus.is_disposed)
+                if (current_focus.is_a?(self.class::OleClientSite) && !current_focus.is_disposed)
                   current_focus.notify_listeners(SWT::FocusIn, event)
                 end
               end

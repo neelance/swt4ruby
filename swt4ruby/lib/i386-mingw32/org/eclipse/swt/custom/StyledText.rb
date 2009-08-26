@@ -665,7 +665,7 @@ module Org::Eclipse::Swt::Custom
         alias_method :attr_print_margin=, :print_margin=
         undef_method :print_margin=
         
-        typesig { [StyledText, Printer, StyledTextPrintOptions] }
+        typesig { [self::StyledText, self::Printer, self::StyledTextPrintOptions] }
         # Creates an instance of <code>Printing</code>.
         # Copies the widget content and rendering data that needs
         # to be requested from listeners.
@@ -713,12 +713,12 @@ module Org::Eclipse::Swt::Custom
               @selection = styled_text.get_selection_range
             end
           end
-          @printer_renderer = StyledTextRenderer.new(printer, nil)
+          @printer_renderer = self.class::StyledTextRenderer.new(printer, nil)
           @printer_renderer.set_content(copy_content(styled_text.get_content))
           cache_line_data(styled_text)
         end
         
-        typesig { [StyledText] }
+        typesig { [self::StyledText] }
         # Caches all line data that needs to be requested from a listener.
         # </p>
         # @param printerContent <code>StyledTextContent</code> to request
@@ -759,7 +759,7 @@ module Org::Eclipse::Swt::Custom
           end
           screen_dpi = styled_text.get_display.get_dpi
           printer_dpi = @printer.get_dpi
-          @resources = Hashtable.new
+          @resources = self.class::Hashtable.new
           i = 0
           while i < line_count
             color = @printer_renderer.get_line_background(i, nil)
@@ -767,7 +767,7 @@ module Org::Eclipse::Swt::Custom
               if (@print_options.attr_print_line_background)
                 printer_color = @resources.get(color)
                 if ((printer_color).nil?)
-                  printer_color = Color.new(@printer, color.get_rgb)
+                  printer_color = self.class::Color.new(@printer, color.get_rgb)
                   @resources.put(color, printer_color)
                 end
                 @printer_renderer.set_line_background(i, 1, printer_color)
@@ -789,7 +789,7 @@ module Org::Eclipse::Swt::Custom
             if (!(style.attr_font).nil?)
               printer_font = @resources.get(font)
               if ((printer_font).nil?)
-                printer_font = Font.new(@printer, font.get_font_data)
+                printer_font = self.class::Font.new(@printer, font.get_font_data)
                 @resources.put(font, printer_font)
               end
               style.attr_font = printer_font
@@ -799,7 +799,7 @@ module Org::Eclipse::Swt::Custom
               printer_color = @resources.get(color)
               if (@print_options.attr_print_text_foreground)
                 if ((printer_color).nil?)
-                  printer_color = Color.new(@printer, color.get_rgb)
+                  printer_color = self.class::Color.new(@printer, color.get_rgb)
                   @resources.put(color, printer_color)
                 end
                 style.attr_foreground = printer_color
@@ -812,7 +812,7 @@ module Org::Eclipse::Swt::Custom
               printer_color = @resources.get(color)
               if (@print_options.attr_print_text_background)
                 if ((printer_color).nil?)
-                  printer_color = Color.new(@printer, color.get_rgb)
+                  printer_color = self.class::Color.new(@printer, color.get_rgb)
                   @resources.put(color, printer_color)
                 end
                 style.attr_background = printer_color
@@ -838,12 +838,12 @@ module Org::Eclipse::Swt::Custom
           end
         end
         
-        typesig { [StyledTextContent] }
+        typesig { [self::StyledTextContent] }
         # Copies the text of the specified <code>StyledTextContent</code>.
         # </p>
         # @param original the <code>StyledTextContent</code> to copy.
         def copy_content(original)
-          printer_content = DefaultContent.new
+          printer_content = self.class::DefaultContent.new
           insert_offset = 0
           i = 0
           while i < original.get_line_count
@@ -889,7 +889,7 @@ module Org::Eclipse::Swt::Custom
         def init
           trim = @printer.compute_trim(0, 0, 0, 0)
           dpi = @printer.get_dpi
-          @printer_font = Font.new(@printer, @font_data.get_name, @font_data.get_height, SWT::NORMAL)
+          @printer_font = self.class::Font.new(@printer, @font_data.get_name, @font_data.get_height, SWT::NORMAL)
           @client_area = @printer.get_client_area
           @page_width = @client_area.attr_width
           # one inch margin around text
@@ -942,7 +942,7 @@ module Org::Eclipse::Swt::Custom
           orientation = @gc.get_style & (SWT::RIGHT_TO_LEFT | SWT::LEFT_TO_RIGHT)
           print_layout = nil
           if (@print_options.attr_print_line_numbers || !(@print_options.attr_header).nil? || !(@print_options.attr_footer).nil?)
-            print_layout = TextLayout.new(@printer)
+            print_layout = self.class::TextLayout.new(@printer)
             print_layout.set_font(@printer_font)
           end
           if (@print_options.attr_print_line_numbers)
@@ -960,7 +960,7 @@ module Org::Eclipse::Swt::Custom
                 i += 1
               end
             else
-              buffer = StringBuffer.new("0")
+              buffer = self.class::StringBuffer.new("0")
               while ((count /= 10) > 0)
                 buffer.append("0")
               end
@@ -1039,7 +1039,7 @@ module Org::Eclipse::Swt::Custom
           end
         end
         
-        typesig { [::Java::Int, ::Java::Boolean, TextLayout] }
+        typesig { [::Java::Int, ::Java::Boolean, self::TextLayout] }
         # Print header or footer decorations.
         # 
         # @param page page number to print, if specified in the StyledTextPrintOptions header or footer.
@@ -1067,7 +1067,7 @@ module Org::Eclipse::Swt::Custom
           end
         end
         
-        typesig { [String, ::Java::Int, ::Java::Int, ::Java::Boolean, TextLayout] }
+        typesig { [self::String, ::Java::Int, ::Java::Int, ::Java::Boolean, self::TextLayout] }
         # Print one segment of a header or footer decoration.
         # Headers and footers have three different segments.
         # One each for left aligned, centered, and right aligned text.
@@ -1080,7 +1080,7 @@ module Org::Eclipse::Swt::Custom
           page_index = segment.index_of(StyledTextPrintOptions::PAGE_TAG)
           if (!(page_index).equal?(-1))
             page_tag_length = StyledTextPrintOptions::PAGE_TAG.length
-            buffer = StringBuffer.new(segment.substring(0, page_index))
+            buffer = self.class::StringBuffer.new(segment.substring(0, page_index))
             buffer.append(page)
             buffer.append(segment.substring(page_index + page_tag_length))
             segment = RJava.cast_to_string(buffer.to_s)
@@ -1111,7 +1111,7 @@ module Org::Eclipse::Swt::Custom
           end
         end
         
-        typesig { [::Java::Int, ::Java::Int, SwtGC, Color, Color, TextLayout, TextLayout, ::Java::Int] }
+        typesig { [::Java::Int, ::Java::Int, SwtGC, self::Color, self::Color, self::TextLayout, self::TextLayout, ::Java::Int] }
         def print_line(x, y, gc, foreground, background, layout, print_layout, index)
           if (!(background).nil?)
             rect = layout.get_bounds
@@ -1224,8 +1224,8 @@ module Org::Eclipse::Swt::Custom
           @font_table = nil
           @write_unicode = false
           super(start, length)
-          @color_table = Vector.new
-          @font_table = Vector.new
+          @color_table = self.class::Vector.new
+          @font_table = self.class::Vector.new
           @color_table.add_element(get_foreground)
           @color_table.add_element(get_background)
           @font_table.add_element(get_font)
@@ -1244,7 +1244,7 @@ module Org::Eclipse::Swt::Custom
           end
         end
         
-        typesig { [Color, ::Java::Int] }
+        typesig { [self::Color, ::Java::Int] }
         # Returns the index of the specified color in the RTF color table.
         # 
         # @param color the color
@@ -1263,7 +1263,7 @@ module Org::Eclipse::Swt::Custom
           return index
         end
         
-        typesig { [Font] }
+        typesig { [self::Font] }
         # Returns the index of the specified color in the RTF color table.
         # 
         # @param color the color
@@ -1296,7 +1296,7 @@ module Org::Eclipse::Swt::Custom
               os_version = RJava.cast_to_string(os_version.substring(0, major_index))
               begin
                 major_version = JavaInteger.parse_int(os_version)
-              rescue NumberFormatException => exception
+              rescue self.class::NumberFormatException => exception
                 # ignore exception. version number remains unknown.
                 # will write without Unicode
               end
@@ -1305,7 +1305,7 @@ module Org::Eclipse::Swt::Custom
           @write_unicode = !os_name.starts_with(win95) && !os_name.starts_with(win98) && !os_name.starts_with(win_me) && (!os_name.starts_with(win_nt) || major_version > 4)
         end
         
-        typesig { [String, ::Java::Int, ::Java::Int] }
+        typesig { [self::String, ::Java::Int, ::Java::Int] }
         # Appends the specified segment of "string" to the RTF data.
         # Copy from <code>start</code> up to, but excluding, <code>end</code>.
         # 
@@ -1351,7 +1351,7 @@ module Org::Eclipse::Swt::Custom
         typesig { [] }
         # Writes the RTF header including font table and color table.
         def write_header
-          header = StringBuffer.new
+          header = self.class::StringBuffer.new
           font_data = get_font.get_font_data[0]
           header.append("{\\rtf1\\ansi")
           # specify code page, necessary for copy to work in bidi
@@ -1397,7 +1397,7 @@ module Org::Eclipse::Swt::Custom
           write(header.to_s, 0)
         end
         
-        typesig { [String, ::Java::Int] }
+        typesig { [self::String, ::Java::Int] }
         # Appends the specified line text to the RTF data.  Lines will be formatted
         # using the styles queried from the LineStyleListener, if set, or those set
         # directly in the widget.
@@ -1435,7 +1435,7 @@ module Org::Eclipse::Swt::Custom
             styles = self.attr_renderer.get_style_ranges(line_offset, line.length, false)
           end
           if ((styles).nil?)
-            styles = Array.typed(StyleRange).new(0) { nil }
+            styles = Array.typed(self.class::StyleRange).new(0) { nil }
           end
           line_background = self.attr_renderer.get_line_background(line_index, nil)
           event = get_line_background_data(line_offset, line)
@@ -1445,7 +1445,7 @@ module Org::Eclipse::Swt::Custom
           write_styled_line(line, line_offset, ranges, styles, line_background, line_indent, line_alignment, line_justify)
         end
         
-        typesig { [String] }
+        typesig { [self::String] }
         # Appends the specified line delimiter to the RTF data.
         # 
         # @param lineDelimiter line delimiter to write as RTF.
@@ -1460,7 +1460,7 @@ module Org::Eclipse::Swt::Custom
           write("\\par ")
         end
         
-        typesig { [String, ::Java::Int, Array.typed(::Java::Int), Array.typed(StyleRange), Color, ::Java::Int, ::Java::Int, ::Java::Boolean] }
+        typesig { [self::String, ::Java::Int, Array.typed(::Java::Int), Array.typed(self::StyleRange), self::Color, ::Java::Int, ::Java::Int, ::Java::Boolean] }
         # Appends the specified line text to the RTF data.
         # <p>
         # Use the colors and font styles specified in "styles" and "lineBackground".
@@ -1652,7 +1652,7 @@ module Org::Eclipse::Swt::Custom
           @start_offset = 0
           @end_offset = 0
           @is_closed = false
-          @buffer = StringBuffer.new(length)
+          @buffer = self.class::StringBuffer.new(length)
           @start_offset = start
           @end_offset = start + length
         end
@@ -1698,13 +1698,13 @@ module Org::Eclipse::Swt::Custom
           return @buffer.to_s
         end
         
-        typesig { [String] }
+        typesig { [self::String] }
         # Appends the given string to the data.
         def write(string)
           @buffer.append(string)
         end
         
-        typesig { [String, ::Java::Int] }
+        typesig { [self::String, ::Java::Int] }
         # Inserts the given string to the data at the specified offset.
         # <p>
         # Do nothing if "offset" is < 0 or > getCharCount()
@@ -1731,7 +1731,7 @@ module Org::Eclipse::Swt::Custom
           @buffer.append(i)
         end
         
-        typesig { [String, ::Java::Int] }
+        typesig { [self::String, ::Java::Int] }
         # Appends the specified line text to the data.
         # 
         # @param line line text to write. Must not contain line breaks
@@ -1764,7 +1764,7 @@ module Org::Eclipse::Swt::Custom
           end
         end
         
-        typesig { [String] }
+        typesig { [self::String] }
         # Appends the specified line delimiter to the data.
         # 
         # @param lineDelimiter line delimiter to write

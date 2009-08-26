@@ -217,7 +217,7 @@ module Org::Eclipse::Swt::Awt
               begin
                 class_name = !(self.attr_embedded_frame_class).nil? ? self.attr_embedded_frame_class : "sun.awt.windows.WEmbeddedFrame"
                 clazz = Class.for_name(class_name)
-              rescue JavaThrowable => e
+              rescue self.class::JavaThrowable => e
                 exception[0] = e
                 return
               end
@@ -225,14 +225,14 @@ module Org::Eclipse::Swt::Awt
               value = nil
               constructor = nil
               begin
-                constructor = clazz.get_constructor(Array.typed(Class).new([Array]))
+                constructor = clazz.get_constructor(Array.typed(self.class::Class).new([Array]))
                 # 64
                 value = constructor.new_instance(Array.typed(Object).new([RJava.cast_to_int(handle)]))
-              rescue JavaThrowable => e1
+              rescue self.class::JavaThrowable => e1
                 begin
-                  constructor = clazz.get_constructor(Array.typed(Class).new([Array]))
-                  value = constructor.new_instance(Array.typed(Object).new([Long.new(handle)]))
-                rescue JavaThrowable => e2
+                  constructor = clazz.get_constructor(Array.typed(self.class::Class).new([Array]))
+                  value = constructor.new_instance(Array.typed(Object).new([self.class::Long.new(handle)]))
+                rescue self.class::JavaThrowable => e2
                   exception[0] = e2
                   return
                 end
@@ -252,7 +252,7 @@ module Org::Eclipse::Swt::Awt
                 field = clazz.get_declared_field("winGraphicsConfig")
                 field.set_accessible(true)
                 field.set(frame.get_peer, frame.get_graphics_configuration)
-              rescue JavaThrowable => e
+              rescue self.class::JavaThrowable => e
               end
               result[0] = frame
             ensure
@@ -308,14 +308,14 @@ module Org::Eclipse::Swt::Awt
             case (e.attr_type)
             when SWT::Deiconify
               listener_class = self.class
-              EventQueue.invoke_later(Class.new(Runnable.class == Class ? Runnable : Object) do
+              EventQueue.invoke_later(Class.new(self.class::Runnable.class == Class ? self.class::Runnable : Object) do
                 extend LocalClass
                 include_class_members listener_class
-                include Runnable if Runnable.class == Module
+                include self::Runnable if self::Runnable.class == Module
                 
                 typesig { [] }
                 define_method :run do
-                  frame.dispatch_event(WindowEvent.new(frame, WindowEvent::WINDOW_DEICONIFIED))
+                  frame.dispatch_event(self.class::WindowEvent.new(frame, WindowEvent::WINDOW_DEICONIFIED))
                 end
                 
                 typesig { [] }
@@ -328,14 +328,14 @@ module Org::Eclipse::Swt::Awt
               end.new_local(self))
             when SWT::Iconify
               listener_class = self.class
-              EventQueue.invoke_later(Class.new(Runnable.class == Class ? Runnable : Object) do
+              EventQueue.invoke_later(Class.new(self.class::Runnable.class == Class ? self.class::Runnable : Object) do
                 extend LocalClass
                 include_class_members listener_class
-                include Runnable if Runnable.class == Module
+                include self::Runnable if self::Runnable.class == Module
                 
                 typesig { [] }
                 define_method :run do
-                  frame.dispatch_event(WindowEvent.new(frame, WindowEvent::WINDOW_ICONIFIED))
+                  frame.dispatch_event(self.class::WindowEvent.new(frame, WindowEvent::WINDOW_ICONIFIED))
                 end
                 
                 typesig { [] }
@@ -377,16 +377,16 @@ module Org::Eclipse::Swt::Awt
               shell_.remove_listener(SWT::Iconify, shell_listener)
               parent.set_visible(false)
               listener_class = self.class
-              EventQueue.invoke_later(Class.new(Runnable.class == Class ? Runnable : Object) do
+              EventQueue.invoke_later(Class.new(self.class::Runnable.class == Class ? self.class::Runnable : Object) do
                 extend LocalClass
                 include_class_members listener_class
-                include Runnable if Runnable.class == Module
+                include self::Runnable if self::Runnable.class == Module
                 
                 typesig { [] }
                 define_method :run do
                   begin
                     frame.dispose
-                  rescue JavaThrowable => e_
+                  rescue self.class::JavaThrowable => e_
                   end
                 end
                 
@@ -400,30 +400,30 @@ module Org::Eclipse::Swt::Awt
               end.new_local(self))
             when SWT::Activate
               listener_class = self.class
-              EventQueue.invoke_later(Class.new(Runnable.class == Class ? Runnable : Object) do
+              EventQueue.invoke_later(Class.new(self.class::Runnable.class == Class ? self.class::Runnable : Object) do
                 extend LocalClass
                 include_class_members listener_class
-                include Runnable if Runnable.class == Module
+                include self::Runnable if self::Runnable.class == Module
                 
                 typesig { [] }
                 define_method :run do
                   if (Library::JAVA_VERSION < Library._java_version(1, 4, 0))
-                    frame.dispatch_event(WindowEvent.new(frame, WindowEvent::WINDOW_ACTIVATED))
-                    frame.dispatch_event(FocusEvent.new(frame, FocusEvent::FOCUS_GAINED))
+                    frame.dispatch_event(self.class::WindowEvent.new(frame, WindowEvent::WINDOW_ACTIVATED))
+                    frame.dispatch_event(self.class::FocusEvent.new(frame, FocusEvent::FOCUS_GAINED))
                   else
                     if (Library::JAVA_VERSION < Library._java_version(1, 5, 0))
-                      frame.dispatch_event(WindowEvent.new(frame, WindowEvent::WINDOW_ACTIVATED))
+                      frame.dispatch_event(self.class::WindowEvent.new(frame, WindowEvent::WINDOW_ACTIVATED))
                       # WindowEvent.WINDOW_GAINED_FOCUS
-                      frame.dispatch_event(WindowEvent.new(frame, 207))
+                      frame.dispatch_event(self.class::WindowEvent.new(frame, 207))
                     else
                       begin
                         # Initialize the default focus traversal policy
                         clazz = frame.get_class
-                        method = clazz.get_method("synthesizeWindowActivation", Array.typed(Class).new([Array]))
+                        method = clazz.get_method("synthesizeWindowActivation", Array.typed(self.class::Class).new([Array]))
                         if (!(method).nil?)
-                          method.invoke(frame, Array.typed(Object).new([Boolean.new(true)]))
+                          method.invoke(frame, Array.typed(Object).new([self.class::Boolean.new(true)]))
                         end
-                      rescue JavaThrowable => e_
+                      rescue self.class::JavaThrowable => e_
                       end
                     end
                   end
@@ -439,30 +439,30 @@ module Org::Eclipse::Swt::Awt
               end.new_local(self))
             when SWT::Deactivate
               listener_class = self.class
-              EventQueue.invoke_later(Class.new(Runnable.class == Class ? Runnable : Object) do
+              EventQueue.invoke_later(Class.new(self.class::Runnable.class == Class ? self.class::Runnable : Object) do
                 extend LocalClass
                 include_class_members listener_class
-                include Runnable if Runnable.class == Module
+                include self::Runnable if self::Runnable.class == Module
                 
                 typesig { [] }
                 define_method :run do
                   if (Library::JAVA_VERSION < Library._java_version(1, 4, 0))
-                    frame.dispatch_event(WindowEvent.new(frame, WindowEvent::WINDOW_DEACTIVATED))
-                    frame.dispatch_event(FocusEvent.new(frame, FocusEvent::FOCUS_LOST))
+                    frame.dispatch_event(self.class::WindowEvent.new(frame, WindowEvent::WINDOW_DEACTIVATED))
+                    frame.dispatch_event(self.class::FocusEvent.new(frame, FocusEvent::FOCUS_LOST))
                   else
                     if (Library::JAVA_VERSION < Library._java_version(1, 5, 0))
                       # WindowEvent.WINDOW_LOST_FOCUS
-                      frame.dispatch_event(WindowEvent.new(frame, 208))
-                      frame.dispatch_event(WindowEvent.new(frame, WindowEvent::WINDOW_DEACTIVATED))
+                      frame.dispatch_event(self.class::WindowEvent.new(frame, 208))
+                      frame.dispatch_event(self.class::WindowEvent.new(frame, WindowEvent::WINDOW_DEACTIVATED))
                     else
                       begin
                         # Initialize the default focus traversal policy
                         clazz = frame.get_class
-                        method = clazz.get_method("synthesizeWindowActivation", Array.typed(Class).new([Array]))
+                        method = clazz.get_method("synthesizeWindowActivation", Array.typed(self.class::Class).new([Array]))
                         if (!(method).nil?)
-                          method.invoke(frame, Array.typed(Object).new([Boolean.new(false)]))
+                          method.invoke(frame, Array.typed(Object).new([self.class::Boolean.new(false)]))
                         end
-                      rescue JavaThrowable => e_
+                      rescue self.class::JavaThrowable => e_
                       end
                     end
                   end
@@ -502,10 +502,10 @@ module Org::Eclipse::Swt::Awt
             end
             client_area = parent.get_client_area
             runnable_class = self.class
-            EventQueue.invoke_later(Class.new(Runnable.class == Class ? Runnable : Object) do
+            EventQueue.invoke_later(Class.new(self.class::Runnable.class == Class ? self.class::Runnable : Object) do
               extend LocalClass
               include_class_members runnable_class
-              include Runnable if Runnable.class == Module
+              include self::Runnable if self::Runnable.class == Module
               
               typesig { [] }
               define_method :run do
@@ -576,10 +576,10 @@ module Org::Eclipse::Swt::Awt
           typesig { [ComponentEvent] }
           define_method :component_resized do |e|
             component_adapter_class = self.class
-            display.sync_exec(Class.new(Runnable.class == Class ? Runnable : Object) do
+            display.sync_exec(Class.new(self.class::Runnable.class == Class ? self.class::Runnable : Object) do
               extend LocalClass
               include_class_members component_adapter_class
-              include Runnable if Runnable.class == Module
+              include self::Runnable if self::Runnable.class == Module
               
               typesig { [] }
               define_method :run do

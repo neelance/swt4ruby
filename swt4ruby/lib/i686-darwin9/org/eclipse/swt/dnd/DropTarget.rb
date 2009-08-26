@@ -328,9 +328,9 @@ module Org::Eclipse::Swt::Dnd
             allowed_operations = self.attr_drag_over_event.attr_operations
             allowed_types = self.attr_drag_over_event.attr_data_types
             # pass a copy of data types in to listeners in case application modifies it
-            data_types = Array.typed(TransferData).new(allowed_types.attr_length) { nil }
+            data_types = Array.typed(self.class::TransferData).new(allowed_types.attr_length) { nil }
             System.arraycopy(allowed_types, 0, data_types, 0, data_types.attr_length)
-            event = DNDEvent.new
+            event = self.class::DNDEvent.new
             event.attr_widget = self.attr_drag_over_event.attr_widget
             event.attr_x = self.attr_drag_over_event.attr_x
             event.attr_y = self.attr_drag_over_event.attr_y

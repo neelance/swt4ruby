@@ -61,7 +61,7 @@ module Org::Eclipse::Swt::Graphics
         alias_method :attr_atsu_style=, :atsu_style=
         undef_method :atsu_style=
         
-        typesig { [Device, Font] }
+        typesig { [self::Device, self::Font] }
         def create_style(device, default_font)
           if (!(@atsu_style).equal?(0))
             return
@@ -253,7 +253,7 @@ module Org::Eclipse::Swt::Graphics
             index += 1
           end
           if (!(foreground).nil? && (metrics).nil?)
-            rgb = RGBColor.new
+            rgb = self.class::RGBColor.new
             color = foreground.attr_handle
             rgb.attr_red = RJava.cast_to_short((color[0] * 0xffff))
             rgb.attr_green = RJava.cast_to_short((color[1] * 0xffff))
