@@ -62,7 +62,7 @@ module Org::Eclipse::Swt::Internal::Cairo
     undef_method :max_y_advance=
     
     class_module.module_eval {
-      const_set_lazy(:Sizeof) { Cairo.cairo_font_extents_t_sizeof }
+      const_set_lazy(:Sizeof) { SwtCairo.cairo_font_extents_t_sizeof }
       const_attr_reader  :Sizeof
     }
     

@@ -661,7 +661,7 @@ module Org::Eclipse::Swt::Printing
         @print_job = 0
         return false
       end
-      @cairo = Cairo.cairo_create(@surface)
+      @cairo = SwtCairo.cairo_create(@surface)
       if ((@cairo).equal?(0))
         OS.g_object_unref(@print_job)
         @print_job = 0
@@ -685,7 +685,7 @@ module Org::Eclipse::Swt::Printing
         OS.g_object_unref(@page_setup)
       end
       if (!(@cairo).equal?(0))
-        Cairo.cairo_destroy(@cairo)
+        SwtCairo.cairo_destroy(@cairo)
       end
       if (!(@print_job).equal?(0))
         OS.g_object_unref(@print_job)
@@ -708,7 +708,7 @@ module Org::Eclipse::Swt::Printing
       if ((@print_job).equal?(0))
         return
       end
-      Cairo.cairo_surface_finish(@surface)
+      SwtCairo.cairo_surface_finish(@surface)
       OS.gtk_print_job_send(@print_job, 0, 0, 0)
     end
     
@@ -752,12 +752,12 @@ module Org::Eclipse::Swt::Printing
       end
       width = OS.gtk_page_setup_get_paper_width(@page_setup, OS::GTK_UNIT_POINTS)
       height = OS.gtk_page_setup_get_paper_height(@page_setup, OS::GTK_UNIT_POINTS)
-      type = Cairo.cairo_surface_get_type(@surface)
+      type = SwtCairo.cairo_surface_get_type(@surface)
       case (type)
-      when Cairo::CAIRO_SURFACE_TYPE_PS
-        Cairo.cairo_ps_surface_set_size(@surface, width, height)
-      when Cairo::CAIRO_SURFACE_TYPE_PDF
-        Cairo.cairo_pdf_surface_set_size(@surface, width, height)
+      when SwtCairo::CAIRO_SURFACE_TYPE_PS
+        SwtCairo.cairo_ps_surface_set_size(@surface, width, height)
+      when SwtCairo::CAIRO_SURFACE_TYPE_PDF
+        SwtCairo.cairo_pdf_surface_set_size(@surface, width, height)
       end
       return true
     end
@@ -775,7 +775,7 @@ module Org::Eclipse::Swt::Printing
     def end_page
       check_device
       if (!(@cairo).equal?(0))
-        Cairo.cairo_show_page(@cairo)
+        SwtCairo.cairo_show_page(@cairo)
       end
     end
     

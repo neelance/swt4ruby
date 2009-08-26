@@ -241,19 +241,19 @@ module Org::Eclipse::Swt::Graphics
           OS.pango_layout_set_font_description(layout, font.attr_handle)
           current_x = Array.typed(::Java::Double).new(1) { 0.0 }
           current_y = Array.typed(::Java::Double).new(1) { 0.0 }
-          Cairo.cairo_get_current_point(cairo, current_x, current_y)
+          SwtCairo.cairo_get_current_point(cairo, current_x, current_y)
           if (!(current_x[0]).equal?(x) || !(current_y[0]).equal?(y))
-            Cairo.cairo_move_to(cairo, x, y)
+            SwtCairo.cairo_move_to(cairo, x, y)
           end
           OS.pango_cairo_layout_path(cairo, layout)
           OS.g_object_unref(layout)
         else
           SwtGC.set_cairo_font(cairo, font)
           extents = Cairo_font_extents_t.new
-          Cairo.cairo_font_extents(cairo, extents)
+          SwtCairo.cairo_font_extents(cairo, extents)
           baseline = y + extents.attr_ascent
-          Cairo.cairo_move_to(cairo, x, baseline)
-          Cairo.cairo_text_path(cairo, buffer)
+          SwtCairo.cairo_move_to(cairo, x, baseline)
+          SwtCairo.cairo_text_path(cairo, buffer)
         end
       end
       
@@ -311,20 +311,20 @@ module Org::Eclipse::Swt::Graphics
           if (!(pattern).nil?)
             if (!((@data.attr_style & SWT::MIRRORED)).equal?(0) && !(pattern.attr_surface).equal?(0))
               # int
-              new_pattern = Cairo.cairo_pattern_create_for_surface(pattern.attr_surface)
+              new_pattern = SwtCairo.cairo_pattern_create_for_surface(pattern.attr_surface)
               if ((new_pattern).equal?(0))
                 SWT.error(SWT::ERROR_NO_HANDLES)
               end
-              Cairo.cairo_pattern_set_extend(new_pattern, Cairo::CAIRO_EXTEND_REPEAT)
+              SwtCairo.cairo_pattern_set_extend(new_pattern, SwtCairo::CAIRO_EXTEND_REPEAT)
               matrix = Array.typed(::Java::Double).new([-1, 0, 0, 1, 0, 0])
-              Cairo.cairo_pattern_set_matrix(new_pattern, matrix)
-              Cairo.cairo_set_source(cairo, new_pattern)
-              Cairo.cairo_pattern_destroy(new_pattern)
+              SwtCairo.cairo_pattern_set_matrix(new_pattern, matrix)
+              SwtCairo.cairo_set_source(cairo, new_pattern)
+              SwtCairo.cairo_pattern_destroy(new_pattern)
             else
-              Cairo.cairo_set_source(cairo, pattern.attr_handle)
+              SwtCairo.cairo_set_source(cairo, pattern.attr_handle)
             end
           else
-            Cairo.cairo_set_source_rgba(cairo, (color.attr_red & 0xffff) / (0xffff).to_f, (color.attr_green & 0xffff) / (0xffff).to_f, (color.attr_blue & 0xffff) / (0xffff).to_f, @data.attr_alpha / (0xff).to_f)
+            SwtCairo.cairo_set_source_rgba(cairo, (color.attr_red & 0xffff) / (0xffff).to_f, (color.attr_green & 0xffff) / (0xffff).to_f, (color.attr_blue & 0xffff) / (0xffff).to_f, @data.attr_alpha / (0xff).to_f)
           end
         end
         if (!((state & FONT)).equal?(0))
@@ -340,28 +340,28 @@ module Org::Eclipse::Swt::Graphics
           cap_style = 0
           case (@data.attr_line_cap)
           when SWT::CAP_ROUND
-            cap_style = Cairo::CAIRO_LINE_CAP_ROUND
+            cap_style = SwtCairo::CAIRO_LINE_CAP_ROUND
           when SWT::CAP_FLAT
-            cap_style = Cairo::CAIRO_LINE_CAP_BUTT
+            cap_style = SwtCairo::CAIRO_LINE_CAP_BUTT
           when SWT::CAP_SQUARE
-            cap_style = Cairo::CAIRO_LINE_CAP_SQUARE
+            cap_style = SwtCairo::CAIRO_LINE_CAP_SQUARE
           end
-          Cairo.cairo_set_line_cap(cairo, cap_style)
+          SwtCairo.cairo_set_line_cap(cairo, cap_style)
         end
         if (!((state & LINE_JOIN)).equal?(0))
           join_style = 0
           case (@data.attr_line_join)
           when SWT::JOIN_MITER
-            join_style = Cairo::CAIRO_LINE_JOIN_MITER
+            join_style = SwtCairo::CAIRO_LINE_JOIN_MITER
           when SWT::JOIN_ROUND
-            join_style = Cairo::CAIRO_LINE_JOIN_ROUND
+            join_style = SwtCairo::CAIRO_LINE_JOIN_ROUND
           when SWT::JOIN_BEVEL
-            join_style = Cairo::CAIRO_LINE_JOIN_BEVEL
+            join_style = SwtCairo::CAIRO_LINE_JOIN_BEVEL
           end
-          Cairo.cairo_set_line_join(cairo, join_style)
+          SwtCairo.cairo_set_line_join(cairo, join_style)
         end
         if (!((state & LINE_WIDTH)).equal?(0))
-          Cairo.cairo_set_line_width(cairo, (@data.attr_line_width).equal?(0) ? 1 : @data.attr_line_width)
+          SwtCairo.cairo_set_line_width(cairo, (@data.attr_line_width).equal?(0) ? 1 : @data.attr_line_width)
           case (@data.attr_line_style)
           when SWT::LINE_DOT, SWT::LINE_DASH, SWT::LINE_DASHDOT, SWT::LINE_DASHDOTDOT
             state |= LINE_STYLE
@@ -392,21 +392,21 @@ module Org::Eclipse::Swt::Graphics
               cairo_dashes[i] = (width).equal?(0) || (@data.attr_line_style).equal?(SWT::LINE_CUSTOM) ? dashes[i] : dashes[i] * width
               i += 1
             end
-            Cairo.cairo_set_dash(cairo, cairo_dashes, cairo_dashes.attr_length, dashes_offset)
+            SwtCairo.cairo_set_dash(cairo, cairo_dashes, cairo_dashes.attr_length, dashes_offset)
           else
-            Cairo.cairo_set_dash(cairo, nil, 0, 0)
+            SwtCairo.cairo_set_dash(cairo, nil, 0, 0)
           end
         end
         if (!((state & LINE_MITERLIMIT)).equal?(0))
-          Cairo.cairo_set_miter_limit(cairo, @data.attr_line_miter_limit)
+          SwtCairo.cairo_set_miter_limit(cairo, @data.attr_line_miter_limit)
         end
         if (!((state & DRAW_OFFSET)).equal?(0))
           @data.attr_cairo_xoffset = @data.attr_cairo_yoffset = 0
           matrix = Array.typed(::Java::Double).new(6) { 0.0 }
-          Cairo.cairo_get_matrix(cairo, matrix)
+          SwtCairo.cairo_get_matrix(cairo, matrix)
           dx = Array.typed(::Java::Double).new([1])
           dy = Array.typed(::Java::Double).new([1])
-          Cairo.cairo_user_to_device_distance(cairo, dx, dy)
+          SwtCairo.cairo_user_to_device_distance(cairo, dx, dy)
           scaling = dx[0]
           if (scaling < 0)
             scaling = -scaling
@@ -520,22 +520,22 @@ module Org::Eclipse::Swt::Graphics
         OS.memmove(rect, rects[0] + (i * GdkRectangle.attr_sizeof), GdkRectangle.attr_sizeof)
         x[0] = rect.attr_x
         y[0] = rect.attr_y
-        Cairo.cairo_matrix_transform_point(matrix, x, y)
+        SwtCairo.cairo_matrix_transform_point(matrix, x, y)
         point_array[0] = RJava.cast_to_int(x[0])
         point_array[1] = RJava.cast_to_int(y[0])
         x[0] = rect.attr_x + rect.attr_width
         y[0] = rect.attr_y
-        Cairo.cairo_matrix_transform_point(matrix, x, y)
+        SwtCairo.cairo_matrix_transform_point(matrix, x, y)
         point_array[2] = RJava.cast_to_int(Math.round(x[0]))
         point_array[3] = RJava.cast_to_int(y[0])
         x[0] = rect.attr_x + rect.attr_width
         y[0] = rect.attr_y + rect.attr_height
-        Cairo.cairo_matrix_transform_point(matrix, x, y)
+        SwtCairo.cairo_matrix_transform_point(matrix, x, y)
         point_array[4] = RJava.cast_to_int(Math.round(x[0]))
         point_array[5] = RJava.cast_to_int(Math.round(y[0]))
         x[0] = rect.attr_x
         y[0] = rect.attr_y + rect.attr_height
-        Cairo.cairo_matrix_transform_point(matrix, x, y)
+        SwtCairo.cairo_matrix_transform_point(matrix, x, y)
         point_array[6] = RJava.cast_to_int(x[0])
         point_array[7] = RJava.cast_to_int(Math.round(y[0]))
         # int
@@ -719,7 +719,7 @@ module Org::Eclipse::Swt::Graphics
         # int
         cairo = @data.attr_cairo
         if (!(cairo).equal?(0))
-          Cairo.cairo_destroy(cairo)
+          SwtCairo.cairo_destroy(cairo)
         end
         @data.attr_cairo = 0
       end
@@ -800,22 +800,22 @@ module Org::Eclipse::Swt::Graphics
         y_offset = @data.attr_cairo_yoffset
         if ((width).equal?(height))
           if (arc_angle >= 0)
-            Cairo.cairo_arc_negative(cairo, x + x_offset + width / 2, y + y_offset + height / 2, width / 2, -start_angle * (Compatibility::PI).to_f / 180, -(start_angle + arc_angle) * (Compatibility::PI).to_f / 180)
+            SwtCairo.cairo_arc_negative(cairo, x + x_offset + width / 2, y + y_offset + height / 2, width / 2, -start_angle * (Compatibility::PI).to_f / 180, -(start_angle + arc_angle) * (Compatibility::PI).to_f / 180)
           else
-            Cairo.cairo_arc(cairo, x + x_offset + width / 2, y + y_offset + height / 2, width / 2, -start_angle * (Compatibility::PI).to_f / 180, -(start_angle + arc_angle) * (Compatibility::PI).to_f / 180)
+            SwtCairo.cairo_arc(cairo, x + x_offset + width / 2, y + y_offset + height / 2, width / 2, -start_angle * (Compatibility::PI).to_f / 180, -(start_angle + arc_angle) * (Compatibility::PI).to_f / 180)
           end
         else
-          Cairo.cairo_save(cairo)
-          Cairo.cairo_translate(cairo, x + x_offset + width / 2, y + y_offset + height / 2)
-          Cairo.cairo_scale(cairo, width / 2, height / 2)
+          SwtCairo.cairo_save(cairo)
+          SwtCairo.cairo_translate(cairo, x + x_offset + width / 2, y + y_offset + height / 2)
+          SwtCairo.cairo_scale(cairo, width / 2, height / 2)
           if (arc_angle >= 0)
-            Cairo.cairo_arc_negative(cairo, 0, 0, 1, -start_angle * (Compatibility::PI).to_f / 180, -(start_angle + arc_angle) * (Compatibility::PI).to_f / 180)
+            SwtCairo.cairo_arc_negative(cairo, 0, 0, 1, -start_angle * (Compatibility::PI).to_f / 180, -(start_angle + arc_angle) * (Compatibility::PI).to_f / 180)
           else
-            Cairo.cairo_arc(cairo, 0, 0, 1, -start_angle * (Compatibility::PI).to_f / 180, -(start_angle + arc_angle) * (Compatibility::PI).to_f / 180)
+            SwtCairo.cairo_arc(cairo, 0, 0, 1, -start_angle * (Compatibility::PI).to_f / 180, -(start_angle + arc_angle) * (Compatibility::PI).to_f / 180)
           end
-          Cairo.cairo_restore(cairo)
+          SwtCairo.cairo_restore(cairo)
         end
-        Cairo.cairo_stroke(cairo)
+        SwtCairo.cairo_stroke(cairo)
         return
       end
       OS.gdk_draw_arc(@data.attr_drawable, @handle, 0, x, y, width, height, start_angle * 64, arc_angle * 64)
@@ -854,17 +854,17 @@ module Org::Eclipse::Swt::Graphics
         check_gc(FOREGROUND)
         line_width = Array.typed(::Java::Int).new(1) { 0 }
         OS.gtk_widget_style_get(@data.attr_device.attr_shell_handle, OS.attr_focus_line_width, line_width, 0)
-        Cairo.cairo_save(cairo)
-        Cairo.cairo_set_line_width(cairo, line_width[0])
+        SwtCairo.cairo_save(cairo)
+        SwtCairo.cairo_set_line_width(cairo, line_width[0])
         dashes = Array.typed(::Java::Double).new([1, 1])
         dash_offset = -line_width[0] / 2
         while (dash_offset < 0)
           dash_offset += 2
         end
-        Cairo.cairo_set_dash(cairo, dashes, dashes.attr_length, dash_offset)
-        Cairo.cairo_rectangle(cairo, x + line_width[0] / 2, y + line_width[0] / 2, width, height)
-        Cairo.cairo_stroke(cairo)
-        Cairo.cairo_restore(cairo)
+        SwtCairo.cairo_set_dash(cairo, dashes, dashes.attr_length, dash_offset)
+        SwtCairo.cairo_rectangle(cairo, x + line_width[0] / 2, y + line_width[0] / 2, width, height)
+        SwtCairo.cairo_stroke(cairo)
+        SwtCairo.cairo_restore(cairo)
         return
       end
       OS.gtk_paint_focus(style, @data.attr_drawable, OS::GTK_STATE_NORMAL, nil, @data.attr_device.attr_shell_handle, Array.typed(::Java::Byte).new(1) { 0 }, x, y, width, height)
@@ -972,30 +972,30 @@ module Org::Eclipse::Swt::Graphics
       if (!(cairo).equal?(0))
         if (!(@data.attr_alpha).equal?(0))
           src_image.create_surface
-          Cairo.cairo_save(cairo)
+          SwtCairo.cairo_save(cairo)
           if (!((@data.attr_style & SWT::MIRRORED)).equal?(0))
-            Cairo.cairo_scale(cairo, -1, 1)
-            Cairo.cairo_translate(cairo, -2 * dest_x - dest_width, 0)
+            SwtCairo.cairo_scale(cairo, -1, 1)
+            SwtCairo.cairo_translate(cairo, -2 * dest_x - dest_width, 0)
           end
-          Cairo.cairo_rectangle(cairo, dest_x, dest_y, dest_width, dest_height)
-          Cairo.cairo_clip(cairo)
-          Cairo.cairo_translate(cairo, dest_x - src_x, dest_y - src_y)
+          SwtCairo.cairo_rectangle(cairo, dest_x, dest_y, dest_width, dest_height)
+          SwtCairo.cairo_clip(cairo)
+          SwtCairo.cairo_translate(cairo, dest_x - src_x, dest_y - src_y)
           if (!(src_width).equal?(dest_width) || !(src_height).equal?(dest_height))
-            Cairo.cairo_scale(cairo, dest_width / (src_width).to_f, dest_height / (src_height).to_f)
+            SwtCairo.cairo_scale(cairo, dest_width / (src_width).to_f, dest_height / (src_height).to_f)
           end
-          filter = Cairo::CAIRO_FILTER_GOOD
+          filter = SwtCairo::CAIRO_FILTER_GOOD
           case (@data.attr_interpolation)
           when SWT::DEFAULT
-            filter = Cairo::CAIRO_FILTER_GOOD
+            filter = SwtCairo::CAIRO_FILTER_GOOD
           when SWT::NONE
-            filter = Cairo::CAIRO_FILTER_NEAREST
+            filter = SwtCairo::CAIRO_FILTER_NEAREST
           when SWT::LOW
-            filter = Cairo::CAIRO_FILTER_FAST
+            filter = SwtCairo::CAIRO_FILTER_FAST
           when SWT::HIGH
-            filter = Cairo::CAIRO_FILTER_BEST
+            filter = SwtCairo::CAIRO_FILTER_BEST
           end
           # int
-          pattern = Cairo.cairo_pattern_create_for_surface(src_image.attr_surface)
+          pattern = SwtCairo.cairo_pattern_create_for_surface(src_image.attr_surface)
           if ((pattern).equal?(0))
             SWT.error(SWT::ERROR_NO_HANDLES)
           end
@@ -1013,57 +1013,57 @@ module Org::Eclipse::Swt::Graphics
             # 
             # NOTE: For some reaons, it is necessary to use CAIRO_EXTEND_PAD with
             # the image that was created or the edges are still faded.
-            if (Cairo.cairo_version >= Cairo._cairo_version_encode(1, 4, 0))
+            if (SwtCairo.cairo_version >= SwtCairo._cairo_version_encode(1, 4, 0))
               # int
-              surface = Cairo.cairo_image_surface_create(Cairo::CAIRO_FORMAT_ARGB32, img_width * 3, img_height * 3)
+              surface = SwtCairo.cairo_image_surface_create(SwtCairo::CAIRO_FORMAT_ARGB32, img_width * 3, img_height * 3)
               # int
-              cr = Cairo.cairo_create(surface)
-              Cairo.cairo_set_source_surface(cr, src_image.attr_surface, img_width, img_height)
-              Cairo.cairo_paint(cr)
-              Cairo.cairo_scale(cr, -1, -1)
-              Cairo.cairo_set_source_surface(cr, src_image.attr_surface, -img_width, -img_height)
-              Cairo.cairo_paint(cr)
-              Cairo.cairo_set_source_surface(cr, src_image.attr_surface, -img_width * 3, -img_height)
-              Cairo.cairo_paint(cr)
-              Cairo.cairo_set_source_surface(cr, src_image.attr_surface, -img_width, -img_height * 3)
-              Cairo.cairo_paint(cr)
-              Cairo.cairo_set_source_surface(cr, src_image.attr_surface, -img_width * 3, -img_height * 3)
-              Cairo.cairo_paint(cr)
-              Cairo.cairo_scale(cr, 1, -1)
-              Cairo.cairo_set_source_surface(cr, src_image.attr_surface, -img_width, img_height)
-              Cairo.cairo_paint(cr)
-              Cairo.cairo_set_source_surface(cr, src_image.attr_surface, -img_width * 3, img_height)
-              Cairo.cairo_paint(cr)
-              Cairo.cairo_scale(cr, -1, -1)
-              Cairo.cairo_set_source_surface(cr, src_image.attr_surface, img_width, -img_height)
-              Cairo.cairo_paint(cr)
-              Cairo.cairo_set_source_surface(cr, src_image.attr_surface, img_width, -img_height * 3)
-              Cairo.cairo_paint(cr)
-              Cairo.cairo_destroy(cr)
+              cr = SwtCairo.cairo_create(surface)
+              SwtCairo.cairo_set_source_surface(cr, src_image.attr_surface, img_width, img_height)
+              SwtCairo.cairo_paint(cr)
+              SwtCairo.cairo_scale(cr, -1, -1)
+              SwtCairo.cairo_set_source_surface(cr, src_image.attr_surface, -img_width, -img_height)
+              SwtCairo.cairo_paint(cr)
+              SwtCairo.cairo_set_source_surface(cr, src_image.attr_surface, -img_width * 3, -img_height)
+              SwtCairo.cairo_paint(cr)
+              SwtCairo.cairo_set_source_surface(cr, src_image.attr_surface, -img_width, -img_height * 3)
+              SwtCairo.cairo_paint(cr)
+              SwtCairo.cairo_set_source_surface(cr, src_image.attr_surface, -img_width * 3, -img_height * 3)
+              SwtCairo.cairo_paint(cr)
+              SwtCairo.cairo_scale(cr, 1, -1)
+              SwtCairo.cairo_set_source_surface(cr, src_image.attr_surface, -img_width, img_height)
+              SwtCairo.cairo_paint(cr)
+              SwtCairo.cairo_set_source_surface(cr, src_image.attr_surface, -img_width * 3, img_height)
+              SwtCairo.cairo_paint(cr)
+              SwtCairo.cairo_scale(cr, -1, -1)
+              SwtCairo.cairo_set_source_surface(cr, src_image.attr_surface, img_width, -img_height)
+              SwtCairo.cairo_paint(cr)
+              SwtCairo.cairo_set_source_surface(cr, src_image.attr_surface, img_width, -img_height * 3)
+              SwtCairo.cairo_paint(cr)
+              SwtCairo.cairo_destroy(cr)
               # int
-              new_pattern = Cairo.cairo_pattern_create_for_surface(surface)
-              Cairo.cairo_surface_destroy(surface)
+              new_pattern = SwtCairo.cairo_pattern_create_for_surface(surface)
+              SwtCairo.cairo_surface_destroy(surface)
               if ((new_pattern).equal?(0))
                 SWT.error(SWT::ERROR_NO_HANDLES)
               end
-              Cairo.cairo_pattern_destroy(pattern)
+              SwtCairo.cairo_pattern_destroy(pattern)
               pattern = new_pattern
-              Cairo.cairo_pattern_set_extend(pattern, Cairo::CAIRO_EXTEND_PAD)
+              SwtCairo.cairo_pattern_set_extend(pattern, SwtCairo::CAIRO_EXTEND_PAD)
               matrix = Array.typed(::Java::Double).new(6) { 0.0 }
-              Cairo.cairo_matrix_init_translate(matrix, img_width, img_height)
-              Cairo.cairo_pattern_set_matrix(pattern, matrix)
+              SwtCairo.cairo_matrix_init_translate(matrix, img_width, img_height)
+              SwtCairo.cairo_pattern_set_matrix(pattern, matrix)
             end
             # Cairo.cairo_pattern_set_extend(pattern, Cairo.CAIRO_EXTEND_REFLECT);
           end
-          Cairo.cairo_pattern_set_filter(pattern, filter)
-          Cairo.cairo_set_source(cairo, pattern)
+          SwtCairo.cairo_pattern_set_filter(pattern, filter)
+          SwtCairo.cairo_set_source(cairo, pattern)
           if (!(@data.attr_alpha).equal?(0xff))
-            Cairo.cairo_paint_with_alpha(cairo, @data.attr_alpha / (0xff).to_f)
+            SwtCairo.cairo_paint_with_alpha(cairo, @data.attr_alpha / (0xff).to_f)
           else
-            Cairo.cairo_paint(cairo)
+            SwtCairo.cairo_paint(cairo)
           end
-          Cairo.cairo_restore(cairo)
-          Cairo.cairo_pattern_destroy(pattern)
+          SwtCairo.cairo_restore(cairo)
+          SwtCairo.cairo_pattern_destroy(pattern)
         end
         return
       end
@@ -1422,9 +1422,9 @@ module Org::Eclipse::Swt::Graphics
       if (!(cairo).equal?(0))
         x_offset = @data.attr_cairo_xoffset
         y_offset = @data.attr_cairo_yoffset
-        Cairo.cairo_move_to(cairo, x1 + x_offset, y1 + y_offset)
-        Cairo.cairo_line_to(cairo, x2 + x_offset, y2 + y_offset)
-        Cairo.cairo_stroke(cairo)
+        SwtCairo.cairo_move_to(cairo, x1 + x_offset, y1 + y_offset)
+        SwtCairo.cairo_line_to(cairo, x2 + x_offset, y2 + y_offset)
+        SwtCairo.cairo_stroke(cairo)
         return
       end
       OS.gdk_draw_line(@data.attr_drawable, @handle, x1, y1, x2, y2)
@@ -1469,15 +1469,15 @@ module Org::Eclipse::Swt::Graphics
         x_offset = @data.attr_cairo_xoffset
         y_offset = @data.attr_cairo_yoffset
         if ((width).equal?(height))
-          Cairo.cairo_arc_negative(cairo, x + x_offset + width / 2, y + y_offset + height / 2, width / 2, 0, -2 * (Compatibility::PI).to_f)
+          SwtCairo.cairo_arc_negative(cairo, x + x_offset + width / 2, y + y_offset + height / 2, width / 2, 0, -2 * (Compatibility::PI).to_f)
         else
-          Cairo.cairo_save(cairo)
-          Cairo.cairo_translate(cairo, x + x_offset + width / 2, y + y_offset + height / 2)
-          Cairo.cairo_scale(cairo, width / 2, height / 2)
-          Cairo.cairo_arc_negative(cairo, 0, 0, 1, 0, -2 * (Compatibility::PI).to_f)
-          Cairo.cairo_restore(cairo)
+          SwtCairo.cairo_save(cairo)
+          SwtCairo.cairo_translate(cairo, x + x_offset + width / 2, y + y_offset + height / 2)
+          SwtCairo.cairo_scale(cairo, width / 2, height / 2)
+          SwtCairo.cairo_arc_negative(cairo, 0, 0, 1, 0, -2 * (Compatibility::PI).to_f)
+          SwtCairo.cairo_restore(cairo)
         end
-        Cairo.cairo_stroke(cairo)
+        SwtCairo.cairo_stroke(cairo)
         return
       end
       OS.gdk_draw_arc(@data.attr_drawable, @handle, 0, x, y, width, height, 0, 23040)
@@ -1519,19 +1519,19 @@ module Org::Eclipse::Swt::Graphics
       check_gc(DRAW)
       # int
       cairo = @data.attr_cairo
-      Cairo.cairo_save(cairo)
+      SwtCairo.cairo_save(cairo)
       x_offset = @data.attr_cairo_xoffset
       y_offset = @data.attr_cairo_yoffset
-      Cairo.cairo_translate(cairo, x_offset, y_offset)
+      SwtCairo.cairo_translate(cairo, x_offset, y_offset)
       # int
-      copy = Cairo.cairo_copy_path(path.attr_handle)
+      copy = SwtCairo.cairo_copy_path(path.attr_handle)
       if ((copy).equal?(0))
         SWT.error(SWT::ERROR_NO_HANDLES)
       end
-      Cairo.cairo_append_path(cairo, copy)
-      Cairo.cairo_path_destroy(copy)
-      Cairo.cairo_stroke(cairo)
-      Cairo.cairo_restore(cairo)
+      SwtCairo.cairo_append_path(cairo, copy)
+      SwtCairo.cairo_path_destroy(copy)
+      SwtCairo.cairo_stroke(cairo)
+      SwtCairo.cairo_restore(cairo)
     end
     
     typesig { [::Java::Int, ::Java::Int] }
@@ -1558,8 +1558,8 @@ module Org::Eclipse::Swt::Graphics
       # int
       cairo = @data.attr_cairo
       if (!(cairo).equal?(0))
-        Cairo.cairo_rectangle(cairo, x, y, 1, 1)
-        Cairo.cairo_fill(cairo)
+        SwtCairo.cairo_rectangle(cairo, x, y, 1, 1)
+        SwtCairo.cairo_fill(cairo)
         return
       end
       OS.gdk_draw_point(@data.attr_drawable, @handle, x, y)
@@ -1593,7 +1593,7 @@ module Org::Eclipse::Swt::Graphics
       cairo = @data.attr_cairo
       if (!(cairo).equal?(0))
         draw_polyline(cairo, point_array, true)
-        Cairo.cairo_stroke(cairo)
+        SwtCairo.cairo_stroke(cairo)
         return
       end
       OS.gdk_draw_polygon(@data.attr_drawable, @handle, 0, point_array, point_array.attr_length / 2)
@@ -1627,7 +1627,7 @@ module Org::Eclipse::Swt::Graphics
       cairo = @data.attr_cairo
       if (!(cairo).equal?(0))
         draw_polyline(cairo, point_array, false)
-        Cairo.cairo_stroke(cairo)
+        SwtCairo.cairo_stroke(cairo)
         return
       end
       OS.gdk_draw_lines(@data.attr_drawable, @handle, point_array, point_array.attr_length / 2)
@@ -1642,16 +1642,16 @@ module Org::Eclipse::Swt::Graphics
       end
       x_offset = @data.attr_cairo_xoffset
       y_offset = @data.attr_cairo_yoffset
-      Cairo.cairo_move_to(cairo, point_array[0] + x_offset, point_array[1] + y_offset)
+      SwtCairo.cairo_move_to(cairo, point_array[0] + x_offset, point_array[1] + y_offset)
       i = 1
       j = 2
       while i < count
-        Cairo.cairo_line_to(cairo, point_array[j] + x_offset, point_array[j + 1] + y_offset)
+        SwtCairo.cairo_line_to(cairo, point_array[j] + x_offset, point_array[j + 1] + y_offset)
         i += 1
         j += 2
       end
       if (close)
-        Cairo.cairo_close_path(cairo)
+        SwtCairo.cairo_close_path(cairo)
       end
     end
     
@@ -1687,8 +1687,8 @@ module Org::Eclipse::Swt::Graphics
       if (!(cairo).equal?(0))
         x_offset = @data.attr_cairo_xoffset
         y_offset = @data.attr_cairo_yoffset
-        Cairo.cairo_rectangle(cairo, x + x_offset, y + y_offset, width, height)
-        Cairo.cairo_stroke(cairo)
+        SwtCairo.cairo_rectangle(cairo, x + x_offset, y + y_offset, width, height)
+        SwtCairo.cairo_stroke(cairo)
         return
       end
       OS.gdk_draw_rectangle(@data.attr_drawable, @handle, 0, x, y, width, height)
@@ -1767,24 +1767,24 @@ module Org::Eclipse::Swt::Graphics
         x_offset = @data.attr_cairo_xoffset
         y_offset = @data.attr_cairo_yoffset
         if ((naw).equal?(0) || (nah).equal?(0))
-          Cairo.cairo_rectangle(cairo, x + x_offset, y + y_offset, width, height)
+          SwtCairo.cairo_rectangle(cairo, x + x_offset, y + y_offset, width, height)
         else
           naw2 = naw / 2
           nah2 = nah / 2
           fw = nw / naw2
           fh = nh / nah2
-          Cairo.cairo_save(cairo)
-          Cairo.cairo_translate(cairo, nx + x_offset, ny + y_offset)
-          Cairo.cairo_scale(cairo, naw2, nah2)
-          Cairo.cairo_move_to(cairo, fw - 1, 0)
-          Cairo.cairo_arc(cairo, fw - 1, 1, 1, Compatibility::PI + Compatibility::PI / 2.0, Compatibility::PI * 2.0)
-          Cairo.cairo_arc(cairo, fw - 1, fh - 1, 1, 0, Compatibility::PI / 2.0)
-          Cairo.cairo_arc(cairo, 1, fh - 1, 1, Compatibility::PI / 2, Compatibility::PI)
-          Cairo.cairo_arc(cairo, 1, 1, 1, Compatibility::PI, 270.0 * Compatibility::PI / 180.0)
-          Cairo.cairo_close_path(cairo)
-          Cairo.cairo_restore(cairo)
+          SwtCairo.cairo_save(cairo)
+          SwtCairo.cairo_translate(cairo, nx + x_offset, ny + y_offset)
+          SwtCairo.cairo_scale(cairo, naw2, nah2)
+          SwtCairo.cairo_move_to(cairo, fw - 1, 0)
+          SwtCairo.cairo_arc(cairo, fw - 1, 1, 1, Compatibility::PI + Compatibility::PI / 2.0, Compatibility::PI * 2.0)
+          SwtCairo.cairo_arc(cairo, fw - 1, fh - 1, 1, 0, Compatibility::PI / 2.0)
+          SwtCairo.cairo_arc(cairo, 1, fh - 1, 1, Compatibility::PI / 2, Compatibility::PI)
+          SwtCairo.cairo_arc(cairo, 1, 1, 1, Compatibility::PI, 270.0 * Compatibility::PI / 180.0)
+          SwtCairo.cairo_close_path(cairo)
+          SwtCairo.cairo_restore(cairo)
         end
-        Cairo.cairo_stroke(cairo)
+        SwtCairo.cairo_stroke(cairo)
         return
       end
       naw2 = naw / 2
@@ -1961,12 +1961,12 @@ module Org::Eclipse::Swt::Graphics
           # TODO - honor flags
           check_gc(FOREGROUND | FONT)
           extents = Cairo_font_extents_t.new
-          Cairo.cairo_font_extents(cairo, extents)
+          SwtCairo.cairo_font_extents(cairo, extents)
           baseline = y + extents.attr_ascent
-          Cairo.cairo_move_to(cairo, x, baseline)
+          SwtCairo.cairo_move_to(cairo, x, baseline)
           buffer = Converter.wcs_to_mbcs(nil, string, true)
-          Cairo.cairo_show_text(cairo, buffer)
-          Cairo.cairo_new_path(cairo)
+          SwtCairo.cairo_show_text(cairo, buffer)
+          SwtCairo.cairo_new_path(cairo)
           return
         end
       end
@@ -1977,24 +1977,24 @@ module Org::Eclipse::Swt::Graphics
           width = Array.typed(::Java::Int).new(1) { 0 }
           height = Array.typed(::Java::Int).new(1) { 0 }
           OS.pango_layout_get_size(@data.attr_layout, width, height)
-          Cairo.cairo_rectangle(cairo, x, y, OS._pango_pixels(width[0]), OS._pango_pixels(height[0]))
-          Cairo.cairo_fill(cairo)
+          SwtCairo.cairo_rectangle(cairo, x, y, OS._pango_pixels(width[0]), OS._pango_pixels(height[0]))
+          SwtCairo.cairo_fill(cairo)
         end
         check_gc(FOREGROUND | FONT)
         if (!((@data.attr_style & SWT::MIRRORED)).equal?(0))
-          Cairo.cairo_save(cairo)
+          SwtCairo.cairo_save(cairo)
           width = Array.typed(::Java::Int).new(1) { 0 }
           height = Array.typed(::Java::Int).new(1) { 0 }
           OS.pango_layout_get_size(@data.attr_layout, width, height)
-          Cairo.cairo_scale(cairo, -1, 1)
-          Cairo.cairo_translate(cairo, -2 * x - OS._pango_pixels(width[0]), 0)
+          SwtCairo.cairo_scale(cairo, -1, 1)
+          SwtCairo.cairo_translate(cairo, -2 * x - OS._pango_pixels(width[0]), 0)
         end
-        Cairo.cairo_move_to(cairo, x, y)
+        SwtCairo.cairo_move_to(cairo, x, y)
         OS.pango_cairo_show_layout(cairo, @data.attr_layout)
         if (!((@data.attr_style & SWT::MIRRORED)).equal?(0))
-          Cairo.cairo_restore(cairo)
+          SwtCairo.cairo_restore(cairo)
         end
-        Cairo.cairo_new_path(cairo)
+        SwtCairo.cairo_new_path(cairo)
         return
       end
       check_gc(FOREGROUND | FONT | BACKGROUND_BG)
@@ -2104,24 +2104,24 @@ module Org::Eclipse::Swt::Graphics
       if (!(cairo).equal?(0))
         if ((width).equal?(height))
           if (arc_angle >= 0)
-            Cairo.cairo_arc_negative(cairo, x + width / 2, y + height / 2, width / 2, -start_angle * (Compatibility::PI).to_f / 180, -(start_angle + arc_angle) * (Compatibility::PI).to_f / 180)
+            SwtCairo.cairo_arc_negative(cairo, x + width / 2, y + height / 2, width / 2, -start_angle * (Compatibility::PI).to_f / 180, -(start_angle + arc_angle) * (Compatibility::PI).to_f / 180)
           else
-            Cairo.cairo_arc(cairo, x + width / 2, y + height / 2, width / 2, -start_angle * (Compatibility::PI).to_f / 180, -(start_angle + arc_angle) * (Compatibility::PI).to_f / 180)
+            SwtCairo.cairo_arc(cairo, x + width / 2, y + height / 2, width / 2, -start_angle * (Compatibility::PI).to_f / 180, -(start_angle + arc_angle) * (Compatibility::PI).to_f / 180)
           end
-          Cairo.cairo_line_to(cairo, x + width / 2, y + height / 2)
+          SwtCairo.cairo_line_to(cairo, x + width / 2, y + height / 2)
         else
-          Cairo.cairo_save(cairo)
-          Cairo.cairo_translate(cairo, x + width / 2, y + height / 2)
-          Cairo.cairo_scale(cairo, width / 2, height / 2)
+          SwtCairo.cairo_save(cairo)
+          SwtCairo.cairo_translate(cairo, x + width / 2, y + height / 2)
+          SwtCairo.cairo_scale(cairo, width / 2, height / 2)
           if (arc_angle >= 0)
-            Cairo.cairo_arc_negative(cairo, 0, 0, 1, -start_angle * (Compatibility::PI).to_f / 180, -(start_angle + arc_angle) * (Compatibility::PI).to_f / 180)
+            SwtCairo.cairo_arc_negative(cairo, 0, 0, 1, -start_angle * (Compatibility::PI).to_f / 180, -(start_angle + arc_angle) * (Compatibility::PI).to_f / 180)
           else
-            Cairo.cairo_arc(cairo, 0, 0, 1, -start_angle * (Compatibility::PI).to_f / 180, -(start_angle + arc_angle) * (Compatibility::PI).to_f / 180)
+            SwtCairo.cairo_arc(cairo, 0, 0, 1, -start_angle * (Compatibility::PI).to_f / 180, -(start_angle + arc_angle) * (Compatibility::PI).to_f / 180)
           end
-          Cairo.cairo_line_to(cairo, 0, 0)
-          Cairo.cairo_restore(cairo)
+          SwtCairo.cairo_line_to(cairo, 0, 0)
+          SwtCairo.cairo_restore(cairo)
         end
-        Cairo.cairo_fill(cairo)
+        SwtCairo.cairo_fill(cairo)
         return
       end
       OS.gdk_draw_arc(@data.attr_drawable, @handle, 1, x, y, width, height, start_angle * 64, arc_angle * 64)
@@ -2191,20 +2191,20 @@ module Org::Eclipse::Swt::Graphics
         # int
         pattern = 0
         if (vertical)
-          pattern = Cairo.cairo_pattern_create_linear(0.0, 0.0, 0.0, 1.0)
+          pattern = SwtCairo.cairo_pattern_create_linear(0.0, 0.0, 0.0, 1.0)
         else
-          pattern = Cairo.cairo_pattern_create_linear(0.0, 0.0, 1.0, 0.0)
+          pattern = SwtCairo.cairo_pattern_create_linear(0.0, 0.0, 1.0, 0.0)
         end
-        Cairo.cairo_pattern_add_color_stop_rgba(pattern, 0, from_rgb.attr_red / 255, from_rgb.attr_green / 255, from_rgb.attr_blue / 255, @data.attr_alpha / 255)
-        Cairo.cairo_pattern_add_color_stop_rgba(pattern, 1, to_rgb.attr_red / 255, to_rgb.attr_green / 255, to_rgb.attr_blue / 255, @data.attr_alpha / 255)
-        Cairo.cairo_save(cairo)
-        Cairo.cairo_translate(cairo, x, y)
-        Cairo.cairo_scale(cairo, width, height)
-        Cairo.cairo_rectangle(cairo, 0, 0, 1, 1)
-        Cairo.cairo_set_source(cairo, pattern)
-        Cairo.cairo_fill(cairo)
-        Cairo.cairo_restore(cairo)
-        Cairo.cairo_pattern_destroy(pattern)
+        SwtCairo.cairo_pattern_add_color_stop_rgba(pattern, 0, from_rgb.attr_red / 255, from_rgb.attr_green / 255, from_rgb.attr_blue / 255, @data.attr_alpha / 255)
+        SwtCairo.cairo_pattern_add_color_stop_rgba(pattern, 1, to_rgb.attr_red / 255, to_rgb.attr_green / 255, to_rgb.attr_blue / 255, @data.attr_alpha / 255)
+        SwtCairo.cairo_save(cairo)
+        SwtCairo.cairo_translate(cairo, x, y)
+        SwtCairo.cairo_scale(cairo, width, height)
+        SwtCairo.cairo_rectangle(cairo, 0, 0, 1, 1)
+        SwtCairo.cairo_set_source(cairo, pattern)
+        SwtCairo.cairo_fill(cairo)
+        SwtCairo.cairo_restore(cairo)
+        SwtCairo.cairo_pattern_destroy(pattern)
         return
       end
       ImageData.fill_gradient_rectangle(self, @data.attr_device, x, y, width, height, vertical, from_rgb, to_rgb, 8, 8, 8)
@@ -2242,15 +2242,15 @@ module Org::Eclipse::Swt::Graphics
       cairo = @data.attr_cairo
       if (!(cairo).equal?(0))
         if ((width).equal?(height))
-          Cairo.cairo_arc_negative(cairo, x + width / 2, y + height / 2, width / 2, 0, 2 * (Compatibility::PI).to_f)
+          SwtCairo.cairo_arc_negative(cairo, x + width / 2, y + height / 2, width / 2, 0, 2 * (Compatibility::PI).to_f)
         else
-          Cairo.cairo_save(cairo)
-          Cairo.cairo_translate(cairo, x + width / 2, y + height / 2)
-          Cairo.cairo_scale(cairo, width / 2, height / 2)
-          Cairo.cairo_arc_negative(cairo, 0, 0, 1, 0, 2 * (Compatibility::PI).to_f)
-          Cairo.cairo_restore(cairo)
+          SwtCairo.cairo_save(cairo)
+          SwtCairo.cairo_translate(cairo, x + width / 2, y + height / 2)
+          SwtCairo.cairo_scale(cairo, width / 2, height / 2)
+          SwtCairo.cairo_arc_negative(cairo, 0, 0, 1, 0, 2 * (Compatibility::PI).to_f)
+          SwtCairo.cairo_restore(cairo)
         end
-        Cairo.cairo_fill(cairo)
+        SwtCairo.cairo_fill(cairo)
         return
       end
       OS.gdk_draw_arc(@data.attr_drawable, @handle, 1, x, y, width, height, 0, 23040)
@@ -2293,13 +2293,13 @@ module Org::Eclipse::Swt::Graphics
       # int
       cairo = @data.attr_cairo
       # int
-      copy = Cairo.cairo_copy_path(path.attr_handle)
+      copy = SwtCairo.cairo_copy_path(path.attr_handle)
       if ((copy).equal?(0))
         SWT.error(SWT::ERROR_NO_HANDLES)
       end
-      Cairo.cairo_append_path(cairo, copy)
-      Cairo.cairo_path_destroy(copy)
-      Cairo.cairo_fill(cairo)
+      SwtCairo.cairo_append_path(cairo, copy)
+      SwtCairo.cairo_path_destroy(copy)
+      SwtCairo.cairo_fill(cairo)
     end
     
     typesig { [Array.typed(::Java::Int)] }
@@ -2332,7 +2332,7 @@ module Org::Eclipse::Swt::Graphics
       cairo = @data.attr_cairo
       if (!(cairo).equal?(0))
         draw_polyline(cairo, point_array, true)
-        Cairo.cairo_fill(cairo)
+        SwtCairo.cairo_fill(cairo)
         return
       end
       OS.gdk_draw_polygon(@data.attr_drawable, @handle, 1, point_array, point_array.attr_length / 2)
@@ -2368,8 +2368,8 @@ module Org::Eclipse::Swt::Graphics
       # int
       cairo = @data.attr_cairo
       if (!(cairo).equal?(0))
-        Cairo.cairo_rectangle(cairo, x, y, width, height)
-        Cairo.cairo_fill(cairo)
+        SwtCairo.cairo_rectangle(cairo, x, y, width, height)
+        SwtCairo.cairo_fill(cairo)
         return
       end
       OS.gdk_draw_rectangle(@data.attr_drawable, @handle, 1, x, y, width, height)
@@ -2444,24 +2444,24 @@ module Org::Eclipse::Swt::Graphics
       cairo = @data.attr_cairo
       if (!(cairo).equal?(0))
         if ((naw).equal?(0) || (nah).equal?(0))
-          Cairo.cairo_rectangle(cairo, x, y, width, height)
+          SwtCairo.cairo_rectangle(cairo, x, y, width, height)
         else
           naw2 = naw / 2
           nah2 = nah / 2
           fw = nw / naw2
           fh = nh / nah2
-          Cairo.cairo_save(cairo)
-          Cairo.cairo_translate(cairo, nx, ny)
-          Cairo.cairo_scale(cairo, naw2, nah2)
-          Cairo.cairo_move_to(cairo, fw - 1, 0)
-          Cairo.cairo_arc(cairo, fw - 1, 1, 1, Compatibility::PI + Compatibility::PI / 2.0, Compatibility::PI * 2.0)
-          Cairo.cairo_arc(cairo, fw - 1, fh - 1, 1, 0, Compatibility::PI / 2.0)
-          Cairo.cairo_arc(cairo, 1, fh - 1, 1, Compatibility::PI / 2, Compatibility::PI)
-          Cairo.cairo_arc(cairo, 1, 1, 1, Compatibility::PI, 270.0 * Compatibility::PI / 180.0)
-          Cairo.cairo_close_path(cairo)
-          Cairo.cairo_restore(cairo)
+          SwtCairo.cairo_save(cairo)
+          SwtCairo.cairo_translate(cairo, nx, ny)
+          SwtCairo.cairo_scale(cairo, naw2, nah2)
+          SwtCairo.cairo_move_to(cairo, fw - 1, 0)
+          SwtCairo.cairo_arc(cairo, fw - 1, 1, 1, Compatibility::PI + Compatibility::PI / 2.0, Compatibility::PI * 2.0)
+          SwtCairo.cairo_arc(cairo, fw - 1, fh - 1, 1, 0, Compatibility::PI / 2.0)
+          SwtCairo.cairo_arc(cairo, 1, fh - 1, 1, Compatibility::PI / 2, Compatibility::PI)
+          SwtCairo.cairo_arc(cairo, 1, 1, 1, Compatibility::PI, 270.0 * Compatibility::PI / 180.0)
+          SwtCairo.cairo_close_path(cairo)
+          SwtCairo.cairo_restore(cairo)
         end
-        Cairo.cairo_fill(cairo)
+        SwtCairo.cairo_fill(cairo)
         return
       end
       naw2 = naw / 2
@@ -2612,13 +2612,13 @@ module Org::Eclipse::Swt::Graphics
       if ((@data.attr_cairo).equal?(0))
         return SWT::DEFAULT
       end
-      antialias = Cairo.cairo_get_antialias(@data.attr_cairo)
+      antialias = SwtCairo.cairo_get_antialias(@data.attr_cairo)
       case (antialias)
-      when Cairo::CAIRO_ANTIALIAS_DEFAULT
+      when SwtCairo::CAIRO_ANTIALIAS_DEFAULT
         return SWT::DEFAULT
-      when Cairo::CAIRO_ANTIALIAS_NONE
+      when SwtCairo::CAIRO_ANTIALIAS_NONE
         return SWT::OFF
-      when Cairo::CAIRO_ANTIALIAS_GRAY, Cairo::CAIRO_ANTIALIAS_SUBPIXEL
+      when SwtCairo::CAIRO_ANTIALIAS_GRAY, SwtCairo::CAIRO_ANTIALIAS_SUBPIXEL
         return SWT::ON
       end
       return SWT::DEFAULT
@@ -2743,8 +2743,8 @@ module Org::Eclipse::Swt::Graphics
         # Convert to user space
         if (!(cairo).equal?(0))
           matrix = Array.typed(::Java::Double).new(6) { 0.0 }
-          Cairo.cairo_get_matrix(cairo, matrix)
-          Cairo.cairo_matrix_invert(matrix)
+          SwtCairo.cairo_get_matrix(cairo, matrix)
+          SwtCairo.cairo_matrix_invert(matrix)
           clip_rgn = convert_rgn(rgn, matrix)
           OS.gdk_region_destroy(rgn)
           rgn = clip_rgn
@@ -2819,8 +2819,8 @@ module Org::Eclipse::Swt::Graphics
       # Convert to user space
       if (!(cairo).equal?(0))
         matrix = Array.typed(::Java::Double).new(6) { 0.0 }
-        Cairo.cairo_get_matrix(cairo, matrix)
-        Cairo.cairo_matrix_invert(matrix)
+        SwtCairo.cairo_get_matrix(cairo, matrix)
+        SwtCairo.cairo_matrix_invert(matrix)
         # int
         rgn = convert_rgn(clipping, matrix)
         OS.gdk_region_subtract(clipping, clipping)
@@ -2849,7 +2849,7 @@ module Org::Eclipse::Swt::Graphics
       if ((cairo).equal?(0))
         return SWT::FILL_EVEN_ODD
       end
-      return (Cairo.cairo_get_fill_rule(cairo)).equal?(Cairo::CAIRO_FILL_RULE_WINDING) ? SWT::FILL_WINDING : SWT::FILL_EVEN_ODD
+      return (SwtCairo.cairo_get_fill_rule(cairo)).equal?(SwtCairo::CAIRO_FILL_RULE_WINDING) ? SWT::FILL_WINDING : SWT::FILL_EVEN_ODD
     end
     
     typesig { [] }
@@ -3151,28 +3151,28 @@ module Org::Eclipse::Swt::Graphics
       if ((@data.attr_cairo).equal?(0))
         return SWT::DEFAULT
       end
-      antialias = Cairo::CAIRO_ANTIALIAS_DEFAULT
+      antialias = SwtCairo::CAIRO_ANTIALIAS_DEFAULT
       if (OS::GTK_VERSION < OS._version(2, 8, 0))
         # int
-        options = Cairo.cairo_font_options_create
-        Cairo.cairo_get_font_options(@data.attr_cairo, options)
-        antialias = Cairo.cairo_font_options_get_antialias(options)
-        Cairo.cairo_font_options_destroy(options)
+        options = SwtCairo.cairo_font_options_create
+        SwtCairo.cairo_get_font_options(@data.attr_cairo, options)
+        antialias = SwtCairo.cairo_font_options_get_antialias(options)
+        SwtCairo.cairo_font_options_destroy(options)
       else
         if (!(@data.attr_context).equal?(0))
           # int
           options = OS.pango_cairo_context_get_font_options(@data.attr_context)
           if (!(options).equal?(0))
-            antialias = Cairo.cairo_font_options_get_antialias(options)
+            antialias = SwtCairo.cairo_font_options_get_antialias(options)
           end
         end
       end
       case (antialias)
-      when Cairo::CAIRO_ANTIALIAS_DEFAULT
+      when SwtCairo::CAIRO_ANTIALIAS_DEFAULT
         return SWT::DEFAULT
-      when Cairo::CAIRO_ANTIALIAS_NONE
+      when SwtCairo::CAIRO_ANTIALIAS_NONE
         return SWT::OFF
-      when Cairo::CAIRO_ANTIALIAS_GRAY, Cairo::CAIRO_ANTIALIAS_SUBPIXEL
+      when SwtCairo::CAIRO_ANTIALIAS_GRAY, SwtCairo::CAIRO_ANTIALIAS_SUBPIXEL
         return SWT::ON
       end
       return SWT::DEFAULT
@@ -3208,10 +3208,10 @@ module Org::Eclipse::Swt::Graphics
       # int
       cairo = @data.attr_cairo
       if (!(cairo).equal?(0))
-        Cairo.cairo_get_matrix(cairo, transform.attr_handle)
+        SwtCairo.cairo_get_matrix(cairo, transform.attr_handle)
         identity_ = identity
-        Cairo.cairo_matrix_invert(identity_)
-        Cairo.cairo_matrix_multiply(transform.attr_handle, transform.attr_handle, identity_)
+        SwtCairo.cairo_matrix_invert(identity_)
+        SwtCairo.cairo_matrix_multiply(transform.attr_handle, transform.attr_handle, identity_)
       else
         transform.set_elements(1, 0, 0, 1, 0, 0)
       end
@@ -3262,9 +3262,9 @@ module Org::Eclipse::Swt::Graphics
         w = Array.typed(::Java::Int).new(1) { 0 }
         h = Array.typed(::Java::Int).new(1) { 0 }
         OS.gdk_drawable_get_size(@data.attr_drawable, w, h)
-        Cairo.cairo_matrix_init(identity_, -1, 0, 0, 1, w[0], 0)
+        SwtCairo.cairo_matrix_init(identity_, -1, 0, 0, 1, w[0], 0)
       else
-        Cairo.cairo_matrix_init_identity(identity_)
+        SwtCairo.cairo_matrix_init_identity(identity_)
       end
       return identity_
     end
@@ -3298,7 +3298,7 @@ module Org::Eclipse::Swt::Graphics
         init_cairo
         # int
         cairo = data.attr_cairo
-        Cairo.cairo_set_matrix(cairo, identity)
+        SwtCairo.cairo_set_matrix(cairo, identity)
       end
     end
     
@@ -3341,18 +3341,18 @@ module Org::Eclipse::Swt::Graphics
       width = w[0]
       height = h[0]
       # int
-      surface = Cairo.cairo_xlib_surface_create(x_display, x_drawable, x_visual, width, height)
+      surface = SwtCairo.cairo_xlib_surface_create(x_display, x_drawable, x_visual, width, height)
       if ((surface).equal?(0))
         SWT.error(SWT::ERROR_NO_HANDLES)
       end
-      Cairo.cairo_surface_set_device_offset(surface, translate_x, translate_y)
-      @data.attr_cairo = cairo = Cairo.cairo_create(surface)
-      Cairo.cairo_surface_destroy(surface)
+      SwtCairo.cairo_surface_set_device_offset(surface, translate_x, translate_y)
+      @data.attr_cairo = cairo = SwtCairo.cairo_create(surface)
+      SwtCairo.cairo_surface_destroy(surface)
       if ((cairo).equal?(0))
         SWT.error(SWT::ERROR_NO_HANDLES)
       end
       @data.attr_dispose_cairo = true
-      Cairo.cairo_set_fill_rule(cairo, Cairo::CAIRO_FILL_RULE_EVEN_ODD)
+      SwtCairo.cairo_set_fill_rule(cairo, SwtCairo::CAIRO_FILL_RULE_EVEN_ODD)
       @data.attr_state &= ~(BACKGROUND | FOREGROUND | FONT | LINE_WIDTH | LINE_CAP | LINE_JOIN | LINE_STYLE | DRAW_OFFSET)
       set_cairo_clip(cairo, @data.attr_clip_rgn)
     end
@@ -3471,7 +3471,7 @@ module Org::Eclipse::Swt::Graphics
         # int
         cairo = @data.attr_cairo
         if (!(cairo).equal?(0))
-          Cairo.cairo_destroy(cairo)
+          SwtCairo.cairo_destroy(cairo)
         end
         @data.attr_cairo = 0
         @data.attr_interpolation = SWT::DEFAULT
@@ -3549,18 +3549,18 @@ module Org::Eclipse::Swt::Graphics
       mode = 0
       case (antialias)
       when SWT::DEFAULT
-        mode = Cairo::CAIRO_ANTIALIAS_DEFAULT
+        mode = SwtCairo::CAIRO_ANTIALIAS_DEFAULT
       when SWT::OFF
-        mode = Cairo::CAIRO_ANTIALIAS_NONE
+        mode = SwtCairo::CAIRO_ANTIALIAS_NONE
       when SWT::ON
-        mode = Cairo::CAIRO_ANTIALIAS_GRAY
+        mode = SwtCairo::CAIRO_ANTIALIAS_GRAY
       else
         SWT.error(SWT::ERROR_INVALID_ARGUMENT)
       end
       init_cairo
       # int
       cairo = @data.attr_cairo
-      Cairo.cairo_set_antialias(cairo, mode)
+      SwtCairo.cairo_set_antialias(cairo, mode)
     end
     
     typesig { [Color] }
@@ -3653,26 +3653,26 @@ module Org::Eclipse::Swt::Graphics
         height = OS._pango_pixels(OS.pango_font_description_get_size(font)) * 96 / 72
         pango_style = OS.pango_font_description_get_style(font)
         pango_weight = OS.pango_font_description_get_weight(font)
-        slant = Cairo::CAIRO_FONT_SLANT_NORMAL
+        slant = SwtCairo::CAIRO_FONT_SLANT_NORMAL
         if ((pango_style).equal?(OS::PANGO_STYLE_ITALIC))
-          slant = Cairo::CAIRO_FONT_SLANT_ITALIC
+          slant = SwtCairo::CAIRO_FONT_SLANT_ITALIC
         end
         if ((pango_style).equal?(OS::PANGO_STYLE_OBLIQUE))
-          slant = Cairo::CAIRO_FONT_SLANT_OBLIQUE
+          slant = SwtCairo::CAIRO_FONT_SLANT_OBLIQUE
         end
-        weight = Cairo::CAIRO_FONT_WEIGHT_NORMAL
+        weight = SwtCairo::CAIRO_FONT_WEIGHT_NORMAL
         if ((pango_weight).equal?(OS::PANGO_WEIGHT_BOLD))
-          weight = Cairo::CAIRO_FONT_WEIGHT_BOLD
+          weight = SwtCairo::CAIRO_FONT_WEIGHT_BOLD
         end
-        Cairo.cairo_select_font_face(cairo, buffer, slant, weight)
-        Cairo.cairo_set_font_size(cairo, height)
+        SwtCairo.cairo_select_font_face(cairo, buffer, slant, weight)
+        SwtCairo.cairo_set_font_size(cairo, height)
       end
       
       typesig { [::Java::Long, ::Java::Long] }
       # int
       # int
       def set_cairo_clip(cairo, clip_rgn)
-        Cairo.cairo_reset_clip(cairo)
+        SwtCairo.cairo_reset_clip(cairo)
         if ((clip_rgn).equal?(0))
           return
         end
@@ -3688,14 +3688,14 @@ module Org::Eclipse::Swt::Graphics
           i = 0
           while i < n_rects[0]
             OS.memmove(rect, rects[0] + (i * GdkRectangle.attr_sizeof), GdkRectangle.attr_sizeof)
-            Cairo.cairo_rectangle(cairo, rect.attr_x, rect.attr_y, rect.attr_width, rect.attr_height)
+            SwtCairo.cairo_rectangle(cairo, rect.attr_x, rect.attr_y, rect.attr_width, rect.attr_height)
             i += 1
           end
           if (!(rects[0]).equal?(0))
             OS.g_free(rects[0])
           end
         end
-        Cairo.cairo_clip(cairo)
+        SwtCairo.cairo_clip(cairo)
       end
       
       typesig { [::Java::Long, ::Java::Int, Color, ::Java::Int] }
@@ -3706,7 +3706,7 @@ module Org::Eclipse::Swt::Graphics
         red = ((color.attr_red & 0xffff) / (0xffff).to_f)
         green = ((color.attr_green & 0xffff) / (0xffff).to_f)
         blue = ((color.attr_blue & 0xffff) / (0xffff).to_f)
-        Cairo.cairo_pattern_add_color_stop_rgba(pattern, offset, red, green, blue, aa)
+        SwtCairo.cairo_pattern_add_color_stop_rgba(pattern, offset, red, green, blue, aa)
       end
     }
     
@@ -3738,7 +3738,7 @@ module Org::Eclipse::Swt::Graphics
           if ((@data.attr_clipping_transform).nil?)
             @data.attr_clipping_transform = Array.typed(::Java::Double).new(6) { 0.0 }
           end
-          Cairo.cairo_get_matrix(cairo, @data.attr_clipping_transform)
+          SwtCairo.cairo_get_matrix(cairo, @data.attr_clipping_transform)
           set_cairo_clip(cairo, clip_rgn)
         else
           # int
@@ -3831,13 +3831,13 @@ module Org::Eclipse::Swt::Graphics
         # int
         cairo = @data.attr_cairo
         # int
-        copy = Cairo.cairo_copy_path(path.attr_handle)
+        copy = SwtCairo.cairo_copy_path(path.attr_handle)
         if ((copy).equal?(0))
           SWT.error(SWT::ERROR_NO_HANDLES)
         end
-        Cairo.cairo_append_path(cairo, copy)
-        Cairo.cairo_path_destroy(copy)
-        Cairo.cairo_clip(cairo)
+        SwtCairo.cairo_append_path(cairo, copy)
+        SwtCairo.cairo_path_destroy(copy)
+        SwtCairo.cairo_clip(cairo)
       end
     end
     
@@ -3934,12 +3934,12 @@ module Org::Eclipse::Swt::Graphics
       if ((@handle).equal?(0))
         SWT.error(SWT::ERROR_GRAPHIC_DISPOSED)
       end
-      cairo_mode = Cairo::CAIRO_FILL_RULE_EVEN_ODD
+      cairo_mode = SwtCairo::CAIRO_FILL_RULE_EVEN_ODD
       case (rule)
       when SWT::FILL_WINDING
-        cairo_mode = Cairo::CAIRO_FILL_RULE_WINDING
+        cairo_mode = SwtCairo::CAIRO_FILL_RULE_WINDING
       when SWT::FILL_EVEN_ODD
-        cairo_mode = Cairo::CAIRO_FILL_RULE_EVEN_ODD
+        cairo_mode = SwtCairo::CAIRO_FILL_RULE_EVEN_ODD
       else
         SWT.error(SWT::ERROR_INVALID_ARGUMENT)
       end
@@ -3948,7 +3948,7 @@ module Org::Eclipse::Swt::Graphics
       # int
       cairo = @data.attr_cairo
       if (!(cairo).equal?(0))
-        Cairo.cairo_set_fill_rule(cairo, cairo_mode)
+        SwtCairo.cairo_set_fill_rule(cairo, cairo_mode)
       end
     end
     
@@ -4443,27 +4443,27 @@ module Org::Eclipse::Swt::Graphics
       mode = 0
       case (antialias)
       when SWT::DEFAULT
-        mode = Cairo::CAIRO_ANTIALIAS_DEFAULT
+        mode = SwtCairo::CAIRO_ANTIALIAS_DEFAULT
       when SWT::OFF
-        mode = Cairo::CAIRO_ANTIALIAS_NONE
+        mode = SwtCairo::CAIRO_ANTIALIAS_NONE
       when SWT::ON
-        mode = Cairo::CAIRO_ANTIALIAS_GRAY
+        mode = SwtCairo::CAIRO_ANTIALIAS_GRAY
       else
         SWT.error(SWT::ERROR_INVALID_ARGUMENT)
       end
       init_cairo
       # int
-      options = Cairo.cairo_font_options_create
-      Cairo.cairo_font_options_set_antialias(options, mode)
+      options = SwtCairo.cairo_font_options_create
+      SwtCairo.cairo_font_options_set_antialias(options, mode)
       if (OS::GTK_VERSION < OS._version(2, 8, 0))
-        Cairo.cairo_set_font_options(@data.attr_cairo, options)
+        SwtCairo.cairo_set_font_options(@data.attr_cairo, options)
       else
         if ((@data.attr_context).equal?(0))
           create_layout
         end
         OS.pango_cairo_context_set_font_options(@data.attr_context, options)
       end
-      Cairo.cairo_font_options_destroy(options)
+      SwtCairo.cairo_font_options_destroy(options)
     end
     
     typesig { [Transform] }
@@ -4506,9 +4506,9 @@ module Org::Eclipse::Swt::Graphics
       cairo = @data.attr_cairo
       identity_ = identity
       if (!(transform).nil?)
-        Cairo.cairo_matrix_multiply(identity_, transform.attr_handle, identity_)
+        SwtCairo.cairo_matrix_multiply(identity_, transform.attr_handle, identity_)
       end
-      Cairo.cairo_set_matrix(cairo, identity_)
+      SwtCairo.cairo_set_matrix(cairo, identity_)
       @data.attr_state &= ~DRAW_OFFSET
     end
     
@@ -4629,9 +4629,9 @@ module Org::Eclipse::Swt::Graphics
           check_gc(FONT)
           buffer = Converter.wcs_to_mbcs(nil, string, true)
           font_extents = Cairo_font_extents_t.new
-          Cairo.cairo_font_extents(cairo, font_extents)
+          SwtCairo.cairo_font_extents(cairo, font_extents)
           extents = Cairo_text_extents_t.new
-          Cairo.cairo_text_extents(cairo, buffer, extents)
+          SwtCairo.cairo_text_extents(cairo, buffer, extents)
           return Point.new(RJava.cast_to_int(extents.attr_width), RJava.cast_to_int(font_extents.attr_height))
         end
       end

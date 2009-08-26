@@ -551,9 +551,9 @@ module Org::Eclipse::Swt::Graphics
           selection_background = self.attr_device.get_system_color(SWT::COLOR_LIST_SELECTION)
         end
         if (!(cairo).equal?(0) && OS::GTK_VERSION >= OS._version(2, 8, 0))
-          Cairo.cairo_save(cairo)
+          SwtCairo.cairo_save(cairo)
           color = selection_background.attr_handle
-          Cairo.cairo_set_source_rgba(cairo, (color.attr_red & 0xffff) / (0xffff).to_f, (color.attr_green & 0xffff) / (0xffff).to_f, (color.attr_blue & 0xffff) / (0xffff).to_f, data.attr_alpha / (0xff).to_f)
+          SwtCairo.cairo_set_source_rgba(cairo, (color.attr_red & 0xffff) / (0xffff).to_f, (color.attr_green & 0xffff) / (0xffff).to_f, (color.attr_blue & 0xffff) / (0xffff).to_f, data.attr_alpha / (0xff).to_f)
         else
           OS.gdk_gc_set_foreground(gc.attr_handle, selection_background.attr_handle)
         end
@@ -596,8 +596,8 @@ module Org::Eclipse::Swt::Graphics
             end
             width = !((flags & SWT::FULL_SELECTION)).equal?(0) ? 0x7fffffff : height / 3
             if (!(cairo).equal?(0) && OS::GTK_VERSION >= OS._version(2, 8, 0))
-              Cairo.cairo_rectangle(cairo, line_x, line_y, width, height)
-              Cairo.cairo_fill(cairo)
+              SwtCairo.cairo_rectangle(cairo, line_x, line_y, width, height)
+              SwtCairo.cairo_fill(cairo)
             else
               OS.gdk_draw_rectangle(data.attr_drawable, gc.attr_handle, 1, line_x, line_y, width, height)
             end
@@ -609,7 +609,7 @@ module Org::Eclipse::Swt::Graphics
           OS.g_free(attrs[0])
         end
         if (!(cairo).equal?(0) && OS::GTK_VERSION >= OS._version(2, 8, 0))
-          Cairo.cairo_restore(cairo)
+          SwtCairo.cairo_restore(cairo)
         else
           OS.gdk_gc_set_foreground(gc.attr_handle, data.attr_foreground)
         end
@@ -620,15 +620,15 @@ module Org::Eclipse::Swt::Graphics
       if (!has_selection)
         if (!(cairo).equal?(0) && OS::GTK_VERSION >= OS._version(2, 8, 0))
           if (!((data.attr_style & SWT::MIRRORED)).equal?(0))
-            Cairo.cairo_save(cairo)
-            Cairo.cairo_scale(cairo, -1, 1)
-            Cairo.cairo_translate(cairo, -2 * x - width, 0)
+            SwtCairo.cairo_save(cairo)
+            SwtCairo.cairo_scale(cairo, -1, 1)
+            SwtCairo.cairo_translate(cairo, -2 * x - width, 0)
           end
-          Cairo.cairo_move_to(cairo, x, y)
+          SwtCairo.cairo_move_to(cairo, x, y)
           OS.pango_cairo_show_layout(cairo, @layout)
           draw_border(gc, x, y, nil)
           if (!((data.attr_style & SWT::MIRRORED)).equal?(0))
-            Cairo.cairo_restore(cairo)
+            SwtCairo.cairo_restore(cairo)
           end
         else
           OS.gdk_draw_layout(data.attr_drawable, gc.attr_handle, x, y, @layout)
@@ -653,13 +653,13 @@ module Org::Eclipse::Swt::Graphics
             # long
             ptr = OS.pango_layout_get_text(@layout)
             if (!((data.attr_style & SWT::MIRRORED)).equal?(0))
-              Cairo.cairo_save(cairo)
-              Cairo.cairo_scale(cairo, -1, 1)
-              Cairo.cairo_translate(cairo, -2 * x - width, 0)
+              SwtCairo.cairo_save(cairo)
+              SwtCairo.cairo_scale(cairo, -1, 1)
+              SwtCairo.cairo_translate(cairo, -2 * x - width, 0)
             end
             draw_with_cairo(gc, x, y, 0, OS.strlen(ptr), full_selection, selection_foreground.attr_handle, selection_background.attr_handle)
             if (!((data.attr_style & SWT::MIRRORED)).equal?(0))
-              Cairo.cairo_restore(cairo)
+              SwtCairo.cairo_restore(cairo)
             end
           else
             OS.gdk_draw_layout_with_colors(data.attr_drawable, gc.attr_handle, x, y, @layout, selection_foreground.attr_handle, selection_background.attr_handle)
@@ -677,13 +677,13 @@ module Org::Eclipse::Swt::Graphics
           byte_sel_end = Math.min(byte_sel_end, strlen_)
           if (!(cairo).equal?(0) && OS::GTK_VERSION >= OS._version(2, 8, 0))
             if (!((data.attr_style & SWT::MIRRORED)).equal?(0))
-              Cairo.cairo_save(cairo)
-              Cairo.cairo_scale(cairo, -1, 1)
-              Cairo.cairo_translate(cairo, -2 * x - width, 0)
+              SwtCairo.cairo_save(cairo)
+              SwtCairo.cairo_scale(cairo, -1, 1)
+              SwtCairo.cairo_translate(cairo, -2 * x - width, 0)
             end
             draw_with_cairo(gc, x, y, byte_sel_start, byte_sel_end, full_selection, selection_foreground.attr_handle, selection_background.attr_handle)
             if (!((data.attr_style & SWT::MIRRORED)).equal?(0))
-              Cairo.cairo_restore(cairo)
+              SwtCairo.cairo_restore(cairo)
             end
           else
             clipping = Region.new
@@ -711,9 +711,9 @@ module Org::Eclipse::Swt::Graphics
       data = gc.attr_data
       # long
       cairo = data.attr_cairo
-      Cairo.cairo_save(cairo)
+      SwtCairo.cairo_save(cairo)
       if (!full_selection)
-        Cairo.cairo_move_to(cairo, x, y)
+        SwtCairo.cairo_move_to(cairo, x, y)
         OS.pango_cairo_show_layout(cairo, @layout)
         draw_border(gc, x, y, nil)
       end
@@ -722,16 +722,16 @@ module Org::Eclipse::Swt::Graphics
       rgn = OS.gdk_pango_layout_get_clip_region(@layout, x, y, ranges, ranges.attr_length / 2)
       if (!(rgn).equal?(0))
         OS.gdk_cairo_region(cairo, rgn)
-        Cairo.cairo_clip(cairo)
-        Cairo.cairo_set_source_rgba(cairo, (bg.attr_red & 0xffff) / (0xffff).to_f, (bg.attr_green & 0xffff) / (0xffff).to_f, (bg.attr_blue & 0xffff) / (0xffff).to_f, data.attr_alpha / (0xff).to_f)
-        Cairo.cairo_paint(cairo)
+        SwtCairo.cairo_clip(cairo)
+        SwtCairo.cairo_set_source_rgba(cairo, (bg.attr_red & 0xffff) / (0xffff).to_f, (bg.attr_green & 0xffff) / (0xffff).to_f, (bg.attr_blue & 0xffff) / (0xffff).to_f, data.attr_alpha / (0xff).to_f)
+        SwtCairo.cairo_paint(cairo)
         OS.gdk_region_destroy(rgn)
       end
-      Cairo.cairo_set_source_rgba(cairo, (fg.attr_red & 0xffff) / (0xffff).to_f, (fg.attr_green & 0xffff) / (0xffff).to_f, (fg.attr_blue & 0xffff) / (0xffff).to_f, data.attr_alpha / (0xff).to_f)
-      Cairo.cairo_move_to(cairo, x, y)
+      SwtCairo.cairo_set_source_rgba(cairo, (fg.attr_red & 0xffff) / (0xffff).to_f, (fg.attr_green & 0xffff) / (0xffff).to_f, (fg.attr_blue & 0xffff) / (0xffff).to_f, data.attr_alpha / (0xff).to_f)
+      SwtCairo.cairo_move_to(cairo, x, y)
       OS.pango_cairo_show_layout(cairo, @layout)
       draw_border(gc, x, y, fg)
-      Cairo.cairo_restore(cairo)
+      SwtCairo.cairo_restore(cairo)
     end
     
     typesig { [SwtGC, ::Java::Int, ::Java::Int, GdkColor] }
@@ -745,7 +745,7 @@ module Org::Eclipse::Swt::Graphics
       ptr = OS.pango_layout_get_text(@layout)
       gc_values = nil
       if (!(cairo).equal?(0) && OS::GTK_VERSION >= OS._version(2, 8, 0))
-        Cairo.cairo_save(cairo)
+        SwtCairo.cairo_save(cairo)
       end
       i = 0
       while i < @styles.attr_length - 1
@@ -801,8 +801,8 @@ module Org::Eclipse::Swt::Graphics
               dashes = !(width_).equal?(0) ? SwtGC::LINE_DOT : SwtGC::LINE_DOT_ZERO
             end
             if (!(cairo).equal?(0) && OS::GTK_VERSION >= OS._version(2, 8, 0))
-              Cairo.cairo_set_source_rgba(cairo, (color.attr_red & 0xffff) / (0xffff).to_f, (color.attr_green & 0xffff) / (0xffff).to_f, (color.attr_blue & 0xffff) / (0xffff).to_f, data.attr_alpha / (0xff).to_f)
-              Cairo.cairo_set_line_width(cairo, width_)
+              SwtCairo.cairo_set_source_rgba(cairo, (color.attr_red & 0xffff) / (0xffff).to_f, (color.attr_green & 0xffff) / (0xffff).to_f, (color.attr_blue & 0xffff) / (0xffff).to_f, data.attr_alpha / (0xff).to_f)
+              SwtCairo.cairo_set_line_width(cairo, width_)
               if (!(dashes).nil?)
                 cairo_dashes = Array.typed(::Java::Double).new(dashes.attr_length) { 0.0 }
                 j_ = 0
@@ -810,17 +810,17 @@ module Org::Eclipse::Swt::Graphics
                   cairo_dashes[j_] = (width_).equal?(0) || (data.attr_line_style).equal?(SWT::LINE_CUSTOM) ? dashes[j_] : dashes[j_] * width_
                   j_ += 1
                 end
-                Cairo.cairo_set_dash(cairo, cairo_dashes, cairo_dashes.attr_length, 0)
+                SwtCairo.cairo_set_dash(cairo, cairo_dashes, cairo_dashes.attr_length, 0)
               else
-                Cairo.cairo_set_dash(cairo, nil, 0, 0)
+                SwtCairo.cairo_set_dash(cairo, nil, 0, 0)
               end
               j_ = 0
               while j_ < n_rects[0]
                 OS.memmove(rect, rects[0] + (j_ * GdkRectangle.attr_sizeof), GdkRectangle.attr_sizeof)
-                Cairo.cairo_rectangle(cairo, rect.attr_x + 0.5, rect.attr_y + 0.5, rect.attr_width - 1, rect.attr_height - 1)
+                SwtCairo.cairo_rectangle(cairo, rect.attr_x + 0.5, rect.attr_y + 0.5, rect.attr_width - 1, rect.attr_height - 1)
                 j_ += 1
               end
-              Cairo.cairo_stroke(cairo)
+              SwtCairo.cairo_stroke(cairo)
             else
               if ((gc_values).nil?)
                 gc_values = GdkGCValues.new
@@ -900,7 +900,7 @@ module Org::Eclipse::Swt::Graphics
               color = data.attr_foreground
             end
             if (!(cairo).equal?(0) && OS::GTK_VERSION >= OS._version(2, 8, 0))
-              Cairo.cairo_set_source_rgba(cairo, (color.attr_red & 0xffff) / (0xffff).to_f, (color.attr_green & 0xffff) / (0xffff).to_f, (color.attr_blue & 0xffff) / (0xffff).to_f, data.attr_alpha / (0xff).to_f)
+              SwtCairo.cairo_set_source_rgba(cairo, (color.attr_red & 0xffff) / (0xffff).to_f, (color.attr_green & 0xffff) / (0xffff).to_f, (color.attr_blue & 0xffff) / (0xffff).to_f, data.attr_alpha / (0xff).to_f)
             else
               if ((gc_values).nil?)
                 gc_values = GdkGCValues.new
@@ -941,19 +941,19 @@ module Org::Eclipse::Swt::Graphics
                 squiggly_y = Math.min(underline_y, rect.attr_y + rect.attr_height - squiggly_height - 1)
                 points = compute_polyline(rect.attr_x, squiggly_y, rect.attr_x + rect.attr_width, squiggly_y + squiggly_height)
                 if (!(cairo).equal?(0) && OS::GTK_VERSION >= OS._version(2, 8, 0))
-                  Cairo.cairo_set_line_width(cairo, squiggly_thickness)
-                  Cairo.cairo_set_line_cap(cairo, Cairo::CAIRO_LINE_CAP_BUTT)
-                  Cairo.cairo_set_line_join(cairo, Cairo::CAIRO_LINE_JOIN_MITER)
+                  SwtCairo.cairo_set_line_width(cairo, squiggly_thickness)
+                  SwtCairo.cairo_set_line_cap(cairo, SwtCairo::CAIRO_LINE_CAP_BUTT)
+                  SwtCairo.cairo_set_line_join(cairo, SwtCairo::CAIRO_LINE_JOIN_MITER)
                   if (points.attr_length > 0)
                     x_offset = 0.5
                     y_offset = 0.5
-                    Cairo.cairo_move_to(cairo, points[0] + x_offset, points[1] + y_offset)
+                    SwtCairo.cairo_move_to(cairo, points[0] + x_offset, points[1] + y_offset)
                     k = 2
                     while k < points.attr_length
-                      Cairo.cairo_line_to(cairo, points[k] + x_offset, points[k + 1] + y_offset)
+                      SwtCairo.cairo_line_to(cairo, points[k] + x_offset, points[k + 1] + y_offset)
                       k += 2
                     end
-                    Cairo.cairo_stroke(cairo)
+                    SwtCairo.cairo_stroke(cairo)
                   end
                 else
                   OS.gdk_gc_set_line_attributes(gdk_gc, squiggly_thickness, OS::GDK_LINE_SOLID, OS::GDK_CAP_BUTT, OS::GDK_JOIN_MITER)
@@ -961,21 +961,21 @@ module Org::Eclipse::Swt::Graphics
                 end
               when SWT::UNDERLINE_DOUBLE
                 if (!(cairo).equal?(0) && OS::GTK_VERSION >= OS._version(2, 8, 0))
-                  Cairo.cairo_rectangle(cairo, rect.attr_x, underline_y + underline_thickness * 2, rect.attr_width, underline_thickness)
-                  Cairo.cairo_fill(cairo)
+                  SwtCairo.cairo_rectangle(cairo, rect.attr_x, underline_y + underline_thickness * 2, rect.attr_width, underline_thickness)
+                  SwtCairo.cairo_fill(cairo)
                 else
                   OS.gdk_draw_rectangle(data.attr_drawable, gdk_gc, 1, rect.attr_x, underline_y + underline_thickness * 2, rect.attr_width, underline_thickness)
                 end
                 if (!(cairo).equal?(0) && OS::GTK_VERSION >= OS._version(2, 8, 0))
-                  Cairo.cairo_rectangle(cairo, rect.attr_x, underline_y, rect.attr_width, underline_thickness)
-                  Cairo.cairo_fill(cairo)
+                  SwtCairo.cairo_rectangle(cairo, rect.attr_x, underline_y, rect.attr_width, underline_thickness)
+                  SwtCairo.cairo_fill(cairo)
                 else
                   OS.gdk_draw_rectangle(data.attr_drawable, gdk_gc, 1, rect.attr_x, underline_y, rect.attr_width, underline_thickness)
                 end
               when SWT::UNDERLINE_SINGLE
                 if (!(cairo).equal?(0) && OS::GTK_VERSION >= OS._version(2, 8, 0))
-                  Cairo.cairo_rectangle(cairo, rect.attr_x, underline_y, rect.attr_width, underline_thickness)
-                  Cairo.cairo_fill(cairo)
+                  SwtCairo.cairo_rectangle(cairo, rect.attr_x, underline_y, rect.attr_width, underline_thickness)
+                  SwtCairo.cairo_fill(cairo)
                 else
                   OS.gdk_draw_rectangle(data.attr_drawable, gdk_gc, 1, rect.attr_x, underline_y, rect.attr_width, underline_thickness)
                 end
@@ -1029,7 +1029,7 @@ module Org::Eclipse::Swt::Graphics
               color = data.attr_foreground
             end
             if (!(cairo).equal?(0) && OS::GTK_VERSION >= OS._version(2, 8, 0))
-              Cairo.cairo_set_source_rgba(cairo, (color.attr_red & 0xffff) / (0xffff).to_f, (color.attr_green & 0xffff) / (0xffff).to_f, (color.attr_blue & 0xffff) / (0xffff).to_f, data.attr_alpha / (0xff).to_f)
+              SwtCairo.cairo_set_source_rgba(cairo, (color.attr_red & 0xffff) / (0xffff).to_f, (color.attr_green & 0xffff) / (0xffff).to_f, (color.attr_blue & 0xffff) / (0xffff).to_f, data.attr_alpha / (0xff).to_f)
             else
               if ((gc_values).nil?)
                 gc_values = GdkGCValues.new
@@ -1066,8 +1066,8 @@ module Org::Eclipse::Swt::Graphics
                 strikeout_y = rect.attr_y + metrics.attr_ascent - strikeout_position - style.attr_rise
               end
               if (!(cairo).equal?(0) && OS::GTK_VERSION >= OS._version(2, 8, 0))
-                Cairo.cairo_rectangle(cairo, rect.attr_x, strikeout_y, rect.attr_width, strikeout_thickness)
-                Cairo.cairo_fill(cairo)
+                SwtCairo.cairo_rectangle(cairo, rect.attr_x, strikeout_y, rect.attr_width, strikeout_thickness)
+                SwtCairo.cairo_fill(cairo)
               else
                 OS.gdk_draw_rectangle(data.attr_drawable, gdk_gc, 1, rect.attr_x, strikeout_y, rect.attr_width, strikeout_thickness)
               end
@@ -1087,7 +1087,7 @@ module Org::Eclipse::Swt::Graphics
         data.attr_state &= ~SwtGC::LINE_STYLE
       end
       if (!(cairo).equal?(0) && OS::GTK_VERSION >= OS._version(2, 8, 0))
-        Cairo.cairo_restore(cairo)
+        SwtCairo.cairo_restore(cairo)
       end
     end
     

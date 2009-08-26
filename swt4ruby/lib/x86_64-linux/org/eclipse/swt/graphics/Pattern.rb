@@ -97,11 +97,11 @@ module Org::Eclipse::Swt::Graphics
       end
       self.attr_device.check_cairo
       image.create_surface
-      @handle = Cairo.cairo_pattern_create_for_surface(image.attr_surface)
+      @handle = SwtCairo.cairo_pattern_create_for_surface(image.attr_surface)
       if ((@handle).equal?(0))
         SWT.error(SWT::ERROR_NO_HANDLES)
       end
-      Cairo.cairo_pattern_set_extend(@handle, Cairo::CAIRO_EXTEND_REPEAT)
+      SwtCairo.cairo_pattern_set_extend(@handle, SwtCairo::CAIRO_EXTEND_REPEAT)
       @surface = image.attr_surface
       init
     end
@@ -193,19 +193,19 @@ module Org::Eclipse::Swt::Graphics
         SWT.error(SWT::ERROR_INVALID_ARGUMENT)
       end
       self.attr_device.check_cairo
-      @handle = Cairo.cairo_pattern_create_linear(x1, y1, x2, y2)
+      @handle = SwtCairo.cairo_pattern_create_linear(x1, y1, x2, y2)
       if ((@handle).equal?(0))
         SWT.error(SWT::ERROR_NO_HANDLES)
       end
       SwtGC.set_cairo_pattern_color(@handle, 0, color1, alpha1)
       SwtGC.set_cairo_pattern_color(@handle, 1, color2, alpha2)
-      Cairo.cairo_pattern_set_extend(@handle, Cairo::CAIRO_EXTEND_REPEAT)
+      SwtCairo.cairo_pattern_set_extend(@handle, SwtCairo::CAIRO_EXTEND_REPEAT)
       init
     end
     
     typesig { [] }
     def destroy
-      Cairo.cairo_pattern_destroy(@handle)
+      SwtCairo.cairo_pattern_destroy(@handle)
       @handle = @surface = 0
     end
     

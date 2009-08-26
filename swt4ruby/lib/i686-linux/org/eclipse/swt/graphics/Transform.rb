@@ -141,7 +141,7 @@ module Org::Eclipse::Swt::Graphics
       if ((@handle).nil?)
         SWT.error(SWT::ERROR_NO_HANDLES)
       end
-      Cairo.cairo_matrix_init(@handle, m11, m12, m21, m22, dx, dy)
+      SwtCairo.cairo_matrix_init(@handle, m11, m12, m21, m22, dx, dy)
       init
     end
     
@@ -207,7 +207,7 @@ module Org::Eclipse::Swt::Graphics
       if (is_disposed)
         SWT.error(SWT::ERROR_GRAPHIC_DISPOSED)
       end
-      Cairo.cairo_matrix_init(@handle, 1, 0, 0, 1, 0, 0)
+      SwtCairo.cairo_matrix_init(@handle, 1, 0, 0, 1, 0, 0)
     end
     
     typesig { [] }
@@ -222,7 +222,7 @@ module Org::Eclipse::Swt::Graphics
       if (is_disposed)
         SWT.error(SWT::ERROR_GRAPHIC_DISPOSED)
       end
-      if (!(Cairo.cairo_matrix_invert(@handle)).equal?(0))
+      if (!(SwtCairo.cairo_matrix_invert(@handle)).equal?(0))
         SWT.error(SWT::ERROR_CANNOT_INVERT_MATRIX)
       end
     end
@@ -278,7 +278,7 @@ module Org::Eclipse::Swt::Graphics
       if (matrix.is_disposed)
         SWT.error(SWT::ERROR_INVALID_ARGUMENT)
       end
-      Cairo.cairo_matrix_multiply(@handle, matrix.attr_handle, @handle)
+      SwtCairo.cairo_matrix_multiply(@handle, matrix.attr_handle, @handle)
     end
     
     typesig { [::Java::Float] }
@@ -297,7 +297,7 @@ module Org::Eclipse::Swt::Graphics
       if (is_disposed)
         SWT.error(SWT::ERROR_GRAPHIC_DISPOSED)
       end
-      Cairo.cairo_matrix_rotate(@handle, angle * (Compatibility::PI).to_f / 180)
+      SwtCairo.cairo_matrix_rotate(@handle, angle * (Compatibility::PI).to_f / 180)
     end
     
     typesig { [::Java::Float, ::Java::Float] }
@@ -314,7 +314,7 @@ module Org::Eclipse::Swt::Graphics
       if (is_disposed)
         SWT.error(SWT::ERROR_GRAPHIC_DISPOSED)
       end
-      Cairo.cairo_matrix_scale(@handle, scale_x, scale_y)
+      SwtCairo.cairo_matrix_scale(@handle, scale_x, scale_y)
     end
     
     typesig { [::Java::Float, ::Java::Float, ::Java::Float, ::Java::Float, ::Java::Float, ::Java::Float] }
@@ -335,7 +335,7 @@ module Org::Eclipse::Swt::Graphics
       if (is_disposed)
         SWT.error(SWT::ERROR_GRAPHIC_DISPOSED)
       end
-      Cairo.cairo_matrix_init(@handle, m11, m12, m21, m22, dx, dy)
+      SwtCairo.cairo_matrix_init(@handle, m11, m12, m21, m22, dx, dy)
     end
     
     typesig { [::Java::Float, ::Java::Float] }
@@ -355,7 +355,7 @@ module Org::Eclipse::Swt::Graphics
         SWT.error(SWT::ERROR_GRAPHIC_DISPOSED)
       end
       matrix = Array.typed(::Java::Double).new([1, shear_x, shear_y, 1, 0, 0])
-      Cairo.cairo_matrix_multiply(@handle, matrix, @handle)
+      SwtCairo.cairo_matrix_multiply(@handle, matrix, @handle)
     end
     
     typesig { [Array.typed(::Java::Float)] }
@@ -386,7 +386,7 @@ module Org::Eclipse::Swt::Graphics
       while i < length
         dx[0] = point_array[j]
         dy[0] = point_array[j + 1]
-        Cairo.cairo_matrix_transform_point(@handle, dx, dy)
+        SwtCairo.cairo_matrix_transform_point(@handle, dx, dy)
         point_array[j] = (dx[0]).to_f
         point_array[j + 1] = (dy[0]).to_f
         i += 1
@@ -408,7 +408,7 @@ module Org::Eclipse::Swt::Graphics
       if (is_disposed)
         SWT.error(SWT::ERROR_GRAPHIC_DISPOSED)
       end
-      Cairo.cairo_matrix_translate(@handle, offset_x, offset_y)
+      SwtCairo.cairo_matrix_translate(@handle, offset_x, offset_y)
     end
     
     typesig { [] }

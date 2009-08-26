@@ -477,10 +477,10 @@ module Org::Eclipse::Swt::Widgets
         # int
         cairo = data.attr_cairo
         if (!(cairo).equal?(0))
-          Cairo.cairo_save(cairo)
+          SwtCairo.cairo_save(cairo)
           if (!(control.attr_background_image).nil?)
             pt = self.attr_display.map(self, control, 0, 0)
-            Cairo.cairo_translate(cairo, -pt.attr_x, -pt.attr_y)
+            SwtCairo.cairo_translate(cairo, -pt.attr_x, -pt.attr_y)
             x += pt.attr_x
             y += pt.attr_y
             # int
@@ -495,30 +495,30 @@ module Org::Eclipse::Swt::Widgets
             h = Array.typed(::Java::Int).new(1) { 0 }
             OS.gdk_drawable_get_size(drawable, w, h)
             # int
-            surface = Cairo.cairo_xlib_surface_create(x_display, x_drawable, x_visual, w[0], h[0])
+            surface = SwtCairo.cairo_xlib_surface_create(x_display, x_drawable, x_visual, w[0], h[0])
             if ((surface).equal?(0))
               error(SWT::ERROR_NO_HANDLES)
             end
             # int
-            pattern = Cairo.cairo_pattern_create_for_surface(surface)
+            pattern = SwtCairo.cairo_pattern_create_for_surface(surface)
             if ((pattern).equal?(0))
               error(SWT::ERROR_NO_HANDLES)
             end
-            Cairo.cairo_pattern_set_extend(pattern, Cairo::CAIRO_EXTEND_REPEAT)
+            SwtCairo.cairo_pattern_set_extend(pattern, SwtCairo::CAIRO_EXTEND_REPEAT)
             if (!((data.attr_style & SWT::MIRRORED)).equal?(0))
               matrix = Array.typed(::Java::Double).new([-1, 0, 0, 1, 0, 0])
-              Cairo.cairo_pattern_set_matrix(pattern, matrix)
+              SwtCairo.cairo_pattern_set_matrix(pattern, matrix)
             end
-            Cairo.cairo_set_source(cairo, pattern)
-            Cairo.cairo_surface_destroy(surface)
-            Cairo.cairo_pattern_destroy(pattern)
+            SwtCairo.cairo_set_source(cairo, pattern)
+            SwtCairo.cairo_surface_destroy(surface)
+            SwtCairo.cairo_pattern_destroy(pattern)
           else
             color = control.get_background_color
-            Cairo.cairo_set_source_rgba(cairo, (color.attr_red & 0xffff) / (0xffff).to_f, (color.attr_green & 0xffff) / (0xffff).to_f, (color.attr_blue & 0xffff) / (0xffff).to_f, data.attr_alpha / (0xff).to_f)
+            SwtCairo.cairo_set_source_rgba(cairo, (color.attr_red & 0xffff) / (0xffff).to_f, (color.attr_green & 0xffff) / (0xffff).to_f, (color.attr_blue & 0xffff) / (0xffff).to_f, data.attr_alpha / (0xff).to_f)
           end
-          Cairo.cairo_rectangle(cairo, x, y, width, height)
-          Cairo.cairo_fill(cairo)
-          Cairo.cairo_restore(cairo)
+          SwtCairo.cairo_rectangle(cairo, x, y, width, height)
+          SwtCairo.cairo_fill(cairo)
+          SwtCairo.cairo_restore(cairo)
         else
           # int
           gdk_gc = gc.attr_handle

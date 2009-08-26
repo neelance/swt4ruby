@@ -68,7 +68,7 @@ module Org::Eclipse::Swt::Internal::Cairo
     undef_method :y_advance=
     
     class_module.module_eval {
-      const_set_lazy(:Sizeof) { Cairo.cairo_text_extents_t_sizeof }
+      const_set_lazy(:Sizeof) { SwtCairo.cairo_text_extents_t_sizeof }
       const_attr_reader  :Sizeof
     }
     

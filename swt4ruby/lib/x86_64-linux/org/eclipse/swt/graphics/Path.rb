@@ -98,12 +98,12 @@ module Org::Eclipse::Swt::Graphics
       @closed = true
       self.attr_device.check_cairo
       # int
-      surface = Cairo.cairo_image_surface_create(Cairo::CAIRO_FORMAT_ARGB32, 1, 1)
+      surface = SwtCairo.cairo_image_surface_create(SwtCairo::CAIRO_FORMAT_ARGB32, 1, 1)
       if ((surface).equal?(0))
         SWT.error(SWT::ERROR_NO_HANDLES)
       end
-      @handle = Cairo.cairo_create(surface)
-      Cairo.cairo_surface_destroy(surface)
+      @handle = SwtCairo.cairo_create(surface)
+      SwtCairo.cairo_surface_destroy(surface)
       if ((@handle).equal?(0))
         SWT.error(SWT::ERROR_NO_HANDLES)
       end
@@ -153,12 +153,12 @@ module Org::Eclipse::Swt::Graphics
         SWT.error(SWT::ERROR_INVALID_ARGUMENT)
       end
       # int
-      surface = Cairo.cairo_image_surface_create(Cairo::CAIRO_FORMAT_ARGB32, 1, 1)
+      surface = SwtCairo.cairo_image_surface_create(SwtCairo::CAIRO_FORMAT_ARGB32, 1, 1)
       if ((surface).equal?(0))
         SWT.error(SWT::ERROR_NO_HANDLES)
       end
-      @handle = Cairo.cairo_create(surface)
-      Cairo.cairo_surface_destroy(surface)
+      @handle = SwtCairo.cairo_create(surface)
+      SwtCairo.cairo_surface_destroy(surface)
       if ((@handle).equal?(0))
         SWT.error(SWT::ERROR_NO_HANDLES)
       end
@@ -166,19 +166,19 @@ module Org::Eclipse::Swt::Graphics
       copy = 0
       flatness = Math.max(0, flatness)
       if ((flatness).equal?(0))
-        copy = Cairo.cairo_copy_path(path.attr_handle)
+        copy = SwtCairo.cairo_copy_path(path.attr_handle)
       else
-        tolerance = Cairo.cairo_get_tolerance(path.attr_handle)
-        Cairo.cairo_set_tolerance(path.attr_handle, flatness)
-        copy = Cairo.cairo_copy_path_flat(path.attr_handle)
-        Cairo.cairo_set_tolerance(path.attr_handle, tolerance)
+        tolerance = SwtCairo.cairo_get_tolerance(path.attr_handle)
+        SwtCairo.cairo_set_tolerance(path.attr_handle, flatness)
+        copy = SwtCairo.cairo_copy_path_flat(path.attr_handle)
+        SwtCairo.cairo_set_tolerance(path.attr_handle, tolerance)
       end
       if ((copy).equal?(0))
-        Cairo.cairo_destroy(@handle)
+        SwtCairo.cairo_destroy(@handle)
         SWT.error(SWT::ERROR_NO_HANDLES)
       end
-      Cairo.cairo_append_path(@handle, copy)
-      Cairo.cairo_path_destroy(copy)
+      SwtCairo.cairo_append_path(@handle, copy)
+      SwtCairo.cairo_path_destroy(copy)
       init
     end
     
@@ -250,27 +250,27 @@ module Org::Eclipse::Swt::Graphics
       if ((width).equal?(height))
         angle = -start_angle * (Compatibility::PI).to_f / 180
         if (@closed)
-          Cairo.cairo_move_to(@handle, (x + width / 2) + width / 2 * Math.cos(angle), (y + height / 2) + height / 2 * Math.sin(angle))
+          SwtCairo.cairo_move_to(@handle, (x + width / 2) + width / 2 * Math.cos(angle), (y + height / 2) + height / 2 * Math.sin(angle))
         end
         if (arc_angle >= 0)
-          Cairo.cairo_arc_negative(@handle, x + width / 2, y + height / 2, width / 2, angle, -(start_angle + arc_angle) * (Compatibility::PI).to_f / 180)
+          SwtCairo.cairo_arc_negative(@handle, x + width / 2, y + height / 2, width / 2, angle, -(start_angle + arc_angle) * (Compatibility::PI).to_f / 180)
         else
-          Cairo.cairo_arc(@handle, x + width / 2, y + height / 2, width / 2, angle, -(start_angle + arc_angle) * (Compatibility::PI).to_f / 180)
+          SwtCairo.cairo_arc(@handle, x + width / 2, y + height / 2, width / 2, angle, -(start_angle + arc_angle) * (Compatibility::PI).to_f / 180)
         end
       else
-        Cairo.cairo_save(@handle)
-        Cairo.cairo_translate(@handle, x + width / 2, y + height / 2)
-        Cairo.cairo_scale(@handle, width / 2, height / 2)
+        SwtCairo.cairo_save(@handle)
+        SwtCairo.cairo_translate(@handle, x + width / 2, y + height / 2)
+        SwtCairo.cairo_scale(@handle, width / 2, height / 2)
         angle = -start_angle * (Compatibility::PI).to_f / 180
         if (@closed)
-          Cairo.cairo_move_to(@handle, Math.cos(angle), Math.sin(angle))
+          SwtCairo.cairo_move_to(@handle, Math.cos(angle), Math.sin(angle))
         end
         if (arc_angle >= 0)
-          Cairo.cairo_arc_negative(@handle, 0, 0, 1, angle, -(start_angle + arc_angle) * (Compatibility::PI).to_f / 180)
+          SwtCairo.cairo_arc_negative(@handle, 0, 0, 1, angle, -(start_angle + arc_angle) * (Compatibility::PI).to_f / 180)
         else
-          Cairo.cairo_arc(@handle, 0, 0, 1, angle, -(start_angle + arc_angle) * (Compatibility::PI).to_f / 180)
+          SwtCairo.cairo_arc(@handle, 0, 0, 1, angle, -(start_angle + arc_angle) * (Compatibility::PI).to_f / 180)
         end
-        Cairo.cairo_restore(@handle)
+        SwtCairo.cairo_restore(@handle)
       end
       @closed = false
       if (Math.abs(arc_angle) >= 360)
@@ -302,12 +302,12 @@ module Org::Eclipse::Swt::Graphics
       end
       @moved = false
       # int
-      copy = Cairo.cairo_copy_path(path.attr_handle)
+      copy = SwtCairo.cairo_copy_path(path.attr_handle)
       if ((copy).equal?(0))
         SWT.error(SWT::ERROR_NO_HANDLES)
       end
-      Cairo.cairo_append_path(@handle, copy)
-      Cairo.cairo_path_destroy(copy)
+      SwtCairo.cairo_append_path(@handle, copy)
+      SwtCairo.cairo_path_destroy(copy)
       @closed = path.attr_closed
     end
     
@@ -327,7 +327,7 @@ module Org::Eclipse::Swt::Graphics
         SWT.error(SWT::ERROR_GRAPHIC_DISPOSED)
       end
       @moved = false
-      Cairo.cairo_rectangle(@handle, x, y, width, height)
+      SwtCairo.cairo_rectangle(@handle, x, y, width, height)
       @closed = true
     end
     
@@ -374,7 +374,7 @@ module Org::Eclipse::Swt::Graphics
       if (is_disposed)
         SWT.error(SWT::ERROR_GRAPHIC_DISPOSED)
       end
-      Cairo.cairo_close_path(@handle)
+      SwtCairo.cairo_close_path(@handle)
       @moved = false
       @closed = true
     end
@@ -418,18 +418,18 @@ module Org::Eclipse::Swt::Graphics
       # int
       cairo = gc.attr_data.attr_cairo
       # int
-      copy = Cairo.cairo_copy_path(@handle)
+      copy = SwtCairo.cairo_copy_path(@handle)
       if ((copy).equal?(0))
         SWT.error(SWT::ERROR_NO_HANDLES)
       end
-      Cairo.cairo_append_path(cairo, copy)
-      Cairo.cairo_path_destroy(copy)
+      SwtCairo.cairo_append_path(cairo, copy)
+      SwtCairo.cairo_path_destroy(copy)
       if (outline)
-        result = !(Cairo.cairo_in_stroke(cairo, x, y)).equal?(0)
+        result = !(SwtCairo.cairo_in_stroke(cairo, x, y)).equal?(0)
       else
-        result = !(Cairo.cairo_in_fill(cairo, x, y)).equal?(0)
+        result = !(SwtCairo.cairo_in_fill(cairo, x, y)).equal?(0)
       end
-      Cairo.cairo_new_path(cairo)
+      SwtCairo.cairo_new_path(cairo)
       return result
     end
     
@@ -453,11 +453,11 @@ module Org::Eclipse::Swt::Graphics
       if (!@moved)
         current_x = Array.typed(::Java::Double).new(1) { 0.0 }
         current_y = Array.typed(::Java::Double).new(1) { 0.0 }
-        Cairo.cairo_get_current_point(@handle, current_x, current_y)
-        Cairo.cairo_move_to(@handle, current_x[0], current_y[0])
+        SwtCairo.cairo_get_current_point(@handle, current_x, current_y)
+        SwtCairo.cairo_move_to(@handle, current_x[0], current_y[0])
         @moved = true
       end
-      Cairo.cairo_curve_to(@handle, cx1, cy1, cx2, cy2, x, y)
+      SwtCairo.cairo_curve_to(@handle, cx1, cy1, cx2, cy2, x, y)
       @closed = false
     end
     
@@ -486,12 +486,12 @@ module Org::Eclipse::Swt::Graphics
         SWT.error(SWT::ERROR_INVALID_ARGUMENT)
       end
       # int
-      copy = Cairo.cairo_copy_path(@handle)
+      copy = SwtCairo.cairo_copy_path(@handle)
       if ((copy).equal?(0))
         SWT.error(SWT::ERROR_NO_HANDLES)
       end
       path = Cairo_path_t.new
-      Cairo.memmove(path, copy, self.attr_cairo_path_t.attr_sizeof)
+      SwtCairo.memmove(path, copy, self.attr_cairo_path_t.attr_sizeof)
       min_x = 0
       min_y = 0
       max_x = 0
@@ -505,22 +505,22 @@ module Org::Eclipse::Swt::Graphics
         while (i < path.attr_num_data)
           # int
           offset = path.attr_data + i * self.attr_cairo_path_data_t.attr_sizeof
-          Cairo.memmove(data, offset, self.attr_cairo_path_data_t.attr_sizeof)
+          SwtCairo.memmove(data, offset, self.attr_cairo_path_data_t.attr_sizeof)
           case (data.attr_type)
-          when Cairo::CAIRO_PATH_MOVE_TO
-            Cairo.memmove(points, offset + self.attr_cairo_path_data_t.attr_sizeof, self.attr_cairo_path_data_t.attr_sizeof)
+          when SwtCairo::CAIRO_PATH_MOVE_TO
+            SwtCairo.memmove(points, offset + self.attr_cairo_path_data_t.attr_sizeof, self.attr_cairo_path_data_t.attr_sizeof)
             min_x = Math.min(min_x, points[0])
             min_y = Math.min(min_y, points[1])
             max_x = Math.max(max_x, points[0])
             max_y = Math.max(max_y, points[1])
-          when Cairo::CAIRO_PATH_LINE_TO
-            Cairo.memmove(points, offset + self.attr_cairo_path_data_t.attr_sizeof, self.attr_cairo_path_data_t.attr_sizeof)
+          when SwtCairo::CAIRO_PATH_LINE_TO
+            SwtCairo.memmove(points, offset + self.attr_cairo_path_data_t.attr_sizeof, self.attr_cairo_path_data_t.attr_sizeof)
             min_x = Math.min(min_x, points[0])
             min_y = Math.min(min_y, points[1])
             max_x = Math.max(max_x, points[0])
             max_y = Math.max(max_y, points[1])
-          when Cairo::CAIRO_PATH_CURVE_TO
-            Cairo.memmove(points, offset + self.attr_cairo_path_data_t.attr_sizeof, self.attr_cairo_path_data_t.attr_sizeof * 3)
+          when SwtCairo::CAIRO_PATH_CURVE_TO
+            SwtCairo.memmove(points, offset + self.attr_cairo_path_data_t.attr_sizeof, self.attr_cairo_path_data_t.attr_sizeof * 3)
             min_x = Math.min(min_x, points[0])
             min_y = Math.min(min_y, points[1])
             max_x = Math.max(max_x, points[0])
@@ -533,7 +533,7 @@ module Org::Eclipse::Swt::Graphics
             min_y = Math.min(min_y, points[5])
             max_x = Math.max(max_x, points[4])
             max_y = Math.max(max_y, points[5])
-          when Cairo::CAIRO_PATH_CLOSE_PATH
+          when SwtCairo::CAIRO_PATH_CLOSE_PATH
           end
           i += data.attr_length
         end
@@ -542,7 +542,7 @@ module Org::Eclipse::Swt::Graphics
       bounds[1] = (min_y).to_f
       bounds[2] = ((max_x - min_x)).to_f
       bounds[3] = ((max_y - min_y)).to_f
-      Cairo.cairo_path_destroy(copy)
+      SwtCairo.cairo_path_destroy(copy)
     end
     
     typesig { [Array.typed(::Java::Float)] }
@@ -570,7 +570,7 @@ module Org::Eclipse::Swt::Graphics
       end
       x = Array.typed(::Java::Double).new(1) { 0.0 }
       y = Array.typed(::Java::Double).new(1) { 0.0 }
-      Cairo.cairo_get_current_point(@handle, x, y)
+      SwtCairo.cairo_get_current_point(@handle, x, y)
       point[0] = (x[0]).to_f
       point[1] = (y[0]).to_f
     end
@@ -590,12 +590,12 @@ module Org::Eclipse::Swt::Graphics
         SWT.error(SWT::ERROR_GRAPHIC_DISPOSED)
       end
       # int
-      copy = Cairo.cairo_copy_path(@handle)
+      copy = SwtCairo.cairo_copy_path(@handle)
       if ((copy).equal?(0))
         SWT.error(SWT::ERROR_NO_HANDLES)
       end
       path = Cairo_path_t.new
-      Cairo.memmove(path, copy, self.attr_cairo_path_t.attr_sizeof)
+      SwtCairo.memmove(path, copy, self.attr_cairo_path_t.attr_sizeof)
       types = Array.typed(::Java::Byte).new(path.attr_num_data) { 0 }
       pts = Array.typed(::Java::Float).new(path.attr_num_data * 6) { 0.0 }
       type_index = 0
@@ -607,28 +607,28 @@ module Org::Eclipse::Swt::Graphics
         while (i < path.attr_num_data)
           # int
           offset = path.attr_data + i * self.attr_cairo_path_data_t.attr_sizeof
-          Cairo.memmove(data, offset, self.attr_cairo_path_data_t.attr_sizeof)
+          SwtCairo.memmove(data, offset, self.attr_cairo_path_data_t.attr_sizeof)
           case (data.attr_type)
-          when Cairo::CAIRO_PATH_MOVE_TO
+          when SwtCairo::CAIRO_PATH_MOVE_TO
             types[((type_index += 1) - 1)] = SWT::PATH_MOVE_TO
-            Cairo.memmove(points, offset + self.attr_cairo_path_data_t.attr_sizeof, self.attr_cairo_path_data_t.attr_sizeof)
+            SwtCairo.memmove(points, offset + self.attr_cairo_path_data_t.attr_sizeof, self.attr_cairo_path_data_t.attr_sizeof)
             pts[((pts_index += 1) - 1)] = (points[0]).to_f
             pts[((pts_index += 1) - 1)] = (points[1]).to_f
-          when Cairo::CAIRO_PATH_LINE_TO
+          when SwtCairo::CAIRO_PATH_LINE_TO
             types[((type_index += 1) - 1)] = SWT::PATH_LINE_TO
-            Cairo.memmove(points, offset + self.attr_cairo_path_data_t.attr_sizeof, self.attr_cairo_path_data_t.attr_sizeof)
+            SwtCairo.memmove(points, offset + self.attr_cairo_path_data_t.attr_sizeof, self.attr_cairo_path_data_t.attr_sizeof)
             pts[((pts_index += 1) - 1)] = (points[0]).to_f
             pts[((pts_index += 1) - 1)] = (points[1]).to_f
-          when Cairo::CAIRO_PATH_CURVE_TO
+          when SwtCairo::CAIRO_PATH_CURVE_TO
             types[((type_index += 1) - 1)] = SWT::PATH_CUBIC_TO
-            Cairo.memmove(points, offset + self.attr_cairo_path_data_t.attr_sizeof, self.attr_cairo_path_data_t.attr_sizeof * 3)
+            SwtCairo.memmove(points, offset + self.attr_cairo_path_data_t.attr_sizeof, self.attr_cairo_path_data_t.attr_sizeof * 3)
             pts[((pts_index += 1) - 1)] = (points[0]).to_f
             pts[((pts_index += 1) - 1)] = (points[1]).to_f
             pts[((pts_index += 1) - 1)] = (points[2]).to_f
             pts[((pts_index += 1) - 1)] = (points[3]).to_f
             pts[((pts_index += 1) - 1)] = (points[4]).to_f
             pts[((pts_index += 1) - 1)] = (points[5]).to_f
-          when Cairo::CAIRO_PATH_CLOSE_PATH
+          when SwtCairo::CAIRO_PATH_CLOSE_PATH
             types[((type_index += 1) - 1)] = SWT::PATH_CLOSE
           end
           i += data.attr_length
@@ -644,7 +644,7 @@ module Org::Eclipse::Swt::Graphics
         System.arraycopy(pts, 0, new_pts, 0, pts_index)
         pts = new_pts
       end
-      Cairo.cairo_path_destroy(copy)
+      SwtCairo.cairo_path_destroy(copy)
       result = PathData.new
       result.attr_types = types
       result.attr_points = pts
@@ -668,11 +668,11 @@ module Org::Eclipse::Swt::Graphics
       if (!@moved)
         current_x = Array.typed(::Java::Double).new(1) { 0.0 }
         current_y = Array.typed(::Java::Double).new(1) { 0.0 }
-        Cairo.cairo_get_current_point(@handle, current_x, current_y)
-        Cairo.cairo_move_to(@handle, current_x[0], current_y[0])
+        SwtCairo.cairo_get_current_point(@handle, current_x, current_y)
+        SwtCairo.cairo_move_to(@handle, current_x[0], current_y[0])
         @moved = true
       end
-      Cairo.cairo_line_to(@handle, x, y)
+      SwtCairo.cairo_line_to(@handle, x, y)
       @closed = false
     end
     
@@ -697,7 +697,7 @@ module Org::Eclipse::Swt::Graphics
       # is to detect that the app did not call cairo_move_to()
       # before those calls and call it explicitly.
       @moved = true
-      Cairo.cairo_move_to(@handle, x, y)
+      SwtCairo.cairo_move_to(@handle, x, y)
       @closed = true
     end
     
@@ -718,9 +718,9 @@ module Org::Eclipse::Swt::Graphics
       end
       current_x = Array.typed(::Java::Double).new(1) { 0.0 }
       current_y = Array.typed(::Java::Double).new(1) { 0.0 }
-      Cairo.cairo_get_current_point(@handle, current_x, current_y)
+      SwtCairo.cairo_get_current_point(@handle, current_x, current_y)
       if (!@moved)
-        Cairo.cairo_move_to(@handle, current_x[0], current_y[0])
+        SwtCairo.cairo_move_to(@handle, current_x[0], current_y[0])
         @moved = true
       end
       x0 = (current_x[0]).to_f
@@ -729,13 +729,13 @@ module Org::Eclipse::Swt::Graphics
       cy1 = y0 + 2 * (cy - y0) / 3
       cx2 = cx1 + (x - x0) / 3
       cy2 = cy1 + (y - y0) / 3
-      Cairo.cairo_curve_to(@handle, cx1, cy1, cx2, cy2, x, y)
+      SwtCairo.cairo_curve_to(@handle, cx1, cy1, cx2, cy2, x, y)
       @closed = false
     end
     
     typesig { [] }
     def destroy
-      Cairo.cairo_destroy(@handle)
+      SwtCairo.cairo_destroy(@handle)
       @handle = 0
     end
     

@@ -51,7 +51,7 @@ module Org::Eclipse::Swt::Internal::Cairo
     undef_method :num_data=
     
     class_module.module_eval {
-      const_set_lazy(:Sizeof) { Cairo.cairo_path_t_sizeof }
+      const_set_lazy(:Sizeof) { SwtCairo.cairo_path_t_sizeof }
       const_attr_reader  :Sizeof
     }
     

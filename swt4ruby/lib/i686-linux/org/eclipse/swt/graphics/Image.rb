@@ -976,7 +976,7 @@ module Org::Eclipse::Swt::Graphics
         end
         @surface_data = OS.g_malloc(stride * height)
         OS.memmove(@surface_data, pixels, stride * height)
-        @surface = Cairo.cairo_image_surface_create_for_data(@surface_data, Cairo::CAIRO_FORMAT_ARGB32, width, height, stride)
+        @surface = SwtCairo.cairo_image_surface_create_for_data(@surface_data, SwtCairo::CAIRO_FORMAT_ARGB32, width, height, stride)
         OS.g_object_unref(pixbuf)
       else
         # long
@@ -985,7 +985,7 @@ module Org::Eclipse::Swt::Graphics
         x_drawable = OS._gdk_pixmap_xid(@pixmap)
         # long
         x_visual = OS.gdk_x11_visual_get_xvisual(OS.gdk_visual_get_system)
-        @surface = Cairo.cairo_xlib_surface_create(x_display, x_drawable, x_visual, width, height)
+        @surface = SwtCairo.cairo_xlib_surface_create(x_display, x_drawable, x_visual, width, height)
       end
       # Destroy the image mask if the there is a GC created on the image
       if (!(@transparent_pixel).equal?(-1) && !(@mem_gc).nil?)
@@ -1015,7 +1015,7 @@ module Org::Eclipse::Swt::Graphics
         OS.g_object_unref(@mask)
       end
       if (!(@surface).equal?(0))
-        Cairo.cairo_surface_destroy(@surface)
+        SwtCairo.cairo_surface_destroy(@surface)
       end
       if (!(@surface_data).equal?(0))
         OS.g_free(@surface_data)

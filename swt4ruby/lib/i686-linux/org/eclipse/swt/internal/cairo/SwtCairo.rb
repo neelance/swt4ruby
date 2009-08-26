@@ -29,7 +29,7 @@ module Org::Eclipse::Swt::Internal::Cairo
     }
   end
   
-  class Cairo < CairoImports.const_get :Platform
+  class SwtCairo < CairoImports.const_get :Platform
     include_class_members CairoImports
     
     class_module.module_eval {
