@@ -50,7 +50,7 @@ module Org::Eclipse::Swt::Internal
       # Returns the PI constant as a double.
       
       def pi
-        defined?(@@pi) ? @@pi : @@pi= Math::PI
+        defined?(@@pi) ? @@pi : @@pi= Math.attr_pi
       end
       alias_method :attr_pi, :pi
       

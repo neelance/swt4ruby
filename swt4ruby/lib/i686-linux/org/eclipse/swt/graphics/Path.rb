@@ -248,27 +248,27 @@ module Org::Eclipse::Swt::Graphics
       end
       @moved = true
       if ((width).equal?(height))
-        angle = -start_angle * (Compatibility::PI).to_f / 180
+        angle = -start_angle * (Compatibility.attr_pi).to_f / 180
         if (@closed)
           SwtCairo.cairo_move_to(@handle, (x + width / 2) + width / 2 * Math.cos(angle), (y + height / 2) + height / 2 * Math.sin(angle))
         end
         if (arc_angle >= 0)
-          SwtCairo.cairo_arc_negative(@handle, x + width / 2, y + height / 2, width / 2, angle, -(start_angle + arc_angle) * (Compatibility::PI).to_f / 180)
+          SwtCairo.cairo_arc_negative(@handle, x + width / 2, y + height / 2, width / 2, angle, -(start_angle + arc_angle) * (Compatibility.attr_pi).to_f / 180)
         else
-          SwtCairo.cairo_arc(@handle, x + width / 2, y + height / 2, width / 2, angle, -(start_angle + arc_angle) * (Compatibility::PI).to_f / 180)
+          SwtCairo.cairo_arc(@handle, x + width / 2, y + height / 2, width / 2, angle, -(start_angle + arc_angle) * (Compatibility.attr_pi).to_f / 180)
         end
       else
         SwtCairo.cairo_save(@handle)
         SwtCairo.cairo_translate(@handle, x + width / 2, y + height / 2)
         SwtCairo.cairo_scale(@handle, width / 2, height / 2)
-        angle = -start_angle * (Compatibility::PI).to_f / 180
+        angle = -start_angle * (Compatibility.attr_pi).to_f / 180
         if (@closed)
           SwtCairo.cairo_move_to(@handle, Math.cos(angle), Math.sin(angle))
         end
         if (arc_angle >= 0)
-          SwtCairo.cairo_arc_negative(@handle, 0, 0, 1, angle, -(start_angle + arc_angle) * (Compatibility::PI).to_f / 180)
+          SwtCairo.cairo_arc_negative(@handle, 0, 0, 1, angle, -(start_angle + arc_angle) * (Compatibility.attr_pi).to_f / 180)
         else
-          SwtCairo.cairo_arc(@handle, 0, 0, 1, angle, -(start_angle + arc_angle) * (Compatibility::PI).to_f / 180)
+          SwtCairo.cairo_arc(@handle, 0, 0, 1, angle, -(start_angle + arc_angle) * (Compatibility.attr_pi).to_f / 180)
         end
         SwtCairo.cairo_restore(@handle)
       end

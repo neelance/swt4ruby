@@ -197,7 +197,7 @@ module Org::Eclipse::Swt::Widgets
           OS._cgcontext_save_gstate(context[0])
           rect = CGRect.new
           OS._hiview_get_bounds(self.attr_handle, rect)
-          OS._cgcontext_rotate_ctm(context[0], (Compatibility::PI).to_f)
+          OS._cgcontext_rotate_ctm(context[0], (Compatibility.attr_pi).to_f)
           OS._cgcontext_translate_ctm(context[0], -rect.attr_width, -rect.attr_height)
         end
       end

@@ -297,7 +297,7 @@ module Org::Eclipse::Swt::Graphics
       if (is_disposed)
         SWT.error(SWT::ERROR_GRAPHIC_DISPOSED)
       end
-      SwtCairo.cairo_matrix_rotate(@handle, angle * (Compatibility::PI).to_f / 180)
+      SwtCairo.cairo_matrix_rotate(@handle, angle * (Compatibility.attr_pi).to_f / 180)
     end
     
     typesig { [::Java::Float, ::Java::Float] }

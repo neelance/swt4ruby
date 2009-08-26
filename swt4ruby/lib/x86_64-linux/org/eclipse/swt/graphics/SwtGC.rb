@@ -800,18 +800,18 @@ module Org::Eclipse::Swt::Graphics
         y_offset = @data.attr_cairo_yoffset
         if ((width).equal?(height))
           if (arc_angle >= 0)
-            SwtCairo.cairo_arc_negative(cairo, x + x_offset + width / 2, y + y_offset + height / 2, width / 2, -start_angle * (Compatibility::PI).to_f / 180, -(start_angle + arc_angle) * (Compatibility::PI).to_f / 180)
+            SwtCairo.cairo_arc_negative(cairo, x + x_offset + width / 2, y + y_offset + height / 2, width / 2, -start_angle * (Compatibility.attr_pi).to_f / 180, -(start_angle + arc_angle) * (Compatibility.attr_pi).to_f / 180)
           else
-            SwtCairo.cairo_arc(cairo, x + x_offset + width / 2, y + y_offset + height / 2, width / 2, -start_angle * (Compatibility::PI).to_f / 180, -(start_angle + arc_angle) * (Compatibility::PI).to_f / 180)
+            SwtCairo.cairo_arc(cairo, x + x_offset + width / 2, y + y_offset + height / 2, width / 2, -start_angle * (Compatibility.attr_pi).to_f / 180, -(start_angle + arc_angle) * (Compatibility.attr_pi).to_f / 180)
           end
         else
           SwtCairo.cairo_save(cairo)
           SwtCairo.cairo_translate(cairo, x + x_offset + width / 2, y + y_offset + height / 2)
           SwtCairo.cairo_scale(cairo, width / 2, height / 2)
           if (arc_angle >= 0)
-            SwtCairo.cairo_arc_negative(cairo, 0, 0, 1, -start_angle * (Compatibility::PI).to_f / 180, -(start_angle + arc_angle) * (Compatibility::PI).to_f / 180)
+            SwtCairo.cairo_arc_negative(cairo, 0, 0, 1, -start_angle * (Compatibility.attr_pi).to_f / 180, -(start_angle + arc_angle) * (Compatibility.attr_pi).to_f / 180)
           else
-            SwtCairo.cairo_arc(cairo, 0, 0, 1, -start_angle * (Compatibility::PI).to_f / 180, -(start_angle + arc_angle) * (Compatibility::PI).to_f / 180)
+            SwtCairo.cairo_arc(cairo, 0, 0, 1, -start_angle * (Compatibility.attr_pi).to_f / 180, -(start_angle + arc_angle) * (Compatibility.attr_pi).to_f / 180)
           end
           SwtCairo.cairo_restore(cairo)
         end
@@ -1469,12 +1469,12 @@ module Org::Eclipse::Swt::Graphics
         x_offset = @data.attr_cairo_xoffset
         y_offset = @data.attr_cairo_yoffset
         if ((width).equal?(height))
-          SwtCairo.cairo_arc_negative(cairo, x + x_offset + width / 2, y + y_offset + height / 2, width / 2, 0, -2 * (Compatibility::PI).to_f)
+          SwtCairo.cairo_arc_negative(cairo, x + x_offset + width / 2, y + y_offset + height / 2, width / 2, 0, -2 * (Compatibility.attr_pi).to_f)
         else
           SwtCairo.cairo_save(cairo)
           SwtCairo.cairo_translate(cairo, x + x_offset + width / 2, y + y_offset + height / 2)
           SwtCairo.cairo_scale(cairo, width / 2, height / 2)
-          SwtCairo.cairo_arc_negative(cairo, 0, 0, 1, 0, -2 * (Compatibility::PI).to_f)
+          SwtCairo.cairo_arc_negative(cairo, 0, 0, 1, 0, -2 * (Compatibility.attr_pi).to_f)
           SwtCairo.cairo_restore(cairo)
         end
         SwtCairo.cairo_stroke(cairo)
@@ -1777,10 +1777,10 @@ module Org::Eclipse::Swt::Graphics
           SwtCairo.cairo_translate(cairo, nx + x_offset, ny + y_offset)
           SwtCairo.cairo_scale(cairo, naw2, nah2)
           SwtCairo.cairo_move_to(cairo, fw - 1, 0)
-          SwtCairo.cairo_arc(cairo, fw - 1, 1, 1, Compatibility::PI + Compatibility::PI / 2.0, Compatibility::PI * 2.0)
-          SwtCairo.cairo_arc(cairo, fw - 1, fh - 1, 1, 0, Compatibility::PI / 2.0)
-          SwtCairo.cairo_arc(cairo, 1, fh - 1, 1, Compatibility::PI / 2, Compatibility::PI)
-          SwtCairo.cairo_arc(cairo, 1, 1, 1, Compatibility::PI, 270.0 * Compatibility::PI / 180.0)
+          SwtCairo.cairo_arc(cairo, fw - 1, 1, 1, Compatibility.attr_pi + Compatibility.attr_pi / 2.0, Compatibility.attr_pi * 2.0)
+          SwtCairo.cairo_arc(cairo, fw - 1, fh - 1, 1, 0, Compatibility.attr_pi / 2.0)
+          SwtCairo.cairo_arc(cairo, 1, fh - 1, 1, Compatibility.attr_pi / 2, Compatibility.attr_pi)
+          SwtCairo.cairo_arc(cairo, 1, 1, 1, Compatibility.attr_pi, 270.0 * Compatibility.attr_pi / 180.0)
           SwtCairo.cairo_close_path(cairo)
           SwtCairo.cairo_restore(cairo)
         end
@@ -2104,9 +2104,9 @@ module Org::Eclipse::Swt::Graphics
       if (!(cairo).equal?(0))
         if ((width).equal?(height))
           if (arc_angle >= 0)
-            SwtCairo.cairo_arc_negative(cairo, x + width / 2, y + height / 2, width / 2, -start_angle * (Compatibility::PI).to_f / 180, -(start_angle + arc_angle) * (Compatibility::PI).to_f / 180)
+            SwtCairo.cairo_arc_negative(cairo, x + width / 2, y + height / 2, width / 2, -start_angle * (Compatibility.attr_pi).to_f / 180, -(start_angle + arc_angle) * (Compatibility.attr_pi).to_f / 180)
           else
-            SwtCairo.cairo_arc(cairo, x + width / 2, y + height / 2, width / 2, -start_angle * (Compatibility::PI).to_f / 180, -(start_angle + arc_angle) * (Compatibility::PI).to_f / 180)
+            SwtCairo.cairo_arc(cairo, x + width / 2, y + height / 2, width / 2, -start_angle * (Compatibility.attr_pi).to_f / 180, -(start_angle + arc_angle) * (Compatibility.attr_pi).to_f / 180)
           end
           SwtCairo.cairo_line_to(cairo, x + width / 2, y + height / 2)
         else
@@ -2114,9 +2114,9 @@ module Org::Eclipse::Swt::Graphics
           SwtCairo.cairo_translate(cairo, x + width / 2, y + height / 2)
           SwtCairo.cairo_scale(cairo, width / 2, height / 2)
           if (arc_angle >= 0)
-            SwtCairo.cairo_arc_negative(cairo, 0, 0, 1, -start_angle * (Compatibility::PI).to_f / 180, -(start_angle + arc_angle) * (Compatibility::PI).to_f / 180)
+            SwtCairo.cairo_arc_negative(cairo, 0, 0, 1, -start_angle * (Compatibility.attr_pi).to_f / 180, -(start_angle + arc_angle) * (Compatibility.attr_pi).to_f / 180)
           else
-            SwtCairo.cairo_arc(cairo, 0, 0, 1, -start_angle * (Compatibility::PI).to_f / 180, -(start_angle + arc_angle) * (Compatibility::PI).to_f / 180)
+            SwtCairo.cairo_arc(cairo, 0, 0, 1, -start_angle * (Compatibility.attr_pi).to_f / 180, -(start_angle + arc_angle) * (Compatibility.attr_pi).to_f / 180)
           end
           SwtCairo.cairo_line_to(cairo, 0, 0)
           SwtCairo.cairo_restore(cairo)
@@ -2242,12 +2242,12 @@ module Org::Eclipse::Swt::Graphics
       cairo = @data.attr_cairo
       if (!(cairo).equal?(0))
         if ((width).equal?(height))
-          SwtCairo.cairo_arc_negative(cairo, x + width / 2, y + height / 2, width / 2, 0, 2 * (Compatibility::PI).to_f)
+          SwtCairo.cairo_arc_negative(cairo, x + width / 2, y + height / 2, width / 2, 0, 2 * (Compatibility.attr_pi).to_f)
         else
           SwtCairo.cairo_save(cairo)
           SwtCairo.cairo_translate(cairo, x + width / 2, y + height / 2)
           SwtCairo.cairo_scale(cairo, width / 2, height / 2)
-          SwtCairo.cairo_arc_negative(cairo, 0, 0, 1, 0, 2 * (Compatibility::PI).to_f)
+          SwtCairo.cairo_arc_negative(cairo, 0, 0, 1, 0, 2 * (Compatibility.attr_pi).to_f)
           SwtCairo.cairo_restore(cairo)
         end
         SwtCairo.cairo_fill(cairo)
@@ -2454,10 +2454,10 @@ module Org::Eclipse::Swt::Graphics
           SwtCairo.cairo_translate(cairo, nx, ny)
           SwtCairo.cairo_scale(cairo, naw2, nah2)
           SwtCairo.cairo_move_to(cairo, fw - 1, 0)
-          SwtCairo.cairo_arc(cairo, fw - 1, 1, 1, Compatibility::PI + Compatibility::PI / 2.0, Compatibility::PI * 2.0)
-          SwtCairo.cairo_arc(cairo, fw - 1, fh - 1, 1, 0, Compatibility::PI / 2.0)
-          SwtCairo.cairo_arc(cairo, 1, fh - 1, 1, Compatibility::PI / 2, Compatibility::PI)
-          SwtCairo.cairo_arc(cairo, 1, 1, 1, Compatibility::PI, 270.0 * Compatibility::PI / 180.0)
+          SwtCairo.cairo_arc(cairo, fw - 1, 1, 1, Compatibility.attr_pi + Compatibility.attr_pi / 2.0, Compatibility.attr_pi * 2.0)
+          SwtCairo.cairo_arc(cairo, fw - 1, fh - 1, 1, 0, Compatibility.attr_pi / 2.0)
+          SwtCairo.cairo_arc(cairo, 1, fh - 1, 1, Compatibility.attr_pi / 2, Compatibility.attr_pi)
+          SwtCairo.cairo_arc(cairo, 1, 1, 1, Compatibility.attr_pi, 270.0 * Compatibility.attr_pi / 180.0)
           SwtCairo.cairo_close_path(cairo)
           SwtCairo.cairo_restore(cairo)
         end

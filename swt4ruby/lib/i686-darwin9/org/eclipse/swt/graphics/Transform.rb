@@ -290,7 +290,7 @@ module Org::Eclipse::Swt::Graphics
       if (is_disposed)
         SWT.error(SWT::ERROR_GRAPHIC_DISPOSED)
       end
-      OS._cgaffine_transform_rotate(@handle, angle * (Compatibility::PI).to_f / 180, @handle)
+      OS._cgaffine_transform_rotate(@handle, angle * (Compatibility.attr_pi).to_f / 180, @handle)
     end
     
     typesig { [::Java::Float, ::Java::Float] }

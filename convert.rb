@@ -4,7 +4,7 @@ dir = "#{File.dirname __FILE__}/swt4ruby"
 controller = Java2Ruby::ConversionController.new
 
 controller.add_is_constant_hook do |converter, name, value|
-  name == "lock" || (!%w{CurrentDevice DEBUG DeviceFinder SWT_RESTORECARET TrimEnabled}.include?(name) && value)
+  name == "lock" || (!%w{CurrentDevice DEBUG DeviceFinder PI SWT_RESTORECARET TrimEnabled}.include?(name) && value)
 end
 
 controller.add_ruby_constant_name_hook do |converter, name|

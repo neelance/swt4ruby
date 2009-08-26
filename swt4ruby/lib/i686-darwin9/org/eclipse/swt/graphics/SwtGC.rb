@@ -920,9 +920,9 @@ module Org::Eclipse::Swt::Graphics
       OS._cgcontext_translate_ctm(@handle, x + x_offset + width / 2, y + y_offset + height / 2)
       OS._cgcontext_scale_ctm(@handle, width / 2, height / 2)
       if (arc_angle < 0)
-        OS._cgcontext_add_arc(@handle, 0, 0, 1, -(start_angle + arc_angle) * (Compatibility::PI).to_f / 180, -start_angle * (Compatibility::PI).to_f / 180, true)
+        OS._cgcontext_add_arc(@handle, 0, 0, 1, -(start_angle + arc_angle) * (Compatibility.attr_pi).to_f / 180, -start_angle * (Compatibility.attr_pi).to_f / 180, true)
       else
-        OS._cgcontext_add_arc(@handle, 0, 0, 1, -start_angle * (Compatibility::PI).to_f / 180, -(start_angle + arc_angle) * (Compatibility::PI).to_f / 180, true)
+        OS._cgcontext_add_arc(@handle, 0, 0, 1, -start_angle * (Compatibility.attr_pi).to_f / 180, -(start_angle + arc_angle) * (Compatibility.attr_pi).to_f / 180, true)
       end
       OS._cgcontext_restore_gstate(@handle)
       OS._cgcontext_stroke_path(@handle)
@@ -1171,7 +1171,7 @@ module Org::Eclipse::Swt::Graphics
       OS._cgcontext_translate_ctm(@handle, x + x_offset + width / 2, y + y_offset + height / 2)
       OS._cgcontext_scale_ctm(@handle, width / 2, height / 2)
       OS._cgcontext_move_to_point(@handle, 1, 0)
-      OS._cgcontext_add_arc(@handle, 0, 0, 1, 0, ((2 * Compatibility::PI)).to_f, true)
+      OS._cgcontext_add_arc(@handle, 0, 0, 1, 0, ((2 * Compatibility.attr_pi)).to_f, true)
       OS._cgcontext_restore_gstate(@handle)
       OS._cgcontext_stroke_path(@handle)
       flush
@@ -1769,9 +1769,9 @@ module Org::Eclipse::Swt::Graphics
       OS._cgcontext_scale_ctm(@handle, width / 2, height / 2)
       OS._cgcontext_move_to_point(@handle, 0, 0)
       if (arc_angle < 0)
-        OS._cgcontext_add_arc(@handle, 0, 0, 1, -(start_angle + arc_angle) * (Compatibility::PI).to_f / 180, -start_angle * (Compatibility::PI).to_f / 180, true)
+        OS._cgcontext_add_arc(@handle, 0, 0, 1, -(start_angle + arc_angle) * (Compatibility.attr_pi).to_f / 180, -start_angle * (Compatibility.attr_pi).to_f / 180, true)
       else
-        OS._cgcontext_add_arc(@handle, 0, 0, 1, -start_angle * (Compatibility::PI).to_f / 180, -(start_angle + arc_angle) * (Compatibility::PI).to_f / 180, true)
+        OS._cgcontext_add_arc(@handle, 0, 0, 1, -start_angle * (Compatibility.attr_pi).to_f / 180, -(start_angle + arc_angle) * (Compatibility.attr_pi).to_f / 180, true)
       end
       OS._cgcontext_close_path(@handle)
       OS._cgcontext_restore_gstate(@handle)
@@ -1876,7 +1876,7 @@ module Org::Eclipse::Swt::Graphics
       OS._cgcontext_translate_ctm(@handle, x + width / 2, y + height / 2)
       OS._cgcontext_scale_ctm(@handle, width / 2, height / 2)
       OS._cgcontext_move_to_point(@handle, 1, 0)
-      OS._cgcontext_add_arc(@handle, 0, 0, 1, 0, ((Compatibility::PI * 2)).to_f, false)
+      OS._cgcontext_add_arc(@handle, 0, 0, 1, 0, ((Compatibility.attr_pi * 2)).to_f, false)
       OS._cgcontext_close_path(@handle)
       OS._cgcontext_restore_gstate(@handle)
       OS._cgcontext_fill_path(@handle)

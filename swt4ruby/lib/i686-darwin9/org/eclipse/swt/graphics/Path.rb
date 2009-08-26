@@ -326,11 +326,11 @@ module Org::Eclipse::Swt::Graphics
       end
       cmt = Array.typed(::Java::Float).new(6) { 0.0 }
       OS._cgaffine_transform_make(width / 2, 0, 0, height / 2, x + width / 2, y + height / 2, cmt)
-      angle = -start_angle * (Compatibility::PI).to_f / 180
+      angle = -start_angle * (Compatibility.attr_pi).to_f / 180
       if (@closed)
         OS._cgpath_move_to_point(@handle, cmt, (Math.cos(angle)).to_f, (Math.sin(angle)).to_f)
       end
-      OS._cgpath_add_arc(@handle, cmt, 0, 0, 1, angle, -(start_angle + arc_angle) * (Compatibility::PI).to_f / 180, arc_angle >= 0)
+      OS._cgpath_add_arc(@handle, cmt, 0, 0, 1, angle, -(start_angle + arc_angle) * (Compatibility.attr_pi).to_f / 180, arc_angle >= 0)
       @moved = true
       @closed = false
       if (Math.abs(arc_angle) >= 360)
