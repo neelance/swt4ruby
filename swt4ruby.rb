@@ -75,6 +75,10 @@ class Swt4Ruby
     def new_image(*args, &block)
       Org::Eclipse::Swt::Graphics::Image.new find_display, *args
     end
+
+    def new_point(x, y)
+      Org::Eclipse::Swt::Graphics::Point.new x, y
+    end
   end
 
   module NewWidgetMethods

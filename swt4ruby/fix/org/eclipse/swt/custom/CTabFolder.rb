@@ -1,4 +1,4 @@
-class Org::Eclipse::Swt::Widgets::CTabFolder
+class Org::Eclipse::Swt::Custom::CTabFolder
   def new_c_tab_item(*styles, &block)
     CTabItem.create self, styles, &block
   end
