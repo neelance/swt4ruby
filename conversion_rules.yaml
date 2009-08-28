@@ -1,0 +1,30 @@
+--- 
+prefix: Swt
+prefix_class_names:
+- Cairo
+- GC
+- GCData
+- Layout
+- Monitor
+- List
+- LONG
+constants:
+- lock
+no_constants:
+- CurrentDevice
+- DEBUG
+- DeviceFinder
+- PI
+- SWT_RESTORECARET
+- TrimEnabled
+constant_name_mapping:
+  lock: PLATFORM_LOCK
+  PLATFORM: SWT_PLATFORM
+field_name_mapping:
+  fixedClassInitProc: fixed_class_init_proc_address
+  fixedMapProc: fixed_map_proc_address
+  fixedSizeAllocateProc: fixed_size_allocate_proc_address
+  oldFixedSizeAllocateProc: old_fixed_size_allocate_proc
+  rendererClassInitProc: renderer_class_init_proc
+  rendererRenderProc: renderer_render_proc
+  rendererGetSizeProc: renderer_get_size_proc
