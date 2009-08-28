@@ -1,4 +1,4 @@
-class Org::Eclipse::Swt::Widgets::StyledText
+class Org::Eclipse::Swt::Custom::StyledText
   # This method is called when a line needs to be reordered for measuring or rendering in a bidi locale.
   def on_line_get_segments(&block)
     add_bidi_segment_listener Swt4Ruby::Listener.new(:line_get_segments, &block)
