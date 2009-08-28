@@ -28,7 +28,7 @@ require "rjava"
 # 
 # ***** END LICENSE BLOCK *****
 module Org::Eclipse::Swt::Internal::Mozilla
-  module NsIHelperAppLauncher_1_9Imports
+  module NsIHelperAppLauncher_1_9Imports #:nodoc:
     class_module.module_eval {
       include ::Java::Lang
       include ::Org::Eclipse::Swt::Internal::Mozilla

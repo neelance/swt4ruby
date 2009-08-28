@@ -8,7 +8,9 @@ controller.add_is_constant_hook do |converter, name, value|
 end
 
 controller.add_ruby_constant_name_hook do |converter, name|
-  if name == "PLATFORM"
+  if name == "lock"
+    "PLATFORM_LOCK"
+	elsif name == "PLATFORM"
     "SWT_PLATFORM"
   else
     nil
@@ -22,14 +24,6 @@ controller.add_ruby_class_name_hook do |converter, package, names|
     name_parts << "Swt#{names.shift}"
     name_parts.concat names
     name_parts.join "::"
-  else
-    nil
-  end
-end
-
-controller.add_ruby_constant_name_hook do |converter, name|
-  if name == "lock"
-    "PLATFORM_LOCK"
   else
     nil
   end

@@ -9,7 +9,7 @@ require "rjava"
 # Contributors:
 # IBM Corporation - initial API and implementation
 module Org::Eclipse::Swt::Widgets
-  module CoolItemImports
+  module CoolItemImports #:nodoc:
     class_module.module_eval {
       include ::Java::Lang
       include ::Org::Eclipse::Swt::Widgets

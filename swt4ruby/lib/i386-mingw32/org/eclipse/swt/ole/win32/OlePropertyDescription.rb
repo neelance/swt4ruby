@@ -9,7 +9,7 @@ require "rjava"
 # Contributors:
 # IBM Corporation - initial API and implementation
 module Org::Eclipse::Swt::Ole::Win32
-  module OlePropertyDescriptionImports
+  module OlePropertyDescriptionImports #:nodoc:
     class_module.module_eval {
       include ::Java::Lang
       include ::Org::Eclipse::Swt::Ole::Win32

@@ -9,7 +9,7 @@ require "rjava"
 # Contributors:
 # IBM Corporation - initial API and implementation
 module Org::Eclipse::Swt::Dnd
-  module DragSourceAdapterImports
+  module DragSourceAdapterImports #:nodoc:
     class_module.module_eval {
       include ::Java::Lang
       include ::Org::Eclipse::Swt::Dnd

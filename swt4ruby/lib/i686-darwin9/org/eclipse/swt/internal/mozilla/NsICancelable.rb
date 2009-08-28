@@ -28,7 +28,7 @@ require "rjava"
 # 
 # ***** END LICENSE BLOCK *****
 module Org::Eclipse::Swt::Internal::Mozilla
-  module NsICancelableImports
+  module NsICancelableImports #:nodoc:
     class_module.module_eval {
       include ::Java::Lang
       include ::Org::Eclipse::Swt::Internal::Mozilla

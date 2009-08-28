@@ -9,7 +9,7 @@ require "rjava"
 # Contributors:
 # IBM Corporation - initial API and implementation
 module Org::Eclipse::Swt::Custom
-  module LineStyleListenerImports
+  module LineStyleListenerImports #:nodoc:
     class_module.module_eval {
       include ::Java::Lang
       include ::Org::Eclipse::Swt::Custom

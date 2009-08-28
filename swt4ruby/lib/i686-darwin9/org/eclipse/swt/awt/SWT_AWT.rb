@@ -10,7 +10,7 @@ require "rjava"
 # IBM Corporation - initial API and implementation
 # Scott Kovatch - interface to apple.awt.CHIViewEmbeddedFrame
 module Org::Eclipse::Swt::Awt
-  module SWT_AWTImports
+  module SWT_AWTImports #:nodoc:
     class_module.module_eval {
       include ::Java::Lang
       include ::Org::Eclipse::Swt::Awt

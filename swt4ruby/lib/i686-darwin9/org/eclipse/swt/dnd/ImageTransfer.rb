@@ -10,7 +10,7 @@ require "rjava"
 # IBM Corporation - initial API and implementation
 # Outhink - support for typeFileURL
 module Org::Eclipse::Swt::Dnd
-  module ImageTransferImports
+  module ImageTransferImports #:nodoc:
     class_module.module_eval {
       include ::Java::Lang
       include ::Org::Eclipse::Swt::Dnd

@@ -13,7 +13,7 @@ require "rjava"
 # Contributors:
 # IBM Corporation - initial API and implementation
 module Org::Eclipse::Swt::Internal::Gtk
-  module GtkBorderImports
+  module GtkBorderImports #:nodoc:
     class_module.module_eval {
       include ::Java::Lang
       include ::Org::Eclipse::Swt::Internal::Gtk

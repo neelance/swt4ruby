@@ -28,7 +28,7 @@ require "rjava"
 # 
 # ***** END LICENSE BLOCK *****
 module Org::Eclipse::Swt::Internal::Mozilla
-  module NsIDocShell_1_9Imports
+  module NsIDocShell_1_9Imports #:nodoc:
     class_module.module_eval {
       include ::Java::Lang
       include ::Org::Eclipse::Swt::Internal::Mozilla
