@@ -1085,37 +1085,37 @@ module Org::Eclipse::Swt::Widgets
       
       # long
       
-      def fixed_class_init_proc
-        defined?(@@fixed_class_init_proc) ? @@fixed_class_init_proc : @@fixed_class_init_proc= 0
+      def fixed_class_init_proc_address
+        defined?(@@fixed_class_init_proc_address) ? @@fixed_class_init_proc_address : @@fixed_class_init_proc_address= 0
       end
-      alias_method :attr_fixed_class_init_proc, :fixed_class_init_proc
+      alias_method :attr_fixed_class_init_proc_address, :fixed_class_init_proc_address
       
-      def fixed_class_init_proc=(value)
-        @@fixed_class_init_proc = value
+      def fixed_class_init_proc_address=(value)
+        @@fixed_class_init_proc_address = value
       end
-      alias_method :attr_fixed_class_init_proc=, :fixed_class_init_proc=
+      alias_method :attr_fixed_class_init_proc_address=, :fixed_class_init_proc_address=
       
       
-      def fixed_map_proc
-        defined?(@@fixed_map_proc) ? @@fixed_map_proc : @@fixed_map_proc= 0
+      def fixed_map_proc_address
+        defined?(@@fixed_map_proc_address) ? @@fixed_map_proc_address : @@fixed_map_proc_address= 0
       end
-      alias_method :attr_fixed_map_proc, :fixed_map_proc
+      alias_method :attr_fixed_map_proc_address, :fixed_map_proc_address
       
-      def fixed_map_proc=(value)
-        @@fixed_map_proc = value
+      def fixed_map_proc_address=(value)
+        @@fixed_map_proc_address = value
       end
-      alias_method :attr_fixed_map_proc=, :fixed_map_proc=
+      alias_method :attr_fixed_map_proc_address=, :fixed_map_proc_address=
       
       
-      def fixed_size_allocate_proc
-        defined?(@@fixed_size_allocate_proc) ? @@fixed_size_allocate_proc : @@fixed_size_allocate_proc= 0
+      def fixed_size_allocate_proc_address
+        defined?(@@fixed_size_allocate_proc_address) ? @@fixed_size_allocate_proc_address : @@fixed_size_allocate_proc_address= 0
       end
-      alias_method :attr_fixed_size_allocate_proc, :fixed_size_allocate_proc
+      alias_method :attr_fixed_size_allocate_proc_address, :fixed_size_allocate_proc_address
       
-      def fixed_size_allocate_proc=(value)
-        @@fixed_size_allocate_proc = value
+      def fixed_size_allocate_proc_address=(value)
+        @@fixed_size_allocate_proc_address = value
       end
-      alias_method :attr_fixed_size_allocate_proc=, :fixed_size_allocate_proc=
+      alias_method :attr_fixed_size_allocate_proc_address=, :fixed_size_allocate_proc_address=
       
       
       def old_fixed_size_allocate_proc
@@ -2146,23 +2146,23 @@ module Org::Eclipse::Swt::Widgets
       if ((self.attr_fixed_type).equal?(0))
         type_name = Converter.wcs_to_mbcs(nil, "SwtFixed", true) # $NON-NLS-1$
         self.attr_fixed_class_init_callback = Callback.new(get_class, "fixedClassInitProc", 2) # $NON-NLS-1$
-        self.attr_fixed_class_init_proc = self.attr_fixed_class_init_callback.get_address
-        if ((self.attr_fixed_class_init_proc).equal?(0))
+        self.attr_fixed_class_init_proc_address = self.attr_fixed_class_init_callback.get_address
+        if ((self.attr_fixed_class_init_proc_address).equal?(0))
           SWT.error(SWT::ERROR_NO_MORE_CALLBACKS)
         end
         self.attr_fixed_map_callback = Callback.new(get_class, "fixedMapProc", 1) # $NON-NLS-1$
-        self.attr_fixed_map_proc = self.attr_fixed_map_callback.get_address
-        if ((self.attr_fixed_map_proc).equal?(0))
+        self.attr_fixed_map_proc_address = self.attr_fixed_map_callback.get_address
+        if ((self.attr_fixed_map_proc_address).equal?(0))
           SWT.error(SWT::ERROR_NO_MORE_CALLBACKS)
         end
         self.attr_fixed_size_allocate_callback = Callback.new(get_class, "fixedSizeAllocateProc", 2) # $NON-NLS-1$
-        self.attr_fixed_size_allocate_proc = self.attr_fixed_size_allocate_callback.get_address
-        if ((self.attr_fixed_size_allocate_proc).equal?(0))
+        self.attr_fixed_size_allocate_proc_address = self.attr_fixed_size_allocate_callback.get_address
+        if ((self.attr_fixed_size_allocate_proc_address).equal?(0))
           SWT.error(SWT::ERROR_NO_MORE_CALLBACKS)
         end
         fixed_info = GTypeInfo.new
         fixed_info.attr_class_size = RJava.cast_to_short(OS._gtk_fixed_class_sizeof)
-        fixed_info.attr_class_init = self.attr_fixed_class_init_proc
+        fixed_info.attr_class_init = self.attr_fixed_class_init_proc_address
         fixed_info.attr_instance_size = RJava.cast_to_short(OS._gtk_fixed_sizeof)
         self.attr_fixed_info_ptr = OS.g_malloc(GTypeInfo.attr_sizeof)
         OS.memmove(self.attr_fixed_info_ptr, fixed_info, GTypeInfo.attr_sizeof)
@@ -2616,9 +2616,9 @@ module Org::Eclipse::Swt::Widgets
       def fixed_class_init_proc(g_class, class_data)
         klass = GtkWidgetClass.new
         OS.memmove(klass, g_class)
-        klass.attr_map = self.attr_fixed_map_proc
+        klass.attr_map = self.attr_fixed_map_proc_address
         self.attr_old_fixed_size_allocate_proc = klass.attr_size_allocate
-        klass.attr_size_allocate = self.attr_fixed_size_allocate_proc
+        klass.attr_size_allocate = self.attr_fixed_size_allocate_proc_address
         OS.memmove(g_class, klass)
         return 0
       end
