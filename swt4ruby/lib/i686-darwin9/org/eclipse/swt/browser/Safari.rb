@@ -275,9 +275,9 @@ module Org::Eclipse::Swt::Browser
             end
           end
           
-          typesig { [] }
-          define_method :initialize do
-            super()
+          typesig { [Object] }
+          define_method :initialize do |*args|
+            super(*args)
           end
           
           private
@@ -354,9 +354,9 @@ module Org::Eclipse::Swt::Browser
             out_window[0] = 0
           end
           
-          typesig { [] }
-          define_method :initialize do
-            super()
+          typesig { [Object] }
+          define_method :initialize do |*args|
+            super(*args)
           end
           
           private
@@ -444,9 +444,9 @@ module Org::Eclipse::Swt::Browser
           end
         end
         
-        typesig { [] }
-        define_method :initialize do
-          super()
+        typesig { [Object] }
+        define_method :initialize do |*args|
+          super(*args)
         end
         
         private
@@ -1253,9 +1253,9 @@ module Org::Eclipse::Swt::Browser
                   end
                 end
                 
-                typesig { [] }
-                define_method :initialize do
-                  super()
+                typesig { [Object] }
+                define_method :initialize do |*args|
+                  super(*args)
                 end
                 
                 private
@@ -1292,9 +1292,9 @@ module Org::Eclipse::Swt::Browser
               end
             end
             
-            typesig { [] }
-            define_method :initialize do
-              super()
+            typesig { [Object] }
+            define_method :initialize do |*args|
+              super(*args)
             end
             
             private
@@ -1494,9 +1494,9 @@ module Org::Eclipse::Swt::Browser
               end
             end
             
-            typesig { [] }
-            define_method :initialize do
-              super()
+            typesig { [Object] }
+            define_method :initialize do |*args|
+              super(*args)
             end
             
             private
@@ -1593,9 +1593,9 @@ module Org::Eclipse::Swt::Browser
             end
           end
           
-          typesig { [] }
-          define_method :initialize do
-            super()
+          typesig { [Object] }
+          define_method :initialize do |*args|
+            super(*args)
           end
           
           private

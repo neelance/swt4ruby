@@ -227,9 +227,9 @@ module Org::Eclipse::Swt::Browser
           return _filter_data_object(args[0], args[1])
         end
         
-        typesig { [] }
-        define_method :initialize do
-          super()
+        typesig { [Object] }
+        define_method :initialize do |*args|
+          super(*args)
         end
         
         private
@@ -287,9 +287,9 @@ module Org::Eclipse::Swt::Browser
           end
         end
         
-        typesig { [] }
-        define_method :initialize do
-          super()
+        typesig { [Object] }
+        define_method :initialize do |*args|
+          super(*args)
         end
         
         private
@@ -328,9 +328,9 @@ module Org::Eclipse::Swt::Browser
           return _query_service(args[0], args[1], args[2])
         end
         
-        typesig { [] }
-        define_method :initialize do
-          super()
+        typesig { [Object] }
+        define_method :initialize do |*args|
+          super(*args)
         end
         
         private
@@ -430,9 +430,9 @@ module Org::Eclipse::Swt::Browser
           return _get_zone_mappings(RJava.cast_to_int(args[0]), args[1], RJava.cast_to_int(args[2]))
         end
         
-        typesig { [] }
-        define_method :initialize do
-          super()
+        typesig { [Object] }
+        define_method :initialize do |*args|
+          super(*args)
         end
         
         private
@@ -481,9 +481,9 @@ module Org::Eclipse::Swt::Browser
           return _exec(args[0], RJava.cast_to_int(args[1]), RJava.cast_to_int(args[2]), args[3], args[4])
         end
         
-        typesig { [] }
-        define_method :initialize do
-          super()
+        typesig { [Object] }
+        define_method :initialize do |*args|
+          super(*args)
         end
         
         private

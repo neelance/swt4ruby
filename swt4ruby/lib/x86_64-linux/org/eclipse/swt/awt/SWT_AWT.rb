@@ -270,9 +270,9 @@ module Org::Eclipse::Swt::Awt
                   frame.dispatch_event(self.class::WindowEvent.new(frame, WindowEvent::WINDOW_DEICONIFIED))
                 end
                 
-                typesig { [] }
-                define_method :initialize do
-                  super()
+                typesig { [Object] }
+                define_method :initialize do |*args|
+                  super(*args)
                 end
                 
                 private
@@ -290,9 +290,9 @@ module Org::Eclipse::Swt::Awt
                   frame.dispatch_event(self.class::WindowEvent.new(frame, WindowEvent::WINDOW_ICONIFIED))
                 end
                 
-                typesig { [] }
-                define_method :initialize do
-                  super()
+                typesig { [Object] }
+                define_method :initialize do |*args|
+                  super(*args)
                 end
                 
                 private
@@ -301,9 +301,9 @@ module Org::Eclipse::Swt::Awt
             end
           end
           
-          typesig { [] }
-          define_method :initialize do
-            super()
+          typesig { [Object] }
+          define_method :initialize do |*args|
+            super(*args)
           end
           
           private
@@ -336,9 +336,9 @@ module Org::Eclipse::Swt::Awt
                   frame.dispose
                 end
                 
-                typesig { [] }
-                define_method :initialize do
-                  super()
+                typesig { [Object] }
+                define_method :initialize do |*args|
+                  super(*args)
                 end
                 
                 private
@@ -358,9 +358,9 @@ module Org::Eclipse::Swt::Awt
                     frame.set_size(client_area.attr_width, client_area.attr_height)
                   end
                   
-                  typesig { [] }
-                  define_method :initialize do
-                    super()
+                  typesig { [Object] }
+                  define_method :initialize do |*args|
+                    super(*args)
                   end
                   
                   private
@@ -370,9 +370,9 @@ module Org::Eclipse::Swt::Awt
             end
           end
           
-          typesig { [] }
-          define_method :initialize do
-            super()
+          typesig { [Object] }
+          define_method :initialize do |*args|
+            super(*args)
           end
           
           private
@@ -403,9 +403,9 @@ module Org::Eclipse::Swt::Awt
                 frame.validate
               end
               
-              typesig { [] }
-              define_method :initialize do
-                super()
+              typesig { [Object] }
+              define_method :initialize do |*args|
+                super(*args)
               end
               
               private
@@ -413,9 +413,9 @@ module Org::Eclipse::Swt::Awt
             end.new_local(self))
           end
           
-          typesig { [] }
-          define_method :initialize do
-            super()
+          typesig { [Object] }
+          define_method :initialize do |*args|
+            super(*args)
           end
           
           private
@@ -477,9 +477,9 @@ module Org::Eclipse::Swt::Awt
                 shell.set_size(dim.attr_width, dim.attr_height)
               end
               
-              typesig { [] }
-              define_method :initialize do
-                super()
+              typesig { [Object] }
+              define_method :initialize do |*args|
+                super(*args)
               end
               
               private
@@ -487,9 +487,9 @@ module Org::Eclipse::Swt::Awt
             end.new_local(self))
           end
           
-          typesig { [] }
-          define_method :initialize do
-            super()
+          typesig { [Object] }
+          define_method :initialize do |*args|
+            super(*args)
           end
           
           private

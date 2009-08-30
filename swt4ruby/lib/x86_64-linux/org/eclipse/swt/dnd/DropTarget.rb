@@ -308,9 +308,9 @@ module Org::Eclipse::Swt::Dnd
           end
         end
         
-        typesig { [] }
-        define_method :initialize do
-          super()
+        typesig { [Object] }
+        define_method :initialize do |*args|
+          super(*args)
         end
         
         private
@@ -327,9 +327,9 @@ module Org::Eclipse::Swt::Dnd
           on_dispose
         end
         
-        typesig { [] }
-        define_method :initialize do
-          super()
+        typesig { [Object] }
+        define_method :initialize do |*args|
+          super(*args)
         end
         
         private
@@ -406,9 +406,9 @@ module Org::Eclipse::Swt::Dnd
           control_.get_display.timer_exec(delay, self.attr_drag_over_heartbeat)
         end
         
-        typesig { [] }
-        define_method :initialize do
-          super()
+        typesig { [Object] }
+        define_method :initialize do |*args|
+          super(*args)
         end
         
         private

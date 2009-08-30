@@ -84,9 +84,9 @@ module Org::Eclipse::Swt::Browser
           return _release
         end
         
-        typesig { [] }
-        define_method :initialize do
-          super()
+        typesig { [Object] }
+        define_method :initialize do |*args|
+          super(*args)
         end
         
         private
@@ -133,9 +133,9 @@ module Org::Eclipse::Swt::Browser
           return _prompt_for_save_to_file(args[0], args[1], args[2], args[3], args[4])
         end
         
-        typesig { [] }
-        define_method :initialize do
-          super()
+        typesig { [Object] }
+        define_method :initialize do |*args|
+          super(*args)
         end
         
         private

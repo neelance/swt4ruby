@@ -137,9 +137,9 @@ module Org::Eclipse::Swt::Ole::Win32
           return _release
         end
         
-        typesig { [] }
-        define_method :initialize do
-          super()
+        typesig { [Object] }
+        define_method :initialize do |*args|
+          super(*args)
         end
         
         private
@@ -187,9 +187,9 @@ module Org::Eclipse::Swt::Ole::Win32
           return _on_request_edit(RJava.cast_to_int(args[0]))
         end
         
-        typesig { [] }
-        define_method :initialize do
-          super()
+        typesig { [Object] }
+        define_method :initialize do |*args|
+          super(*args)
         end
         
         private

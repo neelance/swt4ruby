@@ -93,9 +93,9 @@ module Org::Eclipse::Swt::Browser
           return _release
         end
         
-        typesig { [] }
-        define_method :initialize do
-          super()
+        typesig { [Object] }
+        define_method :initialize do |*args|
+          super(*args)
         end
         
         private
@@ -135,9 +135,9 @@ module Org::Eclipse::Swt::Browser
           return _create_chrome_window(args[0], RJava.cast_to_int(args[1]), args[2])
         end
         
-        typesig { [] }
-        define_method :initialize do
-          super()
+        typesig { [Object] }
+        define_method :initialize do |*args|
+          super(*args)
         end
         
         private
@@ -186,9 +186,9 @@ module Org::Eclipse::Swt::Browser
           return _create_chrome_window2(args[0], RJava.cast_to_int(args[1]), RJava.cast_to_int(args[2]), args[3], args[4], args[5])
         end
         
-        typesig { [] }
-        define_method :initialize do
-          super()
+        typesig { [Object] }
+        define_method :initialize do |*args|
+          super(*args)
         end
         
         private
@@ -351,9 +351,9 @@ module Org::Eclipse::Swt::Browser
             shell.open
           end
           
-          typesig { [] }
-          define_method :initialize do
-            super()
+          typesig { [Object] }
+          define_method :initialize do |*args|
+            super(*args)
           end
           
           private
@@ -369,9 +369,9 @@ module Org::Eclipse::Swt::Browser
             shell.close
           end
           
-          typesig { [] }
-          define_method :initialize do
-            super()
+          typesig { [Object] }
+          define_method :initialize do |*args|
+            super(*args)
           end
           
           private

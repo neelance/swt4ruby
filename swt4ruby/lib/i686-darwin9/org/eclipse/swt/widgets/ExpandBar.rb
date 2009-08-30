@@ -168,9 +168,9 @@ module Org::Eclipse::Swt::Widgets
           end
         end
         
-        typesig { [] }
-        define_method :initialize do
-          super()
+        typesig { [Object] }
+        define_method :initialize do |*args|
+          super(*args)
         end
         
         private
@@ -197,9 +197,9 @@ module Org::Eclipse::Swt::Widgets
             on_scroll(event)
           end
           
-          typesig { [] }
-          define_method :initialize do
-            super()
+          typesig { [Object] }
+          define_method :initialize do |*args|
+            super(*args)
           end
           
           private

@@ -212,9 +212,9 @@ module Org::Eclipse::Swt::Custom
                 handle_focus(SWT::FocusOut)
               end
               
-              typesig { [] }
-              define_method :initialize do
-                super()
+              typesig { [Object] }
+              define_method :initialize do |*args|
+                super(*args)
               end
               
               private
@@ -223,9 +223,9 @@ module Org::Eclipse::Swt::Custom
           end
         end
         
-        typesig { [] }
-        define_method :initialize do
-          super()
+        typesig { [Object] }
+        define_method :initialize do |*args|
+          super(*args)
         end
         
         private
@@ -244,9 +244,9 @@ module Org::Eclipse::Swt::Custom
           end
         end
         
-        typesig { [] }
-        define_method :initialize do
-          super()
+        typesig { [Object] }
+        define_method :initialize do |*args|
+          super(*args)
         end
         
         private
@@ -1105,9 +1105,9 @@ module Org::Eclipse::Swt::Custom
           e.attr_result = get_tool_tip_text
         end
         
-        typesig { [] }
-        define_method :initialize do
-          super()
+        typesig { [Object] }
+        define_method :initialize do |*args|
+          super(*args)
         end
         
         private
@@ -1136,9 +1136,9 @@ module Org::Eclipse::Swt::Custom
           e.attr_result = get_tool_tip_text
         end
         
-        typesig { [] }
-        define_method :initialize do
-          super()
+        typesig { [Object] }
+        define_method :initialize do |*args|
+          super(*args)
         end
         
         private
@@ -1161,9 +1161,9 @@ module Org::Eclipse::Swt::Custom
           e.attr_length = sel.attr_y - sel.attr_x
         end
         
-        typesig { [] }
-        define_method :initialize do
-          super()
+        typesig { [Object] }
+        define_method :initialize do |*args|
+          super(*args)
         end
         
         private
@@ -1212,9 +1212,9 @@ module Org::Eclipse::Swt::Custom
           e.attr_result = get_text
         end
         
-        typesig { [] }
-        define_method :initialize do
-          super()
+        typesig { [Object] }
+        define_method :initialize do |*args|
+          super(*args)
         end
         
         private
@@ -1230,9 +1230,9 @@ module Org::Eclipse::Swt::Custom
           e.attr_detail = self.attr_text.get_editable ? ACC::ROLE_TEXT : ACC::ROLE_LABEL
         end
         
-        typesig { [] }
-        define_method :initialize do
-          super()
+        typesig { [Object] }
+        define_method :initialize do |*args|
+          super(*args)
         end
         
         private
@@ -1248,9 +1248,9 @@ module Org::Eclipse::Swt::Custom
           e.attr_result = is_dropped ? SWT.get_message("SWT_Close") : SWT.get_message("SWT_Open") # $NON-NLS-1$ //$NON-NLS-2$
         end
         
-        typesig { [] }
-        define_method :initialize do
-          super()
+        typesig { [Object] }
+        define_method :initialize do |*args|
+          super(*args)
         end
         
         private

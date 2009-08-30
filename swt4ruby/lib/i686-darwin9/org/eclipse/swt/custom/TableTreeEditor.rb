@@ -156,10 +156,10 @@ module Org::Eclipse::Swt::Custom
           e.attr_display.async_exec(@runnable)
         end
         
-        typesig { [] }
-        define_method :initialize do
+        typesig { [Object] }
+        define_method :initialize do |*args|
           @runnable = nil
-          super()
+          super(*args)
           tree_listener_class = self.class
           @runnable = Class.new(self.class::Runnable.class == Class ? self.class::Runnable : Object) do
             extend LocalClass
@@ -178,9 +178,9 @@ module Org::Eclipse::Swt::Custom
               self.attr_editor.set_visible(true)
             end
             
-            typesig { [] }
-            define_method :initialize do
-              super()
+            typesig { [Object] }
+            define_method :initialize do |*args|
+              super(*args)
             end
             
             private
@@ -207,9 +207,9 @@ module Org::Eclipse::Swt::Custom
           layout
         end
         
-        typesig { [] }
-        define_method :initialize do
-          super()
+        typesig { [Object] }
+        define_method :initialize do |*args|
+          super(*args)
         end
         
         private

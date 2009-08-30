@@ -621,9 +621,9 @@ module Org::Eclipse::Swt::Dnd
           return _enum_format_etc(RJava.cast_to_int(args[0]), args[1])
         end
         
-        typesig { [] }
-        define_method :initialize do
-          super()
+        typesig { [Object] }
+        define_method :initialize do |*args|
+          super(*args)
         end
         
         private

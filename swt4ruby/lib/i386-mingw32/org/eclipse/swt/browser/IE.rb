@@ -463,9 +463,9 @@ module Org::Eclipse::Swt::Browser
             OS._internet_set_option(0, OS::INTERNET_OPTION_END_BROWSER_SESSION, 0, 0)
           end
           
-          typesig { [] }
-          define_method :initialize do
-            super()
+          typesig { [Object] }
+          define_method :initialize do |*args|
+            super(*args)
           end
           
           private
@@ -565,9 +565,9 @@ module Org::Eclipse::Swt::Browser
           handle_domevent(e)
         end
         
-        typesig { [] }
-        define_method :initialize do
-          super()
+        typesig { [Object] }
+        define_method :initialize do |*args|
+          super(*args)
         end
         
         private
@@ -628,9 +628,9 @@ module Org::Eclipse::Swt::Browser
           end
         end
         
-        typesig { [] }
-        define_method :initialize do
-          super()
+        typesig { [Object] }
+        define_method :initialize do |*args|
+          super(*args)
         end
         
         private
@@ -768,9 +768,9 @@ module Org::Eclipse::Swt::Browser
                     end
                   end
                   
-                  typesig { [] }
-                  define_method :initialize do
-                    super()
+                  typesig { [Object] }
+                  define_method :initialize do |*args|
+                    super(*args)
                   end
                   
                   private
@@ -1007,9 +1007,9 @@ module Org::Eclipse::Swt::Browser
                   self.attr_browser.dispose
                 end
                 
-                typesig { [] }
-                define_method :initialize do
-                  super()
+                typesig { [Object] }
+                define_method :initialize do |*args|
+                  super(*args)
                 end
                 
                 private
@@ -1058,9 +1058,9 @@ module Org::Eclipse::Swt::Browser
           end
         end
         
-        typesig { [] }
-        define_method :initialize do
-          super()
+        typesig { [Object] }
+        define_method :initialize do |*args|
+          super(*args)
         end
         
         private

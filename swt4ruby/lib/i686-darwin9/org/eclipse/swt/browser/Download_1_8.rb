@@ -132,9 +132,9 @@ module Org::Eclipse::Swt::Browser
           return _release
         end
         
-        typesig { [] }
-        define_method :initialize do
-          super()
+        typesig { [Object] }
+        define_method :initialize do |*args|
+          super(*args)
         end
         
         private
@@ -301,9 +301,9 @@ module Org::Eclipse::Swt::Browser
           return _get_mimeinfo(args[0])
         end
         
-        typesig { [] }
-        define_method :initialize do
-          super()
+        typesig { [Object] }
+        define_method :initialize do |*args|
+          super(*args)
         end
         
         private
@@ -520,9 +520,9 @@ module Org::Eclipse::Swt::Browser
           return _set_dialog(args[0])
         end
         
-        typesig { [] }
-        define_method :initialize do
-          super()
+        typesig { [Object] }
+        define_method :initialize do |*args|
+          super(*args)
         end
         
         private
@@ -597,9 +597,9 @@ module Org::Eclipse::Swt::Browser
           return _on_security_change(args[0], args[1], RJava.cast_to_int(args[2]))
         end
         
-        typesig { [] }
-        define_method :initialize do
-          super()
+        typesig { [Object] }
+        define_method :initialize do |*args|
+          super(*args)
         end
         
         private
@@ -754,9 +754,9 @@ module Org::Eclipse::Swt::Browser
           self.attr_cancelable = nil
         end
         
-        typesig { [] }
-        define_method :initialize do
-          super()
+        typesig { [Object] }
+        define_method :initialize do |*args|
+          super(*args)
         end
         
         private

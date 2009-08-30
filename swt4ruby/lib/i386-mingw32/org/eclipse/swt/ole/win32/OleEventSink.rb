@@ -160,9 +160,9 @@ module Org::Eclipse::Swt::Ole::Win32
           return _invoke(RJava.cast_to_int(args[0]), args[1], RJava.cast_to_int(args[2]), RJava.cast_to_int(args[3]), args[4], args[5], args[6], args[7])
         end
         
-        typesig { [] }
-        define_method :initialize do
-          super()
+        typesig { [Object] }
+        define_method :initialize do |*args|
+          super(*args)
         end
         
         private
