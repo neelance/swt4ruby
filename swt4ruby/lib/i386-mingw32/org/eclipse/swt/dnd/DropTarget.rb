@@ -218,7 +218,7 @@ module Org::Eclipse::Swt::Dnd
           end
         end
         
-        typesig { [Object] }
+        typesig { [Vararg.new(Object)] }
         define_method :initialize do |*args|
           super(*args)
         end
@@ -237,7 +237,7 @@ module Org::Eclipse::Swt::Dnd
           on_dispose
         end
         
-        typesig { [Object] }
+        typesig { [Vararg.new(Object)] }
         define_method :initialize do |*args|
           super(*args)
         end
@@ -412,7 +412,7 @@ module Org::Eclipse::Swt::Dnd
           end
         end
         
-        typesig { [Object] }
+        typesig { [Vararg.new(Object)] }
         define_method :initialize do |*args|
           super(*args)
         end

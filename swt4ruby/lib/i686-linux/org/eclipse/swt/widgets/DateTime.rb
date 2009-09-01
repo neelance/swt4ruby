@@ -277,7 +277,7 @@ module Org::Eclipse::Swt::Widgets
             end
           end
           
-          typesig { [Object] }
+          typesig { [Vararg.new(Object)] }
           define_method :initialize do |*args|
             super(*args)
           end
@@ -306,7 +306,7 @@ module Org::Eclipse::Swt::Widgets
             self.attr_text.set_focus
           end
           
-          typesig { [Object] }
+          typesig { [Vararg.new(Object)] }
           define_method :initialize do |*args|
             super(*args)
           end
@@ -325,7 +325,7 @@ module Org::Eclipse::Swt::Widgets
             self.attr_text.set_focus
           end
           
-          typesig { [Object] }
+          typesig { [Vararg.new(Object)] }
           define_method :initialize do |*args|
             super(*args)
           end
@@ -343,7 +343,7 @@ module Org::Eclipse::Swt::Widgets
             on_resize(event)
           end
           
-          typesig { [Object] }
+          typesig { [Vararg.new(Object)] }
           define_method :initialize do |*args|
             super(*args)
           end
@@ -976,7 +976,7 @@ module Org::Eclipse::Swt::Widgets
           end
         end
         
-        typesig { [Object] }
+        typesig { [Vararg.new(Object)] }
         define_method :initialize do |*args|
           super(*args)
         end

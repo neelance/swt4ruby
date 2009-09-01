@@ -125,7 +125,7 @@ module Org::Eclipse::Swt::Custom
           redraw
         end
         
-        typesig { [Object] }
+        typesig { [Vararg.new(Object)] }
         define_method :initialize do |*args|
           super(*args)
         end
@@ -143,7 +143,7 @@ module Org::Eclipse::Swt::Custom
           paint(e)
         end
         
-        typesig { [Object] }
+        typesig { [Vararg.new(Object)] }
         define_method :initialize do |*args|
           super(*args)
         end
@@ -161,7 +161,7 @@ module Org::Eclipse::Swt::Custom
           stop
         end
         
-        typesig { [Object] }
+        typesig { [Vararg.new(Object)] }
         define_method :initialize do |*args|
           super(*args)
         end
@@ -313,7 +313,7 @@ module Org::Eclipse::Swt::Custom
             display.timer_exec(SLEEP, timer[0])
           end
           
-          typesig { [Object] }
+          typesig { [Vararg.new(Object)] }
           define_method :initialize do |*args|
             super(*args)
           end

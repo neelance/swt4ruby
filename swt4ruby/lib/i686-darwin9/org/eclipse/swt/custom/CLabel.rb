@@ -218,7 +218,7 @@ module Org::Eclipse::Swt::Custom
           on_paint(event)
         end
         
-        typesig { [Object] }
+        typesig { [Vararg.new(Object)] }
         define_method :initialize do |*args|
           super(*args)
         end
@@ -236,7 +236,7 @@ module Org::Eclipse::Swt::Custom
           on_dispose(event)
         end
         
-        typesig { [Object] }
+        typesig { [Vararg.new(Object)] }
         define_method :initialize do |*args|
           super(*args)
         end
@@ -256,7 +256,7 @@ module Org::Eclipse::Swt::Custom
           end
         end
         
-        typesig { [Object] }
+        typesig { [Vararg.new(Object)] }
         define_method :initialize do |*args|
           super(*args)
         end
@@ -438,7 +438,7 @@ module Org::Eclipse::Swt::Custom
           end
         end
         
-        typesig { [Object] }
+        typesig { [Vararg.new(Object)] }
         define_method :initialize do |*args|
           super(*args)
         end
@@ -480,7 +480,7 @@ module Org::Eclipse::Swt::Custom
           e.attr_detail = ACC::STATE_READONLY
         end
         
-        typesig { [Object] }
+        typesig { [Vararg.new(Object)] }
         define_method :initialize do |*args|
           super(*args)
         end

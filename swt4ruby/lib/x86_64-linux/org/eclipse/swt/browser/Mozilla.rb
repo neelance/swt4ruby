@@ -529,7 +529,7 @@ module Org::Eclipse::Swt::Browser
             enumerator._release
           end
           
-          typesig { [Object] }
+          typesig { [Vararg.new(Object)] }
           define_method :initialize do |*args|
             super(*args)
           end
@@ -1355,7 +1355,7 @@ module Org::Eclipse::Swt::Browser
             self.attr_initialized = false
           end
           
-          typesig { [Object] }
+          typesig { [Vararg.new(Object)] }
           define_method :initialize do |*args|
             super(*args)
           end
@@ -1574,7 +1574,7 @@ module Org::Eclipse::Swt::Browser
                   on_resize
                 end
                 
-                typesig { [Object] }
+                typesig { [Vararg.new(Object)] }
                 define_method :initialize do |*args|
                   super(*args)
                 end
@@ -1586,7 +1586,7 @@ module Org::Eclipse::Swt::Browser
           end
         end
         
-        typesig { [Object] }
+        typesig { [Vararg.new(Object)] }
         define_method :initialize do |*args|
           super(*args)
         end
@@ -1653,7 +1653,7 @@ module Org::Eclipse::Swt::Browser
           return _release
         end
         
-        typesig { [Object] }
+        typesig { [Vararg.new(Object)] }
         define_method :initialize do |*args|
           super(*args)
         end
@@ -1694,7 +1694,7 @@ module Org::Eclipse::Swt::Browser
           return _query_referent(args[0], args[1])
         end
         
-        typesig { [Object] }
+        typesig { [Vararg.new(Object)] }
         define_method :initialize do |*args|
           super(*args)
         end
@@ -1771,7 +1771,7 @@ module Org::Eclipse::Swt::Browser
           return _on_security_change(args[0], args[1], RJava.cast_to_int(args[2]))
         end
         
-        typesig { [Object] }
+        typesig { [Vararg.new(Object)] }
         define_method :initialize do |*args|
           super(*args)
         end
@@ -1880,7 +1880,7 @@ module Org::Eclipse::Swt::Browser
           return _exit_modal_event_loop(RJava.cast_to_int(args[0]))
         end
         
-        typesig { [Object] }
+        typesig { [Vararg.new(Object)] }
         define_method :initialize do |*args|
           super(*args)
         end
@@ -1928,7 +1928,7 @@ module Org::Eclipse::Swt::Browser
           return _focus_prev_element
         end
         
-        typesig { [Object] }
+        typesig { [Vararg.new(Object)] }
         define_method :initialize do |*args|
           super(*args)
         end
@@ -2025,7 +2025,7 @@ module Org::Eclipse::Swt::Browser
           return _get_site_window(args[0])
         end
         
-        typesig { [Object] }
+        typesig { [Vararg.new(Object)] }
         define_method :initialize do |*args|
           super(*args)
         end
@@ -2066,7 +2066,7 @@ module Org::Eclipse::Swt::Browser
           return _get_interface(args[0], args[1])
         end
         
-        typesig { [Object] }
+        typesig { [Vararg.new(Object)] }
         define_method :initialize do |*args|
           super(*args)
         end
@@ -2107,7 +2107,7 @@ module Org::Eclipse::Swt::Browser
           return _get_weak_reference(args[0])
         end
         
-        typesig { [Object] }
+        typesig { [Vararg.new(Object)] }
         define_method :initialize do |*args|
           super(*args)
         end
@@ -2149,7 +2149,7 @@ module Org::Eclipse::Swt::Browser
           return _on_show_context_menu(RJava.cast_to_int(args[0]), args[1], args[2])
         end
         
-        typesig { [Object] }
+        typesig { [Vararg.new(Object)] }
         define_method :initialize do |*args|
           super(*args)
         end
@@ -2241,7 +2241,7 @@ module Org::Eclipse::Swt::Browser
           return _set_parent_content_listener(args[0])
         end
         
-        typesig { [Object] }
+        typesig { [Vararg.new(Object)] }
         define_method :initialize do |*args|
           super(*args)
         end
@@ -2291,7 +2291,7 @@ module Org::Eclipse::Swt::Browser
           return _on_hide_tooltip
         end
         
-        typesig { [Object] }
+        typesig { [Vararg.new(Object)] }
         define_method :initialize do |*args|
           super(*args)
         end
@@ -2332,7 +2332,7 @@ module Org::Eclipse::Swt::Browser
           return _handle_event(args[0])
         end
         
-        typesig { [Object] }
+        typesig { [Vararg.new(Object)] }
         define_method :initialize do |*args|
           super(*args)
         end
@@ -3937,7 +3937,7 @@ module Org::Eclipse::Swt::Browser
           self.attr_browser.traverse(SWT::TRAVERSE_TAB_NEXT)
         end
         
-        typesig { [Object] }
+        typesig { [Vararg.new(Object)] }
         define_method :initialize do |*args|
           super(*args)
         end
@@ -3967,7 +3967,7 @@ module Org::Eclipse::Swt::Browser
           self.attr_browser.traverse(SWT::TRAVERSE_TAB_PREVIOUS)
         end
         
-        typesig { [Object] }
+        typesig { [Vararg.new(Object)] }
         define_method :initialize do |*args|
           super(*args)
         end

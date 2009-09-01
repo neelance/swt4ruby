@@ -729,7 +729,7 @@ module Org::Eclipse::Swt::Widgets
                 end
               end
               
-              typesig { [Object] }
+              typesig { [Vararg.new(Object)] }
               define_method :initialize do |*args|
                 super(*args)
               end
@@ -764,7 +764,7 @@ module Org::Eclipse::Swt::Widgets
                 end
               end
               
-              typesig { [Object] }
+              typesig { [Vararg.new(Object)] }
               define_method :initialize do |*args|
                 super(*args)
               end

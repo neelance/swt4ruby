@@ -218,7 +218,7 @@ module Org::Eclipse::Swt::Custom
             h_scroll
           end
           
-          typesig { [Object] }
+          typesig { [Vararg.new(Object)] }
           define_method :initialize do |*args|
             super(*args)
           end
@@ -240,7 +240,7 @@ module Org::Eclipse::Swt::Custom
             v_scroll
           end
           
-          typesig { [Object] }
+          typesig { [Vararg.new(Object)] }
           define_method :initialize do |*args|
             super(*args)
           end
@@ -262,7 +262,7 @@ module Org::Eclipse::Swt::Custom
           layout(false)
         end
         
-        typesig { [Object] }
+        typesig { [Vararg.new(Object)] }
         define_method :initialize do |*args|
           super(*args)
         end
@@ -285,7 +285,7 @@ module Org::Eclipse::Swt::Custom
           end
         end
         
-        typesig { [Object] }
+        typesig { [Vararg.new(Object)] }
         define_method :initialize do |*args|
           super(*args)
         end
@@ -303,7 +303,7 @@ module Org::Eclipse::Swt::Custom
           get_display.remove_filter(SWT::FocusIn, self.attr_filter)
         end
         
-        typesig { [Object] }
+        typesig { [Vararg.new(Object)] }
         define_method :initialize do |*args|
           super(*args)
         end

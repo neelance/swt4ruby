@@ -854,7 +854,7 @@ module Org::Eclipse::Swt::Custom
           end
         end
         
-        typesig { [Object] }
+        typesig { [Vararg.new(Object)] }
         define_method :initialize do |*args|
           super(*args)
         end
@@ -2294,7 +2294,7 @@ module Org::Eclipse::Swt::Custom
           e.attr_result = shortcut
         end
         
-        typesig { [Object] }
+        typesig { [Vararg.new(Object)] }
         define_method :initialize do |*args|
           super(*args)
         end
@@ -2478,7 +2478,7 @@ module Org::Eclipse::Swt::Custom
           e.attr_children = children
         end
         
-        typesig { [Object] }
+        typesig { [Vararg.new(Object)] }
         define_method :initialize do |*args|
           super(*args)
         end
@@ -2502,7 +2502,7 @@ module Org::Eclipse::Swt::Custom
           end
         end
         
-        typesig { [Object] }
+        typesig { [Vararg.new(Object)] }
         define_method :initialize do |*args|
           super(*args)
         end
@@ -2524,7 +2524,7 @@ module Org::Eclipse::Swt::Custom
           end
         end
         
-        typesig { [Object] }
+        typesig { [Vararg.new(Object)] }
         define_method :initialize do |*args|
           super(*args)
         end
@@ -4841,7 +4841,7 @@ module Org::Eclipse::Swt::Custom
             @local_class_parent.set_selection(index, true)
           end
           
-          typesig { [Object] }
+          typesig { [Vararg.new(Object)] }
           define_method :initialize do |*args|
             super(*args)
           end

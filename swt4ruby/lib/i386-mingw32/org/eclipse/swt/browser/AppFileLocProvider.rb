@@ -157,7 +157,7 @@ module Org::Eclipse::Swt::Browser
           return _release
         end
         
-        typesig { [Object] }
+        typesig { [Vararg.new(Object)] }
         define_method :initialize do |*args|
           super(*args)
         end
@@ -198,7 +198,7 @@ module Org::Eclipse::Swt::Browser
           return get_file(args[0], args[1], args[2])
         end
         
-        typesig { [Object] }
+        typesig { [Vararg.new(Object)] }
         define_method :initialize do |*args|
           super(*args)
         end
@@ -246,7 +246,7 @@ module Org::Eclipse::Swt::Browser
           return get_files(args[0], args[1])
         end
         
-        typesig { [Object] }
+        typesig { [Vararg.new(Object)] }
         define_method :initialize do |*args|
           super(*args)
         end

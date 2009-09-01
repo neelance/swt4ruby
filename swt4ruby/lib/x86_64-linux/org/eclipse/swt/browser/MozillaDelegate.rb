@@ -227,7 +227,7 @@ module Org::Eclipse::Swt::Browser
           self.attr_listener = nil
         end
         
-        typesig { [Object] }
+        typesig { [Vararg.new(Object)] }
         define_method :initialize do |*args|
           super(*args)
         end
@@ -256,7 +256,7 @@ module Org::Eclipse::Swt::Browser
             (self.attr_browser.attr_web_browser)._activate
           end
           
-          typesig { [Object] }
+          typesig { [Vararg.new(Object)] }
           define_method :initialize do |*args|
             super(*args)
           end

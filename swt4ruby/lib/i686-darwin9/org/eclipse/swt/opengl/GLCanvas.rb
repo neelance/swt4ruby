@@ -153,7 +153,7 @@ module Org::Eclipse::Swt::Opengl
           end
         end
         
-        typesig { [Object] }
+        typesig { [Vararg.new(Object)] }
         define_method :initialize do |*args|
           super(*args)
         end
@@ -175,7 +175,7 @@ module Org::Eclipse::Swt::Opengl
           fix_bounds
         end
         
-        typesig { [Object] }
+        typesig { [Vararg.new(Object)] }
         define_method :initialize do |*args|
           super(*args)
         end

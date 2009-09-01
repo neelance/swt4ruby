@@ -247,7 +247,7 @@ module Org::Eclipse::Swt::Dnd
           end
         end
         
-        typesig { [Object] }
+        typesig { [Vararg.new(Object)] }
         define_method :initialize do |*args|
           super(*args)
         end
@@ -267,7 +267,7 @@ module Org::Eclipse::Swt::Dnd
           @local_class_parent.on_dispose
         end
         
-        typesig { [Object] }
+        typesig { [Vararg.new(Object)] }
         define_method :initialize do |*args|
           super(*args)
         end
@@ -391,7 +391,7 @@ module Org::Eclipse::Swt::Dnd
           return _give_feedback(RJava.cast_to_int(args[0]))
         end
         
-        typesig { [Object] }
+        typesig { [Vararg.new(Object)] }
         define_method :initialize do |*args|
           super(*args)
         end
@@ -460,7 +460,7 @@ module Org::Eclipse::Swt::Dnd
           return _enum_format_etc(RJava.cast_to_int(args[0]), args[1])
         end
         
-        typesig { [Object] }
+        typesig { [Vararg.new(Object)] }
         define_method :initialize do |*args|
           super(*args)
         end

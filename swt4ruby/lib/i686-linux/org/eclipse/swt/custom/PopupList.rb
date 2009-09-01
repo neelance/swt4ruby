@@ -82,7 +82,7 @@ module Org::Eclipse::Swt::Custom
           self.attr_shell.set_visible(false)
         end
         
-        typesig { [Object] }
+        typesig { [Vararg.new(Object)] }
         define_method :initialize do |*args|
           super(*args)
         end
@@ -106,7 +106,7 @@ module Org::Eclipse::Swt::Custom
           self.attr_list.set_size(shell_size.attr_width, shell_size.attr_height)
         end
         
-        typesig { [Object] }
+        typesig { [Vararg.new(Object)] }
         define_method :initialize do |*args|
           super(*args)
         end
@@ -133,7 +133,7 @@ module Org::Eclipse::Swt::Custom
           self.attr_shell.set_visible(false)
         end
         
-        typesig { [Object] }
+        typesig { [Vararg.new(Object)] }
         define_method :initialize do |*args|
           super(*args)
         end
@@ -157,7 +157,7 @@ module Org::Eclipse::Swt::Custom
           end
         end
         
-        typesig { [Object] }
+        typesig { [Vararg.new(Object)] }
         define_method :initialize do |*args|
           super(*args)
         end

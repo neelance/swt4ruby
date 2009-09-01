@@ -102,7 +102,7 @@ module Org::Eclipse::Swt::Browser
           return _release
         end
         
-        typesig { [Object] }
+        typesig { [Vararg.new(Object)] }
         define_method :initialize do |*args|
           super(*args)
         end
@@ -150,7 +150,7 @@ module Org::Eclipse::Swt::Browser
           return _get_next(args[0])
         end
         
-        typesig { [Object] }
+        typesig { [Vararg.new(Object)] }
         define_method :initialize do |*args|
           super(*args)
         end

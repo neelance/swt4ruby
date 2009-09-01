@@ -463,7 +463,7 @@ module Org::Eclipse::Swt::Browser
             OS._internet_set_option(0, OS::INTERNET_OPTION_END_BROWSER_SESSION, 0, 0)
           end
           
-          typesig { [Object] }
+          typesig { [Vararg.new(Object)] }
           define_method :initialize do |*args|
             super(*args)
           end
@@ -565,7 +565,7 @@ module Org::Eclipse::Swt::Browser
           handle_domevent(e)
         end
         
-        typesig { [Object] }
+        typesig { [Vararg.new(Object)] }
         define_method :initialize do |*args|
           super(*args)
         end
@@ -628,7 +628,7 @@ module Org::Eclipse::Swt::Browser
           end
         end
         
-        typesig { [Object] }
+        typesig { [Vararg.new(Object)] }
         define_method :initialize do |*args|
           super(*args)
         end
@@ -768,7 +768,7 @@ module Org::Eclipse::Swt::Browser
                     end
                   end
                   
-                  typesig { [Object] }
+                  typesig { [Vararg.new(Object)] }
                   define_method :initialize do |*args|
                     super(*args)
                   end
@@ -1007,7 +1007,7 @@ module Org::Eclipse::Swt::Browser
                   self.attr_browser.dispose
                 end
                 
-                typesig { [Object] }
+                typesig { [Vararg.new(Object)] }
                 define_method :initialize do |*args|
                   super(*args)
                 end
@@ -1058,7 +1058,7 @@ module Org::Eclipse::Swt::Browser
           end
         end
         
-        typesig { [Object] }
+        typesig { [Vararg.new(Object)] }
         define_method :initialize do |*args|
           super(*args)
         end

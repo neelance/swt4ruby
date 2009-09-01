@@ -145,7 +145,7 @@ module Org::Eclipse::Swt::Custom
           layout
         end
         
-        typesig { [Object] }
+        typesig { [Vararg.new(Object)] }
         define_method :initialize do |*args|
           super(*args)
         end
@@ -163,7 +163,7 @@ module Org::Eclipse::Swt::Custom
           layout
         end
         
-        typesig { [Object] }
+        typesig { [Vararg.new(Object)] }
         define_method :initialize do |*args|
           super(*args)
         end
@@ -200,7 +200,7 @@ module Org::Eclipse::Swt::Custom
           e.attr_display.async_exec(@runnable)
         end
         
-        typesig { [Object] }
+        typesig { [Vararg.new(Object)] }
         define_method :initialize do |*args|
           @runnable = nil
           super(*args)
@@ -222,7 +222,7 @@ module Org::Eclipse::Swt::Custom
               self.attr_editor.set_visible(true)
             end
             
-            typesig { [Object] }
+            typesig { [Vararg.new(Object)] }
             define_method :initialize do |*args|
               super(*args)
             end

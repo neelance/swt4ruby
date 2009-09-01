@@ -155,7 +155,7 @@ module Org::Eclipse::Swt::Custom
           on_drag_sash(e)
         end
         
-        typesig { [Object] }
+        typesig { [Vararg.new(Object)] }
         define_method :initialize do |*args|
           super(*args)
         end

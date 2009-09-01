@@ -137,7 +137,7 @@ module Org::Eclipse::Swt::Ole::Win32
           return _release
         end
         
-        typesig { [Object] }
+        typesig { [Vararg.new(Object)] }
         define_method :initialize do |*args|
           super(*args)
         end
@@ -187,7 +187,7 @@ module Org::Eclipse::Swt::Ole::Win32
           return _on_request_edit(RJava.cast_to_int(args[0]))
         end
         
-        typesig { [Object] }
+        typesig { [Vararg.new(Object)] }
         define_method :initialize do |*args|
           super(*args)
         end

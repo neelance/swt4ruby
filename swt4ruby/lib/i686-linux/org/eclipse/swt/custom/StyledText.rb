@@ -1945,7 +1945,7 @@ module Org::Eclipse::Swt::Custom
             set_caret_location(new_caret_pos, direction)
           end
           
-          typesig { [Object] }
+          typesig { [Vararg.new(Object)] }
           define_method :initialize do |*args|
             super(*args)
           end
@@ -2844,7 +2844,7 @@ module Org::Eclipse::Swt::Custom
             end
           end
           
-          typesig { [Object] }
+          typesig { [Vararg.new(Object)] }
           define_method :initialize do |*args|
             super(*args)
           end
@@ -2869,7 +2869,7 @@ module Org::Eclipse::Swt::Custom
               end
             end
             
-            typesig { [Object] }
+            typesig { [Vararg.new(Object)] }
             define_method :initialize do |*args|
               super(*args)
             end
@@ -2896,7 +2896,7 @@ module Org::Eclipse::Swt::Custom
                 end
               end
               
-              typesig { [Object] }
+              typesig { [Vararg.new(Object)] }
               define_method :initialize do |*args|
                 super(*args)
               end
@@ -2923,7 +2923,7 @@ module Org::Eclipse::Swt::Custom
                   end
                 end
                 
-                typesig { [Object] }
+                typesig { [Vararg.new(Object)] }
                 define_method :initialize do |*args|
                   super(*args)
                 end
@@ -5813,7 +5813,7 @@ module Org::Eclipse::Swt::Custom
           handle_text_set(event)
         end
         
-        typesig { [Object] }
+        typesig { [Vararg.new(Object)] }
         define_method :initialize do |*args|
           super(*args)
         end
@@ -5859,7 +5859,7 @@ module Org::Eclipse::Swt::Custom
           end
         end
         
-        typesig { [Object] }
+        typesig { [Vararg.new(Object)] }
         define_method :initialize do |*args|
           super(*args)
         end
@@ -5893,7 +5893,7 @@ module Org::Eclipse::Swt::Custom
           end
         end
         
-        typesig { [Object] }
+        typesig { [Vararg.new(Object)] }
         define_method :initialize do |*args|
           super(*args)
         end
@@ -5912,7 +5912,7 @@ module Org::Eclipse::Swt::Custom
             handle_vertical_scroll(event)
           end
           
-          typesig { [Object] }
+          typesig { [Vararg.new(Object)] }
           define_method :initialize do |*args|
             super(*args)
           end
@@ -5932,7 +5932,7 @@ module Org::Eclipse::Swt::Custom
             handle_horizontal_scroll(event)
           end
           
-          typesig { [Object] }
+          typesig { [Vararg.new(Object)] }
           define_method :initialize do |*args|
             super(*args)
           end
@@ -6588,7 +6588,7 @@ module Org::Eclipse::Swt::Custom
           e.attr_result = shortcut
         end
         
-        typesig { [Object] }
+        typesig { [Vararg.new(Object)] }
         define_method :initialize do |*args|
           super(*args)
         end
@@ -6613,7 +6613,7 @@ module Org::Eclipse::Swt::Custom
           e.attr_length = selection.attr_y
         end
         
-        typesig { [Object] }
+        typesig { [Vararg.new(Object)] }
         define_method :initialize do |*args|
           super(*args)
         end
@@ -6654,7 +6654,7 @@ module Org::Eclipse::Swt::Custom
           e.attr_result = @local_class_parent.get_text
         end
         
-        typesig { [Object] }
+        typesig { [Vararg.new(Object)] }
         define_method :initialize do |*args|
           super(*args)
         end
@@ -6672,7 +6672,7 @@ module Org::Eclipse::Swt::Custom
           accessible.set_focus(ACC::CHILDID_SELF)
         end
         
-        typesig { [Object] }
+        typesig { [Vararg.new(Object)] }
         define_method :initialize do |*args|
           super(*args)
         end

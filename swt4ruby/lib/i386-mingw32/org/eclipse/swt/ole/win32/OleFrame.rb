@@ -204,7 +204,7 @@ module Org::Eclipse::Swt::Ole::Win32
           end
         end
         
-        typesig { [Object] }
+        typesig { [Vararg.new(Object)] }
         define_method :initialize do |*args|
           super(*args)
         end
@@ -280,7 +280,7 @@ module Org::Eclipse::Swt::Ole::Win32
             display.timer_exec(time, timer[0])
           end
           
-          typesig { [Object] }
+          typesig { [Vararg.new(Object)] }
           define_method :initialize do |*args|
             super(*args)
           end
@@ -326,7 +326,7 @@ module Org::Eclipse::Swt::Ole::Win32
             end
           end
           
-          typesig { [Object] }
+          typesig { [Vararg.new(Object)] }
           define_method :initialize do |*args|
             super(*args)
           end
@@ -502,7 +502,7 @@ module Org::Eclipse::Swt::Ole::Win32
           return _release
         end
         
-        typesig { [Object] }
+        typesig { [Vararg.new(Object)] }
         define_method :initialize do |*args|
           super(*args)
         end
@@ -610,7 +610,7 @@ module Org::Eclipse::Swt::Ole::Win32
           return _translate_accelerator(args[0], RJava.cast_to_int(args[1]))
         end
         
-        typesig { [Object] }
+        typesig { [Vararg.new(Object)] }
         define_method :initialize do |*args|
           super(*args)
         end

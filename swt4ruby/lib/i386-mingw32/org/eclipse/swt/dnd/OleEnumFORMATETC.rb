@@ -96,7 +96,7 @@ module Org::Eclipse::Swt::Dnd
           return _release
         end
         
-        typesig { [Object] }
+        typesig { [Vararg.new(Object)] }
         define_method :initialize do |*args|
           super(*args)
         end
@@ -154,7 +154,7 @@ module Org::Eclipse::Swt::Dnd
           return _reset
         end
         
-        typesig { [Object] }
+        typesig { [Vararg.new(Object)] }
         define_method :initialize do |*args|
           super(*args)
         end

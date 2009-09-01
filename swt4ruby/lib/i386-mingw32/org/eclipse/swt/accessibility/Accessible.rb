@@ -317,7 +317,7 @@ module Org::Eclipse::Swt::Accessibility
           return put_acc_value(args[0], args[1])
         end
         
-        typesig { [Object] }
+        typesig { [Vararg.new(Object)] }
         define_method :initialize do |*args|
           super(*args)
         end
@@ -408,7 +408,7 @@ module Org::Eclipse::Swt::Accessibility
           return _clone(args[0])
         end
         
-        typesig { [Object] }
+        typesig { [Vararg.new(Object)] }
         define_method :initialize do |*args|
           super(*args)
         end

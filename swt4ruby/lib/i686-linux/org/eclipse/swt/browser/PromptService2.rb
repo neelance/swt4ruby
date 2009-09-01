@@ -91,7 +91,7 @@ module Org::Eclipse::Swt::Browser
           return _release
         end
         
-        typesig { [Object] }
+        typesig { [Vararg.new(Object)] }
         define_method :initialize do |*args|
           super(*args)
         end
@@ -190,7 +190,7 @@ module Org::Eclipse::Swt::Browser
           return _select(args[0], args[1], args[2], RJava.cast_to_int(args[3]), args[4], args[5], args[6])
         end
         
-        typesig { [Object] }
+        typesig { [Vararg.new(Object)] }
         define_method :initialize do |*args|
           super(*args)
         end
@@ -305,7 +305,7 @@ module Org::Eclipse::Swt::Browser
           return _async_prompt_auth(args[0], args[1], args[2], args[3], RJava.cast_to_int(args[4]), args[5], args[6], args[7], args[8])
         end
         
-        typesig { [Object] }
+        typesig { [Vararg.new(Object)] }
         define_method :initialize do |*args|
           super(*args)
         end
