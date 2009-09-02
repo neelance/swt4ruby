@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2008 IBM Corporation and others.
+ * Copyright (c) 2000, 2009 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -12,9 +12,8 @@ package org.eclipse.swt.opengl;
 
 import org.eclipse.swt.*;
 import org.eclipse.swt.widgets.*;
-import org.eclipse.swt.graphics.*;
-import org.eclipse.swt.internal.carbon.*;
-import org.eclipse.swt.internal.opengl.carbon.*;
+import org.eclipse.swt.internal.cocoa.*;
+import org.eclipse.swt.opengl.GLData;
 
 /**
  * GLCanvas is a widget capable of displaying OpenGL content.
@@ -26,11 +25,12 @@ import org.eclipse.swt.internal.opengl.carbon.*;
  * @since 3.2
  */
 
-public class GLCanvas extends Canvas {	
-	int context;
-	int pixelFormat;
+public class GLCanvas extends Canvas {
+	NSOpenGLContext context;
+	NSOpenGLPixelFormat pixelFormat;
+	
 	static final int MAX_ATTRIBUTES = 32;
-	static final String RESET_VISIBLE_REGION = "org.eclipse.swt.internal.resetVisibleRegion";
+	static final String GLCONTEXT_KEY = "org.eclipse.swt.internal.cocoa.glcontext"; //$NON-NLS-1$
 
 /**
  * Create a GLCanvas widget using the attributes described in the GLData
@@ -48,121 +48,98 @@ public class GLCanvas extends Canvas {
 public GLCanvas (Composite parent, int style, GLData data) {
 	super (parent, style);
 	if (data == null) SWT.error (SWT.ERROR_NULL_ARGUMENT);
-	int aglAttrib [] = new int [MAX_ATTRIBUTES];
+	int attrib [] = new int [MAX_ATTRIBUTES];
 	int pos = 0;
-	aglAttrib [pos++] = AGL.AGL_RGBA;
-	if (data.doubleBuffer) aglAttrib [pos++] = AGL.AGL_DOUBLEBUFFER;
-	if (data.stereo) aglAttrib [pos++] = AGL.AGL_STEREO;
-	if (data.redSize > 0) {
-		aglAttrib [pos++] = AGL.AGL_RED_SIZE;
-		aglAttrib [pos++] = data.redSize;
+
+	if (data.doubleBuffer) attrib [pos++] = OS.NSOpenGLPFADoubleBuffer;
+	
+	if (data.stereo) attrib [pos++] = OS.NSOpenGLPFAStereo;
+
+	/*
+	 * Feature in Cocoa: NSOpenGL/CoreOpenGL only supports specifying the total number of bits
+	 * in the size of the color component. If specified, the color size is the sum of the red, green
+	 * and blue values in the GLData. 
+	 */
+	if ((data.redSize + data.blueSize + data.greenSize) > 0) {
+		attrib [pos++] = OS.NSOpenGLPFAColorSize;
+		attrib [pos++] = data.redSize + data.greenSize + data.blueSize;
 	}
-	if (data.greenSize > 0) {
-		aglAttrib [pos++] = AGL.AGL_GREEN_SIZE;
-		aglAttrib [pos++] = data.greenSize;
-	}
-	if (data.blueSize > 0) {
-		aglAttrib [pos++] = AGL.AGL_BLUE_SIZE;
-		aglAttrib [pos++] = data.blueSize;
-	}
+	
 	if (data.alphaSize > 0) {
-		aglAttrib [pos++] = AGL.AGL_ALPHA_SIZE;
-		aglAttrib [pos++] = data.alphaSize;
+		attrib [pos++] = OS.NSOpenGLPFAAlphaSize;
+		attrib [pos++] = data.alphaSize;
 	}
+	
 	if (data.depthSize > 0) {
-		aglAttrib [pos++] = AGL.AGL_DEPTH_SIZE;
-		aglAttrib [pos++] = data.depthSize;
+		attrib [pos++] = OS.NSOpenGLPFADepthSize;
+		attrib [pos++] = data.depthSize;
 	}
+	
 	if (data.stencilSize > 0) {
-		aglAttrib [pos++] = AGL.AGL_STENCIL_SIZE;
-		aglAttrib [pos++] = data.stencilSize;
+		attrib [pos++] = OS.NSOpenGLPFAStencilSize;
+		attrib [pos++] = data.stencilSize;
 	}
-	if (data.accumRedSize > 0) {
-		aglAttrib [pos++] = AGL.AGL_ACCUM_RED_SIZE;
-		aglAttrib [pos++] = data.accumRedSize;
+	
+	/*
+	 * Feature in Cocoa: NSOpenGL/CoreOpenGL only supports specifying the total number of bits
+	 * in the size of the color accumulator component. If specified, the color size is the sum of the red, green,
+	 * blue and alpha accum values in the GLData. 
+	 */
+	if ((data.accumRedSize + data.accumBlueSize + data.accumGreenSize) > 0) {
+		attrib [pos++] = OS.NSOpenGLPFAAccumSize;
+		attrib [pos++] = data.accumRedSize + data.accumGreenSize + data.accumBlueSize + data.accumAlphaSize;
 	}
-	if (data.accumGreenSize > 0) {
-		aglAttrib [pos++] = AGL.AGL_ACCUM_GREEN_SIZE;
-		aglAttrib [pos++] = data.accumGreenSize;
-	}
-	if (data.accumBlueSize > 0) {
-		aglAttrib [pos++] = AGL.AGL_ACCUM_BLUE_SIZE;
-		aglAttrib [pos++] = data.accumBlueSize;
-	}
-	if (data.accumAlphaSize > 0) {
-		aglAttrib [pos++] = AGL.AGL_ACCUM_ALPHA_SIZE;
-		aglAttrib [pos++] = data.accumAlphaSize;
-	}
+	
 	if (data.sampleBuffers > 0) {
-		aglAttrib [pos++] = AGL.AGL_SAMPLE_BUFFERS_ARB;
-		aglAttrib [pos++] = data.sampleBuffers;
+		attrib [pos++] = OS.NSOpenGLPFASampleBuffers;
+		attrib [pos++] = data.sampleBuffers;
 	}
+	
 	if (data.samples > 0) {
-		aglAttrib [pos++] = AGL.AGL_SAMPLES_ARB;
-		aglAttrib [pos++] = data.samples;
+		attrib [pos++] = OS.NSOpenGLPFASamples;
+		attrib [pos++] = data.samples;
 	}
-	aglAttrib [pos++] = AGL.AGL_NONE;
-	pixelFormat = AGL.aglChoosePixelFormat (0, 0, aglAttrib);
-	if (pixelFormat == 0) {		
+	
+	attrib [pos++] = 0;
+	
+	pixelFormat = (NSOpenGLPixelFormat)new NSOpenGLPixelFormat().alloc();
+	
+	if (pixelFormat == null) {		
 		dispose ();
 		SWT.error (SWT.ERROR_UNSUPPORTED_DEPTH);
 	}
-	//FIXME- share lists
-	//context = AGL.aglCreateContext (pixelFormat, share == null ? 0 : share.context);
-	context = AGL.aglCreateContext (pixelFormat, 0);
-	int window = OS.GetControlOwner (handle);
-	int port = OS.GetWindowPort (window);
-	AGL.aglSetDrawable (context, port);
-
+	pixelFormat.initWithAttributes(attrib);
+	
+	NSOpenGLContext ctx = data.shareContext != null ? data.shareContext.context : null;
+	context = (NSOpenGLContext) new NSOpenGLContext().alloc();
+	if (context == null) {		
+		dispose ();
+		SWT.error (SWT.ERROR_UNSUPPORTED_DEPTH);
+	}
+	context = context.initWithFormat(pixelFormat, ctx);
+	setData(GLCONTEXT_KEY, context);
+	NSNotificationCenter.defaultCenter().addObserver(view,  OS.sel_updateOpenGLContext_, OS.NSViewGlobalFrameDidChangeNotification, view);
+	
 	Listener listener = new Listener () {
 		public void handleEvent (Event event) {
 			switch (event.type) {
-			case SWT.Dispose:
-				AGL.aglDestroyContext (context);
-				AGL.aglDestroyPixelFormat (pixelFormat);
-				break;
+			
+				case SWT.Dispose:
+					setData(GLCONTEXT_KEY, null);
+					NSNotificationCenter.defaultCenter().removeObserver(view);
+					
+					if (context != null) {
+						context.clearDrawable();
+						context.release();
+					}
+					context = null;
+					if (pixelFormat != null) pixelFormat.release();
+					pixelFormat = null;
+					break;
 			}
 		}
 	};
 	addListener (SWT.Dispose, listener);
-	setData (RESET_VISIBLE_REGION, new Runnable() {
-		public void run() {
-			if (isDisposed ()) return;
-			fixBounds ();
-		}
-	});
-}
-
-void fixBounds () {
-	Rect bounds = new Rect ();
-	OS.GetControlBounds (handle, bounds);
-	int window = OS.GetControlOwner (handle);
-	int [] contentView = new int [1];
-	OS.HIViewFindByID (OS.HIViewGetRoot (window), OS.kHIViewWindowContentID (), contentView);
-	CGPoint pt = new CGPoint ();
-	OS.HIViewConvertPoint (pt, OS.HIViewGetSuperview (handle), contentView [0]);
-	bounds.left += (int) pt.x;
-	bounds.top += (int) pt.y;
-	bounds.right += (int) pt.x;
-	bounds.bottom += (int) pt.y;
-	int x = bounds.left;
-	int y = bounds.top;
-	int width = bounds.right - bounds.left;
-	int height = bounds.bottom - bounds.top;
-	int port = OS.GetWindowPort (window);
-	OS.GetPortBounds (port, bounds);
-	int [] glbounds = new int [4];
-	glbounds[0] = x;
-	glbounds[1] = bounds.bottom - bounds.top - y - height;
-	glbounds[2] = width;
-	glbounds[3] = height;
-	AGL.aglSetInteger (context, AGL.AGL_BUFFER_RECT, glbounds);
-	AGL.aglEnable (context, AGL.AGL_BUFFER_RECT);
-	GCData data = new GCData ();
-	int gc = internal_new_GC (data);
-	AGL.aglSetInteger (context, AGL.AGL_CLIP_REGION, data.visibleRgn);
-	AGL.aglEnable (context, AGL.AGL_CLIP_REGION);
-	internal_dispose_GC (gc, data);
 }
 
 /**
@@ -177,35 +154,50 @@ void fixBounds () {
 public GLData getGLData () {
 	checkWidget ();
 	GLData data = new GLData ();
-	int [] value = new int [1];
-	AGL.aglDescribePixelFormat (pixelFormat, AGL.AGL_DOUBLEBUFFER, value);
+	int /*long*/ [] value = new int /*long*/ [1];
+	pixelFormat.getValues(value, OS.NSOpenGLPFADoubleBuffer, 0);
 	data.doubleBuffer = value [0] != 0;
-	AGL.aglDescribePixelFormat (pixelFormat, AGL.AGL_STEREO, value);
+	pixelFormat.getValues(value, OS.NSOpenGLPFAStereo, 0);
 	data.stereo = value [0] != 0;
-	AGL.aglDescribePixelFormat (pixelFormat, AGL.AGL_RED_SIZE, value);
-	data.redSize = value [0];
-	AGL.aglDescribePixelFormat (pixelFormat, AGL.AGL_GREEN_SIZE, value);
-	data.greenSize = value [0];
-	AGL.aglDescribePixelFormat (pixelFormat, AGL.AGL_BLUE_SIZE, value);
-	data.blueSize = value [0];
-	AGL.aglDescribePixelFormat (pixelFormat, AGL.AGL_ALPHA_SIZE, value);
-	data.alphaSize = value [0];
-	AGL.aglDescribePixelFormat (pixelFormat, AGL.AGL_DEPTH_SIZE, value);
-	data.depthSize = value [0];
-	AGL.aglDescribePixelFormat (pixelFormat, AGL.AGL_STENCIL_SIZE, value);
-	data.stencilSize = value [0];
-	AGL.aglDescribePixelFormat (pixelFormat, AGL.AGL_ACCUM_RED_SIZE, value);
-	data.accumRedSize = value [0];
-	AGL.aglDescribePixelFormat (pixelFormat, AGL.AGL_ACCUM_GREEN_SIZE, value);
-	data.accumGreenSize = value [0];
-	AGL.aglDescribePixelFormat (pixelFormat, AGL.AGL_ACCUM_BLUE_SIZE, value);
-	data.accumBlueSize = value [0];
-	AGL.aglDescribePixelFormat (pixelFormat, AGL.AGL_ACCUM_ALPHA_SIZE, value);
-	data.accumAlphaSize = value [0];
-	AGL.aglDescribePixelFormat (pixelFormat, AGL.AGL_SAMPLE_BUFFERS_ARB, value);
-	data.sampleBuffers = value [0];
-	AGL.aglDescribePixelFormat (pixelFormat, AGL.AGL_SAMPLES_ARB, value);
-	data.samples = value [0];
+
+	pixelFormat.getValues(value, OS.NSOpenGLPFAAlphaSize, 0);
+	data.alphaSize = (int/*64*/)value [0];
+
+	/*
+	 * Feature in Cocoa: NSOpenGL/CoreOpenGL only supports specifying the total number of bits
+	 * in the size of the color component. For compatibility we split the color size less any alpha
+	 * into thirds and allocate a third to each color.
+	 */
+	pixelFormat.getValues(value, OS.NSOpenGLPFAColorSize, 0);
+
+	int colorSize = ((int/*64*/)(value[0] - data.alphaSize)) / 3;
+
+	data.redSize = colorSize;
+	data.greenSize = colorSize;
+	data.blueSize = colorSize;
+	
+	pixelFormat.getValues(value, OS.NSOpenGLPFADepthSize, 0);
+	data.depthSize = (int/*64*/)value [0];
+	pixelFormat.getValues(value, OS.NSOpenGLPFAStencilSize, 0);
+	data.stencilSize = (int/*64*/)value [0];
+	
+	/*
+	 * Feature(?) in Cocoa: NSOpenGL/CoreOpenGL doesn't support setting an accumulation buffer alpha, but
+	 * has an alpha if the color values for the accumulation buffer were set. Allocate the values evenly
+	 * in that case.
+	 */
+	pixelFormat.getValues(value, OS.NSOpenGLPFAAccumSize, 0);
+
+	int accumColorSize = (int/*64*/)(value[0]) / 4;	
+	data.accumRedSize = accumColorSize;
+	data.accumGreenSize = accumColorSize;
+	data.accumBlueSize = accumColorSize;
+	data.accumAlphaSize = accumColorSize;
+
+	pixelFormat.getValues(value, OS.NSOpenGLPFASampleBuffers, 0);
+	data.sampleBuffers = (int/*64*/)value [0];
+	pixelFormat.getValues(value, OS.NSOpenGLPFASamples, 0);
+	data.samples = (int/*64*/)value [0];
 	return data;
 }
 
@@ -222,7 +214,8 @@ public GLData getGLData () {
  */
 public boolean isCurrent () {
 	checkWidget ();
-	return AGL.aglGetCurrentContext () == context;
+	NSOpenGLContext current = NSOpenGLContext.currentContext();
+	return current != null && current.id == context.id;
 }
 
 /**
@@ -236,9 +229,7 @@ public boolean isCurrent () {
  */
 public void setCurrent () {
 	checkWidget ();
-	if (AGL.aglGetCurrentContext () != context) {
-		AGL.aglSetCurrentContext (context);
-	}
+	context.makeCurrentContext();
 }
 
 /**
@@ -251,6 +242,6 @@ public void setCurrent () {
  */
 public void swapBuffers () {
 	checkWidget ();
-	AGL.aglSwapBuffers (context);
+	context.flushBuffer();
 }
 }

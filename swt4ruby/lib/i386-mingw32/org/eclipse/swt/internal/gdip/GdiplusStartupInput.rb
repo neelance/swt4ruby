@@ -1,6 +1,6 @@
 require "rjava"
 
-# Copyright (c) 2000, 2006 IBM Corporation and others.
+# Copyright (c) 2000, 2008 IBM Corporation and others.
 # All rights reserved. This program and the accompanying materials
 # are made available under the terms of the Eclipse Public License v1.0
 # which accompanies this distribution, and is available at
@@ -16,6 +16,7 @@ module Org::Eclipse::Swt::Internal::Gdip
     }
   end
   
+  # @jniclass flags=cpp
   class GdiplusStartupInput 
     include_class_members GdiplusStartupInputImports
     
@@ -25,6 +26,7 @@ module Org::Eclipse::Swt::Internal::Gdip
     alias_method :attr_gdiplus_version=, :gdiplus_version=
     undef_method :gdiplus_version=
     
+    # @field cast=(DebugEventProc)
     # long
     attr_accessor :debug_event_callback
     alias_method :attr_debug_event_callback, :debug_event_callback
@@ -32,12 +34,14 @@ module Org::Eclipse::Swt::Internal::Gdip
     alias_method :attr_debug_event_callback=, :debug_event_callback=
     undef_method :debug_event_callback=
     
+    # @field cast=(BOOL)
     attr_accessor :suppress_background_thread
     alias_method :attr_suppress_background_thread, :suppress_background_thread
     undef_method :suppress_background_thread
     alias_method :attr_suppress_background_thread=, :suppress_background_thread=
     undef_method :suppress_background_thread=
     
+    # @field cast=(BOOL)
     attr_accessor :suppress_external_codecs
     alias_method :attr_suppress_external_codecs, :suppress_external_codecs
     undef_method :suppress_external_codecs

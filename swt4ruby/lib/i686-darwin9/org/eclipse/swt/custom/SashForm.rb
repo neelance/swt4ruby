@@ -1,6 +1,6 @@
 require "rjava"
 
-# Copyright (c) 2000, 2008 IBM Corporation and others.
+# Copyright (c) 2000, 2009 IBM Corporation and others.
 # All rights reserved. This program and the accompanying materials
 # are made available under the terms of the Eclipse Public License v1.0
 # which accompanies this distribution, and is available at
@@ -172,6 +172,16 @@ module Org::Eclipse::Swt::Custom
         return style & mask
       end
     }
+    
+    typesig { [] }
+    def create_sash
+      sash = Sash.new(self, @sash_style)
+      sash.set_background(@background)
+      sash.set_foreground(@foreground)
+      sash.set_tool_tip_text(get_tool_tip_text)
+      sash.add_listener(SWT::Selection, @sash_listener)
+      return sash
+    end
     
     typesig { [] }
     # Returns SWT.HORIZONTAL if the controls in the SashForm are laid out side by side
@@ -394,10 +404,7 @@ module Org::Eclipse::Swt::Custom
       i = 0
       while i < @sashes.attr_length
         @sashes[i].dispose
-        @sashes[i] = Sash.new(self, @sash_style)
-        @sashes[i].set_background(@background)
-        @sashes[i].set_foreground(@foreground)
-        @sashes[i].add_listener(SWT::Selection, @sash_listener)
+        @sashes[i] = create_sash
         i += 1
       end
       layout(false)
@@ -499,6 +506,16 @@ module Org::Eclipse::Swt::Custom
       end
       @sash_width = width
       layout(false)
+    end
+    
+    typesig { [String] }
+    def set_tool_tip_text(string)
+      super(string)
+      i = 0
+      while i < @sashes.attr_length
+        @sashes[i].set_tool_tip_text(string)
+        i += 1
+      end
     end
     
     typesig { [Array.typed(::Java::Int)] }

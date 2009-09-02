@@ -1,6 +1,6 @@
 require "rjava"
 
-# Copyright (c) 2000, 2008 IBM Corporation and others.
+# Copyright (c) 2000, 2009 IBM Corporation and others.
 # All rights reserved. This program and the accompanying materials
 # are made available under the terms of the Eclipse Public License v1.0
 # which accompanies this distribution, and is available at
@@ -13,7 +13,7 @@ module Org::Eclipse::Swt::Widgets
     class_module.module_eval {
       include ::Java::Lang
       include ::Org::Eclipse::Swt::Widgets
-      include_const ::Org::Eclipse::Swt::Internal::Carbon, :OS
+      include ::Org::Eclipse::Swt::Internal::Cocoa
       include ::Org::Eclipse::Swt
       include ::Org::Eclipse::Swt::Events
       include ::Org::Eclipse::Swt::Graphics
@@ -40,6 +40,7 @@ module Org::Eclipse::Swt::Widgets
   # @see <a href="http://www.eclipse.org/swt/snippets/#scale">Scale snippets</a>
   # @see <a href="http://www.eclipse.org/swt/examples.php">SWT Example: ControlExample</a>
   # @see <a href="http://www.eclipse.org/swt/">Sample code and further information</a>
+  # @noextend This class is not intended to be subclassed by clients.
   class Scale < ScaleImports.const_get :Control
     include_class_members ScaleImports
     
@@ -91,16 +92,6 @@ module Org::Eclipse::Swt::Widgets
       @page_increment = 10
     end
     
-    typesig { [::Java::Int, ::Java::Int] }
-    def action_proc(the_control, part_code)
-      result = super(the_control, part_code)
-      if ((result).equal?(OS.attr_no_err))
-        return result
-      end
-      send_event(SWT::Selection)
-      return result
-    end
-    
     typesig { [SelectionListener] }
     # Adds the listener to the collection of listeners who will
     # be notified when the user changes the receiver's value, by sending
@@ -143,17 +134,16 @@ module Org::Eclipse::Swt::Widgets
     typesig { [::Java::Int, ::Java::Int, ::Java::Boolean] }
     def compute_size(w_hint, h_hint, changed)
       check_widget
-      width = 0
-      height = 0
+      widget = self.attr_view
+      # double
+      thickness = widget.knob_thickness
+      width = DEFAULT_WIDTH
+      height = DEFAULT_HEIGHT
       if (!((self.attr_style & SWT::HORIZONTAL)).equal?(0))
-        out_metric = Array.typed(::Java::Int).new(1) { 0 }
-        OS._get_theme_metric(OS.attr_k_theme_metric_hslider_height, out_metric)
-        height = out_metric[0]
+        height = RJava.cast_to_int(Math.ceil(thickness))
         width = height * 10
       else
-        out_metric = Array.typed(::Java::Int).new(1) { 0 }
-        OS._get_theme_metric(OS.attr_k_theme_metric_vslider_width, out_metric)
-        width = out_metric[0]
+        width = RJava.cast_to_int(Math.ceil(thickness))
         height = width * 10
       end
       if (!(w_hint).equal?(SWT::DEFAULT))
@@ -168,15 +158,23 @@ module Org::Eclipse::Swt::Widgets
     typesig { [] }
     def create_handle
       self.attr_state |= THEME_BACKGROUND
-      action_proc = self.attr_display.attr_action_proc
-      out_control = Array.typed(::Java::Int).new(1) { 0 }
-      window = OS._get_control_owner(self.attr_parent.attr_handle)
-      value = !((self.attr_style & SWT::VERTICAL)).equal?(0) ? 100 : 0
-      OS._create_slider_control(window, nil, value, 0, 100, OS.attr_k_control_slider_does_not_point, RJava.cast_to_short(0), true, action_proc, out_control)
-      if ((out_control[0]).equal?(0))
-        error(SWT::ERROR_NO_HANDLES)
-      end
-      self.attr_handle = out_control[0]
+      widget = SWTSlider.new.alloc
+      widget.init
+      widget.set_max_value(100)
+      widget.set_target(widget)
+      widget.set_action(OS.attr_sel_send_selection)
+      self.attr_view = widget
+    end
+    
+    typesig { [] }
+    def default_nsfont
+      return self.attr_display.attr_slider_font
+    end
+    
+    typesig { [] }
+    def deregister
+      super
+      self.attr_display.remove_widget((self.attr_view).cell)
     end
     
     typesig { [] }
@@ -206,7 +204,7 @@ module Org::Eclipse::Swt::Widgets
     # </ul>
     def get_maximum
       check_widget
-      return OS._get_control32bit_maximum(self.attr_handle)
+      return RJava.cast_to_int((self.attr_view).max_value)
     end
     
     typesig { [] }
@@ -220,7 +218,7 @@ module Org::Eclipse::Swt::Widgets
     # </ul>
     def get_minimum
       check_widget
-      return OS._get_control32bit_minimum(self.attr_handle)
+      return RJava.cast_to_int((self.attr_view).min_value)
     end
     
     typesig { [] }
@@ -250,38 +248,13 @@ module Org::Eclipse::Swt::Widgets
     # </ul>
     def get_selection
       check_widget
-      value = OS._get_control32bit_value(self.attr_handle)
-      if (!((self.attr_style & SWT::VERTICAL)).equal?(0))
-        minimum = OS._get_control32bit_minimum(self.attr_handle)
-        maximum = OS._get_control32bit_maximum(self.attr_handle)
-        value = maximum - value + minimum
-      end
-      return value
+      return RJava.cast_to_int((self.attr_view).double_value)
     end
     
-    typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
-    def k_event_mouse_down(next_handler, the_event, user_data)
-      result = super(next_handler, the_event, user_data)
-      if ((result).equal?(OS.attr_no_err))
-        return result
-      end
-      # Bug in the Macintosh.  For some reason, when the slider
-      # is not ghosted, if the slider has keyboard focus, the
-      # user will not be able to drag the thumb to the maximum value
-      # of the slider.  The fix is to clear the focus temporarily
-      # and restore it after the thumb tracking is complety.
-      if (!has_focus)
-        return result
-      end
-      self.attr_display.attr_ignore_focus = true
-      window = OS._get_control_owner(self.attr_handle)
-      OS._clear_keyboard_focus(window)
-      result = OS._call_next_event_handler(next_handler, the_event)
-      if (!is_disposed)
-        OS._set_keyboard_focus(window, self.attr_handle, RJava.cast_to_short(focus_part))
-      end
-      self.attr_display.attr_ignore_focus = false
-      return result
+    typesig { [] }
+    def register
+      super
+      self.attr_display.add_widget((self.attr_view).cell, self)
     end
     
     typesig { [SelectionListener] }
@@ -310,6 +283,14 @@ module Org::Eclipse::Swt::Widgets
       end
       self.attr_event_table.unhook(SWT::Selection, listener)
       self.attr_event_table.unhook(SWT::DefaultSelection, listener)
+    end
+    
+    typesig { [] }
+    def send_selection
+      curr_event = NSApplication.shared_application.current_event
+      if (!(curr_event.type).equal?(OS::NSLeftMouseUp))
+        post_event(SWT::Selection)
+      end
     end
     
     typesig { [::Java::Int] }
@@ -346,13 +327,11 @@ module Org::Eclipse::Swt::Widgets
     # </ul>
     def set_maximum(value)
       check_widget
-      if (value < 0)
+      minimum = RJava.cast_to_int((self.attr_view).min_value)
+      if (value <= minimum)
         return
       end
-      minimum = OS._get_control32bit_minimum(self.attr_handle)
-      if (value > minimum)
-        OS._set_control32bit_maximum(self.attr_handle, value)
-      end
+      (self.attr_view).set_max_value(value)
     end
     
     typesig { [::Java::Int] }
@@ -369,13 +348,11 @@ module Org::Eclipse::Swt::Widgets
     # </ul>
     def set_minimum(value)
       check_widget
-      if (value < 0)
+      maximum = RJava.cast_to_int((self.attr_view).max_value)
+      if (!(0 <= value && value < maximum))
         return
       end
-      maximum = OS._get_control32bit_maximum(self.attr_handle)
-      if (value < maximum)
-        OS._set_control32bit_minimum(self.attr_handle, value)
-      end
+      (self.attr_view).set_min_value(value)
     end
     
     typesig { [::Java::Int] }
@@ -410,12 +387,7 @@ module Org::Eclipse::Swt::Widgets
     # </ul>
     def set_selection(value)
       check_widget
-      if (!((self.attr_style & SWT::VERTICAL)).equal?(0))
-        minimum = OS._get_control32bit_minimum(self.attr_handle)
-        maximum = OS._get_control32bit_maximum(self.attr_handle)
-        value = Math.min(maximum, Math.max(minimum, maximum - value + minimum))
-      end
-      OS._set_control32bit_value(self.attr_handle, value)
+      (self.attr_view).set_double_value(value)
     end
     
     private

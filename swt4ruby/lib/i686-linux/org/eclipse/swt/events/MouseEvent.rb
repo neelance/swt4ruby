@@ -43,8 +43,8 @@ module Org::Eclipse::Swt::Events
     alias_method :attr_button=, :button=
     undef_method :button=
     
-    # the state of the keyboard modifier keys at the time
-    # the event was generated
+    # the state of the keyboard modifier keys and mouse masks
+    # at the time the event was generated.
     attr_accessor :state_mask
     alias_method :attr_state_mask, :state_mask
     undef_method :state_mask

@@ -1,6 +1,6 @@
 require "rjava"
 
-# Copyright (c) 2000, 2008 IBM Corporation and others.
+# Copyright (c) 2000, 2009 IBM Corporation and others.
 # All rights reserved. This program and the accompanying materials
 # are made available under the terms of the Eclipse Public License v1.0
 # which accompanies this distribution, and is available at
@@ -16,12 +16,7 @@ module Org::Eclipse::Swt::Widgets
       include ::Org::Eclipse::Swt
       include ::Org::Eclipse::Swt::Events
       include ::Org::Eclipse::Swt::Graphics
-      include_const ::Org::Eclipse::Swt::Internal::Carbon, :ControlEditTextSelectionRec
-      include_const ::Org::Eclipse::Swt::Internal::Carbon, :MenuTrackingData
-      include_const ::Org::Eclipse::Swt::Internal::Carbon, :OS
-      include_const ::Org::Eclipse::Swt::Internal::Carbon, :CFRange
-      include_const ::Org::Eclipse::Swt::Internal::Carbon, :CGRect
-      include_const ::Org::Eclipse::Swt::Internal::Carbon, :Rect
+      include ::Org::Eclipse::Swt::Internal::Cocoa
     }
   end
   
@@ -61,14 +56,9 @@ module Org::Eclipse::Swt::Widgets
   # @see <a href="http://www.eclipse.org/swt/snippets/#combo">Combo snippets</a>
   # @see <a href="http://www.eclipse.org/swt/examples.php">SWT Example: ControlExample</a>
   # @see <a href="http://www.eclipse.org/swt/">Sample code and further information</a>
+  # @noextend This class is not intended to be subclassed by clients.
   class Combo < ComboImports.const_get :Composite
     include_class_members ComboImports
-    
-    attr_accessor :menu_handle
-    alias_method :attr_menu_handle, :menu_handle
-    undef_method :menu_handle
-    alias_method :attr_menu_handle=, :menu_handle=
-    undef_method :menu_handle=
     
     attr_accessor :text_limit
     alias_method :attr_text_limit, :text_limit
@@ -76,17 +66,29 @@ module Org::Eclipse::Swt::Widgets
     alias_method :attr_text_limit=, :text_limit=
     undef_method :text_limit=
     
-    attr_accessor :last_text
-    alias_method :attr_last_text, :last_text
-    undef_method :last_text
-    alias_method :attr_last_text=, :last_text=
-    undef_method :last_text=
+    attr_accessor :receiving_focus
+    alias_method :attr_receiving_focus, :receiving_focus
+    undef_method :receiving_focus
+    alias_method :attr_receiving_focus=, :receiving_focus=
+    undef_method :receiving_focus=
     
-    attr_accessor :selection
-    alias_method :attr_selection, :selection
-    undef_method :selection
-    alias_method :attr_selection=, :selection=
-    undef_method :selection=
+    attr_accessor :ignore_verify
+    alias_method :attr_ignore_verify, :ignore_verify
+    undef_method :ignore_verify
+    alias_method :attr_ignore_verify=, :ignore_verify=
+    undef_method :ignore_verify=
+    
+    attr_accessor :ignore_selection
+    alias_method :attr_ignore_selection, :ignore_selection
+    undef_method :ignore_selection
+    alias_method :attr_ignore_selection=, :ignore_selection=
+    undef_method :ignore_selection=
+    
+    attr_accessor :selection_range
+    alias_method :attr_selection_range, :selection_range
+    undef_method :selection_range
+    alias_method :attr_selection_range=, :selection_range=
+    undef_method :selection_range=
     
     class_module.module_eval {
       # These values can be different on different platforms.
@@ -95,9 +97,6 @@ module Org::Eclipse::Swt::Widgets
       when_class_loaded do
         const_set :LIMIT, 0x7fffffff
       end
-      
-      const_set_lazy(:AX_ATTRIBUTES) { Array.typed(String).new([OS.attr_k_axvalue_attribute, OS.attr_k_axnumber_of_characters_attribute, OS.attr_k_axselected_text_attribute, OS.attr_k_axselected_text_range_attribute, OS.attr_k_axstring_for_range_parameterized_attribute, ]) }
-      const_attr_reader  :AX_ATTRIBUTES
     }
     
     typesig { [Composite, ::Java::Int] }
@@ -130,13 +129,13 @@ module Org::Eclipse::Swt::Widgets
     # @see Widget#checkSubclass
     # @see Widget#getStyle
     def initialize(parent, style)
-      @menu_handle = 0
       @text_limit = 0
-      @last_text = nil
-      @selection = nil
+      @receiving_focus = false
+      @ignore_verify = false
+      @ignore_selection = false
+      @selection_range = nil
       super(parent, check_style(style))
       @text_limit = LIMIT
-      @last_text = ""
     end
     
     typesig { [String] }
@@ -158,26 +157,21 @@ module Org::Eclipse::Swt::Widgets
       if ((string).nil?)
         error(SWT::ERROR_NULL_ARGUMENT)
       end
-      buffer = CharArray.new(string.length)
-      string.get_chars(0, buffer.attr_length, buffer, 0)
-      ptr = OS._cfstring_create_with_characters(OS.attr_k_cfallocator_default, buffer, buffer.attr_length)
-      if ((ptr).equal?(0))
-        error(SWT::ERROR_ITEM_NOT_ADDED)
-      end
-      result = 0
+      str = NSString.string_with(string)
       if (!((self.attr_style & SWT::READ_ONLY)).equal?(0))
-        result = OS._append_menu_item_text_with_cfstring(@menu_handle, ptr, 0, 0, nil)
-        # Feature in the Macintosh.  Setting text that starts with "-" makes the
-        # menu item a separator.  The fix is to clear the separator attribute.
-        if (string.starts_with("-"))
-          OS._change_menu_item_attributes(@menu_handle, RJava.cast_to_short(OS._count_menu_items(@menu_handle)), 0, OS.attr_k_menu_item_attr_separator)
+        widget = self.attr_view
+        # long
+        selection = widget.index_of_selected_item
+        ns_menu = widget.menu
+        ns_item = NSMenuItem.new.alloc
+        ns_item.init_with_title(str, 0, NSString.string_with(""))
+        ns_menu.add_item(ns_item)
+        ns_item.release
+        if ((selection).equal?(-1))
+          widget.select_item_at_index(-1)
         end
       else
-        result = OS._hicombo_box_append_text_item(self.attr_handle, ptr, nil)
-      end
-      OS._cfrelease(ptr)
-      if (!(result).equal?(OS.attr_no_err))
-        error(SWT::ERROR_ITEM_NOT_ADDED)
+        (self.attr_view).add_item_with_object_value(str)
       end
     end
     
@@ -212,35 +206,21 @@ module Org::Eclipse::Swt::Widgets
       if (0 > index || index > count)
         error(SWT::ERROR_INVALID_RANGE)
       end
-      buffer = CharArray.new(string.length)
-      string.get_chars(0, buffer.attr_length, buffer, 0)
-      ptr = OS._cfstring_create_with_characters(OS.attr_k_cfallocator_default, buffer, buffer.attr_length)
-      if ((ptr).equal?(0))
-        error(SWT::ERROR_ITEM_NOT_ADDED)
-      end
-      result = 0
-      selection_index = -1
+      str = NSString.string_with(string)
       if (!((self.attr_style & SWT::READ_ONLY)).equal?(0))
-        selection_index = OS._get_control_value(self.attr_handle) - 1
-        result = OS._insert_menu_item_text_with_cfstring(@menu_handle, ptr, RJava.cast_to_short(index), 0, 0)
-        # Feature in the Macintosh.  Setting text that starts with "-" makes the
-        # menu item a separator.  The fix is to clear the separator attribute.
-        if (string.starts_with("-"))
-          OS._change_menu_item_attributes(@menu_handle, RJava.cast_to_short((index + 1)), 0, OS.attr_k_menu_item_attr_separator)
+        widget = self.attr_view
+        # long
+        selection = widget.index_of_selected_item
+        ns_menu = widget.menu
+        ns_item = NSMenuItem.new.alloc
+        ns_item.init_with_title(str, 0, NSString.string_with(""))
+        ns_menu.insert_item(ns_item, index)
+        ns_item.release
+        if ((selection).equal?(-1))
+          widget.select_item_at_index(-1)
         end
       else
-        result = OS._hicombo_box_insert_text_item_at_index(self.attr_handle, index, ptr)
-      end
-      OS._cfrelease(ptr)
-      if (!(result).equal?(OS.attr_no_err))
-        error(SWT::ERROR_ITEM_NOT_ADDED)
-      end
-      # When inserting an item into a READ_ONLY combo at or above the selected
-      # index neither the selection index nor the text get updated. Fix is to
-      # update the selection index to be sure the displayed item matches the
-      # selected index.
-      if (selection_index >= index)
-        OS._set_control32bit_value(self.attr_handle, selection_index + 2)
+        (self.attr_view).insert_item_with_object_value(str, index)
       end
     end
     
@@ -334,22 +314,12 @@ module Org::Eclipse::Swt::Widgets
     end
     
     typesig { [::Java::Int, ::Java::Int] }
-    def call_focus_event_handler(next_handler, the_event)
-      part = Array.typed(::Java::Short).new(1) { 0 }
-      if (((self.attr_style & SWT::READ_ONLY)).equal?(0))
-        OS._get_event_parameter(the_event, OS.attr_k_event_param_control_part, OS.attr_type_control_part_code, nil, 2, nil, part)
-        if ((part[0]).equal?(OS.attr_k_control_focus_no_part))
-          @selection = ControlEditTextSelectionRec.new
-          OS._get_control_data(self.attr_handle, RJava.cast_to_short(OS.attr_k_control_entire_control), OS.attr_k_control_edit_text_selection_tag, 4, @selection, nil)
-        end
-      end
-      result = super(next_handler, the_event)
-      if (((self.attr_style & SWT::READ_ONLY)).equal?(0))
-        if (!(part[0]).equal?(OS.attr_k_control_focus_no_part) && !(@selection).nil?)
-          OS._set_control_data(self.attr_handle, RJava.cast_to_short(OS.attr_k_control_entire_control), OS.attr_k_control_edit_text_selection_tag, 4, @selection)
-          @selection = nil
-        end
-      end
+    # long
+    # long
+    def become_first_responder(id, sel)
+      @receiving_focus = true
+      result = super(id, sel)
+      @receiving_focus = false
       return result
     end
     
@@ -380,42 +350,6 @@ module Org::Eclipse::Swt::Widgets
         return style
       end
     }
-    
-    typesig { [] }
-    def check_selection
-      if (!((self.attr_style & SWT::READ_ONLY)).equal?(0))
-        return
-      end
-      new_text = get_text
-      if ((new_text == @last_text))
-        return
-      end
-      if (hooks(SWT::Verify) || filters(SWT::Verify))
-        set_text(@last_text, false)
-        new_text = RJava.cast_to_string(verify_text(new_text, 0, @last_text.length, nil))
-        if ((new_text).nil?)
-          return
-        end
-        set_text(new_text, false)
-      else
-        @last_text = new_text
-      end
-      send_event(SWT::Modify)
-      if (is_disposed)
-        return
-      end
-      index = index_of(new_text)
-      if (!(index).equal?(-1))
-        post_event(SWT::Selection)
-      end
-      # Send value changed notification to accessible client.
-      string = OS.attr_k_axfocused_window_changed_notification
-      buffer = CharArray.new(string.length)
-      string.get_chars(0, buffer.attr_length, buffer, 0)
-      string_ref = OS._cfstring_create_with_characters(OS.attr_k_cfallocator_default, buffer, buffer.attr_length)
-      OS._axnotification_hiobject_notify(string_ref, self.attr_handle, 0)
-      OS._cfrelease(string_ref)
-    end
     
     typesig { [] }
     def check_subclass
@@ -454,61 +388,43 @@ module Org::Eclipse::Swt::Widgets
       check_widget
       width = 0
       height = 0
-      ptr = Array.typed(::Java::Int).new(1) { 0 }
-      if (!((self.attr_style & SWT::READ_ONLY)).equal?(0))
-        index = OS._get_control_value(self.attr_handle) - 1
-        OS._copy_menu_item_text_as_cfstring(@menu_handle, RJava.cast_to_short((index + 1)), ptr)
-      else
-        OS._get_control_data(self.attr_handle, RJava.cast_to_short(OS.attr_k_hicombo_box_edit_text_part), OS.attr_k_control_edit_text_cfstring_tag, 4, ptr, nil)
-      end
-      size = text_extent(ptr[0], 0)
-      if (!(ptr[0]).equal?(0))
-        OS._cfrelease(ptr[0])
-      end
-      width = Math.max(width, size.attr_x)
-      height = Math.max(height, size.attr_y)
-      count = 0
-      if (!((self.attr_style & SWT::READ_ONLY)).equal?(0))
-        count = OS._count_menu_items(@menu_handle)
-      else
-        count = OS._hicombo_box_get_item_count(self.attr_handle)
-      end
-      i = 0
-      while i < count
-        result = 0
-        if (!((self.attr_style & SWT::READ_ONLY)).equal?(0))
-          result = OS._copy_menu_item_text_as_cfstring(@menu_handle, RJava.cast_to_short((i + 1)), ptr)
-        else
-          result = OS._hicombo_box_copy_text_item_at_index(self.attr_handle, i, ptr)
+      widget = self.attr_view
+      view_cell = widget.cell
+      size = view_cell.cell_size
+      width = RJava.cast_to_int(Math.ceil(size.attr_width))
+      height = RJava.cast_to_int(Math.ceil(size.attr_height))
+      if (((self.attr_style & SWT::READ_ONLY)).equal?(0))
+        @ignore_verify = true
+        cell_ = NSComboBoxCell.new(view_cell.attr_id)
+        array = cell_.object_values
+        # 64
+        length = RJava.cast_to_int(array.count)
+        if (length > 0)
+          cell_ = NSComboBoxCell.new(cell_.copy)
+          i = 0
+          while i < length
+            object = array.object_at_index(i)
+            cell_.set_title(NSString.new(object))
+            size = cell_.cell_size
+            width = Math.max(width, RJava.cast_to_int(Math.ceil(size.attr_width)))
+            i += 1
+          end
+          cell_.release
         end
-        if ((result).equal?(OS.attr_no_err))
-          size = text_extent(ptr[0], 0)
-          width = Math.max(width, size.attr_x)
-          OS._cfrelease(ptr[0])
+        @ignore_verify = false
+      end
+      # Feature in Cocoa.  Attempting to create an NSComboBox with a
+      # height > 27 spews a very long warning message to stdout and
+      # often draws the combo incorrectly.  The workaround is to limit
+      # the returned height of editable Combos to the height that is
+      # required to display their text, even if a larger hHint is specified.
+      if (!(h_hint).equal?(SWT::DEFAULT))
+        if (!((self.attr_style & SWT::READ_ONLY)).equal?(0) || h_hint < height)
+          height = h_hint
         end
-        i += 1
       end
-      metric = Array.typed(::Java::Int).new(1) { 0 }
-      if (!((self.attr_style & SWT::READ_ONLY)).equal?(0))
-        OS._get_theme_metric(OS.attr_k_theme_metric_disclosure_button_width, metric)
-        width += metric[0]
-        # TODO
-        width += 13
-      else
-        OS._get_theme_metric(OS.attr_k_theme_metric_combo_box_large_disclosure_width, metric)
-        width += metric[0]
-      end
-      OS._get_theme_metric(OS.attr_k_theme_metric_edit_text_whitespace, metric)
-      width += metric[0] * 2
-      height += metric[0] * 2
-      inset = get_inset
-      width += inset.attr_left + inset.attr_right
-      height += inset.attr_top + inset.attr_bottom
       if (!(w_hint).equal?(SWT::DEFAULT))
         width = w_hint
-      end
-      if (!(h_hint).equal?(SWT::DEFAULT))
-        height = h_hint
       end
       return Point.new(width, height)
     end
@@ -537,42 +453,19 @@ module Org::Eclipse::Swt::Widgets
     typesig { [] }
     def create_handle
       if (!((self.attr_style & SWT::READ_ONLY)).equal?(0))
-        out_control = Array.typed(::Java::Int).new(1) { 0 }
-        window = OS._get_control_owner(self.attr_parent.attr_handle)
-        # From ControlDefinitions.h:
-        # 
-        # Passing in a menu ID of -12345 causes the popup not to try and get the menu from a
-        # resource. Instead, you can build the menu and later stuff the MenuRef field in
-        # the popup data information.
-        OS._create_popup_button_control(window, nil, 0, RJava.cast_to_short(-12345), false, RJava.cast_to_short(0), RJava.cast_to_short(0), 0, out_control)
-        if ((out_control[0]).equal?(0))
-          error(SWT::ERROR_NO_HANDLES)
-        end
-        self.attr_handle = out_control[0]
-        menu_ref = Array.typed(::Java::Int).new(1) { 0 }
-        OS._create_new_menu(RJava.cast_to_short(0), 0, menu_ref)
-        if ((menu_ref[0]).equal?(0))
-          error(SWT::ERROR_NO_HANDLES)
-        end
-        @menu_handle = menu_ref[0]
-        OS._set_control_popup_menu_handle(self.attr_handle, @menu_handle)
-        OS._set_control32bit_maximum(self.attr_handle, 0x7fff)
+        widget = SWTPopUpButton.new.alloc
+        widget.init_with_frame(NSRect.new, false)
+        widget.menu.set_autoenables_items(false)
+        widget.set_target(widget)
+        widget.set_action(OS.attr_sel_send_selection)
+        self.attr_view = widget
       else
-        out_control = Array.typed(::Java::Int).new(1) { 0 }
-        rect = CGRect.new
-        in_attributes = OS.attr_k_hicombo_box_auto_size_list_attribute
-        # The following code is intentionally commented.
-        # Auto completion does not allow the user to change
-        # case of the text in a combo box.
-        # 
-        # inAttributes |= OS.kHIComboBoxAutoCompletionAttribute;
-        OS._hicombo_box_create(rect, 0, nil, 0, in_attributes, out_control)
-        if ((out_control[0]).equal?(0))
-          error(SWT::ERROR_NO_HANDLES)
-        end
-        self.attr_handle = out_control[0]
-        OS._set_control_data(self.attr_handle, RJava.cast_to_short(OS.attr_k_hicombo_box_edit_text_part), OS.attr_k_txndraw_caret_when_inactive_tag, 4, Array.typed(::Java::Byte).new([0]))
-        OS._hiview_set_visible(self.attr_handle, true)
+        widget = SWTComboBox.new.alloc
+        widget.init
+        widget.set_delegate(widget)
+        widget.set_target(widget)
+        widget.set_action(OS.attr_sel_send_selection)
+        self.attr_view = widget
       end
     end
     
@@ -622,12 +515,26 @@ module Org::Eclipse::Swt::Widgets
     
     typesig { [] }
     def default_background
-      return self.attr_display.get_system_color(SWT::COLOR_LIST_BACKGROUND)
+      return self.attr_display.get_widget_color(SWT::COLOR_LIST_BACKGROUND)
+    end
+    
+    typesig { [] }
+    def default_nsfont
+      if (!((self.attr_style & SWT::READ_ONLY)).equal?(0))
+        return self.attr_display.attr_pop_up_button_font
+      end
+      return self.attr_display.attr_combo_box_font
     end
     
     typesig { [] }
     def default_foreground
-      return self.attr_display.get_system_color(SWT::COLOR_LIST_FOREGROUND)
+      return self.attr_display.get_widget_color(SWT::COLOR_LIST_FOREGROUND)
+    end
+    
+    typesig { [] }
+    def deregister
+      super
+      self.attr_display.remove_widget((self.attr_view).cell)
     end
     
     typesig { [::Java::Int] }
@@ -648,10 +555,10 @@ module Org::Eclipse::Swt::Widgets
       end
       if ((index).equal?(get_selection_index))
         if (!((self.attr_style & SWT::READ_ONLY)).equal?(0))
-          OS._set_control32bit_value(self.attr_handle, 0)
+          (self.attr_view).select_item(nil)
           send_event(SWT::Modify)
         else
-          set_text("")
+          (self.attr_view).deselect_item_at_index(index)
         end
       end
     end
@@ -672,32 +579,57 @@ module Org::Eclipse::Swt::Widgets
     def deselect_all
       check_widget
       if (!((self.attr_style & SWT::READ_ONLY)).equal?(0))
-        OS._set_control32bit_value(self.attr_handle, 0)
+        (self.attr_view).select_item(nil)
         send_event(SWT::Modify)
       else
-        set_text("")
+        widget = self.attr_view
+        # long
+        index = widget.index_of_selected_item
+        if (!(index).equal?(-1))
+          widget.deselect_item_at_index(index)
+        end
       end
     end
     
+    typesig { [::Java::Int, ::Java::Int, ::Java::Boolean, Array.typed(::Java::Boolean)] }
+    def drag_detect(x, y, filter, consume)
+      if (((self.attr_style & SWT::READ_ONLY)).equal?(0))
+        field_editor = (self.attr_view).current_editor
+        if (!(field_editor).nil?)
+          selected_range_ = field_editor.selected_range
+          if (selected_range_.attr_length > 0)
+            mouse_location_ = NSEvent.mouse_location
+            fe_as_text_view = NSTextView.new(field_editor)
+            # long
+            char_position = fe_as_text_view.character_index_for_insertion_at_point(mouse_location_)
+            if (!(char_position).equal?(OS::NSNotFound) && char_position >= selected_range_.attr_location && char_position < (selected_range_.attr_location + selected_range_.attr_length))
+              if (super(x, y, filter, consume))
+                if (!(consume).nil?)
+                  consume[0] = true
+                end
+                return true
+              end
+            end
+          end
+        end
+        return false
+      end
+      return super(x, y, filter, consume)
+    end
+    
     typesig { [] }
-    def destroy_widget
-      # Bug in the Macintosh.  Carbon segments fault if the combo box has
-      # keyboard focus and it is disposed or its parent is disposed because
-      # there is an outstanding timer that runs after the widget is dispoed.
-      # The fix is to remove the combo box from its parent and dispose it when
-      # the display is idle.
-      # 
-      # NOTE: The problem does not happen when the window is disposed.
-      if (!((get_shell.attr_state & DISPOSE_SENT)).equal?(0))
-        super
+    def get_char_count
+      str = nil
+      if (!((self.attr_style & SWT::READ_ONLY)).equal?(0))
+        str = (self.attr_view).title_of_selected_item
       else
-        release_handle
+        str = NSCell.new((self.attr_view).cell).title
       end
-    end
-    
-    typesig { [] }
-    def get_ax_attributes
-      return AX_ATTRIBUTES
+      if ((str).nil?)
+        return 0
+      end
+      # 64
+      return RJava.cast_to_int(str.length)
     end
     
     typesig { [::Java::Int] }
@@ -717,27 +649,20 @@ module Org::Eclipse::Swt::Widgets
     # </ul>
     def get_item(index)
       check_widget
-      count = get_item_count
-      if (0 > index || index >= count)
+      count_ = get_item_count
+      if (0 > index || index >= count_)
         error(SWT::ERROR_INVALID_RANGE)
       end
-      ptr = Array.typed(::Java::Int).new(1) { 0 }
-      result = 0
+      str = nil
       if (!((self.attr_style & SWT::READ_ONLY)).equal?(0))
-        result = OS._copy_menu_item_text_as_cfstring(@menu_handle, RJava.cast_to_short((index + 1)), ptr)
+        str = (self.attr_view).item_title_at_index(index)
       else
-        result = OS._hicombo_box_copy_text_item_at_index(self.attr_handle, index, ptr)
+        str = NSString.new((self.attr_view).item_object_value_at_index(index))
       end
-      if (!(result).equal?(OS.attr_no_err))
+      if ((str).nil?)
         error(SWT::ERROR_CANNOT_GET_ITEM)
       end
-      length_ = OS._cfstring_get_length(ptr[0])
-      buffer = CharArray.new(length_)
-      range = CFRange.new
-      range.attr_length = length_
-      OS._cfstring_get_characters(ptr[0], range, buffer)
-      OS._cfrelease(ptr[0])
-      return String.new(buffer)
+      return str.get_string
     end
     
     typesig { [] }
@@ -752,9 +677,11 @@ module Org::Eclipse::Swt::Widgets
     def get_item_count
       check_widget
       if (!((self.attr_style & SWT::READ_ONLY)).equal?(0))
-        return OS._count_menu_items(@menu_handle)
+        # 64
+        return RJava.cast_to_int((self.attr_view).number_of_items)
       else
-        return OS._hicombo_box_get_item_count(self.attr_handle)
+        # 64
+        return RJava.cast_to_int((self.attr_view).number_of_items)
       end
     end
     
@@ -791,10 +718,10 @@ module Org::Eclipse::Swt::Widgets
     # </ul>
     def get_items
       check_widget
-      count = get_item_count
-      result = Array.typed(String).new(count) { nil }
+      count_ = get_item_count
+      result = Array.typed(String).new(count_) { nil }
       i = 0
-      while i < count
+      while i < count_
         result[i] = get_item(i)
         i += 1
       end
@@ -820,26 +747,13 @@ module Org::Eclipse::Swt::Widgets
     # 
     # @since 3.4
     def get_list_visible
-      check_widget
-      if (!((self.attr_style & SWT::READ_ONLY)).equal?(0))
-        out_data = MenuTrackingData.new
-        return (OS._get_menu_tracking_data(@menu_handle, out_data)).equal?(OS.attr_no_err)
-      else
-        if (OS::VERSION >= 0x1040)
-          return OS._hicombo_box_is_list_visible(self.attr_handle)
-        end
-        return false
-      end
+      # TODO
+      return false
     end
     
     typesig { [] }
     def get_mininum_height
       return get_text_height
-    end
-    
-    typesig { [] }
-    def get_name_text
-      return get_text
     end
     
     typesig { [] }
@@ -881,14 +795,15 @@ module Org::Eclipse::Swt::Widgets
       if (!((self.attr_style & SWT::READ_ONLY)).equal?(0))
         return Point.new(0, get_char_count)
       else
-        selection = nil
-        if (!(@selection).nil?)
-          selection = @selection
-        else
-          selection = ControlEditTextSelectionRec.new
-          OS._get_control_data(self.attr_handle, RJava.cast_to_short(OS.attr_k_hicombo_box_edit_text_part), OS.attr_k_control_edit_text_selection_tag, 4, selection, nil)
+        if ((@selection_range).nil?)
+          str = NSTextFieldCell.new((self.attr_view).cell).title
+          # 64
+          # 64
+          return Point.new(RJava.cast_to_int(str.length), RJava.cast_to_int(str.length))
         end
-        return Point.new(selection.attr_sel_start, selection.attr_sel_end)
+        # 64
+        # 64
+        return Point.new(RJava.cast_to_int(@selection_range.attr_location), RJava.cast_to_int((@selection_range.attr_location + @selection_range.attr_length)))
       end
     end
     
@@ -905,9 +820,11 @@ module Org::Eclipse::Swt::Widgets
     def get_selection_index
       check_widget
       if (!((self.attr_style & SWT::READ_ONLY)).equal?(0))
-        return OS._get_control_value(self.attr_handle) - 1
+        # 64
+        return RJava.cast_to_int((self.attr_view).index_of_selected_item)
       else
-        return index_of(get_text)
+        # 64
+        return RJava.cast_to_int((self.attr_view).index_of_selected_item)
       end
     end
     
@@ -929,29 +846,27 @@ module Org::Eclipse::Swt::Widgets
     
     typesig { [::Java::Int, ::Java::Int] }
     def get_text(start, end_)
-      result = 0
-      ptr = Array.typed(::Java::Int).new(1) { 0 }
+      str = nil
       if (!((self.attr_style & SWT::READ_ONLY)).equal?(0))
-        index = OS._get_control_value(self.attr_handle) - 1
-        result = OS._copy_menu_item_text_as_cfstring(@menu_handle, RJava.cast_to_short((index + 1)), ptr)
+        str = (self.attr_view).title_of_selected_item
       else
-        actual_size = Array.typed(::Java::Int).new(1) { 0 }
-        result = OS._get_control_data(self.attr_handle, RJava.cast_to_short(OS.attr_k_hicombo_box_edit_text_part), OS.attr_k_control_edit_text_cfstring_tag, 4, ptr, actual_size)
+        str = NSCell.new((self.attr_view).cell).title
       end
-      if (!(result).equal?(OS.attr_no_err))
+      if ((str).nil?)
         return CharArray.new(0)
       end
-      range = CFRange.new
+      range = NSRange.new
       range.attr_location = start
       if ((end_).equal?(-1))
-        length_ = OS._cfstring_get_length(ptr[0])
+        # long
+        length_ = str.length
         range.attr_length = length_ - start
       else
         range.attr_length = end_ - start
       end
-      buffer = CharArray.new(range.attr_length)
-      OS._cfstring_get_characters(ptr[0], range, buffer)
-      OS._cfrelease(ptr[0])
+      # 64
+      buffer = CharArray.new(RJava.cast_to_int(range.attr_length))
+      str.get_characters(buffer, range)
       return buffer
     end
     
@@ -966,8 +881,13 @@ module Org::Eclipse::Swt::Widgets
     # </ul>
     def get_text_height
       check_widget
-      # TODO - not supported by the OS
-      return 26
+      cell_ = nil
+      if (!((self.attr_style & SWT::READ_ONLY)).equal?(0))
+        cell_ = (self.attr_view).cell
+      else
+        cell_ = (self.attr_view).cell
+      end
+      return RJava.cast_to_int(cell_.cell_size.attr_height)
     end
     
     typesig { [] }
@@ -1010,20 +930,8 @@ module Org::Eclipse::Swt::Widgets
       if (!((self.attr_style & SWT::READ_ONLY)).equal?(0))
         return get_item_count
       else
-        buffer = Array.typed(::Java::Int).new(1) { 0 }
-        OS._get_control_data(self.attr_handle, RJava.cast_to_short(OS.attr_k_control_entire_control), OS.attr_k_hicombo_box_num_visible_items_tag, 4, buffer, nil)
-        return buffer[0]
-      end
-    end
-    
-    typesig { [] }
-    def hook_events
-      super
-      if (!((self.attr_style & SWT::READ_ONLY)).equal?(0))
-        command_proc = self.attr_display.attr_command_proc
-        mask = Array.typed(::Java::Int).new([OS.attr_k_event_class_command, OS.attr_k_event_process_command, ])
-        menu_target = OS._get_menu_event_target(@menu_handle)
-        OS._install_event_handler(menu_target, command_proc, mask.attr_length / 2, mask, self.attr_handle, nil)
+        # 64
+        return RJava.cast_to_int((self.attr_view).number_of_visible_items)
       end
     end
     
@@ -1070,12 +978,12 @@ module Org::Eclipse::Swt::Widgets
       if ((string).nil?)
         error(SWT::ERROR_NULL_ARGUMENT)
       end
-      count = get_item_count
-      if (!(0 <= start && start < count))
+      count_ = get_item_count
+      if (!(0 <= start && start < count_))
         return -1
       end
       i = start
-      while i < count
+      while i < count_
         if ((string == get_item(i)))
           return i
         end
@@ -1084,228 +992,61 @@ module Org::Eclipse::Swt::Widgets
       return -1
     end
     
-    typesig { [] }
-    def get_char_count
-      # checkWidget ();
-      ptr = Array.typed(::Java::Int).new(1) { 0 }
-      result = 0
-      if (!((self.attr_style & SWT::READ_ONLY)).equal?(0))
-        index = OS._get_control_value(self.attr_handle) - 1
-        result = OS._copy_menu_item_text_as_cfstring(@menu_handle, RJava.cast_to_short((index + 1)), ptr)
-      else
-        actual_size = Array.typed(::Java::Int).new(1) { 0 }
-        result = OS._get_control_data(self.attr_handle, RJava.cast_to_short(OS.attr_k_hicombo_box_edit_text_part), OS.attr_k_control_edit_text_cfstring_tag, 4, ptr, actual_size)
-      end
-      if (!(result).equal?(OS.attr_no_err))
-        return 0
-      end
-      length_ = OS._cfstring_get_length(ptr[0])
-      OS._cfrelease(ptr[0])
-      return length_
-    end
-    
-    typesig { [] }
-    def get_inset
-      return self.attr_display.attr_combo_inset
-    end
-    
-    typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
-    def k_event_accessible_get_named_attribute(next_handler, the_event, user_data)
-      code = OS.attr_event_not_handled_err
-      if (((self.attr_style & SWT::READ_ONLY)).equal?(0))
-        string_ref = Array.typed(::Java::Int).new(1) { 0 }
-        OS._get_event_parameter(the_event, OS.attr_k_event_param_accessible_attribute_name, OS.attr_type_cfstring_ref, nil, 4, nil, string_ref)
-        length_ = 0
-        if (!(string_ref[0]).equal?(0))
-          length_ = OS._cfstring_get_length(string_ref[0])
+    typesig { [String] }
+    def insert_edit_text(string)
+      @ignore_verify = true
+      length_ = string.length
+      selection = get_selection
+      if (has_focus)
+        if (!(@text_limit).equal?(LIMIT))
+          char_count = get_char_count
+          if (char_count - (selection.attr_y - selection.attr_x) + length_ > @text_limit)
+            length_ = @text_limit - char_count + (selection.attr_y - selection.attr_x)
+          end
         end
         buffer = CharArray.new(length_)
-        range = CFRange.new
-        range.attr_length = length_
-        OS._cfstring_get_characters(string_ref[0], range, buffer)
-        attribute_name = String.new(buffer)
-        if ((attribute_name == OS.attr_k_axvalue_attribute))
-          buffer = get_text(0, -1)
-          string_ref[0] = OS._cfstring_create_with_characters(OS.attr_k_cfallocator_default, buffer, buffer.attr_length)
-          if (!(string_ref[0]).equal?(0))
-            OS._set_event_parameter(the_event, OS.attr_k_event_param_accessible_attribute_value, OS.attr_type_cfstring_ref, 4, string_ref)
-            OS._cfrelease(string_ref[0])
-            code = OS.attr_no_err
-          end
-        else
-          if ((attribute_name == OS.attr_k_axnumber_of_characters_attribute))
-            OS._set_event_parameter(the_event, OS.attr_k_event_param_accessible_attribute_value, OS.attr_type_sint32, 4, Array.typed(::Java::Int).new([get_char_count]))
-            code = OS.attr_no_err
-          else
-            if ((attribute_name == OS.attr_k_axselected_text_attribute))
-              sel = get_selection
-              buffer = get_text(sel.attr_x, sel.attr_y)
-              string_ref[0] = OS._cfstring_create_with_characters(OS.attr_k_cfallocator_default, buffer, buffer.attr_length)
-              if (!(string_ref[0]).equal?(0))
-                OS._set_event_parameter(the_event, OS.attr_k_event_param_accessible_attribute_value, OS.attr_type_cfstring_ref, 4, string_ref)
-                OS._cfrelease(string_ref[0])
-                code = OS.attr_no_err
-              end
-            else
-              if ((attribute_name == OS.attr_k_axselected_text_range_attribute))
-                sel = get_selection
-                range = CFRange.new
-                range.attr_location = sel.attr_x
-                range.attr_length = sel.attr_y - sel.attr_x
-                value_ref = OS._axvalue_create(OS.attr_k_axvalue_cfrange_type, range)
-                OS._set_event_parameter(the_event, OS.attr_k_event_param_accessible_attribute_value, OS.attr_type_cftype_ref, 4, Array.typed(::Java::Int).new([value_ref]))
-                OS._cfrelease(value_ref)
-                code = OS.attr_no_err
-              else
-                if ((attribute_name == OS.attr_k_axstring_for_range_parameterized_attribute))
-                  value_ref = Array.typed(::Java::Int).new(1) { 0 }
-                  status = OS._get_event_parameter(the_event, OS.attr_k_event_param_accessible_attribute_parameter, OS.attr_type_cftype_ref, nil, 4, nil, value_ref)
-                  if ((status).equal?(OS.attr_no_err))
-                    range = CFRange.new
-                    ok = OS._axvalue_get_value(value_ref[0], OS.attr_k_axvalue_cfrange_type, range)
-                    if (ok)
-                      buffer = get_text(range.attr_location, range.attr_location + range.attr_length)
-                      string_ref[0] = OS._cfstring_create_with_characters(OS.attr_k_cfallocator_default, buffer, buffer.attr_length)
-                      if (!(string_ref[0]).equal?(0))
-                        OS._set_event_parameter(the_event, OS.attr_k_event_param_accessible_attribute_value, OS.attr_type_cfstring_ref, 4, string_ref)
-                        OS._cfrelease(string_ref[0])
-                        code = OS.attr_no_err
-                      end
-                    end
-                  end
-                end
-              end
-            end
+        string.get_chars(0, buffer.attr_length, buffer, 0)
+        nsstring = NSString.string_with_characters(buffer, buffer.attr_length)
+        field_editor = (self.attr_view).current_editor
+        field_editor.replace_characters_in_range(field_editor.selected_range, nsstring)
+        @selection_range = nil
+      else
+        old_text = get_text
+        if (!(@text_limit).equal?(LIMIT))
+          char_count = old_text.length
+          if (char_count - (selection.attr_y - selection.attr_x) + length_ > @text_limit)
+            string = RJava.cast_to_string(string.substring(0, @text_limit - char_count + (selection.attr_y - selection.attr_x)))
           end
         end
+        new_text = RJava.cast_to_string(old_text.substring(0, selection.attr_x)) + string + RJava.cast_to_string(old_text.substring(selection.attr_y))
+        nsstring = NSString.string_with(new_text)
+        NSCell.new((self.attr_view).cell).set_title(nsstring)
+        @selection_range = nil
+        set_selection(Point.new(selection.attr_x + string.length, 0))
       end
-      if (!(self.attr_accessible).nil?)
-        code = self.attr_accessible.internal_k_event_accessible_get_named_attribute(next_handler, the_event, code)
-      end
-      return code
+      @ignore_verify = false
+    end
+    
+    typesig { [::Java::Int] }
+    # long
+    def is_event_view(id)
+      return true
     end
     
     typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
-    def k_event_control_activate(next_handler, the_event, user_data)
-      result = super(next_handler, the_event, user_data)
-      if ((result).equal?(OS.attr_no_err))
-        return result
-      end
-      # Feature in the Macintosh.  When a combo box gets
-      # kEventControlActivate, it starts the caret blinking.
-      # Because there is no clipping on the Macintosh, the
-      # caret may blink through a widget that is obscured.
-      # The fix is to avoid running the default handler.
-      return OS.attr_no_err
-    end
-    
-    typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
-    def k_event_process_command(next_handler, the_event, user_data)
-      result = super(next_handler, the_event, user_data)
-      if ((result).equal?(OS.attr_no_err))
-        return result
-      end
-      # It is possible (but unlikely), that application
-      # code could have disposed the widget in the modify
-      # event.  If this happens, end the processing of the
-      # Windows message by returning zero as the result of
-      # the window proc.
-      # 
-      # Note: this should be a send event, but selection is updated
-      # right way.
-      post_event(SWT::Modify)
-      if (is_disposed)
-        return OS.attr_event_not_handled_err
-      end
-      post_event(SWT::Selection)
-      return OS.attr_event_not_handled_err
-    end
-    
-    typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
-    def k_event_raw_key_pressed(next_handler, the_event, user_data)
-      # Feature in the Macintosh. The combo box widget consumes the
-      # kEventRawKeyDown event when the up and down arrow keys are
-      # pressed, causing kEventTextInputUnicodeForKeyEvent not
-      # to be sent.  The fix is to handle these keys in kEventRawKeyDown.
-      # 
-      # NOTE:  This was fixed in OS X 10.4.
-      if (OS::VERSION < 0x1040)
-        key_code = Array.typed(::Java::Int).new(1) { 0 }
-        OS._get_event_parameter(the_event, OS.attr_k_event_param_key_code, OS.attr_type_uint32, nil, key_code.attr_length * 4, nil, key_code)
-        case (key_code[0])
-        # Up arrow
-        when 126, 125
-          # Down arrow
-          if (!send_key_event(SWT::KeyDown, the_event))
-            return OS.attr_no_err
-          end
-        end
-      end
-      return OS.attr_event_not_handled_err
-    end
-    
-    typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
-    def k_event_control_set_focus_part(next_handler, the_event, user_data)
-      result = super(next_handler, the_event, user_data)
-      if ((result).equal?(OS.attr_no_err))
-        if (((self.attr_style & SWT::READ_ONLY)).equal?(0))
-          part = Array.typed(::Java::Short).new(1) { 0 }
-          OS._get_event_parameter(the_event, OS.attr_k_event_param_control_part, OS.attr_type_control_part_code, nil, 2, nil, part)
-          if (!(part[0]).equal?(OS.attr_k_control_focus_no_part))
-            self.attr_display.attr_focus_combo = self
-          end
-        end
-      end
-      return result
-    end
-    
-    typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
-    def k_event_unicode_key_pressed(next_handler, the_event, user_data)
-      result = super(next_handler, the_event, user_data)
-      if ((result).equal?(OS.attr_no_err))
-        return result
-      end
-      keyboard_event = Array.typed(::Java::Int).new(1) { 0 }
-      OS._get_event_parameter(the_event, OS.attr_k_event_param_text_input_send_keyboard_event, OS.attr_type_event_ref, nil, keyboard_event.attr_length * 4, nil, keyboard_event)
-      key_code = Array.typed(::Java::Int).new(1) { 0 }
-      OS._get_event_parameter(keyboard_event[0], OS.attr_k_event_param_key_code, OS.attr_type_uint32, nil, key_code.attr_length * 4, nil, key_code)
-      string = OS.attr_k_axvalue_changed_notification
-      buffer = CharArray.new(string.length)
-      string.get_chars(0, buffer.attr_length, buffer, 0)
-      string_ref = OS._cfstring_create_with_characters(OS.attr_k_cfallocator_default, buffer, buffer.attr_length)
-      OS._axnotification_hiobject_notify(string_ref, self.attr_handle, 0)
-      OS._cfrelease(string_ref)
-      string = RJava.cast_to_string(OS.attr_k_axselected_text_changed_notification)
-      buffer = CharArray.new(string.length)
-      string.get_chars(0, buffer.attr_length, buffer, 0)
-      string_ref = OS._cfstring_create_with_characters(OS.attr_k_cfallocator_default, buffer, buffer.attr_length)
-      OS._axnotification_hiobject_notify(string_ref, self.attr_handle, 0)
-      OS._cfrelease(string_ref)
-      if (hooks(SWT::Verify) || filters(SWT::Verify) || hooks(SWT::Modify) || filters(SWT::Modify))
-        modifiers = Array.typed(::Java::Int).new(1) { 0 }
-        OS._get_event_parameter(keyboard_event[0], OS.attr_k_event_param_key_modifiers, OS.attr_type_uint32, nil, 4, nil, modifiers)
-        if ((modifiers[0]).equal?(OS.attr_cmd_key))
-          case (key_code[0])
-          when 7
-            # X
-            cut
-            return OS.attr_no_err
-          when 9
-            # V
-            paste
-            return OS.attr_no_err
-          end
-        end
-      end
-      case (key_code[0])
-      # KP Enter
-      when 76, 36
-        # Return
-        post_event(SWT::DefaultSelection)
-      end
-      result = OS._call_next_event_handler(next_handler, the_event)
-      @last_text = RJava.cast_to_string(get_text)
-      return result
+    # long
+    # long
+    # long
+    def mouse_down(id, sel, the_event)
+      # If this is a combo box with an editor field and the control is disposed
+      # while the view's cell editor is open we crash while tearing down the
+      # popup window. Fix is to retain the view before letting Cocoa track
+      # the mouse events.
+      # 'view' will be cleared if disposed during the mouseDown so cache it.
+      view_copy = self.attr_view
+      view_copy.retain
+      super(id, sel, the_event)
+      view_copy.release
     end
     
     typesig { [] }
@@ -1333,6 +1074,9 @@ module Org::Eclipse::Swt::Widgets
       left_text = text.substring(0, start)
       right_text = text.substring(end_, text.length)
       new_text = get_clipboard_text
+      if ((new_text).nil?)
+        return
+      end
       if (hooks(SWT::Verify) || filters(SWT::Verify))
         new_text = RJava.cast_to_string(verify_text(new_text, start, end_, nil))
         if ((new_text).nil?)
@@ -1352,35 +1096,18 @@ module Org::Eclipse::Swt::Widgets
     end
     
     typesig { [] }
-    def poll_track_event
-      return true
-    end
-    
-    typesig { [] }
-    def release_handle
-      # Bug in the Macintosh.  Carbon segments fault if the combo box has
-      # keyboard focus and it is disposed or its parent is disposed because
-      # there is an outstanding timer that runs after the widget is dispoed.
-      # The fix is to remove the combo box from its parent and dispose it when
-      # the display is idle.
-      # 
-      # NOTE: The problem does not happen when the window is disposed.
-      if (((get_shell.attr_state & DISPOSE_SENT)).equal?(0))
-        self.attr_display.add_to_dispose_window(self.attr_handle)
-      end
+    def register
       super
+      self.attr_display.add_widget((self.attr_view).cell, self)
     end
     
     typesig { [] }
     def release_widget
       super
-      if ((self.attr_display.attr_focus_combo).equal?(self))
-        self.attr_display.attr_focus_combo = nil
+      if (((self.attr_style & SWT::READ_ONLY)).equal?(0))
+        (self.attr_view).abort_editing
       end
-      if (!(@menu_handle).equal?(0))
-        OS._dispose_menu(@menu_handle)
-      end
-      @menu_handle = 0
+      @selection_range = nil
     end
     
     typesig { [::Java::Int] }
@@ -1401,17 +1128,14 @@ module Org::Eclipse::Swt::Widgets
       if ((index).equal?(-1))
         error(SWT::ERROR_INVALID_RANGE)
       end
-      count = get_item_count
-      if (0 > index || index >= count)
+      count_ = get_item_count
+      if (0 > index || index >= count_)
         error(SWT::ERROR_INVALID_RANGE)
       end
       if (!((self.attr_style & SWT::READ_ONLY)).equal?(0))
-        OS._delete_menu_items(@menu_handle, RJava.cast_to_short((index + 1)), 1)
-        if ((index).equal?(OS._get_control_value(self.attr_handle) - 1))
-          OS._set_control32bit_value(self.attr_handle, 0)
-        end
+        (self.attr_view).remove_item_at_index(index)
       else
-        OS._hicombo_box_remove_item_at_index(self.attr_handle, index)
+        (self.attr_view).remove_item_at_index(index)
       end
     end
     
@@ -1435,23 +1159,15 @@ module Org::Eclipse::Swt::Widgets
       if (start > end_)
         return
       end
-      count = get_item_count
-      if (!(0 <= start && start <= end_ && end_ < count))
+      count_ = get_item_count
+      if (!(0 <= start && start <= end_ && end_ < count_))
         error(SWT::ERROR_INVALID_RANGE)
       end
-      new_end = Math.min(end_, count - 1)
-      if (!((self.attr_style & SWT::READ_ONLY)).equal?(0))
-        OS._delete_menu_items(@menu_handle, RJava.cast_to_short((start + 1)), new_end - start + 1)
-        index = OS._get_control_value(self.attr_handle) - 1
-        if (start <= index && index <= end_)
-          OS._set_control32bit_value(self.attr_handle, 0)
-        end
-      else
-        i = new_end
-        while i >= start
-          OS._hicombo_box_remove_item_at_index(self.attr_handle, i)
-          i -= 1
-        end
+      new_end = Math.min(end_, count_ - 1)
+      i = new_end
+      while i >= start
+        remove(i)
+        i -= 1
       end
     end
     
@@ -1492,19 +1208,11 @@ module Org::Eclipse::Swt::Widgets
     # </ul>
     def remove_all
       check_widget
-      count = get_item_count
       if (!((self.attr_style & SWT::READ_ONLY)).equal?(0))
-        OS._delete_menu_items(@menu_handle, RJava.cast_to_short(1), count)
-        OS._set_control32bit_value(self.attr_handle, 0)
+        (self.attr_view).remove_all_items
       else
         set_text("", true)
-        if (count > 0)
-          i = count - 1
-          while i >= 0
-            OS._hicombo_box_remove_item_at_index(self.attr_handle, i)
-            i -= 1
-          end
-        end
+        (self.attr_view).remove_all_items
       end
     end
     
@@ -1605,125 +1313,131 @@ module Org::Eclipse::Swt::Widgets
     # </ul>
     def select(index)
       check_widget
-      count = get_item_count
-      if (0 <= index && index < count)
+      count_ = get_item_count
+      @ignore_selection = true
+      if (0 <= index && index < count_)
         if (!((self.attr_style & SWT::READ_ONLY)).equal?(0))
-          OS._set_control32bit_value(self.attr_handle, index + 1)
-          send_event(SWT::Modify)
+          (self.attr_view).select_item_at_index(index)
         else
-          set_text(get_item(index), true)
+          (self.attr_view).select_item_at_index(index)
         end
+      end
+      @ignore_selection = false
+      send_event(SWT::Modify)
+    end
+    
+    typesig { [] }
+    def send_selection
+      send_event(SWT::Modify)
+      if (!@ignore_selection)
+        post_event(SWT::Selection)
       end
     end
     
-    typesig { [::Java::Int, Event] }
-    def send_key_event(type, event)
-      if (!super(type, event))
-        return false
+    typesig { [NSEvent, ::Java::Int] }
+    def send_key_event(ns_event, type)
+      result = super(ns_event, type)
+      if (!result)
+        return result
+      end
+      state_mask = 0
+      # long
+      modifier_flags_ = ns_event.modifier_flags
+      if (!((modifier_flags_ & OS::NSAlternateKeyMask)).equal?(0))
+        state_mask |= SWT::ALT
+      end
+      if (!((modifier_flags_ & OS::NSShiftKeyMask)).equal?(0))
+        state_mask |= SWT::SHIFT
+      end
+      if (!((modifier_flags_ & OS::NSControlKeyMask)).equal?(0))
+        state_mask |= SWT::CONTROL
+      end
+      if (!((modifier_flags_ & OS::NSCommandKeyMask)).equal?(0))
+        state_mask |= SWT::COMMAND
       end
       if (!(type).equal?(SWT::KeyDown))
-        return true
+        return result
       end
-      if (!((self.attr_style & SWT::READ_ONLY)).equal?(0))
-        return true
-      end
-      if ((event.attr_character).equal?(0))
-        return true
-      end
-      if (!((event.attr_state_mask & SWT::COMMAND)).equal?(0))
-        return true
-      end
-      old_text = ""
-      new_text = ""
-      if (hooks(SWT::Verify) || filters(SWT::Verify))
-        char_count = get_char_count
-        selection = get_selection
-        start = selection.attr_x
-        end_ = selection.attr_y
-        case (event.attr_character)
-        when SWT::BS
-          if ((start).equal?(end_))
-            if ((start).equal?(0))
-              return true
-            end
-            start = Math.max(0, start - 1)
-          end
-        when SWT::DEL
-          if ((start).equal?(end_))
-            if ((start).equal?(char_count))
-              return true
-            end
-            end_ = Math.min(end_ + 1, char_count)
-          end
-        when SWT::CR
-          return true
-        else
-          if (!(event.attr_character).equal?(Character.new(?\t.ord)) && event.attr_character < 0x20)
-            return true
-          end
-          old_text = RJava.cast_to_string(String.new(Array.typed(::Java::Char).new([event.attr_character])))
-        end
-        new_text = RJava.cast_to_string(verify_text(old_text, start, end_, event))
-        if ((new_text).nil?)
+      key_code_ = ns_event.key_code
+      if ((state_mask).equal?(SWT::COMMAND))
+        case (key_code_)
+        when 7
+          # X
+          cut
           return false
-        end
-        if (char_count - (end_ - start) + new_text.length > @text_limit)
+        when 8
+          # C
+          copy
           return false
-        end
-        if (!(new_text).equal?(old_text))
-          text = get_text
-          left_text = text.substring(0, start)
-          right_text = text.substring(end_, text.length)
-          set_text(left_text + new_text + right_text, false)
-          start += new_text.length
-          set_selection(Point.new(start, start))
-        end
-      end
-      # Post the modify event so that the character will be inserted
-      # into the widget when the modify event is delivered.  Normally,
-      # modify events are sent but it is safe to post the event here
-      # because this method is called from the event loop.
-      post_event(SWT::Modify)
-      return (new_text).equal?(old_text)
-    end
-    
-    typesig { [::Java::Int, Array.typed(::Java::Float)] }
-    def set_background(control, color)
-      if (((self.attr_style & SWT::READ_ONLY)).equal?(0))
-        if ((color).nil?)
-          color = default_background.attr_handle
+        when 9
+          # V
+          paste
+          return false
+        when 0
+          # A
+          if (((self.attr_style & SWT::READ_ONLY)).equal?(0))
+            (self.attr_view).select_text(nil)
+            return false
+          end
         end
       end
-      super(control, color)
-    end
-    
-    typesig { [::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Boolean, ::Java::Boolean, ::Java::Boolean] }
-    def set_bounds(x, y, width, height, move, resize, events)
-      if (!((self.attr_style & SWT::READ_ONLY)).equal?(0))
-        return super(x, y, width, height, move, resize, events)
-      end
-      # Bug in the Macintosh.  When the caret is moved,
-      # the combo widget scrolls to show the new location.
-      # This means that the combo widget may be scrolled
-      # to the left in order to show the caret when the
-      # widget is not large enough to show both the caret
-      # location and all the text.  Unfortunately, when
-      # the widget is resized such that all the text and
-      # the caret could be visible, the Macintosh does not
-      # scroll the widget back.  The fix is to save the
-      # current selection, reset the text and then restore
-      # the selection.  This will cause the widget
-      # to recompute the left scroll position.
-      inset = get_inset
-      rect = get_bounds
-      old_width = rect.attr_width - inset.attr_left - inset.attr_right
-      result = super(x, y, width, height, move, resize, events)
-      if ((old_width).equal?(0) && width > 0)
-        selection = get_selection
-        set_text(get_text, false)
-        set_selection(selection)
+      case (key_code_)
+      # KP Enter
+      when 76, 36
+        # Return
+        post_event(SWT::DefaultSelection)
       end
       return result
+    end
+    
+    typesig { [] }
+    def update_background
+      ns_color = nil
+      if (!(self.attr_background_image).nil?)
+        ns_color = NSColor.color_with_pattern_image(self.attr_background_image.attr_handle)
+      else
+        if (!(self.attr_background).nil?)
+          ns_color = NSColor.color_with_device_red(self.attr_background[0], self.attr_background[1], self.attr_background[2], self.attr_background[3])
+        else
+          ns_color = NSColor.text_background_color
+        end
+      end
+      if (!((self.attr_style & SWT::READ_ONLY)).equal?(0))
+        # TODO
+      else
+        (self.attr_view).set_background_color(ns_color)
+      end
+    end
+    
+    typesig { [::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Boolean, ::Java::Boolean] }
+    def set_bounds(x, y, width, height, move, resize)
+      # Feature in Cocoa.  Attempting to create an NSComboBox with a
+      # height > 27 spews a very long warning message to stdout and
+      # often draws the combo incorrectly.  The workaround is to limit
+      # the height of editable Combos to the height that is required
+      # to display their text.
+      if (((self.attr_style & SWT::READ_ONLY)).equal?(0))
+        widget = self.attr_view
+        size = widget.cell.cell_size
+        height = Math.min(height, RJava.cast_to_int(Math.ceil(size.attr_height)))
+      end
+      super(x, y, width, height, move, resize)
+    end
+    
+    typesig { [Array.typed(::Java::Float)] }
+    # double
+    def set_foreground(color)
+      ns_color = nil
+      if ((color).nil?)
+        ns_color = NSColor.text_color
+      else
+        ns_color = NSColor.color_with_device_red(color[0], color[1], color[2], 1)
+      end
+      if (!((self.attr_style & SWT::READ_ONLY)).equal?(0))
+        # TODO
+      else
+        (self.attr_view).set_text_color(ns_color)
+      end
     end
     
     typesig { [::Java::Int, String] }
@@ -1746,31 +1460,18 @@ module Org::Eclipse::Swt::Widgets
       if ((string).nil?)
         error(SWT::ERROR_NULL_ARGUMENT)
       end
-      count = get_item_count
-      if (0 > index || index >= count)
+      count_ = get_item_count
+      if (0 > index || index >= count_)
         error(SWT::ERROR_INVALID_RANGE)
       end
-      buffer = CharArray.new(string.length)
-      string.get_chars(0, buffer.attr_length, buffer, 0)
-      ptr = OS._cfstring_create_with_characters(OS.attr_k_cfallocator_default, buffer, buffer.attr_length)
-      if ((ptr).equal?(0))
-        error(SWT::ERROR_ITEM_NOT_ADDED)
-      end
-      result = 0
+      str = NSString.string_with(string)
       if (!((self.attr_style & SWT::READ_ONLY)).equal?(0))
-        result = OS._set_menu_item_text_with_cfstring(@menu_handle, RJava.cast_to_short((index + 1)), ptr)
-        # Feature in the Macintosh.  Setting text that starts with "-" makes the
-        # menu item a separator.  The fix is to clear the separator attribute.
-        if (string.starts_with("-"))
-          OS._change_menu_item_attributes(@menu_handle, RJava.cast_to_short((index + 1)), 0, OS.attr_k_menu_item_attr_separator)
-        end
+        ns_item = (self.attr_view).item_at_index(index)
+        ns_item.set_title(str)
       else
-        result = OS._hicombo_box_insert_text_item_at_index(self.attr_handle, index, ptr)
-        OS._hicombo_box_remove_item_at_index(self.attr_handle, index + 1)
-      end
-      OS._cfrelease(ptr)
-      if (!(result).equal?(OS.attr_no_err))
-        error(SWT::ERROR_ITEM_NOT_ADDED)
+        widget = self.attr_view
+        widget.insert_item_with_object_value(str, index)
+        widget.remove_item_at_index(index + 1)
       end
     end
     
@@ -1805,28 +1506,17 @@ module Org::Eclipse::Swt::Widgets
       end
       i_ = 0
       while i_ < items.attr_length
-        string = items[i_]
-        buffer = CharArray.new(string.length)
-        string.get_chars(0, buffer.attr_length, buffer, 0)
-        ptr = OS._cfstring_create_with_characters(OS.attr_k_cfallocator_default, buffer, buffer.attr_length)
-        if ((ptr).equal?(0))
-          error(SWT::ERROR_ITEM_NOT_ADDED)
-        end
-        result = 0
+        str = NSString.string_with(items[i_])
         if (!((self.attr_style & SWT::READ_ONLY)).equal?(0))
-          result = OS._append_menu_item_text_with_cfstring(@menu_handle, ptr, 0, 0, nil)
-          # Feature in the Macintosh.  Setting text that starts with "-" makes the
-          # menu item a separator.  The fix is to clear the separator attribute.
-          if (string.starts_with("-"))
-            OS._change_menu_item_attributes(@menu_handle, RJava.cast_to_short((i_ + 1)), 0, OS.attr_k_menu_item_attr_separator)
-          end
+          ns_menu = (self.attr_view).menu
+          ns_item = NSMenuItem.new.alloc
+          ns_item.init_with_title(str, 0, NSString.string_with(""))
+          ns_menu.add_item(ns_item)
+          ns_item.release
+          # clear the selection
+          (self.attr_view).select_item_at_index(-1)
         else
-          out_index = Array.typed(::Java::Int).new(1) { 0 }
-          result = OS._hicombo_box_append_text_item(self.attr_handle, ptr, out_index)
-        end
-        OS._cfrelease(ptr)
-        if (!(result).equal?(OS.attr_no_err))
-          error(SWT::ERROR_ITEM_NOT_ADDED)
+          (self.attr_view).add_item_with_object_value(str)
         end
         i_ += 1
       end
@@ -1852,15 +1542,8 @@ module Org::Eclipse::Swt::Widgets
     def set_list_visible(visible)
       check_widget
       if (!((self.attr_style & SWT::READ_ONLY)).equal?(0))
-        if (visible)
-          OS._hiview_simulate_click(self.attr_handle, RJava.cast_to_short(0), 0, nil)
-        else
-          OS._cancel_menu_tracking(@menu_handle, true, 0)
-        end
+        (self.attr_view).set_pulls_down(visible)
       else
-        if (OS::VERSION >= 0x1040)
-          OS._hicombo_box_set_list_visible(self.attr_handle, visible)
-        end
       end
     end
     
@@ -1902,16 +1585,18 @@ module Org::Eclipse::Swt::Widgets
         error(SWT::ERROR_NULL_ARGUMENT)
       end
       if (((self.attr_style & SWT::READ_ONLY)).equal?(0))
-        length_ = get_char_count
-        start = selection.attr_x
-        end_ = selection.attr_y
-        sel = ControlEditTextSelectionRec.new
-        sel.attr_sel_start = RJava.cast_to_short(Math.min(Math.max(Math.min(start, end_), 0), length_))
-        sel.attr_sel_end = RJava.cast_to_short(Math.min(Math.max(Math.max(start, end_), 0), length_))
-        if (has_focus)
-          OS._set_control_data(self.attr_handle, OS.attr_k_hicombo_box_edit_text_part, OS.attr_k_control_edit_text_selection_tag, 4, sel)
-        else
-          @selection = sel
+        widget = self.attr_view
+        str = NSCell.new(widget.cell).title
+        # 64
+        length_ = RJava.cast_to_int(str.length)
+        start = Math.min(Math.max(Math.min(selection.attr_x, selection.attr_y), 0), length_)
+        end_ = Math.min(Math.max(Math.max(selection.attr_x, selection.attr_y), 0), length_)
+        @selection_range = NSRange.new
+        @selection_range.attr_location = start
+        @selection_range.attr_length = end_ - start
+        field_editor = widget.current_editor
+        if (!(field_editor).nil?)
+          field_editor.set_selected_range(@selection_range)
         end
       end
     end
@@ -1919,6 +1604,10 @@ module Org::Eclipse::Swt::Widgets
     typesig { [String] }
     # Sets the contents of the receiver's text field to the
     # given string.
+    # <p>
+    # This call is ignored when the receiver is read only and
+    # the given string is not in the receiver's list.
+    # </p>
     # <p>
     # Note: The text field in a <code>Combo</code> is typically
     # only capable of displaying a single line of text. Thus,
@@ -1946,6 +1635,7 @@ module Org::Eclipse::Swt::Widgets
     
     typesig { [String, ::Java::Boolean] }
     def set_text(string, notify)
+      @ignore_verify = true
       if (notify)
         if (hooks(SWT::Verify) || filters(SWT::Verify))
           string = RJava.cast_to_string(verify_text(string, 0, get_char_count, nil))
@@ -1965,18 +1655,14 @@ module Org::Eclipse::Swt::Widgets
       else
         buffer = CharArray.new(Math.min(string.length, @text_limit))
         string.get_chars(0, buffer.attr_length, buffer, 0)
-        ptr = OS._cfstring_create_with_characters(OS.attr_k_cfallocator_default, buffer, buffer.attr_length)
-        if ((ptr).equal?(0))
-          error(SWT::ERROR_CANNOT_SET_TEXT)
-        end
-        @last_text = string
-        OS._set_control_data(self.attr_handle, OS.attr_k_hicombo_box_edit_text_part, OS.attr_k_control_edit_text_cfstring_tag, 4, Array.typed(::Java::Int).new([ptr]))
-        OS._cfrelease(ptr)
-        @selection = nil
+        nsstring = NSString.string_with_characters(buffer, buffer.attr_length)
+        NSCell.new((self.attr_view).cell).set_title(nsstring)
         if (notify)
           send_event(SWT::Modify)
         end
       end
+      @selection_range = nil
+      @ignore_verify = false
     end
     
     typesig { [::Java::Int] }
@@ -2022,29 +1708,99 @@ module Org::Eclipse::Swt::Widgets
     # </ul>
     # 
     # @since 3.0
-    def set_visible_item_count(count)
+    def set_visible_item_count(count_)
       check_widget
-      if (count < 0)
+      if (count_ < 0)
         return
       end
       if (!((self.attr_style & SWT::READ_ONLY)).equal?(0))
         # TODO
       else
-        OS._set_control_data(self.attr_handle, OS.attr_k_control_entire_control, OS.attr_k_hicombo_box_num_visible_items_tag, 4, Array.typed(::Java::Int).new([count]))
+        (self.attr_view).set_number_of_visible_items(count_)
       end
     end
     
-    typesig { [String, ::Java::Int, ::Java::Int, Event] }
+    typesig { [::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int] }
+    # long
+    # long
+    # long
+    # long
+    def should_change_text_in_range_replacement_string(id, sel, affected_char_range, replacement_string)
+      range = NSRange.new
+      OS.memmove(range, affected_char_range, NSRange.attr_sizeof)
+      result = call_super_boolean(id, sel, range, replacement_string)
+      if (hooks(SWT::Verify))
+        text = NSString.new(replacement_string).get_string
+        current_event_ = self.attr_display.attr_application.current_event
+        # long
+        type_ = current_event_.type
+        if (!(type_).equal?(OS::NSKeyDown) && !(type_).equal?(OS::NSKeyUp))
+          current_event_ = nil
+        end
+        # 64
+        # 64
+        new_text = verify_text(text, RJava.cast_to_int(range.attr_location), RJava.cast_to_int((range.attr_location + range.attr_length)), current_event_)
+        if ((new_text).nil?)
+          return false
+        end
+        if (!(text).equal?(new_text))
+          insert_edit_text(new_text)
+          result = false
+        end
+        if (!result)
+          send_event(SWT::Modify)
+        end
+      end
+      return result
+    end
+    
+    typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
+    # long
+    # long
+    # long
+    def text_view_did_change_selection(id, sel, a_notification)
+      notification = NSNotification.new(a_notification)
+      editor = NSText.new(notification.object.attr_id)
+      @selection_range = editor.selected_range
+    end
+    
+    typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
+    # long
+    # long
+    # long
+    def text_did_change(id, sel, a_notification)
+      super(id, sel, a_notification)
+      post_event(SWT::Modify)
+    end
+    
+    typesig { [::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int] }
+    # long
+    # long
+    # long
+    # long
+    # long
+    def text_view_will_change_selection_from_character_range_to_character_range(id, sel, a_text_view, old_selected_char_range, new_selected_char_range)
+      # If the selection is changing as a result of the receiver getting focus
+      # then return the receiver's last selection range, otherwise the full
+      # text will be automatically selected.
+      if (@receiving_focus && !(@selection_range).nil?)
+        return @selection_range
+      end
+      # allow the selection change to proceed
+      result = NSRange.new
+      OS.memmove(result, new_selected_char_range, NSRange.attr_sizeof)
+      return result
+    end
+    
+    typesig { [String, ::Java::Int, ::Java::Int, NSEvent] }
     def verify_text(string, start, end_, key_event)
       event = Event.new
+      if (!(key_event).nil?)
+        set_key_state(event, SWT::MouseDown, key_event)
+      end
       event.attr_text = string
       event.attr_start = start
       event.attr_end = end_
-      if (!(key_event).nil?)
-        event.attr_character = key_event.attr_character
-        event.attr_key_code = key_event.attr_key_code
-        event.attr_state_mask = key_event.attr_state_mask
-      end
       # It is possible (but unlikely), that application
       # code could have disposed the widget in the verify
       # event.  If this happens, answer null to cancel

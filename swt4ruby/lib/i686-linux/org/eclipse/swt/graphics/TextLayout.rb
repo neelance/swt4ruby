@@ -1,6 +1,6 @@
 require "rjava"
 
-# Copyright (c) 2000, 2008 IBM Corporation and others.
+# Copyright (c) 2000, 2009 IBM Corporation and others.
 # All rights reserved. This program and the accompanying materials
 # are made available under the terms of the Eclipse Public License v1.0
 # which accompanies this distribution, and is available at
@@ -333,6 +333,19 @@ module Org::Eclipse::Swt::Graphics
           when SWT::UNDERLINE_SQUIGGLE, SWT::UNDERLINE_ERROR
             if (OS::GTK_VERSION >= OS._version(2, 4, 0))
               underline_style = OS::PANGO_UNDERLINE_ERROR
+            end
+          when SWT::UNDERLINE_LINK
+            if ((style.attr_foreground).nil?)
+              # long
+              attr = OS.pango_attr_foreground_new(RJava.cast_to_short(0), RJava.cast_to_short(0x3333), RJava.cast_to_short(0x9999))
+              OS.memmove(attribute, attr, PangoAttribute.attr_sizeof)
+              attribute.attr_start_index = byte_start
+              attribute.attr_end_index = byte_end
+              OS.memmove(attr, attribute, PangoAttribute.attr_sizeof)
+              OS.pango_attr_list_insert(@attr_list, attr)
+            end
+            if ((style.attr_underline_color).nil?)
+              underline_style = OS::PANGO_UNDERLINE_SINGLE
             end
           end
           if (!(underline_style).equal?(OS::PANGO_UNDERLINE_NONE) && (style.attr_underline_color).nil?)
@@ -972,7 +985,7 @@ module Org::Eclipse::Swt::Graphics
                 else
                   OS.gdk_draw_rectangle(data.attr_drawable, gdk_gc, 1, rect.attr_x, underline_y, rect.attr_width, underline_thickness)
                 end
-              when SWT::UNDERLINE_SINGLE
+              when SWT::UNDERLINE_LINK, SWT::UNDERLINE_SINGLE
                 if (!(cairo).equal?(0) && OS::GTK_VERSION >= OS._version(2, 8, 0))
                   SwtCairo.cairo_rectangle(cairo, rect.attr_x, underline_y, rect.attr_width, underline_thickness)
                   SwtCairo.cairo_fill(cairo)
@@ -1169,6 +1182,7 @@ module Org::Eclipse::Swt::Graphics
       if (!(@ascent).equal?(-1) && !(@descent).equal?(-1))
         height = Math.max(height, @ascent + @descent)
       end
+      height += OS._pango_pixels(OS.pango_layout_get_spacing(@layout))
       return Rectangle.new(0, 0, width_, height)
     end
     
@@ -2449,6 +2463,11 @@ module Org::Eclipse::Swt::Graphics
     
     typesig { [String] }
     # Sets the receiver's text.
+    # <p>
+    # Note: Setting the text also clears all the styles. This method
+    # returns without doing anything if the new text is the same as
+    # the current text.
+    # </p>
     # 
     # @param text the new text
     # 

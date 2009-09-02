@@ -1,6 +1,6 @@
 require "rjava"
 
-# Copyright (c) 2005, 2008 IBM Corporation and others.
+# Copyright (c) 2005, 2009 IBM Corporation and others.
 # All rights reserved. This program and the accompanying materials
 # are made available under the terms of the Eclipse Public License v1.0
 # which accompanies this distribution, and is available at
@@ -155,6 +155,16 @@ module Org::Eclipse::Swt::Opengl
     alias_method :attr_samples=, :samples=
     undef_method :samples=
     
+    # Another GLCanvas whose texture namespace and display lists
+    # should be shared.
+    # 
+    # @since 3.5
+    attr_accessor :share_context
+    alias_method :attr_share_context, :share_context
+    undef_method :share_context
+    alias_method :attr_share_context=, :share_context=
+    undef_method :share_context=
+    
     typesig { [] }
     # Returns a string containing a concise, human-readable
     # description of the receiver.
@@ -180,6 +190,7 @@ module Org::Eclipse::Swt::Opengl
       @accum_alpha_size = 0
       @sample_buffers = 0
       @samples = 0
+      @share_context = nil
     end
     
     private

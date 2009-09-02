@@ -1,6 +1,6 @@
 require "rjava"
 
-# Copyright (c) 2000, 2008 IBM Corporation and others.
+# Copyright (c) 2000, 2009 IBM Corporation and others.
 # All rights reserved. This program and the accompanying materials
 # are made available under the terms of the Eclipse Public License v1.0
 # which accompanies this distribution, and is available at
@@ -115,6 +115,10 @@ module Org::Eclipse::Swt::Accessibility
       
       const_set_lazy(:ROLE_RADIOBUTTON) { 0x2d }
       const_attr_reader  :ROLE_RADIOBUTTON
+      
+      # @since 3.5
+      const_set_lazy(:ROLE_SPLITBUTTON) { 0x3e }
+      const_attr_reader  :ROLE_SPLITBUTTON
       
       const_set_lazy(:ROLE_COMBOBOX) { 0x2e }
       const_attr_reader  :ROLE_COMBOBOX

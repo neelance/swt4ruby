@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2004 IBM Corporation and others.
+ * Copyright (c) 2000, 2008 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -25,6 +25,14 @@ public class CDE extends Platform {
 	public static final native int DtActionArg_sizeof();
 
 /** Natives */
+
+/**
+ * @param appContext cast=(XtAppContext)
+ * @param display cast=(Display *)
+ * @param topWiget cast=(Widget)
+ * @param appName cast=(char *)
+ * @param appClass cast=(char *)
+ */
 public static final native boolean _DtAppInitialize(long /*int*/ appContext, long /*int*/ display, long /*int*/ topWiget, byte[] appName, byte[] appClass);
 public static final boolean DtAppInitialize(long /*int*/ appContext, long /*int*/ display, long /*int*/ topWiget, byte[] appName, byte[] appClass) {
 	lock.lock();
@@ -52,6 +60,7 @@ public static final long /*int*/ DtDtsDataTypeNames() {
 		lock.unlock();
 	}
 }
+/** @param fileName cast=(char *) */
 public static final native long /*int*/ _DtDtsFileToDataType(byte[] fileName);
 public static final long /*int*/ DtDtsFileToDataType(byte[] fileName) {
 	lock.lock();
@@ -61,6 +70,7 @@ public static final long /*int*/ DtDtsFileToDataType(byte[] fileName) {
 		lock.unlock();
 	}
 }
+/** @param dataType cast=(char *) */
 public static final native boolean _DtDtsDataTypeIsAction(byte[] dataType);
 public static final boolean DtDtsDataTypeIsAction(byte[] dataType) {
 	lock.lock();
@@ -70,6 +80,11 @@ public static final boolean DtDtsDataTypeIsAction(byte[] dataType) {
 		lock.unlock();
 	}
 }
+/**
+ * @param dataType cast=(char *)
+ * @param attrName cast=(char *)
+ * @param optName cast=(char *)
+ */
 public static final native long /*int*/ _DtDtsDataTypeToAttributeValue(byte[] dataType, byte[] attrName, byte[] optName);
 public static final long /*int*/ DtDtsDataTypeToAttributeValue(byte[] dataType, byte[] attrName, byte[] optName) {
 	lock.lock();
@@ -79,6 +94,7 @@ public static final long /*int*/ DtDtsDataTypeToAttributeValue(byte[] dataType, 
 		lock.unlock();
 	}
 }
+/** @param dataType cast=(char *) */
 public static final native void _DtDtsFreeDataType(long /*int*/ dataType);
 public static final void DtDtsFreeDataType(long /*int*/ dataType) {
 	lock.lock();
@@ -88,6 +104,7 @@ public static final void DtDtsFreeDataType(long /*int*/ dataType) {
 		lock.unlock();
 	}
 }
+/** @param dataTypeList cast=(char **) */
 public static final native void _DtDtsFreeDataTypeNames(long /*int*/ dataTypeList);
 public static final void DtDtsFreeDataTypeNames(long /*int*/ dataTypeList) {
 	lock.lock();
@@ -97,6 +114,7 @@ public static final void DtDtsFreeDataTypeNames(long /*int*/ dataTypeList) {
 		lock.unlock();
 	}
 }
+/** @param attrValue cast=(char *) */
 public static final native void _DtDtsFreeAttributeValue(long /*int*/ attrValue);
 public static final void DtDtsFreeAttributeValue(long /*int*/ attrValue) {
 	lock.lock();
@@ -106,6 +124,15 @@ public static final void DtDtsFreeAttributeValue(long /*int*/ attrValue) {
 		lock.unlock();
 	}
 }
+/**
+ * @param topWidget cast=(Widget)
+ * @param action cast=(char *)
+ * @param termOpts cast=(char *)
+ * @param execHost cast=(char *)
+ * @param contextDir cast=(char *)
+ * @param callback cast=(DtActionCallbackProc)
+ * @param clientData cast=(XtPointer)
+ */
 public static final native long _DtActionInvoke(long /*int*/ topWidget, byte[] action, DtActionArg args, int argCount, byte[] termOpts, byte[] execHost, byte[] contextDir, int useIndicator, long /*int*/ callback, long /*int*/ clientData);
 public static final long DtActionInvoke(long /*int*/ topWidget, byte[] action, DtActionArg args, int argCount, byte[] termOpts, byte[] execHost, byte[] contextDir, int useIndicator, long /*int*/ callback, long /*int*/ clientData) {
 	lock.lock();
@@ -115,6 +142,7 @@ public static final long DtActionInvoke(long /*int*/ topWidget, byte[] action, D
 		lock.unlock();
 	}
 }
+/** @method flags=const */
 public static final native long /*int*/ _topLevelShellWidgetClass();
 public static final long /*int*/ topLevelShellWidgetClass() {
 	lock.lock();
@@ -124,6 +152,13 @@ public static final long /*int*/ topLevelShellWidgetClass() {
 		lock.unlock();
 	}
 }
+/**
+ * @param appName cast=(String)
+ * @param appClass cast=(String)
+ * @param widgetClass cast=(WidgetClass)
+ * @param display cast=(Display *)
+ * @param argList cast=(ArgList)
+ */
 public static final native long /*int*/ _XtAppCreateShell(byte[] appName, byte[] appClass, long /*int*/ widgetClass, long /*int*/ display, long /*int*/ [] argList, int argCount);
 public static final long /*int*/ XtAppCreateShell(byte[] appName, byte[] appClass, long /*int*/ widgetClass, long /*int*/ display, long /*int*/ [] argList, int argCount) {
 	lock.lock();
@@ -142,6 +177,16 @@ public static final long /*int*/ XtCreateApplicationContext() {
 		lock.unlock();
 	}
 }
+/**
+ * @param app_context cast=(XtAppContext)
+ * @param display cast=(Display *)
+ * @param appName cast=(String)
+ * @param appClass cast=(String)
+ * @param options cast=(XrmOptionDescRec *)
+ * @param num_options cast=(Cardinal)
+ * @param argc cast=(int *)
+ * @param argv cast=(String *)
+ */
 public static final native void _XtDisplayInitialize(long /*int*/ app_context, long /*int*/ display, byte[] appName, byte[] appClass, long /*int*/ options, int num_options, long /*int*/ [] argc, int argv);
 public static final void XtDisplayInitialize(long /*int*/ appContext, long /*int*/ display, byte[] appName, byte[] appClass, long /*int*/ options, int num_options, long /*int*/ [] argc, int argv) {
 	lock.lock();
@@ -151,6 +196,7 @@ public static final void XtDisplayInitialize(long /*int*/ appContext, long /*int
 		lock.unlock();
 	}
 }
+/** @param widget cast=(Widget) */
 public static final native void _XtRealizeWidget(long /*int*/ widget);
 public static final void XtRealizeWidget(long /*int*/ widget) {
 	lock.lock();
@@ -160,6 +206,7 @@ public static final void XtRealizeWidget(long /*int*/ widget) {
 		lock.unlock();
 	}
 }
+/** @param widget cast=(Widget) */
 public static final native void _XtResizeWidget(long /*int*/ widget, int width, int height, int borderWidth);
 public static final void XtResizeWidget(long /*int*/ widget, int width, int height, int borderWidth) {
 	lock.lock();
@@ -169,6 +216,7 @@ public static final void XtResizeWidget(long /*int*/ widget, int width, int heig
 		lock.unlock();
 	}
 }
+/** @param widget cast=(Widget) */
 public static final native void _XtSetMappedWhenManaged(long /*int*/ widget, boolean flag);
 public static final void XtSetMappedWhenManaged(long /*int*/ widget, boolean flag) {
 	lock.lock();

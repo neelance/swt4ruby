@@ -1,6 +1,6 @@
 require "rjava"
 
-# Copyright (c) 2000, 2008 IBM Corporation and others.
+# Copyright (c) 2000, 2009 IBM Corporation and others.
 # All rights reserved. This program and the accompanying materials
 # are made available under the terms of the Eclipse Public License v1.0
 # which accompanies this distribution, and is available at
@@ -95,6 +95,7 @@ module Org::Eclipse::Swt::Widgets
   # @see Device#dispose
   # @see <a href="http://www.eclipse.org/swt/snippets/#display">Display snippets</a>
   # @see <a href="http://www.eclipse.org/swt/">Sample code and further information</a>
+  # @noextend This class is not intended to be subclassed by clients.
   class Display < DisplayImports.const_get :Device
     include_class_members DisplayImports
     
@@ -150,6 +151,12 @@ module Org::Eclipse::Swt::Widgets
     alias_method :attr_window_shadow_class=, :window_shadow_class=
     undef_method :window_shadow_class=
     
+    attr_accessor :window_own_dcclass
+    alias_method :attr_window_own_dcclass, :window_own_dcclass
+    undef_method :window_own_dcclass
+    alias_method :attr_window_own_dcclass=, :window_own_dcclass=
+    undef_method :window_own_dcclass=
+    
     class_module.module_eval {
       
       def window_class_count
@@ -168,6 +175,10 @@ module Org::Eclipse::Swt::Widgets
       # $NON-NLS-1$
       const_set_lazy(:WindowShadowName) { "SWT_WindowShadow" }
       const_attr_reader  :WindowShadowName
+      
+      # $NON-NLS-1$
+      const_set_lazy(:WindowOwnDCName) { "SWT_WindowOwnDC" }
+      const_attr_reader  :WindowOwnDCName
     }
     
     # $NON-NLS-1$
@@ -182,6 +193,12 @@ module Org::Eclipse::Swt::Widgets
     undef_method :filter_table
     alias_method :attr_filter_table=, :filter_table=
     undef_method :filter_table=
+    
+    attr_accessor :use_own_dc
+    alias_method :attr_use_own_dc, :use_own_dc
+    undef_method :use_own_dc
+    alias_method :attr_use_own_dc=, :use_own_dc=
+    undef_method :use_own_dc=
     
     # Widget Table
     attr_accessor :free_slot
@@ -506,6 +523,10 @@ module Org::Eclipse::Swt::Widgets
       # $NON-NLS-1$
       const_set_lazy(:RUN_MESSAGES_IN_MESSAGE_PROC_KEY) { "org.eclipse.swt.internal.win32.runMessagesInMessageProc" }
       const_attr_reader  :RUN_MESSAGES_IN_MESSAGE_PROC_KEY
+      
+      # $NON-NLS-1$
+      const_set_lazy(:USE_OWNDC_KEY) { "org.eclipse.swt.internal.win32.useOwnDC" }
+      const_attr_reader  :USE_OWNDC_KEY
     }
     
     # $NON-NLS-1$
@@ -557,6 +578,7 @@ module Org::Eclipse::Swt::Widgets
     undef_method :next_timer_id=
     
     class_module.module_eval {
+      # Settings
       # long
       const_set_lazy(:SETTINGS_ID) { 100 }
       const_attr_reader  :SETTINGS_ID
@@ -564,6 +586,18 @@ module Org::Eclipse::Swt::Widgets
       const_set_lazy(:SETTINGS_DELAY) { 2000 }
       const_attr_reader  :SETTINGS_DELAY
     }
+    
+    attr_accessor :last_high_contrast
+    alias_method :attr_last_high_contrast, :last_high_contrast
+    undef_method :last_high_contrast
+    alias_method :attr_last_high_contrast=, :last_high_contrast=
+    undef_method :last_high_contrast=
+    
+    attr_accessor :send_settings
+    alias_method :attr_send_settings, :send_settings
+    undef_method :send_settings
+    alias_method :attr_send_settings=, :send_settings=
+    undef_method :send_settings=
     
     # Keyboard and Mouse
     attr_accessor :click_rect
@@ -1120,8 +1154,10 @@ module Org::Eclipse::Swt::Widgets
       @thread_id = 0
       @window_class = nil
       @window_shadow_class = nil
+      @window_own_dcclass = nil
       @event_table = nil
       @filter_table = nil
+      @use_own_dc = false
       @free_slot = 0
       @index_table = nil
       @last_control = nil
@@ -1166,6 +1202,8 @@ module Org::Eclipse::Swt::Widgets
       @timer_ids = nil
       @timer_list = nil
       @next_timer_id = 0
+      @last_high_contrast = false
+      @send_settings = false
       @click_rect = nil
       @click_count = 0
       @last_time = 0
@@ -2340,7 +2378,11 @@ module Org::Eclipse::Swt::Widgets
               run_async_messages(false)
             end
           end
-          wake_thread
+          msg = MSG.new
+          flags = OS::PM_NOREMOVE | OS::PM_NOYIELD | OS::PM_QS_INPUT | OS::PM_QS_POSTMESSAGE
+          if (!OS._peek_message(msg, 0, 0, 0, flags))
+            wake_thread
+          end
         end
       end
       # 64
@@ -2646,6 +2688,9 @@ module Org::Eclipse::Swt::Widgets
       end
       if ((key == RUN_MESSAGES_IN_MESSAGE_PROC_KEY))
         return Boolean.new(@run_messages_in_message_proc)
+      end
+      if ((key == USE_OWNDC_KEY))
+        return Boolean.new(@use_own_dc)
       end
       if ((@keys).nil?)
         return nil
@@ -3655,6 +3700,7 @@ module Org::Eclipse::Swt::Widgets
       # Use the character encoding for the default locale
       @window_class = TCHAR.new(0, WindowName + RJava.cast_to_string(self.attr_window_class_count), true)
       @window_shadow_class = TCHAR.new(0, WindowShadowName + RJava.cast_to_string(self.attr_window_class_count), true)
+      @window_own_dcclass = TCHAR.new(0, WindowOwnDCName + RJava.cast_to_string(self.attr_window_class_count), true)
       self.attr_window_class_count += 1
       # Register the SWT window class
       # long
@@ -3695,6 +3741,15 @@ module Org::Eclipse::Swt::Widgets
       byte_count = @window_shadow_class.length * TCHAR.attr_sizeof
       lp_wnd_class.attr_lpsz_class_name = OS._heap_alloc(h_heap, OS::HEAP_ZERO_MEMORY, byte_count)
       OS._move_memory(lp_wnd_class.attr_lpsz_class_name, @window_shadow_class, byte_count)
+      OS._register_class(lp_wnd_class)
+      OS._heap_free(h_heap, 0, lp_wnd_class.attr_lpsz_class_name)
+      # Register the CS_OWNDC window class
+      if (!OS::IsWinCE && OS::WIN32_VERSION >= OS._version(5, 1))
+        lp_wnd_class.attr_style |= OS::CS_OWNDC
+      end
+      byte_count = @window_own_dcclass.length * TCHAR.attr_sizeof
+      lp_wnd_class.attr_lpsz_class_name = OS._heap_alloc(h_heap, OS::HEAP_ZERO_MEMORY, byte_count)
+      OS._move_memory(lp_wnd_class.attr_lpsz_class_name, @window_own_dcclass, byte_count)
       OS._register_class(lp_wnd_class)
       OS._heap_free(h_heap, 0, lp_wnd_class.attr_lpsz_class_name)
       # Create the message only HWND
@@ -3744,6 +3799,8 @@ module Org::Eclipse::Swt::Widgets
         i += 1
       end
       @index_table[GROW_SIZE - 1] = -1
+      # Remember the last high contrast state
+      @last_high_contrast = get_high_contrast
     end
     
     typesig { [::Java::Int, SwtGCData] }
@@ -4216,15 +4273,54 @@ module Org::Eclipse::Swt::Widgets
             return 0
           end
         when OS::WM_DWMCOLORIZATIONCOLORCHANGED
-          OS._set_timer(@hwnd_message, SETTINGS_ID, SETTINGS_DELAY, 0)
-        when OS::WM_SETTINGCHANGE
+          @send_settings = true
+          # FALL THROUGH
+          # 
+          # Bug in Windows.  When high contrast is cleared using
+          # the key sequence, Alt + Left Shift + Print Screen, the
+          # system parameter is set to false, but WM_SETTINGCHANGE
+          # is not sent with SPI_SETHIGHCONTRAST.  The fix is to
+          # detect the change when any WM_SETTINGCHANGE message
+          # is sent.
+          if (!(@last_high_contrast).equal?(get_high_contrast))
+            @send_settings = true
+            @last_high_contrast = get_high_contrast
+          end
           if (!OS::IsWinCE && OS::WIN32_VERSION >= OS._version(6, 0))
-            OS._set_timer(@hwnd_message, SETTINGS_ID, SETTINGS_DELAY, 0)
-            throw :break_case, :thrown
+            @send_settings = true
           end
           # 64
           case (RJava.cast_to_int(w_param))
           when 0, 1, OS::SPI_SETHIGHCONTRAST
+            @send_settings = true
+            @last_high_contrast = get_high_contrast
+          end
+          # Set the initial timer or push the time out period forward
+          if (@send_settings)
+            OS._set_timer(@hwnd_message, SETTINGS_ID, SETTINGS_DELAY, 0)
+          end
+        when OS::WM_SETTINGCHANGE
+          # Bug in Windows.  When high contrast is cleared using
+          # the key sequence, Alt + Left Shift + Print Screen, the
+          # system parameter is set to false, but WM_SETTINGCHANGE
+          # is not sent with SPI_SETHIGHCONTRAST.  The fix is to
+          # detect the change when any WM_SETTINGCHANGE message
+          # is sent.
+          if (!(@last_high_contrast).equal?(get_high_contrast))
+            @send_settings = true
+            @last_high_contrast = get_high_contrast
+          end
+          if (!OS::IsWinCE && OS::WIN32_VERSION >= OS._version(6, 0))
+            @send_settings = true
+          end
+          # 64
+          case (RJava.cast_to_int(w_param))
+          when 0, 1, OS::SPI_SETHIGHCONTRAST
+            @send_settings = true
+            @last_high_contrast = get_high_contrast
+          end
+          # Set the initial timer or push the time out period forward
+          if (@send_settings)
             OS._set_timer(@hwnd_message, SETTINGS_ID, SETTINGS_DELAY, 0)
           end
         when OS::WM_THEMECHANGED
@@ -4248,6 +4344,7 @@ module Org::Eclipse::Swt::Widgets
           end
         when OS::WM_TIMER
           if ((w_param).equal?(SETTINGS_ID))
+            @send_settings = false
             OS._kill_timer(@hwnd_message, SETTINGS_ID)
             run_settings
           else
@@ -4417,6 +4514,13 @@ module Org::Eclipse::Swt::Widgets
     # <li>(in) type MouseMove
     # <li>(in) x the x coordinate to move the mouse pointer to in screen coordinates
     # <li>(in) y the y coordinate to move the mouse pointer to in screen coordinates
+    # </ul>
+    # <p>MouseWheel</p>
+    # <p>The following fields in the <code>Event</code> apply:
+    # <ul>
+    # <li>(in) type MouseWheel
+    # <li>(in) detail either SWT.SCROLL_LINE or SWT.SCROLL_PAGE
+    # <li>(in) count the number of lines or pages to scroll
     # </ul>
     # </dl>
     # 
@@ -4625,7 +4729,7 @@ module Org::Eclipse::Swt::Widgets
         run_deferred_events
         return true
       end
-      return @run_messages && run_async_messages(false)
+      return is_disposed || (@run_messages && run_async_messages(false))
     end
     
     class_module.module_eval {
@@ -4755,6 +4859,8 @@ module Org::Eclipse::Swt::Widgets
         @foreground_idle_callback = nil
         @foreground_idle_proc = 0
       end
+      # Stop the settings timer
+      OS._kill_timer(@hwnd_message, SETTINGS_ID)
       # Destroy the message only HWND
       if (!(@hwnd_message).equal?(0))
         OS._destroy_window(@hwnd_message)
@@ -4769,9 +4875,10 @@ module Org::Eclipse::Swt::Widgets
       # long
       h_instance = OS._get_module_handle(nil)
       OS._unregister_class(@window_class, h_instance)
-      # Unregister the SWT drop shadow window class
+      # Unregister the SWT drop shadow and CS_OWNDC window class
       OS._unregister_class(@window_shadow_class, h_instance)
-      @window_class = @window_shadow_class = nil
+      OS._unregister_class(@window_own_dcclass, h_instance)
+      @window_class = @window_shadow_class = @window_own_dcclass = nil
       @window_callback.dispose
       @window_callback = nil
       @window_proc = 0
@@ -5106,6 +5213,7 @@ module Org::Eclipse::Swt::Widgets
     
     typesig { [] }
     def run_deferred_events
+      run = false
       # Run deferred events.  This code is always
       # called in the Display's thread so it must
       # be re-enterant but need not be synchronized.
@@ -5123,13 +5231,14 @@ module Org::Eclipse::Swt::Widgets
         if (!(widget).nil? && !widget.is_disposed)
           item = event.attr_item
           if ((item).nil? || !item.is_disposed)
+            run = true
             widget.send_event(event)
           end
         end
       end
       # Clear the queue
       @event_queue = nil
-      return true
+      return run
     end
     
     typesig { [] }
@@ -5353,6 +5462,11 @@ module Org::Eclipse::Swt::Widgets
       if ((key == RUN_MESSAGES_IN_MESSAGE_PROC_KEY))
         data = value
         @run_messages_in_message_proc = !(data).nil? && data.boolean_value
+        return
+      end
+      if ((key == USE_OWNDC_KEY))
+        data = value
+        @use_own_dc = !(data).nil? && data.boolean_value
         return
       end
       # Remove the key/value pair

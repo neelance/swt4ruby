@@ -94,6 +94,7 @@ module Org::Eclipse::Swt::Graphics
     # @see SWT#UNDERLINE_DOUBLE
     # @see SWT#UNDERLINE_ERROR
     # @see SWT#UNDERLINE_SQUIGGLE
+    # @see SWT#UNDERLINE_LINK
     # 
     # @since 3.4
     attr_accessor :underline_style
@@ -166,6 +167,17 @@ module Org::Eclipse::Swt::Graphics
     alias_method :attr_rise=, :rise=
     undef_method :rise=
     
+    # the data. An user data field. It can be used to hold the HREF when the range
+    # is used as a link or the embed object when the range is used with <code>GlyphMetrics</code>.
+    # <p>
+    # 
+    # @since 3.5
+    attr_accessor :data
+    alias_method :attr_data, :data
+    undef_method :data
+    alias_method :attr_data=, :data=
+    undef_method :data=
+    
     typesig { [] }
     # Create an empty text style.
     # 
@@ -183,6 +195,7 @@ module Org::Eclipse::Swt::Graphics
       @border_color = nil
       @metrics = nil
       @rise = 0
+      @data = nil
     end
     
     typesig { [Font, Color, Color] }
@@ -205,6 +218,7 @@ module Org::Eclipse::Swt::Graphics
       @border_color = nil
       @metrics = nil
       @rise = 0
+      @data = nil
       if (!(font).nil? && font.is_disposed)
         SWT.error(SWT::ERROR_INVALID_ARGUMENT)
       end
@@ -238,6 +252,7 @@ module Org::Eclipse::Swt::Graphics
       @border_color = nil
       @metrics = nil
       @rise = 0
+      @data = nil
       if ((style).nil?)
         SWT.error(SWT::ERROR_INVALID_ARGUMENT)
       end
@@ -253,6 +268,7 @@ module Org::Eclipse::Swt::Graphics
       @border_color = style.attr_border_color
       @metrics = style.attr_metrics
       @rise = style.attr_rise
+      @data = style.attr_data
     end
     
     typesig { [Object] }
@@ -350,6 +366,15 @@ module Org::Eclipse::Swt::Graphics
           return false
         end
       end
+      if (!(@data).nil?)
+        if (!(@data == style.attr_data))
+          return false
+        end
+      else
+        if (!(style.attr_data).nil?)
+          return false
+        end
+      end
       return true
     end
     
@@ -415,6 +440,15 @@ module Org::Eclipse::Swt::Graphics
         if (!(style.attr_border_color).nil?)
           return false
         end
+        if (!(@foreground).nil?)
+          if (!(@foreground == style.attr_foreground))
+            return false
+          end
+        else
+          if (!(style.attr_foreground).nil?)
+            return false
+          end
+        end
       end
       return true
     end
@@ -441,6 +475,15 @@ module Org::Eclipse::Swt::Graphics
         if (!(style.attr_underline_color).nil?)
           return false
         end
+        if (!(@foreground).nil?)
+          if (!(@foreground == style.attr_foreground))
+            return false
+          end
+        else
+          if (!(style.attr_foreground).nil?)
+            return false
+          end
+        end
       end
       return true
     end
@@ -464,6 +507,15 @@ module Org::Eclipse::Swt::Graphics
         if (!(style.attr_strikeout_color).nil?)
           return false
         end
+        if (!(@foreground).nil?)
+          if (!(@foreground == style.attr_foreground))
+            return false
+          end
+        else
+          if (!(style.attr_foreground).nil?)
+            return false
+          end
+        end
       end
       return true
     end
@@ -474,56 +526,100 @@ module Org::Eclipse::Swt::Graphics
     # 
     # @return a string representation of the <code>TextStyle</code>
     def to_s
-      buffer = StringBuffer.new("TextStyle {")
+      buffer = StringBuffer.new("TextStyle {") # $NON-NLS-1$
       start_length = buffer.length
       if (!(@font).nil?)
         if (buffer.length > start_length)
           buffer.append(", ")
-        end
-        buffer.append("font=")
+        end # $NON-NLS-1$
+        buffer.append("font=") # $NON-NLS-1$
         buffer.append(@font)
       end
       if (!(@foreground).nil?)
         if (buffer.length > start_length)
           buffer.append(", ")
-        end
-        buffer.append("foreground=")
+        end # $NON-NLS-1$
+        buffer.append("foreground=") # $NON-NLS-1$
         buffer.append(@foreground)
       end
       if (!(@background).nil?)
         if (buffer.length > start_length)
           buffer.append(", ")
-        end
-        buffer.append("background=")
+        end # $NON-NLS-1$
+        buffer.append("background=") # $NON-NLS-1$
         buffer.append(@background)
       end
       if (@underline)
         if (buffer.length > start_length)
           buffer.append(", ")
+        end # $NON-NLS-1$
+        buffer.append("underline=") # $NON-NLS-1$
+        case (@underline_style)
+        # $NON-NLS-1$
+        # $NON-NLS-1$
+        # $NON-NLS-1$
+        # $NON-NLS-1$
+        when SWT::UNDERLINE_SINGLE
+          buffer.append("single")
+        when SWT::UNDERLINE_DOUBLE
+          buffer.append("double")
+        when SWT::UNDERLINE_SQUIGGLE
+          buffer.append("squiggle")
+        when SWT::UNDERLINE_ERROR
+          buffer.append("error")
+        when SWT::UNDERLINE_LINK
+          buffer.append("link")
+        end # $NON-NLS-1$
+        if (!(@underline_color).nil?)
+          buffer.append(", underlineColor=") # $NON-NLS-1$
+          buffer.append(@underline_color)
         end
-        buffer.append("underlined")
       end
       if (@strikeout)
         if (buffer.length > start_length)
           buffer.append(", ")
+        end # $NON-NLS-1$
+        buffer.append("striked out") # $NON-NLS-1$
+        if (!(@strikeout_color).nil?)
+          buffer.append(", strikeoutColor=") # $NON-NLS-1$
+          buffer.append(@strikeout_color)
         end
-        buffer.append("striked out")
+      end
+      if (!(@border_style).equal?(SWT::NONE))
+        if (buffer.length > start_length)
+          buffer.append(", ")
+        end # $NON-NLS-1$
+        buffer.append("border=") # $NON-NLS-1$
+        case (@border_style)
+        # $NON-NLS-1$
+        # $NON-NLS-1$
+        when SWT::BORDER_SOLID
+          buffer.append("solid")
+        when SWT::BORDER_DOT
+          buffer.append("dot")
+        when SWT::BORDER_DASH
+          buffer.append("dash")
+        end # $NON-NLS-1$
+        if (!(@border_color).nil?)
+          buffer.append(", borderColor=") # $NON-NLS-1$
+          buffer.append(@border_color)
+        end
       end
       if (!(@rise).equal?(0))
         if (buffer.length > start_length)
           buffer.append(", ")
-        end
-        buffer.append("rise=")
+        end # $NON-NLS-1$
+        buffer.append("rise=") # $NON-NLS-1$
         buffer.append(@rise)
       end
       if (!(@metrics).nil?)
         if (buffer.length > start_length)
           buffer.append(", ")
-        end
-        buffer.append("metrics=")
+        end # $NON-NLS-1$
+        buffer.append("metrics=") # $NON-NLS-1$
         buffer.append(@metrics)
       end
-      buffer.append("}")
+      buffer.append("}") # $NON-NLS-1$
       return buffer.to_s
     end
     

@@ -1,6 +1,6 @@
 require "rjava"
 
-# Copyright (c) 2000, 2006 IBM Corporation and others.
+# Copyright (c) 2000, 2008 IBM Corporation and others.
 # All rights reserved. This program and the accompanying materials
 # are made available under the terms of the Eclipse Public License v1.0
 # which accompanies this distribution, and is available at
@@ -19,6 +19,7 @@ module Org::Eclipse::Swt::Internal::Win32
   class HDLAYOUT 
     include_class_members HDLAYOUTImports
     
+    # @field cast=(RECT *)
     # long
     attr_accessor :prc
     alias_method :attr_prc, :prc
@@ -26,6 +27,7 @@ module Org::Eclipse::Swt::Internal::Win32
     alias_method :attr_prc=, :prc=
     undef_method :prc=
     
+    # @field cast=(WINDOWPOS *)
     # long
     attr_accessor :pwpos
     alias_method :attr_pwpos, :pwpos

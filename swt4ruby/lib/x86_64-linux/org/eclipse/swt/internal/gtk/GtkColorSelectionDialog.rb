@@ -1,6 +1,6 @@
 require "rjava"
 
-# Copyright (c) 2000, 2006 IBM Corporation and others. All rights reserved.
+# Copyright (c) 2000, 2008 IBM Corporation and others. All rights reserved.
 # The contents of this file are made available under the terms
 # of the GNU Lesser General Public License (LGPL) Version 2.1 that
 # accompanies this distribution (lgpl-v21.txt).  The LGPL is also
@@ -23,6 +23,7 @@ module Org::Eclipse::Swt::Internal::Gtk
   class GtkColorSelectionDialog 
     include_class_members GtkColorSelectionDialogImports
     
+    # @field cast=(GtkWidget *)
     # int
     attr_accessor :colorsel
     alias_method :attr_colorsel, :colorsel
@@ -30,6 +31,7 @@ module Org::Eclipse::Swt::Internal::Gtk
     alias_method :attr_colorsel=, :colorsel=
     undef_method :colorsel=
     
+    # @field cast=(GtkWidget *)
     # int
     attr_accessor :ok_button
     alias_method :attr_ok_button, :ok_button
@@ -37,6 +39,7 @@ module Org::Eclipse::Swt::Internal::Gtk
     alias_method :attr_ok_button=, :ok_button=
     undef_method :ok_button=
     
+    # @field cast=(GtkWidget *)
     # int
     attr_accessor :cancel_button
     alias_method :attr_cancel_button, :cancel_button
@@ -44,6 +47,7 @@ module Org::Eclipse::Swt::Internal::Gtk
     alias_method :attr_cancel_button=, :cancel_button=
     undef_method :cancel_button=
     
+    # @field cast=(GtkWidget *)
     # int
     attr_accessor :help_button
     alias_method :attr_help_button, :help_button

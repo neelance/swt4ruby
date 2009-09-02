@@ -1,6 +1,6 @@
 require "rjava"
 
-# Copyright (c) 2000, 2006 IBM Corporation and others.
+# Copyright (c) 2000, 2008 IBM Corporation and others.
 # All rights reserved. This program and the accompanying materials
 # are made available under the terms of the Eclipse Public License v1.0
 # which accompanies this distribution, and is available at
@@ -20,12 +20,14 @@ module Org::Eclipse::Swt::Internal::Win32
     include_class_members MINMAXINFOImports
     
     # POINT ptReserved;
+    # @field accessor=ptReserved.x
     attr_accessor :pt_reserved_x
     alias_method :attr_pt_reserved_x, :pt_reserved_x
     undef_method :pt_reserved_x
     alias_method :attr_pt_reserved_x=, :pt_reserved_x=
     undef_method :pt_reserved_x=
     
+    # @field accessor=ptReserved.y
     attr_accessor :pt_reserved_y
     alias_method :attr_pt_reserved_y, :pt_reserved_y
     undef_method :pt_reserved_y
@@ -33,12 +35,14 @@ module Org::Eclipse::Swt::Internal::Win32
     undef_method :pt_reserved_y=
     
     # POINT ptMaxSize;
+    # @field accessor=ptMaxSize.x
     attr_accessor :pt_max_size_x
     alias_method :attr_pt_max_size_x, :pt_max_size_x
     undef_method :pt_max_size_x
     alias_method :attr_pt_max_size_x=, :pt_max_size_x=
     undef_method :pt_max_size_x=
     
+    # @field accessor=ptMaxSize.y
     attr_accessor :pt_max_size_y
     alias_method :attr_pt_max_size_y, :pt_max_size_y
     undef_method :pt_max_size_y
@@ -46,12 +50,14 @@ module Org::Eclipse::Swt::Internal::Win32
     undef_method :pt_max_size_y=
     
     # POINT ptMaxPosition;
+    # @field accessor=ptMaxPosition.x
     attr_accessor :pt_max_position_x
     alias_method :attr_pt_max_position_x, :pt_max_position_x
     undef_method :pt_max_position_x
     alias_method :attr_pt_max_position_x=, :pt_max_position_x=
     undef_method :pt_max_position_x=
     
+    # @field accessor=ptMaxPosition.y
     attr_accessor :pt_max_position_y
     alias_method :attr_pt_max_position_y, :pt_max_position_y
     undef_method :pt_max_position_y
@@ -59,12 +65,14 @@ module Org::Eclipse::Swt::Internal::Win32
     undef_method :pt_max_position_y=
     
     # POINT ptMinTrackSize;
+    # @field accessor=ptMinTrackSize.x
     attr_accessor :pt_min_track_size_x
     alias_method :attr_pt_min_track_size_x, :pt_min_track_size_x
     undef_method :pt_min_track_size_x
     alias_method :attr_pt_min_track_size_x=, :pt_min_track_size_x=
     undef_method :pt_min_track_size_x=
     
+    # @field accessor=ptMinTrackSize.y
     attr_accessor :pt_min_track_size_y
     alias_method :attr_pt_min_track_size_y, :pt_min_track_size_y
     undef_method :pt_min_track_size_y
@@ -72,12 +80,14 @@ module Org::Eclipse::Swt::Internal::Win32
     undef_method :pt_min_track_size_y=
     
     # POINT ptMaxTrackSize;
+    # @field accessor=ptMaxTrackSize.x
     attr_accessor :pt_max_track_size_x
     alias_method :attr_pt_max_track_size_x, :pt_max_track_size_x
     undef_method :pt_max_track_size_x
     alias_method :attr_pt_max_track_size_x=, :pt_max_track_size_x=
     undef_method :pt_max_track_size_x=
     
+    # @field accessor=ptMaxTrackSize.y
     attr_accessor :pt_max_track_size_y
     alias_method :attr_pt_max_track_size_y, :pt_max_track_size_y
     undef_method :pt_max_track_size_y

@@ -1,6 +1,6 @@
 require "rjava"
 
-# Copyright (c) 2003, 2007 IBM Corporation and others.
+# Copyright (c) 2003, 2009 IBM Corporation and others.
 # All rights reserved. This program and the accompanying materials
 # are made available under the terms of the Eclipse Public License v1.0
 # which accompanies this distribution, and is available at
@@ -200,10 +200,17 @@ module Org::Eclipse::Swt::Browser
     # int
     # int
     def _create_instance(a_outer, iid, result)
-      helper_app_launcher_dialog = HelperAppLauncherDialog.new
-      helper_app_launcher_dialog._add_ref
-      # int
-      XPCOM.memmove(result, Array.typed(::Java::Long).new([helper_app_launcher_dialog.get_address]), C::PTR_SIZEOF)
+      if (Mozilla::IsPre_1_9)
+        helper_app_launcher_dialog = HelperAppLauncherDialog.new
+        helper_app_launcher_dialog._add_ref
+        # int
+        XPCOM.memmove(result, Array.typed(::Java::Long).new([helper_app_launcher_dialog.get_address]), C::PTR_SIZEOF)
+      else
+        helper_app_launcher_dialog = HelperAppLauncherDialog_1_9.new
+        helper_app_launcher_dialog._add_ref
+        # int
+        XPCOM.memmove(result, Array.typed(::Java::Long).new([helper_app_launcher_dialog.get_address]), C::PTR_SIZEOF)
+      end
       return XPCOM::NS_OK
     end
     

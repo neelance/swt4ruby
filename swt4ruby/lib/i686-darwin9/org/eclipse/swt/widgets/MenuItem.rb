@@ -1,6 +1,6 @@
 require "rjava"
 
-# Copyright (c) 2000, 2008 IBM Corporation and others.
+# Copyright (c) 2000, 2009 IBM Corporation and others.
 # All rights reserved. This program and the accompanying materials
 # are made available under the terms of the Eclipse Public License v1.0
 # which accompanies this distribution, and is available at
@@ -13,10 +13,10 @@ module Org::Eclipse::Swt::Widgets
     class_module.module_eval {
       include ::Java::Lang
       include ::Org::Eclipse::Swt::Widgets
+      include ::Org::Eclipse::Swt::Internal::Cocoa
       include ::Org::Eclipse::Swt
       include ::Org::Eclipse::Swt::Graphics
       include ::Org::Eclipse::Swt::Events
-      include ::Org::Eclipse::Swt::Internal::Carbon
     }
   end
   
@@ -36,8 +36,15 @@ module Org::Eclipse::Swt::Widgets
   # </p>
   # 
   # @see <a href="http://www.eclipse.org/swt/">Sample code and further information</a>
+  # @noextend This class is not intended to be subclassed by clients.
   class MenuItem < MenuItemImports.const_get :Item
     include_class_members MenuItemImports
+    
+    attr_accessor :ns_item
+    alias_method :attr_ns_item, :ns_item
+    undef_method :ns_item
+    alias_method :attr_ns_item=, :ns_item=
+    undef_method :ns_item=
     
     attr_accessor :parent
     alias_method :attr_parent, :parent
@@ -58,8 +65,6 @@ module Org::Eclipse::Swt::Widgets
     undef_method :accelerator=
     
     typesig { [Menu, ::Java::Int] }
-    # int x, y, width, height;
-    # 
     # Constructs a new instance of this class given its parent
     # (which must be a <code>Menu</code>) and a style value
     # describing its behavior and appearance. The item is added
@@ -93,6 +98,7 @@ module Org::Eclipse::Swt::Widgets
     # @see Widget#checkSubclass
     # @see Widget#getStyle
     def initialize(parent, style)
+      @ns_item = nil
       @parent = nil
       @menu = nil
       @accelerator = 0
@@ -137,6 +143,7 @@ module Org::Eclipse::Swt::Widgets
     # @see Widget#checkSubclass
     # @see Widget#getStyle
     def initialize(parent, style, index)
+      @ns_item = nil
       @parent = nil
       @menu = nil
       @accelerator = 0
@@ -248,17 +255,16 @@ module Org::Eclipse::Swt::Widgets
     
     typesig { [] }
     def create_empty_menu
-      # Bug in the Macintosh.  When a menu bar item does not have
-      # an associated pull down menu, the Macintosh segment faults.
-      # The fix is to temporarily attach an empty menu.
       if (!((@parent.attr_style & SWT::BAR)).equal?(0))
-        out_menu_ref = Array.typed(::Java::Int).new(1) { 0 }
-        if (!(OS._create_new_menu(RJava.cast_to_short(0), 0, out_menu_ref)).equal?(OS.attr_no_err))
-          error(SWT::ERROR_NO_HANDLES)
-        end
-        return out_menu_ref[0]
+        return SWTMenu.new.alloc.init
       end
-      return 0
+      return nil
+    end
+    
+    typesig { [] }
+    def deregister
+      super
+      self.attr_display.remove_widget(@ns_item)
     end
     
     typesig { [] }
@@ -284,36 +290,6 @@ module Org::Eclipse::Swt::Widgets
     def get_accelerator
       check_widget
       return @accelerator
-    end
-    
-    typesig { [] }
-    # public
-    def get_bounds
-      check_widget
-      if (!((@parent.attr_style & SWT::BAR)).equal?(0))
-        index = @parent.index_of(self)
-        if ((index).equal?(-1))
-          return Rectangle.new(0, 0, 0, 0)
-        end
-        menu = self.attr_display.get_menu_bar
-        if (!(@parent).equal?(menu))
-          return Rectangle.new(0, 0, 0, 0)
-        end
-        out_menu_ref = Array.typed(::Java::Int).new(1) { 0 }
-        if (!(OS._get_menu_item_hierarchical_menu(menu.attr_handle, RJava.cast_to_short((index + 1)), out_menu_ref)).equal?(OS.attr_no_err))
-          return Rectangle.new(0, 0, 0, 0)
-        end
-        rect = Rect.new
-        # TODO - get the bounds of the menu item from the menu title
-        # if (... code needed to do this ... != OS.noErr) {
-        # return new Rectangle (0 ,0, 0, 0);
-        # }
-        width = rect.attr_right - rect.attr_left
-        height = rect.attr_bottom - rect.attr_top
-        return Rectangle.new(rect.attr_left, rect.attr_top, width, height)
-      end
-      return Rectangle.new(0, 0, 0, 0)
-      # return new Rectangle (x, y, width, height);
     end
     
     typesig { [] }
@@ -393,38 +369,7 @@ module Org::Eclipse::Swt::Widgets
       if (((self.attr_style & (SWT::CHECK | SWT::RADIO))).equal?(0))
         return false
       end
-      index = @parent.index_of(self)
-      if ((index).equal?(-1))
-        return false
-      end
-      out_mark = Array.typed(::Java::Short).new(1) { 0 }
-      OS._get_item_mark(@parent.attr_handle, RJava.cast_to_short((index + 1)), out_mark)
-      return !(out_mark[0]).equal?(0)
-    end
-    
-    typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
-    def k_event_process_command(next_handler, the_event, user_data)
-      # TEMPORARY CODE
-      if (!is_enabled)
-        return OS.attr_no_err
-      end
-      if (!((self.attr_style & SWT::CHECK)).equal?(0))
-        set_selection(!get_selection)
-      else
-        if (!((self.attr_style & SWT::RADIO)).equal?(0))
-          if (!((@parent.get_style & SWT::NO_RADIO_GROUP)).equal?(0))
-            set_selection(!get_selection)
-          else
-            select_radio
-          end
-        end
-      end
-      modifiers = Array.typed(::Java::Int).new(1) { 0 }
-      OS._get_event_parameter(the_event, OS.attr_k_event_param_key_modifiers, OS.attr_type_uint32, nil, 4, nil, modifiers)
-      event = Event.new
-      set_input_state(event, RJava.cast_to_short(0), OS._get_current_event_button_state, modifiers[0])
-      post_event(SWT::Selection, event)
-      return OS.attr_no_err
+      return (@ns_item.state).equal?(OS::NSOnState)
     end
     
     typesig { [] }
@@ -446,74 +391,102 @@ module Org::Eclipse::Swt::Widgets
     end
     
     typesig { [::Java::Int] }
-    def key_glyph(key)
+    def key_char(key)
+      # TODO - use the NS key constants
       case (key)
+      # case ' ': return OS.kMenuBlankGlyph;
       # case ' ': return OS.kMenuSpaceGlyph;
+      # case SWT.CAPS_LOCK: return ??;
       when SWT::BS
-        return OS.attr_k_menu_delete_left_glyph
+        return OS::NSBackspaceCharacter
       when SWT::CR
-        return OS.attr_k_menu_return_glyph
+        return OS::NSCarriageReturnCharacter
       when SWT::DEL
-        return OS.attr_k_menu_delete_right_glyph
+        return OS::NSDeleteCharacter
       when SWT::ESC
-        return OS.attr_k_menu_escape_glyph
+        return SWT::ESC
       when SWT::LF
-        return OS.attr_k_menu_return_glyph
+        return OS::NSNewlineCharacter
       when SWT::TAB
-        return OS.attr_k_menu_tab_right_glyph
-      when Character.new(?\s.ord)
-        return OS.attr_k_menu_blank_glyph
+        return OS::NSTabCharacter
       when SWT::ALT
-        return OS.attr_k_menu_option_glyph
+        return 0x2325
       when SWT::SHIFT
-        return OS.attr_k_menu_shift_glyph
+        return 0x21e7
       when SWT::CONTROL
-        return OS.attr_k_menu_control_isoglyph
+        return 0xf2303
       when SWT::COMMAND
-        return OS.attr_k_menu_command_glyph
+        return 0x2318
       when SWT::ARROW_UP
-        return OS.attr_k_menu_up_arrow_glyph
+        return 0x2191
       when SWT::ARROW_DOWN
-        return OS.attr_k_menu_down_arrow_glyph
+        return 0x2193
       when SWT::ARROW_LEFT
-        return OS.attr_k_menu_left_arrow_glyph
+        return 0x2190
       when SWT::ARROW_RIGHT
-        return OS.attr_k_menu_right_arrow_glyph
+        return 0x2192
       when SWT::PAGE_UP
-        return OS.attr_k_menu_page_up_glyph
+        return 0x21de
       when SWT::PAGE_DOWN
-        return OS.attr_k_menu_page_down_glyph
+        return 0x21df
+      when SWT::KEYPAD_CR
+        return OS::NSEnterCharacter
+      when SWT::HELP
+        return OS::NSHelpFunctionKey
+      when SWT::HOME
+        return 0xf729
+      when SWT::END_
+        return 0xf72b
       when SWT::F1
-        return OS.attr_k_menu_f1glyph
+        return 0xf704
       when SWT::F2
-        return OS.attr_k_menu_f2glyph
+        return 0xf705
       when SWT::F3
-        return OS.attr_k_menu_f3glyph
+        return 0xf706
       when SWT::F4
-        return OS.attr_k_menu_f4glyph
+        return 0xf707
       when SWT::F5
-        return OS.attr_k_menu_f5glyph
+        return 0xf708
       when SWT::F6
-        return OS.attr_k_menu_f6glyph
+        return 0xf709
       when SWT::F7
-        return OS.attr_k_menu_f7glyph
+        return 0xf70a
       when SWT::F8
-        return OS.attr_k_menu_f8glyph
+        return 0xf70b
       when SWT::F9
-        return OS.attr_k_menu_f9glyph
+        return 0xf70c
       when SWT::F10
-        return OS.attr_k_menu_f10glyph
+        return 0xf70d
       when SWT::F11
-        return OS.attr_k_menu_f11glyph
+        return 0xf70e
       when SWT::F12
-        return OS.attr_k_menu_f12glyph
+        return 0xf70f
+      when SWT::F13
+        return 0xf710
+      when SWT::F14
+        return 0xf711
+      when SWT::F15
+        return 0xf712
       end
-      return OS.attr_k_menu_null_glyph
+      # The following lines are intentionally commented.
+      # 
+      # case SWT.INSERT: return ??;
+      return 0
+    end
+    
+    typesig { [] }
+    def register
+      super
+      self.attr_display.add_widget(@ns_item, self)
     end
     
     typesig { [] }
     def release_handle
       super
+      if (!(@ns_item).nil?)
+        @ns_item.release
+      end
+      @ns_item = nil
       @parent = nil
     end
     
@@ -618,36 +591,6 @@ module Org::Eclipse::Swt::Widgets
     end
     
     typesig { [] }
-    # public
-    def select
-      check_widget
-      menu = @parent
-      menu_parent = nil
-      while (!(menu.attr_cascade).nil? && !((menu_parent = menu.attr_cascade.attr_parent)).nil?)
-        if (!((menu_parent.attr_style & SWT::BAR)).equal?(0))
-          break
-        end
-        menu = menu_parent
-      end
-      if ((menu).nil?)
-        return
-      end
-      OS._hilite_menu(OS._get_menu_id(menu.attr_handle))
-      event = Array.typed(::Java::Int).new(1) { 0 }
-      OS._create_event(0, OS.attr_k_event_class_command, OS.attr_k_event_process_command, 0.0, 0, event)
-      if (!(event[0]).equal?(0))
-        parent_handle = @parent.attr_handle
-        command = HICommand.new
-        command.attr_attributes = OS.attr_k_hicommand_from_menu
-        command.attr_menu_menu_ref = parent_handle
-        command.attr_menu_menu_item_index = RJava.cast_to_short((@parent.index_of(self) + 1))
-        OS._set_event_parameter(event[0], OS.attr_k_event_param_direct_object, OS.attr_type_hicommand, HICommand.attr_sizeof, command)
-        OS._send_event_to_event_target(event[0], OS._get_application_event_target)
-        OS._release_event(event[0])
-      end
-    end
-    
-    typesig { [] }
     def select_radio
       index = 0
       items = @parent.get_items
@@ -663,6 +606,27 @@ module Org::Eclipse::Swt::Widgets
         j += 1
       end
       set_selection(true)
+    end
+    
+    typesig { [] }
+    def send_selection
+      if (!((self.attr_style & SWT::CHECK)).equal?(0))
+        set_selection(!get_selection)
+      else
+        if (!((self.attr_style & SWT::RADIO)).equal?(0))
+          if (!((@parent.get_style & SWT::NO_RADIO_GROUP)).equal?(0))
+            set_selection(!get_selection)
+          else
+            select_radio
+          end
+        end
+      end
+      event = Event.new
+      ns_event = NSApplication.shared_application.current_event
+      if (!(ns_event).nil?)
+        set_input_state(event, ns_event, 0)
+      end
+      post_event(SWT::Selection, event)
     end
     
     typesig { [::Java::Int] }
@@ -682,50 +646,33 @@ module Org::Eclipse::Swt::Widgets
     # </ul>
     def set_accelerator(accelerator)
       check_widget
-      index = @parent.index_of(self)
-      if ((index).equal?(-1))
+      if ((@accelerator).equal?(accelerator))
         return
       end
-      update = ((@accelerator).equal?(0) && !(accelerator).equal?(0)) || (!(@accelerator).equal?(0) && (accelerator).equal?(0))
       @accelerator = accelerator
-      in_set_virtual_key = false
-      in_modifiers = OS.attr_k_menu_no_modifiers
-      in_glyph = OS.attr_k_menu_null_glyph
-      in_key = 0
-      if (!(accelerator).equal?(0))
-        in_key = accelerator & SWT::KEY_MASK
-        in_glyph = key_glyph(in_key)
-        virtual_key = Display.untranslate_key(in_key)
-        if ((in_key).equal?(Character.new(?\s.ord)))
-          virtual_key = 49
-        end
-        if (!(virtual_key).equal?(0))
-          in_set_virtual_key = true
-          in_key = virtual_key
-        else
-          in_key = Character.to_upper_case(RJava.cast_to_char(in_key))
-        end
-        in_modifiers = OS.attr_k_menu_no_command_modifier
-        if (!((accelerator & SWT::SHIFT)).equal?(0))
-          in_modifiers |= OS.attr_k_menu_shift_modifier
-        end
-        if (!((accelerator & SWT::CONTROL)).equal?(0))
-          in_modifiers |= OS.attr_k_menu_control_modifier
-        end
-        if (!((accelerator & SWT::COMMAND)).equal?(0))
-          in_modifiers &= ~OS.attr_k_menu_no_command_modifier
-        end
-        if (!((accelerator & SWT::ALT)).equal?(0))
-          in_modifiers |= OS.attr_k_menu_option_modifier
-        end
+      key = accelerator & SWT::KEY_MASK
+      virtual_key = key_char(key)
+      string = nil
+      if (!(virtual_key).equal?(0))
+        string = NSString.string_with(RJava.cast_to_string(RJava.cast_to_char(virtual_key)) + "")
+      else
+        string = NSString.string_with(RJava.cast_to_string(RJava.cast_to_char(key)) + "")
       end
-      menu_index = RJava.cast_to_short((index + 1))
-      OS._set_menu_item_modifiers(@parent.attr_handle, menu_index, in_modifiers)
-      OS._set_menu_item_command_key(@parent.attr_handle, menu_index, in_set_virtual_key, RJava.cast_to_char(in_key))
-      OS._set_menu_item_key_glyph(@parent.attr_handle, menu_index, RJava.cast_to_short(in_glyph))
-      if (update)
-        update_text(menu_index)
+      @ns_item.set_key_equivalent(string.lowercase_string)
+      mask = 0
+      if (!((accelerator & SWT::SHIFT)).equal?(0))
+        mask |= OS::NSShiftKeyMask
       end
+      if (!((accelerator & SWT::CONTROL)).equal?(0))
+        mask |= OS::NSControlKeyMask
+      end
+      if (!((accelerator & SWT::COMMAND)).equal?(0))
+        mask |= OS::NSCommandKeyMask
+      end
+      if (!((accelerator & SWT::ALT)).equal?(0))
+        mask |= OS::NSAlternateKeyMask
+      end
+      @ns_item.set_key_equivalent_modifier_mask(mask)
     end
     
     typesig { [::Java::Boolean] }
@@ -742,26 +689,12 @@ module Org::Eclipse::Swt::Widgets
     # </ul>
     def set_enabled(enabled)
       check_widget
-      index = @parent.index_of(self)
-      if ((index).equal?(-1))
-        return
-      end
-      out_menu_ref = Array.typed(::Java::Int).new(1) { 0 }
-      menu_index = RJava.cast_to_short((index + 1))
-      OS._get_menu_item_hierarchical_menu(@parent.attr_handle, menu_index, out_menu_ref)
       if (enabled)
         self.attr_state &= ~DISABLED
-        if (!(out_menu_ref[0]).equal?(0))
-          OS._enable_menu_item(out_menu_ref[0], RJava.cast_to_short(0))
-        end
-        OS._enable_menu_item(@parent.attr_handle, menu_index)
       else
         self.attr_state |= DISABLED
-        if (!(out_menu_ref[0]).equal?(0))
-          OS._disable_menu_item(out_menu_ref[0], RJava.cast_to_short(0))
-        end
-        OS._disable_menu_item(@parent.attr_handle, menu_index)
       end
+      @ns_item.set_enabled(enabled)
     end
     
     typesig { [Image] }
@@ -769,6 +702,9 @@ module Org::Eclipse::Swt::Widgets
     # <p>
     # Note: This operation is a hint and is not supported on
     # platforms that do not have this concept (for example, Windows NT).
+    # Furthermore, some platforms (such as GTK), cannot display both
+    # a check box and an image at the same time.  Instead, they hide
+    # the image and display the check box.
     # </p>
     # 
     # @param image the image to display
@@ -782,14 +718,8 @@ module Org::Eclipse::Swt::Widgets
       if (!((self.attr_style & SWT::SEPARATOR)).equal?(0))
         return
       end
-      index = @parent.index_of(self)
-      if ((index).equal?(-1))
-        return
-      end
       super(image)
-      image_handle = !(image).nil? ? image.attr_handle : 0
-      type = !(image).nil? ? OS.attr_k_menu_cgimage_ref_type : OS.attr_k_menu_no_icon
-      OS._set_menu_item_icon_handle(@parent.attr_handle, RJava.cast_to_short((index + 1)), type, image_handle)
+      @ns_item.set_image(!(image).nil? ? image.attr_handle : nil)
     end
     
     typesig { [Menu] }
@@ -843,35 +773,25 @@ module Org::Eclipse::Swt::Widgets
       end
       @menu = menu
       # Update the menu in the OS
-      index = @parent.index_of(self)
-      if ((index).equal?(-1))
-        return
-      end
-      menu_handle = 0
       if ((menu).nil?)
-        menu_handle = create_empty_menu
+        empty_menu = create_empty_menu
+        if (!(empty_menu).nil?)
+          @ns_item.set_submenu(empty_menu)
+          empty_menu.release
+        end
       else
         menu.attr_cascade = self
-        menu_handle = menu.attr_handle
+        @ns_item.set_submenu(menu.attr_ns_menu)
       end
-      menu_index = RJava.cast_to_short((index + 1))
-      if (!(menu_handle).equal?(0))
-        out_string = Array.typed(::Java::Int).new(1) { 0 }
-        if (!(OS._copy_menu_item_text_as_cfstring(@parent.attr_handle, menu_index, out_string)).equal?(OS.attr_no_err))
-          error(SWT::ERROR_CANNOT_SET_MENU)
-        end
-        OS._set_menu_title_with_cfstring(menu_handle, out_string[0])
-        OS._cfrelease(out_string[0])
+      if (!(menu).nil?)
+        @ns_item.set_target(nil)
+        @ns_item.set_action(0)
+      else
+        @ns_item.set_target(@ns_item)
+        @ns_item.set_action(OS.attr_sel_send_selection)
       end
-      if (!(old_menu).nil?)
-        OS._retain_menu(old_menu.attr_handle)
-      end
-      if (!(OS._set_menu_item_hierarchical_menu(@parent.attr_handle, menu_index, menu_handle)).equal?(OS.attr_no_err))
-        error(SWT::ERROR_CANNOT_SET_MENU)
-      end
-      if (!(menu_handle).equal?(0))
-        OS._release_menu(menu_handle)
-      end
+      # Update menu title with parent item title
+      update_text
     end
     
     typesig { [::Java::Boolean] }
@@ -903,12 +823,7 @@ module Org::Eclipse::Swt::Widgets
       if (((self.attr_style & (SWT::CHECK | SWT::RADIO))).equal?(0))
         return
       end
-      index = @parent.index_of(self)
-      if ((index).equal?(-1))
-        return
-      end
-      in_mark = selected ? (!((self.attr_style & SWT::RADIO)).equal?(0)) ? OS.attr_diamond_mark : OS.attr_check_mark : 0
-      OS._set_item_mark(@parent.attr_handle, RJava.cast_to_short((index + 1)), RJava.cast_to_short(in_mark))
+      @ns_item.set_state(selected ? OS::NSOnState : OS::NSOffState)
     end
     
     typesig { [String] }
@@ -958,19 +873,12 @@ module Org::Eclipse::Swt::Widgets
       if ((self.attr_text == string))
         return
       end
-      index = @parent.index_of(self)
-      if ((index).equal?(-1))
-        return
-      end
       super(string)
-      update_text(RJava.cast_to_short((index + 1)))
+      update_text
     end
     
-    typesig { [::Java::Short] }
-    def update_text(menu_index)
-      if (!((self.attr_style & SWT::SEPARATOR)).equal?(0))
-        return
-      end
+    typesig { [] }
+    def update_text
       buffer = CharArray.new(self.attr_text.length)
       self.attr_text.get_chars(0, buffer.attr_length, buffer, 0)
       i = 0
@@ -990,22 +898,116 @@ module Org::Eclipse::Swt::Widgets
           j -= 1
         end
       end
-      str = OS._cfstring_create_with_characters(OS.attr_k_cfallocator_default, buffer, j)
-      if ((str).equal?(0))
-        error(SWT::ERROR_CANNOT_SET_TEXT)
+      text = String.new(buffer, 0, j)
+      submenu_ = @ns_item.submenu
+      label = NSString.string_with(text)
+      if (!(submenu_).nil? && !((@parent.get_style & SWT::BAR)).equal?(0))
+        submenu_.set_title(label)
+      else
+        @ns_item.set_title(label)
       end
-      OS._set_menu_item_text_with_cfstring(@parent.attr_handle, menu_index, str)
-      out_hier_menu = Array.typed(::Java::Int).new(1) { 0 }
-      OS._get_menu_item_hierarchical_menu(@parent.attr_handle, menu_index, out_hier_menu)
-      if (!(out_hier_menu[0]).equal?(0))
-        OS._set_menu_title_with_cfstring(out_hier_menu[0], str)
+    end
+    
+    typesig { [::Java::Boolean] }
+    def update_accelerator(show)
+      if (!(@accelerator).equal?(0))
+        return
       end
-      # Feature in the Macintosh.  Setting text that starts with "-" makes the
-      # menu item a separator.  The fix is to clear the separator attribute.
-      if (self.attr_text.starts_with("-"))
-        OS._change_menu_item_attributes(@parent.attr_handle, menu_index, 0, OS.attr_k_menu_item_attr_separator)
+      mask = 0
+      key = 0
+      if (show)
+        buffer = CharArray.new(self.attr_text.length)
+        self.attr_text.get_chars(0, buffer.attr_length, buffer, 0)
+        i = 0
+        j = 0
+        while (i < buffer.attr_length)
+          if ((buffer[i]).equal?(Character.new(?\t.ord)))
+            break
+          end
+          if (((buffer[((j += 1) - 1)] = buffer[((i += 1) - 1)])).equal?(Character.new(?&.ord)))
+            if ((i).equal?(buffer.attr_length))
+              next
+            end
+            if ((buffer[i]).equal?(Character.new(?&.ord)))
+              i += 1
+              next
+            end
+            j -= 1
+          end
+        end
+        if (i < buffer.attr_length && (buffer[i]).equal?(Character.new(?\t.ord)))
+          j = i + 1
+          while j < buffer.attr_length
+            case (buffer[j])
+            when Character.new(0x2303)
+              mask |= OS::NSControlKeyMask
+              i += 1
+            when Character.new(0x2325)
+              mask |= OS::NSAlternateKeyMask
+              i += 1
+            when Character.new(0x21E7)
+              mask |= OS::NSShiftKeyMask
+              i += 1
+            when Character.new(0x2318)
+              mask |= OS::NSCommandKeyMask
+              i += 1
+            else
+              j = buffer.attr_length
+            end
+            j += 1
+          end
+          case (buffer.attr_length - i - 1)
+          when 1
+            key = buffer[i + 1]
+            if ((key).equal?(0x2423))
+              key = Character.new(?\s.ord)
+            end
+          when 2
+            if ((buffer[i + 1]).equal?(Character.new(?F.ord)))
+              case (buffer[i + 2])
+              when Character.new(?1.ord)
+                key = 0xf704
+              when Character.new(?2.ord)
+                key = 0xf705
+              when Character.new(?3.ord)
+                key = 0xf706
+              when Character.new(?4.ord)
+                key = 0xf707
+              when Character.new(?5.ord)
+                key = 0xf708
+              when Character.new(?6.ord)
+                key = 0xf709
+              when Character.new(?7.ord)
+                key = 0xf70a
+              when Character.new(?8.ord)
+                key = 0xf70b
+              when Character.new(?9.ord)
+                key = 0xf70c
+              end
+            end
+          when 3
+            if ((buffer[i + 1]).equal?(Character.new(?F.ord)) && (buffer[i + 2]).equal?(Character.new(?1.ord)))
+              case (buffer[i + 3])
+              when Character.new(?0.ord)
+                key = 0xf70d
+              when Character.new(?1.ord)
+                key = 0xf70e
+              when Character.new(?2.ord)
+                key = 0xf70f
+              when Character.new(?3.ord)
+                key = 0xf710
+              when Character.new(?4.ord)
+                key = 0xf711
+              when Character.new(?5.ord)
+                key = 0xf712
+              end
+            end
+          end
+        end
       end
-      OS._cfrelease(str)
+      string = NSString.string_with((key).equal?(0) ? "" : String.value_of(RJava.cast_to_char(key)))
+      @ns_item.set_key_equivalent_modifier_mask(mask)
+      @ns_item.set_key_equivalent(string.lowercase_string)
     end
     
     private

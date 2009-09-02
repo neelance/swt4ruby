@@ -1,6 +1,6 @@
 require "rjava"
 
-# Copyright (c) 2000, 2008 IBM Corporation and others.
+# Copyright (c) 2000, 2009 IBM Corporation and others.
 # All rights reserved. This program and the accompanying materials
 # are made available under the terms of the Eclipse Public License v1.0
 # which accompanies this distribution, and is available at
@@ -83,7 +83,7 @@ module Org::Eclipse::Swt::Widgets
   # downgraded to <code>APPLICATION_MODAL</code>.
   # <dl>
   # <dt><b>Styles:</b></dt>
-  # <dd>BORDER, CLOSE, MIN, MAX, NO_TRIM, RESIZE, TITLE, ON_TOP, TOOL</dd>
+  # <dd>BORDER, CLOSE, MIN, MAX, NO_TRIM, RESIZE, TITLE, ON_TOP, TOOL, SHEET</dd>
   # <dd>APPLICATION_MODAL, MODELESS, PRIMARY_MODAL, SYSTEM_MODAL</dd>
   # <dt><b>Events:</b></dt>
   # <dd>Activate, Close, Deactivate, Deiconify, Iconify</dd>
@@ -200,6 +200,18 @@ module Org::Eclipse::Swt::Widgets
     alias_method :attr_was_maximized=, :was_maximized=
     undef_method :was_maximized=
     
+    attr_accessor :modified
+    alias_method :attr_modified, :modified
+    undef_method :modified
+    alias_method :attr_modified=, :modified=
+    undef_method :modified=
+    
+    attr_accessor :center
+    alias_method :attr_center, :center
+    undef_method :center
+    alias_method :attr_center=, :center=
+    undef_method :center=
+    
     attr_accessor :tool_title
     alias_method :attr_tool_title, :tool_title
     undef_method :tool_title
@@ -313,13 +325,16 @@ module Org::Eclipse::Swt::Widgets
     # @see SWT#MAX
     # @see SWT#RESIZE
     # @see SWT#TITLE
+    # @see SWT#TOOL
     # @see SWT#NO_TRIM
     # @see SWT#SHELL_TRIM
     # @see SWT#DIALOG_TRIM
+    # @see SWT#ON_TOP
     # @see SWT#MODELESS
     # @see SWT#PRIMARY_MODAL
     # @see SWT#APPLICATION_MODAL
     # @see SWT#SYSTEM_MODAL
+    # @see SWT#SHEET
     def initialize(style)
       initialize__shell(nil, style)
     end
@@ -381,13 +396,16 @@ module Org::Eclipse::Swt::Widgets
     # @see SWT#MAX
     # @see SWT#RESIZE
     # @see SWT#TITLE
+    # @see SWT#TOOL
     # @see SWT#NO_TRIM
     # @see SWT#SHELL_TRIM
     # @see SWT#DIALOG_TRIM
+    # @see SWT#ON_TOP
     # @see SWT#MODELESS
     # @see SWT#PRIMARY_MODAL
     # @see SWT#APPLICATION_MODAL
     # @see SWT#SYSTEM_MODAL
+    # @see SWT#SHEET
     def initialize(display, style)
       initialize__shell(display, nil, style, 0, false)
     end
@@ -408,6 +426,8 @@ module Org::Eclipse::Swt::Widgets
       @show_with_parent = false
       @full_screen = false
       @was_maximized = false
+      @modified = false
+      @center = false
       @tool_title = nil
       @balloon_title = nil
       @tool_icon = 0
@@ -431,7 +451,8 @@ module Org::Eclipse::Swt::Widgets
       if (!(parent).nil? && parent.is_disposed)
         error(SWT::ERROR_INVALID_ARGUMENT)
       end
-      self.attr_style = check_style(style)
+      @center = !(parent).nil? && !((style & SWT::SHEET)).equal?(0)
+      self.attr_style = check_style(parent, style)
       self.attr_parent = parent
       self.attr_display = display
       self.attr_handle = handle
@@ -512,6 +533,7 @@ module Org::Eclipse::Swt::Widgets
     # @see SWT#PRIMARY_MODAL
     # @see SWT#APPLICATION_MODAL
     # @see SWT#SYSTEM_MODAL
+    # @see SWT#SHEET
     def initialize(parent, style)
       initialize__shell(!(parent).nil? ? parent.attr_display : nil, parent, style, 0, false)
     end
@@ -559,11 +581,18 @@ module Org::Eclipse::Swt::Widgets
         return Shell.new(display, nil, SWT::NO_TRIM, handle, false)
       end
       
-      typesig { [::Java::Int] }
-      def check_style(style)
+      typesig { [Shell, ::Java::Int] }
+      def check_style(parent, style)
         style = Decorations.check_style(style)
         style &= ~SWT::TRANSPARENT
         mask = SWT::SYSTEM_MODAL | SWT::APPLICATION_MODAL | SWT::PRIMARY_MODAL
+        if (!((style & SWT::SHEET)).equal?(0))
+          style &= ~SWT::SHEET
+          style |= (parent).nil? ? SWT::SHELL_TRIM : SWT::DIALOG_TRIM
+          if (((style & mask)).equal?(0))
+            style |= (parent).nil? ? SWT::APPLICATION_MODAL : SWT::PRIMARY_MODAL
+          end
+        end
         bits = style & ~mask
         if (!((style & SWT::SYSTEM_MODAL)).equal?(0))
           return bits | SWT::SYSTEM_MODAL
@@ -650,6 +679,29 @@ module Org::Eclipse::Swt::Widgets
         return OS._call_window_proc(DialogProc, hwnd, msg, w_param, l_param)
       end
       return OS._def_window_proc(hwnd, msg, w_param, l_param)
+    end
+    
+    typesig { [] }
+    def center
+      if ((self.attr_parent).nil?)
+        return
+      end
+      rect = get_bounds
+      parent_rect = self.attr_display.map(self.attr_parent, nil, self.attr_parent.get_client_area)
+      x = Math.max(parent_rect.attr_x, parent_rect.attr_x + (parent_rect.attr_width - rect.attr_width) / 2)
+      y = Math.max(parent_rect.attr_y, parent_rect.attr_y + (parent_rect.attr_height - rect.attr_height) / 2)
+      monitor_rect = self.attr_parent.get_monitor.get_client_area
+      if (x + rect.attr_width > monitor_rect.attr_x + monitor_rect.attr_width)
+        x = Math.max(monitor_rect.attr_x, monitor_rect.attr_x + monitor_rect.attr_width - rect.attr_width)
+      else
+        x = Math.max(x, monitor_rect.attr_x)
+      end
+      if (y + rect.attr_height > monitor_rect.attr_y + monitor_rect.attr_height)
+        y = Math.max(monitor_rect.attr_y, monitor_rect.attr_y + monitor_rect.attr_height - rect.attr_height)
+      else
+        y = Math.max(y, monitor_rect.attr_y)
+      end
+      set_location(x, y)
     end
     
     typesig { [] }
@@ -1251,6 +1303,21 @@ module Org::Eclipse::Swt::Widgets
     end
     
     typesig { [] }
+    # Gets the receiver's modified state.
+    # 
+    # </ul>
+    # @exception SWTException <ul>
+    # <li>ERROR_WIDGET_DISPOSED - if the receiver has been disposed</li>
+    # <li>ERROR_THREAD_INVALID_ACCESS - if not called from the thread that created the receiver</li>
+    # </ul>
+    # 
+    # @since 3.5
+    def get_modified
+      check_widget
+      return @modified
+    end
+    
+    typesig { [] }
     # Returns the region that defines the shape of the shell,
     # or null if the shell has the default shape.
     # 
@@ -1726,7 +1793,7 @@ module Org::Eclipse::Swt::Widgets
     # to switch to the full screen state, and if the argument is
     # <code>false</code> and the receiver was previously switched
     # into full screen state, causes the receiver to switch back
-    # to either the maximmized or normal states.
+    # to either the maximized or normal states.
     # <p>
     # Note: The result of intermixing calls to <code>setFullScreen(true)</code>,
     # <code>setMaximized(true)</code> and <code>setMinimized(true)</code> will
@@ -1899,6 +1966,23 @@ module Org::Eclipse::Swt::Widgets
         error(SWT::ERROR_NULL_ARGUMENT)
       end
       set_minimum_size(size.attr_x, size.attr_y)
+    end
+    
+    typesig { [::Java::Boolean] }
+    # Sets the receiver's modified state as specified by the argument.
+    # 
+    # @param modified the new modified state for the receiver
+    # 
+    # </ul>
+    # @exception SWTException <ul>
+    # <li>ERROR_WIDGET_DISPOSED - if the receiver has been disposed</li>
+    # <li>ERROR_THREAD_INVALID_ACCESS - if not called from the thread that created the receiver</li>
+    # </ul>
+    # 
+    # @since 3.5
+    def set_modified(modified)
+      check_widget
+      @modified = modified
     end
     
     typesig { [::Java::Int, ::Java::Boolean] }
@@ -2111,6 +2195,12 @@ module Org::Eclipse::Swt::Widgets
       if (!visible)
         fix_active_shell
       end
+      if (visible && @center && !self.attr_moved)
+        center
+        if (is_disposed)
+          return
+        end
+      end
       super(visible)
       if (is_disposed)
         return
@@ -2123,7 +2213,7 @@ module Org::Eclipse::Swt::Widgets
           end
         end
       end
-      # Make the splash screen appear in the task bar
+      # Make the foreign window parent appear in the task bar
       if (visible)
         if (!(self.attr_parent).nil? && !((self.attr_parent.attr_state & FOREIGN_HANDLE)).equal?(0))
           # long

@@ -1,6 +1,6 @@
 require "rjava"
 
-# Copyright (c) 2000, 2006 IBM Corporation and others.
+# Copyright (c) 2000, 2008 IBM Corporation and others.
 # All rights reserved. This program and the accompanying materials
 # are made available under the terms of the Eclipse Public License v1.0
 # which accompanies this distribution, and is available at
@@ -31,6 +31,7 @@ module Org::Eclipse::Swt::Internal::Win32
     alias_method :attr_f_mask=, :f_mask=
     undef_method :f_mask=
     
+    # @field cast=(HWND)
     # long
     attr_accessor :hwnd
     alias_method :attr_hwnd, :hwnd
@@ -38,6 +39,7 @@ module Org::Eclipse::Swt::Internal::Win32
     alias_method :attr_hwnd=, :hwnd=
     undef_method :hwnd=
     
+    # @field cast=(LPCTSTR)
     # long
     attr_accessor :lp_verb
     alias_method :attr_lp_verb, :lp_verb
@@ -45,6 +47,7 @@ module Org::Eclipse::Swt::Internal::Win32
     alias_method :attr_lp_verb=, :lp_verb=
     undef_method :lp_verb=
     
+    # @field cast=(LPCTSTR)
     # long
     attr_accessor :lp_file
     alias_method :attr_lp_file, :lp_file
@@ -52,6 +55,7 @@ module Org::Eclipse::Swt::Internal::Win32
     alias_method :attr_lp_file=, :lp_file=
     undef_method :lp_file=
     
+    # @field cast=(LPCTSTR)
     # long
     attr_accessor :lp_parameters
     alias_method :attr_lp_parameters, :lp_parameters
@@ -59,6 +63,7 @@ module Org::Eclipse::Swt::Internal::Win32
     alias_method :attr_lp_parameters=, :lp_parameters=
     undef_method :lp_parameters=
     
+    # @field cast=(LPCTSTR)
     # long
     attr_accessor :lp_directory
     alias_method :attr_lp_directory, :lp_directory
@@ -72,6 +77,7 @@ module Org::Eclipse::Swt::Internal::Win32
     alias_method :attr_n_show=, :n_show=
     undef_method :n_show=
     
+    # @field cast=(HINSTANCE)
     # long
     attr_accessor :h_inst_app
     alias_method :attr_h_inst_app, :h_inst_app
@@ -80,6 +86,7 @@ module Org::Eclipse::Swt::Internal::Win32
     undef_method :h_inst_app=
     
     # Optional members
+    # @field cast=(LPVOID)
     # long
     attr_accessor :lp_idlist
     alias_method :attr_lp_idlist, :lp_idlist
@@ -87,6 +94,7 @@ module Org::Eclipse::Swt::Internal::Win32
     alias_method :attr_lp_idlist=, :lp_idlist=
     undef_method :lp_idlist=
     
+    # @field cast=(LPCTSTR)
     # long
     attr_accessor :lp_class
     alias_method :attr_lp_class, :lp_class
@@ -94,6 +102,7 @@ module Org::Eclipse::Swt::Internal::Win32
     alias_method :attr_lp_class=, :lp_class=
     undef_method :lp_class=
     
+    # @field cast=(HKEY)
     # long
     attr_accessor :hkey_class
     alias_method :attr_hkey_class, :hkey_class
@@ -111,6 +120,7 @@ module Org::Eclipse::Swt::Internal::Win32
     # HANDLE hIcon;
     # HANDLE hMonitor;
     # };
+    # @field cast=(HANDLE)
     # long
     attr_accessor :h_icon
     alias_method :attr_h_icon, :h_icon
@@ -118,6 +128,7 @@ module Org::Eclipse::Swt::Internal::Win32
     alias_method :attr_h_icon=, :h_icon=
     undef_method :h_icon=
     
+    # @field cast=(HANDLE)
     # long
     attr_accessor :h_process
     alias_method :attr_h_process, :h_process

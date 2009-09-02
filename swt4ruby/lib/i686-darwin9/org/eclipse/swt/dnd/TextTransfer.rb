@@ -13,8 +13,7 @@ module Org::Eclipse::Swt::Dnd
     class_module.module_eval {
       include ::Java::Lang
       include ::Org::Eclipse::Swt::Dnd
-      include_const ::Org::Eclipse::Swt::Internal::Carbon, :CFRange
-      include_const ::Org::Eclipse::Swt::Internal::Carbon, :OS
+      include ::Org::Eclipse::Swt::Internal::Cocoa
     }
   end
   
@@ -45,26 +44,11 @@ module Org::Eclipse::Swt::Dnd
       end
       alias_method :attr__instance=, :_instance=
       
-      const_set_lazy(:TEXT) { "TEXT" }
-      const_attr_reader  :TEXT
+      const_set_lazy(:ID_NAME) { OS::NSStringPboardType.get_string }
+      const_attr_reader  :ID_NAME
       
-      # $NON-NLS-1$
-      const_set_lazy(:UTEXT) { "utxt" }
-      const_attr_reader  :UTEXT
-      
-      # $NON-NLS-1$
-      const_set_lazy(:UTF8) { "utf8" }
-      const_attr_reader  :UTF8
-      
-      # $NON-NLS-1$
-      const_set_lazy(:TEXTID) { OS.attr_k_scrap_flavor_type_text }
-      const_attr_reader  :TEXTID
-      
-      const_set_lazy(:UTEXTID) { OS.attr_k_scrap_flavor_type_unicode }
-      const_attr_reader  :UTEXTID
-      
-      const_set_lazy(:UTF8ID) { (Character.new(?u.ord) << 24) + (Character.new(?t.ord) << 16) + (Character.new(?f.ord) << 8) + Character.new(?8.ord) }
-      const_attr_reader  :UTF8ID
+      const_set_lazy(:ID) { register_type(ID_NAME) }
+      const_attr_reader  :ID
     }
     
     typesig { [] }
@@ -95,44 +79,7 @@ module Org::Eclipse::Swt::Dnd
       if (!check_text(object) || !is_supported_type(transfer_data))
         DND.error(DND::ERROR_INVALID_DATA)
       end
-      string = object
-      chars = CharArray.new(string.length)
-      string.get_chars(0, chars.attr_length, chars, 0)
-      transfer_data.attr_result = -1
-      case (transfer_data.attr_type)
-      when UTF8ID, TEXTID
-        cfstring = OS._cfstring_create_with_characters(OS.attr_k_cfallocator_default, chars, chars.attr_length)
-        if ((cfstring).equal?(0))
-          return
-        end
-        buffer = nil
-        begin
-          range = CFRange.new
-          range.attr_length = chars.attr_length
-          encoding = (transfer_data.attr_type).equal?(UTF8ID) ? OS.attr_k_cfstring_encoding_utf8 : OS._cfstring_get_system_encoding
-          size = Array.typed(::Java::Int).new(1) { 0 }
-          num_chars = OS._cfstring_get_bytes(cfstring, range, encoding, Character.new(??.ord), true, nil, 0, size)
-          if ((num_chars).equal?(0))
-            return
-          end
-          buffer = Array.typed(::Java::Byte).new(size[0]) { 0 }
-          num_chars = OS._cfstring_get_bytes(cfstring, range, encoding, Character.new(??.ord), true, buffer, size[0], size)
-          if ((num_chars).equal?(0))
-            return
-          end
-        ensure
-          OS._cfrelease(cfstring)
-        end
-        transfer_data.attr_data = Array.typed(Array.typed(::Java::Byte)).new(1) { nil }
-        transfer_data.attr_data[0] = buffer
-        transfer_data.attr_result = OS.attr_no_err
-      when UTEXTID
-        buffer = Array.typed(::Java::Byte).new(chars.attr_length * 2) { 0 }
-        OS.memmove(buffer, chars, buffer.attr_length)
-        transfer_data.attr_data = Array.typed(Array.typed(::Java::Byte)).new(1) { nil }
-        transfer_data.attr_data[0] = buffer
-        transfer_data.attr_result = OS.attr_no_err
-      end
+      transfer_data.attr_data = NSString.string_with(object)
     end
     
     typesig { [TransferData] }
@@ -147,49 +94,18 @@ module Org::Eclipse::Swt::Dnd
       if (!is_supported_type(transfer_data) || (transfer_data.attr_data).nil?)
         return nil
       end
-      if ((transfer_data.attr_data.attr_length).equal?(0) || (transfer_data.attr_data[0].attr_length).equal?(0))
-        return nil
-      end
-      buffer = transfer_data.attr_data[0]
-      case (transfer_data.attr_type)
-      when UTF8ID, TEXTID
-        encoding = (transfer_data.attr_type).equal?(UTF8ID) ? OS.attr_k_cfstring_encoding_utf8 : OS._cfstring_get_system_encoding
-        cfstring = OS._cfstring_create_with_bytes(OS.attr_k_cfallocator_default, buffer, buffer.attr_length, encoding, true)
-        if ((cfstring).equal?(0))
-          return nil
-        end
-        begin
-          length_ = OS._cfstring_get_length(cfstring)
-          if ((length_).equal?(0))
-            return nil
-          end
-          chars = CharArray.new(length_)
-          range = CFRange.new
-          range.attr_length = length_
-          OS._cfstring_get_characters(cfstring, range, chars)
-          return String.new(chars)
-        ensure
-          OS._cfrelease(cfstring)
-        end
-        chars = CharArray.new((buffer.attr_length + 1) / 2)
-        OS.memmove(chars, buffer, buffer.attr_length)
-        return String.new(chars)
-      when UTEXTID
-        chars = CharArray.new((buffer.attr_length + 1) / 2)
-        OS.memmove(chars, buffer, buffer.attr_length)
-        return String.new(chars)
-      end
-      return nil
+      string = transfer_data.attr_data
+      return string.get_string
     end
     
     typesig { [] }
     def get_type_ids
-      return Array.typed(::Java::Int).new([UTEXTID, UTF8ID, TEXTID])
+      return Array.typed(::Java::Int).new([ID])
     end
     
     typesig { [] }
     def get_type_names
-      return Array.typed(String).new([UTEXT, UTF8, TEXT])
+      return Array.typed(String).new([ID_NAME])
     end
     
     typesig { [Object] }

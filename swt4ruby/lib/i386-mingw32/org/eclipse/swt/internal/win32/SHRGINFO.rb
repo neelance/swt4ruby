@@ -1,6 +1,6 @@
 require "rjava"
 
-# Copyright (c) 2000, 2006 IBM Corporation and others.
+# Copyright (c) 2000, 2008 IBM Corporation and others.
 # All rights reserved. This program and the accompanying materials
 # are made available under the terms of the Eclipse Public License v1.0
 # which accompanies this distribution, and is available at
@@ -25,6 +25,7 @@ module Org::Eclipse::Swt::Internal::Win32
     alias_method :attr_cb_size=, :cb_size=
     undef_method :cb_size=
     
+    # @field cast=(HWND)
     # long
     attr_accessor :hwnd_client
     alias_method :attr_hwnd_client, :hwnd_client
@@ -33,12 +34,14 @@ module Org::Eclipse::Swt::Internal::Win32
     undef_method :hwnd_client=
     
     # POINT ptDown
+    # @field accessor=ptDown.x
     attr_accessor :pt_down_x
     alias_method :attr_pt_down_x, :pt_down_x
     undef_method :pt_down_x
     alias_method :attr_pt_down_x=, :pt_down_x=
     undef_method :pt_down_x=
     
+    # @field accessor=ptDown.y
     attr_accessor :pt_down_y
     alias_method :attr_pt_down_y, :pt_down_y
     undef_method :pt_down_y

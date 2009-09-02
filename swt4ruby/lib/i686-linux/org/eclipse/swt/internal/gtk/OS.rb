@@ -1,6 +1,6 @@
 require "rjava"
 
-# Copyright (c) 2000, 2008 IBM Corporation and others. All rights reserved.
+# Copyright (c) 2000, 2009 IBM Corporation and others. All rights reserved.
 # The contents of this file are made available under the terms
 # of the GNU Lesser General Public License (LGPL) Version 2.1 that
 # accompanies this distribution (lgpl-v21.txt).  The LGPL is also
@@ -787,6 +787,12 @@ module Org::Eclipse::Swt::Internal::Gtk
       const_set_lazy(:GTK_PACK_START) { 0 }
       const_attr_reader  :GTK_PACK_START
       
+      const_set_lazy(:GTK_PAGE_ORIENTATION_PORTRAIT) { 0 }
+      const_attr_reader  :GTK_PAGE_ORIENTATION_PORTRAIT
+      
+      const_set_lazy(:GTK_PAGE_ORIENTATION_LANDSCAPE) { 1 }
+      const_attr_reader  :GTK_PAGE_ORIENTATION_LANDSCAPE
+      
       const_set_lazy(:GTK_POLICY_ALWAYS) { 0x0 }
       const_attr_reader  :GTK_POLICY_ALWAYS
       
@@ -1009,6 +1015,18 @@ module Org::Eclipse::Swt::Internal::Gtk
       const_set_lazy(:GTK_TREE_VIEW_DROP_INTO_OR_AFTER) { 3 }
       const_attr_reader  :GTK_TREE_VIEW_DROP_INTO_OR_AFTER
       
+      const_set_lazy(:GTK_TREE_VIEW_GRID_LINES_NONE) { 0 }
+      const_attr_reader  :GTK_TREE_VIEW_GRID_LINES_NONE
+      
+      const_set_lazy(:GTK_TREE_VIEW_GRID_LINES_HORIZONTAL) { 1 }
+      const_attr_reader  :GTK_TREE_VIEW_GRID_LINES_HORIZONTAL
+      
+      const_set_lazy(:GTK_TREE_VIEW_GRID_LINES_VERTICAL) { 2 }
+      const_attr_reader  :GTK_TREE_VIEW_GRID_LINES_VERTICAL
+      
+      const_set_lazy(:GTK_TREE_VIEW_GRID_LINES_BOTH) { 3 }
+      const_attr_reader  :GTK_TREE_VIEW_GRID_LINES_BOTH
+      
       const_set_lazy(:GDK_UNMAP) { 15 }
       const_attr_reader  :GDK_UNMAP
       
@@ -1050,6 +1068,9 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       const_set_lazy(:GDK_WINDOW_TYPE_HINT_DIALOG) { 1 }
       const_attr_reader  :GDK_WINDOW_TYPE_HINT_DIALOG
+      
+      const_set_lazy(:GDK_WINDOW_TYPE_HINT_TOOLTIP) { 10 }
+      const_attr_reader  :GDK_WINDOW_TYPE_HINT_TOOLTIP
       
       const_set_lazy(:GTK_WRAP_NONE) { 0 }
       const_attr_reader  :GTK_WRAP_NONE
@@ -1187,6 +1208,9 @@ module Org::Eclipse::Swt::Internal::Gtk
       const_set_lazy(:Day_selected) { ascii("day-selected") }
       const_attr_reader  :Day_selected
       
+      const_set_lazy(:Day_selected_double_click) { ascii("day-selected-double-click") }
+      const_attr_reader  :Day_selected_double_click
+      
       const_set_lazy(:Delete_range) { ascii("delete-range") }
       const_attr_reader  :Delete_range
       
@@ -1298,6 +1322,12 @@ module Org::Eclipse::Swt::Internal::Gtk
       const_set_lazy(:Row_changed) { ascii("row-changed") }
       const_attr_reader  :Row_changed
       
+      const_set_lazy(:Row_inserted) { ascii("row-inserted") }
+      const_attr_reader  :Row_inserted
+      
+      const_set_lazy(:Row_deleted) { ascii("row-deleted") }
+      const_attr_reader  :Row_deleted
+      
       const_set_lazy(:Scroll_child) { ascii("scroll-child") }
       const_attr_reader  :Scroll_child
       
@@ -1383,6 +1413,12 @@ module Org::Eclipse::Swt::Internal::Gtk
       const_set_lazy(:Foreground_gdk) { ascii("foreground-gdk") }
       const_attr_reader  :Foreground_gdk
       
+      const_set_lazy(:Grid_line_width) { ascii("grid-line-width") }
+      const_attr_reader  :Grid_line_width
+      
+      const_set_lazy(:Gtk_alternative_button_order) { ascii("gtk-alternative-button-order") }
+      const_attr_reader  :Gtk_alternative_button_order
+      
       const_set_lazy(:Gtk_cursor_blink) { ascii("gtk-cursor-blink") }
       const_attr_reader  :Gtk_cursor_blink
       
@@ -1395,6 +1431,9 @@ module Org::Eclipse::Swt::Internal::Gtk
       const_set_lazy(:Gtk_entry_select_on_focus) { ascii("gtk-entry-select-on-focus") }
       const_attr_reader  :Gtk_entry_select_on_focus
       
+      const_set_lazy(:Inner_border) { ascii("inner-border") }
+      const_attr_reader  :Inner_border
+      
       const_set_lazy(:Horizontal_separator) { ascii("horizontal-separator") }
       const_attr_reader  :Horizontal_separator
       
@@ -1406,6 +1445,9 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       const_set_lazy(:Mode) { ascii("mode") }
       const_attr_reader  :Mode
+      
+      const_set_lazy(:Model) { ascii("model") }
+      const_attr_reader  :Model
       
       const_set_lazy(:Pixbuf) { ascii("pixbuf") }
       const_attr_reader  :Pixbuf
@@ -1814,14 +1856,38 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS_realpath, [:pointer, :long, :long, :long], :int32
       typesig { [Array.typed(::Java::Byte), Array.typed(::Java::Byte)] }
+      # @param path cast=(const char *)
+      # @param realPath cast=(char *)
+      # 
       # long
       def realpath(path, real_path)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS_realpath, JNI.env, self.jni_id, path.jni_id, real_path.jni_id)
       end
       
-      JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS_GTK_1WIDGET_1HEIGHT, [:pointer, :long, :int32], :int32
+      JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS_G_1OBJECT_1CLASS_1CONSTRUCTOR, [:pointer, :long, :int32], :int32
       typesig { [::Java::Int] }
       # Object private fields accessors
+      # @param object_class cast=(GObjectClass *)
+      # long
+      # long
+      def _g_object_class_constructor(object_class)
+        JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS_G_1OBJECT_1CLASS_1CONSTRUCTOR, JNI.env, self.jni_id, object_class.to_int)
+      end
+      
+      JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS_G_1OBJECT_1CLASS_1SET_1CONSTRUCTOR, [:pointer, :long, :int32, :int32], :void
+      typesig { [::Java::Int, ::Java::Int] }
+      # @param object_class cast=(GObjectClass *)
+      # @paramOFF constructor cast=(GObject* (*) (GType, guint, GObjectConstructParam *))
+      # 
+      # long
+      # long
+      def _g_object_class_set_constructor(object_class, constructor)
+        JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS_G_1OBJECT_1CLASS_1SET_1CONSTRUCTOR, JNI.env, self.jni_id, object_class.to_int, constructor.to_int)
+      end
+      
+      JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS_GTK_1WIDGET_1HEIGHT, [:pointer, :long, :int32], :int32
+      typesig { [::Java::Int] }
+      # @param widget cast=(GtkWidget *)
       # long
       def _gtk_widget_height(widget)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS_GTK_1WIDGET_1HEIGHT, JNI.env, self.jni_id, widget.to_int)
@@ -1829,6 +1895,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS_GTK_1WIDGET_1WIDTH, [:pointer, :long, :int32], :int32
       typesig { [::Java::Int] }
+      # @param widget cast=(GtkWidget *)
       # long
       def _gtk_widget_width(widget)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS_GTK_1WIDGET_1WIDTH, JNI.env, self.jni_id, widget.to_int)
@@ -1836,6 +1903,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS_GTK_1WIDGET_1WINDOW, [:pointer, :long, :int32], :int32
       typesig { [::Java::Int] }
+      # @param widget cast=(GtkWidget *)
       # long
       # long
       def _gtk_widget_window(widget)
@@ -1844,6 +1912,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS_GTK_1WIDGET_1X, [:pointer, :long, :int32], :int32
       typesig { [::Java::Int] }
+      # @param widget cast=(GtkWidget *)
       # long
       def _gtk_widget_x(widget)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS_GTK_1WIDGET_1X, JNI.env, self.jni_id, widget.to_int)
@@ -1851,6 +1920,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS_GTK_1WIDGET_1Y, [:pointer, :long, :int32], :int32
       typesig { [::Java::Int] }
+      # @param widget cast=(GtkWidget *)
       # long
       def _gtk_widget_y(widget)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS_GTK_1WIDGET_1Y, JNI.env, self.jni_id, widget.to_int)
@@ -1858,6 +1928,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS_GTK_1SCROLLED_1WINDOW_1HSCROLLBAR, [:pointer, :long, :int32], :int32
       typesig { [::Java::Int] }
+      # @param widget cast=(GtkScrolledWindow *)
       # long
       # long
       def _gtk_scrolled_window_hscrollbar(widget)
@@ -1866,6 +1937,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS_GTK_1SCROLLED_1WINDOW_1VSCROLLBAR, [:pointer, :long, :int32], :int32
       typesig { [::Java::Int] }
+      # @param widget cast=(GtkScrolledWindow *)
       # long
       # long
       def _gtk_scrolled_window_vscrollbar(widget)
@@ -1874,6 +1946,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS_GTK_1SCROLLED_1WINDOW_1SCROLLBAR_1SPACING, [:pointer, :long, :int32], :int32
       typesig { [::Java::Int] }
+      # @param widget cast=(GtkScrolledWindow *)
       # long
       def _gtk_scrolled_window_scrollbar_spacing(widget)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS_GTK_1SCROLLED_1WINDOW_1SCROLLBAR_1SPACING, JNI.env, self.jni_id, widget.to_int)
@@ -1881,6 +1954,9 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS_GTK_1ACCEL_1LABEL_1SET_1ACCEL_1STRING, [:pointer, :long, :int32, :int32], :void
       typesig { [::Java::Int, ::Java::Int] }
+      # @param acce_label cast=(GtkAccelLabel *)
+      # @param string cast=(gchar *)
+      # 
       # long
       # long
       def _gtk_accel_label_set_accel_string(acce_label, string)
@@ -1889,6 +1965,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS_GTK_1ACCEL_1LABEL_1GET_1ACCEL_1STRING, [:pointer, :long, :int32], :int32
       typesig { [::Java::Int] }
+      # @param acce_label cast=(GtkAccelLabel *)
       # long
       # long
       def _gtk_accel_label_get_accel_string(acce_label)
@@ -1897,6 +1974,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS_GTK_1ENTRY_1IM_1CONTEXT, [:pointer, :long, :int32], :int32
       typesig { [::Java::Int] }
+      # @param widget cast=(GtkEntry *)
       # long
       # long
       def _gtk_entry_im_context(widget)
@@ -1905,6 +1983,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS_GTK_1TEXTVIEW_1IM_1CONTEXT, [:pointer, :long, :int32], :int32
       typesig { [::Java::Int] }
+      # @param widget cast=(GtkTextView *)
       # long
       # long
       def _gtk_textview_im_context(widget)
@@ -1913,6 +1992,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS_GTK_1TOOLTIPS_1TIP_1WINDOW, [:pointer, :long, :int32], :int32
       typesig { [::Java::Int] }
+      # @param widget cast=(GtkTooltips *)
       # long
       # long
       def _gtk_tooltips_tip_window(widget)
@@ -1921,6 +2001,9 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS_GTK_1TOOLTIPS_1SET_1ACTIVE, [:pointer, :long, :int32, :int32], :void
       typesig { [::Java::Int, ::Java::Int] }
+      # @param widget cast=(GtkTooltips *)
+      # @param data cast=(GtkTooltipsData *)
+      # 
       # long
       # long
       def _gtk_tooltips_set_active(widget, data)
@@ -1929,6 +2012,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS_GTK_1WIDGET_1SET_1HEIGHT, [:pointer, :long, :int32, :int32], :void
       typesig { [::Java::Int, ::Java::Int] }
+      # @param widget cast=(GtkWidget *)
       # long
       def _gtk_widget_set_height(widget, height)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS_GTK_1WIDGET_1SET_1HEIGHT, JNI.env, self.jni_id, widget.to_int, height.to_int)
@@ -1936,6 +2020,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS_GTK_1WIDGET_1SET_1WIDTH, [:pointer, :long, :int32, :int32], :void
       typesig { [::Java::Int, ::Java::Int] }
+      # @param widget cast=(GtkWidget *)
       # long
       def _gtk_widget_set_width(widget, width)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS_GTK_1WIDGET_1SET_1WIDTH, JNI.env, self.jni_id, widget.to_int, width.to_int)
@@ -1943,6 +2028,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS_GTK_1WIDGET_1SET_1X, [:pointer, :long, :int32, :int32], :void
       typesig { [::Java::Int, ::Java::Int] }
+      # @param widget cast=(GtkWidget *)
       # long
       def _gtk_widget_set_x(widget, x)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS_GTK_1WIDGET_1SET_1X, JNI.env, self.jni_id, widget.to_int, x.to_int)
@@ -1950,6 +2036,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS_GTK_1WIDGET_1SET_1Y, [:pointer, :long, :int32, :int32], :void
       typesig { [::Java::Int, ::Java::Int] }
+      # @param widget cast=(GtkWidget *)
       # long
       def _gtk_widget_set_y(widget, y)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS_GTK_1WIDGET_1SET_1Y, JNI.env, self.jni_id, widget.to_int, y.to_int)
@@ -1957,6 +2044,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS_GTK_1WIDGET_1REQUISITION_1WIDTH, [:pointer, :long, :int32], :int32
       typesig { [::Java::Int] }
+      # @param widget cast=(GtkWidget *)
       # long
       def _gtk_widget_requisition_width(widget)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS_GTK_1WIDGET_1REQUISITION_1WIDTH, JNI.env, self.jni_id, widget.to_int)
@@ -1964,6 +2052,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS_GTK_1WIDGET_1REQUISITION_1HEIGHT, [:pointer, :long, :int32], :int32
       typesig { [::Java::Int] }
+      # @param widget cast=(GtkWidget *)
       # long
       def _gtk_widget_requisition_height(widget)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS_GTK_1WIDGET_1REQUISITION_1HEIGHT, JNI.env, self.jni_id, widget.to_int)
@@ -1971,6 +2060,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS_GDK_1EVENT_1TYPE, [:pointer, :long, :int32], :int32
       typesig { [::Java::Int] }
+      # @param event cast=(GdkEvent *)
       # long
       def _gdk_event_type(event)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS_GDK_1EVENT_1TYPE, JNI.env, self.jni_id, event.to_int)
@@ -1978,6 +2068,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS_GDK_1EVENT_1WINDOW, [:pointer, :long, :int32], :int32
       typesig { [::Java::Int] }
+      # @param event cast=(GdkEventAny *)
       # long
       # long
       def _gdk_event_window(event)
@@ -1986,6 +2077,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS_X_1EVENT_1TYPE, [:pointer, :long, :int32], :int32
       typesig { [::Java::Int] }
+      # @param xevent cast=(XEvent *)
       # long
       def _x_event_type(xevent)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS_X_1EVENT_1TYPE, JNI.env, self.jni_id, xevent.to_int)
@@ -1993,6 +2085,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS_X_1EVENT_1WINDOW, [:pointer, :long, :int32], :int32
       typesig { [::Java::Int] }
+      # @param xevent cast=(XAnyEvent *)
       # long
       # long
       def _x_event_window(xevent)
@@ -2152,12 +2245,14 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS_GDK_1WINDOWING_1X11, [:pointer, :long], :int8
       typesig { [] }
+      # @method flags=no_gen
       def _gdk_windowing_x11
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS_GDK_1WINDOWING_1X11, JNI.env, self.jni_id) != 0
       end
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1GDK_1PIXMAP_1XID, [:pointer, :long, :int32], :int32
       typesig { [::Java::Int] }
+      # @param pixmap cast=(GdkPixmap *)
       # long
       # long
       def ___gdk_pixmap_xid(pixmap)
@@ -2178,6 +2273,10 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1XCheckMaskEvent, [:pointer, :long, :int32, :int32, :int32], :int8
       typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
+      # @param display cast=(Display *)
+      # @param event_mask cast=(long)
+      # @param event_return cast=(XEvent *)
+      # 
       # long
       # long
       # long
@@ -2200,6 +2299,11 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1XCheckWindowEvent, [:pointer, :long, :int32, :int32, :int32, :int32], :int8
       typesig { [::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int] }
+      # @param display cast=(Display *)
+      # @param window cast=(Window)
+      # @param event_mask cast=(long)
+      # @param event_return cast=(XEvent *)
+      # 
       # long
       # long
       # long
@@ -2224,6 +2328,11 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1XCheckIfEvent, [:pointer, :long, :int32, :int32, :int32, :int32], :int8
       typesig { [::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int] }
+      # @param display cast=(Display *)
+      # @param event_return cast=(XEvent *)
+      # @param predicate cast=(Bool (*)())
+      # @param arg cast=(XPointer)
+      # 
       # long
       # long
       # long
@@ -2248,6 +2357,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1XDefaultScreen, [:pointer, :long, :int32], :int32
       typesig { [::Java::Int] }
+      # @param display cast=(Display *)
       # long
       def ___xdefault_screen(display)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1XDefaultScreen, JNI.env, self.jni_id, display.to_int)
@@ -2266,6 +2376,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1XDefaultRootWindow, [:pointer, :long, :int32], :int32
       typesig { [::Java::Int] }
+      # @param display cast=(Display *)
       # long
       # long
       def ___xdefault_root_window(display)
@@ -2286,6 +2397,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1XFlush, [:pointer, :long, :int32], :void
       typesig { [::Java::Int] }
+      # @param display cast=(Display *)
       # long
       def ___xflush(display)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1XFlush, JNI.env, self.jni_id, display.to_int)
@@ -2304,6 +2416,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1XFree, [:pointer, :long, :int32], :void
       typesig { [::Java::Int] }
+      # @param address cast=(void *)
       # long
       def ___xfree(address)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1XFree, JNI.env, self.jni_id, address.to_int)
@@ -2322,6 +2435,9 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1XGetSelectionOwner, [:pointer, :long, :int32, :int32], :int32
       typesig { [::Java::Int, ::Java::Int] }
+      # @param display cast=(Display *)
+      # @param selection cast=(Atom)
+      # 
       # long
       # long
       # long
@@ -2344,6 +2460,10 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1XInternAtom, [:pointer, :long, :int32, :long, :int8], :int32
       typesig { [::Java::Int, Array.typed(::Java::Byte), ::Java::Boolean] }
+      # @param display cast=(Display *)
+      # @param name cast=(char *)
+      # @param ifExists cast=(Bool)
+      # 
       # long
       # long
       def ___xintern_atom(display, name, if_exists)
@@ -2364,6 +2484,16 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1XQueryPointer, [:pointer, :long, :int32, :int32, :long, :long, :long, :long, :long, :long, :long], :int32
       typesig { [::Java::Int, ::Java::Int, Array.typed(::Java::Int), Array.typed(::Java::Int), Array.typed(::Java::Int), Array.typed(::Java::Int), Array.typed(::Java::Int), Array.typed(::Java::Int), Array.typed(::Java::Int)] }
+      # @param display cast=(Display *)
+      # @param w cast=(Window)
+      # @param root_return cast=(Window *)
+      # @param child_return cast=(Window *)
+      # @param root_x_return cast=(int *)
+      # @param root_y_return cast=(int *)
+      # @param win_x_return cast=(int *)
+      # @param win_y_return cast=(int *)
+      # @param mask_return cast=(unsigned int *)
+      # 
       # long
       # long
       # long
@@ -2388,6 +2518,13 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1XQueryTree, [:pointer, :long, :int32, :int32, :long, :long, :long, :long], :int32
       typesig { [::Java::Int, ::Java::Int, Array.typed(::Java::Int), Array.typed(::Java::Int), Array.typed(::Java::Int), Array.typed(::Java::Int)] }
+      # @param display cast=(Display *)
+      # @param w cast=(Window)
+      # @param root_return cast=(Window *)
+      # @param parent_return cast=(Window *)
+      # @param children_return cast=(Window **)
+      # @param nchildren_return cast=(unsigned int *)
+      # 
       # long
       # long
       # long
@@ -2414,6 +2551,9 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1XKeysymToKeycode, [:pointer, :long, :int32, :int32], :int32
       typesig { [::Java::Int, ::Java::Int] }
+      # @param display cast=(Display *)
+      # @param keysym cast=(KeySym)
+      # 
       # long
       # long
       def ___xkeysym_to_keycode(display, keysym)
@@ -2434,6 +2574,10 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1XListProperties, [:pointer, :long, :int32, :int32, :long], :int32
       typesig { [::Java::Int, ::Java::Int, Array.typed(::Java::Int)] }
+      # @param display cast=(Display *)
+      # @param window cast=(Window)
+      # @param num_prop_return cast=(int *)
+      # 
       # long
       # long
       # long
@@ -2456,6 +2600,10 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1XReconfigureWMWindow, [:pointer, :long, :int32, :int32, :int32, :int32, :long], :int32
       typesig { [::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, XWindowChanges] }
+      # @param display cast=(Display *)
+      # @param window cast=(Window)
+      # @param values flags=no_out
+      # 
       # long
       # long
       def ___xreconfigure_wmwindow(display, window, screen, value_mask, values)
@@ -2476,6 +2624,10 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1XSendEvent, [:pointer, :long, :int32, :int32, :int8, :int32, :int32], :int32
       typesig { [::Java::Int, ::Java::Int, ::Java::Boolean, ::Java::Int, ::Java::Int] }
+      # @param display cast=(Display *)
+      # @param w cast=(Window)
+      # @param event_send cast=(XEvent *)
+      # 
       # long
       # long
       # long
@@ -2500,6 +2652,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1XSetIOErrorHandler, [:pointer, :long, :int32], :int32
       typesig { [::Java::Int] }
+      # @param handler cast=(XIOErrorHandler)
       # long
       # long
       def ___xset_ioerror_handler(handler)
@@ -2520,6 +2673,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1XSetErrorHandler, [:pointer, :long, :int32], :int32
       typesig { [::Java::Int] }
+      # @param handler cast=(XErrorHandler)
       # long
       # long
       def ___xset_error_handler(handler)
@@ -2540,6 +2694,9 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1XSetInputFocus, [:pointer, :long, :int32, :int32, :int32, :int32], :int32
       typesig { [::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int] }
+      # @param display cast=(Display *)
+      # @param window cast=(Window)
+      # 
       # long
       # long
       def ___xset_input_focus(display, window, revert, time)
@@ -2558,8 +2715,35 @@ module Org::Eclipse::Swt::Internal::Gtk
         end
       end
       
+      JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1XSetTransientForHint, [:pointer, :long, :int32, :int32, :int32], :int32
+      typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
+      # @param display cast=(Display *)
+      # @param w cast=(Window)
+      # @param prop_window cast=(Window)
+      # 
+      # long
+      # long
+      # long
+      def ___xset_transient_for_hint(display, w, prop_window)
+        JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1XSetTransientForHint, JNI.env, self.jni_id, display.to_int, w.to_int, prop_window.to_int)
+      end
+      
+      typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
+      # long
+      # long
+      # long
+      def _xset_transient_for_hint(display, w, prop_window)
+        PLATFORM_LOCK.lock
+        begin
+          return ___xset_transient_for_hint(display, w, prop_window)
+        ensure
+          PLATFORM_LOCK.unlock
+        end
+      end
+      
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1XSynchronize, [:pointer, :long, :int32, :int8], :int32
       typesig { [::Java::Int, ::Java::Boolean] }
+      # @param display cast=(Display *)
       # long
       # long
       def ___xsynchronize(display, onoff)
@@ -2580,6 +2764,10 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1XTestFakeButtonEvent, [:pointer, :long, :int32, :int32, :int8, :int32], :void
       typesig { [::Java::Int, ::Java::Int, ::Java::Boolean, ::Java::Int] }
+      # @param display cast=(Display *)
+      # @param is_press cast=(Bool)
+      # @param delay cast=(unsigned long)
+      # 
       # long
       # long
       def ___xtest_fake_button_event(display, button, is_press, delay)
@@ -2600,6 +2788,10 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1XTestFakeKeyEvent, [:pointer, :long, :int32, :int32, :int8, :int32], :void
       typesig { [::Java::Int, ::Java::Int, ::Java::Boolean, ::Java::Int] }
+      # @param display cast=(Display *)
+      # @param is_press cast=(Bool)
+      # @param delay cast=(unsigned long)
+      # 
       # long
       # long
       def ___xtest_fake_key_event(display, keycode, is_press, delay)
@@ -2620,6 +2812,9 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1XTestFakeMotionEvent, [:pointer, :long, :int32, :int32, :int32, :int32, :int32], :void
       typesig { [::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int] }
+      # @param display cast=(Display *)
+      # @param delay cast=(unsigned long)
+      # 
       # long
       # long
       def ___xtest_fake_motion_event(display, screen_number, x, y, delay)
@@ -2640,6 +2835,10 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1XWarpPointer, [:pointer, :long, :int32, :int32, :int32, :int32, :int32, :int32, :int32, :int32, :int32], :int32
       typesig { [::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int] }
+      # @param display cast=(Display *)
+      # @param sourceWindow cast=(Window)
+      # @param destWindow cast=(Window)
+      # 
       # long
       # long
       # long
@@ -2662,6 +2861,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gdk_1x11_1atom_1to_1xatom, [:pointer, :long, :int32], :int32
       typesig { [::Java::Int] }
+      # @param atom cast=(GdkAtom)
       # long
       # long
       def __gdk_x11_atom_to_xatom(atom)
@@ -2682,6 +2882,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gdk_1x11_1colormap_1get_1xcolormap, [:pointer, :long, :int32], :int32
       typesig { [::Java::Int] }
+      # @param colormap cast=(GdkColormap *)
       # long
       # long
       def __gdk_x11_colormap_get_xcolormap(colormap)
@@ -2702,6 +2903,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gdk_1x11_1drawable_1get_1xdisplay, [:pointer, :long, :int32], :int32
       typesig { [::Java::Int] }
+      # @param drawable cast=(GdkDrawable *)
       # long
       # long
       def __gdk_x11_drawable_get_xdisplay(drawable)
@@ -2722,6 +2924,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gdk_1x11_1drawable_1get_1xid, [:pointer, :long, :int32], :int32
       typesig { [::Java::Int] }
+      # @param drawable cast=(GdkDrawable *)
       # long
       # long
       def __gdk_x11_drawable_get_xid(drawable)
@@ -2742,6 +2945,10 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gdk_1x11_1screen_1lookup_1visual, [:pointer, :long, :int32, :int32], :int32
       typesig { [::Java::Int, ::Java::Int] }
+      # @method flags=dynamic
+      # @param screen cast=(GdkScreen *)
+      # @param xvisualid cast=(VisualID)
+      # 
       # long
       # long
       def __gdk_x11_screen_lookup_visual(screen, xvisualid)
@@ -2762,6 +2969,9 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gdk_1x11_1screen_1get_1window_1manager_1name, [:pointer, :long, :int32], :int32
       typesig { [::Java::Int] }
+      # @method flags=dynamic
+      # @param screen cast=(GdkScreen *)
+      # 
       # long
       # long
       def __gdk_x11_screen_get_window_manager_name(screen)
@@ -2782,6 +2992,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gdk_1x11_1visual_1get_1xvisual, [:pointer, :long, :int32], :int32
       typesig { [::Java::Int] }
+      # @param visual cast=(GdkVisual *)
       # long
       # long
       def __gdk_x11_visual_get_xvisual(visual)
@@ -2842,6 +3053,10 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gdk_1window_1add_1filter, [:pointer, :long, :int32, :int32, :int32], :void
       typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
+      # @param window cast=(GdkWindow *)
+      # @param function cast=(GdkFilterFunc)
+      # @param data cast=(gpointer)
+      # 
       # long
       # long
       # long
@@ -2864,6 +3079,10 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gdk_1window_1remove_1filter, [:pointer, :long, :int32, :int32, :int32], :void
       typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
+      # @param window cast=(GdkWindow *)
+      # @param function cast=(GdkFilterFunc)
+      # @param data cast=(gpointer)
+      # 
       # long
       # long
       # long
@@ -2886,6 +3105,10 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method "Java_org_eclipse_swt_internal_gtk_OS_memmove__IL#{XButtonEvent.jni_name}_2I".to_sym, [:pointer, :long, :int32, :long, :int32], :void
       typesig { [::Java::Int, XButtonEvent, ::Java::Int] }
+      # @param dest cast=(void *)
+      # @param src cast=(const void *),flags=no_out
+      # @param size cast=(size_t)
+      # 
       # long
       # long
       def memmove(dest, src, size)
@@ -2894,6 +3117,10 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method "Java_org_eclipse_swt_internal_gtk_OS_memmove__IL#{XClientMessageEvent.jni_name}_2I".to_sym, [:pointer, :long, :int32, :long, :int32], :void
       typesig { [::Java::Int, XClientMessageEvent, ::Java::Int] }
+      # @param dest cast=(void *)
+      # @param src cast=(const void *),flags=no_out
+      # @param size cast=(size_t)
+      # 
       # long
       # long
       def memmove(dest, src, size)
@@ -2902,6 +3129,10 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method "Java_org_eclipse_swt_internal_gtk_OS_memmove__IL#{XCrossingEvent.jni_name}_2I".to_sym, [:pointer, :long, :int32, :long, :int32], :void
       typesig { [::Java::Int, XCrossingEvent, ::Java::Int] }
+      # @param dest cast=(void *)
+      # @param src cast=(const void *),flags=no_out
+      # @param size cast=(size_t)
+      # 
       # long
       # long
       def memmove(dest, src, size)
@@ -2910,6 +3141,10 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method "Java_org_eclipse_swt_internal_gtk_OS_memmove__IL#{XExposeEvent.jni_name}_2I".to_sym, [:pointer, :long, :int32, :long, :int32], :void
       typesig { [::Java::Int, XExposeEvent, ::Java::Int] }
+      # @param dest cast=(void *)
+      # @param src cast=(const void *),flags=no_out
+      # @param size cast=(size_t)
+      # 
       # long
       # long
       def memmove(dest, src, size)
@@ -2918,6 +3153,10 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method "Java_org_eclipse_swt_internal_gtk_OS_memmove__IL#{XFocusChangeEvent.jni_name}_2I".to_sym, [:pointer, :long, :int32, :long, :int32], :void
       typesig { [::Java::Int, XFocusChangeEvent, ::Java::Int] }
+      # @param dest cast=(void *)
+      # @param src cast=(const void *),flags=no_out
+      # @param size cast=(size_t)
+      # 
       # long
       # long
       def memmove(dest, src, size)
@@ -2926,6 +3165,10 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method "Java_org_eclipse_swt_internal_gtk_OS_memmove__L#{XButtonEvent.jni_name}_2II".to_sym, [:pointer, :long, :long, :int32, :int32], :void
       typesig { [XButtonEvent, ::Java::Int, ::Java::Int] }
+      # @param dest cast=(void *),flags=no_in
+      # @param src cast=(const void *)
+      # @param size cast=(size_t)
+      # 
       # long
       # long
       def memmove(dest, src, size)
@@ -2934,6 +3177,10 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method "Java_org_eclipse_swt_internal_gtk_OS_memmove__L#{XCrossingEvent.jni_name}_2II".to_sym, [:pointer, :long, :long, :int32, :int32], :void
       typesig { [XCrossingEvent, ::Java::Int, ::Java::Int] }
+      # @param dest cast=(void *),flags=no_in
+      # @param src cast=(const void *)
+      # @param size cast=(size_t)
+      # 
       # long
       # long
       def memmove(dest, src, size)
@@ -2942,6 +3189,10 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method "Java_org_eclipse_swt_internal_gtk_OS_memmove__L#{XExposeEvent.jni_name}_2II".to_sym, [:pointer, :long, :long, :int32, :int32], :void
       typesig { [XExposeEvent, ::Java::Int, ::Java::Int] }
+      # @param dest cast=(void *),flags=no_in
+      # @param src cast=(const void *)
+      # @param size cast=(size_t)
+      # 
       # long
       # long
       def memmove(dest, src, size)
@@ -2950,6 +3201,10 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method "Java_org_eclipse_swt_internal_gtk_OS_memmove__L#{XFocusChangeEvent.jni_name}_2II".to_sym, [:pointer, :long, :long, :int32, :int32], :void
       typesig { [XFocusChangeEvent, ::Java::Int, ::Java::Int] }
+      # @param dest cast=(void *),flags=no_in
+      # @param src cast=(const void *)
+      # @param size cast=(size_t)
+      # 
       # long
       # long
       def memmove(dest, src, size)
@@ -2958,6 +3213,10 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method "Java_org_eclipse_swt_internal_gtk_OS_memmove__L#{XVisibilityEvent.jni_name}_2II".to_sym, [:pointer, :long, :long, :int32, :int32], :void
       typesig { [XVisibilityEvent, ::Java::Int, ::Java::Int] }
+      # @param dest cast=(void *),flags=no_in
+      # @param src cast=(const void *)
+      # @param size cast=(size_t)
+      # 
       # long
       # long
       def memmove(dest, src, size)
@@ -2994,6 +3253,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1XRenderQueryExtension, [:pointer, :long, :int32, :long, :long], :int8
       typesig { [::Java::Int, Array.typed(::Java::Int), Array.typed(::Java::Int)] }
+      # @method flags=dynamic
       # long
       def ___xrender_query_extension(display, event_basep, error_basep)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1XRenderQueryExtension, JNI.env, self.jni_id, display.to_int, event_basep.jni_id, error_basep.jni_id) != 0
@@ -3012,6 +3272,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1XRenderQueryVersion, [:pointer, :long, :int32, :long, :long], :int32
       typesig { [::Java::Int, Array.typed(::Java::Int), Array.typed(::Java::Int)] }
+      # @method flags=dynamic
       # long
       def ___xrender_query_version(display, major_versionp, minor_versionp)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1XRenderQueryVersion, JNI.env, self.jni_id, display.to_int, major_versionp.jni_id, minor_versionp.jni_id)
@@ -3030,6 +3291,9 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1XRenderCreatePicture, [:pointer, :long, :int32, :int32, :int32, :int32, :long], :int32
       typesig { [::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, XRenderPictureAttributes] }
+      # @method flags=dynamic
+      # @param attributes flags=no_out
+      # 
       # long
       # long
       # long
@@ -3056,6 +3320,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1XRenderSetPictureClipRectangles, [:pointer, :long, :int32, :int32, :int32, :int32, :long, :int32], :void
       typesig { [::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, Array.typed(::Java::Short), ::Java::Int] }
+      # @method flags=dynamic
       # long
       # long
       def ___xrender_set_picture_clip_rectangles(display, picture, x_origin, y_origin, rects, count)
@@ -3076,6 +3341,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1XRenderSetPictureTransform, [:pointer, :long, :int32, :int32, :long], :void
       typesig { [::Java::Int, ::Java::Int, Array.typed(::Java::Int)] }
+      # @method flags=dynamic
       # long
       # long
       def ___xrender_set_picture_transform(display, picture, transform)
@@ -3096,6 +3362,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1XRenderFreePicture, [:pointer, :long, :int32, :int32], :void
       typesig { [::Java::Int, ::Java::Int] }
+      # @method flags=dynamic
       # long
       # long
       def ___xrender_free_picture(display, picture)
@@ -3116,6 +3383,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1XRenderComposite, [:pointer, :long, :int32, :int32, :int32, :int32, :int32, :int32, :int32, :int32, :int32, :int32, :int32, :int32, :int32], :void
       typesig { [::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int] }
+      # @method flags=dynamic
       # long
       # long
       # long
@@ -3140,6 +3408,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1XRenderFindStandardFormat, [:pointer, :long, :int32, :int32], :int32
       typesig { [::Java::Int, ::Java::Int] }
+      # @method flags=dynamic
       # long
       # long
       def ___xrender_find_standard_format(display, format)
@@ -3160,6 +3429,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1XRenderFindVisualFormat, [:pointer, :long, :int32, :int32], :int32
       typesig { [::Java::Int, ::Java::Int] }
+      # @method flags=dynamic
       # long
       # long
       # long
@@ -3180,13 +3450,21 @@ module Org::Eclipse::Swt::Internal::Gtk
         end
       end
       
-      JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS_Call, [:pointer, :long, :int32, :int32, :int32, :int32], :int32
+      JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS_Call__IIII, [:pointer, :long, :int32, :int32, :int32, :int32], :int32
       typesig { [::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int] }
       # Natives
       # long
       # long
       def _call(func, arg0, arg1, arg2)
-        JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS_Call, JNI.env, self.jni_id, func.to_int, arg0.to_int, arg1.to_int, arg2.to_int)
+        JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS_Call__IIII, JNI.env, self.jni_id, func.to_int, arg0.to_int, arg1.to_int, arg2.to_int)
+      end
+      
+      JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS_Call__IIIJ, [:pointer, :long, :int32, :int32, :int32, :int64], :int64
+      typesig { [::Java::Int, ::Java::Int, ::Java::Int, ::Java::Long] }
+      # long
+      # long
+      def _call(func, arg0, arg1, arg2)
+        JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS_Call__IIIJ, JNI.env, self.jni_id, func.to_int, arg0.to_int, arg1.to_int, arg2.to_int)
       end
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1GDK_1DISPLAY, [:pointer, :long], :int32
@@ -3227,6 +3505,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1GDK_1TYPE_1COLOR, [:pointer, :long], :int32
       typesig { [] }
+      # @method flags=const
       # long
       def ___gdk_type_color
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1GDK_1TYPE_1COLOR, JNI.env, self.jni_id)
@@ -3245,6 +3524,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1GDK_1TYPE_1PIXBUF, [:pointer, :long], :int32
       typesig { [] }
+      # @method flags=const
       # long
       def ___gdk_type_pixbuf
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1GDK_1TYPE_1PIXBUF, JNI.env, self.jni_id)
@@ -3423,8 +3703,27 @@ module Org::Eclipse::Swt::Internal::Gtk
         end
       end
       
+      JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1GTK_1IS_1SOCKET, [:pointer, :long, :int32], :int8
+      typesig { [::Java::Int] }
+      # long
+      def ___gtk_is_socket(obj)
+        JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1GTK_1IS_1SOCKET, JNI.env, self.jni_id, obj.to_int) != 0
+      end
+      
+      typesig { [::Java::Int] }
+      # long
+      def _gtk_is_socket(obj)
+        PLATFORM_LOCK.lock
+        begin
+          return ___gtk_is_socket(obj)
+        ensure
+          PLATFORM_LOCK.unlock
+        end
+      end
+      
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1GTK_1STOCK_1CANCEL, [:pointer, :long], :int32
       typesig { [] }
+      # @method flags=const
       # long
       def ___gtk_stock_cancel
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1GTK_1STOCK_1CANCEL, JNI.env, self.jni_id)
@@ -3443,6 +3742,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1GTK_1STOCK_1OK, [:pointer, :long], :int32
       typesig { [] }
+      # @method flags=const
       # long
       def ___gtk_stock_ok
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1GTK_1STOCK_1OK, JNI.env, self.jni_id)
@@ -3461,6 +3761,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1GTK_1TYPE_1CELL_1RENDERER_1TEXT, [:pointer, :long], :int32
       typesig { [] }
+      # @method flags=const
       # long
       def ___gtk_type_cell_renderer_text
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1GTK_1TYPE_1CELL_1RENDERER_1TEXT, JNI.env, self.jni_id)
@@ -3479,6 +3780,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1GTK_1TYPE_1CELL_1RENDERER_1PIXBUF, [:pointer, :long], :int32
       typesig { [] }
+      # @method flags=const
       # long
       def ___gtk_type_cell_renderer_pixbuf
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1GTK_1TYPE_1CELL_1RENDERER_1PIXBUF, JNI.env, self.jni_id)
@@ -3497,6 +3799,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1GTK_1TYPE_1CELL_1RENDERER_1TOGGLE, [:pointer, :long], :int32
       typesig { [] }
+      # @method flags=const
       # long
       def ___gtk_type_cell_renderer_toggle
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1GTK_1TYPE_1CELL_1RENDERER_1TOGGLE, JNI.env, self.jni_id)
@@ -3515,6 +3818,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1GTK_1TYPE_1FIXED, [:pointer, :long], :int32
       typesig { [] }
+      # @method flags=const
       # long
       def ___gtk_type_fixed
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1GTK_1TYPE_1FIXED, JNI.env, self.jni_id)
@@ -3533,6 +3837,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1GTK_1TYPE_1MENU, [:pointer, :long], :int32
       typesig { [] }
+      # @method flags=const
       # long
       def ___gtk_type_menu
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1GTK_1TYPE_1MENU, JNI.env, self.jni_id)
@@ -3551,6 +3856,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1GTK_1TYPE_1WIDGET, [:pointer, :long], :int32
       typesig { [] }
+      # @method flags=const
       # long
       def ___gtk_type_widget
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1GTK_1TYPE_1WIDGET, JNI.env, self.jni_id)
@@ -3809,6 +4115,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1G_1TYPE_1BOOLEAN, [:pointer, :long], :int32
       typesig { [] }
+      # @method flags=const
       # long
       def ___g_type_boolean
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1G_1TYPE_1BOOLEAN, JNI.env, self.jni_id)
@@ -3827,6 +4134,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1G_1TYPE_1INT, [:pointer, :long], :int32
       typesig { [] }
+      # @method flags=const
       # long
       def ___g_type_int
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1G_1TYPE_1INT, JNI.env, self.jni_id)
@@ -3865,6 +4173,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1G_1TYPE_1STRING, [:pointer, :long], :int32
       typesig { [] }
+      # @method flags=const
       # long
       def ___g_type_string
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1G_1TYPE_1STRING, JNI.env, self.jni_id)
@@ -3899,6 +4208,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1PANGO_1TYPE_1FONT_1DESCRIPTION, [:pointer, :long], :int32
       typesig { [] }
+      # @method flags=const
       # long
       def ___pango_type_font_description
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1PANGO_1TYPE_1FONT_1DESCRIPTION, JNI.env, self.jni_id)
@@ -3915,8 +4225,28 @@ module Org::Eclipse::Swt::Internal::Gtk
         end
       end
       
+      JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1PANGO_1TYPE_1LAYOUT, [:pointer, :long], :int32
+      typesig { [] }
+      # @method flags=const
+      # long
+      def ___pango_type_layout
+        JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1PANGO_1TYPE_1LAYOUT, JNI.env, self.jni_id)
+      end
+      
+      typesig { [] }
+      # long
+      def _pango_type_layout
+        PLATFORM_LOCK.lock
+        begin
+          return ___pango_type_layout
+        ensure
+          PLATFORM_LOCK.unlock
+        end
+      end
+      
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1dlclose, [:pointer, :long, :int32], :int32
       typesig { [::Java::Int] }
+      # @param handle cast=(void *)
       # long
       def __dlclose(handle)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1dlclose, JNI.env, self.jni_id, handle.to_int)
@@ -3935,6 +4265,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1dlopen, [:pointer, :long, :long, :int32], :int32
       typesig { [Array.typed(::Java::Byte), ::Java::Int] }
+      # @param filename cast=(const char *)
       # long
       def __dlopen(filename, flag)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1dlopen, JNI.env, self.jni_id, filename.jni_id, flag.to_int)
@@ -3953,6 +4284,9 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1dlsym, [:pointer, :long, :int32, :long], :int32
       typesig { [::Java::Int, Array.typed(::Java::Byte)] }
+      # @param handle cast=(void *)
+      # @param symbol cast=(const char *)
+      # 
       # long
       # long
       def __dlsym(handle, symbol)
@@ -3973,6 +4307,12 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1g_1signal_1add_1emission_1hook, [:pointer, :long, :int32, :int32, :int32, :int32, :int32], :int32
       typesig { [::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int] }
+      # @param signal_id cast=(guint)
+      # @param detail cast=(GQuark)
+      # @param hook_func cast=(GSignalEmissionHook)
+      # @param hook_data cast=(gpointer)
+      # @param data_destroy cast=(GDestroyNotify)
+      # 
       # long
       # long
       # long
@@ -3997,6 +4337,9 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1g_1signal_1remove_1emission_1hook, [:pointer, :long, :int32, :int32], :void
       typesig { [::Java::Int, ::Java::Int] }
+      # @param signal_id cast=(guint)
+      # @param hook_id cast=(gulong)
+      # 
       # long
       def __g_signal_remove_emission_hook(signal_id, hook_id)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1g_1signal_1remove_1emission_1hook, JNI.env, self.jni_id, signal_id.to_int, hook_id.to_int)
@@ -4015,6 +4358,10 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1g_1cclosure_1new, [:pointer, :long, :int32, :int32, :int32], :int32
       typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
+      # @param callback_func cast=(GCallback)
+      # @param user_data cast=(gpointer)
+      # @param destroy_data cast=(GClosureNotify)
+      # 
       # long
       # long
       # long
@@ -4039,6 +4386,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1g_1closure_1ref, [:pointer, :long, :int32], :int32
       typesig { [::Java::Int] }
+      # @param closure cast=(GClosure *)
       # long
       # long
       def __g_closure_ref(closure)
@@ -4059,6 +4407,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1g_1closure_1unref, [:pointer, :long, :int32], :void
       typesig { [::Java::Int] }
+      # @param closure cast=(GClosure *)
       # long
       def __g_closure_unref(closure)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1g_1closure_1unref, JNI.env, self.jni_id, closure.to_int)
@@ -4077,6 +4426,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1g_1main_1context_1acquire, [:pointer, :long, :int32], :int8
       typesig { [::Java::Int] }
+      # @param context cast=(GMainContext *)
       # long
       def __g_main_context_acquire(context)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1g_1main_1context_1acquire, JNI.env, self.jni_id, context.to_int) != 0
@@ -4095,6 +4445,9 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1g_1main_1context_1check, [:pointer, :long, :int32, :int32, :int32, :int32], :int32
       typesig { [::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int] }
+      # @param context cast=(GMainContext *)
+      # @param fds cast=(GPollFD *)
+      # 
       # long
       # long
       def __g_main_context_check(context, max_priority, fds, n_fds)
@@ -4133,6 +4486,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1g_1main_1context_1iteration, [:pointer, :long, :int32, :int8], :int8
       typesig { [::Java::Int, ::Java::Boolean] }
+      # @param context cast=(GMainContext *)
       # long
       def __g_main_context_iteration(context, may_block)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1g_1main_1context_1iteration, JNI.env, self.jni_id, context.to_int, may_block ? 1 : 0) != 0
@@ -4151,6 +4505,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1g_1main_1context_1pending, [:pointer, :long, :int32], :int8
       typesig { [::Java::Int] }
+      # @param context cast=(GMainContext *)
       # long
       def __g_main_context_pending(context)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1g_1main_1context_1pending, JNI.env, self.jni_id, context.to_int) != 0
@@ -4169,6 +4524,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1g_1main_1context_1get_1poll_1func, [:pointer, :long, :int32], :int32
       typesig { [::Java::Int] }
+      # @param context cast=(GMainContext *)
       # long
       # long
       def __g_main_context_get_poll_func(context)
@@ -4189,6 +4545,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1g_1main_1context_1prepare, [:pointer, :long, :int32, :long], :int8
       typesig { [::Java::Int, Array.typed(::Java::Int)] }
+      # @param context cast=(GMainContext *)
       # long
       def __g_main_context_prepare(context, priority)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1g_1main_1context_1prepare, JNI.env, self.jni_id, context.to_int, priority.jni_id) != 0
@@ -4207,6 +4564,9 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1g_1main_1context_1query, [:pointer, :long, :int32, :int32, :long, :int32, :int32], :int32
       typesig { [::Java::Int, ::Java::Int, Array.typed(::Java::Int), ::Java::Int, ::Java::Int] }
+      # @param context cast=(GMainContext *)
+      # @param fds cast=(GPollFD *)
+      # 
       # long
       # long
       def __g_main_context_query(context, max_priority, timeout_, fds, n_fds)
@@ -4227,6 +4587,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1g_1main_1context_1release, [:pointer, :long, :int32], :void
       typesig { [::Java::Int] }
+      # @param context cast=(GMainContext *)
       # long
       def __g_main_context_release(context)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1g_1main_1context_1release, JNI.env, self.jni_id, context.to_int)
@@ -4245,6 +4606,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS_g_1main_1context_1wakeup, [:pointer, :long, :int32], :void
       typesig { [::Java::Int] }
+      # @param context cast=(GMainContext *)
       # long
       def g_main_context_wakeup(context)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS_g_1main_1context_1wakeup, JNI.env, self.jni_id, context.to_int)
@@ -4252,6 +4614,12 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1g_1filename_1to_1utf8, [:pointer, :long, :int32, :int32, :long, :long, :long], :int32
       typesig { [::Java::Int, ::Java::Int, Array.typed(::Java::Int), Array.typed(::Java::Int), Array.typed(::Java::Int)] }
+      # @param opsysstring cast=(const gchar *)
+      # @param len cast=(gssize)
+      # @param bytes_read cast=(gsize *)
+      # @param bytes_written cast=(gsize *)
+      # @param error cast=(GError **)
+      # 
       # long
       # long
       # long
@@ -4280,6 +4648,10 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1g_1filename_1to_1uri, [:pointer, :long, :int32, :int32, :long], :int32
       typesig { [::Java::Int, ::Java::Int, Array.typed(::Java::Int)] }
+      # @param filename cast=(const char *)
+      # @param hostname cast=(const char *)
+      # @param error cast=(GError **)
+      # 
       # long
       # long
       # long
@@ -4304,6 +4676,12 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1g_1filename_1from_1utf8, [:pointer, :long, :int32, :int32, :long, :long, :long], :int32
       typesig { [::Java::Int, ::Java::Int, Array.typed(::Java::Int), Array.typed(::Java::Int), Array.typed(::Java::Int)] }
+      # @param opsysstring cast=(const gchar *)
+      # @param len cast=(gssize)
+      # @param bytes_read cast=(gsize *)
+      # @param bytes_written cast=(gsize *)
+      # @param error cast=(GError **)
+      # 
       # long
       # long
       # long
@@ -4332,6 +4710,10 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1g_1filename_1from_1uri, [:pointer, :long, :int32, :long, :long], :int32
       typesig { [::Java::Int, Array.typed(::Java::Int), Array.typed(::Java::Int)] }
+      # @param uri cast=(const char *)
+      # @param hostname cast=(char **)
+      # @param error cast=(GError **)
+      # 
       # long
       # long
       # long
@@ -4356,6 +4738,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1g_1free, [:pointer, :long, :int32], :void
       typesig { [::Java::Int] }
+      # @param mem cast=(gpointer)
       # long
       def __g_free(mem)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1g_1free, JNI.env, self.jni_id, mem.to_int)
@@ -4374,6 +4757,9 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1g_1idle_1add, [:pointer, :long, :int32, :int32], :int32
       typesig { [::Java::Int, ::Java::Int] }
+      # @param function cast=(GSourceFunc)
+      # @param data cast=(gpointer)
+      # 
       # long
       # long
       def __g_idle_add(function, data)
@@ -4394,6 +4780,9 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1g_1list_1append, [:pointer, :long, :int32, :int32], :int32
       typesig { [::Java::Int, ::Java::Int] }
+      # @param list cast=(GList *)
+      # @param data cast=(gpointer)
+      # 
       # long
       # long
       # long
@@ -4416,6 +4805,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1g_1list_1data, [:pointer, :long, :int32], :int32
       typesig { [::Java::Int] }
+      # @param list cast=(GList *)
       # long
       # long
       def __g_list_data(list)
@@ -4436,6 +4826,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1g_1list_1free, [:pointer, :long, :int32], :void
       typesig { [::Java::Int] }
+      # @param list cast=(GList *)
       # long
       def __g_list_free(list)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1g_1list_1free, JNI.env, self.jni_id, list.to_int)
@@ -4454,6 +4845,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1g_1list_1free_11, [:pointer, :long, :int32], :void
       typesig { [::Java::Int] }
+      # @param list cast=(GList *)
       # long
       def __g_list_free_1(list)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1g_1list_1free_11, JNI.env, self.jni_id, list.to_int)
@@ -4472,6 +4864,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1g_1list_1length, [:pointer, :long, :int32], :int32
       typesig { [::Java::Int] }
+      # @param list cast=(GList *)
       # long
       def __g_list_length(list)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1g_1list_1length, JNI.env, self.jni_id, list.to_int)
@@ -4490,6 +4883,9 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1g_1list_1set_1next, [:pointer, :long, :int32, :int32], :void
       typesig { [::Java::Int, ::Java::Int] }
+      # @param list cast=(GList *)
+      # @param llist cast=(GList *)
+      # 
       # long
       # long
       def __g_list_set_next(list, llist)
@@ -4530,6 +4926,9 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1g_1list_1nth, [:pointer, :long, :int32, :int32], :int32
       typesig { [::Java::Int, ::Java::Int] }
+      # @param list cast=(GList *)
+      # @param n cast=(guint)
+      # 
       # long
       # long
       def __g_list_nth(list, n)
@@ -4550,6 +4949,9 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1g_1list_1nth_1data, [:pointer, :long, :int32, :int32], :int32
       typesig { [::Java::Int, ::Java::Int] }
+      # @param list cast=(GList *)
+      # @param n cast=(guint)
+      # 
       # long
       # long
       def __g_list_nth_data(list, n)
@@ -4570,6 +4972,9 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1g_1list_1prepend, [:pointer, :long, :int32, :int32], :int32
       typesig { [::Java::Int, ::Java::Int] }
+      # @param list cast=(GList *)
+      # @param data cast=(gpointer)
+      # 
       # long
       # long
       # long
@@ -4592,6 +4997,9 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1g_1list_1set_1previous, [:pointer, :long, :int32, :int32], :void
       typesig { [::Java::Int, ::Java::Int] }
+      # @param list cast=(GList *)
+      # @param llist cast=(GList *)
+      # 
       # long
       # long
       def __g_list_set_previous(list, llist)
@@ -4632,6 +5040,9 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1g_1list_1remove_1link, [:pointer, :long, :int32, :int32], :int32
       typesig { [::Java::Int, ::Java::Int] }
+      # @param list cast=(GList *)
+      # @param link cast=(GList *)
+      # 
       # long
       # long
       # long
@@ -4654,6 +5065,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1g_1list_1reverse, [:pointer, :long, :int32], :int32
       typesig { [::Java::Int] }
+      # @param list cast=(GList *)
       # long
       # long
       def __g_list_reverse(list)
@@ -4674,6 +5086,12 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1g_1locale_1from_1utf8, [:pointer, :long, :int32, :int32, :long, :long, :long], :int32
       typesig { [::Java::Int, ::Java::Int, Array.typed(::Java::Int), Array.typed(::Java::Int), Array.typed(::Java::Int)] }
+      # @param utf8string cast=(const gchar *)
+      # @param len cast=(gssize)
+      # @param bytes_read cast=(gsize *)
+      # @param bytes_written cast=(gsize *)
+      # @param error cast=(GError **)
+      # 
       # long
       # long
       # long
@@ -4702,6 +5120,12 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1g_1locale_1to_1utf8, [:pointer, :long, :int32, :int32, :long, :long, :long], :int32
       typesig { [::Java::Int, ::Java::Int, Array.typed(::Java::Int), Array.typed(::Java::Int), Array.typed(::Java::Int)] }
+      # @param opsysstring cast=(const gchar *)
+      # @param len cast=(gssize)
+      # @param bytes_read cast=(gsize *)
+      # @param bytes_written cast=(gsize *)
+      # @param error cast=(GError **)
+      # 
       # long
       # long
       # long
@@ -4730,6 +5154,11 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1g_1log_1default_1handler, [:pointer, :long, :int32, :int32, :int32, :int32], :void
       typesig { [::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int] }
+      # @param log_domain cast=(gchar *)
+      # @param log_levels cast=(GLogLevelFlags)
+      # @param message cast=(gchar *)
+      # @param unused_data cast=(gpointer)
+      # 
       # long
       # long
       # long
@@ -4752,6 +5181,8 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1g_1log_1remove_1handler, [:pointer, :long, :long, :int32], :void
       typesig { [Array.typed(::Java::Byte), ::Java::Int] }
+      # @param log_domain cast=(gchar *),flags=no_out
+      # @param handler_id cast=(gint)
       def __g_log_remove_handler(log_domain, handler_id)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1g_1log_1remove_1handler, JNI.env, self.jni_id, log_domain.jni_id, handler_id.to_int)
       end
@@ -4768,6 +5199,11 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1g_1log_1set_1handler, [:pointer, :long, :long, :int32, :int32, :int32], :int32
       typesig { [Array.typed(::Java::Byte), ::Java::Int, ::Java::Int, ::Java::Int] }
+      # @param log_domain cast=(gchar *),flags=no_out
+      # @param log_levels cast=(GLogLevelFlags)
+      # @param log_func cast=(GLogFunc)
+      # @param user_data cast=(gpointer)
+      # 
       # long
       # long
       def __g_log_set_handler(log_domain, log_levels, log_func, user_data)
@@ -4788,6 +5224,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1g_1malloc, [:pointer, :long, :int32], :int32
       typesig { [::Java::Int] }
+      # @param size cast=(gulong)
       # long
       # long
       def __g_malloc(size)
@@ -4808,6 +5245,10 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1g_1object_1get, [:pointer, :long, :int32, :long, :long, :int32], :void
       typesig { [::Java::Int, Array.typed(::Java::Byte), Array.typed(::Java::Int), ::Java::Int] }
+      # @param object cast=(GObject *)
+      # @param first_property_name cast=(const gchar *),flags=no_out
+      # @param terminator cast=(const gchar *),flags=sentinel
+      # 
       # long
       # long
       def __g_object_get(object, first_property_name, value, terminator)
@@ -4828,6 +5269,9 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1g_1object_1get_1qdata, [:pointer, :long, :int32, :int32], :int32
       typesig { [::Java::Int, ::Java::Int] }
+      # @param object cast=(GObject *)
+      # @param quark cast=(GQuark)
+      # 
       # long
       # long
       def __g_object_get_qdata(object, quark)
@@ -4848,6 +5292,9 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1g_1object_1new, [:pointer, :long, :int32, :int32], :int32
       typesig { [::Java::Int, ::Java::Int] }
+      # @param type cast=(GType)
+      # @param first_property_name cast=(const gchar *)
+      # 
       # long
       # long
       # long
@@ -4868,8 +5315,30 @@ module Org::Eclipse::Swt::Internal::Gtk
         end
       end
       
+      JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1g_1object_1notify, [:pointer, :long, :int32, :long], :void
+      typesig { [::Java::Int, Array.typed(::Java::Byte)] }
+      # @param object cast=(GObject *)
+      # @param property_name cast=(const gchar *)
+      # 
+      # long
+      def __g_object_notify(object, property_name)
+        JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1g_1object_1notify, JNI.env, self.jni_id, object.to_int, property_name.jni_id)
+      end
+      
+      typesig { [::Java::Int, Array.typed(::Java::Byte)] }
+      # long
+      def g_object_notify(object, property_name)
+        PLATFORM_LOCK.lock
+        begin
+          __g_object_notify(object, property_name)
+        ensure
+          PLATFORM_LOCK.unlock
+        end
+      end
+      
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1g_1object_1ref, [:pointer, :long, :int32], :int32
       typesig { [::Java::Int] }
+      # @param object cast=(gpointer)
       # long
       # long
       def __g_object_ref(object)
@@ -4890,6 +5359,10 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1g_1object_1set__I_3BZI, [:pointer, :long, :int32, :long, :int8, :int32], :void
       typesig { [::Java::Int, Array.typed(::Java::Byte), ::Java::Boolean, ::Java::Int] }
+      # @param object cast=(gpointer)
+      # @param first_property_name cast=(const gchar *),flags=no_out
+      # @param terminator cast=(const gchar *),flags=sentinel
+      # 
       # long
       # long
       def __g_object_set(object, first_property_name, data, terminator)
@@ -4910,6 +5383,10 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method "Java_org_eclipse_swt_internal_gtk_OS__1g_1object_1set__I_3BL#{GdkColor.jni_name}_2I".to_sym, [:pointer, :long, :int32, :long, :long, :int32], :void
       typesig { [::Java::Int, Array.typed(::Java::Byte), GdkColor, ::Java::Int] }
+      # @param object cast=(gpointer)
+      # @param first_property_name cast=(const gchar *)
+      # @param terminator cast=(const gchar *),flags=sentinel
+      # 
       # long
       # long
       def __g_object_set(object, first_property_name, data, terminator)
@@ -4930,6 +5407,10 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1g_1object_1set__I_3BII, [:pointer, :long, :int32, :long, :int32, :int32], :void
       typesig { [::Java::Int, Array.typed(::Java::Byte), ::Java::Int, ::Java::Int] }
+      # @param object cast=(gpointer)
+      # @param first_property_name cast=(const gchar *),flags=no_out
+      # @param terminator cast=(const gchar *),flags=sentinel
+      # 
       # long
       # long
       def __g_object_set(object, first_property_name, data, terminator)
@@ -4950,6 +5431,10 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1g_1object_1set__I_3BXfloatXI, [:pointer, :long, :int32, :long, :float, :int32], :void
       typesig { [::Java::Int, Array.typed(::Java::Byte), ::Java::Float, ::Java::Int] }
+      # @param object cast=(gpointer)
+      # @param first_property_name cast=(const gchar *),flags=no_out
+      # @param terminator cast=(const gchar *),flags=sentinel
+      # 
       # long
       # long
       def __g_object_set(object, first_property_name, data, terminator)
@@ -4970,6 +5455,10 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1g_1object_1set__I_3BJI, [:pointer, :long, :int32, :long, :int64, :int32], :void
       typesig { [::Java::Int, Array.typed(::Java::Byte), ::Java::Long, ::Java::Int] }
+      # @param object cast=(gpointer)
+      # @param first_property_name cast=(const gchar *),flags=no_out
+      # @param terminator cast=(const gchar *),flags=sentinel
+      # 
       # long
       # long
       def __g_object_set(object, first_property_name, data, terminator)
@@ -4990,6 +5479,10 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1g_1object_1set_1qdata, [:pointer, :long, :int32, :int32, :int32], :void
       typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
+      # @param object cast=(GObject *)
+      # @param quark cast=(GQuark)
+      # @param data cast=(gpointer)
+      # 
       # long
       # long
       def __g_object_set_qdata(object, quark, data)
@@ -5010,6 +5503,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1g_1object_1unref, [:pointer, :long, :int32], :void
       typesig { [::Java::Int] }
+      # @param object cast=(gpointer)
       # long
       def __g_object_unref(object)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1g_1object_1unref, JNI.env, self.jni_id, object.to_int)
@@ -5028,6 +5522,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1g_1quark_1from_1string, [:pointer, :long, :long], :int32
       typesig { [Array.typed(::Java::Byte)] }
+      # @param string cast=(const gchar *),flags=no_out
       def __g_quark_from_string(string)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1g_1quark_1from_1string, JNI.env, self.jni_id, string.jni_id)
       end
@@ -5044,6 +5539,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1g_1set_1prgname, [:pointer, :long, :long], :void
       typesig { [Array.typed(::Java::Byte)] }
+      # @param prgname cast=(const gchar *),flags=no_out
       def __g_set_prgname(prgname)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1g_1set_1prgname, JNI.env, self.jni_id, prgname.jni_id)
       end
@@ -5060,6 +5556,11 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1g_1signal_1connect, [:pointer, :long, :int32, :long, :int32, :int32], :int32
       typesig { [::Java::Int, Array.typed(::Java::Byte), ::Java::Int, ::Java::Int] }
+      # @param instance cast=(gpointer)
+      # @param detailed_signal cast=(const gchar *),flags=no_out
+      # @param proc cast=(GCallback)
+      # @param data cast=(gpointer)
+      # 
       # long
       # long
       # long
@@ -5082,6 +5583,11 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1g_1signal_1connect_1closure, [:pointer, :long, :int32, :long, :int32, :int8], :int32
       typesig { [::Java::Int, Array.typed(::Java::Byte), ::Java::Int, ::Java::Boolean] }
+      # @param instance cast=(gpointer)
+      # @param detailed_signal cast=(const gchar *)
+      # @param closure cast=(GClosure *)
+      # @param after cast=(gboolean)
+      # 
       # long
       # long
       def __g_signal_connect_closure(instance, detailed_signal, closure, after)
@@ -5102,6 +5608,12 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1g_1signal_1connect_1closure_1by_1id, [:pointer, :long, :int32, :int32, :int32, :int32, :int8], :int32
       typesig { [::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Boolean] }
+      # @param instance cast=(gpointer)
+      # @param signal_id cast=(guint)
+      # @param detail cast=(GQuark)
+      # @param closure cast=(GClosure *)
+      # @param after cast=(gboolean)
+      # 
       # long
       # long
       def __g_signal_connect_closure_by_id(instance, signal_id, detail, closure, after)
@@ -5122,6 +5634,11 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1g_1signal_1connect_1after, [:pointer, :long, :int32, :long, :int32, :int32], :int32
       typesig { [::Java::Int, Array.typed(::Java::Byte), ::Java::Int, ::Java::Int] }
+      # @param instance cast=(gpointer)
+      # @param detailed_signal cast=(const gchar *),flags=no_out
+      # @param proc cast=(GCallback)
+      # @param data cast=(gpointer)
+      # 
       # long
       # long
       # long
@@ -5144,6 +5661,9 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1g_1signal_1emit_1by_1name__I_3B, [:pointer, :long, :int32, :long], :void
       typesig { [::Java::Int, Array.typed(::Java::Byte)] }
+      # @param instance cast=(gpointer)
+      # @param detailed_signal cast=(const gchar *),flags=no_out
+      # 
       # long
       def __g_signal_emit_by_name(instance, detailed_signal)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1g_1signal_1emit_1by_1name__I_3B, JNI.env, self.jni_id, instance.to_int, detailed_signal.jni_id)
@@ -5162,6 +5682,9 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1g_1signal_1emit_1by_1name__I_3BI, [:pointer, :long, :int32, :long, :int32], :void
       typesig { [::Java::Int, Array.typed(::Java::Byte), ::Java::Int] }
+      # @param instance cast=(gpointer)
+      # @param detailed_signal cast=(const gchar *),flags=no_out
+      # 
       # long
       # long
       def __g_signal_emit_by_name(instance, detailed_signal, data)
@@ -5182,6 +5705,9 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1g_1signal_1emit_1by_1name__I_3BII, [:pointer, :long, :int32, :long, :int32, :int32], :void
       typesig { [::Java::Int, Array.typed(::Java::Byte), ::Java::Int, ::Java::Int] }
+      # @param instance cast=(gpointer)
+      # @param detailed_signal cast=(const gchar *),flags=no_out
+      # 
       # long
       # long
       # long
@@ -5204,6 +5730,9 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1g_1signal_1emit_1by_1name__I_3B_3B, [:pointer, :long, :int32, :long, :long], :void
       typesig { [::Java::Int, Array.typed(::Java::Byte), Array.typed(::Java::Byte)] }
+      # @param instance cast=(gpointer)
+      # @param detailed_signal cast=(const gchar *),flags=no_out
+      # 
       # long
       def __g_signal_emit_by_name(instance, detailed_signal, data)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1g_1signal_1emit_1by_1name__I_3B_3B, JNI.env, self.jni_id, instance.to_int, detailed_signal.jni_id, data.jni_id)
@@ -5222,6 +5751,9 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1g_1signal_1handler_1disconnect, [:pointer, :long, :int32, :int32], :void
       typesig { [::Java::Int, ::Java::Int] }
+      # @param instance cast=(gpointer)
+      # @param handler_id cast=(gulong)
+      # 
       # long
       def __g_signal_handler_disconnect(instance, handler_id)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1g_1signal_1handler_1disconnect, JNI.env, self.jni_id, instance.to_int, handler_id.to_int)
@@ -5240,6 +5772,14 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1g_1signal_1handlers_1block_1matched, [:pointer, :long, :int32, :int32, :int32, :int32, :int32, :int32, :int32], :int32
       typesig { [::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int] }
+      # @param instance cast=(gpointer)
+      # @param mask cast=(GSignalMatchType)
+      # @param signal_id cast=(guint)
+      # @param detail cast=(GQuark)
+      # @param closure cast=(GClosure *)
+      # @param func cast=(gpointer)
+      # @param data cast=(gpointer)
+      # 
       # long
       # long
       # long
@@ -5264,6 +5804,14 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1g_1signal_1handlers_1disconnect_1matched, [:pointer, :long, :int32, :int32, :int32, :int32, :int32, :int32, :int32], :int32
       typesig { [::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int] }
+      # @param instance cast=(gpointer)
+      # @param mask cast=(GSignalMatchType)
+      # @param signal_id cast=(guint)
+      # @param detail cast=(GQuark)
+      # @param closure cast=(GClosure *)
+      # @param func cast=(gpointer)
+      # @param data cast=(gpointer)
+      # 
       # long
       # long
       # long
@@ -5288,6 +5836,14 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1g_1signal_1handlers_1unblock_1matched, [:pointer, :long, :int32, :int32, :int32, :int32, :int32, :int32, :int32], :int32
       typesig { [::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int] }
+      # @param instance cast=(gpointer)
+      # @param mask cast=(GSignalMatchType)
+      # @param signal_id cast=(guint)
+      # @param detail cast=(GQuark)
+      # @param closure cast=(GClosure *)
+      # @param func cast=(gpointer)
+      # @param data cast=(gpointer)
+      # 
       # long
       # long
       # long
@@ -5312,6 +5868,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1g_1signal_1lookup, [:pointer, :long, :long, :int32], :int32
       typesig { [Array.typed(::Java::Byte), ::Java::Int] }
+      # @param name cast=(const gchar *),flags=no_out
       # long
       def __g_signal_lookup(name, itype)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1g_1signal_1lookup, JNI.env, self.jni_id, name.jni_id, itype.to_int)
@@ -5330,6 +5887,9 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1g_1signal_1stop_1emission_1by_1name, [:pointer, :long, :int32, :long], :void
       typesig { [::Java::Int, Array.typed(::Java::Byte)] }
+      # @param instance cast=(gpointer)
+      # @param detailed_signal cast=(const gchar *),flags=no_out
+      # 
       # long
       def __g_signal_stop_emission_by_name(instance, detailed_signal)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1g_1signal_1stop_1emission_1by_1name, JNI.env, self.jni_id, instance.to_int, detailed_signal.jni_id)
@@ -5348,6 +5908,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1g_1source_1remove, [:pointer, :long, :int32], :int8
       typesig { [::Java::Int] }
+      # @param tag cast=(guint)
       # long
       # long
       def __g_source_remove(tag)
@@ -5368,6 +5929,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1g_1slist_1data, [:pointer, :long, :int32], :int32
       typesig { [::Java::Int] }
+      # @param list cast=(GSList *)
       # long
       # long
       def __g_slist_data(list)
@@ -5388,6 +5950,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1g_1slist_1free, [:pointer, :long, :int32], :void
       typesig { [::Java::Int] }
+      # @param list cast=(GSList *)
       # long
       def __g_slist_free(list)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1g_1slist_1free, JNI.env, self.jni_id, list.to_int)
@@ -5406,6 +5969,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1g_1slist_1next, [:pointer, :long, :int32], :int32
       typesig { [::Java::Int] }
+      # @param list cast=(GSList *)
       # long
       # long
       def __g_slist_next(list)
@@ -5426,6 +5990,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1g_1slist_1length, [:pointer, :long, :int32], :int32
       typesig { [::Java::Int] }
+      # @param list cast=(GSList *)
       # long
       def __g_slist_length(list)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1g_1slist_1length, JNI.env, self.jni_id, list.to_int)
@@ -5444,6 +6009,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1g_1strfreev, [:pointer, :long, :int32], :void
       typesig { [::Java::Int] }
+      # @param string_array cast=(gchar **)
       # long
       def __g_strfreev(string_array)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1g_1strfreev, JNI.env, self.jni_id, string_array.to_int)
@@ -5462,6 +6028,9 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1g_1strtod, [:pointer, :long, :int32, :long], :double
       typesig { [::Java::Int, Array.typed(::Java::Int)] }
+      # @param str cast=(const gchar *)
+      # @param endptr cast=(gchar **)
+      # 
       # long
       # long
       def __g_strtod(str, endptr)
@@ -5482,6 +6051,10 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1g_1type_1add_1interface_1static, [:pointer, :long, :int32, :int32, :int32], :void
       typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
+      # @param instance_type cast=(GType)
+      # @param interface_type cast=(GType)
+      # @param info cast=(const GInterfaceInfo *)
+      # 
       # long
       # long
       # long
@@ -5504,6 +6077,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1g_1type_1class_1peek, [:pointer, :long, :int32], :int32
       typesig { [::Java::Int] }
+      # @param g_class cast=(GType)
       # long
       # long
       def __g_type_class_peek(g_class)
@@ -5524,6 +6098,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1g_1type_1class_1peek_1parent, [:pointer, :long, :int32], :int32
       typesig { [::Java::Int] }
+      # @param g_class cast=(gpointer)
       # long
       # long
       def __g_type_class_peek_parent(g_class)
@@ -5542,8 +6117,49 @@ module Org::Eclipse::Swt::Internal::Gtk
         end
       end
       
+      JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1g_1type_1class_1ref, [:pointer, :long, :int32], :int32
+      typesig { [::Java::Int] }
+      # @param g_class cast=(GType)
+      # long
+      # long
+      def __g_type_class_ref(g_class)
+        JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1g_1type_1class_1ref, JNI.env, self.jni_id, g_class.to_int)
+      end
+      
+      typesig { [::Java::Int] }
+      # long
+      # long
+      def g_type_class_ref(g_class)
+        PLATFORM_LOCK.lock
+        begin
+          return __g_type_class_ref(g_class)
+        ensure
+          PLATFORM_LOCK.unlock
+        end
+      end
+      
+      JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1g_1type_1class_1unref, [:pointer, :long, :int32], :void
+      typesig { [::Java::Int] }
+      # @param g_class cast=(gpointer)
+      # long
+      def __g_type_class_unref(g_class)
+        JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1g_1type_1class_1unref, JNI.env, self.jni_id, g_class.to_int)
+      end
+      
+      typesig { [::Java::Int] }
+      # long
+      def g_type_class_unref(g_class)
+        PLATFORM_LOCK.lock
+        begin
+          __g_type_class_unref(g_class)
+        ensure
+          PLATFORM_LOCK.unlock
+        end
+      end
+      
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1g_1type_1from_1name, [:pointer, :long, :long], :int32
       typesig { [Array.typed(::Java::Byte)] }
+      # @param name cast=(const gchar *)
       # long
       def __g_type_from_name(name)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1g_1type_1from_1name, JNI.env, self.jni_id, name.jni_id)
@@ -5562,6 +6178,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1g_1type_1interface_1peek_1parent, [:pointer, :long, :int32], :int32
       typesig { [::Java::Int] }
+      # @param iface cast=(gpointer)
       # long
       # long
       def __g_type_interface_peek_parent(iface)
@@ -5582,6 +6199,9 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1g_1type_1is_1a, [:pointer, :long, :int32, :int32], :int8
       typesig { [::Java::Int, ::Java::Int] }
+      # @param type cast=(GType)
+      # @param is_a_type cast=(GType)
+      # 
       # long
       # long
       def __g_type_is_a(type, is_a_type)
@@ -5602,6 +6222,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1g_1type_1name, [:pointer, :long, :int32], :int32
       typesig { [::Java::Int] }
+      # @param handle cast=(GType)
       # long
       # long
       def __g_type_name(handle)
@@ -5622,6 +6243,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1g_1type_1parent, [:pointer, :long, :int32], :int32
       typesig { [::Java::Int] }
+      # @param type cast=(GType)
       # long
       # long
       def __g_type_parent(type)
@@ -5642,6 +6264,9 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1g_1type_1query, [:pointer, :long, :int32, :int32], :void
       typesig { [::Java::Int, ::Java::Int] }
+      # @param type cast=(GType)
+      # @param query cast=(GTypeQuery *)
+      # 
       # long
       # long
       def __g_type_query(type, query)
@@ -5662,6 +6287,11 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1g_1type_1register_1static, [:pointer, :long, :int32, :long, :int32, :int32], :int32
       typesig { [::Java::Int, Array.typed(::Java::Byte), ::Java::Int, ::Java::Int] }
+      # @param parent_type cast=(GType)
+      # @param type_name cast=(const gchar *)
+      # @param info cast=(const GTypeInfo *)
+      # @param flags cast=(GTypeFlags)
+      # 
       # long
       # long
       # long
@@ -5684,6 +6314,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1g_1thread_1init, [:pointer, :long, :int32], :void
       typesig { [::Java::Int] }
+      # @param vtable cast=(GThreadFunctions *)
       # long
       def __g_thread_init(vtable)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1g_1thread_1init, JNI.env, self.jni_id, vtable.to_int)
@@ -5718,6 +6349,12 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1g_1utf16_1to_1utf8, [:pointer, :long, :long, :int32, :long, :long, :long], :int32
       typesig { [Array.typed(::Java::Char), ::Java::Int, Array.typed(::Java::Int), Array.typed(::Java::Int), Array.typed(::Java::Int)] }
+      # @param str cast=(const gunichar2 *),flags=no_out critical
+      # @param len cast=(glong)
+      # @param items_read cast=(glong *),flags=critical
+      # @param items_written cast=(glong *),flags=critical
+      # @param error cast=(GError **),flags=critical
+      # 
       # long
       # long
       # long
@@ -5744,6 +6381,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1g_1utf8_1offset_1to_1pointer, [:pointer, :long, :int32, :int32], :int32
       typesig { [::Java::Int, ::Java::Int] }
+      # @param str cast=(const gchar *)
       # long
       # long
       # long
@@ -5766,6 +6404,9 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1g_1utf8_1pointer_1to_1offset, [:pointer, :long, :int32, :int32], :int32
       typesig { [::Java::Int, ::Java::Int] }
+      # @param str cast=(const gchar *)
+      # @param pos cast=(const gchar *)
+      # 
       # long
       # long
       # long
@@ -5788,6 +6429,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1g_1utf8_1strlen, [:pointer, :long, :int32, :int32], :int32
       typesig { [::Java::Int, ::Java::Int] }
+      # @param str cast=(const gchar *)
       # long
       # long
       # long
@@ -5810,6 +6452,12 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1g_1utf8_1to_1utf16___3BI_3I_3I_3I, [:pointer, :long, :long, :int32, :long, :long, :long], :int32
       typesig { [Array.typed(::Java::Byte), ::Java::Int, Array.typed(::Java::Int), Array.typed(::Java::Int), Array.typed(::Java::Int)] }
+      # @param str cast=(const gchar *),flags=no_out critical
+      # @param len cast=(glong)
+      # @param items_read cast=(glong *),flags=critical
+      # @param items_written cast=(glong *),flags=critical
+      # @param error cast=(GError **),flags=critical
+      # 
       # long
       # long
       # long
@@ -5836,6 +6484,12 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1g_1utf8_1to_1utf16__II_3I_3I_3I, [:pointer, :long, :int32, :int32, :long, :long, :long], :int32
       typesig { [::Java::Int, ::Java::Int, Array.typed(::Java::Int), Array.typed(::Java::Int), Array.typed(::Java::Int)] }
+      # @param str cast=(const gchar *)
+      # @param len cast=(glong)
+      # @param items_read cast=(glong *),flags=critical
+      # @param items_written cast=(glong *),flags=critical
+      # @param error cast=(GError **),flags=critical
+      # 
       # long
       # long
       # long
@@ -5864,6 +6518,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1g_1value_1peek_1pointer, [:pointer, :long, :int32], :int32
       typesig { [::Java::Int] }
+      # @param value cast=(const GValue *)
       # long
       # long
       def __g_value_peek_pointer(value)
@@ -5884,6 +6539,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gdk_1atom_1intern, [:pointer, :long, :long, :int8], :int32
       typesig { [Array.typed(::Java::Byte), ::Java::Boolean] }
+      # @param atom_name cast=(const gchar *),flags=no_out critical
       # long
       def __gdk_atom_intern(atom_name, only_if_exists)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1gdk_1atom_1intern, JNI.env, self.jni_id, atom_name.jni_id, only_if_exists ? 1 : 0)
@@ -5902,6 +6558,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gdk_1atom_1name, [:pointer, :long, :int32], :int32
       typesig { [::Java::Int] }
+      # @param atom cast=(GdkAtom)
       # long
       # long
       def __gdk_atom_name(atom)
@@ -5938,6 +6595,11 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gdk_1bitmap_1create_1from_1data, [:pointer, :long, :int32, :long, :int32, :int32], :int32
       typesig { [::Java::Int, Array.typed(::Java::Byte), ::Java::Int, ::Java::Int] }
+      # @param window cast=(GdkWindow *)
+      # @param data cast=(const gchar *),flags=no_out critical
+      # @param width cast=(gint)
+      # @param height cast=(gint)
+      # 
       # long
       # long
       def __gdk_bitmap_create_from_data(window, data, width, height)
@@ -5956,8 +6618,30 @@ module Org::Eclipse::Swt::Internal::Gtk
         end
       end
       
+      JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gdk_1cairo_1create, [:pointer, :long, :int32], :int32
+      typesig { [::Java::Int] }
+      # @method flags=dynamic
+      # long
+      # long
+      def __gdk_cairo_create(drawable)
+        JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1gdk_1cairo_1create, JNI.env, self.jni_id, drawable.to_int)
+      end
+      
+      typesig { [::Java::Int] }
+      # long
+      # long
+      def gdk_cairo_create(drawable)
+        PLATFORM_LOCK.lock
+        begin
+          return __gdk_cairo_create(drawable)
+        ensure
+          PLATFORM_LOCK.unlock
+        end
+      end
+      
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gdk_1cairo_1region, [:pointer, :long, :int32, :int32], :void
       typesig { [::Java::Int, ::Java::Int] }
+      # @method flags=dynamic
       # long
       # long
       def __gdk_cairo_region(cairo, region)
@@ -5978,6 +6662,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gdk_1cairo_1set_1source_1color, [:pointer, :long, :int32, :long], :void
       typesig { [::Java::Int, GdkColor] }
+      # @method flags=dynamic
       # long
       def __gdk_cairo_set_source_color(cairo, color)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1gdk_1cairo_1set_1source_1color, JNI.env, self.jni_id, cairo.to_int, color.jni_id)
@@ -5996,6 +6681,9 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gdk_1color_1white, [:pointer, :long, :int32, :long], :int8
       typesig { [::Java::Int, GdkColor] }
+      # @param colormap cast=(GdkColormap *)
+      # @param color cast=(GdkColor *),flags=no_in
+      # 
       # long
       def __gdk_color_white(colormap, color)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1gdk_1color_1white, JNI.env, self.jni_id, colormap.to_int, color.jni_id) != 0
@@ -6014,6 +6702,11 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gdk_1colormap_1alloc_1color, [:pointer, :long, :int32, :long, :int8, :int8], :int8
       typesig { [::Java::Int, GdkColor, ::Java::Boolean, ::Java::Boolean] }
+      # @param colormap cast=(GdkColormap *)
+      # @param color cast=(GdkColor *)
+      # @param writeable cast=(gboolean)
+      # @param best_match cast=(gboolean)
+      # 
       # long
       def __gdk_colormap_alloc_color(colormap, color, writeable, best_match)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1gdk_1colormap_1alloc_1color, JNI.env, self.jni_id, colormap.to_int, color.jni_id, writeable ? 1 : 0, best_match ? 1 : 0) != 0
@@ -6032,6 +6725,10 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gdk_1colormap_1free_1colors, [:pointer, :long, :int32, :long, :int32], :void
       typesig { [::Java::Int, GdkColor, ::Java::Int] }
+      # @param colormap cast=(GdkColormap *)
+      # @param colors cast=(GdkColor *),flags=no_out
+      # @param ncolors cast=(gint)
+      # 
       # long
       def __gdk_colormap_free_colors(colormap, colors, ncolors)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1gdk_1colormap_1free_1colors, JNI.env, self.jni_id, colormap.to_int, colors.jni_id, ncolors.to_int)
@@ -6068,6 +6765,10 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gdk_1colormap_1query_1color, [:pointer, :long, :int32, :int32, :long], :void
       typesig { [::Java::Int, ::Java::Int, GdkColor] }
+      # @param colormap cast=(GdkColormap *)
+      # @param pixel cast=(gulong)
+      # @param result cast=(GdkColor *)
+      # 
       # long
       # long
       def __gdk_colormap_query_color(colormap, pixel, result)
@@ -6088,6 +6789,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gdk_1cursor_1destroy, [:pointer, :long, :int32], :void
       typesig { [::Java::Int] }
+      # @param cursor cast=(GdkCursor *)
       # long
       def __gdk_cursor_destroy(cursor)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1gdk_1cursor_1destroy, JNI.env, self.jni_id, cursor.to_int)
@@ -6106,6 +6808,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gdk_1cursor_1new, [:pointer, :long, :int32], :int32
       typesig { [::Java::Int] }
+      # @param cursor_type cast=(GdkCursorType)
       # long
       # long
       def __gdk_cursor_new(cursor_type)
@@ -6126,6 +6829,13 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gdk_1cursor_1new_1from_1pixmap, [:pointer, :long, :int32, :int32, :long, :long, :int32, :int32], :int32
       typesig { [::Java::Int, ::Java::Int, GdkColor, GdkColor, ::Java::Int, ::Java::Int] }
+      # @param source cast=(GdkPixmap *)
+      # @param mask cast=(GdkPixmap *)
+      # @param fg cast=(GdkColor *),flags=no_out
+      # @param bg cast=(GdkColor *),flags=no_out
+      # @param x cast=(gint)
+      # @param y cast=(gint)
+      # 
       # long
       # long
       # long
@@ -6148,6 +6858,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gdk_1cursor_1new_1from_1pixbuf, [:pointer, :long, :int32, :int32, :int32, :int32], :int32
       typesig { [::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int] }
+      # @method flags=dynamic
       # long
       # long
       # long
@@ -6170,6 +6881,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gdk_1display_1get_1default, [:pointer, :long], :int32
       typesig { [] }
+      # @method flags=dynamic
       # long
       def __gdk_display_get_default
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1gdk_1display_1get_1default, JNI.env, self.jni_id)
@@ -6188,6 +6900,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gdk_1display_1supports_1cursor_1color, [:pointer, :long, :int32], :int8
       typesig { [::Java::Int] }
+      # @method flags=dynamic
       # long
       def __gdk_display_supports_cursor_color(display)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1gdk_1display_1supports_1cursor_1color, JNI.env, self.jni_id, display.to_int) != 0
@@ -6206,6 +6919,10 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gdk_1drag_1status, [:pointer, :long, :int32, :int32, :int32], :void
       typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
+      # @param context cast=(GdkDragContext *)
+      # @param action cast=(GdkDragAction)
+      # @param time cast=(guint32)
+      # 
       # long
       def __gdk_drag_status(context, action, time)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1gdk_1drag_1status, JNI.env, self.jni_id, context.to_int, action.to_int, time.to_int)
@@ -6224,6 +6941,16 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gdk_1draw_1arc, [:pointer, :long, :int32, :int32, :int32, :int32, :int32, :int32, :int32, :int32, :int32], :void
       typesig { [::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int] }
+      # @param drawable cast=(GdkDrawable *)
+      # @param gc cast=(GdkGC *)
+      # @param filled cast=(gint)
+      # @param x cast=(gint)
+      # @param y cast=(gint)
+      # @param width cast=(gint)
+      # @param height cast=(gint)
+      # @param angle1 cast=(gint)
+      # @param angle2 cast=(gint)
+      # 
       # long
       # long
       def __gdk_draw_arc(drawable, gc, filled, x, y, width, height, angle1, angle2)
@@ -6244,6 +6971,16 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gdk_1draw_1drawable, [:pointer, :long, :int32, :int32, :int32, :int32, :int32, :int32, :int32, :int32, :int32], :void
       typesig { [::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int] }
+      # @param drawable cast=(GdkDrawable *)
+      # @param gc cast=(GdkGC *)
+      # @param src cast=(GdkDrawable *)
+      # @param xsrc cast=(gint)
+      # @param ysrc cast=(gint)
+      # @param xdest cast=(gint)
+      # @param ydest cast=(gint)
+      # @param width cast=(gint)
+      # @param height cast=(gint)
+      # 
       # long
       # long
       # long
@@ -6266,6 +7003,10 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gdk_1draw_1image, [:pointer, :long, :int32, :int32, :int32, :int32, :int32, :int32, :int32, :int32, :int32], :void
       typesig { [::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int] }
+      # @param drawable cast=(GdkDrawable *)
+      # @param gc cast=(GdkGC *)
+      # @param image cast=(GdkImage *)
+      # 
       # long
       # long
       # long
@@ -6288,6 +7029,12 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gdk_1draw_1layout, [:pointer, :long, :int32, :int32, :int32, :int32, :int32], :void
       typesig { [::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int] }
+      # @param drawable cast=(GdkDrawable *)
+      # @param gc cast=(GdkGC *)
+      # @param x cast=(gint)
+      # @param y cast=(gint)
+      # @param layout cast=(PangoLayout *)
+      # 
       # long
       # long
       # long
@@ -6310,6 +7057,14 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gdk_1draw_1layout_1with_1colors, [:pointer, :long, :int32, :int32, :int32, :int32, :int32, :long, :long], :void
       typesig { [::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, GdkColor, GdkColor] }
+      # @param drawable cast=(GdkDrawable *)
+      # @param gc cast=(GdkGC *)
+      # @param x cast=(gint)
+      # @param y cast=(gint)
+      # @param layout cast=(PangoLayout *)
+      # @param foreground flags=no_out
+      # @param background flags=no_out
+      # 
       # long
       # long
       # long
@@ -6332,6 +7087,13 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gdk_1draw_1line, [:pointer, :long, :int32, :int32, :int32, :int32, :int32, :int32], :void
       typesig { [::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int] }
+      # @param drawable cast=(GdkDrawable *)
+      # @param gc cast=(GdkGC *)
+      # @param x1 cast=(gint)
+      # @param y1 cast=(gint)
+      # @param x2 cast=(gint)
+      # @param y2 cast=(gint)
+      # 
       # long
       # long
       def __gdk_draw_line(drawable, gc, x1, y1, x2, y2)
@@ -6352,6 +7114,11 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gdk_1draw_1lines, [:pointer, :long, :int32, :int32, :long, :int32], :void
       typesig { [::Java::Int, ::Java::Int, Array.typed(::Java::Int), ::Java::Int] }
+      # @param drawable cast=(GdkDrawable *)
+      # @param gc cast=(GdkGC *)
+      # @param points cast=(GdkPoint *),flags=no_out critical
+      # @param npoints cast=(gint)
+      # 
       # long
       # long
       def __gdk_draw_lines(drawable, gc, points, npoints)
@@ -6372,6 +7139,20 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gdk_1draw_1pixbuf, [:pointer, :long, :int32, :int32, :int32, :int32, :int32, :int32, :int32, :int32, :int32, :int32, :int32, :int32], :void
       typesig { [::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int] }
+      # @method flags=dynamic
+      # @param drawable cast=(GdkDrawable *)
+      # @param gc cast=(GdkGC *)
+      # @param pixbuf cast=(GdkPixbuf *)
+      # @param xsrc cast=(gint)
+      # @param ysrc cast=(gint)
+      # @param xdest cast=(gint)
+      # @param ydest cast=(gint)
+      # @param width cast=(gint)
+      # @param height cast=(gint)
+      # @param dither cast=(GdkRgbDither)
+      # @param x_dither cast=(gint)
+      # @param y_dither cast=(gint)
+      # 
       # long
       # long
       # long
@@ -6394,6 +7175,9 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gdk_1draw_1point, [:pointer, :long, :int32, :int32, :int32, :int32], :void
       typesig { [::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int] }
+      # @param drawable cast=(GdkDrawable *)
+      # @param gc cast=(GdkGC *)
+      # 
       # long
       # long
       def __gdk_draw_point(drawable, gc, x, y)
@@ -6414,6 +7198,12 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gdk_1draw_1polygon, [:pointer, :long, :int32, :int32, :int32, :long, :int32], :void
       typesig { [::Java::Int, ::Java::Int, ::Java::Int, Array.typed(::Java::Int), ::Java::Int] }
+      # @param drawable cast=(GdkDrawable *)
+      # @param gc cast=(GdkGC *)
+      # @param filled cast=(gint)
+      # @param points cast=(GdkPoint *),flags=no_out critical
+      # @param npoints cast=(gint)
+      # 
       # long
       # long
       def __gdk_draw_polygon(drawable, gc, filled, points, npoints)
@@ -6434,6 +7224,14 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gdk_1draw_1rectangle, [:pointer, :long, :int32, :int32, :int32, :int32, :int32, :int32, :int32], :void
       typesig { [::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int] }
+      # @param drawable cast=(GdkDrawable *)
+      # @param gc cast=(GdkGC *)
+      # @param filled cast=(gint)
+      # @param x cast=(gint)
+      # @param y cast=(gint)
+      # @param width cast=(gint)
+      # @param height cast=(gint)
+      # 
       # long
       # long
       def __gdk_draw_rectangle(drawable, gc, filled, x, y, width, height)
@@ -6454,6 +7252,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gdk_1drawable_1get_1depth, [:pointer, :long, :int32], :int32
       typesig { [::Java::Int] }
+      # @param drawable cast=(GdkDrawable *)
       # long
       def __gdk_drawable_get_depth(drawable)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1gdk_1drawable_1get_1depth, JNI.env, self.jni_id, drawable.to_int)
@@ -6472,6 +7271,12 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gdk_1drawable_1get_1image, [:pointer, :long, :int32, :int32, :int32, :int32, :int32], :int32
       typesig { [::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int] }
+      # @param drawable cast=(GdkDrawable *)
+      # @param x cast=(gint)
+      # @param y cast=(gint)
+      # @param width cast=(gint)
+      # @param height cast=(gint)
+      # 
       # long
       # long
       def __gdk_drawable_get_image(drawable, x, y, width, height)
@@ -6492,6 +7297,10 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gdk_1drawable_1get_1size, [:pointer, :long, :int32, :long, :long], :void
       typesig { [::Java::Int, Array.typed(::Java::Int), Array.typed(::Java::Int)] }
+      # @param drawable cast=(GdkDrawable *)
+      # @param width cast=(gint *),flags=no_in critical
+      # @param height cast=(gint *),flags=no_in critical
+      # 
       # long
       def __gdk_drawable_get_size(drawable, width, height)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1gdk_1drawable_1get_1size, JNI.env, self.jni_id, drawable.to_int, width.jni_id, height.jni_id)
@@ -6510,6 +7319,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gdk_1drawable_1get_1visible_1region, [:pointer, :long, :int32], :int32
       typesig { [::Java::Int] }
+      # @param drawable cast=(GdkDrawable *)
       # long
       # long
       def __gdk_drawable_get_visible_region(drawable)
@@ -6530,6 +7340,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gdk_1event_1copy, [:pointer, :long, :int32], :int32
       typesig { [::Java::Int] }
+      # @param event cast=(GdkEvent *)
       # long
       # long
       def __gdk_event_copy(event)
@@ -6550,6 +7361,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gdk_1event_1free, [:pointer, :long, :int32], :void
       typesig { [::Java::Int] }
+      # @param event cast=(GdkEvent *)
       # long
       def __gdk_event_free(event)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1gdk_1event_1free, JNI.env, self.jni_id, event.to_int)
@@ -6586,6 +7398,10 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gdk_1event_1get_1root_1coords, [:pointer, :long, :int32, :long, :long], :int8
       typesig { [::Java::Int, Array.typed(::Java::Double), Array.typed(::Java::Double)] }
+      # @param event cast=(GdkEvent *)
+      # @param px cast=(gdouble *)
+      # @param py cast=(gdouble *)
+      # 
       # long
       def __gdk_event_get_root_coords(event, px, py)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1gdk_1event_1get_1root_1coords, JNI.env, self.jni_id, event.to_int, px.jni_id, py.jni_id) != 0
@@ -6604,6 +7420,10 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gdk_1event_1get_1coords, [:pointer, :long, :int32, :long, :long], :int8
       typesig { [::Java::Int, Array.typed(::Java::Double), Array.typed(::Java::Double)] }
+      # @param event cast=(GdkEvent *)
+      # @param px cast=(gdouble *)
+      # @param py cast=(gdouble *)
+      # 
       # long
       def __gdk_event_get_coords(event, px, py)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1gdk_1event_1get_1coords, JNI.env, self.jni_id, event.to_int, px.jni_id, py.jni_id) != 0
@@ -6622,6 +7442,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gdk_1event_1get_1graphics_1expose, [:pointer, :long, :int32], :int32
       typesig { [::Java::Int] }
+      # @param window cast=(GdkWindow *)
       # long
       # long
       def __gdk_event_get_graphics_expose(window)
@@ -6642,6 +7463,9 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gdk_1event_1get_1state, [:pointer, :long, :int32, :long], :int8
       typesig { [::Java::Int, Array.typed(::Java::Int)] }
+      # @param event cast=(GdkEvent *)
+      # @param pmod cast=(GdkModifierType *)
+      # 
       # long
       def __gdk_event_get_state(event, pmod)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1gdk_1event_1get_1state, JNI.env, self.jni_id, event.to_int, pmod.jni_id) != 0
@@ -6660,6 +7484,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gdk_1event_1get_1time, [:pointer, :long, :int32], :int32
       typesig { [::Java::Int] }
+      # @param event cast=(GdkEvent *)
       # long
       def __gdk_event_get_time(event)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1gdk_1event_1get_1time, JNI.env, self.jni_id, event.to_int)
@@ -6678,6 +7503,10 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gdk_1event_1handler_1set, [:pointer, :long, :int32, :int32, :int32], :void
       typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
+      # @param func cast=(GdkEventFunc)
+      # @param data cast=(gpointer)
+      # @param notify cast=(GDestroyNotify)
+      # 
       # long
       # long
       # long
@@ -6736,6 +7565,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gdk_1event_1put, [:pointer, :long, :int32], :void
       typesig { [::Java::Int] }
+      # @param event cast=(GdkEvent *)
       # long
       def __gdk_event_put(event)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1gdk_1event_1put, JNI.env, self.jni_id, event.to_int)
@@ -6802,6 +7632,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gdk_1free_1text_1list, [:pointer, :long, :int32], :void
       typesig { [::Java::Int] }
+      # @param list cast=(gchar **)
       # long
       def __gdk_free_text_list(list)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1gdk_1free_1text_1list, JNI.env, self.jni_id, list.to_int)
@@ -6820,6 +7651,9 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gdk_1gc_1get_1values, [:pointer, :long, :int32, :long], :void
       typesig { [::Java::Int, GdkGCValues] }
+      # @param gc cast=(GdkGC *)
+      # @param values cast=(GdkGCValues *),flags=no_in
+      # 
       # long
       def __gdk_gc_get_values(gc, values)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1gdk_1gc_1get_1values, JNI.env, self.jni_id, gc.to_int, values.jni_id)
@@ -6838,6 +7672,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gdk_1gc_1new, [:pointer, :long, :int32], :int32
       typesig { [::Java::Int] }
+      # @param window cast=(GdkDrawable *)
       # long
       # long
       def __gdk_gc_new(window)
@@ -6858,6 +7693,9 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gdk_1gc_1set_1background, [:pointer, :long, :int32, :long], :void
       typesig { [::Java::Int, GdkColor] }
+      # @param gc cast=(GdkGC *)
+      # @param color cast=(GdkColor *),flags=no_out
+      # 
       # long
       def __gdk_gc_set_background(gc, color)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1gdk_1gc_1set_1background, JNI.env, self.jni_id, gc.to_int, color.jni_id)
@@ -6876,6 +7714,9 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gdk_1gc_1set_1clip_1mask, [:pointer, :long, :int32, :int32], :void
       typesig { [::Java::Int, ::Java::Int] }
+      # @param gc cast=(GdkGC *)
+      # @param mask cast=(GdkBitmap *)
+      # 
       # long
       # long
       def __gdk_gc_set_clip_mask(gc, mask)
@@ -6896,6 +7737,10 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gdk_1gc_1set_1clip_1origin, [:pointer, :long, :int32, :int32, :int32], :void
       typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
+      # @param gc cast=(GdkGC *)
+      # @param x cast=(gint)
+      # @param y cast=(gint)
+      # 
       # long
       def __gdk_gc_set_clip_origin(gc, x, y)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1gdk_1gc_1set_1clip_1origin, JNI.env, self.jni_id, gc.to_int, x.to_int, y.to_int)
@@ -6914,6 +7759,9 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gdk_1gc_1set_1clip_1rectangle, [:pointer, :long, :int32, :long], :void
       typesig { [::Java::Int, GdkRectangle] }
+      # @param gc cast=(GdkGC *)
+      # @param rectangle cast=(GdkRectangle *),flags=no_out
+      # 
       # long
       def __gdk_gc_set_clip_rectangle(gc, rectangle)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1gdk_1gc_1set_1clip_1rectangle, JNI.env, self.jni_id, gc.to_int, rectangle.jni_id)
@@ -6932,6 +7780,9 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gdk_1gc_1set_1clip_1region, [:pointer, :long, :int32, :int32], :void
       typesig { [::Java::Int, ::Java::Int] }
+      # @param gc cast=(GdkGC *)
+      # @param region cast=(GdkRegion *)
+      # 
       # long
       # long
       def __gdk_gc_set_clip_region(gc, region)
@@ -6952,6 +7803,11 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gdk_1gc_1set_1dashes, [:pointer, :long, :int32, :int32, :long, :int32], :void
       typesig { [::Java::Int, ::Java::Int, Array.typed(::Java::Byte), ::Java::Int] }
+      # @param gc cast=(GdkGC *)
+      # @param dash_offset cast=(gint)
+      # @param dash_list cast=(gint8 *),flags=no_out critical
+      # @param n cast=(gint)
+      # 
       # long
       def __gdk_gc_set_dashes(gc, dash_offset, dash_list, n)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1gdk_1gc_1set_1dashes, JNI.env, self.jni_id, gc.to_int, dash_offset.to_int, dash_list.jni_id, n.to_int)
@@ -6970,6 +7826,9 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gdk_1gc_1set_1exposures, [:pointer, :long, :int32, :int8], :void
       typesig { [::Java::Int, ::Java::Boolean] }
+      # @param gc cast=(GdkGC *)
+      # @param exposures cast=(gboolean)
+      # 
       # long
       def __gdk_gc_set_exposures(gc, exposures)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1gdk_1gc_1set_1exposures, JNI.env, self.jni_id, gc.to_int, exposures ? 1 : 0)
@@ -6988,6 +7847,9 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gdk_1gc_1set_1fill, [:pointer, :long, :int32, :int32], :void
       typesig { [::Java::Int, ::Java::Int] }
+      # @param gc cast=(GdkGC *)
+      # @param fill cast=(GdkFill)
+      # 
       # long
       def __gdk_gc_set_fill(gc, fill)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1gdk_1gc_1set_1fill, JNI.env, self.jni_id, gc.to_int, fill.to_int)
@@ -7006,6 +7868,9 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gdk_1gc_1set_1foreground, [:pointer, :long, :int32, :long], :void
       typesig { [::Java::Int, GdkColor] }
+      # @param gc cast=(GdkGC *)
+      # @param color cast=(GdkColor *),flags=no_out
+      # 
       # long
       def __gdk_gc_set_foreground(gc, color)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1gdk_1gc_1set_1foreground, JNI.env, self.jni_id, gc.to_int, color.jni_id)
@@ -7024,6 +7889,9 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gdk_1gc_1set_1function, [:pointer, :long, :int32, :int32], :void
       typesig { [::Java::Int, ::Java::Int] }
+      # @param gc cast=(GdkGC *)
+      # @param function cast=(GdkFunction)
+      # 
       # long
       # long
       def __gdk_gc_set_function(gc, function)
@@ -7044,6 +7912,12 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gdk_1gc_1set_1line_1attributes, [:pointer, :long, :int32, :int32, :int32, :int32, :int32], :void
       typesig { [::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int] }
+      # @param gc cast=(GdkGC *)
+      # @param line_width cast=(gint)
+      # @param line_style cast=(GdkLineStyle)
+      # @param cap_style cast=(GdkCapStyle)
+      # @param join_style cast=(GdkJoinStyle)
+      # 
       # long
       def __gdk_gc_set_line_attributes(gc, line_width, line_style, cap_style, join_style)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1gdk_1gc_1set_1line_1attributes, JNI.env, self.jni_id, gc.to_int, line_width.to_int, line_style.to_int, cap_style.to_int, join_style.to_int)
@@ -7062,6 +7936,9 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gdk_1gc_1set_1stipple, [:pointer, :long, :int32, :int32], :void
       typesig { [::Java::Int, ::Java::Int] }
+      # @param gc cast=(GdkGC *)
+      # @param stipple cast=(GdkPixmap *)
+      # 
       # long
       # long
       def __gdk_gc_set_stipple(gc, stipple)
@@ -7082,6 +7959,9 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gdk_1gc_1set_1subwindow, [:pointer, :long, :int32, :int32], :void
       typesig { [::Java::Int, ::Java::Int] }
+      # @param gc cast=(GdkGC *)
+      # @param mode cast=(GdkSubwindowMode)
+      # 
       # long
       # long
       def __gdk_gc_set_subwindow(gc, mode)
@@ -7102,6 +7982,9 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gdk_1gc_1set_1tile, [:pointer, :long, :int32, :int32], :void
       typesig { [::Java::Int, ::Java::Int] }
+      # @param gc cast=(GdkGC *)
+      # @param tile cast=(GdkPixmap *)
+      # 
       # long
       # long
       def __gdk_gc_set_tile(gc, tile)
@@ -7122,6 +8005,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gdk_1gc_1set_1ts_1origin, [:pointer, :long, :int32, :int32, :int32], :void
       typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
+      # @param gc cast=(GdkGC *)
       # long
       def __gdk_gc_set_ts_origin(gc, x, y)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1gdk_1gc_1set_1ts_1origin, JNI.env, self.jni_id, gc.to_int, x.to_int, y.to_int)
@@ -7140,6 +8024,10 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gdk_1gc_1set_1values, [:pointer, :long, :int32, :long, :int32], :void
       typesig { [::Java::Int, GdkGCValues, ::Java::Int] }
+      # @param gc cast=(GdkGC *)
+      # @param values cast=(GdkGCValues *),flags=no_out
+      # @param values_mask cast=(GdkGCValuesMask)
+      # 
       # long
       def __gdk_gc_set_values(gc, values, values_mask)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1gdk_1gc_1set_1values, JNI.env, self.jni_id, gc.to_int, values.jni_id, values_mask.to_int)
@@ -7192,6 +8080,13 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gdk_1keymap_1translate_1keyboard_1state, [:pointer, :long, :int32, :int32, :int32, :int32, :long, :long, :long, :long], :int8
       typesig { [::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, Array.typed(::Java::Int), Array.typed(::Java::Int), Array.typed(::Java::Int), Array.typed(::Java::Int)] }
+      # @param keymap cast=(GdkKeymap*)
+      # @param state cast=(GdkModifierType)
+      # @param keyval cast=(guint*)
+      # @param effective_group cast=(gint*)
+      # @param level cast=(gint*)
+      # @param consumed_modifiers cast=(GdkModifierType *)
+      # 
       # long
       def __gdk_keymap_translate_keyboard_state(keymap, hardware_keycode, state, group, keyval, effective_group, level, consumed_modifiers)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1gdk_1keymap_1translate_1keyboard_1state, JNI.env, self.jni_id, keymap.to_int, hardware_keycode.to_int, state.to_int, group.to_int, keyval.jni_id, effective_group.jni_id, level.jni_id, consumed_modifiers.jni_id) != 0
@@ -7260,6 +8155,9 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gdk_1pango_1context_1set_1colormap, [:pointer, :long, :int32, :int32], :void
       typesig { [::Java::Int, ::Java::Int] }
+      # @param context cast=(PangoContext *)
+      # @param colormap cast=(GdkColormap *)
+      # 
       # long
       # long
       def __gdk_pango_context_set_colormap(context, colormap)
@@ -7280,6 +8178,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gdk_1pango_1layout_1get_1clip_1region, [:pointer, :long, :int32, :int32, :int32, :long, :int32], :int32
       typesig { [::Java::Int, ::Java::Int, ::Java::Int, Array.typed(::Java::Int), ::Java::Int] }
+      # @param layout cast=(PangoLayout *)
       # long
       # long
       def __gdk_pango_layout_get_clip_region(layout, x_origin, y_origin, index_ranges, n_ranges)
@@ -7300,6 +8199,9 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gdk_1pixbuf_1copy_1area, [:pointer, :long, :int32, :int32, :int32, :int32, :int32, :int32, :int32, :int32], :void
       typesig { [::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int] }
+      # @param src_pixbuf cast=(GdkPixbuf *)
+      # @param dest_pixbuf cast=(GdkPixbuf *)
+      # 
       # long
       # long
       def __gdk_pixbuf_copy_area(src_pixbuf, src_x, src_y, width, height, dest_pixbuf, dest_x, dest_y)
@@ -7320,6 +8222,10 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gdk_1pixbuf_1get_1from_1drawable, [:pointer, :long, :int32, :int32, :int32, :int32, :int32, :int32, :int32, :int32, :int32], :int32
       typesig { [::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int] }
+      # @param dest cast=(GdkPixbuf *)
+      # @param src cast=(GdkDrawable *)
+      # @param cmap cast=(GdkColormap *)
+      # 
       # long
       # long
       # long
@@ -7344,6 +8250,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gdk_1pixbuf_1get_1has_1alpha, [:pointer, :long, :int32], :int8
       typesig { [::Java::Int] }
+      # @param pixbuf cast=(const GdkPixbuf *)
       # long
       def __gdk_pixbuf_get_has_alpha(pixbuf)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1gdk_1pixbuf_1get_1has_1alpha, JNI.env, self.jni_id, pixbuf.to_int) != 0
@@ -7362,6 +8269,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gdk_1pixbuf_1get_1height, [:pointer, :long, :int32], :int32
       typesig { [::Java::Int] }
+      # @param pixbuf cast=(const GdkPixbuf *)
       # long
       def __gdk_pixbuf_get_height(pixbuf)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1gdk_1pixbuf_1get_1height, JNI.env, self.jni_id, pixbuf.to_int)
@@ -7380,6 +8288,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gdk_1pixbuf_1get_1pixels, [:pointer, :long, :int32], :int32
       typesig { [::Java::Int] }
+      # @param pixbuf cast=(const GdkPixbuf *)
       # long
       # long
       def __gdk_pixbuf_get_pixels(pixbuf)
@@ -7400,6 +8309,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gdk_1pixbuf_1get_1rowstride, [:pointer, :long, :int32], :int32
       typesig { [::Java::Int] }
+      # @param pixbuf cast=(const GdkPixbuf *)
       # long
       def __gdk_pixbuf_get_rowstride(pixbuf)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1gdk_1pixbuf_1get_1rowstride, JNI.env, self.jni_id, pixbuf.to_int)
@@ -7418,6 +8328,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gdk_1pixbuf_1get_1width, [:pointer, :long, :int32], :int32
       typesig { [::Java::Int] }
+      # @param pixbuf cast=(const GdkPixbuf *)
       # long
       def __gdk_pixbuf_get_width(pixbuf)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1gdk_1pixbuf_1get_1width, JNI.env, self.jni_id, pixbuf.to_int)
@@ -7454,6 +8365,9 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gdk_1pixbuf_1loader_1close, [:pointer, :long, :int32, :long], :int8
       typesig { [::Java::Int, Array.typed(::Java::Int)] }
+      # @param loader cast=(GdkPixbufLoader *)
+      # @param error cast=(GError **)
+      # 
       # long
       # long
       def __gdk_pixbuf_loader_close(loader, error)
@@ -7474,6 +8388,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gdk_1pixbuf_1loader_1get_1pixbuf, [:pointer, :long, :int32], :int32
       typesig { [::Java::Int] }
+      # @param loader cast=(GdkPixbufLoader *)
       # long
       # long
       def __gdk_pixbuf_loader_get_pixbuf(loader)
@@ -7494,6 +8409,11 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gdk_1pixbuf_1loader_1write, [:pointer, :long, :int32, :int32, :int32, :long], :int8
       typesig { [::Java::Int, ::Java::Int, ::Java::Int, Array.typed(::Java::Int)] }
+      # @param loader cast=(GdkPixbufLoader *)
+      # @param buffer cast=(const guchar *)
+      # @param count cast=(gsize)
+      # @param error cast=(GError **)
+      # 
       # long
       # long
       # long
@@ -7516,6 +8436,9 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gdk_1pixbuf_1new, [:pointer, :long, :int32, :int8, :int32, :int32, :int32], :int32
       typesig { [::Java::Int, ::Java::Boolean, ::Java::Int, ::Java::Int, ::Java::Int] }
+      # @param colorspace cast=(GdkColorspace)
+      # @param has_alpha cast=(gboolean)
+      # 
       # long
       def __gdk_pixbuf_new(colorspace, has_alpha, bits_per_sample, width, height)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1gdk_1pixbuf_1new, JNI.env, self.jni_id, colorspace.to_int, has_alpha ? 1 : 0, bits_per_sample.to_int, width.to_int, height.to_int)
@@ -7534,6 +8457,9 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gdk_1pixbuf_1new_1from_1file, [:pointer, :long, :long, :long], :int32
       typesig { [Array.typed(::Java::Byte), Array.typed(::Java::Int)] }
+      # @param filename cast=(const char *)
+      # @param error cast=(GError**)
+      # 
       # long
       # long
       def __gdk_pixbuf_new_from_file(filename, error)
@@ -7554,6 +8480,11 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gdk_1pixbuf_1render_1to_1drawable, [:pointer, :long, :int32, :int32, :int32, :int32, :int32, :int32, :int32, :int32, :int32, :int32, :int32, :int32], :void
       typesig { [::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int] }
+      # @param pixbuf cast=(GdkPixbuf *)
+      # @param drawable cast=(GdkDrawable *)
+      # @param gc cast=(GdkGC *)
+      # @param dither cast=(GdkRgbDither)
+      # 
       # long
       # long
       # long
@@ -7576,6 +8507,11 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gdk_1pixbuf_1render_1to_1drawable_1alpha, [:pointer, :long, :int32, :int32, :int32, :int32, :int32, :int32, :int32, :int32, :int32, :int32, :int32, :int32, :int32], :void
       typesig { [::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int] }
+      # @param pixbuf cast=(GdkPixbuf *)
+      # @param drawable cast=(GdkDrawable *)
+      # @param alpha_mode cast=(GdkPixbufAlphaMode)
+      # @param dither cast=(GdkRgbDither)
+      # 
       # long
       # long
       def __gdk_pixbuf_render_to_drawable_alpha(pixbuf, drawable, src_x, src_y, dest_x, dest_y, width, height, alpha_mode, alpha_threshold, dither, x_dither, y_dither)
@@ -7596,6 +8532,10 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gdk_1pixbuf_1render_1pixmap_1and_1mask, [:pointer, :long, :int32, :long, :long, :int32], :void
       typesig { [::Java::Int, Array.typed(::Java::Int), Array.typed(::Java::Int), ::Java::Int] }
+      # @param pixbuf cast=(GdkPixbuf *)
+      # @param pixmap_return cast=(GdkDrawable **)
+      # @param mask_return cast=(GdkBitmap **)
+      # 
       # long
       # long
       # long
@@ -7616,23 +8556,38 @@ module Org::Eclipse::Swt::Internal::Gtk
         end
       end
       
-      JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gdk_1pixbuf_1save_1to_1buffer, [:pointer, :long, :int32, :long, :long, :long, :long, :long], :int8
-      typesig { [::Java::Int, Array.typed(::Java::Int), Array.typed(::Java::Int), Array.typed(::Java::Byte), Array.typed(::Java::Int), Array.typed(::Java::Byte)] }
+      JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gdk_1pixbuf_1save_1to_1bufferv, [:pointer, :long, :int32, :long, :long, :long, :long, :long, :long], :int8
+      typesig { [::Java::Int, Array.typed(::Java::Int), Array.typed(::Java::Int), Array.typed(::Java::Byte), Array.typed(::Java::Int), Array.typed(::Java::Int), Array.typed(::Java::Int)] }
+      # @method flags=dynamic
+      # @param pixbuf cast=(GdkPixbuf *)
+      # @param buffer cast=(gchar **)
+      # @param buffer_size cast=(gsize *)
+      # @param type cast=(const char *)
+      # @param option_keys=(char **)
+      # @param option_values=(char **)
+      # @param error cast=(GError **)
+      # 
       # long
       # long
       # long
-      def __gdk_pixbuf_save_to_buffer(pixbuf, buffer, buffer_size, type, error, terminate)
-        JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1gdk_1pixbuf_1save_1to_1buffer, JNI.env, self.jni_id, pixbuf.to_int, buffer.jni_id, buffer_size.jni_id, type.jni_id, error.jni_id, terminate.jni_id) != 0
+      # long
+      # long
+      # long
+      def __gdk_pixbuf_save_to_bufferv(pixbuf, buffer, buffer_size, type, option_keys, option_values, error)
+        JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1gdk_1pixbuf_1save_1to_1bufferv, JNI.env, self.jni_id, pixbuf.to_int, buffer.jni_id, buffer_size.jni_id, type.jni_id, option_keys.jni_id, option_values.jni_id, error.jni_id) != 0
       end
       
-      typesig { [::Java::Int, Array.typed(::Java::Int), Array.typed(::Java::Int), Array.typed(::Java::Byte), Array.typed(::Java::Int), Array.typed(::Java::Byte)] }
+      typesig { [::Java::Int, Array.typed(::Java::Int), Array.typed(::Java::Int), Array.typed(::Java::Byte), Array.typed(::Java::Int), Array.typed(::Java::Int), Array.typed(::Java::Int)] }
       # long
       # long
       # long
-      def gdk_pixbuf_save_to_buffer(pixbuf, buffer, buffer_size, type, error, terminate)
+      # long
+      # long
+      # long
+      def gdk_pixbuf_save_to_bufferv(pixbuf, buffer, buffer_size, type, option_keys, option_values, error)
         PLATFORM_LOCK.lock
         begin
-          return __gdk_pixbuf_save_to_buffer(pixbuf, buffer, buffer_size, type, error, terminate)
+          return __gdk_pixbuf_save_to_bufferv(pixbuf, buffer, buffer_size, type, option_keys, option_values, error)
         ensure
           PLATFORM_LOCK.unlock
         end
@@ -7640,6 +8595,13 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gdk_1pixbuf_1scale, [:pointer, :long, :int32, :int32, :int32, :int32, :int32, :int32, :double, :double, :double, :double, :int32], :void
       typesig { [::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Double, ::Java::Double, ::Java::Double, ::Java::Double, ::Java::Int] }
+      # @param src cast=(const GdkPixbuf *)
+      # @param dest cast=(GdkPixbuf *)
+      # @param offset_x cast=(double)
+      # @param offset_y cast=(double)
+      # @param scale_x cast=(double)
+      # @param scale_y cast=(double)
+      # 
       # long
       # long
       def __gdk_pixbuf_scale(src, dest, dest_x, dest_y, dest_width, dest_height, offset_x, offset_y, scale_x, scale_y, interp_type)
@@ -7660,6 +8622,9 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gdk_1pixbuf_1scale_1simple, [:pointer, :long, :int32, :int32, :int32, :int32], :int32
       typesig { [::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int] }
+      # @param src cast=(const GdkPixbuf *)
+      # @param interp_type cast=(GdkInterpType)
+      # 
       # long
       # long
       def __gdk_pixbuf_scale_simple(src, dest_width, dest_height, interp_type)
@@ -7680,6 +8645,11 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gdk_1pixmap_1new, [:pointer, :long, :int32, :int32, :int32, :int32], :int32
       typesig { [::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int] }
+      # @param window cast=(GdkWindow *)
+      # @param width cast=(gint)
+      # @param height cast=(gint)
+      # @param depth cast=(gint)
+      # 
       # long
       # long
       def __gdk_pixmap_new(window, width, height, depth)
@@ -7700,6 +8670,13 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gdk_1pointer_1grab, [:pointer, :long, :int32, :int8, :int32, :int32, :int32, :int32], :int32
       typesig { [::Java::Int, ::Java::Boolean, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int] }
+      # @param window cast=(GdkWindow *)
+      # @param owner_events cast=(gboolean)
+      # @param event_mask cast=(GdkEventMask)
+      # @param confine_to cast=(GdkWindow *)
+      # @param cursor cast=(GdkCursor *)
+      # @param time cast=(guint32)
+      # 
       # long
       # long
       # long
@@ -7738,6 +8715,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gdk_1pointer_1ungrab, [:pointer, :long, :int32], :void
       typesig { [::Java::Int] }
+      # @param time cast=(guint32)
       def __gdk_pointer_ungrab(time)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1gdk_1pointer_1ungrab, JNI.env, self.jni_id, time.to_int)
       end
@@ -7754,6 +8732,14 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gdk_1property_1get, [:pointer, :long, :int32, :int32, :int32, :int32, :int32, :int32, :long, :long, :long, :long], :int8
       typesig { [::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, Array.typed(::Java::Int), Array.typed(::Java::Int), Array.typed(::Java::Int), Array.typed(::Java::Int)] }
+      # @param window cast=(GdkWindow *)
+      # @param property cast=(GdkAtom)
+      # @param type cast=(GdkAtom)
+      # @param actual_property_type cast=(GdkAtom *)
+      # @param actual_format cast=(gint *)
+      # @param actual_length cast=(gint *)
+      # @param data cast=(guchar **)
+      # 
       # long
       # long
       # long
@@ -7784,6 +8770,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gdk_1region_1destroy, [:pointer, :long, :int32], :void
       typesig { [::Java::Int] }
+      # @param region cast=(GdkRegion *)
       # long
       def __gdk_region_destroy(region)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1gdk_1region_1destroy, JNI.env, self.jni_id, region.to_int)
@@ -7802,6 +8789,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gdk_1region_1empty, [:pointer, :long, :int32], :int8
       typesig { [::Java::Int] }
+      # @param region cast=(GdkRegion *)
       # long
       def __gdk_region_empty(region)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1gdk_1region_1empty, JNI.env, self.jni_id, region.to_int) != 0
@@ -7820,6 +8808,9 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gdk_1region_1get_1clipbox, [:pointer, :long, :int32, :long], :void
       typesig { [::Java::Int, GdkRectangle] }
+      # @param region cast=(GdkRegion *)
+      # @param rectangle cast=(GdkRectangle *),flags=no_in
+      # 
       # long
       def __gdk_region_get_clipbox(region, rectangle)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1gdk_1region_1get_1clipbox, JNI.env, self.jni_id, region.to_int, rectangle.jni_id)
@@ -7838,6 +8829,10 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gdk_1region_1get_1rectangles, [:pointer, :long, :int32, :long, :long], :void
       typesig { [::Java::Int, Array.typed(::Java::Int), Array.typed(::Java::Int)] }
+      # @param region cast=(GdkRegion *)
+      # @param rectangles cast=(GdkRectangle **)
+      # @param n_rectangles cast=(gint *)
+      # 
       # long
       # long
       def __gdk_region_get_rectangles(region, rectangles, n_rectangles)
@@ -7858,6 +8853,9 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gdk_1region_1intersect, [:pointer, :long, :int32, :int32], :void
       typesig { [::Java::Int, ::Java::Int] }
+      # @param source1 cast=(GdkRegion *)
+      # @param source2 cast=(GdkRegion *)
+      # 
       # long
       # long
       def __gdk_region_intersect(source1, source2)
@@ -7896,6 +8894,10 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gdk_1region_1offset, [:pointer, :long, :int32, :int32, :int32], :void
       typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
+      # @param region cast=(GdkRegion *)
+      # @param dx cast=(gint)
+      # @param dy cast=(gint)
+      # 
       # long
       def __gdk_region_offset(region, dx, dy)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1gdk_1region_1offset, JNI.env, self.jni_id, region.to_int, dx.to_int, dy.to_int)
@@ -7914,6 +8916,10 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gdk_1region_1point_1in, [:pointer, :long, :int32, :int32, :int32], :int8
       typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
+      # @param region cast=(GdkRegion *)
+      # @param x cast=(gint)
+      # @param y cast=(gint)
+      # 
       # long
       def __gdk_region_point_in(region, x, y)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1gdk_1region_1point_1in, JNI.env, self.jni_id, region.to_int, x.to_int, y.to_int) != 0
@@ -7932,6 +8938,9 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gdk_1region_1polygon, [:pointer, :long, :long, :int32, :int32], :int32
       typesig { [Array.typed(::Java::Int), ::Java::Int, ::Java::Int] }
+      # @param points cast=(GdkPoint *)
+      # @param fill_rule cast=(GdkFillRule)
+      # 
       # long
       def __gdk_region_polygon(points, npoints, fill_rule)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1gdk_1region_1polygon, JNI.env, self.jni_id, points.jni_id, npoints.to_int, fill_rule.to_int)
@@ -7950,6 +8959,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gdk_1region_1rectangle, [:pointer, :long, :long], :int32
       typesig { [GdkRectangle] }
+      # @param rectangle flags=no_out
       # long
       def __gdk_region_rectangle(rectangle)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1gdk_1region_1rectangle, JNI.env, self.jni_id, rectangle.jni_id)
@@ -7968,6 +8978,9 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gdk_1region_1rect_1in, [:pointer, :long, :int32, :long], :int32
       typesig { [::Java::Int, GdkRectangle] }
+      # @param region cast=(GdkRegion *)
+      # @param rect cast=(GdkRectangle *),flags=no_out
+      # 
       # long
       # long
       def __gdk_region_rect_in(region, rect)
@@ -7988,6 +9001,9 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gdk_1region_1subtract, [:pointer, :long, :int32, :int32], :void
       typesig { [::Java::Int, ::Java::Int] }
+      # @param source1 cast=(GdkRegion *)
+      # @param source2 cast=(GdkRegion *)
+      # 
       # long
       # long
       def __gdk_region_subtract(source1, source2)
@@ -8008,6 +9024,9 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gdk_1region_1union, [:pointer, :long, :int32, :int32], :void
       typesig { [::Java::Int, ::Java::Int] }
+      # @param source1 cast=(GdkRegion *)
+      # @param source2 cast=(GdkRegion *)
+      # 
       # long
       # long
       def __gdk_region_union(source1, source2)
@@ -8028,6 +9047,9 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gdk_1region_1union_1with_1rect, [:pointer, :long, :int32, :long], :void
       typesig { [::Java::Int, GdkRectangle] }
+      # @param region cast=(GdkRegion *)
+      # @param rect cast=(GdkRectangle *),flags=no_out
+      # 
       # long
       def __gdk_region_union_with_rect(region, rect)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1gdk_1region_1union_1with_1rect, JNI.env, self.jni_id, region.to_int, rect.jni_id)
@@ -8062,6 +9084,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gdk_1screen_1get_1default, [:pointer, :long], :int32
       typesig { [] }
+      # @method flags=dynamic
       # long
       def __gdk_screen_get_default
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1gdk_1screen_1get_1default, JNI.env, self.jni_id)
@@ -8080,6 +9103,11 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gdk_1screen_1get_1monitor_1at_1point, [:pointer, :long, :int32, :int32, :int32], :int32
       typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
+      # @method flags=dynamic
+      # @param screen cast=(GdkScreen *)
+      # @param x cast=(gint)
+      # @param y cast=(gint)
+      # 
       # long
       def __gdk_screen_get_monitor_at_point(screen, x, y)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1gdk_1screen_1get_1monitor_1at_1point, JNI.env, self.jni_id, screen.to_int, x.to_int, y.to_int)
@@ -8098,6 +9126,10 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gdk_1screen_1get_1monitor_1at_1window, [:pointer, :long, :int32, :int32], :int32
       typesig { [::Java::Int, ::Java::Int] }
+      # @method flags=dynamic
+      # @param screen cast=(GdkScreen *)
+      # @param window cast=(GdkWindow *)
+      # 
       # long
       # long
       def __gdk_screen_get_monitor_at_window(screen, window)
@@ -8118,6 +9150,10 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gdk_1screen_1get_1monitor_1geometry, [:pointer, :long, :int32, :int32, :long], :void
       typesig { [::Java::Int, ::Java::Int, GdkRectangle] }
+      # @method flags=dynamic
+      # @param screen cast=(GdkScreen *)
+      # @param dest flags=no_in
+      # 
       # long
       def __gdk_screen_get_monitor_geometry(screen, monitor_num, dest)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1gdk_1screen_1get_1monitor_1geometry, JNI.env, self.jni_id, screen.to_int, monitor_num.to_int, dest.jni_id)
@@ -8136,6 +9172,9 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gdk_1screen_1get_1n_1monitors, [:pointer, :long, :int32], :int32
       typesig { [::Java::Int] }
+      # @method flags=dynamic
+      # @param screen cast=(GdkScreen *)
+      # 
       # long
       def __gdk_screen_get_n_monitors(screen)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1gdk_1screen_1get_1n_1monitors, JNI.env, self.jni_id, screen.to_int)
@@ -8154,6 +9193,9 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gdk_1screen_1get_1number, [:pointer, :long, :int32], :int32
       typesig { [::Java::Int] }
+      # @method flags=dynamic
+      # @param screen cast=(GdkScreen *)
+      # 
       # long
       def __gdk_screen_get_number(screen)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1gdk_1screen_1get_1number, JNI.env, self.jni_id, screen.to_int)
@@ -8220,6 +9262,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gdk_1set_1program_1class, [:pointer, :long, :long], :void
       typesig { [Array.typed(::Java::Byte)] }
+      # @param program_class cast=(const char *)
       def __gdk_set_program_class(program_class)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1gdk_1set_1program_1class, JNI.env, self.jni_id, program_class.jni_id)
       end
@@ -8236,6 +9279,12 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gdk_1utf8_1to_1compound_1text, [:pointer, :long, :long, :long, :long, :long, :long], :int8
       typesig { [Array.typed(::Java::Byte), Array.typed(::Java::Int), Array.typed(::Java::Int), Array.typed(::Java::Int), Array.typed(::Java::Int)] }
+      # @param str cast=(const gchar *)
+      # @param encoding cast=(GdkAtom *)
+      # @param format cast=(gint *)
+      # @param ctext cast=(guchar **)
+      # @param length cast=(gint *)
+      # 
       # long
       # long
       def __gdk_utf8_to_compound_text(str, encoding, format, ctext, length_)
@@ -8256,6 +9305,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gdk_1utf8_1to_1string_1target, [:pointer, :long, :long], :int32
       typesig { [Array.typed(::Java::Byte)] }
+      # @param str cast=(const gchar *)
       # long
       def __gdk_utf8_to_string_target(str)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1gdk_1utf8_1to_1string_1target, JNI.env, self.jni_id, str.jni_id)
@@ -8274,6 +9324,10 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gdk_1text_1property_1to_1utf8_1list, [:pointer, :long, :int32, :int32, :int32, :int32, :long], :int32
       typesig { [::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, Array.typed(::Java::Int)] }
+      # @param encoding cast=(GdkAtom)
+      # @param text cast=(guchar *)
+      # @param list cast=(gchar ***)
+      # 
       # long
       # long
       # long
@@ -8296,6 +9350,9 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1tooltip_1trigger_1tooltip_1query, [:pointer, :long, :int32], :void
       typesig { [::Java::Int] }
+      # @method flags=dynamic
+      # @param display cast=(GdkDisplay*)
+      # 
       # long
       def __gtk_tooltip_trigger_tooltip_query(display)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1gtk_1tooltip_1trigger_1tooltip_1query, JNI.env, self.jni_id, display.to_int)
@@ -8348,6 +9405,9 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gdk_1window_1at_1pointer, [:pointer, :long, :long, :long], :int32
       typesig { [Array.typed(::Java::Int), Array.typed(::Java::Int)] }
+      # @param win_x cast=(gint *)
+      # @param win_y cast=(gint *)
+      # 
       # long
       def __gdk_window_at_pointer(win_x, win_y)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1gdk_1window_1at_1pointer, JNI.env, self.jni_id, win_x.jni_id, win_y.jni_id)
@@ -8366,6 +9426,9 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gdk_1window_1begin_1paint_1rect, [:pointer, :long, :int32, :long], :void
       typesig { [::Java::Int, GdkRectangle] }
+      # @param window cast=(GdkWindow *)
+      # @param rectangle cast=(GdkRectangle *),flags=no_out
+      # 
       # long
       def __gdk_window_begin_paint_rect(window, rectangle)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1gdk_1window_1begin_1paint_1rect, JNI.env, self.jni_id, window.to_int, rectangle.jni_id)
@@ -8384,6 +9447,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gdk_1window_1clear_1area, [:pointer, :long, :int32, :int32, :int32, :int32, :int32], :void
       typesig { [::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int] }
+      # @param window cast=(GdkWindow *)
       # long
       def __gdk_window_clear_area(window, x, y, width, height)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1gdk_1window_1clear_1area, JNI.env, self.jni_id, window.to_int, x.to_int, y.to_int, width.to_int, height.to_int)
@@ -8402,6 +9466,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gdk_1window_1destroy, [:pointer, :long, :int32], :void
       typesig { [::Java::Int] }
+      # @param window cast=(GdkWindow *)
       # long
       def __gdk_window_destroy(window)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1gdk_1window_1destroy, JNI.env, self.jni_id, window.to_int)
@@ -8420,6 +9485,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gdk_1window_1end_1paint, [:pointer, :long, :int32], :void
       typesig { [::Java::Int] }
+      # @param window cast=(GdkWindow *)
       # long
       def __gdk_window_end_paint(window)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1gdk_1window_1end_1paint, JNI.env, self.jni_id, window.to_int)
@@ -8438,6 +9504,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gdk_1window_1get_1children, [:pointer, :long, :int32], :int32
       typesig { [::Java::Int] }
+      # @param window cast=(GdkWindow *)
       # long
       # long
       def __gdk_window_get_children(window)
@@ -8458,6 +9525,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gdk_1window_1get_1events, [:pointer, :long, :int32], :int32
       typesig { [::Java::Int] }
+      # @param window cast=(GdkWindow *)
       # long
       def __gdk_window_get_events(window)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1gdk_1window_1get_1events, JNI.env, self.jni_id, window.to_int)
@@ -8476,6 +9544,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gdk_1window_1focus, [:pointer, :long, :int32, :int32], :void
       typesig { [::Java::Int, ::Java::Int] }
+      # @param window cast=(GdkWindow *)
       # long
       def __gdk_window_focus(window, timestamp)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1gdk_1window_1focus, JNI.env, self.jni_id, window.to_int, timestamp.to_int)
@@ -8494,6 +9563,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gdk_1window_1freeze_1updates, [:pointer, :long, :int32], :void
       typesig { [::Java::Int] }
+      # @param window cast=(GdkWindow *)
       # long
       def __gdk_window_freeze_updates(window)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1gdk_1window_1freeze_1updates, JNI.env, self.jni_id, window.to_int)
@@ -8512,6 +9582,9 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gdk_1window_1get_1frame_1extents, [:pointer, :long, :int32, :long], :void
       typesig { [::Java::Int, GdkRectangle] }
+      # @param window cast=(GdkWindow *)
+      # @param rect cast=(GdkRectangle *),flags=no_in
+      # 
       # long
       def __gdk_window_get_frame_extents(window, rect)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1gdk_1window_1get_1frame_1extents, JNI.env, self.jni_id, window.to_int, rect.jni_id)
@@ -8530,6 +9603,11 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gdk_1window_1get_1internal_1paint_1info, [:pointer, :long, :int32, :long, :long, :long], :void
       typesig { [::Java::Int, Array.typed(::Java::Int), Array.typed(::Java::Int), Array.typed(::Java::Int)] }
+      # @param window cast=(GdkWindow *)
+      # @param real_drawable cast=(GdkDrawable **)
+      # @param x_offset cast=(gint *)
+      # @param y_offset cast=(gint *)
+      # 
       # long
       # long
       def __gdk_window_get_internal_paint_info(window, real_drawable, x_offset, y_offset)
@@ -8550,6 +9628,10 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gdk_1window_1get_1origin, [:pointer, :long, :int32, :long, :long], :int32
       typesig { [::Java::Int, Array.typed(::Java::Int), Array.typed(::Java::Int)] }
+      # @param window cast=(GdkWindow *)
+      # @param x cast=(gint *)
+      # @param y cast=(gint *)
+      # 
       # long
       def __gdk_window_get_origin(window, x, y)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1gdk_1window_1get_1origin, JNI.env, self.jni_id, window.to_int, x.jni_id, y.jni_id)
@@ -8568,6 +9650,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gdk_1window_1get_1parent, [:pointer, :long, :int32], :int32
       typesig { [::Java::Int] }
+      # @param window cast=(GdkWindow *)
       # long
       # long
       def __gdk_window_get_parent(window)
@@ -8588,6 +9671,11 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gdk_1window_1get_1pointer, [:pointer, :long, :int32, :long, :long, :long], :int32
       typesig { [::Java::Int, Array.typed(::Java::Int), Array.typed(::Java::Int), Array.typed(::Java::Int)] }
+      # @param window cast=(GdkWindow *)
+      # @param x cast=(gint *)
+      # @param y cast=(gint *)
+      # @param mask cast=(GdkModifierType *)
+      # 
       # long
       # long
       def __gdk_window_get_pointer(window, x, y, mask)
@@ -8608,6 +9696,10 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gdk_1window_1get_1position, [:pointer, :long, :int32, :long, :long], :void
       typesig { [::Java::Int, Array.typed(::Java::Int), Array.typed(::Java::Int)] }
+      # @param window cast=(GdkWindow *)
+      # @param x cast=(gint *)
+      # @param y cast=(gint *)
+      # 
       # long
       def __gdk_window_get_position(window, x, y)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1gdk_1window_1get_1position, JNI.env, self.jni_id, window.to_int, x.jni_id, y.jni_id)
@@ -8626,6 +9718,9 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gdk_1window_1get_1user_1data, [:pointer, :long, :int32, :long], :void
       typesig { [::Java::Int, Array.typed(::Java::Int)] }
+      # @param window cast=(GdkWindow *)
+      # @param data cast=(gpointer *)
+      # 
       # long
       # long
       def __gdk_window_get_user_data(window, data)
@@ -8646,6 +9741,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gdk_1window_1hide, [:pointer, :long, :int32], :void
       typesig { [::Java::Int] }
+      # @param window cast=(GdkWindow *)
       # long
       def __gdk_window_hide(window)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1gdk_1window_1hide, JNI.env, self.jni_id, window.to_int)
@@ -8664,6 +9760,10 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gdk_1window_1invalidate_1rect, [:pointer, :long, :int32, :long, :int8], :void
       typesig { [::Java::Int, GdkRectangle, ::Java::Boolean] }
+      # @param window cast=(GdkWindow *)
+      # @param rectangle cast=(GdkRectangle *),flags=no_out
+      # @param invalidate_children cast=(gboolean)
+      # 
       # long
       def __gdk_window_invalidate_rect(window, rectangle, invalidate_children)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1gdk_1window_1invalidate_1rect, JNI.env, self.jni_id, window.to_int, rectangle.jni_id, invalidate_children ? 1 : 0)
@@ -8682,6 +9782,10 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gdk_1window_1invalidate_1region, [:pointer, :long, :int32, :int32, :int8], :void
       typesig { [::Java::Int, ::Java::Int, ::Java::Boolean] }
+      # @param window cast=(GdkWindow *)
+      # @param region cast=(GdkRegion *)
+      # @param invalidate_children cast=(gboolean)
+      # 
       # long
       # long
       def __gdk_window_invalidate_region(window, region, invalidate_children)
@@ -8702,6 +9806,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gdk_1window_1is_1visible, [:pointer, :long, :int32], :int8
       typesig { [::Java::Int] }
+      # @param window cast=(GdkWindow *)
       # long
       def __gdk_window_is_visible(window)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1gdk_1window_1is_1visible, JNI.env, self.jni_id, window.to_int) != 0
@@ -8720,6 +9825,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gdk_1window_1move, [:pointer, :long, :int32, :int32, :int32], :void
       typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
+      # @param window cast=(GdkWindow *)
       # long
       def __gdk_window_move(window, x, y)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1gdk_1window_1move, JNI.env, self.jni_id, window.to_int, x.to_int, y.to_int)
@@ -8738,6 +9844,9 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gdk_1window_1new, [:pointer, :long, :int32, :long, :int32], :int32
       typesig { [::Java::Int, GdkWindowAttr, ::Java::Int] }
+      # @param parent cast=(GdkWindow *)
+      # @param attributes flags=no_out
+      # 
       # long
       # long
       def __gdk_window_new(parent, attributes, attributes_mask)
@@ -8758,6 +9867,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gdk_1window_1lower, [:pointer, :long, :int32], :void
       typesig { [::Java::Int] }
+      # @param window cast=(GdkWindow *)
       # long
       def __gdk_window_lower(window)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1gdk_1window_1lower, JNI.env, self.jni_id, window.to_int)
@@ -8792,6 +9902,9 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gdk_1window_1process_1updates, [:pointer, :long, :int32, :int8], :void
       typesig { [::Java::Int, ::Java::Boolean] }
+      # @param window cast=(GdkWindow *)
+      # @param update_children cast=(gboolean)
+      # 
       # long
       def __gdk_window_process_updates(window, update_children)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1gdk_1window_1process_1updates, JNI.env, self.jni_id, window.to_int, update_children ? 1 : 0)
@@ -8810,6 +9923,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gdk_1window_1raise, [:pointer, :long, :int32], :void
       typesig { [::Java::Int] }
+      # @param window cast=(GdkWindow *)
       # long
       def __gdk_window_raise(window)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1gdk_1window_1raise, JNI.env, self.jni_id, window.to_int)
@@ -8828,6 +9942,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gdk_1window_1resize, [:pointer, :long, :int32, :int32, :int32], :void
       typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
+      # @param window cast=(GdkWindow *)
       # long
       def __gdk_window_resize(window, width, height)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1gdk_1window_1resize, JNI.env, self.jni_id, window.to_int, width.to_int, height.to_int)
@@ -8846,6 +9961,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gdk_1window_1scroll, [:pointer, :long, :int32, :int32, :int32], :void
       typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
+      # @param window cast=(GdkWindow *)
       # long
       def __gdk_window_scroll(window, dx, dy)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1gdk_1window_1scroll, JNI.env, self.jni_id, window.to_int, dx.to_int, dy.to_int)
@@ -8864,6 +9980,10 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gdk_1window_1set_1accept_1focus, [:pointer, :long, :int32, :int8], :void
       typesig { [::Java::Int, ::Java::Boolean] }
+      # @method flags=dynamic
+      # @param window cast=(GdkWindow *)
+      # @param accept_focus cast=(gboolean)
+      # 
       # long
       def __gdk_window_set_accept_focus(window, accept_focus)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1gdk_1window_1set_1accept_1focus, JNI.env, self.jni_id, window.to_int, accept_focus ? 1 : 0)
@@ -8882,6 +10002,10 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gdk_1window_1set_1back_1pixmap, [:pointer, :long, :int32, :int32, :int8], :void
       typesig { [::Java::Int, ::Java::Int, ::Java::Boolean] }
+      # @param window cast=(GdkWindow *)
+      # @param pixmap cast=(GdkPixmap *)
+      # @param parent_relative cast=(gboolean)
+      # 
       # long
       # long
       def __gdk_window_set_back_pixmap(window, pixmap, parent_relative)
@@ -8902,6 +10026,9 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gdk_1window_1set_1cursor, [:pointer, :long, :int32, :int32], :void
       typesig { [::Java::Int, ::Java::Int] }
+      # @param window cast=(GdkWindow *)
+      # @param cursor cast=(GdkCursor *)
+      # 
       # long
       # long
       def __gdk_window_set_cursor(window, cursor)
@@ -8922,6 +10049,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gdk_1window_1set_1debug_1updates, [:pointer, :long, :int8], :void
       typesig { [::Java::Boolean] }
+      # @param setting cast=(gboolean)
       def __gdk_window_set_debug_updates(setting)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1gdk_1window_1set_1debug_1updates, JNI.env, self.jni_id, setting ? 1 : 0)
       end
@@ -8938,6 +10066,9 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gdk_1window_1set_1decorations, [:pointer, :long, :int32, :int32], :void
       typesig { [::Java::Int, ::Java::Int] }
+      # @param window cast=(GdkWindow *)
+      # @param decorations cast=(GdkWMDecoration)
+      # 
       # long
       def __gdk_window_set_decorations(window, decorations)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1gdk_1window_1set_1decorations, JNI.env, self.jni_id, window.to_int, decorations.to_int)
@@ -8956,6 +10087,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gdk_1window_1set_1events, [:pointer, :long, :int32, :int32], :void
       typesig { [::Java::Int, ::Java::Int] }
+      # @param window cast=(GdkWindow *)
       # long
       def __gdk_window_set_events(window, event_mask)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1gdk_1window_1set_1events, JNI.env, self.jni_id, window.to_int, event_mask.to_int)
@@ -8974,6 +10106,11 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gdk_1window_1set_1icon, [:pointer, :long, :int32, :int32, :int32, :int32], :void
       typesig { [::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int] }
+      # @param window cast=(GdkWindow *)
+      # @param icon_window cast=(GdkWindow *)
+      # @param pixmap cast=(GdkPixmap *)
+      # @param mask cast=(GdkBitmap *)
+      # 
       # long
       # long
       # long
@@ -8998,6 +10135,9 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gdk_1window_1set_1icon_1list, [:pointer, :long, :int32, :int32], :void
       typesig { [::Java::Int, ::Java::Int] }
+      # @param window cast=(GdkWindow *)
+      # @param pixbufs cast=(GList *)
+      # 
       # long
       # long
       def __gdk_window_set_icon_list(window, pixbufs)
@@ -9018,6 +10158,10 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gdk_1window_1set_1keep_1above, [:pointer, :long, :int32, :int8], :void
       typesig { [::Java::Int, ::Java::Boolean] }
+      # @method flags=dynamic
+      # @param window cast=(GdkWindow *)
+      # @param setting cast=(gboolean)
+      # 
       # long
       def __gdk_window_set_keep_above(window, setting)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1gdk_1window_1set_1keep_1above, JNI.env, self.jni_id, window.to_int, setting ? 1 : 0)
@@ -9036,6 +10180,9 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gdk_1window_1set_1override_1redirect, [:pointer, :long, :int32, :int8], :void
       typesig { [::Java::Int, ::Java::Boolean] }
+      # @param window cast=(GdkWindow *)
+      # @param override_redirect cast=(gboolean)
+      # 
       # long
       def __gdk_window_set_override_redirect(window, override_redirect)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1gdk_1window_1set_1override_1redirect, JNI.env, self.jni_id, window.to_int, override_redirect ? 1 : 0)
@@ -9054,6 +10201,9 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gdk_1window_1set_1user_1data, [:pointer, :long, :int32, :int32], :void
       typesig { [::Java::Int, ::Java::Int] }
+      # @param window cast=(GdkWindow *)
+      # @param user_data cast=(gpointer)
+      # 
       # long
       # long
       def __gdk_window_set_user_data(window, user_data)
@@ -9074,6 +10224,9 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gdk_1window_1shape_1combine_1region, [:pointer, :long, :int32, :int32, :int32, :int32], :void
       typesig { [::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int] }
+      # @param window cast=(GdkWindow *)
+      # @param shape_region cast=(GdkRegion *)
+      # 
       # long
       # long
       def __gdk_window_shape_combine_region(window, shape_region, offset_x, offset_y)
@@ -9094,6 +10247,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gdk_1window_1show, [:pointer, :long, :int32], :void
       typesig { [::Java::Int] }
+      # @param window cast=(GdkWindow *)
       # long
       def __gdk_window_show(window)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1gdk_1window_1show, JNI.env, self.jni_id, window.to_int)
@@ -9112,6 +10266,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gdk_1window_1show_1unraised, [:pointer, :long, :int32], :void
       typesig { [::Java::Int] }
+      # @param window cast=(GdkWindow *)
       # long
       def __gdk_window_show_unraised(window)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1gdk_1window_1show_1unraised, JNI.env, self.jni_id, window.to_int)
@@ -9130,6 +10285,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gdk_1window_1thaw_1updates, [:pointer, :long, :int32], :void
       typesig { [::Java::Int] }
+      # @param window cast=(GdkWindow *)
       # long
       def __gdk_window_thaw_updates(window)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1gdk_1window_1thaw_1updates, JNI.env, self.jni_id, window.to_int)
@@ -9166,6 +10322,10 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1accel_1groups_1activate, [:pointer, :long, :int32, :int32, :int32], :int8
       typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
+      # @param accelGroup cast=(GObject *)
+      # @param accelKey cast=(guint)
+      # @param accelMods cast=(GdkModifierType)
+      # 
       # long
       def __gtk_accel_groups_activate(accel_group, accel_key, accel_mods)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1gtk_1accel_1groups_1activate, JNI.env, self.jni_id, accel_group.to_int, accel_key.to_int, accel_mods.to_int) != 0
@@ -9184,6 +10344,9 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1accel_1label_1set_1accel_1widget, [:pointer, :long, :int32, :int32], :void
       typesig { [::Java::Int, ::Java::Int] }
+      # @param accel_label cast=(GtkAccelLabel *)
+      # @param accel_widget cast=(GtkWidget *)
+      # 
       # long
       # long
       def __gtk_accel_label_set_accel_widget(accel_label, accel_widget)
@@ -9204,6 +10367,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1adjustment_1changed, [:pointer, :long, :int32], :void
       typesig { [::Java::Int] }
+      # @param adjustment cast=(GtkAdjustment *)
       # long
       def __gtk_adjustment_changed(adjustment)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1gtk_1adjustment_1changed, JNI.env, self.jni_id, adjustment.to_int)
@@ -9222,6 +10386,12 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1adjustment_1new, [:pointer, :long, :double, :double, :double, :double, :double, :double], :int32
       typesig { [::Java::Double, ::Java::Double, ::Java::Double, ::Java::Double, ::Java::Double, ::Java::Double] }
+      # @param value cast=(gdouble)
+      # @param lower cast=(gdouble)
+      # @param upper cast=(gdouble)
+      # @param step_increment cast=(gdouble)
+      # @param page_increment cast=(gdouble)
+      # 
       # long
       def __gtk_adjustment_new(value, lower, upper, step_increment, page_increment, page_size)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1gtk_1adjustment_1new, JNI.env, self.jni_id, value, lower, upper, step_increment, page_increment, page_size)
@@ -9240,6 +10410,9 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1adjustment_1set_1value, [:pointer, :long, :int32, :double], :void
       typesig { [::Java::Int, ::Java::Double] }
+      # @param adjustment cast=(GtkAdjustment *)
+      # @param value cast=(gdouble)
+      # 
       # long
       def __gtk_adjustment_set_value(adjustment, value)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1gtk_1adjustment_1set_1value, JNI.env, self.jni_id, adjustment.to_int, value)
@@ -9258,6 +10431,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1adjustment_1value_1changed, [:pointer, :long, :int32], :void
       typesig { [::Java::Int] }
+      # @param adjustment cast=(GtkAdjustment *)
       # long
       def __gtk_adjustment_value_changed(adjustment)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1gtk_1adjustment_1value_1changed, JNI.env, self.jni_id, adjustment.to_int)
@@ -9276,6 +10450,9 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1arrow_1new, [:pointer, :long, :int32, :int32], :int32
       typesig { [::Java::Int, ::Java::Int] }
+      # @param arrow_type cast=(GtkArrowType)
+      # @param shadow_type cast=(GtkShadowType)
+      # 
       # long
       def __gtk_arrow_new(arrow_type, shadow_type)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1gtk_1arrow_1new, JNI.env, self.jni_id, arrow_type.to_int, shadow_type.to_int)
@@ -9294,6 +10471,10 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1arrow_1set, [:pointer, :long, :int32, :int32, :int32], :void
       typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
+      # @param arrow cast=(GtkArrow *)
+      # @param arrow_type cast=(GtkArrowType)
+      # @param shadow_type cast=(GtkShadowType)
+      # 
       # long
       def __gtk_arrow_set(arrow, arrow_type, shadow_type)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1gtk_1arrow_1set, JNI.env, self.jni_id, arrow.to_int, arrow_type.to_int, shadow_type.to_int)
@@ -9312,6 +10493,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1bin_1get_1child, [:pointer, :long, :int32], :int32
       typesig { [::Java::Int] }
+      # @param bin cast=(GtkBin *)
       # long
       # long
       def __gtk_bin_get_child(bin)
@@ -9330,8 +10512,28 @@ module Org::Eclipse::Swt::Internal::Gtk
         end
       end
       
+      JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1border_1free, [:pointer, :long, :int32], :void
+      typesig { [::Java::Int] }
+      # @param border cast=(GtkBorder *)
+      # long
+      def __gtk_border_free(border)
+        JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1gtk_1border_1free, JNI.env, self.jni_id, border.to_int)
+      end
+      
+      typesig { [::Java::Int] }
+      # long
+      def gtk_border_free(border)
+        PLATFORM_LOCK.lock
+        begin
+          __gtk_border_free(border)
+        ensure
+          PLATFORM_LOCK.unlock
+        end
+      end
+      
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1box_1set_1spacing, [:pointer, :long, :int32, :int32], :void
       typesig { [::Java::Int, ::Java::Int] }
+      # @param box cast=(GtkBox *)
       # long
       def __gtk_box_set_spacing(box, spacing)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1gtk_1box_1set_1spacing, JNI.env, self.jni_id, box.to_int, spacing.to_int)
@@ -9350,6 +10552,9 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1box_1set_1child_1packing, [:pointer, :long, :int32, :int32, :int8, :int8, :int32, :int32], :void
       typesig { [::Java::Int, ::Java::Int, ::Java::Boolean, ::Java::Boolean, ::Java::Int, ::Java::Int] }
+      # @param box cast=(GtkBox *)
+      # @param child cast=(GtkWidget *)
+      # 
       # long
       # long
       def __gtk_box_set_child_packing(box, child, expand, fill, padding, pack_type)
@@ -9370,6 +10575,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1button_1clicked, [:pointer, :long, :int32], :void
       typesig { [::Java::Int] }
+      # @param button cast=(GtkButton *)
       # long
       def __gtk_button_clicked(button)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1gtk_1button_1clicked, JNI.env, self.jni_id, button.to_int)
@@ -9388,6 +10594,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1button_1get_1relief, [:pointer, :long, :int32], :int32
       typesig { [::Java::Int] }
+      # @param button cast=(GtkButton *)
       # long
       def __gtk_button_get_relief(button)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1gtk_1button_1get_1relief, JNI.env, self.jni_id, button.to_int)
@@ -9424,6 +10631,9 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1button_1set_1relief, [:pointer, :long, :int32, :int32], :void
       typesig { [::Java::Int, ::Java::Int] }
+      # @param button cast=(GtkButton *)
+      # @param newstyle cast=(GtkReliefStyle)
+      # 
       # long
       def __gtk_button_set_relief(button, newstyle)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1gtk_1button_1set_1relief, JNI.env, self.jni_id, button.to_int, newstyle.to_int)
@@ -9442,6 +10652,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1calendar_1new, [:pointer, :long], :int32
       typesig { [] }
+      # @method flags=dynamic
       # long
       def __gtk_calendar_new
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1gtk_1calendar_1new, JNI.env, self.jni_id)
@@ -9460,6 +10671,11 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1calendar_1select_1month, [:pointer, :long, :int32, :int32, :int32], :int8
       typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
+      # @method flags=dynamic
+      # @param calendar cast=(GtkCalendar *)
+      # @param month cast=(guint)
+      # @param year cast=(guint)
+      # 
       # long
       # long
       def __gtk_calendar_select_month(calendar, month, year)
@@ -9480,6 +10696,10 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1calendar_1select_1day, [:pointer, :long, :int32, :int32], :void
       typesig { [::Java::Int, ::Java::Int] }
+      # @method flags=dynamic
+      # @param calendar cast=(GtkCalendar *)
+      # @param day cast=(guint)
+      # 
       # long
       def __gtk_calendar_select_day(calendar, day)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1gtk_1calendar_1select_1day, JNI.env, self.jni_id, calendar.to_int, day.to_int)
@@ -9498,6 +10718,10 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1calendar_1set_1display_1options, [:pointer, :long, :int32, :int32], :void
       typesig { [::Java::Int, ::Java::Int] }
+      # @method flags=dynamic
+      # @param calendar cast=(GtkCalendar *)
+      # @param flags cast=(GtkCalendarDisplayOptions)
+      # 
       # long
       def __gtk_calendar_set_display_options(calendar, flags)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1gtk_1calendar_1set_1display_1options, JNI.env, self.jni_id, calendar.to_int, flags.to_int)
@@ -9516,6 +10740,10 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1calendar_1display_1options, [:pointer, :long, :int32, :int32], :void
       typesig { [::Java::Int, ::Java::Int] }
+      # @method flags=dynamic
+      # @param calendar cast=(GtkCalendar *)
+      # @param flags cast=(GtkCalendarDisplayOptions)
+      # 
       # long
       def __gtk_calendar_display_options(calendar, flags)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1gtk_1calendar_1display_1options, JNI.env, self.jni_id, calendar.to_int, flags.to_int)
@@ -9534,6 +10762,12 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1calendar_1get_1date, [:pointer, :long, :int32, :long, :long, :long], :void
       typesig { [::Java::Int, Array.typed(::Java::Int), Array.typed(::Java::Int), Array.typed(::Java::Int)] }
+      # @method flags=dynamic
+      # @param calendar cast=(GtkCalendar *)
+      # @param year cast=(guint *)
+      # @param month cast=(guint *)
+      # @param day cast=(guint *)
+      # 
       # long
       def __gtk_calendar_get_date(calendar, year, month, day)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1gtk_1calendar_1get_1date, JNI.env, self.jni_id, calendar.to_int, year.jni_id, month.jni_id, day.jni_id)
@@ -9552,6 +10786,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1cell_1layout_1clear, [:pointer, :long, :int32], :void
       typesig { [::Java::Int] }
+      # @method flags=dynamic
       # long
       def __gtk_cell_layout_clear(cell_layout)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1gtk_1cell_1layout_1clear, JNI.env, self.jni_id, cell_layout.to_int)
@@ -9570,6 +10805,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1cell_1layout_1set_1attributes, [:pointer, :long, :int32, :int32, :long, :int32, :int32], :void
       typesig { [::Java::Int, ::Java::Int, Array.typed(::Java::Byte), ::Java::Int, ::Java::Int] }
+      # @method flags=no_gen
       # long
       # long
       # long
@@ -9592,6 +10828,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1cell_1layout_1pack_1start, [:pointer, :long, :int32, :int32, :int8], :void
       typesig { [::Java::Int, ::Java::Int, ::Java::Boolean] }
+      # @method flags=dynamic
       # long
       # long
       def __gtk_cell_layout_pack_start(cell_layout, cell, expand)
@@ -9612,6 +10849,14 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1cell_1renderer_1get_1size, [:pointer, :long, :int32, :int32, :long, :long, :long, :long, :long], :void
       typesig { [::Java::Int, ::Java::Int, GdkRectangle, Array.typed(::Java::Int), Array.typed(::Java::Int), Array.typed(::Java::Int), Array.typed(::Java::Int)] }
+      # @param cell cast=(GtkCellRenderer *)
+      # @param widget cast=(GtkWidget *)
+      # @param area cast=(GdkRectangle *),flags=no_in
+      # @param x_offset cast=(gint *)
+      # @param y_offset cast=(gint *)
+      # @param width cast=(gint *)
+      # @param height cast=(gint *)
+      # 
       # long
       # long
       def __gtk_cell_renderer_get_size(cell, widget, area, x_offset, y_offset, width, height)
@@ -9704,6 +10949,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1check_1menu_1item_1get_1active, [:pointer, :long, :int32], :int8
       typesig { [::Java::Int] }
+      # @param check_menu_item cast=(GtkCheckMenuItem *)
       # long
       def __gtk_check_menu_item_get_active(check_menu_item)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1gtk_1check_1menu_1item_1get_1active, JNI.env, self.jni_id, check_menu_item.to_int) != 0
@@ -9722,6 +10968,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1check_1menu_1item_1new_1with_1label, [:pointer, :long, :long], :int32
       typesig { [Array.typed(::Java::Byte)] }
+      # @param label cast=(const gchar *)
       # long
       def __gtk_check_menu_item_new_with_label(label)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1gtk_1check_1menu_1item_1new_1with_1label, JNI.env, self.jni_id, label.jni_id)
@@ -9740,6 +10987,9 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1check_1menu_1item_1set_1active, [:pointer, :long, :int32, :int8], :void
       typesig { [::Java::Int, ::Java::Boolean] }
+      # @param wid cast=(GtkCheckMenuItem *)
+      # @param active cast=(gboolean)
+      # 
       # long
       def __gtk_check_menu_item_set_active(wid, active)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1gtk_1check_1menu_1item_1set_1active, JNI.env, self.jni_id, wid.to_int, active ? 1 : 0)
@@ -9776,6 +11026,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1clipboard_1clear, [:pointer, :long, :int32], :void
       typesig { [::Java::Int] }
+      # @param clipboard cast=(GtkClipboard *)
       # long
       def __gtk_clipboard_clear(clipboard)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1gtk_1clipboard_1clear, JNI.env, self.jni_id, clipboard.to_int)
@@ -9794,6 +11045,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1clipboard_1get, [:pointer, :long, :int32], :int32
       typesig { [::Java::Int] }
+      # @param selection cast=(GdkAtom)
       # long
       # long
       def __gtk_clipboard_get(selection)
@@ -9814,6 +11066,13 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1clipboard_1set_1with_1data, [:pointer, :long, :int32, :int32, :int32, :int32, :int32, :int32], :int8
       typesig { [::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int] }
+      # @param clipboard cast=(GtkClipboard *)
+      # @param target cast=(const GtkTargetEntry *)
+      # @param n_targets cast=(guint)
+      # @param get_func cast=(GtkClipboardGetFunc)
+      # @param clear_func cast=(GtkClipboardClearFunc)
+      # @param user_data cast=(GObject *)
+      # 
       # long
       # long
       # long
@@ -9840,6 +11099,9 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1clipboard_1wait_1for_1contents, [:pointer, :long, :int32, :int32], :int32
       typesig { [::Java::Int, ::Java::Int] }
+      # @param clipboard cast=(GtkClipboard *)
+      # @param target cast=(GdkAtom)
+      # 
       # long
       # long
       # long
@@ -9862,6 +11124,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1color_1selection_1dialog_1new, [:pointer, :long, :long], :int32
       typesig { [Array.typed(::Java::Byte)] }
+      # @param title cast=(const gchar *)
       # long
       def __gtk_color_selection_dialog_new(title)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1gtk_1color_1selection_1dialog_1new, JNI.env, self.jni_id, title.jni_id)
@@ -9880,6 +11143,9 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1color_1selection_1get_1current_1color, [:pointer, :long, :int32, :long], :void
       typesig { [::Java::Int, GdkColor] }
+      # @param colorsel cast=(GtkColorSelection *)
+      # @param color cast=(GdkColor *),flags=no_in
+      # 
       # long
       def __gtk_color_selection_get_current_color(colorsel, color)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1gtk_1color_1selection_1get_1current_1color, JNI.env, self.jni_id, colorsel.to_int, color.jni_id)
@@ -9898,6 +11164,9 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1color_1selection_1set_1current_1color, [:pointer, :long, :int32, :long], :void
       typesig { [::Java::Int, GdkColor] }
+      # @param colorsel cast=(GtkColorSelection *)
+      # @param color cast=(GdkColor *),flags=no_out
+      # 
       # long
       def __gtk_color_selection_set_current_color(colorsel, color)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1gtk_1color_1selection_1set_1current_1color, JNI.env, self.jni_id, colorsel.to_int, color.jni_id)
@@ -9916,6 +11185,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1color_1selection_1set_1has_1palette, [:pointer, :long, :int32, :int8], :void
       typesig { [::Java::Int, ::Java::Boolean] }
+      # @param colorsel cast=(GtkColorSelection *)
       # long
       def __gtk_color_selection_set_has_palette(colorsel, has_palette)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1gtk_1color_1selection_1set_1has_1palette, JNI.env, self.jni_id, colorsel.to_int, has_palette ? 1 : 0)
@@ -9934,6 +11204,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1combo_1disable_1activate, [:pointer, :long, :int32], :void
       typesig { [::Java::Int] }
+      # @param combo cast=(GtkCombo *)
       # long
       def __gtk_combo_disable_activate(combo)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1gtk_1combo_1disable_1activate, JNI.env, self.jni_id, combo.to_int)
@@ -9970,6 +11241,9 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1combo_1set_1case_1sensitive, [:pointer, :long, :int32, :int8], :void
       typesig { [::Java::Int, ::Java::Boolean] }
+      # @param combo cast=(GtkCombo *)
+      # @param val cast=(gboolean)
+      # 
       # long
       def __gtk_combo_set_case_sensitive(combo, val)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1gtk_1combo_1set_1case_1sensitive, JNI.env, self.jni_id, combo.to_int, val ? 1 : 0)
@@ -9988,6 +11262,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1combo_1box_1set_1focus_1on_1click, [:pointer, :long, :int32, :int8], :void
       typesig { [::Java::Int, ::Java::Boolean] }
+      # @method flags=dynamic
       # long
       def __gtk_combo_box_set_focus_on_click(combo, val)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1gtk_1combo_1box_1set_1focus_1on_1click, JNI.env, self.jni_id, combo.to_int, val ? 1 : 0)
@@ -10006,6 +11281,9 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1combo_1set_1popdown_1strings, [:pointer, :long, :int32, :int32], :void
       typesig { [::Java::Int, ::Java::Int] }
+      # @param combo cast=(GtkCombo *)
+      # @param strings cast=(GList *)
+      # 
       # long
       # long
       def __gtk_combo_set_popdown_strings(combo, strings)
@@ -10026,6 +11304,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1combo_1box_1entry_1new_1text, [:pointer, :long], :int32
       typesig { [] }
+      # @method flags=dynamic
       # long
       def __gtk_combo_box_entry_new_text
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1gtk_1combo_1box_1entry_1new_1text, JNI.env, self.jni_id)
@@ -10044,6 +11323,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1combo_1box_1new_1text, [:pointer, :long], :int32
       typesig { [] }
+      # @method flags=dynamic
       # long
       def __gtk_combo_box_new_text
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1gtk_1combo_1box_1new_1text, JNI.env, self.jni_id)
@@ -10062,6 +11342,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1combo_1box_1insert_1text, [:pointer, :long, :int32, :int32, :long], :void
       typesig { [::Java::Int, ::Java::Int, Array.typed(::Java::Byte)] }
+      # @method flags=dynamic
       # long
       def __gtk_combo_box_insert_text(combo_box, position, text)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1gtk_1combo_1box_1insert_1text, JNI.env, self.jni_id, combo_box.to_int, position.to_int, text.jni_id)
@@ -10080,6 +11361,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1combo_1box_1remove_1text, [:pointer, :long, :int32, :int32], :void
       typesig { [::Java::Int, ::Java::Int] }
+      # @method flags=dynamic
       # long
       def __gtk_combo_box_remove_text(combo_box, position)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1gtk_1combo_1box_1remove_1text, JNI.env, self.jni_id, combo_box.to_int, position.to_int)
@@ -10098,6 +11380,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1combo_1box_1get_1active, [:pointer, :long, :int32], :int32
       typesig { [::Java::Int] }
+      # @method flags=dynamic
       # long
       def __gtk_combo_box_get_active(combo_box)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1gtk_1combo_1box_1get_1active, JNI.env, self.jni_id, combo_box.to_int)
@@ -10116,6 +11399,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1combo_1box_1get_1model, [:pointer, :long, :int32], :int32
       typesig { [::Java::Int] }
+      # @method flags=dynamic
       # long
       # long
       def __gtk_combo_box_get_model(combo_box)
@@ -10136,6 +11420,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1combo_1box_1set_1active, [:pointer, :long, :int32, :int32], :void
       typesig { [::Java::Int, ::Java::Int] }
+      # @method flags=dynamic
       # long
       def __gtk_combo_box_set_active(combo_box, index)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1gtk_1combo_1box_1set_1active, JNI.env, self.jni_id, combo_box.to_int, index.to_int)
@@ -10154,6 +11439,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1combo_1box_1popup, [:pointer, :long, :int32], :void
       typesig { [::Java::Int] }
+      # @method flags=dynamic
       # long
       def __gtk_combo_box_popup(combo_box)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1gtk_1combo_1box_1popup, JNI.env, self.jni_id, combo_box.to_int)
@@ -10172,6 +11458,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1combo_1box_1popdown, [:pointer, :long, :int32], :void
       typesig { [::Java::Int] }
+      # @method flags=dynamic
       # long
       def __gtk_combo_box_popdown(combo_box)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1gtk_1combo_1box_1popdown, JNI.env, self.jni_id, combo_box.to_int)
@@ -10190,6 +11477,9 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1container_1add, [:pointer, :long, :int32, :int32], :void
       typesig { [::Java::Int, ::Java::Int] }
+      # @param container cast=(GtkContainer *)
+      # @param widget cast=(GtkWidget *)
+      # 
       # long
       # long
       def __gtk_container_add(container, widget)
@@ -10210,6 +11500,10 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1container_1forall, [:pointer, :long, :int32, :int32, :int32], :void
       typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
+      # @param container cast=(GtkContainer *)
+      # @param callback cast=(GtkCallback)
+      # @param callback_data cast=(gpointer)
+      # 
       # long
       # long
       # long
@@ -10232,6 +11526,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1container_1get_1border_1width, [:pointer, :long, :int32], :int32
       typesig { [::Java::Int] }
+      # @param container cast=(GtkContainer *)
       # long
       def __gtk_container_get_border_width(container)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1gtk_1container_1get_1border_1width, JNI.env, self.jni_id, container.to_int)
@@ -10250,6 +11545,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1container_1get_1children, [:pointer, :long, :int32], :int32
       typesig { [::Java::Int] }
+      # @param container cast=(GtkContainer *)
       # long
       # long
       def __gtk_container_get_children(container)
@@ -10270,6 +11566,9 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1container_1remove, [:pointer, :long, :int32, :int32], :void
       typesig { [::Java::Int, ::Java::Int] }
+      # @param container cast=(GtkContainer *)
+      # @param widget cast=(GtkWidget *)
+      # 
       # long
       # long
       def __gtk_container_remove(container, widget)
@@ -10290,6 +11589,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1container_1resize_1children, [:pointer, :long, :int32], :void
       typesig { [::Java::Int] }
+      # @param container cast=(GtkContainer *)
       # long
       def __gtk_container_resize_children(container)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1gtk_1container_1resize_1children, JNI.env, self.jni_id, container.to_int)
@@ -10308,6 +11608,9 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1container_1set_1border_1width, [:pointer, :long, :int32, :int32], :void
       typesig { [::Java::Int, ::Java::Int] }
+      # @param container cast=(GtkContainer *)
+      # @param border_width cast=(guint)
+      # 
       # long
       def __gtk_container_set_border_width(container, border_width)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1gtk_1container_1set_1border_1width, JNI.env, self.jni_id, container.to_int, border_width.to_int)
@@ -10326,6 +11629,10 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1dialog_1add_1button, [:pointer, :long, :int32, :long, :int32], :int32
       typesig { [::Java::Int, Array.typed(::Java::Byte), ::Java::Int] }
+      # @param dialog cast=(GtkDialog *)
+      # @param button_text cast=(const gchar *)
+      # @param response_id cast=(gint)
+      # 
       # long
       # long
       def __gtk_dialog_add_button(dialog, button_text, response_id)
@@ -10346,6 +11653,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1dialog_1run, [:pointer, :long, :int32], :int32
       typesig { [::Java::Int] }
+      # @param dialog cast=(GtkDialog *)
       # long
       def __gtk_dialog_run(dialog)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1gtk_1dialog_1run, JNI.env, self.jni_id, dialog.to_int)
@@ -10364,6 +11672,12 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1drag_1begin, [:pointer, :long, :int32, :int32, :int32, :int32, :int32], :int32
       typesig { [::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int] }
+      # @param widget cast=(GtkWidget *)
+      # @param targets cast=(GtkTargetList *)
+      # @param actions cast=(GdkDragAction)
+      # @param button cast=(gint)
+      # @param event cast=(GdkEvent *)
+      # 
       # long
       # long
       # long
@@ -10388,6 +11702,12 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1drag_1check_1threshold, [:pointer, :long, :int32, :int32, :int32, :int32, :int32], :int8
       typesig { [::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int] }
+      # @param widget cast=(GtkWidget *)
+      # @param start_x cast=(gint)
+      # @param start_y cast=(gint)
+      # @param current_x cast=(gint)
+      # @param current_y cast=(gint)
+      # 
       # long
       def __gtk_drag_check_threshold(widget, start_x, start_y, current_x, current_y)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1gtk_1drag_1check_1threshold, JNI.env, self.jni_id, widget.to_int, start_x.to_int, start_y.to_int, current_x.to_int, current_y.to_int) != 0
@@ -10406,6 +11726,10 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1drag_1dest_1find_1target, [:pointer, :long, :int32, :int32, :int32], :int32
       typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
+      # @param widget cast=(GtkWidget *)
+      # @param context cast=(GdkDragContext *)
+      # @param target_list cast=(GtkTargetList *)
+      # 
       # long
       # long
       # long
@@ -10430,6 +11754,12 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1drag_1dest_1set, [:pointer, :long, :int32, :int32, :int32, :int32, :int32], :void
       typesig { [::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int] }
+      # @param widget cast=(GtkWidget *)
+      # @param flags cast=(GtkDestDefaults)
+      # @param targets cast=(const GtkTargetEntry *)
+      # @param n_targets cast=(gint)
+      # @param actions cast=(GdkDragAction)
+      # 
       # long
       # long
       def __gtk_drag_dest_set(widget, flags, targets, n_targets, actions)
@@ -10450,6 +11780,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1drag_1dest_1unset, [:pointer, :long, :int32], :void
       typesig { [::Java::Int] }
+      # @param widget cast=(GtkWidget *)
       # long
       def __gtk_drag_dest_unset(widget)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1gtk_1drag_1dest_1unset, JNI.env, self.jni_id, widget.to_int)
@@ -10468,6 +11799,11 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1drag_1finish, [:pointer, :long, :int32, :int8, :int8, :int32], :void
       typesig { [::Java::Int, ::Java::Boolean, ::Java::Boolean, ::Java::Int] }
+      # @param context cast=(GdkDragContext *)
+      # @param success cast=(gboolean)
+      # @param delete cast=(gboolean)
+      # @param time cast=(guint32)
+      # 
       # long
       def __gtk_drag_finish(context, success, delete, time)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1gtk_1drag_1finish, JNI.env, self.jni_id, context.to_int, success ? 1 : 0, delete ? 1 : 0, time.to_int)
@@ -10486,6 +11822,11 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1drag_1get_1data, [:pointer, :long, :int32, :int32, :int32, :int32], :void
       typesig { [::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int] }
+      # @param widget cast=(GtkWidget *)
+      # @param context cast=(GdkDragContext *)
+      # @param target cast=(GdkAtom)
+      # @param time cast=(guint32)
+      # 
       # long
       # long
       # long
@@ -10508,6 +11849,9 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1drag_1set_1icon_1pixbuf, [:pointer, :long, :int32, :int32, :int32, :int32], :void
       typesig { [::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int] }
+      # @param context cast=(GdkDragContext *)
+      # @param pixbuf cast=(GdkPixbuf *)
+      # 
       # long
       # long
       def __gtk_drag_set_icon_pixbuf(context, pixbuf, hot_x, hot_y)
@@ -10546,6 +11890,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1editable_1copy_1clipboard, [:pointer, :long, :int32], :void
       typesig { [::Java::Int] }
+      # @param editable cast=(GtkEditable *)
       # long
       def __gtk_editable_copy_clipboard(editable)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1gtk_1editable_1copy_1clipboard, JNI.env, self.jni_id, editable.to_int)
@@ -10564,6 +11909,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1editable_1cut_1clipboard, [:pointer, :long, :int32], :void
       typesig { [::Java::Int] }
+      # @param editable cast=(GtkEditable *)
       # long
       def __gtk_editable_cut_clipboard(editable)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1gtk_1editable_1cut_1clipboard, JNI.env, self.jni_id, editable.to_int)
@@ -10582,6 +11928,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1editable_1delete_1selection, [:pointer, :long, :int32], :void
       typesig { [::Java::Int] }
+      # @param editable cast=(GtkEditable *)
       # long
       def __gtk_editable_delete_selection(editable)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1gtk_1editable_1delete_1selection, JNI.env, self.jni_id, editable.to_int)
@@ -10600,6 +11947,10 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1editable_1delete_1text, [:pointer, :long, :int32, :int32, :int32], :void
       typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
+      # @param editable cast=(GtkEditable *)
+      # @param start_pos cast=(gint)
+      # @param end_pos cast=(gint)
+      # 
       # long
       def __gtk_editable_delete_text(editable, start_pos, end_pos)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1gtk_1editable_1delete_1text, JNI.env, self.jni_id, editable.to_int, start_pos.to_int, end_pos.to_int)
@@ -10618,6 +11969,10 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1editable_1get_1chars, [:pointer, :long, :int32, :int32, :int32], :int32
       typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
+      # @param editable cast=(GtkEditable *)
+      # @param start_pos cast=(gint)
+      # @param end_pos cast=(gint)
+      # 
       # long
       # long
       def __gtk_editable_get_chars(editable, start_pos, end_pos)
@@ -10638,6 +11993,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1editable_1get_1editable, [:pointer, :long, :int32], :int8
       typesig { [::Java::Int] }
+      # @param editable cast=(GtkEditable *)
       # long
       def __gtk_editable_get_editable(editable)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1gtk_1editable_1get_1editable, JNI.env, self.jni_id, editable.to_int) != 0
@@ -10656,6 +12012,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1editable_1get_1position, [:pointer, :long, :int32], :int32
       typesig { [::Java::Int] }
+      # @param editable cast=(GtkEditable *)
       # long
       def __gtk_editable_get_position(editable)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1gtk_1editable_1get_1position, JNI.env, self.jni_id, editable.to_int)
@@ -10674,6 +12031,10 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1editable_1get_1selection_1bounds, [:pointer, :long, :int32, :long, :long], :int8
       typesig { [::Java::Int, Array.typed(::Java::Int), Array.typed(::Java::Int)] }
+      # @param editable cast=(GtkEditable *)
+      # @param start cast=(gint *)
+      # @param end cast=(gint *)
+      # 
       # long
       def __gtk_editable_get_selection_bounds(editable, start, end_)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1gtk_1editable_1get_1selection_1bounds, JNI.env, self.jni_id, editable.to_int, start.jni_id, end_.jni_id) != 0
@@ -10692,6 +12053,11 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1editable_1insert_1text, [:pointer, :long, :int32, :long, :int32, :long], :void
       typesig { [::Java::Int, Array.typed(::Java::Byte), ::Java::Int, Array.typed(::Java::Int)] }
+      # @param editable cast=(GtkEditable *)
+      # @param new_text cast=(gchar *)
+      # @param new_text_length cast=(gint)
+      # @param position cast=(gint *)
+      # 
       # long
       def __gtk_editable_insert_text(editable, new_text, new_text_length, position)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1gtk_1editable_1insert_1text, JNI.env, self.jni_id, editable.to_int, new_text.jni_id, new_text_length.to_int, position.jni_id)
@@ -10710,6 +12076,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1editable_1paste_1clipboard, [:pointer, :long, :int32], :void
       typesig { [::Java::Int] }
+      # @param editable cast=(GtkEditable *)
       # long
       def __gtk_editable_paste_clipboard(editable)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1gtk_1editable_1paste_1clipboard, JNI.env, self.jni_id, editable.to_int)
@@ -10728,6 +12095,10 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1editable_1select_1region, [:pointer, :long, :int32, :int32, :int32], :void
       typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
+      # @param editable cast=(GtkEditable *)
+      # @param start cast=(gint)
+      # @param end cast=(gint)
+      # 
       # long
       def __gtk_editable_select_region(editable, start, end_)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1gtk_1editable_1select_1region, JNI.env, self.jni_id, editable.to_int, start.to_int, end_.to_int)
@@ -10746,6 +12117,9 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1editable_1set_1editable, [:pointer, :long, :int32, :int8], :void
       typesig { [::Java::Int, ::Java::Boolean] }
+      # @param entry cast=(GtkEditable *)
+      # @param editable cast=(gboolean)
+      # 
       # long
       def __gtk_editable_set_editable(entry, editable)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1gtk_1editable_1set_1editable, JNI.env, self.jni_id, entry.to_int, editable ? 1 : 0)
@@ -10764,6 +12138,9 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1editable_1set_1position, [:pointer, :long, :int32, :int32], :void
       typesig { [::Java::Int, ::Java::Int] }
+      # @param editable cast=(GtkEditable *)
+      # @param position cast=(gint)
+      # 
       # long
       def __gtk_editable_set_position(editable, position)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1gtk_1editable_1set_1position, JNI.env, self.jni_id, editable.to_int, position.to_int)
@@ -10780,8 +12157,30 @@ module Org::Eclipse::Swt::Internal::Gtk
         end
       end
       
+      JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1entry_1get_1inner_1border, [:pointer, :long, :int32], :int32
+      typesig { [::Java::Int] }
+      # @method flags=dynamic
+      # long
+      # long
+      def __gtk_entry_get_inner_border(entry)
+        JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1gtk_1entry_1get_1inner_1border, JNI.env, self.jni_id, entry.to_int)
+      end
+      
+      typesig { [::Java::Int] }
+      # long
+      # long
+      def gtk_entry_get_inner_border(entry)
+        PLATFORM_LOCK.lock
+        begin
+          return __gtk_entry_get_inner_border(entry)
+        ensure
+          PLATFORM_LOCK.unlock
+        end
+      end
+      
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1entry_1get_1invisible_1char, [:pointer, :long, :int32], :unknown
       typesig { [::Java::Int] }
+      # @param entry cast=(GtkEntry *)
       # long
       def __gtk_entry_get_invisible_char(entry)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1gtk_1entry_1get_1invisible_1char, JNI.env, self.jni_id, entry.to_int)
@@ -10800,6 +12199,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1entry_1get_1layout, [:pointer, :long, :int32], :int32
       typesig { [::Java::Int] }
+      # @param entry cast=(GtkEntry *)
       # long
       # long
       def __gtk_entry_get_layout(entry)
@@ -10820,17 +12220,18 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1entry_1get_1layout_1offsets, [:pointer, :long, :int32, :long, :long], :void
       typesig { [::Java::Int, Array.typed(::Java::Int), Array.typed(::Java::Int)] }
+      # @param entry cast=(GtkEntry *)
       # long
-      def __gtk_entry_get_layout_offsets(layout, x, y)
-        JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1gtk_1entry_1get_1layout_1offsets, JNI.env, self.jni_id, layout.to_int, x.jni_id, y.jni_id)
+      def __gtk_entry_get_layout_offsets(entry, x, y)
+        JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1gtk_1entry_1get_1layout_1offsets, JNI.env, self.jni_id, entry.to_int, x.jni_id, y.jni_id)
       end
       
       typesig { [::Java::Int, Array.typed(::Java::Int), Array.typed(::Java::Int)] }
       # long
-      def gtk_entry_get_layout_offsets(layout, x, y)
+      def gtk_entry_get_layout_offsets(entry, x, y)
         PLATFORM_LOCK.lock
         begin
-          __gtk_entry_get_layout_offsets(layout, x, y)
+          __gtk_entry_get_layout_offsets(entry, x, y)
         ensure
           PLATFORM_LOCK.unlock
         end
@@ -10838,6 +12239,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1entry_1text_1index_1to_1layout_1index, [:pointer, :long, :int32, :int32], :int32
       typesig { [::Java::Int, ::Java::Int] }
+      # @method flags=dynamic
       # long
       def __gtk_entry_text_index_to_layout_index(entry, index)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1gtk_1entry_1text_1index_1to_1layout_1index, JNI.env, self.jni_id, entry.to_int, index.to_int)
@@ -10856,6 +12258,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1entry_1get_1max_1length, [:pointer, :long, :int32], :int32
       typesig { [::Java::Int] }
+      # @param entry cast=(GtkEntry *)
       # long
       def __gtk_entry_get_max_length(entry)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1gtk_1entry_1get_1max_1length, JNI.env, self.jni_id, entry.to_int)
@@ -10874,6 +12277,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1entry_1get_1text, [:pointer, :long, :int32], :int32
       typesig { [::Java::Int] }
+      # @param entry cast=(GtkEntry *)
       # long
       # long
       def __gtk_entry_get_text(entry)
@@ -10894,6 +12298,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1FcConfigAppFontAddFile, [:pointer, :long, :int32, :long], :int8
       typesig { [::Java::Int, Array.typed(::Java::Byte)] }
+      # @method flags=dynamic
       # long
       def ___fc_config_app_font_add_file(config, file)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1FcConfigAppFontAddFile, JNI.env, self.jni_id, config.to_int, file.jni_id) != 0
@@ -10912,6 +12317,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1entry_1get_1visibility, [:pointer, :long, :int32], :int8
       typesig { [::Java::Int] }
+      # @param entry cast=(GtkEntry *)
       # long
       def __gtk_entry_get_visibility(entry)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1gtk_1entry_1get_1visibility, JNI.env, self.jni_id, entry.to_int) != 0
@@ -10948,6 +12354,9 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1entry_1set_1activates_1default, [:pointer, :long, :int32, :int8], :void
       typesig { [::Java::Int, ::Java::Boolean] }
+      # @param entry cast=(GtkEntry *)
+      # @param setting cast=(gboolean)
+      # 
       # long
       def __gtk_entry_set_activates_default(entry, setting)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1gtk_1entry_1set_1activates_1default, JNI.env, self.jni_id, entry.to_int, setting ? 1 : 0)
@@ -10966,6 +12375,10 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1entry_1set_1alignment, [:pointer, :long, :int32, :float], :void
       typesig { [::Java::Int, ::Java::Float] }
+      # @method flags=dynamic
+      # @param entry cast=(GtkEntry *)
+      # @param xalign cast=(gfloat)
+      # 
       # long
       def __gtk_entry_set_alignment(entry, xalign)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1gtk_1entry_1set_1alignment, JNI.env, self.jni_id, entry.to_int, xalign)
@@ -10984,6 +12397,9 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1entry_1set_1has_1frame, [:pointer, :long, :int32, :int8], :void
       typesig { [::Java::Int, ::Java::Boolean] }
+      # @param entry cast=(GtkEntry *)
+      # @param setting cast=(gboolean)
+      # 
       # long
       def __gtk_entry_set_has_frame(entry, setting)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1gtk_1entry_1set_1has_1frame, JNI.env, self.jni_id, entry.to_int, setting ? 1 : 0)
@@ -11002,6 +12418,9 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1entry_1set_1invisible_1char, [:pointer, :long, :int32, :unknown], :void
       typesig { [::Java::Int, ::Java::Char] }
+      # @param entry cast=(GtkEntry *)
+      # @param ch cast=(gint)
+      # 
       # long
       def __gtk_entry_set_invisible_char(entry, ch)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1gtk_1entry_1set_1invisible_1char, JNI.env, self.jni_id, entry.to_int, ch.to_int)
@@ -11020,6 +12439,9 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1entry_1set_1max_1length, [:pointer, :long, :int32, :int32], :void
       typesig { [::Java::Int, ::Java::Int] }
+      # @param entry cast=(GtkEntry *)
+      # @param max cast=(gint)
+      # 
       # long
       def __gtk_entry_set_max_length(entry, max)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1gtk_1entry_1set_1max_1length, JNI.env, self.jni_id, entry.to_int, max.to_int)
@@ -11038,6 +12460,9 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1entry_1set_1text, [:pointer, :long, :int32, :long], :void
       typesig { [::Java::Int, Array.typed(::Java::Byte)] }
+      # @param entry cast=(GtkEntry *)
+      # @param text cast=(const gchar *)
+      # 
       # long
       def __gtk_entry_set_text(entry, text)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1gtk_1entry_1set_1text, JNI.env, self.jni_id, entry.to_int, text.jni_id)
@@ -11056,6 +12481,9 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1entry_1set_1visibility, [:pointer, :long, :int32, :int8], :void
       typesig { [::Java::Int, ::Java::Boolean] }
+      # @param entry cast=(GtkEntry *)
+      # @param visible cast=(gboolean)
+      # 
       # long
       def __gtk_entry_set_visibility(entry, visible)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1gtk_1entry_1set_1visibility, JNI.env, self.jni_id, entry.to_int, visible ? 1 : 0)
@@ -11090,6 +12518,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1expander_1get_1expanded, [:pointer, :long, :int32], :int8
       typesig { [::Java::Int] }
+      # @method flags=dynamic
       # long
       def __gtk_expander_get_expanded(expander)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1gtk_1expander_1get_1expanded, JNI.env, self.jni_id, expander.to_int) != 0
@@ -11108,6 +12537,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1expander_1get_1label_1widget, [:pointer, :long, :int32], :int32
       typesig { [::Java::Int] }
+      # @method flags=dynamic
       # long
       # long
       def __gtk_expander_get_label_widget(expander)
@@ -11128,6 +12558,9 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1expander_1new, [:pointer, :long, :long], :int32
       typesig { [Array.typed(::Java::Byte)] }
+      # @method flags=dynamic
+      # @param label cast=(const gchar *)
+      # 
       # long
       def __gtk_expander_new(label)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1gtk_1expander_1new, JNI.env, self.jni_id, label.jni_id)
@@ -11146,6 +12579,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1expander_1set_1expanded, [:pointer, :long, :int32, :int8], :void
       typesig { [::Java::Int, ::Java::Boolean] }
+      # @method flags=dynamic
       # long
       def __gtk_expander_set_expanded(expander, expanded)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1gtk_1expander_1set_1expanded, JNI.env, self.jni_id, expander.to_int, expanded ? 1 : 0)
@@ -11164,6 +12598,9 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1expander_1set_1label, [:pointer, :long, :int32, :long], :void
       typesig { [::Java::Int, Array.typed(::Java::Byte)] }
+      # @method flags=dynamic
+      # @param label cast=(const gchar *)
+      # 
       # long
       def __gtk_expander_set_label(expander, label)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1gtk_1expander_1set_1label, JNI.env, self.jni_id, expander.to_int, label.jni_id)
@@ -11182,6 +12619,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1expander_1set_1label_1widget, [:pointer, :long, :int32, :int32], :void
       typesig { [::Java::Int, ::Java::Int] }
+      # @method flags=dynamic
       # long
       # long
       def __gtk_expander_set_label_widget(expander, label_widget)
@@ -11202,6 +12640,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1file_1chooser_1add_1filter, [:pointer, :long, :int32, :int32], :void
       typesig { [::Java::Int, ::Java::Int] }
+      # @method flags=dynamic
       # long
       # long
       def __gtk_file_chooser_add_filter(chooser, filter)
@@ -11222,6 +12661,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1file_1chooser_1dialog_1new, [:pointer, :long, :long, :int32, :int32, :int32, :int32, :int32, :int32, :int32], :int32
       typesig { [Array.typed(::Java::Byte), ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int] }
+      # @method flags=no_gen
       # long
       # long
       # long
@@ -11248,6 +12688,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1file_1chooser_1get_1current_1folder, [:pointer, :long, :int32], :int32
       typesig { [::Java::Int] }
+      # @method flags=dynamic
       # long
       # long
       def __gtk_file_chooser_get_current_folder(chooser)
@@ -11268,6 +12709,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1file_1chooser_1get_1filename, [:pointer, :long, :int32], :int32
       typesig { [::Java::Int] }
+      # @method flags=dynamic
       # long
       # long
       def __gtk_file_chooser_get_filename(chooser)
@@ -11288,6 +12730,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1file_1chooser_1get_1filenames, [:pointer, :long, :int32], :int32
       typesig { [::Java::Int] }
+      # @method flags=dynamic
       # long
       # long
       def __gtk_file_chooser_get_filenames(chooser)
@@ -11306,8 +12749,51 @@ module Org::Eclipse::Swt::Internal::Gtk
         end
       end
       
+      JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1file_1chooser_1get_1uri, [:pointer, :long, :int32], :int32
+      typesig { [::Java::Int] }
+      # @method flags=dynamic
+      # long
+      # long
+      def __gtk_file_chooser_get_uri(chooser)
+        JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1gtk_1file_1chooser_1get_1uri, JNI.env, self.jni_id, chooser.to_int)
+      end
+      
+      typesig { [::Java::Int] }
+      # long
+      # long
+      def gtk_file_chooser_get_uri(chooser)
+        PLATFORM_LOCK.lock
+        begin
+          return __gtk_file_chooser_get_uri(chooser)
+        ensure
+          PLATFORM_LOCK.unlock
+        end
+      end
+      
+      JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1file_1chooser_1get_1uris, [:pointer, :long, :int32], :int32
+      typesig { [::Java::Int] }
+      # @method flags=dynamic
+      # long
+      # long
+      def __gtk_file_chooser_get_uris(chooser)
+        JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1gtk_1file_1chooser_1get_1uris, JNI.env, self.jni_id, chooser.to_int)
+      end
+      
+      typesig { [::Java::Int] }
+      # long
+      # long
+      def gtk_file_chooser_get_uris(chooser)
+        PLATFORM_LOCK.lock
+        begin
+          return __gtk_file_chooser_get_uris(chooser)
+        ensure
+          PLATFORM_LOCK.unlock
+        end
+      end
+      
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1file_1chooser_1get_1filter, [:pointer, :long, :int32], :int32
       typesig { [::Java::Int] }
+      # @method flags=dynamic
       # long
       # long
       def __gtk_file_chooser_get_filter(chooser)
@@ -11328,6 +12814,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1file_1chooser_1set_1current_1folder, [:pointer, :long, :int32, :int32], :void
       typesig { [::Java::Int, ::Java::Int] }
+      # @method flags=dynamic
       # long
       # long
       def __gtk_file_chooser_set_current_folder(chooser, filename)
@@ -11346,8 +12833,28 @@ module Org::Eclipse::Swt::Internal::Gtk
         end
       end
       
+      JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1file_1chooser_1set_1current_1folder_1uri, [:pointer, :long, :int32, :long], :void
+      typesig { [::Java::Int, Array.typed(::Java::Byte)] }
+      # @method flags=dynamic
+      # long
+      def __gtk_file_chooser_set_current_folder_uri(chooser, uri)
+        JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1gtk_1file_1chooser_1set_1current_1folder_1uri, JNI.env, self.jni_id, chooser.to_int, uri.jni_id)
+      end
+      
+      typesig { [::Java::Int, Array.typed(::Java::Byte)] }
+      # long
+      def gtk_file_chooser_set_current_folder_uri(chooser, uri)
+        PLATFORM_LOCK.lock
+        begin
+          __gtk_file_chooser_set_current_folder_uri(chooser, uri)
+        ensure
+          PLATFORM_LOCK.unlock
+        end
+      end
+      
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1file_1chooser_1set_1current_1name, [:pointer, :long, :int32, :long], :void
       typesig { [::Java::Int, Array.typed(::Java::Byte)] }
+      # @method flags=dynamic
       # long
       def __gtk_file_chooser_set_current_name(chooser, name)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1gtk_1file_1chooser_1set_1current_1name, JNI.env, self.jni_id, chooser.to_int, name.jni_id)
@@ -11364,8 +12871,28 @@ module Org::Eclipse::Swt::Internal::Gtk
         end
       end
       
+      JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1file_1chooser_1set_1local_1only, [:pointer, :long, :int32, :int8], :void
+      typesig { [::Java::Int, ::Java::Boolean] }
+      # @method flags=dynamic
+      # long
+      def __gtk_file_chooser_set_local_only(chooser, local_only)
+        JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1gtk_1file_1chooser_1set_1local_1only, JNI.env, self.jni_id, chooser.to_int, local_only ? 1 : 0)
+      end
+      
+      typesig { [::Java::Int, ::Java::Boolean] }
+      # long
+      def gtk_file_chooser_set_local_only(chooser, local_only)
+        PLATFORM_LOCK.lock
+        begin
+          __gtk_file_chooser_set_local_only(chooser, local_only)
+        ensure
+          PLATFORM_LOCK.unlock
+        end
+      end
+      
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1file_1chooser_1set_1do_1overwrite_1confirmation, [:pointer, :long, :int32, :int8], :void
       typesig { [::Java::Int, ::Java::Boolean] }
+      # @method flags=dynamic
       # long
       def __gtk_file_chooser_set_do_overwrite_confirmation(chooser, do_overwrite_confirmation)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1gtk_1file_1chooser_1set_1do_1overwrite_1confirmation, JNI.env, self.jni_id, chooser.to_int, do_overwrite_confirmation ? 1 : 0)
@@ -11384,6 +12911,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1file_1chooser_1set_1extra_1widget, [:pointer, :long, :int32, :int32], :void
       typesig { [::Java::Int, ::Java::Int] }
+      # @method flags=dynamic
       # long
       # long
       def __gtk_file_chooser_set_extra_widget(chooser, extra_widget)
@@ -11404,6 +12932,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1file_1chooser_1set_1filename, [:pointer, :long, :int32, :int32], :void
       typesig { [::Java::Int, ::Java::Int] }
+      # @method flags=dynamic
       # long
       # long
       def __gtk_file_chooser_set_filename(chooser, name)
@@ -11424,6 +12953,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1file_1chooser_1set_1filter, [:pointer, :long, :int32, :int32], :void
       typesig { [::Java::Int, ::Java::Int] }
+      # @method flags=dynamic
       # long
       # long
       def __gtk_file_chooser_set_filter(chooser, filter)
@@ -11442,8 +12972,28 @@ module Org::Eclipse::Swt::Internal::Gtk
         end
       end
       
+      JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1file_1chooser_1set_1uri, [:pointer, :long, :int32, :long], :void
+      typesig { [::Java::Int, Array.typed(::Java::Byte)] }
+      # @method flags=dynamic
+      # long
+      def __gtk_file_chooser_set_uri(chooser, uri)
+        JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1gtk_1file_1chooser_1set_1uri, JNI.env, self.jni_id, chooser.to_int, uri.jni_id)
+      end
+      
+      typesig { [::Java::Int, Array.typed(::Java::Byte)] }
+      # long
+      def gtk_file_chooser_set_uri(chooser, uri)
+        PLATFORM_LOCK.lock
+        begin
+          __gtk_file_chooser_set_uri(chooser, uri)
+        ensure
+          PLATFORM_LOCK.unlock
+        end
+      end
+      
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1file_1chooser_1set_1select_1multiple, [:pointer, :long, :int32, :int8], :void
       typesig { [::Java::Int, ::Java::Boolean] }
+      # @method flags=dynamic
       # long
       def __gtk_file_chooser_set_select_multiple(chooser, select_multiple)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1gtk_1file_1chooser_1set_1select_1multiple, JNI.env, self.jni_id, chooser.to_int, select_multiple ? 1 : 0)
@@ -11462,6 +13012,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1file_1filter_1add_1pattern, [:pointer, :long, :int32, :long], :void
       typesig { [::Java::Int, Array.typed(::Java::Byte)] }
+      # @method flags=dynamic
       # long
       def __gtk_file_filter_add_pattern(filter, pattern)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1gtk_1file_1filter_1add_1pattern, JNI.env, self.jni_id, filter.to_int, pattern.jni_id)
@@ -11480,6 +13031,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1file_1filter_1new, [:pointer, :long], :int32
       typesig { [] }
+      # @method flags=dynamic
       # long
       def __gtk_file_filter_new
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1gtk_1file_1filter_1new, JNI.env, self.jni_id)
@@ -11498,6 +13050,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1file_1filter_1get_1name, [:pointer, :long, :int32], :int32
       typesig { [::Java::Int] }
+      # @method flags=dynamic
       # long
       # long
       def __gtk_file_filter_get_name(filter)
@@ -11518,6 +13071,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1file_1filter_1set_1name, [:pointer, :long, :int32, :long], :void
       typesig { [::Java::Int, Array.typed(::Java::Byte)] }
+      # @method flags=dynamic
       # long
       def __gtk_file_filter_set_name(filter, name)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1gtk_1file_1filter_1set_1name, JNI.env, self.jni_id, filter.to_int, name.jni_id)
@@ -11536,6 +13090,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1file_1selection_1get_1filename, [:pointer, :long, :int32], :int32
       typesig { [::Java::Int] }
+      # @param filesel cast=(GtkFileSelection *)
       # long
       # long
       def __gtk_file_selection_get_filename(filesel)
@@ -11556,6 +13111,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1file_1selection_1get_1selections, [:pointer, :long, :int32], :int32
       typesig { [::Java::Int] }
+      # @param filesel cast=(GtkFileSelection *)
       # long
       # long
       def __gtk_file_selection_get_selections(filesel)
@@ -11576,6 +13132,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1file_1selection_1hide_1fileop_1buttons, [:pointer, :long, :int32], :void
       typesig { [::Java::Int] }
+      # @param filesel cast=(GtkFileSelection *)
       # long
       def __gtk_file_selection_hide_fileop_buttons(filesel)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1gtk_1file_1selection_1hide_1fileop_1buttons, JNI.env, self.jni_id, filesel.to_int)
@@ -11594,6 +13151,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1file_1selection_1new, [:pointer, :long, :long], :int32
       typesig { [Array.typed(::Java::Byte)] }
+      # @param title cast=(const gchar *)
       # long
       def __gtk_file_selection_new(title)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1gtk_1file_1selection_1new, JNI.env, self.jni_id, title.jni_id)
@@ -11612,6 +13170,9 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1file_1selection_1set_1filename, [:pointer, :long, :int32, :int32], :void
       typesig { [::Java::Int, ::Java::Int] }
+      # @param filesel cast=(GtkFileSelection *)
+      # @param filename cast=(const gchar *)
+      # 
       # long
       # long
       def __gtk_file_selection_set_filename(filesel, filename)
@@ -11632,6 +13193,9 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1file_1selection_1set_1select_1multiple, [:pointer, :long, :int32, :int8], :void
       typesig { [::Java::Int, ::Java::Boolean] }
+      # @param filesel cast=(GtkFileSelection *)
+      # @param select_multiple cast=(gboolean)
+      # 
       # long
       def __gtk_file_selection_set_select_multiple(filesel, select_multiple)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1gtk_1file_1selection_1set_1select_1multiple, JNI.env, self.jni_id, filesel.to_int, select_multiple ? 1 : 0)
@@ -11650,6 +13214,11 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1fixed_1move, [:pointer, :long, :int32, :int32, :int32, :int32], :void
       typesig { [::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int] }
+      # @param fixed cast=(GtkFixed *)
+      # @param widget cast=(GtkWidget *)
+      # @param x cast=(gint)
+      # @param y cast=(gint)
+      # 
       # long
       # long
       def __gtk_fixed_move(fixed, widget, x, y)
@@ -11688,6 +13257,9 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1fixed_1set_1has_1window, [:pointer, :long, :int32, :int8], :void
       typesig { [::Java::Int, ::Java::Boolean] }
+      # @param fixed cast=(GtkFixed *)
+      # @param has_window cast=(gboolean)
+      # 
       # long
       def __gtk_fixed_set_has_window(fixed, has_window)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1gtk_1fixed_1set_1has_1window, JNI.env, self.jni_id, fixed.to_int, has_window ? 1 : 0)
@@ -11706,6 +13278,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1font_1selection_1dialog_1get_1font_1name, [:pointer, :long, :int32], :int32
       typesig { [::Java::Int] }
+      # @param fsd cast=(GtkFontSelectionDialog *)
       # long
       # long
       def __gtk_font_selection_dialog_get_font_name(fsd)
@@ -11726,6 +13299,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1font_1selection_1dialog_1new, [:pointer, :long, :long], :int32
       typesig { [Array.typed(::Java::Byte)] }
+      # @param title cast=(const gchar *)
       # long
       def __gtk_font_selection_dialog_new(title)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1gtk_1font_1selection_1dialog_1new, JNI.env, self.jni_id, title.jni_id)
@@ -11744,6 +13318,9 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1font_1selection_1dialog_1set_1font_1name, [:pointer, :long, :int32, :long], :int8
       typesig { [::Java::Int, Array.typed(::Java::Byte)] }
+      # @param fsd cast=(GtkFontSelectionDialog *)
+      # @param fontname cast=(const gchar *)
+      # 
       # long
       def __gtk_font_selection_dialog_set_font_name(fsd, fontname)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1gtk_1font_1selection_1dialog_1set_1font_1name, JNI.env, self.jni_id, fsd.to_int, fontname.jni_id) != 0
@@ -11762,6 +13339,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1frame_1new, [:pointer, :long, :long], :int32
       typesig { [Array.typed(::Java::Byte)] }
+      # @param label cast=(const gchar *)
       # long
       def __gtk_frame_new(label)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1gtk_1frame_1new, JNI.env, self.jni_id, label.jni_id)
@@ -11780,6 +13358,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1frame_1get_1label_1widget, [:pointer, :long, :int32], :int32
       typesig { [::Java::Int] }
+      # @param frame cast=(GtkFrame *)
       # long
       # long
       def __gtk_frame_get_label_widget(frame)
@@ -11800,6 +13379,9 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1frame_1set_1label, [:pointer, :long, :int32, :long], :void
       typesig { [::Java::Int, Array.typed(::Java::Byte)] }
+      # @param frame cast=(GtkFrame *)
+      # @param label cast=(const gchar *)
+      # 
       # long
       def __gtk_frame_set_label(frame, label)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1gtk_1frame_1set_1label, JNI.env, self.jni_id, frame.to_int, label.jni_id)
@@ -11818,6 +13400,9 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1frame_1set_1label_1widget, [:pointer, :long, :int32, :int32], :void
       typesig { [::Java::Int, ::Java::Int] }
+      # @param frame cast=(GtkFrame *)
+      # @param label_widget cast=(GtkWidget *)
+      # 
       # long
       # long
       def __gtk_frame_set_label_widget(frame, label_widget)
@@ -11838,6 +13423,9 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1frame_1set_1shadow_1type, [:pointer, :long, :int32, :int32], :void
       typesig { [::Java::Int, ::Java::Int] }
+      # @param frame cast=(GtkFrame *)
+      # @param type cast=(GtkShadowType)
+      # 
       # long
       def __gtk_frame_set_shadow_type(frame, type)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1gtk_1frame_1set_1shadow_1type, JNI.env, self.jni_id, frame.to_int, type.to_int)
@@ -11874,6 +13462,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1get_1current_1event_1state, [:pointer, :long, :long], :int8
       typesig { [Array.typed(::Java::Int)] }
+      # @param state cast=(GdkModifierType*)
       def __gtk_get_current_event_state(state)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1gtk_1get_1current_1event_1state, JNI.env, self.jni_id, state.jni_id) != 0
       end
@@ -11924,6 +13513,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1get_1event_1widget, [:pointer, :long, :int32], :int32
       typesig { [::Java::Int] }
+      # @param event cast=(GdkEvent *)
       # long
       # long
       def __gtk_get_event_widget(event)
@@ -11944,6 +13534,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1grab_1add, [:pointer, :long, :int32], :void
       typesig { [::Java::Int] }
+      # @param widget cast=(GtkWidget *)
       # long
       def __gtk_grab_add(widget)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1gtk_1grab_1add, JNI.env, self.jni_id, widget.to_int)
@@ -11980,6 +13571,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1grab_1remove, [:pointer, :long, :int32], :void
       typesig { [::Java::Int] }
+      # @param widget cast=(GtkWidget *)
       # long
       def __gtk_grab_remove(widget)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1gtk_1grab_1remove, JNI.env, self.jni_id, widget.to_int)
@@ -11998,6 +13590,9 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1hbox_1new, [:pointer, :long, :int8, :int32], :int32
       typesig { [::Java::Boolean, ::Java::Int] }
+      # @param homogeneous cast=(gboolean)
+      # @param spacing cast=(gint)
+      # 
       # long
       def __gtk_hbox_new(homogeneous, spacing)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1gtk_1hbox_1new, JNI.env, self.jni_id, homogeneous ? 1 : 0, spacing.to_int)
@@ -12016,6 +13611,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1hscale_1new, [:pointer, :long, :int32], :int32
       typesig { [::Java::Int] }
+      # @param adjustment cast=(GtkAdjustment *)
       # long
       # long
       def __gtk_hscale_new(adjustment)
@@ -12036,6 +13632,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1hscrollbar_1new, [:pointer, :long, :int32], :int32
       typesig { [::Java::Int] }
+      # @param adjustment cast=(GtkAdjustment *)
       # long
       # long
       def __gtk_hscrollbar_new(adjustment)
@@ -12074,6 +13671,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1icon_1factory_1lookup_1default, [:pointer, :long, :long], :int32
       typesig { [Array.typed(::Java::Byte)] }
+      # @param stock_id cast=(const gchar *)
       # long
       def __gtk_icon_factory_lookup_default(stock_id)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1gtk_1icon_1factory_1lookup_1default, JNI.env, self.jni_id, stock_id.jni_id)
@@ -12092,6 +13690,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1icon_1source_1free, [:pointer, :long, :int32], :void
       typesig { [::Java::Int] }
+      # @param source cast=(GtkIconSource *)
       # long
       def __gtk_icon_source_free(source)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1gtk_1icon_1source_1free, JNI.env, self.jni_id, source.to_int)
@@ -12128,6 +13727,9 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1icon_1source_1set_1pixbuf, [:pointer, :long, :int32, :int32], :void
       typesig { [::Java::Int, ::Java::Int] }
+      # @param source cast=(GtkIconSource *)
+      # @param pixbuf cast=(GdkPixbuf *)
+      # 
       # long
       # long
       def __gtk_icon_source_set_pixbuf(source, pixbuf)
@@ -12148,6 +13750,14 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1icon_1set_1render_1icon, [:pointer, :long, :int32, :int32, :int32, :int32, :int32, :int32, :int32], :int32
       typesig { [::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int] }
+      # @param icon_set cast=(GtkIconSet *)
+      # @param style cast=(GtkStyle *)
+      # @param direction cast=(GtkTextDirection)
+      # @param state cast=(GtkStateType)
+      # @param size cast=(GtkIconSize)
+      # @param widget cast=(GtkWidget *)
+      # @param detail cast=(const char *)
+      # 
       # long
       # long
       # long
@@ -12174,6 +13784,9 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1im_1context_1filter_1keypress, [:pointer, :long, :int32, :int32], :int8
       typesig { [::Java::Int, ::Java::Int] }
+      # @param context cast=(GtkIMContext *)
+      # @param event cast=(GdkEventKey *)
+      # 
       # long
       # long
       def __gtk_im_context_filter_keypress(context, event)
@@ -12194,6 +13807,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1im_1context_1focus_1in, [:pointer, :long, :int32], :void
       typesig { [::Java::Int] }
+      # @param context cast=(GtkIMContext *)
       # long
       def __gtk_im_context_focus_in(context)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1gtk_1im_1context_1focus_1in, JNI.env, self.jni_id, context.to_int)
@@ -12212,6 +13826,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1im_1context_1focus_1out, [:pointer, :long, :int32], :void
       typesig { [::Java::Int] }
+      # @param context cast=(GtkIMContext *)
       # long
       def __gtk_im_context_focus_out(context)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1gtk_1im_1context_1focus_1out, JNI.env, self.jni_id, context.to_int)
@@ -12230,6 +13845,11 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1im_1context_1get_1preedit_1string, [:pointer, :long, :int32, :long, :long, :long], :void
       typesig { [::Java::Int, Array.typed(::Java::Int), Array.typed(::Java::Int), Array.typed(::Java::Int)] }
+      # @param context cast=(GtkIMContext *)
+      # @param str cast=(gchar **)
+      # @param attrs cast=(PangoAttrList **)
+      # @param cursor_pos cast=(gint *)
+      # 
       # long
       # long
       # long
@@ -12270,6 +13890,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1im_1context_1reset, [:pointer, :long, :int32], :void
       typesig { [::Java::Int] }
+      # @param context cast=(GtkIMContext *)
       # long
       def __gtk_im_context_reset(context)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1gtk_1im_1context_1reset, JNI.env, self.jni_id, context.to_int)
@@ -12288,6 +13909,9 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1im_1context_1set_1client_1window, [:pointer, :long, :int32, :int32], :void
       typesig { [::Java::Int, ::Java::Int] }
+      # @param context cast=(GtkIMContext *)
+      # @param window cast=(GdkWindow *)
+      # 
       # long
       # long
       def __gtk_im_context_set_client_window(context, window)
@@ -12308,6 +13932,9 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1im_1context_1set_1cursor_1location, [:pointer, :long, :int32, :long], :void
       typesig { [::Java::Int, GdkRectangle] }
+      # @param context cast=(GtkIMContext *)
+      # @param area cast=(GdkRectangle *),flags=no_out
+      # 
       # long
       def __gtk_im_context_set_cursor_location(context, area)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1gtk_1im_1context_1set_1cursor_1location, JNI.env, self.jni_id, context.to_int, area.jni_id)
@@ -12326,6 +13953,9 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1im_1multicontext_1append_1menuitems, [:pointer, :long, :int32, :int32], :void
       typesig { [::Java::Int, ::Java::Int] }
+      # @param context cast=(GtkIMMulticontext *)
+      # @param menushell cast=(GtkMenuShell *)
+      # 
       # long
       # long
       def __gtk_im_multicontext_append_menuitems(context, menushell)
@@ -12364,6 +13994,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1image_1menu_1item_1new_1with_1label, [:pointer, :long, :long], :int32
       typesig { [Array.typed(::Java::Byte)] }
+      # @param label cast=(const gchar *)
       # long
       def __gtk_image_menu_item_new_with_label(label)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1gtk_1image_1menu_1item_1new_1with_1label, JNI.env, self.jni_id, label.jni_id)
@@ -12382,6 +14013,9 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1image_1menu_1item_1set_1image, [:pointer, :long, :int32, :int32], :void
       typesig { [::Java::Int, ::Java::Int] }
+      # @param menu_item cast=(GtkImageMenuItem *)
+      # @param image cast=(GtkWidget *)
+      # 
       # long
       # long
       def __gtk_image_menu_item_set_image(menu_item, image)
@@ -12420,6 +14054,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1image_1new_1from_1pixbuf, [:pointer, :long, :int32], :int32
       typesig { [::Java::Int] }
+      # @param pixbuf cast=(GdkPixbuf *)
       # long
       # long
       def __gtk_image_new_from_pixbuf(pixbuf)
@@ -12440,6 +14075,9 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1image_1new_1from_1pixmap, [:pointer, :long, :int32, :int32], :int32
       typesig { [::Java::Int, ::Java::Int] }
+      # @param pixmap cast=(GdkPixmap *)
+      # @param mask cast=(GdkBitmap *)
+      # 
       # long
       # long
       # long
@@ -12462,6 +14100,9 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1image_1set_1from_1pixbuf, [:pointer, :long, :int32, :int32], :void
       typesig { [::Java::Int, ::Java::Int] }
+      # @param image cast=(GtkImage *)
+      # @param pixbuf cast=(GdkPixbuf *)
+      # 
       # long
       # long
       def __gtk_image_set_from_pixbuf(image, pixbuf)
@@ -12482,6 +14123,10 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1image_1set_1from_1pixmap, [:pointer, :long, :int32, :int32, :int32], :void
       typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
+      # @param image cast=(GtkImage *)
+      # @param pixmap cast=(GdkBitmap *)
+      # @param mask cast=(GdkBitmap *)
+      # 
       # long
       # long
       # long
@@ -12504,6 +14149,9 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1init_1check, [:pointer, :long, :long, :long], :int8
       typesig { [Array.typed(::Java::Int), Array.typed(::Java::Int)] }
+      # @param argc cast=(int *)
+      # @param argv cast=(char ***)
+      # 
       # long
       # long
       def __gtk_init_check(argc, argv)
@@ -12524,6 +14172,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1label_1get_1layout, [:pointer, :long, :int32], :int32
       typesig { [::Java::Int] }
+      # @param label cast=(GtkLabel *)
       # long
       # long
       def __gtk_label_get_layout(label)
@@ -12544,6 +14193,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1label_1get_1mnemonic_1keyval, [:pointer, :long, :int32], :int32
       typesig { [::Java::Int] }
+      # @param label cast=(GtkLabel *)
       # long
       def __gtk_label_get_mnemonic_keyval(label)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1gtk_1label_1get_1mnemonic_1keyval, JNI.env, self.jni_id, label.to_int)
@@ -12562,6 +14212,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1label_1new, [:pointer, :long, :long], :int32
       typesig { [Array.typed(::Java::Byte)] }
+      # @param label cast=(const gchar *)
       # long
       def __gtk_label_new(label)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1gtk_1label_1new, JNI.env, self.jni_id, label.jni_id)
@@ -12580,6 +14231,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1label_1new_1with_1mnemonic, [:pointer, :long, :long], :int32
       typesig { [Array.typed(::Java::Byte)] }
+      # @param str cast=(const gchar *)
       # long
       def __gtk_label_new_with_mnemonic(str)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1gtk_1label_1new_1with_1mnemonic, JNI.env, self.jni_id, str.jni_id)
@@ -12598,6 +14250,9 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1label_1set_1attributes, [:pointer, :long, :int32, :int32], :void
       typesig { [::Java::Int, ::Java::Int] }
+      # @param label cast=(GtkLabel *)
+      # @param attrs cast=(PangoAttrList *)
+      # 
       # long
       # long
       def __gtk_label_set_attributes(label, attrs)
@@ -12618,6 +14273,9 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1label_1set_1justify, [:pointer, :long, :int32, :int32], :void
       typesig { [::Java::Int, ::Java::Int] }
+      # @param label cast=(GtkLabel *)
+      # @param jtype cast=(GtkJustification)
+      # 
       # long
       def __gtk_label_set_justify(label, jtype)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1gtk_1label_1set_1justify, JNI.env, self.jni_id, label.to_int, jtype.to_int)
@@ -12636,6 +14294,9 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1label_1set_1line_1wrap, [:pointer, :long, :int32, :int8], :void
       typesig { [::Java::Int, ::Java::Boolean] }
+      # @param label cast=(GtkLabel *)
+      # @param wrap cast=(gboolean)
+      # 
       # long
       def __gtk_label_set_line_wrap(label, wrap)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1gtk_1label_1set_1line_1wrap, JNI.env, self.jni_id, label.to_int, wrap ? 1 : 0)
@@ -12654,6 +14315,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1label_1set_1line_1wrap_1mode, [:pointer, :long, :int32, :int32], :void
       typesig { [::Java::Int, ::Java::Int] }
+      # @method flags=dynamic
       # long
       def __gtk_label_set_line_wrap_mode(label, wrap_mode)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1gtk_1label_1set_1line_1wrap_1mode, JNI.env, self.jni_id, label.to_int, wrap_mode.to_int)
@@ -12672,6 +14334,9 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1label_1set_1text__II, [:pointer, :long, :int32, :int32], :void
       typesig { [::Java::Int, ::Java::Int] }
+      # @param label cast=(GtkLabel *)
+      # @param str cast=(const gchar *)
+      # 
       # long
       # long
       def __gtk_label_set_text(label, str)
@@ -12692,6 +14357,9 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1label_1set_1text__I_3B, [:pointer, :long, :int32, :long], :void
       typesig { [::Java::Int, Array.typed(::Java::Byte)] }
+      # @param label cast=(GtkLabel *)
+      # @param str cast=(const gchar *)
+      # 
       # long
       def __gtk_label_set_text(label, str)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1gtk_1label_1set_1text__I_3B, JNI.env, self.jni_id, label.to_int, str.jni_id)
@@ -12710,6 +14378,9 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1label_1set_1text_1with_1mnemonic, [:pointer, :long, :int32, :long], :void
       typesig { [::Java::Int, Array.typed(::Java::Byte)] }
+      # @param label cast=(GtkLabel *)
+      # @param str cast=(const gchar *)
+      # 
       # long
       def __gtk_label_set_text_with_mnemonic(label, str)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1gtk_1label_1set_1text_1with_1mnemonic, JNI.env, self.jni_id, label.to_int, str.jni_id)
@@ -12728,6 +14399,9 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1list_1append_1items, [:pointer, :long, :int32, :int32], :void
       typesig { [::Java::Int, ::Java::Int] }
+      # @param list cast=(GtkList *)
+      # @param items cast=(GList *)
+      # 
       # long
       # long
       def __gtk_list_append_items(list, items)
@@ -12748,6 +14422,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1list_1clear_1items, [:pointer, :long, :int32, :int32, :int32], :void
       typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
+      # @param list cast=(GtkList *)
       # long
       def __gtk_list_clear_items(list, start, end_)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1gtk_1list_1clear_1items, JNI.env, self.jni_id, list.to_int, start.to_int, end_.to_int)
@@ -12766,6 +14441,9 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1list_1insert_1items, [:pointer, :long, :int32, :int32, :int32], :void
       typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
+      # @param list cast=(GtkList *)
+      # @param items cast=(GList *)
+      # 
       # long
       # long
       def __gtk_list_insert_items(list, items, position)
@@ -12786,6 +14464,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1list_1item_1new_1with_1label, [:pointer, :long, :long], :int32
       typesig { [Array.typed(::Java::Byte)] }
+      # @param label cast=(const gchar *)
       # long
       def __gtk_list_item_new_with_label(label)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1gtk_1list_1item_1new_1with_1label, JNI.env, self.jni_id, label.jni_id)
@@ -12804,6 +14483,9 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1list_1remove_1items, [:pointer, :long, :int32, :int32], :void
       typesig { [::Java::Int, ::Java::Int] }
+      # @param list cast=(GtkList *)
+      # @param items cast=(GList *)
+      # 
       # long
       # long
       def __gtk_list_remove_items(list, items)
@@ -12824,6 +14506,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1list_1select_1item, [:pointer, :long, :int32, :int32], :void
       typesig { [::Java::Int, ::Java::Int] }
+      # @param list cast=(GtkList *)
       # long
       def __gtk_list_select_item(list, item)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1gtk_1list_1select_1item, JNI.env, self.jni_id, list.to_int, item.to_int)
@@ -12842,6 +14525,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1list_1unselect_1all, [:pointer, :long, :int32], :void
       typesig { [::Java::Int] }
+      # @param list cast=(GtkList *)
       # long
       def __gtk_list_unselect_all(list)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1gtk_1list_1unselect_1all, JNI.env, self.jni_id, list.to_int)
@@ -12860,6 +14544,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1list_1unselect_1item, [:pointer, :long, :int32, :int32], :void
       typesig { [::Java::Int, ::Java::Int] }
+      # @param list cast=(GtkList *)
       # long
       def __gtk_list_unselect_item(list, item)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1gtk_1list_1unselect_1item, JNI.env, self.jni_id, list.to_int, item.to_int)
@@ -12878,6 +14563,9 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1list_1store_1append, [:pointer, :long, :int32, :int32], :void
       typesig { [::Java::Int, ::Java::Int] }
+      # @param list_store cast=(GtkListStore *)
+      # @param iter cast=(GtkTreeIter *)
+      # 
       # long
       # long
       def __gtk_list_store_append(list_store, iter)
@@ -12898,6 +14586,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1list_1store_1clear, [:pointer, :long, :int32], :void
       typesig { [::Java::Int] }
+      # @param store cast=(GtkListStore *)
       # long
       def __gtk_list_store_clear(store)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1gtk_1list_1store_1clear, JNI.env, self.jni_id, store.to_int)
@@ -12916,6 +14605,10 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1list_1store_1insert, [:pointer, :long, :int32, :int32, :int32], :void
       typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
+      # @param list_store cast=(GtkListStore *)
+      # @param iter cast=(GtkTreeIter *)
+      # @param position cast=(gint)
+      # 
       # long
       # long
       def __gtk_list_store_insert(list_store, iter, position)
@@ -12936,6 +14629,9 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1list_1store_1newv, [:pointer, :long, :int32, :long], :int32
       typesig { [::Java::Int, Array.typed(::Java::Int)] }
+      # @param numColumns cast=(gint)
+      # @param types cast=(GType *)
+      # 
       # long
       # long
       def __gtk_list_store_newv(num_columns, types)
@@ -12956,6 +14652,9 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1list_1store_1remove, [:pointer, :long, :int32, :int32], :void
       typesig { [::Java::Int, ::Java::Int] }
+      # @param list_store cast=(GtkListStore *)
+      # @param iter cast=(GtkTreeIter *)
+      # 
       # long
       # long
       def __gtk_list_store_remove(list_store, iter)
@@ -12976,6 +14675,9 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1list_1store_1set__III_3BI, [:pointer, :long, :int32, :int32, :int32, :long, :int32], :void
       typesig { [::Java::Int, ::Java::Int, ::Java::Int, Array.typed(::Java::Byte), ::Java::Int] }
+      # @param store cast=(GtkListStore *)
+      # @param iter cast=(GtkTreeIter *)
+      # 
       # long
       # long
       # long
@@ -12998,6 +14700,9 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1list_1store_1set__IIIII, [:pointer, :long, :int32, :int32, :int32, :int32, :int32], :void
       typesig { [::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int] }
+      # @param store cast=(GtkListStore *)
+      # @param iter cast=(GtkTreeIter *)
+      # 
       # long
       # long
       # long
@@ -13020,6 +14725,9 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1list_1store_1set__IIIJI, [:pointer, :long, :int32, :int32, :int32, :int64, :int32], :void
       typesig { [::Java::Int, ::Java::Int, ::Java::Int, ::Java::Long, ::Java::Int] }
+      # @param store cast=(GtkListStore *)
+      # @param iter cast=(GtkTreeIter *)
+      # 
       # long
       # long
       # long
@@ -13042,6 +14750,10 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method "Java_org_eclipse_swt_internal_gtk_OS__1gtk_1list_1store_1set__IIIL#{GdkColor.jni_name}_2I".to_sym, [:pointer, :long, :int32, :int32, :int32, :long, :int32], :void
       typesig { [::Java::Int, ::Java::Int, ::Java::Int, GdkColor, ::Java::Int] }
+      # @param store cast=(GtkListStore *)
+      # @param iter cast=(GtkTreeIter *)
+      # @param value flags=no_out
+      # 
       # long
       # long
       # long
@@ -13064,6 +14776,9 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1list_1store_1set__IIIZI, [:pointer, :long, :int32, :int32, :int32, :int8, :int32], :void
       typesig { [::Java::Int, ::Java::Int, ::Java::Int, ::Java::Boolean, ::Java::Int] }
+      # @param store cast=(GtkListStore *)
+      # @param iter cast=(GtkTreeIter *)
+      # 
       # long
       # long
       # long
@@ -13086,6 +14801,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1major_1version, [:pointer, :long], :int32
       typesig { [] }
+      # @method flags=const
       def __gtk_major_version
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1gtk_1major_1version, JNI.env, self.jni_id)
       end
@@ -13102,6 +14818,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1minor_1version, [:pointer, :long], :int32
       typesig { [] }
+      # @method flags=const
       def __gtk_minor_version
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1gtk_1minor_1version, JNI.env, self.jni_id)
       end
@@ -13118,6 +14835,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1micro_1version, [:pointer, :long], :int32
       typesig { [] }
+      # @method flags=const
       def __gtk_micro_version
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1gtk_1micro_1version, JNI.env, self.jni_id)
       end
@@ -13166,6 +14884,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1main_1do_1event, [:pointer, :long, :int32], :void
       typesig { [::Java::Int] }
+      # @param event cast=(GdkEvent *)
       # long
       def __gtk_main_do_event(event)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1gtk_1main_1do_1event, JNI.env, self.jni_id, event.to_int)
@@ -13200,8 +14919,30 @@ module Org::Eclipse::Swt::Internal::Gtk
         end
       end
       
+      JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1menu_1get_1attach_1widget, [:pointer, :long, :int32], :int32
+      typesig { [::Java::Int] }
+      # @param menu cast=(GtkMenu *)
+      # long
+      # long
+      def __gtk_menu_get_attach_widget(menu)
+        JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1gtk_1menu_1get_1attach_1widget, JNI.env, self.jni_id, menu.to_int)
+      end
+      
+      typesig { [::Java::Int] }
+      # long
+      # long
+      def gtk_menu_get_attach_widget(menu)
+        PLATFORM_LOCK.lock
+        begin
+          return __gtk_menu_get_attach_widget(menu)
+        ensure
+          PLATFORM_LOCK.unlock
+        end
+      end
+      
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1menu_1item_1remove_1submenu, [:pointer, :long, :int32], :void
       typesig { [::Java::Int] }
+      # @param menu_item cast=(GtkMenuItem *)
       # long
       def __gtk_menu_item_remove_submenu(menu_item)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1gtk_1menu_1item_1remove_1submenu, JNI.env, self.jni_id, menu_item.to_int)
@@ -13220,6 +14961,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1menu_1item_1get_1submenu, [:pointer, :long, :int32], :int32
       typesig { [::Java::Int] }
+      # @param menu_item cast=(GtkMenuItem *)
       # long
       # long
       def __gtk_menu_item_get_submenu(menu_item)
@@ -13240,6 +14982,9 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1menu_1item_1set_1submenu, [:pointer, :long, :int32, :int32], :void
       typesig { [::Java::Int, ::Java::Int] }
+      # @param menu_item cast=(GtkMenuItem *)
+      # @param submenu cast=(GtkWidget *)
+      # 
       # long
       # long
       def __gtk_menu_item_set_submenu(menu_item, submenu)
@@ -13278,6 +15023,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1menu_1popdown, [:pointer, :long, :int32], :void
       typesig { [::Java::Int] }
+      # @param menu cast=(GtkMenu *)
       # long
       def __gtk_menu_popdown(menu)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1gtk_1menu_1popdown, JNI.env, self.jni_id, menu.to_int)
@@ -13296,6 +15042,14 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1menu_1popup, [:pointer, :long, :int32, :int32, :int32, :int32, :int32, :int32, :int32], :void
       typesig { [::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int] }
+      # @param menu cast=(GtkMenu *)
+      # @param parent_menu_shell cast=(GtkWidget *)
+      # @param parent_menu_item cast=(GtkWidget *)
+      # @param func cast=(GtkMenuPositionFunc)
+      # @param data cast=(gpointer)
+      # @param button cast=(guint)
+      # @param activate_time cast=(guint32)
+      # 
       # long
       # long
       # long
@@ -13322,6 +15076,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1menu_1shell_1deactivate, [:pointer, :long, :int32], :void
       typesig { [::Java::Int] }
+      # @param menu_shell cast=(GtkMenuShell *)
       # long
       def __gtk_menu_shell_deactivate(menu_shell)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1gtk_1menu_1shell_1deactivate, JNI.env, self.jni_id, menu_shell.to_int)
@@ -13340,6 +15095,10 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1menu_1shell_1insert, [:pointer, :long, :int32, :int32, :int32], :void
       typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
+      # @param menu_shell cast=(GtkMenuShell *)
+      # @param child cast=(GtkWidget *)
+      # @param position cast=(gint)
+      # 
       # long
       # long
       def __gtk_menu_shell_insert(menu_shell, child, position)
@@ -13360,6 +15119,9 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1menu_1shell_1select_1item, [:pointer, :long, :int32, :int32], :void
       typesig { [::Java::Int, ::Java::Int] }
+      # @param menu_shell cast=(GtkMenuShell *)
+      # @param menu_item cast=(GtkWidget *)
+      # 
       # long
       # long
       def __gtk_menu_shell_select_item(menu_shell, menu_item)
@@ -13380,6 +15142,10 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1menu_1shell_1set_1take_1focus, [:pointer, :long, :int32, :int8], :void
       typesig { [::Java::Int, ::Java::Boolean] }
+      # @method flags=dynamic
+      # @param menu_shell cast=(GtkMenuShell *)
+      # @param take_focus cast=(gboolean)
+      # 
       # long
       def __gtk_menu_shell_set_take_focus(menu_shell, take_focus)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1gtk_1menu_1shell_1set_1take_1focus, JNI.env, self.jni_id, menu_shell.to_int, take_focus ? 1 : 0)
@@ -13398,6 +15164,12 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1message_1dialog_1new, [:pointer, :long, :int32, :int32, :int32, :int32, :long], :int32
       typesig { [::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, Array.typed(::Java::Byte)] }
+      # @param parent cast=(GtkWindow *)
+      # @param flags cast=(GtkDialogFlags)
+      # @param type cast=(GtkMessageType)
+      # @param buttons cast=(GtkButtonsType)
+      # @param message_format cast=(const gchar *)
+      # 
       # long
       # long
       def __gtk_message_dialog_new(parent, flags, type, buttons, message_format)
@@ -13418,6 +15190,10 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1misc_1set_1alignment, [:pointer, :long, :int32, :float, :float], :void
       typesig { [::Java::Int, ::Java::Float, ::Java::Float] }
+      # @param misc cast=(GtkMisc *)
+      # @param xalign cast=(gfloat)
+      # @param yalign cast=(gfloat)
+      # 
       # long
       def __gtk_misc_set_alignment(misc, xalign, yalign)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1gtk_1misc_1set_1alignment, JNI.env, self.jni_id, misc.to_int, xalign, yalign)
@@ -13436,6 +15212,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1notebook_1get_1current_1page, [:pointer, :long, :int32], :int32
       typesig { [::Java::Int] }
+      # @param notebook cast=(GtkNotebook *)
       # long
       def __gtk_notebook_get_current_page(notebook)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1gtk_1notebook_1get_1current_1page, JNI.env, self.jni_id, notebook.to_int)
@@ -13454,6 +15231,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1notebook_1get_1scrollable, [:pointer, :long, :int32], :int8
       typesig { [::Java::Int] }
+      # @param notebook cast=(GtkNotebook *)
       # long
       def __gtk_notebook_get_scrollable(notebook)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1gtk_1notebook_1get_1scrollable, JNI.env, self.jni_id, notebook.to_int) != 0
@@ -13472,6 +15250,11 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1notebook_1insert_1page, [:pointer, :long, :int32, :int32, :int32, :int32], :void
       typesig { [::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int] }
+      # @param notebook cast=(GtkNotebook *)
+      # @param child cast=(GtkWidget *)
+      # @param tab_label cast=(GtkWidget *)
+      # @param position cast=(gint)
+      # 
       # long
       # long
       # long
@@ -13512,6 +15295,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1notebook_1next_1page, [:pointer, :long, :int32], :void
       typesig { [::Java::Int] }
+      # @param notebook cast=(GtkNotebook *)
       # long
       def __gtk_notebook_next_page(notebook)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1gtk_1notebook_1next_1page, JNI.env, self.jni_id, notebook.to_int)
@@ -13530,6 +15314,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1notebook_1prev_1page, [:pointer, :long, :int32], :void
       typesig { [::Java::Int] }
+      # @param notebook cast=(GtkNotebook *)
       # long
       def __gtk_notebook_prev_page(notebook)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1gtk_1notebook_1prev_1page, JNI.env, self.jni_id, notebook.to_int)
@@ -13548,6 +15333,9 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1notebook_1remove_1page, [:pointer, :long, :int32, :int32], :void
       typesig { [::Java::Int, ::Java::Int] }
+      # @param notebook cast=(GtkNotebook *)
+      # @param page_num cast=(gint)
+      # 
       # long
       def __gtk_notebook_remove_page(notebook, page_num)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1gtk_1notebook_1remove_1page, JNI.env, self.jni_id, notebook.to_int, page_num.to_int)
@@ -13566,6 +15354,9 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1notebook_1set_1current_1page, [:pointer, :long, :int32, :int32], :void
       typesig { [::Java::Int, ::Java::Int] }
+      # @param notebook cast=(GtkNotebook *)
+      # @param page_num cast=(gint)
+      # 
       # long
       def __gtk_notebook_set_current_page(notebook, page_num)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1gtk_1notebook_1set_1current_1page, JNI.env, self.jni_id, notebook.to_int, page_num.to_int)
@@ -13584,6 +15375,9 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1notebook_1set_1scrollable, [:pointer, :long, :int32, :int8], :void
       typesig { [::Java::Int, ::Java::Boolean] }
+      # @param notebook cast=(GtkNotebook *)
+      # @param scrollable cast=(gboolean)
+      # 
       # long
       def __gtk_notebook_set_scrollable(notebook, scrollable)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1gtk_1notebook_1set_1scrollable, JNI.env, self.jni_id, notebook.to_int, scrollable ? 1 : 0)
@@ -13602,6 +15396,9 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1notebook_1set_1show_1tabs, [:pointer, :long, :int32, :int8], :void
       typesig { [::Java::Int, ::Java::Boolean] }
+      # @param notebook cast=(GtkNotebook *)
+      # @param show_tabs cast=(gboolean)
+      # 
       # long
       def __gtk_notebook_set_show_tabs(notebook, show_tabs)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1gtk_1notebook_1set_1show_1tabs, JNI.env, self.jni_id, notebook.to_int, show_tabs ? 1 : 0)
@@ -13620,6 +15417,9 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1notebook_1set_1tab_1pos, [:pointer, :long, :int32, :int32], :void
       typesig { [::Java::Int, ::Java::Int] }
+      # @param notebook cast=(GtkNotebook *)
+      # @param pos cast=(GtkPositionType)
+      # 
       # long
       def __gtk_notebook_set_tab_pos(notebook, pos)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1gtk_1notebook_1set_1tab_1pos, JNI.env, self.jni_id, notebook.to_int, pos.to_int)
@@ -13638,6 +15438,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1object_1sink, [:pointer, :long, :int32], :void
       typesig { [::Java::Int] }
+      # @param object cast=(GtkObject *)
       # long
       def __gtk_object_sink(object)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1gtk_1object_1sink, JNI.env, self.jni_id, object.to_int)
@@ -13656,6 +15457,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1page_1setup_1new, [:pointer, :long], :int32
       typesig { [] }
+      # @method flags=dynamic
       # long
       def __gtk_page_setup_new
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1gtk_1page_1setup_1new, JNI.env, self.jni_id)
@@ -13674,6 +15476,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1page_1setup_1get_1orientation, [:pointer, :long, :int32], :int32
       typesig { [::Java::Int] }
+      # @method flags=dynamic
       # long
       def __gtk_page_setup_get_orientation(setup)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1gtk_1page_1setup_1get_1orientation, JNI.env, self.jni_id, setup.to_int)
@@ -13692,6 +15495,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1page_1setup_1set_1orientation, [:pointer, :long, :int32, :int32], :void
       typesig { [::Java::Int, ::Java::Int] }
+      # @method flags=dynamic
       # long
       def __gtk_page_setup_set_orientation(setup, orientation)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1gtk_1page_1setup_1set_1orientation, JNI.env, self.jni_id, setup.to_int, orientation.to_int)
@@ -13710,6 +15514,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1page_1setup_1get_1paper_1size, [:pointer, :long, :int32], :int32
       typesig { [::Java::Int] }
+      # @method flags=dynamic
       # long
       # long
       def __gtk_page_setup_get_paper_size(setup)
@@ -13730,6 +15535,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1page_1setup_1set_1paper_1size, [:pointer, :long, :int32, :int32], :void
       typesig { [::Java::Int, ::Java::Int] }
+      # @method flags=dynamic
       # long
       # long
       def __gtk_page_setup_set_paper_size(setup, size)
@@ -13750,6 +15556,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1page_1setup_1get_1top_1margin, [:pointer, :long, :int32, :int32], :double
       typesig { [::Java::Int, ::Java::Int] }
+      # @method flags=dynamic
       # long
       def __gtk_page_setup_get_top_margin(setup, unit)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1gtk_1page_1setup_1get_1top_1margin, JNI.env, self.jni_id, setup.to_int, unit.to_int)
@@ -13768,6 +15575,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1page_1setup_1set_1top_1margin, [:pointer, :long, :int32, :double, :int32], :void
       typesig { [::Java::Int, ::Java::Double, ::Java::Int] }
+      # @method flags=dynamic
       # long
       def __gtk_page_setup_set_top_margin(setup, margin, unit)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1gtk_1page_1setup_1set_1top_1margin, JNI.env, self.jni_id, setup.to_int, margin, unit.to_int)
@@ -13786,6 +15594,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1page_1setup_1get_1bottom_1margin, [:pointer, :long, :int32, :int32], :double
       typesig { [::Java::Int, ::Java::Int] }
+      # @method flags=dynamic
       # long
       def __gtk_page_setup_get_bottom_margin(setup, unit)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1gtk_1page_1setup_1get_1bottom_1margin, JNI.env, self.jni_id, setup.to_int, unit.to_int)
@@ -13804,6 +15613,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1page_1setup_1set_1bottom_1margin, [:pointer, :long, :int32, :double, :int32], :void
       typesig { [::Java::Int, ::Java::Double, ::Java::Int] }
+      # @method flags=dynamic
       # long
       def __gtk_page_setup_set_bottom_margin(setup, margin, unit)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1gtk_1page_1setup_1set_1bottom_1margin, JNI.env, self.jni_id, setup.to_int, margin, unit.to_int)
@@ -13822,6 +15632,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1page_1setup_1get_1left_1margin, [:pointer, :long, :int32, :int32], :double
       typesig { [::Java::Int, ::Java::Int] }
+      # @method flags=dynamic
       # long
       def __gtk_page_setup_get_left_margin(setup, unit)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1gtk_1page_1setup_1get_1left_1margin, JNI.env, self.jni_id, setup.to_int, unit.to_int)
@@ -13840,6 +15651,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1page_1setup_1set_1left_1margin, [:pointer, :long, :int32, :double, :int32], :void
       typesig { [::Java::Int, ::Java::Double, ::Java::Int] }
+      # @method flags=dynamic
       # long
       def __gtk_page_setup_set_left_margin(setup, margin, unit)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1gtk_1page_1setup_1set_1left_1margin, JNI.env, self.jni_id, setup.to_int, margin, unit.to_int)
@@ -13858,6 +15670,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1page_1setup_1get_1right_1margin, [:pointer, :long, :int32, :int32], :double
       typesig { [::Java::Int, ::Java::Int] }
+      # @method flags=dynamic
       # long
       def __gtk_page_setup_get_right_margin(setup, unit)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1gtk_1page_1setup_1get_1right_1margin, JNI.env, self.jni_id, setup.to_int, unit.to_int)
@@ -13876,6 +15689,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1page_1setup_1set_1right_1margin, [:pointer, :long, :int32, :double, :int32], :void
       typesig { [::Java::Int, ::Java::Double, ::Java::Int] }
+      # @method flags=dynamic
       # long
       def __gtk_page_setup_set_right_margin(setup, margin, unit)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1gtk_1page_1setup_1set_1right_1margin, JNI.env, self.jni_id, setup.to_int, margin, unit.to_int)
@@ -13894,6 +15708,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1page_1setup_1get_1paper_1width, [:pointer, :long, :int32, :int32], :double
       typesig { [::Java::Int, ::Java::Int] }
+      # @method flags=dynamic
       # long
       def __gtk_page_setup_get_paper_width(setup, unit)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1gtk_1page_1setup_1get_1paper_1width, JNI.env, self.jni_id, setup.to_int, unit.to_int)
@@ -13912,6 +15727,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1page_1setup_1get_1paper_1height, [:pointer, :long, :int32, :int32], :double
       typesig { [::Java::Int, ::Java::Int] }
+      # @method flags=dynamic
       # long
       def __gtk_page_setup_get_paper_height(setup, unit)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1gtk_1page_1setup_1get_1paper_1height, JNI.env, self.jni_id, setup.to_int, unit.to_int)
@@ -13930,6 +15746,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1page_1setup_1get_1page_1width, [:pointer, :long, :int32, :int32], :double
       typesig { [::Java::Int, ::Java::Int] }
+      # @method flags=dynamic
       # long
       def __gtk_page_setup_get_page_width(setup, unit)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1gtk_1page_1setup_1get_1page_1width, JNI.env, self.jni_id, setup.to_int, unit.to_int)
@@ -13948,6 +15765,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1page_1setup_1get_1page_1height, [:pointer, :long, :int32, :int32], :double
       typesig { [::Java::Int, ::Java::Int] }
+      # @method flags=dynamic
       # long
       def __gtk_page_setup_get_page_height(setup, unit)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1gtk_1page_1setup_1get_1page_1height, JNI.env, self.jni_id, setup.to_int, unit.to_int)
@@ -13966,6 +15784,12 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1paint_1handle, [:pointer, :long, :int32, :int32, :int32, :int32, :long, :int32, :long, :int32, :int32, :int32, :int32, :int32], :void
       typesig { [::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, GdkRectangle, ::Java::Int, Array.typed(::Java::Byte), ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int] }
+      # @param style cast=(GtkStyle *)
+      # @param window cast=(GdkWindow *)
+      # @param area flags=no_out
+      # @param widget cast=(GtkWidget *)
+      # @param detail cast=(const gchar *)
+      # 
       # long
       # long
       # long
@@ -13988,6 +15812,11 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1paint_1flat_1box, [:pointer, :long, :int32, :int32, :int32, :int32, :long, :int32, :long, :int32, :int32, :int32, :int32], :void
       typesig { [::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, GdkRectangle, ::Java::Int, Array.typed(::Java::Byte), ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int] }
+      # @param style cast=(GtkStyle *)
+      # @param window cast=(GdkWindow *)
+      # @param widget cast=(GtkWidget *)
+      # @param detail cast=(const gchar *)
+      # 
       # long
       # long
       # long
@@ -14010,6 +15839,12 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1paint_1focus, [:pointer, :long, :int32, :int32, :int32, :long, :int32, :long, :int32, :int32, :int32, :int32], :void
       typesig { [::Java::Int, ::Java::Int, ::Java::Int, GdkRectangle, ::Java::Int, Array.typed(::Java::Byte), ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int] }
+      # @param style cast=(GtkStyle *)
+      # @param window cast=(GdkWindow *)
+      # @param area flags=no_out
+      # @param widget cast=(GtkWidget *)
+      # @param detail cast=(const gchar *)
+      # 
       # long
       # long
       # long
@@ -14032,6 +15867,11 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1paint_1option, [:pointer, :long, :int32, :int32, :int32, :int32, :long, :int32, :long, :int32, :int32, :int32, :int32], :void
       typesig { [::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, GdkRectangle, ::Java::Int, Array.typed(::Java::Byte), ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int] }
+      # @param style cast=(GtkStyle *)
+      # @param window cast=(GdkWindow *)
+      # @param widget cast=(GtkWidget *)
+      # @param detail cast=(const gchar *)
+      # 
       # long
       # long
       # long
@@ -14054,6 +15894,11 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1paint_1slider, [:pointer, :long, :int32, :int32, :int32, :int32, :long, :int32, :long, :int32, :int32, :int32, :int32, :int32], :void
       typesig { [::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, GdkRectangle, ::Java::Int, Array.typed(::Java::Byte), ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int] }
+      # @param style cast=(GtkStyle *)
+      # @param window cast=(GdkWindow *)
+      # @param widget cast=(GtkWidget *)
+      # @param detail cast=(const gchar *)
+      # 
       # long
       # long
       # long
@@ -14076,6 +15921,11 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1paint_1tab, [:pointer, :long, :int32, :int32, :int32, :int32, :long, :int32, :long, :int32, :int32, :int32, :int32], :void
       typesig { [::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, GdkRectangle, ::Java::Int, Array.typed(::Java::Byte), ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int] }
+      # @param style cast=(GtkStyle *)
+      # @param window cast=(GdkWindow *)
+      # @param widget cast=(GtkWidget *)
+      # @param detail cast=(const gchar *)
+      # 
       # long
       # long
       # long
@@ -14098,6 +15948,11 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1paint_1arrow, [:pointer, :long, :int32, :int32, :int32, :int32, :long, :int32, :long, :int32, :int8, :int32, :int32, :int32, :int32], :void
       typesig { [::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, GdkRectangle, ::Java::Int, Array.typed(::Java::Byte), ::Java::Int, ::Java::Boolean, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int] }
+      # @param style cast=(GtkStyle *)
+      # @param window cast=(GdkWindow *)
+      # @param widget cast=(GtkWidget *)
+      # @param detail cast=(const gchar *)
+      # 
       # long
       # long
       # long
@@ -14120,6 +15975,11 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1paint_1box, [:pointer, :long, :int32, :int32, :int32, :int32, :long, :int32, :long, :int32, :int32, :int32, :int32], :void
       typesig { [::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, GdkRectangle, ::Java::Int, Array.typed(::Java::Byte), ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int] }
+      # @param style cast=(GtkStyle *)
+      # @param window cast=(GdkWindow *)
+      # @param widget cast=(GtkWidget *)
+      # @param detail cast=(const gchar *)
+      # 
       # long
       # long
       # long
@@ -14142,6 +16002,11 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1paint_1box_1gap, [:pointer, :long, :int32, :int32, :int32, :int32, :long, :int32, :long, :int32, :int32, :int32, :int32, :int32, :int32, :int32], :void
       typesig { [::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, GdkRectangle, ::Java::Int, Array.typed(::Java::Byte), ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int] }
+      # @param style cast=(GtkStyle *)
+      # @param window cast=(GdkWindow *)
+      # @param widget cast=(GtkWidget *)
+      # @param detail cast=(gchar *)
+      # 
       # long
       # long
       # long
@@ -14164,6 +16029,11 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1paint_1check, [:pointer, :long, :int32, :int32, :int32, :int32, :long, :int32, :long, :int32, :int32, :int32, :int32], :void
       typesig { [::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, GdkRectangle, ::Java::Int, Array.typed(::Java::Byte), ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int] }
+      # @param style cast=(GtkStyle *)
+      # @param window cast=(GdkWindow *)
+      # @param widget cast=(GtkWidget *)
+      # @param detail cast=(const gchar *)
+      # 
       # long
       # long
       # long
@@ -14186,6 +16056,11 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1paint_1expander, [:pointer, :long, :int32, :int32, :int32, :long, :int32, :long, :int32, :int32, :int32], :void
       typesig { [::Java::Int, ::Java::Int, ::Java::Int, GdkRectangle, ::Java::Int, Array.typed(::Java::Byte), ::Java::Int, ::Java::Int, ::Java::Int] }
+      # @param style cast=(GtkStyle *)
+      # @param window cast=(GdkWindow *)
+      # @param widget cast=(GtkWidget *)
+      # @param detail cast=(const gchar *)
+      # 
       # long
       # long
       # long
@@ -14208,6 +16083,11 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1paint_1extension, [:pointer, :long, :int32, :int32, :int32, :int32, :long, :int32, :long, :int32, :int32, :int32, :int32, :int32], :void
       typesig { [::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, GdkRectangle, ::Java::Int, Array.typed(::Java::Byte), ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int] }
+      # @param style cast=(GtkStyle *)
+      # @param window cast=(GdkWindow *)
+      # @param widget cast=(GtkWidget *)
+      # @param detail cast=(gchar *)
+      # 
       # long
       # long
       # long
@@ -14230,6 +16110,11 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1paint_1hline, [:pointer, :long, :int32, :int32, :int32, :long, :int32, :long, :int32, :int32, :int32], :void
       typesig { [::Java::Int, ::Java::Int, ::Java::Int, GdkRectangle, ::Java::Int, Array.typed(::Java::Byte), ::Java::Int, ::Java::Int, ::Java::Int] }
+      # @param style cast=(GtkStyle *)
+      # @param window cast=(GdkWindow *)
+      # @param widget cast=(GtkWidget *)
+      # @param detail cast=(const gchar *)
+      # 
       # long
       # long
       # long
@@ -14252,6 +16137,12 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1paint_1layout, [:pointer, :long, :int32, :int32, :int32, :int8, :long, :int32, :long, :int32, :int32, :int32], :void
       typesig { [::Java::Int, ::Java::Int, ::Java::Int, ::Java::Boolean, GdkRectangle, ::Java::Int, Array.typed(::Java::Byte), ::Java::Int, ::Java::Int, ::Java::Int] }
+      # @param style cast=(GtkStyle *)
+      # @param window cast=(GdkWindow *)
+      # @param widget cast=(GtkWidget *)
+      # @param detail cast=(const gchar *)
+      # @param layout cast=(PangoLayout *)
+      # 
       # long
       # long
       # long
@@ -14276,6 +16167,11 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1paint_1shadow_1gap, [:pointer, :long, :int32, :int32, :int32, :int32, :long, :int32, :long, :int32, :int32, :int32, :int32, :int32, :int32, :int32], :void
       typesig { [::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, GdkRectangle, ::Java::Int, Array.typed(::Java::Byte), ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int] }
+      # @param style cast=(GtkStyle *)
+      # @param window cast=(GdkWindow *)
+      # @param widget cast=(GtkWidget *)
+      # @param detail cast=(gchar *)
+      # 
       # long
       # long
       # long
@@ -14298,6 +16194,11 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1paint_1shadow, [:pointer, :long, :int32, :int32, :int32, :int32, :long, :int32, :long, :int32, :int32, :int32, :int32], :void
       typesig { [::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, GdkRectangle, ::Java::Int, Array.typed(::Java::Byte), ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int] }
+      # @param style cast=(GtkStyle *)
+      # @param window cast=(GdkWindow *)
+      # @param widget cast=(GtkWidget *)
+      # @param detail cast=(gchar *)
+      # 
       # long
       # long
       # long
@@ -14320,6 +16221,11 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1paint_1vline, [:pointer, :long, :int32, :int32, :int32, :long, :int32, :long, :int32, :int32, :int32], :void
       typesig { [::Java::Int, ::Java::Int, ::Java::Int, GdkRectangle, ::Java::Int, Array.typed(::Java::Byte), ::Java::Int, ::Java::Int, ::Java::Int] }
+      # @param style cast=(GtkStyle *)
+      # @param window cast=(GdkWindow *)
+      # @param widget cast=(GtkWidget *)
+      # @param detail cast=(const gchar *)
+      # 
       # long
       # long
       # long
@@ -14342,6 +16248,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1paper_1size_1free, [:pointer, :long, :int32], :void
       typesig { [::Java::Int] }
+      # @method flags=dynamic
       # long
       def __gtk_paper_size_free(size)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1gtk_1paper_1size_1free, JNI.env, self.jni_id, size.to_int)
@@ -14360,6 +16267,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1paper_1size_1new, [:pointer, :long, :long], :int32
       typesig { [Array.typed(::Java::Byte)] }
+      # @method flags=dynamic
       # long
       def __gtk_paper_size_new(name)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1gtk_1paper_1size_1new, JNI.env, self.jni_id, name.jni_id)
@@ -14378,6 +16286,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1paper_1size_1new_1from_1ppd, [:pointer, :long, :long, :long, :double, :double], :int32
       typesig { [Array.typed(::Java::Byte), Array.typed(::Java::Byte), ::Java::Double, ::Java::Double] }
+      # @method flags=dynamic
       # long
       def __gtk_paper_size_new_from_ppd(ppd_name, ppd_display_name, width, height)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1gtk_1paper_1size_1new_1from_1ppd, JNI.env, self.jni_id, ppd_name.jni_id, ppd_display_name.jni_id, width, height)
@@ -14396,6 +16305,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1paper_1size_1new_1custom, [:pointer, :long, :long, :long, :double, :double, :int32], :int32
       typesig { [Array.typed(::Java::Byte), Array.typed(::Java::Byte), ::Java::Double, ::Java::Double, ::Java::Int] }
+      # @method flags=dynamic
       # long
       def __gtk_paper_size_new_custom(name, display_name, width, height, unit)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1gtk_1paper_1size_1new_1custom, JNI.env, self.jni_id, name.jni_id, display_name.jni_id, width, height, unit.to_int)
@@ -14414,6 +16324,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1paper_1size_1get_1name, [:pointer, :long, :int32], :int32
       typesig { [::Java::Int] }
+      # @method flags=dynamic
       # long
       # long
       def __gtk_paper_size_get_name(size)
@@ -14434,6 +16345,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1paper_1size_1get_1display_1name, [:pointer, :long, :int32], :int32
       typesig { [::Java::Int] }
+      # @method flags=dynamic
       # long
       # long
       def __gtk_paper_size_get_display_name(size)
@@ -14454,6 +16366,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1paper_1size_1get_1ppd_1name, [:pointer, :long, :int32], :int32
       typesig { [::Java::Int] }
+      # @method flags=dynamic
       # long
       # long
       def __gtk_paper_size_get_ppd_name(size)
@@ -14474,6 +16387,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1paper_1size_1get_1width, [:pointer, :long, :int32, :int32], :double
       typesig { [::Java::Int, ::Java::Int] }
+      # @method flags=dynamic
       # long
       def __gtk_paper_size_get_width(size, unit)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1gtk_1paper_1size_1get_1width, JNI.env, self.jni_id, size.to_int, unit.to_int)
@@ -14492,6 +16406,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1paper_1size_1get_1height, [:pointer, :long, :int32, :int32], :double
       typesig { [::Java::Int, ::Java::Int] }
+      # @method flags=dynamic
       # long
       def __gtk_paper_size_get_height(size, unit)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1gtk_1paper_1size_1get_1height, JNI.env, self.jni_id, size.to_int, unit.to_int)
@@ -14510,6 +16425,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1paper_1size_1is_1custom, [:pointer, :long, :int32], :int8
       typesig { [::Java::Int] }
+      # @method flags=dynamic
       # long
       def __gtk_paper_size_is_custom(size)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1gtk_1paper_1size_1is_1custom, JNI.env, self.jni_id, size.to_int) != 0
@@ -14528,6 +16444,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1plug_1get_1id, [:pointer, :long, :int32], :int32
       typesig { [::Java::Int] }
+      # @param plug cast=(GtkPlug *)
       # long
       # long
       def __gtk_plug_get_id(plug)
@@ -14568,6 +16485,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1printer_1get_1backend, [:pointer, :long, :int32], :int32
       typesig { [::Java::Int] }
+      # @method flags=dynamic
       # long
       # long
       def __gtk_printer_get_backend(printer)
@@ -14588,6 +16506,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1printer_1get_1name, [:pointer, :long, :int32], :int32
       typesig { [::Java::Int] }
+      # @method flags=dynamic
       # long
       # long
       def __gtk_printer_get_name(printer)
@@ -14608,6 +16527,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1printer_1is_1default, [:pointer, :long, :int32], :int8
       typesig { [::Java::Int] }
+      # @method flags=dynamic
       # long
       def __gtk_printer_is_default(printer)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1gtk_1printer_1is_1default, JNI.env, self.jni_id, printer.to_int) != 0
@@ -14626,6 +16546,11 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1enumerate_1printers, [:pointer, :long, :int32, :int32, :int32, :int8], :void
       typesig { [::Java::Int, ::Java::Int, ::Java::Int, ::Java::Boolean] }
+      # @method flags=dynamic
+      # @param data cast=(gpointer)
+      # @param destroy cast=(GDestroyNotify)
+      # @param wait cast=(gboolean)
+      # 
       # long
       # long
       # long
@@ -14648,6 +16573,9 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1print_1job_1new, [:pointer, :long, :long, :int32, :int32, :int32], :int32
       typesig { [Array.typed(::Java::Byte), ::Java::Int, ::Java::Int, ::Java::Int] }
+      # @method flags=dynamic
+      # @param title cast=(const gchar *)
+      # 
       # long
       # long
       # long
@@ -14672,6 +16600,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1print_1job_1get_1settings, [:pointer, :long, :int32], :int32
       typesig { [::Java::Int] }
+      # @method flags=dynamic
       # long
       # long
       def __gtk_print_job_get_settings(job)
@@ -14692,6 +16621,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1print_1job_1get_1printer, [:pointer, :long, :int32], :int32
       typesig { [::Java::Int] }
+      # @method flags=dynamic
       # long
       # long
       def __gtk_print_job_get_printer(job)
@@ -14712,6 +16642,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1print_1job_1get_1title, [:pointer, :long, :int32], :int32
       typesig { [::Java::Int] }
+      # @method flags=dynamic
       # long
       # long
       def __gtk_print_job_get_title(job)
@@ -14732,6 +16663,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1print_1job_1get_1status, [:pointer, :long, :int32], :int32
       typesig { [::Java::Int] }
+      # @method flags=dynamic
       # long
       def __gtk_print_job_get_status(job)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1gtk_1print_1job_1get_1status, JNI.env, self.jni_id, job.to_int)
@@ -14750,6 +16682,10 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1print_1job_1set_1source_1file, [:pointer, :long, :int32, :long, :long], :int8
       typesig { [::Java::Int, Array.typed(::Java::Byte), Array.typed(::Java::Int)] }
+      # @method flags=dynamic
+      # @param filename cast=(const gchar *)
+      # @param error cast=(GError **)
+      # 
       # long
       # long
       def __gtk_print_job_set_source_file(job, filename, error)
@@ -14770,6 +16706,9 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1print_1job_1get_1surface, [:pointer, :long, :int32, :long], :int32
       typesig { [::Java::Int, Array.typed(::Java::Int)] }
+      # @method flags=dynamic
+      # @param error cast=(GError **)
+      # 
       # long
       # long
       # long
@@ -14792,6 +16731,10 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1print_1job_1send, [:pointer, :long, :int32, :int32, :int32, :int32], :void
       typesig { [::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int] }
+      # @method flags=dynamic
+      # @param user_data cast=(gpointer)
+      # @param dnotify cast=(GDestroyNotify)
+      # 
       # long
       # long
       # long
@@ -14816,6 +16759,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1print_1settings_1new, [:pointer, :long], :int32
       typesig { [] }
+      # @method flags=dynamic
       # long
       def __gtk_print_settings_new
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1gtk_1print_1settings_1new, JNI.env, self.jni_id)
@@ -14834,6 +16778,9 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1print_1settings_1foreach, [:pointer, :long, :int32, :int32, :int32], :void
       typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
+      # @method flags=dynamic
+      # @param data cast=(gpointer)
+      # 
       # long
       # long
       # long
@@ -14856,6 +16803,9 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1print_1settings_1get, [:pointer, :long, :int32, :long], :int32
       typesig { [::Java::Int, Array.typed(::Java::Byte)] }
+      # @method flags=dynamic
+      # @param key cast=(const gchar *)
+      # 
       # long
       # long
       def __gtk_print_settings_get(settings, key)
@@ -14876,6 +16826,10 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1print_1settings_1set, [:pointer, :long, :int32, :long, :long], :void
       typesig { [::Java::Int, Array.typed(::Java::Byte), Array.typed(::Java::Byte)] }
+      # @method flags=dynamic
+      # @param key cast=(const gchar *)
+      # @param value cast=(const gchar *)
+      # 
       # long
       def __gtk_print_settings_set(settings, key, value)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1gtk_1print_1settings_1set, JNI.env, self.jni_id, settings.to_int, key.jni_id, value.jni_id)
@@ -14894,6 +16848,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1print_1settings_1get_1printer, [:pointer, :long, :int32], :int32
       typesig { [::Java::Int] }
+      # @method flags=dynamic
       # long
       # long
       def __gtk_print_settings_get_printer(settings)
@@ -14914,6 +16869,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1print_1settings_1set_1printer, [:pointer, :long, :int32, :long], :void
       typesig { [::Java::Int, Array.typed(::Java::Byte)] }
+      # @method flags=dynamic
       # long
       def __gtk_print_settings_set_printer(settings, printer)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1gtk_1print_1settings_1set_1printer, JNI.env, self.jni_id, settings.to_int, printer.jni_id)
@@ -14932,6 +16888,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1print_1settings_1get_1orientation, [:pointer, :long, :int32], :int32
       typesig { [::Java::Int] }
+      # @method flags=dynamic
       # long
       def __gtk_print_settings_get_orientation(settings)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1gtk_1print_1settings_1get_1orientation, JNI.env, self.jni_id, settings.to_int)
@@ -14950,6 +16907,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1print_1settings_1set_1orientation, [:pointer, :long, :int32, :int32], :void
       typesig { [::Java::Int, ::Java::Int] }
+      # @method flags=dynamic
       # long
       def __gtk_print_settings_set_orientation(settings, orientation)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1gtk_1print_1settings_1set_1orientation, JNI.env, self.jni_id, settings.to_int, orientation.to_int)
@@ -14968,6 +16926,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1print_1settings_1get_1collate, [:pointer, :long, :int32], :int8
       typesig { [::Java::Int] }
+      # @method flags=dynamic
       # long
       def __gtk_print_settings_get_collate(settings)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1gtk_1print_1settings_1get_1collate, JNI.env, self.jni_id, settings.to_int) != 0
@@ -14986,6 +16945,9 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1print_1settings_1set_1collate, [:pointer, :long, :int32, :int8], :void
       typesig { [::Java::Int, ::Java::Boolean] }
+      # @method flags=dynamic
+      # @param collate cast=(gboolean)
+      # 
       # long
       def __gtk_print_settings_set_collate(settings, collate)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1gtk_1print_1settings_1set_1collate, JNI.env, self.jni_id, settings.to_int, collate ? 1 : 0)
@@ -15004,6 +16966,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1print_1settings_1get_1n_1copies, [:pointer, :long, :int32], :int32
       typesig { [::Java::Int] }
+      # @method flags=dynamic
       # long
       def __gtk_print_settings_get_n_copies(settings)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1gtk_1print_1settings_1get_1n_1copies, JNI.env, self.jni_id, settings.to_int)
@@ -15022,6 +16985,9 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1print_1settings_1set_1n_1copies, [:pointer, :long, :int32, :int32], :void
       typesig { [::Java::Int, ::Java::Int] }
+      # @method flags=dynamic
+      # @param num_copies cast=(gint)
+      # 
       # long
       def __gtk_print_settings_set_n_copies(settings, num_copies)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1gtk_1print_1settings_1set_1n_1copies, JNI.env, self.jni_id, settings.to_int, num_copies.to_int)
@@ -15040,6 +17006,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1print_1settings_1get_1print_1pages, [:pointer, :long, :int32], :int32
       typesig { [::Java::Int] }
+      # @method flags=dynamic
       # long
       def __gtk_print_settings_get_print_pages(settings)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1gtk_1print_1settings_1get_1print_1pages, JNI.env, self.jni_id, settings.to_int)
@@ -15058,6 +17025,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1print_1settings_1set_1print_1pages, [:pointer, :long, :int32, :int32], :void
       typesig { [::Java::Int, ::Java::Int] }
+      # @method flags=dynamic
       # long
       def __gtk_print_settings_set_print_pages(settings, pages)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1gtk_1print_1settings_1set_1print_1pages, JNI.env, self.jni_id, settings.to_int, pages.to_int)
@@ -15076,6 +17044,9 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1print_1settings_1get_1page_1ranges, [:pointer, :long, :int32, :long], :int32
       typesig { [::Java::Int, Array.typed(::Java::Int)] }
+      # @method flags=dynamic
+      # @param num_ranges cast=(gint *)
+      # 
       # long
       # long
       def __gtk_print_settings_get_page_ranges(settings, num_ranges)
@@ -15096,6 +17067,9 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1print_1settings_1set_1page_1ranges, [:pointer, :long, :int32, :long, :int32], :void
       typesig { [::Java::Int, Array.typed(::Java::Int), ::Java::Int] }
+      # @method flags=dynamic
+      # @param num_ranges cast=(gint)
+      # 
       # long
       def __gtk_print_settings_set_page_ranges(settings, page_ranges, num_ranges)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1gtk_1print_1settings_1set_1page_1ranges, JNI.env, self.jni_id, settings.to_int, page_ranges.jni_id, num_ranges.to_int)
@@ -15114,6 +17088,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1print_1settings_1get_1paper_1width, [:pointer, :long, :int32, :int32], :double
       typesig { [::Java::Int, ::Java::Int] }
+      # @method flags=dynamic
       # long
       def __gtk_print_settings_get_paper_width(settings, unit)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1gtk_1print_1settings_1get_1paper_1width, JNI.env, self.jni_id, settings.to_int, unit.to_int)
@@ -15132,6 +17107,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1print_1settings_1get_1paper_1height, [:pointer, :long, :int32, :int32], :double
       typesig { [::Java::Int, ::Java::Int] }
+      # @method flags=dynamic
       # long
       def __gtk_print_settings_get_paper_height(settings, unit)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1gtk_1print_1settings_1get_1paper_1height, JNI.env, self.jni_id, settings.to_int, unit.to_int)
@@ -15150,6 +17126,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1print_1settings_1get_1resolution, [:pointer, :long, :int32], :int32
       typesig { [::Java::Int] }
+      # @method flags=dynamic
       # long
       def __gtk_print_settings_get_resolution(settings)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1gtk_1print_1settings_1get_1resolution, JNI.env, self.jni_id, settings.to_int)
@@ -15168,6 +17145,10 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1print_1unix_1dialog_1new, [:pointer, :long, :long, :int32], :int32
       typesig { [Array.typed(::Java::Byte), ::Java::Int] }
+      # @method flags=dynamic
+      # @param title cast=(const gchar *)
+      # @param parent cast=(GtkWindow *)
+      # 
       # long
       # long
       def __gtk_print_unix_dialog_new(title, parent)
@@ -15188,6 +17169,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1print_1unix_1dialog_1set_1page_1setup, [:pointer, :long, :int32, :int32], :void
       typesig { [::Java::Int, ::Java::Int] }
+      # @method flags=dynamic
       # long
       # long
       def __gtk_print_unix_dialog_set_page_setup(dialog, page_setup)
@@ -15208,6 +17190,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1print_1unix_1dialog_1get_1page_1setup, [:pointer, :long, :int32], :int32
       typesig { [::Java::Int] }
+      # @method flags=dynamic
       # long
       # long
       def __gtk_print_unix_dialog_get_page_setup(dialog)
@@ -15228,6 +17211,9 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1print_1unix_1dialog_1set_1current_1page, [:pointer, :long, :int32, :int32], :void
       typesig { [::Java::Int, ::Java::Int] }
+      # @method flags=dynamic
+      # @param current_page cast=(gint)
+      # 
       # long
       def __gtk_print_unix_dialog_set_current_page(dialog, current_page)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1gtk_1print_1unix_1dialog_1set_1current_1page, JNI.env, self.jni_id, dialog.to_int, current_page.to_int)
@@ -15246,6 +17232,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1print_1unix_1dialog_1get_1current_1page, [:pointer, :long, :int32], :int32
       typesig { [::Java::Int] }
+      # @method flags=dynamic
       # long
       def __gtk_print_unix_dialog_get_current_page(dialog)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1gtk_1print_1unix_1dialog_1get_1current_1page, JNI.env, self.jni_id, dialog.to_int)
@@ -15264,6 +17251,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1print_1unix_1dialog_1set_1settings, [:pointer, :long, :int32, :int32], :void
       typesig { [::Java::Int, ::Java::Int] }
+      # @method flags=dynamic
       # long
       # long
       def __gtk_print_unix_dialog_set_settings(dialog, settings)
@@ -15284,6 +17272,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1print_1unix_1dialog_1get_1settings, [:pointer, :long, :int32], :int32
       typesig { [::Java::Int] }
+      # @method flags=dynamic
       # long
       # long
       def __gtk_print_unix_dialog_get_settings(dialog)
@@ -15304,6 +17293,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1print_1unix_1dialog_1get_1selected_1printer, [:pointer, :long, :int32], :int32
       typesig { [::Java::Int] }
+      # @method flags=dynamic
       # long
       # long
       def __gtk_print_unix_dialog_get_selected_printer(dialog)
@@ -15324,6 +17314,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1print_1unix_1dialog_1set_1manual_1capabilities, [:pointer, :long, :int32, :int32], :void
       typesig { [::Java::Int, ::Java::Int] }
+      # @method flags=dynamic
       # long
       # long
       def __gtk_print_unix_dialog_set_manual_capabilities(dialog, capabilities)
@@ -15362,6 +17353,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1progress_1bar_1pulse, [:pointer, :long, :int32], :void
       typesig { [::Java::Int] }
+      # @param pbar cast=(GtkProgressBar *)
       # long
       def __gtk_progress_bar_pulse(pbar)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1gtk_1progress_1bar_1pulse, JNI.env, self.jni_id, pbar.to_int)
@@ -15380,6 +17372,9 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1progress_1bar_1set_1fraction, [:pointer, :long, :int32, :double], :void
       typesig { [::Java::Int, ::Java::Double] }
+      # @param pbar cast=(GtkProgressBar *)
+      # @param fraction cast=(gdouble)
+      # 
       # long
       def __gtk_progress_bar_set_fraction(pbar, fraction)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1gtk_1progress_1bar_1set_1fraction, JNI.env, self.jni_id, pbar.to_int, fraction)
@@ -15398,6 +17393,9 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1progress_1bar_1set_1orientation, [:pointer, :long, :int32, :int32], :void
       typesig { [::Java::Int, ::Java::Int] }
+      # @param pbar cast=(GtkProgressBar *)
+      # @param orientation cast=(GtkProgressBarOrientation)
+      # 
       # long
       def __gtk_progress_bar_set_orientation(pbar, orientation)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1gtk_1progress_1bar_1set_1orientation, JNI.env, self.jni_id, pbar.to_int, orientation.to_int)
@@ -15416,6 +17414,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1radio_1button_1get_1group, [:pointer, :long, :int32], :int32
       typesig { [::Java::Int] }
+      # @param radio_button cast=(GtkRadioButton *)
       # long
       # long
       def __gtk_radio_button_get_group(radio_button)
@@ -15436,6 +17435,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1radio_1button_1new, [:pointer, :long, :int32], :int32
       typesig { [::Java::Int] }
+      # @param group cast=(GSList *)
       # long
       # long
       def __gtk_radio_button_new(group)
@@ -15456,6 +17456,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1radio_1menu_1item_1get_1group, [:pointer, :long, :int32], :int32
       typesig { [::Java::Int] }
+      # @param radio_menu_item cast=(GtkRadioMenuItem *)
       # long
       # long
       def __gtk_radio_menu_item_get_group(radio_menu_item)
@@ -15476,6 +17477,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1radio_1menu_1item_1new, [:pointer, :long, :int32], :int32
       typesig { [::Java::Int] }
+      # @param group cast=(GSList *)
       # long
       # long
       def __gtk_radio_menu_item_new(group)
@@ -15496,6 +17498,9 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1radio_1menu_1item_1new_1with_1label, [:pointer, :long, :int32, :long], :int32
       typesig { [::Java::Int, Array.typed(::Java::Byte)] }
+      # @param group cast=(GSList *)
+      # @param label cast=(const gchar *)
+      # 
       # long
       # long
       def __gtk_radio_menu_item_new_with_label(group, label)
@@ -15516,6 +17521,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1range_1get_1adjustment, [:pointer, :long, :int32], :int32
       typesig { [::Java::Int] }
+      # @param range cast=(GtkRange *)
       # long
       # long
       def __gtk_range_get_adjustment(range)
@@ -15536,6 +17542,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1range_1set_1increments, [:pointer, :long, :int32, :double, :double], :void
       typesig { [::Java::Int, ::Java::Double, ::Java::Double] }
+      # @param range cast=(GtkRange *)
       # long
       def __gtk_range_set_increments(range, step, page)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1gtk_1range_1set_1increments, JNI.env, self.jni_id, range.to_int, step, page)
@@ -15554,6 +17561,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1range_1set_1inverted, [:pointer, :long, :int32, :int8], :void
       typesig { [::Java::Int, ::Java::Boolean] }
+      # @param range cast=(GtkRange *)
       # long
       def __gtk_range_set_inverted(range, setting)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1gtk_1range_1set_1inverted, JNI.env, self.jni_id, range.to_int, setting ? 1 : 0)
@@ -15572,6 +17580,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1range_1set_1range, [:pointer, :long, :int32, :double, :double], :void
       typesig { [::Java::Int, ::Java::Double, ::Java::Double] }
+      # @param range cast=(GtkRange *)
       # long
       def __gtk_range_set_range(range, min, max)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1gtk_1range_1set_1range, JNI.env, self.jni_id, range.to_int, min, max)
@@ -15590,6 +17599,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1range_1set_1value, [:pointer, :long, :int32, :double], :void
       typesig { [::Java::Int, ::Java::Double] }
+      # @param range cast=(GtkRange *)
       # long
       def __gtk_range_set_value(range, value)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1gtk_1range_1set_1value, JNI.env, self.jni_id, range.to_int, value)
@@ -15608,6 +17618,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1rc_1parse_1string, [:pointer, :long, :long], :void
       typesig { [Array.typed(::Java::Byte)] }
+      # @param rc_string cast=(const gchar *)
       def __gtk_rc_parse_string(rc_string)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1gtk_1rc_1parse_1string, JNI.env, self.jni_id, rc_string.jni_id)
       end
@@ -15624,6 +17635,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1rc_1style_1get_1bg_1pixmap_1name, [:pointer, :long, :int32, :int32], :int32
       typesig { [::Java::Int, ::Java::Int] }
+      # @param style cast=(GtkRcStyle *)
       # long
       # long
       def __gtk_rc_style_get_bg_pixmap_name(style, index)
@@ -15644,6 +17656,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1rc_1style_1get_1color_1flags, [:pointer, :long, :int32, :int32], :int32
       typesig { [::Java::Int, ::Java::Int] }
+      # @param style cast=(GtkRcStyle *)
       # long
       def __gtk_rc_style_get_color_flags(style, index)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1gtk_1rc_1style_1get_1color_1flags, JNI.env, self.jni_id, style.to_int, index.to_int)
@@ -15662,6 +17675,9 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1rc_1style_1set_1bg, [:pointer, :long, :int32, :int32, :long], :void
       typesig { [::Java::Int, ::Java::Int, GdkColor] }
+      # @param style cast=(GtkRcStyle *)
+      # @param color flags=no_out
+      # 
       # long
       def __gtk_rc_style_set_bg(style, index, color)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1gtk_1rc_1style_1set_1bg, JNI.env, self.jni_id, style.to_int, index.to_int, color.jni_id)
@@ -15680,6 +17696,9 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1rc_1style_1set_1bg_1pixmap_1name, [:pointer, :long, :int32, :int32, :int32], :void
       typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
+      # @param style cast=(GtkRcStyle *)
+      # @param name cast=(char *)
+      # 
       # long
       # long
       def __gtk_rc_style_set_bg_pixmap_name(style, index, name)
@@ -15700,6 +17719,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1rc_1style_1set_1color_1flags, [:pointer, :long, :int32, :int32, :int32], :void
       typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
+      # @param style cast=(GtkRcStyle *)
       # long
       def __gtk_rc_style_set_color_flags(style, index, flag)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1gtk_1rc_1style_1set_1color_1flags, JNI.env, self.jni_id, style.to_int, index.to_int, flag.to_int)
@@ -15718,6 +17738,9 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1scale_1set_1digits, [:pointer, :long, :int32, :int32], :void
       typesig { [::Java::Int, ::Java::Int] }
+      # @param scale cast=(GtkScale *)
+      # @param digits cast=(gint)
+      # 
       # long
       def __gtk_scale_set_digits(scale, digits)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1gtk_1scale_1set_1digits, JNI.env, self.jni_id, scale.to_int, digits.to_int)
@@ -15736,6 +17759,9 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1scale_1set_1draw_1value, [:pointer, :long, :int32, :int8], :void
       typesig { [::Java::Int, ::Java::Boolean] }
+      # @param scale cast=(GtkScale *)
+      # @param draw_value cast=(gboolean)
+      # 
       # long
       def __gtk_scale_set_draw_value(scale, draw_value)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1gtk_1scale_1set_1draw_1value, JNI.env, self.jni_id, scale.to_int, draw_value ? 1 : 0)
@@ -15754,6 +17780,9 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1rc_1style_1set_1fg, [:pointer, :long, :int32, :int32, :long], :void
       typesig { [::Java::Int, ::Java::Int, GdkColor] }
+      # @param style cast=(GtkRcStyle *)
+      # @param color flags=no_out
+      # 
       # long
       def __gtk_rc_style_set_fg(style, index, color)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1gtk_1rc_1style_1set_1fg, JNI.env, self.jni_id, style.to_int, index.to_int, color.jni_id)
@@ -15772,6 +17801,9 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1rc_1style_1set_1text, [:pointer, :long, :int32, :int32, :long], :void
       typesig { [::Java::Int, ::Java::Int, GdkColor] }
+      # @param style cast=(GtkRcStyle *)
+      # @param color flags=no_out
+      # 
       # long
       def __gtk_rc_style_set_text(style, index, color)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1gtk_1rc_1style_1set_1text, JNI.env, self.jni_id, style.to_int, index.to_int, color.jni_id)
@@ -15790,6 +17822,9 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1scrolled_1window_1add_1with_1viewport, [:pointer, :long, :int32, :int32], :void
       typesig { [::Java::Int, ::Java::Int] }
+      # @param scrolled_window cast=(GtkScrolledWindow *)
+      # @param child cast=(GtkWidget *)
+      # 
       # long
       # long
       def __gtk_scrolled_window_add_with_viewport(scrolled_window, child)
@@ -15810,6 +17845,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1scrolled_1window_1get_1hadjustment, [:pointer, :long, :int32], :int32
       typesig { [::Java::Int] }
+      # @param scrolled_window cast=(GtkScrolledWindow *)
       # long
       # long
       def __gtk_scrolled_window_get_hadjustment(scrolled_window)
@@ -15830,6 +17866,10 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1scrolled_1window_1get_1policy, [:pointer, :long, :int32, :long, :long], :void
       typesig { [::Java::Int, Array.typed(::Java::Int), Array.typed(::Java::Int)] }
+      # @param scrolled_window cast=(GtkScrolledWindow *)
+      # @param hscrollbar_policy cast=(GtkPolicyType *)
+      # @param vscrollbar_policy cast=(GtkPolicyType *)
+      # 
       # long
       def __gtk_scrolled_window_get_policy(scrolled_window, hscrollbar_policy, vscrollbar_policy)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1gtk_1scrolled_1window_1get_1policy, JNI.env, self.jni_id, scrolled_window.to_int, hscrollbar_policy.jni_id, vscrollbar_policy.jni_id)
@@ -15848,6 +17888,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1scrolled_1window_1get_1shadow_1type, [:pointer, :long, :int32], :int32
       typesig { [::Java::Int] }
+      # @param scrolled_window cast=(GtkScrolledWindow *)
       # long
       def __gtk_scrolled_window_get_shadow_type(scrolled_window)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1gtk_1scrolled_1window_1get_1shadow_1type, JNI.env, self.jni_id, scrolled_window.to_int)
@@ -15866,6 +17907,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1scrolled_1window_1get_1vadjustment, [:pointer, :long, :int32], :int32
       typesig { [::Java::Int] }
+      # @param scrolled_window cast=(GtkScrolledWindow *)
       # long
       # long
       def __gtk_scrolled_window_get_vadjustment(scrolled_window)
@@ -15886,6 +17928,9 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1scrolled_1window_1new, [:pointer, :long, :int32, :int32], :int32
       typesig { [::Java::Int, ::Java::Int] }
+      # @param hadjustment cast=(GtkAdjustment *)
+      # @param vadjustment cast=(GtkAdjustment *)
+      # 
       # long
       # long
       # long
@@ -15908,6 +17953,9 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1scrolled_1window_1set_1placement, [:pointer, :long, :int32, :int32], :void
       typesig { [::Java::Int, ::Java::Int] }
+      # @param scrolled_window cast=(GtkScrolledWindow *)
+      # @param placement cast=(GtkCornerType)
+      # 
       # long
       def __gtk_scrolled_window_set_placement(scrolled_window, placement)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1gtk_1scrolled_1window_1set_1placement, JNI.env, self.jni_id, scrolled_window.to_int, placement.to_int)
@@ -15926,6 +17974,10 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1scrolled_1window_1set_1policy, [:pointer, :long, :int32, :int32, :int32], :void
       typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
+      # @param scrolled_window cast=(GtkScrolledWindow *)
+      # @param hscrollbar_policy cast=(GtkPolicyType)
+      # @param vscrollbar_policy cast=(GtkPolicyType)
+      # 
       # long
       def __gtk_scrolled_window_set_policy(scrolled_window, hscrollbar_policy, vscrollbar_policy)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1gtk_1scrolled_1window_1set_1policy, JNI.env, self.jni_id, scrolled_window.to_int, hscrollbar_policy.to_int, vscrollbar_policy.to_int)
@@ -15944,6 +17996,9 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1scrolled_1window_1set_1shadow_1type, [:pointer, :long, :int32, :int32], :void
       typesig { [::Java::Int, ::Java::Int] }
+      # @param scrolled_window cast=(GtkScrolledWindow *)
+      # @param type cast=(GtkShadowType)
+      # 
       # long
       def __gtk_scrolled_window_set_shadow_type(scrolled_window, type)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1gtk_1scrolled_1window_1set_1shadow_1type, JNI.env, self.jni_id, scrolled_window.to_int, type.to_int)
@@ -15980,6 +18035,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1selection_1data_1free, [:pointer, :long, :int32], :void
       typesig { [::Java::Int] }
+      # @param selection_data cast=(GtkSelectionData *)
       # long
       def __gtk_selection_data_free(selection_data)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1gtk_1selection_1data_1free, JNI.env, self.jni_id, selection_data.to_int)
@@ -15998,6 +18054,12 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1selection_1data_1set, [:pointer, :long, :int32, :int32, :int32, :int32, :int32], :void
       typesig { [::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int] }
+      # @param selection_data cast=(GtkSelectionData *)
+      # @param type cast=(GdkAtom)
+      # @param format cast=(gint)
+      # @param data cast=(const guchar *)
+      # @param length cast=(gint)
+      # 
       # long
       # long
       # long
@@ -16056,6 +18118,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1socket_1get_1id, [:pointer, :long, :int32], :int32
       typesig { [::Java::Int] }
+      # @param socket cast=(GtkSocket *)
       # long
       # long
       def __gtk_socket_get_id(socket)
@@ -16094,6 +18157,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1spin_1button_1new, [:pointer, :long, :int32, :double, :int32], :int32
       typesig { [::Java::Int, ::Java::Double, ::Java::Int] }
+      # @param adjustment cast=(GtkAdjustment *)
       # long
       # long
       def __gtk_spin_button_new(adjustment, climb_rate, digits)
@@ -16114,6 +18178,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1spin_1button_1get_1adjustment, [:pointer, :long, :int32], :int32
       typesig { [::Java::Int] }
+      # @param spin_button cast=(GtkSpinButton*)
       # long
       # long
       def __gtk_spin_button_get_adjustment(spin_button)
@@ -16134,6 +18199,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1spin_1button_1get_1digits, [:pointer, :long, :int32], :int32
       typesig { [::Java::Int] }
+      # @param spin_button cast=(GtkSpinButton*)
       # long
       def __gtk_spin_button_get_digits(spin_button)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1gtk_1spin_1button_1get_1digits, JNI.env, self.jni_id, spin_button.to_int)
@@ -16152,6 +18218,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1spin_1button_1set_1digits, [:pointer, :long, :int32, :int32], :void
       typesig { [::Java::Int, ::Java::Int] }
+      # @param spin_button cast=(GtkSpinButton*)
       # long
       def __gtk_spin_button_set_digits(spin_button, digits)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1gtk_1spin_1button_1set_1digits, JNI.env, self.jni_id, spin_button.to_int, digits.to_int)
@@ -16170,6 +18237,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1spin_1button_1set_1increments, [:pointer, :long, :int32, :double, :double], :void
       typesig { [::Java::Int, ::Java::Double, ::Java::Double] }
+      # @param spin_button cast=(GtkSpinButton*)
       # long
       def __gtk_spin_button_set_increments(spin_button, step, page)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1gtk_1spin_1button_1set_1increments, JNI.env, self.jni_id, spin_button.to_int, step, page)
@@ -16188,6 +18256,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1spin_1button_1set_1range, [:pointer, :long, :int32, :double, :double], :void
       typesig { [::Java::Int, ::Java::Double, ::Java::Double] }
+      # @param spin_button cast=(GtkSpinButton*)
       # long
       def __gtk_spin_button_set_range(spin_button, max, min)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1gtk_1spin_1button_1set_1range, JNI.env, self.jni_id, spin_button.to_int, max, min)
@@ -16206,6 +18275,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1spin_1button_1set_1value, [:pointer, :long, :int32, :double], :void
       typesig { [::Java::Int, ::Java::Double] }
+      # @param spin_button cast=(GtkSpinButton*)
       # long
       def __gtk_spin_button_set_value(spin_button, value)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1gtk_1spin_1button_1set_1value, JNI.env, self.jni_id, spin_button.to_int, value)
@@ -16224,6 +18294,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1spin_1button_1set_1wrap, [:pointer, :long, :int32, :int8], :void
       typesig { [::Java::Int, ::Java::Boolean] }
+      # @param spin_button cast=(GtkSpinButton*)
       # long
       def __gtk_spin_button_set_wrap(spin_button, wrap)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1gtk_1spin_1button_1set_1wrap, JNI.env, self.jni_id, spin_button.to_int, wrap ? 1 : 0)
@@ -16242,6 +18313,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1spin_1button_1update, [:pointer, :long, :int32], :void
       typesig { [::Java::Int] }
+      # @param spin_button cast=(GtkSpinButton*)
       # long
       def __gtk_spin_button_update(spin_button)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1gtk_1spin_1button_1update, JNI.env, self.jni_id, spin_button.to_int)
@@ -16258,8 +18330,136 @@ module Org::Eclipse::Swt::Internal::Gtk
         end
       end
       
+      JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1status_1icon_1get_1geometry, [:pointer, :long, :int32, :int32, :long, :int32], :int8
+      typesig { [::Java::Int, ::Java::Int, GdkRectangle, ::Java::Int] }
+      # @method flags=dynamic
+      # 
+      # long
+      # long
+      # long
+      def __gtk_status_icon_get_geometry(handle, screen, area, orientation)
+        JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1gtk_1status_1icon_1get_1geometry, JNI.env, self.jni_id, handle.to_int, screen.to_int, area.jni_id, orientation.to_int) != 0
+      end
+      
+      typesig { [::Java::Int, ::Java::Int, GdkRectangle, ::Java::Int] }
+      # long
+      # long
+      # long
+      def gtk_status_icon_get_geometry(handle, screen, area, orientation)
+        PLATFORM_LOCK.lock
+        begin
+          return __gtk_status_icon_get_geometry(handle, screen, area, orientation)
+        ensure
+          PLATFORM_LOCK.unlock
+        end
+      end
+      
+      JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1status_1icon_1get_1visible, [:pointer, :long, :int32], :int8
+      typesig { [::Java::Int] }
+      # @method flags=dynamic
+      # 
+      # long
+      def __gtk_status_icon_get_visible(handle)
+        JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1gtk_1status_1icon_1get_1visible, JNI.env, self.jni_id, handle.to_int) != 0
+      end
+      
+      typesig { [::Java::Int] }
+      # long
+      def gtk_status_icon_get_visible(handle)
+        PLATFORM_LOCK.lock
+        begin
+          return __gtk_status_icon_get_visible(handle)
+        ensure
+          PLATFORM_LOCK.unlock
+        end
+      end
+      
+      JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1status_1icon_1new, [:pointer, :long], :int32
+      typesig { [] }
+      # @method flags=dynamic
+      # long
+      def __gtk_status_icon_new
+        JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1gtk_1status_1icon_1new, JNI.env, self.jni_id)
+      end
+      
+      typesig { [] }
+      # long
+      def gtk_status_icon_new
+        PLATFORM_LOCK.lock
+        begin
+          return __gtk_status_icon_new
+        ensure
+          PLATFORM_LOCK.unlock
+        end
+      end
+      
+      JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1status_1icon_1set_1from_1pixbuf, [:pointer, :long, :int32, :int32], :void
+      typesig { [::Java::Int, ::Java::Int] }
+      # @method flags=dynamic
+      # 
+      # long
+      # long
+      def __gtk_status_icon_set_from_pixbuf(handle, pixbuf)
+        JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1gtk_1status_1icon_1set_1from_1pixbuf, JNI.env, self.jni_id, handle.to_int, pixbuf.to_int)
+      end
+      
+      typesig { [::Java::Int, ::Java::Int] }
+      # long
+      # long
+      def gtk_status_icon_set_from_pixbuf(handle, pixbuf)
+        PLATFORM_LOCK.lock
+        begin
+          __gtk_status_icon_set_from_pixbuf(handle, pixbuf)
+        ensure
+          PLATFORM_LOCK.unlock
+        end
+      end
+      
+      JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1status_1icon_1set_1visible, [:pointer, :long, :int32, :int8], :void
+      typesig { [::Java::Int, ::Java::Boolean] }
+      # @method flags=dynamic
+      # 
+      # long
+      def __gtk_status_icon_set_visible(handle, visible)
+        JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1gtk_1status_1icon_1set_1visible, JNI.env, self.jni_id, handle.to_int, visible ? 1 : 0)
+      end
+      
+      typesig { [::Java::Int, ::Java::Boolean] }
+      # long
+      def gtk_status_icon_set_visible(handle, visible)
+        PLATFORM_LOCK.lock
+        begin
+          __gtk_status_icon_set_visible(handle, visible)
+        ensure
+          PLATFORM_LOCK.unlock
+        end
+      end
+      
+      JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1status_1icon_1set_1tooltip, [:pointer, :long, :int32, :long], :void
+      typesig { [::Java::Int, Array.typed(::Java::Byte)] }
+      # @method flags=dynamic
+      # 
+      # long
+      def __gtk_status_icon_set_tooltip(handle, tip_text)
+        JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1gtk_1status_1icon_1set_1tooltip, JNI.env, self.jni_id, handle.to_int, tip_text.jni_id)
+      end
+      
+      typesig { [::Java::Int, Array.typed(::Java::Byte)] }
+      # long
+      def gtk_status_icon_set_tooltip(handle, tip_text)
+        PLATFORM_LOCK.lock
+        begin
+          __gtk_status_icon_set_tooltip(handle, tip_text)
+        ensure
+          PLATFORM_LOCK.unlock
+        end
+      end
+      
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1style_1get_1base, [:pointer, :long, :int32, :int32, :long], :void
       typesig { [::Java::Int, ::Java::Int, GdkColor] }
+      # @param style cast=(GtkStyle *)
+      # @param color flags=no_in
+      # 
       # long
       def __gtk_style_get_base(style, index, color)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1gtk_1style_1get_1base, JNI.env, self.jni_id, style.to_int, index.to_int, color.jni_id)
@@ -16278,6 +18478,9 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1style_1get_1black, [:pointer, :long, :int32, :long], :void
       typesig { [::Java::Int, GdkColor] }
+      # @param style cast=(GtkStyle *)
+      # @param color flags=no_in
+      # 
       # long
       def __gtk_style_get_black(style, color)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1gtk_1style_1get_1black, JNI.env, self.jni_id, style.to_int, color.jni_id)
@@ -16296,6 +18499,9 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1style_1get_1bg, [:pointer, :long, :int32, :int32, :long], :void
       typesig { [::Java::Int, ::Java::Int, GdkColor] }
+      # @param style cast=(GtkStyle *)
+      # @param color flags=no_in
+      # 
       # long
       def __gtk_style_get_bg(style, index, color)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1gtk_1style_1get_1bg, JNI.env, self.jni_id, style.to_int, index.to_int, color.jni_id)
@@ -16314,6 +18520,9 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1style_1get_1dark, [:pointer, :long, :int32, :int32, :long], :void
       typesig { [::Java::Int, ::Java::Int, GdkColor] }
+      # @param style cast=(GtkStyle *)
+      # @param color flags=no_in
+      # 
       # long
       def __gtk_style_get_dark(style, index, color)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1gtk_1style_1get_1dark, JNI.env, self.jni_id, style.to_int, index.to_int, color.jni_id)
@@ -16332,6 +18541,9 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1style_1get_1fg, [:pointer, :long, :int32, :int32, :long], :void
       typesig { [::Java::Int, ::Java::Int, GdkColor] }
+      # @param style cast=(GtkStyle *)
+      # @param color flags=no_in
+      # 
       # long
       def __gtk_style_get_fg(style, index, color)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1gtk_1style_1get_1fg, JNI.env, self.jni_id, style.to_int, index.to_int, color.jni_id)
@@ -16350,6 +18562,9 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1style_1get_1fg_1gc, [:pointer, :long, :int32, :int32, :long], :void
       typesig { [::Java::Int, ::Java::Int, Array.typed(::Java::Int)] }
+      # @param style cast=(GtkStyle *)
+      # @param gc cast=(GdkGC **),flags=no_in
+      # 
       # long
       # long
       def __gtk_style_get_fg_gc(style, index, gc)
@@ -16370,6 +18585,9 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1style_1get_1bg_1gc, [:pointer, :long, :int32, :int32, :long], :void
       typesig { [::Java::Int, ::Java::Int, Array.typed(::Java::Int)] }
+      # @param style cast=(GtkStyle *)
+      # @param gc cast=(GdkGC **),flags=no_in
+      # 
       # long
       # long
       def __gtk_style_get_bg_gc(style, index, gc)
@@ -16390,6 +18608,9 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1style_1get_1light_1gc, [:pointer, :long, :int32, :int32, :long], :void
       typesig { [::Java::Int, ::Java::Int, Array.typed(::Java::Int)] }
+      # @param style cast=(GtkStyle *)
+      # @param gc cast=(GdkGC **)
+      # 
       # long
       # long
       def __gtk_style_get_light_gc(style, index, gc)
@@ -16410,6 +18631,9 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1style_1get_1dark_1gc, [:pointer, :long, :int32, :int32, :long], :void
       typesig { [::Java::Int, ::Java::Int, Array.typed(::Java::Int)] }
+      # @param style cast=(GtkStyle *)
+      # @param gc cast=(GdkGC **),flags=no_in
+      # 
       # long
       # long
       def __gtk_style_get_dark_gc(style, index, gc)
@@ -16430,6 +18654,9 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1style_1get_1mid_1gc, [:pointer, :long, :int32, :int32, :long], :void
       typesig { [::Java::Int, ::Java::Int, Array.typed(::Java::Int)] }
+      # @param style cast=(GtkStyle *)
+      # @param gc cast=(GdkGC **)
+      # 
       # long
       # long
       def __gtk_style_get_mid_gc(style, index, gc)
@@ -16450,6 +18677,9 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1style_1get_1text_1gc, [:pointer, :long, :int32, :int32, :long], :void
       typesig { [::Java::Int, ::Java::Int, Array.typed(::Java::Int)] }
+      # @param style cast=(GtkStyle *)
+      # @param gc cast=(GdkGC **)
+      # 
       # long
       # long
       def __gtk_style_get_text_gc(style, index, gc)
@@ -16470,6 +18700,9 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1style_1get_1text_1aa_1gc, [:pointer, :long, :int32, :int32, :long], :void
       typesig { [::Java::Int, ::Java::Int, Array.typed(::Java::Int)] }
+      # @param style cast=(GtkStyle *)
+      # @param gc cast=(GdkGC **)
+      # 
       # long
       # long
       def __gtk_style_get_text_aa_gc(style, index, gc)
@@ -16490,6 +18723,9 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1style_1get_1black_1gc, [:pointer, :long, :int32, :long], :void
       typesig { [::Java::Int, Array.typed(::Java::Int)] }
+      # @param style cast=(GtkStyle *)
+      # @param gc cast=(GdkGC **),flags=no_in
+      # 
       # long
       # long
       def __gtk_style_get_black_gc(style, gc)
@@ -16510,6 +18746,9 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1style_1get_1white_1gc, [:pointer, :long, :int32, :long], :void
       typesig { [::Java::Int, Array.typed(::Java::Int)] }
+      # @param style cast=(GtkStyle *)
+      # @param gc cast=(GdkGC **)
+      # 
       # long
       # long
       def __gtk_style_get_white_gc(style, gc)
@@ -16530,6 +18769,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1style_1get_1font_1desc, [:pointer, :long, :int32], :int32
       typesig { [::Java::Int] }
+      # @param style cast=(GtkStyle *)
       # long
       # long
       def __gtk_style_get_font_desc(style)
@@ -16550,6 +18790,9 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1style_1get_1light, [:pointer, :long, :int32, :int32, :long], :void
       typesig { [::Java::Int, ::Java::Int, GdkColor] }
+      # @param style cast=(GtkStyle *)
+      # @param color flags=no_in
+      # 
       # long
       def __gtk_style_get_light(style, index, color)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1gtk_1style_1get_1light, JNI.env, self.jni_id, style.to_int, index.to_int, color.jni_id)
@@ -16568,6 +18811,9 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1style_1get_1text, [:pointer, :long, :int32, :int32, :long], :void
       typesig { [::Java::Int, ::Java::Int, GdkColor] }
+      # @param style cast=(GtkStyle *)
+      # @param color flags=no_in
+      # 
       # long
       def __gtk_style_get_text(style, index, color)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1gtk_1style_1get_1text, JNI.env, self.jni_id, style.to_int, index.to_int, color.jni_id)
@@ -16586,6 +18832,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1style_1get_1xthickness, [:pointer, :long, :int32], :int32
       typesig { [::Java::Int] }
+      # @param style cast=(GtkStyle *)
       # long
       def __gtk_style_get_xthickness(style)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1gtk_1style_1get_1xthickness, JNI.env, self.jni_id, style.to_int)
@@ -16604,6 +18851,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1style_1get_1ythickness, [:pointer, :long, :int32], :int32
       typesig { [::Java::Int] }
+      # @param style cast=(GtkStyle *)
       # long
       def __gtk_style_get_ythickness(style)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1gtk_1style_1get_1ythickness, JNI.env, self.jni_id, style.to_int)
@@ -16622,6 +18870,11 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1style_1render_1icon, [:pointer, :long, :int32, :int32, :int32, :int32, :int32, :int32, :long], :int32
       typesig { [::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, Array.typed(::Java::Byte)] }
+      # @param style cast=(GtkStyle *)
+      # @param source cast=(GtkIconSource *)
+      # @param widget cast=(GtkWidget *)
+      # @param detail cast=(const gchar *)
+      # 
       # long
       # long
       # long
@@ -16646,6 +18899,9 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1target_1list_1new, [:pointer, :long, :int32, :int32], :int32
       typesig { [::Java::Int, ::Java::Int] }
+      # @param targets cast=(const GtkTargetEntry *)
+      # @param ntargets cast=(guint)
+      # 
       # long
       # long
       def __gtk_target_list_new(targets, ntargets)
@@ -16666,6 +18922,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1target_1list_1unref, [:pointer, :long, :int32], :void
       typesig { [::Java::Int] }
+      # @param list cast=(GtkTargetList *)
       # long
       def __gtk_target_list_unref(list)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1gtk_1target_1list_1unref, JNI.env, self.jni_id, list.to_int)
@@ -16684,6 +18941,9 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1text_1buffer_1copy_1clipboard, [:pointer, :long, :int32, :int32], :void
       typesig { [::Java::Int, ::Java::Int] }
+      # @param buffer cast=(GtkTextBuffer *)
+      # @param clipboard cast=(GtkClipboard *)
+      # 
       # long
       # long
       def __gtk_text_buffer_copy_clipboard(buffer, clipboard)
@@ -16704,6 +18964,10 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1text_1buffer_1cut_1clipboard, [:pointer, :long, :int32, :int32, :int8], :void
       typesig { [::Java::Int, ::Java::Int, ::Java::Boolean] }
+      # @param buffer cast=(GtkTextBuffer *)
+      # @param clipboard cast=(GtkClipboard *)
+      # @param default_editable cast=(gboolean)
+      # 
       # long
       # long
       def __gtk_text_buffer_cut_clipboard(buffer, clipboard, default_editable)
@@ -16724,6 +18988,10 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1text_1buffer_1delete, [:pointer, :long, :int32, :long, :long], :void
       typesig { [::Java::Int, Array.typed(::Java::Byte), Array.typed(::Java::Byte)] }
+      # @param buffer cast=(GtkTextBuffer *)
+      # @param start cast=(GtkTextIter *)
+      # @param end cast=(GtkTextIter *)
+      # 
       # long
       def __gtk_text_buffer_delete(buffer, start, end_)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1gtk_1text_1buffer_1delete, JNI.env, self.jni_id, buffer.to_int, start.jni_id, end_.jni_id)
@@ -16742,6 +19010,10 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1text_1buffer_1get_1bounds, [:pointer, :long, :int32, :long, :long], :void
       typesig { [::Java::Int, Array.typed(::Java::Byte), Array.typed(::Java::Byte)] }
+      # @param buffer cast=(GtkTextBuffer *)
+      # @param start cast=(GtkTextIter *)
+      # @param end cast=(GtkTextIter *)
+      # 
       # long
       def __gtk_text_buffer_get_bounds(buffer, start, end_)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1gtk_1text_1buffer_1get_1bounds, JNI.env, self.jni_id, buffer.to_int, start.jni_id, end_.jni_id)
@@ -16760,6 +19032,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1text_1buffer_1get_1char_1count, [:pointer, :long, :int32], :int32
       typesig { [::Java::Int] }
+      # @param buffer cast=(GtkTextBuffer *)
       # long
       def __gtk_text_buffer_get_char_count(buffer)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1gtk_1text_1buffer_1get_1char_1count, JNI.env, self.jni_id, buffer.to_int)
@@ -16778,6 +19051,9 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1text_1buffer_1get_1end_1iter, [:pointer, :long, :int32, :long], :void
       typesig { [::Java::Int, Array.typed(::Java::Byte)] }
+      # @param buffer cast=(GtkTextBuffer *)
+      # @param iter cast=(GtkTextIter *)
+      # 
       # long
       def __gtk_text_buffer_get_end_iter(buffer, iter)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1gtk_1text_1buffer_1get_1end_1iter, JNI.env, self.jni_id, buffer.to_int, iter.jni_id)
@@ -16796,6 +19072,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1text_1buffer_1get_1insert, [:pointer, :long, :int32], :int32
       typesig { [::Java::Int] }
+      # @param buffer cast=(GtkTextBuffer *)
       # long
       # long
       def __gtk_text_buffer_get_insert(buffer)
@@ -16816,6 +19093,10 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1text_1buffer_1get_1iter_1at_1line, [:pointer, :long, :int32, :long, :int32], :void
       typesig { [::Java::Int, Array.typed(::Java::Byte), ::Java::Int] }
+      # @param buffer cast=(GtkTextBuffer *)
+      # @param iter cast=(GtkTextIter *)
+      # @param line_number cast=(gint)
+      # 
       # long
       def __gtk_text_buffer_get_iter_at_line(buffer, iter, line_number)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1gtk_1text_1buffer_1get_1iter_1at_1line, JNI.env, self.jni_id, buffer.to_int, iter.jni_id, line_number.to_int)
@@ -16834,6 +19115,10 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1text_1buffer_1get_1iter_1at_1mark, [:pointer, :long, :int32, :long, :int32], :void
       typesig { [::Java::Int, Array.typed(::Java::Byte), ::Java::Int] }
+      # @param buffer cast=(GtkTextBuffer *)
+      # @param iter cast=(GtkTextIter *)
+      # @param mark cast=(GtkTextMark *)
+      # 
       # long
       # long
       def __gtk_text_buffer_get_iter_at_mark(buffer, iter, mark)
@@ -16854,6 +19139,10 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1text_1buffer_1get_1iter_1at_1offset, [:pointer, :long, :int32, :long, :int32], :void
       typesig { [::Java::Int, Array.typed(::Java::Byte), ::Java::Int] }
+      # @param buffer cast=(GtkTextBuffer *)
+      # @param iter cast=(GtkTextIter *)
+      # @param char_offset cast=(gint)
+      # 
       # long
       def __gtk_text_buffer_get_iter_at_offset(buffer, iter, char_offset)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1gtk_1text_1buffer_1get_1iter_1at_1offset, JNI.env, self.jni_id, buffer.to_int, iter.jni_id, char_offset.to_int)
@@ -16872,6 +19161,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1text_1buffer_1get_1line_1count, [:pointer, :long, :int32], :int32
       typesig { [::Java::Int] }
+      # @param buffer cast=(GtkTextBuffer *)
       # long
       def __gtk_text_buffer_get_line_count(buffer)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1gtk_1text_1buffer_1get_1line_1count, JNI.env, self.jni_id, buffer.to_int)
@@ -16890,6 +19180,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1text_1buffer_1get_1selection_1bound, [:pointer, :long, :int32], :int32
       typesig { [::Java::Int] }
+      # @param buffer cast=(GtkTextBuffer *)
       # long
       # long
       def __gtk_text_buffer_get_selection_bound(buffer)
@@ -16910,6 +19201,10 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1text_1buffer_1get_1selection_1bounds, [:pointer, :long, :int32, :long, :long], :int8
       typesig { [::Java::Int, Array.typed(::Java::Byte), Array.typed(::Java::Byte)] }
+      # @param buffer cast=(GtkTextBuffer *)
+      # @param start cast=(GtkTextIter *)
+      # @param end cast=(GtkTextIter *)
+      # 
       # long
       def __gtk_text_buffer_get_selection_bounds(buffer, start, end_)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1gtk_1text_1buffer_1get_1selection_1bounds, JNI.env, self.jni_id, buffer.to_int, start.jni_id, end_.jni_id) != 0
@@ -16928,6 +19223,11 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1text_1buffer_1get_1text, [:pointer, :long, :int32, :long, :long, :int8], :int32
       typesig { [::Java::Int, Array.typed(::Java::Byte), Array.typed(::Java::Byte), ::Java::Boolean] }
+      # @param buffer cast=(GtkTextBuffer *)
+      # @param start cast=(GtkTextIter *)
+      # @param end cast=(GtkTextIter *)
+      # @param include_hidden_chars cast=(gboolean)
+      # 
       # long
       # long
       def __gtk_text_buffer_get_text(buffer, start, end_, include_hidden_chars)
@@ -16948,6 +19248,11 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1text_1buffer_1insert__I_3B_3BI, [:pointer, :long, :int32, :long, :long, :int32], :void
       typesig { [::Java::Int, Array.typed(::Java::Byte), Array.typed(::Java::Byte), ::Java::Int] }
+      # @param buffer cast=(GtkTextBuffer *)
+      # @param iter cast=(GtkTextIter *)
+      # @param text cast=(const gchar *)
+      # @param len cast=(gint)
+      # 
       # long
       def __gtk_text_buffer_insert(buffer, iter, text, len)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1gtk_1text_1buffer_1insert__I_3B_3BI, JNI.env, self.jni_id, buffer.to_int, iter.jni_id, text.jni_id, len.to_int)
@@ -16966,6 +19271,11 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1text_1buffer_1insert__II_3BI, [:pointer, :long, :int32, :int32, :long, :int32], :void
       typesig { [::Java::Int, ::Java::Int, Array.typed(::Java::Byte), ::Java::Int] }
+      # @param buffer cast=(GtkTextBuffer *)
+      # @param iter cast=(GtkTextIter *)
+      # @param text cast=(const gchar *)
+      # @param len cast=(gint)
+      # 
       # long
       # long
       def __gtk_text_buffer_insert(buffer, iter, text, len)
@@ -16986,6 +19296,10 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1text_1buffer_1move_1mark, [:pointer, :long, :int32, :int32, :long], :void
       typesig { [::Java::Int, ::Java::Int, Array.typed(::Java::Byte)] }
+      # @param buffer cast=(GtkTextBuffer *)
+      # @param mark cast=(GtkTextMark *)
+      # @param where cast=(const GtkTextIter *)
+      # 
       # long
       # long
       def __gtk_text_buffer_move_mark(buffer, mark, where)
@@ -17006,6 +19320,11 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1text_1buffer_1paste_1clipboard, [:pointer, :long, :int32, :int32, :long, :int8], :void
       typesig { [::Java::Int, ::Java::Int, Array.typed(::Java::Byte), ::Java::Boolean] }
+      # @param buffer cast=(GtkTextBuffer *)
+      # @param clipboard cast=(GtkClipboard *)
+      # @param override_location cast=(GtkTextIter *)
+      # @param default_editable cast=(gboolean)
+      # 
       # long
       # long
       def __gtk_text_buffer_paste_clipboard(buffer, clipboard, override_location, default_editable)
@@ -17026,6 +19345,9 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1text_1buffer_1place_1cursor, [:pointer, :long, :int32, :long], :void
       typesig { [::Java::Int, Array.typed(::Java::Byte)] }
+      # @param buffer cast=(GtkTextBuffer *)
+      # @param where cast=(const GtkTextIter *)
+      # 
       # long
       def __gtk_text_buffer_place_cursor(buffer, where)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1gtk_1text_1buffer_1place_1cursor, JNI.env, self.jni_id, buffer.to_int, where.jni_id)
@@ -17044,6 +19366,10 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1text_1buffer_1set_1text, [:pointer, :long, :int32, :long, :int32], :void
       typesig { [::Java::Int, Array.typed(::Java::Byte), ::Java::Int] }
+      # @param buffer cast=(GtkTextBuffer *)
+      # @param text cast=(const gchar *)
+      # @param len cast=(gint)
+      # 
       # long
       def __gtk_text_buffer_set_text(buffer, text, len)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1gtk_1text_1buffer_1set_1text, JNI.env, self.jni_id, buffer.to_int, text.jni_id, len.to_int)
@@ -17062,6 +19388,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1text_1iter_1get_1line, [:pointer, :long, :long], :int32
       typesig { [Array.typed(::Java::Byte)] }
+      # @param iter cast=(const GtkTextIter *)
       def __gtk_text_iter_get_line(iter)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1gtk_1text_1iter_1get_1line, JNI.env, self.jni_id, iter.jni_id)
       end
@@ -17078,6 +19405,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1text_1iter_1get_1offset, [:pointer, :long, :long], :int32
       typesig { [Array.typed(::Java::Byte)] }
+      # @param iter cast=(const GtkTextIter *)
       def __gtk_text_iter_get_offset(iter)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1gtk_1text_1iter_1get_1offset, JNI.env, self.jni_id, iter.jni_id)
       end
@@ -17094,6 +19422,13 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1text_1view_1buffer_1to_1window_1coords, [:pointer, :long, :int32, :int32, :int32, :int32, :long, :long], :void
       typesig { [::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, Array.typed(::Java::Int), Array.typed(::Java::Int)] }
+      # @param text_view cast=(GtkTextView *)
+      # @param win cast=(GtkTextWindowType)
+      # @param buffer_x cast=(gint)
+      # @param buffer_y cast=(gint)
+      # @param window_x cast=(gint *)
+      # @param window_y cast=(gint *)
+      # 
       # long
       def __gtk_text_view_buffer_to_window_coords(text_view, win, buffer_x, buffer_y, window_x, window_y)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1gtk_1text_1view_1buffer_1to_1window_1coords, JNI.env, self.jni_id, text_view.to_int, win.to_int, buffer_x.to_int, buffer_y.to_int, window_x.jni_id, window_y.jni_id)
@@ -17112,6 +19447,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1text_1view_1get_1buffer, [:pointer, :long, :int32], :int32
       typesig { [::Java::Int] }
+      # @param text_view cast=(GtkTextView *)
       # long
       # long
       def __gtk_text_view_get_buffer(text_view)
@@ -17132,6 +19468,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1text_1view_1get_1editable, [:pointer, :long, :int32], :int8
       typesig { [::Java::Int] }
+      # @param text_view cast=(GtkTextView *)
       # long
       def __gtk_text_view_get_editable(text_view)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1gtk_1text_1view_1get_1editable, JNI.env, self.jni_id, text_view.to_int) != 0
@@ -17150,6 +19487,11 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1text_1view_1get_1iter_1at_1location, [:pointer, :long, :int32, :long, :int32, :int32], :void
       typesig { [::Java::Int, Array.typed(::Java::Byte), ::Java::Int, ::Java::Int] }
+      # @param text_view cast=(GtkTextView *)
+      # @param iter cast=(GtkTextIter *)
+      # @param x cast=(gint)
+      # @param y cast=(gint)
+      # 
       # long
       def __gtk_text_view_get_iter_at_location(text_view, iter, x, y)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1gtk_1text_1view_1get_1iter_1at_1location, JNI.env, self.jni_id, text_view.to_int, iter.jni_id, x.to_int, y.to_int)
@@ -17168,6 +19510,10 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1text_1view_1get_1iter_1location, [:pointer, :long, :int32, :long, :long], :void
       typesig { [::Java::Int, Array.typed(::Java::Byte), GdkRectangle] }
+      # @param text_view cast=(GtkTextView *)
+      # @param iter cast=(const GtkTextIter *)
+      # @param location cast=(GdkRectangle *),flags=no_in
+      # 
       # long
       def __gtk_text_view_get_iter_location(text_view, iter, location)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1gtk_1text_1view_1get_1iter_1location, JNI.env, self.jni_id, text_view.to_int, iter.jni_id, location.jni_id)
@@ -17186,6 +19532,11 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1text_1view_1get_1line_1at_1y, [:pointer, :long, :int32, :long, :int32, :long], :void
       typesig { [::Java::Int, Array.typed(::Java::Byte), ::Java::Int, Array.typed(::Java::Int)] }
+      # @param text_view cast=(GtkTextView *)
+      # @param target_iter cast=(GtkTextIter *)
+      # @param y cast=(gint)
+      # @param line_top cast=(gint *)
+      # 
       # long
       def __gtk_text_view_get_line_at_y(text_view, target_iter, y, line_top)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1gtk_1text_1view_1get_1line_1at_1y, JNI.env, self.jni_id, text_view.to_int, target_iter.jni_id, y.to_int, line_top.jni_id)
@@ -17204,6 +19555,9 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1text_1view_1get_1visible_1rect, [:pointer, :long, :int32, :long], :void
       typesig { [::Java::Int, GdkRectangle] }
+      # @param text_view cast=(GtkTextView *)
+      # @param visible_rect cast=(GdkRectangle *),flags=no_in
+      # 
       # long
       def __gtk_text_view_get_visible_rect(text_view, visible_rect)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1gtk_1text_1view_1get_1visible_1rect, JNI.env, self.jni_id, text_view.to_int, visible_rect.jni_id)
@@ -17222,6 +19576,9 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1text_1view_1get_1window, [:pointer, :long, :int32, :int32], :int32
       typesig { [::Java::Int, ::Java::Int] }
+      # @param text_view cast=(GtkTextView *)
+      # @param win cast=(GtkTextWindowType)
+      # 
       # long
       # long
       def __gtk_text_view_get_window(text_view, win)
@@ -17260,6 +19617,9 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1text_1view_1scroll_1mark_1onscreen, [:pointer, :long, :int32, :int32], :void
       typesig { [::Java::Int, ::Java::Int] }
+      # @param text_view cast=(GtkTextView *)
+      # @param mark cast=(GtkTextMark *)
+      # 
       # long
       # long
       def __gtk_text_view_scroll_mark_onscreen(text_view, mark)
@@ -17280,6 +19640,13 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1text_1view_1scroll_1to_1iter, [:pointer, :long, :int32, :long, :double, :int8, :double, :double], :int8
       typesig { [::Java::Int, Array.typed(::Java::Byte), ::Java::Double, ::Java::Boolean, ::Java::Double, ::Java::Double] }
+      # @param text_view cast=(GtkTextView *)
+      # @param iter cast=(GtkTextIter *)
+      # @param within_margin cast=(gdouble)
+      # @param use_align cast=(gboolean)
+      # @param xalign cast=(gdouble)
+      # @param yalign cast=(gdouble)
+      # 
       # long
       def __gtk_text_view_scroll_to_iter(text_view, iter, within_margin, use_align, xalign, yalign)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1gtk_1text_1view_1scroll_1to_1iter, JNI.env, self.jni_id, text_view.to_int, iter.jni_id, within_margin, use_align ? 1 : 0, xalign, yalign) != 0
@@ -17298,6 +19665,9 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1text_1view_1set_1editable, [:pointer, :long, :int32, :int8], :void
       typesig { [::Java::Int, ::Java::Boolean] }
+      # @param text_view cast=(GtkTextView *)
+      # @param setting cast=(gboolean)
+      # 
       # long
       def __gtk_text_view_set_editable(text_view, setting)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1gtk_1text_1view_1set_1editable, JNI.env, self.jni_id, text_view.to_int, setting ? 1 : 0)
@@ -17316,6 +19686,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1text_1view_1set_1justification, [:pointer, :long, :int32, :int32], :void
       typesig { [::Java::Int, ::Java::Int] }
+      # @param text_view cast=(GtkTextView *)
       # long
       def __gtk_text_view_set_justification(text_view, justification)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1gtk_1text_1view_1set_1justification, JNI.env, self.jni_id, text_view.to_int, justification.to_int)
@@ -17334,6 +19705,9 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1text_1view_1set_1tabs, [:pointer, :long, :int32, :int32], :void
       typesig { [::Java::Int, ::Java::Int] }
+      # @param text_view cast=(GtkTextView *)
+      # @param tabs cast=(PangoTabArray *)
+      # 
       # long
       # long
       def __gtk_text_view_set_tabs(text_view, tabs)
@@ -17354,6 +19728,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1text_1view_1set_1wrap_1mode, [:pointer, :long, :int32, :int32], :void
       typesig { [::Java::Int, ::Java::Int] }
+      # @param text_view cast=(GtkTextView *)
       # long
       def __gtk_text_view_set_wrap_mode(text_view, wrap_mode)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1gtk_1text_1view_1set_1wrap_1mode, JNI.env, self.jni_id, text_view.to_int, wrap_mode.to_int)
@@ -17372,6 +19747,13 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1text_1view_1window_1to_1buffer_1coords, [:pointer, :long, :int32, :int32, :int32, :int32, :long, :long], :void
       typesig { [::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, Array.typed(::Java::Int), Array.typed(::Java::Int)] }
+      # @param text_view cast=(GtkTextView *)
+      # @param win cast=(GtkTextWindowType)
+      # @param window_x cast=(gint)
+      # @param window_y cast=(gint)
+      # @param buffer_x cast=(gint *)
+      # @param buffer_y cast=(gint *)
+      # 
       # long
       def __gtk_text_view_window_to_buffer_coords(text_view, win, window_x, window_y, buffer_x, buffer_y)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1gtk_1text_1view_1window_1to_1buffer_1coords, JNI.env, self.jni_id, text_view.to_int, win.to_int, window_x.to_int, window_y.to_int, buffer_x.jni_id, buffer_y.jni_id)
@@ -17390,6 +19772,10 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1timeout_1add, [:pointer, :long, :int32, :int32, :int32], :int32
       typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
+      # @param interval cast=(guint32)
+      # @param function cast=(GtkFunction)
+      # @param data cast=(gpointer)
+      # 
       # long
       # long
       def __gtk_timeout_add(interval, function, data)
@@ -17410,6 +19796,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1timeout_1remove, [:pointer, :long, :int32], :void
       typesig { [::Java::Int] }
+      # @param timeout_handler_id cast=(guint)
       def __gtk_timeout_remove(timeout_handler_id)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1gtk_1timeout_1remove, JNI.env, self.jni_id, timeout_handler_id.to_int)
       end
@@ -17426,6 +19813,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1toggle_1button_1get_1active, [:pointer, :long, :int32], :int8
       typesig { [::Java::Int] }
+      # @param toggle_button cast=(GtkToggleButton *)
       # long
       def __gtk_toggle_button_get_active(toggle_button)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1gtk_1toggle_1button_1get_1active, JNI.env, self.jni_id, toggle_button.to_int) != 0
@@ -17462,6 +19850,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1toggle_1button_1get_1inconsistent, [:pointer, :long, :int32], :int8
       typesig { [::Java::Int] }
+      # @param toggle_button cast=(GtkToggleButton *)
       # long
       def __gtk_toggle_button_get_inconsistent(toggle_button)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1gtk_1toggle_1button_1get_1inconsistent, JNI.env, self.jni_id, toggle_button.to_int) != 0
@@ -17480,6 +19869,9 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1toggle_1button_1set_1active, [:pointer, :long, :int32, :int8], :void
       typesig { [::Java::Int, ::Java::Boolean] }
+      # @param toggle_button cast=(GtkToggleButton *)
+      # @param is_active cast=(gboolean)
+      # 
       # long
       def __gtk_toggle_button_set_active(toggle_button, is_active)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1gtk_1toggle_1button_1set_1active, JNI.env, self.jni_id, toggle_button.to_int, is_active ? 1 : 0)
@@ -17498,6 +19890,9 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1toggle_1button_1set_1inconsistent, [:pointer, :long, :int32, :int8], :void
       typesig { [::Java::Int, ::Java::Boolean] }
+      # @param toggle_button cast=(GtkToggleButton *)
+      # @param setting cast=(gboolean)
+      # 
       # long
       def __gtk_toggle_button_set_inconsistent(toggle_button, setting)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1gtk_1toggle_1button_1set_1inconsistent, JNI.env, self.jni_id, toggle_button.to_int, setting ? 1 : 0)
@@ -17516,6 +19911,9 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1toggle_1button_1set_1mode, [:pointer, :long, :int32, :int8], :void
       typesig { [::Java::Int, ::Java::Boolean] }
+      # @param toggle_button cast=(GtkToggleButton *)
+      # @param draw_indicator cast=(gboolean)
+      # 
       # long
       def __gtk_toggle_button_set_mode(toggle_button, draw_indicator)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1gtk_1toggle_1button_1set_1mode, JNI.env, self.jni_id, toggle_button.to_int, draw_indicator ? 1 : 0)
@@ -17534,6 +19932,12 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1toolbar_1insert_1widget, [:pointer, :long, :int32, :int32, :long, :long, :int32], :void
       typesig { [::Java::Int, ::Java::Int, Array.typed(::Java::Byte), Array.typed(::Java::Byte), ::Java::Int] }
+      # @param toolbar cast=(GtkToolbar *)
+      # @param widget cast=(GtkWidget *)
+      # @param tooltip_text cast=(const char *)
+      # @param tooltip_private_text cast=(const char *)
+      # @param position cast=(gint)
+      # 
       # long
       # long
       def __gtk_toolbar_insert_widget(toolbar, widget, tooltip_text, tooltip_private_text, position)
@@ -17572,6 +19976,9 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1toolbar_1set_1orientation, [:pointer, :long, :int32, :int32], :void
       typesig { [::Java::Int, ::Java::Int] }
+      # @param toolbar cast=(GtkToolbar *)
+      # @param orientation cast=(GtkOrientation)
+      # 
       # long
       def __gtk_toolbar_set_orientation(toolbar, orientation)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1gtk_1toolbar_1set_1orientation, JNI.env, self.jni_id, toolbar.to_int, orientation.to_int)
@@ -17590,6 +19997,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1tooltips_1data_1get, [:pointer, :long, :int32], :int32
       typesig { [::Java::Int] }
+      # @param widget cast=(GtkWidget *)
       # long
       # long
       def __gtk_tooltips_data_get(widget)
@@ -17610,6 +20018,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1tooltips_1disable, [:pointer, :long, :int32], :void
       typesig { [::Java::Int] }
+      # @param tooltips cast=(GtkTooltips *)
       # long
       def __gtk_tooltips_disable(tooltips)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1gtk_1tooltips_1disable, JNI.env, self.jni_id, tooltips.to_int)
@@ -17628,6 +20037,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1tooltips_1enable, [:pointer, :long, :int32], :void
       typesig { [::Java::Int] }
+      # @param tooltips cast=(GtkTooltips *)
       # long
       def __gtk_tooltips_enable(tooltips)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1gtk_1tooltips_1enable, JNI.env, self.jni_id, tooltips.to_int)
@@ -17664,6 +20074,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1tooltips_1force_1window, [:pointer, :long, :int32], :void
       typesig { [::Java::Int] }
+      # @param tooltips cast=(GtkTooltips *)
       # long
       def __gtk_tooltips_force_window(tooltips)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1gtk_1tooltips_1force_1window, JNI.env, self.jni_id, tooltips.to_int)
@@ -17682,6 +20093,11 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1tooltips_1set_1tip, [:pointer, :long, :int32, :int32, :long, :long], :void
       typesig { [::Java::Int, ::Java::Int, Array.typed(::Java::Byte), Array.typed(::Java::Byte)] }
+      # @param tooltips cast=(GtkTooltips *)
+      # @param widget cast=(GtkWidget *)
+      # @param tip_text cast=(const gchar *)
+      # @param tip_private cast=(const gchar *)
+      # 
       # long
       # long
       def __gtk_tooltips_set_tip(tooltips, widget, tip_text, tip_private)
@@ -17702,6 +20118,9 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1tree_1model_1get__III_3II, [:pointer, :long, :int32, :int32, :int32, :long, :int32], :void
       typesig { [::Java::Int, ::Java::Int, ::Java::Int, Array.typed(::Java::Int), ::Java::Int] }
+      # @param tree_model cast=(GtkTreeModel *)
+      # @param iter cast=(GtkTreeIter *)
+      # 
       # long
       # long
       # long
@@ -17724,6 +20143,9 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1tree_1model_1get__III_3JI, [:pointer, :long, :int32, :int32, :int32, :long, :int32], :void
       typesig { [::Java::Int, ::Java::Int, ::Java::Int, Array.typed(::Java::Long), ::Java::Int] }
+      # @param tree_model cast=(GtkTreeModel *)
+      # @param iter cast=(GtkTreeIter *)
+      # 
       # long
       # long
       # long
@@ -17746,6 +20168,10 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1tree_1model_1get_1iter, [:pointer, :long, :int32, :int32, :int32], :int8
       typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
+      # @param tree_model cast=(GtkTreeModel *)
+      # @param iter cast=(GtkTreeIter *)
+      # @param path cast=(GtkTreePath *)
+      # 
       # long
       # long
       # long
@@ -17768,6 +20194,9 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1tree_1model_1get_1iter_1first, [:pointer, :long, :int32, :int32], :int8
       typesig { [::Java::Int, ::Java::Int] }
+      # @param tree_model cast=(GtkTreeModel *)
+      # @param iter cast=(GtkTreeIter *)
+      # 
       # long
       # long
       def __gtk_tree_model_get_iter_first(tree_model, iter)
@@ -17788,6 +20217,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1tree_1model_1get_1n_1columns, [:pointer, :long, :int32], :int32
       typesig { [::Java::Int] }
+      # @param tree_model cast=(GtkTreeModel *)
       # long
       def __gtk_tree_model_get_n_columns(tree_model)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1gtk_1tree_1model_1get_1n_1columns, JNI.env, self.jni_id, tree_model.to_int)
@@ -17806,6 +20236,9 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1tree_1model_1get_1path, [:pointer, :long, :int32, :int32], :int32
       typesig { [::Java::Int, ::Java::Int] }
+      # @param tree_model cast=(GtkTreeModel *)
+      # @param iter cast=(GtkTreeIter *)
+      # 
       # long
       # long
       # long
@@ -17846,6 +20279,10 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1tree_1model_1iter_1children, [:pointer, :long, :int32, :int32, :int32], :int8
       typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
+      # @param model cast=(GtkTreeModel *)
+      # @param iter cast=(GtkTreeIter *)
+      # @param parent cast=(GtkTreeIter *)
+      # 
       # long
       # long
       # long
@@ -17868,6 +20305,9 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1tree_1model_1iter_1n_1children, [:pointer, :long, :int32, :int32], :int32
       typesig { [::Java::Int, ::Java::Int] }
+      # @param model cast=(GtkTreeModel *)
+      # @param iter cast=(GtkTreeIter *)
+      # 
       # long
       # long
       def __gtk_tree_model_iter_n_children(model, iter)
@@ -17888,6 +20328,9 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1tree_1model_1iter_1next, [:pointer, :long, :int32, :int32], :int8
       typesig { [::Java::Int, ::Java::Int] }
+      # @param model cast=(GtkTreeModel *)
+      # @param iter cast=(GtkTreeIter *)
+      # 
       # long
       # long
       def __gtk_tree_model_iter_next(model, iter)
@@ -17908,6 +20351,10 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1tree_1model_1iter_1nth_1child, [:pointer, :long, :int32, :int32, :int32, :int32], :int8
       typesig { [::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int] }
+      # @param tree_model cast=(GtkTreeModel *)
+      # @param iter cast=(GtkTreeIter *)
+      # @param parent cast=(GtkTreeIter *)
+      # 
       # long
       # long
       # long
@@ -17930,6 +20377,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1tree_1path_1append_1index, [:pointer, :long, :int32, :int32], :void
       typesig { [::Java::Int, ::Java::Int] }
+      # @param path cast=(GtkTreePath *)
       # long
       def __gtk_tree_path_append_index(path, index)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1gtk_1tree_1path_1append_1index, JNI.env, self.jni_id, path.to_int, index.to_int)
@@ -17948,6 +20396,9 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1tree_1path_1compare, [:pointer, :long, :int32, :int32], :int32
       typesig { [::Java::Int, ::Java::Int] }
+      # @param a cast=(const GtkTreePath *)
+      # @param b cast=(const GtkTreePath *)
+      # 
       # long
       # long
       # long
@@ -17970,6 +20421,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1tree_1path_1down, [:pointer, :long, :int32], :void
       typesig { [::Java::Int] }
+      # @param path cast=(GtkTreePath *)
       # long
       def __gtk_tree_path_down(path)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1gtk_1tree_1path_1down, JNI.env, self.jni_id, path.to_int)
@@ -17988,6 +20440,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1tree_1path_1free, [:pointer, :long, :int32], :void
       typesig { [::Java::Int] }
+      # @param path cast=(GtkTreePath *)
       # long
       def __gtk_tree_path_free(path)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1gtk_1tree_1path_1free, JNI.env, self.jni_id, path.to_int)
@@ -18006,6 +20459,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1tree_1path_1get_1depth, [:pointer, :long, :int32], :int32
       typesig { [::Java::Int] }
+      # @param path cast=(GtkTreePath *)
       # long
       def __gtk_tree_path_get_depth(path)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1gtk_1tree_1path_1get_1depth, JNI.env, self.jni_id, path.to_int)
@@ -18024,6 +20478,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1tree_1path_1get_1indices, [:pointer, :long, :int32], :int32
       typesig { [::Java::Int] }
+      # @param path cast=(GtkTreePath *)
       # long
       # long
       def __gtk_tree_path_get_indices(path)
@@ -18080,6 +20535,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1tree_1path_1new_1from_1string___3B, [:pointer, :long, :long], :int32
       typesig { [Array.typed(::Java::Byte)] }
+      # @param path cast=(const gchar *)
       # long
       def __gtk_tree_path_new_from_string(path)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1gtk_1tree_1path_1new_1from_1string___3B, JNI.env, self.jni_id, path.jni_id)
@@ -18098,6 +20554,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1tree_1path_1new_1from_1string__I, [:pointer, :long, :int32], :int32
       typesig { [::Java::Int] }
+      # @param path cast=(const gchar *)
       # long
       # long
       def __gtk_tree_path_new_from_string(path)
@@ -18118,6 +20575,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1tree_1path_1next, [:pointer, :long, :int32], :void
       typesig { [::Java::Int] }
+      # @param path cast=(GtkTreePath *)
       # long
       def __gtk_tree_path_next(path)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1gtk_1tree_1path_1next, JNI.env, self.jni_id, path.to_int)
@@ -18136,6 +20594,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1tree_1path_1prev, [:pointer, :long, :int32], :int8
       typesig { [::Java::Int] }
+      # @param path cast=(GtkTreePath *)
       # long
       def __gtk_tree_path_prev(path)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1gtk_1tree_1path_1prev, JNI.env, self.jni_id, path.to_int) != 0
@@ -18154,6 +20613,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1tree_1path_1up, [:pointer, :long, :int32], :int8
       typesig { [::Java::Int] }
+      # @param path cast=(GtkTreePath *)
       # long
       def __gtk_tree_path_up(path)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1gtk_1tree_1path_1up, JNI.env, self.jni_id, path.to_int) != 0
@@ -18172,6 +20632,9 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1tree_1selection_1count_1selected_1rows, [:pointer, :long, :int32], :int32
       typesig { [::Java::Int] }
+      # @method flags=dynamic
+      # @param selection cast=(GtkTreeSelection *)
+      # 
       # long
       def __gtk_tree_selection_count_selected_rows(selection)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1gtk_1tree_1selection_1count_1selected_1rows, JNI.env, self.jni_id, selection.to_int)
@@ -18190,6 +20653,10 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1tree_1selection_1get_1selected, [:pointer, :long, :int32, :long, :int32], :int8
       typesig { [::Java::Int, Array.typed(::Java::Int), ::Java::Int] }
+      # @param selection cast=(GtkTreeSelection *)
+      # @param model cast=(GtkTreeModel **)
+      # @param iter cast=(GtkTreeIter *)
+      # 
       # long
       # long
       # long
@@ -18212,6 +20679,10 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1tree_1selection_1get_1selected_1rows, [:pointer, :long, :int32, :long], :int32
       typesig { [::Java::Int, Array.typed(::Java::Int)] }
+      # @method flags=dynamic
+      # @param selection cast=(GtkTreeSelection *)
+      # @param model cast=(GtkTreeModel **)
+      # 
       # long
       # long
       # long
@@ -18234,6 +20705,9 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1tree_1selection_1path_1is_1selected, [:pointer, :long, :int32, :int32], :int8
       typesig { [::Java::Int, ::Java::Int] }
+      # @param selection cast=(GtkTreeSelection *)
+      # @param path cast=(GtkTreePath *)
+      # 
       # long
       # long
       def __gtk_tree_selection_path_is_selected(selection, path)
@@ -18254,6 +20728,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1tree_1selection_1select_1all, [:pointer, :long, :int32], :void
       typesig { [::Java::Int] }
+      # @param selection cast=(GtkTreeSelection *)
       # long
       def __gtk_tree_selection_select_all(selection)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1gtk_1tree_1selection_1select_1all, JNI.env, self.jni_id, selection.to_int)
@@ -18272,6 +20747,9 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1tree_1selection_1select_1iter, [:pointer, :long, :int32, :int32], :void
       typesig { [::Java::Int, ::Java::Int] }
+      # @param selection cast=(GtkTreeSelection *)
+      # @param iter cast=(GtkTreeIter *)
+      # 
       # long
       # long
       def __gtk_tree_selection_select_iter(selection, iter)
@@ -18292,6 +20770,10 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1tree_1selection_1selected_1foreach, [:pointer, :long, :int32, :int32, :int32], :void
       typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
+      # @param selection cast=(GtkTreeSelection *)
+      # @param func cast=(GtkTreeSelectionForeachFunc)
+      # @param data cast=(gpointer)
+      # 
       # long
       # long
       # long
@@ -18314,6 +20796,9 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1tree_1selection_1set_1mode, [:pointer, :long, :int32, :int32], :void
       typesig { [::Java::Int, ::Java::Int] }
+      # @param selection cast=(GtkTreeSelection *)
+      # @param mode cast=(GtkSelectionMode)
+      # 
       # long
       def __gtk_tree_selection_set_mode(selection, mode)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1gtk_1tree_1selection_1set_1mode, JNI.env, self.jni_id, selection.to_int, mode.to_int)
@@ -18332,6 +20817,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1tree_1selection_1unselect_1all, [:pointer, :long, :int32], :void
       typesig { [::Java::Int] }
+      # @param selection cast=(GtkTreeSelection *)
       # long
       def __gtk_tree_selection_unselect_all(selection)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1gtk_1tree_1selection_1unselect_1all, JNI.env, self.jni_id, selection.to_int)
@@ -18350,6 +20836,9 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1tree_1selection_1unselect_1iter, [:pointer, :long, :int32, :int32], :void
       typesig { [::Java::Int, ::Java::Int] }
+      # @param selection cast=(GtkTreeSelection *)
+      # @param iter cast=(GtkTreeIter *)
+      # 
       # long
       # long
       def __gtk_tree_selection_unselect_iter(selection, iter)
@@ -18370,6 +20859,10 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1tree_1store_1append, [:pointer, :long, :int32, :int32, :int32], :void
       typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
+      # @param store cast=(GtkTreeStore *)
+      # @param iter cast=(GtkTreeIter *)
+      # @param parent cast=(GtkTreeIter *)
+      # 
       # long
       # long
       # long
@@ -18392,6 +20885,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1tree_1store_1clear, [:pointer, :long, :int32], :void
       typesig { [::Java::Int] }
+      # @param store cast=(GtkTreeStore *)
       # long
       def __gtk_tree_store_clear(store)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1gtk_1tree_1store_1clear, JNI.env, self.jni_id, store.to_int)
@@ -18410,6 +20904,11 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1tree_1store_1insert, [:pointer, :long, :int32, :int32, :int32, :int32], :void
       typesig { [::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int] }
+      # @param store cast=(GtkTreeStore *)
+      # @param iter cast=(GtkTreeIter *)
+      # @param parent cast=(GtkTreeIter *)
+      # @param position cast=(gint)
+      # 
       # long
       # long
       # long
@@ -18432,6 +20931,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1tree_1store_1newv, [:pointer, :long, :int32, :long], :int32
       typesig { [::Java::Int, Array.typed(::Java::Int)] }
+      # @param types cast=(GType *)
       # long
       # long
       def __gtk_tree_store_newv(num_columns, types)
@@ -18452,6 +20952,9 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1tree_1store_1remove, [:pointer, :long, :int32, :int32], :void
       typesig { [::Java::Int, ::Java::Int] }
+      # @param store cast=(GtkTreeStore *)
+      # @param iter cast=(GtkTreeIter *)
+      # 
       # long
       # long
       def __gtk_tree_store_remove(store, iter)
@@ -18472,6 +20975,9 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1tree_1store_1set__III_3BI, [:pointer, :long, :int32, :int32, :int32, :long, :int32], :void
       typesig { [::Java::Int, ::Java::Int, ::Java::Int, Array.typed(::Java::Byte), ::Java::Int] }
+      # @param store cast=(GtkTreeStore *)
+      # @param iter cast=(GtkTreeIter *)
+      # 
       # long
       # long
       # long
@@ -18494,6 +21000,9 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1tree_1store_1set__IIIII, [:pointer, :long, :int32, :int32, :int32, :int32, :int32], :void
       typesig { [::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int] }
+      # @param store cast=(GtkTreeStore *)
+      # @param iter cast=(GtkTreeIter *)
+      # 
       # long
       # long
       # long
@@ -18516,6 +21025,9 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1tree_1store_1set__IIIJI, [:pointer, :long, :int32, :int32, :int32, :int64, :int32], :void
       typesig { [::Java::Int, ::Java::Int, ::Java::Int, ::Java::Long, ::Java::Int] }
+      # @param store cast=(GtkTreeStore *)
+      # @param iter cast=(GtkTreeIter *)
+      # 
       # long
       # long
       # long
@@ -18538,6 +21050,10 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method "Java_org_eclipse_swt_internal_gtk_OS__1gtk_1tree_1store_1set__IIIL#{GdkColor.jni_name}_2I".to_sym, [:pointer, :long, :int32, :int32, :int32, :long, :int32], :void
       typesig { [::Java::Int, ::Java::Int, ::Java::Int, GdkColor, ::Java::Int] }
+      # @param store cast=(GtkTreeStore *)
+      # @param iter cast=(GtkTreeIter *)
+      # @param value flags=no_out
+      # 
       # long
       # long
       # long
@@ -18560,6 +21076,9 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1tree_1store_1set__IIIZI, [:pointer, :long, :int32, :int32, :int32, :int8, :int32], :void
       typesig { [::Java::Int, ::Java::Int, ::Java::Int, ::Java::Boolean, ::Java::Int] }
+      # @param store cast=(GtkTreeStore *)
+      # @param iter cast=(GtkTreeIter *)
+      # 
       # long
       # long
       # long
@@ -18582,6 +21101,9 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1tree_1view_1create_1row_1drag_1icon, [:pointer, :long, :int32, :int32], :int32
       typesig { [::Java::Int, ::Java::Int] }
+      # @param view cast=(GtkTreeView *)
+      # @param path cast=(GtkTreePath *)
+      # 
       # long
       # long
       # long
@@ -18604,6 +21126,9 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1tree_1view_1collapse_1row, [:pointer, :long, :int32, :int32], :int8
       typesig { [::Java::Int, ::Java::Int] }
+      # @param view cast=(GtkTreeView *)
+      # @param path cast=(GtkTreePath *)
+      # 
       # long
       # long
       def __gtk_tree_view_collapse_row(view, path)
@@ -18624,6 +21149,11 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1tree_1view_1column_1add_1attribute, [:pointer, :long, :int32, :int32, :long, :int32], :void
       typesig { [::Java::Int, ::Java::Int, Array.typed(::Java::Byte), ::Java::Int] }
+      # @param treeColumn cast=(GtkTreeViewColumn *)
+      # @param cellRenderer cast=(GtkCellRenderer *)
+      # @param attribute cast=(const gchar *)
+      # @param column cast=(gint)
+      # 
       # long
       # long
       def __gtk_tree_view_column_add_attribute(tree_column, cell_renderer, attribute, column)
@@ -18644,6 +21174,12 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1tree_1view_1column_1cell_1get_1position, [:pointer, :long, :int32, :int32, :long, :long], :int8
       typesig { [::Java::Int, ::Java::Int, Array.typed(::Java::Int), Array.typed(::Java::Int)] }
+      # @method flags=dynamic
+      # @param tree_column cast=(GtkTreeViewColumn *)
+      # @param cell_renderer cast=(GtkCellRenderer *)
+      # @param start_pos cast=(gint *)
+      # @param width cast=(gint *)
+      # 
       # long
       # long
       def __gtk_tree_view_column_cell_get_position(tree_column, cell_renderer, start_pos, width)
@@ -18664,6 +21200,13 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1tree_1view_1column_1cell_1get_1size, [:pointer, :long, :int32, :long, :long, :long, :long, :long], :void
       typesig { [::Java::Int, GdkRectangle, Array.typed(::Java::Int), Array.typed(::Java::Int), Array.typed(::Java::Int), Array.typed(::Java::Int)] }
+      # @param tree_column cast=(GtkTreeViewColumn *)
+      # @param cell_area cast=(GdkRectangle *),flags=no_in
+      # @param x_offset cast=(gint *)
+      # @param y_offset cast=(gint *)
+      # @param width cast=(gint *)
+      # @param height cast=(gint *)
+      # 
       # long
       def __gtk_tree_view_column_cell_get_size(tree_column, cell_area, x_offset, y_offset, width, height)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1gtk_1tree_1view_1column_1cell_1get_1size, JNI.env, self.jni_id, tree_column.to_int, cell_area.jni_id, x_offset.jni_id, y_offset.jni_id, width.jni_id, height.jni_id)
@@ -18682,6 +21225,10 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1tree_1view_1column_1cell_1set_1cell_1data, [:pointer, :long, :int32, :int32, :int32, :int8, :int8], :void
       typesig { [::Java::Int, ::Java::Int, ::Java::Int, ::Java::Boolean, ::Java::Boolean] }
+      # @param tree_column cast=(GtkTreeViewColumn *)
+      # @param tree_model cast=(GtkTreeModel *)
+      # @param iter cast=(GtkTreeIter *)
+      # 
       # long
       # long
       # long
@@ -18704,6 +21251,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1tree_1view_1column_1clear, [:pointer, :long, :int32], :void
       typesig { [::Java::Int] }
+      # @param tree_column cast=(GtkTreeViewColumn *)
       # long
       def __gtk_tree_view_column_clear(tree_column)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1gtk_1tree_1view_1column_1clear, JNI.env, self.jni_id, tree_column.to_int)
@@ -18722,6 +21270,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1tree_1view_1column_1get_1cell_1renderers, [:pointer, :long, :int32], :int32
       typesig { [::Java::Int] }
+      # @param tree_column cast=(GtkTreeViewColumn *)
       # long
       # long
       def __gtk_tree_view_column_get_cell_renderers(tree_column)
@@ -18742,6 +21291,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1tree_1view_1column_1get_1fixed_1width, [:pointer, :long, :int32], :int32
       typesig { [::Java::Int] }
+      # @param column cast=(GtkTreeViewColumn *)
       # long
       def __gtk_tree_view_column_get_fixed_width(column)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1gtk_1tree_1view_1column_1get_1fixed_1width, JNI.env, self.jni_id, column.to_int)
@@ -18760,6 +21310,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1tree_1view_1column_1get_1reorderable, [:pointer, :long, :int32], :int8
       typesig { [::Java::Int] }
+      # @param column cast=(GtkTreeViewColumn *)
       # long
       def __gtk_tree_view_column_get_reorderable(column)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1gtk_1tree_1view_1column_1get_1reorderable, JNI.env, self.jni_id, column.to_int) != 0
@@ -18778,6 +21329,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1tree_1view_1column_1get_1resizable, [:pointer, :long, :int32], :int8
       typesig { [::Java::Int] }
+      # @param column cast=(GtkTreeViewColumn *)
       # long
       def __gtk_tree_view_column_get_resizable(column)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1gtk_1tree_1view_1column_1get_1resizable, JNI.env, self.jni_id, column.to_int) != 0
@@ -18796,6 +21348,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1tree_1view_1column_1get_1sizing, [:pointer, :long, :int32], :int32
       typesig { [::Java::Int] }
+      # @param tree_column cast=(GtkTreeViewColumn *)
       # long
       def __gtk_tree_view_column_get_sizing(tree_column)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1gtk_1tree_1view_1column_1get_1sizing, JNI.env, self.jni_id, tree_column.to_int)
@@ -18814,6 +21367,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1tree_1view_1column_1get_1spacing, [:pointer, :long, :int32], :int32
       typesig { [::Java::Int] }
+      # @param tree_column cast=(GtkTreeViewColumn *)
       # long
       def __gtk_tree_view_column_get_spacing(tree_column)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1gtk_1tree_1view_1column_1get_1spacing, JNI.env, self.jni_id, tree_column.to_int)
@@ -18832,6 +21386,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1tree_1view_1column_1get_1visible, [:pointer, :long, :int32], :int8
       typesig { [::Java::Int] }
+      # @param column cast=(GtkTreeViewColumn *)
       # long
       def __gtk_tree_view_column_get_visible(column)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1gtk_1tree_1view_1column_1get_1visible, JNI.env, self.jni_id, column.to_int) != 0
@@ -18850,6 +21405,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1tree_1view_1column_1get_1sort_1indicator, [:pointer, :long, :int32], :int8
       typesig { [::Java::Int] }
+      # @param tree_column cast=(GtkTreeViewColumn *)
       # long
       def __gtk_tree_view_column_get_sort_indicator(tree_column)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1gtk_1tree_1view_1column_1get_1sort_1indicator, JNI.env, self.jni_id, tree_column.to_int) != 0
@@ -18868,6 +21424,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1tree_1view_1column_1get_1sort_1order, [:pointer, :long, :int32], :int32
       typesig { [::Java::Int] }
+      # @param tree_column cast=(GtkTreeViewColumn *)
       # long
       def __gtk_tree_view_column_get_sort_order(tree_column)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1gtk_1tree_1view_1column_1get_1sort_1order, JNI.env, self.jni_id, tree_column.to_int)
@@ -18886,6 +21443,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1tree_1view_1column_1get_1width, [:pointer, :long, :int32], :int32
       typesig { [::Java::Int] }
+      # @param column cast=(GtkTreeViewColumn *)
       # long
       def __gtk_tree_view_column_get_width(column)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1gtk_1tree_1view_1column_1get_1width, JNI.env, self.jni_id, column.to_int)
@@ -18922,6 +21480,10 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1tree_1view_1column_1pack_1start, [:pointer, :long, :int32, :int32, :int8], :void
       typesig { [::Java::Int, ::Java::Int, ::Java::Boolean] }
+      # @param tree_column cast=(GtkTreeViewColumn *)
+      # @param cell_renderer cast=(GtkCellRenderer *)
+      # @param expand cast=(gboolean)
+      # 
       # long
       # long
       def __gtk_tree_view_column_pack_start(tree_column, cell_renderer, expand)
@@ -18942,6 +21504,10 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1tree_1view_1column_1pack_1end, [:pointer, :long, :int32, :int32, :int8], :void
       typesig { [::Java::Int, ::Java::Int, ::Java::Boolean] }
+      # @param tree_column cast=(GtkTreeViewColumn *)
+      # @param cell_renderer cast=(GtkCellRenderer *)
+      # @param expand cast=(gboolean)
+      # 
       # long
       # long
       def __gtk_tree_view_column_pack_end(tree_column, cell_renderer, expand)
@@ -18962,6 +21528,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1tree_1view_1column_1set_1alignment, [:pointer, :long, :int32, :float], :void
       typesig { [::Java::Int, ::Java::Float] }
+      # @param tree_column cast=(GtkTreeViewColumn *)
       # long
       def __gtk_tree_view_column_set_alignment(tree_column, xalign)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1gtk_1tree_1view_1column_1set_1alignment, JNI.env, self.jni_id, tree_column.to_int, xalign)
@@ -18980,6 +21547,12 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1tree_1view_1column_1set_1cell_1data_1func, [:pointer, :long, :int32, :int32, :int32, :int32, :int32], :void
       typesig { [::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int] }
+      # @param tree_column cast=(GtkTreeViewColumn *)
+      # @param cell_renderer cast=(GtkCellRenderer *)
+      # @param func cast=(GtkTreeCellDataFunc)
+      # @param func_data cast=(gpointer)
+      # @param destroy cast=(GtkDestroyNotify)
+      # 
       # long
       # long
       # long
@@ -19006,6 +21579,9 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1tree_1view_1column_1set_1clickable, [:pointer, :long, :int32, :int8], :void
       typesig { [::Java::Int, ::Java::Boolean] }
+      # @param column cast=(GtkTreeViewColumn *)
+      # @param clickable cast=(gboolean)
+      # 
       # long
       def __gtk_tree_view_column_set_clickable(column, clickable)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1gtk_1tree_1view_1column_1set_1clickable, JNI.env, self.jni_id, column.to_int, clickable ? 1 : 0)
@@ -19024,6 +21600,9 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1tree_1view_1column_1set_1fixed_1width, [:pointer, :long, :int32, :int32], :void
       typesig { [::Java::Int, ::Java::Int] }
+      # @param column cast=(GtkTreeViewColumn *)
+      # @param fixed_width cast=(gint)
+      # 
       # long
       def __gtk_tree_view_column_set_fixed_width(column, fixed_width)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1gtk_1tree_1view_1column_1set_1fixed_1width, JNI.env, self.jni_id, column.to_int, fixed_width.to_int)
@@ -19042,6 +21621,9 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1tree_1view_1column_1set_1min_1width, [:pointer, :long, :int32, :int32], :void
       typesig { [::Java::Int, ::Java::Int] }
+      # @param tree_column cast=(GtkTreeViewColumn *)
+      # @param min_width cast=(gint)
+      # 
       # long
       def __gtk_tree_view_column_set_min_width(tree_column, min_width)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1gtk_1tree_1view_1column_1set_1min_1width, JNI.env, self.jni_id, tree_column.to_int, min_width.to_int)
@@ -19060,6 +21642,9 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1tree_1view_1column_1set_1reorderable, [:pointer, :long, :int32, :int8], :void
       typesig { [::Java::Int, ::Java::Boolean] }
+      # @param column cast=(GtkTreeViewColumn *)
+      # @param reorderable cast=(gboolean)
+      # 
       # long
       def __gtk_tree_view_column_set_reorderable(column, reorderable)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1gtk_1tree_1view_1column_1set_1reorderable, JNI.env, self.jni_id, column.to_int, reorderable ? 1 : 0)
@@ -19078,6 +21663,9 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1tree_1view_1column_1set_1resizable, [:pointer, :long, :int32, :int8], :void
       typesig { [::Java::Int, ::Java::Boolean] }
+      # @param column cast=(GtkTreeViewColumn *)
+      # @param resizable cast=(gboolean)
+      # 
       # long
       def __gtk_tree_view_column_set_resizable(column, resizable)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1gtk_1tree_1view_1column_1set_1resizable, JNI.env, self.jni_id, column.to_int, resizable ? 1 : 0)
@@ -19096,6 +21684,9 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1tree_1view_1column_1set_1sizing, [:pointer, :long, :int32, :int32], :void
       typesig { [::Java::Int, ::Java::Int] }
+      # @param column cast=(GtkTreeViewColumn *)
+      # @param type cast=(GtkTreeViewColumnSizing)
+      # 
       # long
       def __gtk_tree_view_column_set_sizing(column, type)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1gtk_1tree_1view_1column_1set_1sizing, JNI.env, self.jni_id, column.to_int, type.to_int)
@@ -19114,6 +21705,9 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1tree_1view_1column_1set_1sort_1indicator, [:pointer, :long, :int32, :int8], :void
       typesig { [::Java::Int, ::Java::Boolean] }
+      # @param tree_column cast=(GtkTreeViewColumn *)
+      # @param setting cast=(gboolean)
+      # 
       # long
       def __gtk_tree_view_column_set_sort_indicator(tree_column, setting)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1gtk_1tree_1view_1column_1set_1sort_1indicator, JNI.env, self.jni_id, tree_column.to_int, setting ? 1 : 0)
@@ -19132,6 +21726,9 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1tree_1view_1column_1set_1sort_1order, [:pointer, :long, :int32, :int32], :void
       typesig { [::Java::Int, ::Java::Int] }
+      # @param tree_column cast=(GtkTreeViewColumn *)
+      # @param order cast=(GtkSortType)
+      # 
       # long
       def __gtk_tree_view_column_set_sort_order(tree_column, order)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1gtk_1tree_1view_1column_1set_1sort_1order, JNI.env, self.jni_id, tree_column.to_int, order.to_int)
@@ -19150,6 +21747,9 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1tree_1view_1column_1set_1title, [:pointer, :long, :int32, :long], :void
       typesig { [::Java::Int, Array.typed(::Java::Byte)] }
+      # @param tree_column cast=(GtkTreeViewColumn *)
+      # @param title cast=(const gchar *)
+      # 
       # long
       def __gtk_tree_view_column_set_title(tree_column, title)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1gtk_1tree_1view_1column_1set_1title, JNI.env, self.jni_id, tree_column.to_int, title.jni_id)
@@ -19168,6 +21768,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1tree_1view_1column_1set_1visible, [:pointer, :long, :int32, :int8], :void
       typesig { [::Java::Int, ::Java::Boolean] }
+      # @param tree_column cast=(GtkTreeViewColumn *)
       # long
       def __gtk_tree_view_column_set_visible(tree_column, visible)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1gtk_1tree_1view_1column_1set_1visible, JNI.env, self.jni_id, tree_column.to_int, visible ? 1 : 0)
@@ -19186,6 +21787,9 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1tree_1view_1column_1set_1widget, [:pointer, :long, :int32, :int32], :void
       typesig { [::Java::Int, ::Java::Int] }
+      # @param tree_column cast=(GtkTreeViewColumn *)
+      # @param widget cast=(GtkWidget *)
+      # 
       # long
       # long
       def __gtk_tree_view_column_set_widget(tree_column, widget)
@@ -19206,6 +21810,9 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1tree_1view_1set_1drag_1dest_1row, [:pointer, :long, :int32, :int32, :int32], :void
       typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
+      # @param view cast=(GtkTreeView *)
+      # @param path cast=(GtkTreePath *)
+      # 
       # long
       # long
       def __gtk_tree_view_set_drag_dest_row(view, path, pos)
@@ -19226,6 +21833,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1tree_1view_1set_1enable_1search, [:pointer, :long, :int32, :int8], :void
       typesig { [::Java::Int, ::Java::Boolean] }
+      # @param view cast=(GtkTreeView *)
       # long
       def __gtk_tree_view_set_enable_search(view, enable_search)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1gtk_1tree_1view_1set_1enable_1search, JNI.env, self.jni_id, view.to_int, enable_search ? 1 : 0)
@@ -19244,6 +21852,10 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1tree_1view_1expand_1row, [:pointer, :long, :int32, :int32, :int8], :int8
       typesig { [::Java::Int, ::Java::Int, ::Java::Boolean] }
+      # @param view cast=(GtkTreeView *)
+      # @param path cast=(GtkTreePath *)
+      # @param open_all cast=(gboolean)
+      # 
       # long
       # long
       def __gtk_tree_view_expand_row(view, path, open_all)
@@ -19264,6 +21876,11 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1tree_1view_1get_1background_1area, [:pointer, :long, :int32, :int32, :int32, :long], :void
       typesig { [::Java::Int, ::Java::Int, ::Java::Int, GdkRectangle] }
+      # @param tree_view cast=(GtkTreeView *)
+      # @param path cast=(GtkTreePath *)
+      # @param column cast=(GtkTreeViewColumn *)
+      # @param rect cast=(GdkRectangle *)
+      # 
       # long
       # long
       # long
@@ -19286,6 +21903,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1tree_1view_1get_1bin_1window, [:pointer, :long, :int32], :int32
       typesig { [::Java::Int] }
+      # @param tree_view cast=(GtkTreeView *)
       # long
       # long
       def __gtk_tree_view_get_bin_window(tree_view)
@@ -19306,6 +21924,11 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1tree_1view_1get_1cell_1area, [:pointer, :long, :int32, :int32, :int32, :long], :void
       typesig { [::Java::Int, ::Java::Int, ::Java::Int, GdkRectangle] }
+      # @param tree_view cast=(GtkTreeView *)
+      # @param path cast=(GtkTreePath *)
+      # @param column cast=(GtkTreeViewColumn *)
+      # @param rect cast=(GdkRectangle *),flags=no_in
+      # 
       # long
       # long
       # long
@@ -19328,6 +21951,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1tree_1view_1get_1expander_1column, [:pointer, :long, :int32], :int32
       typesig { [::Java::Int] }
+      # @param tree_view cast=(GtkTreeView *)
       # long
       # long
       def __gtk_tree_view_get_expander_column(tree_view)
@@ -19348,6 +21972,9 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1tree_1view_1get_1column, [:pointer, :long, :int32, :int32], :int32
       typesig { [::Java::Int, ::Java::Int] }
+      # @param tree_view cast=(GtkTreeView *)
+      # @param n cast=(gint)
+      # 
       # long
       # long
       def __gtk_tree_view_get_column(tree_view, n)
@@ -19368,6 +21995,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1tree_1view_1get_1columns, [:pointer, :long, :int32], :int32
       typesig { [::Java::Int] }
+      # @param tree_view cast=(GtkTreeView *)
       # long
       # long
       def __gtk_tree_view_get_columns(tree_view)
@@ -19388,6 +22016,10 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1tree_1view_1get_1cursor, [:pointer, :long, :int32, :long, :long], :void
       typesig { [::Java::Int, Array.typed(::Java::Int), Array.typed(::Java::Int)] }
+      # @param tree_view cast=(GtkTreeView *)
+      # @param path cast=(GtkTreePath **)
+      # @param focus_column cast=(GtkTreeViewColumn **)
+      # 
       # long
       # long
       # long
@@ -19410,6 +22042,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1tree_1view_1get_1headers_1visible, [:pointer, :long, :int32], :int8
       typesig { [::Java::Int] }
+      # @param tree_view cast=(GtkTreeView *)
       # long
       def __gtk_tree_view_get_headers_visible(tree_view)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1gtk_1tree_1view_1get_1headers_1visible, JNI.env, self.jni_id, tree_view.to_int) != 0
@@ -19428,6 +22061,14 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1tree_1view_1get_1path_1at_1pos, [:pointer, :long, :int32, :int32, :int32, :long, :long, :long, :long], :int8
       typesig { [::Java::Int, ::Java::Int, ::Java::Int, Array.typed(::Java::Int), Array.typed(::Java::Int), Array.typed(::Java::Int), Array.typed(::Java::Int)] }
+      # @param tree_view cast=(GtkTreeView *)
+      # @param x cast=(gint)
+      # @param y cast=(gint)
+      # @param path cast=(GtkTreePath **)
+      # @param column cast=(GtkTreeViewColumn **)
+      # @param cell_x cast=(gint *)
+      # @param cell_y cast=(gint *)
+      # 
       # long
       # long
       # long
@@ -19450,6 +22091,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1tree_1view_1get_1rules_1hint, [:pointer, :long, :int32], :int8
       typesig { [::Java::Int] }
+      # @param tree_view cast=(GtkTreeView *)
       # long
       def __gtk_tree_view_get_rules_hint(tree_view)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1gtk_1tree_1view_1get_1rules_1hint, JNI.env, self.jni_id, tree_view.to_int) != 0
@@ -19468,6 +22110,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1tree_1view_1get_1selection, [:pointer, :long, :int32], :int32
       typesig { [::Java::Int] }
+      # @param tree_view cast=(GtkTreeView *)
       # long
       # long
       def __gtk_tree_view_get_selection(tree_view)
@@ -19488,6 +22131,9 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1tree_1view_1get_1visible_1rect, [:pointer, :long, :int32, :long], :void
       typesig { [::Java::Int, GdkRectangle] }
+      # @param tree_view cast=(GtkTreeView *)
+      # @param visible_rect flags=no_in
+      # 
       # long
       def __gtk_tree_view_get_visible_rect(tree_view, visible_rect)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1gtk_1tree_1view_1get_1visible_1rect, JNI.env, self.jni_id, tree_view.to_int, visible_rect.jni_id)
@@ -19506,6 +22152,10 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1tree_1view_1insert_1column, [:pointer, :long, :int32, :int32, :int32], :int32
       typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
+      # @param tree_view cast=(GtkTreeView *)
+      # @param column cast=(GtkTreeViewColumn *)
+      # @param position cast=(gint)
+      # 
       # long
       # long
       def __gtk_tree_view_insert_column(tree_view, column, position)
@@ -19526,6 +22176,10 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1tree_1view_1move_1column_1after, [:pointer, :long, :int32, :int32, :int32], :void
       typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
+      # @param tree_view cast=(GtkTreeView *)
+      # @param column cast=(GtkTreeViewColumn *)
+      # @param base_column cast=(GtkTreeViewColumn *)
+      # 
       # long
       # long
       # long
@@ -19548,6 +22202,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1tree_1view_1new_1with_1model, [:pointer, :long, :int32], :int32
       typesig { [::Java::Int] }
+      # @param model cast=(GtkTreeModel *)
       # long
       # long
       def __gtk_tree_view_new_with_model(model)
@@ -19568,6 +22223,9 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1tree_1view_1remove_1column, [:pointer, :long, :int32, :int32], :void
       typesig { [::Java::Int, ::Java::Int] }
+      # @param tree_view cast=(GtkTreeView *)
+      # @param column cast=(GtkTreeViewColumn *)
+      # 
       # long
       # long
       def __gtk_tree_view_remove_column(tree_view, column)
@@ -19588,6 +22246,9 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1tree_1view_1row_1expanded, [:pointer, :long, :int32, :int32], :int8
       typesig { [::Java::Int, ::Java::Int] }
+      # @param view cast=(GtkTreeView *)
+      # @param path cast=(GtkTreePath *)
+      # 
       # long
       # long
       def __gtk_tree_view_row_expanded(view, path)
@@ -19608,6 +22269,13 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1tree_1view_1scroll_1to_1cell, [:pointer, :long, :int32, :int32, :int32, :int8, :float, :float], :void
       typesig { [::Java::Int, ::Java::Int, ::Java::Int, ::Java::Boolean, ::Java::Float, ::Java::Float] }
+      # @param tree_view cast=(GtkTreeView *)
+      # @param path cast=(GtkTreePath *)
+      # @param column cast=(GtkTreeViewColumn *)
+      # @param use_align cast=(gboolean)
+      # @param row_aligh cast=(gfloat)
+      # @param column_align cast=(gfloat)
+      # 
       # long
       # long
       # long
@@ -19630,6 +22298,10 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1tree_1view_1scroll_1to_1point, [:pointer, :long, :int32, :int32, :int32], :void
       typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
+      # @param tree_view cast=(GtkTreeView *)
+      # @param tree_x cast=(gint)
+      # @param tree_y cast=(gint)
+      # 
       # long
       def __gtk_tree_view_scroll_to_point(tree_view, tree_x, tree_y)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1gtk_1tree_1view_1scroll_1to_1point, JNI.env, self.jni_id, tree_view.to_int, tree_x.to_int, tree_y.to_int)
@@ -19648,6 +22320,10 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1tree_1view_1set_1cursor, [:pointer, :long, :int32, :int32, :int32, :int8], :void
       typesig { [::Java::Int, ::Java::Int, ::Java::Int, ::Java::Boolean] }
+      # @param tree_view cast=(GtkTreeView *)
+      # @param path cast=(GtkTreePath *)
+      # @param focus_column cast=(GtkTreeViewColumn *)
+      # 
       # long
       # long
       # long
@@ -19668,8 +22344,32 @@ module Org::Eclipse::Swt::Internal::Gtk
         end
       end
       
+      JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1tree_1view_1set_1grid_1lines, [:pointer, :long, :int32, :int32], :void
+      typesig { [::Java::Int, ::Java::Int] }
+      # @method flags=dynamic
+      # @param tree_view cast=(GtkTreeView*)
+      # 
+      # long
+      def __gtk_tree_view_set_grid_lines(tree_view, grid_lines)
+        JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1gtk_1tree_1view_1set_1grid_1lines, JNI.env, self.jni_id, tree_view.to_int, grid_lines.to_int)
+      end
+      
+      typesig { [::Java::Int, ::Java::Int] }
+      # long
+      def gtk_tree_view_set_grid_lines(tree_view, grid_lines)
+        PLATFORM_LOCK.lock
+        begin
+          __gtk_tree_view_set_grid_lines(tree_view, grid_lines)
+        ensure
+          PLATFORM_LOCK.unlock
+        end
+      end
+      
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1tree_1view_1set_1headers_1visible, [:pointer, :long, :int32, :int8], :void
       typesig { [::Java::Int, ::Java::Boolean] }
+      # @param tree_view cast=(GtkTreeView *)
+      # @param visible cast=(gboolean)
+      # 
       # long
       def __gtk_tree_view_set_headers_visible(tree_view, visible)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1gtk_1tree_1view_1set_1headers_1visible, JNI.env, self.jni_id, tree_view.to_int, visible ? 1 : 0)
@@ -19688,6 +22388,9 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1tree_1view_1set_1model, [:pointer, :long, :int32, :int32], :void
       typesig { [::Java::Int, ::Java::Int] }
+      # @param tree_view cast=(GtkTreeView *)
+      # @param model cast=(GtkTreeModel *)
+      # 
       # long
       # long
       def __gtk_tree_view_set_model(tree_view, model)
@@ -19708,6 +22411,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1tree_1view_1set_1rules_1hint, [:pointer, :long, :int32, :int8], :void
       typesig { [::Java::Int, ::Java::Boolean] }
+      # @param tree_view cast=(GtkTreeView *)
       # long
       def __gtk_tree_view_set_rules_hint(tree_view, setting)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1gtk_1tree_1view_1set_1rules_1hint, JNI.env, self.jni_id, tree_view.to_int, setting ? 1 : 0)
@@ -19726,6 +22430,9 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1tree_1view_1set_1search_1column, [:pointer, :long, :int32, :int32], :void
       typesig { [::Java::Int, ::Java::Int] }
+      # @param tree_view cast=(GtkTreeView *)
+      # @param column cast=(gint)
+      # 
       # long
       def __gtk_tree_view_set_search_column(tree_view, column)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1gtk_1tree_1view_1set_1search_1column, JNI.env, self.jni_id, tree_view.to_int, column.to_int)
@@ -19744,6 +22451,12 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1tree_1view_1tree_1to_1widget_1coords, [:pointer, :long, :int32, :int32, :int32, :long, :long], :void
       typesig { [::Java::Int, ::Java::Int, ::Java::Int, Array.typed(::Java::Int), Array.typed(::Java::Int)] }
+      # @param tree_view cast=(GtkTreeView *)
+      # @param tx cast=(gint)
+      # @param ty cast=(gint)
+      # @param wx cast=(gint *)
+      # @param wy cast=(gint *)
+      # 
       # long
       def __gtk_tree_view_tree_to_widget_coords(tree_view, tx, ty, wx, wy)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1gtk_1tree_1view_1tree_1to_1widget_1coords, JNI.env, self.jni_id, tree_view.to_int, tx.to_int, ty.to_int, wx.jni_id, wy.jni_id)
@@ -19762,6 +22475,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1tree_1view_1unset_1rows_1drag_1dest, [:pointer, :long, :int32], :void
       typesig { [::Java::Int] }
+      # @param tree_view cast=(GtkTreeView *)
       # long
       def __gtk_tree_view_unset_rows_drag_dest(tree_view)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1gtk_1tree_1view_1unset_1rows_1drag_1dest, JNI.env, self.jni_id, tree_view.to_int)
@@ -19780,6 +22494,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1tree_1view_1widget_1to_1tree_1coords, [:pointer, :long, :int32, :int32, :int32, :long, :long], :void
       typesig { [::Java::Int, ::Java::Int, ::Java::Int, Array.typed(::Java::Int), Array.typed(::Java::Int)] }
+      # @param tree_view cast=(GtkTreeView *)
       # long
       def __gtk_tree_view_widget_to_tree_coords(tree_view, wx, wy, tx, ty)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1gtk_1tree_1view_1widget_1to_1tree_1coords, JNI.env, self.jni_id, tree_view.to_int, wx.to_int, wy.to_int, tx.jni_id, ty.jni_id)
@@ -19798,6 +22513,9 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1vbox_1new, [:pointer, :long, :int8, :int32], :int32
       typesig { [::Java::Boolean, ::Java::Int] }
+      # @param homogeneous cast=(gboolean)
+      # @param spacing cast=(gint)
+      # 
       # long
       def __gtk_vbox_new(homogeneous, spacing)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1gtk_1vbox_1new, JNI.env, self.jni_id, homogeneous ? 1 : 0, spacing.to_int)
@@ -19814,8 +22532,49 @@ module Org::Eclipse::Swt::Internal::Gtk
         end
       end
       
+      JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1viewport_1get_1shadow_1type, [:pointer, :long, :int32], :int32
+      typesig { [::Java::Int] }
+      # @param viewport cast=(GtkViewport *)
+      # long
+      def __gtk_viewport_get_shadow_type(viewport)
+        JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1gtk_1viewport_1get_1shadow_1type, JNI.env, self.jni_id, viewport.to_int)
+      end
+      
+      typesig { [::Java::Int] }
+      # long
+      def gtk_viewport_get_shadow_type(viewport)
+        PLATFORM_LOCK.lock
+        begin
+          return __gtk_viewport_get_shadow_type(viewport)
+        ensure
+          PLATFORM_LOCK.unlock
+        end
+      end
+      
+      JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1viewport_1set_1shadow_1type, [:pointer, :long, :int32, :int32], :void
+      typesig { [::Java::Int, ::Java::Int] }
+      # @param viewport cast=(GtkViewport *)
+      # @param type cast=(GtkShadowType)
+      # 
+      # long
+      def __gtk_viewport_set_shadow_type(viewport, type)
+        JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1gtk_1viewport_1set_1shadow_1type, JNI.env, self.jni_id, viewport.to_int, type.to_int)
+      end
+      
+      typesig { [::Java::Int, ::Java::Int] }
+      # long
+      def gtk_viewport_set_shadow_type(viewport, type)
+        PLATFORM_LOCK.lock
+        begin
+          __gtk_viewport_set_shadow_type(viewport, type)
+        ensure
+          PLATFORM_LOCK.unlock
+        end
+      end
+      
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1vscale_1new, [:pointer, :long, :int32], :int32
       typesig { [::Java::Int] }
+      # @param adjustment cast=(GtkAdjustment *)
       # long
       # long
       def __gtk_vscale_new(adjustment)
@@ -19836,6 +22595,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1vscrollbar_1new, [:pointer, :long, :int32], :int32
       typesig { [::Java::Int] }
+      # @param adjustment cast=(GtkAdjustment *)
       # long
       # long
       def __gtk_vscrollbar_new(adjustment)
@@ -19874,6 +22634,12 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1widget_1add_1accelerator, [:pointer, :long, :int32, :long, :int32, :int32, :int32, :int32], :void
       typesig { [::Java::Int, Array.typed(::Java::Byte), ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int] }
+      # @param widget cast=(GtkWidget *)
+      # @param accel_signal cast=(const gchar *)
+      # @param accel_group cast=(GtkAccelGroup *)
+      # @param accel_key cast=(guint)
+      # @param accel_mods cast=(GdkModifierType)
+      # 
       # long
       # long
       def __gtk_widget_add_accelerator(widget, accel_signal, accel_group, accel_key, accel_mods, accel_flags)
@@ -19894,6 +22660,9 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1widget_1add_1events, [:pointer, :long, :int32, :int32], :void
       typesig { [::Java::Int, ::Java::Int] }
+      # @param widget cast=(GtkWidget *)
+      # @param events cast=(gint)
+      # 
       # long
       def __gtk_widget_add_events(widget, events)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1gtk_1widget_1add_1events, JNI.env, self.jni_id, widget.to_int, events.to_int)
@@ -19912,6 +22681,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1widget_1child_1focus, [:pointer, :long, :int32, :int32], :int8
       typesig { [::Java::Int, ::Java::Int] }
+      # @param widget cast=(GtkWidget *)
       # long
       def __gtk_widget_child_focus(widget, direction)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1gtk_1widget_1child_1focus, JNI.env, self.jni_id, widget.to_int, direction.to_int) != 0
@@ -19930,6 +22700,9 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1widget_1create_1pango_1layout__I_3B, [:pointer, :long, :int32, :long], :int32
       typesig { [::Java::Int, Array.typed(::Java::Byte)] }
+      # @param widget cast=(GtkWidget *)
+      # @param text cast=(const gchar *)
+      # 
       # long
       # long
       def __gtk_widget_create_pango_layout(widget, text)
@@ -19950,6 +22723,9 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1widget_1create_1pango_1layout__II, [:pointer, :long, :int32, :int32], :int32
       typesig { [::Java::Int, ::Java::Int] }
+      # @param widget cast=(GtkWidget *)
+      # @param text cast=(const gchar *)
+      # 
       # long
       # long
       # long
@@ -19972,6 +22748,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1widget_1destroy, [:pointer, :long, :int32], :void
       typesig { [::Java::Int] }
+      # @param widget cast=(GtkWidget *)
       # long
       def __gtk_widget_destroy(widget)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1gtk_1widget_1destroy, JNI.env, self.jni_id, widget.to_int)
@@ -19990,6 +22767,9 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1widget_1event, [:pointer, :long, :int32, :int32], :int8
       typesig { [::Java::Int, ::Java::Int] }
+      # @param widget cast=(GtkWidget *)
+      # @param event cast=(GdkEvent *)
+      # 
       # long
       # long
       def __gtk_widget_event(widget, event)
@@ -20010,6 +22790,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1widget_1get_1accessible, [:pointer, :long, :int32], :int32
       typesig { [::Java::Int] }
+      # @param widget cast=(GtkWidget *)
       # long
       # long
       def __gtk_widget_get_accessible(widget)
@@ -20030,6 +22811,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1widget_1get_1child_1visible, [:pointer, :long, :int32], :int8
       typesig { [::Java::Int] }
+      # @param widget cast=(GtkWidget *)
       # long
       def __gtk_widget_get_child_visible(widget)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1gtk_1widget_1get_1child_1visible, JNI.env, self.jni_id, widget.to_int) != 0
@@ -20082,6 +22864,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1widget_1get_1direction, [:pointer, :long, :int32], :int32
       typesig { [::Java::Int] }
+      # @param widget cast=(GtkWidget *)
       # long
       def __gtk_widget_get_direction(widget)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1gtk_1widget_1get_1direction, JNI.env, self.jni_id, widget.to_int)
@@ -20100,6 +22883,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1widget_1get_1events, [:pointer, :long, :int32], :int32
       typesig { [::Java::Int] }
+      # @param widget cast=(GtkWidget *)
       # long
       def __gtk_widget_get_events(widget)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1gtk_1widget_1get_1events, JNI.env, self.jni_id, widget.to_int)
@@ -20118,6 +22902,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1widget_1get_1modifier_1style, [:pointer, :long, :int32], :int32
       typesig { [::Java::Int] }
+      # @param widget cast=(GtkWidget *)
       # long
       # long
       def __gtk_widget_get_modifier_style(widget)
@@ -20138,6 +22923,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1widget_1get_1pango_1context, [:pointer, :long, :int32], :int32
       typesig { [::Java::Int] }
+      # @param widget cast=(GtkWidget *)
       # long
       # long
       def __gtk_widget_get_pango_context(widget)
@@ -20158,6 +22944,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1widget_1get_1parent, [:pointer, :long, :int32], :int32
       typesig { [::Java::Int] }
+      # @param widget cast=(GtkWidget *)
       # long
       # long
       def __gtk_widget_get_parent(widget)
@@ -20178,6 +22965,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1widget_1get_1style, [:pointer, :long, :int32], :int32
       typesig { [::Java::Int] }
+      # @param widget cast=(GtkWidget *)
       # long
       # long
       def __gtk_widget_get_style(widget)
@@ -20198,6 +22986,10 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1widget_1get_1size_1request, [:pointer, :long, :int32, :long, :long], :void
       typesig { [::Java::Int, Array.typed(::Java::Int), Array.typed(::Java::Int)] }
+      # @param widget cast=(GtkWidget *)
+      # @param width cast=(gint *)
+      # @param height cast=(gint *)
+      # 
       # long
       def __gtk_widget_get_size_request(widget, width, height)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1gtk_1widget_1get_1size_1request, JNI.env, self.jni_id, widget.to_int, width.jni_id, height.jni_id)
@@ -20216,6 +23008,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1widget_1get_1toplevel, [:pointer, :long, :int32], :int32
       typesig { [::Java::Int] }
+      # @param widget cast=(GtkWidget *)
       # long
       # long
       def __gtk_widget_get_toplevel(widget)
@@ -20236,6 +23029,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1widget_1grab_1focus, [:pointer, :long, :int32], :void
       typesig { [::Java::Int] }
+      # @param widget cast=(GtkWidget *)
       # long
       def __gtk_widget_grab_focus(widget)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1gtk_1widget_1grab_1focus, JNI.env, self.jni_id, widget.to_int)
@@ -20254,6 +23048,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1widget_1hide, [:pointer, :long, :int32], :void
       typesig { [::Java::Int] }
+      # @param widget cast=(GtkWidget *)
       # long
       def __gtk_widget_hide(widget)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1gtk_1widget_1hide, JNI.env, self.jni_id, widget.to_int)
@@ -20272,6 +23067,9 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1widget_1is_1composited, [:pointer, :long, :int32], :int8
       typesig { [::Java::Int] }
+      # @method flags=dynamic
+      # @param widget cast=(GtkWidget *)
+      # 
       # long
       def __gtk_widget_is_composited(widget)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1gtk_1widget_1is_1composited, JNI.env, self.jni_id, widget.to_int) != 0
@@ -20290,6 +23088,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1widget_1is_1focus, [:pointer, :long, :int32], :int8
       typesig { [::Java::Int] }
+      # @param widget cast=(GtkWidget *)
       # long
       def __gtk_widget_is_focus(widget)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1gtk_1widget_1is_1focus, JNI.env, self.jni_id, widget.to_int) != 0
@@ -20308,6 +23107,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1widget_1map, [:pointer, :long, :int32], :void
       typesig { [::Java::Int] }
+      # @param widget cast=(GtkWidget *)
       # long
       def __gtk_widget_map(widget)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1gtk_1widget_1map, JNI.env, self.jni_id, widget.to_int)
@@ -20326,6 +23126,9 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1widget_1mnemonic_1activate, [:pointer, :long, :int32, :int8], :int8
       typesig { [::Java::Int, ::Java::Boolean] }
+      # @param widget cast=(GtkWidget *)
+      # @param group_cycling cast=(gboolean)
+      # 
       # long
       def __gtk_widget_mnemonic_activate(widget, group_cycling)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1gtk_1widget_1mnemonic_1activate, JNI.env, self.jni_id, widget.to_int, group_cycling ? 1 : 0) != 0
@@ -20344,6 +23147,10 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1widget_1modify_1base, [:pointer, :long, :int32, :int32, :long], :void
       typesig { [::Java::Int, ::Java::Int, GdkColor] }
+      # @param widget cast=(GtkWidget *)
+      # @param state cast=(GtkStateType)
+      # @param color cast=(GdkColor *),flags=no_out
+      # 
       # long
       def __gtk_widget_modify_base(widget, state, color)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1gtk_1widget_1modify_1base, JNI.env, self.jni_id, widget.to_int, state.to_int, color.jni_id)
@@ -20362,6 +23169,10 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1widget_1modify_1bg, [:pointer, :long, :int32, :int32, :long], :void
       typesig { [::Java::Int, ::Java::Int, GdkColor] }
+      # @param widget cast=(GtkWidget *)
+      # @param state cast=(GtkStateType)
+      # @param color cast=(GdkColor *),flags=no_out
+      # 
       # long
       def __gtk_widget_modify_bg(widget, state, color)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1gtk_1widget_1modify_1bg, JNI.env, self.jni_id, widget.to_int, state.to_int, color.jni_id)
@@ -20380,6 +23191,10 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1widget_1modify_1fg, [:pointer, :long, :int32, :int32, :long], :void
       typesig { [::Java::Int, ::Java::Int, GdkColor] }
+      # @param widget cast=(GtkWidget *)
+      # @param state cast=(GtkStateType)
+      # @param color cast=(GdkColor *),flags=no_out
+      # 
       # long
       def __gtk_widget_modify_fg(widget, state, color)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1gtk_1widget_1modify_1fg, JNI.env, self.jni_id, widget.to_int, state.to_int, color.jni_id)
@@ -20398,6 +23213,9 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1widget_1modify_1font, [:pointer, :long, :int32, :int32], :void
       typesig { [::Java::Int, ::Java::Int] }
+      # @param widget cast=(GtkWidget *)
+      # @param pango_font_descr cast=(PangoFontDescription *)
+      # 
       # long
       # long
       def __gtk_widget_modify_font(widget, pango_font_descr)
@@ -20418,6 +23236,9 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1widget_1modify_1style, [:pointer, :long, :int32, :int32], :void
       typesig { [::Java::Int, ::Java::Int] }
+      # @param widget cast=(GtkWidget *)
+      # @param style cast=(GtkRcStyle *)
+      # 
       # long
       # long
       def __gtk_widget_modify_style(widget, style)
@@ -20438,6 +23259,10 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1widget_1modify_1text, [:pointer, :long, :int32, :int32, :long], :void
       typesig { [::Java::Int, ::Java::Int, GdkColor] }
+      # @param widget cast=(GtkWidget *)
+      # @param state cast=(GtkStateType)
+      # @param color cast=(GdkColor *),flags=no_out
+      # 
       # long
       def __gtk_widget_modify_text(widget, state, color)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1gtk_1widget_1modify_1text, JNI.env, self.jni_id, widget.to_int, state.to_int, color.jni_id)
@@ -20456,6 +23281,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1widget_1queue_1resize, [:pointer, :long, :int32], :void
       typesig { [::Java::Int] }
+      # @param widget cast=(GtkWidget *)
       # long
       def __gtk_widget_queue_resize(widget)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1gtk_1widget_1queue_1resize, JNI.env, self.jni_id, widget.to_int)
@@ -20474,6 +23300,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1widget_1realize, [:pointer, :long, :int32], :void
       typesig { [::Java::Int] }
+      # @param widget cast=(GtkWidget *)
       # long
       def __gtk_widget_realize(widget)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1gtk_1widget_1realize, JNI.env, self.jni_id, widget.to_int)
@@ -20492,6 +23319,11 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1widget_1remove_1accelerator, [:pointer, :long, :int32, :int32, :int32, :int32], :void
       typesig { [::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int] }
+      # @param widget cast=(GtkWidget *)
+      # @param accel_group cast=(GtkAccelGroup *)
+      # @param accel_key cast=(guint)
+      # @param accel_mods cast=(GdkModifierType)
+      # 
       # long
       # long
       def __gtk_widget_remove_accelerator(widget, accel_group, accel_key, accel_mods)
@@ -20512,6 +23344,9 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1widget_1reparent, [:pointer, :long, :int32, :int32], :void
       typesig { [::Java::Int, ::Java::Int] }
+      # @param widget cast=(GtkWidget *)
+      # @param new_parent cast=(GtkWidget *)
+      # 
       # long
       # long
       def __gtk_widget_reparent(widget, new_parent)
@@ -20532,6 +23367,9 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1widget_1send_1expose, [:pointer, :long, :int32, :int32], :int32
       typesig { [::Java::Int, ::Java::Int] }
+      # @param widget cast=(GtkWidget *)
+      # @param event cast=(GdkEvent *)
+      # 
       # long
       # long
       def __gtk_widget_send_expose(widget, event)
@@ -20552,6 +23390,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1widget_1set_1app_1paintable, [:pointer, :long, :int32, :int8], :void
       typesig { [::Java::Int, ::Java::Boolean] }
+      # @param widget cast=(GtkWidget *)
       # long
       def __gtk_widget_set_app_paintable(widget, app_paintable)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1gtk_1widget_1set_1app_1paintable, JNI.env, self.jni_id, widget.to_int, app_paintable ? 1 : 0)
@@ -20570,6 +23409,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1widget_1set_1default_1direction, [:pointer, :long, :int32], :void
       typesig { [::Java::Int] }
+      # @param dir cast=(GtkTextDirection)
       def __gtk_widget_set_default_direction(dir)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1gtk_1widget_1set_1default_1direction, JNI.env, self.jni_id, dir.to_int)
       end
@@ -20586,6 +23426,9 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1widget_1set_1direction, [:pointer, :long, :int32, :int32], :void
       typesig { [::Java::Int, ::Java::Int] }
+      # @param widget cast=(GtkWidget *)
+      # @param dir cast=(GtkTextDirection)
+      # 
       # long
       def __gtk_widget_set_direction(widget, dir)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1gtk_1widget_1set_1direction, JNI.env, self.jni_id, widget.to_int, dir.to_int)
@@ -20604,6 +23447,9 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1widget_1set_1double_1buffered, [:pointer, :long, :int32, :int8], :void
       typesig { [::Java::Int, ::Java::Boolean] }
+      # @param widget cast=(GtkWidget *)
+      # @param double_buffered cast=(gboolean)
+      # 
       # long
       def __gtk_widget_set_double_buffered(widget, double_buffered)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1gtk_1widget_1set_1double_1buffered, JNI.env, self.jni_id, widget.to_int, double_buffered ? 1 : 0)
@@ -20622,6 +23468,9 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1widget_1set_1name, [:pointer, :long, :int32, :long], :void
       typesig { [::Java::Int, Array.typed(::Java::Byte)] }
+      # @param widget cast=(GtkWidget *)
+      # @param name cast=(const char *)
+      # 
       # long
       def __gtk_widget_set_name(widget, name)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1gtk_1widget_1set_1name, JNI.env, self.jni_id, widget.to_int, name.jni_id)
@@ -20640,6 +23489,9 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1widget_1set_1redraw_1on_1allocate, [:pointer, :long, :int32, :int8], :void
       typesig { [::Java::Int, ::Java::Boolean] }
+      # @param widget cast=(GtkWidget *)
+      # @param redraw cast=(gboolean)
+      # 
       # long
       def __gtk_widget_set_redraw_on_allocate(widget, redraw)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1gtk_1widget_1set_1redraw_1on_1allocate, JNI.env, self.jni_id, widget.to_int, redraw ? 1 : 0)
@@ -20658,6 +23510,9 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1widget_1set_1sensitive, [:pointer, :long, :int32, :int8], :void
       typesig { [::Java::Int, ::Java::Boolean] }
+      # @param widget cast=(GtkWidget *)
+      # @param sensitive cast=(gboolean)
+      # 
       # long
       def __gtk_widget_set_sensitive(widget, sensitive)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1gtk_1widget_1set_1sensitive, JNI.env, self.jni_id, widget.to_int, sensitive ? 1 : 0)
@@ -20676,6 +23531,10 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1widget_1set_1size_1request, [:pointer, :long, :int32, :int32, :int32], :void
       typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
+      # @param widget cast=(GtkWidget *)
+      # @param width cast=(gint)
+      # @param height cast=(gint)
+      # 
       # long
       def __gtk_widget_set_size_request(widget, width, height)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1gtk_1widget_1set_1size_1request, JNI.env, self.jni_id, widget.to_int, width.to_int, height.to_int)
@@ -20694,6 +23553,9 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1widget_1set_1state, [:pointer, :long, :int32, :int32], :void
       typesig { [::Java::Int, ::Java::Int] }
+      # @param widget cast=(GtkWidget *)
+      # @param state cast=(GtkStateType)
+      # 
       # long
       def __gtk_widget_set_state(widget, state)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1gtk_1widget_1set_1state, JNI.env, self.jni_id, widget.to_int, state.to_int)
@@ -20712,6 +23574,9 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1widget_1set_1style, [:pointer, :long, :int32, :int32], :void
       typesig { [::Java::Int, ::Java::Int] }
+      # @param widget cast=(GtkWidget *)
+      # @param style cast=(GtkStyle *)
+      # 
       # long
       # long
       def __gtk_widget_set_style(widget, style)
@@ -20732,6 +23597,11 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1widget_1shape_1combine_1mask, [:pointer, :long, :int32, :int32, :int32, :int32], :void
       typesig { [::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int] }
+      # @param widget cast=(GtkWidget *)
+      # @param shape_mask cast=(GdkBitmap *)
+      # @param offset_x cast=(gint)
+      # @param offset_y cast=(gint)
+      # 
       # long
       # long
       def __gtk_widget_shape_combine_mask(widget, shape_mask, offset_x, offset_y)
@@ -20752,6 +23622,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1widget_1show, [:pointer, :long, :int32], :void
       typesig { [::Java::Int] }
+      # @param widget cast=(GtkWidget *)
       # long
       def __gtk_widget_show(widget)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1gtk_1widget_1show, JNI.env, self.jni_id, widget.to_int)
@@ -20770,6 +23641,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1widget_1show_1now, [:pointer, :long, :int32], :void
       typesig { [::Java::Int] }
+      # @param widget cast=(GtkWidget *)
       # long
       def __gtk_widget_show_now(widget)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1gtk_1widget_1show_1now, JNI.env, self.jni_id, widget.to_int)
@@ -20788,6 +23660,9 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1widget_1size_1allocate, [:pointer, :long, :int32, :long], :void
       typesig { [::Java::Int, GtkAllocation] }
+      # @param widget cast=(GtkWidget *)
+      # @param allocation cast=(GtkAllocation *),flags=no_out
+      # 
       # long
       def __gtk_widget_size_allocate(widget, allocation)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1gtk_1widget_1size_1allocate, JNI.env, self.jni_id, widget.to_int, allocation.jni_id)
@@ -20806,6 +23681,9 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1widget_1size_1request, [:pointer, :long, :int32, :long], :void
       typesig { [::Java::Int, GtkRequisition] }
+      # @param widget cast=(GtkWidget *)
+      # @param requisition cast=(GtkRequisition *),flags=no_in
+      # 
       # long
       def __gtk_widget_size_request(widget, requisition)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1gtk_1widget_1size_1request, JNI.env, self.jni_id, widget.to_int, requisition.jni_id)
@@ -20824,6 +23702,10 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1widget_1style_1get__I_3B_3II, [:pointer, :long, :int32, :long, :long, :int32], :void
       typesig { [::Java::Int, Array.typed(::Java::Byte), Array.typed(::Java::Int), ::Java::Int] }
+      # @param widget cast=(GtkWidget *)
+      # @param property_name cast=(const gchar *)
+      # @param terminator cast=(const gchar *),flags=sentinel
+      # 
       # long
       # long
       def __gtk_widget_style_get(widget, property_name, value, terminator)
@@ -20844,6 +23726,10 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1widget_1style_1get__I_3B_3JI, [:pointer, :long, :int32, :long, :long, :int32], :void
       typesig { [::Java::Int, Array.typed(::Java::Byte), Array.typed(::Java::Long), ::Java::Int] }
+      # @param widget cast=(GtkWidget *)
+      # @param property_name cast=(const gchar *)
+      # @param terminator cast=(const gchar *),flags=sentinel
+      # 
       # long
       # long
       def __gtk_widget_style_get(widget, property_name, value, terminator)
@@ -20864,6 +23750,9 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1widget_1translate_1coordinates, [:pointer, :long, :int32, :int32, :int32, :int32, :long, :long], :int8
       typesig { [::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, Array.typed(::Java::Int), Array.typed(::Java::Int)] }
+      # @param src_widget cast=(GtkWidget *)
+      # @param dest_widget cast=(GtkWidget *)
+      # 
       # long
       # long
       def __gtk_widget_translate_coordinates(src_widget, dest_widget, src_x, src_y, dest_x, dest_y)
@@ -20884,6 +23773,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1widget_1unrealize, [:pointer, :long, :int32], :void
       typesig { [::Java::Int] }
+      # @param widget cast=(GtkWidget *)
       # long
       def __gtk_widget_unrealize(widget)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1gtk_1widget_1unrealize, JNI.env, self.jni_id, widget.to_int)
@@ -20902,6 +23792,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1window_1activate_1default, [:pointer, :long, :int32], :int8
       typesig { [::Java::Int] }
+      # @param window cast=(GtkWindow *)
       # long
       def __gtk_window_activate_default(window)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1gtk_1window_1activate_1default, JNI.env, self.jni_id, window.to_int) != 0
@@ -20920,6 +23811,9 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1window_1add_1accel_1group, [:pointer, :long, :int32, :int32], :void
       typesig { [::Java::Int, ::Java::Int] }
+      # @param window cast=(GtkWindow *)
+      # @param accel_group cast=(GtkAccelGroup *)
+      # 
       # long
       # long
       def __gtk_window_add_accel_group(window, accel_group)
@@ -20940,6 +23834,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1window_1deiconify, [:pointer, :long, :int32], :void
       typesig { [::Java::Int] }
+      # @param handle cast=(GtkWindow *)
       # long
       def __gtk_window_deiconify(handle)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1gtk_1window_1deiconify, JNI.env, self.jni_id, handle.to_int)
@@ -20958,6 +23853,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1window_1get_1focus, [:pointer, :long, :int32], :int32
       typesig { [::Java::Int] }
+      # @param window cast=(GtkWindow *)
       # long
       # long
       def __gtk_window_get_focus(window)
@@ -20978,6 +23874,9 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1window_1get_1group, [:pointer, :long, :int32], :int32
       typesig { [::Java::Int] }
+      # @method flags=dynamic
+      # @param window cast=(GtkWindow *)
+      # 
       # long
       # long
       def __gtk_window_get_group(window)
@@ -20998,6 +23897,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1window_1get_1icon_1list, [:pointer, :long, :int32], :int32
       typesig { [::Java::Int] }
+      # @param window cast=(GtkWindow *)
       # long
       # long
       def __gtk_window_get_icon_list(window)
@@ -21018,6 +23918,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1window_1get_1modal, [:pointer, :long, :int32], :int8
       typesig { [::Java::Int] }
+      # @param window cast=(GtkWindow *)
       # long
       def __gtk_window_get_modal(window)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1gtk_1window_1get_1modal, JNI.env, self.jni_id, window.to_int) != 0
@@ -21036,6 +23937,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1window_1get_1mnemonic_1modifier, [:pointer, :long, :int32], :int32
       typesig { [::Java::Int] }
+      # @param window cast=(GtkWindow *)
       # long
       def __gtk_window_get_mnemonic_modifier(window)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1gtk_1window_1get_1mnemonic_1modifier, JNI.env, self.jni_id, window.to_int)
@@ -21054,6 +23956,9 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1window_1get_1opacity, [:pointer, :long, :int32], :double
       typesig { [::Java::Int] }
+      # @method flags=dynamic
+      # @param window cast=(GtkWindow *)
+      # 
       # long
       def __gtk_window_get_opacity(window)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1gtk_1window_1get_1opacity, JNI.env, self.jni_id, window.to_int)
@@ -21072,6 +23977,10 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1window_1get_1position, [:pointer, :long, :int32, :long, :long], :void
       typesig { [::Java::Int, Array.typed(::Java::Int), Array.typed(::Java::Int)] }
+      # @param handle cast=(GtkWindow *)
+      # @param x cast=(gint *)
+      # @param y cast=(gint *)
+      # 
       # long
       def __gtk_window_get_position(handle, x, y)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1gtk_1window_1get_1position, JNI.env, self.jni_id, handle.to_int, x.jni_id, y.jni_id)
@@ -21090,6 +23999,10 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1window_1get_1size, [:pointer, :long, :int32, :long, :long], :void
       typesig { [::Java::Int, Array.typed(::Java::Int), Array.typed(::Java::Int)] }
+      # @param handle cast=(GtkWindow *)
+      # @param x cast=(gint *)
+      # @param y cast=(gint *)
+      # 
       # long
       def __gtk_window_get_size(handle, x, y)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1gtk_1window_1get_1size, JNI.env, self.jni_id, handle.to_int, x.jni_id, y.jni_id)
@@ -21108,6 +24021,9 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1window_1group_1add_1window, [:pointer, :long, :int32, :int32], :void
       typesig { [::Java::Int, ::Java::Int] }
+      # @param group cast=(GtkWindowGroup*)
+      # @param window cast=(GtkWindow*)
+      # 
       # long
       # long
       def __gtk_window_group_add_window(group, window)
@@ -21128,6 +24044,9 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1window_1group_1remove_1window, [:pointer, :long, :int32, :int32], :void
       typesig { [::Java::Int, ::Java::Int] }
+      # @param group cast=(GtkWindowGroup*)
+      # @param window cast=(GtkWindow*)
+      # 
       # long
       # long
       def __gtk_window_group_remove_window(group, window)
@@ -21166,6 +24085,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1window_1iconify, [:pointer, :long, :int32], :void
       typesig { [::Java::Int] }
+      # @param handle cast=(GtkWindow *)
       # long
       def __gtk_window_iconify(handle)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1gtk_1window_1iconify, JNI.env, self.jni_id, handle.to_int)
@@ -21202,6 +24122,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1window_1maximize, [:pointer, :long, :int32], :void
       typesig { [::Java::Int] }
+      # @param handle cast=(GtkWindow *)
       # long
       def __gtk_window_maximize(handle)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1gtk_1window_1maximize, JNI.env, self.jni_id, handle.to_int)
@@ -21220,6 +24141,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1window_1fullscreen, [:pointer, :long, :int32], :void
       typesig { [::Java::Int] }
+      # @param handle cast=(GtkWindow *)
       # long
       def __gtk_window_fullscreen(handle)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1gtk_1window_1fullscreen, JNI.env, self.jni_id, handle.to_int)
@@ -21238,6 +24160,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1window_1unfullscreen, [:pointer, :long, :int32], :void
       typesig { [::Java::Int] }
+      # @param handle cast=(GtkWindow *)
       # long
       def __gtk_window_unfullscreen(handle)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1gtk_1window_1unfullscreen, JNI.env, self.jni_id, handle.to_int)
@@ -21256,6 +24179,10 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1window_1move, [:pointer, :long, :int32, :int32, :int32], :void
       typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
+      # @param handle cast=(GtkWindow *)
+      # @param x cast=(gint)
+      # @param y cast=(gint)
+      # 
       # long
       def __gtk_window_move(handle, x, y)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1gtk_1window_1move, JNI.env, self.jni_id, handle.to_int, x.to_int, y.to_int)
@@ -21274,6 +24201,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1window_1new, [:pointer, :long, :int32], :int32
       typesig { [::Java::Int] }
+      # @param type cast=(GtkWindowType)
       # long
       def __gtk_window_new(type)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1gtk_1window_1new, JNI.env, self.jni_id, type.to_int)
@@ -21292,6 +24220,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1window_1present, [:pointer, :long, :int32], :void
       typesig { [::Java::Int] }
+      # @param window cast=(GtkWindow *)
       # long
       def __gtk_window_present(window)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1gtk_1window_1present, JNI.env, self.jni_id, window.to_int)
@@ -21310,6 +24239,9 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1window_1remove_1accel_1group, [:pointer, :long, :int32, :int32], :void
       typesig { [::Java::Int, ::Java::Int] }
+      # @param window cast=(GtkWindow *)
+      # @param accel_group cast=(GtkAccelGroup *)
+      # 
       # long
       # long
       def __gtk_window_remove_accel_group(window, accel_group)
@@ -21330,6 +24262,10 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1window_1resize, [:pointer, :long, :int32, :int32, :int32], :void
       typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
+      # @param handle cast=(GtkWindow *)
+      # @param x cast=(gint)
+      # @param y cast=(gint)
+      # 
       # long
       def __gtk_window_resize(handle, x, y)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1gtk_1window_1resize, JNI.env, self.jni_id, handle.to_int, x.to_int, y.to_int)
@@ -21348,6 +24284,9 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1window_1set_1default, [:pointer, :long, :int32, :int32], :void
       typesig { [::Java::Int, ::Java::Int] }
+      # @param window cast=(GtkWindow *)
+      # @param widget cast=(GtkWidget *)
+      # 
       # long
       # long
       def __gtk_window_set_default(window, widget)
@@ -21368,6 +24307,9 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1window_1set_1destroy_1with_1parent, [:pointer, :long, :int32, :int8], :void
       typesig { [::Java::Int, ::Java::Boolean] }
+      # @param window cast=(GtkWindow *)
+      # @param setting cast=(gboolean)
+      # 
       # long
       def __gtk_window_set_destroy_with_parent(window, setting)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1gtk_1window_1set_1destroy_1with_1parent, JNI.env, self.jni_id, window.to_int, setting ? 1 : 0)
@@ -21386,6 +24328,10 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1window_1set_1keep_1below, [:pointer, :long, :int32, :int8], :void
       typesig { [::Java::Int, ::Java::Boolean] }
+      # @method flags=dynamic
+      # @param window cast=(GtkWindow *)
+      # @param setting cast=(gboolean)
+      # 
       # long
       def __gtk_window_set_keep_below(window, setting)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1gtk_1window_1set_1keep_1below, JNI.env, self.jni_id, window.to_int, setting ? 1 : 0)
@@ -21404,6 +24350,10 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1window_1set_1geometry_1hints, [:pointer, :long, :int32, :int32, :long, :int32], :void
       typesig { [::Java::Int, ::Java::Int, GdkGeometry, ::Java::Int] }
+      # @param window cast=(GtkWindow *)
+      # @param geometry_widget cast=(GtkWidget *)
+      # @param geometry flags=no_out
+      # 
       # long
       # long
       def __gtk_window_set_geometry_hints(window, geometry_widget, geometry, geom_mask)
@@ -21424,6 +24374,9 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1window_1set_1icon_1list, [:pointer, :long, :int32, :int32], :void
       typesig { [::Java::Int, ::Java::Int] }
+      # @param window cast=(GtkWindow *)
+      # @param list cast=(GList *)
+      # 
       # long
       # long
       def __gtk_window_set_icon_list(window, list)
@@ -21444,6 +24397,9 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1window_1set_1modal, [:pointer, :long, :int32, :int8], :void
       typesig { [::Java::Int, ::Java::Boolean] }
+      # @param window cast=(GtkWindow *)
+      # @param modal cast=(gboolean)
+      # 
       # long
       def __gtk_window_set_modal(window, modal)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1gtk_1window_1set_1modal, JNI.env, self.jni_id, window.to_int, modal ? 1 : 0)
@@ -21462,6 +24418,9 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1window_1set_1opacity, [:pointer, :long, :int32, :double], :void
       typesig { [::Java::Int, ::Java::Double] }
+      # @method flags=dynamic
+      # @param window cast=(GtkWindow *)
+      # 
       # long
       def __gtk_window_set_opacity(window, opacity)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1gtk_1window_1set_1opacity, JNI.env, self.jni_id, window.to_int, opacity)
@@ -21480,6 +24439,10 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1widget_1set_1tooltip_1text, [:pointer, :long, :int32, :long], :void
       typesig { [::Java::Int, Array.typed(::Java::Byte)] }
+      # @method flags=dynamic
+      # @param widget cast=(GtkWidget *)
+      # @param tip_text cast=(const gchar *)
+      # 
       # long
       def __gtk_widget_set_tooltip_text(widget, tip_text)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1gtk_1widget_1set_1tooltip_1text, JNI.env, self.jni_id, widget.to_int, tip_text.jni_id)
@@ -21498,6 +24461,9 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1widget_1set_1parent_1window, [:pointer, :long, :int32, :int32], :void
       typesig { [::Java::Int, ::Java::Int] }
+      # @param widget cast=(GtkWidget *)
+      # @param parent_window cast=(GdkWindow *)
+      # 
       # long
       # long
       def __gtk_widget_set_parent_window(widget, parent_window)
@@ -21518,6 +24484,9 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1window_1set_1resizable, [:pointer, :long, :int32, :int8], :void
       typesig { [::Java::Int, ::Java::Boolean] }
+      # @param window cast=(GtkWindow *)
+      # @param resizable cast=(gboolean)
+      # 
       # long
       def __gtk_window_set_resizable(window, resizable)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1gtk_1window_1set_1resizable, JNI.env, self.jni_id, window.to_int, resizable ? 1 : 0)
@@ -21536,6 +24505,9 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1window_1set_1title, [:pointer, :long, :int32, :long], :void
       typesig { [::Java::Int, Array.typed(::Java::Byte)] }
+      # @param window cast=(GtkWindow *)
+      # @param title cast=(const gchar *)
+      # 
       # long
       def __gtk_window_set_title(window, title)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1gtk_1window_1set_1title, JNI.env, self.jni_id, window.to_int, title.jni_id)
@@ -21554,6 +24526,10 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1window_1set_1skip_1taskbar_1hint, [:pointer, :long, :int32, :int8], :void
       typesig { [::Java::Int, ::Java::Boolean] }
+      # @method flags=dynamic
+      # @param window cast=(GtkWindow *)
+      # @param skips_taskbar cast=(gboolean)
+      # 
       # long
       def __gtk_window_set_skip_taskbar_hint(window, skips_taskbar)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1gtk_1window_1set_1skip_1taskbar_1hint, JNI.env, self.jni_id, window.to_int, skips_taskbar ? 1 : 0)
@@ -21572,6 +24548,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1window_1set_1type_1hint, [:pointer, :long, :int32, :int32], :void
       typesig { [::Java::Int, ::Java::Int] }
+      # @param window cast=(GtkWindow *)
       # long
       def __gtk_window_set_type_hint(window, hint)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1gtk_1window_1set_1type_1hint, JNI.env, self.jni_id, window.to_int, hint.to_int)
@@ -21590,6 +24567,9 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1window_1set_1transient_1for, [:pointer, :long, :int32, :int32], :void
       typesig { [::Java::Int, ::Java::Int] }
+      # @param window cast=(GtkWindow *)
+      # @param parent cast=(GtkWindow *)
+      # 
       # long
       # long
       def __gtk_window_set_transient_for(window, parent)
@@ -21610,6 +24590,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1gtk_1window_1unmaximize, [:pointer, :long, :int32], :void
       typesig { [::Java::Int] }
+      # @param handle cast=(GtkWindow *)
       # long
       def __gtk_window_unmaximize(handle)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1gtk_1window_1unmaximize, JNI.env, self.jni_id, handle.to_int)
@@ -21628,6 +24609,10 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method "Java_org_eclipse_swt_internal_gtk_OS_memmove__IL#{GInterfaceInfo.jni_name}_2I".to_sym, [:pointer, :long, :int32, :long, :int32], :void
       typesig { [::Java::Int, GInterfaceInfo, ::Java::Int] }
+      # @param dest cast=(void *)
+      # @param src cast=(const void *),flags=no_out
+      # @param size cast=(size_t)
+      # 
       # long
       def memmove(dest, src, size)
         JNI.__send__("Java_org_eclipse_swt_internal_gtk_OS_memmove__IL#{GInterfaceInfo.jni_name}_2I".to_sym, JNI.env, self.jni_id, dest.to_int, src.jni_id, size.to_int)
@@ -21635,6 +24620,9 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method "Java_org_eclipse_swt_internal_gtk_OS_memmove__IL#{GObjectClass.jni_name}_2".to_sym, [:pointer, :long, :int32, :long], :void
       typesig { [::Java::Int, GObjectClass] }
+      # @param dest cast=(void *),flags=no_in
+      # @param src cast=(const void *),flags=no_out
+      # 
       # long
       def memmove(dest, src)
         JNI.__send__("Java_org_eclipse_swt_internal_gtk_OS_memmove__IL#{GObjectClass.jni_name}_2".to_sym, JNI.env, self.jni_id, dest.to_int, src.jni_id)
@@ -21642,6 +24630,10 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method "Java_org_eclipse_swt_internal_gtk_OS_memmove__IL#{GTypeInfo.jni_name}_2I".to_sym, [:pointer, :long, :int32, :long, :int32], :void
       typesig { [::Java::Int, GTypeInfo, ::Java::Int] }
+      # @param dest cast=(void *)
+      # @param src cast=(const void *),flags=no_out
+      # @param size cast=(size_t)
+      # 
       # long
       def memmove(dest, src, size)
         JNI.__send__("Java_org_eclipse_swt_internal_gtk_OS_memmove__IL#{GTypeInfo.jni_name}_2I".to_sym, JNI.env, self.jni_id, dest.to_int, src.jni_id, size.to_int)
@@ -21649,6 +24641,10 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method "Java_org_eclipse_swt_internal_gtk_OS_memmove__IL#{GtkTargetEntry.jni_name}_2I".to_sym, [:pointer, :long, :int32, :long, :int32], :void
       typesig { [::Java::Int, GtkTargetEntry, ::Java::Int] }
+      # @param dest cast=(void *)
+      # @param src cast=(const void *),flags=no_out
+      # @param size cast=(size_t)
+      # 
       # long
       # long
       def memmove(dest, src, size)
@@ -21657,6 +24653,9 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method "Java_org_eclipse_swt_internal_gtk_OS_memmove__IL#{GtkAdjustment.jni_name}_2".to_sym, [:pointer, :long, :int32, :long], :void
       typesig { [::Java::Int, GtkAdjustment] }
+      # @param dest cast=(void *)
+      # @param src cast=(const void *),flags=no_out
+      # 
       # long
       def memmove(dest, src)
         JNI.__send__("Java_org_eclipse_swt_internal_gtk_OS_memmove__IL#{GtkAdjustment.jni_name}_2".to_sym, JNI.env, self.jni_id, dest.to_int, src.jni_id)
@@ -21664,6 +24663,10 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method "Java_org_eclipse_swt_internal_gtk_OS_memmove__IL#{GdkEventButton.jni_name}_2I".to_sym, [:pointer, :long, :int32, :long, :int32], :void
       typesig { [::Java::Int, GdkEventButton, ::Java::Int] }
+      # @param dest cast=(void *)
+      # @param src cast=(const void *),flags=no_out
+      # @param size cast=(size_t)
+      # 
       # long
       # long
       def memmove(dest, src, size)
@@ -21672,6 +24675,10 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method "Java_org_eclipse_swt_internal_gtk_OS_memmove__IL#{GdkEventExpose.jni_name}_2I".to_sym, [:pointer, :long, :int32, :long, :int32], :void
       typesig { [::Java::Int, GdkEventExpose, ::Java::Int] }
+      # @param dest cast=(void *)
+      # @param src cast=(const void *),flags=no_out
+      # @param size cast=(size_t)
+      # 
       # long
       # long
       def memmove(dest, src, size)
@@ -21680,6 +24687,10 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method "Java_org_eclipse_swt_internal_gtk_OS_memmove__IL#{GdkEventMotion.jni_name}_2I".to_sym, [:pointer, :long, :int32, :long, :int32], :void
       typesig { [::Java::Int, GdkEventMotion, ::Java::Int] }
+      # @param dest cast=(void *)
+      # @param src cast=(const void *),flags=no_out
+      # @param size cast=(size_t)
+      # 
       # long
       # long
       def memmove(dest, src, size)
@@ -21688,6 +24699,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method "Java_org_eclipse_swt_internal_gtk_OS_memmove__IL#{GtkWidgetClass.jni_name}_2".to_sym, [:pointer, :long, :int32, :long], :void
       typesig { [::Java::Int, GtkWidgetClass] }
+      # @param src flags=no_out
       # long
       def memmove(dest, src)
         JNI.__send__("Java_org_eclipse_swt_internal_gtk_OS_memmove__IL#{GtkWidgetClass.jni_name}_2".to_sym, JNI.env, self.jni_id, dest.to_int, src.jni_id)
@@ -21695,6 +24707,10 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method "Java_org_eclipse_swt_internal_gtk_OS_memmove__IL#{PangoAttribute.jni_name}_2I".to_sym, [:pointer, :long, :int32, :long, :int32], :void
       typesig { [::Java::Int, PangoAttribute, ::Java::Int] }
+      # @param dest cast=(void *)
+      # @param src cast=(const void *),flags=no_out
+      # @param size cast=(size_t)
+      # 
       # long
       # long
       def memmove(dest, src, size)
@@ -21703,6 +24719,9 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method "Java_org_eclipse_swt_internal_gtk_OS_memmove__L#{GObjectClass.jni_name}_2I".to_sym, [:pointer, :long, :long, :int32], :void
       typesig { [GObjectClass, ::Java::Int] }
+      # @param dest cast=(void *),flags=no_in
+      # @param src cast=(const void *)
+      # 
       # long
       def memmove(dest, src)
         JNI.__send__("Java_org_eclipse_swt_internal_gtk_OS_memmove__L#{GObjectClass.jni_name}_2I".to_sym, JNI.env, self.jni_id, dest.jni_id, src.to_int)
@@ -21710,6 +24729,10 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method "Java_org_eclipse_swt_internal_gtk_OS_memmove__L#{GTypeQuery.jni_name}_2II".to_sym, [:pointer, :long, :long, :int32, :int32], :void
       typesig { [GTypeQuery, ::Java::Int, ::Java::Int] }
+      # @param dest cast=(void *),flags=no_in
+      # @param src cast=(const void *)
+      # @param size cast=(size_t)
+      # 
       # long
       # long
       def memmove(dest, src, size)
@@ -21718,6 +24741,9 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method "Java_org_eclipse_swt_internal_gtk_OS_memmove__L#{GtkColorSelectionDialog.jni_name}_2I".to_sym, [:pointer, :long, :long, :int32], :void
       typesig { [GtkColorSelectionDialog, ::Java::Int] }
+      # @param dest cast=(void *),flags=no_in
+      # @param src cast=(const void *)
+      # 
       # long
       def memmove(dest, src)
         JNI.__send__("Java_org_eclipse_swt_internal_gtk_OS_memmove__L#{GtkColorSelectionDialog.jni_name}_2I".to_sym, JNI.env, self.jni_id, dest.jni_id, src.to_int)
@@ -21725,6 +24751,9 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method "Java_org_eclipse_swt_internal_gtk_OS_memmove__L#{GtkFileSelection.jni_name}_2I".to_sym, [:pointer, :long, :long, :int32], :void
       typesig { [GtkFileSelection, ::Java::Int] }
+      # @param dest cast=(void *),flags=no_in
+      # @param src cast=(const void *)
+      # 
       # long
       def memmove(dest, src)
         JNI.__send__("Java_org_eclipse_swt_internal_gtk_OS_memmove__L#{GtkFileSelection.jni_name}_2I".to_sym, JNI.env, self.jni_id, dest.jni_id, src.to_int)
@@ -21732,6 +24761,10 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method "Java_org_eclipse_swt_internal_gtk_OS_memmove__L#{GdkDragContext.jni_name}_2II".to_sym, [:pointer, :long, :long, :int32, :int32], :void
       typesig { [GdkDragContext, ::Java::Int, ::Java::Int] }
+      # @param dest cast=(void *),flags=no_in
+      # @param src cast=(const void *)
+      # @param size cast=(size_t)
+      # 
       # long
       # long
       def memmove(dest, src, size)
@@ -21740,6 +24773,10 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method "Java_org_eclipse_swt_internal_gtk_OS_memmove__L#{GtkSelectionData.jni_name}_2II".to_sym, [:pointer, :long, :long, :int32, :int32], :void
       typesig { [GtkSelectionData, ::Java::Int, ::Java::Int] }
+      # @param dest cast=(void *),flags=no_in
+      # @param src cast=(const void *)
+      # @param size cast=(size_t)
+      # 
       # long
       # long
       def memmove(dest, src, size)
@@ -21748,6 +24785,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method "Java_org_eclipse_swt_internal_gtk_OS_memmove__L#{GtkWidgetClass.jni_name}_2I".to_sym, [:pointer, :long, :long, :int32], :void
       typesig { [GtkWidgetClass, ::Java::Int] }
+      # @param dest flags=no_in
       # long
       def memmove(dest, src)
         JNI.__send__("Java_org_eclipse_swt_internal_gtk_OS_memmove__L#{GtkWidgetClass.jni_name}_2I".to_sym, JNI.env, self.jni_id, dest.jni_id, src.to_int)
@@ -21755,6 +24793,10 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method "Java_org_eclipse_swt_internal_gtk_OS_memmove__L#{GtkTargetPair.jni_name}_2II".to_sym, [:pointer, :long, :long, :int32, :int32], :void
       typesig { [GtkTargetPair, ::Java::Int, ::Java::Int] }
+      # @param dest cast=(void *),flags=no_in
+      # @param src cast=(const void *)
+      # @param size cast=(size_t)
+      # 
       # long
       # long
       def memmove(dest, src, size)
@@ -21763,6 +24805,9 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method "Java_org_eclipse_swt_internal_gtk_OS_memmove__L#{GtkCombo.jni_name}_2I".to_sym, [:pointer, :long, :long, :int32], :void
       typesig { [GtkCombo, ::Java::Int] }
+      # @param dest cast=(void *),flags=no_in
+      # @param src cast=(const void *)
+      # 
       # long
       def memmove(dest, src)
         JNI.__send__("Java_org_eclipse_swt_internal_gtk_OS_memmove__L#{GtkCombo.jni_name}_2I".to_sym, JNI.env, self.jni_id, dest.jni_id, src.to_int)
@@ -21770,6 +24815,9 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method "Java_org_eclipse_swt_internal_gtk_OS_memmove__L#{GtkAdjustment.jni_name}_2I".to_sym, [:pointer, :long, :long, :int32], :void
       typesig { [GtkAdjustment, ::Java::Int] }
+      # @param dest cast=(void *),flags=no_in
+      # @param src cast=(const void *)
+      # 
       # long
       def memmove(dest, src)
         JNI.__send__("Java_org_eclipse_swt_internal_gtk_OS_memmove__L#{GtkAdjustment.jni_name}_2I".to_sym, JNI.env, self.jni_id, dest.jni_id, src.to_int)
@@ -21777,6 +24825,10 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method "Java_org_eclipse_swt_internal_gtk_OS_memmove__L#{GtkBorder.jni_name}_2II".to_sym, [:pointer, :long, :long, :int32, :int32], :void
       typesig { [GtkBorder, ::Java::Int, ::Java::Int] }
+      # @param dest cast=(void *),flags=no_in
+      # @param src cast=(const void *)
+      # @param size cast=(size_t)
+      # 
       # long
       # long
       def memmove(dest, src, size)
@@ -21785,6 +24837,10 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method "Java_org_eclipse_swt_internal_gtk_OS_memmove__L#{GdkColor.jni_name}_2II".to_sym, [:pointer, :long, :long, :int32, :int32], :void
       typesig { [GdkColor, ::Java::Int, ::Java::Int] }
+      # @param dest cast=(void *),flags=no_in
+      # @param src cast=(const void *)
+      # @param size cast=(size_t)
+      # 
       # long
       # long
       def memmove(dest, src, size)
@@ -21793,6 +24849,10 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method "Java_org_eclipse_swt_internal_gtk_OS_memmove__L#{GdkEvent.jni_name}_2II".to_sym, [:pointer, :long, :long, :int32, :int32], :void
       typesig { [GdkEvent, ::Java::Int, ::Java::Int] }
+      # @param dest cast=(void *),flags=no_in
+      # @param src cast=(const void *)
+      # @param size cast=(size_t)
+      # 
       # long
       # long
       def memmove(dest, src, size)
@@ -21801,6 +24861,10 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method "Java_org_eclipse_swt_internal_gtk_OS_memmove__L#{GdkEventAny.jni_name}_2II".to_sym, [:pointer, :long, :long, :int32, :int32], :void
       typesig { [GdkEventAny, ::Java::Int, ::Java::Int] }
+      # @param dest cast=(void *),flags=no_in
+      # @param src cast=(const void *)
+      # @param size cast=(size_t)
+      # 
       # long
       # long
       def memmove(dest, src, size)
@@ -21809,6 +24873,10 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method "Java_org_eclipse_swt_internal_gtk_OS_memmove__L#{GdkEventButton.jni_name}_2II".to_sym, [:pointer, :long, :long, :int32, :int32], :void
       typesig { [GdkEventButton, ::Java::Int, ::Java::Int] }
+      # @param dest cast=(void *),flags=no_in
+      # @param src cast=(const void *)
+      # @param size cast=(size_t)
+      # 
       # long
       # long
       def memmove(dest, src, size)
@@ -21817,6 +24885,10 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method "Java_org_eclipse_swt_internal_gtk_OS_memmove__L#{GdkEventCrossing.jni_name}_2II".to_sym, [:pointer, :long, :long, :int32, :int32], :void
       typesig { [GdkEventCrossing, ::Java::Int, ::Java::Int] }
+      # @param dest cast=(void *),flags=no_in
+      # @param src cast=(const void *)
+      # @param size cast=(size_t)
+      # 
       # long
       # long
       def memmove(dest, src, size)
@@ -21825,6 +24897,10 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method "Java_org_eclipse_swt_internal_gtk_OS_memmove__L#{GdkEventExpose.jni_name}_2II".to_sym, [:pointer, :long, :long, :int32, :int32], :void
       typesig { [GdkEventExpose, ::Java::Int, ::Java::Int] }
+      # @param dest cast=(void *),flags=no_in
+      # @param src cast=(const void *)
+      # @param size cast=(size_t)
+      # 
       # long
       # long
       def memmove(dest, src, size)
@@ -21833,6 +24909,10 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method "Java_org_eclipse_swt_internal_gtk_OS_memmove__L#{GdkEventFocus.jni_name}_2II".to_sym, [:pointer, :long, :long, :int32, :int32], :void
       typesig { [GdkEventFocus, ::Java::Int, ::Java::Int] }
+      # @param dest cast=(void *),flags=no_in
+      # @param src cast=(const void *)
+      # @param size cast=(size_t)
+      # 
       # long
       # long
       def memmove(dest, src, size)
@@ -21841,6 +24921,10 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method "Java_org_eclipse_swt_internal_gtk_OS_memmove__L#{GdkEventKey.jni_name}_2II".to_sym, [:pointer, :long, :long, :int32, :int32], :void
       typesig { [GdkEventKey, ::Java::Int, ::Java::Int] }
+      # @param dest cast=(void *),flags=no_in
+      # @param src cast=(const void *)
+      # @param size cast=(size_t)
+      # 
       # long
       # long
       def memmove(dest, src, size)
@@ -21849,6 +24933,10 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method "Java_org_eclipse_swt_internal_gtk_OS_memmove__L#{GdkEventMotion.jni_name}_2II".to_sym, [:pointer, :long, :long, :int32, :int32], :void
       typesig { [GdkEventMotion, ::Java::Int, ::Java::Int] }
+      # @param dest cast=(void *),flags=no_in
+      # @param src cast=(const void *)
+      # @param size cast=(size_t)
+      # 
       # long
       # long
       def memmove(dest, src, size)
@@ -21857,6 +24945,10 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method "Java_org_eclipse_swt_internal_gtk_OS_memmove__L#{GdkEventScroll.jni_name}_2II".to_sym, [:pointer, :long, :long, :int32, :int32], :void
       typesig { [GdkEventScroll, ::Java::Int, ::Java::Int] }
+      # @param dest cast=(void *),flags=no_in
+      # @param src cast=(const void *)
+      # @param size cast=(size_t)
+      # 
       # long
       # long
       def memmove(dest, src, size)
@@ -21865,6 +24957,10 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method "Java_org_eclipse_swt_internal_gtk_OS_memmove__L#{GdkEventVisibility.jni_name}_2II".to_sym, [:pointer, :long, :long, :int32, :int32], :void
       typesig { [GdkEventVisibility, ::Java::Int, ::Java::Int] }
+      # @param dest cast=(void *),flags=no_in
+      # @param src cast=(const void *)
+      # @param size cast=(size_t)
+      # 
       # long
       # long
       def memmove(dest, src, size)
@@ -21873,6 +24969,10 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method "Java_org_eclipse_swt_internal_gtk_OS_memmove__L#{GdkEventWindowState.jni_name}_2II".to_sym, [:pointer, :long, :long, :int32, :int32], :void
       typesig { [GdkEventWindowState, ::Java::Int, ::Java::Int] }
+      # @param dest cast=(void *),flags=no_in
+      # @param src cast=(const void *)
+      # @param size cast=(size_t)
+      # 
       # long
       # long
       def memmove(dest, src, size)
@@ -21895,6 +24995,9 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method "Java_org_eclipse_swt_internal_gtk_OS_memmove__L#{GtkFixed.jni_name}_2I".to_sym, [:pointer, :long, :long, :int32], :void
       typesig { [GtkFixed, ::Java::Int] }
+      # @param dest cast=(void *),flags=no_in
+      # @param src cast=(const void *)
+      # 
       # long
       def memmove(dest, src)
         JNI.__send__("Java_org_eclipse_swt_internal_gtk_OS_memmove__L#{GtkFixed.jni_name}_2I".to_sym, JNI.env, self.jni_id, dest.jni_id, src.to_int)
@@ -21902,6 +25005,9 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method "Java_org_eclipse_swt_internal_gtk_OS_memmove__IL#{GtkFixed.jni_name}_2".to_sym, [:pointer, :long, :int32, :long], :void
       typesig { [::Java::Int, GtkFixed] }
+      # @param dest cast=(void *),flags=no_in
+      # @param src cast=(const void *),flags=no_out
+      # 
       # long
       def memmove(dest, src)
         JNI.__send__("Java_org_eclipse_swt_internal_gtk_OS_memmove__IL#{GtkFixed.jni_name}_2".to_sym, JNI.env, self.jni_id, dest.to_int, src.jni_id)
@@ -21909,6 +25015,9 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method "Java_org_eclipse_swt_internal_gtk_OS_memmove__L#{GdkVisual.jni_name}_2I".to_sym, [:pointer, :long, :long, :int32], :void
       typesig { [GdkVisual, ::Java::Int] }
+      # @param dest cast=(void *),flags=no_in
+      # @param src cast=(const void *)
+      # 
       # long
       def memmove(dest, src)
         JNI.__send__("Java_org_eclipse_swt_internal_gtk_OS_memmove__L#{GdkVisual.jni_name}_2I".to_sym, JNI.env, self.jni_id, dest.jni_id, src.to_int)
@@ -21916,6 +25025,9 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method "Java_org_eclipse_swt_internal_gtk_OS_memmove__L#{GdkImage.jni_name}_2I".to_sym, [:pointer, :long, :long, :int32], :void
       typesig { [GdkImage, ::Java::Int] }
+      # @param dest cast=(void *),flags=no_in
+      # @param src cast=(const void *)
+      # 
       # long
       def memmove(dest, src)
         JNI.__send__("Java_org_eclipse_swt_internal_gtk_OS_memmove__L#{GdkImage.jni_name}_2I".to_sym, JNI.env, self.jni_id, dest.jni_id, src.to_int)
@@ -21923,6 +25035,10 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method "Java_org_eclipse_swt_internal_gtk_OS_memmove__L#{GdkRectangle.jni_name}_2II".to_sym, [:pointer, :long, :long, :int32, :int32], :void
       typesig { [GdkRectangle, ::Java::Int, ::Java::Int] }
+      # @param dest cast=(void *),flags=no_in
+      # @param src cast=(const void *)
+      # @param size cast=(size_t)
+      # 
       # long
       # long
       def memmove(dest, src, size)
@@ -21931,6 +25047,10 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method "Java_org_eclipse_swt_internal_gtk_OS_memmove__L#{PangoAttribute.jni_name}_2II".to_sym, [:pointer, :long, :long, :int32, :int32], :void
       typesig { [PangoAttribute, ::Java::Int, ::Java::Int] }
+      # @param dest cast=(void *),flags=no_in
+      # @param src cast=(const void *)
+      # @param size cast=(size_t)
+      # 
       # long
       # long
       def memmove(dest, src, size)
@@ -21939,6 +25059,10 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method "Java_org_eclipse_swt_internal_gtk_OS_memmove__L#{PangoAttrColor.jni_name}_2II".to_sym, [:pointer, :long, :long, :int32, :int32], :void
       typesig { [PangoAttrColor, ::Java::Int, ::Java::Int] }
+      # @param dest cast=(void *),flags=no_in
+      # @param src cast=(const void *)
+      # @param size cast=(size_t)
+      # 
       # long
       # long
       def memmove(dest, src, size)
@@ -21947,6 +25071,10 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method "Java_org_eclipse_swt_internal_gtk_OS_memmove__L#{PangoAttrInt.jni_name}_2II".to_sym, [:pointer, :long, :long, :int32, :int32], :void
       typesig { [PangoAttrInt, ::Java::Int, ::Java::Int] }
+      # @param dest cast=(void *),flags=no_in
+      # @param src cast=(const void *)
+      # @param size cast=(size_t)
+      # 
       # long
       # long
       def memmove(dest, src, size)
@@ -21955,6 +25083,10 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method "Java_org_eclipse_swt_internal_gtk_OS_memmove__L#{PangoItem.jni_name}_2II".to_sym, [:pointer, :long, :long, :int32, :int32], :void
       typesig { [PangoItem, ::Java::Int, ::Java::Int] }
+      # @param dest cast=(void *),flags=no_in
+      # @param src cast=(const void *)
+      # @param size cast=(size_t)
+      # 
       # long
       # long
       def memmove(dest, src, size)
@@ -21963,6 +25095,10 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method "Java_org_eclipse_swt_internal_gtk_OS_memmove__L#{PangoLayoutLine.jni_name}_2II".to_sym, [:pointer, :long, :long, :int32, :int32], :void
       typesig { [PangoLayoutLine, ::Java::Int, ::Java::Int] }
+      # @param dest cast=(void *),flags=no_in
+      # @param src cast=(const void *)
+      # @param size cast=(size_t)
+      # 
       # long
       # long
       def memmove(dest, src, size)
@@ -21971,6 +25107,10 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method "Java_org_eclipse_swt_internal_gtk_OS_memmove__L#{PangoLayoutRun.jni_name}_2II".to_sym, [:pointer, :long, :long, :int32, :int32], :void
       typesig { [PangoLayoutRun, ::Java::Int, ::Java::Int] }
+      # @param dest cast=(void *),flags=no_in
+      # @param src cast=(const void *)
+      # @param size cast=(size_t)
+      # 
       # long
       # long
       def memmove(dest, src, size)
@@ -21979,6 +25119,10 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method "Java_org_eclipse_swt_internal_gtk_OS_memmove__L#{PangoLogAttr.jni_name}_2II".to_sym, [:pointer, :long, :long, :int32, :int32], :void
       typesig { [PangoLogAttr, ::Java::Int, ::Java::Int] }
+      # @param dest cast=(void *),flags=no_in
+      # @param src cast=(const void *)
+      # @param size cast=(size_t)
+      # 
       # long
       # long
       def memmove(dest, src, size)
@@ -22005,6 +25149,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1pango_1attr_1font_1desc_1new, [:pointer, :long, :int32], :int32
       typesig { [::Java::Int] }
+      # @param desc cast=(const PangoFontDescription *)
       # long
       # long
       def __pango_attr_font_desc_new(desc)
@@ -22061,6 +25206,9 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1pango_1attr_1shape_1new, [:pointer, :long, :long, :long], :int32
       typesig { [PangoRectangle, PangoRectangle] }
+      # @param ink_rect flags=no_out
+      # @param logical_rect flags=no_out
+      # 
       # long
       def __pango_attr_shape_new(ink_rect, logical_rect)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1pango_1attr_1shape_1new, JNI.env, self.jni_id, ink_rect.jni_id, logical_rect.jni_id)
@@ -22079,6 +25227,9 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1pango_1attr_1list_1insert, [:pointer, :long, :int32, :int32], :void
       typesig { [::Java::Int, ::Java::Int] }
+      # @param list cast=(PangoAttrList *)
+      # @param attr cast=(PangoAttribute *)
+      # 
       # long
       # long
       def __pango_attr_list_insert(list, attr)
@@ -22099,6 +25250,9 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1pango_1attr_1list_1change, [:pointer, :long, :int32, :int32], :void
       typesig { [::Java::Int, ::Java::Int] }
+      # @param list cast=(PangoAttrList *)
+      # @param attr cast=(PangoAttribute *)
+      # 
       # long
       # long
       def __pango_attr_list_change(list, attr)
@@ -22119,6 +25273,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1pango_1attr_1list_1get_1iterator, [:pointer, :long, :int32], :int32
       typesig { [::Java::Int] }
+      # @param list cast=(PangoAttrList *)
       # long
       # long
       def __pango_attr_list_get_iterator(list)
@@ -22139,6 +25294,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1pango_1attr_1iterator_1next, [:pointer, :long, :int32], :int8
       typesig { [::Java::Int] }
+      # @param iterator cast=(PangoAttrIterator *)
       # long
       def __pango_attr_iterator_next(iterator)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1pango_1attr_1iterator_1next, JNI.env, self.jni_id, iterator.to_int) != 0
@@ -22157,6 +25313,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1pango_1attr_1iterator_1range, [:pointer, :long, :int32, :long, :long], :void
       typesig { [::Java::Int, Array.typed(::Java::Int), Array.typed(::Java::Int)] }
+      # @param iterator cast=(PangoAttrIterator *)
       # long
       def __pango_attr_iterator_range(iterator, start, end_)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1pango_1attr_1iterator_1range, JNI.env, self.jni_id, iterator.to_int, start.jni_id, end_.jni_id)
@@ -22175,6 +25332,9 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1pango_1attr_1iterator_1get, [:pointer, :long, :int32, :int32], :int32
       typesig { [::Java::Int, ::Java::Int] }
+      # @param iterator cast=(PangoAttrIterator *)
+      # @param type cast=(PangoAttrType)
+      # 
       # long
       # long
       def __pango_attr_iterator_get(iterator, type)
@@ -22195,6 +25355,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1pango_1attr_1iterator_1get_1attrs, [:pointer, :long, :int32], :int32
       typesig { [::Java::Int] }
+      # @param iterator cast=(PangoAttrIterator *)
       # long
       # long
       def __pango_attr_iterator_get_attrs(iterator)
@@ -22215,6 +25376,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1pango_1attr_1iterator_1destroy, [:pointer, :long, :int32], :void
       typesig { [::Java::Int] }
+      # @param iterator cast=(PangoAttrIterator *)
       # long
       def __pango_attr_iterator_destroy(iterator)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1pango_1attr_1iterator_1destroy, JNI.env, self.jni_id, iterator.to_int)
@@ -22251,6 +25413,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1pango_1attr_1list_1unref, [:pointer, :long, :int32], :void
       typesig { [::Java::Int] }
+      # @param list cast=(PangoAttrList *)
       # long
       def __pango_attr_list_unref(list)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1pango_1attr_1list_1unref, JNI.env, self.jni_id, list.to_int)
@@ -22269,6 +25432,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1pango_1attr_1strikethrough_1color_1new, [:pointer, :long, :int16, :int16, :int16], :int32
       typesig { [::Java::Short, ::Java::Short, ::Java::Short] }
+      # @method flags=dynamic
       # long
       def __pango_attr_strikethrough_color_new(red, green, blue)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1pango_1attr_1strikethrough_1color_1new, JNI.env, self.jni_id, red.to_int, green.to_int, blue.to_int)
@@ -22305,6 +25469,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1pango_1attr_1underline_1color_1new, [:pointer, :long, :int16, :int16, :int16], :int32
       typesig { [::Java::Short, ::Java::Short, ::Java::Short] }
+      # @method flags=dynamic
       # long
       def __pango_attr_underline_color_new(red, green, blue)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1pango_1attr_1underline_1color_1new, JNI.env, self.jni_id, red.to_int, green.to_int, blue.to_int)
@@ -22359,6 +25524,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1pango_1cairo_1font_1map_1get_1default, [:pointer, :long], :int32
       typesig { [] }
+      # @method flags=dynamic
       # long
       def __pango_cairo_font_map_get_default
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1pango_1cairo_1font_1map_1get_1default, JNI.env, self.jni_id)
@@ -22377,6 +25543,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1pango_1cairo_1font_1map_1new, [:pointer, :long], :int32
       typesig { [] }
+      # @method flags=dynamic
       # long
       def __pango_cairo_font_map_new
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1pango_1cairo_1font_1map_1new, JNI.env, self.jni_id)
@@ -22395,6 +25562,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1pango_1cairo_1font_1map_1create_1context, [:pointer, :long, :int32], :int32
       typesig { [::Java::Int] }
+      # @method flags=dynamic
       # long
       # long
       def __pango_cairo_font_map_create_context(fontmap)
@@ -22415,6 +25583,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1pango_1cairo_1create_1layout, [:pointer, :long, :int32], :int32
       typesig { [::Java::Int] }
+      # @method flags=dynamic
       # long
       # long
       def __pango_cairo_create_layout(cairo)
@@ -22435,6 +25604,9 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1pango_1cairo_1context_1get_1font_1options, [:pointer, :long, :int32], :int32
       typesig { [::Java::Int] }
+      # @method flags=dynamic
+      # @param context cast=(PangoContext *)
+      # 
       # long
       # long
       def __pango_cairo_context_get_font_options(context)
@@ -22455,6 +25627,9 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1pango_1cairo_1context_1set_1font_1options, [:pointer, :long, :int32, :int32], :void
       typesig { [::Java::Int, ::Java::Int] }
+      # @method flags=dynamic
+      # @param context cast=(PangoContext *)
+      # 
       # long
       # long
       def __pango_cairo_context_set_font_options(context, options)
@@ -22475,6 +25650,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1pango_1cairo_1font_1map_1set_1resolution, [:pointer, :long, :int32, :double], :void
       typesig { [::Java::Int, ::Java::Double] }
+      # @method flags=dynamic
       # long
       def __pango_cairo_font_map_set_resolution(fontmap, dpi)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1pango_1cairo_1font_1map_1set_1resolution, JNI.env, self.jni_id, fontmap.to_int, dpi)
@@ -22493,6 +25669,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1pango_1cairo_1layout_1path, [:pointer, :long, :int32, :int32], :void
       typesig { [::Java::Int, ::Java::Int] }
+      # @method flags=dynamic
       # long
       # long
       def __pango_cairo_layout_path(cairo, layout)
@@ -22513,6 +25690,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1pango_1cairo_1show_1layout, [:pointer, :long, :int32, :int32], :void
       typesig { [::Java::Int, ::Java::Int] }
+      # @method flags=dynamic
       # long
       # long
       def __pango_cairo_show_layout(cairo, layout)
@@ -22533,6 +25711,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1pango_1context_1get_1base_1dir, [:pointer, :long, :int32], :int32
       typesig { [::Java::Int] }
+      # @param context cast=(PangoContext *)
       # long
       def __pango_context_get_base_dir(context)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1pango_1context_1get_1base_1dir, JNI.env, self.jni_id, context.to_int)
@@ -22551,6 +25730,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1pango_1context_1get_1language, [:pointer, :long, :int32], :int32
       typesig { [::Java::Int] }
+      # @param context cast=(PangoContext *)
       # long
       # long
       def __pango_context_get_language(context)
@@ -22571,6 +25751,10 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1pango_1context_1get_1metrics, [:pointer, :long, :int32, :int32, :int32], :int32
       typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
+      # @param context cast=(PangoContext *)
+      # @param desc cast=(const PangoFontDescription *)
+      # @param language cast=(PangoLanguage *)
+      # 
       # long
       # long
       # long
@@ -22595,6 +25779,10 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1pango_1context_1list_1families, [:pointer, :long, :int32, :long, :long], :void
       typesig { [::Java::Int, Array.typed(::Java::Int), Array.typed(::Java::Int)] }
+      # @param context cast=(PangoContext *)
+      # @param families cast=(PangoFontFamily ***)
+      # @param n_families cast=(int *)
+      # 
       # long
       # long
       def __pango_context_list_families(context, families, n_families)
@@ -22615,6 +25803,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1pango_1context_1set_1base_1dir, [:pointer, :long, :int32, :int32], :void
       typesig { [::Java::Int, ::Java::Int] }
+      # @param context cast=(PangoContext *)
       # long
       def __pango_context_set_base_dir(context, direction)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1pango_1context_1set_1base_1dir, JNI.env, self.jni_id, context.to_int, direction.to_int)
@@ -22633,6 +25822,9 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1pango_1context_1set_1language, [:pointer, :long, :int32, :int32], :void
       typesig { [::Java::Int, ::Java::Int] }
+      # @param context cast=(PangoContext *)
+      # @param language cast=(PangoLanguage *)
+      # 
       # long
       # long
       def __pango_context_set_language(context, language)
@@ -22653,6 +25845,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1pango_1font_1description_1copy, [:pointer, :long, :int32], :int32
       typesig { [::Java::Int] }
+      # @param desc cast=(PangoFontDescription *)
       # long
       # long
       def __pango_font_description_copy(desc)
@@ -22673,6 +25866,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1pango_1font_1description_1free, [:pointer, :long, :int32], :void
       typesig { [::Java::Int] }
+      # @param desc cast=(PangoFontDescription *)
       # long
       def __pango_font_description_free(desc)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1pango_1font_1description_1free, JNI.env, self.jni_id, desc.to_int)
@@ -22691,6 +25885,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1pango_1font_1description_1from_1string, [:pointer, :long, :long], :int32
       typesig { [Array.typed(::Java::Byte)] }
+      # @param str cast=(const char *),flags=no_out critical
       # long
       def __pango_font_description_from_string(str)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1pango_1font_1description_1from_1string, JNI.env, self.jni_id, str.jni_id)
@@ -22709,6 +25904,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1pango_1font_1description_1get_1family, [:pointer, :long, :int32], :int32
       typesig { [::Java::Int] }
+      # @param desc cast=(PangoFontDescription *)
       # long
       # long
       def __pango_font_description_get_family(desc)
@@ -22729,6 +25925,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1pango_1font_1description_1get_1size, [:pointer, :long, :int32], :int32
       typesig { [::Java::Int] }
+      # @param desc cast=(PangoFontDescription *)
       # long
       def __pango_font_description_get_size(desc)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1pango_1font_1description_1get_1size, JNI.env, self.jni_id, desc.to_int)
@@ -22747,6 +25944,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1pango_1font_1description_1get_1style, [:pointer, :long, :int32], :int32
       typesig { [::Java::Int] }
+      # @param desc cast=(PangoFontDescription *)
       # long
       def __pango_font_description_get_style(desc)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1pango_1font_1description_1get_1style, JNI.env, self.jni_id, desc.to_int)
@@ -22765,6 +25963,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1pango_1font_1description_1get_1weight, [:pointer, :long, :int32], :int32
       typesig { [::Java::Int] }
+      # @param desc cast=(PangoFontDescription *)
       # long
       def __pango_font_description_get_weight(desc)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1pango_1font_1description_1get_1weight, JNI.env, self.jni_id, desc.to_int)
@@ -22801,6 +26000,9 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1pango_1font_1description_1set_1family, [:pointer, :long, :int32, :long], :void
       typesig { [::Java::Int, Array.typed(::Java::Byte)] }
+      # @param desc cast=(PangoFontDescription *)
+      # @param family cast=(const char *),flags=no_out critical
+      # 
       # long
       def __pango_font_description_set_family(desc, family)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1pango_1font_1description_1set_1family, JNI.env, self.jni_id, desc.to_int, family.jni_id)
@@ -22819,6 +26021,9 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1pango_1font_1description_1set_1size, [:pointer, :long, :int32, :int32], :void
       typesig { [::Java::Int, ::Java::Int] }
+      # @param desc cast=(PangoFontDescription *)
+      # @param size cast=(gint)
+      # 
       # long
       def __pango_font_description_set_size(desc, size)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1pango_1font_1description_1set_1size, JNI.env, self.jni_id, desc.to_int, size.to_int)
@@ -22837,6 +26042,9 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1pango_1font_1description_1set_1stretch, [:pointer, :long, :int32, :int32], :void
       typesig { [::Java::Int, ::Java::Int] }
+      # @param desc cast=(PangoFontDescription *)
+      # @param stretch cast=(PangoStretch)
+      # 
       # long
       def __pango_font_description_set_stretch(desc, stretch)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1pango_1font_1description_1set_1stretch, JNI.env, self.jni_id, desc.to_int, stretch.to_int)
@@ -22855,6 +26063,9 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1pango_1font_1description_1set_1style, [:pointer, :long, :int32, :int32], :void
       typesig { [::Java::Int, ::Java::Int] }
+      # @param desc cast=(PangoFontDescription *)
+      # @param weight cast=(PangoStyle)
+      # 
       # long
       def __pango_font_description_set_style(desc, weight)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1pango_1font_1description_1set_1style, JNI.env, self.jni_id, desc.to_int, weight.to_int)
@@ -22873,6 +26084,9 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1pango_1font_1description_1set_1weight, [:pointer, :long, :int32, :int32], :void
       typesig { [::Java::Int, ::Java::Int] }
+      # @param desc cast=(PangoFontDescription *)
+      # @param weight cast=(PangoWeight)
+      # 
       # long
       def __pango_font_description_set_weight(desc, weight)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1pango_1font_1description_1set_1weight, JNI.env, self.jni_id, desc.to_int, weight.to_int)
@@ -22891,6 +26105,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1pango_1font_1description_1to_1string, [:pointer, :long, :int32], :int32
       typesig { [::Java::Int] }
+      # @param desc cast=(PangoFontDescription *)
       # long
       # long
       def __pango_font_description_to_string(desc)
@@ -22911,6 +26126,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1pango_1font_1face_1describe, [:pointer, :long, :int32], :int32
       typesig { [::Java::Int] }
+      # @param face cast=(PangoFontFace *)
       # long
       # long
       def __pango_font_face_describe(face)
@@ -22931,6 +26147,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1pango_1font_1family_1get_1name, [:pointer, :long, :int32], :int32
       typesig { [::Java::Int] }
+      # @param family cast=(PangoFontFamily *)
       # long
       # long
       def __pango_font_family_get_name(family)
@@ -22951,6 +26168,10 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1pango_1font_1family_1list_1faces, [:pointer, :long, :int32, :long, :long], :void
       typesig { [::Java::Int, Array.typed(::Java::Int), Array.typed(::Java::Int)] }
+      # @param family cast=(PangoFontFamily *)
+      # @param faces cast=(PangoFontFace ***)
+      # @param n_faces cast=(int *)
+      # 
       # long
       # long
       def __pango_font_family_list_faces(family, faces, n_faces)
@@ -22971,6 +26192,9 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1pango_1font_1get_1metrics, [:pointer, :long, :int32, :int32], :int32
       typesig { [::Java::Int, ::Java::Int] }
+      # @param font cast=(PangoFont *)
+      # @param language cast=(PangoLanguage *)
+      # 
       # long
       # long
       # long
@@ -22993,6 +26217,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1pango_1font_1metrics_1get_1approximate_1char_1width, [:pointer, :long, :int32], :int32
       typesig { [::Java::Int] }
+      # @param metrics cast=(PangoFontMetrics *)
       # long
       def __pango_font_metrics_get_approximate_char_width(metrics)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1pango_1font_1metrics_1get_1approximate_1char_1width, JNI.env, self.jni_id, metrics.to_int)
@@ -23011,6 +26236,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1pango_1font_1metrics_1get_1ascent, [:pointer, :long, :int32], :int32
       typesig { [::Java::Int] }
+      # @param metrics cast=(PangoFontMetrics *)
       # long
       def __pango_font_metrics_get_ascent(metrics)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1pango_1font_1metrics_1get_1ascent, JNI.env, self.jni_id, metrics.to_int)
@@ -23029,6 +26255,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1pango_1font_1metrics_1get_1descent, [:pointer, :long, :int32], :int32
       typesig { [::Java::Int] }
+      # @param metrics cast=(PangoFontMetrics *)
       # long
       def __pango_font_metrics_get_descent(metrics)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1pango_1font_1metrics_1get_1descent, JNI.env, self.jni_id, metrics.to_int)
@@ -23047,6 +26274,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1pango_1font_1metrics_1get_1underline_1thickness, [:pointer, :long, :int32], :int32
       typesig { [::Java::Int] }
+      # @method flags=dynamic
       # long
       def __pango_font_metrics_get_underline_thickness(metrics)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1pango_1font_1metrics_1get_1underline_1thickness, JNI.env, self.jni_id, metrics.to_int)
@@ -23065,6 +26293,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1pango_1font_1metrics_1get_1underline_1position, [:pointer, :long, :int32], :int32
       typesig { [::Java::Int] }
+      # @method flags=dynamic
       # long
       def __pango_font_metrics_get_underline_position(metrics)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1pango_1font_1metrics_1get_1underline_1position, JNI.env, self.jni_id, metrics.to_int)
@@ -23083,6 +26312,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1pango_1font_1metrics_1get_1strikethrough_1thickness, [:pointer, :long, :int32], :int32
       typesig { [::Java::Int] }
+      # @method flags=dynamic
       # long
       def __pango_font_metrics_get_strikethrough_thickness(metrics)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1pango_1font_1metrics_1get_1strikethrough_1thickness, JNI.env, self.jni_id, metrics.to_int)
@@ -23101,6 +26331,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1pango_1font_1metrics_1get_1strikethrough_1position, [:pointer, :long, :int32], :int32
       typesig { [::Java::Int] }
+      # @method flags=dynamic
       # long
       def __pango_font_metrics_get_strikethrough_position(metrics)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1pango_1font_1metrics_1get_1strikethrough_1position, JNI.env, self.jni_id, metrics.to_int)
@@ -23119,6 +26350,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1pango_1font_1metrics_1unref, [:pointer, :long, :int32], :void
       typesig { [::Java::Int] }
+      # @param metrics cast=(PangoFontMetrics *)
       # long
       def __pango_font_metrics_unref(metrics)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1pango_1font_1metrics_1unref, JNI.env, self.jni_id, metrics.to_int)
@@ -23137,6 +26369,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1pango_1language_1from_1string, [:pointer, :long, :long], :int32
       typesig { [Array.typed(::Java::Byte)] }
+      # @param language cast=(const char *),flags=no_out
       # long
       def __pango_language_from_string(language)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1pango_1language_1from_1string, JNI.env, self.jni_id, language.jni_id)
@@ -23155,6 +26388,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1pango_1layout_1context_1changed, [:pointer, :long, :int32], :void
       typesig { [::Java::Int] }
+      # @param layout cast=(PangoLayout *)
       # long
       def __pango_layout_context_changed(layout)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1pango_1layout_1context_1changed, JNI.env, self.jni_id, layout.to_int)
@@ -23173,6 +26407,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1pango_1layout_1get_1alignment, [:pointer, :long, :int32], :int32
       typesig { [::Java::Int] }
+      # @param layout cast=(PangoLayout*)
       # long
       def __pango_layout_get_alignment(layout)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1pango_1layout_1get_1alignment, JNI.env, self.jni_id, layout.to_int)
@@ -23191,6 +26426,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1pango_1layout_1get_1context, [:pointer, :long, :int32], :int32
       typesig { [::Java::Int] }
+      # @param layout cast=(PangoLayout *)
       # long
       # long
       def __pango_layout_get_context(layout)
@@ -23211,6 +26447,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1pango_1layout_1get_1attributes, [:pointer, :long, :int32], :int32
       typesig { [::Java::Int] }
+      # @param layout cast=(PangoLayout *)
       # long
       # long
       def __pango_layout_get_attributes(layout)
@@ -23231,6 +26468,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1pango_1layout_1get_1indent, [:pointer, :long, :int32], :int32
       typesig { [::Java::Int] }
+      # @param layout cast=(PangoLayout*)
       # long
       def __pango_layout_get_indent(layout)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1pango_1layout_1get_1indent, JNI.env, self.jni_id, layout.to_int)
@@ -23249,6 +26487,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1pango_1layout_1get_1iter, [:pointer, :long, :int32], :int32
       typesig { [::Java::Int] }
+      # @param layout cast=(PangoLayout*)
       # long
       # long
       def __pango_layout_get_iter(layout)
@@ -23269,6 +26508,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1pango_1layout_1get_1justify, [:pointer, :long, :int32], :int8
       typesig { [::Java::Int] }
+      # @param layout cast=(PangoLayout*)
       # long
       def __pango_layout_get_justify(layout)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1pango_1layout_1get_1justify, JNI.env, self.jni_id, layout.to_int) != 0
@@ -23287,6 +26527,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1pango_1layout_1get_1line, [:pointer, :long, :int32, :int32], :int32
       typesig { [::Java::Int, ::Java::Int] }
+      # @param layout cast=(PangoLayout *)
       # long
       # long
       def __pango_layout_get_line(layout, line)
@@ -23307,6 +26548,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1pango_1layout_1get_1line_1count, [:pointer, :long, :int32], :int32
       typesig { [::Java::Int] }
+      # @param layout cast=(PangoLayout*)
       # long
       def __pango_layout_get_line_count(layout)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1pango_1layout_1get_1line_1count, JNI.env, self.jni_id, layout.to_int)
@@ -23325,6 +26567,10 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1pango_1layout_1get_1log_1attrs, [:pointer, :long, :int32, :long, :long], :void
       typesig { [::Java::Int, Array.typed(::Java::Int), Array.typed(::Java::Int)] }
+      # @param layout cast=(PangoLayout*)
+      # @param attrs cast=(PangoLogAttr **)
+      # @param n_attrs cast=(int *)
+      # 
       # long
       # long
       def __pango_layout_get_log_attrs(layout, attrs, n_attrs)
@@ -23345,6 +26591,10 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1pango_1layout_1get_1size, [:pointer, :long, :int32, :long, :long], :void
       typesig { [::Java::Int, Array.typed(::Java::Int), Array.typed(::Java::Int)] }
+      # @param layout cast=(PangoLayout *)
+      # @param width cast=(int *)
+      # @param height cast=(int *)
+      # 
       # long
       def __pango_layout_get_size(layout, width, height)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1pango_1layout_1get_1size, JNI.env, self.jni_id, layout.to_int, width.jni_id, height.jni_id)
@@ -23363,6 +26613,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1pango_1layout_1get_1spacing, [:pointer, :long, :int32], :int32
       typesig { [::Java::Int] }
+      # @param layout cast=(PangoLayout*)
       # long
       def __pango_layout_get_spacing(layout)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1pango_1layout_1get_1spacing, JNI.env, self.jni_id, layout.to_int)
@@ -23381,6 +26632,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1pango_1layout_1get_1tabs, [:pointer, :long, :int32], :int32
       typesig { [::Java::Int] }
+      # @param layout cast=(PangoLayout*)
       # long
       # long
       def __pango_layout_get_tabs(layout)
@@ -23401,6 +26653,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1pango_1layout_1get_1text, [:pointer, :long, :int32], :int32
       typesig { [::Java::Int] }
+      # @param layout cast=(PangoLayout *)
       # long
       # long
       def __pango_layout_get_text(layout)
@@ -23421,6 +26674,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1pango_1layout_1get_1width, [:pointer, :long, :int32], :int32
       typesig { [::Java::Int] }
+      # @param layout cast=(PangoLayout *)
       # long
       def __pango_layout_get_width(layout)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1pango_1layout_1get_1width, JNI.env, self.jni_id, layout.to_int)
@@ -23439,6 +26693,9 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1pango_1layout_1index_1to_1pos, [:pointer, :long, :int32, :int32, :long], :void
       typesig { [::Java::Int, ::Java::Int, PangoRectangle] }
+      # @param layout cast=(PangoLayout*)
+      # @param pos flags=no_in
+      # 
       # long
       def __pango_layout_index_to_pos(layout, index, pos)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1pango_1layout_1index_1to_1pos, JNI.env, self.jni_id, layout.to_int, index.to_int, pos.jni_id)
@@ -23457,6 +26714,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1pango_1layout_1iter_1free, [:pointer, :long, :int32], :void
       typesig { [::Java::Int] }
+      # @param iter cast=(PangoLayoutIter*)
       # long
       def __pango_layout_iter_free(iter)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1pango_1layout_1iter_1free, JNI.env, self.jni_id, iter.to_int)
@@ -23475,6 +26733,10 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1pango_1layout_1iter_1get_1line_1extents, [:pointer, :long, :int32, :long, :long], :void
       typesig { [::Java::Int, PangoRectangle, PangoRectangle] }
+      # @param iter cast=(PangoLayoutIter*)
+      # @param ink_rect flags=no_in
+      # @param logical_rect flags=no_in
+      # 
       # long
       def __pango_layout_iter_get_line_extents(iter, ink_rect, logical_rect)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1pango_1layout_1iter_1get_1line_1extents, JNI.env, self.jni_id, iter.to_int, ink_rect.jni_id, logical_rect.jni_id)
@@ -23493,6 +26755,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1pango_1layout_1iter_1get_1index, [:pointer, :long, :int32], :int32
       typesig { [::Java::Int] }
+      # @param iter cast=(PangoLayoutIter*)
       # long
       def __pango_layout_iter_get_index(iter)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1pango_1layout_1iter_1get_1index, JNI.env, self.jni_id, iter.to_int)
@@ -23511,6 +26774,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1pango_1layout_1iter_1get_1run, [:pointer, :long, :int32], :int32
       typesig { [::Java::Int] }
+      # @param iter cast=(PangoLayoutIter*)
       # long
       # long
       def __pango_layout_iter_get_run(iter)
@@ -23531,6 +26795,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1pango_1layout_1iter_1next_1line, [:pointer, :long, :int32], :int8
       typesig { [::Java::Int] }
+      # @param iter cast=(PangoLayoutIter*)
       # long
       def __pango_layout_iter_next_line(iter)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1pango_1layout_1iter_1next_1line, JNI.env, self.jni_id, iter.to_int) != 0
@@ -23549,6 +26814,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1pango_1layout_1iter_1next_1run, [:pointer, :long, :int32], :int8
       typesig { [::Java::Int] }
+      # @param iter cast=(PangoLayoutIter*)
       # long
       def __pango_layout_iter_next_run(iter)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1pango_1layout_1iter_1next_1run, JNI.env, self.jni_id, iter.to_int) != 0
@@ -23567,6 +26833,10 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1pango_1layout_1line_1get_1extents, [:pointer, :long, :int32, :long, :long], :void
       typesig { [::Java::Int, PangoRectangle, PangoRectangle] }
+      # @param line cast=(PangoLayoutLine*)
+      # @param ink_rect cast=(PangoRectangle *),flags=no_in
+      # @param logical_rect cast=(PangoRectangle *),flags=no_in
+      # 
       # long
       def __pango_layout_line_get_extents(line, ink_rect, logical_rect)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1pango_1layout_1line_1get_1extents, JNI.env, self.jni_id, line.to_int, ink_rect.jni_id, logical_rect.jni_id)
@@ -23585,6 +26855,10 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1pango_1layout_1line_1x_1to_1index, [:pointer, :long, :int32, :int32, :long, :long], :int8
       typesig { [::Java::Int, ::Java::Int, Array.typed(::Java::Int), Array.typed(::Java::Int)] }
+      # @param line cast=(PangoLayoutLine*)
+      # @param index_ cast=(int *)
+      # @param trailing cast=(int *)
+      # 
       # long
       def __pango_layout_line_x_to_index(line, x_pos, index_, trailing)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1pango_1layout_1line_1x_1to_1index, JNI.env, self.jni_id, line.to_int, x_pos.to_int, index_.jni_id, trailing.jni_id) != 0
@@ -23601,26 +26875,9 @@ module Org::Eclipse::Swt::Internal::Gtk
         end
       end
       
-      JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1pango_1layout_1line_1get_1resolved_1dir, [:pointer, :long, :int32], :int32
-      typesig { [::Java::Int] }
-      # long
-      def __pango_layout_line_get_resolved_dir(line)
-        JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1pango_1layout_1line_1get_1resolved_1dir, JNI.env, self.jni_id, line.to_int)
-      end
-      
-      typesig { [::Java::Int] }
-      # long
-      def pango_layout_line_get_resolved_dir(line)
-        PLATFORM_LOCK.lock
-        begin
-          return __pango_layout_line_get_resolved_dir(line)
-        ensure
-          PLATFORM_LOCK.unlock
-        end
-      end
-      
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1pango_1layout_1new, [:pointer, :long, :int32], :int32
       typesig { [::Java::Int] }
+      # @param context cast=(PangoContext *)
       # long
       # long
       def __pango_layout_new(context)
@@ -23641,6 +26898,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1pango_1layout_1set_1alignment, [:pointer, :long, :int32, :int32], :void
       typesig { [::Java::Int, ::Java::Int] }
+      # @param layout cast=(PangoLayout *)
       # long
       def __pango_layout_set_alignment(layout, alignment)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1pango_1layout_1set_1alignment, JNI.env, self.jni_id, layout.to_int, alignment.to_int)
@@ -23659,6 +26917,9 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1pango_1layout_1set_1attributes, [:pointer, :long, :int32, :int32], :void
       typesig { [::Java::Int, ::Java::Int] }
+      # @param layout cast=(PangoLayout *)
+      # @param attrs cast=(PangoAttrList *)
+      # 
       # long
       # long
       def __pango_layout_set_attributes(layout, attrs)
@@ -23679,6 +26940,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1pango_1layout_1set_1auto_1dir, [:pointer, :long, :int32, :int8], :void
       typesig { [::Java::Int, ::Java::Boolean] }
+      # @method flags=dynamic
       # long
       def __pango_layout_set_auto_dir(layout, auto_dir)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1pango_1layout_1set_1auto_1dir, JNI.env, self.jni_id, layout.to_int, auto_dir ? 1 : 0)
@@ -23697,6 +26959,9 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1pango_1layout_1set_1font_1description, [:pointer, :long, :int32, :int32], :void
       typesig { [::Java::Int, ::Java::Int] }
+      # @param context cast=(PangoLayout *)
+      # @param descr cast=(PangoFontDescription *)
+      # 
       # long
       # long
       def __pango_layout_set_font_description(context, descr)
@@ -23717,6 +26982,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1pango_1layout_1set_1indent, [:pointer, :long, :int32, :int32], :void
       typesig { [::Java::Int, ::Java::Int] }
+      # @param layout cast=(PangoLayout*)
       # long
       def __pango_layout_set_indent(layout, indent)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1pango_1layout_1set_1indent, JNI.env, self.jni_id, layout.to_int, indent.to_int)
@@ -23735,6 +27001,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1pango_1layout_1set_1justify, [:pointer, :long, :int32, :int8], :void
       typesig { [::Java::Int, ::Java::Boolean] }
+      # @param layout cast=(PangoLayout*)
       # long
       def __pango_layout_set_justify(layout, justify)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1pango_1layout_1set_1justify, JNI.env, self.jni_id, layout.to_int, justify ? 1 : 0)
@@ -23753,6 +27020,9 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1pango_1layout_1set_1single_1paragraph_1mode, [:pointer, :long, :int32, :int8], :void
       typesig { [::Java::Int, ::Java::Boolean] }
+      # @param context cast=(PangoLayout *)
+      # @param setting cast=(gboolean)
+      # 
       # long
       def __pango_layout_set_single_paragraph_mode(context, setting)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1pango_1layout_1set_1single_1paragraph_1mode, JNI.env, self.jni_id, context.to_int, setting ? 1 : 0)
@@ -23771,6 +27041,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1pango_1layout_1set_1spacing, [:pointer, :long, :int32, :int32], :void
       typesig { [::Java::Int, ::Java::Int] }
+      # @param layout cast=(PangoLayout *)
       # long
       def __pango_layout_set_spacing(layout, spacing)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1pango_1layout_1set_1spacing, JNI.env, self.jni_id, layout.to_int, spacing.to_int)
@@ -23789,6 +27060,9 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1pango_1layout_1set_1tabs, [:pointer, :long, :int32, :int32], :void
       typesig { [::Java::Int, ::Java::Int] }
+      # @param layout cast=(PangoLayout *)
+      # @param tabs cast=(PangoTabArray *)
+      # 
       # long
       # long
       def __pango_layout_set_tabs(layout, tabs)
@@ -23809,6 +27083,10 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1pango_1layout_1set_1text, [:pointer, :long, :int32, :long, :int32], :void
       typesig { [::Java::Int, Array.typed(::Java::Byte), ::Java::Int] }
+      # @param layout cast=(PangoLayout *)
+      # @param text cast=(const char *),flags=no_out critical
+      # @param length cast=(int)
+      # 
       # long
       def __pango_layout_set_text(layout, text, length_)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1pango_1layout_1set_1text, JNI.env, self.jni_id, layout.to_int, text.jni_id, length_.to_int)
@@ -23827,6 +27105,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1pango_1layout_1set_1width, [:pointer, :long, :int32, :int32], :void
       typesig { [::Java::Int, ::Java::Int] }
+      # @param layout cast=(PangoLayout *)
       # long
       def __pango_layout_set_width(layout, width)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1pango_1layout_1set_1width, JNI.env, self.jni_id, layout.to_int, width.to_int)
@@ -23845,6 +27124,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1pango_1layout_1set_1wrap, [:pointer, :long, :int32, :int32], :void
       typesig { [::Java::Int, ::Java::Int] }
+      # @param layout cast=(PangoLayout *)
       # long
       def __pango_layout_set_wrap(layout, wrap)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1pango_1layout_1set_1wrap, JNI.env, self.jni_id, layout.to_int, wrap.to_int)
@@ -23863,6 +27143,10 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1pango_1layout_1xy_1to_1index, [:pointer, :long, :int32, :int32, :int32, :long, :long], :int8
       typesig { [::Java::Int, ::Java::Int, ::Java::Int, Array.typed(::Java::Int), Array.typed(::Java::Int)] }
+      # @param layout cast=(PangoLayout *)
+      # @param index cast=(int *)
+      # @param trailing cast=(int *)
+      # 
       # long
       def __pango_layout_xy_to_index(layout, x, y, index, trailing)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1pango_1layout_1xy_1to_1index, JNI.env, self.jni_id, layout.to_int, x.to_int, y.to_int, index.jni_id, trailing.jni_id) != 0
@@ -23881,6 +27165,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1pango_1tab_1array_1get_1size, [:pointer, :long, :int32], :int32
       typesig { [::Java::Int] }
+      # @param tab_array cast=(PangoTabArray *)
       # long
       def __pango_tab_array_get_size(tab_array)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1pango_1tab_1array_1get_1size, JNI.env, self.jni_id, tab_array.to_int)
@@ -23899,6 +27184,10 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1pango_1tab_1array_1get_1tabs, [:pointer, :long, :int32, :long, :long], :void
       typesig { [::Java::Int, Array.typed(::Java::Int), Array.typed(::Java::Int)] }
+      # @param tab_array cast=(PangoTabArray *)
+      # @param alignments cast=(PangoTabAlign **)
+      # @param locations cast=(int **)
+      # 
       # long
       # long
       # long
@@ -23921,6 +27210,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1pango_1tab_1array_1free, [:pointer, :long, :int32], :void
       typesig { [::Java::Int] }
+      # @param tab_array cast=(PangoTabArray *)
       # long
       def __pango_tab_array_free(tab_array)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1pango_1tab_1array_1free, JNI.env, self.jni_id, tab_array.to_int)
@@ -23939,6 +27229,9 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1pango_1tab_1array_1new, [:pointer, :long, :int32, :int8], :int32
       typesig { [::Java::Int, ::Java::Boolean] }
+      # @param initial_size cast=(gint)
+      # @param positions_in_pixels cast=(gboolean)
+      # 
       # long
       def __pango_tab_array_new(initial_size, positions_in_pixels)
         JNI.__send__(:Java_org_eclipse_swt_internal_gtk_OS__1pango_1tab_1array_1new, JNI.env, self.jni_id, initial_size.to_int, positions_in_pixels ? 1 : 0)
@@ -23957,6 +27250,11 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1pango_1tab_1array_1set_1tab, [:pointer, :long, :int32, :int32, :int32, :int32], :void
       typesig { [::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int] }
+      # @param tab_array cast=(PangoTabArray *)
+      # @param tab_index cast=(gint)
+      # @param alignment cast=(PangoTabAlign)
+      # @param location cast=(gint)
+      # 
       # long
       # long
       def __pango_tab_array_set_tab(tab_array, tab_index, alignment, location)
@@ -23977,6 +27275,11 @@ module Org::Eclipse::Swt::Internal::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_gtk_OS__1atk_1object_1add_1relationship, [:pointer, :long, :int32, :int32, :int32], :int8
       typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
+      # @method flags=dynamic
+      # @param object cast=(AtkObject *)
+      # @param relationship cast=(AtkRelationType)
+      # @param target cast=(AtkObject *)
+      # 
       # long
       # long
       def __atk_object_add_relationship(object, relationship, target)

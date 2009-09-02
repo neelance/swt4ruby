@@ -1,6 +1,6 @@
 require "rjava"
 
-# Copyright (c) 2000, 2007 IBM Corporation and others.
+# Copyright (c) 2000, 2008 IBM Corporation and others.
 # All rights reserved. This program and the accompanying materials
 # are made available under the terms of the Eclipse Public License v1.0
 # which accompanies this distribution, and is available at
@@ -25,6 +25,7 @@ module Org::Eclipse::Swt::Internal::Ole::Win32
     alias_method :attr_memid=, :memid=
     undef_method :memid=
     
+    # @field cast=(OLECHAR FAR *)
     # long
     attr_accessor :lpstr_schema
     alias_method :attr_lpstr_schema, :lpstr_schema
@@ -40,6 +41,7 @@ module Org::Eclipse::Swt::Internal::Ole::Win32
     
     # ELEMDESC elemdescVar
     # TYPEDESC elemdescVar.tdesc
+    # @field accessor=elemdescVar.tdesc.lptdesc,cast=(struct FARSTRUCT tagTYPEDESC FAR *)
     # long
     attr_accessor :elemdesc_var_tdesc_union
     alias_method :attr_elemdesc_var_tdesc_union, :elemdesc_var_tdesc_union
@@ -47,6 +49,7 @@ module Org::Eclipse::Swt::Internal::Ole::Win32
     alias_method :attr_elemdesc_var_tdesc_union=, :elemdesc_var_tdesc_union=
     undef_method :elemdesc_var_tdesc_union=
     
+    # @field accessor=elemdescVar.tdesc.vt
     attr_accessor :elemdesc_var_tdesc_vt
     alias_method :attr_elemdesc_var_tdesc_vt, :elemdesc_var_tdesc_vt
     undef_method :elemdesc_var_tdesc_vt
@@ -54,6 +57,7 @@ module Org::Eclipse::Swt::Internal::Ole::Win32
     undef_method :elemdesc_var_tdesc_vt=
     
     # PARAMDESC elemdescFunc.paramdesc
+    # @field accessor=elemdescVar.paramdesc.pparamdescex,cast=(LPPARAMDESCEX)
     # long
     attr_accessor :elemdesc_var_paramdesc_pparamdescex
     alias_method :attr_elemdesc_var_paramdesc_pparamdescex, :elemdesc_var_paramdesc_pparamdescex
@@ -61,6 +65,7 @@ module Org::Eclipse::Swt::Internal::Ole::Win32
     alias_method :attr_elemdesc_var_paramdesc_pparamdescex=, :elemdesc_var_paramdesc_pparamdescex=
     undef_method :elemdesc_var_paramdesc_pparamdescex=
     
+    # @field accessor=elemdescVar.paramdesc.wParamFlags
     attr_accessor :elemdesc_var_paramdesc_w_param_flags
     alias_method :attr_elemdesc_var_paramdesc_w_param_flags, :elemdesc_var_paramdesc_w_param_flags
     undef_method :elemdesc_var_paramdesc_w_param_flags

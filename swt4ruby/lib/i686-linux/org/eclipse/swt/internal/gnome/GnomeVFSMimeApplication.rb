@@ -1,6 +1,6 @@
 require "rjava"
 
-# Copyright (c) 2000, 2006 IBM Corporation and others. All rights reserved.
+# Copyright (c) 2000, 2008 IBM Corporation and others. All rights reserved.
 # The contents of this file are made available under the terms
 # of the GNU Lesser General Public License (LGPL) Version 2.1 that
 # accompanies this distribution (lgpl-v21.txt).  The LGPL is also
@@ -23,6 +23,7 @@ module Org::Eclipse::Swt::Internal::Gnome
   class GnomeVFSMimeApplication 
     include_class_members GnomeVFSMimeApplicationImports
     
+    # @field cast=(char *)
     # long
     attr_accessor :id
     alias_method :attr_id, :id
@@ -30,6 +31,7 @@ module Org::Eclipse::Swt::Internal::Gnome
     alias_method :attr_id=, :id=
     undef_method :id=
     
+    # @field cast=(char *)
     # long
     attr_accessor :name
     alias_method :attr_name, :name
@@ -37,6 +39,7 @@ module Org::Eclipse::Swt::Internal::Gnome
     alias_method :attr_name=, :name=
     undef_method :name=
     
+    # @field cast=(char *)
     # long
     attr_accessor :command
     alias_method :attr_command, :command
@@ -44,18 +47,21 @@ module Org::Eclipse::Swt::Internal::Gnome
     alias_method :attr_command=, :command=
     undef_method :command=
     
+    # @field cast=(gboolean)
     attr_accessor :can_open_multiple_files
     alias_method :attr_can_open_multiple_files, :can_open_multiple_files
     undef_method :can_open_multiple_files
     alias_method :attr_can_open_multiple_files=, :can_open_multiple_files=
     undef_method :can_open_multiple_files=
     
+    # @field cast=(GnomeVFSMimeApplicationArgumentType)
     attr_accessor :expects_uris
     alias_method :attr_expects_uris, :expects_uris
     undef_method :expects_uris
     alias_method :attr_expects_uris=, :expects_uris=
     undef_method :expects_uris=
     
+    # @field cast=(GList *)
     # long
     attr_accessor :supported_uri_schemes
     alias_method :attr_supported_uri_schemes, :supported_uri_schemes
@@ -63,6 +69,7 @@ module Org::Eclipse::Swt::Internal::Gnome
     alias_method :attr_supported_uri_schemes=, :supported_uri_schemes=
     undef_method :supported_uri_schemes=
     
+    # @field cast=(gboolean)
     attr_accessor :requires_terminal
     alias_method :attr_requires_terminal, :requires_terminal
     undef_method :requires_terminal

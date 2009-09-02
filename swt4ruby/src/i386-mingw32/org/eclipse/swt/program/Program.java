@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2008 IBM Corporation and others.
+ * Copyright (c) 2000, 2009 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -357,7 +357,7 @@ public ImageData getImageData () {
 		} catch (NumberFormatException e) {}
 	}
 	int length = fileName.length ();
-	if (length != 0 && fileName.charAt (0) == '\"') {
+	if (length > 1 && fileName.charAt (0) == '\"') {
 		if (fileName.charAt (length - 1) == '\"') {
 			fileName = fileName.substring (1, length - 1);
 		}

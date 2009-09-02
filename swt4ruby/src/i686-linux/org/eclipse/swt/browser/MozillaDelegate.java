@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2003, 2008 IBM Corporation and others.
+ * Copyright (c) 2003, 2009 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -14,6 +14,7 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.browser.Browser;
 import org.eclipse.swt.internal.*;
 import org.eclipse.swt.internal.gtk.*;
+import org.eclipse.swt.internal.mozilla.*;
 import org.eclipse.swt.widgets.*;
 
 class MozillaDelegate {
@@ -25,15 +26,16 @@ class MozillaDelegate {
 	static int /*long*/ eventProc;
 	static final int STOP_PROPOGATE = 1;
 
-	static boolean IsLinux;
+	static boolean IsSparc;
 	static {
 		String osName = System.getProperty ("os.name").toLowerCase (); //$NON-NLS-1$
-		IsLinux = osName.startsWith ("linux"); //$NON-NLS-1$
+		String osArch = System.getProperty ("os.arch").toLowerCase (); //$NON-NLS-1$
+		IsSparc = (osName.startsWith ("sunos") || osName.startsWith ("solaris")) && osArch.startsWith("sparc"); //$NON-NLS-1$
 	}
 
 MozillaDelegate (Browser browser) {
 	super ();
-	if (!IsLinux) {
+	if (IsSparc) {
 		browser.dispose ();
 		SWT.error (SWT.ERROR_NO_HANDLES, null, " [Unsupported platform]"); //$NON-NLS-1$
 	}
@@ -69,6 +71,13 @@ static byte[] wcsToMbcs (String codePage, String string, boolean terminate) {
 	return Converter.wcsToMbcs (codePage, string, terminate);
 }
 
+void addWindowSubclass () {
+}
+
+int createBaseWindow (nsIBaseWindow baseWindow) {
+	return baseWindow.Create ();
+}
+
 int /*long*/ getHandle () {
 	/*
 	* Bug in Mozilla Linux GTK.  Embedding Mozilla into a GtkFixed
@@ -84,6 +93,10 @@ int /*long*/ getHandle () {
 	OS.gtk_container_add (browser.handle, embedHandle);
 	OS.gtk_widget_show (embedHandle);
 	return embedHandle;
+}
+
+String getJSLibraryName () {
+	return "libmozjs.so"; //$NON-NLS-1$
 }
 
 String getLibraryName () {
@@ -193,6 +206,9 @@ void onDispose (int /*long*/ embedHandle) {
 		listener = null;
 	}
 	browser = null;
+}
+
+void removeWindowSubclass () {
 }
 
 void setSize (int /*long*/ embedHandle, int width, int height) {

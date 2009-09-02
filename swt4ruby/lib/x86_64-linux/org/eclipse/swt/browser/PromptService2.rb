@@ -1,6 +1,6 @@
 require "rjava"
 
-# Copyright (c) 2003, 2008 IBM Corporation and others.
+# Copyright (c) 2003, 2009 IBM Corporation and others.
 # All rights reserved. This program and the accompanying materials
 # are made available under the terms of the Eclipse Public License v1.0
 # which accompanies this distribution, and is available at
@@ -384,69 +384,8 @@ module Org::Eclipse::Swt::Browser
       if ((a_domwindow).equal?(0))
         return nil
       end
-      # int
-      # int
-      result = Array.typed(::Java::Long).new(1) { 0 }
-      rc = XPCOM._ns_get_service_manager(result)
-      if (!(rc).equal?(XPCOM::NS_OK))
-        Mozilla.error(rc)
-      end
-      if ((result[0]).equal?(0))
-        Mozilla.error(XPCOM::NS_NOINTERFACE)
-      end
-      service_manager = NsIServiceManager.new(result[0])
-      result[0] = 0
-      a_contract_id = MozillaDelegate.wcs_to_mbcs(nil, XPCOM::NS_WINDOWWATCHER_CONTRACTID, true)
-      rc = service_manager._get_service_by_contract_id(a_contract_id, NsIWindowWatcher::NS_IWINDOWWATCHER_IID, result)
-      if (!(rc).equal?(XPCOM::NS_OK))
-        Mozilla.error(rc)
-      end
-      if ((result[0]).equal?(0))
-        Mozilla.error(XPCOM::NS_NOINTERFACE)
-      end
-      service_manager._release
-      window_watcher = NsIWindowWatcher.new(result[0])
-      result[0] = 0
-      # the chrome will only be answered for the top-level nsIDOMWindow
       window = NsIDOMWindow.new(a_domwindow)
-      rc = window._get_top(result)
-      if (!(rc).equal?(XPCOM::NS_OK))
-        Mozilla.error(rc)
-      end
-      if ((result[0]).equal?(0))
-        Mozilla.error(XPCOM::NS_NOINTERFACE)
-      end
-      a_domwindow = result[0]
-      result[0] = 0
-      rc = window_watcher._get_chrome_for_window(a_domwindow, result)
-      if (!(rc).equal?(XPCOM::NS_OK))
-        Mozilla.error(rc)
-      end
-      if ((result[0]).equal?(0))
-        Mozilla.error(XPCOM::NS_NOINTERFACE)
-      end
-      window_watcher._release
-      web_browser_chrome = NsIWebBrowserChrome.new(result[0])
-      result[0] = 0
-      rc = web_browser_chrome._query_interface(NsIEmbeddingSiteWindow::NS_IEMBEDDINGSITEWINDOW_IID, result)
-      if (!(rc).equal?(XPCOM::NS_OK))
-        Mozilla.error(rc)
-      end
-      if ((result[0]).equal?(0))
-        Mozilla.error(XPCOM::NS_NOINTERFACE)
-      end
-      web_browser_chrome._release
-      embedding_site_window = NsIEmbeddingSiteWindow.new(result[0])
-      result[0] = 0
-      rc = embedding_site_window._get_site_window(result)
-      if (!(rc).equal?(XPCOM::NS_OK))
-        Mozilla.error(rc)
-      end
-      if ((result[0]).equal?(0))
-        Mozilla.error(XPCOM::NS_NOINTERFACE)
-      end
-      embedding_site_window._release
-      return Mozilla.find_browser(result[0])
+      return Mozilla.find_browser(window)
     end
     
     typesig { [::Java::Int, ::Java::Int, ::Java::Long] }
@@ -695,47 +634,43 @@ module Org::Eclipse::Swt::Browser
       if ((result[0]).equal?(1))
         # User selected OK. User name and password are returned as PRUnichar values. Any default
         # value that we override must be freed using the nsIMemory service.
-        cnt = 0
-        size = 0
-        # int
-        ptr = 0
-        buffer = nil
-        # int
-        # int
-        result2 = Array.typed(::Java::Long).new(1) { 0 }
         if (!(value_label[0]).nil?)
+          # int
+          # int
+          result2 = Array.typed(::Java::Long).new(1) { 0 }
+          rc = XPCOM._ns_get_service_manager(result2)
+          if (!(rc).equal?(XPCOM::NS_OK))
+            SWT.error(rc)
+          end
+          if ((result2[0]).equal?(0))
+            SWT.error(XPCOM::NS_NOINTERFACE)
+          end
+          service_manager = NsIServiceManager.new(result2[0])
+          result2[0] = 0
+          a_contract_id = MozillaDelegate.wcs_to_mbcs(nil, XPCOM::NS_MEMORY_CONTRACTID, true)
+          rc = service_manager._get_service_by_contract_id(a_contract_id, NsIMemory::NS_IMEMORY_IID, result2)
+          if (!(rc).equal?(XPCOM::NS_OK))
+            SWT.error(rc)
+          end
+          if ((result2[0]).equal?(0))
+            SWT.error(XPCOM::NS_NOINTERFACE)
+          end
+          service_manager._release
+          memory = NsIMemory.new(result2[0])
+          result2[0] = 0
           cnt = value_label[0].length
           buffer = CharArray.new(cnt + 1)
           value_label[0].get_chars(0, cnt, buffer, 0)
           size = buffer.attr_length * 2
-          ptr = C.malloc(size)
+          # int
+          ptr = memory._alloc(size)
           XPCOM.memmove(ptr, buffer, size)
           # int
           XPCOM.memmove(a_value, Array.typed(::Java::Long).new([ptr]), C::PTR_SIZEOF)
           if (!(value_addr[0]).equal?(0))
-            rc = XPCOM._ns_get_service_manager(result2)
-            if (!(rc).equal?(XPCOM::NS_OK))
-              SWT.error(rc)
-            end
-            if ((result2[0]).equal?(0))
-              SWT.error(XPCOM::NS_NOINTERFACE)
-            end
-            service_manager = NsIServiceManager.new(result2[0])
-            result2[0] = 0
-            a_contract_id = MozillaDelegate.wcs_to_mbcs(nil, XPCOM::NS_MEMORY_CONTRACTID, true)
-            rc = service_manager._get_service_by_contract_id(a_contract_id, NsIMemory::NS_IMEMORY_IID, result2)
-            if (!(rc).equal?(XPCOM::NS_OK))
-              SWT.error(rc)
-            end
-            if ((result2[0]).equal?(0))
-              SWT.error(XPCOM::NS_NOINTERFACE)
-            end
-            service_manager._release
-            memory = NsIMemory.new(result2[0])
-            result2[0] = 0
             memory._free(value_addr[0])
-            memory._release
           end
+          memory._release
         end
       end
       if (!(a_check_state).equal?(0))
@@ -752,7 +687,46 @@ module Org::Eclipse::Swt::Browser
     # int
     # int
     def _prompt_auth(a_parent, a_channel, level, auth_info, checkbox_label, checkbox_value, _retval)
+      auth = NsIAuthInformation.new(auth_info)
       browser = get_browser(a_parent)
+      if (!(browser).nil?)
+        mozilla = browser.attr_web_browser
+        # Do not invoke the listeners if this challenge has been failed too many
+        # times because a listener is likely giving incorrect credentials repeatedly
+        # and will do so indefinitely.
+        if (((mozilla.attr_auth_count += 1) - 1) < 3)
+          i = 0
+          while i < mozilla.attr_authentication_listeners.attr_length
+            event = AuthenticationEvent.new(browser)
+            event.attr_location = mozilla.attr_last_navigate_url
+            mozilla.attr_authentication_listeners[i].authenticate(event)
+            if (!event.attr_doit)
+              XPCOM.memmove(_retval, Array.typed(::Java::Int).new([0]), 4)
+              # PRBool
+              return XPCOM::NS_OK
+            end
+            if (!(event.attr_user).nil? && !(event.attr_password).nil?)
+              string = NsEmbedString.new(event.attr_user)
+              rc = auth._set_username(string.get_address)
+              if (!(rc).equal?(XPCOM::NS_OK))
+                SWT.error(rc)
+              end
+              string.dispose
+              string = NsEmbedString.new(event.attr_password)
+              rc = auth._set_password(string.get_address)
+              if (!(rc).equal?(XPCOM::NS_OK))
+                SWT.error(rc)
+              end
+              string.dispose
+              XPCOM.memmove(_retval, Array.typed(::Java::Int).new([1]), 4)
+              # PRBool
+              return XPCOM::NS_OK
+            end
+            i += 1
+          end
+        end
+      end
+      # no listener handled the challenge, so show an authentication dialog
       check_label = nil
       check_value = Array.typed(::Java::Int).new(1) { 0 }
       user_label = Array.typed(String).new(1) { nil }
@@ -767,7 +741,6 @@ module Org::Eclipse::Swt::Browser
         # PRBool
       end
       # get initial username and password values
-      auth = NsIAuthInformation.new(auth_info)
       # int
       ptr = XPCOM.ns_embed_string_new
       rc = auth._get_username(ptr)
@@ -817,21 +790,21 @@ module Org::Eclipse::Swt::Browser
       end
       ns_uri = NsIURI.new(uri[0])
       # int
-      a_spec = XPCOM.ns_embed_cstring_new
-      rc = ns_uri._get_host(a_spec)
+      host = XPCOM.ns_embed_cstring_new
+      rc = ns_uri._get_host(host)
       if (!(rc).equal?(XPCOM::NS_OK))
         SWT.error(rc)
       end
-      length = XPCOM.ns_embed_cstring_length(a_spec)
-      buffer = XPCOM.ns_embed_cstring_get(a_spec)
+      length = XPCOM.ns_embed_cstring_length(host)
+      buffer = XPCOM.ns_embed_cstring_get(host)
       bytes = Array.typed(::Java::Byte).new(length) { 0 }
       XPCOM.memmove(bytes, buffer, length)
-      XPCOM.ns_embed_cstring_delete(a_spec)
-      host = String.new(bytes)
+      host_string = String.new(bytes)
+      XPCOM.ns_embed_cstring_delete(host)
       ns_uri._release
       message = nil
-      if (realm.length > 0 && host.length > 0)
-        message = RJava.cast_to_string(Compatibility.get_message("SWT_Enter_Username_and_Password", Array.typed(String).new([realm, host]))) # $NON-NLS-1$
+      if (realm.length > 0 && host_string.length > 0)
+        message = RJava.cast_to_string(Compatibility.get_message("SWT_Enter_Username_and_Password", Array.typed(String).new([realm, host_string]))) # $NON-NLS-1$
       else
         message = "" # $NON-NLS-1$
       end
@@ -875,148 +848,166 @@ module Org::Eclipse::Swt::Browser
     # int
     def _prompt_username_and_password(a_parent, a_dialog_title, a_text, a_username, a_password, a_check_msg, a_check_state, _retval)
       browser = get_browser(a_parent)
-      title_label = nil
-      text_label = nil
-      check_label = nil
-      user_label = Array.typed(String).new(1) { nil }
-      pass_label = Array.typed(String).new(1) { nil }
-      dest = nil
-      length_ = 0
-      if (!(a_dialog_title).equal?(0))
-        length_ = XPCOM.strlen__prunichar(a_dialog_title)
-        dest = CharArray.new(length_)
-        XPCOM.memmove(dest, a_dialog_title, length_ * 2)
-        title_label = RJava.cast_to_string(String.new(dest))
-      else
-        title_label = RJava.cast_to_string(SWT.get_message("SWT_Authentication_Required")) # $NON-NLS-1$
+      user = nil
+      password = nil
+      if (!(browser).nil?)
+        mozilla = browser.attr_web_browser
+        # Do not invoke the listeners if this challenge has been failed too many
+        # times because a listener is likely giving incorrect credentials repeatedly
+        # and will do so indefinitely.
+        if (((mozilla.attr_auth_count += 1) - 1) < 3)
+          i = 0
+          while i < mozilla.attr_authentication_listeners.attr_length
+            event = AuthenticationEvent.new(browser)
+            event.attr_location = mozilla.attr_last_navigate_url
+            mozilla.attr_authentication_listeners[i].authenticate(event)
+            if (!event.attr_doit)
+              XPCOM.memmove(_retval, Array.typed(::Java::Int).new([0]), 4)
+              # PRBool
+              return XPCOM::NS_OK
+            end
+            if (!(event.attr_user).nil? && !(event.attr_password).nil?)
+              user = RJava.cast_to_string(event.attr_user)
+              password = RJava.cast_to_string(event.attr_password)
+              XPCOM.memmove(_retval, Array.typed(::Java::Int).new([1]), 4)
+              # PRBool
+              break
+            end
+            i += 1
+          end
+        end
       end
-      length_ = XPCOM.strlen__prunichar(a_text)
-      dest = CharArray.new(length_)
-      XPCOM.memmove(dest, a_text, length_ * 2)
-      text_label = RJava.cast_to_string(String.new(dest))
-      # int
-      # int
-      user_addr = Array.typed(::Java::Long).new(1) { 0 }
-      XPCOM.memmove(user_addr, a_username, C::PTR_SIZEOF)
-      if (!(user_addr[0]).equal?(0))
-        length_ = XPCOM.strlen__prunichar(user_addr[0])
-        dest = CharArray.new(length_)
-        XPCOM.memmove(dest, user_addr[0], length_ * 2)
-        user_label[0] = String.new(dest)
-      end
-      # int
-      # int
-      pass_addr = Array.typed(::Java::Long).new(1) { 0 }
-      XPCOM.memmove(pass_addr, a_password, C::PTR_SIZEOF)
-      if (!(pass_addr[0]).equal?(0))
-        length_ = XPCOM.strlen__prunichar(pass_addr[0])
-        dest = CharArray.new(length_)
-        XPCOM.memmove(dest, pass_addr[0], length_ * 2)
-        pass_label[0] = String.new(dest)
-      end
-      if (!(a_check_msg).equal?(0))
-        length_ = XPCOM.strlen__prunichar(a_check_msg)
-        if (length_ > 0)
+      if ((user).nil?)
+        # no listener handled the challenge, so show an authentication dialog
+        title_label = nil
+        text_label = nil
+        check_label = nil
+        user_label = Array.typed(String).new(1) { nil }
+        pass_label = Array.typed(String).new(1) { nil }
+        dest = nil
+        length_ = 0
+        if (!(a_dialog_title).equal?(0))
+          length_ = XPCOM.strlen__prunichar(a_dialog_title)
           dest = CharArray.new(length_)
-          XPCOM.memmove(dest, a_check_msg, length_ * 2)
-          check_label = RJava.cast_to_string(String.new(dest))
+          XPCOM.memmove(dest, a_dialog_title, length_ * 2)
+          title_label = RJava.cast_to_string(String.new(dest))
+        else
+          title_label = RJava.cast_to_string(SWT.get_message("SWT_Authentication_Required")) # $NON-NLS-1$
         end
+        length_ = XPCOM.strlen__prunichar(a_text)
+        dest = CharArray.new(length_)
+        XPCOM.memmove(dest, a_text, length_ * 2)
+        text_label = RJava.cast_to_string(String.new(dest))
+        # int
+        # int
+        user_addr = Array.typed(::Java::Long).new(1) { 0 }
+        XPCOM.memmove(user_addr, a_username, C::PTR_SIZEOF)
+        if (!(user_addr[0]).equal?(0))
+          length_ = XPCOM.strlen__prunichar(user_addr[0])
+          dest = CharArray.new(length_)
+          XPCOM.memmove(dest, user_addr[0], length_ * 2)
+          user_label[0] = String.new(dest)
+        end
+        # int
+        # int
+        pass_addr = Array.typed(::Java::Long).new(1) { 0 }
+        XPCOM.memmove(pass_addr, a_password, C::PTR_SIZEOF)
+        if (!(pass_addr[0]).equal?(0))
+          length_ = XPCOM.strlen__prunichar(pass_addr[0])
+          dest = CharArray.new(length_)
+          XPCOM.memmove(dest, pass_addr[0], length_ * 2)
+          pass_label[0] = String.new(dest)
+        end
+        if (!(a_check_msg).equal?(0))
+          length_ = XPCOM.strlen__prunichar(a_check_msg)
+          if (length_ > 0)
+            dest = CharArray.new(length_)
+            XPCOM.memmove(dest, a_check_msg, length_ * 2)
+            check_label = RJava.cast_to_string(String.new(dest))
+          end
+        end
+        shell = (browser).nil? ? Shell.new : browser.get_shell
+        dialog = PromptDialog.new(shell)
+        check = Array.typed(::Java::Int).new(1) { 0 }
+        result = Array.typed(::Java::Int).new(1) { 0 }
+        if (!(a_check_state).equal?(0))
+          XPCOM.memmove(check, a_check_state, 4)
+        end
+        # PRBool
+        dialog.prompt_username_and_password(title_label, text_label, check_label, user_label, pass_label, check, result)
+        XPCOM.memmove(_retval, result, 4)
+        # PRBool
+        if ((result[0]).equal?(1))
+          # User selected OK
+          user = RJava.cast_to_string(user_label[0])
+          password = RJava.cast_to_string(pass_label[0])
+        end
+        if (!(a_check_state).equal?(0))
+          XPCOM.memmove(a_check_state, check, 4)
+        end
+        # PRBool
       end
-      shell = (browser).nil? ? Shell.new : browser.get_shell
-      dialog = PromptDialog.new(shell)
-      check = Array.typed(::Java::Int).new(1) { 0 }
-      result = Array.typed(::Java::Int).new(1) { 0 }
-      if (!(a_check_state).equal?(0))
-        XPCOM.memmove(check, a_check_state, 4)
-      end
-      # PRBool
-      dialog.prompt_username_and_password(title_label, text_label, check_label, user_label, pass_label, check, result)
-      XPCOM.memmove(_retval, result, 4)
-      # PRBool
-      if ((result[0]).equal?(1))
-        # User selected OK. User name and password are returned as PRUnichar values. Any default
+      if (!(user).nil?)
+        # User name and password are returned as PRUnichar values. Any default
         # value that we override must be freed using the nsIMemory service.
-        cnt = 0
-        size = 0
-        # int
-        ptr = 0
-        buffer = nil
+        # 
         # int
         # int
-        result2 = Array.typed(::Java::Long).new(1) { 0 }
-        if (!(user_label[0]).nil?)
-          cnt = user_label[0].length
-          buffer = CharArray.new(cnt + 1)
-          user_label[0].get_chars(0, cnt, buffer, 0)
-          size = buffer.attr_length * 2
-          ptr = C.malloc(size)
-          XPCOM.memmove(ptr, buffer, size)
-          # int
-          XPCOM.memmove(a_username, Array.typed(::Java::Long).new([ptr]), C::PTR_SIZEOF)
-          if (!(user_addr[0]).equal?(0))
-            rc = XPCOM._ns_get_service_manager(result2)
-            if (!(rc).equal?(XPCOM::NS_OK))
-              SWT.error(rc)
-            end
-            if ((result2[0]).equal?(0))
-              SWT.error(XPCOM::NS_NOINTERFACE)
-            end
-            service_manager = NsIServiceManager.new(result2[0])
-            result2[0] = 0
-            a_contract_id = MozillaDelegate.wcs_to_mbcs(nil, XPCOM::NS_MEMORY_CONTRACTID, true)
-            rc = service_manager._get_service_by_contract_id(a_contract_id, NsIMemory::NS_IMEMORY_IID, result2)
-            if (!(rc).equal?(XPCOM::NS_OK))
-              SWT.error(rc)
-            end
-            if ((result[0]).equal?(0))
-              SWT.error(XPCOM::NS_NOINTERFACE)
-            end
-            service_manager._release
-            memory = NsIMemory.new(result2[0])
-            result2[0] = 0
-            memory._free(user_addr[0])
-            memory._release
-          end
+        user_addr = Array.typed(::Java::Long).new(1) { 0 }
+        XPCOM.memmove(user_addr, a_username, C::PTR_SIZEOF)
+        # int
+        # int
+        pass_addr = Array.typed(::Java::Long).new(1) { 0 }
+        XPCOM.memmove(pass_addr, a_password, C::PTR_SIZEOF)
+        # int
+        # int
+        result = Array.typed(::Java::Long).new(1) { 0 }
+        rc = XPCOM._ns_get_service_manager(result)
+        if (!(rc).equal?(XPCOM::NS_OK))
+          SWT.error(rc)
         end
-        if (!(pass_label[0]).nil?)
-          cnt = pass_label[0].length
-          buffer = CharArray.new(cnt + 1)
-          pass_label[0].get_chars(0, cnt, buffer, 0)
-          size = buffer.attr_length * 2
-          ptr = C.malloc(size)
-          XPCOM.memmove(ptr, buffer, size)
-          # int
-          XPCOM.memmove(a_password, Array.typed(::Java::Long).new([ptr]), C::PTR_SIZEOF)
-          if (!(pass_addr[0]).equal?(0))
-            rc = XPCOM._ns_get_service_manager(result2)
-            if (!(rc).equal?(XPCOM::NS_OK))
-              SWT.error(rc)
-            end
-            if ((result2[0]).equal?(0))
-              SWT.error(XPCOM::NS_NOINTERFACE)
-            end
-            service_manager = NsIServiceManager.new(result2[0])
-            result2[0] = 0
-            a_contract_id = MozillaDelegate.wcs_to_mbcs(nil, XPCOM::NS_MEMORY_CONTRACTID, true)
-            rc = service_manager._get_service_by_contract_id(a_contract_id, NsIMemory::NS_IMEMORY_IID, result2)
-            if (!(rc).equal?(XPCOM::NS_OK))
-              SWT.error(rc)
-            end
-            if ((result2[0]).equal?(0))
-              SWT.error(XPCOM::NS_NOINTERFACE)
-            end
-            service_manager._release
-            memory = NsIMemory.new(result2[0])
-            result2[0] = 0
-            memory._free(pass_addr[0])
-            memory._release
-          end
+        if ((result[0]).equal?(0))
+          SWT.error(XPCOM::NS_NOINTERFACE)
         end
+        service_manager = NsIServiceManager.new(result[0])
+        result[0] = 0
+        a_contract_id = MozillaDelegate.wcs_to_mbcs(nil, XPCOM::NS_MEMORY_CONTRACTID, true)
+        rc = service_manager._get_service_by_contract_id(a_contract_id, NsIMemory::NS_IMEMORY_IID, result)
+        if (!(rc).equal?(XPCOM::NS_OK))
+          SWT.error(rc)
+        end
+        if ((result[0]).equal?(0))
+          SWT.error(XPCOM::NS_NOINTERFACE)
+        end
+        service_manager._release
+        memory = NsIMemory.new(result[0])
+        result[0] = 0
+        if (!(user_addr[0]).equal?(0))
+          memory._free(user_addr[0])
+        end
+        if (!(pass_addr[0]).equal?(0))
+          memory._free(pass_addr[0])
+        end
+        memory._release
+        # write the name and password values
+        cnt = user.length
+        buffer = CharArray.new(cnt + 1)
+        user.get_chars(0, cnt, buffer, 0)
+        size = buffer.attr_length * 2
+        # int
+        ptr = C.malloc(size)
+        XPCOM.memmove(ptr, buffer, size)
+        # int
+        XPCOM.memmove(a_username, Array.typed(::Java::Long).new([ptr]), C::PTR_SIZEOF)
+        cnt = password.length
+        buffer = CharArray.new(cnt + 1)
+        password.get_chars(0, cnt, buffer, 0)
+        size = buffer.attr_length * 2
+        ptr = C.malloc(size)
+        XPCOM.memmove(ptr, buffer, size)
+        # int
+        XPCOM.memmove(a_password, Array.typed(::Java::Long).new([ptr]), C::PTR_SIZEOF)
       end
-      if (!(a_check_state).equal?(0))
-        XPCOM.memmove(a_check_state, check, 4)
-      end
-      # PRBool
       return XPCOM::NS_OK
     end
     

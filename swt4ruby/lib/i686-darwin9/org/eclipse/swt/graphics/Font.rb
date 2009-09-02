@@ -1,6 +1,6 @@
 require "rjava"
 
-# Copyright (c) 2000, 2008 IBM Corporation and others.
+# Copyright (c) 2000, 2009 IBM Corporation and others.
 # All rights reserved. This program and the accompanying materials
 # are made available under the terms of the Eclipse Public License v1.0
 # which accompanies this distribution, and is available at
@@ -13,7 +13,7 @@ module Org::Eclipse::Swt::Graphics
     class_module.module_eval {
       include ::Java::Lang
       include ::Org::Eclipse::Swt::Graphics
-      include ::Org::Eclipse::Swt::Internal::Carbon
+      include ::Org::Eclipse::Swt::Internal::Cocoa
       include ::Org::Eclipse::Swt
     }
   end
@@ -49,7 +49,7 @@ module Org::Eclipse::Swt::Graphics
     alias_method :attr_handle=, :handle=
     undef_method :handle=
     
-    # the style to the OS font (a FMFontStyle)
+    # the traits not supported to the OS font resource
     # (Warning: This field is platform dependent)
     # <p>
     # <b>IMPORTANT:</b> This field is <em>not</em> part of the SWT
@@ -57,46 +57,24 @@ module Org::Eclipse::Swt::Graphics
     # within the packages provided by SWT. It is not available on all
     # platforms and should never be accessed from application code.
     # </p>
-    attr_accessor :style
-    alias_method :attr_style, :style
-    undef_method :style
-    alias_method :attr_style=, :style=
-    undef_method :style=
+    attr_accessor :extra_traits
+    alias_method :attr_extra_traits, :extra_traits
+    undef_method :extra_traits
+    alias_method :attr_extra_traits=, :extra_traits=
+    undef_method :extra_traits=
     
-    # the size to the OS font
-    # (Warning: This field is platform dependent)
-    # <p>
-    # <b>IMPORTANT:</b> This field is <em>not</em> part of the SWT
-    # public API. It is marked public only so that it can be shared
-    # within the packages provided by SWT. It is not available on all
-    # platforms and should never be accessed from application code.
-    # </p>
-    attr_accessor :size
-    alias_method :attr_size, :size
-    undef_method :size
-    alias_method :attr_size=, :size=
-    undef_method :size=
-    
-    # the ATSUI style for the OS font
-    # (Warning: This field is platform dependent)
-    # <p>
-    # <b>IMPORTANT:</b> This field is <em>not</em> part of the SWT
-    # public API. It is marked public only so that it can be shared
-    # within the packages provided by SWT. It is not available on all
-    # platforms and should never be accessed from application code.
-    # </p>
-    attr_accessor :atsui_style
-    alias_method :attr_atsui_style, :atsui_style
-    undef_method :atsui_style
-    alias_method :attr_atsui_style=, :atsui_style=
-    undef_method :atsui_style=
+    class_module.module_eval {
+      const_set_lazy(:SYNTHETIC_BOLD) { -2.5 }
+      const_attr_reader  :SYNTHETIC_BOLD
+      
+      const_set_lazy(:SYNTHETIC_ITALIC) { 0.2 }
+      const_attr_reader  :SYNTHETIC_ITALIC
+    }
     
     typesig { [Device] }
     def initialize(device)
-      @handle = 0
-      @style = 0
-      @size = 0.0
-      @atsui_style = 0
+      @handle = nil
+      @extra_traits = 0
       super(device)
     end
     
@@ -118,16 +96,24 @@ module Org::Eclipse::Swt::Graphics
     # <li>ERROR_NO_HANDLES - if a font could not be created from the given font data</li>
     # </ul>
     def initialize(device, fd)
-      @handle = 0
-      @style = 0
-      @size = 0.0
-      @atsui_style = 0
+      @handle = nil
+      @extra_traits = 0
       super(device)
       if ((fd).nil?)
         SWT.error(SWT::ERROR_NULL_ARGUMENT)
       end
-      init(fd.get_name, fd.get_height_f, fd.get_style, fd.attr_ats_name)
-      init
+      pool = nil
+      if (!NSThread.is_main_thread)
+        pool = NSAutoreleasePool.new.alloc.init
+      end
+      begin
+        init(fd.get_name, fd.get_height_f, fd.get_style, fd.attr_ns_name)
+        init
+      ensure
+        if (!(pool).nil?)
+          pool.release
+        end
+      end
     end
     
     typesig { [Device, Array.typed(FontData)] }
@@ -153,10 +139,8 @@ module Org::Eclipse::Swt::Graphics
     # 
     # @since 2.1
     def initialize(device, fds)
-      @handle = 0
-      @style = 0
-      @size = 0.0
-      @atsui_style = 0
+      @handle = nil
+      @extra_traits = 0
       super(device)
       if ((fds).nil?)
         SWT.error(SWT::ERROR_NULL_ARGUMENT)
@@ -171,9 +155,19 @@ module Org::Eclipse::Swt::Graphics
         end
         i += 1
       end
-      fd = fds[0]
-      init(fd.get_name, fd.get_height_f, fd.get_style, fd.attr_ats_name)
-      init
+      pool = nil
+      if (!NSThread.is_main_thread)
+        pool = NSAutoreleasePool.new.alloc.init
+      end
+      begin
+        fd = fds[0]
+        init(fd.get_name, fd.get_height_f, fd.get_style, fd.attr_ns_name)
+        init
+      ensure
+        if (!(pool).nil?)
+          pool.release
+        end
+      end
     end
     
     typesig { [Device, String, ::Java::Int, ::Java::Int] }
@@ -198,71 +192,57 @@ module Org::Eclipse::Swt::Graphics
     # <li>ERROR_NO_HANDLES - if a font could not be created from the given arguments</li>
     # </ul>
     def initialize(device, name, height, style)
-      @handle = 0
-      @style = 0
-      @size = 0.0
-      @atsui_style = 0
+      @handle = nil
+      @extra_traits = 0
       super(device)
-      init(name, height, style, nil)
-      init
+      pool = nil
+      if (!NSThread.is_main_thread)
+        pool = NSAutoreleasePool.new.alloc.init
+      end
+      begin
+        init(name, height, style, nil)
+        init
+      ensure
+        if (!(pool).nil?)
+          pool.release
+        end
+      end
     end
     
     typesig { [Device, String, ::Java::Float, ::Java::Int] }
     # public
     def initialize(device, name, height, style)
-      @handle = 0
-      @style = 0
-      @size = 0.0
-      @atsui_style = 0
+      @handle = nil
+      @extra_traits = 0
       super(device)
       init(name, height, style, nil)
       init
     end
     
-    typesig { [] }
-    def create_style
-      buffer = Array.typed(::Java::Int).new(1) { 0 }
-      OS._atsucreate_style(buffer)
-      if ((buffer[0]).equal?(0))
-        SWT.error(SWT::ERROR_NO_HANDLES)
+    typesig { [NSMutableAttributedString, NSRange] }
+    def add_traits(attr_str, range)
+      if (!((@extra_traits & OS::NSBoldFontMask)).equal?(0))
+        attr_str.add_attribute(OS::NSStrokeWidthAttributeName, NSNumber.number_with_double(SYNTHETIC_BOLD), range)
       end
-      atsu_style = buffer[0]
-      synthesize = !(@style).equal?(0)
-      ptr = OS._new_ptr(8 + (synthesize ? 8 : 0))
-      OS.memmove(ptr, Array.typed(::Java::Int).new([OS._fmget_font_from_atsfont_ref(@handle)]), 4)
-      OS.memmove(ptr + 4, Array.typed(::Java::Int).new([OS._x2fix(@size)]), 4)
-      tags = nil
-      sizes = nil
-      values = nil
-      if (synthesize)
-        OS.memmove(ptr + 8, Array.typed(::Java::Byte).new([!((@style & OS.attr_bold)).equal?(0) ? 1 : 0]), 1)
-        OS.memmove(ptr + 9, Array.typed(::Java::Byte).new([!((@style & OS.attr_italic)).equal?(0) ? 1 : 0]), 1)
-        tags = Array.typed(::Java::Int).new([OS.attr_k_atsufont_tag, OS.attr_k_atsusize_tag, OS.attr_k_atsuqdboldface_tag, OS.attr_k_atsuqditalic_tag])
-        sizes = Array.typed(::Java::Int).new([4, 4, 1, 1])
-        values = Array.typed(::Java::Int).new([ptr, ptr + 4, ptr + 8, ptr + 9])
-      else
-        tags = Array.typed(::Java::Int).new([OS.attr_k_atsufont_tag, OS.attr_k_atsusize_tag])
-        sizes = Array.typed(::Java::Int).new([4, 4])
-        values = Array.typed(::Java::Int).new([ptr, ptr + 4])
+      if (!((@extra_traits & OS::NSItalicFontMask)).equal?(0))
+        attr_str.add_attribute(OS::NSObliquenessAttributeName, NSNumber.number_with_double(SYNTHETIC_ITALIC), range)
       end
-      OS._atsuset_attributes(atsu_style, tags.attr_length, tags, sizes, values)
-      OS._dispose_ptr(ptr)
-      types = Array.typed(::Java::Short).new([RJava.cast_to_short(OS.attr_k_ligatures_type), RJava.cast_to_short(OS.attr_k_ligatures_type), RJava.cast_to_short(OS.attr_k_ligatures_type), RJava.cast_to_short(OS.attr_k_ligatures_type), RJava.cast_to_short(OS.attr_k_ligatures_type), RJava.cast_to_short(OS.attr_k_ligatures_type), RJava.cast_to_short(OS.attr_k_ligatures_type), RJava.cast_to_short(OS.attr_k_ligatures_type), ])
-      selectors = Array.typed(::Java::Short).new([RJava.cast_to_short(OS.attr_k_required_ligatures_off_selector), RJava.cast_to_short(OS.attr_k_common_ligatures_off_selector), RJava.cast_to_short(OS.attr_k_rare_ligatures_off_selector), RJava.cast_to_short(OS.attr_k_logos_off_selector), RJava.cast_to_short(OS.attr_k_rebus_pictures_off_selector), RJava.cast_to_short(OS.attr_k_diphthong_ligatures_off_selector), RJava.cast_to_short(OS.attr_k_squared_ligatures_off_selector), RJava.cast_to_short(OS.attr_k_abbrev_squared_ligatures_off_selector), RJava.cast_to_short(OS.attr_k_symbol_ligatures_off_selector), ])
-      OS._atsuset_font_features(atsu_style, types.attr_length, types, selectors)
-      return atsu_style
+    end
+    
+    typesig { [NSMutableDictionary] }
+    def add_traits(dict)
+      if (!((@extra_traits & OS::NSBoldFontMask)).equal?(0))
+        dict.set_object(NSNumber.number_with_double(SYNTHETIC_BOLD), OS::NSStrokeWidthAttributeName)
+      end
+      if (!((@extra_traits & OS::NSItalicFontMask)).equal?(0))
+        dict.set_object(NSNumber.number_with_double(SYNTHETIC_ITALIC), OS::NSObliquenessAttributeName)
+      end
     end
     
     typesig { [] }
     def destroy
-      if ((@handle).equal?(0))
-        return
-      end
-      @handle = 0
-      if (!(@atsui_style).equal?(0))
-        OS._atsudispose_style(@atsui_style)
-      end
-      @atsui_style = 0
+      @handle.release
+      @handle = nil
     end
     
     typesig { [Object] }
@@ -282,7 +262,7 @@ module Org::Eclipse::Swt::Graphics
         return false
       end
       font = object
-      return (@handle).equal?(font.attr_handle) && (@size).equal?(font.attr_size)
+      return (@handle).equal?(font.attr_handle)
     end
     
     typesig { [] }
@@ -300,69 +280,46 @@ module Org::Eclipse::Swt::Graphics
       if (is_disposed)
         SWT.error(SWT::ERROR_GRAPHIC_DISPOSED)
       end
-      buffer = Array.typed(::Java::Int).new(1) { 0 }
-      OS._atsfont_get_name(@handle, 0, buffer)
-      range = CFRange.new
-      range.attr_length = OS._cfstring_get_length(buffer[0])
-      chars = CharArray.new(range.attr_length)
-      OS._cfstring_get_characters(buffer[0], range, chars)
-      OS._cfrelease(buffer[0])
-      ats_name = String.new(chars)
-      platform_code = OS.attr_k_font_unicode_platform
-      encoding = OS.attr_k_cfstring_encoding_unicode
-      if (!(OS._atsufind_font_name(@handle, OS.attr_k_font_family_name, platform_code, OS.attr_k_font_no_script_code, OS.attr_k_font_no_language_code, 0, nil, buffer, nil)).equal?(OS.attr_no_err))
-        platform_code = OS.attr_k_font_no_platform_code
-        encoding = OS.attr_k_cfstring_encoding_mac_roman
-        OS._atsufind_font_name(@handle, OS.attr_k_font_family_name, platform_code, OS.attr_k_font_no_script_code, OS.attr_k_font_no_language_code, 0, nil, buffer, nil)
+      pool = nil
+      if (!NSThread.is_main_thread)
+        pool = NSAutoreleasePool.new.alloc.init
       end
-      bytes = Array.typed(::Java::Byte).new(buffer[0]) { 0 }
-      OS._atsufind_font_name(@handle, OS.attr_k_font_family_name, platform_code, OS.attr_k_font_no_script_code, OS.attr_k_font_no_language_code, bytes.attr_length, bytes, buffer, nil)
-      name = ""
-      ptr = OS._cfstring_create_with_bytes(0, bytes, bytes.attr_length, encoding, false)
-      if (!(ptr).equal?(0))
-        range.attr_length = OS._cfstring_get_length(ptr)
-        if (!(range.attr_length).equal?(0))
-          chars = CharArray.new(range.attr_length)
-          OS._cfstring_get_characters(ptr, range, chars)
-          name = RJava.cast_to_string(String.new(chars))
+      begin
+        family = @handle.family_name
+        name = family.get_string
+        str = @handle.font_name
+        ns_name = str.get_string
+        manager = NSFontManager.shared_font_manager
+        # long
+        traits = manager.traits_of_font(@handle)
+        style = SWT::NORMAL
+        if (!((traits & OS::NSItalicFontMask)).equal?(0))
+          style |= SWT::ITALIC
         end
-        OS._cfrelease(ptr)
+        if (!((traits & OS::NSBoldFontMask)).equal?(0))
+          style |= SWT::BOLD
+        end
+        if (!((@extra_traits & OS::NSItalicFontMask)).equal?(0))
+          style |= SWT::ITALIC
+        end
+        if (!((@extra_traits & OS::NSBoldFontMask)).equal?(0))
+          style |= SWT::BOLD
+        end
+        dpi = self.attr_device.attr_dpi
+        screen_dpi = self.attr_device.get_screen_dpi
+        # 64
+        data = FontData.new(name, (@handle.point_size).to_f * screen_dpi.attr_y / dpi.attr_y, style)
+        data.attr_ns_name = ns_name
+        return Array.typed(FontData).new([data])
+      ensure
+        if (!(pool).nil?)
+          pool.release
+        end
       end
-      style = 0
-      if (!((@style & OS.attr_italic)).equal?(0))
-        style |= SWT::ITALIC
-      end
-      if (!((@style & OS.attr_bold)).equal?(0))
-        style |= SWT::BOLD
-      end
-      if (!(ats_name.index_of("Italic")).equal?(-1))
-        style |= SWT::ITALIC
-      end
-      if (!(ats_name.index_of("Bold")).equal?(-1))
-        style |= SWT::BOLD
-      end
-      device_dpi = self.attr_device.get_dpi.attr_y
-      screen_dpi = get_screen_dpi.attr_y
-      data = FontData.new(name, @size * screen_dpi / device_dpi, style)
-      data.attr_ats_name = ats_name
-      return Array.typed(FontData).new([data])
-    end
-    
-    typesig { [] }
-    def get_screen_dpi
-      gdevice = OS._get_main_device
-      ptr = Array.typed(::Java::Int).new(1) { 0 }
-      OS.memmove(ptr, gdevice, 4)
-      device = GDevice.new
-      OS.memmove(device, ptr[0], GDevice.attr_sizeof)
-      OS.memmove(ptr, device.attr_gd_pmap, 4)
-      pixmap = PixMap.new
-      OS.memmove(pixmap, ptr[0], PixMap.attr_sizeof)
-      return Point.new(OS._fix2long(pixmap.attr_h_res), OS._fix2long(pixmap.attr_v_res))
     end
     
     class_module.module_eval {
-      typesig { [Device, ::Java::Int, ::Java::Short, ::Java::Float] }
+      typesig { [Device, NSFont] }
       # Invokes platform specific functionality to allocate a new font.
       # <p>
       # <b>IMPORTANT:</b> This method is <em>not</em> part of the public
@@ -378,11 +335,9 @@ module Org::Eclipse::Swt::Graphics
       # @param size the size for the font
       # 
       # @private
-      def carbon_new(device, handle, style, size)
+      def cocoa_new(device, handle)
         font = Font.new(device)
         font.attr_handle = handle
-        font.attr_style = style
-        font.attr_size = size
         return font
       end
     }
@@ -397,76 +352,75 @@ module Org::Eclipse::Swt::Graphics
     # 
     # @see #equals
     def hash_code
-      return @handle
+      # 64
+      return !(@handle).nil? ? RJava.cast_to_int(@handle.attr_id) : 0
     end
     
     typesig { [String, ::Java::Float, ::Java::Int, String] }
-    def init(name, height, style, ats_name)
+    def init(name, height, style, ns_name)
       if ((name).nil?)
         SWT.error(SWT::ERROR_NULL_ARGUMENT)
       end
       if (height < 0)
         SWT.error(SWT::ERROR_INVALID_ARGUMENT)
       end
-      font = 0
-      if (!(ats_name).nil?)
-        ptr = create_cfstring(ats_name)
-        if (!(ptr).equal?(0))
-          font = OS._atsfont_find_from_name(ptr, OS.attr_k_atsoption_flags_default)
-          OS._cfrelease(ptr)
-        end
+      dpi = self.attr_device.attr_dpi
+      screen_dpi = self.attr_device.get_screen_dpi
+      size = height * dpi.attr_y / screen_dpi.attr_y
+      if (!(ns_name).nil?)
+        @handle = NSFont.font_with_name(NSString.string_with(ns_name), size)
       else
-        ats_name = name
-        if (!((style & SWT::BOLD)).equal?(0))
-          ats_name += " Bold"
+        family = NSString.string_with(name)
+        ns_font = NSFont.font_with_name(family, size)
+        if ((ns_font).nil?)
+          ns_font = NSFont.system_font_of_size(size)
         end
-        if (!((style & SWT::ITALIC)).equal?(0))
-          ats_name += " Italic"
-        end
-        ptr = create_cfstring(ats_name)
-        if (!(ptr).equal?(0))
-          font = OS._atsfont_find_from_name(ptr, OS.attr_k_atsoption_flags_default)
-          OS._cfrelease(ptr)
-        end
-        if ((font).equal?(0) && !((style & SWT::ITALIC)).equal?(0))
-          @style |= OS.attr_italic
-          ats_name = name
-          if (!((style & SWT::BOLD)).equal?(0))
-            ats_name += " Bold"
+        manager = NSFontManager.shared_font_manager
+        if (!(ns_font).nil?)
+          if (((style & (SWT::BOLD | SWT::ITALIC))).equal?(0))
+            @handle = ns_font
+          else
+            traits = 0
+            if (!((style & SWT::ITALIC)).equal?(0))
+              traits |= OS::NSItalicFontMask
+            end
+            if (!((style & SWT::BOLD)).equal?(0))
+              traits |= OS::NSBoldFontMask
+            end
+            @handle = manager.convert_font(ns_font, traits)
+            if (!((style & SWT::ITALIC)).equal?(0) && ((@handle).nil? || ((manager.traits_of_font(@handle) & OS::NSItalicFontMask)).equal?(0)))
+              traits &= ~OS::NSItalicFontMask
+              @handle = nil
+              if (!((style & SWT::BOLD)).equal?(0))
+                @handle = manager.convert_font(ns_font, traits)
+              end
+            end
+            if (!((style & SWT::BOLD)).equal?(0) && (@handle).nil?)
+              traits &= ~OS::NSBoldFontMask
+              if (!((style & SWT::ITALIC)).equal?(0))
+                traits |= OS::NSItalicFontMask
+                @handle = manager.convert_font(ns_font, traits)
+              end
+            end
+            if ((@handle).nil?)
+              @handle = ns_font
+            end
           end
-          ptr = create_cfstring(ats_name)
-          if (!(ptr).equal?(0))
-            font = OS._atsfont_find_from_name(ptr, OS.attr_k_atsoption_flags_default)
-            OS._cfrelease(ptr)
-          end
         end
-        if ((font).equal?(0) && !((style & SWT::BOLD)).equal?(0))
-          @style |= OS.attr_bold
-          ats_name = name
-          ptr = create_cfstring(ats_name)
-          if (!(ptr).equal?(0))
-            font = OS._atsfont_find_from_name(ptr, OS.attr_k_atsoption_flags_default)
-            OS._cfrelease(ptr)
-          end
+        if ((@handle).nil?)
+          @handle = NSFont.system_font_of_size(size)
+        end
+        if (!((style & SWT::ITALIC)).equal?(0) && ((manager.traits_of_font(@handle) & OS::NSItalicFontMask)).equal?(0))
+          @extra_traits |= OS::NSItalicFontMask
+        end
+        if (!((style & SWT::BOLD)).equal?(0) && ((manager.traits_of_font(@handle) & OS::NSBoldFontMask)).equal?(0))
+          @extra_traits |= OS::NSBoldFontMask
         end
       end
-      device_dpi = self.attr_device.get_dpi.attr_y
-      screen_dpi = get_screen_dpi.attr_y
-      @size = height * device_dpi / screen_dpi
-      if ((font).equal?(0))
-        system_font = self.attr_device.attr_system_font
-        @handle = system_font.attr_handle
-      else
-        @handle = font
+      if ((@handle).nil?)
+        @handle = self.attr_device.attr_system_font.attr_handle
       end
-      @atsui_style = create_style
-    end
-    
-    typesig { [String] }
-    def create_cfstring(str)
-      chars = CharArray.new(str.length)
-      str.get_chars(0, chars.attr_length, chars, 0)
-      return OS._cfstring_create_with_characters(OS.attr_k_cfallocator_default, chars, chars.attr_length)
+      @handle.retain
     end
     
     typesig { [] }
@@ -479,7 +433,7 @@ module Org::Eclipse::Swt::Graphics
     # 
     # @return <code>true</code> when the font is disposed and <code>false</code> otherwise
     def is_disposed
-      return (@handle).equal?(0)
+      return (@handle).nil?
     end
     
     typesig { [] }

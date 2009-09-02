@@ -1,6 +1,6 @@
 require "rjava"
 
-# Copyright (c) 2000, 2008 IBM Corporation and others.
+# Copyright (c) 2000, 2009 IBM Corporation and others.
 # All rights reserved. This program and the accompanying materials
 # are made available under the terms of the Eclipse Public License v1.0
 # which accompanies this distribution, and is available at
@@ -13,16 +13,18 @@ module Org::Eclipse::Swt::Dnd
     class_module.module_eval {
       include ::Java::Lang
       include ::Org::Eclipse::Swt::Dnd
+      include ::Java::Util
       include ::Org::Eclipse::Swt
-      include ::Org::Eclipse::Swt::Widgets
+      include ::Org::Eclipse::Swt::Graphics
       include ::Org::Eclipse::Swt::Internal
-      include ::Org::Eclipse::Swt::Internal::Carbon
+      include ::Org::Eclipse::Swt::Internal::Cocoa
+      include ::Org::Eclipse::Swt::Widgets
     }
   end
   
   # Class <code>DropTarget</code> defines the target object for a drag and drop transfer.
   # 
-  # IMPORTANT: This class is <em>not</em> intended to be subclassed.
+  # <p>IMPORTANT: This class is <em>not</em> intended to be subclassed.</p>
   # 
   # <p>This class identifies the <code>Control</code> over which the user must position the cursor
   # in order to drop the data being transferred.  It also specifies what data types can be dropped on
@@ -72,8 +74,108 @@ module Org::Eclipse::Swt::Dnd
   # @see <a href="http://www.eclipse.org/swt/snippets/#dnd">Drag and Drop snippets</a>
   # @see <a href="http://www.eclipse.org/swt/examples.php">SWT Example: DNDExample</a>
   # @see <a href="http://www.eclipse.org/swt/">Sample code and further information</a>
+  # @noextend This class is not intended to be subclassed by clients.
   class DropTarget < DropTargetImports.const_get :Widget
     include_class_members DropTargetImports
+    
+    class_module.module_eval {
+      
+      def drop_target2args
+        defined?(@@drop_target2args) ? @@drop_target2args : @@drop_target2args= nil
+      end
+      alias_method :attr_drop_target2args, :drop_target2args
+      
+      def drop_target2args=(value)
+        @@drop_target2args = value
+      end
+      alias_method :attr_drop_target2args=, :drop_target2args=
+      
+      
+      def drop_target3args
+        defined?(@@drop_target3args) ? @@drop_target3args : @@drop_target3args= nil
+      end
+      alias_method :attr_drop_target3args, :drop_target3args
+      
+      def drop_target3args=(value)
+        @@drop_target3args = value
+      end
+      alias_method :attr_drop_target3args=, :drop_target3args=
+      
+      
+      def drop_target6args
+        defined?(@@drop_target6args) ? @@drop_target6args : @@drop_target6args= nil
+      end
+      alias_method :attr_drop_target6args, :drop_target6args
+      
+      def drop_target6args=(value)
+        @@drop_target6args = value
+      end
+      alias_method :attr_drop_target6args=, :drop_target6args=
+      
+      # long
+      
+      def proc2args
+        defined?(@@proc2args) ? @@proc2args : @@proc2args= 0
+      end
+      alias_method :attr_proc2args, :proc2args
+      
+      def proc2args=(value)
+        @@proc2args = value
+      end
+      alias_method :attr_proc2args=, :proc2args=
+      
+      
+      def proc3args
+        defined?(@@proc3args) ? @@proc3args : @@proc3args= 0
+      end
+      alias_method :attr_proc3args, :proc3args
+      
+      def proc3args=(value)
+        @@proc3args = value
+      end
+      alias_method :attr_proc3args=, :proc3args=
+      
+      
+      def proc6args
+        defined?(@@proc6args) ? @@proc6args : @@proc6args= 0
+      end
+      alias_method :attr_proc6args, :proc6args
+      
+      def proc6args=(value)
+        @@proc6args = value
+      end
+      alias_method :attr_proc6args=, :proc6args=
+      
+      when_class_loaded do
+        clazz = DropTarget
+        self.attr_drop_target2args = Callback.new(clazz, "dropTargetProc", 2)
+        self.attr_proc2args = self.attr_drop_target2args.get_address
+        if ((self.attr_proc2args).equal?(0))
+          SWT.error(SWT::ERROR_NO_MORE_CALLBACKS)
+        end
+        self.attr_drop_target3args = Callback.new(clazz, "dropTargetProc", 3)
+        self.attr_proc3args = self.attr_drop_target3args.get_address
+        if ((self.attr_proc3args).equal?(0))
+          SWT.error(SWT::ERROR_NO_MORE_CALLBACKS)
+        end
+        self.attr_drop_target6args = Callback.new(clazz, "dropTargetProc", 6)
+        self.attr_proc6args = self.attr_drop_target6args.get_address
+        if ((self.attr_proc6args).equal?(0))
+          SWT.error(SWT::ERROR_NO_MORE_CALLBACKS)
+        end
+      end
+      
+      
+      def drop_not_allowed
+        defined?(@@drop_not_allowed) ? @@drop_not_allowed : @@drop_not_allowed= false
+      end
+      alias_method :attr_drop_not_allowed, :drop_not_allowed
+      
+      def drop_not_allowed=(value)
+        @@drop_not_allowed = value
+      end
+      alias_method :attr_drop_not_allowed=, :drop_not_allowed=
+    }
     
     attr_accessor :control
     alias_method :attr_control, :control
@@ -125,84 +227,244 @@ module Org::Eclipse::Swt::Dnd
     alias_method :attr_key_operation=, :key_operation=
     undef_method :key_operation=
     
-    # workaround - Simulate events when mouse is not moving
-    attr_accessor :drag_over_start
-    alias_method :attr_drag_over_start, :drag_over_start
-    undef_method :drag_over_start
-    alias_method :attr_drag_over_start=, :drag_over_start=
-    undef_method :drag_over_start=
-    
-    attr_accessor :drag_over_heartbeat
-    alias_method :attr_drag_over_heartbeat, :drag_over_heartbeat
-    undef_method :drag_over_heartbeat
-    alias_method :attr_drag_over_heartbeat=, :drag_over_heartbeat=
-    undef_method :drag_over_heartbeat=
-    
-    attr_accessor :drag_over_event
-    alias_method :attr_drag_over_event, :drag_over_event
-    undef_method :drag_over_event
-    alias_method :attr_drag_over_event=, :drag_over_event=
-    undef_method :drag_over_event=
-    
     class_module.module_eval {
-      # workaround - OS events are relative to the application, not the control.
-      # Track which control is the current target to determine when drag and
-      # drop enters or leaves a widget.
-      
-      def current_drop_target
-        defined?(@@current_drop_target) ? @@current_drop_target : @@current_drop_target= nil
-      end
-      alias_method :attr_current_drop_target, :current_drop_target
-      
-      def current_drop_target=(value)
-        @@current_drop_target = value
-      end
-      alias_method :attr_current_drop_target=, :current_drop_target=
-      
       const_set_lazy(:DEFAULT_DROP_TARGET_EFFECT) { "DEFAULT_DROP_TARGET_EFFECT" }
       const_attr_reader  :DEFAULT_DROP_TARGET_EFFECT
-      
-      # $NON-NLS-1$
-      const_set_lazy(:DRAGOVER_HYSTERESIS) { 50 }
-      const_attr_reader  :DRAGOVER_HYSTERESIS
-      
-      
-      def drag_tracking_handler
-        defined?(@@drag_tracking_handler) ? @@drag_tracking_handler : @@drag_tracking_handler= nil
+    }
+    
+    typesig { [] }
+    # $NON-NLS-1$
+    def add_drag_handlers
+      # Our strategy here is to dynamically add methods to the control's class that are required
+      # by NSDraggingDestination. Then, when setTransfer is called, we just register
+      # the types with the Control's NSView and AppKit will call the methods in the protocol
+      # when a drag goes over the view.
+      # long
+      cls = OS.object_get_class(@control.attr_view.attr_id)
+      if ((cls).equal?(0))
+        DND.error(DND::ERROR_CANNOT_INIT_DROP)
       end
-      alias_method :attr_drag_tracking_handler, :drag_tracking_handler
-      
-      def drag_tracking_handler=(value)
-        @@drag_tracking_handler = value
+      # If we already added it, no need to do it again.
+      # long
+      proc_ptr = OS.class_get_method_implementation(cls, OS.attr_sel_dragging_entered_)
+      if ((proc_ptr).equal?(self.attr_proc3args))
+        return
       end
-      alias_method :attr_drag_tracking_handler=, :drag_tracking_handler=
-      
-      
-      def drag_receive_handler
-        defined?(@@drag_receive_handler) ? @@drag_receive_handler : @@drag_receive_handler= nil
-      end
-      alias_method :attr_drag_receive_handler, :drag_receive_handler
-      
-      def drag_receive_handler=(value)
-        @@drag_receive_handler = value
-      end
-      alias_method :attr_drag_receive_handler=, :drag_receive_handler=
-      
-      when_class_loaded do
-        self.attr_drag_tracking_handler = Callback.new(DropTarget, "DragTrackingHandler", 4) # $NON-NLS-1$
-        drag_tracking_handler_address = self.attr_drag_tracking_handler.get_address
-        if ((drag_tracking_handler_address).equal?(0))
-          SWT.error(SWT::ERROR_NO_MORE_CALLBACKS)
+      # Add the NSDraggingDestination callbacks
+      OS.class_add_method(cls, OS.attr_sel_dragging_entered_, self.attr_proc3args, "@:@")
+      OS.class_add_method(cls, OS.attr_sel_dragging_updated_, self.attr_proc3args, "@:@")
+      OS.class_add_method(cls, OS.attr_sel_dragging_exited_, self.attr_proc3args, "@:@")
+      OS.class_add_method(cls, OS.attr_sel_perform_drag_operation_, self.attr_proc3args, "@:@")
+      OS.class_add_method(cls, OS.attr_sel_wants_periodic_dragging_updates, self.attr_proc2args, "@:")
+      if ((OS.class_get_superclass(cls)).equal?(OS.attr_class_nsoutline_view))
+        OS.class_add_method(cls, OS.attr_sel_outline_view_accept_drop_item_child_index_, self.attr_proc6args, "@:@@@i")
+        OS.class_add_method(cls, OS.attr_sel_outline_view_validate_drop_proposed_item_proposed_child_index_, self.attr_proc6args, "@:@@@i")
+      else
+        if ((OS.class_get_superclass(cls)).equal?(OS.attr_class_nstable_view))
+          OS.class_add_method(cls, OS.attr_sel_table_view_accept_drop_row_drop_operation_, self.attr_proc6args, "@:@@@i")
+          OS.class_add_method(cls, OS.attr_sel_table_view_validate_drop_proposed_row_proposed_drop_operation_, self.attr_proc6args, "@:@@@i")
         end
-        self.attr_drag_receive_handler = Callback.new(DropTarget, "DragReceiveHandler", 3) # $NON-NLS-1$
-        drag_receive_handler_address = self.attr_drag_receive_handler.get_address
-        if ((drag_receive_handler_address).equal?(0))
-          SWT.error(SWT::ERROR_NO_MORE_CALLBACKS)
+      end
+    end
+    
+    typesig { [DropTargetListener] }
+    # Adds the listener to the collection of listeners who will
+    # be notified when a drag and drop operation is in progress, by sending
+    # it one of the messages defined in the <code>DropTargetListener</code>
+    # interface.
+    # 
+    # <p><ul>
+    # <li><code>dragEnter</code> is called when the cursor has entered the drop target boundaries
+    # <li><code>dragLeave</code> is called when the cursor has left the drop target boundaries and just before
+    # the drop occurs or is cancelled.
+    # <li><code>dragOperationChanged</code> is called when the operation being performed has changed
+    # (usually due to the user changing the selected modifier key(s) while dragging)
+    # <li><code>dragOver</code> is called when the cursor is moving over the drop target
+    # <li><code>dropAccept</code> is called just before the drop is performed.  The drop target is given
+    # the chance to change the nature of the drop or veto the drop by setting the <code>event.detail</code> field
+    # <li><code>drop</code> is called when the data is being dropped
+    # </ul></p>
+    # 
+    # @param listener the listener which should be notified
+    # 
+    # @exception IllegalArgumentException <ul>
+    # <li>ERROR_NULL_ARGUMENT - if the listener is null</li>
+    # </ul>
+    # @exception SWTException <ul>
+    # <li>ERROR_WIDGET_DISPOSED - if the receiver has been disposed</li>
+    # <li>ERROR_THREAD_INVALID_ACCESS - if not called from the thread that created the receiver</li>
+    # </ul>
+    # 
+    # @see DropTargetListener
+    # @see #getDropListeners
+    # @see #removeDropListener
+    # @see DropTargetEvent
+    def add_drop_listener(listener)
+      if ((listener).nil?)
+        DND.error(SWT::ERROR_NULL_ARGUMENT)
+      end
+      typed_listener = DNDListener.new(listener)
+      typed_listener.attr_dnd_widget = self
+      add_listener(DND::DragEnter, typed_listener)
+      add_listener(DND::DragLeave, typed_listener)
+      add_listener(DND::DragOver, typed_listener)
+      add_listener(DND::DragOperationChanged, typed_listener)
+      add_listener(DND::Drop, typed_listener)
+      add_listener(DND::DropAccept, typed_listener)
+    end
+    
+    typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
+    # long
+    # long
+    # long
+    # long
+    def call_super(id, sel, arg0)
+      super_struct = Objc_super.new
+      super_struct.attr_receiver = id
+      super_struct.attr_super_class = OS.objc_msg_send(id, OS.attr_sel_superclass)
+      return OS.objc_msg_send_super(super_struct, sel, arg0)
+    end
+    
+    class_module.module_eval {
+      typesig { [::Java::Int] }
+      def check_style(style)
+        if ((style).equal?(SWT::NONE))
+          return DND::DROP_MOVE
         end
-        OS._install_tracking_handler(drag_tracking_handler_address, 0, nil)
-        OS._install_receive_handler(drag_receive_handler_address, 0, nil)
+        return style
       end
     }
+    
+    typesig { [] }
+    def check_subclass
+      name = get_class.get_name
+      valid_name = DropTarget.get_name
+      if (!(valid_name == name))
+        DND.error(SWT::ERROR_INVALID_SUBCLASS)
+      end
+    end
+    
+    typesig { [::Java::Int, ::Java::Int, NSObject] }
+    # long
+    # long
+    def dragging_entered(id, sel, sender)
+      if ((sender).nil?)
+        return OS::NSDragOperationNone
+      end
+      event = DNDEvent.new
+      if (!set_event_data(sender, event))
+        @key_operation = -1
+        set_drop_not_allowed
+        return OS::NSDragOperationNone
+      end
+      allowed_operations = event.attr_operations
+      allowed_data_types = Array.typed(TransferData).new(event.attr_data_types.attr_length) { nil }
+      System.arraycopy(event.attr_data_types, 0, allowed_data_types, 0, allowed_data_types.attr_length)
+      @selected_data_type = nil
+      @selected_operation = DND::DROP_NONE
+      notify_listeners(DND::DragEnter, event)
+      if ((event.attr_detail).equal?(DND::DROP_DEFAULT))
+        event.attr_detail = !((allowed_operations & DND::DROP_MOVE)).equal?(0) ? DND::DROP_MOVE : DND::DROP_NONE
+      end
+      if (!(event.attr_data_type).nil?)
+        i = 0
+        while i < allowed_data_types.attr_length
+          if ((allowed_data_types[i].attr_type).equal?(event.attr_data_type.attr_type))
+            @selected_data_type = allowed_data_types[i]
+            break
+          end
+          i += 1
+        end
+      end
+      if (!(@selected_data_type).nil? && !((allowed_operations & event.attr_detail)).equal?(0))
+        @selected_operation = event.attr_detail
+      end
+      if (((@selected_operation).equal?(DND::DROP_NONE)) && ((OS::PTR_SIZEOF).equal?(4)))
+        set_drop_not_allowed
+      else
+        clear_drop_not_allowed
+      end
+      if (NSObject.new(id).is_kind_of_class(OS.attr_class_nstable_view))
+        # 64
+        return RJava.cast_to_int(call_super(id, sel, sender.attr_id))
+      end
+      return op_to_os_op(@selected_operation)
+    end
+    
+    typesig { [::Java::Int, ::Java::Int, NSObject] }
+    # long
+    # long
+    def dragging_exited(id, sel, sender)
+      clear_drop_not_allowed
+      if ((@key_operation).equal?(-1))
+        return
+      end
+      @key_operation = -1
+      event = DNDEvent.new
+      event.attr_widget = self
+      event.attr_time = RJava.cast_to_int(System.current_time_millis)
+      event.attr_detail = DND::DROP_NONE
+      notify_listeners(DND::DragLeave, event)
+      if (NSObject.new(id).is_kind_of_class(OS.attr_class_nstable_view))
+        call_super(id, sel, sender.attr_id)
+      end
+    end
+    
+    typesig { [::Java::Int, ::Java::Int, NSObject] }
+    # long
+    # long
+    def dragging_updated(id, sel, sender)
+      if ((sender).nil?)
+        return OS::NSDragOperationNone
+      end
+      old_key_operation = @key_operation
+      event = DNDEvent.new
+      if (!set_event_data(sender, event))
+        @key_operation = -1
+        set_drop_not_allowed
+        return OS::NSDragOperationNone
+      end
+      allowed_operations = event.attr_operations
+      allowed_data_types = Array.typed(TransferData).new(event.attr_data_types.attr_length) { nil }
+      System.arraycopy(event.attr_data_types, 0, allowed_data_types, 0, allowed_data_types.attr_length)
+      if ((@key_operation).equal?(old_key_operation))
+        event.attr_type = DND::DragOver
+        event.attr_data_type = @selected_data_type
+        event.attr_detail = @selected_operation
+      else
+        event.attr_type = DND::DragOperationChanged
+        event.attr_data_type = @selected_data_type
+      end
+      @selected_data_type = nil
+      @selected_operation = DND::DROP_NONE
+      notify_listeners(event.attr_type, event)
+      if ((event.attr_detail).equal?(DND::DROP_DEFAULT))
+        event.attr_detail = !((allowed_operations & DND::DROP_MOVE)).equal?(0) ? DND::DROP_MOVE : DND::DROP_NONE
+      end
+      if (!(event.attr_data_type).nil?)
+        i = 0
+        while i < allowed_data_types.attr_length
+          if ((allowed_data_types[i].attr_type).equal?(event.attr_data_type.attr_type))
+            @selected_data_type = allowed_data_types[i]
+            break
+          end
+          i += 1
+        end
+      end
+      if (!(@selected_data_type).nil? && !((event.attr_detail & allowed_operations)).equal?(0))
+        @selected_operation = event.attr_detail
+      end
+      if (((@selected_operation).equal?(DND::DROP_NONE)) && ((OS::PTR_SIZEOF).equal?(4)))
+        set_drop_not_allowed
+      else
+        clear_drop_not_allowed
+      end
+      if (NSObject.new(id).is_kind_of_class(OS.attr_class_nstable_view))
+        # 64
+        return RJava.cast_to_int(call_super(id, sel, sender.attr_id))
+      end
+      return op_to_os_op(@selected_operation)
+    end
     
     typesig { [Control, ::Java::Int] }
     # Creates a new <code>DropTarget</code> to allow data to be dropped on the specified
@@ -243,17 +505,11 @@ module Org::Eclipse::Swt::Dnd
       @selected_data_type = nil
       @selected_operation = 0
       @key_operation = 0
-      @drag_over_start = 0
-      @drag_over_heartbeat = nil
-      @drag_over_event = nil
       super(control, check_style(style))
       @transfer_agents = Array.typed(Transfer).new(0) { nil }
       @feedback = DND::FEEDBACK_NONE
       @key_operation = -1
       @control = control
-      if ((self.attr_drag_tracking_handler).nil? || (self.attr_drag_tracking_handler).nil?)
-        DND.error(DND::ERROR_CANNOT_INIT_DROP)
-      end
       if (!(control.get_data(DND::DROP_TARGET_KEY)).nil?)
         DND.error(DND::ERROR_CANNOT_INIT_DROP)
       end
@@ -309,368 +565,111 @@ module Org::Eclipse::Swt::Dnd
           end
         end
       end
-      @drag_over_heartbeat = Class.new(Runnable.class == Class ? Runnable : Object) do
-        extend LocalClass
-        include_class_members DropTarget
-        include Runnable if Runnable.class == Module
-        
-        typesig { [] }
-        define_method :run do
-          control_ = @local_class_parent.attr_control
-          if ((control_).nil? || control_.is_disposed || (self.attr_drag_over_start).equal?(0))
-            return
-          end
-          time = System.current_time_millis
-          delay = DRAGOVER_HYSTERESIS
-          if (time < self.attr_drag_over_start)
-            delay = RJava.cast_to_int((self.attr_drag_over_start - time))
-          else
-            allowed_operations = self.attr_drag_over_event.attr_operations
-            allowed_types = self.attr_drag_over_event.attr_data_types
-            # pass a copy of data types in to listeners in case application modifies it
-            data_types = Array.typed(self.class::TransferData).new(allowed_types.attr_length) { nil }
-            System.arraycopy(allowed_types, 0, data_types, 0, data_types.attr_length)
-            event = self.class::DNDEvent.new
-            event.attr_widget = self.attr_drag_over_event.attr_widget
-            event.attr_x = self.attr_drag_over_event.attr_x
-            event.attr_y = self.attr_drag_over_event.attr_y
-            event.attr_time = RJava.cast_to_int(time)
-            event.attr_feedback = DND::FEEDBACK_SELECT
-            event.attr_data_types = data_types
-            event.attr_data_type = self.attr_selected_data_type
-            event.attr_operations = self.attr_drag_over_event.attr_operations
-            event.attr_detail = self.attr_selected_operation
-            if (!(self.attr_drop_effect).nil?)
-              event.attr_item = self.attr_drop_effect.get_item(event.attr_x, event.attr_y)
-            end
-            self.attr_selected_data_type = nil
-            self.attr_selected_operation = DND::DROP_NONE
-            notify_listeners(DND::DragOver, event)
-            if (!(event.attr_data_type).nil?)
-              i = 0
-              while i < allowed_types.attr_length
-                if ((allowed_types[i].attr_type).equal?(event.attr_data_type.attr_type))
-                  self.attr_selected_data_type = event.attr_data_type
-                  break
-                end
-                i += 1
-              end
-            end
-            if (!(self.attr_selected_data_type).nil? && !((event.attr_detail & allowed_operations)).equal?(0))
-              self.attr_selected_operation = event.attr_detail
-            end
-          end
-          control_ = @local_class_parent.attr_control
-          if ((control_).nil? || control_.is_disposed)
-            return
-          end
-          control_.get_display.timer_exec(delay, self.attr_drag_over_heartbeat)
-        end
-        
-        typesig { [Vararg.new(Object)] }
-        define_method :initialize do |*args|
-          super(*args)
-        end
-        
-        private
-        alias_method :initialize_anonymous, :initialize
-      end.new_local(self)
+      add_drag_handlers
     end
     
     class_module.module_eval {
-      typesig { [::Java::Int] }
-      def check_style(style)
-        if ((style).equal?(SWT::NONE))
-          return DND::DROP_MOVE
+      typesig { [::Java::Int, ::Java::Int] }
+      # long
+      # long
+      # long
+      def drop_target_proc(id, sel)
+        display = Display.find_display(JavaThread.current_thread)
+        if ((display).nil? || display.is_disposed)
+          return 0
         end
-        return style
+        widget = display.find_widget(id)
+        if ((widget).nil?)
+          return 0
+        end
+        dt = widget.get_data(DND::DROP_TARGET_KEY)
+        if ((dt).nil?)
+          return 0
+        end
+        if ((sel).equal?(OS.attr_sel_wants_periodic_dragging_updates))
+          return dt.wants_periodic_dragging_updates(id, sel) ? 1 : 0
+        end
+        return 0
       end
       
       typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
-      def _drag_receive_handler(the_window, handler_ref_con, the_drag)
-        target = _find_drop_target(the_window, the_drag)
-        if ((target).nil?)
-          return OS.attr_no_err
-        end
-        return target.drag_receive_handler(the_window, handler_ref_con, the_drag)
-      end
-      
-      typesig { [::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int] }
-      def _drag_tracking_handler(message, the_window, handler_ref_con, the_drag)
-        if ((message).equal?(OS.attr_k_drag_tracking_leave_handler) || (message).equal?(OS.attr_k_drag_tracking_enter_handler))
-          self.attr_current_drop_target = nil
-          return OS.attr_no_err
-        end
-        target = _find_drop_target(the_window, the_drag)
-        if (!(self.attr_current_drop_target).nil?)
-          if ((target).nil? || !(self.attr_current_drop_target.attr_control.attr_handle).equal?(target.attr_control.attr_handle))
-            self.attr_current_drop_target.drag_tracking_handler(OS.attr_k_drag_tracking_leave_window, the_window, handler_ref_con, the_drag)
-            self.attr_current_drop_target = target
-            message = OS.attr_k_drag_tracking_enter_window
-          end
-        else
-          self.attr_current_drop_target = target
-          message = OS.attr_k_drag_tracking_enter_window
-        end
-        if ((target).nil?)
-          return OS.attr_no_err
-        end
-        return target.drag_tracking_handler(message, the_window, handler_ref_con, the_drag)
-      end
-      
-      typesig { [::Java::Int, ::Java::Int] }
-      def _find_drop_target(the_window, the_drag)
+      # long
+      # long
+      # long
+      # long
+      def drop_target_proc(id, sel, arg0)
         display = Display.find_display(JavaThread.current_thread)
         if ((display).nil? || display.is_disposed)
-          return nil
+          return 0
         end
-        mouse = Point.new
-        OS._get_drag_mouse(the_drag, mouse, nil)
-        the_root = Array.typed(::Java::Int).new(1) { 0 }
-        OS._get_root_control(the_window, the_root)
-        the_control = Array.typed(::Java::Int).new(1) { 0 }
-        rect = Rect.new
-        OS._get_window_bounds(the_window, RJava.cast_to_short(OS.attr_k_window_content_rgn), rect)
-        in_point = CGPoint.new
-        in_point.attr_x = mouse.attr_h - rect.attr_left
-        in_point.attr_y = mouse.attr_v - rect.attr_top
-        OS._hiview_get_subview_hit(the_root[0], in_point, true, the_control)
-        if (!OS._is_control_enabled(the_control[0]))
-          return nil
-        end
-        widget = display.find_widget(the_control[0])
+        widget = display.find_widget(id)
         if ((widget).nil?)
-          return nil
+          return 0
         end
-        return widget.get_data(DND::DROP_TARGET_KEY)
+        dt = widget.get_data(DND::DROP_TARGET_KEY)
+        if ((dt).nil?)
+          return 0
+        end
+        # arg0 is _always_ the sender, and implements NSDraggingInfo.
+        # Looks like an NSObject for our purposes, though.
+        sender = NSObject.new(arg0)
+        if ((sel).equal?(OS.attr_sel_dragging_entered_))
+          return dt.dragging_entered(id, sel, sender)
+        else
+          if ((sel).equal?(OS.attr_sel_dragging_updated_))
+            return dt.dragging_updated(id, sel, sender)
+          else
+            if ((sel).equal?(OS.attr_sel_dragging_exited_))
+              dt.dragging_exited(id, sel, sender)
+            else
+              if ((sel).equal?(OS.attr_sel_perform_drag_operation_))
+                return dt.perform_drag_operation(id, sel, sender) ? 1 : 0
+              end
+            end
+          end
+        end
+        return 0
+      end
+      
+      typesig { [::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int] }
+      # long
+      # long
+      # long
+      # long
+      # long
+      # long
+      # long
+      def drop_target_proc(id, sel, arg0, arg1, arg2, arg3)
+        display = Display.find_display(JavaThread.current_thread)
+        if ((display).nil? || display.is_disposed)
+          return 0
+        end
+        widget = display.find_widget(id)
+        if ((widget).nil?)
+          return 0
+        end
+        dt = widget.get_data(DND::DROP_TARGET_KEY)
+        if ((dt).nil?)
+          return 0
+        end
+        if ((sel).equal?(OS.attr_sel_outline_view_accept_drop_item_child_index_))
+          return dt.outline_view_accept_drop_item_child_index(id, sel, arg0, arg1, arg2, arg3) ? 1 : 0
+        else
+          if ((sel).equal?(OS.attr_sel_outline_view_validate_drop_proposed_item_proposed_child_index_))
+            return dt.outline_view_validate_drop_proposed_item_proposed_child_index(id, sel, arg0, arg1, arg2, arg3)
+          else
+            if ((sel).equal?(OS.attr_sel_table_view_accept_drop_row_drop_operation_))
+              return dt.table_view_accept_drop_row_drop_operation(id, sel, arg0, arg1, arg2, arg3) ? 1 : 0
+            else
+              if ((sel).equal?(OS.attr_sel_table_view_validate_drop_proposed_row_proposed_drop_operation_))
+                return dt.table_view_validate_drop_proposed_row_proposed_drop_operation(id, sel, arg0, arg1, arg2, arg3)
+              end
+            end
+          end
+        end
+        return 0
       end
     }
-    
-    typesig { [DropTargetListener] }
-    # Adds the listener to the collection of listeners who will
-    # be notified when a drag and drop operation is in progress, by sending
-    # it one of the messages defined in the <code>DropTargetListener</code>
-    # interface.
-    # 
-    # <p><ul>
-    # <li><code>dragEnter</code> is called when the cursor has entered the drop target boundaries
-    # <li><code>dragLeave</code> is called when the cursor has left the drop target boundaries and just before
-    # the drop occurs or is cancelled.
-    # <li><code>dragOperationChanged</code> is called when the operation being performed has changed
-    # (usually due to the user changing the selected modifier key(s) while dragging)
-    # <li><code>dragOver</code> is called when the cursor is moving over the drop target
-    # <li><code>dropAccept</code> is called just before the drop is performed.  The drop target is given
-    # the chance to change the nature of the drop or veto the drop by setting the <code>event.detail</code> field
-    # <li><code>drop</code> is called when the data is being dropped
-    # </ul></p>
-    # 
-    # @param listener the listener which should be notified
-    # 
-    # @exception IllegalArgumentException <ul>
-    # <li>ERROR_NULL_ARGUMENT - if the listener is null</li>
-    # </ul>
-    # @exception SWTException <ul>
-    # <li>ERROR_WIDGET_DISPOSED - if the receiver has been disposed</li>
-    # <li>ERROR_THREAD_INVALID_ACCESS - if not called from the thread that created the receiver</li>
-    # </ul>
-    # 
-    # @see DropTargetListener
-    # @see #getDropListeners
-    # @see #removeDropListener
-    # @see DropTargetEvent
-    def add_drop_listener(listener)
-      if ((listener).nil?)
-        DND.error(SWT::ERROR_NULL_ARGUMENT)
-      end
-      typed_listener = DNDListener.new(listener)
-      typed_listener.attr_dnd_widget = self
-      add_listener(DND::DragEnter, typed_listener)
-      add_listener(DND::DragLeave, typed_listener)
-      add_listener(DND::DragOver, typed_listener)
-      add_listener(DND::DragOperationChanged, typed_listener)
-      add_listener(DND::Drop, typed_listener)
-      add_listener(DND::DropAccept, typed_listener)
-    end
-    
-    typesig { [] }
-    def check_subclass
-      name = get_class.get_name
-      valid_name = DropTarget.get_name
-      if (!(valid_name == name))
-        DND.error(SWT::ERROR_INVALID_SUBCLASS)
-      end
-    end
-    
-    typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
-    def drag_receive_handler(the_window, handler_ref_con, the_drag)
-      update_drag_over_hover(0, nil)
-      if ((@key_operation).equal?(-1))
-        return OS.attr_drag_not_accepted_err
-      end
-      event = DNDEvent.new
-      event.attr_widget = self
-      event.attr_time = RJava.cast_to_int(System.current_time_millis)
-      event.attr_detail = DND::DROP_NONE
-      notify_listeners(DND::DragLeave, event)
-      event = DNDEvent.new
-      if (!set_event_data(the_drag, event))
-        return OS.attr_drag_not_accepted_err
-      end
-      @key_operation = -1
-      allowed_operations = event.attr_operations
-      allowed_data_types = Array.typed(TransferData).new(event.attr_data_types.attr_length) { nil }
-      System.arraycopy(event.attr_data_types, 0, allowed_data_types, 0, event.attr_data_types.attr_length)
-      event.attr_data_type = @selected_data_type
-      event.attr_detail = @selected_operation
-      @selected_data_type = nil
-      @selected_operation = DND::DROP_NONE
-      notify_listeners(DND::DropAccept, event)
-      if (!(event.attr_data_type).nil?)
-        i = 0
-        while i < allowed_data_types.attr_length
-          if ((allowed_data_types[i].attr_type).equal?(event.attr_data_type.attr_type))
-            @selected_data_type = allowed_data_types[i]
-            break
-          end
-          i += 1
-        end
-      end
-      if (!(@selected_data_type).nil? && !((event.attr_detail & allowed_operations)).equal?(0))
-        @selected_operation = event.attr_detail
-      end
-      if ((@selected_operation).equal?(DND::DROP_NONE))
-        # this was not a successful drop
-        return OS.attr_drag_not_accepted_err
-      end
-      # ask drag source for dropped data
-      data = Array.typed(Array.typed(::Java::Byte)).new(0) { nil }
-      # locate all the items with data of the desired type
-      num_items = Array.typed(::Java::Short).new(1) { 0 }
-      OS._count_drag_items(the_drag, num_items)
-      i = 0
-      while i < num_items[0]
-        the_item_ref = Array.typed(::Java::Int).new(1) { 0 }
-        OS._get_drag_item_reference_number(the_drag, RJava.cast_to_short((i + 1)), the_item_ref)
-        size = Array.typed(::Java::Int).new(1) { 0 }
-        OS._get_flavor_data_size(the_drag, the_item_ref[0], @selected_data_type.attr_type, size)
-        if (size[0] > 0)
-          buffer = Array.typed(::Java::Byte).new(size[0]) { 0 }
-          OS._get_flavor_data(the_drag, the_item_ref[0], @selected_data_type.attr_type, buffer, size, 0)
-          new_data = Array.typed(Array.typed(::Java::Byte)).new(data.attr_length + 1) { nil }
-          System.arraycopy(data, 0, new_data, 0, data.attr_length)
-          new_data[data.attr_length] = buffer
-          data = new_data
-        end
-        i += 1
-      end
-      # Get Data in a Java format
-      object = nil
-      i_ = 0
-      while i_ < @transfer_agents.attr_length
-        transfer = @transfer_agents[i_]
-        if (!(transfer).nil? && transfer.is_supported_type(@selected_data_type))
-          @selected_data_type.attr_data = data
-          object = transfer.native_to_java(@selected_data_type)
-          break
-        end
-        i_ += 1
-      end
-      if ((object).nil?)
-        @selected_operation = DND::DROP_NONE
-      end
-      event.attr_data_type = @selected_data_type
-      event.attr_detail = @selected_operation
-      event.attr_data = object
-      notify_listeners(DND::Drop, event)
-      @selected_operation = DND::DROP_NONE
-      if (((allowed_operations & event.attr_detail)).equal?(event.attr_detail))
-        @selected_operation = event.attr_detail
-      end
-      # notify source of action taken
-      action = op_to_os_op(@selected_operation)
-      OS._set_drag_drop_action(the_drag, action)
-      return ((@selected_operation).equal?(DND::DROP_NONE)) ? OS.attr_drag_not_accepted_err : OS.attr_no_err
-    end
-    
-    typesig { [::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int] }
-    def drag_tracking_handler(message, the_window, handler_ref_con, the_drag)
-      if ((message).equal?(OS.attr_k_drag_tracking_leave_window))
-        update_drag_over_hover(0, nil)
-        OS._set_theme_cursor(OS.attr_k_theme_arrow_cursor)
-        if ((@key_operation).equal?(-1))
-          return OS.attr_drag_not_accepted_err
-        end
-        @key_operation = -1
-        event = DNDEvent.new
-        event.attr_widget = self
-        event.attr_time = RJava.cast_to_int(System.current_time_millis)
-        event.attr_detail = DND::DROP_NONE
-        notify_listeners(DND::DragLeave, event)
-        return OS.attr_no_err
-      end
-      old_key_operation = @key_operation
-      if ((message).equal?(OS.attr_k_drag_tracking_enter_window))
-        @selected_data_type = nil
-        @selected_operation = 0
-      end
-      event = DNDEvent.new
-      if (!set_event_data(the_drag, event))
-        @key_operation = -1
-        OS._set_theme_cursor(OS.attr_k_theme_not_allowed_cursor)
-        return OS.attr_drag_not_accepted_err
-      end
-      allowed_operations = event.attr_operations
-      allowed_data_types = Array.typed(TransferData).new(event.attr_data_types.attr_length) { nil }
-      System.arraycopy(event.attr_data_types, 0, allowed_data_types, 0, allowed_data_types.attr_length)
-      case (message)
-      when OS.attr_k_drag_tracking_enter_window
-        event.attr_type = DND::DragEnter
-      when OS.attr_k_drag_tracking_in_window
-        if ((@key_operation).equal?(old_key_operation))
-          event.attr_type = DND::DragOver
-          event.attr_data_type = @selected_data_type
-          event.attr_detail = @selected_operation
-        else
-          event.attr_type = DND::DragOperationChanged
-          event.attr_data_type = @selected_data_type
-        end
-      end
-      update_drag_over_hover(DRAGOVER_HYSTERESIS, event)
-      @selected_data_type = nil
-      @selected_operation = DND::DROP_NONE
-      notify_listeners(event.attr_type, event)
-      if ((event.attr_detail).equal?(DND::DROP_DEFAULT))
-        event.attr_detail = !((allowed_operations & DND::DROP_MOVE)).equal?(0) ? DND::DROP_MOVE : DND::DROP_NONE
-      end
-      if (!(event.attr_data_type).nil?)
-        i = 0
-        while i < allowed_data_types.attr_length
-          if ((allowed_data_types[i].attr_type).equal?(event.attr_data_type.attr_type))
-            @selected_data_type = allowed_data_types[i]
-            break
-          end
-          i += 1
-        end
-      end
-      if (!(@selected_data_type).nil? && !((allowed_operations & event.attr_detail)).equal?(0))
-        @selected_operation = event.attr_detail
-      end
-      OS._set_drag_drop_action(the_drag, op_to_os_op(@selected_operation))
-      case (@selected_operation)
-      when DND::DROP_COPY
-        OS._set_theme_cursor(OS.attr_k_theme_copy_arrow_cursor)
-      when DND::DROP_LINK
-        OS._set_theme_cursor(OS.attr_k_theme_alias_arrow_cursor)
-      when DND::DROP_MOVE
-        OS._set_theme_cursor(OS.attr_k_theme_arrow_cursor)
-      else
-        OS._set_theme_cursor(OS.attr_k_theme_not_allowed_cursor)
-      end
-      if ((message).equal?(OS.attr_k_drag_tracking_enter_window))
-        @drag_over_heartbeat.run
-      end
-      return OS.attr_no_err
-    end
     
     typesig { [] }
     # Returns the Control which is registered for this DropTarget.  This is the control over which the
@@ -734,20 +733,28 @@ module Org::Eclipse::Swt::Dnd
       return @drop_effect
     end
     
-    typesig { [::Java::Int] }
-    def get_operation_from_key_state(the_drag)
-      modifiers = Array.typed(::Java::Short).new(1) { 0 }
-      OS._get_drag_modifiers(the_drag, modifiers, nil, nil)
-      option = ((modifiers[0] & OS.attr_option_key)).equal?(OS.attr_option_key)
-      command = ((modifiers[0] & OS.attr_cmd_key)).equal?(OS.attr_cmd_key)
-      if (option && command)
+    typesig { [] }
+    def get_operation_from_key_state
+      # The NSDraggingInfo object already combined the modifier keys with the
+      # drag source's allowed events. This might be better accomplished by diffing
+      # the base drag source mask with the active drag state mask instead of snarfing
+      # the current event.
+      # See documentation on [NSDraggingInfo draggingSourceOperationMask] for the
+      # correct Cocoa behavior.  Control + Option or Command is NSDragOperationGeneric,
+      # or DND.DROP_DEFAULT in the SWT.
+      curr_event = NSApplication.shared_application.current_event
+      # long
+      modifiers = curr_event.modifier_flags
+      option = ((modifiers & OS::NSAlternateKeyMask)).equal?(OS::NSAlternateKeyMask)
+      control = ((modifiers & OS::NSControlKeyMask)).equal?(OS::NSControlKeyMask)
+      if (control && option)
+        return DND::DROP_DEFAULT
+      end
+      if (control)
         return DND::DROP_LINK
       end
       if (option)
         return DND::DROP_COPY
-      end
-      if (command)
-        return DND::DROP_MOVE
       end
       return DND::DROP_DEFAULT
     end
@@ -771,6 +778,8 @@ module Org::Eclipse::Swt::Dnd
       @control_listener = nil
       @control.set_data(DND::DROP_TARGET_KEY, nil)
       @transfer_agents = nil
+      # Unregister the control as a drop target.
+      @control.attr_view.unregister_dragged_types
       @control = nil
     end
     
@@ -778,33 +787,213 @@ module Org::Eclipse::Swt::Dnd
     def op_to_os_op(operation)
       os_operation = 0
       if (!((operation & DND::DROP_COPY)).equal?(0))
-        os_operation |= OS.attr_k_drag_action_copy
+        os_operation |= OS::NSDragOperationCopy
       end
       if (!((operation & DND::DROP_LINK)).equal?(0))
-        os_operation |= OS.attr_k_drag_action_alias
+        os_operation |= OS::NSDragOperationLink
       end
       if (!((operation & DND::DROP_MOVE)).equal?(0))
-        os_operation |= OS.attr_k_drag_action_move
+        os_operation |= OS::NSDragOperationMove
+      end
+      if (!((operation & DND::DROP_TARGET_MOVE)).equal?(0))
+        os_operation |= OS::NSDragOperationDelete
       end
       return os_operation
     end
     
     typesig { [::Java::Int] }
+    # long
     def os_op_to_op(os_operation)
       operation = 0
-      if (!((os_operation & OS.attr_k_drag_action_copy)).equal?(0))
+      if (!((os_operation & OS::NSDragOperationCopy)).equal?(0))
         operation |= DND::DROP_COPY
       end
-      if (!((os_operation & OS.attr_k_drag_action_alias)).equal?(0))
+      if (!((os_operation & OS::NSDragOperationLink)).equal?(0))
         operation |= DND::DROP_LINK
       end
-      if (!((os_operation & OS.attr_k_drag_action_move)).equal?(0))
+      if (!((os_operation & OS::NSDragOperationDelete)).equal?(0))
+        operation |= DND::DROP_TARGET_MOVE
+      end
+      if (!((os_operation & OS::NSDragOperationMove)).equal?(0))
         operation |= DND::DROP_MOVE
       end
-      if ((os_operation).equal?(OS.attr_k_drag_action_all))
+      if ((os_operation).equal?(OS::NSDragOperationEvery))
         operation = DND::DROP_COPY | DND::DROP_MOVE | DND::DROP_LINK
       end
       return operation
+    end
+    
+    typesig { [NSObject] }
+    def drop(sender)
+      clear_drop_not_allowed
+      event = DNDEvent.new
+      event.attr_widget = self
+      event.attr_time = RJava.cast_to_int(System.current_time_millis)
+      if (!(@drop_effect).nil?)
+        mouse_location = sender.dragging_location
+        global_loc = sender.dragging_destination_window.convert_base_to_screen(mouse_location)
+        event.attr_item = @drop_effect.get_item(RJava.cast_to_int(global_loc.attr_x), RJava.cast_to_int(global_loc.attr_y))
+      end
+      event.attr_detail = DND::DROP_NONE
+      notify_listeners(DND::DragLeave, event)
+      event = DNDEvent.new
+      if (!set_event_data(sender, event))
+        return false
+      end
+      @key_operation = -1
+      allowed_operations = event.attr_operations
+      allowed_data_types = Array.typed(TransferData).new(event.attr_data_types.attr_length) { nil }
+      System.arraycopy(event.attr_data_types, 0, allowed_data_types, 0, event.attr_data_types.attr_length)
+      event.attr_data_type = @selected_data_type
+      event.attr_detail = @selected_operation
+      notify_listeners(DND::DropAccept, event)
+      @selected_data_type = nil
+      if (!(event.attr_data_type).nil?)
+        i = 0
+        while i < allowed_data_types.attr_length
+          if ((allowed_data_types[i].attr_type).equal?(event.attr_data_type.attr_type))
+            @selected_data_type = allowed_data_types[i]
+            break
+          end
+          i += 1
+        end
+      end
+      @selected_operation = DND::DROP_NONE
+      if (!(@selected_data_type).nil? && !((event.attr_detail & allowed_operations)).equal?(0))
+        @selected_operation = event.attr_detail
+      end
+      if ((@selected_operation).equal?(DND::DROP_NONE))
+        return false
+      end
+      # ask drag source for dropped data
+      pasteboard = sender.dragging_pasteboard
+      data = nil
+      types = NSMutableArray.array_with_capacity(10)
+      i = 0
+      while i < @transfer_agents.attr_length
+        transfer = @transfer_agents[i]
+        type_names = transfer.get_type_names
+        type_ids = transfer.get_type_ids
+        j = 0
+        while j < type_names.attr_length
+          if ((@selected_data_type.attr_type).equal?(type_ids[j]))
+            types.add_object(NSString.string_with(type_names[j]))
+            break
+          end
+          j += 1
+        end
+        i += 1
+      end
+      type = pasteboard.available_type_from_array(types)
+      tdata = TransferData.new
+      if (!(type).nil?)
+        tdata.attr_type = Transfer.register_type(type.get_string)
+        if (type.is_equal(OS::NSStringPboardType) || type.is_equal(OS::NSHTMLPboardType) || type.is_equal(OS::NSRTFPboardType))
+          tdata.attr_data = pasteboard.string_for_type(type)
+        else
+          if (type.is_equal(OS::NSURLPboardType))
+            tdata.attr_data = NSURL._urlfrom_pasteboard(pasteboard)
+          else
+            if (type.is_equal(OS::NSFilenamesPboardType))
+              tdata.attr_data = NSArray.new(pasteboard.property_list_for_type(type).attr_id)
+            else
+              tdata.attr_data = pasteboard.data_for_type(type)
+            end
+          end
+        end
+      end
+      if (!(tdata.attr_data).nil?)
+        data = tdata.attr_data
+      end
+      # Get Data in a Java format
+      object = nil
+      i_ = 0
+      while i_ < @transfer_agents.attr_length
+        transfer = @transfer_agents[i_]
+        if (!(transfer).nil? && transfer.is_supported_type(@selected_data_type))
+          @selected_data_type.attr_data = data
+          object = transfer.native_to_java(@selected_data_type)
+          break
+        end
+        i_ += 1
+      end
+      if ((object).nil?)
+        @selected_operation = DND::DROP_NONE
+      end
+      event.attr_data_type = @selected_data_type
+      event.attr_detail = @selected_operation
+      event.attr_data = object
+      notify_listeners(DND::Drop, event)
+      @selected_operation = DND::DROP_NONE
+      if (((allowed_operations & event.attr_detail)).equal?(event.attr_detail))
+        @selected_operation = event.attr_detail
+      end
+      # notify source of action taken
+      return (!(@selected_operation).equal?(DND::DROP_NONE))
+    end
+    
+    typesig { [::Java::Int, ::Java::Int, NSObject] }
+    # long
+    # long
+    def perform_drag_operation(id, sel, sender)
+      if (NSObject.new(id).is_kind_of_class(OS.attr_class_nstable_view))
+        return !(call_super(id, sel, sender.attr_id)).equal?(0)
+      end
+      return drop(sender)
+    end
+    
+    typesig { [::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int] }
+    # long
+    # long
+    # long
+    # long
+    # long
+    # long
+    def outline_view_accept_drop_item_child_index(id, sel, outline_view, info, item, index)
+      return drop(NSObject.new(info))
+    end
+    
+    typesig { [::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int] }
+    # long
+    # long
+    # long
+    # long
+    # long
+    # long
+    # long
+    def outline_view_validate_drop_proposed_item_proposed_child_index(id, sel, outline_view, info, item, index)
+      # TODO stop scrolling and expansion when app does not set FEEDBACK_SCROLL and/or FEEDBACK_EXPAND
+      # TODO expansion animation and auto collapse not working because of outlineView:shouldExpandItem:
+      widget = NSOutlineView.new(outline_view)
+      sender = NSObject.new(info)
+      pt = sender.dragging_location
+      pt = widget.convert_point_from_view_(pt, nil)
+      tree = get_control
+      child_item = tree.get_item(Point.new(RJava.cast_to_int(pt.attr_x), RJava.cast_to_int(pt.attr_y)))
+      if ((@feedback).equal?(0) || (child_item).nil?)
+        widget.set_drop_item(nil, -1)
+      else
+        if (!((@feedback & DND::FEEDBACK_SELECT)).equal?(0))
+          widget.set_drop_item(child_item.attr_handle, -1)
+        else
+          parent_item = child_item.get_parent_item
+          child_index = 0
+          parent_id = nil
+          if (!(parent_item).nil?)
+            parent_id = parent_item.attr_handle
+            child_index = parent_item.index_of(child_item)
+          else
+            child_index = (get_control).index_of(child_item)
+          end
+          if (!((@feedback & DND::FEEDBACK_INSERT_AFTER)).equal?(0))
+            widget.set_drop_item(parent_id, child_index + 1)
+          end
+          if (!((@feedback & DND::FEEDBACK_INSERT_BEFORE)).equal?(0))
+            widget.set_drop_item(parent_id, child_index)
+          end
+        end
+      end
+      return op_to_os_op(@selected_operation)
     end
     
     typesig { [DropTargetListener] }
@@ -848,21 +1037,21 @@ module Org::Eclipse::Swt::Dnd
       @drop_effect = effect
     end
     
-    typesig { [::Java::Int, DNDEvent] }
-    def set_event_data(the_drag, event)
-      if ((the_drag).equal?(0))
+    typesig { [NSObject, DNDEvent] }
+    def set_event_data(dragging_state, event)
+      if ((dragging_state).nil?)
         return false
       end
       # get allowed operations
       style = get_style
-      out_actions = Array.typed(::Java::Int).new(1) { 0 }
-      OS._get_drag_allowable_actions(the_drag, out_actions)
-      operations = os_op_to_op(out_actions[0]) & style
+      # long
+      allowed_actions = dragging_state.dragging_source_operation_mask
+      operations = os_op_to_op(allowed_actions) & style
       if ((operations).equal?(DND::DROP_NONE))
         return false
       end
       # get current operation
-      operation = get_operation_from_key_state(the_drag)
+      operation = get_operation_from_key_state
       @key_operation = operation
       if ((operation).equal?(DND::DROP_DEFAULT))
         if (((style & DND::DROP_DEFAULT)).equal?(0))
@@ -874,65 +1063,31 @@ module Org::Eclipse::Swt::Dnd
         end
       end
       # get allowed transfer types
-      num_items = Array.typed(::Java::Short).new(1) { 0 }
-      OS._count_drag_items(the_drag, num_items)
-      flavors = Array.typed(::Java::Int).new(10) { 0 }
+      drag_pboard = dragging_state.dragging_pasteboard
+      dragged_types = drag_pboard.types
+      if ((dragged_types).nil?)
+        return false
+      end
+      # long
+      dragged_type_count = dragged_types.count
+      data_types = Array.typed(TransferData).new(RJava.cast_to_int(dragged_type_count)) { nil }
       index = -1
-      # Get a unique list of flavors
       i = 0
-      while i < num_items[0]
-        the_item_ref = Array.typed(::Java::Int).new(1) { 0 }
-        OS._get_drag_item_reference_number(the_drag, RJava.cast_to_short((i + 1)), the_item_ref)
-        num_flavors = Array.typed(::Java::Short).new(1) { 0 }
-        OS._count_drag_item_flavors(the_drag, the_item_ref[0], num_flavors)
-        the_type = Array.typed(::Java::Int).new(1) { 0 }
+      while i < dragged_type_count
+        dragged_type = dragged_types.object_at_index(i)
+        native_data_type = NSString.new(dragged_type)
+        data = TransferData.new
+        data.attr_type = Transfer.register_type(native_data_type.get_string)
         j = 0
-        while j < num_flavors[0]
-          the_type[0] = 0
-          if ((OS._get_flavor_type(the_drag, the_item_ref[0], RJava.cast_to_short((j + 1)), the_type)).equal?(OS.attr_no_err))
-            unique = true
-            k = 0
-            while k < flavors.attr_length
-              if ((flavors[k]).equal?(the_type[0]))
-                unique = false
-                break
-              end
-              k += 1
-            end
-            if (unique)
-              if ((index).equal?(flavors.attr_length - 1))
-                temp = Array.typed(::Java::Int).new(flavors.attr_length + 10) { 0 }
-                System.arraycopy(flavors, 0, temp, 0, flavors.attr_length)
-                flavors = temp
-              end
-              flavors[(index += 1)] = the_type[0]
-            end
+        while j < @transfer_agents.attr_length
+          transfer = @transfer_agents[j]
+          if (!(transfer).nil? && transfer.is_supported_type(data))
+            data_types[(index += 1)] = data
+            break
           end
           j += 1
         end
         i += 1
-      end
-      if ((index).equal?(-1))
-        return false
-      end
-      data_types = Array.typed(TransferData).new(index + 1) { nil }
-      index = -1
-      i_ = 0
-      while i_ < data_types.attr_length
-        if (!(flavors[i_]).equal?(0))
-          data = TransferData.new
-          data.attr_type = flavors[i_]
-          j = 0
-          while j < @transfer_agents.attr_length
-            transfer = @transfer_agents[j]
-            if (!(transfer).nil? && transfer.is_supported_type(data))
-              data_types[(index += 1)] = data
-              break
-            end
-            j += 1
-          end
-        end
-        i_ += 1
       end
       if ((index).equal?(-1))
         return false
@@ -942,11 +1097,15 @@ module Org::Eclipse::Swt::Dnd
         System.arraycopy(data_types, 0, temp, 0, index + 1)
         data_types = temp
       end
-      mouse = Point.new
-      OS._get_drag_mouse(the_drag, mouse, nil)
+      # Convert from window-relative to global coordinates, and flip it.
+      mouse = dragging_state.dragging_location
+      global_mouse = dragging_state.dragging_destination_window.convert_base_to_screen(mouse)
+      screens_ = NSScreen.screens
+      screen_rect = NSScreen.new(screens_.object_at_index(0)).frame
+      global_mouse.attr_y = screen_rect.attr_height - global_mouse.attr_y
       event.attr_widget = self
-      event.attr_x = mouse.attr_h
-      event.attr_y = mouse.attr_v
+      event.attr_x = RJava.cast_to_int(global_mouse.attr_x)
+      event.attr_y = RJava.cast_to_int(global_mouse.attr_y)
       event.attr_time = RJava.cast_to_int(System.current_time_millis)
       event.attr_feedback = DND::FEEDBACK_SELECT
       event.attr_data_types = data_types
@@ -976,25 +1135,82 @@ module Org::Eclipse::Swt::Dnd
         DND.error(SWT::ERROR_NULL_ARGUMENT)
       end
       @transfer_agents = transfer_agents
+      # Register the types as valid drop types in Cocoa.
+      # Accumulate all of the transfer types into a list.
+      type_strings = ArrayList.new
+      i = 0
+      while i < @transfer_agents.attr_length
+        types_ = transfer_agents[i].get_type_names
+        j = 0
+        while j < types_.attr_length
+          type_strings.add(types_[j])
+          j += 1
+        end
+        i += 1
+      end
+      # Convert to an NSArray of NSStrings so we can register with the Control.
+      type_string_count = type_strings.size
+      ns_type_strings = NSMutableArray.array_with_capacity(type_string_count)
+      i_ = 0
+      while i_ < type_string_count
+        ns_type_strings.add_object(NSString.string_with(type_strings.get(i_)))
+        i_ += 1
+      end
+      @control.attr_view.register_for_dragged_types(ns_type_strings)
     end
     
-    typesig { [::Java::Long, DNDEvent] }
-    def update_drag_over_hover(delay, event)
-      if ((delay).equal?(0))
-        @drag_over_start = 0
-        @drag_over_event = nil
-        return
+    typesig { [] }
+    def set_drop_not_allowed
+      if (!self.attr_drop_not_allowed)
+        NSCursor.current_cursor.push
+        if ((OS::PTR_SIZEOF).equal?(4))
+          OS._set_theme_cursor(OS.attr_k_theme_not_allowed_cursor)
+        end
+        self.attr_drop_not_allowed = true
       end
-      @drag_over_start = System.current_time_millis + delay
-      if ((@drag_over_event).nil?)
-        @drag_over_event = DNDEvent.new
+    end
+    
+    typesig { [] }
+    def clear_drop_not_allowed
+      if (self.attr_drop_not_allowed)
+        NSCursor.pop
+        self.attr_drop_not_allowed = false
       end
-      @drag_over_event.attr_x = event.attr_x
-      @drag_over_event.attr_y = event.attr_y
-      @drag_over_event.attr_data_types = event.attr_data_types
-      @drag_over_event.attr_operations = event.attr_operations
-      @drag_over_event.attr_data_type = event.attr_data_type
-      @drag_over_event.attr_detail = event.attr_detail
+    end
+    
+    typesig { [::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int] }
+    # long
+    # long
+    # long
+    # long
+    # long
+    # long
+    def table_view_accept_drop_row_drop_operation(id, sel, table_view, info, row, operation)
+      return drop(NSObject.new(info))
+    end
+    
+    typesig { [::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int] }
+    # long
+    # long
+    # long
+    # long
+    # long
+    # long
+    def table_view_validate_drop_proposed_row_proposed_drop_operation(id, sel, table_view, info, row, operation)
+      # TODO stop scrolling and expansion when app does not set FEEDBACK_SCROLL and/or FEEDBACK_EXPAND
+      widget = NSTableView.new(table_view)
+      if (0 <= row && row < widget.number_of_rows)
+        widget.set_drop_row(row, OS::NSTableViewDropOn)
+      end
+      return op_to_os_op(@selected_operation)
+    end
+    
+    typesig { [::Java::Int, ::Java::Int] }
+    # By returning true we get draggingUpdated messages even when the mouse isn't moving.
+    # long
+    # long
+    def wants_periodic_dragging_updates(id, sel)
+      return true
     end
     
     private

@@ -41,12 +41,12 @@ public class nsIMemory extends nsISupports {
 		super(address);
 	}
 
-	public int Alloc(int size) {
-		return XPCOM.VtblCall(nsISupports.LAST_METHOD_ID + 1, getAddress(), size);
+	public long /*int*/ Alloc(int size) {
+		return XPCOM.nsIMemory_Alloc(getAddress(), size);
 	}
 
-	public int Realloc(long /*int*/ ptr, int newSize) {
-		return XPCOM.VtblCall(nsISupports.LAST_METHOD_ID + 2, getAddress(), ptr, newSize);
+	public long /*int*/ Realloc(long /*int*/ ptr, int newSize) {
+		return XPCOM.nsIMemory_Realloc(getAddress(), ptr, newSize);
 	}
 
 	public int Free(long /*int*/ ptr) {

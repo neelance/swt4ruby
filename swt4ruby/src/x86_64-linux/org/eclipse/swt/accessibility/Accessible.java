@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2008 IBM Corporation and others.
+ * Copyright (c) 2000, 2009 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -46,6 +46,12 @@ public class Accessible {
 	AccessibleObject accessibleObject;
 	Control control;
 	
+	/**
+	 * @since 3.5
+	 */
+	protected Accessible() {
+	}
+
 	Accessible (Control control) {
 		super ();
 		this.control = control;
@@ -209,9 +215,6 @@ public class Accessible {
 			accessibleObject.release ();
 			accessibleObject = null;
 		}
-		accessibleListeners = null;
-		controlListeners = null;
-		textListeners = null;
 	}
 	/**
 	 * Removes the listener from the collection of listeners who will

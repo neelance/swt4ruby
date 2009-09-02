@@ -43,6 +43,8 @@ module Org::Eclipse::Swt::Graphics
     # within the packages provided by SWT. It is not available on all
     # platforms and should never be accessed from application code.
     # </p>
+    # 
+    # double
     attr_accessor :handle
     alias_method :attr_handle, :handle
     undef_method :handle
@@ -138,6 +140,7 @@ module Org::Eclipse::Swt::Graphics
         return false
       end
       color = object
+      # double
       rgb_color = color.attr_handle
       if ((@handle).equal?(rgb_color))
         return true
@@ -236,7 +239,9 @@ module Org::Eclipse::Swt::Graphics
       # @param handle the handle for the color
       # 
       # @private
-      def carbon_new(device, rgb_color)
+      # 
+      # double
+      def cocoa_new(device, rgb_color)
         color = Color.new(device)
         color.attr_handle = rgb_color
         return color
@@ -248,6 +253,8 @@ module Org::Eclipse::Swt::Graphics
       if ((red > 255) || (red < 0) || (green > 255) || (green < 0) || (blue > 255) || (blue < 0))
         SWT.error(SWT::ERROR_INVALID_ARGUMENT)
       end
+      # double
+      # double
       rgb_color = Array.typed(::Java::Float).new(4) { 0.0 }
       rgb_color[0] = red / 255
       rgb_color[1] = green / 255

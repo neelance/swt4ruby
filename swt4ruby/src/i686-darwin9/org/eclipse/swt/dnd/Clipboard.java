@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2008 IBM Corporation and others.
+ * Copyright (c) 2000, 2009 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -13,7 +13,7 @@ package org.eclipse.swt.dnd;
 
 import org.eclipse.swt.*;
 import org.eclipse.swt.widgets.*;
-import org.eclipse.swt.internal.carbon.OS;
+import org.eclipse.swt.internal.cocoa.*;
 
 /**
  * The <code>Clipboard</code> provides a mechanism for transferring data from one
@@ -24,11 +24,11 @@ import org.eclipse.swt.internal.carbon.OS;
  * @see <a href="http://www.eclipse.org/swt/snippets/#clipboard">Clipboard snippets</a>
  * @see <a href="http://www.eclipse.org/swt/examples.php">SWT Example: ClipboardExample</a>
  * @see <a href="http://www.eclipse.org/swt/">Sample code and further information</a>
+ * @noextend This class is not intended to be subclassed by clients.
  */
 public class Clipboard {
 
 	Display display;
-	int scrap = 0;
 
 /**
  * Constructs a new instance of this class.  Creating an instance of a Clipboard
@@ -168,14 +168,9 @@ public void clearContents() {
  */
 public void clearContents(int clipboards) {
 	checkWidget();
-	if ((clipboards & DND.CLIPBOARD) == 0 || scrap == 0) return;
-	int oldScrap = scrap;
-	scrap = 0;
-	int[] currentScrap = new int[1];
-	if (OS.GetCurrentScrap(currentScrap) != OS.noErr) return;
-	if (currentScrap[0] == oldScrap) {
-		OS.ClearCurrentScrap();
-	}
+	if ((clipboards & DND.CLIPBOARD) == 0) return;
+	NSPasteboard pasteboard = NSPasteboard.generalPasteboard();
+	pasteboard.declareTypes(NSMutableArray.arrayWithCapacity(0), null);
 }
 
 /**
@@ -279,26 +274,33 @@ public Object getContents(Transfer transfer, int clipboards) {
 	checkWidget();
 	if (transfer == null) DND.error(SWT.ERROR_NULL_ARGUMENT);
 	if ((clipboards & DND.CLIPBOARD) == 0) return null;
-	int[] scrap = new int[1];
-	if (OS.GetCurrentScrap(scrap) != OS.noErr) return null;
-	int[] typeIds = transfer.getTypeIds();
-	int[] size = new int[1];	
-	// get data from system clipboard
-	for (int i=0; i<typeIds.length; i++) {
-		int type = typeIds[i];
-		size[0] = 0;
-		if (OS.GetScrapFlavorSize(scrap[0], type, size) == OS.noErr && size[0] > 0) {
-			byte[] buffer = new byte[size[0]];
-			if (OS.GetScrapFlavorData(scrap[0], type, size, buffer) == OS.noErr) {
-				TransferData tdata = new TransferData();
-				tdata.type = type;		
-				tdata.data = new byte[1][];
-				tdata.data[0] = buffer;
-				return transfer.nativeToJava(tdata);
-			}
+	NSPasteboard pasteboard = NSPasteboard.generalPasteboard();
+	if (pasteboard == null) return null;
+	String[] typeNames = transfer.getTypeNames();
+	NSMutableArray types = NSMutableArray.arrayWithCapacity(typeNames.length);
+	for (int i = 0; i < typeNames.length; i++) {
+		types.addObject(NSString.stringWith(typeNames[i]));
+	}
+	NSString type = pasteboard.availableTypeFromArray(types);
+	if (type != null) {
+		TransferData tdata = new TransferData();
+		tdata.type = Transfer.registerType(type.getString());
+		if (type.isEqual(OS.NSStringPboardType) || 
+				type.isEqual(OS.NSRTFPboardType) ||
+				type.isEqual(OS.NSHTMLPboardType)) {
+			tdata.data = pasteboard.stringForType(type);
+		} else if (type.isEqual(OS.NSFilenamesPboardType)) {
+			tdata.data = new NSArray(pasteboard.propertyListForType(type).id);
+		} else if (type.isEqual(OS.NSURLPboardType)) {
+			tdata.data = NSURL.URLFromPasteboard(pasteboard);
+		} else {
+			tdata.data = pasteboard.dataForType(type);
+		}
+		if (tdata.data != null) {
+			return transfer.nativeToJava(tdata);
 		}
 	}
-	return null;	// No data available for this transfer
+	return null;
 }
 
 /**
@@ -439,30 +441,31 @@ public void setContents(Object[] data, Transfer[] dataTypes, int clipboards) {
 		}
 	}
 	if ((clipboards & DND.CLIPBOARD) == 0) return;
-	if (OS.ClearCurrentScrap() != OS.noErr) {
+	NSPasteboard pasteboard = NSPasteboard.generalPasteboard();
+	if (pasteboard == null) {
 		DND.error(DND.ERROR_CANNOT_SET_CLIPBOARD);
 	}
-	scrap = 0;
-	int[] currentScrap = new int[1];
-	if (OS.GetCurrentScrap(currentScrap) != OS.noErr) {
-		DND.error(DND.ERROR_CANNOT_SET_CLIPBOARD);
-	}
-	scrap = currentScrap[0];
-	// copy data directly over to System clipboard (not deferred)
+	pasteboard.declareTypes(NSMutableArray.arrayWithCapacity(0), null);
 	for (int i=0; i<dataTypes.length; i++) {
-		int[] typeIds = dataTypes[i].getTypeIds();
-		for (int j=0; j<typeIds.length; j++) {
+		String[] typeNames = dataTypes[i].getTypeNames();
+		for (int j=0; j<typeNames.length; j++) {
 			TransferData transferData = new TransferData();
-			transferData.type = typeIds[j];
-			dataTypes[i].javaToNative(data[i], transferData); 
-			if (transferData.result != OS.noErr) {
-				DND.error(DND.ERROR_CANNOT_SET_CLIPBOARD);
-			}
-			//Drag and Drop can handle multiple items in one transfer but the
-			//Clipboard can not.
-			byte[] datum = transferData.data[0];
-			if (OS.PutScrapFlavor(scrap, transferData.type, 0, datum.length, datum) != OS.noErr){
-				DND.error(DND.ERROR_CANNOT_SET_CLIPBOARD);
+			transferData.type = Transfer.registerType(typeNames[j]);
+			dataTypes[i].javaToNative(data[i], transferData);
+			NSObject tdata = transferData.data;
+			NSString dataType = NSString.stringWith(typeNames[j]);
+			pasteboard.addTypes(NSArray.arrayWithObject(dataType), null);
+			if (dataType.isEqual(OS.NSStringPboardType) || 
+					dataType.isEqual(OS.NSRTFPboardType) ||
+					dataType.isEqual(OS.NSHTMLPboardType)) {
+				pasteboard.setString((NSString) tdata, dataType);
+			} else if (dataType.isEqual(OS.NSURLPboardType)) {
+				NSURL url = (NSURL) tdata;
+				url.writeToPasteboard(pasteboard);
+			} else if (dataType.isEqual(OS.NSFilenamesPboardType)) {
+				pasteboard.setPropertyList((NSArray) tdata, dataType);
+			} else {
+				pasteboard.setData((NSData) tdata, dataType);
 			}
 		}
 	}
@@ -512,12 +515,14 @@ public TransferData[] getAvailableTypes() {
  */
 public TransferData[] getAvailableTypes(int clipboards) {
 	checkWidget();
-	if ((clipboards & DND.CLIPBOARD) == 0) return new TransferData[0]; 
-	int[] types = _getAvailableTypes();
-	TransferData[] result = new TransferData[types.length];
-	for (int i = 0; i < types.length; i++) {
+	if ((clipboards & DND.CLIPBOARD) == 0) return new TransferData[0];
+	NSPasteboard pasteboard = NSPasteboard.generalPasteboard();
+	NSArray types = pasteboard.types();
+	int count = (int)/*64*/types.count();
+	TransferData[] result = new TransferData[count];
+	for (int i = 0; i < count; i++) {
 		result[i] = new TransferData();
-		result[i].type = types[i];
+		result[i].type = Transfer.registerType(new NSString(types.objectAtIndex(i)).getString());
 	}
 	return result;
 }
@@ -540,32 +545,13 @@ public TransferData[] getAvailableTypes(int clipboards) {
  */
 public String[] getAvailableTypeNames() {
 	checkWidget();
-	int[] types = _getAvailableTypes();
-	String[] names = new String[types.length];
-	for (int i = 0; i < types.length; i++) {
-		int type = types[i];
-		StringBuffer sb = new StringBuffer();
-		sb.append((char)((type & 0xff000000) >> 24));
-		sb.append((char)((type & 0x00ff0000) >> 16));
-		sb.append((char)((type & 0x0000ff00) >> 8));
-		sb.append((char)((type & 0x000000ff) >> 0));
-		names[i] = sb.toString();
+	NSPasteboard pasteboard = NSPasteboard.generalPasteboard();
+	NSArray types = pasteboard.types();
+	int count = (int)/*64*/types.count();
+	String[] result = new String[count];
+	for (int i = 0; i < count; i++) {
+		result[i] = new NSString(types.objectAtIndex(i)).getString();
 	}
-	return names;
-}
-
-int[] _getAvailableTypes() {
-	int[] types = new int[0];
-	int[] scrap = new int[1];
-	if (OS.GetCurrentScrap(scrap) != OS.noErr) return types;
-	int[] count = new int[1];
-	if (OS.GetScrapFlavorCount(scrap[0], count) != OS.noErr || count[0] == 0) return types;
-	int[] info = new int[count[0] * 2];
-	if (OS.GetScrapFlavorInfoList(scrap[0], count, info) != OS.noErr) return types;
-	types = new int[count[0]];
-	for (int i= 0; i < count [0]; i++) {
-		types[i] = info[i*2];
-	}
-	return types;
+	return result;
 }
 }

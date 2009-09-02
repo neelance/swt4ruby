@@ -56,14 +56,16 @@ module Org::Eclipse::Swt::Internal::Mozilla
     end
     
     typesig { [::Java::Int] }
+    # int
     def _alloc(size)
-      return XPCOM._vtbl_call(NsISupports::LAST_METHOD_ID + 1, get_address, size)
+      return XPCOM.ns_imemory_alloc(get_address, size)
     end
     
     typesig { [::Java::Long, ::Java::Int] }
     # int
+    # int
     def _realloc(ptr, new_size)
-      return XPCOM._vtbl_call(NsISupports::LAST_METHOD_ID + 2, get_address, ptr, new_size)
+      return XPCOM.ns_imemory_realloc(get_address, ptr, new_size)
     end
     
     typesig { [::Java::Long] }

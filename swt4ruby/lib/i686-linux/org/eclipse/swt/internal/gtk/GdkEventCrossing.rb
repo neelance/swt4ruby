@@ -1,6 +1,6 @@
 require "rjava"
 
-# Copyright (c) 2000, 2006 IBM Corporation and others. All rights reserved.
+# Copyright (c) 2000, 2008 IBM Corporation and others. All rights reserved.
 # The contents of this file are made available under the terms
 # of the GNU Lesser General Public License (LGPL) Version 2.1 that
 # accompanies this distribution (lgpl-v21.txt).  The LGPL is also
@@ -23,6 +23,7 @@ module Org::Eclipse::Swt::Internal::Gtk
   class GdkEventCrossing < GdkEventCrossingImports.const_get :GdkEvent
     include_class_members GdkEventCrossingImports
     
+    # @field cast=(GdkWindow *)
     # long
     attr_accessor :window
     alias_method :attr_window, :window
@@ -30,12 +31,14 @@ module Org::Eclipse::Swt::Internal::Gtk
     alias_method :attr_window=, :window=
     undef_method :window=
     
+    # @field cast=(gint8)
     attr_accessor :send_event
     alias_method :attr_send_event, :send_event
     undef_method :send_event
     alias_method :attr_send_event=, :send_event=
     undef_method :send_event=
     
+    # @field cast=(GdkWindow *)
     # long
     attr_accessor :subwindow
     alias_method :attr_subwindow, :subwindow
@@ -73,18 +76,21 @@ module Org::Eclipse::Swt::Internal::Gtk
     alias_method :attr_y_root=, :y_root=
     undef_method :y_root=
     
+    # @field cast=(GdkCrossingMode)
     attr_accessor :mode
     alias_method :attr_mode, :mode
     undef_method :mode
     alias_method :attr_mode=, :mode=
     undef_method :mode=
     
+    # @field cast=(GdkNotifyType)
     attr_accessor :detail
     alias_method :attr_detail, :detail
     undef_method :detail
     alias_method :attr_detail=, :detail=
     undef_method :detail=
     
+    # @field cast=(gboolean)
     attr_accessor :focus
     alias_method :attr_focus, :focus
     undef_method :focus

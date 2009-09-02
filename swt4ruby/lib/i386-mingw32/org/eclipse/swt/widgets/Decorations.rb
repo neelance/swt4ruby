@@ -1,6 +1,6 @@
 require "rjava"
 
-# Copyright (c) 2000, 2008 IBM Corporation and others.
+# Copyright (c) 2000, 2009 IBM Corporation and others.
 # All rights reserved. This program and the accompanying materials
 # are made available under the terms of the Eclipse Public License v1.0
 # which accompanies this distribution, and is available at
@@ -95,6 +95,7 @@ module Org::Eclipse::Swt::Widgets
   # @see Shell
   # @see SWT
   # @see <a href="http://www.eclipse.org/swt/">Sample code and further information</a>
+  # @noextend This class is not intended to be subclassed by clients.
   class Decorations < DecorationsImports.const_get :Canvas
     include_class_members DecorationsImports
     
@@ -1099,6 +1100,7 @@ module Org::Eclipse::Swt::Widgets
     
     typesig { [::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Boolean] }
     def set_bounds(x, y, width, height, flags, defer)
+      @sw_flags = OS::SW_SHOWNOACTIVATE
       if (OS::IsWinCE)
         @sw_flags = OS::SW_RESTORE
       else
@@ -1677,7 +1679,7 @@ module Org::Eclipse::Swt::Widgets
     typesig { [::Java::Boolean] }
     def set_visible(visible)
       check_widget
-      if (!(self.attr_draw_count).equal?(0))
+      if (!get_drawing)
         if (((((self.attr_state & HIDDEN)).equal?(0))).equal?(visible))
           return
         end
@@ -1701,7 +1703,7 @@ module Org::Eclipse::Swt::Widgets
             OS._command_bar_draw_menu_bar(hwnd_cb, 0)
           end
         end
-        if (!(self.attr_draw_count).equal?(0))
+        if (!get_drawing)
           self.attr_state &= ~HIDDEN
         else
           if (OS::IsWinCE)
@@ -1734,7 +1736,18 @@ module Org::Eclipse::Swt::Widgets
             @old_width = rect.attr_width
             @old_height = rect.attr_height
           end
-          OS._update_window(self.attr_handle)
+          # Bug in Windows.  On Vista using the Classic theme,
+          # when the window is hung and UpdateWindow() is called,
+          # nothing is drawn, and outstanding WM_PAINTs are cleared.
+          # This causes pixel corruption.  The fix is to avoid calling
+          # update on hung windows.
+          update = true
+          if (!OS::IsWinCE && OS::WIN32_VERSION >= OS._version(6, 0) && !OS._is_app_themed)
+            update = !OS._is_hung_app_window(self.attr_handle)
+          end
+          if (update)
+            OS._update_window(self.attr_handle)
+          end
         end
       else
         if (!OS::IsWinCE)
@@ -1748,7 +1761,7 @@ module Org::Eclipse::Swt::Widgets
             end
           end
         end
-        if (!(self.attr_draw_count).equal?(0))
+        if (!get_drawing)
           self.attr_state |= HIDDEN
         else
           OS._show_window(self.attr_handle, OS::SW_HIDE)

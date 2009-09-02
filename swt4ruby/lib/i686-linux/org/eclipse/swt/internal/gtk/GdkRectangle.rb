@@ -1,6 +1,6 @@
 require "rjava"
 
-# Copyright (c) 2000, 2006 IBM Corporation and others. All rights reserved.
+# Copyright (c) 2000, 2008 IBM Corporation and others. All rights reserved.
 # The contents of this file are made available under the terms
 # of the GNU Lesser General Public License (LGPL) Version 2.1 that
 # accompanies this distribution (lgpl-v21.txt).  The LGPL is also
@@ -23,24 +23,28 @@ module Org::Eclipse::Swt::Internal::Gtk
   class GdkRectangle 
     include_class_members GdkRectangleImports
     
+    # @field cast=(gint)
     attr_accessor :x
     alias_method :attr_x, :x
     undef_method :x
     alias_method :attr_x=, :x=
     undef_method :x=
     
+    # @field cast=(gint)
     attr_accessor :y
     alias_method :attr_y, :y
     undef_method :y
     alias_method :attr_y=, :y=
     undef_method :y=
     
+    # @field cast=(gint)
     attr_accessor :width
     alias_method :attr_width, :width
     undef_method :width
     alias_method :attr_width=, :width=
     undef_method :width=
     
+    # @field cast=(gint)
     attr_accessor :height
     alias_method :attr_height, :height
     undef_method :height

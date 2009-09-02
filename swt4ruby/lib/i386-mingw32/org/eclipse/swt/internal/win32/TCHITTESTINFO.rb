@@ -20,12 +20,14 @@ module Org::Eclipse::Swt::Internal::Win32
     include_class_members TCHITTESTINFOImports
     
     # POINT pt;
+    # @field accessor=pt.x
     attr_accessor :x
     alias_method :attr_x, :x
     undef_method :x
     alias_method :attr_x=, :x=
     undef_method :x=
     
+    # @field accessor=pt.y
     attr_accessor :y
     alias_method :attr_y, :y
     undef_method :y

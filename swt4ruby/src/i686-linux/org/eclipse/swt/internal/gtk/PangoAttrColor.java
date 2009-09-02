@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2007 IBM Corporation and others. All rights reserved.
+ * Copyright (c) 2000, 2008 IBM Corporation and others. All rights reserved.
  * The contents of this file are made available under the terms
  * of the GNU Lesser General Public License (LGPL) Version 2.1 that
  * accompanies this distribution (lgpl-v21.txt).  The LGPL is also
@@ -16,8 +16,11 @@ package org.eclipse.swt.internal.gtk;
 
 
 public class PangoAttrColor extends PangoAttribute {
+	/** @field accessor=color.red */
 	public short color_red;
+	/** @field accessor=color.green */
 	public short color_green;
+	/** @field accessor=color.blue */
 	public short color_blue;
 	public static final int sizeof = OS.PangoAttrColor_sizeof();
 }

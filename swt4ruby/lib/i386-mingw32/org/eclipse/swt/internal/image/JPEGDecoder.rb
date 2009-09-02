@@ -1,6 +1,6 @@
 require "rjava"
 
-# Copyright (c) 2000, 2006 IBM Corporation and others.
+# Copyright (c) 2000, 2009 IBM Corporation and others.
 # All rights reserved. This program and the accompanying materials
 # are made available under the terms of the Eclipse Public License v1.0
 # which accompanies this distribution, and is available at
@@ -4269,14 +4269,9 @@ module Org::Eclipse::Swt::Internal::Image
         # Report number of components in selected colorspace.
         # Probably this should be in the color conversion module...
         case (cinfo.attr_out_color_space)
-        # FALLTHROUGH
         when JCS_GRAYSCALE
           cinfo.attr_out_color_components = 1
-        when JCS_RGB
-          if (!(RGB_PIXELSIZE).equal?(3))
-            cinfo.attr_out_color_components = RGB_PIXELSIZE
-          end
-        when JCS_YCbCr
+        when JCS_RGB, JCS_YCbCr
           cinfo.attr_out_color_components = 3
         when JCS_CMYK, JCS_YCCK
           cinfo.attr_out_color_components = 4
@@ -4434,7 +4429,7 @@ module Org::Eclipse::Swt::Internal::Image
             if ((cinfo.attr_jpeg_color_space).equal?(JCS_GRAYSCALE))
               cconvert.attr_color_convert = GRAY_RGB_CONVERT
             else
-              if ((cinfo.attr_jpeg_color_space).equal?(JCS_RGB) && (RGB_PIXELSIZE).equal?(3))
+              if ((cinfo.attr_jpeg_color_space).equal?(JCS_RGB))
                 cconvert.attr_color_convert = NULL_CONVERT
               else
                 error

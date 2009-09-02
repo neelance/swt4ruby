@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2008 IBM Corporation and others.
+ * Copyright (c) 2000, 2009 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -13,8 +13,6 @@ package org.eclipse.swt.widgets;
 
 import org.eclipse.swt.*;
 import org.eclipse.swt.graphics.*;
-import org.eclipse.swt.internal.carbon.HMHelpContentRec;
-import org.eclipse.swt.internal.carbon.OS;
 import org.eclipse.swt.events.*;
 
 /**
@@ -40,19 +38,20 @@ import org.eclipse.swt.events.*;
  * @see <a href="http://www.eclipse.org/swt/">Sample code and further information</a>
  * 
  * @since 3.2
+ * @noextend This class is not intended to be subclassed by clients.
  */
 public class ToolTip extends Widget {
 	Shell parent, tip;
-	int x, y;
-	boolean spikeAbove, autohide;
-	TextLayout layoutText, layoutMessage;
-	String text, message;
 	TrayItem item;
+	int x, y;
+	int [] borderPolygon;
+	boolean spikeAbove, autohide;
+	Listener listener, parentListener;
+	TextLayout layoutText, layoutMessage;
 	Region region;
 	Font boldFont;
 	Runnable runnable;
 	
-	int helpString;
 	static final int BORDER = 5;
 	static final int PADDING = 5;
 	static final int INSET = 4;
@@ -84,6 +83,7 @@ public class ToolTip extends Widget {
  *    <li>ERROR_INVALID_SUBCLASS - if this class is not an allowed subclass</li>
  * </ul>
  *
+ * @see SWT#BALLOON
  * @see SWT#ICON_ERROR
  * @see SWT#ICON_INFORMATION
  * @see SWT#ICON_WARNING
@@ -93,7 +93,30 @@ public class ToolTip extends Widget {
 public ToolTip (Shell parent, int style) {
 	super (parent, checkStyle (style));
 	this.parent = parent;
-	createWidget ();
+	this.autohide = true;
+	x = y = -1;	
+	Display display = getDisplay ();
+	tip = new Shell (parent, SWT.ON_TOP | SWT.NO_TRIM);
+	Color background = display.getSystemColor (SWT.COLOR_INFO_BACKGROUND);
+	tip.setBackground (background);
+	listener = new Listener () {
+		public void handleEvent (Event event) {
+			switch (event.type) {
+				case SWT.Dispose: onDispose (event); break;
+				case SWT.Paint: onPaint (event); break;
+				case SWT.MouseDown: onMouseDown (event); break;
+			}
+		}
+	};
+	addListener (SWT.Dispose, listener);
+	tip.addListener (SWT.Paint, listener);
+	tip.addListener (SWT.MouseDown, listener);
+	parentListener = new Listener () {
+		public void handleEvent (Event event) {
+			dispose ();
+		}
+	};
+	parent.addListener(SWT.Dispose, parentListener);
 }
 
 static int checkStyle (int style) {
@@ -167,6 +190,13 @@ void configure () {
 				w, h-5+t, w-1, h-5+t, w-1, h-3+t, w-2, h-3+t, w-2, h-2+t, w-3, h-2+t, w-3, h-1+t, w-5, h-1+t, w-5, h+t,
 				5, h+t, 5, h-1+t, 3, h-1+t, 3, h-2+t, 2, h-2+t, 2, h-3+t, 1, h-3+t, 1, h-5+t, 0, h-5+t, 
 				0, 5+t};
+			borderPolygon = new int[] {
+					0, 5+t, 1, 4+t, 1, 3+t, 3, 1+t,  4, 1+t, 5, t, 
+					16, t, 16, 1, 35, t,
+					w-6, 0+t, w-5, 1+t, w-4, 1+t, w-2, 3+t, w-2, 4+t, w-1, 5+t,
+					w-1, h-6+t, w-2, h-5+t, w-2, h-4+t, w-4, h-2+t, w-5, h-2+t, w-6, h-1+t,
+					5, h-1+t, 4, h-2+t, 3, h-2+t, 1, h-4+t, 1, h-5+t, 0, h-6+t, 
+					0, 5+t};
 			tip.setLocation (Math.max (0, x - i), y);
 		} else {
 			polyline = new int [] {
@@ -176,6 +206,13 @@ void configure () {
 				35, h, 16, h+t, 16, h,
 				5, h, 5, h-1, 3, h-1, 3, h-2, 2, h-2, 2, h-3, 1, h-3, 1, h-5, 0, h-5, 
 				0, 5};
+			borderPolygon = new int[] {
+					0, 5, 1, 4, 1, 3, 3, 1,  4, 1, 5, 0, 
+					w-6, 0, w-5, 1, w-4, 1, w-2, 3, w-2, 4, w-1, 5,
+					w-1, h-6, w-2, h-5, w-2, h-4, w-4, h-2, w-5, h-2, w-6, h-1,
+					36, h-1, 16, h+t-1, 16, h-1,
+					5, h-1, 4, h-2, 3, h-2, 1, h-4, 1, h-5, 0, h-6, 
+					0, 5};
 			tip.setLocation (Math.max (0, x - i), y - size.y - t);
 		}
 	} else {
@@ -187,6 +224,13 @@ void configure () {
 				w, h-5+t, w-1, h-5+t, w-1, h-3+t, w-2, h-3+t, w-2, h-2+t, w-3, h-2+t, w-3, h-1+t, w-5, h-1+t, w-5, h+t,
 				5, h+t, 5, h-1+t, 3, h-1+t, 3, h-2+t, 2, h-2+t, 2, h-3+t, 1, h-3+t, 1, h-5+t, 0, h-5+t, 
 				0, 5+t};
+			borderPolygon = new int[] {
+					0, 5+t, 1, 4+t, 1, 3+t, 3, 1+t,  4, 1+t, 5, t, 
+					w-35, t, w-17, 2, w-17, t,
+					w-6, t, w-5, 1+t, w-4, 1+t, w-2, 3+t, w-2, 4+t, w-1, 5+t,
+					w-1, h-6+t, w-2, h-5+t, w-2, h-4+t, w-4, h-2+t, w-5, h-2+t, w-6, h-1+t,
+					5, h-1+t, 4, h-2+t, 3, h-2+t, 1, h-4+t, 1, h-5+t, 0, h-6+t, 
+					0, 5+t};
 			tip.setLocation (Math.min (dest.width - size.x, x - size.x + i), y);
 		} else {
 			polyline = new int [] {
@@ -196,6 +240,13 @@ void configure () {
 				w-16, h, w-16, h+t, w-35, h,
 				5, h, 5, h-1, 3, h-1, 3, h-2, 2, h-2, 2, h-3, 1, h-3, 1, h-5, 0, h-5, 
 				0, 5};
+			borderPolygon = new int[] {
+					0, 5, 1, 4, 1, 3, 3, 1,  4, 1, 5, 0, 
+					w-6, 0, w-5, 1, w-4, 1, w-2, 3, w-2, 4, w-1, 5,
+					w-1, h-6, w-2, h-5, w-2, h-4, w-4, h-2, w-5, h-2, w-6, h-1,
+					w-17, h-1, w-17, h+t-2, w-36, h-1,
+					5, h-1, 4, h-2, 3, h-2, 1, h-4, 1, h-5, 0, h-6, 
+					0, 5};
 			tip.setLocation (Math.min (dest.width - size.x, x - size.x + i), y - size.y - t);
 		}
 	}	
@@ -205,28 +256,6 @@ void configure () {
 		region.add (polyline);
 		tip.setRegion (region);
 	}
-}
-
-void createWidget () {
-	super.createWidget ();
-	this.autohide = true;
-	x = y = -1;	
-	text = "";
-	message = "";
-}
-
-
-void disposeTip () {
-	if (tip != null) tip.dispose ();
-	tip = null;
-	if (region != null) region.dispose ();
-	region = null;
-	if (layoutText != null) layoutText.dispose ();
-	layoutText = null;
-	if (layoutMessage != null) layoutMessage.dispose ();
-	layoutMessage = null;
-	if (boldFont != null) boldFont.dispose ();
-	boldFont = null;
 }
 
 /**
@@ -244,37 +273,6 @@ void disposeTip () {
 public boolean getAutoHide () {
 	checkWidget ();
 	return autohide;
-}
-
-/**
- * Returns the receiver's message, which will be an empty
- * string if it has never been set.
- *
- * @return the receiver's message
- *
- * @exception SWTException <ul>
- *    <li>ERROR_WIDGET_DISPOSED - if the receiver has been disposed</li>
- *    <li>ERROR_THREAD_INVALID_ACCESS - if not called from the thread that created the receiver</li>
- * </ul>
- */
-public String getMessage () {
-	checkWidget ();
-	return message;
-}
-
-/**
- * Returns the receiver's parent, which must be a <code>Shell</code>.
- *
- * @return the receiver's parent
- *
- * @exception SWTException <ul>
- *    <li>ERROR_WIDGET_DISPOSED - if the receiver has been disposed</li>
- *    <li>ERROR_THREAD_INVALID_ACCESS - if not called from the thread that created the receiver</li>
- * </ul>
- */
-public Shell getParent () {
-	checkWidget ();
-	return parent;
 }
 
 Point getSize (int maxWidth) {
@@ -306,6 +304,37 @@ Point getSize (int maxWidth) {
 }
 
 /**
+ * Returns the receiver's message, which will be an empty
+ * string if it has never been set.
+ *
+ * @return the receiver's message
+ *
+ * @exception SWTException <ul>
+ *    <li>ERROR_WIDGET_DISPOSED - if the receiver has been disposed</li>
+ *    <li>ERROR_THREAD_INVALID_ACCESS - if not called from the thread that created the receiver</li>
+ * </ul>
+ */
+public String getMessage () {
+	checkWidget ();
+	return layoutMessage != null ? layoutMessage.getText() : "";
+}
+
+/**
+ * Returns the receiver's parent, which must be a <code>Shell</code>.
+ *
+ * @return the receiver's parent
+ *
+ * @exception SWTException <ul>
+ *    <li>ERROR_WIDGET_DISPOSED - if the receiver has been disposed</li>
+ *    <li>ERROR_THREAD_INVALID_ACCESS - if not called from the thread that created the receiver</li>
+ * </ul>
+ */
+public Shell getParent () {
+	checkWidget ();
+	return parent;
+}
+
+/**
  * Returns the receiver's text, which will be an empty
  * string if it has never been set.
  *
@@ -318,7 +347,7 @@ Point getSize (int maxWidth) {
  */
 public String getText () {
 	checkWidget ();
-	return text;
+	return layoutText != null ? layoutText.getText() : "";
 }
 
 /**
@@ -340,14 +369,7 @@ public String getText () {
  */
 public boolean getVisible () {
 	checkWidget ();
-	if (tip != null) return	tip.getVisible ();
-	if (display.helpWidget == this) {
-		int window = OS.FrontWindow ();
-		int [] windowClass = new int [1];
-		OS.GetWindowClass (window, windowClass);
-		return windowClass [0] == OS.kHelpWindowClass;
-	}
-	return false;
+	return tip.getVisible ();
 }
 
 /**
@@ -369,6 +391,31 @@ public boolean isVisible () {
 	return getVisible ();
 }
 
+void onDispose (Event event) {
+	Control parent = getParent ();
+	parent.removeListener (SWT.Dispose, parentListener);
+	removeListener (SWT.Dispose, listener);
+	notifyListeners (SWT.Dispose, event);
+	event.type = SWT.None;
+
+	if (runnable != null) {
+		Display display = getDisplay ();
+		display.timerExec (-1, runnable);
+	}
+	runnable = null;
+	tip.dispose ();
+	tip = null;
+	if (region != null) region.dispose ();
+	region = null;
+	if (layoutText != null) layoutText.dispose ();
+	layoutText = null;
+	if (layoutMessage != null) layoutMessage.dispose ();
+	layoutMessage = null;
+	if (boldFont != null) boldFont.dispose ();
+	boldFont = null;
+	borderPolygon = null;
+}
+
 void onMouseDown (Event event) {
 	notifyListeners (SWT.Selection, new Event ());
 	setVisible (false);
@@ -378,7 +425,13 @@ void onPaint (Event event) {
 	GC gc = event.gc;
 	int x = BORDER + PADDING;
 	int y = BORDER + PADDING;
-	if ((style & SWT.BALLOON) != 0 && spikeAbove) y += TIP_HEIGHT;
+	if ((style & SWT.BALLOON) != 0) {
+		if (spikeAbove) y += TIP_HEIGHT;
+		gc.drawPolygon (borderPolygon);
+	} else {
+		Rectangle rect = tip.getClientArea ();
+		gc.drawRectangle(rect.x, rect.y, rect.width - 1, rect.height -1);
+	} 
 	if (layoutText != null) {
 		int id = style & (SWT.ICON_ERROR | SWT.ICON_INFORMATION | SWT.ICON_WARNING);
 		if ((style & SWT.BALLOON) != 0 && id != 0) {
@@ -396,18 +449,6 @@ void onPaint (Event event) {
 		x = BORDER + PADDING + INSET;
 		layoutMessage.draw (gc, x, y);
 	}
-}
-
-void releaseWidget () {
-	super.releaseWidget ();
-	if (runnable != null) {
-		Display display = getDisplay ();
-		display.timerExec (-1, runnable);
-	}
-	runnable = null;
-	disposeTip ();
-	if (helpString != 0) OS.CFRelease (helpString);
-	helpString = 0;
 }
 
 /**
@@ -477,7 +518,7 @@ public void setLocation (int x, int y) {
 	if (this.x == x && this.y == y) return;
 	this.x = x;
 	this.y = y;
-	if (tip != null && tip.getVisible ()) configure ();
+	if (tip.getVisible ()) configure ();
 }
 
 /**
@@ -524,11 +565,14 @@ public void setLocation (Point location) {
 public void setMessage (String string) {
 	checkWidget ();
 	if (string == null) error (SWT.ERROR_NULL_ARGUMENT);
-	message = string;
-	if (tip != null) {
+	if (layoutMessage != null) layoutMessage.dispose();
+	layoutMessage = null;
+	if (string.length () != 0) {
+		Display display = getDisplay (); 
+		layoutMessage = new TextLayout (display);
 		layoutMessage.setText (string);
-		if (tip.getVisible ()) configure ();
 	}
+	if (tip.getVisible ()) configure ();
 }
 
 /**
@@ -547,13 +591,21 @@ public void setMessage (String string) {
 public void setText (String string) {
 	checkWidget ();
 	if (string == null) error (SWT.ERROR_NULL_ARGUMENT);
-	text = string;
-	if (tip != null) {
+	if (layoutText != null) layoutText.dispose ();
+	layoutText = null;
+	if (boldFont != null) boldFont.dispose ();
+	boldFont = null;
+	if (string.length () != 0) {
+		Display display = getDisplay ();
+		layoutText = new TextLayout (display);
 		layoutText.setText (string);
+		Font font = display.getSystemFont ();
+		FontData data = font.getFontData () [0];
+		boldFont = new Font (display, data.getName (), data.getHeight (), SWT.BOLD);
 		TextStyle style = new TextStyle (boldFont, null, null);
 		layoutText.setStyle (style, 0, string.length ());
-		if (tip.getVisible ()) configure ();
 	}
+	if (tip.getVisible ()) configure ();
 }
 
 /**
@@ -573,91 +625,19 @@ public void setText (String string) {
  * </ul>
  */
 public void setVisible (boolean visible) {
-	if (helpString != 0) OS.CFRelease (helpString);
-	helpString = 0;
+	checkWidget ();
+	if (visible) configure ();
+	tip.setVisible (visible);
+	Display display = getDisplay ();
 	if (runnable != null) display.timerExec (-1, runnable);
 	runnable = null;
-	if (visible) {
-		OS.HMHideTag ();
-		display.helpWidget = this;
-		if (!autohide || (style & SWT.BALLOON) != 0) {
-			// Show tip
-			if (tip == null) {
-				tip = new Shell (parent, SWT.ON_TOP | SWT.NO_TRIM);
-				Color background = display.getSystemColor (SWT.COLOR_INFO_BACKGROUND);
-				tip.setBackground (background);
-				Listener listener = new Listener () {
-					public void handleEvent (Event event) {
-						switch (event.type) {
-							case SWT.Paint: onPaint (event); break;
-							case SWT.MouseDown: onMouseDown (event); break;
-						}
-					}
-				};
-				tip.addListener (SWT.Paint, listener);
-				tip.addListener (SWT.MouseDown, listener);
-				
-				layoutText = new TextLayout (display);
-				layoutText.setText (text);
-				Font font = display.getSystemFont ();
-				FontData data = font.getFontData () [0];
-				boldFont = new Font (display, data.getName (), data.getHeight (), SWT.BOLD);
-				TextStyle style = new TextStyle (boldFont, null, null);
-				layoutText.setStyle (style, 0, text.length ());	
-				layoutMessage = new TextLayout (display);
-				layoutMessage.setText(message);
+	if (autohide && visible) {
+		runnable = new Runnable () {
+			public void run () {
+				if (!isDisposed ()) setVisible (false);
 			}
-			
-			configure ();
-			tip.setVisible (true);
-			if (autohide) {
-				runnable = new Runnable () {
-					public void run () {
-						if (!isDisposed ()) setVisible (false);
-					}
-				};
-				display.timerExec(DELAY, runnable);
-			}
-		} else {
-			// Show HMTag
-			if (tip != null) disposeTip ();
-			if (x == -1 || y == -1) {
-				Point point;
-				if (item != null) {
-					point = item.getLocation ();
-					x = point.x;
-					y = point.y;
-				} else {
-					org.eclipse.swt.internal.carbon.Point pt = new org.eclipse.swt.internal.carbon.Point ();
-					OS.GetGlobalMouse (pt);
-					x = pt.h;
-					y = pt.v;
-				}
-			}
-			StringBuffer string = new StringBuffer (text);
-			if (text.length () > 0) string.append ("\n\n");
-			string.append (message);
-			char [] buffer = new char [string.length ()];
-			string.getChars (0, buffer.length, buffer, 0);
-			helpString = OS.CFStringCreateWithCharacters (OS.kCFAllocatorDefault, buffer, buffer.length);
-			HMHelpContentRec helpContent = new HMHelpContentRec ();
-			helpContent.tagSide = (short) OS.kHMAbsoluteCenterAligned;
-			helpContent.absHotRect_left = (short)x;
-			helpContent.absHotRect_top = (short)y;
-			helpContent.absHotRect_right = (short)(x + 1);
-			helpContent.absHotRect_bottom = (short) (y + 1);
-			helpContent.content0_contentType = OS.kHMCFStringContent;
-			helpContent.content0_tagCFString = helpString;
-			helpContent.content1_contentType = OS.kHMCFStringContent;
-			helpContent.content1_tagCFString = helpString;
-			OS.HMDisplayTag(helpContent);
-		}
-	} else {
-		if (display.helpWidget == this) {
-			display.helpWidget = null;
-			OS.HMHideTag ();
-			if (tip != null) tip.setVisible (false);
-		}
+		};
+		display.timerExec(DELAY, runnable);
 	}
 }
 

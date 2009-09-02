@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2008 IBM Corporation and others.
+ * Copyright (c) 2000, 2009 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -10,15 +10,10 @@
  *******************************************************************************/
 package org.eclipse.swt.widgets;
 
-import java.text.DateFormatSymbols;
-import java.util.Calendar;
-
 import org.eclipse.swt.*;
 import org.eclipse.swt.events.*;
 import org.eclipse.swt.graphics.*;
-import org.eclipse.swt.internal.carbon.LongDateRec;
-import org.eclipse.swt.internal.carbon.OS;
-import org.eclipse.swt.internal.carbon.Rect;
+import org.eclipse.swt.internal.cocoa.*;
 
 /**
  * Instances of this class are selectable user interface
@@ -30,13 +25,14 @@ import org.eclipse.swt.internal.carbon.Rect;
  * </p>
  * <dl>
  * <dt><b>Styles:</b></dt>
- * <dd>DATE, TIME, CALENDAR, SHORT, MEDIUM, LONG</dd>
+ * <dd>DATE, TIME, CALENDAR, SHORT, MEDIUM, LONG, DROP_DOWN</dd>
  * <dt><b>Events:</b></dt>
- * <dd>Selection</dd>
+ * <dd>DefaultSelection, Selection</dd>
  * </dl>
  * <p>
  * Note: Only one of the styles DATE, TIME, or CALENDAR may be specified,
  * and only one of the styles SHORT, MEDIUM, or LONG may be specified.
+ * The DROP_DOWN style is a <em>HINT</em>, and it is only valid with the DATE style.
  * </p><p>
  * IMPORTANT: This class is <em>not</em> intended to be subclassed.
  * </p>
@@ -46,22 +42,12 @@ import org.eclipse.swt.internal.carbon.Rect;
  * @see <a href="http://www.eclipse.org/swt/">Sample code and further information</a>
  *
  * @since 3.3
+ * @noextend This class is not intended to be subclassed by clients.
  */
 public class DateTime extends Composite {
-	LongDateRec dateRec;
-	LongDateRec dateAndTime = new LongDateRec ();  // copy of date for a kControlClockTypeHourMinuteSecond or time for a kControlClockTypeMonthDayYear
-
 	static final int MIN_YEAR = 1752; // Gregorian switchover in North America: September 19, 1752
 	static final int MAX_YEAR = 9999;
 	
-	/* Emulated Calendar variables */
-	Color fg, bg;
-	Calendar calendar;
-	DateFormatSymbols formatSymbols;
-	Button monthDown, monthUp, yearDown, yearUp;
-	static final int MARGIN_WIDTH = 2;
-	static final int MARGIN_HEIGHT = 1;
-
 /**
  * Constructs a new instance of this class given its parent
  * and a style value describing its behavior and appearance.
@@ -89,49 +75,15 @@ public class DateTime extends Composite {
  * @see SWT#DATE
  * @see SWT#TIME
  * @see SWT#CALENDAR
+ * @see SWT#SHORT
+ * @see SWT#MEDIUM
+ * @see SWT#LONG
+ * @see SWT#DROP_DOWN
  * @see Widget#checkSubclass
  * @see Widget#getStyle
  */
 public DateTime (Composite parent, int style) {
-	super (parent, checkStyle (style) | ((style & SWT.CALENDAR) != 0 ? SWT.NO_REDRAW_RESIZE : 0));
-	if ((this.style & SWT.CALENDAR) != 0) {
-		calendar = Calendar.getInstance();
-		formatSymbols = new DateFormatSymbols();
-
-		Listener listener = new Listener() {
-			public void handleEvent(Event event) {
-				switch(event.type) {
-					case SWT.Paint:		handlePaint(event); break;
-					case SWT.Resize:	handleResize(event); break;
-					case SWT.MouseDown:	handleMouseDown(event); break;
-					case SWT.KeyDown:	handleKeyDown(event); break;
-					case SWT.Traverse:	handleTraverse(event); break;
-				}
-			}
-		};
-		addListener(SWT.Paint, listener);
-		addListener(SWT.Resize, listener);
-		addListener(SWT.MouseDown, listener);
-		addListener(SWT.KeyDown, listener);
-		addListener(SWT.Traverse, listener);
-		yearDown = new Button(this, SWT.ARROW | SWT.LEFT);
-		//yearDown.setToolTipText(SWT.getMessage ("SWT_Last_Year")); //$NON-NLS-1$
-		monthDown = new Button(this, SWT.ARROW | SWT.LEFT);
-		//monthDown.setToolTipText(SWT.getMessage ("SWT_Last_Month")); //$NON-NLS-1$
-		monthUp = new Button(this, SWT.ARROW | SWT.RIGHT);
-		//monthUp.setToolTipText(SWT.getMessage ("SWT_Next_Month")); //$NON-NLS-1$
-		yearUp = new Button(this, SWT.ARROW | SWT.RIGHT);
-		//yearUp.setToolTipText(SWT.getMessage ("SWT_Next_Year")); //$NON-NLS-1$
-		listener = new Listener() {
-			public void handleEvent(Event event) {
-				handleSelection(event);
-			}
-		};
-		yearDown.addListener(SWT.Selection, listener);
-		monthDown.addListener(SWT.Selection, listener);
-		monthUp.addListener(SWT.Selection, listener);
-		yearUp.addListener(SWT.Selection, listener);
-	}
+	super (parent, checkStyle (style));
 }
 
 static int checkStyle (int style) {
@@ -158,7 +110,7 @@ protected void checkSubclass () {
  * interface.
  * <p>
  * <code>widgetSelected</code> is called when the user changes the control's value.
- * <code>widgetDefaultSelected</code> is not called.
+ * <code>widgetDefaultSelected</code> is typically called when ENTER is pressed.
  * </p>
  *
  * @param listener the listener which should be notified
@@ -186,19 +138,10 @@ public void addSelectionListener (SelectionListener listener) {
 public Point computeSize (int wHint, int hHint, boolean changed) {
 	checkWidget ();
 	int width = 0, height = 0;
-	if (wHint == SWT.DEFAULT || hHint == SWT.DEFAULT) {
-		if ((style & SWT.CALENDAR) != 0) {
-			Point cellSize = getCellSize(null);
-			Point buttonSize = monthDown.computeSize(SWT.DEFAULT, SWT.DEFAULT, changed);
-			width = cellSize.x * 7;
-			height = cellSize.y * 7 + Math.max(cellSize.y, buttonSize.y);
-		} else {
-			Rect rect = new Rect ();
-			OS.GetBestControlRect (handle, rect, null);
-			width = rect.right - rect.left;
-			height = rect.bottom - rect.top;
-		}
-	}
+	NSControl widget = (NSControl)view;
+	NSSize size = widget.cell ().cellSize ();
+	width = (int)Math.ceil (size.width);
+	height = (int)Math.ceil (size.height);
 	if (width == 0) width = DEFAULT_WIDTH;
 	if (height == 0) height = DEFAULT_HEIGHT;
 	if (wHint != SWT.DEFAULT) width = wHint;
@@ -209,220 +152,38 @@ public Point computeSize (int wHint, int hHint, boolean changed) {
 }
 
 void createHandle () {
-	int clockType = -1;
-	if ((style & SWT.TIME) != 0) clockType = (style & SWT.SHORT) != 0 ? OS.kControlClockTypeHourMinute : OS.kControlClockTypeHourMinuteSecond;
-	if ((style & SWT.DATE) != 0) clockType = (style & SWT.SHORT) != 0 ? OS.kControlClockTypeMonthYear : OS.kControlClockTypeMonthDayYear;
-	if (clockType != -1) { /* SWT.DATE and SWT.TIME */
-		int clockFlags = OS.kControlClockFlagStandard;
-		int [] outControl = new int [1];
-		int window = OS.GetControlOwner (parent.handle);
-		OS.CreateClockControl(window, null, clockType, clockFlags, outControl);
-		if (outControl [0] == 0) error (SWT.ERROR_NO_HANDLES);
-		handle = outControl [0];
-	} else { /* SWT.CALENDAR */
-		// TODO: on Cocoa, can use NSDatePicker - otherwise, use emulated:
-		super.createHandle();
-	}
-}
-
-void createWidget() {
-	super.createWidget ();
-	getDate();
-}
-
-void drawDay(GC gc, Point cellSize, int day) {
-	int cell = getCell(day);
-	Point location = getCellLocation(cell, cellSize);
-	String str = String.valueOf(day);
-	Point extent = gc.stringExtent(str);
-	int date = calendar.get(Calendar.DAY_OF_MONTH);
-	if (day == date) {
-		Display display = getDisplay();
-		gc.setBackground(display.getSystemColor(SWT.COLOR_LIST_SELECTION));
-		gc.setForeground(display.getSystemColor(SWT.COLOR_LIST_SELECTION_TEXT));
-		gc.fillRectangle(location.x, location.y, cellSize.x, cellSize.y);
-	}
-	gc.drawString(str, location.x + (cellSize.x - extent.x) / 2, location.y + (cellSize.y - extent.y) / 2, true);
-	if (day == date) {
-		gc.setBackground(getBackground());
-		gc.setForeground(getForeground());
-	}
-}
-
-void drawDays(GC gc, Point cellSize, Rectangle client) {
-	gc.setBackground(getBackground());
-	gc.setForeground(getForeground());
-	gc.fillRectangle(0, cellSize.y, client.width, cellSize.y * 7);
-	int firstDay = calendar.getActualMinimum(Calendar.DAY_OF_MONTH);
-	int lastDay = calendar.getActualMaximum(Calendar.DAY_OF_MONTH);
-	for (int day = firstDay; day <= lastDay; day++) {
-		drawDay(gc, cellSize, day);
-	}
-}
-
-void drawDaysOfWeek(GC gc, Point cellSize, Rectangle client) {
-	Display display = getDisplay();
-	gc.setBackground(display.getSystemColor(SWT.COLOR_WIDGET_BACKGROUND));
-	gc.setForeground(display.getSystemColor(SWT.COLOR_WIDGET_FOREGROUND));
-	gc.fillRectangle(0, 0, client.width, cellSize.y);
-	String[] days = formatSymbols.getShortWeekdays();
-	int x = 0, y = 0; 
-	for (int i = 1; i < days.length; i++) {
-		String day = days[i];
-		Point extent = gc.stringExtent(day);
-		gc.drawString(day, x + (cellSize.x - extent.x) / 2, y + (cellSize.y - extent.y) / 2, true);
-		x += cellSize.x;
-	}
-	gc.drawLine(0, cellSize.y - 1, client.width, cellSize.y - 1);
-}
-
-void drawMonth(GC gc, Point cellSize, Rectangle client) {
-	Display display = getDisplay();
-	gc.setBackground(display.getSystemColor(SWT.COLOR_WIDGET_BACKGROUND));
-	gc.setForeground(display.getSystemColor(SWT.COLOR_WIDGET_FOREGROUND));
-	int y = cellSize.y * 7;
-	gc.fillRectangle(0, y, client.width, cellSize.y);
-	gc.drawLine(0, y - 1, client.width, y - 1);
-	String str = formatSymbols.getShortMonths()[calendar.get(Calendar.MONTH)] + ", " + calendar.get(Calendar.YEAR);
-	Point extent = gc.stringExtent(str);
-	gc.drawString(str, (cellSize.x * 7 - extent.x) / 2, y + (cellSize.y - extent.y) / 2, true);
-}
-
-void handleKeyDown(Event event) {
-	int newDay = calendar.get(Calendar.DAY_OF_MONTH);
-	switch (event.keyCode) {
-		case SWT.ARROW_DOWN: newDay += 7; break;
-		case SWT.ARROW_UP: newDay -= 7; break;
-		case SWT.ARROW_RIGHT: newDay += 1; break;
-		case SWT.ARROW_LEFT: newDay -= 1; break;
-	}
-	setDay(newDay, true);
-}
-
-void handleMouseDown(Event event) {
-	setFocus();
-	Point cellSize = getCellSize(null);
-	int column = event.x / cellSize.x;
-	int row = event.y / cellSize.y;	
-	int cell = row * 7 + column;
-	int newDay = getDate(cell);
-	setDay(newDay, true);
-}
-
-void handlePaint(Event event) {
-	GC gc = event.gc;
-	Rectangle client = getClientArea();
-	Point cellSize = getCellSize(gc);
-	drawDaysOfWeek(gc, cellSize, client);
-	drawDays(gc, cellSize, client);
-	drawMonth(gc, cellSize, client);
-}
-
-void handleResize(Event event) {
-	yearDown.pack();
-	monthDown.pack();
-	monthUp.pack();
-	yearUp.pack();
-	Point cellSize = getCellSize(null);
-	Point size = monthDown.getSize();
-	int height = Math.max(cellSize.y, size.y);
-	int y = cellSize.y * 7 + (height - size.y) / 2;
-	yearDown.setLocation(0, y);
-	monthDown.setLocation(size.x, y);
-	int x = cellSize.x * 7 - size.x;
-	monthUp.setLocation(x - size.x, y);
-	yearUp.setLocation(x, y);
-}
-
-void handleSelection(Event event) {
-	if (event.widget == monthDown) {
-		calendar.add(Calendar.MONTH, -1);
-	} else if (event.widget == monthUp) {
-		calendar.add(Calendar.MONTH, 1);
-	} else if (event.widget == yearDown) {
-		calendar.add(Calendar.YEAR, -1);
-	} else if (event.widget == yearUp) {				
-		calendar.add(Calendar.YEAR, 1);
+	NSDatePicker widget = (NSDatePicker)new SWTDatePicker().alloc();
+	widget.init();
+	int pickerStyle = OS.NSTextFieldAndStepperDatePickerStyle;
+	int elementFlags = 0;
+	if ((style & SWT.CALENDAR) != 0) {
+		pickerStyle = OS.NSClockAndCalendarDatePickerStyle;
+		elementFlags = OS.NSYearMonthDayDatePickerElementFlag;
 	} else {
-		return;
+		if ((style & SWT.TIME) != 0) {
+			elementFlags = (style & SWT.SHORT) != 0 ? OS.NSHourMinuteDatePickerElementFlag : OS.NSHourMinuteSecondDatePickerElementFlag;
+		}
+		if ((style & SWT.DATE) != 0) {
+			elementFlags = (style & SWT.SHORT) != 0 ? OS.NSYearMonthDatePickerElementFlag : OS.NSYearMonthDayDatePickerElementFlag;
+		}
 	}
-	redraw();
-	postEvent(SWT.Selection);
+	widget.setDrawsBackground(true);
+	widget.setDatePickerStyle(pickerStyle);
+	widget.setDatePickerElements(elementFlags);
+	NSDate date = NSCalendarDate.calendarDate();
+	widget.setDateValue(date);
+	widget.setTarget(widget);
+	widget.setAction(OS.sel_sendSelection);
+	view = widget;
 }
 
-void handleTraverse(Event event) {
-	switch (event.detail) {
-		case SWT.TRAVERSE_ESCAPE:
-		case SWT.TRAVERSE_PAGE_NEXT:
-		case SWT.TRAVERSE_PAGE_PREVIOUS:
-		case SWT.TRAVERSE_RETURN:
-		case SWT.TRAVERSE_TAB_NEXT:
-		case SWT.TRAVERSE_TAB_PREVIOUS:
-			event.doit = true;
-			break;
-	}	
+NSFont defaultNSFont() {
+	return display.datePickerFont;
 }
 
-Point getCellSize(GC gc) {
-	boolean dispose = gc == null; 
-	if (gc == null) gc = new GC(this);
-	int width = 0, height = 0;
-	String[] days = formatSymbols.getShortWeekdays();
-	for (int i = 0; i < days.length; i++) {
-		Point extent = gc.stringExtent(days[i]);
-		width = Math.max(width, extent.x);
-		height = Math.max(height, extent.y);
-	}
-	int firstDay = calendar.getMinimum(Calendar.DAY_OF_MONTH);
-	int lastDay = calendar.getMaximum(Calendar.DAY_OF_MONTH);
-	for (int day = firstDay; day <= lastDay; day++) {
-		Point extent = gc.stringExtent(String.valueOf(day));
-		width = Math.max(width, extent.x);
-		height = Math.max(height, extent.y);	
-	}
-	if (dispose) gc.dispose();
-	return new Point(width + MARGIN_WIDTH * 2, height + MARGIN_HEIGHT * 2);
-}
-
-Point getCellLocation(int cell, Point cellSize) {
-	return new Point(cell % 7 * cellSize.x, cell / 7 * cellSize.y);
-}
-
-int getCell(int date) {
-	int day = calendar.get(Calendar.DAY_OF_MONTH);
-	calendar.set(Calendar.DAY_OF_MONTH, 1);
-	int result = date + calendar.get(Calendar.DAY_OF_WEEK) + 5;
-	calendar.set(Calendar.DAY_OF_MONTH, day);
-	return result;
-}
-
-void getDate() {
-	dateRec = new LongDateRec ();
-	OS.GetControlData (handle, (short)OS.kControlEntireControl, OS.kControlClockLongDateTag, LongDateRec.sizeof, dateRec, null);
-}
-
-int getDate(int cell) {
-	int day = calendar.get(Calendar.DAY_OF_MONTH);
-	calendar.set(Calendar.DAY_OF_MONTH, 1);
-	int result = cell - calendar.get(Calendar.DAY_OF_WEEK) - 5;
-	calendar.set(Calendar.DAY_OF_MONTH, day);
-	return result;
-}
-
-public Color getBackground() {
-	checkWidget();
-	if (bg == null) {
-		return getDisplay().getSystemColor(SWT.COLOR_LIST_BACKGROUND);
-	}
-	return bg;
-}
-
-public Color getForeground() {
-	checkWidget();
-	if (fg == null) {
-		return getDisplay().getSystemColor(SWT.COLOR_LIST_FOREGROUND);
-	}
-	return fg;
+NSCalendarDate getCalendarDate () {
+	NSDate date = ((NSDatePicker)view).dateValue();
+	return date.dateWithCalendarFormat(null, null);
 }
 
 /**
@@ -440,12 +201,7 @@ public Color getForeground() {
  */
 public int getDay () {
 	checkWidget ();
-	if ((style & SWT.TIME) != 0) return dateAndTime.day;
-	if ((style & SWT.CALENDAR) != 0) {
-		return calendar.get(Calendar.DAY_OF_MONTH);
-	}
-	getDate();
-	return dateRec.day;
+	return (int)/*64*/getCalendarDate().dayOfMonth();
 }
 
 /**
@@ -463,12 +219,7 @@ public int getDay () {
  */
 public int getHours () {
 	checkWidget ();
-	if ((style & SWT.DATE) != 0) return dateAndTime.hour;
-	if ((style & SWT.CALENDAR) != 0) {
-		return calendar.get(Calendar.HOUR_OF_DAY);
-	}
-	getDate();
-	return dateRec.hour;
+	return (int)/*64*/getCalendarDate().hourOfDay();
 }
 
 /**
@@ -486,12 +237,7 @@ public int getHours () {
  */
 public int getMinutes () {
 	checkWidget ();
-	if ((style & SWT.DATE) != 0) return dateAndTime.minute;
-	if ((style & SWT.CALENDAR) != 0) {
-		return calendar.get(Calendar.MINUTE);
-	}
-	getDate();
-	return dateRec.minute;
+	return (int)/*64*/getCalendarDate().minuteOfHour();
 }
 
 /**
@@ -509,12 +255,7 @@ public int getMinutes () {
  */
 public int getMonth () {
 	checkWidget ();
-	if ((style & SWT.TIME) != 0) return dateAndTime.month - 1;
-	if ((style & SWT.CALENDAR) != 0) {
-		return calendar.get(Calendar.MONTH);
-	}
-	getDate();
-	return dateRec.month - 1;
+	return (int)/*64*/getCalendarDate().monthOfYear() - 1;
 }
 
 String getNameText() {
@@ -537,12 +278,7 @@ String getNameText() {
  */
 public int getSeconds () {
 	checkWidget ();
-	if ((style & SWT.DATE) != 0) return dateAndTime.second;
-	if ((style & SWT.CALENDAR) != 0) {
-		return calendar.get(Calendar.SECOND);
-	}
-	getDate();
-	return dateRec.second;
+	return (int)/*64*/getCalendarDate().secondOfMinute();
 }
 
 /**
@@ -560,78 +296,16 @@ public int getSeconds () {
  */
 public int getYear () {
 	checkWidget ();
-	if ((style & SWT.TIME) != 0) return dateAndTime.year;
-	if ((style & SWT.CALENDAR) != 0) {
-		return calendar.get(Calendar.YEAR);
-	}
-	getDate();
-	return dateRec.year;
+	return (int)/*64*/getCalendarDate().yearOfCommonEra();
 }
 
-void hookEvents () {
-	super.hookEvents ();
-	if (OS.VERSION >= 0x1040) {
-		int clockProc = display.clockProc;
-		int [] mask = new int [] {
-			OS.kEventClassClockView, OS.kEventClockDateOrTimeChanged,
-		};
-		int controlTarget = OS.GetControlEventTarget (handle);
-		OS.InstallEventHandler (controlTarget, clockProc, mask.length / 2, mask, handle, null);
-	}
+boolean isEventView (int /*long*/ id) {
+	return true;
 }
 
-boolean isValid(int fieldName, int value) {
-	int year = (style & SWT.TIME) != 0 ? dateAndTime.year : dateRec.year;
-	int month = (style & SWT.TIME) != 0 ? dateAndTime.month : dateRec.month;
-	Calendar calendar = Calendar.getInstance();
-	calendar.set(Calendar.YEAR, year);
-	calendar.set(Calendar.MONTH, month - 1);
-	int min = calendar.getActualMinimum(fieldName);
-	int max = calendar.getActualMaximum(fieldName);
-	return value >= min && value <= max;
-}
-
-boolean isValidDate(int year, int month, int day) {
-	Calendar calendar = Calendar.getInstance();
-	calendar.set(Calendar.YEAR, year);
-	calendar.set(Calendar.MONTH, month);
-	calendar.set(Calendar.DAY_OF_MONTH, day);
-	return calendar.get(Calendar.YEAR) == year
-		&& calendar.get(Calendar.MONTH) == month
-		&& calendar.get(Calendar.DAY_OF_MONTH) == day;
-}
-
-int kEventClockDateOrTimeChanged (int nextHandler, int theEvent, int userData) {
-	sendSelectionEvent ();
-	return OS.noErr;
-}
-
-int kEventControlHit (int nextHandler, int theEvent, int userData) {
-	int result = super.kEventControlHit (nextHandler, theEvent, userData);
-	if (result == OS.noErr) return result;
-	if (OS.VERSION < 0x1040) sendSelectionEvent ();
-	return result;
-}
-
-int kEventTextInputUnicodeForKeyEvent (int nextHandler, int theEvent, int userData) {
-	int result = super.kEventTextInputUnicodeForKeyEvent (nextHandler, theEvent, userData);
-	if (result == OS.noErr) return result;
-	if (OS.VERSION < 0x1040) sendSelectionEvent ();
-	return result;
-}
-
-boolean pollTrackEvent() {
-	return ((style & SWT.DATE) != 0) || ((style & SWT.TIME) != 0);
-}
-
-void redraw(int cell, Point cellSize) {
-	Point location = getCellLocation(cell, cellSize);
-	redraw(location.x, location.y, cellSize.x, cellSize.y, false);	
-}
-
-void releaseWidget () {
-	super.releaseWidget();
-	dateRec = null;
+boolean isFlipped (int /*long*/ id, int /*long*/ sel) {
+	if ((style & SWT.CALENDAR) != 0) return super.isFlipped (id, sel);
+	return true;
 }
 
 /**
@@ -659,41 +333,49 @@ public void removeSelectionListener (SelectionListener listener) {
 	eventTable.unhook (SWT.DefaultSelection, listener);	
 }
 
-void sendSelectionEvent () {
-	LongDateRec rec = new LongDateRec ();
-	OS.GetControlData (handle, (short)OS.kControlEntireControl, OS.kControlClockLongDateTag, LongDateRec.sizeof, rec, null);
-	if (rec.second != dateRec.second ||
-		rec.minute != dateRec.minute ||
-		rec.hour != dateRec.hour ||
-		rec.day != dateRec.day ||
-		rec.month != dateRec.month ||
-		rec.year != dateRec.year) {
-		dateRec = rec;
+boolean sendKeyEvent (NSEvent nsEvent, int type) {
+	boolean result = super.sendKeyEvent (nsEvent, type);
+	if (!result) return result;
+	if (type != SWT.KeyDown) return result;
+	if ((style & SWT.CALENDAR) == 0) {
+		short keyCode = nsEvent.keyCode ();
+		switch (keyCode) {
+			case 76: /* KP Enter */
+			case 36: /* Return */
+				postEvent (SWT.DefaultSelection);
+		}
+	}
+	return result;
+}
+
+void sendSelection () {
+	NSEvent event = NSApplication.sharedApplication().currentEvent();
+	if (event != null && (style & SWT.CALENDAR) != 0) {
+		if (event.clickCount() == 2) {
+			postEvent (SWT.DefaultSelection);
+		} else if (event.type() == OS.NSLeftMouseUp) {
+			postEvent (SWT.Selection);
+		}
+	} else { // SWT.DATE or SWT.TIME
 		postEvent (SWT.Selection);
 	}
 }
 
-public void setBackground(Color color) {
-	checkWidget();
-	super.setBackground(color);
-	bg = color;
-}
+void updateBackground () {
+	NSColor nsColor = null;
+	if (backgroundImage != null) {
+		nsColor = NSColor.colorWithPatternImage(backgroundImage.handle);
+	} else if (background != null) {
+		nsColor = NSColor.colorWithDeviceRed(background[0], background[1], background[2], background[3]);
+	} else {
+		if ((style & SWT.CALENDAR) != 0) {
+			nsColor = NSColor.controlBackgroundColor ();
+		} else {
+			nsColor = NSColor.textBackgroundColor ();
+		}
 
-public void setForeground(Color color) {
-	checkWidget();
-	super.setForeground(color);
-	fg = color;
-}
-
-void setDay(int newDay, boolean notify) {
-	int firstDay = calendar.getActualMinimum(Calendar.DAY_OF_MONTH);
-	int lastDay = calendar.getActualMaximum(Calendar.DAY_OF_MONTH);
-	if (!(firstDay <= newDay && newDay <= lastDay)) return;
-	Point cellSize = getCellSize(null);
-	redraw(getCell(calendar.get(Calendar.DAY_OF_MONTH)), cellSize);
-	calendar.set(Calendar.DAY_OF_MONTH, newDay);
-	redraw(getCell(calendar.get(Calendar.DAY_OF_MONTH)), cellSize);
-	if (notify) postEvent(SWT.Selection);
+	}
+	((NSDatePicker)view).setBackgroundColor(nsColor);
 }
 
 /**
@@ -716,24 +398,12 @@ void setDay(int newDay, boolean notify) {
  */
 public void setDate (int year, int month, int day) {
 	checkWidget ();
-	if (!isValidDate(year, month, day)) return;
-	if ((style & SWT.CALENDAR) != 0) {
-		calendar.set(Calendar.YEAR, year);
-		calendar.set(Calendar.MONTH, month);
-		redraw();
-		setDay(day, false);
-	} else {
-		dateRec.year = (short)year;
-		dateRec.month = (short)(month + 1);
-		dateRec.day = (short)day;
-		OS.SetControlData (handle, (short)OS.kControlEntireControl, OS.kControlClockLongDateTag, LongDateRec.sizeof, dateRec);
-		OS.GetControlData (handle, (short)OS.kControlEntireControl, OS.kControlClockLongDateTag, LongDateRec.sizeof, dateRec, null);
-		redraw();
-		if ((style & SWT.TIME) != 0) {
-			dateAndTime.year = (short)year;
-			dateAndTime.month = (short)(month + 1);
-			dateAndTime.day = (short)day;
-		}
+	if (year < MIN_YEAR || year > MAX_YEAR) return;
+	NSCalendarDate date = getCalendarDate();
+	NSCalendarDate newDate = NSCalendarDate.dateWithYear(year, month + 1, day,
+			date.hourOfDay(), date.minuteOfHour(), date.secondOfMinute(), date.timeZone());
+	if (newDate.yearOfCommonEra() == year && newDate.monthOfYear() == month + 1 && newDate.dayOfMonth() == day) {
+		((NSDatePicker)view).setDateValue(newDate);
 	}
 }
 
@@ -741,6 +411,7 @@ public void setDate (int year, int month, int day) {
  * Sets the receiver's date, or day of the month, to the specified day.
  * <p>
  * The first day of the month is 1, and the last day depends on the month and year.
+ * If the specified day is not valid for the receiver's month and year, then it is ignored. 
  * </p>
  *
  * @param day a positive integer beginning with 1
@@ -749,19 +420,31 @@ public void setDate (int year, int month, int day) {
  *    <li>ERROR_WIDGET_DISPOSED - if the receiver has been disposed</li>
  *    <li>ERROR_THREAD_INVALID_ACCESS - if not called from the thread that created the receiver</li>
  * </ul>
+ * 
+ * @see #setDate
  */
 public void setDay (int day) {
 	checkWidget ();
-	if (!isValid(Calendar.DAY_OF_MONTH, day)) return;
-	if ((style & SWT.CALENDAR) != 0) {
-		setDay(day, false);
-	} else {
-		dateRec.day = (short)day;
-		OS.SetControlData (handle, (short)OS.kControlEntireControl, OS.kControlClockLongDateTag, LongDateRec.sizeof, dateRec);
-		OS.GetControlData (handle, (short)OS.kControlEntireControl, OS.kControlClockLongDateTag, LongDateRec.sizeof, dateRec, null);
-		if ((style & SWT.TIME) != 0) dateAndTime.day = (short)day;
-		redraw();
+	NSCalendarDate date = getCalendarDate();
+	NSCalendarDate newDate = NSCalendarDate.dateWithYear(date.yearOfCommonEra(), date.monthOfYear(), day,
+			date.hourOfDay(), date.minuteOfHour(), date.secondOfMinute(), date.timeZone());
+	if (newDate.yearOfCommonEra() == date.yearOfCommonEra() && newDate.monthOfYear() == date.monthOfYear() && newDate.dayOfMonth() == day) {
+		((NSDatePicker)view).setDateValue(newDate);
 	}
+}
+
+void setForeground (float /*double*/ [] color) {
+	NSColor nsColor;
+	if (color == null) {
+		if ((style & SWT.CALENDAR) != 0) {
+			nsColor = NSColor.controlTextColor ();
+		} else {
+			nsColor = NSColor.textColor ();
+		}
+	} else {
+		nsColor = NSColor.colorWithDeviceRed(color[0], color[1], color[2], 1);
+	}
+	((NSDatePicker)view).setTextColor(nsColor);
 }
 
 /**
@@ -779,16 +462,11 @@ public void setDay (int day) {
  */
 public void setHours (int hours) {
 	checkWidget ();
-	if (!isValid(Calendar.HOUR_OF_DAY, hours)) return;
-	if ((style & SWT.CALENDAR) != 0) {
-		calendar.set(Calendar.HOUR_OF_DAY, hours);
-	} else {
-		dateRec.hour = (short)hours;
-		OS.SetControlData (handle, (short)OS.kControlEntireControl, OS.kControlClockLongDateTag, LongDateRec.sizeof, dateRec);
-		OS.GetControlData (handle, (short)OS.kControlEntireControl, OS.kControlClockLongDateTag, LongDateRec.sizeof, dateRec, null);
-		if ((style & SWT.DATE) != 0) dateAndTime.hour = (short)hours;
-	}
-	redraw();
+	if (hours < 0 || hours > 23) return;
+	NSCalendarDate date = getCalendarDate();
+	NSCalendarDate newDate = NSCalendarDate.dateWithYear(date.yearOfCommonEra(), date.monthOfYear(), date.dayOfMonth(),
+			hours, date.minuteOfHour(), date.secondOfMinute(), date.timeZone());
+	((NSDatePicker)view).setDateValue(newDate);
 }
 
 /**
@@ -806,22 +484,18 @@ public void setHours (int hours) {
  */
 public void setMinutes (int minutes) {
 	checkWidget ();
-	if (!isValid(Calendar.MINUTE, minutes)) return;
-	if ((style & SWT.CALENDAR) != 0) {
-		calendar.set(Calendar.MINUTE, minutes);
-	} else {
-		dateRec.minute = (short)minutes;
-		OS.SetControlData (handle, (short)OS.kControlEntireControl, OS.kControlClockLongDateTag, LongDateRec.sizeof, dateRec);
-		OS.GetControlData (handle, (short)OS.kControlEntireControl, OS.kControlClockLongDateTag, LongDateRec.sizeof, dateRec, null);
-		if ((style & SWT.DATE) != 0) dateAndTime.minute = (short)minutes;
-	}
-	redraw();
+	if (minutes < 0 || minutes > 59) return;
+	NSCalendarDate date = getCalendarDate();
+	NSCalendarDate newDate = NSCalendarDate.dateWithYear(date.yearOfCommonEra(), date.monthOfYear(), date.dayOfMonth(),
+			date.hourOfDay(), minutes, date.secondOfMinute(), date.timeZone());
+	((NSDatePicker)view).setDateValue(newDate);
 }
 
 /**
  * Sets the receiver's month.
  * <p>
  * The first month of the year is 0, and the last month is 11.
+ * If the specified month is not valid for the receiver's day and year, then it is ignored. 
  * </p>
  *
  * @param month an integer between 0 and 11
@@ -830,19 +504,17 @@ public void setMinutes (int minutes) {
  *    <li>ERROR_WIDGET_DISPOSED - if the receiver has been disposed</li>
  *    <li>ERROR_THREAD_INVALID_ACCESS - if not called from the thread that created the receiver</li>
  * </ul>
+ * 
+ * @see #setDate
  */
 public void setMonth (int month) {
 	checkWidget ();
-	if (!isValid(Calendar.MONTH, month)) return;
-	if ((style & SWT.CALENDAR) != 0) {
-		calendar.set(Calendar.MONTH, month);
-	} else {
-		dateRec.month = (short)(month + 1);
-		OS.SetControlData (handle, (short)OS.kControlEntireControl, OS.kControlClockLongDateTag, LongDateRec.sizeof, dateRec);
-		OS.GetControlData (handle, (short)OS.kControlEntireControl, OS.kControlClockLongDateTag, LongDateRec.sizeof, dateRec, null);
-		if ((style & SWT.TIME) != 0) dateAndTime.month = (short)(month + 1);
+	NSCalendarDate date = getCalendarDate();
+	NSCalendarDate newDate = NSCalendarDate.dateWithYear(date.yearOfCommonEra(), month + 1, date.dayOfMonth(),
+			date.hourOfDay(), date.minuteOfHour(), date.secondOfMinute(), date.timeZone());
+	if (newDate.yearOfCommonEra() == date.yearOfCommonEra() && newDate.monthOfYear() == month + 1 && newDate.dayOfMonth() == date.dayOfMonth()) {
+		((NSDatePicker)view).setDateValue(newDate);
 	}
-	redraw();
 }
 
 /**
@@ -860,16 +532,11 @@ public void setMonth (int month) {
  */
 public void setSeconds (int seconds) {
 	checkWidget ();
-	if (!isValid(Calendar.SECOND, seconds)) return;
-	if ((style & SWT.CALENDAR) != 0) {
-		calendar.set(Calendar.SECOND, seconds);
-	} else {
-		dateRec.second = (short)seconds;
-		OS.SetControlData (handle, (short)OS.kControlEntireControl, OS.kControlClockLongDateTag, LongDateRec.sizeof, dateRec);
-		OS.GetControlData (handle, (short)OS.kControlEntireControl, OS.kControlClockLongDateTag, LongDateRec.sizeof, dateRec, null);
-		if ((style & SWT.DATE) != 0) dateAndTime.second = (short)seconds;
-	}
-	redraw();
+	if (seconds < 0 || seconds > 59) return;
+	NSCalendarDate date = getCalendarDate();
+	NSCalendarDate newDate = NSCalendarDate.dateWithYear(date.yearOfCommonEra(), date.monthOfYear(), date.dayOfMonth(),
+			date.hourOfDay(), date.minuteOfHour(), seconds, date.timeZone());
+	((NSDatePicker)view).setDateValue(newDate);
 }
 
 /**
@@ -888,32 +555,18 @@ public void setSeconds (int seconds) {
  */
 public void setTime (int hours, int minutes, int seconds) {
 	checkWidget ();
-	if (!isValid(Calendar.HOUR_OF_DAY, hours)) return;
-	if (!isValid(Calendar.MINUTE, minutes)) return;
-	if (!isValid(Calendar.SECOND, seconds)) return;
-	if ((style & SWT.CALENDAR) != 0) {
-		calendar.set(Calendar.HOUR_OF_DAY, hours);
-		calendar.set(Calendar.MINUTE, minutes);
-		calendar.set(Calendar.SECOND, seconds);
-	} else {
-		dateRec.hour = (short)hours;
-		dateRec.minute = (short)minutes;
-		dateRec.second = (short)seconds;
-		OS.SetControlData (handle, (short)OS.kControlEntireControl, OS.kControlClockLongDateTag, LongDateRec.sizeof, dateRec);
-		OS.GetControlData (handle, (short)OS.kControlEntireControl, OS.kControlClockLongDateTag, LongDateRec.sizeof, dateRec, null);
-		if ((style & SWT.DATE) != 0) {
-			dateAndTime.hour = (short)hours;
-			dateAndTime.minute = (short)minutes;
-			dateAndTime.second = (short)seconds;
-		}
-	}
-	redraw();
+	if (hours < 0 || hours > 23 || minutes < 0 || minutes > 59 || seconds < 0 || seconds > 59) return;
+	NSCalendarDate date = getCalendarDate();
+	NSCalendarDate newDate = NSCalendarDate.dateWithYear(date.yearOfCommonEra(), date.monthOfYear(), date.dayOfMonth(),
+			hours, minutes, seconds, date.timeZone());
+	((NSDatePicker)view).setDateValue(newDate);
 }
 
 /**
  * Sets the receiver's year.
  * <p>
  * The first year is 1752 and the last year is 9999.
+ * If the specified year is not valid for the receiver's day and month, then it is ignored. 
  * </p>
  *
  * @param year an integer between 1752 and 9999
@@ -922,19 +575,17 @@ public void setTime (int hours, int minutes, int seconds) {
  *    <li>ERROR_WIDGET_DISPOSED - if the receiver has been disposed</li>
  *    <li>ERROR_THREAD_INVALID_ACCESS - if not called from the thread that created the receiver</li>
  * </ul>
+ * 
+ * @see #setDate
  */
 public void setYear (int year) {
 	checkWidget ();
-	//if (!isValid(Calendar.YEAR, year)) return;
 	if (year < MIN_YEAR || year > MAX_YEAR) return;
-	if ((style & SWT.CALENDAR) != 0) {
-		calendar.set(Calendar.YEAR, year);
-	} else {
-		dateRec.year = (short)year;
-		OS.SetControlData (handle, (short)OS.kControlEntireControl, OS.kControlClockLongDateTag, LongDateRec.sizeof, dateRec);
-		OS.GetControlData (handle, (short)OS.kControlEntireControl, OS.kControlClockLongDateTag, LongDateRec.sizeof, dateRec, null);
-		if ((style & SWT.TIME) != 0) dateAndTime.year = (short)year;
+	NSCalendarDate date = getCalendarDate();
+	NSCalendarDate newDate = NSCalendarDate.dateWithYear(year, date.monthOfYear(), date.dayOfMonth(),
+			date.hourOfDay(), date.minuteOfHour(), date.secondOfMinute(), date.timeZone());
+	if (newDate.yearOfCommonEra() == year && newDate.monthOfYear() == date.monthOfYear() && newDate.dayOfMonth() == date.dayOfMonth()) {
+		((NSDatePicker)view).setDateValue(newDate);
 	}
-	redraw();
 }
 }

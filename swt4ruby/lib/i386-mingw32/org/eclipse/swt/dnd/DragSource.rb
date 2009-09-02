@@ -1,6 +1,6 @@
 require "rjava"
 
-# Copyright (c) 2000, 2008 IBM Corporation and others.
+# Copyright (c) 2000, 2009 IBM Corporation and others.
 # All rights reserved. This program and the accompanying materials
 # are made available under the terms of the Eclipse Public License v1.0
 # which accompanies this distribution, and is available at
@@ -99,6 +99,7 @@ module Org::Eclipse::Swt::Dnd
   # @see <a href="http://www.eclipse.org/swt/snippets/#dnd">Drag and Drop snippets</a>
   # @see <a href="http://www.eclipse.org/swt/examples.php">SWT Example: DNDExample</a>
   # @see <a href="http://www.eclipse.org/swt/">Sample code and further information</a>
+  # @noextend This class is not intended to be subclassed by clients.
   class DragSource < DragSourceImports.const_get :Widget
     include_class_members DragSourceImports
     
@@ -521,16 +522,16 @@ module Org::Eclipse::Swt::Dnd
         # The fix is to create a transparent window that covers the shell client
         # area and use it during the drag to prevent the image from being inverted.
         # On XP if the shell is RTL, the image is not displayed.
-        offset = event.attr_x - drag_event.attr_x
+        offset_x = event.attr_offset_x
         @hwnd_drag = @top_control.attr_handle
         if (!((@top_control.get_style & SWT::RIGHT_TO_LEFT)).equal?(0))
-          offset = image.get_bounds.attr_width - offset
+          offset_x = image.get_bounds.attr_width - offset_x
           rect = RECT.new
           OS._get_client_rect(@top_control.attr_handle, rect)
           @hwnd_drag = OS._create_window_ex(OS::WS_EX_TRANSPARENT | OS::WS_EX_NOINHERITLAYOUT, WindowClass, nil, OS::WS_CHILD | OS::WS_CLIPSIBLINGS, 0, 0, rect.attr_right - rect.attr_left, rect.attr_bottom - rect.attr_top, @top_control.attr_handle, 0, OS._get_module_handle(nil), nil)
           OS._show_window(@hwnd_drag, OS::SW_SHOW)
         end
-        OS._image_list_begin_drag(imagelist.get_handle, 0, offset, event.attr_y - drag_event.attr_y)
+        OS._image_list_begin_drag(imagelist.get_handle, 0, offset_x, event.attr_offset_y)
         # Feature in Windows. When ImageList_DragEnter() is called,
         # it takes a snapshot of the screen  If a drag is started
         # when another window is in front, then the snapshot will
@@ -658,6 +659,9 @@ module Org::Eclipse::Swt::Dnd
       event.attr_time = OS._get_message_time
       event.attr_data_type = transfer_data
       notify_listeners(DND::DragSetData, event)
+      if (!event.attr_doit)
+        return COM::E_FAIL
+      end
       # get matching transfer agent to perform conversion
       transfer = nil
       i = 0

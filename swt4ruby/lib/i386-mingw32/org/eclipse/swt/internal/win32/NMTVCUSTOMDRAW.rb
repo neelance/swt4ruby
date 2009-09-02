@@ -1,6 +1,6 @@
 require "rjava"
 
-# Copyright (c) 2000, 2006 IBM Corporation and others.
+# Copyright (c) 2000, 2008 IBM Corporation and others.
 # All rights reserved. This program and the accompanying materials
 # are made available under the terms of the Eclipse Public License v1.0
 # which accompanies this distribution, and is available at
@@ -31,6 +31,7 @@ module Org::Eclipse::Swt::Internal::Win32
     alias_method :attr_clr_text_bk=, :clr_text_bk=
     undef_method :clr_text_bk=
     
+    # @field flags=no_wince
     attr_accessor :i_level
     alias_method :attr_i_level, :i_level
     undef_method :i_level

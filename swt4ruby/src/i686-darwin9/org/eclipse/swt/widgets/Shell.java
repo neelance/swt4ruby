@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2008 IBM Corporation and others.
+ * Copyright (c) 2000, 2009 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -10,15 +10,10 @@
  *******************************************************************************/
 package org.eclipse.swt.widgets;
 
-
-import org.eclipse.swt.internal.carbon.OS;
-import org.eclipse.swt.internal.carbon.Rect;
-import org.eclipse.swt.internal.carbon.CGPoint;
-import org.eclipse.swt.internal.carbon.CGRect;
-
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.*;
 import org.eclipse.swt.graphics.*;
+import org.eclipse.swt.internal.cocoa.*;
 
 /**
  * Instances of this class represent the "windows"
@@ -84,7 +79,7 @@ import org.eclipse.swt.graphics.*;
  * downgraded to <code>APPLICATION_MODAL</code>.
  * <dl>
  * <dt><b>Styles:</b></dt>
- * <dd>BORDER, CLOSE, MIN, MAX, NO_TRIM, RESIZE, TITLE, ON_TOP, TOOL</dd>
+ * <dd>BORDER, CLOSE, MIN, MAX, NO_TRIM, RESIZE, TITLE, ON_TOP, TOOL, SHEET</dd>
  * <dd>APPLICATION_MODAL, MODELESS, PRIMARY_MODAL, SYSTEM_MODAL</dd>
  * <dt><b>Events:</b></dt>
  * <dd>Activate, Close, Deactivate, Deiconify, Iconify</dd>
@@ -120,15 +115,16 @@ import org.eclipse.swt.graphics.*;
  * @see <a href="http://www.eclipse.org/swt/">Sample code and further information</a>
  */
 public class Shell extends Decorations {
-	int shellHandle, windowGroup;
-	boolean resized, moved, drawing, reshape, update, deferDispose, active, disposed, opened, fullScreen;
-	boolean showWithParent;
-	int invalRgn;
+	NSWindow window;
+	SWTWindowDelegate windowDelegate;
+	int /*long*/ tooltipOwner, tooltipTag, tooltipUserData;
+	boolean opened, moved, resized, fullScreen, center;
 	Control lastActive;
-	Rect rgnRect;
 	Rectangle normalBounds;
-	int imHandle;
-
+	boolean keyInputHappened;
+	NSRect currentFrame;
+	NSRect fullScreenFrame;
+	
 	static int DEFAULT_CLIENT_WIDTH = -1;
 	static int DEFAULT_CLIENT_HEIGHT = -1;
 
@@ -172,13 +168,16 @@ public Shell () {
  * @see SWT#MAX
  * @see SWT#RESIZE
  * @see SWT#TITLE
+ * @see SWT#TOOL
  * @see SWT#NO_TRIM
  * @see SWT#SHELL_TRIM
  * @see SWT#DIALOG_TRIM
+ * @see SWT#ON_TOP
  * @see SWT#MODELESS
  * @see SWT#PRIMARY_MODAL
  * @see SWT#APPLICATION_MODAL
  * @see SWT#SYSTEM_MODAL
+ * @see SWT#SHEET
  */
 public Shell (int style) {
 	this ((Display) null, style);
@@ -242,19 +241,22 @@ public Shell (Display display) {
  * @see SWT#MAX
  * @see SWT#RESIZE
  * @see SWT#TITLE
+ * @see SWT#TOOL
  * @see SWT#NO_TRIM
  * @see SWT#SHELL_TRIM
  * @see SWT#DIALOG_TRIM
+ * @see SWT#ON_TOP
  * @see SWT#MODELESS
  * @see SWT#PRIMARY_MODAL
  * @see SWT#APPLICATION_MODAL
  * @see SWT#SYSTEM_MODAL
+ * @see SWT#SHEET
  */
 public Shell (Display display, int style) {
 	this (display, null, style, 0, false);
 }
 
-Shell (Display display, Shell parent, int style, int handle, boolean embedded) {
+Shell (Display display, Shell parent, int style, int /*long*/handle, boolean embedded) {
 	super ();
 	checkSubclass ();
 	if (display == null) display = Display.getCurrent ();
@@ -265,14 +267,17 @@ Shell (Display display, Shell parent, int style, int handle, boolean embedded) {
 	if (parent != null && parent.isDisposed ()) {
 		error (SWT.ERROR_INVALID_ARGUMENT);	
 	}
-	this.style = checkStyle (style);
+	if (!Display.getSheetEnabled ()) {
+		this.center = parent != null && (style & SWT.SHEET) != 0;
+	}
+	this.style = checkStyle (parent, style);
 	this.parent = parent;
 	this.display = display;
 	if (handle != 0) {
 		if (embedded) {
-			this.handle = handle;
+			view = new NSView(handle);
 		} else {
-			shellHandle = handle;
+			window = new NSWindow(handle);
 			state |= FOREIGN_HANDLE;
 		}
 	}
@@ -351,6 +356,7 @@ public Shell (Shell parent) {
  * @see SWT#PRIMARY_MODAL
  * @see SWT#APPLICATION_MODAL
  * @see SWT#SYSTEM_MODAL
+ * @see SWT#SHEET
  */
 public Shell (Shell parent, int style) {
 	this (parent != null ? parent.display : null, parent, style, 0, false);
@@ -373,19 +379,62 @@ public Shell (Shell parent, int style) {
  * 
  * @since 3.3
  */
-public static Shell internal_new (Display display, int handle) {
+public static Shell internal_new (Display display, int /*long*/ handle) {
 	return new Shell (display, null, SWT.NO_TRIM, handle, false);
 }
 
-static int checkStyle (int style) {
+/**	 
+ * Invokes platform specific functionality to allocate a new shell
+ * that is 'embedded'.  In this case, the handle represents an NSView
+ * that acts as an embedded SWT Shell in an AWT Canvas.
+ * <p>
+ * <b>IMPORTANT:</b> This method is <em>not</em> part of the public
+ * API for <code>Shell</code>. It is marked public only so that it
+ * can be shared within the packages provided by SWT. It is not
+ * available on all platforms, and should never be called from
+ * application code.
+ * </p>
+ *
+ * @param display the display for the shell
+ * @param handle the handle for the shell
+ * @return a new shell object containing the specified display and handle
+ * 
+ * @since 3.5
+ */
+public static Shell cocoa_new (Display display, int /*long*/ handle) {
+	return new Shell (display, null, SWT.NO_TRIM, handle, true);
+}
+
+static int checkStyle (Shell parent, int style) {
 	style = Decorations.checkStyle (style);
 	style &= ~SWT.TRANSPARENT;
 	int mask = SWT.SYSTEM_MODAL | SWT.APPLICATION_MODAL | SWT.PRIMARY_MODAL;
+	if ((style & SWT.SHEET) != 0) {
+		if (Display.getSheetEnabled ()) {
+			style &= ~(SWT.CLOSE | SWT.TITLE | SWT.MIN | SWT.MAX);
+			if (parent == null) {
+				style &= ~SWT.SHEET;
+				style |= SWT.SHELL_TRIM;
+			}
+		} else {
+			style &= ~SWT.SHEET;
+			style |= parent == null ? SWT.SHELL_TRIM : SWT.DIALOG_TRIM;
+		}
+		if ((style & mask) == 0) {
+			style |= parent == null ? SWT.APPLICATION_MODAL : SWT.PRIMARY_MODAL;
+		}
+	}
 	int bits = style & ~mask;
 	if ((style & SWT.SYSTEM_MODAL) != 0) return bits | SWT.SYSTEM_MODAL;
 	if ((style & SWT.APPLICATION_MODAL) != 0) return bits | SWT.APPLICATION_MODAL;
 	if ((style & SWT.PRIMARY_MODAL) != 0) return bits | SWT.PRIMARY_MODAL;
 	return bits;
+}
+
+boolean accessibilityIsIgnored(int /*long*/ id, int /*long*/ sel) {
+	// The content view of a shell is always ignored.
+	if (id == view.id) return true;
+	return super.accessibilityIsIgnored(id, sel);
 }
 
 /**
@@ -418,6 +467,14 @@ public void addShellListener(ShellListener listener) {
 	addListener(SWT.Deiconify,typedListener);
 }
 
+void becomeKeyWindow (int /*long*/ id, int /*long*/ sel) {
+	Display display = this.display;
+	display.keyWindow = window;
+	super.becomeKeyWindow(id, sel);
+	display.checkFocus();
+	display.keyWindow = null;
+}
+
 void bringToTop (boolean force) {
 	if (getMinimized ()) return;
 	if (force) {
@@ -427,8 +484,33 @@ void bringToTop (boolean force) {
 	}
 }
 
+boolean canBecomeKeyWindow (int /*long*/ id, int /*long*/ sel) {
+	if (window.styleMask () == OS.NSBorderlessWindowMask) return true;
+	return super.canBecomeKeyWindow (id, sel);
+}
+
 void checkOpen () {
 	if (!opened) resized = false;
+}
+
+void center () {
+	if (parent == null) return;
+	Rectangle rect = getBounds ();
+	Rectangle parentRect = display.map (parent, null, parent.getClientArea());
+	int x = Math.max (parentRect.x, parentRect.x + (parentRect.width - rect.width) / 2);
+	int y = Math.max (parentRect.y, parentRect.y + (parentRect.height - rect.height) / 2);
+	Rectangle monitorRect = parent.getMonitor ().getClientArea();
+	if (x + rect.width > monitorRect.x + monitorRect.width) {
+		x = Math.max (monitorRect.x, monitorRect.x + monitorRect.width - rect.width);
+	} else {
+		x = Math.max (x, monitorRect.x);
+	}
+	if (y + rect.height > monitorRect.y + monitorRect.height) {
+		y = Math.max (monitorRect.y, monitorRect.y + monitorRect.height - rect.height);
+	} else {
+		y = Math.max (y, monitorRect.y);
+	}
+	setLocation (x, y);
 }
 
 /**
@@ -459,192 +541,115 @@ void closeWidget () {
 
 public Rectangle computeTrim (int x, int y, int width, int height) {
 	checkWidget();
-	Rectangle trim = super.computeTrim (x, y, width, height);
-	Rect rect = new Rect ();
-	OS.GetWindowStructureWidths (shellHandle, rect);
-	trim.x -= rect.left;
-	trim.y -= rect.top;
-	trim.width += rect.left + rect.right;
-	trim.height += rect.top + rect.bottom;
-	return trim;
+	Rectangle trim = super.computeTrim(x, y, width, height);
+	NSRect rect = new NSRect ();
+	rect.x = trim.x;
+	rect.y = trim.y;
+	rect.width = trim.width;
+	rect.height = trim.height;
+	if (window != null) {
+		if (!fixResize()) {
+			rect = window.frameRectForContentRect(rect);
+		}
+	}
+	return new Rectangle ((int)rect.x, (int)rect.y, (int)rect.width, (int)rect.height);
 }
 
 void createHandle () {
-	state |= CANVAS | GRAB | HIDDEN;
-	int attributes = OS.kWindowStandardHandlerAttribute;
-	attributes |= OS.kWindowCompositingAttribute;
-	if ((style & SWT.NO_TRIM) == 0) {
-		if ((style & SWT.CLOSE) != 0) attributes |= OS.kWindowCloseBoxAttribute;
-		if ((style & SWT.MIN) != 0) attributes |= OS.kWindowCollapseBoxAttribute;
-		if ((style & SWT.MAX) != 0) attributes |= OS.kWindowFullZoomAttribute;
-		if ((style & SWT.RESIZE) != 0) {
-			attributes |= OS.kWindowResizableAttribute;
-			/*
-			* Bug in the Macintosh.  For some reason, a window has no title bar
-			* and the kWindowResizableAttribute, no rubber banding feedback is
-			* given while the window is resizing.  The fix is to create the window 
-			* with kWindowLiveResizeAttribute in this case.  This is inconsistent
-			* with other windows, but the user will get feedback when resizing.
-			*/
-			if ((style & SWT.TITLE) == 0) attributes |= OS.kWindowLiveResizeAttribute;
-			if (!OS.__BIG_ENDIAN__()) attributes |= OS.kWindowLiveResizeAttribute;
-		} 
-	} else {
-		if ((style & SWT.TOOL) == 0) attributes |= OS.kWindowNoShadowAttribute;
-	}
-	int windowClass = OS.kDocumentWindowClass;
-	if ((style & (SWT.CLOSE | SWT.TITLE)) == 0) windowClass = OS.kSheetWindowClass;
-	if ((style & (SWT.APPLICATION_MODAL | SWT.PRIMARY_MODAL | SWT.SYSTEM_MODAL)) != 0) {
-		if ((style & (SWT.CLOSE | SWT.MAX | SWT.MIN)) == 0)  {
-			windowClass = (style & SWT.TITLE) != 0 ? OS.kMovableModalWindowClass : OS.kModalWindowClass;
+	state |= HIDDEN;
+	if (window == null) {
+		window = (NSWindow) new SWTWindow ().alloc ();
+		int styleMask = OS.NSBorderlessWindowMask;
+		if ((style & SWT.NO_TRIM) == 0) {
+			if ((style & SWT.TITLE) != 0) styleMask |= OS.NSTitledWindowMask;
+			if ((style & SWT.CLOSE) != 0) styleMask |= OS.NSClosableWindowMask;
+			if ((style & SWT.MIN) != 0) styleMask |= OS.NSMiniaturizableWindowMask;
+			if ((style & SWT.MAX) != 0) styleMask |= OS.NSResizableWindowMask;
+			if ((style & SWT.RESIZE) != 0) styleMask |= OS.NSResizableWindowMask;
 		}
-	}
-	if (shellHandle == 0) {
-		Monitor monitor = getMonitor ();
-		Rectangle rect = monitor.getClientArea ();
-		int width = rect.width * 5 / 8;
-		int height = rect.height * 5 / 8;
-		Rect bounds = new Rect ();
-		OS.SetRect (bounds, (short) 0, (short) 0, (short) width, (short) height);
-		int [] outWindow = new int [1];
-		attributes &= OS.GetAvailableWindowAttributes (windowClass);
-		OS.CreateNewWindow (windowClass, attributes, bounds, outWindow);
-		if (outWindow [0] == 0) error (SWT.ERROR_NO_HANDLES);
-		shellHandle = outWindow [0];
-		OS.RepositionWindow (shellHandle, 0, OS.kWindowCascadeOnMainScreen);
-//		OS.SetThemeWindowBackground (shellHandle, (short) OS.kThemeBrushDialogBackgroundActive, false);
-		int [] theRoot = new int [1];
-		OS.HIViewFindByID (OS.HIViewGetRoot (shellHandle), OS.kHIViewWindowContentID (), theRoot);
-		/*
-		* Bug in the Macintosh.  When the window class is kMovableModalWindowClass or
-		* kModalWindowClass, HIViewFindByID() fails to find the control identified by
-		* kHIViewWindowContentID.  The fix is to call GetRootControl() if the call
-		* failed.
-		*/
-		if (theRoot [0] == 0) OS.GetRootControl (shellHandle, theRoot);		
-		if (theRoot [0] == 0) error (SWT.ERROR_NO_HANDLES);
-		if ((style & (SWT.H_SCROLL | SWT.V_SCROLL)) != 0) {
-			createScrolledHandle (theRoot [0]);
-		} else {
-			createHandle (theRoot [0]);
+		NSScreen screen = null;
+		NSScreen primaryScreen = new NSScreen(NSScreen.screens().objectAtIndex(0));
+		if (parent != null) screen = parent.getShell().window.screen();
+		if (screen == null) screen = primaryScreen;
+		window = window.initWithContentRect(new NSRect(), styleMask, OS.NSBackingStoreBuffered, false, screen);
+		if ((style & (SWT.NO_TRIM | SWT.BORDER | SWT.SHELL_TRIM)) == 0 || (style & (SWT.TOOL | SWT.SHEET)) != 0) {
+			window.setHasShadow (true);
 		}
-		OS.SetControlVisibility (topHandle (), false, false);
-	} else {
-		int [] theRoot = new int [1];
-		OS.HIViewFindByID (shellHandle, OS.kHIViewWindowContentID (), theRoot);
-		if (theRoot [0] == 0) OS.GetRootControl (shellHandle, theRoot);
-		handle = OS.HIViewGetFirstSubview (theRoot [0]);
-		if (handle == 0) error (SWT.ERROR_NO_HANDLES);
-		if (OS.IsWindowVisible (shellHandle)) state &= ~HIDDEN;
-	}
-	int [] outGroup = new int [1];
-	OS.CreateWindowGroup (OS.kWindowGroupAttrHideOnCollapse, outGroup);
-	if (outGroup [0] == 0) error (SWT.ERROR_NO_HANDLES);
-	windowGroup = outGroup [0];
-	int parentGroup;
-	if ((style & SWT.ON_TOP) != 0) {
-		parentGroup = OS.GetWindowGroupOfClass (OS.kFloatingWindowClass);		
-	} else {
-		if (parent != null) {
-			parentGroup = parent.getShell ().windowGroup;
-		} else {
-			parentGroup = OS.GetWindowGroupOfClass (OS.kDocumentWindowClass);
+		if ((style & SWT.NO_TRIM) == 0) {
+			NSSize size = window.minSize();
+			size.width = NSWindow.minFrameWidthWithTitle(NSString.stringWith(""), styleMask);
+			window.setMinSize(size);
 		}
+		if (fixResize ()) {
+			if (window.respondsToSelector(OS.sel_setMovable_)) {
+				OS.objc_msgSend(window.id, OS.sel_setMovable_, 0);
+			}
+		}
+		display.cascadeWindow(window, screen);
+		NSRect screenFrame = screen.frame();
+		float /*double*/ width = screenFrame.width * 5 / 8, height = screenFrame.height * 5 / 8;;
+		NSRect frame = window.frame();
+		NSRect primaryFrame = primaryScreen.frame();
+		frame.y = primaryFrame.height - ((primaryFrame.height - (frame.y + frame.height)) + height);
+		frame.width = width;
+		frame.height = height;
+		window.setFrame(frame, false);
+		if ((style & SWT.ON_TOP) != 0) {
+			window.setLevel(OS.NSStatusWindowLevel);
+		}
+		super.createHandle ();
+		topView ().setHidden (true);
+	} else {
+//		int /*long*/ cls = OS.objc_lookUpClass ("SWTWindow");
+//		OS.object_setClass(window.id, cls);
+		state &= ~HIDDEN;
+		//TODO - get the content of the foreign window instead of creating it
+		super.createHandle ();
+		style |= SWT.NO_BACKGROUND;
 	}
-	OS.SetWindowGroup (shellHandle, parentGroup);
-	OS.SetWindowGroupParent (windowGroup, parentGroup);
-	OS.SetWindowGroupOwner (windowGroup, shellHandle);
-	CGPoint inMinLimits = new CGPoint (), inMaxLimits = new CGPoint ();
-	OS.GetWindowResizeLimits (shellHandle, inMinLimits, inMaxLimits);
-	if (DEFAULT_CLIENT_WIDTH == -1) DEFAULT_CLIENT_WIDTH = (int) inMinLimits.x;
-	if (DEFAULT_CLIENT_HEIGHT == -1) DEFAULT_CLIENT_HEIGHT = 0;
-	inMinLimits.y = (int) 0;
-	int trim = SWT.TITLE | SWT.CLOSE | SWT.MIN | SWT.MAX;
-	if ((style & SWT.NO_TRIM) != 0 || (style & trim) == 0) {
-		inMinLimits.x = (int) 0;	
+	window.setAcceptsMouseMovedEvents(true);
+	windowDelegate = (SWTWindowDelegate)new SWTWindowDelegate().alloc().init();
+	window.setDelegate(windowDelegate);
+	id id = window.fieldEditor (true, null);
+	if (id != null) {
+		OS.object_setClass (id.id, OS.objc_getClass ("SWTEditorView"));
 	}
-	OS.SetWindowResizeLimits (shellHandle, inMinLimits, inMaxLimits);
-	int [] docID = new int [1];
-	OS.NewTSMDocument ((short)1, new int [] {OS.kUnicodeDocument}, docID, 0);
-	if (docID [0] == 0) error (SWT.ERROR_NO_HANDLES);
-	imHandle = docID [0];
-}
-
-void createWidget () {
-	super.createWidget ();
-	resizeBounds ();
 }
 
 void deregister () {
 	super.deregister ();
-	int [] theRoot = new int [1];
-	OS.GetRootControl (shellHandle, theRoot);
-	display.removeWidget (theRoot [0]);
+	if (window != null) display.removeWidget (window);
+	if (windowDelegate != null) display.removeWidget (windowDelegate);
 }
 
 void destroyWidget () {
-	int theWindow = shellHandle;
-	/*
-	* Bug in the Macintosh.  Under certain circumstances, yet to
-	* be determined, calling HideWindow() and then DisposeWindow()
-	* causes a segment fault when an application is exiting.  This
-	* seems to happen to large applications.  The fix is to avoid
-	* calling HideWindow() when a shell is about to be disposed.
-	* 
-	* Bug in the Macintosh.  Disposing a window from kEventWindowDeactivated
-	* causes a segment fault. The fix is to defer disposing the window until
-	* the event loop becomes idle.
-	*/
+	NSWindow window = this.window;
 	Display display = this.display;
-	Composite parent = this.parent;
-	while (!deferDispose && parent != null) {
-		Shell shell = parent.getShell ();
-		deferDispose = shell.deferDispose;
-		parent = shell.parent;
-	}
-	if (deferDispose) OS.HideWindow (shellHandle);
+	boolean sheet = (style & (SWT.SHEET)) != 0;
 	releaseHandle ();
-	if (theWindow != 0) {
-		if (deferDispose) {
-			display.addDisposeWindow (theWindow);
-		} else {
-			OS.DisposeWindow (theWindow);
+	if (window != null) {
+		if (sheet) {
+			NSApplication application = NSApplication.sharedApplication();
+			application.endSheet(window, 0);
 		}
-	} 
+		window.close();
+	}
+	//If another shell is not going to become active, clear the menu bar.
+	if (!display.isDisposed () && display.getShells ().length == 0) {
+		display.setMenuBar (null);
+	}
 }
 
-void drawWidget (int control, int context, int damageRgn, int visibleRgn, int theEvent) {
-	super.drawWidget (control, context, damageRgn, visibleRgn, theEvent);
-	
-	/*
-	* Bug in the Macintosh. In kEventWindowGetRegion, 
-	* Carbon assumes the origin of the Region is (0, 0)
-	* and ignores the actual origin.  This causes the 
-	* window to be shifted for a non zero origin.  Also,
-	* the size of the window is the size of the region
-	* which may be less then the size specified in
-	* setSize or setBounds.
-	* The fix is to include (0, 0) and the bottom 
-	* right corner of the size in the region and to
-	* make these points transparent.
-	*/
-	if (region == null || region.isDisposed ()) return;
-	boolean origin = region.contains (0, 0);
-	boolean limit = region.contains(rgnRect.right - 1, rgnRect.bottom - 1);
-	if (origin && limit) return;
-	
-	CGRect cgRect = new CGRect ();
-	cgRect.width = 1;
-	cgRect.height = 1;
-	if (!origin) {
-		OS.CGContextClearRect (context, cgRect);
+void drawBackground (int /*long*/ id, NSGraphicsContext context, NSRect rect) {
+	if (id != view.id) return;
+	if (regionPath != null && background == null) {
+		context.saveGraphicsState();
+		NSColor.windowBackgroundColor().setFill();
+		NSBezierPath.fillRect(rect);
+		context.restoreGraphicsState();
+		return;
 	}
-	if (!limit) {
-		cgRect.x = rgnRect.right - 1;
-		cgRect.y = rgnRect.bottom - 1;
-		OS.CGContextClearRect (context, cgRect);
-	}
-	OS.CGContextSynchronize (context);
+	super.drawBackground (id, context, rect);
 }
 
 Control findBackgroundControl () {
@@ -657,6 +662,20 @@ Composite findDeferredControl () {
 
 Cursor findCursor () {
 	return cursor;
+}
+
+boolean fixResize () {
+	/*
+	* Feature in Cocoa.  It is not possible to have a resizable window
+	* without the title bar.  The fix is to resize the content view on
+	* top of the title bar.
+	*/
+	if ((style & SWT.NO_TRIM) == 0) {
+		if ((style & SWT.RESIZE) != 0 && (style & (SWT.TITLE | SWT.CLOSE | SWT.MIN | SWT.MAX)) == 0) {
+			return true;
+		}
+	}
+	return false;
 }
 
 void fixShell (Shell newShell, Control control) {
@@ -687,10 +706,11 @@ void fixShell (Shell newShell, Control control) {
  */
 public void forceActive () {
 	checkWidget ();
-	if (!isVisible ()) return;
-	OS.SelectWindow (shellHandle);
-	OS.SetUserFocusWindow (shellHandle);
-	OS.SetFrontProcessWithOptions (new int [] {0, OS.kCurrentProcess}, OS.kSetFrontProcessFrontWindowOnly);
+	if (!isVisible()) return;
+	if (window == null) return;
+	makeKeyAndOrderFront ();
+	NSApplication application = NSApplication.sharedApplication ();
+	application.activateIgnoringOtherApps (true);
 }
 
 /**
@@ -708,23 +728,39 @@ public void forceActive () {
  */
 public int getAlpha () {
 	checkWidget ();
-	float [] alpha = new float [1];
-	if (OS.GetWindowAlpha (shellHandle, alpha) == OS.noErr) {
-		return (int)(alpha [0] * 255);
-	}
-	return 0xFF;
+	// TODO: Should we support embedded frame alpha?
+	if (window == null) return 255;
+	return (int)(window.alphaValue() * 255);
 }
 
 public Rectangle getBounds () {
 	checkWidget();
-	Rect rect = new Rect ();
-	OS.GetWindowBounds (shellHandle, (short) OS.kWindowStructureRgn, rect);
-	return new Rectangle (rect.left, rect.top, rect.right - rect.left, rect.bottom - rect.top);
+	NSRect frame = (window == null ? view.frame() : window.frame());
+	float /*double*/ y = display.getPrimaryFrame().height - (int)(frame.y + frame.height);
+	return new Rectangle ((int)frame.x, (int)y, (int)frame.width, (int)frame.height);
 }
 
-int getDrawCount (int control) {
-	if (!isTrimHandle (control)) return drawCount;
-	return 0;
+public Rectangle getClientArea () {
+	checkWidget();
+	NSRect rect;
+	if (window != null) {
+		rect = window.frame();
+		if (!fixResize ()) {
+			rect = window.contentRectForFrameRect(rect);
+		}
+	} else {
+		rect = scrollView != null ? scrollView.frame() : view.frame();
+	}
+	int width = (int)rect.width, height = (int)rect.height;
+	if (scrollView != null) {
+		NSSize size = new NSSize();
+		size.width = width;
+		size.height = height;
+		size = NSScrollView.contentSizeForFrameSize(size, (style & SWT.H_SCROLL) != 0, (style & SWT.V_SCROLL) != 0, OS.NSNoBorder);
+		width = (int)size.width;
+		height = (int)size.height;
+	}
+	return new Rectangle (0, 0, width, height);
 }
 
 /**
@@ -770,47 +806,16 @@ public int getImeInputMode () {
 
 public Point getLocation () {
 	checkWidget();
-	Rect rect = new Rect ();
-	OS.GetWindowBounds (shellHandle, (short) OS.kWindowStructureRgn, rect);
-	return new Point (rect.left, rect.top);
+	// TODO: frame is relative to superview. What does getLocation mean in the embedded case?
+	NSRect frame = (window != null ? window.frame() : view.frame());
+	float /*double*/ y = display.getPrimaryFrame().height - (int)(frame.y + frame.height);
+	return new Point ((int)frame.x, (int)y);
 }
 
 public boolean getMaximized () {
 	checkWidget();
-	//NOT DONE
-	return !fullScreen && super.getMaximized ();
-}
-
-public boolean getMinimized () {
-	checkWidget();
-	if (!getVisible ()) return super.getMinimized ();
-	return OS.IsWindowCollapsed (shellHandle);
-}
-
-/**
- * Returns a point describing the minimum receiver's size. The
- * x coordinate of the result is the minimum width of the receiver.
- * The y coordinate of the result is the minimum height of the
- * receiver.
- *
- * @return the receiver's size
- *
- * @exception SWTException <ul>
- *    <li>ERROR_WIDGET_DISPOSED - if the receiver has been disposed</li>
- *    <li>ERROR_THREAD_INVALID_ACCESS - if not called from the thread that created the receiver</li>
- * </ul>
- * 
- * @since 3.1
- */
-public Point getMinimumSize () {
-	checkWidget();
-	Rect rect = new Rect ();
-	OS.GetWindowStructureWidths (shellHandle, rect);
-	CGPoint inMinLimits = new CGPoint (), inMaxLimits = new CGPoint ();
-	OS.GetWindowResizeLimits (shellHandle, inMinLimits, inMaxLimits);
-	int width = Math.max (1, (int) inMinLimits.x + (rect.left + rect.right));
-	int height = Math.max (1, (int) inMinLimits.y + (rect.top + rect.bottom));
-	return new Point (width, height);
+	if (window == null) return false;
+	return !fullScreen && window.isZoomed();
 }
 
 Shell getModalShell () {
@@ -841,8 +846,49 @@ Shell getModalShell () {
 	return null;
 }
 
-float [] getParentBackground () {
-	return null;
+/**
+ * Gets the receiver's modified state.
+ *
+ * </ul>
+ * @exception SWTException <ul>
+ *    <li>ERROR_WIDGET_DISPOSED - if the receiver has been disposed</li>
+ *    <li>ERROR_THREAD_INVALID_ACCESS - if not called from the thread that created the receiver</li>
+ * </ul>
+ * 
+ * @since 3.5
+ */
+public boolean getModified () {
+	checkWidget ();
+	return window.isDocumentEdited ();
+}
+
+public boolean getMinimized () {
+	checkWidget();
+	if (!getVisible ()) return super.getMinimized ();
+	if (window == null) return false;
+	return window.isMiniaturized();
+}
+
+/**
+ * Returns a point describing the minimum receiver's size. The
+ * x coordinate of the result is the minimum width of the receiver.
+ * The y coordinate of the result is the minimum height of the
+ * receiver.
+ *
+ * @return the receiver's size
+ *
+ * @exception SWTException <ul>
+ *    <li>ERROR_WIDGET_DISPOSED - if the receiver has been disposed</li>
+ *    <li>ERROR_THREAD_INVALID_ACCESS - if not called from the thread that created the receiver</li>
+ * </ul>
+ * 
+ * @since 3.1
+ */
+public Point getMinimumSize () {
+	checkWidget();
+	if (window == null) return new Point(0, 0);
+	NSSize size = window.minSize();
+	return new Point((int)size.width, (int)size.height);
 }
 
 /** 
@@ -908,9 +954,8 @@ public Shell [] getShells () {
 
 public Point getSize () {
 	checkWidget();
-	Rect rect = new Rect ();
-	OS.GetWindowBounds (shellHandle, (short) OS.kWindowStructureRgn, rect);
-	return new Point (rect.right - rect.left, rect.bottom - rect.top);
+	NSRect frame = (window != null ? window.frame() : view.frame());
+	return new Point ((int) frame.width, (int) frame.height);
 }
 
 float getThemeAlpha () {
@@ -921,49 +966,24 @@ boolean hasBorder () {
 	return false;
 }
 
-void hookEvents () {
-	super.hookEvents ();
-	int mouseProc = display.mouseProc;
-	int windowProc = display.windowProc;
-	int[] mask1 = new int [] {
-		OS.kEventClassWindow, OS.kEventWindowActivated,
-		OS.kEventClassWindow, OS.kEventWindowBoundsChanged,
-		OS.kEventClassWindow, OS.kEventWindowClose,
-		OS.kEventClassWindow, OS.kEventWindowCollapsing,
-		OS.kEventClassWindow, OS.kEventWindowCollapsed,
-		OS.kEventClassWindow, OS.kEventWindowDeactivated,
-		OS.kEventClassWindow, OS.kEventWindowDrawContent,
-		OS.kEventClassWindow, OS.kEventWindowExpanded,
-		OS.kEventClassWindow, OS.kEventWindowGetRegion,
-		OS.kEventClassWindow, OS.kEventWindowHidden,
-		OS.kEventClassWindow, OS.kEventWindowHitTest,
-		OS.kEventClassWindow, OS.kEventWindowShown,
-		OS.kEventClassWindow, OS.kEventWindowUpdate,
-		OS.kEventClassWindow, OS.kEventWindowGetClickModality,
-	};
-	int windowTarget = OS.GetWindowEventTarget (shellHandle);
-	OS.InstallEventHandler (windowTarget, windowProc, mask1.length / 2, mask1, shellHandle, null);
-	int [] mask2 = new int [] {
-		OS.kEventClassMouse, OS.kEventMouseDown,
-		OS.kEventClassMouse, OS.kEventMouseDragged,
-//		OS.kEventClassMouse, OS.kEventMouseEntered,
-//		OS.kEventClassMouse, OS.kEventMouseExited,
-		OS.kEventClassMouse, OS.kEventMouseMoved,
-		OS.kEventClassMouse, OS.kEventMouseUp,
-		OS.kEventClassMouse, OS.kEventMouseWheelMoved,
-	};
-	OS.InstallEventHandler (windowTarget, mouseProc, mask2.length / 2, mask2, shellHandle, null);
+void helpRequested(int /*long*/ id, int /*long*/ sel, int /*long*/ theEvent) {
+	Control control = display.getFocusControl();
+	while (control != null) {
+		if (control.hooks (SWT.Help)) {
+			control.postEvent (SWT.Help);
+			break;
+		}
+		control = control.parent;
+	}
 }
 
-void invalidateVisibleRegion (int control) {
-	resetVisibleRegion (control);
-	invalidateChildrenVisibleRegion (control);
+void invalidateVisibleRegion () {
+	resetVisibleRegion ();
+	invalidateChildrenVisibleRegion ();
 }
 
-void invalWindowRgn (int window, int rgn) {
-	display.needsPaint = true;
-	if (invalRgn == 0) invalRgn = OS.NewRgn();
-	OS.UnionRgn (rgn, invalRgn, invalRgn);
+boolean isDrawing () {
+	return getDrawing ();
 }
 
 public boolean isEnabled () {
@@ -980,295 +1000,38 @@ public boolean isVisible () {
 	return getVisible ();
 }
 
-int kEventWindowActivated (int nextHandler, int theEvent, int userData) {
-	int result = super.kEventWindowActivated (nextHandler, theEvent, userData);
-	if (result == OS.noErr) return result;
+boolean makeFirstResponder (int /*long*/ id, int /*long*/ sel, int /*long*/ responder) {
+	Display display = this.display;
+	boolean result = super.makeFirstResponder(id, sel, responder);
+	display.checkFocus();
+	return result;
+}
+
+void makeKeyAndOrderFront() {
 	/*
-	* Bug in the Macintosh.  Despite the that a window has scope
-	* kWindowActivationScopeNone, it gets kEventWindowActivated
-	* events but does not get kEventWindowDeactivated events.  The
-	* fix is to ignore kEventWindowActivated events.
+	* Bug in Cocoa.  If a child window becomes the key window when its
+	* parent window is miniaturized, the parent window appears as if
+	* restored to its full size without actually being restored. In this
+	* case the parent window does become active when its child is closed
+	* and the user is forced to restore the window from the dock.
+	* The fix is to be sure that the parent window is deminiaturized before
+	* making the child a key window. 
 	*/
-	int [] outScope = new int [1];
-	OS.GetWindowActivationScope (shellHandle, outScope); 
-	if (outScope [0] == OS.kWindowActivationScopeNone) return result;
-	if (!active) {
-		active = true;
-		deferDispose = true;
-		Display display = this.display;
-		display.activeShell = this;
-		display.setMenuBar (menuBar);
-		if (menuBar != null) OS.DrawMenuBar ();
-		sendEvent (SWT.Activate);
-		if (isDisposed ()) return result;
-		if (!restoreFocus () && !traverseGroup (true)) setFocus ();
-		if (isDisposed ()) return result;
-		display.activeShell = null;
-		Shell parentShell = this;
-		while (parentShell.parent != null) {
-			parentShell = (Shell) parentShell.parent;
-			if (parentShell.fullScreen) {
-				break;
-			}
-		}
-		if (!parentShell.fullScreen || menuBar != null) {
-			updateSystemUIMode ();
-		} else {
-			parentShell.updateSystemUIMode ();
-		}
-		deferDispose = false;
+	if (parent != null) {
+		Shell shell = (Shell) parent;
+		if (shell.window.isMiniaturized()) shell.window.deminiaturize(null);
 	}
-	return result;
+	window.makeKeyAndOrderFront (null);
 }
 
-int kEventWindowBoundsChanged (int nextHandler, int theEvent, int userData) {
-	int result = super.kEventWindowBoundsChanged (nextHandler, theEvent, userData);
-	if (result == OS.noErr) return result;
-	int [] attributes = new int [1];
-	OS.GetEventParameter (theEvent, OS.kEventParamAttributes, OS.typeUInt32, null, attributes.length * 4, null, attributes);
-	if ((attributes [0] & OS.kWindowBoundsChangeOriginChanged) != 0) {
-		moved = true;
-		sendEvent (SWT.Move);
-		if (isDisposed ()) return OS.noErr;
-	}
-	if ((attributes [0] & OS.kWindowBoundsChangeSizeChanged) != 0) {
-		resized = true;
-		resizeBounds ();
-		sendEvent (SWT.Resize);
-		if (isDisposed ()) return OS.noErr;
-		if (layout != null) {
-			markLayout (false, false);
-			updateLayout (false);
-		}
-		if (region != null && !region.isDisposed()) {
-			OS.GetEventParameter (theEvent, OS.kEventParamCurrentBounds, OS.typeQDRectangle, null, Rect.sizeof, null, rgnRect);
-			OS.SetRect (rgnRect, (short) 0, (short) 0, (short) (rgnRect.right - rgnRect.left), (short) (rgnRect.bottom - rgnRect.top));
-			OS.ReshapeCustomWindow (shellHandle);
-		}
-	}
-	return result;
-}
-
-int kEventWindowClose (int nextHandler, int theEvent, int userData) {
-	int result = super.kEventWindowClose (nextHandler, theEvent, userData);
-	if (result == OS.noErr) return result;
-	if (isEnabled ()) closeWidget ();
-	return OS.noErr;
-}
-
-int kEventWindowCollapsed (int nextHandler, int theEvent, int userData) {
-	int result = super.kEventWindowCollapsed (nextHandler, theEvent, userData);
-	if (result == OS.noErr) return result;
-	minimized = true;
-	sendEvent (SWT.Iconify);
-	return result;
-}
-
-int kEventWindowCollapsing (int nextHandler, int theEvent, int userData) {
-	int result = super.kEventWindowCollapsing (nextHandler, theEvent, userData);
-	if (result == OS.noErr) return result;
-	updateMinimized (true);
-	return result;
-}
-
-int kEventWindowDeactivated (int nextHandler, int theEvent, int userData) {
-	int result = super.kEventWindowDeactivated (nextHandler, theEvent, userData);
-	if (result == OS.noErr) return result;
-	if (active) {
-		active = false;
-		deferDispose = true;
-		Display display = this.display;
-		display.activeShell = this;
-		sendEvent (SWT.Deactivate);
-		if (isDisposed ()) return result;
-		setActiveControl (null);
-		if (isDisposed ()) return result;
-		display.activeShell = null;
-		saveFocus ();
-		if (savedFocus != null) {
-			/*
-			* Bug in the Macintosh.  When ClearKeyboardFocus() is called,
-			* the control that has focus gets two kEventControlSetFocus
-			* events indicating that focus was lost.  The fix is to ignore
-			* both of these and send the focus lost event explicitly.
-			*/
-			display.ignoreFocus = true;
-			OS.ClearKeyboardFocus (shellHandle);
-			display.ignoreFocus = false;
-			if (!savedFocus.isDisposed ()) savedFocus.sendFocusEvent (SWT.FocusOut, false);
-		}
-		display.setMenuBar (null);
-		deferDispose = false;
-	}
-	return result;
-}
-
-int kEventWindowDrawContent (int nextHandler, int theEvent, int userData) {
-	drawing = true;
-	int result = OS.CallNextEventHandler (nextHandler, theEvent);
-	drawing = false;	
-	if (reshape) {
-		reshape = false;
-		OS.ReshapeCustomWindow (shellHandle);
-	}
-	return result;
-}
-
-int kEventWindowExpanded (int nextHandler, int theEvent, int userData) {
-	int result = super.kEventWindowExpanded (nextHandler, theEvent, userData);
-	if (result == OS.noErr) return result;
-	minimized = false;
-	updateMinimized (false);
-	sendEvent (SWT.Deiconify);
-	return result;
-}
-
-int kEventWindowGetClickModality (int nextHandler, int theEvent, int userData) {
-	/*
-	* Bug in the Macintosh.  When the user clicks in an Expose window that is
-	* disabled because of a modal dialog, the modal dialog does not come to
-	* front and is obscured by the Expose window.  The fix is to select the
-	* modal dialog.
-	*/
-	int result = OS.CallNextEventHandler (nextHandler, theEvent);
-	int [] modal = new int [1];
-	OS.GetEventParameter (theEvent, OS.kEventParamModalWindow, OS.typeWindowRef, null, 4, null, modal);
-	if (modal [0] != 0) OS.SelectWindow (modal [0]);
-	
-	/*
-	* Feature in the Macintosh. ON_TOP shells are in the kFloatingWindowClass window
-	* group and are not modal disabled by default. The fix is to detect that it should
-	* be disabled and update the event parameters.
-	* 
-	* Bug in Macintosh.  When a kWindowModalityWindowModal window is active the 
-	* default handler of kEventWindowGetClickModality does not properly set the 
-	* kEventParamModalClickResult. The fix is to set it ourselves.
-	*/
-	Shell modalShell = getModalShell ();
-	if (modalShell != null) {
-		int [] modality = new int [1];
-		OS.GetWindowModality (modalShell.shellHandle, modality, null);
-		if ((style & SWT.ON_TOP) != 0 || modality [0] == OS.kWindowModalityWindowModal) {
-			int clickResult = OS.kHIModalClickIsModal | OS.kHIModalClickAnnounce;
-			OS.SetEventParameter (theEvent, OS.kEventParamWindowModality, OS.typeWindowModality, 4, modality);
-			OS.SetEventParameter (theEvent, OS.kEventParamModalClickResult, OS.typeModalClickResult, 4, new int[]{clickResult});
-			OS.SetEventParameter (theEvent, OS.kEventParamModalWindow, OS.typeWindowRef, 4, new int[]{modalShell.shellHandle});
-		}
-	}
-	return result;
-}
-
-int kEventWindowGetRegion (int nextHandler, int theEvent, int userData) {
-	int result = super.kEventWindowGetRegion (nextHandler, theEvent, userData);
-	if (result == OS.noErr) return result;
-	if (region == null || region.isDisposed ()) return OS.eventNotHandledErr;
-	short [] regionCode = new short [1];
-	OS.GetEventParameter (theEvent, OS.kEventParamWindowRegionCode, OS.typeWindowRegionCode , null, 2, null, regionCode);
-	int [] temp = new int [1];
-	OS.GetEventParameter (theEvent, OS.kEventParamRgnHandle, OS.typeQDRgnHandle , null, 4, null, temp);
-	int hRegion = temp [0];
-	switch (regionCode [0]) {
-		case OS.kWindowContentRgn:
-		case OS.kWindowStructureRgn:
-			OS.RectRgn (hRegion, rgnRect);
-			OS.SectRgn (hRegion, region.handle, hRegion);
-			/*
-			* Bug in the Macintosh. In kEventWindowGetRegion, 
-			* Carbon assumes the origin of the Region is (0, 0)
-			* and ignores the actual origin.  This causes the 
-			* window to be shifted for a non zero origin.  Also,
-			* the size of the window is the size of the region
-			* which may be less then the size specified in
-			* setSize or setBounds.
-			* The fix is to include (0, 0) and the bottom 
-			* right corner of the size in the region and to
-			* make these points transparent.
-			*/
-			if (!region.contains (0, 0)) {
-				Rect r = new Rect ();
-				OS.SetRect (r, (short)0, (short)0, (short)1, (short)1);
-				int rectRgn = OS.NewRgn ();
-				OS.RectRgn (rectRgn, r);
-				OS.UnionRgn (rectRgn, hRegion, hRegion);
-				OS.DisposeRgn (rectRgn);
-			}
-			if (!region.contains (rgnRect.right - 1, rgnRect.bottom - 1)) {
-				Rect r = new Rect ();
-				OS.SetRect (r, (short) (rgnRect.right - 1), (short) (rgnRect.bottom - 1), rgnRect.right, rgnRect.bottom);
-				int rectRgn = OS.NewRgn ();
-				OS.RectRgn (rectRgn, r);
-				OS.UnionRgn (rectRgn, hRegion, hRegion);
-				OS.DisposeRgn (rectRgn);
-			}
-			return OS.noErr;
-		default:
-			OS.DiffRgn (hRegion, hRegion, hRegion);
-			return OS.noErr;
-	}
-}
-
-int kEventWindowHidden (int nextHandler, int theEvent, int userData) {
-	int result = super.kEventWindowHidden (nextHandler, theEvent, userData);
-	if (result == OS.noErr) return result;
-	Shell [] shells = getShells ();
-	for (int i=0; i<shells.length; i++) {
-		Shell shell = shells [i];
-		if (!shell.isDisposed ()) shell.setWindowVisible (false);
-	}
-	return OS.eventNotHandledErr;
-}
-
-int kEventWindowHitTest (int nextHandler, int theEvent, int userData) {
-	int result = super.kEventWindowHitTest (nextHandler, theEvent, userData);
-	if (result == OS.noErr) return result;
-	if (region == null || region.isDisposed ()) return OS.eventNotHandledErr;
-	org.eclipse.swt.internal.carbon.Point pt = new org.eclipse.swt.internal.carbon.Point ();
-	int sizeof = org.eclipse.swt.internal.carbon.Point.sizeof;
-	OS.GetEventParameter (theEvent, OS.kEventParamMouseLocation, OS.typeQDPoint, null, sizeof, null, pt);
-	Rect rect = new Rect ();
-	OS.GetWindowBounds (shellHandle, (short) OS.kWindowContentRgn, rect);
-	OS.SetPt (pt, (short) (pt.h - rect.left), (short) (pt.v - rect.top));
-	int rgn = OS.NewRgn ();
-	OS.RectRgn (rgn, rgnRect);
-	OS.SectRgn (rgn, region.handle, rgn);
-	short inData = OS.PtInRgn (pt, rgn) ? OS.wInContent: OS.wNoHit;
-	OS.DisposeRgn (rgn);
-	OS.SetEventParameter (theEvent, OS.kEventParamWindowDefPart, OS.typeWindowDefPartCode, 2, new short [] {inData});
-	return OS.noErr;
-}
-
-int kEventWindowShown (int nextHandler, int theEvent, int userData) {
-	int result = super.kEventWindowShown (nextHandler, theEvent, userData);
-	if (result == OS.noErr) return result;
-	invalidateVisibleRegion (topHandle ());
-	Shell [] shells = getShells ();
-	for (int i=0; i<shells.length; i++) {
-		Shell shell = shells [i];
-		if (!shell.isDisposed () && shell.getVisible ()) {
-			shell.setWindowVisible (true);
-		}
-	}
-	return OS.eventNotHandledErr;
-}
-
-int kEventWindowUpdate (int nextHandler, int theEvent, int userData) {
-	update = true;
-	int result = OS.CallNextEventHandler (nextHandler, theEvent);
-	update = false;
-	if (invalRgn != 0) {
-		OS.InvalWindowRgn (shellHandle, invalRgn);
-		OS.DisposeRgn (invalRgn);
-		invalRgn = 0;
-	}
-	return result;
-}
-
-void resizeBounds () {
-	Rect rect = new Rect ();
-	OS.GetWindowBounds (shellHandle, (short)  OS.kWindowContentRgn, rect);
-	int control = scrolledHandle != 0 ? scrolledHandle : handle;
-	setBounds (control, 0, 0, rect.right - rect.left, rect.bottom - rect.top, false, true, false);
-	resizeClientArea ();
+void noResponderFor(int /*long*/ id, int /*long*/ sel, int /*long*/ selector) {
+	/**
+	 * Feature in Cocoa.  If the selector is keyDown and nothing has handled the event
+	 * a system beep is generated.  There's no need to beep, as many keystrokes in the SWT
+	 * are listened for and acted upon but not explicitly handled in a keyDown handler.  Fix is to
+	 * not call the default implementation when a keyDown: is being handled. 
+	 */
+	if (selector != OS.sel_keyDown_) super.noResponderFor(id, sel, selector);
 }
 
 /**
@@ -1294,11 +1057,21 @@ void resizeBounds () {
  */
 public void open () {
 	checkWidget();
+	int mask = SWT.PRIMARY_MODAL | SWT.APPLICATION_MODAL | SWT.SYSTEM_MODAL;
+	if ((style & mask) != 0) {
+		display.setModalShell (this);
+	} else {
+		updateModal ();
+	}
 	bringToTop (false);
-	setVisible (true);
+	setWindowVisible (true, true);
 	if (isDisposed ()) return;
-	if (active) {
-		if (!restoreFocus () && !traverseGroup (true)) setFocus ();
+	if (!restoreFocus () && !traverseGroup (true)) {
+		// if the parent shell is minimized, setting focus will cause it
+		// to become unminimized.
+		if (parent == null || !((Shell)parent).window.isMiniaturized()) {
+			setFocus ();
+		}
 	}
 }
 
@@ -1311,9 +1084,8 @@ public boolean print (GC gc) {
 
 void register () {
 	super.register ();
-	int [] theRoot = new int [1];
-	OS.GetRootControl (shellHandle, theRoot);
-	display.addWidget (theRoot [0], this);
+	if (window != null) display.addWidget (window, this);
+	if (windowDelegate != null) display.addWidget (windowDelegate, this);
 }
 
 void releaseChildren (boolean destroy) {
@@ -1328,8 +1100,11 @@ void releaseChildren (boolean destroy) {
 }
 
 void releaseHandle () {
+	if (window != null) window.setDelegate(null);
+	if (windowDelegate != null) windowDelegate.release();
+	windowDelegate = null;
 	super.releaseHandle ();
-	shellHandle = 0;
+	window = null;
 }
 
 void releaseParent () {
@@ -1339,12 +1114,8 @@ void releaseParent () {
 void releaseWidget () {
 	super.releaseWidget ();
 	display.clearModal (this);
-	disposed = true;
-	if (windowGroup != 0) OS.ReleaseWindowGroup (windowGroup);
-	display.updateQuitMenu ();
-	if (invalRgn != 0) OS.DisposeRgn (invalRgn);
-	if (imHandle != 0) OS.DeleteTSMDocument (imHandle);
-	imHandle = invalRgn = windowGroup = 0;
+	updateParent (false);
+	display.updateQuitMenu();
 	lastActive = null;
 }
 
@@ -1376,6 +1147,31 @@ public void removeShellListener(ShellListener listener) {
 	eventTable.unhook(SWT.Deiconify,listener);
 }
 
+void sendToolTipEvent (boolean enter) {
+	if (!isVisible()) return;
+	if (tooltipTag == 0) {
+		NSView view = window.contentView();
+		tooltipTag = view.addToolTipRect(new NSRect(), window, 0);
+		if (tooltipTag != 0) {
+			NSTrackingArea trackingArea = new NSTrackingArea(tooltipTag);
+			id owner = trackingArea.owner();
+			if (owner != null) tooltipOwner = owner.id;
+			id userInfo = trackingArea.userInfo();
+			if (userInfo != null) {
+				tooltipUserData = userInfo.id;
+			} else {
+				int /*long*/ [] value = new int /*long*/ [1];
+				OS.object_getInstanceVariable(tooltipTag, new byte[]{'_','u', 's', 'e', 'r', 'I', 'n', 'f', 'o'}, value);
+				tooltipUserData = value[0];
+			}
+		}
+	}
+	if (tooltipTag == 0 || tooltipOwner == 0 || tooltipUserData == 0) return;
+	NSPoint pt = window.convertScreenToBase(NSEvent.mouseLocation());
+	NSEvent event = NSEvent.enterExitEventWithType(enter ? OS.NSMouseEntered : OS.NSMouseExited, pt, 0, 0, window.windowNumber(), null, 0, tooltipTag, tooltipUserData);
+	OS.objc_msgSend(tooltipOwner, enter ? OS.sel_mouseEntered_ : OS.sel_mouseExited_, event.id);
+}
+
 /**
  * If the receiver is visible, moves it to the top of the 
  * drawing order for the display on which it was created 
@@ -1398,10 +1194,10 @@ public void removeShellListener(ShellListener listener) {
  * @see Shell#setActive
  */
 public void setActive () {
+	if (window == null) return;	
 	checkWidget ();
-	if (!isVisible ()) return;
-	OS.SelectWindow (shellHandle);
-	OS.SetUserFocusWindow (shellHandle);
+	if (!isVisible()) return;
+	makeKeyAndOrderFront ();
 }
 
 void setActiveControl (Control control) {
@@ -1459,45 +1255,67 @@ void setActiveControl (Control control) {
  * @since 3.4
  */
 public void setAlpha (int alpha) {
+	if (window == null) return;	
 	checkWidget ();
 	alpha &= 0xFF;
-	OS.SetWindowAlpha (shellHandle, alpha / 255f);
+	window.setAlphaValue (alpha / 255f);
 }
 
-int setBounds (int x, int y, int width, int height, boolean move, boolean resize, boolean events) {
+void setBounds (int x, int y, int width, int height, boolean move, boolean resize) {
+	// Embedded Shells are not resizable.
+	if (window == null) return;
 	if (fullScreen) setFullScreen (false);
-	Rect rect = new Rect ();
+	boolean sheet = window.isSheet();
+	if (sheet && move && !resize) return;
+	int screenHeight = (int) display.getPrimaryFrame().height;
+	NSRect frame = window.frame();
 	if (!move) {
-		OS.GetWindowBounds (shellHandle, (short) OS.kWindowStructureRgn, rect);
-		x = rect.left;
-		y = rect.top;
+		x = (int)frame.x;
+		y = screenHeight - (int)(frame.y + frame.height);
 	}
-	if (!resize) {
-		OS.GetWindowBounds (shellHandle, (short) OS.kWindowStructureRgn, rect);
-		width = rect.right - rect.left;
-		height = rect.bottom - rect.top;
+	if (resize) {
+		NSSize minSize = window.minSize();
+		width = Math.max(width, (int)minSize.width);
+		height = Math.max(height, (int)minSize.height);
 	} else {
-		OS.GetWindowStructureWidths (shellHandle, rect);
-		CGPoint inMinLimits = new CGPoint (), inMaxLimits = new CGPoint ();
-		OS.GetWindowResizeLimits (shellHandle, inMinLimits, inMaxLimits);
-		width = Math.max (1, Math.max (width, (int) inMinLimits.x + (rect.left + rect.right)));
-		height = Math.max (1, Math.max (height, (int) inMinLimits.y + (rect.top + rect.bottom)));
+		width = (int)frame.width;
+		height = (int)frame.height;
 	}
-	if (rgnRect != null) {
-		OS.SetRect (rgnRect, (short) 0, (short) 0, (short) width, (short) height);	
+	if (sheet) {
+		y = screenHeight - (int)(frame.y + frame.height);
+		NSRect parentRect = parent.getShell().window.frame();
+		frame.width = width;
+		frame.height = height;
+		frame.x = parentRect.x + (parentRect.width - frame.width) / 2;
+		frame.y = screenHeight - (int)(y + frame.height);
+		window.setFrame(frame, isVisible(), true);
+	} else {
+		frame.x = x;
+		frame.y = screenHeight - (int)(y + height);
+		frame.width = width;
+		frame.height = height;
+		window.setFrame(frame, isVisible());
 	}
-	OS.SetRect (rect, (short) x, (short) y, (short) (x + width), (short) (y + height));
-	OS.SetWindowBounds (shellHandle, (short) OS.kWindowStructureRgn, rect);
-	return 0;
+}
+
+void setClipRegion (float /*double*/ x, float /*double*/ y) {
+	if (regionPath != null) {
+		NSAffineTransform transform = NSAffineTransform.transform();
+		transform.translateXBy(-x, -y);
+		regionPath.transformUsingAffineTransform(transform);
+		regionPath.addClip();
+		transform.translateXBy(2*x, 2*y);
+		regionPath.transformUsingAffineTransform(transform);
+	}
 }
 
 public void setEnabled (boolean enabled) {
 	checkWidget();
 	if (((state & DISABLED) == 0) == enabled) return;
 	super.setEnabled (enabled);
-	if (enabled && OS.IsWindowActive (shellHandle)) {
-		if (!restoreFocus ()) traverseGroup (false);
-	}
+//	if (enabled && OS.IsWindowActive (shellHandle)) {
+//		if (!restoreFocus ()) traverseGroup (false);
+//	}
 }
 
 /**
@@ -1506,7 +1324,7 @@ public void setEnabled (boolean enabled) {
  * to switch to the full screen state, and if the argument is
  * <code>false</code> and the receiver was previously switched
  * into full screen state, causes the receiver to switch back
- * to either the maximmized or normal states.
+ * to either the maximized or normal states.
  * <p>
  * Note: The result of intermixing calls to <code>setFullScreen(true)</code>, 
  * <code>setMaximized(true)</code> and <code>setMinimized(true)</code> will 
@@ -1525,46 +1343,36 @@ public void setEnabled (boolean enabled) {
  */
 public void setFullScreen (boolean fullScreen) {
 	checkWidget ();
+	if (this.fullScreen == fullScreen) return;
 	this.fullScreen = fullScreen; 
+
 	if (fullScreen) {
-		normalBounds = getBounds ();
-		OS.ChangeWindowAttributes (shellHandle, OS.kWindowNoTitleBarAttribute, OS.kWindowResizableAttribute | OS.kWindowLiveResizeAttribute);
-		updateSystemUIMode ();
-		Rectangle screen = getMonitor ().getBounds ();
-		if (menuBar != null && getMonitor ().equals(display.getPrimaryMonitor ())) {
-			Rect rect = new Rect ();
-			int gdevice = OS.GetMainDevice ();
-			OS.GetAvailableWindowPositioningBounds (gdevice, rect);
-			screen.height -= rect.top;
-			screen.y += rect.top;
+		currentFrame = window.frame();
+		window.setShowsResizeIndicator(false); //only hides resize indicator
+		if (window.respondsToSelector(OS.sel_setMovable_)) {
+			OS.objc_msgSend(window.id, OS.sel_setMovable_, 0);
 		}
-		Rect rect = new Rect ();
-		OS.SetRect (rect, (short) screen.x, (short) screen.y, (short) (screen.x + screen.width), (short) (screen.y + screen.height));
-		OS.SetWindowBounds (shellHandle, (short) OS.kWindowStructureRgn, rect);
+		
+		fullScreenFrame = NSScreen.mainScreen().frame();
+		if (getMonitor().equals(display.getPrimaryMonitor ())) {
+			if (menuBar != null) {
+				float /*double*/ menuBarHt = currentFrame.height - contentView().frame().height;
+				fullScreenFrame.height -= menuBarHt;
+				OS.SetSystemUIMode(OS.kUIModeContentHidden, 0);
+			} 
+			else {
+				OS.SetSystemUIMode(OS.kUIModeAllHidden, 0);
+			}
+		}
+		window.setFrame(fullScreenFrame, true);
+		window.contentView().setFrame(fullScreenFrame);
 	} else {
-		int attributes = 0;
-		if ((style & SWT.RESIZE) != 0) {
-			attributes |= OS.kWindowResizableAttribute;
-			/*
-			* Bug in the Macintosh.  For some reason, a window has no title bar
-			* and the kWindowResizableAttribute, no rubber banding feedback is
-			* given while the window is resizing.  The fix is to create the window 
-			* with kWindowLiveResizeAttribute in this case.  This is inconsistent
-			* with other windows, but the user will get feedback when resizing.
-			*/
-			if ((style & SWT.TITLE) == 0) attributes |= OS.kWindowLiveResizeAttribute;
-			if (!OS.__BIG_ENDIAN__()) attributes |= OS.kWindowLiveResizeAttribute;
+		window.setShowsResizeIndicator(true);
+		if (window.respondsToSelector(OS.sel_setMovable_)) {
+			OS.objc_msgSend(window.id, OS.sel_setMovable_, 1);
 		}
-		OS.ChangeWindowAttributes (shellHandle, attributes, OS.kWindowNoTitleBarAttribute);
-		OS.SetSystemUIMode (OS.kUIModeNormal, 0);
-		if (maximized) {
-			setMaximized (true);
-		} else {
-			Rect rect = new Rect ();
-			if (normalBounds != null) OS.SetRect (rect, (short) normalBounds.x, (short) normalBounds.y, (short) (normalBounds.x + normalBounds.width), (short) (normalBounds.y + normalBounds.height));
-			OS.SetWindowBounds (shellHandle, (short) OS.kWindowStructureRgn, rect);
-		}
-		normalBounds = null;
+		OS.SetSystemUIMode(OS.kUIModeNormal, 0);
+		window.setFrame(currentFrame, true);
 	}
 }
 
@@ -1599,26 +1407,20 @@ public void setImeInputMode (int mode) {
 public void setMaximized (boolean maximized) {
 	checkWidget();
 	super.setMaximized (maximized);
-	org.eclipse.swt.internal.carbon.Point pt = new org.eclipse.swt.internal.carbon.Point ();
-	if (maximized) {
-		Rect rect = new Rect ();
-		int gdevice = OS.GetMainDevice ();
-		OS.GetAvailableWindowPositioningBounds (gdevice, rect);
-		pt.h = (short) (rect.right - rect.left);
-		pt.v = (short) (rect.bottom - rect.top);
-	}
-	short inPartCode = (short) (maximized ? OS.inZoomOut : OS.inZoomIn);
-	OS.ZoomWindowIdeal (shellHandle, inPartCode, pt);
+	if (window == null) return;
+	if (window.isZoomed () == maximized) return;
+	window.zoom (null);
 }
 
 public void setMinimized (boolean minimized) {
 	checkWidget();
-	if (this.minimized == minimized) return;
 	super.setMinimized (minimized);
-	if (!minimized && OS.IsWindowCollapsed (shellHandle)) {
-		OS.SelectWindow (shellHandle);
+	if (window == null) return;
+	if (minimized) {
+		window.miniaturize (null);
+	} else {
+		window.deminiaturize (null);
 	}
-	OS.CollapseWindow (shellHandle, minimized);
 }
 
 /**
@@ -1638,24 +1440,17 @@ public void setMinimized (boolean minimized) {
  */
 public void setMinimumSize (int width, int height) {
 	checkWidget();
-	int clientWidth = 0, clientHeight = 0;
-	int trim = SWT.TITLE | SWT.CLOSE | SWT.MIN | SWT.MAX;
-	if ((style & SWT.NO_TRIM) == 0 && (style & trim) != 0) {
-		clientWidth = DEFAULT_CLIENT_WIDTH;
-		clientHeight = DEFAULT_CLIENT_HEIGHT;
+	if (window == null) return;
+	NSSize size = new NSSize();
+	size.width = width;
+	size.height = height;
+	window.setMinSize(size);
+	NSRect frame = window.frame();
+	if (width > frame.width || height > frame.height) {
+		width = (int)(width > frame.width ? width : frame.width);
+		height = (int)(height > frame.height ? height : frame.height);
+		setBounds(0, 0, width, height, false, true);
 	}
-	Rect rect = new Rect ();
-	OS.GetWindowStructureWidths (shellHandle, rect);
-	CGPoint inMinLimits = new CGPoint (), inMaxLimits = new CGPoint ();
-	OS.GetWindowResizeLimits (shellHandle, inMinLimits, inMaxLimits);
-	width = Math.max (width, clientWidth + rect.left + rect.right);
-	height = Math.max (height, clientHeight + rect.top + rect.bottom);
-	inMinLimits.x = width - (rect.left + rect.right);
-	inMinLimits.y = height - (rect.top + rect.bottom);
-	OS.SetWindowResizeLimits (shellHandle, inMinLimits, inMaxLimits);
-	Point size = getSize ();
-	int newWidth = Math.max (size.x, width), newHeight = Math.max (size.y, height);
-	if (newWidth != size.x || newHeight != size.y) setSize (newWidth, newHeight);
 }
 
 /**
@@ -1682,6 +1477,24 @@ public void setMinimumSize (Point size) {
 }
 
 /**
+ * Sets the receiver's modified state as specified by the argument.
+ *
+ * @param modified the new modified state for the receiver
+ *
+ * </ul>
+ * @exception SWTException <ul>
+ *    <li>ERROR_WIDGET_DISPOSED - if the receiver has been disposed</li>
+ *    <li>ERROR_THREAD_INVALID_ACCESS - if not called from the thread that created the receiver</li>
+ * </ul>
+ * 
+ * @since 3.5
+ */
+public void setModified (boolean modified) {
+	checkWidget ();
+	window.setDocumentEdited (modified);
+}
+
+/**
  * Sets the shape of the shell to the region specified
  * by the argument.  When the argument is null, the
  * default shape of the shell is restored.  The shell
@@ -1704,41 +1517,32 @@ public void setMinimumSize (Point size) {
 public void setRegion (Region region) {
 	checkWidget ();
 	if ((style & SWT.NO_TRIM) == 0) return;
+	if (window == null) return;
 	if (region != null && region.isDisposed()) error (SWT.ERROR_INVALID_ARGUMENT);
-	if (region == null) {
-		rgnRect = null;
-	} else {
-		if (rgnRect == null) {
-			rgnRect = new Rect ();
-			OS.GetWindowBounds (shellHandle, (short) OS.kWindowStructureRgn, rgnRect);
-			OS.SetRect (rgnRect, (short) 0, (short) 0, (short) (rgnRect.right - rgnRect.left), (short) (rgnRect.bottom - rgnRect.top));	
-		}
-	}
 	this.region = region;
-	/*
-	* Bug in the Macintosh.  Calling ReshapeCustomWindow() from a
-	* kEventWindowDrawContent handler originating from ShowWindow()
-	* will deadlock.  The fix is to detected this case and only call
-	* ReshapeCustomWindow() after the default handler is done.
-	*/
-	if (drawing) {
-		reshape = true;
+	if (regionPath != null) regionPath.release();
+	regionPath = getPath(region);
+	if (region != null) {
+		window.setBackgroundColor(NSColor.clearColor());
+		window.setOpaque(false);
 	} else {
-		OS.ReshapeCustomWindow (shellHandle);
-		redrawWidget (handle, true);
+		window.setBackgroundColor(NSColor.windowBackgroundColor());
+		window.setOpaque(true);
+	}
+	window.contentView().setNeedsDisplay(true);
+	if (isVisible() && window.hasShadow()) {
+		window.display();
+		window.invalidateShadow();
 	}
 }
 
 public void setText (String string) {
 	checkWidget();
 	if (string == null) error (SWT.ERROR_NULL_ARGUMENT);
+	if (window == null) return;
 	super.setText (string);
-	char [] buffer = new char [string.length ()];
-	string.getChars (0, buffer.length, buffer, 0);
-	int ptr = OS.CFStringCreateWithCharacters (OS.kCFAllocatorDefault, buffer, buffer.length);
-	if (ptr == 0) error (SWT.ERROR_CANNOT_SET_TEXT);
-	OS.SetWindowTitleWithCFString (shellHandle, ptr);
-	OS.CFRelease (ptr);
+	NSString str = NSString.stringWith(string);
+	window.setTitle(str);
 }
 
 public void setVisible (boolean visible) {
@@ -1753,6 +1557,14 @@ public void setVisible (boolean visible) {
 	} else {
 		updateModal ();
 	}
+	if (window == null) {
+		super.setVisible(visible);
+	} else {
+		setWindowVisible (visible, false);
+	}
+}
+
+void setWindowVisible (boolean visible, boolean key) {
 	if (visible) {
 		if ((state & HIDDEN) == 0) return;
 		state &= ~HIDDEN;
@@ -1760,61 +1572,36 @@ public void setVisible (boolean visible) {
 		if ((state & HIDDEN) != 0) return;
 		state |= HIDDEN;
 	}
-	showWithParent = visible;
-	setWindowVisible (visible);
-}
-
-void setWindowVisible (boolean visible) {
-	if (OS.IsWindowVisible (shellHandle) == visible) return;
+	if (window != null && (window.isVisible() == visible)) return;
 	if (visible) {
+		display.clearPool ();
+		if (center && !moved) {
+			if (isDisposed ()) return;			
+			center ();
+		}
 		sendEvent (SWT.Show);
 		if (isDisposed ()) return;
-		int inModalKind = OS.kWindowModalityNone;
-		if ((style & SWT.PRIMARY_MODAL) != 0) inModalKind = OS.kWindowModalityWindowModal;
-		if ((style & SWT.APPLICATION_MODAL) != 0) inModalKind = OS.kWindowModalityAppModal;
-		if ((style & SWT.SYSTEM_MODAL) != 0) inModalKind = OS.kWindowModalitySystemModal;
-		if (inModalKind != OS.kWindowModalityNone) {
-			int inUnavailableWindow = 0;
-			if (parent != null) inUnavailableWindow = OS.GetControlOwner (parent.handle);
-			OS.SetWindowModality (shellHandle, inModalKind, inUnavailableWindow);
-			if (inUnavailableWindow != 0) OS.CollapseWindow (inUnavailableWindow, false);
-		}
-		int topHandle = topHandle ();
-		OS.SetControlVisibility (topHandle, true, false);
-		int [] scope = new int [1];
-		if ((style & SWT.ON_TOP) != 0) {
-			OS.GetWindowActivationScope (shellHandle, scope);
-			OS.SetWindowActivationScope (shellHandle, OS.kWindowActivationScopeNone);
-		}
-
-		int shellHandle = this.shellHandle;
-		OS.RetainWindow (shellHandle);
-		OS.ShowWindow (shellHandle);
-		OS.ReleaseWindow (shellHandle);
-		if (isDisposed()) return;
-		if (minimized != OS.IsWindowCollapsed (shellHandle)) {
-			OS.CollapseWindow (shellHandle, minimized);
-		}
-		if ((style & SWT.ON_TOP) != 0) {
-			OS.SetWindowActivationScope (shellHandle, scope [0]);
-			OS.BringToFront (shellHandle);
+		topView ().setHidden (false);
+		invalidateVisibleRegion();
+		if ((style & (SWT.SHEET)) != 0) {
+			NSApplication application = NSApplication.sharedApplication();
+			application.beginSheet(window, ((Shell)parent).window, null, 0, 0);
+			if (OS.VERSION <= 0x1060 && window.respondsToSelector(OS.sel__setNeedsToUseHeartBeatWindow_)) {
+				OS.objc_msgSend(window.id, OS.sel__setNeedsToUseHeartBeatWindow_, 0);
+			}
 		} else {
-			/*
-			* Bug in the Macintosh.  ShowWindow() does not activate the shell when an ON_TOP
-			* shell is visible. The fix is to detect that the shell was not activated and
-			* activate it.
-			*/
-			if (display.getActiveShell () != this) {
-				Shell[] shells = display.getShells();
-				for (int i = 0; i < shells.length; i++) {
-					Shell shell = shells [i];
-					if ((shell.style & SWT.ON_TOP) != 0 && shell.isVisible ()) {
-						bringToTop(false);
-						break;
-					}
+			// If the parent window is miniaturized, the window will be shown
+			// when its parent is shown.
+			boolean parentMinimized = parent != null && ((Shell)parent).window.isMiniaturized();
+			if (!parentMinimized) {
+				if (key) {
+					makeKeyAndOrderFront ();
+				} else {
+					window.orderFront (null);
 				}
 			}
 		}
+		updateParent (visible);
 		opened = true;
 		if (!moved) {
 			moved = true;
@@ -1831,34 +1618,42 @@ void setWindowVisible (boolean visible) {
 			}
 		}
 	} else {
-		/*
-		* Bug in the Macintosh.  Under certain circumstances, yet to
-		* be determined, calling HideWindow() and then DisposeWindow()
-		* causes a segment fault when an application is exiting.  This
-		* seems to happen to large applications.  The fix is to avoid
-		* calling HideWindow() when a shell is about to be disposed.
-		*/
-		if (!disposed) OS.HideWindow (shellHandle);
-		if (isDisposed ()) return;
-		int topHandle = topHandle ();
-		OS.SetControlVisibility (topHandle, false, false);
-		invalidateVisibleRegion (topHandle);
+		updateParent (visible);
+		if ((style & (SWT.SHEET)) != 0) {
+			NSApplication application = NSApplication.sharedApplication();
+			application.endSheet(window, 0);
+		}
+		window.orderOut (null);
+		topView ().setHidden (true);
+		invalidateVisibleRegion();
 		sendEvent (SWT.Hide);
 	}
-	display.updateQuitMenu ();
+	
+	display.updateQuitMenu();
 }
 
 void setZOrder () {
-	if (scrolledHandle != 0) OS.HIViewAddSubview (scrolledHandle, handle);
+	if (scrollView != null) scrollView.setDocumentView (view);
+	if (window == null) return;
+	window.setContentView (scrollView != null ? scrollView : view);
+	if (fixResize ()) {
+		NSRect rect = window.frame();
+		rect.x = rect.y = 0;
+		window.contentView().setFrame(rect);
+	}
 }
 
 void setZOrder (Control control, boolean above) {
-	if (above) {
-		//NOT DONE - move one window above another
-	 	OS.BringToFront (shellHandle);
-	 } else {
-		int window = control == null ? 0 : OS.GetControlOwner (control.handle);
-		OS.SendBehind (shellHandle, window);
+	if (window == null) return;
+	if (control == null) {
+		if (above) {
+			window.orderFront(null);
+		} else {
+			window.orderBack(null);
+		}
+	} else {
+		NSWindow otherWindow = control.getShell().window;
+		window.orderWindow(above ? OS.NSWindowAbove : OS.NSWindowBelow, otherWindow.windowNumber());
 	}
 }
 
@@ -1869,56 +1664,166 @@ boolean traverseEscape () {
 	return true;
 }
 
-void updateMinimized (boolean minimized) {
-	/*
-	* Need to handle ON_TOP child shells ourselves, since they
-	* are not in the same group hierarchy of this shell.
-	*/
-	Shell [] shells = getShells ();
-	for (int i = 0; i < shells.length; i++) {
-		Shell shell = shells [i];
-		if (this == shell.parent && (shell.style & SWT.ON_TOP) != 0) {
-			if (minimized) {
-				if (shells[i].isVisible ()) {
-					shells[i].showWithParent = true;
-					OS.HideWindow (shell.shellHandle);
-				}
-			} else {
-				if (shells[i].showWithParent) {
-					shells[i].showWithParent = false;
-					OS.ShowWindow (shell.shellHandle);
-				}
-			}
-		}
-	}
-}
-
 void updateModal () {
 	// do nothing
 }
 
+void updateParent (boolean visible) {
+	if (visible) {
+		if (parent != null && parent.getVisible ()) {
+			((Shell)parent).window.addChildWindow (window, OS.NSWindowAbove);
+		}		
+	} else {
+		NSWindow parentWindow = window.parentWindow ();
+		if (parentWindow != null) parentWindow.removeChildWindow (window);
+	}
+	Shell [] shells = getShells ();
+	for (int i = 0; i < shells.length; i++) {
+		Shell shell = shells [i];
+		if (shell.parent == this && shell.getVisible ()) {
+			shell.updateParent (visible);
+		}
+	}
+}
+
 void updateSystemUIMode () {
 	if (!getMonitor ().equals (display.getPrimaryMonitor ())) return;
-	boolean isActive = false;
-	Shell activeShell = display.getActiveShell ();
-	Shell current = this;
-	while (current != null) {
-		if (current.equals (activeShell)) {
-			isActive = true;
-			break;
-		}
-		current = (Shell) current.parent;
-	}
-	if (!isActive) return;
 	if (fullScreen) {
 		int mode = OS.kUIModeAllHidden;
 		if (menuBar != null) {
 			mode = OS.kUIModeContentHidden;
 		}
 		OS.SetSystemUIMode (mode, 0);
+		window.setFrame(fullScreenFrame, true);
 	} else {
 		OS.SetSystemUIMode (OS.kUIModeNormal, 0);
 	}
+}
+
+int /*long*/ view_stringForToolTip_point_userData (int /*long*/ id, int /*long*/ sel, int /*long*/ view, int /*long*/ tag, int /*long*/ point, int /*long*/ userData) {
+	NSPoint pt = new NSPoint();
+	OS.memmove (pt, point, NSPoint.sizeof);
+	Control control = display.findControl (false);
+	if (control == null) return 0;
+	Widget target = control.findTooltip (new NSView (view).convertPoint_toView_ (pt, null));
+	String string = target.tooltipText ();
+	if (string == null) return 0;
+	char[] chars = new char [string.length ()];
+	string.getChars (0, chars.length, chars, 0);
+	int length = fixMnemonic (chars);
+	return NSString.stringWithCharacters (chars, length).id;
+}
+
+void windowDidBecomeKey(int /*long*/ id, int /*long*/ sel, int /*long*/ notification) {
+	super.windowDidBecomeKey(id, sel, notification);
+	Display display = this.display;
+	display.setMenuBar (menuBar);
+	sendEvent (SWT.Activate);
+	if (isDisposed ()) return;
+	Shell parentShell = this;
+	while (parentShell.parent != null) {
+		parentShell = (Shell) parentShell.parent;
+		if (parentShell.fullScreen) {
+			break;
+		}
+	}
+	if (!parentShell.fullScreen || menuBar != null) {
+		updateSystemUIMode ();
+	} else {
+		parentShell.updateSystemUIMode ();
+	}
+}
+
+void windowDidMove(int /*long*/ id, int /*long*/ sel, int /*long*/ notification) {
+	moved = true;
+	sendEvent(SWT.Move);
+}
+
+void windowDidResize(int /*long*/ id, int /*long*/ sel, int /*long*/ notification) {
+	if (fullScreen) {
+		window.setFrame(fullScreenFrame, true);
+		window.contentView().setFrame(fullScreenFrame);
+	}
+	if (fixResize ()) {
+		NSRect rect = window.frame ();
+		rect.x = rect.y = 0;
+		window.contentView ().setFrame (rect);
+	}
+	resized = true;
+	sendEvent (SWT.Resize);
+	if (isDisposed ()) return;
+	if (layout != null) {
+		markLayout (false, false);
+		updateLayout (false);
+	}
+}
+
+void windowDidResignKey(int /*long*/ id, int /*long*/ sel, int /*long*/ notification) {
+	super.windowDidResignKey(id, sel, notification);
+	sendEvent (SWT.Deactivate);
+}
+
+void windowSendEvent (int /*long*/ id, int /*long*/ sel, int /*long*/ event) {
+	NSEvent nsEvent = new NSEvent (event);
+	int type = (int)/*64*/nsEvent.type ();
+	switch (type) {
+		case OS.NSLeftMouseUp:
+		case OS.NSRightMouseUp:
+		case OS.NSOtherMouseUp:
+		case OS.NSMouseMoved:
+			NSView[] hitView = new NSView[1];
+			Control control = display.findControl (false, hitView);
+			if (control != null && (!control.isActive() || !control.isEnabled())) control = null;
+			if (type == OS.NSMouseMoved) {
+				Control trimControl = control;
+				if (trimControl != null && trimControl.isTrim (hitView[0])) trimControl = null;
+				display.checkEnterExit (trimControl, nsEvent, false);
+				if (trimControl != null) trimControl.sendMouseEvent (nsEvent, type, false);
+			}
+			Widget target = null;
+			if (control != null) target = control.findTooltip (nsEvent.locationInWindow());
+			if (display.tooltipControl != control || display.tooltipTarget != target) {
+				Control oldControl = display.tooltipControl;
+				Shell oldShell = oldControl != null && !oldControl.isDisposed() ? oldControl.getShell() : null;
+				Shell shell = control != null && !control.isDisposed() ? control.getShell() : null;
+				if (oldShell != null) oldShell.sendToolTipEvent (false);
+				if (shell != null) shell.sendToolTipEvent (true);
+			}
+			display.tooltipControl = control;
+			display.tooltipTarget = target;
+			break;
+			
+		case OS.NSKeyDown:
+			/**
+			 * Feature in cocoa.  Control+Tab, Ctrl+Shift+Tab, Ctrl+PageDown and Ctrl+PageUp are
+			 * swallowed to handle native traversal. If we find that, force the key event to
+			 * the first responder.
+			 */
+			if ((nsEvent.modifierFlags() & OS.NSControlKeyMask) != 0) {
+				NSString chars = nsEvent.characters();
+				
+				if (chars != null && chars.length() == 1) {
+					int firstChar = (int)/*64*/chars.characterAtIndex(0);
+
+					// Shift-tab appears as control-Y.
+					switch (firstChar) {
+						case '\t':
+						case 25:
+						case OS.NSPageDownFunctionKey:
+						case OS.NSPageUpFunctionKey:
+							window.firstResponder().keyDown(nsEvent);
+							return;
+					}
+				}
+			}
+			break;
+	}
+	super.windowSendEvent (id, sel, event);
+}
+
+boolean windowShouldClose(int /*long*/ id, int /*long*/ sel, int /*long*/ window) {
+	closeWidget ();
+	return false;
 }
 
 }

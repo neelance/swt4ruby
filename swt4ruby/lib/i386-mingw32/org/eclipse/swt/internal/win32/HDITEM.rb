@@ -1,6 +1,6 @@
 require "rjava"
 
-# Copyright (c) 2000, 2006 IBM Corporation and others.
+# Copyright (c) 2000, 2008 IBM Corporation and others.
 # All rights reserved. This program and the accompanying materials
 # are made available under the terms of the Eclipse Public License v1.0
 # which accompanies this distribution, and is available at
@@ -31,6 +31,7 @@ module Org::Eclipse::Swt::Internal::Win32
     alias_method :attr_cxy=, :cxy=
     undef_method :cxy=
     
+    # @field cast=(LPTSTR)
     # long
     attr_accessor :psz_text
     alias_method :attr_psz_text, :psz_text
@@ -38,6 +39,7 @@ module Org::Eclipse::Swt::Internal::Win32
     alias_method :attr_psz_text=, :psz_text=
     undef_method :psz_text=
     
+    # @field cast=(HBITMAP)
     # long
     attr_accessor :hbm
     alias_method :attr_hbm, :hbm
@@ -76,12 +78,14 @@ module Org::Eclipse::Swt::Internal::Win32
     alias_method :attr_i_order=, :i_order=
     undef_method :i_order=
     
+    # @field flags=no_wince
     attr_accessor :type
     alias_method :attr_type, :type
     undef_method :type
     alias_method :attr_type=, :type=
     undef_method :type=
     
+    # @field cast=(void *),flags=no_wince
     # long
     attr_accessor :pv_filter
     alias_method :attr_pv_filter, :pv_filter

@@ -1,6 +1,6 @@
 require "rjava"
 
-# Copyright (c) 2000, 2008 IBM Corporation and others.
+# Copyright (c) 2000, 2009 IBM Corporation and others.
 # All rights reserved. This program and the accompanying materials
 # are made available under the terms of the Eclipse Public License v1.0
 # which accompanies this distribution, and is available at
@@ -13,9 +13,10 @@ module Org::Eclipse::Swt::Widgets
     class_module.module_eval {
       include ::Java::Lang
       include ::Org::Eclipse::Swt::Widgets
-      include_const ::Org::Eclipse::Swt::Internal::Carbon, :OS
       include ::Org::Eclipse::Swt
+      include ::Org::Eclipse::Swt::Accessibility
       include ::Org::Eclipse::Swt::Graphics
+      include ::Org::Eclipse::Swt::Internal::Cocoa
     }
   end
   
@@ -35,10 +36,9 @@ module Org::Eclipse::Swt::Widgets
   # than <code>Canvas</code>.
   # </p><p>
   # Note: The <code>CENTER</code> style, although undefined for composites, has the
-  # same value as <code>EMBEDDED</code> (which is used to embed widgets from other
-  # widget toolkits into SWT).  On some operating systems (GTK, Motif), this may cause
-  # the children of this composite to be obscured.  The <code>EMBEDDED</code> style
-  # is for use by other widget toolkits and should normally never be used.
+  # same value as <code>EMBEDDED</code> which is used to embed widgets from other
+  # widget toolkits into SWT.  On some operating systems (GTK, Motif), this may cause
+  # the children of this composite to be obscured.
   # </p><p>
   # This class may be subclassed by custom control implementors
   # who are building controls that are constructed from aggregates
@@ -63,18 +63,6 @@ module Org::Eclipse::Swt::Widgets
     alias_method :attr_tab_list=, :tab_list=
     undef_method :tab_list=
     
-    attr_accessor :scrolled_visible_rgn
-    alias_method :attr_scrolled_visible_rgn, :scrolled_visible_rgn
-    undef_method :scrolled_visible_rgn
-    alias_method :attr_scrolled_visible_rgn=, :scrolled_visible_rgn=
-    undef_method :scrolled_visible_rgn=
-    
-    attr_accessor :siblings_visible_rgn
-    alias_method :attr_siblings_visible_rgn, :siblings_visible_rgn
-    undef_method :siblings_visible_rgn
-    alias_method :attr_siblings_visible_rgn=, :siblings_visible_rgn=
-    undef_method :siblings_visible_rgn=
-    
     attr_accessor :layout_count
     alias_method :attr_layout_count, :layout_count
     undef_method :layout_count
@@ -91,8 +79,6 @@ module Org::Eclipse::Swt::Widgets
     def initialize
       @layout = nil
       @tab_list = nil
-      @scrolled_visible_rgn = 0
-      @siblings_visible_rgn = 0
       @layout_count = 0
       @background_mode = 0
       super()
@@ -127,12 +113,12 @@ module Org::Eclipse::Swt::Widgets
     # @see SWT#NO_MERGE_PAINTS
     # @see SWT#NO_REDRAW_RESIZE
     # @see SWT#NO_RADIO_GROUP
+    # @see SWT#EMBEDDED
+    # @see SWT#DOUBLE_BUFFERED
     # @see Widget#getStyle
     def initialize(parent, style)
       @layout = nil
       @tab_list = nil
-      @scrolled_visible_rgn = 0
-      @siblings_visible_rgn = 0
       @layout_count = 0
       @background_mode = 0
       super(parent, style)
@@ -140,26 +126,23 @@ module Org::Eclipse::Swt::Widgets
     
     typesig { [] }
     def __get_children
-      buffer = Array.typed(::Java::Short).new(1) { 0 }
-      OS._count_sub_controls(self.attr_handle, buffer)
-      count = buffer[0]
-      children = Array.typed(Control).new(count) { nil }
-      i = 0
+      views = content_view.subviews
+      # 64
+      count_ = RJava.cast_to_int(views.count)
+      children = Array.typed(Control).new(count_) { nil }
+      if ((count_).equal?(0))
+        return children
+      end
       j = 0
-      child = OS._hiview_get_first_subview(self.attr_handle)
-      while (i < count)
-        if (!(child).equal?(0))
-          widget = self.attr_display.get_widget(child)
-          if (!(widget).nil? && !(widget).equal?(self))
-            if (widget.is_a?(Control))
-              children[((j += 1) - 1)] = widget
-            end
-          end
+      i = 0
+      while i < count_
+        widget = self.attr_display.get_widget(views.object_at_index(count_ - i - 1).attr_id)
+        if (!(widget).nil? && !(widget).equal?(self) && widget.is_a?(Control))
+          children[((j += 1) - 1)] = widget
         end
-        child = OS._hiview_get_next_view(child)
         i += 1
       end
-      if ((j).equal?(count))
+      if ((j).equal?(count_))
         return children
       end
       new_children = Array.typed(Control).new(j) { nil }
@@ -172,18 +155,18 @@ module Org::Eclipse::Swt::Widgets
       if ((@tab_list).nil?)
         return nil
       end
-      count = 0
+      count_ = 0
       i = 0
       while i < @tab_list.attr_length
         if (!@tab_list[i].is_disposed)
-          count += 1
+          count_ += 1
         end
         i += 1
       end
-      if ((count).equal?(@tab_list.attr_length))
+      if ((count_).equal?(@tab_list.attr_length))
         return @tab_list
       end
-      new_list = Array.typed(Control).new(count) { nil }
+      new_list = Array.typed(Control).new(count_) { nil }
       index = 0
       i_ = 0
       while i_ < @tab_list.attr_length
@@ -197,11 +180,52 @@ module Org::Eclipse::Swt::Widgets
     end
     
     typesig { [::Java::Int, ::Java::Int] }
-    def call_focus_event_handler(next_handler, the_event)
+    # long
+    # long
+    def accepts_first_responder(id, sel)
       if (!((self.attr_state & CANVAS)).equal?(0))
-        return OS.attr_no_err
+        if (((self.attr_style & SWT::NO_FOCUS)).equal?(0) && hooks_keys)
+          if ((content_view.subviews.count).equal?(0))
+            return true
+          end
+        end
+        return false
       end
-      return super(next_handler, the_event)
+      return super(id, sel)
+    end
+    
+    typesig { [::Java::Int, ::Java::Int] }
+    # long
+    # long
+    # long
+    def accessibility_attribute_names(id, sel)
+      if ((id).equal?(self.attr_view.attr_id))
+        if (!(self.attr_accessible).nil?)
+          # If there is an accessible, it may provide its own list of attributes if it's a lightweight control.
+          # If not, let Cocoa handle it for this view.
+          return_object = self.attr_accessible.internal_accessibility_attribute_names(ACC::CHILDID_SELF)
+          if (!(return_object).nil?)
+            return return_object.attr_id
+          end
+        end
+      end
+      return super(id, sel)
+    end
+    
+    typesig { [::Java::Int, ::Java::Int] }
+    # long
+    # long
+    def accessibility_is_ignored(id, sel)
+      # If we have an accessible and it represents a valid accessible role, this view is not ignored.
+      if (!(self.attr_view).nil? && (id).equal?(self.attr_view.attr_id))
+        if (!(self.attr_accessible).nil?)
+          role = self.attr_accessible.internal_accessibility_attribute_value(OS::NSAccessibilityRoleAttribute, ACC::CHILDID_SELF)
+          if (!(role).nil?)
+            return false
+          end
+        end
+      end
+      return super(id, sel)
     end
     
     typesig { [Array.typed(Control)] }
@@ -312,7 +336,7 @@ module Org::Eclipse::Swt::Widgets
         child = list[i]
         child_list = child.compute_tab_list
         if (!(child_list.attr_length).equal?(0))
-          new_result = Array.typed(Control).new(result.attr_length + child_list.attr_length) { nil }
+          new_result = Array.typed(Widget).new(result.attr_length + child_list.attr_length) { nil }
           System.arraycopy(result, 0, new_result, 0, result.attr_length)
           System.arraycopy(child_list, 0, new_result, result.attr_length, child_list.attr_length)
           result = new_result
@@ -324,92 +348,47 @@ module Org::Eclipse::Swt::Widgets
     
     typesig { [] }
     def create_handle
-      self.attr_state |= CANVAS | GRAB
-      scrolled = !((self.attr_style & (SWT::H_SCROLL | SWT::V_SCROLL))).equal?(0)
+      self.attr_state |= CANVAS
+      scrolled = !((self.attr_style & (SWT::V_SCROLL | SWT::H_SCROLL))).equal?(0)
       if (!scrolled)
         self.attr_state |= THEME_BACKGROUND
       end
-      if (scrolled || !((self.attr_style & SWT::BORDER)).equal?(0))
-        create_scrolled_handle(self.attr_parent.attr_handle)
-      else
-        create_handle(self.attr_parent.attr_handle)
+      rect = NSRect.new
+      if (scrolled || has_border)
+        scroll_widget = SWTScrollView.new.alloc
+        scroll_widget.init_with_frame(rect)
+        scroll_widget.set_draws_background(false)
+        if (!((self.attr_style & SWT::H_SCROLL)).equal?(0))
+          scroll_widget.set_has_horizontal_scroller(true)
+        end
+        if (!((self.attr_style & SWT::V_SCROLL)).equal?(0))
+          scroll_widget.set_has_vertical_scroller(true)
+        end
+        scroll_widget.set_border_type(has_border ? OS::NSBezelBorder : OS::NSNoBorder)
+        self.attr_scroll_view = scroll_widget
+      end
+      widget = SWTCanvasView.new.alloc
+      widget.init_with_frame(rect)
+      # widget.setFocusRingType(OS.NSFocusRingTypeExterior);
+      self.attr_view = widget
+      if (!(self.attr_scroll_view).nil?)
+        content_view_ = self.attr_scroll_view.content_view
+        content_view_.set_autoresizes_subviews(true)
+        self.attr_view.set_autoresizing_mask(OS::NSViewWidthSizable | OS::NSViewHeightSizable)
       end
     end
     
-    typesig { [::Java::Int] }
-    def create_handle(parent_handle)
-      features = OS.attr_k_control_supports_embedding | OS.attr_k_control_supports_focus
-      out_control = Array.typed(::Java::Int).new(1) { 0 }
-      window = OS._get_control_owner(parent_handle)
-      OS._create_user_pane_control(window, nil, features, out_control)
-      if ((out_control[0]).equal?(0))
-        error(SWT::ERROR_NO_HANDLES)
-      end
-      self.attr_handle = out_control[0]
-      OS._hiobject_set_accessibility_ignored(self.attr_handle, true)
-    end
-    
-    typesig { [::Java::Int] }
-    def create_scrolled_handle(parent_handle)
-      features = OS.attr_k_control_supports_embedding
-      out_control = Array.typed(::Java::Int).new(1) { 0 }
-      window = OS._get_control_owner(parent_handle)
-      OS._create_user_pane_control(window, nil, features, out_control)
-      if ((out_control[0]).equal?(0))
-        error(SWT::ERROR_NO_HANDLES)
-      end
-      self.attr_scrolled_handle = out_control[0]
-      out_control[0] = 0
-      features |= OS.attr_k_control_supports_focus
-      OS._create_user_pane_control(window, nil, features, out_control)
-      if ((out_control[0]).equal?(0))
-        error(SWT::ERROR_NO_HANDLES)
-      end
-      self.attr_handle = out_control[0]
-      OS._hiobject_set_accessibility_ignored(self.attr_scrolled_handle, true)
-      OS._hiobject_set_accessibility_ignored(self.attr_handle, true)
-    end
-    
-    typesig { [::Java::Int, ::Java::Int] }
-    def draw_background(control, context)
-      if ((control).equal?(self.attr_scrolled_handle))
-        parent = self
-        shell = get_shell
-        if (!(shell).equal?(self))
-          parent = self.attr_parent
-        end
-        draw_background = ((self.attr_style & SWT::TRANSPARENT)).equal?(0)
-        if (((self.attr_style & SWT::NO_FOCUS)).equal?(0) && hooks_keys)
-          parent.draw_focus(control, context, has_focus && draw_focus_ring, has_border, draw_background, inset)
-        else
-          if (has_border)
-            parent.draw_focus(control, context, false, has_border, draw_background, inset)
-          else
-            parent.fill_background(control, context, nil)
-          end
-        end
-      else
-        if (!((self.attr_state & CANVAS)).equal?(0))
-          if (((self.attr_style & (SWT::NO_BACKGROUND | SWT::TRANSPARENT))).equal?(0))
-            fill_background(control, context, nil)
-          end
-        end
-      end
-    end
-    
-    typesig { [::Java::Boolean] }
-    def enable_widget(enabled)
-      # NOT DONE - take into account current scroll bar state
-      if (!((self.attr_state & CANVAS)).equal?(0))
-        if (!(self.attr_horizontal_bar).nil?)
-          self.attr_horizontal_bar.enable_widget(enabled)
-        end
-        if (!(self.attr_vertical_bar).nil?)
-          self.attr_vertical_bar.enable_widget(enabled)
-        end
+    typesig { [::Java::Int, NSGraphicsContext, NSRect] }
+    # long
+    def draw_background(id, context, rect)
+      if (!(id).equal?(self.attr_view.attr_id))
         return
       end
-      super(enabled)
+      if (!((self.attr_state & CANVAS)).equal?(0))
+        if (((self.attr_style & SWT::NO_BACKGROUND)).equal?(0))
+          fill_background(self.attr_view, context, rect, -1)
+        end
+      end
     end
     
     typesig { [] }
@@ -455,19 +434,19 @@ module Org::Eclipse::Swt::Widgets
       if ((@tab_list).nil?)
         return
       end
-      count = 0
+      count_ = 0
       i = 0
       while i < @tab_list.attr_length
         if ((@tab_list[i]).equal?(control))
-          count += 1
+          count_ += 1
         end
         i += 1
       end
-      if ((count).equal?(0))
+      if ((count_).equal?(0))
         return
       end
       new_list = nil
-      length = @tab_list.attr_length - count
+      length = @tab_list.attr_length - count_
       if (!(length).equal?(0))
         new_list = Array.typed(Control).new(length) { nil }
         index = 0
@@ -530,15 +509,6 @@ module Org::Eclipse::Swt::Widgets
     end
     
     typesig { [] }
-    def get_children_count
-      # NOTE:  The current implementation will count
-      # non-registered children.
-      count = Array.typed(::Java::Short).new(1) { 0 }
-      OS._count_sub_controls(self.attr_handle, count)
-      return count[0]
-    end
-    
-    typesig { [] }
     # Returns layout which is associated with the receiver, or
     # null if one has not been set.
     # 
@@ -588,16 +558,16 @@ module Org::Eclipse::Swt::Widgets
       check_widget
       tab_list = __get_tab_list
       if ((tab_list).nil?)
-        count = 0
+        count_ = 0
         list = __get_children
         i = 0
         while i < list.attr_length
           if (list[i].is_tab_group)
-            count += 1
+            count_ += 1
           end
           i += 1
         end
-        tab_list = Array.typed(Control).new(count) { nil }
+        tab_list = Array.typed(Control).new(count_) { nil }
         index = 0
         i_ = 0
         while i_ < list.attr_length
@@ -610,164 +580,19 @@ module Org::Eclipse::Swt::Widgets
       return tab_list
     end
     
-    typesig { [::Java::Int, ::Java::Boolean] }
-    def get_visible_region(control, clip_children)
-      if (!clip_children && (control).equal?(self.attr_handle))
-        if ((@siblings_visible_rgn).equal?(0))
-          @siblings_visible_rgn = OS._new_rgn
-          calculate_visible_region(control, @siblings_visible_rgn, clip_children)
-        end
-        result = OS._new_rgn
-        OS._copy_rgn(@siblings_visible_rgn, result)
-        return result
-      end
-      if ((control).equal?(self.attr_scrolled_handle))
-        if (!clip_children)
-          return super(control, clip_children)
-        end
-        if ((@scrolled_visible_rgn).equal?(0))
-          @scrolled_visible_rgn = OS._new_rgn
-          calculate_visible_region(control, @scrolled_visible_rgn, clip_children)
-        end
-        result = OS._new_rgn
-        OS._copy_rgn(@scrolled_visible_rgn, result)
-        return result
-      end
-      return super(control, clip_children)
-    end
-    
-    typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
-    def k_event_control_click(next_handler, the_event, user_data)
-      result = super(next_handler, the_event, user_data)
-      if ((result).equal?(OS.attr_no_err))
-        return result
-      end
-      if (!((self.attr_state & CANVAS)).equal?(0))
-        if (!is_enabled)
-          return result
-        end
-        if (((self.attr_style & SWT::NO_FOCUS)).equal?(0) && hooks_keys)
-          the_control = Array.typed(::Java::Int).new(1) { 0 }
-          window = OS._get_control_owner(self.attr_handle)
-          OS._get_keyboard_focus(window, the_control)
-          if (!(self.attr_handle).equal?(the_control[0]))
-            count = Array.typed(::Java::Short).new(1) { 0 }
-            OS._count_sub_controls(self.attr_handle, count)
-            if ((count[0]).equal?(0))
-              if ((OS._set_keyboard_focus(window, self.attr_handle, RJava.cast_to_short(focus_part))).equal?(OS.attr_no_err))
-                return OS.attr_no_err
-              end
-            end
-          end
-        end
-      end
-      return result
-    end
-    
-    typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
-    def k_event_control_get_focus_part(next_handler, the_event, user_data)
-      if (!((self.attr_state & CANVAS)).equal?(0))
-        return OS.attr_no_err
-      end
-      return super(next_handler, the_event, user_data)
-    end
-    
-    typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
-    def k_event_control_set_focus_part(next_handler, the_event, user_data)
-      result = super(next_handler, the_event, user_data)
-      if ((result).equal?(OS.attr_no_err))
-        if (!((self.attr_state & CANVAS)).equal?(0))
-          if (!(self.attr_scrolled_handle).equal?(0))
-            if (((self.attr_style & SWT::NO_FOCUS)).equal?(0) && hooks_keys)
-              part = Array.typed(::Java::Short).new(1) { 0 }
-              OS._get_event_parameter(the_event, OS.attr_k_event_param_control_part, OS.attr_type_control_part_code, nil, 2, nil, part)
-              redraw_widget(self.attr_scrolled_handle, false)
-            end
-          end
-        end
-      end
-      return result
-    end
-    
-    typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
-    def k_event_mouse_down(next_handler, the_event, user_data)
-      result = super(next_handler, the_event, user_data)
-      if ((result).equal?(OS.attr_no_err))
-        return result
-      end
-      if (!((self.attr_state & CANVAS)).equal?(0))
-        if (!((self.attr_style & SWT::NO_FOCUS)).equal?(0))
-          shell = get_shell
-          bits = SWT::ON_TOP | SWT::NO_FOCUS
-          if (((shell.attr_style & bits)).equal?(bits))
-            return OS.attr_no_err
-          end
-        end
-      end
-      return result
-    end
-    
-    typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
-    def k_event_raw_key_pressed(next_handler, the_event, user_data)
-      # Feature in the Macintosh.  For some reason, the default handler
-      # does not issue kEventTextInputUnicodeForKeyEvent when the user
-      # types Command+Space.  The fix is to look for this case and
-      # send the key from kEventRawKeyDown instead.
-      # 
-      # NOTE: This code relies on Command+Space being consumed and
-      # will deliver two events if this ever changes.
-      if (!((self.attr_state & CANVAS)).equal?(0))
-        key_code = Array.typed(::Java::Int).new(1) { 0 }
-        OS._get_event_parameter(the_event, OS.attr_k_event_param_key_code, OS.attr_type_uint32, nil, key_code.attr_length * 4, nil, key_code)
-        # Space
-        if ((key_code[0]).equal?(49))
-          modifiers = Array.typed(::Java::Int).new(1) { 0 }
-          OS._get_event_parameter(the_event, OS.attr_k_event_param_key_modifiers, OS.attr_type_uint32, nil, 4, nil, modifiers)
-          if ((modifiers[0]).equal?(OS.attr_cmd_key))
-            if (!send_key_event(SWT::KeyDown, the_event))
-              return OS.attr_no_err
-            end
-          end
-        end
-      end
-      return OS.attr_event_not_handled_err
-    end
-    
-    typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
-    def k_event_unicode_key_pressed(next_handler, the_event, user_data)
-      result = super(next_handler, the_event, user_data)
-      if (!((self.attr_state & CANVAS)).equal?(0))
-        keyboard_event = Array.typed(::Java::Int).new(1) { 0 }
-        OS._get_event_parameter(the_event, OS.attr_k_event_param_text_input_send_keyboard_event, OS.attr_type_event_ref, nil, keyboard_event.attr_length * 4, nil, keyboard_event)
-        key_code = Array.typed(::Java::Int).new(1) { 0 }
-        OS._get_event_parameter(keyboard_event[0], OS.attr_k_event_param_key_code, OS.attr_type_uint32, nil, key_code.attr_length * 4, nil, key_code)
-        case (key_code[0])
-        # KP Enter
-        when 76, 36
-          # Return
-          # 
-          # Feature in the Macintosh.  The default behaviour when the return key is pressed is
-          # to select the default button.  This is not the expected behaviour for Composite and
-          # its subclasses.  The fix is to avoid calling the default handler.
-          return OS.attr_no_err
-        end
-      end
-      return result
-    end
-    
     typesig { [] }
     def hooks_keys
       return hooks(SWT::KeyDown) || hooks(SWT::KeyUp)
     end
     
-    typesig { [::Java::Int] }
-    def invalidate_children_visible_region(control)
+    typesig { [] }
+    def invalidate_children_visible_region
       children = __get_children
       i = 0
       while i < children.attr_length
         child = children[i]
-        child.reset_visible_region(control)
-        child.invalidate_children_visible_region(control)
+        child.reset_visible_region
+        child.invalidate_children_visible_region
         i += 1
       end
     end
@@ -794,12 +619,62 @@ module Org::Eclipse::Swt::Widgets
       return !(find_deferred_control).nil?
     end
     
+    typesig { [::Java::Int, ::Java::Int] }
+    # long
+    # long
+    def is_opaque(id, sel)
+      if (!((self.attr_state & CANVAS)).equal?(0))
+        if ((id).equal?(self.attr_view.attr_id))
+          if ((self.attr_region).nil? && !(self.attr_background).nil? && (self.attr_background[3]).equal?(1))
+            return true
+          end
+        end
+      end
+      return super(id, sel)
+    end
+    
     typesig { [] }
     def is_tab_group
       if (!((self.attr_state & CANVAS)).equal?(0))
         return true
       end
       return super
+    end
+    
+    typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
+    # long
+    # long
+    # long
+    def key_down(id, sel, the_event)
+      if ((self.attr_view.window.first_responder.attr_id).equal?(id))
+        if (!((self.attr_state & CANVAS)).equal?(0))
+          s = self.get_shell
+          array = NSArray.array_with_object(NSEvent.new(the_event))
+          s.attr_key_input_happened = false
+          self.attr_view.interpret_key_events(array)
+          if (ime_in_composition)
+            return
+          end
+          if (!s.attr_key_input_happened)
+            ns_event = NSEvent.new(the_event)
+            consume = Array.typed(::Java::Boolean).new(1) { false }
+            if (translate_traversal(ns_event.key_code, ns_event, consume))
+              return
+            end
+            if (is_disposed)
+              return
+            end
+            if (!send_key_event(ns_event, SWT::KeyDown))
+              return
+            end
+            if (consume[0])
+              return
+            end
+          end
+          return
+        end
+      end
+      super(id, sel, the_event)
     end
     
     typesig { [] }
@@ -1024,6 +899,48 @@ module Org::Eclipse::Swt::Widgets
       return Point.new(width, height)
     end
     
+    typesig { [::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int] }
+    # long
+    # long
+    # long
+    def mouse_event(id, sel, the_event, type)
+      result = super(id, sel, the_event, type)
+      return ((self.attr_state & CANVAS)).equal?(0) ? result : !(NSEvent.new(the_event).type).equal?(OS::NSLeftMouseDown)
+    end
+    
+    typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
+    # long
+    # long
+    # long
+    def page_down(id, sel, sender)
+      if (!((self.attr_state & CANVAS)).equal?(0))
+        return
+      end
+      super(id, sel, sender)
+    end
+    
+    typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
+    # long
+    # long
+    # long
+    def page_up(id, sel, sender)
+      if (!((self.attr_state & CANVAS)).equal?(0))
+        return
+      end
+      super(id, sel, sender)
+    end
+    
+    typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
+    # long
+    # long
+    # long
+    def reflect_scrolled_clip_view(id, sel, a_clip_view)
+      if (!((self.attr_state & CANVAS)).equal?(0))
+        return
+      end
+      super(id, sel, a_clip_view)
+    end
+    
     typesig { [::Java::Boolean] }
     def release_children(destroy)
       children = __get_children
@@ -1041,13 +958,6 @@ module Org::Eclipse::Swt::Widgets
     typesig { [] }
     def release_widget
       super
-      if (!(@scrolled_visible_rgn).equal?(0))
-        OS._dispose_rgn(@scrolled_visible_rgn)
-      end
-      if (!(@siblings_visible_rgn).equal?(0))
-        OS._dispose_rgn(@siblings_visible_rgn)
-      end
-      @siblings_visible_rgn = @scrolled_visible_rgn = 0
       @layout = nil
       @tab_list = nil
     end
@@ -1057,17 +967,68 @@ module Org::Eclipse::Swt::Widgets
       fix_tab_list(control)
     end
     
-    typesig { [::Java::Int] }
-    def reset_visible_region(control)
-      if (!(@scrolled_visible_rgn).equal?(0))
-        OS._dispose_rgn(@scrolled_visible_rgn)
-        @scrolled_visible_rgn = 0
+    typesig { [] }
+    def resized
+      super
+      if (!(@layout).nil?)
+        mark_layout(false, false)
+        update_layout(false)
       end
-      if (!(@siblings_visible_rgn).equal?(0))
-        OS._dispose_rgn(@siblings_visible_rgn)
-        @siblings_visible_rgn = 0
+    end
+    
+    typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
+    # long
+    # long
+    # long
+    def scroll_wheel(id, sel, the_event)
+      if (!((self.attr_state & CANVAS)).equal?(0))
+        view = !(self.attr_scroll_view).nil? ? self.attr_scroll_view : self.attr_view
+        if ((id).equal?(view.attr_id))
+          ns_event = NSEvent.new(the_event)
+          # double
+          delta = ns_event.delta_y
+          if (!(delta).equal?(0))
+            if (hooks(SWT::MouseWheel) || filters(SWT::MouseWheel))
+              if (!send_mouse_event(ns_event, SWT::MouseWheel, true))
+                return
+              end
+            end
+          end
+          handled = false
+          bar = self.attr_vertical_bar
+          if (!(delta).equal?(0) && !(bar).nil? && bar.get_enabled)
+            if (-1 < delta && delta < 0)
+              delta = -1
+            end
+            if (0 < delta && delta < 1)
+              delta = 1
+            end
+            selection = Math.max(0, RJava.cast_to_int((0.5 + bar.get_selection - bar.get_increment * delta)))
+            bar.set_selection(selection)
+            event = Event.new
+            event.attr_detail = delta > 0 ? SWT::PAGE_UP : SWT::PAGE_DOWN
+            bar.send_event(SWT::Selection, event)
+            handled = true
+          end
+          bar = self.attr_horizontal_bar
+          delta = ns_event.delta_x
+          if (!(delta).equal?(0) && !(bar).nil? && bar.get_enabled)
+            selection = Math.max(0, RJava.cast_to_int((0.5 + bar.get_selection - bar.get_increment * delta)))
+            bar.set_selection(selection)
+            event = Event.new
+            event.attr_detail = delta > 0 ? SWT::PAGE_UP : SWT::PAGE_DOWN
+            bar.send_event(SWT::Selection, event)
+            handled = true
+          end
+          if (!handled)
+            view.superview.scroll_wheel(ns_event)
+          end
+          return
+        end
+        call_super(id, sel, the_event)
+        return
       end
-      super(control)
+      super(id, sel, the_event)
     end
     
     typesig { [::Java::Int] }
@@ -1095,16 +1056,6 @@ module Org::Eclipse::Swt::Widgets
         children[i].update_background_mode
         i += 1
       end
-    end
-    
-    typesig { [::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Boolean, ::Java::Boolean, ::Java::Boolean] }
-    def set_bounds(x, y, width, height, move, resize, events)
-      result = super(x, y, width, height, move, resize, events)
-      if (!(@layout).nil? && !((result & RESIZED)).equal?(0))
-        mark_layout(false, false)
-        update_layout(false)
-      end
-      return result
     end
     
     typesig { [] }
@@ -1241,7 +1192,7 @@ module Org::Eclipse::Swt::Widgets
       @tab_list = tab_list
     end
     
-    typesig { [::Java::Int, ::Java::Int] }
+    typesig { [::Java::Int, NSEvent] }
     def traversal_code(key, the_event)
       if (!((self.attr_state & CANVAS)).equal?(0))
         if (!((self.attr_style & SWT::NO_FOCUS)).equal?(0))
@@ -1261,6 +1212,18 @@ module Org::Eclipse::Swt::Widgets
       i = 0
       while i < children.attr_length
         children[i].update_background_mode
+        i += 1
+      end
+    end
+    
+    typesig { [::Java::Boolean] }
+    def update_cursor_rects(enabled)
+      super(enabled)
+      children = __get_children
+      i = 0
+      while i < children.attr_length
+        control = children[i]
+        control.update_cursor_rects(enabled && control.is_enabled)
         i += 1
       end
     end

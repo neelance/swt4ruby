@@ -1,6 +1,6 @@
 require "rjava"
 
-# Copyright (c) 2000, 2006 IBM Corporation and others.
+# Copyright (c) 2000, 2008 IBM Corporation and others.
 # All rights reserved. This program and the accompanying materials
 # are made available under the terms of the Eclipse Public License v1.0
 # which accompanies this distribution, and is available at
@@ -20,12 +20,14 @@ module Org::Eclipse::Swt::Internal::Win32
     include_class_members NMTVDISPINFOImports
     
     # TVITEM item;
+    # @field accessor=item.mask
     attr_accessor :mask
     alias_method :attr_mask, :mask
     undef_method :mask
     alias_method :attr_mask=, :mask=
     undef_method :mask=
     
+    # @field accessor=item.hItem,cast=(HTREEITEM)
     # long
     attr_accessor :h_item
     alias_method :attr_h_item, :h_item
@@ -33,18 +35,21 @@ module Org::Eclipse::Swt::Internal::Win32
     alias_method :attr_h_item=, :h_item=
     undef_method :h_item=
     
+    # @field accessor=item.state
     attr_accessor :state
     alias_method :attr_state, :state
     undef_method :state
     alias_method :attr_state=, :state=
     undef_method :state=
     
+    # @field accessor=item.stateMask
     attr_accessor :state_mask
     alias_method :attr_state_mask, :state_mask
     undef_method :state_mask
     alias_method :attr_state_mask=, :state_mask=
     undef_method :state_mask=
     
+    # @field accessor=item.pszText,cast=(LPTSTR)
     # long
     attr_accessor :psz_text
     alias_method :attr_psz_text, :psz_text
@@ -52,30 +57,35 @@ module Org::Eclipse::Swt::Internal::Win32
     alias_method :attr_psz_text=, :psz_text=
     undef_method :psz_text=
     
+    # @field accessor=item.cchTextMax
     attr_accessor :cch_text_max
     alias_method :attr_cch_text_max, :cch_text_max
     undef_method :cch_text_max
     alias_method :attr_cch_text_max=, :cch_text_max=
     undef_method :cch_text_max=
     
+    # @field accessor=item.iImage
     attr_accessor :i_image
     alias_method :attr_i_image, :i_image
     undef_method :i_image
     alias_method :attr_i_image=, :i_image=
     undef_method :i_image=
     
+    # @field accessor=item.iSelectedImage
     attr_accessor :i_selected_image
     alias_method :attr_i_selected_image, :i_selected_image
     undef_method :i_selected_image
     alias_method :attr_i_selected_image=, :i_selected_image=
     undef_method :i_selected_image=
     
+    # @field accessor=item.cChildren
     attr_accessor :c_children
     alias_method :attr_c_children, :c_children
     undef_method :c_children
     alias_method :attr_c_children=, :c_children=
     undef_method :c_children=
     
+    # @field accessor=item.lParam
     # long
     attr_accessor :l_param
     alias_method :attr_l_param, :l_param

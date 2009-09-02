@@ -1,6 +1,6 @@
 require "rjava"
 
-# Copyright (c) 2000, 2008 IBM Corporation and others.
+# Copyright (c) 2000, 2009 IBM Corporation and others.
 # All rights reserved. This program and the accompanying materials
 # are made available under the terms of the Eclipse Public License v1.0
 # which accompanies this distribution, and is available at
@@ -45,6 +45,7 @@ module Org::Eclipse::Swt::Widgets
   # @see <a href="http://www.eclipse.org/swt/">Sample code and further information</a>
   # 
   # @since 3.2
+  # @noextend This class is not intended to be subclassed by clients.
   class ExpandBar < ExpandBarImports.const_get :Composite
     include_class_members ExpandBarImports
     
@@ -109,6 +110,7 @@ module Org::Eclipse::Swt::Widgets
     # <li>ERROR_INVALID_SUBCLASS - if this class is not an allowed subclass</li>
     # </ul>
     # 
+    # @see SWT#V_SCROLL
     # @see Widget#checkSubclass
     # @see Widget#getStyle
     def initialize(parent, style)
@@ -871,6 +873,8 @@ module Org::Eclipse::Swt::Widgets
     end
     
     typesig { [::Java::Int, ::Java::Int] }
+    # long
+    # long
     def _wm_mouseleave(w_param, l_param)
       result = super(w_param, l_param)
       if (!(result).nil?)
@@ -910,6 +914,13 @@ module Org::Eclipse::Swt::Widgets
         i += 1
       end
       return result
+    end
+    
+    typesig { [::Java::Int, ::Java::Int] }
+    # long
+    # long
+    def _wm_mousewheel(w_param, l_param)
+      return wm_scroll_wheel(true, w_param, l_param)
     end
     
     typesig { [::Java::Int, ::Java::Int] }

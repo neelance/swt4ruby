@@ -15,6 +15,12 @@ import org.eclipse.swt.internal.C;
 import org.eclipse.swt.internal.mozilla.*;
 import org.eclipse.swt.widgets.*;
 
+/**
+ * This class implements the nsIHelperAppLauncherDialog interface for mozilla
+ * versions 1.4 - 1.8.x.  For mozilla versions >= 1.9 this interface is
+ * implemented by class HelperAppLauncherDialog_1_9.  HelperAppLauncherDialogFactory
+ * determines at runtime which of these classes to instantiate. 
+ */
 class HelperAppLauncherDialog {
 	XPCOMObject supports;
 	XPCOMObject helperAppLauncherDialog;
@@ -98,28 +104,19 @@ int Release () {
 
 int Show (long /*int*/ aLauncher, long /*int*/ aContext, int aReason) {
 	/*
-	* The interface for nsIHelperAppLauncher changed in GRE versions 1.8 and 1.9.  Query for
-	* each of these interfaces in turn until one is found.
-	*/
+	 * The interface for nsIHelperAppLauncher changed as of mozilla 1.8.  Query the received
+	 * nsIHelperAppLauncher for the new interface, and if it is not found then fall back to
+	 * the old interface. 
+	 */
 	nsISupports supports = new nsISupports (aLauncher);
 	long /*int*/[] result = new long /*int*/[1];
-	int rc = supports.QueryInterface (nsIHelperAppLauncher_1_9.NS_IHELPERAPPLAUNCHER_IID, result);
-	if (rc == 0) {
-		nsIHelperAppLauncher_1_9 helperAppLauncher = new nsIHelperAppLauncher_1_9 (aLauncher);
-		rc = helperAppLauncher.SaveToDisk (0, 0);
-		helperAppLauncher.Release ();
-		return rc;
-	}
-
-	result[0] = 0;
-	rc = supports.QueryInterface (nsIHelperAppLauncher_1_8.NS_IHELPERAPPLAUNCHER_IID, result);
-	if (rc == 0) {
+	int rc = supports.QueryInterface (nsIHelperAppLauncher_1_8.NS_IHELPERAPPLAUNCHER_IID, result);
+	if (rc == XPCOM.NS_OK) {	/* >= 1.8 */
 		nsIHelperAppLauncher_1_8 helperAppLauncher = new nsIHelperAppLauncher_1_8 (aLauncher);
 		rc = helperAppLauncher.SaveToDisk (0, 0);
 		helperAppLauncher.Release ();
 		return rc;
 	}
-
 	nsIHelperAppLauncher helperAppLauncher = new nsIHelperAppLauncher (aLauncher);	/* < 1.8 */
 	return helperAppLauncher.SaveToDisk (0, 0);
 }
@@ -141,28 +138,20 @@ int PromptForSaveToFile (long /*int*/ arg0, long /*int*/ arg1, long /*int*/ arg2
 	 * The interface for nsIHelperAppLauncher changed as of mozilla 1.8, so the first
 	 * argument must be queried for both the old and new nsIHelperAppLauncher interfaces. 
 	 */
- 	boolean using_1_8 = false, using_1_9 = false;
+ 	boolean using_1_8 = false;
 	nsISupports support = new nsISupports (arg0);
 	long /*int*/[] result = new long /*int*/[1];
 	int rc = support.QueryInterface (nsIHelperAppLauncher_1_8.NS_IHELPERAPPLAUNCHER_IID, result);
-	if (rc == 0) {
+	if (rc == XPCOM.NS_OK) {
 		using_1_8 = true;
 		hasLauncher = true;
 		new nsISupports (result[0]).Release ();
 	} else {
 		result[0] = 0;
-		rc = support.QueryInterface (nsIHelperAppLauncher_1_9.NS_IHELPERAPPLAUNCHER_IID, result);
-		if (rc == 0) {
-			using_1_9 = true;
+		rc = support.QueryInterface (nsIHelperAppLauncher.NS_IHELPERAPPLAUNCHER_IID, result);
+		if (rc == XPCOM.NS_OK) {
 			hasLauncher = true;
 			new nsISupports (result[0]).Release ();
-		} else {
-			result[0] = 0;
-			rc = support.QueryInterface (nsIHelperAppLauncher.NS_IHELPERAPPLAUNCHER_IID, result);
-			if (rc == 0) {
-				hasLauncher = true;
-				new nsISupports (result[0]).Release ();
-			}
 		}
 	}
 	result[0] = 0;
@@ -197,9 +186,6 @@ int PromptForSaveToFile (long /*int*/ arg0, long /*int*/ arg1, long /*int*/ arg2
 		if (hasLauncher) {
 			if (using_1_8) {
 				nsIHelperAppLauncher_1_8 launcher = new nsIHelperAppLauncher_1_8 (arg0);
-				rc = launcher.Cancel (XPCOM.NS_BINDING_ABORTED);
-			} else if (using_1_9) {
-				nsIHelperAppLauncher_1_9 launcher = new nsIHelperAppLauncher_1_9 (arg0);
 				rc = launcher.Cancel (XPCOM.NS_BINDING_ABORTED);
 			} else {
 				nsIHelperAppLauncher launcher = new nsIHelperAppLauncher (arg0);

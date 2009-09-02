@@ -528,6 +528,12 @@ public Image(Device device, InputStream stream) {
 public Image(Device device, String filename) {
 	super(device);
 	if (filename == null) SWT.error(SWT.ERROR_NULL_ARGUMENT);
+	initNative(filename);
+	if (this.pixmap == 0) init(new ImageData(filename));
+	init();
+}
+
+void initNative(String filename) {
 	try {
 		int length = filename.length ();
 		char [] chars = new char [length];
@@ -566,11 +572,8 @@ public Image(Device device, String filename) {
 			this.pixmap = pixmap_return[0];
 			if (pixmap == 0) SWT.error(SWT.ERROR_NO_HANDLES);
 			OS.g_object_unref (pixbuf);
-			return;
 		}
 	} catch (SWTException e) {}
-	init(new ImageData(filename));
-	init();
 }
 
 void createAlphaMask (int width, int height) {
@@ -849,8 +852,7 @@ public ImageData getImageData() {
 	OS.g_object_unref(pixbuf);
 
 	PaletteData palette = new PaletteData(0xFF0000, 0xFF00, 0xFF);
-	ImageData data = new ImageData(width, height, 24, palette);
-	data.data = srcData;
+	ImageData data = new ImageData(width, height, 24, palette, 4, srcData);
 	data.bytesPerLine = stride;
 
 	if (transparentPixel == -1 && type == SWT.ICON && mask != 0) {

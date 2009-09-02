@@ -1,6 +1,6 @@
 require "rjava"
 
-# Copyright (c) 2000, 2006 IBM Corporation and others.
+# Copyright (c) 2000, 2008 IBM Corporation and others.
 # All rights reserved. This program and the accompanying materials
 # are made available under the terms of the Eclipse Public License v1.0
 # which accompanies this distribution, and is available at
@@ -25,6 +25,7 @@ module Org::Eclipse::Swt::Internal::Win32
     alias_method :attr_l_struct_size=, :l_struct_size=
     undef_method :l_struct_size=
     
+    # @field cast=(LPTSTR)
     # long
     attr_accessor :lp_out_string
     alias_method :attr_lp_out_string, :lp_out_string
@@ -32,6 +33,7 @@ module Org::Eclipse::Swt::Internal::Win32
     alias_method :attr_lp_out_string=, :lp_out_string=
     undef_method :lp_out_string=
     
+    # @field cast=(UINT  *)
     # long
     attr_accessor :lp_order
     alias_method :attr_lp_order, :lp_order
@@ -39,6 +41,7 @@ module Org::Eclipse::Swt::Internal::Win32
     alias_method :attr_lp_order=, :lp_order=
     undef_method :lp_order=
     
+    # @field cast=(int  *)
     # long
     attr_accessor :lp_dx
     alias_method :attr_lp_dx, :lp_dx
@@ -46,6 +49,7 @@ module Org::Eclipse::Swt::Internal::Win32
     alias_method :attr_lp_dx=, :lp_dx=
     undef_method :lp_dx=
     
+    # @field cast=(int  *)
     # long
     attr_accessor :lp_caret_pos
     alias_method :attr_lp_caret_pos, :lp_caret_pos
@@ -53,6 +57,7 @@ module Org::Eclipse::Swt::Internal::Win32
     alias_method :attr_lp_caret_pos=, :lp_caret_pos=
     undef_method :lp_caret_pos=
     
+    # @field cast=(LPSTR)
     # long
     attr_accessor :lp_class
     alias_method :attr_lp_class, :lp_class
@@ -60,6 +65,7 @@ module Org::Eclipse::Swt::Internal::Win32
     alias_method :attr_lp_class=, :lp_class=
     undef_method :lp_class=
     
+    # @field cast=(LPWSTR)
     # long
     attr_accessor :lp_glyphs
     alias_method :attr_lp_glyphs, :lp_glyphs

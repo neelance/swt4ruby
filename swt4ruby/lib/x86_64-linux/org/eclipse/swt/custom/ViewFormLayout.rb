@@ -1,6 +1,6 @@
 require "rjava"
 
-# Copyright (c) 2000, 2005 IBM Corporation and others.
+# Copyright (c) 2000, 2009 IBM Corporation and others.
 # All rights reserved. This program and the accompanying materials
 # are made available under the terms of the Eclipse Public License v1.0
 # which accompanies this distribution, and is available at
@@ -225,9 +225,21 @@ module Org::Eclipse::Swt::Custom
         end
         content.set_bounds(rect.attr_x + form.attr_margin_width + form.attr_highlight, y, rect.attr_width - 2 * form.attr_margin_width - 2 * form.attr_highlight, rect.attr_y + rect.attr_height - y - form.attr_margin_height - form.attr_highlight)
       end
-      if (!(old_seperator).equal?(-1) && !(form.attr_separator).equal?(-1))
-        t = Math.min(form.attr_separator, old_seperator)
-        b = Math.max(form.attr_separator, old_seperator)
+      if (!(old_seperator).equal?(form.attr_separator))
+        t = 0
+        b = 0
+        if ((old_seperator).equal?(-1))
+          t = form.attr_separator
+          b = form.attr_separator + 1
+        else
+          if ((form.attr_separator).equal?(-1))
+            t = old_seperator
+            b = old_seperator + 1
+          else
+            t = Math.min(form.attr_separator, old_seperator)
+            b = Math.max(form.attr_separator, old_seperator)
+          end
+        end
         form.redraw(form.attr_border_left, t, form.get_size.attr_x - form.attr_border_left - form.attr_border_right, b - t, false)
       end
     end

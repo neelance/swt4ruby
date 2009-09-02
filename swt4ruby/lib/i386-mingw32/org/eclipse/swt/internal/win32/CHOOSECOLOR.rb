@@ -1,6 +1,6 @@
 require "rjava"
 
-# Copyright (c) 2000, 2006 IBM Corporation and others.
+# Copyright (c) 2000, 2008 IBM Corporation and others.
 # All rights reserved. This program and the accompanying materials
 # are made available under the terms of the Eclipse Public License v1.0
 # which accompanies this distribution, and is available at
@@ -25,6 +25,7 @@ module Org::Eclipse::Swt::Internal::Win32
     alias_method :attr_l_struct_size=, :l_struct_size=
     undef_method :l_struct_size=
     
+    # @field cast=(HWND)
     # long
     attr_accessor :hwnd_owner
     alias_method :attr_hwnd_owner, :hwnd_owner
@@ -32,6 +33,7 @@ module Org::Eclipse::Swt::Internal::Win32
     alias_method :attr_hwnd_owner=, :hwnd_owner=
     undef_method :hwnd_owner=
     
+    # @field cast=(HANDLE)
     # long
     attr_accessor :h_instance
     alias_method :attr_h_instance, :h_instance
@@ -45,6 +47,7 @@ module Org::Eclipse::Swt::Internal::Win32
     alias_method :attr_rgb_result=, :rgb_result=
     undef_method :rgb_result=
     
+    # @field cast=(COLORREF *)
     # long
     attr_accessor :lp_cust_colors
     alias_method :attr_lp_cust_colors, :lp_cust_colors
@@ -65,6 +68,7 @@ module Org::Eclipse::Swt::Internal::Win32
     alias_method :attr_l_cust_data=, :l_cust_data=
     undef_method :l_cust_data=
     
+    # @field cast=(LPCCHOOKPROC)
     # long
     attr_accessor :lpfn_hook
     alias_method :attr_lpfn_hook, :lpfn_hook
@@ -72,6 +76,7 @@ module Org::Eclipse::Swt::Internal::Win32
     alias_method :attr_lpfn_hook=, :lpfn_hook=
     undef_method :lpfn_hook=
     
+    # @field cast=(LPCTSTR)
     # long
     attr_accessor :lp_template_name
     alias_method :attr_lp_template_name, :lp_template_name

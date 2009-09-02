@@ -1,6 +1,6 @@
 require "rjava"
 
-# Copyright (c) 2000, 2008 IBM Corporation and others.
+# Copyright (c) 2000, 2009 IBM Corporation and others.
 # All rights reserved. This program and the accompanying materials
 # are made available under the terms of the Eclipse Public License v1.0
 # which accompanies this distribution, and is available at
@@ -13,9 +13,9 @@ module Org::Eclipse::Swt::Widgets
     class_module.module_eval {
       include ::Java::Lang
       include ::Org::Eclipse::Swt::Widgets
-      include_const ::Org::Eclipse::Swt::Internal::Carbon, :OS
       include ::Org::Eclipse::Swt
       include ::Org::Eclipse::Swt::Graphics
+      include ::Org::Eclipse::Swt::Internal::Cocoa
     }
   end
   
@@ -95,6 +95,7 @@ module Org::Eclipse::Swt::Widgets
   # @see Shell
   # @see SWT
   # @see <a href="http://www.eclipse.org/swt/">Sample code and further information</a>
+  # @noextend This class is not intended to be subclassed by clients.
   class Decorations < DecorationsImports.const_get :Canvas
     include_class_members DecorationsImports
     
@@ -520,11 +521,11 @@ module Org::Eclipse::Swt::Widgets
     
     typesig { [] }
     def save_focus
-      window = OS._get_control_owner(self.attr_handle)
-      control = self.attr_display.get_focus_control(window, false)
-      if (!(control).nil? && !(control).equal?(self) && (self).equal?(control.menu_shell))
-        set_saved_focus(control)
-      end
+      # int window = OS.GetControlOwner (handle);
+      # Control control = display.getFocusControl (window, false);
+      # if (control != null && control != this && this == control.menuShell ()) {
+      # setSavedFocus (control);
+      # }
     end
     
     typesig { [Button] }
@@ -567,17 +568,13 @@ module Org::Eclipse::Swt::Widgets
       if ((button).equal?(@default_button))
         return
       end
-      if (!(@default_button).nil?)
-        if (!@default_button.is_disposed)
-          @default_button.set_default(false)
-        end
-      end
       @default_button = button
-      if (!(@default_button).nil?)
-        if (!@default_button.is_disposed)
-          @default_button.set_default(true)
-        end
+      cell = nil
+      if (!(@default_button).nil? && !((@default_button.attr_style & SWT::PUSH)).equal?(0))
+        cell = NSButtonCell.new((@default_button.attr_view).cell)
       end
+      self.attr_view.window.set_default_button_cell(cell)
+      self.attr_display.update_default_button
     end
     
     typesig { [Image] }
@@ -605,12 +602,8 @@ module Org::Eclipse::Swt::Widgets
       if (!(self.attr_parent).nil?)
         return
       end
-      if ((self.attr_display.attr_dock_image).equal?(0))
-        if (!(image).nil?)
-          OS._set_application_dock_tile_image(image.attr_handle)
-        else
-          OS._restore_application_dock_tile_image
-        end
+      if ((self.attr_display.attr_dock_image).nil?)
+        self.attr_display.attr_application.set_application_icon_image(!(image).nil? ? image.attr_handle : nil)
       end
     end
     
@@ -653,14 +646,18 @@ module Org::Eclipse::Swt::Widgets
       if (!(self.attr_parent).nil?)
         return
       end
-      if ((self.attr_display.attr_dock_image).equal?(0))
+      if ((self.attr_display.attr_dock_image).nil?)
         if (!(images).nil? && images.attr_length > 1)
           best_images = Array.typed(Image).new(images.attr_length) { nil }
           System.arraycopy(images, 0, best_images, 0, images.attr_length)
           sort(best_images)
           images = best_images
         end
-        OS._set_application_dock_tile_image(images[0].attr_handle)
+        if (!(images).nil? && images.attr_length > 0)
+          self.attr_display.attr_application.set_application_icon_image(images[0].attr_handle)
+        else
+          self.attr_display.attr_application.set_application_icon_image(nil)
+        end
       end
     end
     

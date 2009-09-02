@@ -1,6 +1,6 @@
 require "rjava"
 
-# Copyright (c) 2000, 2008 IBM Corporation and others.
+# Copyright (c) 2000, 2009 IBM Corporation and others.
 # All rights reserved. This program and the accompanying materials
 # are made available under the terms of the Eclipse Public License v1.0
 # which accompanies this distribution, and is available at
@@ -38,6 +38,7 @@ module Org::Eclipse::Swt::Widgets
   # @see <a href="http://www.eclipse.org/swt/snippets/#progressbar">ProgressBar snippets</a>
   # @see <a href="http://www.eclipse.org/swt/examples.php">SWT Example: ControlExample</a>
   # @see <a href="http://www.eclipse.org/swt/">Sample code and further information</a>
+  # @noextend This class is not intended to be subclassed by clients.
   class ProgressBar < ProgressBarImports.const_get :Control
     include_class_members ProgressBarImports
     
@@ -118,6 +119,7 @@ module Org::Eclipse::Swt::Widgets
     # @see SWT#SMOOTH
     # @see SWT#HORIZONTAL
     # @see SWT#VERTICAL
+    # @see SWT#INDETERMINATE
     # @see Widget#checkSubclass
     # @see Widget#getStyle
     def initialize(parent, style)
@@ -357,20 +359,31 @@ module Org::Eclipse::Swt::Widgets
     def set_selection(value)
       check_widget
       # Feature in Vista.  When the progress bar is not in
-      # a normal state, PBM_SETPOS does not set the position.
+      # a normal state, PBM_SETPOS does not set the position
+      # of the bar when the selection is equal to the minimum.
       # This is undocumented.  The fix is to temporarily
       # set the state to PBST_NORMAL, set the position, then
       # reset the state.
       # 
       # long
       state = 0
+      fix_selection = false
       if (!OS::IsWinCE && OS::WIN32_VERSION >= OS._version(6, 0))
-        state = OS._send_message(self.attr_handle, OS::PBM_GETSTATE, 0, 0)
-        OS._send_message(self.attr_handle, OS::PBM_SETSTATE, OS::PBST_NORMAL, 0)
+        # 64
+        minumum = RJava.cast_to_int(OS._send_message(self.attr_handle, OS::PBM_GETRANGE, 1, 0))
+        # 64
+        selection = RJava.cast_to_int(OS._send_message(self.attr_handle, OS::PBM_GETPOS, 0, 0))
+        if ((selection).equal?(minumum))
+          fix_selection = true
+          state = OS._send_message(self.attr_handle, OS::PBM_GETSTATE, 0, 0)
+          OS._send_message(self.attr_handle, OS::PBM_SETSTATE, OS::PBST_NORMAL, 0)
+        end
       end
       OS._send_message(self.attr_handle, OS::PBM_SETPOS, value, 0)
       if (!OS::IsWinCE && OS::WIN32_VERSION >= OS._version(6, 0))
-        OS._send_message(self.attr_handle, OS::PBM_SETSTATE, state, 0)
+        if (fix_selection)
+          OS._send_message(self.attr_handle, OS::PBM_SETSTATE, state, 0)
+        end
       end
     end
     

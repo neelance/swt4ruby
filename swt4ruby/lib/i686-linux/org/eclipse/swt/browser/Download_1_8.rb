@@ -21,6 +21,10 @@ module Org::Eclipse::Swt::Browser
     }
   end
   
+  # This class implements the nsIDownload interface for mozilla
+  # version 1.8.x.  For mozilla versions 1.4 - 1.7.x this interface
+  # is implemented by class nsIDownload.  Mozilla versions later
+  # than 1.8.x do not need to call this interface.
   class Download_1_8 
     include_class_members Download_1_8Imports
     

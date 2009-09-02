@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2008 IBM Corporation and others.
+ * Copyright (c) 2000, 2009 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -12,11 +12,7 @@ package org.eclipse.swt.printing;
 
 import org.eclipse.swt.*;
 import org.eclipse.swt.graphics.*;
-import org.eclipse.swt.internal.carbon.CFRange;
-import org.eclipse.swt.internal.carbon.OS;
-import org.eclipse.swt.internal.carbon.PMRect;
-import org.eclipse.swt.internal.carbon.PMResolution;
-import org.eclipse.swt.internal.carbon.Rect;
+import org.eclipse.swt.internal.cocoa.*;
 
 /**
  * Instances of this class are used to print to a printer.
@@ -42,122 +38,66 @@ import org.eclipse.swt.internal.carbon.Rect;
  */
 public final class Printer extends Device {
 	PrinterData data;
-	int printSession, printSettings, pageFormat;
-	boolean inPage, isGCCreated;
-	int context;
-	int colorspace;
-
+	NSPrinter printer;
+	NSPrintInfo printInfo;
+	NSPrintOperation operation;
+	NSView view;
+	NSWindow window;
+	boolean isGCCreated;
+	
 	static final String DRIVER = "Mac";
-	static final String PRINTER_DRIVER = "Printer";
-	static final String FILE_DRIVER = "File";
-	static final String PREVIEW_DRIVER = "Preview";
-	static final String FAX_DRIVER = "Fax";
 
 /**
  * Returns an array of <code>PrinterData</code> objects
- * representing all available printers.
+ * representing all available printers.  If there are no
+ * printers, the array will be empty.
  *
- * @return the list of available printers
+ * @return an array of PrinterData objects representing the available printers
  */
 public static PrinterData[] getPrinterList() {
-	PrinterData[] result = null;
-	int[] printSession = new int[1];
-	OS.PMCreateSession(printSession);
-	if (printSession[0] != 0) {
-		int[] printerList = new int[1], currentIndex = new int[1], currentPrinter = new int[1];
-		OS.PMSessionCreatePrinterList(printSession[0], printerList, currentIndex, currentPrinter);
-		if (printerList[0] != 0) {
-			int count = OS.CFArrayGetCount(printerList[0]);
-			result = new PrinterData[count];
-			for (int i=0; i<count; i++) {
-				String name = getString(OS.CFArrayGetValueAtIndex(printerList[0], i));
-				result[i] = new PrinterData(DRIVER, name);
-			}
-			OS.CFRelease(printerList[0]);
+	NSAutoreleasePool pool = null;
+	if (!NSThread.isMainThread()) pool = (NSAutoreleasePool) new NSAutoreleasePool().alloc().init();
+	try {
+		NSArray printers = NSPrinter.printerNames();
+		int count = (int)/*64*/printers.count();
+		PrinterData[] result = new PrinterData[count];
+		for (int i = 0; i < count; i++) {
+			NSString str = new NSString(printers.objectAtIndex(i));
+			result[i] = new PrinterData(DRIVER, str.getString());
 		}
-		OS.PMRelease(printSession[0]);
+		return result;
+	} finally {
+		if (pool != null) pool.release();
 	}
-	return result == null ? new PrinterData[0] : result;
 }
 
 /**
  * Returns a <code>PrinterData</code> object representing
  * the default printer or <code>null</code> if there is no 
- * printer available on the System.
+ * default printer.
  *
  * @return the default printer data or null
  * 
  * @since 2.1
  */
 public static PrinterData getDefaultPrinterData() {
-	PrinterData result = null;
-	int[] printSession = new int[1];
-	OS.PMCreateSession(printSession);
-	if (printSession[0] != 0) {
-		String name = getCurrentPrinterName(printSession[0]);
-		if (name != null) result = new PrinterData(DRIVER, name);
-		OS.PMRelease(printSession[0]);
+	NSAutoreleasePool pool = null;
+	if (!NSThread.isMainThread()) pool = (NSAutoreleasePool) new NSAutoreleasePool().alloc().init();
+	try {
+		NSPrinter printer = NSPrintInfo.defaultPrinter();
+		if (printer == null) return null;
+		NSString str = printer.name();
+		return new PrinterData(DRIVER, str.getString());
+	} finally {
+		if (pool != null) pool.release();
 	}
-	return result;
-}
-static String getCurrentPrinterName(int printSession) {
-	String result = null;
-	int[] printerList = new int[1], currentIndex = new int[1], currentPrinter = new int[1];
-	OS.PMSessionCreatePrinterList(printSession, printerList, currentIndex, currentPrinter);
-	if (printerList[0] != 0) {
-		int count = OS.CFArrayGetCount(printerList[0]);
-		if (currentIndex[0] >= 0 && currentIndex[0] < count) {
-			result = getString(OS.CFArrayGetValueAtIndex(printerList[0], currentIndex[0]));
-		}
-		OS.CFRelease(printerList[0]);
-	}
-	return result;
-}
-static String getString(int ptr) {
-	int length = OS.CFStringGetLength(ptr);
-	char [] buffer = new char[length];
-	CFRange range = new CFRange();
-	range.length = length;
-	OS.CFStringGetCharacters(ptr, range, buffer);
-	return new String(buffer);
-}
-static int packData(int handle, byte[] buffer, int offset) {
-	int length = OS.GetHandleSize (handle);
-	buffer[offset++] = (byte)((length & 0xFF) >> 0);
-	buffer[offset++] = (byte)((length & 0xFF00) >> 8);
-	buffer[offset++] = (byte)((length & 0xFF0000) >> 16);
-	buffer[offset++] = (byte)((length & 0xFF000000) >> 24);
-	int [] ptr = new int [1];
-	OS.HLock(handle);
-	OS.memmove(ptr, handle, 4);
-	byte[] buffer1 = new byte[length];
-	OS.memmove(buffer1, ptr [0], length);
-	OS.HUnlock(handle);
-	System.arraycopy(buffer1, 0, buffer, offset, length);
-	return offset + length;
-}
-static int unpackData(int[] handle, byte[] buffer, int offset) {
-	int length = 
-		((buffer[offset++] & 0xFF) << 0) |
-		((buffer[offset++] & 0xFF) << 8) |
-		((buffer[offset++] & 0xFF) << 16) |
-		((buffer[offset++] & 0xFF) << 24);
-	handle[0] = OS.NewHandle(length);
-	if (handle[0] == 0) SWT.error(SWT.ERROR_NO_HANDLES);
-	int[] ptr = new int[1];
-	OS.HLock(handle[0]);
-	OS.memmove(ptr, handle[0], 4);
-	byte[] buffer1 = new byte[length];
-	System.arraycopy(buffer, offset, buffer1, 0, length);
-	OS.memmove(ptr[0], buffer1, length);
-	OS.HUnlock(handle[0]);
-	return offset + length;
+	
 }
 
 /**
  * Constructs a new printer representing the default printer.
  * <p>
- * You must dispose the printer when it is no longer required. 
+ * Note: You must dispose the printer when it is no longer required. 
  * </p>
  *
  * @exception SWTError <ul>
@@ -172,12 +112,13 @@ public Printer() {
 
 /**
  * Constructs a new printer given a <code>PrinterData</code>
- * object representing the desired printer.
+ * object representing the desired printer. If the argument
+ * is null, then the default printer will be used.
  * <p>
- * You must dispose the printer when it is no longer required. 
+ * Note: You must dispose the printer when it is no longer required. 
  * </p>
  *
- * @param data the printer data for the specified printer
+ * @param data the printer data for the specified printer, or null to use the default printer
  *
  * @exception IllegalArgumentException <ul>
  *    <li>ERROR_INVALID_ARGUMENT - if the specified printer data does not represent a valid printer
@@ -229,11 +170,21 @@ public Printer(PrinterData data) {
  */
 public Rectangle computeTrim(int x, int y, int width, int height) {
 	checkDevice();
-	PMRect pageRect = new PMRect();
-	PMRect paperRect = new PMRect();
-	OS.PMGetAdjustedPageRect(pageFormat, pageRect);
-	OS.PMGetAdjustedPaperRect(pageFormat, paperRect);
-	return new Rectangle(x+(int)paperRect.left, y+(int)paperRect.top, width+(int)(paperRect.right-pageRect.right), height+(int)(paperRect.bottom-pageRect.bottom));
+	NSAutoreleasePool pool = null;
+	if (!NSThread.isMainThread()) pool = (NSAutoreleasePool) new NSAutoreleasePool().alloc().init();
+	try {
+		NSSize paperSize = printInfo.paperSize();
+		NSRect bounds = printInfo.imageablePageBounds();
+		Point dpi = getDPI (), screenDPI = getIndependentDPI();
+		float scaling = scalingFactor();
+		x -= (bounds.x * dpi.x / screenDPI.x) / scaling;
+		y -= (bounds.y * dpi.y / screenDPI.y) / scaling;
+		width += ((paperSize.width - bounds.width) * dpi.x / screenDPI.x) / scaling;
+		height += ((paperSize.height - bounds.height) * dpi.y / screenDPI.y) / scaling;
+		return new Rectangle(x, y, width, height);
+	} finally {
+		if (pool != null) pool.release();
+	}
 }
 
 /**	 
@@ -243,61 +194,57 @@ public Rectangle computeTrim(int x, int y, int width, int height) {
  * @param deviceData the device data
  */
 protected void create(DeviceData deviceData) {
-	data = (PrinterData)deviceData;
-	
-	int[] buffer = new int[1];
-	if (OS.PMCreateSession(buffer) != OS.noErr) SWT.error(SWT.ERROR_NO_HANDLES);
-	printSession = buffer[0];
-	if (printSession == 0) SWT.error(SWT.ERROR_NO_HANDLES);
-		
-	if (data.otherData != null) {
-		/* Deserialize settings */
-		int offset = 0;
-		byte[] otherData = data.otherData;
-		offset = unpackData(buffer, otherData, offset);
-		int flatSettings = buffer[0];
-		offset = unpackData(buffer, otherData, offset);
-		int flatFormat = buffer[0];
-		if (OS.PMUnflattenPrintSettings(flatSettings, buffer) != OS.noErr) SWT.error(SWT.ERROR_NO_HANDLES);
-		printSettings = buffer[0];
-		if (printSettings == 0) SWT.error(SWT.ERROR_NO_HANDLES);
-		if (OS.PMUnflattenPageFormat(flatFormat, buffer) != OS.noErr) SWT.error(SWT.ERROR_NO_HANDLES);
-		pageFormat = buffer[0];
-		if (pageFormat == 0) SWT.error(SWT.ERROR_NO_HANDLES);
-		OS.DisposeHandle(flatSettings);
-		OS.DisposeHandle(flatFormat);
-	} else {
-		/* Create default settings */
-		if (OS.PMCreatePrintSettings(buffer) != OS.noErr) SWT.error(SWT.ERROR_NO_HANDLES);
-		printSettings = buffer[0];
-		if (printSettings == 0) SWT.error(SWT.ERROR_NO_HANDLES);
-		OS.PMSessionDefaultPrintSettings(printSession, printSettings);
-		if (OS.PMCreatePageFormat(buffer) != OS.noErr) SWT.error(SWT.ERROR_NO_HANDLES);
-		pageFormat = buffer[0];
-		if (pageFormat == 0) SWT.error(SWT.ERROR_NO_HANDLES);
-		OS.PMSessionDefaultPageFormat(printSession, pageFormat);
-	}
-	
-	if (PREVIEW_DRIVER.equals(data.driver)) {
-		OS.PMSessionSetDestination(printSession, printSettings, (short) OS.kPMDestinationPreview, 0, 0);
-	}
-	String name = data.name;
-	char[] buffer1 = new char[name.length ()];
-	name.getChars(0, buffer1.length, buffer1, 0);
-	int ptr = OS.CFStringCreateWithCharacters(OS.kCFAllocatorDefault, buffer1, buffer1.length);
-	if (ptr != 0) {
-		OS.PMSessionSetCurrentPrinter(printSession, ptr); 
-		OS.CFRelease(ptr);
-	}
-	
-	OS.PMSessionValidatePrintSettings(printSession, printSettings, null);
-	OS.PMSessionValidatePageFormat(printSession, pageFormat, null);	
-	
-	int graphicsContextsArray = OS.CFArrayCreateMutable(OS.kCFAllocatorDefault, 1, 0);
-	if (graphicsContextsArray != 0) {
-		OS.CFArrayAppendValue(graphicsContextsArray, OS.kPMGraphicsContextCoreGraphics());
-		OS.PMSessionSetDocumentFormatGeneration(printSession, OS.kPMDocumentFormatPDF(), graphicsContextsArray, 0);
-		OS.CFRelease(graphicsContextsArray);
+	NSAutoreleasePool pool = null;
+	if (!NSThread.isMainThread()) pool = (NSAutoreleasePool) new NSAutoreleasePool().alloc().init();
+	try {
+		NSApplication.sharedApplication();
+		data = (PrinterData)deviceData;
+		if (data.otherData != null) {
+			NSData nsData = NSData.dataWithBytes(data.otherData, data.otherData.length);
+			printInfo = new NSPrintInfo(NSKeyedUnarchiver.unarchiveObjectWithData(nsData).id);
+		} else {
+			printInfo = NSPrintInfo.sharedPrintInfo();
+		}
+		printInfo.retain();
+		printer = NSPrinter.printerWithName(NSString.stringWith(data.name));
+		if (printer != null) {
+			printer.retain();
+			printInfo.setPrinter(printer);
+		}
+		printInfo.setOrientation(data.orientation == PrinterData.LANDSCAPE ? OS.NSLandscapeOrientation : OS.NSPortraitOrientation);
+		NSMutableDictionary dict = printInfo.dictionary();	
+		if (data.collate != false) dict.setValue(NSNumber.numberWithBool(data.collate), OS.NSPrintMustCollate);
+		if (data.copyCount != 1) dict.setValue(NSNumber.numberWithInt(data.copyCount), OS.NSPrintCopies);
+		if (data.printToFile) {
+			dict.setValue(OS.NSPrintSaveJob, OS.NSPrintJobDisposition);
+			if (data.fileName != null) dict.setValue(NSString.stringWith(data.fileName), OS.NSPrintSavePath);
+		}
+		/*
+		* Bug in Cocoa.  For some reason, the output still goes to the printer when
+		* the user chooses the preview button.  The fix is to reset the job disposition.
+		*/
+		NSString job = printInfo.jobDisposition();
+		if (job.isEqual(new NSString(OS.NSPrintPreviewJob()))) {
+			printInfo.setJobDisposition(job);
+		}
+		NSRect rect = new NSRect();
+		window = (NSWindow)new NSWindow().alloc();
+		window.initWithContentRect(rect, OS.NSBorderlessWindowMask, OS.NSBackingStoreBuffered, false);
+		String className = "SWTPrinterView"; //$NON-NLS-1$
+		if (OS.objc_lookUpClass(className) == 0) {
+			int /*long*/ cls = OS.objc_allocateClassPair(OS.class_NSView, className, 0);
+			OS.class_addMethod(cls, OS.sel_isFlipped, OS.isFlipped_CALLBACK(), "@:");
+			OS.objc_registerClassPair(cls);
+		}
+		view = (NSView)new SWTPrinterView().alloc();
+		view.initWithFrame(rect);
+		window.setContentView(view);
+		operation = NSPrintOperation.printOperationWithView(view, printInfo);
+		operation.retain();
+		operation.setShowsPrintPanel(false);
+		operation.setShowsProgressPanel(false);
+	} finally {
+		if (pool != null) pool.release();
 	}
 }
 
@@ -307,12 +254,22 @@ protected void create(DeviceData deviceData) {
  * mechanism of the <code>Device</code> class.
  */
 protected void destroy() {
-	if (pageFormat != 0) OS.PMRelease(pageFormat);
-	pageFormat = 0;
-	if (printSettings != 0) OS.PMRelease(printSettings);
-	printSettings = 0;
-	if (printSession != 0) OS.PMRelease(printSession);
-	printSession = 0;
+	NSAutoreleasePool pool = null;
+	if (!NSThread.isMainThread()) pool = (NSAutoreleasePool) new NSAutoreleasePool().alloc().init();
+	try {
+		if (printer != null) printer.release();
+		if (printInfo != null) printInfo.release();
+		if (view != null) view.release();
+		if (window != null) window.release();
+		if (operation != null) operation.release();
+		printer = null;
+		printInfo = null;
+		view = null;
+		window = null;
+		operation = null;
+	} finally {
+		if (pool != null) pool.release();
+	}
 }
 
 /**	 
@@ -328,32 +285,33 @@ protected void destroy() {
  * @param data the platform specific GC data 
  * @return the platform specific GC handle
  */
-public int internal_new_GC(GCData data) {
+public int /*long*/ internal_new_GC(GCData data) {
 	if (isDisposed()) SWT.error(SWT.ERROR_GRAPHIC_DISPOSED);
-	setupNewPage();
-	if (data != null) {
-		if (isGCCreated) SWT.error(SWT.ERROR_INVALID_ARGUMENT);
-		data.device = this;
-		data.background = getSystemColor(SWT.COLOR_WHITE).handle;
-		data.foreground = getSystemColor(SWT.COLOR_BLACK).handle;
-		data.font = getSystemFont ();
-		PMRect paperRect= new PMRect();
-		OS.PMGetAdjustedPaperRect(pageFormat, paperRect);
-		Rect portRect = new Rect();
-		portRect.left = (short)paperRect.left;
-		portRect.right = (short)paperRect.right;
-		portRect.top = (short)paperRect.top;
-		portRect.bottom = (short)paperRect.bottom;
-		data.portRect = portRect;
-		isGCCreated = true;
+	NSAutoreleasePool pool = null;
+	if (!NSThread.isMainThread()) pool = (NSAutoreleasePool) new NSAutoreleasePool().alloc().init();
+	try {
+		if (data != null) {
+			if (isGCCreated) SWT.error(SWT.ERROR_INVALID_ARGUMENT);
+			data.device = this;
+			data.background = getSystemColor(SWT.COLOR_WHITE).handle;
+			data.foreground = getSystemColor(SWT.COLOR_BLACK).handle;
+			data.font = getSystemFont ();
+			float scaling = scalingFactor();
+			Point dpi = getDPI (), screenDPI = getIndependentDPI();
+			NSSize size = printInfo.paperSize();
+			size.width = (size.width * (dpi.x / screenDPI.x)) / scaling;
+			size.height = (size.height * dpi.y / screenDPI.y) / scaling;
+			data.size = size;
+			isGCCreated = true;
+		}
+		return operation.context().id;
+	} finally {
+		if (pool != null) pool.release();
 	}
-	return context;
 }
 
 protected void init () {
 	super.init();
-	colorspace = OS.CGColorSpaceCreateDeviceRGB();
-	if (colorspace == 0) SWT.error(SWT.ERROR_NO_HANDLES);
 }
 
 /**	 
@@ -369,7 +327,7 @@ protected void init () {
  * @param hDC the platform specific GC handle
  * @param data the platform specific GC data 
  */
-public void internal_dispose_GC(int context, GCData data) {
+public void internal_dispose_GC(int /*long*/ context, GCData data) {
 	if (data != null) isGCCreated = false;
 }
 
@@ -379,9 +337,11 @@ public void internal_dispose_GC(int context, GCData data) {
  * mechanism of the <code>Device</code> class.
  */
 protected void release () {
-	if (colorspace != 0) OS.CGColorSpaceRelease(colorspace);
-	colorspace = 0;
 	super.release();
+}
+
+float scalingFactor() {
+	return new NSNumber(printInfo.dictionary().objectForKey(OS.NSPrintScalingFactor)).floatValue();
 }
 
 /**
@@ -407,16 +367,23 @@ protected void release () {
  */
 public boolean startJob(String jobName) {
 	checkDevice();
-	if (jobName != null && jobName.length() != 0) {
-		char[] buffer = new char[jobName.length ()];
-		jobName.getChars(0, buffer.length, buffer, 0);
-		int ptr = OS.CFStringCreateWithCharacters(OS.kCFAllocatorDefault, buffer, buffer.length);
-		if (ptr != 0) {
-			OS.PMSetJobNameCFString(printSettings, ptr); 
-			OS.CFRelease (ptr);
+	NSAutoreleasePool pool = null;
+	if (!NSThread.isMainThread()) pool = (NSAutoreleasePool) new NSAutoreleasePool().alloc().init();
+	try {
+		if (jobName != null && jobName.length() != 0) {
+			operation.setJobTitle(NSString.stringWith(jobName));
 		}
+		printInfo.setUpPrintOperationDefaultValues();
+		NSPrintOperation.setCurrentOperation(operation);
+		NSGraphicsContext context = operation.createContext();
+		if (context != null) {
+			view.beginDocument();
+			return true;
+		}
+		return false;
+	} finally {
+		if (pool != null) pool.release();
 	}
-	return OS.PMSessionBeginDocumentNoDialog(printSession, printSettings, pageFormat) == OS.noErr;
 }
 
 /**
@@ -432,12 +399,16 @@ public boolean startJob(String jobName) {
  */
 public void endJob() {
 	checkDevice();
-	if (inPage) {
-		OS.PMSessionEndPageNoDialog(printSession);
-		inPage = false;
+	NSAutoreleasePool pool = null;
+	if (!NSThread.isMainThread()) pool = (NSAutoreleasePool) new NSAutoreleasePool().alloc().init();
+	try {
+		view.endDocument();
+		operation.deliverResult();
+		operation.destroyContext();
+		operation.cleanUpOperation();
+	} finally {
+		if (pool != null) pool.release();
 	}
-	OS.PMSessionEndDocumentNoDialog(printSession);
-	context = 0;
 }
 
 /**
@@ -449,13 +420,14 @@ public void endJob() {
  */
 public void cancelJob() {
 	checkDevice();
-	OS.PMSessionSetError(printSession, OS.kPMCancel);
-	if (inPage) {
-		OS.PMSessionEndPageNoDialog(printSession);
-		inPage = false;
+	NSAutoreleasePool pool = null;
+	if (!NSThread.isMainThread()) pool = (NSAutoreleasePool) new NSAutoreleasePool().alloc().init();
+	try {
+		operation.destroyContext();
+		operation.cleanUpOperation();
+	} finally {
+		if (pool != null) pool.release();
 	}
-	OS.PMSessionEndDocumentNoDialog(printSession);
-	context = 0;
 }
 
 static DeviceData checkNull (PrinterData data) {
@@ -489,9 +461,33 @@ static DeviceData checkNull (PrinterData data) {
  */
 public boolean startPage() {
 	checkDevice();
-	if (OS.PMSessionError(printSession) != OS.noErr) return false;
-	setupNewPage();
-	return context != 0;
+	NSAutoreleasePool pool = null;
+	if (!NSThread.isMainThread()) pool = (NSAutoreleasePool) new NSAutoreleasePool().alloc().init();
+	try {
+		float scaling = scalingFactor();
+		NSSize paperSize = printInfo.paperSize();
+		paperSize.width /= scaling;
+		paperSize.height /= scaling;
+		NSRect rect = new NSRect();
+		rect.width = paperSize.width;
+		rect.height = paperSize.height;
+		view.beginPageInRect(rect, new NSPoint());
+		NSRect imageBounds = printInfo.imageablePageBounds();
+		imageBounds.x /= scaling;
+		imageBounds.y /= scaling;
+		imageBounds.width /= scaling;
+		imageBounds.height /= scaling;
+		NSBezierPath.bezierPathWithRect(imageBounds).setClip();
+		NSAffineTransform transform = NSAffineTransform.transform();
+		transform.translateXBy(imageBounds.x, imageBounds.y);
+		Point dpi = getDPI (), screenDPI = getIndependentDPI();
+		transform.scaleXBy(screenDPI.x / (float)dpi.x, screenDPI.y / (float)dpi.y);
+		transform.concat();
+		operation.context().saveGraphicsState();
+		return true;
+	} finally {
+		if (pool != null) pool.release();
+	}
 }
 
 /**
@@ -507,9 +503,13 @@ public boolean startPage() {
  */
 public void endPage() {
 	checkDevice();
-	if (inPage) {
-		OS.PMSessionEndPageNoDialog(printSession);
-		inPage = false;
+	NSAutoreleasePool pool = null;
+	if (!NSThread.isMainThread()) pool = (NSAutoreleasePool) new NSAutoreleasePool().alloc().init();
+	try {
+		operation.context().restoreGraphicsState();
+		view.endPage();
+	} finally {
+		if (pool != null) pool.release();
 	}
 }
 
@@ -526,9 +526,18 @@ public void endPage() {
  */
 public Point getDPI() {
 	checkDevice();
-	PMResolution resolution = new PMResolution();
-	OS.PMGetResolution(pageFormat, resolution);
-	return new Point((int)resolution.hRes, (int)resolution.vRes);
+	NSAutoreleasePool pool = null;
+	if (!NSThread.isMainThread()) pool = (NSAutoreleasePool) new NSAutoreleasePool().alloc().init();
+	try {
+		//TODO get output resolution
+		return getIndependentDPI();
+	} finally {
+		if (pool != null) pool.release();
+	}
+}
+
+Point getIndependentDPI() {
+	return super.getDPI();
 }
 
 /**
@@ -548,9 +557,16 @@ public Point getDPI() {
  */
 public Rectangle getBounds() {
 	checkDevice();
-	PMRect paperRect = new PMRect();
-	OS.PMGetAdjustedPaperRect(pageFormat, paperRect);
-	return new Rectangle(0, 0, (int)(paperRect.right-paperRect.left), (int)(paperRect.bottom-paperRect.top));
+	NSAutoreleasePool pool = null;
+	if (!NSThread.isMainThread()) pool = (NSAutoreleasePool) new NSAutoreleasePool().alloc().init();
+	try {
+		NSSize size = printInfo.paperSize();
+		float scaling = scalingFactor();
+		Point dpi = getDPI (), screenDPI = getIndependentDPI();
+		return new Rectangle (0, 0, (int)((size.width * dpi.x / screenDPI.x) / scaling), (int)((size.height * dpi.y / screenDPI.y)  / scaling));
+	} finally {
+		if (pool != null) pool.release();
+	}
 }
 
 /**
@@ -572,9 +588,16 @@ public Rectangle getBounds() {
  */
 public Rectangle getClientArea() {
 	checkDevice();
-	PMRect pageRect = new PMRect();
-	OS.PMGetAdjustedPageRect(pageFormat, pageRect);
-	return new Rectangle(0, 0, (int)(pageRect.right-pageRect.left), (int)(pageRect.bottom-pageRect.top));
+	NSAutoreleasePool pool = null;
+	if (!NSThread.isMainThread()) pool = (NSAutoreleasePool) new NSAutoreleasePool().alloc().init();
+	try {
+		float scaling = scalingFactor();
+		NSRect rect = printInfo.imageablePageBounds();
+		Point dpi = getDPI (), screenDPI = getIndependentDPI();
+		return new Rectangle(0, 0, (int)((rect.width * dpi.x / screenDPI.x) / scaling), (int)((rect.height * dpi.y / screenDPI.y) / scaling));
+	} finally {
+		if (pool != null) pool.release();
+	}
 }
 
 /**
@@ -587,61 +610,4 @@ public PrinterData getPrinterData() {
 	checkDevice();
 	return data;
 }
-
-/**
- * On the Mac the core graphics context for printing is only valid between PMSessionBeginPage and PMSessionEndPage,
- * so printing code has to retrieve and initializes a graphic context for every page like this:
- * 
- * <pre>
- * PMSessionBeginDocument
- *    PMSessionBeginPage
- * 	     PMSessionGetGraphicsContext
- * 		 // ... use context
- *    PMSessionEndPage
- * PMSessionEndDocument
- * </pre>
- * 
- * In SWT it is OK to create a GC once between startJob / endJob and use it for all pages in between:
- * 
- * <pre>
- * startJob(...);
- * 	  GC gc= new GC(printer);
- *    startPage();
- * 		 // ... use gc
- *    endPage();
- *    gc.dispose();
- * endJob();
- * </pre>
- * 
- * The solution to resolve this difference is to rely on the fact that Mac OS X returns the same but
- * reinitialized graphics context for every page. So we only have to account for the fact that SWT assumes
- * that the graphics context keeps it settings across a page break when it actually does not.
- * So we have to copy some settings that exist in the CGC before a PMSessionEndPage to the CGC after a PMSessionBeginPage.
- * <p>
- * In addition to this we have to cope with the situation that in SWT we can create a GC before a call to
- * PMSessionBeginPage. For this we decouple the call to PMSessionBeginPage from
- * SWT's method startPage as follows: if a new GC is created before a call to startPage, internal_new_GC
- * does the PMSessionBeginPage and the next following startPage does nothing.
- * </p>
- */
-void setupNewPage() {
-	if (!inPage) {
-		inPage= true;
-		OS.PMSessionBeginPageNoDialog(printSession, pageFormat, null);
-		int[] buffer = new int[1];
-		OS.PMSessionGetGraphicsContext(printSession, 0, buffer);
-		if (context == 0) {
-			context = buffer[0];
-		} else {
-			if (context != buffer[0]) SWT.error(SWT.ERROR_UNSPECIFIED);
-		}
-		PMRect paperRect= new PMRect();
-		OS.PMGetAdjustedPaperRect(pageFormat, paperRect);
-		OS.CGContextScaleCTM(context, 1, -1);
-		OS.CGContextTranslateCTM(context, 0, -(float)(paperRect.bottom-paperRect.top));
-		OS.CGContextSetStrokeColorSpace(context, colorspace);
-		OS.CGContextSetFillColorSpace(context, colorspace);
-	}
-}
-
 }

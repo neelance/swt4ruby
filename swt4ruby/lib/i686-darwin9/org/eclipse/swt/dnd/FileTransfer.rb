@@ -14,8 +14,7 @@ module Org::Eclipse::Swt::Dnd
     class_module.module_eval {
       include ::Java::Lang
       include ::Org::Eclipse::Swt::Dnd
-      include ::Java::Io
-      include ::Org::Eclipse::Swt::Internal::Carbon
+      include ::Org::Eclipse::Swt::Internal::Cocoa
     }
   end
   
@@ -52,19 +51,11 @@ module Org::Eclipse::Swt::Dnd
       end
       alias_method :attr__instance=, :_instance=
       
-      const_set_lazy(:HFS) { "hfs " }
-      const_attr_reader  :HFS
+      const_set_lazy(:ID_NAME) { OS::NSFilenamesPboardType.get_string }
+      const_attr_reader  :ID_NAME
       
-      # $NON-NLS-1$
-      const_set_lazy(:FURL) { "furl" }
-      const_attr_reader  :FURL
-      
-      # $NON-NLS-1$
-      const_set_lazy(:HFSID) { register_type(HFS) }
-      const_attr_reader  :HFSID
-      
-      const_set_lazy(:FURLID) { register_type(FURL) }
-      const_attr_reader  :FURLID
+      const_set_lazy(:ID) { register_type(ID_NAME) }
+      const_attr_reader  :ID
     }
     
     typesig { [] }
@@ -98,68 +89,16 @@ module Org::Eclipse::Swt::Dnd
         DND.error(DND::ERROR_INVALID_DATA)
       end
       files = object
-      transfer_data.attr_result = -1
-      data = Array.typed(Array.typed(::Java::Byte)).new(files.attr_length) { nil }
+      length = files.attr_length
+      array = NSMutableArray.array_with_capacity(length)
       i = 0
-      while i < data.attr_length
-        file = JavaFile.new(files[i])
-        is_directory_ = file.is_directory
+      while i < length
         file_name = files[i]
-        chars = CharArray.new(file_name.length)
-        file_name.get_chars(0, chars.attr_length, chars, 0)
-        cfstring = OS._cfstring_create_with_characters(OS.attr_k_cfallocator_default, chars, chars.attr_length)
-        if ((cfstring).equal?(0))
-          return
-        end
-        begin
-          url = OS._cfurlcreate_with_file_system_path(OS.attr_k_cfallocator_default, cfstring, OS.attr_k_cfurlposixpath_style, is_directory_)
-          if ((url).equal?(0))
-            return
-          end
-          begin
-            if ((transfer_data.attr_type).equal?(HFSID))
-              fs_ref = Array.typed(::Java::Byte).new(80) { 0 }
-              if (!OS._cfurlget_fsref(url, fs_ref))
-                return
-              end
-              fs_spec = Array.typed(::Java::Byte).new(70) { 0 }
-              if (!(OS._fsget_catalog_info(fs_ref, 0, nil, nil, fs_spec, nil)).equal?(OS.attr_no_err))
-                return
-              end
-              hfsflavor = Array.typed(::Java::Byte).new(10 + fs_spec.attr_length) { 0 }
-              finfo = Array.typed(::Java::Byte).new(16) { 0 }
-              OS._fsp_get_finfo(fs_spec, finfo)
-              System.arraycopy(finfo, 0, hfsflavor, 0, 10)
-              System.arraycopy(fs_spec, 0, hfsflavor, 10, fs_spec.attr_length)
-              data[i] = hfsflavor
-            end
-            if ((transfer_data.attr_type).equal?(FURLID))
-              encoding = OS._cfstring_get_system_encoding
-              the_data = OS._cfurlcreate_data(OS.attr_k_cfallocator_default, url, encoding, true)
-              if ((the_data).equal?(0))
-                return
-              end
-              begin
-                length_ = OS._cfdata_get_length(the_data)
-                buffer = Array.typed(::Java::Byte).new(length_) { 0 }
-                range = CFRange.new
-                range.attr_length = length_
-                OS._cfdata_get_bytes(the_data, range, buffer)
-                data[i] = buffer
-              ensure
-                OS._cfrelease(the_data)
-              end
-            end
-          ensure
-            OS._cfrelease(url)
-          end
-        ensure
-          OS._cfrelease(cfstring)
-        end
+        string = NSString.string_with(file_name)
+        array.add_object(string)
         i += 1
       end
-      transfer_data.attr_data = data
-      transfer_data.attr_result = 0
+      transfer_data.attr_data = array
     end
     
     typesig { [TransferData] }
@@ -176,55 +115,17 @@ module Org::Eclipse::Swt::Dnd
       if (!is_supported_type(transfer_data) || (transfer_data.attr_data).nil?)
         return nil
       end
-      if ((transfer_data.attr_data.attr_length).equal?(0))
+      array = transfer_data.attr_data
+      if ((array.count).equal?(0))
         return nil
       end
-      count = transfer_data.attr_data.attr_length
-      file_names = Array.typed(String).new(count) { nil }
+      # 64
+      count_ = RJava.cast_to_int(array.count)
+      file_names = Array.typed(String).new(count_) { nil }
       i = 0
-      while i < count
-        data = transfer_data.attr_data[i]
-        url = 0
-        if ((transfer_data.attr_type).equal?(HFSID))
-          fsspec = Array.typed(::Java::Byte).new(data.attr_length - 10) { 0 }
-          System.arraycopy(data, 10, fsspec, 0, fsspec.attr_length)
-          fs_ref = Array.typed(::Java::Byte).new(80) { 0 }
-          if (!(OS._fsp_make_fsref(fsspec, fs_ref)).equal?(OS.attr_no_err))
-            return nil
-          end
-          url = OS._cfurlcreate_from_fsref(OS.attr_k_cfallocator_default, fs_ref)
-          if ((url).equal?(0))
-            return nil
-          end
-        end
-        if ((transfer_data.attr_type).equal?(FURLID))
-          encoding = OS.attr_k_cfstring_encoding_utf8
-          url = OS._cfurlcreate_with_bytes(OS.attr_k_cfallocator_default, data, data.attr_length, encoding, 0)
-          if ((url).equal?(0))
-            return nil
-          end
-        end
-        begin
-          path = OS._cfurlcopy_file_system_path(url, OS.attr_k_cfurlposixpath_style)
-          if ((path).equal?(0))
-            return nil
-          end
-          begin
-            length_ = OS._cfstring_get_length(path)
-            if ((length_).equal?(0))
-              return nil
-            end
-            buffer = CharArray.new(length_)
-            range = CFRange.new
-            range.attr_length = length_
-            OS._cfstring_get_characters(path, range, buffer)
-            file_names[i] = String.new(buffer)
-          ensure
-            OS._cfrelease(path)
-          end
-        ensure
-          OS._cfrelease(url)
-        end
+      while i < count_
+        string = NSString.new(array.object_at_index(i))
+        file_names[i] = string.get_string
         i += 1
       end
       return file_names
@@ -232,12 +133,12 @@ module Org::Eclipse::Swt::Dnd
     
     typesig { [] }
     def get_type_ids
-      return Array.typed(::Java::Int).new([FURLID, HFSID])
+      return Array.typed(::Java::Int).new([ID])
     end
     
     typesig { [] }
     def get_type_names
-      return Array.typed(String).new([FURL, HFS])
+      return Array.typed(String).new([ID_NAME])
     end
     
     typesig { [Object] }

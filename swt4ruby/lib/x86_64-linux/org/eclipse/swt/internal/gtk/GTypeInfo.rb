@@ -1,6 +1,6 @@
 require "rjava"
 
-# Copyright (c) 2000, 2006 IBM Corporation and others. All rights reserved.
+# Copyright (c) 2000, 2008 IBM Corporation and others. All rights reserved.
 # The contents of this file are made available under the terms
 # of the GNU Lesser General Public License (LGPL) Version 2.1 that
 # accompanies this distribution (lgpl-v21.txt).  The LGPL is also
@@ -23,12 +23,14 @@ module Org::Eclipse::Swt::Internal::Gtk
   class GTypeInfo 
     include_class_members GTypeInfoImports
     
+    # @field cast=(guint16)
     attr_accessor :class_size
     alias_method :attr_class_size, :class_size
     undef_method :class_size
     alias_method :attr_class_size=, :class_size=
     undef_method :class_size=
     
+    # @field cast=(GBaseInitFunc)
     # int
     attr_accessor :base_init
     alias_method :attr_base_init, :base_init
@@ -36,6 +38,7 @@ module Org::Eclipse::Swt::Internal::Gtk
     alias_method :attr_base_init=, :base_init=
     undef_method :base_init=
     
+    # @field cast=(GBaseFinalizeFunc)
     # int
     attr_accessor :base_finalize
     alias_method :attr_base_finalize, :base_finalize
@@ -43,6 +46,7 @@ module Org::Eclipse::Swt::Internal::Gtk
     alias_method :attr_base_finalize=, :base_finalize=
     undef_method :base_finalize=
     
+    # @field cast=(GClassInitFunc)
     # int
     attr_accessor :class_init
     alias_method :attr_class_init, :class_init
@@ -50,6 +54,7 @@ module Org::Eclipse::Swt::Internal::Gtk
     alias_method :attr_class_init=, :class_init=
     undef_method :class_init=
     
+    # @field cast=(GClassFinalizeFunc)
     # int
     attr_accessor :class_finalize
     alias_method :attr_class_finalize, :class_finalize
@@ -57,6 +62,7 @@ module Org::Eclipse::Swt::Internal::Gtk
     alias_method :attr_class_finalize=, :class_finalize=
     undef_method :class_finalize=
     
+    # @field cast=(gconstpointer)
     # int
     attr_accessor :class_data
     alias_method :attr_class_data, :class_data
@@ -64,18 +70,21 @@ module Org::Eclipse::Swt::Internal::Gtk
     alias_method :attr_class_data=, :class_data=
     undef_method :class_data=
     
+    # @field cast=(guint16)
     attr_accessor :instance_size
     alias_method :attr_instance_size, :instance_size
     undef_method :instance_size
     alias_method :attr_instance_size=, :instance_size=
     undef_method :instance_size=
     
+    # @field cast=(guint16)
     attr_accessor :n_preallocs
     alias_method :attr_n_preallocs, :n_preallocs
     undef_method :n_preallocs
     alias_method :attr_n_preallocs=, :n_preallocs=
     undef_method :n_preallocs=
     
+    # @field cast=(GInstanceInitFunc)
     # int
     attr_accessor :instance_init
     alias_method :attr_instance_init, :instance_init
@@ -83,6 +92,7 @@ module Org::Eclipse::Swt::Internal::Gtk
     alias_method :attr_instance_init=, :instance_init=
     undef_method :instance_init=
     
+    # @field cast=(GTypeValueTable *)
     # int
     attr_accessor :value_table
     alias_method :attr_value_table, :value_table

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2008 IBM Corporation and others.
+ * Copyright (c) 2000, 2009 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -43,6 +43,7 @@ import org.eclipse.swt.events.*;
  * @see <a href="http://www.eclipse.org/swt/snippets/#button">Button snippets</a>
  * @see <a href="http://www.eclipse.org/swt/examples.php">SWT Example: ControlExample</a>
  * @see <a href="http://www.eclipse.org/swt/">Sample code and further information</a>
+ * @noextend This class is not intended to be subclassed by clients.
  */
 
 public class Button extends Control {
@@ -53,7 +54,7 @@ public class Button extends Control {
 	static final int MARGIN = 4;
 	static final int CHECK_WIDTH, CHECK_HEIGHT;
 	static final int ICON_WIDTH = 128, ICON_HEIGHT = 128;
-	static final boolean COMMAND_LINK = false;
+	static /*final*/ boolean COMMAND_LINK = false;
 	static final int /*long*/ ButtonProc;
 	static final TCHAR ButtonClass = new TCHAR (0, "BUTTON", true);
 	static {
@@ -103,6 +104,8 @@ public class Button extends Control {
  * @see SWT#RADIO
  * @see SWT#TOGGLE
  * @see SWT#FLAT
+ * @see SWT#UP
+ * @see SWT#DOWN
  * @see SWT#LEFT
  * @see SWT#RIGHT
  * @see SWT#CENTER
@@ -764,21 +767,6 @@ boolean mnemonicMatch (char key) {
 	return Character.toUpperCase (key) == Character.toUpperCase (mnemonic);
 }
 
-void printWidget (int /*long*/ hwnd, GC gc) {
-	/*
-	* Bug in Windows.  For some reason, PrintWindow() fails
-	* when it is called on a push button.  The fix is to
-	* detect the failure and use WM_PRINT instead.  Note
-	* that WM_PRINT cannot be used all the time because it
-	* fails for browser controls when the browser has focus.
-	*/
-	int /*long*/ hDC = gc.handle;
-	if (!OS.PrintWindow (hwnd, hDC, 0)) {
-		int flags = OS.PRF_CLIENT | OS.PRF_NONCLIENT | OS.PRF_ERASEBKGND | OS.PRF_CHILDREN;
-		OS.SendMessage (hwnd, OS.WM_PRINT, hDC, flags);
-	}
-}
-
 void releaseWidget () {
 	super.releaseWidget ();
 	if (imageList != null) imageList.dispose ();
@@ -1013,9 +1001,9 @@ public void setGrayed (boolean grayed) {
 	}
 }
 
-boolean setRadioFocus () {
+boolean setRadioFocus (boolean tabbing) {
 	if ((style & SWT.RADIO) == 0 || !getSelection ()) return false;
-	return setFocus ();
+	return tabbing ? setTabItemFocus () : setFocus ();
 }
 
 boolean setRadioSelection (boolean value) {
@@ -1165,7 +1153,7 @@ int /*long*/ windowProc () {
 }
 
 
-LRESULT WM_ERASEBKGND (int wParam, int lParam) {
+LRESULT WM_ERASEBKGND (int /*long*/ wParam, int /*long*/ lParam) {
 	LRESULT result = super.WM_ERASEBKGND (wParam, lParam);
 	if (result != null) return result;
 	/*
@@ -1292,6 +1280,16 @@ LRESULT WM_UPDATEUISTATE (int /*long*/ wParam, int /*long*/ lParam) {
 			}
 		}
 	}
+	/*
+	* Feature in Windows.  Push and toggle buttons draw directly
+	* in WM_UPDATEUISTATE rather than damaging and drawing later
+	* in WM_PAINT.  This means that clients who hook WM_PAINT
+	* expecting to get all the drawing will not.  The fix is to
+	* redraw the control when paint events are hooked.
+	*/
+	if ((style & (SWT.PUSH | SWT.TOGGLE)) != 0) {
+		if (hooks (SWT.Paint) || filters (SWT.Paint)) OS.InvalidateRect (handle, null, true);
+	}
 	return result;
 }
 
@@ -1350,6 +1348,18 @@ LRESULT wmDrawChild (int /*long*/ wParam, int /*long*/ lParam) {
 			case SWT.DOWN: iStateId = OS.ABS_DOWNNORMAL; break;
 			case SWT.LEFT: iStateId = OS.ABS_LEFTNORMAL; break;
 			case SWT.RIGHT: iStateId = OS.ABS_RIGHTNORMAL; break;
+		}
+		/*
+		* Feature in Windows.  On Vista only, DrawThemeBackground()
+		* does not mirror the drawing. The fix is switch left to right
+		* and right to left.
+		*/
+		if (!OS.IsWinCE && OS.WIN32_VERSION >= OS.VERSION (6, 0)) {
+			if ((style & SWT.MIRRORED) != 0) {
+				if ((style & (SWT.LEFT | SWT.RIGHT)) != 0) {
+					iStateId = iStateId == OS.ABS_RIGHTNORMAL ? OS.ABS_LEFTNORMAL : OS.ABS_RIGHTNORMAL; 
+				}
+			}
 		}
 		/*
 		* NOTE: The normal, hot, pressed and disabled state is

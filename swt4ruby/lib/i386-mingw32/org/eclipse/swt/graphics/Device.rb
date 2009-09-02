@@ -1,6 +1,6 @@
 require "rjava"
 
-# Copyright (c) 2000, 2008 IBM Corporation and others.
+# Copyright (c) 2000, 2009 IBM Corporation and others.
 # All rights reserved. This program and the accompanying materials
 # are made available under the terms of the Eclipse Public License v1.0
 # which accompanies this distribution, and is available at
@@ -144,6 +144,19 @@ module Org::Eclipse::Swt::Graphics
     alias_method :attr_gdip_token=, :gdip_token=
     undef_method :gdip_token=
     
+    # long
+    attr_accessor :font_collection
+    alias_method :attr_font_collection, :font_collection
+    undef_method :font_collection
+    alias_method :attr_font_collection=, :font_collection=
+    undef_method :font_collection=
+    
+    attr_accessor :loaded_fonts
+    alias_method :attr_loaded_fonts, :loaded_fonts
+    undef_method :loaded_fonts
+    alias_method :attr_loaded_fonts=, :loaded_fonts=
+    undef_method :loaded_fonts=
+    
     attr_accessor :disposed
     alias_method :attr_disposed, :disposed
     undef_method :disposed
@@ -159,8 +172,6 @@ module Org::Eclipse::Swt::Graphics
       # fix is to remove this feature. Unfortunately,
       # too many application programs rely on this
       # feature.
-      # 
-      # This code will be removed in the future.
       
       def current_device
         defined?(@@current_device) ? @@current_device : @@current_device= nil
@@ -186,7 +197,7 @@ module Org::Eclipse::Swt::Graphics
       when_class_loaded do
         begin
           Class.for_name("org.eclipse.swt.widgets.Display") # $NON-NLS-1$
-        rescue JavaThrowable => e
+        rescue ClassNotFoundException => e
         end
       end
       
@@ -244,6 +255,8 @@ module Org::Eclipse::Swt::Graphics
       @pixels = nil
       @scripts = nil
       @gdip_token = nil
+      @font_collection = 0
+      @loaded_fonts = nil
       @disposed = false
       synchronized((Device)) do
         if (!(data).nil?)
@@ -258,6 +271,34 @@ module Org::Eclipse::Swt::Graphics
         create(data)
         init
       end
+    end
+    
+    typesig { [String] }
+    def add_font(font)
+      if ((@loaded_fonts).nil?)
+        @loaded_fonts = Array.typed(String).new(4) { nil }
+      end
+      length = @loaded_fonts.attr_length
+      i = 0
+      while i < length
+        if ((font == @loaded_fonts[i]))
+          return
+        end
+        i += 1
+      end
+      index = 0
+      while (index < length)
+        if ((@loaded_fonts[index]).nil?)
+          break
+        end
+        index += 1
+      end
+      if ((index).equal?(length))
+        temp = Array.typed(String).new(length + 4) { nil }
+        System.arraycopy(@loaded_fonts, 0, temp, 0, length)
+        @loaded_fonts = temp
+      end
+      @loaded_fonts[index] = font
     end
     
     typesig { [] }
@@ -301,6 +342,25 @@ module Org::Eclipse::Swt::Graphics
         input.attr_gdiplus_version = 1
         if ((Gdip._gdiplus_startup(token, input, 0)).equal?(0))
           @gdip_token = token
+          if (!(@loaded_fonts).nil?)
+            @font_collection = Gdip._private_font_collection_new
+            if ((@font_collection).equal?(0))
+              SWT.error(SWT::ERROR_NO_HANDLES)
+            end
+            i = 0
+            while i < @loaded_fonts.attr_length
+              path = @loaded_fonts[i]
+              if ((path).nil?)
+                break
+              end
+              length_ = path.length
+              buffer = CharArray.new(length_ + 1)
+              path.get_chars(0, length_, buffer, 0)
+              Gdip._private_font_collection_add_font_file(@font_collection, buffer)
+              i += 1
+            end
+            @loaded_fonts = nil
+          end
         end
       rescue JavaThrowable => t
         SWT.error(SWT::ERROR_NO_GRAPHICS_LIBRARY, t, " [GDI+ is required]") # $NON-NLS-1$
@@ -505,9 +565,9 @@ module Org::Eclipse::Swt::Graphics
       if (@tracking)
         synchronized((@tracking_lock)) do
           count = 0
-          length = @objects.attr_length
+          length_ = @objects.attr_length
           i = 0
-          while i < length
+          while i < length_
             if (!(@objects[i]).nil?)
               count += 1
             end
@@ -517,7 +577,7 @@ module Org::Eclipse::Swt::Graphics
           data.attr_objects = Array.typed(Object).new(count) { nil }
           data.attr_errors = Array.typed(JavaError).new(count) { nil }
           i_ = 0
-          while i_ < length
+          while i_ < length_
             if (!(@objects[i_]).nil?)
               data.attr_objects[index] = @objects[i_]
               data.attr_errors[index] = @errors[i_]
@@ -705,16 +765,16 @@ module Org::Eclipse::Swt::Graphics
       # long
       buffer = Array.typed(::Java::Int).new(1) { 0 }
       dw_flags = OS::FORMAT_MESSAGE_ALLOCATE_BUFFER | OS::FORMAT_MESSAGE_FROM_SYSTEM | OS::FORMAT_MESSAGE_IGNORE_INSERTS
-      length = OS._format_message(dw_flags, 0, error_, OS::LANG_USER_DEFAULT, buffer, 0, 0)
-      if ((length).equal?(0))
+      length_ = OS._format_message(dw_flags, 0, error_, OS::LANG_USER_DEFAULT, buffer, 0, 0)
+      if ((length_).equal?(0))
         return " [GetLastError=0x" + RJava.cast_to_string(JavaInteger.to_hex_string(error_)) + "]"
       end # $NON-NLS-1$ //$NON-NLS-2$
-      buffer1 = TCHAR.new(0, length)
-      OS._move_memory(buffer1, buffer[0], length * TCHAR.attr_sizeof)
+      buffer1 = TCHAR.new(0, length_)
+      OS._move_memory(buffer1, buffer[0], length_ * TCHAR.attr_sizeof)
       if (!(buffer[0]).equal?(0))
         OS._local_free(buffer[0])
       end
-      return buffer1.to_s(0, length)
+      return buffer1.to_s(0, length_)
     end
     
     typesig { [::Java::Int] }
@@ -975,7 +1035,24 @@ module Org::Eclipse::Swt::Graphics
       end
       if (OS::IsWinNT && OS::WIN32_VERSION >= OS._version(4, 10))
         lpsz_filename = TCHAR.new(0, path, true)
-        return !(OS._add_font_resource_ex(lpsz_filename, OS::FR_PRIVATE, 0)).equal?(0)
+        loaded = !(OS._add_font_resource_ex(lpsz_filename, OS::FR_PRIVATE, 0)).equal?(0)
+        if (loaded)
+          if (!(@gdip_token).nil?)
+            if ((@font_collection).equal?(0))
+              @font_collection = Gdip._private_font_collection_new
+              if ((@font_collection).equal?(0))
+                SWT.error(SWT::ERROR_NO_HANDLES)
+              end
+            end
+            length_ = path.length
+            buffer = CharArray.new(length_ + 1)
+            path.get_chars(0, length_, buffer, 0)
+            Gdip._private_font_collection_add_font_file(@font_collection, buffer)
+          else
+            add_font(path)
+          end
+        end
+        return loaded
       end
       return false
     end
@@ -1134,6 +1211,10 @@ module Org::Eclipse::Swt::Graphics
     # @see #destroy
     def release
       if (!(@gdip_token).nil?)
+        if (!(@font_collection).equal?(0))
+          Gdip._private_font_collection_delete(@font_collection)
+        end
+        @font_collection = 0
         Gdip._gdiplus_shutdown(@gdip_token[0])
       end
       @gdip_token = nil

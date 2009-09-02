@@ -1,6 +1,6 @@
 require "rjava"
 
-# Copyright (c) 2000, 2008 IBM Corporation and others.
+# Copyright (c) 2000, 2009 IBM Corporation and others.
 # All rights reserved. This program and the accompanying materials
 # are made available under the terms of the Eclipse Public License v1.0
 # which accompanies this distribution, and is available at
@@ -20,9 +20,6 @@ module Org::Eclipse::Swt::Widgets
     }
   end
   
-  # TODO - features not yet implemented: read-only, drop-down calendar for date
-  # TODO - font, colors, background image not yet implemented (works on some platforms)
-  # 
   # Instances of this class are selectable user interface
   # objects that allow the user to enter and modify date
   # or time values.
@@ -32,13 +29,14 @@ module Org::Eclipse::Swt::Widgets
   # </p>
   # <dl>
   # <dt><b>Styles:</b></dt>
-  # <dd>DATE, TIME, CALENDAR, SHORT, MEDIUM, LONG</dd>
+  # <dd>DATE, TIME, CALENDAR, SHORT, MEDIUM, LONG, DROP_DOWN</dd>
   # <dt><b>Events:</b></dt>
-  # <dd>Selection</dd>
+  # <dd>DefaultSelection, Selection</dd>
   # </dl>
   # <p>
   # Note: Only one of the styles DATE, TIME, or CALENDAR may be specified,
   # and only one of the styles SHORT, MEDIUM, or LONG may be specified.
+  # The DROP_DOWN style is a <em>HINT</em>, and it is only valid with the DATE style.
   # </p><p>
   # IMPORTANT: This class is <em>not</em> intended to be subclassed.
   # </p>
@@ -48,8 +46,15 @@ module Org::Eclipse::Swt::Widgets
   # @see <a href="http://www.eclipse.org/swt/">Sample code and further information</a>
   # 
   # @since 3.3
+  # @noextend This class is not intended to be subclassed by clients.
   class DateTime < DateTimeImports.const_get :Composite
     include_class_members DateTimeImports
+    
+    attr_accessor :double_click
+    alias_method :attr_double_click, :double_click
+    undef_method :double_click
+    alias_method :attr_double_click=, :double_click=
+    undef_method :double_click=
     
     attr_accessor :ignore_selection
     alias_method :attr_ignore_selection, :ignore_selection
@@ -245,9 +250,14 @@ module Org::Eclipse::Swt::Widgets
     # @see SWT#DATE
     # @see SWT#TIME
     # @see SWT#CALENDAR
+    # @see SWT#SHORT
+    # @see SWT#MEDIUM
+    # @see SWT#LONG
+    # @see SWT#DROP_DOWN
     # @see Widget#checkSubclass
     # @see Widget#getStyle
     def initialize(parent, style)
+      @double_click = false
       @ignore_selection = false
       @last_system_time = nil
       @time = nil
@@ -267,7 +277,7 @@ module Org::Eclipse::Swt::Widgets
     # interface.
     # <p>
     # <code>widgetSelected</code> is called when the user changes the control's value.
-    # <code>widgetDefaultSelected</code> is not called.
+    # <code>widgetDefaultSelected</code> is typically called when ENTER is pressed.
     # </p>
     # 
     # @param listener the listener which should be notified
@@ -315,7 +325,11 @@ module Org::Eclipse::Swt::Widgets
         # the SWT style.
         style &= ~(SWT::H_SCROLL | SWT::V_SCROLL)
         style = check_bits(style, SWT::DATE, SWT::TIME, SWT::CALENDAR, 0, 0, 0)
-        return check_bits(style, SWT::MEDIUM, SWT::SHORT, SWT::LONG, 0, 0, 0)
+        style = check_bits(style, SWT::MEDIUM, SWT::SHORT, SWT::LONG, 0, 0, 0)
+        if (((style & SWT::DATE)).equal?(0))
+          style &= ~SWT::DROP_DOWN
+        end
+        return style
       end
     }
     
@@ -489,12 +503,15 @@ module Org::Eclipse::Swt::Widgets
           end
           OS._release_dc(self.attr_handle, h_dc)
           up_down_width = OS._get_system_metrics(OS::SM_CXVSCROLL)
-          width += up_down_width + MARGIN
           up_down_height = OS._get_system_metrics(OS::SM_CYVSCROLL)
-          # TODO: On Vista, can send DTM_GETDATETIMEPICKERINFO to ask the Edit control what its margins are
           if (!OS::IsWinCE && OS::WIN32_VERSION >= OS._version(6, 0))
+            # TODO: On Vista, can send DTM_GETDATETIMEPICKERINFO to ask the Edit control what its margins are
             up_down_height += 7
+            if (!((self.attr_style & SWT::DROP_DOWN)).equal?(0))
+              up_down_width += 16
+            end
           end
+          width += up_down_width + MARGIN
           height = Math.max(height, up_down_height)
         end
       end
@@ -557,54 +574,41 @@ module Org::Eclipse::Swt::Widgets
     
     typesig { [] }
     def get_custom_short_date_format
-      if (true)
-        tchar = TCHAR.new(get_code_page, 80)
-        size = OS._get_locale_info(OS::LOCALE_USER_DEFAULT, OS::LOCALE_SYEARMONTH, tchar, 80)
-        return !(size).equal?(0) ? tchar.to_s(0, size - 1) : "M/yyyy" # $NON-NLS-1$
-      end
+      tchar = TCHAR.new(get_code_page, 80)
+      size = OS._get_locale_info(OS::LOCALE_USER_DEFAULT, OS::LOCALE_SYEARMONTH, tchar, 80)
+      return !(size).equal?(0) ? tchar.to_s(0, size - 1) : "M/yyyy" # $NON-NLS-1$
       # TODO: Not currently used, but may need for WinCE (or if numeric short date is required)
-      buffer = StringBuffer.new(get_short_date_format)
-      length_ = buffer.length
-      in_quotes = false
-      start = 0
-      end_ = 0
-      while (start < length_)
-        ch = buffer.char_at(start)
-        if ((ch).equal?(SINGLE_QUOTE))
-          in_quotes = !in_quotes
-        else
-          if ((ch).equal?(DAY_FORMAT_CONSTANT) && !in_quotes)
-            end_ = start + 1
-            while (end_ < length_ && (buffer.char_at(end_)).equal?(DAY_FORMAT_CONSTANT))
-              end_ += 1
-            end
-            ordering = get_short_date_format_ordering
-            case (ordering)
-            when MONTH_DAY_YEAR
-              # skip the following separator
-              while (end_ < length_ && !(buffer.char_at(end_)).equal?(YEAR_FORMAT_CONSTANT))
-                end_ += 1
-              end
-            when DAY_MONTH_YEAR
-              # skip the following separator
-              while (end_ < length_ && !(buffer.char_at(end_)).equal?(MONTH_FORMAT_CONSTANT))
-                end_ += 1
-              end
-            when YEAR_MONTH_DAY
-              # skip the preceding separator
-              while (start > 0 && !(buffer.char_at(start)).equal?(MONTH_FORMAT_CONSTANT))
-                start -= 1
-              end
-            end
-            break
-          end
-        end
-        start += 1
-      end
-      if (start < end_)
-        buffer.delete(start, end_)
-      end
-      return buffer.to_s
+      # StringBuffer buffer = new StringBuffer (getShortDateFormat ());
+      # int length = buffer.length ();
+      # boolean inQuotes = false;
+      # int start = 0, end = 0;
+      # while (start < length) {
+      # char ch = buffer.charAt (start);
+      # if (ch == SINGLE_QUOTE) inQuotes = !inQuotes;
+      # else if (ch == DAY_FORMAT_CONSTANT && !inQuotes) {
+      # end = start + 1;
+      # while (end < length && buffer.charAt (end) == DAY_FORMAT_CONSTANT) end++;
+      # int ordering = getShortDateFormatOrdering ();
+      # switch (ordering) {
+      # case MONTH_DAY_YEAR:
+      # // skip the following separator
+      # while (end < length && buffer.charAt (end) != YEAR_FORMAT_CONSTANT) end++;
+      # break;
+      # case DAY_MONTH_YEAR:
+      # // skip the following separator
+      # while (end < length && buffer.charAt (end) != MONTH_FORMAT_CONSTANT) end++;
+      # break;
+      # case YEAR_MONTH_DAY:
+      # // skip the preceding separator
+      # while (start > 0 && buffer.charAt (start) != MONTH_FORMAT_CONSTANT) start--;
+      # break;
+      # }
+      # break;
+      # }
+      # start++;
+      # }
+      # if (start < end) buffer.delete (start, end);
+      # return buffer.toString ();
     end
     
     typesig { [] }
@@ -889,6 +893,7 @@ module Org::Eclipse::Swt::Widgets
     # Sets the receiver's date, or day of the month, to the specified day.
     # <p>
     # The first day of the month is 1, and the last day depends on the month and year.
+    # If the specified day is not valid for the receiver's month and year, then it is ignored.
     # </p>
     # 
     # @param day a positive integer beginning with 1
@@ -897,6 +902,8 @@ module Org::Eclipse::Swt::Widgets
     # <li>ERROR_WIDGET_DISPOSED - if the receiver has been disposed</li>
     # <li>ERROR_THREAD_INVALID_ACCESS - if not called from the thread that created the receiver</li>
     # </ul>
+    # 
+    # @see #setDate
     def set_day(day)
       check_widget
       systime = SYSTEMTIME.new
@@ -962,6 +969,7 @@ module Org::Eclipse::Swt::Widgets
     # Sets the receiver's month.
     # <p>
     # The first month of the year is 0, and the last month is 11.
+    # If the specified month is not valid for the receiver's day and year, then it is ignored.
     # </p>
     # 
     # @param month an integer between 0 and 11
@@ -970,6 +978,8 @@ module Org::Eclipse::Swt::Widgets
     # <li>ERROR_WIDGET_DISPOSED - if the receiver has been disposed</li>
     # <li>ERROR_THREAD_INVALID_ACCESS - if not called from the thread that created the receiver</li>
     # </ul>
+    # 
+    # @see #setDate
     def set_month(month)
       check_widget
       systime = SYSTEMTIME.new
@@ -1040,6 +1050,7 @@ module Org::Eclipse::Swt::Widgets
     # Sets the receiver's year.
     # <p>
     # The first year is 1752 and the last year is 9999.
+    # If the specified year is not valid for the receiver's day and month, then it is ignored.
     # </p>
     # 
     # @param year an integer between 1752 and 9999
@@ -1048,6 +1059,8 @@ module Org::Eclipse::Swt::Widgets
     # <li>ERROR_WIDGET_DISPOSED - if the receiver has been disposed</li>
     # <li>ERROR_THREAD_INVALID_ACCESS - if not called from the thread that created the receiver</li>
     # </ul>
+    # 
+    # @see #setDate
     def set_year(year)
       check_widget
       systime = SYSTEMTIME.new
@@ -1073,7 +1086,10 @@ module Org::Eclipse::Swt::Widgets
         bits |= OS::DTS_TIMEFORMAT
       end
       if (!((self.attr_style & SWT::DATE)).equal?(0))
-        bits |= (!((self.attr_style & SWT::MEDIUM)).equal?(0) ? OS::DTS_SHORTDATECENTURYFORMAT : OS::DTS_LONGDATEFORMAT) | OS::DTS_UPDOWN
+        bits |= (!((self.attr_style & SWT::MEDIUM)).equal?(0) ? OS::DTS_SHORTDATECENTURYFORMAT : OS::DTS_LONGDATEFORMAT)
+        if (((self.attr_style & SWT::DROP_DOWN)).equal?(0))
+          bits |= OS::DTS_UPDOWN
+        end
       end
       return bits
     end
@@ -1095,13 +1111,25 @@ module Org::Eclipse::Swt::Widgets
     def wm_notify_child(hdr, w_param, l_param)
       catch(:break_case) do
         case (hdr.attr_code)
-        when OS::MCN_SELCHANGE, OS::DTN_DATETIMECHANGE
+        when OS::DTN_CLOSEUP
+          # Feature in Windows.  When the user selects the drop-down button,
+          # the DateTimePicker runs a modal loop and consumes WM_LBUTTONUP.
+          # This is done without adding a mouse capture.  Since WM_LBUTTONUP
+          # is not delivered, the normal mechanism where a mouse capture is
+          # added on mouse down and removed when the mouse is released
+          # is broken, leaving an unwanted capture.  The fix is to avoid
+          # setting capture on mouse down right after WM_LBUTTONUP is consumed.
+          self.attr_display.attr_capture_changed = true
+        when OS::MCN_SELCHANGE
           if (@ignore_selection)
             throw :break_case, :thrown
           end
           systime = SYSTEMTIME.new
-          msg = !((self.attr_style & SWT::CALENDAR)).equal?(0) ? OS::MCM_GETCURSEL : OS::DTM_GETSYSTEMTIME
-          OS._send_message(self.attr_handle, msg, 0, systime)
+          OS._send_message(self.attr_handle, OS::MCM_GETCURSEL, 0, systime)
+          post_event(SWT::Selection)
+        when OS::DTN_DATETIMECHANGE
+          systime = SYSTEMTIME.new
+          OS._send_message(self.attr_handle, OS::DTM_GETSYSTEMTIME, 0, systime)
           if ((@last_system_time).nil? || !(systime.attr_w_day).equal?(@last_system_time.attr_w_day) || !(systime.attr_w_month).equal?(@last_system_time.attr_w_month) || !(systime.attr_w_year).equal?(@last_system_time.attr_w_year))
             post_event(SWT::Selection)
             if (((self.attr_style & SWT::TIME)).equal?(0))
@@ -1111,6 +1139,90 @@ module Org::Eclipse::Swt::Widgets
         end
       end
       return super(hdr, w_param, l_param)
+    end
+    
+    typesig { [::Java::Int, ::Java::Int] }
+    # long
+    # long
+    def _wm_char(w_param, l_param)
+      result = super(w_param, l_param)
+      if (!(result).nil?)
+        return result
+      end
+      # Feature in Windows.  For some reason, when the
+      # user presses tab, return or escape, Windows beeps.
+      # The fix is to look for these keys and not call
+      # the window proc.
+      # 
+      # 64
+      case (RJava.cast_to_int(w_param))
+      # FALL THROUGH
+      when SWT::CR
+        post_event(SWT::DefaultSelection)
+        return LRESULT::ZERO
+      when SWT::TAB, SWT::ESC
+        return LRESULT::ZERO
+      end
+      return result
+    end
+    
+    typesig { [::Java::Int, ::Java::Int] }
+    # long
+    # long
+    def _wm_lbuttondblclk(w_param, l_param)
+      result = super(w_param, l_param)
+      if (is_disposed)
+        return LRESULT::ZERO
+      end
+      if (!((self.attr_style & SWT::CALENDAR)).equal?(0))
+        p_mchit_test = MCHITTESTINFO.new
+        p_mchit_test.attr_cb_size = MCHITTESTINFO.attr_sizeof
+        pt = POINT.new
+        pt.attr_x = OS._get_x_lparam(l_param)
+        pt.attr_y = OS._get_y_lparam(l_param)
+        p_mchit_test.attr_pt = pt
+        # long
+        code = OS._send_message(self.attr_handle, OS::MCM_HITTEST, 0, p_mchit_test)
+        if (((code & OS::MCHT_CALENDARDATE)).equal?(OS::MCHT_CALENDARDATE))
+          @double_click = true
+        end
+      end
+      return result
+    end
+    
+    typesig { [::Java::Int, ::Java::Int] }
+    # long
+    # long
+    def _wm_lbuttondown(w_param, l_param)
+      result = super(w_param, l_param)
+      if ((result).equal?(LRESULT::ZERO))
+        return result
+      end
+      @double_click = false
+      # Feature in Windows. For some reason, the calendar control
+      # does not take focus on WM_LBUTTONDOWN.  The fix is to
+      # explicitly set focus.
+      if (!((self.attr_style & SWT::CALENDAR)).equal?(0))
+        if (((self.attr_style & SWT::NO_FOCUS)).equal?(0))
+          OS._set_focus(self.attr_handle)
+        end
+      end
+      return result
+    end
+    
+    typesig { [::Java::Int, ::Java::Int] }
+    # long
+    # long
+    def _wm_lbuttonup(w_param, l_param)
+      result = super(w_param, l_param)
+      if (is_disposed)
+        return LRESULT::ZERO
+      end
+      if (@double_click)
+        post_event(SWT::DefaultSelection)
+      end
+      @double_click = false
+      return result
     end
     
     typesig { [::Java::Int, ::Java::Int] }

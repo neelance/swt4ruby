@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2008 IBM Corporation and others.
+ * Copyright (c) 2000, 2009 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -10,10 +10,7 @@
  *******************************************************************************/
 package org.eclipse.swt.widgets;
 
-import org.eclipse.swt.internal.carbon.CFRange;
-import org.eclipse.swt.internal.carbon.OS;
-import org.eclipse.swt.internal.carbon.Rect;
-import org.eclipse.swt.internal.carbon.CGPoint;
+import org.eclipse.swt.internal.cocoa.*;
 
 import org.eclipse.swt.*;
 import org.eclipse.swt.events.*;
@@ -39,23 +36,17 @@ import org.eclipse.swt.graphics.*;
  * @see <a href="http://www.eclipse.org/swt/">Sample code and further information</a>
  * 
  * @since 3.1
+ * @noextend This class is not intended to be subclassed by clients.
  */
 public class Link extends Control {
+	NSScrollView scrollView;
 	String text;
-	TextLayout layout;
-	Color linkColor, disabledColor;
 	Point [] offsets;
 	Point selection;
 	String [] ids;
 	int [] mnemonics;
-	int focusIndex;
+	NSColor linkColor;
 	
-	static final RGB LINK_FOREGROUND = new RGB (0, 51, 153);
-	static final RGB LINK_DISABLED_FOREGROUND = new RGB (172, 168, 153);
-	static final String [] AX_ATTRIBUTES = {
-		OS.kAXTitleAttribute,
-	};
-
 /**
  * Constructs a new instance of this class given its parent
  * and a style value describing its behavior and appearance.
@@ -119,8 +110,12 @@ public void addSelectionListener (SelectionListener listener) {
 	addListener (SWT.DefaultSelection, typedListener);
 }
 
-int callFocusEventHandler (int nextHandler, int theEvent) {
-	return OS.noErr;
+boolean textView_clickOnLink_atIndex(int /*long*/ id, int /*long*/ sel, int /*long*/ textView, int /*long*/ link, int /*long*/ charIndex) {
+	NSString str = new NSString (link);
+	Event event = new Event ();
+	event.text = str.getString();
+	sendEvent (SWT.Selection, event);
+	return true;
 }
 
 public Point computeSize (int wHint, int hHint, boolean changed) {
@@ -128,136 +123,91 @@ public Point computeSize (int wHint, int hHint, boolean changed) {
 	if (wHint != SWT.DEFAULT && wHint < 0) wHint = 0;
 	if (hHint != SWT.DEFAULT && hHint < 0) hHint = 0;
 	int width, height;
-	int layoutWidth = layout.getWidth ();
-	//TEMPORARY CODE
-	if (wHint == 0) {
-		layout.setWidth (1);
-		Rectangle rect = layout.getBounds ();
-		width = 0;
-		height = rect.height;
-	} else {
-		layout.setWidth (wHint);
-		Rectangle rect = layout.getBounds ();
-		width = rect.width;
-		height = rect.height;
-	}
-	layout.setWidth (layoutWidth);		
+	//TODO wrapping, wHint
+	int borderStyle = hasBorder() ? OS.NSBezelBorder : OS.NSNoBorder;
+	NSSize borderSize = NSScrollView.frameSizeForContentSize(new NSSize(), false, false, borderStyle);
+	NSTextView widget = (NSTextView)view;
+	NSSize size = widget.textStorage().size();
+	width = (int)(size.width + borderSize.width);
+	height = (int)(size.height + borderSize.height);
 	if (wHint != SWT.DEFAULT) width = wHint;
 	if (hHint != SWT.DEFAULT) height = hHint;
 	int border = getBorderWidth ();
 	width += border * 2;
 	height += border * 2;
+
+	// TODO is this true?  if so, can this rounding be turned off?
+	/*
+	 * Bug in Cocoa.  NSTextStorage.size() seems to return a width
+	 * value that is rounded down, because its result is never
+	 * fractional.  The workaround is to increment width by 1
+	 * to ensure that it is wide enough to show the full text.  
+	 */
+	width += 1;
 	return new Point (width, height);
 }
 
 void createHandle () {
-	state |= GRAB | THEME_BACKGROUND;
-	int features = OS.kControlSupportsFocus;
-	int [] outControl = new int [1];
-	int window = OS.GetControlOwner (parent.handle);
-	OS.CreateUserPaneControl (window, null, features, outControl);
-	if (outControl [0] == 0) error (SWT.ERROR_NO_HANDLES);
-	handle = outControl [0];
-	layout = new TextLayout (display);
-	linkColor = new Color (display, LINK_FOREGROUND);
-	disabledColor = new Color (display, LINK_DISABLED_FOREGROUND);
-	offsets = new Point [0];
-	ids = new String [0];
-	mnemonics = new int [0]; 
-	selection = new Point (-1, -1);
-	focusIndex = -1;
+	state |= THEME_BACKGROUND;
+	NSScrollView scrollWidget = (NSScrollView)new SWTScrollView().alloc();
+	scrollWidget.init();
+	scrollWidget.setDrawsBackground(false);
+	scrollWidget.setBorderType(hasBorder() ? OS.NSBezelBorder : OS.NSNoBorder);
+
+	NSTextView widget = (NSTextView)new SWTTextView().alloc();
+	widget.init();
+	widget.setEditable(false);
+	widget.setDrawsBackground(false);
+	widget.setDelegate(widget);
+	widget.setAutoresizingMask (OS.NSViewWidthSizable | OS.NSViewHeightSizable);
+	widget.textContainer().setLineFragmentPadding(0);
+	
+	scrollView = scrollWidget;
+	view = widget;
 }
 
 void createWidget () {
 	super.createWidget ();
-	layout.setFont (getFont ());
 	text = "";
+	NSDictionary dict = ((NSTextView)view).linkTextAttributes();
+	linkColor = new NSColor(dict.valueForKey(OS.NSForegroundColorAttributeName));
 }
 
-void drawBackground (int control, int context) {
-	fillBackground (control, context, null);
-	if (!hasFocus () || !drawFocusRing () || focusIndex == -1) return;
-	int [] outMetric = new int [1];
-	OS.GetThemeMetric (OS.kThemeMetricFocusRectOutset, outMetric);
-	outMetric[0]--;
-	Rect r = new Rect ();
-	Rectangle [] rects = getRectangles (focusIndex);
-	for (int i = 0; i < rects.length; i++) {
-		Rectangle rect = rects [i];
-		r.left = (short) (rect.x + outMetric[0]);
-		r.top = (short) (rect.y + outMetric[0]);
-		r.right = (short) (r.left + rect.width - (outMetric[0] * 2));
-		r.bottom = (short) (r.top + rect.height - (outMetric[0] * 2));
-		OS.DrawThemeFocusRect (r, true);
-	}
+NSFont defaultNSFont () {
+	return display.textViewFont;
 }
 
-void drawWidget (int control, int context, int damageRgn, int visibleRgn, int theEvent) {
-	GCData data = new GCData ();
-	data.paintEvent = theEvent;
-	data.visibleRgn = visibleRgn;
-	GC gc = GC.carbon_new (this, data);
-	int selStart = selection.x;
-	int selEnd = selection.y;
-	if (selStart > selEnd) {
-		selStart = selection.y;
-		selEnd = selection.x;
-	}
-	// temporary code to disable text selection
-	selStart = selEnd = -1;
-	if ((state & DISABLED) != 0) gc.setForeground (disabledColor);
-	layout.draw (gc, 0, 0, selStart, selEnd, null, null);
-	gc.dispose ();
-	super.drawWidget (control, context, damageRgn, visibleRgn, theEvent);
+void deregister () {
+	super.deregister ();
+	if (scrollView != null) display.removeWidget (scrollView);
 }
 
 void enableWidget (boolean enabled) {
 	super.enableWidget (enabled);
-	TextStyle linkStyle = new TextStyle (null, enabled ? linkColor : disabledColor, null);
-	linkStyle.underline = true;
-	for (int i = 0; i < offsets.length; i++) {
-		Point point = offsets [i];
-		layout.setStyle (linkStyle, point.x, point.y);
+	NSColor nsColor = null; 
+	if (enabled) {
+		if (foreground == null) {
+			nsColor = NSColor.textColor ();
+		} else {
+			nsColor = NSColor.colorWithDeviceRed (foreground [0], foreground [1], foreground [2], foreground[3]);
+		}
+	} else {
+		nsColor = NSColor.disabledControlTextColor();
 	}
-	redraw ();
-}
-
-String [] getAxAttributes () {
-	return AX_ATTRIBUTES;
+	NSTextView widget = (NSTextView)view;
+	widget.setTextColor(nsColor);
+	NSDictionary linkTextAttributes = widget.linkTextAttributes();
+	int count = (int)/*64*/linkTextAttributes.count();
+	NSMutableDictionary dict = NSMutableDictionary.dictionaryWithCapacity(count);
+	dict.setDictionary(linkTextAttributes);
+	dict.setValue(enabled ? linkColor : nsColor, OS.NSForegroundColorAttributeName);
+	widget.setLinkTextAttributes(dict);
 }
 
 String getNameText () {
 	return getText ();
 }
 
-Rectangle [] getRectangles (int linkIndex) {
-	int lineCount = layout.getLineCount ();
-	Rectangle [] rects = new Rectangle [lineCount];
-	int [] lineOffsets = layout.getLineOffsets ();
-	Point point = offsets [linkIndex];
-	int lineStart = 1;
-	while (point.x > lineOffsets [lineStart]) lineStart++;
-	int lineEnd = 1;
-	while (point.y > lineOffsets [lineEnd]) lineEnd++;
-	int index = 0;
-	if (lineStart == lineEnd) {
-		rects [index++] = layout.getBounds (point.x, point.y);		
-	} else {
-		rects [index++] = layout.getBounds (point.x, lineOffsets [lineStart]-1);
-		rects [index++] = layout.getBounds (lineOffsets [lineEnd-1], point.y);
-		if (lineEnd - lineStart > 1) {
-			for (int i = lineStart; i < lineEnd - 1; i++) {
-				rects [index++] = layout.getLineBounds (i);
-			}
-		}
-	}
-	if (rects.length != index) {
-		Rectangle [] tmp = new Rectangle [index];
-		System.arraycopy (rects, 0, tmp, 0, index);
-		rects = tmp;
-	}	
-	return rects;
-}
 
 /**
  * Returns the receiver's text, which will be an empty
@@ -275,133 +225,18 @@ public String getText () {
 	return text;
 }
 
-int kEventAccessibleGetNamedAttribute (int nextHandler, int theEvent, int userData) {
-	int code = OS.eventNotHandledErr;
-	int [] stringRef = new int [1];
-	OS.GetEventParameter (theEvent, OS.kEventParamAccessibleAttributeName, OS.typeCFStringRef, null, 4, null, stringRef);
-	int length = 0;
-	if (stringRef [0] != 0) length = OS.CFStringGetLength (stringRef [0]);
-	char [] buffer = new char [length];
-	CFRange range = new CFRange ();
-	range.length = length;
-	OS.CFStringGetCharacters (stringRef [0], range, buffer);
-	String attributeName = new String(buffer);
-	if (attributeName.equals (OS.kAXRoleAttribute) || attributeName.equals (OS.kAXRoleDescriptionAttribute)) {
-		String roleText = OS.kAXLinkRole;
-		buffer = new char [roleText.length ()];
-		roleText.getChars (0, buffer.length, buffer, 0);
-		stringRef [0] = OS.CFStringCreateWithCharacters (OS.kCFAllocatorDefault, buffer, buffer.length);
-		if (stringRef [0] != 0) {
-			if (attributeName.equals (OS.kAXRoleAttribute)) {
-				OS.SetEventParameter (theEvent, OS.kEventParamAccessibleAttributeValue, OS.typeCFStringRef, 4, stringRef);
-			} else { // kAXRoleDescriptionAttribute
-				int stringRef2 = OS.HICopyAccessibilityRoleDescription (stringRef [0], 0);
-				OS.SetEventParameter (theEvent, OS.kEventParamAccessibleAttributeValue, OS.typeCFStringRef, 4, new int [] {stringRef2});
-				OS.CFRelease(stringRef2);
-			}
-			OS.CFRelease(stringRef [0]);
-			code = OS.noErr;
-		}
-	} else if (attributeName.equals (OS.kAXTitleAttribute) || attributeName.equals (OS.kAXDescriptionAttribute)) {
-		String text = parse (getText ());
-		if (text != null) {
-			buffer = new char [text.length ()];
-			text.getChars (0, buffer.length, buffer, 0);
-			stringRef [0] = OS.CFStringCreateWithCharacters (OS.kCFAllocatorDefault, buffer, buffer.length);
-			if (stringRef [0] != 0) {
-				OS.SetEventParameter (theEvent, OS.kEventParamAccessibleAttributeValue, OS.typeCFStringRef, 4, stringRef);
-				OS.CFRelease(stringRef [0]);
-				code = OS.noErr;
-			}
-		}
-	}
-	if (accessible != null) {
-		code = accessible.internal_kEventAccessibleGetNamedAttribute (nextHandler, theEvent, code);
-	}
-	return code;
-}
-
-int kEventControlGetFocusPart (int nextHandler, int theEvent, int userData) {
-	return OS.noErr;
-}
-
-int kEventControlSetFocusPart (int nextHandler, int theEvent, int userData) {
-	int result = super.kEventControlSetFocusPart (nextHandler, theEvent, userData);
-	if (result == OS.noErr) redraw ();
-	return result;
-}
-
-int kEventMouseMoved (int nextHandler, int theEvent, int userData) {
-	int result = super.kEventMouseMoved (nextHandler, theEvent, userData);
-	if (result == OS.noErr) return result;
-	CGPoint pt = new CGPoint ();
-	OS.GetEventParameter (theEvent, OS.kEventParamWindowMouseLocation, OS.typeHIPoint, null, CGPoint.sizeof, null, pt);
-	OS.HIViewConvertPoint (pt, 0, handle);
-	int x = (int) pt.x;
-	int y = (int) pt.y;
-	for (int j = 0; j < offsets.length; j++) {
-		Rectangle [] rects = getRectangles (j);
-		for (int i = 0; i < rects.length; i++) {
-			Rectangle rectangle = rects [i];
-			if (rectangle.contains (x, y)) {
-				setCursor (display.getSystemCursor (SWT.CURSOR_HAND));
-				return result;
-			}
-		}
-	}
-	setCursor (null);
-	return result;
-}
-
-int kEventUnicodeKeyPressed (int nextHandler, int theEvent, int userData) {
-	int result = super.kEventUnicodeKeyPressed (nextHandler, theEvent, userData);
-	if (result == OS.noErr) return result;
-	if (focusIndex == -1) return result;
-	int [] keyboardEvent = new int [1];
-	OS.GetEventParameter (theEvent, OS.kEventParamTextInputSendKeyboardEvent, OS.typeEventRef, null, keyboardEvent.length * 4, null, keyboardEvent);
-	int [] keyCode = new int [1];
-	OS.GetEventParameter (keyboardEvent [0], OS.kEventParamKeyCode, OS.typeUInt32, null, keyCode.length * 4, null, keyCode);
-	switch (keyCode [0]) {
-		case 36: /* Return */
-		case 49: /* Space */
-		case 76: /* Enter */
-			Event event = new Event ();
-			event.text = ids [focusIndex];
-			sendEvent (SWT.Selection, event);
-			break;
-		case 48: /* Tab */
-			int [] modifiers = new int [1];
-			OS.GetEventParameter (keyboardEvent [0], OS.kEventParamKeyModifiers, OS.typeUInt32, null, 4, null, modifiers);
-			boolean next = (modifiers [0] & OS.shiftKey) == 0;
-			if (next) {
-				if (focusIndex < offsets.length - 1) {
-					focusIndex++;
-					redraw ();
-				}
-			} else {
-				if (focusIndex > 0) {
-					focusIndex--;
-					redraw ();
-				} 
-			}
-			break;
-			
-	}
-	return result;
+void register () {
+	super.register ();
+	if (scrollView != null) display.addWidget (scrollView, this);
 }
 
 void releaseWidget () {
 	super.releaseWidget ();
-	if (layout != null) layout.dispose ();
-	layout = null;
-	if (linkColor != null) linkColor.dispose ();
-	linkColor = null;
-	if (disabledColor != null) disabledColor.dispose ();
-	disabledColor = null;
 	offsets = null;
 	ids = null;
 	mnemonics = null;
 	text = null;
+	linkColor = null;
 }
 
 /**
@@ -578,86 +413,39 @@ int parseMnemonics (char[] buffer, int start, int end, StringBuffer result) {
 	return mnemonic;
 }
 
-boolean sendMouseEvent (int type, short button, int count, int detail, boolean send, int chord, short x, short y, int modifiers) {
-	boolean result = super.sendMouseEvent (type, button, count, detail, send, chord, x, y, modifiers);
-	switch (type) {
-		case SWT.MouseDown:
-			if (button == 1 && count == 1) {
-				int offset = layout.getOffset (x, y, null);
-				int oldSelectionX = selection.x;
-				int oldSelectionY = selection.y;
-				selection.x = offset;
-				selection.y = -1;
-				if (oldSelectionX != -1 && oldSelectionY != -1) {
-					if (oldSelectionX > oldSelectionY) {
-						int temp = oldSelectionX;
-						oldSelectionX = oldSelectionY;
-						oldSelectionY = temp;
-					}
-					Rectangle rectangle = layout.getBounds (oldSelectionX, oldSelectionY);
-					redraw (rectangle.x, rectangle.y, rectangle.width, rectangle.height, false);
-				}		
-				for (int j = 0; j < offsets.length; j++) {
-					Rectangle [] rects = getRectangles (j);
-					for (int i = 0; i < rects.length; i++) {
-						Rectangle rectangle = rects [i];
-						if (rectangle.contains (x, y)) {
-							focusIndex = j;
-							redraw ();
-							setFocus ();
-							return result;
-						}
-					}
-				}
-			}
-			break;
-		case SWT.MouseMove:
-			if ((chord & 0x01) != 0) {
-				int oldSelection = selection.y;
-				selection.y = layout.getOffset (x, y, null);
-				if (selection.y != oldSelection) {
-					int newSelection = selection.y;
-					if (oldSelection > newSelection) {
-						int temp = oldSelection;
-						oldSelection = newSelection;
-						newSelection = temp;
-					}
-					Rectangle rectangle = layout.getBounds (oldSelection, newSelection);
-					redraw (rectangle.x, rectangle.y, rectangle.width, rectangle.height, false);
-				}
-			}
-			break;
-		case SWT.MouseUp:
-			if (focusIndex == -1) break;
-			if (button == 1) {
-				Rectangle [] rects = getRectangles (focusIndex);
-				for (int i = 0; i < rects.length; i++) {
-					Rectangle rectangle = rects [i];
-					if (rectangle.contains (x, y)) {
-						Event event = new Event ();
-						event.text = ids [focusIndex];
-						notifyListeners (SWT.Selection, event);
-						return result;
-					}
-				}
-			}
-			break;
+void updateBackground () {
+	NSColor nsColor = null;
+	if (backgroundImage != null) {
+		nsColor = NSColor.colorWithPatternImage(backgroundImage.handle);
+	} else if (background != null) {
+		nsColor = NSColor.colorWithDeviceRed(background[0], background[1], background[2], background[3]);
 	}
-	
-	return result;
+	setBackground(nsColor);
 }
 
-int setBounds (int x, int y, int width, int height, boolean move, boolean resize, boolean events) {
-	int result = super.setBounds(x, y, width, height, move, resize, events);
-	if ((result & RESIZED) != 0) {
-		layout.setWidth (width > 0 ? width : -1);
+void setBackground(NSColor nsColor) {
+	NSTextView widget = (NSTextView)view;
+	if (nsColor == null) {
+		widget.setDrawsBackground(false);
+	} else {
+		widget.setDrawsBackground(true);
+		widget.setBackgroundColor (nsColor);
 	}
-	return result;
 }
 
-void setFontStyle (Font font) {
-	super.setFontStyle (font);
-	layout.setFont (getFont ());
+void setFont(NSFont font) {
+	((NSTextView) view).setFont(font);
+}
+
+void setForeground (float /*double*/ [] color) {
+	if (!getEnabled ()) return;
+	NSColor nsColor;
+	if (color == null) {
+		nsColor = NSColor.textColor ();
+	} else {
+		nsColor = NSColor.colorWithDeviceRed (color [0], color [1], color [2], 1);
+	}
+	((NSTextView) view).setTextColor (nsColor);
 }
 
 /**
@@ -669,8 +457,9 @@ void setFontStyle (Font font) {
  * selected, the text field of the selection event contains either the
  * text of the hyperlink or the value of its HREF, if one was specified.
  * In the rare case of identical hyperlinks within the same string, the
- * HREF tag can be used to distinguish between them.  The string may
- * include the mnemonic character and line delimiters.
+ * HREF attribute can be used to distinguish between them.  The string may
+ * include the mnemonic character and line delimiters. The only delimiter
+ * the HREF attribute supports is the quotation mark (").
  * </p>
  * 
  * @param string the new text
@@ -688,46 +477,50 @@ public void setText (String string) {
 	if (string == null) error (SWT.ERROR_NULL_ARGUMENT);
 	if (string.equals (text)) return;
 	text = string;
-	layout.setText (parse (string));
-	focusIndex = offsets.length > 0 ? 0 : -1 ;
-	selection.x = selection.y = -1;
-	boolean enabled = (state & DISABLED) == 0;
-	TextStyle linkStyle = new TextStyle (null, enabled ? linkColor : disabledColor, null);
-	linkStyle.underline = true;
+	NSTextView widget = (NSTextView)view;
+	widget.setString(NSString.stringWith(parse(string)));
+	NSTextStorage textStorage = widget.textStorage();
+	NSRange range = new NSRange();
 	for (int i = 0; i < offsets.length; i++) {
-		Point point = offsets [i];
-		layout.setStyle (linkStyle, point.x, point.y);
+		range.location = offsets[i].x;
+		range.length = offsets[i].y - offsets[i].x + 1;
+		textStorage.addAttribute(OS.NSLinkAttributeName, NSString.stringWith(ids[i]), range);
 	}
-	/*
-	* This code is intentionally commented. Mnemonics are 
-	* not drawn on the Macintosh.
-	*/
-//	TextStyle mnemonicStyle = new TextStyle (null, null, null);
-//	mnemonicStyle.underline = true;
-//	for (int i = 0; i < mnemonics.length; i++) {
-//		int mnemonic  = mnemonics [i];
-//		if (mnemonic != -1) {
-//			layout.setStyle (mnemonicStyle, mnemonic, mnemonic);
-//		}
-//	}
-	redraw ();    
 }
 
-int traversalCode (int key, int theEvent) {
-	if (offsets.length == 0) return 0;
-	int bits = super.traversalCode (key, theEvent);
-	if (key == 48 /* Tab */ && theEvent != 0) {
-		int [] modifiers = new int [1];
-		OS.GetEventParameter (theEvent, OS.kEventParamKeyModifiers, OS.typeUInt32, null, 4, null, modifiers);
-		boolean next = (modifiers [0] & OS.shiftKey) == 0;
-		if (next && focusIndex < offsets.length - 1) {
-			return bits & ~ SWT.TRAVERSE_TAB_NEXT;
-		}
-		if (!next && focusIndex > 0) {
-			return bits & ~ SWT.TRAVERSE_TAB_PREVIOUS;
-		}
-	}
-	return bits;
+void setZOrder () {
+	super.setZOrder ();
+	if (scrollView != null) scrollView.setDocumentView (view);
 }
+
+NSView topView () {
+	return scrollView;
+}
+
+void updateCursorRects (boolean enabled) {
+	super.updateCursorRects (enabled);
+	if (scrollView == null) return;
+	updateCursorRects (enabled, scrollView);	
+	NSClipView contentView = scrollView.contentView ();
+	updateCursorRects (enabled, contentView);
+	contentView.setDocumentCursor (enabled ? NSCursor.IBeamCursor () : null);
+}
+
+//int traversalCode (int key, int theEvent) {
+//	if (offsets.length == 0) return 0;
+//	int bits = super.traversalCode (key, theEvent);
+//	if (key == 48 /* Tab */ && theEvent != 0) {
+//		int [] modifiers = new int [1];
+//		OS.GetEventParameter (theEvent, OS.kEventParamKeyModifiers, OS.typeUInt32, null, 4, null, modifiers);
+//		boolean next = (modifiers [0] & OS.shiftKey) == 0;
+//		if (next && focusIndex < offsets.length - 1) {
+//			return bits & ~ SWT.TRAVERSE_TAB_NEXT;
+//		}
+//		if (!next && focusIndex > 0) {
+//			return bits & ~ SWT.TRAVERSE_TAB_PREVIOUS;
+//		}
+//	}
+//	return bits;
+//}
 
 }

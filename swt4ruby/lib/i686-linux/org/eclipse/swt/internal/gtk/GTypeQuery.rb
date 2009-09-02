@@ -1,6 +1,6 @@
 require "rjava"
 
-# Copyright (c) 2000, 2006 IBM Corporation and others. All rights reserved.
+# Copyright (c) 2000, 2008 IBM Corporation and others. All rights reserved.
 # The contents of this file are made available under the terms
 # of the GNU Lesser General Public License (LGPL) Version 2.1 that
 # accompanies this distribution (lgpl-v21.txt).  The LGPL is also
@@ -23,12 +23,14 @@ module Org::Eclipse::Swt::Internal::Gtk
   class GTypeQuery 
     include_class_members GTypeQueryImports
     
+    # @field cast=(GType)
     attr_accessor :type
     alias_method :attr_type, :type
     undef_method :type
     alias_method :attr_type=, :type=
     undef_method :type=
     
+    # @field cast=(const gchar *)
     # long
     attr_accessor :type_name
     alias_method :attr_type_name, :type_name
@@ -36,12 +38,14 @@ module Org::Eclipse::Swt::Internal::Gtk
     alias_method :attr_type_name=, :type_name=
     undef_method :type_name=
     
+    # @field cast=(guint)
     attr_accessor :class_size
     alias_method :attr_class_size, :class_size
     undef_method :class_size
     alias_method :attr_class_size=, :class_size=
     undef_method :class_size=
     
+    # @field cast=(guint)
     attr_accessor :instance_size
     alias_method :attr_instance_size, :instance_size
     undef_method :instance_size

@@ -21,6 +21,10 @@ module Org::Eclipse::Swt::Browser
     }
   end
   
+  # This class implements the nsIDownload interface for mozilla
+  # versions 1.4 - 1.7.x.  For mozilla version 1.8.x this interface
+  # is implemented by class nsIDownload_1_8.  Later versions of
+  # mozilla do not need to call this interface.
   class Download 
     include_class_members DownloadImports
     
@@ -607,7 +611,7 @@ module Org::Eclipse::Swt::Browser
       # int
       result = Array.typed(::Java::Long).new(1) { 0 }
       rc = supports._query_interface(NsIURI::NS_IURI_IID, result)
-      if ((rc).equal?(0))
+      if ((rc).equal?(XPCOM::NS_OK))
         # >= 1.7
         target = NsIURI.new(result[0])
         result[0] = 0

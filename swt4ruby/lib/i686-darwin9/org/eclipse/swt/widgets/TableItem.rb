@@ -1,6 +1,6 @@
 require "rjava"
 
-# Copyright (c) 2000, 2008 IBM Corporation and others.
+# Copyright (c) 2000, 2009 IBM Corporation and others.
 # All rights reserved. This program and the accompanying materials
 # are made available under the terms of the Eclipse Public License v1.0
 # which accompanies this distribution, and is available at
@@ -13,8 +13,7 @@ module Org::Eclipse::Swt::Widgets
     class_module.module_eval {
       include ::Java::Lang
       include ::Org::Eclipse::Swt::Widgets
-      include_const ::Org::Eclipse::Swt::Internal::Carbon, :OS
-      include_const ::Org::Eclipse::Swt::Internal::Carbon, :Rect
+      include ::Org::Eclipse::Swt::Internal::Cocoa
       include ::Org::Eclipse::Swt
       include ::Org::Eclipse::Swt::Graphics
     }
@@ -34,6 +33,7 @@ module Org::Eclipse::Swt::Widgets
   # 
   # @see <a href="http://www.eclipse.org/swt/snippets/#table">Table, TableItem, TableColumn snippets</a>
   # @see <a href="http://www.eclipse.org/swt/">Sample code and further information</a>
+  # @noextend This class is not intended to be subclassed by clients.
   class TableItem < TableItemImports.const_get :Item
     include_class_members TableItemImports
     
@@ -221,9 +221,6 @@ module Org::Eclipse::Swt::Widgets
       if ((index).equal?(0) && !(@width).equal?(-1))
         return @width
       end
-      width = 0
-      image = (index).equal?(0) ? self.attr_image : ((@images).nil? ? nil : @images[index])
-      text = (index).equal?(0) ? self.attr_text : ((@strings).nil? ? "" : @strings[index])
       font = nil
       if (!(@cell_font).nil?)
         font = @cell_font[index]
@@ -232,28 +229,52 @@ module Org::Eclipse::Swt::Widgets
         font = @font
       end
       if ((font).nil?)
-        font = @parent.get_font
+        font = @parent.attr_font
       end
-      gc.set_font(font)
+      if ((font).nil?)
+        font = @parent.default_font
+      end
+      text = (index).equal?(0) ? self.attr_text : ((@strings).nil? ? "" : @strings[index])
+      image = (index).equal?(0) ? self.attr_image : ((@images).nil? ? nil : @images[index])
+      cell = @parent.attr_data_cell
+      if (!(font.attr_extra_traits).equal?(0))
+        attrib_str = @parent.create_string(text, font, nil, 0, true, false)
+        cell.set_attributed_string_value(attrib_str)
+        attrib_str.release
+      else
+        cell.set_font(font.attr_handle)
+        cell.set_title(NSString.string_with(!(text).nil? ? text : ""))
+      end
+      # This code is inlined for performance
+      super_struct = Objc_super.new
+      super_struct.attr_receiver = cell.attr_id
+      super_struct.attr_super_class = OS.objc_msg_send(cell.attr_id, OS.attr_sel_superclass)
+      size = NSSize.new
+      OS.objc_msg_send_super_stret(size, super_struct, OS.attr_sel_cell_size)
       if (!(image).nil?)
-        width += image.get_bounds.attr_width + @parent.get_gap
+        size.attr_width += @parent.attr_image_bounds.attr_width + Table::IMAGE_GAP
       end
-      if (!(text).nil? && text.length > 0)
-        width += gc.string_extent(text).attr_x
+      # cell.setImage (image != null ? image.handle : null);
+      # NSSize size = cell.cellSize ();
+      width = RJava.cast_to_int(Math.ceil(size.attr_width))
+      send_measure = true
+      if (!((@parent.attr_style & SWT::VIRTUAL)).equal?(0))
+        send_measure = @cached
       end
-      if (@parent.hooks(SWT::MeasureItem))
+      if (send_measure && @parent.hooks(SWT::MeasureItem))
+        gc.set_font(font)
         event = Event.new
         event.attr_item = self
         event.attr_index = index
         event.attr_gc = gc
-        height = Array.typed(::Java::Short).new(1) { 0 }
-        OS._get_data_browser_table_view_row_height(@parent.attr_handle, height)
+        widget = @parent.attr_view
+        height = RJava.cast_to_int(widget.row_height)
         event.attr_width = width
-        event.attr_height = height[0]
+        event.attr_height = height
         @parent.send_event(SWT::MeasureItem, event)
-        if (height[0] < event.attr_height)
-          OS._set_data_browser_table_view_row_height(@parent.attr_handle, RJava.cast_to_short(event.attr_height))
-          redraw_widget(@parent.attr_handle, false)
+        if (height < event.attr_height)
+          widget.set_row_height(event.attr_height)
+          widget.set_needs_display(true)
         end
         width = event.attr_width
       end
@@ -284,6 +305,12 @@ module Org::Eclipse::Swt::Widgets
       @width = -1
     end
     
+    typesig { [::Java::Int] }
+    def create_string(index)
+      text = (index).equal?(0) ? self.attr_text : ((@strings).nil? ? "" : @strings[index])
+      return NSString.string_with(!(text).nil? ? text : "")
+    end
+    
     typesig { [] }
     def destroy_widget
       @parent.destroy_item(self)
@@ -303,7 +330,7 @@ module Org::Eclipse::Swt::Widgets
     # @since 2.0
     def get_background
       check_widget
-      if (!@parent.check_data(self, true))
+      if (!@parent.check_data(self))
         error(SWT::ERROR_WIDGET_DISPOSED)
       end
       return !(@background).nil? ? @background : @parent.get_background
@@ -323,7 +350,7 @@ module Org::Eclipse::Swt::Widgets
     # @since 3.0
     def get_background(index)
       check_widget
-      if (!@parent.check_data(self, true))
+      if (!@parent.check_data(self))
         error(SWT::ERROR_WIDGET_DISPOSED)
       end
       count = Math.max(1, @parent.attr_column_count)
@@ -350,35 +377,12 @@ module Org::Eclipse::Swt::Widgets
     # @since 3.2
     def get_bounds
       check_widget
-      if (!@parent.check_data(self, true))
+      if (!@parent.check_data(self))
         error(SWT::ERROR_WIDGET_DISPOSED)
       end
-      rect = Rect.new
-      item_index = @parent.index_of(self)
-      if ((item_index).equal?(-1))
-        return Rectangle.new(0, 0, 0, 0)
-      end
-      id = @parent.get_id(item_index)
-      column_id = (@parent.attr_column_count).equal?(0) ? @parent.attr_column_id : @parent.attr_columns[0].attr_id
-      if (!(OS._get_data_browser_item_part_bounds(@parent.attr_handle, id, column_id, OS.attr_k_data_browser_property_content_part, rect)).equal?(OS.attr_no_err))
-        return Rectangle.new(0, 0, 0, 0)
-      end
-      x = rect.attr_left
-      y = rect.attr_top
-      width = 0
-      if (!(self.attr_image).nil?)
-        bounds = self.attr_image.get_bounds
-        x += bounds.attr_width + @parent.get_gap
-      end
-      gc = SwtGC.new(@parent)
-      extent = gc.string_extent(self.attr_text)
-      gc.dispose
-      width += extent.attr_x
-      if (@parent.attr_column_count > 0)
-        width = Math.min(width, rect.attr_right - x)
-      end
-      height = rect.attr_bottom - rect.attr_top
-      return Rectangle.new(x, y, width, height)
+      table_view = @parent.attr_view
+      rect = table_view.rect_of_row(@parent.index_of(self))
+      return Rectangle.new(RJava.cast_to_int(rect.attr_x), RJava.cast_to_int(rect.attr_y), RJava.cast_to_int(rect.attr_width), RJava.cast_to_int(rect.attr_height))
     end
     
     typesig { [::Java::Int] }
@@ -394,47 +398,21 @@ module Org::Eclipse::Swt::Widgets
     # </ul>
     def get_bounds(index)
       check_widget
-      if (!@parent.check_data(self, true))
+      if (!@parent.check_data(self))
         error(SWT::ERROR_WIDGET_DISPOSED)
       end
-      @parent.check_items(true)
-      if (!(index).equal?(0) && !(0 <= index && index < @parent.attr_column_count))
+      if (!(0 <= index && index < Math.max(1, @parent.attr_column_count)))
         return Rectangle.new(0, 0, 0, 0)
       end
-      rect = Rect.new
-      item_index = @parent.index_of(self)
-      if ((item_index).equal?(-1))
-        return Rectangle.new(0, 0, 0, 0)
-      end
-      id = @parent.get_id(item_index)
-      column_id = (@parent.attr_column_count).equal?(0) ? @parent.attr_column_id : @parent.attr_columns[index].attr_id
-      if (!(OS._get_data_browser_item_part_bounds(@parent.attr_handle, id, column_id, OS.attr_k_data_browser_property_enclosing_part, rect)).equal?(OS.attr_no_err))
-        return Rectangle.new(0, 0, 0, 0)
-      end
-      x = 0
-      y = 0
-      width = 0
-      height = 0
-      if (OS::VERSION >= 0x1040)
-        if (@parent.get_lines_visible)
-          rect.attr_left += Table::GRID_WIDTH
-          rect.attr_top += Table::GRID_WIDTH
-        end
-        x = rect.attr_left
-        y = rect.attr_top
-        width = rect.attr_right - rect.attr_left
-        height = rect.attr_bottom - rect.attr_top
+      table_view = @parent.attr_view
+      if ((@parent.attr_column_count).equal?(0))
+        index = !((@parent.attr_style & SWT::CHECK)).equal?(0) ? 1 : 0
       else
-        rect2 = Rect.new
-        if (!(OS._get_data_browser_item_part_bounds(@parent.attr_handle, id, column_id, OS.attr_k_data_browser_property_content_part, rect2)).equal?(OS.attr_no_err))
-          return Rectangle.new(0, 0, 0, 0)
-        end
-        x = rect2.attr_left
-        y = rect2.attr_top
-        width = rect.attr_right - rect2.attr_left + 1
-        height = rect2.attr_bottom - rect2.attr_top + 1
+        column = @parent.get_column(index)
+        index = @parent.index_of(column.attr_ns_column)
       end
-      return Rectangle.new(x, y, width, height)
+      rect = table_view.frame_of_cell_at_column(index, @parent.index_of(self))
+      return Rectangle.new(RJava.cast_to_int(rect.attr_x), RJava.cast_to_int(rect.attr_y), RJava.cast_to_int(rect.attr_width), RJava.cast_to_int(rect.attr_height))
     end
     
     typesig { [] }
@@ -450,7 +428,7 @@ module Org::Eclipse::Swt::Widgets
     # </ul>
     def get_checked
       check_widget
-      if (!@parent.check_data(self, true))
+      if (!@parent.check_data(self))
         error(SWT::ERROR_WIDGET_DISPOSED)
       end
       if (((@parent.attr_style & SWT::CHECK)).equal?(0))
@@ -472,7 +450,7 @@ module Org::Eclipse::Swt::Widgets
     # @since 3.0
     def get_font
       check_widget
-      if (!@parent.check_data(self, true))
+      if (!@parent.check_data(self))
         error(SWT::ERROR_WIDGET_DISPOSED)
       end
       return !(@font).nil? ? @font : @parent.get_font
@@ -493,7 +471,7 @@ module Org::Eclipse::Swt::Widgets
     # @since 3.0
     def get_font(index)
       check_widget
-      if (!@parent.check_data(self, true))
+      if (!@parent.check_data(self))
         error(SWT::ERROR_WIDGET_DISPOSED)
       end
       count = Math.max(1, @parent.attr_column_count)
@@ -519,7 +497,7 @@ module Org::Eclipse::Swt::Widgets
     # @since 2.0
     def get_foreground
       check_widget
-      if (!@parent.check_data(self, true))
+      if (!@parent.check_data(self))
         error(SWT::ERROR_WIDGET_DISPOSED)
       end
       return !(@foreground).nil? ? @foreground : @parent.get_foreground
@@ -539,7 +517,7 @@ module Org::Eclipse::Swt::Widgets
     # @since 3.0
     def get_foreground(index)
       check_widget
-      if (!@parent.check_data(self, true))
+      if (!@parent.check_data(self))
         error(SWT::ERROR_WIDGET_DISPOSED)
       end
       count = Math.max(1, @parent.attr_column_count)
@@ -565,7 +543,7 @@ module Org::Eclipse::Swt::Widgets
     # </ul>
     def get_grayed
       check_widget
-      if (!@parent.check_data(self, true))
+      if (!@parent.check_data(self))
         error(SWT::ERROR_WIDGET_DISPOSED)
       end
       if (((@parent.attr_style & SWT::CHECK)).equal?(0))
@@ -577,7 +555,7 @@ module Org::Eclipse::Swt::Widgets
     typesig { [] }
     def get_image
       check_widget
-      if (!@parent.check_data(self, true))
+      if (!@parent.check_data(self))
         error(SWT::ERROR_WIDGET_DISPOSED)
       end
       return super
@@ -596,7 +574,7 @@ module Org::Eclipse::Swt::Widgets
     # </ul>
     def get_image(index)
       check_widget
-      if (!@parent.check_data(self, true))
+      if (!@parent.check_data(self))
         error(SWT::ERROR_WIDGET_DISPOSED)
       end
       if ((index).equal?(0))
@@ -625,36 +603,28 @@ module Org::Eclipse::Swt::Widgets
     # </ul>
     def get_image_bounds(index)
       check_widget
-      if (!@parent.check_data(self, true))
+      if (!@parent.check_data(self))
         error(SWT::ERROR_WIDGET_DISPOSED)
       end
-      @parent.check_items(true)
-      if (!(index).equal?(0) && !(0 <= index && index < @parent.attr_column_count))
+      if (!(0 <= index && index < Math.max(1, @parent.attr_column_count)))
         return Rectangle.new(0, 0, 0, 0)
       end
-      rect = Rect.new
-      item_index = @parent.index_of(self)
-      if ((item_index).equal?(-1))
-        return Rectangle.new(0, 0, 0, 0)
+      table_view = @parent.attr_view
+      image = (index).equal?(0) ? self.attr_image : (!(@images).nil?) ? @images[index] : nil
+      if ((@parent.attr_column_count).equal?(0))
+        index = !((@parent.attr_style & SWT::CHECK)).equal?(0) ? 1 : 0
+      else
+        column = @parent.get_column(index)
+        index = @parent.index_of(column.attr_ns_column)
       end
-      id = @parent.get_id(item_index)
-      column_id = (@parent.attr_column_count).equal?(0) ? @parent.attr_column_id : @parent.attr_columns[index].attr_id
-      if (!(OS._get_data_browser_item_part_bounds(@parent.attr_handle, id, column_id, OS.attr_k_data_browser_property_content_part, rect)).equal?(OS.attr_no_err))
-        return Rectangle.new(0, 0, 0, 0)
+      rect = table_view.frame_of_cell_at_column(index, @parent.index_of(self))
+      rect.attr_x += Tree::IMAGE_GAP
+      if (!(image).nil?)
+        rect.attr_width = @parent.attr_image_bounds.attr_width
+      else
+        rect.attr_width = 0
       end
-      x = rect.attr_left
-      y = rect.attr_top
-      width = 0
-      if ((index).equal?(0) && !(self.attr_image).nil?)
-        bounds = self.attr_image.get_bounds
-        width += bounds.attr_width
-      end
-      if (!(index).equal?(0) && !(@images).nil? && !(@images[index]).nil?)
-        bounds = @images[index].get_bounds
-        width += bounds.attr_width
-      end
-      height = rect.attr_bottom - rect.attr_top + 1
-      return Rectangle.new(x, y, width, height)
+      return Rectangle.new(RJava.cast_to_int(rect.attr_x), RJava.cast_to_int(rect.attr_y), RJava.cast_to_int(rect.attr_width), RJava.cast_to_int(rect.attr_height))
     end
     
     typesig { [] }
@@ -668,7 +638,7 @@ module Org::Eclipse::Swt::Widgets
     # </ul>
     def get_image_indent
       check_widget
-      if (!@parent.check_data(self, true))
+      if (!@parent.check_data(self))
         error(SWT::ERROR_WIDGET_DISPOSED)
       end
       return 0
@@ -701,7 +671,7 @@ module Org::Eclipse::Swt::Widgets
     typesig { [] }
     def get_text
       check_widget
-      if (!@parent.check_data(self, true))
+      if (!@parent.check_data(self))
         error(SWT::ERROR_WIDGET_DISPOSED)
       end
       return super
@@ -720,7 +690,7 @@ module Org::Eclipse::Swt::Widgets
     # </ul>
     def get_text(index)
       check_widget
-      if (!@parent.check_data(self, true))
+      if (!@parent.check_data(self))
         error(SWT::ERROR_WIDGET_DISPOSED)
       end
       if ((index).equal?(0))
@@ -752,84 +722,55 @@ module Org::Eclipse::Swt::Widgets
     # @since 3.3
     def get_text_bounds(index)
       check_widget
-      if (!@parent.check_data(self, true))
+      if (!@parent.check_data(self))
         error(SWT::ERROR_WIDGET_DISPOSED)
       end
-      @parent.check_items(true)
-      if (!(index).equal?(0) && !(0 <= index && index < @parent.attr_column_count))
+      if (!(0 <= index && index < Math.max(1, @parent.attr_column_count)))
         return Rectangle.new(0, 0, 0, 0)
       end
-      rect = Rect.new
-      item_index = @parent.index_of(self)
-      if ((item_index).equal?(-1))
-        return Rectangle.new(0, 0, 0, 0)
-      end
-      id = @parent.get_id(item_index)
-      column_id = (@parent.attr_column_count).equal?(0) ? @parent.attr_column_id : @parent.attr_columns[index].attr_id
-      if (!(OS._get_data_browser_item_part_bounds(@parent.attr_handle, id, column_id, OS.attr_k_data_browser_property_enclosing_part, rect)).equal?(OS.attr_no_err))
-        return Rectangle.new(0, 0, 0, 0)
-      end
-      image_width = 0
-      margin = @parent.get_inset_width / 2
-      image = get_image(index)
-      if (!(image).nil?)
-        bounds = image.get_bounds
-        image_width = bounds.attr_width + @parent.get_gap
-      end
-      x = 0
-      y = 0
-      width = 0
-      height = 0
-      if (OS::VERSION >= 0x1040)
-        if (@parent.get_lines_visible)
-          rect.attr_left += Table::GRID_WIDTH
-          rect.attr_top += Table::GRID_WIDTH
-        end
-        x = rect.attr_left + image_width + margin
-        y = rect.attr_top
-        width = Math.max(0, rect.attr_right - rect.attr_left - image_width - margin * 2)
-        height = rect.attr_bottom - rect.attr_top
+      table_view = @parent.attr_view
+      image = (index).equal?(0) ? self.attr_image : (!(@images).nil?) ? @images[index] : nil
+      if ((@parent.attr_column_count).equal?(0))
+        index = !((@parent.attr_style & SWT::CHECK)).equal?(0) ? 1 : 0
       else
-        rect2 = Rect.new
-        if (!(OS._get_data_browser_item_part_bounds(@parent.attr_handle, id, column_id, OS.attr_k_data_browser_property_content_part, rect2)).equal?(OS.attr_no_err))
-          return Rectangle.new(0, 0, 0, 0)
-        end
-        x = rect2.attr_left + image_width + margin
-        y = rect2.attr_top
-        width = Math.max(0, rect.attr_right - rect2.attr_left + 1 - image_width - margin * 2)
-        height = rect2.attr_bottom - rect2.attr_top + 1
+        column = @parent.get_column(index)
+        index = @parent.index_of(column.attr_ns_column)
       end
-      return Rectangle.new(x, y, width, height)
+      rect = table_view.frame_of_cell_at_column(index, @parent.index_of(self))
+      rect.attr_x += Tree::TEXT_GAP
+      rect.attr_width -= Tree::TEXT_GAP
+      if (!(image).nil?)
+        offset = @parent.attr_image_bounds.attr_width + Tree::IMAGE_GAP
+        rect.attr_x += offset
+        rect.attr_width -= offset
+      end
+      return Rectangle.new(RJava.cast_to_int(rect.attr_x), RJava.cast_to_int(rect.attr_y), RJava.cast_to_int(rect.attr_width), RJava.cast_to_int(rect.attr_height))
     end
     
     typesig { [::Java::Int] }
-    def redraw(property_id)
-      if ((@parent.attr_current_item).equal?(self))
+    def redraw(column_index)
+      if ((@parent.attr_current_item).equal?(self) || !is_drawing)
         return
       end
-      if (!(@parent.attr_draw_count).equal?(0) && !(property_id).equal?(Table::CHECK_COLUMN_ID))
-        return
-      end
-      item_index = @parent.index_of(self)
-      if ((item_index).equal?(-1))
-        return
-      end
-      id = Array.typed(::Java::Int).new([@parent.get_id(item_index)])
-      OS._update_data_browser_items(@parent.attr_handle, OS.attr_k_data_browser_no_item, id.attr_length, id, OS.attr_k_data_browser_item_no_property, property_id)
-      # Bug in the Macintosh. When the height of the row is smaller than the
-      # check box, the tail of the check mark draws outside of the item part
-      # bounds. This means it will not be redrawn when the item is unckeched.
-      # The fix is to redraw the area.
-      if ((property_id).equal?(Table::CHECK_COLUMN_ID))
-        rect = Rect.new
-        if ((OS._get_data_browser_item_part_bounds(@parent.attr_handle, @parent.get_id(item_index), property_id, OS.attr_k_data_browser_property_enclosing_part, rect)).equal?(OS.attr_no_err))
-          x = rect.attr_left
-          y = rect.attr_top - 1
-          width = rect.attr_right - rect.attr_left
-          height = 1
-          redraw_widget(@parent.attr_handle, x, y, width, height, false)
+      # redraw the full item if columnIndex == -1
+      table_view = @parent.attr_view
+      rect = nil
+      if ((column_index).equal?(-1) || @parent.hooks(SWT::MeasureItem) || @parent.hooks(SWT::EraseItem) || @parent.hooks(SWT::PaintItem))
+        rect = table_view.rect_of_row(@parent.index_of(self))
+      else
+        index = 0
+        if ((@parent.attr_column_count).equal?(0))
+          index = !((@parent.attr_style & SWT::CHECK)).equal?(0) ? 1 : 0
+        else
+          if (0 <= column_index && column_index < @parent.attr_column_count)
+            index = @parent.index_of(@parent.attr_columns[column_index].attr_ns_column)
+          else
+            return
+          end
         end
+        rect = table_view.frame_of_cell_at_column(index, @parent.index_of(self))
       end
+      table_view.set_needs_display_in_rect(rect)
     end
     
     typesig { [] }
@@ -841,7 +782,7 @@ module Org::Eclipse::Swt::Widgets
     typesig { [] }
     def release_parent
       super
-      @parent.check_items(true)
+      # parent.checkItems (true);
     end
     
     typesig { [] }
@@ -885,7 +826,7 @@ module Org::Eclipse::Swt::Widgets
         return
       end
       @cached = true
-      redraw(OS.attr_k_data_browser_no_item)
+      redraw(-1)
     end
     
     typesig { [::Java::Int, Color] }
@@ -929,7 +870,7 @@ module Org::Eclipse::Swt::Widgets
         return
       end
       @cached = true
-      redraw(OS.attr_k_data_browser_no_item)
+      redraw(index)
     end
     
     typesig { [::Java::Boolean] }
@@ -950,20 +891,9 @@ module Org::Eclipse::Swt::Widgets
       if ((@checked).equal?(checked))
         return
       end
-      set_checked(checked, false)
-    end
-    
-    typesig { [::Java::Boolean, ::Java::Boolean] }
-    def set_checked(checked, notify)
       @checked = checked
       @cached = true
-      redraw(Table::CHECK_COLUMN_ID)
-      if (notify)
-        event = Event.new
-        event.attr_item = self
-        event.attr_detail = SWT::CHECK
-        @parent.post_event(SWT::Selection, event)
-      end
+      redraw(-1)
     end
     
     typesig { [Font] }
@@ -995,8 +925,9 @@ module Org::Eclipse::Swt::Widgets
       if (!(old_font).nil? && (old_font == font))
         return
       end
+      @width = -1
       @cached = true
-      redraw(OS.attr_k_data_browser_no_item)
+      redraw(-1)
     end
     
     typesig { [::Java::Int, Font] }
@@ -1040,8 +971,9 @@ module Org::Eclipse::Swt::Widgets
       if (!(old_font).nil? && (old_font == font))
         return
       end
+      @width = -1
       @cached = true
-      redraw(OS.attr_k_data_browser_no_item)
+      redraw(index)
     end
     
     typesig { [Color] }
@@ -1074,7 +1006,7 @@ module Org::Eclipse::Swt::Widgets
         return
       end
       @cached = true
-      redraw(OS.attr_k_data_browser_no_item)
+      redraw(-1)
     end
     
     typesig { [::Java::Int, Color] }
@@ -1118,7 +1050,7 @@ module Org::Eclipse::Swt::Widgets
         return
       end
       @cached = true
-      redraw(OS.attr_k_data_browser_no_item)
+      redraw(index)
     end
     
     typesig { [::Java::Boolean] }
@@ -1141,7 +1073,7 @@ module Org::Eclipse::Swt::Widgets
       end
       @grayed = grayed
       @cached = true
-      redraw(Table::CHECK_COLUMN_ID)
+      redraw(-1)
     end
     
     typesig { [Array.typed(Image)] }
@@ -1192,7 +1124,7 @@ module Org::Eclipse::Swt::Widgets
         return
       end
       if ((@parent.attr_image_bounds).nil? && !(image).nil?)
-        @parent.set_item_height(image)
+        @parent.set_item_height(image, nil, false)
       end
       if ((index).equal?(0))
         if (!(image).nil? && (image.attr_type).equal?(SWT::ICON))
@@ -1219,7 +1151,7 @@ module Org::Eclipse::Swt::Widgets
       if ((index).equal?(0))
         @parent.set_scroll_width(self)
       end
-      redraw(OS.attr_k_data_browser_no_item)
+      redraw(index)
     end
     
     typesig { [Image] }
@@ -1315,7 +1247,7 @@ module Org::Eclipse::Swt::Widgets
       if ((index).equal?(0))
         @parent.set_scroll_width(self)
       end
-      redraw(OS.attr_k_data_browser_no_item)
+      redraw(index)
     end
     
     typesig { [String] }

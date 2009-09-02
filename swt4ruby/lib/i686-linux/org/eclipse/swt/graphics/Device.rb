@@ -1,6 +1,6 @@
 require "rjava"
 
-# Copyright (c) 2000, 2008 IBM Corporation and others.
+# Copyright (c) 2000, 2009 IBM Corporation and others.
 # All rights reserved. This program and the accompanying materials
 # are made available under the terms of the Eclipse Public License v1.0
 # which accompanies this distribution, and is available at
@@ -369,8 +369,6 @@ module Org::Eclipse::Swt::Graphics
       # fix is to remove this feature. Unfortunately,
       # too many application programs rely on this
       # feature.
-      # 
-      # This code will be removed in the future.
       
       def current_device
         defined?(@@current_device) ? @@current_device : @@current_device= nil
@@ -396,7 +394,7 @@ module Org::Eclipse::Swt::Graphics
       when_class_loaded do
         begin
           Class.for_name("org.eclipse.swt.widgets.Display")
-        rescue JavaThrowable => e
+        rescue ClassNotFoundException => e
         end
       end
       
@@ -1216,6 +1214,54 @@ module Org::Eclipse::Swt::Graphics
       end
       @gdk_colors = nil
       @color_ref_count = nil
+      if (!(@color_black).nil?)
+        @color_black.dispose
+      end
+      if (!(@color_dark_red).nil?)
+        @color_dark_red.dispose
+      end
+      if (!(@color_dark_green).nil?)
+        @color_dark_green.dispose
+      end
+      if (!(@color_dark_yellow).nil?)
+        @color_dark_yellow.dispose
+      end
+      if (!(@color_dark_blue).nil?)
+        @color_dark_blue.dispose
+      end
+      if (!(@color_dark_magenta).nil?)
+        @color_dark_magenta.dispose
+      end
+      if (!(@color_dark_cyan).nil?)
+        @color_dark_cyan.dispose
+      end
+      if (!(@color_gray).nil?)
+        @color_gray.dispose
+      end
+      if (!(@color_dark_gray).nil?)
+        @color_dark_gray.dispose
+      end
+      if (!(@color_red).nil?)
+        @color_red.dispose
+      end
+      if (!(@color_green).nil?)
+        @color_green.dispose
+      end
+      if (!(@color_yellow).nil?)
+        @color_yellow.dispose
+      end
+      if (!(@color_blue).nil?)
+        @color_blue.dispose
+      end
+      if (!(@color_magenta).nil?)
+        @color_magenta.dispose
+      end
+      if (!(@color_cyan).nil?)
+        @color_cyan.dispose
+      end
+      if (!(@color_white).nil?)
+        @color_white.dispose
+      end
       @color_black = @color_dark_red = @color_dark_green = @color_dark_yellow = @color_dark_blue = @color_dark_magenta = @color_dark_cyan = @color_gray = @color_dark_gray = @color_red = @color_green = @color_yellow = @color_blue = @color_magenta = @color_cyan = @color_white = nil
       if (!(@empty_tab).equal?(0))
         OS.pango_tab_array_free(@empty_tab)

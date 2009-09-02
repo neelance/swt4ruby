@@ -1,6 +1,6 @@
 require "rjava"
 
-# Copyright (c) 2000, 2006 IBM Corporation and others.
+# Copyright (c) 2000, 2008 IBM Corporation and others.
 # All rights reserved. This program and the accompanying materials
 # are made available under the terms of the Eclipse Public License v1.0
 # which accompanies this distribution, and is available at
@@ -19,6 +19,7 @@ module Org::Eclipse::Swt::Internal::Win32
   class BUTTON_IMAGELIST 
     include_class_members BUTTON_IMAGELISTImports
     
+    # @field cast=(HIMAGELIST)
     # long
     attr_accessor :himl
     alias_method :attr_himl, :himl
@@ -26,30 +27,35 @@ module Org::Eclipse::Swt::Internal::Win32
     alias_method :attr_himl=, :himl=
     undef_method :himl=
     
+    # @field accessor=margin.left,cast=(LONG)
     attr_accessor :margin_left
     alias_method :attr_margin_left, :margin_left
     undef_method :margin_left
     alias_method :attr_margin_left=, :margin_left=
     undef_method :margin_left=
     
+    # @field accessor=margin.top,cast=(LONG)
     attr_accessor :margin_top
     alias_method :attr_margin_top, :margin_top
     undef_method :margin_top
     alias_method :attr_margin_top=, :margin_top=
     undef_method :margin_top=
     
+    # @field accessor=margin.right,cast=(LONG)
     attr_accessor :margin_right
     alias_method :attr_margin_right, :margin_right
     undef_method :margin_right
     alias_method :attr_margin_right=, :margin_right=
     undef_method :margin_right=
     
+    # @field accessor=margin.bottom,cast=(LONG)
     attr_accessor :margin_bottom
     alias_method :attr_margin_bottom, :margin_bottom
     undef_method :margin_bottom
     alias_method :attr_margin_bottom=, :margin_bottom=
     undef_method :margin_bottom=
     
+    # @field cast=(UINT)
     attr_accessor :u_align
     alias_method :attr_u_align, :u_align
     undef_method :u_align

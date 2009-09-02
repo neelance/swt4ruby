@@ -13,6 +13,7 @@ module Org::Eclipse::Swt::Dnd
     class_module.module_eval {
       include ::Java::Lang
       include ::Org::Eclipse::Swt::Dnd
+      include ::Org::Eclipse::Swt::Internal::Cocoa
     }
   end
   
@@ -165,11 +166,8 @@ module Org::Eclipse::Swt::Dnd
         DND.error(DND::ERROR_INVALID_DATA)
       end
       orig = object
-      buffer = Array.typed(::Java::Byte).new(orig.attr_length) { 0 }
-      System.arraycopy(orig, 0, buffer, 0, orig.attr_length)
-      transfer_data.attr_data = Array.typed(Array.typed(::Java::Byte)).new(1) { nil }
-      transfer_data.attr_data[0] = buffer
-      transfer_data.attr_result = 0
+      data = NSData.data_with_bytes(orig, orig.attr_length)
+      transfer_data.attr_data = data
     end
     
     typesig { [TransferData] }
@@ -185,10 +183,17 @@ module Org::Eclipse::Swt::Dnd
       if (!is_supported_type(transfer_data) || (transfer_data.attr_data).nil?)
         return nil
       end
-      if ((transfer_data.attr_data.attr_length).equal?(0) || (transfer_data.attr_data[0].attr_length).equal?(0))
+      if ((transfer_data.attr_data).nil?)
         return nil
       end
-      return transfer_data.attr_data[0]
+      data = transfer_data.attr_data
+      if ((data.length).equal?(0))
+        return nil
+      end
+      # 64
+      bytes = Array.typed(::Java::Byte).new(RJava.cast_to_int(data.length)) { 0 }
+      data.get_bytes(bytes)
+      return bytes
     end
     
     typesig { [Object] }

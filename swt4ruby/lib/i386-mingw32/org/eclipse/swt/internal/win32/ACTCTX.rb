@@ -1,6 +1,6 @@
 require "rjava"
 
-# Copyright (c) 2000, 2006 IBM Corporation and others.
+# Copyright (c) 2000, 2008 IBM Corporation and others.
 # All rights reserved. This program and the accompanying materials
 # are made available under the terms of the Eclipse Public License v1.0
 # which accompanies this distribution, and is available at
@@ -31,6 +31,7 @@ module Org::Eclipse::Swt::Internal::Win32
     alias_method :attr_dw_flags=, :dw_flags=
     undef_method :dw_flags=
     
+    # @field cast=(LPCTSTR)
     # long
     attr_accessor :lp_source
     alias_method :attr_lp_source, :lp_source
@@ -50,6 +51,7 @@ module Org::Eclipse::Swt::Internal::Win32
     alias_method :attr_w_lang_id=, :w_lang_id=
     undef_method :w_lang_id=
     
+    # @field cast=(LPCTSTR)
     # long
     attr_accessor :lp_assembly_directory
     alias_method :attr_lp_assembly_directory, :lp_assembly_directory
@@ -57,6 +59,7 @@ module Org::Eclipse::Swt::Internal::Win32
     alias_method :attr_lp_assembly_directory=, :lp_assembly_directory=
     undef_method :lp_assembly_directory=
     
+    # @field cast=(LPCTSTR)
     # long
     attr_accessor :lp_resource_name
     alias_method :attr_lp_resource_name, :lp_resource_name
@@ -64,6 +67,7 @@ module Org::Eclipse::Swt::Internal::Win32
     alias_method :attr_lp_resource_name=, :lp_resource_name=
     undef_method :lp_resource_name=
     
+    # @field cast=(LPCTSTR)
     # long
     attr_accessor :lp_application_name
     alias_method :attr_lp_application_name, :lp_application_name
@@ -71,6 +75,7 @@ module Org::Eclipse::Swt::Internal::Win32
     alias_method :attr_lp_application_name=, :lp_application_name=
     undef_method :lp_application_name=
     
+    # @field cast=(HMODULE)
     # long
     attr_accessor :h_module
     alias_method :attr_h_module, :h_module

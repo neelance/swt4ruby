@@ -1,6 +1,6 @@
 require "rjava"
 
-# Copyright (c) 2000, 2008 IBM Corporation and others.
+# Copyright (c) 2000, 2009 IBM Corporation and others.
 # All rights reserved. This program and the accompanying materials
 # are made available under the terms of the Eclipse Public License v1.0
 # which accompanies this distribution, and is available at
@@ -35,6 +35,7 @@ module Org::Eclipse::Swt::Widgets
   # @see <a href="http://www.eclipse.org/swt/snippets/#directorydialog">DirectoryDialog snippets</a>
   # @see <a href="http://www.eclipse.org/swt/examples.php">SWT Example: ControlExample, Dialog tab</a>
   # @see <a href="http://www.eclipse.org/swt/">Sample code and further information</a>
+  # @noextend This class is not intended to be subclassed by clients.
   class DirectoryDialog < DirectoryDialogImports.const_get :Dialog
     include_class_members DirectoryDialogImports
     
@@ -149,8 +150,15 @@ module Org::Eclipse::Swt::Widgets
       title_bytes = Converter.wcs_to_mbcs(nil, self.attr_title, true)
       # long
       shell_handle = self.attr_parent.top_handle
+      display = !(self.attr_parent).nil? ? self.attr_parent.get_display : Display.get_current
       # long
-      handle = OS.gtk_file_chooser_dialog_new(title_bytes, shell_handle, OS::GTK_FILE_CHOOSER_ACTION_SELECT_FOLDER, OS._gtk_stock_cancel, OS::GTK_RESPONSE_CANCEL, OS._gtk_stock_ok, OS::GTK_RESPONSE_OK, 0)
+      handle = 0
+      if ((display.get_dismissal_alignment).equal?(SWT::RIGHT))
+        handle = OS.gtk_file_chooser_dialog_new(title_bytes, shell_handle, OS::GTK_FILE_CHOOSER_ACTION_SELECT_FOLDER, OS._gtk_stock_cancel, OS::GTK_RESPONSE_CANCEL, OS._gtk_stock_ok, OS::GTK_RESPONSE_OK, 0)
+      else
+        handle = OS.gtk_file_chooser_dialog_new(title_bytes, shell_handle, OS::GTK_FILE_CHOOSER_ACTION_SELECT_FOLDER, OS._gtk_stock_ok, OS::GTK_RESPONSE_OK, OS._gtk_stock_cancel, OS::GTK_RESPONSE_CANCEL, 0)
+      end
+      OS.gtk_window_set_modal(handle, true)
       # long
       pixbufs = OS.gtk_window_get_icon_list(shell_handle)
       if (!(pixbufs).equal?(0))
@@ -195,7 +203,6 @@ module Org::Eclipse::Swt::Widgets
         OS.gtk_file_chooser_set_extra_widget(handle, box)
       end
       answer = nil
-      display = !(self.attr_parent).nil? ? self.attr_parent.get_display : Display.get_current
       display.add_idle_proc
       old_modal = nil
       if (OS.gtk_window_get_modal(handle))
@@ -263,6 +270,7 @@ module Org::Eclipse::Swt::Widgets
           OS.g_list_free(pixbufs)
         end
       end
+      OS.gtk_window_set_modal(handle, true)
       answer = nil
       if (!(@filter_path).nil?)
         path = @filter_path

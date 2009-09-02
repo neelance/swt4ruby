@@ -180,6 +180,14 @@ module Org::Eclipse::Swt::Custom
       
       # binding = SWT.INSERT;
       # 
+      # TEMPORARY CODE - API SUBJECT TO CHANGE
+      # 
+      # Toggle block selection mode
+      # 
+      # @since 3.5
+      const_set_lazy(:TOGGLE_BLOCKSELECTION) { 16777226 }
+      const_attr_reader  :TOGGLE_BLOCKSELECTION
+      
       # Bullet style dot.
       # 
       # @see Bullet

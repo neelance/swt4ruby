@@ -746,13 +746,21 @@ module Org::Eclipse::Swt::Graphics
       @alpha = -1
       @width = -1
       @height = -1
-      device = self.attr_device
       if ((filename).nil?)
         SWT.error(SWT::ERROR_NULL_ARGUMENT)
       end
+      init_native(filename)
+      if ((@handle).equal?(0))
+        init(ImageData.new(filename))
+      end
+      init
+    end
+    
+    typesig { [String] }
+    def init_native(filename)
       gdip = true
       begin
-        device.check_gdip
+        self.attr_device.check_gdip
       rescue SWTException => e
         gdip = false
       end
@@ -777,7 +785,7 @@ module Org::Eclipse::Swt::Graphics
               # long
               # long
               hicon = Array.typed(::Java::Int).new(1) { 0 }
-              Gdip._bitmap_get_hicon(bitmap, hicon)
+              status = Gdip._bitmap_get_hicon(bitmap, hicon)
               @handle = hicon[0]
             else
               @type = SWT::BITMAP
@@ -798,7 +806,7 @@ module Org::Eclipse::Swt::Graphics
                 # but it cannot be used when there is transparency.
                 # 
                 # long
-                h_dc = device.internal_new__gc(nil)
+                h_dc = self.attr_device.internal_new__gc(nil)
                 # long
                 src_hdc = OS._create_compatible_dc(h_dc)
                 # long
@@ -819,101 +827,105 @@ module Org::Eclipse::Swt::Graphics
                 end
                 OS._select_object(src_hdc, old_src_bitmap)
                 OS._delete_dc(src_hdc)
-                device.internal_dispose__gc(h_dc, nil)
+                self.attr_device.internal_dispose__gc(h_dc, nil)
               else
                 # long
                 locked_bitmap_data = Gdip._bitmap_data_new
                 if (!(locked_bitmap_data).equal?(0))
-                  Gdip._bitmap_lock_bits(bitmap, 0, 0, pixel_format, locked_bitmap_data)
-                  bitmap_data = BitmapData.new
-                  Gdip._move_memory(bitmap_data, locked_bitmap_data)
-                  stride = bitmap_data.attr_stride
-                  # long
-                  pixels = bitmap_data.attr_scan0
-                  depth = 0
-                  scanline_pad = 4
-                  transparent_pixel = -1
-                  case (bitmap_data.attr_pixel_format)
-                  when Gdip::PixelFormat1bppIndexed
-                    depth = 1
-                  when Gdip::PixelFormat4bppIndexed
-                    depth = 4
-                  when Gdip::PixelFormat8bppIndexed
-                    depth = 8
-                  when Gdip::PixelFormat16bppARGB1555, Gdip::PixelFormat16bppRGB555, Gdip::PixelFormat16bppRGB565
-                    depth = 16
-                  when Gdip::PixelFormat24bppRGB
-                    depth = 24
-                  when Gdip::PixelFormat32bppRGB, Gdip::PixelFormat32bppARGB
-                    depth = 32
-                  end
-                  if (!(depth).equal?(0))
-                    palette_data = nil
+                  status = Gdip._bitmap_lock_bits(bitmap, 0, 0, pixel_format, locked_bitmap_data)
+                  if ((status).equal?(0))
+                    bitmap_data = BitmapData.new
+                    Gdip._move_memory(bitmap_data, locked_bitmap_data)
+                    stride = bitmap_data.attr_stride
+                    # long
+                    pixels = bitmap_data.attr_scan0
+                    depth = 0
+                    scanline_pad = 4
+                    transparent_pixel = -1
                     case (bitmap_data.attr_pixel_format)
-                    when Gdip::PixelFormat1bppIndexed, Gdip::PixelFormat4bppIndexed, Gdip::PixelFormat8bppIndexed
-                      palette_size = Gdip._image_get_palette_size(bitmap)
-                      # long
-                      h_heap = OS._get_process_heap
-                      # long
-                      palette = OS._heap_alloc(h_heap, OS::HEAP_ZERO_MEMORY, palette_size)
-                      if ((palette).equal?(0))
-                        SWT.error(SWT::ERROR_NO_HANDLES)
-                      end
-                      Gdip._image_get_palette(bitmap, palette, palette_size)
-                      color_palette = ColorPalette.new
-                      Gdip._move_memory(color_palette, palette, ColorPalette.attr_sizeof)
-                      entries = Array.typed(::Java::Int).new(color_palette.attr_count) { 0 }
-                      OS._move_memory(entries, palette + 8, entries.attr_length * 4)
-                      OS._heap_free(h_heap, 0, palette)
-                      rgbs = Array.typed(RGB).new(color_palette.attr_count) { nil }
-                      palette_data = PaletteData.new(rgbs)
-                      i = 0
-                      while i < entries.attr_length
-                        if ((((entries[i] >> 24) & 0xff)).equal?(0) && !((color_palette.attr_flags & Gdip::PaletteFlagsHasAlpha)).equal?(0))
-                          transparent_pixel = i
-                        end
-                        rgbs[i] = RGB.new(((entries[i] & 0xff0000) >> 16), ((entries[i] & 0xff00) >> 8), ((entries[i] & 0xff) >> 0))
-                        i += 1
-                      end
-                    when Gdip::PixelFormat16bppARGB1555, Gdip::PixelFormat16bppRGB555
-                      palette_data = PaletteData.new(0x7c00, 0x3e0, 0x1f)
-                    when Gdip::PixelFormat16bppRGB565
-                      palette_data = PaletteData.new(0xf800, 0x7e0, 0x1f)
+                    when Gdip::PixelFormat1bppIndexed
+                      depth = 1
+                    when Gdip::PixelFormat4bppIndexed
+                      depth = 4
+                    when Gdip::PixelFormat8bppIndexed
+                      depth = 8
+                    when Gdip::PixelFormat16bppARGB1555, Gdip::PixelFormat16bppRGB555, Gdip::PixelFormat16bppRGB565
+                      depth = 16
                     when Gdip::PixelFormat24bppRGB
-                      palette_data = PaletteData.new(0xff, 0xff00, 0xff0000)
+                      depth = 24
                     when Gdip::PixelFormat32bppRGB, Gdip::PixelFormat32bppARGB
-                      palette_data = PaletteData.new(0xff00, 0xff0000, -0x1000000)
+                      depth = 32
                     end
-                    data = Array.typed(::Java::Byte).new(stride * height) { 0 }
-                    alpha_data = nil
-                    OS._move_memory(data, pixels, data.attr_length)
-                    case (bitmap_data.attr_pixel_format)
-                    when Gdip::PixelFormat16bppARGB1555
-                      alpha_data = Array.typed(::Java::Byte).new(width * height) { 0 }
-                      i = 1
-                      j = 0
-                      while i < data.attr_length
-                        alpha_data[j] = (!((data[i] & 0x80)).equal?(0) ? 255 : 0)
-                        i += 2
-                        j += 1
+                    if (!(depth).equal?(0))
+                      palette_data = nil
+                      case (bitmap_data.attr_pixel_format)
+                      when Gdip::PixelFormat1bppIndexed, Gdip::PixelFormat4bppIndexed, Gdip::PixelFormat8bppIndexed
+                        palette_size = Gdip._image_get_palette_size(bitmap)
+                        # long
+                        h_heap = OS._get_process_heap
+                        # long
+                        palette = OS._heap_alloc(h_heap, OS::HEAP_ZERO_MEMORY, palette_size)
+                        if ((palette).equal?(0))
+                          SWT.error(SWT::ERROR_NO_HANDLES)
+                        end
+                        Gdip._image_get_palette(bitmap, palette, palette_size)
+                        color_palette = ColorPalette.new
+                        Gdip._move_memory(color_palette, palette, ColorPalette.attr_sizeof)
+                        entries = Array.typed(::Java::Int).new(color_palette.attr_count) { 0 }
+                        OS._move_memory(entries, palette + 8, entries.attr_length * 4)
+                        OS._heap_free(h_heap, 0, palette)
+                        rgbs = Array.typed(RGB).new(color_palette.attr_count) { nil }
+                        palette_data = PaletteData.new(rgbs)
+                        i = 0
+                        while i < entries.attr_length
+                          if ((((entries[i] >> 24) & 0xff)).equal?(0) && !((color_palette.attr_flags & Gdip::PaletteFlagsHasAlpha)).equal?(0))
+                            transparent_pixel = i
+                          end
+                          rgbs[i] = RGB.new(((entries[i] & 0xff0000) >> 16), ((entries[i] & 0xff00) >> 8), ((entries[i] & 0xff) >> 0))
+                          i += 1
+                        end
+                      when Gdip::PixelFormat16bppARGB1555, Gdip::PixelFormat16bppRGB555
+                        palette_data = PaletteData.new(0x7c00, 0x3e0, 0x1f)
+                      when Gdip::PixelFormat16bppRGB565
+                        palette_data = PaletteData.new(0xf800, 0x7e0, 0x1f)
+                      when Gdip::PixelFormat24bppRGB
+                        palette_data = PaletteData.new(0xff, 0xff00, 0xff0000)
+                      when Gdip::PixelFormat32bppRGB, Gdip::PixelFormat32bppARGB
+                        palette_data = PaletteData.new(0xff00, 0xff0000, -0x1000000)
                       end
-                    when Gdip::PixelFormat32bppARGB
-                      alpha_data = Array.typed(::Java::Byte).new(width * height) { 0 }
-                      i = 3
-                      j = 0
-                      while i < data.attr_length
-                        alpha_data[j] = data[i]
-                        i += 4
-                        j += 1
+                      data = Array.typed(::Java::Byte).new(stride * height) { 0 }
+                      alpha_data = nil
+                      OS._move_memory(data, pixels, data.attr_length)
+                      case (bitmap_data.attr_pixel_format)
+                      when Gdip::PixelFormat16bppARGB1555
+                        alpha_data = Array.typed(::Java::Byte).new(width * height) { 0 }
+                        i = 1
+                        j = 0
+                        while i < data.attr_length
+                          alpha_data[j] = (!((data[i] & 0x80)).equal?(0) ? 255 : 0)
+                          i += 2
+                          j += 1
+                        end
+                      when Gdip::PixelFormat32bppARGB
+                        alpha_data = Array.typed(::Java::Byte).new(width * height) { 0 }
+                        i = 3
+                        j = 0
+                        while i < data.attr_length
+                          alpha_data[j] = data[i]
+                          i += 4
+                          j += 1
+                        end
                       end
+                      img = ImageData.new(width, height, depth, palette_data, scanline_pad, data)
+                      img.attr_transparent_pixel = transparent_pixel
+                      img.attr_alpha_data = alpha_data
+                      init(img)
                     end
                     Gdip._bitmap_unlock_bits(bitmap, locked_bitmap_data)
-                    Gdip._bitmap_data_delete(locked_bitmap_data)
-                    img = ImageData.new(width, height, depth, palette_data, scanline_pad, data)
-                    img.attr_transparent_pixel = transparent_pixel
-                    img.attr_alpha_data = alpha_data
-                    init(img)
+                  else
+                    error_ = SWT::ERROR_INVALID_IMAGE
                   end
+                  Gdip._bitmap_data_delete(locked_bitmap_data)
                 end
               end
             end
@@ -923,12 +935,9 @@ module Org::Eclipse::Swt::Graphics
             if ((@handle).equal?(0))
               SWT.error(error_)
             end
-            return
           end
         end
       end
-      init(ImageData.new(filename))
-      init
     end
     
     typesig { [::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int] }

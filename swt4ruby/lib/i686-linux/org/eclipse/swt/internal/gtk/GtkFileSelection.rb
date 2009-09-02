@@ -1,6 +1,6 @@
 require "rjava"
 
-# Copyright (c) 2000, 2006 IBM Corporation and others. All rights reserved.
+# Copyright (c) 2000, 2008 IBM Corporation and others. All rights reserved.
 # The contents of this file are made available under the terms
 # of the GNU Lesser General Public License (LGPL) Version 2.1 that
 # accompanies this distribution (lgpl-v21.txt).  The LGPL is also
@@ -23,6 +23,7 @@ module Org::Eclipse::Swt::Internal::Gtk
   class GtkFileSelection 
     include_class_members GtkFileSelectionImports
     
+    # @field cast=(GtkWidget *)
     # long
     attr_accessor :dir_list
     alias_method :attr_dir_list, :dir_list
@@ -30,6 +31,7 @@ module Org::Eclipse::Swt::Internal::Gtk
     alias_method :attr_dir_list=, :dir_list=
     undef_method :dir_list=
     
+    # @field cast=(GtkWidget *)
     # long
     attr_accessor :file_list
     alias_method :attr_file_list, :file_list
@@ -37,6 +39,7 @@ module Org::Eclipse::Swt::Internal::Gtk
     alias_method :attr_file_list=, :file_list=
     undef_method :file_list=
     
+    # @field cast=(GtkWidget *)
     # long
     attr_accessor :selection_entry
     alias_method :attr_selection_entry, :selection_entry
@@ -44,6 +47,7 @@ module Org::Eclipse::Swt::Internal::Gtk
     alias_method :attr_selection_entry=, :selection_entry=
     undef_method :selection_entry=
     
+    # @field cast=(GtkWidget *)
     # long
     attr_accessor :selection_text
     alias_method :attr_selection_text, :selection_text
@@ -51,6 +55,7 @@ module Org::Eclipse::Swt::Internal::Gtk
     alias_method :attr_selection_text=, :selection_text=
     undef_method :selection_text=
     
+    # @field cast=(GtkWidget *)
     # long
     attr_accessor :main_vbox
     alias_method :attr_main_vbox, :main_vbox
@@ -58,6 +63,7 @@ module Org::Eclipse::Swt::Internal::Gtk
     alias_method :attr_main_vbox=, :main_vbox=
     undef_method :main_vbox=
     
+    # @field cast=(GtkWidget *)
     # long
     attr_accessor :ok_button
     alias_method :attr_ok_button, :ok_button
@@ -65,6 +71,7 @@ module Org::Eclipse::Swt::Internal::Gtk
     alias_method :attr_ok_button=, :ok_button=
     undef_method :ok_button=
     
+    # @field cast=(GtkWidget *)
     # long
     attr_accessor :cancel_button
     alias_method :attr_cancel_button, :cancel_button
@@ -72,6 +79,7 @@ module Org::Eclipse::Swt::Internal::Gtk
     alias_method :attr_cancel_button=, :cancel_button=
     undef_method :cancel_button=
     
+    # @field cast=(GtkWidget *)
     # long
     attr_accessor :help_button
     alias_method :attr_help_button, :help_button
@@ -79,6 +87,7 @@ module Org::Eclipse::Swt::Internal::Gtk
     alias_method :attr_help_button=, :help_button=
     undef_method :help_button=
     
+    # @field cast=(GtkWidget *)
     # long
     attr_accessor :history_pulldown
     alias_method :attr_history_pulldown, :history_pulldown
@@ -86,6 +95,7 @@ module Org::Eclipse::Swt::Internal::Gtk
     alias_method :attr_history_pulldown=, :history_pulldown=
     undef_method :history_pulldown=
     
+    # @field cast=(GtkWidget *)
     # long
     attr_accessor :history_menu
     alias_method :attr_history_menu, :history_menu
@@ -93,6 +103,7 @@ module Org::Eclipse::Swt::Internal::Gtk
     alias_method :attr_history_menu=, :history_menu=
     undef_method :history_menu=
     
+    # @field cast=(GList *)
     # long
     attr_accessor :history_list
     alias_method :attr_history_list, :history_list
@@ -100,6 +111,7 @@ module Org::Eclipse::Swt::Internal::Gtk
     alias_method :attr_history_list=, :history_list=
     undef_method :history_list=
     
+    # @field cast=(GtkWidget *)
     # long
     attr_accessor :fileop_dialog
     alias_method :attr_fileop_dialog, :fileop_dialog
@@ -107,6 +119,7 @@ module Org::Eclipse::Swt::Internal::Gtk
     alias_method :attr_fileop_dialog=, :fileop_dialog=
     undef_method :fileop_dialog=
     
+    # @field cast=(GtkWidget *)
     # long
     attr_accessor :fileop_entry
     alias_method :attr_fileop_entry, :fileop_entry
@@ -114,6 +127,7 @@ module Org::Eclipse::Swt::Internal::Gtk
     alias_method :attr_fileop_entry=, :fileop_entry=
     undef_method :fileop_entry=
     
+    # @field cast=(gchar *)
     # long
     attr_accessor :fileop_file
     alias_method :attr_fileop_file, :fileop_file
@@ -121,6 +135,7 @@ module Org::Eclipse::Swt::Internal::Gtk
     alias_method :attr_fileop_file=, :fileop_file=
     undef_method :fileop_file=
     
+    # @field cast=(gpointer)
     # long
     attr_accessor :cmpl_state
     alias_method :attr_cmpl_state, :cmpl_state
@@ -129,6 +144,7 @@ module Org::Eclipse::Swt::Internal::Gtk
     undef_method :cmpl_state=
     
     # gpointer
+    # @field cast=(GtkWidget *)
     # long
     attr_accessor :fileop_c_dir
     alias_method :attr_fileop_c_dir, :fileop_c_dir
@@ -136,6 +152,7 @@ module Org::Eclipse::Swt::Internal::Gtk
     alias_method :attr_fileop_c_dir=, :fileop_c_dir=
     undef_method :fileop_c_dir=
     
+    # @field cast=(GtkWidget *)
     # long
     attr_accessor :fileop_del_file
     alias_method :attr_fileop_del_file, :fileop_del_file
@@ -143,6 +160,7 @@ module Org::Eclipse::Swt::Internal::Gtk
     alias_method :attr_fileop_del_file=, :fileop_del_file=
     undef_method :fileop_del_file=
     
+    # @field cast=(GtkWidget *)
     # long
     attr_accessor :fileop_ren_file
     alias_method :attr_fileop_ren_file, :fileop_ren_file
@@ -150,6 +168,7 @@ module Org::Eclipse::Swt::Internal::Gtk
     alias_method :attr_fileop_ren_file=, :fileop_ren_file=
     undef_method :fileop_ren_file=
     
+    # @field cast=(GtkWidget *)
     # long
     attr_accessor :button_area
     alias_method :attr_button_area, :button_area
@@ -157,6 +176,7 @@ module Org::Eclipse::Swt::Internal::Gtk
     alias_method :attr_button_area=, :button_area=
     undef_method :button_area=
     
+    # @field cast=(GtkWidget *)
     # long
     attr_accessor :action_area
     alias_method :attr_action_area, :action_area

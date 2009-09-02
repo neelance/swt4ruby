@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2008 IBM Corporation and others.
+ * Copyright (c) 2000, 2009 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -29,6 +29,14 @@ import org.eclipse.swt.*;
  * The SWT drawing coordinate system is the two-dimensional space with the origin
  * (0,0) at the top left corner of the drawing area and with (x,y) values increasing
  * to the right and downward respectively.
+ * </p>
+ * 
+ * <p>
+ * The result of drawing on an image that was created with an indexed
+ * palette using a color that is not in the palette is platform specific.
+ * Some platforms will match to the nearest color while other will draw
+ * the color itself. This happens because the allocated image might use
+ * a direct palette on platforms that do not support indexed palette.
  * </p>
  * 
  * <p>
@@ -1624,20 +1632,23 @@ public void drawText (String string, int x, int y, int flags) {
 	}
 	setString(string, flags);
 	if (cairo != 0) {
+		checkGC(FONT);
 		if ((flags & SWT.DRAW_TRANSPARENT) == 0) {
 			checkGC(BACKGROUND);
-			int[] width = new int[1], height = new int[1];
-			OS.pango_layout_get_size(data.layout, width, height);
-			Cairo.cairo_rectangle(cairo, x, y, OS.PANGO_PIXELS(width[0]), OS.PANGO_PIXELS(height[0]));
+			if (data.stringWidth == -1) {
+				computeStringSize();
+			}
+			Cairo.cairo_rectangle(cairo, x, y, data.stringWidth, data.stringHeight);
 			Cairo.cairo_fill(cairo);
 		}
-		checkGC(FOREGROUND | FONT);
+		checkGC(FOREGROUND);
 		if ((data.style & SWT.MIRRORED) != 0) {
 			Cairo.cairo_save(cairo);
-			int[] width = new int[1], height = new int[1];
-			OS.pango_layout_get_size(data.layout, width, height);
+			if (data.stringWidth == -1) {
+				computeStringSize();
+			}
 			Cairo.cairo_scale(cairo, -1f,  1);
-			Cairo.cairo_translate(cairo, -2 * x - OS.PANGO_PIXELS(width[0]), 0);
+			Cairo.cairo_translate(cairo, -2 * x - data.stringWidth, 0);
 		}
 		Cairo.cairo_move_to(cairo, x, y);
 		OS.pango_cairo_show_layout(cairo, data.layout);
@@ -1654,21 +1665,20 @@ public void drawText (String string, int x, int y, int flags) {
 		OS.gdk_draw_layout_with_colors(data.drawable, handle, x, y, data.layout, null, background);
 	} else {
 		long /*int*/ layout = data.layout;
-		int[] w = new int[1], h = new int[1];
-		OS.pango_layout_get_size(layout, w, h);
-		int width = OS.PANGO_PIXELS(w[0]);
-		int height = OS.PANGO_PIXELS(h[0]);
-		long /*int*/ pixmap = OS.gdk_pixmap_new(OS.GDK_ROOT_PARENT(), width, height, -1);
+		if (data.stringWidth == -1) {
+			computeStringSize();
+		}
+		long /*int*/ pixmap = OS.gdk_pixmap_new(OS.GDK_ROOT_PARENT(), data.stringWidth, data.stringHeight, -1);
 		if (pixmap == 0) SWT.error(SWT.ERROR_NO_HANDLES);
 		long /*int*/ gdkGC = OS.gdk_gc_new(pixmap);
 		if (gdkGC == 0) SWT.error(SWT.ERROR_NO_HANDLES);
 		GdkColor black = new GdkColor();
 		OS.gdk_gc_set_foreground(gdkGC, black);
-		OS.gdk_draw_rectangle(pixmap, gdkGC, 1, 0, 0, width, height);
+		OS.gdk_draw_rectangle(pixmap, gdkGC, 1, 0, 0, data.stringWidth, data.stringHeight);
 		OS.gdk_gc_set_foreground(gdkGC, data.foreground);
 		OS.gdk_draw_layout_with_colors(pixmap, gdkGC, 0, 0, layout, null, background);
 		OS.g_object_unref(gdkGC);
-		OS.gdk_draw_drawable(data.drawable, handle, pixmap, 0, 0, x, y, width, height);
+		OS.gdk_draw_drawable(data.drawable, handle, pixmap, 0, 0, x, y, data.stringWidth, data.stringHeight);
 		OS.g_object_unref(pixmap);
 	}
 }
@@ -2499,6 +2509,7 @@ public Pattern getForegroundPattern() {
  * @see GCData
  * 
  * @since 3.2
+ * @noreference This method is not intended to be referenced by clients.
  */
 public GCData getGCData() {
 	if (handle == 0) SWT.error(SWT.ERROR_GRAPHIC_DISPOSED);
@@ -2839,7 +2850,14 @@ void initCairo() {
 	data.disposeCairo = true;
 	Cairo.cairo_set_fill_rule(cairo, Cairo.CAIRO_FILL_RULE_EVEN_ODD);
 	data.state &= ~(BACKGROUND | FOREGROUND | FONT | LINE_WIDTH | LINE_CAP | LINE_JOIN | LINE_STYLE | DRAW_OFFSET);
-	setCairoClip(cairo, data.clipRgn);
+	setCairoClip(data.damageRgn, data.clipRgn);
+}
+
+void computeStringSize() {
+	int[] width = new int[1], height = new int[1];
+	OS.pango_layout_get_size(data.layout, width, height);
+	data.stringHeight = OS.PANGO_PIXELS(height[0]);
+	data.stringWidth = OS.PANGO_PIXELS(width[0]);
 }
 
 /**
@@ -2948,6 +2966,7 @@ public void setAdvanced(boolean advanced) {
 		if (cairo != 0) Cairo.cairo_destroy(cairo);
 		data.cairo = 0;
 		data.interpolation = SWT.DEFAULT;
+		data.alpha = 0xFF;
 		data.backgroundPattern = data.foregroundPattern = null;
 		data.state = 0;
 		setClipping(0);
@@ -3107,15 +3126,13 @@ static void setCairoFont(long /*int*/ cairo, long /*int*/ font) {
 	Cairo.cairo_set_font_size(cairo, height);
 }
 
-static void setCairoClip(long /*int*/ cairo, long /*int*/ clipRgn) {
-	Cairo.cairo_reset_clip(cairo);
-	if (clipRgn == 0) return;
+static void setCairoRegion(long /*int*/ cairo, long /*int*/ rgn) {
 	if (OS.GTK_VERSION >= OS.VERSION(2, 8, 0)) {
-		OS.gdk_cairo_region(cairo, clipRgn);
+		OS.gdk_cairo_region(cairo, rgn);
 	} else {
 		int[] nRects = new int[1];
 		long /*int*/[] rects = new long /*int*/[1];
-		OS.gdk_region_get_rectangles(clipRgn, rects, nRects);
+		OS.gdk_region_get_rectangles(rgn, rects, nRects);
 		GdkRectangle rect = new GdkRectangle();
 		for (int i=0; i<nRects[0]; i++) {
 			OS.memmove(rect, rects[0] + (i * GdkRectangle.sizeof), GdkRectangle.sizeof);
@@ -3123,7 +3140,6 @@ static void setCairoClip(long /*int*/ cairo, long /*int*/ clipRgn) {
 		}
 		if (rects[0] != 0) OS.g_free(rects[0]);
 	}
-	Cairo.cairo_clip(cairo);
 }
 
 static void setCairoPatternColor(long /*int*/ pattern, int offset, Color c, int alpha) {
@@ -3135,6 +3151,25 @@ static void setCairoPatternColor(long /*int*/ pattern, int offset, Color c, int 
 	Cairo.cairo_pattern_add_color_stop_rgba(pattern, offset, red, green, blue, aa);
 }
 
+void setCairoClip(long /*int*/ damageRgn, long /*int*/ clipRgn) {
+	long /*int*/ cairo = data.cairo;
+	Cairo.cairo_reset_clip(cairo);
+	if (damageRgn != 0) {
+		double[] matrix = new double[6];
+		Cairo.cairo_get_matrix(cairo, matrix);
+		double[] identity = new double[6];
+		Cairo.cairo_matrix_init_identity(identity);
+		Cairo.cairo_set_matrix(cairo, identity);
+		setCairoRegion(cairo, damageRgn);
+		Cairo.cairo_clip(cairo);
+		Cairo.cairo_set_matrix(cairo, matrix);
+	}
+	if (clipRgn != 0) {
+		setCairoRegion(cairo, clipRgn);
+		Cairo.cairo_clip(cairo);
+	}
+}
+
 void setClipping(long /*int*/ clipRgn) {
 	long /*int*/ cairo = data.cairo;
 	if (clipRgn == 0) {
@@ -3144,7 +3179,7 @@ void setClipping(long /*int*/ clipRgn) {
 		}
 		if (cairo != 0) {
 			data.clippingTransform = null;
-			setCairoClip(cairo, clipRgn);
+			setCairoClip(data.damageRgn, 0);
 		} else {
 			long /*int*/ clipping = data.damageRgn != 0 ? data.damageRgn : 0;
 			OS.gdk_gc_set_clip_region(handle, clipping);
@@ -3156,7 +3191,7 @@ void setClipping(long /*int*/ clipRgn) {
 		if (cairo != 0) {
 			if (data.clippingTransform == null) data.clippingTransform = new double[6];
 			Cairo.cairo_get_matrix(cairo, data.clippingTransform);
-			setCairoClip(cairo, clipRgn);
+			setCairoClip(data.damageRgn, clipRgn);
 		} else {
 			long /*int*/ clipping = clipRgn;
 			if (data.damageRgn != 0) {
@@ -3981,10 +4016,10 @@ public Point textExtent(String string, int flags) {
 	}
 	setString(string, flags);
 	checkGC(FONT);
-	if (data.stringWidth != -1) return new Point(data.stringWidth, data.stringHeight);
-	int[] width = new int[1], height = new int[1];
-	OS.pango_layout_get_size(data.layout, width, height);
-	return new Point(data.stringWidth = OS.PANGO_PIXELS(width[0]), data.stringHeight = OS.PANGO_PIXELS(height[0]));
+	if (data.stringWidth == -1) {
+		computeStringSize();
+	}
+	return new Point(data.stringWidth, data.stringHeight);
 }
 
 /**

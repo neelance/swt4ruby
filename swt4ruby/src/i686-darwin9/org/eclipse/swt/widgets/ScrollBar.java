@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2008 IBM Corporation and others.
+ * Copyright (c) 2000, 2009 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -11,7 +11,7 @@
 package org.eclipse.swt.widgets;
 
  
-import org.eclipse.swt.internal.carbon.OS;
+import org.eclipse.swt.internal.cocoa.*;
 
 import org.eclipse.swt.*;
 import org.eclipse.swt.events.*;
@@ -81,23 +81,19 @@ import org.eclipse.swt.graphics.*;
  * @see Scrollable#getVerticalBar
  * @see <a href="http://www.eclipse.org/swt/examples.php">SWT Example: ControlExample</a>
  * @see <a href="http://www.eclipse.org/swt/">Sample code and further information</a>
+ * @noextend This class is not intended to be subclassed by clients.
  */
 public class ScrollBar extends Widget {
-	int handle;
-	int visibleRgn, oldActionProc;
+	NSScroller view;
 	Scrollable parent;
-	boolean dragging;
+	int minimum, maximum = 100, thumb = 10;
 	int increment = 1;
 	int pageIncrement = 10;
+	id target;
+	int /*long*/ actionSelector;;
 
 ScrollBar () {
 	/* Do nothing */
-}
-
-ScrollBar (Scrollable parent, int style) {
-	super (parent, checkStyle (style));
-	this.parent = parent;
-	createWidget ();
 }
 
 /**
@@ -144,89 +140,13 @@ static int checkStyle (int style) {
 	return checkBits (style, SWT.HORIZONTAL, SWT.VERTICAL, 0, 0, 0, 0);
 }
 
-int actionProc (int theControl, int partCode) {
-	int result = super.actionProc (theControl, partCode);
-	if (result == OS.noErr) return result;
-	Event event = new Event ();
-	int inc = 0;
-	switch (partCode) {
-	    case OS.kControlUpButtonPart:
-			inc -= increment;
-	        event.detail = SWT.ARROW_UP;
-	        break;
-	    case OS.kControlPageUpPart:
-			inc -= pageIncrement;
-	        event.detail = SWT.PAGE_UP;
-	        break;
-	    case OS.kControlPageDownPart:
-			inc += pageIncrement;
-	        event.detail = SWT.PAGE_DOWN;
-	        break;
-	    case OS.kControlDownButtonPart:
-			inc += increment;
-	        event.detail = SWT.ARROW_DOWN;
-	        break;
-	    case OS.kControlIndicatorPart:
-	    	dragging = true;
-			event.detail = SWT.DRAG;
-	        break;
-		default:
-			return result;
-	}
-	if (oldActionProc != 0) {
-		OS.Call (oldActionProc, theControl, partCode);
-		parent.redrawBackgroundImage ();
-	} else {
-		int value = OS.GetControl32BitValue (handle) + inc;	    
-		OS.SetControl32BitValue (handle, value);
-	}
-	sendEvent (SWT.Selection, event);
-	return result;
-}
-
-void destroyHandle () {
-	int theControl = handle;
-	releaseHandle ();
-	if (theControl != 0) {
-		OS.DisposeControl (theControl);
-	}
-}
-
-void destroyWidget () {
-	parent.destroyScrollBar (this);
-	releaseHandle ();
-	//parent.sendEvent (SWT.Resize);
-}
-
-void enableWidget (boolean enabled) {
-	if (enabled) {
-		OS.EnableControl (handle);
-	} else {
-		OS.DisableControl (handle);
-	}
-}
-
-void createHandle () {
-	int actionProc = display.actionProc;
-	int [] outControl = new int [1];
-	int window = OS.GetControlOwner (parent.scrolledHandle);
-	OS.CreateScrollBarControl (window, null, 0, 0, 90, 10, true, actionProc, outControl);
-	if (outControl [0] == 0) error (SWT.ERROR_NO_HANDLES);
-	handle = outControl [0];
-}
-
-void createWidget () {
-	super.createWidget ();
-	setZOrder ();
-}
-
 void deregister () {
 	super.deregister ();
-	display.removeWidget (handle);
+	display.removeWidget (view);
 }
 
-int getDrawCount (int control) {
-	return parent.getDrawCount (control);
+boolean getDrawing () {
+	return parent.getDrawing ();
 }
 
 /**
@@ -278,9 +198,7 @@ public int getIncrement () {
  */
 public int getMaximum () {
 	checkWidget();
-	int maximum = OS.GetControl32BitMaximum (handle) & 0x7FFFFFFF;
-	int viewSize = OS.GetControlViewSize (handle);
-    return maximum + viewSize;
+	return maximum;
 }
 
 /**
@@ -295,7 +213,7 @@ public int getMaximum () {
  */
 public int getMinimum () {
 	checkWidget();
-    return OS.GetControl32BitMinimum (handle) & 0x7FFFFFFF;
+	return minimum;
 }
 
 /**
@@ -342,7 +260,9 @@ public Scrollable getParent () {
  */
 public int getSelection () {
 	checkWidget();
-    return OS.GetControl32BitValue (handle) & 0x7FFFFFFF;
+	NSScroller widget = (NSScroller)view;
+	double value = widget.doubleValue();
+    return (int)(0.5f + ((maximum - thumb - minimum) * value + minimum));
 }
 
 /**
@@ -360,7 +280,8 @@ public int getSelection () {
  */
 public Point getSize () {
 	checkWidget();
-	return getControlSize (handle);
+	NSRect rect = ((NSScroller)view).frame();
+	return new Point((int)rect.width, (int)rect.height);
 }
 
 /**
@@ -378,7 +299,7 @@ public Point getSize () {
  */
 public int getThumb () {
 	checkWidget();
-    return OS.GetControlViewSize (handle);
+	return thumb;
 }
 
 /**
@@ -403,53 +324,6 @@ public boolean getVisible () {
 	return (state & HIDDEN) == 0;
 }
 
-int getVisibleRegion (int control, boolean clipChildren) {
-	if (visibleRgn == 0) {
-		visibleRgn = OS.NewRgn ();
-		calculateVisibleRegion (control, visibleRgn, clipChildren);
-	}
-	int result = OS.NewRgn ();
-	OS.CopyRgn (visibleRgn, result);
-	return result;
-}
-
-void hookEvents () {
-	super.hookEvents ();
-	int controlProc = display.controlProc;
-	int [] mask = new int [] {
-		OS.kEventClassControl, OS.kEventControlTrack,
-	};
-	int controlTarget = OS.GetControlEventTarget (handle);
-	OS.InstallEventHandler (controlTarget, controlProc, mask.length / 2, mask, handle, null);
-	if ((parent.state & CANVAS) == 0) {
-		oldActionProc = OS.GetControlAction (handle);
-		OS.SetControlAction (handle, display.actionProc);
-	}
-}
-
-
-void invalidateVisibleRegion (int control) {
-	resetVisibleRegion (control);
-	parent.resetVisibleRegion (control);
-}
-
-void invalWindowRgn (int window, int rgn) {
-	parent.invalWindowRgn (window, rgn);
-}
-
-boolean isDrawing (int control) {
-	/*
-	* Feature in the Macintosh.  The scroll bars in a DataBrowser are
-	* always invisible according to IsControlVisible(), despite the fact
-	* that they are drawn.  The fix is to check our visibility flag
-	* instead of calling IsControlVisible().
-	* 
-	* Note: During resize IsControlVisible() returns true allowing the
-	* clipping to be properly calculated.
-	*/
-	return isVisible () && getDrawCount (control) == 0;
-}
-
 /**
  * Returns <code>true</code> if the receiver is enabled and all
  * of the receiver's ancestors are enabled, and <code>false</code>
@@ -470,8 +344,8 @@ public boolean isEnabled () {
 	return getEnabled () && parent.isEnabled ();
 }
 
-boolean isTrimHandle (int trimHandle) {
-	return handle == trimHandle;
+boolean isDrawing () {
+	return getDrawing() && parent.isDrawing ();
 }
 
 /**
@@ -491,36 +365,6 @@ boolean isTrimHandle (int trimHandle) {
 public boolean isVisible () {
 	checkWidget();
 	return getVisible () && parent.isVisible ();
-}
-
-int kEventMouseDown (int nextHandler, int theEvent, int userData) {
-	int status = super.kEventMouseDown (nextHandler, theEvent, userData);
-	if (status == OS.noErr) return status;
-	dragging = false;
-	status = OS.CallNextEventHandler (nextHandler, theEvent);
-	if (dragging) {
-		Event event = new Event ();
-		sendEvent (SWT.Selection, event);
-	}
-	dragging = false;
-	return status;
-}
-
-int kEventMouseWheelMoved (int nextHandler, int theEvent, int userData) {
-    int oldSelection = getSelection ();
-    int result = OS.CallNextEventHandler (nextHandler, theEvent);
-    int newSelection = getSelection ();
-    if (oldSelection != newSelection) {
-    	Event event = new Event ();
-		event.detail = newSelection < oldSelection ? SWT.PAGE_UP : SWT.PAGE_DOWN; 
-        sendEvent (SWT.Selection, event);
-        parent.redrawBackgroundImage ();
-    }
-    return result;
-}
-
-void redraw () {
-	redrawWidget (handle, false);
 }
 
 /**
@@ -550,32 +394,62 @@ public void removeSelectionListener(SelectionListener listener) {
 
 void register () {
 	super.register ();
-	display.addWidget (handle, this);
+	display.addWidget (view, this);
 }
 
 void releaseHandle () {
 	super.releaseHandle ();
-	handle = 0;
+	if (view != null) view.release();
+	view = null;
 }
 
 void releaseParent () {
 	super.releaseParent ();
 	if (parent.horizontalBar == this) parent.horizontalBar = null;
 	if (parent.verticalBar == this) parent.verticalBar = null;
-	parent.resizeClientArea ();
 }
 
 void releaseWidget () {
 	super.releaseWidget ();
-	if (visibleRgn != 0) OS.DisposeRgn (visibleRgn);
-	visibleRgn = 0;
+	parent = null;
 }
 
-void resetVisibleRegion (int control) {
-	if (visibleRgn != 0) {
-		OS.DisposeRgn (visibleRgn);
-		visibleRgn = 0;
+void sendSelection () {
+	int value = 0;
+	if (target != null) {
+		view.sendAction(actionSelector, target);
+	} else {
+		value = getSelection ();
 	}
+	Event event = new Event();
+	int hitPart = (int)/*64*/((NSScroller)view).hitPart();
+	switch (hitPart) {
+	    case OS.NSScrollerDecrementLine:
+	        value -= increment;
+	        event.detail = SWT.ARROW_UP;
+	        break;
+	    case OS.NSScrollerDecrementPage:
+	        value -= pageIncrement;
+	        event.detail = SWT.PAGE_UP;
+	        break;
+	    case OS.NSScrollerIncrementLine:
+	        value += increment;
+	        event.detail = SWT.ARROW_DOWN;
+	        break;
+	    case OS.NSScrollerIncrementPage:
+	        value += pageIncrement;
+	        event.detail = SWT.PAGE_DOWN;
+	        break;
+	    case OS.NSScrollerKnob:
+			event.detail = SWT.DRAG;
+	        break;
+	}
+	if (target == null) {
+		if (event.detail != SWT.DRAG) {
+			setSelection(value);
+		}
+	}
+	sendEvent(SWT.Selection, event);
 }
 
 /**
@@ -597,6 +471,11 @@ public void setIncrement (int value) {
 	increment = value;
 }
 
+void setClipRegion (float /*double*/ x, float /*double*/ y) {
+	NSRect frame = view.frame();
+	parent.setClipRegion(frame.x + x, frame.y + y);
+}
+
 /**
  * Enables the receiver if the argument is <code>true</code>,
  * and disables it otherwise. A disabled control is typically
@@ -615,11 +494,16 @@ public void setEnabled (boolean enabled) {
 	if (enabled) {
 		if ((state & DISABLED) == 0) return;
 		state &= ~DISABLED;
-		OS.EnableControl (handle);
 	} else {
 		if ((state & DISABLED) != 0) return;
 		state |= DISABLED;
-		OS.DisableControl (handle);
+	}
+	enableWidget (enabled);
+}
+
+void enableWidget (boolean enabled) {
+	if (!enabled || (state & DISABLED) == 0) {
+		view.setEnabled (enabled);
 	}
 }
 
@@ -639,14 +523,13 @@ public void setEnabled (boolean enabled) {
 public void setMaximum (int value) {
 	checkWidget();
 	if (value < 0) return;
-	int minimum = OS.GetControl32BitMinimum (handle);
 	if (value <= minimum) return;
-	int viewSize = OS.GetControlViewSize (handle);
-	if (value - minimum < viewSize) {
-		viewSize = value - minimum;
-		OS.SetControlViewSize (handle, viewSize);
+	if (value - minimum < thumb) {
+		thumb = value - minimum;
 	}
-	OS.SetControl32BitMaximum (handle, value - viewSize);
+	int selection = Math.max(minimum, Math.min (getSelection (), value - thumb));
+	this.maximum = value;
+	updateBar(selection, minimum, value, thumb);
 }
 
 /**
@@ -665,15 +548,13 @@ public void setMaximum (int value) {
 public void setMinimum (int value) {
 	checkWidget();
 	if (value < 0) return;
-	int viewSize = OS.GetControlViewSize (handle);
-	int maximum = OS.GetControl32BitMaximum (handle) + viewSize;
 	if (value >= maximum) return;
-	if (maximum - value < viewSize) {
-		viewSize = maximum - value;
-		OS.SetControl32BitMaximum (handle, maximum - viewSize);
-		OS.SetControlViewSize (handle, viewSize);
+	if (maximum - value < thumb) {
+		thumb = maximum - value;
 	}
-	OS.SetControl32BitMinimum (handle, value);
+	int selection = Math.min(maximum - thumb, Math.max (getSelection (), value));
+	this.minimum = value;
+	updateBar(selection, value, maximum, thumb);
 }
 
 /**
@@ -709,7 +590,7 @@ public void setPageIncrement (int value) {
  */
 public void setSelection (int value) {
 	checkWidget();
-	OS.SetControl32BitValue (handle, value);
+	updateBar(value, minimum, maximum, thumb);
 }
 
 /**
@@ -729,12 +610,9 @@ public void setSelection (int value) {
 public void setThumb (int value) {
 	checkWidget();
 	if (value < 1) return;
-	int minimum = OS.GetControl32BitMinimum (handle);
-	int viewSize = OS.GetControlViewSize (handle);
-	int maximum = OS.GetControl32BitMaximum (handle) + viewSize;
 	value = Math.min (value, maximum - minimum);
-	OS.SetControl32BitMaximum (handle, maximum - value);
-    OS.SetControlViewSize (handle, value);
+	updateBar(getSelection(), minimum, maximum, value);
+	this.thumb = value;
 }
 
 /**
@@ -765,13 +643,12 @@ public void setValues (int selection, int minimum, int maximum, int thumb, int i
 	if (thumb < 1) return;
 	if (increment < 1) return;
 	if (pageIncrement < 1) return;
-	thumb = Math.min (thumb, maximum - minimum);
-	OS.SetControl32BitMinimum (handle, minimum);
-	OS.SetControl32BitMaximum (handle, maximum - thumb);
-	OS.SetControlViewSize (handle, thumb);
-	OS.SetControl32BitValue (handle, selection);
+	this.thumb = thumb = Math.min (thumb, maximum - minimum);
+	this.maximum = maximum;
+	this.minimum = minimum;
 	this.increment = increment;
 	this.pageIncrement = pageIncrement;
+	updateBar (selection, minimum, maximum, thumb);
 }
 
 /**
@@ -792,21 +669,17 @@ public void setValues (int selection, int minimum, int maximum, int thumb, int i
  */
 public void setVisible (boolean visible) {
 	checkWidget();
-	if (visible) {
-		if ((state & HIDDEN) == 0) return;
-		state &= ~HIDDEN;
-	} else {
-		if ((state & HIDDEN) != 0) return;
-		state |= HIDDEN;
-	}
-	if (parent.setScrollBarVisible (this, visible)) {
-		sendEvent (visible ? SWT.Show : SWT.Hide);
-		parent.sendEvent (SWT.Resize);
-	}
+	parent.setScrollBarVisible (this, visible);
 }
 
-void setZOrder () {
-	OS.HIViewAddSubview (parent.scrolledHandle, handle);
+void updateBar (int selection, int minimum, int maximum, int thumb) {
+	NSScroller widget = (NSScroller) view;
+	selection = Math.max (minimum, Math.min (maximum - thumb, selection));
+	int range = maximum - thumb - minimum;
+	float fraction = range <= 0 ? 1 : (float) (selection - minimum) / range;
+	float knob = range <= 0 ? 1 : (float) thumb / (maximum - minimum);
+	widget.setFloatValue (fraction, knob);
+	widget.setEnabled (range > 0); 
 }
 
 }

@@ -170,7 +170,7 @@ module Org::Eclipse::Swt::Program
           gnome_name = Converter.wcs_to_mbcs(nil, "_NET_SUPPORTING_WM_CHECK", true)
           # int
           gnome = OS._xintern_atom(x_display, gnome_name, true)
-          if (!(gnome).equal?(OS::None) && gnome_init)
+          if (!(gnome).equal?(OS::None) && (OS::GTK_VERSION >= OS._version(2, 2, 0)) && gnome_init)
             desktop = DESKTOP_GNOME
             # int
             icon_theme = GNOME.gnome_icon_theme_new

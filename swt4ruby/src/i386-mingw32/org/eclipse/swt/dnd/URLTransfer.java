@@ -26,6 +26,7 @@ import org.eclipse.swt.internal.win32.*;
  * </code></pre>
  *
  * @see Transfer
+ * @since 3.4
  */
 public class URLTransfer extends ByteArrayTransfer {
 
@@ -98,7 +99,7 @@ public Object nativeToJava(TransferData transferData){
 	STGMEDIUM stgmedium = new STGMEDIUM();
 	FORMATETC formatetc = transferData.formatetc;
 	stgmedium.tymed = COM.TYMED_HGLOBAL;	
-	transferData.result = data.GetData(formatetc, stgmedium);
+	transferData.result = getData(data, formatetc, stgmedium);
 	data.Release();	
 	if (transferData.result != COM.S_OK) return null;
 	int /*long*/ hMem = stgmedium.unionField;

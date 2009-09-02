@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2008 IBM Corporation and others.
+ * Copyright (c) 2000, 2009 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -40,9 +40,9 @@ import org.eclipse.swt.events.*;
  * @see <a href="http://www.eclipse.org/swt/">Sample code and further information</a>
  * 
  * @since 3.1
+ * @noextend This class is not intended to be subclassed by clients.
  */
 public class Spinner extends Composite {
-	static final int INNER_BORDER = 2;
 	static final int MIN_ARROW_WIDTH = 6;
 	int lastEventTime = 0;
 	long /*int*/ gdkEventKey = 0;
@@ -244,8 +244,6 @@ public Rectangle computeTrim (int x, int y, int width, int height) {
 		xborder += OS.gtk_style_get_xthickness (style);
 		yborder += OS.gtk_style_get_ythickness (style);
 	}
-	xborder += INNER_BORDER;
-	yborder += INNER_BORDER;
 	int [] property = new int [1];
 	OS.gtk_widget_style_get (handle, OS.interior_focus, property, 0);
 	if (property [0] == 0) {
@@ -263,6 +261,11 @@ public Rectangle computeTrim (int x, int y, int width, int height) {
 	trim.width += 2 * xborder;
 	trim.height += 2 * yborder;
 	trim.width += arrowSize + (2 * OS.gtk_style_get_xthickness (style));
+	GtkBorder innerBorder = Display.getEntryInnerBorder (handle);
+	trim.x -= innerBorder.left;
+	trim.y -= innerBorder.top;
+	trim.width += innerBorder.left + innerBorder.right;
+	trim.height += innerBorder.top + innerBorder.bottom;
 	return new Rectangle (trim.x, trim.y, trim.width, trim.height);
 }
 
@@ -1123,6 +1126,10 @@ public void setValues (int selection, int minimum, int maximum, int digits, int 
 	OS.gtk_spin_button_set_value (handle, selection / factor);
 	OS.gtk_spin_button_set_digits (handle, digits);
 	OS.g_signal_handlers_unblock_matched (handle, OS.G_SIGNAL_MATCH_DATA, 0, 0, 0, 0, VALUE_CHANGED);
+}
+
+boolean checkSubwindow () {
+	return false;
 }
 
 boolean translateTraversal (GdkEventKey keyEvent) {

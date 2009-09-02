@@ -1,6 +1,6 @@
 require "rjava"
 
-# Copyright (c) 2000, 2008 IBM Corporation and others.
+# Copyright (c) 2000, 2009 IBM Corporation and others.
 # All rights reserved. This program and the accompanying materials
 # are made available under the terms of the Eclipse Public License v1.0
 # which accompanies this distribution, and is available at
@@ -115,9 +115,10 @@ module Org::Eclipse::Swt::Printing
       
       typesig { [] }
       # Returns an array of <code>PrinterData</code> objects
-      # representing all available printers.
+      # representing all available printers.  If there are no
+      # printers, the array will be empty.
       # 
-      # @return the list of available printers
+      # @return an array of PrinterData objects representing the available printers
       def get_printer_list
         length = 1024
         # Use the character encoding for the default locale
@@ -167,7 +168,7 @@ module Org::Eclipse::Swt::Printing
       typesig { [] }
       # Returns a <code>PrinterData</code> object representing
       # the default printer or <code>null</code> if there is no
-      # printer available on the System.
+      # default printer.
       # 
       # @return the default printer data or null
       # 
@@ -222,7 +223,7 @@ module Org::Eclipse::Swt::Printing
     typesig { [] }
     # Constructs a new printer representing the default printer.
     # <p>
-    # You must dispose the printer when it is no longer required.
+    # Note: You must dispose the printer when it is no longer required.
     # </p>
     # 
     # @exception SWTError <ul>
@@ -236,12 +237,13 @@ module Org::Eclipse::Swt::Printing
     
     typesig { [PrinterData] }
     # Constructs a new printer given a <code>PrinterData</code>
-    # object representing the desired printer.
+    # object representing the desired printer. If the argument
+    # is null, then the default printer will be used.
     # <p>
-    # You must dispose the printer when it is no longer required.
+    # Note: You must dispose the printer when it is no longer required.
     # </p>
     # 
-    # @param data the printer data for the specified printer
+    # @param data the printer data for the specified printer, or null to use the default printer
     # 
     # @exception IllegalArgumentException <ul>
     # <li>ERROR_INVALID_ARGUMENT - if the specified printer data does not represent a valid printer
@@ -271,14 +273,48 @@ module Org::Eclipse::Swt::Printing
       device = TCHAR.new(0, @data.attr_name, true)
       # long
       lp_init_data = 0
-      buffer = @data.attr_other_data
+      devmode_data = @data.attr_other_data
       # long
       h_heap = OS._get_process_heap
-      if (!(buffer).nil? && !(buffer.attr_length).equal?(0))
+      if (!(devmode_data).nil? && !(devmode_data.attr_length).equal?(0))
         # If user setup info from a print dialog was specified, restore the DEVMODE struct.
-        lp_init_data = OS._heap_alloc(h_heap, OS::HEAP_ZERO_MEMORY, buffer.attr_length)
-        OS._move_memory(lp_init_data, buffer, buffer.attr_length)
+        lp_init_data = OS._heap_alloc(h_heap, OS::HEAP_ZERO_MEMORY, devmode_data.attr_length)
+        OS._move_memory(lp_init_data, devmode_data, devmode_data.attr_length)
+      else
+        # Initialize DEVMODE for the default printer.
+        pd = PRINTDLG.new
+        pd.attr_l_struct_size = PRINTDLG.attr_sizeof
+        pd.attr_flags = OS::PD_RETURNDEFAULT
+        OS._print_dlg(pd)
+        if (!(pd.attr_h_dev_mode).equal?(0))
+          # long
+          h_global = pd.attr_h_dev_mode
+          # long
+          ptr = OS._global_lock(h_global)
+          size = OS._global_size(h_global)
+          lp_init_data = OS._heap_alloc(h_heap, OS::HEAP_ZERO_MEMORY, size)
+          OS._move_memory(lp_init_data, ptr, size)
+          OS._global_unlock(h_global)
+          OS._global_free(pd.attr_h_dev_mode)
+        end
+        if (!(pd.attr_h_dev_names).equal?(0))
+          OS._global_free(pd.attr_h_dev_names)
+        end
       end
+      # Initialize DEVMODE struct fields from the printerData.
+      devmode = OS::IsUnicode ? DEVMODEW.new : DEVMODEA.new
+      OS._move_memory(devmode, lp_init_data, DEVMODE.attr_sizeof)
+      devmode.attr_dm_fields |= OS::DM_ORIENTATION
+      devmode.attr_dm_orientation = (@data.attr_orientation).equal?(PrinterData::LANDSCAPE) ? OS::DMORIENT_LANDSCAPE : OS::DMORIENT_PORTRAIT
+      if (!(@data.attr_copy_count).equal?(1))
+        devmode.attr_dm_fields |= OS::DM_COPIES
+        devmode.attr_dm_copies = RJava.cast_to_short(@data.attr_copy_count)
+      end
+      if (!(@data.attr_collate).equal?(false))
+        devmode.attr_dm_fields |= OS::DM_COLLATE
+        devmode.attr_dm_collate = OS::DMCOLLATE_TRUE
+      end
+      OS._move_memory(lp_init_data, devmode, DEVMODE.attr_sizeof)
       @handle = OS._create_dc(driver, device, 0, lp_init_data)
       if (!(lp_init_data).equal?(0))
         OS._heap_free(h_heap, 0, lp_init_data)

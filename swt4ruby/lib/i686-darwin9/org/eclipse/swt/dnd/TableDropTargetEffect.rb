@@ -1,6 +1,6 @@
 require "rjava"
 
-# Copyright (c) 2000, 2008 IBM Corporation and others.
+# Copyright (c) 2000, 2009 IBM Corporation and others.
 # All rights reserved. This program and the accompanying materials
 # are made available under the terms of the Eclipse Public License v1.0
 # which accompanies this distribution, and is available at
@@ -13,11 +13,6 @@ module Org::Eclipse::Swt::Dnd
     class_module.module_eval {
       include ::Java::Lang
       include ::Org::Eclipse::Swt::Dnd
-      include_const ::Org::Eclipse::Swt, :SWT
-      include ::Org::Eclipse::Swt::Graphics
-      include_const ::Org::Eclipse::Swt::Internal, :Callback
-      include_const ::Org::Eclipse::Swt::Internal::Carbon, :DataBrowserCallbacks
-      include_const ::Org::Eclipse::Swt::Internal::Carbon, :OS
       include ::Org::Eclipse::Swt::Widgets
     }
   end
@@ -53,87 +48,13 @@ module Org::Eclipse::Swt::Dnd
   class TableDropTargetEffect < TableDropTargetEffectImports.const_get :DropTargetEffect
     include_class_members TableDropTargetEffectImports
     
-    class_module.module_eval {
-      const_set_lazy(:SCROLL_HYSTERESIS) { 150 }
-      const_attr_reader  :SCROLL_HYSTERESIS
-    }
-    
-    # milli seconds
-    attr_accessor :scroll_item
-    alias_method :attr_scroll_item, :scroll_item
-    undef_method :scroll_item
-    alias_method :attr_scroll_item=, :scroll_item=
-    undef_method :scroll_item=
-    
-    attr_accessor :scroll_begin_time
-    alias_method :attr_scroll_begin_time, :scroll_begin_time
-    undef_method :scroll_begin_time
-    alias_method :attr_scroll_begin_time=, :scroll_begin_time=
-    undef_method :scroll_begin_time=
-    
-    attr_accessor :callbacks
-    alias_method :attr_callbacks, :callbacks
-    undef_method :callbacks
-    alias_method :attr_callbacks=, :callbacks=
-    undef_method :callbacks=
-    
-    class_module.module_eval {
-      
-      def accept_drag_proc
-        defined?(@@accept_drag_proc) ? @@accept_drag_proc : @@accept_drag_proc= nil
-      end
-      alias_method :attr_accept_drag_proc, :accept_drag_proc
-      
-      def accept_drag_proc=(value)
-        @@accept_drag_proc = value
-      end
-      alias_method :attr_accept_drag_proc=, :accept_drag_proc=
-      
-      when_class_loaded do
-        self.attr_accept_drag_proc = Callback.new(TableDropTargetEffect, "AcceptDragProc", 5) # $NON-NLS-1$
-        accept_drag_proc = self.attr_accept_drag_proc.get_address
-        if ((accept_drag_proc).equal?(0))
-          SWT.error(SWT::ERROR_NO_MORE_CALLBACKS)
-        end
-      end
-      
-      typesig { [::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int] }
-      def _accept_drag_proc(the_control, item_id, property, the_rect, the_drag)
-        target = _find_drop_target(the_control, the_drag)
-        if ((target).nil?)
-          return 0
-        end
-        return !((target.attr_feedback & DND::FEEDBACK_SELECT)).equal?(0) ? 1 : 0
-      end
-      
-      typesig { [::Java::Int, ::Java::Int] }
-      def _find_drop_target(the_control, the_drag)
-        if ((the_control).equal?(0))
-          return nil
-        end
-        display = Display.find_display(JavaThread.current_thread)
-        if ((display).nil? || display.is_disposed)
-          return nil
-        end
-        widget = display.find_widget(the_control)
-        if ((widget).nil?)
-          return nil
-        end
-        return widget.get_data(DND::DROP_TARGET_KEY)
-      end
-    }
-    
     typesig { [Table] }
     # Creates a new <code>TableDropTargetEffect</code> to handle the drag under effect on the specified
     # <code>Table</code>.
     # 
     # @param table the <code>Table</code> over which the user positions the cursor to drop the data
     def initialize(table)
-      @scroll_item = nil
-      @scroll_begin_time = 0
-      @callbacks = nil
       super(table)
-      @callbacks = nil
     end
     
     typesig { [::Java::Int] }
@@ -162,15 +83,6 @@ module Org::Eclipse::Swt::Dnd
     # @see DropTargetAdapter
     # @see DropTargetEvent
     def drag_enter(event)
-      if ((@callbacks).nil?)
-        table = self.attr_control
-        callbacks = DataBrowserCallbacks.new
-        OS._get_data_browser_callbacks(table.attr_handle, callbacks)
-        callbacks.attr_v1_accept_drag_callback = self.attr_accept_drag_proc.get_address
-        OS._set_data_browser_callbacks(table.attr_handle, callbacks)
-      end
-      @scroll_begin_time = 0
-      @scroll_item = nil
     end
     
     typesig { [DropTargetEvent] }
@@ -187,8 +99,6 @@ module Org::Eclipse::Swt::Dnd
     # @see DropTargetAdapter
     # @see DropTargetEvent
     def drag_leave(event)
-      @scroll_begin_time = 0
-      @scroll_item = nil
     end
     
     typesig { [DropTargetEvent] }
@@ -208,41 +118,7 @@ module Org::Eclipse::Swt::Dnd
     # @see DND#FEEDBACK_SELECT
     # @see DND#FEEDBACK_SCROLL
     def drag_over(event)
-      table = self.attr_control
       effect = check_effect(event.attr_feedback)
-      item = get_item(table, event.attr_x, event.attr_y)
-      if (((effect & DND::FEEDBACK_SCROLL)).equal?(0))
-        @scroll_begin_time = 0
-        @scroll_item = nil
-      else
-        if (!(item).nil? && (item == @scroll_item) && !(@scroll_begin_time).equal?(0))
-          if (System.current_time_millis >= @scroll_begin_time)
-            area = table.get_client_area
-            header_height = table.get_header_height
-            item_height = table.get_item_height
-            pt = Point.new(event.attr_x, event.attr_y)
-            pt = table.get_display.map(nil, table, pt)
-            next_item = nil
-            if (pt.attr_y < area.attr_y + header_height + 2 * item_height)
-              index = Math.max(0, table.index_of(item) - 1)
-              next_item = table.get_item(index)
-            end
-            if (pt.attr_y > area.attr_y + area.attr_height - 2 * item_height)
-              index = Math.min(table.get_item_count - 1, table.index_of(item) + 1)
-              next_item = table.get_item(index)
-            end
-            if (!(next_item).nil?)
-              table.show_item(next_item)
-            end
-            @scroll_begin_time = 0
-            @scroll_item = nil
-          end
-        else
-          @scroll_begin_time = System.current_time_millis + SCROLL_HYSTERESIS
-          @scroll_item = item
-        end
-      end
-      # store current effect for selection feedback
       (event.attr_widget).attr_feedback = effect
     end
     

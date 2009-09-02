@@ -1,6 +1,6 @@
 require "rjava"
 
-# Copyright (c) 2000, 2008 IBM Corporation and others.
+# Copyright (c) 2000, 2009 IBM Corporation and others.
 # All rights reserved. This program and the accompanying materials
 # are made available under the terms of the Eclipse Public License v1.0
 # which accompanies this distribution, and is available at
@@ -17,8 +17,11 @@ module Org::Eclipse::Swt::Awt
       include_const ::Java::Awt, :Canvas
       include_const ::Java::Awt, :EventQueue
       include_const ::Java::Awt, :Frame
+      include_const ::Java::Awt, :Toolkit
       include_const ::Java::Lang::Reflect, :Constructor
+      include_const ::Java::Lang::Reflect, :Method
       include_const ::Org::Eclipse::Swt, :SWT
+      include_const ::Org::Eclipse::Swt::Internal, :Library
       include_const ::Org::Eclipse::Swt::Widgets, :Composite
       include_const ::Org::Eclipse::Swt::Widgets, :Display
       include_const ::Org::Eclipse::Swt::Widgets, :Event
@@ -66,6 +69,76 @@ module Org::Eclipse::Swt::Awt
       
       when_class_loaded do
         System.set_property("apple.awt.usingSWT", "true")
+      end
+      
+      
+      def loaded
+        defined?(@@loaded) ? @@loaded : @@loaded= false
+      end
+      alias_method :attr_loaded, :loaded
+      
+      def loaded=(value)
+        @@loaded = value
+      end
+      alias_method :attr_loaded=, :loaded=
+      
+      
+      def swing_initialized
+        defined?(@@swing_initialized) ? @@swing_initialized : @@swing_initialized= false
+      end
+      alias_method :attr_swing_initialized, :swing_initialized
+      
+      def swing_initialized=(value)
+        @@swing_initialized = value
+      end
+      alias_method :attr_swing_initialized=, :swing_initialized=
+      
+      JNI.native_method :Java_org_eclipse_swt_awt_SWT_AWT_getAWTHandle, [:pointer, :long, :long], :int32
+      typesig { [Canvas] }
+      # long
+      def get_awthandle(canvas)
+        JNI.__send__(:Java_org_eclipse_swt_awt_SWT_AWT_getAWTHandle, JNI.env, self.jni_id, canvas.jni_id)
+      end
+      
+      typesig { [] }
+      def load_library
+        synchronized(self) do
+          if (self.attr_loaded)
+            return
+          end
+          self.attr_loaded = true
+          Toolkit.get_default_toolkit
+          # Note that the jawt library is loaded explicitly
+          # because it cannot be found by the library loader.
+          # All exceptions are caught because the library may
+          # have been loaded already.
+          begin
+            System.load_library("jawt")
+          rescue JavaThrowable => e
+          end
+          Library.load_library("swt-awt")
+        end
+      end
+      
+      typesig { [] }
+      def initialize_swing
+        synchronized(self) do
+          if (self.attr_swing_initialized)
+            return
+          end
+          self.attr_swing_initialized = true
+          begin
+            # Initialize the default focus traversal policy
+            empty_class = Array.typed(Class).new(0) { nil }
+            empty_object = Array.typed(Object).new(0) { nil }
+            clazz = Class.for_name("javax.swing.UIManager")
+            method = clazz.get_method("getDefaults", empty_class)
+            if (!(method).nil?)
+              method.invoke(clazz, empty_object)
+            end
+          rescue JavaThrowable => e
+          end
+        end
       end
       
       typesig { [Composite] }
@@ -119,10 +192,11 @@ module Org::Eclipse::Swt::Awt
         if (((parent.get_style & SWT::EMBEDDED)).equal?(0))
           SWT.error(SWT::ERROR_INVALID_ARGUMENT)
         end
-        handle = parent.attr_handle
+        # long
+        handle = parent.attr_view.attr_id
         clazz = nil
         begin
-          class_name = !(self.attr_embedded_frame_class).nil? ? self.attr_embedded_frame_class : "apple.awt.CHIViewEmbeddedFrame"
+          class_name = !(self.attr_embedded_frame_class).nil? ? self.attr_embedded_frame_class : "apple.awt.CEmbeddedFrame"
           if ((self.attr_embedded_frame_class).nil?)
             clazz = Class.for_name(class_name, true, ClassLoader.get_system_class_loader)
           else
@@ -211,6 +285,37 @@ module Org::Eclipse::Swt::Awt
         end
         SWT.error(SWT::ERROR_NOT_IMPLEMENTED)
         return nil
+        # TODO: Uncomment this code once Display/Shell related issues are ironed out.
+        # int /*long*/ handle = 0;
+        # 
+        # try {
+        # loadLibrary ();
+        # handle = getAWTHandle (parent);
+        # } catch (Throwable e) {
+        # SWT.error (SWT.ERROR_NOT_IMPLEMENTED, e);
+        # }
+        # if (handle == 0) SWT.error (SWT.ERROR_INVALID_ARGUMENT, null, " [peer not created]");
+        # 
+        # final Shell shell = Shell.cocoa_new (display, handle);
+        # final ComponentListener listener = new ComponentAdapter () {
+        # public void componentResized (ComponentEvent e) {
+        # display.asyncExec (new Runnable () {
+        # public void run () {
+        # if (shell.isDisposed()) return;
+        # Dimension dim = parent.getSize ();
+        # shell.setSize (dim.width, dim.height);
+        # }
+        # });
+        # }
+        # };
+        # parent.addComponentListener(listener);
+        # shell.addListener(SWT.Dispose, new Listener() {
+        # public void handleEvent(Event event) {
+        # parent.removeComponentListener(listener);
+        # }
+        # });
+        # shell.setVisible (true);
+        # return shell;
       end
     }
     

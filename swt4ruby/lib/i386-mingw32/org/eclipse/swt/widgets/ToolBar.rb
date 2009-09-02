@@ -1,6 +1,6 @@
 require "rjava"
 
-# Copyright (c) 2000, 2008 IBM Corporation and others.
+# Copyright (c) 2000, 2009 IBM Corporation and others.
 # All rights reserved. This program and the accompanying materials
 # are made available under the terms of the Eclipse Public License v1.0
 # which accompanies this distribution, and is available at
@@ -45,6 +45,7 @@ module Org::Eclipse::Swt::Widgets
   # @see <a href="http://www.eclipse.org/swt/snippets/#toolbar">ToolBar, ToolItem snippets</a>
   # @see <a href="http://www.eclipse.org/swt/examples.php">SWT Example: ControlExample</a>
   # @see <a href="http://www.eclipse.org/swt/">Sample code and further information</a>
+  # @noextend This class is not intended to be subclassed by clients.
   class ToolBar < ToolBarImports.const_get :Composite
     include_class_members ToolBarImports
     
@@ -54,11 +55,29 @@ module Org::Eclipse::Swt::Widgets
     alias_method :attr_last_focus_id=, :last_focus_id=
     undef_method :last_focus_id=
     
+    attr_accessor :last_arrow_id
+    alias_method :attr_last_arrow_id, :last_arrow_id
+    undef_method :last_arrow_id
+    alias_method :attr_last_arrow_id=, :last_arrow_id=
+    undef_method :last_arrow_id=
+    
+    attr_accessor :last_hot_id
+    alias_method :attr_last_hot_id, :last_hot_id
+    undef_method :last_hot_id
+    alias_method :attr_last_hot_id=, :last_hot_id=
+    undef_method :last_hot_id=
+    
     attr_accessor :items
     alias_method :attr_items, :items
     undef_method :items
     alias_method :attr_items=, :items=
     undef_method :items=
+    
+    attr_accessor :tab_item_list
+    alias_method :attr_tab_item_list, :tab_item_list
+    undef_method :tab_item_list
+    alias_method :attr_tab_item_list=, :tab_item_list=
+    undef_method :tab_item_list=
     
     attr_accessor :ignore_resize
     alias_method :attr_ignore_resize, :ignore_resize
@@ -146,7 +165,10 @@ module Org::Eclipse::Swt::Widgets
     # @see Widget#getStyle()
     def initialize(parent, style)
       @last_focus_id = 0
+      @last_arrow_id = 0
+      @last_hot_id = 0
       @items = nil
+      @tab_item_list = nil
       @ignore_resize = false
       @ignore_mouse = false
       @image_list = nil
@@ -277,7 +299,7 @@ module Org::Eclipse::Swt::Widgets
         border = get_border_width
         new_width = (w_hint).equal?(SWT::DEFAULT) ? 0x3fff : w_hint + border * 2
         new_height = (h_hint).equal?(SWT::DEFAULT) ? 0x3fff : h_hint + border * 2
-        redraw = (self.attr_draw_count).equal?(0) && OS._is_window_visible(self.attr_handle)
+        redraw = get_drawing && OS._is_window_visible(self.attr_handle)
         @ignore_resize = true
         if (redraw)
           OS._update_window(self.attr_handle)
@@ -330,6 +352,68 @@ module Org::Eclipse::Swt::Widgets
         trim.attr_height += 2
       end
       return trim
+    end
+    
+    typesig { [] }
+    def compute_tab_group
+      items = __get_items
+      if ((@tab_item_list).nil?)
+        i = 0
+        while (i < items.attr_length && (items[i].attr_control).nil?)
+          i += 1
+        end
+        if ((i).equal?(items.attr_length))
+          return super
+        end
+      end
+      # 64
+      index = RJava.cast_to_int(OS._send_message(self.attr_handle, OS::TB_GETHOTITEM, 0, 0))
+      if ((index).equal?(-1))
+        index = @last_hot_id
+      end
+      while (index >= 0)
+        item = items[index]
+        if (item.is_tab_group)
+          return item
+        end
+        index -= 1
+      end
+      return super
+    end
+    
+    typesig { [] }
+    def compute_tab_list
+      items = __get_items
+      if ((@tab_item_list).nil?)
+        i = 0
+        while (i < items.attr_length && (items[i].attr_control).nil?)
+          i += 1
+        end
+        if ((i).equal?(items.attr_length))
+          return super
+        end
+      end
+      result = Array.typed(Widget).new([])
+      if (!is_tab_group || !is_enabled || !is_visible)
+        return result
+      end
+      list = !(self.attr_tab_list).nil? ? __get_tab_item_list : items
+      i = 0
+      while i < list.attr_length
+        child = list[i]
+        child_list = child.compute_tab_list
+        if (!(child_list.attr_length).equal?(0))
+          new_result = Array.typed(Widget).new(result.attr_length + child_list.attr_length) { nil }
+          System.arraycopy(result, 0, new_result, 0, result.attr_length)
+          System.arraycopy(child_list, 0, new_result, result.attr_length, child_list.attr_length)
+          result = new_result
+        end
+        i += 1
+      end
+      if ((result.attr_length).equal?(0))
+        result = Array.typed(Widget).new([self])
+      end
+      return result
     end
     
     typesig { [] }
@@ -439,7 +523,7 @@ module Org::Eclipse::Swt::Widgets
     def create_widget
       super
       @items = Array.typed(ToolItem).new(4) { nil }
-      @last_focus_id = -1
+      @last_focus_id = @last_arrow_id = @last_hot_id = -1
     end
     
     typesig { [] }
@@ -479,6 +563,12 @@ module Org::Eclipse::Swt::Widgets
       OS._send_message(self.attr_handle, OS::TB_DELETEBUTTON, index, 0)
       if ((item.attr_id).equal?(@last_focus_id))
         @last_focus_id = -1
+      end
+      if ((item.attr_id).equal?(@last_arrow_id))
+        @last_arrow_id = -1
+      end
+      if ((item.attr_id).equal?(@last_hot_id))
+        @last_hot_id = -1
       end
       @items[item.attr_id] = nil
       item.attr_id = -1
@@ -640,6 +730,11 @@ module Org::Eclipse::Swt::Widgets
     # </ul>
     def get_items
       check_widget
+      return __get_items
+    end
+    
+    typesig { [] }
+    def __get_items
       # 64
       count = RJava.cast_to_int(OS._send_message(self.attr_handle, OS::TB_BUTTONCOUNT, 0, 0))
       lp_button = TBBUTTON.new
@@ -673,6 +768,35 @@ module Org::Eclipse::Swt::Widgets
       end
       # 64
       return RJava.cast_to_int(OS._send_message(self.attr_handle, OS::TB_GETROWS, 0, 0))
+    end
+    
+    typesig { [] }
+    def __get_tab_item_list
+      if ((@tab_item_list).nil?)
+        return @tab_item_list
+      end
+      count = 0
+      i = 0
+      while i < @tab_item_list.attr_length
+        if (!@tab_item_list[i].is_disposed)
+          count += 1
+        end
+        i += 1
+      end
+      if ((count).equal?(@tab_item_list.attr_length))
+        return @tab_item_list
+      end
+      new_list = Array.typed(ToolItem).new(count) { nil }
+      index = 0
+      i_ = 0
+      while i_ < @tab_item_list.attr_length
+        if (!@tab_item_list[i_].is_disposed)
+          new_list[((index += 1) - 1)] = @tab_item_list[i_]
+        end
+        i_ += 1
+      end
+      @tab_item_list = new_list
+      return @tab_item_list
     end
     
     typesig { [ToolItem] }
@@ -767,32 +891,36 @@ module Org::Eclipse::Swt::Widgets
       # when the tool bar contains a drop down item, it needs to take
       # into account extra padding.
       if (!((self.attr_style & SWT::VERTICAL)).equal?(0))
-        info = TBBUTTONINFO.new
-        info.attr_cb_size = TBBUTTONINFO.attr_sizeof
-        info.attr_dw_mask = OS::TBIF_SIZE
-        # long
-        size = OS._send_message(self.attr_handle, OS::TB_GETBUTTONSIZE, 0, 0)
-        info.attr_cx = RJava.cast_to_short(OS._loword(size))
-        index = 0
-        while (index < @items.attr_length)
-          item = @items[index]
-          if (!(item).nil? && !((item.attr_style & SWT::DROP_DOWN)).equal?(0))
-            break
-          end
-          index += 1
-        end
-        if (index < @items.attr_length)
+        # 64
+        item_count = RJava.cast_to_int(OS._send_message(self.attr_handle, OS::TB_BUTTONCOUNT, 0, 0))
+        if (item_count > 1)
+          info = TBBUTTONINFO.new
+          info.attr_cb_size = TBBUTTONINFO.attr_sizeof
+          info.attr_dw_mask = OS::TBIF_SIZE
           # long
-          padding = OS._send_message(self.attr_handle, OS::TB_GETPADDING, 0, 0)
-          info.attr_cx += OS._loword(padding) * 2
-        end
-        i = 0
-        while i < @items.attr_length
-          item = @items[i]
-          if (!(item).nil? && ((item.attr_style & SWT::SEPARATOR)).equal?(0))
-            OS._send_message(self.attr_handle, OS::TB_SETBUTTONINFO, item.attr_id, info)
+          size = OS._send_message(self.attr_handle, OS::TB_GETBUTTONSIZE, 0, 0)
+          info.attr_cx = RJava.cast_to_short(OS._loword(size))
+          index = 0
+          while (index < @items.attr_length)
+            item = @items[index]
+            if (!(item).nil? && !((item.attr_style & SWT::DROP_DOWN)).equal?(0))
+              break
+            end
+            index += 1
           end
-          i += 1
+          if (index < @items.attr_length)
+            # long
+            padding = OS._send_message(self.attr_handle, OS::TB_GETPADDING, 0, 0)
+            info.attr_cx += OS._loword(padding) * 2
+          end
+          i = 0
+          while i < @items.attr_length
+            item = @items[i]
+            if (!(item).nil? && ((item.attr_style & SWT::SEPARATOR)).equal?(0))
+              OS._send_message(self.attr_handle, OS::TB_SETBUTTONINFO, item.attr_id, info)
+            end
+            i += 1
+          end
         end
       end
       i = 0
@@ -939,7 +1067,7 @@ module Org::Eclipse::Swt::Widgets
       # ensuring that only one tool bar position is deferred at
       # any given time.
       if (!(self.attr_parent.attr_lpwp).nil?)
-        if ((self.attr_draw_count).equal?(0) && OS._is_window_visible(self.attr_handle))
+        if (get_drawing && OS._is_window_visible(self.attr_handle))
           self.attr_parent.set_resize_children(false)
           self.attr_parent.set_resize_children(true)
         end
@@ -964,7 +1092,7 @@ module Org::Eclipse::Swt::Widgets
       # the bit afterwards.
       # 
       # NOTE:  This work around only runs when the tool bar contains
-      # both text and images.
+      # only images.
       if (OS::COMCTL32_MAJOR >= 6 && OS._is_app_themed)
         has_text = false
         has_image = false
@@ -1083,7 +1211,20 @@ module Org::Eclipse::Swt::Widgets
       if (!super(parent))
         return false
       end
-      OS._send_message(self.attr_handle, OS::TB_SETPARENT, parent.attr_handle, 0)
+      # long
+      hwnd_parent = parent.attr_handle
+      OS._send_message(self.attr_handle, OS::TB_SETPARENT, hwnd_parent, 0)
+      # Bug in Windows.  When a tool bar is reparented, the tooltip
+      # control that is automatically created for the item is not
+      # reparented to the new shell.  The fix is to move the tooltip
+      # over using SetWindowLongPtr().  Note that for some reason,
+      # SetParent() does not work.
+      # 
+      # long
+      hwnd_shell = parent.get_shell.attr_handle
+      # long
+      hwnd_tool_tip = OS._send_message(self.attr_handle, OS::TB_GETTOOLTIPS, 0, 0)
+      OS._set_window_long_ptr(hwnd_tool_tip, OS::GWLP_HWNDPARENT, hwnd_shell)
       return true
     end
     
@@ -1125,6 +1266,32 @@ module Org::Eclipse::Swt::Widgets
         _set_window_pos(self.attr_handle, 0, 0, 0, rect.attr_right - rect.attr_left, rect.attr_bottom - rect.attr_top, flags)
         @ignore_resize = false
       end
+    end
+    
+    typesig { [Array.typed(ToolItem)] }
+    # public
+    def set_tab_item_list(tab_list)
+      check_widget
+      if (!(tab_list).nil?)
+        i = 0
+        while i < tab_list.attr_length
+          item = tab_list[i]
+          if ((item).nil?)
+            error(SWT::ERROR_INVALID_ARGUMENT)
+          end
+          if (item.is_disposed)
+            error(SWT::ERROR_INVALID_ARGUMENT)
+          end
+          if (!(item.attr_parent).equal?(self))
+            error(SWT::ERROR_INVALID_PARENT)
+          end
+          i += 1
+        end
+        new_list = Array.typed(ToolItem).new(tab_list.attr_length) { nil }
+        System.arraycopy(tab_list, 0, new_list, 0, tab_list.attr_length)
+        tab_list = new_list
+      end
+      @tab_item_list = tab_list
     end
     
     typesig { [] }
@@ -1179,6 +1346,14 @@ module Org::Eclipse::Swt::Widgets
         if (0 <= index && index < @items.attr_length)
           item = @items[index]
           if (!(item).nil?)
+            # But in Windows.  When the  arrow keys are used to change
+            # the hot item, for some reason, Windows displays the tool
+            # tip for the hot item in at (0, 0) on the screen rather
+            # than next to the current hot item.  This fix is to disallow
+            # tool tips while the user is traversing with the arrow keys.
+            if (!(@last_arrow_id).equal?(-1))
+              return ""
+            end
             return item.attr_tool_tip_text
           end
         end
@@ -1340,7 +1515,7 @@ module Org::Eclipse::Swt::Widgets
       if (!(result).nil?)
         return result
       end
-      return LRESULT.new(OS::DLGC_BUTTON)
+      return LRESULT.new(OS::DLGC_BUTTON | OS::DLGC_WANTARROWS)
     end
     
     typesig { [::Java::Int, ::Java::Int] }
@@ -1427,6 +1602,16 @@ module Org::Eclipse::Swt::Widgets
         end
       end
       return result
+    end
+    
+    typesig { [::Java::Int, ::Java::Int] }
+    # long
+    # long
+    def _wm_mousemove(w_param, l_param)
+      if (!(OS._get_message_pos).equal?(self.attr_display.attr_last_mouse))
+        @last_arrow_id = -1
+      end
+      return super(w_param, l_param)
     end
     
     typesig { [::Java::Int, ::Java::Int] }
@@ -1542,7 +1727,7 @@ module Org::Eclipse::Swt::Widgets
       # blank are drawn over by separator.  This leaves
       # garbage on the screen.  The fix is to damage the
       # pixels.
-      if (!(self.attr_draw_count).equal?(0))
+      if (!get_drawing)
         return result
       end
       if (((self.attr_style & SWT::WRAP)).equal?(0))
@@ -1640,6 +1825,17 @@ module Org::Eclipse::Swt::Widgets
             lpnmhi = NMTBHOTITEM.new
             OS._move_memory(lpnmhi, l_param, NMTBHOTITEM.attr_sizeof)
             case (lpnmhi.attr_dw_flags)
+            when OS::HICF_MOUSE
+              # But in Windows.  When the tool bar has focus, a mouse is
+              # in an item and hover help for that item is displayed and
+              # then the arrow keys are used to change the hot item,
+              # for some reason, Windows snaps the hot item back to the
+              # one that is under the mouse.  The fix is to disallow
+              # hot item changes when the user is traversing using the
+              # arrow keys.
+              if (!(@last_arrow_id).equal?(-1))
+                return LRESULT::ONE
+              end
             when OS::HICF_ARROWKEYS
               client = RECT.new
               OS._get_client_rect(self.attr_handle, client)
@@ -1650,6 +1846,12 @@ module Org::Eclipse::Swt::Widgets
               if (rect.attr_right > client.attr_right || rect.attr_bottom > client.attr_bottom)
                 return LRESULT::ONE
               end
+              @last_arrow_id = lpnmhi.attr_id_new
+            else
+              @last_arrow_id = -1
+            end
+            if (((lpnmhi.attr_dw_flags & OS::HICF_LEAVING)).equal?(0))
+              @last_hot_id = lpnmhi.attr_id_new
             end
           end
         end

@@ -1,6 +1,6 @@
 require "rjava"
 
-# Copyright (c) 2003, 2007 IBM Corporation and others.
+# Copyright (c) 2003, 2009 IBM Corporation and others.
 # All rights reserved. This program and the accompanying materials
 # are made available under the terms of the Eclipse Public License v1.0
 # which accompanies this distribution, and is available at
@@ -22,6 +22,24 @@ module Org::Eclipse::Swt::Internal::Mozilla
   class XPCOMObject 
     include_class_members XPCOMObjectImports
     
+    class_module.module_eval {
+      
+      def is_solaris
+        defined?(@@is_solaris) ? @@is_solaris : @@is_solaris= false
+      end
+      alias_method :attr_is_solaris, :is_solaris
+      
+      def is_solaris=(value)
+        @@is_solaris = value
+      end
+      alias_method :attr_is_solaris=, :is_solaris=
+      
+      when_class_loaded do
+        os_name = System.get_property("os.name").to_lower_case # $NON-NLS-1$
+        self.attr_is_solaris = os_name.starts_with("sunos") || os_name.starts_with("solaris") # $NON-NLS-1$
+      end
+    }
+    
     # long
     attr_accessor :pp_vtable
     alias_method :attr_pp_vtable, :pp_vtable
@@ -36,9 +54,12 @@ module Org::Eclipse::Swt::Internal::Mozilla
       const_set_lazy(:MAX_VTABLE_LENGTH) { 80 }
       const_attr_reader  :MAX_VTABLE_LENGTH
       
+      const_set_lazy(:OS_OFFSET) { self.attr_is_solaris ? 2 : 0 }
+      const_attr_reader  :OS_OFFSET
+      
       
       def callbacks
-        defined?(@@callbacks) ? @@callbacks : @@callbacks= Array.typed(Array.typed(Callback)).new(MAX_VTABLE_LENGTH) { Array.typed(Callback).new(MAX_ARG_COUNT) { nil } }
+        defined?(@@callbacks) ? @@callbacks : @@callbacks= Array.typed(Array.typed(Callback)).new(MAX_VTABLE_LENGTH + OS_OFFSET) { Array.typed(Callback).new(MAX_ARG_COUNT) { nil } }
       end
       alias_method :attr_callbacks, :callbacks
       
@@ -64,24 +85,24 @@ module Org::Eclipse::Swt::Internal::Mozilla
       @pp_vtable = 0
       # long
       # long
-      callback_addresses = Array.typed(::Java::Int).new(arg_counts.attr_length) { 0 }
+      callback_addresses = Array.typed(::Java::Int).new(arg_counts.attr_length + OS_OFFSET) { 0 }
       synchronized((self.attr_callbacks)) do
         i = 0
         length = arg_counts.attr_length
         while i < length
-          if (((self.attr_callbacks[i][arg_counts[i]])).nil?)
-            self.attr_callbacks[i][arg_counts[i]] = Callback.new(get_class, "callback" + RJava.cast_to_string(i), arg_counts[i] + 1, true, XPCOM::NS_ERROR_FAILURE) # $NON-NLS-1$
+          if (((self.attr_callbacks[i + OS_OFFSET][arg_counts[i]])).nil?)
+            self.attr_callbacks[i + OS_OFFSET][arg_counts[i]] = Callback.new(get_class, "callback" + RJava.cast_to_string(i), arg_counts[i] + 1, true, XPCOM::NS_ERROR_FAILURE) # $NON-NLS-1$
           end
-          callback_addresses[i] = self.attr_callbacks[i][arg_counts[i]].get_address
-          if ((callback_addresses[i]).equal?(0))
+          callback_addresses[i + OS_OFFSET] = self.attr_callbacks[i + OS_OFFSET][arg_counts[i]].get_address
+          if ((callback_addresses[i + OS_OFFSET]).equal?(0))
             SWT.error(SWT::ERROR_NO_MORE_CALLBACKS)
           end
           i += 1
         end
       end
       # long
-      p_vtable = C.malloc(C::PTR_SIZEOF * arg_counts.attr_length)
-      XPCOM.memmove(p_vtable, callback_addresses, C::PTR_SIZEOF * arg_counts.attr_length)
+      p_vtable = C.malloc(C::PTR_SIZEOF * (arg_counts.attr_length + OS_OFFSET))
+      XPCOM.memmove(p_vtable, callback_addresses, C::PTR_SIZEOF * (arg_counts.attr_length + OS_OFFSET))
       @pp_vtable = C.malloc(C::PTR_SIZEOF)
       # long
       XPCOM.memmove(@pp_vtable, Array.typed(::Java::Int).new([p_vtable]), C::PTR_SIZEOF)

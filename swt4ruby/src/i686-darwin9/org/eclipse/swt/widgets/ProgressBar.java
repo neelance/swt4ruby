@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2008 IBM Corporation and others.
+ * Copyright (c) 2000, 2009 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -11,8 +11,8 @@
 package org.eclipse.swt.widgets;
 
 
-import org.eclipse.swt.graphics.Point;
-import org.eclipse.swt.internal.carbon.OS;
+import org.eclipse.swt.graphics.*;
+import org.eclipse.swt.internal.cocoa.*;
 
 import org.eclipse.swt.*;
 
@@ -36,9 +36,12 @@ import org.eclipse.swt.*;
  * @see <a href="http://www.eclipse.org/swt/snippets/#progressbar">ProgressBar snippets</a>
  * @see <a href="http://www.eclipse.org/swt/examples.php">SWT Example: ControlExample</a>
  * @see <a href="http://www.eclipse.org/swt/">Sample code and further information</a>
+ * @noextend This class is not intended to be subclassed by clients.
  */
 public class ProgressBar extends Control {
 	
+	NSBezierPath visiblePath;
+
 /**
  * Constructs a new instance of this class given its parent
  * and a style value describing its behavior and appearance.
@@ -66,6 +69,7 @@ public class ProgressBar extends Control {
  * @see SWT#SMOOTH
  * @see SWT#HORIZONTAL
  * @see SWT#VERTICAL
+ * @see SWT#INDETERMINATE
  * @see Widget#checkSubclass
  * @see Widget#getStyle
  */
@@ -80,14 +84,13 @@ static int checkStyle (int style) {
 
 public Point computeSize (int wHint, int hHint, boolean changed) {
 	checkWidget();
-	int [] outMetric = new int [1];
-	OS.GetThemeMetric (OS.kThemeMetricNormalProgressBarThickness, outMetric);
+	int size = OS.NSProgressIndicatorPreferredThickness;
 	int width = 0, height = 0;
 	if ((style & SWT.HORIZONTAL) != 0) {
-		height = outMetric [0];
+		height = size;
 		width = height * 10;
 	} else {
-		width = outMetric [0];
+		width = size;
 		height = width * 10;
 	}
 	if (wHint != SWT.DEFAULT) width = wHint;
@@ -96,15 +99,44 @@ public Point computeSize (int wHint, int hHint, boolean changed) {
 }
 
 void createHandle () {
-	int [] outControl = new int [1];
-	int window = OS.GetControlOwner (parent.handle);
-	OS.CreateProgressBarControl (window, null, 0, 0, 100, (style & SWT.INDETERMINATE) != 0, outControl);
-	if (outControl [0] == 0) error (SWT.ERROR_NO_HANDLES);
-	handle = outControl [0];
+	NSProgressIndicator widget = (NSProgressIndicator)new SWTProgressIndicator().alloc();
+	widget.init();
+	widget.setUsesThreadedAnimation(false);
+	widget.setIndeterminate((style & SWT.INDETERMINATE) != 0);
+	view = widget;
 }
 
-void drawBackground (int control, int context) {
-	fillBackground (control, context, null);
+NSFont defaultNSFont () {
+	return display.progressIndicatorFont;
+}
+
+void _drawThemeProgressArea (int /*long*/ id, int /*long*/ sel, int /*long*/ arg0) {
+	/*
+	* Bug in Cocoa.  When the threaded animation is turned off by calling
+	* setUsesThreadedAnimation(), _drawThemeProgressArea() attempts to
+	* access a deallocated NSBitmapGraphicsContext when drawing a zero sized
+	* progress bar.  The fix is to avoid calling super when the progress bar
+	* is zero sized.
+	*/
+	NSRect frame = view.frame();
+	if (frame.width == 0 || frame.height == 0) return;
+	
+	/*
+	* Bug in Cocoa. When the progress bar is animating it calls
+	* _drawThemeProgressArea() directly without taking into account
+	* obscured areas. The fix is to clip the drawing to the visible
+	* region of the progress bar before calling super.
+	*/	
+	if (visiblePath == null) {
+		int /*long*/ visibleRegion = getVisibleRegion();
+		visiblePath = getPath(visibleRegion);
+		OS.DisposeRgn(visibleRegion);
+	}
+	NSGraphicsContext context = NSGraphicsContext.currentContext();
+	context.saveGraphicsState();
+	visiblePath.setClip();
+	super._drawThemeProgressArea (id, sel, arg0);
+	context.restoreGraphicsState();	
 }
 
 /**
@@ -119,7 +151,7 @@ void drawBackground (int control, int context) {
  */
 public int getMaximum () {
 	checkWidget();
-    return OS.GetControl32BitMaximum (handle);
+	return (int)((NSProgressIndicator)view).maxValue();
 }
 
 /**
@@ -134,7 +166,7 @@ public int getMaximum () {
  */
 public int getMinimum () {
 	checkWidget();
-    return OS.GetControl32BitMinimum (handle);
+	return (int)((NSProgressIndicator)view).minValue();
 }
 
 /**
@@ -149,7 +181,7 @@ public int getMinimum () {
  */
 public int getSelection () {
 	checkWidget();
-    return OS.GetControl32BitValue (handle);
+    return (int)((NSProgressIndicator)view).doubleValue();
 }
 
 /**
@@ -189,10 +221,13 @@ public int getState () {
  */
 public void setMaximum (int value) {
 	checkWidget();
-	if (value < 0) return;
-	int minimum = OS.GetControl32BitMinimum (handle);
-	if (value > minimum) {
-		OS.SetControl32BitMaximum (handle, value);
+	int minimum = (int)((NSProgressIndicator)view).minValue();
+	if (value <= minimum) return;
+	((NSProgressIndicator)view).setMaxValue(value);
+	int selection = (int)((NSProgressIndicator)view).doubleValue();
+	int newSelection = Math.min (selection, value);
+	if (selection != newSelection) {
+		((NSProgressIndicator)view).setDoubleValue(newSelection);
 	}
 }
 
@@ -211,10 +246,13 @@ public void setMaximum (int value) {
  */
 public void setMinimum (int value) {
 	checkWidget();
-	if (value < 0) return;
-	int maximum = OS.GetControl32BitMaximum (handle);
-	if (value < maximum) {
-		OS.SetControl32BitMinimum (handle, value);
+	int maximum =  (int)((NSProgressIndicator)view).maxValue();
+	if (!(0 <= value && value < maximum)) return;
+	((NSProgressIndicator)view).setMinValue(value);
+	int selection = (int)((NSProgressIndicator)view).doubleValue();
+	int newSelection = Math.max (selection, value);
+	if (selection != newSelection) {
+		((NSProgressIndicator)view).setDoubleValue(newSelection);
 	}
 }
 
@@ -232,15 +270,15 @@ public void setMinimum (int value) {
  */
 public void setSelection (int value) {
 	checkWidget();
-    OS.SetControl32BitValue (handle, value);
-    /*
-    * Feature in the Macintosh.  Progress bars are always updated
-    * using an event loop timer, even when they are not indeterminate.
-    * This means that nothing is drawn until the event loop.  The
-    * fix is to allow operating system timers to run without dispatching
-    * any other events.
-    */
-	display.runEventLoopTimers ();
+	((NSProgressIndicator)view).setDoubleValue(value);
+	/*
+	* Feature in Cocoa.  The progress bar does
+	* not redraw right away when a value is
+	* changed.  This is not strictly incorrect
+	* but unexpected.  The fix is to force all
+	* outstanding redraws to be delivered.
+	*/
+	update(false);
 }
 
 /**
@@ -263,5 +301,30 @@ public void setSelection (int value) {
 public void setState (int state) {
 	checkWidget ();
 	//NOT IMPLEMENTED
+}
+
+void releaseWidget () {
+	super.releaseWidget();
+	if (visiblePath != null) visiblePath.release();
+	visiblePath = null;
+}
+
+void resetVisibleRegion () {
+	super.resetVisibleRegion ();
+	if (visiblePath != null) visiblePath.release();
+	visiblePath = null;
+}
+
+void viewDidMoveToWindow(int /*long*/ id, int /*long*/ sel) {
+	/*
+	 * Bug in Cocoa. An indeterminate progress indicator doesn't start animating until it is in
+	 * a visible window.  Workaround is to catch when the bar has been added to a window and start
+	 * the animation there.
+	 */
+	if (view.window() != null) {
+		if ((style & SWT.INDETERMINATE) != 0) {
+			((NSProgressIndicator)view).startAnimation(null);
+		}
+	}
 }
 }

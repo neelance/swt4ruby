@@ -116,7 +116,20 @@ module Org::Eclipse::Swt::Custom
     alias_method :attr_font=, :font=
     undef_method :font=
     
+    attr_accessor :_shell
+    alias_method :attr__shell, :_shell
+    undef_method :_shell
+    alias_method :attr__shell=, :_shell=
+    undef_method :_shell=
+    
+    class_module.module_eval {
+      const_set_lazy(:PACKAGE_PREFIX) { "org.eclipse.swt.custom." }
+      const_attr_reader  :PACKAGE_PREFIX
+    }
+    
     typesig { [Composite, ::Java::Int] }
+    # $NON-NLS-1$
+    # 
     # Constructs a new instance of this class given its parent
     # and a style value describing its behavior and appearance.
     # <p>
@@ -155,8 +168,10 @@ module Org::Eclipse::Swt::Custom
       @foreground = nil
       @background = nil
       @font = nil
+      @_shell = nil
       super(parent, style = check_style(style))
       @visible_item_count = 5
+      @_shell = Composite.instance_method(:get_shell).bind(self).call
       text_style = SWT::SINGLE
       if (!((style & SWT::READ_ONLY)).equal?(0))
         text_style |= SWT::READ_ONLY
@@ -177,6 +192,9 @@ module Org::Eclipse::Swt::Custom
         
         typesig { [Event] }
         define_method :handle_event do |event|
+          if (is_disposed)
+            return
+          end
           if ((self.attr_popup).equal?(event.attr_widget))
             popup_event(event)
             return
@@ -238,6 +256,9 @@ module Org::Eclipse::Swt::Custom
         
         typesig { [Event] }
         define_method :handle_event do |event|
+          if (is_disposed)
+            return
+          end
           shell = (event.attr_widget).get_shell
           if ((shell).equal?(@local_class_parent.get_shell))
             handle_focus(SWT::FocusOut)
@@ -455,6 +476,15 @@ module Org::Eclipse::Swt::Custom
     end
     
     typesig { [] }
+    def check_subclass
+      name = get_class.get_name
+      index = name.last_index_of(Character.new(?..ord))
+      if (!(name.substring(0, index + 1) == PACKAGE_PREFIX))
+        SWT.error(SWT::ERROR_INVALID_SUBCLASS)
+      end
+    end
+    
+    typesig { [] }
     # Sets the selection in the receiver's text field to an empty
     # selection starting just before the first character. If the
     # text field is editable, this has the effect of placing the
@@ -480,6 +510,9 @@ module Org::Eclipse::Swt::Custom
     def combo_event(event)
       case (event.attr_type)
       when SWT::Dispose
+        remove_listener(SWT::Dispose, @listener)
+        notify_listeners(SWT::Dispose, event)
+        event.attr_type = SWT::None
         if (!(@popup).nil? && !@popup.is_disposed)
           @list.remove_listener(SWT::Dispose, @listener)
           @popup.dispose
@@ -492,6 +525,7 @@ module Org::Eclipse::Swt::Custom
         @text = nil
         @list = nil
         @arrow = nil
+        @_shell = nil
       when SWT::FocusIn
         focus_control = get_display.get_focus_control
         if ((focus_control).equal?(@arrow) || (focus_control).equal?(@list))
@@ -659,7 +693,7 @@ module Org::Eclipse::Swt::Custom
     
     typesig { [::Java::Boolean] }
     def drop_down(drop)
-      if ((drop).equal?(is_dropped) || !is_visible)
+      if ((drop).equal?(is_dropped))
         return
       end
       if (!drop)
@@ -667,6 +701,9 @@ module Org::Eclipse::Swt::Custom
         if (!is_disposed && is_focus_control)
           @text.set_focus
         end
+        return
+      end
+      if (!is_visible)
         return
       end
       if (!(get_shell).equal?(@popup.get_parent))
@@ -905,6 +942,19 @@ module Org::Eclipse::Swt::Custom
     end
     
     typesig { [] }
+    def get_shell
+      check_widget
+      shell = super
+      if (!(shell).equal?(@_shell))
+        if (!(@_shell).nil? && !@_shell.is_disposed)
+          @_shell.remove_listener(SWT::Deactivate, @listener)
+        end
+        @_shell = shell
+      end
+      return @_shell
+    end
+    
+    typesig { [] }
     def get_style
       style = super
       style &= ~SWT::READ_ONLY
@@ -979,9 +1029,6 @@ module Org::Eclipse::Swt::Custom
     
     typesig { [::Java::Int] }
     def handle_focus(type)
-      if (is_disposed)
-        return
-      end
       case (type)
       when SWT::FocusIn
         if (@has_focus)

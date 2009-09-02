@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2008 IBM Corporation and others.
+ * Copyright (c) 2000, 2009 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -32,6 +32,7 @@ import org.eclipse.swt.events.*;
  *
  * @see <a href="http://www.eclipse.org/swt/snippets/#table">Table, TableItem, TableColumn snippets</a>
  * @see <a href="http://www.eclipse.org/swt/">Sample code and further information</a>
+ * @noextend This class is not intended to be subclassed by clients.
  */
 public class TableColumn extends Item {
 	Table parent;
@@ -359,14 +360,7 @@ public void pack () {
 	}
 	parent.ignoreColumnResize = true;
 	int columnWidth = 0;
-	/*
-	* Bug in Windows.  When the first column of a table does not
-	* have an image and the user double clicks on the divider,
-	* Windows packs the column but does not take into account
-	* the empty space left for the image.  The fix is to measure
-	* each items ourselves rather than letting Windows do it.
-	*/
-	if ((index == 0 && !parent.firstColumnImage) || parent.hooks (SWT.MeasureItem)) {
+	if (parent.hooks (SWT.MeasureItem)) {
 		RECT headerRect = new RECT ();
 		int /*long*/ hwndHeader = OS.SendMessage (hwnd, OS.LVM_GETHEADER, 0, 0);
 		OS.SendMessage (hwndHeader, OS.HDM_GETITEMRECT, index, headerRect);
@@ -401,6 +395,25 @@ public void pack () {
 			* is to increase the column width by a small amount.
 			*/
 			if (parent.imageList == null) columnWidth += 2;
+			/*
+			* Bug in Windows.  When the first column of a table does not
+			* have an image and the user double clicks on the divider,
+			* Windows packs the column but does not take into account
+			* the empty space left for the image.  The fix is to increase
+			* the column width by the width of the image list.
+			* 
+			* NOTE:  This bug does not happen on Vista.
+			*/
+			if (!OS.IsWinCE && OS.WIN32_VERSION < OS.VERSION (6, 0)) {
+				if (!parent.firstColumnImage) {
+					int /*long*/ hImageList = OS.SendMessage (hwnd, OS.LVM_GETIMAGELIST, OS.LVSIL_SMALL, 0);
+					if (hImageList != 0) {
+						int [] cx = new int [1], cy = new int [1];
+						OS.ImageList_GetIconSize (hImageList, cx, cy);
+						columnWidth += cx [0];
+					}
+				}
+			}
 			/*
 			* Bug in Windows.  When LVM_SETCOLUMNWIDTH is used with LVSCW_AUTOSIZE
 			* for a table with a state image list, the column is width does not
@@ -806,8 +819,17 @@ public void setText (String string) {
 
 /**
  * Sets the receiver's tool tip text to the argument, which
- * may be null indicating that no tool tip text should be shown.
- *
+ * may be null indicating that the default tool tip for the 
+ * control will be shown. For a control that has a default
+ * tool tip, such as the Tree control on Windows, setting
+ * the tool tip text to an empty string replaces the default,
+ * causing no tool tip text to be shown.
+ * <p>
+ * The mnemonic indicator (character '&amp;') is not displayed in a tool tip.
+ * To display a single '&amp;' in the tool tip, the character '&amp;' can be 
+ * escaped by doubling it in the string.
+ * </p>
+ * 
  * @param string the new tool tip text (or null)
  *
  * @exception SWTException <ul>
@@ -843,7 +865,9 @@ public void setWidth (int width) {
 	int index = parent.indexOf (this);
 	if (index == -1) return;
 	int /*long*/ hwnd = parent.handle;
-	OS.SendMessage (hwnd, OS.LVM_SETCOLUMNWIDTH, index, width);
+	if (width != (int)/*64*/OS.SendMessage (hwnd, OS.LVM_GETCOLUMNWIDTH, index, 0)) {
+		OS.SendMessage (hwnd, OS.LVM_SETCOLUMNWIDTH, index, width);
+	}
 }
 
 void updateToolTip (int index) {

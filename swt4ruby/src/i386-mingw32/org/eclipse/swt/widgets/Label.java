@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2008 IBM Corporation and others.
+ * Copyright (c) 2000, 2009 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -21,7 +21,7 @@ import org.eclipse.swt.graphics.*;
  * When SEPARATOR is specified, displays a single
  * vertical or horizontal line.
  * <p>
- * Shadow styles are hints and may not be honoured
+ * Shadow styles are hints and may not be honored
  * by the platform.  To create a separator label
  * with the default shadow style for the platform,
  * do not specify a shadow style.
@@ -46,12 +46,13 @@ import org.eclipse.swt.graphics.*;
  * @see <a href="http://www.eclipse.org/swt/snippets/#label">Label snippets</a>
  * @see <a href="http://www.eclipse.org/swt/examples.php">SWT Example: ControlExample</a>
  * @see <a href="http://www.eclipse.org/swt/">Sample code and further information</a>
+ * @noextend This class is not intended to be subclassed by clients.
  */
 public class Label extends Control {
 	String text = "";
 	Image image;
 	static final int MARGIN = 4;
-	static final boolean IMAGE_AND_TEXT = false;
+	static /*final*/ boolean IMAGE_AND_TEXT = false;
 	static final int /*long*/ LabelProc;
 	static final TCHAR LabelClass = new TCHAR (0, "STATIC", true);
 	static {

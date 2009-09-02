@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2008 IBM Corporation and others.
+ * Copyright (c) 2000, 2009 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -11,10 +11,9 @@
 package org.eclipse.swt.widgets;
 
 
-import org.eclipse.swt.internal.carbon.OS;
-
 import org.eclipse.swt.*;
 import org.eclipse.swt.graphics.*;
+import org.eclipse.swt.internal.cocoa.*;
 
 /**
  * Instances of this class provide the appearance and
@@ -93,6 +92,7 @@ import org.eclipse.swt.graphics.*;
  * @see Shell
  * @see SWT
  * @see <a href="http://www.eclipse.org/swt/">Sample code and further information</a>
+ * @noextend This class is not intended to be subclassed by clients.
  */
 public class Decorations extends Canvas {
 	Image image;
@@ -182,7 +182,7 @@ int compare (ImageData data1, ImageData data2) {
 	return data1.width > data2.width || data1.height > data2.height ? -1 : 1;
 }
 
-Control computeTabGroup () {
+Widget computeTabGroup () {
 	return this;
 }
 
@@ -414,11 +414,11 @@ boolean restoreFocus () {
 }
 
 void saveFocus () {
-	int window = OS.GetControlOwner (handle);
-	Control control = display.getFocusControl (window, false);
-	if (control != null && control != this && this == control.menuShell ()) {
-		setSavedFocus (control);
-	}
+//	int window = OS.GetControlOwner (handle);
+//	Control control = display.getFocusControl (window, false);
+//	if (control != null && control != this && this == control.menuShell ()) {
+//		setSavedFocus (control);
+//	}
 }
 
 /**
@@ -454,13 +454,13 @@ public void setDefaultButton (Button button) {
 		if ((button.style & SWT.PUSH) == 0) return;
 	}
 	if (button == defaultButton) return;
-	if (defaultButton != null) {
-		if (!defaultButton.isDisposed ()) defaultButton.setDefault (false);
-	}
 	defaultButton = button;
-	if (defaultButton != null) {
-		if (!defaultButton.isDisposed ()) defaultButton.setDefault (true);
+	NSButtonCell cell = null;
+	if (defaultButton != null && (defaultButton.style & SWT.PUSH) != 0) {
+		cell = new NSButtonCell (((NSButton)defaultButton.view).cell ());
 	}
+	view.window().setDefaultButtonCell (cell);
+	display.updateDefaultButton();
 }
 
 /**
@@ -485,12 +485,8 @@ public void setImage (Image image) {
 	if (image != null && image.isDisposed()) error(SWT.ERROR_INVALID_ARGUMENT);
 	this.image = image;
 	if (parent != null) return;
-	if (display.dockImage == 0) {
-		if (image != null) {
-			OS.SetApplicationDockTileImage (image.handle);
-		} else {
-			OS.RestoreApplicationDockTileImage ();
-		}
+	if (display.dockImage == null) {
+		display.application.setApplicationIconImage (image != null ? image.handle : null);
 	}
 }
 
@@ -526,14 +522,18 @@ public void setImages (Image [] images) {
 	}
 	this.images = images;
 	if (parent != null) return;
-	if (display.dockImage == 0) {
+	if (display.dockImage == null) {
 		if (images != null && images.length > 1) {
 			Image [] bestImages = new Image [images.length];
 			System.arraycopy (images, 0, bestImages, 0, images.length);
 			sort (bestImages);
 			images = bestImages;
 		}
-		OS.SetApplicationDockTileImage (images [0].handle);
+		if (images != null && images.length > 0) {
+			display.application.setApplicationIconImage (images [0].handle);
+		} else {
+			display.application.setApplicationIconImage (null);
+		}
 	}
 }
 

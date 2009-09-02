@@ -849,15 +849,17 @@ module Org::Eclipse::Swt::Custom
       origin = get_origin
       if (item_rect.attr_x < 0)
         origin.attr_x = Math.max(0, origin.attr_x + item_rect.attr_x)
+      else
+        if (area.attr_width < item_rect.attr_x + item_rect.attr_width)
+          origin.attr_x = Math.max(0, origin.attr_x + item_rect.attr_x + Math.min(item_rect.attr_width, area.attr_width) - area.attr_width)
+        end
       end
       if (item_rect.attr_y < 0)
         origin.attr_y = Math.max(0, origin.attr_y + item_rect.attr_y)
-      end
-      if (area.attr_width < item_rect.attr_x + item_rect.attr_width)
-        origin.attr_x = Math.max(0, origin.attr_x + item_rect.attr_x + item_rect.attr_width - area.attr_width)
-      end
-      if (area.attr_height < item_rect.attr_y + item_rect.attr_height)
-        origin.attr_y = Math.max(0, origin.attr_y + item_rect.attr_y + item_rect.attr_height - area.attr_height)
+      else
+        if (area.attr_height < item_rect.attr_y + item_rect.attr_height)
+          origin.attr_y = Math.max(0, origin.attr_y + item_rect.attr_y + Math.min(item_rect.attr_height, area.attr_height) - area.attr_height)
+        end
       end
       set_origin(origin)
     end

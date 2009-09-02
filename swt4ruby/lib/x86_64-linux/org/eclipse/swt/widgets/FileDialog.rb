@@ -1,6 +1,6 @@
 require "rjava"
 
-# Copyright (c) 2000, 2008 IBM Corporation and others.
+# Copyright (c) 2000, 2009 IBM Corporation and others.
 # All rights reserved. This program and the accompanying materials
 # are made available under the terms of the Eclipse Public License v1.0
 # which accompanies this distribution, and is available at
@@ -37,6 +37,7 @@ module Org::Eclipse::Swt::Widgets
   # @see <a href="http://www.eclipse.org/swt/snippets/#filedialog">FileDialog snippets</a>
   # @see <a href="http://www.eclipse.org/swt/examples.php">SWT Example: ControlExample, Dialog tab</a>
   # @see <a href="http://www.eclipse.org/swt/">Sample code and further information</a>
+  # @noextend This class is not intended to be subclassed by clients.
   class FileDialog < FileDialogImports.const_get :Dialog
     include_class_members FileDialogImports
     
@@ -87,6 +88,12 @@ module Org::Eclipse::Swt::Widgets
     undef_method :overwrite
     alias_method :attr_overwrite=, :overwrite=
     undef_method :overwrite=
+    
+    attr_accessor :uri_mode
+    alias_method :attr_uri_mode, :uri_mode
+    undef_method :uri_mode
+    alias_method :attr_uri_mode=, :uri_mode=
+    undef_method :uri_mode=
     
     # int
     attr_accessor :handle
@@ -142,6 +149,10 @@ module Org::Eclipse::Swt::Widgets
     # <li>ERROR_THREAD_INVALID_ACCESS - if not called from the thread that created the parent</li>
     # <li>ERROR_INVALID_SUBCLASS - if this class is not an allowed subclass</li>
     # </ul>
+    # 
+    # @see SWT#SAVE
+    # @see SWT#OPEN
+    # @see SWT#MULTI
     def initialize(parent, style)
       @filter_names = nil
       @filter_extensions = nil
@@ -151,6 +162,7 @@ module Org::Eclipse::Swt::Widgets
       @full_path = nil
       @filter_index = 0
       @overwrite = false
+      @uri_mode = false
       @handle = 0
       super(parent, check_style(parent, style))
       @filter_names = Array.typed(String).new(0) { nil }
@@ -170,7 +182,12 @@ module Org::Eclipse::Swt::Widgets
       @full_path = RJava.cast_to_string(nil)
       if (((self.attr_style & (SWT::SAVE | SWT::MULTI))).equal?(SWT::MULTI))
         # int
-        list = OS.gtk_file_chooser_get_filenames(@handle)
+        list = 0
+        if (@uri_mode)
+          list = OS.gtk_file_chooser_get_uris(@handle)
+        else
+          list = OS.gtk_file_chooser_get_filenames(@handle)
+        end
         list_length = OS.g_slist_length(list)
         @file_names = Array.typed(String).new(list_length) { nil }
         # int
@@ -181,8 +198,13 @@ module Org::Eclipse::Swt::Widgets
           # int
           name = OS.g_slist_data(current)
           # int
-          utf8ptr = OS.g_filename_to_utf8(name, -1, nil, nil, nil)
-          OS.g_free(name)
+          utf8ptr = 0
+          if (@uri_mode)
+            utf8ptr = name
+          else
+            utf8ptr = OS.g_filename_to_utf8(name, -1, nil, nil, nil)
+            OS.g_free(name)
+          end
           if (!(utf8ptr).equal?(0))
             # int
             # int
@@ -211,28 +233,33 @@ module Org::Eclipse::Swt::Widgets
         OS.g_slist_free(list)
       else
         # int
-        path = OS.gtk_file_chooser_get_filename(@handle)
-        if (!(path).equal?(0))
+        utf8ptr = 0
+        if (@uri_mode)
+          utf8ptr = OS.gtk_file_chooser_get_uri(@handle)
+        else
           # int
-          utf8ptr = OS.g_filename_to_utf8(path, -1, nil, nil, nil)
-          OS.g_free(path)
-          if (!(utf8ptr).equal?(0))
-            # int
-            # int
-            items_written = Array.typed(::Java::Long).new(1) { 0 }
-            # int
-            utf16ptr = OS.g_utf8_to_utf16(utf8ptr, -1, nil, items_written, nil)
-            OS.g_free(utf8ptr)
-            if (!(utf16ptr).equal?(0))
-              # 64
-              clength = RJava.cast_to_int(items_written[0])
-              chars = CharArray.new(clength)
-              OS.memmove(chars, utf16ptr, clength * 2)
-              OS.g_free(utf16ptr)
-              @full_path = RJava.cast_to_string(String.new(chars))
-              @file_names = Array.typed(String).new(1) { nil }
-              @file_names[0] = @full_path.substring(@full_path.last_index_of(SEPARATOR) + 1)
-            end
+          path = OS.gtk_file_chooser_get_filename(@handle)
+          if (!(path).equal?(0))
+            utf8ptr = OS.g_filename_to_utf8(path, -1, nil, nil, nil)
+            OS.g_free(path)
+          end
+        end
+        if (!(utf8ptr).equal?(0))
+          # int
+          # int
+          items_written = Array.typed(::Java::Long).new(1) { 0 }
+          # int
+          utf16ptr = OS.g_utf8_to_utf16(utf8ptr, -1, nil, items_written, nil)
+          OS.g_free(utf8ptr)
+          if (!(utf16ptr).equal?(0))
+            # 64
+            clength = RJava.cast_to_int(items_written[0])
+            chars = CharArray.new(clength)
+            OS.memmove(chars, utf16ptr, clength * 2)
+            OS.g_free(utf16ptr)
+            @full_path = RJava.cast_to_string(String.new(chars))
+            @file_names = Array.typed(String).new(1) { nil }
+            @file_names[0] = @full_path.substring(@full_path.last_index_of(SEPARATOR) + 1)
           end
         end
       end
@@ -500,15 +527,23 @@ module Org::Eclipse::Swt::Widgets
       action = !((self.attr_style & SWT::SAVE)).equal?(0) ? OS::GTK_FILE_CHOOSER_ACTION_SAVE : OS::GTK_FILE_CHOOSER_ACTION_OPEN
       # int
       shell_handle = self.attr_parent.top_handle
-      @handle = OS.gtk_file_chooser_dialog_new(title_bytes, shell_handle, action, OS._gtk_stock_cancel, OS::GTK_RESPONSE_CANCEL, OS._gtk_stock_ok, OS::GTK_RESPONSE_OK, 0)
+      display = !(self.attr_parent).nil? ? self.attr_parent.get_display : Display.get_current
+      if ((display.get_dismissal_alignment).equal?(SWT::RIGHT))
+        @handle = OS.gtk_file_chooser_dialog_new(title_bytes, shell_handle, action, OS._gtk_stock_cancel, OS::GTK_RESPONSE_CANCEL, OS._gtk_stock_ok, OS::GTK_RESPONSE_OK, 0)
+      else
+        @handle = OS.gtk_file_chooser_dialog_new(title_bytes, shell_handle, action, OS._gtk_stock_ok, OS::GTK_RESPONSE_OK, OS._gtk_stock_cancel, OS::GTK_RESPONSE_CANCEL, 0)
+      end
+      OS.gtk_window_set_modal(@handle, true)
       # int
       pixbufs = OS.gtk_window_get_icon_list(shell_handle)
       if (!(pixbufs).equal?(0))
         OS.gtk_window_set_icon_list(@handle, pixbufs)
         OS.g_list_free(pixbufs)
       end
+      if (@uri_mode)
+        OS.gtk_file_chooser_set_local_only(@handle, false)
+      end
       preset_chooser_dialog
-      display = !(self.attr_parent).nil? ? self.attr_parent.get_display : Display.get_current
       display.add_idle_proc
       answer = nil
       old_modal = nil
@@ -553,6 +588,7 @@ module Org::Eclipse::Swt::Widgets
           OS.g_list_free(pixbufs)
         end
       end
+      OS.gtk_window_set_modal(@handle, true)
       preset_classic_dialog
       display = !(self.attr_parent).nil? ? self.attr_parent.get_display : Display.get_current
       display.add_idle_proc
@@ -596,19 +632,45 @@ module Org::Eclipse::Swt::Widgets
       if ((@file_name).nil?)
         @file_name = ""
       end
-      if (@filter_path.length > 0)
-        string_buffer = StringBuffer.new
-        # filename must be a full path
-        if (!(@filter_path.char_at(0)).equal?(SEPARATOR))
-          string_buffer.append(SEPARATOR)
+      if (!((self.attr_style & SWT::SAVE)).equal?(0))
+        if (@filter_path.length > 0)
+          if (@uri_mode)
+            buffer = Converter.wcs_to_mbcs(nil, @filter_path, true)
+            OS.gtk_file_chooser_set_current_folder_uri(@handle, buffer)
+          else
+            # filename must be a full path
+            buffer = Converter.wcs_to_mbcs(nil, RJava.cast_to_string(SEPARATOR) + @filter_path, true)
+            # Bug in GTK. GtkFileChooser may crash on GTK versions 2.4.10 to 2.6
+            # when setting a file name that is not a true canonical path.
+            # The fix is to use the canonical path.
+            # 
+            # int
+            ptr = OS.realpath(buffer, nil)
+            OS.gtk_file_chooser_set_current_folder(@handle, ptr)
+            OS.g_free(ptr)
+          end
         end
-        string_buffer.append(@filter_path)
-        if (@file_name.length > 0 && ((self.attr_style & SWT::SAVE)).equal?(0))
-          if (!(@filter_path.char_at(@filter_path.length - 1)).equal?(SEPARATOR))
+        if (@file_name.length > 0)
+          buffer = Converter.wcs_to_mbcs(nil, @file_name, true)
+          OS.gtk_file_chooser_set_current_name(@handle, buffer)
+        end
+      else
+        string_buffer = StringBuffer.new
+        if (@filter_path.length > 0)
+          if (!@uri_mode)
+            # filename must be a full path
             string_buffer.append(SEPARATOR)
           end
+          string_buffer.append(@filter_path)
+          string_buffer.append(SEPARATOR)
+        end
+        if (@file_name.length > 0)
           string_buffer.append(@file_name)
-          buffer = Converter.wcs_to_mbcs(nil, string_buffer.to_s, true)
+        end
+        buffer = Converter.wcs_to_mbcs(nil, string_buffer.to_s, true)
+        if (@uri_mode)
+          OS.gtk_file_chooser_set_uri(@handle, buffer)
+        else
           # Bug in GTK. GtkFileChooser may crash on GTK versions 2.4.10 to 2.6
           # when setting a file name that is not a true canonical path.
           # The fix is to use the canonical path.
@@ -619,40 +681,9 @@ module Org::Eclipse::Swt::Widgets
             OS.gtk_file_chooser_set_filename(@handle, ptr)
             OS.g_free(ptr)
           end
-        else
-          buffer = Converter.wcs_to_mbcs(nil, string_buffer.to_s, true)
-          # Bug in GTK. GtkFileChooser may crash on GTK versions 2.4.10 to 2.6
-          # when setting a file name that is not a true canonical path.
-          # The fix is to use the canonical path.
-          # 
-          # int
-          ptr = OS.realpath(buffer, nil)
-          if (!(ptr).equal?(0))
-            OS.gtk_file_chooser_set_current_folder(@handle, ptr)
-            OS.g_free(ptr)
-          end
-        end
-      else
-        if (@file_name.length > 0)
-          if ((@file_name.char_at(0)).equal?(SEPARATOR))
-            buffer = Converter.wcs_to_mbcs(nil, @file_name, true)
-            # Bug in GTK. GtkFileChooser may crash on GTK versions 2.4.10 to 2.6
-            # when setting a file name that is not a true canonical path.
-            # The fix is to use the canonical path.
-            # 
-            # int
-            ptr = OS.realpath(buffer, nil)
-            if (!(ptr).equal?(0))
-              OS.gtk_file_chooser_set_filename(@handle, ptr)
-              OS.g_free(ptr)
-            end
-          end
         end
       end
-      if (!((self.attr_style & SWT::SAVE)).equal?(0) && @file_name.length > 0)
-        buffer = Converter.wcs_to_mbcs(nil, @file_name, true)
-        OS.gtk_file_chooser_set_current_name(@handle, buffer)
-      end
+      # Set overwrite mode
       if (!((self.attr_style & SWT::SAVE)).equal?(0))
         if (OS::GTK_VERSION >= OS._version(2, 8, 0))
           OS.gtk_file_chooser_set_do_overwrite_confirmation(@handle, @overwrite)
@@ -843,6 +874,20 @@ module Org::Eclipse::Swt::Widgets
     # @since 3.4
     def set_overwrite(overwrite)
       @overwrite = overwrite
+    end
+    
+    typesig { [::Java::Boolean] }
+    # Sets URI Mode.
+    # 
+    # When the FileDialog is in URI mode it returns
+    # a URI (instead of a file name) for the following
+    # methods: open() and getFilterPath().
+    # The input argment for setFilterPath() should also
+    # be a URI.
+    # 
+    # public
+    def set_urimode(uri_mode)
+      @uri_mode = uri_mode
     end
     
     private

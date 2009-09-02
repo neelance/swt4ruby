@@ -14,11 +14,9 @@ import org.eclipse.swt.*;
 import org.eclipse.swt.graphics.*;
 
 public class Theme {
-	
 	Device device;
 	
 public Theme(Device device) {
-	if (device == null) SWT.error(SWT.ERROR_NULL_ARGUMENT);
 	this.device = device;
 }
 
@@ -27,7 +25,6 @@ void checkTheme() {
 }
 
 public Rectangle computeTrim(GC gc, DrawData data) {
-	checkTheme();
 	if (gc == null) SWT.error(SWT.ERROR_NULL_ARGUMENT);
 	if (data == null) SWT.error(SWT.ERROR_NULL_ARGUMENT);
 	if (gc.isDisposed()) SWT.error(SWT.ERROR_INVALID_ARGUMENT);
@@ -37,7 +34,7 @@ public Rectangle computeTrim(GC gc, DrawData data) {
 public void dispose () {
 	device = null;
 }
-
+	
 public void drawBackground(GC gc, Rectangle bounds, DrawData data) {
 	checkTheme();
 	if (gc == null) SWT.error(SWT.ERROR_NULL_ARGUMENT);

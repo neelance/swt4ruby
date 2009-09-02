@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2007, 2008 IBM Corporation and others.
+ * Copyright (c) 2007, 2009 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -10,12 +10,9 @@
  *******************************************************************************/
 package org.eclipse.swt.widgets;
 
-
-import org.eclipse.swt.*;
+import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.*;
-import org.eclipse.swt.internal.carbon.OS;
-import org.eclipse.swt.internal.carbon.TextRange;
-
+import org.eclipse.swt.internal.cocoa.*;
 
 /**
  * Instances of this class represent input method editors.
@@ -36,6 +33,7 @@ import org.eclipse.swt.internal.carbon.TextRange;
  * @see <a href="http://www.eclipse.org/swt/">Sample code and further information</a>
  * 
  * @since 3.4
+ * @noextend This class is not intended to be subclassed by clients.
  */
 public class IME extends Widget {
 	Canvas parent;
@@ -46,9 +44,7 @@ public class IME extends Widget {
 	int [] ranges;
 	TextStyle [] styles;
 	
-	static final int UNDERLINE_IME_INPUT = 1 << 16;
-	static final int UNDERLINE_IME_TARGET_CONVERTED = 2 << 16;
-	static final int UNDERLINE_IME_CONVERTED = 3 << 16;
+	static final int UNDERLINE_THICK = 1 << 16;
 	
 /**
  * Prevents uninitialized instances from being created outside the package.
@@ -89,12 +85,63 @@ public IME (Canvas parent, int style) {
 	createWidget ();
 }
 
+int /*long*/ attributedSubstringFromRange (int /*long*/ id, int /*long*/ sel, int /*long*/ rangePtr) {
+	Event event = new Event ();
+	event.detail = SWT.COMPOSITION_SELECTION;
+	sendEvent (SWT.ImeComposition, event);
+	NSRange range = new NSRange ();
+	OS.memmove (range, rangePtr, NSRange.sizeof);
+	int start = (int)/*64*/range.location;
+	int end = (int)/*64*/(range.location + range.length);
+	if (event.start <= start && start <= event.end && event.start <= end && end <= event.end) {
+		NSString str = NSString.stringWith (event.text.substring(start - event.start, end - event.start));
+		NSAttributedString attriStr = ((NSAttributedString)new NSAttributedString().alloc()).initWithString(str, null);
+		attriStr.autorelease ();
+		return attriStr.id;
+	}
+	return 0;
+}
+
+int /*long*/ characterIndexForPoint (int /*long*/ id, int /*long*/ sel, int /*long*/ point) {
+	if (!isInlineEnabled ()) return OS.NSNotFound;
+	NSPoint pt = new NSPoint ();
+	OS.memmove (pt, point, NSPoint.sizeof);
+	NSView view = parent.view;
+	pt = view.window ().convertScreenToBase (pt);
+	pt = view.convertPoint_fromView_ (pt, null);
+	Event event = new Event ();
+	event.detail = SWT.COMPOSITION_OFFSET;
+	event.x = (int) pt.x;
+	event.y = (int) pt.y;
+	sendEvent (SWT.ImeComposition, event);
+	int offset = event.index + event.count;
+	return offset != -1 ? offset : OS.NSNotFound;
+}
+
 void createWidget () {
 	text = "";
 	startOffset = -1;
 	if (parent.getIME () == null) {
 		parent.setIME (this);
 	}
+}
+
+NSRect firstRectForCharacterRange(int /*long*/ id, int /*long*/ sel, int /*long*/ range) {
+	NSRect rect = new NSRect ();
+	Caret caret = parent.caret;
+	if (caret != null) {
+		NSView view = parent.view;
+		NSPoint pt = new NSPoint ();
+		pt.x = caret.x;
+		pt.y = caret.y + caret.height;
+		pt = view.convertPoint_toView_ (pt, null);
+		pt = view.window ().convertBaseToScreen (pt);
+		rect.x = pt.x;
+		rect.y = pt.y;
+		rect.width = caret.width;
+		rect.height = caret.height;
+	}
+	return rect;
 }
 
 /**
@@ -205,6 +252,48 @@ public TextStyle [] getStyles () {
 	return result;
 }
 
+TextStyle getStyle (NSDictionary attribs) {
+	NSArray keys = attribs.allKeys ();
+	int /*long*/ count = keys.count ();
+	TextStyle style = new TextStyle ();
+	for (int j = 0; j < count; j++) {
+		NSString key = new NSString (keys.objectAtIndex (j));
+		if (key.isEqualTo (OS.NSBackgroundColorAttributeName)) {
+			NSColor color = new NSColor (attribs.objectForKey (key)).colorUsingColorSpaceName (OS.NSCalibratedRGBColorSpace);
+			float /*double*/ [] rgbColor = new float /*double*/ []{color.redComponent(), color.greenComponent(), color.blueComponent(), color.alphaComponent()};
+			style.background = Color.cocoa_new (display, rgbColor);
+		} else if (key.isEqualTo (OS.NSForegroundColorAttributeName)) {
+			NSColor color = new NSColor (attribs.objectForKey (key)).colorUsingColorSpaceName (OS.NSCalibratedRGBColorSpace);
+			float /*double*/ [] rgbColor = new float /*double*/ []{color.redComponent(), color.greenComponent(), color.blueComponent(), color.alphaComponent()};
+			style.foreground = Color.cocoa_new (display, rgbColor);
+		} else if (key.isEqualTo (OS.NSUnderlineColorAttributeName)) {
+			NSColor color = new NSColor (attribs.objectForKey (key)).colorUsingColorSpaceName (OS.NSCalibratedRGBColorSpace);
+			float /*double*/ [] rgbColor = new float /*double*/ []{color.redComponent(), color.greenComponent(), color.blueComponent(), color.alphaComponent()};
+			style.underlineColor = Color.cocoa_new (display, rgbColor);
+		} else if (key.isEqualTo (OS.NSUnderlineStyleAttributeName)) {
+			NSNumber value = new NSNumber (attribs.objectForKey (key));
+			switch (value.intValue ()) {
+				case OS.NSUnderlineStyleSingle: style.underlineStyle = SWT.UNDERLINE_SINGLE; break;
+				case OS.NSUnderlineStyleDouble: style.underlineStyle = SWT.UNDERLINE_DOUBLE; break;
+				case OS.NSUnderlineStyleThick: style.underlineStyle = UNDERLINE_THICK; break;
+			}
+			style.underline = value.intValue () != OS.NSUnderlineStyleNone;
+		} else if (key.isEqualTo (OS.NSStrikethroughColorAttributeName)) {
+			NSColor color = new NSColor (attribs.objectForKey (key)).colorUsingColorSpaceName (OS.NSCalibratedRGBColorSpace);
+			float /*double*/ [] rgbColor = new float /*double*/ []{color.redComponent(), color.greenComponent(), color.blueComponent(), color.alphaComponent()};
+			style.strikeoutColor = Color.cocoa_new (display, rgbColor);
+		} else if (key.isEqualTo (OS.NSStrikethroughStyleAttributeName)) {
+			NSNumber value = new NSNumber (attribs.objectForKey (key));
+			style.strikeout = value.intValue () != OS.NSUnderlineStyleNone;
+		} else if (key.isEqualTo (OS.NSFontAttributeName)) {
+			NSFont font = new NSFont (attribs.objectForKey (key));
+			font.retain();
+			style.font = Font.cocoa_new (display, font);
+		} 
+	}
+	return style;
+}
+
 /**
  * Returns the composition text.
  * <p>
@@ -240,164 +329,60 @@ public String getText () {
  * </ul>
  */
 public boolean getWideCaret() {
-	checkWidget ();
 	return false; 
+}
+
+boolean hasMarkedText (int /*long*/ id, int /*long*/ sel) {
+	return text.length () != 0;
+}
+
+boolean insertText (int /*long*/ id, int /*long*/ sel, int /*long*/ string) {
+	if (startOffset == -1) return true;
+	NSString str = new NSString (string);
+	if (str.isKindOfClass (OS.objc_getClass ("NSAttributedString"))) {
+		str = new NSAttributedString (string).string ();
+	}
+	int length = (int)/*64*/str.length ();
+	int end = startOffset + text.length ();
+	resetStyles ();
+	caretOffset = commitCount = length;
+	Event event = new Event ();
+	event.detail = SWT.COMPOSITION_CHANGED;
+	event.start = startOffset;
+	event.end = end;
+	event.text = text = str.getString();
+	sendEvent (SWT.ImeComposition, event);
+	text = "";
+	caretOffset = commitCount = 0;
+	startOffset = -1;
+	return event.doit;
 }
 
 boolean isInlineEnabled () {
 	return hooks (SWT.ImeComposition);
 }
 
-int kEventTextInputOffsetToPos (int nextHandler, int theEvent, int userData) {
-	if (!isInlineEnabled ()) return OS.eventNotHandledErr;
-	Caret caret = parent.caret;
-	if (caret == null) return OS.eventNotHandledErr;
-	org.eclipse.swt.internal.carbon.Point pt = new org.eclipse.swt.internal.carbon.Point ();
-	int sizeof = org.eclipse.swt.internal.carbon.Point.sizeof;
-	org.eclipse.swt.graphics.Point point = parent.toDisplay (caret.x, caret.y + caret.height);
-	pt.h = (short)point.x;
-	pt.v = (short)point.y;
-	OS.SetEventParameter (theEvent, OS.kEventParamTextInputReplyPoint, OS.typeQDPoint, sizeof, pt);
-	return OS.noErr;
-}
-
-int kEventTextInputPosToOffset (int nextHandler, int theEvent, int userData) {
-	if (!isInlineEnabled ()) return OS.eventNotHandledErr;
-	if (startOffset == -1) return OS.eventNotHandledErr;
-	org.eclipse.swt.internal.carbon.Point pt = new org.eclipse.swt.internal.carbon.Point ();
-	int sizeof = org.eclipse.swt.internal.carbon.Point.sizeof;
-	OS.GetEventParameter (theEvent, OS.kEventParamTextInputSendCurrentPoint, OS.typeQDPoint, null, sizeof, null, pt);
-	org.eclipse.swt.graphics.Point point = parent.toControl (pt.h, pt.v);
-	Event event = new Event ();
-	event.detail = SWT.COMPOSITION_OFFSET;
-	event.x = point.x;
-	event.y = point.y;
-	sendEvent (SWT.ImeComposition, event);
-	int hitTest;
-	int offset = event.index + event.count;
-	if (offset == -1) {
-		hitTest = OS.kTSMOutsideOfBody;
+NSRange markedRange (int /*long*/ id, int /*long*/ sel) {
+	NSRange range = new NSRange ();
+	if (startOffset != -1) {
+		range.location = startOffset;
+		range.length = text.length ();
 	} else {
-		if (startOffset <= offset && offset < startOffset + text.length()) {
-			hitTest = OS.kTSMInsideOfActiveInputArea;
-			offset -= startOffset;
-		} else {
-			hitTest = OS.kTSMInsideOfBody;
+		range.location = OS.NSNotFound;
+	}
+	return range;
+}
+
+void resetStyles () {
+	if (styles != null) {
+		for (int i = 0; i < styles.length; i++) {
+			TextStyle style = styles [i];
+			Font font = style.font;
+			if (font != null) font.handle.release ();
 		}
 	}
-	OS.SetEventParameter (theEvent, OS.kEventParamTextInputReplyTextOffset, OS.typeLongInteger, 4, new int [] {offset * 2});
-	OS.SetEventParameter (theEvent, OS.kEventParamTextInputReplyRegionClass, OS.typeLongInteger, 4, new int [] {hitTest});
-	OS.SetEventParameter (theEvent, OS.kEventParamTextInputReplyLeadingEdge, OS.typeBoolean, 4, new boolean [] {event.count == 0});
-	return OS.noErr;
-}
-
-int kEventTextInputGetSelectedText (int nextHandler, int theEvent, int userData) {
-	Event event = new Event ();
-	event.detail = SWT.COMPOSITION_SELECTION;
-	sendEvent (SWT.ImeComposition, event);
-	String text = event.text;
-	if (text.length () > 0) {
-		char [] buffer = new char [text.length ()];
-		text.getChars (0, buffer.length, buffer, 0);
-		OS.SetEventParameter (theEvent, OS.kEventParamTextInputReplyText, OS.typeUnicodeText, buffer.length * 2, buffer);
-		return OS.noErr;
-	}
-	return OS.eventNotHandledErr;
-}
-
-int kEventTextInputUpdateActiveInputArea (int nextHandler, int theEvent, int userData) {
-	if (!isInlineEnabled ()) return OS.eventNotHandledErr;
-	ranges = null;
 	styles = null;
-	caretOffset = commitCount = 0;
-	int [] length = new int [1];
-	OS.GetEventParameter (theEvent, OS.kEventParamTextInputSendText, OS.typeUnicodeText, null, 0, length, (char [])null);
-	char [] chars = new char [length [0]];
-	OS.GetEventParameter (theEvent, OS.kEventParamTextInputSendText, OS.typeUnicodeText, null, length [0], null, chars);
-	int [] fixed_length = new int [1];
-	OS.GetEventParameter (theEvent, OS.kEventParamTextInputSendFixLen, OS.typeLongInteger, null, 4, null, fixed_length);
-	int [] rangeSize = new int [1];
-	int rc = OS.GetEventParameter (theEvent, OS.kEventParamTextInputSendHiliteRng, OS.typeTextRangeArray, null, 0, rangeSize, (byte [])null);
-	if (rc == OS.noErr) {
-		int firstSelectedConverted = -1;
-		boolean hasConvertedText = false;
-		int textRanges = OS.NewPtr (rangeSize [0]);
-		OS.GetEventParameter (theEvent, OS.kEventParamTextInputSendHiliteRng, OS.typeTextRangeArray, null, rangeSize [0], null, textRanges);
-		short [] nRanges = new short [1];
-		OS.memmove (nRanges, textRanges, 2);
-		int count = nRanges [0];
-		if (count > 0) {
-			TextRange range = new TextRange ();
-			ranges = new int [(count - 1) * 2];
-			styles = new TextStyle [count - 1];
-			for (int i = 0, j = 0; i < count; i++) {
-				OS.memmove (range, textRanges + 2 + (i * TextRange.sizeof), TextRange.sizeof);
-				switch (range.fHiliteStyle) {
-					case OS.kCaretPosition: 
-						caretOffset = range.fStart / 2;
-						break;
-					case OS.kConvertedText:	
-					case OS.kSelectedConvertedText:
-					case OS.kSelectedRawText:
-					case OS.kRawText:
-						ranges [j * 2] = range.fStart / 2;
-						ranges [j * 2 + 1] = range.fEnd / 2 - 1;
-						styles [j] = new TextStyle ();
-						styles [j].underline = true;
-						styles [j].underlineStyle = UNDERLINE_IME_INPUT;
-						if (range.fHiliteStyle == OS.kConvertedText) {
-							styles [j].underlineStyle = UNDERLINE_IME_CONVERTED;
-							hasConvertedText = true;
-						}
-						if (range.fHiliteStyle == OS.kSelectedConvertedText) {
-							styles [j].underlineStyle = UNDERLINE_IME_TARGET_CONVERTED;
-							if (firstSelectedConverted == -1) {
-								firstSelectedConverted = range.fStart;
-							}
-						}
-						j++;
-						break;
-				}
-			}
-		}
-		OS.DisposePtr (textRanges);
-		if (hasConvertedText && firstSelectedConverted != -1) {
-			caretOffset = firstSelectedConverted / 2;
-		}
-	}
-	int end = startOffset + text.length();
-	if (startOffset == -1) {
-		Event event = new Event ();
-		event.detail = SWT.COMPOSITION_SELECTION;
-		sendEvent (SWT.ImeComposition, event);
-		startOffset = event.start;
-		end = event.end;
-	}
-	Event event = new Event ();
-	event.detail = SWT.COMPOSITION_CHANGED;
-	event.start = startOffset;
-	event.end = end;
-	event.text = text = new String(chars, 0, length [0] / 2);
-	commitCount = fixed_length [0] != -1 ? fixed_length [0] / 2: length [0] / 2;
-	sendEvent (SWT.ImeComposition, event);
-	if (commitCount == text.length ()) {
-		text = "";
-		caretOffset = commitCount = 0;
-		startOffset = -1;
-		ranges = null;
-		styles = null;
-	}
-	if (event.doit) {
-		if (fixed_length [0] == -1 || fixed_length [0] == length [0]) {
-			for (int i=0; i<chars.length; i++) {
-				if (chars [i] == 0) break;
-				event = new Event ();
-				event.character = chars [i];
-				parent.sendKeyEvent (SWT.KeyDown, event);
-			}
-		}
-	}
-	return OS.noErr;
+	ranges = null;
 }
 
 void releaseParent () {
@@ -409,8 +394,17 @@ void releaseWidget () {
 	super.releaseWidget ();
 	parent = null;
 	text = null;
-	styles = null;
-	ranges = null;
+	resetStyles ();
+}
+
+NSRange selectedRange (int /*long*/ id, int /*long*/ sel) {
+	Event event = new Event ();
+	event.detail = SWT.COMPOSITION_SELECTION;
+	sendEvent (SWT.ImeComposition, event);
+	NSRange range = new NSRange ();
+	range.location = event.start;
+	range.length = event.text.length ();
+	return range;
 }
 
 /**
@@ -422,7 +416,7 @@ void releaseWidget () {
  * above the IME, then the IME must be informed that the composition
  * offset has changed.
  *
- * @return the offset of the composition
+ * @param offset the offset of the composition
  *
  * @exception SWTException <ul>
  *    <li>ERROR_WIDGET_DISPOSED - if the receiver has been disposed</li>
@@ -435,6 +429,82 @@ public void setCompositionOffset (int offset) {
 	if (startOffset != -1) {
 		startOffset = offset;
 	}
+}
+
+boolean setMarkedText_selectedRange (int /*long*/ id, int /*long*/ sel, int /*long*/ string, int /*long*/ selRange) {
+	if (!isInlineEnabled ()) return true;
+	resetStyles ();
+	caretOffset = commitCount = 0;
+	int end = startOffset + text.length ();
+	if (startOffset == -1) {
+		Event event = new Event ();
+		event.detail = SWT.COMPOSITION_SELECTION;
+		sendEvent (SWT.ImeComposition, event);
+		startOffset = event.start;
+		end = event.end;
+	}
+	NSString str = new NSString (string);
+	if (str.isKindOfClass (OS.objc_getClass ("NSAttributedString"))) {
+		NSAttributedString attribStr = new NSAttributedString (string);
+		str = attribStr.string ();
+		int length = (int)/*64*/str.length ();
+		styles = new TextStyle [length];
+		ranges = new int [length * 2];
+		NSRange rangeLimit = new NSRange (), effectiveRange = new NSRange ();
+		rangeLimit.length = length;
+		int rangeCount = 0;
+		int /*long*/ ptr = OS.malloc (NSRange.sizeof);
+		for (int i = 0; i < length;) {
+			NSDictionary attribs = attribStr.attributesAtIndex(i, ptr, rangeLimit);
+			OS.memmove (effectiveRange, ptr, NSRange.sizeof);
+			i = (int)/*64*/(effectiveRange.location + effectiveRange.length);
+			ranges [rangeCount * 2] = (int)/*64*/effectiveRange.location;
+			ranges [rangeCount * 2 + 1] = (int)/*64*/(effectiveRange.location + effectiveRange.length - 1);
+			styles [rangeCount++] = getStyle (attribs);
+		}
+		OS.free (ptr);
+		if (rangeCount != styles.length) {
+			TextStyle [] newStyles = new TextStyle [rangeCount];
+			System.arraycopy (styles, 0, newStyles, 0, newStyles.length);
+			styles = newStyles;
+			int [] newRanges = new int [rangeCount * 2];
+			System.arraycopy (ranges, 0, newRanges, 0, newRanges.length);
+			ranges = newRanges;
+		}
+	}
+	int length = (int)/*64*/str.length ();
+	if (ranges == null && length > 0) {
+		styles = new TextStyle []{getStyle (display.markedAttributes)};
+		ranges = new int[]{0, length - 1};
+	}
+	NSRange range = new NSRange ();
+	OS.memmove (range, selRange, NSRange.sizeof);
+	caretOffset = (int)/*64*/range.location;
+	Event event = new Event ();
+	event.detail = SWT.COMPOSITION_CHANGED;
+	event.start = startOffset;
+	event.end = end;
+	event.text = text = str.getString();
+	sendEvent (SWT.ImeComposition, event);
+	if (isDisposed ()) return false;
+	if (text.length () == 0) {
+		Shell s = parent.getShell ();
+		s.keyInputHappened = true;
+		startOffset = -1;
+		resetStyles ();
+	}
+	return true;
+}
+
+int /*long*/ validAttributesForMarkedText (int /*long*/ id, int /*long*/ sel) {
+	NSMutableArray attribs = NSMutableArray.arrayWithCapacity (6);
+	attribs.addObject (new NSString (OS.NSForegroundColorAttributeName ()));
+	attribs.addObject (new NSString (OS.NSBackgroundColorAttributeName ()));
+	attribs.addObject (new NSString (OS.NSUnderlineStyleAttributeName ()));
+	attribs.addObject (new NSString (OS.NSUnderlineColorAttributeName ()));
+	attribs.addObject (new NSString (OS.NSStrikethroughStyleAttributeName ()));
+	attribs.addObject (new NSString (OS.NSStrikethroughColorAttributeName ()));
+	return attribs.id;
 }
 
 }

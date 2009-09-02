@@ -1,6 +1,6 @@
 require "rjava"
 
-# Copyright (c) 2007, 2008 IBM Corporation and others.
+# Copyright (c) 2007, 2009 IBM Corporation and others.
 # All rights reserved. This program and the accompanying materials
 # are made available under the terms of the Eclipse Public License v1.0
 # which accompanies this distribution, and is available at
@@ -13,10 +13,9 @@ module Org::Eclipse::Swt::Widgets
     class_module.module_eval {
       include ::Java::Lang
       include ::Org::Eclipse::Swt::Widgets
-      include ::Org::Eclipse::Swt
+      include_const ::Org::Eclipse::Swt, :SWT
       include ::Org::Eclipse::Swt::Graphics
-      include_const ::Org::Eclipse::Swt::Internal::Carbon, :OS
-      include_const ::Org::Eclipse::Swt::Internal::Carbon, :TextRange
+      include ::Org::Eclipse::Swt::Internal::Cocoa
     }
   end
   
@@ -38,6 +37,7 @@ module Org::Eclipse::Swt::Widgets
   # @see <a href="http://www.eclipse.org/swt/">Sample code and further information</a>
   # 
   # @since 3.4
+  # @noextend This class is not intended to be subclassed by clients.
   class IME < IMEImports.const_get :Widget
     include_class_members IMEImports
     
@@ -84,14 +84,8 @@ module Org::Eclipse::Swt::Widgets
     undef_method :styles=
     
     class_module.module_eval {
-      const_set_lazy(:UNDERLINE_IME_INPUT) { 1 << 16 }
-      const_attr_reader  :UNDERLINE_IME_INPUT
-      
-      const_set_lazy(:UNDERLINE_IME_TARGET_CONVERTED) { 2 << 16 }
-      const_attr_reader  :UNDERLINE_IME_TARGET_CONVERTED
-      
-      const_set_lazy(:UNDERLINE_IME_CONVERTED) { 3 << 16 }
-      const_attr_reader  :UNDERLINE_IME_CONVERTED
+      const_set_lazy(:UNDERLINE_THICK) { 1 << 16 }
+      const_attr_reader  :UNDERLINE_THICK
     }
     
     typesig { [] }
@@ -146,6 +140,53 @@ module Org::Eclipse::Swt::Widgets
       create_widget
     end
     
+    typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
+    # long
+    # long
+    # long
+    # long
+    def attributed_substring_from_range(id, sel, range_ptr)
+      event = Event.new
+      event.attr_detail = SWT::COMPOSITION_SELECTION
+      send_event(SWT::ImeComposition, event)
+      range = NSRange.new
+      OS.memmove(range, range_ptr, NSRange.attr_sizeof)
+      # 64
+      start = RJava.cast_to_int(range.attr_location)
+      # 64
+      end_ = RJava.cast_to_int((range.attr_location + range.attr_length))
+      if (event.attr_start <= start && start <= event.attr_end && event.attr_start <= end_ && end_ <= event.attr_end)
+        str = NSString.string_with(event.attr_text.substring(start - event.attr_start, end_ - event.attr_start))
+        attri_str = (NSAttributedString.new.alloc).init_with_string(str, nil)
+        attri_str.autorelease
+        return attri_str.attr_id
+      end
+      return 0
+    end
+    
+    typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
+    # long
+    # long
+    # long
+    # long
+    def character_index_for_point(id, sel, point)
+      if (!is_inline_enabled)
+        return OS::NSNotFound
+      end
+      pt = NSPoint.new
+      OS.memmove(pt, point, NSPoint.attr_sizeof)
+      view = @parent.attr_view
+      pt = view.window.convert_screen_to_base(pt)
+      pt = view.convert_point_from_view_(pt, nil)
+      event = Event.new
+      event.attr_detail = SWT::COMPOSITION_OFFSET
+      event.attr_x = RJava.cast_to_int(pt.attr_x)
+      event.attr_y = RJava.cast_to_int(pt.attr_y)
+      send_event(SWT::ImeComposition, event)
+      offset = event.attr_index + event.attr_count
+      return !(offset).equal?(-1) ? offset : OS::NSNotFound
+    end
+    
     typesig { [] }
     def create_widget
       @text = ""
@@ -153,6 +194,28 @@ module Org::Eclipse::Swt::Widgets
       if ((@parent.get_ime).nil?)
         @parent.set_ime(self)
       end
+    end
+    
+    typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
+    # long
+    # long
+    # long
+    def first_rect_for_character_range(id, sel, range)
+      rect = NSRect.new
+      caret = @parent.attr_caret
+      if (!(caret).nil?)
+        view = @parent.attr_view
+        pt = NSPoint.new
+        pt.attr_x = caret.attr_x
+        pt.attr_y = caret.attr_y + caret.attr_height
+        pt = view.convert_point_to_view_(pt, nil)
+        pt = view.window.convert_base_to_screen(pt)
+        rect.attr_x = pt.attr_x
+        rect.attr_y = pt.attr_y
+        rect.attr_width = caret.attr_width
+        rect.attr_height = caret.attr_height
+      end
+      return rect
     end
     
     typesig { [] }
@@ -264,6 +327,75 @@ module Org::Eclipse::Swt::Widgets
       return result
     end
     
+    typesig { [NSDictionary] }
+    def get_style(attribs)
+      keys = attribs.all_keys
+      # long
+      count_ = keys.count
+      style = TextStyle.new
+      j = 0
+      while j < count_
+        key = NSString.new(keys.object_at_index(j))
+        if (key.is_equal_to(OS::NSBackgroundColorAttributeName))
+          color = NSColor.new(attribs.object_for_key(key)).color_using_color_space_name(OS::NSCalibratedRGBColorSpace)
+          # double
+          # double
+          rgb_color = Array.typed(::Java::Float).new([color.red_component, color.green_component, color.blue_component, color.alpha_component])
+          style.attr_background = Color.cocoa_new(self.attr_display, rgb_color)
+        else
+          if (key.is_equal_to(OS::NSForegroundColorAttributeName))
+            color = NSColor.new(attribs.object_for_key(key)).color_using_color_space_name(OS::NSCalibratedRGBColorSpace)
+            # double
+            # double
+            rgb_color = Array.typed(::Java::Float).new([color.red_component, color.green_component, color.blue_component, color.alpha_component])
+            style.attr_foreground = Color.cocoa_new(self.attr_display, rgb_color)
+          else
+            if (key.is_equal_to(OS::NSUnderlineColorAttributeName))
+              color = NSColor.new(attribs.object_for_key(key)).color_using_color_space_name(OS::NSCalibratedRGBColorSpace)
+              # double
+              # double
+              rgb_color = Array.typed(::Java::Float).new([color.red_component, color.green_component, color.blue_component, color.alpha_component])
+              style.attr_underline_color = Color.cocoa_new(self.attr_display, rgb_color)
+            else
+              if (key.is_equal_to(OS::NSUnderlineStyleAttributeName))
+                value = NSNumber.new(attribs.object_for_key(key))
+                case (value.int_value)
+                when OS::NSUnderlineStyleSingle
+                  style.attr_underline_style = SWT::UNDERLINE_SINGLE
+                when OS::NSUnderlineStyleDouble
+                  style.attr_underline_style = SWT::UNDERLINE_DOUBLE
+                when OS::NSUnderlineStyleThick
+                  style.attr_underline_style = UNDERLINE_THICK
+                end
+                style.attr_underline = !(value.int_value).equal?(OS::NSUnderlineStyleNone)
+              else
+                if (key.is_equal_to(OS::NSStrikethroughColorAttributeName))
+                  color = NSColor.new(attribs.object_for_key(key)).color_using_color_space_name(OS::NSCalibratedRGBColorSpace)
+                  # double
+                  # double
+                  rgb_color = Array.typed(::Java::Float).new([color.red_component, color.green_component, color.blue_component, color.alpha_component])
+                  style.attr_strikeout_color = Color.cocoa_new(self.attr_display, rgb_color)
+                else
+                  if (key.is_equal_to(OS::NSStrikethroughStyleAttributeName))
+                    value = NSNumber.new(attribs.object_for_key(key))
+                    style.attr_strikeout = !(value.int_value).equal?(OS::NSUnderlineStyleNone)
+                  else
+                    if (key.is_equal_to(OS::NSFontAttributeName))
+                      font = NSFont.new(attribs.object_for_key(key))
+                      font.retain
+                      style.attr_font = Font.cocoa_new(self.attr_display, font)
+                    end
+                  end
+                end
+              end
+            end
+          end
+        end
+        j += 1
+      end
+      return style
+    end
+    
     typesig { [] }
     # Returns the composition text.
     # <p>
@@ -297,8 +429,43 @@ module Org::Eclipse::Swt::Widgets
     # <li>ERROR_THREAD_INVALID_ACCESS - if not called from the thread that created the receiver</li>
     # </ul>
     def get_wide_caret
-      check_widget
       return false
+    end
+    
+    typesig { [::Java::Int, ::Java::Int] }
+    # long
+    # long
+    def has_marked_text(id, sel)
+      return !(@text.length).equal?(0)
+    end
+    
+    typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
+    # long
+    # long
+    # long
+    def insert_text(id, sel, string)
+      if ((@start_offset).equal?(-1))
+        return true
+      end
+      str = NSString.new(string)
+      if (str.is_kind_of_class(OS.objc_get_class("NSAttributedString")))
+        str = NSAttributedString.new(string).string
+      end
+      # 64
+      length_ = RJava.cast_to_int(str.length)
+      end_ = @start_offset + @text.length
+      reset_styles
+      @caret_offset = @commit_count = length_
+      event = Event.new
+      event.attr_detail = SWT::COMPOSITION_CHANGED
+      event.attr_start = @start_offset
+      event.attr_end = end_
+      event.attr_text = @text = RJava.cast_to_string(str.get_string)
+      send_event(SWT::ImeComposition, event)
+      @text = ""
+      @caret_offset = @commit_count = 0
+      @start_offset = -1
+      return event.attr_doit
     end
     
     typesig { [] }
@@ -306,172 +473,35 @@ module Org::Eclipse::Swt::Widgets
       return hooks(SWT::ImeComposition)
     end
     
-    typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
-    def k_event_text_input_offset_to_pos(next_handler, the_event, user_data)
-      if (!is_inline_enabled)
-        return OS.attr_event_not_handled_err
-      end
-      caret = @parent.attr_caret
-      if ((caret).nil?)
-        return OS.attr_event_not_handled_err
-      end
-      pt = Org::Eclipse::Swt::Internal::Carbon::Point.new
-      sizeof = Org::Eclipse::Swt::Internal::Carbon::Point.attr_sizeof
-      point = @parent.to_display(caret.attr_x, caret.attr_y + caret.attr_height)
-      pt.attr_h = RJava.cast_to_short(point.attr_x)
-      pt.attr_v = RJava.cast_to_short(point.attr_y)
-      OS._set_event_parameter(the_event, OS.attr_k_event_param_text_input_reply_point, OS.attr_type_qdpoint, sizeof, pt)
-      return OS.attr_no_err
-    end
-    
-    typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
-    def k_event_text_input_pos_to_offset(next_handler, the_event, user_data)
-      if (!is_inline_enabled)
-        return OS.attr_event_not_handled_err
-      end
-      if ((@start_offset).equal?(-1))
-        return OS.attr_event_not_handled_err
-      end
-      pt = Org::Eclipse::Swt::Internal::Carbon::Point.new
-      sizeof = Org::Eclipse::Swt::Internal::Carbon::Point.attr_sizeof
-      OS._get_event_parameter(the_event, OS.attr_k_event_param_text_input_send_current_point, OS.attr_type_qdpoint, nil, sizeof, nil, pt)
-      point = @parent.to_control(pt.attr_h, pt.attr_v)
-      event = Event.new
-      event.attr_detail = SWT::COMPOSITION_OFFSET
-      event.attr_x = point.attr_x
-      event.attr_y = point.attr_y
-      send_event(SWT::ImeComposition, event)
-      hit_test = 0
-      offset = event.attr_index + event.attr_count
-      if ((offset).equal?(-1))
-        hit_test = OS.attr_k_tsmoutside_of_body
+    typesig { [::Java::Int, ::Java::Int] }
+    # long
+    # long
+    def marked_range(id, sel)
+      range = NSRange.new
+      if (!(@start_offset).equal?(-1))
+        range.attr_location = @start_offset
+        range.attr_length = @text.length
       else
-        if (@start_offset <= offset && offset < @start_offset + @text.length)
-          hit_test = OS.attr_k_tsminside_of_active_input_area
-          offset -= @start_offset
-        else
-          hit_test = OS.attr_k_tsminside_of_body
+        range.attr_location = OS::NSNotFound
+      end
+      return range
+    end
+    
+    typesig { [] }
+    def reset_styles
+      if (!(@styles).nil?)
+        i = 0
+        while i < @styles.attr_length
+          style = @styles[i]
+          font = style.attr_font
+          if (!(font).nil?)
+            font.attr_handle.release
+          end
+          i += 1
         end
       end
-      OS._set_event_parameter(the_event, OS.attr_k_event_param_text_input_reply_text_offset, OS.attr_type_long_integer, 4, Array.typed(::Java::Int).new([offset * 2]))
-      OS._set_event_parameter(the_event, OS.attr_k_event_param_text_input_reply_region_class, OS.attr_type_long_integer, 4, Array.typed(::Java::Int).new([hit_test]))
-      OS._set_event_parameter(the_event, OS.attr_k_event_param_text_input_reply_leading_edge, OS.attr_type_boolean, 4, Array.typed(::Java::Boolean).new([(event.attr_count).equal?(0)]))
-      return OS.attr_no_err
-    end
-    
-    typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
-    def k_event_text_input_get_selected_text(next_handler, the_event, user_data)
-      event = Event.new
-      event.attr_detail = SWT::COMPOSITION_SELECTION
-      send_event(SWT::ImeComposition, event)
-      text = event.attr_text
-      if (text.length > 0)
-        buffer = CharArray.new(text.length)
-        text.get_chars(0, buffer.attr_length, buffer, 0)
-        OS._set_event_parameter(the_event, OS.attr_k_event_param_text_input_reply_text, OS.attr_type_unicode_text, buffer.attr_length * 2, buffer)
-        return OS.attr_no_err
-      end
-      return OS.attr_event_not_handled_err
-    end
-    
-    typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
-    def k_event_text_input_update_active_input_area(next_handler, the_event, user_data)
-      if (!is_inline_enabled)
-        return OS.attr_event_not_handled_err
-      end
-      @ranges = nil
       @styles = nil
-      @caret_offset = @commit_count = 0
-      length_ = Array.typed(::Java::Int).new(1) { 0 }
-      OS._get_event_parameter(the_event, OS.attr_k_event_param_text_input_send_text, OS.attr_type_unicode_text, nil, 0, length_, nil)
-      chars = CharArray.new(length_[0])
-      OS._get_event_parameter(the_event, OS.attr_k_event_param_text_input_send_text, OS.attr_type_unicode_text, nil, length_[0], nil, chars)
-      fixed_length = Array.typed(::Java::Int).new(1) { 0 }
-      OS._get_event_parameter(the_event, OS.attr_k_event_param_text_input_send_fix_len, OS.attr_type_long_integer, nil, 4, nil, fixed_length)
-      range_size = Array.typed(::Java::Int).new(1) { 0 }
-      rc = OS._get_event_parameter(the_event, OS.attr_k_event_param_text_input_send_hilite_rng, OS.attr_type_text_range_array, nil, 0, range_size, nil)
-      if ((rc).equal?(OS.attr_no_err))
-        first_selected_converted = -1
-        has_converted_text = false
-        text_ranges = OS._new_ptr(range_size[0])
-        OS._get_event_parameter(the_event, OS.attr_k_event_param_text_input_send_hilite_rng, OS.attr_type_text_range_array, nil, range_size[0], nil, text_ranges)
-        n_ranges = Array.typed(::Java::Short).new(1) { 0 }
-        OS.memmove(n_ranges, text_ranges, 2)
-        count = n_ranges[0]
-        if (count > 0)
-          range = TextRange.new
-          @ranges = Array.typed(::Java::Int).new((count - 1) * 2) { 0 }
-          @styles = Array.typed(TextStyle).new(count - 1) { nil }
-          i = 0
-          j = 0
-          while i < count
-            OS.memmove(range, text_ranges + 2 + (i * TextRange.attr_sizeof), TextRange.attr_sizeof)
-            case (range.attr_f_hilite_style)
-            when OS.attr_k_caret_position
-              @caret_offset = range.attr_f_start / 2
-            when OS.attr_k_converted_text, OS.attr_k_selected_converted_text, OS.attr_k_selected_raw_text, OS.attr_k_raw_text
-              @ranges[j * 2] = range.attr_f_start / 2
-              @ranges[j * 2 + 1] = range.attr_f_end / 2 - 1
-              @styles[j] = TextStyle.new
-              @styles[j].attr_underline = true
-              @styles[j].attr_underline_style = UNDERLINE_IME_INPUT
-              if ((range.attr_f_hilite_style).equal?(OS.attr_k_converted_text))
-                @styles[j].attr_underline_style = UNDERLINE_IME_CONVERTED
-                has_converted_text = true
-              end
-              if ((range.attr_f_hilite_style).equal?(OS.attr_k_selected_converted_text))
-                @styles[j].attr_underline_style = UNDERLINE_IME_TARGET_CONVERTED
-                if ((first_selected_converted).equal?(-1))
-                  first_selected_converted = range.attr_f_start
-                end
-              end
-              j += 1
-            end
-            i += 1
-          end
-        end
-        OS._dispose_ptr(text_ranges)
-        if (has_converted_text && !(first_selected_converted).equal?(-1))
-          @caret_offset = first_selected_converted / 2
-        end
-      end
-      end_ = @start_offset + @text.length
-      if ((@start_offset).equal?(-1))
-        event = Event.new
-        event.attr_detail = SWT::COMPOSITION_SELECTION
-        send_event(SWT::ImeComposition, event)
-        @start_offset = event.attr_start
-        end_ = event.attr_end
-      end
-      event = Event.new
-      event.attr_detail = SWT::COMPOSITION_CHANGED
-      event.attr_start = @start_offset
-      event.attr_end = end_
-      event.attr_text = @text = RJava.cast_to_string(String.new(chars, 0, length_[0] / 2))
-      @commit_count = !(fixed_length[0]).equal?(-1) ? fixed_length[0] / 2 : length_[0] / 2
-      send_event(SWT::ImeComposition, event)
-      if ((@commit_count).equal?(@text.length))
-        @text = ""
-        @caret_offset = @commit_count = 0
-        @start_offset = -1
-        @ranges = nil
-        @styles = nil
-      end
-      if (event.attr_doit)
-        if ((fixed_length[0]).equal?(-1) || (fixed_length[0]).equal?(length_[0]))
-          i = 0
-          while i < chars.attr_length
-            if ((chars[i]).equal?(0))
-              break
-            end
-            event = Event.new
-            event.attr_character = chars[i]
-            @parent.send_key_event(SWT::KeyDown, event)
-            i += 1
-          end
-        end
-      end
-      return OS.attr_no_err
+      @ranges = nil
     end
     
     typesig { [] }
@@ -487,8 +517,20 @@ module Org::Eclipse::Swt::Widgets
       super
       @parent = nil
       @text = RJava.cast_to_string(nil)
-      @styles = nil
-      @ranges = nil
+      reset_styles
+    end
+    
+    typesig { [::Java::Int, ::Java::Int] }
+    # long
+    # long
+    def selected_range(id, sel)
+      event = Event.new
+      event.attr_detail = SWT::COMPOSITION_SELECTION
+      send_event(SWT::ImeComposition, event)
+      range = NSRange.new
+      range.attr_location = event.attr_start
+      range.attr_length = event.attr_text.length
+      return range
     end
     
     typesig { [::Java::Int] }
@@ -500,7 +542,7 @@ module Org::Eclipse::Swt::Widgets
     # above the IME, then the IME must be informed that the composition
     # offset has changed.
     # 
-    # @return the offset of the composition
+    # @param offset the offset of the composition
     # 
     # @exception SWTException <ul>
     # <li>ERROR_WIDGET_DISPOSED - if the receiver has been disposed</li>
@@ -514,6 +556,104 @@ module Org::Eclipse::Swt::Widgets
       if (!(@start_offset).equal?(-1))
         @start_offset = offset
       end
+    end
+    
+    typesig { [::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int] }
+    # long
+    # long
+    # long
+    # long
+    def set_marked_text_selected_range(id, sel, string, sel_range)
+      if (!is_inline_enabled)
+        return true
+      end
+      reset_styles
+      @caret_offset = @commit_count = 0
+      end_ = @start_offset + @text.length
+      if ((@start_offset).equal?(-1))
+        event = Event.new
+        event.attr_detail = SWT::COMPOSITION_SELECTION
+        send_event(SWT::ImeComposition, event)
+        @start_offset = event.attr_start
+        end_ = event.attr_end
+      end
+      str = NSString.new(string)
+      if (str.is_kind_of_class(OS.objc_get_class("NSAttributedString")))
+        attrib_str = NSAttributedString.new(string)
+        str = attrib_str.string
+        # 64
+        length_ = RJava.cast_to_int(str.length)
+        @styles = Array.typed(TextStyle).new(length_) { nil }
+        @ranges = Array.typed(::Java::Int).new(length_ * 2) { 0 }
+        range_limit = NSRange.new
+        effective_range = NSRange.new
+        range_limit.attr_length = length_
+        range_count = 0
+        # long
+        ptr = OS.malloc(NSRange.attr_sizeof)
+        i = 0
+        while i < length_
+          attribs = attrib_str.attributes_at_index(i, ptr, range_limit)
+          OS.memmove(effective_range, ptr, NSRange.attr_sizeof)
+          # 64
+          i = RJava.cast_to_int((effective_range.attr_location + effective_range.attr_length))
+          # 64
+          @ranges[range_count * 2] = RJava.cast_to_int(effective_range.attr_location)
+          # 64
+          @ranges[range_count * 2 + 1] = RJava.cast_to_int((effective_range.attr_location + effective_range.attr_length - 1))
+          @styles[((range_count += 1) - 1)] = get_style(attribs)
+        end
+        OS.free(ptr)
+        if (!(range_count).equal?(@styles.attr_length))
+          new_styles = Array.typed(TextStyle).new(range_count) { nil }
+          System.arraycopy(@styles, 0, new_styles, 0, new_styles.attr_length)
+          @styles = new_styles
+          new_ranges = Array.typed(::Java::Int).new(range_count * 2) { 0 }
+          System.arraycopy(@ranges, 0, new_ranges, 0, new_ranges.attr_length)
+          @ranges = new_ranges
+        end
+      end
+      # 64
+      length_ = RJava.cast_to_int(str.length)
+      if ((@ranges).nil? && length_ > 0)
+        @styles = Array.typed(TextStyle).new([get_style(self.attr_display.attr_marked_attributes)])
+        @ranges = Array.typed(::Java::Int).new([0, length_ - 1])
+      end
+      range = NSRange.new
+      OS.memmove(range, sel_range, NSRange.attr_sizeof)
+      # 64
+      @caret_offset = RJava.cast_to_int(range.attr_location)
+      event = Event.new
+      event.attr_detail = SWT::COMPOSITION_CHANGED
+      event.attr_start = @start_offset
+      event.attr_end = end_
+      event.attr_text = @text = RJava.cast_to_string(str.get_string)
+      send_event(SWT::ImeComposition, event)
+      if (is_disposed)
+        return false
+      end
+      if ((@text.length).equal?(0))
+        s = @parent.get_shell
+        s.attr_key_input_happened = true
+        @start_offset = -1
+        reset_styles
+      end
+      return true
+    end
+    
+    typesig { [::Java::Int, ::Java::Int] }
+    # long
+    # long
+    # long
+    def valid_attributes_for_marked_text(id, sel)
+      attribs = NSMutableArray.array_with_capacity(6)
+      attribs.add_object(NSString.new(OS._nsforeground_color_attribute_name))
+      attribs.add_object(NSString.new(OS._nsbackground_color_attribute_name))
+      attribs.add_object(NSString.new(OS._nsunderline_style_attribute_name))
+      attribs.add_object(NSString.new(OS._nsunderline_color_attribute_name))
+      attribs.add_object(NSString.new(OS._nsstrikethrough_style_attribute_name))
+      attribs.add_object(NSString.new(OS._nsstrikethrough_color_attribute_name))
+      return attribs.attr_id
     end
     
     private

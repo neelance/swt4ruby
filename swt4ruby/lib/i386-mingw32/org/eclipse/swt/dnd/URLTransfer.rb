@@ -30,6 +30,7 @@ module Org::Eclipse::Swt::Dnd
   # </code></pre>
   # 
   # @see Transfer
+  # @since 3.4
   class URLTransfer < URLTransferImports.const_get :ByteArrayTransfer
     include_class_members URLTransferImports
     
@@ -123,7 +124,7 @@ module Org::Eclipse::Swt::Dnd
       stgmedium = STGMEDIUM.new
       formatetc = transfer_data.attr_formatetc
       stgmedium.attr_tymed = COM::TYMED_HGLOBAL
-      transfer_data.attr_result = data._get_data(formatetc, stgmedium)
+      transfer_data.attr_result = get_data(data, formatetc, stgmedium)
       data._release
       if (!(transfer_data.attr_result).equal?(COM::S_OK))
         return nil

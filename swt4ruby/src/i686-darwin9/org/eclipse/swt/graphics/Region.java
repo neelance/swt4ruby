@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2008 IBM Corporation and others.
+ * Copyright (c) 2000, 2009 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -11,7 +11,8 @@
 package org.eclipse.swt.graphics;
 
 
-import org.eclipse.swt.internal.carbon.*;
+import org.eclipse.swt.internal.*;
+import org.eclipse.swt.internal.cocoa.*;
 import org.eclipse.swt.*;
 
 /**
@@ -38,7 +39,7 @@ public final class Region extends Resource {
 	 * platforms and should never be accessed from application code.
 	 * </p>
 	 */
-	public int handle;
+	public int /*long*/ handle;
 
 /**
  * Constructs a new empty region.
@@ -72,14 +73,92 @@ public Region() {
  */
 public Region(Device device) {
 	super(device);
-	handle = OS.NewRgn();
-	if (handle == 0) SWT.error(SWT.ERROR_NO_HANDLES);
-	init();
+	NSAutoreleasePool pool = null;
+	if (!NSThread.isMainThread()) pool = (NSAutoreleasePool) new NSAutoreleasePool().alloc().init();
+	try {
+		handle = OS.NewRgn();
+		if (handle == 0) SWT.error(SWT.ERROR_NO_HANDLES);
+		init();
+	} finally {
+		if (pool != null) pool.release();
+	}
 }
 
-Region(Device device, int handle) {
+Region(Device device, int /*long*/ handle) {
 	super(device);
 	this.handle = handle;
+}
+
+public static Region cocoa_new(Device device, int /*long*/ handle) {
+	return new Region(device, handle);
+}
+
+static int /*long*/ polyToRgn(int[] poly, int length) {
+	short[] r = new short[4];
+	int /*long*/ polyRgn = OS.NewRgn(), rectRgn = OS.NewRgn();
+	int minY = poly[1], maxY = poly[1];
+	for (int y = 3; y < length; y += 2) {
+		if (poly[y] < minY) minY = poly[y];
+		if (poly[y] > maxY) maxY = poly[y];
+	}
+	int[] inter = new int[length + 1];
+	for (int y = minY; y <= maxY; y++) {
+		int count = 0;
+		int x1 = poly[0], y1 = poly[1];
+		for (int p = 2; p < length; p += 2) {
+			int x2 = poly[p], y2 = poly[p + 1];
+			if (y1 != y2 && ((y1 <= y && y < y2) || (y2 <= y && y < y1))) {
+				inter[count++] = (int)((((y - y1) / (float)(y2 - y1)) * (x2 - x1)) + x1 + 0.5f);
+			}
+			x1 = x2;
+			y1 = y2;
+		}
+		int x2 = poly[0], y2 = poly[1];			
+		if (y1 != y2 && ((y1 <= y && y < y2) || (y2 <= y && y < y1))) {
+			inter[count++] = (int)((((y - y1) / (float)(y2 - y1)) * (x2 - x1)) + x1 + 0.5f);
+		}
+		for (int gap=count/2; gap>0; gap/=2) {
+			for (int i=gap; i<count; i++) {
+				for (int j=i-gap; j>=0; j-=gap) {
+					if ((inter[j] - inter[j + gap]) <= 0)
+						break;
+					int temp = inter[j];
+					inter[j] = inter[j + gap];
+					inter[j + gap] = temp;
+				}
+			}
+		}
+		for (int i = 0; i < count; i += 2) {
+			OS.SetRect(r, (short)inter[i], (short)y, (short)(inter[i + 1]),(short)(y + 1));
+			OS.RectRgn(rectRgn, r);
+			OS.UnionRgn(polyRgn, rectRgn, polyRgn);
+		}
+	}
+	OS.DisposeRgn(rectRgn);
+	return polyRgn;
+}
+
+static int /*long*/ polyRgn(int[] pointArray, int count) {
+	NSAutoreleasePool pool = null;
+	if (!NSThread.isMainThread()) pool = (NSAutoreleasePool) new NSAutoreleasePool().alloc().init();
+	try {
+		int /*long*/ polyRgn;
+		if (C.PTR_SIZEOF == 4) {
+			polyRgn = OS.NewRgn();
+			OS.OpenRgn();
+			OS.MoveTo((short)pointArray[0], (short)pointArray[1]);
+			for (int i = 1; i < count / 2; i++) {
+				OS.LineTo((short)pointArray[2 * i], (short)pointArray[2 * i + 1]);
+			}
+			OS.LineTo((short)pointArray[0], (short)pointArray[1]);
+			OS.CloseRgn(polyRgn);
+		} else {
+			polyRgn = polyToRgn(pointArray, count);
+		}
+		return polyRgn;
+	} finally {
+		if (pool != null) pool.release();
+	}
 }
 
 /**
@@ -101,17 +180,26 @@ Region(Device device, int handle) {
 public void add (int[] pointArray) {
 	if (isDisposed()) SWT.error(SWT.ERROR_GRAPHIC_DISPOSED);
 	if (pointArray == null) SWT.error(SWT.ERROR_NULL_ARGUMENT);
-	if (pointArray.length < 2) return;
-	int polyRgn = OS.NewRgn();
-	OS.OpenRgn();
-	OS.MoveTo((short)pointArray[0], (short)pointArray[1]);
-	for (int i = 1; i < pointArray.length / 2; i++) {
-		OS.LineTo((short)pointArray[2 * i], (short)pointArray[2 * i + 1]);
+	NSAutoreleasePool pool = null;
+	if (!NSThread.isMainThread()) pool = (NSAutoreleasePool) new NSAutoreleasePool().alloc().init();
+	try {
+		add(pointArray, pointArray.length);
+	} finally {
+		if (pool != null) pool.release();
 	}
-	OS.LineTo((short)pointArray[0], (short)pointArray[1]);
-	OS.CloseRgn(polyRgn);
-	OS.UnionRgn(handle, polyRgn, handle);
-	OS.DisposeRgn(polyRgn);
+}
+	
+void add(int[] pointArray, int count) {
+	if (count <= 2) return;
+	NSAutoreleasePool pool = null;
+	if (!NSThread.isMainThread()) pool = (NSAutoreleasePool) new NSAutoreleasePool().alloc().init();
+	try {
+		int /*long*/ polyRgn = polyRgn(pointArray, count);
+		OS.UnionRgn(handle, polyRgn, handle);
+		OS.DisposeRgn(polyRgn);
+	} finally {
+		if (pool != null) pool.release();
+	}
 }
 
 /**
@@ -132,7 +220,13 @@ public void add(Rectangle rect) {
 	if (isDisposed()) SWT.error(SWT.ERROR_GRAPHIC_DISPOSED);
 	if (rect == null) SWT.error(SWT.ERROR_NULL_ARGUMENT);
 	if (rect.width < 0 || rect.height < 0) SWT.error(SWT.ERROR_INVALID_ARGUMENT);
-	add (rect.x, rect.y, rect.width, rect.height);
+	NSAutoreleasePool pool = null;
+	if (!NSThread.isMainThread()) pool = (NSAutoreleasePool) new NSAutoreleasePool().alloc().init();
+	try {
+		add (rect.x, rect.y, rect.width, rect.height);
+	} finally {
+		if (pool != null) pool.release();
+	}
 }
 
 /**
@@ -156,12 +250,18 @@ public void add(Rectangle rect) {
 public void add(int x, int y, int width, int height) {
 	if (isDisposed()) SWT.error(SWT.ERROR_GRAPHIC_DISPOSED);
 	if (width < 0 || height < 0) SWT.error(SWT.ERROR_INVALID_ARGUMENT);
-	int rectRgn = OS.NewRgn();
-	Rect r = new Rect();
-	OS.SetRect(r, (short)x, (short)y, (short)(x + width),(short)(y + height));
-	OS.RectRgn(rectRgn, r);
-	OS.UnionRgn(handle, rectRgn, handle);
-	OS.DisposeRgn(rectRgn);
+	NSAutoreleasePool pool = null;
+	if (!NSThread.isMainThread()) pool = (NSAutoreleasePool) new NSAutoreleasePool().alloc().init();
+	try {
+		int /*long*/ rectRgn = OS.NewRgn();
+		short[] r = new short[4];
+		OS.SetRect(r, (short)x, (short)y, (short)(x + width),(short)(y + height));
+		OS.RectRgn(rectRgn, r);
+		OS.UnionRgn(handle, rectRgn, handle);
+		OS.DisposeRgn(rectRgn);
+	} finally {
+		if (pool != null) pool.release();
+	}
 }
 
 /**
@@ -183,7 +283,13 @@ public void add(Region region) {
 	if (isDisposed()) SWT.error(SWT.ERROR_GRAPHIC_DISPOSED);
 	if (region == null) SWT.error(SWT.ERROR_NULL_ARGUMENT);
 	if (region.isDisposed()) SWT.error(SWT.ERROR_INVALID_ARGUMENT);
-	OS.UnionRgn(handle, region.handle, handle);
+	NSAutoreleasePool pool = null;
+	if (!NSThread.isMainThread()) pool = (NSAutoreleasePool) new NSAutoreleasePool().alloc().init();
+	try {
+		OS.UnionRgn(handle, region.handle, handle);
+	} finally {
+		if (pool != null) pool.release();
+	}
 }
 
 /**
@@ -201,9 +307,14 @@ public void add(Region region) {
  */
 public boolean contains(int x, int y) {
 	if (isDisposed()) SWT.error(SWT.ERROR_GRAPHIC_DISPOSED);
-	org.eclipse.swt.internal.carbon.Point point = new org.eclipse.swt.internal.carbon.Point();
-	OS.SetPt(point, (short)x, (short)y);
-	return OS.PtInRgn(point, handle);
+	NSAutoreleasePool pool = null;
+	if (!NSThread.isMainThread()) pool = (NSAutoreleasePool) new NSAutoreleasePool().alloc().init();
+	try {
+		short[] point = new short[]{(short)y, (short)x};
+		return OS.PtInRgn(point, handle);
+	} finally {
+		if (pool != null) pool.release();
+	}
 }
 
 /**
@@ -224,6 +335,57 @@ public boolean contains(int x, int y) {
 public boolean contains(Point pt) {
 	if (pt == null) SWT.error(SWT.ERROR_NULL_ARGUMENT);
 	return contains(pt.x, pt.y);
+}
+
+NSAffineTransform transform;
+void convertRgn(NSAffineTransform transform) {
+	int /*long*/ newRgn = OS.NewRgn();
+	Callback callback = new Callback(this, "convertRgn", 4);
+	int /*long*/ proc = callback.getAddress();
+	if (proc == 0) SWT.error(SWT.ERROR_NO_MORE_CALLBACKS);
+	this.transform = transform;
+	OS.QDRegionToRects(handle, OS.kQDParseRegionFromTopLeft, proc, newRgn);
+	this.transform = null;
+	callback.dispose();
+	OS.CopyRgn(newRgn, handle);
+	OS.DisposeRgn(newRgn);
+}
+
+int /*long*/ convertRgn(int /*long*/ message, int /*long*/ rgn, int /*long*/ r, int /*long*/ newRgn) {
+	if (message == OS.kQDRegionToRectsMsgParse) {
+		short[] rect = new short[4];
+		OS.memmove(rect, r, rect.length * 2);
+		int i = 0;
+		NSPoint point = new NSPoint();
+		int[] points = new int[10];
+		point.x = rect[1];
+		point.y = rect[0];
+		point = transform.transformPoint(point);
+		short startX, startY;
+		points[i++] = startX = (short)point.x;
+		points[i++] = startY = (short)point.y;
+		point.x = rect[3];
+		point.y = rect[0];
+		point = transform.transformPoint(point);
+		points[i++] = (short)Math.round(point.x);
+		points[i++] = (short)point.y;
+		point.x = rect[3];
+		point.y = rect[2];
+		point = transform.transformPoint(point);
+		points[i++] = (short)Math.round(point.x);
+		points[i++] = (short)Math.round(point.y);
+		point.x = rect[1];
+		point.y = rect[2];
+		point = transform.transformPoint(point);
+		points[i++] = (short)point.x;
+		points[i++] = (short)Math.round(point.y);
+		points[i++] = startX;
+		points[i++] = startY;
+		int /*long*/ polyRgn = polyRgn(points, points.length);
+		OS.UnionRgn(newRgn, polyRgn, newRgn);
+		OS.DisposeRgn(polyRgn);
+	}
+	return 0;
 }
 
 void destroy() {
@@ -263,15 +425,48 @@ public boolean equals(Object object) {
  */
 public Rectangle getBounds() {
 	if (isDisposed()) SWT.error(SWT.ERROR_GRAPHIC_DISPOSED);
-	Rect bounds = new Rect();
-	OS.GetRegionBounds(handle, bounds);
-	int width = bounds.right - bounds.left;
-	int height = bounds.bottom - bounds.top;
-	return new Rectangle(bounds.left, bounds.top, width, height);
+	NSAutoreleasePool pool = null;
+	if (!NSThread.isMainThread()) pool = (NSAutoreleasePool) new NSAutoreleasePool().alloc().init();
+	try {
+		short[] bounds = new short[4];
+		OS.GetRegionBounds(handle, bounds);
+		int width = bounds[3] - bounds[1];
+		int height = bounds[2] - bounds[0];
+		return new Rectangle(bounds[1], bounds[0], width, height);
+	} finally {
+		if (pool != null) pool.release();
+	}
 }
 
-public static Region carbon_new(Device device, int handle) {
-	return new Region(device, handle);
+NSBezierPath getPath() {
+	Callback callback = new Callback(this, "regionToRects", 4);
+	if (callback.getAddress() == 0) SWT.error(SWT.ERROR_NO_MORE_CALLBACKS);
+	NSBezierPath path = NSBezierPath.bezierPath();
+	path.retain();
+	OS.QDRegionToRects(handle, OS.kQDParseRegionFromTopLeft, callback.getAddress(), path.id);
+	callback.dispose();
+	if (path.isEmpty()) path.appendBezierPathWithRect(new NSRect());
+	return path;
+}
+
+NSPoint pt = new NSPoint();
+short[] rect = new short[4];
+int /*long*/ regionToRects(int /*long*/ message, int /*long*/ rgn, int /*long*/ r, int /*long*/ path) {
+	if (message == OS.kQDRegionToRectsMsgParse) {
+		OS.memmove(rect, r, rect.length * 2);
+		pt.x = rect[1];
+		pt.y = rect[0];
+		OS.objc_msgSend(path, OS.sel_moveToPoint_, pt);
+		pt.x = rect[3];
+		OS.objc_msgSend(path, OS.sel_lineToPoint_, pt);
+		pt.x = rect[3];
+		pt.y = rect[2];
+		OS.objc_msgSend(path, OS.sel_lineToPoint_, pt);
+		pt.x = rect[1];
+		OS.objc_msgSend(path, OS.sel_lineToPoint_, pt);
+		OS.objc_msgSend(path, OS.sel_closePath);
+	}
+	return 0;
 }
 
 /**
@@ -285,7 +480,7 @@ public static Region carbon_new(Device device, int handle) {
  * @see #equals
  */
 public int hashCode() {
-	return handle;
+	return (int)/*64*/handle;
 }
 
 /**
@@ -331,12 +526,18 @@ public void intersect(Rectangle rect) {
 public void intersect(int x, int y, int width, int height) {
 	if (isDisposed()) SWT.error(SWT.ERROR_GRAPHIC_DISPOSED);
 	if (width < 0 || height < 0) SWT.error(SWT.ERROR_INVALID_ARGUMENT);
-	int rectRgn = OS.NewRgn();
-	Rect r = new Rect();
-	OS.SetRect(r, (short)x, (short)y, (short)(x + width),(short)(y + height));
-	OS.RectRgn(rectRgn, r);
-	OS.SectRgn(handle, rectRgn, handle);
-	OS.DisposeRgn(rectRgn);
+	NSAutoreleasePool pool = null;
+	if (!NSThread.isMainThread()) pool = (NSAutoreleasePool) new NSAutoreleasePool().alloc().init();
+	try {
+		int /*long*/ rectRgn = OS.NewRgn();
+		short[] r = new short[4];
+		OS.SetRect(r, (short)x, (short)y, (short)(x + width),(short)(y + height));
+		OS.RectRgn(rectRgn, r);
+		OS.SectRgn(handle, rectRgn, handle);
+		OS.DisposeRgn(rectRgn);
+	} finally {
+		if (pool != null) pool.release();
+	}
 }
 
 /**
@@ -360,7 +561,13 @@ public void intersect(Region region) {
 	if (isDisposed()) SWT.error(SWT.ERROR_GRAPHIC_DISPOSED);
 	if (region == null) SWT.error(SWT.ERROR_NULL_ARGUMENT);
 	if (region.isDisposed()) SWT.error(SWT.ERROR_INVALID_ARGUMENT);
-	OS.SectRgn(handle, region.handle, handle);
+	NSAutoreleasePool pool = null;
+	if (!NSThread.isMainThread()) pool = (NSAutoreleasePool) new NSAutoreleasePool().alloc().init();
+	try {
+		OS.SectRgn(handle, region.handle, handle);
+	} finally {
+		if (pool != null) pool.release();
+	}
 }
 
 /**
@@ -382,9 +589,15 @@ public void intersect(Region region) {
  */
 public boolean intersects (int x, int y, int width, int height) {
 	if (isDisposed()) SWT.error(SWT.ERROR_GRAPHIC_DISPOSED);
-	Rect rect = new Rect();
-	OS.SetRect(rect, (short)x, (short)y, (short)(x + width),(short)(y + height));
-	return OS.RectInRgn(rect, handle);
+	NSAutoreleasePool pool = null;
+	if (!NSThread.isMainThread()) pool = (NSAutoreleasePool) new NSAutoreleasePool().alloc().init();
+	try {
+		short[] r = new short[4];
+		OS.SetRect(r, (short)x, (short)y, (short)(x + width),(short)(y + height));
+		return OS.RectInRgn(r, handle);
+	} finally {
+		if (pool != null) pool.release();
+	}
 }
 
 /**
@@ -436,7 +649,13 @@ public boolean isDisposed() {
  */
 public boolean isEmpty() {
 	if (isDisposed()) SWT.error(SWT.ERROR_GRAPHIC_DISPOSED);
-	return OS.EmptyRgn(handle);
+	NSAutoreleasePool pool = null;
+	if (!NSThread.isMainThread()) pool = (NSAutoreleasePool) new NSAutoreleasePool().alloc().init();
+	try {
+		return OS.EmptyRgn(handle);
+	} finally {
+		if (pool != null) pool.release();
+	}
 }
 
 /**
@@ -458,16 +677,15 @@ public void subtract (int[] pointArray) {
 	if (isDisposed()) SWT.error(SWT.ERROR_GRAPHIC_DISPOSED);
 	if (pointArray == null) SWT.error(SWT.ERROR_NULL_ARGUMENT);
 	if (pointArray.length < 2) return;
-	int polyRgn = OS.NewRgn();
-	OS.OpenRgn();
-	OS.MoveTo((short)pointArray[0], (short)pointArray[1]);
-	for (int i = 1; i < pointArray.length / 2; i++) {
-		OS.LineTo((short)pointArray[2 * i], (short)pointArray[2 * i + 1]);
+	NSAutoreleasePool pool = null;
+	if (!NSThread.isMainThread()) pool = (NSAutoreleasePool) new NSAutoreleasePool().alloc().init();
+	try {
+		int /*long*/ polyRgn = polyRgn(pointArray, pointArray.length);
+		OS.DiffRgn(handle, polyRgn, handle);
+		OS.DisposeRgn(polyRgn);
+	} finally {
+		if (pool != null) pool.release();
 	}
-	OS.LineTo((short)pointArray[0], (short)pointArray[1]);
-	OS.CloseRgn(polyRgn);
-	OS.DiffRgn(handle, polyRgn, handle);
-	OS.DisposeRgn(polyRgn);
 }
 
 /**
@@ -513,12 +731,18 @@ public void subtract(Rectangle rect) {
 public void subtract(int x, int y, int width, int height) {
 	if (isDisposed()) SWT.error(SWT.ERROR_GRAPHIC_DISPOSED);
 	if (width < 0 || height < 0) SWT.error(SWT.ERROR_INVALID_ARGUMENT);
-	int rectRgn = OS.NewRgn();
-	Rect r = new Rect();
-	OS.SetRect(r, (short)x, (short)y, (short)(x + width),(short)(y + height));
-	OS.RectRgn(rectRgn, r);
-	OS.DiffRgn(handle, rectRgn, handle);
-	OS.DisposeRgn(rectRgn);
+	NSAutoreleasePool pool = null;
+	if (!NSThread.isMainThread()) pool = (NSAutoreleasePool) new NSAutoreleasePool().alloc().init();
+	try {
+		int /*long*/ rectRgn = OS.NewRgn();
+		short[] r = new short[4];
+		OS.SetRect(r, (short)x, (short)y, (short)(x + width),(short)(y + height));
+		OS.RectRgn(rectRgn, r);
+		OS.DiffRgn(handle, rectRgn, handle);
+		OS.DisposeRgn(rectRgn);
+	} finally {
+		if (pool != null) pool.release();
+	}
 }
 
 /**
@@ -542,7 +766,13 @@ public void subtract(Region region) {
 	if (isDisposed()) SWT.error(SWT.ERROR_GRAPHIC_DISPOSED);
 	if (region == null) SWT.error(SWT.ERROR_NULL_ARGUMENT);
 	if (region.isDisposed()) SWT.error(SWT.ERROR_INVALID_ARGUMENT);
-	OS.DiffRgn(handle, region.handle, handle);
+	NSAutoreleasePool pool = null;
+	if (!NSThread.isMainThread()) pool = (NSAutoreleasePool) new NSAutoreleasePool().alloc().init();
+	try {
+		OS.DiffRgn(handle, region.handle, handle);
+	} finally {
+		if (pool != null) pool.release();
+	}
 }
 
 /**
@@ -560,7 +790,13 @@ public void subtract(Region region) {
  */
 public void translate (int x, int y) {
 	if (isDisposed()) SWT.error(SWT.ERROR_GRAPHIC_DISPOSED);
-	OS.OffsetRgn (handle, (short)x, (short)y);
+	NSAutoreleasePool pool = null;
+	if (!NSThread.isMainThread()) pool = (NSAutoreleasePool) new NSAutoreleasePool().alloc().init();
+	try {
+		OS.OffsetRgn (handle, (short)x, (short)y);
+	} finally {
+		if (pool != null) pool.release();
+	}
 }
 
 /**
@@ -581,7 +817,13 @@ public void translate (int x, int y) {
 public void translate (Point pt) {
 	if (isDisposed()) SWT.error(SWT.ERROR_GRAPHIC_DISPOSED);
 	if (pt == null) SWT.error(SWT.ERROR_NULL_ARGUMENT);
-	translate (pt.x, pt.y);
+	NSAutoreleasePool pool = null;
+	if (!NSThread.isMainThread()) pool = (NSAutoreleasePool) new NSAutoreleasePool().alloc().init();
+	try {
+		translate (pt.x, pt.y);
+	} finally {
+		if (pool != null) pool.release();
+	}
 }
 
 /**

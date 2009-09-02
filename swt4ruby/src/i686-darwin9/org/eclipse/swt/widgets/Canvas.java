@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2008 IBM Corporation and others.
+ * Copyright (c) 2000, 2009 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -11,10 +11,9 @@
 package org.eclipse.swt.widgets;
 
 
-import org.eclipse.swt.internal.carbon.*;
-
 import org.eclipse.swt.*;
 import org.eclipse.swt.graphics.*;
+import org.eclipse.swt.internal.cocoa.*;
 
 /**
  * Instances of this class provide a surface for drawing
@@ -41,10 +40,28 @@ import org.eclipse.swt.graphics.*;
 public class Canvas extends Composite {
 	Caret caret;
 	IME ime;
+	NSOpenGLContext context;
 
 Canvas () {
 	/* Do nothing */
 }
+
+int /*long*/ attributedSubstringFromRange (int /*long*/ id, int /*long*/ sel, int /*long*/ range) {
+	if (ime != null) return ime.attributedSubstringFromRange (id, sel, range);
+	return super.attributedSubstringFromRange(id, sel, range);
+}
+
+void sendFocusEvent(int type) {
+	if (caret != null) {
+		if (type == SWT.FocusIn) {
+			caret.setFocus();	
+		} else {
+			caret.killFocus();
+		}
+	}
+	super.sendFocusEvent(type);
+}
+
 
 /**
  * Constructs a new instance of this class given its parent
@@ -77,6 +94,11 @@ public Canvas (Composite parent, int style) {
 	super (parent, style);
 }
 
+int /*long*/ characterIndexForPoint (int /*long*/ id, int /*long*/ sel, int /*long*/ point) {
+	if (ime != null) return ime.characterIndexForPoint (id, sel, point);
+	return super.characterIndexForPoint (id, sel, point);
+}
+
 /** 
  * Fills the interior of the rectangle specified by the arguments,
  * with the receiver's background. 
@@ -104,43 +126,86 @@ public void drawBackground (GC gc, int x, int y, int width, int height) {
 	if (gc.isDisposed ()) error (SWT.ERROR_INVALID_ARGUMENT);
 	Control control = findBackgroundControl ();
 	if (control != null) {
-		control.fillBackground (handle, gc.handle, new Rectangle (x, y, width, height));
+		NSRect rect = new NSRect();
+		rect.x = x;
+		rect.y = y;
+		rect.width = width;
+		rect.height = height;
+		int imgHeight = -1;
+		GCData data = gc.getGCData();
+		if (data.image != null) imgHeight =  data.image.getBounds().height;
+		NSGraphicsContext context = gc.handle;
+		if (data.flippedContext != null) {
+			NSGraphicsContext.static_saveGraphicsState();
+			NSGraphicsContext.setCurrentContext(context);
+		}
+		control.fillBackground (view, context, rect, imgHeight);
+		if (data.flippedContext != null) {
+			NSGraphicsContext.static_restoreGraphicsState();
+		}
 	} else {
 		gc.fillRectangle (x, y, width, height);
 	}
 }
 
-void drawWidget (int control, int context, int damageRgn, int visibleRgn, int theEvent) {
-	super.drawWidget (control, context, damageRgn, visibleRgn, theEvent);
-	if (OS.VERSION >= 0x1040) {
-		if (control != handle) return;
-		if (caret == null) return;
-		if (caret.isShowing) {
-			OS.CGContextSaveGState (context);
-			CGRect rect = new CGRect ();
-			rect.x = caret.x;
-			rect.y = caret.y;
-			Image image = caret.image;
-			OS.CGContextSetBlendMode (context, OS.kCGBlendModeDifference);
-			if (image != null) {
-				rect.width = OS.CGImageGetWidth (image.handle);
-				rect.height = OS.CGImageGetHeight (image.handle);
-			 	OS.CGContextScaleCTM (context, 1, -1);
-			 	OS.CGContextTranslateCTM (context, 0, -(rect.height + 2 * rect.y));
-				OS.CGContextDrawImage (context, rect, image.handle);
-			} else {
-				rect.width = caret.width != 0 ? caret.width : Caret.DEFAULT_WIDTH;
-				rect.height = caret.height;
-				OS.CGContextSetShouldAntialias (context, false);
-				int colorspace = OS.CGColorSpaceCreateDeviceRGB ();
-				OS.CGContextSetFillColorSpace (context, colorspace);
-				OS.CGContextSetFillColor (context, new float[]{1, 1, 1, 1});
-				OS.CGColorSpaceRelease (colorspace);
-				OS.CGContextFillRect (context, rect);
-			}
-			OS.CGContextRestoreGState (context);
+void drawRect (int /*long*/ id, int /*long*/ sel, NSRect rect) {
+	if (context != null && context.view() == null) context.setView(view);
+	super.drawRect(id, sel, rect);
+}
+
+void drawWidget (int /*long*/ id, NSGraphicsContext context, NSRect rect) {
+	if (id != view.id) return;
+	super.drawWidget (id, context, rect);
+	if (caret == null) return;
+	if (caret.isShowing) {
+		Image image = caret.image;
+		if (image != null) {
+			NSImage imageHandle = image.handle;
+			NSImageRep imageRep = imageHandle.bestRepresentationForDevice(null);
+			if (!imageRep.isKindOfClass(OS.class_NSBitmapImageRep)) return;
+			NSBitmapImageRep rep = new NSBitmapImageRep(imageRep);
+			CGRect destRect = new CGRect ();
+			destRect.origin.x = caret.x;
+			destRect.origin.y = caret.y;
+		 	NSSize size = imageHandle.size();
+			destRect.size.width = size.width;
+			destRect.size.height = size.height;
+		 	int /*long*/ data = rep.bitmapData();
+		 	int /*long*/ bpr = rep.bytesPerRow();
+			int alphaInfo = rep.hasAlpha() ? OS.kCGImageAlphaFirst : OS.kCGImageAlphaNoneSkipFirst;
+		 	int /*long*/ provider = OS.CGDataProviderCreateWithData(0, data, bpr * (int)size.height, 0);
+			int /*long*/ colorspace = OS.CGColorSpaceCreateDeviceRGB();
+			int /*long*/ cgImage = OS.CGImageCreate((int)size.width, (int)size.height, rep.bitsPerSample(), rep.bitsPerPixel(), bpr, colorspace, alphaInfo, provider, 0, true, 0);
+			OS.CGColorSpaceRelease(colorspace);
+			OS.CGDataProviderRelease(provider);
+			int /*long*/ ctx = context.graphicsPort();
+			OS.CGContextSaveGState(ctx);
+		 	OS.CGContextScaleCTM (ctx, 1, -1);
+		 	OS.CGContextTranslateCTM (ctx, 0, -(size.height + 2 * destRect.origin.y));
+			OS.CGContextSetBlendMode (ctx, OS.kCGBlendModeDifference);
+			OS.CGContextDrawImage (ctx, destRect, cgImage);
+			OS.CGContextRestoreGState(ctx);
+		 	OS.CGImageRelease(cgImage);			
+		} else {
+			context.saveGraphicsState();
+			context.setCompositingOperation(OS.NSCompositeXOR);
+			NSRect drawRect = new NSRect();
+			drawRect.x = caret.x;
+			drawRect.y = caret.y;
+			drawRect.width = caret.width != 0 ? caret.width : Caret.DEFAULT_WIDTH;
+			drawRect.height = caret.height;
+			context.setShouldAntialias(false);
+			NSColor color = NSColor.colorWithDeviceRed(1, 1, 1, 1);
+			color.set();
+			NSBezierPath.fillRect(drawRect);
+			context.restoreGraphicsState();
 		}
 	}
+}
+
+NSRect firstRectForCharacterRange (int /*long*/ id, int /*long*/ sel, int /*long*/ range) {
+	if (ime != null) return ime.firstRectForCharacterRange (id, sel, range);
+	return super.firstRectForCharacterRange (id, sel, range);
 }
 
 /**
@@ -183,89 +248,30 @@ public IME getIME () {
     return ime;
 }
 
-int kEventControlDraw (int nextHandler, int theEvent, int userData) {
-	int [] theControl = new int [1];
-	OS.GetEventParameter (theEvent, OS.kEventParamDirectObject, OS.typeControlRef, null, 4, null, theControl);
-	boolean isFocus = OS.VERSION < 0x1040 && theControl [0] == handle && caret != null && caret.isFocusCaret ();
-	if (isFocus) caret.killFocus ();
-	int result = super.kEventControlDraw (nextHandler, theEvent, userData);
-	if (isFocus) caret.setFocus ();
-	return result;
+boolean hasMarkedText (int /*long*/ id, int /*long*/ sel) {
+	if (ime != null) return ime.hasMarkedText (id, sel);
+	return super.hasMarkedText (id, sel);
 }
 
-int kEventControlSetFocusPart (int nextHandler, int theEvent, int userData) {
-	int result = super.kEventControlSetFocusPart (nextHandler, theEvent, userData);
-	if (result == OS.noErr) {
-		if (!isDisposed ()) {
-			Shell shell = getShell ();
-			short [] part = new short [1];
-			OS.GetEventParameter (theEvent, OS.kEventParamControlPart, OS.typeControlPartCode, null, 2, null, part);
-			if (part [0] != OS.kControlFocusNoPart) {
-				if (caret != null) caret.setFocus ();
-				OS.ActivateTSMDocument (shell.imHandle);
-			} else {
-				if (caret != null) caret.killFocus ();
-				OS.DeactivateTSMDocument (shell.imHandle);
-			}
-		}
-	}
-	return result;
+boolean imeInComposition () {
+	return ime != null && ime.isInlineEnabled () && ime.startOffset != -1;
 }
 
-int kEventTextInputOffsetToPos (int nextHandler, int theEvent, int userData) {
+boolean insertText (int /*long*/ id, int /*long*/ sel, int /*long*/ string) {
 	if (ime != null) {
-		int result = ime.kEventTextInputOffsetToPos (nextHandler, theEvent, userData);
-		if (result != OS.eventNotHandledErr) return result;
+		if (!ime.insertText (id, sel, string)) return false;
 	}
-	return super.kEventTextInputOffsetToPos (nextHandler, theEvent, userData);
+	return super.insertText (id, sel, string);
 }
 
-int kEventTextInputPosToOffset (int nextHandler, int theEvent, int userData) {
-	if (ime != null) {
-		int result = ime.kEventTextInputPosToOffset (nextHandler, theEvent, userData);
-		if (result != OS.eventNotHandledErr) return result;
-	}
-	return super.kEventTextInputPosToOffset (nextHandler, theEvent, userData);
+boolean isOpaque (int /*long*/ id, int /*long*/ sel) {
+	if (context != null) return true;
+	return super.isOpaque(id, sel);
 }
 
-int kEventTextInputUnicodeForKeyEvent (int nextHandler, int theEvent, int userData) {
-	int result = super.kEventTextInputUnicodeForKeyEvent(nextHandler, theEvent, userData);
-	if (result != OS.noErr) {
-		if (caret != null) {
-			OS.CGDisplayHideCursor (OS.CGMainDisplayID ());
-		}
-	}
-	return result;
-}
-
-int kEventTextInputUpdateActiveInputArea (int nextHandler, int theEvent, int userData) {
-	if (ime != null) {
-		int result = ime.kEventTextInputUpdateActiveInputArea (nextHandler, theEvent, userData);
-		if (result != OS.eventNotHandledErr) return result;
-	}
-	return super.kEventTextInputUpdateActiveInputArea (nextHandler, theEvent, userData);
-}
-
-int kEventTextInputGetSelectedText (int nextHandler, int theEvent, int userData) {
-	if (ime != null) {
-		int result = ime.kEventTextInputGetSelectedText (nextHandler, theEvent, userData);
-		if (result != OS.eventNotHandledErr) return result;
-	}
-	return super.kEventTextInputGetSelectedText (nextHandler, theEvent, userData);
-}
-
-void redrawWidget (int control, boolean children) {
-	boolean isFocus = OS.VERSION < 0x1040 && caret != null && caret.isFocusCaret ();
-	if (isFocus) caret.killFocus ();
-	super.redrawWidget (control, children);
-	if (isFocus) caret.setFocus ();
-}
-
-void redrawWidget (int control, int x, int y, int width, int height, boolean all) {
-	boolean isFocus = OS.VERSION < 0x1040 && caret != null && caret.isFocusCaret ();
-	if (isFocus) caret.killFocus ();
-	super.redrawWidget (control, x, y, width, height, all);
-	if (isFocus) caret.setFocus ();
+NSRange markedRange (int /*long*/ id, int /*long*/ sel) {
+	if (ime != null) return ime.markedRange (id, sel);
+	return super.markedRange (id, sel);
 }
 
 void releaseChildren (boolean destroy) {
@@ -307,7 +313,9 @@ public void scroll (int destX, int destY, int x, int y, int width, int height, b
 	if (width <= 0 || height <= 0) return;
 	int deltaX = destX - x, deltaY = destY - y;
 	if (deltaX == 0 && deltaY == 0) return;
-	if (!isDrawing (handle)) return;
+	if (!isDrawing ()) return;
+	NSRect visibleRect = view.visibleRect();
+	if (visibleRect.width <= 0 || visibleRect.height <= 0) return;
 	boolean isFocus = caret != null && caret.isFocusCaret ();
 	if (isFocus) caret.killFocus ();
 	Rectangle clientRect = getClientArea ();
@@ -316,14 +324,86 @@ public void scroll (int destX, int destY, int x, int y, int width, int height, b
 		update (all);
 	}
 	Control control = findBackgroundControl ();
-	if (control != null && control.backgroundImage != null) {
-		redrawWidget (handle, x, y, width, height, false);
-		redrawWidget (handle, destX, destY, width, height, false);
+	boolean redraw = control != null && control.backgroundImage != null;
+	if (!redraw) redraw = isObscured ();
+	if (redraw) {
+		redrawWidget (view, x, y, width, height, false);
+		redrawWidget (view, destX, destY, width, height, false);
 	} else {
-	    GC gc = new GC (this);
-	    gc.copyArea (x, y, width, height, destX, destY);
-	    gc.dispose ();
+		NSRect damage = new NSRect();
+		damage.x = x;
+		damage.y = y;
+		damage.width = width;
+		damage.height = height;
+		NSPoint dest = new NSPoint();
+		dest.x = destX;
+		dest.y = destY;
+
+		view.lockFocus();
+		OS.NSCopyBits(0, damage , dest);
+		view.unlockFocus();
+
+		boolean disjoint = (destX + width < x) || (x + width < destX) || (destY + height < y) || (y + height < destY);
+		if (disjoint) {
+			view.setNeedsDisplayInRect(damage);
+		} else {
+			if (deltaX != 0) {
+				int newX = destX - deltaX;
+				if (deltaX < 0) newX = destX + width;
+				damage.x = newX;
+				damage.width = Math.abs(deltaX);
+				view.setNeedsDisplayInRect(damage);
+			}
+			if (deltaY != 0) {
+				int newY = destY - deltaY;
+				if (deltaY < 0) newY = destY + height;
+				damage.x = x;
+				damage.y = newY;
+				damage.width = width;
+				damage.height =  Math.abs (deltaY);
+				view.setNeedsDisplayInRect(damage);
+			}
+		}
+
+		NSRect srcRect = new NSRect();
+		srcRect.x = sourceRect.x;
+		srcRect.y = sourceRect.y;
+		srcRect.width = sourceRect.width;
+		srcRect.height = sourceRect.height;
+		OS.NSIntersectionRect(visibleRect, visibleRect, srcRect);
+
+		if (!OS.NSEqualRects(visibleRect, srcRect)) {
+			if (srcRect.x != visibleRect.x) {
+				damage.x = srcRect.x + deltaX;
+				damage.y = srcRect.y + deltaY;
+				damage.width = visibleRect.x - srcRect.x;
+				damage.height = srcRect.height;
+				view.setNeedsDisplayInRect(damage);
+			} 
+			if (visibleRect.x + visibleRect.width != srcRect.x + srcRect.width) {
+				damage.x = srcRect.x + visibleRect.width + deltaX;
+				damage.y = srcRect.y + deltaY;
+				damage.width = srcRect.width - visibleRect.width;
+				damage.height = srcRect.height;
+				view.setNeedsDisplayInRect(damage);
+			}
+			if (visibleRect.y != srcRect.y) {
+				damage.x = visibleRect.x + deltaX;
+				damage.y = srcRect.y + deltaY;
+				damage.width = visibleRect.width;
+				damage.height = visibleRect.y - srcRect.y;
+				view.setNeedsDisplayInRect(damage);
+			}
+			if (visibleRect.y + visibleRect.height != srcRect.y + srcRect.height) {
+				damage.x = visibleRect.x + deltaX;
+				damage.y = visibleRect.y + visibleRect.height + deltaY;
+				damage.width = visibleRect.width;
+				damage.height = srcRect.y + srcRect.height - (visibleRect.y + visibleRect.height);
+				view.setNeedsDisplayInRect(damage);
+			}
+		}
 	}
+
     if (all) {
 		Control [] children = _getChildren ();
 		for (int i=0; i<children.length; i++) {
@@ -336,6 +416,16 @@ public void scroll (int destX, int destY, int x, int y, int width, int height, b
 		}
 	}
 	if (isFocus) caret.setFocus ();
+}
+
+NSRange selectedRange (int /*long*/ id, int /*long*/ sel) {
+	if (ime != null) return ime.selectedRange (id, sel);
+	return super.selectedRange (id, sel);
+}
+
+boolean sendKeyEvent (NSEvent nsEvent, int type) {
+	if (caret != null) NSCursor.setHiddenUntilMouseMoves (true);
+	return super.sendKeyEvent (nsEvent, type);
 }
 
 /**
@@ -378,6 +468,10 @@ public void setFont (Font font) {
 	super.setFont (font);
 }
 
+void setOpenGLContext(Object value) {
+	context = (NSOpenGLContext)value;
+}
+
 /**
  * Sets the receiver's IME.
  * 
@@ -397,6 +491,22 @@ public void setIME (IME ime) {
 	checkWidget ();
 	if (ime != null && ime.isDisposed()) error(SWT.ERROR_INVALID_ARGUMENT);
 	this.ime = ime;
+}
+
+boolean setMarkedText_selectedRange (int /*long*/ id, int /*long*/ sel, int /*long*/ string, int /*long*/ range) {
+	if (ime != null) {
+		if (!ime.setMarkedText_selectedRange (id, sel, string, range)) return false;
+	}
+	return super.setMarkedText_selectedRange (id, sel, string, range);
+}
+
+int /*long*/ validAttributesForMarkedText (int /*long*/ id, int /*long*/ sel) {
+	if (ime != null) return ime.validAttributesForMarkedText (id, sel);
+	return super.validAttributesForMarkedText(id, sel);
+}
+
+void updateOpenGLContext(int /*long*/ id, int /*long*/ sel, int /*long*/ notification) {
+	if (context != null) ((NSOpenGLContext)context).update();
 }
 
 }

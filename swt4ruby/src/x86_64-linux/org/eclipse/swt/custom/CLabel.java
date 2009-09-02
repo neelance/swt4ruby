@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2008 IBM Corporation and others.
+ * Copyright (c) 2000, 2009 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -41,6 +41,7 @@ import org.eclipse.swt.accessibility.*;
  *
  * @see <a href="http://www.eclipse.org/swt/examples.php">SWT Example: CustomControlExample</a>
  * @see <a href="http://www.eclipse.org/swt/">Sample code and further information</a>
+ * @noextend This class is not intended to be subclassed by clients.
  */
 public class CLabel extends Canvas {
 
@@ -70,6 +71,7 @@ public class CLabel extends Canvas {
 	private int[] gradientPercents;
 	private boolean gradientVertical;
 	private Color background;
+	private Listener disposeListener;
 	
 	private static int DRAW_FLAGS = SWT.DRAW_MNEMONIC | SWT.DRAW_TAB | SWT.DRAW_TRANSPARENT | SWT.DRAW_DELIMITER;
 
@@ -117,12 +119,6 @@ public CLabel(Composite parent, int style) {
 		}
 	});
 	
-	addDisposeListener(new DisposeListener(){
-		public void widgetDisposed(DisposeEvent event) {
-			onDispose(event);
-		}
-	});
-
 	addTraverseListener(new TraverseListener() {
 		public void keyTraversed(TraverseEvent event) {
 			if (event.detail == SWT.TRAVERSE_MNEMONIC) {
@@ -130,6 +126,12 @@ public CLabel(Composite parent, int style) {
 			}
 		}
 	});
+	
+	disposeListener = new Listener() {
+		public void handleEvent(Event event) {
+			onDispose(event);
+		}
+	};
 	
 	initAccessible();
 
@@ -308,7 +310,11 @@ private void initAccessible() {
 		}
 	});
 }
-void onDispose(DisposeEvent event) {
+void onDispose(Event event) {
+	removeListener(SWT.Dispose, disposeListener);
+	notifyListeners(SWT.Dispose, event);
+	event.type = SWT.None;
+
 	gradientColors = null;
 	gradientPercents = null;
 	backgroundImage = null;
@@ -722,6 +728,16 @@ public void setImage(Image image) {
 /**
  * Set the label's text.
  * The value <code>null</code> clears it.
+ * <p>
+ * Mnemonics are indicated by an '&amp;' that causes the next
+ * character to be the mnemonic.  When the user presses a
+ * key sequence that matches the mnemonic, focus is assigned
+ * to the control that follows the label. On most platforms,
+ * the mnemonic appears underlined but may be emphasised in a
+ * platform specific manner.  The mnemonic indicator character
+ * '&amp;' can be escaped by doubling it in the string, causing
+ * a single '&amp;' to be displayed.
+ * </p>
  * 
  * @param text the text to be displayed in the label or null
  * 

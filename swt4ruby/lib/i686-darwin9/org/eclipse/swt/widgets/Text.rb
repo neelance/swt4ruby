@@ -1,6 +1,6 @@
 require "rjava"
 
-# Copyright (c) 2000, 2008 IBM Corporation and others.
+# Copyright (c) 2000, 2009 IBM Corporation and others.
 # All rights reserved. This program and the accompanying materials
 # are made available under the terms of the Eclipse Public License v1.0
 # which accompanies this distribution, and is available at
@@ -13,21 +13,11 @@ module Org::Eclipse::Swt::Widgets
     class_module.module_eval {
       include ::Java::Lang
       include ::Org::Eclipse::Swt::Widgets
-      include_const ::Org::Eclipse::Swt::Internal::Carbon, :HILayoutInfo
-      include_const ::Org::Eclipse::Swt::Internal::Carbon, :HISideBinding
-      include_const ::Org::Eclipse::Swt::Internal::Carbon, :HIThemeFrameDrawInfo
-      include_const ::Org::Eclipse::Swt::Internal::Carbon, :OS
-      include_const ::Org::Eclipse::Swt::Internal::Carbon, :RGBColor
-      include_const ::Org::Eclipse::Swt::Internal::Carbon, :Rect
-      include_const ::Org::Eclipse::Swt::Internal::Carbon, :ControlEditTextSelectionRec
-      include_const ::Org::Eclipse::Swt::Internal::Carbon, :ControlFontStyleRec
-      include_const ::Org::Eclipse::Swt::Internal::Carbon, :CFRange
-      include_const ::Org::Eclipse::Swt::Internal::Carbon, :CGRect
-      include_const ::Org::Eclipse::Swt::Internal::Carbon, :TXNTab
-      include_const ::Org::Eclipse::Swt::Internal::Carbon, :CGPoint
       include ::Org::Eclipse::Swt
       include ::Org::Eclipse::Swt::Events
       include ::Org::Eclipse::Swt::Graphics
+      include ::Org::Eclipse::Swt::Internal
+      include ::Org::Eclipse::Swt::Internal::Cocoa
     }
   end
   
@@ -43,34 +33,32 @@ module Org::Eclipse::Swt::Widgets
   # <p>
   # <dl>
   # <dt><b>Styles:</b></dt>
-  # <dd>CANCEL, CENTER, LEFT, MULTI, PASSWORD, SEARCH, SINGLE, RIGHT, READ_ONLY, WRAP</dd>
+  # <dd>CENTER, ICON_CANCEL, ICON_SEARCH, LEFT, MULTI, PASSWORD, SEARCH, SINGLE, RIGHT, READ_ONLY, WRAP</dd>
   # <dt><b>Events:</b></dt>
   # <dd>DefaultSelection, Modify, Verify</dd>
   # </dl>
   # <p>
   # Note: Only one of the styles MULTI and SINGLE may be specified,
   # and only one of the styles LEFT, CENTER, and RIGHT may be specified.
-  # </p><p>
+  # </p>
+  # <p>
+  # Note: The styles ICON_CANCEL and ICON_SEARCH are hints used in combination with SEARCH.
+  # When the platform supports the hint, the text control shows these icons.  When an icon
+  # is selected, a default selection event is sent with the detail field set to one of
+  # ICON_CANCEL or ICON_SEARCH.  Normally, application code does not need to check the
+  # detail.  In the case of ICON_CANCEL, the text is cleared before the default selection
+  # event is sent causing the application to search for an empty string.
+  # </p>
+  # <p>
   # IMPORTANT: This class is <em>not</em> intended to be subclassed.
   # </p>
   # 
   # @see <a href="http://www.eclipse.org/swt/snippets/#text">Text snippets</a>
   # @see <a href="http://www.eclipse.org/swt/examples.php">SWT Example: ControlExample</a>
   # @see <a href="http://www.eclipse.org/swt/">Sample code and further information</a>
+  # @noextend This class is not intended to be subclassed by clients.
   class Text < TextImports.const_get :Scrollable
     include_class_members TextImports
-    
-    attr_accessor :txn_object
-    alias_method :attr_txn_object, :txn_object
-    undef_method :txn_object
-    alias_method :attr_txn_object=, :txn_object=
-    undef_method :txn_object=
-    
-    attr_accessor :frame_handle
-    alias_method :attr_frame_handle, :frame_handle
-    undef_method :frame_handle
-    alias_method :attr_frame_handle=, :frame_handle=
-    undef_method :frame_handle=
     
     attr_accessor :text_limit
     alias_method :attr_text_limit, :text_limit
@@ -84,12 +72,6 @@ module Org::Eclipse::Swt::Widgets
     alias_method :attr_tabs=, :tabs=
     undef_method :tabs=
     
-    attr_accessor :selection
-    alias_method :attr_selection, :selection
-    undef_method :selection
-    alias_method :attr_selection=, :selection=
-    undef_method :selection=
-    
     attr_accessor :echo_character
     alias_method :attr_echo_character, :echo_character
     undef_method :echo_character
@@ -101,6 +83,12 @@ module Org::Eclipse::Swt::Widgets
     undef_method :double_click
     alias_method :attr_double_click=, :double_click=
     undef_method :double_click=
+    
+    attr_accessor :receiving_focus
+    alias_method :attr_receiving_focus, :receiving_focus
+    undef_method :receiving_focus
+    alias_method :attr_receiving_focus=, :receiving_focus=
+    undef_method :receiving_focus=
     
     attr_accessor :hidden_text
     alias_method :attr_hidden_text, :hidden_text
@@ -114,6 +102,37 @@ module Org::Eclipse::Swt::Widgets
     alias_method :attr_message=, :message=
     undef_method :message=
     
+    attr_accessor :selection_range
+    alias_method :attr_selection_range, :selection_range
+    undef_method :selection_range
+    alias_method :attr_selection_range=, :selection_range=
+    undef_method :selection_range=
+    
+    attr_accessor :target_search
+    alias_method :attr_target_search, :target_search
+    undef_method :target_search
+    alias_method :attr_target_search=, :target_search=
+    undef_method :target_search=
+    
+    attr_accessor :target_cancel
+    alias_method :attr_target_cancel, :target_cancel
+    undef_method :target_cancel
+    alias_method :attr_target_cancel=, :target_cancel=
+    undef_method :target_cancel=
+    
+    # long
+    attr_accessor :action_search
+    alias_method :attr_action_search, :action_search
+    undef_method :action_search
+    alias_method :attr_action_search=, :action_search=
+    undef_method :action_search=
+    
+    attr_accessor :action_cancel
+    alias_method :attr_action_cancel, :action_cancel
+    undef_method :action_cancel
+    alias_method :attr_action_cancel=, :action_cancel=
+    undef_method :action_cancel=
+    
     class_module.module_eval {
       const_set_lazy(:PASSWORD) { Character.new(0x2022) }
       const_attr_reader  :PASSWORD
@@ -125,9 +144,6 @@ module Org::Eclipse::Swt::Widgets
         const_set :LIMIT, 0x7fffffff
         const_set :DELIMITER, "\r"
       end
-      
-      const_set_lazy(:AX_ATTRIBUTES) { Array.typed(String).new([OS.attr_k_axtitle_attribute, OS.attr_k_axvalue_attribute, OS.attr_k_axnumber_of_characters_attribute, OS.attr_k_axselected_text_attribute, OS.attr_k_axselected_text_range_attribute, OS.attr_k_axstring_for_range_parameterized_attribute, ]) }
-      const_attr_reader  :AX_ATTRIBUTES
     }
     
     typesig { [Composite, ::Java::Int] }
@@ -158,31 +174,58 @@ module Org::Eclipse::Swt::Widgets
     # @see SWT#MULTI
     # @see SWT#READ_ONLY
     # @see SWT#WRAP
+    # @see SWT#LEFT
+    # @see SWT#RIGHT
+    # @see SWT#CENTER
+    # @see SWT#PASSWORD
+    # @see SWT#SEARCH
+    # @see SWT#ICON_SEARCH
+    # @see SWT#ICON_CANCEL
     # @see Widget#checkSubclass
     # @see Widget#getStyle
     def initialize(parent, style)
-      @txn_object = 0
-      @frame_handle = 0
       @text_limit = 0
       @tabs = 0
-      @selection = nil
       @echo_character = 0
       @double_click = false
+      @receiving_focus = false
       @hidden_text = nil
       @message = nil
+      @selection_range = nil
+      @target_search = nil
+      @target_cancel = nil
+      @action_search = 0
+      @action_cancel = 0
       super(parent, check_style(style))
       @text_limit = LIMIT
       @tabs = 8
       if (!((style & SWT::SEARCH)).equal?(0))
-        in_attributes_to_set = !((style & SWT::CANCEL)).equal?(0) ? OS.attr_k_hisearch_field_attributes_cancel : 0
-        OS._hisearch_field_change_attributes(self.attr_handle, in_attributes_to_set, 0)
-        # Ensure that SWT.CANCEL is set.
-        # NOTE: CANCEL has the same value as H_SCROLL so it is
+        # Ensure that SWT.ICON_CANCEL and ICON_SEARCH are set.
+        # NOTE: ICON_CANCEL has the same value as H_SCROLL and
+        # ICON_SEARCH has the same value as V_SCROLL so it is
         # necessary to first clear these bits to avoid a scroll
         # bar and then reset the bit using the original style
         # supplied by the programmer.
-        if (!((style & SWT::CANCEL)).equal?(0))
-          self.attr_style |= SWT::CANCEL
+        cell = NSSearchFieldCell.new((self.attr_view).cell)
+        if (!((style & SWT::ICON_CANCEL)).equal?(0))
+          self.attr_style |= SWT::ICON_CANCEL
+          cancel_cell = cell.cancel_button_cell
+          @target_cancel = cancel_cell.target
+          @action_cancel = cancel_cell.action
+          cancel_cell.set_target(self.attr_view)
+          cancel_cell.set_action(OS.attr_sel_send_cancel_selection)
+        else
+          cell.set_cancel_button_cell(nil)
+        end
+        if (!((style & SWT::ICON_SEARCH)).equal?(0))
+          self.attr_style |= SWT::ICON_SEARCH
+          search_cell = cell.search_button_cell
+          @target_search = search_cell.target
+          @action_search = search_cell.action
+          search_cell.set_target(self.attr_view)
+          search_cell.set_action(OS.attr_sel_send_search_selection)
+        else
+          cell.set_search_button_cell(nil)
         end
       end
     end
@@ -304,17 +347,33 @@ module Org::Eclipse::Swt::Widgets
           return
         end
       end
-      if ((@txn_object).equal?(0))
+      str = NSString.string_with(string)
+      if (!((self.attr_style & SWT::SINGLE)).equal?(0))
         set_selection(get_char_count)
         insert_edit_text(string)
       else
-        set_txntext(OS.attr_k_txnend_offset, OS.attr_k_txnend_offset, string)
-        OS._txnset_selection(@txn_object, OS.attr_k_txnend_offset, OS.attr_k_txnend_offset)
-        OS._txnshow_selection(@txn_object, false)
+        widget = self.attr_view
+        storage = widget.text_storage
+        range = NSRange.new
+        range.attr_location = storage.length
+        storage.replace_characters_in_range(range, str)
+        range.attr_location = storage.length
+        widget.scroll_range_to_visible(range)
+        widget.set_selected_range(range)
       end
       if (!(string.length).equal?(0))
-        send_modify_event(true)
+        send_event(SWT::Modify)
       end
+    end
+    
+    typesig { [::Java::Int, ::Java::Int] }
+    # long
+    # long
+    def become_first_responder(id, sel)
+      @receiving_focus = true
+      result = super(id, sel)
+      @receiving_focus = false
+      return result
     end
     
     class_module.module_eval {
@@ -323,6 +382,9 @@ module Org::Eclipse::Swt::Widgets
         if (!((style & SWT::SEARCH)).equal?(0))
           style |= SWT::SINGLE | SWT::BORDER
           style &= ~SWT::PASSWORD
+          # NOTE: ICON_CANCEL has the same value as H_SCROLL and
+          # ICON_SEARCH has the same value as V_SCROLL so they are
+          # cleared because SWT.SINGLE is set.
         end
         if (!((style & SWT::SINGLE)).equal?(0) && !((style & SWT::MULTI)).equal?(0))
           style &= ~SWT::MULTI
@@ -348,77 +410,6 @@ module Org::Eclipse::Swt::Widgets
       end
     }
     
-    typesig { [::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int] }
-    def call_paint_event_handler(control, damage_rgn, visible_rgn, the_event, next_handler)
-      result = super(control, damage_rgn, visible_rgn, the_event, next_handler)
-      if ((@frame_handle).equal?(control))
-        context = Array.typed(::Java::Int).new(1) { 0 }
-        OS._get_event_parameter(the_event, OS.attr_k_event_param_cgcontext_ref, OS.attr_type_cgcontext_ref, nil, 4, nil, context)
-        OS._cgcontext_save_gstate(context[0])
-        out_metric = Array.typed(::Java::Int).new(1) { 0 }
-        OS._get_theme_metric(OS.attr_k_theme_metric_focus_rect_outset, out_metric)
-        rect = CGRect.new
-        OS._hiview_get_bounds(@frame_handle, rect)
-        rect.attr_x += out_metric[0]
-        rect.attr_y += out_metric[0]
-        rect.attr_width -= out_metric[0] * 2
-        rect.attr_height -= out_metric[0] * 2
-        state = 0
-        if (OS._is_control_enabled(control))
-          state = OS._is_control_active(control) ? OS.attr_k_theme_state_active : OS.attr_k_theme_state_inactive
-        else
-          state = OS._is_control_active(control) ? OS.attr_k_theme_state_unavailable : OS.attr_k_theme_state_unavailable_inactive
-        end
-        info = HIThemeFrameDrawInfo.new
-        info.attr_state = state
-        info.attr_is_focused = has_focus
-        info.attr_kind = OS.attr_k_hitheme_frame_text_field_square
-        OS._hitheme_draw_frame(rect, info, context[0], OS.attr_k_hitheme_orientation_normal)
-        if (((self.attr_style & (SWT::H_SCROLL | SWT::V_SCROLL))).equal?((SWT::V_SCROLL | SWT::H_SCROLL)))
-          OS._hiview_get_bounds(@frame_handle, rect)
-          rect.attr_x = rect.attr_width - out_metric[0]
-          rect.attr_y = rect.attr_height - out_metric[0]
-          OS._get_theme_metric(OS.attr_k_theme_metric_edit_text_frame_outset, out_metric)
-          rect.attr_x -= out_metric[0]
-          rect.attr_y -= out_metric[0]
-          OS._get_theme_metric(OS.attr_k_theme_metric_scroll_bar_width, out_metric)
-          rect.attr_x -= out_metric[0]
-          rect.attr_y -= out_metric[0]
-          rect.attr_width = rect.attr_height = out_metric[0]
-          OS._cgcontext_set_fill_color(context[0], Array.typed(::Java::Float).new([1, 1, 1, 1]))
-          OS._cgcontext_fill_rect(context[0], rect)
-        end
-        OS._cgcontext_restore_gstate(context[0])
-      end
-      return result
-    end
-    
-    typesig { [::Java::Int, ::Java::Int] }
-    def call_focus_event_handler(next_handler, the_event)
-      part = Array.typed(::Java::Short).new(1) { 0 }
-      if ((@txn_object).equal?(0))
-        OS._get_event_parameter(the_event, OS.attr_k_event_param_control_part, OS.attr_type_control_part_code, nil, 2, nil, part)
-        if ((part[0]).equal?(OS.attr_k_control_focus_no_part))
-          @selection = ControlEditTextSelectionRec.new
-          OS._get_control_data(self.attr_handle, RJava.cast_to_short(OS.attr_k_control_entire_control), OS.attr_k_control_edit_text_selection_tag, 4, @selection, nil)
-        end
-      end
-      result = super(next_handler, the_event)
-      if (is_disposed)
-        return result
-      end
-      if (!(@frame_handle).equal?(0))
-        OS._hiview_set_needs_display(@frame_handle, true)
-      end
-      if ((@txn_object).equal?(0))
-        if (!(part[0]).equal?(OS.attr_k_control_focus_no_part) && !(@selection).nil?)
-          OS._set_control_data(self.attr_handle, RJava.cast_to_short(OS.attr_k_control_entire_control), OS.attr_k_control_edit_text_selection_tag, 4, @selection)
-          @selection = nil
-        end
-      end
-      return result
-    end
-    
     typesig { [] }
     # Clears the selection.
     # 
@@ -428,15 +419,8 @@ module Org::Eclipse::Swt::Widgets
     # </ul>
     def clear_selection
       check_widget
-      if ((@txn_object).equal?(0))
-        selection = get_selection
-        set_selection(selection.attr_x)
-      else
-        o_start_offset = Array.typed(::Java::Int).new(1) { 0 }
-        o_end_offset = Array.typed(::Java::Int).new(1) { 0 }
-        OS._txnget_selection(@txn_object, o_start_offset, o_end_offset)
-        OS._txnset_selection(@txn_object, o_start_offset[0], o_start_offset[0])
-      end
+      selection = get_selection
+      set_selection(selection.attr_x)
     end
     
     typesig { [::Java::Int, ::Java::Int, ::Java::Boolean] }
@@ -444,120 +428,103 @@ module Org::Eclipse::Swt::Widgets
       check_widget
       width = 0
       height = 0
-      if ((@txn_object).equal?(0))
-        if (!((self.attr_style & SWT::SEARCH)).equal?(0))
-          ptr1 = Array.typed(::Java::Int).new(1) { 0 }
-          OS._get_control_data(self.attr_handle, RJava.cast_to_short(OS.attr_k_control_entire_control), OS.attr_k_control_edit_text_cfstring_tag, 4, ptr1, nil)
-          size1 = text_extent(ptr1[0], 0)
-          if (!(ptr1[0]).equal?(0))
-            OS._cfrelease(ptr1[0])
-          end
-          width = size1.attr_x
-          height = size1.attr_y
-          metric = Array.typed(::Java::Int).new(1) { 0 }
-          OS._get_theme_metric(OS.attr_k_theme_metric_edit_text_whitespace, metric)
-          height += metric[0] * 2
-          OS._get_theme_metric(OS.attr_k_theme_metric_edit_text_frame_outset, metric)
-          height += metric[0] * 2
-          # This code is intentionally commented
-          # int [] ptr2 = new int [1];
-          # OS.HISearchFieldCopyDescriptiveText (handle, ptr2);
-          # Point size2 = textExtent (ptr2 [0], 0);
-          # width = Math.max (width, size2.x);
-          # if (ptr2 [0] != 0) OS.CFRelease (ptr2 [0]);
-        else
-          if (!((self.attr_style & SWT::RIGHT)).equal?(0))
-            OS._set_control_data(self.attr_handle, OS.attr_k_control_entire_control, OS.attr_k_control_edit_text_single_line_tag, 1, Array.typed(::Java::Byte).new([1]))
-          end
-          rect = Rect.new
-          OS._get_best_control_rect(self.attr_handle, rect, nil)
-          if (!((self.attr_style & SWT::RIGHT)).equal?(0))
-            OS._set_control_data(self.attr_handle, OS.attr_k_control_entire_control, OS.attr_k_control_edit_text_single_line_tag, 1, Array.typed(::Java::Byte).new([0]))
-          end
-          width = rect.attr_right - rect.attr_left
-          height = rect.attr_bottom - rect.attr_top
+      if (!((self.attr_style & SWT::SINGLE)).equal?(0))
+        widget = self.attr_view
+        size = widget.cell.cell_size
+        width = RJava.cast_to_int(Math.ceil(size.attr_width))
+        height = RJava.cast_to_int(Math.ceil(size.attr_height))
+        border = nil
+        if (!((self.attr_style & SWT::BORDER)).equal?(0) && (!(w_hint).equal?(SWT::DEFAULT) || !(h_hint).equal?(SWT::DEFAULT)))
+          # determine the size of the cell without its border
+          insets = widget.cell.title_rect_for_bounds(NSRect.new)
+          border = Point.new(-RJava.cast_to_int(Math.ceil(insets.attr_width)), -RJava.cast_to_int(Math.ceil(insets.attr_height)))
+          width -= border.attr_x
+          height -= border.attr_y
+        end
+        if (width <= 0)
+          width = DEFAULT_WIDTH
+        end
+        if (height <= 0)
+          height = DEFAULT_HEIGHT
+        end
+        if (!(w_hint).equal?(SWT::DEFAULT))
+          width = w_hint
+        end
+        if (!(h_hint).equal?(SWT::DEFAULT))
+          height = h_hint
+        end
+        if (!(border).nil?)
+          # re-add the border size (if any) now that wHint/hHint is taken
+          width += border.attr_x
+          height += border.attr_y
         end
       else
-        o_data_handle = Array.typed(::Java::Int).new(1) { 0 }
-        OS._txnget_data(@txn_object, OS.attr_k_txnstart_offset, OS.attr_k_txnend_offset, o_data_handle)
-        if (!(o_data_handle[0]).equal?(0))
-          length_ = OS._get_handle_size(o_data_handle[0])
-          str = 0
-          if (!(length_).equal?(0))
-            ptr = Array.typed(::Java::Int).new(1) { 0 }
-            OS._hlock(o_data_handle[0])
-            OS.memmove(ptr, o_data_handle[0], 4)
-            str = OS._cfstring_create_with_characters(OS.attr_k_cfallocator_default, ptr[0], length_ / 2)
-            OS._hunlock(o_data_handle[0])
+        layout_manager = NSLayoutManager.new.alloc.init
+        text_container = NSTextContainer.new.alloc
+        size = NSSize.new
+        size.attr_width = size.attr_height = Float::MAX_VALUE
+        if (!((self.attr_style & SWT::WRAP)).equal?(0))
+          if (!(w_hint).equal?(SWT::DEFAULT))
+            size.attr_width = w_hint
           end
-          OS._dispose_handle(o_data_handle[0])
-          size = text_extent(str, !(w_hint).equal?(SWT::DEFAULT) && !((self.attr_style & SWT::WRAP)).equal?(0) ? w_hint : 0)
-          if (!(str).equal?(0))
-            OS._cfrelease(str)
+          if (!(h_hint).equal?(SWT::DEFAULT))
+            size.attr_height = h_hint
           end
-          width = size.attr_x
-          height = size.attr_y
         end
+        text_container.init_with_container_size(size)
+        layout_manager.add_text_container(text_container)
+        text_storage_ = NSTextStorage.new.alloc.init
+        text_storage_.set_attributed_string((self.attr_view).text_storage)
+        layout_manager.set_text_storage(text_storage_)
+        layout_manager.glyph_range_for_text_container(text_container)
+        rect = layout_manager.used_rect_for_text_container(text_container)
+        width = (layout_manager.number_of_glyphs).equal?(0) ? DEFAULT_WIDTH : RJava.cast_to_int(Math.ceil(rect.attr_width))
+        height = RJava.cast_to_int(Math.ceil(rect.attr_height))
+        text_storage_.release
+        text_container.release
+        layout_manager.release
+        if (width <= 0)
+          width = DEFAULT_WIDTH
+        end
+        if (height <= 0)
+          height = DEFAULT_HEIGHT
+        end
+        if (!(w_hint).equal?(SWT::DEFAULT))
+          width = w_hint
+        end
+        if (!(h_hint).equal?(SWT::DEFAULT))
+          height = h_hint
+        end
+        trim = compute_trim(0, 0, width, height)
+        width = trim.attr_width
+        height = trim.attr_height
       end
-      if (width <= 0)
-        width = DEFAULT_WIDTH
-      end
-      if (height <= 0)
-        height = DEFAULT_HEIGHT
-      end
-      if (!(w_hint).equal?(SWT::DEFAULT))
-        width = w_hint
-      end
-      if (!(h_hint).equal?(SWT::DEFAULT))
-        height = h_hint
-      end
-      trim = compute_trim(0, 0, width, height)
-      width = trim.attr_width
-      height = trim.attr_height
       return Point.new(width, height)
     end
     
     typesig { [::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int] }
     def compute_trim(x, y, width, height)
-      check_widget
-      size = Array.typed(::Java::Int).new(1) { 0 }
-      OS._get_theme_metric(OS.attr_k_theme_metric_scroll_bar_width, size)
-      if (!(self.attr_horizontal_bar).nil?)
-        height += size[0]
-      end
-      if (!(self.attr_vertical_bar).nil?)
-        width += size[0]
-      end
-      inset_ = inset
-      x -= inset_.attr_left
-      y -= inset_.attr_top
-      width += inset_.attr_left + inset_.attr_right
-      height += inset_.attr_top + inset_.attr_bottom
-      if ((@txn_object).equal?(0))
-        inset_ = get_inset
-        x -= inset_.attr_left
-        y -= inset_.attr_top
-        width += inset_.attr_left + inset_.attr_right
-        height += inset_.attr_top + inset_.attr_bottom
-      end
-      if (!((self.attr_style & SWT::SEARCH)).equal?(0))
-        left = Array.typed(::Java::Int).new(1) { 0 }
-        right = Array.typed(::Java::Int).new(1) { 0 }
-        out_attributes = Array.typed(::Java::Int).new(1) { 0 }
-        OS._hisearch_field_get_attributes(self.attr_handle, out_attributes)
-        if (!((out_attributes[0] & OS.attr_k_hisearch_field_attributes_search_icon)).equal?(0))
-          OS._get_theme_metric(self.attr_display.attr_small_fonts ? OS.attr_k_theme_metric_round_text_field_small_content_inset_with_icon_left : OS.attr_k_theme_metric_round_text_field_content_inset_with_icon_left, left)
-        else
-          OS._get_theme_metric(self.attr_display.attr_small_fonts ? OS.attr_k_theme_metric_round_text_field_small_content_inset_left : OS.attr_k_theme_metric_round_text_field_content_inset_left, left)
+      result = super(x, y, width, height)
+      if (!((self.attr_style & SWT::SINGLE)).equal?(0))
+        widget = self.attr_view
+        if (!((self.attr_style & SWT::SEARCH)).equal?(0))
+          cell_ = NSSearchFieldCell.new(widget.cell)
+          test_width = 100
+          rect = NSRect.new
+          rect.attr_width = test_width
+          rect = cell_.search_text_rect_for_bounds(rect)
+          left_indent = RJava.cast_to_int(rect.attr_x)
+          right_indent = test_width - left_indent - RJava.cast_to_int(Math.ceil(rect.attr_width))
+          result.attr_x -= left_indent
+          result.attr_width += left_indent + right_indent
         end
-        if (!((out_attributes[0] & OS.attr_k_hisearch_field_attributes_cancel)).equal?(0))
-          OS._get_theme_metric(self.attr_display.attr_small_fonts ? OS.attr_k_theme_metric_round_text_field_small_content_inset_with_icon_right : OS.attr_k_theme_metric_round_text_field_content_inset_with_icon_right, right)
-        else
-          OS._get_theme_metric(self.attr_display.attr_small_fonts ? OS.attr_k_theme_metric_round_text_field_small_content_inset_right : OS.attr_k_theme_metric_round_text_field_content_inset_right, right)
-        end
-        width += left[0] + right[0]
+        inset = widget.cell.title_rect_for_bounds(NSRect.new)
+        result.attr_x -= inset.attr_x
+        result.attr_y -= inset.attr_y
+        result.attr_width -= inset.attr_width
+        result.attr_height -= inset.attr_height
       end
-      return Rectangle.new(x, y, width, height)
+      return result
     end
     
     typesig { [] }
@@ -572,143 +539,106 @@ module Org::Eclipse::Swt::Widgets
     # </ul>
     def copy
       check_widget
-      if ((@txn_object).equal?(0))
+      if (!((self.attr_style & SWT::SINGLE)).equal?(0))
         selection = get_selection
         if ((selection.attr_x).equal?(selection.attr_y))
           return
         end
         copy_to_clipboard(get_edit_text(selection.attr_x, selection.attr_y - 1))
       else
-        OS._txncopy(@txn_object)
+        text = self.attr_view
+        if ((text.selected_range.attr_length).equal?(0))
+          return
+        end
+        text.copy(nil)
       end
     end
     
     typesig { [] }
     def create_handle
-      out_control = Array.typed(::Java::Int).new(1) { 0 }
-      if (!((self.attr_style & SWT::MULTI)).equal?(0) || ((self.attr_style & (SWT::BORDER | SWT::SEARCH))).equal?(0))
-        if (!((self.attr_style & (SWT::H_SCROLL | SWT::V_SCROLL))).equal?(0) || OS::VERSION >= 0x1050)
-          options = 0
-          if (((self.attr_style & (SWT::H_SCROLL | SWT::V_SCROLL))).equal?((SWT::H_SCROLL | SWT::V_SCROLL)))
-            options |= OS.attr_k_hiscroll_view_options_allow_grow
-          end
-          if (!((self.attr_style & SWT::H_SCROLL)).equal?(0))
-            options |= OS.attr_k_hiscroll_view_options_horiz_scroll
-          end
-          if (!((self.attr_style & SWT::V_SCROLL)).equal?(0))
-            options |= OS.attr_k_hiscroll_view_options_vert_scroll
-          end
-          # Bug in the Macintosh.  HIScrollViewCreate() fails if no scroll bit is
-          # specified. In order to get horizontal scrolling in a single line text, a
-          # scroll view is created with the vertical bit set and the scroll bars
-          # are set to auto hide.  But calling HIScrollViewSetScrollBarAutoHide()
-          # before the view has been resized still leaves space for the vertical
-          # scroll bar.  The fix is to call HIScrollViewSetScrollBarAutoHide()
-          # once the widget has been resized.
-          if ((options).equal?(0))
-            options |= OS.attr_k_hiscroll_view_options_vert_scroll
-          end
-          OS._hiscroll_view_create(options, out_control)
-          if ((out_control[0]).equal?(0))
-            error(SWT::ERROR_NO_HANDLES)
-          end
-          self.attr_scrolled_handle = out_control[0]
-          OS._hiview_set_visible(self.attr_scrolled_handle, true)
-        end
-        i_frame_options = OS.attr_k_txndont_draw_caret_when_inactive_mask | OS.attr_k_txnmonostyled_text_mask
-        # Bug in the Macintosh.  For some reason a single line text does not
-        # display properly when it is right aligned.  The fix is to use a
-        # multi line text when right aligned.
-        if (((self.attr_style & SWT::RIGHT)).equal?(0))
-          if (!((self.attr_style & SWT::SINGLE)).equal?(0))
-            i_frame_options |= OS.attr_k_txnsingle_line_only_mask
-          end
-        end
-        if (!((self.attr_style & SWT::WRAP)).equal?(0))
-          i_frame_options |= OS.attr_k_txnalways_wrap_at_view_edge_mask
-        end
-        OS._hitext_view_create(nil, 0, i_frame_options, out_control)
-        if ((out_control[0]).equal?(0))
-          error(SWT::ERROR_NO_HANDLES)
-        end
-        self.attr_handle = out_control[0]
-        OS._hiview_set_visible(self.attr_handle, true)
-        if (!((self.attr_style & SWT::MULTI)).equal?(0) && !((self.attr_style & SWT::BORDER)).equal?(0))
-          features = OS.attr_k_control_supports_embedding
-          OS._create_user_pane_control(0, nil, features, out_control)
-          if ((out_control[0]).equal?(0))
-            error(SWT::ERROR_NO_HANDLES)
-          end
-          @frame_handle = out_control[0]
-        end
-        @txn_object = OS._hitext_view_get_txnobject(self.attr_handle)
-        ptr = OS._new_ptr(Rect.attr_sizeof)
-        rect = !((self.attr_style & SWT::SINGLE)).equal?(0) ? inset : Rect.new
-        OS.memmove(ptr, rect, Rect.attr_sizeof)
-        tags = Array.typed(::Java::Int).new([OS.attr_k_txndisable_drag_and_drop_tag, OS.attr_k_txndo_font_substitution, OS.attr_k_txnioprivileges_tag, OS.attr_k_txnmargins_tag, OS.attr_k_txnjustification_tag, ])
-        just = OS.attr_k_txnflush_left
-        if (!((self.attr_style & SWT::CENTER)).equal?(0))
-          just = OS.attr_k_txncenter
-        end
-        if (!((self.attr_style & SWT::RIGHT)).equal?(0))
-          just = OS.attr_k_txnflush_right
-        end
-        datas = Array.typed(::Java::Int).new([1, 1, !((self.attr_style & SWT::READ_ONLY)).equal?(0) ? 1 : 0, ptr, just, ])
-        OS._txnset_txnobject_controls(@txn_object, false, tags.attr_length, tags, datas)
-        OS._dispose_ptr(ptr)
-      else
-        if (!((self.attr_style & SWT::SEARCH)).equal?(0))
-          attributes = !((self.attr_style & SWT::CANCEL)).equal?(0) ? OS.attr_k_hisearch_field_attributes_cancel : 0
-          OS._hisearch_field_create(nil, attributes, 0, 0, out_control)
-        else
-          window = OS._get_control_owner(self.attr_parent.attr_handle)
-          OS._create_edit_unicode_text_control(window, nil, 0, !((self.attr_style & SWT::PASSWORD)).equal?(0), nil, out_control)
-        end
-        if ((out_control[0]).equal?(0))
-          error(SWT::ERROR_NO_HANDLES)
-        end
-        self.attr_handle = out_control[0]
-        if (!((self.attr_style & SWT::SEARCH)).equal?(0) && self.attr_display.attr_small_fonts)
-          OS._set_control_data(self.attr_handle, OS.attr_k_control_entire_control, OS.attr_k_control_size_tag, 2, Array.typed(::Java::Short).new([OS.attr_k_control_size_small]))
-        end
-        # Bug in the Macintosh.  For some reason a single line text does not
-        # display selection properly when it is right aligned.  The fix is to use a
-        # multi line text when right aligned.
-        if (((self.attr_style & SWT::RIGHT)).equal?(0))
-          OS._set_control_data(self.attr_handle, OS.attr_k_control_entire_control, OS.attr_k_control_edit_text_single_line_tag, 1, Array.typed(::Java::Byte).new([1]))
-        end
-        if (!((self.attr_style & SWT::READ_ONLY)).equal?(0))
-          OS._set_control_data(self.attr_handle, OS.attr_k_control_entire_control, OS.attr_k_control_edit_text_locked_tag, 1, Array.typed(::Java::Byte).new([1]))
-        end
-        if (!((self.attr_style & (SWT::RIGHT | SWT::CENTER))).equal?(0))
-          font_style = ControlFontStyleRec.new
-          font_style.attr_flags |= OS.attr_k_control_use_just_mask
-          if (!((self.attr_style & SWT::CENTER)).equal?(0))
-            font_style.attr_just = OS.attr_te_just_center
-          end
-          if (!((self.attr_style & SWT::RIGHT)).equal?(0))
-            font_style.attr_just = OS.attr_te_just_right
-          end
-          OS._set_control_font_style(self.attr_handle, font_style)
-        end
-        if (!((self.attr_style & SWT::SEARCH)).equal?(0))
-          OS._hiview_set_visible(self.attr_handle, true)
+      if (!((self.attr_style & SWT::READ_ONLY)).equal?(0))
+        if (((self.attr_style & (SWT::BORDER | SWT::H_SCROLL | SWT::V_SCROLL))).equal?(0))
+          self.attr_state |= THEME_BACKGROUND
         end
       end
-    end
-    
-    typesig { [::Java::Int] }
-    def create_scroll_bar(style)
-      return create_standard_bar(style)
+      if (!((self.attr_style & SWT::SINGLE)).equal?(0))
+        widget = nil
+        if (!((self.attr_style & SWT::PASSWORD)).equal?(0))
+          widget = SWTSecureTextField.new.alloc
+        else
+          if (!((self.attr_style & SWT::SEARCH)).equal?(0))
+            widget = SWTSearchField.new.alloc
+          else
+            widget = SWTTextField.new.alloc
+          end
+        end
+        widget.init
+        widget.set_selectable(true)
+        widget.set_editable(((self.attr_style & SWT::READ_ONLY)).equal?(0))
+        if (((self.attr_style & SWT::BORDER)).equal?(0))
+          widget.set_focus_ring_type(OS::NSFocusRingTypeNone)
+          widget.set_bordered(false)
+        end
+        align = OS::NSLeftTextAlignment
+        if (!((self.attr_style & SWT::CENTER)).equal?(0))
+          align = OS::NSCenterTextAlignment
+        end
+        if (!((self.attr_style & SWT::RIGHT)).equal?(0))
+          align = OS::NSRightTextAlignment
+        end
+        widget.set_alignment(align)
+        cell_ = widget.cell
+        cell_.set_wraps(false)
+        cell_.set_scrollable(true)
+        # widget.setTarget(widget);
+        # widget.setAction(OS.sel_sendSelection);
+        self.attr_view = widget
+      else
+        scroll_widget = SWTScrollView.new.alloc
+        scroll_widget.init
+        scroll_widget.set_has_vertical_scroller(!((self.attr_style & SWT::VERTICAL)).equal?(0))
+        scroll_widget.set_has_horizontal_scroller(!((self.attr_style & SWT::HORIZONTAL)).equal?(0))
+        scroll_widget.set_autoresizes_subviews(true)
+        if (!((self.attr_style & SWT::BORDER)).equal?(0))
+          scroll_widget.set_border_type(OS::NSBezelBorder)
+        end
+        widget = SWTTextView.new.alloc
+        widget.init
+        widget.set_editable(((self.attr_style & SWT::READ_ONLY)).equal?(0))
+        size = NSSize.new
+        size.attr_width = size.attr_height = Float::MAX_VALUE
+        widget.set_max_size(size)
+        widget.set_autoresizing_mask(OS::NSViewWidthSizable | OS::NSViewHeightSizable)
+        if (((self.attr_style & SWT::WRAP)).equal?(0))
+          text_container_ = widget.text_container
+          widget.set_horizontally_resizable(true)
+          text_container_.set_width_tracks_text_view(false)
+          csize = NSSize.new
+          csize.attr_width = csize.attr_height = Float::MAX_VALUE
+          text_container_.set_container_size(csize)
+        end
+        align = OS::NSLeftTextAlignment
+        if (!((self.attr_style & SWT::CENTER)).equal?(0))
+          align = OS::NSCenterTextAlignment
+        end
+        if (!((self.attr_style & SWT::RIGHT)).equal?(0))
+          align = OS::NSRightTextAlignment
+        end
+        widget.set_alignment(align)
+        # widget.setTarget(widget);
+        # widget.setAction(OS.sel_sendSelection);
+        widget.set_rich_text(false)
+        widget.set_delegate(widget)
+        widget.set_font(self.attr_display.get_system_font.attr_handle)
+        self.attr_view = widget
+        self.attr_scroll_view = scroll_widget
+      end
     end
     
     typesig { [] }
     def create_widget
       super
       @double_click = true
-      if (!((self.attr_style & SWT::PASSWORD)).equal?(0))
-        set_echo_char(PASSWORD)
-      end
       @message = ""
     end
     
@@ -740,98 +670,81 @@ module Org::Eclipse::Swt::Widgets
           end
           if (!(new_text.length).equal?(0))
             copy_to_clipboard(old_text)
-            if ((@txn_object).equal?(0))
+            if (!((self.attr_style & SWT::SINGLE)).equal?(0))
               insert_edit_text(new_text)
             else
-              set_txntext(OS.attr_k_txnuse_current_selection, OS.attr_k_txnuse_current_selection, new_text)
-              OS._txnshow_selection(@txn_object, false)
+              widget = self.attr_view
+              widget.replace_characters_in_range(widget.selected_range, NSString.string_with(new_text))
             end
             cut = false
           end
         end
       end
       if (cut)
-        if ((@txn_object).equal?(0))
+        if (!((self.attr_style & SWT::SINGLE)).equal?(0))
           if ((old_text).nil?)
             old_text = get_edit_text(old_selection.attr_x, old_selection.attr_y - 1)
           end
           copy_to_clipboard(old_text)
           insert_edit_text("")
         else
-          OS._txncut(@txn_object)
-          # Feature in the Macintosh.  When an empty string is set in the TXNObject,
-          # the font attributes are cleared.  The fix is to reset them.
-          if ((OS._txndata_size(@txn_object) / 2).equal?(0))
-            set_font_style(self.attr_font)
-          end
+          (self.attr_view).cut(nil)
         end
       end
       new_selection = get_selection
       if (!cut || !(old_selection == new_selection))
-        send_modify_event(true)
+        send_event(SWT::Modify)
       end
     end
     
     typesig { [] }
     def default_background
-      return self.attr_display.get_system_color(SWT::COLOR_LIST_BACKGROUND)
+      return self.attr_display.get_widget_color(SWT::COLOR_LIST_BACKGROUND)
+    end
+    
+    typesig { [] }
+    def default_nsfont
+      if (!((self.attr_style & SWT::MULTI)).equal?(0))
+        return self.attr_display.attr_text_view_font
+      end
+      if (!((self.attr_style & SWT::SEARCH)).equal?(0))
+        return self.attr_display.attr_search_field_font
+      end
+      if (!((self.attr_style & SWT::PASSWORD)).equal?(0))
+        return self.attr_display.attr_secure_text_field_font
+      end
+      return self.attr_display.attr_text_field_font
     end
     
     typesig { [] }
     def default_foreground
-      return self.attr_display.get_system_color(SWT::COLOR_LIST_FOREGROUND)
+      return self.attr_display.get_widget_color(SWT::COLOR_LIST_FOREGROUND)
     end
     
     typesig { [] }
     def deregister
       super
-      if (!(@frame_handle).equal?(0))
-        self.attr_display.remove_widget(@frame_handle)
+      if (!((self.attr_style & SWT::SINGLE)).equal?(0))
+        self.attr_display.remove_widget((self.attr_view).cell)
       end
     end
     
     typesig { [::Java::Int, ::Java::Int, ::Java::Boolean, Array.typed(::Java::Boolean)] }
     def drag_detect(x, y, filter, consume)
-      if (filter)
-        selection = get_selection
-        if (!(selection.attr_x).equal?(selection.attr_y))
-          position = get_position(x, y)
-          if (selection.attr_x <= position && position < selection.attr_y)
-            if (super(x, y, filter, consume))
-              if (!(consume).nil?)
-                consume[0] = true
-              end
-              return true
+      selection = get_selection
+      if (!(selection.attr_x).equal?(selection.attr_y))
+        # long
+        position = get_position(x, y)
+        if (selection.attr_x <= position && position < selection.attr_y)
+          if (super(x, y, filter, consume))
+            if (!(consume).nil?)
+              consume[0] = true
             end
+            return true
           end
         end
-        return false
       end
-      return super(x, y, filter, consume)
-    end
-    
-    typesig { [] }
-    def focus_part
-      if (!((self.attr_style & SWT::SEARCH)).equal?(0))
-        return OS.attr_k_control_edit_text_part
-      end
-      return super
-    end
-    
-    typesig { [] }
-    def get_ax_attributes
-      return AX_ATTRIBUTES
-    end
-    
-    typesig { [] }
-    def get_border_width
-      check_widget
-      if (has_border)
-        out_metric = Array.typed(::Java::Int).new(1) { 0 }
-        OS._get_theme_metric(OS.attr_k_theme_metric_edit_text_frame_outset, out_metric)
-        return out_metric[0]
-      end
-      return 0
+      return false
     end
     
     typesig { [] }
@@ -854,6 +767,16 @@ module Org::Eclipse::Swt::Widgets
       return (get_top_pixel + get_caret_location.attr_y) / get_line_height
     end
     
+    typesig { [::Java::Int, ::Java::Int] }
+    # long
+    # long
+    def accepts_first_responder(id, sel)
+      if (!((self.attr_style & SWT::READ_ONLY)).equal?(0))
+        return true
+      end
+      return super(id, sel)
+    end
+    
     typesig { [] }
     # Returns a point describing the receiver's location relative
     # to its parent (or its display if its parent is null).
@@ -869,18 +792,28 @@ module Org::Eclipse::Swt::Widgets
     # </ul>
     def get_caret_location
       check_widget
-      if ((@txn_object).equal?(0))
-        # TODO - caret location for unicode text
+      if (!((self.attr_style & SWT::SINGLE)).equal?(0))
+        # TODO - caret location for single text
         return Point.new(0, 0)
       end
-      o_point = CGPoint.new
-      o_start_offset = Array.typed(::Java::Int).new(1) { 0 }
-      o_end_offset = Array.typed(::Java::Int).new(1) { 0 }
-      OS._txnget_selection(@txn_object, o_start_offset, o_end_offset)
-      OS._txnoffset_to_hipoint(@txn_object, o_start_offset[0], o_point)
-      o_view_rect = Rect.new
-      OS._txnget_view_rect(@txn_object, o_view_rect)
-      return Point.new(RJava.cast_to_int(o_point.attr_x) - o_view_rect.attr_left, RJava.cast_to_int(o_point.attr_y) - o_view_rect.attr_top)
+      widget = self.attr_view
+      layout_manager_ = widget.layout_manager
+      container = widget.text_container
+      range = widget.selected_range
+      # long
+      p_rect_count = OS.malloc(C::PTR_SIZEOF)
+      # long
+      p_array = layout_manager_.rect_array_for_character_range(range, range, container, p_rect_count)
+      # long
+      # long
+      rect_count = Array.typed(::Java::Int).new(1) { 0 }
+      OS.memmove(rect_count, p_rect_count, C::PTR_SIZEOF)
+      OS.free(p_rect_count)
+      rect = NSRect.new
+      if (rect_count[0] > 0)
+        OS.memmove(rect, p_array, NSRect.attr_sizeof)
+      end
+      return Point.new(RJava.cast_to_int(rect.attr_x), RJava.cast_to_int(rect.attr_y))
     end
     
     typesig { [] }
@@ -897,13 +830,14 @@ module Org::Eclipse::Swt::Widgets
     # </ul>
     def get_caret_position
       check_widget
-      if ((@txn_object).equal?(0))
-        return get_selection.attr_x
+      if (!((self.attr_style & SWT::SINGLE)).equal?(0))
+        # 64
+        return !(@selection_range).nil? ? RJava.cast_to_int(@selection_range.attr_location) : 0
+      else
+        range = (self.attr_view).selected_range
+        # 64
+        return RJava.cast_to_int(range.attr_location)
       end
-      o_start_offset = Array.typed(::Java::Int).new(1) { 0 }
-      o_end_offset = Array.typed(::Java::Int).new(1) { 0 }
-      OS._txnget_selection(@txn_object, o_start_offset, o_end_offset)
-      return o_start_offset[0]
     end
     
     typesig { [] }
@@ -917,17 +851,13 @@ module Org::Eclipse::Swt::Widgets
     # </ul>
     def get_char_count
       check_widget
-      if ((@txn_object).equal?(0))
-        ptr = Array.typed(::Java::Int).new(1) { 0 }
-        result = OS._get_control_data(self.attr_handle, RJava.cast_to_short(OS.attr_k_control_entire_control), OS.attr_k_control_edit_text_cfstring_tag, 4, ptr, nil)
-        if (!(result).equal?(OS.attr_no_err))
-          return 0
-        end
-        length_ = OS._cfstring_get_length(ptr[0])
-        OS._cfrelease(ptr[0])
-        return length_
+      if (!((self.attr_style & SWT::SINGLE)).equal?(0))
+        # 64
+        return RJava.cast_to_int(NSCell.new((self.attr_view).cell).title.length)
+      else
+        # 64
+        return RJava.cast_to_int((self.attr_view).text_storage.length)
       end
-      return OS._txndata_size(@txn_object) / 2
     end
     
     typesig { [] }
@@ -985,14 +915,54 @@ module Org::Eclipse::Swt::Widgets
     end
     
     typesig { [] }
-    def get_inset
-      if (!((self.attr_style & SWT::SEARCH)).equal?(0))
-        return self.attr_display.attr_search_text_inset
+    def get_edit_text
+      str = nil
+      if (!((self.attr_style & SWT::SINGLE)).equal?(0))
+        str = NSTextFieldCell.new((self.attr_view).cell).title
+      else
+        str = (self.attr_view).text_storage.string
       end
-      if (!(@txn_object).equal?(0))
-        return super
+      # 64
+      length_ = RJava.cast_to_int(str.length)
+      buffer = CharArray.new(length_)
+      if (!(@hidden_text).nil?)
+        @hidden_text.get_chars(0, length_, buffer, 0)
+      else
+        range = NSRange.new
+        range.attr_length = length_
+        str.get_characters(buffer, range)
       end
-      return self.attr_display.attr_edit_text_inset
+      return buffer
+    end
+    
+    typesig { [::Java::Int, ::Java::Int] }
+    def get_edit_text(start, end_)
+      str = nil
+      if (!((self.attr_style & SWT::SINGLE)).equal?(0))
+        str = NSTextFieldCell.new((self.attr_view).cell).title
+      else
+        str = (self.attr_view).text_storage.string
+      end
+      # 64
+      length_ = RJava.cast_to_int(str.length)
+      end_ = Math.min(end_, length_ - 1)
+      if (start > end_)
+        return CharArray.new(0)
+      end
+      start = Math.max(0, start)
+      range = NSRange.new
+      range.attr_location = start
+      range.attr_length = Math.max(0, end_ - start + 1)
+      # 64
+      buffer = CharArray.new(RJava.cast_to_int(range.attr_length))
+      if (!(@hidden_text).nil?)
+        # 64
+        # 64
+        @hidden_text.get_chars(RJava.cast_to_int(range.attr_location), RJava.cast_to_int((range.attr_location + range.attr_length)), buffer, 0)
+      else
+        str.get_characters(buffer, range)
+      end
+      return buffer
     end
     
     typesig { [] }
@@ -1009,9 +979,17 @@ module Org::Eclipse::Swt::Widgets
       if (!((self.attr_style & SWT::SINGLE)).equal?(0))
         return 1
       end
-      o_line_total = Array.typed(::Java::Int).new(1) { 0 }
-      OS._txnget_line_count(@txn_object, o_line_total)
-      return o_line_total[0]
+      storage = (self.attr_view).text_storage
+      # 64
+      count = RJava.cast_to_int(storage.paragraphs.count)
+      string_ = storage.string
+      # long
+      length_ = string_.length
+      c = 0
+      if ((length_).equal?(0) || ((c = string_.character_at_index(length_ - 1))).equal?(Character.new(?\n.ord)) || (c).equal?(Character.new(?\r.ord)))
+        count += 1
+      end
+      return count
     end
     
     typesig { [] }
@@ -1041,13 +1019,18 @@ module Org::Eclipse::Swt::Widgets
     # </ul>
     def get_line_height
       check_widget
-      if ((@txn_object).equal?(0))
-        return text_extent(Array.typed(::Java::Char).new([Character.new(?\s.ord)]), 0).attr_y
+      font = !(self.attr_font).nil? ? self.attr_font : default_font
+      if (!((self.attr_style & SWT::SINGLE)).equal?(0))
+        dict = NSDictionary.dictionary_with_object(font.attr_handle, OS::NSFontAttributeName)
+        str = NSString.string_with(" ")
+        attrib_str = (NSAttributedString.new.alloc).init_with_string(str, dict)
+        size_ = attrib_str.size
+        attrib_str.release
+        return RJava.cast_to_int(size_.attr_height)
+      else
+        widget = self.attr_view
+        return RJava.cast_to_int(Math.ceil(widget.layout_manager.default_line_height_for_font(font.attr_handle)))
       end
-      o_line_width = Array.typed(::Java::Int).new(1) { 0 }
-      o_line_height = Array.typed(::Java::Int).new(1) { 0 }
-      OS._txnget_line_metrics(@txn_object, 0, o_line_width, o_line_height)
-      return OS._fix2long(o_line_height[0])
     end
     
     typesig { [] }
@@ -1068,13 +1051,10 @@ module Org::Eclipse::Swt::Widgets
     end
     
     typesig { [] }
-    # Returns the widget message. When the widget is created
-    # with the style <code>SWT.SEARCH</code>, the message text
-    # is displayed as a hint for the user, indicating the
-    # purpose of the field.
+    # Returns the widget message.  The message text is displayed
+    # as a hint for the user, indicating the purpose of the field.
     # <p>
-    # Note: This operation is a <em>HINT</em> and is not
-    # supported on platforms that do not have this concept.
+    # Typically this is used in conjunction with <code>SWT.SEARCH</code>.
     # </p>
     # 
     # @return the widget message
@@ -1091,28 +1071,21 @@ module Org::Eclipse::Swt::Widgets
     end
     
     typesig { [::Java::Int, ::Java::Int] }
+    # long
+    # long
+    # long
     def get_position(x, y)
       # checkWidget ();
-      if ((@txn_object).equal?(0))
-        return -1
+      if (!((self.attr_style & SWT::MULTI)).equal?(0))
+        widget = self.attr_view
+        view_location = NSPoint.new
+        view_location.attr_x = x
+        view_location.attr_y = y
+        return widget.character_index_for_insertion_at_point(view_location)
+      else
+        # TODO
+        return 0
       end
-      o_offset = Array.typed(::Java::Int).new(1) { 0 }
-      o_view_rect = Rect.new
-      OS._txnget_view_rect(@txn_object, o_view_rect)
-      i_point = CGPoint.new
-      i_point.attr_x = x + o_view_rect.attr_left
-      i_point.attr_y = y + o_view_rect.attr_top
-      return (OS._txnhipoint_to_offset(@txn_object, i_point, o_offset)).equal?(OS.attr_no_err) ? o_offset[0] : -1
-    end
-    
-    typesig { [Point] }
-    # public
-    def get_position(point)
-      check_widget
-      if ((point).nil?)
-        error(SWT::ERROR_NULL_ARGUMENT)
-      end
-      return get_position(point.attr_x, point.attr_y)
     end
     
     typesig { [] }
@@ -1134,20 +1107,22 @@ module Org::Eclipse::Swt::Widgets
     # </ul>
     def get_selection
       check_widget
-      if ((@txn_object).equal?(0))
-        selection = nil
-        if (!(@selection).nil?)
-          selection = @selection
-        else
-          selection = ControlEditTextSelectionRec.new
-          OS._get_control_data(self.attr_handle, RJava.cast_to_short(OS.attr_k_control_entire_control), OS.attr_k_control_edit_text_selection_tag, 4, selection, nil)
+      if (!((self.attr_style & SWT::SINGLE)).equal?(0))
+        if ((@selection_range).nil?)
+          str = NSTextFieldCell.new((self.attr_view).cell).title
+          # 64
+          # 64
+          return Point.new(RJava.cast_to_int(str.length), RJava.cast_to_int(str.length))
         end
-        return Point.new(selection.attr_sel_start, selection.attr_sel_end)
+        # 64
+        # 64
+        return Point.new(RJava.cast_to_int(@selection_range.attr_location), RJava.cast_to_int((@selection_range.attr_location + @selection_range.attr_length)))
       else
-        o_start_offset = Array.typed(::Java::Int).new(1) { 0 }
-        o_end_offset = Array.typed(::Java::Int).new(1) { 0 }
-        OS._txnget_selection(@txn_object, o_start_offset, o_end_offset)
-        return Point.new(o_start_offset[0], o_end_offset[0])
+        widget = self.attr_view
+        range = widget.selected_range
+        # 64
+        # 64
+        return Point.new(RJava.cast_to_int(range.attr_location), RJava.cast_to_int((range.attr_location + range.attr_length)))
       end
     end
     
@@ -1162,14 +1137,14 @@ module Org::Eclipse::Swt::Widgets
     # </ul>
     def get_selection_count
       check_widget
-      if ((@txn_object).equal?(0))
-        selection = get_selection
-        return selection.attr_y - selection.attr_x
+      if (!((self.attr_style & SWT::SINGLE)).equal?(0))
+        # 64
+        return !(@selection_range).nil? ? RJava.cast_to_int(@selection_range.attr_length) : 0
       else
-        o_start_offset = Array.typed(::Java::Int).new(1) { 0 }
-        o_end_offset = Array.typed(::Java::Int).new(1) { 0 }
-        OS._txnget_selection(@txn_object, o_start_offset, o_end_offset)
-        return o_end_offset[0] - o_start_offset[0]
+        widget = self.attr_view
+        range = widget.selected_range
+        # 64
+        return RJava.cast_to_int(range.attr_length)
       end
     end
     
@@ -1184,14 +1159,20 @@ module Org::Eclipse::Swt::Widgets
     # </ul>
     def get_selection_text
       check_widget
-      if ((@txn_object).equal?(0))
+      if (!((self.attr_style & SWT::SINGLE)).equal?(0))
         selection = get_selection
         if ((selection.attr_x).equal?(selection.attr_y))
           return ""
         end
         return String.new(get_edit_text(selection.attr_x, selection.attr_y - 1))
       else
-        return get_txntext(OS.attr_k_txnuse_current_selection, OS.attr_k_txnuse_current_selection)
+        widget = self.attr_view
+        range = widget.selected_range
+        str = widget.text_storage.string
+        # 64
+        buffer = CharArray.new(RJava.cast_to_int(range.attr_length))
+        str.get_characters(buffer, range)
+        return String.new(buffer)
       end
     end
     
@@ -1229,11 +1210,13 @@ module Org::Eclipse::Swt::Widgets
     # </ul>
     def get_text
       check_widget
-      if ((@txn_object).equal?(0))
-        return String.new(get_edit_text(0, -1))
+      str = nil
+      if (!((self.attr_style & SWT::SINGLE)).equal?(0))
+        return String.new(get_edit_text)
       else
-        return get_txntext(OS.attr_k_txnstart_offset, OS.attr_k_txnend_offset)
+        str = (self.attr_view).text_storage.string
       end
+      return str.get_string
     end
     
     typesig { [::Java::Int, ::Java::Int] }
@@ -1255,45 +1238,25 @@ module Org::Eclipse::Swt::Widgets
     # </ul>
     def get_text(start, end_)
       check_widget
-      if ((@txn_object).equal?(0))
+      if (!(start <= end_ && 0 <= end_))
+        return ""
+      end # $NON-NLS-1$
+      if (!((self.attr_style & SWT::SINGLE)).equal?(0))
         return String.new(get_edit_text(start, end_))
-      else
-        if (!(start <= end_ && 0 <= end_))
-          return ""
-        end
-        length_ = OS._txndata_size(@txn_object) / 2
-        start = Math.max(0, start)
-        end_ = Math.min(end_, length_ - 1)
-        return get_txntext(start, end_ + 1)
       end
-    end
-    
-    typesig { [::Java::Int, ::Java::Int] }
-    def get_edit_text(start, end_)
-      ptr = Array.typed(::Java::Int).new(1) { 0 }
-      actual_size = Array.typed(::Java::Int).new(1) { 0 }
-      result = OS._get_control_data(self.attr_handle, RJava.cast_to_short(OS.attr_k_control_entire_control), OS.attr_k_control_edit_text_cfstring_tag, 4, ptr, actual_size)
-      if (!(result).equal?(OS.attr_no_err))
-        return CharArray.new(0)
-      end
-      length_ = OS._cfstring_get_length(ptr[0])
-      range = CFRange.new
-      start = Math.min(Math.max(0, start), length_)
+      storage = (self.attr_view).text_storage
+      # 64
+      end_ = Math.min(end_, RJava.cast_to_int(storage.length) - 1)
+      if (start > end_)
+        return ""
+      end # $NON-NLS-1$
+      start = Math.max(0, start)
+      range = NSRange.new
       range.attr_location = start
-      if ((end_).equal?(-1))
-        range.attr_length = Math.max(0, length_ - start)
-      else
-        end_ = Math.min(Math.max(0, end_), length_ - 1)
-        range.attr_length = Math.max(0, end_ - start + 1)
-      end
-      buffer = CharArray.new(range.attr_length)
-      if (!(@hidden_text).nil?)
-        @hidden_text.get_chars(range.attr_location, range.attr_location + range.attr_length, buffer, 0)
-      else
-        OS._cfstring_get_characters(ptr[0], range, buffer)
-      end
-      OS._cfrelease(ptr[0])
-      return buffer
+      range.attr_length = end_ - start + 1
+      substring = storage.attributed_substring_from_range(range)
+      string_ = substring.string
+      return string_.get_string
     end
     
     typesig { [] }
@@ -1361,82 +1324,7 @@ module Org::Eclipse::Swt::Widgets
       if (!((self.attr_style & SWT::SINGLE)).equal?(0))
         return 0
       end
-      rect = CGRect.new
-      OS._txnget_hirect(@txn_object, OS.attr_k_txndestination_rect_key, rect)
-      dest_y = RJava.cast_to_int(rect.attr_y)
-      OS._txnget_hirect(@txn_object, OS.attr_k_txntext_rect_key, rect)
-      return dest_y - RJava.cast_to_int(rect.attr_y)
-    end
-    
-    typesig { [::Java::Int, ::Java::Int] }
-    def get_txnchars(i_start_offset, i_end_offset)
-      o_data_handle = Array.typed(::Java::Int).new(1) { 0 }
-      OS._txnget_data(@txn_object, i_start_offset, i_end_offset, o_data_handle)
-      if ((o_data_handle[0]).equal?(0))
-        return CharArray.new(0)
-      end
-      length_ = OS._get_handle_size(o_data_handle[0])
-      if ((length_).equal?(0))
-        return CharArray.new(0)
-      end
-      ptr = Array.typed(::Java::Int).new(1) { 0 }
-      OS._hlock(o_data_handle[0])
-      OS.memmove(ptr, o_data_handle[0], 4)
-      buffer = CharArray.new(length_ / 2)
-      OS.memmove(buffer, ptr[0], length_)
-      OS._hunlock(o_data_handle[0])
-      OS._dispose_handle(o_data_handle[0])
-      return buffer
-    end
-    
-    typesig { [::Java::Int, ::Java::Int] }
-    def get_txntext(i_start_offset, i_end_offset)
-      return String.new(get_txnchars(i_start_offset, i_end_offset))
-    end
-    
-    typesig { [] }
-    def hook_events
-      super
-      if (!((self.attr_style & SWT::SEARCH)).equal?(0))
-        search_proc = self.attr_display.attr_search_proc
-        mask = Array.typed(::Java::Int).new([OS.attr_k_event_class_search_field, OS.attr_k_event_search_field_cancel_clicked, ])
-        control_target = OS._get_control_event_target(self.attr_handle)
-        OS._install_event_handler(control_target, search_proc, mask.attr_length / 2, mask, self.attr_handle, nil)
-      end
-      if (!(@frame_handle).equal?(0))
-        control_proc = self.attr_display.attr_control_proc
-        mask = Array.typed(::Java::Int).new([OS.attr_k_event_class_control, OS.attr_k_event_control_draw, ])
-        control_target = OS._get_control_event_target(@frame_handle)
-        OS._install_event_handler(control_target, control_proc, mask.attr_length / 2, mask, @frame_handle, nil)
-      end
-    end
-    
-    typesig { [] }
-    def inset
-      if (!((self.attr_style & SWT::SEARCH)).equal?(0))
-        return super
-      end
-      if (!((self.attr_style & SWT::SINGLE)).equal?(0) && ((self.attr_style & SWT::BORDER)).equal?(0))
-        rect = Rect.new
-        rect.attr_left = rect.attr_top = rect.attr_right = rect.attr_bottom = 1
-        return rect
-      end
-      if (!((self.attr_style & SWT::MULTI)).equal?(0) && !((self.attr_style & SWT::BORDER)).equal?(0))
-        out_metric = Array.typed(::Java::Int).new(1) { 0 }
-        OS._get_theme_metric(OS.attr_k_theme_metric_focus_rect_outset, out_metric)
-        rect = Rect.new
-        rect.attr_left += out_metric[0]
-        rect.attr_top += out_metric[0]
-        rect.attr_right += out_metric[0]
-        rect.attr_bottom += out_metric[0]
-        OS._get_theme_metric(OS.attr_k_theme_metric_edit_text_frame_outset, out_metric)
-        rect.attr_left += out_metric[0]
-        rect.attr_top += out_metric[0]
-        rect.attr_right += out_metric[0]
-        rect.attr_bottom += out_metric[0]
-        return rect
-      end
-      return Rect.new
+      return RJava.cast_to_int(self.attr_scroll_view.content_view.bounds.attr_y)
     end
     
     typesig { [String] }
@@ -1454,32 +1342,34 @@ module Org::Eclipse::Swt::Widgets
     # <li>ERROR_WIDGET_DISPOSED - if the receiver has been disposed</li>
     # <li>ERROR_THREAD_INVALID_ACCESS - if not called from the thread that created the receiver</li>
     # </ul>
-    def insert(string)
+    def insert(string_)
       check_widget
-      if ((string).nil?)
+      if ((string_).nil?)
         error(SWT::ERROR_NULL_ARGUMENT)
       end
       if (hooks(SWT::Verify) || filters(SWT::Verify))
         selection = get_selection
-        string = RJava.cast_to_string(verify_text(string, selection.attr_x, selection.attr_y, nil))
-        if ((string).nil?)
+        string_ = RJava.cast_to_string(verify_text(string_, selection.attr_x, selection.attr_y, nil))
+        if ((string_).nil?)
           return
         end
       end
-      if ((@txn_object).equal?(0))
-        insert_edit_text(string)
+      if (!((self.attr_style & SWT::SINGLE)).equal?(0))
+        insert_edit_text(string_)
       else
-        set_txntext(OS.attr_k_txnuse_current_selection, OS.attr_k_txnuse_current_selection, string)
-        OS._txnshow_selection(@txn_object, false)
+        str = NSString.string_with(string_)
+        widget = self.attr_view
+        range = widget.selected_range
+        widget.text_storage.replace_characters_in_range(range, str)
       end
-      if (!(string.length).equal?(0))
-        send_modify_event(true)
+      if (!(string_.length).equal?(0))
+        send_event(SWT::Modify)
       end
     end
     
     typesig { [String] }
-    def insert_edit_text(string)
-      length_ = string.length
+    def insert_edit_text(string_)
+      length_ = string_.length
       selection = get_selection
       if (has_focus && (@hidden_text).nil?)
         if (!(@text_limit).equal?(LIMIT))
@@ -1489,223 +1379,34 @@ module Org::Eclipse::Swt::Widgets
           end
         end
         buffer = CharArray.new(length_)
-        string.get_chars(0, buffer.attr_length, buffer, 0)
-        ptr = OS._cfstring_create_with_characters(OS.attr_k_cfallocator_default, buffer, buffer.attr_length)
-        if ((ptr).equal?(0))
-          error(SWT::ERROR_CANNOT_SET_TEXT)
+        string_.get_chars(0, buffer.attr_length, buffer, 0)
+        nsstring = NSString.string_with_characters(buffer, buffer.attr_length)
+        field_editor = (self.attr_view).current_editor
+        if (!(field_editor).nil?)
+          field_editor.replace_characters_in_range(field_editor.selected_range, nsstring)
         end
-        OS._set_control_data(self.attr_handle, OS.attr_k_control_entire_control, OS.attr_k_control_edit_text_insert_cfstring_ref_tag, 4, Array.typed(::Java::Int).new([ptr]))
-        OS._cfrelease(ptr)
+        @selection_range = nil
       else
         old_text = get_text
         if (!(@text_limit).equal?(LIMIT))
           char_count = old_text.length
           if (char_count - (selection.attr_y - selection.attr_x) + length_ > @text_limit)
-            string = RJava.cast_to_string(string.substring(0, @text_limit - char_count + (selection.attr_y - selection.attr_x)))
+            string_ = RJava.cast_to_string(string_.substring(0, @text_limit - char_count + (selection.attr_y - selection.attr_x)))
           end
         end
-        new_text = RJava.cast_to_string(old_text.substring(0, selection.attr_x)) + string + RJava.cast_to_string(old_text.substring(selection.attr_y))
+        new_text = RJava.cast_to_string(old_text.substring(0, selection.attr_x)) + string_ + RJava.cast_to_string(old_text.substring(selection.attr_y))
         set_edit_text(new_text)
-        set_selection(selection.attr_x + string.length)
+        set_selection(selection.attr_x + string_.length)
       end
     end
     
-    typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
-    def k_event_accessible_get_named_attribute(next_handler, the_event, user_data)
-      code = OS.attr_event_not_handled_err
-      if (!(@txn_object).equal?(0))
-        string_ref = Array.typed(::Java::Int).new(1) { 0 }
-        OS._get_event_parameter(the_event, OS.attr_k_event_param_accessible_attribute_name, OS.attr_type_cfstring_ref, nil, 4, nil, string_ref)
-        length_ = 0
-        if (!(string_ref[0]).equal?(0))
-          length_ = OS._cfstring_get_length(string_ref[0])
-        end
-        buffer = CharArray.new(length_)
-        range = CFRange.new
-        range.attr_length = length_
-        OS._cfstring_get_characters(string_ref[0], range, buffer)
-        attribute_name = String.new(buffer)
-        if ((attribute_name == OS.attr_k_axrole_attribute) || (attribute_name == OS.attr_k_axrole_description_attribute))
-          role_text = !((self.attr_style & SWT::MULTI)).equal?(0) ? OS.attr_k_axtext_area_role : OS.attr_k_axtext_field_role
-          buffer = CharArray.new(role_text.length)
-          role_text.get_chars(0, buffer.attr_length, buffer, 0)
-          string_ref[0] = OS._cfstring_create_with_characters(OS.attr_k_cfallocator_default, buffer, buffer.attr_length)
-          if (!(string_ref[0]).equal?(0))
-            if ((attribute_name == OS.attr_k_axrole_attribute))
-              OS._set_event_parameter(the_event, OS.attr_k_event_param_accessible_attribute_value, OS.attr_type_cfstring_ref, 4, string_ref)
-            else
-              # kAXRoleDescriptionAttribute
-              string_ref2 = OS._hicopy_accessibility_role_description(string_ref[0], 0)
-              OS._set_event_parameter(the_event, OS.attr_k_event_param_accessible_attribute_value, OS.attr_type_cfstring_ref, 4, Array.typed(::Java::Int).new([string_ref2]))
-              OS._cfrelease(string_ref2)
-            end
-            OS._cfrelease(string_ref[0])
-            code = OS.attr_no_err
-          end
-        else
-          if (OS::VERSION < 0x1050 && (attribute_name == OS.attr_k_axfocused_attribute))
-            OS._set_event_parameter(the_event, OS.attr_k_event_param_accessible_attribute_value, OS.attr_type_boolean, 4, Array.typed(::Java::Boolean).new([has_focus]))
-            code = OS.attr_no_err
-          else
-            if ((attribute_name == OS.attr_k_axtitle_attribute))
-              # Feature of the Macintosh.  For some reason, AXTextFields return their text contents
-              # when they are asked for their title.  Since they also return their text contents
-              # when they are asked for their value, this causes screen readers to speak the text
-              # twice.  The fix is to return nothing when asked for a title.
-              code = OS.attr_no_err
-            else
-              if ((attribute_name == OS.attr_k_axvalue_attribute))
-                buffer = get_txnchars(OS.attr_k_txnstart_offset, OS.attr_k_txnend_offset)
-                string_ref[0] = OS._cfstring_create_with_characters(OS.attr_k_cfallocator_default, buffer, buffer.attr_length)
-                if (!(string_ref[0]).equal?(0))
-                  OS._set_event_parameter(the_event, OS.attr_k_event_param_accessible_attribute_value, OS.attr_type_cfstring_ref, 4, string_ref)
-                  OS._cfrelease(string_ref[0])
-                  code = OS.attr_no_err
-                end
-              else
-                if ((attribute_name == OS.attr_k_axnumber_of_characters_attribute))
-                  OS._set_event_parameter(the_event, OS.attr_k_event_param_accessible_attribute_value, OS.attr_type_sint32, 4, Array.typed(::Java::Int).new([get_char_count]))
-                  code = OS.attr_no_err
-                else
-                  if ((attribute_name == OS.attr_k_axselected_text_attribute))
-                    sel = get_selection
-                    buffer = get_txnchars(sel.attr_x, sel.attr_y)
-                    string_ref[0] = OS._cfstring_create_with_characters(OS.attr_k_cfallocator_default, buffer, buffer.attr_length)
-                    if (!(string_ref[0]).equal?(0))
-                      OS._set_event_parameter(the_event, OS.attr_k_event_param_accessible_attribute_value, OS.attr_type_cfstring_ref, 4, string_ref)
-                      OS._cfrelease(string_ref[0])
-                      code = OS.attr_no_err
-                    end
-                  else
-                    if ((attribute_name == OS.attr_k_axselected_text_range_attribute))
-                      sel = get_selection
-                      range = CFRange.new
-                      range.attr_location = sel.attr_x
-                      range.attr_length = sel.attr_y - sel.attr_x
-                      value_ref = OS._axvalue_create(OS.attr_k_axvalue_cfrange_type, range)
-                      OS._set_event_parameter(the_event, OS.attr_k_event_param_accessible_attribute_value, OS.attr_type_cftype_ref, 4, Array.typed(::Java::Int).new([value_ref]))
-                      OS._cfrelease(value_ref)
-                      code = OS.attr_no_err
-                    else
-                      if ((attribute_name == OS.attr_k_axstring_for_range_parameterized_attribute))
-                        value_ref = Array.typed(::Java::Int).new(1) { 0 }
-                        status = OS._get_event_parameter(the_event, OS.attr_k_event_param_accessible_attribute_parameter, OS.attr_type_cftype_ref, nil, 4, nil, value_ref)
-                        if ((status).equal?(OS.attr_no_err))
-                          range = CFRange.new
-                          ok = OS._axvalue_get_value(value_ref[0], OS.attr_k_axvalue_cfrange_type, range)
-                          if (ok)
-                            buffer = get_txnchars(range.attr_location, range.attr_location + range.attr_length)
-                            string_ref[0] = OS._cfstring_create_with_characters(OS.attr_k_cfallocator_default, buffer, buffer.attr_length)
-                            if (!(string_ref[0]).equal?(0))
-                              OS._set_event_parameter(the_event, OS.attr_k_event_param_accessible_attribute_value, OS.attr_type_cfstring_ref, 4, string_ref)
-                              OS._cfrelease(string_ref[0])
-                              code = OS.attr_no_err
-                            end
-                          end
-                        end
-                      end
-                    end
-                  end
-                end
-              end
-            end
-          end
-        end
+    typesig { [::Java::Int] }
+    # long
+    def is_event_view(id)
+      if (!((self.attr_style & SWT::MULTI)).equal?(0))
+        return super(id)
       end
-      if (!(self.attr_accessible).nil?)
-        code = self.attr_accessible.internal_k_event_accessible_get_named_attribute(next_handler, the_event, code)
-      end
-      return code
-    end
-    
-    typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
-    def k_event_mouse_down(next_handler, the_event, user_data)
-      result = super(next_handler, the_event, user_data)
-      if ((result).equal?(OS.attr_no_err))
-        return result
-      end
-      if (!@double_click)
-        click_count = Array.typed(::Java::Int).new(1) { 0 }
-        OS._get_event_parameter(the_event, OS.attr_k_event_param_click_count, OS.attr_type_uint32, nil, 4, nil, click_count)
-        if (click_count[0] > 1)
-          return OS.attr_no_err
-        end
-      end
-      return result
-    end
-    
-    typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
-    def k_event_search_field_cancel_clicked(next_handler, the_event, user_data)
-      result = super(next_handler, the_event, user_data)
-      if ((result).equal?(OS.attr_no_err))
-        return result
-      end
-      set_text("")
-      event = Event.new
-      event.attr_detail = SWT::CANCEL
-      post_event(SWT::DefaultSelection, event)
-      return result
-    end
-    
-    typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
-    def k_event_unicode_key_pressed(next_handler, the_event, user_data)
-      result = super(next_handler, the_event, user_data)
-      if ((result).equal?(OS.attr_no_err))
-        return result
-      end
-      keyboard_event = Array.typed(::Java::Int).new(1) { 0 }
-      OS._get_event_parameter(the_event, OS.attr_k_event_param_text_input_send_keyboard_event, OS.attr_type_event_ref, nil, keyboard_event.attr_length * 4, nil, keyboard_event)
-      modifiers = Array.typed(::Java::Int).new(1) { 0 }
-      OS._get_event_parameter(keyboard_event[0], OS.attr_k_event_param_key_modifiers, OS.attr_type_uint32, nil, 4, nil, modifiers)
-      if ((modifiers[0]).equal?(OS.attr_cmd_key))
-        key_code = Array.typed(::Java::Int).new(1) { 0 }
-        OS._get_event_parameter(keyboard_event[0], OS.attr_k_event_param_key_code, OS.attr_type_uint32, nil, key_code.attr_length * 4, nil, key_code)
-        case (key_code[0])
-        when 7
-          # X
-          cut
-          return OS.attr_no_err
-        when 8
-          # C
-          copy
-          return OS.attr_no_err
-        when 9
-          # V
-          paste
-          return OS.attr_no_err
-        end
-      end
-      if (!((self.attr_style & SWT::SINGLE)).equal?(0))
-        key_code = Array.typed(::Java::Int).new(1) { 0 }
-        OS._get_event_parameter(keyboard_event[0], OS.attr_k_event_param_key_code, OS.attr_type_uint32, nil, key_code.attr_length * 4, nil, key_code)
-        case (key_code[0])
-        # Feature in the Macintosh.  Tab and Return characters are inserted into a
-        # single line TXN Object.  While this may be correct platform behavior, it is
-        # unexpected.  The fix is to avoid calling the default handler.
-        # 
-        # KP Enter
-        when 76, 36
-          # Return
-          post_event(SWT::DefaultSelection)
-          return OS.attr_no_err
-        when 48
-          # Tab
-          return OS.attr_no_err
-        end
-      end
-      return result
-    end
-    
-    typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
-    def k_event_text_input_update_active_input_area(next_handler, the_event, user_data)
-      length_ = Array.typed(::Java::Int).new(1) { 0 }
-      OS._get_event_parameter(the_event, OS.attr_k_event_param_text_input_send_text, OS.attr_type_unicode_text, nil, 0, length_, nil)
-      fixed_length = Array.typed(::Java::Int).new(1) { 0 }
-      OS._get_event_parameter(the_event, OS.attr_k_event_param_text_input_send_fix_len, OS.attr_type_long_integer, nil, 4, nil, fixed_length)
-      if ((fixed_length[0]).equal?(-1) || (fixed_length[0]).equal?(length_[0]))
-        send_modify_event(false)
-      end
-      return OS.attr_event_not_handled_err
+      return true
     end
     
     typesig { [] }
@@ -1724,7 +1425,7 @@ module Org::Eclipse::Swt::Widgets
       if (!((self.attr_style & SWT::READ_ONLY)).equal?(0))
         return
       end
-      paste_ = true
+      paste = true
       old_text = nil
       if (hooks(SWT::Verify) || filters(SWT::Verify))
         old_text = RJava.cast_to_string(get_clipboard_text)
@@ -1735,55 +1436,49 @@ module Org::Eclipse::Swt::Widgets
             return
           end
           if (!(new_text == old_text))
-            if ((@txn_object).equal?(0))
+            if (!((self.attr_style & SWT::SINGLE)).equal?(0))
               insert_edit_text(new_text)
             else
-              set_txntext(OS.attr_k_txnuse_current_selection, OS.attr_k_txnuse_current_selection, new_text)
-              OS._txnshow_selection(@txn_object, false)
+              text_view = self.attr_view
+              text_view.replace_characters_in_range(text_view.selected_range, NSString.string_with(new_text))
             end
-            paste_ = false
+            paste = false
           end
         end
       end
-      if (paste_)
-        if ((@txn_object).equal?(0))
+      if (paste)
+        if (!((self.attr_style & SWT::SINGLE)).equal?(0))
           if ((old_text).nil?)
             old_text = RJava.cast_to_string(get_clipboard_text)
           end
+          if ((old_text).nil?)
+            return
+          end
           insert_edit_text(old_text)
         else
-          if (!(@text_limit).equal?(LIMIT))
-            if ((old_text).nil?)
-              old_text = RJava.cast_to_string(get_clipboard_text)
-            end
-            set_txntext(OS.attr_k_txnuse_current_selection, OS.attr_k_txnuse_current_selection, old_text)
-            OS._txnshow_selection(@txn_object, false)
-          else
-            OS._txnpaste(@txn_object)
-          end
+          # TODO check text limit
+          (self.attr_view).paste(nil)
         end
       end
-      send_modify_event(true)
-    end
-    
-    typesig { [] }
-    def poll_track_event
-      return true
+      send_event(SWT::Modify)
     end
     
     typesig { [] }
     def register
       super
-      if (!(@frame_handle).equal?(0))
-        self.attr_display.add_widget(@frame_handle, self)
+      if (!((self.attr_style & SWT::SINGLE)).equal?(0))
+        self.attr_display.add_widget((self.attr_view).cell, self)
       end
     end
     
     typesig { [] }
     def release_widget
       super
-      @txn_object = 0
+      if (!((self.attr_style & SWT::SINGLE)).equal?(0))
+        (self.attr_view).abort_editing
+      end
       @hidden_text = RJava.cast_to_string(@message = RJava.cast_to_string(nil))
+      @selection_range = nil
     end
     
     typesig { [ModifyListener] }
@@ -1877,193 +1572,103 @@ module Org::Eclipse::Swt::Widgets
     # </ul>
     def select_all
       check_widget
-      if ((@txn_object).equal?(0))
+      if (!((self.attr_style & SWT::SINGLE)).equal?(0))
         set_selection(0, get_char_count)
       else
-        OS._txnselect_all(@txn_object)
+        (self.attr_view).select_all(nil)
       end
     end
     
-    typesig { [::Java::Int, Event] }
-    def send_key_event(type, event)
-      if (!super(type, event))
-        return false
+    typesig { [NSEvent, ::Java::Int] }
+    def send_key_event(ns_event, type)
+      result = super(ns_event, type)
+      if (!result)
+        return result
       end
       if (!(type).equal?(SWT::KeyDown))
-        return true
+        return result
       end
-      if (!((self.attr_style & SWT::READ_ONLY)).equal?(0))
-        return true
+      state_mask = 0
+      # long
+      modifier_flags_ = ns_event.modifier_flags
+      if (!((modifier_flags_ & OS::NSAlternateKeyMask)).equal?(0))
+        state_mask |= SWT::ALT
       end
-      if ((event.attr_character).equal?(0))
-        return true
+      if (!((modifier_flags_ & OS::NSShiftKeyMask)).equal?(0))
+        state_mask |= SWT::SHIFT
       end
-      if (!((event.attr_state_mask & SWT::COMMAND)).equal?(0))
-        return true
+      if (!((modifier_flags_ & OS::NSControlKeyMask)).equal?(0))
+        state_mask |= SWT::CONTROL
       end
-      old_text = ""
-      char_count = get_char_count
-      selection = get_selection
-      start = selection.attr_x
-      end_ = selection.attr_y
-      case (event.attr_character)
-      when SWT::BS
-        if ((start).equal?(end_))
-          if ((start).equal?(0))
-            return true
-          end
-          start = Math.max(0, start - 1)
+      if (!((modifier_flags_ & OS::NSCommandKeyMask)).equal?(0))
+        state_mask |= SWT::COMMAND
+      end
+      if ((state_mask).equal?(SWT::COMMAND))
+        key_code_ = ns_event.key_code
+        case (key_code_)
+        when 7
+          # X
+          cut
+          return false
+        when 8
+          # C
+          copy
+          return false
+        when 9
+          # V
+          paste
+          return false
         end
-      when SWT::DEL
-        if ((start).equal?(end_))
-          if ((start).equal?(char_count))
-            return true
-          end
-          end_ = Math.min(end_ + 1, char_count)
+      end
+      if (!((self.attr_style & SWT::SINGLE)).equal?(0))
+        key_code_ = ns_event.key_code
+        case (key_code_)
+        # KP Enter
+        when 76, 36
+          # Return
+          post_event(SWT::DefaultSelection)
         end
-      when SWT::CR
-        if (!((self.attr_style & SWT::SINGLE)).equal?(0))
-          return true
-        end
-        old_text = DELIMITER
+      end
+      return result
+    end
+    
+    typesig { [] }
+    def send_search_selection
+      if (!(@target_search).nil?)
+        (self.attr_view).send_action(@action_search, @target_search)
+      end
+      event = Event.new
+      event.attr_detail = SWT::ICON_SEARCH
+      post_event(SWT::DefaultSelection, event)
+    end
+    
+    typesig { [] }
+    def send_cancel_selection
+      if (!(@target_cancel).nil?)
+        (self.attr_view).send_action(@action_cancel, @target_cancel)
+      end
+      event = Event.new
+      event.attr_detail = SWT::ICON_CANCEL
+      post_event(SWT::DefaultSelection, event)
+    end
+    
+    typesig { [] }
+    def update_background
+      ns_color = nil
+      if (!(self.attr_background_image).nil?)
+        ns_color = NSColor.color_with_pattern_image(self.attr_background_image.attr_handle)
       else
-        if (!(event.attr_character).equal?(Character.new(?\t.ord)) && event.attr_character < 0x20)
-          return true
-        end
-        old_text = RJava.cast_to_string(String.new(Array.typed(::Java::Char).new([event.attr_character])))
-      end
-      new_text = verify_text(old_text, start, end_, event)
-      if ((new_text).nil?)
-        return false
-      end
-      if (char_count - (end_ - start) + new_text.length > @text_limit)
-        return false
-      end
-      result = (new_text).equal?(old_text)
-      if (!(new_text).equal?(old_text) || !(@hidden_text).nil?)
-        if ((@txn_object).equal?(0))
-          text = String.new(get_edit_text(0, -1))
-          left_text = text.substring(0, start)
-          right_text = text.substring(end_, text.length)
-          set_edit_text(left_text + new_text + right_text)
-          start += new_text.length
-          set_selection(Point.new(start, start))
-          result = false
+        if (!(self.attr_background).nil?)
+          ns_color = NSColor.color_with_device_red(self.attr_background[0], self.attr_background[1], self.attr_background[2], self.attr_background[3])
         else
-          set_txntext(start, end_, new_text)
+          ns_color = NSColor.text_background_color
         end
       end
-      # Post the modify event so that the character will be inserted
-      # into the widget when the modify event is delivered.  Normally,
-      # modify events are sent but it is safe to post the event here
-      # because this method is called from the event loop.
-      send_modify_event(false)
-      return result
-    end
-    
-    typesig { [::Java::Boolean] }
-    def send_modify_event(send)
-      string = OS.attr_k_axselected_text_changed_notification
-      buffer = CharArray.new(string.length)
-      string.get_chars(0, buffer.attr_length, buffer, 0)
-      string_ref = OS._cfstring_create_with_characters(OS.attr_k_cfallocator_default, buffer, buffer.attr_length)
-      OS._axnotification_hiobject_notify(string_ref, self.attr_handle, 0)
-      OS._cfrelease(string_ref)
-      string = RJava.cast_to_string(OS.attr_k_axvalue_changed_notification)
-      buffer = CharArray.new(string.length)
-      string.get_chars(0, buffer.attr_length, buffer, 0)
-      string_ref = OS._cfstring_create_with_characters(OS.attr_k_cfallocator_default, buffer, buffer.attr_length)
-      OS._axnotification_hiobject_notify(string_ref, self.attr_handle, 0)
-      OS._cfrelease(string_ref)
-      if (send)
-        send_event(SWT::Modify)
+      if (!((self.attr_style & SWT::SINGLE)).equal?(0))
+        (self.attr_view).set_background_color(ns_color)
       else
-        post_event(SWT::Modify)
+        (self.attr_view).set_background_color(ns_color)
       end
-    end
-    
-    typesig { [Array.typed(::Java::Float)] }
-    def set_background(color)
-      if ((@txn_object).equal?(0))
-        super(color)
-      else
-        colorspace = OS._cgcolor_space_create_device_rgb
-        color_ref = OS._cgcolor_create(colorspace, color)
-        OS._hitext_view_set_background_color(self.attr_handle, color_ref)
-        OS._cgcolor_release(color_ref)
-        OS._cgcolor_space_release(colorspace)
-      end
-    end
-    
-    typesig { [::Java::Int, Array.typed(::Java::Float)] }
-    def set_background(control, color)
-      # Bug in the Macintosh. For some reason, when the same background
-      # color is set in two instances of an EditUnicodeTextControl, the
-      # color is not set in the second instance.  It seems that the edit
-      # control is checking globally that the last color that was set is the
-      # same.  The fix is to ensure the that the color that is about to
-      # be set is not the same as the last globally remembered color by
-      # first setting it to black, then white and finally the color.
-      if ((self.attr_handle).equal?(control))
-        font_style = ControlFontStyleRec.new
-        OS._get_control_data(control, RJava.cast_to_short(OS.attr_k_control_entire_control), OS.attr_k_control_font_style_tag, ControlFontStyleRec.attr_sizeof, font_style, nil)
-        font_style.attr_flags |= OS.attr_k_control_use_back_color_mask
-        OS._set_control_font_style(control, font_style)
-        font_style.attr_back_color_red = font_style.attr_back_color_green = font_style.attr_back_color_blue = RJava.cast_to_short(0xffff)
-        OS._set_control_font_style(control, font_style)
-      end
-      super(control, color)
-    end
-    
-    typesig { [::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Boolean, ::Java::Boolean, ::Java::Boolean] }
-    def set_bounds(x, y, width, height, move, resize, events)
-      bounds = nil
-      if ((@txn_object).equal?(0) && resize)
-        bounds = get_bounds
-      end
-      result = super(x, y, width, height, move, resize, events)
-      if (!(bounds).nil? && !((result & RESIZED)).equal?(0))
-        # Feature in the Macintosh.  When the caret is moved,
-        # the text widget scrolls to show the new location.
-        # This means that the text widget may be scrolled
-        # to the right in order to show the caret when the
-        # widget is not large enough to show both the caret
-        # location and all the text.  Unfortunately, when
-        # the text widget is resized such that all the text
-        # and the caret could be visible, Macintosh does not
-        # scroll the widget back.  The fix is to reset the
-        # selection or the text depend on if the widget
-        # is on focus or not.
-        inset_ = get_inset
-        min_width = inset_.attr_left + inset_.attr_right
-        if (bounds.attr_width <= min_width && width > min_width)
-          if (has_focus)
-            selection = ControlEditTextSelectionRec.new
-            if ((OS._get_control_data(self.attr_handle, RJava.cast_to_short(OS.attr_k_control_entire_control), OS.attr_k_control_edit_text_selection_tag, 4, selection, nil)).equal?(OS.attr_no_err))
-              OS._set_control_data(self.attr_handle, OS.attr_k_control_entire_control, OS.attr_k_control_edit_text_selection_tag, 4, selection)
-            end
-          else
-            ptr = Array.typed(::Java::Int).new(1) { 0 }
-            if ((OS._get_control_data(self.attr_handle, RJava.cast_to_short(OS.attr_k_control_entire_control), OS.attr_k_control_edit_text_cfstring_tag, 4, ptr, nil)).equal?(OS.attr_no_err))
-              OS._set_control_data(self.attr_handle, OS.attr_k_control_entire_control, OS.attr_k_control_edit_text_cfstring_tag, 4, ptr)
-            end
-            if (!(ptr[0]).equal?(0))
-              OS._cfrelease(ptr[0])
-            end
-          end
-        end
-      end
-      # Bug in the Macintosh.  HIScrollViewCreate() fails if no scroll bit is
-      # specified. In order to get horizontal scrolling in a single line text, a
-      # scroll view is created with the vertical bit set and the scroll bars
-      # are set to auto hide.  But calling HIScrollViewSetScrollBarAutoHide()
-      # before the view has been resized still leaves space for the vertical
-      # scroll bar.  The fix is to call HIScrollViewSetScrollBarAutoHide()
-      # once the widget has been resized.
-      if (!(self.attr_scrolled_handle).equal?(0) && ((self.attr_style & (SWT::H_SCROLL | SWT::V_SCROLL))).equal?(0))
-        OS._hiscroll_view_set_scroll_bar_auto_hide(self.attr_scrolled_handle, true)
-      end
-      return result
     end
     
     typesig { [::Java::Boolean] }
@@ -2113,16 +1718,12 @@ module Org::Eclipse::Swt::Widgets
       if (!((self.attr_style & SWT::MULTI)).equal?(0))
         return
       end
-      if ((@txn_object).equal?(0))
-        if (((self.attr_style & SWT::PASSWORD)).equal?(0))
-          selection = get_selection
-          text = get_text
-          @echo_character = echo
-          set_edit_text(text)
-          set_selection(selection)
-        end
-      else
-        OS._txnecho_mode(@txn_object, echo, OS.attr_k_text_encoding_mac_unicode, !(echo).equal?(Character.new(?\0.ord)))
+      if (((self.attr_style & SWT::PASSWORD)).equal?(0))
+        selection = get_selection
+        text = get_text
+        @echo_character = echo
+        set_edit_text(text)
+        set_selection(selection)
       end
       @echo_character = echo
     end
@@ -2143,72 +1744,56 @@ module Org::Eclipse::Swt::Widgets
       else
         self.attr_style |= SWT::READ_ONLY
       end
-      if ((@txn_object).equal?(0))
-        OS._set_control_data(self.attr_handle, OS.attr_k_control_entire_control, OS.attr_k_control_edit_text_locked_tag, 1, Array.typed(::Java::Byte).new([(!((self.attr_style & SWT::READ_ONLY)).equal?(0) ? 1 : 0)]))
+      if (!((self.attr_style & SWT::SINGLE)).equal?(0))
+        (self.attr_view).set_editable(editable)
       else
-        OS._txnset_txnobject_controls(@txn_object, false, 1, Array.typed(::Java::Int).new([OS.attr_k_txnioprivileges_tag]), Array.typed(::Java::Int).new([(!((self.attr_style & SWT::READ_ONLY)).equal?(0)) ? 1 : 0]))
+        (self.attr_view).set_editable(editable)
       end
+    end
+    
+    typesig { [String] }
+    def set_edit_text(string_)
+      buffer = nil
+      if (((self.attr_style & SWT::PASSWORD)).equal?(0) && !(@echo_character).equal?(Character.new(?\0.ord)))
+        @hidden_text = string_
+        buffer = CharArray.new(Math.min(@hidden_text.length, @text_limit))
+        i = 0
+        while i < buffer.attr_length
+          buffer[i] = @echo_character
+          i += 1
+        end
+      else
+        @hidden_text = RJava.cast_to_string(nil)
+        buffer = CharArray.new(Math.min(string_.length, @text_limit))
+        string_.get_chars(0, buffer.attr_length, buffer, 0)
+      end
+      nsstring = NSString.string_with_characters(buffer, buffer.attr_length)
+      NSCell.new((self.attr_view).cell).set_title(nsstring)
+      @selection_range = nil
+    end
+    
+    typesig { [NSFont] }
+    def set_font(font)
+      if (!((self.attr_style & SWT::MULTI)).equal?(0))
+        (self.attr_view).set_font(font)
+        return
+      end
+      super(font)
     end
     
     typesig { [Array.typed(::Java::Float)] }
+    # double
     def set_foreground(color)
-      if ((@txn_object).equal?(0))
-        super(color)
+      ns_color = nil
+      if ((color).nil?)
+        ns_color = NSColor.text_color
       else
-        ptr2 = OS._new_ptr(OS.attr_k_txnqdfont_color_attribute_size)
-        rgb = nil
-        if ((color).nil?)
-          rgb = RGBColor.new
-        else
-          rgb = to_rgbcolor(color)
-        end
-        OS.memmove(ptr2, rgb, RGBColor.attr_sizeof)
-        attribs = Array.typed(::Java::Int).new([OS.attr_k_txnqdfont_color_attribute, OS.attr_k_txnqdfont_color_attribute_size, ptr2, ])
-        ptr1 = OS._new_ptr(attribs.attr_length * 4)
-        OS.memmove(ptr1, attribs, attribs.attr_length * 4)
-        read_only = !((self.attr_style & SWT::READ_ONLY)).equal?(0)
-        tag = Array.typed(::Java::Int).new([OS.attr_k_txnioprivileges_tag])
-        if (read_only)
-          OS._txnset_txnobject_controls(@txn_object, false, 1, tag, Array.typed(::Java::Int).new([0]))
-        end
-        OS._txnset_type_attributes(@txn_object, attribs.attr_length / 3, ptr1, 0, 0)
-        if (read_only)
-          OS._txnset_txnobject_controls(@txn_object, false, 1, tag, Array.typed(::Java::Int).new([1]))
-        end
-        OS._dispose_ptr(ptr1)
-        OS._dispose_ptr(ptr2)
+        ns_color = NSColor.color_with_device_red(color[0], color[1], color[2], 1)
       end
-    end
-    
-    typesig { [Font] }
-    def set_font_style(font)
-      if ((@txn_object).equal?(0))
-        super(font)
+      if (!((self.attr_style & SWT::SINGLE)).equal?(0))
+        (self.attr_view).set_text_color(ns_color)
       else
-        family = OS.attr_k_txndefault_font_name
-        font_style = OS.attr_k_txndefault_font_style
-        size = OS.attr_k_txndefault_font_size
-        if (!(font).nil?)
-          id = Array.typed(::Java::Short).new(1) { 0 }
-          s = Array.typed(::Java::Short).new(1) { 0 }
-          OS._fmget_font_family_instance_from_font(font.attr_handle, id, s)
-          family = id[0]
-          font_style = s[0] | font.attr_style
-          size = OS._x2fix(font.attr_size)
-        end
-        attribs = Array.typed(::Java::Int).new([OS.attr_k_txnqdfont_size_attribute, OS.attr_k_txnqdfont_size_attribute_size, size, OS.attr_k_txnqdfont_style_attribute, OS.attr_k_txnqdfont_style_attribute_size, font_style, OS.attr_k_txnqdfont_family_idattribute, OS.attr_k_txnqdfont_family_idattribute_size, family, ])
-        ptr = OS._new_ptr(attribs.attr_length * 4)
-        OS.memmove(ptr, attribs, attribs.attr_length * 4)
-        read_only = !((self.attr_style & SWT::READ_ONLY)).equal?(0)
-        tag = Array.typed(::Java::Int).new([OS.attr_k_txnioprivileges_tag])
-        if (read_only)
-          OS._txnset_txnobject_controls(@txn_object, false, 1, tag, Array.typed(::Java::Int).new([0]))
-        end
-        OS._txnset_type_attributes(@txn_object, attribs.attr_length / 3, ptr, 0, 0)
-        if (read_only)
-          OS._txnset_txnobject_controls(@txn_object, false, 1, tag, Array.typed(::Java::Int).new([1]))
-        end
-        OS._dispose_ptr(ptr)
+        (self.attr_view).set_text_color(ns_color)
       end
     end
     
@@ -2233,13 +1818,10 @@ module Org::Eclipse::Swt::Widgets
     end
     
     typesig { [String] }
-    # Sets the widget message. When the widget is created
-    # with the style <code>SWT.SEARCH</code>, the message text
-    # is displayed as a hint for the user, indicating the
-    # purpose of the field.
+    # Sets the widget message. The message text is displayed
+    # as a hint for the user, indicating the purpose of the field.
     # <p>
-    # Note: This operation is a <em>HINT</em> and is not
-    # supported on platforms that do not have this concept.
+    # Typically this is used in conjunction with <code>SWT.SEARCH</code>.
     # </p>
     # 
     # @param message the new message
@@ -2259,15 +1841,10 @@ module Org::Eclipse::Swt::Widgets
         error(SWT::ERROR_NULL_ARGUMENT)
       end
       @message = message
-      if (!((self.attr_style & SWT::SEARCH)).equal?(0))
-        buffer = CharArray.new(message.length)
-        message.get_chars(0, buffer.attr_length, buffer, 0)
-        ptr = OS._cfstring_create_with_characters(OS.attr_k_cfallocator_default, buffer, buffer.attr_length)
-        if ((ptr).equal?(0))
-          error(SWT::ERROR_CANNOT_SET_TEXT)
-        end
-        OS._hisearch_field_set_descriptive_text(self.attr_handle, ptr)
-        OS._cfrelease(ptr)
+      if (!((self.attr_style & SWT::SINGLE)).equal?(0))
+        str = NSString.string_with(message)
+        cell_ = NSTextFieldCell.new((self.attr_view).cell)
+        cell_.set_placeholder_string(str)
       end
     end
     
@@ -2324,22 +1901,28 @@ module Org::Eclipse::Swt::Widgets
     # </ul>
     def set_selection(start, end_)
       check_widget
-      if ((@txn_object).equal?(0))
-        length_ = get_char_count
-        selection = ControlEditTextSelectionRec.new
-        selection.attr_sel_start = RJava.cast_to_short(Math.min(Math.max(Math.min(start, end_), 0), length_))
-        selection.attr_sel_end = RJava.cast_to_short(Math.min(Math.max(Math.max(start, end_), 0), length_))
-        if (has_focus)
-          OS._set_control_data(self.attr_handle, OS.attr_k_control_entire_control, OS.attr_k_control_edit_text_selection_tag, 4, selection)
-        else
-          @selection = selection
+      if (!((self.attr_style & SWT::SINGLE)).equal?(0))
+        str = NSCell.new((self.attr_view).cell).title
+        # 64
+        length_ = RJava.cast_to_int(str.length)
+        sel_start = Math.min(Math.max(Math.min(start, end_), 0), length_)
+        sel_end = Math.min(Math.max(Math.max(start, end_), 0), length_)
+        @selection_range = NSRange.new
+        @selection_range.attr_location = sel_start
+        @selection_range.attr_length = sel_end - sel_start
+        field_editor = (self.attr_view).current_editor
+        if (!(field_editor).nil?)
+          field_editor.set_selected_range(@selection_range)
         end
       else
-        length_ = OS._txndata_size(@txn_object) / 2
-        n_start = Math.min(Math.max(Math.min(start, end_), 0), length_)
-        n_end = Math.min(Math.max(Math.max(start, end_), 0), length_)
-        OS._txnset_selection(@txn_object, n_start, n_end)
-        OS._txnshow_selection(@txn_object, false)
+        # 64
+        length_ = RJava.cast_to_int((self.attr_view).text_storage.length)
+        sel_start = Math.min(Math.max(Math.min(start, end_), 0), length_)
+        sel_end = Math.min(Math.max(Math.max(start, end_), 0), length_)
+        range = NSRange.new
+        range.attr_location = sel_start
+        range.attr_length = sel_end - sel_start
+        (self.attr_view).set_selected_range(range)
       end
     end
     
@@ -2399,16 +1982,23 @@ module Org::Eclipse::Swt::Widgets
       if ((@tabs).equal?(tabs))
         return
       end
-      if ((@txn_object).equal?(0))
+      @tabs = tabs
+      if (!((self.attr_style & SWT::SINGLE)).equal?(0))
         return
       end
-      @tabs = tabs
-      tab = TXNTab.new
-      tab.attr_value = RJava.cast_to_short((text_extent(Array.typed(::Java::Char).new([Character.new(?\s.ord)]), 0).attr_x * tabs))
-      tags = Array.typed(::Java::Int).new([OS.attr_k_txntab_settings_tag])
-      datas = Array.typed(::Java::Int).new(1) { 0 }
-      OS.memmove(datas, tab, TXNTab.attr_sizeof)
-      OS._txnset_txnobject_controls(@txn_object, false, tags.attr_length, tags, datas)
+      # double
+      size_ = text_extent("s").attr_width * tabs
+      widget = self.attr_view
+      default_style = widget.default_paragraph_style
+      paragraph_style = NSMutableParagraphStyle.new(default_style.mutable_copy)
+      paragraph_style.set_tab_stops(NSArray.array)
+      tab = NSTextTab.new.alloc
+      tab = tab.init_with_type(OS::NSLeftTabStopType, size_)
+      paragraph_style.add_tab_stop(tab)
+      tab.release
+      paragraph_style.set_default_tab_interval(size_)
+      widget.set_default_paragraph_style(paragraph_style)
+      paragraph_style.release
     end
     
     typesig { [String] }
@@ -2425,133 +2015,26 @@ module Org::Eclipse::Swt::Widgets
     # <li>ERROR_WIDGET_DISPOSED - if the receiver has been disposed</li>
     # <li>ERROR_THREAD_INVALID_ACCESS - if not called from the thread that created the receiver</li>
     # </ul>
-    def set_text(string)
+    def set_text(string_)
       check_widget
-      if ((string).nil?)
+      if ((string_).nil?)
         error(SWT::ERROR_NULL_ARGUMENT)
       end
       if (hooks(SWT::Verify) || filters(SWT::Verify))
-        string = RJava.cast_to_string(verify_text(string, 0, get_char_count, nil))
-        if ((string).nil?)
+        string_ = RJava.cast_to_string(verify_text(string_, 0, get_char_count, nil))
+        if ((string_).nil?)
           return
         end
       end
-      if ((@txn_object).equal?(0))
-        set_edit_text(string)
+      if (!((self.attr_style & SWT::SINGLE)).equal?(0))
+        set_edit_text(string_)
       else
-        set_txntext(OS.attr_k_txnstart_offset, OS.attr_k_txnend_offset, string)
-        OS._txnset_selection(@txn_object, OS.attr_k_txnstart_offset, OS.attr_k_txnstart_offset)
-        OS._txnshow_selection(@txn_object, false)
+        widget = self.attr_view
+        str = NSString.string_with(string_)
+        widget.set_string(str)
+        widget.set_selected_range(NSRange.new)
       end
-      send_modify_event(true)
-    end
-    
-    typesig { [String] }
-    def set_edit_text(string)
-      buffer = nil
-      if (((self.attr_style & SWT::PASSWORD)).equal?(0) && !(@echo_character).equal?(Character.new(?\0.ord)))
-        @hidden_text = string
-        buffer = CharArray.new(Math.min(@hidden_text.length, @text_limit))
-        i = 0
-        while i < buffer.attr_length
-          buffer[i] = @echo_character
-          i += 1
-        end
-      else
-        @hidden_text = RJava.cast_to_string(nil)
-        buffer = CharArray.new(Math.min(string.length, @text_limit))
-        string.get_chars(0, buffer.attr_length, buffer, 0)
-      end
-      ptr = OS._cfstring_create_with_characters(OS.attr_k_cfallocator_default, buffer, buffer.attr_length)
-      if ((ptr).equal?(0))
-        error(SWT::ERROR_CANNOT_SET_TEXT)
-      end
-      OS._set_control_data(self.attr_handle, OS.attr_k_control_entire_control, OS.attr_k_control_edit_text_cfstring_tag, 4, Array.typed(::Java::Int).new([ptr]))
-      OS._cfrelease(ptr)
-      if (!(@selection).nil?)
-        @selection = nil
-      end
-    end
-    
-    typesig { [::Java::Int, ::Java::Int, String] }
-    def set_txntext(i_start_offset, i_end_offset, string)
-      length_ = string.length
-      if (!(@text_limit).equal?(LIMIT))
-        char_count = OS._txndata_size(@txn_object) / 2
-        start = i_start_offset
-        end_ = i_end_offset
-        if ((i_start_offset).equal?(OS.attr_k_txnuse_current_selection) || (i_end_offset).equal?(OS.attr_k_txnuse_current_selection))
-          o_start_offset = Array.typed(::Java::Int).new(1) { 0 }
-          o_end_offset = Array.typed(::Java::Int).new(1) { 0 }
-          OS._txnget_selection(@txn_object, o_start_offset, o_end_offset)
-          start = o_start_offset[0]
-          end_ = o_end_offset[0]
-        else
-          if ((i_start_offset).equal?(OS.attr_k_txnend_offset))
-            start = char_count
-          end
-          if ((i_end_offset).equal?(OS.attr_k_txnend_offset))
-            end_ = char_count
-          end
-        end
-        if (char_count - (end_ - start) + length_ > @text_limit)
-          length_ = @text_limit - char_count + (end_ - start)
-        end
-      end
-      buffer = CharArray.new(length_)
-      string.get_chars(0, buffer.attr_length, buffer, 0)
-      read_only = !((self.attr_style & SWT::READ_ONLY)).equal?(0)
-      tag = Array.typed(::Java::Int).new([OS.attr_k_txnioprivileges_tag])
-      if (read_only)
-        OS._txnset_txnobject_controls(@txn_object, false, 1, tag, Array.typed(::Java::Int).new([0]))
-      end
-      OS._txnset_data(@txn_object, OS.attr_k_txnunicode_text_data, buffer, buffer.attr_length * 2, i_start_offset, i_end_offset)
-      if (read_only)
-        OS._txnset_txnobject_controls(@txn_object, false, 1, tag, Array.typed(::Java::Int).new([1]))
-      end
-      # Feature in the Macintosh.  When an empty string is set in the TXNObject,
-      # the font attributes are cleared.  The fix is to reset them.
-      if ((OS._txndata_size(@txn_object) / 2).equal?(0))
-        set_font_style(self.attr_font)
-      end
-    end
-    
-    typesig { [] }
-    def set_zorder
-      if (!(@frame_handle).equal?(0))
-        child = !(self.attr_scrolled_handle).equal?(0) ? self.attr_scrolled_handle : self.attr_handle
-        OS._hiview_add_subview(@frame_handle, child)
-        layout = HILayoutInfo.new
-        layout.attr_version = 0
-        OS._hiview_get_layout_info(child, layout)
-        biding = layout.attr_binding.attr_top
-        biding.attr_to_view = 0
-        biding.attr_kind = OS.attr_k_hilayout_bind_min
-        biding.attr_offset = 0
-        biding = layout.attr_binding.attr_left
-        biding.attr_to_view = 0
-        biding.attr_kind = OS.attr_k_hilayout_bind_min
-        biding.attr_offset = 0
-        biding = layout.attr_binding.attr_bottom
-        biding.attr_to_view = 0
-        biding.attr_kind = OS.attr_k_hilayout_bind_max
-        biding.attr_offset = 0
-        biding = layout.attr_binding.attr_right
-        biding.attr_to_view = 0
-        biding.attr_kind = OS.attr_k_hilayout_bind_max
-        biding.attr_offset = 0
-        r = CGRect.new
-        r.attr_width = r.attr_height = 100
-        OS._hiview_set_frame(@frame_handle, r)
-        inset_ = inset
-        r.attr_x += inset_.attr_left
-        r.attr_y += inset_.attr_top
-        r.attr_width -= inset_.attr_left + inset_.attr_right
-        r.attr_height -= inset_.attr_top + inset_.attr_bottom
-        OS._hiview_set_frame(child, r)
-        OS._hiview_set_layout_info(child, layout)
-      end
-      super
+      send_event(SWT::Modify)
     end
     
     typesig { [::Java::Int] }
@@ -2601,16 +2084,66 @@ module Org::Eclipse::Swt::Widgets
       if (!((self.attr_style & SWT::SINGLE)).equal?(0))
         return
       end
-      event = Array.typed(::Java::Int).new(1) { 0 }
-      OS._create_event(0, OS.attr_k_event_class_scrollable, OS.attr_k_event_scrollable_scroll_to, 0.0, 0, event)
-      if (!(event[0]).equal?(0))
-        line_height = get_line_height
-        pt = CGPoint.new
-        pt.attr_y = line_height * Math.min(get_line_count, index)
-        OS._set_event_parameter(event[0], OS.attr_k_event_param_origin, OS.attr_type_hipoint, CGPoint.attr_sizeof, pt)
-        OS._send_event_to_event_target(event[0], OS._get_control_event_target(self.attr_handle))
-        OS._release_event(event[0])
+      row = Math.max(0, Math.min(index, get_line_count - 1))
+      pt = NSPoint.new
+      pt.attr_x = self.attr_scroll_view.content_view.bounds.attr_x
+      pt.attr_y = get_line_height * row
+      self.attr_view.scroll_point(pt)
+    end
+    
+    typesig { [::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int] }
+    # long
+    # long
+    # long
+    # long
+    def should_change_text_in_range_replacement_string(id, sel, affected_char_range, replacement_string)
+      range = NSRange.new
+      OS.memmove(range, affected_char_range, NSRange.attr_sizeof)
+      result = call_super_boolean(id, sel, range, replacement_string)
+      if (!hooks(SWT::Verify) && (@echo_character).equal?(Character.new(?\0.ord)))
+        return result
       end
+      text = NSString.new(replacement_string).get_string
+      new_text = text
+      if (hooks(SWT::Verify))
+        current_event_ = self.attr_display.attr_application.current_event
+        # long
+        type_ = current_event_.type
+        if (!(type_).equal?(OS::NSKeyDown) && !(type_).equal?(OS::NSKeyUp))
+          current_event_ = nil
+        end
+        # 64
+        # 64
+        new_text = RJava.cast_to_string(verify_text(text, RJava.cast_to_int(range.attr_location), RJava.cast_to_int((range.attr_location + range.attr_length)), current_event_))
+      end
+      if ((new_text).nil?)
+        return false
+      end
+      if (!((self.attr_style & SWT::SINGLE)).equal?(0))
+        if (!(text).equal?(new_text) || !(@echo_character).equal?(Character.new(?\0.ord)))
+          # handle backspace and delete
+          if ((range.attr_length).equal?(1))
+            editor = NSText.new(id)
+            editor.set_selected_range(range)
+          end
+          insert_edit_text(new_text)
+          result = false
+        end
+      else
+        if (!(text).equal?(new_text))
+          widget = self.attr_view
+          selection = get_selection
+          sel_range = NSRange.new
+          sel_range.attr_location = selection.attr_x
+          sel_range.attr_length = selection.attr_x + selection.attr_y
+          widget.text_storage.replace_characters_in_range(sel_range, NSString.string_with(new_text))
+          result = false
+        end
+      end
+      if (!result)
+        send_event(SWT::Modify)
+      end
+      return result
     end
     
     typesig { [] }
@@ -2627,22 +2160,55 @@ module Org::Eclipse::Swt::Widgets
     # </ul>
     def show_selection
       check_widget
-      if ((@txn_object).equal?(0))
+      if (!((self.attr_style & SWT::SINGLE)).equal?(0))
         set_selection(get_selection)
       else
-        OS._txnshow_selection(@txn_object, false)
+        widget = self.attr_view
+        widget.scroll_range_to_visible(widget.selected_range)
       end
     end
     
-    typesig { [] }
-    def top_handle
-      if (!(@frame_handle).equal?(0))
-        return @frame_handle
-      end
-      return super
+    typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
+    # long
+    # long
+    # long
+    def text_view_did_change_selection(id, sel, a_notification)
+      notification = NSNotification.new(a_notification)
+      editor = NSText.new(notification.object.attr_id)
+      @selection_range = editor.selected_range
     end
     
-    typesig { [::Java::Int, ::Java::Int] }
+    typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
+    # long
+    # long
+    # long
+    def text_did_change(id, sel, a_notification)
+      if (!((self.attr_style & SWT::SINGLE)).equal?(0))
+        super(id, sel, a_notification)
+      end
+      post_event(SWT::Modify)
+    end
+    
+    typesig { [::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int] }
+    # long
+    # long
+    # long
+    # long
+    # long
+    def text_view_will_change_selection_from_character_range_to_character_range(id, sel, a_text_view, old_selected_char_range, new_selected_char_range)
+      # If the selection is changing as a result of the receiver getting focus
+      # then return the receiver's last selection range, otherwise the full
+      # text will be automatically selected.
+      if (@receiving_focus && !(@selection_range).nil?)
+        return @selection_range
+      end
+      # allow the selection change to proceed
+      result = NSRange.new
+      OS.memmove(result, new_selected_char_range, NSRange.attr_sizeof)
+      return result
+    end
+    
+    typesig { [::Java::Int, NSEvent] }
     def traversal_code(key, the_event)
       bits = super(key, the_event)
       if (!((self.attr_style & SWT::READ_ONLY)).equal?(0))
@@ -2651,11 +2217,11 @@ module Org::Eclipse::Swt::Widgets
       if (!((self.attr_style & SWT::MULTI)).equal?(0))
         bits &= ~SWT::TRAVERSE_RETURN
         # Tab
-        if ((key).equal?(48) && !(the_event).equal?(0))
-          modifiers = Array.typed(::Java::Int).new(1) { 0 }
-          OS._get_event_parameter(the_event, OS.attr_k_event_param_key_modifiers, OS.attr_type_uint32, nil, 4, nil, modifiers)
-          next_ = ((modifiers[0] & OS.attr_shift_key)).equal?(0)
-          if (next_ && ((modifiers[0] & OS.attr_control_key)).equal?(0))
+        if ((key).equal?(48) && !(the_event).nil?)
+          # long
+          modifiers = the_event.modifier_flags
+          next_ = ((modifiers & OS::NSShiftKeyMask)).equal?(0)
+          if (next_ && ((modifiers & OS::NSControlKeyMask)).equal?(0))
             bits &= ~(SWT::TRAVERSE_TAB_NEXT | SWT::TRAVERSE_TAB_PREVIOUS)
           end
         end
@@ -2663,17 +2229,25 @@ module Org::Eclipse::Swt::Widgets
       return bits
     end
     
-    typesig { [String, ::Java::Int, ::Java::Int, Event] }
-    def verify_text(string, start, end_, key_event)
+    typesig { [::Java::Boolean] }
+    def update_cursor_rects(enabled)
+      super(enabled)
+      if ((self.attr_scroll_view).nil?)
+        return
+      end
+      content_view_ = self.attr_scroll_view.content_view
+      content_view_.set_document_cursor(enabled ? NSCursor._ibeam_cursor : nil)
+    end
+    
+    typesig { [String, ::Java::Int, ::Java::Int, NSEvent] }
+    def verify_text(string_, start, end_, key_event)
       event = Event.new
-      event.attr_text = string
+      if (!(key_event).nil?)
+        set_key_state(event, SWT::MouseDown, key_event)
+      end
+      event.attr_text = string_
       event.attr_start = start
       event.attr_end = end_
-      if (!(key_event).nil?)
-        event.attr_character = key_event.attr_character
-        event.attr_key_code = key_event.attr_key_code
-        event.attr_state_mask = key_event.attr_state_mask
-      end
       # It is possible (but unlikely), that application
       # code could have disposed the widget in the verify
       # event.  If this happens, answer null to cancel

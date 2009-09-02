@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2008 IBM Corporation and others.
+ * Copyright (c) 2000, 2009 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -94,6 +94,14 @@ public SashForm(Composite parent, int style) {
 static int checkStyle (int style) {
 	int mask = SWT.BORDER | SWT.LEFT_TO_RIGHT | SWT.RIGHT_TO_LEFT;
 	return style & mask;
+}
+Sash createSash() {
+	Sash sash = new Sash(this, sashStyle);
+	sash.setBackground(background);
+	sash.setForeground(foreground);
+	sash.setToolTipText(getToolTipText());
+	sash.addListener(SWT.Selection, sashListener);
+	return sash;
 }
 /**
  * Returns SWT.HORIZONTAL if the controls in the SashForm are laid out side by side
@@ -296,10 +304,7 @@ public void setOrientation(int orientation) {
 	sashStyle |= orientation == SWT.VERTICAL ? SWT.HORIZONTAL : SWT.VERTICAL;
 	for (int i = 0; i < sashes.length; i++) {
 		sashes[i].dispose();
-		sashes[i] = new Sash(this, sashStyle);
-		sashes[i].setBackground(background);
-		sashes[i].setForeground(foreground);
-		sashes[i].addListener(SWT.Selection, sashListener);
+		sashes[i] = createSash();
 	}
 	layout(false);
 }
@@ -388,6 +393,12 @@ public void setSashWidth(int width) {
 	if (SASH_WIDTH == width) return;
 	SASH_WIDTH = width;
 	layout(false);
+}
+public void setToolTipText(String string) {
+	super.setToolTipText(string);
+	for (int i = 0; i < sashes.length; i++) {
+		sashes[i].setToolTipText(string);
+	}
 }
 /**
  * Specify the relative weight of each child in the SashForm.  This will determine

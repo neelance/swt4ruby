@@ -1,6 +1,6 @@
 require "rjava"
 
-# Copyright (c) 2003, 2008 IBM Corporation and others.
+# Copyright (c) 2003, 2009 IBM Corporation and others.
 # All rights reserved. This program and the accompanying materials
 # are made available under the terms of the Eclipse Public License v1.0
 # which accompanies this distribution, and is available at
@@ -13,6 +13,7 @@ module Org::Eclipse::Swt::Browser
     class_module.module_eval {
       include ::Java::Lang
       include ::Org::Eclipse::Swt::Browser
+      include ::Java::Util
       include ::Org::Eclipse::Swt
       include ::Org::Eclipse::Swt::Graphics
       include ::Org::Eclipse::Swt::Internal::Ole::Win32
@@ -134,6 +135,12 @@ module Org::Eclipse::Swt::Browser
     alias_method :attr_html=, :html=
     undef_method :html=
     
+    attr_accessor :last_navigate_url
+    alias_method :attr_last_navigate_url, :last_navigate_url
+    undef_method :last_navigate_url
+    alias_method :attr_last_navigate_url=, :last_navigate_url=
+    undef_method :last_navigate_url=
+    
     attr_accessor :style
     alias_method :attr_style, :style
     undef_method :style
@@ -166,15 +173,15 @@ module Org::Eclipse::Swt::Browser
     
     class_module.module_eval {
       
-      def silence_internal_navigate
-        defined?(@@silence_internal_navigate) ? @@silence_internal_navigate : @@silence_internal_navigate= false
+      def is_ie7
+        defined?(@@is_ie7) ? @@is_ie7 : @@is_ie7= false
       end
-      alias_method :attr_silence_internal_navigate, :silence_internal_navigate
+      alias_method :attr_is_ie7, :is_ie7
       
-      def silence_internal_navigate=(value)
-        @@silence_internal_navigate = value
+      def is_ie7=(value)
+        @@is_ie7 = value
       end
-      alias_method :attr_silence_internal_navigate=, :silence_internal_navigate=
+      alias_method :attr_is_ie7=, :is_ie7=
       
       
       def prog_id
@@ -266,6 +273,9 @@ module Org::Eclipse::Swt::Browser
       const_set_lazy(:URLPOLICY_JAVA_PROHIBIT) { 0x0 }
       const_attr_reader  :URLPOLICY_JAVA_PROHIBIT
       
+      const_set_lazy(:URLPOLICY_JAVA_LOW) { 0x30000 }
+      const_attr_reader  :URLPOLICY_JAVA_LOW
+      
       const_set_lazy(:URLZONE_LOCAL_MACHINE) { 0 }
       const_attr_reader  :URLZONE_LOCAL_MACHINE
       
@@ -284,11 +294,11 @@ module Org::Eclipse::Swt::Browser
       const_set_lazy(:URLACTION_JAVA_MIN) { 0x1c00 }
       const_attr_reader  :URLACTION_JAVA_MIN
       
-      const_set_lazy(:URLPOLICY_JAVA_LOW) { 0x30000 }
-      const_attr_reader  :URLPOLICY_JAVA_LOW
-      
       const_set_lazy(:URLACTION_JAVA_MAX) { 0x1cff }
       const_attr_reader  :URLACTION_JAVA_MAX
+      
+      const_set_lazy(:URLACTION_SCRIPT_RUN) { 0x1400 }
+      const_attr_reader  :URLACTION_SCRIPT_RUN
       
       const_set_lazy(:DISPID_AMBIENT_DLCONTROL) { -5512 }
       const_attr_reader  :DISPID_AMBIENT_DLCONTROL
@@ -400,6 +410,10 @@ module Org::Eclipse::Swt::Browser
       const_attr_reader  :EVENT_MOUSEOVER
       
       # $NON-NLS-1$
+      const_set_lazy(:PROTOCOL_FILE) { "file://" }
+      const_attr_reader  :PROTOCOL_FILE
+      
+      # $NON-NLS-1$
       const_set_lazy(:PROPERTY_ALTKEY) { "altKey" }
       const_attr_reader  :PROPERTY_ALTKEY
       
@@ -460,7 +474,77 @@ module Org::Eclipse::Swt::Browser
           
           typesig { [] }
           define_method :run do
+            if (OS::IsPPC)
+              return
+            end
             OS._internet_set_option(0, OS::INTERNET_OPTION_END_BROWSER_SESSION, 0, 0)
+          end
+          
+          typesig { [Vararg.new(Object)] }
+          define_method :initialize do |*args|
+            super(*args)
+          end
+          
+          private
+          alias_method :initialize_anonymous, :initialize
+        end.new_local(self)
+        NativeGetCookie = Class.new(Runnable.class == Class ? Runnable : Object) do
+          extend LocalClass
+          include_class_members IE
+          include Runnable if Runnable.class == Module
+          
+          typesig { [] }
+          define_method :run do
+            if (OS::IsPPC)
+              return
+            end
+            url = self.class::TCHAR.new(0, CookieUrl, true)
+            cookie_data = self.class::TCHAR.new(0, 8192)
+            size = Array.typed(::Java::Int).new([cookie_data.length])
+            if (!OS._internet_get_cookie(url, nil, cookie_data, size))
+              # original cookieData size was not large enough
+              size[0] /= TCHAR.attr_sizeof
+              cookie_data = self.class::TCHAR.new(0, size[0])
+              if (!OS._internet_get_cookie(url, nil, cookie_data, size))
+                return
+              end
+            end
+            all_cookies = cookie_data.to_s(0, size[0])
+            tokenizer = self.class::StringTokenizer.new(all_cookies, ";") # $NON-NLS-1$
+            while (tokenizer.has_more_tokens)
+              cookie = tokenizer.next_token
+              index = cookie.index_of(Character.new(?=.ord))
+              if (!(index).equal?(-1))
+                name = cookie.substring(0, index).trim
+                if ((name == CookieName))
+                  CookieValue = cookie.substring(index + 1).trim
+                  return
+                end
+              end
+            end
+          end
+          
+          typesig { [Vararg.new(Object)] }
+          define_method :initialize do |*args|
+            super(*args)
+          end
+          
+          private
+          alias_method :initialize_anonymous, :initialize
+        end.new_local(self)
+        NativeSetCookie = Class.new(Runnable.class == Class ? Runnable : Object) do
+          extend LocalClass
+          include_class_members IE
+          include Runnable if Runnable.class == Module
+          
+          typesig { [] }
+          define_method :run do
+            if (OS::IsPPC)
+              return
+            end
+            url = self.class::TCHAR.new(0, CookieUrl, true)
+            value = self.class::TCHAR.new(0, CookieValue, true)
+            CookieResult = OS._internet_set_cookie(url, nil, value)
           end
           
           typesig { [Vararg.new(Object)] }
@@ -496,9 +580,7 @@ module Org::Eclipse::Swt::Browser
                 rescue NumberFormatException => e
                   # just continue, version-specific features will not be enabled
                 end
-                if (major >= 7)
-                  self.attr_silence_internal_navigate = true
-                end
+                self.attr_is_ie7 = major >= 7
               end
             end
           end
@@ -605,6 +687,12 @@ module Org::Eclipse::Swt::Browser
                 i += 1
               end
               self.attr_documents = nil
+              elements_ = self.attr_functions.elements
+              while (elements_.has_more_elements)
+                (elements_.next_element).dispose(false)
+              end
+              self.attr_functions = nil
+              self.attr_last_navigate_url = nil
               self.attr_dom_listener = nil
               if (!(self.attr_auto).nil?)
                 self.attr_auto.dispose
@@ -654,6 +742,14 @@ module Org::Eclipse::Swt::Browser
             when BeforeNavigate2
               var_result = event.attr_arguments[1]
               url = var_result.get_string
+              # Bug in IE.  For navigations on the local machine, BeforeNavigate2's url
+              # field contains a string representing the file path in a non-URL format.
+              # In order to be consistent with the other Browser implementations, this
+              # case is detected and the string is changed to be a proper url string.
+              if ((url.index_of(":/")).equal?(-1) && !(url.index_of(":\\")).equal?(-1))
+                # $NON-NLS-1$ //$NON-NLS-2$
+                url = PROTOCOL_FILE + RJava.cast_to_string(url.replace(Character.new(?\\.ord), Character.new(?/.ord)))
+              end
               new_event = self.class::LocationEvent.new(self.attr_browser)
               new_event.attr_display = self.attr_browser.get_display
               new_event.attr_widget = self.attr_browser
@@ -672,6 +768,7 @@ module Org::Eclipse::Swt::Browser
                 COM._move_memory(p_cancel, Array.typed(::Java::Short).new([doit ? COM::VARIANT_FALSE : COM::VARIANT_TRUE]), 2)
               end
               if (doit)
+                self.attr_last_navigate_url = url
                 var_result = event.attr_arguments[0]
                 dispatch = var_result.get_dispatch
                 variant = self.class::Variant.new(self.attr_auto)
@@ -705,6 +802,14 @@ module Org::Eclipse::Swt::Browser
               dispatch = var_result.get_dispatch
               var_result = event.attr_arguments[1]
               url = var_result.get_string
+              # Bug in IE.  For navigations on the local machine, DocumentComplete's URL
+              # field contains a string representing the file path in a non-URL format.
+              # In order to be consistent with the other Browser implementations, this
+              # case is detected and the string is changed to be a proper url string.
+              if ((url.index_of(":/")).equal?(-1) && !(url.index_of(":\\")).equal?(-1))
+                # $NON-NLS-1$ //$NON-NLS-2$
+                url = PROTOCOL_FILE + RJava.cast_to_string(url.replace(Character.new(?\\.ord), Character.new(?/.ord)))
+              end
               if (!(self.attr_html).nil? && (url == ABOUT_BLANK))
                 ole_listener_class = self.class
                 runnable = Class.new(self.class::Runnable.class == Class ? self.class::Runnable : Object) do
@@ -812,6 +917,12 @@ module Org::Eclipse::Swt::Browser
                 if (!(self.attr_global_dispatch).equal?(0) && (dispatch.get_address).equal?(self.attr_global_dispatch))
                   # final document complete
                   self.attr_global_dispatch = 0
+                  # re-install registered functions
+                  elements_ = self.attr_functions.elements
+                  while (elements_.has_more_elements)
+                    function = elements_.next_element
+                    execute(function.attr_function_string)
+                  end
                   progress_event = self.class::ProgressEvent.new(self.attr_browser)
                   progress_event.attr_display = self.attr_browser.get_display
                   progress_event.attr_widget = self.attr_browser
@@ -912,8 +1023,11 @@ module Org::Eclipse::Swt::Browser
                   # when OnToolBar FALSE has not been emitted.
                   rgdispid = self.attr_auto.get_ids_of_names(Array.typed(String).new(["AddressBar"])) # $NON-NLS-1$
                   p_var_result = self.attr_auto.get_property(rgdispid[0])
-                  if (!(p_var_result).nil? && (p_var_result.get_type).equal?(OLE::VT_BOOL))
-                    self.attr_address_bar = p_var_result.get_boolean
+                  if (!(p_var_result).nil?)
+                    if ((p_var_result.get_type).equal?(OLE::VT_BOOL))
+                      self.attr_address_bar = p_var_result.get_boolean
+                    end
+                    p_var_result.dispose
                   end
                 end
                 new_event.attr_address_bar = self.attr_address_bar
@@ -1111,6 +1225,9 @@ module Org::Eclipse::Swt::Browser
       disp_id_member = rgdispid[0]
       p_var_result = @auto.get_property(disp_id_member)
       if ((p_var_result).nil? || (p_var_result.get_type).equal?(COM::VT_EMPTY))
+        if (!(p_var_result).nil?)
+          p_var_result.dispose
+        end
         return false
       end
       document = p_var_result.get_automation
@@ -1153,13 +1270,26 @@ module Org::Eclipse::Swt::Browser
     end
     
     typesig { [] }
+    def get_browser_type
+      return "ie" # $NON-NLS-1$
+    end
+    
+    typesig { [String] }
+    def get_delete_function_string(function_name)
+      return "window." + function_name + "=undefined" # $NON-NLS-1$ //$NON-NLS-2$
+    end
+    
+    typesig { [] }
     def get_text
       # get the document object
       rgdispid = @auto.get_ids_of_names(Array.typed(String).new(["Document"])) # $NON-NLS-1$
       p_var_result = @auto.get_property(rgdispid[0])
       if ((p_var_result).nil? || (p_var_result.get_type).equal?(COM::VT_EMPTY))
-        return ""
-      end # $NON-NLS-1$
+        if (!(p_var_result).nil?)
+          p_var_result.dispose
+        end
+        return "" # $NON-NLS-1$
+      end
       document = p_var_result.get_automation
       p_var_result.dispose
       # get the html object
@@ -1172,8 +1302,11 @@ module Org::Eclipse::Swt::Browser
       p_var_result = document.get_property(rgdispid[0])
       document.dispose
       if ((p_var_result).nil? || (p_var_result.get_type).equal?(COM::VT_EMPTY))
-        return ""
-      end # $NON-NLS-1$
+        if (!(p_var_result).nil?)
+          p_var_result.dispose
+        end
+        return "" # $NON-NLS-1$
+      end
       element = p_var_result.get_automation
       p_var_result.dispose
       # get its outerHTML property
@@ -1181,8 +1314,11 @@ module Org::Eclipse::Swt::Browser
       p_var_result = element.get_property(rgdispid[0])
       element.dispose
       if ((p_var_result).nil? || (p_var_result.get_type).equal?(COM::VT_EMPTY))
-        return ""
-      end # $NON-NLS-1$
+        if (!(p_var_result).nil?)
+          p_var_result.dispose
+        end
+        return "" # $NON-NLS-1$
+      end
       result = p_var_result.get_string
       p_var_result.dispose
       return result
@@ -1194,7 +1330,7 @@ module Org::Eclipse::Swt::Browser
       p_var_result = @auto.get_property(rgdispid[0])
       if ((p_var_result).nil? || !(p_var_result.get_type).equal?(OLE::VT_BSTR))
         return ""
-      end
+      end # $NON-NLS-1$
       result = p_var_result.get_string
       p_var_result.dispose
       return result
@@ -1270,13 +1406,13 @@ module Org::Eclipse::Swt::Browser
       rgdispid_named_args = Array.typed(::Java::Int).new(1) { 0 }
       rgdispid_named_args[0] = rgdispid[1]
       old_value = false
-      if (!OS::IsWinCE && self.attr_silence_internal_navigate)
+      if (!OS::IsWinCE && self.attr_is_ie7)
         h_result = OS._co_internet_is_feature_enabled(OS::FEATURE_DISABLE_NAVIGATION_SOUNDS, OS::GET_FEATURE_FROM_PROCESS)
         old_value = (h_result).equal?(COM::S_OK)
         OS._co_internet_set_feature_enabled(OS::FEATURE_DISABLE_NAVIGATION_SOUNDS, OS::SET_FEATURE_ON_PROCESS, true)
       end
       p_var_result = @auto.invoke(rgdispid[0], rgvarg, rgdispid_named_args)
-      if (!OS::IsWinCE && self.attr_silence_internal_navigate)
+      if (!OS::IsWinCE && self.attr_is_ie7)
         OS._co_internet_set_feature_enabled(OS::FEATURE_DISABLE_NAVIGATION_SOUNDS, OS::SET_FEATURE_ON_PROCESS, old_value)
       end
       rgvarg[0].dispose
@@ -1310,13 +1446,13 @@ module Org::Eclipse::Swt::Browser
           rgdispid_named_args = Array.typed(::Java::Int).new(1) { 0 }
           rgdispid_named_args[0] = rgdispid[1]
           old_value = false
-          if (!OS::IsWinCE && self.attr_silence_internal_navigate)
+          if (!OS::IsWinCE && self.attr_is_ie7)
             h_result = OS._co_internet_is_feature_enabled(OS::FEATURE_DISABLE_NAVIGATION_SOUNDS, OS::GET_FEATURE_FROM_PROCESS)
             old_value = (h_result).equal?(COM::S_OK)
             OS._co_internet_set_feature_enabled(OS::FEATURE_DISABLE_NAVIGATION_SOUNDS, OS::SET_FEATURE_ON_PROCESS, true)
           end
           @auto.invoke(rgdispid[0], rgvarg, rgdispid_named_args)
-          if (!OS::IsWinCE && self.attr_silence_internal_navigate)
+          if (!OS::IsWinCE && self.attr_is_ie7)
             OS._co_internet_set_feature_enabled(OS::FEATURE_DISABLE_NAVIGATION_SOUNDS, OS::SET_FEATURE_ON_PROCESS, old_value)
           end
           rgvarg[0].dispose
@@ -1411,6 +1547,19 @@ module Org::Eclipse::Swt::Browser
         key_event.attr_state_mask = mask
         key_event.attr_state_mask &= ~@last_key_code
         # remove current keydown if it's a state key
+        # 
+        # keypress events are not received for Enter, Delete and Tab, so
+        # KeyDown events are sent for them here.  Set the KeyDown event's
+        # character field and IE's lastCharCode field for these keys so
+        # that the Browser's key events are consistent with other controls.
+        case (@last_key_code)
+        when SWT::CR
+          @last_char_code = key_event.attr_character = SWT::CR
+        when SWT::DEL
+          @last_char_code = key_event.attr_character = SWT::DEL
+        when SWT::TAB
+          @last_char_code = key_event.attr_character = SWT::TAB
+        end
         self.attr_browser.notify_listeners(key_event.attr_type, key_event)
         if (!key_event.attr_doit)
           rgdispid = event.get_ids_of_names(Array.typed(String).new([PROPERTY_RETURNVALUE]))
@@ -1781,6 +1930,7 @@ module Org::Eclipse::Swt::Browser
       @tool_bar = false
       @global_dispatch = 0
       @html = nil
+      @last_navigate_url = nil
       @style = 0
       @last_key_code = 0
       @last_char_code = 0

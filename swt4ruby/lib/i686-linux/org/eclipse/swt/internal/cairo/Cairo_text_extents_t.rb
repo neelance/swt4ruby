@@ -17,7 +17,7 @@ require "rjava"
 # 
 # IBM
 # -  Binding to permit interfacing between Cairo and SWT
-# -  Copyright (C) 2005 IBM Corp.  All Rights Reserved.
+# -  Copyright (C) 2005, 2006 IBM Corp.  All Rights Reserved.
 # 
 # ***** END LICENSE BLOCK *****
 module Org::Eclipse::Swt::Internal::Cairo

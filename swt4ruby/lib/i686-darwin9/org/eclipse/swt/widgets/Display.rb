@@ -1,6 +1,6 @@
 require "rjava"
 
-# Copyright (c) 2000, 2008 IBM Corporation and others.
+# Copyright (c) 2000, 2009 IBM Corporation and others.
 # All rights reserved. This program and the accompanying materials
 # are made available under the terms of the Eclipse Public License v1.0
 # which accompanies this distribution, and is available at
@@ -13,21 +13,10 @@ module Org::Eclipse::Swt::Widgets
     class_module.module_eval {
       include ::Java::Lang
       include ::Org::Eclipse::Swt::Widgets
-      include ::Org::Eclipse::Swt::Internal
-      include_const ::Org::Eclipse::Swt::Internal::Carbon, :CFRange
-      include_const ::Org::Eclipse::Swt::Internal::Carbon, :CFRunLoopSourceContext
-      include_const ::Org::Eclipse::Swt::Internal::Carbon, :EventRecord
-      include_const ::Org::Eclipse::Swt::Internal::Carbon, :MenuTrackingData
-      include_const ::Org::Eclipse::Swt::Internal::Carbon, :OS
-      include_const ::Org::Eclipse::Swt::Internal::Carbon, :CGPoint
-      include_const ::Org::Eclipse::Swt::Internal::Carbon, :CGRect
-      include_const ::Org::Eclipse::Swt::Internal::Carbon, :GDevice
-      include_const ::Org::Eclipse::Swt::Internal::Carbon, :HICommand
-      include_const ::Org::Eclipse::Swt::Internal::Carbon, :Rect
-      include_const ::Org::Eclipse::Swt::Internal::Carbon, :RGBColor
-      include ::Org::Eclipse::Swt::Internal::Cocoa
       include ::Org::Eclipse::Swt
       include ::Org::Eclipse::Swt::Graphics
+      include ::Org::Eclipse::Swt::Internal
+      include ::Org::Eclipse::Swt::Internal::Cocoa
     }
   end
   
@@ -106,6 +95,7 @@ module Org::Eclipse::Swt::Widgets
   # @see Device#dispose
   # @see <a href="http://www.eclipse.org/swt/snippets/#display">Display snippets</a>
   # @see <a href="http://www.eclipse.org/swt/">Sample code and further information</a>
+  # @noextend This class is not intended to be subclassed by clients.
   class Display < DisplayImports.const_get :Device
     include_class_members DisplayImports
     
@@ -115,342 +105,6 @@ module Org::Eclipse::Swt::Widgets
     undef_method :event_queue
     alias_method :attr_event_queue=, :event_queue=
     undef_method :event_queue=
-    
-    attr_accessor :action_callback
-    alias_method :attr_action_callback, :action_callback
-    undef_method :action_callback
-    alias_method :attr_action_callback=, :action_callback=
-    undef_method :action_callback=
-    
-    attr_accessor :apple_event_callback
-    alias_method :attr_apple_event_callback, :apple_event_callback
-    undef_method :apple_event_callback
-    alias_method :attr_apple_event_callback=, :apple_event_callback=
-    undef_method :apple_event_callback=
-    
-    attr_accessor :clock_callback
-    alias_method :attr_clock_callback, :clock_callback
-    undef_method :clock_callback
-    alias_method :attr_clock_callback=, :clock_callback=
-    undef_method :clock_callback=
-    
-    attr_accessor :command_callback
-    alias_method :attr_command_callback, :command_callback
-    undef_method :command_callback
-    alias_method :attr_command_callback=, :command_callback=
-    undef_method :command_callback=
-    
-    attr_accessor :control_callback
-    alias_method :attr_control_callback, :control_callback
-    undef_method :control_callback
-    alias_method :attr_control_callback=, :control_callback=
-    undef_method :control_callback=
-    
-    attr_accessor :accessibility_callback
-    alias_method :attr_accessibility_callback, :accessibility_callback
-    undef_method :accessibility_callback
-    alias_method :attr_accessibility_callback=, :accessibility_callback=
-    undef_method :accessibility_callback=
-    
-    attr_accessor :appearance_callback
-    alias_method :attr_appearance_callback, :appearance_callback
-    undef_method :appearance_callback
-    alias_method :attr_appearance_callback=, :appearance_callback=
-    undef_method :appearance_callback=
-    
-    attr_accessor :draw_item_callback
-    alias_method :attr_draw_item_callback, :draw_item_callback
-    undef_method :draw_item_callback
-    alias_method :attr_draw_item_callback=, :draw_item_callback=
-    undef_method :draw_item_callback=
-    
-    attr_accessor :item_data_callback
-    alias_method :attr_item_data_callback, :item_data_callback
-    undef_method :item_data_callback
-    alias_method :attr_item_data_callback=, :item_data_callback=
-    undef_method :item_data_callback=
-    
-    attr_accessor :item_notification_callback
-    alias_method :attr_item_notification_callback, :item_notification_callback
-    undef_method :item_notification_callback
-    alias_method :attr_item_notification_callback=, :item_notification_callback=
-    undef_method :item_notification_callback=
-    
-    attr_accessor :item_compare_callback
-    alias_method :attr_item_compare_callback, :item_compare_callback
-    undef_method :item_compare_callback
-    alias_method :attr_item_compare_callback=, :item_compare_callback=
-    undef_method :item_compare_callback=
-    
-    attr_accessor :search_callback
-    alias_method :attr_search_callback, :search_callback
-    undef_method :search_callback
-    alias_method :attr_search_callback=, :search_callback=
-    undef_method :search_callback=
-    
-    attr_accessor :tray_item_callback
-    alias_method :attr_tray_item_callback, :tray_item_callback
-    undef_method :tray_item_callback
-    alias_method :attr_tray_item_callback=, :tray_item_callback=
-    undef_method :tray_item_callback=
-    
-    attr_accessor :hit_test_callback
-    alias_method :attr_hit_test_callback, :hit_test_callback
-    undef_method :hit_test_callback
-    alias_method :attr_hit_test_callback=, :hit_test_callback=
-    undef_method :hit_test_callback=
-    
-    attr_accessor :keyboard_callback
-    alias_method :attr_keyboard_callback, :keyboard_callback
-    undef_method :keyboard_callback
-    alias_method :attr_keyboard_callback=, :keyboard_callback=
-    undef_method :keyboard_callback=
-    
-    attr_accessor :menu_callback
-    alias_method :attr_menu_callback, :menu_callback
-    undef_method :menu_callback
-    alias_method :attr_menu_callback=, :menu_callback=
-    undef_method :menu_callback=
-    
-    attr_accessor :mouse_hover_callback
-    alias_method :attr_mouse_hover_callback, :mouse_hover_callback
-    undef_method :mouse_hover_callback
-    alias_method :attr_mouse_hover_callback=, :mouse_hover_callback=
-    undef_method :mouse_hover_callback=
-    
-    attr_accessor :help_callback
-    alias_method :attr_help_callback, :help_callback
-    undef_method :help_callback
-    alias_method :attr_help_callback=, :help_callback=
-    undef_method :help_callback=
-    
-    attr_accessor :observer_callback
-    alias_method :attr_observer_callback, :observer_callback
-    undef_method :observer_callback
-    alias_method :attr_observer_callback=, :observer_callback=
-    undef_method :observer_callback=
-    
-    attr_accessor :source_callback
-    alias_method :attr_source_callback, :source_callback
-    undef_method :source_callback
-    alias_method :attr_source_callback=, :source_callback=
-    undef_method :source_callback=
-    
-    attr_accessor :mouse_callback
-    alias_method :attr_mouse_callback, :mouse_callback
-    undef_method :mouse_callback
-    alias_method :attr_mouse_callback=, :mouse_callback=
-    undef_method :mouse_callback=
-    
-    attr_accessor :tracking_callback
-    alias_method :attr_tracking_callback, :tracking_callback
-    undef_method :tracking_callback
-    alias_method :attr_tracking_callback=, :tracking_callback=
-    undef_method :tracking_callback=
-    
-    attr_accessor :window_callback
-    alias_method :attr_window_callback, :window_callback
-    undef_method :window_callback
-    alias_method :attr_window_callback=, :window_callback=
-    undef_method :window_callback=
-    
-    attr_accessor :color_callback
-    alias_method :attr_color_callback, :color_callback
-    undef_method :color_callback
-    alias_method :attr_color_callback=, :color_callback=
-    undef_method :color_callback=
-    
-    attr_accessor :text_input_callback
-    alias_method :attr_text_input_callback, :text_input_callback
-    undef_method :text_input_callback
-    alias_method :attr_text_input_callback=, :text_input_callback=
-    undef_method :text_input_callback=
-    
-    attr_accessor :release_callback
-    alias_method :attr_release_callback, :release_callback
-    undef_method :release_callback
-    alias_method :attr_release_callback=, :release_callback=
-    undef_method :release_callback=
-    
-    attr_accessor :core_event_callback
-    alias_method :attr_core_event_callback, :core_event_callback
-    undef_method :core_event_callback
-    alias_method :attr_core_event_callback=, :core_event_callback=
-    undef_method :core_event_callback=
-    
-    attr_accessor :polling_callback
-    alias_method :attr_polling_callback, :polling_callback
-    undef_method :polling_callback
-    alias_method :attr_polling_callback=, :polling_callback=
-    undef_method :polling_callback=
-    
-    attr_accessor :action_proc
-    alias_method :attr_action_proc, :action_proc
-    undef_method :action_proc
-    alias_method :attr_action_proc=, :action_proc=
-    undef_method :action_proc=
-    
-    attr_accessor :apple_event_proc
-    alias_method :attr_apple_event_proc, :apple_event_proc
-    undef_method :apple_event_proc
-    alias_method :attr_apple_event_proc=, :apple_event_proc=
-    undef_method :apple_event_proc=
-    
-    attr_accessor :clock_proc
-    alias_method :attr_clock_proc, :clock_proc
-    undef_method :clock_proc
-    alias_method :attr_clock_proc=, :clock_proc=
-    undef_method :clock_proc=
-    
-    attr_accessor :command_proc
-    alias_method :attr_command_proc, :command_proc
-    undef_method :command_proc
-    alias_method :attr_command_proc=, :command_proc=
-    undef_method :command_proc=
-    
-    attr_accessor :control_proc
-    alias_method :attr_control_proc, :control_proc
-    undef_method :control_proc
-    alias_method :attr_control_proc=, :control_proc=
-    undef_method :control_proc=
-    
-    attr_accessor :appearance_proc
-    alias_method :attr_appearance_proc, :appearance_proc
-    undef_method :appearance_proc
-    alias_method :attr_appearance_proc=, :appearance_proc=
-    undef_method :appearance_proc=
-    
-    attr_accessor :accessibility_proc
-    alias_method :attr_accessibility_proc, :accessibility_proc
-    undef_method :accessibility_proc
-    alias_method :attr_accessibility_proc=, :accessibility_proc=
-    undef_method :accessibility_proc=
-    
-    attr_accessor :draw_item_proc
-    alias_method :attr_draw_item_proc, :draw_item_proc
-    undef_method :draw_item_proc
-    alias_method :attr_draw_item_proc=, :draw_item_proc=
-    undef_method :draw_item_proc=
-    
-    attr_accessor :item_data_proc
-    alias_method :attr_item_data_proc, :item_data_proc
-    undef_method :item_data_proc
-    alias_method :attr_item_data_proc=, :item_data_proc=
-    undef_method :item_data_proc=
-    
-    attr_accessor :item_notification_proc
-    alias_method :attr_item_notification_proc, :item_notification_proc
-    undef_method :item_notification_proc
-    alias_method :attr_item_notification_proc=, :item_notification_proc=
-    undef_method :item_notification_proc=
-    
-    attr_accessor :item_compare_proc
-    alias_method :attr_item_compare_proc, :item_compare_proc
-    undef_method :item_compare_proc
-    alias_method :attr_item_compare_proc=, :item_compare_proc=
-    undef_method :item_compare_proc=
-    
-    attr_accessor :help_proc
-    alias_method :attr_help_proc, :help_proc
-    undef_method :help_proc
-    alias_method :attr_help_proc=, :help_proc=
-    undef_method :help_proc=
-    
-    attr_accessor :search_proc
-    alias_method :attr_search_proc, :search_proc
-    undef_method :search_proc
-    alias_method :attr_search_proc=, :search_proc=
-    undef_method :search_proc=
-    
-    attr_accessor :tray_item_proc
-    alias_method :attr_tray_item_proc, :tray_item_proc
-    undef_method :tray_item_proc
-    alias_method :attr_tray_item_proc=, :tray_item_proc=
-    undef_method :tray_item_proc=
-    
-    attr_accessor :hit_test_proc
-    alias_method :attr_hit_test_proc, :hit_test_proc
-    undef_method :hit_test_proc
-    alias_method :attr_hit_test_proc=, :hit_test_proc=
-    undef_method :hit_test_proc=
-    
-    attr_accessor :keyboard_proc
-    alias_method :attr_keyboard_proc, :keyboard_proc
-    undef_method :keyboard_proc
-    alias_method :attr_keyboard_proc=, :keyboard_proc=
-    undef_method :keyboard_proc=
-    
-    attr_accessor :menu_proc
-    alias_method :attr_menu_proc, :menu_proc
-    undef_method :menu_proc
-    alias_method :attr_menu_proc=, :menu_proc=
-    undef_method :menu_proc=
-    
-    attr_accessor :mouse_hover_proc
-    alias_method :attr_mouse_hover_proc, :mouse_hover_proc
-    undef_method :mouse_hover_proc
-    alias_method :attr_mouse_hover_proc=, :mouse_hover_proc=
-    undef_method :mouse_hover_proc=
-    
-    attr_accessor :observer_proc
-    alias_method :attr_observer_proc, :observer_proc
-    undef_method :observer_proc
-    alias_method :attr_observer_proc=, :observer_proc=
-    undef_method :observer_proc=
-    
-    attr_accessor :source_proc
-    alias_method :attr_source_proc, :source_proc
-    undef_method :source_proc
-    alias_method :attr_source_proc=, :source_proc=
-    undef_method :source_proc=
-    
-    attr_accessor :mouse_proc
-    alias_method :attr_mouse_proc, :mouse_proc
-    undef_method :mouse_proc
-    alias_method :attr_mouse_proc=, :mouse_proc=
-    undef_method :mouse_proc=
-    
-    attr_accessor :tracking_proc
-    alias_method :attr_tracking_proc, :tracking_proc
-    undef_method :tracking_proc
-    alias_method :attr_tracking_proc=, :tracking_proc=
-    undef_method :tracking_proc=
-    
-    attr_accessor :window_proc
-    alias_method :attr_window_proc, :window_proc
-    undef_method :window_proc
-    alias_method :attr_window_proc=, :window_proc=
-    undef_method :window_proc=
-    
-    attr_accessor :color_proc
-    alias_method :attr_color_proc, :color_proc
-    undef_method :color_proc
-    alias_method :attr_color_proc=, :color_proc=
-    undef_method :color_proc=
-    
-    attr_accessor :text_input_proc
-    alias_method :attr_text_input_proc, :text_input_proc
-    undef_method :text_input_proc
-    alias_method :attr_text_input_proc=, :text_input_proc=
-    undef_method :text_input_proc=
-    
-    attr_accessor :release_proc
-    alias_method :attr_release_proc, :release_proc
-    undef_method :release_proc
-    alias_method :attr_release_proc=, :release_proc=
-    undef_method :release_proc=
-    
-    attr_accessor :core_event_proc
-    alias_method :attr_core_event_proc, :core_event_proc
-    undef_method :core_event_proc
-    alias_method :attr_core_event_proc=, :core_event_proc=
-    undef_method :core_event_proc=
-    
-    attr_accessor :polling_proc
-    alias_method :attr_polling_proc, :polling_proc
-    undef_method :polling_proc
-    alias_method :attr_polling_proc=, :polling_proc=
-    undef_method :polling_proc=
     
     attr_accessor :event_table
     alias_method :attr_event_table, :event_table
@@ -464,91 +118,36 @@ module Org::Eclipse::Swt::Widgets
     alias_method :attr_filter_table=, :filter_table=
     undef_method :filter_table=
     
-    attr_accessor :queue
-    alias_method :attr_queue, :queue
-    undef_method :queue
-    alias_method :attr_queue=, :queue=
-    undef_method :queue=
-    
-    attr_accessor :run_loop
-    alias_method :attr_run_loop, :run_loop
-    undef_method :run_loop
-    alias_method :attr_run_loop=, :run_loop=
-    undef_method :run_loop=
-    
-    attr_accessor :run_loop_source
-    alias_method :attr_run_loop_source, :run_loop_source
-    undef_method :run_loop_source
-    alias_method :attr_run_loop_source=, :run_loop_source=
-    undef_method :run_loop_source=
-    
-    attr_accessor :run_loop_observer
-    alias_method :attr_run_loop_observer, :run_loop_observer
-    undef_method :run_loop_observer
-    alias_method :attr_run_loop_observer=, :run_loop_observer=
-    undef_method :run_loop_observer=
-    
-    attr_accessor :last_modifiers
-    alias_method :attr_last_modifiers, :last_modifiers
-    undef_method :last_modifiers
-    alias_method :attr_last_modifiers=, :last_modifiers=
-    undef_method :last_modifiers=
-    
-    attr_accessor :last_state
-    alias_method :attr_last_state, :last_state
-    undef_method :last_state
-    alias_method :attr_last_state=, :last_state=
-    undef_method :last_state=
-    
-    attr_accessor :last_x
-    alias_method :attr_last_x, :last_x
-    undef_method :last_x
-    alias_method :attr_last_x=, :last_x=
-    undef_method :last_x=
-    
-    attr_accessor :last_y
-    alias_method :attr_last_y, :last_y
-    undef_method :last_y
-    alias_method :attr_last_y=, :last_y=
-    undef_method :last_y=
-    
     attr_accessor :disposing
     alias_method :attr_disposing, :disposing
     undef_method :disposing
     alias_method :attr_disposing=, :disposing=
     undef_method :disposing=
     
-    attr_accessor :in_paint
-    alias_method :attr_in_paint, :in_paint
-    undef_method :in_paint
-    alias_method :attr_in_paint=, :in_paint=
-    undef_method :in_paint=
+    attr_accessor :send_event_count
+    alias_method :attr_send_event_count, :send_event_count
+    undef_method :send_event_count
+    alias_method :attr_send_event_count=, :send_event_count=
+    undef_method :send_event_count=
     
-    attr_accessor :needs_paint
-    alias_method :attr_needs_paint, :needs_paint
-    undef_method :needs_paint
-    alias_method :attr_needs_paint=, :needs_paint=
-    undef_method :needs_paint=
+    # Key event management
+    attr_accessor :dead_key_state
+    alias_method :attr_dead_key_state, :dead_key_state
+    undef_method :dead_key_state
+    alias_method :attr_dead_key_state=, :dead_key_state=
+    undef_method :dead_key_state=
     
-    # GC
-    attr_accessor :gc_window
-    alias_method :attr_gc_window, :gc_window
-    undef_method :gc_window
-    alias_method :attr_gc_window=, :gc_window=
-    undef_method :gc_window=
+    attr_accessor :current_keyboard_uchrdata
+    alias_method :attr_current_keyboard_uchrdata, :current_keyboard_uchrdata
+    undef_method :current_keyboard_uchrdata
+    alias_method :attr_current_keyboard_uchrdata=, :current_keyboard_uchrdata=
+    undef_method :current_keyboard_uchrdata=
     
-    # Deferred dispose window
-    attr_accessor :dispose_window
-    alias_method :attr_dispose_window, :dispose_window
-    undef_method :dispose_window
-    alias_method :attr_dispose_window=, :dispose_window=
-    undef_method :dispose_window=
-    
-    attr_accessor :dispose_window_list
-    alias_method :attr_dispose_window_list, :dispose_window_list
-    undef_method :dispose_window_list
-    alias_method :attr_dispose_window_list=, :dispose_window_list=
-    undef_method :dispose_window_list=
+    attr_accessor :event_source_delay_set
+    alias_method :attr_event_source_delay_set, :event_source_delay_set
+    undef_method :event_source_delay_set
+    alias_method :attr_event_source_delay_set=, :event_source_delay_set=
+    undef_method :event_source_delay_set=
     
     # Sync/Async Widget Communication
     attr_accessor :synchronizer
@@ -563,90 +162,187 @@ module Org::Eclipse::Swt::Widgets
     alias_method :attr_thread=, :thread=
     undef_method :thread=
     
+    attr_accessor :allow_timers
+    alias_method :attr_allow_timers, :allow_timers
+    undef_method :allow_timers
+    alias_method :attr_allow_timers=, :allow_timers=
+    undef_method :allow_timers=
+    
     attr_accessor :run_async_messages
     alias_method :attr_run_async_messages, :run_async_messages
     undef_method :run_async_messages
     alias_method :attr_run_async_messages=, :run_async_messages=
     undef_method :run_async_messages=
     
-    # Widget Table
-    attr_accessor :free_slot
-    alias_method :attr_free_slot, :free_slot
-    undef_method :free_slot
-    alias_method :attr_free_slot=, :free_slot=
-    undef_method :free_slot=
+    attr_accessor :contexts
+    alias_method :attr_contexts, :contexts
+    undef_method :contexts
+    alias_method :attr_contexts=, :contexts=
+    undef_method :contexts=
     
-    attr_accessor :index_table
-    alias_method :attr_index_table, :index_table
-    undef_method :index_table
-    alias_method :attr_index_table=, :index_table=
-    undef_method :index_table=
+    attr_accessor :current_caret
+    alias_method :attr_current_caret, :current_caret
+    undef_method :current_caret
+    alias_method :attr_current_caret=, :current_caret=
+    undef_method :current_caret=
     
-    attr_accessor :property
-    alias_method :attr_property, :property
-    undef_method :property
-    alias_method :attr_property=, :property=
-    undef_method :property=
+    attr_accessor :send_event
+    alias_method :attr_send_event, :send_event
+    undef_method :send_event
+    alias_method :attr_send_event=, :send_event=
+    undef_method :send_event=
     
-    attr_accessor :widget_table
-    alias_method :attr_widget_table, :widget_table
-    undef_method :widget_table
-    alias_method :attr_widget_table=, :widget_table=
-    undef_method :widget_table=
+    attr_accessor :current_control
+    alias_method :attr_current_control, :current_control
+    undef_method :current_control
+    alias_method :attr_current_control=, :current_control=
+    undef_method :current_control=
     
-    class_module.module_eval {
-      const_set_lazy(:GROW_SIZE) { 1024 }
-      const_attr_reader  :GROW_SIZE
-      
-      const_set_lazy(:SWT0) { (Character.new(?s.ord) << 24) + (Character.new(?w.ord) << 16) + (Character.new(?t.ord) << 8) + Character.new(?0.ord) }
-      const_attr_reader  :SWT0
-    }
+    attr_accessor :tracking_control
+    alias_method :attr_tracking_control, :tracking_control
+    undef_method :tracking_control
+    alias_method :attr_tracking_control=, :tracking_control=
+    undef_method :tracking_control=
     
-    # Focus and Activation
-    attr_accessor :active_shell
-    alias_method :attr_active_shell, :active_shell
-    undef_method :active_shell
-    alias_method :attr_active_shell=, :active_shell=
-    undef_method :active_shell=
+    attr_accessor :tooltip_control
+    alias_method :attr_tooltip_control, :tooltip_control
+    undef_method :tooltip_control
+    alias_method :attr_tooltip_control=, :tooltip_control=
+    undef_method :tooltip_control=
     
-    attr_accessor :focus_event
-    alias_method :attr_focus_event, :focus_event
-    undef_method :focus_event
-    alias_method :attr_focus_event=, :focus_event=
-    undef_method :focus_event=
+    attr_accessor :tooltip_target
+    alias_method :attr_tooltip_target, :tooltip_target
+    undef_method :tooltip_target
+    alias_method :attr_tooltip_target=, :tooltip_target=
+    undef_method :tooltip_target=
     
-    attr_accessor :focus_control
-    alias_method :attr_focus_control, :focus_control
-    undef_method :focus_control
-    alias_method :attr_focus_control=, :focus_control=
-    undef_method :focus_control=
+    attr_accessor :is_painting
+    alias_method :attr_is_painting, :is_painting
+    undef_method :is_painting
+    alias_method :attr_is_painting=, :is_painting=
+    undef_method :is_painting=
     
-    attr_accessor :focus_combo
-    alias_method :attr_focus_combo, :focus_combo
-    undef_method :focus_combo
-    alias_method :attr_focus_combo=, :focus_combo=
-    undef_method :focus_combo=
+    attr_accessor :needs_display
+    alias_method :attr_needs_display, :needs_display
+    undef_method :needs_display
+    alias_method :attr_needs_display=, :needs_display=
+    undef_method :needs_display=
     
-    attr_accessor :ignore_focus
-    alias_method :attr_ignore_focus, :ignore_focus
-    undef_method :ignore_focus
-    alias_method :attr_ignore_focus=, :ignore_focus=
-    undef_method :ignore_focus=
+    attr_accessor :needs_display_in_rect
+    alias_method :attr_needs_display_in_rect, :needs_display_in_rect
+    undef_method :needs_display_in_rect
+    alias_method :attr_needs_display_in_rect=, :needs_display_in_rect=
+    undef_method :needs_display_in_rect=
     
-    attr_accessor :delay_dispose
-    alias_method :attr_delay_dispose, :delay_dispose
-    undef_method :delay_dispose
-    alias_method :attr_delay_dispose=, :delay_dispose=
-    undef_method :delay_dispose=
+    attr_accessor :marked_attributes
+    alias_method :attr_marked_attributes, :marked_attributes
+    undef_method :marked_attributes
+    alias_method :attr_marked_attributes=, :marked_attributes=
+    undef_method :marked_attributes=
     
-    # Modality
+    # Fonts
+    attr_accessor :small_fonts
+    alias_method :attr_small_fonts, :small_fonts
+    undef_method :small_fonts
+    alias_method :attr_small_fonts=, :small_fonts=
+    undef_method :small_fonts=
+    
+    attr_accessor :button_font
+    alias_method :attr_button_font, :button_font
+    undef_method :button_font
+    alias_method :attr_button_font=, :button_font=
+    undef_method :button_font=
+    
+    attr_accessor :pop_up_button_font
+    alias_method :attr_pop_up_button_font, :pop_up_button_font
+    undef_method :pop_up_button_font
+    alias_method :attr_pop_up_button_font=, :pop_up_button_font=
+    undef_method :pop_up_button_font=
+    
+    attr_accessor :text_field_font
+    alias_method :attr_text_field_font, :text_field_font
+    undef_method :text_field_font
+    alias_method :attr_text_field_font=, :text_field_font=
+    undef_method :text_field_font=
+    
+    attr_accessor :secure_text_field_font
+    alias_method :attr_secure_text_field_font, :secure_text_field_font
+    undef_method :secure_text_field_font
+    alias_method :attr_secure_text_field_font=, :secure_text_field_font=
+    undef_method :secure_text_field_font=
+    
+    attr_accessor :search_field_font
+    alias_method :attr_search_field_font, :search_field_font
+    undef_method :search_field_font
+    alias_method :attr_search_field_font=, :search_field_font=
+    undef_method :search_field_font=
+    
+    attr_accessor :combo_box_font
+    alias_method :attr_combo_box_font, :combo_box_font
+    undef_method :combo_box_font
+    alias_method :attr_combo_box_font=, :combo_box_font=
+    undef_method :combo_box_font=
+    
+    attr_accessor :slider_font
+    alias_method :attr_slider_font, :slider_font
+    undef_method :slider_font
+    alias_method :attr_slider_font=, :slider_font=
+    undef_method :slider_font=
+    
+    attr_accessor :scroller_font
+    alias_method :attr_scroller_font, :scroller_font
+    undef_method :scroller_font
+    alias_method :attr_scroller_font=, :scroller_font=
+    undef_method :scroller_font=
+    
+    attr_accessor :text_view_font
+    alias_method :attr_text_view_font, :text_view_font
+    undef_method :text_view_font
+    alias_method :attr_text_view_font=, :text_view_font=
+    undef_method :text_view_font=
+    
+    attr_accessor :table_view_font
+    alias_method :attr_table_view_font, :table_view_font
+    undef_method :table_view_font
+    alias_method :attr_table_view_font=, :table_view_font=
+    undef_method :table_view_font=
+    
+    attr_accessor :outline_view_font
+    alias_method :attr_outline_view_font, :outline_view_font
+    undef_method :outline_view_font
+    alias_method :attr_outline_view_font=, :outline_view_font=
+    undef_method :outline_view_font=
+    
+    attr_accessor :date_picker_font
+    alias_method :attr_date_picker_font, :date_picker_font
+    undef_method :date_picker_font
+    alias_method :attr_date_picker_font=, :date_picker_font=
+    undef_method :date_picker_font=
+    
+    attr_accessor :box_font
+    alias_method :attr_box_font, :box_font
+    undef_method :box_font
+    alias_method :attr_box_font=, :box_font=
+    undef_method :box_font=
+    
+    attr_accessor :tab_view_font
+    alias_method :attr_tab_view_font, :tab_view_font
+    undef_method :tab_view_font
+    alias_method :attr_tab_view_font=, :tab_view_font=
+    undef_method :tab_view_font=
+    
+    attr_accessor :progress_indicator_font
+    alias_method :attr_progress_indicator_font, :progress_indicator_font
+    undef_method :progress_indicator_font
+    alias_method :attr_progress_indicator_font=, :progress_indicator_font=
+    undef_method :progress_indicator_font=
+    
     attr_accessor :modal_shells
     alias_method :attr_modal_shells, :modal_shells
     undef_method :modal_shells
     alias_method :attr_modal_shells=, :modal_shells=
     undef_method :modal_shells=
     
-    # Menus
     attr_accessor :menu_bar
     alias_method :attr_menu_bar, :menu_bar
     undef_method :menu_bar
@@ -665,12 +361,281 @@ module Org::Eclipse::Swt::Widgets
     alias_method :attr_popups=, :popups=
     undef_method :popups=
     
+    attr_accessor :application
+    alias_method :attr_application, :application
+    undef_method :application
+    alias_method :attr_application=, :application=
+    undef_method :application=
+    
+    # long
+    attr_accessor :application_class
+    alias_method :attr_application_class, :application_class
+    undef_method :application_class
+    alias_method :attr_application_class=, :application_class=
+    undef_method :application_class=
+    
+    attr_accessor :dock_image
+    alias_method :attr_dock_image, :dock_image
+    undef_method :dock_image
+    alias_method :attr_dock_image=, :dock_image=
+    undef_method :dock_image=
+    
+    attr_accessor :is_embedded
+    alias_method :attr_is_embedded, :is_embedded
+    undef_method :is_embedded
+    alias_method :attr_is_embedded=, :is_embedded=
+    undef_method :is_embedded=
+    
     class_module.module_eval {
-      const_set_lazy(:ID_TEMPORARY) { 1000 }
-      const_attr_reader  :ID_TEMPORARY
       
-      const_set_lazy(:ID_START) { 1001 }
-      const_attr_reader  :ID_START
+      def launched
+        defined?(@@launched) ? @@launched : @@launched= false
+      end
+      alias_method :attr_launched, :launched
+      
+      def launched=(value)
+        @@launched = value
+      end
+      alias_method :attr_launched=, :launched=
+    }
+    
+    # Focus
+    attr_accessor :focus_control
+    alias_method :attr_focus_control, :focus_control
+    undef_method :focus_control
+    alias_method :attr_focus_control=, :focus_control=
+    undef_method :focus_control=
+    
+    attr_accessor :current_focus_control
+    alias_method :attr_current_focus_control, :current_focus_control
+    undef_method :current_focus_control
+    alias_method :attr_current_focus_control=, :current_focus_control=
+    undef_method :current_focus_control=
+    
+    attr_accessor :focus_event
+    alias_method :attr_focus_event, :focus_event
+    undef_method :focus_event
+    alias_method :attr_focus_event=, :focus_event=
+    undef_method :focus_event=
+    
+    attr_accessor :screen_window
+    alias_method :attr_screen_window, :screen_window
+    undef_method :screen_window
+    alias_method :attr_screen_window=, :screen_window=
+    undef_method :screen_window=
+    
+    attr_accessor :key_window
+    alias_method :attr_key_window, :key_window
+    undef_method :key_window
+    alias_method :attr_key_window=, :key_window=
+    undef_method :key_window=
+    
+    attr_accessor :pools
+    alias_method :attr_pools, :pools
+    undef_method :pools
+    alias_method :attr_pools=, :pools=
+    undef_method :pools=
+    
+    attr_accessor :pool_count
+    alias_method :attr_pool_count, :pool_count
+    undef_method :pool_count
+    alias_method :attr_pool_count=, :pool_count=
+    undef_method :pool_count=
+    
+    attr_accessor :loop_count
+    alias_method :attr_loop_count, :loop_count
+    undef_method :loop_count
+    alias_method :attr_loop_count=, :loop_count=
+    undef_method :loop_count=
+    
+    attr_accessor :screen_id
+    alias_method :attr_screen_id, :screen_id
+    undef_method :screen_id
+    alias_method :attr_screen_id=, :screen_id=
+    undef_method :screen_id=
+    
+    attr_accessor :screen_cascade
+    alias_method :attr_screen_cascade, :screen_cascade
+    undef_method :screen_cascade
+    alias_method :attr_screen_cascade=, :screen_cascade=
+    undef_method :screen_cascade=
+    
+    # long
+    attr_accessor :run_loop_observer
+    alias_method :attr_run_loop_observer, :run_loop_observer
+    undef_method :run_loop_observer
+    alias_method :attr_run_loop_observer=, :run_loop_observer=
+    undef_method :run_loop_observer=
+    
+    attr_accessor :observer_callback
+    alias_method :attr_observer_callback, :observer_callback
+    undef_method :observer_callback
+    alias_method :attr_observer_callback=, :observer_callback=
+    undef_method :observer_callback=
+    
+    attr_accessor :lock_cursor
+    alias_method :attr_lock_cursor, :lock_cursor
+    undef_method :lock_cursor
+    alias_method :attr_lock_cursor=, :lock_cursor=
+    undef_method :lock_cursor=
+    
+    # long
+    attr_accessor :old_cursor_set_proc
+    alias_method :attr_old_cursor_set_proc, :old_cursor_set_proc
+    undef_method :old_cursor_set_proc
+    alias_method :attr_old_cursor_set_proc=, :old_cursor_set_proc=
+    undef_method :old_cursor_set_proc=
+    
+    attr_accessor :cursor_set_callback
+    alias_method :attr_cursor_set_callback, :cursor_set_callback
+    undef_method :cursor_set_callback
+    alias_method :attr_cursor_set_callback=, :cursor_set_callback=
+    undef_method :cursor_set_callback=
+    
+    class_module.module_eval {
+      # the following Callbacks are never freed
+      
+      def window_callback2
+        defined?(@@window_callback2) ? @@window_callback2 : @@window_callback2= nil
+      end
+      alias_method :attr_window_callback2, :window_callback2
+      
+      def window_callback2=(value)
+        @@window_callback2 = value
+      end
+      alias_method :attr_window_callback2=, :window_callback2=
+      
+      
+      def window_callback3
+        defined?(@@window_callback3) ? @@window_callback3 : @@window_callback3= nil
+      end
+      alias_method :attr_window_callback3, :window_callback3
+      
+      def window_callback3=(value)
+        @@window_callback3 = value
+      end
+      alias_method :attr_window_callback3=, :window_callback3=
+      
+      
+      def window_callback4
+        defined?(@@window_callback4) ? @@window_callback4 : @@window_callback4= nil
+      end
+      alias_method :attr_window_callback4, :window_callback4
+      
+      def window_callback4=(value)
+        @@window_callback4 = value
+      end
+      alias_method :attr_window_callback4=, :window_callback4=
+      
+      
+      def window_callback5
+        defined?(@@window_callback5) ? @@window_callback5 : @@window_callback5= nil
+      end
+      alias_method :attr_window_callback5, :window_callback5
+      
+      def window_callback5=(value)
+        @@window_callback5 = value
+      end
+      alias_method :attr_window_callback5=, :window_callback5=
+      
+      
+      def window_callback6
+        defined?(@@window_callback6) ? @@window_callback6 : @@window_callback6= nil
+      end
+      alias_method :attr_window_callback6, :window_callback6
+      
+      def window_callback6=(value)
+        @@window_callback6 = value
+      end
+      alias_method :attr_window_callback6=, :window_callback6=
+      
+      
+      def dialog_callback3
+        defined?(@@dialog_callback3) ? @@dialog_callback3 : @@dialog_callback3= nil
+      end
+      alias_method :attr_dialog_callback3, :dialog_callback3
+      
+      def dialog_callback3=(value)
+        @@dialog_callback3 = value
+      end
+      alias_method :attr_dialog_callback3=, :dialog_callback3=
+      
+      
+      def dialog_callback4
+        defined?(@@dialog_callback4) ? @@dialog_callback4 : @@dialog_callback4= nil
+      end
+      alias_method :attr_dialog_callback4, :dialog_callback4
+      
+      def dialog_callback4=(value)
+        @@dialog_callback4 = value
+      end
+      alias_method :attr_dialog_callback4=, :dialog_callback4=
+      
+      
+      def dialog_callback5
+        defined?(@@dialog_callback5) ? @@dialog_callback5 : @@dialog_callback5= nil
+      end
+      alias_method :attr_dialog_callback5, :dialog_callback5
+      
+      def dialog_callback5=(value)
+        @@dialog_callback5 = value
+      end
+      alias_method :attr_dialog_callback5=, :dialog_callback5=
+      
+      
+      def application_callback2
+        defined?(@@application_callback2) ? @@application_callback2 : @@application_callback2= nil
+      end
+      alias_method :attr_application_callback2, :application_callback2
+      
+      def application_callback2=(value)
+        @@application_callback2 = value
+      end
+      alias_method :attr_application_callback2=, :application_callback2=
+      
+      
+      def application_callback3
+        defined?(@@application_callback3) ? @@application_callback3 : @@application_callback3= nil
+      end
+      alias_method :attr_application_callback3, :application_callback3
+      
+      def application_callback3=(value)
+        @@application_callback3 = value
+      end
+      alias_method :attr_application_callback3=, :application_callback3=
+      
+      
+      def application_callback6
+        defined?(@@application_callback6) ? @@application_callback6 : @@application_callback6= nil
+      end
+      alias_method :attr_application_callback6, :application_callback6
+      
+      def application_callback6=(value)
+        @@application_callback6 = value
+      end
+      alias_method :attr_application_callback6=, :application_callback6=
+      
+      
+      def field_editor_callback3
+        defined?(@@field_editor_callback3) ? @@field_editor_callback3 : @@field_editor_callback3= nil
+      end
+      alias_method :attr_field_editor_callback3, :field_editor_callback3
+      
+      def field_editor_callback3=(value)
+        @@field_editor_callback3 = value
+      end
+      alias_method :attr_field_editor_callback3=, :field_editor_callback3=
+      
+      
+      def field_editor_callback4
+        defined?(@@field_editor_callback4) ? @@field_editor_callback4 : @@field_editor_callback4= nil
+      end
+      alias_method :attr_field_editor_callback4, :field_editor_callback4
+      
+      def field_editor_callback4=(value)
+        @@field_editor_callback4 = value
+      end
+      alias_method :attr_field_editor_callback4=, :field_editor_callback4=
     }
     
     # Display Shutdown
@@ -687,230 +652,17 @@ module Org::Eclipse::Swt::Widgets
     alias_method :attr_tray=, :tray=
     undef_method :tray=
     
-    # Timers
-    attr_accessor :timer_ids
-    alias_method :attr_timer_ids, :timer_ids
-    undef_method :timer_ids
-    alias_method :attr_timer_ids=, :timer_ids=
-    undef_method :timer_ids=
+    attr_accessor :current_tray_item
+    alias_method :attr_current_tray_item, :current_tray_item
+    undef_method :current_tray_item
+    alias_method :attr_current_tray_item=, :current_tray_item=
+    undef_method :current_tray_item=
     
-    attr_accessor :timer_list
-    alias_method :attr_timer_list, :timer_list
-    undef_method :timer_list
-    alias_method :attr_timer_list=, :timer_list=
-    undef_method :timer_list=
-    
-    attr_accessor :timer_callback
-    alias_method :attr_timer_callback, :timer_callback
-    undef_method :timer_callback
-    alias_method :attr_timer_callback=, :timer_callback=
-    undef_method :timer_callback=
-    
-    attr_accessor :timer_proc
-    alias_method :attr_timer_proc, :timer_proc
-    undef_method :timer_proc
-    alias_method :attr_timer_proc=, :timer_proc=
-    undef_method :timer_proc=
-    
-    attr_accessor :allow_timers
-    alias_method :attr_allow_timers, :allow_timers
-    undef_method :allow_timers
-    alias_method :attr_allow_timers=, :allow_timers=
-    undef_method :allow_timers=
-    
-    attr_accessor :polling_timer
-    alias_method :attr_polling_timer, :polling_timer
-    undef_method :polling_timer
-    alias_method :attr_polling_timer=, :polling_timer=
-    undef_method :polling_timer=
-    
-    class_module.module_eval {
-      const_set_lazy(:POLLING_TIMEOUT) { 10 }
-      const_attr_reader  :POLLING_TIMEOUT
-    }
-    
-    # Current caret
-    attr_accessor :current_caret
-    alias_method :attr_current_caret, :current_caret
-    undef_method :current_caret
-    alias_method :attr_current_caret=, :current_caret=
-    undef_method :current_caret=
-    
-    attr_accessor :caret_callback
-    alias_method :attr_caret_callback, :caret_callback
-    undef_method :caret_callback
-    alias_method :attr_caret_callback=, :caret_callback=
-    undef_method :caret_callback=
-    
-    attr_accessor :caret_id
-    alias_method :attr_caret_id, :caret_id
-    undef_method :caret_id
-    alias_method :attr_caret_id=, :caret_id=
-    undef_method :caret_id=
-    
-    attr_accessor :caret_proc
-    alias_method :attr_caret_proc, :caret_proc
-    undef_method :caret_proc
-    alias_method :attr_caret_proc=, :caret_proc=
-    undef_method :caret_proc=
-    
-    # Grabs
-    attr_accessor :grab_control
-    alias_method :attr_grab_control, :grab_control
-    undef_method :grab_control
-    alias_method :attr_grab_control=, :grab_control=
-    undef_method :grab_control=
-    
-    # Hover Help
-    attr_accessor :help_string
-    alias_method :attr_help_string, :help_string
-    undef_method :help_string
-    alias_method :attr_help_string=, :help_string=
-    undef_method :help_string=
-    
-    attr_accessor :help_widget
-    alias_method :attr_help_widget, :help_widget
-    undef_method :help_widget
-    alias_method :attr_help_widget=, :help_widget=
-    undef_method :help_widget=
-    
-    attr_accessor :last_help_x
-    alias_method :attr_last_help_x, :last_help_x
-    undef_method :last_help_x
-    alias_method :attr_last_help_x=, :last_help_x=
-    undef_method :last_help_x=
-    
-    attr_accessor :last_help_y
-    alias_method :attr_last_help_y, :last_help_y
-    undef_method :last_help_y
-    alias_method :attr_last_help_y=, :last_help_y=
-    undef_method :last_help_y=
-    
-    # Mouse DoubleClick
-    attr_accessor :click_count
-    alias_method :attr_click_count, :click_count
-    undef_method :click_count
-    alias_method :attr_click_count=, :click_count=
-    undef_method :click_count=
-    
-    attr_accessor :click_count_button
-    alias_method :attr_click_count_button, :click_count_button
-    undef_method :click_count_button
-    alias_method :attr_click_count_button=, :click_count_button=
-    undef_method :click_count_button=
-    
-    # Mouse Enter/Exit/Hover
-    attr_accessor :current_control
-    alias_method :attr_current_control, :current_control
-    undef_method :current_control
-    alias_method :attr_current_control=, :current_control=
-    undef_method :current_control=
-    
-    attr_accessor :mouse_hover_id
-    alias_method :attr_mouse_hover_id, :mouse_hover_id
-    undef_method :mouse_hover_id
-    alias_method :attr_mouse_hover_id=, :mouse_hover_id=
-    undef_method :mouse_hover_id=
-    
-    attr_accessor :mouse_moved
-    alias_method :attr_mouse_moved, :mouse_moved
-    undef_method :mouse_moved
-    alias_method :attr_mouse_moved=, :mouse_moved=
-    undef_method :mouse_moved=
-    
-    # Drag Detect
-    attr_accessor :drag_button
-    alias_method :attr_drag_button, :drag_button
-    undef_method :drag_button
-    alias_method :attr_drag_button=, :drag_button=
-    undef_method :drag_button=
-    
-    attr_accessor :drag_x
-    alias_method :attr_drag_x, :drag_x
-    undef_method :drag_x
-    alias_method :attr_drag_x=, :drag_x=
-    undef_method :drag_x=
-    
-    attr_accessor :drag_y
-    alias_method :attr_drag_y, :drag_y
-    undef_method :drag_y
-    alias_method :attr_drag_y=, :drag_y=
-    undef_method :drag_y=
-    
-    attr_accessor :drag_state
-    alias_method :attr_drag_state, :drag_state
-    undef_method :drag_state
-    alias_method :attr_drag_state=, :drag_state=
-    undef_method :drag_state=
-    
-    attr_accessor :drag_modifiers
-    alias_method :attr_drag_modifiers, :drag_modifiers
-    undef_method :drag_modifiers
-    alias_method :attr_drag_modifiers=, :drag_modifiers=
-    undef_method :drag_modifiers=
-    
-    attr_accessor :dragging
-    alias_method :attr_dragging, :dragging
-    undef_method :dragging
-    alias_method :attr_dragging=, :dragging=
-    undef_method :dragging=
-    
-    # Insets
-    attr_accessor :button_inset
-    alias_method :attr_button_inset, :button_inset
-    undef_method :button_inset
-    alias_method :attr_button_inset=, :button_inset=
-    undef_method :button_inset=
-    
-    attr_accessor :tab_folder_north_inset
-    alias_method :attr_tab_folder_north_inset, :tab_folder_north_inset
-    undef_method :tab_folder_north_inset
-    alias_method :attr_tab_folder_north_inset=, :tab_folder_north_inset=
-    undef_method :tab_folder_north_inset=
-    
-    attr_accessor :tab_folder_south_inset
-    alias_method :attr_tab_folder_south_inset, :tab_folder_south_inset
-    undef_method :tab_folder_south_inset
-    alias_method :attr_tab_folder_south_inset=, :tab_folder_south_inset=
-    undef_method :tab_folder_south_inset=
-    
-    attr_accessor :combo_inset
-    alias_method :attr_combo_inset, :combo_inset
-    undef_method :combo_inset
-    alias_method :attr_combo_inset=, :combo_inset=
-    undef_method :combo_inset=
-    
-    attr_accessor :edit_text_inset
-    alias_method :attr_edit_text_inset, :edit_text_inset
-    undef_method :edit_text_inset
-    alias_method :attr_edit_text_inset=, :edit_text_inset=
-    undef_method :edit_text_inset=
-    
-    attr_accessor :search_text_inset
-    alias_method :attr_search_text_inset, :search_text_inset
-    undef_method :search_text_inset
-    alias_method :attr_search_text_inset=, :search_text_inset=
-    undef_method :search_text_inset=
-    
-    # Fonts
-    attr_accessor :small_fonts
-    alias_method :attr_small_fonts, :small_fonts
-    undef_method :small_fonts
-    alias_method :attr_small_fonts=, :small_fonts=
-    undef_method :small_fonts=
-    
-    # Keyboard
-    attr_accessor :kchr_ptr
-    alias_method :attr_kchr_ptr, :kchr_ptr
-    undef_method :kchr_ptr
-    alias_method :attr_kchr_ptr=, :kchr_ptr=
-    undef_method :kchr_ptr=
-    
-    attr_accessor :kchr_state
-    alias_method :attr_kchr_state, :kchr_state
-    undef_method :kchr_state
-    alias_method :attr_kchr_state=, :kchr_state=
-    undef_method :kchr_state=
+    attr_accessor :tray_item_menu
+    alias_method :attr_tray_item_menu, :tray_item_menu
+    undef_method :tray_item_menu
+    alias_method :attr_tray_item_menu=, :tray_item_menu=
+    undef_method :tray_item_menu=
     
     # System Resources
     attr_accessor :error_image
@@ -937,25 +689,39 @@ module Org::Eclipse::Swt::Widgets
     alias_method :attr_cursors=, :cursors=
     undef_method :cursors=
     
-    # System Settings
-    attr_accessor :run_settings
-    alias_method :attr_run_settings, :run_settings
-    undef_method :run_settings
-    alias_method :attr_run_settings=, :run_settings=
-    undef_method :run_settings=
+    # System Colors
+    # double
+    attr_accessor :colors
+    alias_method :attr_colors, :colors
+    undef_method :colors
+    alias_method :attr_colors=, :colors=
+    undef_method :colors=
     
-    attr_accessor :highlight_color
-    alias_method :attr_highlight_color, :highlight_color
-    undef_method :highlight_color
-    alias_method :attr_highlight_color=, :highlight_color=
-    undef_method :highlight_color=
+    # double
+    attr_accessor :alternate_selected_control_text_color
+    alias_method :attr_alternate_selected_control_text_color, :alternate_selected_control_text_color
+    undef_method :alternate_selected_control_text_color
+    alias_method :attr_alternate_selected_control_text_color=, :alternate_selected_control_text_color=
+    undef_method :alternate_selected_control_text_color=
     
-    # Dock icon
-    attr_accessor :dock_image
-    alias_method :attr_dock_image, :dock_image
-    undef_method :dock_image
-    alias_method :attr_dock_image=, :dock_image=
-    undef_method :dock_image=
+    attr_accessor :selected_control_text_color
+    alias_method :attr_selected_control_text_color, :selected_control_text_color
+    undef_method :selected_control_text_color
+    alias_method :attr_selected_control_text_color=, :selected_control_text_color=
+    undef_method :selected_control_text_color=
+    
+    # double
+    attr_accessor :alternate_selected_control_color
+    alias_method :attr_alternate_selected_control_color, :alternate_selected_control_color
+    undef_method :alternate_selected_control_color
+    alias_method :attr_alternate_selected_control_color=, :alternate_selected_control_color=
+    undef_method :alternate_selected_control_color=
+    
+    attr_accessor :secondary_selected_control_color
+    alias_method :attr_secondary_selected_control_color, :secondary_selected_control_color
+    undef_method :secondary_selected_control_color
+    alias_method :attr_secondary_selected_control_color=, :secondary_selected_control_color=
+    undef_method :secondary_selected_control_color=
     
     class_module.module_eval {
       # Key Mappings.
@@ -966,14 +732,13 @@ module Org::Eclipse::Swt::Widgets
       # Functions Keys
       # Numeric Keypad Keys
       # Other keys
-      # {??,	SWT.CAPS_LOCK},
       # {??,	SWT.SCROLL_LOCK},
       # {??,	SWT.PAUSE},
       # {??,	SWT.BREAK},
       # {??,	SWT.PRINT_SCREEN},
       
       def key_table
-        defined?(@@key_table) ? @@key_table : @@key_table= Array.typed(Array.typed(::Java::Int)).new([Array.typed(::Java::Int).new([58, SWT::ALT]), Array.typed(::Java::Int).new([56, SWT::SHIFT]), Array.typed(::Java::Int).new([59, SWT::CONTROL]), Array.typed(::Java::Int).new([55, SWT::COMMAND]), Array.typed(::Java::Int).new([126, SWT::ARROW_UP]), Array.typed(::Java::Int).new([125, SWT::ARROW_DOWN]), Array.typed(::Java::Int).new([123, SWT::ARROW_LEFT]), Array.typed(::Java::Int).new([124, SWT::ARROW_RIGHT]), Array.typed(::Java::Int).new([116, SWT::PAGE_UP]), Array.typed(::Java::Int).new([121, SWT::PAGE_DOWN]), Array.typed(::Java::Int).new([115, SWT::HOME]), Array.typed(::Java::Int).new([119, SWT::END_]), Array.typed(::Java::Int).new([51, SWT::BS]), Array.typed(::Java::Int).new([36, SWT::CR]), Array.typed(::Java::Int).new([117, SWT::DEL]), Array.typed(::Java::Int).new([53, SWT::ESC]), Array.typed(::Java::Int).new([76, SWT::LF]), Array.typed(::Java::Int).new([48, SWT::TAB]), Array.typed(::Java::Int).new([122, SWT::F1]), Array.typed(::Java::Int).new([120, SWT::F2]), Array.typed(::Java::Int).new([99, SWT::F3]), Array.typed(::Java::Int).new([118, SWT::F4]), Array.typed(::Java::Int).new([96, SWT::F5]), Array.typed(::Java::Int).new([97, SWT::F6]), Array.typed(::Java::Int).new([98, SWT::F7]), Array.typed(::Java::Int).new([100, SWT::F8]), Array.typed(::Java::Int).new([101, SWT::F9]), Array.typed(::Java::Int).new([109, SWT::F10]), Array.typed(::Java::Int).new([103, SWT::F11]), Array.typed(::Java::Int).new([111, SWT::F12]), Array.typed(::Java::Int).new([105, SWT::F13]), Array.typed(::Java::Int).new([107, SWT::F14]), Array.typed(::Java::Int).new([113, SWT::F15]), Array.typed(::Java::Int).new([67, SWT::KEYPAD_MULTIPLY]), Array.typed(::Java::Int).new([69, SWT::KEYPAD_ADD]), Array.typed(::Java::Int).new([76, SWT::KEYPAD_CR]), Array.typed(::Java::Int).new([78, SWT::KEYPAD_SUBTRACT]), Array.typed(::Java::Int).new([65, SWT::KEYPAD_DECIMAL]), Array.typed(::Java::Int).new([75, SWT::KEYPAD_DIVIDE]), Array.typed(::Java::Int).new([82, SWT::KEYPAD_0]), Array.typed(::Java::Int).new([83, SWT::KEYPAD_1]), Array.typed(::Java::Int).new([84, SWT::KEYPAD_2]), Array.typed(::Java::Int).new([85, SWT::KEYPAD_3]), Array.typed(::Java::Int).new([86, SWT::KEYPAD_4]), Array.typed(::Java::Int).new([87, SWT::KEYPAD_5]), Array.typed(::Java::Int).new([88, SWT::KEYPAD_6]), Array.typed(::Java::Int).new([89, SWT::KEYPAD_7]), Array.typed(::Java::Int).new([91, SWT::KEYPAD_8]), Array.typed(::Java::Int).new([92, SWT::KEYPAD_9]), Array.typed(::Java::Int).new([81, SWT::KEYPAD_EQUAL]), Array.typed(::Java::Int).new([71, SWT::NUM_LOCK]), Array.typed(::Java::Int).new([114, SWT::HELP]), ])
+        defined?(@@key_table) ? @@key_table : @@key_table= Array.typed(Array.typed(::Java::Int)).new([Array.typed(::Java::Int).new([58, SWT::ALT]), Array.typed(::Java::Int).new([56, SWT::SHIFT]), Array.typed(::Java::Int).new([59, SWT::CONTROL]), Array.typed(::Java::Int).new([55, SWT::COMMAND]), Array.typed(::Java::Int).new([61, SWT::ALT]), Array.typed(::Java::Int).new([62, SWT::CONTROL]), Array.typed(::Java::Int).new([60, SWT::SHIFT]), Array.typed(::Java::Int).new([54, SWT::COMMAND]), Array.typed(::Java::Int).new([126, SWT::ARROW_UP]), Array.typed(::Java::Int).new([125, SWT::ARROW_DOWN]), Array.typed(::Java::Int).new([123, SWT::ARROW_LEFT]), Array.typed(::Java::Int).new([124, SWT::ARROW_RIGHT]), Array.typed(::Java::Int).new([116, SWT::PAGE_UP]), Array.typed(::Java::Int).new([121, SWT::PAGE_DOWN]), Array.typed(::Java::Int).new([115, SWT::HOME]), Array.typed(::Java::Int).new([119, SWT::END_]), Array.typed(::Java::Int).new([51, SWT::BS]), Array.typed(::Java::Int).new([36, SWT::CR]), Array.typed(::Java::Int).new([117, SWT::DEL]), Array.typed(::Java::Int).new([53, SWT::ESC]), Array.typed(::Java::Int).new([76, SWT::LF]), Array.typed(::Java::Int).new([48, SWT::TAB]), Array.typed(::Java::Int).new([122, SWT::F1]), Array.typed(::Java::Int).new([120, SWT::F2]), Array.typed(::Java::Int).new([99, SWT::F3]), Array.typed(::Java::Int).new([118, SWT::F4]), Array.typed(::Java::Int).new([96, SWT::F5]), Array.typed(::Java::Int).new([97, SWT::F6]), Array.typed(::Java::Int).new([98, SWT::F7]), Array.typed(::Java::Int).new([100, SWT::F8]), Array.typed(::Java::Int).new([101, SWT::F9]), Array.typed(::Java::Int).new([109, SWT::F10]), Array.typed(::Java::Int).new([103, SWT::F11]), Array.typed(::Java::Int).new([111, SWT::F12]), Array.typed(::Java::Int).new([105, SWT::F13]), Array.typed(::Java::Int).new([107, SWT::F14]), Array.typed(::Java::Int).new([113, SWT::F15]), Array.typed(::Java::Int).new([67, SWT::KEYPAD_MULTIPLY]), Array.typed(::Java::Int).new([69, SWT::KEYPAD_ADD]), Array.typed(::Java::Int).new([76, SWT::KEYPAD_CR]), Array.typed(::Java::Int).new([78, SWT::KEYPAD_SUBTRACT]), Array.typed(::Java::Int).new([65, SWT::KEYPAD_DECIMAL]), Array.typed(::Java::Int).new([75, SWT::KEYPAD_DIVIDE]), Array.typed(::Java::Int).new([82, SWT::KEYPAD_0]), Array.typed(::Java::Int).new([83, SWT::KEYPAD_1]), Array.typed(::Java::Int).new([84, SWT::KEYPAD_2]), Array.typed(::Java::Int).new([85, SWT::KEYPAD_3]), Array.typed(::Java::Int).new([86, SWT::KEYPAD_4]), Array.typed(::Java::Int).new([87, SWT::KEYPAD_5]), Array.typed(::Java::Int).new([88, SWT::KEYPAD_6]), Array.typed(::Java::Int).new([89, SWT::KEYPAD_7]), Array.typed(::Java::Int).new([91, SWT::KEYPAD_8]), Array.typed(::Java::Int).new([92, SWT::KEYPAD_9]), Array.typed(::Java::Int).new([81, SWT::KEYPAD_EQUAL]), Array.typed(::Java::Int).new([57, SWT::CAPS_LOCK]), Array.typed(::Java::Int).new([71, SWT::NUM_LOCK]), Array.typed(::Java::Int).new([114, SWT::HELP]), ])
       end
       alias_method :attr_key_table, :key_table
       
@@ -984,7 +749,7 @@ module Org::Eclipse::Swt::Widgets
       
       
       def app_name
-        defined?(@@app_name) ? @@app_name : @@app_name= "SWT"
+        defined?(@@app_name) ? @@app_name : @@app_name= nil
       end
       alias_method :attr_app_name, :app_name
       
@@ -993,11 +758,22 @@ module Org::Eclipse::Swt::Widgets
       end
       alias_method :attr_app_name=, :app_name=
       
-      # $NON-NLS-1$
       const_set_lazy(:ADD_WIDGET_KEY) { "org.eclipse.swt.internal.addWidget" }
       const_attr_reader  :ADD_WIDGET_KEY
       
       # $NON-NLS-1$
+      const_set_lazy(:SWT_OBJECT) { Array.typed(::Java::Byte).new([Character.new(?S.ord), Character.new(?W.ord), Character.new(?T.ord), Character.new(?_.ord), Character.new(?O.ord), Character.new(?B.ord), Character.new(?J.ord), Character.new(?E.ord), Character.new(?C.ord), Character.new(?T.ord), Character.new(?\0.ord)]) }
+      const_attr_reader  :SWT_OBJECT
+      
+      const_set_lazy(:SWT_IMAGE) { Array.typed(::Java::Byte).new([Character.new(?S.ord), Character.new(?W.ord), Character.new(?T.ord), Character.new(?_.ord), Character.new(?I.ord), Character.new(?M.ord), Character.new(?A.ord), Character.new(?G.ord), Character.new(?E.ord), Character.new(?\0.ord)]) }
+      const_attr_reader  :SWT_IMAGE
+      
+      const_set_lazy(:SWT_ROW) { Array.typed(::Java::Byte).new([Character.new(?S.ord), Character.new(?W.ord), Character.new(?T.ord), Character.new(?_.ord), Character.new(?R.ord), Character.new(?O.ord), Character.new(?W.ord), Character.new(?\0.ord)]) }
+      const_attr_reader  :SWT_ROW
+      
+      const_set_lazy(:SWT_COLUMN) { Array.typed(::Java::Byte).new([Character.new(?S.ord), Character.new(?W.ord), Character.new(?T.ord), Character.new(?_.ord), Character.new(?C.ord), Character.new(?O.ord), Character.new(?L.ord), Character.new(?U.ord), Character.new(?M.ord), Character.new(?N.ord), Character.new(?\0.ord)]) }
+      const_attr_reader  :SWT_COLUMN
+      
       # Multiple Displays.
       
       def default
@@ -1026,7 +802,56 @@ module Org::Eclipse::Swt::Widgets
       const_attr_reader  :PACKAGE_PREFIX
     }
     
-    # $NON-NLS-1$
+    # Timer
+    attr_accessor :timer_list
+    alias_method :attr_timer_list, :timer_list
+    undef_method :timer_list
+    alias_method :attr_timer_list=, :timer_list=
+    undef_method :timer_list=
+    
+    attr_accessor :ns_timers
+    alias_method :attr_ns_timers, :ns_timers
+    undef_method :ns_timers
+    alias_method :attr_ns_timers=, :ns_timers=
+    undef_method :ns_timers=
+    
+    attr_accessor :timer_delegate
+    alias_method :attr_timer_delegate, :timer_delegate
+    undef_method :timer_delegate
+    alias_method :attr_timer_delegate=, :timer_delegate=
+    undef_method :timer_delegate=
+    
+    class_module.module_eval {
+      
+      def application_delegate
+        defined?(@@application_delegate) ? @@application_delegate : @@application_delegate= nil
+      end
+      alias_method :attr_application_delegate, :application_delegate
+      
+      def application_delegate=(value)
+        @@application_delegate = value
+      end
+      alias_method :attr_application_delegate=, :application_delegate=
+    }
+    
+    # Settings
+    attr_accessor :run_settings
+    alias_method :attr_run_settings, :run_settings
+    undef_method :run_settings
+    alias_method :attr_run_settings=, :run_settings=
+    undef_method :run_settings=
+    
+    attr_accessor :settings_delegate
+    alias_method :attr_settings_delegate, :settings_delegate
+    undef_method :settings_delegate
+    alias_method :attr_settings_delegate=, :settings_delegate=
+    undef_method :settings_delegate=
+    
+    class_module.module_eval {
+      const_set_lazy(:DEFAULT_BUTTON_INTERVAL) { 30 }
+      const_attr_reader  :DEFAULT_BUTTON_INTERVAL
+    }
+    
     # Display Data
     attr_accessor :data
     alias_method :attr_data, :data
@@ -1120,54 +945,23 @@ module Org::Eclipse::Swt::Widgets
       end
     }
     
-    typesig { [::Java::Int, ::Java::Int] }
-    def action_proc(the_control, part_code)
-      widget = get_widget(the_control)
-      if (!(widget).nil?)
-        return widget.action_proc(the_control, part_code)
+    typesig { [SwtGCData] }
+    def add_context(context)
+      if ((@contexts).nil?)
+        @contexts = Array.typed(SwtGCData).new(12) { nil }
       end
-      return OS.attr_no_err
-    end
-    
-    typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
-    def appearance_proc(the_apple_event, reply, handler_refcon)
-      @run_settings = true
-      wake_thread
-      return OS.attr_event_not_handled_err
-    end
-    
-    typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
-    def apple_event_proc(next_handler, the_event, user_data)
-      event_class = OS._get_event_class(the_event)
-      event_kind = OS._get_event_kind(the_event)
-      case (event_class)
-      when OS.attr_k_event_class_application
-        case (event_kind)
-        when OS.attr_k_event_app_available_window_bounds_changed
-          # Reset the dock image in case the dock has been restarted
-          if (!(@dock_image).equal?(0))
-            reason = Array.typed(::Java::Int).new(1) { 0 }
-            OS._get_event_parameter(the_event, OS.attr_k_event_param_reason, OS.attr_type_uint32, nil, 4, nil, reason)
-            if ((reason[0]).equal?(OS.attr_k_avail_bounds_changed_for_dock))
-              OS._set_application_dock_tile_image(@dock_image)
-            end
-          end
+      i = 0
+      while i < @contexts.attr_length
+        if (!(@contexts[i]).nil? && (@contexts[i]).equal?(context))
+          @contexts[i] = context
+          return
         end
-      when OS.attr_k_event_class_apple_event
-        event_record = EventRecord.new
-        release = false
-        if (OS._is_event_in_queue(@queue, the_event))
-          OS._retain_event(the_event)
-          release = true
-          OS._remove_event_from_queue(@queue, the_event)
-        end
-        OS._convert_event_ref_to_event_record(the_event, event_record)
-        OS._aeprocess_apple_event(event_record)
-        if (release)
-          OS._release_event(the_event)
-        end
+        i += 1
       end
-      return OS.attr_event_not_handled_err
+      new_contexts = Array.typed(SwtGCData).new(@contexts.attr_length + 12) { nil }
+      new_contexts[@contexts.attr_length] = context
+      System.arraycopy(@contexts, 0, new_contexts, 0, @contexts.attr_length)
+      @contexts = new_contexts
     end
     
     typesig { [::Java::Int, Listener] }
@@ -1258,17 +1052,37 @@ module Org::Eclipse::Swt::Widgets
       i = 0
       while i < @menus.attr_length
         if ((@menus[i]).nil?)
-          menu.attr_id = RJava.cast_to_short((ID_START + i))
           @menus[i] = menu
           return
         end
         i += 1
       end
       new_menus = Array.typed(Menu).new(@menus.attr_length + 12) { nil }
-      menu.attr_id = RJava.cast_to_short((ID_START + @menus.attr_length))
       new_menus[@menus.attr_length] = menu
       System.arraycopy(@menus, 0, new_menus, 0, @menus.attr_length)
       @menus = new_menus
+    end
+    
+    typesig { [] }
+    def add_pool
+      add_pool(NSAutoreleasePool.new.alloc.init)
+    end
+    
+    typesig { [NSAutoreleasePool] }
+    def add_pool(pool)
+      if ((@pools).nil?)
+        @pools = Array.typed(NSAutoreleasePool).new(4) { nil }
+      end
+      if ((@pool_count).equal?(@pools.attr_length))
+        temp = Array.typed(NSAutoreleasePool).new(@pool_count + 4) { nil }
+        System.arraycopy(@pools, 0, temp, 0, @pool_count)
+        @pools = temp
+      end
+      if ((@pool_count).equal?(0))
+        dictionary = NSThread.current_thread.thread_dictionary
+        dictionary.set_object(NSNumber.number_with_integer(pool.attr_id), NSString.string_with("SWT_NSAutoreleasePool"))
+      end
+      @pools[((@pool_count += 1) - 1)] = pool
     end
     
     typesig { [Menu] }
@@ -1299,74 +1113,12 @@ module Org::Eclipse::Swt::Widgets
       @popups[index] = menu
     end
     
-    typesig { [::Java::Int] }
-    def add_to_dispose_window(control)
-      root = Array.typed(::Java::Int).new(1) { 0 }
-      if ((@dispose_window).equal?(0))
-        out_window = Array.typed(::Java::Int).new(1) { 0 }
-        OS._create_new_window(OS.attr_k_overlay_window_class, 0, Rect.new, out_window)
-        @dispose_window = out_window[0]
-        OS._create_root_control(@dispose_window, root)
-      else
-        OS._get_root_control(@dispose_window, root)
-      end
-      OS._embed_control(control, root[0])
-    end
-    
-    typesig { [::Java::Int, Widget] }
-    def add_widget(handle, widget)
-      if ((handle).equal?(0))
+    typesig { [NSObject, Widget] }
+    def add_widget(view, widget)
+      if ((view).nil?)
         return
       end
-      if ((@free_slot).equal?(-1))
-        length_ = (@free_slot = @index_table.attr_length) + GROW_SIZE
-        new_index_table = Array.typed(::Java::Int).new(length_) { 0 }
-        new_widget_table = Array.typed(Widget).new(length_) { nil }
-        System.arraycopy(@index_table, 0, new_index_table, 0, @free_slot)
-        System.arraycopy(@widget_table, 0, new_widget_table, 0, @free_slot)
-        i = @free_slot
-        while i < length_ - 1
-          new_index_table[i] = i + 1
-          i += 1
-        end
-        new_index_table[length_ - 1] = -1
-        @index_table = new_index_table
-        @widget_table = new_widget_table
-      end
-      @property[0] = @free_slot + 1
-      OS._set_control_property(handle, SWT0, SWT0, 4, @property)
-      old_slot = @free_slot
-      @free_slot = @index_table[old_slot]
-      @index_table[old_slot] = -2
-      @widget_table[old_slot] = widget
-    end
-    
-    typesig { [::Java::Int] }
-    def add_dispose_window(window)
-      if ((@dispose_window_list).nil?)
-        @dispose_window_list = Array.typed(::Java::Int).new(4) { 0 }
-      end
-      length_ = @dispose_window_list.attr_length
-      i = 0
-      while i < length_
-        if ((@dispose_window_list[i]).equal?(window))
-          return
-        end
-        i += 1
-      end
-      index = 0
-      while (index < length_)
-        if ((@dispose_window_list[index]).equal?(0))
-          break
-        end
-        index += 1
-      end
-      if ((index).equal?(length_))
-        new_list = Array.typed(::Java::Int).new(length_ + 4) { 0 }
-        System.arraycopy(@dispose_window_list, 0, new_list, 0, length_)
-        @dispose_window_list = new_list
-      end
-      @dispose_window_list[index] = window
+      OS.object_set_instance_variable(view.attr_id, SWT_OBJECT, widget.attr_jni_ref)
     end
     
     typesig { [Runnable] }
@@ -1409,24 +1161,26 @@ module Org::Eclipse::Swt::Widgets
     # </ul>
     def beep
       check_device
-      OS._sys_beep(RJava.cast_to_short(100))
+      OS._nsbeep
     end
     
-    typesig { [::Java::Int, ::Java::Int] }
-    def caret_proc(id, client_data)
-      if ((@current_caret).nil? || @current_caret.is_disposed)
-        return 0
+    typesig { [NSWindow, NSScreen] }
+    def cascade_window(window, screen)
+      dictionary = screen.device_description
+      screen_number = NSNumber.new(dictionary.object_for_key(NSString.string_with("NSScreenNumber")).attr_id).int_value
+      index = 0
+      while (!(@screen_id[index]).equal?(0) && !(@screen_id[index]).equal?(screen_number))
+        index += 1
       end
-      if (@current_caret.blink_caret)
-        blink_rate = @current_caret.attr_blink_rate
-        if ((blink_rate).equal?(0))
-          return 0
-        end
-        OS._set_event_loop_timer_next_fire_time(id, blink_rate / 1000.0)
-      else
-        @current_caret = nil
+      @screen_id[index] = screen_number
+      cascade = @screen_cascade[index]
+      if ((cascade).nil?)
+        frame_ = screen.frame
+        cascade = NSPoint.new
+        cascade.attr_x = frame_.attr_x
+        cascade.attr_y = frame_.attr_y + frame_.attr_height
       end
-      return 0
+      @screen_cascade[index] = window.cascade_top_left_from_point(cascade)
     end
     
     typesig { [] }
@@ -1439,6 +1193,39 @@ module Org::Eclipse::Swt::Widgets
       end
       if (is_disposed)
         error(SWT::ERROR_DEVICE_DISPOSED)
+      end
+    end
+    
+    typesig { [Control, NSEvent, ::Java::Boolean] }
+    def check_enter_exit(control, ns_event, send)
+      if (!(control).equal?(@current_control))
+        if (!(@current_control).nil? && !@current_control.is_disposed)
+          @current_control.send_mouse_event(ns_event, SWT::MouseExit, send)
+        end
+        if (!(control).nil? && control.is_disposed)
+          control = nil
+        end
+        @current_control = control
+        if (!(control).nil?)
+          control.send_mouse_event(ns_event, SWT::MouseEnter, send)
+        end
+        set_cursor(control)
+      end
+      timer_exec(!(control).nil? && !control.is_disposed ? get_tool_tip_time : -1, @hover_timer)
+    end
+    
+    typesig { [] }
+    def check_focus
+      old_control = @current_focus_control
+      new_control = get_focus_control
+      if (!(old_control).equal?(new_control))
+        if (!(old_control).nil? && !old_control.is_disposed)
+          old_control.send_focus_event(SWT::FocusOut)
+        end
+        @current_focus_control = new_control
+        if (!(new_control).nil? && !new_control.is_disposed)
+          new_control.send_focus_event(SWT::FocusIn)
+        end
       end
     end
     
@@ -1457,129 +1244,6 @@ module Org::Eclipse::Swt::Widgets
       if (!Display.is_valid_class(get_class))
         error(SWT::ERROR_INVALID_SUBCLASS)
       end
-    end
-    
-    typesig { [Shell] }
-    def clear_modal(shell)
-      if ((@modal_shells).nil?)
-        return
-      end
-      index = 0
-      length_ = @modal_shells.attr_length
-      while (index < length_)
-        if ((@modal_shells[index]).equal?(shell))
-          break
-        end
-        if ((@modal_shells[index]).nil?)
-          return
-        end
-        index += 1
-      end
-      if ((index).equal?(length_))
-        return
-      end
-      System.arraycopy(@modal_shells, index + 1, @modal_shells, index, (length_ -= 1) - index)
-      @modal_shells[length_] = nil
-      if ((index).equal?(0) && (@modal_shells[0]).nil?)
-        @modal_shells = nil
-      end
-      shells = get_shells
-      i = 0
-      while i < shells.attr_length
-        shells[i].update_modal
-        i += 1
-      end
-    end
-    
-    typesig { [::Java::Int] }
-    def create_image(type)
-      ref = Array.typed(::Java::Int).new(1) { 0 }
-      result = OS._get_icon_ref(OS.attr_k_on_system_disk, OS.attr_k_system_icons_creator, type, ref)
-      if (!(result).equal?(OS.attr_no_err))
-        return nil
-      end
-      family = Array.typed(::Java::Int).new(1) { 0 }
-      result = OS._icon_ref_to_icon_family(ref[0], OS.attr_k_selector_al_lavailable_data, family)
-      OS._release_icon_ref(ref[0])
-      if (!(result).equal?(OS.attr_no_err))
-        return nil
-      end
-      image = create_image_from_family(family[0], OS.attr_k_large32bit_data, OS.attr_k_large8bit_mask, 32, 32)
-      OS._dispose_handle(family[0])
-      return image
-    end
-    
-    typesig { [::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int] }
-    def create_image_from_family(family, type, mask_type, width, height)
-      data_handle = OS._new_handle(0)
-      result = OS._get_icon_family_data(family, type, data_handle)
-      if (!(result).equal?(OS.attr_no_err))
-        OS._dispose_handle(data_handle)
-        return nil
-      end
-      mask_handle = OS._new_handle(0)
-      result = OS._get_icon_family_data(family, mask_type, mask_handle)
-      if (!(result).equal?(OS.attr_no_err))
-        OS._dispose_handle(mask_handle)
-        OS._dispose_handle(data_handle)
-        return nil
-      end
-      bpr = width * 4
-      data_size = OS._get_handle_size(data_handle)
-      data = OS._new_ptr_clear(data_size)
-      if ((data).equal?(0))
-        OS._dispose_handle(mask_handle)
-        OS._dispose_handle(data_handle)
-        return nil
-      end
-      OS._hlock(data_handle)
-      OS._hlock(mask_handle)
-      icon_ptr = Array.typed(::Java::Int).new(1) { 0 }
-      mask_ptr = Array.typed(::Java::Int).new(1) { 0 }
-      OS.memmove(icon_ptr, data_handle, 4)
-      OS.memmove(mask_ptr, mask_handle, 4)
-      OS.memmove(data, icon_ptr[0], data_size)
-      pixel_count = data_size / 4
-      i = 0
-      while i < pixel_count
-        OS.memmove(data + (i * 4), mask_ptr[0] + i, 1)
-        i += 1
-      end
-      OS._hunlock(mask_handle)
-      OS._hunlock(data_handle)
-      OS._dispose_handle(mask_handle)
-      OS._dispose_handle(data_handle)
-      provider = OS._cgdata_provider_create_with_data(0, data, data_size, @release_proc)
-      if ((provider).equal?(0))
-        OS._dispose_ptr(data)
-        return nil
-      end
-      colorspace = OS._cgcolor_space_create_device_rgb
-      if ((colorspace).equal?(0))
-        OS._cgdata_provider_release(provider)
-        return nil
-      end
-      cg_image = OS._cgimage_create(width, height, 8, 32, bpr, colorspace, OS.attr_k_cgimage_alpha_first, provider, nil, true, 0)
-      OS._cgcolor_space_release(colorspace)
-      OS._cgdata_provider_release(provider)
-      return Array.typed(::Java::Int).new([cg_image, data])
-    end
-    
-    typesig { [] }
-    def create_overlay_window
-      gdevice = OS._get_main_device
-      ptr = Array.typed(::Java::Int).new(1) { 0 }
-      OS.memmove(ptr, gdevice, 4)
-      device = GDevice.new
-      OS.memmove(device, ptr[0], GDevice.attr_sizeof)
-      rect = Rect.new
-      OS._set_rect(rect, device.attr_left, device.attr_top, device.attr_right, device.attr_bottom)
-      out_window = Array.typed(::Java::Int).new(1) { 0 }
-      OS._create_new_window(OS.attr_k_overlay_window_class, 0, rect, out_window)
-      if ((out_window[0]).equal?(0))
-        SWT.error(SWT::ERROR_NO_HANDLES)
-      end
-      return out_window[0]
     end
     
     typesig { [] }
@@ -1610,148 +1274,181 @@ module Org::Eclipse::Swt::Widgets
     # @param data the device data
     def initialize(data)
       @event_queue = nil
-      @action_callback = nil
-      @apple_event_callback = nil
-      @clock_callback = nil
-      @command_callback = nil
-      @control_callback = nil
-      @accessibility_callback = nil
-      @appearance_callback = nil
-      @draw_item_callback = nil
-      @item_data_callback = nil
-      @item_notification_callback = nil
-      @item_compare_callback = nil
-      @search_callback = nil
-      @tray_item_callback = nil
-      @hit_test_callback = nil
-      @keyboard_callback = nil
-      @menu_callback = nil
-      @mouse_hover_callback = nil
-      @help_callback = nil
-      @observer_callback = nil
-      @source_callback = nil
-      @mouse_callback = nil
-      @tracking_callback = nil
-      @window_callback = nil
-      @color_callback = nil
-      @text_input_callback = nil
-      @release_callback = nil
-      @core_event_callback = nil
-      @polling_callback = nil
-      @action_proc = 0
-      @apple_event_proc = 0
-      @clock_proc = 0
-      @command_proc = 0
-      @control_proc = 0
-      @appearance_proc = 0
-      @accessibility_proc = 0
-      @draw_item_proc = 0
-      @item_data_proc = 0
-      @item_notification_proc = 0
-      @item_compare_proc = 0
-      @help_proc = 0
-      @search_proc = 0
-      @tray_item_proc = 0
-      @hit_test_proc = 0
-      @keyboard_proc = 0
-      @menu_proc = 0
-      @mouse_hover_proc = 0
-      @observer_proc = 0
-      @source_proc = 0
-      @mouse_proc = 0
-      @tracking_proc = 0
-      @window_proc = 0
-      @color_proc = 0
-      @text_input_proc = 0
-      @release_proc = 0
-      @core_event_proc = 0
-      @polling_proc = 0
       @event_table = nil
       @filter_table = nil
-      @queue = 0
-      @run_loop = 0
-      @run_loop_source = 0
-      @run_loop_observer = 0
-      @last_modifiers = 0
-      @last_state = 0
-      @last_x = 0
-      @last_y = 0
       @disposing = false
-      @in_paint = false
-      @needs_paint = false
-      @gc_window = 0
-      @dispose_window = 0
-      @dispose_window_list = nil
+      @send_event_count = 0
+      @dead_key_state = nil
+      @current_keyboard_uchrdata = 0
+      @event_source_delay_set = false
       @synchronizer = nil
       @thread = nil
+      @allow_timers = false
       @run_async_messages = false
-      @free_slot = 0
-      @index_table = nil
-      @property = nil
-      @widget_table = nil
-      @active_shell = nil
-      @focus_event = 0
-      @focus_control = nil
-      @focus_combo = nil
-      @ignore_focus = false
-      @delay_dispose = false
+      @contexts = nil
+      @current_caret = nil
+      @send_event = false
+      @current_control = nil
+      @tracking_control = nil
+      @tooltip_control = nil
+      @tooltip_target = nil
+      @is_painting = nil
+      @needs_display = nil
+      @needs_display_in_rect = nil
+      @marked_attributes = nil
+      @small_fonts = false
+      @button_font = nil
+      @pop_up_button_font = nil
+      @text_field_font = nil
+      @secure_text_field_font = nil
+      @search_field_font = nil
+      @combo_box_font = nil
+      @slider_font = nil
+      @scroller_font = nil
+      @text_view_font = nil
+      @table_view_font = nil
+      @outline_view_font = nil
+      @date_picker_font = nil
+      @box_font = nil
+      @tab_view_font = nil
+      @progress_indicator_font = nil
       @modal_shells = nil
       @menu_bar = nil
       @menus = nil
       @popups = nil
+      @application = nil
+      @application_class = 0
+      @dock_image = nil
+      @is_embedded = false
+      @focus_control = nil
+      @current_focus_control = nil
+      @focus_event = 0
+      @screen_window = nil
+      @key_window = nil
+      @pools = nil
+      @pool_count = 0
+      @loop_count = 0
+      @screen_id = nil
+      @screen_cascade = nil
+      @run_loop_observer = 0
+      @observer_callback = nil
+      @lock_cursor = false
+      @old_cursor_set_proc = 0
+      @cursor_set_callback = nil
       @dispose_list = nil
       @tray = nil
-      @timer_ids = nil
-      @timer_list = nil
-      @timer_callback = nil
-      @timer_proc = 0
-      @allow_timers = false
-      @polling_timer = 0
-      @current_caret = nil
-      @caret_callback = nil
-      @caret_id = 0
-      @caret_proc = 0
-      @grab_control = nil
-      @help_string = 0
-      @help_widget = nil
-      @last_help_x = 0
-      @last_help_y = 0
-      @click_count = 0
-      @click_count_button = 0
-      @current_control = nil
-      @mouse_hover_id = 0
-      @mouse_moved = false
-      @drag_button = 0
-      @drag_x = 0
-      @drag_y = 0
-      @drag_state = 0
-      @drag_modifiers = 0
-      @dragging = false
-      @button_inset = nil
-      @tab_folder_north_inset = nil
-      @tab_folder_south_inset = nil
-      @combo_inset = nil
-      @edit_text_inset = nil
-      @search_text_inset = nil
-      @small_fonts = false
-      @kchr_ptr = 0
-      @kchr_state = nil
+      @current_tray_item = nil
+      @tray_item_menu = nil
       @error_image = nil
       @info_image = nil
       @warning_image = nil
       @cursors = nil
+      @colors = nil
+      @alternate_selected_control_text_color = nil
+      @selected_control_text_color = nil
+      @alternate_selected_control_color = nil
+      @secondary_selected_control_color = nil
+      @timer_list = nil
+      @ns_timers = nil
+      @timer_delegate = nil
       @run_settings = false
-      @highlight_color = nil
-      @dock_image = 0
+      @settings_delegate = nil
       @data = nil
       @keys = nil
       @values = nil
+      @hover_timer = nil
+      @caret_timer = nil
+      @default_button_timer = nil
       super(data)
-      @synchronizer = Synchronizer.new(self)
-      @run_async_messages = true
-      @allow_timers = true
-      @kchr_state = Array.typed(::Java::Int).new(1) { 0 }
+      @dead_key_state = Array.typed(::Java::Int).new(1) { 0 }
+      @screen_id = Array.typed(::Java::Int).new(32) { 0 }
+      @screen_cascade = Array.typed(NSPoint).new(32) { nil }
+      @lock_cursor = true
       @cursors = Array.typed(Cursor).new(SWT::CURSOR_HAND + 1) { nil }
+      @hover_timer = Class.new(Runnable.class == Class ? Runnable : Object) do
+        extend LocalClass
+        include_class_members Display
+        include Runnable if Runnable.class == Module
+        
+        typesig { [] }
+        define_method :run do
+          if (!(self.attr_current_control).nil? && !self.attr_current_control.is_disposed)
+            self.attr_current_control.send_mouse_event(NSApplication.shared_application.current_event, SWT::MouseHover, !(self.attr_tracking_control).nil? && !self.attr_tracking_control.is_disposed)
+          end
+        end
+        
+        typesig { [Vararg.new(Object)] }
+        define_method :initialize do |*args|
+          super(*args)
+        end
+        
+        private
+        alias_method :initialize_anonymous, :initialize
+      end.new_local(self)
+      @caret_timer = Class.new(Runnable.class == Class ? Runnable : Object) do
+        extend LocalClass
+        include_class_members Display
+        include Runnable if Runnable.class == Module
+        
+        typesig { [] }
+        define_method :run do
+          if (!(self.attr_current_caret).nil?)
+            if ((self.attr_current_caret).nil? || self.attr_current_caret.is_disposed)
+              return
+            end
+            if (self.attr_current_caret.blink_caret)
+              blink_rate = self.attr_current_caret.attr_blink_rate
+              if (!(blink_rate).equal?(0))
+                timer_exec(blink_rate, self)
+              end
+            else
+              self.attr_current_caret = nil
+            end
+          end
+        end
+        
+        typesig { [Vararg.new(Object)] }
+        define_method :initialize do |*args|
+          super(*args)
+        end
+        
+        private
+        alias_method :initialize_anonymous, :initialize
+      end.new_local(self)
+      @default_button_timer = Class.new(Runnable.class == Class ? Runnable : Object) do
+        extend LocalClass
+        include_class_members Display
+        include Runnable if Runnable.class == Module
+        
+        typesig { [] }
+        define_method :run do
+          if (is_disposed)
+            return
+          end
+          shell = get_active_shell
+          if (!(shell).nil? && !shell.is_disposed)
+            default_button = shell.attr_default_button
+            if (!(default_button).nil? && !default_button.is_disposed)
+              view = default_button.attr_view
+              view.display
+            end
+          end
+          if (is_disposed)
+            return
+          end
+          if (has_default_button)
+            timer_exec(DEFAULT_BUTTON_INTERVAL, self)
+          end
+        end
+        
+        typesig { [Vararg.new(Object)] }
+        define_method :initialize do |*args|
+          super(*args)
+        end
+        
+        private
+        alias_method :initialize_anonymous, :initialize
+      end.new_local(self)
     end
     
     class_module.module_eval {
@@ -1763,7 +1460,7 @@ module Org::Eclipse::Swt::Widgets
             if (!(self.attr_displays[i]).nil?)
               if (!multiple)
                 SWT.error(SWT::ERROR_NOT_IMPLEMENTED, nil, " [multiple displays]")
-              end # $NON-NLS-1$
+              end
               if ((self.attr_displays[i].attr_thread).equal?(thread))
                 SWT.error(SWT::ERROR_THREAD_INVALID_ACCESS)
               end
@@ -1772,126 +1469,7 @@ module Org::Eclipse::Swt::Widgets
           end
         end
       end
-    }
-    
-    typesig { [::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int] }
-    def color_proc(in_control, in_message, in_draw_depth, in_draw_in_color)
-      widget = get_widget(in_control)
-      if (!(widget).nil?)
-        return widget.color_proc(in_control, in_message, in_draw_depth, in_draw_in_color)
-      end
-      return OS.attr_event_not_handled_err
-    end
-    
-    typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
-    def command_proc(next_handler, the_event, user_data)
-      event_kind = OS._get_event_kind(the_event)
-      command = HICommand.new
-      OS._get_event_parameter(the_event, OS.attr_k_event_param_direct_object, OS.attr_type_hicommand, nil, HICommand.attr_sizeof, nil, command)
-      case (event_kind)
-      when OS.attr_k_event_process_command
-        if (!((command.attr_attributes & OS.attr_k_hicommand_from_menu)).equal?(0))
-          if (!(user_data).equal?(0))
-            widget = get_widget(user_data)
-            if (!(widget).nil?)
-              return widget.command_proc(next_handler, the_event, user_data)
-            end
-          else
-            result = OS.attr_event_not_handled_err
-            menu_ref = command.attr_menu_menu_ref
-            menu_id = OS._get_menu_id(menu_ref)
-            menu = get_menu(menu_id)
-            if (!(menu).nil?)
-              # Feature in the Macintosh.  When a menu item is selected by the
-              # user, the Macintosh sends kEventMenuOpening, remembers the index
-              # of the item the user selected, sends kEventMenuClosed and then
-              # sends kEventProcessCommand.  If application code modifies the menu
-              # inside of kEventMenuClosed by adding or removing items, the index
-              # of the item that the user selected is invalid.  The fix is to detect
-              # that a menu has been modified during kEventMenuClosed and use the
-              # last target item remembered kEventMenuTargetItem.
-              item = nil
-              if (menu.attr_closed && menu.attr_modified)
-                item = menu.attr_last_target
-              else
-                item = menu.get_item(command.attr_menu_menu_item_index - 1)
-              end
-              if (!(item).nil?)
-                result = item.k_event_process_command(next_handler, the_event, user_data)
-              end
-            end
-            OS._hilite_menu(RJava.cast_to_short(0))
-            return result
-          end
-        end
-      end
-      return OS.attr_event_not_handled_err
-    end
-    
-    typesig { [::Java::Int] }
-    def compute_inset(control)
-      temp_rgn = OS._new_rgn
-      rect = Rect.new
-      OS._get_control_region(control, RJava.cast_to_short(OS.attr_k_control_structure_meta_part), temp_rgn)
-      OS._get_control_bounds(control, rect)
-      rgn_rect = Rect.new
-      OS._get_region_bounds(temp_rgn, rgn_rect)
-      OS._dispose_rgn(temp_rgn)
-      rect.attr_left -= rgn_rect.attr_left
-      rect.attr_top -= rgn_rect.attr_top
-      rect.attr_right = RJava.cast_to_short((rgn_rect.attr_right - rect.attr_right))
-      rect.attr_bottom = RJava.cast_to_short((rgn_rect.attr_bottom - rect.attr_bottom))
-      return rect
-    end
-    
-    typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
-    def clock_proc(next_handler, the_event, user_data)
-      widget = get_widget(user_data)
-      if (!(widget).nil?)
-        return widget.clock_proc(next_handler, the_event, user_data)
-      end
-      return OS.attr_event_not_handled_err
-    end
-    
-    typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
-    def control_proc(next_handler, the_event, user_data)
-      widget = get_widget(user_data)
-      if (!(widget).nil?)
-        return widget.control_proc(next_handler, the_event, user_data)
-      end
-      return OS.attr_event_not_handled_err
-    end
-    
-    typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
-    def core_event_proc(the_apple_event, reply, handler_refcon)
-      if (!@disposing)
-        event = Event.new
-        send_event(SWT::Close, event)
-        if (event.attr_doit)
-          dispose
-          # When the application is closing, no SWT program can continue
-          # to run.  In order to avoid running code after the display has
-          # been disposed, exit from Java.
-          # 
-          # This code is intentionally commented
-          # System.exit (0);
-        else
-          return OS.attr_user_canceled_err
-        end
-      end
-      return OS.attr_no_err
-    end
-    
-    typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
-    def accessibility_proc(next_handler, the_event, user_data)
-      widget = get_widget(user_data)
-      if (!(widget).nil?)
-        return widget.accessibility_proc(next_handler, the_event, user_data)
-      end
-      return OS.attr_event_not_handled_err
-    end
-    
-    class_module.module_eval {
+      
       typesig { [String] }
       def convert_to_lf(text)
         cr = Character.new(?\r.ord)
@@ -1928,19 +1506,43 @@ module Org::Eclipse::Swt::Widgets
       end
     }
     
-    typesig { [] }
-    def clear_menu_flags
-      if ((@menus).nil?)
+    typesig { [Shell] }
+    def clear_modal(shell)
+      if ((@modal_shells).nil?)
         return
       end
-      i = 0
-      while i < @menus.attr_length
-        menu = @menus[i]
-        if (!(menu).nil?)
-          menu.attr_modified = menu.attr_closed = false
-          menu.attr_last_target = nil
+      index = 0
+      length_ = @modal_shells.attr_length
+      while (index < length_)
+        if ((@modal_shells[index]).equal?(shell))
+          break
         end
+        if ((@modal_shells[index]).nil?)
+          return
+        end
+        index += 1
+      end
+      if ((index).equal?(length_))
+        return
+      end
+      System.arraycopy(@modal_shells, index + 1, @modal_shells, index, (length_ -= 1) - index)
+      @modal_shells[length_] = nil
+      if ((index).equal?(0) && (@modal_shells[0]).nil?)
+        @modal_shells = nil
+      end
+      shells = get_shells
+      i = 0
+      while i < shells.attr_length
+        shells[i].update_modal
         i += 1
+      end
+    end
+    
+    typesig { [] }
+    def clear_pool
+      if ((@send_event_count).equal?(0) && (@loop_count).equal?(@pool_count - 1) && (Callback.get_entry_count).equal?(0))
+        remove_pool
+        add_pool
       end
     end
     
@@ -1981,6 +1583,7 @@ module Org::Eclipse::Swt::Widgets
       check_display(@thread = JavaThread.current_thread, false)
       create_display(data)
       register(self)
+      @synchronizer = Synchronizer.new(self)
       if ((self.attr_default).nil?)
         self.attr_default = self
       end
@@ -1988,77 +1591,174 @@ module Org::Eclipse::Swt::Widgets
     
     typesig { [DeviceData] }
     def create_display(data)
-      if (OS::VERSION < 0x1030)
-        System.out.println("***WARNING: SWT requires MacOS X version " + RJava.cast_to_string(10) + "." + RJava.cast_to_string(3) + " or greater") # $NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+      if (OS::VERSION < 0x1050)
+        System.out.println("***WARNING: SWT requires MacOS X version " + RJava.cast_to_string(10) + "." + RJava.cast_to_string(5) + " or greater") # $NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
         System.out.println("***WARNING: Detected: " + RJava.cast_to_string(JavaInteger.to_hex_string((OS::VERSION & 0xff00) >> 8)) + "." + RJava.cast_to_string(JavaInteger.to_hex_string((OS::VERSION & 0xf0) >> 4)) + "." + RJava.cast_to_string(JavaInteger.to_hex_string(OS::VERSION & 0xf))) # $NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+        error(SWT::ERROR_NOT_IMPLEMENTED)
       end
-      # Feature in the Macintosh.  On OS 10.2, it is necessary
-      # to explicitly check in with the Process Manager and set
-      # the current process to be the front process in order for
-      # windows to come to the front by default.  The fix is call
-      # both GetCurrentProcess() and SetFrontProcess().
-      # 
-      # NOTE: It is not actually necessary to use the process
-      # serial number returned by GetCurrentProcess() in the
-      # call to SetFrontProcess() (ie. kCurrentProcess can be
-      # used) but both functions must be called in order for
-      # windows to come to the front.
-      psn = Array.typed(::Java::Int).new(2) { 0 }
-      if ((OS._get_current_process(psn)).equal?(OS.attr_no_err))
-        pid = OS.getpid
-        buffer = nil
-        ptr = OS.getenv(ascii("APP_NAME_" + RJava.cast_to_string(pid))) # $NON-NLS-1$
-        if (!(ptr).equal?(0))
-          buffer = Array.typed(::Java::Byte).new(OS.strlen(ptr) + 1) { 0 }
-          OS.memmove(buffer, ptr, buffer.attr_length)
-        else
-          if (!(self.attr_app_name).nil?)
-            chars = CharArray.new(self.attr_app_name.length)
-            self.attr_app_name.get_chars(0, chars.attr_length, chars, 0)
-            cfstring = OS._cfstring_create_with_characters(OS.attr_k_cfallocator_default, chars, chars.attr_length)
-            if (!(cfstring).equal?(0))
-              range = CFRange.new
-              range.attr_length = chars.attr_length
-              encoding = OS._cfstring_get_system_encoding
-              size = Array.typed(::Java::Int).new(1) { 0 }
-              num_chars = OS._cfstring_get_bytes(cfstring, range, encoding, Character.new(??.ord), true, nil, 0, size)
-              if (!(num_chars).equal?(0))
-                buffer = Array.typed(::Java::Byte).new(size[0] + 1) { 0 }
-                num_chars = OS._cfstring_get_bytes(cfstring, range, encoding, Character.new(??.ord), true, buffer, size[0], size)
-              end
-              OS._cfrelease(cfstring)
-            end
+      nsthread = NSThread.current_thread
+      dictionary = nsthread.thread_dictionary
+      key = NSString.string_with("SWT_NSAutoreleasePool")
+      id = NSNumber.new(dictionary.object_for_key(key))
+      add_pool(NSAutoreleasePool.new(id.integer_value))
+      @application = NSApplication.shared_application
+      # TODO: If an NSApplication is already running we don't want to create another NSApplication.
+      # But if we don't we won't get mouse events, since we currently need to subclass NSApplication and intercept sendEvent to
+      # deliver mouse events correctly to widgets.
+      if (!@application.is_running)
+        # Feature in the Macintosh.  On OS 10.2, it is necessary
+        # to explicitly check in with the Process Manager and set
+        # the current process to be the front process in order for
+        # windows to come to the front by default.  The fix is call
+        # both GetCurrentProcess() and SetFrontProcess().
+        # 
+        # NOTE: It is not actually necessary to use the process
+        # serial number returned by GetCurrentProcess() in the
+        # call to SetFrontProcess() (ie. kCurrentProcess can be
+        # used) but both functions must be called in order for
+        # windows to come to the front.
+        psn = Array.typed(::Java::Int).new(2) { 0 }
+        if ((OS._get_current_process(psn)).equal?(OS.attr_no_err))
+          pid = OS.getpid
+          # long
+          ptr = get_app_name._utf8string
+          if (!(ptr).equal?(0))
+            OS._cpsset_process_name(psn, ptr)
           end
-        end
-        if (!(buffer).nil?)
-          OS._cpsset_process_name(psn, buffer)
-        end
-        OS._cpsenable_foreground_operation(psn, 0x3, 0x3c, 0x2c, 0x1103)
-        OS._set_front_process(psn)
-        ptr = OS.getenv(ascii("APP_ICON_" + RJava.cast_to_string(pid))) # $NON-NLS-1$
-        if (!(ptr).equal?(0))
-          image = read_image_ref(ptr)
-          if (!(image).equal?(0))
+          OS._transform_process_type(psn, OS.attr_k_process_transform_to_foreground_application)
+          OS._set_front_process(psn)
+          ptr = OS.getenv(ascii("APP_ICON_" + RJava.cast_to_string(pid)))
+          if (!(ptr).equal?(0))
+            path = NSString.string_with_utf8string(ptr)
+            image = NSImage.new.alloc
+            image = image.init_by_referencing_file(path)
             @dock_image = image
-            OS._set_application_dock_tile_image(@dock_image)
+            @application.set_application_icon_image(image)
+          end
+        end
+        class_name = "SWTApplication"
+        # long
+        cls = 0
+        if (((cls = OS.objc_look_up_class(class_name))).equal?(0))
+          clazz = get_class
+          self.attr_application_callback2 = Callback.new(clazz, "applicationProc", 2)
+          # long
+          proc2 = self.attr_application_callback2.get_address
+          if ((proc2).equal?(0))
+            error(SWT::ERROR_NO_MORE_CALLBACKS)
+          end
+          self.attr_application_callback3 = Callback.new(clazz, "applicationProc", 3)
+          # long
+          proc3 = self.attr_application_callback3.get_address
+          if ((proc3).equal?(0))
+            error(SWT::ERROR_NO_MORE_CALLBACKS)
+          end
+          self.attr_application_callback6 = Callback.new(clazz, "applicationProc", 6)
+          # long
+          proc6 = self.attr_application_callback6.get_address
+          if ((proc6).equal?(0))
+            error(SWT::ERROR_NO_MORE_CALLBACKS)
+          end
+          cls = OS.objc_allocate_class_pair(OS.attr_class_nsapplication, class_name, 0)
+          OS.class_add_method(cls, OS.attr_sel_send_event_, proc3, "@:@")
+          OS.class_add_method(cls, OS.attr_sel_next_event_matching_mask_until_date_in_mode_dequeue_, proc6, "@:i@@B")
+          OS.class_add_method(cls, OS.attr_sel_is_running, proc2, "@:")
+          OS.class_add_method(cls, OS.attr_sel_finish_launching, proc2, "@:")
+          OS.objc_register_class_pair(cls)
+        end
+        @application_class = OS.object_set_class(@application.attr_id, cls)
+        class_name = "SWTApplicationDelegate"
+        if ((OS.objc_look_up_class(class_name)).equal?(0))
+          # long
+          app_proc3 = self.attr_application_callback3.get_address
+          if ((app_proc3).equal?(0))
+            error(SWT::ERROR_NO_MORE_CALLBACKS)
+          end
+          cls = OS.objc_allocate_class_pair(OS.attr_class_nsobject, class_name, 0)
+          OS.class_add_method(cls, OS.attr_sel_application_will_finish_launching_, app_proc3, "@:@")
+          OS.class_add_method(cls, OS.attr_sel_terminate_, app_proc3, "@:@")
+          OS.class_add_method(cls, OS.attr_sel_quit_requested_, app_proc3, "@:@")
+          OS.class_add_method(cls, OS.attr_sel_order_front_standard_about_panel_, app_proc3, "@:@")
+          OS.class_add_method(cls, OS.attr_sel_hide_other_applications_, app_proc3, "@:@")
+          OS.class_add_method(cls, OS.attr_sel_hide_, app_proc3, "@:@")
+          OS.class_add_method(cls, OS.attr_sel_unhide_all_applications_, app_proc3, "@:@")
+          OS.class_add_method(cls, OS.attr_sel_application_did_become_active_, app_proc3, "@:@")
+          OS.class_add_method(cls, OS.attr_sel_application_did_resign_active_, app_proc3, "@:@")
+          OS.objc_register_class_pair(cls)
+        end
+        if ((self.attr_application_delegate).nil?)
+          self.attr_application_delegate = SWTApplicationDelegate.new.alloc.init
+          @application.set_delegate(self.attr_application_delegate)
+        end
+      else
+        @is_embedded = true
+      end
+    end
+    
+    typesig { [] }
+    def create_main_menu
+      app_name = get_app_name
+      empty_str = NSString.string_with("")
+      main_menu = NSMenu.new.alloc
+      main_menu.init_with_title(empty_str)
+      menu_item = nil
+      apple_menu = nil
+      format = NSString.string_with("%@ %@")
+      title = nil
+      app_item = menu_item = main_menu.add_item_with_title(empty_str, 0, empty_str)
+      apple_menu = NSMenu.new.alloc
+      apple_menu.init_with_title(empty_str)
+      OS.objc_msg_send(@application.attr_id, OS.sel_register_name("setAppleMenu:"), apple_menu.attr_id)
+      title = NSString.new(OS.objc_msg_send(OS.attr_class_nsstring, OS.attr_sel_string_with_format_, format.attr_id, NSString.string_with(SWT.get_message("About")).attr_id, app_name.attr_id))
+      menu_item = apple_menu.add_item_with_title(title, OS.attr_sel_order_front_standard_about_panel_, empty_str)
+      menu_item.set_target(self.attr_application_delegate)
+      apple_menu.add_item(NSMenuItem.separator_item)
+      title = NSString.string_with(SWT.get_message("Preferences..."))
+      menu_item = apple_menu.add_item_with_title(title, 0, NSString.string_with(","))
+      apple_menu.add_item(NSMenuItem.separator_item)
+      title = NSString.string_with(SWT.get_message("Services"))
+      menu_item = apple_menu.add_item_with_title(title, 0, empty_str)
+      services_menu = NSMenu.new.alloc
+      services_menu.init_with_title(empty_str)
+      apple_menu.set_submenu(services_menu, menu_item)
+      services_menu.release
+      @application.set_services_menu(services_menu)
+      apple_menu.add_item(NSMenuItem.separator_item)
+      title = NSString.new(OS.objc_msg_send(OS.attr_class_nsstring, OS.attr_sel_string_with_format_, format.attr_id, NSString.string_with(SWT.get_message("Hide")).attr_id, app_name.attr_id))
+      menu_item = apple_menu.add_item_with_title(title, OS.attr_sel_hide_, NSString.string_with("h"))
+      menu_item.set_target(self.attr_application_delegate)
+      title = NSString.string_with(SWT.get_message("Hide Others"))
+      menu_item = apple_menu.add_item_with_title(title, OS.attr_sel_hide_other_applications_, NSString.string_with("h"))
+      menu_item.set_key_equivalent_modifier_mask(OS::NSCommandKeyMask | OS::NSAlternateKeyMask)
+      menu_item.set_target(self.attr_application_delegate)
+      title = NSString.string_with(SWT.get_message("Show All"))
+      menu_item = apple_menu.add_item_with_title(title, OS.attr_sel_unhide_all_applications_, empty_str)
+      menu_item.set_target(self.attr_application_delegate)
+      apple_menu.add_item(NSMenuItem.separator_item)
+      title = NSString.new(OS.objc_msg_send(OS.attr_class_nsstring, OS.attr_sel_string_with_format_, format.attr_id, NSString.string_with(SWT.get_message("Quit")).attr_id, app_name.attr_id))
+      menu_item = apple_menu.add_item_with_title(title, OS.attr_sel_quit_requested_, NSString.string_with("q"))
+      menu_item.set_target(self.attr_application_delegate)
+      main_menu.set_submenu(apple_menu, app_item)
+      apple_menu.release
+      @application.set_main_menu(main_menu)
+      main_menu.release
+    end
+    
+    typesig { [::Java::Int, ::Java::Int] }
+    # long
+    # long
+    # long
+    def cursor_set_proc(id, sel)
+      if (@lock_cursor)
+        if (!(@current_control).nil?)
+          cursor = @current_control.find_cursor
+          if (!(cursor).nil? && !(cursor.attr_handle.attr_id).equal?(id))
+            return 0
           end
         end
       end
-      # Feature in the Macintosh.  In order to get the standard
-      # application menu to appear on the menu bar, an application
-      # must manipulate the menu bar.  If the application does not
-      # install a menu bar, the application menu will not appear.
-      # The fix is to use ClearMenuBar() to manipulate the menu
-      # bar before any application has had a chance install a menu
-      # bar.
-      OS._clear_menu_bar
-      @queue = OS._get_current_event_queue
-      @run_loop = OS._get_cfrun_loop_from_event_loop(OS._get_current_event_loop)
-      OS._txninit_textension(0, 0, 0)
-      # Save the current highlight color
-      OS._register_appearance_client
-      @highlight_color = RGBColor.new
-      OS._get_theme_brush_as_color(RJava.cast_to_short(OS.attr_k_theme_brush_primary_highlight_color), RJava.cast_to_short(get_depth), true, @highlight_color)
+      OS.call(@old_cursor_set_proc, id, sel)
+      return 0
     end
     
     class_module.module_eval {
@@ -2095,6 +1795,7 @@ module Org::Eclipse::Swt::Widgets
     
     typesig { [] }
     def destroy_display
+      @application = nil
     end
     
     typesig { [Runnable] }
@@ -2126,33 +1827,6 @@ module Org::Eclipse::Swt::Widgets
       System.arraycopy(@dispose_list, 0, new_dispose_list, 0, @dispose_list.attr_length)
       new_dispose_list[@dispose_list.attr_length] = runnable
       @dispose_list = new_dispose_list
-    end
-    
-    typesig { [::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int] }
-    def draw_item_proc(browser, item, property, item_state, the_rect, gd_depth, color_device)
-      widget = get_widget(browser)
-      if (!(widget).nil?)
-        return widget.draw_item_proc(browser, item, property, item_state, the_rect, gd_depth, color_device)
-      end
-      return OS.attr_no_err
-    end
-    
-    typesig { [] }
-    def dispose_windows
-      if (!(@dispose_window).equal?(0))
-        OS._dispose_window(@dispose_window)
-        @dispose_window = 0
-      end
-      if (!(@dispose_window_list).nil?)
-        i = 0
-        while i < @dispose_window_list.attr_length
-          if (!(@dispose_window_list[i]).equal?(0))
-            OS._dispose_window(@dispose_window_list[i])
-          end
-          i += 1
-        end
-        @dispose_window_list = nil
-      end
     end
     
     typesig { [::Java::Int] }
@@ -2193,6 +1867,8 @@ module Org::Eclipse::Swt::Widgets
     # <li>ERROR_THREAD_INVALID_ACCESS - if not called from the thread that created the receiver</li>
     # <li>ERROR_DEVICE_DISPOSED - if the receiver has been disposed</li>
     # </ul>
+    # 
+    # long
     def find_widget(handle)
       check_device
       return get_widget(handle)
@@ -2219,9 +1895,11 @@ module Org::Eclipse::Swt::Widgets
     # </ul>
     # 
     # @since 3.1
+    # 
+    # long
     def find_widget(handle, id)
       check_device
-      return nil
+      return get_widget(handle)
     end
     
     typesig { [Widget, ::Java::Int] }
@@ -2283,39 +1961,12 @@ module Org::Eclipse::Swt::Widgets
     # </ul>
     def get_active_shell
       check_device
-      # Feature in the Macintosh.  When SetWindowActivationScope()
-      # is used with kWindowActivationScopeNone to stop a window from
-      # becoming active and taking focus when shown, for some reason,
-      # when focus is lost to the desktop or another application,
-      # the window becomes active.  Specifically, IsWindowActive()
-      # starts to return true for the window, even though is has
-      # never been made active.  The fix is to check that the current
-      # and front process are the same before calling IsWindowActive().
-      psn1 = Array.typed(::Java::Int).new(2) { 0 }
-      if ((OS._get_current_process(psn1)).equal?(OS.attr_no_err))
-        psn2 = Array.typed(::Java::Int).new(2) { 0 }
-        if ((OS._get_front_process(psn2)).equal?(OS.attr_no_err))
-          result = Array.typed(::Java::Boolean).new(1) { false }
-          if ((OS._same_process(psn1, psn2, result)).equal?(OS.attr_no_err))
-            if (!result[0])
-              return nil
-            end
-          end
+      window = !(@key_window).nil? ? @key_window : @application.key_window
+      if (!(window).nil?)
+        widget = get_widget(window.content_view)
+        if (widget.is_a?(Shell))
+          return widget
         end
-      end
-      if (!(@active_shell).nil? && !@active_shell.is_disposed)
-        return @active_shell
-      end
-      i = 0
-      while i < @widget_table.attr_length
-        widget = @widget_table[i]
-        if (!(widget).nil? && widget.is_a?(Shell))
-          shell = widget
-          if (OS._is_window_active(shell.attr_shell_handle))
-            return shell
-          end
-        end
-        i += 1
       end
       return nil
     end
@@ -2332,18 +1983,58 @@ module Org::Eclipse::Swt::Widgets
     # </ul>
     def get_bounds
       check_device
-      gdevice = OS._get_device_list
-      if ((gdevice).equal?(0) || (OS._get_next_device(gdevice)).equal?(0))
-        return super
-      end
-      monitors = get_monitors
-      rect = monitors[0].get_bounds
-      i = 1
-      while i < monitors.attr_length
-        rect = rect.union(monitors[i].get_bounds)
+      screens_ = NSScreen.screens
+      return get_bounds(screens_)
+    end
+    
+    typesig { [NSArray] }
+    def get_bounds(screens_)
+      primary_frame = NSScreen.new(screens_.object_at_index(0)).frame
+      # double
+      min_x = Float::MAX_VALUE
+      max_x = Float::MIN_VALUE
+      # double
+      min_y = Float::MAX_VALUE
+      max_y = Float::MIN_VALUE
+      # long
+      count_ = screens_.count
+      i = 0
+      while i < count_
+        screen = NSScreen.new(screens_.object_at_index(i))
+        frame_ = screen.frame
+        # double
+        x1 = frame_.attr_x
+        x2 = frame_.attr_x + frame_.attr_width
+        # double
+        y1 = primary_frame.attr_height - frame_.attr_y
+        y2 = primary_frame.attr_height - (frame_.attr_y + frame_.attr_height)
+        if (x1 < min_x)
+          min_x = x1
+        end
+        if (x2 < min_x)
+          min_x = x2
+        end
+        if (x1 > max_x)
+          max_x = x1
+        end
+        if (x2 > max_x)
+          max_x = x2
+        end
+        if (y1 < min_y)
+          min_y = y1
+        end
+        if (y2 < min_y)
+          min_y = y2
+        end
+        if (y1 > max_y)
+          max_y = y1
+        end
+        if (y2 > max_y)
+          max_y = y2
+        end
         i += 1
       end
-      return rect
+      return Rectangle.new(RJava.cast_to_int(min_x), RJava.cast_to_int(min_y), RJava.cast_to_int((max_x - min_x)), RJava.cast_to_int((max_y - min_y)))
     end
     
     class_module.module_eval {
@@ -2361,7 +2052,7 @@ module Org::Eclipse::Swt::Widgets
     typesig { [] }
     def get_caret_blink_time
       # checkDevice ();
-      return OS._get_caret_time * 1000 / 60
+      return 560
     end
     
     typesig { [] }
@@ -2378,18 +2069,16 @@ module Org::Eclipse::Swt::Widgets
     # @see #getBounds
     def get_client_area
       check_device
-      gdevice = OS._get_device_list
-      if ((gdevice).equal?(0) || (OS._get_next_device(gdevice)).equal?(0))
-        return super
+      screens_ = NSScreen.screens
+      if (!(screens_.count).equal?(1))
+        return get_bounds(screens_)
       end
-      monitors = get_monitors
-      rect = monitors[0].get_bounds
-      i = 1
-      while i < monitors.attr_length
-        rect = rect.union(monitors[i].get_bounds)
-        i += 1
-      end
-      return rect
+      screen = NSScreen.new(screens_.object_at_index(0))
+      frame_ = screen.frame
+      visible_frame_ = screen.visible_frame
+      # double
+      y = frame_.attr_height - (visible_frame_.attr_y + visible_frame_.attr_height)
+      return Rectangle.new(RJava.cast_to_int(visible_frame_.attr_x), RJava.cast_to_int(y), RJava.cast_to_int(visible_frame_.attr_width), RJava.cast_to_int(visible_frame_.attr_height))
     end
     
     typesig { [] }
@@ -2405,46 +2094,7 @@ module Org::Eclipse::Swt::Widgets
     # </ul>
     def get_cursor_control
       check_device
-      where = Org::Eclipse::Swt::Internal::Carbon::Point.new
-      OS._get_global_mouse(where)
-      the_window = Array.typed(::Java::Int).new(1) { 0 }
-      if (!(OS._find_window(where, the_window)).equal?(OS.attr_in_content))
-        return nil
-      end
-      if ((the_window[0]).equal?(0))
-        return nil
-      end
-      rect = Rect.new
-      OS._get_window_bounds(the_window[0], RJava.cast_to_short(OS.attr_k_window_content_rgn), rect)
-      in_point = CGPoint.new
-      in_point.attr_x = where.attr_h - rect.attr_left
-      in_point.attr_y = where.attr_v - rect.attr_top
-      the_root = Array.typed(::Java::Int).new(1) { 0 }
-      OS._get_root_control(the_window[0], the_root)
-      the_control = Array.typed(::Java::Int).new(1) { 0 }
-      OS._hiview_get_subview_hit(the_root[0], in_point, true, the_control)
-      while (!(the_control[0]).equal?(0) && !OS._is_control_enabled(the_control[0]))
-        OS._get_super_control(the_control[0], the_control)
-      end
-      if (!(the_control[0]).equal?(0))
-        begin
-          widget = get_widget(the_control[0])
-          if (!(widget).nil?)
-            if (widget.is_a?(Control))
-              control = widget
-              if (control.is_enabled)
-                return control.is_enabled_modal ? control : nil
-              end
-            end
-          end
-          OS._get_super_control(the_control[0], the_control)
-        end while (!(the_control[0]).equal?(0))
-      end
-      widget = get_widget(the_root[0])
-      if (!(widget).nil? && widget.is_a?(Control))
-        return widget
-      end
-      return nil
+      return find_control(false)
     end
     
     typesig { [] }
@@ -2459,9 +2109,9 @@ module Org::Eclipse::Swt::Widgets
     # </ul>
     def get_cursor_location
       check_device
-      pt = Org::Eclipse::Swt::Internal::Carbon::Point.new
-      OS._get_global_mouse(pt)
-      return Point.new(pt.attr_h, pt.attr_v)
+      location = NSEvent.mouse_location
+      primary_frame = get_primary_frame
+      return Point.new(RJava.cast_to_int(location.attr_x), RJava.cast_to_int((primary_frame.attr_height - location.attr_y)))
     end
     
     typesig { [] }
@@ -2620,31 +2270,28 @@ module Org::Eclipse::Swt::Widgets
       if (!(@focus_control).nil? && !@focus_control.is_disposed)
         return @focus_control
       end
-      the_window = OS._get_user_focus_window
-      if ((the_window).equal?(0))
-        return nil
-      end
-      return get_focus_control(the_window, false)
+      window = !(@key_window).nil? ? @key_window : @application.key_window
+      return __get_focus_control(window)
     end
     
-    typesig { [::Java::Int, ::Java::Boolean] }
-    def get_focus_control(window, disabled)
-      the_control = Array.typed(::Java::Int).new(1) { 0 }
-      OS._get_keyboard_focus(window, the_control)
-      if ((the_control[0]).equal?(0))
-        return nil
-      end
-      begin
-        widget = get_widget(the_control[0])
-        if (!(widget).nil? && widget.is_a?(Control))
-          control = widget
-          if (disabled)
-            return control
-          end
-          return control.is_enabled ? control : nil
+    typesig { [NSWindow] }
+    def __get_focus_control(window)
+      if (!(window).nil?)
+        responder = window.first_responder
+        if (!(responder).nil? && !responder.responds_to_selector(OS.attr_sel_superview))
+          return nil
         end
-        OS._get_super_control(the_control[0], the_control)
-      end while (!(the_control[0]).equal?(0))
+        view = NSView.new(responder.attr_id)
+        if (!(view).nil?)
+          begin
+            widget = _get_widget(view.attr_id)
+            if (widget.is_a?(Control))
+              return widget
+            end
+            view = view.superview
+          end while (!(view).nil?)
+        end
+      end
       return nil
     end
     
@@ -2705,11 +2352,8 @@ module Org::Eclipse::Swt::Widgets
     
     typesig { [] }
     def get_last_event_time
-      # This code is intentionally commented.  Event time is
-      # in seconds and we need an accurate time in milliseconds.
-      # 
-      # return (int) (OS.GetLastUserEventTime () * 1000.0);
-      return RJava.cast_to_int(System.current_time_millis)
+      event = @application.current_event
+      return !(event).nil? ? RJava.cast_to_int((event.timestamp * 1000)) : 0
     end
     
     typesig { [Decorations] }
@@ -2717,17 +2361,17 @@ module Org::Eclipse::Swt::Widgets
       if ((@menus).nil?)
         return Array.typed(Menu).new(0) { nil }
       end
-      count = 0
+      count_ = 0
       i = 0
       while i < @menus.attr_length
         menu = @menus[i]
         if (!(menu).nil? && (menu.attr_parent).equal?(shell))
-          count += 1
+          count_ += 1
         end
         i += 1
       end
       index = 0
-      result = Array.typed(Menu).new(count) { nil }
+      result = Array.typed(Menu).new(count_) { nil }
       i_ = 0
       while i_ < @menus.attr_length
         menu = @menus[i_]
@@ -2737,23 +2381,6 @@ module Org::Eclipse::Swt::Widgets
         i_ += 1
       end
       return result
-    end
-    
-    typesig { [::Java::Int] }
-    def get_menu(id)
-      if ((@menus).nil?)
-        return nil
-      end
-      index = id - ID_START
-      if (0 <= index && index < @menus.attr_length)
-        return @menus[index]
-      end
-      return nil
-    end
-    
-    typesig { [] }
-    def get_menu_bar
-      return @menu_bar
     end
     
     typesig { [] }
@@ -2769,40 +2396,35 @@ module Org::Eclipse::Swt::Widgets
     # @since 3.0
     def get_monitors
       check_device
-      count = 0
-      monitors = Array.typed(SwtMonitor).new(1) { nil }
-      rect = Rect.new
-      device = GDevice.new
-      gdevice = OS._get_device_list
-      while (!(gdevice).equal?(0))
-        if (count >= monitors.attr_length)
-          new_monitors = Array.typed(SwtMonitor).new(monitors.attr_length + 4) { nil }
-          System.arraycopy(monitors, 0, new_monitors, 0, monitors.attr_length)
-          monitors = new_monitors
-        end
+      screens_ = NSScreen.screens
+      primary_frame = NSScreen.new(screens_.object_at_index(0)).frame
+      # 64
+      count_ = RJava.cast_to_int(screens_.count)
+      monitors = Array.typed(SwtMonitor).new(count_) { nil }
+      i = 0
+      while i < count_
         monitor = SwtMonitor.new
-        monitor.attr_handle = gdevice
-        ptr = Array.typed(::Java::Int).new(1) { 0 }
-        OS.memmove(ptr, gdevice, 4)
-        OS.memmove(device, ptr[0], GDevice.attr_sizeof)
-        monitor.attr_x = device.attr_left
-        monitor.attr_y = device.attr_top
-        monitor.attr_width = device.attr_right - device.attr_left
-        monitor.attr_height = device.attr_bottom - device.attr_top
-        OS._get_available_window_positioning_bounds(gdevice, rect)
-        monitor.attr_client_x = rect.attr_left
-        monitor.attr_client_y = rect.attr_top
-        monitor.attr_client_width = rect.attr_right - rect.attr_left
-        monitor.attr_client_height = rect.attr_bottom - rect.attr_top
-        monitors[((count += 1) - 1)] = monitor
-        gdevice = OS._get_next_device(gdevice)
-      end
-      if (count < monitors.attr_length)
-        new_monitors = Array.typed(SwtMonitor).new(count) { nil }
-        System.arraycopy(monitors, 0, new_monitors, 0, count)
-        monitors = new_monitors
+        screen = NSScreen.new(screens_.object_at_index(i))
+        frame_ = screen.frame
+        monitor.attr_x = RJava.cast_to_int(frame_.attr_x)
+        monitor.attr_y = RJava.cast_to_int((primary_frame.attr_height - (frame_.attr_y + frame_.attr_height)))
+        monitor.attr_width = RJava.cast_to_int(frame_.attr_width)
+        monitor.attr_height = RJava.cast_to_int(frame_.attr_height)
+        visible_frame_ = screen.visible_frame
+        monitor.attr_client_x = RJava.cast_to_int(visible_frame_.attr_x)
+        monitor.attr_client_y = RJava.cast_to_int((primary_frame.attr_height - (visible_frame_.attr_y + visible_frame_.attr_height)))
+        monitor.attr_client_width = RJava.cast_to_int(visible_frame_.attr_width)
+        monitor.attr_client_height = RJava.cast_to_int(visible_frame_.attr_height)
+        monitors[i] = monitor
+        i += 1
       end
       return monitors
+    end
+    
+    typesig { [] }
+    def get_primary_frame
+      screens_ = NSScreen.screens
+      return NSScreen.new(screens_.object_at_index(0)).frame
     end
     
     typesig { [] }
@@ -2813,23 +2435,19 @@ module Org::Eclipse::Swt::Widgets
     # @since 3.0
     def get_primary_monitor
       check_device
-      gdevice = OS._get_main_device
       monitor = SwtMonitor.new
-      monitor.attr_handle = gdevice
-      ptr = Array.typed(::Java::Int).new(1) { 0 }
-      OS.memmove(ptr, gdevice, 4)
-      device = GDevice.new
-      OS.memmove(device, ptr[0], GDevice.attr_sizeof)
-      monitor.attr_x = device.attr_left
-      monitor.attr_y = device.attr_top
-      monitor.attr_width = device.attr_right - device.attr_left
-      monitor.attr_height = device.attr_bottom - device.attr_top
-      rect = Rect.new
-      OS._get_available_window_positioning_bounds(gdevice, rect)
-      monitor.attr_client_x = rect.attr_left
-      monitor.attr_client_y = rect.attr_top
-      monitor.attr_client_width = rect.attr_right - rect.attr_left
-      monitor.attr_client_height = rect.attr_bottom - rect.attr_top
+      screens_ = NSScreen.screens
+      screen = NSScreen.new(screens_.object_at_index(0))
+      frame_ = screen.frame
+      monitor.attr_x = RJava.cast_to_int(frame_.attr_x)
+      monitor.attr_y = RJava.cast_to_int((frame_.attr_height - (frame_.attr_y + frame_.attr_height)))
+      monitor.attr_width = RJava.cast_to_int(frame_.attr_width)
+      monitor.attr_height = RJava.cast_to_int(frame_.attr_height)
+      visible_frame_ = screen.visible_frame
+      monitor.attr_client_x = RJava.cast_to_int(visible_frame_.attr_x)
+      monitor.attr_client_y = RJava.cast_to_int((frame_.attr_height - (visible_frame_.attr_y + visible_frame_.attr_height)))
+      monitor.attr_client_width = RJava.cast_to_int(visible_frame_.attr_width)
+      monitor.attr_client_height = RJava.cast_to_int(visible_frame_.attr_height)
       return monitor
     end
     
@@ -2845,27 +2463,16 @@ module Org::Eclipse::Swt::Widgets
     # </ul>
     def get_shells
       check_device
+      windows_ = @application.windows
       index = 0
-      result = Array.typed(Shell).new(16) { nil }
+      # 64
+      result = Array.typed(Shell).new(RJava.cast_to_int(windows_.count)) { nil }
       i = 0
-      while i < @widget_table.attr_length
-        widget = @widget_table[i]
-        if (!(widget).nil? && widget.is_a?(Shell))
-          j = 0
-          while (j < index)
-            if ((result[j]).equal?(widget))
-              break
-            end
-            j += 1
-          end
-          if ((j).equal?(index))
-            if ((index).equal?(result.attr_length))
-              new_result = Array.typed(Shell).new(index + 16) { nil }
-              System.arraycopy(result, 0, new_result, 0, index)
-              result = new_result
-            end
-            result[((index += 1) - 1)] = widget
-          end
+      while i < result.attr_length
+        window = NSWindow.new(windows_.object_at_index(i))
+        widget = get_widget(window.content_view)
+        if (widget.is_a?(Shell))
+          result[((index += 1) - 1)] = widget
         end
         i += 1
       end
@@ -2876,6 +2483,13 @@ module Org::Eclipse::Swt::Widgets
       System.arraycopy(result, 0, new_result, 0, index)
       return new_result
     end
+    
+    class_module.module_eval {
+      typesig { [] }
+      def get_sheet_enabled
+        return !("false" == System.get_property("org.eclipse.swt.sheet"))
+      end
+    }
     
     typesig { [] }
     # Gets the synchronizer used by the display.
@@ -2936,54 +2550,86 @@ module Org::Eclipse::Swt::Widgets
     # @see SWT
     def get_system_color(id)
       check_device
-      rgb = RGBColor.new
+      color = get_widget_color(id)
+      if (!(color).nil?)
+        return color
+      end
+      return super(id)
+    end
+    
+    typesig { [::Java::Int] }
+    def get_widget_color(id)
+      if (0 <= id && id < @colors.attr_length && !(@colors[id]).nil?)
+        return Color.cocoa_new(self, @colors[id])
+      end
+      return nil
+    end
+    
+    typesig { [::Java::Int] }
+    # double
+    def get_widget_color_rgb(id)
+      color = nil
       case (id)
       when SWT::COLOR_INFO_FOREGROUND
-        return super(SWT::COLOR_BLACK)
+        color = NSColor.black_color
       when SWT::COLOR_INFO_BACKGROUND
-        return Color.carbon_new(self, Array.typed(::Java::Float).new([0xff / 255, 0xff / 255, 0xe1 / 255, 1]))
+        # double
+        return Array.typed(::Java::Float).new([0xff / 255, 0xff / 255, 0xe1 / 255, 1])
       when SWT::COLOR_TITLE_FOREGROUND
-        OS._get_theme_text_color(RJava.cast_to_short(OS.attr_k_theme_text_color_document_window_title_active), RJava.cast_to_short(get_depth), true, rgb)
+        color = NSColor.window_frame_text_color
       when SWT::COLOR_TITLE_BACKGROUND
-        # undocumented darker highlight color
-        OS._get_theme_brush_as_color(RJava.cast_to_short(-5), RJava.cast_to_short(get_depth), true, rgb)
+        color = NSColor.alternate_selected_control_color
       when SWT::COLOR_TITLE_BACKGROUND_GRADIENT
-        OS._get_theme_brush_as_color(RJava.cast_to_short(OS.attr_k_theme_brush_primary_highlight_color), RJava.cast_to_short(get_depth), true, rgb)
+        color = NSColor.selected_control_color
       when SWT::COLOR_TITLE_INACTIVE_FOREGROUND
-        OS._get_theme_text_color(RJava.cast_to_short(OS.attr_k_theme_text_color_document_window_title_inactive), RJava.cast_to_short(get_depth), true, rgb)
+        color = NSColor.disabled_control_text_color
       when SWT::COLOR_TITLE_INACTIVE_BACKGROUND
-        OS._get_theme_brush_as_color(RJava.cast_to_short(OS.attr_k_theme_brush_secondary_highlight_color), RJava.cast_to_short(get_depth), true, rgb)
+        color = NSColor.secondary_selected_control_color
       when SWT::COLOR_TITLE_INACTIVE_BACKGROUND_GRADIENT
-        OS._get_theme_brush_as_color(RJava.cast_to_short(OS.attr_k_theme_brush_secondary_highlight_color), RJava.cast_to_short(get_depth), true, rgb)
+        color = NSColor.secondary_selected_control_color
       when SWT::COLOR_WIDGET_DARK_SHADOW
-        return Color.carbon_new(self, Array.typed(::Java::Float).new([0x33 / 255, 0x33 / 255, 0x33 / 255, 1]))
+        color = NSColor.control_dark_shadow_color
       when SWT::COLOR_WIDGET_NORMAL_SHADOW
-        return Color.carbon_new(self, Array.typed(::Java::Float).new([0x66 / 255, 0x66 / 255, 0x66 / 255, 1]))
+        color = NSColor.control_shadow_color
       when SWT::COLOR_WIDGET_LIGHT_SHADOW
-        return Color.carbon_new(self, Array.typed(::Java::Float).new([0x99 / 255, 0x99 / 255, 0x99 / 255, 1]))
+        color = NSColor.control_highlight_color
       when SWT::COLOR_WIDGET_HIGHLIGHT_SHADOW
-        return Color.carbon_new(self, Array.typed(::Java::Float).new([0xcc / 255, 0xcc / 255, 0xcc / 255, 1]))
+        color = NSColor.control_light_highlight_color
       when SWT::COLOR_WIDGET_BACKGROUND
-        OS._get_theme_brush_as_color(RJava.cast_to_short((OS::VERSION < 0x1050 ? OS.attr_k_theme_brush_button_face_active : OS.attr_k_theme_brush_button_inactive_dark_shadow)), RJava.cast_to_short(get_depth), true, rgb)
+        color = NSColor.control_highlight_color
       when SWT::COLOR_WIDGET_FOREGROUND
-        OS._get_theme_text_color(RJava.cast_to_short(OS.attr_k_theme_text_color_push_button_active), RJava.cast_to_short(get_depth), true, rgb)
+        color = NSColor.control_text_color
       when SWT::COLOR_WIDGET_BORDER
-        return super(SWT::COLOR_BLACK)
+        color = NSColor.black_color
       when SWT::COLOR_LIST_FOREGROUND
-        OS._get_theme_text_color(RJava.cast_to_short(OS.attr_k_theme_text_color_list_view), RJava.cast_to_short(get_depth), true, rgb)
+        color = NSColor.text_color
       when SWT::COLOR_LIST_BACKGROUND
-        OS._get_theme_brush_as_color(RJava.cast_to_short(OS.attr_k_theme_brush_list_view_background), RJava.cast_to_short(get_depth), true, rgb)
+        color = NSColor.text_background_color
       when SWT::COLOR_LIST_SELECTION_TEXT
-        OS._get_theme_text_color(RJava.cast_to_short(OS.attr_k_theme_text_color_list_view), RJava.cast_to_short(get_depth), true, rgb)
+        color = NSColor.selected_text_color
       when SWT::COLOR_LIST_SELECTION
-        OS._get_theme_brush_as_color(RJava.cast_to_short(OS.attr_k_theme_brush_primary_highlight_color), RJava.cast_to_short(get_depth), true, rgb)
-      else
-        return super(id)
+        color = NSColor.selected_text_background_color
       end
-      red = ((rgb.attr_red >> 8) & 0xff) / 255
-      green = ((rgb.attr_green >> 8) & 0xff) / 255
-      blue = ((rgb.attr_blue >> 8) & 0xff) / 255
-      return Color.carbon_new(self, Array.typed(::Java::Float).new([red, green, blue, 1]))
+      return get_widget_color_rgb(color)
+    end
+    
+    typesig { [NSColor] }
+    # double
+    def get_widget_color_rgb(color)
+      if ((color).nil?)
+        return nil
+      end
+      color = color.color_using_color_space(NSColorSpace.device_rgbcolor_space)
+      if ((color).nil?)
+        return nil
+      end
+      # double
+      # double
+      # 64
+      components = Array.typed(::Java::Float).new(RJava.cast_to_int(color.number_of_components)) { 0.0 }
+      color.get_components(components)
+      # double
+      return Array.typed(::Java::Float).new([components[0], components[1], components[2], components[3]])
     end
     
     typesig { [::Java::Int] }
@@ -3065,36 +2711,37 @@ module Org::Eclipse::Swt::Widgets
     # @since 3.0
     def get_system_image(id)
       check_device
-      catch(:break_case) do
-        case (id)
-        when SWT::ICON_ERROR
-          if (!(@error_image).nil?)
-            return @error_image
-          end
-          image = create_image(OS.attr_k_alert_stop_icon)
-          if ((image).nil?)
-            throw :break_case, :thrown
-          end
-          return @error_image = Image.carbon_new(self, SWT::ICON, image[0], image[1])
-        when SWT::ICON_INFORMATION, SWT::ICON_QUESTION, SWT::ICON_WORKING
-          if (!(@info_image).nil?)
-            return @info_image
-          end
-          image = create_image(OS.attr_k_alert_note_icon)
-          if ((image).nil?)
-            throw :break_case, :thrown
-          end
-          return @info_image = Image.carbon_new(self, SWT::ICON, image[0], image[1])
-        when SWT::ICON_WARNING
-          if (!(@warning_image).nil?)
-            return @warning_image
-          end
-          image = create_image(OS.attr_k_alert_caution_icon)
-          if ((image).nil?)
-            throw :break_case, :thrown
-          end
-          return @warning_image = Image.carbon_new(self, SWT::ICON, image[0], image[1])
+      case (id)
+      when SWT::ICON_ERROR
+        if (!(@error_image).nil?)
+          return @error_image
         end
+        ns_image = NSWorkspace.shared_workspace.icon_for_file_type(NSString.new(OS._nsfile_type_for_hfstype_code(OS.attr_k_alert_stop_icon)))
+        if ((ns_image).nil?)
+          return nil
+        end
+        ns_image.retain
+        return @error_image = Image.cocoa_new(self, SWT::ICON, ns_image)
+      when SWT::ICON_INFORMATION, SWT::ICON_QUESTION, SWT::ICON_WORKING
+        if (!(@info_image).nil?)
+          return @info_image
+        end
+        ns_image = NSWorkspace.shared_workspace.icon_for_file_type(NSString.new(OS._nsfile_type_for_hfstype_code(OS.attr_k_alert_note_icon)))
+        if ((ns_image).nil?)
+          return nil
+        end
+        ns_image.retain
+        return @info_image = Image.cocoa_new(self, SWT::ICON, ns_image)
+      when SWT::ICON_WARNING
+        if (!(@warning_image).nil?)
+          return @warning_image
+        end
+        ns_image = NSWorkspace.shared_workspace.icon_for_file_type(NSString.new(OS._nsfile_type_for_hfstype_code(OS.attr_k_alert_caution_icon)))
+        if ((ns_image).nil?)
+          return nil
+        end
+        ns_image.retain
+        return @warning_image = Image.cocoa_new(self, SWT::ICON, ns_image)
       end
       return nil
     end
@@ -3135,36 +2782,59 @@ module Org::Eclipse::Swt::Widgets
       end
     end
     
+    typesig { [] }
+    def get_tool_tip_time
+      check_device
+      # TODO get OS value (NSTooltipManager?)
+      return 560
+    end
+    
     typesig { [::Java::Int] }
-    def get_widget(handle)
-      if ((handle).equal?(0))
+    # long
+    def get_widget(id)
+      return _get_widget(id)
+    end
+    
+    class_module.module_eval {
+      typesig { [::Java::Int] }
+      # long
+      def _get_widget(id)
+        if ((id).equal?(0))
+          return nil
+        end
+        # long
+        # long
+        jni_ref = Array.typed(::Java::Int).new(1) { 0 }
+        OS.object_get_instance_variable(id, SWT_OBJECT, jni_ref)
+        if ((jni_ref[0]).equal?(0))
+          return nil
+        end
+        return OS._jniget_object(jni_ref[0])
+      end
+    }
+    
+    typesig { [NSView] }
+    def get_widget(view)
+      if ((view).nil?)
         return nil
       end
-      @property[0] = 0
-      OS._get_control_property(handle, SWT0, SWT0, 4, nil, @property)
-      index = @property[0] - 1
-      if (0 <= index && index < @widget_table.attr_length)
-        return @widget_table[index]
-      end
-      return nil
+      return get_widget(view.attr_id)
     end
     
-    typesig { [::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int] }
-    def help_proc(in_control, in_global_mouse, in_request, out_content_provided, io_help_content)
-      widget = get_widget(in_control)
-      if (!(widget).nil?)
-        return widget.help_proc(in_control, in_global_mouse, in_request, out_content_provided, io_help_content)
+    typesig { [] }
+    def has_default_button
+      windows_ = @application.windows
+      # long
+      count_ = windows_.count
+      i = 0
+      while i < count_
+        window = NSWindow.new(windows_.object_at_index(i))
+        if (!(window.default_button_cell).nil?)
+          return true
+        end
+        i += 1
       end
-      return OS.attr_event_not_handled_err
-    end
-    
-    typesig { [::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int] }
-    def hit_test_proc(browser, item, property, the_rect, mouse_rect)
-      widget = get_widget(browser)
-      if (!(widget).nil?)
-        return widget.hit_test_proc(browser, item, property, the_rect, mouse_rect)
-      end
-      return OS.attr_no_err
+      return false
     end
     
     typesig { [] }
@@ -3177,255 +2847,715 @@ module Org::Eclipse::Swt::Widgets
     # @see #create
     def init
       super
-      initialize_callbacks
-      initialize_insets
-      initialize_widget_table
-      initialize_fonts
-    end
-    
-    typesig { [] }
-    def initialize_callbacks
-      # Create Callbacks
-      @action_callback = Callback.new(self, "actionProc", 2) # $NON-NLS-1$
-      @action_proc = @action_callback.get_address
-      if ((@action_proc).equal?(0))
-        error(SWT::ERROR_NO_MORE_CALLBACKS)
-      end
-      @apple_event_callback = Callback.new(self, "appleEventProc", 3) # $NON-NLS-1$
-      @apple_event_proc = @apple_event_callback.get_address
-      if ((@apple_event_proc).equal?(0))
-        error(SWT::ERROR_NO_MORE_CALLBACKS)
-      end
-      @caret_callback = Callback.new(self, "caretProc", 2) # $NON-NLS-1$
-      @caret_proc = @caret_callback.get_address
-      if ((@caret_proc).equal?(0))
-        error(SWT::ERROR_NO_MORE_CALLBACKS)
-      end
-      @clock_callback = Callback.new(self, "clockProc", 3) # $NON-NLS-1$
-      @clock_proc = @clock_callback.get_address
-      if ((@clock_proc).equal?(0))
-        error(SWT::ERROR_NO_MORE_CALLBACKS)
-      end
-      @command_callback = Callback.new(self, "commandProc", 3) # $NON-NLS-1$
-      @command_proc = @command_callback.get_address
-      if ((@command_proc).equal?(0))
-        error(SWT::ERROR_NO_MORE_CALLBACKS)
-      end
-      @control_callback = Callback.new(self, "controlProc", 3) # $NON-NLS-1$
-      @control_proc = @control_callback.get_address
-      if ((@control_proc).equal?(0))
-        error(SWT::ERROR_NO_MORE_CALLBACKS)
-      end
-      @accessibility_callback = Callback.new(self, "accessibilityProc", 3) # $NON-NLS-1$
-      @accessibility_proc = @accessibility_callback.get_address
-      if ((@accessibility_proc).equal?(0))
-        error(SWT::ERROR_NO_MORE_CALLBACKS)
-      end
-      @draw_item_callback = Callback.new(self, "drawItemProc", 7) # $NON-NLS-1$
-      @draw_item_proc = @draw_item_callback.get_address
-      if ((@draw_item_proc).equal?(0))
-        error(SWT::ERROR_NO_MORE_CALLBACKS)
-      end
-      @item_compare_callback = Callback.new(self, "itemCompareProc", 4) # $NON-NLS-1$
-      @item_compare_proc = @item_compare_callback.get_address
-      if ((@item_compare_proc).equal?(0))
-        error(SWT::ERROR_NO_MORE_CALLBACKS)
-      end
-      @item_data_callback = Callback.new(self, "itemDataProc", 5) # $NON-NLS-1$
-      @item_data_proc = @item_data_callback.get_address
-      if ((@item_data_proc).equal?(0))
-        error(SWT::ERROR_NO_MORE_CALLBACKS)
-      end
-      @item_notification_callback = Callback.new(self, "itemNotificationProc", 3) # $NON-NLS-1$
-      @item_notification_proc = @item_notification_callback.get_address
-      if ((@item_notification_proc).equal?(0))
-        error(SWT::ERROR_NO_MORE_CALLBACKS)
-      end
-      @help_callback = Callback.new(self, "helpProc", 5) # $NON-NLS-1$
-      @help_proc = @help_callback.get_address
-      if ((@help_proc).equal?(0))
-        error(SWT::ERROR_NO_MORE_CALLBACKS)
-      end
-      @hit_test_callback = Callback.new(self, "hitTestProc", 5) # $NON-NLS-1$
-      @hit_test_proc = @hit_test_callback.get_address
-      if ((@hit_test_proc).equal?(0))
-        error(SWT::ERROR_NO_MORE_CALLBACKS)
-      end
-      @keyboard_callback = Callback.new(self, "keyboardProc", 3) # $NON-NLS-1$
-      @keyboard_proc = @keyboard_callback.get_address
-      if ((@keyboard_proc).equal?(0))
-        error(SWT::ERROR_NO_MORE_CALLBACKS)
-      end
-      @menu_callback = Callback.new(self, "menuProc", 3) # $NON-NLS-1$
-      @menu_proc = @menu_callback.get_address
-      if ((@menu_proc).equal?(0))
-        error(SWT::ERROR_NO_MORE_CALLBACKS)
-      end
-      @mouse_hover_callback = Callback.new(self, "mouseHoverProc", 2) # $NON-NLS-1$
-      @mouse_hover_proc = @mouse_hover_callback.get_address
-      if ((@mouse_hover_proc).equal?(0))
-        error(SWT::ERROR_NO_MORE_CALLBACKS)
-      end
-      @mouse_callback = Callback.new(self, "mouseProc", 3) # $NON-NLS-1$
-      @mouse_proc = @mouse_callback.get_address
-      if ((@mouse_proc).equal?(0))
-        error(SWT::ERROR_NO_MORE_CALLBACKS)
-      end
-      @timer_callback = Callback.new(self, "timerProc", 2) # $NON-NLS-1$
-      @timer_proc = @timer_callback.get_address
-      if ((@timer_proc).equal?(0))
-        error(SWT::ERROR_NO_MORE_CALLBACKS)
-      end
-      @tracking_callback = Callback.new(self, "trackingProc", 6) # $NON-NLS-1$
-      @tracking_proc = @tracking_callback.get_address
-      if ((@tracking_proc).equal?(0))
-        error(SWT::ERROR_NO_MORE_CALLBACKS)
-      end
-      @window_callback = Callback.new(self, "windowProc", 3) # $NON-NLS-1$
-      @window_proc = @window_callback.get_address
-      if ((@window_proc).equal?(0))
-        error(SWT::ERROR_NO_MORE_CALLBACKS)
-      end
-      @color_callback = Callback.new(self, "colorProc", 4) # $NON-NLS-1$
-      @color_proc = @color_callback.get_address
-      if ((@color_proc).equal?(0))
-        error(SWT::ERROR_NO_MORE_CALLBACKS)
-      end
-      @text_input_callback = Callback.new(self, "textInputProc", 3) # $NON-NLS-1$
-      @text_input_proc = @text_input_callback.get_address
-      if ((@text_input_proc).equal?(0))
-        error(SWT::ERROR_NO_MORE_CALLBACKS)
-      end
-      @appearance_callback = Callback.new(self, "appearanceProc", 3) # $NON-NLS-1$
-      @appearance_proc = @appearance_callback.get_address
-      if ((@appearance_proc).equal?(0))
-        error(SWT::ERROR_NO_MORE_CALLBACKS)
-      end
-      @tray_item_callback = Callback.new(self, "trayItemProc", 4) # $NON-NLS-1$
-      @tray_item_proc = @tray_item_callback.get_address
-      if ((@tray_item_proc).equal?(0))
-        error(SWT::ERROR_NO_MORE_CALLBACKS)
+      init_classes
+      init_colors
+      init_fonts
+      if (!@is_embedded)
+        # Feature in Cocoa:  NSApplication.finishLaunching() adds an apple menu to the menu bar that isn't accessible via NSMenu.
+        # If Display objects are created and disposed of multiple times in a single process, another apple menu is added to the menu bar.
+        # It must be called or the dock icon will continue to bounce. So, it should only be called once per process, not just once per
+        # creation of a Display.  Use a static so creation of additional Display objects won't affect the menu bar.
+        if (!self.attr_launched)
+          @application.finish_launching
+          self.attr_launched = true
+          Runtime.get_runtime.add_shutdown_hook(# only add the shutdown hook once
+          Class.new(JavaThread.class == Class ? JavaThread : Object) do
+            extend LocalClass
+            include_class_members Display
+            include JavaThread if JavaThread.class == Module
+            
+            typesig { [] }
+            define_method :run do
+              NSApplication.shared_application.terminate(nil)
+            end
+            
+            typesig { [Vararg.new(Object)] }
+            define_method :initialize do |*args|
+              super(*args)
+            end
+            
+            private
+            alias_method :initialize_anonymous, :initialize
+          end.new_local(self))
+        end
       end
       @observer_callback = Callback.new(self, "observerProc", 3) # $NON-NLS-1$
-      @observer_proc = @observer_callback.get_address
-      if ((@observer_proc).equal?(0))
+      # long
+      observer_proc = @observer_callback.get_address
+      if ((observer_proc).equal?(0))
         error(SWT::ERROR_NO_MORE_CALLBACKS)
       end
-      @source_callback = Callback.new(self, "sourceProc", 1) # $NON-NLS-1$
-      @source_proc = @source_callback.get_address
-      if ((@source_proc).equal?(0))
-        error(SWT::ERROR_NO_MORE_CALLBACKS)
-      end
-      @search_callback = Callback.new(self, "searchProc", 3) # $NON-NLS-1$
-      @search_proc = @search_callback.get_address
-      if ((@search_proc).equal?(0))
-        error(SWT::ERROR_NO_MORE_CALLBACKS)
-      end
-      @release_callback = Callback.new(self, "releaseDataProc", 3) # $NON-NLS-1$
-      @release_proc = @release_callback.get_address
-      if ((@release_proc).equal?(0))
-        SWT.error(SWT::ERROR_NO_MORE_CALLBACKS)
-      end
-      @core_event_callback = Callback.new(self, "coreEventProc", 3) # $NON-NLS-1$
-      @core_event_proc = @core_event_callback.get_address
-      if ((@core_event_proc).equal?(0))
-        SWT.error(SWT::ERROR_NO_MORE_CALLBACKS)
-      end
-      @polling_callback = Callback.new(self, "pollingProc", 2)
-      @polling_proc = @polling_callback.get_address
-      if ((@polling_proc).equal?(0))
-        SWT.error(SWT::ERROR_NO_MORE_CALLBACKS)
-      end
-      # Install Event Handlers
-      mask1 = Array.typed(::Java::Int).new([OS.attr_k_event_class_command, OS.attr_k_event_process_command, ])
-      app_target = OS._get_application_event_target
-      OS._install_event_handler(app_target, @command_proc, mask1.attr_length / 2, mask1, 0, nil)
-      # OS.kEventClassMouse, OS.kEventMouseEntered,
-      # OS.kEventClassMouse, OS.kEventMouseExited,
-      mask2 = Array.typed(::Java::Int).new([OS.attr_k_event_class_mouse, OS.attr_k_event_mouse_down, OS.attr_k_event_class_mouse, OS.attr_k_event_mouse_dragged, OS.attr_k_event_class_mouse, OS.attr_k_event_mouse_moved, OS.attr_k_event_class_mouse, OS.attr_k_event_mouse_up, OS.attr_k_event_class_mouse, OS.attr_k_event_mouse_wheel_moved, ])
-      OS._install_event_handler(app_target, @mouse_proc, mask2.attr_length / 2, mask2, 0, nil)
-      mask3 = Array.typed(::Java::Int).new([OS.attr_k_event_class_application, OS.attr_k_event_app_available_window_bounds_changed, OS.attr_k_event_class_apple_event, OS.attr_k_event_apple_event, ])
-      OS._install_event_handler(app_target, @apple_event_proc, mask3.attr_length / 2, mask3, 0, nil)
-      OS._aeinstall_event_handler(OS.attr_k_core_event_class, OS.attr_k_aequit_application, @core_event_proc, 0, false)
-      mask4 = Array.typed(::Java::Int).new([OS.attr_k_event_class_keyboard, OS.attr_k_event_raw_key_down, OS.attr_k_event_class_keyboard, OS.attr_k_event_raw_key_modifiers_changed, OS.attr_k_event_class_keyboard, OS.attr_k_event_raw_key_repeat, OS.attr_k_event_class_keyboard, OS.attr_k_event_raw_key_up, ])
-      focus_target = OS._get_user_focus_event_target
-      OS._install_event_handler(focus_target, @keyboard_proc, mask4.attr_length / 2, mask4, 0, nil)
-      mask5 = Array.typed(::Java::Int).new([OS.attr_k_event_class_text_input, OS.attr_k_event_text_input_unicode_for_key_event, OS.attr_k_event_class_text_input, OS.attr_k_event_text_input_update_active_input_area, OS.attr_k_event_class_text_input, OS.attr_k_event_text_input_offset_to_pos, OS.attr_k_event_class_text_input, OS.attr_k_event_text_input_pos_to_offset, OS.attr_k_event_class_text_input, OS.attr_k_event_text_input_get_selected_text, ])
-      OS._install_event_handler(focus_target, @text_input_proc, mask5.attr_length / 2, mask5, 0, nil)
-      OS._aeinstall_event_handler(OS.attr_k_appearance_event_class, OS.attr_k_aeappearance_changed, @appearance_proc, 0, false)
-      OS._aeinstall_event_handler(OS.attr_k_appearance_event_class, OS.attr_k_aesmall_system_font_changed, @appearance_proc, 0, false)
-      OS._aeinstall_event_handler(OS.attr_k_appearance_event_class, OS.attr_k_aesystem_font_changed, @appearance_proc, 0, false)
-      OS._aeinstall_event_handler(OS.attr_k_appearance_event_class, OS.attr_k_aeviews_font_changed, @appearance_proc, 0, false)
-      mode = OS.k_cfrun_loop_common_modes
       activities = OS.attr_k_cfrun_loop_before_waiting
-      @run_loop_observer = OS._cfrun_loop_observer_create(OS.attr_k_cfallocator_default, activities, true, 0, @observer_proc, 0)
+      @run_loop_observer = OS._cfrun_loop_observer_create(0, activities, true, 0, observer_proc, 0)
       if ((@run_loop_observer).equal?(0))
         error(SWT::ERROR_NO_HANDLES)
       end
-      OS._cfrun_loop_add_observer(@run_loop, @run_loop_observer, mode)
-      context = CFRunLoopSourceContext.new
-      context.attr_version = 0
-      context.attr_perform = @source_proc
-      @run_loop_source = OS._cfrun_loop_source_create(OS.attr_k_cfallocator_default, 0, context)
-      if ((@run_loop_source).equal?(0))
-        error(SWT::ERROR_NO_HANDLES)
+      OS._cfrun_loop_add_observer(OS._cfrun_loop_get_current, @run_loop_observer, OS.k_cfrun_loop_common_modes)
+      @cursor_set_callback = Callback.new(self, "cursorSetProc", 2)
+      # long
+      cursor_set_proc = @cursor_set_callback.get_address
+      if ((cursor_set_proc).equal?(0))
+        error(SWT::ERROR_NO_MORE_CALLBACKS)
       end
-      OS._cfrun_loop_add_source(@run_loop, @run_loop_source, mode)
+      # long
+      method = OS.class_get_instance_method(OS.attr_class_nscursor, OS.attr_sel_set)
+      if (!(method).equal?(0))
+        @old_cursor_set_proc = OS.method_set_implementation(method, cursor_set_proc)
+      end
+      @timer_delegate = SWTWindowDelegate.new.alloc.init
+      @settings_delegate = SWTWindowDelegate.new.alloc.init
+      default_center_ = NSNotificationCenter.default_center
+      default_center_.add_observer(@settings_delegate, OS.attr_sel_system_settings_changed_, OS::NSSystemColorsDidChangeNotification, nil)
+      default_center_.add_observer(@settings_delegate, OS.attr_sel_system_settings_changed_, OS::NSApplicationDidChangeScreenParametersNotification, nil)
+      text_view = NSTextView.new.alloc
+      text_view.init
+      @marked_attributes = text_view.marked_text_attributes
+      @marked_attributes.retain
+      text_view.release
+      @is_painting = NSMutableArray.new.alloc
+      @is_painting = @is_painting.init_with_capacity(12)
+    end
+    
+    typesig { [::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int] }
+    # long
+    # long
+    # long
+    # long
+    # long
+    # long
+    def add_event_methods(cls, proc2, proc3, draw_rect_proc, hit_test_proc, needs_display_in_rect_proc)
+      if (!(proc3).equal?(0))
+        OS.class_add_method(cls, OS.attr_sel_mouse_down_, proc3, "@:@")
+        OS.class_add_method(cls, OS.attr_sel_mouse_up_, proc3, "@:@")
+        OS.class_add_method(cls, OS.attr_sel_scroll_wheel_, proc3, "@:@")
+        OS.class_add_method(cls, OS.attr_sel_right_mouse_down_, proc3, "@:@")
+        OS.class_add_method(cls, OS.attr_sel_right_mouse_up_, proc3, "@:@")
+        OS.class_add_method(cls, OS.attr_sel_right_mouse_dragged_, proc3, "@:@")
+        OS.class_add_method(cls, OS.attr_sel_other_mouse_down_, proc3, "@:@")
+        OS.class_add_method(cls, OS.attr_sel_other_mouse_up_, proc3, "@:@")
+        OS.class_add_method(cls, OS.attr_sel_other_mouse_dragged_, proc3, "@:@")
+        OS.class_add_method(cls, OS.attr_sel_mouse_dragged_, proc3, "@:@")
+        OS.class_add_method(cls, OS.attr_sel_mouse_moved_, proc3, "@:@")
+        OS.class_add_method(cls, OS.attr_sel_mouse_entered_, proc3, "@:@")
+        OS.class_add_method(cls, OS.attr_sel_mouse_exited_, proc3, "@:@")
+        OS.class_add_method(cls, OS.attr_sel_menu_for_event_, proc3, "@:@")
+        OS.class_add_method(cls, OS.attr_sel_key_down_, proc3, "@:@")
+        OS.class_add_method(cls, OS.attr_sel_key_up_, proc3, "@:@")
+        OS.class_add_method(cls, OS.attr_sel_flags_changed_, proc3, "@:@")
+        OS.class_add_method(cls, OS.attr_sel_cursor_update_, proc3, "@:@")
+        OS.class_add_method(cls, OS.attr_sel_set_needs_display_, proc3, "@:B")
+        OS.class_add_method(cls, OS.attr_sel_should_delay_window_ordering_for_event_, proc3, "@:@")
+        OS.class_add_method(cls, OS.attr_sel_accepts_first_mouse_, proc3, "@:@")
+      end
+      if (!(proc2).equal?(0))
+        OS.class_add_method(cls, OS.attr_sel_resign_first_responder, proc2, "@:")
+        OS.class_add_method(cls, OS.attr_sel_become_first_responder, proc2, "@:")
+        OS.class_add_method(cls, OS.attr_sel_reset_cursor_rects, proc2, "@:")
+        OS.class_add_method(cls, OS.attr_sel_update_tracking_areas, proc2, "@:")
+      end
+      if (!(needs_display_in_rect_proc).equal?(0))
+        OS.class_add_method(cls, OS.attr_sel_set_needs_display_in_rect_, needs_display_in_rect_proc, "@:{NSRect}")
+      end
+      if (!(draw_rect_proc).equal?(0))
+        OS.class_add_method(cls, OS.attr_sel_draw_rect_, draw_rect_proc, "@:{NSRect}")
+      end
+      if (!(hit_test_proc).equal?(0))
+        OS.class_add_method(cls, OS.attr_sel_hit_test_, hit_test_proc, "@:{NSPoint}")
+      end
+    end
+    
+    typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
+    # long
+    # long
+    # long
+    def add_frame_methods(cls, set_frame_origin_proc, set_frame_size_proc)
+      OS.class_add_method(cls, OS.attr_sel_set_frame_origin_, set_frame_origin_proc, "@:{NSPoint}")
+      OS.class_add_method(cls, OS.attr_sel_set_frame_size_, set_frame_size_proc, "@:{NSSize}")
+    end
+    
+    typesig { [::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int] }
+    # long
+    # long
+    # long
+    # long
+    # long
+    def add_accessibility_methods(cls, proc2, proc3, proc4, accessibility_hit_test_proc)
+      OS.class_add_method(cls, OS.attr_sel_accessibility_action_names, proc2, "@:")
+      OS.class_add_method(cls, OS.attr_sel_accessibility_attribute_names, proc2, "@:")
+      OS.class_add_method(cls, OS.attr_sel_accessibility_parameterized_attribute_names, proc2, "@:")
+      OS.class_add_method(cls, OS.attr_sel_accessibility_focused_uielement, proc2, "@:")
+      OS.class_add_method(cls, OS.attr_sel_accessibility_is_ignored, proc2, "@:")
+      OS.class_add_method(cls, OS.attr_sel_accessibility_attribute_value_, proc3, "@:@")
+      OS.class_add_method(cls, OS.attr_sel_accessibility_hit_test_, accessibility_hit_test_proc, "@:{NSPoint}")
+      OS.class_add_method(cls, OS.attr_sel_accessibility_attribute_value_for_parameter_, proc4, "@:@@")
+      OS.class_add_method(cls, OS.attr_sel_accessibility_perform_action_, proc3, "@:@")
+      OS.class_add_method(cls, OS.attr_sel_accessibility_action_description_, proc3, "@:@")
+    end
+    
+    typesig { [::Java::Int, ::Java::Int, ::Java::Int, Array.typed(::Java::Byte)] }
+    # long
+    # long
+    def register_cell_subclass(cell_class, size, align, types)
+      cell_class_name = OS.class_get_name(cell_class)
+      # long
+      cls = OS.objc_allocate_class_pair(cell_class, "SWTAccessible" + cell_class_name, 0)
+      OS.class_add_ivar(cls, SWT_OBJECT, size, align, types)
+      OS.objc_register_class_pair(cls)
+      return cls
     end
     
     typesig { [] }
-    def initialize_fonts
-      # TEMPORARY CODE
-      @small_fonts = !(System.get_property("org.eclipse.swt.internal.carbon.smallFonts")).nil? # $NON-NLS-1$
+    def init_classes
+      if (!(OS.objc_look_up_class("SWTView")).equal?(0))
+        return
+      end
+      clazz = get_class
+      self.attr_dialog_callback3 = Callback.new(clazz, "dialogProc", 3)
+      # long
+      dialog_proc3 = self.attr_dialog_callback3.get_address
+      if ((dialog_proc3).equal?(0))
+        error(SWT::ERROR_NO_MORE_CALLBACKS)
+      end
+      self.attr_dialog_callback4 = Callback.new(clazz, "dialogProc", 4)
+      # long
+      dialog_proc4 = self.attr_dialog_callback4.get_address
+      if ((dialog_proc4).equal?(0))
+        error(SWT::ERROR_NO_MORE_CALLBACKS)
+      end
+      self.attr_dialog_callback5 = Callback.new(clazz, "dialogProc", 5)
+      # long
+      dialog_proc5 = self.attr_dialog_callback5.get_address
+      if ((dialog_proc5).equal?(0))
+        error(SWT::ERROR_NO_MORE_CALLBACKS)
+      end
+      self.attr_window_callback3 = Callback.new(clazz, "windowProc", 3)
+      # long
+      proc3 = self.attr_window_callback3.get_address
+      if ((proc3).equal?(0))
+        error(SWT::ERROR_NO_MORE_CALLBACKS)
+      end
+      self.attr_window_callback2 = Callback.new(clazz, "windowProc", 2)
+      # long
+      proc2 = self.attr_window_callback2.get_address
+      if ((proc2).equal?(0))
+        error(SWT::ERROR_NO_MORE_CALLBACKS)
+      end
+      self.attr_window_callback4 = Callback.new(clazz, "windowProc", 4)
+      # long
+      proc4 = self.attr_window_callback4.get_address
+      if ((proc4).equal?(0))
+        error(SWT::ERROR_NO_MORE_CALLBACKS)
+      end
+      self.attr_window_callback5 = Callback.new(clazz, "windowProc", 5)
+      # long
+      proc5 = self.attr_window_callback5.get_address
+      if ((proc5).equal?(0))
+        error(SWT::ERROR_NO_MORE_CALLBACKS)
+      end
+      self.attr_window_callback6 = Callback.new(clazz, "windowProc", 6)
+      # long
+      proc6 = self.attr_window_callback6.get_address
+      if ((proc6).equal?(0))
+        error(SWT::ERROR_NO_MORE_CALLBACKS)
+      end
+      self.attr_field_editor_callback3 = Callback.new(clazz, "fieldEditorProc", 3)
+      # long
+      field_editor_proc3 = self.attr_field_editor_callback3.get_address
+      if ((field_editor_proc3).equal?(0))
+        error(SWT::ERROR_NO_MORE_CALLBACKS)
+      end
+      self.attr_field_editor_callback4 = Callback.new(clazz, "fieldEditorProc", 4)
+      # long
+      field_editor_proc4 = self.attr_field_editor_callback4.get_address
+      if ((field_editor_proc4).equal?(0))
+        error(SWT::ERROR_NO_MORE_CALLBACKS)
+      end
+      # long
+      is_flipped_proc = OS.is_flipped_callback
+      # long
+      draw_rect_proc = OS._callback_draw_rect_(proc3)
+      # long
+      draw_interior_with_frame_in_view_proc = OS._callback_draw_interior_with_frame_in_view_(proc4)
+      # long
+      draw_with_expansion_frame_proc = OS._callback_draw_with_expansion_frame_in_view_(proc4)
+      # long
+      image_rect_for_bounds_proc = OS._callback_image_rect_for_bounds_(proc3)
+      # long
+      title_rect_for_bounds_proc = OS._callback_title_rect_for_bounds_(proc3)
+      # long
+      hit_test_for_event_in_rect_of_view_proc = OS._callback_hit_test_for_event_in_rect_of_view_(proc5)
+      # long
+      cell_size_proc = OS._callback_cell_size(proc2)
+      # long
+      draw_image_with_frame_in_view_proc = OS._callback_draw_image_with_frame_in_view_(proc5)
+      # long
+      set_frame_origin_proc = OS._callback_set_frame_origin_(proc3)
+      # long
+      set_frame_size_proc = OS._callback_set_frame_size_(proc3)
+      # long
+      hit_test_proc = OS._callback_hit_test_(proc3)
+      # long
+      marked_range_proc = OS._callback_marked_range(proc2)
+      # long
+      selected_range_proc = OS._callback_selected_range(proc2)
+      # long
+      highlight_selection_in_clip_rect_proc = OS._callback_highlight_selection_in_clip_rect_(proc3)
+      # long
+      set_marked_text_selected_range_proc = OS._callback_set_marked_text_selected_range_(proc4)
+      # long
+      attributed_substring_from_range_proc = OS._callback_attributed_substring_from_range_(proc3)
+      # long
+      character_index_for_point_proc = OS._callback_character_index_for_point_(proc3)
+      # long
+      first_rect_for_character_range_proc = OS._callback_first_rect_for_character_range_(proc3)
+      # long
+      text_will_change_selection_proc = OS._callback_text_view_will_change_selection_from_character_range_to_character_range_(proc5)
+      # long
+      accessibility_hit_test_proc = OS._callback_accessibility_hit_test_(proc3)
+      # long
+      should_change_text_in_range_replacement_string_proc = OS._callback_should_change_text_in_range_replacement_string_(field_editor_proc4)
+      # long
+      should_change_text_in_range_replacement_string_field_editor_proc = should_change_text_in_range_replacement_string_proc
+      # long
+      view_string_for_tool_tip_point_user_data_proc = OS._callback_view_string_for_tool_tip_point_user_data_(proc6)
+      # long
+      can_drag_rows_with_indexes_at_point_proc = OS._callback_can_drag_rows_with_indexes_at_point_(proc4)
+      # long
+      set_needs_display_in_rect_proc = OS._callback_set_needs_display_in_rect_(proc3)
+      # long
+      expansion_frame_with_frame_proc = OS._callback_expansion_frame_with_frame_in_view_(proc4)
+      types = Array.typed(::Java::Byte).new([Character.new(?*.ord), Character.new(?\0.ord)])
+      size = C::PTR_SIZEOF
+      align = (C::PTR_SIZEOF).equal?(4) ? 2 : 3
+      class_name = nil
+      # long
+      cls = 0
+      class_name = "SWTBox"
+      cls = OS.objc_allocate_class_pair(OS.attr_class_nsbox, class_name, 0)
+      OS.class_add_ivar(cls, SWT_OBJECT, size, align, types)
+      add_event_methods(cls, proc2, proc3, draw_rect_proc, hit_test_proc, set_needs_display_in_rect_proc)
+      add_frame_methods(cls, set_frame_origin_proc, set_frame_size_proc)
+      add_accessibility_methods(cls, proc2, proc3, proc4, accessibility_hit_test_proc)
+      OS.objc_register_class_pair(cls)
+      class_name = "SWTButton"
+      cls = OS.objc_allocate_class_pair(OS.attr_class_nsbutton, class_name, 0)
+      OS.class_add_ivar(cls, SWT_OBJECT, size, align, types)
+      OS.class_add_method(cls, OS.attr_sel_send_selection, proc2, "@:")
+      add_event_methods(cls, proc2, proc3, draw_rect_proc, hit_test_proc, set_needs_display_in_rect_proc)
+      add_frame_methods(cls, set_frame_origin_proc, set_frame_size_proc)
+      OS.objc_register_class_pair(cls)
+      cls = register_cell_subclass(NSButton.cell_class, size, align, types)
+      add_accessibility_methods(cls, proc2, proc3, proc4, accessibility_hit_test_proc)
+      OS.class_add_method(cls, OS.attr_sel_next_state, proc2, "@:")
+      NSButton.set_cell_class(cls)
+      class_name = "SWTButtonCell"
+      cls = OS.objc_allocate_class_pair(OS.attr_class_nsbutton_cell, class_name, 0)
+      OS.class_add_ivar(cls, SWT_OBJECT, size, align, types)
+      add_accessibility_methods(cls, proc2, proc3, proc4, accessibility_hit_test_proc)
+      OS.class_add_method(cls, OS.attr_sel_draw_image_with_frame_in_view_, draw_image_with_frame_in_view_proc, "@:@{NSFrame}@")
+      OS.class_add_method(cls, OS.attr_sel_cell_size, cell_size_proc, "@:")
+      OS.class_add_method(cls, OS.attr_sel_draw_interior_with_frame_in_view_, draw_interior_with_frame_in_view_proc, "@:{NSRect}@")
+      OS.class_add_method(cls, OS.attr_sel_title_rect_for_bounds_, title_rect_for_bounds_proc, "@:{NSRect}")
+      OS.objc_register_class_pair(cls)
+      class_name = "SWTCanvasView"
+      cls = OS.objc_allocate_class_pair(OS.attr_class_nsview, class_name, 0)
+      OS.class_add_ivar(cls, SWT_OBJECT, size, align, types)
+      # NSTextInput protocol
+      OS.class_add_protocol(cls, OS.objc_get_protocol("NSTextInput"))
+      OS.class_add_method(cls, OS.attr_sel_has_marked_text, proc2, "@:")
+      OS.class_add_method(cls, OS.attr_sel_marked_range, marked_range_proc, "@:")
+      OS.class_add_method(cls, OS.attr_sel_selected_range, selected_range_proc, "@:")
+      OS.class_add_method(cls, OS.attr_sel_set_marked_text_selected_range_, set_marked_text_selected_range_proc, "@:@{NSRange}")
+      OS.class_add_method(cls, OS.attr_sel_unmark_text, proc2, "@:")
+      OS.class_add_method(cls, OS.attr_sel_valid_attributes_for_marked_text, proc2, "@:")
+      OS.class_add_method(cls, OS.attr_sel_attributed_substring_from_range_, attributed_substring_from_range_proc, "@:{NSRange}")
+      OS.class_add_method(cls, OS.attr_sel_insert_text_, proc3, "@:@")
+      OS.class_add_method(cls, OS.attr_sel_character_index_for_point_, character_index_for_point_proc, "@:{NSPoint}")
+      OS.class_add_method(cls, OS.attr_sel_first_rect_for_character_range_, first_rect_for_character_range_proc, "@:{NSRange}")
+      OS.class_add_method(cls, OS.attr_sel_do_command_by_selector_, proc3, "@::")
+      # NSTextInput protocol end
+      OS.class_add_method(cls, OS.attr_sel_can_become_key_view, proc2, "@:")
+      OS.class_add_method(cls, OS.attr_sel_is_flipped, is_flipped_proc, "@:")
+      OS.class_add_method(cls, OS.attr_sel_accepts_first_responder, proc2, "@:")
+      OS.class_add_method(cls, OS.attr_sel_is_opaque, proc2, "@:")
+      OS.class_add_method(cls, OS.attr_sel_update_open_glcontext_, proc3, "@:@")
+      add_event_methods(cls, proc2, proc3, draw_rect_proc, hit_test_proc, set_needs_display_in_rect_proc)
+      add_frame_methods(cls, set_frame_origin_proc, set_frame_size_proc)
+      add_accessibility_methods(cls, proc2, proc3, proc4, accessibility_hit_test_proc)
+      OS.objc_register_class_pair(cls)
+      class_name = "SWTComboBox"
+      cls = OS.objc_allocate_class_pair(OS.attr_class_nscombo_box, class_name, 0)
+      OS.class_add_ivar(cls, SWT_OBJECT, size, align, types)
+      OS.class_add_method(cls, OS.attr_sel_send_selection, proc2, "@:")
+      OS.class_add_method(cls, OS.attr_sel_text_did_change_, proc3, "@:@")
+      OS.class_add_method(cls, OS.attr_sel_text_view_did_change_selection_, proc3, "@:@")
+      OS.class_add_method(cls, OS.attr_sel_text_view_will_change_selection_from_character_range_to_character_range_, text_will_change_selection_proc, "@:@{NSRange}{NSRange}")
+      add_event_methods(cls, proc2, proc3, draw_rect_proc, hit_test_proc, set_needs_display_in_rect_proc)
+      add_frame_methods(cls, set_frame_origin_proc, set_frame_size_proc)
+      add_accessibility_methods(cls, proc2, proc3, proc4, accessibility_hit_test_proc)
+      OS.objc_register_class_pair(cls)
+      cls = register_cell_subclass(NSComboBox.cell_class, size, align, types)
+      add_accessibility_methods(cls, proc2, proc3, proc4, accessibility_hit_test_proc)
+      NSComboBox.set_cell_class(cls)
+      class_name = "SWTDatePicker"
+      cls = OS.objc_allocate_class_pair(OS.attr_class_nsdate_picker, class_name, 0)
+      OS.class_add_ivar(cls, SWT_OBJECT, size, align, types)
+      OS.class_add_method(cls, OS.attr_sel_is_flipped, proc2, "@:")
+      OS.class_add_method(cls, OS.attr_sel_send_selection, proc2, "@:")
+      add_event_methods(cls, proc2, proc3, draw_rect_proc, hit_test_proc, set_needs_display_in_rect_proc)
+      add_frame_methods(cls, set_frame_origin_proc, set_frame_size_proc)
+      add_accessibility_methods(cls, proc2, proc3, proc4, accessibility_hit_test_proc)
+      OS.objc_register_class_pair(cls)
+      class_name = "SWTEditorView"
+      cls = OS.objc_allocate_class_pair(OS.attr_class_nstext_view, class_name, 0)
+      # TODO hitTestProc and drawRectProc should be set Control.setRegion()?
+      add_event_methods(cls, 0, field_editor_proc3, 0, 0, 0)
+      OS.class_add_method(cls, OS.attr_sel_insert_text_, field_editor_proc3, "@:@")
+      OS.class_add_method(cls, OS.attr_sel_do_command_by_selector_, field_editor_proc3, "@::")
+      OS.class_add_method(cls, OS.attr_sel_should_change_text_in_range_replacement_string_, should_change_text_in_range_replacement_string_field_editor_proc, "@:{NSRange}@")
+      OS.objc_register_class_pair(cls)
+      class_name = "SWTImageView"
+      cls = OS.objc_allocate_class_pair(OS.attr_class_nsimage_view, class_name, 0)
+      OS.class_add_ivar(cls, SWT_OBJECT, size, align, types)
+      OS.class_add_method(cls, OS.attr_sel_is_flipped, is_flipped_proc, "@:")
+      add_event_methods(cls, proc2, proc3, draw_rect_proc, hit_test_proc, set_needs_display_in_rect_proc)
+      add_frame_methods(cls, set_frame_origin_proc, set_frame_size_proc)
+      add_accessibility_methods(cls, proc2, proc3, proc4, accessibility_hit_test_proc)
+      OS.objc_register_class_pair(cls)
+      cls = register_cell_subclass(NSImageView.cell_class, size, align, types)
+      add_accessibility_methods(cls, proc2, proc3, proc4, accessibility_hit_test_proc)
+      NSImageView.set_cell_class(cls)
+      class_name = "SWTImageTextCell"
+      cls = OS.objc_allocate_class_pair(OS.attr_class_nstext_field_cell, class_name, 0)
+      OS.class_add_ivar(cls, SWT_OBJECT, size, align, types)
+      OS.class_add_ivar(cls, SWT_IMAGE, size, align, types)
+      OS.class_add_ivar(cls, SWT_ROW, size, align, types)
+      OS.class_add_ivar(cls, SWT_COLUMN, size, align, types)
+      OS.class_add_method(cls, OS.attr_sel_draw_interior_with_frame_in_view_, draw_interior_with_frame_in_view_proc, "@:{NSRect}@")
+      OS.class_add_method(cls, OS.attr_sel_draw_with_expansion_frame_in_view_, draw_with_expansion_frame_proc, "@:{NSRect}@")
+      OS.class_add_method(cls, OS.attr_sel_image_rect_for_bounds_, image_rect_for_bounds_proc, "@:{NSRect}")
+      OS.class_add_method(cls, OS.attr_sel_title_rect_for_bounds_, title_rect_for_bounds_proc, "@:{NSRect}")
+      OS.class_add_method(cls, OS.attr_sel_hit_test_for_event_in_rect_of_view_, hit_test_for_event_in_rect_of_view_proc, "@:@{NSRect}@")
+      OS.class_add_method(cls, OS.attr_sel_cell_size, cell_size_proc, "@:")
+      OS.class_add_method(cls, OS.attr_sel_image, proc2, "@:")
+      OS.class_add_method(cls, OS.attr_sel_set_image_, proc3, "@:@")
+      OS.class_add_method(cls, OS.attr_sel_expansion_frame_with_frame_in_view_, expansion_frame_with_frame_proc, "@:{NSRect}@")
+      OS.objc_register_class_pair(cls)
+      class_name = "SWTMenu"
+      cls = OS.objc_allocate_class_pair(OS.attr_class_nsmenu, class_name, 0)
+      OS.class_add_ivar(cls, SWT_OBJECT, size, align, types)
+      OS.class_add_method(cls, OS.attr_sel_menu_will_open_, proc3, "@:@")
+      OS.class_add_method(cls, OS.attr_sel_menu_did_close_, proc3, "@:@")
+      OS.class_add_method(cls, OS.attr_sel_menu_will_highlight_item_, proc4, "@:@@")
+      OS.class_add_method(cls, OS.attr_sel_menu_needs_update_, proc3, "@:@")
+      OS.objc_register_class_pair(cls)
+      class_name = "SWTMenuItem"
+      cls = OS.objc_allocate_class_pair(OS.attr_class_nsmenu_item, class_name, 0)
+      OS.class_add_ivar(cls, SWT_OBJECT, size, align, types)
+      OS.class_add_method(cls, OS.attr_sel_send_selection, proc2, "@:")
+      OS.objc_register_class_pair(cls)
+      class_name = "SWTOutlineView"
+      cls = OS.objc_allocate_class_pair(OS.attr_class_nsoutline_view, class_name, 0)
+      OS.class_add_ivar(cls, SWT_OBJECT, size, align, types)
+      OS.class_add_method(cls, OS.attr_sel_highlight_selection_in_clip_rect_, highlight_selection_in_clip_rect_proc, "@:{NSRect}")
+      OS.class_add_method(cls, OS.attr_sel_send_double_selection, proc2, "@:")
+      OS.class_add_method(cls, OS.attr_sel_outline_view_selection_did_change_, proc3, "@:@")
+      OS.class_add_method(cls, OS.attr_sel_outline_view_child_of_item_, proc5, "@:@i@")
+      OS.class_add_method(cls, OS.attr_sel_outline_view_is_item_expandable_, proc4, "@:@@")
+      OS.class_add_method(cls, OS.attr_sel_outline_view_number_of_children_of_item_, proc4, "@:@@")
+      OS.class_add_method(cls, OS.attr_sel_outline_view_object_value_for_table_column_by_item_, proc5, "@:@@@")
+      OS.class_add_method(cls, OS.attr_sel_outline_view_will_display_cell_for_table_column_item_, proc6, "@:@@@@")
+      OS.class_add_method(cls, OS.attr_sel_outline_view_set_object_value_for_table_column_by_item_, proc6, "@:@@@@")
+      OS.class_add_method(cls, OS.attr_sel_outline_view_column_did_move_, proc3, "@:@")
+      OS.class_add_method(cls, OS.attr_sel_outline_view_column_did_resize_, proc3, "@:@")
+      OS.class_add_method(cls, OS.attr_sel_outline_view_did_click_table_column_, proc4, "@:@@")
+      OS.class_add_method(cls, OS.attr_sel_can_drag_rows_with_indexes_at_point_, can_drag_rows_with_indexes_at_point_proc, "@:@{NSPoint=ff}")
+      OS.class_add_method(cls, OS.attr_sel_outline_view_write_items_to_pasteboard_, proc5, "@:@@@")
+      OS.class_add_method(cls, OS.attr_sel_expand_item_expand_children_, proc4, "@:@Z")
+      OS.class_add_method(cls, OS.attr_sel_collapse_item_collapse_children_, proc4, "@:@Z")
+      add_event_methods(cls, proc2, proc3, draw_rect_proc, hit_test_proc, set_needs_display_in_rect_proc)
+      add_frame_methods(cls, set_frame_origin_proc, set_frame_size_proc)
+      add_accessibility_methods(cls, proc2, proc3, proc4, accessibility_hit_test_proc)
+      OS.objc_register_class_pair(cls)
+      class_name = "SWTPanelDelegate"
+      cls = OS.objc_allocate_class_pair(OS.attr_class_nsobject, class_name, 0)
+      OS.class_add_ivar(cls, SWT_OBJECT, size, align, types)
+      OS.class_add_method(cls, OS.attr_sel_window_will_close_, dialog_proc3, "@:@")
+      OS.class_add_method(cls, OS.attr_sel_change_color_, dialog_proc3, "@:@")
+      OS.class_add_method(cls, OS.attr_sel_change_font_, dialog_proc3, "@:@")
+      OS.class_add_method(cls, OS.attr_sel_send_selection_, dialog_proc3, "@:@")
+      OS.class_add_method(cls, OS.attr_sel_panel_should_show_filename_, dialog_proc4, "@:@@")
+      OS.class_add_method(cls, OS.attr_sel_panel_did_end_return_code_context_info_, dialog_proc5, "@:@i@")
+      OS.objc_register_class_pair(cls)
+      class_name = "SWTPopUpButton"
+      cls = OS.objc_allocate_class_pair(OS.attr_class_nspop_up_button, class_name, 0)
+      OS.class_add_ivar(cls, SWT_OBJECT, size, align, types)
+      OS.class_add_method(cls, OS.attr_sel_send_selection, proc2, "@:")
+      add_event_methods(cls, proc2, proc3, draw_rect_proc, hit_test_proc, set_needs_display_in_rect_proc)
+      add_frame_methods(cls, set_frame_origin_proc, set_frame_size_proc)
+      add_accessibility_methods(cls, proc2, proc3, proc4, accessibility_hit_test_proc)
+      OS.objc_register_class_pair(cls)
+      cls = register_cell_subclass(NSPopUpButton.cell_class, size, align, types)
+      add_accessibility_methods(cls, proc2, proc3, proc4, accessibility_hit_test_proc)
+      NSPopUpButton.set_cell_class(cls)
+      class_name = "SWTProgressIndicator"
+      cls = OS.objc_allocate_class_pair(OS.attr_class_nsprogress_indicator, class_name, 0)
+      OS.class_add_ivar(cls, SWT_OBJECT, size, align, types)
+      OS.class_add_method(cls, OS.attr_sel_view_did_move_to_window, proc2, "@:")
+      OS.class_add_method(cls, OS.attr_sel__draw_theme_progress_area_, proc3, "@:c")
+      add_event_methods(cls, proc2, proc3, draw_rect_proc, hit_test_proc, set_needs_display_in_rect_proc)
+      add_frame_methods(cls, set_frame_origin_proc, set_frame_size_proc)
+      add_accessibility_methods(cls, proc2, proc3, proc4, accessibility_hit_test_proc)
+      OS.objc_register_class_pair(cls)
+      class_name = "SWTScroller"
+      cls = OS.objc_allocate_class_pair(OS.attr_class_nsscroller, class_name, 0)
+      OS.class_add_ivar(cls, SWT_OBJECT, size, align, types)
+      OS.class_add_method(cls, OS.attr_sel_send_selection, proc2, "@:")
+      add_event_methods(cls, proc2, proc3, draw_rect_proc, hit_test_proc, set_needs_display_in_rect_proc)
+      add_frame_methods(cls, set_frame_origin_proc, set_frame_size_proc)
+      add_accessibility_methods(cls, proc2, proc3, proc4, accessibility_hit_test_proc)
+      OS.objc_register_class_pair(cls)
+      class_name = "SWTScrollView"
+      cls = OS.objc_allocate_class_pair(OS.attr_class_nsscroll_view, class_name, 0)
+      OS.class_add_ivar(cls, SWT_OBJECT, size, align, types)
+      OS.class_add_method(cls, OS.attr_sel_send_vertical_selection, proc2, "@:")
+      OS.class_add_method(cls, OS.attr_sel_send_horizontal_selection, proc2, "@:")
+      OS.class_add_method(cls, OS.attr_sel_page_down_, proc3, "@:@")
+      OS.class_add_method(cls, OS.attr_sel_page_up_, proc3, "@:@")
+      OS.class_add_method(cls, OS.attr_sel_reflect_scrolled_clip_view_, proc3, "@:@")
+      add_event_methods(cls, proc2, proc3, draw_rect_proc, hit_test_proc, set_needs_display_in_rect_proc)
+      add_frame_methods(cls, set_frame_origin_proc, set_frame_size_proc)
+      add_accessibility_methods(cls, proc2, proc3, proc4, accessibility_hit_test_proc)
+      OS.objc_register_class_pair(cls)
+      class_name = "SWTSearchField"
+      cls = OS.objc_allocate_class_pair(OS.attr_class_nssearch_field, class_name, 0)
+      OS.class_add_ivar(cls, SWT_OBJECT, size, align, types)
+      add_event_methods(cls, proc2, proc3, draw_rect_proc, hit_test_proc, set_needs_display_in_rect_proc)
+      add_frame_methods(cls, set_frame_origin_proc, set_frame_size_proc)
+      add_accessibility_methods(cls, proc2, proc3, proc4, accessibility_hit_test_proc)
+      OS.class_add_method(cls, OS.attr_sel_text_did_change_, proc3, "@:@")
+      OS.class_add_method(cls, OS.attr_sel_text_view_did_change_selection_, proc3, "@:@")
+      OS.class_add_method(cls, OS.attr_sel_text_view_will_change_selection_from_character_range_to_character_range_, text_will_change_selection_proc, "@:@{NSRange}{NSRange}")
+      OS.class_add_method(cls, OS.attr_sel_send_search_selection, proc2, "@:")
+      OS.class_add_method(cls, OS.attr_sel_send_cancel_selection, proc2, "@:")
+      OS.objc_register_class_pair(cls)
+      cls = register_cell_subclass(NSSearchField.cell_class, size, align, types)
+      add_accessibility_methods(cls, proc2, proc3, proc4, accessibility_hit_test_proc)
+      NSSearchField.set_cell_class(cls)
+      # Don't subclass NSSecureTextFieldCell -- you'll get an NSException from [NSSecureTextField setCellClass:]!
+      class_name = "SWTSecureTextField"
+      cls = OS.objc_allocate_class_pair(OS.attr_class_nssecure_text_field, class_name, 0)
+      OS.class_add_ivar(cls, SWT_OBJECT, size, align, types)
+      add_event_methods(cls, proc2, proc3, draw_rect_proc, hit_test_proc, set_needs_display_in_rect_proc)
+      add_frame_methods(cls, set_frame_origin_proc, set_frame_size_proc)
+      add_accessibility_methods(cls, proc2, proc3, proc4, accessibility_hit_test_proc)
+      OS.class_add_method(cls, OS.attr_sel_text_did_change_, proc3, "@:@")
+      OS.class_add_method(cls, OS.attr_sel_text_view_did_change_selection_, proc3, "@:@")
+      OS.class_add_method(cls, OS.attr_sel_text_view_will_change_selection_from_character_range_to_character_range_, text_will_change_selection_proc, "@:@{NSRange}{NSRange}")
+      OS.objc_register_class_pair(cls)
+      class_name = "SWTSlider"
+      cls = OS.objc_allocate_class_pair(OS.attr_class_nsslider, class_name, 0)
+      OS.class_add_ivar(cls, SWT_OBJECT, size, align, types)
+      OS.class_add_method(cls, OS.attr_sel_send_selection, proc2, "@:")
+      add_event_methods(cls, proc2, proc3, draw_rect_proc, hit_test_proc, set_needs_display_in_rect_proc)
+      add_frame_methods(cls, set_frame_origin_proc, set_frame_size_proc)
+      add_accessibility_methods(cls, proc2, proc3, proc4, accessibility_hit_test_proc)
+      OS.objc_register_class_pair(cls)
+      cls = register_cell_subclass(NSSlider.cell_class, size, align, types)
+      add_accessibility_methods(cls, proc2, proc3, proc4, accessibility_hit_test_proc)
+      NSSlider.set_cell_class(cls)
+      class_name = "SWTStepper"
+      cls = OS.objc_allocate_class_pair(OS.attr_class_nsstepper, class_name, 0)
+      OS.class_add_ivar(cls, SWT_OBJECT, size, align, types)
+      OS.class_add_method(cls, OS.attr_sel_send_selection, proc2, "@:")
+      add_event_methods(cls, proc2, proc3, draw_rect_proc, hit_test_proc, set_needs_display_in_rect_proc)
+      add_frame_methods(cls, set_frame_origin_proc, set_frame_size_proc)
+      add_accessibility_methods(cls, proc2, proc3, proc4, accessibility_hit_test_proc)
+      OS.objc_register_class_pair(cls)
+      cls = register_cell_subclass(NSStepper.cell_class, size, align, types)
+      add_accessibility_methods(cls, proc2, proc3, proc4, accessibility_hit_test_proc)
+      NSStepper.set_cell_class(cls)
+      class_name = "SWTTableHeaderCell"
+      cls = OS.objc_allocate_class_pair(OS.attr_class_nstable_header_cell, class_name, 0)
+      OS.class_add_ivar(cls, SWT_OBJECT, size, align, types)
+      OS.class_add_method(cls, OS.attr_sel_draw_interior_with_frame_in_view_, draw_interior_with_frame_in_view_proc, "@:{NSRect}@")
+      OS.objc_register_class_pair(cls)
+      class_name = "SWTTableHeaderView"
+      cls = OS.objc_allocate_class_pair(OS.attr_class_nstable_header_view, class_name, 0)
+      OS.class_add_ivar(cls, SWT_OBJECT, size, align, types)
+      OS.class_add_method(cls, OS.attr_sel_mouse_down_, proc3, "@:@")
+      OS.class_add_method(cls, OS.attr_sel_reset_cursor_rects, proc2, "@:")
+      OS.class_add_method(cls, OS.attr_sel_update_tracking_areas, proc2, "@:")
+      OS.class_add_method(cls, OS.attr_sel_menu_for_event_, proc3, "@:@")
+      # TODO hitTestProc and drawRectProc should be set Control.setRegion()?
+      OS.objc_register_class_pair(cls)
+      class_name = "SWTTableView"
+      cls = OS.objc_allocate_class_pair(OS.attr_class_nstable_view, class_name, 0)
+      OS.class_add_ivar(cls, SWT_OBJECT, size, align, types)
+      OS.class_add_method(cls, OS.attr_sel_highlight_selection_in_clip_rect_, highlight_selection_in_clip_rect_proc, "@:{NSRect}")
+      OS.class_add_method(cls, OS.attr_sel_send_double_selection, proc2, "@:")
+      OS.class_add_method(cls, OS.attr_sel_number_of_rows_in_table_view_, proc3, "@:@")
+      OS.class_add_method(cls, OS.attr_sel_table_view_object_value_for_table_column_row_, proc5, "@:@:@:@")
+      OS.class_add_method(cls, OS.attr_sel_table_view_should_edit_table_column_row_, proc5, "@:@:@:@")
+      OS.class_add_method(cls, OS.attr_sel_table_view_selection_did_change_, proc3, "@:@")
+      OS.class_add_method(cls, OS.attr_sel_table_view_will_display_cell_for_table_column_row_, proc6, "@:@@@i")
+      OS.class_add_method(cls, OS.attr_sel_table_view_set_object_value_for_table_column_row_, proc6, "@:@@@i")
+      OS.class_add_method(cls, OS.attr_sel_table_view_column_did_move_, proc3, "@:@")
+      OS.class_add_method(cls, OS.attr_sel_table_view_column_did_resize_, proc3, "@:@")
+      OS.class_add_method(cls, OS.attr_sel_table_view_did_click_table_column_, proc4, "@:@")
+      OS.class_add_method(cls, OS.attr_sel_can_drag_rows_with_indexes_at_point_, can_drag_rows_with_indexes_at_point_proc, "@:@{NSPoint=ff}")
+      OS.class_add_method(cls, OS.attr_sel_table_view_write_rows_with_indexes_to_pasteboard_, proc5, "@:@@@")
+      add_event_methods(cls, proc2, proc3, draw_rect_proc, hit_test_proc, set_needs_display_in_rect_proc)
+      add_frame_methods(cls, set_frame_origin_proc, set_frame_size_proc)
+      add_accessibility_methods(cls, proc2, proc3, proc4, accessibility_hit_test_proc)
+      OS.objc_register_class_pair(cls)
+      class_name = "SWTTabView"
+      cls = OS.objc_allocate_class_pair(OS.attr_class_nstab_view, class_name, 0)
+      OS.class_add_ivar(cls, SWT_OBJECT, size, align, types)
+      OS.class_add_method(cls, OS.attr_sel_tab_view_will_select_tab_view_item_, proc4, "@:@@")
+      OS.class_add_method(cls, OS.attr_sel_tab_view_did_select_tab_view_item_, proc4, "@:@@")
+      add_event_methods(cls, proc2, proc3, draw_rect_proc, hit_test_proc, set_needs_display_in_rect_proc)
+      add_frame_methods(cls, set_frame_origin_proc, set_frame_size_proc)
+      add_accessibility_methods(cls, proc2, proc3, proc4, accessibility_hit_test_proc)
+      OS.objc_register_class_pair(cls)
+      class_name = "SWTTextView"
+      cls = OS.objc_allocate_class_pair(OS.attr_class_nstext_view, class_name, 0)
+      OS.class_add_ivar(cls, SWT_OBJECT, size, align, types)
+      add_event_methods(cls, proc2, proc3, draw_rect_proc, hit_test_proc, set_needs_display_in_rect_proc)
+      add_frame_methods(cls, set_frame_origin_proc, set_frame_size_proc)
+      add_accessibility_methods(cls, proc2, proc3, proc4, accessibility_hit_test_proc)
+      OS.class_add_method(cls, OS.attr_sel_insert_text_, proc3, "@:@")
+      OS.class_add_method(cls, OS.attr_sel_do_command_by_selector_, proc3, "@::")
+      OS.class_add_method(cls, OS.attr_sel_text_did_change_, proc3, "@:@")
+      OS.class_add_method(cls, OS.attr_sel_text_view_clicked_on_link_at_index_, proc5, "@:@@@")
+      OS.class_add_method(cls, OS.attr_sel_drag_selection_with_event_offset_slide_back_, proc5, "@:@@@")
+      OS.class_add_method(cls, OS.attr_sel_should_change_text_in_range_replacement_string_, should_change_text_in_range_replacement_string_proc, "@:{NSRange}@")
+      OS.objc_register_class_pair(cls)
+      class_name = "SWTTextField"
+      cls = OS.objc_allocate_class_pair(OS.attr_class_nstext_field, class_name, 0)
+      OS.class_add_ivar(cls, SWT_OBJECT, size, align, types)
+      add_event_methods(cls, proc2, proc3, draw_rect_proc, hit_test_proc, set_needs_display_in_rect_proc)
+      add_frame_methods(cls, set_frame_origin_proc, set_frame_size_proc)
+      add_accessibility_methods(cls, proc2, proc3, proc4, accessibility_hit_test_proc)
+      OS.class_add_method(cls, OS.attr_sel_accepts_first_responder, proc2, "@:")
+      OS.class_add_method(cls, OS.attr_sel_text_did_change_, proc3, "@:@")
+      OS.class_add_method(cls, OS.attr_sel_text_did_end_editing_, proc3, "@:@")
+      OS.class_add_method(cls, OS.attr_sel_text_view_did_change_selection_, proc3, "@:@")
+      OS.class_add_method(cls, OS.attr_sel_text_view_will_change_selection_from_character_range_to_character_range_, text_will_change_selection_proc, "@:@{NSRange}{NSRange}")
+      OS.objc_register_class_pair(cls)
+      cls = register_cell_subclass(NSTextField.cell_class, size, align, types)
+      add_accessibility_methods(cls, proc2, proc3, proc4, accessibility_hit_test_proc)
+      NSTextField.set_cell_class(cls)
+      class_name = "SWTTreeItem"
+      cls = OS.objc_allocate_class_pair(OS.attr_class_nsobject, class_name, 0)
+      OS.class_add_ivar(cls, SWT_OBJECT, size, align, types)
+      OS.objc_register_class_pair(cls)
+      class_name = "SWTView"
+      cls = OS.objc_allocate_class_pair(OS.attr_class_nsview, class_name, 0)
+      OS.class_add_ivar(cls, SWT_OBJECT, size, align, types)
+      OS.class_add_method(cls, OS.attr_sel_can_become_key_view, proc2, "@:")
+      OS.class_add_method(cls, OS.attr_sel_is_flipped, is_flipped_proc, "@:")
+      OS.class_add_method(cls, OS.attr_sel_accepts_first_responder, proc2, "@:")
+      OS.class_add_method(cls, OS.attr_sel_is_opaque, proc2, "@:")
+      add_event_methods(cls, proc2, proc3, draw_rect_proc, hit_test_proc, set_needs_display_in_rect_proc)
+      add_frame_methods(cls, set_frame_origin_proc, set_frame_size_proc)
+      add_accessibility_methods(cls, proc2, proc3, proc4, accessibility_hit_test_proc)
+      OS.objc_register_class_pair(cls)
+      class_name = "SWTWindow"
+      cls = OS.objc_allocate_class_pair(OS.attr_class_nswindow, class_name, 0)
+      OS.class_add_ivar(cls, SWT_OBJECT, size, align, types)
+      OS.class_add_method(cls, OS.attr_sel_send_event_, proc3, "@:@")
+      OS.class_add_method(cls, OS.attr_sel_help_requested_, proc3, "@:@")
+      OS.class_add_method(cls, OS.attr_sel_can_become_key_window, proc2, "@:")
+      OS.class_add_method(cls, OS.attr_sel_become_key_window, proc2, "@:")
+      OS.class_add_method(cls, OS.attr_sel_make_first_responder_, proc3, "@:@")
+      OS.class_add_method(cls, OS.attr_sel_no_responder_for_, proc3, "@:@")
+      OS.class_add_method(cls, OS.attr_sel_view_string_for_tool_tip_point_user_data_, view_string_for_tool_tip_point_user_data_proc, "@:@i{NSPoint}@")
+      add_accessibility_methods(cls, proc2, proc3, proc4, accessibility_hit_test_proc)
+      OS.objc_register_class_pair(cls)
+      class_name = "SWTWindowDelegate"
+      cls = OS.objc_allocate_class_pair(OS.attr_class_nsobject, class_name, 0)
+      OS.class_add_ivar(cls, SWT_OBJECT, size, align, types)
+      OS.class_add_method(cls, OS.attr_sel_window_did_resize_, proc3, "@:@")
+      OS.class_add_method(cls, OS.attr_sel_window_did_move_, proc3, "@:@")
+      OS.class_add_method(cls, OS.attr_sel_window_should_close_, proc3, "@:@")
+      OS.class_add_method(cls, OS.attr_sel_window_will_close_, proc3, "@:@")
+      OS.class_add_method(cls, OS.attr_sel_window_did_resign_key_, proc3, "@:@")
+      OS.class_add_method(cls, OS.attr_sel_window_did_become_key_, proc3, "@:@")
+      OS.class_add_method(cls, OS.attr_sel_timer_proc_, proc3, "@:@")
+      OS.class_add_method(cls, OS.attr_sel_system_settings_changed_, proc3, "@:@")
+      OS.objc_register_class_pair(cls)
+    end
+    
+    typesig { [::Java::Int, ::Java::Int] }
+    # long
+    # long
+    def get_font(cls, sel)
+      # long
+      widget = OS.objc_msg_send(OS.objc_msg_send(cls, OS.attr_sel_alloc), OS.attr_sel_init_with_frame_, NSRect.new)
+      # long
+      font = 0
+      if (OS.objc_msg_send_bool(widget, OS.attr_sel_responds_to_selector_, sel))
+        font = OS.objc_msg_send(widget, sel)
+      end
+      result = nil
+      if (!(font).equal?(0))
+        result = NSFont.new(font)
+      else
+        result = NSFont.system_font_of_size(NSFont.system_font_size_for_control_size(OS::NSRegularControlSize))
+      end
+      result.retain
+      OS.objc_msg_send(widget, OS.attr_sel_release)
+      return result
     end
     
     typesig { [] }
-    def initialize_insets
-      out_control = Array.typed(::Java::Int).new(1) { 0 }
-      rect = Rect.new
-      rect.attr_right = rect.attr_bottom = RJava.cast_to_short(200)
-      OS._create_push_button_control(0, rect, 0, out_control)
-      @button_inset = compute_inset(out_control[0])
-      OS._dispose_control(out_control[0])
-      OS._create_tabs_control(0, rect, RJava.cast_to_short(OS.attr_k_control_tab_size_large), RJava.cast_to_short(OS.attr_k_control_tab_direction_north), RJava.cast_to_short(0), 0, out_control)
-      @tab_folder_north_inset = compute_inset(out_control[0])
-      OS._dispose_control(out_control[0])
-      OS._create_tabs_control(0, rect, RJava.cast_to_short(OS.attr_k_control_tab_size_large), RJava.cast_to_short(OS.attr_k_control_tab_direction_south), RJava.cast_to_short(0), 0, out_control)
-      @tab_folder_south_inset = compute_inset(out_control[0])
-      OS._dispose_control(out_control[0])
-      OS._create_edit_unicode_text_control(0, rect, 0, false, nil, out_control)
-      @edit_text_inset = compute_inset(out_control[0])
-      OS._dispose_control(out_control[0])
-      attributes = OS.attr_k_hisearch_field_attributes_search_icon | OS.attr_k_hisearch_field_attributes_cancel
-      OS._hisearch_field_create(nil, attributes, 0, 0, out_control)
-      if (@small_fonts)
-        OS._set_control_data(out_control[0], OS.attr_k_control_entire_control, OS.attr_k_control_size_tag, 2, Array.typed(::Java::Short).new([OS.attr_k_control_size_small]))
-      end
-      @search_text_inset = compute_inset(out_control[0])
-      # FIXME -
-      @search_text_inset.attr_bottom = @search_text_inset.attr_top
-      OS._dispose_control(out_control[0])
-      cg_rect = CGRect.new
-      cg_rect.attr_width = cg_rect.attr_height = 200
-      in_attributes = OS.attr_k_hicombo_box_auto_completion_attribute | OS.attr_k_hicombo_box_auto_size_list_attribute
-      OS._hicombo_box_create(cg_rect, 0, nil, 0, in_attributes, out_control)
-      @combo_inset = compute_inset(out_control[0])
-      # FIXME -
-      @combo_inset.attr_bottom = @combo_inset.attr_top
-      OS._dispose_control(out_control[0])
+    def init_colors
+      # double
+      @colors = Array.typed(Array.typed(::Java::Float)).new(SWT::COLOR_TITLE_INACTIVE_BACKGROUND_GRADIENT + 1) { nil }
+      @colors[SWT::COLOR_INFO_FOREGROUND] = get_widget_color_rgb(SWT::COLOR_INFO_FOREGROUND)
+      @colors[SWT::COLOR_INFO_BACKGROUND] = get_widget_color_rgb(SWT::COLOR_INFO_BACKGROUND)
+      @colors[SWT::COLOR_TITLE_FOREGROUND] = get_widget_color_rgb(SWT::COLOR_TITLE_FOREGROUND)
+      @colors[SWT::COLOR_TITLE_BACKGROUND] = get_widget_color_rgb(SWT::COLOR_TITLE_BACKGROUND)
+      @colors[SWT::COLOR_TITLE_BACKGROUND_GRADIENT] = get_widget_color_rgb(SWT::COLOR_TITLE_BACKGROUND_GRADIENT)
+      @colors[SWT::COLOR_TITLE_INACTIVE_FOREGROUND] = get_widget_color_rgb(SWT::COLOR_TITLE_INACTIVE_FOREGROUND)
+      @colors[SWT::COLOR_TITLE_INACTIVE_BACKGROUND] = get_widget_color_rgb(SWT::COLOR_TITLE_INACTIVE_BACKGROUND)
+      @colors[SWT::COLOR_TITLE_INACTIVE_BACKGROUND_GRADIENT] = get_widget_color_rgb(SWT::COLOR_TITLE_INACTIVE_BACKGROUND_GRADIENT)
+      @colors[SWT::COLOR_WIDGET_DARK_SHADOW] = get_widget_color_rgb(SWT::COLOR_WIDGET_DARK_SHADOW)
+      @colors[SWT::COLOR_WIDGET_NORMAL_SHADOW] = get_widget_color_rgb(SWT::COLOR_WIDGET_NORMAL_SHADOW)
+      @colors[SWT::COLOR_WIDGET_LIGHT_SHADOW] = get_widget_color_rgb(SWT::COLOR_WIDGET_LIGHT_SHADOW)
+      @colors[SWT::COLOR_WIDGET_HIGHLIGHT_SHADOW] = get_widget_color_rgb(SWT::COLOR_WIDGET_HIGHLIGHT_SHADOW)
+      @colors[SWT::COLOR_WIDGET_BACKGROUND] = get_widget_color_rgb(SWT::COLOR_WIDGET_BACKGROUND)
+      @colors[SWT::COLOR_WIDGET_FOREGROUND] = get_widget_color_rgb(SWT::COLOR_WIDGET_FOREGROUND)
+      @colors[SWT::COLOR_WIDGET_BORDER] = get_widget_color_rgb(SWT::COLOR_WIDGET_BORDER)
+      @colors[SWT::COLOR_LIST_FOREGROUND] = get_widget_color_rgb(SWT::COLOR_LIST_FOREGROUND)
+      @colors[SWT::COLOR_LIST_BACKGROUND] = get_widget_color_rgb(SWT::COLOR_LIST_BACKGROUND)
+      @colors[SWT::COLOR_LIST_SELECTION_TEXT] = get_widget_color_rgb(SWT::COLOR_LIST_SELECTION_TEXT)
+      @colors[SWT::COLOR_LIST_SELECTION] = get_widget_color_rgb(SWT::COLOR_LIST_SELECTION)
+      @alternate_selected_control_color = get_widget_color_rgb(NSColor.alternate_selected_control_color)
+      @alternate_selected_control_text_color = get_widget_color_rgb(NSColor.alternate_selected_control_text_color)
+      @secondary_selected_control_color = get_widget_color_rgb(NSColor.secondary_selected_control_color)
+      @selected_control_text_color = get_widget_color_rgb(NSColor.selected_control_text_color)
     end
     
     typesig { [] }
-    def initialize_widget_table
-      @property = Array.typed(::Java::Int).new(1) { 0 }
-      @index_table = Array.typed(::Java::Int).new(GROW_SIZE) { 0 }
-      @widget_table = Array.typed(Widget).new(GROW_SIZE) { nil }
-      i = 0
-      while i < GROW_SIZE - 1
-        @index_table[i] = i + 1
-        i += 1
-      end
-      @index_table[GROW_SIZE - 1] = -1
+    def init_fonts
+      @small_fonts = !(System.get_property("org.eclipse.swt.internal.carbon.smallFonts")).nil?
+      @button_font = get_font(OS.attr_class_nsbutton, OS.attr_sel_font)
+      @pop_up_button_font = get_font(OS.attr_class_nspop_up_button, OS.attr_sel_font)
+      @text_field_font = get_font(OS.attr_class_nstext_field, OS.attr_sel_font)
+      @secure_text_field_font = get_font(OS.attr_class_nssecure_text_field, OS.attr_sel_font)
+      @search_field_font = get_font(OS.attr_class_nssearch_field, OS.attr_sel_font)
+      @combo_box_font = get_font(OS.attr_class_nscombo_box, OS.attr_sel_font)
+      @slider_font = get_font(OS.attr_class_nsslider, OS.attr_sel_font)
+      @scroller_font = get_font(OS.attr_class_nsscroller, OS.attr_sel_font)
+      @text_view_font = get_font(OS.attr_class_nstext_view, OS.attr_sel_font)
+      @table_view_font = get_font(OS.attr_class_nstable_view, OS.attr_sel_font)
+      @outline_view_font = get_font(OS.attr_class_nsoutline_view, OS.attr_sel_font)
+      @date_picker_font = get_font(OS.attr_class_nsdate_picker, OS.attr_sel_font)
+      @box_font = get_font(OS.attr_class_nsbox, OS.attr_sel_title_font)
+      @tab_view_font = get_font(OS.attr_class_nstab_view, OS.attr_sel_font)
+      @progress_indicator_font = get_font(OS.attr_class_nsprogress_indicator, OS.attr_sel_font)
     end
     
     typesig { [SwtGCData] }
@@ -3447,51 +3577,36 @@ module Org::Eclipse::Swt::Widgets
     # @exception SWTError <ul>
     # <li>ERROR_NO_HANDLES if a handle could not be obtained for gc creation</li>
     # </ul>
+    # 
+    # long
     def internal_new__gc(data)
       if (is_disposed)
         SWT.error(SWT::ERROR_DEVICE_DISPOSED)
       end
-      # TODO - multiple monitors
-      window = @gc_window
-      if ((window).equal?(0))
-        window = @gc_window = create_overlay_window
-      else
-        gdevice = OS._get_main_device
-        ptr = Array.typed(::Java::Int).new(1) { 0 }
-        OS.memmove(ptr, gdevice, 4)
-        device = GDevice.new
-        OS.memmove(device, ptr[0], GDevice.attr_sizeof)
-        rect = Rect.new
-        OS._set_rect(rect, device.attr_left, device.attr_top, device.attr_right, device.attr_bottom)
-        OS._set_window_bounds(window, RJava.cast_to_short(OS.attr_k_window_structure_rgn), rect)
+      if ((@screen_window).nil?)
+        window = NSWindow.new.alloc
+        rect = NSRect.new
+        window = window.init_with_content_rect(rect, OS::NSBorderlessWindowMask, OS::NSBackingStoreBuffered, false)
+        window.set_released_when_closed(false)
+        @screen_window = window
       end
-      port = OS._get_window_port(window)
-      buffer = Array.typed(::Java::Int).new(1) { 0 }
-      OS._create_cgcontext_for_port(port, buffer)
-      context = buffer[0]
-      if ((context).equal?(0))
-        SWT.error(SWT::ERROR_NO_HANDLES)
-      end
-      port_rect = Rect.new
-      OS._get_port_bounds(port, port_rect)
-      OS._cgcontext_scale_ctm(context, 1, -1)
-      OS._cgcontext_translate_ctm(context, 0, port_rect.attr_top - port_rect.attr_bottom)
+      context = @screen_window.graphics_context
+      # NSAffineTransform transform = NSAffineTransform.transform();
+      # NSSize size = handle.size();
+      # transform.translateXBy(0, size.height);
+      # transform.scaleXBy(1, -1);
+      # transform.set();
       if (!(data).nil?)
         mask = SWT::LEFT_TO_RIGHT | SWT::RIGHT_TO_LEFT
         if (((data.attr_style & mask)).equal?(0))
           data.attr_style |= SWT::LEFT_TO_RIGHT
         end
         data.attr_device = self
-        data.attr_window = window
         data.attr_background = get_system_color(SWT::COLOR_WHITE).attr_handle
         data.attr_foreground = get_system_color(SWT::COLOR_BLACK).attr_handle
         data.attr_font = get_system_font
-        data.attr_update_clip = true
-        data.attr_port_rect = port_rect
-      else
-        OS._show_window(window)
       end
-      return context
+      return context.attr_id
     end
     
     typesig { [::Java::Int, SwtGCData] }
@@ -3506,25 +3621,12 @@ module Org::Eclipse::Swt::Widgets
     # 
     # @param hDC the platform specific GC handle
     # @param data the platform specific GC data
+    # 
+    # long
     def internal_dispose__gc(context, data)
       if (is_disposed)
         SWT.error(SWT::ERROR_DEVICE_DISPOSED)
       end
-      if (!(data).nil?)
-        window = data.attr_window
-        if ((@gc_window).equal?(window))
-          OS._hide_window(window)
-        else
-          OS._dispose_window(window)
-        end
-        data.attr_window = 0
-      end
-      # This code is intentionaly commented. Use CGContextSynchronize
-      # instead of CGContextFlush to improve performance.
-      # 
-      # OS.CGContextFlush (context);
-      OS._cgcontext_synchronize(context)
-      OS._cgcontext_release(context)
     end
     
     class_module.module_eval {
@@ -3539,59 +3641,6 @@ module Org::Eclipse::Swt::Widgets
     typesig { [] }
     def is_valid_thread
       return (@thread).equal?(JavaThread.current_thread)
-    end
-    
-    typesig { [::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int] }
-    def item_compare_proc(browser, item_one, item_two, sort_property)
-      widget = get_widget(browser)
-      if (!(widget).nil?)
-        return widget.item_compare_proc(browser, item_one, item_two, sort_property)
-      end
-      return OS.attr_no_err
-    end
-    
-    typesig { [::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int] }
-    def item_data_proc(browser, item, property, item_data, set_value)
-      widget = get_widget(browser)
-      if (!(widget).nil?)
-        return widget.item_data_proc(browser, item, property, item_data, set_value)
-      end
-      return OS.attr_no_err
-    end
-    
-    typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
-    def item_notification_proc(browser, item, message)
-      widget = get_widget(browser)
-      if (!(widget).nil?)
-        return widget.item_notification_proc(browser, item, message)
-      end
-      return OS.attr_no_err
-    end
-    
-    typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
-    def keyboard_proc(next_handler, the_event, user_data)
-      the_window = OS._get_user_focus_window
-      if (!(the_window).equal?(0))
-        the_control = Array.typed(::Java::Int).new(1) { 0 }
-        OS._get_keyboard_focus(the_window, the_control)
-        widget = get_widget(the_control[0])
-        if (!(widget).nil?)
-          out_data = MenuTrackingData.new
-          if (!(OS._get_menu_tracking_data(0, out_data)).equal?(OS.attr_no_err))
-            return widget.keyboard_proc(next_handler, the_event, user_data)
-          end
-        end
-      end
-      return OS.attr_event_not_handled_err
-    end
-    
-    typesig { [::Java::Int, ::Java::Int] }
-    def polling_proc(in_timer, in_user_data)
-      if ((@grab_control).nil? || @grab_control.is_disposed)
-        return 0
-      end
-      @grab_control.send_track_events
-      return 0
     end
     
     typesig { [Event] }
@@ -3631,6 +3680,13 @@ module Org::Eclipse::Swt::Widgets
     # <li>(in) x the x coordinate to move the mouse pointer to in screen coordinates
     # <li>(in) y the y coordinate to move the mouse pointer to in screen coordinates
     # </ul>
+    # <p>MouseWheel</p>
+    # <p>The following fields in the <code>Event</code> apply:
+    # <ul>
+    # <li>(in) type MouseWheel
+    # <li>(in) detail either SWT.SCROLL_LINE or SWT.SCROLL_PAGE
+    # <li>(in) count the number of lines or pages to scroll
+    # </ul>
     # </dl>
     # 
     # @param event the event to be generated
@@ -3653,41 +3709,43 @@ module Org::Eclipse::Swt::Widgets
         if ((event).nil?)
           error(SWT::ERROR_NULL_ARGUMENT)
         end
+        # TODO: Not sure if these calls have any effect on event posting.
+        if (!@event_source_delay_set)
+          OS._cgset_local_events_suppression_interval(0.0)
+          OS._cgenable_event_state_combining(1)
+          OS._cgset_local_events_filter_during_suppression_state(OS.attr_k_cgevent_filter_mask_permit_local_keyboard_events | OS.attr_k_cgevent_filter_mask_permit_local_mouse_events | OS.attr_k_cgevent_filter_mask_permit_system_defined_events, OS.attr_k_cgevent_suppression_state_suppression_interval)
+          OS._cgset_local_events_filter_during_suppression_state(OS.attr_k_cgevent_filter_mask_permit_local_keyboard_events | OS.attr_k_cgevent_filter_mask_permit_local_mouse_events | OS.attr_k_cgevent_filter_mask_permit_system_defined_events, OS.attr_k_cgevent_suppression_state_remote_mouse_drag)
+          @event_source_delay_set = true
+        end
         type = event.attr_type
         case (type)
         when SWT::KeyDown, SWT::KeyUp
-          v_key = Display.untranslate_key(event.attr_key_code)
-          if (!(v_key).equal?(0))
-            return (OS._cgpost_keyboard_event(0, v_key, (type).equal?(SWT::KeyDown))).equal?(0)
-          else
-            kchr_ptr = OS._get_script_manager_variable(RJava.cast_to_short(OS.attr_sm_kchrcache))
-            key = -1
-            encoding = Array.typed(::Java::Int).new(1) { 0 }
-            key_script = RJava.cast_to_short(OS._get_script_manager_variable(RJava.cast_to_short(OS.attr_sm_key_script)))
-            region_code = RJava.cast_to_short(OS._get_script_manager_variable(RJava.cast_to_short(OS.attr_sm_region_code)))
-            if ((OS._upgrade_script_info_to_text_encoding(key_script, RJava.cast_to_short(OS.attr_k_text_language_dont_care), region_code, nil, encoding)).equal?(OS.attr_param_err))
-              if ((OS._upgrade_script_info_to_text_encoding(key_script, RJava.cast_to_short(OS.attr_k_text_language_dont_care), RJava.cast_to_short(OS.attr_k_text_region_dont_care), nil, encoding)).equal?(OS.attr_param_err))
-                encoding[0] = OS.attr_k_text_encoding_mac_roman
-              end
-            end
-            encoding_info = Array.typed(::Java::Int).new(1) { 0 }
-            OS._create_unicode_to_text_info_by_encoding(encoding[0], encoding_info)
-            if (!(encoding_info[0]).equal?(0))
-              input = Array.typed(::Java::Char).new([event.attr_character])
-              buffer = Array.typed(::Java::Byte).new(2) { 0 }
-              OS._convert_from_unicode_to_pstring(encoding_info[0], 2, input, buffer)
-              OS._dispose_unicode_to_text_info(encoding_info)
-              key = buffer[1] & 0x7f
-            end
-            if ((key).equal?(-1))
+          v_key = RJava.cast_to_short(Display.untranslate_key(event.attr_key_code))
+          if ((v_key).equal?(0))
+            # long
+            uchr_ptr = 0
+            # long
+            current_kbd = OS._tiscopy_current_keyboard_input_source
+            # long
+            uchr_cfdata = OS._tisget_input_source_property(current_kbd, OS.k_tisproperty_unicode_key_layout_data)
+            if ((uchr_cfdata).equal?(0))
               return false
             end
-            state = Array.typed(::Java::Int).new(1) { 0 }
+            uchr_ptr = OS._cfdata_get_byte_ptr(uchr_cfdata)
+            if ((uchr_ptr).equal?(0))
+              return false
+            end
+            if ((OS._cfdata_get_length(uchr_cfdata)).equal?(0))
+              return false
+            end
+            max_string_length = 256
             v_key = -1
+            output = CharArray.new(max_string_length)
+            actual_string_length = Array.typed(::Java::Int).new(1) { 0 }
             i = 0
             while i <= 0x7f
-              result = OS._key_translate(kchr_ptr, RJava.cast_to_short(i), state)
-              if (((result & 0x7f)).equal?(key))
+              OS._uckey_translate(uchr_ptr, i, RJava.cast_to_short(((type).equal?(SWT::KeyDown) ? OS.attr_k_uckey_action_down : OS.attr_k_uckey_action_up)), 0, OS._lmget_kbd_type, 0, @dead_key_state, max_string_length, actual_string_length, output)
+              if ((output[0]).equal?(event.attr_character))
                 v_key = i
                 break
               end
@@ -3696,22 +3754,28 @@ module Org::Eclipse::Swt::Widgets
             if ((v_key).equal?(-1))
               i_ = 0
               while i_ <= 0x7f
-                result = OS._key_translate(kchr_ptr, RJava.cast_to_short((i_ | OS.attr_shift_key)), state)
-                if (((result & 0x7f)).equal?(key))
+                OS._uckey_translate(uchr_ptr, i_, RJava.cast_to_short(((type).equal?(SWT::KeyDown) ? OS.attr_k_uckey_action_down : OS.attr_k_uckey_action_up)), OS.attr_shift_key, OS._lmget_kbd_type, 0, @dead_key_state, max_string_length, actual_string_length, output)
+                if ((output[0]).equal?(event.attr_character))
                   v_key = i_
                   break
                 end
                 i_ += 1
               end
             end
-            if ((v_key).equal?(-1))
-              return false
-            end
-            return (OS._cgpost_keyboard_event(key, v_key, (type).equal?(SWT::KeyDown))).equal?(0)
           end
+          # Bug(?) in UCKeyTranslate:  If event.keyCode doesn't map to a valid SWT constant and event.characer is 0 we still need to post an event.
+          # In Carbon, KeyTranslate eventually found a key that generated 0 but UCKeyTranslate never generates 0.
+          # When that happens, post an event from key 127, which does nothing.
+          if ((v_key).equal?(-1) && (event.attr_character).equal?(0))
+            v_key = 127
+          end
+          if ((v_key).equal?(-1))
+            return false
+          end
+          return (OS._cgpost_keyboard_event(RJava.cast_to_short(0), v_key, (type).equal?(SWT::KeyDown))).equal?(0)
         when SWT::MouseDown, SWT::MouseMove, SWT::MouseUp
           mouse_cursor_position = CGPoint.new
-          chord = OS._get_current_event_button_state
+          chord = OS._get_current_button_state
           if ((type).equal?(SWT::MouseMove))
             mouse_cursor_position.attr_x = event.attr_x
             mouse_cursor_position.attr_y = event.attr_y
@@ -3758,10 +3822,10 @@ module Org::Eclipse::Swt::Widgets
               button4 = !((chord & 0x8)).equal?(0)
               button5 = (type).equal?(SWT::MouseDown)
             end
-            pt = Org::Eclipse::Swt::Internal::Carbon::Point.new
-            OS._get_global_mouse(pt)
-            mouse_cursor_position.attr_x = pt.attr_h
-            mouse_cursor_position.attr_y = pt.attr_v
+            ns_cursor_position = NSEvent.mouse_location
+            primary_frame = get_primary_frame
+            mouse_cursor_position.attr_x = ns_cursor_position.attr_x
+            mouse_cursor_position.attr_y = RJava.cast_to_int((primary_frame.attr_height - ns_cursor_position.attr_y))
             return (OS._cgpost_mouse_event(mouse_cursor_position, true, 5, button1, button3, button2, button4, button5)).equal?(0)
           end
         when SWT::MouseWheel
@@ -3886,33 +3950,42 @@ module Org::Eclipse::Swt::Widgets
       if ((from).equal?(to))
         return point
       end
-      rect = Rect.new
-      if (!(from).nil?)
-        window = OS._get_control_owner(from.attr_handle)
-        pt = CGPoint.new
-        OS._hiview_convert_point(pt, from.attr_handle, 0)
-        point.attr_x += RJava.cast_to_int(pt.attr_x)
-        point.attr_y += RJava.cast_to_int(pt.attr_y)
-        OS._get_window_bounds(window, RJava.cast_to_short(OS.attr_k_window_structure_rgn), rect)
-        point.attr_x += rect.attr_left
-        point.attr_y += rect.attr_top
-        inset = from.get_inset
-        point.attr_x -= inset.attr_left
-        point.attr_y -= inset.attr_top
+      pt = NSPoint.new
+      pt.attr_x = x
+      pt.attr_y = y
+      from_window = !(from).nil? ? from.attr_view.window : nil
+      to_window = !(to).nil? ? to.attr_view.window : nil
+      if (!(to_window).nil? && !(from_window).nil? && (to_window.attr_id).equal?(from_window.attr_id))
+        if (!from.attr_view.is_flipped)
+          pt.attr_y = from.attr_view.bounds.attr_height - pt.attr_y
+        end
+        pt = from.attr_view.convert_point_to_view_(pt, to.attr_view)
+        if (!to.attr_view.is_flipped)
+          pt.attr_y = to.attr_view.bounds.attr_height - pt.attr_y
+        end
+      else
+        primary_frame = get_primary_frame
+        if (!(from).nil?)
+          view = from.event_view
+          if (!view.is_flipped)
+            pt.attr_y = view.bounds.attr_height - pt.attr_y
+          end
+          pt = view.convert_point_to_view_(pt, nil)
+          pt = from_window.convert_base_to_screen(pt)
+          pt.attr_y = primary_frame.attr_height - pt.attr_y
+        end
+        if (!(to).nil?)
+          view = to.event_view
+          pt.attr_y = primary_frame.attr_height - pt.attr_y
+          pt = to_window.convert_screen_to_base(pt)
+          pt = view.convert_point_from_view_(pt, nil)
+          if (!view.is_flipped)
+            pt.attr_y = view.bounds.attr_height - pt.attr_y
+          end
+        end
       end
-      if (!(to).nil?)
-        window = OS._get_control_owner(to.attr_handle)
-        pt = CGPoint.new
-        OS._hiview_convert_point(pt, to.attr_handle, 0)
-        point.attr_x -= RJava.cast_to_int(pt.attr_x)
-        point.attr_y -= RJava.cast_to_int(pt.attr_y)
-        OS._get_window_bounds(window, RJava.cast_to_short(OS.attr_k_window_structure_rgn), rect)
-        point.attr_x -= rect.attr_left
-        point.attr_y -= rect.attr_top
-        inset = to.get_inset
-        point.attr_x += inset.attr_left
-        point.attr_y += inset.attr_top
-      end
+      point.attr_x = RJava.cast_to_int(pt.attr_x)
+      point.attr_y = RJava.cast_to_int(pt.attr_y)
       return point
     end
     
@@ -4008,142 +4081,53 @@ module Org::Eclipse::Swt::Widgets
       if ((from).equal?(to))
         return rectangle
       end
-      rect = Rect.new
-      if (!(from).nil?)
-        window = OS._get_control_owner(from.attr_handle)
-        pt = CGPoint.new
-        OS._hiview_convert_point(pt, from.attr_handle, 0)
-        rectangle.attr_x += RJava.cast_to_int(pt.attr_x)
-        rectangle.attr_y += RJava.cast_to_int(pt.attr_y)
-        OS._get_window_bounds(window, RJava.cast_to_short(OS.attr_k_window_structure_rgn), rect)
-        rectangle.attr_x += rect.attr_left
-        rectangle.attr_y += rect.attr_top
-        inset = from.get_inset
-        rectangle.attr_x -= inset.attr_left
-        rectangle.attr_y -= inset.attr_top
+      pt = NSPoint.new
+      pt.attr_x = x
+      pt.attr_y = y
+      from_window = !(from).nil? ? from.attr_view.window : nil
+      to_window = !(to).nil? ? to.attr_view.window : nil
+      if (!(to_window).nil? && !(from_window).nil? && (to_window.attr_id).equal?(from_window.attr_id))
+        if (!from.attr_view.is_flipped)
+          pt.attr_y = from.attr_view.bounds.attr_height - pt.attr_y
+        end
+        pt = from.attr_view.convert_point_to_view_(pt, to.attr_view)
+        if (!to.attr_view.is_flipped)
+          pt.attr_y = to.attr_view.bounds.attr_height - pt.attr_y
+        end
+      else
+        primary_frame = get_primary_frame
+        if (!(from).nil?)
+          view = from.event_view
+          if (!view.is_flipped)
+            pt.attr_y = view.bounds.attr_height - pt.attr_y
+          end
+          pt = view.convert_point_to_view_(pt, nil)
+          pt = from_window.convert_base_to_screen(pt)
+          pt.attr_y = primary_frame.attr_height - pt.attr_y
+        end
+        if (!(to).nil?)
+          view = to.event_view
+          pt.attr_y = primary_frame.attr_height - pt.attr_y
+          pt = to_window.convert_screen_to_base(pt)
+          pt = view.convert_point_from_view_(pt, nil)
+          if (!view.is_flipped)
+            pt.attr_y = view.bounds.attr_height - pt.attr_y
+          end
+        end
       end
-      if (!(to).nil?)
-        window = OS._get_control_owner(to.attr_handle)
-        pt = CGPoint.new
-        OS._hiview_convert_point(pt, to.attr_handle, 0)
-        rectangle.attr_x -= RJava.cast_to_int(pt.attr_x)
-        rectangle.attr_y -= RJava.cast_to_int(pt.attr_y)
-        OS._get_window_bounds(window, RJava.cast_to_short(OS.attr_k_window_structure_rgn), rect)
-        rectangle.attr_x -= rect.attr_left
-        rectangle.attr_y -= rect.attr_top
-        inset = to.get_inset
-        rectangle.attr_x += inset.attr_left
-        rectangle.attr_y += inset.attr_top
-      end
+      rectangle.attr_x = RJava.cast_to_int(pt.attr_x)
+      rectangle.attr_y = RJava.cast_to_int(pt.attr_y)
       return rectangle
     end
     
     typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
-    def menu_proc(next_handler, the_event, user_data)
-      menu_id = 0
-      if (!(user_data).equal?(0))
-        menu_id = OS._get_menu_id(user_data)
-      else
-        the_menu = Array.typed(::Java::Int).new(1) { 0 }
-        OS._get_event_parameter(the_event, OS.attr_k_event_param_direct_object, OS.attr_type_menu_ref, nil, 4, nil, the_menu)
-        menu_id = OS._get_menu_id(the_menu[0])
-      end
-      menu = get_menu(menu_id)
-      if (!(menu).nil?)
-        return menu.menu_proc(next_handler, the_event, user_data)
-      end
-      return OS.attr_event_not_handled_err
-    end
-    
-    typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
-    def mouse_proc(next_handler, the_event, user_data)
-      event_kind = OS._get_event_kind(the_event)
-      case (event_kind)
-      when OS.attr_k_event_mouse_down
-        button_data = Array.typed(::Java::Short).new(1) { 0 }
-        OS._get_event_parameter(the_event, OS.attr_k_event_param_mouse_button, OS.attr_type_mouse_button, nil, 2, nil, button_data)
-        click_count_data = Array.typed(::Java::Int).new(1) { 0 }
-        OS._get_event_parameter(the_event, OS.attr_k_event_param_click_count, OS.attr_type_uint32, nil, 4, nil, click_count_data)
-        @click_count = (@click_count_button).equal?(button_data[0]) ? click_count_data[0] : 1
-        @click_count_button = button_data[0]
-      when OS.attr_k_event_mouse_dragged, OS.attr_k_event_mouse_moved
-        @mouse_moved = true
-        OS._cgdisplay_show_cursor(OS._cgmain_display_id)
-      end
-      sizeof = Org::Eclipse::Swt::Internal::Carbon::Point.attr_sizeof
-      where = Org::Eclipse::Swt::Internal::Carbon::Point.new
-      OS._get_event_parameter(the_event, OS.attr_k_event_param_mouse_location, OS.attr_type_qdpoint, nil, sizeof, nil, where)
-      the_window = Array.typed(::Java::Int).new(1) { 0 }
-      part = OS._find_window(where, the_window)
-      case (part)
-      when OS.attr_in_menu_bar
-        if ((event_kind).equal?(OS.attr_k_event_mouse_down))
-          clear_menu_flags
-          if ((@menu_bar).nil? || @menu_bar.is_enabled)
-            OS._menu_select(where)
-          end
-          clear_menu_flags
-          return OS.attr_no_err
-        end
-      when OS.attr_in_content
-        window_rect = Rect.new
-        OS._get_window_bounds(the_window[0], RJava.cast_to_short(OS.attr_k_window_content_rgn), window_rect)
-        in_point = CGPoint.new
-        in_point.attr_x = where.attr_h - window_rect.attr_left
-        in_point.attr_y = where.attr_v - window_rect.attr_top
-        root = OS._hiview_get_root(the_window[0])
-        buffer = Array.typed(::Java::Int).new(1) { 0 }
-        OS._hiview_get_view_for_mouse_event(root, the_event, buffer)
-        view = buffer[0]
-        OS._hiview_find_by_id(root, OS.k_hiview_window_content_id, buffer)
-        content_view = buffer[0]
-        while (!(view).equal?(0) && !(view).equal?(content_view) && !OS._is_control_enabled(view))
-          view = OS._hiview_get_superview(view)
-        end
-        widget = nil
-        consume = false
-        begin
-          widget = get_widget(view)
-          if (!(widget).nil?)
-            if (widget.is_enabled)
-              break
-            end
-            consume = true
-          end
-          view = OS._hiview_get_superview(view)
-        end while (!(view).equal?(0) && !(view).equal?(content_view))
-        if (!(widget).nil?)
-          if (widget.contains(RJava.cast_to_int(in_point.attr_x), RJava.cast_to_int(in_point.attr_y)))
-            result = !(user_data).equal?(0) ? widget.mouse_proc(next_handler, the_event, user_data) : OS.attr_event_not_handled_err
-            return consume ? OS.attr_no_err : result
-          end
-        end
-      end
-      case (event_kind)
-      when OS.attr_k_event_mouse_dragged, OS.attr_k_event_mouse_moved
-        OS._init_cursor
-      end
-      return OS.attr_event_not_handled_err
-    end
-    
-    typesig { [::Java::Int, ::Java::Int] }
-    def mouse_hover_proc(id, handle)
-      OS._remove_event_loop_timer(id)
-      @mouse_hover_id = 0
-      @mouse_moved = false
-      if (!(@current_control).nil? && !@current_control.is_disposed)
-        # OPTIMIZE - use OS calls
-        chord = OS._get_current_event_button_state
-        modifiers = OS._get_current_event_key_modifiers
-        pt = @current_control.to_control(get_cursor_location)
-        @current_control.send_mouse_event(SWT::MouseHover, RJava.cast_to_short(0), 0, true, chord, RJava.cast_to_short(pt.attr_x), RJava.cast_to_short(pt.attr_y), modifiers)
-      end
-      return 0
-    end
-    
-    typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
+    # long
+    # long
+    # long
+    # long
     def observer_proc(observer, activity, info)
-      case (activity)
+      # 64
+      case (RJava.cast_to_int(activity))
       when OS.attr_k_cfrun_loop_before_waiting
         if (@run_async_messages)
           if (run_async_messages(false))
@@ -4152,68 +4136,6 @@ module Org::Eclipse::Swt::Widgets
         end
       end
       return 0
-    end
-    
-    typesig { [::Java::Int] }
-    def read_image_ref(path)
-      image = 0
-      url = OS._cfurlcreate_from_file_system_representation(OS.attr_k_cfallocator_default, path, OS.strlen(path), false)
-      if (!(url).equal?(0))
-        extention = OS._cfurlcopy_path_extension(url)
-        if (!(extention).equal?(0))
-          length_ = OS._cfstring_get_length(extention)
-          buffer = CharArray.new(length_)
-          range = CFRange.new
-          range.attr_length = length_
-          OS._cfstring_get_characters(extention, range, buffer)
-          ext = String.new(buffer)
-          if (ext.equals_ignore_case("png"))
-            # $NON-NLS-1$
-            provider = OS._cgdata_provider_create_with_url(url)
-            if (!(provider).equal?(0))
-              image = OS._cgimage_create_with_pngdata_provider(provider, nil, true, OS.attr_k_cgrendering_intent_default)
-              OS._cgdata_provider_release(provider)
-            end
-          else
-            if (ext.equals_ignore_case("jpeg") || (ext == "jpg"))
-              # $NON-NLS-1$ //$NON-NLS-2$
-              provider = OS._cgdata_provider_create_with_url(url)
-              if (!(provider).equal?(0))
-                image = OS._cgimage_create_with_jpegdata_provider(provider, nil, true, OS.attr_k_cgrendering_intent_default)
-                OS._cgdata_provider_release(provider)
-              end
-            else
-              if (ext.equals_ignore_case("icns"))
-                # $NON-NLS-1$
-                fs_ref = Array.typed(::Java::Byte).new(80) { 0 }
-                if (OS._cfurlget_fsref(url, fs_ref))
-                  fs_spec = Array.typed(::Java::Byte).new(70) { 0 }
-                  if ((OS._fsget_catalog_info(fs_ref, 0, nil, nil, fs_spec, nil)).equal?(OS.attr_no_err))
-                    icon_family = Array.typed(::Java::Int).new(1) { 0 }
-                    OS._read_icon_file(fs_spec, icon_family)
-                    if (!(icon_family[0]).equal?(0))
-                      icon = create_image_from_family(icon_family[0], OS.attr_k_thumbnail32bit_data, OS.attr_k_thumbnail8bit_mask, 128, 128)
-                      if ((icon).nil?)
-                        icon = create_image_from_family(icon_family[0], OS.attr_k_huge32bit_data, OS.attr_k_huge8bit_mask, 64, 64)
-                      end
-                      if ((icon).nil?)
-                        icon = create_image_from_family(icon_family[0], OS.attr_k_large32bit_data, OS.attr_k_large8bit_mask, 32, 32)
-                      end
-                      if (!(icon).nil?)
-                        image = icon[0]
-                      end
-                      OS._dispose_handle(icon_family[0])
-                    end
-                  end
-                end
-              end
-            end
-          end
-          OS._cfrelease(extention)
-        end
-        OS._cfrelease(url)
-      end
-      return image
     end
     
     typesig { [] }
@@ -4241,32 +4163,35 @@ module Org::Eclipse::Swt::Widgets
     # @see #wake
     def read_and_dispatch
       check_device
+      if ((@send_event_count).equal?(0) && (@loop_count).equal?(@pool_count - 1) && (Callback.get_entry_count).equal?(0))
+        remove_pool
+      end
+      add_pool
+      @loop_count += 1
       events = false
-      events |= run_settings
-      events |= run_timers
-      events |= run_popups
-      out_event = Array.typed(::Java::Int).new(1) { 0 }
-      status = OS._receive_next_event(0, nil, OS.attr_k_event_duration_no_wait, true, out_event)
-      if ((status).equal?(OS.attr_no_err))
-        events = true
-        OS._send_event_to_event_target(out_event[0], OS._get_event_dispatcher_target)
-        OS._release_event(out_event[0])
-        # Feature in the Macintosh.  HIComboBox does not send any
-        # notification when the selection changes.  The fix is to
-        # detect if the combo text has changed after every event
-        # has been dispatched.  This is only necessary when the
-        # combo has focus.
-        if (!(@focus_combo).nil? && !@focus_combo.is_disposed)
-          @focus_combo.check_selection
+      begin
+        events |= run_settings
+        events |= run_timers
+        events |= run_contexts
+        events |= run_popups
+        event = @application.next_event_matching_mask(0, nil, OS::NSDefaultRunLoopMode, true)
+        if (!(event).nil?)
+          events = true
+          @application.send_event(event)
+        end
+        events |= run_paint
+        events |= run_deferred_events
+        if (!events)
+          events = is_disposed || run_async_messages(false)
+        end
+      ensure
+        remove_pool
+        @loop_count -= 1
+        if ((@send_event_count).equal?(0) && (@loop_count).equal?(@pool_count) && (Callback.get_entry_count).equal?(0))
+          add_pool
         end
       end
-      events |= run_paint
-      if (events)
-        run_enter_exit
-        run_deferred_events
-        return true
-      end
-      return run_async_messages(false)
+      return events
     end
     
     class_module.module_eval {
@@ -4348,29 +4273,6 @@ module Org::Eclipse::Swt::Widgets
     
     typesig { [] }
     def release_display
-      dispose_windows
-      if (!(@gc_window).equal?(0))
-        OS._dispose_window(@gc_window)
-      end
-      @gc_window = 0
-      # Release Timers
-      if (!(@caret_id).equal?(0))
-        OS._remove_event_loop_timer(@caret_id)
-      end
-      if (!(@mouse_hover_id).equal?(0))
-        OS._remove_event_loop_timer(@mouse_hover_id)
-      end
-      @caret_id = @mouse_hover_id = 0
-      if (!(@timer_ids).nil?)
-        i = 0
-        while i < @timer_ids.attr_length
-          if (!(@timer_ids[i]).equal?(0) && !(@timer_ids[i]).equal?(-1))
-            OS._remove_event_loop_timer(@timer_ids[i])
-          end
-          i += 1
-        end
-      end
-      @timer_ids = nil
       # Release the System Images
       if (!(@error_image).nil?)
         @error_image.dispose
@@ -4382,6 +4284,31 @@ module Org::Eclipse::Swt::Widgets
         @warning_image.dispose
       end
       @error_image = @info_image = @warning_image = nil
+      @current_caret = nil
+      # Release Timers
+      if (!(@hover_timer).nil?)
+        timer_exec(-1, @hover_timer)
+      end
+      @hover_timer = nil
+      if (!(@caret_timer).nil?)
+        timer_exec(-1, @caret_timer)
+      end
+      @caret_timer = nil
+      if (!(@ns_timers).nil?)
+        i = 0
+        while i < @ns_timers.attr_length
+          if (!(@ns_timers[i]).nil?)
+            @ns_timers[i].invalidate
+            @ns_timers[i].release
+          end
+          i += 1
+        end
+      end
+      @ns_timers = nil
+      if (!(@timer_delegate).nil?)
+        @timer_delegate.release
+      end
+      @timer_delegate = nil
       # Release the System Cursors
       i = 0
       while i < @cursors.attr_length
@@ -4391,88 +4318,145 @@ module Org::Eclipse::Swt::Widgets
         i += 1
       end
       @cursors = nil
-      # Release Dock image
-      if (!(@dock_image).equal?(0))
-        OS._cgimage_release(@dock_image)
+      # Release default fonts
+      if (!(@button_font).nil?)
+        @button_font.release
       end
-      @dock_image = 0
+      if (!(@pop_up_button_font).nil?)
+        @pop_up_button_font.release
+      end
+      if (!(@text_field_font).nil?)
+        @text_field_font.release
+      end
+      if (!(@secure_text_field_font).nil?)
+        @secure_text_field_font.release
+      end
+      if (!(@search_field_font).nil?)
+        @search_field_font.release
+      end
+      if (!(@combo_box_font).nil?)
+        @combo_box_font.release
+      end
+      if (!(@slider_font).nil?)
+        @slider_font.release
+      end
+      if (!(@scroller_font).nil?)
+        @scroller_font.release
+      end
+      if (!(@text_view_font).nil?)
+        @text_view_font.release
+      end
+      if (!(@table_view_font).nil?)
+        @table_view_font.release
+      end
+      if (!(@outline_view_font).nil?)
+        @outline_view_font.release
+      end
+      if (!(@date_picker_font).nil?)
+        @date_picker_font.release
+      end
+      if (!(@box_font).nil?)
+        @box_font.release
+      end
+      if (!(@tab_view_font).nil?)
+        @tab_view_font.release
+      end
+      if (!(@progress_indicator_font).nil?)
+        @progress_indicator_font.release
+      end
+      @button_font = @pop_up_button_font = @text_field_font = @secure_text_field_font = nil
+      @search_field_font = @combo_box_font = @slider_font = @scroller_font
+      @text_view_font = @table_view_font = @outline_view_font = @date_picker_font = nil
+      @box_font = @tab_view_font = @progress_indicator_font = nil
+      # Release Dock image
+      if (!(@dock_image).nil?)
+        @dock_image.release
+      end
+      @dock_image = nil
+      if (!(@screen_window).nil?)
+        @screen_window.release
+      end
+      @screen_window = nil
+      if (!(@needs_display).nil?)
+        @needs_display.release
+      end
+      if (!(@needs_display_in_rect).nil?)
+        @needs_display_in_rect.release
+      end
+      if (!(@is_painting).nil?)
+        @is_painting.release
+      end
+      @needs_display = @needs_display_in_rect = @is_painting = nil
+      @modal_shells = nil
+      @menu_bar = nil
+      @menus = nil
+      if (!(@marked_attributes).nil?)
+        @marked_attributes.release
+      end
+      @marked_attributes = nil
+      if (!(@old_cursor_set_proc).equal?(0))
+        # long
+        method = OS.class_get_instance_method(OS.attr_class_nscursor, OS.attr_sel_set)
+        OS.method_set_implementation(method, @old_cursor_set_proc)
+      end
+      if (!(@cursor_set_callback).nil?)
+        @cursor_set_callback.dispose
+      end
+      @cursor_set_callback = nil
+      @dead_key_state = nil
+      if (!(@settings_delegate).nil?)
+        NSNotificationCenter.default_center.remove_observer(@settings_delegate)
+        @settings_delegate.release
+      end
+      @settings_delegate = nil
+      # Clear the menu bar if we created it.
+      if (!@is_embedded)
+        # remove all existing menu items except the application menu
+        menubar = @application.main_menu
+        # long
+        count_ = menubar.number_of_items
+        while (count_ > 1)
+          menubar.remove_item_at_index(count_ - 1)
+          count_ -= 1
+        end
+      end
+      # The autorelease pool is cleaned up when we call NSApplication.terminate().
+      if (!(@application).nil? && !(@application_class).equal?(0))
+        OS.object_set_class(@application.attr_id, @application_class)
+      end
+      @application = nil
+      @application_class = 0
       if (!(@run_loop_observer).equal?(0))
         OS._cfrun_loop_observer_invalidate(@run_loop_observer)
         OS._cfrelease(@run_loop_observer)
       end
-      if (!(@run_loop_source).equal?(0))
-        OS._cfrun_loop_source_invalidate(@run_loop_source)
-        OS._cfrelease(@run_loop_source)
+      @run_loop_observer = 0
+      if (!(@observer_callback).nil?)
+        @observer_callback.dispose
       end
-      @run_loop = @run_loop_source = @run_loop_observer = 0
-      @release_callback.dispose
-      @action_callback.dispose
-      @apple_event_callback.dispose
-      @caret_callback.dispose
-      @clock_callback.dispose
-      @command_callback.dispose
-      @control_callback.dispose
-      @accessibility_callback.dispose
-      @draw_item_callback.dispose
-      @item_compare_callback.dispose
-      @item_data_callback.dispose
-      @item_notification_callback.dispose
-      @help_callback.dispose
-      @hit_test_callback.dispose
-      @keyboard_callback.dispose
-      @menu_callback.dispose
-      @mouse_hover_callback.dispose
-      @mouse_callback.dispose
-      @tracking_callback.dispose
-      @window_callback.dispose
-      @color_callback.dispose
-      @text_input_callback.dispose
-      @appearance_callback.dispose
-      @tray_item_callback.dispose
-      @observer_callback.dispose
-      @source_callback.dispose
-      @search_callback.dispose
-      @core_event_callback.dispose
-      @polling_callback.dispose
-      @action_callback = @apple_event_callback = @caret_callback = @command_callback = @appearance_callback = nil
-      @accessibility_callback = @clock_callback = @control_callback = @draw_item_callback = @item_data_callback = @item_notification_callback = nil
-      @help_callback = @hit_test_callback = @keyboard_callback = @menu_callback = @item_compare_callback = @search_callback = @tray_item_callback = nil
-      @mouse_hover_callback = @mouse_callback = @tracking_callback = @window_callback = @color_callback = @observer_callback = @source_callback = nil
-      @text_input_callback = @core_event_callback = @release_callback = @polling_callback = nil
-      @action_proc = @apple_event_proc = @caret_proc = @command_proc = @appearance_proc = @search_proc = @tray_item_proc = 0
-      @accessibility_proc = @clock_proc = @control_proc = @draw_item_proc = @item_data_proc = @item_notification_proc = @item_compare_proc = 0
-      @help_proc = @hit_test_proc = @keyboard_proc = @menu_proc = @observer_proc = @source_proc = @release_proc = 0
-      @mouse_hover_proc = @mouse_proc = @tracking_proc = @window_proc = @color_proc = @core_event_proc = 0
-      @text_input_proc = @polling_proc = 0
-      @timer_callback.dispose
-      @timer_callback = nil
-      @timer_list = nil
-      @timer_proc = 0
-      @current_control = @focus_control = @focus_combo = nil
-      @active_shell = nil
-      @help_widget = nil
-      if (!(@help_string).equal?(0))
-        OS._cfrelease(@help_string)
-      end
-      @help_string = 0
-      @widget_table = @menus = @popups = nil
-      @modal_shells = nil
-      @menu_bar = nil
-      @event_table = @filter_table = nil
-      @thread = nil
-      @index_table = @property = @kchr_state = nil
-      @button_inset = @tab_folder_north_inset = @tab_folder_south_inset = @combo_inset = @edit_text_inset = @search_text_inset = nil
-      @data = @highlight_color = nil
-      @values = @keys = nil
-      # NOT DONE - call terminate TXN if this is the last display
-      # NOTE: - display create and dispose needs to be synchronized on all platforms
-      # TXNTerminateTextension ();
+      @observer_callback = nil
     end
     
-    typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
-    def release_data_proc(info, data, size)
-      OS._dispose_ptr(data)
-      return 0
+    typesig { [SwtGCData] }
+    def remove_context(context)
+      if ((@contexts).nil?)
+        return
+      end
+      count_ = 0
+      i = 0
+      while i < @contexts.attr_length
+        if (!(@contexts[i]).nil?)
+          if ((@contexts[i]).equal?(context))
+            @contexts[i] = nil
+          else
+            count_ += 1
+          end
+        end
+        i += 1
+      end
+      if ((count_).equal?(0))
+        @contexts = nil
+      end
     end
     
     typesig { [::Java::Int, Listener] }
@@ -4543,12 +4527,47 @@ module Org::Eclipse::Swt::Widgets
       @event_table.unhook(event_type, listener)
     end
     
+    typesig { [NSObject] }
+    def remove_widget(view)
+      if ((view).nil?)
+        return nil
+      end
+      # long
+      # long
+      jni_ref = Array.typed(::Java::Int).new(1) { 0 }
+      OS.object_get_instance_variable(view.attr_id, SWT_OBJECT, jni_ref)
+      if ((jni_ref[0]).equal?(0))
+        return nil
+      end
+      widget = OS._jniget_object(jni_ref[0])
+      OS.object_set_instance_variable(view.attr_id, SWT_OBJECT, 0)
+      return widget
+    end
+    
     typesig { [Menu] }
     def remove_menu(menu)
       if ((@menus).nil?)
         return
       end
-      @menus[menu.attr_id - ID_START] = nil
+      i = 0
+      while i < @menus.attr_length
+        if ((@menus[i]).equal?(menu))
+          @menus[i] = nil
+          break
+        end
+        i += 1
+      end
+    end
+    
+    typesig { [] }
+    def remove_pool
+      pool = @pools[@pool_count - 1]
+      @pools[(@pool_count -= 1)] = nil
+      if ((@pool_count).equal?(0))
+        dictionary = NSThread.current_thread.thread_dictionary
+        dictionary.remove_object_for_key(NSString.string_with("SWT_NSAutoreleasePool"))
+      end
+      pool.release
     end
     
     typesig { [Menu] }
@@ -4566,152 +4585,28 @@ module Org::Eclipse::Swt::Widgets
       end
     end
     
-    typesig { [::Java::Int] }
-    def remove_widget(handle)
-      if ((handle).equal?(0))
-        return nil
-      end
-      widget = nil
-      @property[0] = 0
-      OS._get_control_property(handle, SWT0, SWT0, 4, nil, @property)
-      index = @property[0] - 1
-      if (0 <= index && index < @widget_table.attr_length)
-        widget = @widget_table[index]
-        @widget_table[index] = nil
-        @index_table[index] = @free_slot
-        @free_slot = index
-        OS._remove_control_property(handle, SWT0, SWT0)
-      end
-      return widget
-    end
-    
     typesig { [::Java::Boolean] }
     def run_async_messages(all)
       return @synchronizer.run_async_messages(all)
     end
     
     typesig { [] }
-    def run_enter_exit
-      # OPTIMIZE - no garbage, widget hit tested again in mouse move
-      event_sent = false
-      control = nil
-      the_control = Array.typed(::Java::Int).new(1) { 0 }
-      where = Org::Eclipse::Swt::Internal::Carbon::Point.new
-      OS._get_global_mouse(where)
-      the_window = Array.typed(::Java::Int).new(1) { 0 }
-      if ((OS._find_window(where, the_window)).equal?(OS.attr_in_content))
-        if (!(the_window[0]).equal?(0))
-          rect = Rect.new
-          OS._get_window_bounds(the_window[0], RJava.cast_to_short(OS.attr_k_window_content_rgn), rect)
-          in_point = CGPoint.new
-          in_point.attr_x = where.attr_h - rect.attr_left
-          in_point.attr_y = where.attr_v - rect.attr_top
-          the_root = Array.typed(::Java::Int).new(1) { 0 }
-          OS._get_root_control(the_window[0], the_root)
-          OS._hiview_get_subview_hit(the_root[0], in_point, true, the_control)
-          while (!(the_control[0]).equal?(0) && !OS._is_control_enabled(the_control[0]))
-            OS._get_super_control(the_control[0], the_control)
+    def run_contexts
+      if (!(@contexts).nil?)
+        i = 0
+        while i < @contexts.attr_length
+          if (!(@contexts[i]).nil? && !(@contexts[i].attr_flipped_context).nil?)
+            @contexts[i].attr_flipped_context.flush_graphics
           end
-          propagate = true
-          if (!(the_control[0]).equal?(0))
-            begin
-              widget = get_widget(the_control[0])
-              if (!(widget).nil?)
-                if (widget.is_a?(Control))
-                  cursor_control = widget
-                  if (cursor_control.is_enabled)
-                    if (cursor_control.is_enabled_modal)
-                      if (widget.is_trim_handle(the_control[0]))
-                        propagate = false
-                        break
-                      end
-                      control = cursor_control
-                    end
-                    break
-                  end
-                end
-              end
-              OS._get_super_control(the_control[0], the_control)
-            end while (!(the_control[0]).equal?(0))
-          end
-          if ((control).nil? && propagate)
-            the_control[0] = the_root[0]
-            widget = get_widget(the_control[0])
-            if (!(widget).nil? && widget.is_a?(Control))
-              cursor_control = widget
-              if (cursor_control.is_enabled)
-                if (cursor_control.is_enabled_modal)
-                  control = cursor_control
-                  the_control[0] = control.attr_handle
-                end
-              end
-            end
-          end
-          if (!(control).nil? && !control.contains(RJava.cast_to_int(in_point.attr_x), RJava.cast_to_int(in_point.attr_y)))
-            control = nil
-          end
+          i += 1
         end
       end
-      if (!(control).equal?(@current_control))
-        if (!(@current_control).nil? && !@current_control.is_disposed)
-          event_sent = true
-          chord = OS._get_current_event_button_state
-          modifiers = OS._get_current_event_key_modifiers
-          pt = @current_control.to_control(where.attr_h, where.attr_v)
-          @current_control.send_mouse_event(SWT::MouseExit, RJava.cast_to_short(0), 0, true, chord, RJava.cast_to_short(pt.attr_x), RJava.cast_to_short(pt.attr_y), modifiers)
-          if (!(@mouse_hover_id).equal?(0))
-            OS._remove_event_loop_timer(@mouse_hover_id)
-          end
-          @mouse_hover_id = 0
-          @mouse_moved = false
-        end
-        # widget could be disposed at this point
-        if (!(control).nil? && control.is_disposed)
-          control = nil
-        end
-        if (!((@current_control = control)).nil?)
-          event_sent = true
-          chord = OS._get_current_event_button_state
-          modifiers = OS._get_current_event_key_modifiers
-          pt = @current_control.to_control(where.attr_h, where.attr_v)
-          @current_control.send_mouse_event(SWT::MouseEnter, RJava.cast_to_short(0), 0, true, chord, RJava.cast_to_short(pt.attr_x), RJava.cast_to_short(pt.attr_y), modifiers)
-        end
-      end
-      if (!(control).nil? && @mouse_moved)
-        out_delay = Array.typed(::Java::Int).new(1) { 0 }
-        OS._hmget_tag_delay(out_delay)
-        if (!(@mouse_hover_id).equal?(0))
-          OS._set_event_loop_timer_next_fire_time(@mouse_hover_id, out_delay[0] / 1000.0)
-        else
-          event_loop = OS._get_current_event_loop
-          id = Array.typed(::Java::Int).new(1) { 0 }
-          OS._install_event_loop_timer(event_loop, out_delay[0] / 1000.0, 0.0, @mouse_hover_proc, 0, id)
-          @mouse_hover_id = id[0]
-        end
-        @mouse_moved = false
-      end
-      if (!OS._still_down && !(the_window[0]).equal?(0) && !(the_control[0]).equal?(0))
-        rect = Rect.new
-        OS._get_window_bounds(the_window[0], RJava.cast_to_short(OS.attr_k_window_content_rgn), rect)
-        pt = CGPoint.new
-        OS._hiview_convert_point(pt, the_control[0], 0)
-        where.attr_h -= RJava.cast_to_int(pt.attr_x)
-        where.attr_v -= RJava.cast_to_int(pt.attr_y)
-        OS._get_window_bounds(the_window[0], RJava.cast_to_short(OS.attr_k_window_structure_rgn), rect)
-        where.attr_h -= rect.attr_left
-        where.attr_v -= rect.attr_top
-        modifiers = OS._get_current_event_key_modifiers
-        cursor_was_set = Array.typed(::Java::Boolean).new(1) { false }
-        OS._handle_control_set_cursor(the_control[0], where, RJava.cast_to_short(modifiers), cursor_was_set)
-        if (!cursor_was_set[0])
-          OS._set_theme_cursor(OS.attr_k_theme_arrow_cursor)
-        end
-      end
-      return event_sent
+      return false
     end
     
     typesig { [] }
     def run_deferred_events
+      run = false
       # Run deferred events.  This code is always
       # called  in the Display's thread so it must
       # be re-enterant need not be synchronized.
@@ -4729,42 +4624,43 @@ module Org::Eclipse::Swt::Widgets
         if (!(widget).nil? && !widget.is_disposed)
           item = event.attr_item
           if ((item).nil? || !item.is_disposed)
+            run = true
             widget.notify_listeners(event.attr_type, event)
           end
         end
       end
       # Clear the queue
       @event_queue = nil
-      return true
-    end
-    
-    typesig { [] }
-    def run_event_loop_timers
-      @allow_timers = false
-      result = (OS._receive_next_event(0, nil, OS.attr_k_event_duration_no_wait, false, nil)).equal?(OS.attr_no_err)
-      @allow_timers = true
-      return result
+      return run
     end
     
     typesig { [] }
     def run_paint
-      if (!@needs_paint)
+      if ((@needs_display).nil? && (@needs_display_in_rect).nil?)
         return false
       end
-      @needs_paint = false
-      i = 0
-      while i < @widget_table.attr_length
-        widget = @widget_table[i]
-        if (!(widget).nil? && widget.is_a?(Shell))
-          shell = widget
-          if (!(shell.attr_inval_rgn).equal?(0))
-            inval_rgn = shell.attr_inval_rgn
-            shell.attr_inval_rgn = 0
-            shell.redraw_children(OS._hiview_get_root(shell.attr_shell_handle), inval_rgn)
-            OS._dispose_rgn(inval_rgn)
-          end
+      if (!(@needs_display).nil?)
+        # long
+        count_ = @needs_display.count
+        i = 0
+        while i < count_
+          OS.objc_msg_send(@needs_display.object_at_index(i).attr_id, OS.attr_sel_set_needs_display_, true)
+          i += 1
         end
-        i += 1
+        @needs_display.release
+        @needs_display = nil
+      end
+      if (!(@needs_display_in_rect).nil?)
+        # long
+        count_ = @needs_display_in_rect.count
+        i = 0
+        while i < count_
+          value = NSValue.new(@needs_display_in_rect.object_at_index(i + 1))
+          OS.objc_msg_send(@needs_display_in_rect.object_at_index(i).attr_id, OS.attr_sel_set_needs_display_in_rect_, value.rect_value)
+          i += 2
+        end
+        @needs_display_in_rect.release
+        @needs_display_in_rect = nil
       end
       return true
     end
@@ -4780,15 +4676,13 @@ module Org::Eclipse::Swt::Widgets
         if ((menu).nil?)
           break
         end
+        run_deferred_events
         length_ = @popups.attr_length
         System.arraycopy(@popups, 1, @popups, 0, (length_ -= 1))
         @popups[length_] = nil
-        clear_menu_flags
-        run_deferred_events
         if (!menu.is_disposed)
           menu.__set_visible(true)
         end
-        clear_menu_flags
         result = true
       end
       @popups = nil
@@ -4801,7 +4695,7 @@ module Org::Eclipse::Swt::Widgets
         return false
       end
       @run_settings = false
-      initialize_insets
+      init_colors
       send_event(SWT::Settings, nil)
       shells = get_shells
       i = 0
@@ -4824,10 +4718,9 @@ module Org::Eclipse::Swt::Widgets
       result = false
       i = 0
       while i < @timer_list.attr_length
-        if ((@timer_ids[i]).equal?(-1))
+        if ((@ns_timers[i]).nil? && !(@timer_list[i]).nil?)
           runnable = @timer_list[i]
           @timer_list[i] = nil
-          @timer_ids[i] = 0
           if (!(runnable).nil?)
             result = true
             runnable.run
@@ -4836,15 +4729,6 @@ module Org::Eclipse::Swt::Widgets
         i += 1
       end
       return result
-    end
-    
-    typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
-    def search_proc(next_handler, the_event, user_data)
-      widget = get_widget(user_data)
-      if (!(widget).nil?)
-        return widget.search_proc(next_handler, the_event, user_data)
-      end
-      return OS.attr_event_not_handled_err
     end
     
     typesig { [::Java::Int, Event] }
@@ -4860,14 +4744,48 @@ module Org::Eclipse::Swt::Widgets
       if ((event.attr_time).equal?(0))
         event.attr_time = get_last_event_time
       end
-      if (!filter_event(event))
-        if (!(@event_table).nil?)
-          @event_table.send_event(event)
+      send_event(@event_table, event)
+    end
+    
+    typesig { [EventTable, Event] }
+    def send_event(table, event)
+      begin
+        @send_event_count += 1
+        if (!filter_event(event))
+          if (!(table).nil?)
+            table.send_event(event)
+          end
         end
+      ensure
+        @send_event_count -= 1
       end
     end
     
     class_module.module_eval {
+      typesig { [] }
+      def get_app_name
+        name = nil
+        pid = OS.getpid
+        # long
+        ptr = OS.getenv(ascii("APP_NAME_" + RJava.cast_to_string(pid)))
+        if (!(ptr).equal?(0))
+          name = NSString.string_with_utf8string(ptr)
+        end
+        if ((name).nil? && !(self.attr_app_name).nil?)
+          name = NSString.string_with(self.attr_app_name)
+        end
+        if ((name).nil?)
+          value = NSBundle.main_bundle.object_for_info_dictionary_key(NSString.string_with("CFBundleName"))
+          if (!(value).nil?)
+            name = NSString.new(value)
+          end
+        end
+        if ((name).nil?)
+          name = NSString.string_with("SWT")
+        end
+        return name
+      end
+      
       typesig { [String] }
       # On platforms which support it, sets the application name
       # to be the argument. On Motif, for example, this can be used
@@ -4880,35 +4798,54 @@ module Org::Eclipse::Swt::Widgets
       end
     }
     
+    # TODO use custom timer instead of timerExec
+    attr_accessor :hover_timer
+    alias_method :attr_hover_timer, :hover_timer
+    undef_method :hover_timer
+    alias_method :attr_hover_timer=, :hover_timer=
+    undef_method :hover_timer=
+    
+    # TODO - use custom timer instead of timerExec
+    attr_accessor :caret_timer
+    alias_method :attr_caret_timer, :caret_timer
+    undef_method :caret_timer
+    alias_method :attr_caret_timer=, :caret_timer=
+    undef_method :caret_timer=
+    
+    # TODO - use custom timer instead of timerExec
+    attr_accessor :default_button_timer
+    alias_method :attr_default_button_timer, :default_button_timer
+    undef_method :default_button_timer
+    alias_method :attr_default_button_timer=, :default_button_timer=
+    undef_method :default_button_timer=
+    
     typesig { [Caret] }
     def set_current_caret(caret)
-      if (!(@caret_id).equal?(0))
-        OS._remove_event_loop_timer(@caret_id)
-      end
-      @caret_id = 0
       @current_caret = caret
-      if (!(@current_caret).nil?)
-        blink_rate = @current_caret.attr_blink_rate
-        timer_id = Array.typed(::Java::Int).new(1) { 0 }
-        time = blink_rate / 1000.0
-        event_loop = OS._get_current_event_loop
-        OS._install_event_loop_timer(event_loop, time, time, @caret_proc, 0, timer_id)
-        @caret_id = timer_id[0]
-      end
+      blink_rate = !(@current_caret).nil? ? @current_caret.attr_blink_rate : -1
+      timer_exec(blink_rate, @caret_timer)
     end
     
-    typesig { [::Java::Int] }
-    def set_cursor(cursor)
-      case (cursor)
-      when OS.attr_k_theme_pointing_hand_cursor, OS.attr_k_theme_arrow_cursor, OS.attr_k_theme_spinning_cursor, OS.attr_k_theme_cross_cursor, OS.attr_k_theme_watch_cursor, OS.attr_k_theme_ibeam_cursor, OS.attr_k_theme_not_allowed_cursor, OS.attr_k_theme_resize_left_right_cursor, OS.attr_k_theme_resize_left_cursor, OS.attr_k_theme_resize_right_cursor, OS.attr_k_theme_resize_up_down_cursor, OS.attr_k_theme_resize_up_cursor, OS.attr_k_theme_resize_down_cursor
-        OS._set_theme_cursor(cursor)
-      else
-        if (OS::VERSION >= 0x1040)
-          Cocoa.objc_msg_send(cursor, Cocoa::S_set)
-        else
-          OS._set_cursor(cursor)
-        end
+    typesig { [Control] }
+    def set_cursor(control)
+      cursor = nil
+      if (!(control).nil? && !control.is_disposed)
+        cursor = control.find_cursor
       end
+      if ((cursor).nil?)
+        window_ = @application.key_window
+        if (!(window_).nil?)
+          if (window_.are_cursor_rects_enabled)
+            window_.disable_cursor_rects
+            window_.enable_cursor_rects
+          end
+          return
+        end
+        cursor = get_system_cursor(SWT::CURSOR_ARROW)
+      end
+      @lock_cursor = false
+      cursor.attr_handle.set
+      @lock_cursor = true
     end
     
     typesig { [::Java::Int, ::Java::Int] }
@@ -4986,12 +4923,12 @@ module Org::Eclipse::Swt::Widgets
       end
       if ((key == ADD_WIDGET_KEY))
         data = value
-        handle = (data[0]).int_value
+        object = data[0]
         widget = data[1]
         if ((widget).nil?)
-          remove_widget(handle)
+          remove_widget(object)
         else
-          add_widget(handle, widget)
+          add_widget(object, widget)
         end
       end
       # Remove the key/value pair
@@ -5043,6 +4980,77 @@ module Org::Eclipse::Swt::Widgets
       new_values[@values.attr_length] = value
       @keys = new_keys
       @values = new_values
+    end
+    
+    typesig { [Menu] }
+    def set_menu_bar(menu)
+      if ((menu).equal?(@menu_bar))
+        return
+      end
+      @menu_bar = menu
+      # remove all existing menu items except the application menu
+      menubar = @application.main_menu
+      # For some reason, NSMenu.cancelTracking() does not dismisses
+      # the menu right away when the menu bar is set in a stacked
+      # event loop. The fix is to use CancelMenuTracking() instead.
+      # 
+      # menubar.cancelTracking();
+      OS._cancel_menu_tracking(OS._acquire_root_menu, true, 0)
+      # long
+      count_ = menubar.number_of_items
+      while (count_ > 1)
+        menubar.remove_item_at_index(count_ - 1)
+        count_ -= 1
+      end
+      # set parent of each item to NULL and add them to menubar
+      if (!(menu).nil?)
+        items = menu.get_items
+        i = 0
+        while i < items.attr_length
+          item = items[i]
+          ns_item = item.attr_ns_item
+          ns_item.set_menu(nil)
+          menubar.add_item(ns_item)
+          # Bug in Cocoa: Calling NSMenuItem.setEnabled() for menu item of a menu bar only
+          # works when the menu bar is the current menu bar.  The underline OS menu does get
+          # enabled/disable when that menu is set later on.  The fix is to toggle the
+          # item enabled state to force the underline menu to be updated.
+          enabled = menu.get_enabled && item.get_enabled
+          ns_item.set_enabled(!enabled)
+          ns_item.set_enabled(enabled)
+          i += 1
+        end
+      end
+    end
+    
+    typesig { [Shell] }
+    def set_modal_shell(shell)
+      if ((@modal_shells).nil?)
+        @modal_shells = Array.typed(Shell).new(4) { nil }
+      end
+      index = 0
+      length_ = @modal_shells.attr_length
+      while (index < length_)
+        if ((@modal_shells[index]).equal?(shell))
+          return
+        end
+        if ((@modal_shells[index]).nil?)
+          break
+        end
+        index += 1
+      end
+      if ((index).equal?(length_))
+        new_modal_shells = Array.typed(Shell).new(length_ + 4) { nil }
+        System.arraycopy(@modal_shells, 0, new_modal_shells, 0, length_)
+        @modal_shells = new_modal_shells
+      end
+      @modal_shells[index] = shell
+      shells = get_shells
+      i = 0
+      while i < shells.attr_length
+        shells[i].update_modal
+        i += 1
+      end
     end
     
     typesig { [Object] }
@@ -5104,62 +5112,6 @@ module Org::Eclipse::Swt::Widgets
       end
     end
     
-    typesig { [Menu] }
-    def set_menu_bar(menu)
-      # Feature in the Macintosh.  SetRootMenu() does not
-      # accept NULL to indicate that their should be no
-      # menu bar. The fix is to create a temporary empty
-      # menu, set that to be the menu bar, clear the menu
-      # bar and then delete the temporary menu.
-      if ((menu).equal?(@menu_bar))
-        return
-      end
-      the_menu = 0
-      if ((menu).nil?)
-        out_menu_ref = Array.typed(::Java::Int).new(1) { 0 }
-        OS._create_new_menu(RJava.cast_to_short(ID_TEMPORARY), 0, out_menu_ref)
-        the_menu = out_menu_ref[0]
-      else
-        the_menu = menu.attr_handle
-      end
-      OS._set_root_menu(the_menu)
-      if ((menu).nil?)
-        OS._clear_menu_bar
-        OS._dispose_menu(the_menu)
-      end
-      @menu_bar = menu
-    end
-    
-    typesig { [Shell] }
-    def set_modal_shell(shell)
-      if ((@modal_shells).nil?)
-        @modal_shells = Array.typed(Shell).new(4) { nil }
-      end
-      index = 0
-      length_ = @modal_shells.attr_length
-      while (index < length_)
-        if ((@modal_shells[index]).equal?(shell))
-          return
-        end
-        if ((@modal_shells[index]).nil?)
-          break
-        end
-        index += 1
-      end
-      if ((index).equal?(length_))
-        new_modal_shells = Array.typed(Shell).new(length_ + 4) { nil }
-        System.arraycopy(@modal_shells, 0, new_modal_shells, 0, length_)
-        @modal_shells = new_modal_shells
-      end
-      @modal_shells[index] = shell
-      shells = get_shells
-      i = 0
-      while i < shells.attr_length
-        shells[i].update_modal
-        i += 1
-      end
-    end
-    
     typesig { [] }
     # Causes the user-interface thread to <em>sleep</em> (that is,
     # to be put in a state where it does not consume CPU cycles)
@@ -5178,34 +5130,15 @@ module Org::Eclipse::Swt::Widgets
       if (!(get_message_count).equal?(0))
         return true
       end
-      dispose_windows
-      # Feature in the Macintosh.  No kAppearanceEventClass event exists
-      # for a change of the Highlight Color.  The fix is to poll for the
-      # change while waiting for an event.
-      if (!(@event_table).nil? && @event_table.hooks(SWT::Settings))
-        color = RGBColor.new
-        result = 0
-        depth = get_depth
-        begin
-          @allow_timers = @run_async_messages = false
-          result = OS._cfrun_loop_run_in_mode(OS.k_cfrun_loop_default_mode, 0.5, true)
-          @allow_timers = @run_async_messages = true
-          if ((result).equal?(OS.attr_k_cfrun_loop_run_timed_out))
-            OS._get_theme_brush_as_color(RJava.cast_to_short(OS.attr_k_theme_brush_primary_highlight_color), RJava.cast_to_short(depth), true, color)
-            if (!(@highlight_color.attr_red).equal?(color.attr_red) || !(@highlight_color.attr_green).equal?(color.attr_green) || !(@highlight_color.attr_blue).equal?(color.attr_blue))
-              @highlight_color = color
-              @run_settings = true
-              return true
-            end
-          end
-        end while ((result).equal?(OS.attr_k_cfrun_loop_run_timed_out))
-        return (result).equal?(OS.attr_k_cfrun_loop_run_handled_source)
+      begin
+        add_pool
+        @allow_timers = @run_async_messages = false
+        NSRunLoop.current_run_loop.run_mode(OS::NSDefaultRunLoopMode, NSDate.distant_future)
+        @allow_timers = @run_async_messages = true
+      ensure
+        remove_pool
       end
-      # Wait for an event and timeout after a day
-      @allow_timers = @run_async_messages = false
-      result = OS._cfrun_loop_run_in_mode(OS.k_cfrun_loop_default_mode, 60 * 60 * 24, true)
-      @allow_timers = @run_async_messages = true
-      return (result).equal?(OS.attr_k_cfrun_loop_run_handled_source)
+      return true
     end
     
     typesig { [::Java::Int] }
@@ -5245,31 +5178,6 @@ module Org::Eclipse::Swt::Widgets
       synchronizer.sync_exec(runnable)
     end
     
-    typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
-    def text_input_proc(next_handler, the_event, user_data)
-      the_window = OS._get_user_focus_window
-      if (!(the_window).equal?(0))
-        the_control = Array.typed(::Java::Int).new(1) { 0 }
-        OS._get_keyboard_focus(the_window, the_control)
-        widget = get_widget(the_control[0])
-        if (!(widget).nil?)
-          out_data = MenuTrackingData.new
-          if (!(OS._get_menu_tracking_data(0, out_data)).equal?(OS.attr_no_err))
-            # Stop the default event handler from activating the default button
-            OS._get_window_default_button(the_window, the_control)
-            OS._set_window_default_button(the_window, 0)
-            result = widget.text_input_proc(next_handler, the_event, user_data)
-            if ((result).equal?(OS.attr_event_not_handled_err))
-              result = OS._call_next_event_handler(next_handler, the_event)
-            end
-            OS._set_window_default_button(the_window, the_control[0])
-            return result
-          end
-        end
-      end
-      return OS.attr_event_not_handled_err
-    end
-    
     typesig { [::Java::Int, Runnable] }
     # Causes the <code>run()</code> method of the runnable to
     # be invoked by the user-interface thread after the specified
@@ -5296,14 +5204,15 @@ module Org::Eclipse::Swt::Widgets
     # @see #asyncExec
     def timer_exec(milliseconds, runnable)
       check_device
+      # TODO - remove a timer, reschedule a timer not tested
       if ((runnable).nil?)
         error(SWT::ERROR_NULL_ARGUMENT)
       end
       if ((@timer_list).nil?)
         @timer_list = Array.typed(Runnable).new(4) { nil }
       end
-      if ((@timer_ids).nil?)
-        @timer_ids = Array.typed(::Java::Int).new(4) { 0 }
+      if ((@ns_timers).nil?)
+        @ns_timers = Array.typed(NSTimer).new(4) { nil }
       end
       index = 0
       while (index < @timer_list.attr_length)
@@ -5313,15 +5222,20 @@ module Org::Eclipse::Swt::Widgets
         index += 1
       end
       if (!(index).equal?(@timer_list.attr_length))
-        timer_id = @timer_ids[index]
-        if (milliseconds < 0)
-          OS._remove_event_loop_timer(timer_id)
+        timer = @ns_timers[index]
+        if ((timer).nil?)
           @timer_list[index] = nil
-          @timer_ids[index] = 0
         else
-          OS._set_event_loop_timer_next_fire_time(timer_id, milliseconds / 1000.0)
+          if (milliseconds < 0)
+            timer.invalidate
+            timer.release
+            @timer_list[index] = nil
+            @ns_timers[index] = nil
+          else
+            timer.set_fire_date(NSDate.date_with_time_interval_since_now(milliseconds / 1000.0))
+          end
+          return
         end
-        return
       end
       if (milliseconds < 0)
         return
@@ -5337,22 +5251,29 @@ module Org::Eclipse::Swt::Widgets
         new_timer_list = Array.typed(Runnable).new(@timer_list.attr_length + 4) { nil }
         System.arraycopy(@timer_list, 0, new_timer_list, 0, @timer_list.attr_length)
         @timer_list = new_timer_list
-        new_timer_ids = Array.typed(::Java::Int).new(@timer_ids.attr_length + 4) { 0 }
-        System.arraycopy(@timer_ids, 0, new_timer_ids, 0, @timer_ids.attr_length)
-        @timer_ids = new_timer_ids
+        new_timer_ids = Array.typed(NSTimer).new(@ns_timers.attr_length + 4) { nil }
+        System.arraycopy(@ns_timers, 0, new_timer_ids, 0, @ns_timers.attr_length)
+        @ns_timers = new_timer_ids
       end
-      timer_id = Array.typed(::Java::Int).new(1) { 0 }
-      event_loop = OS._get_current_event_loop
-      OS._install_event_loop_timer(event_loop, milliseconds / 1000.0, 0.0, @timer_proc, index, timer_id)
-      if (!(timer_id[0]).equal?(0))
-        @timer_ids[index] = timer_id[0]
+      user_info = NSNumber.number_with_int(index)
+      timer = NSTimer.scheduled_timer_with_time_interval(milliseconds / 1000.0, @timer_delegate, OS.attr_sel_timer_proc_, user_info, false)
+      NSRunLoop.current_run_loop.add_timer(timer, OS::NSEventTrackingRunLoopMode)
+      timer.retain
+      if (!(timer).nil?)
+        @ns_timers[index] = timer
         @timer_list[index] = runnable
       end
     end
     
-    typesig { [::Java::Int, ::Java::Int] }
-    def timer_proc(id, index)
-      OS._remove_event_loop_timer(id)
+    typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
+    # long
+    # long
+    # long
+    # long
+    def timer_proc(id, sel, timer_id)
+      timer = NSTimer.new(timer_id)
+      number = NSNumber.new(timer.user_info)
+      index = number.int_value
       if ((@timer_list).nil?)
         return 0
       end
@@ -5360,33 +5281,17 @@ module Org::Eclipse::Swt::Widgets
         if (@allow_timers)
           runnable = @timer_list[index]
           @timer_list[index] = nil
-          @timer_ids[index] = 0
+          @ns_timers[index] = nil
           if (!(runnable).nil?)
             runnable.run
           end
         else
-          @timer_ids[index] = -1
+          @ns_timers[index] = nil
           wake_thread
         end
       end
-      return 0
-    end
-    
-    typesig { [::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int] }
-    def tracking_proc(browser, item_id, property, the_rect, start_pt, modifiers)
-      widget = get_widget(browser)
-      if (!(widget).nil?)
-        return widget.tracking_proc(browser, item_id, property, the_rect, start_pt, modifiers)
-      end
-      return OS.attr_no_err
-    end
-    
-    typesig { [::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int] }
-    def tray_item_proc(target, user_data, selector, event)
-      item = OS._jniget_object(user_data)
-      if (!(item).nil?)
-        return item.tray_item_proc(target, user_data, selector, event)
-      end
+      timer.invalidate
+      timer.release
       return 0
     end
     
@@ -5411,25 +5316,11 @@ module Org::Eclipse::Swt::Widgets
         end
         i += 1
       end
-      # This code is intentionally commented.
-      # 
-      # int [] outEvent = new int [1];
-      # int [] mask = new int [] {OS.kEventClassWindow, OS.kEventWindowUpdate};
-      # while (OS.ReceiveNextEvent (mask.length / 2, mask, OS.kEventDurationNoWait, true, outEvent) == OS.noErr) {
-      # /*
-      # * Bug in the Macintosh.  For some reason, when a hierarchy of
-      # * windows is disposed from kEventWindowClose, despite the fact
-      # * that DisposeWindow() has been called, the window is not
-      # * disposed and there are outstandings kEventWindowUpdate events
-      # * in the event queue.  Dispatching these events will cause a
-      # * segment fault.  The fix is to dispatch events to visible
-      # * windows only.
-      # */
-      # int [] theWindow = new int [1];
-      # OS.GetEventParameter (outEvent [0], OS.kEventParamDirectObject, OS.typeWindowRef, null, 4, null, theWindow);
-      # if (OS.IsWindowVisible (theWindow [0])) OS.SendEventToEventTarget (outEvent [0], OS.GetEventDispatcherTarget ());
-      # OS.ReleaseEvent (outEvent [0]);
-      # }
+    end
+    
+    typesig { [] }
+    def update_default_button
+      timer_exec(has_default_button ? DEFAULT_BUTTON_INTERVAL : -1, @default_button_timer)
     end
     
     typesig { [] }
@@ -5446,10 +5337,17 @@ module Org::Eclipse::Swt::Widgets
         end
         i += 1
       end
-      if (enabled)
-        OS._enable_menu_command(0, OS.attr_k_hicommand_quit)
-      else
-        OS._disable_menu_command(0, OS.attr_k_hicommand_quit)
+      mainmenu = @application.main_menu
+      appitem = mainmenu.item_at_index(0)
+      if (!(appitem).nil?)
+        sm = appitem.submenu
+        # Normally this would be sel_terminate_ but we changed it so terminate: doesn't kill the app.
+        # long
+        quit_index = sm.index_of_item_with_target(self.attr_application_delegate, OS.attr_sel_quit_requested_)
+        if (!(quit_index).equal?(-1))
+          quit_item = sm.item_at_index(quit_index)
+          quit_item.set_enabled(enabled)
+        end
       end
     end
     
@@ -5477,25 +5375,1273 @@ module Org::Eclipse::Swt::Widgets
     
     typesig { [] }
     def wake_thread
-      OS._cfrun_loop_source_signal(@run_loop_source)
-      OS._cfrun_loop_wake_up(@run_loop)
+      # new pool?
+      object = NSObject.new.alloc.init
+      object.perform_selector_on_main_thread(OS.attr_sel_release, nil, false)
+    end
+    
+    typesig { [::Java::Boolean] }
+    def find_control(check_trim)
+      return find_control(check_trim, nil)
+    end
+    
+    typesig { [::Java::Boolean, Array.typed(NSView)] }
+    def find_control(check_trim, hit_view)
+      view = nil
+      screen_location = NSEvent.mouse_location
+      windows_ = @application.ordered_windows
+      i = 0
+      # 64
+      count_ = RJava.cast_to_int(windows_.count)
+      while i < count_ && (view).nil?
+        window_ = NSWindow.new(windows_.object_at_index(i))
+        content_view_ = window_.content_view
+        if (!(content_view_).nil? && OS._nspoint_in_rect(screen_location, window_.frame))
+          location = window_.convert_screen_to_base(screen_location)
+          view = content_view_.hit_test(location)
+          if ((view).nil? && !check_trim)
+            view = content_view_
+          end
+          break
+        end
+        i += 1
+      end
+      control = nil
+      if (!(view).nil?)
+        begin
+          widget = get_widget(view)
+          if (widget.is_a?(Control))
+            control = widget
+            break
+          end
+          view = view.superview
+        end while (!(view).nil?)
+      end
+      if (check_trim)
+        if (!(control).nil? && control.is_trim(view))
+          control = nil
+        end
+      end
+      if (!(control).nil? && !(hit_view).nil?)
+        hit_view[0] = view
+      end
+      return control
+    end
+    
+    typesig { [::Java::Int, ::Java::Int] }
+    # long
+    # long
+    def finish_launching(id, sel)
+      # [NSApplication finishLaunching] cannot run multiple times otherwise
+      # multiple main menus are added.
+      if (self.attr_launched)
+        return
+      end
+      self.attr_launched = true
+      super_struct = Objc_super.new
+      super_struct.attr_receiver = id
+      super_struct.attr_super_class = OS.objc_msg_send(id, OS.attr_sel_superclass)
+      OS.objc_msg_send_super(super_struct, sel)
     end
     
     typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
-    def window_proc(next_handler, the_event, user_data)
-      widget = get_widget(user_data)
-      if ((widget).nil?)
-        the_window = Array.typed(::Java::Int).new(1) { 0 }
-        OS._get_event_parameter(the_event, OS.attr_k_event_param_direct_object, OS.attr_type_window_ref, nil, 4, nil, the_window)
-        the_root = Array.typed(::Java::Int).new(1) { 0 }
-        OS._get_root_control(the_window[0], the_root)
-        widget = get_widget(the_root[0])
-      end
-      if (!(widget).nil?)
-        return widget.window_proc(next_handler, the_event, user_data)
-      end
-      return OS.attr_event_not_handled_err
+    # long
+    # long
+    # long
+    def application_did_become_active(id, sel, notification)
+      check_focus
+      check_enter_exit(find_control(true), nil, false)
     end
+    
+    typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
+    # long
+    # long
+    # long
+    def application_did_resign_active(id, sel, notification)
+      check_focus
+      check_enter_exit(nil, nil, false)
+    end
+    
+    typesig { [::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int] }
+    # long
+    # long
+    # long
+    # long
+    # long
+    # long
+    # long
+    def application_next_event_matching_mask(id, sel, mask, expiration, mode, dequeue)
+      if (!(dequeue).equal?(0) && !(@tracking_control).nil? && !@tracking_control.is_disposed)
+        run_deferred_events
+      end
+      super_struct = Objc_super.new
+      super_struct.attr_receiver = id
+      super_struct.attr_super_class = OS.objc_msg_send(id, OS.attr_sel_superclass)
+      # long
+      result = OS.objc_msg_send_super(super_struct, sel, mask, expiration, mode, !(dequeue).equal?(0))
+      if (!(result).equal?(0))
+        if (!(dequeue).equal?(0) && !(@tracking_control).nil? && !@tracking_control.is_disposed)
+          application_send_tracking_event(NSEvent.new(result), @tracking_control)
+        end
+      end
+      return result
+    end
+    
+    typesig { [NSEvent, Control] }
+    def application_send_tracking_event(ns_event, tracking_control)
+      # 64
+      type_ = RJava.cast_to_int(ns_event.type)
+      case (type_)
+      # FALL THROUGH
+      when OS::NSLeftMouseDown, OS::NSRightMouseDown, OS::NSOtherMouseDown
+        tracking_control.send_mouse_event(ns_event, SWT::MouseDown, true)
+      when OS::NSLeftMouseUp, OS::NSRightMouseUp, OS::NSOtherMouseUp
+        check_enter_exit(find_control(true), ns_event, true)
+        if (tracking_control.is_disposed)
+          return
+        end
+        tracking_control.send_mouse_event(ns_event, SWT::MouseUp, true)
+      when OS::NSLeftMouseDragged, OS::NSRightMouseDragged, OS::NSOtherMouseDragged
+        check_enter_exit(tracking_control, ns_event, true)
+        if (tracking_control.is_disposed)
+          return
+        end
+      when OS::NSMouseMoved
+        tracking_control.send_mouse_event(ns_event, SWT::MouseMove, true)
+      end
+    end
+    
+    typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
+    # long
+    # long
+    # long
+    def application_send_event(id, sel, event)
+      ns_event = NSEvent.new(event)
+      window_ = ns_event.window
+      # 64
+      type_ = RJava.cast_to_int(ns_event.type)
+      down = false
+      case (type_)
+      when OS::NSLeftMouseDown, OS::NSRightMouseDown, OS::NSOtherMouseDown
+        down = true
+        if (!(window_).nil?)
+          shell = get_widget(window_.attr_id)
+          if (!(shell).nil?)
+            modal_shell = shell.get_modal_shell
+            if (!(modal_shell).nil?)
+              if (down)
+                if (!@application.is_active)
+                  @application.activate_ignoring_other_apps(true)
+                end
+                rect = window_.content_rect_for_frame_rect(window_.frame)
+                pt = window_.convert_base_to_screen(ns_event.location_in_window)
+                if (OS._nspoint_in_rect(pt, rect))
+                  beep
+                end
+              end
+              return
+            end
+          end
+        end
+      when OS::NSLeftMouseUp, OS::NSRightMouseUp, OS::NSOtherMouseUp, OS::NSLeftMouseDragged, OS::NSRightMouseDragged, OS::NSOtherMouseDragged, OS::NSMouseMoved, OS::NSMouseEntered, OS::NSMouseExited, OS::NSKeyDown, OS::NSKeyUp, OS::NSScrollWheel
+        if (!(window_).nil?)
+          shell = get_widget(window_.attr_id)
+          if (!(shell).nil?)
+            modal_shell = shell.get_modal_shell
+            if (!(modal_shell).nil?)
+              if (down)
+                if (!@application.is_active)
+                  @application.activate_ignoring_other_apps(true)
+                end
+                rect = window_.content_rect_for_frame_rect(window_.frame)
+                pt = window_.convert_base_to_screen(ns_event.location_in_window)
+                if (OS._nspoint_in_rect(pt, rect))
+                  beep
+                end
+              end
+              return
+            end
+          end
+        end
+      end
+      @send_event = true
+      # Feature in Cocoa. The help key triggers context-sensitive help but doesn't get forwarded to the window as a key event.
+      # If the event is destined for the key window, is the help key, and is an NSKeyDown, send it directly to the window first.
+      if (!(window_).nil? && window_.is_key_window && (ns_event.type).equal?(OS::NSKeyDown) && !((ns_event.modifier_flags & OS::NSHelpKeyMask)).equal?(0))
+        window_.send_event(ns_event)
+      end
+      # Feature in Cocoa. NSKeyUp events are not delivered to the window if the command key is down.
+      # If the event is destined for the key window, and it's a key up and the command key is down, send it directly to the window.
+      if (!(window_).nil? && window_.is_key_window && (ns_event.type).equal?(OS::NSKeyUp) && !((ns_event.modifier_flags & OS::NSCommandKeyMask)).equal?(0))
+        window_.send_event(ns_event)
+      else
+        super_struct = Objc_super.new
+        super_struct.attr_receiver = id
+        super_struct.attr_super_class = OS.objc_msg_send(id, OS.attr_sel_superclass)
+        OS.objc_msg_send_super(super_struct, sel, event)
+      end
+      @send_event = false
+    end
+    
+    typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
+    # long
+    # long
+    # long
+    def application_will_finish_launching(id, sel, notification)
+      loaded = false
+      bundle = NSBundle.bundle_with_identifier(NSString.string_with("com.apple.JavaVM"))
+      dict = NSDictionary.dictionary_with_object(self.attr_application_delegate, NSString.string_with("NSOwner"))
+      path = bundle.path_for_resource(NSString.string_with("DefaultApp"), NSString.string_with("nib"))
+      if (!loaded)
+        loaded = !(path).nil? && NSBundle.load_nib_file(path, dict, 0)
+      end
+      if (!loaded)
+        resource_path_ = bundle.resource_path
+        path = !(resource_path_).nil? ? resource_path_.string_by_appending_string(NSString.string_with("/English.lproj/DefaultApp.nib")) : nil
+        loaded = !(path).nil? && NSBundle.load_nib_file(path, dict, 0)
+      end
+      if (!loaded)
+        path = NSString.string_with(RJava.cast_to_string(System.get_property("java.home")) + "/../Resources/English.lproj/DefaultApp.nib")
+        loaded = !(path).nil? && NSBundle.load_nib_file(path, dict, 0)
+      end
+      if (!loaded)
+        create_main_menu
+      end
+      # replace %@ with application name
+      mainmenu = @application.main_menu
+      appitem = mainmenu.item_at_index(0)
+      if (!(appitem).nil?)
+        name = get_app_name
+        match = NSString.string_with("%@")
+        appitem.set_title(name)
+        sm = appitem.submenu
+        ia = sm.item_array
+        i = 0
+        while i < ia.count
+          ni = NSMenuItem.new(ia.object_at_index(i))
+          title_ = ni.title.string_by_replacing_occurrences_of_string(match, name)
+          ni.set_title(title_)
+          i += 1
+        end
+        # long
+        quit_index = sm.index_of_item_with_target(self.attr_application_delegate, OS.attr_sel_terminate_)
+        if (!(quit_index).equal?(-1))
+          quit_item = sm.item_at_index(quit_index)
+          quit_item.set_action(OS.attr_sel_quit_requested_)
+        end
+      end
+    end
+    
+    class_module.module_eval {
+      typesig { [::Java::Int, ::Java::Int] }
+      # long
+      # long
+      # long
+      def application_proc(id, sel)
+        # TODO optimize getting the display
+        display = get_current
+        if ((display).nil?)
+          return 0
+        end
+        if ((sel).equal?(OS.attr_sel_is_running))
+          # #245724: [NSApplication isRunning] must return true to allow the AWT to load correctly.
+          return display.is_disposed ? 0 : 1
+        end
+        if ((sel).equal?(OS.attr_sel_finish_launching))
+          display.finish_launching(id, sel)
+        end
+        return 0
+      end
+      
+      typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
+      # long
+      # long
+      # long
+      # long
+      def application_proc(id, sel, arg0)
+        # TODO optimize getting the display
+        display = get_current
+        if ((display).nil?)
+          return 0
+        end
+        application = display.attr_application
+        if ((sel).equal?(OS.attr_sel_send_event_))
+          display.application_send_event(id, sel, arg0)
+        else
+          if ((sel).equal?(OS.attr_sel_application_will_finish_launching_))
+            display.application_will_finish_launching(id, sel, arg0)
+          else
+            if ((sel).equal?(OS.attr_sel_terminate_))
+              # Do nothing here -- without a definition of sel_terminate we get a warning dumped to the console.
+            else
+              if ((sel).equal?(OS.attr_sel_order_front_standard_about_panel_))
+                # application.orderFrontStandardAboutPanel(application);
+              else
+                if ((sel).equal?(OS.attr_sel_hide_other_applications_))
+                  application.hide_other_applications(application)
+                else
+                  if ((sel).equal?(OS.attr_sel_hide_))
+                    application.hide(application)
+                  else
+                    if ((sel).equal?(OS.attr_sel_unhide_all_applications_))
+                      application.unhide_all_applications(application)
+                    else
+                      if ((sel).equal?(OS.attr_sel_quit_requested_))
+                        if (!display.attr_disposing)
+                          event = Event.new
+                          display.send_event(SWT::Close, event)
+                          if (event.attr_doit)
+                            display.dispose
+                          end
+                        end
+                      else
+                        if ((sel).equal?(OS.attr_sel_application_did_become_active_))
+                          display.application_did_become_active(id, sel, arg0)
+                        else
+                          if ((sel).equal?(OS.attr_sel_application_did_resign_active_))
+                            display.application_did_resign_active(id, sel, arg0)
+                          end
+                        end
+                      end
+                    end
+                  end
+                end
+              end
+            end
+          end
+        end
+        return 0
+      end
+      
+      typesig { [::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int] }
+      # long
+      # long
+      # long
+      # long
+      # long
+      # long
+      # long
+      def application_proc(id, sel, arg0, arg1, arg2, arg3)
+        # TODO optimize getting the display
+        display = get_current
+        if ((display).nil?)
+          return 0
+        end
+        if ((sel).equal?(OS.attr_sel_next_event_matching_mask_until_date_in_mode_dequeue_))
+          return display.application_next_event_matching_mask(id, sel, arg0, arg1, arg2, arg3)
+        end
+        return 0
+      end
+      
+      typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
+      # long
+      # long
+      # long
+      # long
+      def dialog_proc(id, sel, arg0)
+        # long
+        # long
+        jni_ref = Array.typed(::Java::Int).new(1) { 0 }
+        OS.object_get_instance_variable(id, SWT_OBJECT, jni_ref)
+        if ((jni_ref[0]).equal?(0))
+          return 0
+        end
+        if ((sel).equal?(OS.attr_sel_change_color_))
+          dialog = OS._jniget_object(jni_ref[0])
+          if ((dialog).nil?)
+            return 0
+          end
+          dialog.change_color(id, sel, arg0)
+        else
+          if ((sel).equal?(OS.attr_sel_change_font_))
+            dialog = OS._jniget_object(jni_ref[0])
+            if ((dialog).nil?)
+              return 0
+            end
+            dialog.change_font(id, sel, arg0)
+          else
+            if ((sel).equal?(OS.attr_sel_send_selection_))
+              dialog = OS._jniget_object(jni_ref[0])
+              if ((dialog).nil?)
+                return 0
+              end
+              dialog.send_selection(id, sel, arg0)
+            else
+              if ((sel).equal?(OS.attr_sel_window_will_close_))
+                object = OS._jniget_object(jni_ref[0])
+                if (object.is_a?(FontDialog))
+                  (object).window_will_close(id, sel, arg0)
+                else
+                  if (object.is_a?(ColorDialog))
+                    (object).window_will_close(id, sel, arg0)
+                  end
+                end
+              end
+            end
+          end
+        end
+        return 0
+      end
+      
+      typesig { [::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int] }
+      # long
+      # long
+      # long
+      # long
+      # long
+      def dialog_proc(id, sel, arg0, arg1)
+        # long
+        # long
+        jni_ref = Array.typed(::Java::Int).new(1) { 0 }
+        OS.object_get_instance_variable(id, SWT_OBJECT, jni_ref)
+        if ((jni_ref[0]).equal?(0))
+          return 0
+        end
+        if ((sel).equal?(OS.attr_sel_panel_should_show_filename_))
+          dialog = OS._jniget_object(jni_ref[0])
+          if ((dialog).nil?)
+            return 0
+          end
+          return dialog.panel_should_show_filename(id, sel, arg0, arg1)
+        end
+        return 0
+      end
+      
+      typesig { [::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int] }
+      # long
+      # long
+      # long
+      # long
+      # long
+      # long
+      def dialog_proc(id, sel, arg0, arg1, arg2)
+        # long
+        # long
+        jni_ref = Array.typed(::Java::Int).new(1) { 0 }
+        OS.object_get_instance_variable(id, SWT_OBJECT, jni_ref)
+        if ((jni_ref[0]).equal?(0))
+          return 0
+        end
+        if ((sel).equal?(OS.attr_sel_panel_did_end_return_code_context_info_))
+          dialog = OS._jniget_object(jni_ref[0])
+          if ((dialog).nil?)
+            return 0
+          end
+          dialog.panel_did_end_return_code_context_info(id, sel, arg0, arg1, arg2)
+        end
+        return 0
+      end
+      
+      typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
+      # long
+      # long
+      # long
+      # long
+      def field_editor_proc(id, sel, arg0)
+        widget = nil
+        view = NSView.new(id)
+        begin
+          widget = _get_widget(view.attr_id)
+          if (!(widget).nil?)
+            break
+          end
+          view = view.superview
+        end while (!(view).nil?)
+        if ((widget).nil?)
+          return 0
+        end
+        if ((sel).equal?(OS.attr_sel_key_down_))
+          widget.key_down(id, sel, arg0)
+        else
+          if ((sel).equal?(OS.attr_sel_key_up_))
+            widget.key_up(id, sel, arg0)
+          else
+            if ((sel).equal?(OS.attr_sel_flags_changed_))
+              widget.flags_changed(id, sel, arg0)
+            else
+              if ((sel).equal?(OS.attr_sel_insert_text_))
+                return widget.insert_text(id, sel, arg0) ? 1 : 0
+              else
+                if ((sel).equal?(OS.attr_sel_do_command_by_selector_))
+                  widget.do_command_by_selector(id, sel, arg0)
+                else
+                  if ((sel).equal?(OS.attr_sel_menu_for_event_))
+                    return widget.menu_for_event(id, sel, arg0)
+                  else
+                    if ((sel).equal?(OS.attr_sel_mouse_down_))
+                      widget.mouse_down(id, sel, arg0)
+                    else
+                      if ((sel).equal?(OS.attr_sel_mouse_up_))
+                        widget.mouse_up(id, sel, arg0)
+                      else
+                        if ((sel).equal?(OS.attr_sel_mouse_moved_))
+                          widget.mouse_moved(id, sel, arg0)
+                        else
+                          if ((sel).equal?(OS.attr_sel_mouse_dragged_))
+                            widget.mouse_dragged(id, sel, arg0)
+                          else
+                            if ((sel).equal?(OS.attr_sel_mouse_entered_))
+                              widget.mouse_entered(id, sel, arg0)
+                            else
+                              if ((sel).equal?(OS.attr_sel_mouse_exited_))
+                                widget.mouse_exited(id, sel, arg0)
+                              else
+                                if ((sel).equal?(OS.attr_sel_cursor_update_))
+                                  widget.cursor_update(id, sel, arg0)
+                                else
+                                  if ((sel).equal?(OS.attr_sel_right_mouse_down_))
+                                    widget.right_mouse_down(id, sel, arg0)
+                                  else
+                                    if ((sel).equal?(OS.attr_sel_right_mouse_dragged_))
+                                      widget.right_mouse_dragged(id, sel, arg0)
+                                    else
+                                      if ((sel).equal?(OS.attr_sel_right_mouse_up_))
+                                        widget.right_mouse_up(id, sel, arg0)
+                                      else
+                                        if ((sel).equal?(OS.attr_sel_other_mouse_down_))
+                                          widget.other_mouse_down(id, sel, arg0)
+                                        else
+                                          if ((sel).equal?(OS.attr_sel_other_mouse_up_))
+                                            widget.other_mouse_up(id, sel, arg0)
+                                          else
+                                            if ((sel).equal?(OS.attr_sel_other_mouse_dragged_))
+                                              widget.other_mouse_dragged(id, sel, arg0)
+                                            end
+                                          end
+                                        end
+                                      end
+                                    end
+                                  end
+                                end
+                              end
+                            end
+                          end
+                        end
+                      end
+                    end
+                  end
+                end
+              end
+            end
+          end
+        end
+        return 0
+      end
+      
+      typesig { [::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int] }
+      # long
+      # long
+      # long
+      # long
+      # long
+      def field_editor_proc(id, sel, arg0, arg1)
+        widget = nil
+        view = NSView.new(id)
+        begin
+          widget = _get_widget(view.attr_id)
+          if (!(widget).nil?)
+            break
+          end
+          view = view.superview
+        end while (!(view).nil?)
+        if ((sel).equal?(OS.attr_sel_should_change_text_in_range_replacement_string_))
+          return widget.should_change_text_in_range_replacement_string(id, sel, arg0, arg1) ? 1 : 0
+        end
+        return 0
+      end
+      
+      typesig { [::Java::Int, ::Java::Int] }
+      # long
+      # long
+      # long
+      def window_proc(id, sel)
+        # Feature in Cocoa.  In Cocoa, the default button animation is done
+        # in a separate thread that calls drawRect() and isOpaque() from
+        # outside the UI thread.  This means that those methods, and application
+        # code that runs as a result of those methods, must be thread safe.
+        # In SWT, paint events must happen in the UI thread.  The fix is
+        # to detect a non-UI thread and avoid the drawing. Instead, the
+        # default button is animated by a timer.
+        if (!NSThread.is_main_thread)
+          if ((sel).equal?(OS.attr_sel_is_opaque))
+            return 1
+          end
+        end
+        widget = _get_widget(id)
+        if ((widget).nil?)
+          return 0
+        end
+        if ((sel).equal?(OS.attr_sel_send_selection))
+          widget.send_selection
+        else
+          if ((sel).equal?(OS.attr_sel_send_double_selection))
+            widget.send_double_selection
+          else
+            if ((sel).equal?(OS.attr_sel_send_vertical_selection))
+              widget.send_vertical_selection
+            else
+              if ((sel).equal?(OS.attr_sel_send_horizontal_selection))
+                widget.send_horizontal_selection
+              else
+                if ((sel).equal?(OS.attr_sel_send_search_selection))
+                  widget.send_search_selection
+                else
+                  if ((sel).equal?(OS.attr_sel_send_cancel_selection))
+                    widget.send_cancel_selection
+                  else
+                    if ((sel).equal?(OS.attr_sel_accepts_first_responder))
+                      return widget.accepts_first_responder(id, sel) ? 1 : 0
+                    else
+                      if ((sel).equal?(OS.attr_sel_become_first_responder))
+                        return widget.become_first_responder(id, sel) ? 1 : 0
+                      else
+                        if ((sel).equal?(OS.attr_sel_resign_first_responder))
+                          return widget.resign_first_responder(id, sel) ? 1 : 0
+                        else
+                          if ((sel).equal?(OS.attr_sel_is_opaque))
+                            return widget.is_opaque(id, sel) ? 1 : 0
+                          else
+                            if ((sel).equal?(OS.attr_sel_is_flipped))
+                              return widget.is_flipped(id, sel) ? 1 : 0
+                            else
+                              if ((sel).equal?(OS.attr_sel_can_become_key_view))
+                                return widget.can_become_key_view(id, sel) ? 1 : 0
+                              else
+                                if ((sel).equal?(OS.attr_sel_become_key_window))
+                                  widget.become_key_window(id, sel)
+                                else
+                                  if ((sel).equal?(OS.attr_sel_unmark_text))
+                                    # TODO not called?
+                                  else
+                                    if ((sel).equal?(OS.attr_sel_valid_attributes_for_marked_text))
+                                      return widget.valid_attributes_for_marked_text(id, sel)
+                                    else
+                                      if ((sel).equal?(OS.attr_sel_marked_range))
+                                        range = widget.marked_range(id, sel)
+                                        # NOTE that this is freed in C
+                                        # long
+                                        result = OS.malloc(NSRange.attr_sizeof)
+                                        OS.memmove(result, range, NSRange.attr_sizeof)
+                                        return result
+                                      else
+                                        if ((sel).equal?(OS.attr_sel_selected_range))
+                                          range = widget.selected_range(id, sel)
+                                          # NOTE that this is freed in C
+                                          # long
+                                          result = OS.malloc(NSRange.attr_sizeof)
+                                          OS.memmove(result, range, NSRange.attr_sizeof)
+                                          return result
+                                        else
+                                          if ((sel).equal?(OS.attr_sel_cell_size))
+                                            size_ = widget.cell_size(id, sel)
+                                            # NOTE that this is freed in C
+                                            # long
+                                            result = OS.malloc(NSSize.attr_sizeof)
+                                            OS.memmove(result, size_, NSSize.attr_sizeof)
+                                            return result
+                                          else
+                                            if ((sel).equal?(OS.attr_sel_has_marked_text))
+                                              return widget.has_marked_text(id, sel) ? 1 : 0
+                                            else
+                                              if ((sel).equal?(OS.attr_sel_can_become_key_window))
+                                                return widget.can_become_key_window(id, sel) ? 1 : 0
+                                              else
+                                                if ((sel).equal?(OS.attr_sel_accessibility_action_names))
+                                                  return widget.accessibility_action_names(id, sel)
+                                                else
+                                                  if ((sel).equal?(OS.attr_sel_accessibility_attribute_names))
+                                                    return widget.accessibility_attribute_names(id, sel)
+                                                  else
+                                                    if ((sel).equal?(OS.attr_sel_accessibility_parameterized_attribute_names))
+                                                      return widget.accessibility_parameterized_attribute_names(id, sel)
+                                                    else
+                                                      if ((sel).equal?(OS.attr_sel_accessibility_focused_uielement))
+                                                        return widget.accessibility_focused_uielement(id, sel)
+                                                      else
+                                                        if ((sel).equal?(OS.attr_sel_accessibility_is_ignored))
+                                                          return (widget.accessibility_is_ignored(id, sel) ? 1 : 0)
+                                                        else
+                                                          if ((sel).equal?(OS.attr_sel_next_state))
+                                                            return widget.next_state(id, sel)
+                                                          else
+                                                            if ((sel).equal?(OS.attr_sel_reset_cursor_rects))
+                                                              widget.reset_cursor_rects(id, sel)
+                                                            else
+                                                              if ((sel).equal?(OS.attr_sel_update_tracking_areas))
+                                                                widget.update_tracking_areas(id, sel)
+                                                              else
+                                                                if ((sel).equal?(OS.attr_sel_view_did_move_to_window))
+                                                                  widget.view_did_move_to_window(id, sel)
+                                                                else
+                                                                  if ((sel).equal?(OS.attr_sel_image))
+                                                                    return widget.image(id, sel)
+                                                                  end
+                                                                end
+                                                              end
+                                                            end
+                                                          end
+                                                        end
+                                                      end
+                                                    end
+                                                  end
+                                                end
+                                              end
+                                            end
+                                          end
+                                        end
+                                      end
+                                    end
+                                  end
+                                end
+                              end
+                            end
+                          end
+                        end
+                      end
+                    end
+                  end
+                end
+              end
+            end
+          end
+        end
+        return 0
+      end
+      
+      typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
+      # long
+      # long
+      # long
+      # long
+      def window_proc(id, sel, arg0)
+        # Feature in Cocoa.  In Cocoa, the default button animation is done
+        # in a separate thread that calls drawRect() and isOpaque() from
+        # outside the UI thread.  This means that those methods, and application
+        # code that runs as a result of those methods, must be thread safe.
+        # In SWT, paint events must happen in the UI thread.  The fix is
+        # to detect a non-UI thread and avoid the drawing. Instead, the
+        # default button is animated by a timer.
+        if (!NSThread.is_main_thread)
+          if ((sel).equal?(OS.attr_sel_draw_rect_))
+            return 0
+          end
+        end
+        if ((sel).equal?(OS.attr_sel_timer_proc_))
+          # TODO optimize getting the display
+          display = get_current
+          if ((display).nil?)
+            return 0
+          end
+          return display.timer_proc(id, sel, arg0)
+        end
+        if ((sel).equal?(OS.attr_sel_system_settings_changed_))
+          # TODO optimize getting the display
+          display = get_current
+          if ((display).nil?)
+            return 0
+          end
+          display.attr_run_settings = true
+          return 0
+        end
+        widget = _get_widget(id)
+        if ((widget).nil?)
+          return 0
+        end
+        if ((sel).equal?(OS.attr_sel_window_will_close_))
+          widget.window_will_close(id, sel, arg0)
+        else
+          if ((sel).equal?(OS.attr_sel_draw_rect_))
+            rect = NSRect.new
+            OS.memmove(rect, arg0, NSRect.attr_sizeof)
+            widget.draw_rect(id, sel, rect)
+          else
+            if ((sel).equal?(OS.attr_sel__draw_theme_progress_area_))
+              widget.__draw_theme_progress_area(id, sel, arg0)
+            else
+              if ((sel).equal?(OS.attr_sel_set_frame_origin_))
+                point = NSPoint.new
+                OS.memmove(point, arg0, NSPoint.attr_sizeof)
+                widget.set_frame_origin(id, sel, point)
+              else
+                if ((sel).equal?(OS.attr_sel_set_frame_size_))
+                  size_ = NSSize.new
+                  OS.memmove(size_, arg0, NSSize.attr_sizeof)
+                  widget.set_frame_size(id, sel, size_)
+                else
+                  if ((sel).equal?(OS.attr_sel_hit_test_))
+                    point = NSPoint.new
+                    OS.memmove(point, arg0, NSPoint.attr_sizeof)
+                    return widget.hit_test(id, sel, point)
+                  else
+                    if ((sel).equal?(OS.attr_sel_window_should_close_))
+                      return widget.window_should_close(id, sel, arg0) ? 1 : 0
+                    else
+                      if ((sel).equal?(OS.attr_sel_mouse_down_))
+                        widget.mouse_down(id, sel, arg0)
+                      else
+                        if ((sel).equal?(OS.attr_sel_key_down_))
+                          widget.key_down(id, sel, arg0)
+                        else
+                          if ((sel).equal?(OS.attr_sel_key_up_))
+                            widget.key_up(id, sel, arg0)
+                          else
+                            if ((sel).equal?(OS.attr_sel_flags_changed_))
+                              widget.flags_changed(id, sel, arg0)
+                            else
+                              if ((sel).equal?(OS.attr_sel_mouse_up_))
+                                widget.mouse_up(id, sel, arg0)
+                              else
+                                if ((sel).equal?(OS.attr_sel_right_mouse_down_))
+                                  widget.right_mouse_down(id, sel, arg0)
+                                else
+                                  if ((sel).equal?(OS.attr_sel_right_mouse_dragged_))
+                                    widget.right_mouse_dragged(id, sel, arg0)
+                                  else
+                                    if ((sel).equal?(OS.attr_sel_right_mouse_up_))
+                                      widget.right_mouse_up(id, sel, arg0)
+                                    else
+                                      if ((sel).equal?(OS.attr_sel_other_mouse_down_))
+                                        widget.other_mouse_down(id, sel, arg0)
+                                      else
+                                        if ((sel).equal?(OS.attr_sel_other_mouse_up_))
+                                          widget.other_mouse_up(id, sel, arg0)
+                                        else
+                                          if ((sel).equal?(OS.attr_sel_other_mouse_dragged_))
+                                            widget.other_mouse_dragged(id, sel, arg0)
+                                          else
+                                            if ((sel).equal?(OS.attr_sel_mouse_moved_))
+                                              widget.mouse_moved(id, sel, arg0)
+                                            else
+                                              if ((sel).equal?(OS.attr_sel_mouse_dragged_))
+                                                widget.mouse_dragged(id, sel, arg0)
+                                              else
+                                                if ((sel).equal?(OS.attr_sel_mouse_entered_))
+                                                  widget.mouse_entered(id, sel, arg0)
+                                                else
+                                                  if ((sel).equal?(OS.attr_sel_mouse_exited_))
+                                                    widget.mouse_exited(id, sel, arg0)
+                                                  else
+                                                    if ((sel).equal?(OS.attr_sel_cursor_update_))
+                                                      widget.cursor_update(id, sel, arg0)
+                                                    else
+                                                      if ((sel).equal?(OS.attr_sel_menu_for_event_))
+                                                        return widget.menu_for_event(id, sel, arg0)
+                                                      else
+                                                        if ((sel).equal?(OS.attr_sel_no_responder_for_))
+                                                          widget.no_responder_for(id, sel, arg0)
+                                                        else
+                                                          if ((sel).equal?(OS.attr_sel_should_delay_window_ordering_for_event_))
+                                                            return widget.should_delay_window_ordering_for_event(id, sel, arg0) ? 1 : 0
+                                                          else
+                                                            if ((sel).equal?(OS.attr_sel_accepts_first_mouse_))
+                                                              return widget.accepts_first_mouse(id, sel, arg0) ? 1 : 0
+                                                            else
+                                                              if ((sel).equal?(OS.attr_sel_number_of_rows_in_table_view_))
+                                                                return widget.number_of_rows_in_table_view(id, sel, arg0)
+                                                              else
+                                                                if ((sel).equal?(OS.attr_sel_table_view_selection_did_change_))
+                                                                  widget.table_view_selection_did_change(id, sel, arg0)
+                                                                else
+                                                                  if ((sel).equal?(OS.attr_sel_window_did_resign_key_))
+                                                                    widget.window_did_resign_key(id, sel, arg0)
+                                                                  else
+                                                                    if ((sel).equal?(OS.attr_sel_window_did_become_key_))
+                                                                      widget.window_did_become_key(id, sel, arg0)
+                                                                    else
+                                                                      if ((sel).equal?(OS.attr_sel_window_did_resize_))
+                                                                        widget.window_did_resize(id, sel, arg0)
+                                                                      else
+                                                                        if ((sel).equal?(OS.attr_sel_window_did_move_))
+                                                                          widget.window_did_move(id, sel, arg0)
+                                                                        else
+                                                                          if ((sel).equal?(OS.attr_sel_menu_will_open_))
+                                                                            widget.menu_will_open(id, sel, arg0)
+                                                                          else
+                                                                            if ((sel).equal?(OS.attr_sel_menu_did_close_))
+                                                                              widget.menu_did_close(id, sel, arg0)
+                                                                            else
+                                                                              if ((sel).equal?(OS.attr_sel_menu_needs_update_))
+                                                                                widget.menu_needs_update(id, sel, arg0)
+                                                                              else
+                                                                                if ((sel).equal?(OS.attr_sel_outline_view_selection_did_change_))
+                                                                                  widget.outline_view_selection_did_change(id, sel, arg0)
+                                                                                else
+                                                                                  if ((sel).equal?(OS.attr_sel_send_event_))
+                                                                                    widget.window_send_event(id, sel, arg0)
+                                                                                  else
+                                                                                    if ((sel).equal?(OS.attr_sel_help_requested_))
+                                                                                      widget.help_requested(id, sel, arg0)
+                                                                                    else
+                                                                                      if ((sel).equal?(OS.attr_sel_scroll_wheel_))
+                                                                                        widget.scroll_wheel(id, sel, arg0)
+                                                                                      else
+                                                                                        if ((sel).equal?(OS.attr_sel_page_down_))
+                                                                                          widget.page_down(id, sel, arg0)
+                                                                                        else
+                                                                                          if ((sel).equal?(OS.attr_sel_page_up_))
+                                                                                            widget.page_up(id, sel, arg0)
+                                                                                          else
+                                                                                            if ((sel).equal?(OS.attr_sel_text_view_did_change_selection_))
+                                                                                              widget.text_view_did_change_selection(id, sel, arg0)
+                                                                                            else
+                                                                                              if ((sel).equal?(OS.attr_sel_text_did_change_))
+                                                                                                widget.text_did_change(id, sel, arg0)
+                                                                                              else
+                                                                                                if ((sel).equal?(OS.attr_sel_text_did_end_editing_))
+                                                                                                  widget.text_did_end_editing(id, sel, arg0)
+                                                                                                else
+                                                                                                  if ((sel).equal?(OS.attr_sel_attributed_substring_from_range_))
+                                                                                                    return widget.attributed_substring_from_range(id, sel, arg0)
+                                                                                                  else
+                                                                                                    if ((sel).equal?(OS.attr_sel_character_index_for_point_))
+                                                                                                      return widget.character_index_for_point(id, sel, arg0)
+                                                                                                    else
+                                                                                                      if ((sel).equal?(OS.attr_sel_first_rect_for_character_range_))
+                                                                                                        rect = widget.first_rect_for_character_range(id, sel, arg0)
+                                                                                                        # NOTE that this is freed in C
+                                                                                                        # long
+                                                                                                        result = OS.malloc(NSRect.attr_sizeof)
+                                                                                                        OS.memmove(result, rect, NSRect.attr_sizeof)
+                                                                                                        return result
+                                                                                                      else
+                                                                                                        if ((sel).equal?(OS.attr_sel_insert_text_))
+                                                                                                          return widget.insert_text(id, sel, arg0) ? 1 : 0
+                                                                                                        else
+                                                                                                          if ((sel).equal?(OS.attr_sel_do_command_by_selector_))
+                                                                                                            widget.do_command_by_selector(id, sel, arg0)
+                                                                                                          else
+                                                                                                            if ((sel).equal?(OS.attr_sel_highlight_selection_in_clip_rect_))
+                                                                                                              widget.highlight_selection_in_clip_rect(id, sel, arg0)
+                                                                                                            else
+                                                                                                              if ((sel).equal?(OS.attr_sel_reflect_scrolled_clip_view_))
+                                                                                                                widget.reflect_scrolled_clip_view(id, sel, arg0)
+                                                                                                              else
+                                                                                                                if ((sel).equal?(OS.attr_sel_accessibility_hit_test_))
+                                                                                                                  point = NSPoint.new
+                                                                                                                  OS.memmove(point, arg0, NSPoint.attr_sizeof)
+                                                                                                                  return widget.accessibility_hit_test(id, sel, point)
+                                                                                                                else
+                                                                                                                  if ((sel).equal?(OS.attr_sel_accessibility_attribute_value_))
+                                                                                                                    return widget.accessibility_attribute_value(id, sel, arg0)
+                                                                                                                  else
+                                                                                                                    if ((sel).equal?(OS.attr_sel_accessibility_perform_action_))
+                                                                                                                      widget.accessibility_perform_action(id, sel, arg0)
+                                                                                                                    else
+                                                                                                                      if ((sel).equal?(OS.attr_sel_accessibility_action_description_))
+                                                                                                                        widget.accessibility_action_description(id, sel, arg0)
+                                                                                                                      else
+                                                                                                                        if ((sel).equal?(OS.attr_sel_make_first_responder_))
+                                                                                                                          return widget.make_first_responder(id, sel, arg0) ? 1 : 0
+                                                                                                                        else
+                                                                                                                          if ((sel).equal?(OS.attr_sel_table_view_column_did_move_))
+                                                                                                                            widget.table_view_column_did_move(id, sel, arg0)
+                                                                                                                          else
+                                                                                                                            if ((sel).equal?(OS.attr_sel_table_view_column_did_resize_))
+                                                                                                                              widget.table_view_column_did_resize(id, sel, arg0)
+                                                                                                                            else
+                                                                                                                              if ((sel).equal?(OS.attr_sel_outline_view_column_did_move_))
+                                                                                                                                widget.outline_view_column_did_move(id, sel, arg0)
+                                                                                                                              else
+                                                                                                                                if ((sel).equal?(OS.attr_sel_outline_view_column_did_resize_))
+                                                                                                                                  widget.outline_view_column_did_resize(id, sel, arg0)
+                                                                                                                                else
+                                                                                                                                  if ((sel).equal?(OS.attr_sel_set_needs_display_))
+                                                                                                                                    widget.set_needs_display(id, sel, !(arg0).equal?(0))
+                                                                                                                                  else
+                                                                                                                                    if ((sel).equal?(OS.attr_sel_set_needs_display_in_rect_))
+                                                                                                                                      widget.set_needs_display_in_rect(id, sel, arg0)
+                                                                                                                                    else
+                                                                                                                                      if ((sel).equal?(OS.attr_sel_set_image_))
+                                                                                                                                        widget.set_image(id, sel, arg0)
+                                                                                                                                      else
+                                                                                                                                        if ((sel).equal?(OS.attr_sel_image_rect_for_bounds_))
+                                                                                                                                          rect = NSRect.new
+                                                                                                                                          OS.memmove(rect, arg0, NSRect.attr_sizeof)
+                                                                                                                                          rect = widget.image_rect_for_bounds(id, sel, rect)
+                                                                                                                                          # NOTE that this is freed in C
+                                                                                                                                          # long
+                                                                                                                                          result = OS.malloc(NSRect.attr_sizeof)
+                                                                                                                                          OS.memmove(result, rect, NSRect.attr_sizeof)
+                                                                                                                                          return result
+                                                                                                                                        else
+                                                                                                                                          if ((sel).equal?(OS.attr_sel_title_rect_for_bounds_))
+                                                                                                                                            rect = NSRect.new
+                                                                                                                                            OS.memmove(rect, arg0, NSRect.attr_sizeof)
+                                                                                                                                            rect = widget.title_rect_for_bounds(id, sel, rect)
+                                                                                                                                            # NOTE that this is freed in C
+                                                                                                                                            # long
+                                                                                                                                            result = OS.malloc(NSRect.attr_sizeof)
+                                                                                                                                            OS.memmove(result, rect, NSRect.attr_sizeof)
+                                                                                                                                            return result
+                                                                                                                                          else
+                                                                                                                                            if ((sel).equal?(OS.attr_sel_set_object_value_))
+                                                                                                                                              widget.set_object_value(id, sel, arg0)
+                                                                                                                                            else
+                                                                                                                                              if ((sel).equal?(OS.attr_sel_update_open_glcontext_))
+                                                                                                                                                widget.update_open_glcontext(id, sel, arg0)
+                                                                                                                                              end
+                                                                                                                                            end
+                                                                                                                                          end
+                                                                                                                                        end
+                                                                                                                                      end
+                                                                                                                                    end
+                                                                                                                                  end
+                                                                                                                                end
+                                                                                                                              end
+                                                                                                                            end
+                                                                                                                          end
+                                                                                                                        end
+                                                                                                                      end
+                                                                                                                    end
+                                                                                                                  end
+                                                                                                                end
+                                                                                                              end
+                                                                                                            end
+                                                                                                          end
+                                                                                                        end
+                                                                                                      end
+                                                                                                    end
+                                                                                                  end
+                                                                                                end
+                                                                                              end
+                                                                                            end
+                                                                                          end
+                                                                                        end
+                                                                                      end
+                                                                                    end
+                                                                                  end
+                                                                                end
+                                                                              end
+                                                                            end
+                                                                          end
+                                                                        end
+                                                                      end
+                                                                    end
+                                                                  end
+                                                                end
+                                                              end
+                                                            end
+                                                          end
+                                                        end
+                                                      end
+                                                    end
+                                                  end
+                                                end
+                                              end
+                                            end
+                                          end
+                                        end
+                                      end
+                                    end
+                                  end
+                                end
+                              end
+                            end
+                          end
+                        end
+                      end
+                    end
+                  end
+                end
+              end
+            end
+          end
+        end
+        return 0
+      end
+      
+      typesig { [::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int] }
+      # long
+      # long
+      # long
+      # long
+      # long
+      def window_proc(id, sel, arg0, arg1)
+        widget = _get_widget(id)
+        if ((widget).nil?)
+          return 0
+        end
+        if ((sel).equal?(OS.attr_sel_tab_view_will_select_tab_view_item_))
+          widget.tab_view_will_select_tab_view_item(id, sel, arg0, arg1)
+        else
+          if ((sel).equal?(OS.attr_sel_tab_view_did_select_tab_view_item_))
+            widget.tab_view_did_select_tab_view_item(id, sel, arg0, arg1)
+          else
+            if ((sel).equal?(OS.attr_sel_outline_view_is_item_expandable_))
+              return widget.outline_view_is_item_expandable(id, sel, arg0, arg1) ? 1 : 0
+            else
+              if ((sel).equal?(OS.attr_sel_outline_view_number_of_children_of_item_))
+                return widget.outline_view_number_of_children_of_item(id, sel, arg0, arg1)
+              else
+                if ((sel).equal?(OS.attr_sel_menu_will_highlight_item_))
+                  widget.menu_will_highlight_item(id, sel, arg0, arg1)
+                else
+                  if ((sel).equal?(OS.attr_sel_set_marked_text_selected_range_))
+                    widget.set_marked_text_selected_range(id, sel, arg0, arg1)
+                  else
+                    if ((sel).equal?(OS.attr_sel_draw_interior_with_frame_in_view_))
+                      rect = NSRect.new
+                      OS.memmove(rect, arg0, NSRect.attr_sizeof)
+                      widget.draw_interior_with_frame_in_view(id, sel, rect, arg1)
+                    else
+                      if ((sel).equal?(OS.attr_sel_draw_with_expansion_frame_in_view_))
+                        rect = NSRect.new
+                        OS.memmove(rect, arg0, NSRect.attr_sizeof)
+                        widget.draw_with_expansion_frame_in_view(id, sel, rect, arg1)
+                      else
+                        if ((sel).equal?(OS.attr_sel_accessibility_attribute_value_for_parameter_))
+                          return widget.accessibility_attribute_value_for_parameter(id, sel, arg0, arg1)
+                        else
+                          if ((sel).equal?(OS.attr_sel_table_view_did_click_table_column_))
+                            widget.table_view_did_click_table_column(id, sel, arg0, arg1)
+                          else
+                            if ((sel).equal?(OS.attr_sel_outline_view_did_click_table_column_))
+                              widget.outline_view_did_click_table_column(id, sel, arg0, arg1)
+                            else
+                              if ((sel).equal?(OS.attr_sel_should_change_text_in_range_replacement_string_))
+                                return widget.should_change_text_in_range_replacement_string(id, sel, arg0, arg1) ? 1 : 0
+                              else
+                                if ((sel).equal?(OS.attr_sel_can_drag_rows_with_indexes_at_point_))
+                                  return widget.can_drag_rows_with_indexes_at_point(id, sel, arg0, arg1) ? 1 : 0
+                                else
+                                  if ((sel).equal?(OS.attr_sel_expand_item_expand_children_))
+                                    widget.expand_item_expand_children(id, sel, arg0, !(arg1).equal?(0))
+                                  else
+                                    if ((sel).equal?(OS.attr_sel_collapse_item_collapse_children_))
+                                      widget.collapse_item_collapse_children(id, sel, arg0, !(arg1).equal?(0))
+                                    else
+                                      if ((sel).equal?(OS.attr_sel_expansion_frame_with_frame_in_view_))
+                                        rect = NSRect.new
+                                        OS.memmove(rect, arg0, NSRect.attr_sizeof)
+                                        rect = widget.expansion_frame_with_frame_in_view(id, sel, rect, arg1)
+                                        # NOTE that this is freed in C
+                                        # long
+                                        result = OS.malloc(NSRect.attr_sizeof)
+                                        OS.memmove(result, rect, NSRect.attr_sizeof)
+                                        return result
+                                      end
+                                    end
+                                  end
+                                end
+                              end
+                            end
+                          end
+                        end
+                      end
+                    end
+                  end
+                end
+              end
+            end
+          end
+        end
+        return 0
+      end
+      
+      typesig { [::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int] }
+      # long
+      # long
+      # long
+      # long
+      # long
+      # long
+      def window_proc(id, sel, arg0, arg1, arg2)
+        widget = _get_widget(id)
+        if ((widget).nil?)
+          return 0
+        end
+        if ((sel).equal?(OS.attr_sel_table_view_object_value_for_table_column_row_))
+          return widget.table_view_object_value_for_table_column_row(id, sel, arg0, arg1, arg2)
+        else
+          if ((sel).equal?(OS.attr_sel_table_view_should_edit_table_column_row_))
+            return widget.table_view_should_edit_table_column_row(id, sel, arg0, arg1, arg2) ? 1 : 0
+          else
+            if ((sel).equal?(OS.attr_sel_text_view_clicked_on_link_at_index_))
+              return widget.text_view_click_on_link_at_index(id, sel, arg0, arg1, arg2) ? 1 : 0
+            else
+              if ((sel).equal?(OS.attr_sel_outline_view_child_of_item_))
+                return widget.outline_view_child_of_item(id, sel, arg0, arg1, arg2)
+              else
+                if ((sel).equal?(OS.attr_sel_outline_view_object_value_for_table_column_by_item_))
+                  return widget.outline_view_object_value_for_table_column_by_item(id, sel, arg0, arg1, arg2)
+                else
+                  if ((sel).equal?(OS.attr_sel_text_view_will_change_selection_from_character_range_to_character_range_))
+                    range = widget.text_view_will_change_selection_from_character_range_to_character_range(id, sel, arg0, arg1, arg2)
+                    # NOTE that this is freed in C
+                    # long
+                    result = OS.malloc(NSRange.attr_sizeof)
+                    OS.memmove(result, range, NSRange.attr_sizeof)
+                    return result
+                  else
+                    if ((sel).equal?(OS.attr_sel_drag_selection_with_event_offset_slide_back_))
+                      offset = NSSize.new
+                      OS.memmove(offset, arg0, NSSize.attr_sizeof)
+                      return (widget.drag_selection_with_event(id, sel, arg0, arg1, arg2) ? 1 : 0)
+                    else
+                      if ((sel).equal?(OS.attr_sel_draw_image_with_frame_in_view_))
+                        rect = NSRect.new
+                        OS.memmove(rect, arg1, NSRect.attr_sizeof)
+                        widget.draw_image_with_frame_in_view(id, sel, arg0, rect, arg2)
+                      else
+                        if ((sel).equal?(OS.attr_sel_hit_test_for_event_in_rect_of_view_))
+                          rect = NSRect.new
+                          OS.memmove(rect, arg1, NSRect.attr_sizeof)
+                          return widget.hit_test_for_event(id, sel, arg0, rect, arg2)
+                        else
+                          if ((sel).equal?(OS.attr_sel_table_view_write_rows_with_indexes_to_pasteboard_))
+                            return (widget.table_view_write_rows_with_indexes_to_pasteboard(id, sel, arg0, arg1, arg2) ? 1 : 0)
+                          else
+                            if ((sel).equal?(OS.attr_sel_outline_view_write_items_to_pasteboard_))
+                              return (widget.outline_view_write_items_to_pasteboard(id, sel, arg0, arg1, arg2) ? 1 : 0)
+                            end
+                          end
+                        end
+                      end
+                    end
+                  end
+                end
+              end
+            end
+          end
+        end
+        return 0
+      end
+      
+      typesig { [::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int] }
+      # long
+      # long
+      # long
+      # long
+      # long
+      # long
+      # long
+      def window_proc(id, sel, arg0, arg1, arg2, arg3)
+        widget = _get_widget(id)
+        if ((widget).nil?)
+          return 0
+        end
+        if ((sel).equal?(OS.attr_sel_table_view_will_display_cell_for_table_column_row_))
+          widget.table_view_will_display_cell_for_table_column_row(id, sel, arg0, arg1, arg2, arg3)
+        else
+          if ((sel).equal?(OS.attr_sel_outline_view_will_display_cell_for_table_column_item_))
+            widget.outline_view_will_display_cell_for_table_column_item(id, sel, arg0, arg1, arg2, arg3)
+          else
+            if ((sel).equal?(OS.attr_sel_outline_view_set_object_value_for_table_column_by_item_))
+              widget.outline_view_set_object_value_for_table_column_by_item(id, sel, arg0, arg1, arg2, arg3)
+            else
+              if ((sel).equal?(OS.attr_sel_table_view_set_object_value_for_table_column_row_))
+                widget.table_view_set_object_value_for_table_column_row(id, sel, arg0, arg1, arg2, arg3)
+              else
+                if ((sel).equal?(OS.attr_sel_view_string_for_tool_tip_point_user_data_))
+                  return widget.view_string_for_tool_tip_point_user_data(id, sel, arg0, arg1, arg2, arg3)
+                end
+              end
+            end
+          end
+        end
+        return 0
+      end
+    }
     
     private
     alias_method :initialize__display, :initialize

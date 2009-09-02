@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2003, 2008 IBM Corporation and others.
+ * Copyright (c) 2003, 2009 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -10,11 +10,15 @@
  *******************************************************************************/
 package org.eclipse.swt.browser;
 
-import org.eclipse.swt.SWT;
+import java.util.*;
+
+import org.eclipse.swt.*;
 import org.eclipse.swt.widgets.*;
 
 abstract class WebBrowser {
 	Browser browser;
+	Hashtable functions = new Hashtable ();
+	AuthenticationListener[] authenticationListeners = new AuthenticationListener[0];
 	CloseWindowListener[] closeWindowListeners = new CloseWindowListener[0];
 	LocationListener[] locationListeners = new LocationListener[0];
 	OpenWindowListener[] openWindowListeners = new OpenWindowListener[0];
@@ -22,9 +26,18 @@ abstract class WebBrowser {
 	StatusTextListener[] statusTextListeners = new StatusTextListener[0];
 	TitleListener[] titleListeners = new TitleListener[0];
 	VisibilityWindowListener[] visibilityWindowListeners = new VisibilityWindowListener[0];
+	boolean jsEnabled = true;
+	boolean jsEnabledChanged;
+	int nextFunctionIndex = 1;
+	Object evaluateResult;
 
-	static Runnable MozillaClearSessions;
-	static Runnable NativeClearSessions;
+	static final String ERROR_ID = "org.eclipse.swt.browser.error"; // $NON-NLS-1$
+	static final String EXECUTE_ID = "SWTExecuteTemporaryFunction"; // $NON-NLS-1$
+	static String CookieName, CookieValue, CookieUrl;
+	static boolean CookieResult;
+	static Runnable MozillaClearSessions, NativeClearSessions;
+	static Runnable MozillaGetCookie, NativeGetCookie;
+	static Runnable MozillaSetCookie, NativeSetCookie;
 
 	/* Key Mappings */
 	static final int [][] KeyTable = {
@@ -162,6 +175,35 @@ abstract class WebBrowser {
 		{189,	'-'},
 	};
 
+public class EvaluateFunction extends BrowserFunction {
+	public EvaluateFunction (Browser browser, String name) {
+		super (browser, name, false);
+	}
+	public Object function (Object[] arguments) {
+		if (arguments[0] instanceof String) {
+			String string = (String)arguments[0];
+			if (string.startsWith (ERROR_ID)) {
+				String errorString = ExtractError (string);
+				if (errorString.length () > 0) {
+					evaluateResult = new SWTException (SWT.ERROR_FAILED_EVALUATE, errorString);
+				} else {
+					evaluateResult = new SWTException (SWT.ERROR_FAILED_EVALUATE);
+				}
+				return null;
+			}
+		}
+		evaluateResult = arguments[0];
+		return null;
+	}
+}
+
+public void addAuthenticationListener (AuthenticationListener listener) {
+	AuthenticationListener[] newAuthenticationListeners = new AuthenticationListener[authenticationListeners.length + 1];
+	System.arraycopy(authenticationListeners, 0, newAuthenticationListeners, 0, authenticationListeners.length);
+	authenticationListeners = newAuthenticationListeners;
+	authenticationListeners[authenticationListeners.length - 1] = listener;
+}
+
 public void addCloseWindowListener (CloseWindowListener listener) {
 	CloseWindowListener[] newCloseWindowListeners = new CloseWindowListener[closeWindowListeners.length + 1];
 	System.arraycopy(closeWindowListeners, 0, newCloseWindowListeners, 0, closeWindowListeners.length);
@@ -218,11 +260,142 @@ public static void clearSessions () {
 	if (MozillaClearSessions != null) MozillaClearSessions.run ();
 }
 
+public static String GetCookie (String name, String url) {
+	CookieName = name; CookieUrl = url;
+	if (NativeGetCookie != null) NativeGetCookie.run ();
+	if (MozillaGetCookie != null) MozillaGetCookie.run ();
+	String result = CookieValue;
+	CookieName = CookieValue = CookieUrl = null;
+	return result;
+}
+
+public static boolean SetCookie (String value, String url) {
+	CookieValue = value; CookieUrl = url;
+	CookieResult = false;
+	if (NativeSetCookie != null) NativeSetCookie.run ();
+	if (MozillaSetCookie != null) MozillaSetCookie.run ();
+	CookieValue = CookieUrl = null;
+	return CookieResult;
+}
+
 public abstract void create (Composite parent, int style);
+
+static String CreateErrorString (String error) {
+	return ERROR_ID + error;
+}
+
+static String ExtractError (String error) {
+	return error.substring (ERROR_ID.length ());
+}
+
+public void createFunction (BrowserFunction function) {
+	/* 
+	 * If an existing function with the same name is found then
+	 * remove it so that it is not recreated on subsequent pages
+	 * (the new function overwrites the old one).
+	 */
+	Enumeration keys = functions.keys ();
+	while (keys.hasMoreElements ()) {
+		Object key = keys.nextElement ();
+		BrowserFunction current = (BrowserFunction)functions.get (key);
+		if (current.name.equals (function.name)) {
+			functions.remove (key);
+			break;
+		}
+	}
+
+	function.index = getNextFunctionIndex ();
+	registerFunction (function);
+
+	StringBuffer buffer = new StringBuffer ("window."); //$NON-NLS-1$
+	buffer.append (function.name);
+	buffer.append (" = function "); //$NON-NLS-1$
+	buffer.append (function.name);
+	buffer.append ("() {var result = window.external.callJava("); //$NON-NLS-1$
+	buffer.append (function.index);
+	buffer.append (",Array.prototype.slice.call(arguments)); if (typeof result == 'string' && result.indexOf('"); //$NON-NLS-1$
+	buffer.append (ERROR_ID);
+	buffer.append ("') == 0) {var error = new Error(result.substring("); //$NON-NLS-1$
+	buffer.append (ERROR_ID.length ());
+	buffer.append (")); throw error;} return result;};"); //$NON-NLS-1$
+	buffer.append ("for (var i = 0; i < frames.length; i++) {try { frames[i]."); //$NON-NLS-1$
+	buffer.append (function.name);
+	buffer.append (" = window."); //$NON-NLS-1$
+	buffer.append (function.name);
+	buffer.append (";} catch (e) {} };"); //$NON-NLS-1$
+	function.functionString = buffer.toString ();
+	execute (function.functionString);
+}
+
+void deregisterFunction (BrowserFunction function) {
+	functions.remove (new Integer (function.index));
+}
+
+public void destroyFunction (BrowserFunction function) {
+	String deleteString = getDeleteFunctionString (function.name); 
+	StringBuffer buffer = new StringBuffer ("for (var i = 0; i < frames.length; i++) {try {frames[i].eval(\""); //$NON-NLS-1$
+	buffer.append (deleteString);
+	buffer.append ("\");} catch (e) {}}"); //$NON-NLS-1$
+	execute (buffer.toString ());
+	execute (deleteString);
+	deregisterFunction (function);
+}
 
 public abstract boolean execute (String script);
 
+public Object evaluate (String script) throws SWTException {
+	BrowserFunction function = new EvaluateFunction (browser, ""); // $NON-NLS-1$
+	int index = getNextFunctionIndex ();
+	function.index = index;
+	function.isEvaluate = true;
+	registerFunction (function);
+	String functionName = EXECUTE_ID + index;
+
+	StringBuffer buffer = new StringBuffer ("window."); // $NON-NLS-1$
+	buffer.append (functionName);
+	buffer.append (" = function "); // $NON-NLS-1$
+	buffer.append (functionName);
+	buffer.append ("() {\n"); // $NON-NLS-1$
+	buffer.append (script);
+	buffer.append ("\n};"); // $NON-NLS-1$
+	execute (buffer.toString ());
+
+	buffer = new StringBuffer ("if (window."); // $NON-NLS-1$
+	buffer.append (functionName);
+	buffer.append (" == undefined) {window.external.callJava("); // $NON-NLS-1$
+	buffer.append (index);
+	buffer.append (", ['"); // $NON-NLS-1$
+	buffer.append (ERROR_ID);
+	buffer.append ("']);} else {try {var result = "); // $NON-NLS-1$
+	buffer.append (functionName);
+	buffer.append ("(); window.external.callJava("); // $NON-NLS-1$
+	buffer.append (index);
+	buffer.append (", [result]);} catch (e) {window.external.callJava("); // $NON-NLS-1$
+	buffer.append (index);
+	buffer.append (", ['"); // $NON-NLS-1$
+	buffer.append (ERROR_ID);
+	buffer.append ("' + e.message]);}}"); // $NON-NLS-1$
+	execute (buffer.toString ());
+	execute (getDeleteFunctionString (functionName));
+	deregisterFunction (function);
+
+	Object result = evaluateResult;
+	evaluateResult = null;
+	if (result instanceof SWTException) throw (SWTException)result;
+	return result;
+}
+
 public abstract boolean forward ();
+
+public abstract String getBrowserType ();
+
+String getDeleteFunctionString (String functionName) {
+	return "delete window." + functionName;	//$NON-NLS-1$
+}
+
+int getNextFunctionIndex () {
+	return nextFunctionIndex++;
+}
 
 public abstract String getText ();
 
@@ -241,6 +414,30 @@ public boolean isFocusControl () {
 public abstract boolean isForwardEnabled ();
 
 public abstract void refresh ();
+
+void registerFunction (BrowserFunction function) {
+	functions.put (new Integer (function.index), function);
+}
+
+public void removeAuthenticationListener (AuthenticationListener listener) {
+	if (authenticationListeners.length == 0) return;
+	int index = -1;
+	for (int i = 0; i < authenticationListeners.length; i++) {
+		if (listener == authenticationListeners[i]) {
+			index = i;
+			break;
+		}
+	}
+	if (index == -1) return;
+	if (authenticationListeners.length == 1) {
+		authenticationListeners = new AuthenticationListener[0];
+		return;
+	}
+	AuthenticationListener[] newAuthenticationListeners = new AuthenticationListener[authenticationListeners.length - 1];
+	System.arraycopy (authenticationListeners, 0, newAuthenticationListeners, 0, index);
+	System.arraycopy (authenticationListeners, index + 1, newAuthenticationListeners, index, authenticationListeners.length - index - 1);
+	authenticationListeners = newAuthenticationListeners;
+}
 
 public void removeCloseWindowListener (CloseWindowListener listener) {
 	if (closeWindowListeners.length == 0) return;

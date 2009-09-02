@@ -1,6 +1,6 @@
 require "rjava"
 
-# Copyright (c) 2000, 2007 IBM Corporation and others.
+# Copyright (c) 2000, 2008 IBM Corporation and others.
 # All rights reserved. This program and the accompanying materials
 # are made available under the terms of the Eclipse Public License v1.0
 # which accompanies this distribution, and is available at
@@ -430,6 +430,8 @@ module Org::Eclipse::Swt::Internal::Opengl::Glx
       
       JNI.native_method :Java_org_eclipse_swt_internal_opengl_glx_GLX__1glGetIntegerv, [:pointer, :long, :int32, :long], :void
       typesig { [::Java::Int, Array.typed(::Java::Int)] }
+      # @param pname cast=(GLenum)
+      # @param params cast=(GLint *),flags=no_in
       def __gl_get_integerv(pname, params)
         JNI.__send__(:Java_org_eclipse_swt_internal_opengl_glx_GLX__1glGetIntegerv, JNI.env, self.jni_id, pname.to_int, params.jni_id)
       end
@@ -446,6 +448,10 @@ module Org::Eclipse::Swt::Internal::Opengl::Glx
       
       JNI.native_method :Java_org_eclipse_swt_internal_opengl_glx_GLX__1glViewport, [:pointer, :long, :int32, :int32, :int32, :int32], :void
       typesig { [::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int] }
+      # @param x cast=(GLint)
+      # @param y cast=(GLint)
+      # @param width cast=(GLsizei)
+      # @param height cast=(GLsizei)
       def __gl_viewport(x, y, width, height)
         JNI.__send__(:Java_org_eclipse_swt_internal_opengl_glx_GLX__1glViewport, JNI.env, self.jni_id, x.to_int, y.to_int, width.to_int, height.to_int)
       end
@@ -462,6 +468,7 @@ module Org::Eclipse::Swt::Internal::Opengl::Glx
       
       JNI.native_method :Java_org_eclipse_swt_internal_opengl_glx_GLX__1glXChooseVisual, [:pointer, :long, :int32, :int32, :long], :int32
       typesig { [::Java::Int, ::Java::Int, Array.typed(::Java::Int)] }
+      # @param dpy cast=(Display *)
       # long
       # long
       def __gl_xchoose_visual(dpy, screen, attrib_list)
@@ -482,6 +489,10 @@ module Org::Eclipse::Swt::Internal::Opengl::Glx
       
       JNI.native_method :Java_org_eclipse_swt_internal_opengl_glx_GLX__1glXCopyContext, [:pointer, :long, :int32, :int32, :int32, :int32], :void
       typesig { [::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int] }
+      # @param dpy cast=(Display *)
+      # @param src cast=(GLXContext)
+      # @param dst cast=(GLXContext)
+      # 
       # long
       # long
       # long
@@ -504,6 +515,9 @@ module Org::Eclipse::Swt::Internal::Opengl::Glx
       
       JNI.native_method :Java_org_eclipse_swt_internal_opengl_glx_GLX__1glXCreateContext, [:pointer, :long, :int32, :long, :int32, :int8], :int32
       typesig { [::Java::Int, XVisualInfo, ::Java::Int, ::Java::Boolean] }
+      # @param dpy cast=(Display *)
+      # @param shareList cast=(GLXContext)
+      # 
       # long
       # long
       # long
@@ -526,6 +540,9 @@ module Org::Eclipse::Swt::Internal::Opengl::Glx
       
       JNI.native_method :Java_org_eclipse_swt_internal_opengl_glx_GLX__1glXCreateGLXPixmap, [:pointer, :long, :int32, :long, :int32], :int32
       typesig { [::Java::Int, XVisualInfo, ::Java::Int] }
+      # @param dpy cast=(Display *)
+      # @param pixmap cast=(Pixmap)
+      # 
       # long
       # long
       # long
@@ -548,6 +565,9 @@ module Org::Eclipse::Swt::Internal::Opengl::Glx
       
       JNI.native_method :Java_org_eclipse_swt_internal_opengl_glx_GLX__1glXDestroyContext, [:pointer, :long, :int32, :int32], :void
       typesig { [::Java::Int, ::Java::Int] }
+      # @param dpy cast=(Display *)
+      # @param ctx cast=(GLXContext)
+      # 
       # long
       # long
       def __gl_xdestroy_context(dpy, ctx)
@@ -568,6 +588,9 @@ module Org::Eclipse::Swt::Internal::Opengl::Glx
       
       JNI.native_method :Java_org_eclipse_swt_internal_opengl_glx_GLX__1glXDestroyGLXPixmap, [:pointer, :long, :int32, :int32], :void
       typesig { [::Java::Int, ::Java::Int] }
+      # @param dpy cast=(Display *)
+      # @param pix cast=(GLXPixmap)
+      # 
       # long
       # long
       def __gl_xdestroy_glxpixmap(dpy, pix)
@@ -588,6 +611,7 @@ module Org::Eclipse::Swt::Internal::Opengl::Glx
       
       JNI.native_method :Java_org_eclipse_swt_internal_opengl_glx_GLX__1glXGetClientString, [:pointer, :long, :int32, :int32], :int32
       typesig { [::Java::Int, ::Java::Int] }
+      # @param dpy cast=(Display *)
       # long
       # long
       def __gl_xget_client_string(dpy, name)
@@ -608,6 +632,7 @@ module Org::Eclipse::Swt::Internal::Opengl::Glx
       
       JNI.native_method :Java_org_eclipse_swt_internal_opengl_glx_GLX__1glXGetConfig, [:pointer, :long, :int32, :long, :int32, :long], :int32
       typesig { [::Java::Int, XVisualInfo, ::Java::Int, Array.typed(::Java::Int)] }
+      # @param dpy cast=(Display *)
       # long
       def __gl_xget_config(dpy, vis, attrib, value)
         JNI.__send__(:Java_org_eclipse_swt_internal_opengl_glx_GLX__1glXGetConfig, JNI.env, self.jni_id, dpy.to_int, vis.jni_id, attrib.to_int, value.jni_id)
@@ -662,6 +687,9 @@ module Org::Eclipse::Swt::Internal::Opengl::Glx
       
       JNI.native_method :Java_org_eclipse_swt_internal_opengl_glx_GLX__1glXIsDirect, [:pointer, :long, :int32, :int32], :int8
       typesig { [::Java::Int, ::Java::Int] }
+      # @param dpy cast=(Display *)
+      # @param ctx cast=(GLXContext)
+      # 
       # long
       # long
       def __gl_xis_direct(dpy, ctx)
@@ -682,6 +710,10 @@ module Org::Eclipse::Swt::Internal::Opengl::Glx
       
       JNI.native_method :Java_org_eclipse_swt_internal_opengl_glx_GLX__1glXMakeCurrent, [:pointer, :long, :int32, :int32, :int32], :int8
       typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
+      # @param dpy cast=(Display *)
+      # @param drawable cast=(GLXDrawable)
+      # @param ctx cast=(GLXContext)
+      # 
       # long
       # long
       # long
@@ -704,6 +736,7 @@ module Org::Eclipse::Swt::Internal::Opengl::Glx
       
       JNI.native_method :Java_org_eclipse_swt_internal_opengl_glx_GLX__1glXQueryExtension, [:pointer, :long, :int32, :long, :long], :int8
       typesig { [::Java::Int, Array.typed(::Java::Int), Array.typed(::Java::Int)] }
+      # @param dpy cast=(Display *)
       # long
       def __gl_xquery_extension(dpy, error_base, event_base)
         JNI.__send__(:Java_org_eclipse_swt_internal_opengl_glx_GLX__1glXQueryExtension, JNI.env, self.jni_id, dpy.to_int, error_base.jni_id, event_base.jni_id) != 0
@@ -722,6 +755,7 @@ module Org::Eclipse::Swt::Internal::Opengl::Glx
       
       JNI.native_method :Java_org_eclipse_swt_internal_opengl_glx_GLX__1glXQueryExtensionsString, [:pointer, :long, :int32, :int32], :int32
       typesig { [::Java::Int, ::Java::Int] }
+      # @param dpy cast=(Display *)
       # long
       # long
       def __gl_xquery_extensions_string(dpy, screen)
@@ -742,6 +776,7 @@ module Org::Eclipse::Swt::Internal::Opengl::Glx
       
       JNI.native_method :Java_org_eclipse_swt_internal_opengl_glx_GLX__1glXQueryServerString, [:pointer, :long, :int32, :int32, :int32], :int32
       typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
+      # @param dpy cast=(Display *)
       # long
       # long
       def __gl_xquery_server_string(dpy, screen, name)
@@ -762,6 +797,10 @@ module Org::Eclipse::Swt::Internal::Opengl::Glx
       
       JNI.native_method :Java_org_eclipse_swt_internal_opengl_glx_GLX__1glXQueryVersion, [:pointer, :long, :int32, :long, :long], :int8
       typesig { [::Java::Int, Array.typed(::Java::Int), Array.typed(::Java::Int)] }
+      # @param dpy cast=(Display *)
+      # @param major flags=no_in
+      # @param minor flags=no_in
+      # 
       # long
       def __gl_xquery_version(dpy, major, minor)
         JNI.__send__(:Java_org_eclipse_swt_internal_opengl_glx_GLX__1glXQueryVersion, JNI.env, self.jni_id, dpy.to_int, major.jni_id, minor.jni_id) != 0
@@ -780,6 +819,9 @@ module Org::Eclipse::Swt::Internal::Opengl::Glx
       
       JNI.native_method :Java_org_eclipse_swt_internal_opengl_glx_GLX__1glXSwapBuffers, [:pointer, :long, :int32, :int32], :void
       typesig { [::Java::Int, ::Java::Int] }
+      # @param dpy cast=(Display *)
+      # @param drawable cast=(GLXDrawable)
+      # 
       # long
       # long
       def __gl_xswap_buffers(dpy, drawable)
@@ -832,6 +874,9 @@ module Org::Eclipse::Swt::Internal::Opengl::Glx
       
       JNI.native_method :Java_org_eclipse_swt_internal_opengl_glx_GLX_memmove, [:pointer, :long, :long, :int32, :int32], :void
       typesig { [XVisualInfo, ::Java::Int, ::Java::Int] }
+      # @param src cast=(const void *)
+      # @param size cast=(size_t)
+      # 
       # long
       def memmove(dest, src, size)
         JNI.__send__(:Java_org_eclipse_swt_internal_opengl_glx_GLX_memmove, JNI.env, self.jni_id, dest.jni_id, src.to_int, size.to_int)

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2008 IBM Corporation and others.
+ * Copyright (c) 2000, 2009 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -22,7 +22,7 @@ import org.eclipse.swt.graphics.*;
  * When SEPARATOR is specified, displays a single
  * vertical or horizontal line.
  * <p>
- * Shadow styles are hints and may not be honoured
+ * Shadow styles are hints and may not be honored
  * by the platform.  To create a separator label
  * with the default shadow style for the platform,
  * do not specify a shadow style.
@@ -47,6 +47,7 @@ import org.eclipse.swt.graphics.*;
  * @see <a href="http://www.eclipse.org/swt/snippets/#label">Label snippets</a>
  * @see <a href="http://www.eclipse.org/swt/examples.php">SWT Example: ControlExample</a>
  * @see <a href="http://www.eclipse.org/swt/">Sample code and further information</a>
+ * @noextend This class is not intended to be subclassed by clients.
  */
 public class Label extends Control {
 	long /*int*/ frameHandle, labelHandle, imageHandle;
@@ -125,25 +126,48 @@ public Point computeSize (int wHint, int hHint, boolean changed) {
 			if (hHint == SWT.DEFAULT) hHint = DEFAULT_HEIGHT;
 		}
 	}
-	boolean fixWrap = labelHandle != 0 && (style & SWT.WRAP) != 0;
-	if (fixWrap || frameHandle != 0) forceResize ();
-	int [] labelWidth = new int [1], labelHeight = new int [1];
-	if (fixWrap) {
-		OS.gtk_widget_get_size_request (labelHandle, labelWidth, labelHeight);
-		OS.gtk_widget_set_size_request (labelHandle, wHint, hHint);
-	}	
 	Point size; 
-	if (frameHandle != 0) {
-		int [] reqWidth = new int [1], reqHeight = new int [1];
-		OS.gtk_widget_get_size_request (handle, reqWidth, reqHeight);
-		OS.gtk_widget_set_size_request (handle, wHint, hHint);
-		size = computeNativeSize (frameHandle, -1, -1, changed);
-		OS.gtk_widget_set_size_request (handle, reqWidth [0], reqHeight [0]);
-	} else {
-		size = computeNativeSize (handle, wHint, hHint, changed);
-	}
+	/* 
+	* Feature in GTK. GTK has a predetermined maximum width for wrapping text. 
+	* The fix is to use pango layout directly instead of the label size request 
+	* to calculate its preferred size.
+	*/
+	boolean fixWrap = labelHandle != 0 && (style & SWT.WRAP) != 0 && (OS.GTK_WIDGET_FLAGS (labelHandle) & OS.GTK_VISIBLE) != 0;
+	if (fixWrap || frameHandle != 0) forceResize ();
 	if (fixWrap) {
-		OS.gtk_widget_set_size_request (labelHandle, labelWidth [0], labelHeight [0]);
+		long /*int*/ labelLayout = OS.gtk_label_get_layout (labelHandle);
+		int pangoWidth = OS.pango_layout_get_width (labelLayout);
+		if (wHint != SWT.DEFAULT) {
+			OS.pango_layout_set_width (labelLayout, wHint * OS.PANGO_SCALE);
+		} else {
+			OS.pango_layout_set_width (labelLayout, -1);
+		}
+		int [] w = new int [1], h = new int [1];
+		OS.pango_layout_get_size (labelLayout, w, h);
+		OS.pango_layout_set_width (labelLayout, pangoWidth);
+		if (frameHandle != 0) {
+			int [] labelWidth = new int [1], labelHeight = new int [1];
+			OS.gtk_widget_get_size_request (labelHandle, labelWidth, labelHeight);
+			OS.gtk_widget_set_size_request (labelHandle, 1, 1);
+			size = computeNativeSize (frameHandle, -1, -1, changed);
+			OS.gtk_widget_set_size_request (labelHandle, labelWidth [0], labelHeight [0]);
+			size.x = size.x - 1;
+			size.y = size.y - 1;
+		} else { 
+			size = new Point (0,0);
+		}
+		size.x += wHint == SWT.DEFAULT ? OS.PANGO_PIXELS(w [0]) : wHint;
+		size.y += hHint == SWT.DEFAULT ? OS.PANGO_PIXELS(h [0]) : hHint;
+	} else {
+		if (frameHandle != 0) {
+			int [] reqWidth = new int [1], reqHeight = new int [1];
+			OS.gtk_widget_get_size_request (handle, reqWidth, reqHeight);
+			OS.gtk_widget_set_size_request (handle, wHint, hHint);
+			size = computeNativeSize (frameHandle, -1, -1, changed);
+			OS.gtk_widget_set_size_request (handle, reqWidth [0], reqHeight [0]);
+		} else {
+			size = computeNativeSize (handle, wHint, hHint, changed);
+		}
 	}
 	/*
 	* Feature in GTK.  Instead of using the font height to determine
@@ -389,20 +413,9 @@ public void setAlignment (int alignment) {
 }
 
 void setAlignment () {
-	boolean isRTL = (style & SWT.RIGHT_TO_LEFT) != 0;
-	if (text != null && text.length () != 0) {
-		if (OS.GTK_VERSION >= OS.VERSION(2, 4, 0)) {
-			long /*int*/ layout = OS.gtk_label_get_layout (labelHandle);
-			long /*int*/ linePtr = OS.pango_layout_get_line (layout, 0);
-			int resolved_dir = OS.pango_layout_line_get_resolved_dir (linePtr);
-			if (resolved_dir == OS.PANGO_DIRECTION_RTL) {
-				isRTL = !isRTL;
-			}
-		}
-	}
 	if ((style & SWT.LEFT) != 0) {
 		OS.gtk_misc_set_alignment (labelHandle, 0.0f, 0.0f);
-		OS.gtk_label_set_justify (labelHandle, isRTL ? OS.GTK_JUSTIFY_RIGHT : OS.GTK_JUSTIFY_LEFT);
+		OS.gtk_label_set_justify (labelHandle, OS.GTK_JUSTIFY_LEFT);
 		OS.gtk_misc_set_alignment (imageHandle, 0.0f, 0.5f);
 		return;
 	}
@@ -414,7 +427,7 @@ void setAlignment () {
 	}
 	if ((style & SWT.RIGHT) != 0) {
 		OS.gtk_misc_set_alignment (labelHandle, 1.0f, 0.0f);
-		OS.gtk_label_set_justify (labelHandle, isRTL ? OS.GTK_JUSTIFY_LEFT : OS.GTK_JUSTIFY_RIGHT);
+		OS.gtk_label_set_justify (labelHandle, OS.GTK_JUSTIFY_RIGHT);
 		OS.gtk_misc_set_alignment (imageHandle, 1.0f, 0.5f);
 		return;
 	}
@@ -566,7 +579,6 @@ public void setText (String string) {
 	OS.gtk_label_set_text_with_mnemonic (labelHandle, buffer);
 	OS.gtk_widget_hide (imageHandle);
 	OS.gtk_widget_show (labelHandle);
-	setAlignment ();
 }
 
 void showWidget () {

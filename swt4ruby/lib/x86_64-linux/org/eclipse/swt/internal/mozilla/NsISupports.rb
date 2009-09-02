@@ -39,7 +39,15 @@ module Org::Eclipse::Swt::Internal::Mozilla
     include_class_members NsISupportsImports
     
     class_module.module_eval {
-      const_set_lazy(:LAST_METHOD_ID) { 2 }
+      when_class_loaded do
+        os_name = System.get_property("os.name").to_lower_case # $NON-NLS-1$
+        const_set :IsSolaris, os_name.starts_with("sunos") || os_name.starts_with("solaris") # $NON-NLS-1$
+      end
+      
+      const_set_lazy(:FIRST_METHOD_ID) { IsSolaris ? 2 : 0 }
+      const_attr_reader  :FIRST_METHOD_ID
+      
+      const_set_lazy(:LAST_METHOD_ID) { FIRST_METHOD_ID + 2 }
       const_attr_reader  :LAST_METHOD_ID
       
       const_set_lazy(:NS_ISUPPORTS_IID_STR) { "00000000-0000-0000-c000-000000000046" }
@@ -72,17 +80,17 @@ module Org::Eclipse::Swt::Internal::Mozilla
     typesig { [NsID, Array.typed(::Java::Long)] }
     # int
     def _query_interface(uuid, result)
-      return XPCOM._vtbl_call(0, get_address, uuid, result)
+      return XPCOM._vtbl_call(FIRST_METHOD_ID, get_address, uuid, result)
     end
     
     typesig { [] }
     def _add_ref
-      return XPCOM._vtbl_call(1, get_address)
+      return XPCOM._vtbl_call(FIRST_METHOD_ID + 1, get_address)
     end
     
     typesig { [] }
     def _release
-      return XPCOM._vtbl_call(2, get_address)
+      return XPCOM._vtbl_call(FIRST_METHOD_ID + 2, get_address)
     end
     
     private

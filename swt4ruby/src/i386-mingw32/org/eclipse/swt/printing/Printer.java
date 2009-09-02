@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2008 IBM Corporation and others.
+ * Copyright (c) 2000, 2009 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -74,9 +74,10 @@ public final class Printer extends Device {
 	
 /**
  * Returns an array of <code>PrinterData</code> objects
- * representing all available printers.
+ * representing all available printers.  If there are no
+ * printers, the array will be empty.
  *
- * @return the list of available printers
+ * @return an array of PrinterData objects representing the available printers
  */
 public static PrinterData[] getPrinterList() {
 	int length = 1024;
@@ -119,7 +120,7 @@ public static PrinterData[] getPrinterList() {
 /**
  * Returns a <code>PrinterData</code> object representing
  * the default printer or <code>null</code> if there is no 
- * printer available on the System.
+ * default printer.
  *
  * @return the default printer data or null
  * 
@@ -163,7 +164,7 @@ static DeviceData checkNull (PrinterData data) {
 /**
  * Constructs a new printer representing the default printer.
  * <p>
- * You must dispose the printer when it is no longer required. 
+ * Note: You must dispose the printer when it is no longer required. 
  * </p>
  *
  * @exception SWTError <ul>
@@ -178,12 +179,13 @@ public Printer() {
 
 /**
  * Constructs a new printer given a <code>PrinterData</code>
- * object representing the desired printer.
+ * object representing the desired printer. If the argument
+ * is null, then the default printer will be used.
  * <p>
- * You must dispose the printer when it is no longer required. 
+ * Note: You must dispose the printer when it is no longer required. 
  * </p>
  *
- * @param data the printer data for the specified printer
+ * @param data the printer data for the specified printer, or null to use the default printer
  *
  * @exception IllegalArgumentException <ul>
  *    <li>ERROR_INVALID_ARGUMENT - if the specified printer data does not represent a valid printer
@@ -210,13 +212,45 @@ protected void create(DeviceData deviceData) {
 	TCHAR driver = new TCHAR(0, data.driver, true);
 	TCHAR device = new TCHAR(0, data.name, true);
 	int /*long*/ lpInitData = 0;
-	byte buffer [] = data.otherData;
+	byte devmodeData [] = data.otherData;
 	int /*long*/ hHeap = OS.GetProcessHeap();
-	if (buffer != null && buffer.length != 0) {
+	if (devmodeData != null && devmodeData.length != 0) {
 		/* If user setup info from a print dialog was specified, restore the DEVMODE struct. */
-		lpInitData = OS.HeapAlloc(hHeap, OS.HEAP_ZERO_MEMORY, buffer.length);
-		OS.MoveMemory(lpInitData, buffer, buffer.length);
+		lpInitData = OS.HeapAlloc(hHeap, OS.HEAP_ZERO_MEMORY, devmodeData.length);
+		OS.MoveMemory(lpInitData, devmodeData, devmodeData.length);
+	} else {
+		/* Initialize DEVMODE for the default printer. */
+		PRINTDLG pd = new PRINTDLG();
+		pd.lStructSize = PRINTDLG.sizeof;
+		pd.Flags = OS.PD_RETURNDEFAULT;
+		OS.PrintDlg(pd);
+		if (pd.hDevMode != 0) {
+			int /*long*/ hGlobal = pd.hDevMode;
+			int /*long*/ ptr = OS.GlobalLock(hGlobal);
+			int size = OS.GlobalSize(hGlobal);
+			lpInitData = OS.HeapAlloc(hHeap, OS.HEAP_ZERO_MEMORY, size);
+			OS.MoveMemory(lpInitData, ptr, size);
+			OS.GlobalUnlock(hGlobal);
+			OS.GlobalFree(pd.hDevMode);
+		}
+		if (pd.hDevNames != 0) OS.GlobalFree(pd.hDevNames);
 	}
+	
+	/* Initialize DEVMODE struct fields from the printerData. */
+	DEVMODE devmode = OS.IsUnicode ? (DEVMODE)new DEVMODEW () : new DEVMODEA ();
+	OS.MoveMemory(devmode, lpInitData, DEVMODE.sizeof);
+	devmode.dmFields |= OS.DM_ORIENTATION;
+	devmode.dmOrientation = data.orientation == PrinterData.LANDSCAPE ? OS.DMORIENT_LANDSCAPE : OS.DMORIENT_PORTRAIT;
+	if (data.copyCount != 1) {
+		devmode.dmFields |= OS.DM_COPIES;
+		devmode.dmCopies = (short)data.copyCount;
+	}
+	if (data.collate != false) {
+		devmode.dmFields |= OS.DM_COLLATE;
+		devmode.dmCollate = OS.DMCOLLATE_TRUE;
+	}
+	OS.MoveMemory(lpInitData, devmode, DEVMODE.sizeof);
+
 	handle = OS.CreateDC(driver, device, 0, lpInitData);
 	if (lpInitData != 0) OS.HeapFree(hHeap, 0, lpInitData);
 	if (handle == 0) SWT.error(SWT.ERROR_NO_HANDLES);

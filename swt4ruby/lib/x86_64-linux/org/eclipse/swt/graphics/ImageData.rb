@@ -1,6 +1,6 @@
 require "rjava"
 
-# Copyright (c) 2000, 2008 IBM Corporation and others.
+# Copyright (c) 2000, 2009 IBM Corporation and others.
 # All rights reserved. This program and the accompanying materials
 # are made available under the terms of the Eclipse Public License v1.0
 # which accompanies this distribution, and is available at
@@ -291,7 +291,7 @@ module Org::Eclipse::Swt::Graphics
     # @param palette the palette of the image (must not be null)
     # 
     # @exception IllegalArgumentException <ul>
-    # <li>ERROR_INVALID_ARGUMENT - if the width or height is negative, or if the depth is not
+    # <li>ERROR_INVALID_ARGUMENT - if the width or height is zero or negative, or if the depth is not
     # one of 1, 2, 4, 8, 16, 24 or 32</li>
     # <li>ERROR_NULL_ARGUMENT - if the palette is null</li>
     # </ul>
@@ -311,7 +311,7 @@ module Org::Eclipse::Swt::Graphics
     # @param data the data of the image
     # 
     # @exception IllegalArgumentException <ul>
-    # <li>ERROR_INVALID_ARGUMENT - if the width or height is negative, or if the depth is not
+    # <li>ERROR_INVALID_ARGUMENT - if the width or height is zero or negative, or if the depth is not
     # one of 1, 2, 4, 8, 16, 24 or 32, or the data array is too small to contain the image data</li>
     # <li>ERROR_NULL_ARGUMENT - if the palette or data is null</li>
     # <li>ERROR_CANNOT_BE_ZERO - if the scanlinePad is zero</li>
@@ -2097,6 +2097,58 @@ module Org::Eclipse::Swt::Graphics
           end
           return
         end
+        # Fast 32 to 32 blit
+        if ((alpha_mode).equal?(0x10000) && (stype).equal?(TYPE_GENERIC_32_MSB) && (dtype).equal?(TYPE_GENERIC_32_MSB))
+          if ((src_red_mask).equal?(0xff00) && (src_green_mask).equal?(0xff0000) && (src_blue_mask).equal?(-0x1000000) && (dest_red_mask).equal?(0xff0000) && (dest_green_mask).equal?(0xff00) && (dest_blue_mask).equal?(0xff))
+            dy = dest_height
+            sfy = sfyi
+            while dy > 0
+              dx = dest_width
+              sfx = sfxi
+              while dx > 0
+                dest_data[dp] = src_data[sp + 3]
+                dest_data[dp + 1] = src_data[sp + 2]
+                dest_data[dp + 2] = src_data[sp + 1]
+                dest_data[dp + 3] = src_data[sp]
+                sp += (sfx >> 16) * 4
+                (dx -= 1)
+                dp += dprxi
+                sfx = (sfx & 0xffff) + sfxi
+              end
+              (dy -= 1)
+              sp = spr += (sfy >> 16) * src_stride
+              sfy = (sfy & 0xffff) + sfyi
+              dp = dpr += dpryi
+            end
+            return
+          end
+        end
+        # Fast 24 to 32 blit
+        if ((alpha_mode).equal?(0x10000) && (stype).equal?(TYPE_GENERIC_24) && (dtype).equal?(TYPE_GENERIC_32_MSB))
+          if ((src_red_mask).equal?(0xff) && (src_green_mask).equal?(0xff00) && (src_blue_mask).equal?(0xff0000) && (dest_red_mask).equal?(0xff0000) && (dest_green_mask).equal?(0xff00) && (dest_blue_mask).equal?(0xff))
+            dy = dest_height
+            sfy = sfyi
+            while dy > 0
+              dx = dest_width
+              sfx = sfxi
+              while dx > 0
+                dest_data[dp] = 0
+                dest_data[dp + 1] = src_data[sp + 2]
+                dest_data[dp + 2] = src_data[sp + 1]
+                dest_data[dp + 3] = src_data[sp]
+                sp += (sfx >> 16) * 3
+                (dx -= 1)
+                dp += dprxi
+                sfx = (sfx & 0xffff) + sfxi
+              end
+              (dy -= 1)
+              sp = spr += (sfy >> 16) * src_stride
+              sfy = (sfy & 0xffff) + sfyi
+              dp = dpr += dpryi
+            end
+            return
+          end
+        end
         # Comprehensive blit (apply transformations) **
         src_red_shift = get_channel_shift(src_red_mask)
         src_reds = ANY_TO_EIGHT[get_channel_width(src_red_mask, src_red_shift)]
@@ -3001,6 +3053,52 @@ module Org::Eclipse::Swt::Graphics
       def blit(op, src_data, src_depth, src_stride, src_order, src_x, src_y, src_width, src_height, src_reds, src_greens, src_blues, alpha_mode, alpha_data, alpha_stride, alpha_x, alpha_y, dest_data, dest_depth, dest_stride, dest_order, dest_x, dest_y, dest_width, dest_height, dest_red_mask, dest_green_mask, dest_blue_mask, flip_x, flip_y)
         if ((dest_width <= 0) || (dest_height <= 0) || ((alpha_mode).equal?(ALPHA_TRANSPARENT)))
           return
+        end
+        # Fast blit (straight copy) **
+        if ((src_x).equal?(0) && (src_y).equal?(0) && (dest_x).equal?(0) && (dest_y).equal?(0) && (dest_width).equal?(src_width) && (dest_height).equal?(src_height))
+          if ((dest_depth).equal?(24) && (src_depth).equal?(8) && ((op & BLIT_ALPHA)).equal?(0) && (dest_red_mask).equal?(0xff0000) && (dest_green_mask).equal?(0xff00) && (dest_blue_mask).equal?(0xff))
+            y = 0
+            sp = 0
+            dp = 0
+            spad = src_stride - src_width
+            dpad = dest_stride - (dest_width * 3)
+            while y < dest_height
+              x = 0
+              while x < dest_width
+                index = src_data[((sp += 1) - 1)] & 0xff
+                dest_data[((dp += 1) - 1)] = src_reds[index]
+                dest_data[((dp += 1) - 1)] = src_greens[index]
+                dest_data[((dp += 1) - 1)] = src_blues[index]
+                x += 1
+              end
+              y += 1
+              sp += spad
+              dp += dpad
+            end
+            return
+          end
+          if ((dest_depth).equal?(32) && (dest_order).equal?(MSB_FIRST) && (src_depth).equal?(8) && ((op & BLIT_ALPHA)).equal?(0) && (dest_red_mask).equal?(0xff0000) && (dest_green_mask).equal?(0xff00) && (dest_blue_mask).equal?(0xff))
+            y = 0
+            sp = 0
+            dp = 0
+            spad = src_stride - src_width
+            dpad = dest_stride - (dest_width * 4)
+            while y < dest_height
+              x = 0
+              while x < dest_width
+                index = src_data[((sp += 1) - 1)] & 0xff
+                dp += 1
+                dest_data[((dp += 1) - 1)] = src_reds[index]
+                dest_data[((dp += 1) - 1)] = src_greens[index]
+                dest_data[((dp += 1) - 1)] = src_blues[index]
+                x += 1
+              end
+              y += 1
+              sp += spad
+              dp += dpad
+            end
+            return
+          end
         end
         # these should be supplied as params later
         dest_alpha_mask = 0

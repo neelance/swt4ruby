@@ -1,6 +1,6 @@
 require "rjava"
 
-# Copyright (c) 2000, 2008 IBM Corporation and others.
+# Copyright (c) 2000, 2009 IBM Corporation and others.
 # All rights reserved. This program and the accompanying materials
 # are made available under the terms of the Eclipse Public License v1.0
 # which accompanies this distribution, and is available at
@@ -14,15 +14,8 @@ module Org::Eclipse::Swt::Widgets
       include ::Java::Lang
       include ::Org::Eclipse::Swt::Widgets
       include ::Org::Eclipse::Swt::Internal
-      include_const ::Org::Eclipse::Swt::Internal::Carbon, :CFRange
-      include_const ::Org::Eclipse::Swt::Internal::Carbon, :CGRect
-      include_const ::Org::Eclipse::Swt::Internal::Carbon, :OS
-      include_const ::Org::Eclipse::Swt::Internal::Carbon, :RGBColor
-      include_const ::Org::Eclipse::Swt::Internal::Carbon, :Rect
-      include_const ::Org::Eclipse::Swt::Internal::Carbon, :PixMap
-      include_const ::Org::Eclipse::Swt::Internal::Carbon, :BitMap
+      include ::Org::Eclipse::Swt::Internal::Cocoa
       include ::Org::Eclipse::Swt
-      include ::Org::Eclipse::Swt::Graphics
       include ::Org::Eclipse::Swt::Events
     }
   end
@@ -84,6 +77,13 @@ module Org::Eclipse::Swt::Widgets
     undef_method :data
     alias_method :attr_data=, :data=
     undef_method :data=
+    
+    # long
+    attr_accessor :jni_ref
+    alias_method :attr_jni_ref, :jni_ref
+    undef_method :jni_ref
+    alias_method :attr_jni_ref=, :jni_ref=
+    undef_method :jni_ref=
     
     class_module.module_eval {
       # Global state flags
@@ -156,15 +156,16 @@ module Org::Eclipse::Swt::Widgets
       const_attr_reader  :SAFARI_EVENTS_FIX_KEY
       
       # $NON-NLS-1$
+      const_set_lazy(:GLCONTEXT_KEY) { "org.eclipse.swt.internal.cocoa.glcontext" }
+      const_attr_reader  :GLCONTEXT_KEY
+      
+      # $NON-NLS-1$
       # Default size for widgets
       const_set_lazy(:DEFAULT_WIDTH) { 64 }
       const_attr_reader  :DEFAULT_WIDTH
       
       const_set_lazy(:DEFAULT_HEIGHT) { 64 }
       const_attr_reader  :DEFAULT_HEIGHT
-      
-      const_set_lazy(:EMPTY_RECT) { Rect.new }
-      const_attr_reader  :EMPTY_RECT
     }
     
     typesig { [] }
@@ -174,6 +175,7 @@ module Org::Eclipse::Swt::Widgets
       @display = nil
       @event_table = nil
       @data = nil
+      @jni_ref = 0
       # Do nothing
     end
     
@@ -211,15 +213,309 @@ module Org::Eclipse::Swt::Widgets
       @display = nil
       @event_table = nil
       @data = nil
+      @jni_ref = 0
       check_subclass
       check_parent(parent)
       @style = style
       @display = parent.attr_display
     end
     
+    typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
+    # long
+    # long
+    # long
+    # long
+    def accessibility_action_description(id, sel, arg0)
+      return call_super_object(id, sel, arg0)
+    end
+    
     typesig { [::Java::Int, ::Java::Int] }
-    def action_proc(the_control, part_code)
-      return OS.attr_event_not_handled_err
+    # long
+    # long
+    # long
+    def accessibility_action_names(id, sel)
+      return call_super_object(id, sel)
+    end
+    
+    typesig { [::Java::Int, ::Java::Int] }
+    # long
+    # long
+    # long
+    def accessibility_attribute_names(id, sel)
+      return call_super_object(id, sel)
+    end
+    
+    typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
+    # long
+    # long
+    # long
+    # long
+    def accessibility_attribute_value(id, sel, arg0)
+      return call_super_object(id, sel, arg0)
+    end
+    
+    typesig { [::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int] }
+    # long
+    # long
+    # long
+    # long
+    # long
+    def accessibility_attribute_value_for_parameter(id, sel, arg0, arg1)
+      super_struct = Objc_super.new
+      super_struct.attr_receiver = id
+      super_struct.attr_super_class = OS.objc_msg_send(id, OS.attr_sel_superclass)
+      return OS.objc_msg_send_super(super_struct, sel, arg0, arg1)
+    end
+    
+    typesig { [::Java::Int, ::Java::Int] }
+    # long
+    # long
+    # long
+    def accessibility_focused_uielement(id, sel)
+      return call_super_object(id, sel)
+    end
+    
+    typesig { [::Java::Int, ::Java::Int, NSPoint] }
+    # long
+    # long
+    # long
+    def accessibility_hit_test(id, sel, point)
+      super_struct = Objc_super.new
+      super_struct.attr_receiver = id
+      super_struct.attr_super_class = OS.objc_msg_send(id, OS.attr_sel_superclass)
+      return OS.objc_msg_send_super(super_struct, sel, point)
+    end
+    
+    typesig { [::Java::Int, ::Java::Int] }
+    # long
+    # long
+    def accessibility_is_ignored(id, sel)
+      return call_super_boolean(id, sel)
+    end
+    
+    typesig { [::Java::Int, ::Java::Int] }
+    # long
+    # long
+    # long
+    def accessibility_parameterized_attribute_names(id, sel)
+      return call_super_object(id, sel)
+    end
+    
+    typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
+    # long
+    # long
+    # long
+    def accessibility_perform_action(id, sel, arg0)
+      call_super(id, sel, arg0)
+    end
+    
+    typesig { [] }
+    def get_clipboard_text
+      pasteboard = NSPasteboard.general_pasteboard
+      string = pasteboard.string_for_type(OS::NSStringPboardType)
+      return !(string).nil? ? string.get_string : nil
+    end
+    
+    typesig { [::Java::Float, ::Java::Float] }
+    # double
+    # double
+    def set_clip_region(x, y)
+    end
+    
+    typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
+    # long
+    # long
+    # long
+    # long
+    def attributed_substring_from_range(id, sel, range)
+      return 0
+    end
+    
+    typesig { [::Java::Int, ::Java::Int] }
+    # long
+    # long
+    def call_super(id, sel)
+      super_struct = Objc_super.new
+      super_struct.attr_receiver = id
+      super_struct.attr_super_class = OS.objc_msg_send(id, OS.attr_sel_superclass)
+      OS.objc_msg_send_super(super_struct, sel)
+    end
+    
+    typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
+    # long
+    # long
+    # long
+    def call_super(id, sel, arg0)
+      super_struct = Objc_super.new
+      super_struct.attr_receiver = id
+      super_struct.attr_super_class = OS.objc_msg_send(id, OS.attr_sel_superclass)
+      OS.objc_msg_send_super(super_struct, sel, arg0)
+    end
+    
+    typesig { [::Java::Int, ::Java::Int, NSRect] }
+    # long
+    # long
+    def call_super(id, sel, arg0)
+      super_struct = Objc_super.new
+      super_struct.attr_receiver = id
+      super_struct.attr_super_class = OS.objc_msg_send(id, OS.attr_sel_superclass)
+      OS.objc_msg_send_super(super_struct, sel, arg0)
+    end
+    
+    typesig { [::Java::Int, ::Java::Int, NSRect, ::Java::Int] }
+    # long
+    # long
+    # long
+    def call_super(id, sel, arg0, arg1)
+      super_struct = Objc_super.new
+      super_struct.attr_receiver = id
+      super_struct.attr_super_class = OS.objc_msg_send(id, OS.attr_sel_superclass)
+      OS.objc_msg_send_super(super_struct, sel, arg0, arg1)
+    end
+    
+    typesig { [::Java::Int, ::Java::Int, ::Java::Int, NSRect, ::Java::Int] }
+    # long
+    # long
+    # long
+    # long
+    # long
+    def call_super(id, sel, arg0, arg1, arg2)
+      super_struct = Objc_super.new
+      super_struct.attr_receiver = id
+      super_struct.attr_super_class = OS.objc_msg_send(id, OS.attr_sel_superclass)
+      return OS.objc_msg_send_super(super_struct, sel, arg0, arg1, arg2)
+    end
+    
+    typesig { [::Java::Int, ::Java::Int] }
+    # long
+    # long
+    def call_super_boolean(id, sel)
+      super_struct = Objc_super.new
+      super_struct.attr_receiver = id
+      super_struct.attr_super_class = OS.objc_msg_send(id, OS.attr_sel_superclass)
+      return !(OS.objc_msg_send_super(super_struct, sel)).equal?(0)
+    end
+    
+    typesig { [::Java::Int, ::Java::Int] }
+    # long
+    # long
+    def can_become_key_window(id, sel)
+      return call_super_boolean(id, sel)
+    end
+    
+    typesig { [::Java::Int, ::Java::Int] }
+    # long
+    # long
+    def cell_size(id, sel)
+      result = NSSize.new
+      super_struct = Objc_super.new
+      super_struct.attr_receiver = id
+      super_struct.attr_super_class = OS.objc_msg_send(id, OS.attr_sel_superclass)
+      OS.objc_msg_send_super_stret(result, super_struct, sel)
+      return result
+    end
+    
+    typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
+    # long
+    # long
+    # long
+    def call_super_boolean(id, sel, arg0)
+      super_struct = Objc_super.new
+      super_struct.attr_receiver = id
+      super_struct.attr_super_class = OS.objc_msg_send(id, OS.attr_sel_superclass)
+      return !(OS.objc_msg_send_super(super_struct, sel, arg0)).equal?(0)
+    end
+    
+    typesig { [::Java::Int, ::Java::Int, NSRange, ::Java::Int] }
+    # long
+    # long
+    # long
+    def call_super_boolean(id, sel, range, arg1)
+      super_struct = Objc_super.new
+      super_struct.attr_receiver = id
+      super_struct.attr_super_class = OS.objc_msg_send(id, OS.attr_sel_superclass)
+      return OS.objc_msg_send_super_bool(super_struct, sel, range, arg1)
+    end
+    
+    typesig { [::Java::Int, ::Java::Int] }
+    # long
+    # long
+    # long
+    def call_super_object(id, sel)
+      super_struct = Objc_super.new
+      super_struct.attr_receiver = id
+      super_struct.attr_super_class = OS.objc_msg_send(id, OS.attr_sel_superclass)
+      return OS.objc_msg_send_super(super_struct, sel)
+    end
+    
+    typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
+    # long
+    # long
+    # long
+    # long
+    def call_super_object(id, sel, arg0)
+      super_struct = Objc_super.new
+      super_struct.attr_receiver = id
+      super_struct.attr_super_class = OS.objc_msg_send(id, OS.attr_sel_superclass)
+      return OS.objc_msg_send_super(super_struct, sel, arg0)
+    end
+    
+    typesig { [::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int] }
+    # long
+    # long
+    # long
+    # long
+    def can_drag_rows_with_indexes_at_point(id, sel, arg0, arg1)
+      # Trees/tables are not draggable unless explicitly told they are.
+      return false
+    end
+    
+    typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
+    # long
+    # long
+    # long
+    # long
+    def character_index_for_point(id, sel, point)
+      return OS::NSNotFound
+    end
+    
+    typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
+    # long
+    # long
+    # long
+    def accepts_first_mouse(id, sel, the_event)
+      super_struct = Objc_super.new
+      super_struct.attr_receiver = id
+      super_struct.attr_super_class = OS.objc_msg_send(id, OS.attr_sel_superclass)
+      return !(OS.objc_msg_send_super(super_struct, sel, the_event)).equal?(0)
+    end
+    
+    typesig { [::Java::Int, ::Java::Int] }
+    # long
+    # long
+    def accepts_first_responder(id, sel)
+      return call_super_boolean(id, sel)
+    end
+    
+    typesig { [::Java::Int, ::Java::Int] }
+    # long
+    # long
+    def become_first_responder(id, sel)
+      return call_super_boolean(id, sel)
+    end
+    
+    typesig { [::Java::Int, ::Java::Int] }
+    # long
+    # long
+    def become_key_window(id, sel)
+      call_super(id, sel)
+    end
+    
+    typesig { [::Java::Int, ::Java::Int] }
+    # long
+    # long
+    def resign_first_responder(id, sel)
+      return call_super_boolean(id, sel)
     end
     
     typesig { [::Java::Int, Listener] }
@@ -261,11 +557,6 @@ module Org::Eclipse::Swt::Widgets
       @event_table.hook(event_type, listener)
     end
     
-    typesig { [::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int] }
-    def call_paint_event_handler(control, damage_rgn, visible_rgn, the_event, next_handler)
-      return OS._call_next_event_handler(next_handler, the_event)
-    end
-    
     typesig { [DisposeListener] }
     # Adds the listener to the collection of listeners who will
     # be notified when the widget is disposed. When the widget is
@@ -291,6 +582,13 @@ module Org::Eclipse::Swt::Widgets
       end
       typed_listener = TypedListener.new(listener)
       add_listener(SWT::Dispose, typed_listener)
+    end
+    
+    typesig { [::Java::Int, ::Java::Int] }
+    # long
+    # long
+    def can_become_key_view(id, sel)
+      return true
     end
     
     class_module.module_eval {
@@ -321,57 +619,6 @@ module Org::Eclipse::Swt::Widgets
         return style
       end
     }
-    
-    typesig { [::Java::Int, ::Java::Int, ::Java::Boolean] }
-    def calculate_visible_region(control, visible_rgn, clip_children)
-      temp_rgn = OS._new_rgn
-      if (OS._is_control_visible(control))
-        child_rgn = OS._new_rgn
-        window = OS._get_control_owner(control)
-        count = Array.typed(::Java::Short).new(1) { 0 }
-        out_control = Array.typed(::Java::Int).new(1) { 0 }
-        OS._get_root_control(window, out_control)
-        root = out_control[0]
-        OS._get_control_region(root, RJava.cast_to_short(OS.attr_k_control_structure_meta_part), visible_rgn)
-        temp_control = control
-        last_control = 0
-        while (!(temp_control).equal?(root))
-          OS._get_control_region(temp_control, RJava.cast_to_short(OS.attr_k_control_structure_meta_part), temp_rgn)
-          OS._hiview_convert_region(temp_rgn, temp_control, root)
-          OS._sect_rgn(temp_rgn, visible_rgn, visible_rgn)
-          if (OS._empty_rgn(visible_rgn))
-            break
-          end
-          if (clip_children || !(temp_control).equal?(control))
-            OS._count_sub_controls(temp_control, count)
-            i = 0
-            while i < count[0]
-              OS._get_indexed_sub_control(temp_control, RJava.cast_to_short((count[0] - i)), out_control)
-              child = out_control[0]
-              if ((child).equal?(last_control))
-                break
-              end
-              if (!OS._is_control_visible(child))
-                i += 1
-                next
-              end
-              OS._get_control_region(child, RJava.cast_to_short(OS.attr_k_control_structure_meta_part), temp_rgn)
-              OS._hiview_convert_region(temp_rgn, child, root)
-              OS._union_rgn(temp_rgn, child_rgn, child_rgn)
-              i += 1
-            end
-          end
-          last_control = temp_control
-          OS._get_super_control(temp_control, out_control)
-          temp_control = out_control[0]
-        end
-        OS._diff_rgn(visible_rgn, child_rgn, visible_rgn)
-        OS._dispose_rgn(child_rgn)
-      else
-        OS._copy_rgn(temp_rgn, visible_rgn)
-      end
-      OS._dispose_rgn(temp_rgn)
-    end
     
     typesig { [] }
     def check_open
@@ -466,7 +713,7 @@ module Org::Eclipse::Swt::Widgets
       if ((display).nil?)
         error(SWT::ERROR_WIDGET_DISPOSED)
       end
-      if (!(display.attr_thread).equal?(JavaThread.current_thread))
+      if (!(display.attr_thread).equal?(JavaThread.current_thread) && !display.attr_is_embedded)
         error(SWT::ERROR_THREAD_INVALID_ACCESS)
       end
       if (!((@state & DISPOSED)).equal?(0))
@@ -474,78 +721,25 @@ module Org::Eclipse::Swt::Widgets
       end
     end
     
-    typesig { [::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int] }
-    def color_proc(in_control, in_message, in_draw_depth, in_draw_in_color)
-      return OS.attr_event_not_handled_err
-    end
-    
-    typesig { [::Java::Int, ::Java::Int] }
-    def contains(shell_x, shell_y)
+    typesig { [::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int] }
+    # long
+    # long
+    # long
+    # long
+    # long
+    def text_view_click_on_link_at_index(id, sel, text_view, link, char_index)
       return true
     end
     
-    typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
-    def clock_proc(next_handler, the_event, user_data)
-      kind = OS._get_event_kind(the_event)
-      case (kind)
-      when OS.attr_k_event_clock_date_or_time_changed
-        return k_event_clock_date_or_time_changed(next_handler, the_event, user_data)
-      end
-      return OS.attr_event_not_handled_err
-    end
-    
-    typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
-    def control_proc(next_handler, the_event, user_data)
-      event_kind = OS._get_event_kind(the_event)
-      case (event_kind)
-      when OS.attr_k_event_control_activate
-        return k_event_control_activate(next_handler, the_event, user_data)
-      when OS.attr_k_event_control_apply_background
-        return k_event_control_apply_background(next_handler, the_event, user_data)
-      when OS.attr_k_event_control_bounds_changed
-        return k_event_control_bounds_changed(next_handler, the_event, user_data)
-      when OS.attr_k_event_control_click
-        return k_event_control_click(next_handler, the_event, user_data)
-      when OS.attr_k_event_control_contextual_menu_click
-        return k_event_control_contextual_menu_click(next_handler, the_event, user_data)
-      when OS.attr_k_event_control_deactivate
-        return k_event_control_deactivate(next_handler, the_event, user_data)
-      when OS.attr_k_event_control_draw
-        return k_event_control_draw(next_handler, the_event, user_data)
-      when OS.attr_k_event_control_get_part_region
-        return k_event_control_get_part_region(next_handler, the_event, user_data)
-      when OS.attr_k_event_control_hit
-        return k_event_control_hit(next_handler, the_event, user_data)
-      when OS.attr_k_event_control_set_cursor
-        return k_event_control_set_cursor(next_handler, the_event, user_data)
-      when OS.attr_k_event_control_set_focus_part
-        return k_event_control_set_focus_part(next_handler, the_event, user_data)
-      when OS.attr_k_event_control_track
-        return k_event_control_track(next_handler, the_event, user_data)
-      when OS.attr_k_event_control_get_focus_part
-        return k_event_control_get_focus_part(next_handler, the_event, user_data)
-      when OS.attr_k_event_control_hit_test
-        return k_event_control_hit_test(next_handler, the_event, user_data)
-      when OS.attr_k_event_control_get_click_activation
-        return k_event_control_get_click_activation(next_handler, the_event, user_data)
-      end
-      return OS.attr_event_not_handled_err
-    end
-    
-    typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
-    def accessibility_proc(next_handler, the_event, user_data)
-      event_kind = OS._get_event_kind(the_event)
-      case (event_kind)
-      when OS.attr_k_event_accessible_get_child_at_point
-        return k_event_accessible_get_child_at_point(next_handler, the_event, user_data)
-      when OS.attr_k_event_accessible_get_focused_child
-        return k_event_accessible_get_focused_child(next_handler, the_event, user_data)
-      when OS.attr_k_event_accessible_get_all_attribute_names
-        return k_event_accessible_get_all_attribute_names(next_handler, the_event, user_data)
-      when OS.attr_k_event_accessible_get_named_attribute
-        return k_event_accessible_get_named_attribute(next_handler, the_event, user_data)
-      end
-      return OS.attr_event_not_handled_err
+    typesig { [::Java::Int, ::Java::Int, ::Java::Int, ::Java::Boolean] }
+    # long
+    # long
+    # long
+    def collapse_item_collapse_children(id, sel, item, children)
+      super_struct = Objc_super.new
+      super_struct.attr_receiver = id
+      super_struct.attr_super_class = OS.objc_msg_send(id, OS.attr_sel_superclass)
+      OS.objc_msg_send_super(super_struct, sel, item, children)
     end
     
     typesig { [Array.typed(::Java::Char)] }
@@ -553,244 +747,28 @@ module Org::Eclipse::Swt::Widgets
       if ((buffer.attr_length).equal?(0))
         return
       end
-      OS._clear_current_scrap
-      scrap = Array.typed(::Java::Int).new(1) { 0 }
-      OS._get_current_scrap(scrap)
-      OS._put_scrap_flavor(scrap[0], OS.attr_k_scrap_flavor_type_unicode, 0, buffer.attr_length * 2, buffer)
-    end
-    
-    typesig { [Image] }
-    def create_cicon(image)
-      image_handle = image.attr_handle
-      width = OS._cgimage_get_width(image_handle)
-      height = OS._cgimage_get_height(image_handle)
-      bpr = OS._cgimage_get_bytes_per_row(image_handle)
-      bpp = OS._cgimage_get_bits_per_pixel(image_handle)
-      bpc = OS._cgimage_get_bits_per_component(image_handle)
-      alpha_info = OS._cgimage_get_alpha_info(image_handle)
-      mask_bpl = (((width + 7) / 8) + 3) / 4 * 4
-      mask_size = height * mask_bpl
-      pixmap_size = height * bpr
-      # Create the icon
-      icon_size = PixMap.attr_sizeof + BitMap.attr_sizeof * 2 + 4 + mask_size
-      icon_handle = OS._new_handle(icon_size)
-      if ((icon_handle).equal?(0))
-        SWT.error(SWT::ERROR_NO_HANDLES)
-      end
-      OS._hlock(icon_handle)
-      icon_ptr = Array.typed(::Java::Int).new(1) { 0 }
-      OS.memmove(icon_ptr, icon_handle, 4)
-      # Initialize the pixmap
-      icon_pmap = PixMap.new
-      icon_pmap.attr_row_bytes = RJava.cast_to_short((bpr | 0x8000))
-      icon_pmap.attr_right = RJava.cast_to_short(width)
-      icon_pmap.attr_bottom = RJava.cast_to_short(height)
-      icon_pmap.attr_cmp_count = 3
-      icon_pmap.attr_cmp_size = RJava.cast_to_short(bpc)
-      icon_pmap.attr_pm_table = OS._new_handle(0)
-      icon_pmap.attr_h_res = 72 << 16
-      icon_pmap.attr_v_res = 72 << 16
-      icon_pmap.attr_pixel_type = RJava.cast_to_short(OS::RGBDirect)
-      icon_pmap.attr_pixel_size = RJava.cast_to_short(bpp)
-      icon_pmap.attr_pixel_format = RJava.cast_to_short(bpp)
-      OS.memmove(icon_ptr[0], icon_pmap, PixMap.attr_sizeof)
-      # Initialize the mask
-      icon_mask = BitMap.new
-      icon_mask.attr_row_bytes = RJava.cast_to_short(mask_bpl)
-      icon_mask.attr_right = RJava.cast_to_short(width)
-      icon_mask.attr_bottom = RJava.cast_to_short(height)
-      OS.memmove(icon_ptr[0] + PixMap.attr_sizeof, icon_mask, BitMap.attr_sizeof)
-      # Initialize the icon data
-      icon_data = OS._new_handle(pixmap_size)
-      OS._hlock(icon_data)
-      icon_data_ptr = Array.typed(::Java::Int).new(1) { 0 }
-      OS.memmove(icon_data_ptr, icon_data, 4)
-      OS.memmove(icon_data_ptr[0], image.attr_data, pixmap_size)
-      OS._hunlock(icon_data)
-      OS.memmove(icon_ptr[0] + PixMap.attr_sizeof + 2 * BitMap.attr_sizeof, Array.typed(::Java::Int).new([icon_data]), 4)
-      # Initialize the mask data
-      if (!(alpha_info).equal?(OS.attr_k_cgimage_alpha_first))
-        OS.memset(icon_ptr[0] + PixMap.attr_sizeof + 2 * BitMap.attr_sizeof + 4, -1, mask_size)
-      else
-        src_data = Array.typed(::Java::Byte).new(pixmap_size) { 0 }
-        OS.memmove(src_data, image.attr_data, pixmap_size)
-        mask_data = Array.typed(::Java::Byte).new(mask_size) { 0 }
-        offset = 0
-        mask_offset = 0
-        y = 0
-        while y < height
-          x = 0
-          while x < width
-            if ((src_data[offset] & 0xff) > 128)
-              mask_data[mask_offset + (x >> 3)] |= (1 << (7 - (x & 0x7)))
-            else
-              mask_data[mask_offset + (x >> 3)] &= ~(1 << (7 - (x & 0x7)))
-            end
-            offset += 4
-            x += 1
-          end
-          mask_offset += mask_bpl
-          y += 1
-        end
-        OS.memmove(icon_ptr[0] + PixMap.attr_sizeof + 2 * BitMap.attr_sizeof + 4, mask_data, mask_data.attr_length)
-      end
-      OS._hunlock(icon_handle)
-      return icon_handle
+      pasteboard = NSPasteboard.general_pasteboard
+      pasteboard.declare_types(NSArray.array_with_object(OS::NSStringPboardType), nil)
+      pasteboard.set_string(NSString.string_with_characters(buffer, buffer.attr_length), OS::NSStringPboardType)
     end
     
     typesig { [] }
     def create_handle
     end
     
-    typesig { [Image] }
-    def create_icon_ref(image)
-      image_handle = image.attr_handle
-      image_data = image.attr_data
-      width = OS._cgimage_get_width(image_handle)
-      height = OS._cgimage_get_height(image_handle)
-      bpr = OS._cgimage_get_bytes_per_row(image_handle)
-      alpha_info = OS._cgimage_get_alpha_info(image_handle)
-      type = 0
-      mask_type = 0
-      if ((width).equal?(16) && (height).equal?(16))
-        type = OS.attr_k_small32bit_data
-        mask_type = OS.attr_k_small8bit_mask
-      else
-        if ((width).equal?(32) && (height).equal?(32))
-          type = OS.attr_k_large32bit_data
-          mask_type = OS.attr_k_large8bit_mask
-        else
-          if ((width).equal?(48) && (height).equal?(48))
-            type = OS.attr_k_huge32bit_data
-            mask_type = OS.attr_k_huge8bit_mask
-          else
-            if ((width).equal?(128) && (height).equal?(128))
-              type = OS.attr_k_thumbnail32bit_data
-              mask_type = OS.attr_k_thumbnail8bit_mask
-            else
-              type = OS.attr_k_small32bit_data
-              mask_type = OS.attr_k_small8bit_mask
-              size = 16
-              if (width > 16 || height > 16)
-                type = OS.attr_k_huge32bit_data
-                mask_type = OS.attr_k_huge8bit_mask
-                size = 32
-              end
-              if (width > 32 || height > 32)
-                type = OS.attr_k_huge32bit_data
-                mask_type = OS.attr_k_huge8bit_mask
-                size = 48
-              end
-              if (width > 48 || height > 48)
-                type = OS.attr_k_thumbnail32bit_data
-                mask_type = OS.attr_k_thumbnail8bit_mask
-                size = 128
-              end
-              width = height = size
-              bpr = width * 4
-              data_size = height * bpr
-              image_data = OS._new_ptr(data_size)
-              if ((image_data).equal?(0))
-                SWT.error(SWT::ERROR_NO_HANDLES)
-              end
-              colorspace = OS._cgcolor_space_create_device_rgb
-              if ((colorspace).equal?(0))
-                SWT.error(SWT::ERROR_NO_HANDLES)
-              end
-              context = OS._cgbitmap_context_create(image_data, width, height, 8, bpr, colorspace, OS.attr_k_cgimage_alpha_none_skip_first)
-              OS._cgcolor_space_release(colorspace)
-              if ((context).equal?(0))
-                SWT.error(SWT::ERROR_NO_HANDLES)
-              end
-              rect = CGRect.new
-              rect.attr_width = width
-              rect.attr_height = height
-              OS._cgcontext_draw_image(context, rect, image_handle)
-              OS._cgcontext_release(context)
-            end
-          end
-        end
+    typesig { [] }
+    def create_jniref
+      @jni_ref = OS._new_global_ref(self)
+      if ((@jni_ref).equal?(0))
+        error(SWT::ERROR_NO_HANDLES)
       end
-      if ((type).equal?(0))
-        return 0
-      end
-      icon_family = OS._new_handle(0)
-      if ((icon_family).equal?(0))
-        SWT.error(SWT::ERROR_NO_HANDLES)
-      end
-      data_size = height * bpr
-      data_handle = OS._new_handle(data_size)
-      if ((data_handle).equal?(0))
-        SWT.error(SWT::ERROR_NO_HANDLES)
-      end
-      data_ptr = Array.typed(::Java::Int).new(1) { 0 }
-      OS._hlock(data_handle)
-      OS.memmove(data_ptr, data_handle, 4)
-      OS.memmove(data_ptr[0], image_data, data_size)
-      OS._hunlock(data_handle)
-      OS._set_icon_family_data(icon_family, type, data_handle)
-      OS._dispose_handle(data_handle)
-      # Initialize the mask data
-      mask_size = width * height
-      mask_handle = OS._new_handle(mask_size)
-      if ((mask_handle).equal?(0))
-        SWT.error(SWT::ERROR_NO_HANDLES)
-      end
-      OS._hlock(mask_handle)
-      mask_ptr = Array.typed(::Java::Int).new(1) { 0 }
-      OS.memmove(mask_ptr, mask_handle, 4)
-      if (!(alpha_info).equal?(OS.attr_k_cgimage_alpha_first))
-        OS.memset(mask_ptr[0], 0xff, mask_size)
-      else
-        src_data = Array.typed(::Java::Byte).new(data_size) { 0 }
-        OS.memmove(src_data, image_data, data_size)
-        mask_data = Array.typed(::Java::Byte).new(mask_size) { 0 }
-        offset = 0
-        mask_offset = 0
-        y = 0
-        while y < height
-          x = 0
-          while x < width
-            mask_data[((mask_offset += 1) - 1)] = src_data[offset]
-            offset += 4
-            x += 1
-          end
-          y += 1
-        end
-        OS.memmove(mask_ptr[0], mask_data, mask_data.attr_length)
-      end
-      OS._hunlock(mask_handle)
-      OS._set_icon_family_data(icon_family, mask_type, mask_handle)
-      OS._dispose_handle(mask_handle)
-      if (!(image_data).equal?(image.attr_data))
-        OS._dispose_ptr(image_data)
-      end
-      # Create the icon ref
-      icon_ref = Array.typed(::Java::Int).new(1) { 0 }
-      OS._hlock(icon_family)
-      icon_ptr = Array.typed(::Java::Int).new(1) { 0 }
-      OS.memmove(icon_ptr, icon_family, 4)
-      OS._get_icon_ref_from_icon_family_ptr(icon_ptr[0], OS._get_handle_size(icon_family), icon_ref)
-      OS._hunlock(icon_family)
-      OS._dispose_handle(icon_family)
-      return icon_ref[0]
     end
     
     typesig { [] }
     def create_widget
+      create_jniref
       create_handle
       register
-      hook_events
-    end
-    
-    typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
-    def command_proc(next_handler, the_event, user_data)
-      event_kind = OS._get_event_kind(the_event)
-      case (event_kind)
-      when OS.attr_k_event_process_command
-        return k_event_process_command(next_handler, the_event, user_data)
-      end
-      return OS.attr_event_not_handled_err
     end
     
     typesig { [] }
@@ -798,35 +776,16 @@ module Org::Eclipse::Swt::Widgets
     end
     
     typesig { [] }
+    def destroy_jniref
+      if (!(@jni_ref).equal?(0))
+        OS._delete_global_ref(@jni_ref)
+      end
+      @jni_ref = 0
+    end
+    
+    typesig { [] }
     def destroy_widget
       release_handle
-    end
-    
-    typesig { [::Java::Int] }
-    def destroy_cicon(icon_handle)
-      OS._hlock(icon_handle)
-      # Dispose the ColorTable
-      icon_ptr = Array.typed(::Java::Int).new(1) { 0 }
-      OS.memmove(icon_ptr, icon_handle, 4)
-      icon_pmap = PixMap.new
-      OS.memmove(icon_pmap, icon_ptr[0], PixMap.attr_sizeof)
-      if (!(icon_pmap.attr_pm_table).equal?(0))
-        OS._dispose_handle(icon_pmap.attr_pm_table)
-      end
-      # Dispose the icon data
-      icon_data = Array.typed(::Java::Int).new(1) { 0 }
-      OS.memmove(icon_data, icon_ptr[0] + PixMap.attr_sizeof + 2 * BitMap.attr_sizeof, 4)
-      if (!(icon_data[0]).equal?(0))
-        OS._dispose_handle(icon_data[0])
-      end
-      OS._hunlock(icon_handle)
-      # Dispose the icon
-      OS._dispose_handle(icon_handle)
-    end
-    
-    typesig { [::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int] }
-    def draw_item_proc(browser, item, property, item_state, the_rect, gd_depth, color_device)
-      return OS.attr_no_err
     end
     
     typesig { [] }
@@ -863,13 +822,115 @@ module Org::Eclipse::Swt::Widgets
       release(true)
     end
     
-    typesig { [::Java::Int, ::Java::Int] }
-    def draw_background(control, context)
-      # Do nothing
+    typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
+    # long
+    # long
+    # long
+    def do_command_by_selector(id, sel, a_selector)
+      call_super(id, sel, a_selector)
     end
     
     typesig { [::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int] }
-    def draw_widget(control, context, damage_rgn, visible_rgn, the_event)
+    # long
+    # long
+    # long
+    # long
+    # long
+    def drag_selection_with_event(id, sel, arg0, arg1, arg2)
+      return false
+    end
+    
+    typesig { [::Java::Int, NSGraphicsContext, NSRect] }
+    # long
+    def draw_background(id, context, rect)
+      # Do nothing
+    end
+    
+    typesig { [::Java::Int, ::Java::Int, ::Java::Int, NSRect, ::Java::Int] }
+    # long
+    # long
+    # long
+    # long
+    def draw_image_with_frame_in_view(id, sel, image, rect, view)
+    end
+    
+    typesig { [::Java::Int, ::Java::Int, NSRect, ::Java::Int] }
+    # long
+    # long
+    # long
+    def draw_interior_with_frame_in_view(id, sel, cell_frame, view)
+      call_super(id, sel, cell_frame, view)
+    end
+    
+    typesig { [::Java::Int, ::Java::Int, NSRect, ::Java::Int] }
+    # long
+    # long
+    # long
+    def draw_with_expansion_frame_in_view(id, sel, cell_frame, view)
+      call_super(id, sel, cell_frame, view)
+    end
+    
+    typesig { [::Java::Int, ::Java::Int, NSRect] }
+    # long
+    # long
+    def draw_rect(id, sel, rect)
+      if (!is_drawing)
+        return
+      end
+      display = @display
+      view = NSView.new(id)
+      display.attr_is_painting.add_object(view)
+      context = NSGraphicsContext.current_context
+      context.save_graphics_state
+      set_clip_region(0, 0)
+      draw_background(id, context, rect)
+      super_struct = Objc_super.new
+      super_struct.attr_receiver = id
+      super_struct.attr_super_class = OS.objc_msg_send(id, OS.attr_sel_superclass)
+      OS.objc_msg_send_super(super_struct, sel, rect)
+      if (!is_disposed)
+        # Feature in Cocoa. There are widgets that draw outside of the UI thread,
+        # such as the progress bar and default button.  The fix is to draw the
+        # widget but not send paint events.
+        draw_widget(id, context, rect)
+      end
+      context.restore_graphics_state
+      display.attr_is_painting.remove_object_identical_to(view)
+    end
+    
+    typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
+    # long
+    # long
+    # long
+    def __draw_theme_progress_area(id, sel, arg0)
+      super_struct = Objc_super.new
+      super_struct.attr_receiver = id
+      super_struct.attr_super_class = OS.objc_msg_send(id, OS.attr_sel_superclass)
+      OS.objc_msg_send_super(super_struct, sel, arg0)
+    end
+    
+    typesig { [::Java::Int, NSGraphicsContext, NSRect] }
+    # long
+    def draw_widget(id, context, rect)
+    end
+    
+    typesig { [NSView, ::Java::Boolean] }
+    def redraw_widget(view, children)
+      view.set_needs_display(true)
+    end
+    
+    typesig { [NSView, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Boolean] }
+    # long
+    # long
+    # long
+    # long
+    def redraw_widget(view, x, y, width, height, children)
+      rect = NSRect.new
+      rect.attr_x = x
+      rect.attr_y = y
+      rect.attr_width = width
+      rect.attr_height = height
+      view.set_needs_display_in_rect(rect)
     end
     
     typesig { [::Java::Int] }
@@ -877,9 +938,41 @@ module Org::Eclipse::Swt::Widgets
       SWT.error(code)
     end
     
+    typesig { [::Java::Int, ::Java::Int, ::Java::Int, ::Java::Boolean] }
+    # long
+    # long
+    # long
+    def expand_item_expand_children(id, sel, item, children)
+      super_struct = Objc_super.new
+      super_struct.attr_receiver = id
+      super_struct.attr_super_class = OS.objc_msg_send(id, OS.attr_sel_superclass)
+      OS.objc_msg_send_super(super_struct, sel, item, children)
+    end
+    
+    typesig { [::Java::Int, ::Java::Int, NSRect, ::Java::Int] }
+    # long
+    # long
+    # long
+    def expansion_frame_with_frame_in_view(id, sel, cell_rect, view)
+      super_struct = Objc_super.new
+      super_struct.attr_receiver = id
+      super_struct.attr_super_class = OS.objc_msg_send(id, OS.attr_sel_superclass)
+      result = NSRect.new
+      OS.objc_msg_send_super_stret(result, super_struct, sel, cell_rect, view)
+      return result
+    end
+    
     typesig { [::Java::Int] }
     def filters(event_type)
       return @display.filters(event_type)
+    end
+    
+    typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
+    # long
+    # long
+    # long
+    def first_rect_for_character_range(id, sel, range)
+      return NSRect.new
     end
     
     typesig { [Array.typed(::Java::Char)] }
@@ -899,66 +992,6 @@ module Org::Eclipse::Swt::Widgets
         end
       end
       return j
-    end
-    
-    typesig { [] }
-    def get_clipboard_text
-      result = ""
-      scrap = Array.typed(::Java::Int).new(1) { 0 }
-      OS._get_current_scrap(scrap)
-      size = Array.typed(::Java::Int).new(1) { 0 }
-      if ((OS._get_scrap_flavor_size(scrap[0], OS.attr_k_scrap_flavor_type_unicode, size)).equal?(OS.attr_no_err))
-        if (!(size[0]).equal?(0))
-          buffer = CharArray.new(size[0] / 2)
-          if ((OS._get_scrap_flavor_data(scrap[0], OS.attr_k_scrap_flavor_type_unicode, size, buffer)).equal?(OS.attr_no_err))
-            result = RJava.cast_to_string(String.new(buffer))
-          end
-        end
-      else
-        if ((OS._get_scrap_flavor_size(scrap[0], OS.attr_k_scrap_flavor_type_text, size)).equal?(OS.attr_no_err))
-          if (!(size[0]).equal?(0))
-            buffer = Array.typed(::Java::Byte).new(size[0]) { 0 }
-            if ((OS._get_scrap_flavor_data(scrap[0], OS.attr_k_scrap_flavor_type_text, size, buffer)).equal?(OS.attr_no_err))
-              encoding = OS._cfstring_get_system_encoding
-              cfstring = OS._cfstring_create_with_bytes(OS.attr_k_cfallocator_default, buffer, buffer.attr_length, encoding, true)
-              if (!(cfstring).equal?(0))
-                length = OS._cfstring_get_length(cfstring)
-                if (!(length).equal?(0))
-                  chars = CharArray.new(length)
-                  range = CFRange.new
-                  range.attr_length = length
-                  OS._cfstring_get_characters(cfstring, range, chars)
-                  result = RJava.cast_to_string(String.new(chars))
-                end
-                OS._cfrelease(cfstring)
-              end
-            end
-          end
-        end
-      end
-      return result
-    end
-    
-    typesig { [::Java::Int] }
-    def get_control_bounds(control)
-      rect = CGRect.new
-      OS._hiview_get_frame(control, rect)
-      inset = get_inset
-      rect.attr_x -= inset.attr_left
-      rect.attr_y -= inset.attr_top
-      rect.attr_width += inset.attr_right + inset.attr_left
-      rect.attr_height += inset.attr_bottom + inset.attr_top
-      return Rectangle.new(RJava.cast_to_int(rect.attr_x), RJava.cast_to_int(rect.attr_y), RJava.cast_to_int(rect.attr_width), RJava.cast_to_int(rect.attr_height))
-    end
-    
-    typesig { [::Java::Int] }
-    def get_control_size(control)
-      rect = CGRect.new
-      OS._hiview_get_frame(control, rect)
-      inset = get_inset
-      width = RJava.cast_to_int(rect.attr_width) + inset.attr_left + inset.attr_right
-      height = RJava.cast_to_int(rect.attr_height) + inset.attr_top + inset.attr_bottom
-      return Point.new(width, height)
     end
     
     typesig { [] }
@@ -1050,14 +1083,9 @@ module Org::Eclipse::Swt::Widgets
       return display
     end
     
-    typesig { [::Java::Int] }
-    def get_draw_count(control)
-      return 0
-    end
-    
     typesig { [] }
-    def get_inset
-      return EMPTY_RECT
+    def get_drawing
+      return true
     end
     
     typesig { [::Java::Int] }
@@ -1127,26 +1155,46 @@ module Org::Eclipse::Swt::Widgets
       return @style
     end
     
-    typesig { [::Java::Int, ::Java::Boolean] }
-    def get_visible_region(control, clip_children)
-      visible_rgn = OS._new_rgn
-      calculate_visible_region(control, visible_rgn, clip_children)
-      return visible_rgn
+    typesig { [::Java::Int, ::Java::Int] }
+    # long
+    # long
+    def has_marked_text(id, sel)
+      return false
     end
     
-    typesig { [::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int] }
-    def help_proc(in_control, in_global_mouse, in_request, out_content_provided, io_help_content)
-      return OS.attr_event_not_handled_err
+    typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
+    # long
+    # long
+    # long
+    def help_requested(id, sel, the_event)
     end
     
-    typesig { [::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int] }
-    def hit_test_proc(browser, item, property, the_rect, mouse_rect)
-      # Return true to indicate that the item can be selected
-      return 1
+    typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
+    # long
+    # long
+    # long
+    def highlight_selection_in_clip_rect(id, sel, rect)
     end
     
-    typesig { [] }
-    def hook_events
+    typesig { [::Java::Int, ::Java::Int, NSPoint] }
+    # long
+    # long
+    # long
+    def hit_test(id, sel, point)
+      super_struct = Objc_super.new
+      super_struct.attr_receiver = id
+      super_struct.attr_super_class = OS.objc_msg_send(id, OS.attr_sel_superclass)
+      return OS.objc_msg_send_super(super_struct, sel, point)
+    end
+    
+    typesig { [::Java::Int, ::Java::Int, ::Java::Int, NSRect, ::Java::Int] }
+    # long
+    # long
+    # long
+    # long
+    # long
+    def hit_test_for_event(id, sel, event, rect, control_view)
+      return 0
     end
     
     typesig { [::Java::Int] }
@@ -1157,13 +1205,28 @@ module Org::Eclipse::Swt::Widgets
       return @event_table.hooks(event_type)
     end
     
-    typesig { [::Java::Int] }
-    def invalidate_visible_region(control)
+    typesig { [::Java::Int, ::Java::Int] }
+    # long
+    # long
+    # long
+    def image(id, sel)
+      return 0
     end
     
-    typesig { [::Java::Int, ::Java::Int] }
-    def inval_window_rgn(window, rgn)
-      OS._inval_window_rgn(window, rgn)
+    typesig { [::Java::Int, ::Java::Int, NSRect] }
+    # long
+    # long
+    def image_rect_for_bounds(id, sel, cell_frame)
+      return NSRect.new
+    end
+    
+    typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
+    # long
+    # long
+    # long
+    def insert_text(id, sel, string)
+      call_super(id, sel, string)
+      return true
     end
     
     typesig { [] }
@@ -1180,14 +1243,19 @@ module Org::Eclipse::Swt::Widgets
       return !((@state & DISPOSED)).equal?(0)
     end
     
-    typesig { [::Java::Int] }
-    def is_drawing(control)
-      return OS._is_control_visible(control) && (get_draw_count(control)).equal?(0)
+    typesig { [] }
+    def is_drawing
+      return true
     end
     
-    typesig { [] }
-    def is_enabled
-      return true
+    typesig { [::Java::Int, ::Java::Int] }
+    # long
+    # long
+    def is_flipped(id, sel)
+      super_struct = Objc_super.new
+      super_struct.attr_receiver = id
+      super_struct.attr_super_class = OS.objc_msg_send(id, OS.attr_sel_superclass)
+      return !(OS.objc_msg_send_super(super_struct, sel)).equal?(0)
     end
     
     typesig { [::Java::Int] }
@@ -1210,8 +1278,10 @@ module Org::Eclipse::Swt::Widgets
       return hooks(event_type)
     end
     
-    typesig { [::Java::Int] }
-    def is_trim_handle(trim_handle)
+    typesig { [::Java::Int, ::Java::Int] }
+    # long
+    # long
+    def is_opaque(id, sel)
       return false
     end
     
@@ -1225,443 +1295,327 @@ module Org::Eclipse::Swt::Widgets
       return get_display.is_valid_thread
     end
     
+    typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
+    # long
+    # long
+    # long
+    def flags_changed(id, sel, the_event)
+      call_super(id, sel, the_event)
+    end
+    
+    typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
+    # long
+    # long
+    # long
+    def key_down(id, sel, the_event)
+      super_key_down(id, sel, the_event)
+    end
+    
+    typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
+    # long
+    # long
+    # long
+    def key_up(id, sel, the_event)
+      super_key_up(id, sel, the_event)
+    end
+    
+    typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
+    # long
+    # long
+    # long
+    def mouse_down(id, sel, the_event)
+      call_super(id, sel, the_event)
+    end
+    
+    typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
+    # long
+    # long
+    # long
+    def mouse_up(id, sel, the_event)
+      call_super(id, sel, the_event)
+    end
+    
+    typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
+    # long
+    # long
+    # long
+    def mouse_moved(id, sel, the_event)
+      call_super(id, sel, the_event)
+    end
+    
+    typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
+    # long
+    # long
+    # long
+    def mouse_dragged(id, sel, the_event)
+      call_super(id, sel, the_event)
+    end
+    
+    typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
+    # long
+    # long
+    # long
+    def mouse_entered(id, sel, the_event)
+      call_super(id, sel, the_event)
+    end
+    
+    typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
+    # long
+    # long
+    # long
+    def mouse_exited(id, sel, the_event)
+      call_super(id, sel, the_event)
+    end
+    
+    typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
+    # long
+    # long
+    # long
+    def cursor_update(id, sel, the_event)
+      call_super(id, sel, the_event)
+    end
+    
+    typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
+    # long
+    # long
+    # long
+    def right_mouse_down(id, sel, the_event)
+      call_super(id, sel, the_event)
+    end
+    
+    typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
+    # long
+    # long
+    # long
+    def right_mouse_up(id, sel, the_event)
+      call_super(id, sel, the_event)
+    end
+    
+    typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
+    # long
+    # long
+    # long
+    def right_mouse_dragged(id, sel, the_event)
+      call_super(id, sel, the_event)
+    end
+    
+    typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
+    # long
+    # long
+    # long
+    def other_mouse_down(id, sel, the_event)
+      call_super(id, sel, the_event)
+    end
+    
+    typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
+    # long
+    # long
+    # long
+    def other_mouse_up(id, sel, the_event)
+      call_super(id, sel, the_event)
+    end
+    
+    typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
+    # long
+    # long
+    # long
+    def other_mouse_dragged(id, sel, the_event)
+      call_super(id, sel, the_event)
+    end
+    
+    typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
+    # long
+    # long
+    # long
+    def should_delay_window_ordering_for_event(id, sel, the_event)
+      super_struct = Objc_super.new
+      super_struct.attr_receiver = id
+      super_struct.attr_super_class = OS.objc_msg_send(id, OS.attr_sel_superclass)
+      return !(OS.objc_msg_send_super(super_struct, sel, the_event)).equal?(0)
+    end
+    
+    typesig { [::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int] }
+    # long
+    # long
+    # long
+    # long
+    # long
+    # long
+    def menu_has_key_equivalent_for_event_target_action(id, sel, menu, event, target, action)
+      return true
+    end
+    
+    typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
+    # long
+    # long
+    # long
+    # long
+    def menu_for_event(id, sel, the_event)
+      super_struct = Objc_super.new
+      super_struct.attr_receiver = id
+      super_struct.attr_super_class = OS.objc_msg_send(id, OS.attr_sel_superclass)
+      return OS.objc_msg_send_super(super_struct, sel, the_event)
+    end
+    
+    typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
+    # long
+    # long
+    # long
+    def menu_needs_update(id, sel, menu)
+    end
+    
+    typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
+    # long
+    # long
+    # long
+    def make_first_responder(id, sel, notification)
+      return call_super_boolean(id, sel, notification)
+    end
+    
+    typesig { [::Java::Int, ::Java::Int] }
+    # long
+    # long
+    def marked_range(id, sel)
+      return NSRange.new
+    end
+    
     typesig { [::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int] }
-    def item_compare_proc(browser, item_one, item_two, sort_property)
-      return OS.attr_no_err
+    # long
+    # long
+    # long
+    # long
+    def menu_will_highlight_item(id, sel, menu, item)
+    end
+    
+    typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
+    # long
+    # long
+    # long
+    def menu_did_close(id, sel, menu)
+    end
+    
+    typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
+    # long
+    # long
+    # long
+    def menu_will_open(id, sel, menu)
+    end
+    
+    typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
+    # long
+    # long
+    # long
+    def no_responder_for(id, sel, selector)
+      call_super(id, sel, selector)
+    end
+    
+    typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
+    # long
+    # long
+    # long
+    # long
+    def number_of_rows_in_table_view(id, sel, a_table_view)
+      return 0
     end
     
     typesig { [::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int] }
-    def item_data_proc(browser, item, property, item_data, set_value)
-      return OS.attr_no_err
-    end
-    
-    typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
-    def item_notification_proc(browser, item, message)
-      return OS.attr_no_err
-    end
-    
-    typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
-    def k_event_accessible_get_child_at_point(next_handler, the_event, user_data)
-      return OS.attr_event_not_handled_err
-    end
-    
-    typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
-    def k_event_accessible_get_focused_child(next_handler, the_event, user_data)
-      return OS.attr_event_not_handled_err
-    end
-    
-    typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
-    def k_event_accessible_get_all_attribute_names(next_handler, the_event, user_data)
-      return OS.attr_event_not_handled_err
-    end
-    
-    typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
-    def k_event_accessible_get_named_attribute(next_handler, the_event, user_data)
-      return OS.attr_event_not_handled_err
-    end
-    
-    typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
-    def k_event_process_command(next_handler, the_event, user_data)
-      return OS.attr_event_not_handled_err
-    end
-    
-    typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
-    def k_event_clock_date_or_time_changed(next_handler, the_event, user_data)
-      return OS.attr_event_not_handled_err
-    end
-    
-    typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
-    def k_event_control_apply_background(next_handler, the_event, user_data)
-      return OS.attr_event_not_handled_err
-    end
-    
-    typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
-    def k_event_control_activate(next_handler, the_event, user_data)
-      return OS.attr_event_not_handled_err
-    end
-    
-    typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
-    def k_event_control_bounds_changed(next_handler, the_event, user_data)
-      return OS.attr_event_not_handled_err
-    end
-    
-    typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
-    def k_event_control_click(next_handler, the_event, user_data)
-      return OS.attr_event_not_handled_err
-    end
-    
-    typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
-    def k_event_control_contextual_menu_click(next_handler, the_event, user_data)
-      return OS.attr_event_not_handled_err
-    end
-    
-    typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
-    def k_event_control_deactivate(next_handler, the_event, user_data)
-      return OS.attr_event_not_handled_err
-    end
-    
-    typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
-    def k_event_control_draw(next_handler, the_event, user_data)
-      the_control = Array.typed(::Java::Int).new(1) { 0 }
-      OS._get_event_parameter(the_event, OS.attr_k_event_param_direct_object, OS.attr_type_control_ref, nil, 4, nil, the_control)
-      region = Array.typed(::Java::Int).new(1) { 0 }
-      OS._get_event_parameter(the_event, OS.attr_k_event_param_rgn_handle, OS.attr_type_qdrgn_handle, nil, 4, nil, region)
-      display = @display
-      old_in_paint = display.attr_in_paint
-      display.attr_in_paint = true
-      context = Array.typed(::Java::Int).new(1) { 0 }
-      OS._get_event_parameter(the_event, OS.attr_k_event_param_cgcontext_ref, OS.attr_type_cgcontext_ref, nil, 4, nil, context)
-      visible_rgn = region[0]
-      draw_background(the_control[0], context[0])
-      call_paint_event_handler(the_control[0], region[0], visible_rgn, the_event, next_handler)
-      draw_widget(the_control[0], context[0], region[0], visible_rgn, the_event)
-      display.attr_in_paint = old_in_paint
-      return OS.attr_no_err
-    end
-    
-    typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
-    def k_event_control_get_click_activation(next_handler, the_event, user_data)
-      return OS.attr_event_not_handled_err
-    end
-    
-    typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
-    def k_event_control_get_focus_part(next_handler, the_event, user_data)
-      return OS.attr_event_not_handled_err
-    end
-    
-    typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
-    def k_event_control_get_part_region(next_handler, the_event, user_data)
-      return OS.attr_event_not_handled_err
-    end
-    
-    typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
-    def k_event_control_hit(next_handler, the_event, user_data)
-      return OS.attr_event_not_handled_err
-    end
-    
-    typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
-    def k_event_control_hit_test(next_handler, the_event, user_data)
-      return OS.attr_event_not_handled_err
-    end
-    
-    typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
-    def k_event_control_set_cursor(next_handler, the_event, user_data)
-      return OS.attr_event_not_handled_err
-    end
-    
-    typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
-    def k_event_control_set_focus_part(next_handler, the_event, user_data)
-      return OS.attr_event_not_handled_err
-    end
-    
-    typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
-    def k_event_control_track(next_handler, the_event, user_data)
-      the_control = Array.typed(::Java::Int).new(1) { 0 }
-      OS._get_event_parameter(the_event, OS.attr_k_event_param_direct_object, OS.attr_type_control_ref, nil, 4, nil, the_control)
-      OS._cfretain(the_control[0])
-      result = OS._call_next_event_handler(next_handler, the_event)
-      OS._cfrelease(the_control[0])
-      return result
-    end
-    
-    typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
-    def k_event_menu_calculate_size(next_handler, the_event, user_data)
-      return OS.attr_event_not_handled_err
-    end
-    
-    typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
-    def k_event_menu_closed(next_handler, the_event, user_data)
-      return OS.attr_event_not_handled_err
-    end
-    
-    typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
-    def k_event_menu_create_frame_view(next_handler, the_event, user_data)
-      return OS.attr_event_not_handled_err
-    end
-    
-    typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
-    def k_event_menu_draw_item(next_handler, the_event, user_data)
-      return OS.attr_event_not_handled_err
-    end
-    
-    typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
-    def k_event_menu_draw_item_content(next_handler, the_event, user_data)
-      return OS.attr_event_not_handled_err
-    end
-    
-    typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
-    def k_event_menu_get_frame_bounds(next_handler, the_event, user_data)
-      return OS.attr_event_not_handled_err
-    end
-    
-    typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
-    def k_event_menu_measure_item_width(next_handler, the_event, user_data)
-      return OS.attr_event_not_handled_err
-    end
-    
-    typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
-    def k_event_menu_opening(next_handler, the_event, user_data)
-      return OS.attr_event_not_handled_err
-    end
-    
-    typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
-    def k_event_menu_target_item(next_handler, the_event, user_data)
-      return OS.attr_event_not_handled_err
-    end
-    
-    typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
-    def k_event_mouse_down(next_handler, the_event, user_data)
-      return OS.attr_event_not_handled_err
-    end
-    
-    typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
-    def k_event_mouse_dragged(next_handler, the_event, user_data)
-      return OS.attr_event_not_handled_err
-    end
-    
-    typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
-    def k_event_mouse_moved(next_handler, the_event, user_data)
-      return OS.attr_event_not_handled_err
-    end
-    
-    typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
-    def k_event_mouse_up(next_handler, the_event, user_data)
-      return OS.attr_event_not_handled_err
-    end
-    
-    typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
-    def k_event_mouse_wheel_moved(next_handler, the_event, user_data)
-      return OS.attr_event_not_handled_err
-    end
-    
-    typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
-    def k_event_search_field_cancel_clicked(next_handler, the_event, user_data)
-      return OS.attr_event_not_handled_err
-    end
-    
-    typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
-    def k_event_raw_key_down(next_handler, the_event, user_data)
-      return k_event_raw_key_pressed(next_handler, the_event, user_data)
-    end
-    
-    typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
-    def k_event_raw_key_modifiers_changed(next_handler, the_event, user_data)
-      display = @display
-      modifiers = Array.typed(::Java::Int).new(1) { 0 }
-      OS._get_event_parameter(the_event, OS.attr_k_event_param_key_modifiers, OS.attr_type_uint32, nil, modifiers.attr_length * 4, nil, modifiers)
-      last_modifiers = display.attr_last_modifiers
-      chord = OS._get_current_event_button_state
-      type = SWT::KeyUp
-      if (!((modifiers[0] & OS.attr_alpha_lock)).equal?(0) && ((last_modifiers & OS.attr_alpha_lock)).equal?(0))
-        type = SWT::KeyDown
-      end
-      if (!((modifiers[0] & OS.attr_shift_key)).equal?(0) && ((last_modifiers & OS.attr_shift_key)).equal?(0))
-        type = SWT::KeyDown
-      end
-      if (!((modifiers[0] & OS.attr_control_key)).equal?(0) && ((last_modifiers & OS.attr_control_key)).equal?(0))
-        type = SWT::KeyDown
-      end
-      if (!((modifiers[0] & OS.attr_cmd_key)).equal?(0) && ((last_modifiers & OS.attr_cmd_key)).equal?(0))
-        type = SWT::KeyDown
-      end
-      if (!((modifiers[0] & OS.attr_option_key)).equal?(0) && ((last_modifiers & OS.attr_option_key)).equal?(0))
-        type = SWT::KeyDown
-      end
-      if ((type).equal?(SWT::KeyUp) && ((modifiers[0] & OS.attr_alpha_lock)).equal?(0) && !((last_modifiers & OS.attr_alpha_lock)).equal?(0))
-        event = Event.new
-        event.attr_key_code = SWT::CAPS_LOCK
-        set_input_state(event, SWT::KeyDown, chord, modifiers[0])
-        send_key_event(SWT::KeyDown, event)
-      end
-      event = Event.new
-      set_input_state(event, type, chord, modifiers[0])
-      if ((event.attr_key_code).equal?(0) && (event.attr_character).equal?(0))
-        return OS.attr_event_not_handled_err
-      end
-      result = send_key_event(type, event)
-      if ((type).equal?(SWT::KeyDown) && !((modifiers[0] & OS.attr_alpha_lock)).equal?(0) && ((last_modifiers & OS.attr_alpha_lock)).equal?(0))
-        event = Event.new
-        event.attr_key_code = SWT::CAPS_LOCK
-        set_input_state(event, SWT::KeyUp, chord, modifiers[0])
-        send_key_event(SWT::KeyUp, event)
-      end
-      display.attr_last_modifiers = modifiers[0]
-      return result ? OS.attr_event_not_handled_err : OS.attr_no_err
-    end
-    
-    typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
-    def k_event_raw_key_pressed(next_handler, the_event, user_data)
-      return OS.attr_event_not_handled_err
-    end
-    
-    typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
-    def k_event_raw_key_repeat(next_handler, the_event, user_data)
-      return k_event_raw_key_pressed(next_handler, the_event, user_data)
-    end
-    
-    typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
-    def k_event_raw_key_up(next_handler, the_event, user_data)
-      if (!send_key_event(SWT::KeyUp, the_event))
-        return OS.attr_no_err
-      end
-      return OS.attr_event_not_handled_err
-    end
-    
-    typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
-    def k_event_text_input_unicode_for_key_event(next_handler, the_event, user_data)
-      return OS.attr_event_not_handled_err
-    end
-    
-    typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
-    def k_event_text_input_update_active_input_area(next_handler, the_event, user_data)
-      return OS.attr_event_not_handled_err
-    end
-    
-    typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
-    def k_event_text_input_offset_to_pos(next_handler, the_event, user_data)
-      return OS.attr_event_not_handled_err
-    end
-    
-    typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
-    def k_event_text_input_pos_to_offset(next_handler, the_event, user_data)
-      return OS.attr_event_not_handled_err
-    end
-    
-    typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
-    def k_event_text_input_get_selected_text(next_handler, the_event, user_data)
-      return OS.attr_event_not_handled_err
-    end
-    
-    typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
-    def k_event_window_activated(next_handler, the_event, user_data)
-      return OS.attr_event_not_handled_err
-    end
-    
-    typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
-    def k_event_window_bounds_changed(next_handler, the_event, user_data)
-      return OS.attr_event_not_handled_err
-    end
-    
-    typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
-    def k_event_window_close(next_handler, the_event, user_data)
-      return OS.attr_event_not_handled_err
-    end
-    
-    typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
-    def k_event_window_collapsed(next_handler, the_event, user_data)
-      return OS.attr_event_not_handled_err
-    end
-    
-    typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
-    def k_event_window_collapsing(next_handler, the_event, user_data)
-      return OS.attr_event_not_handled_err
-    end
-    
-    typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
-    def k_event_window_deactivated(next_handler, the_event, user_data)
-      return OS.attr_event_not_handled_err
-    end
-    
-    typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
-    def k_event_window_draw_content(next_handler, the_event, user_data)
-      return OS.attr_event_not_handled_err
-    end
-    
-    typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
-    def k_event_window_expanded(next_handler, the_event, user_data)
-      return OS.attr_event_not_handled_err
-    end
-    
-    typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
-    def k_event_window_get_click_modality(next_handler, the_event, user_data)
-      return OS.attr_event_not_handled_err
-    end
-    
-    typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
-    def k_event_window_get_region(next_handler, the_event, user_data)
-      return OS.attr_event_not_handled_err
-    end
-    
-    typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
-    def k_event_window_hidden(next_handler, the_event, user_data)
-      return OS.attr_event_not_handled_err
-    end
-    
-    typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
-    def k_event_window_hit_test(next_handler, the_event, user_data)
-      return OS.attr_event_not_handled_err
-    end
-    
-    typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
-    def k_event_window_shown(next_handler, the_event, user_data)
-      return OS.attr_event_not_handled_err
-    end
-    
-    typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
-    def k_event_window_update(next_handler, the_event, user_data)
-      return OS.attr_event_not_handled_err
-    end
-    
-    typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
-    def keyboard_proc(next_handler, the_event, user_data)
-      event_kind = OS._get_event_kind(the_event)
-      case (event_kind)
-      when OS.attr_k_event_raw_key_down
-        return k_event_raw_key_down(next_handler, the_event, user_data)
-      when OS.attr_k_event_raw_key_modifiers_changed
-        return k_event_raw_key_modifiers_changed(next_handler, the_event, user_data)
-      when OS.attr_k_event_raw_key_repeat
-        return k_event_raw_key_repeat(next_handler, the_event, user_data)
-      when OS.attr_k_event_raw_key_up
-        return k_event_raw_key_up(next_handler, the_event, user_data)
-      end
-      return OS.attr_event_not_handled_err
-    end
-    
-    typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
-    def menu_proc(next_handler, the_event, user_data)
-      event_kind = OS._get_event_kind(the_event)
-      case (event_kind)
-      when OS.attr_k_event_menu_calculate_size
-        return k_event_menu_calculate_size(next_handler, the_event, user_data)
-      when OS.attr_k_event_menu_closed
-        return k_event_menu_closed(next_handler, the_event, user_data)
-      when OS.attr_k_event_menu_create_frame_view
-        return k_event_menu_create_frame_view(next_handler, the_event, user_data)
-      when OS.attr_k_event_menu_draw_item
-        return k_event_menu_draw_item(next_handler, the_event, user_data)
-      when OS.attr_k_event_menu_draw_item_content
-        return k_event_menu_draw_item_content(next_handler, the_event, user_data)
-      when OS.attr_k_event_menu_get_frame_bounds
-        return k_event_menu_get_frame_bounds(next_handler, the_event, user_data)
-      when OS.attr_k_event_menu_measure_item_width
-        return k_event_menu_measure_item_width(next_handler, the_event, user_data)
-      when OS.attr_k_event_menu_opening
-        return k_event_menu_opening(next_handler, the_event, user_data)
-      when OS.attr_k_event_menu_target_item
-        return k_event_menu_target_item(next_handler, the_event, user_data)
-      end
-      return OS.attr_event_not_handled_err
-    end
-    
-    typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
-    def mouse_proc(next_handler, the_event, user_data)
-      event_kind = OS._get_event_kind(the_event)
-      case (event_kind)
-      # case OS.kEventMouseEntered:		return kEventMouseEntered (nextHandler, theEvent, userData);
-      # case OS.kEventMouseExited:		return kEventMouseExited (nextHandler, theEvent, userData);
-      when OS.attr_k_event_mouse_down
-        return k_event_mouse_down(next_handler, the_event, user_data)
-      when OS.attr_k_event_mouse_up
-        return k_event_mouse_up(next_handler, the_event, user_data)
-      when OS.attr_k_event_mouse_dragged
-        return k_event_mouse_dragged(next_handler, the_event, user_data)
-      when OS.attr_k_event_mouse_moved
-        return k_event_mouse_moved(next_handler, the_event, user_data)
-      when OS.attr_k_event_mouse_wheel_moved
-        return k_event_mouse_wheel_moved(next_handler, the_event, user_data)
-      end
-      return OS.attr_event_not_handled_err
+    # long
+    # long
+    # long
+    # long
+    # long
+    # long
+    def outline_view_child_of_item(id, sel, outline_view, index, item)
+      return 0
+    end
+    
+    typesig { [::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int] }
+    # long
+    # long
+    # long
+    # long
+    def outline_view_did_click_table_column(id, sel, outline_view, table_column)
+    end
+    
+    typesig { [::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int] }
+    # long
+    # long
+    # long
+    # long
+    # long
+    # long
+    def outline_view_object_value_for_table_column_by_item(id, sel, outline_view, table_column, item)
+      return 0
+    end
+    
+    typesig { [::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int] }
+    # long
+    # long
+    # long
+    # long
+    def outline_view_is_item_expandable(id, sel, outline_view, item)
+      return false
+    end
+    
+    typesig { [::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int] }
+    # long
+    # long
+    # long
+    # long
+    # long
+    def outline_view_number_of_children_of_item(id, sel, outline_view, item)
+      return 0
+    end
+    
+    typesig { [::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int] }
+    # long
+    # long
+    # long
+    # long
+    # long
+    # long
+    def outline_view_will_display_cell_for_table_column_item(id, sel, outline_view, cell, table_column, item)
+    end
+    
+    typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
+    # long
+    # long
+    # long
+    def outline_view_column_did_move(id, sel, a_notification)
+    end
+    
+    typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
+    # long
+    # long
+    # long
+    def outline_view_column_did_resize(id, sel, a_notification)
+    end
+    
+    typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
+    # long
+    # long
+    # long
+    def outline_view_selection_did_change(id, sel, notification)
+    end
+    
+    typesig { [::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int] }
+    # long
+    # long
+    # long
+    # long
+    # long
+    # long
+    def outline_view_set_object_value_for_table_column_by_item(id, sel, outline_view, object, table_column, item)
+    end
+    
+    typesig { [::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int] }
+    # long
+    # long
+    # long
+    # long
+    # long
+    def outline_view_write_items_to_pasteboard(id, sel, arg0, arg1, arg2)
+      return false
     end
     
     typesig { [::Java::Int, Event] }
@@ -1691,6 +1645,22 @@ module Org::Eclipse::Swt::Widgets
       send_event(event_type, event)
     end
     
+    typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
+    # long
+    # long
+    # long
+    def page_down(id, sel, sender)
+      call_super(id, sel, sender)
+    end
+    
+    typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
+    # long
+    # long
+    # long
+    def page_up(id, sel, sender)
+      call_super(id, sel, sender)
+    end
+    
     typesig { [::Java::Int] }
     def post_event(event_type)
       send_event(event_type, nil, false)
@@ -1701,65 +1671,12 @@ module Org::Eclipse::Swt::Widgets
       send_event(event_type, event, false)
     end
     
-    typesig { [::Java::Int] }
-    def redraw_children(control)
-      child = OS._hiview_get_first_subview(control)
-      while (!(child).equal?(0))
-        OS._hiview_set_needs_display(child, true)
-        redraw_children(child)
-        child = OS._hiview_get_next_view(child)
-      end
-    end
-    
-    typesig { [::Java::Int, ::Java::Int] }
-    def redraw_children(control, rgn)
-      child = OS._hiview_get_first_subview(control)
-      while (!(child).equal?(0))
-        OS._hiview_convert_region(rgn, control, child)
-        OS._hiview_set_needs_display_in_region(child, rgn, true)
-        redraw_children(child, rgn)
-        OS._hiview_convert_region(rgn, child, control)
-        child = OS._hiview_get_next_view(child)
-      end
-    end
-    
-    typesig { [::Java::Int, ::Java::Boolean] }
-    def redraw_widget(control, children)
-      if (@display.attr_in_paint)
-        rgn = OS._new_rgn
-        rect = Rect.new
-        OS._get_control_bounds(control, rect)
-        rect.attr_right += rect.attr_left
-        rect.attr_bottom += rect.attr_top
-        rect.attr_top = rect.attr_left = 0
-        OS._rect_rgn(rgn, rect)
-        OS._hiview_convert_region(rgn, control, 0)
-        inval_window_rgn(0, rgn)
-        OS._dispose_rgn(rgn)
-      else
-        OS._hiview_set_needs_display(control, true)
-        if (children)
-          redraw_children(control)
-        end
-      end
-    end
-    
-    typesig { [::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Boolean] }
-    def redraw_widget(control, x, y, width, height, children)
-      rgn = OS._new_rgn
-      rect = Rect.new
-      OS._set_rect(rect, RJava.cast_to_short(x), RJava.cast_to_short(y), RJava.cast_to_short((x + width)), RJava.cast_to_short((y + height)))
-      OS._rect_rgn(rgn, rect)
-      if (@display.attr_in_paint)
-        OS._hiview_convert_region(rgn, control, 0)
-        inval_window_rgn(0, rgn)
-      else
-        OS._hiview_set_needs_display_in_region(control, rgn, true)
-        if (children)
-          redraw_children(control, rgn)
-        end
-      end
-      OS._dispose_rgn(rgn)
+    typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
+    # long
+    # long
+    # long
+    def reflect_scrolled_clip_view(id, sel, a_clip_view)
+      call_super(id, sel, a_clip_view)
     end
     
     typesig { [] }
@@ -1796,6 +1713,7 @@ module Org::Eclipse::Swt::Widgets
     def release_handle
       @state |= DISPOSED
       @display = nil
+      destroy_jniref
     end
     
     typesig { [] }
@@ -1806,6 +1724,9 @@ module Org::Eclipse::Swt::Widgets
     typesig { [] }
     def release_widget
       deregister
+      if ((@display.attr_tooltip_target).equal?(self))
+        @display.attr_tooltip_target = nil
+      end
       @event_table = nil
       @data = nil
     end
@@ -1904,23 +1825,43 @@ module Org::Eclipse::Swt::Widgets
     end
     
     typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
-    def search_proc(next_handler, the_event, user_data)
-      kind = OS._get_event_kind(the_event)
-      case (kind)
-      when OS.attr_k_event_search_field_cancel_clicked
-        return k_event_search_field_cancel_clicked(next_handler, the_event, user_data)
-      end
-      return OS.attr_event_not_handled_err
+    # long
+    # long
+    # long
+    def scroll_wheel(id, sel, the_event)
+      call_super(id, sel, the_event)
+    end
+    
+    typesig { [::Java::Int, ::Java::Int] }
+    # long
+    # long
+    def selected_range(id, sel)
+      return NSRange.new
+    end
+    
+    typesig { [::Java::Int, ::Java::Int] }
+    # long
+    # long
+    # long
+    def next_valid_key_view(id, sel)
+      return call_super_object(id, sel)
+    end
+    
+    typesig { [::Java::Int, ::Java::Int] }
+    # long
+    # long
+    # long
+    def previous_valid_key_view(id, sel)
+      return call_super_object(id, sel)
+    end
+    
+    typesig { [] }
+    def send_double_selection
     end
     
     typesig { [Event] }
     def send_event(event)
-      display = event.attr_display
-      if (!display.filter_event(event))
-        if (!(@event_table).nil?)
-          @event_table.send_event(event)
-        end
-      end
+      @display.send_event(@event_table, event)
     end
     
     typesig { [::Java::Int] }
@@ -1954,45 +1895,16 @@ module Org::Eclipse::Swt::Widgets
       end
     end
     
-    typesig { [::Java::Int, ::Java::Int] }
-    def send_key_event(type, the_event)
+    typesig { [NSEvent, ::Java::Int] }
+    def send_key_event(ns_event, type)
       if (!((@state & SAFARI_EVENTS_FIX)).equal?(0))
         return true
       end
-      length_ = Array.typed(::Java::Int).new(1) { 0 }
-      status = OS._get_event_parameter(the_event, OS.attr_k_event_param_key_unicodes, OS.attr_type_unicode_text, nil, 4, length_, nil)
-      if ((status).equal?(OS.attr_no_err) && length_[0] > 2)
-        count = 0
-        chord = Array.typed(::Java::Int).new(1) { 0 }
-        OS._get_event_parameter(the_event, OS.attr_k_event_param_mouse_chord, OS.attr_type_uint32, nil, 4, nil, chord)
-        modifiers = Array.typed(::Java::Int).new(1) { 0 }
-        OS._get_event_parameter(the_event, OS.attr_k_event_param_key_modifiers, OS.attr_type_uint32, nil, 4, nil, modifiers)
-        chars = CharArray.new(length_[0] / 2)
-        OS._get_event_parameter(the_event, OS.attr_k_event_param_key_unicodes, OS.attr_type_unicode_text, nil, chars.attr_length * 2, nil, chars)
-        i = 0
-        while i < chars.attr_length
-          event = Event.new
-          event.attr_character = chars[i]
-          set_input_state(event, type, chord[0], modifiers[0])
-          if (send_key_event(type, event))
-            chars[((count += 1) - 1)] = chars[i]
-          end
-          i += 1
-        end
-        if ((count).equal?(0))
-          return false
-        end
-        if (!(count).equal?(chars.attr_length - 1))
-          OS._set_event_parameter(the_event, OS.attr_k_event_param_key_unicodes, OS.attr_type_unicode_text, count * 2, chars)
-        end
+      event = Event.new
+      if (!set_key_state(event, type, ns_event))
         return true
-      else
-        event = Event.new
-        if (!set_key_state(event, type, the_event))
-          return true
-        end
-        return send_key_event(type, event)
       end
+      return send_key_event(type, event)
     end
     
     typesig { [::Java::Int, Event] }
@@ -2010,72 +1922,24 @@ module Org::Eclipse::Swt::Widgets
       return event.attr_doit
     end
     
-    typesig { [::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Boolean, ::Java::Boolean, ::Java::Boolean] }
-    def set_bounds(control, x, y, width, height, move, resize, events)
-      same_origin = true
-      same_extent = true
-      old_bounds = CGRect.new
-      OS._hiview_get_frame(control, old_bounds)
-      inset = get_inset
-      old_bounds.attr_x -= inset.attr_left
-      old_bounds.attr_y -= inset.attr_top
-      old_bounds.attr_width += inset.attr_left + inset.attr_right
-      old_bounds.attr_height += inset.attr_top + inset.attr_bottom
-      if (!move)
-        x = RJava.cast_to_int(old_bounds.attr_x)
-        y = RJava.cast_to_int(old_bounds.attr_y)
-      end
-      if (!resize)
-        width = RJava.cast_to_int(old_bounds.attr_width)
-        height = RJava.cast_to_int(old_bounds.attr_height)
-      end
-      new_bounds = CGRect.new
-      new_bounds.attr_x = x + inset.attr_left
-      new_bounds.attr_y = y + inset.attr_top
-      new_bounds.attr_width = width - inset.attr_right - inset.attr_left
-      new_bounds.attr_height = height - inset.attr_bottom - inset.attr_top
-      same_origin = (new_bounds.attr_x).equal?(old_bounds.attr_x) && (new_bounds.attr_y).equal?(old_bounds.attr_y)
-      same_extent = (new_bounds.attr_width).equal?(old_bounds.attr_width) && (new_bounds.attr_height).equal?(old_bounds.attr_height)
-      if (same_origin && same_extent)
-        return 0
-      end
-      OS._hiview_set_frame(control, new_bounds)
-      invalidate_visible_region(control)
-      # Bug in the Macintosh.  When HIViewSetDrawingEnabled() is used to
-      # turn off drawing for a control and the control is moved or resized,
-      # the Mac does not redraw the area where the control once was in the
-      # parent.  The fix is to detect this case and redraw the area.
-      if (!OS._hiview_is_drawing_enabled(control))
-        parent = OS._hiview_get_superview(control)
-        if (!(parent).equal?(0) && OS._hiview_is_drawing_enabled(parent))
-          rgn = OS._new_rgn
-          rect = Rect.new
-          OS._set_rect(rect, RJava.cast_to_short(old_bounds.attr_x), RJava.cast_to_short(old_bounds.attr_y), RJava.cast_to_short((old_bounds.attr_x + old_bounds.attr_width)), RJava.cast_to_short((old_bounds.attr_y + old_bounds.attr_height)))
-          OS._rect_rgn(rgn, rect)
-          if (@display.attr_in_paint)
-            OS._hiview_convert_region(rgn, parent, 0)
-            inval_window_rgn(0, rgn)
-          else
-            OS._hiview_set_needs_display_in_region(parent, rgn, true)
-          end
-          OS._dispose_rgn(rgn)
-        end
-      end
-      # Send events
-      result = 0
-      if (move && !same_origin)
-        if (events)
-          send_event(SWT::Move)
-        end
-        result |= MOVED
-      end
-      if (resize && !same_extent)
-        if (events)
-          send_event(SWT::Resize)
-        end
-        result |= RESIZED
-      end
-      return result
+    typesig { [] }
+    def send_horizontal_selection
+    end
+    
+    typesig { [] }
+    def send_cancel_selection
+    end
+    
+    typesig { [] }
+    def send_search_selection
+    end
+    
+    typesig { [] }
+    def send_selection
+    end
+    
+    typesig { [] }
+    def send_vertical_selection
     end
     
     typesig { [Object] }
@@ -2140,6 +2004,10 @@ module Org::Eclipse::Swt::Widgets
       if ((key).nil?)
         error(SWT::ERROR_NULL_ARGUMENT)
       end
+      if ((GLCONTEXT_KEY == key))
+        set_open_glcontext(value)
+        return
+      end
       index = 1
       table = nil
       if (!((@state & KEYED_DATA)).equal?(0))
@@ -2184,34 +2052,90 @@ module Org::Eclipse::Swt::Widgets
       end
     end
     
-    typesig { [Event, ::Java::Int, ::Java::Int, ::Java::Int] }
-    def set_input_state(event, type, chord, modifiers)
-      if (!((chord & 0x1)).equal?(0))
-        event.attr_state_mask |= SWT::BUTTON1
+    typesig { [Object] }
+    def set_open_glcontext(value)
+    end
+    
+    typesig { [::Java::Int, ::Java::Int, NSPoint] }
+    # long
+    # long
+    def set_frame_origin(id, sel, point)
+      super_struct = Objc_super.new
+      super_struct.attr_receiver = id
+      super_struct.attr_super_class = OS.objc_msg_send(id, OS.attr_sel_superclass)
+      OS.objc_msg_send_super(super_struct, sel, point)
+    end
+    
+    typesig { [::Java::Int, ::Java::Int, NSSize] }
+    # long
+    # long
+    def set_frame_size(id, sel, size)
+      super_struct = Objc_super.new
+      super_struct.attr_receiver = id
+      super_struct.attr_super_class = OS.objc_msg_send(id, OS.attr_sel_superclass)
+      OS.objc_msg_send_super(super_struct, sel, size)
+    end
+    
+    typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
+    # long
+    # long
+    # long
+    def set_image(id, sel, arg0)
+    end
+    
+    typesig { [Event, NSEvent, ::Java::Int] }
+    def set_input_state(event, ns_event, type)
+      if ((ns_event).nil?)
+        return true
       end
-      if (!((chord & 0x2)).equal?(0))
-        event.attr_state_mask |= SWT::BUTTON3
-      end
-      if (!((chord & 0x4)).equal?(0))
-        event.attr_state_mask |= SWT::BUTTON2
-      end
-      if (!((chord & 0x8)).equal?(0))
-        event.attr_state_mask |= SWT::BUTTON4
-      end
-      if (!((chord & 0x10)).equal?(0))
-        event.attr_state_mask |= SWT::BUTTON5
-      end
-      if (!((modifiers & OS.attr_option_key)).equal?(0))
+      # long
+      modifier_flags_ = ns_event.modifier_flags
+      if (!((modifier_flags_ & OS::NSAlternateKeyMask)).equal?(0))
         event.attr_state_mask |= SWT::ALT
       end
-      if (!((modifiers & OS.attr_shift_key)).equal?(0))
+      if (!((modifier_flags_ & OS::NSShiftKeyMask)).equal?(0))
         event.attr_state_mask |= SWT::SHIFT
       end
-      if (!((modifiers & OS.attr_control_key)).equal?(0))
+      if (!((modifier_flags_ & OS::NSControlKeyMask)).equal?(0))
         event.attr_state_mask |= SWT::CONTROL
       end
-      if (!((modifiers & OS.attr_cmd_key)).equal?(0))
+      if (!((modifier_flags_ & OS::NSCommandKeyMask)).equal?(0))
         event.attr_state_mask |= SWT::COMMAND
+      end
+      # TODO multiple mouse buttons pressed
+      # 64
+      case (RJava.cast_to_int(ns_event.type))
+      when OS::NSLeftMouseDragged, OS::NSRightMouseDragged, OS::NSOtherMouseDragged
+        # 64
+        case (RJava.cast_to_int(ns_event.button_number))
+        when 0
+          event.attr_state_mask |= SWT::BUTTON1
+        when 1
+          event.attr_state_mask |= SWT::BUTTON3
+        when 2
+          event.attr_state_mask |= SWT::BUTTON2
+        when 3
+          event.attr_state_mask |= SWT::BUTTON4
+        when 4
+          event.attr_state_mask |= SWT::BUTTON5
+        end
+      when OS::NSScrollWheel, OS::NSKeyDown, OS::NSKeyUp
+        state = OS._get_current_button_state
+        if (!((state & 0x1)).equal?(0))
+          event.attr_state_mask |= SWT::BUTTON1
+        end
+        if (!((state & 0x2)).equal?(0))
+          event.attr_state_mask |= SWT::BUTTON3
+        end
+        if (!((state & 0x4)).equal?(0))
+          event.attr_state_mask |= SWT::BUTTON2
+        end
+        if (!((state & 0x8)).equal?(0))
+          event.attr_state_mask |= SWT::BUTTON4
+        end
+        if (!((state & 0x10)).equal?(0))
+          event.attr_state_mask |= SWT::BUTTON5
+        end
       end
       case (type)
       when SWT::MouseDown, SWT::MouseDoubleClick
@@ -2247,73 +2171,40 @@ module Org::Eclipse::Swt::Widgets
           event.attr_state_mask |= SWT::BUTTON5
         end
       when SWT::KeyDown, SWT::Traverse
-        if (!(event.attr_key_code).equal?(0) || !(event.attr_character).equal?(0))
-          return true
-        end
-        last_modifiers = @display.attr_last_modifiers
-        if (!((modifiers & OS.attr_alpha_lock)).equal?(0) && ((last_modifiers & OS.attr_alpha_lock)).equal?(0))
-          event.attr_key_code = SWT::CAPS_LOCK
-          return true
-        end
-        if (!((modifiers & OS.attr_shift_key)).equal?(0) && ((last_modifiers & OS.attr_shift_key)).equal?(0))
-          event.attr_state_mask &= ~SWT::SHIFT
-          event.attr_key_code = SWT::SHIFT
-          return true
-        end
-        if (!((modifiers & OS.attr_control_key)).equal?(0) && ((last_modifiers & OS.attr_control_key)).equal?(0))
-          event.attr_state_mask &= ~SWT::CONTROL
-          event.attr_key_code = SWT::CONTROL
-          return true
-        end
-        if (!((modifiers & OS.attr_cmd_key)).equal?(0) && ((last_modifiers & OS.attr_cmd_key)).equal?(0))
-          event.attr_state_mask &= ~SWT::COMMAND
-          event.attr_key_code = SWT::COMMAND
-          return true
-        end
-        if (!((modifiers & OS.attr_option_key)).equal?(0) && ((last_modifiers & OS.attr_option_key)).equal?(0))
+        if ((event.attr_key_code).equal?(SWT::ALT))
           event.attr_state_mask &= ~SWT::ALT
-          event.attr_key_code = SWT::ALT
-          return true
+        end
+        if ((event.attr_key_code).equal?(SWT::SHIFT))
+          event.attr_state_mask &= ~SWT::SHIFT
+        end
+        if ((event.attr_key_code).equal?(SWT::CONTROL))
+          event.attr_state_mask &= ~SWT::CONTROL
+        end
+        if ((event.attr_key_code).equal?(SWT::COMMAND))
+          event.attr_state_mask &= ~SWT::COMMAND
         end
       when SWT::KeyUp
-        if (!(event.attr_key_code).equal?(0) || !(event.attr_character).equal?(0))
-          return true
-        end
-        last_modifiers = @display.attr_last_modifiers
-        if (((modifiers & OS.attr_alpha_lock)).equal?(0) && !((last_modifiers & OS.attr_alpha_lock)).equal?(0))
-          event.attr_key_code = SWT::CAPS_LOCK
-          return true
-        end
-        if (((modifiers & OS.attr_shift_key)).equal?(0) && !((last_modifiers & OS.attr_shift_key)).equal?(0))
-          event.attr_state_mask |= SWT::SHIFT
-          event.attr_key_code = SWT::SHIFT
-          return true
-        end
-        if (((modifiers & OS.attr_control_key)).equal?(0) && !((last_modifiers & OS.attr_control_key)).equal?(0))
-          event.attr_state_mask |= SWT::CONTROL
-          event.attr_key_code = SWT::CONTROL
-          return true
-        end
-        if (((modifiers & OS.attr_cmd_key)).equal?(0) && !((last_modifiers & OS.attr_cmd_key)).equal?(0))
-          event.attr_state_mask |= SWT::COMMAND
-          event.attr_key_code = SWT::COMMAND
-          return true
-        end
-        if (((modifiers & OS.attr_option_key)).equal?(0) && !((last_modifiers & OS.attr_option_key)).equal?(0))
+        if ((event.attr_key_code).equal?(SWT::ALT))
           event.attr_state_mask |= SWT::ALT
-          event.attr_key_code = SWT::ALT
-          return true
+        end
+        if ((event.attr_key_code).equal?(SWT::SHIFT))
+          event.attr_state_mask |= SWT::SHIFT
+        end
+        if ((event.attr_key_code).equal?(SWT::CONTROL))
+          event.attr_state_mask |= SWT::CONTROL
+        end
+        if ((event.attr_key_code).equal?(SWT::COMMAND))
+          event.attr_state_mask |= SWT::COMMAND
         end
       end
       return true
     end
     
-    typesig { [Event, ::Java::Int, ::Java::Int] }
-    def set_key_state(event, type, the_event)
+    typesig { [Event, ::Java::Int, NSEvent] }
+    def set_key_state(event, type_, ns_event)
       is_null = false
-      key_code = Array.typed(::Java::Int).new(1) { 0 }
-      OS._get_event_parameter(the_event, OS.attr_k_event_param_key_code, OS.attr_type_uint32, nil, key_code.attr_length * 4, nil, key_code)
-      event.attr_key_code = Display.translate_key(key_code[0])
+      key_code_ = ns_event.key_code
+      event.attr_key_code = Display.translate_key(key_code_)
       case (event.attr_key_code)
       when SWT::LF
         # Feature in the Macintosh.  When the numeric key pad
@@ -2334,53 +2225,49 @@ module Org::Eclipse::Swt::Widgets
         event.attr_character = Character.new(?\t.ord)
       else
         if ((event.attr_key_code).equal?(0) || (SWT::KEYPAD_MULTIPLY <= event.attr_key_code && event.attr_key_code <= SWT::KEYPAD_CR))
-          length_ = Array.typed(::Java::Int).new(1) { 0 }
-          status = OS._get_event_parameter(the_event, OS.attr_k_event_param_key_unicodes, OS.attr_type_unicode_text, nil, 4, length_, nil)
-          if ((status).equal?(OS.attr_no_err) && !(length_[0]).equal?(0))
-            chars = CharArray.new(1)
-            OS._get_event_parameter(the_event, OS.attr_k_event_param_key_unicodes, OS.attr_type_unicode_text, nil, 2, nil, chars)
-            event.attr_character = chars[0]
+          chars = ns_event.characters
+          if (chars.length > 0)
+            event.attr_character = RJava.cast_to_char(chars.character_at_index(0))
           end
-          # Bug in the Macintosh.  For some reason, Ctrl+Shift+'2' and Ctrl+Shift+'6'
-          # fail to give 0x0 (^@ or ASCII NUL) and 0x1e (^^).  Other control character
-          # key sequences such as ^A or even Ctrl+Shift+'-' (^_ or 0x1f) are correctly
-          # translated to control characters.  Since it is not possible to know which
-          # key combination gives '@' on an international keyboard, there is no way to
-          # test for either character and convert it to a control character (Shift+'2'
-          # gives '@' only on an English keyboard) to work around the problem.
-          # 
-          # There is no fix at this time.
         end
         if ((event.attr_key_code).equal?(0))
-          kchr_ptr = OS._get_script_manager_variable(RJava.cast_to_short(OS.attr_sm_kchrcache))
-          if (!(@display.attr_kchr_ptr).equal?(kchr_ptr))
-            @display.attr_kchr_ptr = kchr_ptr
-            @display.attr_kchr_state[0] = 0
-          end
-          result = OS._key_translate(@display.attr_kchr_ptr, RJava.cast_to_short(key_code[0]), @display.attr_kchr_state)
-          if (result <= 0x7f)
-            event.attr_key_code = result & 0x7f
-          else
-            encoding = Array.typed(::Java::Int).new(1) { 0 }
-            key_script = RJava.cast_to_short(OS._get_script_manager_variable(RJava.cast_to_short(OS.attr_sm_key_script)))
-            region_code = RJava.cast_to_short(OS._get_script_manager_variable(RJava.cast_to_short(OS.attr_sm_region_code)))
-            if ((OS._upgrade_script_info_to_text_encoding(key_script, RJava.cast_to_short(OS.attr_k_text_language_dont_care), region_code, nil, encoding)).equal?(OS.attr_param_err))
-              if ((OS._upgrade_script_info_to_text_encoding(key_script, RJava.cast_to_short(OS.attr_k_text_language_dont_care), RJava.cast_to_short(OS.attr_k_text_region_dont_care), nil, encoding)).equal?(OS.attr_param_err))
-                encoding[0] = OS.attr_k_text_encoding_mac_roman
+          # long
+          uchr_ptr = 0
+          # long
+          current_kbd = OS._tiscopy_current_keyboard_input_source
+          # long
+          uchr_cfdata = OS._tisget_input_source_property(current_kbd, OS.k_tisproperty_unicode_key_layout_data)
+          if (!(uchr_cfdata).equal?(0))
+            # If the keyboard changed since the last keystroke clear the dead key state.
+            if (!(uchr_cfdata).equal?(@display.attr_current_keyboard_uchrdata))
+              @display.attr_dead_key_state[0] = 0
+            end
+            uchr_ptr = OS._cfdata_get_byte_ptr(uchr_cfdata)
+            if (!(uchr_ptr).equal?(0) && OS._cfdata_get_length(uchr_cfdata) > 0)
+              # long
+              cg_event = ns_event._cgevent
+              keyboard_type = OS._cgevent_get_integer_value_field(cg_event, OS.attr_k_cgkeyboard_event_keyboard_type)
+              max_string_length = 256
+              output = CharArray.new(max_string_length)
+              actual_string_length = Array.typed(::Java::Int).new(1) { 0 }
+              OS._uckey_translate(uchr_ptr, RJava.cast_to_short(key_code_), RJava.cast_to_short(OS.attr_k_uckey_action_down), 0, RJava.cast_to_int(keyboard_type), 0, @display.attr_dead_key_state, max_string_length, actual_string_length, output)
+              if (actual_string_length[0] < 1)
+                # part of a multi-key key
+                event.attr_key_code = 0
+              else
+                event.attr_key_code = output[0]
               end
             end
-            encoding_info = Array.typed(::Java::Int).new(1) { 0 }
-            OS._create_text_to_unicode_info_by_encoding(encoding[0], encoding_info)
-            if (!(encoding_info[0]).equal?(0))
-              chars = CharArray.new(1)
-              nchars = Array.typed(::Java::Int).new(1) { 0 }
-              buffer = Array.typed(::Java::Byte).new(2) { 0 }
-              buffer[0] = 1
-              buffer[1] = (result & 0xff)
-              OS._convert_from_pstring_to_unicode(encoding_info[0], buffer, chars.attr_length * 2, nchars, chars)
-              OS._dispose_text_to_unicode_info(encoding_info)
-              event.attr_key_code = chars[0]
+          else
+            # KCHR keyboard layouts are no longer supported, so fall back to the basic but flawed
+            # method of determining which key was pressed.
+            unmodified_chars = ns_event.characters_ignoring_modifiers.lowercase_string
+            if (unmodified_chars.length > 0)
+              event.attr_key_code = RJava.cast_to_char(unmodified_chars.character_at_index(0))
             end
+          end
+          if (!(current_kbd).equal?(0))
+            OS._cfrelease(current_kbd)
           end
         end
       end
@@ -2389,51 +2276,230 @@ module Org::Eclipse::Swt::Widgets
           return false
         end
       end
-      chord = Array.typed(::Java::Int).new(1) { 0 }
-      OS._get_event_parameter(the_event, OS.attr_k_event_param_mouse_chord, OS.attr_type_uint32, nil, 4, nil, chord)
-      modifiers = Array.typed(::Java::Int).new(1) { 0 }
-      OS._get_event_parameter(the_event, OS.attr_k_event_param_key_modifiers, OS.attr_type_uint32, nil, 4, nil, modifiers)
-      return set_input_state(event, type, chord[0], modifiers[0])
+      set_input_state(event, ns_event, type_)
+      return true
     end
     
-    typesig { [::Java::Int, ::Java::Boolean] }
-    def set_visible(control, visible)
-      OS._hiview_set_visible(control, visible)
-      invalidate_visible_region(control)
+    typesig { [::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int] }
+    # long
+    # long
+    # long
+    # long
+    def set_marked_text_selected_range(id, sel, string, range)
+      return true
     end
     
     typesig { [::Java::Int, ::Java::Int, ::Java::Boolean] }
-    def set_zorder(control, othe_control, above)
-      in_op = above ? OS.attr_k_hiview_zorder_above : OS.attr_k_hiview_zorder_below
-      OS._hiview_set_zorder(control, in_op, othe_control)
-      invalidate_visible_region(control)
+    # long
+    # long
+    def set_needs_display(id, sel, flag)
+      if (flag && !is_drawing)
+        return
+      end
+      view = NSView.new(id)
+      if (flag && @display.attr_is_painting.contains_object(view))
+        needs_display = @display.attr_needs_display
+        if ((needs_display).nil?)
+          needs_display = NSMutableArray.new.alloc
+          @display.attr_needs_display = needs_display = needs_display.init_with_capacity(12)
+        end
+        needs_display.add_object(view)
+        return
+      end
+      super_struct = Objc_super.new
+      super_struct.attr_receiver = id
+      super_struct.attr_super_class = OS.objc_msg_send(id, OS.attr_sel_superclass)
+      OS.objc_msg_send_super(super_struct, sel, flag)
     end
     
     typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
-    def text_input_proc(next_handler, the_event, user_data)
-      event_kind = OS._get_event_kind(the_event)
-      case (event_kind)
-      when OS.attr_k_event_text_input_unicode_for_key_event
-        return k_event_text_input_unicode_for_key_event(next_handler, the_event, user_data)
-      when OS.attr_k_event_text_input_update_active_input_area
-        return k_event_text_input_update_active_input_area(next_handler, the_event, user_data)
-      when OS.attr_k_event_text_input_offset_to_pos
-        return k_event_text_input_offset_to_pos(next_handler, the_event, user_data)
-      when OS.attr_k_event_text_input_pos_to_offset
-        return k_event_text_input_pos_to_offset(next_handler, the_event, user_data)
-      when OS.attr_k_event_text_input_get_selected_text
-        return k_event_text_input_get_selected_text(next_handler, the_event, user_data)
+    # long
+    # long
+    # long
+    def set_needs_display_in_rect(id, sel, arg0)
+      if (!is_drawing)
+        return
       end
-      return OS.attr_event_not_handled_err
+      rect = NSRect.new
+      OS.memmove(rect, arg0, NSRect.attr_sizeof)
+      view = NSView.new(id)
+      if (@display.attr_is_painting.contains_object(view))
+        needs_display_in_rect = @display.attr_needs_display_in_rect
+        if ((needs_display_in_rect).nil?)
+          needs_display_in_rect = NSMutableArray.new.alloc
+          @display.attr_needs_display_in_rect = needs_display_in_rect = needs_display_in_rect.init_with_capacity(12)
+        end
+        needs_display_in_rect.add_object(view)
+        needs_display_in_rect.add_object(NSValue.value_with_rect(rect))
+        return
+      end
+      super_struct = Objc_super.new
+      super_struct.attr_receiver = id
+      super_struct.attr_super_class = OS.objc_msg_send(id, OS.attr_sel_superclass)
+      OS.objc_msg_send_super(super_struct, sel, rect)
     end
     
-    typesig { [Array.typed(::Java::Float)] }
-    def to_rgbcolor(color)
-      rgb = RGBColor.new
-      rgb.attr_red = RJava.cast_to_short((color[0] * 0xffff))
-      rgb.attr_green = RJava.cast_to_short((color[1] * 0xffff))
-      rgb.attr_blue = RJava.cast_to_short((color[2] * 0xffff))
-      return rgb
+    typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
+    # long
+    # long
+    # long
+    def set_object_value(id, sel, arg0)
+      call_super(id, sel, arg0)
+    end
+    
+    typesig { [] }
+    def set_tab_group_focus
+      return set_tab_item_focus
+    end
+    
+    typesig { [] }
+    def set_tab_item_focus
+      return false
+    end
+    
+    typesig { [::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int] }
+    # long
+    # long
+    # long
+    # long
+    def should_change_text_in_range_replacement_string(id, sel, arg0, arg1)
+      return true
+    end
+    
+    typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
+    # long
+    # long
+    # long
+    def super_key_down(id, sel, the_event)
+      call_super(id, sel, the_event)
+    end
+    
+    typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
+    # long
+    # long
+    # long
+    def super_key_up(id, sel, the_event)
+      call_super(id, sel, the_event)
+    end
+    
+    typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
+    # long
+    # long
+    # long
+    def table_view_column_did_move(id, sel, a_notification)
+    end
+    
+    typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
+    # long
+    # long
+    # long
+    def table_view_column_did_resize(id, sel, a_notification)
+    end
+    
+    typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
+    # long
+    # long
+    # long
+    def table_view_selection_did_change(id, sel, a_notification)
+    end
+    
+    typesig { [::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int] }
+    # long
+    # long
+    # long
+    # long
+    def table_view_did_click_table_column(id, sel, table_view, table_column)
+    end
+    
+    typesig { [::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int] }
+    # long
+    # long
+    # long
+    # long
+    # long
+    # long
+    def table_view_object_value_for_table_column_row(id, sel, a_table_view, a_table_column, row_index)
+      return 0
+    end
+    
+    typesig { [::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int] }
+    # long
+    # long
+    # long
+    # long
+    # long
+    # long
+    def table_view_set_object_value_for_table_column_row(id, sel, a_table_view, an_object, a_table_column, row_index)
+    end
+    
+    typesig { [::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int] }
+    # long
+    # long
+    # long
+    # long
+    # long
+    def table_view_should_edit_table_column_row(id, sel, a_table_view, a_table_column, row_index)
+      return true
+    end
+    
+    typesig { [::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int] }
+    # long
+    # long
+    # long
+    # long
+    # long
+    # long
+    def table_view_will_display_cell_for_table_column_row(id, sel, a_table_view, a_cell, a_table_column, row_index)
+    end
+    
+    typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
+    # long
+    # long
+    # long
+    def text_view_did_change_selection(id, sel, a_notification)
+    end
+    
+    typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
+    # long
+    # long
+    # long
+    def text_did_change(id, sel, a_notification)
+      call_super(id, sel, a_notification)
+    end
+    
+    typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
+    # long
+    # long
+    # long
+    def text_did_end_editing(id, sel, a_notification)
+      call_super(id, sel, a_notification)
+    end
+    
+    typesig { [::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int] }
+    # long
+    # long
+    # long
+    # long
+    # long
+    def text_view_will_change_selection_from_character_range_to_character_range(id, sel, a_text_view, old_selected_char_range, new_selected_char_range)
+      return NSRange.new
+    end
+    
+    typesig { [::Java::Int, ::Java::Int, NSRect] }
+    # long
+    # long
+    def title_rect_for_bounds(id, sel, cell_frame)
+      super_struct = Objc_super.new
+      super_struct.attr_receiver = id
+      super_struct.attr_super_class = OS.objc_msg_send(id, OS.attr_sel_superclass)
+      result = NSRect.new
+      OS.objc_msg_send_super_stret(result, super_struct, sel, cell_frame)
+      return result
+    end
+    
+    typesig { [] }
+    def tooltip_text
+      return nil
     end
     
     typesig { [] }
@@ -2452,46 +2518,136 @@ module Org::Eclipse::Swt::Widgets
       return RJava.cast_to_string(get_name) + " {" + string + "}"
     end
     
+    typesig { [::Java::Int, ::Java::Int] }
+    # long
+    # long
+    def reset_cursor_rects(id, sel)
+      call_super(id, sel)
+    end
+    
+    typesig { [::Java::Int, ::Java::Int] }
+    # long
+    # long
+    def update_tracking_areas(id, sel)
+      call_super(id, sel)
+    end
+    
+    typesig { [::Java::Int, ::Java::Int] }
+    # long
+    # long
+    # long
+    def valid_attributes_for_marked_text(id, sel)
+      return 0
+    end
+    
+    typesig { [::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int] }
+    # long
+    # long
+    # long
+    # long
+    def tab_view_did_select_tab_view_item(id, sel, tab_view, tab_view_item)
+    end
+    
+    typesig { [::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int] }
+    # long
+    # long
+    # long
+    # long
+    def tab_view_will_select_tab_view_item(id, sel, tab_view, tab_view_item)
+    end
+    
+    typesig { [::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int] }
+    # long
+    # long
+    # long
+    # long
+    # long
+    def table_view_write_rows_with_indexes_to_pasteboard(id, sel, arg0, arg1, arg2)
+      return false
+    end
+    
     typesig { [::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int] }
-    def tracking_proc(browser, item_id, property, the_rect, start_pt, modifiers)
-      # Return one to indicate that the data browser should process the click
-      return 1
+    # long
+    # long
+    # long
+    # long
+    # long
+    # long
+    # long
+    def view_string_for_tool_tip_point_user_data(id, sel, view, tag, point, user_data)
+      return 0
+    end
+    
+    typesig { [::Java::Int, ::Java::Int] }
+    # long
+    # long
+    def view_did_move_to_window(id, sel)
     end
     
     typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
-    def window_proc(next_handler, the_event, user_data)
-      event_kind = OS._get_event_kind(the_event)
-      case (event_kind)
-      when OS.attr_k_event_window_activated
-        return k_event_window_activated(next_handler, the_event, user_data)
-      when OS.attr_k_event_window_bounds_changed
-        return k_event_window_bounds_changed(next_handler, the_event, user_data)
-      when OS.attr_k_event_window_close
-        return k_event_window_close(next_handler, the_event, user_data)
-      when OS.attr_k_event_window_collapsed
-        return k_event_window_collapsed(next_handler, the_event, user_data)
-      when OS.attr_k_event_window_collapsing
-        return k_event_window_collapsing(next_handler, the_event, user_data)
-      when OS.attr_k_event_window_deactivated
-        return k_event_window_deactivated(next_handler, the_event, user_data)
-      when OS.attr_k_event_window_draw_content
-        return k_event_window_draw_content(next_handler, the_event, user_data)
-      when OS.attr_k_event_window_expanded
-        return k_event_window_expanded(next_handler, the_event, user_data)
-      when OS.attr_k_event_window_get_region
-        return k_event_window_get_region(next_handler, the_event, user_data)
-      when OS.attr_k_event_window_hidden
-        return k_event_window_hidden(next_handler, the_event, user_data)
-      when OS.attr_k_event_window_hit_test
-        return k_event_window_hit_test(next_handler, the_event, user_data)
-      when OS.attr_k_event_window_shown
-        return k_event_window_shown(next_handler, the_event, user_data)
-      when OS.attr_k_event_window_update
-        return k_event_window_update(next_handler, the_event, user_data)
-      when OS.attr_k_event_window_get_click_modality
-        return k_event_window_get_click_modality(next_handler, the_event, user_data)
-      end
-      return OS.attr_event_not_handled_err
+    # long
+    # long
+    # long
+    def window_did_move(id, sel, notification)
+    end
+    
+    typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
+    # long
+    # long
+    # long
+    def window_did_resize(id, sel, notification)
+    end
+    
+    typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
+    # long
+    # long
+    # long
+    def window_did_resign_key(id, sel, notification)
+    end
+    
+    typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
+    # long
+    # long
+    # long
+    def window_did_become_key(id, sel, notification)
+    end
+    
+    typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
+    # long
+    # long
+    # long
+    def window_send_event(id, sel, event)
+      call_super(id, sel, event)
+    end
+    
+    typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
+    # long
+    # long
+    # long
+    def window_should_close(id, sel, window)
+      return false
+    end
+    
+    typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
+    # long
+    # long
+    # long
+    def window_will_close(id, sel, notification)
+    end
+    
+    typesig { [::Java::Int, ::Java::Int] }
+    # long
+    # long
+    # long
+    def next_state(id, sel)
+      return call_super_object(id, sel)
+    end
+    
+    typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
+    # long
+    # long
+    # long
+    def update_open_glcontext(id, sel, notification)
     end
     
     private

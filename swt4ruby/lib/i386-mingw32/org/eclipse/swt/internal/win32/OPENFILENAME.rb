@@ -1,6 +1,6 @@
 require "rjava"
 
-# Copyright (c) 2000, 2006 IBM Corporation and others.
+# Copyright (c) 2000, 2008 IBM Corporation and others.
 # All rights reserved. This program and the accompanying materials
 # are made available under the terms of the Eclipse Public License v1.0
 # which accompanies this distribution, and is available at
@@ -25,6 +25,7 @@ module Org::Eclipse::Swt::Internal::Win32
     alias_method :attr_l_struct_size=, :l_struct_size=
     undef_method :l_struct_size=
     
+    # @field cast=(HWND)
     # long
     attr_accessor :hwnd_owner
     alias_method :attr_hwnd_owner, :hwnd_owner
@@ -32,6 +33,7 @@ module Org::Eclipse::Swt::Internal::Win32
     alias_method :attr_hwnd_owner=, :hwnd_owner=
     undef_method :hwnd_owner=
     
+    # @field cast=(HINSTANCE)
     # long
     attr_accessor :h_instance
     alias_method :attr_h_instance, :h_instance
@@ -39,6 +41,7 @@ module Org::Eclipse::Swt::Internal::Win32
     alias_method :attr_h_instance=, :h_instance=
     undef_method :h_instance=
     
+    # @field cast=(LPCTSTR)
     # long
     attr_accessor :lpstr_filter
     alias_method :attr_lpstr_filter, :lpstr_filter
@@ -46,6 +49,7 @@ module Org::Eclipse::Swt::Internal::Win32
     alias_method :attr_lpstr_filter=, :lpstr_filter=
     undef_method :lpstr_filter=
     
+    # @field cast=(LPTSTR)
     # long
     attr_accessor :lpstr_custom_filter
     alias_method :attr_lpstr_custom_filter, :lpstr_custom_filter
@@ -65,6 +69,7 @@ module Org::Eclipse::Swt::Internal::Win32
     alias_method :attr_n_filter_index=, :n_filter_index=
     undef_method :n_filter_index=
     
+    # @field cast=(LPTSTR)
     # long
     attr_accessor :lpstr_file
     alias_method :attr_lpstr_file, :lpstr_file
@@ -78,6 +83,7 @@ module Org::Eclipse::Swt::Internal::Win32
     alias_method :attr_n_max_file=, :n_max_file=
     undef_method :n_max_file=
     
+    # @field cast=(LPTSTR)
     # long
     attr_accessor :lpstr_file_title
     alias_method :attr_lpstr_file_title, :lpstr_file_title
@@ -91,6 +97,7 @@ module Org::Eclipse::Swt::Internal::Win32
     alias_method :attr_n_max_file_title=, :n_max_file_title=
     undef_method :n_max_file_title=
     
+    # @field cast=(LPCTSTR)
     # long
     attr_accessor :lpstr_initial_dir
     alias_method :attr_lpstr_initial_dir, :lpstr_initial_dir
@@ -98,6 +105,7 @@ module Org::Eclipse::Swt::Internal::Win32
     alias_method :attr_lpstr_initial_dir=, :lpstr_initial_dir=
     undef_method :lpstr_initial_dir=
     
+    # @field cast=(LPCTSTR)
     # long
     attr_accessor :lpstr_title
     alias_method :attr_lpstr_title, :lpstr_title
@@ -123,6 +131,7 @@ module Org::Eclipse::Swt::Internal::Win32
     alias_method :attr_n_file_extension=, :n_file_extension=
     undef_method :n_file_extension=
     
+    # @field cast=(LPCTSTR)
     # long
     attr_accessor :lpstr_def_ext
     alias_method :attr_lpstr_def_ext, :lpstr_def_ext
@@ -137,6 +146,7 @@ module Org::Eclipse::Swt::Internal::Win32
     alias_method :attr_l_cust_data=, :l_cust_data=
     undef_method :l_cust_data=
     
+    # @field cast=(LPOFNHOOKPROC)
     # long
     attr_accessor :lpfn_hook
     alias_method :attr_lpfn_hook, :lpfn_hook
@@ -144,6 +154,7 @@ module Org::Eclipse::Swt::Internal::Win32
     alias_method :attr_lpfn_hook=, :lpfn_hook=
     undef_method :lpfn_hook=
     
+    # @field cast=(LPCTSTR)
     # long
     attr_accessor :lp_template_name
     alias_method :attr_lp_template_name, :lp_template_name
@@ -151,6 +162,7 @@ module Org::Eclipse::Swt::Internal::Win32
     alias_method :attr_lp_template_name=, :lp_template_name=
     undef_method :lp_template_name=
     
+    # @field cast=(void *),flags=no_wince
     # long
     attr_accessor :pv_reserved
     alias_method :attr_pv_reserved, :pv_reserved
@@ -158,12 +170,14 @@ module Org::Eclipse::Swt::Internal::Win32
     alias_method :attr_pv_reserved=, :pv_reserved=
     undef_method :pv_reserved=
     
+    # @field flags=no_wince
     attr_accessor :dw_reserved
     alias_method :attr_dw_reserved, :dw_reserved
     undef_method :dw_reserved
     alias_method :attr_dw_reserved=, :dw_reserved=
     undef_method :dw_reserved=
     
+    # @field flags=no_wince
     attr_accessor :flags_ex
     alias_method :attr_flags_ex, :flags_ex
     undef_method :flags_ex

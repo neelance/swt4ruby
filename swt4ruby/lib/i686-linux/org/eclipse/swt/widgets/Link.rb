@@ -1,6 +1,6 @@
 require "rjava"
 
-# Copyright (c) 2000, 2008 IBM Corporation and others.
+# Copyright (c) 2000, 2009 IBM Corporation and others.
 # All rights reserved. This program and the accompanying materials
 # are made available under the terms of the Eclipse Public License v1.0
 # which accompanies this distribution, and is available at
@@ -40,6 +40,7 @@ module Org::Eclipse::Swt::Widgets
   # @see <a href="http://www.eclipse.org/swt/">Sample code and further information</a>
   # 
   # @since 3.1
+  # @noextend This class is not intended to be subclassed by clients.
   class Link < LinkImports.const_get :Control
     include_class_members LinkImports
     
@@ -880,8 +881,9 @@ module Org::Eclipse::Swt::Widgets
     # selected, the text field of the selection event contains either the
     # text of the hyperlink or the value of its HREF, if one was specified.
     # In the rare case of identical hyperlinks within the same string, the
-    # HREF tag can be used to distinguish between them.  The string may
-    # include the mnemonic character and line delimiters.
+    # HREF attribute can be used to distinguish between them.  The string may
+    # include the mnemonic character and line delimiters. The only delimiter
+    # the HREF attribute supports is the quotation mark (").
     # </p>
     # 
     # @param string the new text

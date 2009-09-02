@@ -1,6 +1,6 @@
 require "rjava"
 
-# Copyright (c) 2000, 2008 IBM Corporation and others.
+# Copyright (c) 2000, 2009 IBM Corporation and others.
 # All rights reserved. This program and the accompanying materials
 # are made available under the terms of the Eclipse Public License v1.0
 # which accompanies this distribution, and is available at
@@ -13,9 +13,9 @@ module Org::Eclipse::Swt::Graphics
     class_module.module_eval {
       include ::Java::Lang
       include ::Org::Eclipse::Swt::Graphics
-      include ::Org::Eclipse::Swt::Internal::Carbon
-      include ::Org::Eclipse::Swt::Internal
       include ::Org::Eclipse::Swt
+      include_const ::Org::Eclipse::Swt::Internal, :Compatibility
+      include ::Org::Eclipse::Swt::Internal::Cocoa
     }
   end
   
@@ -86,15 +86,6 @@ module Org::Eclipse::Swt::Graphics
     alias_method :attr_warnings=, :warnings=
     undef_method :warnings=
     
-    attr_accessor :colorspace
-    alias_method :attr_colorspace, :colorspace
-    undef_method :colorspace
-    alias_method :attr_colorspace=, :colorspace=
-    undef_method :colorspace=
-    
-    # The following colors are listed in the Windows
-    # Programmer's Reference as the colors in the default
-    # palette.
     attr_accessor :color_black
     alias_method :attr_color_black, :color_black
     undef_method :color_black
@@ -198,42 +189,18 @@ module Org::Eclipse::Swt::Graphics
     alias_method :attr_system_font=, :system_font=
     undef_method :system_font=
     
-    # Callbacks
-    attr_accessor :draw_pattern_callback
-    alias_method :attr_draw_pattern_callback, :draw_pattern_callback
-    undef_method :draw_pattern_callback
-    alias_method :attr_draw_pattern_callback=, :draw_pattern_callback=
-    undef_method :draw_pattern_callback=
+    attr_accessor :paragraph_style
+    alias_method :attr_paragraph_style, :paragraph_style
+    undef_method :paragraph_style
+    alias_method :attr_paragraph_style=, :paragraph_style=
+    undef_method :paragraph_style=
     
-    attr_accessor :axial_shading_callback
-    alias_method :attr_axial_shading_callback, :axial_shading_callback
-    undef_method :axial_shading_callback
-    alias_method :attr_axial_shading_callback=, :axial_shading_callback=
-    undef_method :axial_shading_callback=
-    
-    attr_accessor :release_callback
-    alias_method :attr_release_callback, :release_callback
-    undef_method :release_callback
-    alias_method :attr_release_callback=, :release_callback=
-    undef_method :release_callback=
-    
-    attr_accessor :draw_pattern_proc
-    alias_method :attr_draw_pattern_proc, :draw_pattern_proc
-    undef_method :draw_pattern_proc
-    alias_method :attr_draw_pattern_proc=, :draw_pattern_proc=
-    undef_method :draw_pattern_proc=
-    
-    attr_accessor :axial_shading_proc
-    alias_method :attr_axial_shading_proc, :axial_shading_proc
-    undef_method :axial_shading_proc
-    alias_method :attr_axial_shading_proc=, :axial_shading_proc=
-    undef_method :axial_shading_proc=
-    
-    attr_accessor :release_proc
-    alias_method :attr_release_proc, :release_proc
-    undef_method :release_proc
-    alias_method :attr_release_proc=, :release_proc=
-    undef_method :release_proc=
+    # Device DPI
+    attr_accessor :dpi
+    alias_method :attr_dpi, :dpi
+    undef_method :dpi
+    alias_method :attr_dpi=, :dpi=
+    undef_method :dpi=
     
     class_module.module_eval {
       # TEMPORARY CODE. When a graphics object is
@@ -244,8 +211,6 @@ module Org::Eclipse::Swt::Graphics
       # fix is to remove this feature. Unfortunately,
       # too many application programs rely on this
       # feature.
-      # 
-      # This code will be removed in the future.
       
       def current_device
         defined?(@@current_device) ? @@current_device : @@current_device= nil
@@ -271,7 +236,7 @@ module Org::Eclipse::Swt::Graphics
       when_class_loaded do
         begin
           Class.for_name("org.eclipse.swt.widgets.Display")
-        rescue JavaThrowable => e
+        rescue ClassNotFoundException => e
         end
       end
       
@@ -322,7 +287,6 @@ module Org::Eclipse::Swt::Graphics
       @tracking_lock = nil
       @disposed = false
       @warnings = false
-      @colorspace = 0
       @color_black = nil
       @color_dark_red = nil
       @color_dark_green = nil
@@ -340,12 +304,8 @@ module Org::Eclipse::Swt::Graphics
       @color_cyan = nil
       @color_white = nil
       @system_font = nil
-      @draw_pattern_callback = nil
-      @axial_shading_callback = nil
-      @release_callback = nil
-      @draw_pattern_proc = 0
-      @axial_shading_proc = 0
-      @release_proc = 0
+      @paragraph_style = nil
+      @dpi = nil
       synchronized((Device)) do
         if (!(data).nil?)
           @debug = data.attr_debug
@@ -356,18 +316,23 @@ module Org::Eclipse::Swt::Graphics
           @objects = Array.typed(Object).new(128) { nil }
           @tracking_lock = Object.new
         end
+        if (NSThread.is_main_thread)
+          pool = NSAutoreleasePool.new.alloc.init
+          nsthread = NSThread.current_thread
+          dictionary = nsthread.thread_dictionary
+          key = NSString.string_with("SWT_NSAutoreleasePool")
+          obj = dictionary.object_for_key(key)
+          if ((obj).nil?)
+            nsnumber = NSNumber.number_with_integer(pool.attr_id)
+            dictionary.set_object(nsnumber, key)
+          else
+            pool.release
+          end
+        end
+        # check and create pool
         create(data)
         init
       end
-    end
-    
-    typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
-    def axial_shading_proc(ref, in_, out)
-      object = OS._jniget_object(ref)
-      if (object.is_a?(Pattern))
-        return (object).axial_shading_proc(ref, in_, out)
-      end
-      return 0
     end
     
     typesig { [] }
@@ -412,24 +377,6 @@ module Org::Eclipse::Swt::Graphics
     end
     
     typesig { [] }
-    def create_pattern_callbacks
-      if ((@draw_pattern_callback).nil?)
-        @draw_pattern_callback = Callback.new(self, "drawPatternProc", 2)
-        @draw_pattern_proc = @draw_pattern_callback.get_address
-        if ((@draw_pattern_proc).equal?(0))
-          SWT.error(SWT::ERROR_NO_MORE_CALLBACKS)
-        end
-      end
-      if ((@axial_shading_callback).nil?)
-        @axial_shading_callback = Callback.new(self, "axialShadingProc", 3)
-        @axial_shading_proc = @axial_shading_callback.get_address
-        if ((@axial_shading_proc).equal?(0))
-          SWT.error(SWT::ERROR_NO_MORE_CALLBACKS)
-        end
-      end
-    end
-    
-    typesig { [] }
     # Disposes of the operating system resources associated with
     # the receiver. After this method has been invoked, the receiver
     # will answer <code>true</code> when sent the message
@@ -449,6 +396,7 @@ module Org::Eclipse::Swt::Graphics
         @disposed = true
         if (@tracking)
           synchronized((@tracking_lock)) do
+            print_errors
             @objects = nil
             @errors = nil
             @tracking_lock = nil
@@ -488,15 +436,6 @@ module Org::Eclipse::Swt::Graphics
     def destroy
     end
     
-    typesig { [::Java::Int, ::Java::Int] }
-    def draw_pattern_proc(ref, context)
-      object = OS._jniget_object(ref)
-      if (object.is_a?(Pattern))
-        return (object).draw_pattern_proc(ref, context)
-      end
-      return 0
-    end
-    
     typesig { [] }
     # Returns a rectangle describing the receiver's size and location.
     # 
@@ -507,12 +446,8 @@ module Org::Eclipse::Swt::Graphics
     # </ul>
     def get_bounds
       check_device
-      gdevice = OS._get_main_device
-      ptr = Array.typed(::Java::Int).new(1) { 0 }
-      OS.memmove(ptr, gdevice, 4)
-      device = GDevice.new
-      OS.memmove(device, ptr[0], GDevice.attr_sizeof)
-      return Rectangle.new(device.attr_left, device.attr_top, device.attr_right - device.attr_left, device.attr_bottom - device.attr_top)
+      frame = get_primary_screen.frame
+      return Rectangle.new(RJava.cast_to_int(frame.attr_x), RJava.cast_to_int(frame.attr_y), RJava.cast_to_int(frame.attr_width), RJava.cast_to_int(frame.attr_height))
     end
     
     typesig { [] }
@@ -576,10 +511,7 @@ module Org::Eclipse::Swt::Graphics
     # @see #getBounds
     def get_client_area
       check_device
-      gdevice = OS._get_main_device
-      rect = Rect.new
-      OS._get_available_window_positioning_bounds(gdevice, rect)
-      return Rectangle.new(rect.attr_left, rect.attr_top, rect.attr_right - rect.attr_left, rect.attr_bottom - rect.attr_top)
+      return get_bounds
     end
     
     typesig { [] }
@@ -595,12 +527,8 @@ module Org::Eclipse::Swt::Graphics
     # </ul>
     def get_depth
       check_device
-      gdevice = OS._get_main_device
-      ptr = Array.typed(::Java::Int).new(1) { 0 }
-      OS.memmove(ptr, gdevice, 4)
-      device = GDevice.new
-      OS.memmove(device, ptr[0], GDevice.attr_sizeof)
-      return OS._get_pix_depth(device.attr_gd_pmap)
+      # 64
+      return RJava.cast_to_int(OS._nsbits_per_pixel_from_depth(get_primary_screen.depth))
     end
     
     typesig { [] }
@@ -615,15 +543,13 @@ module Org::Eclipse::Swt::Graphics
     # </ul>
     def get_dpi
       check_device
-      gdevice = OS._get_main_device
-      ptr = Array.typed(::Java::Int).new(1) { 0 }
-      OS.memmove(ptr, gdevice, 4)
-      device = GDevice.new
-      OS.memmove(device, ptr[0], GDevice.attr_sizeof)
-      OS.memmove(ptr, device.attr_gd_pmap, 4)
-      pixmap = PixMap.new
-      OS.memmove(pixmap, ptr[0], PixMap.attr_sizeof)
-      return Point.new(OS._fix2long(pixmap.attr_h_res), OS._fix2long(pixmap.attr_v_res))
+      return get_screen_dpi
+    end
+    
+    typesig { [] }
+    def get_primary_screen
+      screens_ = NSScreen.screens
+      return NSScreen.new(screens_.object_at_index(0))
     end
     
     typesig { [String, ::Java::Boolean] }
@@ -644,68 +570,45 @@ module Org::Eclipse::Swt::Graphics
         return Array.typed(FontData).new(0) { nil }
       end
       count = 0
-      buffer = Array.typed(::Java::Int).new(1) { 0 }
-      range = CFRange.new
-      OS._atsuget_font_ids(nil, 0, buffer)
-      fds = Array.typed(FontData).new(buffer[0]) { nil }
-      status = OS._atsfont_iterator_create(OS.attr_k_atsfont_context_local, 0, 0, OS.attr_k_atsoption_flags_default_scope, buffer)
-      iter = buffer[0]
-      while ((status).equal?(OS.attr_no_err))
-        status = OS._atsfont_iterator_next(iter, buffer)
-        if ((status).equal?(OS.attr_no_err))
-          font = buffer[0]
-          if ((OS._atsfont_get_name(font, 0, buffer)).equal?(OS.attr_no_err))
-            range.attr_length = OS._cfstring_get_length(buffer[0])
-            chars = CharArray.new(range.attr_length)
-            OS._cfstring_get_characters(buffer[0], range, chars)
-            OS._cfrelease(buffer[0])
-            ats_name = String.new(chars)
-            platform_code = OS.attr_k_font_unicode_platform
-            encoding = OS.attr_k_cfstring_encoding_unicode
-            if (!(OS._atsufind_font_name(font, OS.attr_k_font_family_name, platform_code, OS.attr_k_font_no_script_code, OS.attr_k_font_no_language_code, 0, nil, buffer, nil)).equal?(OS.attr_no_err))
-              platform_code = OS.attr_k_font_no_platform_code
-              encoding = OS.attr_k_cfstring_encoding_mac_roman
-              if (!(OS._atsufind_font_name(font, OS.attr_k_font_family_name, platform_code, OS.attr_k_font_no_script_code, OS.attr_k_font_no_language_code, 0, nil, buffer, nil)).equal?(OS.attr_no_err))
-                next
-              end
-            end
-            bytes = Array.typed(::Java::Byte).new(buffer[0]) { 0 }
-            OS._atsufind_font_name(font, OS.attr_k_font_family_name, platform_code, OS.attr_k_font_no_script_code, OS.attr_k_font_no_language_code, bytes.attr_length, bytes, buffer, nil)
-            ptr = OS._cfstring_create_with_bytes(0, bytes, bytes.attr_length, encoding, false)
-            if (!(ptr).equal?(0))
-              range.attr_length = OS._cfstring_get_length(ptr)
-              if (!(range.attr_length).equal?(0))
-                chars = CharArray.new(range.attr_length)
-                OS._cfstring_get_characters(ptr, range, chars)
-                name = String.new(chars)
-                if (!name.starts_with("."))
-                  if ((face_name).nil? || Compatibility.equals_ignore_case(face_name, name))
-                    s = SWT::NORMAL
-                    if (!(ats_name.index_of("Italic")).equal?(-1))
-                      s |= SWT::ITALIC
-                    end
-                    if (!(ats_name.index_of("Bold")).equal?(-1))
-                      s |= SWT::BOLD
-                    end
-                    data = FontData.new(name, 0, s)
-                    data.attr_ats_name = ats_name
-                    if ((count).equal?(fds.attr_length))
-                      new_fds = Array.typed(FontData).new(count + 4) { nil }
-                      System.arraycopy(fds, 0, new_fds, 0, count)
-                      fds = new_fds
-                    end
-                    fds[((count += 1) - 1)] = data
-                  end
-                end
-              end
-              OS._cfrelease(ptr)
-            end
+      families = NSFontManager.shared_font_manager.available_font_families
+      # long
+      family_count = families.count
+      fds = Array.typed(FontData).new(100) { nil }
+      i = 0
+      while i < family_count
+        ns_family = NSString.new(families.object_at_index(i))
+        name = ns_family.get_string
+        fonts = NSFontManager.shared_font_manager.available_members_of_font_family(ns_family)
+        # 64
+        font_count = RJava.cast_to_int(fonts.count)
+        j = 0
+        while j < font_count
+          font_details = NSArray.new(fonts.object_at_index(j))
+          ns_name = NSString.new(font_details.object_at_index(0)).get_string
+          # long
+          weight = NSNumber.new(font_details.object_at_index(2)).integer_value
+          # long
+          traits = NSNumber.new(font_details.object_at_index(3)).integer_value
+          style = SWT::NORMAL
+          if (!((traits & OS::NSItalicFontMask)).equal?(0))
+            style |= SWT::ITALIC
           end
+          if ((weight).equal?(9))
+            style |= SWT::BOLD
+          end
+          if ((face_name).nil? || Compatibility.equals_ignore_case(face_name, name))
+            data = FontData.new(name, 0, style)
+            data.attr_ns_name = ns_name
+            if ((count).equal?(fds.attr_length))
+              new_fds = Array.typed(FontData).new(fds.attr_length + 100) { nil }
+              System.arraycopy(fds, 0, new_fds, 0, fds.attr_length)
+              fds = new_fds
+            end
+            fds[((count += 1) - 1)] = data
+          end
+          j += 1
         end
-      end
-      if (!(iter).equal?(0))
-        buffer[0] = iter
-        OS._atsfont_iterator_release(buffer)
+        i += 1
       end
       if ((count).equal?(fds.attr_length))
         return fds
@@ -713,6 +616,14 @@ module Org::Eclipse::Swt::Graphics
       result = Array.typed(FontData).new(count) { nil }
       System.arraycopy(fds, 0, result, 0, count)
       return result
+    end
+    
+    typesig { [] }
+    def get_screen_dpi
+      dictionary = get_primary_screen.device_description
+      value = NSValue.new(dictionary.object_for_key(Id.new(OS._nsdevice_resolution)).attr_id)
+      size = value.size_value
+      return Point.new(RJava.cast_to_int(size.attr_width), RJava.cast_to_int(size.attr_height))
     end
     
     typesig { [::Java::Int] }
@@ -822,15 +733,6 @@ module Org::Eclipse::Swt::Graphics
     # 
     # @see #create
     def init
-      @colorspace = OS._cgcolor_space_create_device_rgb
-      if ((@colorspace).equal?(0))
-        SWT.error(SWT::ERROR_NO_HANDLES)
-      end
-      @release_callback = Callback.new(self, "releaseProc", 3)
-      @release_proc = @release_callback.get_address
-      if ((@release_proc).equal?(0))
-        SWT.error(SWT::ERROR_NO_MORE_CALLBACKS)
-      end
       # Create the standard colors
       @color_black = Color.new(self, 0, 0, 0)
       @color_dark_red = Color.new(self, 0x80, 0, 0)
@@ -848,18 +750,21 @@ module Org::Eclipse::Swt::Graphics
       @color_magenta = Color.new(self, 0xff, 0, 0xff)
       @color_cyan = Color.new(self, 0, 0xff, 0xff)
       @color_white = Color.new(self, 0xff, 0xff, 0xff)
+      @paragraph_style = NSMutableParagraphStyle.new.alloc.init
+      @paragraph_style.set_alignment(OS::NSLeftTextAlignment)
+      @paragraph_style.set_line_break_mode(OS::NSLineBreakByClipping)
+      tabs = NSArray.new(NSArray.new.alloc.init)
+      @paragraph_style.set_tab_stops(tabs)
+      tabs.release
       # Initialize the system font slot
-      # TEMPORARY CODE
       small_fonts = !(System.get_property("org.eclipse.swt.internal.carbon.smallFonts")).nil?
-      family = Array.typed(::Java::Byte).new(256) { 0 }
-      size = Array.typed(::Java::Short).new(1) { 0 }
-      style = Array.typed(::Java::Byte).new(1) { 0 }
-      theme_font = small_fonts ? OS.attr_k_theme_small_system_font : OS.attr_k_theme_system_font
-      OS._get_theme_font(RJava.cast_to_short(theme_font), RJava.cast_to_short(OS.attr_sm_system_script), family, size, style)
-      id = OS._fmget_font_family_from_name(family)
-      font = Array.typed(::Java::Int).new(1) { 0 }
-      OS._fmget_font_from_font_family_instance(id, style[0], font, nil)
-      @system_font = Font.carbon_new(self, OS._fmget_atsfont_ref_from_font(font[0]), style[0], size[0])
+      # double
+      system_font_size_ = small_fonts ? NSFont.small_system_font_size : NSFont.system_font_size
+      dpi = @dpi = get_dpi
+      screen_dpi = get_screen_dpi
+      font = NSFont.system_font_of_size(system_font_size_ * dpi.attr_y / screen_dpi.attr_y)
+      font.retain
+      @system_font = Font.cocoa_new(self, font)
     end
     
     typesig { [SwtGCData] }
@@ -874,6 +779,8 @@ module Org::Eclipse::Swt::Graphics
     # 
     # @param data the platform specific GC data
     # @return the platform specific GC handle
+    # 
+    # long
     def internal_new__gc(data)
       raise NotImplementedError
     end
@@ -890,6 +797,8 @@ module Org::Eclipse::Swt::Graphics
     # 
     # @param hDC the platform specific GC handle
     # @param data the platform specific GC data
+    # 
+    # long
     def internal_dispose__gc(handle, data)
       raise NotImplementedError
     end
@@ -930,23 +839,15 @@ module Org::Eclipse::Swt::Graphics
         SWT.error(SWT::ERROR_NULL_ARGUMENT)
       end
       result = false
-      chars = CharArray.new(path.length)
-      path.get_chars(0, chars.attr_length, chars, 0)
-      str = OS._cfstring_create_with_characters(OS.attr_k_cfallocator_default, chars, chars.attr_length)
-      if (!(str).equal?(0))
-        url = OS._cfurlcreate_with_file_system_path(OS.attr_k_cfallocator_default, str, OS.attr_k_cfurlposixpath_style, false)
-        if (!(url).equal?(0))
-          fs_ref = Array.typed(::Java::Byte).new(80) { 0 }
-          if (OS._cfurlget_fsref(url, fs_ref))
-            fs_spec = Array.typed(::Java::Byte).new(70) { 0 }
-            if ((OS._fsget_catalog_info(fs_ref, 0, nil, nil, fs_spec, nil)).equal?(OS.attr_no_err))
-              container = Array.typed(::Java::Int).new(1) { 0 }
-              result = (OS._atsfont_activate_from_file_specification(fs_spec, OS.attr_k_atsfont_context_local, OS.attr_k_atsfont_format_unspecified, 0, OS.attr_k_atsoption_flags_default, container)).equal?(OS.attr_no_err)
-            end
-          end
-          OS._cfrelease(url)
+      ns_path = NSString.string_with(path)
+      # long
+      fs_representation = ns_path.file_system_representation
+      if (!(fs_representation).equal?(0))
+        fs_ref = Array.typed(::Java::Byte).new(80) { 0 }
+        is_directory = Array.typed(::Java::Boolean).new(1) { false }
+        if ((OS._fspath_make_ref(fs_representation, fs_ref, is_directory)).equal?(OS.attr_no_err))
+          result = (OS._atsfont_activate_from_file_reference(fs_ref, OS.attr_k_atsfont_context_local, OS.attr_k_atsfont_format_unspecified, 0, OS.attr_k_atsoption_flags_default, nil)).equal?(OS.attr_no_err)
         end
-        OS._cfrelease(str)
       end
       return result
     end
@@ -975,6 +876,113 @@ module Org::Eclipse::Swt::Graphics
     end
     
     typesig { [] }
+    def print_errors
+      if (!self.attr_debug)
+        return
+      end
+      if (@tracking)
+        synchronized((@tracking_lock)) do
+          if ((@objects).nil? || (@errors).nil?)
+            return
+          end
+          object_count = 0
+          colors = 0
+          cursors = 0
+          fonts = 0
+          gcs = 0
+          images = 0
+          paths = 0
+          patterns = 0
+          regions = 0
+          text_layouts = 0
+          transforms = 0
+          i = 0
+          while i < @objects.attr_length
+            object = @objects[i]
+            if (!(object).nil?)
+              object_count += 1
+              if (object.is_a?(Color))
+                colors += 1
+              end
+              if (object.is_a?(Cursor))
+                cursors += 1
+              end
+              if (object.is_a?(Font))
+                fonts += 1
+              end
+              if (object.is_a?(SwtGC))
+                gcs += 1
+              end
+              if (object.is_a?(Image))
+                images += 1
+              end
+              if (object.is_a?(Path))
+                paths += 1
+              end
+              if (object.is_a?(Pattern))
+                patterns += 1
+              end
+              if (object.is_a?(Region))
+                regions += 1
+              end
+              if (object.is_a?(TextLayout))
+                text_layouts += 1
+              end
+              if (object.is_a?(Transform))
+                transforms += 1
+              end
+            end
+            i += 1
+          end
+          if (!(object_count).equal?(0))
+            string = "Summary: "
+            if (!(colors).equal?(0))
+              string += RJava.cast_to_string(colors) + " Color(s), "
+            end
+            if (!(cursors).equal?(0))
+              string += RJava.cast_to_string(cursors) + " Cursor(s), "
+            end
+            if (!(fonts).equal?(0))
+              string += RJava.cast_to_string(fonts) + " Font(s), "
+            end
+            if (!(gcs).equal?(0))
+              string += RJava.cast_to_string(gcs) + " GC(s), "
+            end
+            if (!(images).equal?(0))
+              string += RJava.cast_to_string(images) + " Image(s), "
+            end
+            if (!(paths).equal?(0))
+              string += RJava.cast_to_string(paths) + " Path(s), "
+            end
+            if (!(patterns).equal?(0))
+              string += RJava.cast_to_string(patterns) + " Pattern(s), "
+            end
+            if (!(regions).equal?(0))
+              string += RJava.cast_to_string(regions) + " Region(s), "
+            end
+            if (!(text_layouts).equal?(0))
+              string += RJava.cast_to_string(text_layouts) + " TextLayout(s), "
+            end
+            if (!(transforms).equal?(0))
+              string += RJava.cast_to_string(transforms) + " Transforms(s), "
+            end
+            if (!(string.length).equal?(0))
+              string = RJava.cast_to_string(string.substring(0, string.length - 2))
+              System.out.println(string)
+            end
+            i_ = 0
+            while i_ < @errors.attr_length
+              if (!(@errors[i_]).nil?)
+                @errors[i_].print_stack_trace(System.out)
+              end
+              i_ += 1
+            end
+          end
+        end
+      end
+    end
+    
+    typesig { [] }
     # Releases any internal resources back to the operating
     # system and clears all fields except the device handle.
     # <p>
@@ -997,26 +1005,63 @@ module Org::Eclipse::Swt::Graphics
     # @see #dispose
     # @see #destroy
     def release
-      if (!(@release_callback).nil?)
-        @release_callback.dispose
+      if (!(@paragraph_style).nil?)
+        @paragraph_style.release
       end
-      if (!(@draw_pattern_callback).nil?)
-        @draw_pattern_callback.dispose
+      @paragraph_style = nil
+      if (!(@system_font).nil?)
+        @system_font.dispose
       end
-      if (!(@axial_shading_callback).nil?)
-        @axial_shading_callback.dispose
+      @system_font = nil
+      if (!(@color_black).nil?)
+        @color_black.dispose
       end
-      @release_callback = @axial_shading_callback = @draw_pattern_callback = nil
-      @release_proc = @axial_shading_proc = @draw_pattern_proc = 0
-      OS._cgcolor_space_release(@colorspace)
-      @colorspace = 0
+      if (!(@color_dark_red).nil?)
+        @color_dark_red.dispose
+      end
+      if (!(@color_dark_green).nil?)
+        @color_dark_green.dispose
+      end
+      if (!(@color_dark_yellow).nil?)
+        @color_dark_yellow.dispose
+      end
+      if (!(@color_dark_blue).nil?)
+        @color_dark_blue.dispose
+      end
+      if (!(@color_dark_magenta).nil?)
+        @color_dark_magenta.dispose
+      end
+      if (!(@color_dark_cyan).nil?)
+        @color_dark_cyan.dispose
+      end
+      if (!(@color_gray).nil?)
+        @color_gray.dispose
+      end
+      if (!(@color_dark_gray).nil?)
+        @color_dark_gray.dispose
+      end
+      if (!(@color_red).nil?)
+        @color_red.dispose
+      end
+      if (!(@color_green).nil?)
+        @color_green.dispose
+      end
+      if (!(@color_yellow).nil?)
+        @color_yellow.dispose
+      end
+      if (!(@color_blue).nil?)
+        @color_blue.dispose
+      end
+      if (!(@color_magenta).nil?)
+        @color_magenta.dispose
+      end
+      if (!(@color_cyan).nil?)
+        @color_cyan.dispose
+      end
+      if (!(@color_white).nil?)
+        @color_white.dispose
+      end
       @color_black = @color_dark_red = @color_dark_green = @color_dark_yellow = @color_dark_blue = @color_dark_magenta = @color_dark_cyan = @color_gray = @color_dark_gray = @color_red = @color_green = @color_yellow = @color_blue = @color_magenta = @color_cyan = @color_white = nil
-    end
-    
-    typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
-    def release_proc(info, data, size)
-      OS._dispose_ptr(data)
-      return 0
     end
     
     typesig { [::Java::Boolean] }

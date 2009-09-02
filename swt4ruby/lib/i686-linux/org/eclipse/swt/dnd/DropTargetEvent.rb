@@ -1,6 +1,6 @@
 require "rjava"
 
-# Copyright (c) 2000, 2008 IBM Corporation and others.
+# Copyright (c) 2000, 2009 IBM Corporation and others.
 # All rights reserved. This program and the accompanying materials
 # are made available under the terms of the Eclipse Public License v1.0
 # which accompanies this distribution, and is available at
@@ -43,6 +43,7 @@ module Org::Eclipse::Swt::Dnd
     # @see DND#DROP_MOVE
     # @see DND#DROP_COPY
     # @see DND#DROP_LINK
+    # @see DND#DROP_DEFAULT
     attr_accessor :detail
     alias_method :attr_detail, :detail
     undef_method :detail
@@ -56,6 +57,7 @@ module Org::Eclipse::Swt::Dnd
     # @see DND#DROP_MOVE
     # @see DND#DROP_COPY
     # @see DND#DROP_LINK
+    # @see DND#DROP_DEFAULT
     attr_accessor :operations
     alias_method :attr_operations, :operations
     undef_method :operations
@@ -146,6 +148,43 @@ module Org::Eclipse::Swt::Dnd
       e.attr_operations = @operations
       e.attr_feedback = @feedback
       e.attr_item = @item
+    end
+    
+    typesig { [] }
+    # Returns a string containing a concise, human-readable
+    # description of the receiver.
+    # 
+    # @return a string representation of the event
+    def to_s
+      string = super
+      sb = StringBuffer.new
+      sb.append(string.substring(0, string.length - 1)) # remove trailing '}'
+      sb.append(" x=")
+      sb.append(@x)
+      sb.append(" y=")
+      sb.append(@y)
+      sb.append(" item=")
+      sb.append(@item)
+      sb.append(" operations=")
+      sb.append(@operations)
+      sb.append(" operation=")
+      sb.append(@detail)
+      sb.append(" feedback=")
+      sb.append(@feedback)
+      sb.append(" dataTypes={ ")
+      if (!(@data_types).nil?)
+        i = 0
+        while i < @data_types.attr_length
+          sb.append(@data_types[i].attr_type)
+          sb.append(Character.new(?\s.ord))
+          i += 1
+        end
+      end
+      sb.append(Character.new(?}.ord))
+      sb.append(" currentDataType=")
+      sb.append(!(@current_data_type).nil? ? @current_data_type.attr_type : Character.new(?0.ord))
+      sb.append(Character.new(?}.ord))
+      return sb.to_s
     end
     
     private

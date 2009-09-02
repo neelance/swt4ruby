@@ -1,6 +1,6 @@
 require "rjava"
 
-# Copyright (c) 2000, 2005 IBM Corporation and others.
+# Copyright (c) 2000, 2009 IBM Corporation and others.
 # All rights reserved. This program and the accompanying materials
 # are made available under the terms of the Eclipse Public License v1.0
 # which accompanies this distribution, and is available at
@@ -134,10 +134,7 @@ module Org::Eclipse::Swt::Custom
         System.arraycopy(sash_form.attr_sashes, 0, new_sashes, 0, sash_form.attr_sashes.attr_length)
         i = sash_form.attr_sashes.attr_length
         while i < new_sashes.attr_length
-          new_sashes[i] = Sash.new(sash_form, sash_form.attr_sash_style)
-          new_sashes[i].set_background(sash_form.attr_background)
-          new_sashes[i].set_foreground(sash_form.attr_foreground)
-          new_sashes[i].add_listener(SWT::Selection, sash_form.attr_sash_listener)
+          new_sashes[i] = sash_form.create_sash
           i += 1
         end
         sash_form.attr_sashes = new_sashes

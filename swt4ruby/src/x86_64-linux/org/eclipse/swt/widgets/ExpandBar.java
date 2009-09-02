@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2008 IBM Corporation and others.
+ * Copyright (c) 2000, 2009 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -41,6 +41,7 @@ import org.eclipse.swt.graphics.*;
  * @see <a href="http://www.eclipse.org/swt/">Sample code and further information</a>
  * 
  * @since 3.2
+ * @noextend This class is not intended to be subclassed by clients.
  */
 public class ExpandBar extends Composite {
 	ExpandItem [] items;
@@ -73,6 +74,7 @@ public class ExpandBar extends Composite {
  *    <li>ERROR_INVALID_SUBCLASS - if this class is not an allowed subclass</li>
  * </ul>
  *
+ * @see SWT#V_SCROLL
  * @see Widget#checkSubclass
  * @see Widget#getStyle
  */
@@ -155,10 +157,11 @@ void createHandle (int index) {
 		if ((style & SWT.V_SCROLL) != 0) {
 			scrolledHandle = OS.gtk_scrolled_window_new (0, 0);
 			if (scrolledHandle == 0) error (SWT.ERROR_NO_HANDLES);
-			int vsp = (style & SWT.V_SCROLL) != 0 ? OS.GTK_POLICY_AUTOMATIC : OS.GTK_POLICY_NEVER;
-			OS.gtk_scrolled_window_set_policy (scrolledHandle, OS.GTK_POLICY_NEVER, vsp);
+			OS.gtk_scrolled_window_set_policy (scrolledHandle, OS.GTK_POLICY_NEVER, OS.GTK_POLICY_AUTOMATIC);
 			OS.gtk_container_add (fixedHandle, scrolledHandle);
 			OS.gtk_scrolled_window_add_with_viewport (scrolledHandle, handle);
+			long /*int*/ viewport = OS.gtk_bin_get_child (scrolledHandle);
+			OS.gtk_viewport_set_shadow_type (viewport, OS.GTK_SHADOW_NONE);
 		} else {
 			OS.gtk_container_add (fixedHandle, handle);
 		}
@@ -261,6 +264,15 @@ boolean hasFocus () {
 		}
 	}
 	return super.hasFocus();
+}
+
+void hookEvents () {
+	super.hookEvents ();
+	if (OS.GTK_VERSION >= OS.VERSION (2, 4, 0)) {
+		if (scrolledHandle != 0) {
+			OS.g_signal_connect_closure (scrolledHandle, OS.size_allocate, display.closures [SIZE_ALLOCATE], true);
+		}
+	}
 }
 
 int getBandHeight () {
@@ -542,6 +554,12 @@ void layoutItems (int index, boolean setScrollbar) {
 		}
 		if (setScrollbar) setScrollbar ();
 	}
+}
+
+long /*int*/ gtk_size_allocate (long /*int*/ widget, long /*int*/ allocation) {
+	long /*int*/ result = super.gtk_size_allocate (widget, allocation);
+	layoutItems (0, false);
+	return result;
 }
 
 long /*int*/ parentingHandle () {

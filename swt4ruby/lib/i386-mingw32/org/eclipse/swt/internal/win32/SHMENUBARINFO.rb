@@ -1,6 +1,6 @@
 require "rjava"
 
-# Copyright (c) 2000, 2006 IBM Corporation and others.
+# Copyright (c) 2000, 2008 IBM Corporation and others.
 # All rights reserved. This program and the accompanying materials
 # are made available under the terms of the Eclipse Public License v1.0
 # which accompanies this distribution, and is available at
@@ -25,6 +25,7 @@ module Org::Eclipse::Swt::Internal::Win32
     alias_method :attr_cb_size=, :cb_size=
     undef_method :cb_size=
     
+    # @field cast=(HWND)
     # long
     attr_accessor :hwnd_parent
     alias_method :attr_hwnd_parent, :hwnd_parent
@@ -44,6 +45,7 @@ module Org::Eclipse::Swt::Internal::Win32
     alias_method :attr_n_tool_bar_id=, :n_tool_bar_id=
     undef_method :n_tool_bar_id=
     
+    # @field cast=(HINSTANCE)
     # long
     attr_accessor :h_inst_res
     alias_method :attr_h_inst_res, :h_inst_res
@@ -63,6 +65,7 @@ module Org::Eclipse::Swt::Internal::Win32
     alias_method :attr_c_bmp_images=, :c_bmp_images=
     undef_method :c_bmp_images=
     
+    # @field cast=(HWND)
     # long
     attr_accessor :hwnd_mb
     alias_method :attr_hwnd_mb, :hwnd_mb

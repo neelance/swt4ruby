@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2008 IBM Corporation and others.
+ * Copyright (c) 2000, 2009 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -14,12 +14,7 @@ package org.eclipse.swt.widgets;
 import org.eclipse.swt.*;
 import org.eclipse.swt.events.*;
 import org.eclipse.swt.graphics.*;
-import org.eclipse.swt.internal.carbon.ControlEditTextSelectionRec;
-import org.eclipse.swt.internal.carbon.MenuTrackingData;
-import org.eclipse.swt.internal.carbon.OS;
-import org.eclipse.swt.internal.carbon.CFRange;
-import org.eclipse.swt.internal.carbon.CGRect;
-import org.eclipse.swt.internal.carbon.Rect;
+import org.eclipse.swt.internal.cocoa.*;
 
 /**
  * Instances of this class are controls that allow the user
@@ -58,12 +53,13 @@ import org.eclipse.swt.internal.carbon.Rect;
  * @see <a href="http://www.eclipse.org/swt/snippets/#combo">Combo snippets</a>
  * @see <a href="http://www.eclipse.org/swt/examples.php">SWT Example: ControlExample</a>
  * @see <a href="http://www.eclipse.org/swt/">Sample code and further information</a>
+ * @noextend This class is not intended to be subclassed by clients.
  */
 public class Combo extends Composite {
-	int menuHandle;
 	int textLimit = LIMIT;
-	String lastText = "";
-	ControlEditTextSelectionRec selection;
+	boolean receivingFocus;
+	boolean ignoreVerify, ignoreSelection;
+	NSRange selectionRange;
 
 	/**
 	 * the operating system limit for the number of characters
@@ -80,13 +76,6 @@ public class Combo extends Composite {
 		LIMIT = 0x7FFFFFFF;
 	}
 	
-	static final String [] AX_ATTRIBUTES = {
-		OS.kAXValueAttribute,
-		OS.kAXNumberOfCharactersAttribute,
-		OS.kAXSelectedTextAttribute,
-		OS.kAXSelectedTextRangeAttribute,
-		OS.kAXStringForRangeParameterizedAttribute,
-	};
 
 /**
  * Constructs a new instance of this class given its parent
@@ -140,25 +129,19 @@ public Combo (Composite parent, int style) {
 public void add (String string) {
 	checkWidget ();
 	if (string == null) error (SWT.ERROR_NULL_ARGUMENT);
-	char [] buffer = new char [string.length ()];
-	string.getChars (0, buffer.length, buffer, 0);
-	int ptr = OS.CFStringCreateWithCharacters (OS.kCFAllocatorDefault, buffer, buffer.length);
-	if (ptr == 0) error (SWT.ERROR_ITEM_NOT_ADDED);
-	int result;
+	NSString str = NSString.stringWith(string);
 	if ((style & SWT.READ_ONLY) != 0) {
-		result = OS.AppendMenuItemTextWithCFString (menuHandle, ptr, 0, 0, null);
-		/*
-		* Feature in the Macintosh.  Setting text that starts with "-" makes the
-		* menu item a separator.  The fix is to clear the separator attribute. 
-		*/
-		if (string.startsWith ("-")) {
-			OS.ChangeMenuItemAttributes (menuHandle, (short)OS.CountMenuItems (menuHandle), 0, OS.kMenuItemAttrSeparator);
-		}
+		NSPopUpButton widget = (NSPopUpButton)view;
+		int /*long*/ selection = widget.indexOfSelectedItem();
+		NSMenu nsMenu = widget.menu();
+		NSMenuItem nsItem = (NSMenuItem)new NSMenuItem().alloc();
+		nsItem.initWithTitle(str, 0, NSString.stringWith(""));
+		nsMenu.addItem(nsItem);
+		nsItem.release();
+		if (selection == -1) widget.selectItemAtIndex(-1);
 	} else {
-		result = OS.HIComboBoxAppendTextItem (handle, ptr, null);
+		((NSComboBox)view).addItemWithObjectValue(str);
 	}
-	OS.CFRelease (ptr);
-	if (result != OS.noErr) error (SWT.ERROR_ITEM_NOT_ADDED);
 }
 
 /**
@@ -189,34 +172,19 @@ public void add (String string, int index) {
 	if (string == null) error (SWT.ERROR_NULL_ARGUMENT);
 	int count = getItemCount ();
 	if (0 > index || index > count) error (SWT.ERROR_INVALID_RANGE);
-	char [] buffer = new char [string.length ()];
-	string.getChars (0, buffer.length, buffer, 0);
-	int ptr = OS.CFStringCreateWithCharacters (OS.kCFAllocatorDefault, buffer, buffer.length);
-	if (ptr == 0) error (SWT.ERROR_ITEM_NOT_ADDED);
-	int result;
-	int selectionIndex = -1;
+	NSString str = NSString.stringWith(string);
 	if ((style & SWT.READ_ONLY) != 0) {
-		selectionIndex = OS.GetControlValue (handle) - 1;
-		result = OS.InsertMenuItemTextWithCFString (menuHandle, ptr, (short)index, 0, 0);
-		/*
-		* Feature in the Macintosh.  Setting text that starts with "-" makes the
-		* menu item a separator.  The fix is to clear the separator attribute. 
-		*/
-		if (string.startsWith ("-")) {
-			OS.ChangeMenuItemAttributes (menuHandle, (short)(index + 1), 0, OS.kMenuItemAttrSeparator);
-		}
+		NSPopUpButton widget = (NSPopUpButton)view;
+		int /*long*/ selection = widget.indexOfSelectedItem();
+		NSMenu nsMenu = widget.menu();
+		NSMenuItem nsItem = (NSMenuItem)new NSMenuItem().alloc();
+		nsItem.initWithTitle(str, 0, NSString.stringWith(""));
+		nsMenu.insertItem(nsItem, index);
+		nsItem.release();
+		if (selection == -1) widget.selectItemAtIndex(-1);
 	} else {
-		result = OS.HIComboBoxInsertTextItemAtIndex (handle, index, ptr);
+		((NSComboBox)view).insertItemWithObjectValue(str, index);
 	}
-	OS.CFRelease (ptr);
-	if (result != OS.noErr) error (SWT.ERROR_ITEM_NOT_ADDED);
-	/*
-	* When inserting an item into a READ_ONLY combo at or above the selected
-	* index neither the selection index nor the text get updated. Fix is to
-	* update the selection index to be sure the displayed item matches the 
-	* selected index.
-	*/
-	if (selectionIndex >= index) OS.SetControl32BitValue (handle, selectionIndex + 2);
 }
 
 /**
@@ -305,25 +273,12 @@ public void addVerifyListener (VerifyListener listener) {
 	addListener (SWT.Verify, typedListener);
 }
 
-int callFocusEventHandler (int nextHandler, int theEvent) {
-	short [] part = new short [1];
-	if ((style & SWT.READ_ONLY) == 0) {
-		OS.GetEventParameter (theEvent, OS.kEventParamControlPart, OS.typeControlPartCode, null, 2, null, part);
-		if (part [0] == OS.kControlFocusNoPart) {
-			selection = new ControlEditTextSelectionRec ();
-			OS.GetControlData (handle, (short) OS.kControlEntireControl, OS.kControlEditTextSelectionTag, 4, selection, null);
-		}
-	}
-	int result = super.callFocusEventHandler (nextHandler, theEvent);
-	if ((style & SWT.READ_ONLY) == 0) {
-		if (part [0] != OS.kControlFocusNoPart && selection != null) {
-			OS.SetControlData (handle, (short) OS.kControlEntireControl, OS.kControlEditTextSelectionTag, 4, selection);
-			selection = null;
-		}
-	}
+boolean becomeFirstResponder (int /*long*/ id, int /*long*/ sel) {
+	receivingFocus = true;
+	boolean result = super.becomeFirstResponder (id, sel);
+	receivingFocus = false;
 	return result;
 }
-
 
 static int checkStyle (int style) {
 	/*
@@ -351,32 +306,6 @@ static int checkStyle (int style) {
 	style = checkBits (style, SWT.DROP_DOWN, SWT.SIMPLE, 0, 0, 0, 0);
 	if ((style & SWT.SIMPLE) != 0) return style & ~SWT.READ_ONLY;
 	return style;
-}
-
-void checkSelection () {
-	if ((style & SWT.READ_ONLY) != 0) return;
-	String newText = getText ();
-	if (newText.equals (lastText)) return;
-	if (hooks (SWT.Verify) || filters (SWT.Verify)) {
-		setText (lastText, false);
-		newText = verifyText (newText, 0, lastText.length (), null);
-		if (newText == null) return;
-		setText (newText, false);
-	} else {
-		lastText = newText;
-	}
-	sendEvent (SWT.Modify);
-	if (isDisposed ()) return;
-	int index = indexOf (newText);
-	if (index != -1) postEvent (SWT.Selection);
-	
-	/* Send value changed notification to accessible client. */
-	String string = OS.kAXFocusedWindowChangedNotification;
-	char [] buffer = new char [string.length ()];
-	string.getChars (0, buffer.length, buffer, 0);
-	int stringRef = OS.CFStringCreateWithCharacters (OS.kCFAllocatorDefault, buffer, buffer.length);
-	OS.AXNotificationHIObjectNotify(stringRef, handle, 0);
-	OS.CFRelease(stringRef);
 }
 
 protected void checkSubclass () {
@@ -412,54 +341,41 @@ public void clearSelection () {
 public Point computeSize (int wHint, int hHint, boolean changed) {
 	checkWidget ();
 	int width = 0, height = 0;
-	int [] ptr = new int [1];
-	if ((style & SWT.READ_ONLY) != 0) {
-		int index = OS.GetControlValue (handle) - 1;
-		OS.CopyMenuItemTextAsCFString (menuHandle, (short)(index+1), ptr);
-	} else {
-		OS.GetControlData (handle, (short)OS.kHIComboBoxEditTextPart, OS.kControlEditTextCFStringTag, 4, ptr, null);
-	}
-	Point size = textExtent (ptr [0], 0);
-	if (ptr [0] != 0) OS.CFRelease (ptr [0]);
-	width = Math.max (width, size.x);
-	height = Math.max (height, size.y);
-	int count;
-	if ((style & SWT.READ_ONLY) != 0) {
-		count = OS.CountMenuItems (menuHandle);
-	} else {
-		count = OS.HIComboBoxGetItemCount (handle);
-	}
-	for (int i=0; i<count; i++) {
-		int result;
-		if ((style & SWT.READ_ONLY) != 0) {
-			result = OS.CopyMenuItemTextAsCFString(menuHandle, (short)(i+1), ptr);
-		} else {
-			result = OS.HIComboBoxCopyTextItemAtIndex (handle, i, ptr);
+	NSControl widget = (NSControl)view;
+	NSCell viewCell = widget.cell ();
+	NSSize size = viewCell.cellSize ();
+	width = (int)Math.ceil (size.width);
+	height = (int)Math.ceil (size.height);
+
+	if ((style & SWT.READ_ONLY) == 0) {
+		ignoreVerify = true;
+		NSComboBoxCell cell = new NSComboBoxCell (viewCell.id);
+		NSArray array = cell.objectValues ();
+		int length = (int)/*64*/array.count ();
+		if (length > 0) {
+			cell = new NSComboBoxCell (cell.copy ());
+			for (int i = 0; i < length; i++) {
+				id object = array.objectAtIndex (i);
+				cell.setTitle (new NSString (object));
+				size = cell.cellSize ();
+				width = Math.max (width, (int)Math.ceil (size.width));
+			}
+			cell.release ();
 		}
-		if (result == OS.noErr) {
-			size = textExtent (ptr [0], 0);
-			width = Math.max (width, size.x);
-			OS.CFRelease (ptr [0]);
-		}
+		ignoreVerify = false;
 	}
-	int [] metric = new int [1];
-	if ((style & SWT.READ_ONLY) != 0) {
-		OS.GetThemeMetric (OS.kThemeMetricDisclosureButtonWidth, metric);
-		width += metric [0];
-		//TODO
-		width += 13;
-	} else {
-		OS.GetThemeMetric (OS.kThemeMetricComboBoxLargeDisclosureWidth, metric);
-		width += metric [0];
+
+	/*
+	* Feature in Cocoa.  Attempting to create an NSComboBox with a
+	* height > 27 spews a very long warning message to stdout and
+	* often draws the combo incorrectly.  The workaround is to limit
+	* the returned height of editable Combos to the height that is
+	* required to display their text, even if a larger hHint is specified.
+	*/
+	if (hHint != SWT.DEFAULT) {
+		if ((style & SWT.READ_ONLY) != 0 || hHint < height) height = hHint;
 	}
-	OS.GetThemeMetric (OS.kThemeMetricEditTextWhitespace, metric);
-	width += metric [0] * 2;
-	height += metric [0] * 2;
-	Rect inset = getInset ();
-	width += inset.left + inset.right;
-	height += inset.top + inset.bottom;
 	if (wHint != SWT.DEFAULT) width = wHint;
-	if (hHint != SWT.DEFAULT) height = hHint;
 	return new Point (width, height);
 }
 
@@ -485,39 +401,19 @@ public void copy () {
 
 void createHandle () {
 	if ((style & SWT.READ_ONLY) != 0) {
-		int [] outControl = new int [1];
-		int window = OS.GetControlOwner (parent.handle);
-		/*
-		* From ControlDefinitions.h:
-		*
-		* Passing in a menu ID of -12345 causes the popup not to try and get the menu from a
-		* resource. Instead, you can build the menu and later stuff the MenuRef field in
-		* the popup data information.                                                                         
-		*/
-		OS.CreatePopupButtonControl(window, null, 0, (short)-12345, false, (short)0, (short)0, 0, outControl);
-		if (outControl [0] == 0) error (SWT.ERROR_NO_HANDLES);
-		handle = outControl [0];
-		int[] menuRef= new int [1];
-		OS.CreateNewMenu ((short) 0, 0, menuRef);
-		if (menuRef [0] == 0) error (SWT.ERROR_NO_HANDLES);
-		menuHandle = menuRef[0];
-		OS.SetControlPopupMenuHandle (handle, menuHandle);
-		OS.SetControl32BitMaximum (handle, 0x7FFF);
+		NSPopUpButton widget = (NSPopUpButton)new SWTPopUpButton().alloc();
+		widget.initWithFrame(new NSRect(), false);
+		widget.menu().setAutoenablesItems(false);
+		widget.setTarget(widget);
+		widget.setAction(OS.sel_sendSelection);
+		view = widget;
 	} else {
-		int [] outControl = new int [1];
-		CGRect rect = new CGRect ();
-		int inAttributes = OS.kHIComboBoxAutoSizeListAttribute;
-		/*
-		* The following code is intentionally commented.
-		* Auto completion does not allow the user to change
-		* case of the text in a combo box.
-		*/
-//		inAttributes |= OS.kHIComboBoxAutoCompletionAttribute;
-		OS.HIComboBoxCreate(rect, 0, null, 0, inAttributes, outControl);
-		if (outControl [0] == 0) error (SWT.ERROR_NO_HANDLES);
-		handle = outControl [0];
-		OS.SetControlData (handle, (short)OS.kHIComboBoxEditTextPart, OS.kTXNDrawCaretWhenInactiveTag, 4, new byte [ ]{0});
-		OS.HIViewSetVisible (handle, true);
+		NSComboBox widget = (NSComboBox)new SWTComboBox().alloc();
+		widget.init();
+		widget.setDelegate(widget);
+		widget.setTarget(widget);
+		widget.setAction(OS.sel_sendSelection);
+		view = widget;
 	}
 }
 
@@ -560,11 +456,21 @@ public void cut () {
 }
 
 Color defaultBackground () {
-    return display.getSystemColor (SWT.COLOR_LIST_BACKGROUND);
+    return display.getWidgetColor (SWT.COLOR_LIST_BACKGROUND);
+}
+
+NSFont defaultNSFont() {
+	if ((style & SWT.READ_ONLY) != 0) return display.popUpButtonFont;		
+	return display.comboBoxFont;
 }
 
 Color defaultForeground () {
-    return display.getSystemColor (SWT.COLOR_LIST_FOREGROUND);
+    return display.getWidgetColor (SWT.COLOR_LIST_FOREGROUND);
+}
+
+void deregister() {
+	super.deregister();
+	display.removeWidget(((NSControl)view).cell());
 }
 
 /**
@@ -584,10 +490,10 @@ public void deselect (int index) {
 	if (index == -1) return;
 	if (index == getSelectionIndex ()) {
 		if ((style & SWT.READ_ONLY) != 0) {
-			OS.SetControl32BitValue (handle, 0);
+			((NSPopUpButton)view).selectItem(null);
 			sendEvent (SWT.Modify);
 		} else {
-			setText ("");
+			((NSComboBox)view).deselectItemAtIndex(index);
 		}
 	}
 }
@@ -609,32 +515,47 @@ public void deselect (int index) {
 public void deselectAll () {
 	checkWidget ();
 	if ((style & SWT.READ_ONLY) != 0) {
-		OS.SetControl32BitValue (handle, 0);
+		((NSPopUpButton)view).selectItem(null);
 		sendEvent (SWT.Modify);
 	} else {
-		setText ("");
+		NSComboBox widget = (NSComboBox)view;
+		int /*long*/ index = widget.indexOfSelectedItem();
+		if (index != -1) widget.deselectItemAtIndex(index);
 	}
 }
 
-void destroyWidget () {
-	/*
-	* Bug in the Macintosh.  Carbon segments fault if the combo box has
-	* keyboard focus and it is disposed or its parent is disposed because
-	* there is an outstanding timer that runs after the widget is dispoed.
-	* The fix is to remove the combo box from its parent and dispose it when
-	* the display is idle.
-	* 
-	* NOTE: The problem does not happen when the window is disposed.
-	*/
-	if ((getShell ().state & DISPOSE_SENT) != 0) {
-		super.destroyWidget ();
+boolean dragDetect(int x, int y, boolean filter, boolean[] consume) {
+	if ((style & SWT.READ_ONLY) == 0) {
+		NSText fieldEditor = ((NSControl)view).currentEditor();
+		if (fieldEditor != null) {
+			NSRange selectedRange = fieldEditor.selectedRange();
+			if (selectedRange.length > 0) {
+				NSPoint mouseLocation = NSEvent.mouseLocation();
+				NSTextView feAsTextView = new NSTextView(fieldEditor);
+				int /*long*/ charPosition = feAsTextView.characterIndexForInsertionAtPoint(mouseLocation);
+				if (charPosition != OS.NSNotFound && charPosition >= selectedRange.location && charPosition < (selectedRange.location + selectedRange.length)) {
+					if (super.dragDetect(x, y, filter, consume)) {
+						if (consume != null) consume[0] = true;
+						return true;
+					}
+				}	
+			}
+		}
+		return false;
+	}
+	
+	return super.dragDetect(x, y, filter, consume);
+}
+
+int getCharCount() {
+	NSString str;
+	if ((style & SWT.READ_ONLY) != 0) {
+		str = ((NSPopUpButton)view).titleOfSelectedItem();
 	} else {
-		releaseHandle ();
+		str = new NSCell(((NSComboBox)view).cell()).title();
 	}
-}
-
-String [] getAxAttributes () {
-	return AX_ATTRIBUTES;
+	if (str == null) return 0;
+	return (int)/*64*/str.length();
 }
 
 /**
@@ -657,21 +578,14 @@ public String getItem (int index) {
 	checkWidget ();
 	int count = getItemCount ();
 	if (0 > index || index >= count) error (SWT.ERROR_INVALID_RANGE);
-	int[] ptr = new int[1];
-	int result;
+	NSString str;
 	if ((style & SWT.READ_ONLY) != 0) {
-		result = OS.CopyMenuItemTextAsCFString(menuHandle, (short)(index+1), ptr);
+		str = ((NSPopUpButton)view).itemTitleAtIndex(index);
 	} else {
-		result = OS.HIComboBoxCopyTextItemAtIndex (handle, index, ptr);
+		str = new NSString(((NSComboBox)view).itemObjectValueAtIndex(index));
 	}
-	if (result != OS.noErr) error(SWT.ERROR_CANNOT_GET_ITEM);
-	int length = OS.CFStringGetLength (ptr [0]);
-	char [] buffer= new char [length];
-	CFRange range = new CFRange ();
-	range.length = length;
-	OS.CFStringGetCharacters (ptr [0], range, buffer);
-	OS.CFRelease (ptr [0]);
-	return new String (buffer);
+	if (str == null) error(SWT.ERROR_CANNOT_GET_ITEM);
+	return str.getString();
 }
 
 /**
@@ -687,9 +601,9 @@ public String getItem (int index) {
 public int getItemCount () {
 	checkWidget ();
 	if ((style & SWT.READ_ONLY) != 0) {
-		return OS.CountMenuItems (menuHandle);
+		return (int)/*64*/((NSPopUpButton)view).numberOfItems();
 	} else {
-		return OS.HIComboBoxGetItemCount (handle);
+		return (int)/*64*/((NSComboBox)view).numberOfItems();
 	}
 }
 
@@ -754,24 +668,12 @@ public String [] getItems () {
  * @since 3.4
  */
 public boolean getListVisible () {
-	checkWidget ();
-	if ((style & SWT.READ_ONLY) != 0) {
-		MenuTrackingData outData = new MenuTrackingData ();
-		return OS.GetMenuTrackingData (menuHandle, outData) == OS.noErr;
-	} else {
- 		if (OS.VERSION >= 0x1040) {
- 			return OS.HIComboBoxIsListVisible (handle);
- 		}
- 		return false;
-	}
+	//TODO
+	return false;
 }
 
 int getMininumHeight () {
 	return getTextHeight ();
-}
-
-String getNameText () {
-	return getText ();
 }
 
 /**
@@ -815,14 +717,11 @@ public Point getSelection () {
 	if ((style & SWT.READ_ONLY) != 0) {
 		return new Point (0, getCharCount ());
 	} else {
-		ControlEditTextSelectionRec selection;
-		if (this.selection != null) {
-			selection = this.selection;
-		} else {
-			selection = new ControlEditTextSelectionRec ();
-			OS.GetControlData (handle, (short) OS.kHIComboBoxEditTextPart, OS.kControlEditTextSelectionTag, 4, selection, null);
+		if (selectionRange == null) {
+			NSString str = new NSTextFieldCell (((NSTextField) view).cell ()).title ();
+			return new Point((int)/*64*/str.length (), (int)/*64*/str.length ());
 		}
-		return new Point (selection.selStart, selection.selEnd);
+		return new Point((int)/*64*/selectionRange.location, (int)/*64*/(selectionRange.location + selectionRange.length));
 	}
 }
 
@@ -840,9 +739,9 @@ public Point getSelection () {
 public int getSelectionIndex () {
 	checkWidget ();
 	if ((style & SWT.READ_ONLY) != 0) {
-		return OS.GetControlValue (handle) - 1;
+		return (int)/*64*/((NSPopUpButton)view).indexOfSelectedItem();
 	} else {
-		return indexOf (getText ());
+		return (int)/*64*/((NSComboBox)view).indexOfSelectedItem();
 	}
 }
 
@@ -860,31 +759,27 @@ public int getSelectionIndex () {
  */
 public String getText () {
 	checkWidget ();
-	return new String (getText (0, -1));
+	return new String (getText(0, -1));
 }
 
-char []  getText (int start, int end) {
-	int result;
-	int [] ptr = new int [1];
+char [] getText (int start, int end) {
+	NSString str;
 	if ((style & SWT.READ_ONLY) != 0) {
-		int index = OS.GetControlValue (handle) - 1;
-		result = OS.CopyMenuItemTextAsCFString (menuHandle, (short)(index+1), ptr);
+		str = ((NSPopUpButton)view).titleOfSelectedItem();
 	} else {
-		int [] actualSize = new int [1];
-		result = OS.GetControlData (handle, (short)OS.kHIComboBoxEditTextPart, OS.kControlEditTextCFStringTag, 4, ptr, actualSize);
+		str = new NSCell(((NSComboBox)view).cell()).title();
 	}
-	if (result != OS.noErr) return new char [0];
-	CFRange range = new CFRange ();
+	if (str == null) return new char[0];
+	NSRange range = new NSRange ();
 	range.location = start;
 	if (end == -1) {
-		int length = OS.CFStringGetLength (ptr [0]);
+		int /*long*/ length = str.length();
 		range.length = length - start;
 	} else {
 		range.length = end - start;
 	}
-	char [] buffer= new char [range.length];
-	OS.CFStringGetCharacters (ptr [0], range, buffer);
-	OS.CFRelease (ptr [0]);
+	char [] buffer= new char [(int)/*64*/range.length];
+	str.getCharacters(buffer, range);
 	return buffer;
 }
 
@@ -900,8 +795,13 @@ char []  getText (int start, int end) {
  */
 public int getTextHeight () {
 	checkWidget();
-	//TODO - not supported by the OS
-	return 26;
+	NSCell cell;
+	if ((style & SWT.READ_ONLY) != 0) {
+		cell = ((NSPopUpButton)view).cell();
+	} else {
+		cell = ((NSComboBox)view).cell();
+	}
+	return (int)cell.cellSize().height;
 }
 
 /**
@@ -946,21 +846,7 @@ public int getVisibleItemCount () {
 	if ((style & SWT.READ_ONLY) != 0) {
 		return getItemCount ();
 	} else {
-		int [] buffer = new int [1];
-		OS.GetControlData (handle, (short) OS.kControlEntireControl, OS.kHIComboBoxNumVisibleItemsTag, 4, buffer, null);
-		return buffer [0];
-	}
-}
-
-void hookEvents () {
-	super.hookEvents ();
-	if ((style & SWT.READ_ONLY) != 0) {
-		int commandProc = display.commandProc;
-		int [] mask = new int [] {
-			OS.kEventClassCommand, OS.kEventProcessCommand,
-		};
-		int menuTarget = OS.GetMenuEventTarget (menuHandle);
-		OS.InstallEventHandler (menuTarget, commandProc, mask.length / 2, mask, handle, null);		
+		return (int)/*64*/((NSComboBox)view).numberOfVisibleItems();
 	}
 }
 	
@@ -1017,204 +903,55 @@ public int indexOf (String string, int start) {
 	return -1;
 }
 
-int getCharCount () {
-//	checkWidget ();
-	int [] ptr = new int [1];
-	int result;
-	if ((style & SWT.READ_ONLY) != 0) {
-		int index = OS.GetControlValue (handle) - 1;
-		result = OS.CopyMenuItemTextAsCFString(menuHandle, (short)(index+1), ptr);
-	} else {
-		int [] actualSize = new int [1];
-		result = OS.GetControlData (handle, (short)OS.kHIComboBoxEditTextPart, OS.kControlEditTextCFStringTag, 4, ptr, actualSize);
-	}
-	if (result != OS.noErr) return 0;
-	int length = OS.CFStringGetLength (ptr [0]);
-	OS.CFRelease (ptr [0]);
-	return length;
-}
-
-Rect getInset () {
-	return display.comboInset;
-}
-
-int kEventAccessibleGetNamedAttribute (int nextHandler, int theEvent, int userData) {
-	int code = OS.eventNotHandledErr;
-	if ((style & SWT.READ_ONLY) == 0) {
-		int [] stringRef = new int [1];
-		OS.GetEventParameter (theEvent, OS.kEventParamAccessibleAttributeName, OS.typeCFStringRef, null, 4, null, stringRef);
-		int length = 0;
-		if (stringRef [0] != 0) length = OS.CFStringGetLength (stringRef [0]);
+void insertEditText (String string) {
+	ignoreVerify = true;
+	int length = string.length ();
+	Point selection = getSelection ();
+	if (hasFocus ()) {
+		if (textLimit != LIMIT) {
+			int charCount = getCharCount();
+			if (charCount - (selection.y - selection.x) + length > textLimit) {
+				length = textLimit - charCount + (selection.y - selection.x);
+			}
+		}
 		char [] buffer = new char [length];
-		CFRange range = new CFRange ();
-		range.length = length;
-		OS.CFStringGetCharacters (stringRef [0], range, buffer);
-		String attributeName = new String(buffer);
-		if (attributeName.equals (OS.kAXValueAttribute)) {
-			buffer = getText(0, -1);
-			stringRef [0] = OS.CFStringCreateWithCharacters (OS.kCFAllocatorDefault, buffer, buffer.length);
-			if (stringRef [0] != 0) {
-				OS.SetEventParameter (theEvent, OS.kEventParamAccessibleAttributeValue, OS.typeCFStringRef, 4, stringRef);
-				OS.CFRelease(stringRef [0]);
-				code = OS.noErr;
-			}
-		} else if (attributeName.equals (OS.kAXNumberOfCharactersAttribute)) {
-			OS.SetEventParameter (theEvent, OS.kEventParamAccessibleAttributeValue, OS.typeSInt32, 4, new int [] {getCharCount()});
-			code = OS.noErr;
-		} else if (attributeName.equals (OS.kAXSelectedTextAttribute)) {
-			Point sel = getSelection ();
-			buffer = getText(sel.x, sel.y);
-			stringRef [0] = OS.CFStringCreateWithCharacters (OS.kCFAllocatorDefault, buffer, buffer.length);
-			if (stringRef [0] != 0) {
-				OS.SetEventParameter (theEvent, OS.kEventParamAccessibleAttributeValue, OS.typeCFStringRef, 4, stringRef);
-				OS.CFRelease(stringRef [0]);
-				code = OS.noErr;
-			}
-		} else if (attributeName.equals (OS.kAXSelectedTextRangeAttribute)) {
-			Point sel = getSelection ();
-			range = new CFRange();
-			range.location = sel.x;
-			range.length = sel.y - sel.x;
-			int valueRef = OS.AXValueCreate(OS.kAXValueCFRangeType, range);
-			OS.SetEventParameter (theEvent, OS.kEventParamAccessibleAttributeValue, OS.typeCFTypeRef, 4, new int [] {valueRef});
-			OS.CFRelease(valueRef);
-			code = OS.noErr;
-		} else if (attributeName.equals (OS.kAXStringForRangeParameterizedAttribute)) {
-			int valueRef [] = new int [1];
-			int status = OS.GetEventParameter (theEvent, OS.kEventParamAccessibleAttributeParameter, OS.typeCFTypeRef, null, 4, null, valueRef);
-			if (status == OS.noErr) {
-				range = new CFRange();
-				boolean ok = OS.AXValueGetValue(valueRef[0], OS.kAXValueCFRangeType, range);
-				if (ok) {
-					buffer = getText (range.location, range.location + range.length);
-					stringRef [0] = OS.CFStringCreateWithCharacters (OS.kCFAllocatorDefault, buffer, buffer.length);
-					if (stringRef [0] != 0) {
-						OS.SetEventParameter (theEvent, OS.kEventParamAccessibleAttributeValue, OS.typeCFStringRef, 4, stringRef);
-						OS.CFRelease(stringRef [0]);
-						code = OS.noErr;
-					}
-				}
+		string.getChars (0, buffer.length, buffer, 0);
+		NSString nsstring = NSString.stringWithCharacters (buffer, buffer.length);
+		NSText fieldEditor = ((NSTextField) view).currentEditor ();
+		fieldEditor.replaceCharactersInRange (fieldEditor.selectedRange (), nsstring);
+		selectionRange = null;
+	} else {
+		String oldText = getText ();
+		if (textLimit != LIMIT) {
+			int charCount = oldText.length ();
+			if (charCount - (selection.y - selection.x) + length > textLimit) {
+				string = string.substring(0, textLimit - charCount + (selection.y - selection.x));
 			}
 		}
+		String newText = oldText.substring (0, selection.x) + string + oldText.substring (selection.y);
+		NSString nsstring = NSString.stringWith(newText);
+		new NSCell (((NSTextField) view).cell ()).setTitle (nsstring);
+		selectionRange = null;
+		setSelection (new Point(selection.x + string.length (), 0));
 	}
-	if (accessible != null) {
-		code = accessible.internal_kEventAccessibleGetNamedAttribute (nextHandler, theEvent, code);
-	}
-	return code;
+	ignoreVerify = false;
 }
 
-int kEventControlActivate (int nextHandler, int theEvent, int userData) {
-	int result = super.kEventControlActivate (nextHandler, theEvent, userData);
-	if (result == OS.noErr) return result;
-	/*
-	* Feature in the Macintosh.  When a combo box gets
-	* kEventControlActivate, it starts the caret blinking.
-	* Because there is no clipping on the Macintosh, the
-	* caret may blink through a widget that is obscured.
-	* The fix is to avoid running the default handler.
-	*/
-	return OS.noErr;
+boolean isEventView (int /*long*/ id) {
+	return true;
 }
 
-int kEventProcessCommand (int nextHandler, int theEvent, int userData) {
-	int result = super.kEventProcessCommand (nextHandler, theEvent, userData);
-	if (result == OS.noErr) return result;
-	/*
-	* It is possible (but unlikely), that application
-	* code could have disposed the widget in the modify
-	* event.  If this happens, end the processing of the
-	* Windows message by returning zero as the result of
-	* the window proc.
-	* 
-	* Note: this should be a send event, but selection is updated
-	* right way.
-	*/
-	postEvent (SWT.Modify);
-	if (isDisposed ()) return OS.eventNotHandledErr;
-	postEvent (SWT.Selection);
-	return OS.eventNotHandledErr;
-}
-
-int kEventRawKeyPressed (int nextHandler, int theEvent, int userData) {
-	/*
-	* Feature in the Macintosh. The combo box widget consumes the
-	* kEventRawKeyDown event when the up and down arrow keys are
-	* pressed, causing kEventTextInputUnicodeForKeyEvent not
-	* to be sent.  The fix is to handle these keys in kEventRawKeyDown.
-	* 
-	* NOTE:  This was fixed in OS X 10.4.
-	*/
-	if (OS.VERSION < 0x1040) {
-		int [] keyCode = new int [1];
-		OS.GetEventParameter (theEvent, OS.kEventParamKeyCode, OS.typeUInt32, null, keyCode.length * 4, null, keyCode);
-		switch (keyCode [0]) {
-			case 126: /* Up arrow */
-			case 125: /* Down arrow */
-				if (!sendKeyEvent (SWT.KeyDown, theEvent)) return OS.noErr;
-				break;
-		}
-	}
-	return OS.eventNotHandledErr;
-}
-
-int kEventControlSetFocusPart (int nextHandler, int theEvent, int userData) {
-	int result = super.kEventControlSetFocusPart (nextHandler, theEvent, userData);
-	if (result == OS.noErr) {
-		if ((style & SWT.READ_ONLY) == 0) {
-			short [] part = new short [1];
-			OS.GetEventParameter (theEvent, OS.kEventParamControlPart, OS.typeControlPartCode, null, 2, null, part);
-			if (part [0] != OS.kControlFocusNoPart) display.focusCombo = this;
-		}
-	}
-	return result;
-}
-
-int kEventUnicodeKeyPressed (int nextHandler, int theEvent, int userData) {
-	int result = super.kEventUnicodeKeyPressed (nextHandler, theEvent, userData);
-	if (result == OS.noErr) return result;
-	int [] keyboardEvent = new int [1];
-	OS.GetEventParameter (theEvent, OS.kEventParamTextInputSendKeyboardEvent, OS.typeEventRef, null, keyboardEvent.length * 4, null, keyboardEvent);
-	int [] keyCode = new int [1];
-	OS.GetEventParameter (keyboardEvent [0], OS.kEventParamKeyCode, OS.typeUInt32, null, keyCode.length * 4, null, keyCode);
+void mouseDown(int /*long*/ id, int /*long*/ sel, int /*long*/ theEvent) {
+	// If this is a combo box with an editor field and the control is disposed
+	// while the view's cell editor is open we crash while tearing down the
+	// popup window. Fix is to retain the view before letting Cocoa track
+	// the mouse events.
 	
-	String string = OS.kAXValueChangedNotification;
-	char [] buffer = new char [string.length ()];
-	string.getChars (0, buffer.length, buffer, 0);
-	int stringRef = OS.CFStringCreateWithCharacters (OS.kCFAllocatorDefault, buffer, buffer.length);
-	OS.AXNotificationHIObjectNotify(stringRef, handle, 0);
-	OS.CFRelease(stringRef);
-	string = OS.kAXSelectedTextChangedNotification;
-	buffer = new char [string.length ()];
-	string.getChars (0, buffer.length, buffer, 0);
-	stringRef = OS.CFStringCreateWithCharacters (OS.kCFAllocatorDefault, buffer, buffer.length);
-	OS.AXNotificationHIObjectNotify(stringRef, handle, 0);
-	OS.CFRelease(stringRef);
-
-	if (hooks (SWT.Verify) || filters (SWT.Verify)
-			|| hooks (SWT.Modify) || filters (SWT.Modify)) {
-		int [] modifiers = new int [1];
-		OS.GetEventParameter (keyboardEvent [0], OS.kEventParamKeyModifiers, OS.typeUInt32, null, 4, null, modifiers);
-		if (modifiers [0] == OS.cmdKey) {
-			switch (keyCode [0]) {
-				case 7: /* X */
-					cut ();
-					return OS.noErr;
-				case 9: /* V */
-					paste ();
-					return OS.noErr;
-			}
-		}
-	}
-	switch (keyCode [0]) {
-		case 76: /* KP Enter */
-		case 36: { /* Return */
-			postEvent (SWT.DefaultSelection);
-			break;
-		}
-	}
-	result = OS.CallNextEventHandler (nextHandler, theEvent);
-	lastText = getText ();
-	return result;
+	// 'view' will be cleared if disposed during the mouseDown so cache it.
+	NSView viewCopy = view;
+	viewCopy.retain();
+	super.mouseDown(id, sel, theEvent);
+	viewCopy.release();
 }
 
 /**
@@ -1240,6 +977,7 @@ public void paste () {
 	String leftText = text.substring (0, start);
 	String rightText = text.substring (end, text.length ());
 	String newText = getClipboardText ();
+	if (newText == null) return;
 	if (hooks (SWT.Verify) || filters (SWT.Verify)) {
 		newText = verifyText (newText, start, end, null);
 		if (newText == null) return;
@@ -1256,33 +994,17 @@ public void paste () {
 	sendEvent (SWT.Modify);
 }
 
-boolean pollTrackEvent() {
-	return true;
-}
-
-void releaseHandle () {
-	/*
-	* Bug in the Macintosh.  Carbon segments fault if the combo box has
-	* keyboard focus and it is disposed or its parent is disposed because
-	* there is an outstanding timer that runs after the widget is dispoed.
-	* The fix is to remove the combo box from its parent and dispose it when
-	* the display is idle.
-	* 
-	* NOTE: The problem does not happen when the window is disposed.
-	*/
-	if ((getShell ().state & DISPOSE_SENT) == 0) {
-		display.addToDisposeWindow (handle);
-	}
-	super.releaseHandle ();
+void register() {
+	super.register();
+	display.addWidget(((NSControl)view).cell(), this);
 }
 
 void releaseWidget () {
 	super.releaseWidget ();
-	if (display.focusCombo == this) display.focusCombo = null;
-	if (menuHandle != 0) {
-		OS.DisposeMenu (menuHandle);
+	if ((style & SWT.READ_ONLY) == 0) {
+		((NSControl)view).abortEditing();
 	}
-	menuHandle = 0;
+	selectionRange = null;
 }
 
 /**
@@ -1305,12 +1027,9 @@ public void remove (int index) {
 	int count = getItemCount ();
 	if (0 > index || index >= count) error (SWT.ERROR_INVALID_RANGE);
 	if ((style & SWT.READ_ONLY) != 0) {
-		OS.DeleteMenuItems (menuHandle, (short)(index+1), 1);
-		if (index == OS.GetControlValue (handle) - 1) {
-			OS.SetControl32BitValue (handle, 0);
-		}
+		((NSPopUpButton)view).removeItemAtIndex(index);
 	} else {
-		OS.HIComboBoxRemoveItemAtIndex (handle, index);
+		((NSComboBox)view).removeItemAtIndex(index);
 	}
 }
 
@@ -1338,16 +1057,8 @@ public void remove (int start, int end) {
 		error (SWT.ERROR_INVALID_RANGE);
 	}
 	int newEnd = Math.min (end, count - 1);
-	if ((style & SWT.READ_ONLY) != 0) {
-		OS.DeleteMenuItems (menuHandle, (short)(start+1), newEnd-start+1);
-		int index = OS.GetControlValue (handle) - 1;
-		if (start <= index && index <= end) {
-			OS.SetControl32BitValue (handle, 0);
-		}
-	} else {
-		for (int i=newEnd; i>=start; i--) {
-			OS.HIComboBoxRemoveItemAtIndex (handle, i);
-		}
+	for (int i=newEnd; i>=start; i--) {
+		remove(i);
 	}
 }
 
@@ -1386,17 +1097,11 @@ public void remove (String string) {
  */
 public void removeAll () {
 	checkWidget ();
-	int count = getItemCount ();
 	if ((style & SWT.READ_ONLY) != 0) {
-		OS.DeleteMenuItems (menuHandle, (short)1, count);
-		OS.SetControl32BitValue (handle, 0);
+		((NSPopUpButton)view).removeAllItems();
 	} else {
 		setText ("", true);
-		if (count > 0) {
-			for (int i=count-1; i>=0; i--) {
-  				OS.HIComboBoxRemoveItemAtIndex (handle, i);
-			}
-		}
+		((NSComboBox)view).removeAllItems();
 	}
 }
 
@@ -1490,107 +1195,105 @@ public void removeVerifyListener (VerifyListener listener) {
 public void select (int index) {
 	checkWidget ();
 	int count = getItemCount ();
+	ignoreSelection = true;
 	if (0 <= index && index < count) {
 		if ((style & SWT.READ_ONLY) != 0) {
-			OS.SetControl32BitValue (handle, index + 1);
-			sendEvent (SWT.Modify);
+			((NSPopUpButton)view).selectItemAtIndex(index);
 		} else {
-			setText (getItem (index), true);
+			((NSComboBox)view).selectItemAtIndex(index);
 		}
-	}	
+	}
+	ignoreSelection = false;
+	sendEvent (SWT.Modify);
 }
 
-boolean sendKeyEvent (int type, Event event) {
-	if (!super.sendKeyEvent (type, event)) {
-		return false;
-	}
-	if (type != SWT.KeyDown) return true;
-	if ((style & SWT.READ_ONLY) != 0) return true;
-	if (event.character == 0) return true;
-	if ((event.stateMask & SWT.COMMAND) != 0) return true;
-	String oldText = "", newText = "";
-	if (hooks (SWT.Verify) || filters (SWT.Verify)) {
-		int charCount = getCharCount ();
-		Point selection = getSelection ();
-		int start = selection.x, end = selection.y;
-		switch (event.character) {
-			case SWT.BS:
-				if (start == end) {
-					if (start == 0) return true;
-					start = Math.max (0, start - 1);
+void sendSelection () {
+	sendEvent(SWT.Modify);
+	if (!ignoreSelection) postEvent(SWT.Selection);
+}
+
+boolean sendKeyEvent (NSEvent nsEvent, int type) {
+	boolean result = super.sendKeyEvent (nsEvent, type);
+	if (!result) return result;
+	int stateMask = 0;
+	int /*long*/ modifierFlags = nsEvent.modifierFlags();
+	if ((modifierFlags & OS.NSAlternateKeyMask) != 0) stateMask |= SWT.ALT;
+	if ((modifierFlags & OS.NSShiftKeyMask) != 0) stateMask |= SWT.SHIFT;
+	if ((modifierFlags & OS.NSControlKeyMask) != 0) stateMask |= SWT.CONTROL;
+	if ((modifierFlags & OS.NSCommandKeyMask) != 0) stateMask |= SWT.COMMAND;
+	if (type != SWT.KeyDown)  return result;
+	short keyCode = nsEvent.keyCode ();
+	if (stateMask == SWT.COMMAND) {
+		switch (keyCode) {
+			case 7: /* X */
+				cut ();
+				return false;
+			case 8: /* C */
+				copy ();
+				return false;
+			case 9: /* V */
+				paste ();
+				return false;
+			case 0: /* A */
+				if ((style & SWT.READ_ONLY) == 0) {
+					((NSComboBox)view).selectText(null);
+					return false;
 				}
-				break;
-			case SWT.DEL:
-				if (start == end) {
-					if (start == charCount) return true;
-					end = Math.min (end + 1, charCount);
-				}
-				break;
-			case SWT.CR:
-				return true;
-			default:
-				if (event.character != '\t' && event.character < 0x20) return true;
-				oldText = new String (new char [] {event.character});
-		}
-		newText = verifyText (oldText, start, end, event);
-		if (newText == null) return false;
-		if (charCount - (end - start) + newText.length () > textLimit) {
-			return false;
-		}
-		if (newText != oldText) {
-			String text = getText ();
-			String leftText = text.substring (0, start);
-			String rightText = text.substring (end, text.length ());
-			setText (leftText + newText + rightText, false);
-			start += newText.length ();
-			setSelection (new Point (start, start));
 		}
 	}
-	/*
-	* Post the modify event so that the character will be inserted
-	* into the widget when the modify event is delivered.  Normally,
-	* modify events are sent but it is safe to post the event here
-	* because this method is called from the event loop.
-	*/
-	postEvent (SWT.Modify);
-	return newText == oldText;
-}
-
-void setBackground (int control, float [] color) {
-	if ((style & SWT.READ_ONLY) == 0) {
-		if (color == null) color = defaultBackground ().handle;
-	}
-	super.setBackground (control, color);
-}
-
-int setBounds (int x, int y, int width, int height, boolean move, boolean resize, boolean events) {
-	if ((style & SWT.READ_ONLY) != 0) {
-		return super.setBounds (x, y, width, height, move, resize, events);
-	}
-	/*
-	* Bug in the Macintosh.  When the caret is moved,
-	* the combo widget scrolls to show the new location.
-	* This means that the combo widget may be scrolled
-	* to the left in order to show the caret when the
-	* widget is not large enough to show both the caret
-	* location and all the text.  Unfortunately, when
-	* the widget is resized such that all the text and
-	* the caret could be visible, the Macintosh does not
-	* scroll the widget back.  The fix is to save the 
-	* current selection, reset the text and then restore
-	* the selection.  This will cause the widget
-	* to recompute the left scroll position.
-	*/
-	Rect inset = getInset ();
-	Rectangle rect = getBounds ();
-	int oldWidth = rect.width - inset.left - inset.right;
-	int result = super.setBounds (x, y, width, height, move, resize, events);
-	if (oldWidth == 0 && width > 0) {
-		Point selection = getSelection ();
-		setText (getText (), false);
-		setSelection (selection);
+	switch (keyCode) {
+	case 76: /* KP Enter */
+	case 36: /* Return */
+		postEvent (SWT.DefaultSelection);
 	}
 	return result;
+}
+
+void updateBackground () {
+	NSColor nsColor = null;
+	if (backgroundImage != null) {
+		nsColor = NSColor.colorWithPatternImage(backgroundImage.handle);
+	} else if (background != null) {
+		nsColor = NSColor.colorWithDeviceRed(background[0], background[1], background[2], background[3]);
+	} else {
+		nsColor = NSColor.textBackgroundColor ();
+	}
+
+	if ((style & SWT.READ_ONLY) != 0) {
+		//TODO
+	} else {
+		((NSTextField)view).setBackgroundColor(nsColor);
+	}
+}
+
+void setBounds (int x, int y, int width, int height, boolean move, boolean resize) {
+	/*
+	 * Feature in Cocoa.  Attempting to create an NSComboBox with a
+	 * height > 27 spews a very long warning message to stdout and
+	 * often draws the combo incorrectly.  The workaround is to limit
+	 * the height of editable Combos to the height that is required
+	 * to display their text.
+	 */
+	if ((style & SWT.READ_ONLY) == 0) {
+		NSControl widget = (NSControl)view;
+		NSSize size = widget.cell ().cellSize ();
+		height = Math.min (height, (int)Math.ceil (size.height));
+	}
+	super.setBounds (x, y, width, height, move, resize);
+}
+
+void setForeground (float /*double*/ [] color) {
+	NSColor nsColor;
+	if (color == null) {
+		nsColor = NSColor.textColor ();
+	} else {
+		nsColor = NSColor.colorWithDeviceRed(color[0], color[1], color[2], 1);
+	}
+	if ((style & SWT.READ_ONLY) != 0) {
+		//TODO
+	} else {
+		((NSTextField)view).setTextColor(nsColor);
+	}
 }
 
 /**
@@ -1614,26 +1317,15 @@ public void setItem (int index, String string) {
 	if (string == null) error (SWT.ERROR_NULL_ARGUMENT);
 	int count = getItemCount ();
 	if (0 > index || index >= count) error (SWT.ERROR_INVALID_RANGE);
-	char [] buffer = new char [string.length ()];
-	string.getChars (0, buffer.length, buffer, 0);
-	int ptr = OS.CFStringCreateWithCharacters (OS.kCFAllocatorDefault, buffer, buffer.length);
-	if (ptr == 0) error (SWT.ERROR_ITEM_NOT_ADDED);
-	int result;
+	NSString str = NSString.stringWith(string);
 	if ((style & SWT.READ_ONLY) != 0) {
-		result = OS.SetMenuItemTextWithCFString (menuHandle, (short)(index+1), ptr);
-		/*
-		* Feature in the Macintosh.  Setting text that starts with "-" makes the
-		* menu item a separator.  The fix is to clear the separator attribute. 
-		*/
-		if (string.startsWith ("-")) {
-			OS.ChangeMenuItemAttributes (menuHandle, (short)(index+1), 0, OS.kMenuItemAttrSeparator);
-		}
+		NSMenuItem nsItem = ((NSPopUpButton)view).itemAtIndex(index);
+		nsItem.setTitle(str);
 	} else {
-		result = OS.HIComboBoxInsertTextItemAtIndex (handle, index, ptr);
-		OS.HIComboBoxRemoveItemAtIndex (handle, index+1);
+		NSComboBox widget = (NSComboBox)view;
+		widget.insertItemWithObjectValue(str, index);
+		widget.removeItemAtIndex(index + 1);
 	}
-	OS.CFRelease(ptr);
-	if (result != OS.noErr) error (SWT.ERROR_ITEM_NOT_ADDED);
 }
 
 /**
@@ -1659,27 +1351,18 @@ public void setItems (String [] items) {
 	removeAll();
 	if (items.length == 0) return;
 	for (int i= 0; i < items.length; i++) {
-		String string = items[i];
-		char [] buffer = new char [string.length ()];
-		string.getChars (0, buffer.length, buffer, 0);
-		int ptr = OS.CFStringCreateWithCharacters (OS.kCFAllocatorDefault, buffer, buffer.length);
-		if (ptr == 0) error (SWT.ERROR_ITEM_NOT_ADDED);
-		int result;
+		NSString str = NSString.stringWith(items[i]);
 		if ((style & SWT.READ_ONLY) != 0) {
-			result = OS.AppendMenuItemTextWithCFString (menuHandle, ptr, 0, 0, null);
-			/*
-			* Feature in the Macintosh.  Setting text that starts with "-" makes the
-			* menu item a separator.  The fix is to clear the separator attribute. 
-			*/
-			if (string.startsWith ("-")) {
-				OS.ChangeMenuItemAttributes (menuHandle, (short)(i + 1), 0, OS.kMenuItemAttrSeparator);
-			}
+			NSMenu nsMenu = ((NSPopUpButton)view).menu();
+			NSMenuItem nsItem = (NSMenuItem)new NSMenuItem().alloc();
+			nsItem.initWithTitle(str, 0, NSString.stringWith(""));
+			nsMenu.addItem(nsItem);
+			nsItem.release();
+			//clear the selection
+			((NSPopUpButton)view).selectItemAtIndex(-1);
 		} else {
-			int [] outIndex = new int[1];
-			result = OS.HIComboBoxAppendTextItem (handle, ptr, outIndex);
+			((NSComboBox)view).addItemWithObjectValue(str);
 		}
-		OS.CFRelease(ptr);
-		if (result != OS.noErr) error (SWT.ERROR_ITEM_NOT_ADDED);
 	}
 }
 
@@ -1704,15 +1387,8 @@ public void setItems (String [] items) {
 public void setListVisible (boolean visible) {
 	checkWidget ();
 	if ((style & SWT.READ_ONLY) != 0) {
-		if (visible) {
-			OS.HIViewSimulateClick (handle, (short) 0, 0, null);
-		} else {
-			OS.CancelMenuTracking (menuHandle, true, 0);
-		}
+		((NSPopUpButton)view).setPullsDown(visible);
 	} else {
- 		if (OS.VERSION >= 0x1040) {
- 			OS.HIComboBoxSetListVisible (handle, visible);
- 		}
 	}
 }
 
@@ -1754,22 +1430,26 @@ public void setSelection (Point selection) {
 	checkWidget ();
 	if (selection == null) error (SWT.ERROR_NULL_ARGUMENT);
 	if ((style & SWT.READ_ONLY) == 0) {
-		int length = getCharCount ();
-		int start = selection.x, end = selection.y;
-		ControlEditTextSelectionRec sel = new ControlEditTextSelectionRec ();
-		sel.selStart = (short) Math.min (Math.max (Math.min (start, end), 0), length);
-		sel.selEnd = (short) Math.min (Math.max (Math.max (start, end), 0), length);
-		if (hasFocus ()) {
-			OS.SetControlData (handle, OS.kHIComboBoxEditTextPart, OS.kControlEditTextSelectionTag, 4, sel);
-		} else {
-			this.selection = sel;
-		}
+		NSComboBox widget = (NSComboBox)view;
+		NSString str = new NSCell(widget.cell()).title();
+		int length = (int)/*64*/str.length();
+		int start = Math.min (Math.max (Math.min (selection.x, selection.y), 0), length);
+		int end = Math.min (Math.max (Math.max (selection.x, selection.y), 0), length);
+		selectionRange = new NSRange();
+		selectionRange.location = start;
+		selectionRange.length = end - start;
+		NSText fieldEditor = widget.currentEditor();
+		if (fieldEditor != null) fieldEditor.setSelectedRange(selectionRange);
 	}
 }
 
 /**
  * Sets the contents of the receiver's text field to the
  * given string.
+ * <p>
+ * This call is ignored when the receiver is read only and 
+ * the given string is not in the receiver's list.
+ * </p>
  * <p>
  * Note: The text field in a <code>Combo</code> is typically
  * only capable of displaying a single line of text. Thus,
@@ -1795,6 +1475,7 @@ public void setText (String string) {
 }
 
 void setText (String string, boolean notify) {
+	ignoreVerify = true;
 	if (notify) {
 		if (hooks (SWT.Verify) || filters (SWT.Verify)) {
 			string = verifyText (string, 0, getCharCount (), null);
@@ -1808,16 +1489,14 @@ void setText (String string, boolean notify) {
 			if (notify) sendEvent (SWT.Modify);
 		}
 	} else {
-		char [] buffer = new char [Math.min(string.length (), textLimit)];
+		char[] buffer = new char [Math.min(string.length (), textLimit)];
 		string.getChars (0, buffer.length, buffer, 0);
-		int ptr = OS.CFStringCreateWithCharacters (OS.kCFAllocatorDefault, buffer, buffer.length);
-		if (ptr == 0) error (SWT.ERROR_CANNOT_SET_TEXT);
-		lastText = string;
-		OS.SetControlData (handle, OS.kHIComboBoxEditTextPart, OS.kControlEditTextCFStringTag, 4, new int[] {ptr});
-		OS.CFRelease (ptr);
-		selection = null;
+		NSString nsstring = NSString.stringWithCharacters (buffer, buffer.length);
+		new NSCell(((NSComboBox)view).cell()).setTitle(nsstring);
 		if (notify) sendEvent (SWT.Modify);
 	}
+	selectionRange = null;
+	ignoreVerify = false;
 }
 
 /**
@@ -1869,20 +1548,61 @@ public void setVisibleItemCount (int count) {
 	if ((style & SWT.READ_ONLY) != 0) {
 		//TODO 
 	} else {
-		OS.SetControlData (handle, OS.kControlEntireControl, OS.kHIComboBoxNumVisibleItemsTag, 4, new int[] {count});
+		((NSComboBox)view).setNumberOfVisibleItems(count);
 	}
 }
 
-String verifyText (String string, int start, int end, Event keyEvent) {
+boolean shouldChangeTextInRange_replacementString(int /*long*/ id, int /*long*/ sel, int /*long*/ affectedCharRange, int /*long*/ replacementString) {
+	NSRange range = new NSRange();
+	OS.memmove(range, affectedCharRange, NSRange.sizeof);
+	boolean result = callSuperBoolean(id, sel, range, replacementString);
+	if (hooks (SWT.Verify)) {
+		String text = new NSString(replacementString).getString();
+		NSEvent currentEvent = display.application.currentEvent();
+		int /*long*/ type = currentEvent.type();
+		if (type != OS.NSKeyDown && type != OS.NSKeyUp) currentEvent = null;
+		String newText = verifyText(text, (int)/*64*/range.location, (int)/*64*/(range.location+range.length), currentEvent);
+		if (newText == null) return false;
+		if (text != newText) {
+			insertEditText(newText);
+			result = false;
+		}
+		if (!result) sendEvent (SWT.Modify);
+	}
+	return result;
+}
+
+void textViewDidChangeSelection(int /*long*/ id, int /*long*/ sel, int /*long*/ aNotification) {
+	NSNotification notification = new NSNotification(aNotification);
+	NSText editor = new NSText(notification.object().id);
+	selectionRange = editor.selectedRange();
+}
+
+void textDidChange (int /*long*/ id, int /*long*/ sel, int /*long*/ aNotification) {
+	super.textDidChange (id, sel, aNotification);
+	postEvent (SWT.Modify);
+}
+
+NSRange textView_willChangeSelectionFromCharacterRange_toCharacterRange(int /*long*/ id, int /*long*/ sel, int /*long*/ aTextView, int /*long*/ oldSelectedCharRange, int /*long*/ newSelectedCharRange) {
+	/*
+	* If the selection is changing as a result of the receiver getting focus
+	* then return the receiver's last selection range, otherwise the full
+	* text will be automatically selected.
+	*/
+	if (receivingFocus && selectionRange != null) return selectionRange;
+
+	/* allow the selection change to proceed */
+	NSRange result = new NSRange();
+	OS.memmove(result, newSelectedCharRange, NSRange.sizeof);
+	return result;
+}
+
+String verifyText (String string, int start, int end, NSEvent keyEvent) {
 	Event event = new Event ();
+	if (keyEvent != null) setKeyState(event, SWT.MouseDown, keyEvent);
 	event.text = string;
 	event.start = start;
 	event.end = end;
-	if (keyEvent != null) {
-		event.character = keyEvent.character;
-		event.keyCode = keyEvent.keyCode;
-		event.stateMask = keyEvent.stateMask;
-	}
 	/*
 	 * It is possible (but unlikely), that application
 	 * code could have disposed the widget in the verify

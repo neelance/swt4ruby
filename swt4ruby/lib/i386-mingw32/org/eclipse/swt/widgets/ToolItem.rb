@@ -1,6 +1,6 @@
 require "rjava"
 
-# Copyright (c) 2000, 2008 IBM Corporation and others.
+# Copyright (c) 2000, 2009 IBM Corporation and others.
 # All rights reserved. This program and the accompanying materials
 # are made available under the terms of the Eclipse Public License v1.0
 # which accompanies this distribution, and is available at
@@ -38,6 +38,7 @@ module Org::Eclipse::Swt::Widgets
   # 
   # @see <a href="http://www.eclipse.org/swt/snippets/#toolbar">ToolBar, ToolItem snippets</a>
   # @see <a href="http://www.eclipse.org/swt/">Sample code and further information</a>
+  # @noextend This class is not intended to be subclassed by clients.
   class ToolItem < ToolItemImports.const_get :Item
     include_class_members ToolItemImports
     
@@ -256,6 +257,22 @@ module Org::Eclipse::Swt::Widgets
     end
     
     typesig { [] }
+    def compute_tab_list
+      if (is_tab_group)
+        if (get_enabled)
+          if (!((self.attr_style & SWT::SEPARATOR)).equal?(0))
+            if (!(@control).nil?)
+              return @control.compute_tab_list
+            end
+          else
+            return Array.typed(Widget).new([self])
+          end
+        end
+      end
+      return Array.typed(Widget).new(0) { nil }
+    end
+    
+    typesig { [] }
     def destroy_widget
       @parent.destroy_item(self)
       release_handle
@@ -457,6 +474,29 @@ module Org::Eclipse::Swt::Widgets
     end
     
     typesig { [] }
+    def is_tab_group
+      tab_list = @parent.__get_tab_item_list
+      if (!(tab_list).nil?)
+        i = 0
+        while i < tab_list.attr_length
+          if ((tab_list[i]).equal?(self))
+            return true
+          end
+          i += 1
+        end
+      end
+      if (!((self.attr_style & SWT::SEPARATOR)).equal?(0))
+        return true
+      end
+      index = @parent.index_of(self)
+      if ((index).equal?(0))
+        return true
+      end
+      previous = @parent.get_item(index - 1)
+      return !((previous.get_style & SWT::SEPARATOR)).equal?(0)
+    end
+    
+    typesig { [] }
     def release_widget
       super
       release_images
@@ -623,7 +663,7 @@ module Org::Eclipse::Swt::Widgets
         if ((control).nil?)
           if (((info.attr_fs_style & OS::BTNS_SEP)).equal?(0))
             changed = true
-            info.attr_fs_style &= ~OS::BTNS_BUTTON
+            info.attr_fs_style &= ~(OS::BTNS_BUTTON | OS::BTNS_SHOWTEXT)
             info.attr_fs_style |= OS::BTNS_SEP
             if (!((self.attr_state & DISABLED)).equal?(0))
               info.attr_fs_state &= ~OS::TBSTATE_ENABLED
@@ -635,7 +675,7 @@ module Org::Eclipse::Swt::Widgets
           if (!((info.attr_fs_style & OS::BTNS_SEP)).equal?(0))
             changed = true
             info.attr_fs_style &= ~OS::BTNS_SEP
-            info.attr_fs_style |= OS::BTNS_BUTTON
+            info.attr_fs_style |= OS::BTNS_BUTTON | OS::BTNS_SHOWTEXT
             info.attr_fs_state &= ~OS::TBSTATE_ENABLED
             info.attr_dw_mask |= OS::TBIF_IMAGE
             info.attr_i_image = OS::I_IMAGENONE
@@ -833,6 +873,19 @@ module Org::Eclipse::Swt::Widgets
       end
     end
     
+    typesig { [] }
+    def set_tab_item_focus
+      if (@parent.set_tab_item_focus)
+        # long
+        hwnd = @parent.attr_handle
+        # 64
+        index = RJava.cast_to_int(OS._send_message(hwnd, OS::TB_COMMANDTOINDEX, @id, 0))
+        OS._send_message(hwnd, OS::TB_SETHOTITEM, index, 0)
+        return true
+      end
+      return false
+    end
+    
     typesig { [String] }
     # Sets the receiver's text. The string may include
     # the mnemonic character.
@@ -906,7 +959,16 @@ module Org::Eclipse::Swt::Widgets
     
     typesig { [String] }
     # Sets the receiver's tool tip text to the argument, which
-    # may be null indicating that no tool tip text should be shown.
+    # may be null indicating that the default tool tip for the
+    # control will be shown. For a control that has a default
+    # tool tip, such as the Tree control on Windows, setting
+    # the tool tip text to an empty string replaces the default,
+    # causing no tool tip text to be shown.
+    # <p>
+    # The mnemonic indicator (character '&amp;') is not displayed in a tool tip.
+    # To display a single '&amp;' in the tool tip, the character '&amp;' can be
+    # escaped by doubling it in the string.
+    # </p>
     # 
     # @param string the new tool tip text (or null)
     # 

@@ -1,6 +1,6 @@
 require "rjava"
 
-# Copyright (c) 2000, 2008 IBM Corporation and others.
+# Copyright (c) 2000, 2009 IBM Corporation and others.
 # All rights reserved. This program and the accompanying materials
 # are made available under the terms of the Eclipse Public License v1.0
 # which accompanies this distribution, and is available at
@@ -32,6 +32,14 @@ module Org::Eclipse::Swt::Graphics
   # The SWT drawing coordinate system is the two-dimensional space with the origin
   # (0,0) at the top left corner of the drawing area and with (x,y) values increasing
   # to the right and downward respectively.
+  # </p>
+  # 
+  # <p>
+  # The result of drawing on an image that was created with an indexed
+  # palette using a color that is not in the palette is platform specific.
+  # Some platforms will match to the nearest color while other will draw
+  # the color itself. This happens because the allocated image might use
+  # a direct palette on platforms that do not support indexed palette.
   # </p>
   # 
   # <p>
@@ -420,7 +428,17 @@ module Org::Eclipse::Swt::Graphics
           font = @data.attr_font
           OS._select_object(@handle, font.attr_handle)
           # long
-          gdip_font = create_gdip_font(@handle, font.attr_handle)
+          # long
+          h_font = Array.typed(::Java::Int).new(1) { 0 }
+          # long
+          gdip_font = create_gdip_font(@handle, font.attr_handle, gdip_graphics, self.attr_device.attr_font_collection, nil, h_font)
+          if (!(h_font[0]).equal?(0))
+            OS._select_object(@handle, h_font[0])
+            if (!(@data.attr_h_gdifont).equal?(0))
+              OS._delete_object(@data.attr_h_gdifont)
+            end
+            @data.attr_h_gdifont = h_font[0]
+          end
           if (!(@data.attr_gdip_font).equal?(0))
             Gdip._font_delete(@data.attr_gdip_font)
           end
@@ -430,11 +448,12 @@ module Org::Eclipse::Swt::Graphics
           @data.attr_gdip_xoffset = @data.attr_gdip_yoffset = 0
           # long
           matrix = Gdip._matrix_new(1, 0, 0, 1, 0, 0)
-          point = Array.typed(::Java::Float).new([1, 1])
+          point = PointF.new
+          point.attr_x = point.attr_y = 1
           Gdip._graphics_get_transform(gdip_graphics, matrix)
-          Gdip._matrix_transform_points(matrix, point, 1)
+          Gdip._matrix_transform_vectors(matrix, point, 1)
           Gdip._matrix_delete(matrix)
-          scaling = point[0]
+          scaling = point.attr_x
           if (scaling < 0)
             scaling = -scaling
           end
@@ -442,7 +461,7 @@ module Org::Eclipse::Swt::Graphics
           if ((pen_width).equal?(0) || ((RJava.cast_to_int(pen_width) % 2)).equal?(1))
             @data.attr_gdip_xoffset = 0.5 / scaling
           end
-          scaling = point[1]
+          scaling = point.attr_y
           if (scaling < 0)
             scaling = -scaling
           end
@@ -697,16 +716,22 @@ module Org::Eclipse::Swt::Graphics
     end
     
     class_module.module_eval {
-      typesig { [::Java::Int, ::Java::Int] }
+      typesig { [::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, Array.typed(::Java::Int), Array.typed(::Java::Int)] }
       # long
       # long
       # long
-      def create_gdip_font(h_dc, h_font)
+      # long
+      # long
+      # long
+      # long
+      def create_gdip_font(h_dc, h_font, graphics, font_collection, out_family, out_font)
         # long
         font = Gdip._font_new(h_dc, h_font)
         if ((font).equal?(0))
           SWT.error(SWT::ERROR_NO_HANDLES)
         end
+        # long
+        family = 0
         if (!Gdip._font_is_available(font))
           Gdip._font_delete(font)
           log_font = OS::IsUnicode ? LOGFONTW.new : LOGFONTA.new
@@ -741,7 +766,42 @@ module Org::Eclipse::Swt::Graphics
           end
           buffer = CharArray.new(name.length + 1)
           name.get_chars(0, name.length, buffer, 0)
-          font = Gdip._font_new(buffer, size, style, Gdip::UnitPixel, 0)
+          if (!(font_collection).equal?(0))
+            family = Gdip._font_family_new(buffer, font_collection)
+            if (!Gdip._font_family_is_available(family))
+              Gdip._font_family_delete(family)
+              family = Gdip._font_family_new(buffer, 0)
+              if (!Gdip._font_family_is_available(family))
+                Gdip._font_family_delete(family)
+                family = 0
+              end
+            end
+          end
+          if (!(family).equal?(0))
+            font = Gdip._font_new(family, size, style, Gdip::UnitPixel)
+          else
+            font = Gdip._font_new(buffer, size, style, Gdip::UnitPixel, 0)
+          end
+          if (!(out_font).nil? && !(font).equal?(0))
+            # long
+            h_heap = OS._get_process_heap
+            # long
+            p_log_font = OS._heap_alloc(h_heap, OS::HEAP_ZERO_MEMORY, LOGFONTW.attr_sizeof)
+            Gdip._font_get_log_font_w(font, graphics, p_log_font)
+            out_font[0] = OS._create_font_indirect_w(p_log_font)
+            OS._heap_free(h_heap, 0, p_log_font)
+          end
+        end
+        if (!(out_family).nil? && !(font).equal?(0))
+          if ((family).equal?(0))
+            family = Gdip._font_family_new
+            Gdip._font_get_family(font, family)
+          end
+          out_family[0] = family
+        else
+          if (!(family).equal?(0))
+            Gdip._font_family_delete(family)
+          end
         end
         if ((font).equal?(0))
           SWT.error(SWT::ERROR_NO_HANDLES)
@@ -830,10 +890,13 @@ module Org::Eclipse::Swt::Graphics
       if (!(@data.attr_gdip_font).equal?(0))
         Gdip._font_delete(@data.attr_gdip_font)
       end
+      if (!(@data.attr_h_gdifont).equal?(0))
+        OS._delete_object(@data.attr_h_gdifont)
+      end
       if (!(@data.attr_gdip_graphics).equal?(0))
         Gdip._graphics_delete(@data.attr_gdip_graphics)
       end
-      @data.attr_gdip_graphics = @data.attr_gdip_brush = @data.attr_gdip_bg_brush = @data.attr_gdip_fg_brush = @data.attr_gdip_font = @data.attr_gdip_pen = 0
+      @data.attr_gdip_graphics = @data.attr_gdip_brush = @data.attr_gdip_bg_brush = @data.attr_gdip_fg_brush = @data.attr_gdip_font = @data.attr_gdip_pen = @data.attr_h_gdifont = 0
     end
     
     typesig { [::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int] }
@@ -2465,18 +2528,63 @@ module Org::Eclipse::Swt::Graphics
       gdip_graphics = @data.attr_gdip_graphics
       if (!(gdip_graphics).equal?(0))
         check_gc(FONT | FOREGROUND | (is_transparent ? 0 : BACKGROUND))
-        pt = PointF.new
+        n_glyphs = (length_ * 3 / 2) + 16
+        result = GCP_RESULTS.new
+        result.attr_l_struct_size = GCP_RESULTS.attr_sizeof
+        result.attr_n_glyphs = n_glyphs
         # long
-        format = Gdip._string_format_clone(Gdip._string_format_generic_typographic)
-        format_flags = Gdip._string_format_get_format_flags(format) | Gdip::StringFormatFlagsMeasureTrailingSpaces
-        if (!((@data.attr_style & SWT::MIRRORED)).equal?(0))
-          format_flags |= Gdip::StringFormatFlagsDirectionRightToLeft
+        h_heap = OS._get_process_heap
+        # long
+        lp_dx = result.attr_lp_dx = OS._heap_alloc(h_heap, OS::HEAP_ZERO_MEMORY, n_glyphs * 4)
+        # long
+        lp_glyphs = result.attr_lp_glyphs = OS._heap_alloc(h_heap, OS::HEAP_ZERO_MEMORY, n_glyphs * 2)
+        dw_flags = OS::GCP_GLYPHSHAPE | OS::GCP_REORDER | OS::GCP_LIGATE
+        # long
+        hdc = Gdip._graphics_get_hdc(gdip_graphics)
+        # long
+        h_font = @data.attr_h_gdifont
+        if ((h_font).equal?(0) && !(@data.attr_font).nil?)
+          h_font = @data.attr_font.attr_handle
         end
-        Gdip._string_format_set_format_flags(format, format_flags)
-        if (!is_transparent)
+        # long
+        old_font = 0
+        if (!(h_font).equal?(0))
+          old_font = OS._select_object(hdc, h_font)
+        end
+        if (!((@data.attr_style & SWT::MIRRORED)).equal?(0))
+          OS._set_layout(hdc, OS._get_layout(hdc) | OS::LAYOUT_RTL)
+        end
+        OS._get_character_placement_w(hdc, buffer, length_, 0, result, dw_flags)
+        if (!((@data.attr_style & SWT::MIRRORED)).equal?(0))
+          OS._set_layout(hdc, OS._get_layout(hdc) & ~OS::LAYOUT_RTL)
+        end
+        lptm = OS::IsUnicode ? TEXTMETRICW.new : TEXTMETRICA.new
+        OS._get_text_metrics(hdc, lptm)
+        if (!(h_font).equal?(0))
+          OS._select_object(hdc, old_font)
+        end
+        Gdip._graphics_release_hdc(gdip_graphics, hdc)
+        n_glyphs = result.attr_n_glyphs
+        draw_x = x
+        draw_y = y + lptm.attr_tm_ascent
+        dx = Array.typed(::Java::Int).new(n_glyphs) { 0 }
+        OS._move_memory(dx, result.attr_lp_dx, n_glyphs * 4)
+        points = Array.typed(::Java::Float).new(dx.attr_length * 2) { 0.0 }
+        i = 0
+        j = 0
+        while i < dx.attr_length
+          points[((j += 1) - 1)] = draw_x
+          points[((j += 1) - 1)] = draw_y
+          draw_x += dx[i]
+          i += 1
+        end
+        bounds = nil
+        if (!is_transparent || !((@data.attr_style & SWT::MIRRORED)).equal?(0))
           bounds = RectF.new
-          Gdip._graphics_measure_string(gdip_graphics, buffer, length_, @data.attr_gdip_font, pt, format, bounds)
-          Gdip._graphics_fill_rectangle(gdip_graphics, @data.attr_gdip_brush, x, y, Math.round(bounds.attr_width), Math.round(bounds.attr_height))
+          Gdip._graphics_measure_driver_string(gdip_graphics, lp_glyphs, n_glyphs, @data.attr_gdip_font, points, 0, 0, bounds)
+          if (!is_transparent)
+            Gdip._graphics_fill_rectangle(gdip_graphics, @data.attr_gdip_brush, x, y, Math.round(bounds.attr_width), Math.round(bounds.attr_height))
+          end
         end
         gstate = 0
         # long
@@ -2485,18 +2593,16 @@ module Org::Eclipse::Swt::Graphics
           case (Gdip._brush_get_type(brush))
           when Gdip::BrushTypeLinearGradient
             Gdip._linear_gradient_brush_scale_transform(brush, -1, 1, Gdip::MatrixOrderPrepend)
-            Gdip._linear_gradient_brush_translate_transform(brush, -2 * x, 0, Gdip::MatrixOrderPrepend)
+            Gdip._linear_gradient_brush_translate_transform(brush, -2 * x - bounds.attr_width, 0, Gdip::MatrixOrderPrepend)
           when Gdip::BrushTypeTextureFill
             Gdip._texture_brush_scale_transform(brush, -1, 1, Gdip::MatrixOrderPrepend)
-            Gdip._texture_brush_translate_transform(brush, -2 * x, 0, Gdip::MatrixOrderPrepend)
+            Gdip._texture_brush_translate_transform(brush, -2 * x - bounds.attr_width, 0, Gdip::MatrixOrderPrepend)
           end
           gstate = Gdip._graphics_save(gdip_graphics)
           Gdip._graphics_scale_transform(gdip_graphics, -1, 1, Gdip::MatrixOrderPrepend)
-          Gdip._graphics_translate_transform(gdip_graphics, -2 * x, 0, Gdip::MatrixOrderPrepend)
+          Gdip._graphics_translate_transform(gdip_graphics, -2 * x - bounds.attr_width, 0, Gdip::MatrixOrderPrepend)
         end
-        pt.attr_x = x
-        pt.attr_y = y
-        Gdip._graphics_draw_string(gdip_graphics, buffer, length_, @data.attr_gdip_font, pt, format, brush)
+        Gdip._graphics_draw_driver_string(gdip_graphics, lp_glyphs, result.attr_n_glyphs, @data.attr_gdip_font, brush, points, 0, 0)
         if (!((@data.attr_style & SWT::MIRRORED)).equal?(0))
           case (Gdip._brush_get_type(brush))
           when Gdip::BrushTypeLinearGradient
@@ -2506,7 +2612,8 @@ module Org::Eclipse::Swt::Graphics
           end
           Gdip._graphics_restore(gdip_graphics, gstate)
         end
-        Gdip._string_format_delete(format)
+        OS._heap_free(h_heap, 0, lp_glyphs)
+        OS._heap_free(h_heap, 0, lp_dx)
         return
       end
       rop2 = 0
@@ -3624,6 +3731,11 @@ module Org::Eclipse::Swt::Graphics
           Gdip._graphics_set_transform(gdip_graphics, matrix)
           Gdip._matrix_delete(identity)
           Gdip._matrix_delete(matrix)
+          if (!OS::IsWinCE)
+            pt = POINT.new
+            OS._get_window_org_ex(@handle, pt)
+            OS._offset_rgn(h_rgn, pt.attr_x, pt.attr_y)
+          end
           OS._combine_rgn(region.attr_handle, h_rgn, 0, OS::RGN_COPY)
           OS._delete_object(h_rgn)
         end
@@ -3806,6 +3918,7 @@ module Org::Eclipse::Swt::Graphics
     # @see GCData
     # 
     # @since 3.2
+    # @noreference This method is not intended to be referenced by clients.
     def get_gcdata
       if ((@handle).equal?(0))
         SWT.error(SWT::ERROR_GRAPHIC_DISPOSED)
@@ -5313,8 +5426,9 @@ module Org::Eclipse::Swt::Graphics
       end
       check_gc(FONT)
       length_ = string.length
-      if (!(@data.attr_gdip_graphics).equal?(0))
-        pt = PointF.new
+      # long
+      gdip_graphics = @data.attr_gdip_graphics
+      if (!(gdip_graphics).equal?(0))
         bounds = RectF.new
         buffer = nil
         if (!(length_).equal?(0))
@@ -5323,15 +5437,55 @@ module Org::Eclipse::Swt::Graphics
         else
           buffer = Array.typed(::Java::Char).new([Character.new(?\s.ord)])
         end
+        n_glyphs = (length_ * 3 / 2) + 16
+        result = GCP_RESULTS.new
+        result.attr_l_struct_size = GCP_RESULTS.attr_sizeof
+        result.attr_n_glyphs = n_glyphs
         # long
-        format = Gdip._string_format_clone(Gdip._string_format_generic_typographic)
-        format_flags = Gdip._string_format_get_format_flags(format) | Gdip::StringFormatFlagsMeasureTrailingSpaces
-        if (!((@data.attr_style & SWT::MIRRORED)).equal?(0))
-          format_flags |= Gdip::StringFormatFlagsDirectionRightToLeft
+        h_heap = OS._get_process_heap
+        # long
+        lp_dx = result.attr_lp_dx = OS._heap_alloc(h_heap, OS::HEAP_ZERO_MEMORY, n_glyphs * 4)
+        # long
+        lp_glyphs = result.attr_lp_glyphs = OS._heap_alloc(h_heap, OS::HEAP_ZERO_MEMORY, n_glyphs * 2)
+        dw_flags = OS::GCP_GLYPHSHAPE | OS::GCP_REORDER | OS::GCP_LIGATE
+        # long
+        hdc = Gdip._graphics_get_hdc(gdip_graphics)
+        # long
+        h_font = @data.attr_h_gdifont
+        if ((h_font).equal?(0) && !(@data.attr_font).nil?)
+          h_font = @data.attr_font.attr_handle
         end
-        Gdip._string_format_set_format_flags(format, format_flags)
-        Gdip._graphics_measure_string(@data.attr_gdip_graphics, buffer, buffer.attr_length, @data.attr_gdip_font, pt, format, bounds)
-        Gdip._string_format_delete(format)
+        # long
+        old_font = 0
+        if (!(h_font).equal?(0))
+          old_font = OS._select_object(hdc, h_font)
+        end
+        if (!((@data.attr_style & SWT::MIRRORED)).equal?(0))
+          OS._set_layout(hdc, OS._get_layout(hdc) | OS::LAYOUT_RTL)
+        end
+        OS._get_character_placement_w(hdc, buffer, length_, 0, result, dw_flags)
+        if (!((@data.attr_style & SWT::MIRRORED)).equal?(0))
+          OS._set_layout(hdc, OS._get_layout(hdc) & ~OS::LAYOUT_RTL)
+        end
+        if (!(h_font).equal?(0))
+          OS._select_object(hdc, old_font)
+        end
+        Gdip._graphics_release_hdc(gdip_graphics, hdc)
+        draw_x = 0
+        dx = Array.typed(::Java::Int).new(result.attr_n_glyphs) { 0 }
+        OS._move_memory(dx, lp_dx, result.attr_n_glyphs * 4)
+        points = Array.typed(::Java::Float).new(dx.attr_length * 2) { 0.0 }
+        i = 0
+        j = 0
+        while i < dx.attr_length
+          points[j] = draw_x
+          draw_x += dx[i]
+          i += 1
+          j += 2
+        end
+        Gdip._graphics_measure_driver_string(gdip_graphics, lp_glyphs, result.attr_n_glyphs, @data.attr_gdip_font, points, 0, 0, bounds)
+        OS._heap_free(h_heap, 0, lp_glyphs)
+        OS._heap_free(h_heap, 0, lp_dx)
         return Point.new((length_).equal?(0) ? 0 : Math.round(bounds.attr_width), Math.round(bounds.attr_height))
       end
       size = SIZE.new
@@ -5511,7 +5665,7 @@ module Org::Eclipse::Swt::Graphics
         gc = SwtGC.new
         gc.attr_device = data.attr_device
         data.attr_style |= SWT::LEFT_TO_RIGHT
-        if (OS::WIN32_VERSION >= OS._version(4, 10))
+        if (!OS::IsWinCE && OS::WIN32_VERSION >= OS._version(4, 10))
           flags = OS._get_layout(h_dc)
           if (!((flags & OS::LAYOUT_RTL)).equal?(0))
             data.attr_style |= SWT::RIGHT_TO_LEFT | SWT::MIRRORED

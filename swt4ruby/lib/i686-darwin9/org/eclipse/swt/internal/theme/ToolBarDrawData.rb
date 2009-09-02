@@ -13,7 +13,6 @@ module Org::Eclipse::Swt::Internal::Theme
     class_module.module_eval {
       include ::Java::Lang
       include ::Org::Eclipse::Swt::Internal::Theme
-      include ::Org::Eclipse::Swt::Graphics
     }
   end
   
@@ -24,18 +23,6 @@ module Org::Eclipse::Swt::Internal::Theme
     def initialize
       super()
       self.attr_state = Array.typed(::Java::Int).new(1) { 0 }
-    end
-    
-    typesig { [Theme, SwtGC, Rectangle] }
-    def draw(theme, gc, bounds)
-    end
-    
-    typesig { [Theme, Point, Rectangle] }
-    def hit(theme, position, bounds)
-      if (!bounds.contains(position))
-        return DrawData::WIDGET_NOWHERE
-      end
-      return DrawData::WIDGET_WHOLE
     end
     
     private

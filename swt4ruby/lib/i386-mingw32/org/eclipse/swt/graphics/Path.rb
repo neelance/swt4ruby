@@ -1,6 +1,6 @@
 require "rjava"
 
-# Copyright (c) 2000, 2008 IBM Corporation and others.
+# Copyright (c) 2000, 2009 IBM Corporation and others.
 # All rights reserved. This program and the accompanying materials
 # are made available under the terms of the Eclipse Public License v1.0
 # which accompanies this distribution, and is available at
@@ -341,18 +341,18 @@ module Org::Eclipse::Swt::Graphics
       # long
       h_dc = self.attr_device.internal_new__gc(nil)
       # long
-      gdip_font = SwtGC.create_gdip_font(h_dc, font.attr_handle)
+      # long
+      family = Array.typed(::Java::Int).new(1) { 0 }
+      # long
+      gdip_font = SwtGC.create_gdip_font(h_dc, font.attr_handle, 0, self.attr_device.attr_font_collection, family, nil)
       point = PointF.new
       point.attr_x = x - (Gdip._font_get_size(gdip_font) / 6)
       point.attr_y = y
-      # long
-      family = Gdip._font_family_new
-      Gdip._font_get_family(gdip_font, family)
       style = Gdip._font_get_style(gdip_font)
       size = Gdip._font_get_size(gdip_font)
-      Gdip._graphics_path_add_string(@handle, buffer, length_, family, style, size, point, 0)
+      Gdip._graphics_path_add_string(@handle, buffer, length_, family[0], style, size, point, 0)
       Gdip._graphics_path_get_last_point(@handle, @current_point)
-      Gdip._font_family_delete(family)
+      Gdip._font_family_delete(family[0])
       Gdip._font_delete(gdip_font)
       self.attr_device.internal_dispose__gc(h_dc, nil)
     end

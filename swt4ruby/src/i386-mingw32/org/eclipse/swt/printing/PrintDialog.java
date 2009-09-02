@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2008 IBM Corporation and others.
+ * Copyright (c) 2000, 2009 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -27,13 +27,11 @@ import org.eclipse.swt.internal.win32.*;
  * @see <a href="http://www.eclipse.org/swt/snippets/#printing">Printing snippets</a>
  * @see <a href="http://www.eclipse.org/swt/examples.php">SWT Example: ControlExample, Dialog tab</a>
  * @see <a href="http://www.eclipse.org/swt/">Sample code and further information</a>
+ * @noextend This class is not intended to be subclassed by clients.
  */
 
 public class PrintDialog extends Dialog {
-	PrinterData printerData;
-	int scope = PrinterData.ALL_PAGES;
-	int startPage = 1, endPage = 1;
-	boolean printToFile = false;
+	PrinterData printerData = new PrinterData();
 	
 /**
  * Constructs a new instance of this class given only its parent.
@@ -85,19 +83,35 @@ public PrintDialog (Shell parent) {
  * @see Widget#getStyle
  */
 public PrintDialog (Shell parent, int style) {
-	super (parent, style);
+	super (parent, checkStyle(parent, style));
 	checkSubclass ();
+}
+
+static int checkStyle (Shell parent, int style) {
+	int mask = SWT.PRIMARY_MODAL | SWT.APPLICATION_MODAL | SWT.SYSTEM_MODAL;
+	if ((style & SWT.SHEET) != 0) {
+		style &= ~SWT.SHEET;
+		if ((style & mask) == 0) {
+			style |= parent == null ? SWT.APPLICATION_MODAL : SWT.PRIMARY_MODAL;
+		}
+	}
+	return style;
 }
 
 /**
  * Sets the printer data that will be used when the dialog
  * is opened.
+ * <p>
+ * Setting the printer data to null is equivalent to
+ * resetting all data fields to their default values.
+ * </p>
  * 
- * @param data the data that will be used when the dialog is opened
+ * @param data the data that will be used when the dialog is opened or null to use default data
  * 
  * @since 3.4
  */
 public void setPrinterData(PrinterData data) {
+	if (data == null) data = new PrinterData();
 	this.printerData = data;
 }
 
@@ -129,7 +143,7 @@ public PrinterData getPrinterData() {
  * @return the scope setting that the user selected
  */
 public int getScope() {
-	return scope;
+	return printerData.scope;
 }
 
 /**
@@ -148,7 +162,7 @@ public int getScope() {
  * @param scope the scope setting when the dialog is opened
  */
 public void setScope(int scope) {
-	this.scope = scope;
+	printerData.scope = scope;
 }
 
 /**
@@ -162,7 +176,7 @@ public void setScope(int scope) {
  * @return the start page setting that the user selected
  */
 public int getStartPage() {
-	return startPage;
+	return printerData.startPage;
 }
 
 /**
@@ -176,7 +190,7 @@ public int getStartPage() {
  * @param startPage the startPage setting when the dialog is opened
  */
 public void setStartPage(int startPage) {
-	this.startPage = startPage;
+	printerData.startPage = startPage;
 }
 
 /**
@@ -190,7 +204,7 @@ public void setStartPage(int startPage) {
  * @return the end page setting that the user selected
  */
 public int getEndPage() {
-	return endPage;
+	return printerData.endPage;
 }
 
 /**
@@ -204,7 +218,7 @@ public int getEndPage() {
  * @param endPage the end page setting when the dialog is opened
  */
 public void setEndPage(int endPage) {
-	this.endPage = endPage;
+	printerData.endPage = endPage;
 }
 
 /**
@@ -214,7 +228,7 @@ public void setEndPage(int endPage) {
  * @return the 'Print to file' setting that the user selected
  */
 public boolean getPrintToFile() {
-	return printToFile;
+	return printerData.printToFile;
 }
 
 /**
@@ -224,7 +238,7 @@ public boolean getPrintToFile() {
  * @param printToFile the 'Print to file' setting when the dialog is opened
  */
 public void setPrintToFile(boolean printToFile) {
-	this.printToFile = printToFile;
+	printerData.printToFile = printToFile;
 }
 
 protected void checkSubclass() {
@@ -239,7 +253,8 @@ protected void checkSubclass() {
  * Makes the receiver visible and brings it to the front
  * of the display.
  *
- * @return a printer data object describing the desired print job parameters
+ * @return a printer data object describing the desired print job parameters,
+ *         or null if the dialog was canceled, no printers were found, or an error occurred
  *
  * @exception SWTException <ul>
  *    <li>ERROR_WIDGET_DISPOSED - if the receiver has been disposed</li>
@@ -251,28 +266,54 @@ public PrinterData open() {
 	pd.lStructSize = PRINTDLG.sizeof;
 	Control parent = getParent();
 	if (parent != null) pd.hwndOwner = parent.handle;
+	
+	/* Initialize PRINTDLG fields, including DEVMODE. */
+	pd.Flags = OS.PD_RETURNDEFAULT;
+	OS.PrintDlg(pd);
+
+	/*
+	 * If user setup info from a previous print dialog was specified,
+	 * then restore the previous DEVMODE struct.
+	 */
 	int /*long*/ lpInitData = 0;
 	int /*long*/ hHeap = OS.GetProcessHeap();
-	if (printerData != null) {
-		byte buffer [] = printerData.otherData;
-		if (buffer != null && buffer.length != 0) {
-			/* If user setup info from a previous print dialog was specified, restore the DEVMODE struct. */
-			lpInitData = OS.HeapAlloc(hHeap, OS.HEAP_ZERO_MEMORY, buffer.length);
-			OS.MoveMemory(lpInitData, buffer, buffer.length);
-			pd.hDevMode = lpInitData;
-		}
+	byte devmodeData [] = printerData.otherData;
+	if (devmodeData != null && devmodeData.length != 0) {
+		lpInitData = OS.HeapAlloc(hHeap, OS.HEAP_ZERO_MEMORY, devmodeData.length);
+		OS.MoveMemory(lpInitData, devmodeData, devmodeData.length);
+		if (pd.hDevMode != 0) OS.GlobalFree(pd.hDevMode);
+		pd.hDevMode = lpInitData;
 	}
+	
+	/* Initialize the DEVMODE struct's fields from the printerData. */
+	int /*long*/ hMem = pd.hDevMode;
+	int /*long*/ ptr = OS.GlobalLock(hMem);
+	DEVMODE devmode = OS.IsUnicode ? (DEVMODE)new DEVMODEW () : new DEVMODEA ();
+	OS.MoveMemory(devmode, ptr, OS.IsUnicode ? OS.DEVMODEW_sizeof() : OS.DEVMODEA_sizeof());
+	devmode.dmFields |= OS.DM_ORIENTATION;
+	devmode.dmOrientation = printerData.orientation == PrinterData.PORTRAIT ? OS.DMORIENT_PORTRAIT : OS.DMORIENT_LANDSCAPE;
+	if (printerData.copyCount != 1) {
+		devmode.dmFields |= OS.DM_COPIES;
+		devmode.dmCopies = (short)printerData.copyCount;
+	}
+	if (printerData.collate != false) {
+		devmode.dmFields |= OS.DM_COLLATE;
+		devmode.dmCollate = OS.DMCOLLATE_TRUE;
+	}
+	OS.MoveMemory(ptr, devmode, OS.IsUnicode ? OS.DEVMODEW_sizeof() : OS.DEVMODEA_sizeof());
+	OS.GlobalUnlock(hMem);
+
 	pd.Flags = OS.PD_USEDEVMODECOPIESANDCOLLATE;
-	if (printToFile) pd.Flags |= OS.PD_PRINTTOFILE;
-	switch (scope) {
+	if (printerData.printToFile) pd.Flags |= OS.PD_PRINTTOFILE;
+	switch (printerData.scope) {
 		case PrinterData.PAGE_RANGE: pd.Flags |= OS.PD_PAGENUMS; break;
 		case PrinterData.SELECTION: pd.Flags |= OS.PD_SELECTION; break;
 		default: pd.Flags |= OS.PD_ALLPAGES;
 	}
 	pd.nMinPage = 1;
 	pd.nMaxPage = -1;
-	pd.nFromPage = (short) Math.min (0xFFFF, Math.max (1, startPage));
-	pd.nToPage = (short) Math.min (0xFFFF, Math.max (1, endPage));
+	pd.nFromPage = (short) Math.min (0xFFFF, Math.max (1, printerData.startPage));
+	pd.nToPage = (short) Math.min (0xFFFF, Math.max (1, printerData.endPage));
 
 	Display display = parent.getDisplay();
 	Shell [] shells = display.getShells();
@@ -301,15 +342,16 @@ public PrinterData open() {
 	
 	if (success) {
 		/* Get driver and device from the DEVNAMES struct */
-		int /*long*/ hMem = pd.hDevNames;
+		hMem = pd.hDevNames;
 		/* Ensure size is a multiple of 2 bytes on UNICODE platforms */
 		int size = OS.GlobalSize(hMem) / TCHAR.sizeof * TCHAR.sizeof;
-		int /*long*/ ptr = OS.GlobalLock(hMem);
+		ptr = OS.GlobalLock(hMem);
 		short[] offsets = new short[4];
 		OS.MoveMemory(offsets, ptr, 2 * offsets.length);
 		TCHAR buffer = new TCHAR(0, size);
 		OS.MoveMemory(buffer, ptr, size);	
 		OS.GlobalUnlock(hMem);
+		if (pd.hDevNames != 0) OS.GlobalFree(pd.hDevNames);
 
 		int driverOffset = offsets[0];
 		int i = 0;
@@ -355,13 +397,16 @@ public PrinterData open() {
 		ptr = OS.GlobalLock(hMem);
 		data.otherData = new byte[size];
 		OS.MoveMemory(data.otherData, ptr, size);
+		devmode = OS.IsUnicode ? (DEVMODE)new DEVMODEW () : new DEVMODEA ();
+		OS.MoveMemory(devmode, ptr, OS.IsUnicode ? OS.DEVMODEW_sizeof() : OS.DEVMODEA_sizeof());
+		if ((devmode.dmFields & OS.DM_ORIENTATION) != 0) {
+			int dmOrientation = devmode.dmOrientation;
+			data.orientation = dmOrientation == OS.DMORIENT_LANDSCAPE ? PrinterData.LANDSCAPE : PrinterData.PORTRAIT;
+		}
 		OS.GlobalUnlock(hMem);
+		if (pd.hDevMode != 0) OS.GlobalFree(pd.hDevMode);
 		if (lpInitData != 0) OS.HeapFree(hHeap, 0, lpInitData);
-
-		endPage = data.endPage;
-		printToFile = data.printToFile;
-		scope = data.scope;
-		startPage = data.startPage;
+		printerData = data;
 	}
 	return data;
 }

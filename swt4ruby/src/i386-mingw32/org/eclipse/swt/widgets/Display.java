@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2008 IBM Corporation and others.
+ * Copyright (c) 2000, 2009 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -92,6 +92,7 @@ import org.eclipse.swt.graphics.*;
  * @see Device#dispose
  * @see <a href="http://www.eclipse.org/swt/snippets/#display">Display snippets</a>
  * @see <a href="http://www.eclipse.org/swt/">Sample code and further information</a>
+ * @noextend This class is not intended to be subclassed by clients.
  */
 
 public class Display extends Device {
@@ -113,11 +114,13 @@ public class Display extends Device {
 	Callback windowCallback;
 	int /*long*/ windowProc;
 	int threadId;
-	TCHAR windowClass, windowShadowClass;
+	TCHAR windowClass, windowShadowClass, windowOwnDCClass;
 	static int WindowClassCount;
 	static final String WindowName = "SWT_Window"; //$NON-NLS-1$
 	static final String WindowShadowName = "SWT_WindowShadow"; //$NON-NLS-1$
+	static final String WindowOwnDCName = "SWT_WindowOwnDC"; //$NON-NLS-1$
 	EventTable eventTable, filterTable;
+	boolean useOwnDC;
 
 	/* Widget Table */
 	int freeSlot;
@@ -196,6 +199,7 @@ public class Display extends Device {
 	boolean runMessages = true, runMessagesInIdle = false, runMessagesInMessageProc = true;
 	static final String RUN_MESSAGES_IN_IDLE_KEY = "org.eclipse.swt.internal.win32.runMessagesInIdle"; //$NON-NLS-1$
 	static final String RUN_MESSAGES_IN_MESSAGE_PROC_KEY = "org.eclipse.swt.internal.win32.runMessagesInMessageProc"; //$NON-NLS-1$
+	static final String USE_OWNDC_KEY = "org.eclipse.swt.internal.win32.useOwnDC"; //$NON-NLS-1$
 	Thread thread;
 
 	/* Display Shutdown */
@@ -209,8 +213,11 @@ public class Display extends Device {
 	int /*long*/ [] timerIds;
 	Runnable [] timerList;
 	int /*long*/ nextTimerId = SETTINGS_ID + 1;
+	
+	/* Settings */
 	static final int /*long*/ SETTINGS_ID = 100;
 	static final int SETTINGS_DELAY = 2000;
+	boolean lastHighContrast, sendSettings;
 	
 	/* Keyboard and Mouse */
 	RECT clickRect;
@@ -1305,7 +1312,9 @@ int /*long*/ foregroundIdleProc (int /*long*/ code, int /*long*/ wParam, int /*l
 					runAsyncMessages (false);
 				}
 			}
-			wakeThread ();
+			MSG msg = new MSG();
+			int flags = OS.PM_NOREMOVE | OS.PM_NOYIELD | OS.PM_QS_INPUT | OS.PM_QS_POSTMESSAGE;
+			if (!OS.PeekMessage (msg, 0, 0, 0, flags)) wakeThread ();
 		}
 	}
 	return OS.CallNextHookEx (idleHook, (int)/*64*/code, wParam, lParam);
@@ -1586,6 +1595,9 @@ public Object getData (String key) {
 	}
 	if (key.equals (RUN_MESSAGES_IN_MESSAGE_PROC_KEY)) {
 		return new Boolean (runMessagesInMessageProc);
+	}
+	if (key.equals (USE_OWNDC_KEY)) {
+		return new Boolean (useOwnDC);
 	}
 	if (keys == null) return null;
 	for (int i=0; i<keys.length; i++) {
@@ -2506,6 +2518,7 @@ protected void init () {
 	/* Use the character encoding for the default locale */
 	windowClass = new TCHAR (0, WindowName + WindowClassCount, true);
 	windowShadowClass = new TCHAR (0, WindowShadowName + WindowClassCount, true);
+	windowOwnDCClass = new TCHAR (0, WindowOwnDCName + WindowClassCount, true);
 	WindowClassCount++;
 
 	/* Register the SWT window class */
@@ -2547,6 +2560,16 @@ protected void init () {
 	byteCount = windowShadowClass.length () * TCHAR.sizeof;
 	lpWndClass.lpszClassName = OS.HeapAlloc (hHeap, OS.HEAP_ZERO_MEMORY, byteCount);
 	OS.MoveMemory (lpWndClass.lpszClassName, windowShadowClass, byteCount);
+	OS.RegisterClass (lpWndClass);
+	OS.HeapFree (hHeap, 0, lpWndClass.lpszClassName);
+	
+	/* Register the CS_OWNDC window class */
+	if (!OS.IsWinCE && OS.WIN32_VERSION >= OS.VERSION (5, 1)) {
+		lpWndClass.style |= OS.CS_OWNDC;
+	}
+	byteCount = windowOwnDCClass.length () * TCHAR.sizeof;
+	lpWndClass.lpszClassName = OS.HeapAlloc (hHeap, OS.HEAP_ZERO_MEMORY, byteCount);
+	OS.MoveMemory (lpWndClass.lpszClassName, windowOwnDCClass, byteCount);
 	OS.RegisterClass (lpWndClass);
 	OS.HeapFree (hHeap, 0, lpWndClass.lpszClassName);
 	
@@ -2599,6 +2622,9 @@ protected void init () {
 	controlTable = new Control [GROW_SIZE];
 	for (int i=0; i<GROW_SIZE-1; i++) indexTable [i] = i + 1;
 	indexTable [GROW_SIZE - 1] = -1;
+	
+	/* Remember the last high contrast state */
+	lastHighContrast = getHighContrast ();
 }
 
 /**	 
@@ -3056,19 +3082,36 @@ int /*long*/ messageProc (int /*long*/ hwnd, int /*long*/ msg, int /*long*/ wPar
 			break;
 		}
 		case OS.WM_DWMCOLORIZATIONCOLORCHANGED: {
-			OS.SetTimer (hwndMessage, SETTINGS_ID, SETTINGS_DELAY, 0);
-			break;
+			sendSettings = true;
+			//FALL THROUGH
 		}
 		case OS.WM_SETTINGCHANGE: {
+			/*
+			* Bug in Windows.  When high contrast is cleared using
+			* the key sequence, Alt + Left Shift + Print Screen, the
+			* system parameter is set to false, but WM_SETTINGCHANGE
+			* is not sent with SPI_SETHIGHCONTRAST.  The fix is to
+			* detect the change when any WM_SETTINGCHANGE message
+			* is sent.
+			*/
+			if (lastHighContrast != getHighContrast ()) {
+				sendSettings = true;
+				lastHighContrast = getHighContrast ();
+			}
 			if (!OS.IsWinCE && OS.WIN32_VERSION >= OS.VERSION (6, 0)) {
-				OS.SetTimer (hwndMessage, SETTINGS_ID, SETTINGS_DELAY, 0);
-				break;
+				sendSettings = true;
 			} 
 			switch ((int)/*64*/wParam) {
 				case 0:
 				case 1:
-				case OS.SPI_SETHIGHCONTRAST:
-					OS.SetTimer (hwndMessage, SETTINGS_ID, SETTINGS_DELAY, 0);
+				case OS.SPI_SETHIGHCONTRAST: {
+					sendSettings = true;
+					lastHighContrast = getHighContrast ();
+				}
+			}
+			/* Set the initial timer or push the time out period forward */
+			if (sendSettings) {
+				OS.SetTimer (hwndMessage, SETTINGS_ID, SETTINGS_DELAY, 0);
 			}
 			break;
 		}
@@ -3085,6 +3128,7 @@ int /*long*/ messageProc (int /*long*/ hwnd, int /*long*/ msg, int /*long*/ wPar
 		}
 		case OS.WM_TIMER: {
 			if (wParam == SETTINGS_ID) {
+				sendSettings = false;
 				OS.KillTimer (hwndMessage, SETTINGS_ID);
 				runSettings ();
 			} else {
@@ -3231,6 +3275,13 @@ int numpadKey (int key) {
  * <li>(in) type MouseMove
  * <li>(in) x the x coordinate to move the mouse pointer to in screen coordinates
  * <li>(in) y the y coordinate to move the mouse pointer to in screen coordinates
+ * </ul>
+ * <p>MouseWheel</p>
+ * <p>The following fields in the <code>Event</code> apply:
+ * <ul>
+ * <li>(in) type MouseWheel
+ * <li>(in) detail either SWT.SCROLL_LINE or SWT.SCROLL_PAGE
+ * <li>(in) count the number of lines or pages to scroll
  * </ul>
  * </dl>
  * 
@@ -3422,7 +3473,7 @@ public boolean readAndDispatch () {
 		runDeferredEvents ();
 		return true;
 	}
-	return runMessages && runAsyncMessages (false);
+	return isDisposed () || (runMessages && runAsyncMessages (false));
 }
 
 static void register (Display display) {
@@ -3525,6 +3576,9 @@ void releaseDisplay () {
 		foregroundIdleProc = 0;
 	}
 	
+	/* Stop the settings timer */
+	OS.KillTimer (hwndMessage, SETTINGS_ID);
+	
 	/* Destroy the message only HWND */
 	if (hwndMessage != 0) OS.DestroyWindow (hwndMessage);
 	hwndMessage = 0;
@@ -3537,9 +3591,10 @@ void releaseDisplay () {
 	int /*long*/ hInstance = OS.GetModuleHandle (null);
 	OS.UnregisterClass (windowClass, hInstance);
 	
-	/* Unregister the SWT drop shadow window class */
+	/* Unregister the SWT drop shadow and CS_OWNDC window class */
 	OS.UnregisterClass (windowShadowClass, hInstance);
-	windowClass = windowShadowClass = null;
+	OS.UnregisterClass (windowOwnDCClass, hInstance);
+	windowClass = windowShadowClass = windowOwnDCClass = null;
 	windowCallback.dispose ();
 	windowCallback = null;
 	windowProc = 0;
@@ -3801,6 +3856,7 @@ boolean runAsyncMessages (boolean all) {
 }
 
 boolean runDeferredEvents () {
+	boolean run = false;
 	/*
 	* Run deferred events.  This code is always
 	* called in the Display's thread so it must
@@ -3820,6 +3876,7 @@ boolean runDeferredEvents () {
 		if (widget != null && !widget.isDisposed ()) {
 			Widget item = event.item;
 			if (item == null || !item.isDisposed ()) {
+				run = true;
 				widget.sendEvent (event);
 			}
 		}
@@ -3833,7 +3890,7 @@ boolean runDeferredEvents () {
 
 	/* Clear the queue */
 	eventQueue = null;
-	return true;
+	return run;
 }
 
 boolean runPopups () {
@@ -4040,7 +4097,11 @@ public void setData (String key, Object value) {
 		runMessagesInMessageProc = data != null && data.booleanValue ();
 		return;
 	}
-	
+	if (key.equals (USE_OWNDC_KEY)) {
+		Boolean data = (Boolean) value;
+		useOwnDC = data != null && data.booleanValue ();
+		return;
+	}	
 	/* Remove the key/value pair */
 	if (value == null) {
 		if (keys == null) return;

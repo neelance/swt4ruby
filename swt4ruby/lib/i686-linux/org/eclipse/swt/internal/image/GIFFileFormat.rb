@@ -1,6 +1,6 @@
 require "rjava"
 
-# Copyright (c) 2000, 2008 IBM Corporation and others.
+# Copyright (c) 2000, 2009 IBM Corporation and others.
 # All rights reserved. This program and the accompanying materials
 # are made available under the terms of the Eclipse Public License v1.0
 # which accompanies this distribution, and is available at
@@ -366,14 +366,10 @@ module Org::Eclipse::Swt::Internal::Image
     # look for and store 'number of repeats', and return the data.
     def read_application_extension
       begin
-        # Read size of block = 0x0B.
-        self.attr_input_stream.read
-        # Read application identifier.
-        application = Array.typed(::Java::Byte).new(8) { 0 }
-        self.attr_input_stream.read(application)
-        # Read authentication code.
-        authentication = Array.typed(::Java::Byte).new(3) { 0 }
-        self.attr_input_stream.read(authentication)
+        # Read block data.
+        block_size = self.attr_input_stream.read
+        block_data = Array.typed(::Java::Byte).new(block_size) { 0 }
+        self.attr_input_stream.read(block_data)
         # Read application data.
         data = Array.typed(::Java::Byte).new(0) { 0 }
         block = Array.typed(::Java::Byte).new(255) { 0 }
@@ -386,8 +382,8 @@ module Org::Eclipse::Swt::Internal::Image
           size = self.attr_input_stream.read
         end
         # Look for the NETSCAPE 'repeat count' field for an animated GIF.
-        netscape = (application[0]).equal?(Character.new(?N.ord)) && (application[1]).equal?(Character.new(?E.ord)) && (application[2]).equal?(Character.new(?T.ord)) && (application[3]).equal?(Character.new(?S.ord)) && (application[4]).equal?(Character.new(?C.ord)) && (application[5]).equal?(Character.new(?A.ord)) && (application[6]).equal?(Character.new(?P.ord)) && (application[7]).equal?(Character.new(?E.ord))
-        authentic = (authentication[0]).equal?(Character.new(?2.ord)) && (authentication[1]).equal?(Character.new(?..ord)) && (authentication[2]).equal?(Character.new(?0.ord))
+        netscape = block_size > 7 && (block_data[0]).equal?(Character.new(?N.ord)) && (block_data[1]).equal?(Character.new(?E.ord)) && (block_data[2]).equal?(Character.new(?T.ord)) && (block_data[3]).equal?(Character.new(?S.ord)) && (block_data[4]).equal?(Character.new(?C.ord)) && (block_data[5]).equal?(Character.new(?A.ord)) && (block_data[6]).equal?(Character.new(?P.ord)) && (block_data[7]).equal?(Character.new(?E.ord))
+        authentic = block_size > 10 && (block_data[8]).equal?(Character.new(?2.ord)) && (block_data[9]).equal?(Character.new(?..ord)) && (block_data[10]).equal?(Character.new(?0.ord))
         if (netscape && authentic && (data[0]).equal?(1))
           # $NON-NLS-1$ //$NON-NLS-2$
           @repeat_count = (data[1] & 0xff) | ((data[2] & 0xff) << 8)

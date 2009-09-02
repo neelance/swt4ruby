@@ -1,6 +1,6 @@
 require "rjava"
 
-# Copyright (c) 2000, 2006 IBM Corporation and others.
+# Copyright (c) 2000, 2008 IBM Corporation and others.
 # All rights reserved. This program and the accompanying materials
 # are made available under the terms of the Eclipse Public License v1.0
 # which accompanies this distribution, and is available at
@@ -25,6 +25,7 @@ module Org::Eclipse::Swt::Internal::Win32
     alias_method :attr_cb=, :cb=
     undef_method :cb=
     
+    # @field cast=(LPTSTR)
     # long
     attr_accessor :lp_reserved
     alias_method :attr_lp_reserved, :lp_reserved
@@ -32,6 +33,7 @@ module Org::Eclipse::Swt::Internal::Win32
     alias_method :attr_lp_reserved=, :lp_reserved=
     undef_method :lp_reserved=
     
+    # @field cast=(LPTSTR)
     # long
     attr_accessor :lp_desktop
     alias_method :attr_lp_desktop, :lp_desktop
@@ -39,6 +41,7 @@ module Org::Eclipse::Swt::Internal::Win32
     alias_method :attr_lp_desktop=, :lp_desktop=
     undef_method :lp_desktop=
     
+    # @field cast=(LPTSTR)
     # long
     attr_accessor :lp_title
     alias_method :attr_lp_title, :lp_title
@@ -106,6 +109,7 @@ module Org::Eclipse::Swt::Internal::Win32
     alias_method :attr_cb_reserved2=, :cb_reserved2=
     undef_method :cb_reserved2=
     
+    # @field cast=(LPBYTE)
     # long
     attr_accessor :lp_reserved2
     alias_method :attr_lp_reserved2, :lp_reserved2
@@ -113,6 +117,7 @@ module Org::Eclipse::Swt::Internal::Win32
     alias_method :attr_lp_reserved2=, :lp_reserved2=
     undef_method :lp_reserved2=
     
+    # @field cast=(HANDLE)
     # long
     attr_accessor :h_std_input
     alias_method :attr_h_std_input, :h_std_input
@@ -120,6 +125,7 @@ module Org::Eclipse::Swt::Internal::Win32
     alias_method :attr_h_std_input=, :h_std_input=
     undef_method :h_std_input=
     
+    # @field cast=(HANDLE)
     # long
     attr_accessor :h_std_output
     alias_method :attr_h_std_output, :h_std_output
@@ -127,6 +133,7 @@ module Org::Eclipse::Swt::Internal::Win32
     alias_method :attr_h_std_output=, :h_std_output=
     undef_method :h_std_output=
     
+    # @field cast=(HANDLE)
     # long
     attr_accessor :h_std_error
     alias_method :attr_h_std_error, :h_std_error

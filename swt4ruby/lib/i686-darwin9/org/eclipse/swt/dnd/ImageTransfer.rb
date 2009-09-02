@@ -16,7 +16,7 @@ module Org::Eclipse::Swt::Dnd
       include ::Org::Eclipse::Swt::Dnd
       include_const ::Org::Eclipse::Swt, :SWT
       include ::Org::Eclipse::Swt::Graphics
-      include ::Org::Eclipse::Swt::Internal::Carbon
+      include ::Org::Eclipse::Swt::Internal::Cocoa
       include ::Org::Eclipse::Swt::Widgets
     }
   end
@@ -50,16 +50,8 @@ module Org::Eclipse::Swt::Dnd
       end
       alias_method :attr__instance=, :_instance=
       
-      const_set_lazy(:PICT) { "PICT" }
-      const_attr_reader  :PICT
-      
-      # $NON-NLS-1$
-      const_set_lazy(:TIFF) { "TIFF" }
+      const_set_lazy(:TIFF) { OS::NSTIFFPboardType.get_string }
       const_attr_reader  :TIFF
-      
-      # $NON-NLS-1$
-      const_set_lazy(:PICTID) { register_type(PICT) }
-      const_attr_reader  :PICTID
       
       const_set_lazy(:TIFFID) { register_type(TIFF) }
       const_attr_reader  :TIFFID
@@ -93,46 +85,11 @@ module Org::Eclipse::Swt::Dnd
       if (!check_image(object) || !is_supported_type(transfer_data))
         DND.error(DND::ERROR_INVALID_DATA)
       end
-      transfer_data.attr_result = -1
       img_data = object
       image = Image.new(Display.get_current, img_data)
       handle = image.attr_handle
-      width = OS._cgimage_get_width(handle)
-      height = OS._cgimage_get_height(handle)
-      alpha_info = OS._cgimage_get_alpha_info(handle)
-      bpr = OS._cgimage_get_bytes_per_row(handle)
-      rect = Rect.new
-      rect.attr_left = 0
-      rect.attr_top = 0
-      rect.attr_right = RJava.cast_to_short(width)
-      rect.attr_bottom = RJava.cast_to_short(height)
-      g_world = Array.typed(::Java::Int).new(1) { 0 }
-      format = OS.attr_k24rgbpixel_format
-      if (!(alpha_info).equal?(OS.attr_k_cgimage_alpha_none_skip_first))
-        format = OS.attr_k32argbpixel_format
-      end
-      OS._new_gworld_from_ptr(g_world, format, rect, 0, 0, 0, image.attr_data, bpr)
-      cur_port = Array.typed(::Java::Int).new(1) { 0 }
-      cur_gworld = Array.typed(::Java::Int).new(1) { 0 }
-      OS._get_gworld(cur_port, cur_gworld)
-      OS._set_gworld(g_world[0], cur_gworld[0])
-      pict_handle = OS._open_picture(rect)
-      port_bit_map = OS._get_port_bit_map_for_copy_bits(g_world[0])
-      OS._copy_bits(port_bit_map, port_bit_map, rect, rect, RJava.cast_to_short(OS.attr_src_copy), 0)
-      OS._close_picture
-      OS._set_gworld(cur_port[0], cur_gworld[0])
-      OS._dispose_gworld(g_world[0])
-      length = OS._get_handle_size(pict_handle)
-      OS._hlock(pict_handle)
-      buffer = Array.typed(::Java::Int).new(1) { 0 }
-      OS.memmove(buffer, pict_handle, 4)
-      pict_data = Array.typed(::Java::Byte).new(length) { 0 }
-      OS.memmove(pict_data, buffer[0], length)
-      OS._hunlock(pict_handle)
-      OS._kill_picture(pict_handle)
+      transfer_data.attr_data = handle._tiffrepresentation
       image.dispose
-      transfer_data.attr_data = Array.typed(Array.typed(::Java::Byte)).new([pict_data])
-      transfer_data.attr_result = OS.attr_no_err
     end
     
     typesig { [TransferData] }
@@ -148,72 +105,27 @@ module Org::Eclipse::Swt::Dnd
       if (!is_supported_type(transfer_data) || (transfer_data.attr_data).nil?)
         return nil
       end
-      if ((transfer_data.attr_data.attr_length).equal?(0))
+      data = transfer_data.attr_data
+      if ((data.length).equal?(0))
         return nil
       end
-      data_arr = transfer_data.attr_data[0]
-      size = data_arr.attr_length
-      pict_ptr = OS._new_ptr(size)
-      OS.memmove(pict_ptr, data_arr, size)
-      data_provider = OS._cgdata_provider_create_with_data(0, pict_ptr, size, 0)
-      if (!(data_provider).equal?(0))
-        pict_data_ref = OS._qdpict_create_with_provider(data_provider)
-        # get bounds for the image
-        rect = CGRect.new
-        OS._qdpict_get_bounds(pict_data_ref, rect)
-        width = RJava.cast_to_int(rect.attr_width)
-        height = RJava.cast_to_int(rect.attr_height)
-        # Create the image
-        bpr = width * 4
-        data_size = height * bpr
-        data = OS._new_ptr(data_size)
-        if ((data).equal?(0))
-          SWT.error(SWT::ERROR_NO_HANDLES)
-        end
-        provider = OS._cgdata_provider_create_with_data(0, data, data_size, 0)
-        if ((provider).equal?(0))
-          OS._dispose_ptr(data)
-          SWT.error(SWT::ERROR_NO_HANDLES)
-        end
-        colorspace = OS._cgcolor_space_create_device_rgb
-        if ((colorspace).equal?(0))
-          SWT.error(SWT::ERROR_NO_HANDLES)
-        end
-        handle = OS._cgimage_create(width, height, 8, 32, bpr, colorspace, OS.attr_k_cgimage_alpha_none_skip_first, provider, nil, true, 0)
-        OS._cgdata_provider_release(provider)
-        if ((handle).equal?(0))
-          OS._dispose_ptr(data)
-          SWT.error(SWT::ERROR_NO_HANDLES)
-        end
-        bpc = OS._cgimage_get_bits_per_component(handle)
-        context = OS._cgbitmap_context_create(data, width, height, bpc, bpr, colorspace, OS.attr_k_cgimage_alpha_none_skip_first)
-        if ((context).equal?(0))
-          OS._cgimage_release(handle)
-          OS._dispose_ptr(data)
-          SWT.error(SWT::ERROR_NO_HANDLES)
-        end
-        status = OS._qdpict_draw_to_cgcontext(context, rect, pict_data_ref)
-        img_data = nil
-        if ((status).equal?(0))
-          image = Image.carbon_new(Display.get_current, SWT::BITMAP, handle, data)
-          img_data = image.get_image_data
-          image.dispose
-        end
-        OS._cgcontext_release(context)
-        OS._qdpict_release(pict_data_ref)
-        return img_data
-      end
-      return nil
+      ns_image = NSImage.new.alloc
+      ns_image.init_with_data(data)
+      # TODO: Image representation wrong???
+      image = Image.cocoa_new(Display.get_current, SWT::BITMAP, ns_image)
+      image_data = image.get_image_data
+      image.dispose
+      return image_data
     end
     
     typesig { [] }
     def get_type_ids
-      return Array.typed(::Java::Int).new([PICTID])
+      return Array.typed(::Java::Int).new([TIFFID])
     end
     
     typesig { [] }
     def get_type_names
-      return Array.typed(String).new([PICT])
+      return Array.typed(String).new([TIFF])
     end
     
     typesig { [Object] }

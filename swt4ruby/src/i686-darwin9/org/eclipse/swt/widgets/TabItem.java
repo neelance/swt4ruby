@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2008 IBM Corporation and others.
+ * Copyright (c) 2000, 2009 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -13,10 +13,7 @@ package org.eclipse.swt.widgets;
 
 import org.eclipse.swt.*;
 import org.eclipse.swt.graphics.*;
-import org.eclipse.swt.internal.carbon.OS;
-import org.eclipse.swt.internal.carbon.ControlTabInfoRecV1;
-import org.eclipse.swt.internal.carbon.ControlButtonContentInfo;
-import org.eclipse.swt.internal.carbon.Rect;
+import org.eclipse.swt.internal.cocoa.*;
 
 /**
  * Instances of this class represent a selectable user interface object
@@ -33,13 +30,13 @@ import org.eclipse.swt.internal.carbon.Rect;
  *
  * @see <a href="http://www.eclipse.org/swt/snippets/#tabfolder">TabFolder, TabItem snippets</a>
  * @see <a href="http://www.eclipse.org/swt/">Sample code and further information</a>
+ * @noextend This class is not intended to be subclassed by clients.
  */
 public class TabItem extends Item {
 	TabFolder parent;
 	Control control;
 	String toolTipText;
-	
-	static final int EXTRA_WIDTH = 25;
+	NSTabViewItem nsItem;
 
 /**
  * Constructs a new instance of this class given its parent
@@ -115,15 +112,6 @@ public TabItem (TabFolder parent, int style, int index) {
 	parent.createItem (this, index);
 }
 
-int calculateWidth (GC gc) {
-	int width = 0;
-	Image image = getImage ();
-	String text = getText ();
-	if (image != null) width = image.getBounds ().width + 2;
-	if (text != null && text.length () > 0) width += gc.stringExtent (text).x;
-	return width + EXTRA_WIDTH;
-}
-
 protected void checkSubclass () {
 	if (!isValidSubclass ()) error (SWT.ERROR_INVALID_SUBCLASS);
 }
@@ -147,15 +135,25 @@ void destroyWidget () {
  * @since 3.4
  */
 public Rectangle getBounds() {
-	checkWidget ();
-	int index = parent.indexOf (this);
-	if (index == -1) return new Rectangle (0, 0, 0, 0);
-	int rgnHandle = OS.NewRgn ();
-	OS.GetControlRegion (parent.handle, (short) (index + 1), rgnHandle);
-	Rect rect = new Rect ();
-	OS.GetRegionBounds (rgnHandle, rect);
-	OS.DisposeRgn (rgnHandle);
-	return new Rectangle (rect.left, rect.top, rect.right - rect.left, rect.bottom - rect.top);
+	checkWidget();
+	Rectangle result = new Rectangle (0, 0, 0, 0);
+	if (nsItem.respondsToSelector (OS.sel_accessibilityAttributeValue_)) {
+		int /*long*/ posValue = OS.objc_msgSend (nsItem.id, OS.sel_accessibilityAttributeValue_, OS.NSAccessibilityPositionAttribute ());
+		int /*long*/ sizeValue = OS.objc_msgSend (nsItem.id, OS.sel_accessibilityAttributeValue_, OS.NSAccessibilitySizeAttribute ());		
+		NSValue val = new NSValue (posValue);
+		NSPoint pt = val.pointValue ();
+		NSWindow window = parent.view.window ();
+		pt.y = display.getPrimaryFrame().height - pt.y;
+		pt = parent.view.convertPoint_fromView_ (pt, null);
+		pt = window.convertScreenToBase (pt);
+		result.x = (int) pt.x;
+		result.y = (int) pt.y;
+		val = new NSValue (sizeValue);
+		NSSize size = val.sizeValue ();
+		result.width = (int) Math.ceil (size.width);
+		result.height = (int) Math.ceil (size.height);
+	}
+	return result;
 }
 
 /**
@@ -208,6 +206,8 @@ public String getToolTipText () {
 
 void releaseHandle () {
 	super.releaseHandle ();
+	if (nsItem != null) nsItem.release();
+	nsItem = null;
 	parent = null;
 }
 
@@ -250,16 +250,42 @@ public void setControl (Control control) {
 	}
 	Control oldControl = this.control, newControl = control;
 	this.control = control;
-	int index = parent.indexOf (this);
-	if (index != parent.getSelectionIndex ()) {
-		if (newControl != null) newControl.setVisible (false);
-		return;
+	int index = parent.indexOf (this), selectionIndex = parent.getSelectionIndex();;
+	if (index != selectionIndex) {
+		if (newControl != null) {
+			boolean hideControl = true;
+			if (selectionIndex != -1) {
+				Control selectedControl = parent.getItem(selectionIndex).getControl();
+				if (selectedControl == newControl) hideControl=false;
+			} 
+			if (hideControl) newControl.setVisible(false);
+		}
+	} else {
+		if (newControl != null) {
+			newControl.setVisible (true);
+		}
+		if (oldControl != null) oldControl.setVisible (false);
 	}
+	NSView view;
 	if (newControl != null) {
-		newControl.setBounds (parent.getClientArea ());
-		newControl.setVisible (true);
+		view = newControl.topView();
+	} else {
+		view = (NSView)new NSView().alloc();
+		view.init ();
+		view.autorelease();
 	}
-	if (oldControl != null) oldControl.setVisible (false);
+	nsItem.setView (view);
+	/*
+	* Feature in Cocoa.  The method setView() removes the old view from
+	* its parent.  The fix is to detected it has been removed and add
+	* it back.
+	*/
+	if (oldControl != null) {
+		NSView topView = oldControl.topView ();
+		if (topView.superview () == null) {
+			parent.contentView ().addSubview (topView, OS.NSWindowBelow, null);
+		}
+	}
 }
 
 public void setImage (Image image) {
@@ -267,15 +293,6 @@ public void setImage (Image image) {
 	int index = parent.indexOf (this);
 	if (index == -1) return;
 	super.setImage (image);
-	ControlButtonContentInfo inContent = new ControlButtonContentInfo ();
-	if (image == null) {
-		inContent.contentType = (short)OS.kControlContentTextOnly;
-	} else {
-		inContent.contentType = (short)OS.kControlContentCGImageRef;
-		inContent.iconRef = image.handle;
-	}
-	OS.SetControlData (parent.handle, index+1, OS.kControlTabImageContentTag, ControlButtonContentInfo.sizeof, inContent);
-	parent.redraw ();
 }
 
 /**
@@ -310,23 +327,26 @@ public void setText (String string) {
 	int index = parent.indexOf (this);
 	if (index == -1) return;
 	super.setText (string);
-	char [] buffer = new char [text.length ()];
-	text.getChars (0, buffer.length, buffer, 0);
-	int length = fixMnemonic (buffer);
-	int ptr = OS.CFStringCreateWithCharacters (OS.kCFAllocatorDefault, buffer, length);
-	if (ptr == 0) error (SWT.ERROR_CANNOT_SET_TEXT);	
-	ControlTabInfoRecV1 tab = new ControlTabInfoRecV1 ();
-	tab.version= (short) OS.kControlTabInfoVersionOne;
-	tab.iconSuiteID = 0;
-	tab.name = ptr;
-	OS.SetControlData (parent.handle, index+1, OS.kControlTabInfoTag, ControlTabInfoRecV1.sizeof, tab);
-	OS.CFRelease (ptr);
+	char [] chars = new char [string.length ()];
+	string.getChars (0, chars.length, chars, 0);
+	int length = fixMnemonic (chars);
+	NSString str = NSString.stringWithCharacters (chars, length);
+	nsItem.setLabel (str);
 }
 
 /**
  * Sets the receiver's tool tip text to the argument, which
- * may be null indicating that no tool tip text should be shown.
- *
+ * may be null indicating that the default tool tip for the 
+ * control will be shown. For a control that has a default
+ * tool tip, such as the Tree control on Windows, setting
+ * the tool tip text to an empty string replaces the default,
+ * causing no tool tip text to be shown.
+ * <p>
+ * The mnemonic indicator (character '&amp;') is not displayed in a tool tip.
+ * To display a single '&amp;' in the tool tip, the character '&amp;' can be 
+ * escaped by doubling it in the string.
+ * </p>
+ * 
  * @param string the new tool tip text (or null)
  *
  * @exception SWTException <ul>
@@ -337,6 +357,11 @@ public void setText (String string) {
 public void setToolTipText (String string) {
 	checkWidget();
 	toolTipText = string;
+	parent.checkToolTip (this);
+}
+
+String tooltipText () {
+	return toolTipText;
 }
 
 void update () {

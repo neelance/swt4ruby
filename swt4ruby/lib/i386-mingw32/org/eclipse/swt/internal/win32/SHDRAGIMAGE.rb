@@ -31,6 +31,7 @@ module Org::Eclipse::Swt::Internal::Win32
     alias_method :attr_pt_offset=, :pt_offset=
     undef_method :pt_offset=
     
+    # @field cast=(HBITMAP)
     # long
     attr_accessor :hbmp_drag_image
     alias_method :attr_hbmp_drag_image, :hbmp_drag_image

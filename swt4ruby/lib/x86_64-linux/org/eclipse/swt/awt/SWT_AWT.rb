@@ -25,12 +25,16 @@ module Org::Eclipse::Swt::Awt
       include_const ::Org::Eclipse::Swt::Widgets, :Display
       include_const ::Org::Eclipse::Swt::Widgets, :Listener
       include_const ::Org::Eclipse::Swt::Widgets, :Event
+      include_const ::Java::Awt, :AWTEvent
       include_const ::Java::Awt, :Dimension
       include_const ::Java::Awt, :EventQueue
       include_const ::Java::Awt, :Canvas
       include_const ::Java::Awt, :Frame
+      include_const ::Java::Awt, :Window
+      include_const ::Java::Awt::Event, :AWTEventListener
       include_const ::Java::Awt::Event, :ComponentAdapter
       include_const ::Java::Awt::Event, :ComponentEvent
+      include_const ::Java::Awt::Event, :ComponentListener
       include_const ::Java::Awt::Event, :WindowEvent
     }
   end
@@ -98,7 +102,7 @@ module Org::Eclipse::Swt::Awt
       alias_method :attr_swing_initialized=, :swing_initialized=
       
       JNI.native_method :Java_org_eclipse_swt_awt_SWT_AWT_getAWTHandle, [:pointer, :long, :long], :int64
-      typesig { [Canvas] }
+      typesig { [Object] }
       # int
       def get_awthandle(canvas)
         JNI.__send__(:Java_org_eclipse_swt_awt_SWT_AWT_getAWTHandle, JNI.env, self.jni_id, canvas.jni_id)
@@ -250,6 +254,60 @@ module Org::Eclipse::Swt::Awt
           end
         rescue JavaThrowable => e
         end
+        awt_listener = Class.new(AWTEventListener.class == Class ? AWTEventListener : Object) do
+          extend LocalClass
+          include_class_members SWT_AWT
+          include AWTEventListener if AWTEventListener.class == Module
+          
+          typesig { [AWTEvent] }
+          define_method :event_dispatched do |event|
+            if ((event.get_id).equal?(WindowEvent::WINDOW_OPENED))
+              window = event.get_source
+              if ((window.get_parent).equal?(frame))
+                awtevent_listener_class = self.class
+                parent.get_display.async_exec(Class.new(self.class::Runnable.class == Class ? self.class::Runnable : Object) do
+                  extend LocalClass
+                  include_class_members awtevent_listener_class
+                  include class_self::Runnable if class_self::Runnable.class == Module
+                  
+                  typesig { [] }
+                  define_method :run do
+                    if (parent.is_disposed)
+                      return
+                    end
+                    shell = parent.get_shell
+                    load_library
+                    # int
+                    awt_handle = get_awthandle(window)
+                    if ((awt_handle).equal?(0))
+                      return
+                    end
+                    # int
+                    x_window = OS.gdk_x11_drawable_get_xid(OS._gtk_widget_window(OS.gtk_widget_get_toplevel(shell.attr_handle)))
+                    OS._xset_transient_for_hint(OS._gdk_display, awt_handle, x_window)
+                  end
+                  
+                  typesig { [Vararg.new(Object)] }
+                  define_method :initialize do |*args|
+                    super(*args)
+                  end
+                  
+                  private
+                  alias_method :initialize_anonymous, :initialize
+                end.new_local(self))
+              end
+            end
+          end
+          
+          typesig { [Vararg.new(Object)] }
+          define_method :initialize do |*args|
+            super(*args)
+          end
+          
+          private
+          alias_method :initialize_anonymous, :initialize
+        end.new_local(self)
+        frame.get_toolkit.add_awtevent_listener(awt_listener, AWTEvent::WINDOW_EVENT_MASK)
         shell_listener = Class.new(Listener.class == Class ? Listener : Object) do
           extend LocalClass
           include_class_members SWT_AWT
@@ -333,6 +391,7 @@ module Org::Eclipse::Swt::Awt
                 
                 typesig { [] }
                 define_method :run do
+                  frame.get_toolkit.remove_awtevent_listener(awt_listener)
                   frame.dispose
                 end
                 
@@ -458,7 +517,7 @@ module Org::Eclipse::Swt::Awt
           SWT.error(SWT::ERROR_INVALID_ARGUMENT, nil, " [peer not created]")
         end
         shell = Shell.gtk_new(display, handle)
-        parent.add_component_listener(Class.new(ComponentAdapter.class == Class ? ComponentAdapter : Object) do
+        listener = Class.new(ComponentAdapter.class == Class ? ComponentAdapter : Object) do
           extend LocalClass
           include_class_members SWT_AWT
           include ComponentAdapter if ComponentAdapter.class == Module
@@ -473,6 +532,9 @@ module Org::Eclipse::Swt::Awt
               
               typesig { [] }
               define_method :run do
+                if (shell.is_disposed)
+                  return
+                end
                 dim = parent.get_size
                 shell.set_size(dim.attr_width, dim.attr_height)
               end
@@ -485,6 +547,25 @@ module Org::Eclipse::Swt::Awt
               private
               alias_method :initialize_anonymous, :initialize
             end.new_local(self))
+          end
+          
+          typesig { [Vararg.new(Object)] }
+          define_method :initialize do |*args|
+            super(*args)
+          end
+          
+          private
+          alias_method :initialize_anonymous, :initialize
+        end.new_local(self)
+        parent.add_component_listener(listener)
+        shell.add_listener(SWT::Dispose, Class.new(Listener.class == Class ? Listener : Object) do
+          extend LocalClass
+          include_class_members SWT_AWT
+          include Listener if Listener.class == Module
+          
+          typesig { [Event] }
+          define_method :handle_event do |event|
+            parent.remove_component_listener(listener)
           end
           
           typesig { [Vararg.new(Object)] }

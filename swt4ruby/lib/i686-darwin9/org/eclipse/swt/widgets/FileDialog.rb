@@ -1,6 +1,6 @@
 require "rjava"
 
-# Copyright (c) 2000, 2008 IBM Corporation and others.
+# Copyright (c) 2000, 2009 IBM Corporation and others.
 # All rights reserved. This program and the accompanying materials
 # are made available under the terms of the Eclipse Public License v1.0
 # which accompanies this distribution, and is available at
@@ -15,7 +15,7 @@ module Org::Eclipse::Swt::Widgets
       include ::Org::Eclipse::Swt::Widgets
       include ::Org::Eclipse::Swt
       include ::Org::Eclipse::Swt::Internal
-      include ::Org::Eclipse::Swt::Internal::Carbon
+      include ::Org::Eclipse::Swt::Internal::Cocoa
     }
   end
   
@@ -37,8 +37,21 @@ module Org::Eclipse::Swt::Widgets
   # @see <a href="http://www.eclipse.org/swt/snippets/#filedialog">FileDialog snippets</a>
   # @see <a href="http://www.eclipse.org/swt/examples.php">SWT Example: ControlExample, Dialog tab</a>
   # @see <a href="http://www.eclipse.org/swt/">Sample code and further information</a>
+  # @noextend This class is not intended to be subclassed by clients.
   class FileDialog < FileDialogImports.const_get :Dialog
     include_class_members FileDialogImports
+    
+    attr_accessor :panel
+    alias_method :attr_panel, :panel
+    undef_method :panel
+    alias_method :attr_panel=, :panel=
+    undef_method :panel=
+    
+    attr_accessor :popup
+    alias_method :attr_popup, :popup
+    undef_method :popup
+    alias_method :attr_popup=, :popup=
+    undef_method :popup=
     
     attr_accessor :filter_names
     alias_method :attr_filter_names, :filter_names
@@ -126,7 +139,13 @@ module Org::Eclipse::Swt::Widgets
     # <li>ERROR_THREAD_INVALID_ACCESS - if not called from the thread that created the parent</li>
     # <li>ERROR_INVALID_SUBCLASS - if this class is not an allowed subclass</li>
     # </ul>
+    # 
+    # @see SWT#SAVE
+    # @see SWT#OPEN
+    # @see SWT#MULTI
     def initialize(parent, style)
+      @panel = nil
+      @popup = nil
       @filter_names = nil
       @filter_extensions = nil
       @file_names = nil
@@ -140,8 +159,13 @@ module Org::Eclipse::Swt::Widgets
       @file_names = Array.typed(String).new(0) { nil }
       @filter_path = ""
       @file_name = ""
-      @filter_index = 0
+      @filter_index = -1
       @overwrite = false
+      if (Display.get_sheet_enabled)
+        if (!(parent).nil? && !((style & SWT::SHEET)).equal?(0))
+          self.attr_style |= SWT::SHEET
+        end
+      end
       check_subclass
     end
     
@@ -225,90 +249,6 @@ module Org::Eclipse::Swt::Widgets
       return @overwrite
     end
     
-    typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
-    def event_proc(call_back_selector, call_back_parms, call_back_ud)
-      case (call_back_selector)
-      when OS.attr_k_nav_cbpopup_menu_select
-        cb_rec = NavCBRec.new
-        OS.memmove(cb_rec, call_back_parms, NavCBRec.attr_sizeof)
-        if (!(cb_rec.attr_event_data.attr_event_data_parms.attr_param).equal?(0))
-          spec = NavMenuItemSpec.new
-          OS.memmove(spec, cb_rec.attr_event_data.attr_event_data_parms.attr_param, NavMenuItemSpec.attr_sizeof)
-          index = spec.attr_menu_type
-          if (0 <= index && index < @filter_extensions.attr_length)
-            @filter_index = index
-          end
-        end
-      end
-      return 0
-    end
-    
-    typesig { [::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int] }
-    def filter_proc(the_item, info_ptr, call_back_ud, filter_mode)
-      if ((filter_mode).equal?(OS.attr_k_nav_filtering_browser_list))
-        if (!(@filter_extensions).nil? && 0 <= @filter_index && @filter_index < @filter_extensions.attr_length)
-          info = NavFileOrFolderInfo.new
-          OS.memmove(info, info_ptr, NavFileOrFolderInfo.attr_sizeof)
-          if (!info.attr_is_folder)
-            OS._aecoerce_desc(the_item, OS.attr_type_fsref, the_item)
-            fs_ref = Array.typed(::Java::Byte).new(80) { 0 }
-            if ((OS._aeget_desc_data(the_item, fs_ref, fs_ref.attr_length)).equal?(OS.attr_no_err))
-              url = OS._cfurlcreate_from_fsref(OS.attr_k_cfallocator_default, fs_ref)
-              if (!(url).equal?(0))
-                ext = OS._cfurlcopy_path_extension(url)
-                OS._cfrelease(url)
-                if (!(ext).equal?(0))
-                  buffer = CharArray.new(OS._cfstring_get_length(ext))
-                  if (buffer.attr_length > 0)
-                    range = CFRange.new
-                    range.attr_length = buffer.attr_length
-                    OS._cfstring_get_characters(ext, range, buffer)
-                  end
-                  OS._cfrelease(ext)
-                  extension = String.new(buffer)
-                  extensions = @filter_extensions[@filter_index]
-                  start = 0
-                  length_ = extensions.length
-                  while (start < length_)
-                    index = extensions.index_of(EXTENSION_SEPARATOR, start)
-                    if ((index).equal?(-1))
-                      index = length_
-                    end
-                    filter = extensions.substring(start, index).trim
-                    if ((filter == "*") || (filter == "*.*"))
-                      return 1
-                    end
-                    if (filter.starts_with("*."))
-                      filter = RJava.cast_to_string(filter.substring(2))
-                    end
-                    if ((filter.to_lower_case == extension.to_lower_case))
-                      return 1
-                    end
-                    start = index + 1
-                  end
-                  return 0
-                end
-              end
-            end
-          end
-        end
-      end
-      return 1
-    end
-    
-    typesig { [::Java::Int] }
-    def get_string(cf_string)
-      if ((cf_string).equal?(0))
-        return ""
-      end
-      length_ = OS._cfstring_get_length(cf_string)
-      buffer = CharArray.new(length_)
-      range = CFRange.new
-      range.attr_length = length_
-      OS._cfstring_get_characters(cf_string, range, buffer)
-      return String.new(buffer)
-    end
-    
     typesig { [] }
     # Makes the dialog visible and brings it to the front
     # of the display.
@@ -323,201 +263,202 @@ module Org::Eclipse::Swt::Widgets
     def open
       full_path = nil
       @file_names = Array.typed(String).new(0) { nil }
-      title_ptr = 0
-      if (!(self.attr_title).nil?)
-        buffer = CharArray.new(self.attr_title.length)
-        self.attr_title.get_chars(0, buffer.attr_length, buffer, 0)
-        title_ptr = OS._cfstring_create_with_characters(OS.attr_k_cfallocator_default, buffer, buffer.attr_length)
-      end
-      file_name_ptr = 0
-      if (!(@file_name).nil?)
-        buffer = CharArray.new(@file_name.length)
-        @file_name.get_chars(0, buffer.attr_length, buffer, 0)
-        file_name_ptr = OS._cfstring_create_with_characters(OS.attr_k_cfallocator_default, buffer, buffer.attr_length)
-      end
-      options = NavDialogCreationOptions.new
-      options.attr_window_title = options.attr_client_name = title_ptr
-      options.attr_parent_window = OS._get_control_owner(self.attr_parent.attr_handle)
-      options.attr_option_flags = OS.attr_k_nav_support_packages | OS.attr_k_nav_allow_invisible_files
-      options.attr_location_h = -1
-      options.attr_location_v = -1
-      options.attr_save_file_name = file_name_ptr
-      options.attr_modality = OS.attr_k_window_modality_app_modal
-      extensions = 0
-      filter_callback = nil
-      event_callback = nil
-      out_dialog = Array.typed(::Java::Int).new(1) { 0 }
+      # long
+      method = 0
+      # long
+      method_impl = 0
+      callback = nil
       if (!((self.attr_style & SWT::SAVE)).equal?(0))
+        save_panel_ = NSSavePanel.save_panel
+        @panel = save_panel_
         if (!@overwrite)
-          options.attr_option_flags |= OS.attr_k_nav_dont_confirm_replacement
+          callback = Callback.new(self, "_overwriteExistingFileCheck", 3)
+          # long
+          proc = callback.get_address
+          if ((proc).equal?(0))
+            error(SWT::ERROR_NO_MORE_CALLBACKS)
+          end
+          method = OS.class_get_instance_method(OS.attr_class_nssave_panel, OS.attr_sel_overwrite_existing_file_check)
+          if (!(method).equal?(0))
+            method_impl = OS.method_set_implementation(method, proc)
+          end
         end
-        OS._nav_create_put_file_dialog(options, 0, 0, 0, 0, out_dialog)
       else
-        if (!((self.attr_style & SWT::MULTI)).equal?(0))
-          options.attr_option_flags |= OS.attr_k_nav_allow_multiple_files
+        open_panel_ = NSOpenPanel.open_panel
+        open_panel_.set_allows_multiple_selection(!((self.attr_style & SWT::MULTI)).equal?(0))
+        @panel = open_panel_
+      end
+      @panel.set_can_create_directories(true)
+      # long
+      jni_ref = 0
+      delegate = nil
+      if (!(@filter_extensions).nil? && !(@filter_extensions.attr_length).equal?(0))
+        delegate = SWTPanelDelegate.new.alloc.init
+        jni_ref = OS._new_global_ref(self)
+        if ((jni_ref).equal?(0))
+          SWT.error(SWT::ERROR_NO_HANDLES)
         end
-        filter_proc = 0
-        event_proc = 0
-        if (!(@filter_extensions).nil? && !(@filter_extensions.attr_length).equal?(0))
-          extensions = options.attr_popup_extension = OS._cfarray_create_mutable(OS.attr_k_cfallocator_default, @filter_extensions.attr_length, 0)
+        OS.object_set_instance_variable(delegate.attr_id, Display::SWT_OBJECT, jni_ref)
+        @panel.set_delegate(delegate)
+        widget = NSPopUpButton.new.alloc
+        widget.init_with_frame(NSRect.new, false)
+        widget.set_target(delegate)
+        widget.set_action(OS.attr_sel_send_selection_)
+        menu_ = widget.menu
+        menu_.set_autoenables_items(false)
+        i = 0
+        while i < @filter_extensions.attr_length
+          str = @filter_extensions[i]
+          if (!(@filter_names).nil? && @filter_names.attr_length > i)
+            str = RJava.cast_to_string(@filter_names[i])
+          end
+          ns_item = NSMenuItem.new.alloc
+          ns_item.init_with_title(NSString.string_with(str), 0, NSString.string_with(""))
+          menu_.add_item(ns_item)
+          ns_item.release
+          i += 1
+        end
+        widget.select_item_at_index(0 <= @filter_index && @filter_index < @filter_extensions.attr_length ? @filter_index : 0)
+        widget.size_to_fit
+        @panel.set_accessory_view(widget)
+        @popup = widget
+      end
+      @panel.set_title(NSString.string_with(!(self.attr_title).nil? ? self.attr_title : ""))
+      application = NSApplication.shared_application
+      if (!(self.attr_parent).nil? && !((self.attr_style & SWT::SHEET)).equal?(0))
+        application.begin_sheet(@panel, self.attr_parent.attr_window, nil, 0, 0)
+      end
+      dir = !(@filter_path).nil? ? NSString.string_with(@filter_path) : nil
+      file = !(@file_name).nil? ? NSString.string_with(@file_name) : nil
+      # long
+      response = @panel.run_modal_for_directory(dir, file)
+      if (!(self.attr_parent).nil? && !((self.attr_style & SWT::SHEET)).equal?(0))
+        application.end_sheet(@panel, 0)
+      end
+      if (!@overwrite)
+        if (!(method).equal?(0))
+          OS.method_set_implementation(method, method_impl)
+        end
+        if (!(callback).nil?)
+          callback.dispose
+        end
+      end
+      if ((response).equal?(OS::NSFileHandlingPanelOKButton))
+        filename_ = @panel.filename
+        full_path = RJava.cast_to_string(filename_.get_string)
+        if (((self.attr_style & SWT::SAVE)).equal?(0))
+          filenames = (@panel).filenames
+          # 64
+          count_ = RJava.cast_to_int(filenames.count)
+          @file_names = Array.typed(String).new(count_) { nil }
           i = 0
-          while i < @filter_extensions.attr_length
-            str = @filter_extensions[i]
-            if (!(@filter_names).nil? && @filter_names.attr_length > i)
-              str = RJava.cast_to_string(@filter_names[i])
-            end
-            chars = CharArray.new(str.length)
-            str.get_chars(0, chars.attr_length, chars, 0)
-            ptr = OS._cfstring_create_with_characters(OS.attr_k_cfallocator_default, chars, chars.attr_length)
-            if (!(ptr).equal?(0))
-              OS._cfarray_append_value(extensions, ptr)
+          while i < count_
+            filename_ = NSString.new(filenames.object_at_index(i))
+            filename_only = filename_.last_path_component
+            path_only = filename_.string_by_deleting_last_path_component
+            if ((i).equal?(0))
+              # Filter path
+              @filter_path = RJava.cast_to_string(path_only.get_string)
+              # File name
+              @file_name = RJava.cast_to_string(@file_names[0] = filename_only.get_string)
+            else
+              if ((path_only.get_string == @filter_path))
+                @file_names[i] = filename_only.get_string
+              else
+                @file_names[i] = filename_.get_string
+              end
             end
             i += 1
           end
-          filter_callback = Callback.new(self, "filterProc", 4)
-          filter_proc = filter_callback.get_address
-          if ((filter_proc).equal?(0))
-            SWT.error(SWT::ERROR_NO_MORE_CALLBACKS)
-          end
-          event_callback = Callback.new(self, "eventProc", 3)
-          event_proc = event_callback.get_address
-          if ((event_proc).equal?(0))
-            SWT.error(SWT::ERROR_NO_MORE_CALLBACKS)
-          end
         end
-        OS._nav_create_get_file_dialog(options, 0, event_proc, 0, filter_proc, 0, out_dialog)
+        @filter_index = -1
       end
-      if (!(out_dialog[0]).equal?(0))
-        if (!(@filter_path).nil? && @filter_path.length > 0)
-          chars = CharArray.new(@filter_path.length)
-          @filter_path.get_chars(0, chars.attr_length, chars, 0)
-          str = OS._cfstring_create_with_characters(OS.attr_k_cfallocator_default, chars, chars.attr_length)
-          if (!(str).equal?(0))
-            url = OS._cfurlcreate_with_file_system_path(OS.attr_k_cfallocator_default, str, OS.attr_k_cfurlposixpath_style, false)
-            if (!(url).equal?(0))
-              fs_ref = Array.typed(::Java::Byte).new(80) { 0 }
-              if (OS._cfurlget_fsref(url, fs_ref))
-                params = AEDesc.new
-                if ((OS._aecreate_desc(OS.attr_type_fsref, fs_ref, fs_ref.attr_length, params)).equal?(OS.attr_no_err))
-                  OS._nav_custom_control(out_dialog[0], OS.attr_k_nav_ctl_set_location, params)
-                  OS._aedispose_desc(params)
-                end
-              end
-              OS._cfrelease(url)
-            end
-            OS._cfrelease(str)
-          end
-        end
-        if (!(@filter_extensions).nil? && 0 <= @filter_index && @filter_index < @filter_extensions.attr_length)
-          spec = NavMenuItemSpec.new
-          spec.attr_menu_type = @filter_index
-          OS._nav_custom_control(out_dialog[0], OS.attr_k_nav_ctl_select_custom_type, spec)
-        end
-        OS._nav_dialog_run(out_dialog[0])
-        action = OS._nav_dialog_get_user_action(out_dialog[0])
-        case (action)
-        when OS.attr_k_nav_user_action_open, OS.attr_k_nav_user_action_choose, OS.attr_k_nav_user_action_save_as
-          record = NavReplyRecord.new
-          OS._nav_dialog_get_reply(out_dialog[0], record)
-          selection = AEDesc.new
-          selection.attr_descriptor_type = record.attr_selection_descriptor_type
-          selection.attr_data_handle = record.attr_selection_data_handle
-          count = Array.typed(::Java::Int).new(1) { 0 }
-          OS._aecount_items(selection, count)
-          if (count[0] > 0)
-            @file_names = Array.typed(String).new(count[0]) { nil }
-            maximum_size = 80 # size of FSRef
-            data_ptr = OS._new_ptr(maximum_size)
-            ae_keyword = Array.typed(::Java::Int).new(1) { 0 }
-            type_code = Array.typed(::Java::Int).new(1) { 0 }
-            actual_size = Array.typed(::Java::Int).new(1) { 0 }
-            if (!((self.attr_style & SWT::SAVE)).equal?(0))
-              if ((OS._aeget_nth_ptr(selection, 1, OS.attr_type_fsref, ae_keyword, type_code, data_ptr, maximum_size, actual_size)).equal?(OS.attr_no_err))
-                fs_ref = Array.typed(::Java::Byte).new(actual_size[0]) { 0 }
-                OS.memmove(fs_ref, data_ptr, actual_size[0])
-                path_url = OS._cfurlcreate_from_fsref(OS.attr_k_cfallocator_default, fs_ref)
-                # Filter path
-                path_string = OS._cfurlcopy_file_system_path(path_url, OS.attr_k_cfurlposixpath_style)
-                @filter_path = RJava.cast_to_string(get_string(path_string))
-                OS._cfrelease(path_string)
-                # Full path
-                full_url = OS._cfurlcreate_copy_appending_path_component(OS.attr_k_cfallocator_default, path_url, record.attr_save_file_name, false)
-                full_string = OS._cfurlcopy_file_system_path(full_url, OS.attr_k_cfurlposixpath_style)
-                full_path = RJava.cast_to_string(get_string(full_string))
-                OS._cfrelease(full_string)
-                OS._cfrelease(full_url)
-                # File name
-                @file_name = RJava.cast_to_string(@file_names[0] = get_string(record.attr_save_file_name))
-                OS._cfrelease(path_url)
-              end
-            else
-              i = 0
-              while i < count[0]
-                if ((OS._aeget_nth_ptr(selection, i + 1, OS.attr_type_fsref, ae_keyword, type_code, data_ptr, maximum_size, actual_size)).equal?(OS.attr_no_err))
-                  fs_ref = Array.typed(::Java::Byte).new(actual_size[0]) { 0 }
-                  OS.memmove(fs_ref, data_ptr, actual_size[0])
-                  url = OS._cfurlcreate_from_fsref(OS.attr_k_cfallocator_default, fs_ref)
-                  full_string = OS._cfurlcopy_file_system_path(url, OS.attr_k_cfurlposixpath_style)
-                  # File path
-                  path_url = OS._cfurlcreate_copy_deleting_last_path_component(OS.attr_k_cfallocator_default, url)
-                  path_string = OS._cfurlcopy_file_system_path(path_url, OS.attr_k_cfurlposixpath_style)
-                  path = get_string(path_string)
-                  OS._cfrelease(path_string)
-                  OS._cfrelease(path_url)
-                  if ((i).equal?(0))
-                    # Full path
-                    full_path = RJava.cast_to_string(get_string(full_string))
-                    # Filter path
-                    @filter_path = path
-                    # File name
-                    file_string = OS._cfurlcopy_last_path_component(url)
-                    @file_name = RJava.cast_to_string(@file_names[0] = get_string(file_string))
-                    OS._cfrelease(file_string)
-                  else
-                    if ((path == @filter_path))
-                      file_string = OS._cfurlcopy_last_path_component(url)
-                      @file_names[i] = get_string(file_string)
-                      OS._cfrelease(file_string)
-                    else
-                      @file_names[i] = get_string(full_string)
-                    end
-                  end
-                  OS._cfrelease(full_string)
-                  OS._cfrelease(url)
-                end
-                i += 1
-              end
-            end
-            OS._dispose_ptr(data_ptr)
-          end
-          OS._nav_dispose_reply(record)
-        end
+      if (!(@popup).nil?)
+        # 64
+        @filter_index = RJava.cast_to_int(@popup.index_of_selected_item)
+        @panel.set_accessory_view(nil)
+        @popup.release
+        @popup = nil
       end
-      if (!(title_ptr).equal?(0))
-        OS._cfrelease(title_ptr)
+      if (!(delegate).nil?)
+        @panel.set_delegate(nil)
+        delegate.release
       end
-      if (!(file_name_ptr).equal?(0))
-        OS._cfrelease(file_name_ptr)
+      if (!(jni_ref).equal?(0))
+        OS._delete_global_ref(jni_ref)
       end
-      if (!(out_dialog[0]).equal?(0))
-        OS._nav_dialog_dispose(out_dialog[0])
-      end
-      if (!(extensions).equal?(0))
-        count = OS._cfarray_get_count(extensions)
-        i = 0
-        while i < count
-          OS._cfrelease(OS._cfarray_get_value_at_index(extensions, i))
-          i += 1
-        end
-        OS._cfrelease(extensions)
-      end
-      if (!(filter_callback).nil?)
-        filter_callback.dispose
-      end
-      if (!(event_callback).nil?)
-        event_callback.dispose
-      end
+      @panel = nil
       return full_path
+    end
+    
+    typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
+    # long
+    # long
+    # long
+    # long
+    def __overwrite_existing_file_check(id, sel, str)
+      return 1
+    end
+    
+    typesig { [::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int] }
+    # long
+    # long
+    # long
+    # long
+    # long
+    def panel_should_show_filename(id, sel, arg0, arg1)
+      path = NSString.new(arg1)
+      if (!(@filter_extensions).nil? && !(@filter_extensions.attr_length).equal?(0))
+        manager = NSFileManager.default_manager
+        # long
+        ptr = OS.malloc(1)
+        found = manager.file_exists_at_path(path, ptr)
+        is_directory = Array.typed(::Java::Byte).new(1) { 0 }
+        OS.memmove(is_directory, ptr, 1)
+        OS.free(ptr)
+        if (found)
+          if (!(is_directory[0]).equal?(0))
+            return 1
+          else
+            ext = path.path_extension
+            if (!(ext).nil?)
+              # 64
+              filter_index = RJava.cast_to_int(@popup.index_of_selected_item)
+              extension = ext.get_string
+              extensions = @filter_extensions[filter_index]
+              start = 0
+              length_ = extensions.length
+              while (start < length_)
+                index = extensions.index_of(EXTENSION_SEPARATOR, start)
+                if ((index).equal?(-1))
+                  index = length_
+                end
+                filter = extensions.substring(start, index).trim
+                if ((filter == "*") || (filter == "*.*"))
+                  return 1
+                end
+                if (filter.starts_with("*."))
+                  filter = RJava.cast_to_string(filter.substring(2))
+                end
+                if ((filter.to_lower_case == extension.to_lower_case))
+                  return 1
+                end
+                start = index + 1
+              end
+            end
+            return 0
+          end
+        end
+      end
+      return 1
+    end
+    
+    typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
+    # long
+    # long
+    # long
+    def send_selection(id, sel, arg)
+      @panel.validate_visible_columns
     end
     
     typesig { [String] }

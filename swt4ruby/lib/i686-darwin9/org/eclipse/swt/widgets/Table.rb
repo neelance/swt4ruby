@@ -1,6 +1,6 @@
 require "rjava"
 
-# Copyright (c) 2000, 2008 IBM Corporation and others.
+# Copyright (c) 2000, 2009 IBM Corporation and others.
 # All rights reserved. This program and the accompanying materials
 # are made available under the terms of the Eclipse Public License v1.0
 # which accompanies this distribution, and is available at
@@ -13,19 +13,11 @@ module Org::Eclipse::Swt::Widgets
     class_module.module_eval {
       include ::Java::Lang
       include ::Org::Eclipse::Swt::Widgets
-      include_const ::Org::Eclipse::Swt::Internal::Carbon, :CFRange
-      include_const ::Org::Eclipse::Swt::Internal::Carbon, :OS
-      include_const ::Org::Eclipse::Swt::Internal::Carbon, :DataBrowserCallbacks
-      include_const ::Org::Eclipse::Swt::Internal::Carbon, :DataBrowserCustomCallbacks
-      include_const ::Org::Eclipse::Swt::Internal::Carbon, :DataBrowserListViewColumnDesc
-      include_const ::Org::Eclipse::Swt::Internal::Carbon, :DataBrowserListViewHeaderDesc
-      include_const ::Org::Eclipse::Swt::Internal::Carbon, :DataBrowserAccessibilityItemInfo
-      include_const ::Org::Eclipse::Swt::Internal::Carbon, :HMHelpContentRec
-      include_const ::Org::Eclipse::Swt::Internal::Carbon, :Rect
-      include_const ::Org::Eclipse::Swt::Internal::Carbon, :CGPoint
       include ::Org::Eclipse::Swt
+      include ::Org::Eclipse::Swt::Accessibility
       include ::Org::Eclipse::Swt::Events
       include ::Org::Eclipse::Swt::Graphics
+      include ::Org::Eclipse::Swt::Internal::Cocoa
     }
   end
   
@@ -76,6 +68,7 @@ module Org::Eclipse::Swt::Widgets
   # @see <a href="http://www.eclipse.org/swt/snippets/#table">Table, TableItem, TableColumn snippets</a>
   # @see <a href="http://www.eclipse.org/swt/examples.php">SWT Example: ControlExample</a>
   # @see <a href="http://www.eclipse.org/swt/">Sample code and further information</a>
+  # @noextend This class is not intended to be subclassed by clients.
   class Table < TableImports.const_get :Composite
     include_class_members TableImports
     
@@ -91,35 +84,47 @@ module Org::Eclipse::Swt::Widgets
     alias_method :attr_columns=, :columns=
     undef_method :columns=
     
-    attr_accessor :current_item
-    alias_method :attr_current_item, :current_item
-    undef_method :current_item
-    alias_method :attr_current_item=, :current_item=
-    undef_method :current_item=
-    
     attr_accessor :sort_column
     alias_method :attr_sort_column, :sort_column
     undef_method :sort_column
     alias_method :attr_sort_column=, :sort_column=
     undef_method :sort_column=
     
-    attr_accessor :paint_gc
-    alias_method :attr_paint_gc, :paint_gc
-    undef_method :paint_gc
-    alias_method :attr_paint_gc=, :paint_gc=
-    undef_method :paint_gc=
+    attr_accessor :current_item
+    alias_method :attr_current_item, :current_item
+    undef_method :current_item
+    alias_method :attr_current_item=, :current_item=
+    undef_method :current_item=
     
-    attr_accessor :sort_direction
-    alias_method :attr_sort_direction, :sort_direction
-    undef_method :sort_direction
-    alias_method :attr_sort_direction=, :sort_direction=
-    undef_method :sort_direction=
+    attr_accessor :header_view
+    alias_method :attr_header_view, :header_view
+    undef_method :header_view
+    alias_method :attr_header_view=, :header_view=
+    undef_method :header_view=
     
-    attr_accessor :item_count
-    alias_method :attr_item_count, :item_count
-    undef_method :item_count
-    alias_method :attr_item_count=, :item_count=
-    undef_method :item_count=
+    attr_accessor :first_column
+    alias_method :attr_first_column, :first_column
+    undef_method :first_column
+    alias_method :attr_first_column=, :first_column=
+    undef_method :first_column=
+    
+    attr_accessor :check_column
+    alias_method :attr_check_column, :check_column
+    undef_method :check_column
+    alias_method :attr_check_column=, :check_column=
+    undef_method :check_column=
+    
+    attr_accessor :data_cell
+    alias_method :attr_data_cell, :data_cell
+    undef_method :data_cell
+    alias_method :attr_data_cell=, :data_cell=
+    undef_method :data_cell=
+    
+    attr_accessor :button_cell
+    alias_method :attr_button_cell, :button_cell
+    undef_method :button_cell
+    alias_method :attr_button_cell=, :button_cell=
+    undef_method :button_cell=
     
     attr_accessor :column_count
     alias_method :attr_column_count, :column_count
@@ -127,35 +132,11 @@ module Org::Eclipse::Swt::Widgets
     alias_method :attr_column_count=, :column_count=
     undef_method :column_count=
     
-    attr_accessor :column_id
-    alias_method :attr_column_id, :column_id
-    undef_method :column_id
-    alias_method :attr_column_id=, :column_id=
-    undef_method :column_id=
-    
-    attr_accessor :id_count
-    alias_method :attr_id_count, :id_count
-    undef_method :id_count
-    alias_method :attr_id_count=, :id_count=
-    undef_method :id_count=
-    
-    attr_accessor :anchor_first
-    alias_method :attr_anchor_first, :anchor_first
-    undef_method :anchor_first
-    alias_method :attr_anchor_first=, :anchor_first=
-    undef_method :anchor_first=
-    
-    attr_accessor :anchor_last
-    alias_method :attr_anchor_last, :anchor_last
-    undef_method :anchor_last
-    alias_method :attr_anchor_last=, :anchor_last=
-    undef_method :anchor_last=
-    
-    attr_accessor :header_height
-    alias_method :attr_header_height, :header_height
-    undef_method :header_height
-    alias_method :attr_header_height=, :header_height=
-    undef_method :header_height=
+    attr_accessor :item_count
+    alias_method :attr_item_count, :item_count
+    undef_method :item_count
+    alias_method :attr_item_count=, :item_count=
+    undef_method :item_count=
     
     attr_accessor :last_index_of
     alias_method :attr_last_index_of, :last_index_of
@@ -163,17 +144,17 @@ module Org::Eclipse::Swt::Widgets
     alias_method :attr_last_index_of=, :last_index_of=
     undef_method :last_index_of=
     
+    attr_accessor :sort_direction
+    alias_method :attr_sort_direction, :sort_direction
+    undef_method :sort_direction
+    alias_method :attr_sort_direction=, :sort_direction=
+    undef_method :sort_direction=
+    
     attr_accessor :ignore_select
     alias_method :attr_ignore_select, :ignore_select
     undef_method :ignore_select
     alias_method :attr_ignore_select=, :ignore_select=
     undef_method :ignore_select=
-    
-    attr_accessor :was_selected
-    alias_method :attr_was_selected, :was_selected
-    undef_method :was_selected
-    alias_method :attr_was_selected=, :was_selected=
-    undef_method :was_selected=
     
     attr_accessor :fix_scroll_width
     alias_method :attr_fix_scroll_width, :fix_scroll_width
@@ -181,11 +162,11 @@ module Org::Eclipse::Swt::Widgets
     alias_method :attr_fix_scroll_width=, :fix_scroll_width=
     undef_method :fix_scroll_width=
     
-    attr_accessor :draw_background
-    alias_method :attr_draw_background, :draw_background
-    undef_method :draw_background
-    alias_method :attr_draw_background=, :draw_background=
-    undef_method :draw_background=
+    attr_accessor :draw_expansion
+    alias_method :attr_draw_expansion, :draw_expansion
+    undef_method :draw_expansion
+    alias_method :attr_draw_expansion=, :draw_expansion=
+    undef_method :draw_expansion=
     
     attr_accessor :image_bounds
     alias_method :attr_image_bounds, :image_bounds
@@ -193,45 +174,29 @@ module Org::Eclipse::Swt::Widgets
     alias_method :attr_image_bounds=, :image_bounds=
     undef_method :image_bounds=
     
-    attr_accessor :show_index
-    alias_method :attr_show_index, :show_index
-    undef_method :show_index
-    alias_method :attr_show_index=, :show_index=
-    undef_method :show_index=
-    
-    attr_accessor :last_hittest
-    alias_method :attr_last_hittest, :last_hittest
-    undef_method :last_hittest
-    alias_method :attr_last_hittest=, :last_hittest=
-    undef_method :last_hittest=
-    
-    attr_accessor :last_hittest_column
-    alias_method :attr_last_hittest_column, :last_hittest_column
-    undef_method :last_hittest_column
-    alias_method :attr_last_hittest_column=, :last_hittest_column=
-    undef_method :last_hittest_column=
-    
     class_module.module_eval {
-      const_set_lazy(:CHECK_COLUMN_ID) { 1024 }
-      const_attr_reader  :CHECK_COLUMN_ID
       
-      const_set_lazy(:COLUMN_ID) { 1025 }
-      const_attr_reader  :COLUMN_ID
+      def next_id
+        defined?(@@next_id) ? @@next_id : @@next_id= 0
+      end
+      alias_method :attr_next_id, :next_id
       
-      const_set_lazy(:GRID_WIDTH) { 1 }
-      const_attr_reader  :GRID_WIDTH
+      def next_id=(value)
+        @@next_id = value
+      end
+      alias_method :attr_next_id=, :next_id=
       
-      const_set_lazy(:ICON_AND_TEXT_GAP) { 4 }
-      const_attr_reader  :ICON_AND_TEXT_GAP
+      const_set_lazy(:FIRST_COLUMN_MINIMUM_WIDTH) { 5 }
+      const_attr_reader  :FIRST_COLUMN_MINIMUM_WIDTH
       
-      const_set_lazy(:CELL_CONTENT_INSET) { 12 }
-      const_attr_reader  :CELL_CONTENT_INSET
+      const_set_lazy(:IMAGE_GAP) { 3 }
+      const_attr_reader  :IMAGE_GAP
       
-      const_set_lazy(:BORDER_INSET) { 1 }
-      const_attr_reader  :BORDER_INSET
+      const_set_lazy(:TEXT_GAP) { 2 }
+      const_attr_reader  :TEXT_GAP
       
-      const_set_lazy(:AX_ATTRIBUTES) { Array.typed(String).new([OS.attr_k_axchildren_attribute, OS.attr_k_axtitle_attribute, ]) }
-      const_attr_reader  :AX_ATTRIBUTES
+      const_set_lazy(:CELL_GAP) { 1 }
+      const_attr_reader  :CELL_GAP
     }
     
     typesig { [Composite, ::Java::Int] }
@@ -270,27 +235,50 @@ module Org::Eclipse::Swt::Widgets
     def initialize(parent, style)
       @items = nil
       @columns = nil
-      @current_item = nil
       @sort_column = nil
-      @paint_gc = nil
-      @sort_direction = 0
-      @item_count = 0
+      @current_item = nil
+      @header_view = nil
+      @first_column = nil
+      @check_column = nil
+      @data_cell = nil
+      @button_cell = nil
       @column_count = 0
-      @column_id = 0
-      @id_count = 0
-      @anchor_first = 0
-      @anchor_last = 0
-      @header_height = 0
+      @item_count = 0
       @last_index_of = 0
+      @sort_direction = 0
       @ignore_select = false
-      @was_selected = false
       @fix_scroll_width = false
-      @draw_background = false
+      @draw_expansion = false
       @image_bounds = nil
-      @show_index = 0
-      @last_hittest = 0
-      @last_hittest_column = 0
       super(parent, check_style(style))
+    end
+    
+    typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
+    # long
+    # long
+    # long
+    # long
+    def accessibility_attribute_value(id, sel, arg0)
+      if (!(self.attr_accessible).nil?)
+        attribute = NSString.new(arg0)
+        return_value = self.attr_accessible.internal_accessibility_attribute_value(attribute, ACC::CHILDID_SELF)
+        if (!(return_value).nil?)
+          return return_value.attr_id
+        end
+      end
+      attribute_name = NSString.new(arg0)
+      # Accessibility Verifier queries for a title or description.  NSTableView doesn't
+      # seem to return either, so we return a default description value here.
+      if (attribute_name.is_equal_to_string(OS::NSAccessibilityDescriptionAttribute))
+        return NSString.string_with("").attr_id
+      end
+      return super(id, sel, arg0)
+    end
+    
+    typesig { [::Java::Int, Listener] }
+    def __add_listener(event_type, listener)
+      super(event_type, listener)
+      clear_cached_width(@items)
     end
     
     typesig { [SelectionListener] }
@@ -329,18 +317,6 @@ module Org::Eclipse::Swt::Widgets
       add_listener(SWT::DefaultSelection, typed_listener)
     end
     
-    typesig { [::Java::Int, Listener] }
-    def __add_listener(event_type, listener)
-      super(event_type, listener)
-      i = 0
-      while i < @items.attr_length
-        if (!(@items[i]).nil?)
-          @items[i].attr_width = -1
-        end
-        i += 1
-      end
-    end
-    
     typesig { [::Java::Int] }
     def __get_item(index)
       if (((self.attr_style & SWT::VIRTUAL)).equal?(0))
@@ -352,51 +328,89 @@ module Org::Eclipse::Swt::Widgets
       return @items[index] = TableItem.new(self, SWT::NULL, -1, false)
     end
     
-    typesig { [::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int] }
-    def call_paint_event_handler(control, damage_rgn, visible_rgn, the_event, next_handler)
-      # Feature in the Macintosh.  The draw item proc is not called if the column width
-      # is zero. This means that the SWT.MeasureItem listener is not called and the column
-      # does not get wider ever.  The fix is to change the column width to one.
-      if ((@column_count).equal?(0) && (hooks(SWT::MeasureItem) || hooks(SWT::EraseItem) || hooks(SWT::PaintItem)))
-        width = Array.typed(::Java::Short).new(1) { 0 }
-        OS._get_data_browser_table_view_named_column_width(self.attr_handle, @column_id, width)
-        if ((width[0]).equal?(0))
-          OS._set_data_browser_table_view_named_column_width(self.attr_handle, @column_id, RJava.cast_to_short(1))
+    typesig { [Array.typed(TableItem), ::Java::Int, SwtGC] }
+    def calculate_width(items, index, gc)
+      width = 0
+      i = 0
+      while i < @item_count
+        item = items[i]
+        if (!(item).nil? && item.attr_cached)
+          width = Math.max(width, item.calculate_width(index, gc))
         end
+        i += 1
       end
-      current_gc = @paint_gc
-      if ((current_gc).nil?)
-        data = SwtGCData.new
-        data.attr_paint_event = the_event
-        data.attr_visible_rgn = visible_rgn
-        @paint_gc = SwtGC.carbon_new(self, data)
-      end
-      @fix_scroll_width = false
-      @draw_background = !(find_background_control).nil?
-      result = super(control, damage_rgn, visible_rgn, the_event, next_handler)
-      if ((@item_count).equal?(0) && @draw_background)
-        @draw_background = false
-        rect = get_client_area
-        header_height = get_header_height
-        rect.attr_y += header_height
-        rect.attr_height -= header_height
-        fill_background(self.attr_handle, @paint_gc.attr_handle, rect)
-      end
-      if (@fix_scroll_width)
-        @fix_scroll_width = false
-        if (set_scroll_width(@items, true))
-          redraw
-        end
-      end
-      if ((current_gc).nil?)
-        @paint_gc.dispose
-        @paint_gc = nil
-      end
-      return result
+      return width
     end
     
-    typesig { [TableItem, ::Java::Boolean] }
-    def check_data(item, redraw_)
+    typesig { [::Java::Int, ::Java::Int] }
+    # long
+    # long
+    def cell_size(id, sel)
+      size = super(id, sel)
+      image = NSCell.new(id).image
+      if (!(image).nil?)
+        size.attr_width += @image_bounds.attr_width + IMAGE_GAP
+      end
+      if (hooks(SWT::MeasureItem))
+        # long
+        # long
+        out_value = Array.typed(::Java::Int).new(1) { 0 }
+        OS.object_get_instance_variable(id, Display::SWT_ROW, out_value)
+        # long
+        row_index = out_value[0]
+        # 64
+        item = __get_item(RJava.cast_to_int(row_index))
+        OS.object_get_instance_variable(id, Display::SWT_COLUMN, out_value)
+        # long
+        table_column = out_value[0]
+        column_index = 0
+        i = 0
+        while i < @column_count
+          if ((@columns[i].attr_ns_column.attr_id).equal?(table_column))
+            column_index = i
+            break
+          end
+          i += 1
+        end
+        send_measure_item(item, column_index, size)
+      end
+      return size
+    end
+    
+    typesig { [::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int] }
+    # long
+    # long
+    # long
+    # long
+    def can_drag_rows_with_indexes_at_point(id, sel, arg0, arg1)
+      click_point = NSPoint.new
+      OS.memmove(click_point, arg1, NSPoint.attr_sizeof)
+      table = self.attr_view
+      # If the current row is not selected and the user is not attempting to modify the selection, select the row first.
+      # long
+      row = table.row_at_point(click_point)
+      # long
+      modifiers = NSApplication.shared_application.current_event.modifier_flags
+      drag = !((self.attr_state & DRAG_DETECT)).equal?(0) && hooks(SWT::DragDetect)
+      if (drag)
+        if (!table.is_row_selected(row) && ((modifiers & (OS::NSCommandKeyMask | OS::NSShiftKeyMask | OS::NSAlternateKeyMask))).equal?(0))
+          set = NSIndexSet.new.alloc
+          set = set.init_with_index(row)
+          table.select_row_indexes(set, false)
+          set.release
+        end
+      end
+      # The clicked row must be selected to initiate a drag.
+      return (table.is_row_selected(row) && drag)
+    end
+    
+    typesig { [TableItem] }
+    def check_data(item)
+      return check_data(item, index_of(item))
+    end
+    
+    typesig { [TableItem, ::Java::Int] }
+    def check_data(item, index)
       if (item.attr_cached)
         return true
       end
@@ -412,54 +426,11 @@ module Org::Eclipse::Swt::Widgets
         if (is_disposed || item.is_disposed)
           return false
         end
-        if (redraw_)
-          if (!set_scroll_width(item))
-            item.redraw(OS.attr_k_data_browser_no_item)
-          end
+        if (!set_scroll_width(item))
+          item.redraw(-1)
         end
       end
       return true
-    end
-    
-    typesig { [::Java::Boolean] }
-    def check_items(set_scroll_width_)
-      count = Array.typed(::Java::Int).new(1) { 0 }
-      if (!(OS._get_data_browser_item_count(self.attr_handle, OS.attr_k_data_browser_no_item, true, OS.attr_k_data_browser_item_any_state, count)).equal?(OS.attr_no_err))
-        error(SWT::ERROR_CANNOT_GET_COUNT)
-      end
-      if (!(@item_count).equal?(count[0]))
-        # Feature in the Mac. When AddDataBrowserItems() is used
-        # to add items, item notification callbacks are issued with
-        # the message kDataBrowserItemAdded.  When many items are
-        # added, this is slow.  The fix is to temporarily remove
-        # the item notification callback.
-        callbacks = DataBrowserCallbacks.new
-        OS._get_data_browser_callbacks(self.attr_handle, callbacks)
-        callbacks.attr_v1_item_notification_callback = 0
-        OS._set_data_browser_callbacks(self.attr_handle, callbacks)
-        delta = @item_count - count[0]
-        if (delta < 1024)
-          ids = Array.typed(::Java::Int).new(delta) { 0 }
-          i = 0
-          while i < ids.attr_length
-            ids[i] = count[0] + i + 1
-            i += 1
-          end
-          if (!(OS._add_data_browser_items(self.attr_handle, OS.attr_k_data_browser_no_item, ids.attr_length, ids, OS.attr_k_data_browser_item_no_property)).equal?(OS.attr_no_err))
-            error(SWT::ERROR_ITEM_NOT_ADDED)
-          end
-          OS._update_data_browser_items(self.attr_handle, 0, 0, nil, OS.attr_k_data_browser_item_no_property, OS.attr_k_data_browser_no_item)
-        else
-          if (!(OS._add_data_browser_items(self.attr_handle, 0, @item_count, nil, OS.attr_k_data_browser_item_no_property)).equal?(OS.attr_no_err))
-            error(SWT::ERROR_ITEM_NOT_ADDED)
-          end
-        end
-        callbacks.attr_v1_item_notification_callback = self.attr_display.attr_item_notification_proc
-        OS._set_data_browser_callbacks(self.attr_handle, callbacks)
-      end
-      if (set_scroll_width_)
-        set_scroll_width(@items, true)
-      end
     end
     
     class_module.module_eval {
@@ -475,6 +446,8 @@ module Org::Eclipse::Swt::Widgets
         if (((style & SWT::NO_SCROLL)).equal?(0))
           style |= SWT::H_SCROLL | SWT::V_SCROLL
         end
+        # This platform is always FULL_SELECTION
+        style |= SWT::FULL_SELECTION
         return check_bits(style, SWT::SINGLE, SWT::MULTI, 0, 0, 0, 0)
       end
     }
@@ -516,9 +489,8 @@ module Org::Eclipse::Swt::Widgets
         if (!(@current_item).equal?(item))
           item.clear
         end
-        if ((@current_item).nil? && (self.attr_draw_count).equal?(0))
-          id = Array.typed(::Java::Int).new([get_id(index)])
-          OS._update_data_browser_items(self.attr_handle, 0, id.attr_length, id, OS.attr_k_data_browser_item_no_property, OS.attr_k_data_browser_no_item)
+        if ((@current_item).nil?)
+          item.redraw(-1)
         end
         set_scroll_width(item)
       end
@@ -633,10 +605,24 @@ module Org::Eclipse::Swt::Widgets
         end
         i += 1
       end
-      if ((@current_item).nil? && (self.attr_draw_count).equal?(0))
-        OS._update_data_browser_items(self.attr_handle, 0, 0, nil, OS.attr_k_data_browser_item_no_property, OS.attr_k_data_browser_no_item)
+      if ((@current_item).nil? && is_drawing)
+        self.attr_view.set_needs_display(true)
       end
       set_scroll_width(@items, true)
+    end
+    
+    typesig { [Array.typed(TableItem)] }
+    def clear_cached_width(items)
+      if ((items).nil?)
+        return
+      end
+      i = 0
+      while i < items.attr_length
+        if (!(items[i]).nil?)
+          items[i].attr_width = -1
+        end
+        i += 1
+      end
     end
     
     typesig { [::Java::Int, ::Java::Int, ::Java::Boolean] }
@@ -651,18 +637,9 @@ module Org::Eclipse::Swt::Widgets
             i += 1
           end
         else
-          column_width = 0
           gc = SwtGC.new(self)
-          i = 0
-          while i < @item_count
-            item = @items[i]
-            if (!(item).nil?)
-              column_width = Math.max(column_width, item.calculate_width(0, gc))
-            end
-            i += 1
-          end
+          width += calculate_width(@items, 0, gc) + CELL_GAP
           gc.dispose
-          width += column_width + get_inset_width
         end
         if (!((self.attr_style & SWT::CHECK)).equal?(0))
           width += get_check_column_width
@@ -686,106 +663,111 @@ module Org::Eclipse::Swt::Widgets
       return Point.new(rect.attr_width, rect.attr_height)
     end
     
-    typesig { [::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int] }
-    def compute_trim(x, y, width, height)
-      check_widget
-      border = get_border_width
-      rect = Rect.new
-      OS._get_data_browser_scroll_bar_inset(self.attr_handle, rect)
-      x -= rect.attr_left + border
-      y -= rect.attr_top + border
-      width += rect.attr_left + rect.attr_right + border + border
-      height += rect.attr_top + rect.attr_bottom + border + border
-      return Rectangle.new(x, y, width, height)
-    end
-    
-    typesig { [::Java::Int, ::Java::Int] }
-    def contains(shell_x, shell_y)
-      pt = CGPoint.new
-      content_view = Array.typed(::Java::Int).new(1) { 0 }
-      OS._hiview_find_by_id(OS._hiview_get_root(OS._get_control_owner(self.attr_handle)), OS.k_hiview_window_content_id, content_view)
-      OS._hiview_convert_point(pt, self.attr_handle, content_view[0])
-      x = shell_x - RJava.cast_to_int(pt.attr_x)
-      y = shell_y - RJava.cast_to_int(pt.attr_y)
-      if (y < get_header_height)
-        return false
+    typesig { [TableItem, ::Java::Int] }
+    def create_column(item, index)
+      strings = item.attr_strings
+      if (!(strings).nil?)
+        temp = Array.typed(String).new(@column_count) { nil }
+        System.arraycopy(strings, 0, temp, 0, index)
+        System.arraycopy(strings, index, temp, index + 1, @column_count - index - 1)
+        temp[index] = ""
+        item.attr_strings = temp
       end
-      return get_client_area.contains(x, y)
+      if ((index).equal?(0))
+        item.attr_text = ""
+      end
+      images = item.attr_images
+      if (!(images).nil?)
+        temp = Array.typed(Image).new(@column_count) { nil }
+        System.arraycopy(images, 0, temp, 0, index)
+        System.arraycopy(images, index, temp, index + 1, @column_count - index - 1)
+        item.attr_images = temp
+      end
+      if ((index).equal?(0))
+        item.attr_image = nil
+      end
+      cell_background = item.attr_cell_background
+      if (!(cell_background).nil?)
+        temp = Array.typed(Color).new(@column_count) { nil }
+        System.arraycopy(cell_background, 0, temp, 0, index)
+        System.arraycopy(cell_background, index, temp, index + 1, @column_count - index - 1)
+        item.attr_cell_background = temp
+      end
+      cell_foreground = item.attr_cell_foreground
+      if (!(cell_foreground).nil?)
+        temp = Array.typed(Color).new(@column_count) { nil }
+        System.arraycopy(cell_foreground, 0, temp, 0, index)
+        System.arraycopy(cell_foreground, index, temp, index + 1, @column_count - index - 1)
+        item.attr_cell_foreground = temp
+      end
+      cell_font = item.attr_cell_font
+      if (!(cell_font).nil?)
+        temp = Array.typed(Font).new(@column_count) { nil }
+        System.arraycopy(cell_font, 0, temp, 0, index)
+        System.arraycopy(cell_font, index, temp, index + 1, @column_count - index - 1)
+        item.attr_cell_font = temp
+      end
     end
     
     typesig { [] }
     def create_handle
-      @column_id = COLUMN_ID
-      out_control = Array.typed(::Java::Int).new(1) { 0 }
-      window = OS._get_control_owner(self.attr_parent.attr_handle)
-      OS._create_data_browser_control(window, nil, OS.attr_k_data_browser_list_view, out_control)
-      OS._set_automatic_control_drag_tracking_enabled_for_window(window, true)
-      if ((out_control[0]).equal?(0))
-        error(SWT::ERROR_NO_HANDLES)
+      scroll_widget = SWTScrollView.new.alloc
+      scroll_widget.init
+      scroll_widget.set_has_horizontal_scroller(!((self.attr_style & SWT::H_SCROLL)).equal?(0))
+      scroll_widget.set_has_vertical_scroller(!((self.attr_style & SWT::V_SCROLL)).equal?(0))
+      scroll_widget.set_autohides_scrollers(true)
+      scroll_widget.set_border_type(has_border ? OS::NSBezelBorder : OS::NSNoBorder)
+      widget = SWTTableView.new.alloc
+      widget.init
+      widget.set_allows_multiple_selection(!((self.attr_style & SWT::MULTI)).equal?(0))
+      widget.set_allows_column_reordering(false)
+      widget.set_data_source(widget)
+      widget.set_delegate(widget)
+      widget.set_column_autoresizing_style(OS::NSTableViewNoColumnAutoresizing)
+      spacing = NSSize.new
+      spacing.attr_width = spacing.attr_height = CELL_GAP
+      widget.set_intercell_spacing(spacing)
+      widget.set_double_action(OS.attr_sel_send_double_selection)
+      if (!has_border)
+        widget.set_focus_ring_type(OS::NSFocusRingTypeNone)
       end
-      self.attr_handle = out_control[0]
-      if (!draw_focus_ring)
-        OS._set_control_data(self.attr_handle, OS.attr_k_control_entire_control, OS.attr_k_control_data_browser_includes_frame_and_focus_tag, 1, Array.typed(::Java::Byte).new([0]))
-      end
-      selection_flags = !((self.attr_style & SWT::SINGLE)).equal?(0) ? OS.attr_k_data_browser_select_only_one | OS.attr_k_data_browser_never_empty_selection_set : OS.attr_k_data_browser_cmd_toggles_selection
-      OS._set_data_browser_selection_flags(self.attr_handle, selection_flags)
-      height = Array.typed(::Java::Short).new(1) { 0 }
-      OS._get_data_browser_list_view_header_btn_height(self.attr_handle, height)
-      @header_height = height[0]
-      OS._set_data_browser_list_view_header_btn_height(self.attr_handle, RJava.cast_to_short(0))
-      OS._set_data_browser_has_scroll_bars(self.attr_handle, !((self.attr_style & SWT::H_SCROLL)).equal?(0), !((self.attr_style & SWT::V_SCROLL)).equal?(0))
-      if (OS::VERSION >= 0x1040)
-        OS._data_browser_set_metric(self.attr_handle, OS.attr_k_data_browser_metric_cell_content_inset, false, 4)
-      end
-      position = 0
+      @header_view = SWTTableHeaderView.new.alloc.init
+      widget.set_header_view(nil)
+      str = NSString.string_with("") # $NON-NLS-1$
       if (!((self.attr_style & SWT::CHECK)).equal?(0))
-        check_column = DataBrowserListViewColumnDesc.new
-        check_column.attr_header_btn_desc_version = OS.attr_k_data_browser_list_view_latest_header_desc
-        check_column.attr_property_desc_property_id = CHECK_COLUMN_ID
-        check_column.attr_property_desc_property_type = OS.attr_k_data_browser_checkbox_type
-        check_column.attr_property_desc_property_flags = OS.attr_k_data_browser_property_is_mutable
-        check_width = get_check_column_width
-        check_column.attr_header_btn_desc_minimum_width = RJava.cast_to_short(check_width)
-        check_column.attr_header_btn_desc_maximum_width = RJava.cast_to_short(check_width)
-        check_column.attr_header_btn_desc_initial_order = RJava.cast_to_short(OS.attr_k_data_browser_order_increasing)
-        OS._add_data_browser_list_view_column(self.attr_handle, check_column, ((position += 1) - 1))
+        @check_column = NSTableColumn.new.alloc
+        @check_column = @check_column.init_with_identifier(NSString.string_with(String.value_of((self.attr_next_id += 1))))
+        @check_column.header_cell.set_title(str)
+        widget.add_table_column(@check_column)
+        @check_column.set_resizing_mask(OS::NSTableColumnNoResizing)
+        @check_column.set_editable(false)
+        # long
+        cls = NSButton.cell_class
+        # use our custom cell class
+        @button_cell = NSButtonCell.new(OS.class_create_instance(cls, 0))
+        @button_cell.init
+        @check_column.set_data_cell(@button_cell)
+        @button_cell.set_button_type(OS::NSSwitchButton)
+        @button_cell.set_image_position(OS::NSImageOnly)
+        @button_cell.set_allows_mixed_state(true)
+        @check_column.set_width(get_check_column_width)
       end
-      column = DataBrowserListViewColumnDesc.new
-      column.attr_header_btn_desc_version = OS.attr_k_data_browser_list_view_latest_header_desc
-      column.attr_property_desc_property_id = @column_id
-      column.attr_property_desc_property_type = OS.attr_k_data_browser_custom_type
-      column.attr_property_desc_property_flags = OS.attr_k_data_browser_list_view_selection_column | OS.attr_k_data_browser_default_property_flags | OS.attr_k_data_browser_list_view_sortable_column
-      column.attr_header_btn_desc_maximum_width = 0x7fff
-      column.attr_header_btn_desc_initial_order = RJava.cast_to_short(OS.attr_k_data_browser_order_increasing)
-      OS._add_data_browser_list_view_column(self.attr_handle, column, position)
-      OS._set_data_browser_table_view_named_column_width(self.attr_handle, @column_id, RJava.cast_to_short(0))
-      # Feature in the Macintosh.  Scroll bars are not created until
-      # the data browser needs to draw them.  The fix is to force the scroll
-      # bars to be created by temporarily giving the widget a size, drawing
-      # it on a offscreen buffer to avoid flashes and then restoring it to
-      # size zero.
-      if (OS::VERSION < 0x1040)
-        OS._hiview_set_drawing_enabled(self.attr_handle, false)
-        size = 50
-        rect = Rect.new
-        rect.attr_right = rect.attr_bottom = RJava.cast_to_short(size)
-        OS._set_control_bounds(self.attr_handle, rect)
-        bpl = size * 4
-        g_world = Array.typed(::Java::Int).new(1) { 0 }
-        data = OS._new_ptr(bpl * size)
-        OS._new_gworld_from_ptr(g_world, OS.attr_k32argbpixel_format, rect, 0, 0, 0, data, bpl)
-        cur_port = Array.typed(::Java::Int).new(1) { 0 }
-        cur_gworld = Array.typed(::Java::Int).new(1) { 0 }
-        OS._get_gworld(cur_port, cur_gworld)
-        OS._set_gworld(g_world[0], cur_gworld[0])
-        OS._draw_control_in_current_port(self.attr_handle)
-        OS._set_gworld(cur_port[0], cur_gworld[0])
-        OS._dispose_gworld(g_world[0])
-        OS._dispose_ptr(data)
-        rect.attr_right = rect.attr_bottom = RJava.cast_to_short(0)
-        OS._set_control_bounds(self.attr_handle, rect)
-        OS._hiview_set_drawing_enabled(self.attr_handle, true)
-      end
+      @first_column = NSTableColumn.new.alloc
+      @first_column = @first_column.init_with_identifier(NSString.string_with(String.value_of((self.attr_next_id += 1))))
+      # Feature in Cocoa.  If a column's width is too small to show any content
+      # then tableView_objectValueForTableColumn_row is never invoked to
+      # query for item values, which is a problem for VIRTUAL Tables.  The
+      # workaround is to ensure that, for 0-column Tables, the internal first
+      # column always has a minimal width that makes this call come in.
+      @first_column.set_min_width(FIRST_COLUMN_MINIMUM_WIDTH)
+      @first_column.set_width(0)
+      @first_column.header_cell.set_title(str)
+      widget.add_table_column(@first_column)
+      @data_cell = SWTImageTextCell.new.alloc.init
+      @data_cell.set_line_break_mode(OS::NSLineBreakByClipping)
+      @first_column.set_data_cell(@data_cell)
+      self.attr_scroll_view = scroll_widget
+      self.attr_view = widget
     end
     
     typesig { [TableColumn, ::Java::Int] }
@@ -793,91 +775,43 @@ module Org::Eclipse::Swt::Widgets
       if (!(0 <= index && index <= @column_count))
         error(SWT::ERROR_INVALID_RANGE)
       end
-      column.attr_id = @column_id + ((@id_count += 1) - 1)
-      position = index + (!((self.attr_style & SWT::CHECK)).equal?(0) ? 1 : 0)
-      if (!(@column_count).equal?(0))
-        desc = DataBrowserListViewColumnDesc.new
-        desc.attr_header_btn_desc_version = OS.attr_k_data_browser_list_view_latest_header_desc
-        desc.attr_property_desc_property_id = column.attr_id
-        desc.attr_property_desc_property_type = OS.attr_k_data_browser_custom_type
-        desc.attr_property_desc_property_flags = OS.attr_k_data_browser_list_view_selection_column | OS.attr_k_data_browser_default_property_flags | OS.attr_k_data_browser_list_view_sortable_column
-        desc.attr_header_btn_desc_maximum_width = 0x7fff
-        desc.attr_header_btn_desc_initial_order = OS.attr_k_data_browser_order_increasing
-        desc.attr_header_btn_desc_btn_font_style_just = OS.attr_te_flush_left
-        if (!((self.attr_style & SWT::CENTER)).equal?(0))
-          desc.attr_header_btn_desc_btn_font_style_just = OS.attr_te_center
-        end
-        if (!((self.attr_style & SWT::RIGHT)).equal?(0))
-          desc.attr_header_btn_desc_btn_font_style_just = OS.attr_te_flush_right
-        end
-        desc.attr_header_btn_desc_btn_font_style_flags |= OS.attr_k_control_use_just_mask
-        OS._add_data_browser_list_view_column(self.attr_handle, desc, position)
-        OS._set_data_browser_table_view_named_column_width(self.attr_handle, column.attr_id, RJava.cast_to_short(0))
-      end
       if ((@column_count).equal?(@columns.attr_length))
         new_columns = Array.typed(TableColumn).new(@column_count + 4) { nil }
         System.arraycopy(@columns, 0, new_columns, 0, @columns.attr_length)
         @columns = new_columns
       end
+      ns_column = nil
+      if ((@column_count).equal?(0))
+        # TODO - clear attributes, alignment etc.
+        ns_column = @first_column
+        ns_column.set_min_width(0)
+        @first_column = nil
+      else
+        # TODO - set attributes, alignment etc.
+        ns_column = NSTableColumn.new.alloc
+        ns_column = ns_column.init_with_identifier(NSString.string_with(String.value_of((self.attr_next_id += 1))))
+        ns_column.set_min_width(0)
+        (self.attr_view).add_table_column(ns_column)
+        check_column = !((self.attr_style & SWT::CHECK)).equal?(0) ? 1 : 0
+        (self.attr_view).move_column(@column_count + check_column, index + check_column)
+        ns_column.set_data_cell(@data_cell)
+      end
+      column.create_jniref
+      header_cell_ = SWTTableHeaderCell.new.alloc.init
+      ns_column.set_header_cell(header_cell_)
+      self.attr_display.add_widget(header_cell_, column)
+      column.attr_ns_column = ns_column
+      ns_column.set_width(0)
       System.arraycopy(@columns, index, @columns, index + 1, ((@column_count += 1) - 1) - index)
       @columns[index] = column
-      if (@column_count > 1)
-        i = 0
-        while i < @item_count
-          item = @items[i]
-          if (!(item).nil?)
-            strings = item.attr_strings
-            if (!(strings).nil?)
-              temp = Array.typed(String).new(@column_count) { nil }
-              System.arraycopy(strings, 0, temp, 0, index)
-              System.arraycopy(strings, index, temp, index + 1, @column_count - index - 1)
-              temp[index] = ""
-              item.attr_strings = temp
-            end
-            if ((index).equal?(0))
-              item.attr_text = ""
-            end
-            images = item.attr_images
-            if (!(images).nil?)
-              temp = Array.typed(Image).new(@column_count) { nil }
-              System.arraycopy(images, 0, temp, 0, index)
-              System.arraycopy(images, index, temp, index + 1, @column_count - index - 1)
-              item.attr_images = temp
-            end
-            if ((index).equal?(0))
-              item.attr_image = nil
-            end
-            cell_background = item.attr_cell_background
-            if (!(cell_background).nil?)
-              temp = Array.typed(Color).new(@column_count) { nil }
-              System.arraycopy(cell_background, 0, temp, 0, index)
-              System.arraycopy(cell_background, index, temp, index + 1, @column_count - index - 1)
-              item.attr_cell_background = temp
-            end
-            cell_foreground = item.attr_cell_foreground
-            if (!(cell_foreground).nil?)
-              temp = Array.typed(Color).new(@column_count) { nil }
-              System.arraycopy(cell_foreground, 0, temp, 0, index)
-              System.arraycopy(cell_foreground, index, temp, index + 1, @column_count - index - 1)
-              item.attr_cell_foreground = temp
-            end
-            cell_font = item.attr_cell_font
-            if (!(cell_font).nil?)
-              temp = Array.typed(Font).new(@column_count) { nil }
-              System.arraycopy(cell_font, 0, temp, 0, index)
-              System.arraycopy(cell_font, index, temp, index + 1, @column_count - index - 1)
-              item.attr_cell_font = temp
-            end
-          end
-          i += 1
-        end
-      end
-      last_position = Array.typed(::Java::Int).new(1) { 0 }
       i = 0
-      while i < @column_count
-        c = @columns[i]
-        OS._get_data_browser_table_view_column_position(self.attr_handle, c.attr_id, last_position)
-        c.attr_last_position = last_position[0]
+      while i < @item_count
+        item = @items[i]
+        if (!(item).nil?)
+          if (@column_count > 1)
+            create_column(item, index)
+          end
+        end
         i += 1
       end
     end
@@ -887,34 +821,19 @@ module Org::Eclipse::Swt::Widgets
       if (!(0 <= index && index <= @item_count))
         error(SWT::ERROR_INVALID_RANGE)
       end
-      add = (self.attr_draw_count).equal?(0) || !(index).equal?(@item_count)
-      if (add)
-        check_items(false)
-        id = Array.typed(::Java::Int).new([@item_count + 1])
-        if (!(OS._add_data_browser_items(self.attr_handle, OS.attr_k_data_browser_no_item, 1, id, OS.attr_k_data_browser_item_no_property)).equal?(OS.attr_no_err))
-          error(SWT::ERROR_ITEM_NOT_ADDED)
-        end
-        if (!(index).equal?(@item_count))
-          fix_selection(index, true)
-        end
-      end
       if ((@item_count).equal?(@items.attr_length))
         # Grow the array faster when redraw is off
-        length = (self.attr_draw_count).equal?(0) ? @items.attr_length + 4 : Math.max(4, @items.attr_length * 3 / 2)
+        length = get_drawing ? @items.attr_length + 4 : Math.max(4, @items.attr_length * 3 / 2)
         new_items = Array.typed(TableItem).new(length) { nil }
         System.arraycopy(@items, 0, new_items, 0, @items.attr_length)
         @items = new_items
       end
       System.arraycopy(@items, index, @items, index + 1, ((@item_count += 1) - 1) - index)
       @items[index] = item
-      if (add)
-        OS._update_data_browser_items(self.attr_handle, 0, 0, nil, OS.attr_k_data_browser_item_no_property, OS.attr_k_data_browser_no_item)
+      (self.attr_view).note_number_of_rows_changed
+      if (!(index).equal?(@item_count))
+        fix_selection(index, true)
       end
-    end
-    
-    typesig { [::Java::Int] }
-    def create_scroll_bar(style)
-      return create_standard_bar(style)
     end
     
     typesig { [] }
@@ -922,25 +841,31 @@ module Org::Eclipse::Swt::Widgets
       super
       @items = Array.typed(TableItem).new(4) { nil }
       @columns = Array.typed(TableColumn).new(4) { nil }
-      @show_index = -1
     end
     
     typesig { [] }
     def default_background
-      return self.attr_display.get_system_color(SWT::COLOR_LIST_BACKGROUND)
+      return self.attr_display.get_widget_color(SWT::COLOR_LIST_BACKGROUND)
+    end
+    
+    typesig { [] }
+    def default_nsfont
+      return self.attr_display.attr_table_view_font
     end
     
     typesig { [] }
     def default_foreground
-      return self.attr_display.get_system_color(SWT::COLOR_LIST_FOREGROUND)
+      return self.attr_display.get_widget_color(SWT::COLOR_LIST_FOREGROUND)
     end
     
     typesig { [] }
-    def default_theme_font
-      if (self.attr_display.attr_small_fonts)
-        return OS.attr_k_theme_small_system_font
+    def deregister
+      super
+      self.attr_display.remove_widget(@header_view)
+      self.attr_display.remove_widget(@data_cell)
+      if (!(@button_cell).nil?)
+        self.attr_display.remove_widget(@button_cell)
       end
-      return OS.attr_k_theme_views_font
     end
     
     typesig { [::Java::Int] }
@@ -957,8 +882,10 @@ module Org::Eclipse::Swt::Widgets
     def deselect(index)
       check_widget
       if (0 <= index && index < @item_count)
-        ids = Array.typed(::Java::Int).new([get_id(index)])
-        deselect(ids, ids.attr_length)
+        widget = self.attr_view
+        @ignore_select = true
+        widget.deselect_row(index)
+        @ignore_select = false
       end
     end
     
@@ -978,21 +905,25 @@ module Org::Eclipse::Swt::Widgets
     # </ul>
     def deselect(start, end_)
       check_widget
-      # TODO - check range
+      if (start > end_)
+        return
+      end
+      if (end_ < 0 || start >= @item_count)
+        return
+      end
+      start = Math.max(0, start)
+      end_ = Math.min(@item_count - 1, end_)
       if ((start).equal?(0) && (end_).equal?(@item_count - 1))
         deselect_all
       else
-        length = end_ - start + 1
-        if (length <= 0)
-          return
-        end
-        ids = Array.typed(::Java::Int).new(length) { 0 }
-        i = 0
-        while i < length
-          ids[i] = get_id(end_ - i)
+        widget = self.attr_view
+        @ignore_select = true
+        i = start
+        while i <= end_
+          widget.deselect_row(i)
           i += 1
         end
-        deselect(ids, length)
+        @ignore_select = false
       end
     end
     
@@ -1017,36 +948,12 @@ module Org::Eclipse::Swt::Widgets
       if ((indices).nil?)
         error(SWT::ERROR_NULL_ARGUMENT)
       end
-      # TODO - check range
-      length = indices.attr_length
-      ids = Array.typed(::Java::Int).new(length) { 0 }
-      i = 0
-      while i < length
-        ids[i] = get_id(indices[length - i - 1])
-        i += 1
-      end
-      deselect(ids, length)
-    end
-    
-    typesig { [Array.typed(::Java::Int), ::Java::Int] }
-    def deselect(ids, count)
+      widget = self.attr_view
       @ignore_select = true
-      # Bug in the Macintosh.  When the DataBroswer selection flags includes
-      # both kDataBrowserNeverEmptySelectionSet and kDataBrowserSelectOnlyOne,
-      # two items are selected when SetDataBrowserSelectedItems() is called
-      # with kDataBrowserItemsAssign to assign a new seletion despite the fact
-      # that kDataBrowserSelectOnlyOne was specified.  The fix is to save and
-      # restore kDataBrowserNeverEmptySelectionSet around each call to
-      # SetDataBrowserSelectedItems().
-      selection_flags = nil
-      if (!((self.attr_style & SWT::SINGLE)).equal?(0))
-        selection_flags = Array.typed(::Java::Int).new(1) { 0 }
-        OS._get_data_browser_selection_flags(self.attr_handle, selection_flags)
-        OS._set_data_browser_selection_flags(self.attr_handle, selection_flags[0] & ~OS.attr_k_data_browser_never_empty_selection_set)
-      end
-      OS._set_data_browser_selected_items(self.attr_handle, count, ids, OS.attr_k_data_browser_items_remove)
-      if (!((self.attr_style & SWT::SINGLE)).equal?(0))
-        OS._set_data_browser_selection_flags(self.attr_handle, selection_flags[0])
+      i = 0
+      while i < indices.attr_length
+        widget.deselect_row(indices[i])
+        i += 1
       end
       @ignore_select = false
     end
@@ -1060,7 +967,10 @@ module Org::Eclipse::Swt::Widgets
     # </ul>
     def deselect_all
       check_widget
-      deselect(nil, 0)
+      widget = self.attr_view
+      @ignore_select = true
+      widget.deselect_all(nil)
+      @ignore_select = false
     end
     
     typesig { [TableColumn] }
@@ -1136,28 +1046,38 @@ module Org::Eclipse::Swt::Widgets
         end
         i += 1
       end
-      if ((@column_count).equal?(1))
-        @column_id = column.attr_id
-        @id_count = 0
-        desc = DataBrowserListViewHeaderDesc.new
-        desc.attr_version = OS.attr_k_data_browser_list_view_latest_header_desc
-        width = Array.typed(::Java::Short).new(1) { 0 }
-        OS._get_data_browser_table_view_named_column_width(self.attr_handle, @column_id, width)
-        desc.attr_minimum_width = desc.attr_maximum_width = width[0]
-        str = OS._cfstring_create_with_characters(OS.attr_k_cfallocator_default, nil, 0)
-        desc.attr_title_string = str
-        OS._set_data_browser_list_view_header_desc(self.attr_handle, @column_id, desc)
-        OS._cfrelease(str)
-      else
-        if (!(OS._remove_data_browser_table_view_column(self.attr_handle, column.attr_id)).equal?(OS.attr_no_err))
-          error(SWT::ERROR_ITEM_NOT_REMOVED)
-        end
-      end
+      old_index = index_of(column.attr_ns_column)
       System.arraycopy(@columns, index + 1, @columns, index, (@column_count -= 1) - index)
       @columns[@column_count] = nil
-      i_ = index
-      while i_ < @column_count
-        @columns[i_].send_event(SWT::Move)
+      if ((@column_count).equal?(0))
+        # TODO - reset attributes
+        @first_column = column.attr_ns_column
+        @first_column.retain
+        # Feature in Cocoa.  If a column's width is too small to show any content
+        # then tableView_objectValueForTableColumn_row is never invoked to
+        # query for item values, which is a problem for VIRTUAL Tables.  The
+        # workaround is to ensure that, for 0-column Tables, the internal first
+        # column always has a minimal width that makes this call come in.
+        @first_column.set_min_width(FIRST_COLUMN_MINIMUM_WIDTH)
+        set_scroll_width
+      else
+        (self.attr_view).remove_table_column(column.attr_ns_column)
+      end
+      array = (self.attr_view).table_columns
+      # 64
+      array_size = RJava.cast_to_int(array.count)
+      i_ = old_index
+      while i_ < array_size
+        # long
+        column_id = array.object_at_index(i_).attr_id
+        j = 0
+        while j < @column_count
+          if ((@columns[j].attr_ns_column.attr_id).equal?(column_id))
+            @columns[j].send_event(SWT::Move)
+            break
+          end
+          j += 1
+        end
         i_ += 1
       end
     end
@@ -1174,330 +1094,380 @@ module Org::Eclipse::Swt::Widgets
       if (!(index).equal?(@item_count - 1))
         fix_selection(index, false)
       end
-      id = Array.typed(::Java::Int).new([@item_count])
-      if (!(OS._remove_data_browser_items(self.attr_handle, OS.attr_k_data_browser_no_item, id.attr_length, id, 0)).equal?(OS.attr_no_err))
-        error(SWT::ERROR_ITEM_NOT_REMOVED)
-      end
       System.arraycopy(@items, index + 1, @items, index, (@item_count -= 1) - index)
       @items[@item_count] = nil
-      OS._update_data_browser_items(self.attr_handle, 0, 0, nil, OS.attr_k_data_browser_item_no_property, OS.attr_k_data_browser_no_item)
+      (self.attr_view).note_number_of_rows_changed
       if ((@item_count).equal?(0))
         set_table_empty
-      else
-        fix_scroll_bar
       end
     end
     
-    typesig { [ScrollBar] }
-    def destroy_scroll_bar(bar)
-      if (!((bar.attr_style & SWT::H_SCROLL)).equal?(0))
-        self.attr_style &= ~SWT::H_SCROLL
-      end
-      if (!((bar.attr_style & SWT::V_SCROLL)).equal?(0))
-        self.attr_style &= ~SWT::V_SCROLL
-      end
-      OS._set_data_browser_has_scroll_bars(self.attr_handle, !((self.attr_style & SWT::H_SCROLL)).equal?(0), !((self.attr_style & SWT::V_SCROLL)).equal?(0))
+    typesig { [::Java::Int, ::Java::Int, ::Java::Boolean, Array.typed(::Java::Boolean)] }
+    def drag_detect(x, y, filter, consume)
+      # Let Cocoa determine if a drag is starting and fire the notification when we get the callback.
+      return false
     end
     
-    typesig { [::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int] }
-    def draw_item_proc(browser, id, property, item_state, the_rect, gd_depth, color_device)
-      index = get_index(id)
-      if (!(0 <= index && index < @item_count))
-        return OS.attr_no_err
-      end
+    typesig { [::Java::Int, ::Java::Int, NSRect, ::Java::Int] }
+    # long
+    # long
+    # long
+    def draw_interior_with_frame_in_view(id, sel, rect, view)
+      hooks_erase = hooks(SWT::EraseItem)
+      hooks_paint = hooks(SWT::PaintItem)
+      hooks_measure = hooks(SWT::MeasureItem)
+      cell = NSTextFieldCell.new(id)
+      widget = self.attr_view
+      # long
+      # long
+      out_value = Array.typed(::Java::Int).new(1) { 0 }
+      OS.object_get_instance_variable(id, Display::SWT_ROW, out_value)
+      # long
+      row_index = out_value[0]
+      # 64
+      item = __get_item(RJava.cast_to_int(row_index))
+      OS.object_get_instance_variable(id, Display::SWT_COLUMN, out_value)
+      # long
+      table_column = out_value[0]
+      # long
+      ns_column_index = widget.table_columns.index_of_object_identical_to(Id.new(table_column))
       column_index = 0
-      if (@column_count > 0)
-        column_index = 0
-        while column_index < @column_count
-          if ((@columns[column_index].attr_id).equal?(property))
-            break
-          end
-          column_index += 1
+      i = 0
+      while i < @column_count
+        if ((@columns[i].attr_ns_column.attr_id).equal?(table_column))
+          column_index = i
+          break
         end
-        if ((column_index).equal?(@column_count))
-          return OS.attr_no_err
+        i += 1
+      end
+      background = !(item.attr_cell_background).nil? ? item.attr_cell_background[column_index] : nil
+      if ((background).nil?)
+        background = item.attr_background
+      end
+      draw_background = !(background).nil?
+      draw_foreground = true
+      is_selected = cell.is_highlighted
+      draw_selection = is_selected
+      has_focus_ = hooks_erase && has_focus
+      selection_background = nil
+      selection_foreground = nil
+      if (is_selected && (hooks_erase || hooks_paint))
+        selection_foreground = Color.cocoa_new(self.attr_display, has_focus_ ? self.attr_display.attr_alternate_selected_control_text_color : self.attr_display.attr_selected_control_text_color)
+        selection_background = Color.cocoa_new(self.attr_display, has_focus_ ? self.attr_display.attr_alternate_selected_control_color : self.attr_display.attr_secondary_selected_control_color)
+      end
+      content_size = Composite.instance_method(:cell_size).bind(self).call(id, OS.attr_sel_cell_size)
+      image_ = cell.image
+      if (!(image_).nil?)
+        content_size.attr_width += @image_bounds.attr_width + IMAGE_GAP
+      end
+      content_width = RJava.cast_to_int(Math.ceil(content_size.attr_width))
+      spacing = widget.intercell_spacing
+      item_height = RJava.cast_to_int(Math.ceil(widget.row_height + spacing.attr_height))
+      cell_rect = widget.rect_of_column(ns_column_index)
+      cell_rect.attr_y = rect.attr_y
+      cell_rect.attr_height = rect.attr_height + spacing.attr_height
+      if ((@column_count).equal?(0))
+        row_rect = widget.rect_of_row(row_index)
+        cell_rect.attr_width = row_rect.attr_width
+      end
+      # double
+      offset_x = 0
+      offset_y = 0
+      if (hooks_paint || hooks_erase)
+        frame_cell = widget.frame_of_cell_at_column(ns_column_index, row_index)
+        offset_x = rect.attr_x - frame_cell.attr_x
+        offset_y = rect.attr_y - frame_cell.attr_y
+        if (@draw_expansion)
+          offset_x -= 0.5
+          offset_y -= 0.5
         end
       end
-      rect = Rect.new
-      @last_index_of = index
-      item = __get_item(index)
-      if (!((self.attr_style & SWT::VIRTUAL)).equal?(0))
-        if (!item.attr_cached)
-          if (!check_data(item, false))
-            return OS.attr_no_err
-          end
-          if (set_scroll_width(item))
-            if ((OS._get_data_browser_item_part_bounds(self.attr_handle, id, property, OS.attr_k_data_browser_property_enclosing_part, rect)).equal?(OS.attr_no_err))
-              x = rect.attr_left
-              y = rect.attr_top
-              width = rect.attr_right - rect.attr_left
-              height = rect.attr_bottom - rect.attr_top
-              redraw_widget(self.attr_handle, x, y, width, height, false)
-            end
-            return OS.attr_no_err
-          end
-        end
+      item_x = RJava.cast_to_int((rect.attr_x - offset_x))
+      item_y = RJava.cast_to_int((rect.attr_y - offset_y))
+      context = NSGraphicsContext.current_context
+      if (hooks_measure)
+        send_measure_item(item, column_index, content_size)
       end
-      OS.memmove(rect, the_rect, Rect.attr_sizeof)
-      x = rect.attr_left
-      y = rect.attr_top
-      width = rect.attr_right - rect.attr_left
-      height = rect.attr_bottom - rect.attr_top
-      gc = @paint_gc
-      if ((gc).nil?)
+      user_foreground = nil
+      if (hooks_erase)
+        context.save_graphics_state
+        transform_ = NSAffineTransform.transform
+        transform_.translate_xby(offset_x, offset_y)
+        transform_.concat
         data = SwtGCData.new
-        port = Array.typed(::Java::Int).new(1) { 0 }
-        OS._get_port(port)
-        data.attr_port = port[0]
-        gc = SwtGC.carbon_new(self, data)
-      end
-      OS._get_data_browser_item_part_bounds(self.attr_handle, id, property, OS.attr_k_data_browser_property_enclosing_part, rect)
-      grid_width = get_lines_visible ? GRID_WIDTH : 0
-      item_x = rect.attr_left + grid_width
-      item_y = rect.attr_top
-      item_width = rect.attr_right - rect.attr_left - grid_width
-      item_height = rect.attr_bottom - rect.attr_top + 1
-      if (@draw_background)
-        @draw_background = false
-        region = Region.new(self.attr_display)
-        client_area = get_client_area
-        header_height = get_header_height
-        client_area.attr_y += header_height
-        client_area.attr_height -= header_height
-        if (client_area.attr_height < 0)
-          client_area.attr_height = 0
+        data.attr_paint_rect = cell_rect
+        gc = SwtGC.cocoa_new(self, data)
+        gc.set_font(item.get_font(column_index))
+        if (is_selected)
+          gc.set_foreground(selection_foreground)
+          gc.set_background(selection_background)
+        else
+          gc.set_foreground(item.get_foreground(column_index))
+          gc.set_background(item.get_background(column_index))
         end
-        region.add(client_area)
-        if (!((self.attr_style & SWT::CHECK)).equal?(0) || !(grid_width).equal?(0))
-          rgn = OS._new_rgn
-          if (!((self.attr_style & SWT::CHECK)).equal?(0))
-            if ((OS._get_data_browser_item_part_bounds(self.attr_handle, id, Table::CHECK_COLUMN_ID, OS.attr_k_data_browser_property_enclosing_part, rect)).equal?(OS.attr_no_err))
-              OS._set_rect_rgn(rgn, RJava.cast_to_short(rect.attr_left), RJava.cast_to_short(client_area.attr_y), RJava.cast_to_short((rect.attr_right + grid_width)), RJava.cast_to_short((client_area.attr_y + client_area.attr_height)))
-              OS._diff_rgn(region.attr_handle, rgn, region.attr_handle)
-            end
-          end
-          if (!(grid_width).equal?(0))
-            if ((@column_count).equal?(0))
-              if ((OS._get_data_browser_item_part_bounds(self.attr_handle, id, Table::COLUMN_ID, OS.attr_k_data_browser_property_enclosing_part, rect)).equal?(OS.attr_no_err))
-                OS._set_rect_rgn(rgn, RJava.cast_to_short(rect.attr_right), RJava.cast_to_short(client_area.attr_y), RJava.cast_to_short((rect.attr_right + grid_width)), RJava.cast_to_short((client_area.attr_y + client_area.attr_height)))
-                OS._diff_rgn(region.attr_handle, rgn, region.attr_handle)
-              end
-            else
-              i = 0
-              while i < @column_count
-                if ((OS._get_data_browser_item_part_bounds(self.attr_handle, id, @columns[i].attr_id, OS.attr_k_data_browser_property_enclosing_part, rect)).equal?(OS.attr_no_err))
-                  OS._set_rect_rgn(rgn, RJava.cast_to_short(rect.attr_right), RJava.cast_to_short(client_area.attr_y), RJava.cast_to_short((rect.attr_right + grid_width)), RJava.cast_to_short((client_area.attr_y + client_area.attr_height)))
-                  OS._diff_rgn(region.attr_handle, rgn, region.attr_handle)
-                end
-                i += 1
-              end
-            end
-          end
-          OS._dispose_rgn(rgn)
+        if (!@draw_expansion)
+          gc.set_clipping(RJava.cast_to_int((cell_rect.attr_x - offset_x)), RJava.cast_to_int((cell_rect.attr_y - offset_y)), RJava.cast_to_int(cell_rect.attr_width), RJava.cast_to_int(cell_rect.attr_height))
         end
-        if (!(region).nil?)
-          gc.set_clipping(region)
-        end
-        fill_background(self.attr_handle, gc.attr_handle, nil)
-        if (!(region).nil?)
-          gc.set_clipping(nil)
-          region.dispose
-        end
-      end
-      OS._cgcontext_save_gstate(gc.attr_handle)
-      item_rgn = OS._new_rgn
-      OS._set_rect_rgn(item_rgn, RJava.cast_to_short(item_x), RJava.cast_to_short(item_y), RJava.cast_to_short((item_x + item_width)), RJava.cast_to_short((item_y + item_height)))
-      clip = OS._new_rgn
-      OS._get_clip(clip)
-      OS._sect_rgn(clip, item_rgn, item_rgn)
-      OS._dispose_rgn(clip)
-      region = Region.carbon_new(self.attr_display, item_rgn)
-      font = item.get_font(column_index)
-      background = item.get_background(column_index)
-      foreground = item.get_foreground(column_index)
-      image = item.get_image(column_index)
-      text = item.get_text(column_index)
-      gc.set_clipping(region)
-      gc.set_font(font)
-      extent = gc.string_extent(text)
-      content_width = extent.attr_x
-      image_bounds = nil
-      gap = 0
-      if (!(image).nil?)
-        gap = get_gap
-        image_bounds = image.get_bounds
-        content_width += @image_bounds.attr_width + gap
-      end
-      paint_width = content_width
-      if (hooks(SWT::MeasureItem))
         event = Event.new
         event.attr_item = item
-        event.attr_index = column_index
         event.attr_gc = gc
-        event.attr_width = content_width
-        event.attr_height = item_height
-        send_event(SWT::MeasureItem, event)
-        if (item_height < event.attr_height)
-          item_height = event.attr_height
-          OS._set_data_browser_table_view_row_height(self.attr_handle, RJava.cast_to_short(event.attr_height))
-          redraw_widget(self.attr_handle, false)
+        event.attr_index = column_index
+        event.attr_detail = SWT::FOREGROUND
+        if (draw_background)
+          event.attr_detail |= SWT::BACKGROUND
         end
-        if (set_scroll_width(item))
-          redraw_widget(self.attr_handle, false)
+        if (is_selected)
+          event.attr_detail |= SWT::SELECTED
         end
-        content_width = event.attr_width
-        gc.set_clipping(region)
-        gc.set_font(font)
+        event.attr_x = RJava.cast_to_int(cell_rect.attr_x)
+        event.attr_y = RJava.cast_to_int(cell_rect.attr_y)
+        event.attr_width = RJava.cast_to_int(cell_rect.attr_width)
+        event.attr_height = RJava.cast_to_int(cell_rect.attr_height)
+        send_event(SWT::EraseItem, event)
+        if (!event.attr_doit)
+          draw_foreground = draw_background = draw_selection = false
+        else
+          draw_background = draw_background && !((event.attr_detail & SWT::BACKGROUND)).equal?(0)
+          draw_foreground = !((event.attr_detail & SWT::FOREGROUND)).equal?(0)
+          draw_selection = draw_selection && !((event.attr_detail & SWT::SELECTED)).equal?(0)
+        end
+        if (!draw_selection && is_selected)
+          user_foreground = Color.cocoa_new(self.attr_display, gc.get_foreground.attr_handle)
+        end
+        gc.dispose
+        context.restore_graphics_state
+        if (is_disposed)
+          return
+        end
+        if (item.is_disposed)
+          return
+        end
+        if (draw_selection && (((self.attr_style & SWT::HIDE_SELECTION)).equal?(0) || has_focus_))
+          cell_rect.attr_height -= spacing.attr_height
+          call_super(widget.attr_id, OS.attr_sel_highlight_selection_in_clip_rect_, cell_rect)
+          cell_rect.attr_height += spacing.attr_height
+        end
       end
-      draw_state = SWT::FOREGROUND
-      if (!(item.attr_background).nil? || (!(item.attr_cell_background).nil? && !(item.attr_cell_background[column_index]).nil?))
-        draw_state |= SWT::BACKGROUND
+      if (draw_background && !draw_selection)
+        context.save_graphics_state
+        # double
+        color_rgb = background.attr_handle
+        color = NSColor.color_with_device_red(color_rgb[0], color_rgb[1], color_rgb[2], 1)
+        color.set_fill
+        NSBezierPath.fill_rect(cell_rect)
+        context.restore_graphics_state
       end
-      if (!((item_state & (OS.attr_k_data_browser_item_is_selected | OS.attr_k_data_browser_item_is_drag_target))).equal?(0))
-        draw_state |= SWT::SELECTED
+      if (draw_foreground)
+        if ((!@draw_expansion || hooks_measure) && !(image_).nil?)
+          dest_rect = NSRect.new
+          dest_rect.attr_x = rect.attr_x + IMAGE_GAP
+          dest_rect.attr_y = rect.attr_y + (Math.ceil((rect.attr_height - @image_bounds.attr_height) / 2)).to_f
+          dest_rect.attr_width = @image_bounds.attr_width
+          dest_rect.attr_height = @image_bounds.attr_height
+          src_rect = NSRect.new
+          size_ = image_.size
+          src_rect.attr_width = size_.attr_width
+          src_rect.attr_height = size_.attr_height
+          context.save_graphics_state
+          NSBezierPath.bezier_path_with_rect(rect).add_clip
+          transform_ = NSAffineTransform.transform
+          transform_.scale_xby(1, -1)
+          transform_.translate_xby(0, -(dest_rect.attr_height + 2 * dest_rect.attr_y))
+          transform_.concat
+          image_.draw_in_rect(dest_rect, src_rect, OS::NSCompositeSourceOver, 1)
+          context.restore_graphics_state
+          image_width = @image_bounds.attr_width + IMAGE_GAP
+          rect.attr_x += image_width
+          rect.attr_width -= image_width
+        end
+        cell.set_highlighted(false)
+        call_super_ = false
+        if (!(user_foreground).nil?)
+          # Bug in Cocoa.  For some reason, it is not possible to change the
+          # foreground color to black when the cell is highlighted. The text
+          # still draws white.  The fix is to draw the text and not call super.
+          # 
+          # double
+          color = user_foreground.attr_handle
+          if ((color[0]).equal?(0) && (color[1]).equal?(0) && (color[2]).equal?(0) && (color[3]).equal?(1))
+            new_str = NSMutableAttributedString.new(cell.attributed_string_value.mutable_copy)
+            range = NSRange.new
+            range.attr_length = new_str.length
+            new_str.remove_attribute(OS::NSForegroundColorAttributeName, range)
+            new_rect = NSRect.new
+            new_rect.attr_x = rect.attr_x + TEXT_GAP
+            new_rect.attr_y = rect.attr_y
+            new_rect.attr_width = rect.attr_width - TEXT_GAP
+            new_rect.attr_height = rect.attr_height
+            size_ = new_str.size
+            if (new_rect.attr_height > size_.attr_height)
+              new_rect.attr_y += (new_rect.attr_height - size_.attr_height) / 2
+              new_rect.attr_height = size_.attr_height
+            end
+            new_str.draw_in_rect(new_rect)
+            new_str.release
+          else
+            ns_color = NSColor.color_with_device_red(color[0], color[1], color[2], color[3])
+            cell.set_text_color(ns_color)
+            call_super_ = true
+          end
+        else
+          call_super_ = true
+        end
+        if (call_super_)
+          attr_str = cell.attributed_string_value
+          size_ = attr_str.size
+          if (rect.attr_height > size_.attr_height)
+            rect.attr_y += (rect.attr_height - size_.attr_height) / 2
+            rect.attr_height = size_.attr_height
+          end
+          super(id, sel, rect, view)
+        end
       end
-      was_selected = !((draw_state & SWT::SELECTED)).equal?(0)
-      if (!((draw_state & SWT::SELECTED)).equal?(0) && (!((self.attr_style & SWT::FULL_SELECTION)).equal?(0) || (column_index).equal?(0)))
-        gc.set_background(self.attr_display.get_system_color(SWT::COLOR_LIST_SELECTION))
-        gc.set_foreground(self.attr_display.get_system_color(SWT::COLOR_LIST_SELECTION_TEXT))
-      else
-        gc.set_background(background)
-        gc.set_foreground(foreground)
-      end
-      if (hooks(SWT::EraseItem))
+      if (hooks_paint)
+        context.save_graphics_state
+        transform_ = NSAffineTransform.transform
+        transform_.translate_xby(offset_x, offset_y)
+        transform_.concat
+        data = SwtGCData.new
+        data.attr_paint_rect = cell_rect
+        gc = SwtGC.cocoa_new(self, data)
+        gc.set_font(item.get_font(column_index))
+        if (draw_selection)
+          gc.set_foreground(selection_foreground)
+          gc.set_background(selection_background)
+        else
+          gc.set_foreground(!(user_foreground).nil? ? user_foreground : item.get_foreground(column_index))
+          gc.set_background(item.get_background(column_index))
+        end
+        if (!@draw_expansion)
+          gc.set_clipping(RJava.cast_to_int((cell_rect.attr_x - offset_x)), RJava.cast_to_int((cell_rect.attr_y - offset_y)), RJava.cast_to_int(cell_rect.attr_width), RJava.cast_to_int(cell_rect.attr_height))
+        end
         event = Event.new
         event.attr_item = item
-        event.attr_index = column_index
         event.attr_gc = gc
+        event.attr_index = column_index
+        if (draw_foreground)
+          event.attr_detail |= SWT::FOREGROUND
+        end
+        if (draw_background)
+          event.attr_detail |= SWT::BACKGROUND
+        end
+        if (draw_selection)
+          event.attr_detail |= SWT::SELECTED
+        end
         event.attr_x = item_x
         event.attr_y = item_y
-        event.attr_width = item_width
+        event.attr_width = content_width
         event.attr_height = item_height
-        event.attr_detail = draw_state
-        send_event(SWT::EraseItem, event)
-        draw_state = event.attr_doit ? event.attr_detail : 0
-        gc.set_clipping(region)
-        gc.set_font(font)
-        if (!((draw_state & SWT::SELECTED)).equal?(0) && (!((self.attr_style & SWT::FULL_SELECTION)).equal?(0) || (column_index).equal?(0)))
-          gc.set_background(self.attr_display.get_system_color(SWT::COLOR_LIST_SELECTION))
-          gc.set_foreground(self.attr_display.get_system_color(SWT::COLOR_LIST_SELECTION_TEXT))
-        else
-          gc.set_background(background)
-          if (!was_selected)
-            gc.set_foreground(foreground)
-          end
-        end
-      end
-      if (!(@column_count).equal?(0) && !(column_index).equal?(0))
-        column = @columns[column_index]
-        if (!((column.attr_style & SWT::CENTER)).equal?(0))
-          x += (width - content_width) / 2
-        end
-        if (!((column.attr_style & SWT::RIGHT)).equal?(0))
-          x += width - content_width
-        end
-      end
-      string_x = x
-      image_width = 0
-      if (!(image).nil?)
-        string_x += image_width = @image_bounds.attr_width + gap
-      end
-      if (!((draw_state & SWT::SELECTED)).equal?(0) && (!((self.attr_style & SWT::FULL_SELECTION)).equal?(0) || (column_index).equal?(0)))
-        if (((self.attr_style & SWT::HIDE_SELECTION)).equal?(0) || has_focus)
-          if (!((self.attr_style & SWT::FULL_SELECTION)).equal?(0))
-            gc.fill_rectangle(item_x, item_y, item_width, item_height - 1)
-            draw_state &= ~SWT::BACKGROUND
-          else
-            if ((column_index).equal?(0))
-              gc.fill_rectangle(string_x - 1, y, (content_width - image_width) + 2, item_height - 1)
-              draw_state &= ~SWT::BACKGROUND
-            end
-          end
-        else
-          if (!((draw_state & SWT::BACKGROUND)).equal?(0))
-            gc.set_background(background)
-          end
-        end
-      end
-      if (!((draw_state & SWT::BACKGROUND)).equal?(0))
-        if ((@column_count).equal?(0))
-          gc.fill_rectangle(string_x - 1, y, (content_width - image_width) + 2, item_height - 1)
-        else
-          gc.fill_rectangle(item_x, item_y, item_width, item_height)
-        end
-      end
-      if (!((draw_state & SWT::FOREGROUND)).equal?(0))
-        if (!(image).nil?)
-          image_x = x
-          image_y = y + (height - @image_bounds.attr_height) / 2
-          gc.draw_image(image, 0, 0, image_bounds.attr_width, image_bounds.attr_height, image_x, image_y, @image_bounds.attr_width, @image_bounds.attr_height)
-        end
-        gc.draw_string(text, string_x, y + (height - extent.attr_y) / 2, true)
-      end
-      if (hooks(SWT::PaintItem))
-        event = Event.new
-        event.attr_item = item
-        event.attr_index = column_index
-        event.attr_gc = gc
-        event.attr_x = x
-        event.attr_y = y
-        event.attr_width = paint_width
-        event.attr_height = item_height
-        event.attr_detail = draw_state
         send_event(SWT::PaintItem, event)
-      end
-      OS._cgcontext_restore_gstate(gc.attr_handle)
-      OS._dispose_rgn(item_rgn)
-      if (!(gc).equal?(@paint_gc))
         gc.dispose
+        context.restore_graphics_state
       end
-      return OS.attr_no_err
     end
     
-    typesig { [::Java::Boolean] }
-    def enable_widget(enabled)
-      super(enabled)
-      # Bug in the Macintosh. For some reason, the data browser does not
-      # redraw the checkboxes when the enable state changes. The fix is
-      # to force a redraw.
-      redraw_widget(self.attr_handle, false)
+    typesig { [::Java::Int, ::Java::Int, NSRect, ::Java::Int] }
+    # long
+    # long
+    # long
+    def draw_with_expansion_frame_in_view(id, sel, cell_frame, view)
+      @draw_expansion = true
+      super(id, sel, cell_frame, view)
+      @draw_expansion = false
     end
     
-    typesig { [] }
-    def fix_scroll_bar
-      # Bug in the Macintosh. For some reason, the data browser does not update
-      # the vertical scrollbar when it is scrolled to the bottom and items are
-      # removed.  The fix is to check if the scrollbar value is bigger the
-      # maximum number of visible items and clamp it when needed.
-      top = Array.typed(::Java::Int).new(1) { 0 }
-      left = Array.typed(::Java::Int).new(1) { 0 }
-      OS._get_data_browser_scroll_position(self.attr_handle, top, left)
-      maximum = Math.max(0, get_item_height * @item_count - get_client_area.attr_height)
-      if (top[0] > maximum)
-        OS._set_data_browser_scroll_position(self.attr_handle, maximum, left[0])
+    typesig { [::Java::Int, ::Java::Int, NSRect] }
+    def draw_rect(id, sel, rect)
+      @fix_scroll_width = false
+      super(id, sel, rect)
+      if (is_disposed)
+        return
       end
+      if (@fix_scroll_width)
+        @fix_scroll_width = false
+        if (set_scroll_width(@items, true))
+          self.attr_view.set_needs_display(true)
+        end
+      end
+    end
+    
+    typesig { [::Java::Int, ::Java::Int, NSRect, ::Java::Int] }
+    # long
+    # long
+    # long
+    def expansion_frame_with_frame_in_view(id, sel, cell_rect, view)
+      if ((self.attr_tool_tip_text).nil?)
+        rect = super(id, sel, cell_rect, view)
+        cell = NSCell.new(id)
+        if (!(rect.attr_width).equal?(0) && !(rect.attr_height).equal?(0))
+          if (hooks(SWT::MeasureItem))
+            cell_size_ = cell.cell_size
+            cell_rect.attr_width = cell_size_.attr_width
+            return cell_rect
+          end
+        else
+          expansion_rect = nil
+          if (hooks(SWT::MeasureItem))
+            expansion_rect = cell_rect
+            cell_size_ = cell.cell_size
+            expansion_rect.attr_width = cell_size_.attr_width
+          else
+            expansion_rect = cell.title_rect_for_bounds(cell_rect)
+            cell_size_ = Composite.instance_method(:cell_size).bind(self).call(id, OS.attr_sel_cell_size)
+            expansion_rect.attr_width = cell_size_.attr_width
+          end
+          content_rect = self.attr_scroll_view.content_view.bounds
+          OS._nsintersection_rect(content_rect, expansion_rect, content_rect)
+          if (!OS._nsequal_rects(expansion_rect, content_rect))
+            return expansion_rect
+          end
+        end
+        return rect
+      end
+      return NSRect.new
+    end
+    
+    typesig { [NSPoint] }
+    def find_tooltip(pt)
+      widget = self.attr_view
+      header_view_ = widget.header_view
+      if (!(header_view_).nil?)
+        pt = header_view_.convert_point_from_view_(pt, nil)
+        # long
+        index = header_view_.column_at_point(pt)
+        if (!(index).equal?(-1))
+          ns_columns = widget.table_columns
+          ns_column = ns_columns.object_at_index(index)
+          i = 0
+          while i < @column_count
+            column = @columns[i]
+            if ((column.attr_ns_column.attr_id).equal?(ns_column.attr_id))
+              return column
+            end
+            i += 1
+          end
+        end
+      end
+      return super(pt)
     end
     
     typesig { [::Java::Int, ::Java::Boolean] }
-    def fix_selection(index, add_)
+    def fix_selection(index, add)
       selection = get_selection_indices
       if ((selection.attr_length).equal?(0))
         return
       end
       new_count = 0
-      offset = add_ ? 1 : -1
       fix = false
-      down = (@sort_direction).equal?(SWT::DOWN) && !(@sort_column).nil?
       i = 0
       while i < selection.attr_length
-        if (!add_ && (selection[i]).equal?(index))
+        if (!add && (selection[i]).equal?(index))
           fix = true
         else
           new_index = ((new_count += 1) - 1)
-          sel = selection[i]
-          selection[new_index] = get_id(sel)
-          if ((down && sel < index) || (!down && sel >= index))
-            selection[new_index] += offset
+          selection[new_index] = selection[i]
+          if (selection[new_index] >= index)
+            selection[new_index] += add ? 1 : -1
             fix = true
           end
         end
@@ -1509,50 +1479,33 @@ module Org::Eclipse::Swt::Widgets
     end
     
     typesig { [] }
-    def get_ax_attributes
-      return AX_ATTRIBUTES
-    end
-    
-    typesig { [] }
-    def get_border_width
-      check_widget
-      border = 0
-      has_border = Array.typed(::Java::Byte).new(1) { 0 }
-      OS._get_control_data(self.attr_handle, RJava.cast_to_short(OS.attr_k_control_entire_control), OS.attr_k_control_data_browser_includes_frame_and_focus_tag, 1, has_border, nil)
-      if (!(has_border[0]).equal?(0))
-        out_metric = Array.typed(::Java::Int).new(1) { 0 }
-        OS._get_theme_metric(OS.attr_k_theme_metric_focus_rect_outset, out_metric)
-        border += out_metric[0] - BORDER_INSET
-      end
-      return border
-    end
-    
-    typesig { [] }
     def get_check_column_width
-      inset = 0
-      if (OS::VERSION >= 0x1040)
-        metric = Array.typed(::Java::Float).new(1) { 0.0 }
-        OS._data_browser_get_metric(self.attr_handle, OS.attr_k_data_browser_metric_cell_content_inset, nil, metric)
-        inset = RJava.cast_to_int(metric[0])
-      else
-        inset = CELL_CONTENT_INSET
-      end
-      check_width = Array.typed(::Java::Int).new(1) { 0 }
-      OS._get_theme_metric(OS.attr_k_theme_metric_check_box_width, check_width)
-      return check_width[0] + inset * 2
+      return RJava.cast_to_int(@check_column.data_cell.cell_size.attr_width)
     end
     
     typesig { [] }
     def get_client_area
       check_widget
-      border = get_border_width
-      rect = Rect.new
-      inset = Rect.new
-      OS._get_control_bounds(self.attr_handle, rect)
-      OS._get_data_browser_scroll_bar_inset(self.attr_handle, inset)
-      width = Math.max(0, rect.attr_right - rect.attr_left - inset.attr_right - border - border)
-      height = Math.max(0, rect.attr_bottom - rect.attr_top - inset.attr_bottom - border - border)
-      return Rectangle.new(inset.attr_left + border, inset.attr_top + border, width, height)
+      rect = super
+      header_view_ = (self.attr_view).header_view
+      if (!(header_view_).nil?)
+        height = RJava.cast_to_int(header_view_.bounds.attr_height)
+        rect.attr_y -= height
+        rect.attr_height += height
+      end
+      return rect
+    end
+    
+    typesig { [Id] }
+    def get_column(id)
+      i = 0
+      while i < @column_count
+        if ((@columns[i].attr_ns_column.attr_id).equal?(id.attr_id))
+          return @columns[i]
+        end
+        i += 1
+      end
+      return nil
     end
     
     typesig { [::Java::Int] }
@@ -1637,15 +1590,14 @@ module Org::Eclipse::Swt::Widgets
     def get_column_order
       check_widget
       order = Array.typed(::Java::Int).new(@column_count) { 0 }
-      position = Array.typed(::Java::Int).new(1) { 0 }
       i = 0
       while i < @column_count
         column = @columns[i]
-        OS._get_data_browser_table_view_column_position(self.attr_handle, column.attr_id, position)
+        index = index_of(column.attr_ns_column)
         if (!((self.attr_style & SWT::CHECK)).equal?(0))
-          position[0] -= 1
+          index -= 1
         end
-        order[position[0]] = i
+        order[index] = i
         i += 1
       end
       return order
@@ -1685,16 +1637,6 @@ module Org::Eclipse::Swt::Widgets
     end
     
     typesig { [] }
-    def get_gap
-      if (OS::VERSION >= 0x1040)
-        metric = Array.typed(::Java::Float).new(1) { 0.0 }
-        OS._data_browser_get_metric(self.attr_handle, OS.attr_k_data_browser_metric_icon_and_text_gap, nil, metric)
-        return RJava.cast_to_int(metric[0])
-      end
-      return ICON_AND_TEXT_GAP
-    end
-    
-    typesig { [] }
     # Returns the width in pixels of a grid line.
     # 
     # @return the width of a grid line in pixels
@@ -1721,9 +1663,11 @@ module Org::Eclipse::Swt::Widgets
     # @since 2.0
     def get_header_height
       check_widget
-      height = Array.typed(::Java::Short).new(1) { 0 }
-      OS._get_data_browser_list_view_header_btn_height(self.attr_handle, height)
-      return height[0]
+      header_view_ = (self.attr_view).header_view
+      if ((header_view_).nil?)
+        return 0
+      end
+      return RJava.cast_to_int(header_view_.bounds.attr_height)
     end
     
     typesig { [] }
@@ -1744,35 +1688,7 @@ module Org::Eclipse::Swt::Widgets
     # </ul>
     def get_header_visible
       check_widget
-      height = Array.typed(::Java::Short).new(1) { 0 }
-      OS._get_data_browser_list_view_header_btn_height(self.attr_handle, height)
-      return !(height[0]).equal?(0)
-    end
-    
-    typesig { [::Java::Int] }
-    def get_id(index)
-      if ((@sort_direction).equal?(SWT::DOWN) && !(@sort_column).nil?)
-        return @item_count - index
-      end
-      return index + 1
-    end
-    
-    typesig { [::Java::Int] }
-    def get_index(id)
-      if ((@sort_direction).equal?(SWT::DOWN) && !(@sort_column).nil?)
-        return @item_count - id
-      end
-      return id - 1
-    end
-    
-    typesig { [] }
-    def get_inset_width
-      if (OS::VERSION >= 0x1040)
-        metric = Array.typed(::Java::Float).new(1) { 0.0 }
-        OS._data_browser_get_metric(self.attr_handle, OS.attr_k_data_browser_metric_cell_content_inset, nil, metric)
-        return RJava.cast_to_int(metric[0]) * 2
-      end
-      return CELL_CONTENT_INSET * 2
+      return !((self.attr_view).header_view).nil?
     end
     
     typesig { [::Java::Int] }
@@ -1821,74 +1737,16 @@ module Org::Eclipse::Swt::Widgets
     # </ul>
     def get_item(point)
       check_widget
-      check_items(true)
-      if ((point).nil?)
-        error(SWT::ERROR_NULL_ARGUMENT)
+      widget = self.attr_view
+      pt = NSPoint.new
+      pt.attr_x = point.attr_x
+      pt.attr_y = point.attr_y
+      # 64
+      row = RJava.cast_to_int(widget.row_at_point(pt))
+      if ((row).equal?(-1))
+        return nil
       end
-      height = Array.typed(::Java::Short).new(1) { 0 }
-      OS._get_data_browser_table_view_row_height(self.attr_handle, height)
-      rect = Rect.new
-      pt = Org::Eclipse::Swt::Internal::Carbon::Point.new
-      OS._set_pt(pt, RJava.cast_to_short(point.attr_x), RJava.cast_to_short(point.attr_y))
-      last_hittest_index = get_index(@last_hittest)
-      if (0 <= last_hittest_index && last_hittest_index < @item_count && !(@last_hittest_column).equal?(0))
-        if ((OS._get_data_browser_item_part_bounds(self.attr_handle, @last_hittest, @last_hittest_column, OS.attr_k_data_browser_property_enclosing_part, rect)).equal?(OS.attr_no_err))
-          rect.attr_bottom = RJava.cast_to_short((rect.attr_top + height[0]))
-          if (OS._pt_in_rect(pt, rect))
-            return __get_item(last_hittest_index)
-          end
-          if (rect.attr_top <= pt.attr_v && pt.attr_v < rect.attr_bottom)
-            j = 0
-            while j < @column_count
-              if ((OS._get_data_browser_item_part_bounds(self.attr_handle, @last_hittest, @columns[j].attr_id, OS.attr_k_data_browser_property_enclosing_part, rect)).equal?(OS.attr_no_err))
-                rect.attr_bottom = RJava.cast_to_short((rect.attr_top + height[0]))
-                if (OS._pt_in_rect(pt, rect))
-                  return __get_item(last_hittest_index)
-                end
-              end
-              j += 1
-            end
-            return nil
-          end
-        end
-      end
-      top = Array.typed(::Java::Int).new(1) { 0 }
-      left = Array.typed(::Java::Int).new(1) { 0 }
-      OS._get_data_browser_scroll_position(self.attr_handle, top, left)
-      header = Array.typed(::Java::Short).new(1) { 0 }
-      OS._get_data_browser_list_view_header_btn_height(self.attr_handle, header)
-      offsets = Array.typed(::Java::Int).new([0, 1, -1])
-      i = 0
-      while i < offsets.attr_length
-        index = (top[0] - header[0] + point.attr_y) / height[0] + offsets[i]
-        if (0 <= index && index < @item_count)
-          column_id = (@column_count).equal?(0) ? @column_id : @columns[0].attr_id
-          if ((OS._get_data_browser_item_part_bounds(self.attr_handle, get_id(index), column_id, OS.attr_k_data_browser_property_enclosing_part, rect)).equal?(OS.attr_no_err))
-            rect.attr_bottom = RJava.cast_to_short((rect.attr_top + height[0]))
-            if (rect.attr_top <= pt.attr_v && pt.attr_v < rect.attr_bottom)
-              if ((@column_count).equal?(0))
-                if (OS._pt_in_rect(pt, rect))
-                  return __get_item(index)
-                end
-              else
-                j = 0
-                while j < @column_count
-                  if ((OS._get_data_browser_item_part_bounds(self.attr_handle, get_id(index), @columns[j].attr_id, OS.attr_k_data_browser_property_enclosing_part, rect)).equal?(OS.attr_no_err))
-                    rect.attr_bottom = RJava.cast_to_short((rect.attr_top + height[0]))
-                    if (OS._pt_in_rect(pt, rect))
-                      return __get_item(index)
-                    end
-                  end
-                  j += 1
-                end
-              end
-              return nil
-            end
-          end
-        end
-        i += 1
-      end
-      return nil
+      return @items[row]
     end
     
     typesig { [] }
@@ -1917,11 +1775,7 @@ module Org::Eclipse::Swt::Widgets
     # </ul>
     def get_item_height
       check_widget
-      height = Array.typed(::Java::Short).new(1) { 0 }
-      if (!(OS._get_data_browser_table_view_row_height(self.attr_handle, height)).equal?(OS.attr_no_err))
-        error(SWT::ERROR_CANNOT_GET_ITEM_HEIGHT)
-      end
-      return height[0]
+      return RJava.cast_to_int((self.attr_view).row_height) + CELL_GAP
     end
     
     typesig { [] }
@@ -1956,7 +1810,8 @@ module Org::Eclipse::Swt::Widgets
     
     typesig { [] }
     # Returns <code>true</code> if the receiver's lines are visible,
-    # and <code>false</code> otherwise.
+    # and <code>false</code> otherwise. Note that some platforms draw
+    # grid lines while others may draw alternating row colors.
     # <p>
     # If one of the receiver's ancestors is not visible or some
     # other condition makes the receiver not visible, this method
@@ -1972,12 +1827,7 @@ module Org::Eclipse::Swt::Widgets
     # </ul>
     def get_lines_visible
       check_widget
-      if (OS::VERSION >= 0x1040)
-        attrib = Array.typed(::Java::Int).new(1) { 0 }
-        OS._data_browser_get_attributes(self.attr_handle, attrib)
-        return !((attrib[0] & (OS.attr_k_data_browser_attribute_list_view_alternating_row_colors | OS.attr_k_data_browser_attribute_list_view_draw_column_dividers))).equal?(0)
-      end
-      return false
+      return (self.attr_view).uses_alternating_row_background_colors
     end
     
     typesig { [] }
@@ -1997,36 +1847,23 @@ module Org::Eclipse::Swt::Widgets
     # </ul>
     def get_selection
       check_widget
-      ptr = OS._new_handle(0)
-      if (!(OS._get_data_browser_items(self.attr_handle, OS.attr_k_data_browser_no_item, true, OS.attr_k_data_browser_item_is_selected, ptr)).equal?(OS.attr_no_err))
-        error(SWT::ERROR_CANNOT_GET_SELECTION)
+      widget = self.attr_view
+      if ((widget.number_of_selected_rows).equal?(0))
+        return Array.typed(TableItem).new(0) { nil }
       end
-      count = OS._get_handle_size(ptr) / 4
-      result = Array.typed(TableItem).new(count) { nil }
-      if (count > 0)
-        OS._hlock(ptr)
-        id = Array.typed(::Java::Int).new(1) { 0 }
-        OS.memmove(id, ptr, 4)
-        if ((@sort_direction).equal?(SWT::DOWN) && !(@sort_column).nil?)
-          offset = id[0]
-          i = 0
-          while i < count
-            OS.memmove(id, offset, 4)
-            result[i] = __get_item(get_index(id[0]))
-            i += 1
-            offset += 4
-          end
-        else
-          offset = id[0] + (count - 1) * 4
-          i = 0
-          while i < count
-            OS.memmove(id, offset, 4)
-            result[i] = __get_item(get_index(id[0]))
-            i += 1
-            offset -= 4
-          end
-        end
-        OS._hunlock(ptr)
+      selection = widget.selected_row_indexes
+      # 64
+      count_ = RJava.cast_to_int(selection.count)
+      # long
+      # long
+      index_buffer = Array.typed(::Java::Int).new(count_) { 0 }
+      selection.get_indexes(index_buffer, count_, 0)
+      result = Array.typed(TableItem).new(count_) { nil }
+      i = 0
+      while i < count_
+        # 64
+        result[i] = __get_item(RJava.cast_to_int(index_buffer[i]))
+        i += 1
       end
       return result
     end
@@ -2042,11 +1879,8 @@ module Org::Eclipse::Swt::Widgets
     # </ul>
     def get_selection_count
       check_widget
-      count = Array.typed(::Java::Int).new(1) { 0 }
-      if (!(OS._get_data_browser_item_count(self.attr_handle, OS.attr_k_data_browser_no_item, true, OS.attr_k_data_browser_item_is_selected, count)).equal?(OS.attr_no_err))
-        error(SWT::ERROR_CANNOT_GET_COUNT)
-      end
-      return count[0]
+      # 64
+      return RJava.cast_to_int((self.attr_view).number_of_selected_rows)
     end
     
     typesig { [] }
@@ -2061,12 +1895,19 @@ module Org::Eclipse::Swt::Widgets
     # </ul>
     def get_selection_index
       check_widget
-      first = Array.typed(::Java::Int).new(1) { 0 }
-      last = Array.typed(::Java::Int).new(1) { 0 }
-      if (!(OS._get_data_browser_selection_anchor(self.attr_handle, first, last)).equal?(OS.attr_no_err))
+      widget = self.attr_view
+      if ((widget.number_of_selected_rows).equal?(0))
         return -1
       end
-      return get_index(first[0])
+      selection = widget.selected_row_indexes
+      # 64
+      count_ = RJava.cast_to_int(selection.count)
+      # long
+      # long
+      result = Array.typed(::Java::Int).new(count_) { 0 }
+      selection.get_indexes(result, count_, 0)
+      # 64
+      return RJava.cast_to_int(result[0])
     end
     
     typesig { [] }
@@ -2086,36 +1927,24 @@ module Org::Eclipse::Swt::Widgets
     # </ul>
     def get_selection_indices
       check_widget
-      ptr = OS._new_handle(0)
-      if (!(OS._get_data_browser_items(self.attr_handle, OS.attr_k_data_browser_no_item, true, OS.attr_k_data_browser_item_is_selected, ptr)).equal?(OS.attr_no_err))
-        error(SWT::ERROR_CANNOT_GET_SELECTION)
+      widget = self.attr_view
+      if ((widget.number_of_selected_rows).equal?(0))
+        return Array.typed(::Java::Int).new(0) { 0 }
       end
-      count = OS._get_handle_size(ptr) / 4
-      result = Array.typed(::Java::Int).new(count) { 0 }
-      if (count > 0)
-        OS._hlock(ptr)
-        OS.memmove(result, ptr, 4)
-        OS.memmove(result, result[0], count * 4)
-        OS._hunlock(ptr)
-        if ((@sort_direction).equal?(SWT::DOWN) && !(@sort_column).nil?)
-          i = 0
-          while i < count
-            result[i] = get_index(result[i])
-            i += 1
-          end
-        else
-          start = 0
-          end_ = count - 1
-          while start <= end_
-            temp = result[start]
-            result[start] = get_index(result[end_])
-            result[end_] = get_index(temp)
-            start += 1
-            end_ -= 1
-          end
-        end
+      selection = widget.selected_row_indexes
+      # 64
+      count_ = RJava.cast_to_int(selection.count)
+      # long
+      # long
+      indices = Array.typed(::Java::Int).new(count_) { 0 }
+      selection.get_indexes(indices, count_, 0)
+      result = Array.typed(::Java::Int).new(count_) { 0 }
+      i = 0
+      while i < indices.attr_length
+        # 64
+        result[i] = RJava.cast_to_int(indices[i])
+        i += 1
       end
-      OS._dispose_handle(ptr)
       return result
     end
     
@@ -2172,165 +2001,72 @@ module Org::Eclipse::Swt::Widgets
     # </ul>
     def get_top_index
       check_widget
-      top = Array.typed(::Java::Int).new(1) { 0 }
-      left = Array.typed(::Java::Int).new(1) { 0 }
-      OS._get_data_browser_scroll_position(self.attr_handle, top, left)
-      return top[0] / get_item_height
+      # TODO - partial item at the top
+      rect = self.attr_scroll_view.document_visible_rect
+      point = NSPoint.new
+      point.attr_x = rect.attr_x
+      point.attr_y = rect.attr_y
+      # 64
+      return RJava.cast_to_int((self.attr_view).row_at_point(point))
     end
     
-    typesig { [::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int] }
-    def help_proc(in_control, in_global_mouse, in_request, out_content_provided, io_help_content)
-      if ((self.attr_tool_tip_text).nil?)
-        case (in_request)
-        when OS.attr_k_hmsupply_content
-          if (!(!(self.attr_tool_tip_text).nil? && !(self.attr_tool_tip_text.length).equal?(0)))
-            rect = Rect.new
-            window = OS._get_control_owner(self.attr_handle)
-            OS._get_window_bounds(window, RJava.cast_to_short(OS.attr_k_window_content_rgn), rect)
-            window_left = rect.attr_left
-            window_top = rect.attr_top
-            pt = Org::Eclipse::Swt::Internal::Carbon::Point.new
-            OS.memmove(pt, Array.typed(::Java::Int).new([in_global_mouse]), 4)
-            pt.attr_h -= window_left
-            pt.attr_v -= window_top
-            tool_tip_text = nil
-            tag_side = OS.attr_k_hmabsolute_center_aligned
-            in_pt = CGPoint.new
-            content_view = Array.typed(::Java::Int).new(1) { 0 }
-            OS._hiview_find_by_id(OS._hiview_get_root(OS._get_control_owner(self.attr_handle)), OS.k_hiview_window_content_id, content_view)
-            OS._hiview_convert_point(in_pt, self.attr_handle, content_view[0])
-            pt.attr_h -= RJava.cast_to_int(in_pt.attr_x)
-            pt.attr_v -= RJava.cast_to_int(in_pt.attr_y)
-            window_left += RJava.cast_to_int(in_pt.attr_x)
-            window_top += RJava.cast_to_int(in_pt.attr_y)
-            x = pt.attr_h
-            y = pt.attr_v
-            header_height = get_header_height
-            if (!(header_height).equal?(0) && (0 <= y && y < header_height))
-              start_x = 0
-              i = 0
-              while i < @column_count
-                column = @columns[i]
-                width = column.attr_last_width
-                if (start_x <= x && x < start_x + width)
-                  tool_tip_text = RJava.cast_to_string(column.attr_tool_tip_text)
-                  rect.attr_left = RJava.cast_to_short(start_x)
-                  rect.attr_top = RJava.cast_to_short(0)
-                  rect.attr_right = RJava.cast_to_short((rect.attr_left + width))
-                  rect.attr_bottom = RJava.cast_to_short((rect.attr_top + header_height))
-                  tag_side = OS.attr_k_hmoutside_bottom_right_aligned
-                  break
-                end
-                start_x += width
-                i += 1
-              end
-            else
-              item = nil
-              index = get_index(@last_hittest)
-              if (0 <= index && index < @item_count)
-                if ((OS._get_data_browser_item_part_bounds(self.attr_handle, @last_hittest, @last_hittest_column, OS.attr_k_data_browser_property_content_part, rect)).equal?(OS.attr_no_err))
-                  item = __get_item(index)
-                end
-              end
-              if (!(item).nil?)
-                column_index = 0
-                column = nil
-                if (@column_count > 0)
-                  i = 0
-                  while i < @column_count
-                    if ((@columns[i].attr_id).equal?(@last_hittest_column))
-                      column = @columns[i]
-                      column_index = i
-                      break
-                    end
-                    i += 1
-                  end
-                end
-                column_id = @last_hittest_column
-                gc = SwtGC.new(self)
-                inset = get_inset_width
-                width = item.calculate_width(column_index, gc) + inset
-                gc.dispose
-                column_width = 0
-                if ((@column_count).equal?(0))
-                  column_width = get_client_area.attr_width
-                else
-                  w = Array.typed(::Java::Short).new(1) { 0 }
-                  OS._get_data_browser_table_view_named_column_width(self.attr_handle, column_id, w)
-                  column_width = w[0]
-                end
-                if (width > column_width)
-                  tool_tip_text = RJava.cast_to_string(item.get_text(column_index))
-                  image = item.get_image(column_index)
-                  image_width = !(image).nil? ? image.get_bounds.attr_width + get_gap : 0
-                  style = (column).nil? ? SWT::LEFT : column.attr_style
-                  if (!((style & SWT::LEFT)).equal?(0))
-                    rect.attr_left += image_width
-                    rect.attr_right = RJava.cast_to_short((rect.attr_left + width - image_width - inset))
-                  end
-                  if (!((style & SWT::RIGHT)).equal?(0))
-                    rect.attr_left = RJava.cast_to_short((rect.attr_right - width + image_width + inset))
-                  end
-                  if (!((style & SWT::CENTER)).equal?(0))
-                    rect.attr_left += image_width
-                  end
-                end
-              end
-            end
-            if (!(tool_tip_text).nil? && !(tool_tip_text.length).equal?(0))
-              buffer = CharArray.new(tool_tip_text.length)
-              tool_tip_text.get_chars(0, buffer.attr_length, buffer, 0)
-              length_ = fix_mnemonic(buffer)
-              if (!(self.attr_display.attr_help_string).equal?(0))
-                OS._cfrelease(self.attr_display.attr_help_string)
-              end
-              self.attr_display.attr_help_string = OS._cfstring_create_with_characters(OS.attr_k_cfallocator_default, buffer, length_)
-              help_content = HMHelpContentRec.new
-              OS.memmove(help_content, io_help_content, HMHelpContentRec.attr_sizeof)
-              self.attr_display.attr_help_widget = self
-              help_content.attr_version = OS.attr_k_mac_help_version
-              help_content.attr_tag_side = RJava.cast_to_short(tag_side)
-              help_content.attr_abs_hot_rect_left = RJava.cast_to_short((rect.attr_left + window_left))
-              help_content.attr_abs_hot_rect_top = RJava.cast_to_short((rect.attr_top + window_top))
-              help_content.attr_abs_hot_rect_right = RJava.cast_to_short((rect.attr_right + window_left))
-              help_content.attr_abs_hot_rect_bottom = RJava.cast_to_short((rect.attr_bottom + window_top))
-              help_content.attr_content0_content_type = OS.attr_k_hmcfstring_content
-              help_content.attr_content0_tag_cfstring = self.attr_display.attr_help_string
-              help_content.attr_content1_content_type = OS.attr_k_hmcfstring_content
-              help_content.attr_content1_tag_cfstring = self.attr_display.attr_help_string
-              OS.memmove(io_help_content, help_content, HMHelpContentRec.attr_sizeof)
-              OS.memmove(out_content_provided, Array.typed(::Java::Short).new([OS.attr_k_hmcontent_provided]), 2)
-              return OS.attr_no_err
-            end
-          end
-        end
+    typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
+    # long
+    # long
+    # long
+    def highlight_selection_in_clip_rect(id, sel, rect)
+      if (hooks(SWT::EraseItem))
+        return
       end
-      return super(in_control, in_global_mouse, in_request, out_content_provided, io_help_content)
+      if (!((self.attr_style & SWT::HIDE_SELECTION)).equal?(0) && !has_focus)
+        return
+      end
+      clip_rect = NSRect.new
+      OS.memmove(clip_rect, rect, NSRect.attr_sizeof)
+      call_super(id, sel, clip_rect)
     end
     
-    typesig { [::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int] }
-    def hit_test_proc(browser, id, property, the_rect, mouse_rect)
-      @last_hittest = id
-      @last_hittest_column = property
-      return 1
+    typesig { [::Java::Int, ::Java::Int, ::Java::Int, NSRect, ::Java::Int] }
+    # long
+    # long
+    # long
+    # long
+    # long
+    def hit_test_for_event(id, sel, event, rect, control_view)
+      # For some reason, the cell class needs to implement hitTestForEvent:inRect:ofView:,
+      # otherwise the double action selector is not called properly.
+      return call_super(id, sel, event, rect, control_view)
     end
     
-    typesig { [] }
-    def hook_events
-      super
-      callbacks = DataBrowserCallbacks.new
-      callbacks.attr_version = OS.attr_k_data_browser_latest_callbacks
-      OS._init_data_browser_callbacks(callbacks)
-      callbacks.attr_v1_item_data_callback = self.attr_display.attr_item_data_proc
-      callbacks.attr_v1_item_notification_callback = self.attr_display.attr_item_notification_proc
-      OS._set_data_browser_callbacks(self.attr_handle, callbacks)
-      custom = DataBrowserCustomCallbacks.new
-      custom.attr_version = OS.attr_k_data_browser_latest_custom_callbacks
-      OS._init_data_browser_custom_callbacks(custom)
-      custom.attr_v1_draw_item_callback = self.attr_display.attr_draw_item_proc
-      custom.attr_v1_hit_test_callback = self.attr_display.attr_hit_test_proc
-      custom.attr_v1_tracking_callback = self.attr_display.attr_tracking_proc
-      OS._set_data_browser_custom_callbacks(self.attr_handle, custom)
+    typesig { [::Java::Int, ::Java::Int] }
+    # long
+    # long
+    # long
+    def image(id, sel)
+      # long
+      # long
+      image_ = Array.typed(::Java::Int).new(1) { 0 }
+      OS.object_get_instance_variable(id, Display::SWT_IMAGE, image_)
+      return image_[0]
+    end
+    
+    typesig { [::Java::Int, ::Java::Int, NSRect] }
+    # long
+    # long
+    def image_rect_for_bounds(id, sel, cell_frame)
+      image_ = NSCell.new(id).image
+      if (!(image_).nil?)
+        cell_frame.attr_x += IMAGE_GAP
+        cell_frame.attr_width = @image_bounds.attr_width
+        cell_frame.attr_height = @image_bounds.attr_height
+      end
+      return cell_frame
+    end
+    
+    typesig { [NSTableColumn] }
+    def index_of(column)
+      # 64
+      return RJava.cast_to_int((self.attr_view).table_columns.index_of_object_identical_to(column))
     end
     
     typesig { [TableColumn] }
@@ -2430,337 +2166,124 @@ module Org::Eclipse::Swt::Widgets
     # </ul>
     def is_selected(index)
       check_widget
-      return OS._is_data_browser_item_selected(self.attr_handle, get_id(index))
+      if (!(0 <= index && index < @item_count))
+        return false
+      end
+      return (self.attr_view).is_row_selected(index)
     end
     
-    typesig { [::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int] }
-    def item_data_proc(browser, id, property, item_data, set_value)
-      index = get_index(id)
-      if (!(0 <= index && index < @items.attr_length))
-        return OS.attr_no_err
+    typesig { [NSView] }
+    def is_trim(view)
+      if (super(view))
+        return true
       end
-      case (property)
-      when CHECK_COLUMN_ID
-        item = __get_item(index)
-        if (!check_data(item, false))
-          return OS.attr_no_err
-        end
-        if (!(set_value).equal?(0))
-          item.attr_checked = !item.attr_checked
-          if (item.attr_checked && item.attr_grayed)
-            OS._set_data_browser_item_data_button_value(item_data, RJava.cast_to_short(OS.attr_k_theme_button_mixed))
-          else
-            the_data = item.attr_checked ? OS.attr_k_theme_button_on : OS.attr_k_theme_button_off
-            OS._set_data_browser_item_data_button_value(item_data, RJava.cast_to_short(the_data))
-          end
-          event = Event.new
-          event.attr_item = item
-          event.attr_detail = SWT::CHECK
-          post_event(SWT::Selection, event)
-          # Bug in the Macintosh. When the height of the row is smaller than the
-          # check box, the tail of the check mark draws outside of the item part
-          # bounds. This means it will not be redrawn when the item is unckeched.
-          # The fix is to redraw the area.
-          if (!item.attr_checked)
-            item.redraw(Table::CHECK_COLUMN_ID)
-          end
-        else
-          the_data = OS.attr_k_theme_button_off
-          if (item.attr_checked)
-            the_data = item.attr_grayed ? OS.attr_k_theme_button_mixed : OS.attr_k_theme_button_on
-          end
-          OS._set_data_browser_item_data_button_value(item_data, RJava.cast_to_short(the_data))
-        end
-      end
-      return OS.attr_no_err
+      return (view.attr_id).equal?(@header_view.attr_id)
     end
     
     typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
-    def item_notification_proc(browser, id, message)
-      if ((message).equal?(OS.attr_k_data_browser_user_state_changed))
-        resized = false
-        width = Array.typed(::Java::Short).new(1) { 0 }
-        position = Array.typed(::Java::Int).new(1) { 0 }
-        columns = get_columns
-        i = 0
-        while i < @column_count
-          column = columns[i]
-          if (!column.is_disposed)
-            OS._get_data_browser_table_view_named_column_width(self.attr_handle, column.attr_id, width)
-            if (!(width[0]).equal?(column.attr_last_width))
-              column.resized(width[0])
-              resized = true
-            end
-          end
-          if (!column.is_disposed)
-            OS._get_data_browser_table_view_column_position(self.attr_handle, column.attr_id, position)
-            if (!(position[0]).equal?(column.attr_last_position))
-              column.attr_last_position = position[0]
-              column.send_event(SWT::Move)
-              resized = true
-            end
-          end
-          i += 1
+    # long
+    # long
+    # long
+    # long
+    def menu_for_event(id, sel, the_event)
+      if (!(id).equal?(@header_view.attr_id))
+        # Feature in Cocoa: Table views do not change the selection when the user
+        # right-clicks or control-clicks on an NSTableView or its subclasses. Fix is to select the
+        # clicked-on row ourselves.
+        event = NSEvent.new(the_event)
+        table = self.attr_view
+        # get the current selections for the table view.
+        selected_row_indexes_ = table.selected_row_indexes
+        # select the row that was clicked before showing the menu for the event
+        mouse_point = self.attr_view.convert_point_from_view_(event.location_in_window, nil)
+        # long
+        row = table.row_at_point(mouse_point)
+        # figure out if the row that was just clicked on is currently selected
+        if ((selected_row_indexes_.contains_index(row)).equal?(false))
+          set = NSIndexSet.new.alloc
+          set = set.init_with_index(row)
+          table.select_row_indexes(set, false)
+          set.release
         end
-        property = Array.typed(::Java::Int).new(1) { 0 }
-        OS._get_data_browser_sort_property(self.attr_handle, property)
-        if (!(property[0]).equal?(0))
-          if (!resized)
-            i_ = 0
-            while i_ < @column_count
-              column = columns[i_]
-              if ((property[0]).equal?(column.attr_id))
-                column.post_event((self.attr_display.attr_click_count).equal?(2) ? SWT::DefaultSelection : SWT::Selection)
-                break
-              end
-              i_ += 1
-            end
-          end
-          OS._set_data_browser_sort_property(self.attr_handle, 0)
-          if (!(@sort_column).nil? && !@sort_column.is_disposed && !(@sort_direction).equal?(SWT::NONE))
-            OS._set_data_browser_sort_property(self.attr_handle, @sort_column.attr_id)
-            order = (@sort_direction).equal?(SWT::DOWN) ? OS.attr_k_data_browser_order_decreasing : OS.attr_k_data_browser_order_increasing
-            OS._set_data_browser_sort_order(self.attr_handle, RJava.cast_to_short(order))
-          end
-        end
-        return OS.attr_no_err
+        # else that row is currently selected, so don't change anything.
       end
-      index = get_index(id)
-      if (!(0 <= index && index < @items.attr_length))
-        return OS.attr_no_err
-      end
-      catch(:break_case) do
-        case (message)
-        when OS.attr_k_data_browser_item_selected, OS.attr_k_data_browser_item_deselected
-          item = __get_item(index)
-          @was_selected = true
-          if (@ignore_select)
-            throw :break_case, :thrown
-          end
-          first = Array.typed(::Java::Int).new(1) { 0 }
-          last = Array.typed(::Java::Int).new(1) { 0 }
-          OS._get_data_browser_selection_anchor(self.attr_handle, first, last)
-          selected = false
-          if (!((self.attr_style & SWT::MULTI)).equal?(0))
-            modifiers = OS._get_current_event_key_modifiers
-            if (!((modifiers & OS.attr_shift_key)).equal?(0))
-              if ((message).equal?(OS.attr_k_data_browser_item_selected))
-                selected = (first[0]).equal?(id) || (last[0]).equal?(id)
-              else
-                selected = (id).equal?(@anchor_first) || (id).equal?(@anchor_last)
-              end
-            else
-              if (!((modifiers & OS.attr_cmd_key)).equal?(0))
-                selected = true
-              else
-                selected = (first[0]).equal?(last[0])
-              end
-            end
-          else
-            selected = (message).equal?(OS.attr_k_data_browser_item_selected)
-          end
-          if (selected)
-            @anchor_first = first[0]
-            @anchor_last = last[0]
-            event = Event.new
-            event.attr_item = item
-            post_event(SWT::Selection, event)
-          end
-        when OS.attr_k_data_browser_item_double_clicked
-          @was_selected = true
-          if ((self.attr_display.attr_click_count).equal?(2))
-            event = Event.new
-            event.attr_item = __get_item(index)
-            post_event(SWT::DefaultSelection, event)
-          end
-        end
-      end
-      return OS.attr_no_err
+      return super(id, sel, the_event)
     end
     
     typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
-    def k_event_accessible_get_named_attribute(next_handler, the_event, user_data)
-      code = OS.attr_event_not_handled_err
-      string_ref = Array.typed(::Java::Int).new(1) { 0 }
-      OS._get_event_parameter(the_event, OS.attr_k_event_param_accessible_attribute_name, OS.attr_type_cfstring_ref, nil, 4, nil, string_ref)
-      length_ = 0
-      if (!(string_ref[0]).equal?(0))
-        length_ = OS._cfstring_get_length(string_ref[0])
-      end
-      buffer = CharArray.new(length_)
-      range = CFRange.new
-      range.attr_length = length_
-      OS._cfstring_get_characters(string_ref[0], range, buffer)
-      attribute_name = String.new(buffer)
-      if ((attribute_name == OS.attr_k_axheader_attribute))
-        height = Array.typed(::Java::Short).new(1) { 0 }
-        OS._get_data_browser_list_view_header_btn_height(self.attr_handle, height)
-        if ((height[0]).equal?(0))
-          # Bug in the Macintosh.  Even when the header is not visible,
-          # VoiceOver still reports each column header's role for every row.
-          # This is confusing and overly verbose.  The fix is to return
-          # "no header" when the screen reader asks for the header, by
-          # returning noErr without setting the event parameter.
-          code = OS.attr_no_err
-        end
-      else
-        ref = Array.typed(::Java::Int).new(1) { 0 }
-        OS._get_event_parameter(the_event, OS.attr_k_event_param_accessible_object, OS.attr_type_cftype_ref, nil, 4, nil, ref)
-        axuielementref = ref[0]
-        item_info = DataBrowserAccessibilityItemInfo.new
-        err = OS._axuielement_get_data_browser_item_info(axuielementref, self.attr_handle, 0, item_info)
-        if ((err).equal?(OS.attr_no_err) && !(item_info.attr_v0_column_property).equal?(OS.attr_k_data_browser_item_no_property) && !(item_info.attr_v0_item).equal?(OS.attr_k_data_browser_no_item) && (item_info.attr_v0_property_part).equal?(OS.attr_k_data_browser_property_enclosing_part))
-          column_index = 0
-          column_index = 0
-          while column_index < @column_count
-            if ((@columns[column_index].attr_id).equal?(item_info.attr_v0_column_property))
+    # long
+    # long
+    # long
+    def mouse_down(id, sel, the_event)
+      if (!(@header_view).nil? && (id).equal?(@header_view.attr_id))
+        widget = self.attr_view
+        widget.set_allows_column_reordering(false)
+        pt = @header_view.convert_point_from_view_(NSEvent.new(the_event).location_in_window, nil)
+        # long
+        ns_index = @header_view.column_at_point(pt)
+        if (!(ns_index).equal?(-1))
+          ns_column = widget.table_columns.object_at_index(ns_index)
+          i = 0
+          while i < @column_count
+            if ((@columns[i].attr_ns_column.attr_id).equal?(ns_column.attr_id))
+              widget.set_allows_column_reordering(@columns[i].attr_movable)
               break
             end
-            column_index += 1
+            i += 1
           end
-          if (!(column_index).equal?(@column_count) || (@column_count).equal?(0))
-            index = get_index(item_info.attr_v0_item)
-            if (0 <= index && index < @item_count)
-              table_item = __get_item(index)
-              if ((attribute_name == OS.attr_k_axrole_attribute) || (attribute_name == OS.attr_k_axrole_description_attribute))
-                role_text = OS.attr_k_axstatic_text_role
-                buffer = CharArray.new(role_text.length)
-                role_text.get_chars(0, buffer.attr_length, buffer, 0)
-                string_ref[0] = OS._cfstring_create_with_characters(OS.attr_k_cfallocator_default, buffer, buffer.attr_length)
-                if (!(string_ref[0]).equal?(0))
-                  if ((attribute_name == OS.attr_k_axrole_attribute))
-                    OS._set_event_parameter(the_event, OS.attr_k_event_param_accessible_attribute_value, OS.attr_type_cfstring_ref, 4, string_ref)
-                  else
-                    # kAXRoleDescriptionAttribute
-                    string_ref2 = OS._hicopy_accessibility_role_description(string_ref[0], 0)
-                    OS._set_event_parameter(the_event, OS.attr_k_event_param_accessible_attribute_value, OS.attr_type_cfstring_ref, 4, Array.typed(::Java::Int).new([string_ref2]))
-                    OS._cfrelease(string_ref2)
-                  end
-                  OS._cfrelease(string_ref[0])
-                  code = OS.attr_no_err
-                end
-              else
-                if ((attribute_name == OS.attr_k_axchildren_attribute))
-                  children = OS._cfarray_create_mutable(OS.attr_k_cfallocator_default, 0, 0)
-                  OS._set_event_parameter(the_event, OS.attr_k_event_param_accessible_attribute_value, OS.attr_type_cfmutable_array_ref, 4, Array.typed(::Java::Int).new([children]))
-                  OS._cfrelease(children)
-                  code = OS.attr_no_err
-                else
-                  if ((attribute_name == OS.attr_k_axtitle_attribute) || (attribute_name == OS.attr_k_axdescription_attribute))
-                    text = table_item.get_text(column_index)
-                    buffer = CharArray.new(text.length)
-                    text.get_chars(0, buffer.attr_length, buffer, 0)
-                    string_ref[0] = OS._cfstring_create_with_characters(OS.attr_k_cfallocator_default, buffer, buffer.attr_length)
-                    if (!(string_ref[0]).equal?(0))
-                      OS._set_event_parameter(the_event, OS.attr_k_event_param_accessible_attribute_value, OS.attr_type_cfstring_ref, 4, string_ref)
-                      OS._cfrelease(string_ref[0])
-                      code = OS.attr_no_err
-                    end
-                  end
-                end
-              end
-            end
+        end
+      else
+        if ((id).equal?(self.attr_view.attr_id))
+          # Bug/feature in Cocoa:  If the table has a context menu we just set it visible instead of returning
+          # it from menuForEvent:.  This has the side effect, however, of sending control-click to the NSTableView,
+          # which is interpreted as a single click that clears the selection.  Fix is to ignore control-click if the
+          # view has a context menu.
+          event = NSEvent.new(the_event)
+          if (!((event.modifier_flags & OS::NSControlKeyMask)).equal?(0))
+            return
           end
         end
       end
-      if (!(self.attr_accessible).nil?)
-        code = self.attr_accessible.internal_k_event_accessible_get_named_attribute(next_handler, the_event, code)
+      super(id, sel, the_event)
+    end
+    
+    typesig { [::Java::Int, ::Java::Int] }
+    # Feature in Cocoa.  If a checkbox is in multi-state mode, nextState cycles
+    # from off to mixed to on and back to off again.  This will cause the on state
+    # to momentarily appear while clicking on the checkbox.  To avoid this,
+    # override [NSCell nextState] to go directly to the desired state.
+    # 
+    # long
+    # long
+    # long
+    def next_state(id, sel)
+      table_view = self.attr_view
+      # 64
+      index = RJava.cast_to_int(table_view.selected_row)
+      item = @items[index]
+      if (item.attr_grayed)
+        return item.attr_checked ? OS::NSOffState : OS::NSMixedState
       end
-      return code
+      return item.attr_checked ? OS::NSOffState : OS::NSOnState
     end
     
     typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
-    def k_event_mouse_down(next_handler, the_event, user_data)
-      result = super(next_handler, the_event, user_data)
-      if ((result).equal?(OS.attr_no_err))
-        return result
-      end
-      @was_selected = false
-      result = OS._call_next_event_handler(next_handler, the_event)
-      if (is_disposed)
-        return OS.attr_no_err
-      end
-      if (!@was_selected)
-        if (OS._is_data_browser_item_selected(self.attr_handle, @last_hittest))
-          index = get_index(@last_hittest)
-          if (0 <= index && index < @item_count)
-            event = Event.new
-            event.attr_item = __get_item(index)
-            post_event(SWT::Selection, event)
-          end
-        end
-      end
-      return result
+    # long
+    # long
+    # long
+    # long
+    def number_of_rows_in_table_view(id, sel, a_table_view)
+      return @item_count
     end
     
-    typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
-    def k_event_control_get_click_activation(next_handler, the_event, user_data)
-      OS._set_event_parameter(the_event, OS.attr_k_event_param_click_activation, OS.attr_type_click_activation_result, 4, Array.typed(::Java::Int).new([OS.attr_k_activate_and_handle_click]))
-      return OS.attr_no_err
-    end
-    
-    typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
-    def k_event_control_set_cursor(next_handler, the_event, user_data)
-      if (!is_enabled_cursor)
-        return OS.attr_no_err
+    typesig { [] }
+    def register
+      super
+      self.attr_display.add_widget(@header_view, self)
+      self.attr_display.add_widget(@data_cell, self)
+      if (!(@button_cell).nil?)
+        self.attr_display.add_widget(@button_cell, self)
       end
-      if (is_enabled_modal)
-        pt = Org::Eclipse::Swt::Internal::Carbon::Point.new
-        sizeof = Org::Eclipse::Swt::Internal::Carbon::Point.attr_sizeof
-        OS._get_event_parameter(the_event, OS.attr_k_event_param_mouse_location, OS.attr_type_qdpoint, nil, sizeof, nil, pt)
-        if (!contains(pt.attr_h, pt.attr_v))
-          return OS.attr_event_not_handled_err
-        end
-      end
-      return super(next_handler, the_event, user_data)
-    end
-    
-    typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
-    def k_event_unicode_key_pressed(next_handler, the_event, user_data)
-      result = super(next_handler, the_event, user_data)
-      if ((result).equal?(OS.attr_no_err))
-        return result
-      end
-      keyboard_event = Array.typed(::Java::Int).new(1) { 0 }
-      OS._get_event_parameter(the_event, OS.attr_k_event_param_text_input_send_keyboard_event, OS.attr_type_event_ref, nil, keyboard_event.attr_length * 4, nil, keyboard_event)
-      key_code = Array.typed(::Java::Int).new(1) { 0 }
-      OS._get_event_parameter(keyboard_event[0], OS.attr_k_event_param_key_code, OS.attr_type_uint32, nil, key_code.attr_length * 4, nil, key_code)
-      case (key_code[0])
-      # KP Enter
-      # 
-      # Feature in the Macintosh.  For some reason, when the user hits an
-      # up or down arrow to traverse the items in a Data Browser, the item
-      # scrolls to the left such that the white space that is normally
-      # visible to the right of the every item is scrolled out of view.
-      # The fix is to save and restore the horizontal scroll position.
-      # 
-      # Down
-      when 49
-        # Space
-        first = Array.typed(::Java::Int).new(1) { 0 }
-        last = Array.typed(::Java::Int).new(1) { 0 }
-        if ((OS._get_data_browser_selection_anchor(self.attr_handle, first, last)).equal?(OS.attr_no_err))
-          if (!(first[0]).equal?(0))
-            item = __get_item(get_index(first[0]))
-            if (!((self.attr_style & SWT::CHECK)).equal?(0))
-              item.set_checked(!item.get_checked, true)
-            end
-          end
-        end
-      when 76, 36
-        # Return
-        post_event(SWT::DefaultSelection)
-      when 125, 126
-        # Up
-        top = Array.typed(::Java::Int).new(1) { 0 }
-        left = Array.typed(::Java::Int).new(1) { 0 }
-        OS._get_data_browser_scroll_position(self.attr_handle, top, left)
-        result = OS._call_next_event_handler(next_handler, the_event)
-        OS._get_data_browser_scroll_position(self.attr_handle, top, nil)
-        OS._set_data_browser_scroll_position(self.attr_handle, top[0], left[0])
-        redraw_background_image
-      end
-      return result
     end
     
     typesig { [::Java::Boolean] }
@@ -2791,21 +2314,35 @@ module Org::Eclipse::Swt::Widgets
     end
     
     typesig { [] }
+    def release_handle
+      super
+      if (!(@header_view).nil?)
+        @header_view.release
+      end
+      @header_view = nil
+      if (!(@first_column).nil?)
+        @first_column.release
+      end
+      @first_column = nil
+      if (!(@check_column).nil?)
+        @check_column.release
+      end
+      @check_column = nil
+      if (!(@data_cell).nil?)
+        @data_cell.release
+      end
+      @data_cell = nil
+      if (!(@button_cell).nil?)
+        @button_cell.release
+      end
+      @button_cell = nil
+    end
+    
+    typesig { [] }
     def release_widget
       super
       @current_item = nil
       @sort_column = nil
-      @paint_gc = nil
-      @image_bounds = nil
-      # Feature in the Mac. When RemoveDataBrowserItems() is used
-      # to remove items, item notification callbacks are issued with
-      # the message kDataBrowserItemRemoved  When many items are
-      # removed, this is slow.  The fix is to temporarily remove
-      # the item notification callback.
-      callbacks = DataBrowserCallbacks.new
-      OS._get_data_browser_callbacks(self.attr_handle, callbacks)
-      callbacks.attr_v1_item_notification_callback = 0
-      OS._set_data_browser_callbacks(self.attr_handle, callbacks)
     end
     
     typesig { [::Java::Int] }
@@ -2823,7 +2360,6 @@ module Org::Eclipse::Swt::Widgets
     # </ul>
     def remove(index)
       check_widget
-      check_items(true)
       if (!(0 <= index && index < @item_count))
         error(SWT::ERROR_INVALID_RANGE)
       end
@@ -2834,17 +2370,11 @@ module Org::Eclipse::Swt::Widgets
       if (!(index).equal?(@item_count - 1))
         fix_selection(index, false)
       end
-      id = Array.typed(::Java::Int).new([@item_count])
-      if (!(OS._remove_data_browser_items(self.attr_handle, OS.attr_k_data_browser_no_item, id.attr_length, id, 0)).equal?(OS.attr_no_err))
-        error(SWT::ERROR_ITEM_NOT_REMOVED)
-      end
       System.arraycopy(@items, index + 1, @items, index, (@item_count -= 1) - index)
       @items[@item_count] = nil
-      OS._update_data_browser_items(self.attr_handle, 0, 0, nil, OS.attr_k_data_browser_item_no_property, OS.attr_k_data_browser_no_item)
+      (self.attr_view).note_number_of_rows_changed
       if ((@item_count).equal?(0))
         set_table_empty
-      else
-        fix_scroll_bar
       end
     end
     
@@ -2865,7 +2395,6 @@ module Org::Eclipse::Swt::Widgets
     # </ul>
     def remove(start, end_)
       check_widget
-      check_items(true)
       if (start > end_)
         return
       end
@@ -2876,13 +2405,11 @@ module Org::Eclipse::Swt::Widgets
         remove_all
       else
         length_ = end_ - start + 1
-        indices = Array.typed(::Java::Int).new(length_) { 0 }
         i = 0
         while i < length_
-          indices[i] = i + start
+          remove(start)
           i += 1
         end
-        remove(indices)
       end
     end
     
@@ -2902,7 +2429,6 @@ module Org::Eclipse::Swt::Widgets
     # </ul>
     def remove(indices)
       check_widget
-      check_items(true)
       if ((indices).nil?)
         error(SWT::ERROR_NULL_ARGUMENT)
       end
@@ -2917,45 +2443,15 @@ module Org::Eclipse::Swt::Widgets
       if (!(0 <= start && start <= end_ && end_ < @item_count))
         error(SWT::ERROR_INVALID_RANGE)
       end
-      duplicates = 0
       last = -1
       i = 0
       while i < new_indices.attr_length
-        if ((new_indices[i]).equal?(last))
-          duplicates += 1
-        end
-        last = new_indices[i]
-        i += 1
-      end
-      id = Array.typed(::Java::Int).new(new_indices.attr_length - duplicates) { 0 }
-      id_index = id.attr_length - 1
-      last = -1
-      i_ = 0
-      while i_ < new_indices.attr_length
-        index = new_indices[i_]
+        index = new_indices[i]
         if (!(index).equal?(last))
-          item = @items[index]
-          if (!(item).nil? && !item.is_disposed)
-            item.release(false)
-          end
-          if (!(index).equal?(@item_count - 1))
-            fix_selection(index, false)
-          end
-          id[((id_index -= 1) + 1)] = @item_count
-          System.arraycopy(@items, index + 1, @items, index, (@item_count -= 1) - index)
-          @items[@item_count] = nil
+          remove(index)
           last = index
         end
-        i_ += 1
-      end
-      if (!(OS._remove_data_browser_items(self.attr_handle, OS.attr_k_data_browser_no_item, id.attr_length, id, 0)).equal?(OS.attr_no_err))
-        error(SWT::ERROR_ITEM_NOT_REMOVED)
-      end
-      OS._update_data_browser_items(self.attr_handle, 0, 0, nil, OS.attr_k_data_browser_item_no_property, OS.attr_k_data_browser_no_item)
-      if ((@item_count).equal?(0))
-        set_table_empty
-      else
-        fix_scroll_bar
+        i += 1
       end
     end
     
@@ -2976,19 +2472,8 @@ module Org::Eclipse::Swt::Widgets
         end
         i += 1
       end
-      # Feature in the Mac. When RemoveDataBrowserItems() is used
-      # to remove items, item notification callbacks are issued with
-      # the message kDataBrowserItemRemoved  When many items are
-      # removed, this is slow.  The fix is to temporarily remove
-      # the item notification callback.
-      callbacks = DataBrowserCallbacks.new
-      OS._get_data_browser_callbacks(self.attr_handle, callbacks)
-      callbacks.attr_v1_item_notification_callback = 0
-      OS._set_data_browser_callbacks(self.attr_handle, callbacks)
-      OS._remove_data_browser_items(self.attr_handle, OS.attr_k_data_browser_no_item, 0, nil, 0)
-      callbacks.attr_v1_item_notification_callback = self.attr_display.attr_item_notification_proc
-      OS._set_data_browser_callbacks(self.attr_handle, callbacks)
       set_table_empty
+      (self.attr_view).note_number_of_rows_changed
     end
     
     typesig { [SelectionListener] }
@@ -3020,14 +2505,6 @@ module Org::Eclipse::Swt::Widgets
     end
     
     typesig { [::Java::Int] }
-    def reset_visible_region(control)
-      super(control)
-      if (!(@show_index).equal?(-1))
-        show_index(@show_index)
-      end
-    end
-    
-    typesig { [::Java::Int] }
     # Selects the item at the given zero-relative index in the receiver.
     # If the item at the index was already selected, it remains
     # selected. Indices that are out of range are ignored.
@@ -3040,10 +2517,14 @@ module Org::Eclipse::Swt::Widgets
     # </ul>
     def select(index)
       check_widget
-      check_items(false)
       if (0 <= index && index < @item_count)
-        ids = Array.typed(::Java::Int).new([get_id(index)])
-        select(ids, ids.attr_length, false)
+        set = NSIndexSet.new.alloc
+        set = set.init_with_index(index)
+        widget = self.attr_view
+        @ignore_select = true
+        widget.select_row_indexes(set, !((self.attr_style & SWT::MULTI)).equal?(0))
+        @ignore_select = false
+        set.release
       end
     end
     
@@ -3071,7 +2552,6 @@ module Org::Eclipse::Swt::Widgets
     # @see Table#setSelection(int,int)
     def select(start, end_)
       check_widget
-      check_items(false)
       if (end_ < 0 || start > end_ || (!((self.attr_style & SWT::SINGLE)).equal?(0) && !(start).equal?(end_)))
         return
       end
@@ -3083,14 +2563,16 @@ module Org::Eclipse::Swt::Widgets
       else
         start = Math.max(0, start)
         end_ = Math.min(end_, @item_count - 1)
-        length_ = end_ - start + 1
-        ids = Array.typed(::Java::Int).new(length_) { 0 }
-        i = 0
-        while i < length_
-          ids[i] = get_id(end_ - i)
-          i += 1
-        end
-        select(ids, length_, false)
+        range = NSRange.new
+        range.attr_location = start
+        range.attr_length = end_ - start + 1
+        set = NSIndexSet.new.alloc
+        set = set.init_with_indexes_in_range(range)
+        widget = self.attr_view
+        @ignore_select = true
+        widget.select_row_indexes(set, !((self.attr_style & SWT::MULTI)).equal?(0))
+        @ignore_select = false
+        set.release
       end
     end
     
@@ -3118,7 +2600,6 @@ module Org::Eclipse::Swt::Widgets
     # @see Table#setSelection(int[])
     def select(indices)
       check_widget
-      check_items(false)
       if ((indices).nil?)
         error(SWT::ERROR_NULL_ARGUMENT)
       end
@@ -3126,56 +2607,39 @@ module Org::Eclipse::Swt::Widgets
       if ((length_).equal?(0) || (!((self.attr_style & SWT::SINGLE)).equal?(0) && length_ > 1))
         return
       end
-      ids = Array.typed(::Java::Int).new(length_) { 0 }
-      count = 0
+      count_ = 0
+      set = NSMutableIndexSet.new.alloc.init
       i = 0
       while i < length_
-        index = indices[length_ - i - 1]
+        index = indices[i]
         if (index >= 0 && index < @item_count)
-          ids[((count += 1) - 1)] = get_id(index)
+          set.add_index(indices[i])
+          count_ += 1
         end
         i += 1
       end
-      if (count > 0)
-        select(ids, count, false)
+      if (count_ > 0)
+        widget = self.attr_view
+        @ignore_select = true
+        widget.select_row_indexes(set, !((self.attr_style & SWT::MULTI)).equal?(0))
+        @ignore_select = false
       end
+      set.release
     end
     
     typesig { [Array.typed(::Java::Int), ::Java::Int, ::Java::Boolean] }
-    def select_indices(indices, count, clear_)
+    def select(indices, count_, clear_)
+      set = NSMutableIndexSet.new.alloc.init
       i = 0
-      while i < count
-        indices[i] = get_id(indices[i])
+      while i < count_
+        set.add_index(indices[i])
         i += 1
       end
-      select(indices, count, clear_)
-    end
-    
-    typesig { [Array.typed(::Java::Int), ::Java::Int, ::Java::Boolean] }
-    def select(ids, count, clear_)
+      widget = self.attr_view
       @ignore_select = true
-      # Bug in the Macintosh.  When the DataBroswer selection flags includes
-      # both kDataBrowserNeverEmptySelectionSet and kDataBrowserSelectOnlyOne,
-      # two items are selected when SetDataBrowserSelectedItems() is called
-      # with kDataBrowserItemsAssign to assign a new seletion despite the fact
-      # that kDataBrowserSelectOnlyOne was specified.  The fix is to save and
-      # restore kDataBrowserNeverEmptySelectionSet around each call to
-      # SetDataBrowserSelectedItems().
-      selection_flags = nil
-      if (!((self.attr_style & SWT::SINGLE)).equal?(0))
-        selection_flags = Array.typed(::Java::Int).new(1) { 0 }
-        OS._get_data_browser_selection_flags(self.attr_handle, selection_flags)
-        OS._set_data_browser_selection_flags(self.attr_handle, selection_flags[0] & ~OS.attr_k_data_browser_never_empty_selection_set)
-      end
-      operation = OS.attr_k_data_browser_items_assign
-      if (!((self.attr_style & SWT::MULTI)).equal?(0) && !clear_)
-        operation = OS.attr_k_data_browser_items_add
-      end
-      OS._set_data_browser_selected_items(self.attr_handle, count, ids, operation)
-      if (!((self.attr_style & SWT::SINGLE)).equal?(0))
-        OS._set_data_browser_selection_flags(self.attr_handle, selection_flags[0])
-      end
+      widget.select_row_indexes(set, !clear_)
       @ignore_select = false
+      set.release
     end
     
     typesig { [] }
@@ -3190,31 +2654,26 @@ module Org::Eclipse::Swt::Widgets
     # </ul>
     def select_all
       check_widget
-      check_items(false)
       if (!((self.attr_style & SWT::SINGLE)).equal?(0))
         return
       end
-      select(nil, 0, false)
+      widget = self.attr_view
+      @ignore_select = true
+      widget.select_all(nil)
+      @ignore_select = false
     end
     
-    typesig { [Array.typed(::Java::Float)] }
-    def set_background(color)
-      # Bug in the Macintosh.  The default background of a window changes when
-      # the background of a data browser is set using SetControlFontStyle().  This
-      # also affects the background of any TNXObject created on that window.  The
-      # fix is to avoid calling SetControlFontStyle() which has no effect
-      # in a data browser anyways.
-    end
-    
-    typesig { [::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Boolean, ::Java::Boolean, ::Java::Boolean] }
-    def set_bounds(x, y, width, height, move, resize, events)
-      # Ensure that the top item is visible when the tree is resized
-      # from a zero size to a size that can show the selection.
-      result = super(x, y, width, height, move, resize, events)
-      if (!(@show_index).equal?(-1))
-        show_index(@show_index)
+    typesig { [] }
+    def update_background
+      ns_color = nil
+      if (!(self.attr_background_image).nil?)
+        ns_color = NSColor.color_with_pattern_image(self.attr_background_image.attr_handle)
+      else
+        if (!(self.attr_background).nil?)
+          ns_color = NSColor.color_with_device_red(self.attr_background[0], self.attr_background[1], self.attr_background[2], self.attr_background[3])
+        end
       end
-      return result
+      (self.attr_view).set_background_color(ns_color)
     end
     
     typesig { [Array.typed(::Java::Int)] }
@@ -3273,30 +2732,24 @@ module Org::Eclipse::Swt::Widgets
         i += 1
       end
       if (reorder)
-        x = 0
-        width = Array.typed(::Java::Short).new(1) { 0 }
+        table_view = self.attr_view
         old_x = Array.typed(::Java::Int).new(old_order.attr_length) { 0 }
+        check = !((self.attr_style & SWT::CHECK)).equal?(0) ? 1 : 0
         i_ = 0
         while i_ < old_order.attr_length
           index = old_order[i_]
-          column = @columns[index]
-          old_x[index] = x
-          OS._get_data_browser_table_view_named_column_width(self.attr_handle, column.attr_id, width)
-          x += width[0]
+          old_x[index] = RJava.cast_to_int(table_view.rect_of_column(i_ + check).attr_x)
           i_ += 1
         end
-        x = 0
         new_x = Array.typed(::Java::Int).new(order.attr_length) { 0 }
         i__ = 0
         while i__ < order.attr_length
           index = order[i__]
           column = @columns[index]
-          position = !((self.attr_style & SWT::CHECK)).equal?(0) ? i__ + 1 : i__
-          OS._set_data_browser_table_view_column_position(self.attr_handle, column.attr_id, position)
-          column.attr_last_position = position
-          new_x[index] = x
-          OS._get_data_browser_table_view_named_column_width(self.attr_handle, column.attr_id, width)
-          x += width[0]
+          old_index = index_of(column.attr_ns_column)
+          new_index = i__ + check
+          table_view.move_column(old_index, new_index)
+          new_x[index] = RJava.cast_to_int(table_view.rect_of_column(new_index).attr_x)
           i__ += 1
         end
         new_columns = Array.typed(TableColumn).new(@column_count) { nil }
@@ -3314,22 +2767,13 @@ module Org::Eclipse::Swt::Widgets
       end
     end
     
-    typesig { [Font] }
-    def set_font_style(font)
+    typesig { [NSFont] }
+    def set_font(font)
       super(font)
-      if ((@items).nil?)
-        return
-      end
-      i = 0
-      while i < @items.attr_length
-        item = @items[i]
-        if (!(item).nil?)
-          item.attr_width = -1
-        end
-        i += 1
-      end
+      set_item_height(nil, font, !hooks(SWT::MeasureItem))
+      self.attr_view.set_needs_display(true)
+      clear_cached_width(@items)
       set_scroll_width(@items, true)
-      set_item_height(nil)
     end
     
     typesig { [::Java::Boolean] }
@@ -3349,12 +2793,15 @@ module Org::Eclipse::Swt::Widgets
     # </ul>
     def set_header_visible(show)
       check_widget
-      height = Array.typed(::Java::Short).new(1) { 0 }
-      OS._get_data_browser_list_view_header_btn_height(self.attr_handle, height)
-      if (!((!(height[0]).equal?(0))).equal?(show))
-        OS._set_data_browser_list_view_header_btn_height(self.attr_handle, RJava.cast_to_short((show ? @header_height : 0)))
-        invalidate_visible_region(self.attr_handle)
-      end
+      (self.attr_view).set_header_view(show ? @header_view : nil)
+    end
+    
+    typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
+    # long
+    # long
+    # long
+    def set_image(id, sel, arg0)
+      OS.object_set_instance_variable(id, Display::SWT_IMAGE, arg0)
     end
     
     typesig { [::Java::Int] }
@@ -3368,56 +2815,45 @@ module Org::Eclipse::Swt::Widgets
     # </ul>
     # 
     # @since 3.0
-    def set_item_count(count)
+    def set_item_count(count_)
       check_widget
-      check_items(true)
-      count = Math.max(0, count)
-      if ((count).equal?(@item_count))
+      count_ = Math.max(0, count_)
+      if ((count_).equal?(@item_count))
         return
       end
-      set_redraw(false)
-      top = Array.typed(::Java::Int).new(1) { 0 }
-      left = Array.typed(::Java::Int).new(1) { 0 }
-      OS._get_data_browser_scroll_position(self.attr_handle, top, left)
-      callbacks = DataBrowserCallbacks.new
-      OS._get_data_browser_callbacks(self.attr_handle, callbacks)
-      callbacks.attr_v1_item_notification_callback = 0
-      OS._set_data_browser_callbacks(self.attr_handle, callbacks)
-      if (count < @item_count)
-        index = count
-        id = Array.typed(::Java::Int).new(@item_count - count) { 0 }
-        while (index < @item_count)
-          item = @items[index]
-          if (!(item).nil?)
+      if ((count_).equal?(@item_count))
+        return
+      end
+      children = @items
+      if (count_ < @item_count)
+        index = count_
+        while index < @item_count
+          item = children[index]
+          if (!(item).nil? && !item.is_disposed)
             item.release(false)
           end
-          id[index - count] = index + 1
           index += 1
         end
-        if (!(OS._remove_data_browser_items(self.attr_handle, OS.attr_k_data_browser_no_item, id.attr_length, id, 0)).equal?(OS.attr_no_err))
-          error(SWT::ERROR_ITEM_NOT_REMOVED)
+      end
+      if (count_ > @item_count)
+        if (((get_style & SWT::VIRTUAL)).equal?(0))
+          i = @item_count
+          while i < count_
+            TableItem.new(self, SWT::NONE, i, true)
+            i += 1
+          end
+          return
         end
       end
-      length_ = Math.max(4, (count + 3) / 4 * 4)
+      length_ = Math.max(4, (count_ + 3) / 4 * 4)
       new_items = Array.typed(TableItem).new(length_) { nil }
-      System.arraycopy(@items, 0, new_items, 0, Math.min(count, @item_count))
+      if (!(children).nil?)
+        System.arraycopy(@items, 0, new_items, 0, Math.min(count_, @item_count))
+      end
+      children = new_items
       @items = new_items
-      if (((self.attr_style & SWT::VIRTUAL)).equal?(0))
-        i = @item_count
-        while i < count
-          @items[i] = TableItem.new(self, SWT::NONE, i, false)
-          i += 1
-        end
-      end
-      @item_count = count
-      OS._add_data_browser_items(self.attr_handle, 0, @item_count, nil, OS.attr_k_data_browser_item_no_property)
-      callbacks.attr_v1_item_notification_callback = self.attr_display.attr_item_notification_proc
-      OS._set_data_browser_callbacks(self.attr_handle, callbacks)
-      fix_scroll_bar
-      if (!(@sort_column).nil? && !@sort_column.is_disposed && (@sort_direction).equal?(SWT::DOWN))
-        OS._update_data_browser_items(self.attr_handle, 0, 0, nil, OS.attr_k_data_browser_item_no_property, OS.attr_k_data_browser_no_item)
-      end
-      set_redraw(true)
+      @item_count = count_
+      (self.attr_view).note_number_of_rows_changed
     end
     
     typesig { [::Java::Int] }
@@ -3430,46 +2866,28 @@ module Org::Eclipse::Swt::Widgets
       if ((item_height).equal?(-1))
         # TODO - reset item height, ensure other API's such as setFont don't do this
       else
-        OS._set_data_browser_table_view_row_height(self.attr_handle, RJava.cast_to_short(item_height))
+        (self.attr_view).set_row_height(item_height)
       end
     end
     
-    typesig { [Image] }
-    def set_item_height(image)
-      bounds = !(image).nil? ? image.get_bounds : @image_bounds
-      if ((bounds).nil?)
-        return
+    typesig { [Image, NSFont, ::Java::Boolean] }
+    def set_item_height(image_, font, set)
+      if ((font).nil?)
+        font = get_font.attr_handle
       end
-      @image_bounds = bounds
-      height = Array.typed(::Java::Short).new(1) { 0 }
-      if ((OS._get_data_browser_table_view_row_height(self.attr_handle, height)).equal?(OS.attr_no_err))
-        if (height[0] < bounds.attr_height)
-          OS._set_data_browser_table_view_row_height(self.attr_handle, RJava.cast_to_short(bounds.attr_height))
-        end
+      # double
+      ascent = font.ascender
+      # double
+      descent = -font.descender + font.leading
+      height = RJava.cast_to_int(Math.ceil(ascent + descent)) + 1
+      bounds_ = !(image_).nil? ? image_.get_bounds : @image_bounds
+      if (!(bounds_).nil?)
+        @image_bounds = bounds_
+        height = Math.max(height, bounds_.attr_height)
       end
-    end
-    
-    typesig { [::Java::Boolean] }
-    # Marks the receiver's lines as visible if the argument is <code>true</code>,
-    # and marks it invisible otherwise.
-    # <p>
-    # If one of the receiver's ancestors is not visible or some
-    # other condition makes the receiver not visible, marking
-    # it visible may not actually cause it to be displayed.
-    # </p>
-    # 
-    # @param show the new visibility state
-    # 
-    # @exception SWTException <ul>
-    # <li>ERROR_WIDGET_DISPOSED - if the receiver has been disposed</li>
-    # <li>ERROR_THREAD_INVALID_ACCESS - if not called from the thread that created the receiver</li>
-    # </ul>
-    def set_lines_visible(show)
-      check_widget
-      if (OS::VERSION >= 0x1040)
-        attrib = OS.attr_k_data_browser_attribute_list_view_alternating_row_colors | OS.attr_k_data_browser_attribute_list_view_draw_column_dividers
-        OS._data_browser_change_attributes(self.attr_handle, show ? attrib : 0, !show ? attrib : 0)
-        redraw
+      widget = self.attr_view
+      if (set || widget.row_height < height)
+        widget.set_row_height(height)
       end
     end
     
@@ -3485,46 +2903,42 @@ module Org::Eclipse::Swt::Widgets
           System.arraycopy(@items, 0, new_items, 0, @item_count)
           @items = new_items
         end
-        check_items(true)
+        set_scroll_width
       end
     end
     
-    typesig { [ScrollBar, ::Java::Boolean] }
-    def set_scroll_bar_visible(bar, visible)
-      horiz = Array.typed(::Java::Boolean).new(1) { false }
-      vert = Array.typed(::Java::Boolean).new(1) { false }
-      OS._get_data_browser_has_scroll_bars(self.attr_handle, horiz, vert)
-      if (!((bar.attr_style & SWT::H_SCROLL)).equal?(0))
-        horiz[0] = visible
-      end
-      if (!((bar.attr_style & SWT::V_SCROLL)).equal?(0))
-        vert[0] = visible
-      end
-      if (!visible)
-        bar.redraw
-        bar.deregister
-      end
-      if ((OS._set_data_browser_has_scroll_bars(self.attr_handle, horiz[0], vert[0])).equal?(OS.attr_no_err))
-        if (visible)
-          bar.attr_handle = find_standard_bar(bar.attr_style)
-          bar.register
-          bar.hook_events
-          bar.redraw
-        else
-          bar.attr_handle = 0
-        end
-        return true
-      else
-        if (!visible)
-          bar.register
-        end
-      end
-      return false
+    typesig { [::Java::Boolean] }
+    # Marks the receiver's lines as visible if the argument is <code>true</code>,
+    # and marks it invisible otherwise. Note that some platforms draw grid lines
+    # while others may draw alternating row colors.
+    # <p>
+    # If one of the receiver's ancestors is not visible or some
+    # other condition makes the receiver not visible, marking
+    # it visible may not actually cause it to be displayed.
+    # </p>
+    # 
+    # @param show the new visibility state
+    # 
+    # @exception SWTException <ul>
+    # <li>ERROR_WIDGET_DISPOSED - if the receiver has been disposed</li>
+    # <li>ERROR_THREAD_INVALID_ACCESS - if not called from the thread that created the receiver</li>
+    # </ul>
+    def set_lines_visible(show)
+      check_widget
+      (self.attr_view).set_uses_alternating_row_background_colors(show)
+    end
+    
+    typesig { [] }
+    def set_scroll_width
+      return set_scroll_width(@items, true)
     end
     
     typesig { [TableItem] }
     def set_scroll_width(item)
       if (!(@column_count).equal?(0))
+        return false
+      end
+      if (!get_drawing)
         return false
       end
       if (!(@current_item).nil?)
@@ -3533,17 +2947,15 @@ module Org::Eclipse::Swt::Widgets
         end
         return false
       end
-      if (!(self.attr_draw_count).equal?(0))
-        return false
-      end
       gc = SwtGC.new(self)
       new_width = item.calculate_width(0, gc)
       gc.dispose
-      new_width += get_inset_width
-      width = Array.typed(::Java::Short).new(1) { 0 }
-      OS._get_data_browser_table_view_named_column_width(self.attr_handle, @column_id, width)
-      if (width[0] < new_width)
-        OS._set_data_browser_table_view_named_column_width(self.attr_handle, @column_id, RJava.cast_to_short(new_width))
+      old_width = RJava.cast_to_int(@first_column.width)
+      if (old_width < new_width)
+        @first_column.set_width(new_width)
+        if (!(self.attr_horizontal_bar).nil? && !(self.attr_horizontal_bar.attr_view).nil?)
+          redraw_widget(self.attr_horizontal_bar.attr_view, false)
+        end
         return true
       end
       return false
@@ -3551,14 +2963,17 @@ module Org::Eclipse::Swt::Widgets
     
     typesig { [Array.typed(TableItem), ::Java::Boolean] }
     def set_scroll_width(items, set)
+      if ((items).nil?)
+        return false
+      end
       if (!(@column_count).equal?(0))
+        return false
+      end
+      if (!get_drawing)
         return false
       end
       if (!(@current_item).nil?)
         @fix_scroll_width = true
-        return false
-      end
-      if (!(self.attr_draw_count).equal?(0))
         return false
       end
       gc = SwtGC.new(self)
@@ -3572,15 +2987,16 @@ module Org::Eclipse::Swt::Widgets
         i += 1
       end
       gc.dispose
-      new_width += get_inset_width
       if (!set)
-        width = Array.typed(::Java::Short).new(1) { 0 }
-        OS._get_data_browser_table_view_named_column_width(self.attr_handle, @column_id, width)
-        if (width[0] >= new_width)
+        old_width = RJava.cast_to_int(@first_column.width)
+        if (old_width >= new_width)
           return false
         end
       end
-      OS._set_data_browser_table_view_named_column_width(self.attr_handle, @column_id, RJava.cast_to_short(new_width))
+      @first_column.set_width(new_width)
+      if (!(self.attr_horizontal_bar).nil? && !(self.attr_horizontal_bar.attr_view).nil?)
+        redraw_widget(self.attr_horizontal_bar.attr_view, false)
+      end
       return true
     end
     
@@ -3599,23 +3015,11 @@ module Org::Eclipse::Swt::Widgets
     # @see Table#select(int)
     def set_selection(index)
       check_widget
-      check_items(false)
+      # TODO - optimize to use expand flag
       deselect_all
-      set_selection(index, false)
-    end
-    
-    typesig { [::Java::Int, ::Java::Boolean] }
-    def set_selection(index, notify)
-      # checkWidget();
       if (0 <= index && index < @item_count)
-        ids = Array.typed(::Java::Int).new([get_id(index)])
-        select(ids, ids.attr_length, true)
+        select(index)
         show_index(index)
-        if (notify)
-          event = Event.new
-          event.attr_item = __get_item(index)
-          post_event(SWT::Selection, event)
-        end
       end
     end
     
@@ -3642,7 +3046,7 @@ module Org::Eclipse::Swt::Widgets
     # @see Table#select(int,int)
     def set_selection(start, end_)
       check_widget
-      check_items(false)
+      # TODO - optimize to use expand flag
       deselect_all
       if (end_ < 0 || start > end_ || (!((self.attr_style & SWT::SINGLE)).equal?(0) && !(start).equal?(end_)))
         return
@@ -3652,15 +3056,8 @@ module Org::Eclipse::Swt::Widgets
       end
       start = Math.max(0, start)
       end_ = Math.min(end_, @item_count - 1)
-      length_ = end_ - start + 1
-      ids = Array.typed(::Java::Int).new(length_) { 0 }
-      i = 0
-      while i < length_
-        ids[i] = get_id(end_ - i)
-        i += 1
-      end
-      select(ids, length_, true)
-      show_index(get_index(ids[0]))
+      select(start, end_)
+      show_index(start)
     end
     
     typesig { [Array.typed(::Java::Int)] }
@@ -3686,29 +3083,17 @@ module Org::Eclipse::Swt::Widgets
     # @see Table#select(int[])
     def set_selection(indices)
       check_widget
-      check_items(false)
       if ((indices).nil?)
         error(SWT::ERROR_NULL_ARGUMENT)
       end
+      # TODO - optimize to use expand flag
       deselect_all
       length_ = indices.attr_length
       if ((length_).equal?(0) || (!((self.attr_style & SWT::SINGLE)).equal?(0) && length_ > 1))
         return
       end
-      ids = Array.typed(::Java::Int).new(length_) { 0 }
-      count = 0
-      i = 0
-      while i < length_
-        index = indices[length_ - i - 1]
-        if (index >= 0 && index < @item_count)
-          ids[((count += 1) - 1)] = get_id(index)
-        end
-        i += 1
-      end
-      if (count > 0)
-        select(ids, count, true)
-        show_index(get_index(ids[0]))
-      end
+      select(indices)
+      show_index(indices[0])
     end
     
     typesig { [TableItem] }
@@ -3763,29 +3148,38 @@ module Org::Eclipse::Swt::Widgets
     # @see Table#setSelection(int[])
     def set_selection(items)
       check_widget
-      check_items(false)
       if ((items).nil?)
         error(SWT::ERROR_NULL_ARGUMENT)
       end
+      # TODO - optimize to use expand flag
       deselect_all
       length_ = items.attr_length
       if ((length_).equal?(0) || (!((self.attr_style & SWT::SINGLE)).equal?(0) && length_ > 1))
         return
       end
-      ids = Array.typed(::Java::Int).new(length_) { 0 }
-      count = 0
+      indices = Array.typed(::Java::Int).new(length_) { 0 }
+      count_ = 0
       i = 0
       while i < length_
         index = index_of(items[length_ - i - 1])
         if (!(index).equal?(-1))
-          ids[((count += 1) - 1)] = get_id(index)
+          indices[((count_ += 1) - 1)] = index
         end
         i += 1
       end
-      if (count > 0)
-        select(ids, count, true)
-        show_index(get_index(ids[0]))
+      if (count_ > 0)
+        select(indices)
+        show_index(indices[0])
       end
+    end
+    
+    typesig { [] }
+    def set_small_size
+      if ((@check_column).nil?)
+        return
+      end
+      @check_column.data_cell.set_control_size(OS::NSSmallControlSize)
+      @check_column.set_width(get_check_column_width)
     end
     
     typesig { [TableColumn] }
@@ -3812,19 +3206,8 @@ module Org::Eclipse::Swt::Widgets
       if ((column).equal?(@sort_column))
         return
       end
-      indices = get_selection_indices
       @sort_column = column
-      id = 0
-      order = OS.attr_k_data_browser_order_increasing
-      if (!(@sort_column).nil? && !@sort_column.is_disposed && !(@sort_direction).equal?(SWT::NONE))
-        id = @sort_column.attr_id
-        if ((@sort_direction).equal?(SWT::DOWN))
-          order = OS.attr_k_data_browser_order_decreasing
-        end
-      end
-      OS._set_data_browser_sort_property(self.attr_handle, id)
-      OS._set_data_browser_sort_order(self.attr_handle, RJava.cast_to_short(order))
-      select_indices(indices, indices.attr_length, true)
+      (self.attr_view).set_highlighted_table_column((column).nil? ? nil : column.attr_ns_column)
     end
     
     typesig { [::Java::Int] }
@@ -3847,31 +3230,24 @@ module Org::Eclipse::Swt::Widgets
       if ((direction).equal?(@sort_direction))
         return
       end
-      indices = get_selection_indices
       @sort_direction = direction
-      id = 0
-      order = OS.attr_k_data_browser_order_increasing
-      if (!(@sort_column).nil? && !@sort_column.is_disposed && !(@sort_direction).equal?(SWT::NONE))
-        id = @sort_column.attr_id
-        if ((@sort_direction).equal?(SWT::DOWN))
-          order = OS.attr_k_data_browser_order_decreasing
-        end
+      if ((@sort_column).nil?)
+        return
       end
-      OS._set_data_browser_sort_property(self.attr_handle, id)
-      OS._set_data_browser_sort_order(self.attr_handle, RJava.cast_to_short(order))
-      select_indices(indices, indices.attr_length, true)
+      header_view_ = (self.attr_view).header_view
+      if ((header_view_).nil?)
+        return
+      end
+      index = index_of(@sort_column.attr_ns_column)
+      rect = header_view_.header_rect_of_column(index)
+      header_view_.set_needs_display_in_rect(rect)
     end
     
     typesig { [] }
     def set_table_empty
-      OS._set_data_browser_scroll_position(self.attr_handle, 0, 0)
-      @item_count = @anchor_first = @anchor_last = 0
+      @item_count = 0
       @items = Array.typed(TableItem).new(4) { nil }
-      if (!(@image_bounds).nil?)
-        # Reset the item height to the font height
-        @image_bounds = nil
-        set_font_style(self.attr_font)
-      end
+      @image_bounds = nil
     end
     
     typesig { [::Java::Int] }
@@ -3887,13 +3263,12 @@ module Org::Eclipse::Swt::Widgets
     # </ul>
     def set_top_index(index)
       check_widget
-      check_items(false)
-      item_height = get_item_height
-      top = Array.typed(::Java::Int).new(1) { 0 }
-      left = Array.typed(::Java::Int).new(1) { 0 }
-      OS._get_data_browser_scroll_position(self.attr_handle, top, left)
-      top[0] = Math.max(0, Math.min(item_height * @item_count + get_header_height - get_client_area.attr_height, index * item_height))
-      OS._set_data_browser_scroll_position(self.attr_handle, top[0], left[0])
+      widget = self.attr_view
+      row = Math.max(0, Math.min(index, @item_count))
+      pt = NSPoint.new
+      pt.attr_x = self.attr_scroll_view.content_view.bounds.attr_x
+      pt.attr_y = widget.frame_of_cell_at_column(0, row).attr_y
+      self.attr_view.scroll_point(pt)
     end
     
     typesig { [TableColumn] }
@@ -3924,84 +3299,20 @@ module Org::Eclipse::Swt::Widgets
       if (!(column.attr_parent).equal?(self))
         return
       end
-      index = index_of(column)
-      if (@column_count <= 1 || !(0 <= index && index < @column_count))
+      if (@column_count <= 1)
         return
       end
-      # Get width and horizontal position of column
-      w = Array.typed(::Java::Short).new(1) { 0 }
-      OS._get_data_browser_table_view_named_column_width(self.attr_handle, column.attr_id, w)
-      width = w[0]
-      x = 0
-      i = 0
-      while i < index
-        w = Array.typed(::Java::Short).new(1) { 0 }
-        OS._get_data_browser_table_view_named_column_width(self.attr_handle, @columns[i].attr_id, w)
-        x += w[0]
-        i += 1
+      index = index_of(column.attr_ns_column)
+      if (!(0 <= index && index < @column_count + (!((self.attr_style & SWT::CHECK)).equal?(0) ? 1 : 0)))
+        return
       end
-      # Get current scroll position
-      top = Array.typed(::Java::Int).new(1) { 0 }
-      left = Array.typed(::Java::Int).new(1) { 0 }
-      OS._get_data_browser_scroll_position(self.attr_handle, top, left)
-      # Scroll column into view
-      if (x < left[0])
-        OS._set_data_browser_scroll_position(self.attr_handle, top[0], x)
-      else
-        rect = get_client_area
-        max_width = rect.attr_width
-        width = Math.min(width, max_width)
-        if (x + width > left[0] + max_width)
-          left[0] = x + width - max_width
-          OS._set_data_browser_scroll_position(self.attr_handle, top[0], left[0])
-        end
-      end
+      (self.attr_view).scroll_column_to_visible(index)
     end
     
     typesig { [::Java::Int] }
     def show_index(index)
       if (0 <= index && index < @item_count)
-        # Bug in the Macintosh.  When there is not room to show a
-        # single item in the data browser, RevealDataBrowserItem()
-        # scrolls the item such that it is above the top of the data
-        # browser.  The fix is to remember the index and scroll when
-        # the data browser is resized.
-        # 
-        # Bug in the Macintosh.  When items are added to the data
-        # browser after is has been hidden, RevealDataBrowserItem()
-        # when called before the controls behind the data browser
-        # are repainted causes a redraw.  This redraw happens right
-        # away causing pixel corruption.  The fix is to remember the
-        # index and scroll when the data browser is shown.
-        rect = get_client_area
-        if (rect.attr_height < get_item_height || !OS._is_control_visible(self.attr_handle))
-          @show_index = index
-          return
-        end
-        @show_index = -1
-        item = __get_item(index)
-        item_rect = item.get_bounds(0)
-        if (!item_rect.is_empty)
-          if (rect.contains(item_rect.attr_x, item_rect.attr_y) && rect.contains(item_rect.attr_x, item_rect.attr_y + item_rect.attr_height))
-            return
-          end
-        end
-        top = Array.typed(::Java::Int).new(1) { 0 }
-        left = Array.typed(::Java::Int).new(1) { 0 }
-        OS._get_data_browser_scroll_position(self.attr_handle, top, left)
-        OS._reveal_data_browser_item(self.attr_handle, get_id(index), OS.attr_k_data_browser_no_item, OS.attr_k_data_browser_reveal_without_selecting)
-        # Bug in the Macintosh.  For some reason, when the DataBrowser is scrolled
-        # by RevealDataBrowserItem(), the scrollbars are not redrawn.  The fix is to
-        # force a redraw.
-        new_top = Array.typed(::Java::Int).new(1) { 0 }
-        new_left = Array.typed(::Java::Int).new(1) { 0 }
-        OS._get_data_browser_scroll_position(self.attr_handle, new_top, new_left)
-        if (!(self.attr_horizontal_bar).nil? && !(new_left[0]).equal?(left[0]))
-          self.attr_horizontal_bar.redraw
-        end
-        if (!(self.attr_vertical_bar).nil? && !(new_top[0]).equal?(top[0]))
-          self.attr_vertical_bar.redraw
-        end
+        (self.attr_view).scroll_row_to_visible(index)
       end
     end
     
@@ -4024,7 +3335,6 @@ module Org::Eclipse::Swt::Widgets
     # @see Table#showSelection()
     def show_item(item)
       check_widget
-      check_items(false)
       if ((item).nil?)
         error(SWT::ERROR_NULL_ARGUMENT)
       end
@@ -4050,16 +3360,372 @@ module Org::Eclipse::Swt::Widgets
     # @see Table#showItem(TableItem)
     def show_selection
       check_widget
-      check_items(false)
       index = get_selection_index
       if (index >= 0)
+        check_data(__get_item(index))
         show_index(index)
       end
     end
     
+    typesig { [] }
+    def send_double_selection
+      table_view = self.attr_view
+      # 64
+      row_index = RJava.cast_to_int(table_view.clicked_row)
+      if (!(row_index).equal?(-1))
+        if (!((self.attr_style & SWT::CHECK)).equal?(0))
+          columns = table_view.table_columns
+          # 64
+          column_index = RJava.cast_to_int(table_view.clicked_column)
+          column = columns.object_at_index(column_index)
+          if ((column.attr_id).equal?(@check_column.attr_id))
+            return
+          end
+        end
+        event = Event.new
+        event.attr_item = __get_item(row_index)
+        post_event(SWT::DefaultSelection, event)
+      end
+    end
+    
+    typesig { [NSEvent, ::Java::Int] }
+    def send_key_event(ns_event, type)
+      result = super(ns_event, type)
+      if (!result)
+        return result
+      end
+      if (!(type).equal?(SWT::KeyDown))
+        return result
+      end
+      key_code_ = ns_event.key_code
+      case (key_code_)
+      # KP Enter
+      when 76, 36
+        # Return
+        post_event(SWT::DefaultSelection)
+      end
+      return result
+    end
+    
+    typesig { [TableItem, ::Java::Int, NSSize] }
+    def send_measure_item(item, column_index, size_)
+      widget = self.attr_view
+      content_width = RJava.cast_to_int(Math.ceil(size_.attr_width))
+      spacing = widget.intercell_spacing
+      item_height = RJava.cast_to_int(Math.ceil(widget.row_height + spacing.attr_height))
+      data = SwtGCData.new
+      data.attr_paint_rect = widget.frame
+      gc = SwtGC.cocoa_new(self, data)
+      gc.set_font(item.get_font(column_index))
+      event = Event.new
+      event.attr_item = item
+      event.attr_gc = gc
+      event.attr_index = column_index
+      event.attr_width = content_width
+      event.attr_height = item_height
+      send_event(SWT::MeasureItem, event)
+      gc.dispose
+      if (!is_disposed && !item.is_disposed)
+        size_.attr_width = event.attr_width
+        size_.attr_height = event.attr_height
+        if (item_height < event.attr_height)
+          widget.set_row_height(event.attr_height)
+        end
+        if (!(content_width).equal?(event.attr_width))
+          if ((@column_count).equal?(0) && (column_index).equal?(0))
+            item.attr_width = event.attr_width
+            if (set_scroll_width(item))
+              widget.set_needs_display(true)
+            end
+          end
+        end
+      end
+    end
+    
+    typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
+    # long
+    # long
+    # long
+    def table_view_column_did_move(id, sel, a_notification)
+      notification = NSNotification.new(a_notification)
+      user_info_ = notification.user_info
+      ns_old_index = user_info_.value_for_key(NSString.string_with("NSOldColumn")) # $NON-NLS-1$
+      ns_new_index = user_info_.value_for_key(NSString.string_with("NSNewColumn")) # $NON-NLS-1$
+      old_index = NSNumber.new(ns_old_index).int_value
+      new_index = NSNumber.new(ns_new_index).int_value
+      start_index = Math.min(old_index, new_index)
+      end_index = Math.max(old_index, new_index)
+      table_view = self.attr_view
+      ns_columns = table_view.table_columns
+      i = start_index
+      while i <= end_index
+        column_id = ns_columns.object_at_index(i)
+        column = get_column(column_id)
+        if (!(column).nil?)
+          column.send_event(SWT::Move)
+          if (is_disposed)
+            return
+          end
+        end
+        i += 1
+      end
+    end
+    
+    typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
+    # long
+    # long
+    # long
+    def table_view_column_did_resize(id, sel, a_notification)
+      notification = NSNotification.new(a_notification)
+      user_info_ = notification.user_info
+      column_id = user_info_.value_for_key(NSString.string_with("NSTableColumn")) # $NON-NLS-1$
+      column = get_column(column_id)
+      if ((column).nil?)
+        return
+      end
+      # either CHECK column or firstColumn in 0-column Table
+      column.send_event(SWT::Resize)
+      if (is_disposed)
+        return
+      end
+      table_view = self.attr_view
+      index = index_of(column.attr_ns_column)
+      if ((index).equal?(-1))
+        return
+      end
+      # column was disposed in Resize callback
+      ns_columns = table_view.table_columns
+      # 64
+      column_count = RJava.cast_to_int(table_view.number_of_columns)
+      i = index + 1
+      while i < column_count
+        column_id = ns_columns.object_at_index(i)
+        column = get_column(column_id)
+        if (!(column).nil?)
+          column.send_event(SWT::Move)
+          if (is_disposed)
+            return
+          end
+        end
+        i += 1
+      end
+    end
+    
+    typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
+    # long
+    # long
+    # long
+    def table_view_selection_did_change(id, sel, a_notification)
+      if (@ignore_select)
+        return
+      end
+      widget = self.attr_view
+      # 64
+      row = RJava.cast_to_int(widget.selected_row)
+      if ((row).equal?(-1))
+        post_event(SWT::Selection)
+      else
+        item = __get_item(row)
+        event = Event.new
+        event.attr_item = item
+        event.attr_index = row
+        post_event(SWT::Selection, event)
+      end
+    end
+    
+    typesig { [::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int] }
+    # long
+    # long
+    # long
+    # long
+    def table_view_did_click_table_column(id, sel, table_view, table_column)
+      column = get_column(Id.new(table_column))
+      if ((column).nil?)
+        return
+      end
+      # either CHECK column or firstColumn in 0-column Table
+      column.post_event(SWT::Selection)
+    end
+    
+    typesig { [::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int] }
+    # long
+    # long
+    # long
+    # long
+    # long
+    # long
+    def table_view_object_value_for_table_column_row(id, sel, a_table_view, a_table_column, row_index)
+      # 64
+      index = RJava.cast_to_int(row_index)
+      item = __get_item(index)
+      check_data(item, index)
+      if (!(@check_column).nil? && (a_table_column).equal?(@check_column.attr_id))
+        value = nil
+        if (item.attr_checked && item.attr_grayed)
+          value = NSNumber.number_with_int(OS::NSMixedState)
+        else
+          value = NSNumber.number_with_int(item.attr_checked ? OS::NSOnState : OS::NSOffState)
+        end
+        return value.attr_id
+      end
+      i = 0
+      while i < @column_count
+        if ((@columns[i].attr_ns_column.attr_id).equal?(a_table_column))
+          return item.create_string(i).attr_id
+        end
+        i += 1
+      end
+      return item.create_string(0).attr_id
+    end
+    
     typesig { [::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int] }
-    def tracking_proc(browser, id, property, the_rect, start_pt, modifiers)
-      return 1
+    # long
+    # long
+    # long
+    # long
+    # long
+    # long
+    def table_view_set_object_value_for_table_column_row(id, sel, a_table_view, an_object, a_table_column, row_index)
+      if (!(@check_column).nil? && (a_table_column).equal?(@check_column.attr_id))
+        # 64
+        item = @items[RJava.cast_to_int(row_index)]
+        item.attr_checked = !item.attr_checked
+        event = Event.new
+        event.attr_detail = SWT::CHECK
+        event.attr_item = item
+        # 64
+        event.attr_index = RJava.cast_to_int(row_index)
+        post_event(SWT::Selection, event)
+        item.redraw(-1)
+      end
+    end
+    
+    typesig { [::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int] }
+    # long
+    # long
+    # long
+    # long
+    # long
+    def table_view_should_edit_table_column_row(id, sel, a_table_view, a_table_column, row_index)
+      return false
+    end
+    
+    typesig { [::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int] }
+    # long
+    # long
+    # long
+    # long
+    # long
+    # long
+    def table_view_will_display_cell_for_table_column_row(id, sel, a_table_view, cell, table_column, row_index)
+      if (!(@check_column).nil? && (table_column).equal?(@check_column.attr_id))
+        return
+      end
+      # 64
+      item = @items[RJava.cast_to_int(row_index)]
+      index = 0
+      i = 0
+      while i < @column_count
+        if ((@columns[i].attr_ns_column.attr_id).equal?(table_column))
+          index = i
+          break
+        end
+        i += 1
+      end
+      text_cell = NSTextFieldCell.new(cell)
+      OS.object_set_instance_variable(cell, Display::SWT_ROW, row_index)
+      OS.object_set_instance_variable(cell, Display::SWT_COLUMN, table_column)
+      image_ = (index).equal?(0) ? item.attr_image : ((item.attr_images).nil? ? nil : item.attr_images[index])
+      text_cell.set_image(!(image_).nil? ? image_.attr_handle : nil)
+      color = nil
+      if (text_cell.is_enabled)
+        if (text_cell.is_highlighted)
+          color = NSColor.selected_control_text_color
+        else
+          foreground = !(item.attr_cell_foreground).nil? ? item.attr_cell_foreground[index] : nil
+          if ((foreground).nil?)
+            foreground = item.attr_foreground
+          end
+          if ((foreground).nil?)
+            foreground = get_foreground_color
+          end
+          color = NSColor.color_with_device_red(foreground.attr_handle[0], foreground.attr_handle[1], foreground.attr_handle[2], 1)
+        end
+      else
+        color = NSColor.disabled_control_text_color
+      end
+      alignment = OS::NSLeftTextAlignment
+      if (@column_count > 0)
+        style = @columns[index].attr_style
+        if (!((style & SWT::CENTER)).equal?(0))
+          alignment = OS::NSCenterTextAlignment
+        else
+          if (!((style & SWT::RIGHT)).equal?(0))
+            alignment = OS::NSRightTextAlignment
+          end
+        end
+      end
+      font = !(item.attr_cell_font).nil? ? item.attr_cell_font[index] : nil
+      if ((font).nil?)
+        font = item.attr_font
+      end
+      if ((font).nil?)
+        font = self.attr_font
+      end
+      if ((font).nil?)
+        font = default_font
+      end
+      if (!(font.attr_extra_traits).equal?(0))
+        dict = (NSMutableDictionary.new.alloc).init_with_capacity(5)
+        dict.set_object(color, OS::NSForegroundColorAttributeName)
+        dict.set_object(font.attr_handle, OS::NSFontAttributeName)
+        add_traits(dict, font)
+        paragraph_style = NSMutableParagraphStyle.new.alloc.init
+        paragraph_style.set_line_break_mode(OS::NSLineBreakByClipping)
+        paragraph_style.set_alignment(alignment)
+        dict.set_object(paragraph_style, OS::NSParagraphStyleAttributeName)
+        paragraph_style.release
+        attrib_str = (NSAttributedString.new.alloc).init_with_string(text_cell.title, dict)
+        text_cell.set_attributed_string_value(attrib_str)
+        attrib_str.release
+        dict.release
+      else
+        text_cell.set_font(font.attr_handle)
+        text_cell.set_text_color(color)
+        text_cell.set_alignment(alignment)
+      end
+    end
+    
+    typesig { [::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int] }
+    # long
+    # long
+    # long
+    # long
+    # long
+    def table_view_write_rows_with_indexes_to_pasteboard(id, sel, arg0, arg1, arg2)
+      return send_mouse_event(NSApplication.shared_application.current_event, SWT::DragDetect, true)
+    end
+    
+    typesig { [::Java::Int, ::Java::Int, NSRect] }
+    # long
+    # long
+    def title_rect_for_bounds(id, sel, cell_frame)
+      image_ = NSCell.new(id).image
+      if (!(image_).nil?)
+        image_width = @image_bounds.attr_width + IMAGE_GAP
+        cell_frame.attr_x += image_width
+        cell_frame.attr_width -= image_width
+      end
+      return cell_frame
+    end
+    
+    typesig { [::Java::Boolean] }
+    def update_cursor_rects(enabled)
+      super(enabled)
+      if ((@header_view).nil?)
+        return
+      end
+      update_cursor_rects(enabled, @header_view)
     end
     
     private

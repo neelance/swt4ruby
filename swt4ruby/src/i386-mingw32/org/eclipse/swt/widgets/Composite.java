@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2008 IBM Corporation and others.
+ * Copyright (c) 2000, 2009 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -33,10 +33,9 @@ import org.eclipse.swt.graphics.*;
  * than <code>Canvas</code>.
  * </p><p>
  * Note: The <code>CENTER</code> style, although undefined for composites, has the
- * same value as <code>EMBEDDED</code> (which is used to embed widgets from other
- * widget toolkits into SWT).  On some operating systems (GTK, Motif), this may cause
- * the children of this composite to be obscured.  The <code>EMBEDDED</code> style
- * is for use by other widget toolkits and should normally never be used.
+ * same value as <code>EMBEDDED</code> which is used to embed widgets from other
+ * widget toolkits into SWT.  On some operating systems (GTK, Motif), this may cause
+ * the children of this composite to be obscured.
  * </p><p>
  * This class may be subclassed by custom control implementors
  * who are building controls that are constructed from aggregates
@@ -88,6 +87,8 @@ Composite () {
  * @see SWT#NO_MERGE_PAINTS
  * @see SWT#NO_REDRAW_RESIZE
  * @see SWT#NO_RADIO_GROUP
+ * @see SWT#EMBEDDED
+ * @see SWT#DOUBLE_BUFFERED
  * @see Widget#getStyle
  */
 public Composite (Composite parent, int style) {
@@ -204,15 +205,15 @@ protected void checkSubclass () {
 	/* Do nothing - Subclassing is allowed */
 }
 
-Control [] computeTabList () {
-	Control result [] = super.computeTabList ();
+Widget [] computeTabList () {
+	Widget result [] = super.computeTabList ();
 	if (result.length == 0) return result;
 	Control [] list = tabList != null ? _getTabList () : _getChildren ();
 	for (int i=0; i<list.length; i++) {
 		Control child = list [i];
-		Control [] childList = child.computeTabList ();
+		Widget  [] childList = child.computeTabList ();
 		if (childList.length != 0) {
-			Control [] newResult = new Control [result.length + childList.length];
+			Widget [] newResult = new Widget [result.length + childList.length];
 			System.arraycopy (result, 0, newResult, 0, result.length);
 			System.arraycopy (childList, 0, newResult, result.length, childList.length);
 			result = newResult;
@@ -886,7 +887,7 @@ void setBounds (int x, int y, int width, int height, int flags, boolean defer) {
 		defer = false;
 	}
 	if (!defer && (state & CANVAS) != 0) {
-		state &= ~RESIZE_OCCURRED | MOVE_OCCURRED;
+		state &= ~(RESIZE_OCCURRED | MOVE_OCCURRED);
 		state |= RESIZE_DEFERRED | MOVE_DEFERRED;
 	}
 	super.setBounds (x, y, width, height, flags, defer);
@@ -904,7 +905,7 @@ boolean setFixedFocus () {
 	Control [] children = _getChildren ();
 	for (int i=0; i<children.length; i++) {
 		Control child = children [i];
-		if (child.setRadioFocus ()) return true;
+		if (child.setRadioFocus (false)) return true;
 	}
 	for (int i=0; i<children.length; i++) {
 		Control child = children [i];
@@ -918,7 +919,7 @@ public boolean setFocus () {
 	Control [] children = _getChildren ();
 	for (int i=0; i<children.length; i++) {
 		Control child = children [i];
-		if (child.setRadioFocus ()) return true;
+		if (child.setRadioFocus (false)) return true;
 	}
 	for (int i=0; i<children.length; i++) {
 		Control child = children [i];
@@ -1032,7 +1033,7 @@ boolean setTabGroupFocus () {
 	Control [] children = _getChildren ();
 	for (int i=0; i<children.length; i++) {
 		Control child = children [i];
-		if (child.isTabItem () && child.setRadioFocus ()) return true;
+		if (child.isTabItem () && child.setRadioFocus (true)) return true;
 	}
 	for (int i=0; i<children.length; i++) {
 		Control child = children [i];
@@ -1276,7 +1277,7 @@ LRESULT WM_PAINT (int /*long*/ wParam, int /*long*/ lParam) {
 
 	/* Paint the control and the background */
 	PAINTSTRUCT ps = new PAINTSTRUCT ();
-	if (hooks (SWT.Paint)) {
+	if (hooks (SWT.Paint) || filters (SWT.Paint)) {
 
 		/* Use the buffered paint when possible */
 		boolean bufferedPaint = false;
@@ -1339,7 +1340,7 @@ LRESULT WM_PAINT (int /*long*/ wParam, int /*long*/ lParam) {
 			if ((style & (SWT.DOUBLE_BUFFERED | SWT.TRANSPARENT)) != 0 || (style & SWT.NO_MERGE_PAINTS) != 0) {
 				sysRgn = OS.CreateRectRgn (0, 0, 0, 0);
 				if (OS.GetRandomRgn (gc.handle, sysRgn, OS.SYSRGN) == 1) {
-					if (OS.WIN32_VERSION >= OS.VERSION (4, 10)) {
+					if (!OS.IsWinCE && OS.WIN32_VERSION >= OS.VERSION (4, 10)) {
 						if ((OS.GetLayout (gc.handle) & OS.LAYOUT_RTL) != 0) {
 							int nBytes = OS.GetRegionData (sysRgn, 0, null);
 							int [] lpRgnData = new int [nBytes / 4];

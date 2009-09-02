@@ -1,6 +1,6 @@
 require "rjava"
 
-# Copyright (c) 2000, 2008 IBM Corporation and others.
+# Copyright (c) 2000, 2009 IBM Corporation and others.
 # All rights reserved. This program and the accompanying materials
 # are made available under the terms of the Eclipse Public License v1.0
 # which accompanies this distribution, and is available at
@@ -43,6 +43,7 @@ module Org::Eclipse::Swt::Widgets
   # @see <a href="http://www.eclipse.org/swt/">Sample code and further information</a>
   # 
   # @since 3.2
+  # @noextend This class is not intended to be subclassed by clients.
   class ToolTip < ToolTipImports.const_get :Widget
     include_class_members ToolTipImports
     
@@ -163,6 +164,7 @@ module Org::Eclipse::Swt::Widgets
     # <li>ERROR_INVALID_SUBCLASS - if this class is not an allowed subclass</li>
     # </ul>
     # 
+    # @see SWT#BALLOON
     # @see SWT#ICON_ERROR
     # @see SWT#ICON_INFORMATION
     # @see SWT#ICON_WARNING
@@ -186,6 +188,7 @@ module Org::Eclipse::Swt::Widgets
       @layout_message = 0
       @parent = parent
       create_widget(0)
+      parent.add_tool_tip(self)
     end
     
     class_module.module_eval {
@@ -318,6 +321,7 @@ module Org::Eclipse::Swt::Widgets
         background = self.attr_display.get_system_color(SWT::COLOR_INFO_BACKGROUND)
         OS.gtk_widget_modify_bg(self.attr_handle, OS::GTK_STATE_NORMAL, background.attr_handle)
         OS.gtk_widget_set_app_paintable(self.attr_handle, true)
+        OS.gtk_window_set_type_hint(self.attr_handle, OS::GDK_WINDOW_TYPE_HINT_TOOLTIP)
       else
         self.attr_handle = OS.gtk_tooltips_new
         if ((self.attr_handle).equal?(0))
@@ -359,6 +363,9 @@ module Org::Eclipse::Swt::Widgets
     def destroy_widget
       # long
       top_handle_ = top_handle
+      if (!(@parent).nil?)
+        @parent.remove_too_tip(self)
+      end
       release_handle
       if (!(top_handle_).equal?(0) && !((self.attr_state & HANDLE)).equal?(0))
         if (!((self.attr_style & SWT::BALLOON)).equal?(0))
@@ -391,14 +398,21 @@ module Org::Eclipse::Swt::Widgets
       if (!(@item).nil?)
         # long
         item_handle = @item.attr_handle
-        OS.gtk_widget_realize(item_handle)
-        # long
-        window = OS._gtk_widget_window(item_handle)
-        px = Array.typed(::Java::Int).new(1) { 0 }
-        py = Array.typed(::Java::Int).new(1) { 0 }
-        OS.gdk_window_get_origin(window, px, py)
-        x = px[0] + OS._gtk_widget_width(item_handle) / 2
-        y = py[0] + OS._gtk_widget_height(item_handle) / 2
+        if (OS::GTK_VERSION >= OS._version(2, 10, 0))
+          area = GdkRectangle.new
+          OS.gtk_status_icon_get_geometry(item_handle, 0, area, 0)
+          x = area.attr_x + area.attr_width / 2
+          y = area.attr_y + area.attr_height / 2
+        else
+          OS.gtk_widget_realize(item_handle)
+          # long
+          window = OS._gtk_widget_window(item_handle)
+          px = Array.typed(::Java::Int).new(1) { 0 }
+          py = Array.typed(::Java::Int).new(1) { 0 }
+          OS.gdk_window_get_origin(window, px, py)
+          x = px[0] + OS._gtk_widget_width(item_handle) / 2
+          y = py[0] + OS._gtk_widget_height(item_handle) / 2
+        end
       end
       if ((x).equal?(-1) || (y).equal?(-1))
         px = Array.typed(::Java::Int).new(1) { 0 }
@@ -890,6 +904,7 @@ module Org::Eclipse::Swt::Widgets
     # <li>ERROR_THREAD_INVALID_ACCESS - if not called from the thread that created the receiver</li>
     # </ul>
     def set_visible(visible)
+      check_widget
       if (!(@timer_id).equal?(0))
         OS.gtk_timeout_remove(@timer_id)
       end

@@ -45,7 +45,7 @@ import org.eclipse.swt.accessibility.*;
  * @see <a href="http://www.eclipse.org/swt/examples.php">SWT Example: CustomControlExample</a>
  * @see <a href="http://www.eclipse.org/swt/">Sample code and further information</a>
  */
-public final class CCombo extends Composite {
+public class CCombo extends Composite {
 
 	Text text;
 	List list;
@@ -56,7 +56,10 @@ public final class CCombo extends Composite {
 	Listener listener, filter;
 	Color foreground, background;
 	Font font;
+	Shell _shell;
 	
+	static final String PACKAGE_PREFIX = "org.eclipse.swt.custom."; //$NON-NLS-1$
+
 /**
  * Constructs a new instance of this class given its parent
  * and a style value describing its behavior and appearance.
@@ -87,6 +90,7 @@ public final class CCombo extends Composite {
  */
 public CCombo (Composite parent, int style) {
 	super (parent, style = checkStyle (style));
+	_shell = super.getShell ();
 	
 	int textStyle = SWT.SINGLE;
 	if ((style & SWT.READ_ONLY) != 0) textStyle |= SWT.READ_ONLY;
@@ -98,6 +102,7 @@ public CCombo (Composite parent, int style) {
 
 	listener = new Listener () {
 		public void handleEvent (Event event) {
+			if (isDisposed ()) return;
 			if (popup == event.widget) {
 				popupEvent (event);
 				return;
@@ -121,7 +126,7 @@ public CCombo (Composite parent, int style) {
 			if (getShell () == event.widget) {
 				getDisplay().asyncExec(new Runnable() {
 					public void run() {
-						if (isDisposed()) return;
+						if (isDisposed ()) return;
 						handleFocus (SWT.FocusOut);
 					}
 				});
@@ -130,6 +135,7 @@ public CCombo (Composite parent, int style) {
 	};
 	filter = new Listener() {
 		public void handleEvent(Event event) {
+			if (isDisposed ()) return;
 			Shell shell = ((Control)event.widget).getShell ();
 			if (shell == CCombo.this.getShell ()) {
 				handleFocus (SWT.FocusOut);
@@ -319,6 +325,13 @@ void arrowEvent (Event event) {
 		}
 	}
 }
+protected void checkSubclass () {
+	String name = getClass ().getName ();
+	int index = name.lastIndexOf ('.');
+	if (!name.substring (0, index + 1).equals (PACKAGE_PREFIX)) {
+		SWT.error (SWT.ERROR_INVALID_SUBCLASS);
+	}
+}
 /**
  * Sets the selection in the receiver's text field to an empty
  * selection starting just before the first character. If the
@@ -344,6 +357,10 @@ public void clearSelection () {
 void comboEvent (Event event) {
 	switch (event.type) {
 		case SWT.Dispose:
+			removeListener(SWT.Dispose, listener);
+			notifyListeners(SWT.Dispose, event);
+			event.type = SWT.None;
+
 			if (popup != null && !popup.isDisposed ()) {
 				list.removeListener (SWT.Dispose, listener);
 				popup.dispose ();
@@ -356,6 +373,7 @@ void comboEvent (Event event) {
 			text = null;  
 			list = null;  
 			arrow = null;
+			_shell = null;
 			break;
 		case SWT.FocusIn:
 			Control focusControl = getDisplay ().getFocusControl ();
@@ -494,7 +512,7 @@ public void deselectAll () {
 	list.deselectAll ();
 }
 void dropDown (boolean drop) {
-	if (drop == isDropped () || !isVisible()) return;
+	if (drop == isDropped ()) return;
 	if (!drop) {
 		popup.setVisible (false);
 		if (!isDisposed () && isFocusControl()) {
@@ -502,7 +520,7 @@ void dropDown (boolean drop) {
 		}
 		return;
 	}
-
+	if (!isVisible()) return;
 	if (getShell() != popup.getParent ()) {
 		String[] items = list.getItems ();
 		int selectionIndex = list.getSelectionIndex ();
@@ -717,6 +735,17 @@ public int getSelectionIndex () {
 	checkWidget ();
 	return list.getSelectionIndex ();
 }
+public Shell getShell () {
+	checkWidget ();
+	Shell shell = super.getShell ();
+	if (shell != _shell) {
+		if (_shell != null && !_shell.isDisposed ()) {
+			_shell.removeListener (SWT.Deactivate, listener);
+		}
+		_shell = shell;
+	}
+	return _shell;
+}
 public int getStyle () {
 	int style = super.getStyle ();
 	style &= ~SWT.READ_ONLY;
@@ -787,7 +816,6 @@ public int getVisibleItemCount () {
 	return visibleItemCount;
 }
 void handleFocus (int type) {
-	if (isDisposed ()) return;
 	switch (type) {
 		case SWT.FocusIn: {
 			if (hasFocus) return;

@@ -1,6 +1,6 @@
 require "rjava"
 
-# Copyright (c) 2000, 2008 IBM Corporation and others.
+# Copyright (c) 2000, 2009 IBM Corporation and others.
 # All rights reserved. This program and the accompanying materials
 # are made available under the terms of the Eclipse Public License v1.0
 # which accompanies this distribution, and is available at
@@ -15,9 +15,7 @@ module Org::Eclipse::Swt::Widgets
       include ::Org::Eclipse::Swt::Widgets
       include_const ::Org::Eclipse::Swt, :SWT
       include ::Org::Eclipse::Swt::Graphics
-      include_const ::Org::Eclipse::Swt::Internal::Carbon, :OS
-      include_const ::Org::Eclipse::Swt::Internal::Carbon, :CGRect
-      include_const ::Org::Eclipse::Swt::Internal::Carbon, :Rect
+      include ::Org::Eclipse::Swt::Internal::Cocoa
     }
   end
   
@@ -42,8 +40,15 @@ module Org::Eclipse::Swt::Widgets
   # 
   # @see <a href="http://www.eclipse.org/swt/examples.php">SWT Example: ControlExample</a>
   # @see <a href="http://www.eclipse.org/swt/">Sample code and further information</a>
+  # @noextend This class is not intended to be subclassed by clients.
   class Group < GroupImports.const_get :Composite
     include_class_members GroupImports
+    
+    attr_accessor :content_view
+    alias_method :attr_content_view, :content_view
+    undef_method :content_view
+    alias_method :attr_content_view=, :content_view=
+    undef_method :content_view=
     
     attr_accessor :text
     alias_method :attr_text, :text
@@ -83,6 +88,7 @@ module Org::Eclipse::Swt::Widgets
     # @see Widget#checkSubclass
     # @see Widget#getStyle
     def initialize(parent, style)
+      @content_view = nil
       @text = nil
       super(parent, check_style(style))
       @text = ""
@@ -111,56 +117,66 @@ module Org::Eclipse::Swt::Widgets
     typesig { [::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int] }
     def compute_trim(x, y, width, height)
       check_widget
-      old_bounds = CGRect.new
-      bounds = old_bounds
-      OS._hiview_get_frame(self.attr_handle, old_bounds)
-      min_size = 100
-      if (old_bounds.attr_width < min_size || old_bounds.attr_height < min_size)
-        OS._hiview_set_drawing_enabled(self.attr_handle, false)
-        bounds = CGRect.new
-        bounds.attr_width = bounds.attr_height = 100
-        OS._hiview_set_frame(self.attr_handle, bounds)
-      end
-      rgn_handle = OS._new_rgn
-      OS._get_control_region(self.attr_handle, RJava.cast_to_short(OS.attr_k_control_content_meta_part), rgn_handle)
-      client = Rect.new
-      OS._get_region_bounds(rgn_handle, client)
-      OS._dispose_rgn(rgn_handle)
-      width += RJava.cast_to_int(bounds.attr_width) - (client.attr_right - client.attr_left)
-      height += RJava.cast_to_int(bounds.attr_height) - (client.attr_bottom - client.attr_top)
-      if (old_bounds.attr_width < min_size || old_bounds.attr_height < min_size)
-        OS._hiview_set_frame(self.attr_handle, old_bounds)
-        OS._hiview_set_drawing_enabled(self.attr_handle, (self.attr_draw_count).equal?(0))
-      end
-      return Rectangle.new(-client.attr_left, -client.attr_top, width, height)
+      widget = self.attr_view
+      border = RJava.cast_to_int(Math.ceil(widget.border_width))
+      margins = widget.content_view_margins
+      frame_ = @content_view.frame
+      width += (margins.attr_width + border) * 2
+      height += (margins.attr_height + border) * 2 + frame_.attr_y
+      return super(x, y, width, height)
+    end
+    
+    typesig { [] }
+    def content_view
+      return @content_view
     end
     
     typesig { [] }
     def create_handle
       self.attr_state |= THEME_BACKGROUND
-      out_control = Array.typed(::Java::Int).new(1) { 0 }
-      window = OS._get_control_owner(self.attr_parent.attr_handle)
-      OS._create_group_box_control(window, nil, 0, true, out_control)
-      if ((out_control[0]).equal?(0))
-        error(SWT::ERROR_NO_HANDLES)
-      end
-      self.attr_handle = out_control[0]
+      widget = SWTBox.new.alloc
+      widget.init
+      widget.set_title_position(OS::NSNoTitle)
+      content_widget = SWTView.new.alloc
+      content_widget.init
+      # contentWidget.setDrawsBackground(false);
+      widget.set_content_view(content_widget)
+      @content_view = content_widget
+      self.attr_view = widget
     end
     
-    typesig { [::Java::Int, ::Java::Int] }
-    def draw_background(control, context)
-      fill_background(control, context, nil)
+    typesig { [] }
+    def default_nsfont
+      return self.attr_display.attr_box_font
+    end
+    
+    typesig { [] }
+    def deregister
+      super
+      self.attr_display.remove_widget(@content_view)
+      box = self.attr_view
+      self.attr_display.remove_widget(box.title_cell)
+    end
+    
+    typesig { [::Java::Int, NSGraphicsContext, NSRect] }
+    # long
+    def draw_background(id, context, rect)
+      if (!(id).equal?(self.attr_view.attr_id))
+        return
+      end
+      fill_background(self.attr_view, context, rect, -1)
+    end
+    
+    typesig { [] }
+    def event_view
+      return @content_view
     end
     
     typesig { [] }
     def get_client_area
       check_widget
-      rgn_handle = OS._new_rgn
-      OS._get_control_region(self.attr_handle, RJava.cast_to_short(OS.attr_k_control_content_meta_part), rgn_handle)
-      client = Rect.new
-      OS._get_region_bounds(rgn_handle, client)
-      OS._dispose_rgn(rgn_handle)
-      return Rectangle.new(client.attr_left, client.attr_top, client.attr_right - client.attr_left, client.attr_bottom - client.attr_top)
+      rect = @content_view.bounds
+      return Rectangle.new(RJava.cast_to_int(rect.attr_x), RJava.cast_to_int(rect.attr_y), RJava.cast_to_int(rect.attr_width), RJava.cast_to_int(rect.attr_height))
     end
     
     typesig { [] }
@@ -186,7 +202,42 @@ module Org::Eclipse::Swt::Widgets
     
     typesig { [] }
     def get_theme_alpha
-      return 0.25 * self.attr_parent.get_theme_alpha
+      return (!(self.attr_background).nil? ? 1 : 0.25) * self.attr_parent.get_theme_alpha
+    end
+    
+    typesig { [] }
+    def register
+      super
+      self.attr_display.add_widget(@content_view, self)
+      box = self.attr_view
+      self.attr_display.add_widget(box.title_cell, self)
+    end
+    
+    typesig { [] }
+    def release_handle
+      super
+      if (!(@content_view).nil?)
+        @content_view.release
+      end
+      @content_view = nil
+    end
+    
+    typesig { [NSFont] }
+    def set_font(font)
+      (self.attr_view).set_title_font(font)
+    end
+    
+    typesig { [Array.typed(::Java::Float)] }
+    # double
+    def set_foreground(color)
+      ns_color = nil
+      if ((color).nil?)
+        ns_color = NSColor.text_color
+      else
+        ns_color = NSColor.color_with_device_red(color[0], color[1], color[2], 1)
+      end
+      cell = NSTextFieldCell.new((self.attr_view).title_cell.attr_id)
+      cell.set_text_color(ns_color)
     end
     
     typesig { [String] }
@@ -221,12 +272,9 @@ module Org::Eclipse::Swt::Widgets
       buffer = CharArray.new(@text.length)
       @text.get_chars(0, buffer.attr_length, buffer, 0)
       length_ = fix_mnemonic(buffer)
-      ptr = OS._cfstring_create_with_characters(OS.attr_k_cfallocator_default, buffer, length_)
-      if ((ptr).equal?(0))
-        error(SWT::ERROR_CANNOT_SET_TEXT)
-      end
-      OS._set_control_title_with_cfstring(self.attr_handle, ptr)
-      OS._cfrelease(ptr)
+      box = self.attr_view
+      box.set_title_position((length_).equal?(0) ? OS::NSNoTitle : OS::NSAtTop)
+      box.set_title(NSString.string_with_characters(buffer, length_))
     end
     
     private

@@ -1,6 +1,6 @@
 require "rjava"
 
-# Copyright (c) 2000, 2008 IBM Corporation and others.
+# Copyright (c) 2000, 2009 IBM Corporation and others.
 # All rights reserved. This program and the accompanying materials
 # are made available under the terms of the Eclipse Public License v1.0
 # which accompanies this distribution, and is available at
@@ -13,6 +13,7 @@ module Org::Eclipse::Swt::Ole::Win32
     class_module.module_eval {
       include ::Java::Lang
       include ::Org::Eclipse::Swt::Ole::Win32
+      include ::Java::Io
       include ::Org::Eclipse::Swt
       include ::Org::Eclipse::Swt::Internal::Ole::Win32
       include ::Org::Eclipse::Swt::Graphics
@@ -112,19 +113,50 @@ module Org::Eclipse::Swt::Ole::Win32
     alias_method :attr_font=, :font=
     undef_method :font=
     
-    class_module.module_eval {
-      # work around for IE destroying the caret
-      
-      def swt_restorecaret
-        defined?(@@swt_restorecaret) ? @@swt_restorecaret : @@swt_restorecaret= 0
-      end
-      alias_method :attr_swt_restorecaret, :swt_restorecaret
-      
-      def swt_restorecaret=(value)
-        @@swt_restorecaret = value
-      end
-      alias_method :attr_swt_restorecaret=, :swt_restorecaret=
-    }
+    typesig { [Composite, ::Java::Int, JavaFile] }
+    # Create an OleControlSite child widget using the OLE Document type associated with the
+    # specified file.  The OLE Document type is determined either through header information in the file
+    # or through a Registry entry for the file extension. Use style bits to select a particular look
+    # or set of properties.
+    # 
+    # @param parent a composite widget; must be an OleFrame
+    # @param style the bitwise OR'ing of widget styles
+    # @param file the file that is to be opened in this OLE Document
+    # 
+    # @exception IllegalArgumentException
+    # <ul><li>ERROR_NULL_ARGUMENT when the parent is null
+    # <li>ERROR_INVALID_ARGUMENT when the parent is not an OleFrame</ul>
+    # @exception SWTException
+    # <ul><li>ERROR_THREAD_INVALID_ACCESS when called from the wrong thread
+    # <li>ERROR_CANNOT_CREATE_OBJECT when failed to create OLE Object
+    # <li>ERROR_CANNOT_OPEN_FILE when failed to open file
+    # <li>ERROR_INTERFACE_NOT_FOUND when unable to create callbacks for OLE Interfaces
+    # <li>ERROR_INVALID_CLASSID
+    # </ul>
+    # 
+    # @since 3.5
+    def initialize(parent, style, file)
+      @i_ole_control_site = nil
+      @i_dispatch = nil
+      @ole_property_change_sink = nil
+      @ole_event_sink = nil
+      @ole_event_sink_guid = nil
+      @ole_event_sink_iunknown = nil
+      @current_control_info = nil
+      @site_property_ids = nil
+      @site_property_values = nil
+      @font = nil
+      super(parent, style, file)
+      @ole_event_sink = Array.typed(OleEventSink).new(0) { nil }
+      @ole_event_sink_guid = Array.typed(GUID).new(0) { nil }
+      # long
+      @ole_event_sink_iunknown = Array.typed(::Java::Int).new(0) { 0 }
+      @site_property_ids = Array.typed(::Java::Int).new(0) { 0 }
+      @site_property_values = Array.typed(Variant).new(0) { nil }
+      # Init site properties
+      set_site_property(COM::DISPID_AMBIENT_USERMODE, Variant.new(true))
+      set_site_property(COM::DISPID_AMBIENT_UIDEAD, Variant.new(false))
+    end
     
     typesig { [Composite, ::Java::Int, String] }
     # Create an OleControlSite child widget using style bits
@@ -231,6 +263,58 @@ module Org::Eclipse::Swt::Ole::Win32
         dispose_cominterfaces
         raise e
       end
+    end
+    
+    typesig { [Composite, ::Java::Int, String, JavaFile] }
+    # Create an OleClientSite child widget to edit the specified file using the specified OLE Document
+    # application.  Use style bits to select a particular look or set of properties.
+    # <p>
+    # <b>IMPORTANT:</b> This method is <em>not</em> part of the public
+    # API for <code>OleClientSite</code>. It is marked public only so that it
+    # can be shared within the packages provided by SWT. It is not
+    # available on all platforms, and should never be called from
+    # application code.
+    # </p>
+    # @param parent a composite widget; must be an OleFrame
+    # @param style the bitwise OR'ing of widget styles
+    # @param progId the unique program identifier of am OLE Document application;
+    # the value of the ProgID key or the value of the VersionIndependentProgID key specified
+    # in the registry for the desired OLE Document (for example, the VersionIndependentProgID
+    # for Word is Word.Document)
+    # @param file the file that is to be opened in this OLE Document
+    # 
+    # @exception IllegalArgumentException
+    # <ul><li>ERROR_NULL_ARGUMENT when the parent is null
+    # <li>ERROR_INVALID_ARGUMENT when the parent is not an OleFrame</ul>
+    # @exception SWTException
+    # <ul><li>ERROR_THREAD_INVALID_ACCESS when called from the wrong thread
+    # <li>ERROR_INVALID_CLASSID when the progId does not map to a registered CLSID
+    # <li>ERROR_CANNOT_CREATE_OBJECT when failed to create OLE Object
+    # <li>ERROR_CANNOT_OPEN_FILE when failed to open file
+    # </ul>
+    # 
+    # @since 3.5
+    def initialize(parent, style, prog_id, file)
+      @i_ole_control_site = nil
+      @i_dispatch = nil
+      @ole_property_change_sink = nil
+      @ole_event_sink = nil
+      @ole_event_sink_guid = nil
+      @ole_event_sink_iunknown = nil
+      @current_control_info = nil
+      @site_property_ids = nil
+      @site_property_values = nil
+      @font = nil
+      super(parent, style, prog_id, file)
+      @ole_event_sink = Array.typed(OleEventSink).new(0) { nil }
+      @ole_event_sink_guid = Array.typed(GUID).new(0) { nil }
+      # long
+      @ole_event_sink_iunknown = Array.typed(::Java::Int).new(0) { 0 }
+      @site_property_ids = Array.typed(::Java::Int).new(0) { 0 }
+      @site_property_values = Array.typed(Variant).new(0) { nil }
+      # Init site properties
+      set_site_property(COM::DISPID_AMBIENT_USERMODE, Variant.new(true))
+      set_site_property(COM::DISPID_AMBIENT_UIDEAD, Variant.new(false))
     end
     
     typesig { [::Java::Int, OleListener] }
@@ -824,63 +908,70 @@ module Org::Eclipse::Swt::Ole::Win32
       return COM::S_OK
     end
     
-    typesig { [Event] }
-    def on_focus_in(e)
-      if ((self.attr_obj_iole_in_place_object).nil?)
-        return
-      end
-      do_verb(OLE::OLEIVERB_UIACTIVATE)
-      if (is_focus_control)
-        return
-      end
-      # long
-      # long
-      phwnd = Array.typed(::Java::Int).new(1) { 0 }
-      self.attr_obj_iole_in_place_object._get_window(phwnd)
-      if ((phwnd[0]).equal?(0))
-        return
-      end
-      OS._set_focus(phwnd[0])
-    end
-    
-    typesig { [Event] }
-    def on_focus_out(e)
-      if (!(self.attr_obj_iole_in_place_object).nil?)
-        # Bug in Windows.  When IE7 loses focus and UIDeactivate()
-        # is called, IE destroys the caret even though it is
-        # no longer owned by IE.  If focus has moved to a control
-        # that shows a caret then the caret disappears.  The fix
-        # is to detect this case and restore the caret.
-        thread_id = OS._get_current_thread_id
-        lpgui1 = GUITHREADINFO.new
-        lpgui1.attr_cb_size = GUITHREADINFO.attr_sizeof
-        OS._get_guithread_info(thread_id, lpgui1)
-        self.attr_obj_iole_in_place_object._uideactivate
-        if (!(lpgui1.attr_hwnd_caret).equal?(0))
-          lpgui2 = GUITHREADINFO.new
-          lpgui2.attr_cb_size = GUITHREADINFO.attr_sizeof
-          OS._get_guithread_info(thread_id, lpgui2)
-          if ((lpgui2.attr_hwnd_caret).equal?(0) && (lpgui1.attr_hwnd_caret).equal?(OS._get_focus))
-            if ((self.attr_swt_restorecaret).equal?(0))
-              self.attr_swt_restorecaret = OS._register_window_message(TCHAR.new(0, "SWT_RESTORECARET", true))
-            end
-            # If the caret was not restored by SWT, put it back using
-            # the information from GUITHREADINFO.  Note that this will
-            # not be correct when the caret has a bitmap.  There is no
-            # API to query the bitmap that the caret is using.
-            if ((OS._send_message(lpgui1.attr_hwnd_caret, self.attr_swt_restorecaret, 0, 0)).equal?(0))
-              width = lpgui1.attr_right - lpgui1.attr_left
-              height = lpgui1.attr_bottom - lpgui1.attr_top
-              OS._create_caret(lpgui1.attr_hwnd_caret, 0, width, height)
-              OS._set_caret_pos(lpgui1.attr_left, lpgui1.attr_top)
-              OS._show_caret(lpgui1.attr_hwnd_caret)
-            end
-          end
-        end
-      end
-    end
-    
     typesig { [::Java::Int] }
+    # The following is intentionally commented, it's not believed that
+    # OLEIVERB_UIACTIVATE and UIDeactivate should be invoked for every
+    # received focusIn and focusOut, respectively.
+    # 
+    # void onFocusIn(Event e) {
+    # String progID = getProgramID();
+    # if (progID == null) return;
+    # if (!progID.startsWith("Shell.Explorer")) {
+    # super.onFocusIn(e);
+    # return;
+    # }
+    # if (objIOleInPlaceObject == null) return;
+    # doVerb(OLE.OLEIVERB_UIACTIVATE);
+    # if (isFocusControl()) return;
+    # int /*long*/[] phwnd = new int /*long*/[1];
+    # objIOleInPlaceObject.GetWindow(phwnd);
+    # if (phwnd[0] == 0) return;
+    # OS.SetFocus(phwnd[0]);
+    # }
+    # void onFocusOut(Event e) {
+    # if (objIOleInPlaceObject == null) return;
+    # String progID = getProgramID();
+    # if (progID == null) return;
+    # if (!progID.startsWith("Shell.Explorer")) {
+    # super.onFocusOut(e);
+    # return;
+    # }
+    # /*
+    # * Bug in Windows.  When IE7 loses focus and UIDeactivate()
+    # * is called, IE destroys the caret even though it is
+    # * no longer owned by IE.  If focus has moved to a control
+    # * that shows a caret then the caret disappears.  The fix
+    # * is to detect this case and restore the caret.
+    # */
+    # int threadId = OS.GetCurrentThreadId();
+    # GUITHREADINFO lpgui1 = new GUITHREADINFO();
+    # lpgui1.cbSize = GUITHREADINFO.sizeof;
+    # OS.GetGUIThreadInfo(threadId, lpgui1);
+    # objIOleInPlaceObject.UIDeactivate();
+    # if (lpgui1.hwndCaret != 0) {
+    # GUITHREADINFO lpgui2 = new GUITHREADINFO();
+    # lpgui2.cbSize = GUITHREADINFO.sizeof;
+    # OS.GetGUIThreadInfo(threadId, lpgui2);
+    # if (lpgui2.hwndCaret == 0 && lpgui1.hwndCaret == OS.GetFocus()) {
+    # if (SWT_RESTORECARET == 0) {
+    # SWT_RESTORECARET = OS.RegisterWindowMessage (new TCHAR (0, "SWT_RESTORECARET", true));
+    # }
+    # /*
+    # * If the caret was not restored by SWT, put it back using
+    # * the information from GUITHREADINFO.  Note that this will
+    # * not be correct when the caret has a bitmap.  There is no
+    # * API to query the bitmap that the caret is using.
+    # */
+    # if (OS.SendMessage (lpgui1.hwndCaret, SWT_RESTORECARET, 0, 0) == 0) {
+    # int width = lpgui1.right - lpgui1.left;
+    # int height = lpgui1.bottom - lpgui1.top;
+    # OS.CreateCaret (lpgui1.hwndCaret, 0, width, height);
+    # OS.SetCaretPos (lpgui1.left, lpgui1.top);
+    # OS.ShowCaret (lpgui1.hwndCaret);
+    # }
+    # }
+    # }
+    # }
     def _on_focus(f_got_focus)
       return COM::S_OK
     end
@@ -889,7 +980,16 @@ module Org::Eclipse::Swt::Ole::Win32
     def _on_uideactivate(f_undoable)
       # controls don't need to do anything for
       # border space or menubars
+      if ((self.attr_frame).nil? || self.attr_frame.is_disposed)
+        return COM::S_OK
+      end
       self.attr_state = STATE_INPLACEACTIVE
+      self.attr_frame._set_active_object(0, 0)
+      redraw
+      shell = get_shell
+      if (is_focus_control || self.attr_frame.is_focus_control)
+        shell.traverse(SWT::TRAVERSE_TAB_NEXT)
+      end
       return COM::S_OK
     end
     

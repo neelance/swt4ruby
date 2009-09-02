@@ -1,6 +1,6 @@
 require "rjava"
 
-# Copyright (c) 2000, 2006 IBM Corporation and others.
+# Copyright (c) 2000, 2008 IBM Corporation and others.
 # All rights reserved. This program and the accompanying materials
 # are made available under the terms of the Eclipse Public License v1.0
 # which accompanies this distribution, and is available at
@@ -31,6 +31,7 @@ module Org::Eclipse::Swt::Internal::Win32
     alias_method :attr_dw_flags=, :dw_flags=
     undef_method :dw_flags=
     
+    # @field cast=(HWND)
     # long
     attr_accessor :hwnd_track
     alias_method :attr_hwnd_track, :hwnd_track

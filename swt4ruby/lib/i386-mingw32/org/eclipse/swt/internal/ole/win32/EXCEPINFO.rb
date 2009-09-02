@@ -1,6 +1,6 @@
 require "rjava"
 
-# Copyright (c) 2000, 2006 IBM Corporation and others.
+# Copyright (c) 2000, 2008 IBM Corporation and others.
 # All rights reserved. This program and the accompanying materials
 # are made available under the terms of the Eclipse Public License v1.0
 # which accompanies this distribution, and is available at
@@ -31,6 +31,7 @@ module Org::Eclipse::Swt::Internal::Ole::Win32
     alias_method :attr_w_reserved=, :w_reserved=
     undef_method :w_reserved=
     
+    # @field cast=(BSTR)
     # long
     attr_accessor :bstr_source
     alias_method :attr_bstr_source, :bstr_source
@@ -38,6 +39,7 @@ module Org::Eclipse::Swt::Internal::Ole::Win32
     alias_method :attr_bstr_source=, :bstr_source=
     undef_method :bstr_source=
     
+    # @field cast=(BSTR)
     # long
     attr_accessor :bstr_description
     alias_method :attr_bstr_description, :bstr_description
@@ -45,6 +47,7 @@ module Org::Eclipse::Swt::Internal::Ole::Win32
     alias_method :attr_bstr_description=, :bstr_description=
     undef_method :bstr_description=
     
+    # @field cast=(BSTR)
     # long
     attr_accessor :bstr_help_file
     alias_method :attr_bstr_help_file, :bstr_help_file
@@ -58,6 +61,7 @@ module Org::Eclipse::Swt::Internal::Ole::Win32
     alias_method :attr_dw_help_context=, :dw_help_context=
     undef_method :dw_help_context=
     
+    # @field cast=(void FAR *)
     # long
     attr_accessor :pv_reserved
     alias_method :attr_pv_reserved, :pv_reserved
@@ -65,6 +69,7 @@ module Org::Eclipse::Swt::Internal::Ole::Win32
     alias_method :attr_pv_reserved=, :pv_reserved=
     undef_method :pv_reserved=
     
+    # @field cast=(HRESULT (STDAPICALLTYPE FAR* )(struct tagEXCEPINFO FAR*))
     # long
     attr_accessor :pfn_deferred_fill_in
     alias_method :attr_pfn_deferred_fill_in, :pfn_deferred_fill_in

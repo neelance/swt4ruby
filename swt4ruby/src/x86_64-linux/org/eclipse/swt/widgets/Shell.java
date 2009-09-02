@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2008 IBM Corporation and others.
+ * Copyright (c) 2000, 2009 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -81,7 +81,7 @@ import org.eclipse.swt.events.*;
  * downgraded to <code>APPLICATION_MODAL</code>.
  * <dl>
  * <dt><b>Styles:</b></dt>
- * <dd>BORDER, CLOSE, MIN, MAX, NO_TRIM, RESIZE, TITLE, ON_TOP, TOOL</dd>
+ * <dd>BORDER, CLOSE, MIN, MAX, NO_TRIM, RESIZE, TITLE, ON_TOP, TOOL, SHEET</dd>
  * <dd>APPLICATION_MODAL, MODELESS, PRIMARY_MODAL, SYSTEM_MODAL</dd>
  * <dt><b>Events:</b></dt>
  * <dd>Activate, Close, Deactivate, Deiconify, Iconify</dd>
@@ -118,10 +118,11 @@ import org.eclipse.swt.events.*;
  */
 public class Shell extends Decorations {
 	long /*int*/ shellHandle, tooltipsHandle, tooltipWindow, group, modalGroup;
-	boolean mapped, moved, resized, opened, fullScreen, showWithParent;
+	boolean mapped, moved, resized, opened, fullScreen, showWithParent, modified, center;
 	int oldX, oldY, oldWidth, oldHeight;
 	int minWidth, minHeight;
 	Control lastActive;
+	ToolTip [] toolTips;
 
 	static final int MAXIMUM_TRIM = 128;
 
@@ -164,13 +165,16 @@ public Shell () {
  * @see SWT#MAX
  * @see SWT#RESIZE
  * @see SWT#TITLE
+ * @see SWT#TOOL
  * @see SWT#NO_TRIM
  * @see SWT#SHELL_TRIM
  * @see SWT#DIALOG_TRIM
+ * @see SWT#ON_TOP
  * @see SWT#MODELESS
  * @see SWT#PRIMARY_MODAL
  * @see SWT#APPLICATION_MODAL
  * @see SWT#SYSTEM_MODAL
+ * @see SWT#SHEET
  */
 public Shell (int style) {
 	this ((Display) null, style);
@@ -233,13 +237,16 @@ public Shell (Display display) {
  * @see SWT#MAX
  * @see SWT#RESIZE
  * @see SWT#TITLE
+ * @see SWT#TOOL
  * @see SWT#NO_TRIM
  * @see SWT#SHELL_TRIM
  * @see SWT#DIALOG_TRIM
+ * @see SWT#ON_TOP
  * @see SWT#MODELESS
  * @see SWT#PRIMARY_MODAL
  * @see SWT#APPLICATION_MODAL
  * @see SWT#SYSTEM_MODAL
+ * @see SWT#SHEET
  */
 public Shell (Display display, int style) {
 	this (display, null, style, 0, false);
@@ -256,7 +263,8 @@ Shell (Display display, Shell parent, int style, long /*int*/ handle, boolean em
 	if (parent != null && parent.isDisposed ()) {
 		error (SWT.ERROR_INVALID_ARGUMENT);	
 	}
-	this.style = checkStyle (style);
+	this.center = parent != null && (style & SWT.SHEET) != 0;
+	this.style = checkStyle (parent, style);
 	this.parent = parent;
 	this.display = display;
 	if (handle != 0) {
@@ -342,6 +350,7 @@ public Shell (Shell parent) {
  * @see SWT#PRIMARY_MODAL
  * @see SWT#APPLICATION_MODAL
  * @see SWT#SYSTEM_MODAL
+ * @see SWT#SHEET
  */
 public Shell (Shell parent, int style) {
 	this (parent != null ? parent.display : null, parent, style, 0, false);
@@ -372,11 +381,18 @@ public static Shell internal_new (Display display, long /*int*/ handle) {
 	return new Shell (display, null, SWT.NO_TRIM, handle, false);
 }
 
-static int checkStyle (int style) {
+static int checkStyle (Shell parent, int style) {
 	style = Decorations.checkStyle (style);
 	style &= ~SWT.TRANSPARENT;
 	if ((style & SWT.ON_TOP) != 0) style &= ~SWT.SHELL_TRIM;
 	int mask = SWT.SYSTEM_MODAL | SWT.APPLICATION_MODAL | SWT.PRIMARY_MODAL;
+	if ((style & SWT.SHEET) != 0) {
+		style &= ~SWT.SHEET;
+		style |= parent == null ? SWT.SHELL_TRIM : SWT.DIALOG_TRIM;
+		if ((style & mask) == 0) {
+			style |= parent == null ? SWT.APPLICATION_MODAL : SWT.PRIMARY_MODAL;
+		}
+	}
 	int bits = style & ~mask;
 	if ((style & SWT.SYSTEM_MODAL) != 0) return bits | SWT.SYSTEM_MODAL;
 	if ((style & SWT.APPLICATION_MODAL) != 0) return bits | SWT.APPLICATION_MODAL;
@@ -412,6 +428,20 @@ public void addShellListener (ShellListener listener) {
 	addListener (SWT.Deiconify,typedListener);
 	addListener (SWT.Activate, typedListener);
 	addListener (SWT.Deactivate, typedListener);
+}
+
+void addToolTip (ToolTip toolTip) {
+	if (toolTips  == null) toolTips = new ToolTip [4];
+	for (int i=0; i<toolTips.length; i++) {
+		if (toolTips [i] == null) {
+			toolTips [i] = toolTip;
+			return;
+		}
+	}
+	ToolTip [] newToolTips = new ToolTip [toolTips.length + 4];
+	newToolTips [toolTips.length] = toolTip;
+	System.arraycopy (toolTips, 0, newToolTips, 0, toolTips.length);
+	toolTips = newToolTips;
 }
 
 void adjustTrim () {
@@ -524,6 +554,26 @@ void bringToTop (boolean force) {
 	}
 	display.activeShell = this;
 	display.activePending = true;
+}
+
+void center () {
+	if (parent == null) return;
+	Rectangle rect = getBounds ();
+	Rectangle parentRect = display.map (parent, null, parent.getClientArea());
+	int x = Math.max (parentRect.x, parentRect.x + (parentRect.width - rect.width) / 2);
+	int y = Math.max (parentRect.y, parentRect.y + (parentRect.height - rect.height) / 2);
+	Rectangle monitorRect = parent.getMonitor ().getClientArea();
+	if (x + rect.width > monitorRect.x + monitorRect.width) {
+		x = Math.max (monitorRect.x, monitorRect.x + monitorRect.width - rect.width);
+	} else {
+		x = Math.max (x, monitorRect.x);
+	}
+	if (y + rect.height > monitorRect.y + monitorRect.height) {
+		y = Math.max (monitorRect.y, monitorRect.y + monitorRect.height - rect.height);
+	} else {
+		y = Math.max (y, monitorRect.y);
+	}
+	setLocation (x, y);
 }
 
 void checkBorder () {
@@ -907,6 +957,22 @@ Shell getModalShell () {
 	return null;
 }
 
+/**
+ * Gets the receiver's modified state.
+ *
+ * </ul>
+ * @exception SWTException <ul>
+ *    <li>ERROR_WIDGET_DISPOSED - if the receiver has been disposed</li>
+ *    <li>ERROR_THREAD_INVALID_ACCESS - if not called from the thread that created the receiver</li>
+ * </ul>
+ * 
+ * @since 3.5
+ */
+public boolean getModified () {
+	checkWidget ();
+	return modified;
+}
+
 public Point getSize () {
 	checkWidget ();
 	int width = OS.GTK_WIDGET_WIDTH (vboxHandle);
@@ -1184,6 +1250,16 @@ public void removeShellListener (ShellListener listener) {
 	eventTable.unhook (SWT.Deactivate, listener);
 }
 
+void removeTooTip (ToolTip toolTip) {
+	if (toolTips == null) return;
+	for (int i=0; i<toolTips.length; i++) {
+		if (toolTips [i] == toolTip) {
+			toolTips [i] = null;
+			return;
+		}
+	}
+}
+
 /**
  * If the receiver is visible, moves it to the top of the 
  * drawing order for the display on which it was created 
@@ -1418,7 +1494,7 @@ public void setEnabled (boolean enabled) {
  * to switch to the full screen state, and if the argument is
  * <code>false</code> and the receiver was previously switched
  * into full screen state, causes the receiver to switch back
- * to either the maximmized or normal states.
+ * to either the maximized or normal states.
  * <p>
  * Note: The result of intermixing calls to <code>setFullScreen(true)</code>, 
  * <code>setMaximized(true)</code> and <code>setMinimized(true)</code> will 
@@ -1470,10 +1546,18 @@ public void setImeInputMode (int mode) {
 
 void setInitialBounds () {
 	if ((state & FOREIGN_HANDLE) != 0) return;
-	Monitor monitor = getMonitor ();
-	Rectangle rect = monitor.getClientArea ();
-	int width = rect.width * 5 / 8;
-	int height = rect.height * 5 / 8;
+	int width = OS.gdk_screen_width () * 5 / 8;
+	int height = OS.gdk_screen_height () * 5 / 8;
+	long /*int*/ screen = OS.gdk_screen_get_default ();
+	if (screen != 0) {
+		if (OS.gdk_screen_get_n_monitors (screen) > 1) {
+			int monitorNumber = OS.gdk_screen_get_monitor_at_window (screen, paintWindow ());
+			GdkRectangle dest = new GdkRectangle ();
+			OS.gdk_screen_get_monitor_geometry (screen, monitorNumber, dest);
+			width = dest.width * 5 / 8;
+			height = dest.height * 5 / 8;
+		}
+	}
 	if ((style & SWT.RESIZE) != 0) {
 		OS.gtk_window_resize (shellHandle, width, height);
 	}
@@ -1574,6 +1658,24 @@ public void setMinimumSize (Point size) {
 }
 
 /**
+ * Sets the receiver's modified state as specified by the argument.
+ *
+ * @param modified the new modified state for the receiver
+ *
+ * </ul>
+ * @exception SWTException <ul>
+ *    <li>ERROR_WIDGET_DISPOSED - if the receiver has been disposed</li>
+ *    <li>ERROR_THREAD_INVALID_ACCESS - if not called from the thread that created the receiver</li>
+ * </ul>
+ * 
+ * @since 3.5
+ */
+public void setModified (boolean modified) {
+	checkWidget ();
+	this.modified = modified;
+}
+
+/**
  * Sets the shape of the shell to the region specified
  * by the argument.  When the argument is null, the
  * default shape of the shell is restored.  The shell
@@ -1640,6 +1742,10 @@ public void setVisible (boolean visible) {
 	showWithParent = visible;
 	if ((OS.GTK_WIDGET_MAPPED (shellHandle) == visible)) return;
 	if (visible) {
+		if (center && !moved) {
+			center ();
+			if (isDisposed ()) return;
+		}
 		sendEvent (SWT.Show);
 		if (isDisposed ()) return;
 
@@ -1945,6 +2051,15 @@ void releaseChildren (boolean destroy) {
 			shell.release (false);
 		}
 	}
+	if (toolTips != null) {
+		for (int i=0; i<toolTips.length; i++) {
+			ToolTip toolTip = toolTips [i];
+			if (toolTip != null && !toolTip.isDisposed ()) {
+				toolTip.dispose ();
+			}
+		}
+		toolTips = null;
+	}
 	super.releaseChildren (destroy);
 }
 
@@ -1988,7 +2103,7 @@ void setToolTipText (long /*int*/ rootWidget, long /*int*/ tipWidget, String str
 			int [] x = new int [1], y = new int [1];
 			long /*int*/ window = OS.gdk_window_at_pointer (x, y);
 			long /*int*/ [] user_data = new long /*int*/ [1];
-			OS.gdk_window_get_user_data (window, user_data);
+			if (window != 0) OS.gdk_window_get_user_data (window, user_data);
 			if (tipWidget == user_data [0]) {
 				eventPtr = OS.gdk_event_new (OS.GDK_MOTION_NOTIFY);
 				GdkEventMotion event = new GdkEventMotion ();

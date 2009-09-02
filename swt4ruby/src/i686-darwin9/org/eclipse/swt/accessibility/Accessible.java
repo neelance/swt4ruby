@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2008 IBM Corporation and others.
+ * Copyright (c) 2000, 2009 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -11,10 +11,12 @@
 package org.eclipse.swt.accessibility;
 
 
-import java.util.Vector;
+import java.util.*;
+
 import org.eclipse.swt.*;
+import org.eclipse.swt.graphics.*;
+import org.eclipse.swt.internal.cocoa.*;
 import org.eclipse.swt.widgets.*;
-import org.eclipse.swt.internal.carbon.*;
 
 /**
  * Instances of this class provide a bridge between application
@@ -40,45 +42,55 @@ import org.eclipse.swt.internal.carbon.*;
  * @since 2.0
  */
 public class Accessible {
-	static final String [] requiredAttributes = {
-		OS.kAXRoleAttribute,
-		OS.kAXSubroleAttribute,
-		OS.kAXRoleDescriptionAttribute,
-		OS.kAXHelpAttribute,
-		OS.kAXTitleAttribute,
-		OS.kAXValueAttribute,
-		OS.kAXEnabledAttribute,
-		OS.kAXFocusedAttribute,
-		OS.kAXParentAttribute,
-		OS.kAXChildrenAttribute,
-		OS.kAXSelectedChildrenAttribute,
-		OS.kAXVisibleChildrenAttribute,
-		OS.kAXWindowAttribute,
-		OS.kAXTopLevelUIElementAttribute,
-		OS.kAXPositionAttribute,
-		OS.kAXSizeAttribute,
-		OS.kAXDescriptionAttribute,
+
+	static NSString[] baseAttributes = { 
+		OS.NSAccessibilityRoleAttribute,
+		OS.NSAccessibilityRoleDescriptionAttribute,
+		OS.NSAccessibilityHelpAttribute,
+		OS.NSAccessibilityFocusedAttribute,
+		OS.NSAccessibilityParentAttribute,
+		OS.NSAccessibilityChildrenAttribute,
+		OS.NSAccessibilityPositionAttribute,
+		OS.NSAccessibilitySizeAttribute,
+		OS.NSAccessibilityWindowAttribute,
+		OS.NSAccessibilityTopLevelUIElementAttribute
 	};
-	static final String [] textAttributes = {
-		OS.kAXNumberOfCharactersAttribute,
-		OS.kAXSelectedTextAttribute,
-		OS.kAXSelectedTextRangeAttribute,
-		OS.kAXStringForRangeParameterizedAttribute,
-		OS.kAXInsertionPointLineNumberAttribute,
-		OS.kAXRangeForLineParameterizedAttribute,
+
+	static NSString[] baseTextAttributes = {
+		OS.NSAccessibilityNumberOfCharactersAttribute,
+		OS.NSAccessibilitySelectedTextAttribute,
+		OS.NSAccessibilitySelectedTextRangeAttribute,
+		OS.NSAccessibilityInsertionPointLineNumberAttribute,
+		OS.NSAccessibilitySelectedTextRangesAttribute,
+		OS.NSAccessibilityVisibleCharacterRangeAttribute,
+		OS.NSAccessibilityValueAttribute,
 	};
+	
+	static NSString[] baseParameterizedAttributes = {
+		OS.NSAccessibilityStringForRangeParameterizedAttribute,
+		OS.NSAccessibilityRangeForLineParameterizedAttribute,
+	};
+	
+
+	NSMutableArray attributeNames = null;
+	NSMutableArray parameterizedAttributeNames = null;
+	NSMutableArray actionNames = null;
 
 	Vector accessibleListeners = new Vector();
 	Vector accessibleControlListeners = new Vector();
 	Vector accessibleTextListeners = new Vector ();
 	Control control;
-	int axuielementref = 0;
-	int[] osChildIDCache = new int[0];
+
+	Map /*<Integer, SWTAccessibleDelegate>*/ children = new HashMap();
 	
+	/**
+	 * @since 3.5
+	 */
+	protected Accessible() {
+	}
+
 	Accessible(Control control) {
 		this.control = control;
-		axuielementref = OS.AXUIElementCreateWithHIObjectAndIdentifier(control.handle, 0);
-		OS.HIObjectSetAccessibilityIgnored(control.handle, false);
 	}
 	
 	/**
@@ -181,6 +193,302 @@ public class Accessible {
 		accessibleTextListeners.addElement (listener);		
 	}
 	
+	public id internal_accessibilityActionDescription(NSString action, int childID) {
+		// TODO No action support for now.
+		return NSString.stringWith("");
+	}
+
+	public NSArray internal_accessibilityActionNames(int childID) {
+		// The supported action list depends on the role played by the control.
+		AccessibleControlEvent event = new AccessibleControlEvent(this);
+		event.childID = childID;
+		event.detail = -1;
+		for (int i = 0; i < accessibleControlListeners.size(); i++) {
+			AccessibleControlListener listener = (AccessibleControlListener) accessibleControlListeners.elementAt(i);
+			listener.getRole(event);
+		}
+
+		// No accessible listener is overriding the role of the control, so let Cocoa return the default set for the control.
+		if (event.detail == -1) {
+			return null;
+		}
+		
+		if ((childID == ACC.CHILDID_SELF) && (actionNames != null)) {
+			return retainedAutoreleased(actionNames);
+		}
+		
+		NSMutableArray returnValue = NSMutableArray.arrayWithCapacity(5);
+		
+		switch (event.detail) {
+		case ACC.ROLE_PUSHBUTTON:
+		case ACC.ROLE_RADIOBUTTON:
+		case ACC.ROLE_CHECKBUTTON:
+		case ACC.ROLE_TABITEM:
+			returnValue.addObject(OS.NSAccessibilityPressAction);
+			break;
+		}
+
+		switch (event.detail) {
+		case ACC.ROLE_COMBOBOX:
+			returnValue.addObject(OS.NSAccessibilityConfirmAction);
+			break;
+		}
+
+
+		if (childID == ACC.CHILDID_SELF) {
+			actionNames = returnValue;
+			actionNames.retain();
+			return retainedAutoreleased(actionNames);
+		} else {
+			// Caller must retain if they want to hold on to it.
+			return returnValue;
+		}
+	}
+
+	public NSArray internal_accessibilityAttributeNames(int childID) {
+		// The supported attribute set depends on the role played by the control.
+		// We may need to add or remove from the base set as needed.
+		AccessibleControlEvent event = new AccessibleControlEvent(this);
+		event.childID = childID;
+		event.detail = -1;
+		for (int i = 0; i < accessibleControlListeners.size(); i++) {
+			AccessibleControlListener listener = (AccessibleControlListener) accessibleControlListeners.elementAt(i);
+			listener.getRole(event);
+		}
+
+		// No accessible listener is overriding the role of the control, so let Cocoa
+		// return the default set for the control.
+		if (event.detail == -1)
+			return null;
+		
+		if ((childID == ACC.CHILDID_SELF) && (attributeNames != null)) {
+			return retainedAutoreleased(attributeNames);
+		}
+		
+		NSMutableArray returnValue = NSMutableArray.arrayWithCapacity(baseAttributes.length);
+
+		/* Add our list of supported attributes to the array.
+		 * Make sure each attribute name is not already in the array before appending.
+		 */
+		for (int i = 0; i < baseAttributes.length; i++) {
+			if (!returnValue.containsObject(baseAttributes[i])) {
+				returnValue.addObject(baseAttributes[i]);
+			}
+		}
+		
+		if (accessibleTextListeners.size() > 0) {
+			for (int i = 0; i < baseTextAttributes.length; i++) {
+				if (!returnValue.containsObject(baseTextAttributes[i])) {
+					returnValue.addObject(baseTextAttributes[i]);
+				}
+			}
+		}
+		
+		// The following are expected to have a value (AXValue)
+		switch (event.detail) {
+		case ACC.ROLE_CHECKBUTTON:
+		case ACC.ROLE_RADIOBUTTON:
+		case ACC.ROLE_LABEL:
+		case ACC.ROLE_TABITEM:
+		case ACC.ROLE_TABFOLDER:
+			returnValue.addObject(OS.NSAccessibilityValueAttribute);
+			break;
+		}
+		
+		// The following are expected to report their enabled status (AXEnabled)
+		switch (event.detail) {
+		case ACC.ROLE_CHECKBUTTON:
+		case ACC.ROLE_RADIOBUTTON:
+		case ACC.ROLE_LABEL:
+		case ACC.ROLE_TABITEM:
+		case ACC.ROLE_PUSHBUTTON:
+		case ACC.ROLE_COMBOBOX:
+			returnValue.addObject(OS.NSAccessibilityEnabledAttribute);
+			break;
+		}
+		
+		// The following are expected to report a title (AXTitle)
+		switch (event.detail) {
+		case ACC.ROLE_CHECKBUTTON:
+		case ACC.ROLE_RADIOBUTTON:
+		case ACC.ROLE_PUSHBUTTON:
+		case ACC.ROLE_TABITEM:
+			returnValue.addObject(OS.NSAccessibilityTitleAttribute);
+			break;
+		}
+			
+		// Accessibility verifier says these attributes must be reported for combo boxes.
+		if (event.detail == ACC.ROLE_COMBOBOX) {
+			returnValue.addObject(OS.NSAccessibilityExpandedAttribute);
+		}
+		
+		// Accessibility verifier says these attributes must be reported for tab folders.
+		if (event.detail == ACC.ROLE_TABFOLDER) {
+			returnValue.addObject(OS.NSAccessibilityContentsAttribute);
+			returnValue.addObject(OS.NSAccessibilityTabsAttribute);
+		}
+
+		/*
+		 * Only report back sub-roles when the SWT role maps to a sub-role.
+		 */
+		if (event.detail != -1) {
+			String osRole = roleToOs(event.detail);
+			
+			if (osRole.indexOf(':') == -1)
+				returnValue.removeObject(OS.NSAccessibilitySubroleAttribute);
+		}
+
+		/*
+		 * Children never return their own children, so remove that attribute.
+		 */
+		if (childID != ACC.CHILDID_SELF) {
+			returnValue.removeObject(OS.NSAccessibilityChildrenAttribute);
+		}
+		
+		if (childID == ACC.CHILDID_SELF) {
+			attributeNames = returnValue;
+			attributeNames.retain();
+			return retainedAutoreleased(attributeNames);
+		} else {
+			// Caller must retain if necessary.
+			return returnValue;
+		}
+	}
+
+	public id internal_accessibilityAttributeValue(NSString attribute, int childID) {
+		if (attribute.isEqualToString(OS.NSAccessibilityRoleAttribute)) return getRoleAttribute(childID);
+		if (attribute.isEqualToString(OS.NSAccessibilitySubroleAttribute)) return getSubroleAttribute(childID);
+		if (attribute.isEqualToString(OS.NSAccessibilityRoleDescriptionAttribute)) return getRoleDescriptionAttribute(childID);
+		if (attribute.isEqualToString(OS.NSAccessibilityExpandedAttribute)) return getExpandedAttribute(childID);
+		if (attribute.isEqualToString(OS.NSAccessibilityHelpAttribute)) return getHelpAttribute(childID);
+		if (attribute.isEqualToString(OS.NSAccessibilityTitleAttribute)) return getTitleAttribute(childID);
+		if (attribute.isEqualToString(OS.NSAccessibilityValueAttribute)) return getValueAttribute(childID);
+		if (attribute.isEqualToString(OS.NSAccessibilityEnabledAttribute)) return getEnabledAttribute(childID);
+		if (attribute.isEqualToString(OS.NSAccessibilityFocusedAttribute)) return getFocusedAttribute(childID);
+		if (attribute.isEqualToString(OS.NSAccessibilityParentAttribute)) return getParentAttribute(childID);
+		if (attribute.isEqualToString(OS.NSAccessibilityChildrenAttribute)) return getChildrenAttribute(childID);
+		if (attribute.isEqualToString(OS.NSAccessibilityContentsAttribute)) return getChildrenAttribute(childID);
+		// FIXME:  There's no specific API just for tabs, which won't include the buttons (if any.)
+		if (attribute.isEqualToString(OS.NSAccessibilityTabsAttribute)) return getTabsAttribute(childID);
+		if (attribute.isEqualToString(OS.NSAccessibilityWindowAttribute)) return getWindowAttribute(childID);
+		if (attribute.isEqualToString(OS.NSAccessibilityTopLevelUIElementAttribute)) return getTopLevelUIElementAttribute(childID);
+		if (attribute.isEqualToString(OS.NSAccessibilityPositionAttribute)) return getPositionAttribute(childID);
+		if (attribute.isEqualToString(OS.NSAccessibilitySizeAttribute)) return getSizeAttribute(childID);
+		if (attribute.isEqualToString(OS.NSAccessibilityDescriptionAttribute)) return getDescriptionAttribute(childID);
+		if (attribute.isEqualToString(OS.NSAccessibilityNumberOfCharactersAttribute)) return getNumberOfCharactersAttribute(childID);
+		if (attribute.isEqualToString(OS.NSAccessibilitySelectedTextAttribute)) return getSelectedTextAttribute(childID);
+		if (attribute.isEqualToString(OS.NSAccessibilitySelectedTextRangeAttribute)) return getSelectedTextRangeAttribute(childID);
+		if (attribute.isEqualToString(OS.NSAccessibilityInsertionPointLineNumberAttribute)) return getInsertionPointLineNumberAttribute(childID);
+		if (attribute.isEqualToString(OS.NSAccessibilitySelectedTextRangesAttribute)) return getSelectedTextRangesAttribute(childID);
+		if (attribute.isEqualToString(OS.NSAccessibilityVisibleCharacterRangeAttribute)) return getVisibleCharacterRangeAttribute(childID);
+		
+		// If this object don't know how to get the value it's up to the control itself to return an attribute value.
+		return null;
+	}
+	
+	public id internal_accessibilityAttributeValue_forParameter(NSString attribute, id parameter, int childID) {
+		if (attribute.isEqualToString(OS.NSAccessibilityStringForRangeParameterizedAttribute)) return getStringForRangeAttribute(parameter, childID);
+		if (attribute.isEqualToString(OS.NSAccessibilityRangeForLineParameterizedAttribute)) return getRangeForLineParameterizedAttribute(parameter, childID);		
+		return null;
+	}
+
+	// Returns the UI Element that has the focus. You can assume that the search for the focus has already been narrowed down to the receiver.
+	// Override this method to do a deeper search with a UIElement - e.g. a NSMatrix would determine if one of its cells has the focus.
+	public id internal_accessibilityFocusedUIElement(int childID) {
+		AccessibleControlEvent event = new AccessibleControlEvent(this);
+		event.childID = ACC.CHILDID_MULTIPLE; // set to invalid value, to test if the application sets it in getFocus()
+		event.accessible = null;
+		for (int i = 0; i < accessibleControlListeners.size(); i++) {
+			AccessibleControlListener listener = (AccessibleControlListener) accessibleControlListeners.elementAt(i);
+			listener.getFocus(event);
+		}
+		
+		// The listener did not respond, so let Cocoa figure it out.
+		if (event.childID == ACC.CHILDID_MULTIPLE)
+			return null;
+		
+		/* The application can optionally answer an accessible. */
+		if (event.accessible != null) {
+			return new id(OS.NSAccessibilityUnignoredAncestor(event.accessible.control.view.id));
+		}
+		
+		/* Or the application can answer a valid child ID, including CHILDID_SELF and CHILDID_NONE. */
+		if (event.childID == ACC.CHILDID_SELF || event.childID == ACC.CHILDID_NONE) {
+			return new id(OS.NSAccessibilityUnignoredAncestor(control.view.id));
+		}	
+
+		return new id(OS.NSAccessibilityUnignoredAncestor(childIDToOs(event.childID).id));
+	}
+
+	// Returns the deepest descendant of the UIElement hierarchy that contains the point. 
+	// You can assume the point has already been determined to lie within the receiver.
+	// Override this method to do deeper hit testing within a UIElement - e.g. a NSMatrix would test its cells. The point is bottom-left relative screen coordinates.
+	public id internal_accessibilityHitTest(NSPoint point, int childID) {
+		AccessibleControlEvent event = new AccessibleControlEvent(this);
+		event.x = (int) point.x;
+		Monitor primaryMonitor = Display.getCurrent().getPrimaryMonitor();
+		event.y = (int) (primaryMonitor.getBounds().height - point.y);
+	
+		// Set an impossible value to determine if anything responded to the event.
+		event.childID = ACC.CHILDID_MULTIPLE;
+		for (int i = 0; i < accessibleControlListeners.size(); i++) {
+			AccessibleControlListener listener = (AccessibleControlListener) accessibleControlListeners.elementAt(i);
+			listener.getChildAtPoint(event);
+		}
+		
+		// The listener did not respond, so let Cocoa figure it out.
+		if (event.childID == ACC.CHILDID_MULTIPLE)
+			return null;
+		
+		if (event.accessible != null) {
+			return new id(OS.NSAccessibilityUnignoredAncestor(event.accessible.control.view.id));
+		}
+	
+		if (event.childID == ACC.CHILDID_SELF || event.childID == ACC.CHILDID_NONE) {
+			return new id(OS.NSAccessibilityUnignoredAncestor(control.view.id));
+		}
+	
+		return new id(OS.NSAccessibilityUnignoredAncestor(childIDToOs(event.childID).id));
+	}
+
+	// Return YES if the UIElement doesn't show up to the outside world - i.e. its parent should return the UIElement's children as its own - cutting the UIElement out. E.g. NSControls are ignored when they are single-celled.
+	public boolean internal_accessibilityIsIgnored(int childID) {
+		return false;
+	}
+
+	// parameterized attribute methods
+	public NSArray internal_accessibilityParameterizedAttributeNames(int childID) {
+
+		if ((childID == ACC.CHILDID_SELF) && (parameterizedAttributeNames != null)) {
+			return retainedAutoreleased(parameterizedAttributeNames);
+		}
+
+		NSMutableArray returnValue = NSMutableArray.arrayWithCapacity(4);
+
+		if (accessibleTextListeners.size() > 0) {
+			for (int i = 0; i < baseParameterizedAttributes.length; i++) {
+				if (!returnValue.containsObject(baseParameterizedAttributes[i])) {
+					returnValue.addObject(baseParameterizedAttributes[i]);
+				}
+			}
+
+		}
+
+		if (childID == ACC.CHILDID_SELF) {
+			parameterizedAttributeNames = returnValue;
+			parameterizedAttributeNames.retain();
+			return retainedAutoreleased(parameterizedAttributeNames);
+		} else {
+			// Caller must retain if they want to keep it.
+			return returnValue;
+		}
+	}
+
+	public void internal_accessibilityPerformAction(NSString action, int childID) {
+		// TODO Auto-generated method stub
+		// No action support for now.
+	}
+
 	/**
 	 * Returns the control for this Accessible object. 
 	 *
@@ -202,265 +510,48 @@ public class Accessible {
 	 * </p>
 	 */
 	public void internal_dispose_Accessible() {
-		if (axuielementref != 0) {
-			OS.CFRelease(axuielementref);
-			axuielementref = 0;
-			for (int index = 1; index < osChildIDCache.length; index += 2) {
-				OS.CFRelease(osChildIDCache [index]);
-			}
-			osChildIDCache = new int[0];
+		if (actionNames != null) actionNames.release();
+		actionNames = null;
+		if (attributeNames != null) attributeNames.release();
+		attributeNames = null;
+		if (parameterizedAttributeNames != null) parameterizedAttributeNames.release();
+		parameterizedAttributeNames = null;
+		
+		Collection delegates = children.values();
+		Iterator iter = delegates.iterator();
+		while (iter.hasNext()) {
+			SWTAccessibleDelegate childDelegate = (SWTAccessibleDelegate)iter.next();
+			childDelegate.internal_dispose_SWTAccessibleDelegate();
 		}
+		
+		children.clear();
 	}
 	
-	/**
-	 * Invokes platform specific functionality to handle a window message.
-	 * <p>
-	 * <b>IMPORTANT:</b> This method is <em>not</em> part of the public
-	 * API for <code>Accessible</code>. It is marked public only so that it
-	 * can be shared within the packages provided by SWT. It is not
-	 * available on all platforms, and should never be called from
-	 * application code.
-	 * </p>
-	 */
-	public int internal_kEventAccessibleGetChildAtPoint (int nextHandler, int theEvent, int userData) {
-		if (axuielementref != 0) {
-			OS.CallNextEventHandler (nextHandler, theEvent);
-			//TODO: check error?
-			int childID = getChildIDFromEvent(theEvent);
-			CGPoint pt = new CGPoint ();
-			OS.GetEventParameter (theEvent, OS.kEventParamMouseLocation, OS.typeHIPoint, null, CGPoint.sizeof, null, pt);
-			AccessibleControlEvent event = new AccessibleControlEvent(this);
-			event.x = (int) pt.x;
-			event.y = (int) pt.y;
-			event.childID = ACC.CHILDID_SELF;
-			for (int i = 0; i < accessibleControlListeners.size(); i++) {
-				AccessibleControlListener listener = (AccessibleControlListener) accessibleControlListeners.elementAt(i);
-				listener.getChildAtPoint(event);
-			}
-			if (event.accessible != null) {
-				OS.SetEventParameter (theEvent, OS.kEventParamAccessibleChild, OS.typeCFTypeRef, 4, new int[] {event.accessible.axuielementref});
-				return OS.noErr;
-			}
-			if (event.childID == ACC.CHILDID_SELF || event.childID == ACC.CHILDID_NONE || event.childID == childID) {
-				/*
-				 * From the Carbon doc for kEventAccessibleGetChildAtPoint: "If there is no child at the given point,
-				 * you should still return noErr, but leave the parameter empty (do not call SetEventParameter)."
-				 */
-				return OS.noErr;
-			}
-			OS.SetEventParameter (theEvent, OS.kEventParamAccessibleChild, OS.typeCFTypeRef, 4, new int[] {childIDToOs(event.childID)});
-			return OS.noErr;
-		}
-		return OS.eventNotHandledErr;
+	id getExpandedAttribute(int childID) {
+		// TODO: May need to expand the API so the combo box state can be reported.
+		return NSNumber.numberWithBool(false);
 	}
-	
-	/**
-	 * Invokes platform specific functionality to handle a window message.
-	 * <p>
-	 * <b>IMPORTANT:</b> This method is <em>not</em> part of the public
-	 * API for <code>Accessible</code>. It is marked public only so that it
-	 * can be shared within the packages provided by SWT. It is not
-	 * available on all platforms, and should never be called from
-	 * application code.
-	 * </p>
-	 */
-	public int internal_kEventAccessibleGetFocusedChild (int nextHandler, int theEvent, int userData) {
-		if (axuielementref != 0) {
-			int result = OS.CallNextEventHandler (nextHandler, theEvent);
-			//TODO: check error?
-			int childID = getChildIDFromEvent(theEvent);
-			if (childID != ACC.CHILDID_SELF) {
-				/* From the Carbon doc for kEventAccessibleGetFocusedChild:
-				 * "Only return immediate children; do not return grandchildren of yourself."
-				 */
-				return OS.noErr; //TODO: should this return eventNotHandledErr?
-			}
-			AccessibleControlEvent event = new AccessibleControlEvent(this);
-			event.childID = ACC.CHILDID_MULTIPLE; // set to invalid value, to test if the application sets it in getFocus()
-			event.accessible = null;
-			for (int i = 0; i < accessibleControlListeners.size(); i++) {
-				AccessibleControlListener listener = (AccessibleControlListener) accessibleControlListeners.elementAt(i);
-				listener.getFocus(event);
-			}
-			
-			/* The application can optionally answer an accessible. */
-			if (event.accessible != null) {
-				OS.SetEventParameter (theEvent, OS.kEventParamAccessibleChild, OS.typeCFTypeRef, 4, new int[] {event.accessible.axuielementref});
-				return OS.noErr;
-			}
-			
-			/* Or the application can answer a valid child ID, including CHILDID_SELF and CHILDID_NONE. */
-			if (event.childID == ACC.CHILDID_SELF) {
-				OS.SetEventParameter (theEvent, OS.kEventParamAccessibleChild, OS.typeCFTypeRef, 4, new int[] {0});
-				return OS.noErr;
-			}
-			if (event.childID == ACC.CHILDID_NONE) {
-				/*
-				 * From the Carbon doc for kEventAccessibleGetFocusedChild: "If there is no child in the 
-				 * focus chain, your handler should leave the kEventParamAccessibleChild parameter empty 
-				 * and return noErr."
-				 */
-				return OS.noErr;
-			}
-			if (event.childID != ACC.CHILDID_MULTIPLE) {
-				/* Other valid childID. */
-				OS.SetEventParameter (theEvent, OS.kEventParamAccessibleChild, OS.typeCFTypeRef, 4, new int[] {childIDToOs(event.childID)});
-				return OS.noErr;
-			}
-			
-			/* Invalid childID means the application did not implement getFocus, so just go with the default handler. */
-			return result;
-		}
-		return OS.eventNotHandledErr;
-	}
-	
-	/**
-	 * Invokes platform specific functionality to handle a window message.
-	 * <p>
-	 * <b>IMPORTANT:</b> This method is <em>not</em> part of the public
-	 * API for <code>Accessible</code>. It is marked public only so that it
-	 * can be shared within the packages provided by SWT. It is not
-	 * available on all platforms, and should never be called from
-	 * application code.
-	 * </p>
-	 */
-	public int internal_kEventAccessibleGetAllAttributeNames (int nextHandler, int theEvent, int userData) {
-		int code = userData; // userData flags whether nextHandler has already been called
-		if (axuielementref != 0) {
-			if (code == OS.eventNotHandledErr) OS.CallNextEventHandler (nextHandler, theEvent);
-			int [] arrayRef = new int[1];
-			OS.GetEventParameter (theEvent, OS.kEventParamAccessibleAttributeNames, OS.typeCFMutableArrayRef, null, 4, null, arrayRef);
-			int stringArrayRef = arrayRef[0];
-			int length = OS.CFArrayGetCount(stringArrayRef);
-			String [] osAllAttributes = new String [length];
-			for (int i = 0; i < length; i++) {
-				int stringRef = OS.CFArrayGetValueAtIndex(stringArrayRef, i);
-				osAllAttributes[i] = stringRefToString (stringRef);
-			}
-			/* Add our list of supported attributes to the array.
-			 * Make sure each attribute name is not already in the array before appending.
-			 */
-			for (int i = 0; i < requiredAttributes.length; i++) {
-				if (!contains(osAllAttributes, requiredAttributes[i])) {
-					int stringRef = stringToStringRef(requiredAttributes[i]);
-					OS.CFArrayAppendValue(stringArrayRef, stringRef);
-					OS.CFRelease(stringRef);
-				}
-			}
-			if (accessibleTextListeners.size() > 0) {
-				for (int i = 0; i < textAttributes.length; i++) {
-					if (!contains(osAllAttributes, textAttributes[i])) {
-						int stringRef = stringToStringRef(textAttributes[i]);
-						OS.CFArrayAppendValue(stringArrayRef, stringRef);
-						OS.CFRelease(stringRef);
-					}
-				}
-			}
-			code = OS.noErr;
-		}
-		return code;
-	}
-	
-	boolean contains (String [] array, String element) {
-		for (int i = 0; i < array.length; i++) {
-			if (array[i].equals(element)) {
-				return true;
-			}
-		}
-		return false;
-	}
-	
-	/**
-	 * Invokes platform specific functionality to handle a window message.
-	 * <p>
-	 * <b>IMPORTANT:</b> This method is <em>not</em> part of the public
-	 * API for <code>Accessible</code>. It is marked public only so that it
-	 * can be shared within the packages provided by SWT. It is not
-	 * available on all platforms, and should never be called from
-	 * application code.
-	 * </p>
-	 */
-	public int internal_kEventAccessibleGetNamedAttribute (int nextHandler, int theEvent, int userData) {
-		if (axuielementref != 0) {
-			int [] stringRef = new int [1];
-			OS.GetEventParameter (theEvent, OS.kEventParamAccessibleAttributeName, OS.typeCFStringRef, null, 4, null, stringRef);
-			int length = 0;
-			if (stringRef [0] != 0) length = OS.CFStringGetLength (stringRef [0]);
-			char [] buffer= new char [length];
-			CFRange range = new CFRange ();
-			range.length = length;
-			OS.CFStringGetCharacters (stringRef [0], range, buffer);
-			String attributeName = new String(buffer);
-			if (attributeName.equals(OS.kAXRoleAttribute)) return getRoleAttribute(nextHandler, theEvent, userData);
-			if (attributeName.equals(OS.kAXSubroleAttribute)) return getSubroleAttribute(nextHandler, theEvent, userData);
-			if (attributeName.equals(OS.kAXRoleDescriptionAttribute)) return getRoleDescriptionAttribute(nextHandler, theEvent, userData);
-			if (attributeName.equals(OS.kAXHelpAttribute)) return getHelpAttribute(nextHandler, theEvent, userData);
-			if (attributeName.equals(OS.kAXTitleAttribute)) return getTitleAttribute(nextHandler, theEvent, userData);
-			if (attributeName.equals(OS.kAXValueAttribute)) return getValueAttribute(nextHandler, theEvent, userData);
-			if (attributeName.equals(OS.kAXEnabledAttribute)) return getEnabledAttribute(nextHandler, theEvent, userData);
-			if (attributeName.equals(OS.kAXFocusedAttribute)) return getFocusedAttribute(nextHandler, theEvent, userData);
-			if (attributeName.equals(OS.kAXParentAttribute)) return getParentAttribute(nextHandler, theEvent, userData);
-			if (attributeName.equals(OS.kAXChildrenAttribute)) return getChildrenAttribute(nextHandler, theEvent, userData);
-			if (attributeName.equals(OS.kAXSelectedChildrenAttribute)) return getSelectedChildrenAttribute(nextHandler, theEvent, userData);
-			if (attributeName.equals(OS.kAXVisibleChildrenAttribute)) return getVisibleChildrenAttribute(nextHandler, theEvent, userData);
-			if (attributeName.equals(OS.kAXPositionAttribute)) return getPositionAttribute(nextHandler, theEvent, userData);
-			if (attributeName.equals(OS.kAXSizeAttribute)) return getSizeAttribute(nextHandler, theEvent, userData);
-			if (attributeName.equals(OS.kAXDescriptionAttribute)) return getDescriptionAttribute(nextHandler, theEvent, userData);
-			if (attributeName.equals(OS.kAXNumberOfCharactersAttribute)) return getNumberOfCharactersAttribute(nextHandler, theEvent, userData);
-			if (attributeName.equals(OS.kAXSelectedTextAttribute)) return getSelectedTextAttribute(nextHandler, theEvent, userData);
-			if (attributeName.equals(OS.kAXSelectedTextRangeAttribute)) return getSelectedTextRangeAttribute(nextHandler, theEvent, userData);
-			if (attributeName.equals(OS.kAXStringForRangeParameterizedAttribute)) return getStringForRangeAttribute(nextHandler, theEvent, userData);
-			if (attributeName.equals(OS.kAXInsertionPointLineNumberAttribute)) return getInsertionPointLineNumberAttribute(nextHandler, theEvent, userData);
-			if (attributeName.equals(OS.kAXRangeForLineParameterizedAttribute)) return getRangeForLineParameterizedAttribute(nextHandler, theEvent, userData);
-			return getAttribute(nextHandler, theEvent, userData);
-		}
-		return userData;
-	}
-	
-	int getAttribute (int nextHandler, int theEvent, int userData) {
-		/* Generic handler: first try just calling the default handler. */
-		int code = userData != OS.eventNotHandledErr ? userData : OS.CallNextEventHandler (nextHandler, theEvent);
-		if (code != OS.noErr && getChildIDFromEvent(theEvent) != ACC.CHILDID_SELF) {
-			/*
-			* If the childID is unknown to the control, then it was created by the application,
-			* so delegate to the application's accessible UIElement for the control.
-			*/
-			OS.SetEventParameter (theEvent, OS.kEventParamAccessibleObject, OS.typeCFTypeRef, 4, new int [] {axuielementref});
-			code = OS.CallNextEventHandler (nextHandler, theEvent);
-		}
-		return code;
-	}
-	
-	int getHelpAttribute (int nextHandler, int theEvent, int userData) {
-		int code = userData != OS.eventNotHandledErr ? userData : OS.CallNextEventHandler (nextHandler, theEvent);
-		String osHelpAttribute = null;
-		int [] stringRef = new int [1];
-		if (code == OS.noErr) {
-			OS.GetEventParameter (theEvent, OS.kEventParamAccessibleAttributeValue, OS.typeCFStringRef, null, 4, null, stringRef);
-			osHelpAttribute = stringRefToString (stringRef [0]);
-		}
+
+	id getHelpAttribute (int childID) {
+		id returnValue = null;
 		AccessibleEvent event = new AccessibleEvent(this);
-		event.childID = getChildIDFromEvent(theEvent);
-		event.result = osHelpAttribute;
+		event.childID = childID;
 		for (int i = 0; i < accessibleListeners.size(); i++) {
 			AccessibleListener listener = (AccessibleListener) accessibleListeners.elementAt(i);
 			listener.getHelp(event);
 		}
+		
 		if (event.result != null) {
-			stringRef [0] = stringToStringRef (event.result);
-			if (stringRef [0] != 0) {
-				OS.SetEventParameter (theEvent, OS.kEventParamAccessibleAttributeValue, OS.typeCFStringRef, 4, stringRef);
-				OS.CFRelease(stringRef [0]);
-				code = OS.noErr;
-			}
+			returnValue = NSString.stringWith(event.result);
 		}
-		return code;
+		
+		return returnValue;
 	}
 	
-	int getRoleAttribute (int nextHandler, int theEvent, int userData) {
-		int code = userData;
+	NSString getRoleAttribute(int childID) {
+		NSString returnValue = null;
 		AccessibleControlEvent event = new AccessibleControlEvent(this);
-		event.childID = getChildIDFromEvent(theEvent);
+		event.childID = childID;
 		event.detail = -1;
 		for (int i = 0; i < accessibleControlListeners.size(); i++) {
 			AccessibleControlListener listener = (AccessibleControlListener) accessibleControlListeners.elementAt(i);
@@ -470,20 +561,16 @@ public class Accessible {
 			String appRole = roleToOs (event.detail);
 			int index = appRole.indexOf(':');
 			if (index != -1) appRole = appRole.substring(0, index);
-			int stringRef = stringToStringRef (appRole);
-			if (stringRef != 0) {
-				OS.SetEventParameter (theEvent, OS.kEventParamAccessibleAttributeValue, OS.typeCFStringRef, 4, new int [] {stringRef});
-				OS.CFRelease(stringRef);
-				code = OS.noErr;
-			}
+			returnValue = NSString.stringWith(appRole);
 		}
-		return code;
+
+		return returnValue;
 	}
 	
-	int getSubroleAttribute (int nextHandler, int theEvent, int userData) {
-		int code = userData;
+	id getSubroleAttribute (int childID) {
+		id returnValue = null;
 		AccessibleControlEvent event = new AccessibleControlEvent(this);
-		event.childID = getChildIDFromEvent(theEvent);
+		event.childID = childID;
 		event.detail = -1;
 		for (int i = 0; i < accessibleControlListeners.size(); i++) {
 			AccessibleControlListener listener = (AccessibleControlListener) accessibleControlListeners.elementAt(i);
@@ -494,21 +581,16 @@ public class Accessible {
 			int index = appRole.indexOf(':');
 			if (index != -1) {
 				appRole = appRole.substring(index + 1);
-				int stringRef = stringToStringRef (appRole);
-				if (stringRef != 0) {
-					OS.SetEventParameter (theEvent, OS.kEventParamAccessibleAttributeValue, OS.typeCFStringRef, 4, new int [] {stringRef});
-					OS.CFRelease(stringRef);
-				}
+				returnValue = NSString.stringWith(appRole);
 			}
-			code = OS.noErr;
 		}
-		return code;
+		return returnValue;
 	}
 	
-	int getRoleDescriptionAttribute (int nextHandler, int theEvent, int userData) {
-		int code = userData;
+	id getRoleDescriptionAttribute (int childID) {
+		id returnValue = null;
 		AccessibleControlEvent event = new AccessibleControlEvent(this);
-		event.childID = getChildIDFromEvent(theEvent);
+		event.childID = childID;
 		event.detail = -1;
 		for (int i = 0; i < accessibleControlListeners.size(); i++) {
 			AccessibleControlListener listener = (AccessibleControlListener) accessibleControlListeners.elementAt(i);
@@ -522,26 +604,18 @@ public class Accessible {
 				appSubrole = appRole.substring(index + 1);
 				appRole = appRole.substring(0, index);
 			}
-			int stringRef1 = stringToStringRef (appRole);
-			if (stringRef1 != 0) {
-				int stringRef2 = 0;
-				if (appSubrole != null) stringRef2 = stringToStringRef (appSubrole);
-				int stringRef3 = OS.HICopyAccessibilityRoleDescription (stringRef1, stringRef2);
-				OS.CFRelease(stringRef1);
-				if (stringRef2 != 0) OS.CFRelease(stringRef2);
-				if (stringRef3 != 0) {
-					OS.SetEventParameter (theEvent, OS.kEventParamAccessibleAttributeValue, OS.typeCFStringRef, 4, new int [] {stringRef3});
-					OS.CFRelease(stringRef3);
-					code = OS.noErr;
-				}
-			}
+			NSString nsAppRole = NSString.stringWith(appRole);
+			NSString nsAppSubrole = null;
+			
+			if (appSubrole != null) nsAppSubrole = NSString.stringWith(appSubrole);
+			returnValue = new NSString(OS.NSAccessibilityRoleDescription (((nsAppRole != null) ? nsAppRole.id : 0), (nsAppSubrole != null) ? nsAppSubrole.id : 0));
 		}
-		return code;
+		return returnValue;
 	}
 	
-	int getTitleAttribute (int nextHandler, int theEvent, int userData) {
-		int code = userData != OS.eventNotHandledErr ? userData : OS.CallNextEventHandler (nextHandler, theEvent);
-		int childID = getChildIDFromEvent(theEvent);
+	id getTitleAttribute (int childID) {
+		
+		id returnValue = null;//NSString.stringWith("");
 		
 		/*
 		* Feature of the Macintosh.  The text of a Label is returned in its value,
@@ -555,36 +629,22 @@ public class Accessible {
 			listener.getRole(roleEvent);
 		}
 		if (roleEvent.detail != ACC.ROLE_LABEL) {
-			String osTitleAttribute = null;
-			int [] stringRef = new int [1];
-			if (code == OS.noErr) {
-				int status = OS.GetEventParameter (theEvent, OS.kEventParamAccessibleAttributeValue, OS.typeCFStringRef, null, 4, null, stringRef);
-				if (status == OS.noErr) {
-					osTitleAttribute = stringRefToString (stringRef [0]);
-				}
-			}
 			AccessibleEvent event = new AccessibleEvent(this);
 			event.childID = childID;
-			event.result = osTitleAttribute;
+			event.result = null;
 			for (int i = 0; i < accessibleListeners.size(); i++) {
 				AccessibleListener listener = (AccessibleListener) accessibleListeners.elementAt(i);
 				listener.getName(event);
 			}
-			if (event.result != null) {
-				stringRef [0] = stringToStringRef (event.result);
-				if (stringRef [0] != 0) {
-					OS.SetEventParameter (theEvent, OS.kEventParamAccessibleAttributeValue, OS.typeCFStringRef, 4, stringRef);
-					OS.CFRelease(stringRef [0]);
-					code = OS.noErr;
-				}
-			}
+			
+			if (event.result != null)
+				returnValue = NSString.stringWith(event.result);
 		}
-		return code;
+		return returnValue;
 	}
 	
-	int getValueAttribute (int nextHandler, int theEvent, int userData) {
-		int code = userData != OS.eventNotHandledErr ? userData : OS.CallNextEventHandler (nextHandler, theEvent);
-		int childID = getChildIDFromEvent(theEvent);
+	id getValueAttribute (int childID) {
+		id returnValue = null;
 		AccessibleControlEvent event = new AccessibleControlEvent(this);
 		event.childID = childID;
 		event.detail = -1;
@@ -596,72 +656,82 @@ public class Accessible {
 		}
 		int role = event.detail;
 		String value = event.result;
-		if (value != null || role == ACC.ROLE_LABEL) {
-			int stringRef = 0;
-			switch (role) {
-			case ACC.ROLE_RADIOBUTTON: // 1 = on, 0 = off
-			case ACC.ROLE_CHECKBUTTON: // 1 = checked, 0 = unchecked, 2 = mixed
-			case ACC.ROLE_SCROLLBAR: // numeric value representing the position of the scroller
-			case ACC.ROLE_TABITEM:  // 1 = selected, 0 = not selected
-			case ACC.ROLE_SLIDER: // the value associated with the position of the slider thumb
-			case ACC.ROLE_PROGRESSBAR: // the value associated with the fill level of the progress bar
+
+		switch (role) {
+		case ACC.ROLE_RADIOBUTTON: // 1 = on, 0 = off
+		case ACC.ROLE_CHECKBUTTON: // 1 = checked, 0 = unchecked, 2 = mixed
+		case ACC.ROLE_SCROLLBAR: // numeric value representing the position of the scroller
+		case ACC.ROLE_SLIDER: // the value associated with the position of the slider thumb
+		case ACC.ROLE_PROGRESSBAR: // the value associated with the fill level of the progress bar
+			if (value != null) {
 				try {
 					int number = Integer.parseInt(value);
-					OS.SetEventParameter (theEvent, OS.kEventParamAccessibleAttributeValue, OS.typeSInt32, 4, new int [] {number});
-					code = OS.noErr;
+					returnValue = NSNumber.numberWithInt(number);
 				} catch (NumberFormatException ex) {
 					if (value.equalsIgnoreCase("true")) {
-						OS.SetEventParameter (theEvent, OS.kEventParamAccessibleAttributeValue, OS.typeBoolean, 4, new boolean [] {true});
-						code = OS.noErr;
+						returnValue = NSNumber.numberWithBool(true);
 					} else if (value.equalsIgnoreCase("false")) {
-						OS.SetEventParameter (theEvent, OS.kEventParamAccessibleAttributeValue, OS.typeBoolean, 4, new boolean [] {false});
-						code = OS.noErr;
+						returnValue = NSNumber.numberWithBool(false);
 					}
 				}
-				break;
-			case ACC.ROLE_TABFOLDER: // the accessibility object representing the currently selected tab item
-				//break;
-			case ACC.ROLE_COMBOBOX: // text of the currently selected item
-			case ACC.ROLE_TEXT: // text in the text field
-				stringRef = stringToStringRef(value);
-				break;
-			case ACC.ROLE_LABEL: // text in the label
-				/* On a Mac, the 'value' of a label is the same as the 'name' of the label. */
-				AccessibleEvent e = new AccessibleEvent(this);
-				e.childID = childID;
-				e.result = null;
-				for (int i = 0; i < accessibleListeners.size(); i++) {
-					AccessibleListener listener = (AccessibleListener) accessibleListeners.elementAt(i);
-					listener.getName(e);
-				}
-				if (e.result != null) {
-					stringRef = stringToStringRef(e.result);
+			} else {
+				returnValue = NSNumber.numberWithBool(false);
+			}
+			break;
+		case ACC.ROLE_TABFOLDER: // the accessibility object representing the currently selected tab item
+		case ACC.ROLE_TABITEM:  // 1 = selected, 0 = not selected
+			AccessibleControlEvent ace = new AccessibleControlEvent(this);
+			ace.childID = -4;
+			for (int i = 0; i < accessibleControlListeners.size(); i++) {
+				AccessibleControlListener listener = (AccessibleControlListener) accessibleControlListeners.elementAt(i);
+				listener.getSelection(ace);
+			}
+			if (ace.childID >= ACC.CHILDID_SELF) {
+				if (role == ACC.ROLE_TABITEM) {
+			 		returnValue = NSNumber.numberWithBool(ace.childID == childID);
 				} else {
-					if (value != null) stringRef = stringToStringRef(value);
+					returnValue = new id(OS.NSAccessibilityUnignoredAncestor(childIDToOs(ace.childID).id));
 				}
-				break;
+			} else {
+		 		returnValue = NSNumber.numberWithBool(false);				
 			}
-			if (stringRef != 0) {
-				OS.SetEventParameter (theEvent, OS.kEventParamAccessibleAttributeValue, OS.typeCFStringRef, 4, new int [] {stringRef});
-				OS.CFRelease(stringRef);
-				code = OS.noErr;
+			break;
+		case ACC.ROLE_COMBOBOX: // text of the currently selected item
+		case ACC.ROLE_TEXT: // text in the text field
+			if (value != null) returnValue = NSString.stringWith(value);
+			break;
+		case ACC.ROLE_LABEL: // text in the label
+			/* On a Mac, the 'value' of a label is the same as the 'name' of the label. */
+			AccessibleEvent e = new AccessibleEvent(this);
+			e.childID = childID;
+			e.result = null;
+			for (int i = 0; i < accessibleListeners.size(); i++) {
+				AccessibleListener listener = (AccessibleListener) accessibleListeners.elementAt(i);
+				listener.getName(e);
 			}
+			if (e.result != null) {
+				returnValue = NSString.stringWith(e.result);
+			} else {
+				if (value != null) returnValue = NSString.stringWith(value);
+			}
+			break;
 		}
-		return code;
+		
+		return returnValue;
 	}
 	
-	int getEnabledAttribute (int nextHandler, int theEvent, int userData) {
-		int code = userData != OS.eventNotHandledErr ? userData : OS.CallNextEventHandler (nextHandler, theEvent);
-		if (code == OS.eventNotHandledErr) {
-			OS.SetEventParameter (theEvent, OS.kEventParamAccessibleAttributeValue, OS.typeBoolean, 4, new boolean [] {control.isEnabled()});
-			code = OS.noErr;
+	id getEnabledAttribute (int childID) {
+		AccessibleControlEvent event = new AccessibleControlEvent(this);
+		event.detail = -1;
+		for (int i = 0; i < accessibleControlListeners.size(); i++) {
+			AccessibleControlListener listener = (AccessibleControlListener) accessibleControlListeners.elementAt(i);
+			listener.getState(event);
 		}
-		return code;
+
+		return NSNumber.numberWithBool(control.isEnabled());
 	}
 	
-	int getFocusedAttribute (int nextHandler, int theEvent, int userData) {
-		int[] osChildID = new int[1];
-		OS.GetEventParameter (theEvent, OS.kEventParamAccessibleObject, OS.typeCFTypeRef, null, 4, null, osChildID);
+	id getFocusedAttribute (int childID) {
 		AccessibleControlEvent event = new AccessibleControlEvent(this);
 		event.childID = ACC.CHILDID_MULTIPLE; // set to invalid value, to test if the application sets it in getFocus()
 		event.accessible = null;
@@ -671,54 +741,41 @@ public class Accessible {
 		}
 
 		/* The application can optionally answer an accessible. */
-		if (event.accessible != null) {
-			boolean hasFocus = OS.CFEqual(event.accessible.axuielementref, osChildID[0]);
-			OS.SetEventParameter (theEvent, OS.kEventParamAccessibleAttributeValue, OS.typeBoolean, 4, new boolean [] {hasFocus});
-			return OS.noErr;
-		}
+		// FIXME:
+//		if (event.accessible != null) {
+//			boolean hasFocus = (event.accessible.childID == childID) && (event.accessible.control == this.control);
+//			return NSNumber.numberWithBool(hasFocus);
+//		}
 		
 		/* Or the application can answer a valid child ID, including CHILDID_SELF and CHILDID_NONE. */
 		if (event.childID == ACC.CHILDID_SELF) {
-			boolean hasFocus = OS.CFEqual(axuielementref, osChildID[0]);
-			OS.SetEventParameter (theEvent, OS.kEventParamAccessibleAttributeValue, OS.typeBoolean, 4, new boolean [] {hasFocus});
-			return OS.noErr;
+			boolean hasFocus = (event.childID == childID);
+			return NSNumber.numberWithBool(hasFocus);
 		}
 		if (event.childID == ACC.CHILDID_NONE) {
-			OS.SetEventParameter (theEvent, OS.kEventParamAccessibleAttributeValue, OS.typeBoolean, 4, new boolean [] {false});
-			return OS.noErr;
+			return NSNumber.numberWithBool(false);
 		}
 		if (event.childID != ACC.CHILDID_MULTIPLE) {
 			/* Other valid childID. */
-			int childID = osToChildID(osChildID[0]);
-			OS.SetEventParameter (theEvent, OS.kEventParamAccessibleAttributeValue, OS.typeBoolean, 4, new boolean [] {event.childID == childID});
-			return OS.noErr;
+			return NSNumber.numberWithBool(event.childID == childID);
 		}
 
-		/* Invalid childID at this point means the application did not implement getFocus, so return the native focus. */
-		boolean hasFocus = false;
-		int focusWindow = OS.GetUserFocusWindow ();
-		if (focusWindow != 0) {
-			int [] focusControl = new int [1];
-			OS.GetKeyboardFocus (focusWindow, focusControl);
-			if (focusControl [0] == control.handle) hasFocus = true;
-		}
-		OS.SetEventParameter (theEvent, OS.kEventParamAccessibleAttributeValue, OS.typeBoolean, 4, new boolean [] {hasFocus});
-		return OS.noErr;
+		// Invalid childID at this point means the application did not implement getFocus, so 
+		// let the default handler return the native focus.
+		boolean hasFocus = (this.control.view.window().firstResponder() == control.view);
+		return NSNumber.numberWithBool(hasFocus);
 	}
 	
-	int getParentAttribute (int nextHandler, int theEvent, int userData) {
-		int code = userData != OS.eventNotHandledErr ? userData : OS.CallNextEventHandler (nextHandler, theEvent);
-		if (code == OS.eventNotHandledErr) {
-			/* If the childID was created by the application, the parent is the accessible for the control. */
-			OS.SetEventParameter (theEvent, OS.kEventParamAccessibleAttributeValue, OS.typeCFTypeRef, 4, new int [] {axuielementref});
-			code = OS.noErr;
-		}
-		return code;
+	id getParentAttribute (int childID) {
+		// Returning null here means 'let Cocoa figure it out.'
+		if (childID == ACC.CHILDID_SELF)
+			return null;
+		else
+			return new id(OS.NSAccessibilityUnignoredAncestor(control.view.id));
 	}
 	
-	int getChildrenAttribute (int nextHandler, int theEvent, int userData) {
-		int code = userData;
-		int childID = getChildIDFromEvent(theEvent);
+	id getChildrenAttribute (int childID) {
+		id returnValue = null;
 		if (childID == ACC.CHILDID_SELF) {
 			AccessibleControlEvent event = new AccessibleControlEvent(this);
 			event.childID = childID;
@@ -727,132 +784,198 @@ public class Accessible {
 				AccessibleControlListener listener = (AccessibleControlListener) accessibleControlListeners.elementAt(i);
 				listener.getChildCount(event);
 			}
-			if (event.detail == 0) {
-				code = OS.noErr;
-			} else if (event.detail > 0) {
+			if (event.detail > 0) {
 				for (int i = 0; i < accessibleControlListeners.size(); i++) {
 					AccessibleControlListener listener = (AccessibleControlListener) accessibleControlListeners.elementAt(i);
 					listener.getChildren(event);
 				}
 				Object [] appChildren = event.children;
 				if (appChildren != null && appChildren.length > 0) {
-					/* return a CFArrayRef of AXUIElementRefs */
-					int children = OS.CFArrayCreateMutable (OS.kCFAllocatorDefault, 0, 0);
-					if (children != 0) {
-						for (int i = 0; i < appChildren.length; i++) {
-							Object child = appChildren[i];
-							if (child instanceof Integer) {
-								OS.CFArrayAppendValue (children, childIDToOs(((Integer)child).intValue()));
-							} else {
-								OS.CFArrayAppendValue (children, ((Accessible)child).axuielementref);
-							}
-						}			
-						OS.SetEventParameter (theEvent, OS.kEventParamAccessibleAttributeValue, OS.typeCFMutableArrayRef, 4, new int [] {children});
-						OS.CFRelease(children);
-						code = OS.noErr;
+					/* return an NSArray of NSAccessible objects. */
+					NSMutableArray childArray = NSMutableArray.arrayWithCapacity(appChildren.length);
+
+					for (int i = 0; i < appChildren.length; i++) {
+						Object child = appChildren[i];
+						if (child instanceof Integer) {
+							id accChild = childIDToOs(((Integer)child).intValue());							
+							childArray.addObject(accChild);
+						} else {
+							childArray.addObject(((Accessible)child).control.view);
+						}
 					}
+
+					returnValue = new id(OS.NSAccessibilityUnignoredChildren(childArray.id));
 				}
 			}
+		} else {
+			// Lightweight children have no children of their own.
+			// Don't return null if there are no children -- always return an empty array.
+			returnValue = NSArray.array();
 		}
-		return code;
+
+		// Returning null here means we want the control itself to determine its children. If the accessible listener
+		// implemented getChildCount/getChildren, references to those objects would have been returned above.
+		return returnValue;
 	}
 	
-	int getSelectedChildrenAttribute (int nextHandler, int theEvent, int userData) {
-		//TODO
-		return getAttribute (nextHandler, theEvent, userData);
-	}
-	
-	int getVisibleChildrenAttribute (int nextHandler, int theEvent, int userData) {
-		//TODO
-		return getAttribute (nextHandler, theEvent, userData);
-	}
-	
-	int getPositionAttribute (int nextHandler, int theEvent, int userData) {
-		int code = userData != OS.eventNotHandledErr ? userData : OS.CallNextEventHandler (nextHandler, theEvent);
-		CGPoint osPositionAttribute = new CGPoint ();
-		if (code == OS.noErr) {
-			OS.GetEventParameter (theEvent, OS.kEventParamAccessibleAttributeValue, OS.typeHIPoint, null, CGPoint.sizeof, null, osPositionAttribute);
+	id getTabsAttribute (int childID) {
+		id returnValue = null;
+		if (childID == ACC.CHILDID_SELF) {
+			AccessibleControlEvent event = new AccessibleControlEvent(this);
+			event.childID = childID;
+			event.detail = -1; // set to impossible value to test if app resets
+			for (int i = 0; i < accessibleControlListeners.size(); i++) {
+				AccessibleControlListener listener = (AccessibleControlListener) accessibleControlListeners.elementAt(i);
+				listener.getChildCount(event);
+			}
+			if (event.detail > 0) {
+				for (int i = 0; i < accessibleControlListeners.size(); i++) {
+					AccessibleControlListener listener = (AccessibleControlListener) accessibleControlListeners.elementAt(i);
+					listener.getChildren(event);
+				}
+				Object [] appChildren = event.children;
+				if (appChildren != null && appChildren.length > 0) {
+					/* return an NSArray of NSAccessible objects. */
+					NSMutableArray childArray = NSMutableArray.arrayWithCapacity(appChildren.length);
+
+					for (int i = 0; i < appChildren.length; i++) {
+						Object child = appChildren[i];
+						if (child instanceof Integer) {
+							int subChildID = ((Integer)child).intValue();
+							event.childID = subChildID;
+							event.detail = -1;
+							for (int j = 0; j < accessibleControlListeners.size(); j++) {
+								AccessibleControlListener listener = (AccessibleControlListener) accessibleControlListeners.elementAt(j);
+								listener.getRole(event);
+							}
+							
+							if (event.detail == ACC.ROLE_TABITEM) {
+								id accChild = childIDToOs(((Integer)child).intValue());							
+								childArray.addObject(accChild);
+							}
+						} else {
+							childArray.addObject(((Accessible)child).control.view);
+						}
+					}
+
+					returnValue = new id(OS.NSAccessibilityUnignoredChildren(childArray.id));
+				}
+			}
+		} else {
+			// Lightweight children have no children of their own.
+			// Don't return null if there are no children -- always return an empty array.
+			returnValue = NSArray.array();
 		}
+
+		// Returning null here means we want the control itself to determine its children. If the accessible listener
+		// implemented getChildCount/getChildren, references to those objects would have been returned above.
+		return returnValue;
+	}
+	
+	id getWindowAttribute (int childID) {
+		return control.view.window();
+	}
+	
+	id getTopLevelUIElementAttribute (int childID) {
+		return control.view.window();
+	}
+	
+	id getPositionAttribute (int childID) {
+		id returnValue = null;
 		AccessibleControlEvent event = new AccessibleControlEvent(this);
-		event.childID = getChildIDFromEvent(theEvent);
-		event.x = (int) osPositionAttribute.x;
-		event.y = (int) osPositionAttribute.y;
-		if (code != OS.noErr) event.width = -1;
+		event.childID = childID;
+		event.width = -1;
+		
 		for (int i = 0; i < accessibleControlListeners.size(); i++) {
 			AccessibleControlListener listener = (AccessibleControlListener) accessibleControlListeners.elementAt(i);
 			listener.getLocation(event);
 		}
+
+		Monitor primaryMonitor = Display.getCurrent().getPrimaryMonitor();
+		
+		NSPoint osPositionAttribute = new NSPoint ();
 		if (event.width != -1) {
+			// The point returned is the lower-left coordinate of the widget in lower-left relative screen coordinates.
 			osPositionAttribute.x = event.x;
-			osPositionAttribute.y = event.y;
-			OS.SetEventParameter (theEvent, OS.kEventParamAccessibleAttributeValue, OS.typeHIPoint, CGPoint.sizeof, osPositionAttribute);
-			code = OS.noErr;
-		}
-		return code;
-	}
-	
-	int getSizeAttribute (int nextHandler, int theEvent, int userData) {
-		int code = userData != OS.eventNotHandledErr ? userData : OS.CallNextEventHandler (nextHandler, theEvent);
-		CGPoint osSizeAttribute = new CGPoint ();
-		if (code == OS.noErr) {
-			OS.GetEventParameter (theEvent, OS.kEventParamAccessibleAttributeValue, OS.typeHISize, null, CGPoint.sizeof, null, osSizeAttribute);
-		}
-		AccessibleControlEvent event = new AccessibleControlEvent(this);
-		event.childID = getChildIDFromEvent(theEvent);
-		event.width = (code != OS.noErr) ? -1 : (int) osSizeAttribute.x;
-		event.height = (int) osSizeAttribute.y;
-		for (int i = 0; i < accessibleControlListeners.size(); i++) {
-			AccessibleControlListener listener = (AccessibleControlListener) accessibleControlListeners.elementAt(i);
-			listener.getLocation(event);
-		}
-		if (event.width != -1) {
-			osSizeAttribute.x = event.width;
-			osSizeAttribute.y = event.height;
-			OS.SetEventParameter (theEvent, OS.kEventParamAccessibleAttributeValue, OS.typeHISize, CGPoint.sizeof, osSizeAttribute);
-			code = OS.noErr;
-		}
-		return code;
-	}
-	
-	int getDescriptionAttribute (int nextHandler, int theEvent, int userData) {
-		int code = userData != OS.eventNotHandledErr ? userData : OS.CallNextEventHandler (nextHandler, theEvent);
-		String osDescriptionAttribute = null;
-		int [] stringRef = new int [1];
-		if (code == OS.noErr) {
-			int status = OS.GetEventParameter (theEvent, OS.kEventParamAccessibleAttributeValue, OS.typeCFStringRef, null, 4, null, stringRef);
-			if (status == OS.noErr) {
-				osDescriptionAttribute = stringRefToString (stringRef [0]);
+			osPositionAttribute.y = primaryMonitor.getBounds().height - event.y - event.height;
+			returnValue = NSValue.valueWithPoint(osPositionAttribute);
+		} else {
+			if (childID != ACC.CHILDID_SELF) {
+				Point pt = null;
+				Rectangle location = control.getBounds();
+
+				if (control.getParent() != null)
+					pt = control.getParent().toDisplay(location.x, location.y);
+				else 
+					pt = ((Shell)control).toDisplay(location.x, location.y);
+
+				osPositionAttribute.x = pt.x;
+				osPositionAttribute.y = pt.y;
+				returnValue = NSValue.valueWithPoint(osPositionAttribute);
 			}
 		}
+		
+		return returnValue;
+	}
+	
+	id getSizeAttribute (int childID) {
+		id returnValue = null;
+		AccessibleControlEvent event = new AccessibleControlEvent(this);
+		event.childID = childID;
+		event.width = -1;
+
+		for (int i = 0; i < accessibleControlListeners.size(); i++) {
+			AccessibleControlListener listener = (AccessibleControlListener) accessibleControlListeners.elementAt(i);
+			listener.getLocation(event);
+		}
+
+		NSSize controlSize = new NSSize ();
+		if (event.width != -1) {
+			controlSize.width = event.width;
+			controlSize.height = event.height;
+			returnValue = NSValue.valueWithSize(controlSize);
+		} else {
+			if (childID != ACC.CHILDID_SELF) {
+				controlSize.width = controlSize.height = 0;
+				returnValue = NSValue.valueWithSize(controlSize);
+			}
+		}
+		
+		return returnValue;
+	}
+	
+	id getDescriptionAttribute (int childID) {
 		AccessibleEvent event = new AccessibleEvent(this);
-		event.childID = getChildIDFromEvent(theEvent);
-		event.result = osDescriptionAttribute;
+		event.childID = childID;
+		event.result = null;
+		id returnValue = null;
 		for (int i = 0; i < accessibleListeners.size(); i++) {
 			AccessibleListener listener = (AccessibleListener) accessibleListeners.elementAt(i);
 			listener.getDescription(event);
 		}
-		if (event.result != null) {
-			stringRef [0] = stringToStringRef (event.result);
-			if (stringRef [0] != 0) {
-				OS.SetEventParameter (theEvent, OS.kEventParamAccessibleAttributeValue, OS.typeCFStringRef, 4, stringRef);
-				OS.CFRelease(stringRef [0]);
-				code = OS.noErr;
-			}
+
+		returnValue = (event.result != null ? NSString.stringWith(event.result) : null);
+
+		// If no description was provided, and this is a composite or canvas, return a blank string
+		// -- otherwise, let the Cocoa control handle it.
+		if (returnValue == null) {
+			if (control instanceof Composite) returnValue = NSString.stringWith("");
 		}
-		return code;
+
+		return returnValue;
 	}
 	
-	int getInsertionPointLineNumberAttribute (int nextHandler, int theEvent, int userData) {
-		int code = userData;
+	id getInsertionPointLineNumberAttribute (int childID) {
+		id returnValue = null;
 		AccessibleControlEvent controlEvent = new AccessibleControlEvent(this);
-		controlEvent.childID = getChildIDFromEvent(theEvent);
+		controlEvent.childID = childID;
 		controlEvent.result = null;
 		for (int i = 0; i < accessibleControlListeners.size(); i++) {
 			AccessibleControlListener listener = (AccessibleControlListener) accessibleControlListeners.elementAt(i);
 			listener.getValue(controlEvent);
 		}
 		AccessibleTextEvent textEvent = new AccessibleTextEvent(this);
-		textEvent.childID = getChildIDFromEvent(theEvent);
+		textEvent.childID = childID;
 		textEvent.offset = -1;
 		for (int i = 0; i < accessibleTextListeners.size(); i++) {
 			AccessibleTextListener listener = (AccessibleTextListener) accessibleTextListeners.elementAt(i);
@@ -860,16 +983,15 @@ public class Accessible {
 		}
 		if (controlEvent.result != null && textEvent.offset != -1) {
 			int lineNumber = lineNumberForOffset (controlEvent.result, textEvent.offset);
-			OS.SetEventParameter (theEvent, OS.kEventParamAccessibleAttributeValue, OS.typeSInt32, 4, new int [] {lineNumber});
-			code = OS.noErr;
+			returnValue = NSNumber.numberWithInt(lineNumber);
 		}
-		return code;
+		return returnValue;
 	}
 	
-	int getNumberOfCharactersAttribute (int nextHandler, int theEvent, int userData) {
-		int code = userData;
+	id getNumberOfCharactersAttribute (int childID) {
+		id returnValue = null;
 		AccessibleControlEvent event = new AccessibleControlEvent(this);
-		event.childID = getChildIDFromEvent(theEvent);
+		event.childID = childID;
 		event.result = null;
 		for (int i = 0; i < accessibleControlListeners.size(); i++) {
 			AccessibleControlListener listener = (AccessibleControlListener) accessibleControlListeners.elementAt(i);
@@ -877,41 +999,37 @@ public class Accessible {
 		}
 		String appValue = event.result;
 		if (appValue != null) {
-			OS.SetEventParameter (theEvent, OS.kEventParamAccessibleAttributeValue, OS.typeSInt32, 4, new int [] {appValue.length()});
-			code = OS.noErr;
+			returnValue = NSNumber.numberWithInt(appValue.length());
 		}
-		return code;
+		return returnValue;
 	}
 	
-	int getRangeForLineParameterizedAttribute (int nextHandler, int theEvent, int userData) {
-		int code = userData;
-		int lineNumber [] = new int [1];
-		int status = OS.GetEventParameter (theEvent, OS.kEventParamAccessibleAttributeParameter, OS.typeSInt32, null, 4, null, lineNumber);
-		if (status == OS.noErr) {
-			AccessibleControlEvent event = new AccessibleControlEvent(this);
-			event.childID = getChildIDFromEvent(theEvent);
-			event.result = null;
-			for (int i = 0; i < accessibleControlListeners.size(); i++) {
-				AccessibleControlListener listener = (AccessibleControlListener) accessibleControlListeners.elementAt(i);
-				listener.getValue(event);
-			}
-			if (event.result != null) {
-				CFRange range = rangeForLineNumber (lineNumber [0], event.result);
-				if (range.location != -1) {
-					int valueRef = OS.AXValueCreate(OS.kAXValueCFRangeType, range);
-					OS.SetEventParameter (theEvent, OS.kEventParamAccessibleAttributeValue, OS.typeCFTypeRef, 4, new int [] {valueRef});
-					OS.CFRelease(valueRef);
-					code = OS.noErr;
-				}
+	id getRangeForLineParameterizedAttribute (id parameter, int childID) {
+		id returnValue = null;
+
+		// The parameter is an NSNumber with the line number.
+		NSNumber lineNumberObj = new NSNumber(parameter.id);		
+		int lineNumber = lineNumberObj.intValue();
+		AccessibleControlEvent event = new AccessibleControlEvent(this);
+		event.childID = childID;
+		event.result = null;
+		for (int i = 0; i < accessibleControlListeners.size(); i++) {
+			AccessibleControlListener listener = (AccessibleControlListener) accessibleControlListeners.elementAt(i);
+			listener.getValue(event);
+		}
+		if (event.result != null) {
+			NSRange range = rangeForLineNumber (lineNumber, event.result);
+			if (range.location != -1) {
+				returnValue = NSValue.valueWithRange(range);
 			}
 		}
-		return code;
+		return returnValue;
 	}
 	
-	int getSelectedTextAttribute (int nextHandler, int theEvent, int userData) {
-		int code = userData;
+	id getSelectedTextAttribute (int childID) {
+		id returnValue = NSString.stringWith("");
 		AccessibleTextEvent event = new AccessibleTextEvent(this);
-		event.childID = getChildIDFromEvent(theEvent);
+		event.childID = childID;
 		event.offset = -1;
 		event.length = -1;
 		for (int i = 0; i < accessibleTextListeners.size(); i++) {
@@ -930,68 +1048,98 @@ public class Accessible {
 			}
 			String appValue = event2.result;
 			if (appValue != null) {
-				int stringRef = stringToStringRef (appValue.substring(offset, offset + length));
-				if (stringRef != 0) {
-					OS.SetEventParameter (theEvent, OS.kEventParamAccessibleAttributeValue, OS.typeCFStringRef, 4, new int [] {stringRef});
-					OS.CFRelease(stringRef);
-					code = OS.noErr;
-				}
+				returnValue = NSString.stringWith(appValue.substring(offset, offset + length));
 			}
 		}
-		return code;
+		return returnValue;
 	}
 	
-	int getSelectedTextRangeAttribute (int nextHandler, int theEvent, int userData) {
-		int code = userData;
+	id getSelectedTextRangeAttribute (int childID) {
+		id returnValue = null;
 		AccessibleTextEvent event = new AccessibleTextEvent(this);
-		event.childID = getChildIDFromEvent(theEvent);
+		event.childID = childID;
 		event.offset = -1;
-		event.length = -1;
+		event.length = 0;
 		for (int i = 0; i < accessibleTextListeners.size(); i++) {
 			AccessibleTextListener listener = (AccessibleTextListener) accessibleTextListeners.elementAt(i);
 			listener.getSelectionRange(event);
 		}
 		if (event.offset != -1) {
-			CFRange range = new CFRange();
+			NSRange range = new NSRange();
 			range.location = event.offset;
 			range.length = event.length;
-			int valueRef = OS.AXValueCreate(OS.kAXValueCFRangeType, range);
-			OS.SetEventParameter (theEvent, OS.kEventParamAccessibleAttributeValue, OS.typeCFTypeRef, 4, new int [] {valueRef});
-			OS.CFRelease(valueRef);
-			code = OS.noErr;
+			returnValue = NSValue.valueWithRange(range);
 		}
-		return code;
+		return returnValue;
 	}
 	
-	int getStringForRangeAttribute (int nextHandler, int theEvent, int userData) {
-		int code = userData;
-		int valueRef [] = new int [1];
-		int status = OS.GetEventParameter (theEvent, OS.kEventParamAccessibleAttributeParameter, OS.typeCFTypeRef, null, 4, null, valueRef);
-		if (status == OS.noErr) {
-			CFRange range = new CFRange();
-			boolean ok = OS.AXValueGetValue(valueRef[0], OS.kAXValueCFRangeType, range);
-			if (ok) {
-				AccessibleControlEvent event = new AccessibleControlEvent(this);
-				event.childID = getChildIDFromEvent(theEvent);
-				event.result = null;
-				for (int i = 0; i < accessibleControlListeners.size(); i++) {
-					AccessibleControlListener listener = (AccessibleControlListener) accessibleControlListeners.elementAt(i);
-					listener.getValue(event);
-				}
-				String appValue = event.result;
-				if (appValue != null) {
-					int stringRef = stringToStringRef (appValue.substring(range.location, range.location + range.length));
-					if (stringRef != 0) {
-						OS.SetEventParameter (theEvent, OS.kEventParamAccessibleAttributeValue, OS.typeCFStringRef, 4, new int [] {stringRef});
-						OS.CFRelease(stringRef);
-						code = OS.noErr;
-					}
-				}
-			}
+	id getStringForRangeAttribute (id parameter, int childID) {
+		id returnValue = null;
+		
+		// Parameter is an NSRange wrapped in an NSValue. 
+		NSValue parameterObject = new NSValue(parameter.id);
+		NSRange range = parameterObject.rangeValue();		
+		AccessibleControlEvent event = new AccessibleControlEvent(this);
+		event.childID = childID;
+		event.result = null;
+		for (int i = 0; i < accessibleControlListeners.size(); i++) {
+			AccessibleControlListener listener = (AccessibleControlListener) accessibleControlListeners.elementAt(i);
+			listener.getValue(event);
 		}
-		return code;
+		String appValue = event.result;
+
+		if (appValue != null) {
+			returnValue = NSString.stringWith(appValue.substring((int)/*64*/range.location, (int)/*64*/(range.location + range.length)));
+		}
+
+		return returnValue;
 	}
 	
+	id getSelectedTextRangesAttribute (int childID) {
+		NSMutableArray returnValue = null; 
+		AccessibleTextEvent event = new AccessibleTextEvent(this);
+		event.childID = childID;
+		event.offset = -1;
+		event.length = 0;
+		
+		for (int i = 0; i < accessibleTextListeners.size(); i++) {
+			AccessibleTextListener listener = (AccessibleTextListener) accessibleTextListeners.elementAt(i);
+			listener.getSelectionRange(event);
+		}
+		
+		if (event.offset != -1) {
+			returnValue = NSMutableArray.arrayWithCapacity(1);
+			NSRange range = new NSRange();
+			range.location = event.offset;
+			range.length = event.length;
+			returnValue.addObject(NSValue.valueWithRange(range));
+		}
+		
+		return returnValue;
+	}
+	
+	id getVisibleCharacterRangeAttribute (int childID) {
+		AccessibleControlEvent event = new AccessibleControlEvent(this);
+		event.childID = childID;
+		event.result = null;
+		for (int i = 0; i < accessibleControlListeners.size(); i++) {
+			AccessibleControlListener listener = (AccessibleControlListener) accessibleControlListeners.elementAt(i);
+			listener.getValue(event);
+		}
+		
+		NSRange range = new NSRange();
+
+		if (event.result != null) {
+			range.location = 0;
+			range.length = event.result.length();
+		} else {
+			return null;
+//			range.location = range.length = 0;
+		}
+
+		return NSValue.valueWithRange(range);
+	}
+
 	int lineNumberForOffset (String text, int offset) {
 		int lineNumber = 1;
 		int length = text.length();
@@ -1009,8 +1157,8 @@ public class Accessible {
 		return lineNumber;
 	}
 
-	CFRange rangeForLineNumber (int lineNumber, String text) {
-		CFRange range = new CFRange();
+	NSRange rangeForLineNumber (int lineNumber, String text) {
+		NSRange range = new NSRange();
 		range.location = -1;
 		int line = 1;
 		int count = 0;
@@ -1112,6 +1260,12 @@ public class Accessible {
 		accessibleTextListeners.removeElement (listener);
 	}
 
+	static NSArray retainedAutoreleased(NSArray inObject) {
+		id temp = inObject.retain();
+		id temp2 = new NSObject(temp.id).autorelease();
+		return new NSArray(temp2.id);
+	}
+	
 	/**
 	 * Sends a message to accessible clients that the child selection
 	 * within a custom container control has changed.
@@ -1125,9 +1279,7 @@ public class Accessible {
 	 */
 	public void selectionChanged () {
 		checkWidget();
-		int stringRef = stringToStringRef(OS.kAXSelectedChildrenChangedNotification);
-		OS.AXNotificationHIObjectNotify(stringRef, control.handle, 0);
-		OS.CFRelease(stringRef);
+		OS.NSAccessibilityPostNotification(control.view.id, OS.NSAccessibilitySelectedChildrenChangedNotification.id);
 	}
 
 	/**
@@ -1143,10 +1295,7 @@ public class Accessible {
 	 */
 	public void setFocus(int childID) {
 		checkWidget();
-		childIDToOs(childID); // Make sure the childID is cached
-		int stringRef = stringToStringRef(OS.kAXFocusedUIElementChangedNotification);
-		OS.AXNotificationHIObjectNotify(stringRef, control.handle, 0);
-		OS.CFRelease(stringRef);
+		OS.NSAccessibilityPostNotification(control.view.id, OS.NSAccessibilityFocusedUIElementChangedNotification.id);
 	}
 
 	/**
@@ -1164,9 +1313,7 @@ public class Accessible {
 	 */
 	public void textCaretMoved (int index) {
 		checkWidget();
-		int stringRef = stringToStringRef(OS.kAXSelectedTextChangedNotification);
-		OS.AXNotificationHIObjectNotify(stringRef, control.handle, 0);
-		OS.CFRelease(stringRef);
+		OS.NSAccessibilityPostNotification(control.view.id, OS.NSAccessibilitySelectedTextChangedNotification.id);
 	}
 	
 	/**
@@ -1190,9 +1337,7 @@ public class Accessible {
 	 */
 	public void textChanged (int type, int startIndex, int length) {
 		checkWidget();
-		int stringRef = stringToStringRef(OS.kAXValueChangedNotification);
-		OS.AXNotificationHIObjectNotify(stringRef, control.handle, 0);
-		OS.CFRelease(stringRef);
+		OS.NSAccessibilityPostNotification(control.view.id, OS.NSAccessibilityValueChangedNotification.id);
 	}
 	
 	/**
@@ -1208,159 +1353,116 @@ public class Accessible {
 	 */
 	public void textSelectionChanged () {
 		checkWidget();
-		int stringRef = stringToStringRef(OS.kAXSelectedTextChangedNotification);
-		OS.AXNotificationHIObjectNotify(stringRef, control.handle, 0);
-		OS.CFRelease(stringRef);
+		OS.NSAccessibilityPostNotification(control.view.id, OS.NSAccessibilitySelectedTextChangedNotification.id);
 	}
 	
-	int getChildIDFromEvent(int theEvent) {
-		int[] ref = new int[1];
-		OS.GetEventParameter (theEvent, OS.kEventParamAccessibleObject, OS.typeCFTypeRef, null, 4, null, ref);
-		return osToChildID(ref[0]);
-	}
-	
-	int childIDToOs(int childID) {
+	id childIDToOs(int childID) {
 		if (childID == ACC.CHILDID_SELF) {
-			return axuielementref;
+			return control.view;
 		}
-		/* Check cache for childID, if found, return corresponding osChildID. */
-		int index;
-		for (index = 0; index < osChildIDCache.length; index += 2) {
-			if (childID == osChildIDCache [index]) {
-				return osChildIDCache [index + 1];
-			}
-		}
-		/* If childID not in cache, create osChildID, grow cache by 2,
-		 * add childID/osChildID to cache, and return new osChildID. */
-		int osChildID = OS.AXUIElementCreateWithHIObjectAndIdentifier(control.handle, childID + 1);
-		int [] newCache = new int [osChildIDCache.length + 2];
-		System.arraycopy (osChildIDCache, 0, newCache, 0, osChildIDCache.length);
-		osChildIDCache = newCache;
-		osChildIDCache [index] = childID;
-		osChildIDCache [index + 1] = osChildID;
-		return osChildID;
-	}
 
-	int osToChildID(int osChildID) {
-		if (OS.CFEqual(osChildID, axuielementref)) {
-			return ACC.CHILDID_SELF;
+		/* Check cache for childID, if found, return corresponding osChildID. */
+		SWTAccessibleDelegate childRef = (SWTAccessibleDelegate) children.get(new Integer(childID));
+		
+		if (childRef == null) {
+			childRef = new SWTAccessibleDelegate(this, childID);
+			children.put(new Integer(childID), childRef);
 		}
 		
-		/* osChildID is an AXUIElementRef containing the control handle and a long identifier. */
-		long[] childID = new long[1];
-		OS.AXUIElementGetIdentifier(osChildID, childID);
-		if (childID[0] == 0) {
-			return ACC.CHILDID_SELF;
-		}
-		return (int) childID[0] - 1;
-	}
-	
-	int stateToOs(int state) {
-//		int osState = 0;
-//		if ((state & ACC.STATE_SELECTED) != 0) osState |= OS.;
-//		return osState;
-		return state;
-	}
-	
-	int osToState(int osState) {
-//		int state = ACC.STATE_NORMAL;
-//		if ((osState & OS.) != 0) state |= ACC.STATE_SELECTED;
-//		return state;
-		return osState;
+		return childRef;
 	}
 
+	NSString concatStringsAsRole(NSString str1, NSString str2) {
+		NSString returnValue = str1;
+		returnValue = returnValue.stringByAppendingString(NSString.stringWith(":"));
+		returnValue = returnValue.stringByAppendingString(str2);
+		return returnValue;
+	}	
+	
 	String roleToOs(int role) {
+		NSString nsReturnValue = null; //OS.NSAccessibilityUnknownRole;
+		
 		switch (role) {
-			case ACC.ROLE_CLIENT_AREA: return OS.kAXGroupRole;
-			case ACC.ROLE_WINDOW: return OS.kAXWindowRole;
-			case ACC.ROLE_MENUBAR: return OS.kAXMenuBarRole;
-			case ACC.ROLE_MENU: return OS.kAXMenuRole;
-			case ACC.ROLE_MENUITEM: return OS.kAXMenuItemRole;
-			case ACC.ROLE_SEPARATOR: return OS.kAXSplitterRole;
-			case ACC.ROLE_TOOLTIP: return OS.kAXHelpTagRole;
-			case ACC.ROLE_SCROLLBAR: return OS.kAXScrollBarRole;
-			case ACC.ROLE_DIALOG: return OS.kAXWindowRole + ':' + OS.kAXDialogSubrole;
-			case ACC.ROLE_LABEL: return OS.kAXStaticTextRole;
-			case ACC.ROLE_PUSHBUTTON: return OS.kAXButtonRole;
-			case ACC.ROLE_CHECKBUTTON: return OS.kAXCheckBoxRole;
-			case ACC.ROLE_RADIOBUTTON: return OS.kAXRadioButtonRole;
-			case ACC.ROLE_COMBOBOX: return OS.kAXComboBoxRole;
-			case ACC.ROLE_TEXT: return (control.getStyle () & SWT.MULTI) != 0 ? OS.kAXTextAreaRole : OS.kAXTextFieldRole;
-			case ACC.ROLE_TOOLBAR: return OS.kAXToolbarRole;
-			case ACC.ROLE_LIST: return OS.kAXOutlineRole;
-			case ACC.ROLE_LISTITEM: return OS.kAXStaticTextRole;
-			case ACC.ROLE_TABLE: return OS.kAXTableRole;
-			case ACC.ROLE_TABLECELL: return OS.kAXRowRole + ':' + OS.kAXTableRowSubrole;
-			case ACC.ROLE_TABLECOLUMNHEADER: return OS.kAXButtonRole + ':' + OS.kAXSortButtonSubrole;
-			case ACC.ROLE_TABLEROWHEADER: return OS.kAXRowRole + ':' + OS.kAXTableRowSubrole;
-			case ACC.ROLE_TREE: return OS.kAXOutlineRole;
-			case ACC.ROLE_TREEITEM: return OS.kAXOutlineRole + ':' + OS.kAXOutlineRowSubrole;
-			case ACC.ROLE_TABFOLDER: return OS.kAXTabGroupRole;
-			case ACC.ROLE_TABITEM: return OS.kAXRadioButtonRole;
-			case ACC.ROLE_PROGRESSBAR: return OS.kAXProgressIndicatorRole;
-			case ACC.ROLE_SLIDER: return OS.kAXSliderRole;
-			case ACC.ROLE_LINK: return OS.kAXLinkRole;
+			case ACC.ROLE_CLIENT_AREA: nsReturnValue = OS.NSAccessibilityGroupRole; break;
+			case ACC.ROLE_WINDOW: nsReturnValue = OS.NSAccessibilityWindowRole; break;
+			case ACC.ROLE_MENUBAR: nsReturnValue = OS.NSAccessibilityMenuBarRole; break;
+			case ACC.ROLE_MENU: nsReturnValue = OS.NSAccessibilityMenuRole; break;
+			case ACC.ROLE_MENUITEM: nsReturnValue = OS.NSAccessibilityMenuItemRole; break;
+			case ACC.ROLE_SEPARATOR: nsReturnValue = OS.NSAccessibilitySplitterRole; break;
+			case ACC.ROLE_TOOLTIP: nsReturnValue = OS.NSAccessibilityHelpTagRole; break;
+			case ACC.ROLE_SCROLLBAR: nsReturnValue = OS.NSAccessibilityScrollBarRole; break;
+			case ACC.ROLE_DIALOG: nsReturnValue = concatStringsAsRole(OS.NSAccessibilityWindowRole, OS.NSAccessibilityDialogSubrole); break;
+			case ACC.ROLE_LABEL: nsReturnValue = OS.NSAccessibilityStaticTextRole; break;
+			case ACC.ROLE_PUSHBUTTON: nsReturnValue = OS.NSAccessibilityButtonRole; break;
+			case ACC.ROLE_CHECKBUTTON: nsReturnValue = OS.NSAccessibilityCheckBoxRole; break;
+			case ACC.ROLE_RADIOBUTTON: nsReturnValue = OS.NSAccessibilityRadioButtonRole; break;
+			case ACC.ROLE_SPLITBUTTON: nsReturnValue = OS.NSAccessibilityMenuButtonRole; break;
+			case ACC.ROLE_COMBOBOX: nsReturnValue = OS.NSAccessibilityComboBoxRole; break;
+			case ACC.ROLE_TEXT: {
+				int style = control.getStyle();
+				
+				if ((style & SWT.MULTI) != 0) {
+					nsReturnValue = OS.NSAccessibilityTextAreaRole;
+				} else {
+					nsReturnValue = OS.NSAccessibilityTextFieldRole;
+				}
+				
+				break;
+			}
+			case ACC.ROLE_TOOLBAR: nsReturnValue = OS.NSAccessibilityToolbarRole; break;
+			case ACC.ROLE_LIST: nsReturnValue = OS.NSAccessibilityOutlineRole; break;
+			case ACC.ROLE_LISTITEM: nsReturnValue = OS.NSAccessibilityStaticTextRole; break;
+			case ACC.ROLE_TABLE: nsReturnValue = OS.NSAccessibilityTableRole; break;
+			case ACC.ROLE_TABLECELL: nsReturnValue = concatStringsAsRole(OS.NSAccessibilityRowRole, OS.NSAccessibilityTableRowSubrole); break;
+			case ACC.ROLE_TABLECOLUMNHEADER: nsReturnValue = OS.NSAccessibilitySortButtonRole; break;
+			case ACC.ROLE_TABLEROWHEADER: nsReturnValue = concatStringsAsRole(OS.NSAccessibilityRowRole, OS.NSAccessibilityTableRowSubrole); break;
+			case ACC.ROLE_TREE: nsReturnValue = OS.NSAccessibilityOutlineRole; break;
+			case ACC.ROLE_TREEITEM: nsReturnValue = concatStringsAsRole(OS.NSAccessibilityOutlineRole, OS.NSAccessibilityOutlineRowSubrole); break;
+			case ACC.ROLE_TABFOLDER: nsReturnValue = OS.NSAccessibilityTabGroupRole; break;
+			case ACC.ROLE_TABITEM: nsReturnValue = OS.NSAccessibilityRadioButtonRole; break;
+			case ACC.ROLE_PROGRESSBAR: nsReturnValue = OS.NSAccessibilityProgressIndicatorRole; break;
+			case ACC.ROLE_SLIDER: nsReturnValue = OS.NSAccessibilitySliderRole; break;
+			case ACC.ROLE_LINK: nsReturnValue = OS.NSAccessibilityLinkRole; break;
 		}
-		return OS.kAXUnknownRole;
+
+		return nsReturnValue.getString();
 	}
 
-	int osToRole(String osRole) {
+	int osToRole(NSString osRole) {
 		if (osRole == null) return 0;
-		if (osRole.equals(OS.kAXWindowRole)) return ACC.ROLE_WINDOW;
-		if (osRole.equals(OS.kAXMenuBarRole)) return ACC.ROLE_MENUBAR;
-		if (osRole.equals(OS.kAXMenuRole)) return ACC.ROLE_MENU;
-		if (osRole.equals(OS.kAXMenuItemRole)) return ACC.ROLE_MENUITEM;
-		if (osRole.equals(OS.kAXSplitterRole)) return ACC.ROLE_SEPARATOR;
-		if (osRole.equals(OS.kAXHelpTagRole)) return ACC.ROLE_TOOLTIP;
-		if (osRole.equals(OS.kAXScrollBarRole)) return ACC.ROLE_SCROLLBAR;
-		if (osRole.equals(OS.kAXScrollAreaRole)) return ACC.ROLE_LIST;
-		if (osRole.equals(OS.kAXWindowRole + ':' + OS.kAXDialogSubrole)) return ACC.ROLE_DIALOG;
-		if (osRole.equals(OS.kAXWindowRole + ':' + OS.kAXSystemDialogSubrole)) return ACC.ROLE_DIALOG;
-		if (osRole.equals(OS.kAXStaticTextRole)) return ACC.ROLE_LABEL;
-		if (osRole.equals(OS.kAXButtonRole)) return ACC.ROLE_PUSHBUTTON;
-		if (osRole.equals(OS.kAXCheckBoxRole)) return ACC.ROLE_CHECKBUTTON;
-		if (osRole.equals(OS.kAXRadioButtonRole)) return ACC.ROLE_RADIOBUTTON;
-		if (osRole.equals(OS.kAXComboBoxRole)) return ACC.ROLE_COMBOBOX;
-		if (osRole.equals(OS.kAXTextFieldRole)) return ACC.ROLE_TEXT;
-		if (osRole.equals(OS.kAXTextAreaRole)) return ACC.ROLE_TEXT;
-		if (osRole.equals(OS.kAXToolbarRole)) return ACC.ROLE_TOOLBAR;
-		if (osRole.equals(OS.kAXListRole)) return ACC.ROLE_LIST;
-		if (osRole.equals(OS.kAXTableRole)) return ACC.ROLE_TABLE;
-		if (osRole.equals(OS.kAXColumnRole)) return ACC.ROLE_TABLECOLUMNHEADER;
-		if (osRole.equals(OS.kAXButtonRole + ':' + OS.kAXSortButtonSubrole)) return ACC.ROLE_TABLECOLUMNHEADER;
-		if (osRole.equals(OS.kAXRowRole + ':' + OS.kAXTableRowSubrole)) return ACC.ROLE_TABLEROWHEADER;
-		if (osRole.equals(OS.kAXOutlineRole)) return ACC.ROLE_TREE;
-		if (osRole.equals(OS.kAXOutlineRole + ':' + OS.kAXOutlineRowSubrole)) return ACC.ROLE_TREEITEM;
-		if (osRole.equals(OS.kAXTabGroupRole)) return ACC.ROLE_TABFOLDER;
-		if (osRole.equals(OS.kAXProgressIndicatorRole)) return ACC.ROLE_PROGRESSBAR;
-		if (osRole.equals(OS.kAXSliderRole)) return ACC.ROLE_SLIDER;
-		if (osRole.equals(OS.kAXLinkRole)) return ACC.ROLE_LINK;
+		if (osRole.isEqualToString(OS.NSAccessibilityWindowRole)) return ACC.ROLE_WINDOW;
+		if (osRole.isEqualToString(OS.NSAccessibilityMenuBarRole)) return ACC.ROLE_MENUBAR;
+		if (osRole.isEqualToString(OS.NSAccessibilityMenuRole)) return ACC.ROLE_MENU;
+		if (osRole.isEqualToString(OS.NSAccessibilityMenuItemRole)) return ACC.ROLE_MENUITEM;
+		if (osRole.isEqualToString(OS.NSAccessibilitySplitterRole)) return ACC.ROLE_SEPARATOR;
+		if (osRole.isEqualToString(OS.NSAccessibilityHelpTagRole)) return ACC.ROLE_TOOLTIP;
+		if (osRole.isEqualToString(OS.NSAccessibilityScrollBarRole)) return ACC.ROLE_SCROLLBAR;
+		if (osRole.isEqualToString(OS.NSAccessibilityScrollAreaRole)) return ACC.ROLE_LIST;
+		if (osRole.isEqualToString(concatStringsAsRole(OS.NSAccessibilityWindowRole, OS.NSAccessibilityDialogSubrole))) return ACC.ROLE_DIALOG;
+		if (osRole.isEqualToString(concatStringsAsRole(OS.NSAccessibilityWindowRole, OS.NSAccessibilitySystemDialogSubrole))) return ACC.ROLE_DIALOG;
+		if (osRole.isEqualToString(OS.NSAccessibilityStaticTextRole)) return ACC.ROLE_LABEL;
+		if (osRole.isEqualToString(OS.NSAccessibilityButtonRole)) return ACC.ROLE_PUSHBUTTON;
+		if (osRole.isEqualToString(OS.NSAccessibilityCheckBoxRole)) return ACC.ROLE_CHECKBUTTON;
+		if (osRole.isEqualToString(OS.NSAccessibilityRadioButtonRole)) return ACC.ROLE_RADIOBUTTON;
+		if (osRole.isEqualToString(OS.NSAccessibilityMenuButtonRole)) return ACC.ROLE_SPLITBUTTON;
+		if (osRole.isEqualToString(OS.NSAccessibilityComboBoxRole)) return ACC.ROLE_COMBOBOX;
+		if (osRole.isEqualToString(OS.NSAccessibilityTextFieldRole)) return ACC.ROLE_TEXT;
+		if (osRole.isEqualToString(OS.NSAccessibilityTextAreaRole)) return ACC.ROLE_TEXT;
+		if (osRole.isEqualToString(OS.NSAccessibilityToolbarRole)) return ACC.ROLE_TOOLBAR;
+		if (osRole.isEqualToString(OS.NSAccessibilityListRole)) return ACC.ROLE_LIST;
+		if (osRole.isEqualToString(OS.NSAccessibilityTableRole)) return ACC.ROLE_TABLE;
+		if (osRole.isEqualToString(OS.NSAccessibilityColumnRole)) return ACC.ROLE_TABLECOLUMNHEADER;
+		if (osRole.isEqualToString(concatStringsAsRole(OS.NSAccessibilityButtonRole, OS.NSAccessibilitySortButtonRole))) return ACC.ROLE_TABLECOLUMNHEADER;
+		if (osRole.isEqualToString(concatStringsAsRole(OS.NSAccessibilityRowRole, OS.NSAccessibilityTableRowSubrole))) return ACC.ROLE_TABLEROWHEADER;
+		if (osRole.isEqualToString(OS.NSAccessibilityOutlineRole)) return ACC.ROLE_TREE;
+		if (osRole.isEqualToString(concatStringsAsRole(OS.NSAccessibilityOutlineRole, OS.NSAccessibilityOutlineRowSubrole))) return ACC.ROLE_TREEITEM;
+		if (osRole.isEqualToString(OS.NSAccessibilityTabGroupRole)) return ACC.ROLE_TABFOLDER;
+		if (osRole.isEqualToString(OS.NSAccessibilityProgressIndicatorRole)) return ACC.ROLE_PROGRESSBAR;
+		if (osRole.isEqualToString(OS.NSAccessibilitySliderRole)) return ACC.ROLE_SLIDER;
+		if (osRole.isEqualToString(OS.NSAccessibilityLinkRole)) return ACC.ROLE_LINK;
 		return ACC.ROLE_CLIENT_AREA;
 	}
 	
-	/* Return a CFStringRef representing the given java String.
-	 * Note that the caller is responsible for calling OS.CFRelease
-	 * when they are done with the stringRef.
-	 */
-	int stringToStringRef(String string) {
-		char [] buffer = new char [string.length ()];
-		string.getChars (0, buffer.length, buffer, 0);
-		return OS.CFStringCreateWithCharacters (OS.kCFAllocatorDefault, buffer, buffer.length);
-	}
-	
-	/* Return a Java String representing the given CFStringRef.
-	 * Note that this method does not call OS.CFRelease(stringRef).
-	 */
-	String stringRefToString(int stringRef) {
-		if (stringRef == 0) return "";
-		int length = OS.CFStringGetLength (stringRef);
-		char [] buffer= new char [length];
-		CFRange range = new CFRange ();
-		range.length = length;
-		OS.CFStringGetCharacters (stringRef, range, buffer);
-		return new String(buffer);
-	}
-
 	/* checkWidget was copied from Widget, and rewritten to work in this package */
 	void checkWidget () {
 		if (!isValidThread ()) SWT.error (SWT.ERROR_THREAD_INVALID_ACCESS);
@@ -1371,4 +1473,5 @@ public class Accessible {
 	boolean isValidThread () {
 		return control.getDisplay ().getThread () == Thread.currentThread ();
 	}
+
 }

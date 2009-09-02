@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2003, 2007 IBM Corporation and others.
+ * Copyright (c) 2003, 2009 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -88,9 +88,15 @@ int Release () {
 /* nsIFactory */
 
 int CreateInstance (int /*long*/ aOuter, int /*long*/ iid, int /*long*/ result) {
-	HelperAppLauncherDialog helperAppLauncherDialog = new HelperAppLauncherDialog ();
-	helperAppLauncherDialog.AddRef ();
-	XPCOM.memmove (result, new int /*long*/[] {helperAppLauncherDialog.getAddress ()}, C.PTR_SIZEOF);
+	if (Mozilla.IsPre_1_9) {
+		HelperAppLauncherDialog helperAppLauncherDialog = new HelperAppLauncherDialog ();
+		helperAppLauncherDialog.AddRef ();
+		XPCOM.memmove (result, new int /*long*/[] {helperAppLauncherDialog.getAddress ()}, C.PTR_SIZEOF);
+	} else {
+		HelperAppLauncherDialog_1_9 helperAppLauncherDialog = new HelperAppLauncherDialog_1_9 ();
+		helperAppLauncherDialog.AddRef ();
+		XPCOM.memmove (result, new int /*long*/[] {helperAppLauncherDialog.getAddress ()}, C.PTR_SIZEOF);
+	}
 	return XPCOM.NS_OK;
 }
 

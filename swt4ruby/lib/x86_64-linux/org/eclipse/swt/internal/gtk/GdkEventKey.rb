@@ -1,6 +1,6 @@
 require "rjava"
 
-# Copyright (c) 2000, 2006 IBM Corporation and others. All rights reserved.
+# Copyright (c) 2000, 2008 IBM Corporation and others. All rights reserved.
 # The contents of this file are made available under the terms
 # of the GNU Lesser General Public License (LGPL) Version 2.1 that
 # accompanies this distribution (lgpl-v21.txt).  The LGPL is also
@@ -23,6 +23,7 @@ module Org::Eclipse::Swt::Internal::Gtk
   class GdkEventKey < GdkEventKeyImports.const_get :GdkEvent
     include_class_members GdkEventKeyImports
     
+    # @field cast=(GdkWindow *)
     # int
     attr_accessor :window
     alias_method :attr_window, :window
@@ -30,36 +31,42 @@ module Org::Eclipse::Swt::Internal::Gtk
     alias_method :attr_window=, :window=
     undef_method :window=
     
+    # @field cast=(gint8)
     attr_accessor :send_event
     alias_method :attr_send_event, :send_event
     undef_method :send_event
     alias_method :attr_send_event=, :send_event=
     undef_method :send_event=
     
+    # @field cast=(guint32)
     attr_accessor :time
     alias_method :attr_time, :time
     undef_method :time
     alias_method :attr_time=, :time=
     undef_method :time=
     
+    # @field cast=(guint)
     attr_accessor :state
     alias_method :attr_state, :state
     undef_method :state
     alias_method :attr_state=, :state=
     undef_method :state=
     
+    # @field cast=(guint)
     attr_accessor :keyval
     alias_method :attr_keyval, :keyval
     undef_method :keyval
     alias_method :attr_keyval=, :keyval=
     undef_method :keyval=
     
+    # @field cast=(gint)
     attr_accessor :length
     alias_method :attr_length, :length
     undef_method :length
     alias_method :attr_length=, :length=
     undef_method :length=
     
+    # @field cast=(gchar *)
     # int
     attr_accessor :string
     alias_method :attr_string, :string
@@ -67,12 +74,14 @@ module Org::Eclipse::Swt::Internal::Gtk
     alias_method :attr_string=, :string=
     undef_method :string=
     
+    # @field cast=(guint16)
     attr_accessor :hardware_keycode
     alias_method :attr_hardware_keycode, :hardware_keycode
     undef_method :hardware_keycode
     alias_method :attr_hardware_keycode=, :hardware_keycode=
     undef_method :hardware_keycode=
     
+    # @field cast=(guint8)
     attr_accessor :group
     alias_method :attr_group, :group
     undef_method :group

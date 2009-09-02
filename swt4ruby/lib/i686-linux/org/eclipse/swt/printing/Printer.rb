@@ -1,6 +1,6 @@
 require "rjava"
 
-# Copyright (c) 2000, 2008 IBM Corporation and others.
+# Copyright (c) 2000, 2009 IBM Corporation and others.
 # All rights reserved. This program and the accompanying materials
 # are made available under the terms of the Eclipse Public License v1.0
 # which accompanies this distribution, and is available at
@@ -17,8 +17,10 @@ module Org::Eclipse::Swt::Printing
       include ::Org::Eclipse::Swt::Graphics
       include_const ::Org::Eclipse::Swt::Internal, :Callback
       include_const ::Org::Eclipse::Swt::Internal, :Converter
+      include_const ::Org::Eclipse::Swt::Internal::Gtk, :GdkVisual
       include_const ::Org::Eclipse::Swt::Internal::Gtk, :OS
       include_const ::Org::Eclipse::Swt::Internal::Cairo, :Cairo
+      include_const ::Org::Eclipse::Swt::Printing, :PrinterData
     }
   end
   
@@ -172,9 +174,10 @@ module Org::Eclipse::Swt::Printing
       # $NON-NLS-1$
       # 
       # Returns an array of <code>PrinterData</code> objects
-      # representing all available printers.
+      # representing all available printers.  If there are no
+      # printers, the array will be empty.
       # 
-      # @return the list of available printers
+      # @return an array of PrinterData objects representing the available printers
       def get_printer_list
         self.attr_printer_list = Array.typed(PrinterData).new(0) { nil }
         if (OS::GTK_VERSION < OS._version(2, 10, 0) || self.attr_disable_printing)
@@ -224,7 +227,7 @@ module Org::Eclipse::Swt::Printing
       typesig { [] }
       # Returns a <code>PrinterData</code> object representing
       # the default printer or <code>null</code> if there is no
-      # printer available on the System.
+      # default printer.
       # 
       # @return the default printer data or null
       # 
@@ -380,24 +383,6 @@ module Org::Eclipse::Swt::Printing
         OS.gtk_paper_size_free(paper_size)
       end
       
-      typesig { [::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int] }
-      # long
-      def set_scope(settings, scope, start_page, end_page)
-        case (scope)
-        when PrinterData::ALL_PAGES
-          OS.gtk_print_settings_set_print_pages(settings, OS::GTK_PRINT_PAGES_ALL)
-        when PrinterData::PAGE_RANGE
-          OS.gtk_print_settings_set_print_pages(settings, OS::GTK_PRINT_PAGES_RANGES)
-          page_range = Array.typed(::Java::Int).new(2) { 0 }
-          page_range[0] = start_page - 1
-          page_range[1] = end_page - 1
-          OS.gtk_print_settings_set_page_ranges(settings, page_range, 1)
-        when PrinterData::SELECTION
-          # TODO: Not correctly implemented. May need new API. For now, set to ALL. (see gtk bug 344519)
-          OS.gtk_print_settings_set_print_pages(settings, OS::GTK_PRINT_PAGES_ALL)
-        end
-      end
-      
       typesig { [PrinterData] }
       def check_null(data)
         if ((data).nil?)
@@ -418,7 +403,7 @@ module Org::Eclipse::Swt::Printing
     typesig { [] }
     # Constructs a new printer representing the default printer.
     # <p>
-    # You must dispose the printer when it is no longer required.
+    # Note: You must dispose the printer when it is no longer required.
     # </p>
     # 
     # @exception SWTError <ul>
@@ -432,12 +417,13 @@ module Org::Eclipse::Swt::Printing
     
     typesig { [PrinterData] }
     # Constructs a new printer given a <code>PrinterData</code>
-    # object representing the desired printer.
+    # object representing the desired printer. If the argument
+    # is null, then the default printer will be used.
     # <p>
-    # You must dispose the printer when it is no longer required.
+    # Note: You must dispose the printer when it is no longer required.
     # </p>
     # 
-    # @param data the printer data for the specified printer
+    # @param data the printer data for the specified printer, or null to use the default printer
     # 
     # @exception IllegalArgumentException <ul>
     # <li>ERROR_INVALID_ARGUMENT - if the specified printer data does not represent a valid printer
@@ -556,8 +542,10 @@ module Org::Eclipse::Swt::Printing
     # 
     # long
     def internal_new__gc(data)
+      visual = GdkVisual.new
+      OS.memmove(visual, OS.gdk_visual_get_system)
       # long
-      drawable = OS.gdk_pixmap_new(OS._gdk_root_parent, 1, 1, 1)
+      drawable = OS.gdk_pixmap_new(OS._gdk_root_parent, 1, 1, visual.attr_depth)
       # long
       gdk_gc = OS.gdk_gc_new(drawable)
       if ((gdk_gc).equal?(0))
@@ -797,10 +785,9 @@ module Org::Eclipse::Swt::Printing
       end
       # TODO: Return 72 (1/72 inch = 1 point) until gtk bug 346245 is fixed
       # TODO: Fix this: gtk_print_settings_get_resolution returns 0? (see gtk bug 346252)
-      if (true || (resolution).equal?(0))
-        return Point.new(72, 72)
-      end
-      return Point.new(resolution, resolution)
+      # if (resolution == 0)
+      return Point.new(72, 72)
+      # return new Point(resolution, resolution);
     end
     
     typesig { [] }
@@ -931,20 +918,22 @@ module Org::Eclipse::Swt::Printing
       if (!(@data.attr_other_data).nil?)
         restore(@data.attr_other_data, @settings, @page_setup)
       end
-      # Set values of settings from PrinterData.
-      set_scope(@settings, @data.attr_scope, @data.attr_start_page, @data.attr_end_page)
+      # Set values of print_settings and page_setup from PrinterData.
       # TODO: Should we look at printToFile, or driver/name for "Print to File", or both? (see gtk bug 345590)
-      if (@data.attr_print_to_file)
+      if (@data.attr_print_to_file && !(@data.attr_file_name).nil?)
         buffer = Converter.wcs_to_mbcs(nil, @data.attr_file_name, true)
         OS.gtk_print_settings_set(@settings, OS::GTK_PRINT_SETTINGS_OUTPUT_URI, buffer)
       end
-      if ((@data.attr_driver == "GtkPrintBackendFile") && (@data.attr_name == "Print to File"))
+      if ((@data.attr_driver == "GtkPrintBackendFile") && (@data.attr_name == "Print to File") && !(@data.attr_file_name).nil?)
         # $NON-NLS-1$ //$NON-NLS-2$
         buffer = Converter.wcs_to_mbcs(nil, @data.attr_file_name, true)
         OS.gtk_print_settings_set(@settings, OS::GTK_PRINT_SETTINGS_OUTPUT_URI, buffer)
       end
       OS.gtk_print_settings_set_n_copies(@settings, @data.attr_copy_count)
       OS.gtk_print_settings_set_collate(@settings, @data.attr_collate)
+      orientation = (@data.attr_orientation).equal?(PrinterData::LANDSCAPE) ? OS::GTK_PAGE_ORIENTATION_LANDSCAPE : OS::GTK_PAGE_ORIENTATION_PORTRAIT
+      OS.gtk_page_setup_set_orientation(@page_setup, orientation)
+      OS.gtk_print_settings_set_orientation(@settings, orientation)
     end
     
     typesig { [] }

@@ -6,7 +6,7 @@ module Org::Eclipse::Swt::Dnd
     class_module.module_eval {
       include ::Java::Lang
       include ::Org::Eclipse::Swt::Dnd
-      include ::Org::Eclipse::Swt::Internal::Carbon
+      include ::Org::Eclipse::Swt::Internal::Cocoa
     }
   end
   
@@ -22,6 +22,7 @@ module Org::Eclipse::Swt::Dnd
   # </code></pre>
   # 
   # @see Transfer
+  # @since 3.4
   class URLTransfer < URLTransferImports.const_get :ByteArrayTransfer
     include_class_members URLTransferImports
     
@@ -37,17 +38,11 @@ module Org::Eclipse::Swt::Dnd
       end
       alias_method :attr__instance=, :_instance=
       
-      const_set_lazy(:URL) { "url " }
+      const_set_lazy(:URL) { OS::NSURLPboardType.get_string }
       const_attr_reader  :URL
       
       const_set_lazy(:URL_ID) { register_type(URL) }
       const_attr_reader  :URL_ID
-      
-      const_set_lazy(:URLN) { "urln" }
-      const_attr_reader  :URLN
-      
-      const_set_lazy(:URLN_ID) { register_type(URLN) }
-      const_attr_reader  :URLN_ID
     }
     
     typesig { [] }
@@ -78,34 +73,10 @@ module Org::Eclipse::Swt::Dnd
       if (!check_url(object) || !is_supported_type(transfer_data))
         DND.error(DND::ERROR_INVALID_DATA)
       end
-      transfer_data.attr_result = -1
       url = object
-      count = url.length
-      chars = CharArray.new(count)
-      url.get_chars(0, count, chars, 0)
-      cfstring = OS._cfstring_create_with_characters(OS.attr_k_cfallocator_default, chars, count)
-      if ((cfstring).equal?(0))
-        return
-      end
-      begin
-        range = CFRange.new
-        range.attr_length = chars.attr_length
-        encoding = OS.attr_k_cfstring_encoding_utf8
-        size = Array.typed(::Java::Int).new(1) { 0 }
-        num_chars = OS._cfstring_get_bytes(cfstring, range, encoding, Character.new(??.ord), true, nil, 0, size)
-        if ((num_chars).equal?(0) || (size[0]).equal?(0))
-          return
-        end
-        buffer = Array.typed(::Java::Byte).new(size[0]) { 0 }
-        num_chars = OS._cfstring_get_bytes(cfstring, range, encoding, Character.new(??.ord), true, buffer, size[0], size)
-        if ((num_chars).equal?(0))
-          return
-        end
-        transfer_data.attr_data = Array.typed(Array.typed(::Java::Byte)).new([buffer])
-        transfer_data.attr_result = 0
-      ensure
-        OS._cfrelease(cfstring)
-      end
+      ns_string = NSString.string_with(url)
+      escaped_string = ns_string.string_by_adding_percent_escapes_using_encoding(OS::NSUTF8StringEncoding)
+      transfer_data.attr_data = NSURL._urlwith_string(escaped_string)
     end
     
     typesig { [TransferData] }
@@ -121,46 +92,19 @@ module Org::Eclipse::Swt::Dnd
       if (!is_supported_type(transfer_data) || (transfer_data.attr_data).nil?)
         return nil
       end
-      if ((transfer_data.attr_data.attr_length).equal?(0))
-        return nil
-      end
-      buffer = transfer_data.attr_data[0]
-      encoding = OS.attr_k_cfstring_encoding_utf8
-      cfstring = OS._cfstring_create_with_bytes(OS.attr_k_cfallocator_default, buffer, buffer.attr_length, encoding, true)
-      if ((cfstring).equal?(0))
-        return nil
-      end
-      unescaped_chars = Array.typed(::Java::Char).new([Character.new(?%.ord)])
-      unescaped_str = OS._cfstring_create_with_characters(0, unescaped_chars, unescaped_chars.attr_length)
-      str = OS._cfurlcreate_string_by_replacing_percent_escapes(OS.attr_k_cfallocator_default, cfstring, unescaped_str)
-      OS._cfrelease(unescaped_str)
-      OS._cfrelease(cfstring)
-      if ((str).equal?(0))
-        return nil
-      end
-      begin
-        length_ = OS._cfstring_get_length(str)
-        if ((length_).equal?(0))
-          return nil
-        end
-        chars = CharArray.new(length_)
-        range = CFRange.new
-        range.attr_length = length_
-        OS._cfstring_get_characters(str, range, chars)
-        return String.new(chars)
-      ensure
-        OS._cfrelease(str)
-      end
+      ns_url = transfer_data.attr_data
+      ns_string = ns_url.absolute_string
+      return ns_string.get_string
     end
     
     typesig { [] }
     def get_type_ids
-      return Array.typed(::Java::Int).new([URL_ID, URLN_ID])
+      return Array.typed(::Java::Int).new([URL_ID])
     end
     
     typesig { [] }
     def get_type_names
-      return Array.typed(String).new([URL, URLN])
+      return Array.typed(String).new([URL])
     end
     
     typesig { [Object] }

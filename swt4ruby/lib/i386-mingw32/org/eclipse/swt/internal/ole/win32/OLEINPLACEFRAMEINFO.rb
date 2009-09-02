@@ -1,6 +1,6 @@
 require "rjava"
 
-# Copyright (c) 2000, 2006 IBM Corporation and others.
+# Copyright (c) 2000, 2008 IBM Corporation and others.
 # All rights reserved. This program and the accompanying materials
 # are made available under the terms of the Eclipse Public License v1.0
 # which accompanies this distribution, and is available at
@@ -31,6 +31,7 @@ module Org::Eclipse::Swt::Internal::Ole::Win32
     alias_method :attr_f_mdiapp=, :f_mdiapp=
     undef_method :f_mdiapp=
     
+    # @field cast=(HWND)
     # long
     attr_accessor :hwnd_frame
     alias_method :attr_hwnd_frame, :hwnd_frame
@@ -38,6 +39,7 @@ module Org::Eclipse::Swt::Internal::Ole::Win32
     alias_method :attr_hwnd_frame=, :hwnd_frame=
     undef_method :hwnd_frame=
     
+    # @field cast=(HACCEL)
     # long
     attr_accessor :haccel
     alias_method :attr_haccel, :haccel

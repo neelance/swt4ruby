@@ -95,11 +95,11 @@ module Org::Eclipse::Swt::Dnd
         di_getdragimage = OS._register_window_message(TCHAR.new(0, "ShellGetDragImage", true)) # $NON-NLS-1$
         if (!(OS._send_message(self.attr_control.attr_handle, di_getdragimage, 0, shdi)).equal?(0))
           if (!((self.attr_control.get_style & SWT::MIRRORED)).equal?(0))
-            event.attr_x += shdi.attr_size_drag_image.attr_cx - shdi.attr_pt_offset.attr_x
+            event.attr_offset_x = shdi.attr_size_drag_image.attr_cx - shdi.attr_pt_offset.attr_x
           else
-            event.attr_x += shdi.attr_pt_offset.attr_x
+            event.attr_offset_x = shdi.attr_pt_offset.attr_x
           end
-          event.attr_y += shdi.attr_pt_offset.attr_y
+          event.attr_offset_y = shdi.attr_pt_offset.attr_y
           # long
           h_image = shdi.attr_hbmp_drag_image
           if (!(h_image).equal?(0))

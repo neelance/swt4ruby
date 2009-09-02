@@ -1,6 +1,6 @@
 require "rjava"
 
-# Copyright (c) 2000, 2006 IBM Corporation and others.
+# Copyright (c) 2000, 2008 IBM Corporation and others.
 # All rights reserved. This program and the accompanying materials
 # are made available under the terms of the Eclipse Public License v1.0
 # which accompanies this distribution, and is available at
@@ -27,12 +27,14 @@ module Org::Eclipse::Swt::Internal::Win32
     
     # Offset of the file list from the beginning of this structure, in bytes.
     # POINT pt; // Drop point. The coordinates depend on fNC.
+    # @field accessor=pt.x
     attr_accessor :pt_x
     alias_method :attr_pt_x, :pt_x
     undef_method :pt_x
     alias_method :attr_pt_x=, :pt_x=
     undef_method :pt_x=
     
+    # @field accessor=pt.y
     attr_accessor :pt_y
     alias_method :attr_pt_y, :pt_y
     undef_method :pt_y

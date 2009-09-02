@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2008 IBM Corporation and others.
+ * Copyright (c) 2000, 2009 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -15,8 +15,10 @@ import org.eclipse.swt.*;
 import org.eclipse.swt.graphics.*;
 import org.eclipse.swt.internal.Callback;
 import org.eclipse.swt.internal.Converter;
+import org.eclipse.swt.internal.gtk.GdkVisual;
 import org.eclipse.swt.internal.gtk.OS;
 import org.eclipse.swt.internal.cairo.Cairo;
+import org.eclipse.swt.printing.PrinterData;
 
 /**
  * Instances of this class are used to print to a printer.
@@ -66,9 +68,10 @@ public final class Printer extends Device {
 	
 /**
  * Returns an array of <code>PrinterData</code> objects
- * representing all available printers.
+ * representing all available printers.  If there are no
+ * printers, the array will be empty.
  *
- * @return the list of available printers
+ * @return an array of PrinterData objects representing the available printers
  */
 public static PrinterData[] getPrinterList() {
 	printerList = new PrinterData [0];
@@ -111,7 +114,7 @@ static int /*long*/ GtkPrinterFunc_List (int /*long*/ printer, int /*long*/ user
 /**
  * Returns a <code>PrinterData</code> object representing
  * the default printer or <code>null</code> if there is no 
- * printer available on the System.
+ * default printer.
  *
  * @return the default printer data or null
  * 
@@ -236,25 +239,6 @@ static void restore(byte [] data, int /*long*/ settings, int /*long*/ page_setup
 	OS.gtk_paper_size_free(paper_size);
 }
 
-static void setScope(int /*long*/ settings, int scope, int startPage, int endPage) {
-	switch (scope) {
-	case PrinterData.ALL_PAGES:
-		OS.gtk_print_settings_set_print_pages(settings, OS.GTK_PRINT_PAGES_ALL);
-		break;
-	case PrinterData.PAGE_RANGE:
-		OS.gtk_print_settings_set_print_pages(settings, OS.GTK_PRINT_PAGES_RANGES);
-		int [] pageRange = new int[2];
-		pageRange[0] = startPage - 1;
-		pageRange[1] = endPage - 1;
-		OS.gtk_print_settings_set_page_ranges(settings, pageRange, 1);
-		break;
-	case PrinterData.SELECTION:
-		//TODO: Not correctly implemented. May need new API. For now, set to ALL. (see gtk bug 344519)
-		OS.gtk_print_settings_set_print_pages(settings, OS.GTK_PRINT_PAGES_ALL);
-		break;
-	}
-}
-
 static DeviceData checkNull (PrinterData data) {
 	if (data == null) data = new PrinterData();
 	if (data.driver == null || data.name == null) {
@@ -269,7 +253,7 @@ static DeviceData checkNull (PrinterData data) {
 /**
  * Constructs a new printer representing the default printer.
  * <p>
- * You must dispose the printer when it is no longer required. 
+ * Note: You must dispose the printer when it is no longer required. 
  * </p>
  *
  * @exception SWTError <ul>
@@ -284,12 +268,13 @@ public Printer() {
 
 /**
  * Constructs a new printer given a <code>PrinterData</code>
- * object representing the desired printer.
+ * object representing the desired printer. If the argument
+ * is null, then the default printer will be used.
  * <p>
- * You must dispose the printer when it is no longer required. 
+ * Note: You must dispose the printer when it is no longer required. 
  * </p>
  *
- * @param data the printer data for the specified printer
+ * @param data the printer data for the specified printer, or null to use the default printer
  *
  * @exception IllegalArgumentException <ul>
  *    <li>ERROR_INVALID_ARGUMENT - if the specified printer data does not represent a valid printer
@@ -384,7 +369,9 @@ public Font getSystemFont () {
  * @return the platform specific GC handle
  */
 public int /*long*/ internal_new_GC(GCData data) {
-	int /*long*/ drawable = OS.gdk_pixmap_new(OS.GDK_ROOT_PARENT(), 1, 1, 1);
+	GdkVisual visual = new GdkVisual ();
+	OS.memmove (visual, OS.gdk_visual_get_system());
+	int /*long*/ drawable = OS.gdk_pixmap_new(OS.GDK_ROOT_PARENT(), 1, 1, visual.depth);
 	int /*long*/ gdkGC = OS.gdk_gc_new (drawable);
 	if (gdkGC == 0) SWT.error (SWT.ERROR_NO_HANDLES);
 	if (data != null) {
@@ -599,8 +586,8 @@ public Point getDPI() {
 	if (DEBUG) System.out.println("print_settings.resolution=" + resolution);
 	//TODO: Return 72 (1/72 inch = 1 point) until gtk bug 346245 is fixed
 	//TODO: Fix this: gtk_print_settings_get_resolution returns 0? (see gtk bug 346252)
-	if (true || resolution == 0) return new Point(72, 72);
-	return new Point(resolution, resolution);
+	/*if (resolution == 0)*/ return new Point(72, 72);
+//	return new Point(resolution, resolution);
 }
 
 /**
@@ -733,19 +720,21 @@ protected void init() {
 		restore(data.otherData, settings, pageSetup);
 	}
 	
-	/* Set values of settings from PrinterData. */
-	setScope(settings, data.scope, data.startPage, data.endPage);
+	/* Set values of print_settings and page_setup from PrinterData. */
 	//TODO: Should we look at printToFile, or driver/name for "Print to File", or both? (see gtk bug 345590)
-	if (data.printToFile) {
+	if (data.printToFile && data.fileName != null) {
 		byte [] buffer = Converter.wcsToMbcs (null, data.fileName, true);
 		OS.gtk_print_settings_set(settings, OS.GTK_PRINT_SETTINGS_OUTPUT_URI, buffer);
 	}
-	if (data.driver.equals("GtkPrintBackendFile") && data.name.equals("Print to File")) { //$NON-NLS-1$ //$NON-NLS-2$
+	if (data.driver.equals("GtkPrintBackendFile") && data.name.equals("Print to File") && data.fileName != null) { //$NON-NLS-1$ //$NON-NLS-2$
 		byte [] buffer = Converter.wcsToMbcs (null, data.fileName, true);
 		OS.gtk_print_settings_set(settings, OS.GTK_PRINT_SETTINGS_OUTPUT_URI, buffer);
 	}
 	OS.gtk_print_settings_set_n_copies(settings, data.copyCount);
 	OS.gtk_print_settings_set_collate(settings, data.collate);
+	int orientation = data.orientation == PrinterData.LANDSCAPE ? OS.GTK_PAGE_ORIENTATION_LANDSCAPE : OS.GTK_PAGE_ORIENTATION_PORTRAIT;
+	OS.gtk_page_setup_set_orientation(pageSetup, orientation);
+	OS.gtk_print_settings_set_orientation(settings, orientation);
 }
 
 /**

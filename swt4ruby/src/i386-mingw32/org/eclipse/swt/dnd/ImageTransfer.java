@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2007, 2008 IBM Corporation and others.
+ * Copyright (c) 2007, 2009 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -143,7 +143,7 @@ public Object nativeToJava(TransferData transferData) {
 	formatetc.tymed = COM.TYMED_HGLOBAL;
 	STGMEDIUM stgmedium = new STGMEDIUM();
 	stgmedium.tymed = COM.TYMED_HGLOBAL;
-	transferData.result = dataObject.GetData(formatetc, stgmedium);
+	transferData.result = getData(dataObject, formatetc, stgmedium);
 
 	if (transferData.result != COM.S_OK) return null;
 	int /*long*/ hMem = stgmedium.unionField;
@@ -159,7 +159,7 @@ public Object nativeToJava(TransferData transferData) {
 			if (memDib == 0) SWT.error(SWT.ERROR_NO_HANDLES);			
 			int /*long*/ bits = ptr + bmiHeader.biSize;
 			if (bmiHeader.biBitCount <= 8) {
-				bits += (1 << bmiHeader.biBitCount) * 4;
+				bits += (bmiHeader.biClrUsed == 0 ? (1 << bmiHeader.biBitCount) : bmiHeader.biClrUsed) * 4;
 			} else if (bmiHeader.biCompression == OS.BI_BITFIELDS) {
 				bits += 12;
 			}

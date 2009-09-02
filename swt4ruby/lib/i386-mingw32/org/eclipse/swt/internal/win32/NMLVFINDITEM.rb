@@ -1,6 +1,6 @@
 require "rjava"
 
-# Copyright (c) 2000, 2006 IBM Corporation and others.
+# Copyright (c) 2000, 2008 IBM Corporation and others.
 # All rights reserved. This program and the accompanying materials
 # are made available under the terms of the Eclipse Public License v1.0
 # which accompanies this distribution, and is available at
@@ -26,12 +26,14 @@ module Org::Eclipse::Swt::Internal::Win32
     undef_method :i_start=
     
     # LVFINDINFO lvfi;
+    # @field accessor=lvfi.flags
     attr_accessor :flags
     alias_method :attr_flags, :flags
     undef_method :flags
     alias_method :attr_flags=, :flags=
     undef_method :flags=
     
+    # @field accessor=lvfi.psz,cast=(LPCTSTR)
     # long
     attr_accessor :psz
     alias_method :attr_psz, :psz
@@ -39,6 +41,7 @@ module Org::Eclipse::Swt::Internal::Win32
     alias_method :attr_psz=, :psz=
     undef_method :psz=
     
+    # @field accessor=lvfi.lParam
     # long
     attr_accessor :l_param
     alias_method :attr_l_param, :l_param
@@ -47,18 +50,21 @@ module Org::Eclipse::Swt::Internal::Win32
     undef_method :l_param=
     
     # POINT pt;
+    # @field accessor=lvfi.pt.x
     attr_accessor :x
     alias_method :attr_x, :x
     undef_method :x
     alias_method :attr_x=, :x=
     undef_method :x=
     
+    # @field accessor=lvfi.pt.y
     attr_accessor :y
     alias_method :attr_y, :y
     undef_method :y
     alias_method :attr_y=, :y=
     undef_method :y=
     
+    # @field accessor=lvfi.vkDirection
     attr_accessor :vk_direction
     alias_method :attr_vk_direction, :vk_direction
     undef_method :vk_direction

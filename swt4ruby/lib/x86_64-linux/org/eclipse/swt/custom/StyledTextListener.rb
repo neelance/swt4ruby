@@ -78,6 +78,10 @@ module Org::Eclipse::Swt::Custom
         word_boundary_event = MovementEvent.new(e)
         (self.attr_event_listener).get_previous_offset(word_boundary_event)
         (e).attr_end = word_boundary_event.attr_new_offset
+      when StyledText::CaretMoved
+        caret_event = CaretEvent.new(e)
+        (self.attr_event_listener).caret_moved(caret_event)
+        (e).attr_end = caret_event.attr_caret_offset
       end
     end
     

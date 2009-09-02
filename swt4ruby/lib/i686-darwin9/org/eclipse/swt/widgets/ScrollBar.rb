@@ -1,6 +1,6 @@
 require "rjava"
 
-# Copyright (c) 2000, 2008 IBM Corporation and others.
+# Copyright (c) 2000, 2009 IBM Corporation and others.
 # All rights reserved. This program and the accompanying materials
 # are made available under the terms of the Eclipse Public License v1.0
 # which accompanies this distribution, and is available at
@@ -13,7 +13,7 @@ module Org::Eclipse::Swt::Widgets
     class_module.module_eval {
       include ::Java::Lang
       include ::Org::Eclipse::Swt::Widgets
-      include_const ::Org::Eclipse::Swt::Internal::Carbon, :OS
+      include ::Org::Eclipse::Swt::Internal::Cocoa
       include ::Org::Eclipse::Swt
       include ::Org::Eclipse::Swt::Events
       include ::Org::Eclipse::Swt::Graphics
@@ -83,26 +83,15 @@ module Org::Eclipse::Swt::Widgets
   # @see Scrollable#getVerticalBar
   # @see <a href="http://www.eclipse.org/swt/examples.php">SWT Example: ControlExample</a>
   # @see <a href="http://www.eclipse.org/swt/">Sample code and further information</a>
+  # @noextend This class is not intended to be subclassed by clients.
   class ScrollBar < ScrollBarImports.const_get :Widget
     include_class_members ScrollBarImports
     
-    attr_accessor :handle
-    alias_method :attr_handle, :handle
-    undef_method :handle
-    alias_method :attr_handle=, :handle=
-    undef_method :handle=
-    
-    attr_accessor :visible_rgn
-    alias_method :attr_visible_rgn, :visible_rgn
-    undef_method :visible_rgn
-    alias_method :attr_visible_rgn=, :visible_rgn=
-    undef_method :visible_rgn=
-    
-    attr_accessor :old_action_proc
-    alias_method :attr_old_action_proc, :old_action_proc
-    undef_method :old_action_proc
-    alias_method :attr_old_action_proc=, :old_action_proc=
-    undef_method :old_action_proc=
+    attr_accessor :view
+    alias_method :attr_view, :view
+    undef_method :view
+    alias_method :attr_view=, :view=
+    undef_method :view=
     
     attr_accessor :parent
     alias_method :attr_parent, :parent
@@ -110,11 +99,23 @@ module Org::Eclipse::Swt::Widgets
     alias_method :attr_parent=, :parent=
     undef_method :parent=
     
-    attr_accessor :dragging
-    alias_method :attr_dragging, :dragging
-    undef_method :dragging
-    alias_method :attr_dragging=, :dragging=
-    undef_method :dragging=
+    attr_accessor :minimum
+    alias_method :attr_minimum, :minimum
+    undef_method :minimum
+    alias_method :attr_minimum=, :minimum=
+    undef_method :minimum=
+    
+    attr_accessor :maximum
+    alias_method :attr_maximum, :maximum
+    undef_method :maximum
+    alias_method :attr_maximum=, :maximum=
+    undef_method :maximum=
+    
+    attr_accessor :thumb
+    alias_method :attr_thumb, :thumb
+    undef_method :thumb
+    alias_method :attr_thumb=, :thumb=
+    undef_method :thumb=
     
     attr_accessor :increment
     alias_method :attr_increment, :increment
@@ -128,35 +129,36 @@ module Org::Eclipse::Swt::Widgets
     alias_method :attr_page_increment=, :page_increment=
     undef_method :page_increment=
     
+    attr_accessor :target
+    alias_method :attr_target, :target
+    undef_method :target
+    alias_method :attr_target=, :target=
+    undef_method :target=
+    
+    # long
+    attr_accessor :action_selector
+    alias_method :attr_action_selector, :action_selector
+    undef_method :action_selector
+    alias_method :attr_action_selector=, :action_selector=
+    undef_method :action_selector=
+    
     typesig { [] }
     def initialize
-      @handle = 0
-      @visible_rgn = 0
-      @old_action_proc = 0
+      @view = nil
       @parent = nil
-      @dragging = false
+      @minimum = 0
+      @maximum = 0
+      @thumb = 0
       @increment = 0
       @page_increment = 0
+      @target = nil
+      @action_selector = 0
       super()
+      @maximum = 100
+      @thumb = 10
       @increment = 1
       @page_increment = 10
       # Do nothing
-    end
-    
-    typesig { [Scrollable, ::Java::Int] }
-    def initialize(parent, style)
-      @handle = 0
-      @visible_rgn = 0
-      @old_action_proc = 0
-      @parent = nil
-      @dragging = false
-      @increment = 0
-      @page_increment = 0
-      super(parent, check_style(style))
-      @increment = 1
-      @page_increment = 10
-      @parent = parent
-      create_widget
     end
     
     typesig { [SelectionListener] }
@@ -207,96 +209,15 @@ module Org::Eclipse::Swt::Widgets
       end
     }
     
-    typesig { [::Java::Int, ::Java::Int] }
-    def action_proc(the_control, part_code)
-      result = super(the_control, part_code)
-      if ((result).equal?(OS.attr_no_err))
-        return result
-      end
-      event = Event.new
-      inc = 0
-      case (part_code)
-      when OS.attr_k_control_up_button_part
-        inc -= @increment
-        event.attr_detail = SWT::ARROW_UP
-      when OS.attr_k_control_page_up_part
-        inc -= @page_increment
-        event.attr_detail = SWT::PAGE_UP
-      when OS.attr_k_control_page_down_part
-        inc += @page_increment
-        event.attr_detail = SWT::PAGE_DOWN
-      when OS.attr_k_control_down_button_part
-        inc += @increment
-        event.attr_detail = SWT::ARROW_DOWN
-      when OS.attr_k_control_indicator_part
-        @dragging = true
-        event.attr_detail = SWT::DRAG
-      else
-        return result
-      end
-      if (!(@old_action_proc).equal?(0))
-        OS._call(@old_action_proc, the_control, part_code)
-        @parent.redraw_background_image
-      else
-        value = OS._get_control32bit_value(@handle) + inc
-        OS._set_control32bit_value(@handle, value)
-      end
-      send_event(SWT::Selection, event)
-      return result
-    end
-    
-    typesig { [] }
-    def destroy_handle
-      the_control = @handle
-      release_handle
-      if (!(the_control).equal?(0))
-        OS._dispose_control(the_control)
-      end
-    end
-    
-    typesig { [] }
-    def destroy_widget
-      @parent.destroy_scroll_bar(self)
-      release_handle
-      # parent.sendEvent (SWT.Resize);
-    end
-    
-    typesig { [::Java::Boolean] }
-    def enable_widget(enabled)
-      if (enabled)
-        OS._enable_control(@handle)
-      else
-        OS._disable_control(@handle)
-      end
-    end
-    
-    typesig { [] }
-    def create_handle
-      action_proc = self.attr_display.attr_action_proc
-      out_control = Array.typed(::Java::Int).new(1) { 0 }
-      window = OS._get_control_owner(@parent.attr_scrolled_handle)
-      OS._create_scroll_bar_control(window, nil, 0, 0, 90, 10, true, action_proc, out_control)
-      if ((out_control[0]).equal?(0))
-        error(SWT::ERROR_NO_HANDLES)
-      end
-      @handle = out_control[0]
-    end
-    
-    typesig { [] }
-    def create_widget
-      super
-      set_zorder
-    end
-    
     typesig { [] }
     def deregister
       super
-      self.attr_display.remove_widget(@handle)
+      self.attr_display.remove_widget(@view)
     end
     
-    typesig { [::Java::Int] }
-    def get_draw_count(control)
-      return @parent.get_draw_count(control)
+    typesig { [] }
+    def get_drawing
+      return @parent.get_drawing
     end
     
     typesig { [] }
@@ -345,9 +266,7 @@ module Org::Eclipse::Swt::Widgets
     # </ul>
     def get_maximum
       check_widget
-      maximum = OS._get_control32bit_maximum(@handle) & 0x7fffffff
-      view_size = OS._get_control_view_size(@handle)
-      return maximum + view_size
+      return @maximum
     end
     
     typesig { [] }
@@ -361,7 +280,7 @@ module Org::Eclipse::Swt::Widgets
     # </ul>
     def get_minimum
       check_widget
-      return OS._get_control32bit_minimum(@handle) & 0x7fffffff
+      return @minimum
     end
     
     typesig { [] }
@@ -405,7 +324,9 @@ module Org::Eclipse::Swt::Widgets
     # </ul>
     def get_selection
       check_widget
-      return OS._get_control32bit_value(@handle) & 0x7fffffff
+      widget = @view
+      value = widget.double_value
+      return RJava.cast_to_int((0.5 + ((@maximum - @thumb - @minimum) * value + @minimum)))
     end
     
     typesig { [] }
@@ -422,7 +343,8 @@ module Org::Eclipse::Swt::Widgets
     # </ul>
     def get_size
       check_widget
-      return get_control_size(@handle)
+      rect = (@view).frame
+      return Point.new(RJava.cast_to_int(rect.attr_width), RJava.cast_to_int(rect.attr_height))
     end
     
     typesig { [] }
@@ -439,7 +361,7 @@ module Org::Eclipse::Swt::Widgets
     # @see ScrollBar
     def get_thumb
       check_widget
-      return OS._get_control_view_size(@handle)
+      return @thumb
     end
     
     typesig { [] }
@@ -463,53 +385,6 @@ module Org::Eclipse::Swt::Widgets
       return ((self.attr_state & HIDDEN)).equal?(0)
     end
     
-    typesig { [::Java::Int, ::Java::Boolean] }
-    def get_visible_region(control, clip_children)
-      if ((@visible_rgn).equal?(0))
-        @visible_rgn = OS._new_rgn
-        calculate_visible_region(control, @visible_rgn, clip_children)
-      end
-      result = OS._new_rgn
-      OS._copy_rgn(@visible_rgn, result)
-      return result
-    end
-    
-    typesig { [] }
-    def hook_events
-      super
-      control_proc = self.attr_display.attr_control_proc
-      mask = Array.typed(::Java::Int).new([OS.attr_k_event_class_control, OS.attr_k_event_control_track, ])
-      control_target = OS._get_control_event_target(@handle)
-      OS._install_event_handler(control_target, control_proc, mask.attr_length / 2, mask, @handle, nil)
-      if (((@parent.attr_state & CANVAS)).equal?(0))
-        @old_action_proc = OS._get_control_action(@handle)
-        OS._set_control_action(@handle, self.attr_display.attr_action_proc)
-      end
-    end
-    
-    typesig { [::Java::Int] }
-    def invalidate_visible_region(control)
-      reset_visible_region(control)
-      @parent.reset_visible_region(control)
-    end
-    
-    typesig { [::Java::Int, ::Java::Int] }
-    def inval_window_rgn(window, rgn)
-      @parent.inval_window_rgn(window, rgn)
-    end
-    
-    typesig { [::Java::Int] }
-    def is_drawing(control)
-      # Feature in the Macintosh.  The scroll bars in a DataBrowser are
-      # always invisible according to IsControlVisible(), despite the fact
-      # that they are drawn.  The fix is to check our visibility flag
-      # instead of calling IsControlVisible().
-      # 
-      # Note: During resize IsControlVisible() returns true allowing the
-      # clipping to be properly calculated.
-      return is_visible && (get_draw_count(control)).equal?(0)
-    end
-    
     typesig { [] }
     # Returns <code>true</code> if the receiver is enabled and all
     # of the receiver's ancestors are enabled, and <code>false</code>
@@ -529,9 +404,9 @@ module Org::Eclipse::Swt::Widgets
       return get_enabled && @parent.is_enabled
     end
     
-    typesig { [::Java::Int] }
-    def is_trim_handle(trim_handle)
-      return (@handle).equal?(trim_handle)
+    typesig { [] }
+    def is_drawing
+      return get_drawing && @parent.is_drawing
     end
     
     typesig { [] }
@@ -550,41 +425,6 @@ module Org::Eclipse::Swt::Widgets
     def is_visible
       check_widget
       return get_visible && @parent.is_visible
-    end
-    
-    typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
-    def k_event_mouse_down(next_handler, the_event, user_data)
-      status = super(next_handler, the_event, user_data)
-      if ((status).equal?(OS.attr_no_err))
-        return status
-      end
-      @dragging = false
-      status = OS._call_next_event_handler(next_handler, the_event)
-      if (@dragging)
-        event = Event.new
-        send_event(SWT::Selection, event)
-      end
-      @dragging = false
-      return status
-    end
-    
-    typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
-    def k_event_mouse_wheel_moved(next_handler, the_event, user_data)
-      old_selection = get_selection
-      result = OS._call_next_event_handler(next_handler, the_event)
-      new_selection = get_selection
-      if (!(old_selection).equal?(new_selection))
-        event = Event.new
-        event.attr_detail = new_selection < old_selection ? SWT::PAGE_UP : SWT::PAGE_DOWN
-        send_event(SWT::Selection, event)
-        @parent.redraw_background_image
-      end
-      return result
-    end
-    
-    typesig { [] }
-    def redraw
-      redraw_widget(@handle, false)
     end
     
     typesig { [SelectionListener] }
@@ -618,13 +458,16 @@ module Org::Eclipse::Swt::Widgets
     typesig { [] }
     def register
       super
-      self.attr_display.add_widget(@handle, self)
+      self.attr_display.add_widget(@view, self)
     end
     
     typesig { [] }
     def release_handle
       super
-      @handle = 0
+      if (!(@view).nil?)
+        @view.release
+      end
+      @view = nil
     end
     
     typesig { [] }
@@ -636,24 +479,47 @@ module Org::Eclipse::Swt::Widgets
       if ((@parent.attr_vertical_bar).equal?(self))
         @parent.attr_vertical_bar = nil
       end
-      @parent.resize_client_area
     end
     
     typesig { [] }
     def release_widget
       super
-      if (!(@visible_rgn).equal?(0))
-        OS._dispose_rgn(@visible_rgn)
-      end
-      @visible_rgn = 0
+      @parent = nil
     end
     
-    typesig { [::Java::Int] }
-    def reset_visible_region(control)
-      if (!(@visible_rgn).equal?(0))
-        OS._dispose_rgn(@visible_rgn)
-        @visible_rgn = 0
+    typesig { [] }
+    def send_selection
+      value = 0
+      if (!(@target).nil?)
+        @view.send_action(@action_selector, @target)
+      else
+        value = get_selection
       end
+      event = Event.new
+      # 64
+      hit_part = RJava.cast_to_int((@view).hit_part)
+      case (hit_part)
+      when OS::NSScrollerDecrementLine
+        value -= @increment
+        event.attr_detail = SWT::ARROW_UP
+      when OS::NSScrollerDecrementPage
+        value -= @page_increment
+        event.attr_detail = SWT::PAGE_UP
+      when OS::NSScrollerIncrementLine
+        value += @increment
+        event.attr_detail = SWT::ARROW_DOWN
+      when OS::NSScrollerIncrementPage
+        value += @page_increment
+        event.attr_detail = SWT::PAGE_DOWN
+      when OS::NSScrollerKnob
+        event.attr_detail = SWT::DRAG
+      end
+      if ((@target).nil?)
+        if (!(event.attr_detail).equal?(SWT::DRAG))
+          set_selection(value)
+        end
+      end
+      send_event(SWT::Selection, event)
     end
     
     typesig { [::Java::Int] }
@@ -676,6 +542,14 @@ module Org::Eclipse::Swt::Widgets
       @increment = value
     end
     
+    typesig { [::Java::Float, ::Java::Float] }
+    # double
+    # double
+    def set_clip_region(x, y)
+      frame_ = @view.frame
+      @parent.set_clip_region(frame_.attr_x + x, frame_.attr_y + y)
+    end
+    
     typesig { [::Java::Boolean] }
     # Enables the receiver if the argument is <code>true</code>,
     # and disables it otherwise. A disabled control is typically
@@ -695,13 +569,19 @@ module Org::Eclipse::Swt::Widgets
           return
         end
         self.attr_state &= ~DISABLED
-        OS._enable_control(@handle)
       else
         if (!((self.attr_state & DISABLED)).equal?(0))
           return
         end
         self.attr_state |= DISABLED
-        OS._disable_control(@handle)
+      end
+      enable_widget(enabled)
+    end
+    
+    typesig { [::Java::Boolean] }
+    def enable_widget(enabled)
+      if (!enabled || ((self.attr_state & DISABLED)).equal?(0))
+        @view.set_enabled(enabled)
       end
     end
     
@@ -722,16 +602,15 @@ module Org::Eclipse::Swt::Widgets
       if (value < 0)
         return
       end
-      minimum = OS._get_control32bit_minimum(@handle)
-      if (value <= minimum)
+      if (value <= @minimum)
         return
       end
-      view_size = OS._get_control_view_size(@handle)
-      if (value - minimum < view_size)
-        view_size = value - minimum
-        OS._set_control_view_size(@handle, view_size)
+      if (value - @minimum < @thumb)
+        @thumb = value - @minimum
       end
-      OS._set_control32bit_maximum(@handle, value - view_size)
+      selection = Math.max(@minimum, Math.min(get_selection, value - @thumb))
+      @maximum = value
+      update_bar(selection, @minimum, value, @thumb)
     end
     
     typesig { [::Java::Int] }
@@ -751,17 +630,15 @@ module Org::Eclipse::Swt::Widgets
       if (value < 0)
         return
       end
-      view_size = OS._get_control_view_size(@handle)
-      maximum = OS._get_control32bit_maximum(@handle) + view_size
-      if (value >= maximum)
+      if (value >= @maximum)
         return
       end
-      if (maximum - value < view_size)
-        view_size = maximum - value
-        OS._set_control32bit_maximum(@handle, maximum - view_size)
-        OS._set_control_view_size(@handle, view_size)
+      if (@maximum - value < @thumb)
+        @thumb = @maximum - value
       end
-      OS._set_control32bit_minimum(@handle, value)
+      selection = Math.min(@maximum - @thumb, Math.max(get_selection, value))
+      @minimum = value
+      update_bar(selection, value, @maximum, @thumb)
     end
     
     typesig { [::Java::Int] }
@@ -797,7 +674,7 @@ module Org::Eclipse::Swt::Widgets
     # </ul>
     def set_selection(value)
       check_widget
-      OS._set_control32bit_value(@handle, value)
+      update_bar(value, @minimum, @maximum, @thumb)
     end
     
     typesig { [::Java::Int] }
@@ -818,12 +695,9 @@ module Org::Eclipse::Swt::Widgets
       if (value < 1)
         return
       end
-      minimum = OS._get_control32bit_minimum(@handle)
-      view_size = OS._get_control_view_size(@handle)
-      maximum = OS._get_control32bit_maximum(@handle) + view_size
-      value = Math.min(value, maximum - minimum)
-      OS._set_control32bit_maximum(@handle, maximum - value)
-      OS._set_control_view_size(@handle, value)
+      value = Math.min(value, @maximum - @minimum)
+      update_bar(get_selection, @minimum, @maximum, value)
+      @thumb = value
     end
     
     typesig { [::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int] }
@@ -863,13 +737,12 @@ module Org::Eclipse::Swt::Widgets
       if (page_increment < 1)
         return
       end
-      thumb = Math.min(thumb, maximum - minimum)
-      OS._set_control32bit_minimum(@handle, minimum)
-      OS._set_control32bit_maximum(@handle, maximum - thumb)
-      OS._set_control_view_size(@handle, thumb)
-      OS._set_control32bit_value(@handle, selection)
+      @thumb = thumb = Math.min(thumb, maximum - minimum)
+      @maximum = maximum
+      @minimum = minimum
       @increment = increment
       @page_increment = page_increment
+      update_bar(selection, minimum, maximum, thumb)
     end
     
     typesig { [::Java::Boolean] }
@@ -889,26 +762,18 @@ module Org::Eclipse::Swt::Widgets
     # </ul>
     def set_visible(visible)
       check_widget
-      if (visible)
-        if (((self.attr_state & HIDDEN)).equal?(0))
-          return
-        end
-        self.attr_state &= ~HIDDEN
-      else
-        if (!((self.attr_state & HIDDEN)).equal?(0))
-          return
-        end
-        self.attr_state |= HIDDEN
-      end
-      if (@parent.set_scroll_bar_visible(self, visible))
-        send_event(visible ? SWT::Show : SWT::Hide)
-        @parent.send_event(SWT::Resize)
-      end
+      @parent.set_scroll_bar_visible(self, visible)
     end
     
-    typesig { [] }
-    def set_zorder
-      OS._hiview_add_subview(@parent.attr_scrolled_handle, @handle)
+    typesig { [::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int] }
+    def update_bar(selection, minimum, maximum, thumb)
+      widget = @view
+      selection = Math.max(minimum, Math.min(maximum - thumb, selection))
+      range = maximum - thumb - minimum
+      fraction = range <= 0 ? 1 : ((selection - minimum)).to_f / range
+      knob = range <= 0 ? 1 : (thumb).to_f / (maximum - minimum)
+      widget.set_float_value(fraction, knob)
+      widget.set_enabled(range > 0)
     end
     
     private

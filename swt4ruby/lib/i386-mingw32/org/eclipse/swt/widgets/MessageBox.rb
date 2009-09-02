@@ -1,6 +1,6 @@
 require "rjava"
 
-# Copyright (c) 2000, 2008 IBM Corporation and others.
+# Copyright (c) 2000, 2009 IBM Corporation and others.
 # All rights reserved. This program and the accompanying materials
 # are made available under the terms of the Eclipse Public License v1.0
 # which accompanies this distribution, and is available at
@@ -39,6 +39,7 @@ module Org::Eclipse::Swt::Widgets
   # 
   # @see <a href="http://www.eclipse.org/swt/examples.php">SWT Example: ControlExample, Dialog tab</a>
   # @see <a href="http://www.eclipse.org/swt/">Sample code and further information</a>
+  # @noextend This class is not intended to be subclassed by clients.
   class MessageBox < MessageBoxImports.const_get :Dialog
     include_class_members MessageBoxImports
     
@@ -86,6 +87,19 @@ module Org::Eclipse::Swt::Widgets
     # <li>ERROR_THREAD_INVALID_ACCESS - if not called from the thread that created the parent</li>
     # <li>ERROR_INVALID_SUBCLASS - if this class is not an allowed subclass</li>
     # </ul>
+    # 
+    # @see SWT#ICON_ERROR
+    # @see SWT#ICON_INFORMATION
+    # @see SWT#ICON_QUESTION
+    # @see SWT#ICON_WARNING
+    # @see SWT#ICON_WORKING
+    # @see SWT#OK
+    # @see SWT#CANCEL
+    # @see SWT#YES
+    # @see SWT#NO
+    # @see SWT#ABORT
+    # @see SWT#RETRY
+    # @see SWT#IGNORE
     def initialize(parent, style)
       @message = nil
       super(parent, check_style(parent, check_style(style)))
@@ -192,11 +206,11 @@ module Org::Eclipse::Swt::Widgets
       end
       bits = button_bits | icon_bits | modal_bits
       if (!((self.attr_style & SWT::RIGHT_TO_LEFT)).equal?(0))
-        bits |= OS::MB_RTLREADING
+        bits |= OS::MB_RTLREADING | OS::MB_RIGHT
       end
       if (((self.attr_style & (SWT::LEFT_TO_RIGHT | SWT::RIGHT_TO_LEFT))).equal?(0))
         if (!(self.attr_parent).nil? && !((self.attr_parent.attr_style & SWT::MIRRORED)).equal?(0))
-          bits |= OS::MB_RTLREADING
+          bits |= OS::MB_RTLREADING | OS::MB_RIGHT
         end
       end
       # Feature in Windows.  System modal is not supported

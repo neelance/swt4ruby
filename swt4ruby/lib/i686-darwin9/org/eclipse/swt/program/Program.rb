@@ -1,6 +1,6 @@
 require "rjava"
 
-# Copyright (c) 2000, 2008 IBM Corporation and others.
+# Copyright (c) 2000, 2009 IBM Corporation and others.
 # All rights reserved. This program and the accompanying materials
 # are made available under the terms of the Eclipse Public License v1.0
 # which accompanies this distribution, and is available at
@@ -13,13 +13,11 @@ module Org::Eclipse::Swt::Program
     class_module.module_eval {
       include ::Java::Lang
       include ::Org::Eclipse::Swt::Program
-      include_const ::Org::Eclipse::Swt::Internal::Carbon, :CFRange
-      include_const ::Org::Eclipse::Swt::Internal::Carbon, :LSApplicationParameters
-      include_const ::Org::Eclipse::Swt::Internal::Carbon, :OS
+      include_const ::Org::Eclipse::Swt::Internal, :C
+      include ::Org::Eclipse::Swt::Internal::Cocoa
       include ::Org::Eclipse::Swt
       include ::Org::Eclipse::Swt::Graphics
-      include_const ::Java::Util, :Enumeration
-      include_const ::Java::Util, :Hashtable
+      include_const ::Java::Util, :Vector
     }
   end
   
@@ -38,23 +36,29 @@ module Org::Eclipse::Swt::Program
     alias_method :attr_name=, :name=
     undef_method :name=
     
-    attr_accessor :fs_ref
-    alias_method :attr_fs_ref, :fs_ref
-    undef_method :fs_ref
-    alias_method :attr_fs_ref=, :fs_ref=
-    undef_method :fs_ref=
+    attr_accessor :full_path
+    alias_method :attr_full_path, :full_path
+    undef_method :full_path
+    alias_method :attr_full_path=, :full_path=
+    undef_method :full_path=
+    
+    attr_accessor :identifier
+    alias_method :attr_identifier, :identifier
+    undef_method :identifier
+    alias_method :attr_identifier=, :identifier=
+    undef_method :identifier=
     
     class_module.module_eval {
+      const_set_lazy(:PREFIX_FILE) { "file:" }
+      const_attr_reader  :PREFIX_FILE
+      
+      # $NON-NLS-1$
       const_set_lazy(:PREFIX_HTTP) { "http://" }
       const_attr_reader  :PREFIX_HTTP
       
       # $NON-NLS-1$
       const_set_lazy(:PREFIX_HTTPS) { "https://" }
       const_attr_reader  :PREFIX_HTTPS
-      
-      # $NON-NLS-1$
-      const_set_lazy(:PREFIX_FILE) { "file://" }
-      const_attr_reader  :PREFIX_FILE
     }
     
     typesig { [] }
@@ -63,7 +67,8 @@ module Org::Eclipse::Swt::Program
     # Prevents uninitialized instances from being created outside the package.
     def initialize
       @name = nil
-      @fs_ref = nil
+      @full_path = nil
+      @identifier = nil
     end
     
     class_module.module_eval {
@@ -86,24 +91,78 @@ module Org::Eclipse::Swt::Program
         if ((extension.length).equal?(0))
           return nil
         end
-        chars = nil
         if (!(extension.char_at(0)).equal?(Character.new(?..ord)))
-          chars = CharArray.new(extension.length)
-          extension.get_chars(0, chars.attr_length, chars, 0)
-        else
-          chars = CharArray.new(extension.length - 1)
-          extension.get_chars(1, extension.length, chars, 0)
+          extension = "." + extension
         end
-        ext = OS._cfstring_create_with_characters(OS.attr_k_cfallocator_default, chars, chars.attr_length)
-        program = nil
-        if (!(ext).equal?(0))
-          fs_ref = Array.typed(::Java::Byte).new(80) { 0 }
-          if ((OS._lsget_application_for_info(OS.attr_k_lsunknown_type, OS.attr_k_lsunknown_creator, ext, OS.attr_k_lsroles_all, fs_ref, nil)).equal?(OS.attr_no_err))
-            program = get_program(fs_ref)
+        pool = NSAutoreleasePool.new.alloc.init
+        begin
+          workspace = NSWorkspace.shared_workspace
+          # long
+          app_name = OS.malloc(C::PTR_SIZEOF)
+          # long
+          type = OS.malloc(C::PTR_SIZEOF)
+          temp = NSString.new(OS._nstemporary_directory)
+          file_name = NSString.string_with("swt" + RJava.cast_to_string(System.current_time_millis) + extension)
+          full_path = temp.string_by_appending_path_component(file_name)
+          file_manager = NSFileManager.default_manager
+          file_manager.create_file_at_path(full_path, nil, nil)
+          if (!workspace.get_info_for_file(full_path, app_name, type))
+            return nil
           end
-          OS._cfrelease(ext)
+          file_manager.remove_item_at_path(full_path, 0)
+          # long
+          # long
+          buffer = Array.typed(::Java::Int).new(1) { 0 }
+          # long
+          # long
+          buffer2 = Array.typed(::Java::Int).new(1) { 0 }
+          OS.memmove(buffer, app_name, C::PTR_SIZEOF)
+          OS.memmove(buffer2, type, C::PTR_SIZEOF)
+          OS.free(app_name)
+          OS.free(type)
+          if (!(buffer[0]).equal?(0))
+            app_path = NSString.new(buffer[0])
+            app_type = NSString.new(buffer2[0])
+            bundle = NSBundle.bundle_with_path(app_path)
+            if (!(bundle).nil?)
+              text_edit_id = NSString.string_with("com.apple.TextEdit")
+              bundle_id = NSString.string_with("CFBundleIdentifier")
+              info_dictionary_ = bundle.info_dictionary
+              text_edit = text_edit_id.is_equal(info_dictionary_.object_for_key(bundle_id))
+              if (!text_edit)
+                return get_program(bundle)
+              end
+              # if text edit, make sure we're really one of the extensions that
+              # text edit says it can handle.
+              cfbundle_document_types = NSString.string_with("CFBundleDocumentTypes")
+              cfbundle_type_extensions = NSString.string_with("CFBundleTypeExtensions")
+              id = info_dictionary_.object_for_key(cfbundle_document_types)
+              if (!(id).nil?)
+                document_types = NSDictionary.new(id.attr_id)
+                document_types_enumerator = document_types.object_enumerator
+                while (!((id = document_types_enumerator.next_object)).nil?)
+                  document_type = NSDictionary.new(id.attr_id)
+                  supported_extensions = NSDictionary.new(document_type.object_for_key(cfbundle_type_extensions))
+                  if (!(supported_extensions).nil?)
+                    supported_extensions_enumerator = supported_extensions.object_enumerator
+                    if (!(supported_extensions_enumerator).nil?)
+                      ext = nil
+                      while (!((ext = supported_extensions_enumerator.next_object)).nil?)
+                        str_ext = NSString.new(ext)
+                        if (app_type.is_equal(str_ext))
+                          return get_program(bundle)
+                        end
+                      end
+                    end
+                  end
+                end
+              end
+            end
+          end
+          return nil
+        ensure
+          pool.release
         end
-        return program
       end
       
       typesig { [] }
@@ -113,20 +172,86 @@ module Org::Eclipse::Swt::Program
       # 
       # @return an array of extensions
       def get_extensions
-        # From System-Declared Uniform Type Identifiers
-        # Others
-        # iChat
-        # iChat
-        # acrobat reader
-        # Chess
-        # iCal
-        # Mail
-        # Sherlock
-        # Stickies
-        # System Preferences
-        # Console
-        # Grapher
-        return Array.typed(String).new([".txt", ".rtf", ".html", ".htm", ".xml", ".c", ".m", ".cp", ".cpp", ".c++", ".cc", ".cxx", ".mm", ".h", ".hpp", ".h++", ".hxx", ".java", ".jav", ".s", ".r", ".defs", ".mig", ".exp", ".js", ".jscript", ".javascript", ".sh", ".command", ".csh", ".pl", ".pm", ".py", ".rb", ".rbw", ".php", ".php3", ".php4", ".ph3", ".ph4", ".phtml", ".jnlp", ".applescript", ".scpt", ".o", ".exe", ".dll", ".class", ".jar", ".qtz", ".gtar", ".tar", ".gz", ".gzip", ".tgz", ".hqx", ".bin", ".vcf", ".vcard", ".jpg", ".jpeg", ".jp2", ".tif", ".tiff", ".pic", ".pct", ".pict", ".pntg", ".png", ".xbm", ".qif", ".qtif", ".icns", ".mov", ".qt", ".avi", ".vfw", ".mpg", ".mpeg", ".m75", ".m15", ".mp4", ".3gp", ".3gpp", ".3g2", ".3gp2", ".mp3", ".m4a", ".m4p", ".m4b", ".au", ".ulw", ".snd", ".aifc", ".aiff", ".aif", ".caf", ".bundle", ".app", ".plugin", ".mdimporter", ".wdgt", ".cpio", ".zip", ".framework", ".rtfd", ".dfont", ".otf", ".ttf", ".ttc", ".suit", ".pfb", ".pfa", ".icc", ".icm", ".pf", ".pdf", ".ps", ".eps", ".psd", ".ai", ".gif", ".bmp", ".ico", ".doc", ".xls", ".ppt", ".wav", ".wave", ".asf", ".wm", ".wmv", ".wmp", ".wma", ".asx", ".wmx", ".wvx", ".wax", ".key", ".kth", ".tga", ".sgi", ".exr", ".fpx", ".jfx", ".efx", ".sd2", ".rm", ".ram", ".ra", ".smil", ".sit", ".sitx", ".plist", ".nib", ".lproj", ".iPhoto", ".iChat", ".chat", ".rmf", ".xfdf", ".fdf", ".game", ".pgn", ".ics", ".vcs", ".aplmodel", ".icbu", ".icalevent", ".icaltodo", ".mailhold", ".mbox", ".imapmbox", ".emlx", ".mailextract", ".sherlock", ".tpl", ".prefPane", ".sliderSaver", ".saver", ".log", ".gcx", ])
+        pool = NSAutoreleasePool.new.alloc.init
+        begin
+          supported_document_types = NSMutableSet.set
+          workspace = NSWorkspace.shared_workspace
+          cfbundle_document_types = NSString.string_with("CFBundleDocumentTypes")
+          cfbundle_type_extensions = NSString.string_with("CFBundleTypeExtensions")
+          array = NSArray.new(OS._nssearch_path_for_directories_in_domains(OS::NSAllApplicationsDirectory, OS::NSAllDomainsMask, true))
+          # 64
+          count_ = RJava.cast_to_int(array.count)
+          i = 0
+          while i < count_
+            path = NSString.new(array.object_at_index(i))
+            file_manager = NSFileManager.default_manager
+            enumerator = file_manager.enumerator_at_path(path)
+            if (!(enumerator).nil?)
+              id = nil
+              while (!((id = enumerator.next_object)).nil?)
+                enumerator.skip_descendents
+                file_path = NSString.new(id.attr_id)
+                full_path = path.string_by_appending_path_component(file_path)
+                if (workspace.is_file_package_at_path(full_path))
+                  bundle = NSBundle.bundle_with_path(full_path)
+                  id = bundle.info_dictionary.object_for_key(cfbundle_document_types)
+                  if (!(id).nil?)
+                    document_types = NSDictionary.new(id.attr_id)
+                    document_types_enumerator = document_types.object_enumerator
+                    while (!((id = document_types_enumerator.next_object)).nil?)
+                      document_type = NSDictionary.new(id.attr_id)
+                      id = document_type.object_for_key(cfbundle_type_extensions)
+                      if (!(id).nil?)
+                        supported_document_types.add_objects_from_array(NSArray.new(id.attr_id))
+                      end
+                    end
+                  end
+                end
+              end
+            end
+            i += 1
+          end
+          i_ = 0
+          # 64
+          exts = Array.typed(String).new(RJava.cast_to_int(supported_document_types.count)) { nil }
+          enumerator = supported_document_types.object_enumerator
+          id = nil
+          while (!((id = enumerator.next_object)).nil?)
+            ext = NSString.new(id.attr_id).get_string
+            if (!(ext == "*"))
+              exts[((i_ += 1) - 1)] = "." + ext
+            end
+          end
+          if (!(i_).equal?(exts.attr_length))
+            temp = Array.typed(String).new(i_) { nil }
+            System.arraycopy(exts, 0, temp, 0, i_)
+            exts = temp
+          end
+          return exts
+        ensure
+          pool.release
+        end
+      end
+      
+      typesig { [NSBundle] }
+      def get_program(bundle)
+        cfbundle_name = NSString.string_with("CFBundleName")
+        cfbundle_display_name = NSString.string_with("CFBundleDisplayName")
+        full_path = bundle.bundle_path
+        identifier = bundle.bundle_identifier
+        bundle_name = bundle.object_for_info_dictionary_key(cfbundle_display_name)
+        if ((bundle_name).nil?)
+          bundle_name = bundle.object_for_info_dictionary_key(cfbundle_name)
+        end
+        if ((bundle_name).nil?)
+          bundle_name = full_path.last_path_component.string_by_deleting_path_extension
+        end
+        name = NSString.new(bundle_name.attr_id)
+        program = Program.new
+        program.attr_name = name.get_string
+        program.attr_full_path = full_path.get_string
+        program.attr_identifier = !(identifier).nil? ? identifier.get_string : ""
+        return program
       end
       
       typesig { [] }
@@ -136,67 +261,39 @@ module Org::Eclipse::Swt::Program
       # 
       # @return an array of programs
       def get_programs
-        bundles = Hashtable.new
-        extensions = get_extensions
-        fs_ref = Array.typed(::Java::Byte).new(80) { 0 }
-        i = 0
-        while i < extensions.attr_length
-          extension = extensions[i]
-          chars = CharArray.new(extension.length - 1)
-          extension.get_chars(1, extension.length, chars, 0)
-          ext = OS._cfstring_create_with_characters(OS.attr_k_cfallocator_default, chars, chars.attr_length)
-          if (!(ext).equal?(0))
-            if ((OS._lsget_application_for_info(OS.attr_k_lsunknown_type, OS.attr_k_lsunknown_creator, ext, OS.attr_k_lsroles_all, fs_ref, nil)).equal?(OS.attr_no_err))
-              program = get_program(fs_ref)
-              if (!(program).nil? && (bundles.get(program.get_name)).nil?)
-                bundles.put(program.get_name, program)
-                fs_ref = Array.typed(::Java::Byte).new(80) { 0 }
-              end
-            end
-            if (OS::VERSION >= 0x1040)
-              utis = OS._uttype_create_all_identifiers_for_tag(OS.k_uttag_class_filename_extension, ext, 0)
-              if (!(utis).equal?(0))
-                uti_count = OS._cfarray_get_count(utis)
-                j = 0
-                while j < uti_count
-                  uti = OS._cfarray_get_value_at_index(utis, j)
-                  if (!(uti).equal?(0))
-                    apps = OS._lscopy_all_role_handlers_for_content_type(uti, OS.attr_k_lsroles_all)
-                    if (!(apps).equal?(0))
-                      app_count = OS._cfarray_get_count(apps)
-                      k = 0
-                      while k < app_count
-                        app = OS._cfarray_get_value_at_index(apps, k)
-                        if (!(app).equal?(0))
-                          if ((OS._lsfind_application_for_info(OS.attr_k_lsunknown_creator, app, 0, fs_ref, nil)).equal?(OS.attr_no_err))
-                            program = get_program(fs_ref)
-                            if (!(program).nil? && (bundles.get(program.get_name)).nil?)
-                              bundles.put(program.get_name, program)
-                              fs_ref = Array.typed(::Java::Byte).new(80) { 0 }
-                            end
-                          end
-                        end
-                        k += 1
-                      end
-                      OS._cfrelease(apps)
-                    end
+        pool = NSAutoreleasePool.new.alloc.init
+        begin
+          vector = Vector.new
+          workspace = NSWorkspace.shared_workspace
+          array = NSArray.new(OS._nssearch_path_for_directories_in_domains(OS::NSAllApplicationsDirectory, OS::NSAllDomainsMask, true))
+          # 64
+          count_ = RJava.cast_to_int(array.count)
+          i = 0
+          while i < count_
+            path = NSString.new(array.object_at_index(i))
+            file_manager = NSFileManager.default_manager
+            enumerator = file_manager.enumerator_at_path(path)
+            if (!(enumerator).nil?)
+              id = nil
+              while (!((id = enumerator.next_object)).nil?)
+                enumerator.skip_descendents
+                full_path = path.string_by_appending_path_component(NSString.new(id.attr_id))
+                if (workspace.is_file_package_at_path(full_path))
+                  bundle = NSBundle.bundle_with_path(full_path)
+                  if (!(bundle).nil?)
+                    vector.add_element(get_program(bundle))
                   end
-                  j += 1
                 end
-                OS._cfrelease(utis)
               end
             end
-            OS._cfrelease(ext)
+            i += 1
           end
-          i += 1
+          programs = Array.typed(Program).new(vector.size) { nil }
+          vector.copy_into(programs)
+          return programs
+        ensure
+          pool.release
         end
-        count = 0
-        programs = Array.typed(Program).new(bundles.size) { nil }
-        values = bundles.elements
-        while (values.has_more_elements)
-          programs[((count += 1) - 1)] = values.next_element
-        end
-        return programs
       end
       
       typesig { [String] }
@@ -215,36 +312,28 @@ module Org::Eclipse::Swt::Program
         if ((file_name).nil?)
           SWT.error(SWT::ERROR_NULL_ARGUMENT)
         end
-        rc = -1
-        unescaped_chars = Array.typed(::Java::Char).new([Character.new(?%.ord)])
-        if ((file_name.index_of(Character.new(?:.ord))).equal?(-1))
-          file_name = PREFIX_FILE + file_name
-        else
+        pool = NSAutoreleasePool.new.alloc.init
+        begin
+          unescaped_str = NSString.string_with("%") # $NON-NLS-1$
           lowercase_name = file_name.to_lower_case
           if (lowercase_name.starts_with(PREFIX_HTTP) || lowercase_name.starts_with(PREFIX_HTTPS))
-            unescaped_chars = Array.typed(::Java::Char).new([Character.new(?%.ord), Character.new(?#.ord)])
-          end
-        end
-        chars = CharArray.new(file_name.length)
-        file_name.get_chars(0, chars.attr_length, chars, 0)
-        str = OS._cfstring_create_with_characters(0, chars, chars.attr_length)
-        if (!(str).equal?(0))
-          unescaped_str = OS._cfstring_create_with_characters(0, unescaped_chars, unescaped_chars.attr_length)
-          escaped_str = OS._cfurlcreate_string_by_adding_percent_escapes(OS.attr_k_cfallocator_default, str, unescaped_str, 0, OS.attr_k_cfstring_encoding_utf8)
-          if (!(escaped_str).equal?(0))
-            url = OS._cfurlcreate_with_string(OS.attr_k_cfallocator_default, escaped_str, 0)
-            if (!(url).equal?(0))
-              rc = OS._lsopen_cfurlref(url, nil)
-              OS._cfrelease(url)
+            unescaped_str = NSString.string_with("%#") # $NON-NLS-1$
+          else
+            if (!lowercase_name.starts_with(PREFIX_FILE))
+              file_name = PREFIX_FILE + file_name
             end
-            OS._cfrelease(escaped_str)
           end
-          if (!(unescaped_str).equal?(0))
-            OS._cfrelease(unescaped_str)
-          end
-          OS._cfrelease(str)
+          full_path = NSString.string_with(file_name)
+          # long
+          ptr = OS._cfurlcreate_string_by_adding_percent_escapes(0, full_path.attr_id, unescaped_str.attr_id, 0, OS.attr_k_cfstring_encoding_utf8)
+          escaped_string = NSString.new(ptr)
+          workspace = NSWorkspace.shared_workspace
+          result = workspace.open_url(NSURL._urlwith_string(escaped_string))
+          OS._cfrelease(ptr)
+          return result
+        ensure
+          pool.release
         end
-        return (rc).equal?(OS.attr_no_err)
       end
     }
     
@@ -264,91 +353,29 @@ module Org::Eclipse::Swt::Program
       if ((file_name).nil?)
         SWT.error(SWT::ERROR_NULL_ARGUMENT)
       end
-      if (OS::VERSION < 0x1040)
-        return launch(file_name)
-      end
-      rc = -1
-      fs_ref_ptr = OS._new_ptr(@fs_ref.attr_length)
-      if (!(fs_ref_ptr).equal?(0))
-        OS.memmove(fs_ref_ptr, @fs_ref, @fs_ref.attr_length)
-        params = LSApplicationParameters.new
-        params.attr_version = 0
-        params.attr_flags = 0
-        params.attr_application = fs_ref_ptr
-        if ((file_name.length).equal?(0))
-          rc = OS._lsopen_application(params, nil)
+      pool = NSAutoreleasePool.new.alloc.init
+      begin
+        workspace = NSWorkspace.shared_workspace
+        lowercase_name = file_name.to_lower_case
+        if (lowercase_name.starts_with(PREFIX_HTTP) || lowercase_name.starts_with(PREFIX_HTTPS))
+          full_path = NSString.string_with(file_name)
+          unescaped_str = NSString.string_with("%#") # $NON-NLS-1$
+          # long
+          ptr = OS._cfurlcreate_string_by_adding_percent_escapes(0, full_path.attr_id, unescaped_str.attr_id, 0, OS.attr_k_cfstring_encoding_utf8)
+          escaped_string = NSString.new(ptr)
+          urls = NSArray.array_with_object(NSURL._urlwith_string(escaped_string))
+          OS._cfrelease(ptr)
+          return workspace.open_urls(urls, NSString.string_with(@identifier), 0, nil, 0)
         else
-          unescaped_chars = Array.typed(::Java::Char).new([Character.new(?%.ord)])
-          if ((file_name.index_of(Character.new(?:.ord))).equal?(-1))
-            file_name = PREFIX_FILE + file_name
-          else
-            lowercase_name = file_name.to_lower_case
-            if (lowercase_name.starts_with(PREFIX_HTTP) || lowercase_name.starts_with(PREFIX_HTTPS))
-              unescaped_chars = Array.typed(::Java::Char).new([Character.new(?%.ord), Character.new(?#.ord)])
-            end
+          if (file_name.starts_with(PREFIX_FILE))
+            file_name = RJava.cast_to_string(file_name.substring(PREFIX_FILE.length))
           end
-          chars = CharArray.new(file_name.length)
-          file_name.get_chars(0, chars.attr_length, chars, 0)
-          str = OS._cfstring_create_with_characters(0, chars, chars.attr_length)
-          if (!(str).equal?(0))
-            unescaped_str = OS._cfstring_create_with_characters(0, unescaped_chars, unescaped_chars.attr_length)
-            escaped_str = OS._cfurlcreate_string_by_adding_percent_escapes(OS.attr_k_cfallocator_default, str, unescaped_str, 0, OS.attr_k_cfstring_encoding_utf8)
-            if (!(escaped_str).equal?(0))
-              urls = OS._cfarray_create_mutable(OS.attr_k_cfallocator_default, 1, 0)
-              if (!(urls).equal?(0))
-                url = OS._cfurlcreate_with_string(OS.attr_k_cfallocator_default, escaped_str, 0)
-                if (!(url).equal?(0))
-                  OS._cfarray_append_value(urls, url)
-                  rc = OS._lsopen_urls_with_role(urls, OS.attr_k_lsroles_all, 0, params, nil, 0)
-                end
-                OS._cfrelease(urls)
-              end
-              OS._cfrelease(escaped_str)
-            end
-            if (!(unescaped_str).equal?(0))
-              OS._cfrelease(unescaped_str)
-            end
-            OS._cfrelease(str)
-          end
+          full_path = NSString.string_with(file_name)
+          return workspace.open_file(full_path, NSString.string_with(@name))
         end
-        OS._dispose_ptr(fs_ref_ptr)
+      ensure
+        pool.release
       end
-      return (rc).equal?(OS.attr_no_err)
-    end
-    
-    typesig { [::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int] }
-    def create_image_from_family(family, type, mask_type, width, height)
-      data_handle = OS._new_handle(0)
-      result = OS._get_icon_family_data(family, type, data_handle)
-      if (!(result).equal?(OS.attr_no_err))
-        OS._dispose_handle(data_handle)
-        return nil
-      end
-      mask_handle = OS._new_handle(0)
-      result = OS._get_icon_family_data(family, mask_type, mask_handle)
-      if (!(result).equal?(OS.attr_no_err))
-        OS._dispose_handle(mask_handle)
-        OS._dispose_handle(data_handle)
-        return nil
-      end
-      data_size = OS._get_handle_size(data_handle)
-      OS._hlock(data_handle)
-      OS._hlock(mask_handle)
-      icon_ptr = Array.typed(::Java::Int).new(1) { 0 }
-      mask_ptr = Array.typed(::Java::Int).new(1) { 0 }
-      OS.memmove(icon_ptr, data_handle, 4)
-      OS.memmove(mask_ptr, mask_handle, 4)
-      data = Array.typed(::Java::Byte).new(data_size) { 0 }
-      OS.memmove(data, icon_ptr[0], data_size)
-      alpha_data = Array.typed(::Java::Byte).new(width * height) { 0 }
-      OS.memmove(alpha_data, mask_ptr[0], alpha_data.attr_length)
-      OS._hunlock(mask_handle)
-      OS._hunlock(data_handle)
-      OS._dispose_handle(mask_handle)
-      OS._dispose_handle(data_handle)
-      image = ImageData.new(width, height, 32, PaletteData.new(0xff0000, 0xff00, 0xff), 4, data)
-      image.attr_alpha_data = alpha_data
-      return image
     end
     
     typesig { [] }
@@ -358,33 +385,58 @@ module Org::Eclipse::Swt::Program
     # 
     # @return the image data for the program, may be null
     def get_image_data
-      icon_ref = Array.typed(::Java::Int).new(1) { 0 }
-      OS._get_icon_ref_from_file_info(@fs_ref, 0, nil, 0, 0, 0, icon_ref, nil)
-      family = Array.typed(::Java::Int).new(1) { 0 }
-      rc = OS._icon_ref_to_icon_family(icon_ref[0], OS.attr_k_selector_al_lavailable_data, family)
-      OS._release_icon_ref(icon_ref[0])
-      if (!(rc).equal?(OS.attr_no_err))
-        return nil
-      end
-      # ImageData result = createImageFromFamily(family[0], OS.kLarge32BitData, OS.kLarge8BitMask, 32, 32);
-      result = create_image_from_family(family[0], OS.attr_k_small32bit_data, OS.attr_k_small8bit_mask, 16, 16)
-      OS._dispose_handle(family[0])
-      if ((result).nil?)
-        rgbs = Array.typed(RGB).new([RGB.new(0xff, 0xff, 0xff), RGB.new(0x5f, 0x5f, 0x5f), RGB.new(0x80, 0x80, 0x80), RGB.new(0xc0, 0xc0, 0xc0), RGB.new(0xdf, 0xdf, 0xbf), RGB.new(0xff, 0xdf, 0x9f), RGB.new(0x0, 0x0, 0x0), ])
-        result = ImageData.new(16, 16, 4, PaletteData.new(rgbs))
-        result.attr_transparent_pixel = 6 # use black for transparency
-        p = Array.typed(String).new(["CCCCCCCCGGG", "CFAAAAACBGG", "CAAAAAACFBG", "CAAAAAACBBB", "CAAAAAAAAEB", "CAAAAAAAAEB", "CAAAAAAAAEB", "CAAAAAAAAEB", "CAAAAAAAAEB", "CAAAAAAAAEB", "CAAAAAAAAEB", "CAAAAAAAAEB", "CDDDDDDDDDB", "CBBBBBBBBBB", ])
-        y = 0
-        while y < p.attr_length
-          x = 0
-          while x < 11
-            result.set_pixel(x + 3, y + 1, p[y].char_at(x) - Character.new(?A.ord))
-            x += 1
-          end
-          y += 1
+      pool = NSAutoreleasePool.new.alloc.init
+      begin
+        workspace = NSWorkspace.shared_workspace
+        full_path = nil
+        if (!(@full_path).nil?)
+          full_path = NSString.string_with(@full_path)
+        else
+          full_path = workspace.full_path_for_application(NSString.string_with(@name))
         end
+        if (!(full_path).nil?)
+          ns_image = workspace.icon_for_file(full_path)
+          if (!(ns_image).nil?)
+            size_ = NSSize.new
+            size_.attr_width = size_.attr_height = 16
+            ns_image.set_size(size_)
+            image_rep = nil
+            rep = ns_image.best_representation_for_device(nil)
+            if (rep.is_kind_of_class(OS.attr_class_nsbitmap_image_rep))
+              image_rep = NSBitmapImageRep.new(rep.attr_id)
+            end
+            if (!(image_rep).nil?)
+              # 64
+              width = RJava.cast_to_int(image_rep.pixels_wide)
+              # 64
+              height = RJava.cast_to_int(image_rep.pixels_high)
+              # 64
+              bpr = RJava.cast_to_int(image_rep.bytes_per_row)
+              # 64
+              bpp = RJava.cast_to_int(image_rep.bits_per_pixel)
+              data_size = height * bpr
+              src_data = Array.typed(::Java::Byte).new(data_size) { 0 }
+              OS.memmove(src_data, image_rep.bitmap_data, data_size)
+              # TODO: Image representation wrong???
+              palette = PaletteData.new(-0x1000000, 0xff0000, 0xff00)
+              data = ImageData.new(width, height, bpp, palette, 4, src_data)
+              data.attr_bytes_per_line = bpr
+              data.attr_alpha_data = Array.typed(::Java::Byte).new(width * height) { 0 }
+              i = 3
+              o = 0
+              while i < src_data.attr_length
+                data.attr_alpha_data[o] = src_data[i]
+                i += 4
+                o += 1
+              end
+              return data
+            end
+          end
+        end
+        return nil
+      ensure
+        pool.release
       end
-      return result
     end
     
     typesig { [] }
@@ -397,30 +449,6 @@ module Org::Eclipse::Swt::Program
     def get_name
       return @name
     end
-    
-    class_module.module_eval {
-      typesig { [Array.typed(::Java::Byte)] }
-      def get_program(fs_ref)
-        name = ""
-        name_ptr = Array.typed(::Java::Int).new(1) { 0 }
-        OS._lscopy_display_name_for_ref(fs_ref, name_ptr)
-        if (!(name_ptr[0]).equal?(0))
-          length_ = OS._cfstring_get_length(name_ptr[0])
-          if (!(length_).equal?(0))
-            buffer = CharArray.new(length_)
-            range = CFRange.new
-            range.attr_length = length_
-            OS._cfstring_get_characters(name_ptr[0], range, buffer)
-            name = RJava.cast_to_string(String.new(buffer))
-          end
-          OS._cfrelease(name_ptr[0])
-        end
-        program = Program.new
-        program.attr_fs_ref = fs_ref
-        program.attr_name = name
-        return program
-      end
-    }
     
     typesig { [Object] }
     # Compares the argument to the receiver, and returns true

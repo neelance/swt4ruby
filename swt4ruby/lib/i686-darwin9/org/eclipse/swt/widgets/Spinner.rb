@@ -1,6 +1,6 @@
 require "rjava"
 
-# Copyright (c) 2000, 2008 IBM Corporation and others.
+# Copyright (c) 2000, 2009 IBM Corporation and others.
 # All rights reserved. This program and the accompanying materials
 # are made available under the terms of the Eclipse Public License v1.0
 # which accompanies this distribution, and is available at
@@ -13,12 +13,10 @@ module Org::Eclipse::Swt::Widgets
     class_module.module_eval {
       include ::Java::Lang
       include ::Org::Eclipse::Swt::Widgets
-      include_const ::Org::Eclipse::Swt::Internal::Carbon, :CFRange
-      include_const ::Org::Eclipse::Swt::Internal::Carbon, :OS
-      include_const ::Org::Eclipse::Swt::Internal::Carbon, :Rect
       include ::Org::Eclipse::Swt
       include ::Org::Eclipse::Swt::Events
       include ::Org::Eclipse::Swt::Graphics
+      include ::Org::Eclipse::Swt::Internal::Cocoa
     }
   end
   
@@ -44,38 +42,27 @@ module Org::Eclipse::Swt::Widgets
   # @see <a href="http://www.eclipse.org/swt/">Sample code and further information</a>
   # 
   # @since 3.1
+  # @noextend This class is not intended to be subclassed by clients.
   class Spinner < SpinnerImports.const_get :Composite
     include_class_members SpinnerImports
     
-    attr_accessor :text_handle
-    alias_method :attr_text_handle, :text_handle
-    undef_method :text_handle
-    alias_method :attr_text_handle=, :text_handle=
-    undef_method :text_handle=
+    attr_accessor :text_view
+    alias_method :attr_text_view, :text_view
+    undef_method :text_view
+    alias_method :attr_text_view=, :text_view=
+    undef_method :text_view=
     
-    attr_accessor :button_handle
-    alias_method :attr_button_handle, :button_handle
-    undef_method :button_handle
-    alias_method :attr_button_handle=, :button_handle=
-    undef_method :button_handle=
+    attr_accessor :text_formatter
+    alias_method :attr_text_formatter, :text_formatter
+    undef_method :text_formatter
+    alias_method :attr_text_formatter=, :text_formatter=
+    undef_method :text_formatter=
     
-    attr_accessor :text_visible_rgn
-    alias_method :attr_text_visible_rgn, :text_visible_rgn
-    undef_method :text_visible_rgn
-    alias_method :attr_text_visible_rgn=, :text_visible_rgn=
-    undef_method :text_visible_rgn=
-    
-    attr_accessor :button_visible_rgn
-    alias_method :attr_button_visible_rgn, :button_visible_rgn
-    undef_method :button_visible_rgn
-    alias_method :attr_button_visible_rgn=, :button_visible_rgn=
-    undef_method :button_visible_rgn=
-    
-    attr_accessor :increment
-    alias_method :attr_increment, :increment
-    undef_method :increment
-    alias_method :attr_increment=, :increment=
-    undef_method :increment=
+    attr_accessor :button_view
+    alias_method :attr_button_view, :button_view
+    undef_method :button_view
+    alias_method :attr_button_view=, :button_view=
+    undef_method :button_view=
     
     attr_accessor :page_increment
     alias_method :attr_page_increment, :page_increment
@@ -98,7 +85,7 @@ module Org::Eclipse::Swt::Widgets
     class_module.module_eval {
       
       def gap
-        defined?(@@gap) ? @@gap : @@gap= 3
+        defined?(@@gap) ? @@gap : @@gap= 0
       end
       alias_method :attr_gap, :gap
       
@@ -144,56 +131,26 @@ module Org::Eclipse::Swt::Widgets
     # @see Widget#checkSubclass
     # @see Widget#getStyle
     def initialize(parent, style)
-      @text_handle = 0
-      @button_handle = 0
-      @text_visible_rgn = 0
-      @button_visible_rgn = 0
-      @increment = 0
+      @text_view = nil
+      @text_formatter = nil
+      @button_view = nil
       @page_increment = 0
       @digits = 0
       @text_limit = 0
       super(parent, check_style(style))
-      @increment = 1
       @page_increment = 10
       @digits = 0
       @text_limit = LIMIT
     end
     
     typesig { [::Java::Int, ::Java::Int] }
-    def action_proc(the_control, part_code)
-      result = super(the_control, part_code)
-      if ((result).equal?(OS.attr_no_err))
-        return result
+    # long
+    # long
+    def accepts_first_responder(id, sel)
+      if ((id).equal?(self.attr_view.attr_id))
+        return false
       end
-      if ((the_control).equal?(@button_handle))
-        parse_fail = Array.typed(::Java::Boolean).new(1) { false }
-        value = get_selection_text(parse_fail)
-        if (parse_fail[0])
-          value = OS._get_control32bit_value(@button_handle)
-        end
-        new_value = value
-        case (part_code)
-        when OS.attr_k_control_up_button_part
-          new_value += @increment
-        when OS.attr_k_control_down_button_part
-          new_value -= @increment
-        end
-        max = OS._get_control32bit_maximum(@button_handle)
-        min = OS._get_control32bit_minimum(@button_handle)
-        if (!((self.attr_style & SWT::WRAP)).equal?(0))
-          if (new_value > max)
-            new_value = min
-          end
-          if (new_value < min)
-            new_value = max
-          end
-        end
-        new_value = Math.min(Math.max(min, new_value), max)
-        if (!(value).equal?(new_value))
-          set_selection(new_value, true, true, true)
-        end
-      end
-      return result
+      return super(id, sel)
     end
     
     typesig { [ModifyListener] }
@@ -305,55 +262,36 @@ module Org::Eclipse::Swt::Widgets
     typesig { [::Java::Int, ::Java::Int, ::Java::Boolean] }
     def compute_size(w_hint, h_hint, changed)
       check_widget
+      # double
       width = 0
       height = 0
-      max_ = OS._get_control32bit_maximum(@button_handle)
-      string = String.value_of(max_)
-      if (@digits > 0)
-        buffer = StringBuffer.new
-        buffer.append(string)
-        buffer.append(get_decimal_separator)
-        count = @digits - string.length
-        while (count >= 0)
-          buffer.append("0")
-          count -= 1
-        end
-        string = RJava.cast_to_string(buffer.to_s)
-      end
-      buffer = CharArray.new(string.length)
-      string.get_chars(0, buffer.attr_length, buffer, 0)
-      ptr = OS._cfstring_create_with_characters(OS.attr_k_cfallocator_default, buffer, buffer.attr_length)
-      size = text_extent(ptr, 0)
-      if (!(ptr).equal?(0))
-        OS._cfrelease(ptr)
-      end
-      width = Math.max(width, size.attr_x)
-      height = Math.max(height, size.attr_y)
-      metric = Array.typed(::Java::Int).new(1) { 0 }
-      OS._get_theme_metric(OS.attr_k_theme_metric_edit_text_whitespace, metric)
-      width += metric[0] * 2
+      string = Double.to_s(@button_view.max_value)
+      font_ = Font.cocoa_new(self.attr_display, @text_view.font)
+      str = self.attr_parent.create_string(string, font_, nil, 0, true, false)
+      size_ = str.size
+      str.release
+      # 64
+      width = (size_.attr_width).to_f
+      # 64
+      height = (size_.attr_height).to_f
+      frame_rect = @text_view.frame
+      cell_ = NSCell.new(@text_view.cell)
+      cell_rect = cell_.drawing_rect_for_bounds(frame_rect)
+      width += frame_rect.attr_width - cell_rect.attr_width
+      height += frame_rect.attr_height - cell_rect.attr_height
+      width += self.attr_gap
+      size_ = @button_view.cell.cell_size
+      # 64
+      width += RJava.cast_to_int(size_.attr_width)
+      height = Math.max(height, size_.attr_height)
       if (!(w_hint).equal?(SWT::DEFAULT))
         width = w_hint
       end
       if (!(h_hint).equal?(SWT::DEFAULT))
         height = h_hint
       end
-      trim = compute_trim(0, 0, width, height)
-      OS._get_theme_metric(OS.attr_k_theme_metric_little_arrows_height, metric)
-      trim.attr_height = Math.max(trim.attr_height, metric[0])
+      trim = compute_trim(0, 0, RJava.cast_to_int(Math.ceil(width)), RJava.cast_to_int(Math.ceil(height)))
       return Point.new(trim.attr_width, trim.attr_height)
-    end
-    
-    typesig { [::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int] }
-    def compute_trim(x, y, width, height)
-      check_widget
-      inset_ = inset
-      width += inset_.attr_left + inset_.attr_right
-      height += inset_.attr_top + inset_.attr_bottom
-      out_metric = Array.typed(::Java::Int).new(1) { 0 }
-      OS._get_theme_metric(OS.attr_k_theme_metric_little_arrows_width, out_metric)
-      width += out_metric[0] + self.attr_gap
-      return Rectangle.new(x, y, width, height)
     end
     
     typesig { [] }
@@ -368,53 +306,36 @@ module Org::Eclipse::Swt::Widgets
     # </ul>
     def copy
       check_widget
-      selection = Array.typed(::Java::Short).new(2) { 0 }
-      if (!(OS._get_control_data(@text_handle, RJava.cast_to_short(OS.attr_k_control_entire_control), OS.attr_k_control_edit_text_selection_tag, 4, selection, nil)).equal?(OS.attr_no_err))
-        return
+      field_editor = @text_view.current_editor
+      if (!(field_editor).nil?)
+        field_editor.copy(nil)
+      else
+        # TODO
       end
-      if ((selection[0]).equal?(selection[1]))
-        return
-      end
-      actual_size = Array.typed(::Java::Int).new(1) { 0 }
-      ptr = Array.typed(::Java::Int).new(1) { 0 }
-      if (!(OS._get_control_data(@text_handle, RJava.cast_to_short(OS.attr_k_control_entire_control), OS.attr_k_control_edit_text_cfstring_tag, 4, ptr, actual_size)).equal?(OS.attr_no_err))
-        return
-      end
-      range = CFRange.new
-      range.attr_location = selection[0]
-      range.attr_length = selection[1] - selection[0]
-      buffer = CharArray.new(range.attr_length)
-      OS._cfstring_get_characters(ptr[0], range, buffer)
-      OS._cfrelease(ptr[0])
-      copy_to_clipboard(buffer)
     end
     
     typesig { [] }
     def create_handle
-      window = OS._get_control_owner(self.attr_parent.attr_handle)
-      action_proc = self.attr_display.attr_action_proc
-      features = OS.attr_k_control_supports_embedding | OS.attr_k_control_supports_focus
-      out_control = Array.typed(::Java::Int).new(1) { 0 }
-      OS._create_user_pane_control(window, nil, features, out_control)
-      if ((out_control[0]).equal?(0))
-        error(SWT::ERROR_NO_HANDLES)
-      end
-      self.attr_handle = out_control[0]
-      OS._create_little_arrows_control(window, nil, 0, 0, 100, 1, out_control)
-      if ((out_control[0]).equal?(0))
-        error(SWT::ERROR_NO_HANDLES)
-      end
-      @button_handle = out_control[0]
-      OS._set_control_action(@button_handle, action_proc)
-      OS._create_edit_unicode_text_control(window, nil, 0, false, nil, out_control)
-      if ((out_control[0]).equal?(0))
-        error(SWT::ERROR_NO_HANDLES)
-      end
-      @text_handle = out_control[0]
-      OS._set_control_data(@text_handle, OS.attr_k_control_entire_control, OS.attr_k_control_edit_text_single_line_tag, 1, Array.typed(::Java::Byte).new([1]))
-      if (!((self.attr_style & SWT::READ_ONLY)).equal?(0))
-        OS._set_control_data(@text_handle, OS.attr_k_control_entire_control, OS.attr_k_control_edit_text_locked_tag, 1, Array.typed(::Java::Byte).new([1]))
-      end
+      widget = SWTView.new.alloc
+      widget.init
+      # widget.setDrawsBackground(false);
+      button_widget = SWTStepper.new.alloc
+      button_widget.init
+      button_widget.set_value_wraps(!((self.attr_style & SWT::WRAP)).equal?(0))
+      button_widget.set_target(button_widget)
+      button_widget.set_action(OS.attr_sel_send_selection)
+      button_widget.set_max_value(100)
+      text_widget = SWTTextField.new.alloc
+      text_widget.init
+      # textWidget.setTarget(widget);
+      text_widget.set_editable(((self.attr_style & SWT::READ_ONLY)).equal?(0))
+      @text_formatter = NSNumberFormatter.new.alloc
+      @text_formatter.init
+      widget.add_subview(text_widget)
+      widget.add_subview(button_widget)
+      @button_view = button_widget
+      @text_view = text_widget
+      self.attr_view = widget
       set_selection(0, false, true, false)
     end
     
@@ -434,38 +355,42 @@ module Org::Eclipse::Swt::Widgets
       if (!((self.attr_style & SWT::READ_ONLY)).equal?(0))
         return
       end
-      selection = Array.typed(::Java::Short).new(2) { 0 }
-      if (!(OS._get_control_data(@text_handle, RJava.cast_to_short(OS.attr_k_control_entire_control), OS.attr_k_control_edit_text_selection_tag, 4, selection, nil)).equal?(OS.attr_no_err))
-        return
+      field_editor = @text_view.current_editor
+      if (!(field_editor).nil?)
+        field_editor.cut(nil)
+      else
+        # TODO
       end
-      if ((selection[0]).equal?(selection[1]))
-        return
-      end
-      buffer = set_text("", selection[0], selection[1], true)
-      if (!(buffer).nil?)
-        copy_to_clipboard(buffer)
-      end
+    end
+    
+    typesig { [::Java::Boolean] }
+    def enable_widget(enabled)
+      super(enabled)
+      @button_view.set_enabled(enabled)
+      @text_view.set_enabled(enabled)
+    end
+    
+    typesig { [] }
+    def default_nsfont
+      return self.attr_display.attr_text_field_font
     end
     
     typesig { [] }
     def deregister
       super
-      self.attr_display.remove_widget(@text_handle)
-      self.attr_display.remove_widget(@button_handle)
-    end
-    
-    typesig { [::Java::Int, ::Java::Int] }
-    def draw_background(control, context)
-      if ((control).equal?(@text_handle))
-        fill_background(control, context, nil)
-      else
-        self.attr_parent.fill_background(control, context, nil)
+      if (!(@text_view).nil?)
+        self.attr_display.remove_widget(@text_view)
+        self.attr_display.remove_widget(@text_view.cell)
+      end
+      if (!(@button_view).nil?)
+        self.attr_display.remove_widget(@button_view)
+        self.attr_display.remove_widget(@button_view.cell)
       end
     end
     
     typesig { [] }
-    def focus_handle
-      return @text_handle
+    def focus_view
+      return @text_view
     end
     
     typesig { [] }
@@ -483,23 +408,6 @@ module Org::Eclipse::Swt::Widgets
     end
     
     typesig { [] }
-    def get_decimal_separator
-      locale = OS._cflocale_copy_current
-      formatter = OS._cfnumber_formatter_create(OS.attr_k_cfallocator_default, locale, OS.attr_k_cfnumber_formatter_decimal_style)
-      key = OS.k_cfnumber_formatter_decimal_separator
-      result = OS._cfnumber_formatter_copy_property(formatter, key)
-      range = CFRange.new
-      range.attr_location = 0
-      range.attr_length = OS._cfstring_get_length(result)
-      buffer = CharArray.new(range.attr_length)
-      OS._cfstring_get_characters(result, range, buffer)
-      OS._cfrelease(result)
-      OS._cfrelease(formatter)
-      OS._cfrelease(locale)
-      return String.new(buffer)
-    end
-    
-    typesig { [] }
     # Returns the amount that the receiver's value will be
     # modified by when the up/down arrows are pressed.
     # 
@@ -511,7 +419,7 @@ module Org::Eclipse::Swt::Widgets
     # </ul>
     def get_increment
       check_widget
-      return @increment
+      return RJava.cast_to_int(@button_view.increment)
     end
     
     typesig { [] }
@@ -525,7 +433,7 @@ module Org::Eclipse::Swt::Widgets
     # </ul>
     def get_maximum
       check_widget
-      return OS._get_control32bit_maximum(@button_handle)
+      return RJava.cast_to_int(@button_view.max_value)
     end
     
     typesig { [] }
@@ -539,7 +447,7 @@ module Org::Eclipse::Swt::Widgets
     # </ul>
     def get_minimum
       check_widget
-      return OS._get_control32bit_minimum(@button_handle)
+      return RJava.cast_to_int(@button_view.min_value)
     end
     
     typesig { [] }
@@ -568,69 +476,59 @@ module Org::Eclipse::Swt::Widgets
     # </ul>
     def get_selection
       check_widget
-      return OS._get_control32bit_value(@button_handle)
+      return RJava.cast_to_int((@button_view).double_value)
     end
     
     typesig { [Array.typed(::Java::Boolean)] }
     def get_selection_text(parse_fail)
-      actual_size = Array.typed(::Java::Int).new(1) { 0 }
-      ptr = Array.typed(::Java::Int).new(1) { 0 }
-      if ((OS._get_control_data(@text_handle, RJava.cast_to_short(OS.attr_k_control_entire_control), OS.attr_k_control_edit_text_cfstring_tag, 4, ptr, actual_size)).equal?(OS.attr_no_err))
-        range = CFRange.new
-        range.attr_location = 0
-        range.attr_length = OS._cfstring_get_length(ptr[0])
-        buffer = CharArray.new(range.attr_length)
-        OS._cfstring_get_characters(ptr[0], range, buffer)
-        OS._cfrelease(ptr[0])
-        string = String.new(buffer)
-        begin
-          value = 0
-          if (@digits > 0)
-            decimal_separator = get_decimal_separator
-            index = string.index_of(decimal_separator)
-            if (!(index).equal?(-1))
-              start_index = string.starts_with("+") || string.starts_with("-") ? 1 : 0
-              whole_part = !(start_index).equal?(index) ? string.substring(start_index, index) : "0"
-              decimal_part = string.substring(index + 1)
-              if (decimal_part.length > @digits)
-                decimal_part = RJava.cast_to_string(decimal_part.substring(0, @digits))
-              else
-                i = @digits - decimal_part.length
-                j = 0
-                while j < i
-                  decimal_part = decimal_part + "0"
-                  j += 1
-                end
-              end
-              whole_value = JavaInteger.parse_int(whole_part)
-              decimal_value = JavaInteger.parse_int(decimal_part)
-              i = 0
-              while i < @digits
-                whole_value *= 10
-                i += 1
-              end
-              value = whole_value + decimal_value
-              if (string.starts_with("-"))
-                value = -value
-              end
+      string = @text_view.string_value.get_string
+      begin
+        value = 0
+        if (@digits > 0)
+          decimal_separator_ = @text_formatter.decimal_separator.get_string
+          index = string.index_of(decimal_separator_)
+          if (!(index).equal?(-1))
+            start_index = string.starts_with("+") || string.starts_with("-") ? 1 : 0
+            whole_part = !(start_index).equal?(index) ? string.substring(start_index, index) : "0"
+            decimal_part = string.substring(index + 1)
+            if (decimal_part.length > @digits)
+              decimal_part = RJava.cast_to_string(decimal_part.substring(0, @digits))
             else
-              value = JavaInteger.parse_int(string)
-              i = 0
-              while i < @digits
-                value *= 10
-                i += 1
+              i = @digits - decimal_part.length
+              j = 0
+              while j < i
+                decimal_part = decimal_part + "0"
+                j += 1
               end
+            end
+            whole_value = JavaInteger.parse_int(whole_part)
+            decimal_value = JavaInteger.parse_int(decimal_part)
+            i = 0
+            while i < @digits
+              whole_value *= 10
+              i += 1
+            end
+            value = whole_value + decimal_value
+            if (string.starts_with("-"))
+              value = -value
             end
           else
             value = JavaInteger.parse_int(string)
+            i = 0
+            while i < @digits
+              value *= 10
+              i += 1
+            end
           end
-          max_ = OS._get_control32bit_maximum(@button_handle)
-          min_ = OS._get_control32bit_minimum(@button_handle)
-          if (min_ <= value && value <= max_)
-            return value
-          end
-        rescue NumberFormatException => e
+        else
+          value = JavaInteger.parse_int(string)
         end
+        max_ = get_maximum
+        min = get_minimum
+        if (min <= value && value <= max_)
+          return value
+        end
+      rescue NumberFormatException => e
       end
       parse_fail[0] = true
       return -1
@@ -650,18 +548,9 @@ module Org::Eclipse::Swt::Widgets
     # 
     # @since 3.4
     def get_text
-      ptr = Array.typed(::Java::Int).new(1) { 0 }
-      actual_size = Array.typed(::Java::Int).new(1) { 0 }
-      result = OS._get_control_data(@text_handle, RJava.cast_to_short(OS.attr_k_control_entire_control), OS.attr_k_control_edit_text_cfstring_tag, 4, ptr, actual_size)
-      if (!(result).equal?(OS.attr_no_err))
-        return ""
-      end
-      range = CFRange.new
-      range.attr_length = OS._cfstring_get_length(ptr[0])
-      buffer = CharArray.new(range.attr_length)
-      OS._cfstring_get_characters(ptr[0], range, buffer)
-      OS._cfrelease(ptr[0])
-      return String.new(buffer)
+      check_widget
+      str = NSTextFieldCell.new(@text_view.cell).title
+      return str.get_string
     end
     
     typesig { [] }
@@ -685,201 +574,10 @@ module Org::Eclipse::Swt::Widgets
       return @text_limit
     end
     
-    typesig { [::Java::Int, ::Java::Boolean] }
-    def get_visible_region(control, clip_children)
-      if ((control).equal?(@text_handle))
-        if (!clip_children)
-          return super(control, clip_children)
-        end
-        if ((@text_visible_rgn).equal?(0))
-          @text_visible_rgn = OS._new_rgn
-          calculate_visible_region(control, @text_visible_rgn, clip_children)
-        end
-        result = OS._new_rgn
-        OS._copy_rgn(@text_visible_rgn, result)
-        return result
-      end
-      if ((control).equal?(@button_handle))
-        if (!clip_children)
-          return super(control, clip_children)
-        end
-        if ((@button_visible_rgn).equal?(0))
-          @button_visible_rgn = OS._new_rgn
-          calculate_visible_region(control, @button_visible_rgn, clip_children)
-        end
-        result = OS._new_rgn
-        OS._copy_rgn(@button_visible_rgn, result)
-        return result
-      end
-      return super(control, clip_children)
-    end
-    
-    typesig { [] }
-    def hook_events
-      super
-      control_proc = self.attr_display.attr_control_proc
-      mask = Array.typed(::Java::Int).new([OS.attr_k_event_class_control, OS.attr_k_event_control_draw, OS.attr_k_event_class_control, OS.attr_k_event_control_set_focus_part, OS.attr_k_event_class_control, OS.attr_k_event_control_track, OS.attr_k_event_class_control, OS.attr_k_event_control_get_click_activation, ])
-      control_target = OS._get_control_event_target(@text_handle)
-      OS._install_event_handler(control_target, control_proc, mask.attr_length / 2, mask, self.attr_handle, nil)
-      control_target = OS._get_control_event_target(@button_handle)
-      OS._install_event_handler(control_target, control_proc, mask.attr_length / 2, mask, self.attr_handle, nil)
-    end
-    
-    typesig { [] }
-    def inset
-      return self.attr_display.attr_edit_text_inset
-    end
-    
-    typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
-    def k_event_accessible_get_named_attribute(next_handler, the_event, user_data)
-      code = OS.attr_event_not_handled_err
-      string_ref = Array.typed(::Java::Int).new(1) { 0 }
-      OS._get_event_parameter(the_event, OS.attr_k_event_param_accessible_attribute_name, OS.attr_type_cfstring_ref, nil, 4, nil, string_ref)
-      length_ = 0
-      if (!(string_ref[0]).equal?(0))
-        length_ = OS._cfstring_get_length(string_ref[0])
-      end
-      buffer = CharArray.new(length_)
-      range = CFRange.new
-      range.attr_length = length_
-      OS._cfstring_get_characters(string_ref[0], range, buffer)
-      attribute_name = String.new(buffer)
-      if ((attribute_name == OS.attr_k_axrole_attribute) || (attribute_name == OS.attr_k_axrole_description_attribute))
-        role_text = OS.attr_k_axgroup_role
-        buffer = CharArray.new(role_text.length)
-        role_text.get_chars(0, buffer.attr_length, buffer, 0)
-        string_ref[0] = OS._cfstring_create_with_characters(OS.attr_k_cfallocator_default, buffer, buffer.attr_length)
-        if (!(string_ref[0]).equal?(0))
-          if ((attribute_name == OS.attr_k_axrole_attribute))
-            OS._set_event_parameter(the_event, OS.attr_k_event_param_accessible_attribute_value, OS.attr_type_cfstring_ref, 4, string_ref)
-          else
-            # kAXRoleDescriptionAttribute
-            string_ref2 = OS._hicopy_accessibility_role_description(string_ref[0], 0)
-            OS._set_event_parameter(the_event, OS.attr_k_event_param_accessible_attribute_value, OS.attr_type_cfstring_ref, 4, Array.typed(::Java::Int).new([string_ref2]))
-            OS._cfrelease(string_ref2)
-          end
-          OS._cfrelease(string_ref[0])
-          code = OS.attr_no_err
-        end
-      end
-      if (!(self.attr_accessible).nil?)
-        code = self.attr_accessible.internal_k_event_accessible_get_named_attribute(next_handler, the_event, code)
-      end
-      return code
-    end
-    
-    typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
-    def k_event_control_set_focus_part(next_handler, the_event, user_data)
-      result = super(next_handler, the_event, user_data)
-      if ((result).equal?(OS.attr_no_err))
-        part = Array.typed(::Java::Short).new(1) { 0 }
-        OS._get_event_parameter(the_event, OS.attr_k_event_param_control_part, OS.attr_type_control_part_code, nil, 2, nil, part)
-        if ((part[0]).equal?(OS.attr_k_control_focus_no_part))
-          parse_fail = Array.typed(::Java::Boolean).new(1) { false }
-          value = get_selection_text(parse_fail)
-          if (parse_fail[0])
-            value = OS._get_control32bit_value(@button_handle)
-            set_selection(value, false, true, false)
-          end
-        end
-      end
-      return result
-    end
-    
-    typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
-    def k_event_unicode_key_pressed(next_handler, the_event, user_data)
-      result = super(next_handler, the_event, user_data)
-      if ((result).equal?(OS.attr_no_err))
-        return result
-      end
-      keyboard_event = Array.typed(::Java::Int).new(1) { 0 }
-      OS._get_event_parameter(the_event, OS.attr_k_event_param_text_input_send_keyboard_event, OS.attr_type_event_ref, nil, keyboard_event.attr_length * 4, nil, keyboard_event)
-      key_code = Array.typed(::Java::Int).new(1) { 0 }
-      OS._get_event_parameter(keyboard_event[0], OS.attr_k_event_param_key_code, OS.attr_type_uint32, nil, key_code.attr_length * 4, nil, key_code)
-      modifiers = Array.typed(::Java::Int).new(1) { 0 }
-      OS._get_event_parameter(keyboard_event[0], OS.attr_k_event_param_key_modifiers, OS.attr_type_uint32, nil, 4, nil, modifiers)
-      if ((modifiers[0]).equal?(OS.attr_cmd_key))
-        case (key_code[0])
-        when 7
-          # X
-          cut
-          return OS.attr_no_err
-        when 8
-          # C
-          copy
-          return OS.attr_no_err
-        when 9
-          # V
-          paste
-          return OS.attr_no_err
-        end
-      end
-      delta = 0
-      case (key_code[0])
-      # KP Enter
-      when 76, 36
-        # Return
-        post_event(SWT::DefaultSelection)
-        return OS.attr_no_err
-      when 116
-        # Page Up
-        delta = @page_increment
-      when 121
-        # Page Down
-        delta = -@page_increment
-      when 125
-        # Down
-        delta = -@increment
-      when 126
-        # Up
-        delta = @increment
-      end
-      if (!(delta).equal?(0))
-        parse_fail = Array.typed(::Java::Boolean).new(1) { false }
-        value = get_selection_text(parse_fail)
-        if (parse_fail[0])
-          value = OS._get_control32bit_value(@button_handle)
-        end
-        new_value = value + delta
-        max_ = OS._get_control32bit_maximum(@button_handle)
-        min_ = OS._get_control32bit_minimum(@button_handle)
-        if (!((self.attr_style & SWT::WRAP)).equal?(0))
-          if (new_value > max_)
-            new_value = min_
-          end
-          if (new_value < min_)
-            new_value = max_
-          end
-        end
-        new_value = Math.min(Math.max(min_, new_value), max_)
-        if (!(value).equal?(new_value))
-          set_selection(new_value, true, true, true)
-        end
-        return OS.attr_no_err
-      else
-        result = OS._call_next_event_handler(next_handler, the_event)
-        parse_fail = Array.typed(::Java::Boolean).new(1) { false }
-        value = get_selection_text(parse_fail)
-        if (!parse_fail[0])
-          pos = OS._get_control32bit_value(@button_handle)
-          if (!(pos).equal?(value))
-            set_selection(value, true, false, true)
-          end
-        end
-      end
-      return result
-    end
-    
-    typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
-    def k_event_text_input_update_active_input_area(next_handler, the_event, user_data)
-      length_ = Array.typed(::Java::Int).new(1) { 0 }
-      OS._get_event_parameter(the_event, OS.attr_k_event_param_text_input_send_text, OS.attr_type_unicode_text, nil, 0, length_, nil)
-      fixed_length = Array.typed(::Java::Int).new(1) { 0 }
-      OS._get_event_parameter(the_event, OS.attr_k_event_param_text_input_send_fix_len, OS.attr_type_long_integer, nil, 4, nil, fixed_length)
-      if ((fixed_length[0]).equal?(-1) || (fixed_length[0]).equal?(length_[0]))
-        post_event(SWT::Modify)
-      end
-      return OS.attr_event_not_handled_err
+    typesig { [::Java::Int] }
+    # long
+    def is_event_view(id)
+      return true
     end
     
     typesig { [] }
@@ -898,32 +596,50 @@ module Org::Eclipse::Swt::Widgets
       if (!((self.attr_style & SWT::READ_ONLY)).equal?(0))
         return
       end
-      text = get_clipboard_text
-      selection = Array.typed(::Java::Short).new(2) { 0 }
-      if (!(OS._get_control_data(@text_handle, RJava.cast_to_short(OS.attr_k_control_entire_control), OS.attr_k_control_edit_text_selection_tag, 4, selection, nil)).equal?(OS.attr_no_err))
-        return
+      field_editor = @text_view.current_editor
+      if (!(field_editor).nil?)
+        field_editor.paste(nil)
+      else
+        # TODO
       end
-      set_text(text, selection[0], selection[1], true)
-    end
-    
-    typesig { [] }
-    def poll_track_event
-      return true
-    end
-    
-    typesig { [] }
-    def redraw
-      check_widget
-      super
-      redraw_widget(@text_handle, false)
-      redraw_widget(@button_handle, false)
     end
     
     typesig { [] }
     def register
       super
-      self.attr_display.add_widget(@text_handle, self)
-      self.attr_display.add_widget(@button_handle, self)
+      if (!(@text_view).nil?)
+        self.attr_display.add_widget(@text_view, self)
+        self.attr_display.add_widget(@text_view.cell, self)
+      end
+      if (!(@button_view).nil?)
+        self.attr_display.add_widget(@button_view, self)
+        self.attr_display.add_widget(@button_view.cell, self)
+      end
+    end
+    
+    typesig { [] }
+    def release_handle
+      super
+      if (!(@text_formatter).nil?)
+        @text_formatter.release
+      end
+      if (!(@button_view).nil?)
+        @button_view.release
+      end
+      if (!(@text_view).nil?)
+        @text_view.release
+      end
+      @text_formatter = nil
+      @button_view = nil
+      @text_view = nil
+    end
+    
+    typesig { [] }
+    def release_widget
+      super
+      if (!(@text_view).nil?)
+        @text_view.abort_editing
+      end
     end
     
     typesig { [ModifyListener] }
@@ -1008,115 +724,108 @@ module Org::Eclipse::Swt::Widgets
       self.attr_event_table.unhook(SWT::Verify, listener)
     end
     
-    typesig { [::Java::Int] }
-    def reset_visible_region(control)
-      if (!(@text_visible_rgn).equal?(0))
-        OS._dispose_rgn(@text_visible_rgn)
-        @text_visible_rgn = 0
+    typesig { [] }
+    def resized
+      super
+      @button_view.size_to_fit
+      text_size = @text_view.cell.cell_size
+      button_frame = @button_view.bounds
+      frame_ = self.attr_view.frame
+      button_frame.attr_x = frame_.attr_width - button_frame.attr_width
+      button_frame.attr_y = (frame_.attr_height - button_frame.attr_height) / 2
+      text_height = RJava.cast_to_int(Math.min(text_size.attr_height, frame_.attr_height))
+      frame_.attr_x = 0
+      frame_.attr_y = (frame_.attr_height - text_height) / 2
+      frame_.attr_width -= button_frame.attr_width + self.attr_gap
+      frame_.attr_height = text_height
+      @text_view.set_frame(frame_)
+      @button_view.set_frame(button_frame)
+    end
+    
+    typesig { [NSEvent, ::Java::Int] }
+    def send_key_event(ns_event, type)
+      result = super(ns_event, type)
+      if (!result)
+        return result
       end
-      if (!(@button_visible_rgn).equal?(0))
-        OS._dispose_rgn(@button_visible_rgn)
-        @button_visible_rgn = 0
+      if (!(type).equal?(SWT::KeyDown))
+        return result
       end
-      super(control)
+      delta = 0
+      key_code_ = ns_event.key_code
+      case (key_code_)
+      # KP Enter
+      # Page Up
+      # Page Down
+      # Down arrow
+      when 76, 36
+        # Return
+        post_event(SWT::DefaultSelection)
+        return true
+      when 116
+        delta = @page_increment
+      when 121
+        delta = -@page_increment
+      when 125
+        delta = -get_increment
+      when 126
+        delta = get_increment
+      end
+      # Up arrow
+      if (!(delta).equal?(0))
+        parse_fail = Array.typed(::Java::Boolean).new(1) { false }
+        value = get_selection_text(parse_fail)
+        if (parse_fail[0])
+          value = RJava.cast_to_int(@button_view.double_value)
+        end
+        new_value = value + delta
+        max_ = RJava.cast_to_int(@button_view.max_value)
+        min_ = RJava.cast_to_int(@button_view.min_value)
+        if (!((self.attr_style & SWT::WRAP)).equal?(0))
+          if (new_value > max_)
+            new_value = min_
+          end
+          if (new_value < min_)
+            new_value = max_
+          end
+        end
+        new_value = Math.min(Math.max(min_, new_value), max_)
+        if (!(value).equal?(new_value))
+          set_selection(new_value, true, true, true)
+        end
+        # Prevent the arrow or page up/down from being handled by the text field.
+        result = false
+      else
+        parse_fail = Array.typed(::Java::Boolean).new(1) { false }
+        value = get_selection_text(parse_fail)
+        if (!parse_fail[0])
+          pos = RJava.cast_to_int(@button_view.double_value)
+          if (!(pos).equal?(value))
+            set_selection(value, true, false, true)
+          end
+        end
+      end
+      return result
     end
     
     typesig { [] }
-    def resize_client_area
-      out_metric = Array.typed(::Java::Int).new(1) { 0 }
-      OS._get_theme_metric(OS.attr_k_theme_metric_little_arrows_width, out_metric)
-      button_width = out_metric[0] + self.attr_gap
-      OS._get_theme_metric(OS.attr_k_theme_metric_little_arrows_height, out_metric)
-      button_height = out_metric[0]
-      rect = Rect.new
-      OS._get_control_bounds(self.attr_handle, rect)
-      inset_ = inset
-      width = Math.max(0, rect.attr_right - rect.attr_left - inset_.attr_left - inset_.attr_right - button_width)
-      height = Math.max(0, rect.attr_bottom - rect.attr_top - inset_.attr_top - inset_.attr_bottom)
-      button_height = Math.min(button_height, rect.attr_bottom - rect.attr_top)
-      set_bounds(@text_handle, inset_.attr_left, inset_.attr_top, width, height, true, true, false)
-      set_bounds(@button_handle, inset_.attr_left + inset_.attr_right + width + self.attr_gap, inset_.attr_top + (height - button_height) / 2, button_width, button_height, true, true, false)
+    def send_selection
+      set_selection(get_selection, false, true, true)
     end
     
-    typesig { [::Java::Int, Event] }
-    def send_key_event(type, event)
-      if (!super(type, event))
-        return false
-      end
-      if (!(type).equal?(SWT::KeyDown))
-        return true
-      end
-      if (!((self.attr_style & SWT::READ_ONLY)).equal?(0))
-        return true
-      end
-      if ((event.attr_character).equal?(0))
-        return true
-      end
-      if (!((event.attr_state_mask & SWT::COMMAND)).equal?(0))
-        return true
-      end
-      # if (!hooks (SWT.Verify) && !filters (SWT.Verify)) return true;
-      old_text = ""
-      new_text = ""
-      actual_size = Array.typed(::Java::Int).new(1) { 0 }
-      ptr = Array.typed(::Java::Int).new(1) { 0 }
-      char_count = 0
-      if ((OS._get_control_data(@text_handle, RJava.cast_to_short(OS.attr_k_control_entire_control), OS.attr_k_control_edit_text_cfstring_tag, 4, ptr, actual_size)).equal?(OS.attr_no_err))
-        char_count = OS._cfstring_get_length(ptr[0])
-        OS._cfrelease(ptr[0])
-      end
-      selection = Array.typed(::Java::Short).new(2) { 0 }
-      OS._get_control_data(@text_handle, RJava.cast_to_short(OS.attr_k_control_entire_control), OS.attr_k_control_edit_text_selection_tag, 4, selection, nil)
-      start = selection[0]
-      end_ = selection[1]
-      case (event.attr_character)
-      when SWT::BS
-        if ((start).equal?(end_))
-          if ((start).equal?(0))
-            return true
-          end
-          start = Math.max(0, start - 1)
-        end
-      when SWT::DEL
-        if ((start).equal?(end_))
-          if ((start).equal?(char_count))
-            return true
-          end
-          end_ = Math.min(end_ + 1, char_count)
-        end
-      when SWT::CR
-        return true
+    typesig { [] }
+    def update_background
+      ns_color = nil
+      if (!(self.attr_background_image).nil?)
+        ns_color = NSColor.color_with_pattern_image(self.attr_background_image.attr_handle)
       else
-        if (!(event.attr_character).equal?(Character.new(?\t.ord)) && event.attr_character < 0x20)
-          return true
+        if (!(self.attr_background).nil?)
+          ns_color = NSColor.color_with_device_red(self.attr_background[0], self.attr_background[1], self.attr_background[2], self.attr_background[3])
+        else
+          ns_color = NSColor.text_background_color
         end
-        old_text = RJava.cast_to_string(String.new(Array.typed(::Java::Char).new([event.attr_character])))
       end
-      new_text = RJava.cast_to_string(verify_text(old_text, start, end_, event))
-      if ((new_text).nil?)
-        return false
-      end
-      if (char_count - (end_ - start) + new_text.length > @text_limit)
-        return false
-      end
-      if (!(new_text).equal?(old_text))
-        set_text(new_text, start, end_, false)
-        start += new_text.length
-        selection = Array.typed(::Java::Short).new([RJava.cast_to_short(start), RJava.cast_to_short(start)])
-        OS._set_control_data(@text_handle, RJava.cast_to_short(OS.attr_k_control_entire_control), OS.attr_k_control_edit_text_selection_tag, 4, selection)
-      end
-      # Post the modify event so that the character will be inserted
-      # into the widget when the modify event is delivered.  Normally,
-      # modify events are sent but it is safe to post the event here
-      # because this method is called from the event loop.
-      post_event(SWT::Modify)
-      return (new_text).equal?(old_text)
-    end
-    
-    typesig { [Array.typed(::Java::Float)] }
-    def set_background(color)
-      super(color)
-      set_background(@text_handle, color)
+      (@text_view).set_background_color(ns_color)
     end
     
     typesig { [::Java::Int] }
@@ -1147,20 +856,25 @@ module Org::Eclipse::Swt::Widgets
         return
       end
       @digits = value
-      pos = OS._get_control32bit_value(@button_handle)
+      pos = RJava.cast_to_int(@button_view.double_value)
       set_selection(pos, false, true, false)
     end
     
-    typesig { [Font] }
-    def set_font_style(font)
-      super(font)
-      set_font_style(@text_handle, font)
+    typesig { [NSFont] }
+    def set_font(font_)
+      @text_view.set_font(font_)
     end
     
     typesig { [Array.typed(::Java::Float)] }
+    # double
     def set_foreground(color)
-      super(color)
-      set_foreground(@text_handle, color)
+      ns_color = nil
+      if ((color).nil?)
+        ns_color = NSColor.text_color
+      else
+        ns_color = NSColor.color_with_device_red(color[0], color[1], color[2], 1)
+      end
+      (@text_view).set_text_color(ns_color)
     end
     
     typesig { [::Java::Int] }
@@ -1179,7 +893,7 @@ module Org::Eclipse::Swt::Widgets
       if (value < 1)
         return
       end
-      @increment = value
+      @button_view.set_increment(value)
     end
     
     typesig { [::Java::Int] }
@@ -1196,12 +910,12 @@ module Org::Eclipse::Swt::Widgets
     # </ul>
     def set_maximum(value)
       check_widget
-      min_ = OS._get_control32bit_minimum(@button_handle)
+      min_ = get_minimum
       if (value <= min_)
         return
       end
-      pos = OS._get_control32bit_value(@button_handle)
-      OS._set_control32bit_maximum(@button_handle, value)
+      pos = get_selection
+      @button_view.set_max_value(value)
       if (pos > value)
         set_selection(value, true, true, false)
       end
@@ -1221,12 +935,12 @@ module Org::Eclipse::Swt::Widgets
     # </ul>
     def set_minimum(value)
       check_widget
-      max_ = OS._get_control32bit_maximum(@button_handle)
+      max_ = get_maximum
       if (value >= max_)
         return
       end
-      pos = OS._get_control32bit_value(@button_handle)
-      OS._set_control32bit_minimum(@button_handle, value)
+      pos = get_selection
+      @button_view.set_min_value(value)
       if (pos < value)
         set_selection(value, true, true, false)
       end
@@ -1265,36 +979,30 @@ module Org::Eclipse::Swt::Widgets
     # </ul>
     def set_selection(value)
       check_widget
-      min_ = OS._get_control32bit_minimum(@button_handle)
-      max_ = OS._get_control32bit_maximum(@button_handle)
+      min_ = get_minimum
+      max_ = get_maximum
       value = Math.min(Math.max(min_, value), max_)
       set_selection(value, true, true, false)
     end
     
     typesig { [::Java::Int, ::Java::Boolean, ::Java::Boolean, ::Java::Boolean] }
-    def set_selection(value, set_pos, set_text_, notify)
+    def set_selection(value, set_pos, set_text, notify)
       if (set_pos)
-        OS._set_control32bit_value(@button_handle, value)
+        (@button_view).set_double_value(value)
       end
-      if (set_text_)
-        string = nil
-        if ((@digits).equal?(0))
-          string = RJava.cast_to_string(String.value_of(value))
-        else
-          string = RJava.cast_to_string(String.value_of(Math.abs(value)))
-          decimal_separator = get_decimal_separator
+      if (set_text)
+        string = String.value_of(value)
+        if (@digits > 0)
+          decimal_separator_ = @text_formatter.decimal_separator.get_string
           index = string.length - @digits
           buffer = StringBuffer.new
-          if (value < 0)
-            buffer.append("-")
-          end
           if (index > 0)
             buffer.append(string.substring(0, index))
-            buffer.append(decimal_separator)
+            buffer.append(decimal_separator_)
             buffer.append(string.substring(index))
           else
             buffer.append("0")
-            buffer.append(decimal_separator)
+            buffer.append(decimal_separator_)
             while (((index += 1) - 1) < 0)
               buffer.append("0")
             end
@@ -1302,29 +1010,23 @@ module Org::Eclipse::Swt::Widgets
           end
           string = RJava.cast_to_string(buffer.to_s)
         end
+        cell_ = NSCell.new(@text_view.cell)
         if (hooks(SWT::Verify) || filters(SWT::Verify))
-          actual_size = Array.typed(::Java::Int).new(1) { 0 }
-          ptr = Array.typed(::Java::Int).new(1) { 0 }
-          length_ = 0
-          if ((OS._get_control_data(@text_handle, RJava.cast_to_short(OS.attr_k_control_entire_control), OS.attr_k_control_edit_text_cfstring_tag, 4, ptr, actual_size)).equal?(OS.attr_no_err))
-            length_ = OS._cfstring_get_length(ptr[0])
-            OS._cfrelease(ptr[0])
-          end
+          # 64
+          length_ = RJava.cast_to_int(cell_.title.length)
           string = RJava.cast_to_string(verify_text(string, 0, length_, nil))
           if ((string).nil?)
             return
           end
         end
-        buffer = CharArray.new(string.length)
-        string.get_chars(0, buffer.attr_length, buffer, 0)
-        ptr = OS._cfstring_create_with_characters(OS.attr_k_cfallocator_default, buffer, buffer.attr_length)
-        if ((ptr).equal?(0))
-          error(SWT::ERROR_CANNOT_SET_TEXT)
+        @text_view.set_string_value(NSString.string_with(string))
+        selection = NSRange.new
+        selection.attr_location = 0
+        selection.attr_length = string.length
+        field_editor = @text_view.current_editor
+        if (!(field_editor).nil?)
+          field_editor.set_selected_range(selection)
         end
-        OS._set_control_data(@text_handle, OS.attr_k_control_entire_control, OS.attr_k_control_edit_text_cfstring_tag, 4, Array.typed(::Java::Int).new([ptr]))
-        OS._cfrelease(ptr)
-        selection = Array.typed(::Java::Short).new([0, RJava.cast_to_short(string.length)])
-        OS._set_control_data(@text_handle, RJava.cast_to_short(OS.attr_k_control_entire_control), OS.attr_k_control_edit_text_selection_tag, 4, selection)
         send_event(SWT::Modify)
       end
       if (notify)
@@ -1332,57 +1034,10 @@ module Org::Eclipse::Swt::Widgets
       end
     end
     
-    typesig { [String, ::Java::Int, ::Java::Int, ::Java::Boolean] }
-    def set_text(string, start, end_, notify)
-      if (notify)
-        if (hooks(SWT::Verify) || filters(SWT::Verify))
-          string = RJava.cast_to_string(verify_text(string, start, end_, nil))
-          if ((string).nil?)
-            return nil
-          end
-        end
-      end
-      actual_size = Array.typed(::Java::Int).new(1) { 0 }
-      ptr = Array.typed(::Java::Int).new(1) { 0 }
-      if (!(OS._get_control_data(@text_handle, RJava.cast_to_short(OS.attr_k_control_entire_control), OS.attr_k_control_edit_text_cfstring_tag, 4, ptr, actual_size)).equal?(OS.attr_no_err))
-        return nil
-      end
-      char_count = OS._cfstring_get_length(ptr[0])
-      length_ = string.length
-      if (!(@text_limit).equal?(LIMIT))
-        if (char_count - (end_ - start) + length_ > @text_limit)
-          length_ = @text_limit - char_count + (end_ - start)
-        end
-      end
-      text = CharArray.new(char_count - (end_ - start) + length_)
-      range = CFRange.new
-      range.attr_location = 0
-      range.attr_length = start
-      buffer = CharArray.new(range.attr_length)
-      OS._cfstring_get_characters(ptr[0], range, buffer)
-      System.arraycopy(buffer, 0, text, 0, range.attr_length)
-      string.get_chars(0, length_, text, start)
-      range.attr_location = end_
-      range.attr_length = char_count - end_
-      buffer = CharArray.new(range.attr_length)
-      OS._cfstring_get_characters(ptr[0], range, buffer)
-      System.arraycopy(buffer, 0, text, start + length_, range.attr_length)
-      # Copying the return value to buffer
-      range.attr_location = start
-      range.attr_length = end_ - start
-      buffer = CharArray.new(range.attr_length)
-      OS._cfstring_get_characters(ptr[0], range, buffer)
-      OS._cfrelease(ptr[0])
-      ptr[0] = OS._cfstring_create_with_characters(OS.attr_k_cfallocator_default, text, text.attr_length)
-      if ((ptr[0]).equal?(0))
-        error(SWT::ERROR_CANNOT_SET_TEXT)
-      end
-      OS._set_control_data(@text_handle, OS.attr_k_control_entire_control, OS.attr_k_control_edit_text_cfstring_tag, 4, ptr)
-      OS._cfrelease(ptr[0])
-      if (notify)
-        send_event(SWT::Modify)
-      end
-      return buffer
+    typesig { [] }
+    def set_small_size
+      @text_view.cell.set_control_size(OS::NSSmallControlSize)
+      @button_view.cell.set_control_size(OS::NSSmallControlSize)
     end
     
     typesig { [::Java::Int] }
@@ -1436,7 +1091,7 @@ module Org::Eclipse::Swt::Widgets
     # </ul>
     # 
     # @since 3.2
-    def set_values(selection, minimum, maximum, digits, increment, page_increment)
+    def set_values(selection, minimum, maximum, digits, increment_, page_increment)
       check_widget
       if (maximum <= minimum)
         return
@@ -1444,65 +1099,147 @@ module Org::Eclipse::Swt::Widgets
       if (digits < 0)
         return
       end
-      if (increment < 1)
+      if (increment_ < 1)
         return
       end
       if (page_increment < 1)
         return
       end
       selection = Math.min(Math.max(minimum, selection), maximum)
-      @increment = increment
       @page_increment = page_increment
       @digits = digits
-      OS._set_control32bit_maximum(@button_handle, maximum)
-      OS._set_control32bit_minimum(@button_handle, minimum)
+      @button_view.set_increment(increment_)
+      @button_view.set_max_value(maximum)
+      @button_view.set_min_value(minimum)
       set_selection(selection, true, true, false)
     end
     
-    typesig { [] }
-    def set_zorder
-      super
-      if (!(@text_handle).equal?(0))
-        OS._hiview_add_subview(self.attr_handle, @text_handle)
+    typesig { [::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int] }
+    # long
+    # long
+    # long
+    # long
+    def should_change_text_in_range_replacement_string(id, sel, affected_char_range, replacement_string)
+      range = NSRange.new
+      OS.memmove(range, affected_char_range, NSRange.attr_sizeof)
+      result = call_super_boolean(id, sel, range, replacement_string)
+      if (hooks(SWT::Verify))
+        text = NSString.new(replacement_string).get_string
+        current_event_ = self.attr_display.attr_application.current_event
+        # long
+        type_ = current_event_.type
+        if (!(type_).equal?(OS::NSKeyDown) && !(type_).equal?(OS::NSKeyUp))
+          current_event_ = nil
+        end
+        # 64
+        # 64
+        new_text = verify_text(text, RJava.cast_to_int(range.attr_location), RJava.cast_to_int((range.attr_location + range.attr_length)), current_event_)
+        if ((new_text).nil?)
+          return false
+        end
+        if (!(text).equal?(new_text))
+          length_ = new_text.length
+          field_editor = @text_view.current_editor
+          if (!(field_editor).nil?)
+            selected_range_ = field_editor.selected_range
+            if (!(@text_limit).equal?(LIMIT))
+              # long
+              char_count = field_editor.string.length
+              if (char_count - selected_range_.attr_length + length_ > @text_limit)
+                # 64
+                length_ = RJava.cast_to_int((@text_limit - char_count + selected_range_.attr_length))
+              end
+            end
+            buffer = CharArray.new(length_)
+            new_text.get_chars(0, buffer.attr_length, buffer, 0)
+            nsstring = NSString.string_with_characters(buffer, buffer.attr_length)
+            field_editor.replace_characters_in_range(field_editor.selected_range, nsstring)
+            result = false
+          end
+        end
+        if (!result)
+          send_event(SWT::Modify)
+        end
       end
-      if (!(@button_handle).equal?(0))
-        OS._hiview_add_subview(self.attr_handle, @button_handle)
-      end
+      return result
     end
     
-    typesig { [String, ::Java::Int, ::Java::Int, Event] }
-    def verify_text(string, start, end_, key_event)
+    typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
+    # long
+    # long
+    # long
+    def text_did_change(id, sel, a_notification)
+      super(id, sel, a_notification)
+      parse_fail = Array.typed(::Java::Boolean).new(1) { false }
+      value = get_selection_text(parse_fail)
+      if (!parse_fail[0])
+        pos = RJava.cast_to_int(@button_view.double_value)
+        if (!(value).equal?(pos))
+          set_selection(value, true, false, true)
+        end
+      end
+      post_event(SWT::Modify)
+    end
+    
+    typesig { [::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int] }
+    # long
+    # long
+    # long
+    # long
+    # long
+    def text_view_will_change_selection_from_character_range_to_character_range(id, sel, a_text_view, old_selected_char_range, new_selected_char_range)
+      # allow the selection change to proceed
+      result = NSRange.new
+      OS.memmove(result, new_selected_char_range, NSRange.attr_sizeof)
+      return result
+    end
+    
+    typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
+    # long
+    # long
+    # long
+    def text_did_end_editing(id, sel, a_notification)
+      parse_fail = Array.typed(::Java::Boolean).new(1) { false }
+      value = get_selection_text(parse_fail)
+      if (parse_fail[0])
+        value = RJava.cast_to_int(@button_view.double_value)
+        set_selection(value, false, true, false)
+      end
+      super(id, sel, a_notification)
+    end
+    
+    typesig { [::Java::Boolean] }
+    def update_cursor_rects(enabled)
+      super(enabled)
+      update_cursor_rects(enabled, @text_view)
+      update_cursor_rects(enabled, @button_view)
+    end
+    
+    typesig { [String, ::Java::Int, ::Java::Int, NSEvent] }
+    def verify_text(string_, start, end_, key_event)
       event = Event.new
-      event.attr_text = string
+      if (!(key_event).nil?)
+        set_key_state(event, SWT::MouseDown, key_event)
+      end
+      event.attr_text = string_
       event.attr_start = start
       event.attr_end = end_
-      if (!(key_event).nil?)
-        event.attr_character = key_event.attr_character
-        event.attr_key_code = key_event.attr_key_code
-        event.attr_state_mask = key_event.attr_state_mask
-      end
       index = 0
       if (@digits > 0)
-        decimal_separator = get_decimal_separator
-        index = string.index_of(decimal_separator)
+        decimal_separator_ = "." # getDecimalSeparator ();
+        index = string_.index_of(decimal_separator_)
         if (!(index).equal?(-1))
-          string = RJava.cast_to_string(string.substring(0, index) + string.substring(index + 1))
+          string_ = RJava.cast_to_string(string_.substring(0, index) + string_.substring(index + 1))
         end
         index = 0
       end
-      if (string.length > 0)
-        minimum = OS._get_control32bit_minimum(@button_handle)
-        if (minimum < 0 && (string.char_at(0)).equal?(Character.new(?-.ord)))
-          index += 1
-        end
-      end
-      while (index < string.length)
-        if (!Character.is_digit(string.char_at(index)))
+      while (index < string_.length)
+        if (!Character.is_digit(string_.char_at(index)))
           break
         end
         index += 1
       end
-      event.attr_doit = (index).equal?(string.length)
+      event.attr_doit = (index).equal?(string_.length)
       # It is possible (but unlikely), that application
       # code could have disposed the widget in the verify
       # event.  If this happens, answer null to cancel

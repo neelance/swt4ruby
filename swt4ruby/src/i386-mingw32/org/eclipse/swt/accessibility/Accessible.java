@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2008 IBM Corporation and others.
+ * Copyright (c) 2000, 2009 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -11,6 +11,7 @@
 package org.eclipse.swt.accessibility;
 
 
+import java.lang.reflect.Method;
 import java.util.Vector;
 import org.eclipse.swt.*;
 import org.eclipse.swt.widgets.*;
@@ -50,6 +51,13 @@ public class Accessible {
 	Vector textListeners = new Vector ();
 	Object[] variants;
 	Control control;
+	static String ALTERNATE_ACCESSIBLE_CLASS_NAME = "org.eclipse.swt.accessibility2.Accessible2";
+
+	/**
+	 * @since 3.5
+	 */
+	protected Accessible() {
+	}
 
 	Accessible(Control control) {
 		this.control = control;
@@ -96,6 +104,10 @@ public class Accessible {
 			public int /*long*/ method27(int /*long*/[] args) {return put_accValue(args[0], args[1]);}
 		};
 
+		/* If the callback takes a struct parameter (for example, a variant),
+		 * then create a custom callback that dereferences the struct and
+		 * passes a pointer to the original callback.
+		 */
 		int /*long*/ ppVtable = objIAccessible.ppVtable;
 		int /*long*/[] pVtable = new int /*long*/[1];
 		COM.MoveMemory(pVtable, ppVtable, OS.PTR_SIZEOF);
@@ -145,6 +157,16 @@ public class Accessible {
 	 * @return the platform specific accessible object
 	 */
 	public static Accessible internal_new_Accessible(Control control) {
+		if (ALTERNATE_ACCESSIBLE_CLASS_NAME != null) {
+			try {
+				Class clazz = Class.forName(ALTERNATE_ACCESSIBLE_CLASS_NAME);
+				Method method = clazz.getDeclaredMethod ("internal_new_Accessible", new Class [] {Control.class});
+				Object value = method.invoke(clazz, new Object [] {control});
+				return (Accessible)value;
+			} catch (Throwable e) {
+				ALTERNATE_ACCESSIBLE_CLASS_NAME = null;
+			}
+		}
 		return new Accessible(control);
 	}
 
@@ -1387,6 +1409,7 @@ public class Accessible {
 			case ACC.ROLE_PUSHBUTTON: return COM.ROLE_SYSTEM_PUSHBUTTON;
 			case ACC.ROLE_CHECKBUTTON: return COM.ROLE_SYSTEM_CHECKBUTTON;
 			case ACC.ROLE_RADIOBUTTON: return COM.ROLE_SYSTEM_RADIOBUTTON;
+			case ACC.ROLE_SPLITBUTTON: return COM.ROLE_SYSTEM_SPLITBUTTON;
 			case ACC.ROLE_COMBOBOX: return COM.ROLE_SYSTEM_COMBOBOX;
 			case ACC.ROLE_TEXT: return COM.ROLE_SYSTEM_TEXT;
 			case ACC.ROLE_TOOLBAR: return COM.ROLE_SYSTEM_TOOLBAR;
@@ -1422,6 +1445,7 @@ public class Accessible {
 			case COM.ROLE_SYSTEM_PUSHBUTTON: return ACC.ROLE_PUSHBUTTON;
 			case COM.ROLE_SYSTEM_CHECKBUTTON: return ACC.ROLE_CHECKBUTTON;
 			case COM.ROLE_SYSTEM_RADIOBUTTON: return ACC.ROLE_RADIOBUTTON;
+			case COM.ROLE_SYSTEM_SPLITBUTTON: return ACC.ROLE_SPLITBUTTON;
 			case COM.ROLE_SYSTEM_COMBOBOX: return ACC.ROLE_COMBOBOX;
 			case COM.ROLE_SYSTEM_TEXT: return ACC.ROLE_TEXT;
 			case COM.ROLE_SYSTEM_TOOLBAR: return ACC.ROLE_TOOLBAR;

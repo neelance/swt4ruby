@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2008 IBM Corporation and others.
+ * Copyright (c) 2000, 2009 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -12,12 +12,13 @@ package org.eclipse.swt.widgets;
 
 
 import org.eclipse.swt.*;
-import org.eclipse.swt.internal.Converter;
-import org.eclipse.swt.internal.accessibility.gtk.ATK;
-import org.eclipse.swt.internal.gtk.*;
-import org.eclipse.swt.graphics.*;
-import org.eclipse.swt.events.*;
 import org.eclipse.swt.accessibility.*;
+import org.eclipse.swt.events.*;
+import org.eclipse.swt.graphics.*;
+import org.eclipse.swt.internal.*;
+import org.eclipse.swt.internal.accessibility.gtk.*;
+import org.eclipse.swt.internal.cairo.*;
+import org.eclipse.swt.internal.gtk.*;
 
 /**
  * Control is the abstract superclass of all windowed user interface classes.
@@ -40,6 +41,7 @@ import org.eclipse.swt.accessibility.*;
  * @see <a href="http://www.eclipse.org/swt/snippets/#control">Control snippets</a>
  * @see <a href="http://www.eclipse.org/swt/examples.php">SWT Example: ControlExample</a>
  * @see <a href="http://www.eclipse.org/swt/">Sample code and further information</a>
+ * @noextend This class is not intended to be subclassed by clients.
  */
 public abstract class Control extends Widget implements Drawable {
 	long /*int*/ fixedHandle;
@@ -54,6 +56,8 @@ public abstract class Control extends Widget implements Drawable {
 	String toolTipText;
 	Object layoutData;
 	Accessible accessible;
+	
+	static final String IS_ACTIVE = "org.eclipse.swt.internal.control.isactive"; //$NON-NLS-1$
 
 Control () {
 }
@@ -83,6 +87,8 @@ Control () {
  * </ul>
  *
  * @see SWT#BORDER
+ * @see SWT#LEFT_TO_RIGHT
+ * @see SWT#RIGHT_TO_LEFT
  * @see Widget#checkSubclass
  * @see Widget#getStyle
  */
@@ -161,11 +167,12 @@ void fixStyle (long /*int*/ handle) {
 	* should not override the application background.
 	*/
 	if ((state & BACKGROUND) != 0) return;
+	if ((state & THEME_BACKGROUND) == 0) return;
 	long /*int*/ childStyle = parent.childStyle ();
-	if (childStyle != 0) {		
+	if (childStyle != 0) {
 		GdkColor color = new GdkColor();
 		OS.gtk_style_get_bg (childStyle, 0, color);
-		OS.gtk_widget_modify_bg (handle, 0, color);
+		setBackgroundColor (color);
 	}
 }
 
@@ -318,11 +325,11 @@ void printWidget (GC gc, long /*int*/ drawable, int depth, int x, int y) {
 	state &= ~OBSCURED;
 	long /*int*/ topHandle = topHandle ();
 	long /*int*/ window = OS.GTK_WIDGET_WINDOW (topHandle);
-	printWindow (true, this, gc.handle, drawable, depth, window, x, y);
+	printWindow (true, this, gc, drawable, depth, window, x, y);
 	if (obscured) state |= OBSCURED;
 }
 
-void printWindow (boolean first, Control control, long /*int*/ gc, long /*int*/ drawable, int depth, long /*int*/ window, int x, int y) {
+void printWindow (boolean first, Control control, GC gc, long /*int*/ drawable, int depth, long /*int*/ window, int x, int y) {
 	if (OS.gdk_drawable_get_depth (window) != depth) return;
 	GdkRectangle rect = new GdkRectangle ();
 	int [] width = new int [1], height = new int [1];
@@ -362,7 +369,33 @@ void printWindow (boolean first, Control control, long /*int*/ gc, long /*int*/ 
 		destWidth = Math.min (cX [0] + width [0], pW [0]);
 		destHeight = Math.min (cY [0] + height [0], pH [0]);
 	}
-	OS.gdk_draw_drawable (drawable, gc, real_drawable [0], srcX, srcY, destX, destY, destWidth, destHeight);
+	GCData gcData = gc.getGCData();
+	long /*int*/ cairo = gcData.cairo;
+	if (cairo != 0) {
+		long /*int*/ xDisplay = OS.GDK_DISPLAY();
+		long /*int*/ xVisual = OS.gdk_x11_visual_get_xvisual(OS.gdk_visual_get_system());
+		long /*int*/ xDrawable = OS.GDK_PIXMAP_XID(real_drawable [0]);
+		long /*int*/ surface = Cairo.cairo_xlib_surface_create(xDisplay, xDrawable, xVisual, width [0], height [0]);
+		if (surface == 0) SWT.error(SWT.ERROR_NO_HANDLES);
+		Cairo.cairo_save(cairo);
+		Cairo.cairo_rectangle(cairo, destX , destY, destWidth, destHeight);
+		Cairo.cairo_clip(cairo);
+		Cairo.cairo_translate(cairo, destX, destY);
+		long /*int*/ pattern = Cairo.cairo_pattern_create_for_surface(surface);
+		if (pattern == 0) SWT.error(SWT.ERROR_NO_HANDLES);
+		Cairo.cairo_pattern_set_filter(pattern, Cairo.CAIRO_FILTER_BEST);
+		Cairo.cairo_set_source(cairo, pattern);
+		if (gcData.alpha != 0xFF) {
+			Cairo.cairo_paint_with_alpha(cairo, gcData.alpha / (float)0xFF);
+		} else {
+			Cairo.cairo_paint(cairo);
+		}
+		Cairo.cairo_restore(cairo);
+		Cairo.cairo_pattern_destroy(pattern);
+		Cairo.cairo_surface_destroy(surface);
+	} else {
+		OS.gdk_draw_drawable (drawable, gc.handle, real_drawable [0], srcX, srcY, destX, destY, destWidth, destHeight);
+	}
 	OS.gdk_window_end_paint (window);
 	long /*int*/ children = OS.gdk_window_get_children (window);
 	if (children != 0) {
@@ -418,18 +451,18 @@ public Point computeSize (int wHint, int hHint) {
 	return computeSize (wHint, hHint, true);
 }
 
-Control computeTabGroup () {
+Widget computeTabGroup () {
 	if (isTabGroup()) return this;
 	return parent.computeTabGroup ();
 }
 
-Control[] computeTabList() {
+Widget[] computeTabList() {
 	if (isTabGroup()) {
 		if (getVisible() && getEnabled()) {
-			return new Control[] {this};
+			return new Widget[] {this};
 		}
 	}
-	return new Control[0];
+	return new Widget[0];
 }
 
 Control computeTabRoot () {
@@ -1010,6 +1043,11 @@ void setRelations () {
 public void setSize (int width, int height) {
 	checkWidget();
 	setBounds (0, 0, Math.max (0, width), Math.max (0, height), false, true);
+}
+
+
+boolean isActive () {
+	return getShell ().getModalShell () == null && display.getModalDialog () == null;
 }
 
 /*
@@ -1985,7 +2023,13 @@ boolean dragDetect (int x, int y, boolean filter, boolean [] consume) {
 	boolean quit = false, dragging = false;
 	while (!quit) {
 		long /*int*/ eventPtr = 0;
-		while (true) {
+		/*
+		* There should be an event on the queue already, but
+		* in cases where there isn't one, stop trying after
+		* half a second. 
+		*/
+		long timeout = System.currentTimeMillis() + 500;
+		while (System.currentTimeMillis() < timeout) {
 			eventPtr = OS.gdk_event_get ();
 			if (eventPtr != 0) {
 				break;
@@ -1993,6 +2037,7 @@ boolean dragDetect (int x, int y, boolean filter, boolean [] consume) {
 				try {Thread.sleep(50);} catch (Exception ex) {}
 			}
 		}
+		if (eventPtr == 0) return false;
 		switch (OS.GDK_EVENT_TYPE (eventPtr)) {
 			case OS.GDK_MOTION_NOTIFY: {
 				GdkEventMotion gdkMotionEvent = new GdkEventMotion ();
@@ -2102,6 +2147,7 @@ public boolean forceFocus () {
 }
 
 boolean forceFocus (long /*int*/ focusHandle) {
+	if (OS.GTK_WIDGET_HAS_FOCUS (focusHandle)) return true;
 	/* When the control is zero sized it must be realized */
 	OS.gtk_widget_realize (focusHandle);
 	OS.gtk_widget_grab_focus (focusHandle);
@@ -2109,7 +2155,11 @@ boolean forceFocus (long /*int*/ focusHandle) {
 	long /*int*/ shellHandle = shell.shellHandle;
 	long /*int*/ handle = OS.gtk_window_get_focus (shellHandle);
 	while (handle != 0) {
-		if (handle == focusHandle) return true;
+		if (handle == focusHandle) {
+			/* Cancel any previous ignoreFocus requests */
+			display.ignoreFocus = false;
+			return true;
+		}
 		Widget widget = display.getWidget (handle);
 		if (widget != null && widget instanceof Control) {
 			return widget == this;
@@ -2121,7 +2171,11 @@ boolean forceFocus (long /*int*/ focusHandle) {
 
 /**
  * Returns the receiver's background color.
- *
+ * <p>
+ * Note: This operation is a hint and may be overridden by the platform.
+ * For example, on some versions of Windows the background of a TabFolder,
+ * is a gradient rather than a solid color.
+ * </p>
  * @return the background color
  *
  * @exception SWTException <ul>
@@ -2213,6 +2267,11 @@ int getClientWidth () {
 public Cursor getCursor () {
 	checkWidget ();
 	return cursor;
+}
+
+public Object getData(String key) {
+	if (key.equals(IS_ACTIVE)) return new Boolean(isActive ());
+	return super.getData(key);
 }
 
 /**
@@ -2502,6 +2561,10 @@ public boolean getVisible () {
 }
 
 long /*int*/ gtk_button_press_event (long /*int*/ widget, long /*int*/ event) {
+	return gtk_button_press_event (widget, event, true);
+}
+
+long /*int*/ gtk_button_press_event (long /*int*/ widget, long /*int*/ event, boolean sendMouseDown) {
 	GdkEventButton gdkEvent = new GdkEventButton ();
 	OS.memmove (gdkEvent, event, GdkEventButton.sizeof);
 	if (gdkEvent.type == OS.GDK_3BUTTON_PRESS) return 0;
@@ -2537,7 +2600,7 @@ long /*int*/ gtk_button_press_event (long /*int*/ widget, long /*int*/ event) {
 				if (isDisposed ()) return 1;
 			}
 		}
-		if (!sendMouseEvent (SWT.MouseDown, gdkEvent.button, display.clickCount, 0, false, gdkEvent.time, gdkEvent.x_root, gdkEvent.y_root, false, gdkEvent.state)) {
+		if (sendMouseDown && !sendMouseEvent (SWT.MouseDown, gdkEvent.button, display.clickCount, 0, false, gdkEvent.time, gdkEvent.x_root, gdkEvent.y_root, false, gdkEvent.state)) {
 			result = 1;
 		}
 		if (isDisposed ()) return 1;
@@ -2615,6 +2678,13 @@ long /*int*/ gtk_enter_notify_event (long /*int*/ widget, long /*int*/ event) {
 	if (display.currentControl == this) return 0;
 	GdkEventCrossing gdkEvent = new GdkEventCrossing ();
 	OS.memmove (gdkEvent, event, GdkEventCrossing.sizeof);
+	/*
+	 * It is possible to send out too many enter/exit events if entering a 
+	 * control through a subwindow. The fix is to return without sending any 
+	 * events if the GdkEventCrossing subwindow field is set and the control 
+	 * requests to check the field.
+	 */
+	if (gdkEvent.subwindow != 0 && checkSubwindow ()) return 0;
 	if (gdkEvent.mode != OS.GDK_CROSSING_NORMAL && gdkEvent.mode != OS.GDK_CROSSING_UNGRAB) return 0;
 	if ((gdkEvent.state & (OS.GDK_BUTTON1_MASK | OS.GDK_BUTTON2_MASK | OS.GDK_BUTTON3_MASK)) != 0) return 0;
 	if (display.currentControl != null && !display.currentControl.isDisposed ()) {
@@ -2626,6 +2696,10 @@ long /*int*/ gtk_enter_notify_event (long /*int*/ widget, long /*int*/ event) {
 		return sendMouseEvent (SWT.MouseEnter, 0, gdkEvent.time, gdkEvent.x_root, gdkEvent.y_root, false, gdkEvent.state) ? 0 : 1;
 	}
 	return 0;
+}
+
+boolean checkSubwindow () {
+	return false;
 }
 
 long /*int*/ gtk_event_after (long /*int*/ widget, long /*int*/ gdkEvent) {
@@ -2659,6 +2733,8 @@ long /*int*/ gtk_event_after (long /*int*/ widget, long /*int*/ gdkEvent) {
 			 * box to lose focus when focus is received for the menu.  The
 			 * fix is to check the current grab handle and see if it is a GTK_MENU
 			 * and ignore the focus event when the menu is both shown and hidden.
+			 * 
+			 * NOTE: This code runs for all menus.
 			 */
 			Display display = this.display;
 			if (gdkEventFocus.in != 0) {
@@ -3917,9 +3993,6 @@ public void setRedraw (boolean redraw) {
 	}
 }
 
-boolean setTabGroupFocus (boolean next) {
-	return setTabItemFocus (next);
-}
 boolean setTabItemFocus (boolean next) {
 	if (!isShowing ()) return false;
 	return forceFocus ();
@@ -3927,8 +4000,17 @@ boolean setTabItemFocus (boolean next) {
 
 /**
  * Sets the receiver's tool tip text to the argument, which
- * may be null indicating that no tool tip text should be shown.
- *
+ * may be null indicating that the default tool tip for the 
+ * control will be shown. For a control that has a default
+ * tool tip, such as the Tree control on Windows, setting
+ * the tool tip text to an empty string replaces the default,
+ * causing no tool tip text to be shown.
+ * <p>
+ * The mnemonic indicator (character '&amp;') is not displayed in a tool tip.
+ * To display a single '&amp;' in the tool tip, the character '&amp;' can be 
+ * escaped by doubling it in the string.
+ * </p>
+ * 
  * @param string the new tool tip text (or null)
  *
  * @exception SWTException <ul>
@@ -4171,6 +4253,8 @@ boolean showMenu (int x, int y) {
 	event.x = x;
 	event.y = y;
 	sendEvent (SWT.MenuDetect, event);
+	//widget could be disposed at this point
+	if (isDisposed ()) return false;
 	if (event.doit) {
 		if (menu != null && !menu.isDisposed ()) {
 			boolean hooksKeys = hooks (SWT.KeyDown) || hooks (SWT.KeyUp);
@@ -4365,8 +4449,8 @@ boolean traverseEscape () {
 
 boolean traverseGroup (boolean next) {
 	Control root = computeTabRoot ();
-	Control group = computeTabGroup ();
-	Control [] list = root.computeTabList ();
+	Widget group = computeTabGroup ();
+	Widget [] list = root.computeTabList ();
 	int length = list.length;
 	int index = 0;
 	while (index < length) {
@@ -4382,8 +4466,8 @@ boolean traverseGroup (boolean next) {
 	if (index == length) return false;
 	int start = index, offset = (next) ? 1 : -1;
 	while ((index = ((index + offset + length) % length)) != start) {
-		Control control = list [index];
-		if (!control.isDisposed () && control.setTabGroupFocus (next)) {
+		Widget widget = list [index];
+		if (!widget.isDisposed () && widget.setTabGroupFocus (next)) {
 			return true;
 		}
 	}

@@ -1,6 +1,6 @@
 require "rjava"
 
-# Copyright (c) 2000, 2008 IBM Corporation and others.
+# Copyright (c) 2000, 2009 IBM Corporation and others.
 # All rights reserved. This program and the accompanying materials
 # are made available under the terms of the Eclipse Public License v1.0
 # which accompanies this distribution, and is available at
@@ -30,6 +30,7 @@ module Org::Eclipse::Swt::Printing
   # @see <a href="http://www.eclipse.org/swt/snippets/#printing">Printing snippets</a>
   # @see <a href="http://www.eclipse.org/swt/examples.php">SWT Example: ControlExample, Dialog tab</a>
   # @see <a href="http://www.eclipse.org/swt/">Sample code and further information</a>
+  # @noextend This class is not intended to be subclassed by clients.
   class PrintDialog < PrintDialogImports.const_get :Dialog
     include_class_members PrintDialogImports
     
@@ -38,30 +39,6 @@ module Org::Eclipse::Swt::Printing
     undef_method :printer_data
     alias_method :attr_printer_data=, :printer_data=
     undef_method :printer_data=
-    
-    attr_accessor :scope
-    alias_method :attr_scope, :scope
-    undef_method :scope
-    alias_method :attr_scope=, :scope=
-    undef_method :scope=
-    
-    attr_accessor :start_page
-    alias_method :attr_start_page, :start_page
-    undef_method :start_page
-    alias_method :attr_start_page=, :start_page=
-    undef_method :start_page=
-    
-    attr_accessor :end_page
-    alias_method :attr_end_page, :end_page
-    undef_method :end_page
-    alias_method :attr_end_page=, :end_page=
-    undef_method :end_page=
-    
-    attr_accessor :print_to_file
-    alias_method :attr_print_to_file, :print_to_file
-    undef_method :print_to_file
-    alias_method :attr_print_to_file=, :print_to_file=
-    undef_method :print_to_file=
     
     typesig { [Shell] }
     # Constructs a new instance of this class given only its parent.
@@ -112,26 +89,40 @@ module Org::Eclipse::Swt::Printing
     # @see Widget#getStyle
     def initialize(parent, style)
       @printer_data = nil
-      @scope = 0
-      @start_page = 0
-      @end_page = 0
-      @print_to_file = false
-      super(parent, style)
-      @scope = PrinterData::ALL_PAGES
-      @start_page = 1
-      @end_page = 1
-      @print_to_file = false
+      super(parent, check_style(parent, style))
+      @printer_data = PrinterData.new
       check_subclass
     end
+    
+    class_module.module_eval {
+      typesig { [Shell, ::Java::Int] }
+      def check_style(parent, style)
+        mask = SWT::PRIMARY_MODAL | SWT::APPLICATION_MODAL | SWT::SYSTEM_MODAL
+        if (!((style & SWT::SHEET)).equal?(0))
+          style &= ~SWT::SHEET
+          if (((style & mask)).equal?(0))
+            style |= (parent).nil? ? SWT::APPLICATION_MODAL : SWT::PRIMARY_MODAL
+          end
+        end
+        return style
+      end
+    }
     
     typesig { [PrinterData] }
     # Sets the printer data that will be used when the dialog
     # is opened.
+    # <p>
+    # Setting the printer data to null is equivalent to
+    # resetting all data fields to their default values.
+    # </p>
     # 
-    # @param data the data that will be used when the dialog is opened
+    # @param data the data that will be used when the dialog is opened or null to use default data
     # 
     # @since 3.4
     def set_printer_data(data)
+      if ((data).nil?)
+        data = PrinterData.new
+      end
       @printer_data = data
     end
     
@@ -161,7 +152,7 @@ module Org::Eclipse::Swt::Printing
     # 
     # @return the scope setting that the user selected
     def get_scope
-      return @scope
+      return @printer_data.attr_scope
     end
     
     typesig { [::Java::Int] }
@@ -179,7 +170,7 @@ module Org::Eclipse::Swt::Printing
     # 
     # @param scope the scope setting when the dialog is opened
     def set_scope(scope)
-      @scope = scope
+      @printer_data.attr_scope = scope
     end
     
     typesig { [] }
@@ -192,7 +183,7 @@ module Org::Eclipse::Swt::Printing
     # 
     # @return the start page setting that the user selected
     def get_start_page
-      return @start_page
+      return @printer_data.attr_start_page
     end
     
     typesig { [::Java::Int] }
@@ -205,7 +196,7 @@ module Org::Eclipse::Swt::Printing
     # 
     # @param startPage the startPage setting when the dialog is opened
     def set_start_page(start_page)
-      @start_page = start_page
+      @printer_data.attr_start_page = start_page
     end
     
     typesig { [] }
@@ -218,7 +209,7 @@ module Org::Eclipse::Swt::Printing
     # 
     # @return the end page setting that the user selected
     def get_end_page
-      return @end_page
+      return @printer_data.attr_end_page
     end
     
     typesig { [::Java::Int] }
@@ -231,7 +222,7 @@ module Org::Eclipse::Swt::Printing
     # 
     # @param endPage the end page setting when the dialog is opened
     def set_end_page(end_page)
-      @end_page = end_page
+      @printer_data.attr_end_page = end_page
     end
     
     typesig { [] }
@@ -240,7 +231,7 @@ module Org::Eclipse::Swt::Printing
     # 
     # @return the 'Print to file' setting that the user selected
     def get_print_to_file
-      return @print_to_file
+      return @printer_data.attr_print_to_file
     end
     
     typesig { [::Java::Boolean] }
@@ -249,7 +240,7 @@ module Org::Eclipse::Swt::Printing
     # 
     # @param printToFile the 'Print to file' setting when the dialog is opened
     def set_print_to_file(print_to_file)
-      @print_to_file = print_to_file
+      @printer_data.attr_print_to_file = print_to_file
     end
     
     typesig { [] }
@@ -265,7 +256,8 @@ module Org::Eclipse::Swt::Printing
     # Makes the receiver visible and brings it to the front
     # of the display.
     # 
-    # @return a printer data object describing the desired print job parameters
+    # @return a printer data object describing the desired print job parameters,
+    # or null if the dialog was canceled, no printers were found, or an error occurred
     # 
     # @exception SWTException <ul>
     # <li>ERROR_WIDGET_DISPOSED - if the receiver has been disposed</li>
@@ -278,24 +270,49 @@ module Org::Eclipse::Swt::Printing
       if (!(parent).nil?)
         pd.attr_hwnd_owner = parent.attr_handle
       end
+      # Initialize PRINTDLG fields, including DEVMODE.
+      pd.attr_flags = OS::PD_RETURNDEFAULT
+      OS._print_dlg(pd)
+      # If user setup info from a previous print dialog was specified,
+      # then restore the previous DEVMODE struct.
+      # 
       # long
       lp_init_data = 0
       # long
       h_heap = OS._get_process_heap
-      if (!(@printer_data).nil?)
-        buffer = @printer_data.attr_other_data
-        if (!(buffer).nil? && !(buffer.attr_length).equal?(0))
-          # If user setup info from a previous print dialog was specified, restore the DEVMODE struct.
-          lp_init_data = OS._heap_alloc(h_heap, OS::HEAP_ZERO_MEMORY, buffer.attr_length)
-          OS._move_memory(lp_init_data, buffer, buffer.attr_length)
-          pd.attr_h_dev_mode = lp_init_data
+      devmode_data = @printer_data.attr_other_data
+      if (!(devmode_data).nil? && !(devmode_data.attr_length).equal?(0))
+        lp_init_data = OS._heap_alloc(h_heap, OS::HEAP_ZERO_MEMORY, devmode_data.attr_length)
+        OS._move_memory(lp_init_data, devmode_data, devmode_data.attr_length)
+        if (!(pd.attr_h_dev_mode).equal?(0))
+          OS._global_free(pd.attr_h_dev_mode)
         end
+        pd.attr_h_dev_mode = lp_init_data
       end
+      # Initialize the DEVMODE struct's fields from the printerData.
+      # long
+      h_mem = pd.attr_h_dev_mode
+      # long
+      ptr = OS._global_lock(h_mem)
+      devmode = OS::IsUnicode ? DEVMODEW.new : DEVMODEA.new
+      OS._move_memory(devmode, ptr, OS::IsUnicode ? OS._devmodew_sizeof : OS._devmodea_sizeof)
+      devmode.attr_dm_fields |= OS::DM_ORIENTATION
+      devmode.attr_dm_orientation = (@printer_data.attr_orientation).equal?(PrinterData::PORTRAIT) ? OS::DMORIENT_PORTRAIT : OS::DMORIENT_LANDSCAPE
+      if (!(@printer_data.attr_copy_count).equal?(1))
+        devmode.attr_dm_fields |= OS::DM_COPIES
+        devmode.attr_dm_copies = RJava.cast_to_short(@printer_data.attr_copy_count)
+      end
+      if (!(@printer_data.attr_collate).equal?(false))
+        devmode.attr_dm_fields |= OS::DM_COLLATE
+        devmode.attr_dm_collate = OS::DMCOLLATE_TRUE
+      end
+      OS._move_memory(ptr, devmode, OS::IsUnicode ? OS._devmodew_sizeof : OS._devmodea_sizeof)
+      OS._global_unlock(h_mem)
       pd.attr_flags = OS::PD_USEDEVMODECOPIESANDCOLLATE
-      if (@print_to_file)
+      if (@printer_data.attr_print_to_file)
         pd.attr_flags |= OS::PD_PRINTTOFILE
       end
-      case (@scope)
+      case (@printer_data.attr_scope)
       when PrinterData::PAGE_RANGE
         pd.attr_flags |= OS::PD_PAGENUMS
       when PrinterData::SELECTION
@@ -305,8 +322,8 @@ module Org::Eclipse::Swt::Printing
       end
       pd.attr_n_min_page = 1
       pd.attr_n_max_page = -1
-      pd.attr_n_from_page = RJava.cast_to_short(Math.min(0xffff, Math.max(1, @start_page)))
-      pd.attr_n_to_page = RJava.cast_to_short(Math.min(0xffff, Math.max(1, @end_page)))
+      pd.attr_n_from_page = RJava.cast_to_short(Math.min(0xffff, Math.max(1, @printer_data.attr_start_page)))
+      pd.attr_n_to_page = RJava.cast_to_short(Math.min(0xffff, Math.max(1, @printer_data.attr_end_page)))
       display = parent.get_display
       shells = display.get_shells
       if (!((get_style & (SWT::APPLICATION_MODAL | SWT::SYSTEM_MODAL))).equal?(0))
@@ -337,17 +354,18 @@ module Org::Eclipse::Swt::Printing
       end
       if (success)
         # Get driver and device from the DEVNAMES struct
-        # long
         h_mem = pd.attr_h_dev_names
         # Ensure size is a multiple of 2 bytes on UNICODE platforms
         size = OS._global_size(h_mem) / TCHAR.attr_sizeof * TCHAR.attr_sizeof
-        # long
         ptr = OS._global_lock(h_mem)
         offsets = Array.typed(::Java::Short).new(4) { 0 }
         OS._move_memory(offsets, ptr, 2 * offsets.attr_length)
         buffer = TCHAR.new(0, size)
         OS._move_memory(buffer, ptr, size)
         OS._global_unlock(h_mem)
+        if (!(pd.attr_h_dev_names).equal?(0))
+          OS._global_free(pd.attr_h_dev_names)
+        end
         driver_offset = offsets[0]
         i = 0
         while (driver_offset + i < size)
@@ -398,14 +416,20 @@ module Org::Eclipse::Swt::Printing
         ptr = OS._global_lock(h_mem)
         data.attr_other_data = Array.typed(::Java::Byte).new(size) { 0 }
         OS._move_memory(data.attr_other_data, ptr, size)
+        devmode = OS::IsUnicode ? DEVMODEW.new : DEVMODEA.new
+        OS._move_memory(devmode, ptr, OS::IsUnicode ? OS._devmodew_sizeof : OS._devmodea_sizeof)
+        if (!((devmode.attr_dm_fields & OS::DM_ORIENTATION)).equal?(0))
+          dm_orientation = devmode.attr_dm_orientation
+          data.attr_orientation = (dm_orientation).equal?(OS::DMORIENT_LANDSCAPE) ? PrinterData::LANDSCAPE : PrinterData::PORTRAIT
+        end
         OS._global_unlock(h_mem)
+        if (!(pd.attr_h_dev_mode).equal?(0))
+          OS._global_free(pd.attr_h_dev_mode)
+        end
         if (!(lp_init_data).equal?(0))
           OS._heap_free(h_heap, 0, lp_init_data)
         end
-        @end_page = data.attr_end_page
-        @print_to_file = data.attr_print_to_file
-        @scope = data.attr_scope
-        @start_page = data.attr_start_page
+        @printer_data = data
       end
       return data
     end

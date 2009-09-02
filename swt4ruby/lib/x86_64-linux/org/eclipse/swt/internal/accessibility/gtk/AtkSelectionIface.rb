@@ -1,6 +1,6 @@
 require "rjava"
 
-# Copyright (c) 2000, 2006 IBM Corporation and others. All rights reserved.
+# Copyright (c) 2000, 2008 IBM Corporation and others. All rights reserved.
 # The contents of this file are made available under the terms
 # of the GNU Lesser General Public License (LGPL) Version 2.1 that
 # accompanies this distribution (lgpl-v21.txt).  The LGPL is also
@@ -23,6 +23,7 @@ module Org::Eclipse::Swt::Internal::Accessibility::Gtk
   class AtkSelectionIface 
     include_class_members AtkSelectionIfaceImports
     
+    # @field cast=(gboolean (*)())
     # int
     attr_accessor :add_selection
     alias_method :attr_add_selection, :add_selection
@@ -30,6 +31,7 @@ module Org::Eclipse::Swt::Internal::Accessibility::Gtk
     alias_method :attr_add_selection=, :add_selection=
     undef_method :add_selection=
     
+    # @field cast=(gboolean (*)())
     # int
     attr_accessor :clear_selection
     alias_method :attr_clear_selection, :clear_selection
@@ -37,6 +39,7 @@ module Org::Eclipse::Swt::Internal::Accessibility::Gtk
     alias_method :attr_clear_selection=, :clear_selection=
     undef_method :clear_selection=
     
+    # @field cast=(AtkObject *(*)())
     # int
     attr_accessor :ref_selection
     alias_method :attr_ref_selection, :ref_selection
@@ -44,6 +47,7 @@ module Org::Eclipse::Swt::Internal::Accessibility::Gtk
     alias_method :attr_ref_selection=, :ref_selection=
     undef_method :ref_selection=
     
+    # @field cast=(gint (*)())
     # int
     attr_accessor :get_selection_count
     alias_method :attr_get_selection_count, :get_selection_count
@@ -51,6 +55,7 @@ module Org::Eclipse::Swt::Internal::Accessibility::Gtk
     alias_method :attr_get_selection_count=, :get_selection_count=
     undef_method :get_selection_count=
     
+    # @field cast=(gboolean (*)())
     # int
     attr_accessor :is_child_selected
     alias_method :attr_is_child_selected, :is_child_selected
@@ -58,6 +63,7 @@ module Org::Eclipse::Swt::Internal::Accessibility::Gtk
     alias_method :attr_is_child_selected=, :is_child_selected=
     undef_method :is_child_selected=
     
+    # @field cast=(gboolean (*)())
     # int
     attr_accessor :remove_selection
     alias_method :attr_remove_selection, :remove_selection
@@ -65,6 +71,7 @@ module Org::Eclipse::Swt::Internal::Accessibility::Gtk
     alias_method :attr_remove_selection=, :remove_selection=
     undef_method :remove_selection=
     
+    # @field cast=(gboolean (*)())
     # int
     attr_accessor :select_all_selection
     alias_method :attr_select_all_selection, :select_all_selection
@@ -72,6 +79,7 @@ module Org::Eclipse::Swt::Internal::Accessibility::Gtk
     alias_method :attr_select_all_selection=, :select_all_selection=
     undef_method :select_all_selection=
     
+    # @field cast=(void (*)())
     # int
     attr_accessor :selection_changed
     alias_method :attr_selection_changed, :selection_changed

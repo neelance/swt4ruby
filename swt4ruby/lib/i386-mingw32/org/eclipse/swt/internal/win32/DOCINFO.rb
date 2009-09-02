@@ -1,6 +1,6 @@
 require "rjava"
 
-# Copyright (c) 2000, 2006 IBM Corporation and others.
+# Copyright (c) 2000, 2008 IBM Corporation and others.
 # All rights reserved. This program and the accompanying materials
 # are made available under the terms of the Eclipse Public License v1.0
 # which accompanies this distribution, and is available at
@@ -25,6 +25,7 @@ module Org::Eclipse::Swt::Internal::Win32
     alias_method :attr_cb_size=, :cb_size=
     undef_method :cb_size=
     
+    # @field cast=(LPCTSTR)
     # long
     attr_accessor :lpsz_doc_name
     alias_method :attr_lpsz_doc_name, :lpsz_doc_name
@@ -33,6 +34,7 @@ module Org::Eclipse::Swt::Internal::Win32
     undef_method :lpsz_doc_name=
     
     # LPCTSTR
+    # @field cast=(LPCTSTR)
     # long
     attr_accessor :lpsz_output
     alias_method :attr_lpsz_output, :lpsz_output
@@ -41,6 +43,7 @@ module Org::Eclipse::Swt::Internal::Win32
     undef_method :lpsz_output=
     
     # LPCTSTR
+    # @field cast=(LPCTSTR)
     # long
     attr_accessor :lpsz_datatype
     alias_method :attr_lpsz_datatype, :lpsz_datatype

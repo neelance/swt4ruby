@@ -1,6 +1,6 @@
 require "rjava"
 
-# Copyright (c) 2000, 2008 IBM Corporation and others.
+# Copyright (c) 2000, 2009 IBM Corporation and others.
 # All rights reserved. This program and the accompanying materials
 # are made available under the terms of the Eclipse Public License v1.0
 # which accompanies this distribution, and is available at
@@ -1376,6 +1376,10 @@ module Org::Eclipse::Swt::Widgets
       if (OS._get_key_state(OS::VK_RBUTTON) < 0)
         event.attr_state_mask |= SWT::BUTTON3
       end
+      # Bug in Windows.  On some machines that do not have XBUTTONs,
+      # the MK_XBUTTON1 and OS.MK_XBUTTON2 bits are sometimes set,
+      # causing mouse capture to become stuck.  The fix is to test
+      # for the extra buttons only when they exist.
       if (@display.attr_x_mouse)
         if (OS._get_key_state(OS::VK_XBUTTON1) < 0)
           event.attr_state_mask |= SWT::BUTTON4
@@ -1503,6 +1507,16 @@ module Org::Eclipse::Swt::Widgets
       return set_input_state(event, type)
     end
     
+    typesig { [] }
+    def set_tab_group_focus
+      return set_tab_item_focus
+    end
+    
+    typesig { [] }
+    def set_tab_item_focus
+      return false
+    end
+    
     typesig { [::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int] }
     # long
     # long
@@ -1535,6 +1549,10 @@ module Org::Eclipse::Swt::Widgets
       event.attr_x = x
       event.attr_y = y
       send_event(SWT::MenuDetect, event)
+      # widget could be disposed at this point
+      if (is_disposed)
+        return false
+      end
       if (!event.attr_doit)
         return true
       end

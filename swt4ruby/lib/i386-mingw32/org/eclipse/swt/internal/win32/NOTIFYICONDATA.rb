@@ -1,6 +1,6 @@
 require "rjava"
 
-# Copyright (c) 2000, 2006 IBM Corporation and others.
+# Copyright (c) 2000, 2008 IBM Corporation and others.
 # All rights reserved. This program and the accompanying materials
 # are made available under the terms of the Eclipse Public License v1.0
 # which accompanies this distribution, and is available at
@@ -25,6 +25,7 @@ module Org::Eclipse::Swt::Internal::Win32
     alias_method :attr_cb_size=, :cb_size=
     undef_method :cb_size=
     
+    # @field cast=(HWND)
     # long
     attr_accessor :h_wnd
     alias_method :attr_h_wnd, :h_wnd
@@ -50,6 +51,7 @@ module Org::Eclipse::Swt::Internal::Win32
     alias_method :attr_u_callback_message=, :u_callback_message=
     undef_method :u_callback_message=
     
+    # @field cast=(HICON)
     # long
     attr_accessor :h_icon
     alias_method :attr_h_icon, :h_icon
@@ -57,24 +59,28 @@ module Org::Eclipse::Swt::Internal::Win32
     alias_method :attr_h_icon=, :h_icon=
     undef_method :h_icon=
     
+    # @field flags=no_wince
     attr_accessor :dw_state
     alias_method :attr_dw_state, :dw_state
     undef_method :dw_state
     alias_method :attr_dw_state=, :dw_state=
     undef_method :dw_state=
     
+    # @field flags=no_wince
     attr_accessor :dw_state_mask
     alias_method :attr_dw_state_mask, :dw_state_mask
     undef_method :dw_state_mask
     alias_method :attr_dw_state_mask=, :dw_state_mask=
     undef_method :dw_state_mask=
     
+    # @field flags=no_wince
     attr_accessor :u_version
     alias_method :attr_u_version, :u_version
     undef_method :u_version
     alias_method :attr_u_version=, :u_version=
     undef_method :u_version=
     
+    # @field flags=no_wince
     attr_accessor :dw_info_flags
     alias_method :attr_dw_info_flags, :dw_info_flags
     undef_method :dw_info_flags

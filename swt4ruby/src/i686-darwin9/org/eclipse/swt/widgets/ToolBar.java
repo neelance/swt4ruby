@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2008 IBM Corporation and others.
+ * Copyright (c) 2000, 2009 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -11,10 +11,10 @@
 package org.eclipse.swt.widgets;
 
  
-import org.eclipse.swt.internal.carbon.CFRange;
-import org.eclipse.swt.internal.carbon.OS;
+import org.eclipse.swt.internal.cocoa.*;
  
 import org.eclipse.swt.*;
+import org.eclipse.swt.accessibility.*;
 import org.eclipse.swt.graphics.*;
 
 /**
@@ -43,12 +43,13 @@ import org.eclipse.swt.graphics.*;
  * @see <a href="http://www.eclipse.org/swt/snippets/#toolbar">ToolBar, ToolItem snippets</a>
  * @see <a href="http://www.eclipse.org/swt/examples.php">SWT Example: ControlExample</a>
  * @see <a href="http://www.eclipse.org/swt/">Sample code and further information</a>
+ * @noextend This class is not intended to be subclassed by clients.
  */
 public class ToolBar extends Composite {
 	int itemCount;
 	ToolItem [] items;
-
-
+	NSArray accessibilityAttributes = null;
+	
 /**
  * Constructs a new instance of this class given its parent
  * and a style value describing its behavior and appearance.
@@ -100,6 +101,77 @@ public ToolBar (Composite parent, int style) {
 	}
 }
 
+int /*long*/ accessibilityAttributeNames(int /*long*/ id, int /*long*/ sel) {
+	
+	if (accessibilityAttributes == null) {
+		NSMutableArray ourAttributes = NSMutableArray.arrayWithCapacity(10);
+		ourAttributes.addObject(OS.NSAccessibilityRoleAttribute);
+		ourAttributes.addObject(OS.NSAccessibilityRoleDescriptionAttribute);
+		ourAttributes.addObject(OS.NSAccessibilityParentAttribute);
+		ourAttributes.addObject(OS.NSAccessibilityPositionAttribute);
+		ourAttributes.addObject(OS.NSAccessibilitySizeAttribute);
+		ourAttributes.addObject(OS.NSAccessibilityWindowAttribute);
+		ourAttributes.addObject(OS.NSAccessibilityTopLevelUIElementAttribute);
+		ourAttributes.addObject(OS.NSAccessibilityHelpAttribute);
+		ourAttributes.addObject(OS.NSAccessibilityEnabledAttribute);
+		ourAttributes.addObject(OS.NSAccessibilityFocusedAttribute);
+		ourAttributes.addObject(OS.NSAccessibilityChildrenAttribute);
+
+		if (accessible != null) {
+			// See if the accessible will override or augment the standard list.
+			// Help, title, and description can be overridden.
+			NSMutableArray extraAttributes = NSMutableArray.arrayWithCapacity(3);
+			extraAttributes.addObject(OS.NSAccessibilityHelpAttribute);
+			extraAttributes.addObject(OS.NSAccessibilityDescriptionAttribute);
+			extraAttributes.addObject(OS.NSAccessibilityTitleAttribute);
+
+			for (int i = (int)/*64*/extraAttributes.count() - 1; i >= 0; i--) {
+				NSString attribute = new NSString(extraAttributes.objectAtIndex(i).id);
+				if (accessible.internal_accessibilityAttributeValue(attribute, ACC.CHILDID_SELF) != null) {
+					ourAttributes.addObject(extraAttributes.objectAtIndex(i));
+				}
+			}
+		}
+		
+		accessibilityAttributes = ourAttributes;
+		accessibilityAttributes.retain();
+	}
+	
+	return accessibilityAttributes.id;
+}
+
+int /*long*/ accessibilityAttributeValue (int /*long*/ id, int /*long*/ sel, int /*long*/ arg0) {
+	NSString nsAttributeName = new NSString(arg0);
+	
+	if (accessible != null) {
+		id returnObject = accessible.internal_accessibilityAttributeValue(nsAttributeName, ACC.CHILDID_SELF);
+		if (returnObject != null) return returnObject.id;
+	}
+	
+	if (nsAttributeName.isEqualToString (OS.NSAccessibilityRoleAttribute) || nsAttributeName.isEqualToString (OS.NSAccessibilityRoleDescriptionAttribute)) {
+		NSString role = OS.NSAccessibilityToolbarRole;
+
+		if (nsAttributeName.isEqualToString (OS.NSAccessibilityRoleAttribute))
+			return role.id;
+		else {
+			int /*long*/ roleDescription = OS.NSAccessibilityRoleDescription(role.id, 0);
+			return roleDescription;
+		}
+	} else if (nsAttributeName.isEqualToString(OS.NSAccessibilityEnabledAttribute)) {
+		return NSNumber.numberWithBool(isEnabled()).id;
+	} else if (nsAttributeName.isEqualToString(OS.NSAccessibilityFocusedAttribute)) {
+		boolean focused = (view.id == view.window().firstResponder().id);
+		return NSNumber.numberWithBool(focused).id;
+	}
+	
+	return super.accessibilityAttributeValue(id, sel, arg0);
+}
+
+boolean accessibilityIsIgnored(int /*long*/ id, int /*long*/ sel) {
+	// Toolbars aren't ignored.
+	return false;	
+}
+
 static int checkStyle (int style) {
 	/*
 	* Even though it is legal to create this widget
@@ -128,9 +200,11 @@ public Point computeSize (int wHint, int hHint, boolean changed) {
 }
 
 void createHandle () {
-	state |= GRAB | THEME_BACKGROUND;
-	super.createHandle (parent.handle);
-	OS.HIObjectSetAccessibilityIgnored (handle, false);
+	state |= THEME_BACKGROUND;
+	NSView widget = (NSView)new SWTView().alloc();
+	widget.init();
+//	widget.setDrawsBackground(false);
+	view = widget;
 }
 
 void createItem (ToolItem item, int index) {
@@ -140,7 +214,8 @@ void createItem (ToolItem item, int index) {
 		System.arraycopy (items, 0, newItems, 0, items.length);
 		items = newItems;
 	}
-	item.createWidget ();
+	item.createWidget();
+	view.addSubview(item.view);
 	System.arraycopy (items, index, items, index + 1, itemCount++ - index);
 	items [index] = item;
 	relayout ();
@@ -152,11 +227,6 @@ void createWidget () {
 	itemCount = 0;
 }
 
-int defaultThemeFont () {
-	if (display.smallFonts) return OS.kThemeToolbarFont;
-	return OS.kThemeSystemFont;
-}
-
 void destroyItem (ToolItem item) {
 	int index = 0;
 	while (index < itemCount) {
@@ -166,15 +236,34 @@ void destroyItem (ToolItem item) {
 	if (index == itemCount) return;
 	System.arraycopy (items, index + 1, items, index, --itemCount - index);
 	items [itemCount] = null;
+	item.view.removeFromSuperview();
 	relayout ();
 }
 
-void drawBackground (int control, int context) {
-	fillBackground (control, context, null);
+void drawBackground (int /*long*/ id, NSGraphicsContext context, NSRect rect) {
+	if (id != view.id) return;
+	if (background != null) {
+		fillBackground (view, context, rect, -1);
+	}
 }
 
-void enableWidget (boolean enabled) {
-	/* Do nothing - A tool bar does not disable items when it is disabled */
+void enableWidget(boolean enabled) {
+	super.enableWidget(enabled);
+	for (int i = 0; i < itemCount; i++) {
+		ToolItem item = items[i];
+		if (item != null) {
+			item.enableWidget(enabled);
+		}
+	}
+}
+
+Widget findTooltip (NSPoint pt) {
+	pt = view.convertPoint_fromView_ (pt, null);
+	for (int i = 0; i < itemCount; i++) {
+		ToolItem item = items [i];
+		if (OS.NSPointInRect(pt, item.view.frame())) return item;
+	}
+	return super.findTooltip (pt);
 }
 
 /**
@@ -310,48 +399,6 @@ public int indexOf (ToolItem item) {
 	return -1;
 }
 
-void invalidateChildrenVisibleRegion (int control) {
-	super.invalidateChildrenVisibleRegion (control);
-	for (int i=0; i<itemCount; i++) {
-		ToolItem item = items [i];
-		item.resetVisibleRegion (control);
-	}
-}
-
-int kEventAccessibleGetNamedAttribute (int nextHandler, int theEvent, int userData) {
-	int code = OS.eventNotHandledErr;
-	int [] stringRef = new int [1];
-	OS.GetEventParameter (theEvent, OS.kEventParamAccessibleAttributeName, OS.typeCFStringRef, null, 4, null, stringRef);
-	int length = 0;
-	if (stringRef [0] != 0) length = OS.CFStringGetLength (stringRef [0]);
-	char [] buffer = new char [length];
-	CFRange range = new CFRange ();
-	range.length = length;
-	OS.CFStringGetCharacters (stringRef [0], range, buffer);
-	String attributeName = new String(buffer);
-	if (attributeName.equals (OS.kAXRoleAttribute) || attributeName.equals (OS.kAXRoleDescriptionAttribute)) {
-		String roleText = OS.kAXToolbarRole;
-		buffer = new char [roleText.length ()];
-		roleText.getChars (0, buffer.length, buffer, 0);
-		stringRef [0] = OS.CFStringCreateWithCharacters (OS.kCFAllocatorDefault, buffer, buffer.length);
-		if (stringRef [0] != 0) {
-			if (attributeName.equals (OS.kAXRoleAttribute)) {
-				OS.SetEventParameter (theEvent, OS.kEventParamAccessibleAttributeValue, OS.typeCFStringRef, 4, stringRef);
-			} else { // kAXRoleDescriptionAttribute
-				int stringRef2 = OS.HICopyAccessibilityRoleDescription (stringRef [0], 0);
-				OS.SetEventParameter (theEvent, OS.kEventParamAccessibleAttributeValue, OS.typeCFStringRef, 4, new int [] {stringRef2});
-				OS.CFRelease(stringRef2);
-			}
-			OS.CFRelease(stringRef [0]);
-			code = OS.noErr;
-		}
-	}
-	if (accessible != null) {
-		code = accessible.internal_kEventAccessibleGetNamedAttribute (nextHandler, theEvent, code);
-	}
-	return code;
-}
-
 int [] layoutHorizontal (int width, int height, boolean resize) {
 	int xSpacing = 0, ySpacing = 2;
 	int marginWidth = 0, marginHeight = 0;
@@ -385,9 +432,6 @@ int [] layoutHorizontal (int width, int height, boolean resize) {
 		x += xSpacing + size.x;
 		maxX = Math.max (maxX, x);
 	}
-	
-	//TODO - tempporary code
-	if (resize) invalidateVisibleRegion (handle);
 	
 	return new int [] {rows, maxX, y + itemHeight};
 }
@@ -426,9 +470,6 @@ int [] layoutVertical (int width, int height, boolean resize) {
 		maxY = Math.max (maxY, y);
 	}
 	
-	//TODO - tempporary code
-	if (resize) invalidateVisibleRegion (handle);
-	
 	return new int [] {cols, x + itemWidth, maxY};
 }
 
@@ -441,7 +482,7 @@ int [] layout (int nWidth, int nHeight, boolean resize) {
 }
 
 void relayout () {
-	if (drawCount > 0) return;
+	if (!getDrawing()) return;
 	Rectangle rect = getClientArea ();
 	layout (rect.width, rect.height, true);
 }
@@ -460,6 +501,12 @@ void releaseChildren (boolean destroy) {
 	super.releaseChildren (destroy);
 }
 
+void releaseHandle () {
+	super.releaseHandle ();
+	if (accessibilityAttributes != null) accessibilityAttributes.release();
+	accessibilityAttributes = null;
+}
+
 void removeControl (Control control) {
 	super.removeControl (control);
 	for (int i=0; i<itemCount; i++) {
@@ -468,41 +515,16 @@ void removeControl (Control control) {
 	}
 }
 
-void setBackground (float [] color) {
-	super.setBackground (color);
-	if (items == null) return;
-	for (int i=0; i<itemCount; i++) {
-		ToolItem item = items [i];
-		item.setBackground (color);
-	}
-	redrawWidget (handle, true);
-}
-
-int setBounds (int x, int y, int width, int height, boolean move, boolean resize, boolean events) {
-	int result = super.setBounds (x, y, width, height, move, resize, events);
-	if ((result & RESIZED) != 0) 	relayout ();
-	return result;
-}
-
-void setFontStyle (Font font) {
-	super.setFontStyle (font);
-	if (items == null) return;
-	for (int i=0; i<itemCount; i++) {
-		ToolItem item = items [i];
-		item.setFontStyle (font);
-	}
-	redrawWidget (handle, true);
+void resized () {
+	super.resized ();
 	relayout ();
 }
 
-void setForeground (float [] color) {
-	super.setForeground (color);
-	if (items == null) return;
-	for (int i=0; i<itemCount; i++) {
-		ToolItem item = items [i];
-		item.setForeground (color);
+void setFont(NSFont font) {
+	for (int i = 0; i < itemCount; i++) {
+		ToolItem item = items[i];
+		if (item.button != null) ((NSButton)item.button).setAttributedTitle(item.createString());
 	}
-	redrawWidget (handle, true);
 }
 
 public void setRedraw (boolean redraw) {

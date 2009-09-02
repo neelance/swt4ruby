@@ -1,6 +1,6 @@
 require "rjava"
 
-# Copyright (c) 2000, 2008 IBM Corporation and others.
+# Copyright (c) 2000, 2009 IBM Corporation and others.
 # All rights reserved. This program and the accompanying materials
 # are made available under the terms of the Eclipse Public License v1.0
 # which accompanies this distribution, and is available at
@@ -13,7 +13,7 @@ module Org::Eclipse::Swt::Widgets
     class_module.module_eval {
       include ::Java::Lang
       include ::Org::Eclipse::Swt::Widgets
-      include_const ::Org::Eclipse::Swt::Internal::Carbon, :OS
+      include ::Org::Eclipse::Swt::Internal::Cocoa
       include ::Org::Eclipse::Swt
       include ::Org::Eclipse::Swt::Events
       include ::Org::Eclipse::Swt::Graphics
@@ -69,6 +69,7 @@ module Org::Eclipse::Swt::Widgets
   # @see <a href="http://www.eclipse.org/swt/snippets/#slider">Slider snippets</a>
   # @see <a href="http://www.eclipse.org/swt/examples.php">SWT Example: ControlExample</a>
   # @see <a href="http://www.eclipse.org/swt/">Sample code and further information</a>
+  # @noextend This class is not intended to be subclassed by clients.
   class Slider < SliderImports.const_get :Control
     include_class_members SliderImports
     
@@ -77,6 +78,24 @@ module Org::Eclipse::Swt::Widgets
     undef_method :dragging
     alias_method :attr_dragging=, :dragging=
     undef_method :dragging=
+    
+    attr_accessor :minimum
+    alias_method :attr_minimum, :minimum
+    undef_method :minimum
+    alias_method :attr_minimum=, :minimum=
+    undef_method :minimum=
+    
+    attr_accessor :maximum
+    alias_method :attr_maximum, :maximum
+    undef_method :maximum
+    alias_method :attr_maximum=, :maximum=
+    undef_method :maximum=
+    
+    attr_accessor :thumb
+    alias_method :attr_thumb, :thumb
+    undef_method :thumb
+    alias_method :attr_thumb=, :thumb=
+    undef_method :thumb=
     
     attr_accessor :increment
     alias_method :attr_increment, :increment
@@ -120,6 +139,9 @@ module Org::Eclipse::Swt::Widgets
     # @see Widget#getStyle
     def initialize(parent, style)
       @dragging = false
+      @minimum = 0
+      @maximum = 0
+      @thumb = 0
       @increment = 0
       @page_increment = 0
       super(parent, check_style(style))
@@ -175,50 +197,16 @@ module Org::Eclipse::Swt::Widgets
       end
     }
     
-    typesig { [::Java::Int, ::Java::Int] }
-    def action_proc(the_control, part_code)
-      result = super(the_control, part_code)
-      if ((result).equal?(OS.attr_no_err))
-        return result
-      end
-      event = Event.new
-      value = OS._get_control32bit_value(self.attr_handle)
-      case (part_code)
-      when OS.attr_k_control_up_button_part
-        value -= @increment
-        event.attr_detail = SWT::ARROW_UP
-      when OS.attr_k_control_page_up_part
-        value -= @page_increment
-        event.attr_detail = SWT::PAGE_UP
-      when OS.attr_k_control_page_down_part
-        value += @page_increment
-        event.attr_detail = SWT::PAGE_DOWN
-      when OS.attr_k_control_down_button_part
-        value += @increment
-        event.attr_detail = SWT::ARROW_DOWN
-      when OS.attr_k_control_indicator_part
-        @dragging = true
-        event.attr_detail = SWT::DRAG
-      else
-        return result
-      end
-      OS._set_control32bit_value(self.attr_handle, value)
-      send_event(SWT::Selection, event)
-      return result
-    end
-    
     typesig { [::Java::Int, ::Java::Int, ::Java::Boolean] }
     def compute_size(w_hint, h_hint, changed)
       check_widget
-      out_metric = Array.typed(::Java::Int).new(1) { 0 }
-      OS._get_theme_metric(OS.attr_k_theme_metric_scroll_bar_width, out_metric)
       width = 0
       height = 0
       if (!((self.attr_style & SWT::HORIZONTAL)).equal?(0))
-        height = out_metric[0]
+        height = RJava.cast_to_int(NSScroller.scroller_width_for_control_size((self.attr_view).control_size))
         width = height * 10
       else
-        width = out_metric[0]
+        width = RJava.cast_to_int(NSScroller.scroller_width_for_control_size((self.attr_view).control_size))
         height = width * 10
       end
       if (!(w_hint).equal?(SWT::DEFAULT))
@@ -232,19 +220,31 @@ module Org::Eclipse::Swt::Widgets
     
     typesig { [] }
     def create_handle
-      action_proc = self.attr_display.attr_action_proc
-      out_control = Array.typed(::Java::Int).new(1) { 0 }
-      window = OS._get_control_owner(self.attr_parent.attr_handle)
-      OS._create_scroll_bar_control(window, nil, 0, 0, 90, 10, true, action_proc, out_control)
-      if ((out_control[0]).equal?(0))
-        error(SWT::ERROR_NO_HANDLES)
+      widget = SWTScroller.new.alloc
+      rect = NSRect.new
+      if (!((self.attr_style & SWT::HORIZONTAL)).equal?(0))
+        rect.attr_width = 1
+      else
+        rect.attr_height = 1
       end
-      self.attr_handle = out_control[0]
+      widget.init_with_frame(rect)
+      widget.set_enabled(true)
+      widget.set_target(widget)
+      widget.set_action(OS.attr_sel_send_selection)
+      self.attr_view = widget
+      update_bar(0, @minimum, @maximum, @thumb)
     end
     
-    typesig { [::Java::Int, ::Java::Int] }
-    def draw_background(control, context)
-      fill_background(control, context, nil)
+    typesig { [] }
+    def create_widget
+      @maximum = 100
+      @thumb = 10
+      super
+    end
+    
+    typesig { [] }
+    def default_nsfont
+      return self.attr_display.attr_scroller_font
     end
     
     typesig { [] }
@@ -274,9 +274,7 @@ module Org::Eclipse::Swt::Widgets
     # </ul>
     def get_maximum
       check_widget
-      maximum = OS._get_control32bit_maximum(self.attr_handle)
-      view_size = OS._get_control_view_size(self.attr_handle)
-      return maximum + view_size
+      return @maximum
     end
     
     typesig { [] }
@@ -290,7 +288,7 @@ module Org::Eclipse::Swt::Widgets
     # </ul>
     def get_minimum
       check_widget
-      return OS._get_control32bit_minimum(self.attr_handle)
+      return @minimum
     end
     
     typesig { [] }
@@ -320,7 +318,9 @@ module Org::Eclipse::Swt::Widgets
     # </ul>
     def get_selection
       check_widget
-      return OS._get_control32bit_value(self.attr_handle)
+      widget = self.attr_view
+      value = widget.double_value
+      return RJava.cast_to_int((0.5 + ((@maximum - @thumb - @minimum) * value + @minimum)))
     end
     
     typesig { [] }
@@ -335,23 +335,7 @@ module Org::Eclipse::Swt::Widgets
     # </ul>
     def get_thumb
       check_widget
-      return OS._get_control_view_size(self.attr_handle)
-    end
-    
-    typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
-    def k_event_mouse_down(next_handler, the_event, user_data)
-      status = super(next_handler, the_event, user_data)
-      if ((status).equal?(OS.attr_no_err))
-        return status
-      end
-      @dragging = false
-      status = OS._call_next_event_handler(next_handler, the_event)
-      if (@dragging)
-        event = Event.new
-        send_event(SWT::Selection, event)
-      end
-      @dragging = false
-      return status
+      return @thumb
     end
     
     typesig { [SelectionListener] }
@@ -380,6 +364,34 @@ module Org::Eclipse::Swt::Widgets
       end
       self.attr_event_table.unhook(SWT::Selection, listener)
       self.attr_event_table.unhook(SWT::DefaultSelection, listener)
+    end
+    
+    typesig { [] }
+    def send_selection
+      event = Event.new
+      # 64
+      hit_part = RJava.cast_to_int((self.attr_view).hit_part)
+      value = get_selection
+      case (hit_part)
+      when OS::NSScrollerDecrementLine
+        event.attr_detail = SWT::ARROW_UP
+        value -= @increment
+      when OS::NSScrollerDecrementPage
+        value -= @page_increment
+        event.attr_detail = SWT::PAGE_UP
+      when OS::NSScrollerIncrementLine
+        value += @increment
+        event.attr_detail = SWT::ARROW_DOWN
+      when OS::NSScrollerIncrementPage
+        value += @page_increment
+        event.attr_detail = SWT::PAGE_DOWN
+      when OS::NSScrollerKnob
+        event.attr_detail = SWT::DRAG
+      end
+      if (!(event.attr_detail).equal?(SWT::DRAG))
+        set_selection(value)
+      end
+      send_event(SWT::Selection, event)
     end
     
     typesig { [::Java::Int] }
@@ -419,16 +431,15 @@ module Org::Eclipse::Swt::Widgets
       if (value < 0)
         return
       end
-      minimum = OS._get_control32bit_minimum(self.attr_handle)
-      if (value <= minimum)
+      if (value <= @minimum)
         return
       end
-      view_size = OS._get_control_view_size(self.attr_handle)
-      if (value - minimum < view_size)
-        view_size = value - minimum
-        OS._set_control_view_size(self.attr_handle, view_size)
+      if (value - @minimum < @thumb)
+        @thumb = value - @minimum
       end
-      OS._set_control32bit_maximum(self.attr_handle, value - view_size)
+      selection = Math.max(@minimum, Math.min(get_selection, value - @thumb))
+      @maximum = value
+      update_bar(selection, @minimum, value, @thumb)
     end
     
     typesig { [::Java::Int] }
@@ -448,17 +459,15 @@ module Org::Eclipse::Swt::Widgets
       if (value < 0)
         return
       end
-      view_size = OS._get_control_view_size(self.attr_handle)
-      maximum = OS._get_control32bit_maximum(self.attr_handle) + view_size
-      if (value >= maximum)
+      if (value >= @maximum)
         return
       end
-      if (maximum - value < view_size)
-        view_size = maximum - value
-        OS._set_control32bit_maximum(self.attr_handle, maximum - view_size)
-        OS._set_control_view_size(self.attr_handle, view_size)
+      if (@maximum - value < @thumb)
+        @thumb = @maximum - value
       end
-      OS._set_control32bit_minimum(self.attr_handle, value)
+      selection = Math.min(@maximum - @thumb, Math.max(get_selection, value))
+      @minimum = value
+      update_bar(selection, value, @maximum, @thumb)
     end
     
     typesig { [::Java::Int] }
@@ -494,7 +503,23 @@ module Org::Eclipse::Swt::Widgets
     # </ul>
     def set_selection(value)
       check_widget
-      OS._set_control32bit_value(self.attr_handle, value)
+      update_bar(value, @minimum, @maximum, @thumb)
+    end
+    
+    typesig { [] }
+    def set_small_size
+      # This code is intentionally comment
+      # ((NSScroller)view).setControlSize (OS.NSSmallControlSize);
+    end
+    
+    typesig { [::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int] }
+    def update_bar(selection, minimum, maximum, thumb)
+      widget = self.attr_view
+      selection = Math.max(minimum, Math.min(maximum - thumb, selection))
+      range = maximum - thumb - minimum
+      fraction = range <= 0 ? 1 : ((selection - minimum)).to_f / range
+      knob = range <= 0 ? 1 : (thumb).to_f / (maximum - minimum)
+      widget.set_float_value(fraction, knob)
     end
     
     typesig { [::Java::Int] }
@@ -515,12 +540,9 @@ module Org::Eclipse::Swt::Widgets
       if (value < 1)
         return
       end
-      minimum = OS._get_control32bit_minimum(self.attr_handle)
-      view_size = OS._get_control_view_size(self.attr_handle)
-      maximum = OS._get_control32bit_maximum(self.attr_handle) + view_size
-      value = Math.min(value, maximum - minimum)
-      OS._set_control32bit_maximum(self.attr_handle, maximum - value)
-      OS._set_control_view_size(self.attr_handle, value)
+      value = Math.min(value, @maximum - @minimum)
+      update_bar(get_selection, @minimum, @maximum, value)
+      @thumb = value
     end
     
     typesig { [::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int] }
@@ -561,12 +583,12 @@ module Org::Eclipse::Swt::Widgets
         return
       end
       thumb = Math.min(thumb, maximum - minimum)
-      OS._set_control32bit_minimum(self.attr_handle, minimum)
-      OS._set_control32bit_maximum(self.attr_handle, maximum - thumb)
-      OS._set_control_view_size(self.attr_handle, thumb)
-      OS._set_control32bit_value(self.attr_handle, selection)
+      @thumb = thumb
+      @maximum = maximum
+      @minimum = minimum
       @increment = increment
       @page_increment = page_increment
+      update_bar(selection, minimum, maximum, thumb)
     end
     
     private

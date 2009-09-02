@@ -1,6 +1,6 @@
 require "rjava"
 
-# Copyright (c) 2000, 2008 IBM Corporation and others.
+# Copyright (c) 2000, 2009 IBM Corporation and others.
 # All rights reserved. This program and the accompanying materials
 # are made available under the terms of the Eclipse Public License v1.0
 # which accompanies this distribution, and is available at
@@ -13,9 +13,9 @@ module Org::Eclipse::Swt::Widgets
     class_module.module_eval {
       include ::Java::Lang
       include ::Org::Eclipse::Swt::Widgets
-      include ::Org::Eclipse::Swt::Internal::Carbon
       include ::Org::Eclipse::Swt
       include ::Org::Eclipse::Swt::Graphics
+      include ::Org::Eclipse::Swt::Internal::Cocoa
     }
   end
   
@@ -54,12 +54,43 @@ module Org::Eclipse::Swt::Widgets
     alias_method :attr_ime=, :ime=
     undef_method :ime=
     
+    attr_accessor :context
+    alias_method :attr_context, :context
+    undef_method :context
+    alias_method :attr_context=, :context=
+    undef_method :context=
+    
     typesig { [] }
     def initialize
       @caret = nil
       @ime = nil
+      @context = nil
       super()
       # Do nothing
+    end
+    
+    typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
+    # long
+    # long
+    # long
+    # long
+    def attributed_substring_from_range(id, sel, range)
+      if (!(@ime).nil?)
+        return @ime.attributed_substring_from_range(id, sel, range)
+      end
+      return super(id, sel, range)
+    end
+    
+    typesig { [::Java::Int] }
+    def send_focus_event(type)
+      if (!(@caret).nil?)
+        if ((type).equal?(SWT::FocusIn))
+          @caret.set_focus
+        else
+          @caret.kill_focus
+        end
+      end
+      super(type)
     end
     
     typesig { [Composite, ::Java::Int] }
@@ -91,7 +122,20 @@ module Org::Eclipse::Swt::Widgets
     def initialize(parent, style)
       @caret = nil
       @ime = nil
+      @context = nil
       super(parent, style)
+    end
+    
+    typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
+    # long
+    # long
+    # long
+    # long
+    def character_index_for_point(id, sel, point)
+      if (!(@ime).nil?)
+        return @ime.character_index_for_point(id, sel, point)
+      end
+      return super(id, sel, point)
     end
     
     typesig { [SwtGC, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int] }
@@ -124,48 +168,113 @@ module Org::Eclipse::Swt::Widgets
       end
       control = find_background_control
       if (!(control).nil?)
-        control.fill_background(self.attr_handle, gc.attr_handle, Rectangle.new(x, y, width, height))
+        rect = NSRect.new
+        rect.attr_x = x
+        rect.attr_y = y
+        rect.attr_width = width
+        rect.attr_height = height
+        img_height = -1
+        data = gc.get_gcdata
+        if (!(data.attr_image).nil?)
+          img_height = data.attr_image.get_bounds.attr_height
+        end
+        context = gc.attr_handle
+        if (!(data.attr_flipped_context).nil?)
+          NSGraphicsContext.static_save_graphics_state
+          NSGraphicsContext.set_current_context(context)
+        end
+        control.fill_background(self.attr_view, context, rect, img_height)
+        if (!(data.attr_flipped_context).nil?)
+          NSGraphicsContext.static_restore_graphics_state
+        end
       else
         gc.fill_rectangle(x, y, width, height)
       end
     end
     
-    typesig { [::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int] }
-    def draw_widget(control, context, damage_rgn, visible_rgn, the_event)
-      super(control, context, damage_rgn, visible_rgn, the_event)
-      if (OS::VERSION >= 0x1040)
-        if (!(control).equal?(self.attr_handle))
-          return
-        end
-        if ((@caret).nil?)
-          return
-        end
-        if (@caret.attr_is_showing)
-          OS._cgcontext_save_gstate(context)
-          rect = CGRect.new
-          rect.attr_x = @caret.attr_x
-          rect.attr_y = @caret.attr_y
-          image = @caret.attr_image
-          OS._cgcontext_set_blend_mode(context, OS.attr_k_cgblend_mode_difference)
-          if (!(image).nil?)
-            rect.attr_width = OS._cgimage_get_width(image.attr_handle)
-            rect.attr_height = OS._cgimage_get_height(image.attr_handle)
-            OS._cgcontext_scale_ctm(context, 1, -1)
-            OS._cgcontext_translate_ctm(context, 0, -(rect.attr_height + 2 * rect.attr_y))
-            OS._cgcontext_draw_image(context, rect, image.attr_handle)
-          else
-            rect.attr_width = !(@caret.attr_width).equal?(0) ? @caret.attr_width : Caret::DEFAULT_WIDTH
-            rect.attr_height = @caret.attr_height
-            OS._cgcontext_set_should_antialias(context, false)
-            colorspace = OS._cgcolor_space_create_device_rgb
-            OS._cgcontext_set_fill_color_space(context, colorspace)
-            OS._cgcontext_set_fill_color(context, Array.typed(::Java::Float).new([1, 1, 1, 1]))
-            OS._cgcolor_space_release(colorspace)
-            OS._cgcontext_fill_rect(context, rect)
+    typesig { [::Java::Int, ::Java::Int, NSRect] }
+    # long
+    # long
+    def draw_rect(id, sel, rect)
+      if (!(@context).nil? && (@context.view).nil?)
+        @context.set_view(self.attr_view)
+      end
+      super(id, sel, rect)
+    end
+    
+    typesig { [::Java::Int, NSGraphicsContext, NSRect] }
+    # long
+    def draw_widget(id, context, rect)
+      if (!(id).equal?(self.attr_view.attr_id))
+        return
+      end
+      super(id, context, rect)
+      if ((@caret).nil?)
+        return
+      end
+      if (@caret.attr_is_showing)
+        image = @caret.attr_image
+        if (!(image).nil?)
+          image_handle = image.attr_handle
+          image_rep = image_handle.best_representation_for_device(nil)
+          if (!image_rep.is_kind_of_class(OS.attr_class_nsbitmap_image_rep))
+            return
           end
-          OS._cgcontext_restore_gstate(context)
+          rep = NSBitmapImageRep.new(image_rep)
+          dest_rect = CGRect.new
+          dest_rect.attr_origin.attr_x = @caret.attr_x
+          dest_rect.attr_origin.attr_y = @caret.attr_y
+          size_ = image_handle.size
+          dest_rect.attr_size.attr_width = size_.attr_width
+          dest_rect.attr_size.attr_height = size_.attr_height
+          # long
+          data = rep.bitmap_data
+          # long
+          bpr = rep.bytes_per_row
+          alpha_info = rep.has_alpha ? OS.attr_k_cgimage_alpha_first : OS.attr_k_cgimage_alpha_none_skip_first
+          # long
+          provider = OS._cgdata_provider_create_with_data(0, data, bpr * RJava.cast_to_int(size_.attr_height), 0)
+          # long
+          colorspace = OS._cgcolor_space_create_device_rgb
+          # long
+          cg_image = OS._cgimage_create(RJava.cast_to_int(size_.attr_width), RJava.cast_to_int(size_.attr_height), rep.bits_per_sample, rep.bits_per_pixel, bpr, colorspace, alpha_info, provider, 0, true, 0)
+          OS._cgcolor_space_release(colorspace)
+          OS._cgdata_provider_release(provider)
+          # long
+          ctx = context.graphics_port
+          OS._cgcontext_save_gstate(ctx)
+          OS._cgcontext_scale_ctm(ctx, 1, -1)
+          OS._cgcontext_translate_ctm(ctx, 0, -(size_.attr_height + 2 * dest_rect.attr_origin.attr_y))
+          OS._cgcontext_set_blend_mode(ctx, OS.attr_k_cgblend_mode_difference)
+          OS._cgcontext_draw_image(ctx, dest_rect, cg_image)
+          OS._cgcontext_restore_gstate(ctx)
+          OS._cgimage_release(cg_image)
+        else
+          context.save_graphics_state
+          context.set_compositing_operation(OS::NSCompositeXOR)
+          draw_rect = NSRect.new
+          draw_rect.attr_x = @caret.attr_x
+          draw_rect.attr_y = @caret.attr_y
+          draw_rect.attr_width = !(@caret.attr_width).equal?(0) ? @caret.attr_width : Caret::DEFAULT_WIDTH
+          draw_rect.attr_height = @caret.attr_height
+          context.set_should_antialias(false)
+          color = NSColor.color_with_device_red(1, 1, 1, 1)
+          color.set
+          NSBezierPath.fill_rect(draw_rect)
+          context.restore_graphics_state
         end
       end
+    end
+    
+    typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
+    # long
+    # long
+    # long
+    def first_rect_for_character_range(id, sel, range)
+      if (!(@ime).nil?)
+        return @ime.first_rect_for_character_range(id, sel, range)
+      end
+      return super(id, sel, range)
     end
     
     typesig { [] }
@@ -206,122 +315,52 @@ module Org::Eclipse::Swt::Widgets
       return @ime
     end
     
-    typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
-    def k_event_control_draw(next_handler, the_event, user_data)
-      the_control = Array.typed(::Java::Int).new(1) { 0 }
-      OS._get_event_parameter(the_event, OS.attr_k_event_param_direct_object, OS.attr_type_control_ref, nil, 4, nil, the_control)
-      is_focus = OS::VERSION < 0x1040 && (the_control[0]).equal?(self.attr_handle) && !(@caret).nil? && @caret.is_focus_caret
-      if (is_focus)
-        @caret.kill_focus
-      end
-      result = super(next_handler, the_event, user_data)
-      if (is_focus)
-        @caret.set_focus
-      end
-      return result
-    end
-    
-    typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
-    def k_event_control_set_focus_part(next_handler, the_event, user_data)
-      result = super(next_handler, the_event, user_data)
-      if ((result).equal?(OS.attr_no_err))
-        if (!is_disposed)
-          shell = get_shell
-          part = Array.typed(::Java::Short).new(1) { 0 }
-          OS._get_event_parameter(the_event, OS.attr_k_event_param_control_part, OS.attr_type_control_part_code, nil, 2, nil, part)
-          if (!(part[0]).equal?(OS.attr_k_control_focus_no_part))
-            if (!(@caret).nil?)
-              @caret.set_focus
-            end
-            OS._activate_tsmdocument(shell.attr_im_handle)
-          else
-            if (!(@caret).nil?)
-              @caret.kill_focus
-            end
-            OS._deactivate_tsmdocument(shell.attr_im_handle)
-          end
-        end
-      end
-      return result
-    end
-    
-    typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
-    def k_event_text_input_offset_to_pos(next_handler, the_event, user_data)
+    typesig { [::Java::Int, ::Java::Int] }
+    # long
+    # long
+    def has_marked_text(id, sel)
       if (!(@ime).nil?)
-        result = @ime.k_event_text_input_offset_to_pos(next_handler, the_event, user_data)
-        if (!(result).equal?(OS.attr_event_not_handled_err))
-          return result
-        end
+        return @ime.has_marked_text(id, sel)
       end
-      return super(next_handler, the_event, user_data)
+      return super(id, sel)
+    end
+    
+    typesig { [] }
+    def ime_in_composition
+      return !(@ime).nil? && @ime.is_inline_enabled && !(@ime.attr_start_offset).equal?(-1)
     end
     
     typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
-    def k_event_text_input_pos_to_offset(next_handler, the_event, user_data)
+    # long
+    # long
+    # long
+    def insert_text(id, sel, string)
       if (!(@ime).nil?)
-        result = @ime.k_event_text_input_pos_to_offset(next_handler, the_event, user_data)
-        if (!(result).equal?(OS.attr_event_not_handled_err))
-          return result
+        if (!@ime.insert_text(id, sel, string))
+          return false
         end
       end
-      return super(next_handler, the_event, user_data)
+      return super(id, sel, string)
     end
     
-    typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
-    def k_event_text_input_unicode_for_key_event(next_handler, the_event, user_data)
-      result = super(next_handler, the_event, user_data)
-      if (!(result).equal?(OS.attr_no_err))
-        if (!(@caret).nil?)
-          OS._cgdisplay_hide_cursor(OS._cgmain_display_id)
-        end
+    typesig { [::Java::Int, ::Java::Int] }
+    # long
+    # long
+    def is_opaque(id, sel)
+      if (!(@context).nil?)
+        return true
       end
-      return result
+      return super(id, sel)
     end
     
-    typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
-    def k_event_text_input_update_active_input_area(next_handler, the_event, user_data)
+    typesig { [::Java::Int, ::Java::Int] }
+    # long
+    # long
+    def marked_range(id, sel)
       if (!(@ime).nil?)
-        result = @ime.k_event_text_input_update_active_input_area(next_handler, the_event, user_data)
-        if (!(result).equal?(OS.attr_event_not_handled_err))
-          return result
-        end
+        return @ime.marked_range(id, sel)
       end
-      return super(next_handler, the_event, user_data)
-    end
-    
-    typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
-    def k_event_text_input_get_selected_text(next_handler, the_event, user_data)
-      if (!(@ime).nil?)
-        result = @ime.k_event_text_input_get_selected_text(next_handler, the_event, user_data)
-        if (!(result).equal?(OS.attr_event_not_handled_err))
-          return result
-        end
-      end
-      return super(next_handler, the_event, user_data)
-    end
-    
-    typesig { [::Java::Int, ::Java::Boolean] }
-    def redraw_widget(control, children)
-      is_focus = OS::VERSION < 0x1040 && !(@caret).nil? && @caret.is_focus_caret
-      if (is_focus)
-        @caret.kill_focus
-      end
-      super(control, children)
-      if (is_focus)
-        @caret.set_focus
-      end
-    end
-    
-    typesig { [::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Boolean] }
-    def redraw_widget(control, x, y, width, height, all)
-      is_focus = OS::VERSION < 0x1040 && !(@caret).nil? && @caret.is_focus_caret
-      if (is_focus)
-        @caret.kill_focus
-      end
-      super(control, x, y, width, height, all)
-      if (is_focus)
-        @caret.set_focus
-      end
+      return super(id, sel)
     end
     
     typesig { [::Java::Boolean] }
@@ -368,7 +407,11 @@ module Org::Eclipse::Swt::Widgets
       if ((delta_x).equal?(0) && (delta_y).equal?(0))
         return
       end
-      if (!is_drawing(self.attr_handle))
+      if (!is_drawing)
+        return
+      end
+      visible_rect_ = self.attr_view.visible_rect
+      if (visible_rect_.attr_width <= 0 || visible_rect_.attr_height <= 0)
         return
       end
       is_focus = !(@caret).nil? && @caret.is_focus_caret
@@ -381,13 +424,86 @@ module Org::Eclipse::Swt::Widgets
         update(all)
       end
       control = find_background_control
-      if (!(control).nil? && !(control.attr_background_image).nil?)
-        redraw_widget(self.attr_handle, x, y, width, height, false)
-        redraw_widget(self.attr_handle, dest_x, dest_y, width, height, false)
+      redraw = !(control).nil? && !(control.attr_background_image).nil?
+      if (!redraw)
+        redraw = is_obscured
+      end
+      if (redraw)
+        redraw_widget(self.attr_view, x, y, width, height, false)
+        redraw_widget(self.attr_view, dest_x, dest_y, width, height, false)
       else
-        gc = SwtGC.new(self)
-        gc.copy_area(x, y, width, height, dest_x, dest_y)
-        gc.dispose
+        damage = NSRect.new
+        damage.attr_x = x
+        damage.attr_y = y
+        damage.attr_width = width
+        damage.attr_height = height
+        dest = NSPoint.new
+        dest.attr_x = dest_x
+        dest.attr_y = dest_y
+        self.attr_view.lock_focus
+        OS._nscopy_bits(0, damage, dest)
+        self.attr_view.unlock_focus
+        disjoint = (dest_x + width < x) || (x + width < dest_x) || (dest_y + height < y) || (y + height < dest_y)
+        if (disjoint)
+          self.attr_view.set_needs_display_in_rect(damage)
+        else
+          if (!(delta_x).equal?(0))
+            new_x = dest_x - delta_x
+            if (delta_x < 0)
+              new_x = dest_x + width
+            end
+            damage.attr_x = new_x
+            damage.attr_width = Math.abs(delta_x)
+            self.attr_view.set_needs_display_in_rect(damage)
+          end
+          if (!(delta_y).equal?(0))
+            new_y = dest_y - delta_y
+            if (delta_y < 0)
+              new_y = dest_y + height
+            end
+            damage.attr_x = x
+            damage.attr_y = new_y
+            damage.attr_width = width
+            damage.attr_height = Math.abs(delta_y)
+            self.attr_view.set_needs_display_in_rect(damage)
+          end
+        end
+        src_rect = NSRect.new
+        src_rect.attr_x = source_rect.attr_x
+        src_rect.attr_y = source_rect.attr_y
+        src_rect.attr_width = source_rect.attr_width
+        src_rect.attr_height = source_rect.attr_height
+        OS._nsintersection_rect(visible_rect_, visible_rect_, src_rect)
+        if (!OS._nsequal_rects(visible_rect_, src_rect))
+          if (!(src_rect.attr_x).equal?(visible_rect_.attr_x))
+            damage.attr_x = src_rect.attr_x + delta_x
+            damage.attr_y = src_rect.attr_y + delta_y
+            damage.attr_width = visible_rect_.attr_x - src_rect.attr_x
+            damage.attr_height = src_rect.attr_height
+            self.attr_view.set_needs_display_in_rect(damage)
+          end
+          if (!(visible_rect_.attr_x + visible_rect_.attr_width).equal?(src_rect.attr_x + src_rect.attr_width))
+            damage.attr_x = src_rect.attr_x + visible_rect_.attr_width + delta_x
+            damage.attr_y = src_rect.attr_y + delta_y
+            damage.attr_width = src_rect.attr_width - visible_rect_.attr_width
+            damage.attr_height = src_rect.attr_height
+            self.attr_view.set_needs_display_in_rect(damage)
+          end
+          if (!(visible_rect_.attr_y).equal?(src_rect.attr_y))
+            damage.attr_x = visible_rect_.attr_x + delta_x
+            damage.attr_y = src_rect.attr_y + delta_y
+            damage.attr_width = visible_rect_.attr_width
+            damage.attr_height = visible_rect_.attr_y - src_rect.attr_y
+            self.attr_view.set_needs_display_in_rect(damage)
+          end
+          if (!(visible_rect_.attr_y + visible_rect_.attr_height).equal?(src_rect.attr_y + src_rect.attr_height))
+            damage.attr_x = visible_rect_.attr_x + delta_x
+            damage.attr_y = visible_rect_.attr_y + visible_rect_.attr_height + delta_y
+            damage.attr_width = visible_rect_.attr_width
+            damage.attr_height = src_rect.attr_y + src_rect.attr_height - (visible_rect_.attr_y + visible_rect_.attr_height)
+            self.attr_view.set_needs_display_in_rect(damage)
+          end
+        end
       end
       if (all)
         children = __get_children
@@ -404,6 +520,24 @@ module Org::Eclipse::Swt::Widgets
       if (is_focus)
         @caret.set_focus
       end
+    end
+    
+    typesig { [::Java::Int, ::Java::Int] }
+    # long
+    # long
+    def selected_range(id, sel)
+      if (!(@ime).nil?)
+        return @ime.selected_range(id, sel)
+      end
+      return super(id, sel)
+    end
+    
+    typesig { [NSEvent, ::Java::Int] }
+    def send_key_event(ns_event, type)
+      if (!(@caret).nil?)
+        NSCursor.set_hidden_until_mouse_moves(true)
+      end
+      return super(ns_event, type)
     end
     
     typesig { [Caret] }
@@ -452,6 +586,11 @@ module Org::Eclipse::Swt::Widgets
       super(font)
     end
     
+    typesig { [Object] }
+    def set_open_glcontext(value)
+      @context = value
+    end
+    
     typesig { [IME] }
     # Sets the receiver's IME.
     # 
@@ -472,6 +611,41 @@ module Org::Eclipse::Swt::Widgets
         error(SWT::ERROR_INVALID_ARGUMENT)
       end
       @ime = ime
+    end
+    
+    typesig { [::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int] }
+    # long
+    # long
+    # long
+    # long
+    def set_marked_text_selected_range(id, sel, string, range)
+      if (!(@ime).nil?)
+        if (!@ime.set_marked_text_selected_range(id, sel, string, range))
+          return false
+        end
+      end
+      return super(id, sel, string, range)
+    end
+    
+    typesig { [::Java::Int, ::Java::Int] }
+    # long
+    # long
+    # long
+    def valid_attributes_for_marked_text(id, sel)
+      if (!(@ime).nil?)
+        return @ime.valid_attributes_for_marked_text(id, sel)
+      end
+      return super(id, sel)
+    end
+    
+    typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
+    # long
+    # long
+    # long
+    def update_open_glcontext(id, sel, notification)
+      if (!(@context).nil?)
+        (@context).update
+      end
     end
     
     private

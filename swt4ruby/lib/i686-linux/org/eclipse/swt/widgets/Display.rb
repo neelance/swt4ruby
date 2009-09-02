@@ -1,6 +1,6 @@
 require "rjava"
 
-# Copyright (c) 2000, 2008 IBM Corporation and others.
+# Copyright (c) 2000, 2009 IBM Corporation and others.
 # All rights reserved. This program and the accompanying materials
 # are made available under the terms of the Eclipse Public License v1.0
 # which accompanies this distribution, and is available at
@@ -95,6 +95,7 @@ module Org::Eclipse::Swt::Widgets
   # @see Device#dispose
   # @see <a href="http://www.eclipse.org/swt/snippets/#display">Display snippets</a>
   # @see <a href="http://www.eclipse.org/swt/">Sample code and further information</a>
+  # @noextend This class is not intended to be subclassed by clients.
   class Display < DisplayImports.const_get :Device
     include_class_members DisplayImports
     
@@ -1011,6 +1012,12 @@ module Org::Eclipse::Swt::Widgets
     alias_method :attr_click_count=, :click_count=
     undef_method :click_count=
     
+    class_module.module_eval {
+      # Entry inner border
+      const_set_lazy(:INNER_BORDER) { 2 }
+      const_attr_reader  :INNER_BORDER
+    }
+    
     # Timestamp of the Last Received Events
     attr_accessor :last_event_time
     alias_method :attr_last_event_time, :last_event_time
@@ -1023,6 +1030,26 @@ module Org::Eclipse::Swt::Widgets
     undef_method :last_user_event_time
     alias_method :attr_last_user_event_time=, :last_user_event_time=
     undef_method :last_user_event_time=
+    
+    # Pango layout constructor
+    # long
+    attr_accessor :pango_layout_new_proc
+    alias_method :attr_pango_layout_new_proc, :pango_layout_new_proc
+    undef_method :pango_layout_new_proc
+    alias_method :attr_pango_layout_new_proc=, :pango_layout_new_proc=
+    undef_method :pango_layout_new_proc=
+    
+    attr_accessor :pango_layout_new_default_proc
+    alias_method :attr_pango_layout_new_default_proc, :pango_layout_new_default_proc
+    undef_method :pango_layout_new_default_proc
+    alias_method :attr_pango_layout_new_default_proc=, :pango_layout_new_default_proc=
+    undef_method :pango_layout_new_default_proc=
+    
+    attr_accessor :pango_layout_new_callback
+    alias_method :attr_pango_layout_new_callback, :pango_layout_new_callback
+    undef_method :pango_layout_new_callback
+    alias_method :attr_pango_layout_new_callback=, :pango_layout_new_callback=
+    undef_method :pango_layout_new_callback=
     
     class_module.module_eval {
       # Fixed Subclass
@@ -1316,10 +1343,10 @@ module Org::Eclipse::Swt::Widgets
       const_set_lazy(:MAJOR) { 2 }
       const_attr_reader  :MAJOR
       
-      const_set_lazy(:MINOR) { 0 }
+      const_set_lazy(:MINOR) { 2 }
       const_attr_reader  :MINOR
       
-      const_set_lazy(:MICRO) { 6 }
+      const_set_lazy(:MICRO) { 0 }
       const_attr_reader  :MICRO
     }
     
@@ -1612,6 +1639,9 @@ module Org::Eclipse::Swt::Widgets
       @click_count = 0
       @last_event_time = 0
       @last_user_event_time = 0
+      @pango_layout_new_proc = 0
+      @pango_layout_new_default_proc = 0
+      @pango_layout_new_callback = nil
       @data = nil
       @keys = nil
       @values = nil
@@ -2858,6 +2888,36 @@ module Org::Eclipse::Swt::Widgets
       return nil
     end
     
+    class_module.module_eval {
+      typesig { [::Java::Int] }
+      # long
+      def get_entry_inner_border(handle)
+        gtk_border = GtkBorder.new
+        if (OS::GTK_VERSION >= OS._version(2, 10, 0))
+          # long
+          border = OS.gtk_entry_get_inner_border(handle)
+          if (!(border).equal?(0))
+            OS.memmove(gtk_border, border, GtkBorder.attr_sizeof)
+            return gtk_border
+          end
+          # long
+          # long
+          border_ptr = Array.typed(::Java::Int).new(1) { 0 }
+          OS.gtk_widget_style_get(handle, OS.attr_inner_border, border_ptr, 0)
+          if (!(border_ptr[0]).equal?(0))
+            OS.memmove(gtk_border, border_ptr[0], GtkBorder.attr_sizeof)
+            OS.gtk_border_free(border_ptr[0])
+            return gtk_border
+          end
+        end
+        gtk_border.attr_left = INNER_BORDER
+        gtk_border.attr_top = INNER_BORDER
+        gtk_border.attr_right = INNER_BORDER
+        gtk_border.attr_bottom = INNER_BORDER
+        return gtk_border
+      end
+    }
+    
     typesig { [Event] }
     def filter_event(event)
       if (!(@filter_table).nil?)
@@ -3104,7 +3164,13 @@ module Org::Eclipse::Swt::Widgets
     # @since 2.1
     def get_dismissal_alignment
       check_device
-      return SWT::RIGHT
+      buffer = Array.typed(::Java::Int).new(1) { 0 }
+      if (OS::GTK_VERSION >= OS._version(2, 6, 0))
+        # long
+        settings = OS.gtk_settings_get_default
+        OS.g_object_get(settings, OS.attr_gtk_alternative_button_order, buffer, 0)
+      end
+      return (buffer[0]).equal?(1) ? SWT::LEFT : SWT::RIGHT
     end
     
     typesig { [] }
@@ -3808,6 +3874,7 @@ module Org::Eclipse::Swt::Widgets
     def init
       super
       initialize_callbacks
+      initialize_subclasses
       initialize_system_colors
       initialize_system_settings
       initialize_widget_table
@@ -3862,6 +3929,7 @@ module Org::Eclipse::Swt::Widgets
       @closures[Widget::CHANGED] = OS.g_cclosure_new(@window_proc2, Widget::CHANGED, 0)
       @closures[Widget::CLICKED] = OS.g_cclosure_new(@window_proc2, Widget::CLICKED, 0)
       @closures[Widget::DAY_SELECTED] = OS.g_cclosure_new(@window_proc2, Widget::DAY_SELECTED, 0)
+      @closures[Widget::DAY_SELECTED_DOUBLE_CLICK] = OS.g_cclosure_new(@window_proc2, Widget::DAY_SELECTED_DOUBLE_CLICK, 0)
       @closures[Widget::HIDE] = OS.g_cclosure_new(@window_proc2, Widget::HIDE, 0)
       @closures[Widget::GRAB_FOCUS] = OS.g_cclosure_new(@window_proc2, Widget::GRAB_FOCUS, 0)
       @closures[Widget::MAP] = OS.g_cclosure_new(@window_proc2, Widget::MAP, 0)
@@ -3913,6 +3981,7 @@ module Org::Eclipse::Swt::Widgets
       @closures[Widget::UNMAP_EVENT] = OS.g_cclosure_new(@window_proc3, Widget::UNMAP_EVENT, 0)
       @closures[Widget::VISIBILITY_NOTIFY_EVENT] = OS.g_cclosure_new(@window_proc3, Widget::VISIBILITY_NOTIFY_EVENT, 0)
       @closures[Widget::WINDOW_STATE_EVENT] = OS.g_cclosure_new(@window_proc3, Widget::WINDOW_STATE_EVENT, 0)
+      @closures[Widget::ROW_DELETED] = OS.g_cclosure_new(@window_proc3, Widget::ROW_DELETED, 0)
       @window_callback4 = Callback.new(self, "windowProc", 4) # $NON-NLS-1$
       @window_proc4 = @window_callback4.get_address
       if ((@window_proc4).equal?(0))
@@ -3922,9 +3991,11 @@ module Org::Eclipse::Swt::Widgets
       @closures[Widget::DELETE_TEXT] = OS.g_cclosure_new(@window_proc4, Widget::DELETE_TEXT, 0)
       @closures[Widget::ROW_ACTIVATED] = OS.g_cclosure_new(@window_proc4, Widget::ROW_ACTIVATED, 0)
       @closures[Widget::SCROLL_CHILD] = OS.g_cclosure_new(@window_proc4, Widget::SCROLL_CHILD, 0)
+      @closures[Widget::STATUS_ICON_POPUP_MENU] = OS.g_cclosure_new(@window_proc4, Widget::STATUS_ICON_POPUP_MENU, 0)
       @closures[Widget::SWITCH_PAGE] = OS.g_cclosure_new(@window_proc4, Widget::SWITCH_PAGE, 0)
       @closures[Widget::TEST_COLLAPSE_ROW] = OS.g_cclosure_new(@window_proc4, Widget::TEST_COLLAPSE_ROW, 0)
       @closures[Widget::TEST_EXPAND_ROW] = OS.g_cclosure_new(@window_proc4, Widget::TEST_EXPAND_ROW, 0)
+      @closures[Widget::ROW_INSERTED] = OS.g_cclosure_new(@window_proc4, Widget::ROW_INSERTED, 0)
       @window_callback5 = Callback.new(self, "windowProc", 5) # $NON-NLS-1$
       @window_proc5 = @window_callback5.get_address
       if ((@window_proc5).equal?(0))
@@ -4017,6 +4088,24 @@ module Org::Eclipse::Swt::Widgets
       @idle_proc = @idle_callback.get_address
       if ((@idle_proc).equal?(0))
         error(SWT::ERROR_NO_MORE_CALLBACKS)
+      end
+    end
+    
+    typesig { [] }
+    def initialize_subclasses
+      if (OS::GTK_VERSION >= OS._version(2, 4, 0))
+        @pango_layout_new_callback = Callback.new(self, "pangoLayoutNewProc", 3) # $NON-NLS-1$
+        @pango_layout_new_proc = @pango_layout_new_callback.get_address
+        if ((@pango_layout_new_proc).equal?(0))
+          error(SWT::ERROR_NO_MORE_CALLBACKS)
+        end
+        # long
+        pango_layout_type = OS._pango_type_layout
+        # long
+        pango_layout_class = OS.g_type_class_ref(pango_layout_type)
+        @pango_layout_new_default_proc = OS._g_object_class_constructor(pango_layout_class)
+        OS._g_object_class_set_constructor(pango_layout_class, @pango_layout_new_proc)
+        OS.g_type_class_unref(pango_layout_class)
       end
     end
     
@@ -4441,6 +4530,19 @@ module Org::Eclipse::Swt::Widgets
       return widget.hover_proc(handle)
     end
     
+    typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
+    # long
+    # long
+    # long
+    # long
+    def pango_layout_new_proc(type, n_construct_properties, construct_properties)
+      # long
+      # 64
+      layout = OS._call(@pango_layout_new_default_proc, type, RJava.cast_to_int(n_construct_properties), construct_properties)
+      OS.pango_layout_set_auto_dir(layout, false)
+      return layout
+    end
+    
     typesig { [Event] }
     # Generate a low level system event.
     # 
@@ -4478,6 +4580,13 @@ module Org::Eclipse::Swt::Widgets
     # <li>(in) x the x coordinate to move the mouse pointer to in screen coordinates
     # <li>(in) y the y coordinate to move the mouse pointer to in screen coordinates
     # </ul>
+    # <p>MouseWheel</p>
+    # <p>The following fields in the <code>Event</code> apply:
+    # <ul>
+    # <li>(in) type MouseWheel
+    # <li>(in) detail either SWT.SCROLL_LINE or SWT.SCROLL_PAGE
+    # <li>(in) count the number of lines or pages to scroll
+    # </ul>
     # </dl>
     # 
     # @param event the event to be generated
@@ -4493,80 +4602,90 @@ module Org::Eclipse::Swt::Widgets
     # 
     # @since 3.0
     def post(event)
-      synchronized((Device)) do
-        if (is_disposed)
-          error(SWT::ERROR_DEVICE_DISPOSED)
-        end
-        if ((event).nil?)
-          error(SWT::ERROR_NULL_ARGUMENT)
-        end
-        if (!OS._gdk_windowing_x11)
+      # Get the operating system lock before synchronizing on the device
+      # lock so that the device lock will not be held should another
+      # thread already be in the operating system.  This avoids deadlock
+      # should the other thread need the device lock.
+      lock = OS::PLATFORM_LOCK
+      lock.lock
+      begin
+        synchronized((Device)) do
+          if (is_disposed)
+            error(SWT::ERROR_DEVICE_DISPOSED)
+          end
+          if ((event).nil?)
+            error(SWT::ERROR_NULL_ARGUMENT)
+          end
+          if (!OS._gdk_windowing_x11)
+            return false
+          end
+          # long
+          x_display = OS._gdk_display
+          type = event.attr_type
+          case (type)
+          when SWT::KeyDown, SWT::KeyUp
+            key_code = 0
+            # long
+            keysym = untranslate_key(event.attr_key_code)
+            if (!(keysym).equal?(0))
+              key_code = OS._xkeysym_to_keycode(x_display, keysym)
+            end
+            if ((key_code).equal?(0))
+              key = event.attr_character
+              case (key)
+              when SWT::BS
+                keysym = OS::GDK_BackSpace
+              when SWT::CR
+                keysym = OS::GDK_Return
+              when SWT::DEL
+                keysym = OS::GDK_Delete
+              when SWT::ESC
+                keysym = OS::GDK_Escape
+              when SWT::TAB
+                keysym = OS::GDK_Tab
+              when SWT::LF
+                keysym = OS::GDK_Linefeed
+              else
+                keysym = key
+              end
+              key_code = OS._xkeysym_to_keycode(x_display, keysym)
+              if ((key_code).equal?(0))
+                return false
+              end
+            end
+            OS._xtest_fake_key_event(x_display, key_code, (type).equal?(SWT::KeyDown), 0)
+            return true
+          when SWT::MouseDown, SWT::MouseMove, SWT::MouseUp
+            if ((type).equal?(SWT::MouseMove))
+              OS._xtest_fake_motion_event(x_display, -1, event.attr_x, event.attr_y, 0)
+            else
+              button = event.attr_button
+              case (button)
+              when 1, 2, 3
+              when 4
+                button = 6
+              when 5
+                button = 7
+              else
+                return false
+              end
+              OS._xtest_fake_button_event(x_display, button, (type).equal?(SWT::MouseDown), 0)
+            end
+            return true
+          end
+          # This code is intentionally commented. After posting a
+          # mouse wheel event the system may respond unpredictably
+          # to subsequent mouse actions.
+          # 
+          # case SWT.MouseWheel: {
+          # if (event.count == 0) return false;
+          # int button = event.count < 0 ? 5 : 4;
+          # OS.XTestFakeButtonEvent (xDisplay, button, type == SWT.MouseWheel, 0);
+          # }
           return false
         end
-        # long
-        x_display = OS._gdk_display
-        type = event.attr_type
-        case (type)
-        when SWT::KeyDown, SWT::KeyUp
-          key_code = 0
-          # long
-          keysym = untranslate_key(event.attr_key_code)
-          if (!(keysym).equal?(0))
-            key_code = OS._xkeysym_to_keycode(x_display, keysym)
-          end
-          if ((key_code).equal?(0))
-            key = event.attr_character
-            case (key)
-            when SWT::BS
-              keysym = OS::GDK_BackSpace
-            when SWT::CR
-              keysym = OS::GDK_Return
-            when SWT::DEL
-              keysym = OS::GDK_Delete
-            when SWT::ESC
-              keysym = OS::GDK_Escape
-            when SWT::TAB
-              keysym = OS::GDK_Tab
-            when SWT::LF
-              keysym = OS::GDK_Linefeed
-            else
-              keysym = key
-            end
-            key_code = OS._xkeysym_to_keycode(x_display, keysym)
-            if ((key_code).equal?(0))
-              return false
-            end
-          end
-          OS._xtest_fake_key_event(x_display, key_code, (type).equal?(SWT::KeyDown), 0)
-          return true
-        when SWT::MouseDown, SWT::MouseMove, SWT::MouseUp
-          if ((type).equal?(SWT::MouseMove))
-            OS._xtest_fake_motion_event(x_display, -1, event.attr_x, event.attr_y, 0)
-          else
-            button = event.attr_button
-            case (button)
-            when 1, 2, 3
-            when 4
-              button = 6
-            when 5
-              button = 7
-            else
-              return false
-            end
-            OS._xtest_fake_button_event(x_display, button, (type).equal?(SWT::MouseDown), 0)
-          end
-          return true
-        end
-        # This code is intentionally commented. After posting a
-        # mouse wheel event the system may respond unpredictably
-        # to subsequent mouse actions.
-        # 
-        # case SWT.MouseWheel: {
-        # if (event.count == 0) return false;
-        # int button = event.count < 0 ? 5 : 4;
-        # OS.XTestFakeButtonEvent (xDisplay, button, type == SWT.MouseWheel, 0);
-        # }
-        return false
+      ensure
+        lock.unlock
       end
     end
     
@@ -4648,7 +4767,7 @@ module Org::Eclipse::Swt::Widgets
         run_deferred_events
         return true
       end
-      return run_async_messages(false)
+      return is_disposed || run_async_messages(false)
     end
     
     class_module.module_eval {
@@ -4895,6 +5014,18 @@ module Org::Eclipse::Swt::Widgets
       @style_set_callback.dispose
       @style_set_callback = nil
       @style_set_proc = 0
+      # Dispose subclass
+      if (OS::GTK_VERSION >= OS._version(2, 4, 0))
+        # long
+        pango_layout_type = OS._pango_type_layout
+        # long
+        pango_layout_class = OS.g_type_class_ref(pango_layout_type)
+        OS._g_object_class_set_constructor(pango_layout_class, @pango_layout_new_default_proc)
+        OS.g_type_class_unref(pango_layout_class)
+        @pango_layout_new_callback.dispose
+        @pango_layout_new_callback = nil
+        @pango_layout_new_default_proc = @pango_layout_new_proc = 0
+      end
       # Release the sleep resources
       @max_priority = @timeout = nil
       if (!(@fds).equal?(0))
@@ -5073,6 +5204,7 @@ module Org::Eclipse::Swt::Widgets
     
     typesig { [] }
     def run_deferred_events
+      run = false
       # Run deferred events.  This code is always
       # called in the Display's thread so it must
       # be re-enterant but need not be synchronized.
@@ -5090,13 +5222,14 @@ module Org::Eclipse::Swt::Widgets
         if (!(widget).nil? && !widget.is_disposed)
           item = event.attr_item
           if ((item).nil? || !item.is_disposed)
+            run = true
             widget.send_event(event)
           end
         end
       end
       # Clear the queue
       @event_queue = nil
-      return true
+      return run
     end
     
     typesig { [] }
@@ -5245,7 +5378,7 @@ module Org::Eclipse::Swt::Widgets
         end
       end
       if ((key == SET_MODAL_DIALOG))
-        set_modal_dialog(@data)
+        set_modal_dialog(value)
         return
       end
       if ((key == ADD_WIDGET_KEY))
@@ -5548,11 +5681,11 @@ module Org::Eclipse::Swt::Widgets
                 @timeout[0] = 50
               end
               # Exit the OS lock to allow other threads to enter GTK
-              lock = OS::PLATFORM_LOCK
-              count = lock.lock
+              lock_ = OS::PLATFORM_LOCK
+              count = lock_.lock
               i = 0
               while i < count
-                lock.unlock
+                lock_.unlock
                 i += 1
               end
               begin
@@ -5561,10 +5694,10 @@ module Org::Eclipse::Swt::Widgets
               ensure
                 i_ = 0
                 while i_ < count
-                  lock.lock
+                  lock_.lock
                   i_ += 1
                 end
-                lock.unlock
+                lock_.unlock
               end
             end
           end

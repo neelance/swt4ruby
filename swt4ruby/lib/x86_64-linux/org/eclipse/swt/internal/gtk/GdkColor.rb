@@ -1,6 +1,6 @@
 require "rjava"
 
-# Copyright (c) 2000, 2006 IBM Corporation and others. All rights reserved.
+# Copyright (c) 2000, 2008 IBM Corporation and others. All rights reserved.
 # The contents of this file are made available under the terms
 # of the GNU Lesser General Public License (LGPL) Version 2.1 that
 # accompanies this distribution (lgpl-v21.txt).  The LGPL is also
@@ -23,24 +23,28 @@ module Org::Eclipse::Swt::Internal::Gtk
   class GdkColor 
     include_class_members GdkColorImports
     
+    # @field cast=(guint32)
     attr_accessor :pixel
     alias_method :attr_pixel, :pixel
     undef_method :pixel
     alias_method :attr_pixel=, :pixel=
     undef_method :pixel=
     
+    # @field cast=(guint16)
     attr_accessor :red
     alias_method :attr_red, :red
     undef_method :red
     alias_method :attr_red=, :red=
     undef_method :red=
     
+    # @field cast=(guint16)
     attr_accessor :green
     alias_method :attr_green, :green
     undef_method :green
     alias_method :attr_green=, :green=
     undef_method :green=
     
+    # @field cast=(guint16)
     attr_accessor :blue
     alias_method :attr_blue, :blue
     undef_method :blue

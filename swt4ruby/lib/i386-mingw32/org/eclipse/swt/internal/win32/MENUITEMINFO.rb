@@ -1,6 +1,6 @@
 require "rjava"
 
-# Copyright (c) 2000, 2006 IBM Corporation and others.
+# Copyright (c) 2000, 2008 IBM Corporation and others.
 # All rights reserved. This program and the accompanying materials
 # are made available under the terms of the Eclipse Public License v1.0
 # which accompanies this distribution, and is available at
@@ -49,6 +49,7 @@ module Org::Eclipse::Swt::Internal::Win32
     alias_method :attr_w_id=, :w_id=
     undef_method :w_id=
     
+    # @field cast=(HMENU)
     # long
     attr_accessor :h_sub_menu
     alias_method :attr_h_sub_menu, :h_sub_menu
@@ -56,6 +57,7 @@ module Org::Eclipse::Swt::Internal::Win32
     alias_method :attr_h_sub_menu=, :h_sub_menu=
     undef_method :h_sub_menu=
     
+    # @field cast=(HBITMAP)
     # long
     attr_accessor :hbmp_checked
     alias_method :attr_hbmp_checked, :hbmp_checked
@@ -63,6 +65,7 @@ module Org::Eclipse::Swt::Internal::Win32
     alias_method :attr_hbmp_checked=, :hbmp_checked=
     undef_method :hbmp_checked=
     
+    # @field cast=(HBITMAP)
     # long
     attr_accessor :hbmp_unchecked
     alias_method :attr_hbmp_unchecked, :hbmp_unchecked
@@ -77,6 +80,7 @@ module Org::Eclipse::Swt::Internal::Win32
     alias_method :attr_dw_item_data=, :dw_item_data=
     undef_method :dw_item_data=
     
+    # @field cast=(LPTSTR)
     # long
     attr_accessor :dw_type_data
     alias_method :attr_dw_type_data, :dw_type_data
@@ -90,6 +94,7 @@ module Org::Eclipse::Swt::Internal::Win32
     alias_method :attr_cch=, :cch=
     undef_method :cch=
     
+    # @field cast=(HBITMAP),flags=no_wince
     # long
     attr_accessor :hbmp_item
     alias_method :attr_hbmp_item, :hbmp_item

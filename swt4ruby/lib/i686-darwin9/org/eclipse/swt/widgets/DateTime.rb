@@ -1,6 +1,6 @@
 require "rjava"
 
-# Copyright (c) 2000, 2008 IBM Corporation and others.
+# Copyright (c) 2000, 2009 IBM Corporation and others.
 # All rights reserved. This program and the accompanying materials
 # are made available under the terms of the Eclipse Public License v1.0
 # which accompanies this distribution, and is available at
@@ -13,14 +13,10 @@ module Org::Eclipse::Swt::Widgets
     class_module.module_eval {
       include ::Java::Lang
       include ::Org::Eclipse::Swt::Widgets
-      include_const ::Java::Text, :DateFormatSymbols
-      include_const ::Java::Util, :Calendar
       include ::Org::Eclipse::Swt
       include ::Org::Eclipse::Swt::Events
       include ::Org::Eclipse::Swt::Graphics
-      include_const ::Org::Eclipse::Swt::Internal::Carbon, :LongDateRec
-      include_const ::Org::Eclipse::Swt::Internal::Carbon, :OS
-      include_const ::Org::Eclipse::Swt::Internal::Carbon, :Rect
+      include ::Org::Eclipse::Swt::Internal::Cocoa
     }
   end
   
@@ -33,13 +29,14 @@ module Org::Eclipse::Swt::Widgets
   # </p>
   # <dl>
   # <dt><b>Styles:</b></dt>
-  # <dd>DATE, TIME, CALENDAR, SHORT, MEDIUM, LONG</dd>
+  # <dd>DATE, TIME, CALENDAR, SHORT, MEDIUM, LONG, DROP_DOWN</dd>
   # <dt><b>Events:</b></dt>
-  # <dd>Selection</dd>
+  # <dd>DefaultSelection, Selection</dd>
   # </dl>
   # <p>
   # Note: Only one of the styles DATE, TIME, or CALENDAR may be specified,
   # and only one of the styles SHORT, MEDIUM, or LONG may be specified.
+  # The DROP_DOWN style is a <em>HINT</em>, and it is only valid with the DATE style.
   # </p><p>
   # IMPORTANT: This class is <em>not</em> intended to be subclassed.
   # </p>
@@ -49,86 +46,17 @@ module Org::Eclipse::Swt::Widgets
   # @see <a href="http://www.eclipse.org/swt/">Sample code and further information</a>
   # 
   # @since 3.3
+  # @noextend This class is not intended to be subclassed by clients.
   class DateTime < DateTimeImports.const_get :Composite
     include_class_members DateTimeImports
     
-    attr_accessor :date_rec
-    alias_method :attr_date_rec, :date_rec
-    undef_method :date_rec
-    alias_method :attr_date_rec=, :date_rec=
-    undef_method :date_rec=
-    
-    attr_accessor :date_and_time
-    alias_method :attr_date_and_time, :date_and_time
-    undef_method :date_and_time
-    alias_method :attr_date_and_time=, :date_and_time=
-    undef_method :date_and_time=
-    
     class_module.module_eval {
-      # copy of date for a kControlClockTypeHourMinuteSecond or time for a kControlClockTypeMonthDayYear
       const_set_lazy(:MIN_YEAR) { 1752 }
       const_attr_reader  :MIN_YEAR
       
       # Gregorian switchover in North America: September 19, 1752
       const_set_lazy(:MAX_YEAR) { 9999 }
       const_attr_reader  :MAX_YEAR
-    }
-    
-    # Emulated Calendar variables
-    attr_accessor :fg
-    alias_method :attr_fg, :fg
-    undef_method :fg
-    alias_method :attr_fg=, :fg=
-    undef_method :fg=
-    
-    attr_accessor :bg
-    alias_method :attr_bg, :bg
-    undef_method :bg
-    alias_method :attr_bg=, :bg=
-    undef_method :bg=
-    
-    attr_accessor :calendar
-    alias_method :attr_calendar, :calendar
-    undef_method :calendar
-    alias_method :attr_calendar=, :calendar=
-    undef_method :calendar=
-    
-    attr_accessor :format_symbols
-    alias_method :attr_format_symbols, :format_symbols
-    undef_method :format_symbols
-    alias_method :attr_format_symbols=, :format_symbols=
-    undef_method :format_symbols=
-    
-    attr_accessor :month_down
-    alias_method :attr_month_down, :month_down
-    undef_method :month_down
-    alias_method :attr_month_down=, :month_down=
-    undef_method :month_down=
-    
-    attr_accessor :month_up
-    alias_method :attr_month_up, :month_up
-    undef_method :month_up
-    alias_method :attr_month_up=, :month_up=
-    undef_method :month_up=
-    
-    attr_accessor :year_down
-    alias_method :attr_year_down, :year_down
-    undef_method :year_down
-    alias_method :attr_year_down=, :year_down=
-    undef_method :year_down=
-    
-    attr_accessor :year_up
-    alias_method :attr_year_up, :year_up
-    undef_method :year_up
-    alias_method :attr_year_up=, :year_up=
-    undef_method :year_up=
-    
-    class_module.module_eval {
-      const_set_lazy(:MARGIN_WIDTH) { 2 }
-      const_attr_reader  :MARGIN_WIDTH
-      
-      const_set_lazy(:MARGIN_HEIGHT) { 1 }
-      const_attr_reader  :MARGIN_HEIGHT
     }
     
     typesig { [Composite, ::Java::Int] }
@@ -158,89 +86,14 @@ module Org::Eclipse::Swt::Widgets
     # @see SWT#DATE
     # @see SWT#TIME
     # @see SWT#CALENDAR
+    # @see SWT#SHORT
+    # @see SWT#MEDIUM
+    # @see SWT#LONG
+    # @see SWT#DROP_DOWN
     # @see Widget#checkSubclass
     # @see Widget#getStyle
     def initialize(parent, style)
-      @date_rec = nil
-      @date_and_time = nil
-      @fg = nil
-      @bg = nil
-      @calendar = nil
-      @format_symbols = nil
-      @month_down = nil
-      @month_up = nil
-      @year_down = nil
-      @year_up = nil
-      super(parent, check_style(style) | (!((style & SWT::CALENDAR)).equal?(0) ? SWT::NO_REDRAW_RESIZE : 0))
-      @date_and_time = LongDateRec.new
-      if (!((self.attr_style & SWT::CALENDAR)).equal?(0))
-        @calendar = Calendar.get_instance
-        @format_symbols = DateFormatSymbols.new
-        listener = Class.new(Listener.class == Class ? Listener : Object) do
-          extend LocalClass
-          include_class_members DateTime
-          include Listener if Listener.class == Module
-          
-          typesig { [Event] }
-          define_method :handle_event do |event|
-            case (event.attr_type)
-            when SWT::Paint
-              handle_paint(event)
-            when SWT::Resize
-              handle_resize(event)
-            when SWT::MouseDown
-              handle_mouse_down(event)
-            when SWT::KeyDown
-              handle_key_down(event)
-            when SWT::Traverse
-              handle_traverse(event)
-            end
-          end
-          
-          typesig { [Vararg.new(Object)] }
-          define_method :initialize do |*args|
-            super(*args)
-          end
-          
-          private
-          alias_method :initialize_anonymous, :initialize
-        end.new_local(self)
-        add_listener(SWT::Paint, listener)
-        add_listener(SWT::Resize, listener)
-        add_listener(SWT::MouseDown, listener)
-        add_listener(SWT::KeyDown, listener)
-        add_listener(SWT::Traverse, listener)
-        @year_down = Button.new(self, SWT::ARROW | SWT::LEFT)
-        # yearDown.setToolTipText(SWT.getMessage ("SWT_Last_Year")); //$NON-NLS-1$
-        @month_down = Button.new(self, SWT::ARROW | SWT::LEFT)
-        # monthDown.setToolTipText(SWT.getMessage ("SWT_Last_Month")); //$NON-NLS-1$
-        @month_up = Button.new(self, SWT::ARROW | SWT::RIGHT)
-        # monthUp.setToolTipText(SWT.getMessage ("SWT_Next_Month")); //$NON-NLS-1$
-        @year_up = Button.new(self, SWT::ARROW | SWT::RIGHT)
-        listener = # yearUp.setToolTipText(SWT.getMessage ("SWT_Next_Year")); //$NON-NLS-1$
-        Class.new(Listener.class == Class ? Listener : Object) do
-          extend LocalClass
-          include_class_members DateTime
-          include Listener if Listener.class == Module
-          
-          typesig { [Event] }
-          define_method :handle_event do |event|
-            handle_selection(event)
-          end
-          
-          typesig { [Vararg.new(Object)] }
-          define_method :initialize do |*args|
-            super(*args)
-          end
-          
-          private
-          alias_method :initialize_anonymous, :initialize
-        end.new_local(self)
-        @year_down.add_listener(SWT::Selection, listener)
-        @month_down.add_listener(SWT::Selection, listener)
-        @month_up.add_listener(SWT::Selection, listener)
-        @year_up.add_listener(SWT::Selection, listener)
-      end
+      super(parent, check_style(style))
     end
     
     class_module.module_eval {
@@ -271,7 +124,7 @@ module Org::Eclipse::Swt::Widgets
     # interface.
     # <p>
     # <code>widgetSelected</code> is called when the user changes the control's value.
-    # <code>widgetDefaultSelected</code> is not called.
+    # <code>widgetDefaultSelected</code> is typically called when ENTER is pressed.
     # </p>
     # 
     # @param listener the listener which should be notified
@@ -302,19 +155,10 @@ module Org::Eclipse::Swt::Widgets
       check_widget
       width = 0
       height = 0
-      if ((w_hint).equal?(SWT::DEFAULT) || (h_hint).equal?(SWT::DEFAULT))
-        if (!((self.attr_style & SWT::CALENDAR)).equal?(0))
-          cell_size = get_cell_size(nil)
-          button_size = @month_down.compute_size(SWT::DEFAULT, SWT::DEFAULT, changed)
-          width = cell_size.attr_x * 7
-          height = cell_size.attr_y * 7 + Math.max(cell_size.attr_y, button_size.attr_y)
-        else
-          rect = Rect.new
-          OS._get_best_control_rect(self.attr_handle, rect, nil)
-          width = rect.attr_right - rect.attr_left
-          height = rect.attr_bottom - rect.attr_top
-        end
-      end
+      widget = self.attr_view
+      size = widget.cell.cell_size
+      width = RJava.cast_to_int(Math.ceil(size.attr_width))
+      height = RJava.cast_to_int(Math.ceil(size.attr_height))
       if ((width).equal?(0))
         width = DEFAULT_WIDTH
       end
@@ -335,264 +179,40 @@ module Org::Eclipse::Swt::Widgets
     
     typesig { [] }
     def create_handle
-      clock_type = -1
-      if (!((self.attr_style & SWT::TIME)).equal?(0))
-        clock_type = !((self.attr_style & SWT::SHORT)).equal?(0) ? OS.attr_k_control_clock_type_hour_minute : OS.attr_k_control_clock_type_hour_minute_second
-      end
-      if (!((self.attr_style & SWT::DATE)).equal?(0))
-        clock_type = !((self.attr_style & SWT::SHORT)).equal?(0) ? OS.attr_k_control_clock_type_month_year : OS.attr_k_control_clock_type_month_day_year
-      end
-      if (!(clock_type).equal?(-1))
-        # SWT.DATE and SWT.TIME
-        clock_flags = OS.attr_k_control_clock_flag_standard
-        out_control = Array.typed(::Java::Int).new(1) { 0 }
-        window = OS._get_control_owner(self.attr_parent.attr_handle)
-        OS._create_clock_control(window, nil, clock_type, clock_flags, out_control)
-        if ((out_control[0]).equal?(0))
-          error(SWT::ERROR_NO_HANDLES)
+      widget = SWTDatePicker.new.alloc
+      widget.init
+      picker_style = OS::NSTextFieldAndStepperDatePickerStyle
+      element_flags = 0
+      if (!((self.attr_style & SWT::CALENDAR)).equal?(0))
+        picker_style = OS::NSClockAndCalendarDatePickerStyle
+        element_flags = OS::NSYearMonthDayDatePickerElementFlag
+      else
+        if (!((self.attr_style & SWT::TIME)).equal?(0))
+          element_flags = !((self.attr_style & SWT::SHORT)).equal?(0) ? OS::NSHourMinuteDatePickerElementFlag : OS::NSHourMinuteSecondDatePickerElementFlag
         end
-        self.attr_handle = out_control[0]
-      else
-        # SWT.CALENDAR
-        # TODO: on Cocoa, can use NSDatePicker - otherwise, use emulated:
-        super
-      end
-    end
-    
-    typesig { [] }
-    def create_widget
-      super
-      get_date
-    end
-    
-    typesig { [SwtGC, Point, ::Java::Int] }
-    def draw_day(gc, cell_size, day)
-      cell = get_cell(day)
-      location = get_cell_location(cell, cell_size)
-      str = String.value_of(day)
-      extent = gc.string_extent(str)
-      date = @calendar.get(Calendar::DAY_OF_MONTH)
-      if ((day).equal?(date))
-        display = get_display
-        gc.set_background(display.get_system_color(SWT::COLOR_LIST_SELECTION))
-        gc.set_foreground(display.get_system_color(SWT::COLOR_LIST_SELECTION_TEXT))
-        gc.fill_rectangle(location.attr_x, location.attr_y, cell_size.attr_x, cell_size.attr_y)
-      end
-      gc.draw_string(str, location.attr_x + (cell_size.attr_x - extent.attr_x) / 2, location.attr_y + (cell_size.attr_y - extent.attr_y) / 2, true)
-      if ((day).equal?(date))
-        gc.set_background(get_background)
-        gc.set_foreground(get_foreground)
-      end
-    end
-    
-    typesig { [SwtGC, Point, Rectangle] }
-    def draw_days(gc, cell_size, client)
-      gc.set_background(get_background)
-      gc.set_foreground(get_foreground)
-      gc.fill_rectangle(0, cell_size.attr_y, client.attr_width, cell_size.attr_y * 7)
-      first_day = @calendar.get_actual_minimum(Calendar::DAY_OF_MONTH)
-      last_day = @calendar.get_actual_maximum(Calendar::DAY_OF_MONTH)
-      day = first_day
-      while day <= last_day
-        draw_day(gc, cell_size, day)
-        day += 1
-      end
-    end
-    
-    typesig { [SwtGC, Point, Rectangle] }
-    def draw_days_of_week(gc, cell_size, client)
-      display = get_display
-      gc.set_background(display.get_system_color(SWT::COLOR_WIDGET_BACKGROUND))
-      gc.set_foreground(display.get_system_color(SWT::COLOR_WIDGET_FOREGROUND))
-      gc.fill_rectangle(0, 0, client.attr_width, cell_size.attr_y)
-      days = @format_symbols.get_short_weekdays
-      x = 0
-      y = 0
-      i = 1
-      while i < days.attr_length
-        day = days[i]
-        extent = gc.string_extent(day)
-        gc.draw_string(day, x + (cell_size.attr_x - extent.attr_x) / 2, y + (cell_size.attr_y - extent.attr_y) / 2, true)
-        x += cell_size.attr_x
-        i += 1
-      end
-      gc.draw_line(0, cell_size.attr_y - 1, client.attr_width, cell_size.attr_y - 1)
-    end
-    
-    typesig { [SwtGC, Point, Rectangle] }
-    def draw_month(gc, cell_size, client)
-      display = get_display
-      gc.set_background(display.get_system_color(SWT::COLOR_WIDGET_BACKGROUND))
-      gc.set_foreground(display.get_system_color(SWT::COLOR_WIDGET_FOREGROUND))
-      y = cell_size.attr_y * 7
-      gc.fill_rectangle(0, y, client.attr_width, cell_size.attr_y)
-      gc.draw_line(0, y - 1, client.attr_width, y - 1)
-      str = RJava.cast_to_string(@format_symbols.get_short_months[@calendar.get(Calendar::MONTH)]) + ", " + RJava.cast_to_string(@calendar.get(Calendar::YEAR))
-      extent = gc.string_extent(str)
-      gc.draw_string(str, (cell_size.attr_x * 7 - extent.attr_x) / 2, y + (cell_size.attr_y - extent.attr_y) / 2, true)
-    end
-    
-    typesig { [Event] }
-    def handle_key_down(event)
-      new_day = @calendar.get(Calendar::DAY_OF_MONTH)
-      case (event.attr_key_code)
-      when SWT::ARROW_DOWN
-        new_day += 7
-      when SWT::ARROW_UP
-        new_day -= 7
-      when SWT::ARROW_RIGHT
-        new_day += 1
-      when SWT::ARROW_LEFT
-        new_day -= 1
-      end
-      set_day(new_day, true)
-    end
-    
-    typesig { [Event] }
-    def handle_mouse_down(event)
-      set_focus
-      cell_size = get_cell_size(nil)
-      column = event.attr_x / cell_size.attr_x
-      row = event.attr_y / cell_size.attr_y
-      cell = row * 7 + column
-      new_day = get_date(cell)
-      set_day(new_day, true)
-    end
-    
-    typesig { [Event] }
-    def handle_paint(event)
-      gc = event.attr_gc
-      client = get_client_area
-      cell_size = get_cell_size(gc)
-      draw_days_of_week(gc, cell_size, client)
-      draw_days(gc, cell_size, client)
-      draw_month(gc, cell_size, client)
-    end
-    
-    typesig { [Event] }
-    def handle_resize(event)
-      @year_down.pack
-      @month_down.pack
-      @month_up.pack
-      @year_up.pack
-      cell_size = get_cell_size(nil)
-      size = @month_down.get_size
-      height = Math.max(cell_size.attr_y, size.attr_y)
-      y = cell_size.attr_y * 7 + (height - size.attr_y) / 2
-      @year_down.set_location(0, y)
-      @month_down.set_location(size.attr_x, y)
-      x = cell_size.attr_x * 7 - size.attr_x
-      @month_up.set_location(x - size.attr_x, y)
-      @year_up.set_location(x, y)
-    end
-    
-    typesig { [Event] }
-    def handle_selection(event)
-      if ((event.attr_widget).equal?(@month_down))
-        @calendar.add(Calendar::MONTH, -1)
-      else
-        if ((event.attr_widget).equal?(@month_up))
-          @calendar.add(Calendar::MONTH, 1)
-        else
-          if ((event.attr_widget).equal?(@year_down))
-            @calendar.add(Calendar::YEAR, -1)
-          else
-            if ((event.attr_widget).equal?(@year_up))
-              @calendar.add(Calendar::YEAR, 1)
-            else
-              return
-            end
-          end
+        if (!((self.attr_style & SWT::DATE)).equal?(0))
+          element_flags = !((self.attr_style & SWT::SHORT)).equal?(0) ? OS::NSYearMonthDatePickerElementFlag : OS::NSYearMonthDayDatePickerElementFlag
         end
       end
-      redraw
-      post_event(SWT::Selection)
-    end
-    
-    typesig { [Event] }
-    def handle_traverse(event)
-      case (event.attr_detail)
-      when SWT::TRAVERSE_ESCAPE, SWT::TRAVERSE_PAGE_NEXT, SWT::TRAVERSE_PAGE_PREVIOUS, SWT::TRAVERSE_RETURN, SWT::TRAVERSE_TAB_NEXT, SWT::TRAVERSE_TAB_PREVIOUS
-        event.attr_doit = true
-      end
-    end
-    
-    typesig { [SwtGC] }
-    def get_cell_size(gc)
-      dispose = (gc).nil?
-      if ((gc).nil?)
-        gc = SwtGC.new(self)
-      end
-      width = 0
-      height = 0
-      days = @format_symbols.get_short_weekdays
-      i = 0
-      while i < days.attr_length
-        extent = gc.string_extent(days[i])
-        width = Math.max(width, extent.attr_x)
-        height = Math.max(height, extent.attr_y)
-        i += 1
-      end
-      first_day = @calendar.get_minimum(Calendar::DAY_OF_MONTH)
-      last_day = @calendar.get_maximum(Calendar::DAY_OF_MONTH)
-      day = first_day
-      while day <= last_day
-        extent = gc.string_extent(String.value_of(day))
-        width = Math.max(width, extent.attr_x)
-        height = Math.max(height, extent.attr_y)
-        day += 1
-      end
-      if (dispose)
-        gc.dispose
-      end
-      return Point.new(width + MARGIN_WIDTH * 2, height + MARGIN_HEIGHT * 2)
-    end
-    
-    typesig { [::Java::Int, Point] }
-    def get_cell_location(cell, cell_size)
-      return Point.new(cell % 7 * cell_size.attr_x, cell / 7 * cell_size.attr_y)
-    end
-    
-    typesig { [::Java::Int] }
-    def get_cell(date)
-      day = @calendar.get(Calendar::DAY_OF_MONTH)
-      @calendar.set(Calendar::DAY_OF_MONTH, 1)
-      result = date + @calendar.get(Calendar::DAY_OF_WEEK) + 5
-      @calendar.set(Calendar::DAY_OF_MONTH, day)
-      return result
+      widget.set_draws_background(true)
+      widget.set_date_picker_style(picker_style)
+      widget.set_date_picker_elements(element_flags)
+      date = NSCalendarDate.calendar_date
+      widget.set_date_value(date)
+      widget.set_target(widget)
+      widget.set_action(OS.attr_sel_send_selection)
+      self.attr_view = widget
     end
     
     typesig { [] }
-    def get_date
-      @date_rec = LongDateRec.new
-      OS._get_control_data(self.attr_handle, RJava.cast_to_short(OS.attr_k_control_entire_control), OS.attr_k_control_clock_long_date_tag, LongDateRec.attr_sizeof, @date_rec, nil)
-    end
-    
-    typesig { [::Java::Int] }
-    def get_date(cell)
-      day = @calendar.get(Calendar::DAY_OF_MONTH)
-      @calendar.set(Calendar::DAY_OF_MONTH, 1)
-      result = cell - @calendar.get(Calendar::DAY_OF_WEEK) - 5
-      @calendar.set(Calendar::DAY_OF_MONTH, day)
-      return result
+    def default_nsfont
+      return self.attr_display.attr_date_picker_font
     end
     
     typesig { [] }
-    def get_background
-      check_widget
-      if ((@bg).nil?)
-        return get_display.get_system_color(SWT::COLOR_LIST_BACKGROUND)
-      end
-      return @bg
-    end
-    
-    typesig { [] }
-    def get_foreground
-      check_widget
-      if ((@fg).nil?)
-        return get_display.get_system_color(SWT::COLOR_LIST_FOREGROUND)
-      end
-      return @fg
+    def get_calendar_date
+      date = (self.attr_view).date_value
+      return date.date_with_calendar_format(nil, nil)
     end
     
     typesig { [] }
@@ -609,14 +229,8 @@ module Org::Eclipse::Swt::Widgets
     # </ul>
     def get_day
       check_widget
-      if (!((self.attr_style & SWT::TIME)).equal?(0))
-        return @date_and_time.attr_day
-      end
-      if (!((self.attr_style & SWT::CALENDAR)).equal?(0))
-        return @calendar.get(Calendar::DAY_OF_MONTH)
-      end
-      get_date
-      return @date_rec.attr_day
+      # 64
+      return RJava.cast_to_int(get_calendar_date.day_of_month)
     end
     
     typesig { [] }
@@ -633,14 +247,8 @@ module Org::Eclipse::Swt::Widgets
     # </ul>
     def get_hours
       check_widget
-      if (!((self.attr_style & SWT::DATE)).equal?(0))
-        return @date_and_time.attr_hour
-      end
-      if (!((self.attr_style & SWT::CALENDAR)).equal?(0))
-        return @calendar.get(Calendar::HOUR_OF_DAY)
-      end
-      get_date
-      return @date_rec.attr_hour
+      # 64
+      return RJava.cast_to_int(get_calendar_date.hour_of_day)
     end
     
     typesig { [] }
@@ -657,14 +265,8 @@ module Org::Eclipse::Swt::Widgets
     # </ul>
     def get_minutes
       check_widget
-      if (!((self.attr_style & SWT::DATE)).equal?(0))
-        return @date_and_time.attr_minute
-      end
-      if (!((self.attr_style & SWT::CALENDAR)).equal?(0))
-        return @calendar.get(Calendar::MINUTE)
-      end
-      get_date
-      return @date_rec.attr_minute
+      # 64
+      return RJava.cast_to_int(get_calendar_date.minute_of_hour)
     end
     
     typesig { [] }
@@ -681,14 +283,8 @@ module Org::Eclipse::Swt::Widgets
     # </ul>
     def get_month
       check_widget
-      if (!((self.attr_style & SWT::TIME)).equal?(0))
-        return @date_and_time.attr_month - 1
-      end
-      if (!((self.attr_style & SWT::CALENDAR)).equal?(0))
-        return @calendar.get(Calendar::MONTH)
-      end
-      get_date
-      return @date_rec.attr_month - 1
+      # 64
+      return RJava.cast_to_int(get_calendar_date.month_of_year) - 1
     end
     
     typesig { [] }
@@ -710,14 +306,8 @@ module Org::Eclipse::Swt::Widgets
     # </ul>
     def get_seconds
       check_widget
-      if (!((self.attr_style & SWT::DATE)).equal?(0))
-        return @date_and_time.attr_second
-      end
-      if (!((self.attr_style & SWT::CALENDAR)).equal?(0))
-        return @calendar.get(Calendar::SECOND)
-      end
-      get_date
-      return @date_rec.attr_second
+      # 64
+      return RJava.cast_to_int(get_calendar_date.second_of_minute)
     end
     
     typesig { [] }
@@ -734,93 +324,24 @@ module Org::Eclipse::Swt::Widgets
     # </ul>
     def get_year
       check_widget
-      if (!((self.attr_style & SWT::TIME)).equal?(0))
-        return @date_and_time.attr_year
-      end
-      if (!((self.attr_style & SWT::CALENDAR)).equal?(0))
-        return @calendar.get(Calendar::YEAR)
-      end
-      get_date
-      return @date_rec.attr_year
+      # 64
+      return RJava.cast_to_int(get_calendar_date.year_of_common_era)
     end
     
-    typesig { [] }
-    def hook_events
-      super
-      if (OS::VERSION >= 0x1040)
-        clock_proc = self.attr_display.attr_clock_proc
-        mask = Array.typed(::Java::Int).new([OS.attr_k_event_class_clock_view, OS.attr_k_event_clock_date_or_time_changed, ])
-        control_target = OS._get_control_event_target(self.attr_handle)
-        OS._install_event_handler(control_target, clock_proc, mask.attr_length / 2, mask, self.attr_handle, nil)
-      end
+    typesig { [::Java::Int] }
+    # long
+    def is_event_view(id)
+      return true
     end
     
     typesig { [::Java::Int, ::Java::Int] }
-    def is_valid(field_name, value)
-      year = !((self.attr_style & SWT::TIME)).equal?(0) ? @date_and_time.attr_year : @date_rec.attr_year
-      month = !((self.attr_style & SWT::TIME)).equal?(0) ? @date_and_time.attr_month : @date_rec.attr_month
-      calendar = Calendar.get_instance
-      calendar.set(Calendar::YEAR, year)
-      calendar.set(Calendar::MONTH, month - 1)
-      min = calendar.get_actual_minimum(field_name)
-      max_ = calendar.get_actual_maximum(field_name)
-      return value >= min && value <= max_
-    end
-    
-    typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
-    def is_valid_date(year, month, day)
-      calendar = Calendar.get_instance
-      calendar.set(Calendar::YEAR, year)
-      calendar.set(Calendar::MONTH, month)
-      calendar.set(Calendar::DAY_OF_MONTH, day)
-      return (calendar.get(Calendar::YEAR)).equal?(year) && (calendar.get(Calendar::MONTH)).equal?(month) && (calendar.get(Calendar::DAY_OF_MONTH)).equal?(day)
-    end
-    
-    typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
-    def k_event_clock_date_or_time_changed(next_handler, the_event, user_data)
-      send_selection_event
-      return OS.attr_no_err
-    end
-    
-    typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
-    def k_event_control_hit(next_handler, the_event, user_data)
-      result = super(next_handler, the_event, user_data)
-      if ((result).equal?(OS.attr_no_err))
-        return result
+    # long
+    # long
+    def is_flipped(id, sel)
+      if (!((self.attr_style & SWT::CALENDAR)).equal?(0))
+        return super(id, sel)
       end
-      if (OS::VERSION < 0x1040)
-        send_selection_event
-      end
-      return result
-    end
-    
-    typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
-    def k_event_text_input_unicode_for_key_event(next_handler, the_event, user_data)
-      result = super(next_handler, the_event, user_data)
-      if ((result).equal?(OS.attr_no_err))
-        return result
-      end
-      if (OS::VERSION < 0x1040)
-        send_selection_event
-      end
-      return result
-    end
-    
-    typesig { [] }
-    def poll_track_event
-      return (!((self.attr_style & SWT::DATE)).equal?(0)) || (!((self.attr_style & SWT::TIME)).equal?(0))
-    end
-    
-    typesig { [::Java::Int, Point] }
-    def redraw(cell, cell_size)
-      location = get_cell_location(cell, cell_size)
-      redraw(location.attr_x, location.attr_y, cell_size.attr_x, cell_size.attr_y, false)
-    end
-    
-    typesig { [] }
-    def release_widget
-      super
-      @date_rec = nil
+      return true
     end
     
     typesig { [SelectionListener] }
@@ -851,44 +372,61 @@ module Org::Eclipse::Swt::Widgets
       self.attr_event_table.unhook(SWT::DefaultSelection, listener)
     end
     
+    typesig { [NSEvent, ::Java::Int] }
+    def send_key_event(ns_event, type)
+      result = super(ns_event, type)
+      if (!result)
+        return result
+      end
+      if (!(type).equal?(SWT::KeyDown))
+        return result
+      end
+      if (((self.attr_style & SWT::CALENDAR)).equal?(0))
+        key_code_ = ns_event.key_code
+        case (key_code_)
+        # KP Enter
+        when 76, 36
+          # Return
+          post_event(SWT::DefaultSelection)
+        end
+      end
+      return result
+    end
+    
     typesig { [] }
-    def send_selection_event
-      rec = LongDateRec.new
-      OS._get_control_data(self.attr_handle, RJava.cast_to_short(OS.attr_k_control_entire_control), OS.attr_k_control_clock_long_date_tag, LongDateRec.attr_sizeof, rec, nil)
-      if (!(rec.attr_second).equal?(@date_rec.attr_second) || !(rec.attr_minute).equal?(@date_rec.attr_minute) || !(rec.attr_hour).equal?(@date_rec.attr_hour) || !(rec.attr_day).equal?(@date_rec.attr_day) || !(rec.attr_month).equal?(@date_rec.attr_month) || !(rec.attr_year).equal?(@date_rec.attr_year))
-        @date_rec = rec
+    def send_selection
+      event = NSApplication.shared_application.current_event
+      if (!(event).nil? && !((self.attr_style & SWT::CALENDAR)).equal?(0))
+        if ((event.click_count).equal?(2))
+          post_event(SWT::DefaultSelection)
+        else
+          if ((event.type).equal?(OS::NSLeftMouseUp))
+            post_event(SWT::Selection)
+          end
+        end
+      else
+        # SWT.DATE or SWT.TIME
         post_event(SWT::Selection)
       end
     end
     
-    typesig { [Color] }
-    def set_background(color)
-      check_widget
-      super(color)
-      @bg = color
-    end
-    
-    typesig { [Color] }
-    def set_foreground(color)
-      check_widget
-      super(color)
-      @fg = color
-    end
-    
-    typesig { [::Java::Int, ::Java::Boolean] }
-    def set_day(new_day, notify)
-      first_day = @calendar.get_actual_minimum(Calendar::DAY_OF_MONTH)
-      last_day = @calendar.get_actual_maximum(Calendar::DAY_OF_MONTH)
-      if (!(first_day <= new_day && new_day <= last_day))
-        return
+    typesig { [] }
+    def update_background
+      ns_color = nil
+      if (!(self.attr_background_image).nil?)
+        ns_color = NSColor.color_with_pattern_image(self.attr_background_image.attr_handle)
+      else
+        if (!(self.attr_background).nil?)
+          ns_color = NSColor.color_with_device_red(self.attr_background[0], self.attr_background[1], self.attr_background[2], self.attr_background[3])
+        else
+          if (!((self.attr_style & SWT::CALENDAR)).equal?(0))
+            ns_color = NSColor.control_background_color
+          else
+            ns_color = NSColor.text_background_color
+          end
+        end
       end
-      cell_size = get_cell_size(nil)
-      redraw(get_cell(@calendar.get(Calendar::DAY_OF_MONTH)), cell_size)
-      @calendar.set(Calendar::DAY_OF_MONTH, new_day)
-      redraw(get_cell(@calendar.get(Calendar::DAY_OF_MONTH)), cell_size)
-      if (notify)
-        post_event(SWT::Selection)
-      end
+      (self.attr_view).set_background_color(ns_color)
     end
     
     typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
@@ -910,26 +448,13 @@ module Org::Eclipse::Swt::Widgets
     # @since 3.4
     def set_date(year, month, day)
       check_widget
-      if (!is_valid_date(year, month, day))
+      if (year < MIN_YEAR || year > MAX_YEAR)
         return
       end
-      if (!((self.attr_style & SWT::CALENDAR)).equal?(0))
-        @calendar.set(Calendar::YEAR, year)
-        @calendar.set(Calendar::MONTH, month)
-        redraw
-        set_day(day, false)
-      else
-        @date_rec.attr_year = RJava.cast_to_short(year)
-        @date_rec.attr_month = RJava.cast_to_short((month + 1))
-        @date_rec.attr_day = RJava.cast_to_short(day)
-        OS._set_control_data(self.attr_handle, RJava.cast_to_short(OS.attr_k_control_entire_control), OS.attr_k_control_clock_long_date_tag, LongDateRec.attr_sizeof, @date_rec)
-        OS._get_control_data(self.attr_handle, RJava.cast_to_short(OS.attr_k_control_entire_control), OS.attr_k_control_clock_long_date_tag, LongDateRec.attr_sizeof, @date_rec, nil)
-        redraw
-        if (!((self.attr_style & SWT::TIME)).equal?(0))
-          @date_and_time.attr_year = RJava.cast_to_short(year)
-          @date_and_time.attr_month = RJava.cast_to_short((month + 1))
-          @date_and_time.attr_day = RJava.cast_to_short(day)
-        end
+      date = get_calendar_date
+      new_date = NSCalendarDate.date_with_year(year, month + 1, day, date.hour_of_day, date.minute_of_hour, date.second_of_minute, date.time_zone)
+      if ((new_date.year_of_common_era).equal?(year) && (new_date.month_of_year).equal?(month + 1) && (new_date.day_of_month).equal?(day))
+        (self.attr_view).set_date_value(new_date)
       end
     end
     
@@ -937,6 +462,7 @@ module Org::Eclipse::Swt::Widgets
     # Sets the receiver's date, or day of the month, to the specified day.
     # <p>
     # The first day of the month is 1, and the last day depends on the month and year.
+    # If the specified day is not valid for the receiver's month and year, then it is ignored.
     # </p>
     # 
     # @param day a positive integer beginning with 1
@@ -945,22 +471,31 @@ module Org::Eclipse::Swt::Widgets
     # <li>ERROR_WIDGET_DISPOSED - if the receiver has been disposed</li>
     # <li>ERROR_THREAD_INVALID_ACCESS - if not called from the thread that created the receiver</li>
     # </ul>
+    # 
+    # @see #setDate
     def set_day(day)
       check_widget
-      if (!is_valid(Calendar::DAY_OF_MONTH, day))
-        return
+      date = get_calendar_date
+      new_date = NSCalendarDate.date_with_year(date.year_of_common_era, date.month_of_year, day, date.hour_of_day, date.minute_of_hour, date.second_of_minute, date.time_zone)
+      if ((new_date.year_of_common_era).equal?(date.year_of_common_era) && (new_date.month_of_year).equal?(date.month_of_year) && (new_date.day_of_month).equal?(day))
+        (self.attr_view).set_date_value(new_date)
       end
-      if (!((self.attr_style & SWT::CALENDAR)).equal?(0))
-        set_day(day, false)
-      else
-        @date_rec.attr_day = RJava.cast_to_short(day)
-        OS._set_control_data(self.attr_handle, RJava.cast_to_short(OS.attr_k_control_entire_control), OS.attr_k_control_clock_long_date_tag, LongDateRec.attr_sizeof, @date_rec)
-        OS._get_control_data(self.attr_handle, RJava.cast_to_short(OS.attr_k_control_entire_control), OS.attr_k_control_clock_long_date_tag, LongDateRec.attr_sizeof, @date_rec, nil)
-        if (!((self.attr_style & SWT::TIME)).equal?(0))
-          @date_and_time.attr_day = RJava.cast_to_short(day)
+    end
+    
+    typesig { [Array.typed(::Java::Float)] }
+    # double
+    def set_foreground(color)
+      ns_color = nil
+      if ((color).nil?)
+        if (!((self.attr_style & SWT::CALENDAR)).equal?(0))
+          ns_color = NSColor.control_text_color
+        else
+          ns_color = NSColor.text_color
         end
-        redraw
+      else
+        ns_color = NSColor.color_with_device_red(color[0], color[1], color[2], 1)
       end
+      (self.attr_view).set_text_color(ns_color)
     end
     
     typesig { [::Java::Int] }
@@ -977,20 +512,12 @@ module Org::Eclipse::Swt::Widgets
     # </ul>
     def set_hours(hours)
       check_widget
-      if (!is_valid(Calendar::HOUR_OF_DAY, hours))
+      if (hours < 0 || hours > 23)
         return
       end
-      if (!((self.attr_style & SWT::CALENDAR)).equal?(0))
-        @calendar.set(Calendar::HOUR_OF_DAY, hours)
-      else
-        @date_rec.attr_hour = RJava.cast_to_short(hours)
-        OS._set_control_data(self.attr_handle, RJava.cast_to_short(OS.attr_k_control_entire_control), OS.attr_k_control_clock_long_date_tag, LongDateRec.attr_sizeof, @date_rec)
-        OS._get_control_data(self.attr_handle, RJava.cast_to_short(OS.attr_k_control_entire_control), OS.attr_k_control_clock_long_date_tag, LongDateRec.attr_sizeof, @date_rec, nil)
-        if (!((self.attr_style & SWT::DATE)).equal?(0))
-          @date_and_time.attr_hour = RJava.cast_to_short(hours)
-        end
-      end
-      redraw
+      date = get_calendar_date
+      new_date = NSCalendarDate.date_with_year(date.year_of_common_era, date.month_of_year, date.day_of_month, hours, date.minute_of_hour, date.second_of_minute, date.time_zone)
+      (self.attr_view).set_date_value(new_date)
     end
     
     typesig { [::Java::Int] }
@@ -1007,26 +534,19 @@ module Org::Eclipse::Swt::Widgets
     # </ul>
     def set_minutes(minutes)
       check_widget
-      if (!is_valid(Calendar::MINUTE, minutes))
+      if (minutes < 0 || minutes > 59)
         return
       end
-      if (!((self.attr_style & SWT::CALENDAR)).equal?(0))
-        @calendar.set(Calendar::MINUTE, minutes)
-      else
-        @date_rec.attr_minute = RJava.cast_to_short(minutes)
-        OS._set_control_data(self.attr_handle, RJava.cast_to_short(OS.attr_k_control_entire_control), OS.attr_k_control_clock_long_date_tag, LongDateRec.attr_sizeof, @date_rec)
-        OS._get_control_data(self.attr_handle, RJava.cast_to_short(OS.attr_k_control_entire_control), OS.attr_k_control_clock_long_date_tag, LongDateRec.attr_sizeof, @date_rec, nil)
-        if (!((self.attr_style & SWT::DATE)).equal?(0))
-          @date_and_time.attr_minute = RJava.cast_to_short(minutes)
-        end
-      end
-      redraw
+      date = get_calendar_date
+      new_date = NSCalendarDate.date_with_year(date.year_of_common_era, date.month_of_year, date.day_of_month, date.hour_of_day, minutes, date.second_of_minute, date.time_zone)
+      (self.attr_view).set_date_value(new_date)
     end
     
     typesig { [::Java::Int] }
     # Sets the receiver's month.
     # <p>
     # The first month of the year is 0, and the last month is 11.
+    # If the specified month is not valid for the receiver's day and year, then it is ignored.
     # </p>
     # 
     # @param month an integer between 0 and 11
@@ -1035,22 +555,15 @@ module Org::Eclipse::Swt::Widgets
     # <li>ERROR_WIDGET_DISPOSED - if the receiver has been disposed</li>
     # <li>ERROR_THREAD_INVALID_ACCESS - if not called from the thread that created the receiver</li>
     # </ul>
+    # 
+    # @see #setDate
     def set_month(month)
       check_widget
-      if (!is_valid(Calendar::MONTH, month))
-        return
+      date = get_calendar_date
+      new_date = NSCalendarDate.date_with_year(date.year_of_common_era, month + 1, date.day_of_month, date.hour_of_day, date.minute_of_hour, date.second_of_minute, date.time_zone)
+      if ((new_date.year_of_common_era).equal?(date.year_of_common_era) && (new_date.month_of_year).equal?(month + 1) && (new_date.day_of_month).equal?(date.day_of_month))
+        (self.attr_view).set_date_value(new_date)
       end
-      if (!((self.attr_style & SWT::CALENDAR)).equal?(0))
-        @calendar.set(Calendar::MONTH, month)
-      else
-        @date_rec.attr_month = RJava.cast_to_short((month + 1))
-        OS._set_control_data(self.attr_handle, RJava.cast_to_short(OS.attr_k_control_entire_control), OS.attr_k_control_clock_long_date_tag, LongDateRec.attr_sizeof, @date_rec)
-        OS._get_control_data(self.attr_handle, RJava.cast_to_short(OS.attr_k_control_entire_control), OS.attr_k_control_clock_long_date_tag, LongDateRec.attr_sizeof, @date_rec, nil)
-        if (!((self.attr_style & SWT::TIME)).equal?(0))
-          @date_and_time.attr_month = RJava.cast_to_short((month + 1))
-        end
-      end
-      redraw
     end
     
     typesig { [::Java::Int] }
@@ -1067,20 +580,12 @@ module Org::Eclipse::Swt::Widgets
     # </ul>
     def set_seconds(seconds)
       check_widget
-      if (!is_valid(Calendar::SECOND, seconds))
+      if (seconds < 0 || seconds > 59)
         return
       end
-      if (!((self.attr_style & SWT::CALENDAR)).equal?(0))
-        @calendar.set(Calendar::SECOND, seconds)
-      else
-        @date_rec.attr_second = RJava.cast_to_short(seconds)
-        OS._set_control_data(self.attr_handle, RJava.cast_to_short(OS.attr_k_control_entire_control), OS.attr_k_control_clock_long_date_tag, LongDateRec.attr_sizeof, @date_rec)
-        OS._get_control_data(self.attr_handle, RJava.cast_to_short(OS.attr_k_control_entire_control), OS.attr_k_control_clock_long_date_tag, LongDateRec.attr_sizeof, @date_rec, nil)
-        if (!((self.attr_style & SWT::DATE)).equal?(0))
-          @date_and_time.attr_second = RJava.cast_to_short(seconds)
-        end
-      end
-      redraw
+      date = get_calendar_date
+      new_date = NSCalendarDate.date_with_year(date.year_of_common_era, date.month_of_year, date.day_of_month, date.hour_of_day, date.minute_of_hour, seconds, date.time_zone)
+      (self.attr_view).set_date_value(new_date)
     end
     
     typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
@@ -1098,38 +603,19 @@ module Org::Eclipse::Swt::Widgets
     # @since 3.4
     def set_time(hours, minutes, seconds)
       check_widget
-      if (!is_valid(Calendar::HOUR_OF_DAY, hours))
+      if (hours < 0 || hours > 23 || minutes < 0 || minutes > 59 || seconds < 0 || seconds > 59)
         return
       end
-      if (!is_valid(Calendar::MINUTE, minutes))
-        return
-      end
-      if (!is_valid(Calendar::SECOND, seconds))
-        return
-      end
-      if (!((self.attr_style & SWT::CALENDAR)).equal?(0))
-        @calendar.set(Calendar::HOUR_OF_DAY, hours)
-        @calendar.set(Calendar::MINUTE, minutes)
-        @calendar.set(Calendar::SECOND, seconds)
-      else
-        @date_rec.attr_hour = RJava.cast_to_short(hours)
-        @date_rec.attr_minute = RJava.cast_to_short(minutes)
-        @date_rec.attr_second = RJava.cast_to_short(seconds)
-        OS._set_control_data(self.attr_handle, RJava.cast_to_short(OS.attr_k_control_entire_control), OS.attr_k_control_clock_long_date_tag, LongDateRec.attr_sizeof, @date_rec)
-        OS._get_control_data(self.attr_handle, RJava.cast_to_short(OS.attr_k_control_entire_control), OS.attr_k_control_clock_long_date_tag, LongDateRec.attr_sizeof, @date_rec, nil)
-        if (!((self.attr_style & SWT::DATE)).equal?(0))
-          @date_and_time.attr_hour = RJava.cast_to_short(hours)
-          @date_and_time.attr_minute = RJava.cast_to_short(minutes)
-          @date_and_time.attr_second = RJava.cast_to_short(seconds)
-        end
-      end
-      redraw
+      date = get_calendar_date
+      new_date = NSCalendarDate.date_with_year(date.year_of_common_era, date.month_of_year, date.day_of_month, hours, minutes, seconds, date.time_zone)
+      (self.attr_view).set_date_value(new_date)
     end
     
     typesig { [::Java::Int] }
     # Sets the receiver's year.
     # <p>
     # The first year is 1752 and the last year is 9999.
+    # If the specified year is not valid for the receiver's day and month, then it is ignored.
     # </p>
     # 
     # @param year an integer between 1752 and 9999
@@ -1138,23 +624,18 @@ module Org::Eclipse::Swt::Widgets
     # <li>ERROR_WIDGET_DISPOSED - if the receiver has been disposed</li>
     # <li>ERROR_THREAD_INVALID_ACCESS - if not called from the thread that created the receiver</li>
     # </ul>
+    # 
+    # @see #setDate
     def set_year(year)
       check_widget
-      # if (!isValid(Calendar.YEAR, year)) return;
       if (year < MIN_YEAR || year > MAX_YEAR)
         return
       end
-      if (!((self.attr_style & SWT::CALENDAR)).equal?(0))
-        @calendar.set(Calendar::YEAR, year)
-      else
-        @date_rec.attr_year = RJava.cast_to_short(year)
-        OS._set_control_data(self.attr_handle, RJava.cast_to_short(OS.attr_k_control_entire_control), OS.attr_k_control_clock_long_date_tag, LongDateRec.attr_sizeof, @date_rec)
-        OS._get_control_data(self.attr_handle, RJava.cast_to_short(OS.attr_k_control_entire_control), OS.attr_k_control_clock_long_date_tag, LongDateRec.attr_sizeof, @date_rec, nil)
-        if (!((self.attr_style & SWT::TIME)).equal?(0))
-          @date_and_time.attr_year = RJava.cast_to_short(year)
-        end
+      date = get_calendar_date
+      new_date = NSCalendarDate.date_with_year(year, date.month_of_year, date.day_of_month, date.hour_of_day, date.minute_of_hour, date.second_of_minute, date.time_zone)
+      if ((new_date.year_of_common_era).equal?(year) && (new_date.month_of_year).equal?(date.month_of_year) && (new_date.day_of_month).equal?(date.day_of_month))
+        (self.attr_view).set_date_value(new_date)
       end
-      redraw
     end
     
     private

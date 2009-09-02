@@ -1,6 +1,6 @@
 require "rjava"
 
-# Copyright (c) 2000, 2008 IBM Corporation and others.
+# Copyright (c) 2000, 2009 IBM Corporation and others.
 # All rights reserved. This program and the accompanying materials
 # are made available under the terms of the Eclipse Public License v1.0
 # which accompanies this distribution, and is available at
@@ -13,6 +13,7 @@ module Org::Eclipse::Swt::Accessibility
     class_module.module_eval {
       include ::Java::Lang
       include ::Org::Eclipse::Swt::Accessibility
+      include_const ::Java::Lang::Reflect, :Method
       include_const ::Java::Util, :Vector
       include ::Org::Eclipse::Swt
       include ::Org::Eclipse::Swt::Widgets
@@ -105,6 +106,34 @@ module Org::Eclipse::Swt::Accessibility
     undef_method :control
     alias_method :attr_control=, :control=
     undef_method :control=
+    
+    class_module.module_eval {
+      
+      def alternate_accessible_class_name
+        defined?(@@alternate_accessible_class_name) ? @@alternate_accessible_class_name : @@alternate_accessible_class_name= "org.eclipse.swt.accessibility2.Accessible2"
+      end
+      alias_method :attr_alternate_accessible_class_name, :alternate_accessible_class_name
+      
+      def alternate_accessible_class_name=(value)
+        @@alternate_accessible_class_name = value
+      end
+      alias_method :attr_alternate_accessible_class_name=, :alternate_accessible_class_name=
+    }
+    
+    typesig { [] }
+    # @since 3.5
+    def initialize
+      @ref_count = 0
+      @enum_index = 0
+      @obj_iaccessible = nil
+      @obj_ienum_variant = nil
+      @iaccessible = nil
+      @accessible_listeners = Vector.new
+      @accessible_control_listeners = Vector.new
+      @text_listeners = Vector.new
+      @variants = nil
+      @control = nil
+    end
     
     typesig { [Control] }
     def initialize(control)
@@ -325,6 +354,10 @@ module Org::Eclipse::Swt::Accessibility
         private
         alias_method :initialize_anonymous, :initialize
       end.new_local(self, Array.typed(::Java::Int).new([2, 0, 0, 1, 3, 5, 8, 1, 1, 2, 2, 2, 2, 2, 2, 2, 3, 2, 1, 1, 2, 2, 5, 3, 3, 1, 2, 2]))
+      # If the callback takes a struct parameter (for example, a variant),
+      # then create a custom callback that dereferences the struct and
+      # passes a pointer to the original callback.
+      # 
       # long
       pp_vtable = @obj_iaccessible.attr_pp_vtable
       # long
@@ -433,6 +466,16 @@ module Org::Eclipse::Swt::Accessibility
       # @param control the control to get the accessible object for
       # @return the platform specific accessible object
       def internal_new__accessible(control)
+        if (!(self.attr_alternate_accessible_class_name).nil?)
+          begin
+            clazz = Class.for_name(self.attr_alternate_accessible_class_name)
+            method = clazz.get_declared_method("internal_new_Accessible", Array.typed(Class).new([Control]))
+            value = method.invoke(clazz, Array.typed(Object).new([control]))
+            return value
+          rescue JavaThrowable => e
+            self.attr_alternate_accessible_class_name = RJava.cast_to_string(nil)
+          end
+        end
         return Accessible.new(control)
       end
     }
@@ -2069,6 +2112,8 @@ module Org::Eclipse::Swt::Accessibility
         return COM::ROLE_SYSTEM_CHECKBUTTON
       when ACC::ROLE_RADIOBUTTON
         return COM::ROLE_SYSTEM_RADIOBUTTON
+      when ACC::ROLE_SPLITBUTTON
+        return COM::ROLE_SYSTEM_SPLITBUTTON
       when ACC::ROLE_COMBOBOX
         return COM::ROLE_SYSTEM_COMBOBOX
       when ACC::ROLE_TEXT
@@ -2134,6 +2179,8 @@ module Org::Eclipse::Swt::Accessibility
         return ACC::ROLE_CHECKBUTTON
       when COM::ROLE_SYSTEM_RADIOBUTTON
         return ACC::ROLE_RADIOBUTTON
+      when COM::ROLE_SYSTEM_SPLITBUTTON
+        return ACC::ROLE_SPLITBUTTON
       when COM::ROLE_SYSTEM_COMBOBOX
         return ACC::ROLE_COMBOBOX
       when COM::ROLE_SYSTEM_TEXT

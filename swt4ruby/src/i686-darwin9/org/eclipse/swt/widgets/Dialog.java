@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2008 IBM Corporation and others.
+ * Copyright (c) 2000, 2009 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -61,7 +61,7 @@ import org.eclipse.swt.*;
  * and behavior of the instance, including its modality.
  * <dl>
  * <dt><b>Styles:</b></dt>
- * <dd>APPLICATION_MODAL, PRIMARY_MODAL, SYSTEM_MODAL</dd>
+ * <dd>APPLICATION_MODAL, PRIMARY_MODAL, SYSTEM_MODAL, SHEET</dd>
  * <dt><b>Events:</b></dt>
  * <dd>(none)</dd>
  * </dl>
@@ -166,7 +166,14 @@ void checkParent (Shell parent) {
 }
 
 static int checkStyle (Shell parent, int style) {
-	if ((style & (SWT.PRIMARY_MODAL | SWT.APPLICATION_MODAL | SWT.SYSTEM_MODAL)) == 0) {
+	int mask = SWT.PRIMARY_MODAL | SWT.APPLICATION_MODAL | SWT.SYSTEM_MODAL;
+	if ((style & SWT.SHEET) != 0) {
+		style &= ~SWT.SHEET;
+		if ((style & mask) == 0) {
+			style |= parent == null ? SWT.APPLICATION_MODAL : SWT.PRIMARY_MODAL;
+		}
+	}
+	if ((style & mask) == 0) {
 		style |= SWT.APPLICATION_MODAL;
 	}
 	style &= ~SWT.MIRRORED;

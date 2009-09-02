@@ -20,6 +20,10 @@ module Org::Eclipse::Swt::Browser
     }
   end
   
+  # This class implements the nsIHelperAppLauncherDialog interface for mozilla
+  # versions 1.4 - 1.8.x.  For mozilla versions >= 1.9 this interface is
+  # implemented by class HelperAppLauncherDialog_1_9.  HelperAppLauncherDialogFactory
+  # determines at runtime which of these classes to instantiate.
   class HelperAppLauncherDialog 
     include_class_members HelperAppLauncherDialogImports
     
@@ -206,22 +210,16 @@ module Org::Eclipse::Swt::Browser
     # int
     # int
     def _show(a_launcher, a_context, a_reason)
-      # The interface for nsIHelperAppLauncher changed in GRE versions 1.8 and 1.9.  Query for
-      # each of these interfaces in turn until one is found.
+      # The interface for nsIHelperAppLauncher changed as of mozilla 1.8.  Query the received
+      # nsIHelperAppLauncher for the new interface, and if it is not found then fall back to
+      # the old interface.
       supports = NsISupports.new(a_launcher)
       # int
       # int
       result = Array.typed(::Java::Long).new(1) { 0 }
-      rc = supports._query_interface(NsIHelperAppLauncher_1_9::NS_IHELPERAPPLAUNCHER_IID, result)
-      if ((rc).equal?(0))
-        helper_app_launcher = NsIHelperAppLauncher_1_9.new(a_launcher)
-        rc = helper_app_launcher._save_to_disk(0, 0)
-        helper_app_launcher._release
-        return rc
-      end
-      result[0] = 0
       rc = supports._query_interface(NsIHelperAppLauncher_1_8::NS_IHELPERAPPLAUNCHER_IID, result)
-      if ((rc).equal?(0))
+      if ((rc).equal?(XPCOM::NS_OK))
+        # >= 1.8
         helper_app_launcher = NsIHelperAppLauncher_1_8.new(a_launcher)
         rc = helper_app_launcher._save_to_disk(0, 0)
         helper_app_launcher._release
@@ -256,30 +254,21 @@ module Org::Eclipse::Swt::Browser
       # The interface for nsIHelperAppLauncher changed as of mozilla 1.8, so the first
       # argument must be queried for both the old and new nsIHelperAppLauncher interfaces.
       using_1_8 = false
-      using_1_9 = false
       support = NsISupports.new(arg0)
       # int
       # int
       result = Array.typed(::Java::Long).new(1) { 0 }
       rc = support._query_interface(NsIHelperAppLauncher_1_8::NS_IHELPERAPPLAUNCHER_IID, result)
-      if ((rc).equal?(0))
+      if ((rc).equal?(XPCOM::NS_OK))
         using_1_8 = true
         has_launcher = true
         NsISupports.new(result[0])._release
       else
         result[0] = 0
-        rc = support._query_interface(NsIHelperAppLauncher_1_9::NS_IHELPERAPPLAUNCHER_IID, result)
-        if ((rc).equal?(0))
-          using_1_9 = true
+        rc = support._query_interface(NsIHelperAppLauncher::NS_IHELPERAPPLAUNCHER_IID, result)
+        if ((rc).equal?(XPCOM::NS_OK))
           has_launcher = true
           NsISupports.new(result[0])._release
-        else
-          result[0] = 0
-          rc = support._query_interface(NsIHelperAppLauncher::NS_IHELPERAPPLAUNCHER_IID, result)
-          if ((rc).equal?(0))
-            has_launcher = true
-            NsISupports.new(result[0])._release
-          end
         end
       end
       result[0] = 0
@@ -314,13 +303,8 @@ module Org::Eclipse::Swt::Browser
             launcher = NsIHelperAppLauncher_1_8.new(arg0)
             rc = launcher._cancel(XPCOM::NS_BINDING_ABORTED)
           else
-            if (using_1_9)
-              launcher = NsIHelperAppLauncher_1_9.new(arg0)
-              rc = launcher._cancel(XPCOM::NS_BINDING_ABORTED)
-            else
-              launcher = NsIHelperAppLauncher.new(arg0)
-              rc = launcher._cancel
-            end
+            launcher = NsIHelperAppLauncher.new(arg0)
+            rc = launcher._cancel
           end
           if (!(rc).equal?(XPCOM::NS_OK))
             Mozilla.error(rc)

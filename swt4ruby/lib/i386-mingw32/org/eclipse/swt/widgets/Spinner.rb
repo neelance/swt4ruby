@@ -1,6 +1,6 @@
 require "rjava"
 
-# Copyright (c) 2000, 2008 IBM Corporation and others.
+# Copyright (c) 2000, 2009 IBM Corporation and others.
 # All rights reserved. This program and the accompanying materials
 # are made available under the terms of the Eclipse Public License v1.0
 # which accompanies this distribution, and is available at
@@ -42,6 +42,7 @@ module Org::Eclipse::Swt::Widgets
   # @see <a href="http://www.eclipse.org/swt/">Sample code and further information</a>
   # 
   # @since 3.1
+  # @noextend This class is not intended to be subclassed by clients.
   class Spinner < SpinnerImports.const_get :Composite
     include_class_members SpinnerImports
     
@@ -1529,7 +1530,6 @@ module Org::Eclipse::Swt::Widgets
       when OS::EM_UNDO, OS::WM_UNDO
         if (!(OS._send_message(hwnd_text, OS::EM_CANUNDO, 0, 0)).equal?(0))
           @ignore_modify = true
-          OS._send_message(hwnd_text, OS::EM_GETSEL, start, end_)
           OS._call_window_proc(EditProc, hwnd_text, msg, w_param, l_param)
           length_ = OS._get_window_text_length(hwnd_text)
           new_start = Array.typed(::Java::Int).new(1) { 0 }
@@ -1543,6 +1543,7 @@ module Org::Eclipse::Swt::Widgets
             new_text = ""
           end
           OS._call_window_proc(EditProc, hwnd_text, msg, w_param, l_param)
+          OS._send_message(hwnd_text, OS::EM_GETSEL, start, end_)
           @ignore_modify = false
         end
       end

@@ -1,6 +1,6 @@
 require "rjava"
 
-# Copyright (c) 2000, 2008 IBM Corporation and others.
+# Copyright (c) 2000, 2009 IBM Corporation and others.
 # All rights reserved. This program and the accompanying materials
 # are made available under the terms of the Eclipse Public License v1.0
 # which accompanies this distribution, and is available at
@@ -13,8 +13,9 @@ module Org::Eclipse::Swt::Graphics
     class_module.module_eval {
       include ::Java::Lang
       include ::Org::Eclipse::Swt::Graphics
-      include ::Org::Eclipse::Swt::Internal
-      include ::Org::Eclipse::Swt::Internal::Carbon
+      include_const ::Org::Eclipse::Swt::Internal, :C
+      include_const ::Org::Eclipse::Swt::Internal, :Compatibility
+      include ::Org::Eclipse::Swt::Internal::Cocoa
       include ::Org::Eclipse::Swt
     }
   end
@@ -39,267 +40,23 @@ module Org::Eclipse::Swt::Graphics
   class TextLayout < TextLayoutImports.const_get :Resource
     include_class_members TextLayoutImports
     
-    class_module.module_eval {
-      const_set_lazy(:StyleItem) { Class.new do
-        include_class_members TextLayout
-        
-        attr_accessor :style
-        alias_method :attr_style, :style
-        undef_method :style
-        alias_method :attr_style=, :style=
-        undef_method :style=
-        
-        attr_accessor :start
-        alias_method :attr_start, :start
-        undef_method :start
-        alias_method :attr_start=, :start=
-        undef_method :start=
-        
-        attr_accessor :atsu_style
-        alias_method :attr_atsu_style, :atsu_style
-        undef_method :atsu_style
-        alias_method :attr_atsu_style=, :atsu_style=
-        undef_method :atsu_style=
-        
-        typesig { [class_self::Device, class_self::Font] }
-        def create_style(device, default_font)
-          if (!(@atsu_style).equal?(0))
-            return
-          end
-          buffer = Array.typed(::Java::Int).new(1) { 0 }
-          OS._atsucreate_style(buffer)
-          @atsu_style = buffer[0]
-          if ((@atsu_style).equal?(0))
-            SWT.error(SWT::ERROR_NO_HANDLES)
-          end
-          length = 0
-          ptr_length = 0
-          index = 0
-          font = nil
-          foreground = nil
-          metrics = nil
-          if (!(@style).nil?)
-            font = @style.attr_font
-            foreground = @style.attr_foreground
-            metrics = @style.attr_metrics
-            if (@style.attr_underline && ((@style.attr_underline_style).equal?(SWT::UNDERLINE_SINGLE) || (@style.attr_underline_style).equal?(SWT::UNDERLINE_DOUBLE)))
-              length += 1
-              ptr_length += 1
-              if ((@style.attr_underline_style).equal?(SWT::UNDERLINE_DOUBLE))
-                length += 1
-                ptr_length += 2
-              end
-              if (!(@style.attr_underline_color).nil?)
-                length += 1
-                ptr_length += 4
-              end
-            end
-            if (@style.attr_strikeout)
-              length += 1
-              ptr_length += 1
-              if (!(@style.attr_strikeout_color).nil?)
-                length += 1
-                ptr_length += 4
-              end
-            end
-            if (!(metrics).nil?)
-              length += 4
-              ptr_length += 28
-            end
-            if (!(@style.attr_rise).equal?(0))
-              length += 1
-              ptr_length += 4
-            end
-          end
-          if ((font).nil?)
-            font = default_font
-          end
-          synthesize = false
-          if (!(font).nil?)
-            length += 2
-            ptr_length += 8
-            synthesize = !(font.attr_style).equal?(0)
-            if (synthesize)
-              length += 2
-              ptr_length += 2
-            end
-          end
-          if (!(foreground).nil? && (metrics).nil?)
-            length += 1
-            ptr_length += RGBColor.attr_sizeof
-          end
-          buffer1 = Array.typed(::Java::Byte).new(1) { 0 }
-          tags = Array.typed(::Java::Int).new(length) { 0 }
-          sizes = Array.typed(::Java::Int).new(length) { 0 }
-          values = Array.typed(::Java::Int).new(length) { 0 }
-          ptr = OS._new_ptr(ptr_length)
-          ptr1 = ptr
-          if (!(font).nil?)
-            buffer[0] = font.attr_handle
-            tags[index] = OS.attr_k_atsufont_tag
-            sizes[index] = 4
-            values[index] = ptr1
-            OS.memmove(values[index], buffer, sizes[index])
-            ptr1 += sizes[index]
-            index += 1
-            buffer[0] = OS._x2fix(font.attr_size)
-            tags[index] = OS.attr_k_atsusize_tag
-            sizes[index] = 4
-            values[index] = ptr1
-            OS.memmove(values[index], buffer, sizes[index])
-            ptr1 += sizes[index]
-            index += 1
-            if (synthesize)
-              buffer1[0] = !((font.attr_style & OS.attr_italic)).equal?(0) ? 1 : 0
-              tags[index] = OS.attr_k_atsuqditalic_tag
-              sizes[index] = 1
-              values[index] = ptr1
-              OS.memmove(values[index], buffer1, sizes[index])
-              ptr1 += sizes[index]
-              index += 1
-              buffer1[0] = !((font.attr_style & OS.attr_bold)).equal?(0) ? 1 : 0
-              tags[index] = OS.attr_k_atsuqdboldface_tag
-              sizes[index] = 1
-              values[index] = ptr1
-              OS.memmove(values[index], buffer1, sizes[index])
-              ptr1 += sizes[index]
-              index += 1
-            end
-          end
-          underline_color = 0
-          strikeout_color = 0
-          if (!(@style).nil? && @style.attr_underline && ((@style.attr_underline_style).equal?(SWT::UNDERLINE_SINGLE) || (@style.attr_underline_style).equal?(SWT::UNDERLINE_DOUBLE)))
-            buffer1[0] = 1
-            tags[index] = OS.attr_k_atsuqdunderline_tag
-            sizes[index] = 1
-            values[index] = ptr1
-            OS.memmove(values[index], buffer1, sizes[index])
-            ptr1 += sizes[index]
-            index += 1
-            if ((@style.attr_underline_style).equal?(SWT::UNDERLINE_DOUBLE))
-              buffer2 = Array.typed(::Java::Short).new([OS.attr_k_atsustyle_double_line_count])
-              tags[index] = OS.attr_k_atsustyle_underline_count_option_tag
-              sizes[index] = 2
-              values[index] = ptr1
-              OS.memmove(values[index], buffer2, sizes[index])
-              ptr1 += sizes[index]
-              index += 1
-            end
-            if (!(@style.attr_underline_color).nil?)
-              buffer[0] = underline_color = OS._cgcolor_create(device.attr_colorspace, @style.attr_underline_color.attr_handle)
-              tags[index] = OS.attr_k_atsustyle_underline_color_option_tag
-              sizes[index] = 4
-              values[index] = ptr1
-              OS.memmove(values[index], buffer, sizes[index])
-              ptr1 += sizes[index]
-              index += 1
-            end
-          end
-          if (!(@style).nil? && @style.attr_strikeout)
-            buffer1[0] = 1
-            tags[index] = OS.attr_k_atsustyle_strike_through_tag
-            sizes[index] = 1
-            values[index] = ptr1
-            OS.memmove(values[index], buffer1, sizes[index])
-            ptr1 += sizes[index]
-            index += 1
-            if (!(@style.attr_strikeout_color).nil?)
-              buffer[0] = strikeout_color = OS._cgcolor_create(device.attr_colorspace, @style.attr_strikeout_color.attr_handle)
-              tags[index] = OS.attr_k_atsustyle_strike_through_color_option_tag
-              sizes[index] = 4
-              values[index] = ptr1
-              OS.memmove(values[index], buffer, sizes[index])
-              ptr1 += sizes[index]
-              index += 1
-            end
-          end
-          if (!(metrics).nil?)
-            buffer[0] = OS._long2fix(metrics.attr_ascent)
-            tags[index] = OS.attr_k_atsuascent_tag
-            sizes[index] = 4
-            values[index] = ptr1
-            OS.memmove(values[index], buffer, sizes[index])
-            ptr1 += sizes[index]
-            index += 1
-            buffer[0] = OS._long2fix(metrics.attr_descent)
-            tags[index] = OS.attr_k_atsudescent_tag
-            sizes[index] = 4
-            values[index] = ptr1
-            OS.memmove(values[index], buffer, sizes[index])
-            ptr1 += sizes[index]
-            index += 1
-            buffer[0] = OS._long2fix(metrics.attr_width)
-            tags[index] = OS.attr_k_atsuimpose_width_tag
-            sizes[index] = 4
-            values[index] = ptr1
-            OS.memmove(values[index], buffer, sizes[index])
-            ptr1 += sizes[index]
-            index += 1
-            atsurgbalpha_color = Array.typed(::Java::Float).new([0, 0, 0, 0])
-            tags[index] = OS.attr_k_atsurgbalpha_color_tag
-            sizes[index] = 16
-            values[index] = ptr1
-            OS.memmove(values[index], atsurgbalpha_color, sizes[index])
-            ptr1 += sizes[index]
-            index += 1
-          end
-          if (!(@style).nil? && !(@style.attr_rise).equal?(0))
-            buffer[0] = OS._long2fix(@style.attr_rise)
-            tags[index] = OS.attr_k_atsucross_stream_shift_tag
-            sizes[index] = 4
-            values[index] = ptr1
-            OS.memmove(values[index], buffer, sizes[index])
-            ptr1 += sizes[index]
-            index += 1
-          end
-          if (!(foreground).nil? && (metrics).nil?)
-            rgb = self.class::RGBColor.new
-            color = foreground.attr_handle
-            rgb.attr_red = RJava.cast_to_short((color[0] * 0xffff))
-            rgb.attr_green = RJava.cast_to_short((color[1] * 0xffff))
-            rgb.attr_blue = RJava.cast_to_short((color[2] * 0xffff))
-            tags[index] = OS.attr_k_atsucolor_tag
-            sizes[index] = RGBColor.attr_sizeof
-            values[index] = ptr1
-            OS.memmove(values[index], rgb, sizes[index])
-            ptr1 += sizes[index]
-            index += 1
-          end
-          OS._atsuset_attributes(@atsu_style, tags.attr_length, tags, sizes, values)
-          OS._dispose_ptr(ptr)
-          if (!(underline_color).equal?(0))
-            OS._cgcolor_release(underline_color)
-          end
-          if (!(strikeout_color).equal?(0))
-            OS._cgcolor_release(strikeout_color)
-          end
-        end
-        
-        typesig { [] }
-        def free_style
-          if ((@atsu_style).equal?(0))
-            return
-          end
-          OS._atsudispose_style(@atsu_style)
-          @atsu_style = 0
-        end
-        
-        typesig { [] }
-        def to_s
-          return "StyleItem {" + RJava.cast_to_string(@start) + ", " + RJava.cast_to_string(@style) + "}"
-        end
-        
-        typesig { [] }
-        def initialize
-          @style = nil
-          @start = 0
-          @atsu_style = 0
-        end
-        
-        private
-        alias_method :initialize__style_item, :initialize
-      end }
-    }
+    attr_accessor :text_storage
+    alias_method :attr_text_storage, :text_storage
+    undef_method :text_storage
+    alias_method :attr_text_storage=, :text_storage=
+    undef_method :text_storage=
+    
+    attr_accessor :layout_manager
+    alias_method :attr_layout_manager, :layout_manager
+    undef_method :layout_manager
+    alias_method :attr_layout_manager=, :layout_manager=
+    undef_method :layout_manager=
+    
+    attr_accessor :text_container
+    alias_method :attr_text_container, :text_container
+    undef_method :text_container
+    alias_method :attr_text_container=, :text_container=
+    undef_method :text_container=
     
     attr_accessor :font
     alias_method :attr_font, :font
@@ -313,23 +70,11 @@ module Org::Eclipse::Swt::Graphics
     alias_method :attr_text=, :text=
     undef_method :text=
     
-    attr_accessor :text_ptr
-    alias_method :attr_text_ptr, :text_ptr
-    undef_method :text_ptr
-    alias_method :attr_text_ptr=, :text_ptr=
-    undef_method :text_ptr=
-    
     attr_accessor :styles
     alias_method :attr_styles, :styles
     undef_method :styles
     alias_method :attr_styles=, :styles=
     undef_method :styles=
-    
-    attr_accessor :layout
-    alias_method :attr_layout, :layout
-    undef_method :layout
-    alias_method :attr_layout=, :layout=
-    undef_method :layout=
     
     attr_accessor :spacing
     alias_method :attr_spacing, :spacing
@@ -355,11 +100,17 @@ module Org::Eclipse::Swt::Graphics
     alias_method :attr_indent=, :indent=
     undef_method :indent=
     
-    attr_accessor :indent_style
-    alias_method :attr_indent_style, :indent_style
-    undef_method :indent_style
-    alias_method :attr_indent_style=, :indent_style=
-    undef_method :indent_style=
+    attr_accessor :justify
+    alias_method :attr_justify, :justify
+    undef_method :justify
+    alias_method :attr_justify=, :justify=
+    undef_method :justify=
+    
+    attr_accessor :alignment
+    alias_method :attr_alignment, :alignment
+    undef_method :alignment
+    alias_method :attr_alignment=, :alignment=
+    undef_method :alignment=
     
     attr_accessor :tabs
     alias_method :attr_tabs, :tabs
@@ -373,51 +124,36 @@ module Org::Eclipse::Swt::Graphics
     alias_method :attr_segments=, :segments=
     undef_method :segments=
     
-    attr_accessor :tabs_ptr
-    alias_method :attr_tabs_ptr, :tabs_ptr
-    undef_method :tabs_ptr
-    alias_method :attr_tabs_ptr=, :tabs_ptr=
-    undef_method :tabs_ptr=
+    attr_accessor :wrap_width
+    alias_method :attr_wrap_width, :wrap_width
+    undef_method :wrap_width
+    alias_method :attr_wrap_width=, :wrap_width=
+    undef_method :wrap_width=
     
-    attr_accessor :breaks
-    alias_method :attr_breaks, :breaks
-    undef_method :breaks
-    alias_method :attr_breaks=, :breaks=
-    undef_method :breaks=
+    attr_accessor :orientation
+    alias_method :attr_orientation, :orientation
+    undef_method :orientation
+    alias_method :attr_orientation=, :orientation=
+    undef_method :orientation=
     
-    attr_accessor :hard_breaks
-    alias_method :attr_hard_breaks, :hard_breaks
-    undef_method :hard_breaks
-    alias_method :attr_hard_breaks=, :hard_breaks=
-    undef_method :hard_breaks=
+    attr_accessor :line_offsets
+    alias_method :attr_line_offsets, :line_offsets
+    undef_method :line_offsets
+    alias_method :attr_line_offsets=, :line_offsets=
+    undef_method :line_offsets=
     
-    attr_accessor :line_x
-    alias_method :attr_line_x, :line_x
-    undef_method :line_x
-    alias_method :attr_line_x=, :line_x=
-    undef_method :line_x=
-    
-    attr_accessor :line_width
-    alias_method :attr_line_width, :line_width
-    undef_method :line_width
-    alias_method :attr_line_width=, :line_width=
-    undef_method :line_width=
-    
-    attr_accessor :line_height
-    alias_method :attr_line_height, :line_height
-    undef_method :line_height
-    alias_method :attr_line_height=, :line_height=
-    undef_method :line_height=
-    
-    attr_accessor :line_ascent
-    alias_method :attr_line_ascent, :line_ascent
-    undef_method :line_ascent
-    alias_method :attr_line_ascent=, :line_ascent=
-    undef_method :line_ascent=
+    attr_accessor :line_bounds
+    alias_method :attr_line_bounds, :line_bounds
+    undef_method :line_bounds
+    alias_method :attr_line_bounds=, :line_bounds=
+    undef_method :line_bounds=
     
     class_module.module_eval {
-      const_set_lazy(:TAB_COUNT) { 32 }
-      const_attr_reader  :TAB_COUNT
+      const_set_lazy(:UNDERLINE_THICK) { 1 << 16 }
+      const_attr_reader  :UNDERLINE_THICK
+      
+      const_set_lazy(:LINK_FOREGROUND) { RGB.new(0, 51, 153) }
+      const_attr_reader  :LINK_FOREGROUND
     }
     
     attr_accessor :invalid_offsets
@@ -436,14 +172,35 @@ module Org::Eclipse::Swt::Graphics
       const_set_lazy(:ZWS) { Character.new(0x200B) }
       const_attr_reader  :ZWS
       
-      const_set_lazy(:UNDERLINE_IME_INPUT) { 1 << 16 }
-      const_attr_reader  :UNDERLINE_IME_INPUT
-      
-      const_set_lazy(:UNDERLINE_IME_TARGET_CONVERTED) { 2 << 16 }
-      const_attr_reader  :UNDERLINE_IME_TARGET_CONVERTED
-      
-      const_set_lazy(:UNDERLINE_IME_CONVERTED) { 3 << 16 }
-      const_attr_reader  :UNDERLINE_IME_CONVERTED
+      const_set_lazy(:StyleItem) { Class.new do
+        include_class_members TextLayout
+        
+        attr_accessor :style
+        alias_method :attr_style, :style
+        undef_method :style
+        alias_method :attr_style=, :style=
+        undef_method :style=
+        
+        attr_accessor :start
+        alias_method :attr_start, :start
+        undef_method :start
+        alias_method :attr_start=, :start=
+        undef_method :start=
+        
+        typesig { [] }
+        def to_s
+          return "StyleItem {" + RJava.cast_to_string(@start) + ", " + RJava.cast_to_string(@style) + "}"
+        end
+        
+        typesig { [] }
+        def initialize
+          @style = nil
+          @start = 0
+        end
+        
+        private
+        alias_method :initialize__style_item, :initialize
+      end }
     }
     
     typesig { [Device] }
@@ -460,38 +217,29 @@ module Org::Eclipse::Swt::Graphics
     # 
     # @see #dispose()
     def initialize(device)
+      @text_storage = nil
+      @layout_manager = nil
+      @text_container = nil
       @font = nil
       @text = nil
-      @text_ptr = 0
       @styles = nil
-      @layout = 0
       @spacing = 0
       @ascent = 0
       @descent = 0
       @indent = 0
-      @indent_style = 0
+      @justify = false
+      @alignment = 0
       @tabs = nil
       @segments = nil
-      @tabs_ptr = 0
-      @breaks = nil
-      @hard_breaks = nil
-      @line_x = nil
-      @line_width = nil
-      @line_height = nil
-      @line_ascent = nil
+      @wrap_width = 0
+      @orientation = 0
+      @line_offsets = nil
+      @line_bounds = nil
       @invalid_offsets = nil
       super(device)
-      buffer = Array.typed(::Java::Int).new(1) { 0 }
-      OS._atsucreate_text_layout(buffer)
-      if ((buffer[0]).equal?(0))
-        SWT.error(SWT::ERROR_NO_HANDLES)
-      end
-      @layout = buffer[0]
-      set_layout_control(OS.attr_k_atsuline_direction_tag, OS.attr_k_atsuleft_to_right_base_direction, 1)
-      line_options = OS.attr_k_atsline_last_no_justification | OS.attr_k_atsline_use_device_metrics | OS.attr_k_atsline_keep_spaces_out_of_margin
-      set_layout_control(OS.attr_k_atsuline_layout_options_tag, line_options, 4)
-      OS._atsuset_highlighting_method(@layout, OS.attr_k_redraw_highlighting, ATSUUnhighlightData.new)
-      @ascent = @descent = -1
+      @wrap_width = @ascent = @descent = -1
+      @alignment = SWT::LEFT
+      @orientation = SWT::LEFT_TO_RIGHT
       @text = ""
       @styles = Array.typed(StyleItem).new(2) { nil }
       @styles[0] = StyleItem.new
@@ -506,152 +254,6 @@ module Org::Eclipse::Swt::Graphics
       end
     end
     
-    typesig { [] }
-    def compute_runs
-      if (!(@breaks).nil?)
-        return
-      end
-      segments_text = get_segments_text
-      text_length = segments_text.length
-      chars = CharArray.new(text_length + 1)
-      segments_text.get_chars(0, text_length, chars, 1)
-      chars[0] = ZWS
-      break_count = 1
-      i = 0
-      while i < chars.attr_length
-        c = chars[i]
-        if ((c).equal?(Character.new(?\n.ord)) || (c).equal?(Character.new(?\r.ord)))
-          break_count += 1
-        end
-        i += 1
-      end
-      @hard_breaks = Array.typed(::Java::Int).new(break_count) { 0 }
-      break_count = 0
-      i_ = 0
-      while i_ < chars.attr_length
-        c = chars[i_]
-        if ((c).equal?(Character.new(?\n.ord)) || (c).equal?(Character.new(?\r.ord)))
-          chars[i_] = ZWS
-          @hard_breaks[((break_count += 1) - 1)] = i_
-        end
-        i_ += 1
-      end
-      if (!(@invalid_offsets).nil?)
-        i__ = 0
-        while i__ < @invalid_offsets.attr_length
-          @invalid_offsets[i__] += 1
-          i__ += 1
-        end
-      else
-        @invalid_offsets = Array.typed(::Java::Int).new(0) { 0 }
-      end
-      @hard_breaks[break_count] = chars.attr_length
-      new_text_ptr = OS._new_ptr(chars.attr_length * 2)
-      OS.memmove(new_text_ptr, chars, chars.attr_length * 2)
-      OS._atsuset_text_pointer_location(@layout, new_text_ptr, 0, chars.attr_length, chars.attr_length)
-      OS._atsuset_transient_font_matching(@layout, true)
-      if (!(@text_ptr).equal?(0))
-        OS._dispose_ptr(@text_ptr)
-      end
-      @text_ptr = new_text_ptr
-      buffer = Array.typed(::Java::Int).new(1) { 0 }
-      font = !(@font).nil? ? @font : self.attr_device.attr_system_font
-      i__ = 0
-      while i__ < @styles.attr_length - 1
-        run = @styles[i__]
-        run.create_style(self.attr_device, font)
-        # set the default font in the ZWS when text is empty fixes text metrics
-        start = !(text_length).equal?(0) ? translate_offset(run.attr_start) : 0
-        run_length = translate_offset(@styles[i__ + 1].attr_start) - start
-        OS._atsuset_run_style(@layout, run.attr_atsu_style, start, run_length)
-        i__ += 1
-      end
-      ptr = OS._new_ptr(12)
-      buffer = Array.typed(::Java::Int).new([OS._long2fix(@indent), 0, 0])
-      OS.memmove(ptr, buffer, 12)
-      tags = Array.typed(::Java::Int).new([OS.attr_k_atsuimpose_width_tag, OS.attr_k_atsuascent_tag, OS.attr_k_atsudescent_tag])
-      sizes = Array.typed(::Java::Int).new([4, 4, 4])
-      values = Array.typed(::Java::Int).new([ptr, ptr + 4, ptr + 8])
-      OS._atsucreate_style(buffer)
-      @indent_style = buffer[0]
-      OS._atsuset_attributes(@indent_style, tags.attr_length, tags, sizes, values)
-      OS._dispose_ptr(ptr)
-      OS._atsuset_run_style(@layout, @indent_style, 0, 1)
-      i___ = 0
-      while i___ < @hard_breaks.attr_length - 1
-        offset = @hard_breaks[i___]
-        OS._atsuset_run_style(@layout, @indent_style, offset, 1)
-        i___ += 1
-      end
-      OS._atsuget_layout_control(@layout, OS.attr_k_atsuline_width_tag, 4, buffer, nil)
-      wrap_width = buffer[0]
-      i____ = 0
-      start = 0
-      while i____ < @hard_breaks.attr_length
-        hard_break = @hard_breaks[i____]
-        buffer[0] = 0
-        if (!(wrap_width).equal?(0))
-          OS._atsubatch_break_lines(@layout, start, hard_break - start, wrap_width, buffer)
-        end
-        OS._atsuset_soft_line_break(@layout, hard_break)
-        start = hard_break
-        i____ += 1
-      end
-      OS._atsuget_soft_line_breaks(@layout, 0, OS.attr_k_atsuto_text_end, 0, nil, buffer)
-      count = buffer[0]
-      @breaks = Array.typed(::Java::Int).new(count) { 0 }
-      OS._atsuget_soft_line_breaks(@layout, 0, OS.attr_k_atsuto_text_end, count, @breaks, nil)
-      line_count = @breaks.attr_length
-      @line_x = Array.typed(::Java::Int).new(line_count) { 0 }
-      @line_width = Array.typed(::Java::Int).new(line_count) { 0 }
-      @line_height = Array.typed(::Java::Int).new(line_count) { 0 }
-      @line_ascent = Array.typed(::Java::Int).new(line_count) { 0 }
-      trapezoid = ATSTrapezoid.new
-      i_____ = 0
-      start_ = 0
-      while i_____ < line_count
-        if (!(@ascent).equal?(-1))
-          ptr = OS._new_ptr(4)
-          buffer[0] = OS.attr_k_atsuse_line_height
-          OS.memmove(ptr, buffer, 4)
-          tags = Array.typed(::Java::Int).new([OS.attr_k_atsuline_ascent_tag])
-          sizes = Array.typed(::Java::Int).new([4])
-          values = Array.typed(::Java::Int).new([ptr])
-          OS._atsuset_line_controls(@layout, start_, tags.attr_length, tags, sizes, values)
-          OS._atsuget_line_control(@layout, start_, OS.attr_k_atsuline_ascent_tag, 4, buffer, nil)
-          buffer[0] = OS._long2fix(Math.max(@ascent, OS._fix2long(buffer[0])))
-          OS.memmove(ptr, buffer, 4)
-          OS._atsuset_line_controls(@layout, start_, tags.attr_length, tags, sizes, values)
-          OS._dispose_ptr(ptr)
-        end
-        if (!(@descent).equal?(-1))
-          ptr = OS._new_ptr(4)
-          buffer[0] = OS.attr_k_atsuse_line_height
-          OS.memmove(ptr, buffer, 4)
-          tags = Array.typed(::Java::Int).new([OS.attr_k_atsuline_descent_tag])
-          sizes = Array.typed(::Java::Int).new([4])
-          values = Array.typed(::Java::Int).new([ptr])
-          OS._atsuset_line_controls(@layout, start_, tags.attr_length, tags, sizes, values)
-          OS._atsuget_line_control(@layout, start_, OS.attr_k_atsuline_descent_tag, 4, buffer, nil)
-          buffer[0] = OS._long2fix(Math.max(@descent, OS._fix2long(buffer[0])))
-          OS.memmove(ptr, buffer, 4)
-          OS._atsuset_line_controls(@layout, start_, tags.attr_length, tags, sizes, values)
-          OS._dispose_ptr(ptr)
-        end
-        line_break = @breaks[i_____]
-        line_length = line_break - start_
-        OS._atsuget_glyph_bounds(@layout, 0, 0, start_, line_length, RJava.cast_to_short(OS.attr_k_atsuse_device_origins), 1, trapezoid, nil)
-        @line_x[i_____] = OS._fix2long(trapezoid.attr_lower_left_x)
-        @line_ascent[i_____] = -OS._fix2long(trapezoid.attr_upper_right_y)
-        if (!(line_length).equal?(0))
-          @line_width[i_____] = OS._fix2long(trapezoid.attr_lower_right_x) - OS._fix2long(trapezoid.attr_lower_left_x)
-        end
-        @line_height[i_____] = OS._fix2long(trapezoid.attr_lower_right_y) + @line_ascent[i_____] + @spacing
-        start_ = line_break
-        i_____ += 1
-      end
-    end
-    
     typesig { [::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int] }
     def compute_polyline(left, top, right, bottom)
       height = bottom - top # can be any number
@@ -660,11 +262,11 @@ module Org::Eclipse::Swt::Graphics
       if ((peaks).equal?(0) && right - left > 2)
         peaks = 1
       end
-      length_ = ((2 * peaks) + 1) * 2
-      if (length_ < 0)
+      length = ((2 * peaks) + 1) * 2
+      if (length < 0)
         return Array.typed(::Java::Float).new(0) { 0.0 }
       end
-      coordinates = Array.typed(::Java::Float).new(length_) { 0.0 }
+      coordinates = Array.typed(::Java::Float).new(length) { 0.0 }
       i = 0
       while i < peaks
         index = 4 * i
@@ -674,9 +276,192 @@ module Org::Eclipse::Swt::Graphics
         coordinates[index + 3] = top
         i += 1
       end
-      coordinates[length_ - 2] = left + (width * peaks)
-      coordinates[length_ - 1] = bottom
+      coordinates[length - 2] = left + (width * peaks)
+      coordinates[length - 1] = bottom
       return coordinates
+    end
+    
+    typesig { [] }
+    def compute_runs
+      if (!(@text_storage).nil?)
+        return
+      end
+      segments_text = get_segments_text
+      str = NSString.string_with(segments_text)
+      @text_storage = NSTextStorage.new.alloc.init
+      @layout_manager = NSLayoutManager.new.alloc.init
+      @layout_manager.set_background_layout_enabled(NSThread.is_main_thread)
+      @text_container = NSTextContainer.new.alloc
+      size = NSSize.new
+      size.attr_width = !(@wrap_width).equal?(-1) ? @wrap_width : Float::MAX_VALUE
+      size.attr_height = Float::MAX_VALUE
+      @text_container.init_with_container_size(size)
+      @text_storage.add_layout_manager(@layout_manager)
+      @layout_manager.add_text_container(@text_container)
+      # Bug in Cocoa. Adding attributes directly to a NSTextStorage causes
+      # output to the console and eventually a segmentation fault when printing
+      # on a thread other than the main thread. The fix is to add attributes to
+      # a separate NSMutableAttributedString and add it to text storage when done.
+      attr_str = NSMutableAttributedString.new.alloc
+      attr_str.attr_id = attr_str.init_with_string(str).attr_id
+      attr_str.begin_editing
+      default_font = !(@font).nil? ? @font : self.attr_device.attr_system_font
+      range = NSRange.new
+      range.attr_length = str.length
+      attr_str.add_attribute(OS::NSFontAttributeName, default_font.attr_handle, range)
+      default_font.add_traits(attr_str, range)
+      # TODO ascend descent wrap
+      paragraph = NSMutableParagraphStyle.new.alloc.init
+      align = OS::NSLeftTextAlignment
+      if (@justify)
+        align = OS::NSJustifiedTextAlignment
+      else
+        case (@alignment)
+        when SWT::CENTER
+          align = OS::NSCenterTextAlignment
+        when SWT::RIGHT
+          align = OS::NSRightTextAlignment
+        end
+      end
+      paragraph.set_alignment(align)
+      paragraph.set_line_spacing(@spacing)
+      paragraph.set_first_line_head_indent(@indent)
+      paragraph.set_line_break_mode(!(@wrap_width).equal?(-1) ? OS::NSLineBreakByWordWrapping : OS::NSLineBreakByClipping)
+      paragraph.set_tab_stops(NSArray.array)
+      if (!(@tabs).nil?)
+        count = @tabs.attr_length
+        i = 0
+        pos = 0
+        while i < count
+          pos += @tabs[i]
+          tab = NSTextTab.new.alloc
+          tab = tab.init_with_type(OS::NSLeftTabStopType, pos)
+          paragraph.add_tab_stop(tab)
+          tab.release
+          i += 1
+        end
+        width = count - 2 >= 0 ? @tabs[count - 1] - @tabs[count - 2] : @tabs[count - 1]
+        paragraph.set_default_tab_interval(width)
+      end
+      attr_str.add_attribute(OS::NSParagraphStyleAttributeName, paragraph, range)
+      paragraph.release
+      # long
+      text_length = str.length
+      i = 0
+      while i < @styles.attr_length - 1
+        run = @styles[i]
+        if ((run.attr_style).nil?)
+          i += 1
+          next
+        end
+        style = run.attr_style
+        range.attr_location = !(text_length).equal?(0) ? translate_offset(run.attr_start) : 0
+        range.attr_length = translate_offset(@styles[i + 1].attr_start) - range.attr_location
+        font = style.attr_font
+        if (!(font).nil?)
+          attr_str.add_attribute(OS::NSFontAttributeName, font.attr_handle, range)
+          font.add_traits(attr_str, range)
+        end
+        foreground = style.attr_foreground
+        if (!(foreground).nil?)
+          color = NSColor.color_with_device_red(foreground.attr_handle[0], foreground.attr_handle[1], foreground.attr_handle[2], 1)
+          attr_str.add_attribute(OS::NSForegroundColorAttributeName, color, range)
+        end
+        background = style.attr_background
+        if (!(background).nil?)
+          color = NSColor.color_with_device_red(background.attr_handle[0], background.attr_handle[1], background.attr_handle[2], 1)
+          attr_str.add_attribute(OS::NSBackgroundColorAttributeName, color, range)
+        end
+        if (style.attr_strikeout)
+          attr_str.add_attribute(OS::NSStrikethroughStyleAttributeName, NSNumber.number_with_int(OS::NSUnderlineStyleSingle), range)
+          strike_color = style.attr_strikeout_color
+          if (!(strike_color).nil?)
+            color = NSColor.color_with_device_red(strike_color.attr_handle[0], strike_color.attr_handle[1], strike_color.attr_handle[2], 1)
+            attr_str.add_attribute(OS::NSStrikethroughColorAttributeName, color, range)
+          end
+        end
+        if (is_underline_supported(style))
+          underline_style = 0
+          case (style.attr_underline_style)
+          when SWT::UNDERLINE_SINGLE
+            underline_style = OS::NSUnderlineStyleSingle
+          when SWT::UNDERLINE_DOUBLE
+            underline_style = OS::NSUnderlineStyleDouble
+          when UNDERLINE_THICK
+            underline_style = OS::NSUnderlineStyleThick
+          when SWT::UNDERLINE_LINK
+            underline_style = OS::NSUnderlineStyleSingle
+            if ((foreground).nil?)
+              color = NSColor.color_with_device_red(LINK_FOREGROUND.attr_red / 255, LINK_FOREGROUND.attr_green / 255, LINK_FOREGROUND.attr_blue / 255, 1)
+              attr_str.add_attribute(OS::NSForegroundColorAttributeName, color, range)
+            end
+          end
+          if (!(underline_style).equal?(0))
+            attr_str.add_attribute(OS::NSUnderlineStyleAttributeName, NSNumber.number_with_int(underline_style), range)
+            underline_color = style.attr_underline_color
+            if (!(underline_color).nil?)
+              color = NSColor.color_with_device_red(underline_color.attr_handle[0], underline_color.attr_handle[1], underline_color.attr_handle[2], 1)
+              attr_str.add_attribute(OS::NSUnderlineColorAttributeName, color, range)
+            end
+          end
+        end
+        if (!(style.attr_rise).equal?(0))
+          attr_str.add_attribute(OS::NSBaselineOffsetAttributeName, NSNumber.number_with_int(style.attr_rise), range)
+        end
+        if (!(style.attr_metrics).nil?)
+          # TODO implement metrics
+        end
+        i += 1
+      end
+      attr_str.end_editing
+      @text_storage.set_attributed_string(attr_str)
+      attr_str.release
+      @text_container.set_line_fragment_padding(0)
+      @layout_manager.glyph_range_for_text_container(@text_container)
+      number_of_lines = 0
+      # long
+      number_of_glyphs_ = @layout_manager.number_of_glyphs
+      index = 0
+      # long
+      range_ptr = OS.malloc(NSRange.attr_sizeof)
+      line_range = NSRange.new
+      number_of_lines = 0
+      index = 0
+      while index < number_of_glyphs_
+        @layout_manager.line_fragment_used_rect_for_glyph_at_index(index, range_ptr, true)
+        OS.memmove(line_range, range_ptr, NSRange.attr_sizeof)
+        index = line_range.attr_location + line_range.attr_length
+        number_of_lines += 1
+      end
+      if ((number_of_lines).equal?(0))
+        number_of_lines += 1
+      end
+      offsets = Array.typed(::Java::Int).new(number_of_lines + 1) { 0 }
+      bounds = Array.typed(NSRect).new(number_of_lines) { nil }
+      number_of_lines = 0
+      index = 0
+      while index < number_of_glyphs_
+        bounds[number_of_lines] = @layout_manager.line_fragment_used_rect_for_glyph_at_index(index, range_ptr, true)
+        if (number_of_lines < bounds.attr_length - 1)
+          bounds[number_of_lines].attr_height -= @spacing
+        end
+        OS.memmove(line_range, range_ptr, NSRange.attr_sizeof)
+        # 64
+        offsets[number_of_lines] = RJava.cast_to_int(line_range.attr_location)
+        index = line_range.attr_location + line_range.attr_length
+        number_of_lines += 1
+      end
+      if ((number_of_lines).equal?(0))
+        font = !(@font).nil? ? @font : self.attr_device.attr_system_font
+        ns_font = font.attr_handle
+        bounds[0] = NSRect.new
+        bounds[0].attr_height = Math.max(@layout_manager.default_line_height_for_font(ns_font), @ascent + @descent)
+      end
+      OS.free(range_ptr)
+      # 64
+      offsets[number_of_lines] = RJava.cast_to_int(@text_storage.length)
+      @line_offsets = offsets
+      @line_bounds = bounds
     end
     
     typesig { [] }
@@ -685,22 +470,6 @@ module Org::Eclipse::Swt::Graphics
       @font = nil
       @text = RJava.cast_to_string(nil)
       @styles = nil
-      if (!(@layout).equal?(0))
-        OS._atsudispose_text_layout(@layout)
-      end
-      @layout = 0
-      if (!(@text_ptr).equal?(0))
-        OS._dispose_ptr(@text_ptr)
-      end
-      @text_ptr = 0
-      if (!(@tabs_ptr).equal?(0))
-        OS._dispose_ptr(@tabs_ptr)
-      end
-      @tabs_ptr = 0
-      if (!(@indent_style).equal?(0))
-        OS._atsudispose_style(@indent_style)
-      end
-      @indent_style = 0
     end
     
     typesig { [SwtGC, ::Java::Int, ::Java::Int] }
@@ -771,7 +540,6 @@ module Org::Eclipse::Swt::Graphics
     # @since 3.3
     def draw(gc, x, y, selection_start, selection_end, selection_foreground, selection_background, flags)
       check_layout
-      compute_runs
       if ((gc).nil?)
         SWT.error(SWT::ERROR_NULL_ARGUMENT)
       end
@@ -784,385 +552,327 @@ module Org::Eclipse::Swt::Graphics
       if (!(selection_background).nil? && selection_background.is_disposed)
         SWT.error(SWT::ERROR_INVALID_ARGUMENT)
       end
-      length_ = translate_offset(@text.length)
-      if ((length_).equal?(0) && (flags).equal?(0))
-        return
-      end
-      gc.check_gc(SwtGC::FOREGROUND_FILL)
-      if (gc.attr_data.attr_update_clip)
-        gc.set_cgclipping
-      end
-      OS._cgcontext_save_gstate(gc.attr_handle)
-      set_layout_control(OS.attr_k_atsucgcontext_tag, gc.attr_handle, 4)
-      has_selection = selection_start <= selection_end && !(selection_start).equal?(-1) && !(selection_end).equal?(-1)
-      restore_color = false
-      if (has_selection || !((flags & SWT::LAST_LINE_SELECTION)).equal?(0))
-        if (!(selection_background).nil?)
-          restore_color = true
-          color = OS._cgcolor_create(self.attr_device.attr_colorspace, selection_background.attr_handle)
-          set_layout_control(OS.attr_k_atsuline_highlight_cgcolor_tag, color, 4)
-          OS._cgcolor_release(color)
-        else
-          selection_background = self.attr_device.get_system_color(SWT::COLOR_LIST_BACKGROUND)
+      pool = gc.check_gc(SwtGC::CLIPPING | SwtGC::TRANSFORM | SwtGC::FOREGROUND)
+      begin
+        compute_runs
+        length_ = translate_offset(@text.length)
+        if ((length_).equal?(0) && (flags).equal?(0))
+          return
         end
-      end
-      # Feature in ATSU. There is no API to set a background attribute
-      # of an ATSU style. Draw the background of styles ourselfs.
-      rgn = 0
-      rect = nil
-      j = 0
-      while j < @styles.attr_length
-        run = @styles[j]
-        style = run.attr_style
-        if ((style).nil? || (style.attr_background).nil?)
-          j += 1
-          next
+        gc.attr_handle.save_graphics_state
+        pt = NSPoint.new
+        pt.attr_x = x
+        pt.attr_y = y
+        range = NSRange.new
+        # long
+        number_of_glyphs_ = @layout_manager.number_of_glyphs
+        if (number_of_glyphs_ > 0)
+          range.attr_location = 0
+          range.attr_length = number_of_glyphs_
+          @layout_manager.draw_background_for_glyph_range(range, pt)
         end
-        start = translate_offset(run.attr_start)
-        end_ = j + 1 < @styles.attr_length ? translate_offset(@styles[j + 1].attr_start - 1) : length_
-        i = 0
-        line_start = 0
-        line_y = 0
-        while i < @breaks.attr_length
-          line_break = @breaks[i]
-          line_end = line_break - 1
-          if (!(start > line_end || end_ < line_start))
-            high_start = Math.max(line_start, start)
-            high_end = Math.min(line_end, end_)
-            high_len = high_end - high_start + 1
-            if (high_len > 0)
-              OS._cgcontext_save_gstate(gc.attr_handle)
-              if ((rgn).equal?(0))
-                rgn = OS._new_rgn
-              end
-              OS._atsuget_text_highlight(@layout, OS._long2fix(x), OS._long2fix(y + line_y + @line_ascent[i]), high_start, high_len, rgn)
-              shape = OS._hishape_create_with_qdrgn(rgn)
-              OS._hishape_replace_path_in_cgcontext(shape, gc.attr_handle)
-              if ((rect).nil?)
-                rect = CGRect.new
-              end
-              OS._cgcontext_get_path_bounding_box(gc.attr_handle, rect)
-              OS._cgcontext_eoclip(gc.attr_handle)
-              OS._cgcontext_set_fill_color_space(gc.attr_handle, self.attr_device.attr_colorspace)
-              OS._cgcontext_set_fill_color(gc.attr_handle, style.attr_background.attr_handle)
-              OS._cgcontext_fill_rect(gc.attr_handle, rect)
-              OS._dispose_control(shape)
-              OS._cgcontext_restore_gstate(gc.attr_handle)
+        has_selection = selection_start <= selection_end && !(selection_start).equal?(-1) && !(selection_end).equal?(-1)
+        if (has_selection || !((flags & SWT::LAST_LINE_SELECTION)).equal?(0))
+          if ((selection_background).nil?)
+            selection_background = self.attr_device.get_system_color(SWT::COLOR_LIST_SELECTION)
+          end
+          selection_color = NSColor.color_with_device_red(selection_background.attr_handle[0], selection_background.attr_handle[1], selection_background.attr_handle[2], selection_background.attr_handle[3])
+          path = NSBezierPath.bezier_path
+          rect = NSRect.new
+          if (has_selection)
+            # long
+            p_rect_count = OS.malloc(C::PTR_SIZEOF)
+            range.attr_location = translate_offset(selection_start)
+            range.attr_length = translate_offset(selection_end - selection_start + 1)
+            # long
+            p_array = @layout_manager.rect_array_for_character_range(range, range, @text_container, p_rect_count)
+            # long
+            # long
+            rect_count = Array.typed(::Java::Int).new(1) { 0 }
+            OS.memmove(rect_count, p_rect_count, C::PTR_SIZEOF)
+            OS.free(p_rect_count)
+            k = 0
+            while k < rect_count[0]
+              OS.memmove(rect, p_array, NSRect.attr_sizeof)
+              fix_rect(rect)
+              rect.attr_x += pt.attr_x
+              rect.attr_y += pt.attr_y
+              rect.attr_height = Math.max(rect.attr_height, @ascent + @descent)
+              path.append_bezier_path_with_rect(rect)
+              k += 1
+              p_array += NSRect.attr_sizeof
             end
           end
-          if (line_end > end_)
-            break
+          # TODO draw full selection for wrapped text
+          if (!((flags & SWT::LAST_LINE_SELECTION)).equal?(0))
+            bounds = @line_bounds[@line_bounds.attr_length - 1]
+            rect.attr_x = pt.attr_x + bounds.attr_x + bounds.attr_width
+            rect.attr_y = y + bounds.attr_y
+            rect.attr_width = !((flags & SWT::FULL_SELECTION)).equal?(0) ? 0x7fffffff : bounds.attr_height / 3
+            rect.attr_height = Math.max(bounds.attr_height, @ascent + @descent)
+            path.append_bezier_path_with_rect(rect)
           end
-          line_y += @line_height[i]
-          line_start = line_break
-          i += 1
+          selection_color.set_fill
+          path.fill
+        end
+        if (number_of_glyphs_ > 0)
+          range.attr_location = 0
+          range.attr_length = number_of_glyphs_
+          # double
+          fg = gc.attr_data.attr_foreground
+          default_fg = (fg[0]).equal?(0) && (fg[1]).equal?(0) && (fg[2]).equal?(0) && (fg[3]).equal?(1)
+          if (!default_fg)
+            i = 0
+            while i < @styles.attr_length - 1
+              run = @styles[i]
+              if (!(run.attr_style).nil? && !(run.attr_style.attr_foreground).nil?)
+                i += 1
+                next
+              end
+              if (!(run.attr_style).nil? && run.attr_style.attr_underline && (run.attr_style.attr_underline_style).equal?(SWT::UNDERLINE_LINK))
+                i += 1
+                next
+              end
+              range.attr_location = !(length_).equal?(0) ? translate_offset(run.attr_start) : 0
+              range.attr_length = translate_offset(@styles[i + 1].attr_start) - range.attr_location
+              @layout_manager.add_temporary_attribute(OS::NSForegroundColorAttributeName, gc.attr_data.attr_fg, range)
+              i += 1
+            end
+          end
+          range.attr_location = 0
+          range.attr_length = number_of_glyphs_
+          @layout_manager.draw_glyphs_for_glyph_range(range, pt)
+          if (!default_fg)
+            range.attr_location = 0
+            range.attr_length = length_
+            @layout_manager.remove_temporary_attribute(OS::NSForegroundColorAttributeName, range)
+          end
+          point = NSPoint.new
+          j = 0
+          while j < @styles.attr_length
+            run = @styles[j]
+            style = run.attr_style
+            if ((style).nil?)
+              j += 1
+              next
+            end
+            draw_underline = style.attr_underline && !is_underline_supported(style)
+            draw_underline = draw_underline && ((j + 1).equal?(@styles.attr_length) || !style.is_adherent_underline(@styles[j + 1].attr_style))
+            draw_border = !(style.attr_border_style).equal?(SWT::NONE)
+            draw_border = draw_border && ((j + 1).equal?(@styles.attr_length) || !style.is_adherent_border(@styles[j + 1].attr_style))
+            if (!draw_underline && !draw_border)
+              j += 1
+              next
+            end
+            end_ = j + 1 < @styles.attr_length ? translate_offset(@styles[j + 1].attr_start - 1) : length_
+            i = 0
+            while i < @line_offsets.attr_length - 1
+              line_start = untranslate_offset(@line_offsets[i])
+              line_end = untranslate_offset(@line_offsets[i + 1] - 1)
+              if (draw_underline)
+                start = run.attr_start
+                k = j
+                while k > 0 && style.is_adherent_underline(@styles[k - 1].attr_style)
+                  start = @styles[k - 1].attr_start
+                  k -= 1
+                end
+                start = translate_offset(start)
+                if (!(start > line_end || end_ < line_start))
+                  range.attr_location = Math.max(line_start, start)
+                  range.attr_length = Math.min(line_end, end_) + 1 - range.attr_location
+                  if (range.attr_length > 0)
+                    # long
+                    p_rect_count = OS.malloc(C::PTR_SIZEOF)
+                    # long
+                    p_array = @layout_manager.rect_array_for_character_range(range, range, @text_container, p_rect_count)
+                    # long
+                    # long
+                    rect_count = Array.typed(::Java::Int).new(1) { 0 }
+                    OS.memmove(rect_count, p_rect_count, C::PTR_SIZEOF)
+                    OS.free(p_rect_count)
+                    rect = NSRect.new
+                    gc.attr_handle.save_graphics_state
+                    # double
+                    baseline = @layout_manager.typesetter.baseline_offset_in_layout_manager(@layout_manager, line_start)
+                    # double
+                    color = nil
+                    if (!(style.attr_underline_color).nil?)
+                      color = style.attr_underline_color.attr_handle
+                    end
+                    if ((color).nil? && !(style.attr_foreground).nil?)
+                      color = style.attr_foreground.attr_handle
+                    end
+                    if (!(color).nil?)
+                      NSColor.color_with_device_red(color[0], color[1], color[2], color[3]).set_stroke
+                    end
+                    k_ = 0
+                    while k_ < rect_count[0]
+                      OS.memmove(rect, p_array, NSRect.attr_sizeof)
+                      fix_rect(rect)
+                      # double
+                      underline_x = pt.attr_x + rect.attr_x
+                      # double
+                      underline_y = pt.attr_y + rect.attr_y + rect.attr_height - baseline + 1
+                      path = NSBezierPath.bezier_path
+                      case (style.attr_underline_style)
+                      when SWT::UNDERLINE_ERROR
+                        path.set_line_width(2)
+                        path.set_line_cap_style(OS::NSRoundLineCapStyle)
+                        path.set_line_join_style(OS::NSRoundLineJoinStyle)
+                        # double
+                        path.set_line_dash(Array.typed(::Java::Float).new([1, 3]), 2, 0)
+                        point.attr_x = underline_x
+                        point.attr_y = underline_y + 0.5
+                        path.move_to_point(point)
+                        point.attr_x = underline_x + rect.attr_width
+                        point.attr_y = underline_y + 0.5
+                        path.line_to_point(point)
+                      when SWT::UNDERLINE_SQUIGGLE
+                        gc.attr_handle.set_should_antialias(false)
+                        path.set_line_width(1.0)
+                        path.set_line_cap_style(OS::NSButtLineCapStyle)
+                        path.set_line_join_style(OS::NSMiterLineJoinStyle)
+                        # double
+                        line_bottom = pt.attr_y + rect.attr_y + rect.attr_height
+                        squiggly_thickness = 1
+                        squiggly_height = 2 * squiggly_thickness
+                        # double
+                        squiggly_y = Math.min(underline_y - squiggly_height / 2, line_bottom - squiggly_height - 1)
+                        points = compute_polyline(RJava.cast_to_int(underline_x), RJava.cast_to_int(squiggly_y), RJava.cast_to_int((underline_x + rect.attr_width)), RJava.cast_to_int((squiggly_y + squiggly_height)))
+                        point.attr_x = points[0] + 0.5
+                        point.attr_y = points[1] + 0.5
+                        path.move_to_point(point)
+                        p = 2
+                        while p < points.attr_length
+                          point.attr_x = points[p] + 0.5
+                          point.attr_y = points[p + 1] + 0.5
+                          path.line_to_point(point)
+                          p += 2
+                        end
+                      end
+                      path.stroke
+                      k_ += 1
+                      p_array += NSRect.attr_sizeof
+                    end
+                    gc.attr_handle.restore_graphics_state
+                  end
+                end
+              end
+              if (draw_border)
+                start = run.attr_start
+                k = j
+                while k > 0 && style.is_adherent_border(@styles[k - 1].attr_style)
+                  start = @styles[k - 1].attr_start
+                  k -= 1
+                end
+                start = translate_offset(start)
+                if (!(start > line_end || end_ < line_start))
+                  range.attr_location = Math.max(line_start, start)
+                  range.attr_length = Math.min(line_end, end_) + 1 - range.attr_location
+                  if (range.attr_length > 0)
+                    # long
+                    p_rect_count = OS.malloc(C::PTR_SIZEOF)
+                    # long
+                    p_array = @layout_manager.rect_array_for_character_range(range, range, @text_container, p_rect_count)
+                    # long
+                    # long
+                    rect_count = Array.typed(::Java::Int).new(1) { 0 }
+                    OS.memmove(rect_count, p_rect_count, C::PTR_SIZEOF)
+                    OS.free(p_rect_count)
+                    rect = NSRect.new
+                    gc.attr_handle.save_graphics_state
+                    # double
+                    color = nil
+                    if (!(style.attr_border_color).nil?)
+                      color = style.attr_border_color.attr_handle
+                    end
+                    if ((color).nil? && !(style.attr_foreground).nil?)
+                      color = style.attr_foreground.attr_handle
+                    end
+                    if (!(color).nil?)
+                      NSColor.color_with_device_red(color[0], color[1], color[2], color[3]).set_stroke
+                    end
+                    width = 1
+                    dashes = nil
+                    case (style.attr_border_style)
+                    when SWT::BORDER_SOLID
+                    when SWT::BORDER_DASH
+                      dashes = !(width).equal?(0) ? SwtGC::LINE_DASH : SwtGC::LINE_DASH_ZERO
+                    when SWT::BORDER_DOT
+                      dashes = !(width).equal?(0) ? SwtGC::LINE_DOT : SwtGC::LINE_DOT_ZERO
+                    end
+                    # double
+                    lengths = nil
+                    if (!(dashes).nil?)
+                      # double
+                      lengths = Array.typed(::Java::Float).new(dashes.attr_length) { 0.0 }
+                      k_ = 0
+                      while k_ < lengths.attr_length
+                        lengths[k_] = (width).equal?(0) ? dashes[k_] : dashes[k_] * width
+                        k_ += 1
+                      end
+                    end
+                    k_ = 0
+                    while k_ < rect_count[0]
+                      OS.memmove(rect, p_array, NSRect.attr_sizeof)
+                      fix_rect(rect)
+                      rect.attr_x += pt.attr_x + 0.5
+                      rect.attr_y += pt.attr_y + 0.5
+                      rect.attr_width -= 0.5
+                      rect.attr_height -= 0.5
+                      path = NSBezierPath.bezier_path
+                      path.set_line_dash(lengths, !(lengths).nil? ? lengths.attr_length : 0, 0)
+                      path.append_bezier_path_with_rect(rect)
+                      path.stroke
+                      k_ += 1
+                      p_array += NSRect.attr_sizeof
+                    end
+                    gc.attr_handle.restore_graphics_state
+                  end
+                end
+              end
+              i += 1
+            end
+            j += 1
+          end
+        end
+        gc.attr_handle.restore_graphics_state
+      ensure
+        gc.uncheck_gc(pool)
+      end
+    end
+    
+    typesig { [NSRect] }
+    def fix_rect(rect)
+      j = 0
+      while j < @line_bounds.attr_length
+        line = @line_bounds[j]
+        if (line.attr_y <= rect.attr_y && rect.attr_y < line.attr_y + line.attr_height)
+          if (rect.attr_x + rect.attr_width > line.attr_x + line.attr_width)
+            rect.attr_width = line.attr_x + line.attr_width - rect.attr_x
+          end
         end
         j += 1
-      end
-      selection_start = translate_offset(selection_start)
-      selection_end = translate_offset(selection_end)
-      OS._cgcontext_scale_ctm(gc.attr_handle, 1, -1)
-      draw_x = OS._long2fix(x)
-      draw_y = y
-      i = 0
-      start = 0
-      while i < @breaks.attr_length
-        line_break = @breaks[i]
-        line_length = line_break - start
-        if (line_length > 0)
-          fix_ydraw = OS._long2fix(-(draw_y + @line_ascent[i]))
-          OS._atsudraw_text(@layout, start, line_length, draw_x, fix_ydraw)
-          end_ = start + line_length - 1
-          if (!(flags).equal?(0) && (has_selection || !((flags & SWT::LAST_LINE_SELECTION)).equal?(0)))
-            extent = false
-            if ((i).equal?(@breaks.attr_length - 1) && !((flags & SWT::LAST_LINE_SELECTION)).equal?(0))
-              extent = true
-            else
-              hard_break = false
-              j_ = 0
-              while j_ < @hard_breaks.attr_length
-                if ((end_ + 1).equal?(@hard_breaks[j_]))
-                  hard_break = true
-                  break
-                end
-                j_ += 1
-              end
-              if (hard_break)
-                if (selection_start <= end_ + 1 && end_ + 1 <= selection_end)
-                  extent = true
-                end
-              else
-                if (selection_start <= end_ + 1 && end_ + 1 < selection_end && !((flags & SWT::FULL_SELECTION)).equal?(0))
-                  extent = true
-                end
-              end
-            end
-            if (extent)
-              if ((rect).nil?)
-                rect = CGRect.new
-              end
-              rect.attr_x = x + @line_width[i]
-              rect.attr_y = draw_y
-              rect.attr_width = !((flags & SWT::FULL_SELECTION)).equal?(0) ? 0x7fffffff : @line_height[i] / 3
-              rect.attr_height = @line_height[i]
-              OS._cgcontext_save_gstate(gc.attr_handle)
-              OS._cgcontext_translate_ctm(gc.attr_handle, 0, -(@line_height[i] + 2 * draw_y))
-              OS._cgcontext_set_fill_color_space(gc.attr_handle, self.attr_device.attr_colorspace)
-              OS._cgcontext_set_fill_color(gc.attr_handle, selection_background.attr_handle)
-              OS._cgcontext_fill_rect(gc.attr_handle, rect)
-              OS._cgcontext_restore_gstate(gc.attr_handle)
-            end
-          end
-          if (has_selection && !(selection_start > end_ || start > selection_end))
-            sel_start = Math.max(selection_start, start)
-            sel_end = Math.min(selection_end, end_)
-            OS._atsuhighlight_text(@layout, draw_x, fix_ydraw, sel_start, sel_end - sel_start + 1)
-          end
-        end
-        draw_y += @line_height[i]
-        start = line_break
-        i += 1
-      end
-      if (restore_color)
-        set_layout_control(OS.attr_k_atsuline_highlight_cgcolor_tag, 0, 4)
-      end
-      OS._cgcontext_restore_gstate(gc.attr_handle)
-      j_ = 0
-      while j_ < @styles.attr_length
-        run = @styles[j_]
-        style = run.attr_style
-        if ((style).nil?)
-          j_ += 1
-          next
-        end
-        draw_underline = style.attr_underline && !(style.attr_underline_style).equal?(SWT::UNDERLINE_SINGLE) && !(style.attr_underline_style).equal?(SWT::UNDERLINE_DOUBLE)
-        draw_underline = draw_underline && ((j_ + 1).equal?(@styles.attr_length) || !style.is_adherent_underline(@styles[j_ + 1].attr_style))
-        draw_border = !(style.attr_border_style).equal?(SWT::NONE)
-        draw_border = draw_border && ((j_ + 1).equal?(@styles.attr_length) || !style.is_adherent_border(@styles[j_ + 1].attr_style))
-        if (!draw_underline && !draw_border)
-          j_ += 1
-          next
-        end
-        end_ = j_ + 1 < @styles.attr_length ? translate_offset(@styles[j_ + 1].attr_start - 1) : length_
-        i_ = 0
-        line_start = 0
-        line_y = 0
-        while i_ < @breaks.attr_length
-          line_break = @breaks[i_]
-          line_end = line_break - 1
-          if (draw_underline)
-            start_ = run.attr_start
-            k = j_
-            while k > 0 && style.is_adherent_underline(@styles[k - 1].attr_style)
-              start_ = @styles[k - 1].attr_start
-              k -= 1
-            end
-            start_ = translate_offset(start_)
-            if (!(start_ > line_end || end_ < line_start))
-              high_start = Math.max(line_start, start_)
-              high_end = Math.min(line_end, end_)
-              high_len = high_end - high_start + 1
-              if (high_len > 0)
-                OS._cgcontext_save_gstate(gc.attr_handle)
-                underline_y = y + line_y
-                foreground = gc.attr_data.attr_foreground
-                line_width = 1
-                dashes = nil
-                line_cap = OS.attr_k_cgline_cap_butt
-                line_join = OS.attr_k_cgline_join_miter
-                case (style.attr_underline_style)
-                # FALLTHROUGH
-                when SWT::UNDERLINE_ERROR
-                  line_width = 2
-                  dashes = Array.typed(::Java::Float).new([1, 3])
-                  line_cap = OS.attr_k_cgline_cap_round
-                  line_join = OS.attr_k_cgline_join_round
-                  if (!(style.attr_underline_color).nil?)
-                    foreground = style.attr_underline_color.attr_handle
-                  else
-                    if (!(style.attr_foreground).nil?)
-                      foreground = style.attr_foreground.attr_handle
-                    end
-                  end
-                  underline_y += 2 * @line_ascent[i_] + line_width
-                when SWT::UNDERLINE_SQUIGGLE
-                  if (!(style.attr_underline_color).nil?)
-                    foreground = style.attr_underline_color.attr_handle
-                  else
-                    if (!(style.attr_foreground).nil?)
-                      foreground = style.attr_foreground.attr_handle
-                    end
-                  end
-                  underline_y += 2 * @line_ascent[i_] + line_width
-                when UNDERLINE_IME_INPUT, UNDERLINE_IME_TARGET_CONVERTED, UNDERLINE_IME_CONVERTED
-                  line_width = 1.5
-                  foreground = (style.attr_underline_style).equal?(UNDERLINE_IME_CONVERTED) ? Array.typed(::Java::Float).new([0.5, 0.5, 0.5, 1]) : Array.typed(::Java::Float).new([0, 0, 0, 1])
-                  font = style.attr_font
-                  if ((font).nil?)
-                    font = !(@font).nil? ? @font : self.attr_device.attr_system_font
-                  end
-                  metrics = ATSFontMetrics.new
-                  OS._atsfont_get_horizontal_metrics(font.attr_handle, OS.attr_k_atsoption_flags_default, metrics)
-                  underline_y += @line_ascent[i_] + @line_height[i_] + (metrics.attr_descent * font.attr_size)
-                end
-                OS._cgcontext_set_stroke_color_space(gc.attr_handle, self.attr_device.attr_colorspace)
-                OS._cgcontext_set_stroke_color(gc.attr_handle, foreground)
-                OS._cgcontext_set_line_width(gc.attr_handle, line_width)
-                OS._cgcontext_set_line_cap(gc.attr_handle, line_cap)
-                OS._cgcontext_set_line_join(gc.attr_handle, line_join)
-                OS._cgcontext_set_line_dash(gc.attr_handle, 0, dashes, !(dashes).nil? ? dashes.attr_length : 0)
-                OS._cgcontext_translate_ctm(gc.attr_handle, 0.5, 0.5)
-                count = Array.typed(::Java::Int).new(1) { 0 }
-                OS._atsuget_glyph_bounds(@layout, OS._long2fix(x), OS._x2fix(underline_y), high_start, high_len, RJava.cast_to_short(OS.attr_k_atsuse_device_origins), 0, 0, count)
-                trapezoids_ptr = OS.malloc(count[0] * ATSTrapezoid.attr_sizeof)
-                OS._atsuget_glyph_bounds(@layout, OS._long2fix(x), OS._x2fix(underline_y), high_start, high_len, RJava.cast_to_short(OS.attr_k_atsuse_device_origins), count[0], trapezoids_ptr, count)
-                trapezoid = ATSTrapezoid.new
-                k_ = 0
-                while k_ < count[0]
-                  OS.memmove(trapezoid, trapezoids_ptr + (k_ * ATSTrapezoid.attr_sizeof), ATSTrapezoid.attr_sizeof)
-                  left = 0.0
-                  right = 0.0
-                  if (!(trapezoid.attr_upper_left_x).equal?(trapezoid.attr_lower_left_x))
-                    ux = OS._fix2long(trapezoid.attr_upper_left_x)
-                    uy = OS._fix2long(trapezoid.attr_upper_left_y)
-                    lx = OS._fix2long(trapezoid.attr_lower_left_x)
-                    ly = OS._fix2long(trapezoid.attr_lower_left_y)
-                    a = (uy - ly) / (ux - lx)
-                    b = uy - ux * a
-                    left = (underline_y - b) / a
-                  else
-                    left = OS._fix2long(trapezoid.attr_upper_left_x)
-                  end
-                  if (!(trapezoid.attr_upper_right_x).equal?(trapezoid.attr_lower_right_x))
-                    ux = OS._fix2long(trapezoid.attr_upper_right_x)
-                    uy = OS._fix2long(trapezoid.attr_upper_right_y)
-                    lx = OS._fix2long(trapezoid.attr_lower_right_x)
-                    ly = OS._fix2long(trapezoid.attr_lower_right_y)
-                    a = (uy - ly) / (ux - lx)
-                    b = uy - ux * a
-                    right = (underline_y - b) / a
-                  else
-                    right = OS._fix2long(trapezoid.attr_upper_right_x)
-                  end
-                  case (style.attr_underline_style)
-                  when UNDERLINE_IME_TARGET_CONVERTED, UNDERLINE_IME_CONVERTED
-                    left += 1
-                    right -= 1
-                  end
-                  if ((style.attr_underline_style).equal?(SWT::UNDERLINE_SQUIGGLE))
-                    line_bottom = y + line_y + @line_height[i_]
-                    squiggly_thickness = 1
-                    squiggly_height = 2 * squiggly_thickness
-                    squiggly_y = Math.min(OS._fix2long(trapezoid.attr_upper_left_y) - squiggly_height / 2, line_bottom - squiggly_height - 1)
-                    points = compute_polyline(RJava.cast_to_int(left), RJava.cast_to_int(squiggly_y), RJava.cast_to_int(right), RJava.cast_to_int((squiggly_y + squiggly_height)))
-                    OS._cgcontext_begin_path(gc.attr_handle)
-                    OS._cgcontext_add_lines(gc.attr_handle, points, points.attr_length / 2)
-                  else
-                    OS._cgcontext_move_to_point(gc.attr_handle, left, OS._fix2long(trapezoid.attr_upper_left_y))
-                    OS._cgcontext_add_line_to_point(gc.attr_handle, right, OS._fix2long(trapezoid.attr_upper_right_y))
-                  end
-                  k_ += 1
-                end
-                OS.free(trapezoids_ptr)
-                OS._cgcontext_stroke_path(gc.attr_handle)
-                OS._cgcontext_restore_gstate(gc.attr_handle)
-              end
-            end
-          end
-          if (draw_border)
-            start_ = run.attr_start
-            k = j_
-            while k > 0 && style.is_adherent_border(@styles[k - 1].attr_style)
-              start_ = @styles[k - 1].attr_start
-              k -= 1
-            end
-            start_ = translate_offset(start_)
-            if (!(start_ > line_end || end_ < line_start))
-              high_start = Math.max(line_start, start_)
-              high_end = Math.min(line_end, end_)
-              high_len = high_end - high_start + 1
-              if (high_len > 0)
-                OS._cgcontext_save_gstate(gc.attr_handle)
-                count = Array.typed(::Java::Int).new(1) { 0 }
-                OS._atsuget_glyph_bounds(@layout, OS._long2fix(x), OS._long2fix(y + line_y + @line_ascent[i_]), high_start, high_len, RJava.cast_to_short(OS.attr_k_atsuse_device_origins), 0, 0, count)
-                trapezoids_ptr = OS.malloc(count[0] * ATSTrapezoid.attr_sizeof)
-                OS._atsuget_glyph_bounds(@layout, OS._long2fix(x), OS._long2fix(y + line_y + @line_ascent[i_]), high_start, high_len, RJava.cast_to_short(OS.attr_k_atsuse_device_origins), count[0], trapezoids_ptr, count)
-                trapezoid = ATSTrapezoid.new
-                k_ = 0
-                while k_ < count[0]
-                  OS.memmove(trapezoid, trapezoids_ptr + (k_ * ATSTrapezoid.attr_sizeof), ATSTrapezoid.attr_sizeof)
-                  upper_y = y + line_y + 1
-                  lower_y = y + line_y + @line_height[i_]
-                  OS._cgcontext_move_to_point(gc.attr_handle, OS._fix2long(trapezoid.attr_lower_left_x), lower_y)
-                  OS._cgcontext_add_line_to_point(gc.attr_handle, OS._fix2long(trapezoid.attr_upper_left_x), upper_y)
-                  OS._cgcontext_add_line_to_point(gc.attr_handle, OS._fix2long(trapezoid.attr_upper_right_x) - 1, upper_y)
-                  OS._cgcontext_add_line_to_point(gc.attr_handle, OS._fix2long(trapezoid.attr_lower_right_x) - 1, lower_y)
-                  OS._cgcontext_close_path(gc.attr_handle)
-                  k_ += 1
-                end
-                OS.free(trapezoids_ptr)
-                width = 1
-                OS._cgcontext_set_should_antialias(gc.attr_handle, false)
-                OS._cgcontext_set_line_cap(gc.attr_handle, OS.attr_k_cgline_cap_butt)
-                OS._cgcontext_set_line_join(gc.attr_handle, OS.attr_k_cgline_join_miter)
-                OS._cgcontext_set_line_width(gc.attr_handle, width)
-                dashes = nil
-                case (style.attr_border_style)
-                when SWT::BORDER_SOLID
-                when SWT::BORDER_DASH
-                  dashes = !(width).equal?(0) ? SwtGC::LINE_DASH : SwtGC::LINE_DASH_ZERO
-                when SWT::BORDER_DOT
-                  dashes = !(width).equal?(0) ? SwtGC::LINE_DOT : SwtGC::LINE_DOT_ZERO
-                end
-                OS._cgcontext_set_line_dash(gc.attr_handle, 0, dashes, !(dashes).nil? ? dashes.attr_length : 0)
-                color = nil
-                if (!(style.attr_border_color).nil?)
-                  color = style.attr_border_color.attr_handle
-                end
-                if ((color).nil? && !(style.attr_foreground).nil?)
-                  color = style.attr_foreground.attr_handle
-                end
-                if (!(color).nil?)
-                  OS._cgcontext_set_stroke_color_space(gc.attr_handle, self.attr_device.attr_colorspace)
-                  OS._cgcontext_set_stroke_color(gc.attr_handle, color)
-                end
-                OS._cgcontext_translate_ctm(gc.attr_handle, 0.5, 0.5)
-                OS._cgcontext_stroke_path(gc.attr_handle)
-                OS._cgcontext_restore_gstate(gc.attr_handle)
-              end
-            end
-          end
-          if (line_end > end_)
-            break
-          end
-          line_y += @line_height[i_]
-          line_start = line_break
-          i_ += 1
-        end
-        j_ += 1
-      end
-      if (!(rgn).equal?(0))
-        OS._dispose_rgn(rgn)
       end
     end
     
     typesig { [] }
     def free_runs
-      if ((@breaks).nil?)
+      if ((@text_storage).nil?)
         return
       end
-      i = 0
-      while i < @styles.attr_length
-        run = @styles[i]
-        run.free_style
-        i += 1
+      if (!(@text_storage).nil?)
+        @text_storage.release
       end
-      if (!(@indent_style).equal?(0))
-        OS._atsudispose_style(@indent_style)
+      if (!(@layout_manager).nil?)
+        @layout_manager.release
       end
-      @indent_style = 0
-      @breaks = @line_x = @line_width = @line_height = @line_ascent = nil
-      @invalid_offsets = nil
+      if (!(@text_container).nil?)
+        @text_container.release
+      end
+      @text_storage = nil
+      @layout_manager = nil
+      @text_container = nil
     end
     
     typesig { [] }
@@ -1177,15 +887,7 @@ module Org::Eclipse::Swt::Graphics
     # </ul>
     def get_alignment
       check_layout
-      buffer = Array.typed(::Java::Int).new(1) { 0 }
-      OS._atsuget_layout_control(@layout, OS.attr_k_atsuline_flush_factor_tag, 4, buffer, nil)
-      case (buffer[0])
-      when OS.attr_k_atsucenter_alignment
-        return SWT::CENTER
-      when OS.attr_k_atsuend_alignment
-        return SWT::RIGHT
-      end
-      return SWT::LEFT
+      return @alignment
     end
     
     typesig { [] }
@@ -1221,35 +923,28 @@ module Org::Eclipse::Swt::Graphics
     # @see #getLineBounds(int)
     def get_bounds
       check_layout
-      compute_runs
-      width = 0
-      height = 0
-      length_ = @text.length
-      if ((length_).equal?(0))
-        font = !(@font).nil? ? @font : self.attr_device.attr_system_font
-        metrics = ATSFontMetrics.new
-        OS._atsfont_get_vertical_metrics(font.attr_handle, OS.attr_k_atsoption_flags_default, metrics)
-        OS._atsfont_get_horizontal_metrics(font.attr_handle, OS.attr_k_atsoption_flags_default, metrics)
-        ascent = RJava.cast_to_int((0.5 + metrics.attr_ascent * font.attr_size))
-        descent = RJava.cast_to_int((0.5 + (-metrics.attr_descent + metrics.attr_leading) * font.attr_size))
-        ascent = Math.max(ascent, @ascent)
-        descent = Math.max(descent, @descent)
-        height = ascent + descent
-      else
-        i = 0
-        while i < @breaks.attr_length
-          width = Math.max(width, @line_width[i])
-          height += @line_height[i]
-          i += 1
+      pool = nil
+      if (!NSThread.is_main_thread)
+        pool = NSAutoreleasePool.new.alloc.init
+      end
+      begin
+        compute_runs
+        rect = @layout_manager.used_rect_for_text_container(@text_container)
+        if (!(@wrap_width).equal?(-1))
+          rect.attr_width = @wrap_width
+        end
+        if ((@text.length).equal?(0))
+          font = !(@font).nil? ? @font : self.attr_device.attr_system_font
+          ns_font = font.attr_handle
+          rect.attr_height = @layout_manager.default_line_height_for_font(ns_font)
+        end
+        rect.attr_height = Math.max(rect.attr_height, @ascent + @descent) + @spacing
+        return Rectangle.new(0, 0, RJava.cast_to_int(Math.ceil(rect.attr_width)), RJava.cast_to_int(Math.ceil(rect.attr_height)))
+      ensure
+        if (!(pool).nil?)
+          pool.release
         end
       end
-      buffer = Array.typed(::Java::Int).new(1) { 0 }
-      OS._atsuget_layout_control(@layout, OS.attr_k_atsuline_width_tag, 4, buffer, nil)
-      wrap_width = OS._fix2long(buffer[0])
-      if (!(wrap_width).equal?(0))
-        width = Math.max(width, wrap_width)
-      end
-      return Rectangle.new(0, 0, width, height)
     end
     
     typesig { [::Java::Int, ::Java::Int] }
@@ -1267,60 +962,57 @@ module Org::Eclipse::Swt::Graphics
     # </ul>
     def get_bounds(start, end_)
       check_layout
-      compute_runs
-      length_ = @text.length
-      if ((length_).equal?(0))
-        return Rectangle.new(0, 0, 0, 0)
+      pool = nil
+      if (!NSThread.is_main_thread)
+        pool = NSAutoreleasePool.new.alloc.init
       end
-      if (start > end_)
-        return Rectangle.new(0, 0, 0, 0)
+      begin
+        compute_runs
+        length_ = @text.length
+        if ((length_).equal?(0))
+          return Rectangle.new(0, 0, 0, 0)
+        end
+        if (start > end_)
+          return Rectangle.new(0, 0, 0, 0)
+        end
+        start = Math.min(Math.max(0, start), length_ - 1)
+        end_ = Math.min(Math.max(0, end_), length_ - 1)
+        start = translate_offset(start)
+        end_ = translate_offset(end_)
+        range = NSRange.new
+        range.attr_location = start
+        range.attr_length = end_ - start + 1
+        # long
+        p_rect_count = OS.malloc(C::PTR_SIZEOF)
+        # long
+        p_array = @layout_manager.rect_array_for_character_range(range, range, @text_container, p_rect_count)
+        # long
+        # long
+        rect_count = Array.typed(::Java::Int).new(1) { 0 }
+        OS.memmove(rect_count, p_rect_count, C::PTR_SIZEOF)
+        OS.free(p_rect_count)
+        rect = NSRect.new
+        left = 0x7fffffff
+        right = 0
+        top = 0x7fffffff
+        bottom = 0
+        i = 0
+        while i < rect_count[0]
+          OS.memmove(rect, p_array, NSRect.attr_sizeof)
+          fix_rect(rect)
+          left = Math.min(left, RJava.cast_to_int(rect.attr_x))
+          right = Math.max(right, RJava.cast_to_int(Math.ceil(rect.attr_x + rect.attr_width)))
+          top = Math.min(top, RJava.cast_to_int(rect.attr_y))
+          bottom = Math.max(bottom, RJava.cast_to_int(Math.ceil(rect.attr_y + rect.attr_height)))
+          i += 1
+          p_array += NSRect.attr_sizeof
+        end
+        return Rectangle.new(left, top, right - left, bottom - top)
+      ensure
+        if (!(pool).nil?)
+          pool.release
+        end
       end
-      start = Math.min(Math.max(0, start), length_ - 1)
-      end_ = Math.min(Math.max(0, end_), length_ - 1)
-      start = translate_offset(start)
-      end_ = translate_offset(end_)
-      i = 0
-      while i < @hard_breaks.attr_length
-        if ((start).equal?(@hard_breaks[i]))
-          if (start > 0)
-            start -= 1
-          end
-        end
-        if ((end_).equal?(@hard_breaks[i]))
-          if (end_ > 0)
-            end_ -= 1
-          end
-        end
-        i += 1
-      end
-      rgn = OS._new_rgn
-      rect = Rect.new
-      rect1 = Rect.new
-      i_ = 0
-      line_start = 0
-      line_y = 0
-      while i_ < @breaks.attr_length
-        line_break = @breaks[i_]
-        line_end = line_break - 1
-        if (!(start > line_end || end_ < line_start))
-          high_start = Math.max(line_start, start)
-          high_end = Math.min(line_end, end_)
-          high_len = high_end - high_start + 1
-          if (high_len > 0)
-            OS._atsuget_text_highlight(@layout, 0, OS._long2fix(line_y + @line_ascent[i_]), high_start, high_len, rgn)
-            OS._get_region_bounds(rgn, rect1)
-            OS._union_rect(rect, rect1, rect)
-          end
-        end
-        if (line_end > end_)
-          break
-        end
-        line_y += @line_height[i_]
-        line_start = line_break
-        i_ += 1
-      end
-      OS._dispose_rgn(rgn)
-      return Rectangle.new(rect.attr_left, rect.attr_top, rect.attr_right - rect.attr_left, rect.attr_bottom - rect.attr_top)
     end
     
     typesig { [] }
@@ -1382,9 +1074,7 @@ module Org::Eclipse::Swt::Graphics
     # @since 3.2
     def get_justify
       check_layout
-      buffer = Array.typed(::Java::Int).new(1) { 0 }
-      OS._atsuget_layout_control(@layout, OS.attr_k_atsuline_justification_factor_tag, 4, buffer, nil)
-      return (buffer[0]).equal?(OS.attr_k_atsufull_justification)
+      return @justify
     end
     
     typesig { [::Java::Int] }
@@ -1402,15 +1092,37 @@ module Org::Eclipse::Swt::Graphics
     # <li>ERROR_GRAPHIC_DISPOSED - if the receiver has been disposed</li>
     def get_level(offset)
       check_layout
-      compute_runs
-      length_ = @text.length
-      if (!(0 <= offset && offset <= length_))
-        SWT.error(SWT::ERROR_INVALID_RANGE)
+      pool = nil
+      if (!NSThread.is_main_thread)
+        pool = NSAutoreleasePool.new.alloc.init
       end
-      offset = translate_offset(offset)
-      level = 0
-      # TODO
-      return level
+      begin
+        compute_runs
+        length_ = @text.length
+        if (!(0 <= offset && offset <= length_))
+          SWT.error(SWT::ERROR_INVALID_RANGE)
+        end
+        offset = translate_offset(offset)
+        # long
+        glyph_offset = @layout_manager.glyph_index_for_character_at_index(offset)
+        range = NSRange.new
+        range.attr_location = glyph_offset
+        range.attr_length = 1
+        # long
+        p_bidi_levels = OS.malloc(1)
+        bidi_levels = Array.typed(::Java::Byte).new(1) { 0 }
+        # long
+        result = @layout_manager.get_glyphs_in_range(range, 0, 0, 0, 0, p_bidi_levels)
+        if (result > 0)
+          OS.memmove(bidi_levels, p_bidi_levels, 1)
+        end
+        OS.free(p_bidi_levels)
+        return bidi_levels[0]
+      ensure
+        if (!(pool).nil?)
+          pool.release
+        end
+      end
     end
     
     typesig { [] }
@@ -1425,14 +1137,24 @@ module Org::Eclipse::Swt::Graphics
     # </ul>
     def get_line_offsets
       check_layout
-      compute_runs
-      offsets = Array.typed(::Java::Int).new(@breaks.attr_length + 1) { 0 }
-      i = 1
-      while i < offsets.attr_length
-        offsets[i] = untranslate_offset(@breaks[i - 1])
-        i += 1
+      pool = nil
+      if (!NSThread.is_main_thread)
+        pool = NSAutoreleasePool.new.alloc.init
       end
-      return offsets
+      begin
+        compute_runs
+        offsets = Array.typed(::Java::Int).new(@line_offsets.attr_length) { 0 }
+        i = 0
+        while i < offsets.attr_length
+          offsets[i] = untranslate_offset(@line_offsets[i])
+          i += 1
+        end
+        return offsets
+      ensure
+        if (!(pool).nil?)
+          pool.release
+        end
+      end
     end
     
     typesig { [::Java::Int] }
@@ -1450,21 +1172,30 @@ module Org::Eclipse::Swt::Graphics
     # </ul>
     def get_line_index(offset)
       check_layout
-      compute_runs
-      length_ = @text.length
-      if (!(0 <= offset && offset <= length_))
-        SWT.error(SWT::ERROR_INVALID_ARGUMENT)
+      pool = nil
+      if (!NSThread.is_main_thread)
+        pool = NSAutoreleasePool.new.alloc.init
       end
-      offset = translate_offset(offset)
-      i = 0
-      while i < @breaks.attr_length - 1
-        line_break = @breaks[i]
-        if (line_break > offset)
-          return i
+      begin
+        compute_runs
+        length_ = @text.length
+        if (!(0 <= offset && offset <= length_))
+          SWT.error(SWT::ERROR_INVALID_RANGE)
         end
-        i += 1
+        offset = translate_offset(offset)
+        line = 0
+        while line < @line_offsets.attr_length - 1
+          if (@line_offsets[line + 1] > offset)
+            return line
+          end
+          line += 1
+        end
+        return @line_bounds.attr_length - 1
+      ensure
+        if (!(pool).nil?)
+          pool.release
+        end
       end
-      return @breaks.attr_length - 1
     end
     
     typesig { [::Java::Int] }
@@ -1481,21 +1212,23 @@ module Org::Eclipse::Swt::Graphics
     # </ul>
     def get_line_bounds(line_index)
       check_layout
-      compute_runs
-      line_count = @breaks.attr_length
-      if (!(0 <= line_index && line_index < line_count))
-        SWT.error(SWT::ERROR_INVALID_RANGE)
+      pool = nil
+      if (!NSThread.is_main_thread)
+        pool = NSAutoreleasePool.new.alloc.init
       end
-      line_y = 0
-      i = 0
-      while i < line_index
-        line_y += @line_height[i]
-        i += 1
+      begin
+        compute_runs
+        if (!(0 <= line_index && line_index < @line_bounds.attr_length))
+          SWT.error(SWT::ERROR_INVALID_RANGE)
+        end
+        rect = @line_bounds[line_index]
+        height = Math.max(RJava.cast_to_int(Math.ceil(rect.attr_height)), @ascent + @descent)
+        return Rectangle.new(RJava.cast_to_int(rect.attr_x), RJava.cast_to_int(rect.attr_y), RJava.cast_to_int(Math.ceil(rect.attr_width)), height)
+      ensure
+        if (!(pool).nil?)
+          pool.release
+        end
       end
-      line_x = @line_x[line_index]
-      line_width = @line_width[line_index]
-      line_height = @line_height[line_index] - @spacing
-      return Rectangle.new(line_x, line_y, line_width, line_height)
     end
     
     typesig { [] }
@@ -1509,8 +1242,18 @@ module Org::Eclipse::Swt::Graphics
     # </ul>
     def get_line_count
       check_layout
-      compute_runs
-      return @breaks.attr_length
+      pool = nil
+      if (!NSThread.is_main_thread)
+        pool = NSAutoreleasePool.new.alloc.init
+      end
+      begin
+        compute_runs
+        return @line_offsets.attr_length - 1
+      ensure
+        if (!(pool).nil?)
+          pool.release
+        end
+      end
     end
     
     typesig { [::Java::Int] }
@@ -1527,30 +1270,34 @@ module Org::Eclipse::Swt::Graphics
     # </ul>
     def get_line_metrics(line_index)
       check_layout
-      compute_runs
-      line_count = @breaks.attr_length
-      if (!(0 <= line_index && line_index < line_count))
-        SWT.error(SWT::ERROR_INVALID_RANGE)
+      pool = nil
+      if (!NSThread.is_main_thread)
+        pool = NSAutoreleasePool.new.alloc.init
       end
-      length_ = @text.length
-      if ((length_).equal?(0))
-        font = !(@font).nil? ? @font : self.attr_device.attr_system_font
-        metrics = ATSFontMetrics.new
-        OS._atsfont_get_vertical_metrics(font.attr_handle, OS.attr_k_atsoption_flags_default, metrics)
-        OS._atsfont_get_horizontal_metrics(font.attr_handle, OS.attr_k_atsoption_flags_default, metrics)
-        ascent = RJava.cast_to_int((0.5 + metrics.attr_ascent * font.attr_size))
-        descent = RJava.cast_to_int((0.5 + (-metrics.attr_descent + metrics.attr_leading) * font.attr_size))
-        ascent = Math.max(ascent, @ascent)
-        descent = Math.max(descent, @descent)
-        return FontMetrics.carbon_new(ascent, descent, 0, 0, ascent + descent)
+      begin
+        compute_runs
+        line_count = get_line_count
+        if (!(0 <= line_index && line_index < line_count))
+          SWT.error(SWT::ERROR_INVALID_RANGE)
+        end
+        length_ = @text.length
+        if ((length_).equal?(0))
+          font = !(@font).nil? ? @font : self.attr_device.attr_system_font
+          ns_font = font.attr_handle
+          ascent = RJava.cast_to_int((0.5 + ns_font.ascender))
+          descent = RJava.cast_to_int((0.5 + (-ns_font.descender + ns_font.leading)))
+          ascent = Math.max(ascent, @ascent)
+          descent = Math.max(descent, @descent)
+          return FontMetrics.cocoa_new(ascent, descent, 0, 0, ascent + descent)
+        end
+        rect = get_line_bounds(line_index)
+        baseline = RJava.cast_to_int(@layout_manager.typesetter.baseline_offset_in_layout_manager(@layout_manager, get_line_offsets[line_index]))
+        return FontMetrics.cocoa_new(rect.attr_height - baseline, baseline, 0, 0, rect.attr_height)
+      ensure
+        if (!(pool).nil?)
+          pool.release
+        end
       end
-      start = (line_index).equal?(0) ? 0 : @breaks[line_index - 1]
-      line_length = @breaks[line_index] - start
-      ascent = Array.typed(::Java::Int).new(1) { 0 }
-      descent = Array.typed(::Java::Int).new(1) { 0 }
-      OS._atsuget_unjustified_bounds(@layout, start, line_length, nil, nil, ascent, descent)
-      height = OS._fix2long(ascent[0]) + OS._fix2long(descent[0])
-      return FontMetrics.carbon_new(OS._fix2long(ascent[0]), OS._fix2long(descent[0]), 0, 0, height)
     end
     
     typesig { [::Java::Int, ::Java::Boolean] }
@@ -1570,42 +1317,50 @@ module Org::Eclipse::Swt::Graphics
     # @see #getOffset(int, int, int[])
     def get_location(offset, trailing)
       check_layout
-      compute_runs
-      length_ = @text.length
-      if (!(0 <= offset && offset <= length_))
-        SWT.error(SWT::ERROR_INVALID_RANGE)
+      pool = nil
+      if (!NSThread.is_main_thread)
+        pool = NSAutoreleasePool.new.alloc.init
       end
-      if ((length_).equal?(0))
-        return Point.new(0, 0)
-      end
-      offset = translate_offset(offset)
-      i = 0
-      while i < @hard_breaks.attr_length
-        if ((offset).equal?(@hard_breaks[i]))
-          trailing = true
-          if (offset > 0)
-            offset -= 1
+      begin
+        compute_runs
+        length_ = @text.length
+        if (!(0 <= offset && offset <= length_))
+          SWT.error(SWT::ERROR_INVALID_RANGE)
+        end
+        if ((length_).equal?(0))
+          return Point.new(0, 0)
+        end
+        offset = translate_offset(offset)
+        # long
+        glyph_index = @layout_manager.glyph_index_for_character_at_index(offset)
+        rect = @layout_manager.line_fragment_used_rect_for_glyph_at_index(glyph_index, 0)
+        point = @layout_manager.location_for_glyph_at_index(glyph_index)
+        if (trailing)
+          range = NSRange.new
+          range.attr_location = offset
+          range.attr_length = 1
+          # long
+          p_rect_count = OS.malloc(C::PTR_SIZEOF)
+          # long
+          p_array = @layout_manager.rect_array_for_character_range(range, range, @text_container, p_rect_count)
+          # long
+          # long
+          rect_count = Array.typed(::Java::Int).new(1) { 0 }
+          OS.memmove(rect_count, p_rect_count, C::PTR_SIZEOF)
+          OS.free(p_rect_count)
+          if (rect_count[0] > 0)
+            bounds = NSRect.new
+            OS.memmove(bounds, p_array, NSRect.attr_sizeof)
+            fix_rect(bounds)
+            point.attr_x += bounds.attr_width
           end
-          break
         end
-        i += 1
-      end
-      line_y = 0
-      i_ = 0
-      while i_ < @breaks.attr_length - 1
-        line_break = @breaks[i_]
-        if (line_break > offset)
-          break
+        return Point.new(RJava.cast_to_int(point.attr_x), RJava.cast_to_int(rect.attr_y))
+      ensure
+        if (!(pool).nil?)
+          pool.release
         end
-        line_y += @line_height[i_]
-        i_ += 1
       end
-      if (trailing)
-        offset += 1
-      end
-      caret = ATSUCaret.new
-      OS._atsuoffset_to_position(@layout, offset, !trailing, caret, nil, nil)
-      return Point.new(Math.min(OS._fix2long(caret.attr_f_x), OS._fix2long(caret.attr_f_delta_x)), line_y)
     end
     
     typesig { [::Java::Int, ::Java::Int] }
@@ -1627,7 +1382,17 @@ module Org::Eclipse::Swt::Graphics
     # 
     # @see #getPreviousOffset(int, int)
     def get_next_offset(offset, movement)
-      return __get_offset(offset, movement, true)
+      pool = nil
+      if (!NSThread.is_main_thread)
+        pool = NSAutoreleasePool.new.alloc.init
+      end
+      begin
+        return __get_offset(offset, movement, true)
+      ensure
+        if (!(pool).nil?)
+          pool.release
+        end
+      end
     end
     
     typesig { [::Java::Int, ::Java::Int, ::Java::Boolean] }
@@ -1642,73 +1407,52 @@ module Org::Eclipse::Swt::Graphics
         return 0
       end
       offset = translate_offset(offset)
-      new_offset = 0
-      type = OS.attr_k_atsuby_character
+      length_ = translate_offset(length_)
       case (movement)
-      when SWT::MOVEMENT_CLUSTER
-        type = OS.attr_k_atsuby_character_cluster
-      when SWT::MOVEMENT_WORD
-        type = OS.attr_k_atsuby_word
-      end
-      if (forward)
-        offset = __get_native_offset(offset, type, forward)
-        new_offset = untranslate_offset(offset)
-        if ((movement).equal?(SWT::MOVEMENT_WORD) || (movement).equal?(SWT::MOVEMENT_WORD_END))
-          while (new_offset < length_ && (!(!Compatibility.is_letter_or_digit(@text.char_at(new_offset)) && Compatibility.is_letter_or_digit(@text.char_at(new_offset - 1)))))
-            offset = __get_native_offset(offset, type, forward)
-            new_offset = untranslate_offset(offset)
-          end
-        end
-        if ((movement).equal?(SWT::MOVEMENT_WORD_START))
-          while (new_offset < length_ && (!(Compatibility.is_letter_or_digit(@text.char_at(new_offset)) && !Compatibility.is_letter_or_digit(@text.char_at(new_offset - 1)))))
-            offset = __get_native_offset(offset, type, forward)
-            new_offset = untranslate_offset(offset)
-          end
-        end
-      else
-        offset = __get_native_offset(offset, type, forward)
-        new_offset = untranslate_offset(offset)
-        if ((movement).equal?(SWT::MOVEMENT_WORD) || (movement).equal?(SWT::MOVEMENT_WORD_START))
-          while (new_offset > 0 && (!(Compatibility.is_letter_or_digit(@text.char_at(new_offset)) && !Compatibility.is_letter_or_digit(@text.char_at(new_offset - 1)))))
-            offset = __get_native_offset(offset, type, forward)
-            new_offset = untranslate_offset(offset)
-          end
-        end
-        if ((movement).equal?(SWT::MOVEMENT_WORD_END))
-          while (new_offset > 0 && (!(!Compatibility.is_letter_or_digit(@text.char_at(new_offset)) && Compatibility.is_letter_or_digit(@text.char_at(new_offset - 1)))))
-            offset = __get_native_offset(offset, type, forward)
-            new_offset = untranslate_offset(offset)
-          end
-        end
-      end
-      return new_offset
-    end
-    
-    typesig { [::Java::Int, ::Java::Int, ::Java::Boolean] }
-    def __get_native_offset(offset, movement, forward)
-      buffer = Array.typed(::Java::Int).new(1) { 0 }
-      invalid = false
-      begin
-        if (forward)
-          OS._atsunext_cursor_position(@layout, offset, movement, buffer)
-        else
-          OS._atsuprevious_cursor_position(@layout, offset, movement, buffer)
-        end
-        if ((buffer[0]).equal?(offset))
-          return offset
-        end
-        offset = buffer[0]
+      # TODO cluster
+      when SWT::MOVEMENT_CLUSTER, SWT::MOVEMENT_CHAR
         invalid = false
-        i = 0
-        while i < @invalid_offsets.attr_length
-          if ((offset).equal?(@invalid_offsets[i]))
-            invalid = true
+        begin
+          new_offset = offset
+          if (forward)
+            if (new_offset < length_)
+              new_offset += 1
+            end
+          else
+            if (new_offset > 0)
+              new_offset -= 1
+            end
+          end
+          if ((new_offset).equal?(offset))
             break
           end
-          i += 1
-        end
-      end while (invalid)
-      return offset
+          offset = new_offset
+          invalid = false
+          if (!(@invalid_offsets).nil?)
+            i = 0
+            while i < @invalid_offsets.attr_length
+              if ((offset).equal?(@invalid_offsets[i]))
+                invalid = true
+                break
+              end
+              i += 1
+            end
+          end
+        end while (invalid)
+        return untranslate_offset(offset)
+      when SWT::MOVEMENT_WORD
+        # 64
+        return untranslate_offset(RJava.cast_to_int(@text_storage.next_word_from_index(offset, forward)))
+      when SWT::MOVEMENT_WORD_END
+        range = @text_storage.double_click_at_index((length_).equal?(offset) ? length_ - 1 : offset)
+        # 64
+        return untranslate_offset(RJava.cast_to_int((range.attr_location + range.attr_length)))
+      when SWT::MOVEMENT_WORD_START
+        range = @text_storage.double_click_at_index((length_).equal?(offset) ? length_ - 1 : offset)
+        # 64
+        return untranslate_offset(RJava.cast_to_int(range.attr_location))
+      end
+      return untranslate_offset(offset)
     end
     
     typesig { [Point, Array.typed(::Java::Int)] }
@@ -1735,11 +1479,21 @@ module Org::Eclipse::Swt::Graphics
     # @see #getLocation(int, boolean)
     def get_offset(point, trailing)
       check_layout
-      compute_runs
-      if ((point).nil?)
-        SWT.error(SWT::ERROR_NULL_ARGUMENT)
+      pool = nil
+      if (!NSThread.is_main_thread)
+        pool = NSAutoreleasePool.new.alloc.init
       end
-      return get_offset(point.attr_x, point.attr_y, trailing)
+      begin
+        compute_runs
+        if ((point).nil?)
+          SWT.error(SWT::ERROR_NULL_ARGUMENT)
+        end
+        return get_offset(point.attr_x, point.attr_y, trailing)
+      ensure
+        if (!(pool).nil?)
+          pool.release
+        end
+      end
     end
     
     typesig { [::Java::Int, ::Java::Int, Array.typed(::Java::Int)] }
@@ -1766,53 +1520,40 @@ module Org::Eclipse::Swt::Graphics
     # @see #getLocation(int, boolean)
     def get_offset(x, y, trailing)
       check_layout
-      compute_runs
-      if (!(trailing).nil? && trailing.attr_length < 1)
-        SWT.error(SWT::ERROR_INVALID_ARGUMENT)
+      pool = nil
+      if (!NSThread.is_main_thread)
+        pool = NSAutoreleasePool.new.alloc.init
       end
-      length_ = @text.length
-      if ((length_).equal?(0))
-        return 0
-      end
-      line_y = 0
-      start = 0
-      line_index = 0
-      line_index = 0
-      while line_index < @breaks.attr_length - 1
-        line_break = @breaks[line_index]
-        height = @line_height[line_index]
-        if (line_y + height > y)
-          break
+      begin
+        compute_runs
+        if (!(trailing).nil? && trailing.attr_length < 1)
+          SWT.error(SWT::ERROR_INVALID_ARGUMENT)
         end
-        line_y += height
-        start = line_break
-        line_index += 1
-      end
-      offset = Array.typed(::Java::Int).new([start])
-      leading = Array.typed(::Java::Boolean).new(1) { false }
-      OS._atsuposition_to_offset(@layout, OS._long2fix(x), OS._long2fix(y - line_y), offset, leading, nil)
-      if (!(trailing).nil?)
-        trailing[0] = (leading[0] ? 0 : 1)
-      end
-      if (!leading[0])
-        offset[0] -= 1
-      end
-      i = 0
-      while i < @hard_breaks.attr_length
-        if ((offset[0]).equal?(@hard_breaks[i]))
-          offset[0] += 1
-          break
+        length_ = @text.length
+        if ((length_).equal?(0))
+          return 0
         end
-        i += 1
-      end
-      offset[0] = untranslate_offset(offset[0])
-      if (offset[0] > length_ - 1)
-        offset[0] = length_ - 1
+        pt = NSPoint.new
+        pt.attr_x = x
+        pt.attr_y = y
+        # double
+        # double
+        partial_fration = Array.typed(::Java::Float).new(1) { 0.0 }
+        # long
+        glyph_index = @layout_manager.glyph_index_for_point(pt, @text_container, partial_fration)
+        # long
+        offset = @layout_manager.character_index_for_glyph_at_index(glyph_index)
         if (!(trailing).nil?)
-          trailing[0] = 1
+          # 64
+          trailing[0] = Math.round((partial_fration[0]).to_f)
+        end
+        # 64
+        return Math.min(untranslate_offset(RJava.cast_to_int(offset)), length_ - 1)
+      ensure
+        if (!(pool).nil?)
+          pool.release
         end
       end
-      return offset[0]
     end
     
     typesig { [] }
@@ -1825,9 +1566,7 @@ module Org::Eclipse::Swt::Graphics
     # </ul>
     def get_orientation
       check_layout
-      line_dir = Array.typed(::Java::Int).new(1) { 0 }
-      OS._atsuget_layout_control(@layout, OS.attr_k_atsuline_direction_tag, 1, line_dir, nil)
-      return (line_dir[0]).equal?(OS.attr_k_atsuright_to_left_base_direction) ? SWT::RIGHT_TO_LEFT : SWT::LEFT_TO_RIGHT
+      return @orientation
     end
     
     typesig { [::Java::Int, ::Java::Int] }
@@ -1849,7 +1588,17 @@ module Org::Eclipse::Swt::Graphics
     # 
     # @see #getNextOffset(int, int)
     def get_previous_offset(index, movement)
-      return __get_offset(index, movement, false)
+      pool = nil
+      if (!NSThread.is_main_thread)
+        pool = NSAutoreleasePool.new.alloc.init
+      end
+      begin
+        return __get_offset(index, movement, false)
+      ensure
+        if (!(pool).nil?)
+          pool.release
+        end
+      end
     end
     
     typesig { [] }
@@ -2054,10 +1803,7 @@ module Org::Eclipse::Swt::Graphics
     # </ul>
     def get_width
       check_layout
-      buffer = Array.typed(::Java::Int).new(1) { 0 }
-      OS._atsuget_layout_control(@layout, OS.attr_k_atsuline_width_tag, 4, buffer, nil)
-      wrap_width = OS._fix2long(buffer[0])
-      return (wrap_width).equal?(0) ? -1 : wrap_width
+      return @wrap_width
     end
     
     typesig { [] }
@@ -2071,7 +1817,17 @@ module Org::Eclipse::Swt::Graphics
     # 
     # @return <code>true</code> when the text layout is disposed and <code>false</code> otherwise
     def is_disposed
-      return (@layout).equal?(0)
+      return (self.attr_device).nil?
+    end
+    
+    typesig { [TextStyle] }
+    # Returns true if the underline style is supported natively
+    def is_underline_supported(style)
+      if (!(style).nil? && style.attr_underline)
+        u_style = style.attr_underline_style
+        return (u_style).equal?(SWT::UNDERLINE_SINGLE) || (u_style).equal?(SWT::UNDERLINE_DOUBLE) || (u_style).equal?(SWT::UNDERLINE_LINK) || (u_style).equal?(UNDERLINE_THICK)
+      end
+      return false
     end
     
     typesig { [::Java::Int] }
@@ -2098,24 +1854,27 @@ module Org::Eclipse::Swt::Graphics
       if ((alignment).equal?(0))
         return
       end
-      if ((alignment).equal?(get_alignment))
-        return
-      end
-      free_runs
       if (!((alignment & SWT::LEFT)).equal?(0))
         alignment = SWT::LEFT
       end
       if (!((alignment & SWT::RIGHT)).equal?(0))
         alignment = SWT::RIGHT
       end
-      align = OS.attr_k_atsustart_alignment
-      case (alignment)
-      when SWT::CENTER
-        align = OS.attr_k_atsucenter_alignment
-      when SWT::RIGHT
-        align = OS.attr_k_atsuend_alignment
+      if ((@alignment).equal?(alignment))
+        return
       end
-      set_layout_control(OS.attr_k_atsuline_flush_factor_tag, align, 4)
+      pool = nil
+      if (!NSThread.is_main_thread)
+        pool = NSAutoreleasePool.new.alloc.init
+      end
+      begin
+        free_runs
+        @alignment = alignment
+      ensure
+        if (!(pool).nil?)
+          pool.release
+        end
+      end
     end
     
     typesig { [::Java::Int] }
@@ -2143,8 +1902,18 @@ module Org::Eclipse::Swt::Graphics
       if ((@ascent).equal?(ascent))
         return
       end
-      free_runs
-      @ascent = ascent
+      pool = nil
+      if (!NSThread.is_main_thread)
+        pool = NSAutoreleasePool.new.alloc.init
+      end
+      begin
+        free_runs
+        @ascent = ascent
+      ensure
+        if (!(pool).nil?)
+          pool.release
+        end
+      end
     end
     
     typesig { [::Java::Int] }
@@ -2172,27 +1941,18 @@ module Org::Eclipse::Swt::Graphics
       if ((@descent).equal?(descent))
         return
       end
-      free_runs
-      @descent = descent
-    end
-    
-    typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
-    def set_layout_control(tag, value, size)
-      ptr1 = OS._new_ptr(size)
-      if ((size).equal?(1))
-        buffer = Array.typed(::Java::Byte).new(1) { 0 }
-        buffer[0] = value
-        OS.memmove(ptr1, buffer, size)
-      else
-        buffer = Array.typed(::Java::Int).new(1) { 0 }
-        buffer[0] = value
-        OS.memmove(ptr1, buffer, size)
+      pool = nil
+      if (!NSThread.is_main_thread)
+        pool = NSAutoreleasePool.new.alloc.init
       end
-      tags = Array.typed(::Java::Int).new([tag])
-      sizes = Array.typed(::Java::Int).new([size])
-      values = Array.typed(::Java::Int).new([ptr1])
-      OS._atsuset_layout_controls(@layout, tags.attr_length, tags, sizes, values)
-      OS._dispose_ptr(ptr1)
+      begin
+        free_runs
+        @descent = descent
+      ensure
+        if (!(pool).nil?)
+          pool.release
+        end
+      end
     end
     
     typesig { [Font] }
@@ -2223,7 +1983,17 @@ module Org::Eclipse::Swt::Graphics
       if (!(old_font).nil? && (old_font == font))
         return
       end
-      free_runs
+      pool = nil
+      if (!NSThread.is_main_thread)
+        pool = NSAutoreleasePool.new.alloc.init
+      end
+      begin
+        free_runs
+      ensure
+        if (!(pool).nil?)
+          pool.release
+        end
+      end
     end
     
     typesig { [::Java::Int] }
@@ -2245,8 +2015,18 @@ module Org::Eclipse::Swt::Graphics
       if ((@indent).equal?(indent))
         return
       end
-      free_runs
-      @indent = indent
+      pool = nil
+      if (!NSThread.is_main_thread)
+        pool = NSAutoreleasePool.new.alloc.init
+      end
+      begin
+        free_runs
+        @indent = indent
+      ensure
+        if (!(pool).nil?)
+          pool.release
+        end
+      end
     end
     
     typesig { [::Java::Boolean] }
@@ -2262,11 +2042,21 @@ module Org::Eclipse::Swt::Graphics
     # @since 3.2
     def set_justify(justify)
       check_layout
-      if ((justify).equal?(get_justify))
+      if ((justify).equal?(@justify))
         return
       end
-      free_runs
-      set_layout_control(OS.attr_k_atsuline_justification_factor_tag, justify ? OS.attr_k_atsufull_justification : OS.attr_k_atsuno_justification, 4)
+      pool = nil
+      if (!NSThread.is_main_thread)
+        pool = NSAutoreleasePool.new.alloc.init
+      end
+      begin
+        free_runs
+        @justify = justify
+      ensure
+        if (!(pool).nil?)
+          pool.release
+        end
+      end
     end
     
     typesig { [::Java::Int] }
@@ -2280,7 +2070,7 @@ module Org::Eclipse::Swt::Graphics
     # </ul>
     def set_orientation(orientation)
       check_layout
-      mask = SWT::RIGHT_TO_LEFT | SWT::LEFT_TO_RIGHT
+      mask = SWT::LEFT_TO_RIGHT | SWT::RIGHT_TO_LEFT
       orientation &= mask
       if ((orientation).equal?(0))
         return
@@ -2288,15 +2078,21 @@ module Org::Eclipse::Swt::Graphics
       if (!((orientation & SWT::LEFT_TO_RIGHT)).equal?(0))
         orientation = SWT::LEFT_TO_RIGHT
       end
-      if ((orientation).equal?(get_orientation))
+      if ((@orientation).equal?(orientation))
         return
       end
-      free_runs
-      line_dir = OS.attr_k_atsuleft_to_right_base_direction
-      if ((orientation).equal?(SWT::RIGHT_TO_LEFT))
-        line_dir = OS.attr_k_atsuright_to_left_base_direction
+      @orientation = orientation
+      pool = nil
+      if (!NSThread.is_main_thread)
+        pool = NSAutoreleasePool.new.alloc.init
       end
-      set_layout_control(OS.attr_k_atsuline_direction_tag, line_dir, 1)
+      begin
+        free_runs
+      ensure
+        if (!(pool).nil?)
+          pool.release
+        end
+      end
     end
     
     typesig { [Array.typed(::Java::Int)] }
@@ -2336,8 +2132,18 @@ module Org::Eclipse::Swt::Graphics
           end
         end
       end
-      free_runs
-      @segments = segments
+      pool = nil
+      if (!NSThread.is_main_thread)
+        pool = NSAutoreleasePool.new.alloc.init
+      end
+      begin
+        free_runs
+        @segments = segments
+      ensure
+        if (!(pool).nil?)
+          pool.release
+        end
+      end
     end
     
     typesig { [::Java::Int] }
@@ -2360,8 +2166,18 @@ module Org::Eclipse::Swt::Graphics
       if ((@spacing).equal?(spacing))
         return
       end
-      free_runs
-      @spacing = spacing
+      pool = nil
+      if (!NSThread.is_main_thread)
+        pool = NSAutoreleasePool.new.alloc.init
+      end
+      begin
+        free_runs
+        @spacing = spacing
+      ensure
+        if (!(pool).nil?)
+          pool.release
+        end
+      end
     end
     
     typesig { [TextStyle, ::Java::Int, ::Java::Int] }
@@ -2378,87 +2194,97 @@ module Org::Eclipse::Swt::Graphics
     # </ul>
     def set_style(style, start, end_)
       check_layout
-      length_ = @text.length
-      if ((length_).equal?(0))
-        return
+      pool = nil
+      if (!NSThread.is_main_thread)
+        pool = NSAutoreleasePool.new.alloc.init
       end
-      if (start > end_)
-        return
-      end
-      start = Math.min(Math.max(0, start), length_ - 1)
-      end_ = Math.min(Math.max(0, end_), length_ - 1)
-      low = -1
-      high = @styles.attr_length
-      while (high - low > 1)
-        index = (high + low) / 2
-        if (@styles[index + 1].attr_start > start)
-          high = index
-        else
-          low = index
+      begin
+        length_ = @text.length
+        if ((length_).equal?(0))
+          return
         end
-      end
-      if (0 <= high && high < @styles.attr_length)
-        item = @styles[high]
-        if ((item.attr_start).equal?(start) && (@styles[high + 1].attr_start - 1).equal?(end_))
-          if ((style).nil?)
-            if ((item.attr_style).nil?)
-              return
-            end
+        if (start > end_)
+          return
+        end
+        start = Math.min(Math.max(0, start), length_ - 1)
+        end_ = Math.min(Math.max(0, end_), length_ - 1)
+        low = -1
+        high = @styles.attr_length
+        while (high - low > 1)
+          index = (high + low) / 2
+          if (@styles[index + 1].attr_start > start)
+            high = index
           else
-            if ((style == item.attr_style))
-              return
+            low = index
+          end
+        end
+        if (0 <= high && high < @styles.attr_length)
+          item = @styles[high]
+          if ((item.attr_start).equal?(start) && (@styles[high + 1].attr_start - 1).equal?(end_))
+            if ((style).nil?)
+              if ((item.attr_style).nil?)
+                return
+              end
+            else
+              if ((style == item.attr_style))
+                return
+              end
             end
           end
         end
-      end
-      free_runs
-      modify_start = high
-      modify_end = modify_start
-      while (modify_end < @styles.attr_length)
-        if (@styles[modify_end + 1].attr_start > end_)
-          break
+        free_runs
+        modify_start = high
+        modify_end = modify_start
+        while (modify_end < @styles.attr_length)
+          if (@styles[modify_end + 1].attr_start > end_)
+            break
+          end
+          modify_end += 1
         end
-        modify_end += 1
-      end
-      if ((modify_start).equal?(modify_end))
-        style_start = @styles[modify_start].attr_start
-        style_end = @styles[modify_end + 1].attr_start - 1
-        if ((style_start).equal?(start) && (style_end).equal?(end_))
-          @styles[modify_start].attr_style = style
-          return
+        if ((modify_start).equal?(modify_end))
+          style_start = @styles[modify_start].attr_start
+          style_end = @styles[modify_end + 1].attr_start - 1
+          if ((style_start).equal?(start) && (style_end).equal?(end_))
+            @styles[modify_start].attr_style = style
+            return
+          end
+          if (!(style_start).equal?(start) && !(style_end).equal?(end_))
+            new_styles = Array.typed(StyleItem).new(@styles.attr_length + 2) { nil }
+            System.arraycopy(@styles, 0, new_styles, 0, modify_start + 1)
+            item = StyleItem.new
+            item.attr_start = start
+            item.attr_style = style
+            new_styles[modify_start + 1] = item
+            item = StyleItem.new
+            item.attr_start = end_ + 1
+            item.attr_style = @styles[modify_start].attr_style
+            new_styles[modify_start + 2] = item
+            System.arraycopy(@styles, modify_end + 1, new_styles, modify_end + 3, @styles.attr_length - modify_end - 1)
+            @styles = new_styles
+            return
+          end
         end
-        if (!(style_start).equal?(start) && !(style_end).equal?(end_))
-          new_styles = Array.typed(StyleItem).new(@styles.attr_length + 2) { nil }
-          System.arraycopy(@styles, 0, new_styles, 0, modify_start + 1)
-          item = StyleItem.new
-          item.attr_start = start
-          item.attr_style = style
-          new_styles[modify_start + 1] = item
-          item = StyleItem.new
-          item.attr_start = end_ + 1
-          item.attr_style = @styles[modify_start].attr_style
-          new_styles[modify_start + 2] = item
-          System.arraycopy(@styles, modify_end + 1, new_styles, modify_end + 3, @styles.attr_length - modify_end - 1)
-          @styles = new_styles
-          return
+        if ((start).equal?(@styles[modify_start].attr_start))
+          modify_start -= 1
+        end
+        if ((end_).equal?(@styles[modify_end + 1].attr_start - 1))
+          modify_end += 1
+        end
+        new_length = @styles.attr_length + 1 - (modify_end - modify_start - 1)
+        new_styles = Array.typed(StyleItem).new(new_length) { nil }
+        System.arraycopy(@styles, 0, new_styles, 0, modify_start + 1)
+        item = StyleItem.new
+        item.attr_start = start
+        item.attr_style = style
+        new_styles[modify_start + 1] = item
+        @styles[modify_end].attr_start = end_ + 1
+        System.arraycopy(@styles, modify_end, new_styles, modify_start + 2, @styles.attr_length - modify_end)
+        @styles = new_styles
+      ensure
+        if (!(pool).nil?)
+          pool.release
         end
       end
-      if ((start).equal?(@styles[modify_start].attr_start))
-        modify_start -= 1
-      end
-      if ((end_).equal?(@styles[modify_end + 1].attr_start - 1))
-        modify_end += 1
-      end
-      new_length = @styles.attr_length + 1 - (modify_end - modify_start - 1)
-      new_styles = Array.typed(StyleItem).new(new_length) { nil }
-      System.arraycopy(@styles, 0, new_styles, 0, modify_start + 1)
-      item = StyleItem.new
-      item.attr_start = start
-      item.attr_style = style
-      new_styles[modify_start + 1] = item
-      @styles[modify_end].attr_start = end_ + 1
-      System.arraycopy(@styles, modify_end, new_styles, modify_start + 2, @styles.attr_length - modify_end)
-      @styles = new_styles
     end
     
     typesig { [Array.typed(::Java::Int)] }
@@ -2491,46 +2317,27 @@ module Org::Eclipse::Swt::Graphics
           end
         end
       end
-      free_runs
-      @tabs = tabs
-      if (!(@tabs_ptr).equal?(0))
-        OS._dispose_ptr(@tabs_ptr)
+      pool = nil
+      if (!NSThread.is_main_thread)
+        pool = NSAutoreleasePool.new.alloc.init
       end
-      @tabs_ptr = 0
-      if ((tabs).nil?)
-        OS._atsuset_tab_array(@layout, 0, 0)
-      else
-        tab = ATSUTab.new
-        tab.attr_tab_position = OS._long2fix(0)
-        length_ = Math.max(TAB_COUNT, tabs.attr_length)
-        ptr = @tabs_ptr = OS._new_ptr(ATSUTab.attr_sizeof * length_)
-        i = 0
-        offset = 0
-        i = 0
-        offset = ptr
-        while i < tabs.attr_length
-          tab.attr_tab_type = RJava.cast_to_short(OS.attr_k_atsuleft_tab)
-          tab.attr_tab_position = OS._long2fix(tabs[i])
-          OS.memmove(offset, tab, ATSUTab.attr_sizeof)
-          i += 1
-          offset += ATSUTab.attr_sizeof
+      begin
+        free_runs
+        @tabs = tabs
+      ensure
+        if (!(pool).nil?)
+          pool.release
         end
-        width = i - 2 >= 0 ? tabs[i - 1] - tabs[i - 2] : tabs[i - 1]
-        if (width > 0)
-          while i < length_
-            tab.attr_tab_type = RJava.cast_to_short(OS.attr_k_atsuleft_tab)
-            tab.attr_tab_position += OS._long2fix(width)
-            OS.memmove(offset, tab, ATSUTab.attr_sizeof)
-            i += 1
-            offset += ATSUTab.attr_sizeof
-          end
-        end
-        OS._atsuset_tab_array(@layout, ptr, i)
       end
     end
     
     typesig { [String] }
     # Sets the receiver's text.
+    # <p>
+    # Note: Setting the text also clears all the styles. This method
+    # returns without doing anything if the new text is the same as
+    # the current text.
+    # </p>
     # 
     # @param text the new text
     # 
@@ -2548,12 +2355,22 @@ module Org::Eclipse::Swt::Graphics
       if ((text == @text))
         return
       end
-      free_runs
-      @text = text
-      @styles = Array.typed(StyleItem).new(2) { nil }
-      @styles[0] = StyleItem.new
-      @styles[1] = StyleItem.new
-      @styles[@styles.attr_length - 1].attr_start = text.length
+      pool = nil
+      if (!NSThread.is_main_thread)
+        pool = NSAutoreleasePool.new.alloc.init
+      end
+      begin
+        free_runs
+        @text = text
+        @styles = Array.typed(StyleItem).new(2) { nil }
+        @styles[0] = StyleItem.new
+        @styles[1] = StyleItem.new
+        @styles[@styles.attr_length - 1].attr_start = text.length
+      ensure
+        if (!(pool).nil?)
+          pool.release
+        end
+      end
     end
     
     typesig { [::Java::Int] }
@@ -2576,11 +2393,21 @@ module Org::Eclipse::Swt::Graphics
       if (width < -1 || (width).equal?(0))
         SWT.error(SWT::ERROR_INVALID_ARGUMENT)
       end
-      if ((width).equal?(get_width))
+      if ((@wrap_width).equal?(width))
         return
       end
-      free_runs
-      set_layout_control(OS.attr_k_atsuline_width_tag, OS._long2fix(Math.max(0, width)), 4)
+      pool = nil
+      if (!NSThread.is_main_thread)
+        pool = NSAutoreleasePool.new.alloc.init
+      end
+      begin
+        free_runs
+        @wrap_width = width
+      ensure
+        if (!(pool).nil?)
+          pool.release
+        end
+      end
     end
     
     typesig { [] }
@@ -2592,13 +2419,19 @@ module Org::Eclipse::Swt::Graphics
       if (is_disposed)
         return "TextLayout {*DISPOSED*}"
       end
-      return "TextLayout {" + RJava.cast_to_string(@layout) + "}"
+      return "TextLayout {" + @text + "}"
     end
     
     typesig { [::Java::Int] }
     # Translate a client offset to an internal offset
     def translate_offset(offset)
-      offset += 1
+      length_ = @text.length
+      if ((length_).equal?(0))
+        return offset
+      end
+      if ((@invalid_offsets).nil?)
+        return offset
+      end
       i = 0
       while i < @invalid_offsets.attr_length
         if (offset < @invalid_offsets[i])
@@ -2613,6 +2446,13 @@ module Org::Eclipse::Swt::Graphics
     typesig { [::Java::Int] }
     # Translate an internal offset to a client offset
     def untranslate_offset(offset)
+      length_ = @text.length
+      if ((length_).equal?(0))
+        return offset
+      end
+      if ((@invalid_offsets).nil?)
+        return offset
+      end
       i = 0
       while i < @invalid_offsets.attr_length
         if ((offset).equal?(@invalid_offsets[i]))
@@ -2621,11 +2461,11 @@ module Org::Eclipse::Swt::Graphics
           next
         end
         if (offset < @invalid_offsets[i])
-          return Math.max(0, offset - i - 1)
+          return offset - i
         end
         i += 1
       end
-      return Math.max(0, offset - @invalid_offsets.attr_length - 1)
+      return offset - @invalid_offsets.attr_length
     end
     
     private

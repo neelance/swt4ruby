@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2008 IBM Corporation and others.
+ * Copyright (c) 2000, 2009 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -15,9 +15,6 @@ import org.eclipse.swt.*;
 import org.eclipse.swt.events.*;
 import org.eclipse.swt.graphics.*;
 
-//TODO - features not yet implemented: read-only, drop-down calendar for date
-//TODO - font, colors, background image not yet implemented (works on some platforms)
-
 /**
  * Instances of this class are selectable user interface
  * objects that allow the user to enter and modify date
@@ -28,13 +25,14 @@ import org.eclipse.swt.graphics.*;
  * </p>
  * <dl>
  * <dt><b>Styles:</b></dt>
- * <dd>DATE, TIME, CALENDAR, SHORT, MEDIUM, LONG</dd>
+ * <dd>DATE, TIME, CALENDAR, SHORT, MEDIUM, LONG, DROP_DOWN</dd>
  * <dt><b>Events:</b></dt>
- * <dd>Selection</dd>
+ * <dd>DefaultSelection, Selection</dd>
  * </dl>
  * <p>
  * Note: Only one of the styles DATE, TIME, or CALENDAR may be specified,
  * and only one of the styles SHORT, MEDIUM, or LONG may be specified.
+ * The DROP_DOWN style is a <em>HINT</em>, and it is only valid with the DATE style.
  * </p><p>
  * IMPORTANT: This class is <em>not</em> intended to be subclassed.
  * </p>
@@ -44,10 +42,11 @@ import org.eclipse.swt.graphics.*;
  * @see <a href="http://www.eclipse.org/swt/">Sample code and further information</a>
  *
  * @since 3.3
+ * @noextend This class is not intended to be subclassed by clients.
  */
 
 public class DateTime extends Composite {
-	boolean ignoreSelection;
+	boolean doubleClick, ignoreSelection;
 	SYSTEMTIME lastSystemTime;
 	SYSTEMTIME time = new SYSTEMTIME (); // only used in calendar mode
 	static final int /*long*/ DateTimeProc;
@@ -173,6 +172,10 @@ public class DateTime extends Composite {
  * @see SWT#DATE
  * @see SWT#TIME
  * @see SWT#CALENDAR
+ * @see SWT#SHORT
+ * @see SWT#MEDIUM
+ * @see SWT#LONG
+ * @see SWT#DROP_DOWN
  * @see Widget#checkSubclass
  * @see Widget#getStyle
  */
@@ -192,7 +195,7 @@ public DateTime (Composite parent, int style) {
  * interface.
  * <p>
  * <code>widgetSelected</code> is called when the user changes the control's value.
- * <code>widgetDefaultSelected</code> is not called.
+ * <code>widgetDefaultSelected</code> is typically called when ENTER is pressed.
  * </p>
  *
  * @param listener the listener which should be notified
@@ -232,7 +235,9 @@ static int checkStyle (int style) {
 	*/
 	style &= ~(SWT.H_SCROLL | SWT.V_SCROLL);
 	style = checkBits (style, SWT.DATE, SWT.TIME, SWT.CALENDAR, 0, 0, 0);
-	return checkBits (style, SWT.MEDIUM, SWT.SHORT, SWT.LONG, 0, 0, 0);
+	style = checkBits (style, SWT.MEDIUM, SWT.SHORT, SWT.LONG, 0, 0, 0);
+	if ((style & SWT.DATE) == 0) style &=~ SWT.DROP_DOWN;
+	return style;
 }
 
 protected void checkSubclass () {
@@ -375,10 +380,13 @@ public Point computeSize (int wHint, int hHint, boolean changed) {
 			if (newFont != 0) OS.SelectObject (hDC, oldFont);
 			OS.ReleaseDC (handle, hDC);
 			int upDownWidth = OS.GetSystemMetrics (OS.SM_CXVSCROLL);
-			width += upDownWidth + MARGIN;
 			int upDownHeight = OS.GetSystemMetrics (OS.SM_CYVSCROLL);
-			// TODO: On Vista, can send DTM_GETDATETIMEPICKERINFO to ask the Edit control what its margins are
-			if (!OS.IsWinCE && OS.WIN32_VERSION >= OS.VERSION (6, 0)) upDownHeight += 7;
+			if (!OS.IsWinCE && OS.WIN32_VERSION >= OS.VERSION (6, 0)) {
+				// TODO: On Vista, can send DTM_GETDATETIMEPICKERINFO to ask the Edit control what its margins are
+				upDownHeight += 7;
+				if ((style & SWT.DROP_DOWN) != 0) upDownWidth += 16;
+			}
+			width += upDownWidth + MARGIN;
 			height = Math.max (height, upDownHeight);
 		}
 	}
@@ -422,44 +430,42 @@ String getComputeSizeString () {
 }
 
 String getCustomShortDateFormat () {
-	if (true) {
-		TCHAR tchar = new TCHAR (getCodePage (), 80);
-		int size = OS.GetLocaleInfo (OS.LOCALE_USER_DEFAULT, OS.LOCALE_SYEARMONTH, tchar, 80);
-		return size != 0 ? tchar.toString (0, size - 1) : "M/yyyy"; //$NON-NLS-1$
-	}
+	TCHAR tchar = new TCHAR (getCodePage (), 80);
+	int size = OS.GetLocaleInfo (OS.LOCALE_USER_DEFAULT, OS.LOCALE_SYEARMONTH, tchar, 80);
+	return size != 0 ? tchar.toString (0, size - 1) : "M/yyyy"; //$NON-NLS-1$
 	
 	//TODO: Not currently used, but may need for WinCE (or if numeric short date is required)
-	StringBuffer buffer = new StringBuffer (getShortDateFormat ());
-	int length = buffer.length ();
-	boolean inQuotes = false;
-	int start = 0, end = 0;
-	while (start < length) {
-		char ch = buffer.charAt (start);
-		if (ch == SINGLE_QUOTE) inQuotes = !inQuotes;
-		else if (ch == DAY_FORMAT_CONSTANT && !inQuotes) {
-			end = start + 1;
-			while (end < length && buffer.charAt (end) == DAY_FORMAT_CONSTANT) end++;
-			int ordering = getShortDateFormatOrdering ();
-			switch (ordering) {
-			case MONTH_DAY_YEAR:
-				// skip the following separator
-				while (end < length && buffer.charAt (end) != YEAR_FORMAT_CONSTANT) end++;
-				break;
-			case DAY_MONTH_YEAR:
-				// skip the following separator
-				while (end < length && buffer.charAt (end) != MONTH_FORMAT_CONSTANT) end++;
-				break;
-			case YEAR_MONTH_DAY:
-				// skip the preceding separator
-				while (start > 0 && buffer.charAt (start) != MONTH_FORMAT_CONSTANT) start--;
-				break;
-			}
-			break;
-		}
-		start++;
-	}
-	if (start < end) buffer.delete (start, end);
-	return buffer.toString ();
+//	StringBuffer buffer = new StringBuffer (getShortDateFormat ());
+//	int length = buffer.length ();
+//	boolean inQuotes = false;
+//	int start = 0, end = 0;
+//	while (start < length) {
+//		char ch = buffer.charAt (start);
+//		if (ch == SINGLE_QUOTE) inQuotes = !inQuotes;
+//		else if (ch == DAY_FORMAT_CONSTANT && !inQuotes) {
+//			end = start + 1;
+//			while (end < length && buffer.charAt (end) == DAY_FORMAT_CONSTANT) end++;
+//			int ordering = getShortDateFormatOrdering ();
+//			switch (ordering) {
+//			case MONTH_DAY_YEAR:
+//				// skip the following separator
+//				while (end < length && buffer.charAt (end) != YEAR_FORMAT_CONSTANT) end++;
+//				break;
+//			case DAY_MONTH_YEAR:
+//				// skip the following separator
+//				while (end < length && buffer.charAt (end) != MONTH_FORMAT_CONSTANT) end++;
+//				break;
+//			case YEAR_MONTH_DAY:
+//				// skip the preceding separator
+//				while (start > 0 && buffer.charAt (start) != MONTH_FORMAT_CONSTANT) start--;
+//				break;
+//			}
+//			break;
+//		}
+//		start++;
+//	}
+//	if (start < end) buffer.delete (start, end);
+//	return buffer.toString ();
 }
 
 String getCustomShortTimeFormat () {
@@ -725,6 +731,7 @@ public void setDate (int year, int month, int day) {
  * Sets the receiver's date, or day of the month, to the specified day.
  * <p>
  * The first day of the month is 1, and the last day depends on the month and year.
+ * If the specified day is not valid for the receiver's month and year, then it is ignored. 
  * </p>
  *
  * @param day a positive integer beginning with 1
@@ -733,6 +740,8 @@ public void setDate (int year, int month, int day) {
  *    <li>ERROR_WIDGET_DISPOSED - if the receiver has been disposed</li>
  *    <li>ERROR_THREAD_INVALID_ACCESS - if not called from the thread that created the receiver</li>
  * </ul>
+ * 
+ * @see #setDate
  */
 public void setDay (int day) {
 	checkWidget ();
@@ -797,6 +806,7 @@ public void setMinutes (int minutes) {
  * Sets the receiver's month.
  * <p>
  * The first month of the year is 0, and the last month is 11.
+ * If the specified month is not valid for the receiver's day and year, then it is ignored. 
  * </p>
  *
  * @param month an integer between 0 and 11
@@ -805,6 +815,8 @@ public void setMinutes (int minutes) {
  *    <li>ERROR_WIDGET_DISPOSED - if the receiver has been disposed</li>
  *    <li>ERROR_THREAD_INVALID_ACCESS - if not called from the thread that created the receiver</li>
  * </ul>
+ * 
+ * @see #setDate
  */
 public void setMonth (int month) {
 	checkWidget ();
@@ -879,6 +891,7 @@ public void setTime (int hours, int minutes, int seconds) {
  * Sets the receiver's year.
  * <p>
  * The first year is 1752 and the last year is 9999.
+ * If the specified year is not valid for the receiver's day and month, then it is ignored. 
  * </p>
  *
  * @param year an integer between 1752 and 9999
@@ -887,6 +900,8 @@ public void setTime (int hours, int minutes, int seconds) {
  *    <li>ERROR_WIDGET_DISPOSED - if the receiver has been disposed</li>
  *    <li>ERROR_THREAD_INVALID_ACCESS - if not called from the thread that created the receiver</li>
  * </ul>
+ * 
+ * @see #setDate
  */
 public void setYear (int year) {
 	checkWidget ();
@@ -909,7 +924,10 @@ int widgetStyle () {
 	*/
 	bits &= ~OS.WS_CLIPCHILDREN;
 	if ((style & SWT.TIME) != 0) bits |= OS.DTS_TIMEFORMAT;
-	if ((style & SWT.DATE) != 0) bits |= ((style & SWT.MEDIUM) != 0 ? OS.DTS_SHORTDATECENTURYFORMAT : OS.DTS_LONGDATEFORMAT) | OS.DTS_UPDOWN;
+	if ((style & SWT.DATE) != 0) {
+		bits |= ((style & SWT.MEDIUM) != 0 ? OS.DTS_SHORTDATECENTURYFORMAT : OS.DTS_LONGDATEFORMAT);
+		if ((style & SWT.DROP_DOWN) == 0) bits |= OS.DTS_UPDOWN;
+	}
 	return bits;
 }
 
@@ -923,19 +941,95 @@ int /*long*/ windowProc () {
 
 LRESULT wmNotifyChild (NMHDR hdr, int /*long*/ wParam, int /*long*/ lParam) {
 	switch (hdr.code) {
-		case OS.MCN_SELCHANGE:
-		case OS.DTN_DATETIMECHANGE:
+		case OS.DTN_CLOSEUP: {
+			/*
+			* Feature in Windows.  When the user selects the drop-down button,
+			* the DateTimePicker runs a modal loop and consumes WM_LBUTTONUP.
+			* This is done without adding a mouse capture.  Since WM_LBUTTONUP
+			* is not delivered, the normal mechanism where a mouse capture is
+			* added on mouse down and removed when the mouse is released
+			* is broken, leaving an unwanted capture.  The fix is to avoid
+			* setting capture on mouse down right after WM_LBUTTONUP is consumed.
+			*/
+			display.captureChanged = true;
+			break;
+		}
+		case OS.MCN_SELCHANGE: {
 			if (ignoreSelection) break;
 			SYSTEMTIME systime = new SYSTEMTIME ();
-			int msg = (style & SWT.CALENDAR) != 0 ? OS.MCM_GETCURSEL : OS.DTM_GETSYSTEMTIME;
-			OS.SendMessage (handle, msg, 0, systime);
+			OS.SendMessage (handle, OS.MCM_GETCURSEL, 0, systime);
+			postEvent (SWT.Selection);
+			break;
+		}
+		case OS.DTN_DATETIMECHANGE: {
+			SYSTEMTIME systime = new SYSTEMTIME ();
+			OS.SendMessage (handle, OS.DTM_GETSYSTEMTIME, 0, systime);
 			if (lastSystemTime == null || systime.wDay != lastSystemTime.wDay || systime.wMonth != lastSystemTime.wMonth || systime.wYear != lastSystemTime.wYear) {
 				postEvent (SWT.Selection);
 				if ((style & SWT.TIME) == 0) lastSystemTime = systime;
 			}
 			break;
+		}
 	}
 	return super.wmNotifyChild (hdr, wParam, lParam);
+}
+
+LRESULT WM_CHAR (int /*long*/ wParam, int /*long*/ lParam) {
+	LRESULT result = super.WM_CHAR (wParam, lParam);
+	if (result != null) return result;
+	/*
+	* Feature in Windows.  For some reason, when the
+	* user presses tab, return or escape, Windows beeps.
+	* The fix is to look for these keys and not call
+	* the window proc.
+	*/
+	switch ((int)/*64*/wParam) {
+		case SWT.CR:
+			postEvent (SWT.DefaultSelection);
+			// FALL THROUGH
+		case SWT.TAB:
+		case SWT.ESC: return LRESULT.ZERO;
+	}
+	return result;
+}
+
+LRESULT WM_LBUTTONDBLCLK (int /*long*/ wParam, int /*long*/ lParam) {	
+	LRESULT result = super.WM_LBUTTONDBLCLK (wParam, lParam);
+	if (isDisposed ()) return LRESULT.ZERO;
+	if ((style & SWT.CALENDAR) != 0) {
+		MCHITTESTINFO pMCHitTest = new MCHITTESTINFO ();
+		pMCHitTest.cbSize = MCHITTESTINFO.sizeof;
+		POINT pt = new POINT ();
+		pt.x = OS.GET_X_LPARAM (lParam);
+		pt.y = OS.GET_Y_LPARAM (lParam);
+		pMCHitTest.pt = pt;
+		int /*long*/ code = OS.SendMessage (handle, OS.MCM_HITTEST, 0, pMCHitTest);
+		if ((code & OS.MCHT_CALENDARDATE) == OS.MCHT_CALENDARDATE) doubleClick = true;
+	}
+	return result;
+}
+
+LRESULT WM_LBUTTONDOWN (int /*long*/ wParam, int /*long*/ lParam) {
+	LRESULT result = super.WM_LBUTTONDOWN (wParam, lParam);
+	if (result == LRESULT.ZERO) return result;
+	doubleClick = false;
+	/*
+	* Feature in Windows. For some reason, the calendar control
+	* does not take focus on WM_LBUTTONDOWN.  The fix is to
+	* explicitly set focus.
+	*/
+	if ((style & SWT.CALENDAR) != 0) {
+		if ((style & SWT.NO_FOCUS) == 0) OS.SetFocus (handle);
+	}
+	return result;
+}
+
+LRESULT WM_LBUTTONUP (int /*long*/ wParam, int /*long*/ lParam) {	
+	LRESULT result = super.WM_LBUTTONUP (wParam, lParam);
+	if (isDisposed ()) return LRESULT.ZERO;
+	if (doubleClick) postEvent (SWT.DefaultSelection);
+	doubleClick = false;
+	return result;
 }
 
 LRESULT WM_TIMER (int /*long*/ wParam, int /*long*/ lParam) {

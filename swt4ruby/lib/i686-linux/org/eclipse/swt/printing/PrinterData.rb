@@ -1,6 +1,6 @@
 require "rjava"
 
-# Copyright (c) 2000, 2008 IBM Corporation and others.
+# Copyright (c) 2000, 2009 IBM Corporation and others.
 # All rights reserved. This program and the accompanying materials
 # are made available under the terms of the Eclipse Public License v1.0
 # which accompanies this distribution, and is available at
@@ -125,6 +125,16 @@ module Org::Eclipse::Swt::Printing
     alias_method :attr_collate=, :collate=
     undef_method :collate=
     
+    # The orientation of the paper, which can be either PORTRAIT
+    # or LANDSCAPE.
+    # 
+    # @since 3.5
+    attr_accessor :orientation
+    alias_method :attr_orientation, :orientation
+    undef_method :orientation
+    alias_method :attr_orientation=, :orientation=
+    undef_method :orientation=
+    
     class_module.module_eval {
       # <code>scope</code> field value indicating that
       # all pages should be printed
@@ -141,6 +151,20 @@ module Org::Eclipse::Swt::Printing
       # the current selection should be printed
       const_set_lazy(:SELECTION) { 2 }
       const_attr_reader  :SELECTION
+      
+      # <code>orientation</code> field value indicating
+      # portrait paper orientation
+      # 
+      # @since 3.5
+      const_set_lazy(:PORTRAIT) { 1 }
+      const_attr_reader  :PORTRAIT
+      
+      # <code>orientation</code> field value indicating
+      # landscape paper orientation
+      # 
+      # @since 3.5
+      const_set_lazy(:LANDSCAPE) { 2 }
+      const_attr_reader  :LANDSCAPE
     }
     
     # private, platform-specific data
@@ -172,6 +196,7 @@ module Org::Eclipse::Swt::Printing
       @file_name = nil
       @copy_count = 0
       @collate = false
+      @orientation = 0
       @other_data = nil
       super()
       @scope = ALL_PAGES
@@ -180,6 +205,7 @@ module Org::Eclipse::Swt::Printing
       @print_to_file = false
       @copy_count = 1
       @collate = false
+      @orientation = PORTRAIT
     end
     
     typesig { [String, String] }
@@ -201,6 +227,7 @@ module Org::Eclipse::Swt::Printing
       @file_name = nil
       @copy_count = 0
       @collate = false
+      @orientation = 0
       @other_data = nil
       super()
       @scope = ALL_PAGES
@@ -209,6 +236,7 @@ module Org::Eclipse::Swt::Printing
       @print_to_file = false
       @copy_count = 1
       @collate = false
+      @orientation = PORTRAIT
       @driver = driver
       @name = name
     end

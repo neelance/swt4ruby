@@ -1,6 +1,6 @@
 require "rjava"
 
-# Copyright (c) 2000, 2008 IBM Corporation and others.
+# Copyright (c) 2000, 2009 IBM Corporation and others.
 # All rights reserved. This program and the accompanying materials
 # are made available under the terms of the Eclipse Public License v1.0
 # which accompanies this distribution, and is available at
@@ -98,6 +98,7 @@ module Org::Eclipse::Swt::Dnd
   # @see <a href="http://www.eclipse.org/swt/snippets/#dnd">Drag and Drop snippets</a>
   # @see <a href="http://www.eclipse.org/swt/examples.php">SWT Example: DNDExample</a>
   # @see <a href="http://www.eclipse.org/swt/">Sample code and further information</a>
+  # @noextend This class is not intended to be subclassed by clients.
   class DragSource < DragSourceImports.const_get :Widget
     include_class_members DragSourceImports
     
@@ -510,6 +511,9 @@ module Org::Eclipse::Swt::Dnd
       event.attr_time = time
       event.attr_data_type = transfer_data
       notify_listeners(DND::DragSetData, event)
+      if (!event.attr_doit)
+        return
+      end
       transfer = nil
       i = 0
       while i < @transfer_agents.attr_length

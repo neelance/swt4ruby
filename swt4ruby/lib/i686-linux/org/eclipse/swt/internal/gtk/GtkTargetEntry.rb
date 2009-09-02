@@ -1,6 +1,6 @@
 require "rjava"
 
-# Copyright (c) 2000, 2006 IBM Corporation and others. All rights reserved.
+# Copyright (c) 2000, 2008 IBM Corporation and others. All rights reserved.
 # The contents of this file are made available under the terms
 # of the GNU Lesser General Public License (LGPL) Version 2.1 that
 # accompanies this distribution (lgpl-v21.txt).  The LGPL is also
@@ -23,6 +23,7 @@ module Org::Eclipse::Swt::Internal::Gtk
   class GtkTargetEntry 
     include_class_members GtkTargetEntryImports
     
+    # @field cast=(gchar *)
     # long
     attr_accessor :target
     alias_method :attr_target, :target
@@ -30,12 +31,14 @@ module Org::Eclipse::Swt::Internal::Gtk
     alias_method :attr_target=, :target=
     undef_method :target=
     
+    # @field cast=(guint)
     attr_accessor :flags
     alias_method :attr_flags, :flags
     undef_method :flags
     alias_method :attr_flags=, :flags=
     undef_method :flags=
     
+    # @field cast=(guint)
     attr_accessor :info
     alias_method :attr_info, :info
     undef_method :info

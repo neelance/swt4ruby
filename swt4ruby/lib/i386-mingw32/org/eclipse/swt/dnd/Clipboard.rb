@@ -1,6 +1,6 @@
 require "rjava"
 
-# Copyright (c) 2000, 2008 IBM Corporation and others.
+# Copyright (c) 2000, 2009 IBM Corporation and others.
 # All rights reserved. This program and the accompanying materials
 # are made available under the terms of the Eclipse Public License v1.0
 # which accompanies this distribution, and is available at
@@ -28,8 +28,14 @@ module Org::Eclipse::Swt::Dnd
   # @see <a href="http://www.eclipse.org/swt/snippets/#clipboard">Clipboard snippets</a>
   # @see <a href="http://www.eclipse.org/swt/examples.php">SWT Example: ClipboardExample</a>
   # @see <a href="http://www.eclipse.org/swt/">Sample code and further information</a>
+  # @noextend This class is not intended to be subclassed by clients.
   class Clipboard 
     include_class_members ClipboardImports
+    
+    class_module.module_eval {
+      const_set_lazy(:RETRY_LIMIT) { 10 }
+      const_attr_reader  :RETRY_LIMIT
+    }
     
     attr_accessor :display
     alias_method :attr_display, :display
@@ -360,7 +366,7 @@ module Org::Eclipse::Swt::Dnd
       # OleGetClipboard([out] ppDataObject).
       # AddRef has already been called on ppDataObject by the callee and must be released by the caller.
       result = COM._ole_get_clipboard(ppv)
-      while (!(result).equal?(COM::S_OK) && ((retry_count += 1) - 1) < 10)
+      while (!(result).equal?(COM::S_OK) && ((retry_count += 1) - 1) < RETRY_LIMIT)
         begin
           JavaThread.sleep(50)
         rescue JavaThrowable => t
@@ -544,7 +550,7 @@ module Org::Eclipse::Swt::Dnd
       # data, use PeekMessage() to enable cross thread
       # message sends.
       retry_count = 0
-      while (!(result).equal?(COM::S_OK) && ((retry_count += 1) - 1) < 10)
+      while (!(result).equal?(COM::S_OK) && ((retry_count += 1) - 1) < RETRY_LIMIT)
         begin
           JavaThread.sleep(50)
         rescue JavaThrowable => t

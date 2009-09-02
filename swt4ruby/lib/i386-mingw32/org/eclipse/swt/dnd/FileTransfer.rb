@@ -146,7 +146,7 @@ module Org::Eclipse::Swt::Dnd
       formatetc.attr_tymed = COM::TYMED_HGLOBAL
       stgmedium = STGMEDIUM.new
       stgmedium.attr_tymed = COM::TYMED_HGLOBAL
-      transfer_data.attr_result = data_object._get_data(formatetc, stgmedium)
+      transfer_data.attr_result = get_data(data_object, formatetc, stgmedium)
       data_object._release
       if (!(transfer_data.attr_result).equal?(COM::S_OK))
         return nil

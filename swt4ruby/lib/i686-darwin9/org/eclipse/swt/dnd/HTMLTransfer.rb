@@ -13,7 +13,7 @@ module Org::Eclipse::Swt::Dnd
     class_module.module_eval {
       include ::Java::Lang
       include ::Org::Eclipse::Swt::Dnd
-      include_const ::Org::Eclipse::Swt::Internal::Carbon, :OS
+      include ::Org::Eclipse::Swt::Internal::Cocoa
     }
   end
   
@@ -44,10 +44,9 @@ module Org::Eclipse::Swt::Dnd
       end
       alias_method :attr__instance=, :_instance=
       
-      const_set_lazy(:HTML) { "HTML" }
+      const_set_lazy(:HTML) { OS::NSHTMLPboardType.get_string }
       const_attr_reader  :HTML
       
-      # $NON-NLS-1$
       const_set_lazy(:HTMLID) { register_type(HTML) }
       const_attr_reader  :HTMLID
     }
@@ -80,15 +79,7 @@ module Org::Eclipse::Swt::Dnd
       if (!check_html(object) || !is_supported_type(transfer_data))
         DND.error(DND::ERROR_INVALID_DATA)
       end
-      string = object
-      count = string.length
-      chars = CharArray.new(count)
-      string.get_chars(0, count, chars, 0)
-      buffer = Array.typed(::Java::Byte).new(chars.attr_length * 2) { 0 }
-      OS.memmove(buffer, chars, buffer.attr_length)
-      transfer_data.attr_data = Array.typed(Array.typed(::Java::Byte)).new(1) { nil }
-      transfer_data.attr_data[0] = buffer
-      transfer_data.attr_result = OS.attr_no_err
+      transfer_data.attr_data = NSString.string_with(object)
     end
     
     typesig { [TransferData] }
@@ -104,13 +95,8 @@ module Org::Eclipse::Swt::Dnd
       if (!is_supported_type(transfer_data) || (transfer_data.attr_data).nil?)
         return nil
       end
-      if ((transfer_data.attr_data.attr_length).equal?(0) || (transfer_data.attr_data[0].attr_length).equal?(0))
-        return nil
-      end
-      buffer = transfer_data.attr_data[0]
-      chars = CharArray.new((buffer.attr_length + 1) / 2)
-      OS.memmove(chars, buffer, buffer.attr_length)
-      return String.new(chars)
+      string = transfer_data.attr_data
+      return string.get_string
     end
     
     typesig { [] }

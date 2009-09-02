@@ -1,6 +1,6 @@
 require "rjava"
 
-# Copyright (c) 2000, 2008 IBM Corporation and others.
+# Copyright (c) 2000, 2009 IBM Corporation and others.
 # All rights reserved. This program and the accompanying materials
 # are made available under the terms of the Eclipse Public License v1.0
 # which accompanies this distribution, and is available at
@@ -70,6 +70,7 @@ module Org::Eclipse::Swt::Widgets
   # @see <a href="http://www.eclipse.org/swt/snippets/#table">Table, TableItem, TableColumn snippets</a>
   # @see <a href="http://www.eclipse.org/swt/examples.php">SWT Example: ControlExample</a>
   # @see <a href="http://www.eclipse.org/swt/">Sample code and further information</a>
+  # @noextend This class is not intended to be subclassed by clients.
   class Table < TableImports.const_get :Composite
     include_class_members TableImports
     
@@ -217,6 +218,12 @@ module Org::Eclipse::Swt::Widgets
     undef_method :was_resized
     alias_method :attr_was_resized=, :was_resized=
     undef_method :was_resized=
+    
+    attr_accessor :painted
+    alias_method :attr_painted, :painted
+    undef_method :painted
+    alias_method :attr_painted=, :painted=
+    undef_method :painted=
     
     attr_accessor :ignore_activate
     alias_method :attr_ignore_activate, :ignore_activate
@@ -417,6 +424,7 @@ module Org::Eclipse::Swt::Widgets
       @tip_requested = false
       @was_selected = false
       @was_resized = false
+      @painted = false
       @ignore_activate = false
       @ignore_select = false
       @ignore_shrink = false
@@ -542,7 +550,7 @@ module Org::Eclipse::Swt::Widgets
       # Other messages
       when OS::WM_KEYDOWN
         check_activate = true
-        redraw = !(find_image_control).nil? && (self.attr_draw_count).equal?(0) && OS._is_window_visible(self.attr_handle)
+        redraw = !(find_image_control).nil? && get_drawing && OS._is_window_visible(self.attr_handle)
         if (redraw)
           # Feature in Windows.  When LVM_SETBKCOLOR is used with CLR_NONE
           # to make the background of the table transparent, drawing becomes
@@ -557,7 +565,7 @@ module Org::Eclipse::Swt::Widgets
           top_index = RJava.cast_to_int(OS._send_message(self.attr_handle, OS::LVM_GETTOPINDEX, 0, 0))
         end
       when OS::WM_CHAR, OS::WM_IME_CHAR, OS::WM_KEYUP, OS::WM_SYSCHAR, OS::WM_SYSKEYDOWN, OS::WM_SYSKEYUP, OS::WM_HSCROLL, OS::WM_VSCROLL, OS::WM_WINDOWPOSCHANGED
-        redraw = !(find_image_control).nil? && (self.attr_draw_count).equal?(0) && OS._is_window_visible(self.attr_handle)
+        redraw = !(find_image_control).nil? && get_drawing && OS._is_window_visible(self.attr_handle)
         if (redraw)
           # Feature in Windows.  When LVM_SETBKCOLOR is used with CLR_NONE
           # to make the background of the table transparent, drawing becomes
@@ -697,6 +705,8 @@ module Org::Eclipse::Swt::Widgets
             OS._invalidate_rect(self.attr_handle, nil, true)
           end
         end
+      when OS::WM_PAINT
+        @painted = true
       end
       return code
     end
@@ -1090,7 +1100,7 @@ module Org::Eclipse::Swt::Widgets
       # 
       # 64
       item = __get_item(RJava.cast_to_int(nmcd.attr_dw_item_spec))
-      if ((item).nil?)
+      if ((item).nil? || item.is_disposed)
         return nil
       end
       # long
@@ -1386,7 +1396,7 @@ module Org::Eclipse::Swt::Widgets
           OS._send_message(self.attr_handle, OS::LVM_SETITEM, 0, lv_item)
           item.attr_cached = false
         end
-        if ((@current_item).nil? && (self.attr_draw_count).equal?(0) && OS._is_window_visible(self.attr_handle))
+        if ((@current_item).nil? && get_drawing && OS._is_window_visible(self.attr_handle))
           OS._send_message(self.attr_handle, OS::LVM_REDRAWITEMS, index, index)
         end
         set_scroll_width(item, false)
@@ -1461,7 +1471,7 @@ module Org::Eclipse::Swt::Widgets
           i += 1
         end
         if (cleared)
-          if ((@current_item).nil? && (self.attr_draw_count).equal?(0) && OS._is_window_visible(self.attr_handle))
+          if ((@current_item).nil? && get_drawing && OS._is_window_visible(self.attr_handle))
             OS._send_message(self.attr_handle, OS::LVM_REDRAWITEMS, start, end_)
           end
           item = (start).equal?(end_) ? @items[start] : nil
@@ -1538,7 +1548,7 @@ module Org::Eclipse::Swt::Widgets
             OS._send_message(self.attr_handle, OS::LVM_SETITEM, 0, lv_item)
             item.attr_cached = false
           end
-          if ((@current_item).nil? && (self.attr_draw_count).equal?(0) && OS._is_window_visible(self.attr_handle))
+          if ((@current_item).nil? && get_drawing && OS._is_window_visible(self.attr_handle))
             OS._send_message(self.attr_handle, OS::LVM_REDRAWITEMS, index, index)
           end
         end
@@ -1601,7 +1611,7 @@ module Org::Eclipse::Swt::Widgets
         i += 1
       end
       if (cleared)
-        if ((@current_item).nil? && (self.attr_draw_count).equal?(0) && OS._is_window_visible(self.attr_handle))
+        if ((@current_item).nil? && get_drawing && OS._is_window_visible(self.attr_handle))
           OS._send_message(self.attr_handle, OS::LVM_REDRAWITEMS, 0, count - 1)
         end
         set_scroll_width(nil, false)
@@ -2007,7 +2017,7 @@ module Org::Eclipse::Swt::Widgets
         # table is not visible.  When the table is painted,
         # the items array is resized to be smaller to reduce
         # memory usage.
-        small = (self.attr_draw_count).equal?(0) && OS._is_window_visible(self.attr_handle)
+        small = get_drawing && OS._is_window_visible(self.attr_handle)
         length = small ? @items.attr_length + 4 : Math.max(4, @items.attr_length * 3 / 2)
         new_items = Array.typed(TableItem).new(length) { nil }
         System.arraycopy(@items, 0, new_items, 0, @items.attr_length)
@@ -2814,8 +2824,11 @@ module Org::Eclipse::Swt::Widgets
       pinfo.attr_y = point.attr_y
       if (((self.attr_style & SWT::FULL_SELECTION)).equal?(0))
         if (hooks(SWT::MeasureItem))
-          OS._send_message(self.attr_handle, OS::LVM_SUBITEMHITTEST, 0, pinfo)
-          if ((pinfo.attr_i_item).equal?(-1))
+          # Bug in Windows.  When LVM_SUBITEMHITTEST is used to hittest
+          # a point that is above the table, instead of returning -1 to
+          # indicate that the hittest failed, a negative index is returned.
+          # The fix is to consider any value that is negative a failure.
+          if (OS._send_message(self.attr_handle, OS::LVM_SUBITEMHITTEST, 0, pinfo) < 0)
             rect = RECT.new
             rect.attr_left = OS::LVIR_ICON
             @ignore_custom_draw = true
@@ -2824,7 +2837,14 @@ module Org::Eclipse::Swt::Widgets
             @ignore_custom_draw = false
             if (!(code).equal?(0))
               pinfo.attr_x = rect.attr_left
+              # Bug in Windows.  When LVM_SUBITEMHITTEST is used to hittest
+              # a point that is above the table, instead of returning -1 to
+              # indicate that the hittest failed, a negative index is returned.
+              # The fix is to consider any value that is negative a failure.
               OS._send_message(self.attr_handle, OS::LVM_SUBITEMHITTEST, 0, pinfo)
+              if (pinfo.attr_i_item < 0)
+                pinfo.attr_i_item = -1
+              end
             end
           end
           if (!(pinfo.attr_i_item).equal?(-1) && (pinfo.attr_i_sub_item).equal?(0))
@@ -2893,6 +2913,9 @@ module Org::Eclipse::Swt::Widgets
     # </ul>
     def get_item_height
       check_widget
+      if (!@painted && hooks(SWT::MeasureItem))
+        hit_test_selection(0, 0, 0)
+      end
       # long
       empty = OS._send_message(self.attr_handle, OS::LVM_APPROXIMATEVIEWRECT, 0, 0)
       # long
@@ -2934,7 +2957,8 @@ module Org::Eclipse::Swt::Widgets
     
     typesig { [] }
     # Returns <code>true</code> if the receiver's lines are visible,
-    # and <code>false</code> otherwise.
+    # and <code>false</code> otherwise. Note that some platforms draw
+    # grid lines while others may draw alternating row colors.
     # <p>
     # If one of the receiver's ancestors is not visible or some
     # other condition makes the receiver not visible, this method
@@ -3689,7 +3713,7 @@ module Org::Eclipse::Swt::Widgets
       # when the table is destroyed.
       set_defer_resize(true)
       if (OS::IsWin95 && @column_count > 1)
-        redraw_ = (self.attr_draw_count).equal?(0) && OS._is_window_visible(self.attr_handle)
+        redraw_ = get_drawing && OS._is_window_visible(self.attr_handle)
         if (redraw_)
           OS._send_message(self.attr_handle, OS::WM_SETREDRAW, 0, 0)
         end
@@ -4197,10 +4221,15 @@ module Org::Eclipse::Swt::Widgets
           # 64
           width = RJava.cast_to_int(OS._send_message(self.attr_handle, OS::LVM_GETCOLUMNWIDTH, 0, 0))
           if (event.attr_x + event.attr_width > width)
-            OS._send_message(self.attr_handle, OS::LVM_SETCOLUMNWIDTH, 0, event.attr_x + event.attr_width)
+            set_scroll_width(event.attr_x + event.attr_width)
           end
         end
-        if (event.attr_height > get_item_height)
+        # long
+        empty = OS._send_message(self.attr_handle, OS::LVM_APPROXIMATEVIEWRECT, 0, 0)
+        # long
+        one_item = OS._send_message(self.attr_handle, OS::LVM_APPROXIMATEVIEWRECT, 1, 0)
+        item_height = OS._hiword(one_item) - OS._hiword(empty)
+        if (event.attr_height > item_height)
           set_item_height(event.attr_height)
         end
       end
@@ -4237,8 +4266,11 @@ module Org::Eclipse::Swt::Widgets
       OS._send_message(self.attr_handle, OS::LVM_HITTEST, 0, pinfo)
       if (((self.attr_style & SWT::FULL_SELECTION)).equal?(0))
         if (hooks(SWT::MeasureItem))
-          OS._send_message(self.attr_handle, OS::LVM_SUBITEMHITTEST, 0, pinfo)
-          if ((pinfo.attr_i_item).equal?(-1))
+          # Bug in Windows.  When LVM_SUBITEMHITTEST is used to hittest
+          # a point that is above the table, instead of returning -1 to
+          # indicate that the hittest failed, a negative index is returned.
+          # The fix is to consider any value that is negative a failure.
+          if (OS._send_message(self.attr_handle, OS::LVM_SUBITEMHITTEST, 0, pinfo) < 0)
             # 64
             count = RJava.cast_to_int(OS._send_message(self.attr_handle, OS::LVM_GETITEMCOUNT, 0, 0))
             if (!(count).equal?(0))
@@ -4250,7 +4282,14 @@ module Org::Eclipse::Swt::Widgets
               @ignore_custom_draw = false
               if (!(code).equal?(0))
                 pinfo.attr_x = rect.attr_left
+                # Bug in Windows.  When LVM_SUBITEMHITTEST is used to hittest
+                # a point that is above the table, instead of returning -1 to
+                # indicate that the hittest failed, a negative index is returned.
+                # The fix is to consider any value that is negative a failure.
                 OS._send_message(self.attr_handle, OS::LVM_SUBITEMHITTEST, 0, pinfo)
+                if (pinfo.attr_i_item < 0)
+                  pinfo.attr_i_item = -1
+                end
                 pinfo.attr_flags &= ~(OS::LVHT_ONITEMICON | OS::LVHT_ONITEMLABEL)
               end
             end
@@ -5242,7 +5281,8 @@ module Org::Eclipse::Swt::Widgets
     
     typesig { [::Java::Boolean] }
     # Marks the receiver's lines as visible if the argument is <code>true</code>,
-    # and marks it invisible otherwise.
+    # and marks it invisible otherwise. Note that some platforms draw grid lines
+    # while others may draw alternating row colors.
     # <p>
     # If one of the receiver's ancestors is not visible or some
     # other condition makes the receiver not visible, marking
@@ -5353,6 +5393,42 @@ module Org::Eclipse::Swt::Widgets
       end
     end
     
+    typesig { [::Java::Int] }
+    def set_scroll_width(width)
+      # 64
+      if (!(width).equal?(RJava.cast_to_int(OS._send_message(self.attr_handle, OS::LVM_GETCOLUMNWIDTH, 0, 0))))
+        # Feature in Windows.  When LVM_SETCOLUMNWIDTH is sent,
+        # Windows draws right away instead of queuing a WM_PAINT.
+        # This can cause recursive calls when called from paint
+        # or from messages that are retrieving the item data,
+        # such as WM_NOTIFY, causing a stack overflow.  The fix
+        # is to turn off redraw and queue a repaint, collapsing
+        # the recursive calls.
+        redraw_ = false
+        if (hooks(SWT::MeasureItem))
+          redraw_ = get_drawing && OS._is_window_visible(self.attr_handle)
+        end
+        if (redraw_)
+          OS._def_window_proc(self.attr_handle, OS::WM_SETREDRAW, 0, 0)
+        end
+        OS._send_message(self.attr_handle, OS::LVM_SETCOLUMNWIDTH, 0, width)
+        if (redraw_)
+          OS._def_window_proc(self.attr_handle, OS::WM_SETREDRAW, 1, 0)
+          if (OS::IsWinCE)
+            # long
+            hwnd_header = OS._send_message(self.attr_handle, OS::LVM_GETHEADER, 0, 0)
+            if (!(hwnd_header).equal?(0))
+              OS._invalidate_rect(hwnd_header, nil, true)
+            end
+            OS._invalidate_rect(self.attr_handle, nil, true)
+          else
+            flags = OS::RDW_ERASE | OS::RDW_FRAME | OS::RDW_INVALIDATE | OS::RDW_ALLCHILDREN
+            OS._redraw_window(self.attr_handle, nil, 0, flags)
+          end
+        end
+      end
+    end
+    
     typesig { [TableItem, ::Java::Boolean] }
     def set_scroll_width(item, force)
       if (!(@current_item).nil?)
@@ -5361,7 +5437,7 @@ module Org::Eclipse::Swt::Widgets
         end
         return false
       end
-      if (!force && (!(self.attr_draw_count).equal?(0) || !OS._is_window_visible(self.attr_handle)))
+      if (!force && (!get_drawing || !OS._is_window_visible(self.attr_handle)))
         @fix_scroll_width = true
         return false
       end
@@ -5461,32 +5537,7 @@ module Org::Eclipse::Swt::Widgets
           new_width += VISTA_EXTRA
         end
         if (new_width > old_width)
-          # Feature in Windows.  When LVM_SETCOLUMNWIDTH is sent,
-          # Windows draws right away instead of queuing a WM_PAINT.
-          # This can cause recursive calls when called from paint
-          # or from messages that are retrieving the item data,
-          # such as WM_NOTIFY, causing a stack overflow.  The fix
-          # is to turn off redraw and queue a repaint, collapsing
-          # the recursive calls.
-          redraw_ = (self.attr_draw_count).equal?(0) && OS._is_window_visible(self.attr_handle)
-          if (redraw_)
-            OS._def_window_proc(self.attr_handle, OS::WM_SETREDRAW, 0, 0)
-          end
-          OS._send_message(self.attr_handle, OS::LVM_SETCOLUMNWIDTH, 0, new_width)
-          if (redraw_)
-            OS._def_window_proc(self.attr_handle, OS::WM_SETREDRAW, 1, 0)
-            if (OS::IsWinCE)
-              # long
-              hwnd_header = OS._send_message(self.attr_handle, OS::LVM_GETHEADER, 0, 0)
-              if (!(hwnd_header).equal?(0))
-                OS._invalidate_rect(hwnd_header, nil, true)
-              end
-              OS._invalidate_rect(self.attr_handle, nil, true)
-            else
-              flags = OS::RDW_ERASE | OS::RDW_FRAME | OS::RDW_INVALIDATE | OS::RDW_ALLCHILDREN
-              OS._redraw_window(self.attr_handle, nil, 0, flags)
-            end
-          end
+          set_scroll_width(new_width)
           return true
         end
       end
@@ -5800,6 +5851,9 @@ module Org::Eclipse::Swt::Widgets
       if ((index).equal?(top_index))
         return
       end
+      if (!@painted && hooks(SWT::MeasureItem))
+        hit_test_selection(index, 0, 0)
+      end
       # Bug in Windows.  For some reason, LVM_SCROLL refuses to
       # scroll a table vertically when the width and height of
       # the table is smaller than a certain size.  The values
@@ -5946,6 +6000,9 @@ module Org::Eclipse::Swt::Widgets
     
     typesig { [::Java::Int] }
     def show_item(index)
+      if (!@painted && hooks(SWT::MeasureItem))
+        hit_test_selection(index, 0, 0)
+      end
       # Bug in Windows.  For some reason, when there is insufficient space
       # to show an item, LVM_ENSUREVISIBLE causes blank lines to be
       # inserted at the top of the widget.  A call to LVM_GETTOPINDEX will
@@ -6236,12 +6293,11 @@ module Org::Eclipse::Swt::Widgets
       end
       if (!(hwnd).equal?(self.attr_handle))
         case (msg)
-        # This code is intentionally commented
-        # case OS.WM_CONTEXTMENU: {
-        # LRESULT result = wmContextMenu (hwnd, wParam, lParam);
-        # if (result != null) return result.value;
-        # break;
-        # }
+        when OS::WM_CONTEXTMENU
+          result = wm_context_menu(hwnd, w_param, l_param)
+          if (!(result).nil?)
+            return result.attr_value
+          end
         when OS::WM_CAPTURECHANGED
           # Bug in Windows.  When the capture changes during a
           # header drag, Windows does not redraw the header item
@@ -6314,7 +6370,7 @@ module Org::Eclipse::Swt::Widgets
         # in HDC is wrong.
         # 
         # The fix for both cases is to create the image using PrintWindow().
-        if ((!OS::IsWinCE && OS::WIN32_VERSION >= OS._version(6, 0)) || hooks(SWT::EraseItem) || hooks(SWT::PaintItem))
+        if ((!OS::IsWinCE && OS::WIN32_VERSION >= OS._version(6, 0)) || !((self.attr_style & SWT::VIRTUAL)).equal?(0) || hooks(SWT::EraseItem) || hooks(SWT::PaintItem))
           # 64
           top_index = RJava.cast_to_int(OS._send_message(self.attr_handle, OS::LVM_GETTOPINDEX, 0, 0))
           # 64
@@ -6487,7 +6543,7 @@ module Org::Eclipse::Swt::Widgets
       if (!(find_image_control).nil?)
         return LRESULT::ONE
       end
-      if (OS::COMCTL32_MAJOR < 6)
+      if (!OS::IsWinCE && OS::COMCTL32_MAJOR < 6)
         if (!((self.attr_style & SWT::DOUBLE_BUFFERED)).equal?(0))
           # 64
           bits = RJava.cast_to_int(OS._send_message(self.attr_handle, OS::LVM_GETEXTENDEDLISTVIEWSTYLE, 0, 0))
@@ -6730,7 +6786,7 @@ module Org::Eclipse::Swt::Widgets
       if (@fix_scroll_width)
         set_scroll_width(nil, true)
       end
-      if (OS::COMCTL32_MAJOR < 6)
+      if (!OS::IsWinCE && OS::COMCTL32_MAJOR < 6)
         if (!((self.attr_style & SWT::DOUBLE_BUFFERED)).equal?(0) || !(find_image_control).nil?)
           # 64
           bits = RJava.cast_to_int(OS._send_message(self.attr_handle, OS::LVM_GETEXTENDEDLISTVIEWSTYLE, 0, 0))
@@ -6739,7 +6795,7 @@ module Org::Eclipse::Swt::Widgets
             # long
             paint_dc = 0
             ps = PAINTSTRUCT.new
-            hooks_paint = hooks(SWT::Paint)
+            hooks_paint = hooks(SWT::Paint) || filters(SWT::Paint)
             if (hooks_paint)
               data = SwtGCData.new
               data.attr_ps = ps
@@ -6925,6 +6981,11 @@ module Org::Eclipse::Swt::Widgets
           end
         end
       end
+      # Bug in Windows.  When WM_SETREDRAW is used to turn off
+      # redraw for a list, table or tree, the background of the
+      # control is drawn.  The fix is to call DefWindowProc(),
+      # which stops all graphics output to the control.
+      OS._def_window_proc(self.attr_handle, OS::WM_SETREDRAW, w_param, l_param)
       # long
       code = call_window_proc(self.attr_handle, OS::WM_SETREDRAW, w_param, l_param)
       if ((w_param).equal?(0))
@@ -7030,7 +7091,7 @@ module Org::Eclipse::Swt::Widgets
             # 64
             row_count = RJava.cast_to_int(OS._send_message(self.attr_handle, OS::LVM_GETCOUNTPERPAGE, 0, 0))
             if (row_count > V_SCROLL_LIMIT)
-              fix_scroll = (self.attr_draw_count).equal?(0) && OS._is_window_visible(self.attr_handle)
+              fix_scroll = get_drawing && OS._is_window_visible(self.attr_handle)
             end
           end
         end
@@ -7133,7 +7194,7 @@ module Org::Eclipse::Swt::Widgets
             # 64
             row_count = RJava.cast_to_int(OS._send_message(self.attr_handle, OS::LVM_GETCOUNTPERPAGE, 0, 0))
             if (row_count > V_SCROLL_LIMIT)
-              fix_scroll = (self.attr_draw_count).equal?(0) && OS._is_window_visible(self.attr_handle)
+              fix_scroll = get_drawing && OS._is_window_visible(self.attr_handle)
             end
           end
         end
@@ -7598,9 +7659,14 @@ module Org::Eclipse::Swt::Widgets
             # Bug in Windows.  When the first column of a table does not
             # have an image and the user double clicks on the divider,
             # Windows packs the column but does not take into account
-            # the empty space left for the image.  The fix is to measure
-            # each items ourselves rather than letting Windows do it.
-            fix_pack = (phdn.attr_i_item).equal?(0) && !@first_column_image
+            # the empty space left for the image.  The fix is to pack
+            # the column explicitly rather than letting Windows do it.
+            # 
+            # NOTE:  This bug does not happen on Vista.
+            fix_pack = false
+            if (!OS::IsWinCE && OS::WIN32_VERSION < OS._version(6, 0))
+              fix_pack = (phdn.attr_i_item).equal?(0) && !@first_column_image
+            end
             if (!(column).nil? && (fix_pack || hooks(SWT::MeasureItem)))
               column.pack
               return LRESULT::ONE
@@ -7794,7 +7860,11 @@ module Org::Eclipse::Swt::Widgets
             OS._screen_to_client(self.attr_handle, pt)
             pinfo.attr_x = pt.attr_x
             pinfo.attr_y = pt.attr_y
-            if (!(OS._send_message(self.attr_handle, OS::LVM_SUBITEMHITTEST, 0, pinfo)).equal?(-1))
+            # Bug in Windows.  When LVM_SUBITEMHITTEST is used to hittest
+            # a point that is above the table, instead of returning -1 to
+            # indicate that the hittest failed, a negative index is returned.
+            # The fix is to consider any value that is negative a failure.
+            if (OS._send_message(self.attr_handle, OS::LVM_SUBITEMHITTEST, 0, pinfo) >= 0)
               item = __get_item(pinfo.attr_i_item)
               # long
               h_dc = OS._get_dc(self.attr_handle)
@@ -7905,7 +7975,11 @@ module Org::Eclipse::Swt::Widgets
           OS._screen_to_client(self.attr_handle, pt)
           pinfo.attr_x = pt.attr_x
           pinfo.attr_y = pt.attr_y
-          if (!(OS._send_message(self.attr_handle, OS::LVM_SUBITEMHITTEST, 0, pinfo)).equal?(-1))
+          # Bug in Windows.  When LVM_SUBITEMHITTEST is used to hittest
+          # a point that is above the table, instead of returning -1 to
+          # indicate that the hittest failed, a negative index is returned.
+          # The fix is to consider any value that is negative a failure.
+          if (OS._send_message(self.attr_handle, OS::LVM_SUBITEMHITTEST, 0, pinfo) >= 0)
             item = __get_item(pinfo.attr_i_item)
             # long
             h_dc = OS._get_dc(self.attr_handle)

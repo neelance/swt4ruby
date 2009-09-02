@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2008 IBM Corporation and others.
+ * Copyright (c) 2000, 2009 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -92,6 +92,7 @@ import org.eclipse.swt.graphics.*;
  * @see Shell
  * @see SWT
  * @see <a href="http://www.eclipse.org/swt/">Sample code and further information</a>
+ * @noextend This class is not intended to be subclassed by clients.
  */
 
 public class Decorations extends Canvas {
@@ -330,7 +331,7 @@ int compare (ImageData data1, ImageData data2, int width, int height, int depth)
 	return value1 < value2 ? -1 : 1;
 }
 
-Control computeTabGroup () {
+Widget computeTabGroup () {
 	return this;
 }
 
@@ -825,6 +826,7 @@ void saveFocus () {
 }
 
 void setBounds (int x, int y, int width, int height, int flags, boolean defer) {
+	swFlags = OS.SW_SHOWNOACTIVATE;
 	if (OS.IsWinCE) {
 		swFlags = OS.SW_RESTORE;
 	} else {
@@ -1325,7 +1327,7 @@ public void setText (String string) {
 
 public void setVisible (boolean visible) {
 	checkWidget ();
-	if (drawCount != 0) {
+	if (!getDrawing()) {
 		if (((state & HIDDEN) == 0) == visible) return;
 	} else {
 		if (visible == OS.IsWindowVisible (handle)) return;
@@ -1344,7 +1346,7 @@ public void setVisible (boolean visible) {
 				OS.CommandBar_DrawMenuBar (hwndCB, 0);
 			}
 		}
-		if (drawCount != 0) {
+		if (!getDrawing()) {
 			state &= ~HIDDEN;
 		} else {
 			if (OS.IsWinCE) {
@@ -1375,7 +1377,18 @@ public void setVisible (boolean visible) {
 				oldWidth = rect.width;
 				oldHeight = rect.height;
 			}
-			OS.UpdateWindow (handle);
+			/*
+			* Bug in Windows.  On Vista using the Classic theme, 
+			* when the window is hung and UpdateWindow() is called,
+			* nothing is drawn, and outstanding WM_PAINTs are cleared.
+			* This causes pixel corruption.  The fix is to avoid calling
+			* update on hung windows.  
+			*/
+			boolean update = true;
+			if (!OS.IsWinCE && OS.WIN32_VERSION >= OS.VERSION (6, 0) && !OS.IsAppThemed ()) {
+				update = !OS.IsHungAppWindow (handle);
+			}
+			if (update) OS.UpdateWindow (handle);
 		}
 	} else {
 		if (!OS.IsWinCE) {
@@ -1389,7 +1402,7 @@ public void setVisible (boolean visible) {
 				}
 			}
 		}
-		if (drawCount != 0) {
+		if (!getDrawing()) {
 			state |= HIDDEN;
 		} else {
 			OS.ShowWindow (handle, OS.SW_HIDE);

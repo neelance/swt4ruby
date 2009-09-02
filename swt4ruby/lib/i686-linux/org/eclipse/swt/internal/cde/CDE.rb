@@ -1,6 +1,6 @@
 require "rjava"
 
-# Copyright (c) 2000, 2004 IBM Corporation and others.
+# Copyright (c) 2000, 2008 IBM Corporation and others.
 # All rights reserved. This program and the accompanying materials
 # are made available under the terms of the Eclipse Public License v1.0
 # which accompanies this distribution, and is available at
@@ -47,6 +47,13 @@ module Org::Eclipse::Swt::Internal::Cde
       JNI.native_method :Java_org_eclipse_swt_internal_cde_CDE__1DtAppInitialize, [:pointer, :long, :int32, :int32, :int32, :long, :long], :int8
       typesig { [::Java::Int, ::Java::Int, ::Java::Int, Array.typed(::Java::Byte), Array.typed(::Java::Byte)] }
       # Natives
+      # 
+      # @param appContext cast=(XtAppContext)
+      # @param display cast=(Display *)
+      # @param topWiget cast=(Widget)
+      # @param appName cast=(char *)
+      # @param appClass cast=(char *)
+      # 
       # long
       # long
       # long
@@ -103,6 +110,7 @@ module Org::Eclipse::Swt::Internal::Cde
       
       JNI.native_method :Java_org_eclipse_swt_internal_cde_CDE__1DtDtsFileToDataType, [:pointer, :long, :long], :int32
       typesig { [Array.typed(::Java::Byte)] }
+      # @param fileName cast=(char *)
       # long
       def ___dt_dts_file_to_data_type(file_name)
         JNI.__send__(:Java_org_eclipse_swt_internal_cde_CDE__1DtDtsFileToDataType, JNI.env, self.jni_id, file_name.jni_id)
@@ -121,6 +129,7 @@ module Org::Eclipse::Swt::Internal::Cde
       
       JNI.native_method :Java_org_eclipse_swt_internal_cde_CDE__1DtDtsDataTypeIsAction, [:pointer, :long, :long], :int8
       typesig { [Array.typed(::Java::Byte)] }
+      # @param dataType cast=(char *)
       def ___dt_dts_data_type_is_action(data_type)
         JNI.__send__(:Java_org_eclipse_swt_internal_cde_CDE__1DtDtsDataTypeIsAction, JNI.env, self.jni_id, data_type.jni_id) != 0
       end
@@ -137,6 +146,10 @@ module Org::Eclipse::Swt::Internal::Cde
       
       JNI.native_method :Java_org_eclipse_swt_internal_cde_CDE__1DtDtsDataTypeToAttributeValue, [:pointer, :long, :long, :long, :long], :int32
       typesig { [Array.typed(::Java::Byte), Array.typed(::Java::Byte), Array.typed(::Java::Byte)] }
+      # @param dataType cast=(char *)
+      # @param attrName cast=(char *)
+      # @param optName cast=(char *)
+      # 
       # long
       def ___dt_dts_data_type_to_attribute_value(data_type, attr_name, opt_name)
         JNI.__send__(:Java_org_eclipse_swt_internal_cde_CDE__1DtDtsDataTypeToAttributeValue, JNI.env, self.jni_id, data_type.jni_id, attr_name.jni_id, opt_name.jni_id)
@@ -155,6 +168,7 @@ module Org::Eclipse::Swt::Internal::Cde
       
       JNI.native_method :Java_org_eclipse_swt_internal_cde_CDE__1DtDtsFreeDataType, [:pointer, :long, :int32], :void
       typesig { [::Java::Int] }
+      # @param dataType cast=(char *)
       # long
       def ___dt_dts_free_data_type(data_type)
         JNI.__send__(:Java_org_eclipse_swt_internal_cde_CDE__1DtDtsFreeDataType, JNI.env, self.jni_id, data_type.to_int)
@@ -173,6 +187,7 @@ module Org::Eclipse::Swt::Internal::Cde
       
       JNI.native_method :Java_org_eclipse_swt_internal_cde_CDE__1DtDtsFreeDataTypeNames, [:pointer, :long, :int32], :void
       typesig { [::Java::Int] }
+      # @param dataTypeList cast=(char **)
       # long
       def ___dt_dts_free_data_type_names(data_type_list)
         JNI.__send__(:Java_org_eclipse_swt_internal_cde_CDE__1DtDtsFreeDataTypeNames, JNI.env, self.jni_id, data_type_list.to_int)
@@ -191,6 +206,7 @@ module Org::Eclipse::Swt::Internal::Cde
       
       JNI.native_method :Java_org_eclipse_swt_internal_cde_CDE__1DtDtsFreeAttributeValue, [:pointer, :long, :int32], :void
       typesig { [::Java::Int] }
+      # @param attrValue cast=(char *)
       # long
       def ___dt_dts_free_attribute_value(attr_value)
         JNI.__send__(:Java_org_eclipse_swt_internal_cde_CDE__1DtDtsFreeAttributeValue, JNI.env, self.jni_id, attr_value.to_int)
@@ -209,6 +225,14 @@ module Org::Eclipse::Swt::Internal::Cde
       
       JNI.native_method :Java_org_eclipse_swt_internal_cde_CDE__1DtActionInvoke, [:pointer, :long, :int32, :long, :long, :int32, :long, :long, :long, :int32, :int32, :int32], :int64
       typesig { [::Java::Int, Array.typed(::Java::Byte), DtActionArg, ::Java::Int, Array.typed(::Java::Byte), Array.typed(::Java::Byte), Array.typed(::Java::Byte), ::Java::Int, ::Java::Int, ::Java::Int] }
+      # @param topWidget cast=(Widget)
+      # @param action cast=(char *)
+      # @param termOpts cast=(char *)
+      # @param execHost cast=(char *)
+      # @param contextDir cast=(char *)
+      # @param callback cast=(DtActionCallbackProc)
+      # @param clientData cast=(XtPointer)
+      # 
       # long
       # long
       # long
@@ -231,6 +255,7 @@ module Org::Eclipse::Swt::Internal::Cde
       
       JNI.native_method :Java_org_eclipse_swt_internal_cde_CDE__1topLevelShellWidgetClass, [:pointer, :long], :int32
       typesig { [] }
+      # @method flags=const
       # long
       def __top_level_shell_widget_class
         JNI.__send__(:Java_org_eclipse_swt_internal_cde_CDE__1topLevelShellWidgetClass, JNI.env, self.jni_id)
@@ -249,6 +274,12 @@ module Org::Eclipse::Swt::Internal::Cde
       
       JNI.native_method :Java_org_eclipse_swt_internal_cde_CDE__1XtAppCreateShell, [:pointer, :long, :long, :long, :int32, :int32, :long, :int32], :int32
       typesig { [Array.typed(::Java::Byte), Array.typed(::Java::Byte), ::Java::Int, ::Java::Int, Array.typed(::Java::Int), ::Java::Int] }
+      # @param appName cast=(String)
+      # @param appClass cast=(String)
+      # @param widgetClass cast=(WidgetClass)
+      # @param display cast=(Display *)
+      # @param argList cast=(ArgList)
+      # 
       # long
       # long
       # long
@@ -291,6 +322,15 @@ module Org::Eclipse::Swt::Internal::Cde
       
       JNI.native_method :Java_org_eclipse_swt_internal_cde_CDE__1XtDisplayInitialize, [:pointer, :long, :int32, :int32, :long, :long, :int32, :int32, :long, :int32], :void
       typesig { [::Java::Int, ::Java::Int, Array.typed(::Java::Byte), Array.typed(::Java::Byte), ::Java::Int, ::Java::Int, Array.typed(::Java::Int), ::Java::Int] }
+      # @param app_context cast=(XtAppContext)
+      # @param display cast=(Display *)
+      # @param appName cast=(String)
+      # @param appClass cast=(String)
+      # @param options cast=(XrmOptionDescRec *)
+      # @param num_options cast=(Cardinal)
+      # @param argc cast=(int *)
+      # @param argv cast=(String *)
+      # 
       # long
       # long
       # long
@@ -315,6 +355,7 @@ module Org::Eclipse::Swt::Internal::Cde
       
       JNI.native_method :Java_org_eclipse_swt_internal_cde_CDE__1XtRealizeWidget, [:pointer, :long, :int32], :void
       typesig { [::Java::Int] }
+      # @param widget cast=(Widget)
       # long
       def ___xt_realize_widget(widget)
         JNI.__send__(:Java_org_eclipse_swt_internal_cde_CDE__1XtRealizeWidget, JNI.env, self.jni_id, widget.to_int)
@@ -333,6 +374,7 @@ module Org::Eclipse::Swt::Internal::Cde
       
       JNI.native_method :Java_org_eclipse_swt_internal_cde_CDE__1XtResizeWidget, [:pointer, :long, :int32, :int32, :int32, :int32], :void
       typesig { [::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int] }
+      # @param widget cast=(Widget)
       # long
       def ___xt_resize_widget(widget, width, height, border_width)
         JNI.__send__(:Java_org_eclipse_swt_internal_cde_CDE__1XtResizeWidget, JNI.env, self.jni_id, widget.to_int, width.to_int, height.to_int, border_width.to_int)
@@ -351,6 +393,7 @@ module Org::Eclipse::Swt::Internal::Cde
       
       JNI.native_method :Java_org_eclipse_swt_internal_cde_CDE__1XtSetMappedWhenManaged, [:pointer, :long, :int32, :int8], :void
       typesig { [::Java::Int, ::Java::Boolean] }
+      # @param widget cast=(Widget)
       # long
       def ___xt_set_mapped_when_managed(widget, flag)
         JNI.__send__(:Java_org_eclipse_swt_internal_cde_CDE__1XtSetMappedWhenManaged, JNI.env, self.jni_id, widget.to_int, flag ? 1 : 0)

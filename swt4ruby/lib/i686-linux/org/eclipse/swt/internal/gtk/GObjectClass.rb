@@ -1,6 +1,6 @@
 require "rjava"
 
-# Copyright (c) 2000, 2006 IBM Corporation and others. All rights reserved.
+# Copyright (c) 2000, 2008 IBM Corporation and others. All rights reserved.
 # The contents of this file are made available under the terms
 # of the GNU Lesser General Public License (LGPL) Version 2.1 that
 # accompanies this distribution (lgpl-v21.txt).  The LGPL is also
@@ -23,6 +23,7 @@ module Org::Eclipse::Swt::Internal::Gtk
   class GObjectClass 
     include_class_members GObjectClassImports
     
+    # @field cast=(GObject *(*)())
     # long
     attr_accessor :constructor
     alias_method :attr_constructor, :constructor
@@ -30,6 +31,7 @@ module Org::Eclipse::Swt::Internal::Gtk
     alias_method :attr_constructor=, :constructor=
     undef_method :constructor=
     
+    # @field cast=(void (*)())
     # long
     attr_accessor :set_property
     alias_method :attr_set_property, :set_property
@@ -37,6 +39,7 @@ module Org::Eclipse::Swt::Internal::Gtk
     alias_method :attr_set_property=, :set_property=
     undef_method :set_property=
     
+    # @field cast=(void (*)())
     # long
     attr_accessor :get_property
     alias_method :attr_get_property, :get_property
@@ -44,6 +47,7 @@ module Org::Eclipse::Swt::Internal::Gtk
     alias_method :attr_get_property=, :get_property=
     undef_method :get_property=
     
+    # @field cast=(void (*)())
     # long
     attr_accessor :dispose
     alias_method :attr_dispose, :dispose
@@ -51,6 +55,7 @@ module Org::Eclipse::Swt::Internal::Gtk
     alias_method :attr_dispose=, :dispose=
     undef_method :dispose=
     
+    # @field cast=(void (*)())
     # long
     attr_accessor :finalize
     alias_method :attr_finalize, :finalize
@@ -58,6 +63,7 @@ module Org::Eclipse::Swt::Internal::Gtk
     alias_method :attr_finalize=, :finalize=
     undef_method :finalize=
     
+    # @field cast=(void (*)())
     # long
     attr_accessor :dispatch_properties_changed
     alias_method :attr_dispatch_properties_changed, :dispatch_properties_changed
@@ -65,6 +71,7 @@ module Org::Eclipse::Swt::Internal::Gtk
     alias_method :attr_dispatch_properties_changed=, :dispatch_properties_changed=
     undef_method :dispatch_properties_changed=
     
+    # @field cast=(void (*)())
     # long
     attr_accessor :notify
     alias_method :attr_notify, :notify

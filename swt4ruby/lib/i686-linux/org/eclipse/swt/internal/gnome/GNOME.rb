@@ -1,6 +1,6 @@
 require "rjava"
 
-# Copyright (c) 2000, 2006 IBM Corporation and others. All rights reserved.
+# Copyright (c) 2000, 2008 IBM Corporation and others. All rights reserved.
 # The contents of this file are made available under the terms
 # of the GNU Lesser General Public License (LGPL) Version 2.1 that
 # accompanies this distribution (lgpl-v21.txt).  The LGPL is also
@@ -63,6 +63,7 @@ module Org::Eclipse::Swt::Internal::Gnome
       JNI.native_method :Java_org_eclipse_swt_internal_gnome_GNOME__1g_1free, [:pointer, :long, :int32], :void
       typesig { [::Java::Int] }
       # Natives
+      # @param mem cast=(gpointer)
       # long
       def __g_free(mem)
         JNI.__send__(:Java_org_eclipse_swt_internal_gnome_GNOME__1g_1free, JNI.env, self.jni_id, mem.to_int)
@@ -81,6 +82,9 @@ module Org::Eclipse::Swt::Internal::Gnome
       
       JNI.native_method :Java_org_eclipse_swt_internal_gnome_GNOME__1g_1list_1append, [:pointer, :long, :int32, :int32], :int32
       typesig { [::Java::Int, ::Java::Int] }
+      # @param list cast=(GList *)
+      # @param data cast=(gpointer)
+      # 
       # long
       # long
       # long
@@ -103,6 +107,7 @@ module Org::Eclipse::Swt::Internal::Gnome
       
       JNI.native_method :Java_org_eclipse_swt_internal_gnome_GNOME__1g_1list_1free, [:pointer, :long, :int32], :void
       typesig { [::Java::Int] }
+      # @param list cast=(GList *)
       # long
       def __g_list_free(list)
         JNI.__send__(:Java_org_eclipse_swt_internal_gnome_GNOME__1g_1list_1free, JNI.env, self.jni_id, list.to_int)
@@ -141,6 +146,7 @@ module Org::Eclipse::Swt::Internal::Gnome
       
       JNI.native_method :Java_org_eclipse_swt_internal_gnome_GNOME__1g_1object_1unref, [:pointer, :long, :int32], :void
       typesig { [::Java::Int] }
+      # @param object cast=(gpointer)
       # long
       def __g_object_unref(object)
         JNI.__send__(:Java_org_eclipse_swt_internal_gnome_GNOME__1g_1object_1unref, JNI.env, self.jni_id, object.to_int)
@@ -159,6 +165,15 @@ module Org::Eclipse::Swt::Internal::Gnome
       
       JNI.native_method :Java_org_eclipse_swt_internal_gnome_GNOME__1gnome_1icon_1lookup, [:pointer, :long, :int32, :int32, :long, :long, :int32, :long, :int32, :long], :int32
       typesig { [::Java::Int, ::Java::Int, Array.typed(::Java::Byte), Array.typed(::Java::Byte), ::Java::Int, Array.typed(::Java::Byte), ::Java::Int, Array.typed(::Java::Int)] }
+      # @param icon_theme cast=(GnomeIconTheme *)
+      # @param thumbnail_factory cast=(GnomeThumbnailFactory *)
+      # @param file_uri cast=(const char *)
+      # @param custom_icon cast=(const char *)
+      # @param file_info cast=(GnomeVFSFileInfo *)
+      # @param mime_type cast=(const char *)
+      # @param flags cast=(GnomeIconLookupFlags)
+      # @param result cast=(GnomeIconLookupResultFlags *)
+      # 
       # long
       # long
       # long
@@ -183,6 +198,10 @@ module Org::Eclipse::Swt::Internal::Gnome
       
       JNI.native_method :Java_org_eclipse_swt_internal_gnome_GNOME__1gnome_1icon_1theme_1lookup_1icon, [:pointer, :long, :int32, :int32, :int32, :long, :long], :int32
       typesig { [::Java::Int, ::Java::Int, ::Java::Int, Array.typed(::Java::Int), Array.typed(::Java::Int)] }
+      # @param theme cast=(GnomeIconTheme *)
+      # @param icon_name cast=(const char *)
+      # @param icon_data cast=(const GnomeIconData **)
+      # 
       # long
       # long
       # long
@@ -259,6 +278,7 @@ module Org::Eclipse::Swt::Internal::Gnome
       
       JNI.native_method :Java_org_eclipse_swt_internal_gnome_GNOME__1gnome_1vfs_1make_1uri_1from_1input, [:pointer, :long, :long], :int32
       typesig { [Array.typed(::Java::Byte)] }
+      # @param uri cast=(const char *)
       # long
       def __gnome_vfs_make_uri_from_input(uri)
         JNI.__send__(:Java_org_eclipse_swt_internal_gnome_GNOME__1gnome_1vfs_1make_1uri_1from_1input, JNI.env, self.jni_id, uri.jni_id)
@@ -277,6 +297,9 @@ module Org::Eclipse::Swt::Internal::Gnome
       
       JNI.native_method :Java_org_eclipse_swt_internal_gnome_GNOME__1gnome_1vfs_1make_1uri_1from_1input_1with_1dirs, [:pointer, :long, :long, :int32], :int32
       typesig { [Array.typed(::Java::Byte), ::Java::Int] }
+      # @method flags=dynamic
+      # @param uri cast=(const char *)
+      # 
       # long
       def __gnome_vfs_make_uri_from_input_with_dirs(uri, dirs)
         JNI.__send__(:Java_org_eclipse_swt_internal_gnome_GNOME__1gnome_1vfs_1make_1uri_1from_1input_1with_1dirs, JNI.env, self.jni_id, uri.jni_id, dirs.to_int)
@@ -295,6 +318,7 @@ module Org::Eclipse::Swt::Internal::Gnome
       
       JNI.native_method :Java_org_eclipse_swt_internal_gnome_GNOME__1gnome_1vfs_1mime_1application_1free, [:pointer, :long, :int32], :void
       typesig { [::Java::Int] }
+      # @param application cast=(GnomeVFSMimeApplication *)
       # long
       def __gnome_vfs_mime_application_free(application)
         JNI.__send__(:Java_org_eclipse_swt_internal_gnome_GNOME__1gnome_1vfs_1mime_1application_1free, JNI.env, self.jni_id, application.to_int)
@@ -313,6 +337,10 @@ module Org::Eclipse::Swt::Internal::Gnome
       
       JNI.native_method :Java_org_eclipse_swt_internal_gnome_GNOME__1gnome_1vfs_1mime_1application_1launch, [:pointer, :long, :int32, :int32], :int32
       typesig { [::Java::Int, ::Java::Int] }
+      # @method flags=dynamic
+      # @param application cast=(GnomeVFSMimeApplication *)
+      # @param uris cast=(GList *)
+      # 
       # long
       # long
       def __gnome_vfs_mime_application_launch(application, uris)
@@ -333,6 +361,7 @@ module Org::Eclipse::Swt::Internal::Gnome
       
       JNI.native_method :Java_org_eclipse_swt_internal_gnome_GNOME__1gnome_1vfs_1mime_1extensions_1list_1free, [:pointer, :long, :int32], :void
       typesig { [::Java::Int] }
+      # @param list cast=(GList *)
       # long
       def __gnome_vfs_mime_extensions_list_free(list)
         JNI.__send__(:Java_org_eclipse_swt_internal_gnome_GNOME__1gnome_1vfs_1mime_1extensions_1list_1free, JNI.env, self.jni_id, list.to_int)
@@ -351,6 +380,7 @@ module Org::Eclipse::Swt::Internal::Gnome
       
       JNI.native_method :Java_org_eclipse_swt_internal_gnome_GNOME__1gnome_1vfs_1mime_1get_1default_1application, [:pointer, :long, :long], :int32
       typesig { [Array.typed(::Java::Byte)] }
+      # @param mimeType cast=(const char *)
       # long
       def __gnome_vfs_mime_get_default_application(mime_type)
         JNI.__send__(:Java_org_eclipse_swt_internal_gnome_GNOME__1gnome_1vfs_1mime_1get_1default_1application, JNI.env, self.jni_id, mime_type.jni_id)
@@ -369,6 +399,7 @@ module Org::Eclipse::Swt::Internal::Gnome
       
       JNI.native_method :Java_org_eclipse_swt_internal_gnome_GNOME__1gnome_1vfs_1mime_1get_1extensions_1list, [:pointer, :long, :int32], :int32
       typesig { [::Java::Int] }
+      # @param mime_type cast=(const char *)
       # long
       # long
       def __gnome_vfs_mime_get_extensions_list(mime_type)
@@ -389,6 +420,7 @@ module Org::Eclipse::Swt::Internal::Gnome
       
       JNI.native_method :Java_org_eclipse_swt_internal_gnome_GNOME__1gnome_1vfs_1mime_1registered_1mime_1type_1list_1free, [:pointer, :long, :int32], :void
       typesig { [::Java::Int] }
+      # @param list cast=(GList *)
       # long
       def __gnome_vfs_mime_registered_mime_type_list_free(list)
         JNI.__send__(:Java_org_eclipse_swt_internal_gnome_GNOME__1gnome_1vfs_1mime_1registered_1mime_1type_1list_1free, JNI.env, self.jni_id, list.to_int)
@@ -407,6 +439,7 @@ module Org::Eclipse::Swt::Internal::Gnome
       
       JNI.native_method :Java_org_eclipse_swt_internal_gnome_GNOME__1gnome_1vfs_1mime_1type_1from_1name, [:pointer, :long, :long], :int32
       typesig { [Array.typed(::Java::Byte)] }
+      # @param file cast=(const char *)
       # long
       def __gnome_vfs_mime_type_from_name(file)
         JNI.__send__(:Java_org_eclipse_swt_internal_gnome_GNOME__1gnome_1vfs_1mime_1type_1from_1name, JNI.env, self.jni_id, file.jni_id)
@@ -425,6 +458,9 @@ module Org::Eclipse::Swt::Internal::Gnome
       
       JNI.native_method :Java_org_eclipse_swt_internal_gnome_GNOME__1gnome_1vfs_1url_1show, [:pointer, :long, :int32], :int32
       typesig { [::Java::Int] }
+      # @method flags=dynamic
+      # @param url cast=(const char *)
+      # 
       # long
       def __gnome_vfs_url_show(url)
         JNI.__send__(:Java_org_eclipse_swt_internal_gnome_GNOME__1gnome_1vfs_1url_1show, JNI.env, self.jni_id, url.to_int)
@@ -443,6 +479,10 @@ module Org::Eclipse::Swt::Internal::Gnome
       
       JNI.native_method :Java_org_eclipse_swt_internal_gnome_GNOME_memmove, [:pointer, :long, :long, :int32, :int32], :void
       typesig { [GnomeVFSMimeApplication, ::Java::Int, ::Java::Int] }
+      # @param dest cast=(void *),flags=no_in
+      # @param src cast=(const void *)
+      # @param count cast=(size_t)
+      # 
       # long
       # long
       def memmove(dest, src, count)

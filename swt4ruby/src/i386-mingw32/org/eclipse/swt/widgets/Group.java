@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2008 IBM Corporation and others.
+ * Copyright (c) 2000, 2009 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -37,6 +37,7 @@ import org.eclipse.swt.graphics.*;
  * 
  * @see <a href="http://www.eclipse.org/swt/examples.php">SWT Example: ControlExample</a>
  * @see <a href="http://www.eclipse.org/swt/">Sample code and further information</a>
+ * @noextend This class is not intended to be subclassed by clients.
  */
 
 public class Group extends Composite {
@@ -201,7 +202,7 @@ public Rectangle computeTrim (int x, int y, int width, int height) {
 	trim.x -= CLIENT_INSET;
 	trim.y -= tm.tmHeight + offsetY;
 	trim.width += CLIENT_INSET * 2;
-	trim.height += tm.tmHeight + CLIENT_INSET;
+	trim.height += tm.tmHeight + CLIENT_INSET + offsetY;
 	return trim;
 }
 
@@ -289,7 +290,25 @@ boolean mnemonicMatch (char key) {
 	return Character.toUpperCase (key) == Character.toUpperCase (mnemonic);
 }
 
-void printWidget (int /*long*/ hwnd, GC gc) {
+void printWidget (int /*long*/ hwnd, int /*long*/ hdc, GC gc) {
+	/*
+	* Bug in Windows.  For some reason, PrintWindow()
+	* returns success but does nothing when it is called
+	* on a printer.  The fix is to just go directly to
+	* WM_PRINT in this case.
+	*/
+	boolean success = false;
+	if (!(OS.GetDeviceCaps(gc.handle, OS.TECHNOLOGY) == OS.DT_RASPRINTER)) {
+		int bits = OS.GetWindowLong (hwnd, OS.GWL_STYLE);
+		if ((bits & OS.WS_VISIBLE) == 0) {
+			OS.DefWindowProc (hwnd, OS.WM_SETREDRAW, 1, 0);
+		}
+		success = OS.PrintWindow (hwnd, hdc, 0);
+		if ((bits & OS.WS_VISIBLE) == 0) {
+			OS.DefWindowProc (hwnd, OS.WM_SETREDRAW, 0, 0);
+		}
+	}
+	
 	/*
 	* Bug in Windows.  For some reason, PrintWindow() fails
 	* when it is called on a push button.  The fix is to
@@ -297,8 +316,7 @@ void printWidget (int /*long*/ hwnd, GC gc) {
 	* that WM_PRINT cannot be used all the time because it
 	* fails for browser controls when the browser has focus.
 	*/
-	int /*long*/ hDC = gc.handle;
-	if (!OS.PrintWindow (hwnd, hDC, 0)) {
+	if (!success) {
 		/*
 		* Bug in Windows.  For some reason, WM_PRINT when called
 		* with PRF_CHILDREN will not draw the tool bar divider
@@ -307,17 +325,31 @@ void printWidget (int /*long*/ hwnd, GC gc) {
 		* the children, drawing each one.
 		*/
 		int flags = OS.PRF_CLIENT | OS.PRF_NONCLIENT | OS.PRF_ERASEBKGND;
-		OS.SendMessage (hwnd, OS.WM_PRINT, hDC, flags);
-		int nSavedDC = OS.SaveDC (hDC);
+		OS.SendMessage (hwnd, OS.WM_PRINT, hdc, flags);
+		int nSavedDC = OS.SaveDC (hdc);
 		Control [] children = _getChildren ();
 		Rectangle rect = getBounds ();
-		OS.IntersectClipRect (hDC, 0, 0, rect.width, rect.height);
+		OS.IntersectClipRect (hdc, 0, 0, rect.width, rect.height);
 		for (int i=children.length - 1; i>=0; --i) {
 			Point location = children [i].getLocation ();
-			OS.SetWindowOrgEx (hDC, -location.x, -location.y, null);
-			children [i].print (gc);
+			int graphicsMode = OS.GetGraphicsMode(hdc);
+			if (graphicsMode == OS.GM_ADVANCED) {
+				float [] lpXform = {1, 0, 0, 1, location.x, location.y};
+				OS.ModifyWorldTransform(hdc, lpXform, OS.MWT_LEFTMULTIPLY);
+			} else {
+				OS.SetWindowOrgEx (hdc, -location.x, -location.y, null);
+			}
+			int /*long*/ topHandle = children [i].topHandle();
+			int bits = OS.GetWindowLong (topHandle, OS.GWL_STYLE);
+			if ((bits & OS.WS_VISIBLE) != 0) {
+				children [i].printWidget (topHandle, hdc, gc);
+			}
+			if (graphicsMode == OS.GM_ADVANCED) {
+				float [] lpXform = {1, 0, 0, 1, -location.x, -location.y};
+				OS.ModifyWorldTransform(hdc, lpXform, OS.MWT_LEFTMULTIPLY);
+			}
 		}
-		OS.RestoreDC (hDC, nSavedDC);
+		OS.RestoreDC (hdc, nSavedDC);
 	}
 }
 

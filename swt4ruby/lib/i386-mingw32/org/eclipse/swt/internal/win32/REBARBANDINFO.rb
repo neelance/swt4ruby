@@ -1,6 +1,6 @@
 require "rjava"
 
-# Copyright (c) 2000, 2006 IBM Corporation and others.
+# Copyright (c) 2000, 2008 IBM Corporation and others.
 # All rights reserved. This program and the accompanying materials
 # are made available under the terms of the Eclipse Public License v1.0
 # which accompanies this distribution, and is available at
@@ -49,6 +49,7 @@ module Org::Eclipse::Swt::Internal::Win32
     alias_method :attr_clr_back=, :clr_back=
     undef_method :clr_back=
     
+    # @field cast=(LPTSTR)
     # long
     attr_accessor :lp_text
     alias_method :attr_lp_text, :lp_text
@@ -68,6 +69,7 @@ module Org::Eclipse::Swt::Internal::Win32
     alias_method :attr_i_image=, :i_image=
     undef_method :i_image=
     
+    # @field cast=(HWND)
     # long
     attr_accessor :hwnd_child
     alias_method :attr_hwnd_child, :hwnd_child
@@ -93,6 +95,7 @@ module Org::Eclipse::Swt::Internal::Win32
     alias_method :attr_cx=, :cx=
     undef_method :cx=
     
+    # @field cast=(HBITMAP)
     # long
     attr_accessor :hbm_back
     alias_method :attr_hbm_back, :hbm_back
@@ -137,6 +140,7 @@ module Org::Eclipse::Swt::Internal::Win32
     alias_method :attr_l_param=, :l_param=
     undef_method :l_param=
     
+    # @field flags=no_wince
     attr_accessor :cx_header
     alias_method :attr_cx_header, :cx_header
     undef_method :cx_header

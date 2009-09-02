@@ -1,6 +1,6 @@
 require "rjava"
 
-# Copyright (c) 2000, 2007 IBM Corporation and others. All rights reserved.
+# Copyright (c) 2000, 2008 IBM Corporation and others. All rights reserved.
 # The contents of this file are made available under the terms
 # of the GNU Lesser General Public License (LGPL) Version 2.1 that
 # accompanies this distribution (lgpl-v21.txt).  The LGPL is also
@@ -23,18 +23,21 @@ module Org::Eclipse::Swt::Internal::Gtk
   class PangoAttrColor < PangoAttrColorImports.const_get :PangoAttribute
     include_class_members PangoAttrColorImports
     
+    # @field accessor=color.red
     attr_accessor :color_red
     alias_method :attr_color_red, :color_red
     undef_method :color_red
     alias_method :attr_color_red=, :color_red=
     undef_method :color_red=
     
+    # @field accessor=color.green
     attr_accessor :color_green
     alias_method :attr_color_green, :color_green
     undef_method :color_green
     alias_method :attr_color_green=, :color_green=
     undef_method :color_green=
     
+    # @field accessor=color.blue
     attr_accessor :color_blue
     alias_method :attr_color_blue, :color_blue
     undef_method :color_blue

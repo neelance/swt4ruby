@@ -1,6 +1,6 @@
 require "rjava"
 
-# Copyright (c) 2000, 2008 IBM Corporation and others.
+# Copyright (c) 2000, 2009 IBM Corporation and others.
 # All rights reserved. This program and the accompanying materials
 # are made available under the terms of the Eclipse Public License v1.0
 # which accompanies this distribution, and is available at
@@ -38,6 +38,7 @@ module Org::Eclipse::Swt::Widgets
   # @see <a href="http://www.eclipse.org/swt/">Sample code and further information</a>
   # 
   # @since 3.0
+  # @noextend This class is not intended to be subclassed by clients.
   class TrayItem < TrayItemImports.const_get :Item
     include_class_members TrayItemImports
     
@@ -198,52 +199,61 @@ module Org::Eclipse::Swt::Widgets
     typesig { [::Java::Int] }
     def create_handle(index)
       self.attr_state |= HANDLE
-      self.attr_handle = OS.gtk_plug_new(0)
-      if ((self.attr_handle).equal?(0))
-        error(SWT::ERROR_NO_HANDLES)
+      if (OS::GTK_VERSION >= OS._version(2, 10, 0))
+        self.attr_handle = OS.gtk_status_icon_new
+        if ((self.attr_handle).equal?(0))
+          error(SWT::ERROR_NO_HANDLES)
+        end
+        @image_handle = OS.gtk_image_new
+        OS.gtk_status_icon_set_visible(self.attr_handle, true)
+      else
+        self.attr_handle = OS.gtk_plug_new(0)
+        if ((self.attr_handle).equal?(0))
+          error(SWT::ERROR_NO_HANDLES)
+        end
+        @image_handle = OS.gtk_image_new
+        if ((@image_handle).equal?(0))
+          error(SWT::ERROR_NO_HANDLES)
+        end
+        OS.gtk_container_add(self.attr_handle, @image_handle)
+        OS.gtk_widget_show(self.attr_handle)
+        OS.gtk_widget_show(@image_handle)
+        # int
+        id = OS.gtk_plug_get_id(self.attr_handle)
+        monitor = 0
+        # int
+        screen = OS.gdk_screen_get_default
+        if (!(screen).equal?(0))
+          monitor = OS.gdk_screen_get_number(screen)
+        end
+        tray_buffer = Converter.wcs_to_mbcs(nil, "_NET_SYSTEM_TRAY_S" + RJava.cast_to_string(monitor), true)
+        # int
+        tray_atom = OS.gdk_atom_intern(tray_buffer, true)
+        # int
+        x_tray_atom = OS.gdk_x11_atom_to_xatom(tray_atom)
+        # int
+        x_display = OS._gdk_display
+        # int
+        tray_window = OS._xget_selection_owner(x_display, x_tray_atom)
+        message_buffer = Converter.wcs_to_mbcs(nil, "_NET_SYSTEM_TRAY_OPCODE", true)
+        # int
+        message_atom = OS.gdk_atom_intern(message_buffer, true)
+        # int
+        x_message_atom = OS.gdk_x11_atom_to_xatom(message_atom)
+        event = XClientMessageEvent.new
+        event.attr_type = OS::ClientMessage
+        event.attr_window = tray_window
+        event.attr_message_type = x_message_atom
+        event.attr_format = 32
+        event.attr_data[0] = OS::GDK_CURRENT_TIME
+        event.attr_data[1] = OS::SYSTEM_TRAY_REQUEST_DOCK
+        event.attr_data[2] = id
+        # int
+        client_event = OS.g_malloc(XClientMessageEvent.attr_sizeof)
+        OS.memmove(client_event, event, XClientMessageEvent.attr_sizeof)
+        OS._xsend_event(x_display, tray_window, false, OS::NoEventMask, client_event)
+        OS.g_free(client_event)
       end
-      @image_handle = OS.gtk_image_new
-      if ((@image_handle).equal?(0))
-        error(SWT::ERROR_NO_HANDLES)
-      end
-      OS.gtk_container_add(self.attr_handle, @image_handle)
-      OS.gtk_widget_show(self.attr_handle)
-      OS.gtk_widget_show(@image_handle)
-      # int
-      id = OS.gtk_plug_get_id(self.attr_handle)
-      monitor = 0
-      # int
-      screen = OS.gdk_screen_get_default
-      if (!(screen).equal?(0))
-        monitor = OS.gdk_screen_get_number(screen)
-      end
-      tray_buffer = Converter.wcs_to_mbcs(nil, "_NET_SYSTEM_TRAY_S" + RJava.cast_to_string(monitor), true)
-      # int
-      tray_atom = OS.gdk_atom_intern(tray_buffer, true)
-      # int
-      x_tray_atom = OS.gdk_x11_atom_to_xatom(tray_atom)
-      # int
-      x_display = OS._gdk_display
-      # int
-      tray_window = OS._xget_selection_owner(x_display, x_tray_atom)
-      message_buffer = Converter.wcs_to_mbcs(nil, "_NET_SYSTEM_TRAY_OPCODE", true)
-      # int
-      message_atom = OS.gdk_atom_intern(message_buffer, true)
-      # int
-      x_message_atom = OS.gdk_x11_atom_to_xatom(message_atom)
-      event = XClientMessageEvent.new
-      event.attr_type = OS::ClientMessage
-      event.attr_window = tray_window
-      event.attr_message_type = x_message_atom
-      event.attr_format = 32
-      event.attr_data[0] = OS::GDK_CURRENT_TIME
-      event.attr_data[1] = OS::SYSTEM_TRAY_REQUEST_DOCK
-      event.attr_data[2] = id
-      # int
-      client_event = OS.g_malloc(XClientMessageEvent.attr_sizeof)
-      OS.memmove(client_event, event, XClientMessageEvent.attr_sizeof)
-      OS._xsend_event(x_display, tray_window, false, OS::NoEventMask, client_event)
-      OS.g_free(client_event)
     end
     
     typesig { [] }
@@ -304,6 +314,35 @@ module Org::Eclipse::Swt::Widgets
     def get_tool_tip_text
       check_widget
       return @tool_tip_text
+    end
+    
+    typesig { [::Java::Long] }
+    # int
+    # int
+    def gtk_activate(widget)
+      post_event(SWT::Selection)
+      # Feature in GTK. GTK will generate a single-click event before sending
+      # a double-click event. To know when to send a DefaultSelection, look for
+      # the single-click as the current event and for the double-click in the
+      # event queue.
+      # 
+      # int
+      next_event = OS.gdk_event_peek
+      if (!(next_event).equal?(0))
+        next_event_type = OS._gdk_event_type(next_event)
+        # int
+        curr_event = OS.gtk_get_current_event
+        curr_event_type = 0
+        if (!(curr_event).equal?(0))
+          curr_event_type = OS._gdk_event_type(curr_event)
+          OS.gdk_event_free(curr_event)
+        end
+        OS.gdk_event_free(next_event)
+        if ((curr_event_type).equal?(OS::GDK_BUTTON_PRESS) && (next_event_type).equal?(OS::GDK_2BUTTON_PRESS))
+          post_event(SWT::DefaultSelection)
+        end
+      end
+      return 0
     end
     
     typesig { [::Java::Long, ::Java::Long] }
@@ -373,12 +412,27 @@ module Org::Eclipse::Swt::Widgets
       return 0
     end
     
+    typesig { [::Java::Long, ::Java::Long, ::Java::Long] }
+    # int
+    # int
+    # int
+    # int
+    def gtk_status_icon_popup_menu(widget, button, activate_time)
+      send_event(SWT::MenuDetect)
+      return 0
+    end
+    
     typesig { [] }
     def hook_events
-      event_mask = OS::GDK_BUTTON_PRESS_MASK
-      OS.gtk_widget_add_events(self.attr_handle, event_mask)
-      OS.g_signal_connect_closure_by_id(self.attr_handle, self.attr_display.attr_signal_ids[BUTTON_PRESS_EVENT], 0, self.attr_display.attr_closures[BUTTON_PRESS_EVENT], false)
-      OS.g_signal_connect_closure_by_id(@image_handle, self.attr_display.attr_signal_ids[SIZE_ALLOCATE], 0, self.attr_display.attr_closures[SIZE_ALLOCATE], false)
+      if (OS::GTK_VERSION >= OS._version(2, 10, 0))
+        OS.g_signal_connect_closure(self.attr_handle, OS.attr_activate, self.attr_display.attr_closures[ACTIVATE], false)
+        OS.g_signal_connect_closure(self.attr_handle, OS.attr_popup_menu, self.attr_display.attr_closures[STATUS_ICON_POPUP_MENU], false)
+      else
+        event_mask = OS::GDK_BUTTON_PRESS_MASK
+        OS.gtk_widget_add_events(self.attr_handle, event_mask)
+        OS.g_signal_connect_closure_by_id(self.attr_handle, self.attr_display.attr_signal_ids[BUTTON_PRESS_EVENT], 0, self.attr_display.attr_closures[BUTTON_PRESS_EVENT], false)
+        OS.g_signal_connect_closure_by_id(@image_handle, self.attr_display.attr_signal_ids[SIZE_ALLOCATE], 0, self.attr_display.attr_closures[SIZE_ALLOCATE], false)
+      end
     end
     
     typesig { [] }
@@ -393,6 +447,9 @@ module Org::Eclipse::Swt::Widgets
     # </ul>
     def get_visible
       check_widget
+      if (OS::GTK_VERSION >= OS._version(2, 10, 0))
+        return OS.gtk_status_icon_get_visible(self.attr_handle)
+      end
       return OS._gtk_widget_visible(self.attr_handle)
     end
     
@@ -405,7 +462,11 @@ module Org::Eclipse::Swt::Widgets
     typesig { [] }
     def release_handle
       if (!(self.attr_handle).equal?(0))
-        OS.gtk_widget_destroy(self.attr_handle)
+        if (OS::GTK_VERSION >= OS._version(2, 10, 0))
+          OS.g_object_unref(self.attr_handle)
+        else
+          OS.gtk_widget_destroy(self.attr_handle)
+        end
       end
       self.attr_handle = @image_handle = 0
       super
@@ -503,8 +564,6 @@ module Org::Eclipse::Swt::Widgets
       end
       self.attr_image = image
       if (!(image).nil?)
-        rect = image.get_bounds
-        OS.gtk_widget_set_size_request(self.attr_handle, rect.attr_width, rect.attr_height)
         if ((@image_list).nil?)
           @image_list = ImageList.new
         end
@@ -516,12 +575,24 @@ module Org::Eclipse::Swt::Widgets
         end
         # int
         pixbuf = @image_list.get_pixbuf(image_index)
-        OS.gtk_image_set_from_pixbuf(@image_handle, pixbuf)
-        OS.gtk_widget_show(@image_handle)
+        if (OS::GTK_VERSION >= OS._version(2, 10, 0))
+          OS.gtk_status_icon_set_from_pixbuf(self.attr_handle, pixbuf)
+          OS.gtk_status_icon_set_visible(self.attr_handle, true)
+        else
+          rect = image.get_bounds
+          OS.gtk_widget_set_size_request(self.attr_handle, rect.attr_width, rect.attr_height)
+          OS.gtk_image_set_from_pixbuf(@image_handle, pixbuf)
+          OS.gtk_widget_show(@image_handle)
+        end
       else
         OS.gtk_widget_set_size_request(self.attr_handle, 1, 1)
-        OS.gtk_image_set_from_pixbuf(@image_handle, 0)
-        OS.gtk_widget_hide(@image_handle)
+        if (OS::GTK_VERSION >= OS._version(2, 10, 0))
+          OS.gtk_status_icon_set_from_pixbuf(self.attr_handle, 0)
+          OS.gtk_status_icon_set_visible(self.attr_handle, false)
+        else
+          OS.gtk_image_set_from_pixbuf(@image_handle, 0)
+          OS.gtk_widget_hide(@image_handle)
+        end
       end
     end
     
@@ -552,9 +623,18 @@ module Org::Eclipse::Swt::Widgets
     
     typesig { [String] }
     # Sets the receiver's tool tip text to the argument, which
-    # may be null indicating that no tool tip text should be shown.
+    # may be null indicating that the default tool tip for the
+    # control will be shown. For a control that has a default
+    # tool tip, such as the Tree control on Windows, setting
+    # the tool tip text to an empty string replaces the default,
+    # causing no tool tip text to be shown.
+    # <p>
+    # The mnemonic indicator (character '&amp;') is not displayed in a tool tip.
+    # To display a single '&amp;' in the tool tip, the character '&amp;' can be
+    # escaped by doubling it in the string.
+    # </p>
     # 
-    # @param value the new tool tip text (or null)
+    # @param string the new tool tip text (or null)
     # 
     # @exception SWTException <ul>
     # <li>ERROR_WIDGET_DISPOSED - if the receiver has been disposed</li>
@@ -575,7 +655,11 @@ module Org::Eclipse::Swt::Widgets
         OS.g_object_ref(@tooltips_handle)
         OS.gtk_object_sink(@tooltips_handle)
       end
-      OS.gtk_tooltips_set_tip(@tooltips_handle, self.attr_handle, buffer, nil)
+      if (OS::GTK_VERSION >= OS._version(2, 10, 0))
+        OS.gtk_status_icon_set_tooltip(self.attr_handle, buffer)
+      else
+        OS.gtk_tooltips_set_tip(@tooltips_handle, self.attr_handle, buffer, nil)
+      end
     end
     
     typesig { [::Java::Boolean] }
@@ -590,8 +674,14 @@ module Org::Eclipse::Swt::Widgets
     # </ul>
     def set_visible(visible)
       check_widget
-      if ((OS._gtk_widget_visible(self.attr_handle)).equal?(visible))
-        return
+      if (OS::GTK_VERSION >= OS._version(2, 10, 0))
+        if ((OS.gtk_status_icon_get_visible(self.attr_handle)).equal?(visible))
+          return
+        end
+      else
+        if ((OS._gtk_widget_visible(self.attr_handle)).equal?(visible))
+          return
+        end
       end
       if (visible)
         # It is possible (but unlikely), that application
@@ -601,9 +691,17 @@ module Org::Eclipse::Swt::Widgets
         if (is_disposed)
           return
         end
-        OS.gtk_widget_show(self.attr_handle)
+        if (OS::GTK_VERSION >= OS._version(2, 10, 0))
+          OS.gtk_status_icon_set_visible(self.attr_handle, visible)
+        else
+          OS.gtk_widget_show(self.attr_handle)
+        end
       else
-        OS.gtk_widget_hide(self.attr_handle)
+        if (OS::GTK_VERSION >= OS._version(2, 10, 0))
+          OS.gtk_status_icon_set_visible(self.attr_handle, visible)
+        else
+          OS.gtk_widget_hide(self.attr_handle)
+        end
         send_event(SWT::Hide)
       end
     end

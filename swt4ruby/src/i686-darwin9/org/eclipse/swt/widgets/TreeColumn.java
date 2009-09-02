@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2008 IBM Corporation and others.
+ * Copyright (c) 2000, 2009 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -11,8 +11,7 @@
 package org.eclipse.swt.widgets;
 
 
-import org.eclipse.swt.internal.carbon.DataBrowserListViewHeaderDesc;
-import org.eclipse.swt.internal.carbon.OS;
+import org.eclipse.swt.internal.cocoa.*;
 
 import org.eclipse.swt.*;
 import org.eclipse.swt.graphics.*;
@@ -36,12 +35,15 @@ import org.eclipse.swt.events.*;
  * @see <a href="http://www.eclipse.org/swt/">Sample code and further information</a>
  * 
  * @since 3.1
+ * @noextend This class is not intended to be subclassed by clients.
  */
 public class TreeColumn extends Item {
+	NSTableColumn nsColumn;
 	Tree parent;
-	int id, lastWidth, lastPosition, iconRef;
-	boolean resizable;
-	String toolTipText;
+	String toolTipText, displayText;
+	boolean movable;
+
+	static final int MARGIN = 2;
 
 /**
  * Constructs a new instance of this class given its parent
@@ -77,9 +79,8 @@ public class TreeColumn extends Item {
  */
 public TreeColumn (Tree parent, int style) {
 	super (parent, checkStyle (style));
-	resizable = true;
 	this.parent = parent;
-	parent.createItem (this, parent.getColumnCount ());
+	parent.createItem (this, parent.columnCount);
 }
 
 /**
@@ -121,7 +122,6 @@ public TreeColumn (Tree parent, int style) {
  */
 public TreeColumn (Tree parent, int style, int index) {
 	super (parent, checkStyle (style));
-	resizable = true;
 	this.parent = parent;
 	parent.createItem (this, index);
 }
@@ -193,9 +193,98 @@ protected void checkSubclass () {
 	if (!isValidSubclass ()) error (SWT.ERROR_INVALID_SUBCLASS);
 }
 
+void deregister () {
+	super.deregister ();
+	display.removeWidget (nsColumn.headerCell());
+}
+
 void destroyWidget () {
 	parent.destroyItem (this);
 	releaseHandle ();
+}
+
+void drawInteriorWithFrame_inView (int /*long*/ id, int /*long*/ sel, NSRect cellRect, int /*long*/ view) {
+	/*
+	 * Feature in Cocoa.  When the last column in a tree does not reach the
+	 * rightmost edge of the tree view, the cell that draws the rightmost-
+	 * column's header is also invoked to draw the header space between its
+	 * right edge and the tree's right edge.  If this case is detected then
+	 * nothing should be drawn.
+	 */
+	int columnIndex = parent.indexOf (nsColumn);
+	NSRect headerRect = parent.headerView.headerRectOfColumn (columnIndex);
+	if (headerRect.x != cellRect.x || headerRect.width != cellRect.width) return;
+
+	NSGraphicsContext context = NSGraphicsContext.currentContext ();
+	context.saveGraphicsState ();
+
+	int contentWidth = 0;
+	NSSize stringSize = null, imageSize = null;
+	NSAttributedString attrString = null;
+	NSTableHeaderCell headerCell = nsColumn.headerCell ();
+	if (displayText != null) {
+		Font font = Font.cocoa_new(display, headerCell.font ());
+		attrString = parent.createString(displayText, font, null, SWT.LEFT, (parent.state & DISABLED) == 0, false);
+		stringSize = attrString.size ();
+		contentWidth += Math.ceil (stringSize.width);
+		if (image != null) contentWidth += MARGIN; /* space between image and text */
+	}
+	if (image != null) {
+		imageSize = image.handle.size ();
+		contentWidth += Math.ceil (imageSize.width);
+	}
+
+	if (parent.sortColumn == this && parent.sortDirection != SWT.NONE) {
+		boolean ascending = parent.sortDirection == SWT.UP;
+		headerCell.drawSortIndicatorWithFrame (cellRect, new NSView(view), ascending, 0);
+		/* remove the arrow's space from the available drawing width */
+		NSRect sortRect = headerCell.sortIndicatorRectForBounds (cellRect);
+		cellRect.width = Math.max (0, sortRect.x - cellRect.x);
+	}
+
+	int drawX = 0;
+	if ((style & SWT.CENTER) != 0) {
+		drawX = (int)(cellRect.x + Math.max (MARGIN, ((cellRect.width - contentWidth) / 2)));
+	} else if ((style & SWT.RIGHT) != 0) {
+		drawX = (int)(cellRect.x + Math.max (MARGIN, cellRect.width - contentWidth - MARGIN));
+	} else {
+		drawX = (int)cellRect.x + MARGIN;
+	}
+
+	if (image != null) {
+		NSRect destRect = new NSRect ();
+		destRect.x = drawX;
+		destRect.y = cellRect.y;
+		destRect.width = Math.min (imageSize.width, cellRect.width - 2 * MARGIN);
+		destRect.height = Math.min (imageSize.height, cellRect.height);
+		boolean isFlipped = new NSView (view).isFlipped(); 
+		if (isFlipped) {
+			context.saveGraphicsState ();
+			NSAffineTransform transform = NSAffineTransform.transform ();
+		 	transform.scaleXBy (1, -1);
+		 	transform.translateXBy (0, -(destRect.height + 2 * destRect.y));
+		 	transform.concat ();
+		}
+		NSRect sourceRect = new NSRect ();
+		sourceRect.width = destRect.width;
+		sourceRect.height = destRect.height;
+		image.handle.drawInRect (destRect, sourceRect, OS.NSCompositeSourceOver, 1f);
+		if (isFlipped) context.restoreGraphicsState ();
+		drawX += destRect.width;
+	}
+
+	if (displayText != null && displayText.length () > 0) {
+		if (image != null) drawX += MARGIN; /* space between image and text */
+		NSRect destRect = new NSRect ();
+		destRect.x = drawX;
+		destRect.y = cellRect.y;
+		destRect.width = Math.min (stringSize.width, cellRect.x + cellRect.width - MARGIN - drawX);
+		destRect.height = Math.min (stringSize.height, cellRect.height);
+		attrString.drawInRect (destRect);
+	}
+	if (attrString != null) attrString.release ();
+
+	context.restoreGraphicsState ();
 }
 
 /**
@@ -259,9 +348,7 @@ public Tree getParent () {
  */
 public boolean getMoveable () {
 	checkWidget ();
-	int [] flags = new int [1];
-	OS.GetDataBrowserPropertyFlags (parent.handle, id, flags);
-	return (flags [0] & OS.kDataBrowserListViewMovableColumn) != 0;
+	return movable;
 }
 
 /**
@@ -278,7 +365,7 @@ public boolean getMoveable () {
  */
 public boolean getResizable () {
 	checkWidget ();
-	return resizable;
+	return nsColumn.resizingMask() != OS.NSTableColumnNoResizing;
 }
 
 /**
@@ -311,9 +398,10 @@ public String getToolTipText () {
  */
 public int getWidth () {
 	checkWidget ();
-	short [] width = new short [1];
-	OS.GetDataBrowserTableViewNamedColumnWidth (parent.handle, id, width);
-	return Math.max (0, width [0] + parent.getLeftDisclosureInset (id));
+	int width = (int)nsColumn.width();
+	// TODO how to differentiate 0 and 1 cases?
+	if (width > 0) width += Tree.CELL_GAP;
+	return width;
 }
 
 /**
@@ -329,38 +417,47 @@ public int getWidth () {
  */
 public void pack () {
 	checkWidget ();
+
+	int width = 0;
+
+	/* compute header width */
+	if (displayText != null) {
+		NSTableHeaderCell headerCell = nsColumn.headerCell ();
+		Font font = Font.cocoa_new(display, headerCell.font ());
+		NSAttributedString attrString = parent.createString(displayText, font, null, 0, true, false);
+		NSSize stringSize = attrString.size ();
+		attrString.release ();
+		width += Math.ceil (stringSize.width);
+		if (image != null) width += MARGIN; /* space between image and text */
+	}
+	if (image != null) {
+		NSSize imageSize = image.handle.size ();
+		width += Math.ceil (imageSize.width);
+	}
+	if (parent.sortColumn == this && parent.sortDirection != SWT.NONE) {
+		NSTableHeaderCell headerCell = nsColumn.headerCell ();
+		NSRect rect = new NSRect ();
+		rect.width = rect.height = Float.MAX_VALUE;
+		NSSize cellSize = headerCell.cellSizeForBounds (rect);
+		rect.height = cellSize.height;
+		NSRect sortRect = headerCell.sortIndicatorRectForBounds (rect);
+		width += Math.ceil (sortRect.width);
+	}
+
+	/* compute item widths down column */
 	GC gc = new GC (parent);
-	int width = gc.stringExtent (text).x;
-	if (iconRef != 0 || (image != null && OS.VERSION >= 0x1040)) {
-		/* Note that the image is stretched to the header height */
-		width += parent.headerHeight;
-		if (text.length () != 0) width += parent.getGap ();
-	}
-	int index = parent.indexOf (this);
-	width = Math.max (width, calculateWidth (parent.childIds, index, gc, width));
-
+	width = Math.max(width, parent.calculateWidth(parent.items, parent.indexOf (this), gc, true));
 	gc.dispose ();
-	setWidth (width + parent.getInsetWidth (id, true));
-}
-
-int calculateWidth (int[] ids, int index, GC gc, int width) {
-	int max = width;
-	if (ids == null) return max;
-	for (int i=0; i<ids.length; i++) {
-		TreeItem item = parent._getItem (ids [i], false);
-		if (item != null && item.cached) {
-			max = Math.max (max, item.calculateWidth (index, gc));
-			if (item.getExpanded ()) {
-				max = Math.max (max, calculateWidth (item.childIds, index, gc, max));
-			}
-		}
-	}
-	return max;
+	setWidth (width);
 }
 
 void releaseHandle () {
 	super.releaseHandle ();
-	id = -1;
+	if (nsColumn != null) {
+		nsColumn.headerCell ().release ();
+		nsColumn.release ();
+	}
+	nsColumn = null;
 	parent = null;
 }
 
@@ -369,8 +466,6 @@ void releaseWidget () {
 	if (parent.sortColumn == this) {
 		parent.sortColumn = null;
 	}
-	if (iconRef != 0) OS.ReleaseIconRef (iconRef);
-	iconRef = 0;
 }
 
 /**
@@ -423,22 +518,6 @@ public void removeSelectionListener(SelectionListener listener) {
 	eventTable.unhook (SWT.DefaultSelection,listener);	
 }
 
-void resized (int newWidth) {
-	lastWidth = newWidth;
-	sendEvent (SWT.Resize);
-	if (isDisposed ()) return;
-	boolean moved = false;
-	int [] order = parent.getColumnOrder ();
-	TreeColumn [] columns = parent.getColumns ();
-	for (int i=0; i<order.length; i++) {
-		TreeColumn column = columns [order [i]];
-		if (moved && !column.isDisposed ()) {
-			column.sendEvent (SWT.Move);
-		}
-		if (column == this) moved = true;
-	}
-}
-
 /**
  * Controls how text and images will be displayed in the receiver.
  * The argument should be one of <code>LEFT</code>, <code>RIGHT</code>
@@ -461,7 +540,14 @@ public void setAlignment (int alignment) {
 	if (index == -1 || index == 0) return;
 	style &= ~(SWT.LEFT | SWT.RIGHT | SWT.CENTER);
 	style |= alignment & (SWT.LEFT | SWT.RIGHT | SWT.CENTER);
-	updateHeader ();
+	NSOutlineView outlineView = ((NSOutlineView) parent.view);
+	NSTableHeaderView headerView = outlineView.headerView ();
+	if (headerView == null) return;
+	index = parent.indexOf (nsColumn);
+	NSRect rect = headerView.headerRectOfColumn (index);
+	headerView.setNeedsDisplayInRect (rect);
+	rect = outlineView.rectOfColumn (index);
+	parent.view.setNeedsDisplayInRect (rect);
 }
 
 public void setImage (Image image) {
@@ -469,19 +555,12 @@ public void setImage (Image image) {
 	if (image != null && image.isDisposed ()) {
 		error (SWT.ERROR_INVALID_ARGUMENT);
 	}
-	int index = parent.indexOf (this);
-	if (index == -1) return;
-	if (iconRef != 0) {
-		OS.ReleaseIconRef (iconRef);
-		iconRef = 0;
-	}
 	super.setImage (image);
-	if (image != null) {
-		if (OS.VERSION < 0x1040) {
-			iconRef = createIconRef (image);
-		}
-	}
-	updateHeader ();
+	NSTableHeaderView headerView = ((NSOutlineView) parent.view).headerView ();
+	if (headerView == null) return;
+	int index = parent.indexOf (nsColumn);
+	NSRect rect = headerView.headerRectOfColumn (index);
+	headerView.setNeedsDisplayInRect (rect);
 }
 
 /**
@@ -507,14 +586,7 @@ public void setImage (Image image) {
  */
 public void setMoveable (boolean moveable) {
 	checkWidget ();
-	int [] flags = new int [1];
-	OS.GetDataBrowserPropertyFlags (parent.handle, id, flags);
-	if (moveable) {
-		flags [0] |= OS.kDataBrowserListViewMovableColumn;
-	} else {
-		flags [0] &= ~OS.kDataBrowserListViewMovableColumn;
-	}
-	OS.SetDataBrowserPropertyFlags (parent.handle, id, flags [0]);
+	this.movable = moveable;
 }
 
 /**
@@ -531,21 +603,39 @@ public void setMoveable (boolean moveable) {
  */
 public void setResizable (boolean resizable) {
 	checkWidget ();
-	this.resizable = resizable;
-	updateHeader ();
+	nsColumn.setResizingMask(resizable ? OS.NSTableColumnUserResizingMask : OS.NSTableColumnNoResizing);
 }
 
 public void setText (String string) {
 	checkWidget ();
 	if (string == null) error (SWT.ERROR_NULL_ARGUMENT);
 	super.setText (string);
-	updateHeader ();
+	char [] buffer = new char [text.length ()];
+	text.getChars (0, buffer.length, buffer, 0);
+	int length = fixMnemonic (buffer);
+	displayText = new String (buffer, 0, length);
+	NSString title = NSString.stringWith (displayText);
+	nsColumn.headerCell ().setTitle (title);
+	NSTableHeaderView headerView = ((NSOutlineView) parent.view).headerView ();
+	if (headerView == null) return;
+	int index = parent.indexOf (nsColumn);
+	NSRect rect = headerView.headerRectOfColumn (index);
+	headerView.setNeedsDisplayInRect (rect);
 }
 
 /**
  * Sets the receiver's tool tip text to the argument, which
- * may be null indicating that no tool tip text should be shown.
- *
+ * may be null indicating that the default tool tip for the 
+ * control will be shown. For a control that has a default
+ * tool tip, such as the Tree control on Windows, setting
+ * the tool tip text to an empty string replaces the default,
+ * causing no tool tip text to be shown.
+ * <p>
+ * The mnemonic indicator (character '&amp;') is not displayed in a tool tip.
+ * To display a single '&amp;' in the tool tip, the character '&amp;' can be 
+ * escaped by doubling it in the string.
+ * </p>
+ * 
  * @param string the new tool tip text (or null)
  *
  * @exception SWTException <ul>
@@ -558,6 +648,7 @@ public void setText (String string) {
 public void setToolTipText (String string) {
 	checkWidget();
 	toolTipText = string;
+	parent.checkToolTip (this);
 }
 
 /**
@@ -573,52 +664,12 @@ public void setToolTipText (String string) {
 public void setWidth (int width) {
 	checkWidget ();
 	if (width < 0) return;
-	/*
-	* Feature in the Macintosh. The data browser widget adds the left inset
-	* of the disclosure column to the specified width making the column too
-	* wide. The fix is to subtract this value from the column width.
-	*/
-	width -= parent.getLeftDisclosureInset (id);
-	if (width < 0) width = 0;
-	OS.SetDataBrowserTableViewNamedColumnWidth (parent.handle, id, (short) width);
-	updateHeader ();
-	if (width != lastWidth) resized (width);
+	// TODO how to differentiate 0 and 1 cases?
+	width = Math.max (0, width - Tree.CELL_GAP); 
+	nsColumn.setWidth (width);
 }
 
-void updateHeader () {
-	char [] buffer = new char [text.length ()];
-	text.getChars (0, buffer.length, buffer, 0);
-	int length = fixMnemonic (buffer);
-	int str = OS.CFStringCreateWithCharacters (OS.kCFAllocatorDefault, buffer, length);
-	if (str == 0) error (SWT.ERROR_CANNOT_SET_TEXT);
-	DataBrowserListViewHeaderDesc desc = new DataBrowserListViewHeaderDesc ();
-	desc.version = OS.kDataBrowserListViewLatestHeaderDesc;
-	desc.btnFontStyle_just = OS.teFlushLeft;
-	if (parent.indexOf (this) != 0) {
-		if ((style & SWT.CENTER) != 0) desc.btnFontStyle_just = OS.teCenter;
-		if ((style & SWT.RIGHT) != 0) desc.btnFontStyle_just = OS.teFlushRight;
-	}
-	desc.btnFontStyle_flags |= OS.kControlUseJustMask;
-	if (resizable) {
-		desc.minimumWidth = 0;
-		desc.maximumWidth = 0x7fff;
-	} else {
-		short [] width = new short [1];
-		OS.GetDataBrowserTableViewNamedColumnWidth (parent.handle, id, width);
-		desc.minimumWidth = desc.maximumWidth = width [0];
-	}
-	desc.titleString = str;
-	if (OS.VERSION < 0x1040) {
-		desc.btnContentInfo_contentType = (short) (iconRef != 0 ? OS.kControlContentIconRef : OS.kControlContentTextOnly);
-		desc.btnContentInfo_iconRef = iconRef;
-	} else {
-		if (image != null) {
-			desc.btnContentInfo_contentType = OS.kControlContentCGImageRef;
-			desc.btnContentInfo_iconRef = image.handle;
-		}
-	}
-	OS.SetDataBrowserListViewHeaderDesc (parent.handle, id, desc);
-	OS.CFRelease (str);
+String tooltipText () {
+	return toolTipText;
 }
-
 }

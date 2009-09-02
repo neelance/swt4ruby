@@ -1,6 +1,6 @@
 require "rjava"
 
-# Copyright (c) 2000, 2007 IBM Corporation and others.
+# Copyright (c) 2000, 2008 IBM Corporation and others.
 # All rights reserved. This program and the accompanying materials
 # are made available under the terms of the Eclipse Public License v1.0
 # which accompanies this distribution, and is available at
@@ -31,6 +31,7 @@ module Org::Eclipse::Swt::Internal::Win32
     alias_method :attr_dw_flags=, :dw_flags=
     undef_method :dw_flags=
     
+    # @field cast=(RECT*)
     # long
     attr_accessor :prc_exclude
     alias_method :attr_prc_exclude, :prc_exclude
@@ -38,6 +39,7 @@ module Org::Eclipse::Swt::Internal::Win32
     alias_method :attr_prc_exclude=, :prc_exclude=
     undef_method :prc_exclude=
     
+    # @field cast=(BLENDFUNCTION*)
     # long
     attr_accessor :p_blend_function
     alias_method :attr_p_blend_function, :p_blend_function

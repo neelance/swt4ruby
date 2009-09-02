@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2008 IBM Corporation and others.
+ * Copyright (c) 2000, 2009 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -42,10 +42,12 @@ import org.eclipse.swt.graphics.*;
  * @see <a href="http://www.eclipse.org/swt/snippets/#toolbar">ToolBar, ToolItem snippets</a>
  * @see <a href="http://www.eclipse.org/swt/examples.php">SWT Example: ControlExample</a>
  * @see <a href="http://www.eclipse.org/swt/">Sample code and further information</a>
+ * @noextend This class is not intended to be subclassed by clients.
  */
 public class ToolBar extends Composite {
-	int lastFocusId;
+	int lastFocusId, lastArrowId, lastHotId;
 	ToolItem [] items;
+	ToolItem [] tabItemList;
 	boolean ignoreResize, ignoreMouse;
 	ImageList imageList, disabledImageList, hotImageList;
 	static final int /*long*/ ToolBarProc;
@@ -212,7 +214,7 @@ public Point computeSize (int wHint, int hHint, boolean changed) {
 		int border = getBorderWidth ();
 		int newWidth = wHint == SWT.DEFAULT ? 0x3FFF : wHint + border * 2;
 		int newHeight = hHint == SWT.DEFAULT ? 0x3FFF : hHint + border * 2;
-		boolean redraw = drawCount == 0 && OS.IsWindowVisible (handle);
+		boolean redraw = getDrawing () && OS.IsWindowVisible (handle);
 		ignoreResize = true;
 		if (redraw) OS.UpdateWindow (handle);
 		int flags = OS.SWP_NOACTIVATE | OS.SWP_NOMOVE | OS.SWP_NOREDRAW | OS.SWP_NOZORDER;
@@ -251,6 +253,47 @@ public Rectangle computeTrim (int x, int y, int width, int height) {
 	int bits = OS.GetWindowLong (handle, OS.GWL_STYLE);
 	if ((bits & OS.CCS_NODIVIDER) == 0) trim.height += 2;
 	return trim;
+}
+
+Widget computeTabGroup () {
+	ToolItem [] items = _getItems ();
+	if (tabItemList == null) {
+		int i = 0;
+		while (i < items.length && items [i].control == null) i++;
+		if (i == items.length) return super.computeTabGroup (); 
+	}
+	int index = (int)/*64*/OS.SendMessage (handle, OS.TB_GETHOTITEM, 0, 0);
+	if (index == -1) index = lastHotId;
+	while (index >= 0) {
+		ToolItem item = items [index];
+		if (item.isTabGroup ()) return item;
+		index--;
+	}
+	return super.computeTabGroup ();
+}
+
+Widget [] computeTabList () {
+	ToolItem [] items = _getItems ();
+	if (tabItemList == null) {
+		int i = 0;
+		while (i < items.length && items [i].control == null) i++;
+		if (i == items.length) return super.computeTabList (); 
+	}
+	Widget result [] = {};
+	if (!isTabGroup () || !isEnabled () || !isVisible ()) return result;
+	ToolItem [] list = tabList != null ? _getTabItemList () : items;
+	for (int i=0; i<list.length; i++) {
+		ToolItem child = list [i];
+		Widget  [] childList = child.computeTabList ();
+		if (childList.length != 0) {
+			Widget [] newResult = new Widget [result.length + childList.length];
+			System.arraycopy (result, 0, newResult, 0, result.length);
+			System.arraycopy (childList, 0, newResult, result.length, childList.length);
+			result = newResult;
+		}
+	}
+	if (result.length == 0) result = new Widget [] {this}; 
+	return result;
 }
 
 void createHandle () {
@@ -356,7 +399,7 @@ void createItem (ToolItem item, int index) {
 void createWidget () {
 	super.createWidget ();
 	items = new ToolItem [4];
-	lastFocusId = -1;
+	lastFocusId = lastArrowId = lastHotId = -1;
 }
 
 int defaultBackground () {
@@ -386,6 +429,8 @@ void destroyItem (ToolItem item) {
 	}
 	OS.SendMessage (handle, OS.TB_DELETEBUTTON, index, 0);
 	if (item.id == lastFocusId) lastFocusId = -1;
+	if (item.id == lastArrowId) lastArrowId = -1;
+	if (item.id == lastHotId) lastHotId = -1;
 	items [item.id] = null;
 	item.id = -1;
 	int count = (int)/*64*/OS.SendMessage (handle, OS.TB_BUTTONCOUNT, 0, 0);
@@ -530,6 +575,10 @@ public int getItemCount () {
  */
 public ToolItem [] getItems () {
 	checkWidget ();
+	return _getItems ();
+}
+
+ToolItem [] _getItems () {
 	int count = (int)/*64*/OS.SendMessage (handle, OS.TB_BUTTONCOUNT, 0, 0);
 	TBBUTTON lpButton = new TBBUTTON ();
 	ToolItem [] result = new ToolItem [count];
@@ -559,6 +608,24 @@ public int getRowCount () {
 		return (int)/*64*/OS.SendMessage (handle, OS.TB_BUTTONCOUNT, 0, 0);
 	}
 	return (int)/*64*/OS.SendMessage (handle, OS.TB_GETROWS, 0, 0);
+}
+
+ToolItem [] _getTabItemList () {
+	if (tabItemList == null) return tabItemList;
+	int count = 0;
+	for (int i=0; i<tabItemList.length; i++) {
+		if (!tabItemList [i].isDisposed ()) count++;
+	}
+	if (count == tabItemList.length) return tabItemList;
+	ToolItem [] newList = new ToolItem [count];
+	int index = 0;
+	for (int i=0; i<tabItemList.length; i++) {
+		if (!tabItemList [i].isDisposed ()) {
+			newList [index++] = tabItemList [i];
+		}
+	}
+	tabItemList = newList;
+	return tabItemList;
 }
 
 /**
@@ -643,25 +710,28 @@ void layoutItems () {
 	*  into account extra padding.
 	*/
 	if ((style & SWT.VERTICAL) != 0) {
-		TBBUTTONINFO info = new TBBUTTONINFO ();
-		info.cbSize = TBBUTTONINFO.sizeof;
-		info.dwMask = OS.TBIF_SIZE;
-		int /*long*/ size = OS.SendMessage (handle, OS.TB_GETBUTTONSIZE, 0, 0);
-		info.cx = (short) OS.LOWORD (size);
-		int index = 0;
-		while (index < items.length) {
-			ToolItem item = items [index];
-			if (item != null && (item.style & SWT.DROP_DOWN) != 0) break;
-			index++;
-		}
-		if (index < items.length) {
-			int /*long*/ padding = OS.SendMessage (handle, OS.TB_GETPADDING, 0, 0);
-			info.cx += OS.LOWORD (padding) * 2;
-		}
-		for (int i=0; i<items.length; i++) {
-			ToolItem item = items [i];
-			if (item != null && (item.style & SWT.SEPARATOR) == 0) {
-				OS.SendMessage (handle, OS.TB_SETBUTTONINFO, item.id, info);
+		int itemCount = (int)/*64*/OS.SendMessage (handle, OS.TB_BUTTONCOUNT, 0, 0);
+		if (itemCount > 1) {
+			TBBUTTONINFO info = new TBBUTTONINFO ();
+			info.cbSize = TBBUTTONINFO.sizeof;
+			info.dwMask = OS.TBIF_SIZE;
+			int /*long*/ size = OS.SendMessage (handle, OS.TB_GETBUTTONSIZE, 0, 0);
+			info.cx = (short) OS.LOWORD (size);
+			int index = 0;
+			while (index < items.length) {
+				ToolItem item = items [index];
+				if (item != null && (item.style & SWT.DROP_DOWN) != 0) break;
+				index++;
+			}
+			if (index < items.length) {
+				int /*long*/ padding = OS.SendMessage (handle, OS.TB_GETPADDING, 0, 0);
+				info.cx += OS.LOWORD (padding) * 2;
+			}
+			for (int i=0; i<items.length; i++) {
+				ToolItem item = items [i];
+				if (item != null && (item.style & SWT.SEPARATOR) == 0) {
+					OS.SendMessage (handle, OS.TB_SETBUTTONINFO, item.id, info);
+				}
 			}
 		}
 	}
@@ -788,7 +858,7 @@ void setBounds (int x, int y, int width, int height, int flags) {
 	* any given time.
 	*/
 	if (parent.lpwp != null) {
-		if (drawCount == 0 && OS.IsWindowVisible (handle)) {
+		if (getDrawing () && OS.IsWindowVisible (handle)) {
 			parent.setResizeChildren (false);
 			parent.setResizeChildren (true);
 		}
@@ -812,7 +882,7 @@ void setDropDownItems (boolean set) {
 	* the bit afterwards.
 	* 
 	* NOTE:  This work around only runs when the tool bar contains
-	* both text and images.
+	* only images.
 	*/
 	if (OS.COMCTL32_MAJOR >= 6 && OS.IsAppThemed ()) {
 		boolean hasText = false, hasImage = false;
@@ -905,7 +975,18 @@ void setImageList (ImageList imageList) {
 public boolean setParent (Composite parent) {
 	checkWidget ();
 	if (!super.setParent (parent)) return false;
-	OS.SendMessage (handle, OS.TB_SETPARENT, parent.handle, 0);
+	int /*long*/ hwndParent = parent.handle;
+	OS.SendMessage (handle, OS.TB_SETPARENT, hwndParent, 0);
+	/*
+	* Bug in Windows.  When a tool bar is reparented, the tooltip
+	* control that is automatically created for the item is not
+	* reparented to the new shell.  The fix is to move the tooltip
+	* over using SetWindowLongPtr().  Note that for some reason,
+	* SetParent() does not work.
+	*/
+	int /*long*/ hwndShell = parent.getShell ().handle;
+	int /*long*/ hwndToolTip = OS.SendMessage (handle, OS.TB_GETTOOLTIPS, 0, 0);
+	OS.SetWindowLongPtr (hwndToolTip, OS.GWLP_HWNDPARENT, hwndShell);
 	return true;
 }
 
@@ -951,6 +1032,22 @@ void setRowCount (int count) {
 	}
 }
 
+/*public*/ void setTabItemList (ToolItem [] tabList) {
+	checkWidget ();
+	if (tabList != null) {
+		for (int i=0; i<tabList.length; i++) {
+			ToolItem item = tabList [i];
+			if (item == null) error (SWT.ERROR_INVALID_ARGUMENT);
+			if (item.isDisposed ()) error (SWT.ERROR_INVALID_ARGUMENT);
+			if (item.parent != this) error (SWT.ERROR_INVALID_PARENT);
+		}
+		ToolItem [] newList = new ToolItem [tabList.length];
+		System.arraycopy (tabList, 0, newList, 0, tabList.length);
+		tabList = newList;
+	} 
+	this.tabItemList = tabList;
+}
+
 boolean setTabItemFocus () {
 	int index = 0;
 	while (index < items.length) {
@@ -994,7 +1091,17 @@ String toolTipText (NMTTDISPINFO hdr) {
 		if (toolTipText != null) return ""; //$NON-NLS-1$
 		if (0 <= index && index < items.length) {
 			ToolItem item = items [index];
-			if (item != null) return item.toolTipText;
+			if (item != null) {	
+				/*
+				* But in Windows.  When the  arrow keys are used to change
+				* the hot item, for some reason, Windows displays the tool
+				* tip for the hot item in at (0, 0) on the screen rather
+				* than next to the current hot item.  This fix is to disallow
+				* tool tips while the user is traversing with the arrow keys.
+				*/
+				if (lastArrowId != -1) return "";
+				return item.toolTipText;
+			}
 		}
 	}
 	return super.toolTipText (hdr);
@@ -1121,7 +1228,7 @@ LRESULT WM_GETDLGCODE (int /*long*/ wParam, int /*long*/ lParam) {
 	* when the widget has focus.
 	*/
 	if (result != null) return result;
-	return new LRESULT (OS.DLGC_BUTTON);
+	return new LRESULT (OS.DLGC_BUTTON | OS.DLGC_WANTARROWS);
 }
 
 LRESULT WM_KEYDOWN (int /*long*/ wParam, int /*long*/ lParam) {
@@ -1183,6 +1290,11 @@ LRESULT WM_MOUSELEAVE (int /*long*/ wParam, int /*long*/ lParam) {
 		}
 	}
 	return result;
+}
+
+LRESULT WM_MOUSEMOVE (int /*long*/ wParam, int /*long*/ lParam) {
+	if (OS.GetMessagePos () != display.lastMouse) lastArrowId = -1;
+	return super.WM_MOUSEMOVE (wParam, lParam);
 }
 
 LRESULT WM_NOTIFY (int /*long*/ wParam, int /*long*/ lParam) {
@@ -1275,7 +1387,7 @@ LRESULT WM_WINDOWPOSCHANGING (int /*long*/ wParam, int /*long*/ lParam) {
 	* garbage on the screen.  The fix is to damage the
 	* pixels.
 	*/
-	if (drawCount != 0) return result;
+	if (!getDrawing ()) return result;
 	if ((style & SWT.WRAP) == 0) return result;
 	if (!OS.IsWindowVisible (handle)) return result;
 	if (OS.SendMessage (handle, OS.TB_GETROWS, 0, 0) == 1) {
@@ -1362,7 +1474,20 @@ LRESULT wmNotifyChild (NMHDR hdr, int /*long*/ wParam, int /*long*/ lParam) {
 				NMTBHOTITEM lpnmhi = new NMTBHOTITEM ();
 				OS.MoveMemory (lpnmhi, lParam, NMTBHOTITEM.sizeof);
 				switch (lpnmhi.dwFlags) {
-					case OS.HICF_ARROWKEYS:
+					case OS.HICF_MOUSE: {
+						/*
+						* But in Windows.  When the tool bar has focus, a mouse is
+						* in an item and hover help for that item is displayed and
+						* then the arrow keys are used to change the hot item,
+						* for some reason, Windows snaps the hot item back to the
+						* one that is under the mouse.  The fix is to disallow
+						* hot item changes when the user is traversing using the
+						* arrow keys.
+						*/
+						if (lastArrowId != -1) return LRESULT.ONE;
+						break;
+					}
+					case OS.HICF_ARROWKEYS:	{
 			        	RECT client = new RECT ();
 			        	OS.GetClientRect (handle, client);
 			        	int index = (int)/*64*/OS.SendMessage (handle, OS.TB_COMMANDTOINDEX, lpnmhi.idNew, 0);
@@ -1371,7 +1496,14 @@ LRESULT wmNotifyChild (NMHDR hdr, int /*long*/ wParam, int /*long*/ lParam) {
 						if (rect.right > client.right || rect.bottom > client.bottom) {
 							return LRESULT.ONE;
 						}
+						lastArrowId = lpnmhi.idNew;
 						break;
+					}
+					default:
+						lastArrowId = -1;
+				}
+				if ((lpnmhi.dwFlags & OS.HICF_LEAVING) == 0) {
+					lastHotId = lpnmhi.idNew;
 				}
 			}
 			break;

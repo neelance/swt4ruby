@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2006 IBM Corporation and others.
+ * Copyright (c) 2000, 2009 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -2456,11 +2456,6 @@ static void jpeg_calc_output_dimensions (jpeg_decompress_struct cinfo)
 			cinfo.out_color_components = 1;
 			break;
 		case JCS_RGB:
-			if (RGB_PIXELSIZE != 3) {
-				cinfo.out_color_components = RGB_PIXELSIZE;
-				break;
-			}
-			//FALLTHROUGH
 		case JCS_YCbCr:
 			cinfo.out_color_components = 3;
 			break;
@@ -2618,7 +2613,7 @@ static void jinit_color_deconverter (jpeg_decompress_struct cinfo) {
 				build_ycc_rgb_table(cinfo);
 			} else if (cinfo.jpeg_color_space == JCS_GRAYSCALE) {
 				cconvert.color_convert = GRAY_RGB_CONVERT;
-			} else if (cinfo.jpeg_color_space == JCS_RGB && RGB_PIXELSIZE == 3) {
+			} else if (cinfo.jpeg_color_space == JCS_RGB) {
 				cconvert.color_convert = NULL_CONVERT;
 			} else
 				error();

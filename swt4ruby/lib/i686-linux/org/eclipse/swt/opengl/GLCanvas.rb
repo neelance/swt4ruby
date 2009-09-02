@@ -1,6 +1,6 @@
 require "rjava"
 
-# Copyright (c) 2000, 2008 IBM Corporation and others.
+# Copyright (c) 2000, 2009 IBM Corporation and others.
 # All rights reserved. This program and the accompanying materials
 # are made available under the terms of the Eclipse Public License v1.0
 # which accompanies this distribution, and is available at
@@ -160,9 +160,9 @@ module Org::Eclipse::Swt::Opengl
       screen = OS.gdk_screen_get_default
       # long
       gdkvisual = OS.gdk_x11_screen_lookup_visual(screen, @vinfo.attr_visualid)
-      # FIXME- share lists
-      # context = GLX.glXCreateContext (xDisplay, info, share == null ? 0 : share.context, true);
-      @context = GLX.gl_xcreate_context(x_display, @vinfo, 0, true)
+      # long
+      share = !(data.attr_share_context).nil? ? data.attr_share_context.attr_context : 0
+      @context = GLX.gl_xcreate_context(x_display, @vinfo, share, true)
       if ((@context).equal?(0))
         SWT.error(SWT::ERROR_NO_HANDLES)
       end

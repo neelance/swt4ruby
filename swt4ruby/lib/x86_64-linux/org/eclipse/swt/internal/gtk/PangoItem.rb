@@ -1,6 +1,6 @@
 require "rjava"
 
-# Copyright (c) 2000, 2006 IBM Corporation and others. All rights reserved.
+# Copyright (c) 2000, 2008 IBM Corporation and others. All rights reserved.
 # The contents of this file are made available under the terms
 # of the GNU Lesser General Public License (LGPL) Version 2.1 that
 # accompanies this distribution (lgpl-v21.txt).  The LGPL is also
@@ -41,6 +41,7 @@ module Org::Eclipse::Swt::Internal::Gtk
     alias_method :attr_num_chars=, :num_chars=
     undef_method :num_chars=
     
+    # @field accessor=analysis.shape_engine,cast=(PangoEngineShape *)
     # int
     attr_accessor :analysis_shape_engine
     alias_method :attr_analysis_shape_engine, :analysis_shape_engine
@@ -48,6 +49,7 @@ module Org::Eclipse::Swt::Internal::Gtk
     alias_method :attr_analysis_shape_engine=, :analysis_shape_engine=
     undef_method :analysis_shape_engine=
     
+    # @field accessor=analysis.lang_engine,cast=(PangoEngineLang *)
     # int
     attr_accessor :analysis_lang_engine
     alias_method :attr_analysis_lang_engine, :analysis_lang_engine
@@ -55,6 +57,7 @@ module Org::Eclipse::Swt::Internal::Gtk
     alias_method :attr_analysis_lang_engine=, :analysis_lang_engine=
     undef_method :analysis_lang_engine=
     
+    # @field accessor=analysis.font,cast=(PangoFont *)
     # int
     attr_accessor :analysis_font
     alias_method :attr_analysis_font, :analysis_font
@@ -62,12 +65,14 @@ module Org::Eclipse::Swt::Internal::Gtk
     alias_method :attr_analysis_font=, :analysis_font=
     undef_method :analysis_font=
     
+    # @field accessor=analysis.level
     attr_accessor :analysis_level
     alias_method :attr_analysis_level, :analysis_level
     undef_method :analysis_level
     alias_method :attr_analysis_level=, :analysis_level=
     undef_method :analysis_level=
     
+    # @field accessor=analysis.language,cast=(PangoLanguage *)
     # int
     attr_accessor :analysis_language
     alias_method :attr_analysis_language, :analysis_language
@@ -75,6 +80,7 @@ module Org::Eclipse::Swt::Internal::Gtk
     alias_method :attr_analysis_language=, :analysis_language=
     undef_method :analysis_language=
     
+    # @field accessor=analysis.extra_attrs,cast=(GSList *)
     # int
     attr_accessor :analysis_extra_attrs
     alias_method :attr_analysis_extra_attrs, :analysis_extra_attrs

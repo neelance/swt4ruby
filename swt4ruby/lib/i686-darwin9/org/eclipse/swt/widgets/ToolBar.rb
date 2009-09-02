@@ -1,6 +1,6 @@
 require "rjava"
 
-# Copyright (c) 2000, 2008 IBM Corporation and others.
+# Copyright (c) 2000, 2009 IBM Corporation and others.
 # All rights reserved. This program and the accompanying materials
 # are made available under the terms of the Eclipse Public License v1.0
 # which accompanies this distribution, and is available at
@@ -13,9 +13,9 @@ module Org::Eclipse::Swt::Widgets
     class_module.module_eval {
       include ::Java::Lang
       include ::Org::Eclipse::Swt::Widgets
-      include_const ::Org::Eclipse::Swt::Internal::Carbon, :CFRange
-      include_const ::Org::Eclipse::Swt::Internal::Carbon, :OS
+      include ::Org::Eclipse::Swt::Internal::Cocoa
       include ::Org::Eclipse::Swt
+      include ::Org::Eclipse::Swt::Accessibility
       include ::Org::Eclipse::Swt::Graphics
     }
   end
@@ -45,6 +45,7 @@ module Org::Eclipse::Swt::Widgets
   # @see <a href="http://www.eclipse.org/swt/snippets/#toolbar">ToolBar, ToolItem snippets</a>
   # @see <a href="http://www.eclipse.org/swt/examples.php">SWT Example: ControlExample</a>
   # @see <a href="http://www.eclipse.org/swt/">Sample code and further information</a>
+  # @noextend This class is not intended to be subclassed by clients.
   class ToolBar < ToolBarImports.const_get :Composite
     include_class_members ToolBarImports
     
@@ -59,6 +60,12 @@ module Org::Eclipse::Swt::Widgets
     undef_method :items
     alias_method :attr_items=, :items=
     undef_method :items=
+    
+    attr_accessor :accessibility_attributes
+    alias_method :attr_accessibility_attributes, :accessibility_attributes
+    undef_method :accessibility_attributes
+    alias_method :attr_accessibility_attributes=, :accessibility_attributes=
+    undef_method :accessibility_attributes=
     
     typesig { [Composite, ::Java::Int] }
     # Constructs a new instance of this class given its parent
@@ -95,7 +102,9 @@ module Org::Eclipse::Swt::Widgets
     def initialize(parent, style)
       @item_count = 0
       @items = nil
+      @accessibility_attributes = nil
       super(parent, check_style(style))
+      @accessibility_attributes = nil
       # Ensure that either of HORIZONTAL or VERTICAL is set.
       # NOTE: HORIZONTAL and VERTICAL have the same values
       # as H_SCROLL and V_SCROLL so it is necessary to first
@@ -107,6 +116,90 @@ module Org::Eclipse::Swt::Widgets
       else
         self.attr_style |= SWT::HORIZONTAL
       end
+    end
+    
+    typesig { [::Java::Int, ::Java::Int] }
+    # long
+    # long
+    # long
+    def accessibility_attribute_names(id, sel)
+      if ((@accessibility_attributes).nil?)
+        our_attributes = NSMutableArray.array_with_capacity(10)
+        our_attributes.add_object(OS::NSAccessibilityRoleAttribute)
+        our_attributes.add_object(OS::NSAccessibilityRoleDescriptionAttribute)
+        our_attributes.add_object(OS::NSAccessibilityParentAttribute)
+        our_attributes.add_object(OS::NSAccessibilityPositionAttribute)
+        our_attributes.add_object(OS::NSAccessibilitySizeAttribute)
+        our_attributes.add_object(OS::NSAccessibilityWindowAttribute)
+        our_attributes.add_object(OS::NSAccessibilityTopLevelUIElementAttribute)
+        our_attributes.add_object(OS::NSAccessibilityHelpAttribute)
+        our_attributes.add_object(OS::NSAccessibilityEnabledAttribute)
+        our_attributes.add_object(OS::NSAccessibilityFocusedAttribute)
+        our_attributes.add_object(OS::NSAccessibilityChildrenAttribute)
+        if (!(self.attr_accessible).nil?)
+          # See if the accessible will override or augment the standard list.
+          # Help, title, and description can be overridden.
+          extra_attributes = NSMutableArray.array_with_capacity(3)
+          extra_attributes.add_object(OS::NSAccessibilityHelpAttribute)
+          extra_attributes.add_object(OS::NSAccessibilityDescriptionAttribute)
+          extra_attributes.add_object(OS::NSAccessibilityTitleAttribute)
+          # 64
+          i = RJava.cast_to_int(extra_attributes.count) - 1
+          while i >= 0
+            attribute = NSString.new(extra_attributes.object_at_index(i).attr_id)
+            if (!(self.attr_accessible.internal_accessibility_attribute_value(attribute, ACC::CHILDID_SELF)).nil?)
+              our_attributes.add_object(extra_attributes.object_at_index(i))
+            end
+            i -= 1
+          end
+        end
+        @accessibility_attributes = our_attributes
+        @accessibility_attributes.retain
+      end
+      return @accessibility_attributes.attr_id
+    end
+    
+    typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
+    # long
+    # long
+    # long
+    # long
+    def accessibility_attribute_value(id, sel, arg0)
+      ns_attribute_name = NSString.new(arg0)
+      if (!(self.attr_accessible).nil?)
+        return_object = self.attr_accessible.internal_accessibility_attribute_value(ns_attribute_name, ACC::CHILDID_SELF)
+        if (!(return_object).nil?)
+          return return_object.attr_id
+        end
+      end
+      if (ns_attribute_name.is_equal_to_string(OS::NSAccessibilityRoleAttribute) || ns_attribute_name.is_equal_to_string(OS::NSAccessibilityRoleDescriptionAttribute))
+        role = OS::NSAccessibilityToolbarRole
+        if (ns_attribute_name.is_equal_to_string(OS::NSAccessibilityRoleAttribute))
+          return role.attr_id
+        else
+          # long
+          role_description = OS._nsaccessibility_role_description(role.attr_id, 0)
+          return role_description
+        end
+      else
+        if (ns_attribute_name.is_equal_to_string(OS::NSAccessibilityEnabledAttribute))
+          return NSNumber.number_with_bool(is_enabled).attr_id
+        else
+          if (ns_attribute_name.is_equal_to_string(OS::NSAccessibilityFocusedAttribute))
+            focused = ((self.attr_view.attr_id).equal?(self.attr_view.window.first_responder.attr_id))
+            return NSNumber.number_with_bool(focused).attr_id
+          end
+        end
+      end
+      return super(id, sel, arg0)
+    end
+    
+    typesig { [::Java::Int, ::Java::Int] }
+    # long
+    # long
+    def accessibility_is_ignored(id, sel)
+      # Toolbars aren't ignored.
+      return false
     end
     
     class_module.module_eval {
@@ -152,9 +245,11 @@ module Org::Eclipse::Swt::Widgets
     
     typesig { [] }
     def create_handle
-      self.attr_state |= GRAB | THEME_BACKGROUND
-      super(self.attr_parent.attr_handle)
-      OS._hiobject_set_accessibility_ignored(self.attr_handle, false)
+      self.attr_state |= THEME_BACKGROUND
+      widget = SWTView.new.alloc
+      widget.init
+      # widget.setDrawsBackground(false);
+      self.attr_view = widget
     end
     
     typesig { [ToolItem, ::Java::Int] }
@@ -168,6 +263,7 @@ module Org::Eclipse::Swt::Widgets
         @items = new_items
       end
       item.create_widget
+      self.attr_view.add_subview(item.attr_view)
       System.arraycopy(@items, index, @items, index + 1, ((@item_count += 1) - 1) - index)
       @items[index] = item
       relayout
@@ -178,14 +274,6 @@ module Org::Eclipse::Swt::Widgets
       super
       @items = Array.typed(ToolItem).new(4) { nil }
       @item_count = 0
-    end
-    
-    typesig { [] }
-    def default_theme_font
-      if (self.attr_display.attr_small_fonts)
-        return OS.attr_k_theme_toolbar_font
-      end
-      return OS.attr_k_theme_system_font
     end
     
     typesig { [ToolItem] }
@@ -202,17 +290,46 @@ module Org::Eclipse::Swt::Widgets
       end
       System.arraycopy(@items, index + 1, @items, index, (@item_count -= 1) - index)
       @items[@item_count] = nil
+      item.attr_view.remove_from_superview
       relayout
     end
     
-    typesig { [::Java::Int, ::Java::Int] }
-    def draw_background(control, context)
-      fill_background(control, context, nil)
+    typesig { [::Java::Int, NSGraphicsContext, NSRect] }
+    # long
+    def draw_background(id, context, rect)
+      if (!(id).equal?(self.attr_view.attr_id))
+        return
+      end
+      if (!(self.attr_background).nil?)
+        fill_background(self.attr_view, context, rect, -1)
+      end
     end
     
     typesig { [::Java::Boolean] }
     def enable_widget(enabled)
-      # Do nothing - A tool bar does not disable items when it is disabled
+      super(enabled)
+      i = 0
+      while i < @item_count
+        item = @items[i]
+        if (!(item).nil?)
+          item.enable_widget(enabled)
+        end
+        i += 1
+      end
+    end
+    
+    typesig { [NSPoint] }
+    def find_tooltip(pt)
+      pt = self.attr_view.convert_point_from_view_(pt, nil)
+      i = 0
+      while i < @item_count
+        item = @items[i]
+        if (OS._nspoint_in_rect(pt, item.attr_view.frame))
+          return item
+        end
+        i += 1
+      end
+      return super(pt)
     end
     
     typesig { [::Java::Int] }
@@ -358,55 +475,6 @@ module Org::Eclipse::Swt::Widgets
       return -1
     end
     
-    typesig { [::Java::Int] }
-    def invalidate_children_visible_region(control)
-      super(control)
-      i = 0
-      while i < @item_count
-        item = @items[i]
-        item.reset_visible_region(control)
-        i += 1
-      end
-    end
-    
-    typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
-    def k_event_accessible_get_named_attribute(next_handler, the_event, user_data)
-      code = OS.attr_event_not_handled_err
-      string_ref = Array.typed(::Java::Int).new(1) { 0 }
-      OS._get_event_parameter(the_event, OS.attr_k_event_param_accessible_attribute_name, OS.attr_type_cfstring_ref, nil, 4, nil, string_ref)
-      length = 0
-      if (!(string_ref[0]).equal?(0))
-        length = OS._cfstring_get_length(string_ref[0])
-      end
-      buffer = CharArray.new(length)
-      range = CFRange.new
-      range.attr_length = length
-      OS._cfstring_get_characters(string_ref[0], range, buffer)
-      attribute_name = String.new(buffer)
-      if ((attribute_name == OS.attr_k_axrole_attribute) || (attribute_name == OS.attr_k_axrole_description_attribute))
-        role_text = OS.attr_k_axtoolbar_role
-        buffer = CharArray.new(role_text.length)
-        role_text.get_chars(0, buffer.attr_length, buffer, 0)
-        string_ref[0] = OS._cfstring_create_with_characters(OS.attr_k_cfallocator_default, buffer, buffer.attr_length)
-        if (!(string_ref[0]).equal?(0))
-          if ((attribute_name == OS.attr_k_axrole_attribute))
-            OS._set_event_parameter(the_event, OS.attr_k_event_param_accessible_attribute_value, OS.attr_type_cfstring_ref, 4, string_ref)
-          else
-            # kAXRoleDescriptionAttribute
-            string_ref2 = OS._hicopy_accessibility_role_description(string_ref[0], 0)
-            OS._set_event_parameter(the_event, OS.attr_k_event_param_accessible_attribute_value, OS.attr_type_cfstring_ref, 4, Array.typed(::Java::Int).new([string_ref2]))
-            OS._cfrelease(string_ref2)
-          end
-          OS._cfrelease(string_ref[0])
-          code = OS.attr_no_err
-        end
-      end
-      if (!(self.attr_accessible).nil?)
-        code = self.attr_accessible.internal_k_event_accessible_get_named_attribute(next_handler, the_event, code)
-      end
-      return code
-    end
-    
     typesig { [::Java::Int, ::Java::Int, ::Java::Boolean] }
     def layout_horizontal(width, height, resize)
       x_spacing = 0
@@ -448,10 +516,6 @@ module Org::Eclipse::Swt::Widgets
         x += x_spacing + size.attr_x
         max_x = Math.max(max_x, x)
         i_ += 1
-      end
-      # TODO - tempporary code
-      if (resize)
-        invalidate_visible_region(self.attr_handle)
       end
       return Array.typed(::Java::Int).new([rows, max_x, y + item_height])
     end
@@ -498,10 +562,6 @@ module Org::Eclipse::Swt::Widgets
         max_y = Math.max(max_y, y)
         i_ += 1
       end
-      # TODO - tempporary code
-      if (resize)
-        invalidate_visible_region(self.attr_handle)
-      end
       return Array.typed(::Java::Int).new([cols, x + item_width, max_y])
     end
     
@@ -516,7 +576,7 @@ module Org::Eclipse::Swt::Widgets
     
     typesig { [] }
     def relayout
-      if (self.attr_draw_count > 0)
+      if (!get_drawing)
         return
       end
       rect = get_client_area
@@ -540,6 +600,15 @@ module Org::Eclipse::Swt::Widgets
       super(destroy)
     end
     
+    typesig { [] }
+    def release_handle
+      super
+      if (!(@accessibility_attributes).nil?)
+        @accessibility_attributes.release
+      end
+      @accessibility_attributes = nil
+    end
+    
     typesig { [Control] }
     def remove_control(control)
       super(control)
@@ -553,59 +622,22 @@ module Org::Eclipse::Swt::Widgets
       end
     end
     
-    typesig { [Array.typed(::Java::Float)] }
-    def set_background(color)
-      super(color)
-      if ((@items).nil?)
-        return
-      end
-      i = 0
-      while i < @item_count
-        item = @items[i]
-        item.set_background(color)
-        i += 1
-      end
-      redraw_widget(self.attr_handle, true)
-    end
-    
-    typesig { [::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Boolean, ::Java::Boolean, ::Java::Boolean] }
-    def set_bounds(x, y, width, height, move, resize, events)
-      result = super(x, y, width, height, move, resize, events)
-      if (!((result & RESIZED)).equal?(0))
-        relayout
-      end
-      return result
-    end
-    
-    typesig { [Font] }
-    def set_font_style(font)
-      super(font)
-      if ((@items).nil?)
-        return
-      end
-      i = 0
-      while i < @item_count
-        item = @items[i]
-        item.set_font_style(font)
-        i += 1
-      end
-      redraw_widget(self.attr_handle, true)
+    typesig { [] }
+    def resized
+      super
       relayout
     end
     
-    typesig { [Array.typed(::Java::Float)] }
-    def set_foreground(color)
-      super(color)
-      if ((@items).nil?)
-        return
-      end
+    typesig { [NSFont] }
+    def set_font(font)
       i = 0
       while i < @item_count
         item = @items[i]
-        item.set_foreground(color)
+        if (!(item.attr_button).nil?)
+          (item.attr_button).set_attributed_title(item.create_string)
+        end
         i += 1
       end
-      redraw_widget(self.attr_handle, true)
     end
     
     typesig { [::Java::Boolean] }

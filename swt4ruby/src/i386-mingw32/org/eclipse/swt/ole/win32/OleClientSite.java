@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2008 IBM Corporation and others.
+ * Copyright (c) 2000, 2009 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -420,7 +420,20 @@ protected void addObjectReferences() {
 	if (result != COM.S_OK)
 		OLE.error(OLE.ERROR_INTERFACE_NOT_FOUND, result);
 	objIOleObject = new IOleObject(ppvObject[0]);
-	objIOleObject.SetClientSite(iOleClientSite.getAddress());
+	/*
+	 * Feature in Windows. Despite the fact that the clientSite was provided during the 
+	 * creation of the OleObject (which is required by WMP11 - see bug 173556), 
+	 * some applications choose to ignore this optional parameter (see bug 211663) 
+	 * during OleCreate. The fix is to check whether the clientSite has already been set 
+	 * and set it. Note that setting it twice can result in assert failures.
+	 */
+	int /*long*/[] ppvClientSite = new int /*long*/[1];
+	result = objIOleObject.GetClientSite(ppvClientSite);
+	if (ppvClientSite[0] == 0) {
+		objIOleObject.SetClientSite(iOleClientSite.getAddress());
+	} else {
+		Release(); // GetClientSite performs an AddRef so we must release it.
+	}
 	int[] pdwConnection = new int[1];
 	objIOleObject.Advise(iAdviseSink.getAddress(), pdwConnection);
 	objIOleObject.SetHostNames("main", "main");  //$NON-NLS-1$ //$NON-NLS-2$
@@ -819,7 +832,7 @@ public boolean isDirty() {
 	int /*long*/[] address = new int /*long*/[1];
 	if (objIOleObject.QueryInterface(COM.IIDIPersistFile, address) != COM.S_OK)
 		return true;
-	IPersistStorage permStorage = new IPersistStorage(address[0]);
+	IPersistFile permStorage = new IPersistFile(address[0]);
 	// Are the contents of the permanent storage different from the file?
 	int result = permStorage.IsDirty();
 	permStorage.Release();
@@ -838,6 +851,14 @@ public boolean isFocusControl () {
 	}
 	return false;
 }
+private boolean isOffice2007() {
+	String programID = getProgramID();
+	if (programID == null) return false;
+	if (programID.equals("Word.Document.12")) return true; //$NON-NLS-1$ 
+	if (programID.equals("Excel.Sheet.12")) return true; //$NON-NLS-1$ 
+	if (programID.equals("PowerPoint.Show.12")) return true; //$NON-NLS-1$ 
+	return false;
+}
 private int OnClose() {
 	return COM.S_OK;
 }
@@ -846,18 +867,21 @@ private int OnDataChange(int /*long*/ pFormatetc, int /*long*/ pStgmed) {
 }
 private void onDispose(Event e) {
 	inDispose = true;
+
+	// remove listeners
+	removeListener(SWT.Dispose, listener);
+	removeListener(SWT.FocusIn, listener);
+	removeListener(SWT.FocusOut, listener);
+	removeListener(SWT.Paint, listener);
+	removeListener(SWT.Traverse, listener);
+	removeListener(SWT.KeyDown, listener);
+	
 	if (state != STATE_NONE)
 		doVerb(OLE.OLEIVERB_DISCARDUNDOSTATE);
 	deactivateInPlaceClient();
 	releaseObjectInterfaces(); // Note, must release object interfaces before releasing frame
 	deleteTempStorage();
 	
-	// remove listeners
-	removeListener(SWT.Dispose, listener);
-	removeListener(SWT.FocusIn, listener);
-	removeListener(SWT.Paint, listener);
-	removeListener(SWT.Traverse, listener);
-	removeListener(SWT.KeyDown, listener);
 	frame.removeListener(SWT.Resize, listener);
 	frame.removeListener(SWT.Move, listener);
 	
@@ -866,7 +890,14 @@ private void onDispose(Event e) {
 }
 void onFocusIn(Event e) {
 	if (inDispose) return;
-	if (state != STATE_UIACTIVE) doVerb(OLE.OLEIVERB_SHOW);
+	if (state != STATE_UIACTIVE) {
+		int /*long*/[] ppvObject = new int /*long*/[1];
+		if (objIUnknown.QueryInterface(COM.IIDIOleInPlaceObject, ppvObject) == COM.S_OK) {
+			IOleInPlaceObject objIOleInPlaceObject = new IOleInPlaceObject(ppvObject[0]);
+			objIOleInPlaceObject.Release();
+			doVerb(OLE.OLEIVERB_SHOW);
+		}
+	}
 	if (objIOleInPlaceObject == null) return;
 	if (isFocusControl()) return;
 	int /*long*/[] phwnd = new int /*long*/[1];
@@ -939,7 +970,7 @@ private int OnUIActivate() {
 	}
 	return COM.S_OK;
 }
-private int OnUIDeactivate(int fUndoable) {
+int OnUIDeactivate(int fUndoable) {
 	// currently, we are ignoring the fUndoable flag
 	if (frame == null || frame.isDisposed()) return COM.S_OK;
 	state = STATE_INPLACEACTIVE;
@@ -1194,8 +1225,38 @@ private boolean saveToStorageFile(File file) {
 	if (file == null || file.isDirectory()) return false;
 	if (!updateStorage()) return false;
 	
-	// get access to the persistent storage mechanism
 	int /*long*/[] address = new int /*long*/[1];
+	if (objIOleObject.QueryInterface(COM.IIDIPersistFile, address) == COM.S_OK) {
+		String fileName = null; 
+		IPersistFile persistFile = new IPersistFile(address[0]);
+		int /*long*/[] ppszFileName = new int /*long*/[1];
+		if (persistFile.GetCurFile(ppszFileName) == COM.S_OK) {
+			int /*long*/ pszFileName = ppszFileName [0];
+		    int length = OS.wcslen(pszFileName);
+		    char[] buffer = new char[length];
+		    OS.MoveMemory(buffer, pszFileName, length * 2);
+		    fileName = new String(buffer, 0, length);
+		    // Doc says to use IMalloc::Free, but CoTaskMemFree() does the same 
+		    COM.CoTaskMemFree(pszFileName);
+		}
+		int result;
+		String newFile = file.getAbsolutePath();
+		if (fileName != null && fileName.equalsIgnoreCase(newFile)) {
+			result = persistFile.Save(0, false);
+		} else {
+			int length = newFile.length();
+			char[] buffer = new char[length + 1];
+			newFile.getChars(0, length, buffer, 0);
+			int /*long*/ lpszNewFile = COM.CoTaskMemAlloc(buffer.length * 2);
+			COM.MoveMemory(lpszNewFile, buffer, buffer.length * 2);
+			result = persistFile.Save(lpszNewFile, false);
+			COM.CoTaskMemFree(lpszNewFile);
+		}
+		persistFile.Release();
+		if (result == COM.S_OK) return true;
+	}
+	
+	// get access to the persistent storage mechanism
 	if (objIOleObject.QueryInterface(COM.IIDIPersistStorage, address) != COM.S_OK) return false;
 	IPersistStorage permStorage = new IPersistStorage(address[0]);
 	try {
@@ -1237,6 +1298,34 @@ private boolean saveToTraditionalFile(File file) {
 		return false;
 	if (!updateStorage())
 		return false;
+	
+	/*
+	* Bug in Office 2007. Saving Office 2007 documents to compound file storage object
+	* causes the output file to be corrupted. The fix is to detect Office 2007 documents
+	* using the program ID and save only the content of the 'Package' stream. 
+	*/
+	if (isOffice2007()) {
+		/* Excel fails to open the package stream when the PersistStorage is not in hands off mode */
+		int /*long*/[] ppv = new int /*long*/[1];
+		IPersistStorage iPersistStorage = null;
+		if (objIUnknown.QueryInterface(COM.IIDIPersistStorage, ppv) == COM.S_OK) {
+			iPersistStorage = new IPersistStorage(ppv[0]);
+			tempStorage.AddRef();
+			iPersistStorage.HandsOffStorage();
+		}
+		boolean result = false;
+		int /*long*/[] address = new int /*long*/[1];
+		int grfMode = COM.STGM_DIRECT | COM.STGM_READ | COM.STGM_SHARE_EXCLUSIVE;
+		if (tempStorage.OpenStream("Package", 0, grfMode, 0, address) == COM.S_OK) { //$NON-NLS-1$
+			result = saveFromContents(address[0], file);
+		}
+		if (iPersistStorage != null) {
+			iPersistStorage.SaveCompleted(tempStorage.getAddress());
+			tempStorage.Release();
+			iPersistStorage.Release();
+		}
+		return result;
+	}
 	
 	int /*long*/[] address = new int /*long*/[1];
 	// Look for a CONTENTS stream

@@ -1,6 +1,6 @@
 require "rjava"
 
-# Copyright (c) 2000, 2008 IBM Corporation and others.
+# Copyright (c) 2000, 2009 IBM Corporation and others.
 # All rights reserved. This program and the accompanying materials
 # are made available under the terms of the Eclipse Public License v1.0
 # which accompanies this distribution, and is available at
@@ -15,11 +15,7 @@ module Org::Eclipse::Swt::Printing
       include ::Org::Eclipse::Swt::Printing
       include ::Org::Eclipse::Swt
       include ::Org::Eclipse::Swt::Graphics
-      include_const ::Org::Eclipse::Swt::Internal::Carbon, :CFRange
-      include_const ::Org::Eclipse::Swt::Internal::Carbon, :OS
-      include_const ::Org::Eclipse::Swt::Internal::Carbon, :PMRect
-      include_const ::Org::Eclipse::Swt::Internal::Carbon, :PMResolution
-      include_const ::Org::Eclipse::Swt::Internal::Carbon, :Rect
+      include ::Org::Eclipse::Swt::Internal::Cocoa
     }
   end
   
@@ -52,29 +48,35 @@ module Org::Eclipse::Swt::Printing
     alias_method :attr_data=, :data=
     undef_method :data=
     
-    attr_accessor :print_session
-    alias_method :attr_print_session, :print_session
-    undef_method :print_session
-    alias_method :attr_print_session=, :print_session=
-    undef_method :print_session=
+    attr_accessor :printer
+    alias_method :attr_printer, :printer
+    undef_method :printer
+    alias_method :attr_printer=, :printer=
+    undef_method :printer=
     
-    attr_accessor :print_settings
-    alias_method :attr_print_settings, :print_settings
-    undef_method :print_settings
-    alias_method :attr_print_settings=, :print_settings=
-    undef_method :print_settings=
+    attr_accessor :print_info
+    alias_method :attr_print_info, :print_info
+    undef_method :print_info
+    alias_method :attr_print_info=, :print_info=
+    undef_method :print_info=
     
-    attr_accessor :page_format
-    alias_method :attr_page_format, :page_format
-    undef_method :page_format
-    alias_method :attr_page_format=, :page_format=
-    undef_method :page_format=
+    attr_accessor :operation
+    alias_method :attr_operation, :operation
+    undef_method :operation
+    alias_method :attr_operation=, :operation=
+    undef_method :operation=
     
-    attr_accessor :in_page
-    alias_method :attr_in_page, :in_page
-    undef_method :in_page
-    alias_method :attr_in_page=, :in_page=
-    undef_method :in_page=
+    attr_accessor :view
+    alias_method :attr_view, :view
+    undef_method :view
+    alias_method :attr_view=, :view=
+    undef_method :view=
+    
+    attr_accessor :window
+    alias_method :attr_window, :window
+    undef_method :window
+    alias_method :attr_window=, :window=
+    undef_method :window=
     
     attr_accessor :is_gccreated
     alias_method :attr_is_gccreated, :is_gccreated
@@ -82,152 +84,72 @@ module Org::Eclipse::Swt::Printing
     alias_method :attr_is_gccreated=, :is_gccreated=
     undef_method :is_gccreated=
     
-    attr_accessor :context
-    alias_method :attr_context, :context
-    undef_method :context
-    alias_method :attr_context=, :context=
-    undef_method :context=
-    
-    attr_accessor :colorspace
-    alias_method :attr_colorspace, :colorspace
-    undef_method :colorspace
-    alias_method :attr_colorspace=, :colorspace=
-    undef_method :colorspace=
-    
     class_module.module_eval {
       const_set_lazy(:DRIVER) { "Mac" }
       const_attr_reader  :DRIVER
       
-      const_set_lazy(:PRINTER_DRIVER) { "Printer" }
-      const_attr_reader  :PRINTER_DRIVER
-      
-      const_set_lazy(:FILE_DRIVER) { "File" }
-      const_attr_reader  :FILE_DRIVER
-      
-      const_set_lazy(:PREVIEW_DRIVER) { "Preview" }
-      const_attr_reader  :PREVIEW_DRIVER
-      
-      const_set_lazy(:FAX_DRIVER) { "Fax" }
-      const_attr_reader  :FAX_DRIVER
-      
       typesig { [] }
       # Returns an array of <code>PrinterData</code> objects
-      # representing all available printers.
+      # representing all available printers.  If there are no
+      # printers, the array will be empty.
       # 
-      # @return the list of available printers
+      # @return an array of PrinterData objects representing the available printers
       def get_printer_list
-        result = nil
-        print_session = Array.typed(::Java::Int).new(1) { 0 }
-        OS._pmcreate_session(print_session)
-        if (!(print_session[0]).equal?(0))
-          printer_list = Array.typed(::Java::Int).new(1) { 0 }
-          current_index = Array.typed(::Java::Int).new(1) { 0 }
-          current_printer = Array.typed(::Java::Int).new(1) { 0 }
-          OS._pmsession_create_printer_list(print_session[0], printer_list, current_index, current_printer)
-          if (!(printer_list[0]).equal?(0))
-            count = OS._cfarray_get_count(printer_list[0])
-            result = Array.typed(PrinterData).new(count) { nil }
-            i = 0
-            while i < count
-              name = get_string(OS._cfarray_get_value_at_index(printer_list[0], i))
-              result[i] = PrinterData.new(DRIVER, name)
-              i += 1
-            end
-            OS._cfrelease(printer_list[0])
-          end
-          OS._pmrelease(print_session[0])
+        pool = nil
+        if (!NSThread.is_main_thread)
+          pool = NSAutoreleasePool.new.alloc.init
         end
-        return (result).nil? ? Array.typed(PrinterData).new(0) { nil } : result
+        begin
+          printers = NSPrinter.printer_names
+          # 64
+          count_ = RJava.cast_to_int(printers.count)
+          result = Array.typed(PrinterData).new(count_) { nil }
+          i = 0
+          while i < count_
+            str = NSString.new(printers.object_at_index(i))
+            result[i] = PrinterData.new(DRIVER, str.get_string)
+            i += 1
+          end
+          return result
+        ensure
+          if (!(pool).nil?)
+            pool.release
+          end
+        end
       end
       
       typesig { [] }
       # Returns a <code>PrinterData</code> object representing
       # the default printer or <code>null</code> if there is no
-      # printer available on the System.
+      # default printer.
       # 
       # @return the default printer data or null
       # 
       # @since 2.1
       def get_default_printer_data
-        result = nil
-        print_session = Array.typed(::Java::Int).new(1) { 0 }
-        OS._pmcreate_session(print_session)
-        if (!(print_session[0]).equal?(0))
-          name = get_current_printer_name(print_session[0])
-          if (!(name).nil?)
-            result = PrinterData.new(DRIVER, name)
+        pool = nil
+        if (!NSThread.is_main_thread)
+          pool = NSAutoreleasePool.new.alloc.init
+        end
+        begin
+          printer = NSPrintInfo.default_printer
+          if ((printer).nil?)
+            return nil
           end
-          OS._pmrelease(print_session[0])
-        end
-        return result
-      end
-      
-      typesig { [::Java::Int] }
-      def get_current_printer_name(print_session)
-        result = nil
-        printer_list = Array.typed(::Java::Int).new(1) { 0 }
-        current_index = Array.typed(::Java::Int).new(1) { 0 }
-        current_printer = Array.typed(::Java::Int).new(1) { 0 }
-        OS._pmsession_create_printer_list(print_session, printer_list, current_index, current_printer)
-        if (!(printer_list[0]).equal?(0))
-          count = OS._cfarray_get_count(printer_list[0])
-          if (current_index[0] >= 0 && current_index[0] < count)
-            result = RJava.cast_to_string(get_string(OS._cfarray_get_value_at_index(printer_list[0], current_index[0])))
+          str = printer.name
+          return PrinterData.new(DRIVER, str.get_string)
+        ensure
+          if (!(pool).nil?)
+            pool.release
           end
-          OS._cfrelease(printer_list[0])
         end
-        return result
-      end
-      
-      typesig { [::Java::Int] }
-      def get_string(ptr)
-        length = OS._cfstring_get_length(ptr)
-        buffer = CharArray.new(length)
-        range = CFRange.new
-        range.attr_length = length
-        OS._cfstring_get_characters(ptr, range, buffer)
-        return String.new(buffer)
-      end
-      
-      typesig { [::Java::Int, Array.typed(::Java::Byte), ::Java::Int] }
-      def pack_data(handle, buffer, offset)
-        length = OS._get_handle_size(handle)
-        buffer[((offset += 1) - 1)] = ((length & 0xff) >> 0)
-        buffer[((offset += 1) - 1)] = ((length & 0xff00) >> 8)
-        buffer[((offset += 1) - 1)] = ((length & 0xff0000) >> 16)
-        buffer[((offset += 1) - 1)] = ((length & -0x1000000) >> 24)
-        ptr = Array.typed(::Java::Int).new(1) { 0 }
-        OS._hlock(handle)
-        OS.memmove(ptr, handle, 4)
-        buffer1 = Array.typed(::Java::Byte).new(length) { 0 }
-        OS.memmove(buffer1, ptr[0], length)
-        OS._hunlock(handle)
-        System.arraycopy(buffer1, 0, buffer, offset, length)
-        return offset + length
-      end
-      
-      typesig { [Array.typed(::Java::Int), Array.typed(::Java::Byte), ::Java::Int] }
-      def unpack_data(handle, buffer, offset)
-        length = ((buffer[((offset += 1) - 1)] & 0xff) << 0) | ((buffer[((offset += 1) - 1)] & 0xff) << 8) | ((buffer[((offset += 1) - 1)] & 0xff) << 16) | ((buffer[((offset += 1) - 1)] & 0xff) << 24)
-        handle[0] = OS._new_handle(length)
-        if ((handle[0]).equal?(0))
-          SWT.error(SWT::ERROR_NO_HANDLES)
-        end
-        ptr = Array.typed(::Java::Int).new(1) { 0 }
-        OS._hlock(handle[0])
-        OS.memmove(ptr, handle[0], 4)
-        buffer1 = Array.typed(::Java::Byte).new(length) { 0 }
-        System.arraycopy(buffer, offset, buffer1, 0, length)
-        OS.memmove(ptr[0], buffer1, length)
-        OS._hunlock(handle[0])
-        return offset + length
       end
     }
     
     typesig { [] }
     # Constructs a new printer representing the default printer.
     # <p>
-    # You must dispose the printer when it is no longer required.
+    # Note: You must dispose the printer when it is no longer required.
     # </p>
     # 
     # @exception SWTError <ul>
@@ -241,12 +163,13 @@ module Org::Eclipse::Swt::Printing
     
     typesig { [PrinterData] }
     # Constructs a new printer given a <code>PrinterData</code>
-    # object representing the desired printer.
+    # object representing the desired printer. If the argument
+    # is null, then the default printer will be used.
     # <p>
-    # You must dispose the printer when it is no longer required.
+    # Note: You must dispose the printer when it is no longer required.
     # </p>
     # 
-    # @param data the printer data for the specified printer
+    # @param data the printer data for the specified printer, or null to use the default printer
     # 
     # @exception IllegalArgumentException <ul>
     # <li>ERROR_INVALID_ARGUMENT - if the specified printer data does not represent a valid printer
@@ -258,13 +181,12 @@ module Org::Eclipse::Swt::Printing
     # @see Device#dispose
     def initialize(data)
       @data = nil
-      @print_session = 0
-      @print_settings = 0
-      @page_format = 0
-      @in_page = false
+      @printer = nil
+      @print_info = nil
+      @operation = nil
+      @view = nil
+      @window = nil
       @is_gccreated = false
-      @context = 0
-      @colorspace = 0
       super(check_null(data))
     end
     
@@ -304,11 +226,26 @@ module Org::Eclipse::Swt::Printing
     # @see #getClientArea
     def compute_trim(x, y, width, height)
       check_device
-      page_rect = PMRect.new
-      paper_rect = PMRect.new
-      OS._pmget_adjusted_page_rect(@page_format, page_rect)
-      OS._pmget_adjusted_paper_rect(@page_format, paper_rect)
-      return Rectangle.new(x + RJava.cast_to_int(paper_rect.attr_left), y + RJava.cast_to_int(paper_rect.attr_top), width + RJava.cast_to_int((paper_rect.attr_right - page_rect.attr_right)), height + RJava.cast_to_int((paper_rect.attr_bottom - page_rect.attr_bottom)))
+      pool = nil
+      if (!NSThread.is_main_thread)
+        pool = NSAutoreleasePool.new.alloc.init
+      end
+      begin
+        paper_size_ = @print_info.paper_size
+        bounds = @print_info.imageable_page_bounds
+        dpi = get_dpi
+        screen_dpi = get_independent_dpi
+        scaling = scaling_factor
+        x -= (bounds.attr_x * dpi.attr_x / screen_dpi.attr_x) / scaling
+        y -= (bounds.attr_y * dpi.attr_y / screen_dpi.attr_y) / scaling
+        width += ((paper_size_.attr_width - bounds.attr_width) * dpi.attr_x / screen_dpi.attr_x) / scaling
+        height += ((paper_size_.attr_height - bounds.attr_height) * dpi.attr_y / screen_dpi.attr_y) / scaling
+        return Rectangle.new(x, y, width, height)
+      ensure
+        if (!(pool).nil?)
+          pool.release
+        end
+      end
     end
     
     typesig { [DeviceData] }
@@ -317,76 +254,66 @@ module Org::Eclipse::Swt::Printing
     # mechanism of the <code>Device</code> class.
     # @param deviceData the device data
     def create(device_data)
-      @data = device_data
-      buffer = Array.typed(::Java::Int).new(1) { 0 }
-      if (!(OS._pmcreate_session(buffer)).equal?(OS.attr_no_err))
-        SWT.error(SWT::ERROR_NO_HANDLES)
+      pool = nil
+      if (!NSThread.is_main_thread)
+        pool = NSAutoreleasePool.new.alloc.init
       end
-      @print_session = buffer[0]
-      if ((@print_session).equal?(0))
-        SWT.error(SWT::ERROR_NO_HANDLES)
-      end
-      if (!(@data.attr_other_data).nil?)
-        # Deserialize settings
-        offset = 0
-        other_data = @data.attr_other_data
-        offset = unpack_data(buffer, other_data, offset)
-        flat_settings = buffer[0]
-        offset = unpack_data(buffer, other_data, offset)
-        flat_format = buffer[0]
-        if (!(OS._pmunflatten_print_settings(flat_settings, buffer)).equal?(OS.attr_no_err))
-          SWT.error(SWT::ERROR_NO_HANDLES)
+      begin
+        NSApplication.shared_application
+        @data = device_data
+        if (!(@data.attr_other_data).nil?)
+          ns_data = NSData.data_with_bytes(@data.attr_other_data, @data.attr_other_data.attr_length)
+          @print_info = NSPrintInfo.new(NSKeyedUnarchiver.unarchive_object_with_data(ns_data).attr_id)
+        else
+          @print_info = NSPrintInfo.shared_print_info
         end
-        @print_settings = buffer[0]
-        if ((@print_settings).equal?(0))
-          SWT.error(SWT::ERROR_NO_HANDLES)
+        @print_info.retain
+        @printer = NSPrinter.printer_with_name(NSString.string_with(@data.attr_name))
+        if (!(@printer).nil?)
+          @printer.retain
+          @print_info.set_printer(@printer)
         end
-        if (!(OS._pmunflatten_page_format(flat_format, buffer)).equal?(OS.attr_no_err))
-          SWT.error(SWT::ERROR_NO_HANDLES)
+        @print_info.set_orientation((@data.attr_orientation).equal?(PrinterData::LANDSCAPE) ? OS::NSLandscapeOrientation : OS::NSPortraitOrientation)
+        dict = @print_info.dictionary
+        if (!(@data.attr_collate).equal?(false))
+          dict.set_value(NSNumber.number_with_bool(@data.attr_collate), OS::NSPrintMustCollate)
         end
-        @page_format = buffer[0]
-        if ((@page_format).equal?(0))
-          SWT.error(SWT::ERROR_NO_HANDLES)
+        if (!(@data.attr_copy_count).equal?(1))
+          dict.set_value(NSNumber.number_with_int(@data.attr_copy_count), OS::NSPrintCopies)
         end
-        OS._dispose_handle(flat_settings)
-        OS._dispose_handle(flat_format)
-      else
-        # Create default settings
-        if (!(OS._pmcreate_print_settings(buffer)).equal?(OS.attr_no_err))
-          SWT.error(SWT::ERROR_NO_HANDLES)
+        if (@data.attr_print_to_file)
+          dict.set_value(OS::NSPrintSaveJob, OS::NSPrintJobDisposition)
+          if (!(@data.attr_file_name).nil?)
+            dict.set_value(NSString.string_with(@data.attr_file_name), OS::NSPrintSavePath)
+          end
         end
-        @print_settings = buffer[0]
-        if ((@print_settings).equal?(0))
-          SWT.error(SWT::ERROR_NO_HANDLES)
+        # Bug in Cocoa.  For some reason, the output still goes to the printer when
+        # the user chooses the preview button.  The fix is to reset the job disposition.
+        job = @print_info.job_disposition
+        if (job.is_equal(NSString.new(OS._nsprint_preview_job)))
+          @print_info.set_job_disposition(job)
         end
-        OS._pmsession_default_print_settings(@print_session, @print_settings)
-        if (!(OS._pmcreate_page_format(buffer)).equal?(OS.attr_no_err))
-          SWT.error(SWT::ERROR_NO_HANDLES)
+        rect = NSRect.new
+        @window = NSWindow.new.alloc
+        @window.init_with_content_rect(rect, OS::NSBorderlessWindowMask, OS::NSBackingStoreBuffered, false)
+        class_name = "SWTPrinterView" # $NON-NLS-1$
+        if ((OS.objc_look_up_class(class_name)).equal?(0))
+          # long
+          cls = OS.objc_allocate_class_pair(OS.attr_class_nsview, class_name, 0)
+          OS.class_add_method(cls, OS.attr_sel_is_flipped, OS.is_flipped_callback, "@:")
+          OS.objc_register_class_pair(cls)
         end
-        @page_format = buffer[0]
-        if ((@page_format).equal?(0))
-          SWT.error(SWT::ERROR_NO_HANDLES)
+        @view = SWTPrinterView.new.alloc
+        @view.init_with_frame(rect)
+        @window.set_content_view(@view)
+        @operation = NSPrintOperation.print_operation_with_view(@view, @print_info)
+        @operation.retain
+        @operation.set_shows_print_panel(false)
+        @operation.set_shows_progress_panel(false)
+      ensure
+        if (!(pool).nil?)
+          pool.release
         end
-        OS._pmsession_default_page_format(@print_session, @page_format)
-      end
-      if ((PREVIEW_DRIVER == @data.attr_driver))
-        OS._pmsession_set_destination(@print_session, @print_settings, RJava.cast_to_short(OS.attr_k_pmdestination_preview), 0, 0)
-      end
-      name = @data.attr_name
-      buffer1 = CharArray.new(name.length)
-      name.get_chars(0, buffer1.attr_length, buffer1, 0)
-      ptr = OS._cfstring_create_with_characters(OS.attr_k_cfallocator_default, buffer1, buffer1.attr_length)
-      if (!(ptr).equal?(0))
-        OS._pmsession_set_current_printer(@print_session, ptr)
-        OS._cfrelease(ptr)
-      end
-      OS._pmsession_validate_print_settings(@print_session, @print_settings, nil)
-      OS._pmsession_validate_page_format(@print_session, @page_format, nil)
-      graphics_contexts_array = OS._cfarray_create_mutable(OS.attr_k_cfallocator_default, 1, 0)
-      if (!(graphics_contexts_array).equal?(0))
-        OS._cfarray_append_value(graphics_contexts_array, OS.k_pmgraphics_context_core_graphics)
-        OS._pmsession_set_document_format_generation(@print_session, OS.k_pmdocument_format_pdf, graphics_contexts_array, 0)
-        OS._cfrelease(graphics_contexts_array)
       end
     end
     
@@ -395,18 +322,36 @@ module Org::Eclipse::Swt::Printing
     # This method is called internally by the dispose
     # mechanism of the <code>Device</code> class.
     def destroy
-      if (!(@page_format).equal?(0))
-        OS._pmrelease(@page_format)
+      pool = nil
+      if (!NSThread.is_main_thread)
+        pool = NSAutoreleasePool.new.alloc.init
       end
-      @page_format = 0
-      if (!(@print_settings).equal?(0))
-        OS._pmrelease(@print_settings)
+      begin
+        if (!(@printer).nil?)
+          @printer.release
+        end
+        if (!(@print_info).nil?)
+          @print_info.release
+        end
+        if (!(@view).nil?)
+          @view.release
+        end
+        if (!(@window).nil?)
+          @window.release
+        end
+        if (!(@operation).nil?)
+          @operation.release
+        end
+        @printer = nil
+        @print_info = nil
+        @view = nil
+        @window = nil
+        @operation = nil
+      ensure
+        if (!(pool).nil?)
+          pool.release
+        end
       end
-      @print_settings = 0
-      if (!(@print_session).equal?(0))
-        OS._pmrelease(@print_session)
-      end
-      @print_session = 0
     end
     
     typesig { [SwtGCData] }
@@ -421,39 +366,45 @@ module Org::Eclipse::Swt::Printing
     # 
     # @param data the platform specific GC data
     # @return the platform specific GC handle
+    # 
+    # long
     def internal_new__gc(data)
       if (is_disposed)
         SWT.error(SWT::ERROR_GRAPHIC_DISPOSED)
       end
-      setup_new_page
-      if (!(data).nil?)
-        if (@is_gccreated)
-          SWT.error(SWT::ERROR_INVALID_ARGUMENT)
-        end
-        data.attr_device = self
-        data.attr_background = get_system_color(SWT::COLOR_WHITE).attr_handle
-        data.attr_foreground = get_system_color(SWT::COLOR_BLACK).attr_handle
-        data.attr_font = get_system_font
-        paper_rect = PMRect.new
-        OS._pmget_adjusted_paper_rect(@page_format, paper_rect)
-        port_rect = Rect.new
-        port_rect.attr_left = RJava.cast_to_short(paper_rect.attr_left)
-        port_rect.attr_right = RJava.cast_to_short(paper_rect.attr_right)
-        port_rect.attr_top = RJava.cast_to_short(paper_rect.attr_top)
-        port_rect.attr_bottom = RJava.cast_to_short(paper_rect.attr_bottom)
-        data.attr_port_rect = port_rect
-        @is_gccreated = true
+      pool = nil
+      if (!NSThread.is_main_thread)
+        pool = NSAutoreleasePool.new.alloc.init
       end
-      return @context
+      begin
+        if (!(data).nil?)
+          if (@is_gccreated)
+            SWT.error(SWT::ERROR_INVALID_ARGUMENT)
+          end
+          data.attr_device = self
+          data.attr_background = get_system_color(SWT::COLOR_WHITE).attr_handle
+          data.attr_foreground = get_system_color(SWT::COLOR_BLACK).attr_handle
+          data.attr_font = get_system_font
+          scaling = scaling_factor
+          dpi = get_dpi
+          screen_dpi = get_independent_dpi
+          size = @print_info.paper_size
+          size.attr_width = (size.attr_width * (dpi.attr_x / screen_dpi.attr_x)) / scaling
+          size.attr_height = (size.attr_height * dpi.attr_y / screen_dpi.attr_y) / scaling
+          data.attr_size = size
+          @is_gccreated = true
+        end
+        return @operation.context.attr_id
+      ensure
+        if (!(pool).nil?)
+          pool.release
+        end
+      end
     end
     
     typesig { [] }
     def init
       super
-      @colorspace = OS._cgcolor_space_create_device_rgb
-      if ((@colorspace).equal?(0))
-        SWT.error(SWT::ERROR_NO_HANDLES)
-      end
     end
     
     typesig { [::Java::Int, SwtGCData] }
@@ -468,7 +419,9 @@ module Org::Eclipse::Swt::Printing
     # 
     # @param hDC the platform specific GC handle
     # @param data the platform specific GC data
-    def internal_dispose__gc(context, data)
+    # 
+    # long
+    def internal_dispose__gc(context_, data)
       if (!(data).nil?)
         @is_gccreated = false
       end
@@ -479,11 +432,12 @@ module Org::Eclipse::Swt::Printing
     # This method is called internally by the dispose
     # mechanism of the <code>Device</code> class.
     def release
-      if (!(@colorspace).equal?(0))
-        OS._cgcolor_space_release(@colorspace)
-      end
-      @colorspace = 0
       super
+    end
+    
+    typesig { [] }
+    def scaling_factor
+      return NSNumber.new(@print_info.dictionary.object_for_key(OS::NSPrintScalingFactor)).float_value
     end
     
     typesig { [String] }
@@ -508,16 +462,27 @@ module Org::Eclipse::Swt::Printing
     # @see #endJob
     def start_job(job_name)
       check_device
-      if (!(job_name).nil? && !(job_name.length).equal?(0))
-        buffer = CharArray.new(job_name.length)
-        job_name.get_chars(0, buffer.attr_length, buffer, 0)
-        ptr = OS._cfstring_create_with_characters(OS.attr_k_cfallocator_default, buffer, buffer.attr_length)
-        if (!(ptr).equal?(0))
-          OS._pmset_job_name_cfstring(@print_settings, ptr)
-          OS._cfrelease(ptr)
+      pool = nil
+      if (!NSThread.is_main_thread)
+        pool = NSAutoreleasePool.new.alloc.init
+      end
+      begin
+        if (!(job_name).nil? && !(job_name.length).equal?(0))
+          @operation.set_job_title(NSString.string_with(job_name))
+        end
+        @print_info.set_up_print_operation_default_values
+        NSPrintOperation.set_current_operation(@operation)
+        context_ = @operation.create_context
+        if (!(context_).nil?)
+          @view.begin_document
+          return true
+        end
+        return false
+      ensure
+        if (!(pool).nil?)
+          pool.release
         end
       end
-      return (OS._pmsession_begin_document_no_dialog(@print_session, @print_settings, @page_format)).equal?(OS.attr_no_err)
     end
     
     typesig { [] }
@@ -532,12 +497,20 @@ module Org::Eclipse::Swt::Printing
     # @see #endPage
     def end_job
       check_device
-      if (@in_page)
-        OS._pmsession_end_page_no_dialog(@print_session)
-        @in_page = false
+      pool = nil
+      if (!NSThread.is_main_thread)
+        pool = NSAutoreleasePool.new.alloc.init
       end
-      OS._pmsession_end_document_no_dialog(@print_session)
-      @context = 0
+      begin
+        @view.end_document
+        @operation.deliver_result
+        @operation.destroy_context
+        @operation.clean_up_operation
+      ensure
+        if (!(pool).nil?)
+          pool.release
+        end
+      end
     end
     
     typesig { [] }
@@ -548,13 +521,18 @@ module Org::Eclipse::Swt::Printing
     # </ul>
     def cancel_job
       check_device
-      OS._pmsession_set_error(@print_session, OS.attr_k_pmcancel)
-      if (@in_page)
-        OS._pmsession_end_page_no_dialog(@print_session)
-        @in_page = false
+      pool = nil
+      if (!NSThread.is_main_thread)
+        pool = NSAutoreleasePool.new.alloc.init
       end
-      OS._pmsession_end_document_no_dialog(@print_session)
-      @context = 0
+      begin
+        @operation.destroy_context
+        @operation.clean_up_operation
+      ensure
+        if (!(pool).nil?)
+          pool.release
+        end
+      end
     end
     
     class_module.module_eval {
@@ -564,12 +542,12 @@ module Org::Eclipse::Swt::Printing
           data = PrinterData.new
         end
         if ((data.attr_driver).nil? || (data.attr_name).nil?)
-          default_printer = get_default_printer_data
-          if ((default_printer).nil?)
+          default_printer_ = get_default_printer_data
+          if ((default_printer_).nil?)
             SWT.error(SWT::ERROR_NO_HANDLES)
           end
-          data.attr_driver = default_printer.attr_driver
-          data.attr_name = default_printer.attr_name
+          data.attr_driver = default_printer_.attr_driver
+          data.attr_name = default_printer_.attr_name
         end
         return data
       end
@@ -594,11 +572,38 @@ module Org::Eclipse::Swt::Printing
     # @see #endJob
     def start_page
       check_device
-      if (!(OS._pmsession_error(@print_session)).equal?(OS.attr_no_err))
-        return false
+      pool = nil
+      if (!NSThread.is_main_thread)
+        pool = NSAutoreleasePool.new.alloc.init
       end
-      setup_new_page
-      return !(@context).equal?(0)
+      begin
+        scaling = scaling_factor
+        paper_size_ = @print_info.paper_size
+        paper_size_.attr_width /= scaling
+        paper_size_.attr_height /= scaling
+        rect = NSRect.new
+        rect.attr_width = paper_size_.attr_width
+        rect.attr_height = paper_size_.attr_height
+        @view.begin_page_in_rect(rect, NSPoint.new)
+        image_bounds = @print_info.imageable_page_bounds
+        image_bounds.attr_x /= scaling
+        image_bounds.attr_y /= scaling
+        image_bounds.attr_width /= scaling
+        image_bounds.attr_height /= scaling
+        NSBezierPath.bezier_path_with_rect(image_bounds).set_clip
+        transform_ = NSAffineTransform.transform
+        transform_.translate_xby(image_bounds.attr_x, image_bounds.attr_y)
+        dpi = get_dpi
+        screen_dpi = get_independent_dpi
+        transform_.scale_xby(screen_dpi.attr_x / (dpi.attr_x).to_f, screen_dpi.attr_y / (dpi.attr_y).to_f)
+        transform_.concat
+        @operation.context.save_graphics_state
+        return true
+      ensure
+        if (!(pool).nil?)
+          pool.release
+        end
+      end
     end
     
     typesig { [] }
@@ -613,9 +618,17 @@ module Org::Eclipse::Swt::Printing
     # @see #endJob
     def end_page
       check_device
-      if (@in_page)
-        OS._pmsession_end_page_no_dialog(@print_session)
-        @in_page = false
+      pool = nil
+      if (!NSThread.is_main_thread)
+        pool = NSAutoreleasePool.new.alloc.init
+      end
+      begin
+        @operation.context.restore_graphics_state
+        @view.end_page
+      ensure
+        if (!(pool).nil?)
+          pool.release
+        end
       end
     end
     
@@ -631,9 +644,23 @@ module Org::Eclipse::Swt::Printing
     # </ul>
     def get_dpi
       check_device
-      resolution = PMResolution.new
-      OS._pmget_resolution(@page_format, resolution)
-      return Point.new(RJava.cast_to_int(resolution.attr_h_res), RJava.cast_to_int(resolution.attr_v_res))
+      pool = nil
+      if (!NSThread.is_main_thread)
+        pool = NSAutoreleasePool.new.alloc.init
+      end
+      begin
+        # TODO get output resolution
+        return get_independent_dpi
+      ensure
+        if (!(pool).nil?)
+          pool.release
+        end
+      end
+    end
+    
+    typesig { [] }
+    def get_independent_dpi
+      return Device.instance_method(:get_dpi).bind(self).call
     end
     
     typesig { [] }
@@ -652,9 +679,21 @@ module Org::Eclipse::Swt::Printing
     # @see #computeTrim
     def get_bounds
       check_device
-      paper_rect = PMRect.new
-      OS._pmget_adjusted_paper_rect(@page_format, paper_rect)
-      return Rectangle.new(0, 0, RJava.cast_to_int((paper_rect.attr_right - paper_rect.attr_left)), RJava.cast_to_int((paper_rect.attr_bottom - paper_rect.attr_top)))
+      pool = nil
+      if (!NSThread.is_main_thread)
+        pool = NSAutoreleasePool.new.alloc.init
+      end
+      begin
+        size = @print_info.paper_size
+        scaling = scaling_factor
+        dpi = get_dpi
+        screen_dpi = get_independent_dpi
+        return Rectangle.new(0, 0, RJava.cast_to_int(((size.attr_width * dpi.attr_x / screen_dpi.attr_x) / scaling)), RJava.cast_to_int(((size.attr_height * dpi.attr_y / screen_dpi.attr_y) / scaling)))
+      ensure
+        if (!(pool).nil?)
+          pool.release
+        end
+      end
     end
     
     typesig { [] }
@@ -675,9 +714,21 @@ module Org::Eclipse::Swt::Printing
     # @see #computeTrim
     def get_client_area
       check_device
-      page_rect = PMRect.new
-      OS._pmget_adjusted_page_rect(@page_format, page_rect)
-      return Rectangle.new(0, 0, RJava.cast_to_int((page_rect.attr_right - page_rect.attr_left)), RJava.cast_to_int((page_rect.attr_bottom - page_rect.attr_top)))
+      pool = nil
+      if (!NSThread.is_main_thread)
+        pool = NSAutoreleasePool.new.alloc.init
+      end
+      begin
+        scaling = scaling_factor
+        rect = @print_info.imageable_page_bounds
+        dpi = get_dpi
+        screen_dpi = get_independent_dpi
+        return Rectangle.new(0, 0, RJava.cast_to_int(((rect.attr_width * dpi.attr_x / screen_dpi.attr_x) / scaling)), RJava.cast_to_int(((rect.attr_height * dpi.attr_y / screen_dpi.attr_y) / scaling)))
+      ensure
+        if (!(pool).nil?)
+          pool.release
+        end
+      end
     end
     
     typesig { [] }
@@ -688,63 +739,6 @@ module Org::Eclipse::Swt::Printing
     def get_printer_data
       check_device
       return @data
-    end
-    
-    typesig { [] }
-    # On the Mac the core graphics context for printing is only valid between PMSessionBeginPage and PMSessionEndPage,
-    # so printing code has to retrieve and initializes a graphic context for every page like this:
-    # 
-    # <pre>
-    # PMSessionBeginDocument
-    # PMSessionBeginPage
-    # PMSessionGetGraphicsContext
-    # // ... use context
-    # PMSessionEndPage
-    # PMSessionEndDocument
-    # </pre>
-    # 
-    # In SWT it is OK to create a GC once between startJob / endJob and use it for all pages in between:
-    # 
-    # <pre>
-    # startJob(...);
-    # GC gc= new GC(printer);
-    # startPage();
-    # // ... use gc
-    # endPage();
-    # gc.dispose();
-    # endJob();
-    # </pre>
-    # 
-    # The solution to resolve this difference is to rely on the fact that Mac OS X returns the same but
-    # reinitialized graphics context for every page. So we only have to account for the fact that SWT assumes
-    # that the graphics context keeps it settings across a page break when it actually does not.
-    # So we have to copy some settings that exist in the CGC before a PMSessionEndPage to the CGC after a PMSessionBeginPage.
-    # <p>
-    # In addition to this we have to cope with the situation that in SWT we can create a GC before a call to
-    # PMSessionBeginPage. For this we decouple the call to PMSessionBeginPage from
-    # SWT's method startPage as follows: if a new GC is created before a call to startPage, internal_new_GC
-    # does the PMSessionBeginPage and the next following startPage does nothing.
-    # </p>
-    def setup_new_page
-      if (!@in_page)
-        @in_page = true
-        OS._pmsession_begin_page_no_dialog(@print_session, @page_format, nil)
-        buffer = Array.typed(::Java::Int).new(1) { 0 }
-        OS._pmsession_get_graphics_context(@print_session, 0, buffer)
-        if ((@context).equal?(0))
-          @context = buffer[0]
-        else
-          if (!(@context).equal?(buffer[0]))
-            SWT.error(SWT::ERROR_UNSPECIFIED)
-          end
-        end
-        paper_rect = PMRect.new
-        OS._pmget_adjusted_paper_rect(@page_format, paper_rect)
-        OS._cgcontext_scale_ctm(@context, 1, -1)
-        OS._cgcontext_translate_ctm(@context, 0, -((paper_rect.attr_bottom - paper_rect.attr_top)).to_f)
-        OS._cgcontext_set_stroke_color_space(@context, @colorspace)
-        OS._cgcontext_set_fill_color_space(@context, @colorspace)
-      end
     end
     
     private

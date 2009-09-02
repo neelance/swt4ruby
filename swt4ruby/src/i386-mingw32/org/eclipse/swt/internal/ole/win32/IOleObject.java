@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2006 IBM Corporation and others.
+ * Copyright (c) 2000, 2008 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -25,6 +25,9 @@ public int Close(int dwSaveOption) {
 }
 public int DoVerb(int iVerb, MSG lpmsg, int /*long*/ pActiveSite, int lindex, int /*long*/ hwndParent, RECT lprcPosRect) {
 	return COM.VtblCall(11, address, iVerb, lpmsg, pActiveSite, lindex, hwndParent, lprcPosRect);
+}
+public int GetClientSite(int /*long*/[] ppvClientSite) {
+	return COM.VtblCall(4, address, ppvClientSite);
 }
 public int GetExtent(int dwDrawAspect, SIZE pSizel) {
 	return COM.VtblCall(18, address, dwDrawAspect, pSizel);

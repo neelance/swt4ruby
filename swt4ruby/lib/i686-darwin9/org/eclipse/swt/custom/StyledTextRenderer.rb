@@ -1,6 +1,6 @@
 require "rjava"
 
-# Copyright (c) 2000, 2008 IBM Corporation and others.
+# Copyright (c) 2000, 2009 IBM Corporation and others.
 # All rights reserved. This program and the accompanying materials
 # are made available under the terms of the Eclipse Public License v1.0
 # which accompanies this distribution, and is available at
@@ -196,6 +196,18 @@ module Org::Eclipse::Swt::Custom
     alias_method :attr_styles_set_count=, :styles_set_count=
     undef_method :styles_set_count=
     
+    attr_accessor :has_links
+    alias_method :attr_has_links, :has_links
+    undef_method :has_links
+    alias_method :attr_has_links=, :has_links=
+    undef_method :has_links=
+    
+    attr_accessor :fixed_pitch
+    alias_method :attr_fixed_pitch, :fixed_pitch
+    undef_method :fixed_pitch
+    alias_method :attr_fixed_pitch=, :fixed_pitch=
+    undef_method :fixed_pitch=
+    
     class_module.module_eval {
       const_set_lazy(:BULLET_MARGIN) { 8 }
       const_attr_reader  :BULLET_MARGIN
@@ -332,6 +344,8 @@ module Org::Eclipse::Swt::Custom
       @styles = nil
       @styles_set = nil
       @styles_set_count = 0
+      @has_links = false
+      @fixed_pitch = false
       @device = device
       @styled_text = styled_text
     end
@@ -695,6 +709,9 @@ module Org::Eclipse::Swt::Custom
       selection = @styled_text.get_selection
       selection_start = selection.attr_x - line_offset
       selection_end = selection.attr_y - line_offset
+      if (@styled_text.get_block_selection)
+        selection_start = selection_end = 0
+      end
       client = @styled_text.get_client_area
       line_background = get_line_background(line_index, nil)
       event = @styled_text.get_line_background_data(line_offset, line)
@@ -827,7 +844,7 @@ module Org::Eclipse::Swt::Custom
     def get_height
       default_line_height = get_line_height
       if (@styled_text.is_fixed_line_height)
-        return @line_count * default_line_height
+        return @line_count * default_line_height + @styled_text.attr_top_margin + @styled_text.attr_bottom_margin
       end
       total_height = 0
       width = @styled_text.get_wrap_width
@@ -846,6 +863,55 @@ module Org::Eclipse::Swt::Custom
         i += 1
       end
       return total_height + @styled_text.attr_top_margin + @styled_text.attr_bottom_margin
+    end
+    
+    typesig { [::Java::Int] }
+    def has_link(offset)
+      if ((offset).equal?(-1))
+        return false
+      end
+      line_index = @content.get_line_at_offset(offset)
+      line_offset = @content.get_offset_at_line(line_index)
+      line = @content.get_line(line_index)
+      event = @styled_text.get_line_style_data(line_offset, line)
+      if (!(event).nil?)
+        styles = event.attr_styles
+        if (!(styles).nil?)
+          ranges = event.attr_ranges
+          if (!(ranges).nil?)
+            i = 0
+            while i < ranges.attr_length
+              if (ranges[i] <= offset && offset < ranges[i] + ranges[i + 1] && styles[i >> 1].attr_underline && (styles[i >> 1].attr_underline_style).equal?(SWT::UNDERLINE_LINK))
+                return true
+              end
+              i += 2
+            end
+          else
+            i = 0
+            while i < styles.attr_length
+              if (styles[i].attr_start <= offset && offset < styles[i].attr_start + styles[i].attr_length && styles[i >> 1].attr_underline && (styles[i >> 1].attr_underline_style).equal?(SWT::UNDERLINE_LINK))
+                return true
+              end
+              i += 1
+            end
+          end
+        end
+      else
+        if (!(@ranges).nil?)
+          range_count = @style_count << 1
+          index = get_range_index(offset, -1, range_count)
+          if (index >= range_count)
+            return false
+          end
+          range_start = @ranges[index]
+          range_length = @ranges[index + 1]
+          range_style = @styles[index >> 1]
+          if (range_start <= offset && offset < range_start + range_length && range_style.attr_underline && (range_style.attr_underline_style).equal?(SWT::UNDERLINE_LINK))
+            return true
+          end
+        end
+      end
+      return false
     end
     
     typesig { [::Java::Int, ::Java::Int] }
@@ -971,6 +1037,9 @@ module Org::Eclipse::Swt::Custom
     
     typesig { [::Java::Int, ::Java::Int] }
     def get_ranges(start, length_)
+      if ((length_).equal?(0))
+        return nil
+      end
       new_ranges = nil
       end_ = start + length_ - 1
       if (!(@ranges).nil?)
@@ -982,7 +1051,10 @@ module Org::Eclipse::Swt::Custom
         if (@ranges[range_start] > end_)
           return nil
         end
-        range_end = Math.min(range_count - 2, get_range_index(end_, range_start - 1, range_count) + 1)
+        range_end = Math.min(range_count - 2, get_range_index(end_, range_start - 1, range_count))
+        if (@ranges[range_end] > end_)
+          range_end = Math.max(range_start, range_end - 2)
+        end
         new_ranges = Array.typed(::Java::Int).new(range_end - range_start + 2) { 0 }
         System.arraycopy(@ranges, range_start, new_ranges, 0, new_ranges.attr_length)
       else
@@ -994,6 +1066,9 @@ module Org::Eclipse::Swt::Custom
           return nil
         end
         range_end = Math.min(@style_count - 1, get_range_index(end_, range_start - 1, @style_count))
+        if (@styles[range_end].attr_start > end_)
+          range_end = Math.max(range_start, range_end - 1)
+        end
         new_ranges = Array.typed(::Java::Int).new((range_end - range_start + 1) << 1) { 0 }
         i = range_start
         j = 0
@@ -1017,6 +1092,9 @@ module Org::Eclipse::Swt::Custom
     
     typesig { [::Java::Int, ::Java::Int, ::Java::Boolean] }
     def get_style_ranges(start, length_, include_ranges)
+      if ((length_).equal?(0))
+        return nil
+      end
       new_styles = nil
       end_ = start + length_ - 1
       if (!(@ranges).nil?)
@@ -1028,7 +1106,10 @@ module Org::Eclipse::Swt::Custom
         if (@ranges[range_start] > end_)
           return nil
         end
-        range_end = Math.min(range_count - 2, get_range_index(end_, range_start - 1, range_count) + 1)
+        range_end = Math.min(range_count - 2, get_range_index(end_, range_start - 1, range_count))
+        if (@ranges[range_end] > end_)
+          range_end = Math.max(range_start, range_end - 2)
+        end
         new_styles = Array.typed(StyleRange).new(((range_end - range_start) >> 1) + 1) { nil }
         if (include_ranges)
           i = range_start
@@ -1052,27 +1133,22 @@ module Org::Eclipse::Swt::Custom
           return nil
         end
         range_end = Math.min(@style_count - 1, get_range_index(end_, range_start - 1, @style_count))
+        if (@styles[range_end].attr_start > end_)
+          range_end = Math.max(range_start, range_end - 1)
+        end
         new_styles = Array.typed(StyleRange).new(range_end - range_start + 1) { nil }
         System.arraycopy(@styles, range_start, new_styles, 0, new_styles.attr_length)
       end
-      style = new_styles[0]
-      if (start > style.attr_start)
-        if (!include_ranges || (@ranges).nil?)
+      if (include_ranges || (@ranges).nil?)
+        style = new_styles[0]
+        if (start > style.attr_start)
           new_styles[0] = style = style.clone
+          style.attr_length = style.attr_start + style.attr_length - start
+          style.attr_start = start
         end
-        style.attr_length = style.attr_start + style.attr_length - start
-        style.attr_start = start
-      end
-      style = new_styles[new_styles.attr_length - 1]
-      if (end_ < style.attr_start + style.attr_length - 1)
-        if (end_ < style.attr_start)
-          tmp = Array.typed(StyleRange).new(new_styles.attr_length - 1) { nil }
-          System.arraycopy(new_styles, 0, tmp, 0, new_styles.attr_length - 1)
-          new_styles = tmp
-        else
-          if (!include_ranges || (@ranges).nil?)
-            new_styles[new_styles.attr_length - 1] = style = style.clone
-          end
+        style = new_styles[new_styles.attr_length - 1]
+        if (end_ < style.attr_start + style.attr_length - 1)
+          new_styles[new_styles.attr_length - 1] = style = style.clone
           style.attr_length = end_ - style.attr_start + 1
         end
       end
@@ -1081,6 +1157,9 @@ module Org::Eclipse::Swt::Custom
     
     typesig { [StyleRange] }
     def get_style_range(style)
+      if (style.attr_underline && (style.attr_underline_style).equal?(SWT::UNDERLINE_LINK))
+        @has_links = true
+      end
       if ((style.attr_start).equal?(0) && (style.attr_length).equal?(0) && (style.attr_font_style).equal?(SWT::NORMAL))
         return style
       end
@@ -1474,6 +1553,7 @@ module Org::Eclipse::Swt::Custom
       @bullets = nil
       @bullets_indices = nil
       @redraw_lines = nil
+      @has_links = false
     end
     
     typesig { [::Java::Int, ::Java::Int] }
@@ -1559,6 +1639,7 @@ module Org::Eclipse::Swt::Custom
       if (!(@styled_text).nil?)
         gc = SwtGC.new(@styled_text)
         @average_char_width = gc.get_font_metrics.get_average_char_width
+        @fixed_pitch = (gc.string_extent("l").attr_x).equal?(gc.string_extent("W").attr_x) # $NON-NLS-1$ //$NON-NLS-2$
         gc.dispose
       end
     end
@@ -1685,6 +1766,7 @@ module Org::Eclipse::Swt::Custom
         @ranges = nil
         @styles = nil
         @styles_set = nil
+        @has_links = false
         return
       end
       if ((new_ranges).nil? && COMPACT_STYLES)

@@ -1,6 +1,6 @@
 require "rjava"
 
-# Copyright (c) 2000, 2006 IBM Corporation and others.
+# Copyright (c) 2000, 2008 IBM Corporation and others.
 # All rights reserved. This program and the accompanying materials
 # are made available under the terms of the Eclipse Public License v1.0
 # which accompanies this distribution, and is available at
@@ -19,12 +19,14 @@ module Org::Eclipse::Swt::Internal::Ole::Win32
   class FUNCDESC 
     include_class_members FUNCDESCImports
     
+    # @field cast=(MEMBERID)
     attr_accessor :memid
     alias_method :attr_memid, :memid
     undef_method :memid
     alias_method :attr_memid=, :memid=
     undef_method :memid=
     
+    # @field cast=(SCODE FAR *)
     # long
     attr_accessor :lprgscode
     alias_method :attr_lprgscode, :lprgscode
@@ -32,6 +34,7 @@ module Org::Eclipse::Swt::Internal::Ole::Win32
     alias_method :attr_lprgscode=, :lprgscode=
     undef_method :lprgscode=
     
+    # @field cast=(ELEMDESC FAR *)
     # long
     attr_accessor :lprgelemdesc_param
     alias_method :attr_lprgelemdesc_param, :lprgelemdesc_param
@@ -39,18 +42,21 @@ module Org::Eclipse::Swt::Internal::Ole::Win32
     alias_method :attr_lprgelemdesc_param=, :lprgelemdesc_param=
     undef_method :lprgelemdesc_param=
     
+    # @field cast=(FUNCKIND)
     attr_accessor :funckind
     alias_method :attr_funckind, :funckind
     undef_method :funckind
     alias_method :attr_funckind=, :funckind=
     undef_method :funckind=
     
+    # @field cast=(INVOKEKIND)
     attr_accessor :invkind
     alias_method :attr_invkind, :invkind
     undef_method :invkind
     alias_method :attr_invkind=, :invkind=
     undef_method :invkind=
     
+    # @field cast=(CALLCONV)
     attr_accessor :callconv
     alias_method :attr_callconv, :callconv
     undef_method :callconv
@@ -83,6 +89,7 @@ module Org::Eclipse::Swt::Internal::Ole::Win32
     
     # ELEMDESC elemdescFunc;
     # TYPEDESC elemdescFunc.tdesc
+    # @field accessor=elemdescFunc.tdesc.lptdesc,cast=(struct FARSTRUCT tagTYPEDESC FAR* )
     # long
     attr_accessor :elemdesc_func_tdesc_union
     alias_method :attr_elemdesc_func_tdesc_union, :elemdesc_func_tdesc_union
@@ -90,6 +97,7 @@ module Org::Eclipse::Swt::Internal::Ole::Win32
     alias_method :attr_elemdesc_func_tdesc_union=, :elemdesc_func_tdesc_union=
     undef_method :elemdesc_func_tdesc_union=
     
+    # @field accessor=elemdescFunc.tdesc.vt
     attr_accessor :elemdesc_func_tdesc_vt
     alias_method :attr_elemdesc_func_tdesc_vt, :elemdesc_func_tdesc_vt
     undef_method :elemdesc_func_tdesc_vt
@@ -97,6 +105,7 @@ module Org::Eclipse::Swt::Internal::Ole::Win32
     undef_method :elemdesc_func_tdesc_vt=
     
     # PARAMDESC elemdescFunc.paramdesc
+    # @field accessor=elemdescFunc.paramdesc.pparamdescex,cast=(LPPARAMDESCEX)
     # long
     attr_accessor :elemdesc_func_paramdesc_pparamdescex
     alias_method :attr_elemdesc_func_paramdesc_pparamdescex, :elemdesc_func_paramdesc_pparamdescex
@@ -104,6 +113,7 @@ module Org::Eclipse::Swt::Internal::Ole::Win32
     alias_method :attr_elemdesc_func_paramdesc_pparamdescex=, :elemdesc_func_paramdesc_pparamdescex=
     undef_method :elemdesc_func_paramdesc_pparamdescex=
     
+    # @field accessor=elemdescFunc.paramdesc.wParamFlags
     attr_accessor :elemdesc_func_paramdesc_w_param_flags
     alias_method :attr_elemdesc_func_paramdesc_w_param_flags, :elemdesc_func_paramdesc_w_param_flags
     undef_method :elemdesc_func_paramdesc_w_param_flags

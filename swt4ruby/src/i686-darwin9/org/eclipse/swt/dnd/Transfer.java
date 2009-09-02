@@ -27,7 +27,9 @@ package org.eclipse.swt.dnd;
  * @see <a href="http://www.eclipse.org/swt/">Sample code and further information</a>
  */
 public abstract class Transfer {
-	
+
+static String[] TYPES = new String[4];
+
 /**
  * Returns a list of the platform specific data types that can be converted using 
  * this transfer agent.
@@ -131,15 +133,22 @@ abstract protected Object nativeToJava(TransferData transferData);
  * @return the unique identifier associated with this data type
  */
 public static int registerType(String formatName) {
-	int length = formatName.length();
-	// TODO - hashcode may not be unique - need another way
-	if (length > 4) return formatName.hashCode();
-	int type = 0;
-	if (length > 0) type |= (formatName.charAt(0) & 0xff) << 24;
-	if (length > 1) type |= (formatName.charAt(1) & 0xff) << 16;
-	if (length > 2) type |= (formatName.charAt(2) & 0xff) << 8;
-	if (length > 3) type |= formatName.charAt(3) & 0xff; 
-	return type;
+	/* Note the type 0 is not used */
+	int index = 1;
+	while (index < TYPES.length) {
+		String type = TYPES[index];
+		if (type != null && formatName.equals(type)) {
+			return index;
+		}
+		index++;
+	}
+	if (index == TYPES.length) {
+		String[] newTypes = new String[TYPES.length + 4];
+		System.arraycopy(TYPES, 0, newTypes, 0, TYPES.length);
+		TYPES = newTypes;
+	}
+	TYPES[index] = formatName;
+	return index;
 }
 
 /**

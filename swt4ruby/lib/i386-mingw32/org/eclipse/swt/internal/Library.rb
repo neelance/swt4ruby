@@ -1,6 +1,6 @@
 require "rjava"
 
-# Copyright (c) 2000, 2008 IBM Corporation and others.
+# Copyright (c) 2000, 2009 IBM Corporation and others.
 # All rights reserved. This program and the accompanying materials
 # are made available under the terms of the Eclipse Public License v1.0
 # which accompanies this distribution, and is available at
@@ -38,7 +38,7 @@ module Org::Eclipse::Swt::Internal
       # SWT Minor version number (must be in the range 0..999)
       
       def minor_version
-        defined?(@@minor_version) ? @@minor_version : @@minor_version= 448
+        defined?(@@minor_version) ? @@minor_version : @@minor_version= 550
       end
       alias_method :attr_minor_version, :minor_version
       
@@ -59,6 +59,32 @@ module Org::Eclipse::Swt::Internal
       end
       alias_method :attr_revision=, :revision=
       
+      # 64-bit support
+      # final
+      # long
+      
+      def is_64
+        defined?(@@is_64) ? @@is_64 : @@is_64= (0x1ffffffff).equal?(RJava.cast_to_int(0x1ffffffff))
+      end
+      alias_method :attr_is_64, :is_64
+      
+      def is_64=(value)
+        @@is_64 = value
+      end
+      alias_method :attr_is_64=, :is_64=
+      
+      const_set_lazy(:SUFFIX_64) { "-64" }
+      const_attr_reader  :SUFFIX_64
+      
+      # $NON-NLS-1$
+      const_set_lazy(:SWTDIR_32) { "swtlib-32" }
+      const_attr_reader  :SWTDIR_32
+      
+      # $NON-NLS-1$
+      const_set_lazy(:SWTDIR_64) { "swtlib-64" }
+      const_attr_reader  :SWTDIR_64
+      
+      # $NON-NLS-1$
       when_class_loaded do
         const_set :SEPARATOR, RJava.cast_to_string(System.get_property("file.separator"))
         const_set :JAVA_VERSION, parse_version(System.get_property("java.version"))
@@ -134,10 +160,12 @@ module Org::Eclipse::Swt::Internal
         os = nil
         is = nil
         file = JavaFile.new(file_name)
+        extracted = false
         begin
           if (!file.exists)
             is = Library.get_resource_as_stream("/" + mapped_name) # $NON-NLS-1$
             if (!(is).nil?)
+              extracted = true
               read = 0
               buffer = Array.typed(::Java::Byte).new(4096) { 0 }
               os = FileOutputStream.new(file_name)
@@ -153,10 +181,10 @@ module Org::Eclipse::Swt::Internal
                 rescue JavaThrowable => e
                 end
               end
-              if (load(file_name))
-                return true
-              end
             end
+          end
+          if (load(file_name))
+            return true
           end
         rescue JavaThrowable => e
           begin
@@ -171,9 +199,9 @@ module Org::Eclipse::Swt::Internal
             end
           rescue IOException => e1
           end
-        end
-        if (file.exists)
-          file.delete
+          if (extracted && file.exists)
+            file.delete
+          end
         end
         return false
       end
@@ -223,19 +251,13 @@ module Org::Eclipse::Swt::Internal
           prop = RJava.cast_to_string(System.get_property("com.ibm.vm.bitmode"))
         end # $NON-NLS-1$
         if (!(prop).nil?)
-          if (("32" == prop))
+          if (("32" == prop) && self.attr_is_64)
             # $NON-NLS-1$
-            # long
-            if ((0x1ffffffff).equal?(RJava.cast_to_int(0x1ffffffff)))
-              raise UnsatisfiedLinkError.new("Cannot load 64-bit SWT libraries on 32-bit JVM") # $NON-NLS-1$
-            end
+            raise UnsatisfiedLinkError.new("Cannot load 64-bit SWT libraries on 32-bit JVM") # $NON-NLS-1$
           end
-          if (("64" == prop))
+          if (("64" == prop) && !self.attr_is_64)
             # $NON-NLS-1$
-            # long
-            if (!(0x1ffffffff).equal?(RJava.cast_to_int(0x1ffffffff)))
-              raise UnsatisfiedLinkError.new("Cannot load 32-bit SWT libraries on 64-bit JVM") # $NON-NLS-1$
-            end
+            raise UnsatisfiedLinkError.new("Cannot load 32-bit SWT libraries on 64-bit JVM") # $NON-NLS-1$
           end
         end
         # Compute the library name and mapped name
@@ -263,8 +285,8 @@ module Org::Eclipse::Swt::Internal
           end
           lib_name1 = name + "-" + RJava.cast_to_string(Platform::SWT_PLATFORM) + "-" + version # $NON-NLS-1$ //$NON-NLS-2$
           lib_name2 = name + "-" + RJava.cast_to_string(Platform::SWT_PLATFORM) # $NON-NLS-1$
-          mapped_name1 = RJava.cast_to_string(System.map_library_name(lib_name1))
-          mapped_name2 = RJava.cast_to_string(System.map_library_name(lib_name2))
+          mapped_name1 = RJava.cast_to_string(map_library_name(lib_name1))
+          mapped_name2 = RJava.cast_to_string(map_library_name(lib_name2))
         else
           lib_name1 = RJava.cast_to_string(lib_name2 = RJava.cast_to_string(mapped_name1 = RJava.cast_to_string(mapped_name2 = name)))
         end
@@ -287,27 +309,57 @@ module Org::Eclipse::Swt::Internal
           return
         end
         # Try loading library from the tmp directory if swt library path is not specified
+        file_name1 = mapped_name1
+        file_name2 = mapped_name2
         if ((path).nil?)
           path = RJava.cast_to_string(System.get_property("java.io.tmpdir")) # $NON-NLS-1$
-          path = RJava.cast_to_string(JavaFile.new(path).get_absolute_path)
-          if (load(path + SEPARATOR + mapped_name1))
+          dir = JavaFile.new(path, self.attr_is_64 ? SWTDIR_64 : SWTDIR_32)
+          make = false
+          if ((dir.exists && dir.is_directory) || (make = dir.mkdir))
+            path = RJava.cast_to_string(dir.get_absolute_path)
+            if (make && !(Platform::SWT_PLATFORM == "win32"))
+              # $NON-NLS-1$
+              begin
+                Runtime.get_runtime.exec(Array.typed(String).new(["chmod", "777", path])).wait_for # $NON-NLS-1$ //$NON-NLS-2$
+              rescue JavaThrowable => e
+              end
+            end
+          else
+            # fall back to using the tmp directory
+            if (self.attr_is_64)
+              file_name1 = RJava.cast_to_string(map_library_name(lib_name1 + SUFFIX_64))
+              file_name2 = RJava.cast_to_string(map_library_name(lib_name2 + SUFFIX_64))
+            end
+          end
+          if (load(path + SEPARATOR + file_name1))
             return
           end
-          if (map_name && load(path + SEPARATOR + mapped_name2))
+          if (map_name && load(path + SEPARATOR + file_name2))
             return
           end
         end
         # Try extracting and loading library from jar
         if (!(path).nil?)
-          if (extract(path + SEPARATOR + mapped_name1, mapped_name1))
+          if (extract(path + SEPARATOR + file_name1, mapped_name1))
             return
           end
-          if (map_name && extract(path + SEPARATOR + mapped_name2, mapped_name2))
+          if (map_name && extract(path + SEPARATOR + file_name2, mapped_name2))
             return
           end
         end
         # Failed to find the library
         raise UnsatisfiedLinkError.new("no " + lib_name1 + " or " + lib_name2 + " in swt.library.path, java.library.path or the jar file") # $NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+      end
+      
+      typesig { [String] }
+      def map_library_name(lib_name)
+        # SWT libraries in the Macintosh use the extension .jnilib but the some VMs map to .dylib.
+        lib_name = RJava.cast_to_string(System.map_library_name(lib_name))
+        ext = ".dylib" # $NON-NLS-1$
+        if (lib_name.ends_with(ext))
+          lib_name = RJava.cast_to_string(lib_name.substring(0, lib_name.length - ext.length)) + ".jnilib" # $NON-NLS-1$
+        end
+        return lib_name
       end
     }
     

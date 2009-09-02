@@ -1,6 +1,6 @@
 require "rjava"
 
-# Copyright (c) 2000, 2006 IBM Corporation and others.
+# Copyright (c) 2000, 2008 IBM Corporation and others.
 # All rights reserved. This program and the accompanying materials
 # are made available under the terms of the Eclipse Public License v1.0
 # which accompanies this distribution, and is available at
@@ -32,24 +32,28 @@ module Org::Eclipse::Swt::Internal::Win32
     undef_method :w_id=
     
     # RECT rcChild;
+    # @field accessor=rcChild.left
     attr_accessor :rc_child_left
     alias_method :attr_rc_child_left, :rc_child_left
     undef_method :rc_child_left
     alias_method :attr_rc_child_left=, :rc_child_left=
     undef_method :rc_child_left=
     
+    # @field accessor=rcChild.top
     attr_accessor :rc_child_top
     alias_method :attr_rc_child_top, :rc_child_top
     undef_method :rc_child_top
     alias_method :attr_rc_child_top=, :rc_child_top=
     undef_method :rc_child_top=
     
+    # @field accessor=rcChild.right
     attr_accessor :rc_child_right
     alias_method :attr_rc_child_right, :rc_child_right
     undef_method :rc_child_right
     alias_method :attr_rc_child_right=, :rc_child_right=
     undef_method :rc_child_right=
     
+    # @field accessor=rcChild.bottom
     attr_accessor :rc_child_bottom
     alias_method :attr_rc_child_bottom, :rc_child_bottom
     undef_method :rc_child_bottom
@@ -57,24 +61,28 @@ module Org::Eclipse::Swt::Internal::Win32
     undef_method :rc_child_bottom=
     
     # RECT rcBand;
+    # @field accessor=rcBand.left
     attr_accessor :rc_band_left
     alias_method :attr_rc_band_left, :rc_band_left
     undef_method :rc_band_left
     alias_method :attr_rc_band_left=, :rc_band_left=
     undef_method :rc_band_left=
     
+    # @field accessor=rcBand.top
     attr_accessor :rc_band_top
     alias_method :attr_rc_band_top, :rc_band_top
     undef_method :rc_band_top
     alias_method :attr_rc_band_top=, :rc_band_top=
     undef_method :rc_band_top=
     
+    # @field accessor=rcBand.right
     attr_accessor :rc_band_right
     alias_method :attr_rc_band_right, :rc_band_right
     undef_method :rc_band_right
     alias_method :attr_rc_band_right=, :rc_band_right=
     undef_method :rc_band_right=
     
+    # @field accessor=rcBand.bottom
     attr_accessor :rc_band_bottom
     alias_method :attr_rc_band_bottom, :rc_band_bottom
     undef_method :rc_band_bottom

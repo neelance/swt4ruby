@@ -1,6 +1,6 @@
 require "rjava"
 
-# Copyright (c) 2000, 2006 IBM Corporation and others.
+# Copyright (c) 2000, 2008 IBM Corporation and others.
 # All rights reserved. This program and the accompanying materials
 # are made available under the terms of the Eclipse Public License v1.0
 # which accompanies this distribution, and is available at
@@ -19,6 +19,7 @@ module Org::Eclipse::Swt::Internal::Ole::Win32
   class STATSTG 
     include_class_members STATSTGImports
     
+    # @field cast=(LPWSTR)
     # long
     attr_accessor :pwcs_name
     alias_method :attr_pwcs_name, :pwcs_name
@@ -32,6 +33,7 @@ module Org::Eclipse::Swt::Internal::Ole::Win32
     alias_method :attr_type=, :type=
     undef_method :type=
     
+    # @field accessor=cbSize.QuadPart
     attr_accessor :cb_size
     alias_method :attr_cb_size, :cb_size
     undef_method :cb_size
@@ -39,12 +41,14 @@ module Org::Eclipse::Swt::Internal::Ole::Win32
     undef_method :cb_size=
     
     # FILETIME mtime;
+    # @field accessor=mtime.dwLowDateTime
     attr_accessor :mtime_dw_low_date_time
     alias_method :attr_mtime_dw_low_date_time, :mtime_dw_low_date_time
     undef_method :mtime_dw_low_date_time
     alias_method :attr_mtime_dw_low_date_time=, :mtime_dw_low_date_time=
     undef_method :mtime_dw_low_date_time=
     
+    # @field accessor=mtime.dwHighDateTime
     attr_accessor :mtime_dw_high_date_time
     alias_method :attr_mtime_dw_high_date_time, :mtime_dw_high_date_time
     undef_method :mtime_dw_high_date_time
@@ -52,12 +56,14 @@ module Org::Eclipse::Swt::Internal::Ole::Win32
     undef_method :mtime_dw_high_date_time=
     
     # FILETIME ctime;
+    # @field accessor=ctime.dwLowDateTime
     attr_accessor :ctime_dw_low_date_time
     alias_method :attr_ctime_dw_low_date_time, :ctime_dw_low_date_time
     undef_method :ctime_dw_low_date_time
     alias_method :attr_ctime_dw_low_date_time=, :ctime_dw_low_date_time=
     undef_method :ctime_dw_low_date_time=
     
+    # @field accessor=ctime.dwHighDateTime
     attr_accessor :ctime_dw_high_date_time
     alias_method :attr_ctime_dw_high_date_time, :ctime_dw_high_date_time
     undef_method :ctime_dw_high_date_time
@@ -65,12 +71,14 @@ module Org::Eclipse::Swt::Internal::Ole::Win32
     undef_method :ctime_dw_high_date_time=
     
     # FILETIME atime;
+    # @field accessor=atime.dwLowDateTime
     attr_accessor :atime_dw_low_date_time
     alias_method :attr_atime_dw_low_date_time, :atime_dw_low_date_time
     undef_method :atime_dw_low_date_time
     alias_method :attr_atime_dw_low_date_time=, :atime_dw_low_date_time=
     undef_method :atime_dw_low_date_time=
     
+    # @field accessor=atime.dwHighDateTime
     attr_accessor :atime_dw_high_date_time
     alias_method :attr_atime_dw_high_date_time, :atime_dw_high_date_time
     undef_method :atime_dw_high_date_time
@@ -90,24 +98,28 @@ module Org::Eclipse::Swt::Internal::Ole::Win32
     undef_method :grf_locks_supported=
     
     # GUID clsid;
+    # @field accessor=clsid.Data1
     attr_accessor :clsid_data1
     alias_method :attr_clsid_data1, :clsid_data1
     undef_method :clsid_data1
     alias_method :attr_clsid_data1=, :clsid_data1=
     undef_method :clsid_data1=
     
+    # @field accessor=clsid.Data2
     attr_accessor :clsid_data2
     alias_method :attr_clsid_data2, :clsid_data2
     undef_method :clsid_data2
     alias_method :attr_clsid_data2=, :clsid_data2=
     undef_method :clsid_data2=
     
+    # @field accessor=clsid.Data3
     attr_accessor :clsid_data3
     alias_method :attr_clsid_data3, :clsid_data3
     undef_method :clsid_data3
     alias_method :attr_clsid_data3=, :clsid_data3=
     undef_method :clsid_data3=
     
+    # @field accessor=clsid.Data4
     attr_accessor :clsid_data4
     alias_method :attr_clsid_data4, :clsid_data4
     undef_method :clsid_data4

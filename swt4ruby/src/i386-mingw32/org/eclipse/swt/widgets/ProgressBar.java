@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2008 IBM Corporation and others.
+ * Copyright (c) 2000, 2009 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -35,6 +35,7 @@ import org.eclipse.swt.graphics.*;
  * @see <a href="http://www.eclipse.org/swt/snippets/#progressbar">ProgressBar snippets</a>
  * @see <a href="http://www.eclipse.org/swt/examples.php">SWT Example: ControlExample</a>
  * @see <a href="http://www.eclipse.org/swt/">Sample code and further information</a>
+ * @noextend This class is not intended to be subclassed by clients.
  */
 public class ProgressBar extends Control {
 	static final int DELAY = 100;
@@ -103,6 +104,7 @@ public class ProgressBar extends Control {
  * @see SWT#SMOOTH
  * @see SWT#HORIZONTAL
  * @see SWT#VERTICAL
+ * @see SWT#INDETERMINATE
  * @see Widget#checkSubclass
  * @see Widget#getStyle
  */
@@ -315,19 +317,26 @@ public void setSelection (int value) {
 	checkWidget ();
 	/*
 	* Feature in Vista.  When the progress bar is not in
-	* a normal state, PBM_SETPOS does not set the position.
+	* a normal state, PBM_SETPOS does not set the position
+	* of the bar when the selection is equal to the minimum.
 	* This is undocumented.  The fix is to temporarily
 	* set the state to PBST_NORMAL, set the position, then
 	* reset the state.
 	*/
 	int /*long*/ state = 0;
+	boolean fixSelection = false;
 	if (!OS.IsWinCE && OS.WIN32_VERSION >= OS.VERSION (6, 0)) {
-		state = OS.SendMessage (handle, OS.PBM_GETSTATE, 0, 0);
-		OS.SendMessage (handle, OS.PBM_SETSTATE, OS.PBST_NORMAL, 0);
+		int minumum = (int)/*64*/OS.SendMessage (handle, OS.PBM_GETRANGE, 1, 0);
+		int selection = (int)/*64*/OS.SendMessage (handle, OS.PBM_GETPOS, 0, 0);
+		if (selection == minumum) {
+			fixSelection = true;
+			state = OS.SendMessage (handle, OS.PBM_GETSTATE, 0, 0);
+			OS.SendMessage (handle, OS.PBM_SETSTATE, OS.PBST_NORMAL, 0);
+		}
 	}
 	OS.SendMessage (handle, OS.PBM_SETPOS, value, 0);
 	if (!OS.IsWinCE && OS.WIN32_VERSION >= OS.VERSION (6, 0)) {
-		OS.SendMessage (handle, OS.PBM_SETSTATE, state, 0);
+		if (fixSelection) OS.SendMessage (handle, OS.PBM_SETSTATE, state, 0);
 	}
 }
 

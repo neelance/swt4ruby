@@ -1,6 +1,6 @@
 require "rjava"
 
-# Copyright (c) 2000, 2008 IBM Corporation and others.
+# Copyright (c) 2000, 2009 IBM Corporation and others.
 # All rights reserved. This program and the accompanying materials
 # are made available under the terms of the Eclipse Public License v1.0
 # which accompanies this distribution, and is available at
@@ -13,15 +13,11 @@ module Org::Eclipse::Swt::Widgets
     class_module.module_eval {
       include ::Java::Lang
       include ::Org::Eclipse::Swt::Widgets
-      include_const ::Org::Eclipse::Swt::Internal::Carbon, :CFRange
-      include_const ::Org::Eclipse::Swt::Internal::Carbon, :OS
-      include_const ::Org::Eclipse::Swt::Internal::Carbon, :DataBrowserCallbacks
-      include_const ::Org::Eclipse::Swt::Internal::Carbon, :DataBrowserListViewColumnDesc
-      include_const ::Org::Eclipse::Swt::Internal::Carbon, :Rect
-      include_const ::Org::Eclipse::Swt::Internal::Carbon, :CGPoint
       include ::Org::Eclipse::Swt
+      include ::Org::Eclipse::Swt::Accessibility
       include ::Org::Eclipse::Swt::Events
       include ::Org::Eclipse::Swt::Graphics
+      include ::Org::Eclipse::Swt::Internal::Cocoa
     }
   end
   
@@ -44,8 +40,15 @@ module Org::Eclipse::Swt::Widgets
   # @see <a href="http://www.eclipse.org/swt/snippets/#list">List snippets</a>
   # @see <a href="http://www.eclipse.org/swt/examples.php">SWT Example: ControlExample</a>
   # @see <a href="http://www.eclipse.org/swt/">Sample code and further information</a>
+  # @noextend This class is not intended to be subclassed by clients.
   class SwtList < ListImports.const_get :Scrollable
     include_class_members ListImports
+    
+    attr_accessor :column
+    alias_method :attr_column, :column
+    undef_method :column
+    alias_method :attr_column=, :column=
+    undef_method :column=
     
     attr_accessor :items
     alias_method :attr_items, :items
@@ -59,18 +62,6 @@ module Org::Eclipse::Swt::Widgets
     alias_method :attr_item_count=, :item_count=
     undef_method :item_count=
     
-    attr_accessor :anchor_first
-    alias_method :attr_anchor_first, :anchor_first
-    undef_method :anchor_first
-    alias_method :attr_anchor_first=, :anchor_first=
-    undef_method :anchor_first=
-    
-    attr_accessor :anchor_last
-    alias_method :attr_anchor_last, :anchor_last
-    undef_method :anchor_last
-    alias_method :attr_anchor_last=, :anchor_last=
-    undef_method :anchor_last=
-    
     attr_accessor :ignore_select
     alias_method :attr_ignore_select, :ignore_select
     undef_method :ignore_select
@@ -78,14 +69,19 @@ module Org::Eclipse::Swt::Widgets
     undef_method :ignore_select=
     
     class_module.module_eval {
-      const_set_lazy(:COLUMN_ID) { 1024 }
-      const_attr_reader  :COLUMN_ID
       
-      const_set_lazy(:EXTRA_WIDTH) { 25 }
-      const_attr_reader  :EXTRA_WIDTH
+      def next_id
+        defined?(@@next_id) ? @@next_id : @@next_id= 0
+      end
+      alias_method :attr_next_id, :next_id
       
-      const_set_lazy(:BORDER_INSET) { 1 }
-      const_attr_reader  :BORDER_INSET
+      def next_id=(value)
+        @@next_id = value
+      end
+      alias_method :attr_next_id=, :next_id=
+      
+      const_set_lazy(:CELL_GAP) { 1 }
+      const_attr_reader  :CELL_GAP
     }
     
     typesig { [Composite, ::Java::Int] }
@@ -117,12 +113,43 @@ module Org::Eclipse::Swt::Widgets
     # @see Widget#checkSubclass
     # @see Widget#getStyle
     def initialize(parent, style)
+      @column = nil
       @items = nil
       @item_count = 0
-      @anchor_first = 0
-      @anchor_last = 0
       @ignore_select = false
       super(parent, check_style(style))
+    end
+    
+    typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
+    # long
+    # long
+    # long
+    # long
+    def accessibility_attribute_value(id, sel, arg0)
+      if (!(self.attr_accessible).nil?)
+        attribute = NSString.new(arg0)
+        return_value = self.attr_accessible.internal_accessibility_attribute_value(attribute, ACC::CHILDID_SELF)
+        if (!(return_value).nil?)
+          return return_value.attr_id
+        end
+      end
+      attribute_name = NSString.new(arg0)
+      # Accessibility Verifier queries for a title or description.  NSOutlineView doesn't
+      # seem to return either, so we return a default description value here.
+      if (attribute_name.is_equal_to_string(OS::NSAccessibilityDescriptionAttribute))
+        return NSString.string_with("").attr_id
+      end
+      # if (attributeName.isEqualToString(OS.NSAccessibilityHeaderAttribute)) {
+      # /*
+      # * Bug in the Macintosh.  Even when the header is not visible,
+      # * VoiceOver still reports each column header's role for every row.
+      # * This is confusing and overly verbose.  The fix is to return
+      # * "no header" when the screen reader asks for the header, by
+      # * returning noErr without setting the event parameter.
+      # */
+      # return 0;
+      # }
+      return super(id, sel, arg0)
     end
     
     typesig { [String] }
@@ -144,16 +171,14 @@ module Org::Eclipse::Swt::Widgets
       if ((string).nil?)
         error(SWT::ERROR_NULL_ARGUMENT)
       end
-      id = Array.typed(::Java::Int).new([@item_count + 1])
-      if (!(OS._add_data_browser_items(self.attr_handle, OS.attr_k_data_browser_no_item, 1, id, OS.attr_k_data_browser_item_no_property)).equal?(OS.attr_no_err))
-        error(SWT::ERROR_ITEM_NOT_ADDED)
-      end
       if ((@item_count).equal?(@items.attr_length))
         new_items = Array.typed(String).new(@item_count + 4) { nil }
         System.arraycopy(@items, 0, new_items, 0, @items.attr_length)
         @items = new_items
       end
       @items[((@item_count += 1) - 1)] = string
+      (self.attr_view).note_number_of_rows_changed
+      set_scroll_width(string)
     end
     
     typesig { [String, ::Java::Int] }
@@ -186,13 +211,6 @@ module Org::Eclipse::Swt::Widgets
       if (!(0 <= index && index <= @item_count))
         error(SWT::ERROR_INVALID_RANGE)
       end
-      id = Array.typed(::Java::Int).new([@item_count + 1])
-      if (!(OS._add_data_browser_items(self.attr_handle, OS.attr_k_data_browser_no_item, 1, id, OS.attr_k_data_browser_item_no_property)).equal?(OS.attr_no_err))
-        error(SWT::ERROR_ITEM_NOT_ADDED)
-      end
-      if (!(index).equal?(@item_count))
-        fix_selection(index, true)
-      end
       if ((@item_count).equal?(@items.attr_length))
         new_items = Array.typed(String).new(@item_count + 4) { nil }
         System.arraycopy(@items, 0, new_items, 0, @items.attr_length)
@@ -200,7 +218,11 @@ module Org::Eclipse::Swt::Widgets
       end
       System.arraycopy(@items, index, @items, index + 1, ((@item_count += 1) - 1) - index)
       @items[index] = string
-      OS._update_data_browser_items(self.attr_handle, 0, 0, nil, OS.attr_k_data_browser_item_no_property, OS.attr_k_data_browser_no_item)
+      (self.attr_view).note_number_of_rows_changed
+      if (!(index).equal?(@item_count))
+        fix_selection(index, true)
+      end
+      set_scroll_width(string)
     end
     
     typesig { [SelectionListener] }
@@ -248,15 +270,19 @@ module Org::Eclipse::Swt::Widgets
       check_widget
       width = 0
       if ((w_hint).equal?(SWT::DEFAULT))
-        gc = SwtGC.new(self)
+        cell = @column.data_cell
+        font = !(self.attr_font).nil? ? self.attr_font : default_font
+        cell.set_font(font.attr_handle)
         i = 0
-        while i < @item_count
-          extent = gc.string_extent(@items[i])
-          width = Math.max(width, extent.attr_x)
+        while i < @items.attr_length
+          if (!(@items[i]).nil?)
+            cell.set_title(NSString.string_with(@items[i]))
+            size = cell.cell_size
+            width = Math.max(width, RJava.cast_to_int(Math.ceil(size.attr_width)))
+          end
           i += 1
         end
-        gc.dispose
-        width += EXTRA_WIDTH
+        width += CELL_GAP
       else
         width = w_hint
       end
@@ -265,7 +291,8 @@ module Org::Eclipse::Swt::Widgets
       end
       height = 0
       if ((h_hint).equal?(SWT::DEFAULT))
-        height = @item_count * get_item_height
+        item_height = get_item_height + CELL_GAP
+        height = @item_count * item_height
       else
         height = h_hint
       end
@@ -276,83 +303,40 @@ module Org::Eclipse::Swt::Widgets
       return Point.new(rect.attr_width, rect.attr_height)
     end
     
-    typesig { [::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int] }
-    def compute_trim(x, y, width, height)
-      check_widget
-      border = get_border_width
-      rect = Rect.new
-      OS._get_data_browser_scroll_bar_inset(self.attr_handle, rect)
-      x -= rect.attr_left + border
-      y -= rect.attr_top + border
-      width += rect.attr_left + rect.attr_right + border + border
-      height += rect.attr_top + rect.attr_bottom + border + border
-      return Rectangle.new(x, y, width, height)
-    end
-    
-    typesig { [::Java::Int, ::Java::Int] }
-    def contains(shell_x, shell_y)
-      pt = CGPoint.new
-      content_view = Array.typed(::Java::Int).new(1) { 0 }
-      OS._hiview_find_by_id(OS._hiview_get_root(OS._get_control_owner(self.attr_handle)), OS.k_hiview_window_content_id, content_view)
-      OS._hiview_convert_point(pt, self.attr_handle, content_view[0])
-      x = shell_x - RJava.cast_to_int(pt.attr_x)
-      y = shell_y - RJava.cast_to_int(pt.attr_y)
-      return get_client_area.contains(x, y)
-    end
-    
     typesig { [] }
     def create_handle
-      out_control = Array.typed(::Java::Int).new(1) { 0 }
-      window = OS._get_control_owner(self.attr_parent.attr_handle)
-      OS._create_data_browser_control(window, nil, OS.attr_k_data_browser_list_view, out_control)
-      if ((out_control[0]).equal?(0))
-        error(SWT::ERROR_NO_HANDLES)
+      scroll_widget = SWTScrollView.new.alloc
+      scroll_widget.init
+      if (!((self.attr_style & SWT::H_SCROLL)).equal?(0))
+        scroll_widget.set_has_horizontal_scroller(true)
       end
-      self.attr_handle = out_control[0]
-      if (!draw_focus_ring)
-        OS._set_control_data(self.attr_handle, OS.attr_k_control_entire_control, OS.attr_k_control_data_browser_includes_frame_and_focus_tag, 1, Array.typed(::Java::Byte).new([0]))
+      if (!((self.attr_style & SWT::V_SCROLL)).equal?(0))
+        scroll_widget.set_has_vertical_scroller(true)
       end
-      selection_flags = !((self.attr_style & SWT::SINGLE)).equal?(0) ? OS.attr_k_data_browser_select_only_one | OS.attr_k_data_browser_never_empty_selection_set : OS.attr_k_data_browser_cmd_toggles_selection
-      OS._set_data_browser_selection_flags(self.attr_handle, selection_flags)
-      OS._set_data_browser_list_view_header_btn_height(self.attr_handle, RJava.cast_to_short(0))
-      OS._set_data_browser_table_view_hilite_style(self.attr_handle, OS.attr_k_data_browser_table_view_fill_hilite)
-      OS._set_data_browser_has_scroll_bars(self.attr_handle, !((self.attr_style & SWT::H_SCROLL)).equal?(0), !((self.attr_style & SWT::V_SCROLL)).equal?(0))
-      column = DataBrowserListViewColumnDesc.new
-      column.attr_header_btn_desc_version = OS.attr_k_data_browser_list_view_latest_header_desc
-      column.attr_property_desc_property_id = COLUMN_ID
-      column.attr_property_desc_property_type = OS.attr_k_data_browser_text_type
-      column.attr_property_desc_property_flags = OS.attr_k_data_browser_list_view_selection_column | OS.attr_k_data_browser_default_property_flags
-      # NOT DONE
-      column.attr_header_btn_desc_maximum_width = 0x7fff
-      column.attr_header_btn_desc_initial_order = RJava.cast_to_short(OS.attr_k_data_browser_order_increasing)
-      OS._add_data_browser_list_view_column(self.attr_handle, column, 0)
-      # Feature in the Macintosh.  Scroll bars are not created until
-      # the data browser needs to draw them.  The fix is to force the scroll
-      # bars to be created by temporarily giving the widget a size, drawing
-      # it on a offscreen buffer to avoid flashes and then restoring it to
-      # size zero.
-      if (OS::VERSION < 0x1040)
-        OS._hiview_set_drawing_enabled(self.attr_handle, false)
-        size = 50
-        rect = Rect.new
-        rect.attr_right = rect.attr_bottom = RJava.cast_to_short(size)
-        OS._set_control_bounds(self.attr_handle, rect)
-        bpl = size * 4
-        g_world = Array.typed(::Java::Int).new(1) { 0 }
-        data = OS._new_ptr(bpl * size)
-        OS._new_gworld_from_ptr(g_world, OS.attr_k32argbpixel_format, rect, 0, 0, 0, data, bpl)
-        cur_port = Array.typed(::Java::Int).new(1) { 0 }
-        cur_gworld = Array.typed(::Java::Int).new(1) { 0 }
-        OS._get_gworld(cur_port, cur_gworld)
-        OS._set_gworld(g_world[0], cur_gworld[0])
-        OS._draw_control_in_current_port(self.attr_handle)
-        OS._set_gworld(cur_port[0], cur_gworld[0])
-        OS._dispose_gworld(g_world[0])
-        OS._dispose_ptr(data)
-        rect.attr_right = rect.attr_bottom = RJava.cast_to_short(0)
-        OS._set_control_bounds(self.attr_handle, rect)
-        OS._hiview_set_drawing_enabled(self.attr_handle, true)
+      scroll_widget.set_autohides_scrollers(true)
+      scroll_widget.set_border_type(!((self.attr_style & SWT::BORDER)).equal?(0) ? OS::NSBezelBorder : OS::NSNoBorder)
+      widget = SWTTableView.new.alloc
+      widget.init
+      widget.set_allows_multiple_selection(!((self.attr_style & SWT::MULTI)).equal?(0))
+      widget.set_data_source(widget)
+      widget.set_header_view(nil)
+      widget.set_delegate(widget)
+      if (!((self.attr_style & SWT::H_SCROLL)).equal?(0))
+        widget.set_column_autoresizing_style(OS::NSTableViewNoColumnAutoresizing)
       end
+      spacing = NSSize.new
+      spacing.attr_width = spacing.attr_height = CELL_GAP
+      widget.set_intercell_spacing(spacing)
+      widget.set_double_action(OS.attr_sel_send_double_selection)
+      if (!has_border)
+        widget.set_focus_ring_type(OS::NSFocusRingTypeNone)
+      end
+      @column = NSTableColumn.new.alloc
+      @column = @column.init_with_identifier(NSString.string_with(String.value_of((self.attr_next_id += 1))))
+      @column.set_width(0)
+      widget.add_table_column(@column)
+      self.attr_scroll_view = scroll_widget
+      self.attr_view = widget
     end
     
     typesig { [] }
@@ -361,27 +345,19 @@ module Org::Eclipse::Swt::Widgets
       @items = Array.typed(String).new(4) { nil }
     end
     
-    typesig { [::Java::Int] }
-    def create_scroll_bar(style)
-      return create_standard_bar(style)
+    typesig { [] }
+    def default_background
+      return self.attr_display.get_widget_color(SWT::COLOR_LIST_BACKGROUND)
     end
     
     typesig { [] }
-    def default_background
-      return self.attr_display.get_system_color(SWT::COLOR_LIST_BACKGROUND)
+    def default_nsfont
+      return self.attr_display.attr_table_view_font
     end
     
     typesig { [] }
     def default_foreground
-      return self.attr_display.get_system_color(SWT::COLOR_LIST_FOREGROUND)
-    end
-    
-    typesig { [] }
-    def default_theme_font
-      if (self.attr_display.attr_small_fonts)
-        return OS.attr_k_theme_small_system_font
-      end
-      return OS.attr_k_theme_views_font
+      return self.attr_display.get_widget_color(SWT::COLOR_LIST_FOREGROUND)
     end
     
     typesig { [::Java::Int] }
@@ -398,8 +374,10 @@ module Org::Eclipse::Swt::Widgets
     def deselect(index)
       check_widget
       if (0 <= index && index < @item_count)
-        ids = Array.typed(::Java::Int).new([index + 1])
-        deselect(ids, ids.attr_length)
+        widget = self.attr_view
+        @ignore_select = true
+        widget.deselect_row(index)
+        @ignore_select = false
       end
     end
     
@@ -427,17 +405,18 @@ module Org::Eclipse::Swt::Widgets
       end
       start = Math.max(0, start)
       end_ = Math.min(@item_count - 1, end_)
-      length = end_ - start + 1
-      if (length <= 0)
-        return
+      if ((start).equal?(0) && (end_).equal?(@item_count - 1))
+        deselect_all
+      else
+        widget = self.attr_view
+        @ignore_select = true
+        i = start
+        while i <= end_
+          widget.deselect_row(i)
+          i += 1
+        end
+        @ignore_select = false
       end
-      ids = Array.typed(::Java::Int).new(length) { 0 }
-      i = 0
-      while i < length
-        ids[i] = end_ - i + 1
-        i += 1
-      end
-      deselect(ids, length)
     end
     
     typesig { [Array.typed(::Java::Int)] }
@@ -461,36 +440,12 @@ module Org::Eclipse::Swt::Widgets
       if ((indices).nil?)
         error(SWT::ERROR_NULL_ARGUMENT)
       end
-      # NOT DONE - range check
-      length = indices.attr_length
-      ids = Array.typed(::Java::Int).new(length) { 0 }
-      i = 0
-      while i < length
-        ids[i] = indices[length - i - 1] + 1
-        i += 1
-      end
-      deselect(ids, length)
-    end
-    
-    typesig { [Array.typed(::Java::Int), ::Java::Int] }
-    def deselect(ids, count)
+      widget = self.attr_view
       @ignore_select = true
-      # Bug in the Macintosh.  When the DataBroswer selection flags includes
-      # both kDataBrowserNeverEmptySelectionSet and kDataBrowserSelectOnlyOne,
-      # two items are selected when SetDataBrowserSelectedItems() is called
-      # with kDataBrowserItemsAssign to assign a new seletion despite the fact
-      # that kDataBrowserSelectOnlyOne was specified.  The fix is to save and
-      # restore kDataBrowserNeverEmptySelectionSet around each call to
-      # SetDataBrowserSelectedItems().
-      selection_flags = nil
-      if (!((self.attr_style & SWT::SINGLE)).equal?(0))
-        selection_flags = Array.typed(::Java::Int).new(1) { 0 }
-        OS._get_data_browser_selection_flags(self.attr_handle, selection_flags)
-        OS._set_data_browser_selection_flags(self.attr_handle, selection_flags[0] & ~OS.attr_k_data_browser_never_empty_selection_set)
-      end
-      OS._set_data_browser_selected_items(self.attr_handle, count, ids, OS.attr_k_data_browser_items_remove)
-      if (!((self.attr_style & SWT::SINGLE)).equal?(0))
-        OS._set_data_browser_selection_flags(self.attr_handle, selection_flags[0])
+      i = 0
+      while i < indices.attr_length
+        widget.deselect_row(indices[i])
+        i += 1
       end
       @ignore_select = false
     end
@@ -504,18 +459,35 @@ module Org::Eclipse::Swt::Widgets
     # </ul>
     def deselect_all
       check_widget
-      deselect(nil, 0)
+      widget = self.attr_view
+      @ignore_select = true
+      widget.deselect_all(nil)
+      @ignore_select = false
     end
     
-    typesig { [ScrollBar] }
-    def destroy_scroll_bar(bar)
-      if (!((bar.attr_style & SWT::H_SCROLL)).equal?(0))
-        self.attr_style &= ~SWT::H_SCROLL
+    typesig { [::Java::Int, ::Java::Int, ::Java::Boolean, Array.typed(::Java::Boolean)] }
+    def drag_detect(x, y, filter, consume)
+      widget = self.attr_view
+      pt = NSPoint.new
+      pt.attr_x = x
+      pt.attr_y = y
+      # long
+      row = widget.row_at_point(pt)
+      if ((row).equal?(-1))
+        return false
       end
-      if (!((bar.attr_style & SWT::V_SCROLL)).equal?(0))
-        self.attr_style &= ~SWT::V_SCROLL
+      dragging = super(x, y, filter, consume)
+      if (dragging)
+        if (!widget.is_row_selected(row))
+          # TODO expand current selection when Shift, Command key pressed??
+          set = NSIndexSet.new.alloc
+          set = set.init_with_index(row)
+          widget.select_row_indexes(set, false)
+          set.release
+        end
       end
-      OS._set_data_browser_has_scroll_bars(self.attr_handle, !((self.attr_style & SWT::H_SCROLL)).equal?(0), !((self.attr_style & SWT::V_SCROLL)).equal?(0))
+      consume[0] = dragging
+      return dragging
     end
     
     typesig { [::Java::Int, ::Java::Boolean] }
@@ -532,8 +504,8 @@ module Org::Eclipse::Swt::Widgets
           fix = true
         else
           new_index = ((new_count += 1) - 1)
-          selection[new_index] = selection[i] + 1
-          if (selection[new_index] - 1 >= index)
+          selection[new_index] = selection[i]
+          if (selection[new_index] >= index)
             selection[new_index] += add ? 1 : -1
             fix = true
           end
@@ -543,33 +515,6 @@ module Org::Eclipse::Swt::Widgets
       if (fix)
         select(selection, new_count, true)
       end
-    end
-    
-    typesig { [] }
-    def get_border_width
-      check_widget
-      border = 0
-      has_border = Array.typed(::Java::Byte).new(1) { 0 }
-      OS._get_control_data(self.attr_handle, RJava.cast_to_short(OS.attr_k_control_entire_control), OS.attr_k_control_data_browser_includes_frame_and_focus_tag, 1, has_border, nil)
-      if (!(has_border[0]).equal?(0))
-        out_metric = Array.typed(::Java::Int).new(1) { 0 }
-        OS._get_theme_metric(OS.attr_k_theme_metric_focus_rect_outset, out_metric)
-        border += out_metric[0] - BORDER_INSET
-      end
-      return border
-    end
-    
-    typesig { [] }
-    def get_client_area
-      check_widget
-      border = get_border_width
-      rect = Rect.new
-      inset = Rect.new
-      OS._get_control_bounds(self.attr_handle, rect)
-      OS._get_data_browser_scroll_bar_inset(self.attr_handle, inset)
-      width = Math.max(0, rect.attr_right - rect.attr_left - inset.attr_right - border - border)
-      height = Math.max(0, rect.attr_bottom - rect.attr_top - inset.attr_bottom - border - border)
-      return Rectangle.new(inset.attr_left + border, inset.attr_top + border, width, height)
     end
     
     typesig { [] }
@@ -584,12 +529,8 @@ module Org::Eclipse::Swt::Widgets
     # </ul>
     def get_focus_index
       check_widget
-      first = Array.typed(::Java::Int).new(1) { 0 }
-      last = Array.typed(::Java::Int).new(1) { 0 }
-      if (!(OS._get_data_browser_selection_anchor(self.attr_handle, first, last)).equal?(OS.attr_no_err))
-        return -1
-      end
-      return first[0] - 1
+      # 64
+      return RJava.cast_to_int((self.attr_view).selected_row)
     end
     
     typesig { [::Java::Int] }
@@ -640,11 +581,7 @@ module Org::Eclipse::Swt::Widgets
     # </ul>
     def get_item_height
       check_widget
-      height = Array.typed(::Java::Short).new(1) { 0 }
-      if (!(OS._get_data_browser_table_view_row_height(self.attr_handle, height)).equal?(OS.attr_no_err))
-        error(SWT::ERROR_CANNOT_GET_ITEM_HEIGHT)
-      end
-      return height[0]
+      return RJava.cast_to_int((self.attr_view).row_height)
     end
     
     typesig { [] }
@@ -686,27 +623,24 @@ module Org::Eclipse::Swt::Widgets
     # </ul>
     def get_selection
       check_widget
-      ptr = OS._new_handle(0)
-      if (!(OS._get_data_browser_items(self.attr_handle, OS.attr_k_data_browser_no_item, true, OS.attr_k_data_browser_item_is_selected, ptr)).equal?(OS.attr_no_err))
-        error(SWT::ERROR_CANNOT_GET_SELECTION)
+      widget = self.attr_view
+      if ((widget.number_of_selected_rows).equal?(0))
+        return Array.typed(String).new(0) { nil }
       end
-      count = OS._get_handle_size(ptr) / 4
-      result = Array.typed(String).new(count) { nil }
-      if (count > 0)
-        OS._hlock(ptr)
-        id = Array.typed(::Java::Int).new(1) { 0 }
-        OS.memmove(id, ptr, 4)
-        offset = id[0] + (count - 1) * 4
-        i = 0
-        while i < count
-          OS.memmove(id, offset, 4)
-          result[i] = @items[id[0] - 1]
-          i += 1
-          offset -= 4
-        end
-        OS._hunlock(ptr)
+      selection = widget.selected_row_indexes
+      # 64
+      count_ = RJava.cast_to_int(selection.count)
+      # long
+      # long
+      index_buffer = Array.typed(::Java::Int).new(count_) { 0 }
+      selection.get_indexes(index_buffer, count_, 0)
+      result = Array.typed(String).new(count_) { nil }
+      i = 0
+      while i < count_
+        # 64
+        result[i] = @items[RJava.cast_to_int(index_buffer[i])]
+        i += 1
       end
-      OS._dispose_handle(ptr)
       return result
     end
     
@@ -721,11 +655,8 @@ module Org::Eclipse::Swt::Widgets
     # </ul>
     def get_selection_count
       check_widget
-      count = Array.typed(::Java::Int).new(1) { 0 }
-      if (!(OS._get_data_browser_item_count(self.attr_handle, OS.attr_k_data_browser_no_item, true, OS.attr_k_data_browser_item_is_selected, count)).equal?(OS.attr_no_err))
-        error(SWT::ERROR_CANNOT_GET_COUNT)
-      end
-      return count[0]
+      # 64
+      return RJava.cast_to_int((self.attr_view).number_of_selected_rows)
     end
     
     typesig { [] }
@@ -740,12 +671,19 @@ module Org::Eclipse::Swt::Widgets
     # </ul>
     def get_selection_index
       check_widget
-      first = Array.typed(::Java::Int).new(1) { 0 }
-      last = Array.typed(::Java::Int).new(1) { 0 }
-      if (!(OS._get_data_browser_selection_anchor(self.attr_handle, first, last)).equal?(OS.attr_no_err))
+      widget = self.attr_view
+      if ((widget.number_of_selected_rows).equal?(0))
         return -1
       end
-      return first[0] - 1
+      selection = widget.selected_row_indexes
+      # 64
+      count_ = RJava.cast_to_int(selection.count)
+      # long
+      # long
+      result = Array.typed(::Java::Int).new(count_) { 0 }
+      selection.get_indexes(result, count_, 0)
+      # 64
+      return RJava.cast_to_int(result[0])
     end
     
     typesig { [] }
@@ -765,28 +703,24 @@ module Org::Eclipse::Swt::Widgets
     # </ul>
     def get_selection_indices
       check_widget
-      ptr = OS._new_handle(0)
-      if (!(OS._get_data_browser_items(self.attr_handle, OS.attr_k_data_browser_no_item, true, OS.attr_k_data_browser_item_is_selected, ptr)).equal?(OS.attr_no_err))
-        error(SWT::ERROR_CANNOT_GET_SELECTION)
+      widget = self.attr_view
+      if ((widget.number_of_selected_rows).equal?(0))
+        return Array.typed(::Java::Int).new(0) { 0 }
       end
-      count = OS._get_handle_size(ptr) / 4
-      result = Array.typed(::Java::Int).new(count) { 0 }
-      if (count > 0)
-        OS._hlock(ptr)
-        OS.memmove(result, ptr, 4)
-        OS.memmove(result, result[0], count * 4)
-        OS._hunlock(ptr)
-        start = 0
-        end_ = count - 1
-        while start <= end_
-          temp = result[start]
-          result[start] = result[end_] - 1
-          result[end_] = temp - 1
-          start += 1
-          end_ -= 1
-        end
+      selection = widget.selected_row_indexes
+      # 64
+      count_ = RJava.cast_to_int(selection.count)
+      # long
+      # long
+      indices = Array.typed(::Java::Int).new(count_) { 0 }
+      selection.get_indexes(indices, count_, 0)
+      result = Array.typed(::Java::Int).new(count_) { 0 }
+      i = 0
+      while i < result.attr_length
+        # 64
+        result[i] = RJava.cast_to_int(indices[i])
+        i += 1
       end
-      OS._dispose_handle(ptr)
       return result
     end
     
@@ -803,168 +737,17 @@ module Org::Eclipse::Swt::Widgets
     # </ul>
     def get_top_index
       check_widget
-      top = Array.typed(::Java::Int).new(1) { 0 }
-      left = Array.typed(::Java::Int).new(1) { 0 }
-      OS._get_data_browser_scroll_position(self.attr_handle, top, left)
-      return top[0] / get_item_height
-    end
-    
-    typesig { [] }
-    def hook_events
-      super
-      callbacks = DataBrowserCallbacks.new
-      callbacks.attr_version = OS.attr_k_data_browser_latest_callbacks
-      OS._init_data_browser_callbacks(callbacks)
-      callbacks.attr_v1_item_data_callback = self.attr_display.attr_item_data_proc
-      callbacks.attr_v1_item_notification_callback = self.attr_display.attr_item_notification_proc
-      OS._set_data_browser_callbacks(self.attr_handle, callbacks)
-    end
-    
-    typesig { [::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int] }
-    def item_data_proc(browser, id, property, item_data, set_value)
-      index = id - 1
-      case (property)
-      when COLUMN_ID
-        text = @items[index]
-        buffer = CharArray.new(text.length)
-        text.get_chars(0, buffer.attr_length, buffer, 0)
-        ptr = OS._cfstring_create_with_characters(OS.attr_k_cfallocator_default, buffer, buffer.attr_length)
-        if ((ptr).equal?(0))
-          error(SWT::ERROR_CANNOT_SET_TEXT)
-        end
-        OS._set_data_browser_item_data_text(item_data, ptr)
-        OS._cfrelease(ptr)
-      end
-      return OS.attr_no_err
-    end
-    
-    typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
-    def k_event_accessible_get_named_attribute(next_handler, the_event, user_data)
-      code = OS.attr_event_not_handled_err
-      string_ref = Array.typed(::Java::Int).new(1) { 0 }
-      OS._get_event_parameter(the_event, OS.attr_k_event_param_accessible_attribute_name, OS.attr_type_cfstring_ref, nil, 4, nil, string_ref)
-      length_ = 0
-      if (!(string_ref[0]).equal?(0))
-        length_ = OS._cfstring_get_length(string_ref[0])
-      end
-      buffer = CharArray.new(length_)
-      range = CFRange.new
-      range.attr_length = length_
-      OS._cfstring_get_characters(string_ref[0], range, buffer)
-      attribute_name = String.new(buffer)
-      if ((attribute_name == OS.attr_k_axheader_attribute))
-        # Bug in the Macintosh.  Even when the header is not visible,
-        # VoiceOver still reports each column header's role for every row.
-        # This is confusing and overly verbose.  The fix is to return
-        # "no header" when the screen reader asks for the header, by
-        # returning noErr without setting the event parameter.
-        code = OS.attr_no_err
-      end
-      if (!(self.attr_accessible).nil?)
-        code = self.attr_accessible.internal_k_event_accessible_get_named_attribute(next_handler, the_event, code)
-      end
-      return code
-    end
-    
-    typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
-    def k_event_control_get_click_activation(next_handler, the_event, user_data)
-      OS._set_event_parameter(the_event, OS.attr_k_event_param_click_activation, OS.attr_type_click_activation_result, 4, Array.typed(::Java::Int).new([OS.attr_k_activate_and_handle_click]))
-      return OS.attr_no_err
-    end
-    
-    typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
-    def k_event_control_set_cursor(next_handler, the_event, user_data)
-      if (!is_enabled_cursor)
-        return OS.attr_no_err
-      end
-      if (is_enabled_modal)
-        pt = Org::Eclipse::Swt::Internal::Carbon::Point.new
-        sizeof = Org::Eclipse::Swt::Internal::Carbon::Point.attr_sizeof
-        OS._get_event_parameter(the_event, OS.attr_k_event_param_mouse_location, OS.attr_type_qdpoint, nil, sizeof, nil, pt)
-        if (!contains(pt.attr_h, pt.attr_v))
-          return OS.attr_event_not_handled_err
-        end
-      end
-      return super(next_handler, the_event, user_data)
-    end
-    
-    typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
-    def k_event_unicode_key_pressed(next_handler, the_event, user_data)
-      result = super(next_handler, the_event, user_data)
-      if ((result).equal?(OS.attr_no_err))
-        return result
-      end
-      keyboard_event = Array.typed(::Java::Int).new(1) { 0 }
-      OS._get_event_parameter(the_event, OS.attr_k_event_param_text_input_send_keyboard_event, OS.attr_type_event_ref, nil, keyboard_event.attr_length * 4, nil, keyboard_event)
-      key_code = Array.typed(::Java::Int).new(1) { 0 }
-      OS._get_event_parameter(keyboard_event[0], OS.attr_k_event_param_key_code, OS.attr_type_uint32, nil, key_code.attr_length * 4, nil, key_code)
-      case (key_code[0])
-      # KP Enter
-      # 
-      # Feature in the Macintosh.  For some reason, when the user hits an
-      # up or down arrow to traverse the items in a Data Browser, the item
-      # scrolls to the left such that the white space that is normally
-      # visible to the right of the every item is scrolled out of view.
-      # The fix is to save and restore the horizontal scroll position.
-      # 
-      # Down
-      when 76, 36
-        # Return
-        post_event(SWT::DefaultSelection)
-      when 125, 126
-        # Up
-        top = Array.typed(::Java::Int).new(1) { 0 }
-        left = Array.typed(::Java::Int).new(1) { 0 }
-        OS._get_data_browser_scroll_position(self.attr_handle, top, left)
-        result = OS._call_next_event_handler(next_handler, the_event)
-        OS._get_data_browser_scroll_position(self.attr_handle, top, nil)
-        OS._set_data_browser_scroll_position(self.attr_handle, top[0], left[0])
+      # TODO - partial item at the top
+      rect = self.attr_scroll_view.document_visible_rect
+      point = NSPoint.new
+      point.attr_x = rect.attr_x
+      point.attr_y = rect.attr_y
+      # 64
+      result = RJava.cast_to_int((self.attr_view).row_at_point(point))
+      if ((result).equal?(-1))
+        result = 0
       end
       return result
-    end
-    
-    typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
-    def item_notification_proc(browser, id, message)
-      catch(:break_case) do
-        case (message)
-        when OS.attr_k_data_browser_item_selected, OS.attr_k_data_browser_item_deselected
-          if (@ignore_select)
-            throw :break_case, :thrown
-          end
-          first = Array.typed(::Java::Int).new(1) { 0 }
-          last = Array.typed(::Java::Int).new(1) { 0 }
-          OS._get_data_browser_selection_anchor(self.attr_handle, first, last)
-          selected = false
-          if (!((self.attr_style & SWT::MULTI)).equal?(0))
-            modifiers = OS._get_current_event_key_modifiers
-            if (!((modifiers & OS.attr_shift_key)).equal?(0))
-              if ((message).equal?(OS.attr_k_data_browser_item_selected))
-                selected = (first[0]).equal?(id) || (last[0]).equal?(id)
-              else
-                selected = (id).equal?(@anchor_first) || (id).equal?(@anchor_last)
-              end
-            else
-              if (!((modifiers & OS.attr_cmd_key)).equal?(0))
-                selected = true
-              else
-                selected = (first[0]).equal?(last[0])
-              end
-            end
-          else
-            selected = (message).equal?(OS.attr_k_data_browser_item_selected)
-          end
-          if (selected)
-            @anchor_first = first[0]
-            @anchor_last = last[0]
-            post_event(SWT::Selection)
-          end
-        when OS.attr_k_data_browser_item_double_clicked
-          if ((self.attr_display.attr_click_count).equal?(2))
-            post_event(SWT::DefaultSelection)
-          end
-        end
-      end
-      return OS.attr_no_err
     end
     
     typesig { [String] }
@@ -1050,7 +833,60 @@ module Org::Eclipse::Swt::Widgets
       if (!(0 <= index && index < @item_count))
         return false
       end
-      return OS._is_data_browser_item_selected(self.attr_handle, index + 1)
+      return (self.attr_view).is_row_selected(index)
+    end
+    
+    typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
+    # Feature in Cocoa: Table views do not change the selection when the user
+    # right-clicks or control-clicks on an NSTableView or its subclasses. Fix is to select the
+    # clicked-on row ourselves.
+    # 
+    # long
+    # long
+    # long
+    # long
+    def menu_for_event(id, sel, the_event)
+      event = NSEvent.new(the_event)
+      table = self.attr_view
+      # get the current selections for the outline view.
+      selected_row_indexes_ = table.selected_row_indexes
+      # select the row that was clicked before showing the menu for the event
+      mouse_point = self.attr_view.convert_point_from_view_(event.location_in_window, nil)
+      # long
+      row = table.row_at_point(mouse_point)
+      # figure out if the row that was just clicked on is currently selected
+      if ((selected_row_indexes_.contains_index(row)).equal?(false))
+        set = NSIndexSet.new.alloc
+        set = set.init_with_index(row)
+        table.select_row_indexes(set, false)
+        set.release
+      end
+      # else that row is currently selected, so don't change anything.
+      return super(id, sel, the_event)
+    end
+    
+    typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
+    # long
+    # long
+    # long
+    # long
+    def number_of_rows_in_table_view(id, sel, a_table_view)
+      return @item_count
+    end
+    
+    typesig { [] }
+    def release_handle
+      super
+      if (!(@column).nil?)
+        @column.release
+      end
+      @column = nil
+    end
+    
+    typesig { [] }
+    def release_widget
+      super
+      @items = nil
     end
     
     typesig { [::Java::Int] }
@@ -1071,16 +907,20 @@ module Org::Eclipse::Swt::Widgets
       if (!(0 <= index && index < @item_count))
         error(SWT::ERROR_INVALID_RANGE)
       end
+      remove(index, true)
+    end
+    
+    typesig { [::Java::Int, ::Java::Boolean] }
+    def remove(index, fix_scroll)
       if (!(index).equal?(@item_count - 1))
         fix_selection(index, false)
       end
-      id = Array.typed(::Java::Int).new([@item_count])
-      if (!(OS._remove_data_browser_items(self.attr_handle, OS.attr_k_data_browser_no_item, id.attr_length, id, 0)).equal?(OS.attr_no_err))
-        error(SWT::ERROR_ITEM_NOT_REMOVED)
-      end
       System.arraycopy(@items, index + 1, @items, index, (@item_count -= 1) - index)
       @items[@item_count] = nil
-      OS._update_data_browser_items(self.attr_handle, 0, 0, nil, OS.attr_k_data_browser_item_no_property, OS.attr_k_data_browser_no_item)
+      (self.attr_view).note_number_of_rows_changed
+      if (fix_scroll)
+        set_scroll_width
+      end
     end
     
     typesig { [::Java::Int, ::Java::Int] }
@@ -1106,14 +946,13 @@ module Org::Eclipse::Swt::Widgets
       if (!(0 <= start && start <= end_ && end_ < @item_count))
         error(SWT::ERROR_INVALID_RANGE)
       end
-      length_ = end_ - start + 1
-      indices = Array.typed(::Java::Int).new(length_) { 0 }
+      length = end_ - start + 1
       i = 0
-      while i < length_
-        indices[i] = i + start
+      while i < length
+        remove(start, false)
         i += 1
       end
-      remove(indices)
+      set_scroll_width
     end
     
     typesig { [String] }
@@ -1170,41 +1009,21 @@ module Org::Eclipse::Swt::Widgets
       sort(new_indices)
       start = new_indices[new_indices.attr_length - 1]
       end_ = new_indices[0]
-      count = get_item_count
-      if (!(0 <= start && start <= end_ && end_ < count))
+      count_ = get_item_count
+      if (!(0 <= start && start <= end_ && end_ < count_))
         error(SWT::ERROR_INVALID_RANGE)
       end
-      duplicates = 0
       last = -1
       i = 0
       while i < new_indices.attr_length
-        if ((new_indices[i]).equal?(last))
-          duplicates += 1
-        end
-        last = new_indices[i]
-        i += 1
-      end
-      id = Array.typed(::Java::Int).new(new_indices.attr_length - duplicates) { 0 }
-      id_index = id.attr_length - 1
-      last = -1
-      i_ = 0
-      while i_ < new_indices.attr_length
-        index = new_indices[i_]
+        index = new_indices[i]
         if (!(index).equal?(last))
-          if (!(index).equal?(@item_count - 1))
-            fix_selection(index, false)
-          end
-          id[((id_index -= 1) + 1)] = @item_count
-          System.arraycopy(@items, index + 1, @items, index, (@item_count -= 1) - index)
-          @items[@item_count] = nil
+          remove(index, false)
           last = index
         end
-        i_ += 1
+        i += 1
       end
-      if (!(OS._remove_data_browser_items(self.attr_handle, OS.attr_k_data_browser_no_item, id.attr_length, id, 0)).equal?(OS.attr_no_err))
-        error(SWT::ERROR_ITEM_NOT_REMOVED)
-      end
-      OS._update_data_browser_items(self.attr_handle, 0, 0, nil, OS.attr_k_data_browser_item_no_property, OS.attr_k_data_browser_no_item)
+      set_scroll_width
     end
     
     typesig { [] }
@@ -1216,10 +1035,10 @@ module Org::Eclipse::Swt::Widgets
     # </ul>
     def remove_all
       check_widget
-      OS._remove_data_browser_items(self.attr_handle, OS.attr_k_data_browser_no_item, 0, nil, 0)
-      OS._set_data_browser_scroll_position(self.attr_handle, 0, 0)
       @items = Array.typed(String).new(4) { nil }
-      @item_count = @anchor_first = @anchor_last = 0
+      @item_count = 0
+      (self.attr_view).note_number_of_rows_changed
+      set_scroll_width
     end
     
     typesig { [SelectionListener] }
@@ -1264,8 +1083,13 @@ module Org::Eclipse::Swt::Widgets
     def select(index)
       check_widget
       if (0 <= index && index < @item_count)
-        ids = Array.typed(::Java::Int).new([index + 1])
-        select(ids, ids.attr_length, false)
+        set = NSIndexSet.new.alloc
+        set = set.init_with_index(index)
+        widget = self.attr_view
+        @ignore_select = true
+        widget.select_row_indexes(set, !((self.attr_style & SWT::MULTI)).equal?(0))
+        @ignore_select = false
+        set.release
       end
     end
     
@@ -1298,16 +1122,22 @@ module Org::Eclipse::Swt::Widgets
       if ((@item_count).equal?(0) || start >= @item_count)
         return
       end
-      start = Math.max(0, start)
-      end_ = Math.min(end_, @item_count - 1)
-      length_ = end_ - start + 1
-      ids = Array.typed(::Java::Int).new(length_) { 0 }
-      i = 0
-      while i < length_
-        ids[i] = end_ - i + 1
-        i += 1
+      if ((start).equal?(0) && (end_).equal?(@item_count - 1))
+        select_all
+      else
+        start = Math.max(0, start)
+        end_ = Math.min(end_, @item_count - 1)
+        range = NSRange.new
+        range.attr_location = start
+        range.attr_length = end_ - start + 1
+        set = NSIndexSet.new.alloc
+        set = set.init_with_indexes_in_range(range)
+        widget = self.attr_view
+        @ignore_select = true
+        widget.select_row_indexes(set, !((self.attr_style & SWT::MULTI)).equal?(0))
+        @ignore_select = false
+        set.release
       end
-      select(ids, length_, false)
     end
     
     typesig { [Array.typed(::Java::Int)] }
@@ -1336,67 +1166,43 @@ module Org::Eclipse::Swt::Widgets
       if ((indices).nil?)
         error(SWT::ERROR_NULL_ARGUMENT)
       end
-      length_ = indices.attr_length
-      if ((length_).equal?(0) || (!((self.attr_style & SWT::SINGLE)).equal?(0) && length_ > 1))
+      length = indices.attr_length
+      if ((length).equal?(0) || (!((self.attr_style & SWT::SINGLE)).equal?(0) && length > 1))
         return
       end
-      ids = Array.typed(::Java::Int).new(length_) { 0 }
-      count = 0
+      count_ = 0
+      set = NSMutableIndexSet.new.alloc.init
       i = 0
-      while i < length_
-        index = indices[length_ - i - 1]
+      while i < length
+        index = indices[i]
         if (index >= 0 && index < @item_count)
-          ids[((count += 1) - 1)] = index + 1
+          set.add_index(indices[i])
+          count_ += 1
         end
         i += 1
       end
-      if (count > 0)
-        select(ids, count, false)
+      if (count_ > 0)
+        widget = self.attr_view
+        @ignore_select = true
+        widget.select_row_indexes(set, !((self.attr_style & SWT::MULTI)).equal?(0))
+        @ignore_select = false
       end
+      set.release
     end
     
     typesig { [Array.typed(::Java::Int), ::Java::Int, ::Java::Boolean] }
-    def select(ids, count, clear)
-      @ignore_select = true
-      # Bug in the Macintosh.  When the DataBroswer selection flags includes
-      # both kDataBrowserNeverEmptySelectionSet and kDataBrowserSelectOnlyOne,
-      # two items are selected when SetDataBrowserSelectedItems() is called
-      # with kDataBrowserItemsAssign to assign a new seletion despite the fact
-      # that kDataBrowserSelectOnlyOne was specified.  The fix is to save and
-      # restore kDataBrowserNeverEmptySelectionSet around each call to
-      # SetDataBrowserSelectedItems().
-      selection_flags = nil
-      if (!((self.attr_style & SWT::SINGLE)).equal?(0))
-        selection_flags = Array.typed(::Java::Int).new(1) { 0 }
-        OS._get_data_browser_selection_flags(self.attr_handle, selection_flags)
-        OS._set_data_browser_selection_flags(self.attr_handle, selection_flags[0] & ~OS.attr_k_data_browser_never_empty_selection_set)
-      end
-      operation = OS.attr_k_data_browser_items_assign
-      if (!((self.attr_style & SWT::MULTI)).equal?(0) && !clear)
-        operation = OS.attr_k_data_browser_items_add
-      end
-      OS._set_data_browser_selected_items(self.attr_handle, count, ids, operation)
-      if (!((self.attr_style & SWT::SINGLE)).equal?(0))
-        OS._set_data_browser_selection_flags(self.attr_handle, selection_flags[0])
-      end
-      @ignore_select = false
-    end
-    
-    typesig { [Array.typed(String)] }
-    def select(items)
-      check_widget
-      if ((items).nil?)
-        error(SWT::ERROR_NULL_ARGUMENT)
-      end
-      # NOT DONE - range check
-      length_ = items.attr_length
-      ids = Array.typed(::Java::Int).new(length_) { 0 }
+    def select(indices, count_, clear)
+      set = NSMutableIndexSet.new.alloc.init
       i = 0
-      while i < length_
-        ids[i] = index_of(items[length_ - i - 1]) + 1
+      while i < count_
+        set.add_index(indices[i])
         i += 1
       end
-      select(ids, length_, false)
+      widget = self.attr_view
+      @ignore_select = true
+      widget.select_row_indexes(set, !clear)
+      @ignore_select = false
+      set.release
     end
     
     typesig { [] }
@@ -1413,36 +1219,60 @@ module Org::Eclipse::Swt::Widgets
       if (!((self.attr_style & SWT::SINGLE)).equal?(0))
         return
       end
-      select(nil, 0, false)
+      widget = self.attr_view
+      @ignore_select = true
+      widget.select_all(nil)
+      @ignore_select = false
     end
     
-    typesig { [Array.typed(::Java::Float)] }
-    def set_background(color)
-      # Bug in the Macintosh.  The default background of a window changes when
-      # the background of a data browser is set using SetControlFontStyle().  This
-      # also affects the background of any TNXObject created on that window.  The
-      # fix is to avoid calling SetControlFontStyle() which has no effect
-      # in a data browser anyways.
-    end
-    
-    typesig { [::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Boolean, ::Java::Boolean, ::Java::Boolean] }
-    def set_bounds(x, y, width, height, move, resize, events)
-      # Ensure that the top item is visible when the tree is resized
-      # from a zero size to a size that can show the selection.
-      # 
-      # TODO - optimize
-      index = -1
-      if (resize)
-        rect = get_client_area
-        if (rect.attr_height < get_item_height)
-          index = get_top_index
-        end
+    typesig { [] }
+    def send_double_selection
+      if (!((self.attr_view).clicked_row).equal?(-1))
+        post_event(SWT::DefaultSelection)
       end
-      result = super(x, y, width, height, move, resize, events)
-      if (!(index).equal?(-1))
-        show_index(index)
+    end
+    
+    typesig { [NSEvent, ::Java::Int] }
+    def send_key_event(ns_event, type)
+      result = super(ns_event, type)
+      if (!result)
+        return result
+      end
+      if (!(type).equal?(SWT::KeyDown))
+        return result
+      end
+      key_code_ = ns_event.key_code
+      case (key_code_)
+      # KP Enter
+      when 76, 36
+        # Return
+        post_event(SWT::DefaultSelection)
       end
       return result
+    end
+    
+    typesig { [] }
+    def update_background
+      ns_color = nil
+      if (!(self.attr_background_image).nil?)
+        ns_color = NSColor.color_with_pattern_image(self.attr_background_image.attr_handle)
+      else
+        if (!(self.attr_background).nil?)
+          ns_color = NSColor.color_with_device_red(self.attr_background[0], self.attr_background[1], self.attr_background[2], self.attr_background[3])
+        end
+      end
+      (self.attr_view).set_background_color(ns_color)
+    end
+    
+    typesig { [NSFont] }
+    def set_font(font)
+      super(font)
+      # double
+      ascent = font.ascender
+      # double
+      descent = -font.descender + font.leading
+      (self.attr_view).set_row_height(RJava.cast_to_int(Math.ceil(ascent + descent)) + 1)
+      set_scroll_width
     end
     
     typesig { [::Java::Int, String] }
@@ -1468,9 +1298,11 @@ module Org::Eclipse::Swt::Widgets
       if (!(0 <= index && index < @item_count))
         error(SWT::ERROR_INVALID_RANGE)
       end
-      id = Array.typed(::Java::Int).new([index + 1])
       @items[index] = string
-      OS._update_data_browser_items(self.attr_handle, OS.attr_k_data_browser_no_item, id.attr_length, id, OS.attr_k_data_browser_item_no_property, OS.attr_k_data_browser_no_item)
+      table_view = self.attr_view
+      rect = table_view.rect_of_row(index)
+      table_view.set_needs_display_in_rect(rect)
+      set_scroll_width(string)
     end
     
     typesig { [Array.typed(String)] }
@@ -1498,46 +1330,54 @@ module Org::Eclipse::Swt::Widgets
         end
         i += 1
       end
-      OS._remove_data_browser_items(self.attr_handle, OS.attr_k_data_browser_no_item, 0, nil, 0)
-      if (!(OS._add_data_browser_items(self.attr_handle, OS.attr_k_data_browser_no_item, items.attr_length, nil, OS.attr_k_data_browser_item_no_property)).equal?(OS.attr_no_err))
-        error(SWT::ERROR_ITEM_NOT_ADDED)
-      end
       @items = Array.typed(String).new(items.attr_length) { nil }
       System.arraycopy(items, 0, @items, 0, items.attr_length)
       @item_count = items.attr_length
+      (self.attr_view).reload_data
+      set_scroll_width
     end
     
-    typesig { [ScrollBar, ::Java::Boolean] }
-    def set_scroll_bar_visible(bar, visible)
-      horiz = Array.typed(::Java::Boolean).new(1) { false }
-      vert = Array.typed(::Java::Boolean).new(1) { false }
-      OS._get_data_browser_has_scroll_bars(self.attr_handle, horiz, vert)
-      if (!((bar.attr_style & SWT::H_SCROLL)).equal?(0))
-        horiz[0] = visible
+    typesig { [String] }
+    def set_scroll_width(item)
+      if (((self.attr_style & SWT::H_SCROLL)).equal?(0))
+        return false
       end
-      if (!((bar.attr_style & SWT::V_SCROLL)).equal?(0))
-        vert[0] = visible
-      end
-      if (!visible)
-        bar.redraw
-        bar.deregister
-      end
-      if ((OS._set_data_browser_has_scroll_bars(self.attr_handle, horiz[0], vert[0])).equal?(OS.attr_no_err))
-        if (visible)
-          bar.attr_handle = find_standard_bar(bar.attr_style)
-          bar.register
-          bar.hook_events
-          bar.redraw
-        else
-          bar.attr_handle = 0
-        end
+      cell = @column.data_cell
+      font = !(self.attr_font).nil? ? self.attr_font : default_font
+      cell.set_font(font.attr_handle)
+      cell.set_title(NSString.string_with(item))
+      size = cell.cell_size
+      # double
+      old_width = @column.width
+      if (old_width < size.attr_width)
+        @column.set_width(size.attr_width)
         return true
-      else
-        if (!visible)
-          bar.register
-        end
       end
       return false
+    end
+    
+    typesig { [] }
+    def set_scroll_width
+      if (((self.attr_style & SWT::H_SCROLL)).equal?(0))
+        return false
+      end
+      if ((@items).nil?)
+        return false
+      end
+      cell = @column.data_cell
+      font = !(self.attr_font).nil? ? self.attr_font : default_font
+      cell.set_font(font.attr_handle)
+      # double
+      width_ = 0
+      i = 0
+      while i < @item_count
+        cell.set_title(NSString.string_with(@items[i]))
+        size = cell.cell_size
+        width_ = Math.max(width_, size.attr_width)
+        i += 1
+      end
+      @column.set_width(width_)
+      return true
     end
     
     typesig { [::Java::Int] }
@@ -1557,19 +1397,15 @@ module Org::Eclipse::Swt::Widgets
     def set_selection(index)
       check_widget
       deselect_all
-      set_selection(index, false)
-    end
-    
-    typesig { [::Java::Int, ::Java::Boolean] }
-    def set_selection(index, notify)
-      # checkWidget();
       if (0 <= index && index < @item_count)
-        ids = Array.typed(::Java::Int).new([index + 1])
-        select(ids, ids.attr_length, true)
+        set = NSIndexSet.new.alloc
+        set = set.init_with_index(index)
+        widget = self.attr_view
+        @ignore_select = true
+        widget.select_row_indexes(set, false)
+        @ignore_select = false
+        set.release
         show_index(index)
-        if (notify)
-          post_event(SWT::Selection)
-        end
       end
     end
     
@@ -1604,17 +1440,17 @@ module Org::Eclipse::Swt::Widgets
       end
       start = Math.max(0, start)
       end_ = Math.min(end_, @item_count - 1)
-      length_ = end_ - start + 1
-      ids = Array.typed(::Java::Int).new(length_) { 0 }
-      i = 0
-      while i < length_
-        ids[i] = end_ - i + 1
-        i += 1
-      end
-      select(ids, length_, true)
-      if (ids.attr_length > 0)
-        show_index(ids[0] - 1)
-      end
+      range = NSRange.new
+      range.attr_location = start
+      range.attr_length = end_ - start + 1
+      set = NSIndexSet.new.alloc
+      set = set.init_with_indexes_in_range(range)
+      widget = self.attr_view
+      @ignore_select = true
+      widget.select_row_indexes(set, false)
+      @ignore_select = false
+      set.release
+      show_index(end_)
     end
     
     typesig { [Array.typed(::Java::Int)] }
@@ -1643,23 +1479,23 @@ module Org::Eclipse::Swt::Widgets
         error(SWT::ERROR_NULL_ARGUMENT)
       end
       deselect_all
-      length_ = indices.attr_length
-      if ((length_).equal?(0) || (!((self.attr_style & SWT::SINGLE)).equal?(0) && length_ > 1))
+      length = indices.attr_length
+      if ((length).equal?(0) || (!((self.attr_style & SWT::SINGLE)).equal?(0) && length > 1))
         return
       end
-      ids = Array.typed(::Java::Int).new(length_) { 0 }
-      count = 0
+      new_indices = Array.typed(::Java::Int).new(length) { 0 }
+      count_ = 0
       i = 0
-      while i < length_
-        index = indices[length_ - i - 1]
+      while i < length
+        index = indices[length - i - 1]
         if (index >= 0 && index < @item_count)
-          ids[((count += 1) - 1)] = index + 1
+          new_indices[((count_ += 1) - 1)] = index
         end
         i += 1
       end
-      if (count > 0)
-        select(ids, count, true)
-        show_index(ids[0] - 1)
+      if (count_ > 0)
+        select(new_indices, count_, true)
+        show_index(new_indices[0])
       end
     end
     
@@ -1690,38 +1526,38 @@ module Org::Eclipse::Swt::Widgets
         error(SWT::ERROR_NULL_ARGUMENT)
       end
       deselect_all
-      length_ = items.attr_length
-      if ((length_).equal?(0) || (!((self.attr_style & SWT::SINGLE)).equal?(0) && length_ > 1))
+      length = items.attr_length
+      if ((length).equal?(0) || (!((self.attr_style & SWT::SINGLE)).equal?(0) && length > 1))
         return
       end
-      count = 0
-      ids = Array.typed(::Java::Int).new(length_) { 0 }
+      count_ = 0
+      indices = Array.typed(::Java::Int).new(length) { 0 }
       i = 0
-      while i < length_
-        string = items[length_ - i - 1]
+      while i < length
+        string = items[length - i - 1]
         if (!((self.attr_style & SWT::SINGLE)).equal?(0))
           index = index_of(string, 0)
           if (!(index).equal?(-1))
-            count = 1
-            ids = Array.typed(::Java::Int).new([index + 1])
+            count_ = 1
+            indices = Array.typed(::Java::Int).new([index])
           end
         else
           index = 0
           while (!((index = index_of(string, index))).equal?(-1))
-            if ((count).equal?(ids.attr_length))
-              new_ids = Array.typed(::Java::Int).new(ids.attr_length + 4) { 0 }
-              System.arraycopy(ids, 0, new_ids, 0, ids.attr_length)
-              ids = new_ids
+            if ((count_).equal?(indices.attr_length))
+              new_ids = Array.typed(::Java::Int).new(indices.attr_length + 4) { 0 }
+              System.arraycopy(indices, 0, new_ids, 0, indices.attr_length)
+              indices = new_ids
             end
-            ids[((count += 1) - 1)] = index + 1
+            indices[((count_ += 1) - 1)] = index
             index += 1
           end
         end
         i += 1
       end
-      if (count > 0)
-        select(ids, count, true)
-        show_index(ids[0] - 1)
+      if (count_ > 0)
+        select(indices, count_, true)
+        show_index(indices[0])
       end
     end
     
@@ -1738,26 +1574,18 @@ module Org::Eclipse::Swt::Widgets
     # </ul>
     def set_top_index(index)
       check_widget
-      item_height = get_item_height
-      top = Array.typed(::Java::Int).new(1) { 0 }
-      left = Array.typed(::Java::Int).new(1) { 0 }
-      OS._get_data_browser_scroll_position(self.attr_handle, top, left)
-      top[0] = Math.max(0, Math.min(item_height * @item_count - get_client_area.attr_height, index * item_height))
-      OS._set_data_browser_scroll_position(self.attr_handle, top[0], left[0])
+      widget = self.attr_view
+      row = Math.max(0, Math.min(index, @item_count))
+      pt = NSPoint.new
+      pt.attr_x = self.attr_scroll_view.content_view.bounds.attr_x
+      pt.attr_y = widget.frame_of_cell_at_column(0, row).attr_y
+      self.attr_view.scroll_point(pt)
     end
     
     typesig { [::Java::Int] }
     def show_index(index)
       if (0 <= index && index < @item_count)
-        width = Array.typed(::Java::Short).new(1) { 0 }
-        OS._get_data_browser_table_view_named_column_width(self.attr_handle, COLUMN_ID, width)
-        rect = Rect.new
-        inset = Rect.new
-        OS._get_control_bounds(self.attr_handle, rect)
-        OS._get_data_browser_scroll_bar_inset(self.attr_handle, inset)
-        OS._set_data_browser_table_view_named_column_width(self.attr_handle, COLUMN_ID, RJava.cast_to_short((rect.attr_right - rect.attr_left - inset.attr_left - inset.attr_right)))
-        OS._reveal_data_browser_item(self.attr_handle, index + 1, COLUMN_ID, (OS.attr_k_data_browser_reveal_without_selecting | OS.attr_k_data_browser_reveal_and_center_in_view))
-        OS._set_data_browser_table_view_named_column_width(self.attr_handle, COLUMN_ID, width[0])
+        (self.attr_view).scroll_row_to_visible(index)
       end
     end
     
@@ -1776,6 +1604,41 @@ module Org::Eclipse::Swt::Widgets
       if (index >= 0)
         show_index(index)
       end
+    end
+    
+    typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
+    # long
+    # long
+    # long
+    def table_view_selection_did_change(id, sel, a_notification)
+      if (@ignore_select)
+        return
+      end
+      post_event(SWT::Selection)
+    end
+    
+    typesig { [::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int] }
+    # long
+    # long
+    # long
+    # long
+    # long
+    def table_view_should_edit_table_column_row(id, sel, a_table_view, a_table_column, row_index)
+      return false
+    end
+    
+    typesig { [::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int] }
+    # long
+    # long
+    # long
+    # long
+    # long
+    # long
+    def table_view_object_value_for_table_column_row(id, sel, a_table_view, a_table_column, row_index)
+      # 64
+      attrib_str = create_string(@items[RJava.cast_to_int(row_index)], nil, self.attr_foreground, 0, true, false)
+      attrib_str.autorelease
+      return attrib_str.attr_id
     end
     
     private

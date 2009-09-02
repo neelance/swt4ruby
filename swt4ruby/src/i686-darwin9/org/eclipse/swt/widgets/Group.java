@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2008 IBM Corporation and others.
+ * Copyright (c) 2000, 2009 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -13,9 +13,7 @@ package org.eclipse.swt.widgets;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.*;
-import org.eclipse.swt.internal.carbon.OS;
-import org.eclipse.swt.internal.carbon.CGRect;
-import org.eclipse.swt.internal.carbon.Rect;
+import org.eclipse.swt.internal.cocoa.*;
 
 /**
  * Instances of this class provide an etched border
@@ -39,8 +37,10 @@ import org.eclipse.swt.internal.carbon.Rect;
  * 
  * @see <a href="http://www.eclipse.org/swt/examples.php">SWT Example: ControlExample</a>
  * @see <a href="http://www.eclipse.org/swt/">Sample code and further information</a>
+ * @noextend This class is not intended to be subclassed by clients.
  */
 public class Group extends Composite {
+	NSView contentView;
 	String text = "";
 	
 /**
@@ -97,50 +97,56 @@ protected void checkSubclass () {
 
 public Rectangle computeTrim (int x, int y, int width, int height) {
 	checkWidget ();
-	CGRect oldBounds = new CGRect (), bounds = oldBounds;
-	OS.HIViewGetFrame (handle, oldBounds);
-	int MIN_SIZE = 100;
-	if (oldBounds.width < MIN_SIZE || oldBounds.height < MIN_SIZE) {
-		OS.HIViewSetDrawingEnabled (handle, false);
-		bounds = new CGRect ();
-		bounds.width = bounds.height = 100;
-		OS.HIViewSetFrame (handle, bounds);
-	}
-	int rgnHandle = OS.NewRgn ();
-	OS.GetControlRegion (handle, (short)OS.kControlContentMetaPart, rgnHandle);
-	Rect client = new Rect ();
-	OS.GetRegionBounds (rgnHandle, client);
-	OS.DisposeRgn (rgnHandle);
-	width += (int) bounds.width - (client.right - client.left);
-	height += (int) bounds.height - (client.bottom - client.top);
-	if (oldBounds.width < MIN_SIZE || oldBounds.height < MIN_SIZE) {
-		OS.HIViewSetFrame (handle, oldBounds);
-		OS.HIViewSetDrawingEnabled (handle, drawCount == 0);
-	}
-	return new Rectangle (-client.left, -client.top, width, height);
+	NSBox widget = (NSBox)view;
+	int border = (int)Math.ceil (widget.borderWidth ());
+	NSSize margins = widget.contentViewMargins();
+	NSRect frame = contentView.frame();
+	width += (margins.width + border) * 2;
+	height += (margins.height + border) * 2 + frame.y;
+	return super.computeTrim(x, y, width, height);
+}
+
+NSView contentView () {
+	return contentView;
 }
 
 void createHandle () {
 	state |= THEME_BACKGROUND;
-	int [] outControl = new int [1];
-	int window = OS.GetControlOwner (parent.handle);
-	OS.CreateGroupBoxControl (window, null, 0, true, outControl);
-	if (outControl [0] == 0) error (SWT.ERROR_NO_HANDLES);
-	handle = outControl [0];
+	NSBox widget = (NSBox)new SWTBox().alloc();
+	widget.init();
+	widget.setTitlePosition(OS.NSNoTitle);
+	NSView contentWidget = (NSView)new SWTView().alloc();
+	contentWidget.init();
+//	contentWidget.setDrawsBackground(false);
+	widget.setContentView(contentWidget);
+	contentView = contentWidget;
+	view = widget;
 }
 
-void drawBackground (int control, int context) {
-	fillBackground (control, context, null);
+NSFont defaultNSFont () {
+	return display.boxFont;
+}
+
+void deregister () {
+	super.deregister ();
+	display.removeWidget (contentView);
+	SWTBox box = (SWTBox)view;
+	display.removeWidget (box.titleCell());
+}
+
+void drawBackground (int /*long*/ id, NSGraphicsContext context, NSRect rect) {
+	if (id != view.id) return;
+	fillBackground (view, context, rect, -1);
+}
+
+NSView eventView () {
+	return contentView;
 }
 
 public Rectangle getClientArea () {
 	checkWidget();
-	int rgnHandle = OS.NewRgn ();
-	OS.GetControlRegion (handle, (short)OS.kControlContentMetaPart, rgnHandle);
-	Rect client = new Rect ();
-	OS.GetRegionBounds (rgnHandle, client);
-	OS.DisposeRgn (rgnHandle);
-	return new Rectangle (client.left, client.top, client.right - client.left, client.bottom - client.top);
+	NSRect rect = contentView.bounds();
+	return new Rectangle((int)rect.x, (int)rect.y, (int)rect.width, (int)rect.height);
 }
 
 String getNameText () {
@@ -165,7 +171,35 @@ public String getText () {
 }
 
 float getThemeAlpha () {
-	return 0.25f * parent.getThemeAlpha ();
+	return (background != null ? 1 : 0.25f) * parent.getThemeAlpha ();
+}
+
+void register () {
+	super.register ();
+	display.addWidget (contentView, this);
+	SWTBox box = (SWTBox)view;
+	display.addWidget (box.titleCell(), this);
+}
+
+void releaseHandle () {
+	super.releaseHandle ();
+	if (contentView != null) contentView.release();
+	contentView = null;
+}
+
+void setFont(NSFont font) {
+	((NSBox) view).setTitleFont(font);
+}
+
+void setForeground (float /*double*/ [] color) {
+	NSColor nsColor;
+	if (color == null) {
+		nsColor = NSColor.textColor ();
+	} else {
+		nsColor = NSColor.colorWithDeviceRed (color[0], color[1], color[2], 1);
+	}
+	NSTextFieldCell cell = new NSTextFieldCell (((NSBox)view).titleCell ().id);
+	cell.setTextColor (nsColor);
 }
 
 /**
@@ -199,10 +233,9 @@ public void setText (String string) {
 	char [] buffer = new char [text.length ()];
 	text.getChars (0, buffer.length, buffer, 0);
 	int length = fixMnemonic (buffer);
-	int ptr = OS.CFStringCreateWithCharacters (OS.kCFAllocatorDefault, buffer, length);
-	if (ptr == 0) error (SWT.ERROR_CANNOT_SET_TEXT);
-	OS.SetControlTitleWithCFString (handle, ptr);
-	OS.CFRelease (ptr);
+	NSBox box = (NSBox)view;
+	box.setTitlePosition(length == 0 ? OS.NSNoTitle : OS.NSAtTop);
+	box.setTitle(NSString.stringWithCharacters(buffer, length));
 }
 
 }

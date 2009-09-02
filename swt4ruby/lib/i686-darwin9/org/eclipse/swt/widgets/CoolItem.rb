@@ -1,6 +1,6 @@
 require "rjava"
 
-# Copyright (c) 2000, 2008 IBM Corporation and others.
+# Copyright (c) 2000, 2009 IBM Corporation and others.
 # All rights reserved. This program and the accompanying materials
 # are made available under the terms of the Eclipse Public License v1.0
 # which accompanies this distribution, and is available at
@@ -33,6 +33,7 @@ module Org::Eclipse::Swt::Widgets
   # </p>
   # 
   # @see <a href="http://www.eclipse.org/swt/">Sample code and further information</a>
+  # @noextend This class is not intended to be subclassed by clients.
   class CoolItem < CoolItemImports.const_get :Item
     include_class_members CoolItemImports
     
@@ -580,6 +581,10 @@ module Org::Eclipse::Swt::Widgets
         control_width = width - MINIMUM_WIDTH
         if (!((self.attr_style & SWT::DROP_DOWN)).equal?(0) && width < @preferred_width)
           control_width -= CHEVRON_IMAGE_WIDTH + @chevron_horizontal_trim + CHEVRON_LEFT_MARGIN
+        end
+        if (height > @preferred_height)
+          y += (height - @preferred_height) / 2
+          height = @preferred_height
         end
         @control.set_bounds(@parent.fix_rectangle(x + MINIMUM_WIDTH, y, control_width, height))
       end

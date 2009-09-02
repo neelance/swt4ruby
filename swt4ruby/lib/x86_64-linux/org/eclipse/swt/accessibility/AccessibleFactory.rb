@@ -1,6 +1,6 @@
 require "rjava"
 
-# Copyright (c) 2000, 2006 IBM Corporation and others.
+# Copyright (c) 2000, 2009 IBM Corporation and others.
 # All rights reserved. This program and the accompanying materials
 # are made available under the terms of the Eclipse Public License v1.0
 # which accompanies this distribution, and is available at
@@ -91,7 +91,7 @@ module Org::Eclipse::Swt::Accessibility
       const_attr_reader  :FACTORY_TYPENAME
       
       # $NON-NLS-1$
-      const_set_lazy(:ActionRoles) { Array.typed(::Java::Int).new([ACC::ROLE_CHECKBUTTON, ACC::ROLE_COMBOBOX, ACC::ROLE_LINK, ACC::ROLE_MENUITEM, ACC::ROLE_PUSHBUTTON, ACC::ROLE_RADIOBUTTON, ]) }
+      const_set_lazy(:ActionRoles) { Array.typed(::Java::Int).new([ACC::ROLE_CHECKBUTTON, ACC::ROLE_COMBOBOX, ACC::ROLE_LINK, ACC::ROLE_MENUITEM, ACC::ROLE_PUSHBUTTON, ACC::ROLE_RADIOBUTTON, ACC::ROLE_SPLITBUTTON, ]) }
       const_attr_reader  :ActionRoles
       
       const_set_lazy(:HypertextRoles) { Array.typed(::Java::Int).new([ACC::ROLE_LINK]) }

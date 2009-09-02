@@ -30,9 +30,6 @@ module Org::Eclipse::Swt::Internal::Theme
     typesig { [Device] }
     def initialize(device)
       @device = nil
-      if ((device).nil?)
-        SWT.error(SWT::ERROR_NULL_ARGUMENT)
-      end
       @device = device
     end
     
@@ -45,7 +42,6 @@ module Org::Eclipse::Swt::Internal::Theme
     
     typesig { [SwtGC, DrawData] }
     def compute_trim(gc, data)
-      check_theme
       if ((gc).nil?)
         SWT.error(SWT::ERROR_NULL_ARGUMENT)
       end

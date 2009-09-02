@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2008 IBM Corporation and others.
+ * Copyright (c) 2000, 2009 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -14,10 +14,7 @@ package org.eclipse.swt.widgets;
 import org.eclipse.swt.graphics.*;
 import org.eclipse.swt.*;
 import org.eclipse.swt.events.*;
-import org.eclipse.swt.internal.carbon.OS;
-import org.eclipse.swt.internal.carbon.CGPoint;
-import org.eclipse.swt.internal.carbon.CGRect;
-import org.eclipse.swt.internal.carbon.Rect;
+import org.eclipse.swt.internal.cocoa.*;
 
 /**
  *  Instances of this class implement rubber banding rectangles that are
@@ -40,6 +37,7 @@ import org.eclipse.swt.internal.carbon.Rect;
  *
  * @see <a href="http://www.eclipse.org/swt/snippets/#tracker">Tracker snippets</a>
  * @see <a href="http://www.eclipse.org/swt/">Sample code and further information</a>
+ * @noextend This class is not intended to be subclassed by clients.
  */
 public class Tracker extends Widget {
 	Control parent;
@@ -49,7 +47,8 @@ public class Tracker extends Widget {
 	Rectangle bounds;
 	int cursorOrientation = SWT.NONE;
 	boolean inEvent = false;
-	int window, oldX, oldY;
+	NSWindow window;
+	int oldX, oldY;
 		
 	/*
 	* The following values mirror step sizes on Windows
@@ -127,6 +126,7 @@ public Tracker (Composite parent, int style) {
  * @see SWT#RIGHT
  * @see SWT#UP
  * @see SWT#DOWN
+ * @see SWT#RESIZE
  */
 public Tracker (Display display, int style) {
 	if (display == null) display = Display.getCurrent ();
@@ -204,11 +204,8 @@ Point adjustMoveCursor () {
 		newX = pt.x;
 		newY = pt.y;
 	}
-	CGPoint pt = new CGPoint ();
-	pt.x = newX;
-	pt.y = newY;
-	OS.CGWarpMouseCursorPosition (pt);
-	return new Point ((int) pt.x, (int) pt.y);
+	display.setCursorLocation(newX, newY);
+	return new Point (newX, newY);
 }
 
 Point adjustResizeCursor (boolean movePointer) {
@@ -240,10 +237,7 @@ Point adjustResizeCursor (boolean movePointer) {
 		newY = pt.y; 
 	}
 	if (movePointer) {
-		CGPoint pt = new CGPoint ();
-		pt.x = newX;
-		pt.y = newY;
-		OS.CGWarpMouseCursorPosition (pt);
+		display.setCursorLocation(newX, newY);
 	}
 
 	/*
@@ -281,7 +275,9 @@ Point adjustResizeCursor (boolean movePointer) {
 				newCursor = new Cursor(display, SWT.CURSOR_SIZEALL);
 				break;
 		}
-		display.setCursor (newCursor.handle);
+		display.lockCursor = false;
+		newCursor.handle.set();
+		display.lockCursor = true;
 		if (resizeCursor != null) {
 			resizeCursor.dispose ();
 		}
@@ -354,39 +350,46 @@ Rectangle [] computeProportions (Rectangle [] rects) {
 	return result;
 }
 
-void drawRectangles (int window, Rectangle [] rects, boolean erase) {
-	int[] context = new int [1];
-	int port = OS.GetWindowPort (window);
-	Rect portRect = new Rect ();
-	OS.GetPortBounds (port, portRect);
-	OS.QDBeginCGContext (port, context);
-	OS.CGContextScaleCTM (context [0], 1, -1);
-	OS.CGContextTranslateCTM (context [0], 0, portRect.top - portRect.bottom);
-	CGRect cgRect = new CGRect ();
+void drawRectangles (NSWindow window, Rectangle [] rects, boolean erase) {
+	NSGraphicsContext context = window.graphicsContext();
+	NSGraphicsContext.static_saveGraphicsState();
+	NSGraphicsContext.setCurrentContext(context);
+	context.saveGraphicsState();
 	Point parentOrigin;
 	if (parent != null) {
 		parentOrigin = display.map (parent, null, 0, 0);
 	} else {
 		parentOrigin = new Point (0, 0);	
 	}
+	context.setCompositingOperation(erase ? OS.NSCompositeClear : OS.NSCompositeSourceOver);
+	NSRect rectFrame = new NSRect();
+	NSPoint globalPoint = new NSPoint();
+	float /*double*/ screenHeight = display.getPrimaryFrame().height;
 	for (int i=0; i<rects.length; i++) {
 		Rectangle rect = rects [i];
-		cgRect.x = rect.x + parentOrigin.x;
-		cgRect.y = rect.y + parentOrigin.y;
-		cgRect.width = rect.width;
-		cgRect.height = rect.height;
+		rectFrame.x = rect.x + parentOrigin.x;
+		rectFrame.y = screenHeight - (int)((rect.y + parentOrigin.y) + rect.height);
+		rectFrame.width = rect.width;
+		rectFrame.height = rect.height;
+		globalPoint.x = rectFrame.x;
+		globalPoint.y = rectFrame.y;
+		globalPoint = window.convertScreenToBase(globalPoint);
+		rectFrame.x = globalPoint.x;
+		rectFrame.y = globalPoint.y;
+		
 		if (erase) {
-			cgRect.width++;
-			cgRect.height++;
-			OS.CGContextClearRect (context [0], cgRect);
+			rectFrame.width++;
+			rectFrame.height++;
+			NSBezierPath.fillRect(rectFrame);
 		} else {
-			cgRect.x += 0.5f;
-			cgRect.y += 0.5f;
-			OS.CGContextStrokeRect (context [0], cgRect);
+			rectFrame.x += 0.5f;
+			rectFrame.y += 0.5f;
+			NSBezierPath.strokeRect(rectFrame);
 		}
 	}
-	OS.CGContextSynchronize (context [0]);
-	OS.QDEndCGContext (port, context);
+	if (!erase) context.flushGraphics();
+	context.restoreGraphicsState();
+	NSGraphicsContext.static_restoreGraphicsState();
 }
 
 /**
@@ -426,11 +429,16 @@ public boolean getStippled () {
 	return stippled;
 }
 
-int kEventMouse (int eventKind, int nextHandler, int theEvent, int userData) {
-	int sizeof = org.eclipse.swt.internal.carbon.Point.sizeof;
-	org.eclipse.swt.internal.carbon.Point where = new org.eclipse.swt.internal.carbon.Point ();
-	OS.GetEventParameter (theEvent, OS.kEventParamMouseLocation, OS.typeQDPoint, null, sizeof, null, where);
-	int newX = where.h, newY = where.v;	
+void mouse (NSEvent nsEvent) {
+	NSPoint location;
+	if (nsEvent == null || nsEvent.type() == OS.NSMouseMoved) {
+		location = NSEvent.mouseLocation();
+	} else {
+		location = nsEvent.locationInWindow();
+		location = nsEvent.window().convertBaseToScreen(location);
+	}
+	location.y = display.getPrimaryFrame().height - location.y;
+	int newX = (int)location.x, newY = (int)location.y;
 	if (newX != oldX || newY != oldY) {
 		Rectangle [] oldRectangles = rectangles;
 		Rectangle [] rectsToErase = new Rectangle [rectangles.length];
@@ -454,7 +462,7 @@ int kEventMouse (int eventKind, int nextHandler, int theEvent, int userData) {
 			*/
 			if (isDisposed ()) {
 				cancelled = true;
-				return OS.noErr;
+				return;
 			}
 			boolean draw = false;
 			/*
@@ -501,7 +509,7 @@ int kEventMouse (int eventKind, int nextHandler, int theEvent, int userData) {
 			*/
 			if (isDisposed ()) {
 				cancelled = true;
-				return OS.noErr;
+				return;
 			}
 			boolean draw = false;
 			/*
@@ -532,23 +540,21 @@ int kEventMouse (int eventKind, int nextHandler, int theEvent, int userData) {
 		}
 		oldX = newX;  oldY = newY;
 	}
-	tracking = eventKind != OS.kEventMouseUp;
-	return 0;
+	switch ((int)/*64*/nsEvent.type()) {
+		case OS.NSLeftMouseUp:
+		case OS.NSRightMouseUp:
+		case OS.NSOtherMouseUp:
+			tracking = false;
+	}
 }
 
-int kEventMouseDragged (int nextHandler, int theEvent, int userData) {
-	return kEventMouse (OS.kEventMouseDragged, nextHandler, theEvent, userData);
-}
-
-int kEventRawKeyPressed (int nextHandler, int theEvent, int userData) {
-	if (!sendKeyEvent (SWT.KeyDown, theEvent)) return OS.noErr;
-	int [] keyCode = new int [1];
-	OS.GetEventParameter (theEvent, OS.kEventParamKeyCode, OS.typeUInt32, null, keyCode.length * 4, null, keyCode);
-	int [] modifiers = new int [1];
-	OS.GetEventParameter (theEvent, OS.kEventParamKeyModifiers, OS.typeUInt32, null, 4, null, modifiers);
-	int stepSize = (modifiers [0] & OS.controlKey) != 0 ? STEPSIZE_SMALL : STEPSIZE_LARGE;
+void key (NSEvent nsEvent) {
+	//TODO send event
+//	if (!sendKeyEvent (SWT.KeyDown, theEvent)) return OS.noErr;
+	int /*long*/ modifierFlags = nsEvent.modifierFlags();
+	int stepSize = (modifierFlags & OS.NSControlKeyMask) != 0 ? STEPSIZE_SMALL : STEPSIZE_LARGE;
 	int xChange = 0, yChange = 0;
-	switch (keyCode [0]) {
+	switch (nsEvent.keyCode()) {
 		case 53: /* Esc */
 			cancelled = true;
 			tracking = false;
@@ -596,7 +602,7 @@ int kEventRawKeyPressed (int nextHandler, int theEvent, int userData) {
 			*/
 			if (isDisposed ()) {
 				cancelled = true;
-				return OS.noErr;
+				return;
 			}
 			boolean draw = false;
 			/*
@@ -638,7 +644,7 @@ int kEventRawKeyPressed (int nextHandler, int theEvent, int userData) {
 			*/
 			if (isDisposed ()) {
 				cancelled = true;
-				return OS.noErr;
+				return;
 			}
 			boolean draw = false;
 			/*
@@ -673,15 +679,6 @@ int kEventRawKeyPressed (int nextHandler, int theEvent, int userData) {
 			oldY = cursorPos.y;
 		}
 	}
-	return 0;
-}
-
-int kEventMouseMoved (int nextHandler, int theEvent, int userData) {
-	return kEventMouse (OS.kEventMouseMoved, nextHandler, theEvent, userData);
-}
-
-int kEventMouseUp (int nextHandler, int theEvent, int userData) {
-	return kEventMouse (OS.kEventMouseUp, nextHandler, theEvent, userData);
 }
 
 void moveRectangles (int xChange, int yChange) {
@@ -712,10 +709,46 @@ void moveRectangles (int xChange, int yChange) {
  */
 public boolean open () {
 	checkWidget ();
+	Display display = this.display;
 	cancelled = false;
 	tracking = true;
-	window = display.createOverlayWindow ();
-	OS.ShowWindow (window);
+	window = (NSWindow)new NSWindow().alloc();
+	NSArray screens = NSScreen.screens();
+	float /*double*/ minX = Float.MAX_VALUE, maxX = Float.MIN_VALUE;
+	float /*double*/ minY = Float.MAX_VALUE, maxY = Float.MIN_VALUE;	
+	int count = (int)/*64*/screens.count();
+	for (int i = 0; i < count; i++) {
+		NSScreen screen = new NSScreen(screens.objectAtIndex(i));
+		NSRect frame = screen.frame();
+		float /*double*/ x1 = frame.x, x2 = frame.x + frame.width;
+		float /*double*/ y1 = frame.y, y2 = frame.y + frame.height;
+		if (x1 < minX) minX = x1;
+		if (x2 < minX) minX = x2;
+		if (x1 > maxX) maxX = x1;
+		if (x2 > maxX) maxX = x2;
+		if (y1 < minY) minY = y1;
+		if (y2 < minY) minY = y2;
+		if (y1 > maxY) maxY = y1;
+		if (y2 > maxY) maxY = y2;
+	}	
+	NSRect frame = new NSRect();
+	frame.x = minX;
+	frame.y = minY;
+	frame.width = maxX - minX;
+	frame.height = maxY - minY;
+	window = window.initWithContentRect(frame, OS.NSBorderlessWindowMask, OS.NSBackingStoreBuffered, false);
+	window.setOpaque(false);
+	window.setContentView(null);
+	window.setBackgroundColor(NSColor.clearColor());
+	NSGraphicsContext context = window.graphicsContext();
+	NSGraphicsContext.static_saveGraphicsState();
+	NSGraphicsContext.setCurrentContext(context);
+	context.setCompositingOperation(OS.NSCompositeClear);
+	frame.x = frame.y = 0;
+	NSBezierPath.fillRect(frame);
+	NSGraphicsContext.static_restoreGraphicsState();
+	window.orderFrontRegardless();
+
 	drawRectangles (window, rectangles, false);
 	
 	/*
@@ -732,10 +765,22 @@ public boolean open () {
 	}
 	
 	Point cursorPos;
-	if (OS.StillDown ()) {
-		org.eclipse.swt.internal.carbon.Point pt = new org.eclipse.swt.internal.carbon.Point ();
-		OS.GetGlobalMouse (pt);
-		cursorPos = new Point (pt.h, pt.v);
+	boolean down = false;
+	NSApplication application = NSApplication.sharedApplication();
+	NSEvent currentEvent = application.currentEvent();
+	if (currentEvent != null) {
+		switch ((int)/*64*/currentEvent.type()) {
+			case OS.NSLeftMouseDown:
+			case OS.NSLeftMouseDragged:
+			case OS.NSRightMouseDown:
+			case OS.NSRightMouseDragged:
+			case OS.NSOtherMouseDown:
+			case OS.NSOtherMouseDragged:
+				down = true;
+		}
+	}
+	if (down) {
+		cursorPos = display.getCursorLocation();
 	} else {
 		if ((style & SWT.RESIZE) != 0) {
 			cursorPos = adjustResizeCursor (true);
@@ -748,53 +793,70 @@ public boolean open () {
 		oldY = cursorPos.y;
 	}
 
+	Control oldTrackingControl = display.trackingControl;
+	display.trackingControl = null;
 	/* Tracker behaves like a Dialog with its own OS event loop. */
-	int [] outEvent  = new int [1];
 	while (tracking && !cancelled) {
-		int status = OS.ReceiveNextEvent (0, null, OS.kEventDurationNoWait, true, outEvent);
-		if (status != OS.noErr) continue;
-		int event = outEvent [0];
-		int eventClass = OS.GetEventClass (event);
-		int eventKind = OS.GetEventKind (event);
-		int nextHandler = 0;
-		switch (eventClass) {
-			case OS.kEventClassMouse:
-				switch (eventKind) {
-					case OS.kEventMouseUp: kEventMouseUp (nextHandler, event, 0); break;
-					case OS.kEventMouseMoved: kEventMouseMoved (nextHandler, event, 0); break;
-					case OS.kEventMouseDragged: kEventMouseDragged (nextHandler, event, 0); break;
-				}
-				break;
-			case OS.kEventClassKeyboard:
-				switch (eventKind) {
-					case OS.kEventRawKeyDown: kEventRawKeyDown (nextHandler, event, 0); break;
-					case OS.kEventRawKeyModifiersChanged: kEventRawKeyModifiersChanged (nextHandler, event, 0); break;
-					case OS.kEventRawKeyRepeat: kEventRawKeyRepeat (nextHandler, event, 0); break;
-					case OS.kEventRawKeyUp: kEventRawKeyUp (nextHandler, event, 0); break;
-				}
-				break;
-		}
-		/*
-		* Don't dispatch mouse and key events in general, EXCEPT once this
-		* tracker has finished its work.
-		*/
-		boolean dispatch = true;
-		if (tracking && !cancelled) {
-			if (eventClass == OS.kEventClassMouse) dispatch = false;
-			if (eventClass == OS.kEventClassKeyboard) dispatch = false;
-		}
-		if (dispatch) OS.SendEventToEventTarget (event, OS.GetEventDispatcherTarget ());
-		OS.ReleaseEvent (event);
-		if (clientCursor != null && resizeCursor == null) {
-			display.setCursor (clientCursor.handle);
+		display.addPool();
+		try {
+			NSEvent event = application.nextEventMatchingMask(0, NSDate.distantFuture(), OS.NSDefaultRunLoopMode, true);
+			if (event == null) continue;
+			int type = (int)/*64*/event.type();
+			switch (type) {
+				case OS.NSLeftMouseUp:
+				case OS.NSRightMouseUp:
+				case OS.NSOtherMouseUp:
+				case OS.NSMouseMoved:
+				case OS.NSLeftMouseDragged:
+				case OS.NSRightMouseDragged:
+				case OS.NSOtherMouseDragged:
+					mouse(event);
+					break;
+				case OS.NSKeyDown:
+//				case OS.NSKeyUp:
+				case OS.NSFlagsChanged:
+					key(event);
+					break;
+			}
+			boolean dispatch = true;
+			switch (type) {
+				case OS.NSLeftMouseDown:
+				case OS.NSLeftMouseUp:
+				case OS.NSRightMouseDown:
+				case OS.NSRightMouseUp:
+				case OS.NSOtherMouseDown:
+				case OS.NSOtherMouseUp:
+				case OS.NSMouseMoved:
+				case OS.NSLeftMouseDragged:
+				case OS.NSRightMouseDragged:
+				case OS.NSOtherMouseDragged:
+				case OS.NSMouseEntered:
+				case OS.NSMouseExited:
+				case OS.NSKeyDown:
+				case OS.NSKeyUp:
+				case OS.NSFlagsChanged:
+					dispatch = false;
+			}
+			if (dispatch) application.sendEvent(event);
+			if (clientCursor != null && resizeCursor == null) {
+				display.lockCursor = false;
+				clientCursor.handle.set();
+				display.lockCursor = true;
+			}
+		} finally {
+			display.removePool();
 		}
 	}
+	if (oldTrackingControl != null && !oldTrackingControl.isDisposed()) {
+		display.trackingControl = oldTrackingControl;
+	}
+	display.setCursor(display.findControl(true));
 	if (!isDisposed()) {
 		drawRectangles (window, rectangles, true);
 	}
-	OS.DisposeWindow (window);
+	if (window != null) window.close();
 	tracking = false;
-	window = 0;
+	window = null;
 	return !cancelled;
 }
 
@@ -1000,7 +1062,9 @@ public void setCursor (Cursor newCursor) {
 	checkWidget ();
 	clientCursor = newCursor;
 	if (newCursor != null) {
-		if (inEvent) display.setCursor (newCursor.handle);
+		display.lockCursor = false;
+		if (inEvent) newCursor.handle.set();
+		display.lockCursor = true;
 	}
 }
 

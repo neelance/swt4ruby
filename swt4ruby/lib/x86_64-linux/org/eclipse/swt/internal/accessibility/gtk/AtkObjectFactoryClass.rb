@@ -1,6 +1,6 @@
 require "rjava"
 
-# Copyright (c) 2000, 2006 IBM Corporation and others. All rights reserved.
+# Copyright (c) 2000, 2008 IBM Corporation and others. All rights reserved.
 # The contents of this file are made available under the terms
 # of the GNU Lesser General Public License (LGPL) Version 2.1 that
 # accompanies this distribution (lgpl-v21.txt).  The LGPL is also
@@ -23,6 +23,7 @@ module Org::Eclipse::Swt::Internal::Accessibility::Gtk
   class AtkObjectFactoryClass 
     include_class_members AtkObjectFactoryClassImports
     
+    # @field cast=(AtkObject *(*)())
     # int
     attr_accessor :create_accessible
     alias_method :attr_create_accessible, :create_accessible
@@ -30,6 +31,7 @@ module Org::Eclipse::Swt::Internal::Accessibility::Gtk
     alias_method :attr_create_accessible=, :create_accessible=
     undef_method :create_accessible=
     
+    # @field cast=(void (*)())
     # int
     attr_accessor :invalidate
     alias_method :attr_invalidate, :invalidate
@@ -37,6 +39,7 @@ module Org::Eclipse::Swt::Internal::Accessibility::Gtk
     alias_method :attr_invalidate=, :invalidate=
     undef_method :invalidate=
     
+    # @field cast=(GType (*)())
     # int
     attr_accessor :get_accessible_type
     alias_method :attr_get_accessible_type, :get_accessible_type

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2008 IBM Corporation and others.
+ * Copyright (c) 2000, 2009 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -200,6 +200,20 @@ void computeRuns () {
 						underlineStyle = OS.PANGO_UNDERLINE_ERROR;
 					}
 					break;
+				case SWT.UNDERLINE_LINK: {
+					if (style.foreground == null) {
+						long /*int*/ attr = OS.pango_attr_foreground_new((short)0, (short)0x3333, (short)0x9999);
+						OS.memmove (attribute, attr, PangoAttribute.sizeof);
+						attribute.start_index = byteStart;
+						attribute.end_index = byteEnd;
+						OS.memmove (attr, attribute, PangoAttribute.sizeof);
+						OS.pango_attr_list_insert(attrList, attr);
+					} 
+					if (style.underlineColor == null) {
+						underlineStyle = OS.PANGO_UNDERLINE_SINGLE;
+					}
+					break;
+				}
 			}
 			if (underlineStyle != OS.PANGO_UNDERLINE_NONE && style.underlineColor == null) {
 				long /*int*/ attr = OS.pango_attr_underline_new(underlineStyle);
@@ -722,6 +736,7 @@ void drawBorder(GC gc, int x, int y, GdkColor selectionColor) {
 								OS.gdk_draw_rectangle(data.drawable, gdkGC, 1, rect.x, underlineY + underlineThickness * 2, rect.width, underlineThickness);
 							}
 							//FALLTHROUGH
+						case SWT.UNDERLINE_LINK:
 						case SWT.UNDERLINE_SINGLE:
 							if (cairo != 0 && OS.GTK_VERSION >= OS.VERSION(2, 8, 0)) {
 								Cairo.cairo_rectangle(cairo, rect.x, underlineY, rect.width, underlineThickness);
@@ -887,6 +902,7 @@ public Rectangle getBounds() {
 	if (ascent != -1 && descent != -1) {
 		height = Math.max (height, ascent + descent);
 	}
+	height += OS.PANGO_PIXELS(OS.pango_layout_get_spacing(layout));	
 	return new Rectangle(0, 0, width, height);
 }
 
@@ -2040,7 +2056,12 @@ public void setTabs(int[] tabs) {
 
 /**
  * Sets the receiver's text.
- *
+ *<p>
+ * Note: Setting the text also clears all the styles. This method 
+ * returns without doing anything if the new text is the same as 
+ * the current text.
+ * </p>
+ * 
  * @param text the new text
  *
  * @exception IllegalArgumentException <ul>

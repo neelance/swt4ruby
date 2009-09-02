@@ -1,6 +1,6 @@
 require "rjava"
 
-# Copyright (c) 2000, 2006 IBM Corporation and others. All rights reserved.
+# Copyright (c) 2000, 2008 IBM Corporation and others. All rights reserved.
 # The contents of this file are made available under the terms
 # of the GNU Lesser General Public License (LGPL) Version 2.1 that
 # accompanies this distribution (lgpl-v21.txt).  The LGPL is also
@@ -23,6 +23,7 @@ module Org::Eclipse::Swt::Internal::Gtk
   class GdkWindowAttr 
     include_class_members GdkWindowAttrImports
     
+    # @field cast=(gchar *)
     # long
     attr_accessor :title
     alias_method :attr_title, :title
@@ -66,6 +67,7 @@ module Org::Eclipse::Swt::Internal::Gtk
     alias_method :attr_wclass=, :wclass=
     undef_method :wclass=
     
+    # @field cast=(GdkVisual *)
     # long
     attr_accessor :visual
     alias_method :attr_visual, :visual
@@ -73,6 +75,7 @@ module Org::Eclipse::Swt::Internal::Gtk
     alias_method :attr_visual=, :visual=
     undef_method :visual=
     
+    # @field cast=(GdkColormap *)
     # long
     attr_accessor :colormap
     alias_method :attr_colormap, :colormap
@@ -86,6 +89,7 @@ module Org::Eclipse::Swt::Internal::Gtk
     alias_method :attr_window_type=, :window_type=
     undef_method :window_type=
     
+    # @field cast=(GdkCursor *)
     # long
     attr_accessor :cursor
     alias_method :attr_cursor, :cursor
@@ -93,6 +97,7 @@ module Org::Eclipse::Swt::Internal::Gtk
     alias_method :attr_cursor=, :cursor=
     undef_method :cursor=
     
+    # @field cast=(gchar *)
     # long
     attr_accessor :wmclass_name
     alias_method :attr_wmclass_name, :wmclass_name
@@ -100,6 +105,7 @@ module Org::Eclipse::Swt::Internal::Gtk
     alias_method :attr_wmclass_name=, :wmclass_name=
     undef_method :wmclass_name=
     
+    # @field cast=(gchar *)
     # long
     attr_accessor :wmclass_class
     alias_method :attr_wmclass_class, :wmclass_class

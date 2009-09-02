@@ -1,6 +1,6 @@
 require "rjava"
 
-# Copyright (c) 2000, 2008 IBM Corporation and others.
+# Copyright (c) 2000, 2009 IBM Corporation and others.
 # All rights reserved. This program and the accompanying materials
 # are made available under the terms of the Eclipse Public License v1.0
 # which accompanies this distribution, and is available at
@@ -38,6 +38,7 @@ module Org::Eclipse::Swt::Custom
   # </p>
   # 
   # @see <a href="http://www.eclipse.org/swt/">Sample code and further information</a>
+  # @noextend This class is not intended to be subclassed by clients.
   class ViewForm < ViewFormImports.const_get :Composite
     include_class_members ViewFormImports
     
@@ -221,6 +222,12 @@ module Org::Eclipse::Swt::Custom
     alias_method :attr_selection_background=, :selection_background=
     undef_method :selection_background=
     
+    attr_accessor :listener
+    alias_method :attr_listener, :listener
+    undef_method :listener
+    alias_method :attr_listener=, :listener=
+    undef_method :listener=
+    
     class_module.module_eval {
       const_set_lazy(:OFFSCREEN) { -200 }
       const_attr_reader  :OFFSCREEN
@@ -277,6 +284,7 @@ module Org::Eclipse::Swt::Custom
       @highlight = 0
       @old_size = nil
       @selection_background = nil
+      @listener = nil
       super(parent, check_style(style))
       @margin_width = 0
       @margin_height = 0
@@ -292,7 +300,7 @@ module Org::Eclipse::Swt::Custom
       @highlight = 0
       Composite.instance_method(:set_layout).bind(self).call(ViewFormLayout.new)
       set_border_visible(!((style & SWT::BORDER)).equal?(0))
-      listener = Class.new(Listener.class == Class ? Listener : Object) do
+      @listener = Class.new(Listener.class == Class ? Listener : Object) do
         extend LocalClass
         include_class_members ViewForm
         include Listener if Listener.class == Module
@@ -301,7 +309,7 @@ module Org::Eclipse::Swt::Custom
         define_method :handle_event do |e|
           case (e.attr_type)
           when SWT::Dispose
-            on_dispose
+            on_dispose(e)
           when SWT::Paint
             on_paint(e.attr_gc)
           when SWT::Resize
@@ -320,7 +328,7 @@ module Org::Eclipse::Swt::Custom
       events = Array.typed(::Java::Int).new([SWT::Dispose, SWT::Paint, SWT::Resize])
       i = 0
       while i < events.attr_length
-        add_listener(events[i], listener)
+        add_listener(events[i], @listener)
         i += 1
       end
     end
@@ -400,8 +408,11 @@ module Org::Eclipse::Swt::Custom
       return @top_right
     end
     
-    typesig { [] }
-    def on_dispose
+    typesig { [Event] }
+    def on_dispose(event)
+      remove_listener(SWT::Dispose, @listener)
+      notify_listeners(SWT::Dispose, event)
+      event.attr_type = SWT::None
       @top_left = nil
       @top_center = nil
       @top_right = nil

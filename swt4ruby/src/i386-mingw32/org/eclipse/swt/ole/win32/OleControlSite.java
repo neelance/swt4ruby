@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2008 IBM Corporation and others.
+ * Copyright (c) 2000, 2009 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -9,6 +9,8 @@
  *     IBM Corporation - initial API and implementation
  *******************************************************************************/
 package org.eclipse.swt.ole.win32;
+
+import java.io.*;
 
 import org.eclipse.swt.*;
 import org.eclipse.swt.internal.ole.win32.*;
@@ -62,9 +64,37 @@ public class OleControlSite extends OleClientSite
 	
 	private Font font;
 
-	// work around for IE destroying the caret
-	static int SWT_RESTORECARET;
+
+/**
+ * Create an OleControlSite child widget using the OLE Document type associated with the
+ * specified file.  The OLE Document type is determined either through header information in the file 
+ * or through a Registry entry for the file extension. Use style bits to select a particular look 
+ * or set of properties.
+ *
+ * @param parent a composite widget; must be an OleFrame
+ * @param style the bitwise OR'ing of widget styles
+ * @param file the file that is to be opened in this OLE Document
+ *
+ * @exception IllegalArgumentException
+ * <ul><li>ERROR_NULL_ARGUMENT when the parent is null
+ *     <li>ERROR_INVALID_ARGUMENT when the parent is not an OleFrame</ul> 
+ * @exception SWTException
+ * <ul><li>ERROR_THREAD_INVALID_ACCESS when called from the wrong thread
+ *     <li>ERROR_CANNOT_CREATE_OBJECT when failed to create OLE Object
+ *     <li>ERROR_CANNOT_OPEN_FILE when failed to open file
+ *     <li>ERROR_INTERFACE_NOT_FOUND when unable to create callbacks for OLE Interfaces
+ *     <li>ERROR_INVALID_CLASSID
+ * </ul>
+ * 
+ * @since 3.5
+ */
+public OleControlSite(Composite parent, int style, File file) {
+	super(parent, style, file);
 	
+	// Init site properties
+	setSiteProperty(COM.DISPID_AMBIENT_USERMODE, new Variant(true));
+	setSiteProperty(COM.DISPID_AMBIENT_UIDEAD, new Variant(false));
+}
 /**
  * Create an OleControlSite child widget using style bits
  * to select a particular look or set of properties.
@@ -154,6 +184,43 @@ public OleControlSite(Composite parent, int style, String progId) {
 		disposeCOMInterfaces();
 		throw e;
 	}			
+}
+/**
+ * Create an OleClientSite child widget to edit the specified file using the specified OLE Document
+ * application.  Use style bits to select a particular look or set of properties. 
+ * <p>
+ * <b>IMPORTANT:</b> This method is <em>not</em> part of the public
+ * API for <code>OleClientSite</code>. It is marked public only so that it
+ * can be shared within the packages provided by SWT. It is not
+ * available on all platforms, and should never be called from
+ * application code.
+ * </p>
+ * @param parent a composite widget; must be an OleFrame
+ * @param style the bitwise OR'ing of widget styles
+ * @param progId the unique program identifier of am OLE Document application; 
+ *               the value of the ProgID key or the value of the VersionIndependentProgID key specified
+ *               in the registry for the desired OLE Document (for example, the VersionIndependentProgID
+ *               for Word is Word.Document)
+ * @param file the file that is to be opened in this OLE Document
+ *
+ * @exception IllegalArgumentException
+ * <ul><li>ERROR_NULL_ARGUMENT when the parent is null
+ *     <li>ERROR_INVALID_ARGUMENT when the parent is not an OleFrame</ul>
+ * @exception SWTException
+ * <ul><li>ERROR_THREAD_INVALID_ACCESS when called from the wrong thread
+ *     <li>ERROR_INVALID_CLASSID when the progId does not map to a registered CLSID
+ *     <li>ERROR_CANNOT_CREATE_OBJECT when failed to create OLE Object
+ *     <li>ERROR_CANNOT_OPEN_FILE when failed to open file
+ * </ul>
+ * 
+ * @since 3.5
+ */
+public OleControlSite(Composite parent, int style, String progId, File file) {
+	super(parent, style, progId, file);
+	
+	// Init site properties
+	setSiteProperty(COM.DISPID_AMBIENT_USERMODE, new Variant(true));
+	setSiteProperty(COM.DISPID_AMBIENT_UIDEAD, new Variant(false));
 }
 /**	 
  * Adds the listener to receive events.
@@ -585,61 +652,85 @@ private int OnControlInfoChanged() {
 	}
 	return COM.S_OK;
 }
-void onFocusIn(Event e) {
-	if (objIOleInPlaceObject == null) return;
-	doVerb(OLE.OLEIVERB_UIACTIVATE);
-	if (isFocusControl()) return;
-	int /*long*/[] phwnd = new int /*long*/[1];
-	objIOleInPlaceObject.GetWindow(phwnd);
-	if (phwnd[0] == 0) return;
-	OS.SetFocus(phwnd[0]);
-}
-void onFocusOut(Event e) {
-	if (objIOleInPlaceObject != null) {
-		/*
-		* Bug in Windows.  When IE7 loses focus and UIDeactivate()
-		* is called, IE destroys the caret even though it is
-		* no longer owned by IE.  If focus has moved to a control
-		* that shows a caret then the caret disappears.  The fix 
-		* is to detect this case and restore the caret.
-		*/
-		int threadId = OS.GetCurrentThreadId();
-		GUITHREADINFO lpgui1 = new GUITHREADINFO();
-		lpgui1.cbSize = GUITHREADINFO.sizeof;
-		OS.GetGUIThreadInfo(threadId, lpgui1);
-		objIOleInPlaceObject.UIDeactivate();
-		if (lpgui1.hwndCaret != 0) {
-			GUITHREADINFO lpgui2 = new GUITHREADINFO();
-			lpgui2.cbSize = GUITHREADINFO.sizeof;
-			OS.GetGUIThreadInfo(threadId, lpgui2);
-			if (lpgui2.hwndCaret == 0 && lpgui1.hwndCaret == OS.GetFocus()) {
-				if (SWT_RESTORECARET == 0) {
-					SWT_RESTORECARET = OS.RegisterWindowMessage (new TCHAR (0, "SWT_RESTORECARET", true));
-				}
-				/*
-				* If the caret was not restored by SWT, put it back using
-				* the information from GUITHREADINFO.  Note that this will
-				* not be correct when the caret has a bitmap.  There is no
-				* API to query the bitmap that the caret is using.
-				*/
-				if (OS.SendMessage (lpgui1.hwndCaret, SWT_RESTORECARET, 0, 0) == 0) {
-					int width = lpgui1.right - lpgui1.left;
-					int height = lpgui1.bottom - lpgui1.top;
-					OS.CreateCaret (lpgui1.hwndCaret, 0, width, height);
-					OS.SetCaretPos (lpgui1.left, lpgui1.top);
-					OS.ShowCaret (lpgui1.hwndCaret);
-				}
-			}
-		}
-	}
-}
+
+// The following is intentionally commented, it's not believed that
+// OLEIVERB_UIACTIVATE and UIDeactivate should be invoked for every
+// received focusIn and focusOut, respectively.
+//
+//void onFocusIn(Event e) {
+//	String progID = getProgramID();
+//	if (progID == null) return;
+//	if (!progID.startsWith("Shell.Explorer")) {
+//		super.onFocusIn(e);
+//		return;
+//	}
+//	if (objIOleInPlaceObject == null) return;
+//	doVerb(OLE.OLEIVERB_UIACTIVATE);
+//	if (isFocusControl()) return;
+//	int /*long*/[] phwnd = new int /*long*/[1];
+//	objIOleInPlaceObject.GetWindow(phwnd);
+//	if (phwnd[0] == 0) return;
+//	OS.SetFocus(phwnd[0]);
+//}
+//void onFocusOut(Event e) {
+//	if (objIOleInPlaceObject == null) return;
+//	String progID = getProgramID();
+//	if (progID == null) return;
+//	if (!progID.startsWith("Shell.Explorer")) {
+//		super.onFocusOut(e);
+//		return;
+//	}
+//	/*
+//	* Bug in Windows.  When IE7 loses focus and UIDeactivate()
+//	* is called, IE destroys the caret even though it is
+//	* no longer owned by IE.  If focus has moved to a control
+//	* that shows a caret then the caret disappears.  The fix 
+//	* is to detect this case and restore the caret.
+//	*/
+//	int threadId = OS.GetCurrentThreadId();
+//	GUITHREADINFO lpgui1 = new GUITHREADINFO();
+//	lpgui1.cbSize = GUITHREADINFO.sizeof;
+//	OS.GetGUIThreadInfo(threadId, lpgui1);
+//	objIOleInPlaceObject.UIDeactivate();
+//	if (lpgui1.hwndCaret != 0) {
+//		GUITHREADINFO lpgui2 = new GUITHREADINFO();
+//		lpgui2.cbSize = GUITHREADINFO.sizeof;
+//		OS.GetGUIThreadInfo(threadId, lpgui2);
+//		if (lpgui2.hwndCaret == 0 && lpgui1.hwndCaret == OS.GetFocus()) {
+//			if (SWT_RESTORECARET == 0) {
+//				SWT_RESTORECARET = OS.RegisterWindowMessage (new TCHAR (0, "SWT_RESTORECARET", true));
+//			}
+//			/*
+//			* If the caret was not restored by SWT, put it back using
+//			* the information from GUITHREADINFO.  Note that this will
+//			* not be correct when the caret has a bitmap.  There is no
+//			* API to query the bitmap that the caret is using.
+//			*/
+//			if (OS.SendMessage (lpgui1.hwndCaret, SWT_RESTORECARET, 0, 0) == 0) {
+//				int width = lpgui1.right - lpgui1.left;
+//				int height = lpgui1.bottom - lpgui1.top;
+//				OS.CreateCaret (lpgui1.hwndCaret, 0, width, height);
+//				OS.SetCaretPos (lpgui1.left, lpgui1.top);
+//				OS.ShowCaret (lpgui1.hwndCaret);
+//			}
+//		}
+//	}
+//}
+
 private int OnFocus(int fGotFocus) {
 	return COM.S_OK;
 }
 protected int OnUIDeactivate(int fUndoable) {
 	// controls don't need to do anything for
 	// border space or menubars
+	if (frame == null || frame.isDisposed()) return COM.S_OK;
 	state = STATE_INPLACEACTIVE;
+	frame.SetActiveObject(0,0);
+	redraw();
+	Shell shell = getShell();
+	if (isFocusControl() || frame.isFocusControl()) {
+		shell.traverse(SWT.TRAVERSE_TAB_NEXT);
+	}
 	return COM.S_OK;
 }
 protected int QueryInterface(int /*long*/ riid, int /*long*/ ppvObject) {

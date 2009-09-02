@@ -1,6 +1,6 @@
 require "rjava"
 
-# Copyright (c) 2000, 2006 IBM Corporation and others. All rights reserved.
+# Copyright (c) 2000, 2008 IBM Corporation and others. All rights reserved.
 # The contents of this file are made available under the terms
 # of the GNU Lesser General Public License (LGPL) Version 2.1 that
 # accompanies this distribution (lgpl-v21.txt).  The LGPL is also
@@ -23,6 +23,7 @@ module Org::Eclipse::Swt::Internal::Gtk
   class GtkSelectionData 
     include_class_members GtkSelectionDataImports
     
+    # @field cast=(GdkAtom)
     # long
     attr_accessor :selection
     alias_method :attr_selection, :selection
@@ -30,6 +31,7 @@ module Org::Eclipse::Swt::Internal::Gtk
     alias_method :attr_selection=, :selection=
     undef_method :selection=
     
+    # @field cast=(GdkAtom)
     # long
     attr_accessor :target
     alias_method :attr_target, :target
@@ -37,6 +39,7 @@ module Org::Eclipse::Swt::Internal::Gtk
     alias_method :attr_target=, :target=
     undef_method :target=
     
+    # @field cast=(GdkAtom)
     # long
     attr_accessor :type
     alias_method :attr_type, :type
@@ -44,12 +47,14 @@ module Org::Eclipse::Swt::Internal::Gtk
     alias_method :attr_type=, :type=
     undef_method :type=
     
+    # @field cast=(gint)
     attr_accessor :format
     alias_method :attr_format, :format
     undef_method :format
     alias_method :attr_format=, :format=
     undef_method :format=
     
+    # @field cast=(guchar *)
     # long
     attr_accessor :data
     alias_method :attr_data, :data
@@ -57,6 +62,7 @@ module Org::Eclipse::Swt::Internal::Gtk
     alias_method :attr_data=, :data=
     undef_method :data=
     
+    # @field cast=(gint)
     attr_accessor :length
     alias_method :attr_length, :length
     undef_method :length

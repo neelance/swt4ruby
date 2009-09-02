@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2008 IBM Corporation and others.
+ * Copyright (c) 2000, 2009 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -32,6 +32,7 @@ import org.eclipse.swt.graphics.*;
  *
  * @see <a href="http://www.eclipse.org/swt/snippets/#tree">Tree, TreeItem, TreeColumn snippets</a>
  * @see <a href="http://www.eclipse.org/swt/">Sample code and further information</a>
+ * @noextend This class is not intended to be subclassed by clients.
  */
 public class TreeItem extends Item {
 	Tree parent;
@@ -1135,18 +1136,30 @@ void releaseWidget () {
  */
 public void removeAll () {
 	checkWidget ();
-	int length = OS.gtk_tree_model_iter_n_children (parent.modelHandle, handle);
+	int /*long*/ modelHandle = parent.modelHandle;
+	int length = OS.gtk_tree_model_iter_n_children (modelHandle, handle);
 	if (length == 0) return;
 	int /*long*/ iter = OS.g_malloc (OS.GtkTreeIter_sizeof ());
-	int [] index = new int [1];
-	while (OS.gtk_tree_model_iter_children (parent.modelHandle, iter, handle)) {
-		OS.gtk_tree_model_get (parent.modelHandle, iter, Tree.ID_COLUMN, index, -1);
-		if (index [0] != -1) {
-			TreeItem item = parent.items [index [0]];
-			if (item != null && !item.isDisposed ()) {
-				item.dispose ();
-			}
+	if (iter == 0) error (SWT.ERROR_NO_HANDLES);
+	if (parent.fixAccessibility ()) {
+		parent.ignoreAccessibility = true;
+	}
+	int /*long*/ selection = OS.gtk_tree_view_get_selection (parent.handle);
+	int [] value = new int [1];
+	while (OS.gtk_tree_model_iter_children (modelHandle, iter, handle)) {
+		OS.gtk_tree_model_get (modelHandle, iter, Tree.ID_COLUMN, value, -1);
+		TreeItem item = value [0] != -1 ? parent.items [value [0]] : null;
+		if (item != null && !item.isDisposed ()) {
+			item.dispose ();
+		} else {
+			OS.g_signal_handlers_block_matched (selection, OS.G_SIGNAL_MATCH_DATA, 0, 0, 0, 0, CHANGED);
+			OS.gtk_tree_store_remove (modelHandle, iter);
+			OS.g_signal_handlers_unblock_matched (selection, OS.G_SIGNAL_MATCH_DATA, 0, 0, 0, 0, CHANGED);
 		}
+	}
+	if (parent.fixAccessibility ()) {
+		parent.ignoreAccessibility = false;
+		OS.g_object_notify (parent.handle, OS.model);
 	}
 	OS.g_free (iter);
 }

@@ -1,6 +1,6 @@
 require "rjava"
 
-# Copyright (c) 2000, 2006 IBM Corporation and others.
+# Copyright (c) 2000, 2008 IBM Corporation and others.
 # All rights reserved. This program and the accompanying materials
 # are made available under the terms of the Eclipse Public License v1.0
 # which accompanies this distribution, and is available at
@@ -42,6 +42,12 @@ module Org::Eclipse::Swt::Internal::Ole::Win32
     # long
     def _do_verb(i_verb, lpmsg, p_active_site, lindex, hwnd_parent, lprc_pos_rect)
       return COM._vtbl_call(11, self.attr_address, i_verb, lpmsg, p_active_site, lindex, hwnd_parent, lprc_pos_rect)
+    end
+    
+    typesig { [Array.typed(::Java::Int)] }
+    # long
+    def _get_client_site(ppv_client_site)
+      return COM._vtbl_call(4, self.attr_address, ppv_client_site)
     end
     
     typesig { [::Java::Int, SIZE] }

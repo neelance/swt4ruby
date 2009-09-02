@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2008 IBM Corporation and others.
+ * Copyright (c) 2000, 2009 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -40,6 +40,7 @@ import org.eclipse.swt.events.*;
  * @see <a href="http://www.eclipse.org/swt/">Sample code and further information</a>
  * 
  * @since 3.2
+ * @noextend This class is not intended to be subclassed by clients.
  */
 public class ToolTip extends Widget {
 	Shell parent;
@@ -81,6 +82,7 @@ public class ToolTip extends Widget {
  *    <li>ERROR_INVALID_SUBCLASS - if this class is not an allowed subclass</li>
  * </ul>
  *
+ * @see SWT#BALLOON
  * @see SWT#ICON_ERROR
  * @see SWT#ICON_INFORMATION
  * @see SWT#ICON_WARNING
@@ -91,6 +93,7 @@ public ToolTip (Shell parent, int style) {
 	super (parent, checkStyle (style));
 	this.parent = parent;
 	createWidget (0);
+	parent.addToolTip (this);
 }
 
 static int checkStyle (int style) {
@@ -260,6 +263,7 @@ void createHandle (int index) {
 		Color background = display.getSystemColor (SWT.COLOR_INFO_BACKGROUND);
 		OS.gtk_widget_modify_bg (handle, OS.GTK_STATE_NORMAL, background.handle);
 		OS.gtk_widget_set_app_paintable (handle, true);
+		OS.gtk_window_set_type_hint (handle, OS.GDK_WINDOW_TYPE_HINT_TOOLTIP);
 	} else {
 		handle = OS.gtk_tooltips_new ();
 		if (handle == 0) SWT.error (SWT.ERROR_NO_HANDLES);
@@ -294,6 +298,7 @@ void deregister () {
 
 void destroyWidget () {
 	int /*long*/ topHandle = topHandle ();
+	if (parent != null) parent.removeTooTip (this);
 	releaseHandle ();
 	if (topHandle != 0 && (state & HANDLE) != 0) {
 		if ((style & SWT.BALLOON) != 0) {
@@ -326,12 +331,19 @@ Point getLocation () {
 	int y = this.y;
 	if (item != null) {
 		int /*long*/ itemHandle = item.handle; 
-		OS.gtk_widget_realize (itemHandle);
-		int /*long*/ window = OS.GTK_WIDGET_WINDOW (itemHandle);
-		int [] px = new int [1], py = new int [1];
-		OS.gdk_window_get_origin (window, px, py);
-		x = px [0] + OS.GTK_WIDGET_WIDTH (itemHandle) / 2;
-		y = py [0] + OS.GTK_WIDGET_HEIGHT (itemHandle) / 2;
+		if(OS.GTK_VERSION >= OS.VERSION (2, 10, 0)) {
+			GdkRectangle area = new GdkRectangle ();
+			OS.gtk_status_icon_get_geometry (itemHandle, 0, area, 0);
+			x = area.x + area.width / 2;
+			y = area.y + area.height / 2;
+		} else {
+			OS.gtk_widget_realize (itemHandle);
+			int /*long*/ window = OS.GTK_WIDGET_WINDOW (itemHandle);
+			int [] px = new int [1], py = new int [1];
+			OS.gdk_window_get_origin (window, px, py);
+			x = px [0] + OS.GTK_WIDGET_WIDTH (itemHandle) / 2;
+			y = py [0] + OS.GTK_WIDGET_HEIGHT (itemHandle) / 2;
+		}
 	}
 	if (x == -1 || y == -1) {
 		int [] px = new int [1], py = new int [1];
@@ -764,6 +776,7 @@ public void setText (String string) {
  * </ul>
  */
 public void setVisible (boolean visible) {
+	checkWidget ();
 	if (timerId != 0) OS.gtk_timeout_remove(timerId);
 	timerId = 0;
 	if (visible) {

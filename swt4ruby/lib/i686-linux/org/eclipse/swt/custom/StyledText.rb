@@ -1,6 +1,6 @@
 require "rjava"
 
-# Copyright (c) 2000, 2008 IBM Corporation and others.
+# Copyright (c) 2000, 2009 IBM Corporation and others.
 # All rights reserved. This program and the accompanying materials
 # are made available under the terms of the Eclipse Public License v1.0
 # which accompanies this distribution, and is available at
@@ -79,6 +79,7 @@ module Org::Eclipse::Swt::Custom
   # @see <a href="http://www.eclipse.org/swt/snippets/#styledtext">StyledText snippets</a>
   # @see <a href="http://www.eclipse.org/swt/examples.php">SWT Examples: CustomControlExample, TextEditor</a>
   # @see <a href="http://www.eclipse.org/swt/">Sample code and further information</a>
+  # @noextend This class is not intended to be subclassed by clients.
   class StyledText < StyledTextImports.const_get :Canvas
     include_class_members StyledTextImports
     
@@ -136,6 +137,9 @@ module Org::Eclipse::Swt::Custom
       
       const_set_lazy(:WordPrevious) { 3010 }
       const_attr_reader  :WordPrevious
+      
+      const_set_lazy(:CaretMoved) { 3011 }
+      const_attr_reader  :CaretMoved
       
       const_set_lazy(:PREVIOUS_OFFSET_TRAILING) { 0 }
       const_attr_reader  :PREVIOUS_OFFSET_TRAILING
@@ -255,6 +259,12 @@ module Org::Eclipse::Swt::Custom
     undef_method :bottom_margin
     alias_method :attr_bottom_margin=, :bottom_margin=
     undef_method :bottom_margin=
+    
+    attr_accessor :margin_color
+    alias_method :attr_margin_color, :margin_color
+    undef_method :margin_color
+    alias_method :attr_margin_color=, :margin_color=
+    undef_method :margin_color=
     
     attr_accessor :column_x
     alias_method :attr_column_x, :column_x
@@ -414,6 +424,12 @@ module Org::Eclipse::Swt::Custom
     alias_method :attr_last_text_change_replace_char_count=, :last_text_change_replace_char_count=
     undef_method :last_text_change_replace_char_count=
     
+    attr_accessor :last_char_count
+    alias_method :attr_last_char_count, :last_char_count
+    undef_method :last_char_count
+    alias_method :attr_last_char_count=, :last_char_count=
+    undef_method :last_char_count=
+    
     attr_accessor :last_line_bottom
     alias_method :attr_last_line_bottom, :last_line_bottom
     undef_method :last_line_bottom
@@ -488,6 +504,12 @@ module Org::Eclipse::Swt::Custom
     alias_method :attr_ime=, :ime=
     undef_method :ime=
     
+    attr_accessor :cursor
+    alias_method :attr_cursor, :cursor
+    undef_method :cursor
+    alias_method :attr_cursor=, :cursor=
+    undef_method :cursor=
+    
     attr_accessor :alignment
     alias_method :attr_alignment, :alignment
     undef_method :alignment
@@ -512,10 +534,47 @@ module Org::Eclipse::Swt::Custom
     alias_method :attr_line_spacing=, :line_spacing=
     undef_method :line_spacing=
     
+    attr_accessor :alignment_margin
+    alias_method :attr_alignment_margin, :alignment_margin
+    undef_method :alignment_margin
+    alias_method :attr_alignment_margin=, :alignment_margin=
+    undef_method :alignment_margin=
+    
+    # block selection
+    attr_accessor :block_selection
+    alias_method :attr_block_selection, :block_selection
+    undef_method :block_selection
+    alias_method :attr_block_selection=, :block_selection=
+    undef_method :block_selection=
+    
+    attr_accessor :block_xanchor
+    alias_method :attr_block_xanchor, :block_xanchor
+    undef_method :block_xanchor
+    alias_method :attr_block_xanchor=, :block_xanchor=
+    undef_method :block_xanchor=
+    
+    attr_accessor :block_yanchor
+    alias_method :attr_block_yanchor, :block_yanchor
+    undef_method :block_yanchor
+    alias_method :attr_block_yanchor=, :block_yanchor=
+    undef_method :block_yanchor=
+    
+    attr_accessor :block_xlocation
+    alias_method :attr_block_xlocation, :block_xlocation
+    undef_method :block_xlocation
+    alias_method :attr_block_xlocation=, :block_xlocation=
+    undef_method :block_xlocation=
+    
+    attr_accessor :block_ylocation
+    alias_method :attr_block_ylocation, :block_ylocation
+    undef_method :block_ylocation
+    alias_method :attr_block_ylocation=, :block_ylocation=
+    undef_method :block_ylocation=
+    
     class_module.module_eval {
       when_class_loaded do
         platform = SWT.get_platform
-        const_set :IS_CARBON, ("carbon" == platform)
+        const_set :IS_MAC, ("carbon" == platform) || ("cocoa" == platform)
         const_set :IS_GTK, ("gtk" == platform)
         const_set :IS_MOTIF, ("motif" == platform)
       end
@@ -1325,7 +1384,7 @@ module Org::Eclipse::Swt::Custom
               end
               write("\\u")
               write(JavaInteger.to_s(RJava.cast_to_short(ch)))
-              write(Character.new(?\s.ord)) # control word delimiter
+              write(Character.new(??.ord)) # ANSI representation (1 byte long, \\uc1)
               start = index + 1
             else
               if ((ch).equal?(Character.new(?}.ord)) || (ch).equal?(Character.new(?{.ord)) || (ch).equal?(Character.new(?\\.ord)))
@@ -1362,7 +1421,7 @@ module Org::Eclipse::Swt::Custom
             header.append("\\ansicpg")
             header.append(cpg)
           end
-          header.append("\\uc0\\deff0{\\fonttbl{\\f0\\fnil ")
+          header.append("\\uc1\\deff0{\\fonttbl{\\f0\\fnil ")
           header.append(font_data.get_name)
           header.append(";")
           i = 1
@@ -1830,6 +1889,7 @@ module Org::Eclipse::Swt::Custom
       @top_margin = 0
       @right_margin = 0
       @bottom_margin = 0
+      @margin_color = nil
       @column_x = 0
       @caret_offset = 0
       @caret_alignment = 0
@@ -1854,6 +1914,7 @@ module Org::Eclipse::Swt::Custom
       @last_text_change_new_char_count = 0
       @last_text_change_replace_line_count = 0
       @last_text_change_replace_char_count = 0
+      @last_char_count = 0
       @last_line_bottom = 0
       @is_mirrored = false
       @bidi_coloring = false
@@ -1866,10 +1927,17 @@ module Org::Eclipse::Swt::Custom
       @fixed_line_height = false
       @drag_detect = false
       @ime = nil
+      @cursor = nil
       @alignment = 0
       @justify = false
       @indent = 0
       @line_spacing = 0
+      @alignment_margin = 0
+      @block_selection = false
+      @block_xanchor = 0
+      @block_yanchor = 0
+      @block_xlocation = 0
+      @block_ylocation = 0
       super(parent, check_style(style))
       @vertical_scroll_offset = 0
       @horizontal_scroll_offset = 0
@@ -1877,7 +1945,6 @@ module Org::Eclipse::Swt::Custom
       @client_area_height = 0
       @client_area_width = 0
       @tab_length = 4
-      @caret_offset = 0
       @selection = Point.new(0, 0)
       @editable = true
       @word_wrap = false
@@ -1889,6 +1956,7 @@ module Org::Eclipse::Swt::Custom
       @foreground = nil
       @auto_scroll_direction = SWT::NULL
       @auto_scroll_distance = 0
+      @last_char_count = 0
       @bidi_coloring = false
       @left_caret_bitmap = nil
       @right_caret_bitmap = nil
@@ -1897,6 +1965,10 @@ module Org::Eclipse::Swt::Custom
       @default_caret = nil
       @update_caret_direction = true
       @drag_detect = true
+      @block_xanchor = -1
+      @block_yanchor = -1
+      @block_xlocation = -1
+      @block_ylocation = -1
       # set the fg in the OS to ensure that these are the same as StyledText, necessary
       # for ensuring that the bg/fg the IME box uses is the same as what StyledText uses
       Canvas.instance_method(:set_foreground).bind(self).call(get_foreground)
@@ -1958,7 +2030,7 @@ module Org::Eclipse::Swt::Custom
       set_caret(@default_caret)
       calculate_scroll_bars
       create_key_bindings
-      set_cursor(display.get_system_cursor(SWT::CURSOR_IBEAM))
+      Canvas.instance_method(:set_cursor).bind(self).call(display.get_system_cursor(SWT::CURSOR_IBEAM))
       install_listeners
       initialize_accessible
       set_data("DEFAULT_DROP_TARGET_EFFECT", StyledTextDropTargetEffect.new(self))
@@ -2017,6 +2089,27 @@ module Org::Eclipse::Swt::Custom
       add_listener(LineGetSegments, StyledTextListener.new(listener))
     end
     
+    typesig { [CaretListener] }
+    # Adds a caret listener. CaretEvent is sent when the caret offset changes.
+    # 
+    # @param listener the listener
+    # @exception SWTException <ul>
+    # <li>ERROR_WIDGET_DISPOSED - if the receiver has been disposed</li>
+    # <li>ERROR_THREAD_INVALID_ACCESS - if not called from the thread that created the receiver</li>
+    # </ul>
+    # @exception IllegalArgumentException <ul>
+    # <li>ERROR_NULL_ARGUMENT when listener is null</li>
+    # </ul>
+    # 
+    # @since 3.5
+    def add_caret_listener(listener)
+      check_widget
+      if ((listener).nil?)
+        SWT.error(SWT::ERROR_NULL_ARGUMENT)
+      end
+      add_listener(CaretMoved, StyledTextListener.new(listener))
+    end
+    
     typesig { [LineBackgroundListener] }
     # Adds a line background listener. A LineGetBackground event is sent by the
     # widget to determine the background color for a line.
@@ -2062,6 +2155,7 @@ module Org::Eclipse::Swt::Custom
         @renderer.clear_line_style(0, @content.get_line_count)
       end
       add_listener(LineGetStyle, StyledTextListener.new(listener))
+      set_caret_location
     end
     
     typesig { [ModifyListener] }
@@ -2336,7 +2430,8 @@ module Org::Eclipse::Swt::Custom
           end
         end
         style |= SWT::NO_REDRAW_RESIZE | SWT::DOUBLE_BUFFERED | SWT::NO_BACKGROUND
-        return style
+        # Clear SWT.CENTER to avoid the conflict with SWT.EMBEDDED
+        return style & ~SWT::CENTER
       end
     }
     
@@ -2344,18 +2439,16 @@ module Org::Eclipse::Swt::Custom
     # Scrolls down the text to use new space made available by a resize or by
     # deleted lines.
     def claim_bottom_free_space
-      client_area_height = @client_area_height - @top_margin - @bottom_margin
       if (is_fixed_line_height)
-        line_height = @renderer.get_line_height
-        new_vertical_offset = Math.max(0, @content.get_line_count * line_height - client_area_height)
+        new_vertical_offset = Math.max(0, @renderer.get_height - @client_area_height)
         if (new_vertical_offset < get_vertical_scroll_offset)
           scroll_vertical(new_vertical_offset - get_vertical_scroll_offset, true)
         end
       else
         bottom_index = get_partial_bottom_index
         height = get_line_pixel(bottom_index + 1)
-        if (client_area_height > height)
-          scroll_vertical(-get_available_height_above(client_area_height - height), true)
+        if (@client_area_height > height)
+          scroll_vertical(-get_available_height_above(@client_area_height - height), true)
         end
       end
     end
@@ -2363,12 +2456,27 @@ module Org::Eclipse::Swt::Custom
     typesig { [] }
     # Scrolls text to the right to use new space made available by a resize.
     def claim_right_free_space
-      new_horizontal_offset = Math.max(0, @renderer.get_width - (@client_area_width - @left_margin - @right_margin))
+      new_horizontal_offset = Math.max(0, @renderer.get_width - @client_area_width)
       if (new_horizontal_offset < @horizontal_scroll_offset)
         # item is no longer drawn past the right border of the client area
         # align the right end of the item with the right border of the
         # client area (window is scrolled right).
         scroll_horizontal(new_horizontal_offset - @horizontal_scroll_offset, true)
+      end
+    end
+    
+    typesig { [::Java::Boolean, ::Java::Boolean] }
+    def clear_block_selection(reset, send_event)
+      if (reset)
+        reset_selection
+      end
+      @block_xanchor = @block_yanchor = -1
+      @block_xlocation = @block_ylocation = -1
+      @caret_direction = SWT::NULL
+      update_caret_visibility
+      Canvas.instance_method(:redraw).bind(self).call
+      if (send_event)
+        send_selection_event
       end
     end
     
@@ -2460,7 +2568,7 @@ module Org::Eclipse::Swt::Custom
     # </ul>
     def copy
       check_widget
-      copy(DND::CLIPBOARD)
+      copy_selection(DND::CLIPBOARD)
     end
     
     typesig { [::Java::Int] }
@@ -2485,23 +2593,41 @@ module Org::Eclipse::Swt::Custom
     # @since 3.1
     def copy(clipboard_type)
       check_widget
-      if (!(clipboard_type).equal?(DND::CLIPBOARD) && !(clipboard_type).equal?(DND::SELECTION_CLIPBOARD))
-        return
+      copy_selection(clipboard_type)
+    end
+    
+    typesig { [::Java::Int] }
+    def copy_selection(type)
+      if (!(type).equal?(DND::CLIPBOARD) && !(type).equal?(DND::SELECTION_CLIPBOARD))
+        return false
       end
-      length = @selection.attr_y - @selection.attr_x
-      if (length > 0)
-        begin
-          set_clipboard_content(@selection.attr_x, length, clipboard_type)
-        rescue SWTError => error_
-          # Copy to clipboard failed. This happens when another application
-          # is accessing the clipboard while we copy. Ignore the error.
-          # Fixes 1GDQAVN
-          # Rethrow all other errors. Fixes bug 17578.
-          if (!(error_.attr_code).equal?(DND::ERROR_CANNOT_SET_CLIPBOARD))
-            raise error_
+      begin
+        if (@block_selection && !(@block_xlocation).equal?(-1))
+          text = get_block_selection_text(PlatformLineDelimiter)
+          if (text.length > 0)
+            # TODO RTF support
+            plain_text_transfer = TextTransfer.get_instance
+            data = Array.typed(Object).new([text])
+            types = Array.typed(Transfer).new([plain_text_transfer])
+            @clipboard.set_contents(data, types, type)
+            return true
+          end
+        else
+          length_ = @selection.attr_y - @selection.attr_x
+          if (length_ > 0)
+            set_clipboard_content(@selection.attr_x, length_, type)
+            return true
           end
         end
+      rescue SWTError => error_
+        # Copy to clipboard failed. This happens when another application
+        # is accessing the clipboard while we copy. Ignore the error.
+        # Rethrow all other errors. Fixes bug 17578.
+        if (!(error_.attr_code).equal?(DND::ERROR_CANNOT_SET_CLIPBOARD))
+          raise error_
+        end
       end
+      return false
     end
     
     typesig { [] }
@@ -2554,6 +2680,21 @@ module Org::Eclipse::Swt::Custom
         available_height += @renderer.get_line_height(((line_index += 1) - 1))
       end
       return Math.min(height, available_height)
+    end
+    
+    typesig { [] }
+    # Returns the color of the margins.
+    # 
+    # @return the color of the margins.
+    # @exception SWTException <ul>
+    # <li>ERROR_WIDGET_DISPOSED - if the receiver has been disposed</li>
+    # <li>ERROR_THREAD_INVALID_ACCESS - if not called from the thread that created the receiver</li>
+    # </ul>
+    # 
+    # @since 3.5
+    def get_margin_color
+      check_widget
+      return !(@margin_color).nil? ? @margin_color : get_background
     end
     
     typesig { [String] }
@@ -2631,12 +2772,19 @@ module Org::Eclipse::Swt::Custom
           return false
         end
       end
-      if ((@selection.attr_x).equal?(@selection.attr_y))
-        return false
-      end
-      offset = get_offset_at_point(event.attr_x, event.attr_y, nil, true)
-      if (@selection.attr_x <= offset && offset < @selection.attr_y)
-        return drag_detect(event)
+      if (@block_selection && !(@block_xlocation).equal?(-1))
+        rect = get_block_selection_rectangle
+        if (rect.contains(event.attr_x, event.attr_y))
+          return drag_detect(event)
+        end
+      else
+        if ((@selection.attr_x).equal?(@selection.attr_y))
+          return false
+        end
+        offset = get_offset_at_point(event.attr_x, event.attr_y, nil, true)
+        if (@selection.attr_x <= offset && offset < @selection.attr_y)
+          return drag_detect(event)
+        end
       end
       return false
     end
@@ -2649,7 +2797,7 @@ module Org::Eclipse::Swt::Custom
       # Navigation
       set_key_binding(SWT::ARROW_UP, ST::LINE_UP)
       set_key_binding(SWT::ARROW_DOWN, ST::LINE_DOWN)
-      if (IS_CARBON)
+      if (IS_MAC)
         set_key_binding(previous_key | SWT::MOD1, ST::LINE_START)
         set_key_binding(next_key | SWT::MOD1, ST::LINE_END)
         set_key_binding(SWT::HOME, ST::TEXT_START)
@@ -2675,7 +2823,7 @@ module Org::Eclipse::Swt::Custom
       # Selection
       set_key_binding(SWT::ARROW_UP | SWT::MOD2, ST::SELECT_LINE_UP)
       set_key_binding(SWT::ARROW_DOWN | SWT::MOD2, ST::SELECT_LINE_DOWN)
-      if (IS_CARBON)
+      if (IS_MAC)
         set_key_binding(previous_key | SWT::MOD1 | SWT::MOD2, ST::SELECT_LINE_START)
         set_key_binding(next_key | SWT::MOD1 | SWT::MOD2, ST::SELECT_LINE_END)
         set_key_binding(SWT::HOME | SWT::MOD2, ST::SELECT_TEXT_START)
@@ -2703,7 +2851,7 @@ module Org::Eclipse::Swt::Custom
       set_key_binding(Character.new(?X.ord) | SWT::MOD1, ST::CUT)
       set_key_binding(Character.new(?C.ord) | SWT::MOD1, ST::COPY)
       set_key_binding(Character.new(?V.ord) | SWT::MOD1, ST::PASTE)
-      if (IS_CARBON)
+      if (IS_MAC)
         set_key_binding(SWT::DEL | SWT::MOD2, ST::DELETE_NEXT)
         set_key_binding(SWT::BS | SWT::MOD3, ST::DELETE_WORD_PREVIOUS)
         set_key_binding(SWT::DEL | SWT::MOD3, ST::DELETE_WORD_NEXT)
@@ -2772,23 +2920,14 @@ module Org::Eclipse::Swt::Custom
     # </ul>
     def cut
       check_widget
-      length_ = @selection.attr_y - @selection.attr_x
-      if (length_ > 0)
-        begin
-          set_clipboard_content(@selection.attr_x, length_, DND::CLIPBOARD)
-        rescue SWTError => error_
-          # Copy to clipboard failed. This happens when another application
-          # is accessing the clipboard while we copy. Ignore the error.
-          # Fixes 1GDQAVN
-          # Rethrow all other errors. Fixes bug 17578.
-          if (!(error_.attr_code).equal?(DND::ERROR_CANNOT_SET_CLIPBOARD))
-            raise error_
-          end
-          # Abort cut operation if copy to clipboard fails.
-          # Fixes bug 21030.
-          return
+      # Abort cut operation if copy to clipboard fails.
+      # Fixes bug 21030.
+      if (copy_selection(DND::CLIPBOARD))
+        if (@block_selection && !(@block_xlocation).equal?(-1))
+          insert_block_selection_text(RJava.cast_to_char(0), SWT::NULL)
+        else
+          do_delete
         end
-        do_delete
       end
     end
     
@@ -2797,17 +2936,18 @@ module Org::Eclipse::Swt::Custom
     # the move position is outside of the client area, initiate autoscrolling.
     # Otherwise, we've moved back into the widget so end autoscrolling.
     def do_auto_scroll(event)
-      if (event.attr_y > @client_area_height)
-        do_auto_scroll(SWT::DOWN, event.attr_y - @client_area_height)
+      caret_line = get_caret_line
+      if (event.attr_y > @client_area_height - @bottom_margin && !(caret_line).equal?(@content.get_line_count - 1))
+        do_auto_scroll(SWT::DOWN, event.attr_y - (@client_area_height - @bottom_margin))
       else
-        if (event.attr_y < 0)
-          do_auto_scroll(SWT::UP, -event.attr_y)
+        if (event.attr_y < @top_margin && !(caret_line).equal?(0))
+          do_auto_scroll(SWT::UP, @top_margin - event.attr_y)
         else
           if (event.attr_x < @left_margin && !@word_wrap)
             do_auto_scroll(ST::COLUMN_PREVIOUS, @left_margin - event.attr_x)
           else
-            if (event.attr_x > @client_area_width - @left_margin - @right_margin && !@word_wrap)
-              do_auto_scroll(ST::COLUMN_NEXT, event.attr_x - (@client_area_width - @left_margin - @right_margin))
+            if (event.attr_x > @client_area_width - @right_margin && !@word_wrap)
+              do_auto_scroll(ST::COLUMN_NEXT, event.attr_x - (@client_area_width - @right_margin))
             else
               end_auto_scroll
             end
@@ -2839,7 +2979,17 @@ module Org::Eclipse::Swt::Custom
           typesig { [] }
           define_method :run do
             if ((self.attr_auto_scroll_direction).equal?(SWT::UP))
-              do_selection_page_up(self.attr_auto_scroll_distance)
+              if (self.attr_block_selection)
+                vertical_scroll_offset = get_vertical_scroll_offset
+                y = self.attr_block_ylocation - vertical_scroll_offset
+                pixels = Math.max(-self.attr_auto_scroll_distance, -vertical_scroll_offset)
+                if (!(pixels).equal?(0))
+                  set_block_selection_location(self.attr_block_xlocation - self.attr_horizontal_scroll_offset, y + pixels, true)
+                  scroll_vertical(pixels, true)
+                end
+              else
+                do_selection_page_up(self.attr_auto_scroll_distance)
+              end
               display.timer_exec(V_SCROLL_RATE, self)
             end
           end
@@ -2864,7 +3014,18 @@ module Org::Eclipse::Swt::Custom
             typesig { [] }
             define_method :run do
               if ((self.attr_auto_scroll_direction).equal?(SWT::DOWN))
-                do_selection_page_down(self.attr_auto_scroll_distance)
+                if (self.attr_block_selection)
+                  vertical_scroll_offset = get_vertical_scroll_offset
+                  y = self.attr_block_ylocation - vertical_scroll_offset
+                  max_ = self.attr_renderer.get_height - vertical_scroll_offset - self.attr_client_area_height
+                  pixels = Math.min(self.attr_auto_scroll_distance, Math.max(0, max_))
+                  if (!(pixels).equal?(0))
+                    set_block_selection_location(self.attr_block_xlocation - self.attr_horizontal_scroll_offset, y + pixels, true)
+                    scroll_vertical(pixels, true)
+                  end
+                else
+                  do_selection_page_down(self.attr_auto_scroll_distance)
+                end
                 display.timer_exec(V_SCROLL_RATE, self)
               end
             end
@@ -2889,9 +3050,19 @@ module Org::Eclipse::Swt::Custom
               typesig { [] }
               define_method :run do
                 if ((self.attr_auto_scroll_direction).equal?(ST::COLUMN_NEXT))
-                  do_visual_next
-                  set_mouse_word_selection_anchor
-                  do_mouse_selection
+                  if (self.attr_block_selection)
+                    x = self.attr_block_xlocation - self.attr_horizontal_scroll_offset
+                    max_ = self.attr_renderer.get_width - self.attr_horizontal_scroll_offset - self.attr_client_area_width
+                    pixels = Math.min(self.attr_auto_scroll_distance, Math.max(0, max_))
+                    if (!(pixels).equal?(0))
+                      set_block_selection_location(x + pixels, self.attr_block_ylocation - get_vertical_scroll_offset, true)
+                      scroll_horizontal(pixels, true)
+                    end
+                  else
+                    do_visual_next
+                    set_mouse_word_selection_anchor
+                    do_mouse_selection
+                  end
                   display.timer_exec(H_SCROLL_RATE, self)
                 end
               end
@@ -2916,9 +3087,18 @@ module Org::Eclipse::Swt::Custom
                 typesig { [] }
                 define_method :run do
                   if ((self.attr_auto_scroll_direction).equal?(ST::COLUMN_PREVIOUS))
-                    do_visual_previous
-                    set_mouse_word_selection_anchor
-                    do_mouse_selection
+                    if (self.attr_block_selection)
+                      x = self.attr_block_xlocation - self.attr_horizontal_scroll_offset
+                      pixels = Math.max(-self.attr_auto_scroll_distance, -self.attr_horizontal_scroll_offset)
+                      if (!(pixels).equal?(0))
+                        set_block_selection_location(x + pixels, self.attr_block_ylocation - get_vertical_scroll_offset, true)
+                        scroll_horizontal(pixels, true)
+                      end
+                    else
+                      do_visual_previous
+                      set_mouse_word_selection_anchor
+                      do_mouse_selection
+                    end
                     display.timer_exec(H_SCROLL_RATE, self)
                   end
                 end
@@ -2969,6 +3149,167 @@ module Org::Eclipse::Swt::Custom
       end
     end
     
+    typesig { [::Java::Boolean] }
+    def do_block_column(next_)
+      if ((@block_xlocation).equal?(-1))
+        set_block_selection_offset(@caret_offset, false)
+      end
+      x = @block_xlocation - @horizontal_scroll_offset
+      y = @block_ylocation - get_vertical_scroll_offset
+      trailing = Array.typed(::Java::Int).new(1) { 0 }
+      offset = get_offset_at_point(x, y, trailing, true)
+      if (!(offset).equal?(-1))
+        offset += trailing[0]
+        line_index = @content.get_line_at_offset(offset)
+        new_offset = 0
+        if (next_)
+          new_offset = get_cluster_next(offset, line_index)
+        else
+          new_offset = get_cluster_previous(offset, line_index)
+        end
+        offset = !(new_offset).equal?(offset) ? new_offset : -1
+      end
+      if (!(offset).equal?(-1))
+        set_block_selection_offset(offset, true)
+        show_caret
+      else
+        width = next_ ? @renderer.attr_average_char_width : -@renderer.attr_average_char_width
+        max_width = Math.max(@client_area_width - @right_margin - @left_margin, @renderer.get_width)
+        x = Math.max(0, Math.min(@block_xlocation + width, max_width)) - @horizontal_scroll_offset
+        set_block_selection_location(x, y, true)
+        rect = Rectangle.new(x, y, 0, 0)
+        show_location(rect, true)
+      end
+    end
+    
+    typesig { [::Java::Boolean] }
+    def do_block_word(next_)
+      if ((@block_xlocation).equal?(-1))
+        set_block_selection_offset(@caret_offset, false)
+      end
+      x = @block_xlocation - @horizontal_scroll_offset
+      y = @block_ylocation - get_vertical_scroll_offset
+      trailing = Array.typed(::Java::Int).new(1) { 0 }
+      offset = get_offset_at_point(x, y, trailing, true)
+      if (!(offset).equal?(-1))
+        offset += trailing[0]
+        line_index = @content.get_line_at_offset(offset)
+        line_offset = @content.get_offset_at_line(line_index)
+        line_text = @content.get_line(line_index)
+        line_length = line_text.length
+        new_offset = offset
+        if (next_)
+          if (offset < line_offset + line_length)
+            new_offset = get_word_next(offset, SWT::MOVEMENT_WORD)
+          end
+        else
+          if (offset > line_offset)
+            new_offset = get_word_previous(offset, SWT::MOVEMENT_WORD)
+          end
+        end
+        offset = !(new_offset).equal?(offset) ? new_offset : -1
+      end
+      if (!(offset).equal?(-1))
+        set_block_selection_offset(offset, true)
+        show_caret
+      else
+        width = (next_ ? @renderer.attr_average_char_width : -@renderer.attr_average_char_width) * 6
+        max_width = Math.max(@client_area_width - @right_margin - @left_margin, @renderer.get_width)
+        x = Math.max(0, Math.min(@block_xlocation + width, max_width)) - @horizontal_scroll_offset
+        set_block_selection_location(x, y, true)
+        rect = Rectangle.new(x, y, 0, 0)
+        show_location(rect, true)
+      end
+    end
+    
+    typesig { [::Java::Boolean] }
+    def do_block_line_vertical(up)
+      if ((@block_xlocation).equal?(-1))
+        set_block_selection_offset(@caret_offset, false)
+      end
+      y = @block_ylocation - get_vertical_scroll_offset
+      line_index = get_line_index(y)
+      if (up)
+        if (line_index > 0)
+          y = get_line_pixel(line_index - 1)
+          set_block_selection_location(@block_xlocation - @horizontal_scroll_offset, y, true)
+          if (y < @top_margin)
+            scroll_vertical(y - @top_margin, true)
+          end
+        end
+      else
+        line_count = @content.get_line_count
+        if (line_index + 1 < line_count)
+          y = get_line_pixel(line_index + 2) - 1
+          set_block_selection_location(@block_xlocation - @horizontal_scroll_offset, y, true)
+          bottom = @client_area_height - @bottom_margin
+          if (y > bottom)
+            scroll_vertical(y - bottom, true)
+          end
+        end
+      end
+    end
+    
+    typesig { [::Java::Boolean] }
+    def do_block_line_horizontal(end_)
+      if ((@block_xlocation).equal?(-1))
+        set_block_selection_offset(@caret_offset, false)
+      end
+      x = @block_xlocation - @horizontal_scroll_offset
+      y = @block_ylocation - get_vertical_scroll_offset
+      line_index = get_line_index(y)
+      line_offset = @content.get_offset_at_line(line_index)
+      line_text = @content.get_line(line_index)
+      line_length = line_text.length
+      trailing = Array.typed(::Java::Int).new(1) { 0 }
+      offset = get_offset_at_point(x, y, trailing, true)
+      if (!(offset).equal?(-1))
+        offset += trailing[0]
+        new_offset = offset
+        if (end_)
+          if (offset < line_offset + line_length)
+            new_offset = line_offset + line_length
+          end
+        else
+          if (offset > line_offset)
+            new_offset = line_offset
+          end
+        end
+        offset = !(new_offset).equal?(offset) ? new_offset : -1
+      else
+        if (!end_)
+          offset = line_offset + line_length
+        end
+      end
+      if (!(offset).equal?(-1))
+        set_block_selection_offset(offset, true)
+        show_caret
+      else
+        max_width = Math.max(@client_area_width - @right_margin - @left_margin, @renderer.get_width)
+        x = (end_ ? max_width : 0) - @horizontal_scroll_offset
+        set_block_selection_location(x, y, true)
+        rect = Rectangle.new(x, y, 0, 0)
+        show_location(rect, true)
+      end
+    end
+    
+    typesig { [::Java::Boolean] }
+    def do_block_selection(send_event)
+      if (@caret_offset > @selection_anchor)
+        @selection.attr_x = @selection_anchor
+        @selection.attr_y = @caret_offset
+      else
+        @selection.attr_x = @caret_offset
+        @selection.attr_y = @selection_anchor
+      end
+      update_caret_visibility
+      set_caret_location
+      Canvas.instance_method(:redraw).bind(self).call
+      if (send_event)
+        send_selection_event
+      end
+    end
+    
     typesig { [::Java::Char] }
     # Replaces the selection with the character or insert the character at the
     # current caret position if no selection exists.
@@ -2979,6 +3320,10 @@ module Org::Eclipse::Swt::Custom
     # 
     # @param key the character typed by the user
     def do_content(key)
+      if (@block_selection && !(@block_xlocation).equal?(-1))
+        insert_block_selection_text(key, SWT::NULL)
+        return
+      end
       event = Event.new
       event.attr_start = @selection.attr_x
       event.attr_end = @selection.attr_y
@@ -3024,7 +3369,7 @@ module Org::Eclipse::Swt::Custom
       else
         length_ = @content.get_char_count
         if (@caret_offset < length_)
-          @caret_offset = length_
+          set_caret_offset(length_, SWT::DEFAULT)
           show_caret
         end
       end
@@ -3034,7 +3379,7 @@ module Org::Eclipse::Swt::Custom
     # Moves the caret in front of the first character of the widget content.
     def do_content_start
       if (@caret_offset > 0)
-        @caret_offset = 0
+        set_caret_offset(0, SWT::DEFAULT)
         show_caret
       end
     end
@@ -3047,8 +3392,7 @@ module Org::Eclipse::Swt::Custom
     # @see #doSelectionCursorPrevious
     def do_cursor_previous
       if (@selection.attr_y - @selection.attr_x > 0)
-        @caret_offset = @selection.attr_x
-        @caret_alignment = OFFSET_LEADING
+        set_caret_offset(@selection.attr_x, OFFSET_LEADING)
         show_caret
       else
         do_selection_cursor_previous
@@ -3063,8 +3407,7 @@ module Org::Eclipse::Swt::Custom
     # @see #doSelectionCursorNext
     def do_cursor_next
       if (@selection.attr_y - @selection.attr_x > 0)
-        @caret_offset = @selection.attr_y
-        @caret_alignment = PREVIOUS_OFFSET_TRAILING
+        set_caret_offset(@selection.attr_y, PREVIOUS_OFFSET_TRAILING)
         show_caret
       else
         do_selection_cursor_next
@@ -3157,10 +3500,12 @@ module Org::Eclipse::Swt::Custom
       end
       if (last_line)
         if (select)
-          @caret_offset = @content.get_char_count
+          set_caret_offset(@content.get_char_count, SWT::DEFAULT)
         end
       else
-        @caret_offset = get_offset_at_point(@column_x, y, caret_line)
+        alignment = Array.typed(::Java::Int).new(1) { 0 }
+        offset = get_offset_at_point(@column_x, y, caret_line, alignment)
+        set_caret_offset(offset, alignment[0])
       end
       old_column_x = @column_x
       old_hscroll_offset = @horizontal_scroll_offset
@@ -3193,8 +3538,7 @@ module Org::Eclipse::Swt::Custom
         line_end_offset = line_offset + line_length
       end
       if (@caret_offset < line_end_offset)
-        @caret_offset = line_end_offset
-        @caret_alignment = PREVIOUS_OFFSET_TRAILING
+        set_caret_offset(line_end_offset, PREVIOUS_OFFSET_TRAILING)
         show_caret
       end
     end
@@ -3213,8 +3557,7 @@ module Org::Eclipse::Swt::Custom
         @renderer.dispose_text_layout(layout)
       end
       if (@caret_offset > line_offset)
-        @caret_offset = line_offset
-        @caret_alignment = OFFSET_LEADING
+        set_caret_offset(line_offset, OFFSET_LEADING)
         show_caret
       end
     end
@@ -3248,10 +3591,12 @@ module Org::Eclipse::Swt::Custom
       end
       if (first_line)
         if (select)
-          @caret_offset = 0
+          set_caret_offset(0, SWT::DEFAULT)
         end
       else
-        @caret_offset = get_offset_at_point(@column_x, y, caret_line)
+        alignment = Array.typed(::Java::Int).new(1) { 0 }
+        offset = get_offset_at_point(@column_x, y, caret_line, alignment)
+        set_caret_offset(offset, alignment[0])
       end
       old_column_x = @column_x
       old_hscroll_offset = @horizontal_scroll_offset
@@ -3266,6 +3611,32 @@ module Org::Eclipse::Swt::Custom
       @column_x = old_column_x + h_scroll_change
     end
     
+    typesig { [] }
+    def do_mouse_link_cursor
+      display = get_display
+      point = display.get_cursor_location
+      point = display.map(nil, self, point)
+      do_mouse_link_cursor(point.attr_x, point.attr_y)
+    end
+    
+    typesig { [::Java::Int, ::Java::Int] }
+    def do_mouse_link_cursor(x, y)
+      offset = get_offset_at_point(x, y, nil, true)
+      display = get_display
+      new_cursor = @cursor
+      if (@renderer.has_link(offset))
+        new_cursor = display.get_system_cursor(SWT::CURSOR_HAND)
+      else
+        if ((@cursor).nil?)
+          type = @block_selection ? SWT::CURSOR_CROSS : SWT::CURSOR_IBEAM
+          new_cursor = display.get_system_cursor(type)
+        end
+      end
+      if (!(new_cursor).equal?(get_cursor))
+        Canvas.instance_method(:set_cursor).bind(self).call(new_cursor)
+      end
+    end
+    
     typesig { [::Java::Int, ::Java::Int, ::Java::Boolean] }
     # Moves the caret to the specified location.
     # 
@@ -3276,13 +3647,68 @@ module Org::Eclipse::Swt::Custom
     def do_mouse_location_change(x, y, select)
       line = get_line_index(y)
       @update_caret_direction = true
+      if (@block_selection)
+        x = Math.max(@left_margin, Math.min(x, @client_area_width - @right_margin))
+        y = Math.max(@top_margin, Math.min(y, @client_area_height - @bottom_margin))
+        if (@double_click_enabled && @click_count > 1)
+          word_select = ((@click_count & 1)).equal?(0)
+          if (word_select)
+            left = get_point_at_offset(@double_click_selection.attr_x)
+            trailing = Array.typed(::Java::Int).new(1) { 0 }
+            offset = get_offset_at_point(x, y, trailing, true)
+            if (!(offset).equal?(-1))
+              if (x > left.attr_x)
+                offset = get_word_next(offset + trailing[0], SWT::MOVEMENT_WORD_END)
+                set_block_selection_offset(@double_click_selection.attr_x, offset, true)
+              else
+                offset = get_word_previous(offset + trailing[0], SWT::MOVEMENT_WORD_START)
+                set_block_selection_offset(@double_click_selection.attr_y, offset, true)
+              end
+            else
+              if (x > left.attr_x)
+                set_block_selection_location(left.attr_x, left.attr_y, x, y, true)
+              else
+                right = get_point_at_offset(@double_click_selection.attr_y)
+                set_block_selection_location(right.attr_x, right.attr_y, x, y, true)
+              end
+            end
+          else
+            set_block_selection_location(@block_xlocation, y, true)
+          end
+          return
+        else
+          if (select)
+            if ((@block_xlocation).equal?(-1))
+              set_block_selection_offset(@caret_offset, false)
+            end
+          else
+            clear_block_selection(true, false)
+          end
+          trailing = Array.typed(::Java::Int).new(1) { 0 }
+          offset = get_offset_at_point(x, y, trailing, true)
+          if (!(offset).equal?(-1))
+            if (select)
+              set_block_selection_offset(offset + trailing[0], true)
+              return
+            end
+          else
+            if (is_fixed_line_height && @renderer.attr_fixed_pitch)
+              avg = @renderer.attr_average_char_width
+              x = ((x + avg / 2 - @left_margin + @horizontal_scroll_offset) / avg * avg) + @left_margin - @horizontal_scroll_offset
+            end
+            set_block_selection_location(x, y, true)
+            return
+          end
+        end
+      end
       # allow caret to be placed below first line only if receiver is
       # not in single line mode. fixes 4820.
       if (line < 0 || (is_single_line && line > 0))
         return
       end
-      old_caret_alignment = @caret_alignment
-      new_caret_offset = get_offset_at_point(x, y)
+      alignment = Array.typed(::Java::Int).new(1) { 0 }
+      new_caret_offset = get_offset_at_point(x, y, alignment)
+      new_caret_alignemnt = alignment[0]
       if (@double_click_enabled && @click_count > 1)
         new_caret_offset = do_mouse_word_select(x, new_caret_offset, line)
       end
@@ -3290,17 +3716,17 @@ module Org::Eclipse::Swt::Custom
       # Is the mouse within the left client area border or on
       # a different line? If not the autoscroll selection
       # could be incorrectly reset. Fixes 1GKM3XS
-      if (0 <= y && y < @client_area_height && (0 <= x && x < @client_area_width || @word_wrap || !(new_caret_line).equal?(@content.get_line_at_offset(@caret_offset))))
-        if (!(new_caret_offset).equal?(@caret_offset) || !(@caret_alignment).equal?(old_caret_alignment))
-          @caret_offset = new_caret_offset
-          if (select)
-            do_mouse_selection
-          end
-          show_caret
+      vchange = 0 <= y && y < @client_area_height || (new_caret_line).equal?(0) || (new_caret_line).equal?(@content.get_line_count - 1)
+      hchange = 0 <= x && x < @client_area_width || @word_wrap || !(new_caret_line).equal?(@content.get_line_at_offset(@caret_offset))
+      if (vchange && hchange && (!(new_caret_offset).equal?(@caret_offset) || !(new_caret_alignemnt).equal?(@caret_alignment)))
+        set_caret_offset(new_caret_offset, new_caret_alignemnt)
+        if (select)
+          do_mouse_selection
         end
+        show_caret
       end
       if (!select)
-        @caret_offset = new_caret_offset
+        set_caret_offset(new_caret_offset, new_caret_alignemnt)
         clear_selection(true)
       end
     end
@@ -3389,7 +3815,9 @@ module Org::Eclipse::Swt::Custom
           # ensure that scrollLines never gets negative and at least one
           # line is scrolled. fixes bug 5602.
           scroll_lines = Math.max(1, scroll_lines)
-          @caret_offset = get_offset_at_point(@column_x, get_line_pixel(caret_line + scroll_lines))
+          alignment = Array.typed(::Java::Int).new(1) { 0 }
+          offset = get_offset_at_point(@column_x, get_line_pixel(caret_line + scroll_lines), alignment)
+          set_caret_offset(offset, alignment[0])
           if (select)
             do_selection(ST::COLUMN_NEXT)
           end
@@ -3467,7 +3895,9 @@ module Org::Eclipse::Swt::Custom
           caret_height -= line_height
           line_height = @renderer.get_line_height((line_index += 1))
         end
-        @caret_offset = get_offset_at_point(@column_x, caret_height, line_index)
+        alignment = Array.typed(::Java::Int).new(1) { 0 }
+        offset = get_offset_at_point(@column_x, caret_height, line_index, alignment)
+        set_caret_offset(offset, alignment[0])
         if (select)
           do_selection(ST::COLUMN_NEXT)
         end
@@ -3513,8 +3943,7 @@ module Org::Eclipse::Swt::Custom
           bottom_offset = @content.get_offset_at_line(line_index) + @content.get_line(line_index).length
         end
         if (@caret_offset < bottom_offset)
-          @caret_offset = bottom_offset
-          @caret_alignment = OFFSET_LEADING
+          set_caret_offset(bottom_offset, OFFSET_LEADING)
           show_caret
         end
       end
@@ -3554,8 +3983,7 @@ module Org::Eclipse::Swt::Custom
         top_offset = @content.get_offset_at_line(@top_index)
       end
       if (@caret_offset > top_offset)
-        @caret_offset = top_offset
-        @caret_alignment = OFFSET_LEADING
+        set_caret_offset(top_offset, OFFSET_LEADING)
         show_caret
       end
     end
@@ -3580,7 +4008,9 @@ module Org::Eclipse::Swt::Custom
           lines = ((height).equal?(-1) ? @client_area_height : height) / line_height
           scroll_lines = Math.max(1, Math.min(caret_line, lines))
           caret_line -= scroll_lines
-          @caret_offset = get_offset_at_point(@column_x, get_line_pixel(caret_line))
+          alignment = Array.typed(::Java::Int).new(1) { 0 }
+          offset = get_offset_at_point(@column_x, get_line_pixel(caret_line), alignment)
+          set_caret_offset(offset, alignment[0])
           if (select)
             do_selection(ST::COLUMN_PREVIOUS)
           end
@@ -3659,7 +4089,9 @@ module Org::Eclipse::Swt::Custom
           line_height = @renderer.get_line_height((line_index -= 1))
         end
         line_height = @renderer.get_line_height(line_index)
-        @caret_offset = get_offset_at_point(@column_x, line_height - caret_height, line_index)
+        alignment = Array.typed(::Java::Int).new(1) { 0 }
+        offset = get_offset_at_point(@column_x, line_height - caret_height, line_index, alignment)
+        set_caret_offset(offset, alignment[0])
         if (select)
           do_selection(ST::COLUMN_PREVIOUS)
         end
@@ -3734,19 +4166,23 @@ module Org::Eclipse::Swt::Custom
       caret_line = get_caret_line
       line_offset = @content.get_offset_at_line(caret_line)
       offset_in_line = @caret_offset - line_offset
+      offset = 0
+      alignment = 0
       if (offset_in_line < @content.get_line(caret_line).length)
         layout = @renderer.get_text_layout(caret_line)
         offset_in_line = layout.get_next_offset(offset_in_line, SWT::MOVEMENT_CLUSTER)
         line_start = layout.get_line_offsets[layout.get_line_index(offset_in_line)]
         @renderer.dispose_text_layout(layout)
-        @caret_offset = offset_in_line + line_offset
-        @caret_alignment = (offset_in_line).equal?(line_start) ? OFFSET_LEADING : PREVIOUS_OFFSET_TRAILING
+        offset = offset_in_line + line_offset
+        alignment = (offset_in_line).equal?(line_start) ? OFFSET_LEADING : PREVIOUS_OFFSET_TRAILING
+        set_caret_offset(offset, alignment)
         show_caret
       else
         if (caret_line < @content.get_line_count - 1 && !is_single_line)
           caret_line += 1
-          @caret_offset = @content.get_offset_at_line(caret_line)
-          @caret_alignment = PREVIOUS_OFFSET_TRAILING
+          offset = @content.get_offset_at_line(caret_line)
+          alignment = PREVIOUS_OFFSET_TRAILING
+          set_caret_offset(offset, alignment)
           show_caret
         end
       end
@@ -3759,15 +4195,16 @@ module Org::Eclipse::Swt::Custom
       caret_line = get_caret_line
       line_offset = @content.get_offset_at_line(caret_line)
       offset_in_line = @caret_offset - line_offset
-      @caret_alignment = OFFSET_LEADING
       if (offset_in_line > 0)
-        @caret_offset = get_cluster_previous(@caret_offset, caret_line)
+        offset = get_cluster_previous(@caret_offset, caret_line)
+        set_caret_offset(offset, OFFSET_LEADING)
         show_caret
       else
         if (caret_line > 0)
           caret_line -= 1
           line_offset = @content.get_offset_at_line(caret_line)
-          @caret_offset = line_offset + @content.get_line(caret_line).length
+          offset = line_offset + @content.get_line(caret_line).length
+          set_caret_offset(offset, OFFSET_LEADING)
           show_caret
         end
       end
@@ -3844,13 +4281,12 @@ module Org::Eclipse::Swt::Custom
     typesig { [] }
     # Moves the caret to the end of the next word .
     def do_selection_word_next
-      new_caret_offset = get_word_next(@caret_offset, SWT::MOVEMENT_WORD)
-      # Force symmetrical movement for word next and previous. Fixes 14536
-      @caret_alignment = OFFSET_LEADING
+      offset = get_word_next(@caret_offset, SWT::MOVEMENT_WORD)
       # don't change caret position if in single line mode and the cursor
       # would be on a different line. fixes 5673
-      if (!is_single_line || (@content.get_line_at_offset(@caret_offset)).equal?(@content.get_line_at_offset(new_caret_offset)))
-        @caret_offset = new_caret_offset
+      if (!is_single_line || (@content.get_line_at_offset(@caret_offset)).equal?(@content.get_line_at_offset(offset)))
+        # Force symmetrical movement for word next and previous. Fixes 14536
+        set_caret_offset(offset, OFFSET_LEADING)
         show_caret
       end
     end
@@ -3858,14 +4294,8 @@ module Org::Eclipse::Swt::Custom
     typesig { [] }
     # Moves the caret to the start of the previous word.
     def do_selection_word_previous
-      @caret_alignment = OFFSET_LEADING
-      @caret_offset = get_word_previous(@caret_offset, SWT::MOVEMENT_WORD)
-      caret_line = @content.get_line_at_offset(@caret_offset)
-      # word previous always comes from bottom line. when
-      # wrapping lines, stay on bottom line when on line boundary
-      if (@word_wrap && caret_line < @content.get_line_count - 1 && (@caret_offset).equal?(@content.get_offset_at_line(caret_line + 1)))
-        caret_line += 1
-      end
+      offset = get_word_previous(@caret_offset, SWT::MOVEMENT_WORD)
+      set_caret_offset(offset, OFFSET_LEADING)
       show_caret
     end
     
@@ -3875,7 +4305,8 @@ module Org::Eclipse::Swt::Custom
     # beginning of the R2L segment (visually right) and then one character to the
     # left (visually left because it's now in a L2R segment).
     def do_visual_previous
-      @caret_offset = get_cluster_previous(@caret_offset, get_caret_line)
+      offset = get_cluster_previous(@caret_offset, get_caret_line)
+      set_caret_offset(offset, SWT::DEFAULT)
       show_caret
     end
     
@@ -3885,7 +4316,8 @@ module Org::Eclipse::Swt::Custom
     # end of the R2L segment (visually left) and then one character to the
     # right (visually right because it's now in a L2R segment).
     def do_visual_next
-      @caret_offset = get_cluster_next(@caret_offset, get_caret_line)
+      offset = get_cluster_next(@caret_offset, get_caret_line)
+      set_caret_offset(offset, SWT::DEFAULT)
       show_caret
     end
     
@@ -3895,7 +4327,7 @@ module Org::Eclipse::Swt::Custom
     # and remove the selection.
     def do_word_next
       if (@selection.attr_y - @selection.attr_x > 0)
-        @caret_offset = @selection.attr_y
+        set_caret_offset(@selection.attr_y, SWT::DEFAULT)
         show_caret
       else
         do_selection_word_next
@@ -3908,7 +4340,7 @@ module Org::Eclipse::Swt::Custom
     # and remove the selection.
     def do_word_previous
       if (@selection.attr_y - @selection.attr_x > 0)
-        @caret_offset = @selection.attr_x
+        set_caret_offset(@selection.attr_x, SWT::DEFAULT)
         show_caret
       else
         do_selection_word_previous
@@ -4000,6 +4432,106 @@ module Org::Eclipse::Swt::Custom
     end
     
     typesig { [] }
+    # Returns whether the widget is in block selection mode.
+    # 
+    # @return true if widget is in block selection mode, false otherwise
+    # 
+    # @exception SWTException <ul>
+    # <li>ERROR_WIDGET_DISPOSED - if the receiver has been disposed</li>
+    # <li>ERROR_THREAD_INVALID_ACCESS - if not called from the thread that created the receiver</li>
+    # </ul>
+    # 
+    # @since 3.5
+    def get_block_selection
+      check_widget
+      return @block_selection
+    end
+    
+    typesig { [] }
+    def get_block_selecton_position
+      first_line = get_line_index(@block_yanchor - get_vertical_scroll_offset)
+      last_line = get_line_index(@block_ylocation - get_vertical_scroll_offset)
+      if (first_line > last_line)
+        temp = first_line
+        first_line = last_line
+        last_line = temp
+      end
+      left = @block_xanchor
+      right = @block_xlocation
+      if (left > right)
+        left = @block_xlocation
+        right = @block_xanchor
+      end
+      return Rectangle.new(left - @horizontal_scroll_offset, first_line, right - @horizontal_scroll_offset, last_line)
+    end
+    
+    typesig { [] }
+    # Returns the block selection bounds. The bounds is
+    # relative to the upper left corner of the document.
+    # 
+    # @return the block selection bounds
+    # 
+    # @exception SWTException <ul>
+    # <li>ERROR_WIDGET_DISPOSED - if the receiver has been disposed</li>
+    # <li>ERROR_THREAD_INVALID_ACCESS - if not called from the thread that created the receiver</li>
+    # </ul>
+    # 
+    # @since 3.5
+    def get_block_selection_bounds
+      rect = nil
+      if (@block_selection && !(@block_xlocation).equal?(-1))
+        rect = get_block_selection_rectangle
+      else
+        start_point = get_point_at_offset(@selection.attr_x)
+        end_point = get_point_at_offset(@selection.attr_y)
+        height = get_line_height(@selection.attr_y)
+        rect = Rectangle.new(start_point.attr_x, start_point.attr_y, end_point.attr_x - start_point.attr_x, end_point.attr_y + height - start_point.attr_y)
+        if ((@selection.attr_x).equal?(@selection.attr_y))
+          rect.attr_width = get_caret_width
+        end
+      end
+      rect.attr_x += @horizontal_scroll_offset
+      rect.attr_y += get_vertical_scroll_offset
+      return rect
+    end
+    
+    typesig { [] }
+    def get_block_selection_rectangle
+      rect = get_block_selecton_position
+      rect.attr_y = get_line_pixel(rect.attr_y)
+      rect.attr_width = rect.attr_width - rect.attr_x
+      rect.attr_height = get_line_pixel(rect.attr_height + 1) - rect.attr_y
+      return rect
+    end
+    
+    typesig { [String] }
+    def get_block_selection_text(delimiter)
+      rect = get_block_selecton_position
+      first_line = rect.attr_y
+      last_line = rect.attr_height
+      left = rect.attr_x
+      right = rect.attr_width
+      buffer = StringBuffer.new
+      line_index = first_line
+      while line_index <= last_line
+        start = get_offset_at_point(left, 0, line_index, nil)
+        end_ = get_offset_at_point(right, 0, line_index, nil)
+        if (start > end_)
+          temp = start
+          start = end_
+          end_ = temp
+        end
+        text = @content.get_text_range(start, end_ - start)
+        buffer.append(text)
+        if (line_index < last_line)
+          buffer.append(delimiter)
+        end
+        line_index += 1
+      end
+      return buffer.to_s
+    end
+    
+    typesig { [] }
     # Returns the index of the last fully visible line.
     # 
     # @return index of the last fully visible line.
@@ -4030,6 +4562,21 @@ module Org::Eclipse::Swt::Custom
       return bottom_index
     end
     
+    typesig { [] }
+    # Returns the bottom margin.
+    # 
+    # @return the bottom margin.
+    # @exception SWTException <ul>
+    # <li>ERROR_WIDGET_DISPOSED - if the receiver has been disposed</li>
+    # <li>ERROR_THREAD_INVALID_ACCESS - if not called from the thread that created the receiver</li>
+    # </ul>
+    # 
+    # @since 3.5
+    def get_bottom_margin
+      check_widget
+      return @bottom_margin
+    end
+    
     typesig { [::Java::Int] }
     def get_bounds_at_offset(offset)
       line_index = @content.get_line_at_offset(offset)
@@ -4046,7 +4593,7 @@ module Org::Eclipse::Swt::Custom
       end
       if ((offset).equal?(@caret_offset))
         line_end = line_offset + line.length
-        if ((offset).equal?(line_end) && (@caret_alignment).equal?(PREVIOUS_OFFSET_TRAILING))
+        if ((offset).equal?(line_end))
           bounds.attr_width += get_caret_width
         end
       end
@@ -4662,6 +5209,21 @@ module Org::Eclipse::Swt::Custom
       return line
     end
     
+    typesig { [] }
+    # Returns the left margin.
+    # 
+    # @return the left margin.
+    # @exception SWTException <ul>
+    # <li>ERROR_WIDGET_DISPOSED - if the receiver has been disposed</li>
+    # <li>ERROR_THREAD_INVALID_ACCESS - if not called from the thread that created the receiver</li>
+    # </ul>
+    # 
+    # @since 3.5
+    def get_left_margin
+      check_widget
+      return @left_margin - @alignment_margin
+    end
+    
     typesig { [::Java::Int] }
     # Returns the x, y location of the upper left corner of the character
     # bounding box at the specified offset in the text. The point is
@@ -4748,50 +5310,52 @@ module Org::Eclipse::Swt::Custom
       return offset + trailing[0]
     end
     
-    typesig { [::Java::Int, ::Java::Int] }
-    def get_offset_at_point(x, y)
+    typesig { [::Java::Int, ::Java::Int, Array.typed(::Java::Int)] }
+    def get_offset_at_point(x, y, alignment)
       line_index = get_line_index(y)
       y -= get_line_pixel(line_index)
-      return get_offset_at_point(x, y, line_index)
+      return get_offset_at_point(x, y, line_index, alignment)
     end
     
-    typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
-    # Returns the offset at the specified x location in the specified line.
-    # 
-    # @param x	x location of the mouse location
-    # @param line	line the mouse location is in
-    # @return the offset at the specified x location in the specified line,
-    # relative to the beginning of the document
-    def get_offset_at_point(x, y, line_index)
+    typesig { [::Java::Int, ::Java::Int, ::Java::Int, Array.typed(::Java::Int)] }
+    def get_offset_at_point(x, y, line_index, alignment)
       layout = @renderer.get_text_layout(line_index)
       x += @horizontal_scroll_offset - @left_margin
       trailing = Array.typed(::Java::Int).new(1) { 0 }
       offset_in_line = layout.get_offset(x, y, trailing)
-      @caret_alignment = OFFSET_LEADING
+      if (!(alignment).nil?)
+        alignment[0] = OFFSET_LEADING
+      end
       if (!(trailing[0]).equal?(0))
         line_in_paragraph = layout.get_line_index(offset_in_line + trailing[0])
         line_start = layout.get_line_offsets[line_in_paragraph]
         if ((offset_in_line + trailing[0]).equal?(line_start))
           offset_in_line += trailing[0]
-          @caret_alignment = PREVIOUS_OFFSET_TRAILING
+          if (!(alignment).nil?)
+            alignment[0] = PREVIOUS_OFFSET_TRAILING
+          end
         else
           line = @content.get_line(line_index)
           level = 0
-          offset = offset_in_line
-          while (offset > 0 && Character.is_digit(line.char_at(offset)))
-            offset -= 1
-          end
-          if ((offset).equal?(0) && Character.is_digit(line.char_at(offset)))
-            level = is_mirrored ? 1 : 0
-          else
-            level = layout.get_level(offset) & 0x1
+          if (!(alignment).nil?)
+            offset = offset_in_line
+            while (offset > 0 && Character.is_digit(line.char_at(offset)))
+              offset -= 1
+            end
+            if ((offset).equal?(0) && Character.is_digit(line.char_at(offset)))
+              level = is_mirrored ? 1 : 0
+            else
+              level = layout.get_level(offset) & 0x1
+            end
           end
           offset_in_line += trailing[0]
-          trailing_level = layout.get_level(offset_in_line) & 0x1
-          if (!((level ^ trailing_level)).equal?(0))
-            @caret_alignment = PREVIOUS_OFFSET_TRAILING
-          else
-            @caret_alignment = OFFSET_LEADING
+          if (!(alignment).nil?)
+            trailing_level = layout.get_level(offset_in_line) & 0x1
+            if (!((level ^ trailing_level)).equal?(0))
+              alignment[0] = PREVIOUS_OFFSET_TRAILING
+            else
+              alignment[0] = OFFSET_LEADING
+            end
           end
         end
       end
@@ -4970,6 +5534,21 @@ module Org::Eclipse::Swt::Custom
     end
     
     typesig { [] }
+    # Returns the right margin.
+    # 
+    # @return the right margin.
+    # @exception SWTException <ul>
+    # <li>ERROR_WIDGET_DISPOSED - if the receiver has been disposed</li>
+    # <li>ERROR_THREAD_INVALID_ACCESS - if not called from the thread that created the receiver</li>
+    # </ul>
+    # 
+    # @since 3.5
+    def get_right_margin
+      check_widget
+      return @right_margin
+    end
+    
+    typesig { [] }
     # Returns the selection.
     # <p>
     # Text selections are specified in terms of caret positions.  In a text
@@ -5013,6 +5592,49 @@ module Org::Eclipse::Swt::Custom
     end
     
     typesig { [] }
+    # Returns the ranges of text that are inside the block selection rectangle.
+    # <p>
+    # The ranges array contains start and length pairs. When the receiver is not
+    # in block selection mode the return arrays contains the start and length of
+    # the regular selection.
+    # 
+    # @return the ranges array
+    # 
+    # @exception SWTException <ul>
+    # <li>ERROR_WIDGET_DISPOSED - if the receiver has been disposed</li>
+    # <li>ERROR_THREAD_INVALID_ACCESS - if not called from the thread that created the receiver</li>
+    # </ul>
+    # 
+    # @since 3.5
+    def get_selection_ranges
+      check_widget
+      if (@block_selection && !(@block_xlocation).equal?(-1))
+        rect = get_block_selecton_position
+        first_line = rect.attr_y
+        last_line = rect.attr_height
+        left = rect.attr_x
+        right = rect.attr_width
+        ranges = Array.typed(::Java::Int).new((last_line - first_line + 1) * 2) { 0 }
+        index = 0
+        line_index = first_line
+        while line_index <= last_line
+          start = get_offset_at_point(left, 0, line_index, nil)
+          end_ = get_offset_at_point(right, 0, line_index, nil)
+          if (start > end_)
+            temp = start
+            start = end_
+            end_ = temp
+          end
+          ranges[((index += 1) - 1)] = start
+          ranges[((index += 1) - 1)] = end_ - start
+          line_index += 1
+        end
+        return ranges
+      end
+      return Array.typed(::Java::Int).new([@selection.attr_x, @selection.attr_y - @selection.attr_x])
+    end
+    
+    typesig { [] }
     # Returns the receiver's selection background color.
     # 
     # @return the selection background color
@@ -5040,6 +5662,9 @@ module Org::Eclipse::Swt::Custom
     # </ul>
     def get_selection_count
       check_widget
+      if (@block_selection && !(@block_xlocation).equal?(-1))
+        return get_block_selection_text(@content.get_line_delimiter).length
+      end
       return get_selection_range.attr_y
     end
     
@@ -5071,6 +5696,9 @@ module Org::Eclipse::Swt::Custom
     # </ul>
     def get_selection_text
       check_widget
+      if (@block_selection && !(@block_xlocation).equal?(-1))
+        return get_block_selection_text(@content.get_line_delimiter)
+      end
       return @content.get_text_range(@selection.attr_x, @selection.attr_y - @selection.attr_x)
     end
     
@@ -5545,6 +6173,21 @@ module Org::Eclipse::Swt::Custom
     end
     
     typesig { [] }
+    # Returns the top margin.
+    # 
+    # @return the top margin.
+    # @exception SWTException <ul>
+    # <li>ERROR_WIDGET_DISPOSED - if the receiver has been disposed</li>
+    # <li>ERROR_THREAD_INVALID_ACCESS - if not called from the thread that created the receiver</li>
+    # </ul>
+    # 
+    # @since 3.5
+    def get_top_margin
+      check_widget
+      return @top_margin
+    end
+    
+    typesig { [] }
     # Gets the top pixel.
     # <p>
     # The top pixel is the pixel position of the line that is
@@ -5786,8 +6429,176 @@ module Org::Eclipse::Swt::Custom
       if ((string).nil?)
         SWT.error(SWT::ERROR_NULL_ARGUMENT)
       end
-      sel = get_selection_range
-      replace_text_range(sel.attr_x, sel.attr_y, string)
+      if (@block_selection)
+        insert_block_selection_text(string, false)
+      else
+        sel = get_selection_range
+        replace_text_range(sel.attr_x, sel.attr_y, string)
+      end
+    end
+    
+    typesig { [String, ::Java::Boolean] }
+    def insert_block_selection_text(text, fill_with_spaces)
+      line_count = 1
+      i = 0
+      while i < text.length
+        ch = text.char_at(i)
+        if ((ch).equal?(Character.new(?\n.ord)) || (ch).equal?(Character.new(?\r.ord)))
+          line_count += 1
+          if ((ch).equal?(Character.new(?\r.ord)) && i + 1 < text.length && (text.char_at(i + 1)).equal?(Character.new(?\n.ord)))
+            i += 1
+          end
+        end
+        i += 1
+      end
+      lines = Array.typed(String).new(line_count) { nil }
+      start = 0
+      line_count = 0
+      i_ = 0
+      while i_ < text.length
+        ch = text.char_at(i_)
+        if ((ch).equal?(Character.new(?\n.ord)) || (ch).equal?(Character.new(?\r.ord)))
+          lines[((line_count += 1) - 1)] = text.substring(start, i_)
+          if ((ch).equal?(Character.new(?\r.ord)) && i_ + 1 < text.length && (text.char_at(i_ + 1)).equal?(Character.new(?\n.ord)))
+            i_ += 1
+          end
+          start = i_ + 1
+        end
+        i_ += 1
+      end
+      lines[((line_count += 1) - 1)] = text.substring(start)
+      if (fill_with_spaces)
+        max_length = 0
+        i__ = 0
+        while i__ < lines.attr_length
+          length_ = lines[i__].length
+          max_length = Math.max(max_length, length_)
+          i__ += 1
+        end
+        i___ = 0
+        while i___ < lines.attr_length
+          line = lines[i___]
+          length_ = line.length
+          if (length_ < max_length)
+            num_spaces = max_length - length_
+            buffer = StringBuffer.new(length_ + num_spaces)
+            buffer.append(line)
+            j = 0
+            while j < num_spaces
+              buffer.append(Character.new(?\s.ord))
+              j += 1
+            end
+            lines[i___] = buffer.to_s
+          end
+          i___ += 1
+        end
+      end
+      first_line = 0
+      last_line = 0
+      left = 0
+      right = 0
+      if (!(@block_xlocation).equal?(-1))
+        rect = get_block_selecton_position
+        first_line = rect.attr_y
+        last_line = rect.attr_height
+        left = rect.attr_x
+        right = rect.attr_width
+      else
+        first_line = last_line = get_caret_line
+        left = right = get_point_at_offset(@caret_offset).attr_x
+      end
+      start = @caret_offset
+      caret_line = get_caret_line
+      index = 0
+      line_index = first_line
+      while (line_index <= last_line)
+        string = index < line_count ? lines[((index += 1) - 1)] : ""
+        line_start = send_text_event(left, right, line_index, string, fill_with_spaces)
+        if ((line_index).equal?(caret_line))
+          start = line_start
+        end
+        line_index += 1
+      end
+      while (index < line_count)
+        line_start = send_text_event(left, left, line_index, lines[((index += 1) - 1)], fill_with_spaces)
+        if ((line_index).equal?(caret_line))
+          start = line_start
+        end
+        line_index += 1
+      end
+      return start
+    end
+    
+    typesig { [::Java::Char, ::Java::Int] }
+    def insert_block_selection_text(key, action)
+      if ((key).equal?(SWT::CR) || (key).equal?(SWT::LF))
+        return
+      end
+      rect = get_block_selecton_position
+      first_line = rect.attr_y
+      last_line = rect.attr_height
+      left = rect.attr_x
+      right = rect.attr_width
+      trailing = Array.typed(::Java::Int).new(1) { 0 }
+      offset = 0
+      delta = 0
+      text = !(key).equal?(0) ? String.new(Array.typed(::Java::Char).new([key])) : ""
+      length_ = text.length
+      line_index = first_line
+      while line_index <= last_line
+        line = @content.get_line(line_index)
+        line_offset = @content.get_offset_at_line(line_index)
+        line_end_offset = line_offset + line.length
+        line_pixel = get_line_pixel(line_index)
+        start = get_offset_at_point(left, line_pixel, trailing, true)
+        out_of_line = (start).equal?(-1)
+        if (out_of_line)
+          start = left < @left_margin ? line_offset : line_end_offset
+        else
+          start += trailing[0]
+        end
+        end_ = get_offset_at_point(right, line_pixel, trailing, true)
+        if ((end_).equal?(-1))
+          end_ = right < @left_margin ? line_offset : line_end_offset
+        else
+          end_ += trailing[0]
+        end
+        if (start > end_)
+          temp = start
+          start = end_
+          end_ = temp
+        end
+        if ((start).equal?(end_) && !out_of_line)
+          case (action)
+          when ST::DELETE_PREVIOUS
+            if (start > line_offset)
+              start = get_cluster_previous(start, line_index)
+            end
+          when ST::DELETE_NEXT
+            if (end_ < line_end_offset)
+              end_ = get_cluster_next(end_, line_index)
+            end
+          end
+        end
+        if (out_of_line)
+          if (line.length >= delta)
+            delta = line.length
+            offset = line_end_offset + length_
+          end
+        else
+          offset = start + length_
+          delta = @content.get_char_count
+        end
+        event = Event.new
+        event.attr_text = text
+        event.attr_start = start
+        event.attr_end = end_
+        send_key_event(event)
+        line_index += 1
+      end
+      x = get_point_at_offset(offset).attr_x
+      vertical_scroll_offset = get_vertical_scroll_offset
+      set_block_selection_location(x, @block_yanchor - vertical_scroll_offset, x, @block_ylocation - vertical_scroll_offset, false)
     end
     
     typesig { [] }
@@ -6052,12 +6863,12 @@ module Org::Eclipse::Swt::Custom
       length_ = text.length
       if ((length_).equal?(@ime.get_commit_count))
         @content.replace_text_range(start, end_ - start, "")
-        @caret_offset = @ime.get_composition_offset
+        set_caret_offset(@ime.get_composition_offset, SWT::DEFAULT)
         @caret_width = 0
         @caret_direction = SWT::NULL
       else
         @content.replace_text_range(start, end_ - start, text)
-        @caret_offset = @ime.get_caret_offset
+        set_caret_offset(@ime.get_caret_offset, SWT::DEFAULT)
         if (@ime.get_wide_caret)
           start = @ime.get_composition_offset
           line_index = get_caret_line
@@ -6102,6 +6913,7 @@ module Org::Eclipse::Swt::Custom
       end
       @selection_background = nil
       @selection_foreground = nil
+      @margin_color = nil
       @text_change_listener = nil
       @selection = nil
       @double_click_selection = nil
@@ -6134,7 +6946,7 @@ module Org::Eclipse::Swt::Custom
         action = get_key_binding(event.attr_character | event.attr_state_mask)
         if ((action).equal?(SWT::NULL))
           # see if we have a control character
-          if (!((event.attr_state_mask & SWT::CTRL)).equal?(0) && (event.attr_character >= 0) && event.attr_character <= 31)
+          if (!((event.attr_state_mask & SWT::CTRL)).equal?(0) && event.attr_character <= 31)
             # get the character from the CTRL+char sequence, the control
             # key subtracts 64 from the value of the key that it modifies
             c = event.attr_character + 64
@@ -6144,7 +6956,7 @@ module Org::Eclipse::Swt::Custom
       end
       if ((action).equal?(SWT::NULL))
         ignore = false
-        if (IS_CARBON)
+        if (IS_MAC)
           # Ignore accelerator key combinations (we do not want to
           # insert a character in the text in this instance). Do not
           # ignore COMMAND+ALT combinations since that key sequence
@@ -6203,19 +7015,7 @@ module Org::Eclipse::Swt::Custom
     def handle_key_up(event)
       if (!(@clipboard_selection).nil?)
         if (!(@clipboard_selection.attr_x).equal?(@selection.attr_x) || !(@clipboard_selection.attr_y).equal?(@selection.attr_y))
-          begin
-            if (@selection.attr_y - @selection.attr_x > 0)
-              set_clipboard_content(@selection.attr_x, @selection.attr_y - @selection.attr_x, DND::SELECTION_CLIPBOARD)
-            end
-          rescue SWTError => error_
-            # Copy to clipboard failed. This happens when another application
-            # is accessing the clipboard while we copy. Ignore the error.
-            # Fixes 1GDQAVN
-            # Rethrow all other errors. Fixes bug 17578.
-            if (!(error_.attr_code).equal?(DND::ERROR_CANNOT_SET_CLIPBOARD))
-              raise error_
-            end
-          end
+          copy_selection(DND::SELECTION_CLIPBOARD)
         end
       end
       @clipboard_selection = nil
@@ -6246,7 +7046,7 @@ module Org::Eclipse::Swt::Custom
         end
       end
       # set selection
-      if ((!(event.attr_button).equal?(1)) || (IS_CARBON && !((event.attr_state_mask & SWT::MOD4)).equal?(0)))
+      if ((!(event.attr_button).equal?(1)) || (IS_MAC && !((event.attr_state_mask & SWT::MOD4)).equal?(0)))
         return
       end
       @click_count = event.attr_count
@@ -6255,29 +7055,31 @@ module Org::Eclipse::Swt::Custom
         do_mouse_location_change(event.attr_x, event.attr_y, select)
       else
         if (@double_click_enabled)
-          clear_selection(false)
-          offset = get_offset_at_point(event.attr_x, event.attr_y)
+          word_select = ((@click_count & 1)).equal?(0)
+          offset = get_offset_at_point(event.attr_x, event.attr_y, nil)
           line_index = @content.get_line_at_offset(offset)
           line_offset = @content.get_offset_at_line(line_index)
-          line_end = @content.get_char_count
-          if (line_index + 1 < @content.get_line_count)
-            line_end = @content.get_offset_at_line(line_index + 1)
-          end
-          start = 0
-          end_ = 0
-          if (((@click_count & 1)).equal?(0))
-            start = Math.max(0, get_word_previous(offset, SWT::MOVEMENT_WORD_START))
-            end_ = Math.min(@content.get_char_count, get_word_next(start, SWT::MOVEMENT_WORD_END))
+          if (word_select)
+            min_ = @block_selection ? line_offset : 0
+            max_ = @block_selection ? line_offset + @content.get_line(line_index).length : @content.get_char_count
+            start = Math.max(min_, get_word_previous(offset, SWT::MOVEMENT_WORD_START))
+            end_ = Math.min(max_, get_word_next(start, SWT::MOVEMENT_WORD_END))
+            set_selection(start, end_ - start, false, true)
+            send_selection_event
           else
-            start = line_offset
-            end_ = line_end
+            if (@block_selection)
+              set_block_selection_location(@left_margin, event.attr_y, @client_area_width - @right_margin, event.attr_y, true)
+            else
+              line_end = @content.get_char_count
+              if (line_index + 1 < @content.get_line_count)
+                line_end = @content.get_offset_at_line(line_index + 1)
+              end
+              set_selection(line_offset, line_end - line_offset, false, false)
+              send_selection_event
+            end
           end
-          @caret_offset = start
-          reset_selection
-          @caret_offset = end_
-          show_caret
-          do_mouse_selection
           @double_click_selection = Point.new(@selection.attr_x, @selection.attr_y)
+          show_caret
         end
       end
     end
@@ -6286,12 +7088,14 @@ module Org::Eclipse::Swt::Custom
     # Updates the caret location and selection if mouse button 1 is pressed
     # during the mouse move.
     def handle_mouse_move(event)
-      if ((@click_count).equal?(0))
-        return
+      if (@click_count > 0)
+        update
+        do_auto_scroll(event)
+        do_mouse_location_change(event.attr_x, event.attr_y, true)
       end
-      do_mouse_location_change(event.attr_x, event.attr_y, true)
-      update
-      do_auto_scroll(event)
+      if (@renderer.attr_has_links)
+        do_mouse_link_cursor(event.attr_x, event.attr_y)
+      end
     end
     
     typesig { [Event] }
@@ -6300,19 +7104,7 @@ module Org::Eclipse::Swt::Custom
       @click_count = 0
       end_auto_scroll
       if ((event.attr_button).equal?(1))
-        begin
-          if (@selection.attr_y - @selection.attr_x > 0)
-            set_clipboard_content(@selection.attr_x, @selection.attr_y - @selection.attr_x, DND::SELECTION_CLIPBOARD)
-          end
-        rescue SWTError => error_
-          # Copy to clipboard failed. This happens when another application
-          # is accessing the clipboard while we copy. Ignore the error.
-          # Fixes 1GDQAVN
-          # Rethrow all other errors. Fixes bug 17578.
-          if (!(error_.attr_code).equal?(DND::ERROR_CANNOT_SET_CLIPBOARD))
-            raise error_
-          end
-        end
+        copy_selection(DND::SELECTION_CLIPBOARD)
       end
     end
     
@@ -6346,16 +7138,27 @@ module Org::Eclipse::Swt::Custom
           draw_background(gc, 0, y, @client_area_width, end_y - y)
         end
       end
+      if (@block_selection && !(@block_xlocation).equal?(-1))
+        gc.set_background(get_selection_background)
+        rect = get_block_selection_rectangle
+        gc.draw_rectangle(rect.attr_x, rect.attr_y, Math.max(1, rect.attr_width - 1), Math.max(1, rect.attr_height - 1))
+        gc.set_advanced(true)
+        if (gc.get_advanced)
+          gc.set_alpha(100)
+          gc.fill_rectangle(rect)
+          gc.set_advanced(false)
+        end
+      end
       # fill the margin background
-      gc.set_background(background)
+      gc.set_background(!(@margin_color).nil? ? @margin_color : background)
       if (@top_margin > 0)
         draw_background(gc, 0, 0, @client_area_width, @top_margin)
       end
       if (@bottom_margin > 0)
         draw_background(gc, 0, @client_area_height - @bottom_margin, @client_area_width, @bottom_margin)
       end
-      if (@left_margin > 0)
-        draw_background(gc, 0, 0, @left_margin, @client_area_height)
+      if (@left_margin - @alignment_margin > 0)
+        draw_background(gc, 0, 0, @left_margin - @alignment_margin, @client_area_height)
       end
       if (@right_margin > 0)
         draw_background(gc, @client_area_width - @right_margin, 0, @right_margin, @client_area_height)
@@ -6416,7 +7219,9 @@ module Org::Eclipse::Swt::Custom
           end
         end
       end
+      update_caret_visibility
       claim_bottom_free_space
+      set_alignment
       # TODO FIX TOP INDEX DURING RESIZE
       # if (oldHeight != clientAreaHeight || wordWrap) {
       # calculateTopIndex(0);
@@ -6456,13 +7261,19 @@ module Org::Eclipse::Swt::Custom
       # selection redraw would be flushed during scroll which is wrong.
       # in some cases new text would be drawn in scroll source area even
       # though the intent is to scroll it.
-      update_selection(@last_text_change_start, @last_text_change_replace_char_count, @last_text_change_new_char_count)
+      if (!(@block_selection && !(@block_xlocation).equal?(-1)))
+        update_selection(@last_text_change_start, @last_text_change_replace_char_count, @last_text_change_new_char_count)
+      end
       if (@last_text_change_replace_line_count > 0 || @word_wrap)
         claim_bottom_free_space
       end
       if (@last_text_change_replace_char_count > 0)
         claim_right_free_space
       end
+      send_accessible_text_changed(@last_text_change_start, @last_text_change_new_char_count, @last_text_change_replace_char_count)
+      @last_char_count += @last_text_change_new_char_count
+      @last_char_count -= @last_text_change_replace_char_count
+      set_alignment
     end
     
     typesig { [TextChangingEvent] }
@@ -6504,7 +7315,7 @@ module Org::Eclipse::Swt::Custom
       # caretOffset.
       new_end_of_text = @content.get_char_count - event.attr_replace_char_count + event.attr_new_char_count
       if (@caret_offset > new_end_of_text)
-        @caret_offset = new_end_of_text
+        set_caret_offset(new_end_of_text, SWT::DEFAULT)
       end
     end
     
@@ -6516,6 +7327,10 @@ module Org::Eclipse::Swt::Custom
     # @param event text change event.
     def handle_text_set(event)
       reset
+      new_char_count = get_char_count
+      send_accessible_text_changed(0, new_char_count, @last_char_count)
+      @last_char_count = new_char_count
+      set_alignment
     end
     
     typesig { [Event] }
@@ -6749,6 +7564,9 @@ module Org::Eclipse::Swt::Custom
     # @param action one of the actions defined in ST.java
     def invoke_action(action)
       check_widget
+      if (@block_selection && invoke_block_action(action))
+        return
+      end
       @update_caret_direction = true
       case (action)
       # Navigation
@@ -6853,13 +7671,70 @@ module Org::Eclipse::Swt::Custom
         do_delete_word_next
       when ST::TOGGLE_OVERWRITE
         @overwrite = !@overwrite # toggle insert/overwrite mode
+      when ST::TOGGLE_BLOCKSELECTION
+        set_block_selection(!@block_selection)
       end
+    end
+    
+    typesig { [::Java::Int] }
+    # Returns true if an action should not be performed when block
+    # selection in active
+    def invoke_block_action(action)
+      case (action)
+      # Navigation
+      # Selection
+      # Modification
+      when ST::LINE_UP, ST::LINE_DOWN, ST::LINE_START, ST::LINE_END, ST::COLUMN_PREVIOUS, ST::COLUMN_NEXT, ST::PAGE_UP, ST::PAGE_DOWN, ST::WORD_PREVIOUS, ST::WORD_NEXT, ST::TEXT_START, ST::TEXT_END, ST::WINDOW_START, ST::WINDOW_END
+        clear_block_selection(false, false)
+        return false
+      when ST::SELECT_LINE_UP
+        do_block_line_vertical(true)
+        return true
+      when ST::SELECT_LINE_DOWN
+        do_block_line_vertical(false)
+        return true
+      when ST::SELECT_LINE_START
+        do_block_line_horizontal(false)
+        return true
+      when ST::SELECT_LINE_END
+        do_block_line_horizontal(true)
+        return false
+      when ST::SELECT_COLUMN_PREVIOUS
+        do_block_column(false)
+        return true
+      when ST::SELECT_COLUMN_NEXT
+        do_block_column(true)
+        return true
+      when ST::SELECT_WORD_PREVIOUS
+        do_block_word(false)
+        return true
+      when ST::SELECT_WORD_NEXT
+        do_block_word(true)
+        return true
+      when ST::SELECT_ALL
+        return false
+      when ST::SELECT_PAGE_UP, ST::SELECT_PAGE_DOWN, ST::SELECT_TEXT_START, ST::SELECT_TEXT_END, ST::SELECT_WINDOW_START, ST::SELECT_WINDOW_END
+        # blocked actions
+        return true
+      when ST::CUT, ST::COPY, ST::PASTE
+        return false
+      when ST::DELETE_PREVIOUS, ST::DELETE_NEXT
+        if (!(@block_xlocation).equal?(-1))
+          insert_block_selection_text(RJava.cast_to_char(0), action)
+          return true
+        end
+        return false
+      when ST::DELETE_WORD_PREVIOUS, ST::DELETE_WORD_NEXT
+        # blocked actions
+        return !(@block_xlocation).equal?(-1)
+      end
+      return false
     end
     
     typesig { [] }
     # Temporary until SWT provides this
     def is_bidi
-      return IS_GTK || IS_CARBON || BidiUtil.is_bidi_platform || @is_mirrored
+      return IS_GTK || IS_MAC || BidiUtil.is_bidi_platform || @is_mirrored
     end
     
     typesig { [] }
@@ -6957,12 +7832,12 @@ module Org::Eclipse::Swt::Custom
         @content.replace_text_range(event.attr_start, replaced_length, event.attr_text)
         # set the caret position prior to sending the modify event.
         # fixes 1GBB8NJ
-        if (update_caret)
+        if (update_caret && !(@block_selection && !(@block_xlocation).equal?(-1)))
           # always update the caret location. fixes 1G8FODP
-          set_selection(event.attr_start + event.attr_text.length, 0, true)
+          set_selection(event.attr_start + event.attr_text.length, 0, true, false)
           show_caret
         end
-        send_modify_event(event)
+        notify_listeners(SWT::Modify, event)
         if (is_listening(ExtendedModify))
           notify_listeners(ExtendedModify, styled_text_event)
         end
@@ -7000,6 +7875,14 @@ module Org::Eclipse::Swt::Custom
       check_widget
       text = get_clipboard_content(DND::CLIPBOARD)
       if (!(text).nil? && text.length > 0)
+        if (@block_selection)
+          fill_with_spaces = is_fixed_line_height && @renderer.attr_fixed_pitch
+          offset = insert_block_selection_text(text, fill_with_spaces)
+          set_caret_offset(offset, SWT::DEFAULT)
+          clear_block_selection(true, true)
+          set_caret_location
+          return
+        end
         event = Event.new
         event.attr_start = @selection.attr_x
         event.attr_end = @selection.attr_y
@@ -7109,6 +7992,7 @@ module Org::Eclipse::Swt::Custom
       @renderer.reset(@top_index, item_count)
       @renderer.calculate(@top_index, item_count)
       set_scroll_bars(false)
+      do_mouse_link_cursor
     end
     
     typesig { [::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Boolean] }
@@ -7146,27 +8030,31 @@ module Org::Eclipse::Swt::Custom
         first_line = get_line_index(y)
         last_line = get_line_index(y + height)
         reset_cache(first_line, last_line - first_line + 1)
+        do_mouse_link_cursor
       end
     end
     
-    typesig { [::Java::Int, ::Java::Int] }
-    def redraw_lines(start_line, line_count)
+    typesig { [::Java::Int, ::Java::Int, ::Java::Boolean] }
+    def redraw_lines(start_line, line_count, bottom_changed)
       # do nothing if redraw range is completely invisible
+      end_line = start_line + line_count - 1
       partial_bottom_index = get_partial_bottom_index
-      if (start_line > partial_bottom_index || start_line + line_count - 1 < @top_index)
+      partial_top_index = get_partial_top_index
+      if (start_line > partial_bottom_index || end_line < partial_top_index)
         return
       end
       # only redraw visible lines
-      if (start_line < @top_index)
-        line_count -= @top_index - start_line
-        start_line = @top_index
+      if (start_line < partial_top_index)
+        start_line = partial_top_index
       end
-      if (start_line + line_count - 1 > partial_bottom_index)
-        line_count = partial_bottom_index - start_line + 1
+      if (end_line > partial_bottom_index)
+        end_line = partial_bottom_index
       end
-      start_line -= @top_index
       redraw_top = get_line_pixel(start_line)
-      redraw_bottom = get_line_pixel(start_line + line_count)
+      redraw_bottom = get_line_pixel(end_line + 1)
+      if (bottom_changed)
+        redraw_bottom = @client_area_height - @bottom_margin
+      end
       redraw_width = @client_area_width - @left_margin - @right_margin
       Canvas.instance_method(:redraw).bind(self).call(@left_margin, redraw_top, redraw_width, redraw_bottom - redraw_top, true)
     end
@@ -7236,6 +8124,7 @@ module Org::Eclipse::Swt::Custom
       last_line = @content.get_line_at_offset(end_)
       reset_cache(first_line, last_line - first_line + 1)
       internal_redraw_range(start, length_)
+      do_mouse_link_cursor
     end
     
     typesig { [BidiSegmentListener] }
@@ -7258,6 +8147,28 @@ module Org::Eclipse::Swt::Custom
         SWT.error(SWT::ERROR_NULL_ARGUMENT)
       end
       remove_listener(LineGetSegments, listener)
+    end
+    
+    typesig { [CaretListener] }
+    # Removes the specified caret listener.
+    # 
+    # @param listener the listener which should no longer be notified
+    # 
+    # @exception SWTException <ul>
+    # <li>ERROR_WIDGET_DISPOSED - if the receiver has been disposed</li>
+    # <li>ERROR_THREAD_INVALID_ACCESS - if not called from the thread that created the receiver</li>
+    # </ul>
+    # @exception IllegalArgumentException <ul>
+    # <li>ERROR_NULL_ARGUMENT when listener is null</li>
+    # </ul>
+    # 
+    # @since 3.5
+    def remove_caret_listener(listener)
+      check_widget
+      if ((listener).nil?)
+        SWT.error(SWT::ERROR_NULL_ARGUMENT)
+      end
+      remove_listener(CaretMoved, listener)
     end
     
     typesig { [ExtendedModifyListener] }
@@ -7318,6 +8229,7 @@ module Org::Eclipse::Swt::Custom
         SWT.error(SWT::ERROR_NULL_ARGUMENT)
       end
       remove_listener(LineGetStyle, listener)
+      set_caret_location
     end
     
     typesig { [ModifyListener] }
@@ -7550,7 +8462,7 @@ module Org::Eclipse::Swt::Custom
     def reset
       vertical_bar = get_vertical_bar
       horizontal_bar = get_horizontal_bar
-      @caret_offset = 0
+      set_caret_offset(0, SWT::DEFAULT)
       @top_index = 0
       @top_index_y = 0
       @vertical_scroll_offset = 0
@@ -7734,6 +8646,17 @@ module Org::Eclipse::Swt::Custom
       end
     end
     
+    typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
+    def send_accessible_text_changed(start, new_char_count, replace_char_count)
+      accessible = get_accessible
+      if (!(replace_char_count).equal?(0))
+        accessible.text_changed(ACC::TEXT_DELETE, start, replace_char_count)
+      end
+      if (!(new_char_count).equal?(0))
+        accessible.text_changed(ACC::TEXT_INSERT, start, new_char_count)
+      end
+    end
+    
     typesig { [] }
     # Selects all the text.
     # 
@@ -7743,6 +8666,17 @@ module Org::Eclipse::Swt::Custom
     # </ul>
     def select_all
       check_widget
+      if (@block_selection)
+        @renderer.calculate(0, @content.get_line_count)
+        set_scroll_bars(false)
+        vertical_scroll_offset = get_vertical_scroll_offset
+        left = @left_margin - @horizontal_scroll_offset
+        top = @top_margin - vertical_scroll_offset
+        right = @renderer.get_width - @right_margin - @horizontal_scroll_offset
+        bottom = @renderer.get_height - @bottom_margin - vertical_scroll_offset
+        set_block_selection_location(left, top, right, bottom, false)
+        return
+      end
       set_selection(0, Math.max(get_char_count, 0))
     end
     
@@ -7790,22 +8724,6 @@ module Org::Eclipse::Swt::Custom
       return event
     end
     
-    typesig { [Event] }
-    def send_modify_event(event)
-      accessible = get_accessible
-      if ((event.attr_text.length).equal?(0))
-        accessible.text_changed(ACC::TEXT_DELETE, event.attr_start, event.attr_end - event.attr_start)
-      else
-        if ((event.attr_start).equal?(event.attr_end))
-          accessible.text_changed(ACC::TEXT_INSERT, event.attr_start, event.attr_text.length)
-        else
-          accessible.text_changed(ACC::TEXT_DELETE, event.attr_start, event.attr_end - event.attr_start)
-          accessible.text_changed(ACC::TEXT_INSERT, event.attr_start, event.attr_text.length)
-        end
-      end
-      notify_listeners(SWT::Modify, event)
-    end
-    
     typesig { [] }
     # Sends the specified selection event.
     def send_selection_event
@@ -7814,6 +8732,56 @@ module Org::Eclipse::Swt::Custom
       event.attr_x = @selection.attr_x
       event.attr_y = @selection.attr_y
       notify_listeners(SWT::Selection, event)
+    end
+    
+    typesig { [::Java::Int, ::Java::Int, ::Java::Int, String, ::Java::Boolean] }
+    def send_text_event(left, right, line_index, text, fill_with_spaces)
+      line_width = 0
+      start = 0
+      end_ = 0
+      buffer = StringBuffer.new
+      if (line_index < @content.get_line_count)
+        trailing = Array.typed(::Java::Int).new(1) { 0 }
+        start = get_offset_at_point(left, get_line_pixel(line_index), trailing, true)
+        if ((start).equal?(-1))
+          line_offset = @content.get_offset_at_line(line_index)
+          line_legth = @content.get_line(line_index).length
+          start = end_ = line_offset + line_legth
+          if (fill_with_spaces)
+            layout = @renderer.get_text_layout(line_index)
+            line_width = layout.get_bounds.attr_width
+            @renderer.dispose_text_layout(layout)
+          end
+        else
+          start += trailing[0]
+          end_ = (left).equal?(right) ? start : get_offset_at_point(right, 0, line_index, nil)
+          fill_with_spaces = false
+        end
+      else
+        start = end_ = @content.get_char_count
+        buffer.append(@content.get_line_delimiter)
+      end
+      if (start > end_)
+        temp = start
+        start = end_
+        end_ = temp
+      end
+      if (fill_with_spaces)
+        spaces_width = left - line_width + @horizontal_scroll_offset - @left_margin
+        spaces_count = spaces_width / @renderer.attr_average_char_width
+        i = 0
+        while i < spaces_count
+          buffer.append(Character.new(?\s.ord))
+          i += 1
+        end
+      end
+      buffer.append(text)
+      event = Event.new
+      event.attr_start = start
+      event.attr_end = end_
+      event.attr_text = buffer.to_s
+      send_key_event(event)
+      return event.attr_start + event.attr_text.length
     end
     
     typesig { [::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, String, ::Java::Int] }
@@ -7846,6 +8814,34 @@ module Org::Eclipse::Swt::Custom
       return new_offset
     end
     
+    typesig { [] }
+    def set_alignment
+      if (((get_style & SWT::SINGLE)).equal?(0))
+        return
+      end
+      alignment = @renderer.get_line_alignment(0, @alignment)
+      new_alignment_margin = 0
+      if (!(alignment).equal?(SWT::LEFT))
+        @renderer.calculate(0, 1)
+        width = @renderer.get_width - @alignment_margin
+        new_alignment_margin = @client_area_width - width
+        if (new_alignment_margin < 0)
+          new_alignment_margin = 0
+        end
+        if ((alignment).equal?(SWT::CENTER))
+          new_alignment_margin /= 2
+        end
+      end
+      if (!(@alignment_margin).equal?(new_alignment_margin))
+        @left_margin -= @alignment_margin
+        @left_margin += new_alignment_margin
+        @alignment_margin = new_alignment_margin
+        reset_cache(0, 1)
+        set_caret_location
+        Canvas.instance_method(:redraw).bind(self).call
+      end
+    end
+    
     typesig { [::Java::Int] }
     # Sets the alignment of the widget. The argument should be one of <code>SWT.LEFT</code>,
     # <code>SWT.CENTER</code> or <code>SWT.RIGHT</code>. The alignment applies for all lines.
@@ -7873,6 +8869,7 @@ module Org::Eclipse::Swt::Custom
       @alignment = alignment
       reset_cache(0, @content.get_line_count)
       set_caret_location
+      set_alignment
       Canvas.instance_method(:redraw).bind(self).call
     end
     
@@ -7882,7 +8879,160 @@ module Org::Eclipse::Swt::Custom
       check_widget
       @background = color
       super(color)
+      reset_cache(0, @content.get_line_count)
+      set_caret_location
       Canvas.instance_method(:redraw).bind(self).call
+    end
+    
+    typesig { [::Java::Boolean] }
+    # Sets the block selection mode.
+    # 
+    # @param blockSelection true=enable block selection, false=disable block selection
+    # 
+    # @since 3.5
+    def set_block_selection(block_selection)
+      check_widget
+      if (!((get_style & SWT::SINGLE)).equal?(0))
+        return
+      end
+      if ((block_selection).equal?(@block_selection))
+        return
+      end
+      if (@word_wrap)
+        return
+      end
+      @block_selection = block_selection
+      if ((@cursor).nil?)
+        display = get_display
+        type = block_selection ? SWT::CURSOR_CROSS : SWT::CURSOR_IBEAM
+        Canvas.instance_method(:set_cursor).bind(self).call(display.get_system_cursor(type))
+      end
+      if (block_selection)
+        start = @selection.attr_x
+        end_ = @selection.attr_y
+        if (!(start).equal?(end_))
+          set_block_selection_offset(start, end_, false)
+        end
+      else
+        clear_block_selection(false, false)
+      end
+    end
+    
+    typesig { [Rectangle] }
+    # Sets the block selection bounds. The bounds is
+    # relative to the upper left corner of the document.
+    # 
+    # @param rect the new bounds for the block selection
+    # 
+    # @see #setBlockSelectionBounds(int, int, int, int)
+    # @exception SWTException <ul>
+    # <li>ERROR_WIDGET_DISPOSED - if the receiver has been disposed</li>
+    # <li>ERROR_THREAD_INVALID_ACCESS - if not called from the thread that created the receiver</li>
+    # </ul>
+    # @exception IllegalArgumentException <ul>
+    # <li>ERROR_NULL_ARGUMENT when point is null</li>
+    # </ul>
+    # 
+    # @since 3.5
+    def set_block_selection_bounds(rect)
+      check_widget
+      if ((rect).nil?)
+        SWT.error(SWT::ERROR_NULL_ARGUMENT)
+      end
+      set_block_selection_bounds(rect.attr_x, rect.attr_y, rect.attr_width, rect.attr_height)
+    end
+    
+    typesig { [::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int] }
+    # Sets the block selection bounds. The bounds is
+    # relative to the upper left corner of the document.
+    # 
+    # @param x the new x coordinate for the block selection
+    # @param y the new y coordinate for the block selection
+    # @param width the new width for the block selection
+    # @param height the new height for the block selection
+    # 
+    # @exception SWTException <ul>
+    # <li>ERROR_WIDGET_DISPOSED - if the receiver has been disposed</li>
+    # <li>ERROR_THREAD_INVALID_ACCESS - if not called from the thread that created the receiver</li>
+    # </ul>
+    # 
+    # @since 3.5
+    def set_block_selection_bounds(x, y, width, height)
+      check_widget
+      vertical_scroll_offset = get_vertical_scroll_offset
+      if (!@block_selection)
+        x -= @horizontal_scroll_offset
+        y -= vertical_scroll_offset
+        start = get_offset_at_point(x, y, nil)
+        end_ = get_offset_at_point(x + width - 1, y + height - 1, nil)
+        set_selection(start, end_ - start, false, false)
+        set_caret_location
+        return
+      end
+      min_y = @top_margin
+      min_x = @left_margin
+      max_y = @renderer.get_height - @bottom_margin
+      max_x = Math.max(@client_area_width, @renderer.get_width) - @right_margin
+      anchor_x = Math.max(min_x, Math.min(max_x, x)) - @horizontal_scroll_offset
+      anchor_y = Math.max(min_y, Math.min(max_y, y)) - vertical_scroll_offset
+      location_x = Math.max(min_x, Math.min(max_x, x + width)) - @horizontal_scroll_offset
+      location_y = Math.max(min_y, Math.min(max_y, y + height - 1)) - vertical_scroll_offset
+      if (is_fixed_line_height && @renderer.attr_fixed_pitch)
+        avg = @renderer.attr_average_char_width
+        anchor_x = ((anchor_x - @left_margin + @horizontal_scroll_offset) / avg * avg) + @left_margin - @horizontal_scroll_offset
+        location_x = ((location_x + avg / 2 - @left_margin + @horizontal_scroll_offset) / avg * avg) + @left_margin - @horizontal_scroll_offset
+      end
+      set_block_selection_location(anchor_x, anchor_y, location_x, location_y, false)
+    end
+    
+    typesig { [::Java::Int, ::Java::Int, ::Java::Boolean] }
+    def set_block_selection_location(x, y, send_event)
+      vertical_scroll_offset = get_vertical_scroll_offset
+      @block_xlocation = x + @horizontal_scroll_offset
+      @block_ylocation = y + vertical_scroll_offset
+      alignment = Array.typed(::Java::Int).new(1) { 0 }
+      offset = get_offset_at_point(x, y, alignment)
+      set_caret_offset(offset, alignment[0])
+      if ((@block_xanchor).equal?(-1))
+        @block_xanchor = @block_xlocation
+        @block_yanchor = @block_ylocation
+        @selection_anchor = @caret_offset
+      end
+      do_block_selection(send_event)
+    end
+    
+    typesig { [::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Boolean] }
+    def set_block_selection_location(anchor_x, anchor_y, x, y, send_event)
+      vertical_scroll_offset = get_vertical_scroll_offset
+      @block_xanchor = anchor_x + @horizontal_scroll_offset
+      @block_yanchor = anchor_y + vertical_scroll_offset
+      @selection_anchor = get_offset_at_point(anchor_x, anchor_y, nil)
+      set_block_selection_location(x, y, send_event)
+    end
+    
+    typesig { [::Java::Int, ::Java::Boolean] }
+    def set_block_selection_offset(offset, send_event)
+      point = get_point_at_offset(offset)
+      vertical_scroll_offset = get_vertical_scroll_offset
+      @block_xlocation = point.attr_x + @horizontal_scroll_offset
+      @block_ylocation = point.attr_y + vertical_scroll_offset
+      set_caret_offset(offset, SWT::DEFAULT)
+      if ((@block_xanchor).equal?(-1))
+        @block_xanchor = @block_xlocation
+        @block_yanchor = @block_ylocation
+        @selection_anchor = @caret_offset
+      end
+      do_block_selection(send_event)
+    end
+    
+    typesig { [::Java::Int, ::Java::Int, ::Java::Boolean] }
+    def set_block_selection_offset(anchor_offset, offset, send_event)
+      vertical_scroll_offset = get_vertical_scroll_offset
+      anchor_point = get_point_at_offset(anchor_offset)
+      @block_xanchor = anchor_point.attr_x + @horizontal_scroll_offset
+      @block_yanchor = anchor_point.attr_y + vertical_scroll_offset
+      @selection_anchor = anchor_offset
+      set_block_selection_offset(offset, send_event)
     end
     
     typesig { [Caret] }
@@ -7919,6 +9069,21 @@ module Org::Eclipse::Swt::Custom
     def set_bidi_coloring(mode)
       check_widget
       @bidi_coloring = mode
+    end
+    
+    typesig { [::Java::Int] }
+    # Sets the bottom margin.
+    # 
+    # @param bottomMargin the bottom margin.
+    # @exception SWTException <ul>
+    # <li>ERROR_WIDGET_DISPOSED - if the receiver has been disposed</li>
+    # <li>ERROR_THREAD_INVALID_ACCESS - if not called from the thread that created the receiver</li>
+    # </ul>
+    # 
+    # @since 3.5
+    def set_bottom_margin(bottom_margin)
+      check_widget
+      set_margins(@left_margin, @top_margin, @right_margin, bottom_margin)
     end
     
     typesig { [] }
@@ -7983,6 +9148,7 @@ module Org::Eclipse::Swt::Custom
             end
           end
         end
+        update_caret_visibility
       end
       @column_x = location.attr_x
     end
@@ -8004,25 +9170,43 @@ module Org::Eclipse::Swt::Custom
       length_ = get_char_count
       if (length_ > 0 && !(offset).equal?(@caret_offset))
         if (offset < 0)
-          @caret_offset = 0
+          offset = 0
         else
           if (offset > length_)
-            @caret_offset = length_
+            offset = length_
           else
             if (is_line_delimiter(offset))
               # offset is inside a multi byte line delimiter. This is an
               # illegal operation and an exception is thrown. Fixes 1GDKK3R
               SWT.error(SWT::ERROR_INVALID_ARGUMENT)
             end
-            @caret_offset = offset
           end
         end
-        @caret_alignment = PREVIOUS_OFFSET_TRAILING
+        set_caret_offset(offset, PREVIOUS_OFFSET_TRAILING)
         # clear the selection if the caret is moved.
         # don't notify listeners about the selection change.
-        clear_selection(false)
+        if (@block_selection)
+          clear_block_selection(true, false)
+        else
+          clear_selection(false)
+        end
       end
       set_caret_location
+    end
+    
+    typesig { [::Java::Int, ::Java::Int] }
+    def set_caret_offset(offset, alignment)
+      if (!(@caret_offset).equal?(offset))
+        @caret_offset = offset
+        if (is_listening(CaretMoved))
+          event = StyledTextEvent.new(@content)
+          event.attr_end = @caret_offset
+          notify_listeners(CaretMoved, event)
+        end
+      end
+      if (!(alignment).equal?(SWT::DEFAULT))
+        @caret_alignment = alignment
+      end
     end
     
     typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
@@ -8087,9 +9271,15 @@ module Org::Eclipse::Swt::Custom
     # 
     # @see Control#setCursor(Cursor)
     def set_cursor(cursor)
+      check_widget
+      if (!(cursor).nil? && cursor.is_disposed)
+        SWT.error(SWT::ERROR_INVALID_ARGUMENT)
+      end
+      @cursor = cursor
       if ((cursor).nil?)
         display = get_display
-        super(display.get_system_cursor(SWT::CURSOR_IBEAM))
+        type = @block_selection ? SWT::CURSOR_CROSS : SWT::CURSOR_IBEAM
+        super(display.get_system_cursor(type))
       else
         super(cursor)
       end
@@ -8172,6 +9362,8 @@ module Org::Eclipse::Swt::Custom
       check_widget
       @foreground = color
       super(get_foreground)
+      reset_cache(0, @content.get_line_count)
+      set_caret_location
       Canvas.instance_method(:redraw).bind(self).call
     end
     
@@ -8354,6 +9546,21 @@ module Org::Eclipse::Swt::Custom
       end
     end
     
+    typesig { [::Java::Int] }
+    # Sets the left margin.
+    # 
+    # @param leftMargin the left margin.
+    # @exception SWTException <ul>
+    # <li>ERROR_WIDGET_DISPOSED - if the receiver has been disposed</li>
+    # <li>ERROR_THREAD_INVALID_ACCESS - if not called from the thread that created the receiver</li>
+    # </ul>
+    # 
+    # @since 3.5
+    def set_left_margin(left_margin)
+      check_widget
+      set_margins(left_margin, @top_margin, @right_margin, @bottom_margin)
+    end
+    
     typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
     # Sets the alignment of the specified lines. The argument should be one of <code>SWT.LEFT</code>,
     # <code>SWT.CENTER</code> or <code>SWT.RIGHT</code>.
@@ -8399,11 +9606,12 @@ module Org::Eclipse::Swt::Custom
       end
       @renderer.set_line_alignment(start_line, line_count, alignment)
       reset_cache(start_line, line_count)
-      redraw_lines(start_line, line_count)
+      redraw_lines(start_line, line_count, false)
       caret_line = get_caret_line
       if (start_line <= caret_line && caret_line < start_line + line_count)
         set_caret_location
       end
+      set_alignment
     end
     
     typesig { [::Java::Int, ::Java::Int, Color] }
@@ -8453,7 +9661,7 @@ module Org::Eclipse::Swt::Custom
       else
         @renderer.clear_line_background(start_line, line_count)
       end
-      redraw_lines(start_line, line_count)
+      redraw_lines(start_line, line_count, false)
     end
     
     typesig { [::Java::Int, ::Java::Int, Bullet] }
@@ -8495,9 +9703,11 @@ module Org::Eclipse::Swt::Custom
       if (start_line < 0 || start_line + line_count > @content.get_line_count)
         SWT.error(SWT::ERROR_INVALID_ARGUMENT)
       end
+      old_bottom = get_line_pixel(start_line + line_count)
       @renderer.set_line_bullet(start_line, line_count, bullet)
       reset_cache(start_line, line_count)
-      redraw_lines(start_line, line_count)
+      new_bottom = get_line_pixel(start_line + line_count)
+      redraw_lines(start_line, line_count, !(old_bottom).equal?(new_bottom))
       caret_line = get_caret_line
       if (start_line <= caret_line && caret_line < start_line + line_count)
         set_caret_location
@@ -8553,9 +9763,11 @@ module Org::Eclipse::Swt::Custom
       if (start_line < 0 || start_line + line_count > @content.get_line_count)
         SWT.error(SWT::ERROR_INVALID_ARGUMENT)
       end
+      old_bottom = get_line_pixel(start_line + line_count)
       @renderer.set_line_indent(start_line, line_count, indent)
       reset_cache(start_line, line_count)
-      redraw_lines(start_line, line_count)
+      new_bottom = get_line_pixel(start_line + line_count)
+      redraw_lines(start_line, line_count, !(old_bottom).equal?(new_bottom))
       caret_line = get_caret_line
       if (start_line <= caret_line && caret_line < start_line + line_count)
         set_caret_location
@@ -8604,7 +9816,7 @@ module Org::Eclipse::Swt::Custom
       end
       @renderer.set_line_justify(start_line, line_count, justify)
       reset_cache(start_line, line_count)
-      redraw_lines(start_line, line_count)
+      redraw_lines(start_line, line_count, false)
       caret_line = get_caret_line
       if (start_line <= caret_line && caret_line < start_line + line_count)
         set_caret_location
@@ -8632,14 +9844,52 @@ module Org::Eclipse::Swt::Custom
       Canvas.instance_method(:redraw).bind(self).call
     end
     
+    typesig { [Color] }
+    # Sets the color of the margins.
+    # 
+    # @param color the new color (or null)
+    # @exception IllegalArgumentException <ul>
+    # <li>ERROR_INVALID_ARGUMENT - if the argument has been disposed</li>
+    # </ul>
+    # @exception SWTException <ul>
+    # <li>ERROR_WIDGET_DISPOSED - if the receiver has been disposed</li>
+    # <li>ERROR_THREAD_INVALID_ACCESS - if not called from the thread that created the receiver</li>
+    # </ul>
+    # 
+    # @since 3.5
+    def set_margin_color(color)
+      check_widget
+      if (!(color).nil? && color.is_disposed)
+        SWT.error(SWT::ERROR_INVALID_ARGUMENT)
+      end
+      @margin_color = color
+      Canvas.instance_method(:redraw).bind(self).call
+    end
+    
     typesig { [::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int] }
+    # Sets the margins.
+    # 
+    # @param leftMargin the left margin.
+    # @param topMargin the top margin.
+    # @param rightMargin the right margin.
+    # @param bottomMargin the bottom margin.
+    # @exception SWTException <ul>
+    # <li>ERROR_WIDGET_DISPOSED - if the receiver has been disposed</li>
+    # <li>ERROR_THREAD_INVALID_ACCESS - if not called from the thread that created the receiver</li>
+    # </ul>
+    # 
+    # @since 3.5
     def set_margins(left_margin, top_margin, right_margin, bottom_margin)
       check_widget
-      @left_margin = left_margin
-      @top_margin = top_margin
-      @right_margin = right_margin
-      @bottom_margin = bottom_margin
+      @left_margin = Math.max(0, left_margin)
+      @top_margin = Math.max(0, top_margin)
+      @right_margin = Math.max(0, right_margin)
+      @bottom_margin = Math.max(0, bottom_margin)
+      reset_cache(0, @content.get_line_count)
+      set_scroll_bars(true)
       set_caret_location
+      set_alignment
+      Canvas.instance_method(:redraw).bind(self).call
     end
     
     typesig { [] }
@@ -8693,6 +9943,21 @@ module Org::Eclipse::Swt::Custom
       Canvas.instance_method(:redraw).bind(self).call
     end
     
+    typesig { [::Java::Int] }
+    # Sets the right margin.
+    # 
+    # @param rightMargin the right margin.
+    # @exception SWTException <ul>
+    # <li>ERROR_WIDGET_DISPOSED - if the receiver has been disposed</li>
+    # <li>ERROR_THREAD_INVALID_ACCESS - if not called from the thread that created the receiver</li>
+    # </ul>
+    # 
+    # @since 3.5
+    def set_right_margin(right_margin)
+      check_widget
+      set_margins(@left_margin, @top_margin, right_margin, @bottom_margin)
+    end
+    
     typesig { [::Java::Boolean] }
     # Adjusts the maximum and the page size of the scroll bars to
     # reflect content width/length changes.
@@ -8708,9 +9973,9 @@ module Org::Eclipse::Swt::Custom
           # (ie. because the thumb size is less than the scroll maximum)
           # avoids flashing on Motif, fixes 1G7RE1J and 1G5SE92
           if (@client_area_height < maximum)
-            vertical_bar.set_maximum(maximum)
-            vertical_bar.set_thumb(@client_area_height)
-            vertical_bar.set_page_increment(@client_area_height)
+            vertical_bar.set_maximum(maximum - @top_margin - @bottom_margin)
+            vertical_bar.set_thumb(@client_area_height - @top_margin - @bottom_margin)
+            vertical_bar.set_page_increment(@client_area_height - @top_margin - @bottom_margin)
           else
             if (!(vertical_bar.get_thumb).equal?(inactive) || !(vertical_bar.get_maximum).equal?(inactive))
               vertical_bar.set_values(vertical_bar.get_selection, vertical_bar.get_minimum, inactive, inactive, vertical_bar.get_increment, inactive)
@@ -8725,7 +9990,7 @@ module Org::Eclipse::Swt::Custom
         # (ie. because the thumb size is less than the scroll maximum)
         # avoids flashing on Motif, fixes 1G7RE1J and 1G5SE92
         if (@client_area_width < maximum)
-          horizontal_bar.set_maximum(maximum)
+          horizontal_bar.set_maximum(maximum - @left_margin - @right_margin)
           horizontal_bar.set_thumb(@client_area_width - @left_margin - @right_margin)
           horizontal_bar.set_page_increment(@client_area_width - @left_margin - @right_margin)
         else
@@ -8805,6 +10070,8 @@ module Org::Eclipse::Swt::Custom
         end
       end
       @selection_background = color
+      reset_cache(0, @content.get_line_count)
+      set_caret_location
       Canvas.instance_method(:redraw).bind(self).call
     end
     
@@ -8834,6 +10101,8 @@ module Org::Eclipse::Swt::Custom
         end
       end
       @selection_foreground = color
+      reset_cache(0, @content.get_line_count)
+      set_caret_location
       Canvas.instance_method(:redraw).bind(self).call
     end
     
@@ -8862,7 +10131,7 @@ module Org::Eclipse::Swt::Custom
       show_selection
     end
     
-    typesig { [::Java::Int, ::Java::Int, ::Java::Boolean] }
+    typesig { [::Java::Int, ::Java::Int, ::Java::Boolean, ::Java::Boolean] }
     # Sets the selection.
     # <p>
     # The new selection may not be visible. Call showSelection to scroll
@@ -8875,7 +10144,7 @@ module Org::Eclipse::Swt::Custom
     # A negative length places the caret at the selection start.
     # @param sendEvent a Selection event is sent when set to true and when
     # the selection is reset.
-    def set_selection(start, length_, send_event)
+    def set_selection(start, length_, send_event, do_block)
       end_ = start + length_
       if (start > end_)
         temp = end_
@@ -8885,16 +10154,21 @@ module Org::Eclipse::Swt::Custom
       # is the selection range different or is the selection direction
       # different?
       if (!(@selection.attr_x).equal?(start) || !(@selection.attr_y).equal?(end_) || (length_ > 0 && !(@selection_anchor).equal?(@selection.attr_x)) || (length_ < 0 && !(@selection_anchor).equal?(@selection.attr_y)))
-        clear_selection(send_event)
-        if (length_ < 0)
-          @selection_anchor = @selection.attr_y = end_
-          @caret_offset = @selection.attr_x = start
+        if (@block_selection && do_block)
+          set_block_selection_offset(start, end_, send_event)
         else
-          @selection_anchor = @selection.attr_x = start
-          @caret_offset = @selection.attr_y = end_
+          clear_selection(send_event)
+          if (length_ < 0)
+            @selection_anchor = @selection.attr_y = end_
+            @selection.attr_x = start
+            set_caret_offset(start, PREVIOUS_OFFSET_TRAILING)
+          else
+            @selection_anchor = @selection.attr_x = start
+            @selection.attr_y = end_
+            set_caret_offset(end_, PREVIOUS_OFFSET_TRAILING)
+          end
+          internal_redraw_range(@selection.attr_x, @selection.attr_y - @selection.attr_x)
         end
-        @caret_alignment = PREVIOUS_OFFSET_TRAILING
-        internal_redraw_range(@selection.attr_x, @selection.attr_y - @selection.attr_x)
       end
     end
     
@@ -8934,7 +10208,7 @@ module Org::Eclipse::Swt::Custom
         # is thrown. Fixes 1GDKK3R
         SWT.error(SWT::ERROR_INVALID_ARGUMENT)
       end
-      set_selection(start, length_, false)
+      set_selection(start, length_, false, true)
       set_caret_location
     end
     
@@ -9126,13 +10400,13 @@ module Org::Eclipse::Swt::Custom
           range_end = styles[styles.attr_length - 1].attr_start + styles[styles.attr_length - 1].attr_length
         end
       end
-      last_line_bottom = 0
+      expected_bottom = 0
       if (!is_fixed_line_height && !reset_)
         line_end = @content.get_line_at_offset(Math.max(end_, range_end))
         partial_top_index = get_partial_top_index
         partial_bottom_index = get_partial_bottom_index
         if (partial_top_index <= line_end && line_end <= partial_bottom_index)
-          last_line_bottom = get_line_pixel(line_end + 1)
+          expected_bottom = get_line_pixel(line_end + 1)
         end
       end
       if (reset_)
@@ -9153,24 +10427,22 @@ module Org::Eclipse::Swt::Custom
         partial_top_index = get_partial_top_index
         partial_bottom_index = get_partial_bottom_index
         if (!(line_start > partial_bottom_index || line_end < partial_top_index))
-          y = 0
-          height = @client_area_height
+          top = 0
+          bottom = @client_area_height
           if (partial_top_index <= line_start && line_start <= partial_bottom_index)
-            line_top = Math.max(y, get_line_pixel(line_start))
-            y = line_top
-            height -= line_top
+            top = Math.max(0, get_line_pixel(line_start))
           end
           if (partial_top_index <= line_end && line_end <= partial_bottom_index)
-            new_last_line_bottom = get_line_pixel(line_end + 1)
-            if (!is_fixed_line_height)
-              scroll_text(last_line_bottom, new_last_line_bottom)
-            end
-            height = new_last_line_bottom - y
+            bottom = get_line_pixel(line_end + 1)
           end
-          Canvas.instance_method(:redraw).bind(self).call(0, y, @client_area_width, height, false)
+          if (!is_fixed_line_height && !(bottom).equal?(expected_bottom))
+            bottom = @client_area_height
+          end
+          Canvas.instance_method(:redraw).bind(self).call(0, top, @client_area_width, bottom - top, false)
         end
       end
       set_caret_location
+      do_mouse_link_cursor
     end
     
     typesig { [Array.typed(StyleRange)] }
@@ -9269,7 +10541,7 @@ module Org::Eclipse::Swt::Custom
           styled_text_event.attr_text = @content.get_text_range(event.attr_start, event.attr_end - event.attr_start)
         end
         @content.set_text(event.attr_text)
-        send_modify_event(event)
+        notify_listeners(SWT::Modify, event)
         if (!(styled_text_event).nil?)
           notify_listeners(ExtendedModify, styled_text_event)
         end
@@ -9346,6 +10618,21 @@ module Org::Eclipse::Swt::Custom
     end
     
     typesig { [::Java::Int] }
+    # Sets the top margin.
+    # 
+    # @param topMargin the top margin.
+    # @exception SWTException <ul>
+    # <li>ERROR_WIDGET_DISPOSED - if the receiver has been disposed</li>
+    # <li>ERROR_THREAD_INVALID_ACCESS - if not called from the thread that created the receiver</li>
+    # </ul>
+    # 
+    # @since 3.5
+    def set_top_margin(top_margin)
+      check_widget
+      set_margins(@left_margin, top_margin, @right_margin, @bottom_margin)
+    end
+    
+    typesig { [::Java::Int] }
     # Sets the top pixel offset. Do nothing if there is no text set.
     # <p>
     # The top pixel offset is the vertical pixel offset of the widget. The
@@ -9404,6 +10691,9 @@ module Org::Eclipse::Swt::Custom
       if ((@word_wrap).equal?(wrap))
         return
       end
+      if (@word_wrap && @block_selection)
+        set_block_selection(false)
+      end
       @word_wrap = wrap
       set_variable_line_height
       reset_cache(0, @content.get_line_count)
@@ -9419,29 +10709,28 @@ module Org::Eclipse::Swt::Custom
     
     typesig { [Rectangle, ::Java::Boolean] }
     def show_location(rect, scroll_page)
-      client_area_width = @client_area_width - @left_margin - @right_margin
-      client_area_height = @client_area_height - @top_margin - @bottom_margin
       scrolled = false
-      if (rect.attr_y <= @top_margin)
+      if (rect.attr_y < @top_margin)
         scrolled = scroll_vertical(rect.attr_y - @top_margin, true)
       else
-        if (rect.attr_y + rect.attr_height > client_area_height)
-          if ((client_area_height).equal?(0))
-            scrolled = scroll_vertical(rect.attr_y, true)
+        if (rect.attr_y + rect.attr_height > @client_area_height - @bottom_margin)
+          if (@client_area_height - @top_margin - @bottom_margin <= 0)
+            scrolled = scroll_vertical(rect.attr_y - @top_margin, true)
           else
-            scrolled = scroll_vertical(rect.attr_y + rect.attr_height - client_area_height, true)
+            scrolled = scroll_vertical(rect.attr_y + rect.attr_height - (@client_area_height - @bottom_margin), true)
           end
         end
       end
-      if (client_area_width > 0)
-        min_scroll = scroll_page ? client_area_width / 4 : 0
+      width = @client_area_width - @right_margin - @left_margin
+      if (width > 0)
+        min_scroll = scroll_page ? width / 4 : 0
         if (rect.attr_x < @left_margin)
           scroll_width = Math.max(@left_margin - rect.attr_x, min_scroll)
           max_scroll = @horizontal_scroll_offset
           scrolled = scroll_horizontal(-Math.min(max_scroll, scroll_width), true)
         else
-          if (rect.attr_x + rect.attr_width > client_area_width)
-            scroll_width = Math.max(rect.attr_x + rect.attr_width - client_area_width, min_scroll)
+          if (rect.attr_x + rect.attr_width > (@client_area_width - @right_margin))
+            scroll_width = Math.max(rect.attr_x + rect.attr_width - (@client_area_width - @right_margin), min_scroll)
             max_scroll = @renderer.get_width - @horizontal_scroll_offset - @client_area_width
             scrolled = scroll_horizontal(Math.min(max_scroll, scroll_width), true)
           end
@@ -9497,12 +10786,27 @@ module Org::Eclipse::Swt::Custom
           end_bounds = get_bounds_at_offset(end_offset)
         end
         # the character at endOffset is not part of the selection
-        end_bounds.attr_width = 0
+        end_bounds.attr_width = (end_offset).equal?(@caret_offset) ? get_caret_width : 0
         show_location(end_bounds, false)
       else
         # just show the end of the selection since the selection start
         # will not be visible
         show_location(end_bounds, true)
+      end
+    end
+    
+    typesig { [] }
+    def update_caret_visibility
+      caret = get_caret
+      if (!(caret).nil?)
+        if (@block_selection && !(@block_xlocation).equal?(-1))
+          caret.set_visible(false)
+        else
+          location = caret.get_location
+          size = caret.get_size
+          visible = @top_margin <= location.attr_y + size.attr_y && location.attr_y <= @client_area_height - @bottom_margin && @left_margin <= location.attr_x + size.attr_x && location.attr_x <= @client_area_width - @right_margin
+          caret.set_visible(visible)
+        end
       end
     end
     
@@ -9541,10 +10845,10 @@ module Org::Eclipse::Swt::Custom
       end
       if (@selection.attr_y > start_offset && @selection.attr_x < start_offset + replaced_length)
         # selection intersects replaced text. set caret behind text change
-        set_selection(start_offset + new_length, 0, true)
+        set_selection(start_offset + new_length, 0, true, false)
       else
         # move selection to keep same text selected
-        set_selection(@selection.attr_x + new_length - replaced_length, @selection.attr_y - @selection.attr_x, true)
+        set_selection(@selection.attr_x + new_length - replaced_length, @selection.attr_y - @selection.attr_x, true, false)
       end
       set_caret_location
     end

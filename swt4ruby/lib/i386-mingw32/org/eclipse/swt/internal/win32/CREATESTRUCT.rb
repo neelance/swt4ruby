@@ -1,6 +1,6 @@
 require "rjava"
 
-# Copyright (c) 2000, 2006 IBM Corporation and others.
+# Copyright (c) 2000, 2008 IBM Corporation and others.
 # All rights reserved. This program and the accompanying materials
 # are made available under the terms of the Eclipse Public License v1.0
 # which accompanies this distribution, and is available at
@@ -19,6 +19,7 @@ module Org::Eclipse::Swt::Internal::Win32
   class CREATESTRUCT 
     include_class_members CREATESTRUCTImports
     
+    # @field cast=(LPVOID)
     # long
     attr_accessor :lp_create_params
     alias_method :attr_lp_create_params, :lp_create_params
@@ -26,6 +27,7 @@ module Org::Eclipse::Swt::Internal::Win32
     alias_method :attr_lp_create_params=, :lp_create_params=
     undef_method :lp_create_params=
     
+    # @field cast=(HINSTANCE)
     # long
     attr_accessor :h_instance
     alias_method :attr_h_instance, :h_instance
@@ -33,6 +35,7 @@ module Org::Eclipse::Swt::Internal::Win32
     alias_method :attr_h_instance=, :h_instance=
     undef_method :h_instance=
     
+    # @field cast=(HMENU)
     # long
     attr_accessor :h_menu
     alias_method :attr_h_menu, :h_menu
@@ -40,6 +43,7 @@ module Org::Eclipse::Swt::Internal::Win32
     alias_method :attr_h_menu=, :h_menu=
     undef_method :h_menu=
     
+    # @field cast=(HWND)
     # long
     attr_accessor :hwnd_parent
     alias_method :attr_hwnd_parent, :hwnd_parent
@@ -77,6 +81,7 @@ module Org::Eclipse::Swt::Internal::Win32
     alias_method :attr_style=, :style=
     undef_method :style=
     
+    # @field cast=(LPCTSTR)
     # long
     attr_accessor :lpsz_name
     alias_method :attr_lpsz_name, :lpsz_name
@@ -84,6 +89,7 @@ module Org::Eclipse::Swt::Internal::Win32
     alias_method :attr_lpsz_name=, :lpsz_name=
     undef_method :lpsz_name=
     
+    # @field cast=(LPCTSTR)
     # long
     attr_accessor :lpsz_class
     alias_method :attr_lpsz_class, :lpsz_class

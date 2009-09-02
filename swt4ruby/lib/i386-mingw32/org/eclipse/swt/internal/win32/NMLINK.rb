@@ -1,6 +1,6 @@
 require "rjava"
 
-# Copyright (c) 2000, 2006 IBM Corporation and others.
+# Copyright (c) 2000, 2008 IBM Corporation and others.
 # All rights reserved. This program and the accompanying materials
 # are made available under the terms of the Eclipse Public License v1.0
 # which accompanies this distribution, and is available at
@@ -20,36 +20,42 @@ module Org::Eclipse::Swt::Internal::Win32
     include_class_members NMLINKImports
     
     # LITEM item;
+    # @field accessor=item.mask
     attr_accessor :mask
     alias_method :attr_mask, :mask
     undef_method :mask
     alias_method :attr_mask=, :mask=
     undef_method :mask=
     
+    # @field accessor=item.iLink
     attr_accessor :i_link
     alias_method :attr_i_link, :i_link
     undef_method :i_link
     alias_method :attr_i_link=, :i_link=
     undef_method :i_link=
     
+    # @field accessor=item.state
     attr_accessor :state
     alias_method :attr_state, :state
     undef_method :state
     alias_method :attr_state=, :state=
     undef_method :state=
     
+    # @field accessor=item.stateMask
     attr_accessor :state_mask
     alias_method :attr_state_mask, :state_mask
     undef_method :state_mask
     alias_method :attr_state_mask=, :state_mask=
     undef_method :state_mask=
     
+    # @field accessor=item.szID
     attr_accessor :sz_id
     alias_method :attr_sz_id, :sz_id
     undef_method :sz_id
     alias_method :attr_sz_id=, :sz_id=
     undef_method :sz_id=
     
+    # @field accessor=item.szUrl
     attr_accessor :sz_url
     alias_method :attr_sz_url, :sz_url
     undef_method :sz_url

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2008 IBM Corporation and others.
+ * Copyright (c) 2000, 2009 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -54,6 +54,7 @@ import org.eclipse.swt.events.*;
  * @see <a href="http://www.eclipse.org/swt/snippets/#combo">Combo snippets</a>
  * @see <a href="http://www.eclipse.org/swt/examples.php">SWT Example: ControlExample</a>
  * @see <a href="http://www.eclipse.org/swt/">Sample code and further information</a>
+ * @noextend This class is not intended to be subclassed by clients.
  */
 public class Combo extends Composite {
 	long /*int*/ buttonHandle, entryHandle, listHandle, textRenderer, cellHandle, popupHandle;
@@ -62,8 +63,6 @@ public class Combo extends Composite {
 	int fixStart = -1, fixEnd = -1;
 	String [] items = new String [0];
 	boolean ignoreSelect, lockText;
-
-	static final int INNER_BORDER = 2;
 
 	/**
 	 * the operating system limit for the number of characters
@@ -372,7 +371,7 @@ public Point computeSize (int wHint, int hHint, boolean changed) {
 	OS.gtk_widget_realize (entryHandle);
 	long /*int*/ layout = OS.gtk_entry_get_layout (entryHandle);
 	OS.pango_layout_get_size (layout, w, h);
-	int xborder = INNER_BORDER, yborder = INNER_BORDER;
+	int xborder = Display.INNER_BORDER, yborder = Display.INNER_BORDER;
 	long /*int*/ style = OS.gtk_widget_get_style (entryHandle);
 	xborder += OS.gtk_style_get_xthickness (style);
 	yborder += OS.gtk_style_get_ythickness (style);
@@ -1119,7 +1118,9 @@ long /*int*/ gtk_button_press_event (long /*int*/ widget, long /*int*/ event) {
 	if (OS.GTK_VERSION >= OS.VERSION (2, 4, 0)) {
 		GdkEventButton gdkEvent = new GdkEventButton ();
 		OS.memmove (gdkEvent, event, GdkEventButton.sizeof);
-		if (gdkEvent.type == OS.GDK_BUTTON_PRESS) return 0;
+		if (gdkEvent.type == OS.GDK_BUTTON_PRESS && gdkEvent.button == 1 && (style & SWT.READ_ONLY) != 0) {
+			return gtk_button_press_event(widget, event, false);
+		}
 	}
 	return super.gtk_button_press_event (widget, event);
 }
@@ -1274,7 +1275,7 @@ long /*int*/ gtk_event_after (long /*int*/ widget, long /*int*/ gdkEvent)  {
 				GdkEventButton gdkEventButton = new GdkEventButton ();
 				OS.memmove (gdkEventButton, gdkEvent, GdkEventButton.sizeof);
 				if (gdkEventButton.button == 1) {
-					if (!sendMouseEvent (SWT.MouseDown, gdkEventButton.button, display.clickCount, 0, false, gdkEventButton.time, gdkEventButton.x_root, gdkEventButton.y_root, false, gdkEventButton.state)) {
+					if ((style & SWT.READ_ONLY) != 0 && !sendMouseEvent (SWT.MouseDown, gdkEventButton.button, display.clickCount, 0, false, gdkEventButton.time, gdkEventButton.x_root, gdkEventButton.y_root, false, gdkEventButton.state)) {
 						return 1;
 					}
 					if (OS.GTK_VERSION >= OS.VERSION (2, 6, 0)) {
@@ -1395,9 +1396,7 @@ long /*int*/ gtk_key_press_event (long /*int*/ widget, long /*int*/ event) {
 		    	break;  
 		}
 		if (newIndex != oldIndex) {
-			OS.g_signal_handlers_block_matched (handle, OS.G_SIGNAL_MATCH_DATA, 0, 0, 0, 0, CHANGED);
 			OS.gtk_combo_box_set_active (handle, newIndex);
-			OS.g_signal_handlers_unblock_matched (handle, OS.G_SIGNAL_MATCH_DATA, 0, 0, 0, 0, CHANGED);
 			return 1;
 		}
 	}
@@ -2066,6 +2065,10 @@ public void setSelection (Point selection) {
  * Sets the contents of the receiver's text field to the
  * given string.
  * <p>
+ * This call is ignored when the receiver is read only and 
+ * the given string is not in the receiver's list.
+ * </p>
+ * <p>
  * Note: The text field in a <code>Combo</code> is typically
  * only capable of displaying a single line of text. Thus,
  * setting the text to a string containing line breaks or
@@ -2181,6 +2184,10 @@ public void setVisibleItemCount (int count) {
 	checkWidget ();
 	if (count < 0) return;
 	visibleCount = count;
+}
+
+boolean checkSubwindow () {
+	return false;
 }
 
 boolean translateTraversal (GdkEventKey keyEvent) {

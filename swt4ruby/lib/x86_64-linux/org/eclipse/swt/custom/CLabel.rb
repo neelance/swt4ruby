@@ -1,6 +1,6 @@
 require "rjava"
 
-# Copyright (c) 2000, 2008 IBM Corporation and others.
+# Copyright (c) 2000, 2009 IBM Corporation and others.
 # All rights reserved. This program and the accompanying materials
 # are made available under the terms of the Eclipse Public License v1.0
 # which accompanies this distribution, and is available at
@@ -45,6 +45,7 @@ module Org::Eclipse::Swt::Custom
   # 
   # @see <a href="http://www.eclipse.org/swt/examples.php">SWT Example: CustomControlExample</a>
   # @see <a href="http://www.eclipse.org/swt/">Sample code and further information</a>
+  # @noextend This class is not intended to be subclassed by clients.
   class CLabel < CLabelImports.const_get :Canvas
     include_class_members CLabelImports
     
@@ -137,6 +138,12 @@ module Org::Eclipse::Swt::Custom
     alias_method :attr_background=, :background=
     undef_method :background=
     
+    attr_accessor :dispose_listener
+    alias_method :attr_dispose_listener, :dispose_listener
+    undef_method :dispose_listener
+    alias_method :attr_dispose_listener=, :dispose_listener=
+    undef_method :dispose_listener=
+    
     class_module.module_eval {
       
       def draw_flags
@@ -192,6 +199,7 @@ module Org::Eclipse::Swt::Custom
       @gradient_percents = nil
       @gradient_vertical = false
       @background = nil
+      @dispose_listener = nil
       super(parent, check_style(style))
       @align = SWT::LEFT
       @h_indent = INDENT
@@ -226,24 +234,6 @@ module Org::Eclipse::Swt::Custom
         private
         alias_method :initialize_anonymous, :initialize
       end.new_local(self))
-      add_dispose_listener(Class.new(DisposeListener.class == Class ? DisposeListener : Object) do
-        extend LocalClass
-        include_class_members CLabel
-        include DisposeListener if DisposeListener.class == Module
-        
-        typesig { [DisposeEvent] }
-        define_method :widget_disposed do |event|
-          on_dispose(event)
-        end
-        
-        typesig { [Vararg.new(Object)] }
-        define_method :initialize do |*args|
-          super(*args)
-        end
-        
-        private
-        alias_method :initialize_anonymous, :initialize
-      end.new_local(self))
       add_traverse_listener(Class.new(TraverseListener.class == Class ? TraverseListener : Object) do
         extend LocalClass
         include_class_members CLabel
@@ -264,6 +254,24 @@ module Org::Eclipse::Swt::Custom
         private
         alias_method :initialize_anonymous, :initialize
       end.new_local(self))
+      @dispose_listener = Class.new(Listener.class == Class ? Listener : Object) do
+        extend LocalClass
+        include_class_members CLabel
+        include Listener if Listener.class == Module
+        
+        typesig { [Event] }
+        define_method :handle_event do |event|
+          on_dispose(event)
+        end
+        
+        typesig { [Vararg.new(Object)] }
+        define_method :initialize do |*args|
+          super(*args)
+        end
+        
+        private
+        alias_method :initialize_anonymous, :initialize
+      end.new_local(self)
       init_accessible
     end
     
@@ -490,8 +498,11 @@ module Org::Eclipse::Swt::Custom
       end.new_local(self))
     end
     
-    typesig { [DisposeEvent] }
+    typesig { [Event] }
     def on_dispose(event)
+      remove_listener(SWT::Dispose, @dispose_listener)
+      notify_listeners(SWT::Dispose, event)
+      event.attr_type = SWT::None
       @gradient_colors = nil
       @gradient_percents = nil
       @background_image = nil
@@ -939,6 +950,16 @@ module Org::Eclipse::Swt::Custom
     typesig { [String] }
     # Set the label's text.
     # The value <code>null</code> clears it.
+    # <p>
+    # Mnemonics are indicated by an '&amp;' that causes the next
+    # character to be the mnemonic.  When the user presses a
+    # key sequence that matches the mnemonic, focus is assigned
+    # to the control that follows the label. On most platforms,
+    # the mnemonic appears underlined but may be emphasised in a
+    # platform specific manner.  The mnemonic indicator character
+    # '&amp;' can be escaped by doubling it in the string, causing
+    # a single '&amp;' to be displayed.
+    # </p>
     # 
     # @param text the text to be displayed in the label or null
     # 

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2008 IBM Corporation and others.
+ * Copyright (c) 2000, 2009 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -30,6 +30,7 @@ import org.eclipse.swt.graphics.*;
  *
  * @see <a href="http://www.eclipse.org/swt/snippets/#table">Table, TableItem, TableColumn snippets</a>
  * @see <a href="http://www.eclipse.org/swt/">Sample code and further information</a>
+ * @noextend This class is not intended to be subclassed by clients.
  */
 
 public class TableItem extends Item {
@@ -680,7 +681,7 @@ public Rectangle getTextBounds (int index) {
 }
 
 void redraw () {
-	if (parent.currentItem == this || parent.drawCount != 0) return;
+	if (parent.currentItem == this || !parent.getDrawing ()) return;
 	int /*long*/ hwnd = parent.handle;
 	if (!OS.IsWindowVisible (hwnd)) return;
 	int index = parent.indexOf (this);
@@ -689,7 +690,7 @@ void redraw () {
 }
 
 void redraw (int column, boolean drawText, boolean drawImage) {
-	if (parent.currentItem == this || parent.drawCount != 0) return;
+	if (parent.currentItem == this || !parent.getDrawing ()) return;
 	int /*long*/ hwnd = parent.handle;
 	if (!OS.IsWindowVisible (hwnd)) return;
 	int index = parent.indexOf (this);

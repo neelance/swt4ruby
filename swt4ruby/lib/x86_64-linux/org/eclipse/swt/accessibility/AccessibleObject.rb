@@ -1,6 +1,6 @@
 require "rjava"
 
-# Copyright (c) 2000, 2007 IBM Corporation and others.
+# Copyright (c) 2000, 2009 IBM Corporation and others.
 # All rights reserved. This program and the accompanying materials
 # are made available under the terms of the Eclipse Public License v1.0
 # which accompanies this distribution, and is available at
@@ -210,7 +210,7 @@ module Org::Eclipse::Swt::Accessibility
         if ((listeners.attr_length).equal?(0))
           return parent_result
         end
-        event = AccessibleEvent.new(object)
+        event = AccessibleEvent.new(object.attr_accessible)
         event.attr_child_id = object.attr_id
         if (!(parent_result).equal?(0))
           length = OS.strlen(parent_result)
@@ -262,7 +262,7 @@ module Org::Eclipse::Swt::Accessibility
         if ((listeners.attr_length).equal?(0))
           return parent_result
         end
-        event = AccessibleControlEvent.new(object)
+        event = AccessibleControlEvent.new(object.attr_accessible)
         event.attr_child_id = object.attr_id
         if (!(parent_result).equal?(0))
           length = OS.strlen(parent_result)
@@ -328,7 +328,7 @@ module Org::Eclipse::Swt::Accessibility
         OS.memmove(parent_y, y, 4)
         OS.memmove(parent_width, width, 4)
         OS.memmove(parent_height, height, 4)
-        event = AccessibleControlEvent.new(object)
+        event = AccessibleControlEvent.new(object.attr_accessible)
         event.attr_child_id = object.attr_id
         event.attr_x = parent_x[0]
         event.attr_y = parent_y[0]
@@ -411,7 +411,7 @@ module Org::Eclipse::Swt::Accessibility
         parent_y = Array.typed(::Java::Int).new(1) { 0 }
         OS.memmove(parent_x, x, 4)
         OS.memmove(parent_y, y, 4)
-        event = AccessibleControlEvent.new(object)
+        event = AccessibleControlEvent.new(object.attr_accessible)
         event.attr_child_id = object.attr_id
         event.attr_x = parent_x[0]
         event.attr_y = parent_y[0]
@@ -490,7 +490,7 @@ module Org::Eclipse::Swt::Accessibility
         parent_height = Array.typed(::Java::Int).new(1) { 0 }
         OS.memmove(parent_width, width, 4)
         OS.memmove(parent_height, height, 4)
-        event = AccessibleControlEvent.new(object)
+        event = AccessibleControlEvent.new(object.attr_accessible)
         event.attr_child_id = object.attr_id
         event.attr_width = parent_width[0]
         event.attr_height = parent_height[0]
@@ -533,7 +533,7 @@ module Org::Eclipse::Swt::Accessibility
         if ((listeners.attr_length).equal?(0))
           return parent_result
         end
-        event = AccessibleControlEvent.new(object)
+        event = AccessibleControlEvent.new(object.attr_accessible)
         event.attr_child_id = object.attr_id
         # 64
         event.attr_x = RJava.cast_to_int(x)
@@ -631,7 +631,7 @@ module Org::Eclipse::Swt::Accessibility
         if ((listeners.attr_length).equal?(0))
           return parent_result
         end
-        event = AccessibleEvent.new(object)
+        event = AccessibleEvent.new(object.attr_accessible)
         event.attr_child_id = object.attr_id
         if (!(parent_result).equal?(0))
           length = OS.strlen(parent_result)
@@ -680,7 +680,7 @@ module Org::Eclipse::Swt::Accessibility
         if ((listeners.attr_length).equal?(0))
           return parent_result
         end
-        event = AccessibleEvent.new(object)
+        event = AccessibleEvent.new(object.attr_accessible)
         event.attr_child_id = object.attr_id
         if (!(parent_result).equal?(0))
           length = OS.strlen(parent_result)
@@ -729,7 +729,7 @@ module Org::Eclipse::Swt::Accessibility
         if ((listeners.attr_length).equal?(0))
           return parent_result
         end
-        event = AccessibleControlEvent.new(object)
+        event = AccessibleControlEvent.new(object.attr_accessible)
         event.attr_child_id = object.attr_id
         # 64
         event.attr_detail = RJava.cast_to_int(parent_result)
@@ -802,7 +802,7 @@ module Org::Eclipse::Swt::Accessibility
         end
         if (!(object.get_accessible_listeners.attr_length).equal?(0))
           listeners = object.get_control_listeners
-          event = AccessibleControlEvent.new(object)
+          event = AccessibleControlEvent.new(object.attr_accessible)
           event.attr_child_id = object.attr_id
           event.attr_detail = -1
           i = 0
@@ -869,6 +869,8 @@ module Org::Eclipse::Swt::Accessibility
               return ATK::ATK_ROLE_LIST_ITEM
             when ACC::ROLE_RADIOBUTTON
               return ATK::ATK_ROLE_RADIO_BUTTON
+            when ACC::ROLE_SPLITBUTTON
+              return ATK::ATK_ROLE_PUSH_BUTTON
             when ACC::ROLE_WINDOW
               return ATK::ATK_ROLE_WINDOW
             end
@@ -939,7 +941,7 @@ module Org::Eclipse::Swt::Accessibility
         end
         # int
         set = parent_result
-        event = AccessibleControlEvent.new(object)
+        event = AccessibleControlEvent.new(object.attr_accessible)
         event.attr_child_id = object.attr_id
         event.attr_detail = -1
         i = 0
@@ -1024,7 +1026,7 @@ module Org::Eclipse::Swt::Accessibility
         if ((listeners.attr_length).equal?(0))
           return parent_result
         end
-        event = AccessibleControlEvent.new(object)
+        event = AccessibleControlEvent.new(object.attr_accessible)
         event.attr_child_id = object.attr_id
         i = 0
         while i < listeners.attr_length
@@ -1065,7 +1067,7 @@ module Org::Eclipse::Swt::Accessibility
         if ((listeners.attr_length).equal?(0))
           return parent_result
         end
-        event = AccessibleControlEvent.new(object)
+        event = AccessibleControlEvent.new(object.attr_accessible)
         event.attr_child_id = object.attr_id
         i = 0
         while i < listeners.attr_length
@@ -1109,7 +1111,7 @@ module Org::Eclipse::Swt::Accessibility
         if ((listeners.attr_length).equal?(0))
           return parent_result
         end
-        event = AccessibleTextEvent.new(object)
+        event = AccessibleTextEvent.new(object.attr_accessible)
         event.attr_child_id = object.attr_id
         # 64
         event.attr_offset = RJava.cast_to_int(parent_result)
@@ -1203,7 +1205,7 @@ module Org::Eclipse::Swt::Accessibility
         if ((listeners.attr_length).equal?(0))
           return parent_result
         end
-        event = AccessibleTextEvent.new(object)
+        event = AccessibleTextEvent.new(object.attr_accessible)
         event.attr_child_id = object.attr_id
         i = 0
         while i < listeners.attr_length
@@ -1242,7 +1244,7 @@ module Org::Eclipse::Swt::Accessibility
         if ((listeners.attr_length).equal?(0))
           return 0
         end
-        event = AccessibleTextEvent.new(object)
+        event = AccessibleTextEvent.new(object.attr_accessible)
         event.attr_child_id = object.attr_id
         parent_start = Array.typed(::Java::Int).new(1) { 0 }
         parent_end = Array.typed(::Java::Int).new(1) { 0 }
@@ -1810,7 +1812,7 @@ module Org::Eclipse::Swt::Accessibility
       if ((control_listeners.attr_length).equal?(0))
         return parent_text
       end
-      event = AccessibleControlEvent.new(self)
+      event = AccessibleControlEvent.new(@accessible)
       event.attr_child_id = @id
       event.attr_result = parent_text
       i = 0
@@ -1988,7 +1990,7 @@ module Org::Eclipse::Swt::Accessibility
       if ((listeners.attr_length).equal?(0))
         return
       end
-      event = AccessibleControlEvent.new(self)
+      event = AccessibleControlEvent.new(@accessible)
       i = 0
       while i < listeners.attr_length
         listeners[i].get_children(event)

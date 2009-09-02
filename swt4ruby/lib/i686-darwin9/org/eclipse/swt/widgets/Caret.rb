@@ -1,6 +1,6 @@
 require "rjava"
 
-# Copyright (c) 2000, 2008 IBM Corporation and others.
+# Copyright (c) 2000, 2009 IBM Corporation and others.
 # All rights reserved. This program and the accompanying materials
 # are made available under the terms of the Eclipse Public License v1.0
 # which accompanies this distribution, and is available at
@@ -13,10 +13,7 @@ module Org::Eclipse::Swt::Widgets
     class_module.module_eval {
       include ::Java::Lang
       include ::Org::Eclipse::Swt::Widgets
-      include_const ::Org::Eclipse::Swt::Internal::Carbon, :OS
-      include_const ::Org::Eclipse::Swt::Internal::Carbon, :RGBColor
-      include_const ::Org::Eclipse::Swt::Internal::Carbon, :Rect
-      include_const ::Org::Eclipse::Swt::Internal::Carbon, :CGPoint
+      include ::Org::Eclipse::Swt::Internal::Cocoa
       include ::Org::Eclipse::Swt
       include ::Org::Eclipse::Swt::Graphics
     }
@@ -38,6 +35,7 @@ module Org::Eclipse::Swt::Widgets
   # @see <a href="http://www.eclipse.org/swt/snippets/#caret">Caret snippets</a>
   # @see <a href="http://www.eclipse.org/swt/examples.php">SWT Example: ControlExample, Canvas tab</a>
   # @see <a href="http://www.eclipse.org/swt/">Sample code and further information</a>
+  # @noextend This class is not intended to be subclassed by clients.
   class Caret < CaretImports.const_get :Widget
     include_class_members CaretImports
     
@@ -181,81 +179,22 @@ module Org::Eclipse::Swt::Widgets
       if (@parent.is_disposed)
         return false
       end
-      parent_handle = @parent.attr_handle
-      if (!@parent.is_drawing(parent_handle))
-        return false
-      end
       n_width = @width
       n_height = @height
       if (n_width <= 0)
         n_width = DEFAULT_WIDTH
       end
-      if (OS::VERSION >= 0x1040)
-        if (!(@image).nil?)
-          n_width = OS._cgimage_get_width(@image.attr_handle)
-          n_height = OS._cgimage_get_height(@image.attr_handle)
-        end
-        @parent.redraw_widget(@parent.attr_handle, @x, @y, n_width, n_height, false)
-        return true
+      if (!(@image).nil?)
+        size_ = @image.attr_handle.size
+        n_width = RJava.cast_to_int(size_.attr_width)
+        n_height = RJava.cast_to_int(size_.attr_height)
       end
-      window = OS._get_control_owner(parent_handle)
-      port = OS._get_window_port(window)
-      current_port = Array.typed(::Java::Int).new(1) { 0 }
-      OS._get_port(current_port)
-      OS._set_port(port)
-      old_clip = OS._new_rgn
-      visible_rgn = @parent.get_visible_region(parent_handle, true)
-      OS._get_clip(old_clip)
-      OS._set_clip(visible_rgn)
-      rect = Rect.new
-      OS._get_control_bounds(parent_handle, rect)
-      pt = CGPoint.new
-      content_view = Array.typed(::Java::Int).new(1) { 0 }
-      OS._hiview_find_by_id(OS._hiview_get_root(window), OS.k_hiview_window_content_id, content_view)
-      OS._hiview_convert_point(pt, OS._hiview_get_superview(parent_handle), content_view[0])
-      rect.attr_left += RJava.cast_to_int(pt.attr_x)
-      rect.attr_top += RJava.cast_to_int(pt.attr_y)
-      left = rect.attr_left + @x
-      top = rect.attr_top + @y
-      if ((@image).nil?)
-        OS._set_rect(rect, RJava.cast_to_short(left), RJava.cast_to_short(top), RJava.cast_to_short((left + n_width)), RJava.cast_to_short((top + n_height)))
-        color = RGBColor.new
-        color.attr_red = RJava.cast_to_short(0xffff)
-        color.attr_green = RJava.cast_to_short(0xffff)
-        color.attr_blue = RJava.cast_to_short(0xffff)
-        OS._rgbback_color(color)
-        OS._invert_rect(rect)
-      else
-        image_handle = @image.attr_handle
-        n_width = OS._cgimage_get_width(image_handle)
-        n_height = OS._cgimage_get_height(image_handle)
-        bpl = OS._cgimage_get_bytes_per_row(image_handle)
-        bounds = Rect.new
-        bounds.attr_right = RJava.cast_to_short(n_width)
-        bounds.attr_bottom = RJava.cast_to_short(n_height)
-        port_rect = Rect.new
-        OS._get_window_bounds(window, RJava.cast_to_short(OS.attr_k_window_content_rgn), port_rect)
-        left += port_rect.attr_left
-        top += port_rect.attr_top
-        OS._set_rect(rect, RJava.cast_to_short(left), RJava.cast_to_short(top), RJava.cast_to_short((left + n_width)), RJava.cast_to_short((top + n_height)))
-        g_world = Array.typed(::Java::Int).new(1) { 0 }
-        OS._new_gworld_from_ptr(g_world, OS.attr_k32argbpixel_format, bounds, 0, 0, 0, @image.attr_data, bpl)
-        cur_port = Array.typed(::Java::Int).new(1) { 0 }
-        cur_gworld = Array.typed(::Java::Int).new(1) { 0 }
-        OS._get_gworld(cur_port, cur_gworld)
-        OS._set_gworld(g_world[0], cur_gworld[0])
-        port_bit_map = OS._get_port_bit_map_for_copy_bits(port)
-        gworld_bit_map = OS._get_port_bit_map_for_copy_bits(g_world[0])
-        OS._offset_rgn(visible_rgn, port_rect.attr_left, port_rect.attr_top)
-        OS._copy_bits(gworld_bit_map, port_bit_map, bounds, rect, RJava.cast_to_short(OS.attr_not_src_xor), visible_rgn)
-        OS._offset_rgn(visible_rgn, RJava.cast_to_short(-port_rect.attr_left), RJava.cast_to_short(-port_rect.attr_top))
-        OS._set_gworld(cur_port[0], cur_gworld[0])
-        OS._dispose_gworld(g_world[0])
-      end
-      OS._set_clip(old_clip)
-      OS._dispose_rgn(visible_rgn)
-      OS._dispose_rgn(old_clip)
-      OS._set_port(current_port[0])
+      rect = NSRect.new
+      rect.attr_x = @x
+      rect.attr_y = @y
+      rect.attr_width = n_width
+      rect.attr_height = n_height
+      @parent.attr_view.set_needs_display_in_rect(rect)
       return true
     end
     
@@ -625,12 +564,12 @@ module Org::Eclipse::Swt::Widgets
     # <li>ERROR_WIDGET_DISPOSED - if the receiver has been disposed</li>
     # <li>ERROR_THREAD_INVALID_ACCESS - if not called from the thread that created the receiver</li>
     # </ul>
-    def set_size(size)
+    def set_size(size_)
       check_widget
-      if ((size).nil?)
+      if ((size_).nil?)
         error(SWT::ERROR_NULL_ARGUMENT)
       end
-      set_size(size.attr_x, size.attr_y)
+      set_size(size_.attr_x, size_.attr_y)
     end
     
     typesig { [::Java::Boolean] }

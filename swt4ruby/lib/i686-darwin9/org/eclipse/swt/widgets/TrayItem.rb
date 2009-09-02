@@ -1,6 +1,6 @@
 require "rjava"
 
-# Copyright (c) 2000, 2008 IBM Corporation and others.
+# Copyright (c) 2000, 2009 IBM Corporation and others.
 # All rights reserved. This program and the accompanying materials
 # are made available under the terms of the Eclipse Public License v1.0
 # which accompanies this distribution, and is available at
@@ -16,8 +16,6 @@ module Org::Eclipse::Swt::Widgets
       include ::Org::Eclipse::Swt
       include ::Org::Eclipse::Swt::Events
       include ::Org::Eclipse::Swt::Graphics
-      include_const ::Org::Eclipse::Swt::Internal::Carbon, :CGRect
-      include_const ::Org::Eclipse::Swt::Internal::Carbon, :OS
       include ::Org::Eclipse::Swt::Internal::Cocoa
     }
   end
@@ -39,6 +37,7 @@ module Org::Eclipse::Swt::Widgets
   # @see <a href="http://www.eclipse.org/swt/">Sample code and further information</a>
   # 
   # @since 3.0
+  # @noextend This class is not intended to be subclassed by clients.
   class TrayItem < TrayItemImports.const_get :Item
     include_class_members TrayItemImports
     
@@ -72,29 +71,17 @@ module Org::Eclipse::Swt::Widgets
     alias_method :attr_highlight=, :highlight=
     undef_method :highlight=
     
-    attr_accessor :handle
-    alias_method :attr_handle, :handle
-    undef_method :handle
-    alias_method :attr_handle=, :handle=
-    undef_method :handle=
-    
-    attr_accessor :ns_image
-    alias_method :attr_ns_image, :ns_image
-    undef_method :ns_image
-    alias_method :attr_ns_image=, :ns_image=
-    undef_method :ns_image=
+    attr_accessor :item
+    alias_method :attr_item, :item
+    undef_method :item
+    alias_method :attr_item=, :item=
+    undef_method :item=
     
     attr_accessor :view
     alias_method :attr_view, :view
     undef_method :view
     alias_method :attr_view=, :view=
     undef_method :view=
-    
-    attr_accessor :jni_ref
-    alias_method :attr_jni_ref, :jni_ref
-    undef_method :jni_ref
-    alias_method :attr_jni_ref=, :jni_ref=
-    undef_method :jni_ref=
     
     class_module.module_eval {
       const_set_lazy(:BORDER) { 8 }
@@ -136,10 +123,8 @@ module Org::Eclipse::Swt::Widgets
       @tool_tip_text = nil
       @visible = false
       @highlight = false
-      @handle = 0
-      @ns_image = 0
-      @view = 0
-      @jni_ref = 0
+      @item = nil
+      @view = nil
       super(parent, style)
       @visible = true
       @parent = parent
@@ -217,25 +202,27 @@ module Org::Eclipse::Swt::Widgets
     end
     
     typesig { [] }
-    def create_widget
-      status_bar = Cocoa.objc_msg_send(Cocoa::C_NSStatusBar, Cocoa::S_systemStatusBar)
-      @handle = Cocoa.objc_msg_send(status_bar, Cocoa::S_statusItemWithLength, 0)
-      if ((@handle).equal?(0))
+    def create_handle
+      status_bar = NSStatusBar.system_status_bar
+      @item = status_bar.status_item_with_length(0)
+      if ((@item).nil?)
         error(SWT::ERROR_NO_HANDLES)
       end
-      Cocoa.objc_msg_send(@handle, Cocoa::S_retain)
-      Cocoa.objc_msg_send(@handle, Cocoa::S_setHighlightMode, 1)
-      @jni_ref = OS._new_global_ref(self)
-      if ((@jni_ref).equal?(0))
-        SWT.error(SWT::ERROR_NO_HANDLES)
-      end
-      rect = NSRect.new
-      @view = Cocoa.objc_msg_send(Cocoa::C_NSStatusItemImageView, Cocoa::S_alloc)
-      if ((@view).equal?(0))
+      @item.retain
+      @item.set_highlight_mode(true)
+      @view = SWTImageView.new.alloc
+      if ((@view).nil?)
         error(SWT::ERROR_NO_HANDLES)
       end
-      @view = Cocoa.objc_msg_send(@view, Cocoa::S_initWithProc_frame_user_data, self.attr_display.attr_tray_item_proc, rect, @jni_ref)
-      Cocoa.objc_msg_send(@handle, Cocoa::S_setView, @view)
+      @view.init
+      @item.set_view(@view)
+    end
+    
+    typesig { [] }
+    def deregister
+      super
+      self.attr_display.remove_widget(@view)
+      self.attr_display.remove_widget(@view.cell)
     end
     
     typesig { [] }
@@ -246,15 +233,13 @@ module Org::Eclipse::Swt::Widgets
     
     typesig { [] }
     def get_location
-      rect = NSRect.new
-      Cocoa.objc_msg_send_stret(rect, @view, Cocoa::S_frame)
-      window_rect = NSRect.new
-      Cocoa.objc_msg_send_stret(window_rect, Cocoa.objc_msg_send(@view, Cocoa::S_window), Cocoa::S_frame)
-      rect.attr_x += rect.attr_width / 2
-      rect.attr_y += rect.attr_height
-      Cocoa.objc_msg_send_stret(rect, @view, Cocoa::S_convertRect_toView, rect, 0)
-      rect.attr_x += window_rect.attr_x
-      return Point.new(RJava.cast_to_int(rect.attr_x), RJava.cast_to_int(rect.attr_y))
+      rect = @view.frame
+      window_rect = @view.window.frame
+      pt = NSPoint.new
+      pt.attr_x = rect.attr_width / 2
+      pt = @view.convert_point_from_view_(pt, nil)
+      pt.attr_x += window_rect.attr_x
+      return Point.new(RJava.cast_to_int(pt.attr_x), RJava.cast_to_int(pt.attr_y))
     end
     
     typesig { [] }
@@ -321,27 +306,31 @@ module Org::Eclipse::Swt::Widgets
     end
     
     typesig { [] }
+    def register
+      super
+      self.attr_display.add_widget(@view, self)
+      self.attr_display.add_widget((@view).cell, self)
+    end
+    
+    typesig { [] }
     def release_handle
       super
       @parent = nil
-      @handle = 0
+      if (!(@item).nil?)
+        @item.release
+      end
+      if (!(@view).nil?)
+        @view.release
+      end
+      @item = nil
+      @view = nil
     end
     
     typesig { [] }
     def release_widget
-      status_bar = Cocoa.objc_msg_send(Cocoa::C_NSStatusBar, Cocoa::S_systemStatusBar)
-      Cocoa.objc_msg_send(status_bar, Cocoa::S_removeStatusItem, @handle)
-      Cocoa.objc_msg_send(@ns_image, Cocoa::S_release, @handle)
-      if (!(@ns_image).equal?(0))
-        Cocoa.objc_msg_send(@ns_image, Cocoa::S_release)
-      end
-      if (!(@view).equal?(0))
-        Cocoa.objc_msg_send(@view, Cocoa::S_release)
-      end
-      if (!(@jni_ref).equal?(0))
-        OS._delete_global_ref(@jni_ref)
-      end
-      @handle = @ns_image = @view = @jni_ref = 0
+      super
+      status_bar = NSStatusBar.system_status_bar
+      status_bar.remove_status_item(@item)
     end
     
     typesig { [MenuDetectListener] }
@@ -420,28 +409,27 @@ module Org::Eclipse::Swt::Widgets
         error(SWT::ERROR_INVALID_ARGUMENT)
       end
       super(image)
-      if (!(@ns_image).equal?(0))
-        Cocoa.objc_msg_send(@ns_image, Cocoa::S_release, @ns_image)
+      # double
+      width = 0
+      if ((image).nil?)
+        @view.set_image(nil)
+      else
+        # Feature in Cocoa.  If the NSImage object being set into the view is
+        # the same NSImage object that is already there then the new image is
+        # not taken.  This results in the view's image not changing even if the
+        # NSImage object's content has changed since it was last set into the
+        # view.  The workaround is to temporarily set the view's image to null
+        # so that the new image will then be taken.
+        current = @view.image
+        if (!(current).nil? && (current.attr_id).equal?(image.attr_handle.attr_id))
+          @view.set_image(nil)
+        end
+        @view.set_image(image.attr_handle)
+        if (@visible)
+          width = image.attr_handle.size.attr_width + BORDER
+        end
       end
-      @ns_image = 0
-      if (!(image).nil?)
-        rect = CGRect.new
-        rect.attr_width = OS._cgimage_get_width(image.attr_handle)
-        rect.attr_height = OS._cgimage_get_height(image.attr_handle)
-        size = NSSize.new
-        size.attr_width = rect.attr_width
-        size.attr_height = rect.attr_height
-        @ns_image = Cocoa.objc_msg_send(Cocoa::C_NSImage, Cocoa::S_alloc)
-        @ns_image = Cocoa.objc_msg_send(@ns_image, Cocoa::S_initWithSize, size)
-        Cocoa.objc_msg_send(@ns_image, Cocoa::S_lockFocus)
-        image_context = Cocoa.objc_msg_send(Cocoa::C_NSGraphicsContext, Cocoa::S_currentContext)
-        image_context = Cocoa.objc_msg_send(image_context, Cocoa::S_graphicsPort)
-        OS._cgcontext_draw_image(image_context, rect, image.attr_handle)
-        Cocoa.objc_msg_send(@ns_image, Cocoa::S_unlockFocus)
-      end
-      Cocoa.objc_msg_send(@view, Cocoa::S_setImage, @ns_image)
-      width = !(image).nil? && @visible ? OS._cgimage_get_width(image.attr_handle) + BORDER : 0
-      Cocoa.objc_msg_send(@handle, Cocoa::S_setLength, width)
+      @item.set_length(width)
     end
     
     typesig { [ToolTip] }
@@ -471,9 +459,18 @@ module Org::Eclipse::Swt::Widgets
     
     typesig { [String] }
     # Sets the receiver's tool tip text to the argument, which
-    # may be null indicating that no tool tip text should be shown.
+    # may be null indicating that the default tool tip for the
+    # control will be shown. For a control that has a default
+    # tool tip, such as the Tree control on Windows, setting
+    # the tool tip text to an empty string replaces the default,
+    # causing no tool tip text to be shown.
+    # <p>
+    # The mnemonic indicator (character '&amp;') is not displayed in a tool tip.
+    # To display a single '&amp;' in the tool tip, the character '&amp;' can be
+    # escaped by doubling it in the string.
+    # </p>
     # 
-    # @param value the new tool tip text (or null)
+    # @param string the new tool tip text (or null)
     # 
     # @exception SWTException <ul>
     # <li>ERROR_WIDGET_DISPOSED - if the receiver has been disposed</li>
@@ -487,15 +484,14 @@ module Org::Eclipse::Swt::Widgets
     
     typesig { [String] }
     def __set_tool_tip_text(string)
-      ptr = 0
       if (!(string).nil?)
         chars = CharArray.new(string.length)
         string.get_chars(0, chars.attr_length, chars, 0)
-        ptr = OS._cfstring_create_with_characters(0, chars, chars.attr_length)
-      end
-      Cocoa.objc_msg_send(@view, Cocoa::S_setToolTip, ptr)
-      if (!(ptr).equal?(0))
-        OS._cfrelease(ptr)
+        length_ = fix_mnemonic(chars)
+        str = NSString.string_with_characters(chars, length_)
+        @view.set_tool_tip(str)
+      else
+        @view.set_tool_tip(nil)
       end
     end
     
@@ -521,51 +517,145 @@ module Org::Eclipse::Swt::Widgets
         end
       end
       @visible = visible
-      width = !(self.attr_image).nil? && visible ? OS._cgimage_get_width(self.attr_image.attr_handle) + BORDER : 0
-      Cocoa.objc_msg_send(@handle, Cocoa::S_setLength, width)
+      # double
+      width = !(self.attr_image).nil? && visible ? self.attr_image.attr_handle.size.attr_width + BORDER : 0
+      @item.set_length(width)
       if (!visible)
         send_event(SWT::Hide)
       end
     end
     
+    typesig { [Menu] }
+    def show_menu(menu)
+      self.attr_display.attr_tray_item_menu = menu
+      @item.pop_up_status_item_menu(menu.attr_ns_menu)
+    end
+    
     typesig { [] }
     def show_menu
       __set_tool_tip_text(nil)
+      display = self.attr_display
+      display.attr_current_tray_item = self
       send_event(SWT::MenuDetect)
-      if (is_disposed)
-        return
+      if (!is_disposed)
+        display.run_popups
       end
-      self.attr_display.run_popups
+      display.attr_current_tray_item = nil
       if (is_disposed)
         return
       end
       __set_tool_tip_text(@tool_tip_text)
     end
     
-    typesig { [::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int] }
-    def tray_item_proc(target, user_data, selector, arg0)
-      case (selector)
-      when 0
-        mask = Cocoa.objc_msg_send(arg0, Cocoa::S_modifierFlags) & Cocoa::NSDeviceIndependentModifierFlagsMask
-        if ((mask).equal?(Cocoa::NSControlKeyMask))
-          show_menu
-        else
-          @highlight = true
-          Cocoa.objc_msg_send(@view, Cocoa::S_setNeedsDisplay, 1)
-          click_count = Cocoa.objc_msg_send(arg0, Cocoa::S_clickCount)
-          post_event((click_count).equal?(2) ? SWT::DefaultSelection : SWT::Selection)
-        end
-      when 1
-        @highlight = false
-        Cocoa.objc_msg_send(@view, Cocoa::S_setNeedsDisplay, 1)
-      when 2
+    typesig { [] }
+    def display_menu
+      if (@highlight)
+        @view.display
+        self.attr_display.attr_tray_item_menu = nil
         show_menu
-      when 3
-        rect = NSRect.new
-        Cocoa.memcpy(rect, arg0, NSRect.attr_sizeof)
-        Cocoa.objc_msg_send(@handle, Cocoa::S_drawStatusBarBackgroundInRect_withHighlight, rect, @highlight ? 1 : 0)
+        if (!(self.attr_display.attr_tray_item_menu).nil?)
+          self.attr_display.attr_tray_item_menu = nil
+          @highlight = false
+          @view.set_needs_display(true)
+        end
       end
-      return 0
+    end
+    
+    typesig { [NSEvent] }
+    def should_show_menu(event)
+      if (!hooks(SWT::MenuDetect))
+        return false
+      end
+      # 64
+      case (RJava.cast_to_int(event.type))
+      when OS::NSRightMouseDown
+        return true
+      when OS::NSLeftMouseDown
+        if (!(hooks(SWT::Selection) || hooks(SWT::DefaultSelection)))
+          return true
+        end
+        if (((event.modifier_flags & OS::NSDeviceIndependentModifierFlagsMask)).equal?(OS::NSControlKeyMask))
+          return true
+        end
+        return false
+      when OS::NSLeftMouseDragged, OS::NSRightMouseDragged
+        return true
+      end
+      return false
+    end
+    
+    typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
+    # long
+    # long
+    # long
+    def mouse_down(id, sel, the_event)
+      ns_event = NSEvent.new(the_event)
+      @highlight = true
+      @view.set_needs_display(true)
+      if (should_show_menu(ns_event))
+        display_menu
+      end
+    end
+    
+    typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
+    # long
+    # long
+    # long
+    def mouse_dragged(id, sel, the_event)
+      ns_event = NSEvent.new(the_event)
+      frame_ = @view.frame
+      @highlight = OS._nspoint_in_rect(ns_event.location_in_window, frame_)
+      @view.set_needs_display(true)
+      if (should_show_menu(ns_event))
+        display_menu
+      end
+    end
+    
+    typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
+    # long
+    # long
+    # long
+    def mouse_up(id, sel, the_event)
+      if (@highlight)
+        ns_event = NSEvent.new(the_event)
+        if ((ns_event.type).equal?(OS::NSLeftMouseUp))
+          post_event((ns_event.click_count).equal?(2) ? SWT::DefaultSelection : SWT::Selection)
+        end
+      end
+      @highlight = false
+      @view.set_needs_display(true)
+    end
+    
+    typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
+    # long
+    # long
+    # long
+    def right_mouse_down(id, sel, the_event)
+      mouse_down(id, sel, the_event)
+    end
+    
+    typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
+    # long
+    # long
+    # long
+    def right_mouse_up(id, sel, the_event)
+      mouse_up(id, sel, the_event)
+    end
+    
+    typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
+    # long
+    # long
+    # long
+    def right_mouse_dragged(id, sel, the_event)
+      mouse_dragged(id, sel, the_event)
+    end
+    
+    typesig { [::Java::Int, ::Java::Int, NSRect] }
+    # long
+    # long
+    def draw_rect(id, sel, rect)
+      @item.draw_status_bar_background_in_rect(rect, @highlight)
+      super(id, sel, rect)
     end
     
     private

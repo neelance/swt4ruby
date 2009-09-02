@@ -1,6 +1,6 @@
 require "rjava"
 
-# Copyright (c) 2000, 2004 IBM Corporation and others.
+# Copyright (c) 2000, 2008 IBM Corporation and others.
 # All rights reserved. This program and the accompanying materials
 # are made available under the terms of the Eclipse Public License v1.0
 # which accompanies this distribution, and is available at
@@ -38,6 +38,7 @@ module Org::Eclipse::Swt::Internal::Gtk
     alias_method :attr_send_event=, :send_event=
     undef_method :send_event=
     
+    # @field cast=(Display *)
     # int
     attr_accessor :display
     alias_method :attr_display, :display
@@ -45,6 +46,7 @@ module Org::Eclipse::Swt::Internal::Gtk
     alias_method :attr_display=, :display=
     undef_method :display=
     
+    # @field cast=(Window)
     # int
     attr_accessor :window
     alias_method :attr_window, :window
@@ -52,6 +54,7 @@ module Org::Eclipse::Swt::Internal::Gtk
     alias_method :attr_window=, :window=
     undef_method :window=
     
+    # @field cast=(Atom)
     # int
     attr_accessor :message_type
     alias_method :attr_message_type, :message_type
@@ -65,6 +68,7 @@ module Org::Eclipse::Swt::Internal::Gtk
     alias_method :attr_format=, :format=
     undef_method :format=
     
+    # @field accessor=data.l,cast=(long *)
     # int
     attr_accessor :data
     alias_method :attr_data, :data

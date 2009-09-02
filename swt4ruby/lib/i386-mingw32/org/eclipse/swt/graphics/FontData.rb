@@ -1,6 +1,6 @@
 require "rjava"
 
-# Copyright (c) 2000, 2008 IBM Corporation and others.
+# Copyright (c) 2000, 2009 IBM Corporation and others.
 # All rights reserved. This program and the accompanying materials
 # are made available under the terms of the Eclipse Public License v1.0
 # which accompanies this distribution, and is available at
@@ -703,9 +703,10 @@ module Org::Eclipse::Swt::Graphics
     # 
     # @see FontData
     def to_s
-      buffer = StringBuffer.new
+      buffer = StringBuffer.new(128)
       buffer.append("1|") # $NON-NLS-1$
-      buffer.append(get_name)
+      name = get_name
+      buffer.append(name)
       buffer.append("|") # $NON-NLS-1$
       buffer.append(get_height_f)
       buffer.append("|") # $NON-NLS-1$
@@ -738,7 +739,7 @@ module Org::Eclipse::Swt::Graphics
       buffer.append("|") # $NON-NLS-1$
       buffer.append(@data.attr_lf_pitch_and_family)
       buffer.append("|") # $NON-NLS-1$
-      buffer.append(get_name)
+      buffer.append(name)
       return buffer.to_s
     end
     

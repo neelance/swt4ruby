@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2006 IBM Corporation and others. All rights reserved.
+ * Copyright (c) 2000, 2008 IBM Corporation and others. All rights reserved.
  * The contents of this file are made available under the terms
  * of the GNU Lesser General Public License (LGPL) Version 2.1 that
  * accompanies this distribution (lgpl-v21.txt).  The LGPL is also
@@ -144,6 +144,7 @@ public static final long /*int*/ GTK_ACCESSIBLE (long /*int*/ handle) {
 		lock.unlock();
 	}
 }
+/** @param object cast=(AtkObject *) */
 public static final native void _atk_focus_tracker_notify (long /*int*/ object);
 public static final void atk_focus_tracker_notify (long /*int*/ object) {
 	lock.lock();
@@ -162,6 +163,10 @@ public static final long /*int*/ atk_get_default_registry () {
 		lock.unlock();
 	}
 }
+/**
+ * @param factory cast=(AtkObjectFactory *)
+ * @param obj cast=(GObject *)
+ */
 public static final native long /*int*/ _atk_object_factory_create_accessible (long /*int*/ factory, long /*int*/ obj);
 public static final long /*int*/ atk_object_factory_create_accessible (long /*int*/ factory, long /*int*/ obj) {
 	lock.lock();
@@ -171,6 +176,7 @@ public static final long /*int*/ atk_object_factory_create_accessible (long /*in
 		lock.unlock();
 	}
 }
+/** @param factory cast=(AtkObjectFactory *) */
 public static final native long /*int*/ _atk_object_factory_get_accessible_type (long /*int*/ factory);
 public static final long /*int*/ atk_object_factory_get_accessible_type (long /*int*/ factory) {
 	lock.lock();
@@ -180,6 +186,10 @@ public static final long /*int*/ atk_object_factory_get_accessible_type (long /*
 		lock.unlock();
 	}
 }
+/**
+ * @param accessible cast=(AtkObject *)
+ * @param data cast=(gpointer)
+ */
 public static final native void _atk_object_initialize (long /*int*/ accessible, long /*int*/ data);
 public static final void atk_object_initialize (long /*int*/ accessible, long /*int*/ data) {
 	lock.lock();
@@ -189,6 +199,7 @@ public static final void atk_object_initialize (long /*int*/ accessible, long /*
 		lock.unlock();
 	}
 }
+/** @param accessible cast=(AtkObject *) */
 public static final native long /*int*/ _atk_object_ref_relation_set (long /*int*/ accessible);
 public static final long /*int*/ atk_object_ref_relation_set (long /*int*/ accessible) {
 	lock.lock();
@@ -198,6 +209,10 @@ public static final long /*int*/ atk_object_ref_relation_set (long /*int*/ acces
 		lock.unlock();
 	}
 }
+/**
+ * @param registry cast=(AtkRegistry *)
+ * @param type cast=(GType)
+ */
 public static final native long /*int*/ _atk_registry_get_factory (long /*int*/ registry, long /*int*/ type);
 public static final long /*int*/ atk_registry_get_factory (long /*int*/ registry, long /*int*/ type) {
 	lock.lock();
@@ -207,6 +222,11 @@ public static final long /*int*/ atk_registry_get_factory (long /*int*/ registry
 		lock.unlock();
 	}
 }
+/**
+ * @param registry cast=(AtkRegistry *)
+ * @param type cast=(GType)
+ * @param factory_type cast=(GType)
+ */
 public static final native void _atk_registry_set_factory_type (long /*int*/ registry, long /*int*/ type, long /*int*/ factory_type);
 public static final void atk_registry_set_factory_type (long /*int*/ registry, long /*int*/ type, long /*int*/ factory_type) {
 	lock.lock();
@@ -216,6 +236,7 @@ public static final void atk_registry_set_factory_type (long /*int*/ registry, l
 		lock.unlock();
 	}
 }
+/** @param set cast=(AtkRelationSet *) */
 public static final native int _atk_relation_set_get_n_relations (long /*int*/ set);
 public static final int atk_relation_set_get_n_relations (long /*int*/ set) {
 	lock.lock();
@@ -225,6 +246,7 @@ public static final int atk_relation_set_get_n_relations (long /*int*/ set) {
 		lock.unlock();
 	}
 }
+/** @param set cast=(AtkRelationSet *) */
 public static final native long /*int*/ _atk_relation_set_get_relation (long /*int*/ set, int i);
 public static final long /*int*/ atk_relation_set_get_relation (long /*int*/ set, int i) {
 	lock.lock();
@@ -234,6 +256,10 @@ public static final long /*int*/ atk_relation_set_get_relation (long /*int*/ set
 		lock.unlock();
 	}
 }
+/**
+ * @param set cast=(AtkRelationSet *)
+ * @param relation cast=(AtkRelation *)
+ */
 public static final native void _atk_relation_set_remove (long /*int*/ set, long /*int*/ relation);
 public static final void atk_relation_set_remove (long /*int*/ set, long /*int*/ relation) {
 	lock.lock();
@@ -243,6 +269,10 @@ public static final void atk_relation_set_remove (long /*int*/ set, long /*int*/
 		lock.unlock();
 	}
 }
+/**
+ * @param set cast=(AtkStateSet *)
+ * @param type cast=(AtkStateType)
+ */
 public static final native boolean _atk_state_set_add_state (long /*int*/ set, int type);
 public static final boolean atk_state_set_add_state (long /*int*/ set, int type) {
 	lock.lock();

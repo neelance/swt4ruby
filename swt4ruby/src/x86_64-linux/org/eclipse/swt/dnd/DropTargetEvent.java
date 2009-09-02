@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2008 IBM Corporation and others.
+ * Copyright (c) 2000, 2009 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -35,6 +35,7 @@ public class DropTargetEvent extends TypedEvent {
 	 * @see DND#DROP_MOVE
 	 * @see DND#DROP_COPY
 	 * @see DND#DROP_LINK
+	 * @see DND#DROP_DEFAULT
 	 */
 	public int detail;
 	
@@ -46,6 +47,7 @@ public class DropTargetEvent extends TypedEvent {
 	 * @see DND#DROP_MOVE
 	 * @see DND#DROP_COPY
 	 * @see DND#DROP_LINK
+	 * @see DND#DROP_DEFAULT
 	 */
 	public int operations;
 	
@@ -113,5 +115,32 @@ void updateEvent(DNDEvent e) {
 	e.operations = this.operations;
 	e.feedback = this.feedback;
 	e.item = this.item;
+}
+/**
+ * Returns a string containing a concise, human-readable
+ * description of the receiver.
+ *
+ * @return a string representation of the event
+ */
+public String toString() {
+	String string = super.toString ();
+	StringBuffer sb = new StringBuffer();
+	sb.append(string.substring (0, string.length() - 1)); // remove trailing '}'
+	sb.append(" x="); sb.append(x);
+	sb.append(" y="); sb.append(y);
+	sb.append(" item="); sb.append(item);
+	sb.append(" operations="); sb.append(operations);
+	sb.append(" operation="); sb.append(detail);
+	sb.append(" feedback="); sb.append(feedback);
+	sb.append(" dataTypes={ ");
+	if (dataTypes != null) {
+		for (int i = 0; i < dataTypes.length; i++) {
+			sb.append(dataTypes[i].type); sb.append(' ');
+		}
+	}
+	sb.append('}');
+	sb.append(" currentDataType="); sb.append(currentDataType != null ? currentDataType.type : '0');
+	sb.append('}');
+	return sb.toString();
 }
 }

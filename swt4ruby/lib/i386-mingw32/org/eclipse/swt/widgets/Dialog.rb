@@ -1,6 +1,6 @@
 require "rjava"
 
-# Copyright (c) 2000, 2008 IBM Corporation and others.
+# Copyright (c) 2000, 2009 IBM Corporation and others.
 # All rights reserved. This program and the accompanying materials
 # are made available under the terms of the Eclipse Public License v1.0
 # which accompanies this distribution, and is available at
@@ -64,7 +64,7 @@ module Org::Eclipse::Swt::Widgets
   # and behavior of the instance, including its modality.
   # <dl>
   # <dt><b>Styles:</b></dt>
-  # <dd>APPLICATION_MODAL, PRIMARY_MODAL, SYSTEM_MODAL</dd>
+  # <dd>APPLICATION_MODAL, PRIMARY_MODAL, SYSTEM_MODAL, SHEET</dd>
   # <dt><b>Events:</b></dt>
   # <dd>(none)</dd>
   # </dl>
@@ -186,7 +186,14 @@ module Org::Eclipse::Swt::Widgets
     class_module.module_eval {
       typesig { [Shell, ::Java::Int] }
       def check_style(parent, style)
-        if (((style & (SWT::PRIMARY_MODAL | SWT::APPLICATION_MODAL | SWT::SYSTEM_MODAL))).equal?(0))
+        mask = SWT::PRIMARY_MODAL | SWT::APPLICATION_MODAL | SWT::SYSTEM_MODAL
+        if (!((style & SWT::SHEET)).equal?(0))
+          style &= ~SWT::SHEET
+          if (((style & mask)).equal?(0))
+            style |= (parent).nil? ? SWT::APPLICATION_MODAL : SWT::PRIMARY_MODAL
+          end
+        end
+        if (((style & mask)).equal?(0))
           style |= SWT::APPLICATION_MODAL
         end
         style &= ~SWT::MIRRORED

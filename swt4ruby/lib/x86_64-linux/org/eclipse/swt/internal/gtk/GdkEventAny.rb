@@ -1,6 +1,6 @@
 require "rjava"
 
-# Copyright (c) 2000, 2006 IBM Corporation and others. All rights reserved.
+# Copyright (c) 2000, 2008 IBM Corporation and others. All rights reserved.
 # The contents of this file are made available under the terms
 # of the GNU Lesser General Public License (LGPL) Version 2.1 that
 # accompanies this distribution (lgpl-v21.txt).  The LGPL is also
@@ -23,6 +23,7 @@ module Org::Eclipse::Swt::Internal::Gtk
   class GdkEventAny < GdkEventAnyImports.const_get :GdkEvent
     include_class_members GdkEventAnyImports
     
+    # @field cast=(GdkWindow *)
     # int
     attr_accessor :window
     alias_method :attr_window, :window
@@ -30,6 +31,7 @@ module Org::Eclipse::Swt::Internal::Gtk
     alias_method :attr_window=, :window=
     undef_method :window=
     
+    # @field cast=(gint8)
     attr_accessor :send_event
     alias_method :attr_send_event, :send_event
     undef_method :send_event

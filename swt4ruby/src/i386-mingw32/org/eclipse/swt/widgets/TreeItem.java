@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2008 IBM Corporation and others.
+ * Copyright (c) 2000, 2009 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -31,6 +31,7 @@ import org.eclipse.swt.graphics.*;
  *
  * @see <a href="http://www.eclipse.org/swt/snippets/#tree">Tree, TreeItem, TreeColumn snippets</a>
  * @see <a href="http://www.eclipse.org/swt/">Sample code and further information</a>
+ * @noextend This class is not intended to be subclassed by clients.
  */
 
 public class TreeItem extends Item {
@@ -964,7 +965,7 @@ public int indexOf (TreeItem item) {
 }
 
 void redraw () {
-	if (parent.currentItem == this || parent.drawCount != 0) return;
+	if (parent.currentItem == this || !parent.getDrawing ()) return;
 	int /*long*/ hwnd = parent.handle;
 	if (!OS.IsWindowVisible (hwnd)) return;
 	/*
@@ -988,7 +989,7 @@ void redraw () {
 }
 
 void redraw (int column, boolean drawText, boolean drawImage) {
-	if (parent.currentItem == this || parent.drawCount != 0) return;
+	if (parent.currentItem == this || !parent.getDrawing ()) return;
 	int /*long*/ hwnd = parent.handle;
 	if (!OS.IsWindowVisible (hwnd)) return;
 	boolean fullImage = column == 0 && drawText && drawImage;
@@ -1236,7 +1237,7 @@ public void setExpanded (boolean expanded) {
 		if (!OS.GetScrollInfo (hwnd, OS.SB_HORZ, oldInfo)) {
 			oldInfo = null;
 		}
-		if (parent.drawCount == 0 && OS.IsWindowVisible (hwnd)) {
+		if (parent.getDrawing () && OS.IsWindowVisible (hwnd)) {
 			boolean noAnimate = true;
 			count = (int)/*64*/OS.SendMessage (hwnd, OS.TVM_GETVISIBLECOUNT, 0, 0);
 			rects = new RECT [count + 1];

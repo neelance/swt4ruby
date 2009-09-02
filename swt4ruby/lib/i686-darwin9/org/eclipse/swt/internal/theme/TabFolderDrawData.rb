@@ -13,11 +13,8 @@ module Org::Eclipse::Swt::Internal::Theme
     class_module.module_eval {
       include ::Java::Lang
       include ::Org::Eclipse::Swt::Internal::Theme
-      include_const ::Org::Eclipse::Swt, :SWT
+      include ::Org::Eclipse::Swt
       include ::Org::Eclipse::Swt::Graphics
-      include_const ::Org::Eclipse::Swt::Internal::Carbon, :OS
-      include_const ::Org::Eclipse::Swt::Internal::Carbon, :HIThemeTabPaneDrawInfo
-      include_const ::Org::Eclipse::Swt::Internal::Carbon, :CGRect
     }
   end
   
@@ -73,71 +70,6 @@ module Org::Eclipse::Swt::Internal::Theme
       if ((SWT.get_platform == "gtk"))
         @spacing = -2
       end
-    end
-    
-    typesig { [Theme, SwtGC, Rectangle] }
-    def draw(theme, gc, bounds)
-      metric = Array.typed(::Java::Int).new(1) { 0 }
-      OS._get_theme_metric(OS.attr_k_theme_metric_large_tab_height, metric)
-      tab_height = metric[0]
-      OS._get_theme_metric(OS.attr_k_theme_metric_large_tab_caps_width, metric)
-      caps_width = metric[0]
-      rect = CGRect.new
-      rect.attr_x = bounds.attr_x
-      rect.attr_y = bounds.attr_y
-      rect.attr_width = bounds.attr_width
-      rect.attr_height = bounds.attr_height
-      if (!((self.attr_style & SWT::BOTTOM)).equal?(0))
-        rect.attr_height -= tab_height / 2
-      else
-        rect.attr_y += (caps_width + tab_height) / 2
-        rect.attr_height -= (caps_width + tab_height) / 2
-      end
-      info = get_info
-      OS._hitheme_draw_tab_pane(rect, info, gc.attr_handle, OS.attr_k_hitheme_orientation_normal)
-      if (!(@tabs_area).nil?)
-        @tabs_area.attr_x = bounds.attr_x + caps_width + ((bounds.attr_width - caps_width * 2) - @tabs_width) / 2
-        @tabs_area.attr_y = bounds.attr_y
-        @tabs_area.attr_width = bounds.attr_width - caps_width * 2
-        @tabs_area.attr_height = tab_height
-        if (!((self.attr_style & SWT::BOTTOM)).equal?(0))
-          @tabs_area.attr_y += bounds.attr_height - tab_height
-        else
-          @tabs_area.attr_y += caps_width / 2
-        end
-      end
-    end
-    
-    typesig { [] }
-    def get_info
-      state = self.attr_state[DrawData::WIDGET_WHOLE]
-      info = HIThemeTabPaneDrawInfo.new
-      info.attr_version = 1
-      info.attr_direction = OS.attr_k_theme_tab_north
-      if (!((self.attr_style & SWT::BOTTOM)).equal?(0))
-        info.attr_direction = OS.attr_k_theme_tab_south
-      end
-      if (!((self.attr_style & SWT::TOP)).equal?(0))
-        info.attr_direction = OS.attr_k_theme_tab_north
-      end
-      if (!((state & DrawData::PRESSED)).equal?(0))
-        info.attr_state = OS.attr_k_theme_state_pressed
-      else
-        if (!((state & DrawData::ACTIVE)).equal?(0))
-          info.attr_state = ((state & DrawData::DISABLED)).equal?(0) ? OS.attr_k_theme_state_active : OS.attr_k_theme_state_unavailable
-        else
-          info.attr_state = ((state & DrawData::DISABLED)).equal?(0) ? OS.attr_k_theme_state_inactive : OS.attr_k_theme_state_unavailable_inactive
-        end
-      end
-      return info
-    end
-    
-    typesig { [Theme, Point, Rectangle] }
-    def hit(theme, position, bounds)
-      if (!bounds.contains(position))
-        return DrawData::WIDGET_NOWHERE
-      end
-      return DrawData::WIDGET_WHOLE
     end
     
     private

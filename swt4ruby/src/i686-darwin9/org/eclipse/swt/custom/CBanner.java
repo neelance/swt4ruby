@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2008 IBM Corporation and others.
+ * Copyright (c) 2000, 2009 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -39,6 +39,7 @@ import org.eclipse.swt.*;
  * @see <a href="http://www.eclipse.org/swt/">Sample code and further information</a>
  *
  * @since 3.0
+ * @noextend This class is not intended to be subclassed by clients.
  */
 
 public class CBanner extends Composite {	
@@ -61,6 +62,7 @@ public class CBanner extends Composite {
 	Cursor resizeCursor;
 	boolean dragging = false;
 	int rightDragDisplacement = 0;
+	Listener listener;
 	
 	static final int OFFSCREEN = -200;
 	static final int BORDER_BOTTOM = 2;
@@ -102,11 +104,11 @@ public CBanner(Composite parent, int style) {
 	super.setLayout(new CBannerLayout());
 	resizeCursor = new Cursor(getDisplay(), SWT.CURSOR_SIZEWE);
 	
-	Listener listener = new Listener() {
+	listener = new Listener() {
 		public void handleEvent(Event e) {
 			switch (e.type) {
 				case SWT.Dispose:
-					onDispose(); break;
+					onDispose(e); break;
 				case SWT.MouseDown:
 					onMouseDown (e.x, e.y); break;
 				case SWT.MouseExit:
@@ -151,6 +153,17 @@ static int[] bezier(int x0, int y0, int x1, int y1, int x2, int y2, int x3, int 
 static int checkStyle (int style) {
 	return SWT.NONE;
 }
+/*
+* This class was not intended to be subclassed but this restriction
+* cannot be enforced without breaking backward compatibility.
+*/
+//protected void checkSubclass () {
+//	String name = getClass ().getName ();
+//	int index = name.lastIndexOf ('.');
+//	if (!name.substring (0, index + 1).equals ("org.eclipse.swt.custom.")) {
+//		SWT.error (SWT.ERROR_INVALID_SUBCLASS);
+//	}
+//}
 /**
 * Returns the Control that appears on the bottom side of the banner.
 * 
@@ -243,7 +256,11 @@ public boolean getSimple() {
 	checkWidget();
 	return simple;
 }
-void onDispose() {
+void onDispose(Event event) {
+	removeListener(SWT.Dispose, listener);
+	notifyListeners(SWT.Dispose, event);
+	event.type = SWT.None;
+
 	if (resizeCursor != null) resizeCursor.dispose();
 	resizeCursor = null;
 	left = null;

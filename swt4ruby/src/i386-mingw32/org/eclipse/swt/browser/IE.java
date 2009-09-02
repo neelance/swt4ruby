@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2003, 2008 IBM Corporation and others.
+ * Copyright (c) 2003, 2009 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -9,6 +9,8 @@
  *     IBM Corporation - initial API and implementation
  *******************************************************************************/
 package org.eclipse.swt.browser;
+
+import java.util.*;
 
 import org.eclipse.swt.*;
 import org.eclipse.swt.graphics.*;
@@ -30,11 +32,11 @@ class IE extends WebBrowser {
 	Point size;
 	boolean addressBar = true, menuBar = true, statusBar = true, toolBar = true;
 	int /*long*/ globalDispatch;
-	String html;
+	String html, lastNavigateURL;
 	int style, lastKeyCode, lastCharCode;
 	int lastMouseMoveX, lastMouseMoveY;
 
-	static boolean SilenceInternalNavigate;
+	static boolean IsIE7;
 	static String ProgId = "Shell.Explorer";	//$NON-NLS-1$
 
 	static final int BeforeNavigate2 = 0xfa;
@@ -64,14 +66,15 @@ class IE extends WebBrowser {
 	static final int URLPOLICY_ALLOW = 0x00;
 	static final int URLPOLICY_DISALLOW = 0x03;
 	static final int URLPOLICY_JAVA_PROHIBIT = 0x0;
+	static final int URLPOLICY_JAVA_LOW = 0x00030000;
 	static final int URLZONE_LOCAL_MACHINE = 0;
 	static final int URLZONE_INTRANET = 1;
 	static final int URLACTION_ACTIVEX_MIN = 0x00001200;
 	static final int URLACTION_ACTIVEX_MAX = 0x000013ff;
 	static final int URLACTION_ACTIVEX_RUN = 0x00001200;
 	static final int URLACTION_JAVA_MIN = 0x00001C00;
-	static final int URLPOLICY_JAVA_LOW = 0x00030000;
 	static final int URLACTION_JAVA_MAX = 0x00001Cff;
+	static final int URLACTION_SCRIPT_RUN = 0x00001400;
 	
 	static final int DISPID_AMBIENT_DLCONTROL = -5512;
 	static final int DLCTL_DLIMAGES = 0x00000010;
@@ -106,6 +109,7 @@ class IE extends WebBrowser {
 	static final String EVENT_MOUSEDOWN = "mousedown";	//$NON-NLS-1$
 	static final String EVENT_MOUSEOUT = "mouseout";	//$NON-NLS-1$
 	static final String EVENT_MOUSEOVER = "mouseover";	//$NON-NLS-1$
+	static final String PROTOCOL_FILE = "file://"; //$NON-NLS-1$
 	static final String PROPERTY_ALTKEY = "altKey"; //$NON-NLS-1$
 	static final String PROPERTY_BUTTON = "button"; //$NON-NLS-1$
 	static final String PROPERTY_CLIENTX = "clientX"; //$NON-NLS-1$
@@ -123,7 +127,45 @@ class IE extends WebBrowser {
 	static {
 		NativeClearSessions = new Runnable() {
 			public void run() {
+				if (OS.IsPPC) return;
 				OS.InternetSetOption (0, OS.INTERNET_OPTION_END_BROWSER_SESSION, 0, 0);
+			}
+		};
+
+		NativeGetCookie = new Runnable () {
+			public void run () {
+				if (OS.IsPPC) return;
+				TCHAR url = new TCHAR (0, CookieUrl, true);
+				TCHAR cookieData = new TCHAR (0, 8192);
+				int[] size = new int[] {cookieData.length ()};
+				if (!OS.InternetGetCookie (url, null, cookieData, size)) {
+					/* original cookieData size was not large enough */
+					size[0] /= TCHAR.sizeof;
+					cookieData = new TCHAR (0, size[0]);
+					if (!OS.InternetGetCookie (url, null, cookieData, size)) return;
+				}
+				String allCookies = cookieData.toString (0, size[0]);
+				StringTokenizer tokenizer = new StringTokenizer (allCookies, ";"); //$NON-NLS-1$
+				while (tokenizer.hasMoreTokens ()) {
+					String cookie = tokenizer.nextToken ();
+					int index = cookie.indexOf ('=');
+					if (index != -1) {
+						String name = cookie.substring (0, index).trim ();
+						if (name.equals (CookieName)) {
+							CookieValue = cookie.substring (index + 1).trim ();
+							return;
+						}
+					}
+				}
+			}
+		};
+
+		NativeSetCookie = new Runnable () {
+			public void run () {
+				if (OS.IsPPC) return;
+				TCHAR url = new TCHAR (0, CookieUrl, true);
+				TCHAR value = new TCHAR (0, CookieValue, true);
+				CookieResult = OS.InternetSetCookie (url, null, value);
 			}
 		};
 
@@ -152,9 +194,7 @@ class IE extends WebBrowser {
 						} catch (NumberFormatException e) {
 							/* just continue, version-specific features will not be enabled */
 						}
-						if (major >= 7) {
-							SilenceInternalNavigate = true;
-						}
+						IsIE7 = major >= 7;
 					}
 				}
 			}
@@ -242,6 +282,14 @@ public void create(Composite parent, int style) {
 						documents[i].dispose();
 					}
 					documents = null;
+
+					Enumeration elements = functions.elements ();
+					while (elements.hasMoreElements ()) {
+						((BrowserFunction)elements.nextElement ()).dispose (false);
+					}
+					functions = null;
+
+					lastNavigateURL = null;
 					domListener = null;
 					if (auto != null) auto.dispose();
 					auto = null;
@@ -290,6 +338,15 @@ public void create(Composite parent, int style) {
 					case BeforeNavigate2: {
 						Variant varResult = event.arguments[1];
 						String url = varResult.getString();
+						/*
+						* Bug in IE.  For navigations on the local machine, BeforeNavigate2's url
+						* field contains a string representing the file path in a non-URL format.
+						* In order to be consistent with the other Browser implementations, this
+						* case is detected and the string is changed to be a proper url string.
+						*/
+						if (url.indexOf(":/") == -1 && url.indexOf(":\\") != -1) { //$NON-NLS-1$ //$NON-NLS-2$
+							url = PROTOCOL_FILE + url.replace('\\', '/');
+						}
 						LocationEvent newEvent = new LocationEvent(browser);
 						newEvent.display = browser.getDisplay();
 						newEvent.widget = browser;
@@ -305,6 +362,7 @@ public void create(Composite parent, int style) {
 							COM.MoveMemory(pCancel, new short[] {doit ? COM.VARIANT_FALSE : COM.VARIANT_TRUE}, 2);
 						}
 						if (doit) {
+							lastNavigateURL = url;
 							varResult = event.arguments[0];
 							IDispatch dispatch = varResult.getDispatch();
 							Variant variant = new Variant(auto);
@@ -339,6 +397,15 @@ public void create(Composite parent, int style) {
 	
 						varResult = event.arguments[1];
 						String url = varResult.getString();
+						/*
+						* Bug in IE.  For navigations on the local machine, DocumentComplete's URL
+						* field contains a string representing the file path in a non-URL format.
+						* In order to be consistent with the other Browser implementations, this
+						* case is detected and the string is changed to be a proper url string.
+						*/
+						if (url.indexOf(":/") == -1 && url.indexOf(":\\") != -1) { //$NON-NLS-1$ //$NON-NLS-2$
+							url = PROTOCOL_FILE + url.replace('\\', '/');
+						}
 						if (html != null && url.equals(ABOUT_BLANK)) {
 							Runnable runnable = new Runnable () {
 								public void run() {
@@ -428,6 +495,14 @@ public void create(Composite parent, int style) {
 							if (globalDispatch != 0 && dispatch.getAddress() == globalDispatch) {
 								/* final document complete */
 								globalDispatch = 0;
+
+								/* re-install registered functions */
+								Enumeration elements = functions.elements ();
+								while (elements.hasMoreElements ()) {
+									BrowserFunction function = (BrowserFunction)elements.nextElement ();
+									execute (function.functionString);
+								}
+
 								ProgressEvent progressEvent = new ProgressEvent(browser);
 								progressEvent.display = browser.getDisplay();
 								progressEvent.widget = browser;
@@ -537,7 +612,12 @@ public void create(Composite parent, int style) {
 								*/
 								int[] rgdispid = auto.getIDsOfNames(new String[] { "AddressBar" }); //$NON-NLS-1$
 								Variant pVarResult = auto.getProperty(rgdispid[0]);
-								if (pVarResult != null && pVarResult.getType() == OLE.VT_BOOL) addressBar = pVarResult.getBoolean();
+								if (pVarResult != null) {
+									if (pVarResult.getType () == OLE.VT_BOOL) {
+										addressBar = pVarResult.getBoolean ();
+									}
+									pVarResult.dispose ();
+								}
 							}
 							newEvent.addressBar = addressBar;
 							newEvent.menuBar = menuBar;
@@ -702,7 +782,10 @@ public boolean execute(String script) {
 	int[] rgdispid = auto.getIDsOfNames(new String[]{"Document"}); //$NON-NLS-1$
 	int dispIdMember = rgdispid[0];
 	Variant pVarResult = auto.getProperty(dispIdMember);
-	if (pVarResult == null || pVarResult.getType() == COM.VT_EMPTY) return false;
+	if (pVarResult == null || pVarResult.getType() == COM.VT_EMPTY) {
+		if (pVarResult != null) pVarResult.dispose ();
+		return false;
+	}
 	OleAutomation document = pVarResult.getAutomation();
 	pVarResult.dispose();
 
@@ -739,11 +822,22 @@ public boolean forward() {
 	return pVarResult != null && pVarResult.getType() == OLE.VT_EMPTY;
 }
 
+public String getBrowserType () {
+	return "ie"; //$NON-NLS-1$
+}
+
+String getDeleteFunctionString (String functionName) {
+	return "window." + functionName + "=undefined"; //$NON-NLS-1$ //$NON-NLS-2$
+}
+
 public String getText() {
 	/* get the document object */
 	int[] rgdispid = auto.getIDsOfNames(new String[]{"Document"}); //$NON-NLS-1$
 	Variant pVarResult = auto.getProperty(rgdispid[0]);
-	if (pVarResult == null || pVarResult.getType() == COM.VT_EMPTY) return ""; //$NON-NLS-1$
+	if (pVarResult == null || pVarResult.getType() == COM.VT_EMPTY) {
+		if (pVarResult != null) pVarResult.dispose ();
+		return ""; //$NON-NLS-1$
+	}
 	OleAutomation document = pVarResult.getAutomation();
 	pVarResult.dispose();
 
@@ -756,7 +850,10 @@ public String getText() {
 	}
 	pVarResult = document.getProperty(rgdispid[0]);
 	document.dispose();
-	if (pVarResult == null || pVarResult.getType() == COM.VT_EMPTY) return ""; //$NON-NLS-1$
+	if (pVarResult == null || pVarResult.getType() == COM.VT_EMPTY) {
+		if (pVarResult != null) pVarResult.dispose ();
+		return ""; //$NON-NLS-1$
+	}
 	OleAutomation element = pVarResult.getAutomation();
 	pVarResult.dispose();
 
@@ -764,7 +861,10 @@ public String getText() {
 	rgdispid = element.getIDsOfNames(new String[] {"outerHTML"}); //$NON-NLS-1$
 	pVarResult = element.getProperty(rgdispid[0]);
 	element.dispose();
-	if (pVarResult == null || pVarResult.getType() == COM.VT_EMPTY) return ""; //$NON-NLS-1$
+	if (pVarResult == null || pVarResult.getType() == COM.VT_EMPTY) {
+		if (pVarResult != null) pVarResult.dispose ();
+		return ""; //$NON-NLS-1$
+	}
 	String result = pVarResult.getString();
 	pVarResult.dispose();
 
@@ -774,8 +874,7 @@ public String getText() {
 public String getUrl() {
 	int[] rgdispid = auto.getIDsOfNames(new String[] { "LocationURL" }); //$NON-NLS-1$
 	Variant pVarResult = auto.getProperty(rgdispid[0]);
-	if (pVarResult == null || pVarResult.getType() != OLE.VT_BSTR)
-		return "";
+	if (pVarResult == null || pVarResult.getType() != OLE.VT_BSTR) return ""; //$NON-NLS-1$
 	String result = pVarResult.getString();
 	pVarResult.dispose();
 	return result;
@@ -849,13 +948,13 @@ public boolean setText(String html) {
 	int[] rgdispidNamedArgs = new int[1];
 	rgdispidNamedArgs[0] = rgdispid[1];
 	boolean oldValue = false;
-	if (!OS.IsWinCE && SilenceInternalNavigate) {
+	if (!OS.IsWinCE && IsIE7) {
 		int hResult = OS.CoInternetIsFeatureEnabled(OS.FEATURE_DISABLE_NAVIGATION_SOUNDS, OS.GET_FEATURE_FROM_PROCESS);
 		oldValue = hResult == COM.S_OK;
 		OS.CoInternetSetFeatureEnabled(OS.FEATURE_DISABLE_NAVIGATION_SOUNDS, OS.SET_FEATURE_ON_PROCESS, true);
 	}
 	Variant pVarResult = auto.invoke(rgdispid[0], rgvarg, rgdispidNamedArgs);
-	if (!OS.IsWinCE && SilenceInternalNavigate) {
+	if (!OS.IsWinCE && IsIE7) {
 		OS.CoInternetSetFeatureEnabled(OS.FEATURE_DISABLE_NAVIGATION_SOUNDS, OS.SET_FEATURE_ON_PROCESS, oldValue);
 	}
 	rgvarg[0].dispose();
@@ -889,13 +988,13 @@ public boolean setUrl(String url) {
 			int[] rgdispidNamedArgs = new int[1];
 			rgdispidNamedArgs[0] = rgdispid[1];
 			boolean oldValue = false;
-			if (!OS.IsWinCE && SilenceInternalNavigate) {
+			if (!OS.IsWinCE && IsIE7) {
 				int hResult = OS.CoInternetIsFeatureEnabled(OS.FEATURE_DISABLE_NAVIGATION_SOUNDS, OS.GET_FEATURE_FROM_PROCESS);
 				oldValue = hResult == COM.S_OK;
 				OS.CoInternetSetFeatureEnabled(OS.FEATURE_DISABLE_NAVIGATION_SOUNDS, OS.SET_FEATURE_ON_PROCESS, true);
 			}
 			auto.invoke(rgdispid[0], rgvarg, rgdispidNamedArgs);
-			if (!OS.IsWinCE && SilenceInternalNavigate) {
+			if (!OS.IsWinCE && IsIE7) {
 				OS.CoInternetSetFeatureEnabled(OS.FEATURE_DISABLE_NAVIGATION_SOUNDS, OS.SET_FEATURE_ON_PROCESS, oldValue);
 			}
 			rgvarg[0].dispose();
@@ -985,6 +1084,17 @@ void handleDOMEvent (OleEvent e) {
 		keyEvent.keyCode = lastKeyCode;
 		keyEvent.stateMask = mask;
 		keyEvent.stateMask &= ~lastKeyCode;		/* remove current keydown if it's a state key */
+		/*
+		* keypress events are not received for Enter, Delete and Tab, so
+		* KeyDown events are sent for them here.  Set the KeyDown event's
+		* character field and IE's lastCharCode field for these keys so
+		* that the Browser's key events are consistent with other controls.
+		*/
+		switch (lastKeyCode) {
+			case SWT.CR: lastCharCode = keyEvent.character = SWT.CR; break;
+			case SWT.DEL: lastCharCode = keyEvent.character = SWT.DEL; break;
+			case SWT.TAB: lastCharCode = keyEvent.character = SWT.TAB; break;
+		}
 		browser.notifyListeners (keyEvent.type, keyEvent);
 		if (!keyEvent.doit) {
 			rgdispid = event.getIDsOfNames(new String[] { PROPERTY_RETURNVALUE });

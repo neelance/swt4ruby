@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2008 IBM Corporation and others.
+ * Copyright (c) 2000, 2009 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -96,6 +96,7 @@ import org.eclipse.swt.internal.gtk.*;
  * @see <a href="http://www.eclipse.org/swt/snippets/#dnd">Drag and Drop snippets</a>
  * @see <a href="http://www.eclipse.org/swt/examples.php">SWT Example: DNDExample</a>
  * @see <a href="http://www.eclipse.org/swt/">Sample code and further information</a>
+ * @noextend This class is not intended to be subclassed by clients.
  */
 public class DragSource extends Widget {
 
@@ -358,6 +359,7 @@ void dragGetData(int /*long*/ widget, int /*long*/ context, int /*long*/ selecti
 	event.dataType = transferData; 
 	notifyListeners(DND.DragSetData, event);
 		
+	if (!event.doit) return;
 	Transfer transfer = null;
 	for (int i = 0; i < transferAgents.length; i++) {
 		Transfer transferAgent = transferAgents[i];

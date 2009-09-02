@@ -1,6 +1,6 @@
 require "rjava"
 
-# Copyright (c) 2007, 2008 IBM Corporation and others.
+# Copyright (c) 2007, 2009 IBM Corporation and others.
 # All rights reserved. This program and the accompanying materials
 # are made available under the terms of the Eclipse Public License v1.0
 # which accompanies this distribution, and is available at
@@ -169,7 +169,7 @@ module Org::Eclipse::Swt::Dnd
       formatetc.attr_tymed = COM::TYMED_HGLOBAL
       stgmedium = STGMEDIUM.new
       stgmedium.attr_tymed = COM::TYMED_HGLOBAL
-      transfer_data.attr_result = data_object._get_data(formatetc, stgmedium)
+      transfer_data.attr_result = get_data(data_object, formatetc, stgmedium)
       if (!(transfer_data.attr_result).equal?(COM::S_OK))
         return nil
       end
@@ -196,7 +196,7 @@ module Org::Eclipse::Swt::Dnd
           # long
           bits = ptr + bmi_header.attr_bi_size
           if (bmi_header.attr_bi_bit_count <= 8)
-            bits += (1 << bmi_header.attr_bi_bit_count) * 4
+            bits += ((bmi_header.attr_bi_clr_used).equal?(0) ? (1 << bmi_header.attr_bi_bit_count) : bmi_header.attr_bi_clr_used) * 4
           else
             if ((bmi_header.attr_bi_compression).equal?(OS::BI_BITFIELDS))
               bits += 12

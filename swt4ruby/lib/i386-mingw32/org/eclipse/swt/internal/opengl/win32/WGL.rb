@@ -1,6 +1,6 @@
 require "rjava"
 
-# Copyright (c) 2000, 2007 IBM Corporation and others.
+# Copyright (c) 2000, 2008 IBM Corporation and others.
 # All rights reserved. This program and the accompanying materials
 # are made available under the terms of the Eclipse Public License v1.0
 # which accompanies this distribution, and is available at
@@ -234,6 +234,7 @@ module Org::Eclipse::Swt::Internal::Opengl::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_opengl_win32_WGL_ChoosePixelFormat, [:pointer, :long, :int32, :long], :int32
       typesig { [::Java::Int, PIXELFORMATDESCRIPTOR] }
+      # @param hdc cast=(HDC)
       # long
       def _choose_pixel_format(hdc, ppfd)
         JNI.__send__(:Java_org_eclipse_swt_internal_opengl_win32_WGL_ChoosePixelFormat, JNI.env, self.jni_id, hdc.to_int, ppfd.jni_id)
@@ -241,6 +242,7 @@ module Org::Eclipse::Swt::Internal::Opengl::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_opengl_win32_WGL_DescribePixelFormat, [:pointer, :long, :int32, :int32, :int32, :long], :int32
       typesig { [::Java::Int, ::Java::Int, ::Java::Int, PIXELFORMATDESCRIPTOR] }
+      # @param hdc cast=(HDC)
       # long
       def _describe_pixel_format(hdc, i_pixel_format, n_bytes, ppfd)
         JNI.__send__(:Java_org_eclipse_swt_internal_opengl_win32_WGL_DescribePixelFormat, JNI.env, self.jni_id, hdc.to_int, i_pixel_format.to_int, n_bytes.to_int, ppfd.jni_id)
@@ -248,6 +250,7 @@ module Org::Eclipse::Swt::Internal::Opengl::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_opengl_win32_WGL_GetPixelFormat, [:pointer, :long, :int32], :int32
       typesig { [::Java::Int] }
+      # @param hdc cast=(HDC)
       # long
       def _get_pixel_format(hdc)
         JNI.__send__(:Java_org_eclipse_swt_internal_opengl_win32_WGL_GetPixelFormat, JNI.env, self.jni_id, hdc.to_int)
@@ -255,6 +258,7 @@ module Org::Eclipse::Swt::Internal::Opengl::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_opengl_win32_WGL_SetPixelFormat, [:pointer, :long, :int32, :int32, :long], :int8
       typesig { [::Java::Int, ::Java::Int, PIXELFORMATDESCRIPTOR] }
+      # @param hdc cast=(HDC)
       # long
       def _set_pixel_format(hdc, i_pixel_format, ppfd)
         JNI.__send__(:Java_org_eclipse_swt_internal_opengl_win32_WGL_SetPixelFormat, JNI.env, self.jni_id, hdc.to_int, i_pixel_format.to_int, ppfd.jni_id) != 0
@@ -262,6 +266,7 @@ module Org::Eclipse::Swt::Internal::Opengl::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_opengl_win32_WGL_SwapBuffers, [:pointer, :long, :int32], :int8
       typesig { [::Java::Int] }
+      # @param hdc cast=(HDC)
       # long
       def _swap_buffers(hdc)
         JNI.__send__(:Java_org_eclipse_swt_internal_opengl_win32_WGL_SwapBuffers, JNI.env, self.jni_id, hdc.to_int) != 0
@@ -269,6 +274,9 @@ module Org::Eclipse::Swt::Internal::Opengl::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_opengl_win32_WGL_wglCopyContext, [:pointer, :long, :int32, :int32, :int32], :int8
       typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
+      # @param hglrcSrc cast=(HGLRC)
+      # @param hglrcDst cast=(HGLRC)
+      # 
       # long
       # long
       def wgl_copy_context(hglrc_src, hglrc_dst, mask)
@@ -277,6 +285,7 @@ module Org::Eclipse::Swt::Internal::Opengl::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_opengl_win32_WGL_wglCreateContext, [:pointer, :long, :int32], :int32
       typesig { [::Java::Int] }
+      # @param hdc cast=(HDC)
       # long
       # long
       def wgl_create_context(hdc)
@@ -285,6 +294,7 @@ module Org::Eclipse::Swt::Internal::Opengl::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_opengl_win32_WGL_wglCreateLayerContext, [:pointer, :long, :int32, :int32], :int32
       typesig { [::Java::Int, ::Java::Int] }
+      # @param hdc cast=(HDC)
       # long
       # long
       def wgl_create_layer_context(hdc, i_layer_plane)
@@ -293,6 +303,7 @@ module Org::Eclipse::Swt::Internal::Opengl::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_opengl_win32_WGL_wglDeleteContext, [:pointer, :long, :int32], :int8
       typesig { [::Java::Int] }
+      # @param hglrc cast=(HGLRC)
       # long
       def wgl_delete_context(hglrc)
         JNI.__send__(:Java_org_eclipse_swt_internal_opengl_win32_WGL_wglDeleteContext, JNI.env, self.jni_id, hglrc.to_int) != 0
@@ -321,6 +332,9 @@ module Org::Eclipse::Swt::Internal::Opengl::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_opengl_win32_WGL_wglMakeCurrent, [:pointer, :long, :int32, :int32], :int8
       typesig { [::Java::Int, ::Java::Int] }
+      # @param hdc cast=(HDC)
+      # @param hglrc cast=(HGLRC)
+      # 
       # long
       # long
       def wgl_make_current(hdc, hglrc)
@@ -329,6 +343,9 @@ module Org::Eclipse::Swt::Internal::Opengl::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_opengl_win32_WGL_wglShareLists, [:pointer, :long, :int32, :int32], :int8
       typesig { [::Java::Int, ::Java::Int] }
+      # @param hglrc1 cast=(HGLRC)
+      # @param hglrc2 cast=(HGLRC)
+      # 
       # long
       # long
       def wgl_share_lists(hglrc1, hglrc2)
@@ -337,6 +354,7 @@ module Org::Eclipse::Swt::Internal::Opengl::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_opengl_win32_WGL_wglDescribeLayerPlane, [:pointer, :long, :int32, :int32, :int32, :int32, :long], :int8
       typesig { [::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, LAYERPLANEDESCRIPTOR] }
+      # @param hdc cast=(HDC)
       # long
       def wgl_describe_layer_plane(hdc, i_pixel_format, i_layer_plane, n_bytes, plpd)
         JNI.__send__(:Java_org_eclipse_swt_internal_opengl_win32_WGL_wglDescribeLayerPlane, JNI.env, self.jni_id, hdc.to_int, i_pixel_format.to_int, i_layer_plane.to_int, n_bytes.to_int, plpd.jni_id) != 0
@@ -344,6 +362,9 @@ module Org::Eclipse::Swt::Internal::Opengl::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_opengl_win32_WGL_wglSetLayerPaletteEntries, [:pointer, :long, :int32, :int32, :int32, :int32, :long], :int32
       typesig { [::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, Array.typed(::Java::Int)] }
+      # @param hdc cast=(HDC)
+      # @param pcr cast=(COLORREF *)
+      # 
       # long
       def wgl_set_layer_palette_entries(hdc, i_layer_plane, i_start, c_entries, pcr)
         JNI.__send__(:Java_org_eclipse_swt_internal_opengl_win32_WGL_wglSetLayerPaletteEntries, JNI.env, self.jni_id, hdc.to_int, i_layer_plane.to_int, i_start.to_int, c_entries.to_int, pcr.jni_id)
@@ -351,6 +372,9 @@ module Org::Eclipse::Swt::Internal::Opengl::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_opengl_win32_WGL_wglGetLayerPaletteEntries, [:pointer, :long, :int32, :int32, :int32, :int32, :long], :int32
       typesig { [::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, Array.typed(::Java::Int)] }
+      # @param hdc cast=(HDC)
+      # @param pcr cast=(COLORREF *)
+      # 
       # long
       def wgl_get_layer_palette_entries(hdc, i_layer_plane, i_start, c_entries, pcr)
         JNI.__send__(:Java_org_eclipse_swt_internal_opengl_win32_WGL_wglGetLayerPaletteEntries, JNI.env, self.jni_id, hdc.to_int, i_layer_plane.to_int, i_start.to_int, c_entries.to_int, pcr.jni_id)
@@ -358,6 +382,7 @@ module Org::Eclipse::Swt::Internal::Opengl::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_opengl_win32_WGL_wglRealizeLayerPalette, [:pointer, :long, :int32, :int32, :int8], :int8
       typesig { [::Java::Int, ::Java::Int, ::Java::Boolean] }
+      # @param hdc cast=(HDC)
       # long
       def wgl_realize_layer_palette(hdc, i_layer_plane, b_realize)
         JNI.__send__(:Java_org_eclipse_swt_internal_opengl_win32_WGL_wglRealizeLayerPalette, JNI.env, self.jni_id, hdc.to_int, i_layer_plane.to_int, b_realize ? 1 : 0) != 0
@@ -365,6 +390,7 @@ module Org::Eclipse::Swt::Internal::Opengl::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_opengl_win32_WGL_wglSwapLayerBuffers, [:pointer, :long, :int32, :int32], :int8
       typesig { [::Java::Int, ::Java::Int] }
+      # @param hdc cast=(HDC)
       # long
       def wgl_swap_layer_buffers(hdc, fu_planes)
         JNI.__send__(:Java_org_eclipse_swt_internal_opengl_win32_WGL_wglSwapLayerBuffers, JNI.env, self.jni_id, hdc.to_int, fu_planes.to_int) != 0

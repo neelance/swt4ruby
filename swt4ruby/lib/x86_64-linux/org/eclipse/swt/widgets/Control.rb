@@ -1,6 +1,6 @@
 require "rjava"
 
-# Copyright (c) 2000, 2008 IBM Corporation and others.
+# Copyright (c) 2000, 2009 IBM Corporation and others.
 # All rights reserved. This program and the accompanying materials
 # are made available under the terms of the Eclipse Public License v1.0
 # which accompanies this distribution, and is available at
@@ -14,12 +14,13 @@ module Org::Eclipse::Swt::Widgets
       include ::Java::Lang
       include ::Org::Eclipse::Swt::Widgets
       include ::Org::Eclipse::Swt
-      include_const ::Org::Eclipse::Swt::Internal, :Converter
-      include_const ::Org::Eclipse::Swt::Internal::Accessibility::Gtk, :ATK
-      include ::Org::Eclipse::Swt::Internal::Gtk
-      include ::Org::Eclipse::Swt::Graphics
-      include ::Org::Eclipse::Swt::Events
       include ::Org::Eclipse::Swt::Accessibility
+      include ::Org::Eclipse::Swt::Events
+      include ::Org::Eclipse::Swt::Graphics
+      include ::Org::Eclipse::Swt::Internal
+      include ::Org::Eclipse::Swt::Internal::Accessibility::Gtk
+      include ::Org::Eclipse::Swt::Internal::Cairo
+      include ::Org::Eclipse::Swt::Internal::Gtk
     }
   end
   
@@ -43,6 +44,7 @@ module Org::Eclipse::Swt::Widgets
   # @see <a href="http://www.eclipse.org/swt/snippets/#control">Control snippets</a>
   # @see <a href="http://www.eclipse.org/swt/examples.php">SWT Example: ControlExample</a>
   # @see <a href="http://www.eclipse.org/swt/">Sample code and further information</a>
+  # @noextend This class is not intended to be subclassed by clients.
   class Control < ControlImports.const_get :Widget
     include_class_members ControlImports
     overload_protected {
@@ -129,7 +131,13 @@ module Org::Eclipse::Swt::Widgets
     alias_method :attr_accessible=, :accessible=
     undef_method :accessible=
     
+    class_module.module_eval {
+      const_set_lazy(:IS_ACTIVE) { "org.eclipse.swt.internal.control.isactive" }
+      const_attr_reader  :IS_ACTIVE
+    }
+    
     typesig { [] }
+    # $NON-NLS-1$
     def initialize
       @fixed_handle = 0
       @redraw_window = 0
@@ -172,6 +180,8 @@ module Org::Eclipse::Swt::Widgets
     # </ul>
     # 
     # @see SWT#BORDER
+    # @see SWT#LEFT_TO_RIGHT
+    # @see SWT#RIGHT_TO_LEFT
     # @see Widget#checkSubclass
     # @see Widget#getStyle
     def initialize(parent, style)
@@ -293,12 +303,15 @@ module Org::Eclipse::Swt::Widgets
       if (!((self.attr_state & BACKGROUND)).equal?(0))
         return
       end
+      if (((self.attr_state & THEME_BACKGROUND)).equal?(0))
+        return
+      end
       # int
       child_style_ = @parent.child_style
       if (!(child_style_).equal?(0))
         color = GdkColor.new
         OS.gtk_style_get_bg(child_style_, 0, color)
-        OS.gtk_widget_modify_bg(handle, 0, color)
+        set_background_color(color)
       end
     end
     
@@ -483,14 +496,13 @@ module Org::Eclipse::Swt::Widgets
       top_handle_ = top_handle
       # int
       window = OS._gtk_widget_window(top_handle_)
-      print_window(true, self, gc.attr_handle, drawable, depth, window, x, y)
+      print_window(true, self, gc, drawable, depth, window, x, y)
       if (obscured)
         self.attr_state |= OBSCURED
       end
     end
     
-    typesig { [::Java::Boolean, Control, ::Java::Long, ::Java::Long, ::Java::Int, ::Java::Long, ::Java::Int, ::Java::Int] }
-    # int
+    typesig { [::Java::Boolean, Control, SwtGC, ::Java::Long, ::Java::Int, ::Java::Long, ::Java::Int, ::Java::Int] }
     # int
     # int
     def print_window(first, control, gc, drawable, depth, window, x, y)
@@ -549,7 +561,43 @@ module Org::Eclipse::Swt::Widgets
         dest_width = Math.min(c_x[0] + width[0], p_w[0])
         dest_height = Math.min(c_y[0] + height[0], p_h[0])
       end
-      OS.gdk_draw_drawable(drawable, gc, real_drawable[0], src_x, src_y, dest_x, dest_y, dest_width, dest_height)
+      gc_data = gc.get_gcdata
+      # int
+      cairo = gc_data.attr_cairo
+      if (!(cairo).equal?(0))
+        # int
+        x_display = OS._gdk_display
+        # int
+        x_visual = OS.gdk_x11_visual_get_xvisual(OS.gdk_visual_get_system)
+        # int
+        x_drawable = OS._gdk_pixmap_xid(real_drawable[0])
+        # int
+        surface = SwtCairo.cairo_xlib_surface_create(x_display, x_drawable, x_visual, width[0], height[0])
+        if ((surface).equal?(0))
+          SWT.error(SWT::ERROR_NO_HANDLES)
+        end
+        SwtCairo.cairo_save(cairo)
+        SwtCairo.cairo_rectangle(cairo, dest_x, dest_y, dest_width, dest_height)
+        SwtCairo.cairo_clip(cairo)
+        SwtCairo.cairo_translate(cairo, dest_x, dest_y)
+        # int
+        pattern = SwtCairo.cairo_pattern_create_for_surface(surface)
+        if ((pattern).equal?(0))
+          SWT.error(SWT::ERROR_NO_HANDLES)
+        end
+        SwtCairo.cairo_pattern_set_filter(pattern, SwtCairo::CAIRO_FILTER_BEST)
+        SwtCairo.cairo_set_source(cairo, pattern)
+        if (!(gc_data.attr_alpha).equal?(0xff))
+          SwtCairo.cairo_paint_with_alpha(cairo, gc_data.attr_alpha / (0xff).to_f)
+        else
+          SwtCairo.cairo_paint(cairo)
+        end
+        SwtCairo.cairo_restore(cairo)
+        SwtCairo.cairo_pattern_destroy(pattern)
+        SwtCairo.cairo_surface_destroy(surface)
+      else
+        OS.gdk_draw_drawable(drawable, gc.attr_handle, real_drawable[0], src_x, src_y, dest_x, dest_y, dest_width, dest_height)
+      end
       OS.gdk_window_end_paint(window)
       # int
       children = OS.gdk_window_get_children(window)
@@ -622,10 +670,10 @@ module Org::Eclipse::Swt::Widgets
     def compute_tab_list
       if (is_tab_group)
         if (get_visible && get_enabled)
-          return Array.typed(Control).new([self])
+          return Array.typed(Widget).new([self])
         end
       end
-      return Array.typed(Control).new(0) { nil }
+      return Array.typed(Widget).new(0) { nil }
     end
     
     typesig { [] }
@@ -1263,6 +1311,11 @@ module Org::Eclipse::Swt::Widgets
     def set_size(width, height)
       check_widget
       set_bounds(0, 0, Math.max(0, width), Math.max(0, height), false, true)
+    end
+    
+    typesig { [] }
+    def is_active
+      return (get_shell.get_modal_shell).nil? && (self.attr_display.get_modal_dialog).nil?
     end
     
     typesig { [] }
@@ -2324,7 +2377,11 @@ module Org::Eclipse::Swt::Widgets
       while (!quit)
         # int
         event_ptr = 0
-        while (true)
+        # There should be an event on the queue already, but
+        # in cases where there isn't one, stop trying after
+        # half a second.
+        timeout = System.current_time_millis + 500
+        while (System.current_time_millis < timeout)
           event_ptr = OS.gdk_event_get
           if (!(event_ptr).equal?(0))
             break
@@ -2334,6 +2391,9 @@ module Org::Eclipse::Swt::Widgets
             rescue JavaException => ex
             end
           end
+        end
+        if ((event_ptr).equal?(0))
+          return false
         end
         case (OS._gdk_event_type(event_ptr))
         when OS::GDK_MOTION_NOTIFY
@@ -2461,6 +2521,9 @@ module Org::Eclipse::Swt::Widgets
     typesig { [::Java::Long] }
     # int
     def force_focus(focus_handle_)
+      if (OS._gtk_widget_has_focus(focus_handle_))
+        return true
+      end
       # When the control is zero sized it must be realized
       OS.gtk_widget_realize(focus_handle_)
       OS.gtk_widget_grab_focus(focus_handle_)
@@ -2471,6 +2534,8 @@ module Org::Eclipse::Swt::Widgets
       handle = OS.gtk_window_get_focus(shell_handle)
       while (!(handle).equal?(0))
         if ((handle).equal?(focus_handle_))
+          # Cancel any previous ignoreFocus requests
+          self.attr_display.attr_ignore_focus = false
           return true
         end
         widget = self.attr_display.get_widget(handle)
@@ -2484,7 +2549,11 @@ module Org::Eclipse::Swt::Widgets
     
     typesig { [] }
     # Returns the receiver's background color.
-    # 
+    # <p>
+    # Note: This operation is a hint and may be overridden by the platform.
+    # For example, on some versions of Windows the background of a TabFolder,
+    # is a gradient rather than a solid color.
+    # </p>
     # @return the background color
     # 
     # @exception SWTException <ul>
@@ -2582,6 +2651,14 @@ module Org::Eclipse::Swt::Widgets
     def get_cursor
       check_widget
       return @cursor
+    end
+    
+    typesig { [String] }
+    def get_data(key)
+      if ((key == IS_ACTIVE))
+        return Boolean.new(is_active)
+      end
+      return super(key)
     end
     
     typesig { [] }
@@ -2878,6 +2955,14 @@ module Org::Eclipse::Swt::Widgets
     # int
     # int
     def gtk_button_press_event(widget, event)
+      return gtk_button_press_event(widget, event, true)
+    end
+    
+    typesig { [::Java::Long, ::Java::Long, ::Java::Boolean] }
+    # int
+    # int
+    # int
+    def gtk_button_press_event(widget, event, send_mouse_down)
       gdk_event = GdkEventButton.new
       OS.memmove(gdk_event, event, GdkEventButton.attr_sizeof)
       if ((gdk_event.attr_type).equal?(OS::GDK_3BUTTON_PRESS))
@@ -2922,7 +3007,7 @@ module Org::Eclipse::Swt::Widgets
             end
           end
         end
-        if (!send_mouse_event(SWT::MouseDown, gdk_event.attr_button, self.attr_display.attr_click_count, 0, false, gdk_event.attr_time, gdk_event.attr_x_root, gdk_event.attr_y_root, false, gdk_event.attr_state))
+        if (send_mouse_down && !send_mouse_event(SWT::MouseDown, gdk_event.attr_button, self.attr_display.attr_click_count, 0, false, gdk_event.attr_time, gdk_event.attr_x_root, gdk_event.attr_y_root, false, gdk_event.attr_state))
           result = 1
         end
         if (is_disposed)
@@ -3023,6 +3108,13 @@ module Org::Eclipse::Swt::Widgets
       end
       gdk_event = GdkEventCrossing.new
       OS.memmove(gdk_event, event, GdkEventCrossing.attr_sizeof)
+      # It is possible to send out too many enter/exit events if entering a
+      # control through a subwindow. The fix is to return without sending any
+      # events if the GdkEventCrossing subwindow field is set and the control
+      # requests to check the field.
+      if (!(gdk_event.attr_subwindow).equal?(0) && check_subwindow)
+        return 0
+      end
       if (!(gdk_event.attr_mode).equal?(OS::GDK_CROSSING_NORMAL) && !(gdk_event.attr_mode).equal?(OS::GDK_CROSSING_UNGRAB))
         return 0
       end
@@ -3038,6 +3130,11 @@ module Org::Eclipse::Swt::Widgets
         return send_mouse_event(SWT::MouseEnter, 0, gdk_event.attr_time, gdk_event.attr_x_root, gdk_event.attr_y_root, false, gdk_event.attr_state) ? 0 : 1
       end
       return 0
+    end
+    
+    typesig { [] }
+    def check_subwindow
+      return false
     end
     
     typesig { [::Java::Long, ::Java::Long] }
@@ -3074,6 +3171,8 @@ module Org::Eclipse::Swt::Widgets
           # box to lose focus when focus is received for the menu.  The
           # fix is to check the current grab handle and see if it is a GTK_MENU
           # and ignore the focus event when the menu is both shown and hidden.
+          # 
+          # NOTE: This code runs for all menus.
           display = self.attr_display
           if (!(gdk_event_focus.attr_in).equal?(0))
             if (display.attr_ignore_focus)
@@ -4593,11 +4692,6 @@ module Org::Eclipse::Swt::Widgets
     end
     
     typesig { [::Java::Boolean] }
-    def set_tab_group_focus(next_)
-      return set_tab_item_focus(next_)
-    end
-    
-    typesig { [::Java::Boolean] }
     def set_tab_item_focus(next_)
       if (!is_showing)
         return false
@@ -4607,7 +4701,16 @@ module Org::Eclipse::Swt::Widgets
     
     typesig { [String] }
     # Sets the receiver's tool tip text to the argument, which
-    # may be null indicating that no tool tip text should be shown.
+    # may be null indicating that the default tool tip for the
+    # control will be shown. For a control that has a default
+    # tool tip, such as the Tree control on Windows, setting
+    # the tool tip text to an empty string replaces the default,
+    # causing no tool tip text to be shown.
+    # <p>
+    # The mnemonic indicator (character '&amp;') is not displayed in a tool tip.
+    # To display a single '&amp;' in the tool tip, the character '&amp;' can be
+    # escaped by doubling it in the string.
+    # </p>
     # 
     # @param string the new tool tip text (or null)
     # 
@@ -4883,6 +4986,10 @@ module Org::Eclipse::Swt::Widgets
       event.attr_x = x
       event.attr_y = y
       send_event(SWT::MenuDetect, event)
+      # widget could be disposed at this point
+      if (is_disposed)
+        return false
+      end
       if (event.attr_doit)
         if (!(@menu).nil? && !@menu.is_disposed)
           hooks_keys = hooks(SWT::KeyDown) || hooks(SWT::KeyUp)
@@ -5139,8 +5246,8 @@ module Org::Eclipse::Swt::Widgets
       start = index
       offset = (next_) ? 1 : -1
       while (!((index = ((index + offset + length_) % length_))).equal?(start))
-        control = list[index]
-        if (!control.is_disposed && control.set_tab_group_focus(next_))
+        widget = list[index]
+        if (!widget.is_disposed && widget.set_tab_group_focus(next_))
           return true
         end
       end

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2008 IBM Corporation and others.
+ * Copyright (c) 2000, 2009 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -92,6 +92,7 @@ import org.eclipse.swt.graphics.*;
  * @see Device#dispose
  * @see <a href="http://www.eclipse.org/swt/snippets/#display">Display snippets</a>
  * @see <a href="http://www.eclipse.org/swt/">Sample code and further information</a>
+ * @noextend This class is not intended to be subclassed by clients.
  */
 public class Display extends Device {
 
@@ -272,8 +273,15 @@ public class Display extends Device {
 	/* Click count*/
 	int clickCount = 1;
 	
+	/* Entry inner border */
+	static final int INNER_BORDER = 2;
+	
 	/* Timestamp of the Last Received Events */
 	int lastEventTime, lastUserEventTime;
+	
+	/* Pango layout constructor */
+	int /*long*/ pangoLayoutNewProc, pangoLayoutNewDefaultProc;
+	Callback pangoLayoutNewCallback;
 	
 	/* Fixed Subclass */
 	static int /*long*/ fixed_type;
@@ -396,8 +404,8 @@ public class Display extends Device {
 
 	/* GTK Version */
 	static final int MAJOR = 2;
-	static final int MINOR = 0;
-	static final int MICRO = 6;
+	static final int MINOR = 2;
+	static final int MICRO = 0;
 
 	/* Display Data */
 	Object data;
@@ -1432,6 +1440,29 @@ public Control getCursorControl () {
 	return null;
 }
 
+static GtkBorder getEntryInnerBorder (int /*long*/ handle) {
+    GtkBorder gtkBorder = new GtkBorder();
+    if (OS.GTK_VERSION >= OS.VERSION (2, 10, 0)) {
+	    int /*long*/ border = OS.gtk_entry_get_inner_border (handle);
+	    if (border != 0) {
+	    	OS.memmove (gtkBorder, border, GtkBorder.sizeof);
+	    	return gtkBorder;
+	    }
+	    int /*long*/ []  borderPtr = new int /*long*/ [1];
+	    OS.gtk_widget_style_get (handle, OS.inner_border, borderPtr,0);
+	    if (borderPtr[0] != 0) {
+	        OS.memmove (gtkBorder, borderPtr[0], GtkBorder.sizeof);
+	        OS.gtk_border_free(borderPtr[0]);
+	        return gtkBorder;
+	    }
+    }
+    gtkBorder.left = INNER_BORDER;
+    gtkBorder.top = INNER_BORDER;
+    gtkBorder.right = INNER_BORDER;
+    gtkBorder.bottom = INNER_BORDER;
+    return gtkBorder;
+}
+
 boolean filterEvent (Event event) {
 	if (filterTable != null) filterTable.sendEvent (event);
 	return false;
@@ -1654,7 +1685,12 @@ static boolean isValidClass (Class clazz) {
  */
 public int getDismissalAlignment () {
 	checkDevice ();
-	return SWT.RIGHT;
+	int [] buffer = new int [1];
+	if (OS.GTK_VERSION >= OS.VERSION (2, 6, 0)) {
+		int /*long*/ settings = OS.gtk_settings_get_default ();
+		OS.g_object_get (settings, OS.gtk_alternative_button_order, buffer, 0);
+	}
+	return buffer [0] == 1 ? SWT.LEFT : SWT.RIGHT;
 }
 
 /**
@@ -2300,6 +2336,7 @@ int /*long*/ idleProc (int /*long*/ data) {
 protected void init () {
 	super.init ();
 	initializeCallbacks ();
+	initializeSubclasses ();
 	initializeSystemColors ();
 	initializeSystemSettings ();
 	initializeWidgetTable ();
@@ -2353,6 +2390,7 @@ void initializeCallbacks () {
 	closures [Widget.CHANGED] = OS.g_cclosure_new (windowProc2, Widget.CHANGED, 0);
 	closures [Widget.CLICKED] = OS.g_cclosure_new (windowProc2, Widget.CLICKED, 0);
 	closures [Widget.DAY_SELECTED] = OS.g_cclosure_new (windowProc2, Widget.DAY_SELECTED, 0);
+	closures [Widget.DAY_SELECTED_DOUBLE_CLICK] = OS.g_cclosure_new (windowProc2, Widget.DAY_SELECTED_DOUBLE_CLICK, 0);
 	closures [Widget.HIDE] = OS.g_cclosure_new (windowProc2, Widget.HIDE, 0);
 	closures [Widget.GRAB_FOCUS] = OS.g_cclosure_new (windowProc2, Widget.GRAB_FOCUS, 0);
 	closures [Widget.MAP] = OS.g_cclosure_new (windowProc2, Widget.MAP, 0);
@@ -2404,6 +2442,7 @@ void initializeCallbacks () {
 	closures [Widget.UNMAP_EVENT] = OS.g_cclosure_new (windowProc3, Widget.UNMAP_EVENT, 0);
 	closures [Widget.VISIBILITY_NOTIFY_EVENT] = OS.g_cclosure_new (windowProc3, Widget.VISIBILITY_NOTIFY_EVENT, 0);
 	closures [Widget.WINDOW_STATE_EVENT] = OS.g_cclosure_new (windowProc3, Widget.WINDOW_STATE_EVENT, 0);
+	closures [Widget.ROW_DELETED] = OS.g_cclosure_new (windowProc3, Widget.ROW_DELETED, 0);
 
 	windowCallback4 = new Callback (this, "windowProc", 4); //$NON-NLS-1$
 	windowProc4 = windowCallback4.getAddress ();
@@ -2413,9 +2452,11 @@ void initializeCallbacks () {
 	closures [Widget.DELETE_TEXT] = OS.g_cclosure_new (windowProc4, Widget.DELETE_TEXT, 0);
 	closures [Widget.ROW_ACTIVATED] = OS.g_cclosure_new (windowProc4, Widget.ROW_ACTIVATED, 0);
 	closures [Widget.SCROLL_CHILD] = OS.g_cclosure_new (windowProc4, Widget.SCROLL_CHILD, 0);
+	closures [Widget.STATUS_ICON_POPUP_MENU] = OS.g_cclosure_new (windowProc4, Widget.STATUS_ICON_POPUP_MENU, 0);
 	closures [Widget.SWITCH_PAGE] = OS.g_cclosure_new (windowProc4, Widget.SWITCH_PAGE, 0);
 	closures [Widget.TEST_COLLAPSE_ROW] = OS.g_cclosure_new (windowProc4, Widget.TEST_COLLAPSE_ROW, 0);
 	closures [Widget.TEST_EXPAND_ROW] = OS.g_cclosure_new (windowProc4, Widget.TEST_EXPAND_ROW, 0);
+	closures [Widget.ROW_INSERTED] = OS.g_cclosure_new (windowProc4, Widget.ROW_INSERTED, 0);
 
 	windowCallback5 = new Callback (this, "windowProc", 5); //$NON-NLS-1$
 	windowProc5 = windowCallback5.getAddress ();
@@ -2492,6 +2533,19 @@ void initializeCallbacks () {
 	idleCallback = new Callback (this, "idleProc", 1); //$NON-NLS-1$
 	idleProc = idleCallback.getAddress ();
 	if (idleProc == 0) error (SWT.ERROR_NO_MORE_CALLBACKS);
+}
+
+void initializeSubclasses () {
+	if (OS.GTK_VERSION >= OS.VERSION (2, 4, 0)) {
+		pangoLayoutNewCallback = new Callback (this, "pangoLayoutNewProc", 3); //$NON-NLS-1$
+		pangoLayoutNewProc = pangoLayoutNewCallback.getAddress ();
+		if (pangoLayoutNewProc == 0) error (SWT.ERROR_NO_MORE_CALLBACKS);
+		int /*long*/ pangoLayoutType = OS.PANGO_TYPE_LAYOUT ();
+		int /*long*/ pangoLayoutClass = OS.g_type_class_ref (pangoLayoutType);
+		pangoLayoutNewDefaultProc = OS.G_OBJECT_CLASS_CONSTRUCTOR (pangoLayoutClass);
+		OS.G_OBJECT_CLASS_SET_CONSTRUCTOR (pangoLayoutClass, pangoLayoutNewProc);
+		OS.g_type_class_unref (pangoLayoutClass);
+	}
 }
 
 void initializeSystemSettings () {
@@ -2843,6 +2897,12 @@ int /*long*/ mouseHoverProc (int /*long*/ handle) {
 	return widget.hoverProc (handle);
 }
 
+int /*long*/ pangoLayoutNewProc (int /*long*/ type, int /*long*/ n_construct_properties, int /*long*/ construct_properties) {
+	int /*long*/ layout = OS.Call (pangoLayoutNewDefaultProc, type, (int)/*64*/n_construct_properties, construct_properties);
+	OS.pango_layout_set_auto_dir (layout, false);
+	return layout;
+}
+
 /**
  * Generate a low level system event.
  * 
@@ -2880,6 +2940,13 @@ int /*long*/ mouseHoverProc (int /*long*/ handle) {
  * <li>(in) x the x coordinate to move the mouse pointer to in screen coordinates
  * <li>(in) y the y coordinate to move the mouse pointer to in screen coordinates
  * </ul>
+ * <p>MouseWheel</p>
+ * <p>The following fields in the <code>Event</code> apply:
+ * <ul>
+ * <li>(in) type MouseWheel
+ * <li>(in) detail either SWT.SCROLL_LINE or SWT.SCROLL_PAGE
+ * <li>(in) count the number of lines or pages to scroll
+ * </ul>
  * </dl>
  * 
  * @param event the event to be generated
@@ -2897,67 +2964,79 @@ int /*long*/ mouseHoverProc (int /*long*/ handle) {
  * 
  */
 public boolean post (Event event) {
-	synchronized (Device.class) {
-		if (isDisposed ()) error (SWT.ERROR_DEVICE_DISPOSED);
-		if (event == null) error (SWT.ERROR_NULL_ARGUMENT);
-		if (!OS.GDK_WINDOWING_X11()) return false;
-		int /*long*/ xDisplay = OS.GDK_DISPLAY ();
-		int type = event.type;
-		switch (type) {
-			case SWT.KeyDown:
-			case SWT.KeyUp: {
-				int keyCode = 0;
-				int /*long*/ keysym = untranslateKey (event.keyCode);
-				if (keysym != 0) keyCode = OS.XKeysymToKeycode (xDisplay, keysym);
-				if (keyCode == 0) {
-					char key = event.character;
-					switch (key) {
-						case SWT.BS: keysym = OS.GDK_BackSpace; break;
-						case SWT.CR: keysym = OS.GDK_Return; break;
-						case SWT.DEL: keysym = OS.GDK_Delete; break;
-						case SWT.ESC: keysym = OS.GDK_Escape; break;
-						case SWT.TAB: keysym = OS.GDK_Tab; break;
-						case SWT.LF: keysym = OS.GDK_Linefeed; break;
-						default:
-							keysym = key;
+	/*
+	* Get the operating system lock before synchronizing on the device
+	* lock so that the device lock will not be held should another
+	* thread already be in the operating system.  This avoids deadlock
+	* should the other thread need the device lock.
+	*/
+	Lock lock = OS.lock;
+	lock.lock();
+	try {
+		synchronized (Device.class) {
+			if (isDisposed ()) error (SWT.ERROR_DEVICE_DISPOSED);
+			if (event == null) error (SWT.ERROR_NULL_ARGUMENT);
+			if (!OS.GDK_WINDOWING_X11()) return false;
+			int /*long*/ xDisplay = OS.GDK_DISPLAY ();
+			int type = event.type;
+			switch (type) {
+				case SWT.KeyDown:
+				case SWT.KeyUp: {
+					int keyCode = 0;
+					int /*long*/ keysym = untranslateKey (event.keyCode);
+					if (keysym != 0) keyCode = OS.XKeysymToKeycode (xDisplay, keysym);
+					if (keyCode == 0) {
+						char key = event.character;
+						switch (key) {
+							case SWT.BS: keysym = OS.GDK_BackSpace; break;
+							case SWT.CR: keysym = OS.GDK_Return; break;
+							case SWT.DEL: keysym = OS.GDK_Delete; break;
+							case SWT.ESC: keysym = OS.GDK_Escape; break;
+							case SWT.TAB: keysym = OS.GDK_Tab; break;
+							case SWT.LF: keysym = OS.GDK_Linefeed; break;
+							default:
+								keysym = key;
+						}
+						keyCode = OS.XKeysymToKeycode (xDisplay, keysym);
+						if (keyCode == 0) return false;
 					}
-					keyCode = OS.XKeysymToKeycode (xDisplay, keysym);
-					if (keyCode == 0) return false;
+					OS.XTestFakeKeyEvent (xDisplay, keyCode, type == SWT.KeyDown, 0);
+					return true;
 				}
-				OS.XTestFakeKeyEvent (xDisplay, keyCode, type == SWT.KeyDown, 0);
-				return true;
-			}
-			case SWT.MouseDown:
-			case SWT.MouseMove: 
-			case SWT.MouseUp: {
-				if (type == SWT.MouseMove) {
-					OS.XTestFakeMotionEvent (xDisplay, -1, event.x, event.y, 0);
-				} else {
-					int button = event.button;
-					switch (button) {
-						case 1:
-						case 2:
-						case 3:	break;
-						case 4: button = 6;	break;
-						case 5: button = 7;	break;
-						default: return false;
+				case SWT.MouseDown:
+				case SWT.MouseMove: 
+				case SWT.MouseUp: {
+					if (type == SWT.MouseMove) {
+						OS.XTestFakeMotionEvent (xDisplay, -1, event.x, event.y, 0);
+					} else {
+						int button = event.button;
+						switch (button) {
+							case 1:
+							case 2:
+							case 3:	break;
+							case 4: button = 6;	break;
+							case 5: button = 7;	break;
+							default: return false;
+						}
+						OS.XTestFakeButtonEvent (xDisplay, button, type == SWT.MouseDown, 0);
 					}
-					OS.XTestFakeButtonEvent (xDisplay, button, type == SWT.MouseDown, 0);
+					return true;
 				}
-				return true;
+				/*
+				* This code is intentionally commented. After posting a
+				* mouse wheel event the system may respond unpredictably
+				* to subsequent mouse actions.
+				*/
+//				case SWT.MouseWheel: {
+//					if (event.count == 0) return false;
+//					int button = event.count < 0 ? 5 : 4;
+//					OS.XTestFakeButtonEvent (xDisplay, button, type == SWT.MouseWheel, 0);			
+//				}
 			}
-			/*
-			* This code is intentionally commented. After posting a
-			* mouse wheel event the system may respond unpredictably
-			* to subsequent mouse actions.
-			*/
-//			case SWT.MouseWheel: {
-//				if (event.count == 0) return false;
-//				int button = event.count < 0 ? 5 : 4;
-//				OS.XTestFakeButtonEvent (xDisplay, button, type == SWT.MouseWheel, 0);			
-//			}
+			return false;
 		}
-		return false;
+	} finally {
+		lock.unlock();
 	}
 }
 
@@ -3033,7 +3112,7 @@ public boolean readAndDispatch () {
 		runDeferredEvents ();
 		return true;
 	}
-	return runAsyncMessages (false);
+	return isDisposed () || runAsyncMessages (false);
 }
 
 static void register (Display display) {
@@ -3237,6 +3316,17 @@ void releaseDisplay () {
 	styleSetCallback.dispose(); styleSetCallback = null;
 	styleSetProc = 0;
 
+	/* Dispose subclass */
+	if (OS.GTK_VERSION >= OS.VERSION (2, 4, 0)) {
+		int /*long*/ pangoLayoutType = OS.PANGO_TYPE_LAYOUT ();
+		int /*long*/ pangoLayoutClass = OS.g_type_class_ref (pangoLayoutType);
+		OS.G_OBJECT_CLASS_SET_CONSTRUCTOR (pangoLayoutClass, pangoLayoutNewDefaultProc);
+		OS.g_type_class_unref (pangoLayoutClass);
+		pangoLayoutNewCallback.dispose ();
+		pangoLayoutNewCallback = null;
+		pangoLayoutNewDefaultProc = pangoLayoutNewProc = 0;
+	}
+	
 	/* Release the sleep resources */
 	max_priority = timeout = null;
 	if (fds != 0) OS.g_free (fds);
@@ -3379,6 +3469,7 @@ boolean runAsyncMessages (boolean all) {
 }
 
 boolean runDeferredEvents () {
+	boolean run = false;
 	/*
 	* Run deferred events.  This code is always
 	* called in the Display's thread so it must
@@ -3398,6 +3489,7 @@ boolean runDeferredEvents () {
 		if (widget != null && !widget.isDisposed ()) {
 			Widget item = event.item;
 			if (item == null || !item.isDisposed ()) {
+				run = true;
 				widget.sendEvent (event);
 			}
 		}
@@ -3411,7 +3503,7 @@ boolean runDeferredEvents () {
 
 	/* Clear the queue */
 	eventQueue = null;
-	return true;
+	return run;
 }
 
 boolean runPopups () {
@@ -3543,7 +3635,7 @@ public void setData (String key, Object value) {
 		}
 	}
 	if (key.equals (SET_MODAL_DIALOG)) {
-		setModalDialog ((Dialog) data);
+		setModalDialog ((Dialog) value);
 		return;
 	}
 	if (key.equals (ADD_WIDGET_KEY)) {

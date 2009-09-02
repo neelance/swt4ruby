@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2007, 2008 IBM Corporation and others.
+ * Copyright (c) 2007, 2009 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -36,6 +36,7 @@ import org.eclipse.swt.internal.gtk.*;
  * @see <a href="http://www.eclipse.org/swt/">Sample code and further information</a>
  * 
  * @since 3.4
+ * @noextend This class is not intended to be subclassed by clients.
  */
 public class IME extends Widget {
 	Canvas parent;
@@ -362,7 +363,19 @@ int /*long*/ gtk_preedit_changed (int /*long*/ imcontext) {
 		OS.g_free (preeditString [0]);
 	}
 	if (chars != null) {
-		if (text.length() == 0) startOffset = -1;
+		if (text.length() == 0) {
+			/*
+			* Bug in GTK. In Solaris, the IME sends multiple
+			* preedit_changed signals with an empty text.
+			* This behavior is not correct for SWT and can 
+			* cause the editor to replace its current selection
+			* with an empty string. The fix is to ignore any 
+			* preedit_changed signals with an empty text when
+			* the preedit buffer is already empty.    
+			*/
+			if (chars.length == 0) return 0;
+			startOffset = -1;
+		}
 		int end = startOffset + text.length();
 		if (startOffset == -1) {
 			Event event = new Event ();
@@ -412,7 +425,7 @@ void releaseWidget () {
  * above the IME, then the IME must be informed that the composition
  * offset has changed.
  *
- * @return the offset of the composition
+ * @param offset the offset of the composition
  *
  * @exception SWTException <ul>
  *    <li>ERROR_WIDGET_DISPOSED - if the receiver has been disposed</li>

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2008 IBM Corporation and others.
+ * Copyright (c) 2000, 2009 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -39,6 +39,7 @@ import org.eclipse.swt.events.*;
  * @see <a href="http://www.eclipse.org/swt/">Sample code and further information</a>
  * 
  * @since 3.1
+ * @noextend This class is not intended to be subclassed by clients.
  */
 public class Spinner extends Composite {
 	int /*long*/ hwndText, hwndUpDown;
@@ -1293,7 +1294,6 @@ LRESULT wmClipboard (int /*long*/ hwndText, int msg, int /*long*/ wParam, int /*
 		case OS.WM_UNDO:
 			if (OS.SendMessage (hwndText, OS.EM_CANUNDO, 0, 0) != 0) {
 				ignoreModify = true;
-				OS.SendMessage (hwndText, OS.EM_GETSEL, start, end);
 				OS.CallWindowProc (EditProc, hwndText, msg, wParam, lParam);
 				int length = OS.GetWindowTextLength (hwndText);
 				int [] newStart = new int [1], newEnd = new int [1];
@@ -1306,6 +1306,7 @@ LRESULT wmClipboard (int /*long*/ hwndText, int msg, int /*long*/ wParam, int /*
 					newText = "";
 				}
 				OS.CallWindowProc (EditProc, hwndText, msg, wParam, lParam);
+				OS.SendMessage (hwndText, OS.EM_GETSEL, start, end);
 				ignoreModify = false;
 			}
 			break;

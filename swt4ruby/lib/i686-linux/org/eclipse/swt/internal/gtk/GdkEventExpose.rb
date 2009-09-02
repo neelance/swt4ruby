@@ -1,6 +1,6 @@
 require "rjava"
 
-# Copyright (c) 2000, 2006 IBM Corporation and others. All rights reserved.
+# Copyright (c) 2000, 2008 IBM Corporation and others. All rights reserved.
 # The contents of this file are made available under the terms
 # of the GNU Lesser General Public License (LGPL) Version 2.1 that
 # accompanies this distribution (lgpl-v21.txt).  The LGPL is also
@@ -23,6 +23,7 @@ module Org::Eclipse::Swt::Internal::Gtk
   class GdkEventExpose < GdkEventExposeImports.const_get :GdkEvent
     include_class_members GdkEventExposeImports
     
+    # @field cast=(GdkWindow *)
     # long
     attr_accessor :window
     alias_method :attr_window, :window
@@ -30,36 +31,42 @@ module Org::Eclipse::Swt::Internal::Gtk
     alias_method :attr_window=, :window=
     undef_method :window=
     
+    # @field cast=(gint8)
     attr_accessor :send_event
     alias_method :attr_send_event, :send_event
     undef_method :send_event
     alias_method :attr_send_event=, :send_event=
     undef_method :send_event=
     
+    # @field accessor=area.x
     attr_accessor :area_x
     alias_method :attr_area_x, :area_x
     undef_method :area_x
     alias_method :attr_area_x=, :area_x=
     undef_method :area_x=
     
+    # @field accessor=area.y
     attr_accessor :area_y
     alias_method :attr_area_y, :area_y
     undef_method :area_y
     alias_method :attr_area_y=, :area_y=
     undef_method :area_y=
     
+    # @field accessor=area.width
     attr_accessor :area_width
     alias_method :attr_area_width, :area_width
     undef_method :area_width
     alias_method :attr_area_width=, :area_width=
     undef_method :area_width=
     
+    # @field accessor=area.height
     attr_accessor :area_height
     alias_method :attr_area_height, :area_height
     undef_method :area_height
     alias_method :attr_area_height=, :area_height=
     undef_method :area_height=
     
+    # @field cast=(GdkRegion *)
     # long
     attr_accessor :region
     alias_method :attr_region, :region
@@ -67,6 +74,7 @@ module Org::Eclipse::Swt::Internal::Gtk
     alias_method :attr_region=, :region=
     undef_method :region=
     
+    # @field cast=(gint)
     attr_accessor :count
     alias_method :attr_count, :count
     undef_method :count

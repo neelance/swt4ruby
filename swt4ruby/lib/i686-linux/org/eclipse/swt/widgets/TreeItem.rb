@@ -1,6 +1,6 @@
 require "rjava"
 
-# Copyright (c) 2000, 2008 IBM Corporation and others.
+# Copyright (c) 2000, 2009 IBM Corporation and others.
 # All rights reserved. This program and the accompanying materials
 # are made available under the terms of the Eclipse Public License v1.0
 # which accompanies this distribution, and is available at
@@ -35,6 +35,7 @@ module Org::Eclipse::Swt::Widgets
   # 
   # @see <a href="http://www.eclipse.org/swt/snippets/#tree">Tree, TreeItem, TreeColumn snippets</a>
   # @see <a href="http://www.eclipse.org/swt/">Sample code and further information</a>
+  # @noextend This class is not intended to be subclassed by clients.
   class TreeItem < TreeItemImports.const_get :Item
     include_class_members TreeItemImports
     
@@ -1305,21 +1306,37 @@ module Org::Eclipse::Swt::Widgets
     # @since 3.1
     def remove_all
       check_widget
-      length = OS.gtk_tree_model_iter_n_children(@parent.attr_model_handle, self.attr_handle)
+      # long
+      model_handle = @parent.attr_model_handle
+      length = OS.gtk_tree_model_iter_n_children(model_handle, self.attr_handle)
       if ((length).equal?(0))
         return
       end
       # long
       iter = OS.g_malloc(OS._gtk_tree_iter_sizeof)
-      index = Array.typed(::Java::Int).new(1) { 0 }
-      while (OS.gtk_tree_model_iter_children(@parent.attr_model_handle, iter, self.attr_handle))
-        OS.gtk_tree_model_get(@parent.attr_model_handle, iter, Tree::ID_COLUMN, index, -1)
-        if (!(index[0]).equal?(-1))
-          item = @parent.attr_items[index[0]]
-          if (!(item).nil? && !item.is_disposed)
-            item.dispose
-          end
+      if ((iter).equal?(0))
+        error(SWT::ERROR_NO_HANDLES)
+      end
+      if (@parent.fix_accessibility)
+        @parent.attr_ignore_accessibility = true
+      end
+      # long
+      selection = OS.gtk_tree_view_get_selection(@parent.attr_handle)
+      value = Array.typed(::Java::Int).new(1) { 0 }
+      while (OS.gtk_tree_model_iter_children(model_handle, iter, self.attr_handle))
+        OS.gtk_tree_model_get(model_handle, iter, Tree::ID_COLUMN, value, -1)
+        item = !(value[0]).equal?(-1) ? @parent.attr_items[value[0]] : nil
+        if (!(item).nil? && !item.is_disposed)
+          item.dispose
+        else
+          OS.g_signal_handlers_block_matched(selection, OS::G_SIGNAL_MATCH_DATA, 0, 0, 0, 0, CHANGED)
+          OS.gtk_tree_store_remove(model_handle, iter)
+          OS.g_signal_handlers_unblock_matched(selection, OS::G_SIGNAL_MATCH_DATA, 0, 0, 0, 0, CHANGED)
         end
+      end
+      if (@parent.fix_accessibility)
+        @parent.attr_ignore_accessibility = false
+        OS.g_object_notify(@parent.attr_handle, OS.attr_model)
       end
       OS.g_free(iter)
     end

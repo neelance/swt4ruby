@@ -1,6 +1,6 @@
 require "rjava"
 
-# Copyright (c) 2000, 2008 IBM Corporation and others.
+# Copyright (c) 2000, 2009 IBM Corporation and others.
 # All rights reserved. This program and the accompanying materials
 # are made available under the terms of the Eclipse Public License v1.0
 # which accompanies this distribution, and is available at
@@ -43,7 +43,14 @@ module Org::Eclipse::Swt::Opengl
     alias_method :attr_pixel_format=, :pixel_format=
     undef_method :pixel_format=
     
+    class_module.module_eval {
+      const_set_lazy(:USE_OWNDC_KEY) { "org.eclipse.swt.internal.win32.useOwnDC" }
+      const_attr_reader  :USE_OWNDC_KEY
+    }
+    
     typesig { [Composite, ::Java::Int, GLData] }
+    # $NON-NLS-1$
+    # 
     # Create a GLCanvas widget using the attributes described in the GLData
     # object provided.
     # 
@@ -58,7 +65,8 @@ module Org::Eclipse::Swt::Opengl
     def initialize(parent, style, data)
       @context = 0
       @pixel_format = 0
-      super(parent, style)
+      super(parent, check_style(parent, style))
+      parent.get_display.set_data(USE_OWNDC_KEY, Boolean.new(false))
       if ((data).nil?)
         SWT.error(SWT::ERROR_NULL_ARGUMENT)
       end
@@ -108,9 +116,10 @@ module Org::Eclipse::Swt::Opengl
         SWT.error(SWT::ERROR_NO_HANDLES)
       end
       OS._release_dc(self.attr_handle, h_dc)
-      listener = # FIXME- share lists
-      # if (share != null) WGL.wglShareLists (context, share.context);
-      Class.new(Listener.class == Class ? Listener : Object) do
+      if (!(data.attr_share_context).nil?)
+        WGL.wgl_share_lists(data.attr_share_context.attr_context, @context)
+      end
+      listener = Class.new(Listener.class == Class ? Listener : Object) do
         extend LocalClass
         include_class_members GLCanvas
         include Listener if Listener.class == Module
@@ -133,6 +142,18 @@ module Org::Eclipse::Swt::Opengl
       end.new_local(self)
       add_listener(SWT::Dispose, listener)
     end
+    
+    class_module.module_eval {
+      typesig { [Composite, ::Java::Int] }
+      def check_style(parent, style)
+        if (!(parent).nil?)
+          if (!OS::IsWinCE && OS::WIN32_VERSION >= OS._version(6, 0))
+            parent.get_display.set_data(USE_OWNDC_KEY, Boolean.new(true))
+          end
+        end
+        return style
+      end
+    }
     
     typesig { [] }
     # Returns a GLData object describing the created context.

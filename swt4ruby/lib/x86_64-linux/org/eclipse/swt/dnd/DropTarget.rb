@@ -1,6 +1,6 @@
 require "rjava"
 
-# Copyright (c) 2000, 2008 IBM Corporation and others.
+# Copyright (c) 2000, 2009 IBM Corporation and others.
 # All rights reserved. This program and the accompanying materials
 # are made available under the terms of the Eclipse Public License v1.0
 # which accompanies this distribution, and is available at
@@ -23,7 +23,7 @@ module Org::Eclipse::Swt::Dnd
   
   # Class <code>DropTarget</code> defines the target object for a drag and drop transfer.
   # 
-  # IMPORTANT: This class is <em>not</em> intended to be subclassed.
+  # <p>IMPORTANT: This class is <em>not</em> intended to be subclassed.</p>
   # 
   # <p>This class identifies the <code>Control</code> over which the user must position the cursor
   # in order to drop the data being transferred.  It also specifies what data types can be dropped on
@@ -73,6 +73,7 @@ module Org::Eclipse::Swt::Dnd
   # @see <a href="http://www.eclipse.org/swt/snippets/#dnd">Drag and Drop snippets</a>
   # @see <a href="http://www.eclipse.org/swt/examples.php">SWT Example: DNDExample</a>
   # @see <a href="http://www.eclipse.org/swt/">Sample code and further information</a>
+  # @noextend This class is not intended to be subclassed by clients.
   class DropTarget < DropTargetImports.const_get :Widget
     include_class_members DropTargetImports
     
@@ -166,6 +167,10 @@ module Org::Eclipse::Swt::Dnd
     class_module.module_eval {
       const_set_lazy(:DEFAULT_DROP_TARGET_EFFECT) { "DEFAULT_DROP_TARGET_EFFECT" }
       const_attr_reader  :DEFAULT_DROP_TARGET_EFFECT
+      
+      # $NON-NLS-1$
+      const_set_lazy(:IS_ACTIVE) { "org.eclipse.swt.internal.control.isactive" }
+      const_attr_reader  :IS_ACTIVE
       
       # $NON-NLS-1$
       const_set_lazy(:DRAGOVER_HYSTERESIS) { 50 }
@@ -679,7 +684,10 @@ module Org::Eclipse::Swt::Dnd
     # int
     def drag_motion(widget, context, x, y, time)
       old_key_operation = @key_operation
-      if ((old_key_operation).equal?(-1))
+      # Bug in GTK. GTK allows drag & drop on a shell even if a modal
+      # dialog/window is opened on that shell. The fix is to check for
+      # any active modal dialogs/shells before allowing the drop.
+      if (((old_key_operation).equal?(-1)) || !(@control.get_data(IS_ACTIVE)).boolean_value)
         # drag enter
         @selected_data_type = nil
         @selected_operation = DND::DROP_NONE

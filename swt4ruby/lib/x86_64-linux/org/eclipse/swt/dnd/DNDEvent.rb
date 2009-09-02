@@ -1,6 +1,6 @@
 require "rjava"
 
-# Copyright (c) 2000, 2007 IBM Corporation and others.
+# Copyright (c) 2000, 2008 IBM Corporation and others.
 # All rights reserved. This program and the accompanying materials
 # are made available under the terms of the Eclipse Public License v1.0
 # which accompanies this distribution, and is available at
@@ -51,6 +51,18 @@ module Org::Eclipse::Swt::Dnd
     alias_method :attr_image=, :image=
     undef_method :image=
     
+    attr_accessor :offset_x
+    alias_method :attr_offset_x, :offset_x
+    undef_method :offset_x
+    alias_method :attr_offset_x=, :offset_x=
+    undef_method :offset_x=
+    
+    attr_accessor :offset_y
+    alias_method :attr_offset_y, :offset_y
+    undef_method :offset_y
+    alias_method :attr_offset_y=, :offset_y=
+    undef_method :offset_y=
+    
     typesig { [] }
     def initialize
       @data_type = nil
@@ -58,6 +70,8 @@ module Org::Eclipse::Swt::Dnd
       @operations = 0
       @feedback = 0
       @image = nil
+      @offset_x = 0
+      @offset_y = 0
       super()
     end
     

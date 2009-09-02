@@ -1,6 +1,6 @@
 require "rjava"
 
-# Copyright (c) 2000, 2006 IBM Corporation and others.
+# Copyright (c) 2000, 2008 IBM Corporation and others.
 # All rights reserved. This program and the accompanying materials
 # are made available under the terms of the Eclipse Public License v1.0
 # which accompanies this distribution, and is available at
@@ -20,24 +20,28 @@ module Org::Eclipse::Swt::Internal::Ole::Win32
     include_class_members TYPEATTRImports
     
     # GUID guid
+    # @field accessor=guid.Data1
     attr_accessor :guid_data1
     alias_method :attr_guid_data1, :guid_data1
     undef_method :guid_data1
     alias_method :attr_guid_data1=, :guid_data1=
     undef_method :guid_data1=
     
+    # @field accessor=guid.Data2
     attr_accessor :guid_data2
     alias_method :attr_guid_data2, :guid_data2
     undef_method :guid_data2
     alias_method :attr_guid_data2=, :guid_data2=
     undef_method :guid_data2=
     
+    # @field accessor=guid.Data3
     attr_accessor :guid_data3
     alias_method :attr_guid_data3, :guid_data3
     undef_method :guid_data3
     alias_method :attr_guid_data3=, :guid_data3=
     undef_method :guid_data3=
     
+    # @field accessor=guid.Data4
     attr_accessor :guid_data4
     alias_method :attr_guid_data4, :guid_data4
     undef_method :guid_data4
@@ -68,6 +72,7 @@ module Org::Eclipse::Swt::Internal::Ole::Win32
     alias_method :attr_memid_destructor=, :memid_destructor=
     undef_method :memid_destructor=
     
+    # @field cast=(OLECHAR FAR *)
     # long
     attr_accessor :lpstr_schema
     alias_method :attr_lpstr_schema, :lpstr_schema
@@ -136,6 +141,7 @@ module Org::Eclipse::Swt::Internal::Ole::Win32
     undef_method :w_minor_ver_num=
     
     # TYPEDESC tdescAlias
+    # @field accessor=tdescAlias.lptdesc,cast=(struct FARSTRUCT tagTYPEDESC FAR *)
     # long
     attr_accessor :tdesc_alias_union_field
     alias_method :attr_tdesc_alias_union_field, :tdesc_alias_union_field
@@ -143,6 +149,7 @@ module Org::Eclipse::Swt::Internal::Ole::Win32
     alias_method :attr_tdesc_alias_union_field=, :tdesc_alias_union_field=
     undef_method :tdesc_alias_union_field=
     
+    # @field accessor=tdescAlias.vt
     attr_accessor :tdesc_alias_vt
     alias_method :attr_tdesc_alias_vt, :tdesc_alias_vt
     undef_method :tdesc_alias_vt
@@ -150,12 +157,14 @@ module Org::Eclipse::Swt::Internal::Ole::Win32
     undef_method :tdesc_alias_vt=
     
     # IDLDESC idldesctype
+    # @field accessor=idldescType.dwReserved
     attr_accessor :idldesc_type_dw_reserved
     alias_method :attr_idldesc_type_dw_reserved, :idldesc_type_dw_reserved
     undef_method :idldesc_type_dw_reserved
     alias_method :attr_idldesc_type_dw_reserved=, :idldesc_type_dw_reserved=
     undef_method :idldesc_type_dw_reserved=
     
+    # @field accessor=idldescType.wIDLFlags
     attr_accessor :idldesc_type_w_idlflags
     alias_method :attr_idldesc_type_w_idlflags, :idldesc_type_w_idlflags
     undef_method :idldesc_type_w_idlflags

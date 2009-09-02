@@ -1,6 +1,6 @@
 require "rjava"
 
-# Copyright (c) 2000, 2004 IBM Corporation and others.
+# Copyright (c) 2000, 2008 IBM Corporation and others.
 # All rights reserved. This program and the accompanying materials
 # are made available under the terms of the Eclipse Public License v1.0
 # which accompanies this distribution, and is available at
@@ -25,6 +25,7 @@ module Org::Eclipse::Swt::Internal::Cde
     alias_method :attr_arg_class=, :arg_class=
     undef_method :arg_class=
     
+    # @field accessor=u.file.name,cast=(char *)
     # int
     attr_accessor :name
     alias_method :attr_name, :name

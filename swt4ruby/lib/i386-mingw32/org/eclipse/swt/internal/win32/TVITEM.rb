@@ -1,6 +1,6 @@
 require "rjava"
 
-# Copyright (c) 2000, 2006 IBM Corporation and others.
+# Copyright (c) 2000, 2008 IBM Corporation and others.
 # All rights reserved. This program and the accompanying materials
 # are made available under the terms of the Eclipse Public License v1.0
 # which accompanies this distribution, and is available at
@@ -25,6 +25,7 @@ module Org::Eclipse::Swt::Internal::Win32
     alias_method :attr_mask=, :mask=
     undef_method :mask=
     
+    # @field cast=(HTREEITEM)
     # long
     attr_accessor :h_item
     alias_method :attr_h_item, :h_item
@@ -44,6 +45,7 @@ module Org::Eclipse::Swt::Internal::Win32
     alias_method :attr_state_mask=, :state_mask=
     undef_method :state_mask=
     
+    # @field cast=(LPTSTR)
     # long
     attr_accessor :psz_text
     alias_method :attr_psz_text, :psz_text

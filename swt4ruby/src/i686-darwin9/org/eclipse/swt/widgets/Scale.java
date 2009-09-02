@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2008 IBM Corporation and others.
+ * Copyright (c) 2000, 2009 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -11,7 +11,7 @@
 package org.eclipse.swt.widgets;
 
 
-import org.eclipse.swt.internal.carbon.OS;
+import org.eclipse.swt.internal.cocoa.*;
 
 import org.eclipse.swt.*;
 import org.eclipse.swt.events.*;
@@ -38,6 +38,7 @@ import org.eclipse.swt.graphics.*;
  * @see <a href="http://www.eclipse.org/swt/snippets/#scale">Scale snippets</a>
  * @see <a href="http://www.eclipse.org/swt/examples.php">SWT Example: ControlExample</a>
  * @see <a href="http://www.eclipse.org/swt/">Sample code and further information</a>
+ * @noextend This class is not intended to be subclassed by clients.
  */
 public class Scale extends Control {
 	int increment = 1;
@@ -74,13 +75,6 @@ public class Scale extends Control {
  */
 public Scale (Composite parent, int style) {
 	super (parent, checkStyle (style));
-}
-
-int actionProc (int theControl, int partCode) {
-	int result = super.actionProc (theControl, partCode);
-	if (result == OS.noErr) return result;
-	sendEvent (SWT.Selection);
-	return result;
 }
 
 /**
@@ -120,16 +114,14 @@ static int checkStyle (int style) {
 
 public Point computeSize (int wHint, int hHint, boolean changed) {
 	checkWidget();
-	int width = 0, height = 0;
-	if ((style & SWT.HORIZONTAL) != 0) {
-		int [] outMetric = new int [1];
-		OS.GetThemeMetric (OS.kThemeMetricHSliderHeight, outMetric);
-		height = outMetric [0];
+	NSSlider widget = (NSSlider)view;
+	float /*double*/ thickness = widget.knobThickness();
+	int width = DEFAULT_WIDTH, height = DEFAULT_HEIGHT;
+	if ((style & SWT.HORIZONTAL) != 0) {		
+		height = (int)Math.ceil(thickness);
 		width = height * 10;
 	} else {
-		int [] outMetric = new int [1];
-		OS.GetThemeMetric (OS.kThemeMetricVSliderWidth, outMetric);
-		width = outMetric [0];
+		width = (int)Math.ceil(thickness);
 		height = width * 10;
 	}
 	if (wHint != SWT.DEFAULT) width = wHint;
@@ -139,14 +131,23 @@ public Point computeSize (int wHint, int hHint, boolean changed) {
 
 void createHandle () {
 	state |= THEME_BACKGROUND;
-	int actionProc = display.actionProc;
-	int [] outControl = new int [1];
-	int window = OS.GetControlOwner (parent.handle);
-	int value = (style & SWT.VERTICAL) != 0 ? 100 : 0;
-	OS.CreateSliderControl (window, null, value, 0, 100, OS.kControlSliderDoesNotPoint, (short)0, true, actionProc, outControl);
-	if (outControl [0] == 0) error (SWT.ERROR_NO_HANDLES);
-	handle = outControl [0];
+	NSSlider widget = (NSSlider)new SWTSlider().alloc();
+	widget.init();
+	widget.setMaxValue(100);
+	widget.setTarget(widget);
+	widget.setAction(OS.sel_sendSelection);
+	view = widget;
 }
+
+NSFont defaultNSFont () {
+	return display.sliderFont;
+}
+
+void deregister() {
+	super.deregister();
+	display.removeWidget(((NSControl)view).cell());
+}
+
 
 /**
  * Returns the amount that the receiver's value will be
@@ -177,7 +178,7 @@ public int getIncrement () {
  */
 public int getMaximum () {
 	checkWidget();
-    return OS.GetControl32BitMaximum (handle);
+	return (int)((NSSlider)view).maxValue();
 }
 
 /**
@@ -192,7 +193,7 @@ public int getMaximum () {
  */
 public int getMinimum () {
 	checkWidget();
-    return OS.GetControl32BitMinimum (handle);
+	return (int)((NSSlider)view).minValue();
 }
 
 /**
@@ -224,35 +225,12 @@ public int getPageIncrement () {
  */
 public int getSelection () {
 	checkWidget();
-    int value = OS.GetControl32BitValue (handle);
-	if ((style & SWT.VERTICAL) != 0) {
-		int minimum = OS.GetControl32BitMinimum (handle);
-		int maximum = OS.GetControl32BitMaximum (handle);
-		value = maximum - value + minimum;
-	}
-	return value;
+    return (int)((NSSlider)view).doubleValue();
 }
 
-int kEventMouseDown (int nextHandler, int theEvent, int userData) {
-	int result = super.kEventMouseDown (nextHandler, theEvent, userData);
-	if (result == OS.noErr) return result;
-	/*
-	* Bug in the Macintosh.  For some reason, when the slider
-	* is not ghosted, if the slider has keyboard focus, the
-	* user will not be able to drag the thumb to the maximum value
-	* of the slider.  The fix is to clear the focus temporarily
-	* and restore it after the thumb tracking is complety.
-	*/
-	if (!hasFocus ()) return result;
-	display.ignoreFocus = true;
-	int window = OS.GetControlOwner (handle);
-	OS.ClearKeyboardFocus (window);
-	result = OS.CallNextEventHandler (nextHandler, theEvent);
-	if (!isDisposed ()) {
-		OS.SetKeyboardFocus (window, handle, (short) focusPart ());
-	}
-	display.ignoreFocus = false;
-	return result;
+void register() {
+	super.register();
+	display.addWidget(((NSControl)view).cell(), this);
 }
 
 /**
@@ -278,6 +256,13 @@ public void removeSelectionListener(SelectionListener listener) {
 	if (eventTable == null) return;
 	eventTable.unhook(SWT.Selection, listener);
 	eventTable.unhook(SWT.DefaultSelection,listener);
+}
+
+void sendSelection () {
+	NSEvent currEvent = NSApplication.sharedApplication().currentEvent();
+	
+	if (currEvent.type() != OS.NSLeftMouseUp)
+		postEvent (SWT.Selection);
 }
 
 /**
@@ -314,11 +299,9 @@ public void setIncrement (int value) {
  */
 public void setMaximum (int value) {
 	checkWidget();
-	if (value < 0) return;
-	int minimum = OS.GetControl32BitMinimum (handle);
-	if (value > minimum) {
-		OS.SetControl32BitMaximum (handle, value);
-	}
+	int minimum = (int)((NSSlider)view).minValue();
+	if (value <= minimum) return;
+	((NSSlider)view).setMaxValue(value);
 }
 
 /**
@@ -336,11 +319,9 @@ public void setMaximum (int value) {
  */
 public void setMinimum (int value) {
 	checkWidget();
-	if (value < 0) return;
-	int maximum = OS.GetControl32BitMaximum (handle);
-	if (value < maximum) {
-		OS.SetControl32BitMinimum (handle, value);
-	}
+	int maximum = (int)((NSSlider)view).maxValue();
+	if (!(0 <= value && value < maximum)) return;
+	((NSSlider)view).setMinValue(value);
 }
 
 /**
@@ -375,12 +356,7 @@ public void setPageIncrement (int value) {
  */
 public void setSelection (int value) {
 	checkWidget();
-	if ((style & SWT.VERTICAL) != 0) {
-		int minimum = OS.GetControl32BitMinimum (handle);
-		int maximum = OS.GetControl32BitMaximum (handle);
-		value = Math.min (maximum, Math.max (minimum, maximum - value + minimum));
-	}
-	OS.SetControl32BitValue (handle, value);
+	((NSSlider)view).setDoubleValue(value);
 }
 
 }

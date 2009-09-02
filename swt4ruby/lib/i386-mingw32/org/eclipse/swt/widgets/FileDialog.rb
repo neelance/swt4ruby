@@ -1,6 +1,6 @@
 require "rjava"
 
-# Copyright (c) 2000, 2008 IBM Corporation and others.
+# Copyright (c) 2000, 2009 IBM Corporation and others.
 # All rights reserved. This program and the accompanying materials
 # are made available under the terms of the Eclipse Public License v1.0
 # which accompanies this distribution, and is available at
@@ -37,6 +37,7 @@ module Org::Eclipse::Swt::Widgets
   # @see <a href="http://www.eclipse.org/swt/snippets/#filedialog">FileDialog snippets</a>
   # @see <a href="http://www.eclipse.org/swt/examples.php">SWT Example: ControlExample, Dialog tab</a>
   # @see <a href="http://www.eclipse.org/swt/">Sample code and further information</a>
+  # @noextend This class is not intended to be subclassed by clients.
   class FileDialog < FileDialogImports.const_get :Dialog
     include_class_members FileDialogImports
     
@@ -160,6 +161,10 @@ module Org::Eclipse::Swt::Widgets
     # <li>ERROR_THREAD_INVALID_ACCESS - if not called from the thread that created the parent</li>
     # <li>ERROR_INVALID_SUBCLASS - if this class is not an allowed subclass</li>
     # </ul>
+    # 
+    # @see SWT#SAVE
+    # @see SWT#OPEN
+    # @see SWT#MULTI
     def initialize(parent, style)
       @filter_names = nil
       @filter_extensions = nil
@@ -412,7 +417,7 @@ module Org::Eclipse::Swt::Widgets
       end
       callback = nil
       if (!((self.attr_style & SWT::MULTI)).equal?(0))
-        struct.attr_flags |= OS::OFN_ALLOWMULTISELECT | OS::OFN_EXPLORER
+        struct.attr_flags |= OS::OFN_ALLOWMULTISELECT | OS::OFN_EXPLORER | OS::OFN_ENABLESIZING
         if (!OS::IsWinCE && self.attr_use_hook)
           callback = Callback.new(self, "OFNHookProc", 4) # $NON-NLS-1$
           # long

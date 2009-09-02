@@ -1,6 +1,6 @@
 require "rjava"
 
-# Copyright (c) 2000, 2008 IBM Corporation and others.
+# Copyright (c) 2000, 2009 IBM Corporation and others.
 # All rights reserved. This program and the accompanying materials
 # are made available under the terms of the Eclipse Public License v1.0
 # which accompanies this distribution, and is available at
@@ -13,10 +13,10 @@ module Org::Eclipse::Swt::Widgets
     class_module.module_eval {
       include ::Java::Lang
       include ::Org::Eclipse::Swt::Widgets
-      include_const ::Org::Eclipse::Swt::Internal::Carbon, :ControlFontStyleRec
-      include_const ::Org::Eclipse::Swt::Internal::Carbon, :OS
       include ::Org::Eclipse::Swt
+      include ::Org::Eclipse::Swt::Accessibility
       include ::Org::Eclipse::Swt::Graphics
+      include ::Org::Eclipse::Swt::Internal::Cocoa
     }
   end
   
@@ -25,7 +25,7 @@ module Org::Eclipse::Swt::Widgets
   # When SEPARATOR is specified, displays a single
   # vertical or horizontal line.
   # <p>
-  # Shadow styles are hints and may not be honoured
+  # Shadow styles are hints and may not be honored
   # by the platform.  To create a separator label
   # with the default shadow style for the platform,
   # do not specify a shadow style.
@@ -50,6 +50,7 @@ module Org::Eclipse::Swt::Widgets
   # @see <a href="http://www.eclipse.org/swt/snippets/#label">Label snippets</a>
   # @see <a href="http://www.eclipse.org/swt/examples.php">SWT Example: ControlExample</a>
   # @see <a href="http://www.eclipse.org/swt/">Sample code and further information</a>
+  # @noextend This class is not intended to be subclassed by clients.
   class Label < LabelImports.const_get :Control
     include_class_members LabelImports
     
@@ -70,6 +71,18 @@ module Org::Eclipse::Swt::Widgets
     undef_method :is_image
     alias_method :attr_is_image=, :is_image=
     undef_method :is_image=
+    
+    attr_accessor :text_view
+    alias_method :attr_text_view, :text_view
+    undef_method :text_view
+    alias_method :attr_text_view=, :text_view=
+    undef_method :text_view=
+    
+    attr_accessor :image_view
+    alias_method :attr_image_view, :image_view
+    undef_method :image_view
+    alias_method :attr_image_view=, :image_view=
+    undef_method :image_view=
     
     typesig { [Composite, ::Java::Int] }
     # Constructs a new instance of this class given its parent
@@ -111,8 +124,62 @@ module Org::Eclipse::Swt::Widgets
       @text = nil
       @image = nil
       @is_image = false
+      @text_view = nil
+      @image_view = nil
       super(parent, check_style(style))
-      @text = ""
+    end
+    
+    typesig { [::Java::Int, ::Java::Int] }
+    # long
+    # long
+    # long
+    def accessibility_attribute_names(id, sel)
+      if (!(self.attr_accessible).nil?)
+        if ((!(@text_view).nil? && ((id).equal?(@text_view.attr_id) || (id).equal?(@text_view.cell.attr_id))) || (!(@image_view).nil? && ((id).equal?(@image_view.attr_id) || (id).equal?(@image_view.cell.attr_id))))
+          # See if the accessible will override or augment the standard list.
+          # Help, title, and description can be overridden.
+          extra_attributes = NSMutableArray.array_with_capacity(3)
+          extra_attributes.add_object(OS::NSAccessibilityHelpAttribute)
+          extra_attributes.add_object(OS::NSAccessibilityDescriptionAttribute)
+          extra_attributes.add_object(OS::NSAccessibilityTitleAttribute)
+          # 64
+          i = RJava.cast_to_int(extra_attributes.count) - 1
+          while i >= 0
+            attribute = NSString.new(extra_attributes.object_at_index(i).attr_id)
+            if ((self.attr_accessible.internal_accessibility_attribute_value(attribute, ACC::CHILDID_SELF)).nil?)
+              extra_attributes.remove_object_at_index(i)
+            end
+            i -= 1
+          end
+          if (extra_attributes.count > 0)
+            # long
+            super_result = super(id, sel)
+            base_attributes = NSArray.new(super_result)
+            mutable_attributes = NSMutableArray.array_with_capacity(base_attributes.count + 1)
+            mutable_attributes.add_objects_from_array(base_attributes)
+            i_ = 0
+            while i_ < extra_attributes.count
+              curr_attribute = extra_attributes.object_at_index(i_)
+              if (!mutable_attributes.contains_object(curr_attribute))
+                mutable_attributes.add_object(curr_attribute)
+              end
+              i_ += 1
+            end
+            return mutable_attributes.attr_id
+          end
+        end
+      end
+      return super(id, sel)
+    end
+    
+    typesig { [::Java::Int, ::Java::Int] }
+    # long
+    # long
+    def accessibility_is_ignored(id, sel)
+      if ((id).equal?(self.attr_view.attr_id))
+        return true
+      end
+      return super(id, sel)
     end
     
     typesig { [Control] }
@@ -120,25 +187,18 @@ module Org::Eclipse::Swt::Widgets
       if (!control.is_described_by_label)
         return
       end
-      label_element = OS._axuielement_create_with_hiobject_and_identifier(self.attr_handle, 0)
-      string = OS.attr_k_axtitle_uielement_attribute # control LabeledBy this
-      buffer = CharArray.new(string.length)
-      string.get_chars(0, buffer.attr_length, buffer, 0)
-      string_ref = OS._cfstring_create_with_characters(OS.attr_k_cfallocator_default, buffer, buffer.attr_length)
-      OS._hiobject_set_auxiliary_accessibility_attribute(control.focus_handle, 0, string_ref, label_element)
-      OS._cfrelease(label_element)
-      OS._cfrelease(string_ref)
-      related_element = OS._axuielement_create_with_hiobject_and_identifier(control.focus_handle, 0)
-      array = OS._cfarray_create_mutable(OS.attr_k_cfallocator_default, 1, 0)
-      OS._cfarray_append_value(array, related_element)
-      string = RJava.cast_to_string(OS.attr_k_axserves_as_title_for_uielements_attribute) # this LabelFor control
-      buffer = CharArray.new(string.length)
-      string.get_chars(0, buffer.attr_length, buffer, 0)
-      string_ref = OS._cfstring_create_with_characters(OS.attr_k_cfallocator_default, buffer, buffer.attr_length)
-      OS._hiobject_set_auxiliary_accessibility_attribute(self.attr_handle, 0, string_ref, array)
-      OS._cfrelease(related_element)
-      OS._cfrelease(string_ref)
-      OS._cfrelease(array)
+      if (!(@text_view).nil?)
+        accessible_element = control.focus_view
+        if (accessible_element.is_a?(NSControl))
+          view_as_control = accessible_element
+          if (!(view_as_control.cell).nil?)
+            accessible_element = view_as_control.cell
+          end
+        end
+        accessible_element.accessibility_set_override_value(@text_view.cell, OS::NSAccessibilityTitleUIElementAttribute)
+        control_array = NSArray.array_with_object(accessible_element)
+        @text_view.cell.accessibility_set_override_value(control_array, OS::NSAccessibilityServesAsTitleForUIElementsAttribute)
+      end
     end
     
     class_module.module_eval {
@@ -156,31 +216,48 @@ module Org::Eclipse::Swt::Widgets
     typesig { [::Java::Int, ::Java::Int, ::Java::Boolean] }
     def compute_size(w_hint, h_hint, changed)
       check_widget
-      width = 0
-      height = 0
+      width = DEFAULT_WIDTH
+      height = DEFAULT_HEIGHT
       if (!((self.attr_style & SWT::SEPARATOR)).equal?(0))
+        # double
+        line_width = (self.attr_view).border_width
         if (!((self.attr_style & SWT::HORIZONTAL)).equal?(0))
-          width = DEFAULT_WIDTH
-          height = 3
+          height = RJava.cast_to_int(Math.ceil(line_width * 2))
         else
-          width = 3
-          height = DEFAULT_HEIGHT
+          width = RJava.cast_to_int(Math.ceil(line_width * 2))
+        end
+        if (!(w_hint).equal?(SWT::DEFAULT))
+          width = w_hint
+        end
+        if (!(h_hint).equal?(SWT::DEFAULT))
+          height = h_hint
+        end
+        border = get_border_width
+        width += border * 2
+        height += border * 2
+        return Point.new(width, height)
+      end
+      if (@is_image)
+        if (!(@image).nil?)
+          nsimage = @image.attr_handle
+          size_ = nsimage.size
+          width = RJava.cast_to_int(size_.attr_width)
+          height = RJava.cast_to_int(size_.attr_height)
+        else
+          width = height = 0
         end
       else
-        if (@is_image && !(@image).nil?)
-          r = @image.get_bounds
-          width = r.attr_width
-          height = r.attr_height
+        size_ = nil
+        if (!((self.attr_style & SWT::WRAP)).equal?(0) && !(w_hint).equal?(SWT::DEFAULT))
+          rect = NSRect.new
+          rect.attr_width = w_hint
+          rect.attr_height = !(h_hint).equal?(SWT::DEFAULT) ? h_hint : Float::MAX_VALUE
+          size_ = @text_view.cell.cell_size_for_bounds(rect)
         else
-          ptr = Array.typed(::Java::Int).new(1) { 0 }
-          OS._get_control_data(self.attr_handle, RJava.cast_to_short(0), OS.attr_k_control_static_text_cfstring_tag, 4, ptr, nil)
-          size = text_extent(ptr[0], !((self.attr_style & SWT::WRAP)).equal?(0) && !(w_hint).equal?(SWT::DEFAULT) ? w_hint : 0)
-          if (!(ptr[0]).equal?(0))
-            OS._cfrelease(ptr[0])
-          end
-          width = size.attr_x
-          height = size.attr_y
+          size_ = @text_view.cell.cell_size
         end
+        width = RJava.cast_to_int(Math.ceil(size_.attr_width))
+        height = RJava.cast_to_int(Math.ceil(size_.attr_height))
       end
       if (!(w_hint).equal?(SWT::DEFAULT))
         width = w_hint
@@ -193,66 +270,75 @@ module Org::Eclipse::Swt::Widgets
     
     typesig { [] }
     def create_handle
-      self.attr_state |= GRAB | THEME_BACKGROUND
-      out_control = Array.typed(::Java::Int).new(1) { 0 }
-      window = OS._get_control_owner(self.attr_parent.attr_handle)
+      self.attr_state |= THEME_BACKGROUND
+      widget = SWTBox.new.alloc
+      widget.init
+      widget.set_title(NSString.string_with(""))
       if (!((self.attr_style & SWT::SEPARATOR)).equal?(0))
-        OS._create_separator_control(window, nil, out_control)
+        widget.set_box_type(OS::NSBoxSeparator)
+        child = SWTView.new.alloc.init
+        widget.set_content_view(child)
+        child.release
       else
-        just = OS.attr_te_flush_left
-        if (!((self.attr_style & SWT::CENTER)).equal?(0))
-          just = OS.attr_te_center
-        end
-        if (!((self.attr_style & SWT::RIGHT)).equal?(0))
-          just = OS.attr_te_flush_right
-        end
-        font_style = ControlFontStyleRec.new
-        font_style.attr_flags |= OS.attr_k_control_use_just_mask
-        font_style.attr_just = RJava.cast_to_short(just)
-        OS._create_static_text_control(window, nil, 0, font_style, out_control)
+        widget.set_border_type(OS::NSNoBorder)
+        widget.set_border_width(0)
+        widget.set_box_type(OS::NSBoxCustom)
+        offset_size = NSSize.new
+        widget.set_content_view_margins(offset_size)
+        image_widget = SWTImageView.new.alloc
+        image_widget.init
+        image_widget.set_image_scaling(OS::NSScaleNone)
+        text_widget = SWTTextField.new.alloc
+        text_widget.init
+        text_widget.set_bordered(false)
+        text_widget.set_editable(false)
+        text_widget.set_draws_background(false)
+        cell_ = NSTextFieldCell.new(text_widget.cell)
+        cell_.set_wraps(!((self.attr_style & SWT::WRAP)).equal?(0))
+        widget.add_subview(image_widget)
+        widget.add_subview(text_widget)
+        widget.set_content_view(text_widget)
+        @image_view = image_widget
+        @text_view = text_widget
+        __set_alignment
       end
-      if ((out_control[0]).equal?(0))
-        error(SWT::ERROR_NO_HANDLES)
+      self.attr_view = widget
+    end
+    
+    typesig { [] }
+    def create_widget
+      @text = ""
+      super
+    end
+    
+    typesig { [] }
+    def create_string
+      attrib_str = create_string(@text, nil, self.attr_foreground, ((self.attr_style & SWT::WRAP)).equal?(0) ? self.attr_style : 0, true, true)
+      attrib_str.autorelease
+      return attrib_str
+    end
+    
+    typesig { [] }
+    def default_nsfont
+      return self.attr_display.attr_text_field_font
+    end
+    
+    typesig { [] }
+    def deregister
+      super
+      if (!(@text_view).nil?)
+        self.attr_display.remove_widget(@text_view)
+        self.attr_display.remove_widget(@text_view.cell)
       end
-      self.attr_handle = out_control[0]
-      if (((self.attr_style & SWT::WRAP)).equal?(0))
-        OS._set_control_data(self.attr_handle, OS.attr_k_control_entire_control, OS.attr_k_control_static_text_is_multiline_tag, 1, Array.typed(::Java::Byte).new([0]))
+      if (!(@image_view).nil?)
+        self.attr_display.remove_widget(@image_view)
+        self.attr_display.remove_widget(@image_view.cell)
       end
     end
     
     typesig { [] }
-    def default_theme_font
-      if (self.attr_display.attr_small_fonts)
-        return OS.attr_k_theme_small_system_font
-      end
-      return OS.attr_k_theme_push_button_font
-    end
-    
-    typesig { [::Java::Int, ::Java::Int] }
-    def draw_background(control, context)
-      fill_background(control, context, nil)
-    end
-    
-    typesig { [::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int] }
-    def draw_widget(control, context, damage_rgn, visible_rgn, the_event)
-      if (@is_image && !(@image).nil?)
-        data = SwtGCData.new
-        data.attr_paint_event = the_event
-        data.attr_visible_rgn = visible_rgn
-        gc = SwtGC.carbon_new(self, data)
-        x = 0
-        size = get_size
-        bounds = @image.get_bounds
-        if (!((self.attr_style & SWT::CENTER)).equal?(0))
-          x = (size.attr_x - bounds.attr_width) / 2
-        end
-        if (!((self.attr_style & SWT::RIGHT)).equal?(0))
-          x = size.attr_x - bounds.attr_width
-        end
-        gc.draw_image(@image, x, 0)
-        gc.dispose
-      end
-      super(control, context, damage_rgn, visible_rgn, the_event)
+    def event_view
+      return (self.attr_view).content_view
     end
     
     typesig { [] }
@@ -327,14 +413,37 @@ module Org::Eclipse::Swt::Widgets
     end
     
     typesig { [] }
-    # Remove "Label for" relations from the receiver.
+    def register
+      super
+      if (!(@text_view).nil?)
+        self.attr_display.add_widget(@text_view, self)
+        self.attr_display.add_widget(@text_view.cell, self)
+      end
+      if (!(@image_view).nil?)
+        self.attr_display.add_widget(@image_view, self)
+        self.attr_display.add_widget(@image_view.cell, self)
+      end
+    end
+    
+    typesig { [] }
+    def release_handle
+      super
+      if (!(@text_view).nil?)
+        @text_view.release
+      end
+      if (!(@image_view).nil?)
+        @image_view.release
+      end
+      @text_view = nil
+      @image_view = nil
+    end
+    
+    typesig { [] }
+    # Remove "Labeled by" relations from the receiver.
     def remove_relation
-      string = OS.attr_k_axserves_as_title_for_uielements_attribute
-      buffer = CharArray.new(string.length)
-      string.get_chars(0, buffer.attr_length, buffer, 0)
-      string_ref = OS._cfstring_create_with_characters(OS.attr_k_cfallocator_default, buffer, buffer.attr_length)
-      OS._hiobject_set_auxiliary_accessibility_attribute(self.attr_handle, 0, string_ref, 0)
-      OS._cfrelease(string_ref)
+      if (!(@text_view).nil?)
+        @text_view.cell.accessibility_set_override_value(nil, OS::NSAccessibilityServesAsTitleForUIElementsAttribute)
+      end
     end
     
     typesig { [::Java::Int] }
@@ -359,19 +468,68 @@ module Org::Eclipse::Swt::Widgets
       end
       self.attr_style &= ~(SWT::LEFT | SWT::RIGHT | SWT::CENTER)
       self.attr_style |= alignment & (SWT::LEFT | SWT::RIGHT | SWT::CENTER)
-      just = OS.attr_te_flush_left
-      if (!((alignment & SWT::CENTER)).equal?(0))
-        just = OS.attr_te_center
+      __set_alignment
+    end
+    
+    typesig { [] }
+    def update_background
+      if (!((self.attr_style & SWT::SEPARATOR)).equal?(0))
+        return
       end
-      if (!((alignment & SWT::RIGHT)).equal?(0))
-        just = OS.attr_te_flush_right
+      ns_color = nil
+      if (!(self.attr_background_image).nil?)
+        ns_color = NSColor.color_with_pattern_image(self.attr_background_image.attr_handle)
+      else
+        if (!(self.attr_background).nil?)
+          ns_color = NSColor.color_with_device_red(self.attr_background[0], self.attr_background[1], self.attr_background[2], self.attr_background[3])
+        else
+          ns_color = NSColor.clear_color
+        end
       end
-      font_style = ControlFontStyleRec.new
-      OS._get_control_data(self.attr_handle, RJava.cast_to_short(OS.attr_k_control_entire_control), OS.attr_k_control_font_style_tag, ControlFontStyleRec.attr_sizeof, font_style, nil)
-      font_style.attr_flags |= OS.attr_k_control_use_just_mask
-      font_style.attr_just = RJava.cast_to_short(just)
-      OS._set_control_font_style(self.attr_handle, font_style)
-      redraw
+      (self.attr_view).set_fill_color(ns_color)
+    end
+    
+    typesig { [] }
+    def __set_alignment
+      if (!(@image).nil?)
+        if (!((self.attr_style & SWT::RIGHT)).equal?(0))
+          @image_view.set_image_alignment(OS::NSImageAlignRight)
+        end
+        if (!((self.attr_style & SWT::LEFT)).equal?(0))
+          @image_view.set_image_alignment(OS::NSImageAlignLeft)
+        end
+        if (!((self.attr_style & SWT::CENTER)).equal?(0))
+          @image_view.set_image_alignment(OS::NSImageAlignCenter)
+        end
+      end
+      if (!(@text).nil?)
+        cell_ = NSCell.new(@text_view.cell)
+        cell_.set_attributed_string_value(create_string)
+      end
+    end
+    
+    typesig { [NSFont] }
+    def set_font(font)
+      if (!(@text_view).nil?)
+        cell_ = NSCell.new(@text_view.cell)
+        cell_.set_attributed_string_value(create_string)
+        @text_view.set_font(font)
+      end
+    end
+    
+    typesig { [Array.typed(::Java::Float)] }
+    # double
+    def set_foreground(color)
+      if (!((self.attr_style & SWT::SEPARATOR)).equal?(0))
+        return
+      end
+      cell_ = NSCell.new(@text_view.cell)
+      cell_.set_attributed_string_value(create_string)
+    end
+    
+    typesig { [] }
+    def set_tab_item_focus
+      return false
     end
     
     typesig { [Image] }
@@ -397,19 +555,20 @@ module Org::Eclipse::Swt::Widgets
       end
       @image = image
       @is_image = true
-      if ((image).nil?)
-        set_text(@text)
-        return
-      end
-      if (@text.length > 0)
-        ptr = OS._cfstring_create_with_characters(OS.attr_k_cfallocator_default, nil, 0)
-        if ((ptr).equal?(0))
-          error(SWT::ERROR_CANNOT_SET_TEXT)
+      # Feature in Cocoa.  If the NSImage object being set into the view is
+      # the same NSImage object that is already there then the new image is
+      # not taken.  This results in the view's image not changing even if the
+      # NSImage object's content has changed since it was last set into the
+      # view.  The workaround is to temporarily set the view's image to null
+      # so that the new image will then be taken.
+      if (!(image).nil?)
+        current = @image_view.image
+        if (!(current).nil? && (current.attr_id).equal?(image.attr_handle.attr_id))
+          @image_view.set_image(nil)
         end
-        OS._set_control_data(self.attr_handle, 0, OS.attr_k_control_static_text_cfstring_tag, 4, Array.typed(::Java::Int).new([ptr]))
-        OS._cfrelease(ptr)
       end
-      redraw
+      @image_view.set_image(!(image).nil? ? image.attr_handle : nil)
+      (self.attr_view).set_content_view(@image_view)
     end
     
     typesig { [String] }
@@ -448,16 +607,9 @@ module Org::Eclipse::Swt::Widgets
       end
       @is_image = false
       @text = string
-      buffer = CharArray.new(@text.length)
-      @text.get_chars(0, buffer.attr_length, buffer, 0)
-      length_ = fix_mnemonic(buffer)
-      ptr = OS._cfstring_create_with_characters(OS.attr_k_cfallocator_default, buffer, length_)
-      if ((ptr).equal?(0))
-        error(SWT::ERROR_CANNOT_SET_TEXT)
-      end
-      OS._set_control_data(self.attr_handle, 0, OS.attr_k_control_static_text_cfstring_tag, 4, Array.typed(::Java::Int).new([ptr]))
-      OS._cfrelease(ptr)
-      redraw
+      cell_ = NSCell.new(@text_view.cell)
+      cell_.set_attributed_string_value(create_string)
+      (self.attr_view).set_content_view(@text_view)
     end
     
     private

@@ -140,7 +140,7 @@ module Org::Eclipse::Swt::Graphics
     # @param y the y coordinate of the point to test for containment
     # @return <code>true</code> if the rectangle contains the point and <code>false</code> otherwise
     def contains(x, y)
-      return (x >= @x) && (y >= @y) && ((x - @x) < @width) && ((y - @y) < @height)
+      return (x >= @x) && (y >= @y) && x < (@x + @width) && y < (@y + @height)
     end
     
     typesig { [Point] }

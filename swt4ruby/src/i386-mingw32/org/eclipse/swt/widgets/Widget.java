@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2008 IBM Corporation and others.
+ * Copyright (c) 2000, 2009 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -1178,6 +1178,12 @@ boolean setInputState (Event event, int type) {
 	if (OS.GetKeyState (OS.VK_LBUTTON) < 0) event.stateMask |= SWT.BUTTON1;
 	if (OS.GetKeyState (OS.VK_MBUTTON) < 0) event.stateMask |= SWT.BUTTON2;
 	if (OS.GetKeyState (OS.VK_RBUTTON) < 0) event.stateMask |= SWT.BUTTON3;
+	/*
+	* Bug in Windows.  On some machines that do not have XBUTTONs,
+	* the MK_XBUTTON1 and OS.MK_XBUTTON2 bits are sometimes set,
+	* causing mouse capture to become stuck.  The fix is to test
+	* for the extra buttons only when they exist.
+	*/
 	if (display.xMouse) {
 		if (OS.GetKeyState (OS.VK_XBUTTON1) < 0) event.stateMask |= SWT.BUTTON4;
 		if (OS.GetKeyState (OS.VK_XBUTTON2) < 0) event.stateMask |= SWT.BUTTON5;
@@ -1275,6 +1281,14 @@ boolean setKeyState (Event event, int type, int /*long*/ wParam, int /*long*/ lP
 	return setInputState (event, type);
 }
 
+boolean setTabGroupFocus () {
+	return setTabItemFocus ();
+}
+
+boolean setTabItemFocus () {
+	return false;
+}
+
 boolean SetWindowPos (int /*long*/ hWnd, int /*long*/ hWndInsertAfter, int X, int Y, int cx, int cy, int uFlags) {
 	if (OS.IsWinCE) {
 		/*
@@ -1307,6 +1321,8 @@ boolean showMenu (int x, int y) {
 	event.x = x;
 	event.y = y;
 	sendEvent (SWT.MenuDetect, event);
+	// widget could be disposed at this point
+	if (isDisposed ()) return false;
 	if (!event.doit) return true;
 	Menu menu = getMenu ();
 	if (menu != null && !menu.isDisposed ()) {

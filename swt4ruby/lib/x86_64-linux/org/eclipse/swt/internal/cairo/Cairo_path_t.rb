@@ -17,7 +17,7 @@ require "rjava"
 # 
 # IBM
 # -  Binding to permit interfacing between Cairo and SWT
-# -  Copyright (C) 2005 IBM Corp.  All Rights Reserved.
+# -  Copyright (C) 2005, 2008 IBM Corp.  All Rights Reserved.
 # 
 # ***** END LICENSE BLOCK *****
 module Org::Eclipse::Swt::Internal::Cairo
@@ -37,6 +37,7 @@ module Org::Eclipse::Swt::Internal::Cairo
     alias_method :attr_status=, :status=
     undef_method :status=
     
+    # @field cast=(cairo_path_data_t *)
     # int
     attr_accessor :data
     alias_method :attr_data, :data

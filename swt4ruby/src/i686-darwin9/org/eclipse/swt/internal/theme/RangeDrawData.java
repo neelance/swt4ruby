@@ -20,4 +20,5 @@ public class RangeDrawData extends DrawData {
 int getSelection(Point position, Rectangle bounds) {
 	return 0;
 }
+
 }

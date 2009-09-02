@@ -1,6 +1,6 @@
 require "rjava"
 
-# Copyright (c) 2000, 2006 IBM Corporation and others. All rights reserved.
+# Copyright (c) 2000, 2008 IBM Corporation and others. All rights reserved.
 # The contents of this file are made available under the terms
 # of the GNU Lesser General Public License (LGPL) Version 2.1 that
 # accompanies this distribution (lgpl-v21.txt).  The LGPL is also
@@ -23,6 +23,7 @@ module Org::Eclipse::Swt::Internal::Accessibility::Gtk
   class AtkTextIface 
     include_class_members AtkTextIfaceImports
     
+    # @field cast=(gchar *(*)())
     # int
     attr_accessor :get_text
     alias_method :attr_get_text, :get_text
@@ -30,6 +31,7 @@ module Org::Eclipse::Swt::Internal::Accessibility::Gtk
     alias_method :attr_get_text=, :get_text=
     undef_method :get_text=
     
+    # @field cast=(gchar *(*)())
     # int
     attr_accessor :get_text_after_offset
     alias_method :attr_get_text_after_offset, :get_text_after_offset
@@ -37,6 +39,7 @@ module Org::Eclipse::Swt::Internal::Accessibility::Gtk
     alias_method :attr_get_text_after_offset=, :get_text_after_offset=
     undef_method :get_text_after_offset=
     
+    # @field cast=(gchar *(*)())
     # int
     attr_accessor :get_text_at_offset
     alias_method :attr_get_text_at_offset, :get_text_at_offset
@@ -44,6 +47,7 @@ module Org::Eclipse::Swt::Internal::Accessibility::Gtk
     alias_method :attr_get_text_at_offset=, :get_text_at_offset=
     undef_method :get_text_at_offset=
     
+    # @field cast=(gunichar (*)())
     # int
     attr_accessor :get_character_at_offset
     alias_method :attr_get_character_at_offset, :get_character_at_offset
@@ -51,6 +55,7 @@ module Org::Eclipse::Swt::Internal::Accessibility::Gtk
     alias_method :attr_get_character_at_offset=, :get_character_at_offset=
     undef_method :get_character_at_offset=
     
+    # @field cast=(gchar *(*)())
     # int
     attr_accessor :get_text_before_offset
     alias_method :attr_get_text_before_offset, :get_text_before_offset
@@ -58,6 +63,7 @@ module Org::Eclipse::Swt::Internal::Accessibility::Gtk
     alias_method :attr_get_text_before_offset=, :get_text_before_offset=
     undef_method :get_text_before_offset=
     
+    # @field cast=(gint (*)())
     # int
     attr_accessor :get_caret_offset
     alias_method :attr_get_caret_offset, :get_caret_offset
@@ -65,6 +71,7 @@ module Org::Eclipse::Swt::Internal::Accessibility::Gtk
     alias_method :attr_get_caret_offset=, :get_caret_offset=
     undef_method :get_caret_offset=
     
+    # @field cast=(AtkAttributeSet *(*)())
     # int
     attr_accessor :get_run_attributes
     alias_method :attr_get_run_attributes, :get_run_attributes
@@ -72,6 +79,7 @@ module Org::Eclipse::Swt::Internal::Accessibility::Gtk
     alias_method :attr_get_run_attributes=, :get_run_attributes=
     undef_method :get_run_attributes=
     
+    # @field cast=(AtkAttributeSet *(*)())
     # int
     attr_accessor :get_default_attributes
     alias_method :attr_get_default_attributes, :get_default_attributes
@@ -79,6 +87,7 @@ module Org::Eclipse::Swt::Internal::Accessibility::Gtk
     alias_method :attr_get_default_attributes=, :get_default_attributes=
     undef_method :get_default_attributes=
     
+    # @field cast=(void (*)())
     # int
     attr_accessor :get_character_extents
     alias_method :attr_get_character_extents, :get_character_extents
@@ -86,6 +95,7 @@ module Org::Eclipse::Swt::Internal::Accessibility::Gtk
     alias_method :attr_get_character_extents=, :get_character_extents=
     undef_method :get_character_extents=
     
+    # @field cast=(gint (*)())
     # int
     attr_accessor :get_character_count
     alias_method :attr_get_character_count, :get_character_count
@@ -93,6 +103,7 @@ module Org::Eclipse::Swt::Internal::Accessibility::Gtk
     alias_method :attr_get_character_count=, :get_character_count=
     undef_method :get_character_count=
     
+    # @field cast=(gint (*)())
     # int
     attr_accessor :get_offset_at_point
     alias_method :attr_get_offset_at_point, :get_offset_at_point
@@ -100,6 +111,7 @@ module Org::Eclipse::Swt::Internal::Accessibility::Gtk
     alias_method :attr_get_offset_at_point=, :get_offset_at_point=
     undef_method :get_offset_at_point=
     
+    # @field cast=(gint (*)())
     # int
     attr_accessor :get_n_selections
     alias_method :attr_get_n_selections, :get_n_selections
@@ -107,6 +119,7 @@ module Org::Eclipse::Swt::Internal::Accessibility::Gtk
     alias_method :attr_get_n_selections=, :get_n_selections=
     undef_method :get_n_selections=
     
+    # @field cast=(gchar *(*)())
     # int
     attr_accessor :get_selection
     alias_method :attr_get_selection, :get_selection
@@ -114,6 +127,7 @@ module Org::Eclipse::Swt::Internal::Accessibility::Gtk
     alias_method :attr_get_selection=, :get_selection=
     undef_method :get_selection=
     
+    # @field cast=(gboolean (*)())
     # int
     attr_accessor :add_selection
     alias_method :attr_add_selection, :add_selection
@@ -121,6 +135,7 @@ module Org::Eclipse::Swt::Internal::Accessibility::Gtk
     alias_method :attr_add_selection=, :add_selection=
     undef_method :add_selection=
     
+    # @field cast=(gboolean (*)())
     # int
     attr_accessor :remove_selection
     alias_method :attr_remove_selection, :remove_selection
@@ -128,6 +143,7 @@ module Org::Eclipse::Swt::Internal::Accessibility::Gtk
     alias_method :attr_remove_selection=, :remove_selection=
     undef_method :remove_selection=
     
+    # @field cast=(gboolean (*)())
     # int
     attr_accessor :set_selection
     alias_method :attr_set_selection, :set_selection
@@ -135,6 +151,7 @@ module Org::Eclipse::Swt::Internal::Accessibility::Gtk
     alias_method :attr_set_selection=, :set_selection=
     undef_method :set_selection=
     
+    # @field cast=(gboolean (*)())
     # int
     attr_accessor :set_caret_offset
     alias_method :attr_set_caret_offset, :set_caret_offset
@@ -142,6 +159,7 @@ module Org::Eclipse::Swt::Internal::Accessibility::Gtk
     alias_method :attr_set_caret_offset=, :set_caret_offset=
     undef_method :set_caret_offset=
     
+    # @field cast=(void (*)())
     # int
     attr_accessor :text_changed
     alias_method :attr_text_changed, :text_changed
@@ -149,6 +167,7 @@ module Org::Eclipse::Swt::Internal::Accessibility::Gtk
     alias_method :attr_text_changed=, :text_changed=
     undef_method :text_changed=
     
+    # @field cast=(void (*)())
     # int
     attr_accessor :text_caret_moved
     alias_method :attr_text_caret_moved, :text_caret_moved
@@ -156,6 +175,7 @@ module Org::Eclipse::Swt::Internal::Accessibility::Gtk
     alias_method :attr_text_caret_moved=, :text_caret_moved=
     undef_method :text_caret_moved=
     
+    # @field cast=(void (*)())
     # int
     attr_accessor :text_selection_changed
     alias_method :attr_text_selection_changed, :text_selection_changed

@@ -1,6 +1,6 @@
 require "rjava"
 
-# Copyright (c) 2000, 2008 IBM Corporation and others.
+# Copyright (c) 2000, 2009 IBM Corporation and others.
 # All rights reserved. This program and the accompanying materials
 # are made available under the terms of the Eclipse Public License v1.0
 # which accompanies this distribution, and is available at
@@ -50,6 +50,7 @@ module Org::Eclipse::Swt::Custom
   # @see <a href="http://www.eclipse.org/swt/snippets/#ctabfolder">CTabFolder, CTabItem snippets</a>
   # @see <a href="http://www.eclipse.org/swt/examples.php">SWT Example: CustomControlExample</a>
   # @see <a href="http://www.eclipse.org/swt/">Sample code and further information</a>
+  # @noextend This class is not intended to be subclassed by clients.
   class CTabFolder < CTabFolderImports.const_get :Composite
     include_class_members CTabFolderImports
     
@@ -226,6 +227,12 @@ module Org::Eclipse::Swt::Custom
     alias_method :attr_listener=, :listener=
     undef_method :listener=
     
+    attr_accessor :ignore_traverse
+    alias_method :attr_ignore_traverse, :ignore_traverse
+    undef_method :ignore_traverse
+    alias_method :attr_ignore_traverse=, :ignore_traverse=
+    undef_method :ignore_traverse=
+    
     # External Listener management
     attr_accessor :folder_listeners
     alias_method :attr_folder_listeners, :folder_listeners
@@ -305,12 +312,6 @@ module Org::Eclipse::Swt::Custom
     
     # null is a legal value, check on access
     # Unselected item appearance
-    attr_accessor :bg_image
-    alias_method :attr_bg_image, :bg_image
-    undef_method :bg_image
-    alias_method :attr_bg_image=, :bg_image=
-    undef_method :bg_image=
-    
     attr_accessor :gradient_colors
     alias_method :attr_gradient_colors, :gradient_colors
     undef_method :gradient_colors
@@ -335,20 +336,13 @@ module Org::Eclipse::Swt::Custom
     alias_method :attr_show_unselected_image=, :show_unselected_image=
     undef_method :show_unselected_image=
     
-    class_module.module_eval {
-      
-      def border_color
-        defined?(@@border_color) ? @@border_color : @@border_color= nil
-      end
-      alias_method :attr_border_color, :border_color
-      
-      def border_color=(value)
-        @@border_color = value
-      end
-      alias_method :attr_border_color=, :border_color=
-    }
-    
     # close, min/max and chevron buttons
+    attr_accessor :fill_color
+    alias_method :attr_fill_color, :fill_color
+    undef_method :fill_color
+    alias_method :attr_fill_color=, :fill_color=
+    undef_method :fill_color=
+    
     attr_accessor :show_close
     alias_method :attr_show_close, :show_close
     undef_method :show_close
@@ -704,6 +698,7 @@ module Org::Eclipse::Swt::Custom
       @priority = nil
       @mru = false
       @listener = nil
+      @ignore_traverse = false
       @folder_listeners = nil
       @tab_listeners = nil
       @selection_bg_image = nil
@@ -715,11 +710,11 @@ module Org::Eclipse::Swt::Custom
       @selection_fade_start = nil
       @selection_highlight_gradient_begin = nil
       @selection_highlight_gradient_colors_cache = nil
-      @bg_image = nil
       @gradient_colors = nil
       @gradient_percents = nil
       @gradient_vertical = false
       @show_unselected_image = false
+      @fill_color = nil
       @show_close = false
       @show_unselected_close = false
       @chevron_rect = nil
@@ -794,6 +789,11 @@ module Org::Eclipse::Swt::Custom
       @curve_width = 0
       @curve_indent = 0
       @in_dispose = false
+      init(style)
+    end
+    
+    typesig { [::Java::Int] }
+    def init(style)
       Composite.instance_method(:set_layout).bind(self).call(CTabFolderLayout.new)
       style2 = Composite.instance_method(:get_style).bind(self).call
       @old_font = get_font
@@ -811,7 +811,6 @@ module Org::Eclipse::Swt::Custom
       display = get_display
       @selection_foreground = display.get_system_color(SELECTION_FOREGROUND)
       @selection_background = display.get_system_color(SELECTION_BACKGROUND)
-      self.attr_border_color = display.get_system_color(BORDER1_COLOR)
       update_tab_height(false)
       init_accessible
       @listener = # Add all listeners
@@ -895,7 +894,7 @@ module Org::Eclipse::Swt::Custom
         # NO_BACKGROUND style.  The NO_BACKGROUND style is not required on platforms
         # that use double buffering which is true in both of these cases.
         platform = SWT.get_platform
-        if (("carbon" == platform) || ("gtk" == platform))
+        if (("cocoa" == platform) || ("carbon" == platform) || ("gtk" == platform))
           return style
         end # $NON-NLS-1$ //$NON-NLS-2$
         # TEMPORARY CODE
@@ -1032,7 +1031,17 @@ module Org::Eclipse::Swt::Custom
     def antialias(shape, line_rgb, inner_rgb, outer_rgb, gc)
       # Don't perform anti-aliasing on Mac and WPF because the platform
       # already does it.  The simple style also does not require anti-aliasing.
-      if (@simple || ("carbon" == SWT.get_platform) || ("wpf" == SWT.get_platform))
+      if (@simple)
+        return
+      end
+      platform = SWT.get_platform
+      if (("cocoa" == platform))
+        return
+      end # $NON-NLS-1$
+      if (("carbon" == platform))
+        return
+      end # $NON-NLS-1$
+      if (("wpf" == platform))
         return
       end # $NON-NLS-1$
       # Don't perform anti-aliasing on low resolution displays
@@ -1092,6 +1101,16 @@ module Org::Eclipse::Swt::Custom
     end
     
     typesig { [::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int] }
+    # This class was not intended to be subclassed but this restriction
+    # cannot be enforced without breaking backward compatibility.
+    # 
+    # protected void checkSubclass () {
+    # String name = getClass ().getName ();
+    # int index = name.lastIndexOf ('.');
+    # if (!name.substring (0, index + 1).equals ("org.eclipse.swt.custom.")) {
+    # SWT.error (SWT.ERROR_INVALID_SUBCLASS);
+    # }
+    # }
     def compute_trim(x, y, width, height)
       check_widget
       trim_x = x - @margin_width - @highlight_margin - @border_left
@@ -1205,7 +1224,7 @@ module Org::Eclipse::Swt::Custom
     typesig { [SwtGC, Array.typed(::Java::Int), ::Java::Boolean] }
     def draw_background(gc, shape, selected)
       default_background = selected ? @selection_background : get_background
-      image = selected ? @selection_bg_image : @bg_image
+      image = selected ? @selection_bg_image : nil
       colors = selected ? @selection_gradient_colors : @gradient_colors
       percents = selected ? @selection_gradient_percents : @gradient_percents
       vertical = selected ? @selection_gradient_vertical : @gradient_vertical
@@ -1247,7 +1266,7 @@ module Org::Eclipse::Swt::Custom
               if (@on_bottom)
                 pos = 0
                 if (percents[percents.attr_length - 1] < 100)
-                  pos = percents[percents.attr_length - 1] * height / 100
+                  pos = (100 - percents[percents.attr_length - 1]) * height / 100
                   gc.set_background(default_background)
                   gc.fill_rectangle(x, y, width, pos)
                 end
@@ -1263,7 +1282,8 @@ module Org::Eclipse::Swt::Custom
                     last_color = default_background
                   end
                   gc.set_background(last_color)
-                  gradient_height = percents[i] * height / 100
+                  percentage = i > 0 ? percents[i] - percents[i - 1] : percents[i]
+                  gradient_height = percentage * height / 100
                   gc.fill_gradient_rectangle(x, y + pos, width, gradient_height, true)
                   pos += gradient_height
                   i -= 1
@@ -1282,7 +1302,8 @@ module Org::Eclipse::Swt::Custom
                     last_color = default_background
                   end
                   gc.set_background(last_color)
-                  gradient_height = percents[i] * height / 100
+                  percentage = i > 0 ? percents[i] - percents[i - 1] : percents[i]
+                  gradient_height = percentage * height / 100
                   gc.fill_gradient_rectangle(x, y + pos, width, gradient_height, true)
                   pos += gradient_height
                   i += 1
@@ -1385,7 +1406,7 @@ module Org::Eclipse::Swt::Custom
       end
       # draw 1 pixel border around outside
       if (@border_left > 0)
-        gc.set_foreground(self.attr_border_color)
+        gc.set_foreground(get_display.get_system_color(BORDER1_COLOR))
         x1 = @border_left - 1
         x2 = size.attr_x - @border_right
         y1 = @on_bottom ? @border_top - 1 : @border_top + @tab_height
@@ -1593,6 +1614,7 @@ module Org::Eclipse::Swt::Custom
       gc = event.attr_gc
       size = get_size
       shape = nil
+      border_color = get_display.get_system_color(BORDER1_COLOR)
       if ((@tab_height).equal?(0))
         style = get_style
         if (!((style & SWT::FLAT)).equal?(0) && ((style & SWT::BORDER)).equal?(0))
@@ -1619,7 +1641,7 @@ module Org::Eclipse::Swt::Custom
         end
         # draw 1 pixel border
         if (@border_left > 0)
-          gc.set_foreground(self.attr_border_color)
+          gc.set_foreground(border_color)
           gc.draw_polyline(shape)
         end
         return
@@ -1721,7 +1743,7 @@ module Org::Eclipse::Swt::Custom
         x1 = @border_left
         y1 = (@on_bottom) ? size.attr_y - @border_bottom - @tab_height - 1 : @border_top + @tab_height
         x2 = size.attr_x - @border_right
-        gc.set_foreground(self.attr_border_color)
+        gc.set_foreground(border_color)
         gc.draw_line(x1, y1, x2, y1)
       end
       # Draw Buttons
@@ -1731,8 +1753,8 @@ module Org::Eclipse::Swt::Custom
       # Draw border line
       if (@border_left > 0)
         outside = get_parent.get_background.get_rgb
-        antialias(shape, self.attr_border_color.get_rgb, nil, outside, gc)
-        gc.set_foreground(self.attr_border_color)
+        antialias(shape, border_color.get_rgb, nil, outside, gc)
+        gc.set_foreground(border_color)
         gc.draw_polyline(shape)
       end
     end
@@ -1764,6 +1786,14 @@ module Org::Eclipse::Swt::Custom
       height = size.attr_y - @border_top - @border_bottom - 2 * @margin_height - @highlight_margin - @highlight_header
       height -= @tab_height
       return Rectangle.new(@x_client, @y_client, width, height)
+    end
+    
+    typesig { [] }
+    def get_fill_color
+      if ((@fill_color).nil?)
+        @fill_color = Color.new(get_display, CTabFolder::CLOSE_FILL)
+      end
+      return @fill_color
     end
     
     typesig { [::Java::Int] }
@@ -2618,6 +2648,10 @@ module Org::Eclipse::Swt::Custom
         end
         i += 1
       end
+      if (!(@fill_color).nil?)
+        @fill_color.dispose
+        @fill_color = nil
+      end
       @selection_gradient_colors = nil
       @selection_gradient_percents = nil
       @selection_bg_image = nil
@@ -2656,8 +2690,8 @@ module Org::Eclipse::Swt::Custom
       end
     end
     
-    typesig { [Event] }
-    def on_mnemonic(event)
+    typesig { [Event, ::Java::Boolean] }
+    def on_mnemonic(event, doit)
       key = event.attr_character
       i = 0
       while i < @items.attr_length
@@ -2665,7 +2699,9 @@ module Org::Eclipse::Swt::Custom
           mnemonic = __find_mnemonic(@items[i].get_text)
           if (!(mnemonic).equal?(Character.new(?\0.ord)))
             if ((Character.to_lower_case(key)).equal?(mnemonic))
-              set_selection(i, true)
+              if (doit)
+                set_selection(i, true)
+              end
               return true
             end
           end
@@ -2721,28 +2757,22 @@ module Org::Eclipse::Swt::Custom
           i += 1
         end
       when SWT::MouseDown
+        if (!(event.attr_button).equal?(1))
+          return
+        end
         if (@min_rect.contains(x, y))
-          if (!(event.attr_button).equal?(1))
-            return
-          end
           @min_image_state = SELECTED
           redraw(@min_rect.attr_x, @min_rect.attr_y, @min_rect.attr_width, @min_rect.attr_height, false)
           update
           return
         end
         if (@max_rect.contains(x, y))
-          if (!(event.attr_button).equal?(1))
-            return
-          end
           @max_image_state = SELECTED
           redraw(@max_rect.attr_x, @max_rect.attr_y, @max_rect.attr_width, @max_rect.attr_height, false)
           update
           return
         end
         if (@chevron_rect.contains(x, y))
-          if (!(event.attr_button).equal?(1))
-            return
-          end
           if (!(@chevron_image_state).equal?(HOT))
             @chevron_image_state = HOT
           else
@@ -2772,9 +2802,6 @@ module Org::Eclipse::Swt::Custom
         end
         if (!(item).nil?)
           if (item.attr_close_rect.contains(x, y))
-            if (!(event.attr_button).equal?(1))
-              return
-            end
             item.attr_close_image_state = SELECTED
             redraw(item.attr_close_rect.attr_x, item.attr_close_rect.attr_y, item.attr_close_rect.attr_width, item.attr_close_rect.attr_height, false)
             update
@@ -2997,7 +3024,7 @@ module Org::Eclipse::Swt::Custom
     def on_page_traversal(event)
       count = @items.attr_length
       if ((count).equal?(0))
-        return false
+        return
       end
       index = @selected_index
       if ((index).equal?(-1))
@@ -3041,12 +3068,10 @@ module Org::Eclipse::Swt::Custom
                 show_list(@chevron_rect)
               end
             end
-            return true
           end
         end
       end
       set_selection(index, true)
-      return true
     end
     
     typesig { [Event] }
@@ -3118,6 +3143,9 @@ module Org::Eclipse::Swt::Custom
     
     typesig { [Event] }
     def on_traverse(event)
+      if (@ignore_traverse)
+        return
+      end
       case (event.attr_detail)
       when SWT::TRAVERSE_ESCAPE, SWT::TRAVERSE_RETURN, SWT::TRAVERSE_TAB_NEXT, SWT::TRAVERSE_TAB_PREVIOUS
         focus_control = get_display.get_focus_control
@@ -3125,12 +3153,26 @@ module Org::Eclipse::Swt::Custom
           event.attr_doit = true
         end
       when SWT::TRAVERSE_MNEMONIC
-        event.attr_doit = on_mnemonic(event)
-        if (event.attr_doit)
-          event.attr_detail = SWT::TRAVERSE_NONE
-        end
+        event.attr_doit = on_mnemonic(event, false)
       when SWT::TRAVERSE_PAGE_NEXT, SWT::TRAVERSE_PAGE_PREVIOUS
-        event.attr_doit = on_page_traversal(event)
+        event.attr_doit = @items.attr_length > 0
+      end
+      @ignore_traverse = true
+      notify_listeners(SWT::Traverse, event)
+      @ignore_traverse = false
+      event.attr_type = SWT::None
+      if (is_disposed)
+        return
+      end
+      if (!event.attr_doit)
+        return
+      end
+      case (event.attr_detail)
+      when SWT::TRAVERSE_MNEMONIC
+        on_mnemonic(event, true)
+        event.attr_detail = SWT::TRAVERSE_NONE
+      when SWT::TRAVERSE_PAGE_NEXT, SWT::TRAVERSE_PAGE_PREVIOUS
+        on_page_traversal(event)
         event.attr_detail = SWT::TRAVERSE_NONE
       end
     end
@@ -3349,37 +3391,33 @@ module Org::Eclipse::Swt::Custom
         end
       end
       # Are these settings the same as before?
-      if ((@bg_image).nil?)
-        if ((!(@gradient_colors).nil?) && (!(colors).nil?) && ((@gradient_colors.attr_length).equal?(colors.attr_length)))
-          same = false
-          i = 0
-          while i < @gradient_colors.attr_length
-            if ((@gradient_colors[i]).nil?)
-              same = (colors[i]).nil?
-            else
-              same = (@gradient_colors[i] == colors[i])
-            end
+      if ((!(@gradient_colors).nil?) && (!(colors).nil?) && ((@gradient_colors.attr_length).equal?(colors.attr_length)))
+        same = false
+        i = 0
+        while i < @gradient_colors.attr_length
+          if ((@gradient_colors[i]).nil?)
+            same = (colors[i]).nil?
+          else
+            same = (@gradient_colors[i] == colors[i])
+          end
+          if (!same)
+            break
+          end
+          i += 1
+        end
+        if (same)
+          i_ = 0
+          while i_ < @gradient_percents.attr_length
+            same = (@gradient_percents[i_]).equal?(percents[i_])
             if (!same)
               break
             end
-            i += 1
-          end
-          if (same)
-            i_ = 0
-            while i_ < @gradient_percents.attr_length
-              same = (@gradient_percents[i_]).equal?(percents[i_])
-              if (!same)
-                break
-              end
-              i_ += 1
-            end
-          end
-          if (same && (@gradient_vertical).equal?(vertical))
-            return
+            i_ += 1
           end
         end
-      else
-        @bg_image = nil
+        if (same && (@gradient_vertical).equal?(vertical))
+          return
+        end
       end
       # Store the new settings
       if ((colors).nil?)
@@ -3404,31 +3442,6 @@ module Org::Eclipse::Swt::Custom
         set_background(@gradient_colors[@gradient_colors.attr_length - 1])
       end
       # Refresh with the new settings
-      redraw
-    end
-    
-    typesig { [Image] }
-    # Set the image to be drawn in the background of the unselected tab.  Image
-    # is stretched or compressed to cover entire unselected tab area.
-    # 
-    # @param image the image to be drawn in the background
-    # 
-    # @exception SWTException <ul>
-    # <li>ERROR_WIDGET_DISPOSED - if the receiver has been disposed</li>
-    # <li>ERROR_THREAD_INVALID_ACCESS - if not called from the thread that created the receiver</li>
-    # </ul>
-    # 
-    # @since 3.0
-    def set_background(image)
-      check_widget
-      if ((image).equal?(@bg_image))
-        return
-      end
-      if (!(image).nil?)
-        @gradient_colors = nil
-        @gradient_percents = nil
-      end
-      @bg_image = image
       redraw
     end
     

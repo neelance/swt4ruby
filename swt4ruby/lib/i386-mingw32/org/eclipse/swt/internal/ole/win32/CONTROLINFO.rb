@@ -1,6 +1,6 @@
 require "rjava"
 
-# Copyright (c) 2000, 2006 IBM Corporation and others.
+# Copyright (c) 2000, 2008 IBM Corporation and others.
 # All rights reserved. This program and the accompanying materials
 # are made available under the terms of the Eclipse Public License v1.0
 # which accompanies this distribution, and is available at
@@ -25,6 +25,7 @@ module Org::Eclipse::Swt::Internal::Ole::Win32
     alias_method :attr_cb=, :cb=
     undef_method :cb=
     
+    # @field cast=(HACCEL)
     # long
     attr_accessor :h_accel
     alias_method :attr_h_accel, :h_accel

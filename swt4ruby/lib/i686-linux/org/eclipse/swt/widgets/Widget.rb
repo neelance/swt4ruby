@@ -1,6 +1,6 @@
 require "rjava"
 
-# Copyright (c) 2000, 2008 IBM Corporation and others.
+# Copyright (c) 2000, 2009 IBM Corporation and others.
 # All rights reserved. This program and the accompanying materials
 # are made available under the terms of the Eclipse Public License v1.0
 # which accompanies this distribution, and is available at
@@ -366,7 +366,19 @@ module Org::Eclipse::Swt::Widgets
       const_set_lazy(:MONTH_CHANGED) { 62 }
       const_attr_reader  :MONTH_CHANGED
       
-      const_set_lazy(:LAST_SIGNAL) { 63 }
+      const_set_lazy(:STATUS_ICON_POPUP_MENU) { 63 }
+      const_attr_reader  :STATUS_ICON_POPUP_MENU
+      
+      const_set_lazy(:ROW_INSERTED) { 64 }
+      const_attr_reader  :ROW_INSERTED
+      
+      const_set_lazy(:ROW_DELETED) { 65 }
+      const_attr_reader  :ROW_DELETED
+      
+      const_set_lazy(:DAY_SELECTED_DOUBLE_CLICK) { 66 }
+      const_attr_reader  :DAY_SELECTED_DOUBLE_CLICK
+      
+      const_set_lazy(:LAST_SIGNAL) { 67 }
       const_attr_reader  :LAST_SIGNAL
     }
     
@@ -949,6 +961,13 @@ module Org::Eclipse::Swt::Widgets
       return 0
     end
     
+    typesig { [::Java::Int] }
+    # long
+    # long
+    def gtk_day_selected_double_click(widget)
+      return 0
+    end
+    
     typesig { [::Java::Int, ::Java::Int] }
     # long
     # long
@@ -1192,6 +1211,23 @@ module Org::Eclipse::Swt::Widgets
       return 0
     end
     
+    typesig { [::Java::Int, ::Java::Int] }
+    # long
+    # long
+    # long
+    def gtk_row_deleted(model, path)
+      return 0
+    end
+    
+    typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
+    # long
+    # long
+    # long
+    # long
+    def gtk_row_inserted(model, path, iter)
+      return 0
+    end
+    
     typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
     # long
     # long
@@ -1236,6 +1272,15 @@ module Org::Eclipse::Swt::Widgets
     # long
     # long
     def gtk_size_allocate(widget, allocation)
+      return 0
+    end
+    
+    typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
+    # long
+    # long
+    # long
+    # long
+    def gtk_status_icon_popup_menu(handle, button, activate_time)
       return 0
     end
     
@@ -1403,22 +1448,24 @@ module Org::Eclipse::Swt::Widgets
       result = CharArray.new(length_ * 2)
       while (i < length_)
         case (text[i])
+        # FALL THROUGH
         when Character.new(?&.ord)
           if (i + 1 < length_ && (text[i + 1]).equal?(Character.new(?&.ord)))
-            i += 1
+            result[((j += 1) - 1)] = text[((i += 1) - 1)]
           else
             if (replace)
-              text[i] = Character.new(?_.ord)
-            else
-              i += 1
+              result[((j += 1) - 1)] = Character.new(?_.ord)
             end
           end
+          i += 1
         when Character.new(?_.ord)
           if (replace)
             result[((j += 1) - 1)] = Character.new(?_.ord)
           end
+          result[((j += 1) - 1)] = text[((i += 1) - 1)]
+        else
+          result[((j += 1) - 1)] = text[((i += 1) - 1)]
         end
-        result[((j += 1) - 1)] = text[((i += 1) - 1)]
       end
       return result
     end
@@ -2090,6 +2137,16 @@ module Org::Eclipse::Swt::Widgets
     def set_orientation
     end
     
+    typesig { [::Java::Boolean] }
+    def set_tab_group_focus(next_)
+      return set_tab_item_focus(next_)
+    end
+    
+    typesig { [::Java::Boolean] }
+    def set_tab_item_focus(next_)
+      return false
+    end
+    
     typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
     # long
     # long
@@ -2175,6 +2232,8 @@ module Org::Eclipse::Swt::Widgets
         return gtk_clicked(handle)
       when DAY_SELECTED
         return gtk_day_selected(handle)
+      when DAY_SELECTED_DOUBLE_CLICK
+        return gtk_day_selected_double_click(handle)
       when HIDE
         return gtk_hide(handle)
       when GRAB_FOCUS
@@ -2285,6 +2344,8 @@ module Org::Eclipse::Swt::Widgets
         return gtk_visibility_notify_event(handle, arg0)
       when WINDOW_STATE_EVENT
         return gtk_window_state_event(handle, arg0)
+      when ROW_DELETED
+        return gtk_row_deleted(handle, arg0)
       else
         return 0
       end
@@ -2307,12 +2368,16 @@ module Org::Eclipse::Swt::Widgets
         return gtk_row_activated(handle, arg0, arg1)
       when SCROLL_CHILD
         return gtk_scroll_child(handle, arg0, arg1)
+      when STATUS_ICON_POPUP_MENU
+        return gtk_status_icon_popup_menu(handle, arg0, arg1)
       when SWITCH_PAGE
         return gtk_switch_page(handle, arg0, arg1)
       when TEST_COLLAPSE_ROW
         return gtk_test_collapse_row(handle, arg0, arg1)
       when TEST_EXPAND_ROW
         return gtk_test_expand_row(handle, arg0, arg1)
+      when ROW_INSERTED
+        return gtk_row_inserted(handle, arg0, arg1)
       else
         return 0
       end

@@ -1,6 +1,6 @@
 require "rjava"
 
-# Copyright (c) 2000, 2008 IBM Corporation and others.
+# Copyright (c) 2000, 2009 IBM Corporation and others.
 # All rights reserved. This program and the accompanying materials
 # are made available under the terms of the Eclipse Public License v1.0
 # which accompanies this distribution, and is available at
@@ -808,11 +808,13 @@ module Org::Eclipse::Swt
       const_attr_reader  :BAR
       
       # Style constant for drop down menu/list behavior (value is 1&lt;&lt;2).
+      # <br>Note that for <code>DateTime</code> this is a <em>HINT</em>.
       # <p><b>Used By:</b><ul>
       # <li><code>Menu</code></li>
       # <li><code>ToolItem</code></li>
       # <li><code>CoolItem</code></li>
       # <li><code>Combo</code></li>
+      # <li><code>DateTime</code></li>
       # </ul></p>
       const_set_lazy(:DROP_DOWN) { 1 << 2 }
       const_attr_reader  :DROP_DOWN
@@ -888,6 +890,8 @@ module Org::Eclipse::Swt
       # <p><b>Used By:</b><ul>
       # <li><code>Text</code></li>
       # <li><code>List</code></li>
+      # <li><code>Table</code></li>
+      # <li><code>Tree</code></li>
       # <li><code>FileDialog</code></li>
       # </ul></p>
       const_set_lazy(:MULTI) { 1 << 1 }
@@ -1127,6 +1131,24 @@ module Org::Eclipse::Swt
       const_set_lazy(:ON_TOP) { 1 << 14 }
       const_attr_reader  :ON_TOP
       
+      # Style constant for sheet window behavior (value is 1&lt;&lt;28).
+      # <p>
+      # A sheet window is a window intended to be used as a temporary modal
+      # dialog that is attached to a parent window. It is typically used to
+      # prompt the user before proceeding. The window trim, positioning and
+      # general look of a sheet window is platform specific. For example,
+      # on the Macintosh, at the time this documentation was written, the
+      # window title is not visible.
+      # <br>Note that this is a <em>HINT</em>.
+      # </p><p><b>Used By:</b><ul>
+      # <li><code>Dialog</code> and subclasses</li>
+      # <li><code>Shell</code> and subclasses</li>
+      # </ul></p>
+      # 
+      # @since 3.5
+      const_set_lazy(:SHEET) { 1 << 28 }
+      const_attr_reader  :SHEET
+      
       # Trim style convenience constant for the most common top level shell appearance
       # (value is CLOSE|TITLE|MIN|MAX|RESIZE).
       # <p><b>Used By:</b><ul>
@@ -1274,6 +1296,7 @@ module Org::Eclipse::Swt
       # Style constant for preventing child radio group behavior (value is 1&lt;&lt;22).
       # <p><b>Used By:</b><ul>
       # <li><code>Composite</code></li>
+      # <li><code>Menu</code></li>
       # </ul></p>
       const_set_lazy(:NO_RADIO_GROUP) { 1 << 22 }
       const_attr_reader  :NO_RADIO_GROUP
@@ -1415,6 +1438,23 @@ module Org::Eclipse::Swt
       # @since 3.4
       const_set_lazy(:UNDERLINE_SQUIGGLE) { 3 }
       const_attr_reader  :UNDERLINE_SQUIGGLE
+      
+      # Style constant to indicate link underline (value is 0).
+      # <p>
+      # If the text color or the underline color are not set in the range
+      # the usage of <code>UNDERLINE_LINK</code> will change these colors
+      # to the preferred link color of the platform.<br>
+      # Note that clients that use this style, such as <code>StyledText</code>,
+      # will include code to track the mouse and change the cursor to the hand
+      # cursor when mouse is over the link.
+      # </p>
+      # <p><b>Used By:</b><ul>
+      # <li><code>TextStyle</code></li>
+      # </ul></p>
+      # 
+      # @since 3.5
+      const_set_lazy(:UNDERLINE_LINK) { 4 }
+      const_attr_reader  :UNDERLINE_LINK
       
       # Style constant to indicate solid border (value is 1).
       # <p><b>Used By:</b><ul>
@@ -2150,6 +2190,38 @@ module Org::Eclipse::Swt
       const_set_lazy(:ICON_WORKING) { 1 << 4 }
       const_attr_reader  :ICON_WORKING
       
+      # The style constant for "search" icon. This style constant is
+      # used with <code>Text</code> in combination with <code>SWT.SEARCH
+      # </code> (value is 1&lt;&lt;9).
+      # <br>Note that this is a <em>HINT</em>.
+      # 
+      # <p><b>Used By:</b><ul>
+      # <li><code>Text</code></li>
+      # </ul></p>
+      # 
+      # @see #SEARCH
+      # @see #ICON_CANCEL
+      # 
+      # @since 3.5
+      const_set_lazy(:ICON_SEARCH) { 1 << 9 }
+      const_attr_reader  :ICON_SEARCH
+      
+      # The style constant for "cancel" icon. This style constant is
+      # used with <code>Text</code> in combination with <code>SWT.SEARCH
+      # </code> (value is 1&lt;&lt;8).
+      # <br>Note that this is a <em>HINT</em>.
+      # 
+      # <p><b>Used By:</b><ul>
+      # <li><code>Text</code></li>
+      # </ul></p>
+      # 
+      # @see #SEARCH
+      # @see #ICON_SEARCH
+      # 
+      # @since 3.5
+      const_set_lazy(:ICON_CANCEL) { 1 << 8 }
+      const_attr_reader  :ICON_CANCEL
+      
       # The <code>MessageBox</code> style constant for an OK button;
       # valid combinations are OK, OK|CANCEL
       # (value is 1&lt;&lt;5).
@@ -2170,12 +2242,10 @@ module Org::Eclipse::Swt
       
       # The <code>MessageBox</code> style constant for a CANCEL button;
       # valid combinations are OK|CANCEL, YES|NO|CANCEL, RETRY|CANCEL
-      # (value is 1&lt;&lt;8).  This style constant is also used with
-      # <code>Text</code> in combination with SEARCH.
+      # (value is 1&lt;&lt;8).
       # 
       # <p><b>Used By:</b><ul>
       # <li><code>MessageBox</code></li>
-      # <li><code>Text</code></li>
       # </ul></p>
       const_set_lazy(:CANCEL) { 1 << 8 }
       const_attr_reader  :CANCEL
@@ -2684,6 +2754,29 @@ module Org::Eclipse::Swt
       const_set_lazy(:ERROR_INVALID_FONT) { 48 }
       const_attr_reader  :ERROR_INVALID_FONT
       
+      # SWT error constant indicating that an attempt was made to
+      # use an BrowserFunction object which had already been disposed
+      # (value is 49).
+      # 
+      # @since 3.5
+      const_set_lazy(:ERROR_FUNCTION_DISPOSED) { 49 }
+      const_attr_reader  :ERROR_FUNCTION_DISPOSED
+      
+      # SWT error constant indicating that an exception happened
+      # when evaluating a javascript expression
+      # (value is 50).
+      # 
+      # @since 3.5
+      const_set_lazy(:ERROR_FAILED_EVALUATE) { 50 }
+      const_attr_reader  :ERROR_FAILED_EVALUATE
+      
+      # SWT error constant indicating that an invalid value was returned
+      # (value is 51).
+      # 
+      # @since 3.5
+      const_set_lazy(:ERROR_INVALID_RETURN_VALUE) { 51 }
+      const_attr_reader  :ERROR_INVALID_RETURN_VALUE
+      
       # Constant indicating that an image or operation is of type bitmap  (value is 0).
       const_set_lazy(:BITMAP) { 0 }
       const_attr_reader  :BITMAP
@@ -3149,6 +3242,9 @@ module Org::Eclipse::Swt
         # $NON-NLS-1$
         # $NON-NLS-1$
         # $NON-NLS-1$
+        # $NON-NLS-1$
+        # $NON-NLS-1$
+        # $NON-NLS-1$
         when ERROR_UNSPECIFIED
           return "Unspecified error"
         when ERROR_NO_HANDLES
@@ -3159,6 +3255,8 @@ module Org::Eclipse::Swt
           return "Argument cannot be null"
         when ERROR_INVALID_ARGUMENT
           return "Argument not valid"
+        when ERROR_INVALID_RETURN_VALUE
+          return "Return value not valid"
         when ERROR_INVALID_RANGE
           return "Index out of bounds"
         when ERROR_CANNOT_BE_ZERO
@@ -3217,8 +3315,12 @@ module Org::Eclipse::Swt
           return "Graphic is disposed"
         when ERROR_DEVICE_DISPOSED
           return "Device is disposed"
+        when ERROR_FUNCTION_DISPOSED
+          return "BrowserFunction is disposed"
         when ERROR_FAILED_EXEC
           return "Failed to execute runnable"
+        when ERROR_FAILED_EVALUATE
+          return "Failed to evaluate javascript expression"
         when ERROR_FAILED_LOAD_LIBRARY
           return "Unable to load library"
         when ERROR_CANNOT_INVERT_MATRIX
@@ -3246,7 +3348,7 @@ module Org::Eclipse::Swt
       
       typesig { [] }
       # Returns the SWT platform name.
-      # Examples: "win32", "motif", "gtk", "photon", "carbon"
+      # Examples: "win32", "motif", "gtk", "photon", "carbon", "cocoa", "wpf"
       # 
       # @return the SWT platform name
       def get_platform
@@ -3358,7 +3460,7 @@ module Org::Eclipse::Swt
         # SWT Errors (fatal, may occur only on some platforms)
         when ERROR_NULL_ARGUMENT, ERROR_CANNOT_BE_ZERO, ERROR_INVALID_ARGUMENT, ERROR_MENU_NOT_BAR, ERROR_MENU_NOT_DROP_DOWN, ERROR_MENU_NOT_POP_UP, ERROR_MENUITEM_NOT_CASCADE, ERROR_INVALID_PARENT, ERROR_INVALID_RANGE
           raise IllegalArgumentException.new(message)
-        when ERROR_INVALID_SUBCLASS, ERROR_THREAD_INVALID_ACCESS, ERROR_WIDGET_DISPOSED, ERROR_GRAPHIC_DISPOSED, ERROR_DEVICE_DISPOSED, ERROR_INVALID_IMAGE, ERROR_UNSUPPORTED_DEPTH, ERROR_UNSUPPORTED_FORMAT, ERROR_FAILED_EXEC, ERROR_CANNOT_INVERT_MATRIX, ERROR_NO_GRAPHICS_LIBRARY, ERROR_IO
+        when ERROR_INVALID_SUBCLASS, ERROR_THREAD_INVALID_ACCESS, ERROR_WIDGET_DISPOSED, ERROR_GRAPHIC_DISPOSED, ERROR_DEVICE_DISPOSED, ERROR_FUNCTION_DISPOSED, ERROR_INVALID_IMAGE, ERROR_UNSUPPORTED_DEPTH, ERROR_UNSUPPORTED_FORMAT, ERROR_FAILED_EXEC, ERROR_FAILED_EVALUATE, ERROR_CANNOT_INVERT_MATRIX, ERROR_NO_GRAPHICS_LIBRARY, ERROR_INVALID_RETURN_VALUE, ERROR_IO
           exception = SWTException.new(code, message)
           exception.attr_throwable = throwable
           raise exception
@@ -3383,8 +3485,8 @@ module Org::Eclipse::Swt
         # Therefore they are not initialized in the declaration
         # to stop the compiler from inlining.
         platform = get_platform
-        if (("carbon" == platform))
-          # $NON-NLS-1$
+        if (("carbon" == platform) || ("cocoa" == platform))
+          # $NON-NLS-1$ //$NON-NLS-2$
           const_set :MOD1, COMMAND
           const_set :MOD2, SHIFT
           const_set :MOD3, ALT

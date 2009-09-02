@@ -1,6 +1,6 @@
 require "rjava"
 
-# Copyright (c) 2000, 2008 IBM Corporation and others.
+# Copyright (c) 2000, 2009 IBM Corporation and others.
 # All rights reserved. This program and the accompanying materials
 # are made available under the terms of the Eclipse Public License v1.0
 # which accompanies this distribution, and is available at
@@ -14,11 +14,10 @@ module Org::Eclipse::Swt::Widgets
       include ::Java::Lang
       include ::Org::Eclipse::Swt::Widgets
       include ::Org::Eclipse::Swt
+      include ::Org::Eclipse::Swt::Accessibility
       include ::Org::Eclipse::Swt::Events
       include ::Org::Eclipse::Swt::Graphics
-      include_const ::Org::Eclipse::Swt::Graphics, :Point
-      include_const ::Org::Eclipse::Swt::Internal, :Compatibility
-      include ::Org::Eclipse::Swt::Internal::Carbon
+      include ::Org::Eclipse::Swt::Internal::Cocoa
     }
   end
   
@@ -47,6 +46,7 @@ module Org::Eclipse::Swt::Widgets
   # @see <a href="http://www.eclipse.org/swt/snippets/#button">Button snippets</a>
   # @see <a href="http://www.eclipse.org/swt/examples.php">SWT Example: ControlExample</a>
   # @see <a href="http://www.eclipse.org/swt/">Sample code and further information</a>
+  # @noextend This class is not intended to be subclassed by clients.
   class Button < ButtonImports.const_get :Control
     include_class_members ButtonImports
     
@@ -62,23 +62,22 @@ module Org::Eclipse::Swt::Widgets
     alias_method :attr_image=, :image=
     undef_method :image=
     
-    attr_accessor :c_icon
-    alias_method :attr_c_icon, :c_icon
-    undef_method :c_icon
-    alias_method :attr_c_icon=, :c_icon=
-    undef_method :c_icon=
-    
-    attr_accessor :is_image
-    alias_method :attr_is_image, :is_image
-    undef_method :is_image
-    alias_method :attr_is_image=, :is_image=
-    undef_method :is_image=
-    
     attr_accessor :grayed
     alias_method :attr_grayed, :grayed
     undef_method :grayed
     alias_method :attr_grayed=, :grayed=
     undef_method :grayed=
+    
+    class_module.module_eval {
+      const_set_lazy(:EXTRA_HEIGHT) { 2 }
+      const_attr_reader  :EXTRA_HEIGHT
+      
+      const_set_lazy(:EXTRA_WIDTH) { 6 }
+      const_attr_reader  :EXTRA_WIDTH
+      
+      const_set_lazy(:IMAGE_GAP) { 2 }
+      const_attr_reader  :IMAGE_GAP
+    }
     
     typesig { [Composite, ::Java::Int] }
     # Constructs a new instance of this class given its parent
@@ -110,6 +109,8 @@ module Org::Eclipse::Swt::Widgets
     # @see SWT#RADIO
     # @see SWT#TOGGLE
     # @see SWT#FLAT
+    # @see SWT#UP
+    # @see SWT#DOWN
     # @see SWT#LEFT
     # @see SWT#RIGHT
     # @see SWT#CENTER
@@ -118,11 +119,41 @@ module Org::Eclipse::Swt::Widgets
     def initialize(parent, style)
       @text = nil
       @image = nil
-      @c_icon = 0
-      @is_image = false
       @grayed = false
       super(parent, check_style(style))
-      @text = ""
+    end
+    
+    typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
+    # long
+    # long
+    # long
+    # long
+    def accessibility_attribute_value(id, sel, arg0)
+      ns_attribute_name = NSString.new(arg0)
+      if (!(self.attr_accessible).nil?)
+        return_object = self.attr_accessible.internal_accessibility_attribute_value(ns_attribute_name, ACC::CHILDID_SELF)
+        if (!(return_object).nil?)
+          return return_object.attr_id
+        end
+      end
+      if (ns_attribute_name.is_equal_to_string(OS::NSAccessibilityRoleAttribute) || ns_attribute_name.is_equal_to_string(OS::NSAccessibilityRoleDescriptionAttribute))
+        role = nil
+        if (!((self.attr_style & SWT::RADIO)).equal?(0))
+          role = OS::NSAccessibilityRadioButtonRole
+        else
+          if (!((self.attr_style & SWT::ARROW)).equal?(0))
+            role = OS::NSAccessibilityButtonRole
+          end
+        end
+        if (!(role).nil?)
+          if (ns_attribute_name.is_equal_to_string(OS::NSAccessibilityRoleAttribute))
+            return role.attr_id
+          else
+            return OS._nsaccessibility_role_description(role.attr_id, 0)
+          end
+        end
+      end
+      return super(id, sel, arg0)
     end
     
     typesig { [SelectionListener] }
@@ -158,6 +189,19 @@ module Org::Eclipse::Swt::Widgets
       add_listener(SWT::DefaultSelection, typed_listener)
     end
     
+    typesig { [::Java::Int, ::Java::Int] }
+    # long
+    # long
+    def cell_size(id, sel)
+      size = super(id, sel)
+      if (!(@image).nil? && (!((self.attr_style & (SWT::CHECK | SWT::RADIO))).equal?(0)))
+        image_size = @image.attr_handle.size
+        size.attr_width += image_size.attr_width + IMAGE_GAP
+        size.attr_height = Math.max(size.attr_height, image_size.attr_height)
+      end
+      return size
+    end
+    
     class_module.module_eval {
       typesig { [::Java::Int] }
       def check_style(style)
@@ -181,106 +225,38 @@ module Org::Eclipse::Swt::Widgets
       post_event(SWT::Selection)
     end
     
-    typesig { [::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int] }
-    def call_paint_event_handler(control, damage_rgn, visible_rgn, the_event, next_handler)
-      context = nil
-      if (!((self.attr_style & SWT::ARROW)).equal?(0))
-        invert = false
-        if (OS::VERSION < 0x1050)
-          invert = !((self.attr_style & SWT::UP)).equal?(0)
-        else
-          invert = !((self.attr_style & SWT::UP)).equal?(0) || !((self.attr_style & SWT::LEFT)).equal?(0)
-        end
-        if (invert)
-          context = Array.typed(::Java::Int).new(1) { 0 }
-          OS._get_event_parameter(the_event, OS.attr_k_event_param_cgcontext_ref, OS.attr_type_cgcontext_ref, nil, 4, nil, context)
-          OS._cgcontext_save_gstate(context[0])
-          rect = CGRect.new
-          OS._hiview_get_bounds(self.attr_handle, rect)
-          OS._cgcontext_rotate_ctm(context[0], (Compatibility.attr_pi).to_f)
-          OS._cgcontext_translate_ctm(context[0], -rect.attr_width, -rect.attr_height)
-        end
-      end
-      result = super(control, damage_rgn, visible_rgn, the_event, next_handler)
-      if (!(context).nil?)
-        OS._cgcontext_restore_gstate(context[0])
-      end
-      return result
-    end
-    
     typesig { [::Java::Int, ::Java::Int, ::Java::Boolean] }
     def compute_size(w_hint, h_hint, changed)
       check_widget
-      # NEEDS WORK - empty string
       if (!((self.attr_style & SWT::ARROW)).equal?(0))
-        out_metric = Array.typed(::Java::Int).new(1) { 0 }
-        OS._get_theme_metric(OS.attr_k_theme_metric_disclosure_triangle_height, out_metric)
-        width = out_metric[0]
-        height = out_metric[0]
-        if (!(w_hint).equal?(SWT::DEFAULT))
-          width = w_hint
-        end
-        if (!(h_hint).equal?(SWT::DEFAULT))
-          height = h_hint
-        end
+        # TODO use some OS metric instead of hardcoded values
+        width = !(w_hint).equal?(SWT::DEFAULT) ? w_hint : 14
+        height = !(h_hint).equal?(SWT::DEFAULT) ? h_hint : 14
         return Point.new(width, height)
       end
-      width = 0
-      height = 0
-      if (@is_image && !(@image).nil?)
-        bounds = @image.get_bounds
-        width = bounds.attr_width
-        height = bounds.attr_height
-      end
-      ptr = Array.typed(::Java::Int).new(1) { 0 }
-      OS._copy_control_title_as_cfstring(self.attr_handle, ptr)
-      if (!(ptr[0]).equal?(0))
-        size = text_extent(ptr[0], 0)
-        width += size.attr_x
-        height = Math.max(height, size.attr_y)
-        OS._cfrelease(ptr[0])
-        if (!(@image).nil? && @is_image)
-          width += 3
-        end
-      else
-        if ((@image).nil?)
-          width = DEFAULT_WIDTH
-          height = DEFAULT_HEIGHT
-        end
-      end
-      if (!((self.attr_style & (SWT::CHECK | SWT::RADIO))).equal?(0))
-        out_metric = Array.typed(::Java::Int).new(1) { 0 }
-        metric = (!((self.attr_style & SWT::CHECK)).equal?(0)) ? OS.attr_k_theme_metric_check_box_width : OS.attr_k_theme_metric_radio_button_width
-        OS._get_theme_metric(metric, out_metric)
-        width += out_metric[0] + 3 # +3 for gap between button and text/image
-        height = Math.max(out_metric[0], height)
-      else
-        if (!((self.attr_style & SWT::FLAT)).equal?(0) || !((self.attr_style & SWT::TOGGLE)).equal?(0))
-          width += 8
-          height += 8
-        else
-          width += 28
-          out_metric = Array.typed(::Java::Int).new(1) { 0 }
-          OS._get_theme_metric(OS.attr_k_theme_metric_push_button_height, out_metric)
-          height = Math.max(height, out_metric[0])
-        end
-      end
-      inset = get_inset
-      width += inset.attr_left + inset.attr_right
-      height += inset.attr_top + inset.attr_bottom
-      # Feature in Mac OS X. Setting the width of a bevel button
-      # widget to less than 20 will fail.  This means you can not
-      # make a button very small.  By forcing the width to be greater
-      # than or equal to 20, the height of the button can be made
-      # very small, even 0.
-      width = Math.max(20, width)
+      size_ = (self.attr_view).cell.cell_size
+      width = RJava.cast_to_int(Math.ceil(size_.attr_width))
+      height = RJava.cast_to_int(Math.ceil(size_.attr_height))
       if (!(w_hint).equal?(SWT::DEFAULT))
         width = w_hint
       end
       if (!(h_hint).equal?(SWT::DEFAULT))
         height = h_hint
       end
+      if (!((self.attr_style & (SWT::PUSH | SWT::TOGGLE))).equal?(0) && ((self.attr_style & SWT::FLAT)).equal?(0))
+        if (self.attr_display.attr_small_fonts)
+          height += EXTRA_HEIGHT
+        end
+        width += EXTRA_WIDTH
+      end
       return Point.new(width, height)
+    end
+    
+    typesig { [] }
+    def create_string
+      attrib_str = create_string(@text, nil, self.attr_foreground, self.attr_style, true, true)
+      attrib_str.autorelease
+      return attrib_str
     end
     
     typesig { [] }
@@ -288,115 +264,177 @@ module Org::Eclipse::Swt::Widgets
       if (((self.attr_style & SWT::PUSH)).equal?(0))
         self.attr_state |= THEME_BACKGROUND
       end
-      out_control = Array.typed(::Java::Int).new(1) { 0 }
-      window = OS._get_control_owner(self.attr_parent.attr_handle)
-      if (!((self.attr_style & SWT::ARROW)).equal?(0))
-        orientation = OS.attr_k_theme_disclosure_right
-        if (!((self.attr_style & SWT::UP)).equal?(0))
-          orientation = OS.attr_k_theme_disclosure_down
-        end
-        if (!((self.attr_style & SWT::DOWN)).equal?(0))
-          orientation = OS.attr_k_theme_disclosure_down
-        end
-        if (!((self.attr_style & SWT::LEFT)).equal?(0))
-          orientation = OS.attr_k_theme_disclosure_left
-        end
-        OS._create_bevel_button_control(window, nil, 0, RJava.cast_to_short(0), RJava.cast_to_short(OS.attr_k_control_behavior_pushbutton), 0, RJava.cast_to_short(0), RJava.cast_to_short(0), RJava.cast_to_short(0), out_control)
-        if ((out_control[0]).equal?(0))
-          error(SWT::ERROR_NO_HANDLES)
-        end
-        self.attr_handle = out_control[0]
-        OS._set_control_data(self.attr_handle, OS.attr_k_control_entire_control, OS.attr_k_control_bevel_button_kind_tag, 2, Array.typed(::Java::Short).new([RJava.cast_to_short((OS.attr_k_theme_disclosure_button))]))
-        OS._set_control32bit_maximum(self.attr_handle, 2)
-        OS._set_control32bit_value(self.attr_handle, orientation)
-      end
-      if (!((self.attr_style & SWT::CHECK)).equal?(0))
-        # OS.CreateCheckBoxControl (window, null, 0, 0 /*initially off*/, true, outControl);
-        OS._create_bevel_button_control(window, nil, 0, RJava.cast_to_short(0), RJava.cast_to_short(OS.attr_k_control_behavior_toggles), 0, RJava.cast_to_short(0), RJava.cast_to_short(0), RJava.cast_to_short(0), out_control)
-        if ((out_control[0]).equal?(0))
-          error(SWT::ERROR_NO_HANDLES)
-        end
-        self.attr_handle = out_control[0]
-        OS._set_control_data(self.attr_handle, OS.attr_k_control_entire_control, OS.attr_k_control_bevel_button_kind_tag, 2, Array.typed(::Java::Short).new([RJava.cast_to_short(OS.attr_k_theme_check_box)]))
-      end
-      if (!((self.attr_style & SWT::RADIO)).equal?(0))
-        # OS.CreateRadioButtonControl(window, null, 0, 0 /*initially off*/, true, outControl);
-        OS._create_bevel_button_control(window, nil, 0, RJava.cast_to_short(0), RJava.cast_to_short(OS.attr_k_control_behavior_toggles), 0, RJava.cast_to_short(0), RJava.cast_to_short(0), RJava.cast_to_short(0), out_control)
-        if ((out_control[0]).equal?(0))
-          error(SWT::ERROR_NO_HANDLES)
-        end
-        self.attr_handle = out_control[0]
-        OS._set_control_data(self.attr_handle, OS.attr_k_control_entire_control, OS.attr_k_control_bevel_button_kind_tag, 2, Array.typed(::Java::Short).new([RJava.cast_to_short(OS.attr_k_theme_radio_button)]))
-      end
-      if (!((self.attr_style & SWT::TOGGLE)).equal?(0))
-        OS._create_bevel_button_control(window, nil, 0, RJava.cast_to_short(OS.attr_k_control_bevel_button_normal_bevel), RJava.cast_to_short(OS.attr_k_control_behavior_toggles), 0, RJava.cast_to_short(0), RJava.cast_to_short(0), RJava.cast_to_short(0), out_control)
-        if ((out_control[0]).equal?(0))
-          error(SWT::ERROR_NO_HANDLES)
-        end
-        self.attr_handle = out_control[0]
-        if (((self.attr_style & SWT::FLAT)).equal?(0))
-          OS._set_control_data(self.attr_handle, OS.attr_k_control_entire_control, OS.attr_k_control_bevel_button_kind_tag, 2, Array.typed(::Java::Short).new([RJava.cast_to_short(OS.attr_k_theme_rounded_bevel_button)]))
-        end
-      end
+      widget = SWTButton.new.alloc
+      widget.init
+      # Feature in Cocoa.  Images touch the edge of rounded buttons
+      # when set to small size. The fix to subclass the button cell
+      # and offset the image drawing.
+      # 
+      # if (display.smallFonts && (style & (SWT.PUSH | SWT.TOGGLE)) != 0 && (style & SWT.FLAT) == 0) {
+      cell = SWTButtonCell.new.alloc.init
+      widget.set_cell(cell)
+      cell.release
+      # }
+      type = OS::NSMomentaryLightButton
       if (!((self.attr_style & SWT::PUSH)).equal?(0))
         if (!((self.attr_style & SWT::FLAT)).equal?(0))
-          OS._create_bevel_button_control(window, nil, 0, RJava.cast_to_short(2), RJava.cast_to_short(OS.attr_k_control_behavior_pushbutton), 0, RJava.cast_to_short(0), RJava.cast_to_short(0), RJava.cast_to_short(0), out_control)
+          widget.set_bezel_style(OS::NSShadowlessSquareBezelStyle)
+          # if ((style & SWT.BORDER) == 0) widget.setShowsBorderOnlyWhileMouseInside(true);
         else
-          OS._create_push_button_control(window, nil, 0, out_control)
-          # OS.CreateBevelButtonControl(window, null, 0, (short)2, (short)OS.kControlBehaviorPushbutton, 0, (short)0, (short)0, (short)0, outControl);
+          widget.set_bezel_style(OS::NSRoundedBezelStyle)
         end
-        if ((out_control[0]).equal?(0))
-          error(SWT::ERROR_NO_HANDLES)
-        end
-        self.attr_handle = out_control[0]
-        if (((self.attr_style & SWT::FLAT)).equal?(0))
-          OS._set_control_data(self.attr_handle, OS.attr_k_control_entire_control, OS.attr_k_control_bevel_button_kind_tag, 2, Array.typed(::Java::Short).new([RJava.cast_to_short(OS.attr_k_theme_push_button)]))
+      else
+        if (!((self.attr_style & SWT::CHECK)).equal?(0))
+          type = OS::NSSwitchButton
+        else
+          if (!((self.attr_style & SWT::RADIO)).equal?(0))
+            type = OS::NSRadioButton
+          else
+            if (!((self.attr_style & SWT::TOGGLE)).equal?(0))
+              type = OS::NSPushOnPushOffButton
+              if (!((self.attr_style & SWT::FLAT)).equal?(0))
+                widget.set_bezel_style(OS::NSShadowlessSquareBezelStyle)
+                # if ((style & SWT.BORDER) == 0) widget.setShowsBorderOnlyWhileMouseInside(true);
+              else
+                widget.set_bezel_style(OS::NSRoundedBezelStyle)
+              end
+            else
+              if (!((self.attr_style & SWT::ARROW)).equal?(0))
+                widget.set_bezel_style(OS::NSShadowlessSquareBezelStyle)
+              end
+            end
+          end
         end
       end
-      font_rec = ControlFontStyleRec.new
-      font_rec.attr_flags = RJava.cast_to_short(OS.attr_k_control_use_theme_font_idmask)
-      font_rec.attr_font = RJava.cast_to_short(default_theme_font)
-      OS._set_control_font_style(self.attr_handle, font_rec)
-      if (!((self.attr_style & SWT::ARROW)).equal?(0))
-        return
-      end
-      __set_alignment(self.attr_style & (SWT::LEFT | SWT::RIGHT | SWT::CENTER))
+      widget.set_button_type(type)
+      widget.set_title(NSString.string_with(""))
+      widget.set_image_position(OS::NSImageLeft)
+      widget.set_target(widget)
+      widget.set_action(OS.attr_sel_send_selection)
+      self.attr_view = widget
+      __set_alignment(self.attr_style)
     end
     
     typesig { [] }
-    def default_theme_font
-      if (self.attr_display.attr_small_fonts)
-        return OS.attr_k_theme_small_system_font
-      end
-      return OS.attr_k_theme_push_button_font
+    def create_widget
+      @text = ""
+      super
     end
     
-    typesig { [::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int] }
-    def draw_widget(control, context, damage_rgn, visible_rgn, the_event)
-      if (OS::VERSION < 0x1040 && @is_image && !(@image).nil? && !((self.attr_style & SWT::PUSH)).equal?(0) && ((self.attr_style & SWT::FLAT)).equal?(0))
-        bounds = Rect.new
-        content = Rect.new
-        OS._get_control_bounds(self.attr_handle, bounds)
-        draw_info = ThemeButtonDrawInfo.new
-        if (OS._is_control_enabled(self.attr_handle))
-          draw_info.attr_state = OS._is_control_active(self.attr_handle) ? OS.attr_k_theme_state_active : OS.attr_k_theme_state_inactive
-        else
-          draw_info.attr_state = OS._is_control_active(self.attr_handle) ? OS.attr_k_theme_state_unavailable : OS.attr_k_theme_state_unavailable_inactive
-        end
-        draw_info.attr_adornment = OS.attr_k_theme_adornment_default
-        OS._get_theme_button_content_bounds(bounds, OS.attr_k_theme_push_button, draw_info, content)
-        width = (@image).nil? ? 0 : OS._cgimage_get_width(@image.attr_handle)
-        height = (@image).nil? ? 0 : OS._cgimage_get_height(@image.attr_handle)
-        x = (bounds.attr_right - bounds.attr_left - width) / 2
-        y = (content.attr_bottom - content.attr_top - height) / 2
-        data = SwtGCData.new
-        data.attr_paint_event = the_event
-        data.attr_visible_rgn = visible_rgn
-        gc = SwtGC.carbon_new(self, data)
-        gc.draw_image(@image, x, y)
-        gc.dispose
+    typesig { [] }
+    def default_nsfont
+      return self.attr_display.attr_button_font
+    end
+    
+    typesig { [] }
+    def deregister
+      super
+      self.attr_display.remove_widget((self.attr_view).cell)
+    end
+    
+    typesig { [::Java::Int, ::Java::Int, ::Java::Boolean, Array.typed(::Java::Boolean)] }
+    def drag_detect(x, y, filter, consume)
+      dragging = super(x, y, filter, consume)
+      consume[0] = dragging
+      return dragging
+    end
+    
+    typesig { [::Java::Int, ::Java::Int, ::Java::Int, NSRect, ::Java::Int] }
+    # long
+    # long
+    # long
+    # long
+    def draw_image_with_frame_in_view(id, sel, image, rect, view)
+      # Feature in Cocoa.  Images touch the edge of rounded buttons
+      # when set to small size. The fix to subclass the button cell
+      # and offset the image drawing.
+      if (self.attr_display.attr_small_fonts && !((self.attr_style & (SWT::PUSH | SWT::TOGGLE))).equal?(0) && ((self.attr_style & SWT::FLAT)).equal?(0))
+        rect.attr_y += EXTRA_HEIGHT / 2
+        rect.attr_height += EXTRA_HEIGHT
       end
-      super(control, context, damage_rgn, visible_rgn, the_event)
+      call_super(id, sel, image, rect, view)
+    end
+    
+    typesig { [::Java::Int, ::Java::Int, NSRect, ::Java::Int] }
+    # long
+    # long
+    # long
+    def draw_interior_with_frame_in_view(id, sel, cell_rect, viewid)
+      super(id, sel, cell_rect, viewid)
+      if (!(@image).nil? && (!((self.attr_style & (SWT::CHECK | SWT::RADIO))).equal?(0)))
+        image_size = @image.attr_handle.size
+        ns_cell = NSCell.new(id)
+        # double
+        x = 0
+        # double
+        y = (image_size.attr_height - cell_rect.attr_height) / 2
+        image_rect = ns_cell.image_rect_for_bounds(cell_rect)
+        string_size = (self.attr_view).attributed_title.size
+        case (self.attr_style & (SWT::LEFT | SWT::RIGHT | SWT::CENTER))
+        when SWT::LEFT
+          x = image_rect.attr_x + image_rect.attr_width + IMAGE_GAP
+        when SWT::CENTER
+          x = cell_rect.attr_x + image_rect.attr_x + image_rect.attr_width + ((cell_rect.attr_width - string_size.attr_width) / 2) - image_size.attr_width - IMAGE_GAP
+        when SWT::RIGHT
+          x = cell_rect.attr_x + cell_rect.attr_width - string_size.attr_width - image_size.attr_width - IMAGE_GAP
+        end
+        dest_rect = NSRect.new
+        dest_rect.attr_x = x
+        dest_rect.attr_y = y
+        dest_rect.attr_width = image_size.attr_width
+        dest_rect.attr_height = image_size.attr_height
+        NSGraphicsContext.static_save_graphics_state
+        transform_ = NSAffineTransform.transform
+        transform_.scale_xby(1, -1)
+        transform_.translate_xby(0, -image_size.attr_height)
+        transform_.concat
+        @image.attr_handle.draw_in_rect(dest_rect, NSRect.new, OS::NSCompositeSourceOver, 1)
+        NSGraphicsContext.static_restore_graphics_state
+      end
+    end
+    
+    typesig { [::Java::Int, NSGraphicsContext, NSRect] }
+    # long
+    def draw_widget(id, context, rect)
+      if (!((self.attr_style & SWT::ARROW)).equal?(0))
+        frame_ = self.attr_view.frame
+        arrow_size = Math.min(RJava.cast_to_int(frame_.attr_height), RJava.cast_to_int(frame_.attr_width)) / 2
+        context.save_graphics_state
+        p1 = NSPoint.new
+        p1.attr_x = -arrow_size / 2
+        p1.attr_y = -arrow_size / 2
+        p2 = NSPoint.new
+        p2.attr_x = arrow_size / 2
+        p2.attr_y = p1.attr_y
+        p3 = NSPoint.new
+        p3.attr_y = arrow_size / 2
+        path = NSBezierPath.bezier_path
+        path.move_to_point(p1)
+        path.line_to_point(p2)
+        path.line_to_point(p3)
+        path.close_path
+        transform_ = NSAffineTransform.transform
+        if (!((self.attr_style & SWT::LEFT)).equal?(0))
+          transform_.rotate_by_degrees(90)
+        else
+          if (!((self.attr_style & SWT::UP)).equal?(0))
+            transform_.rotate_by_degrees(180)
+          else
+            if (!((self.attr_style & SWT::RIGHT)).equal?(0))
+              transform_.rotate_by_degrees(-90)
+            end
+          end
+        end
+        path.transform_using_affine_transform(transform_)
+        transform_ = NSAffineTransform.transform
+        transform_.translate_xby(frame_.attr_width / 2, frame_.attr_height / 2)
+        path.transform_using_affine_transform(transform_)
+        color = is_enabled ? NSColor.black_color : NSColor.disabled_control_text_color
+        color.set
+        path.fill
+        context.restore_graphics_state
+      end
+      super(id, context, rect)
     end
     
     typesig { [] }
@@ -504,7 +542,10 @@ module Org::Eclipse::Swt::Widgets
       if (((self.attr_style & (SWT::CHECK | SWT::RADIO | SWT::TOGGLE))).equal?(0))
         return false
       end
-      return !(OS._get_control32bit_value(self.attr_handle)).equal?(0)
+      if (!((self.attr_style & SWT::CHECK)).equal?(0) && @grayed)
+        return ((self.attr_view).state).equal?(OS::NSMixedState)
+      end
+      return ((self.attr_view).state).equal?(OS::NSOnState)
     end
     
     typesig { [] }
@@ -524,93 +565,36 @@ module Org::Eclipse::Swt::Widgets
     end
     
     typesig { [] }
-    def get_inset
-      if (((self.attr_style & SWT::PUSH)).equal?(0))
-        return super
-      end
-      return self.attr_display.attr_button_inset
-    end
-    
-    typesig { [] }
     def is_described_by_label
       return false
     end
     
-    typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
-    def k_event_accessible_get_named_attribute(next_handler, the_event, user_data)
-      code = OS.attr_event_not_handled_err
-      if (!((self.attr_style & SWT::RADIO)).equal?(0))
-        string_ref = Array.typed(::Java::Int).new(1) { 0 }
-        OS._get_event_parameter(the_event, OS.attr_k_event_param_accessible_attribute_name, OS.attr_type_cfstring_ref, nil, 4, nil, string_ref)
-        length = 0
-        if (!(string_ref[0]).equal?(0))
-          length = OS._cfstring_get_length(string_ref[0])
-        end
-        buffer = CharArray.new(length)
-        range = CFRange.new
-        range.attr_length = length
-        OS._cfstring_get_characters(string_ref[0], range, buffer)
-        attribute_name = String.new(buffer)
-        if ((attribute_name == OS.attr_k_axrole_attribute) || (attribute_name == OS.attr_k_axrole_description_attribute))
-          role_text = OS.attr_k_axradio_button_role
-          buffer = CharArray.new(role_text.length)
-          role_text.get_chars(0, buffer.attr_length, buffer, 0)
-          string_ref[0] = OS._cfstring_create_with_characters(OS.attr_k_cfallocator_default, buffer, buffer.attr_length)
-          if (!(string_ref[0]).equal?(0))
-            if ((attribute_name == OS.attr_k_axrole_attribute))
-              OS._set_event_parameter(the_event, OS.attr_k_event_param_accessible_attribute_value, OS.attr_type_cfstring_ref, 4, string_ref)
-            else
-              # kAXRoleDescriptionAttribute
-              string_ref2 = OS._hicopy_accessibility_role_description(string_ref[0], 0)
-              OS._set_event_parameter(the_event, OS.attr_k_event_param_accessible_attribute_value, OS.attr_type_cfstring_ref, 4, Array.typed(::Java::Int).new([string_ref2]))
-              OS._cfrelease(string_ref2)
-            end
-            OS._cfrelease(string_ref[0])
-            code = OS.attr_no_err
-          end
-        end
+    typesig { [::Java::Int, ::Java::Int] }
+    # Feature in Cocoa.  If a checkbox is in multi-state mode, nextState cycles from off to mixed to on and back to off again.
+    # This will cause the on state to momentarily appear while clicking on the checkbox. To avoid this, we override [NSCell nextState]
+    # to go directly to the desired state if we have a grayed checkbox.
+    # 
+    # long
+    # long
+    # long
+    def next_state(id, sel)
+      if (!((self.attr_style & SWT::CHECK)).equal?(0) && @grayed)
+        return ((self.attr_view).state).equal?(OS::NSMixedState) ? OS::NSOffState : OS::NSMixedState
       end
-      if (!(self.attr_accessible).nil?)
-        code = self.attr_accessible.internal_k_event_accessible_get_named_attribute(next_handler, the_event, code)
-      end
-      return code
+      return super(id, sel)
     end
     
-    typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
-    def k_event_control_hit(next_handler, the_event, user_data)
-      result = super(next_handler, the_event, user_data)
-      if ((result).equal?(OS.attr_no_err))
-        return result
-      end
-      if (!((self.attr_style & SWT::RADIO)).equal?(0))
-        if (((self.attr_parent.get_style & SWT::NO_RADIO_GROUP)).equal?(0))
-          select_radio
-        end
-      else
-        if (!((self.attr_style & SWT::CHECK)).equal?(0))
-          if (@grayed)
-            case (OS._get_control32bit_value(self.attr_handle))
-            when 0
-              OS._set_control32bit_maximum(self.attr_handle, 2)
-              OS._set_control32bit_value(self.attr_handle, 2)
-            when 1, 2
-              OS._set_control32bit_maximum(self.attr_handle, 0)
-              OS._set_control32bit_value(self.attr_handle, 0)
-            end
-          end
-        end
-      end
-      post_event(SWT::Selection)
-      return OS.attr_event_not_handled_err
+    typesig { [] }
+    def register
+      super
+      self.attr_display.add_widget((self.attr_view).cell, self)
     end
     
     typesig { [] }
     def release_widget
       super
-      if (!(@c_icon).equal?(0))
-        destroy_cicon(@c_icon)
-        @c_icon = 0
-      end
+      @image = nil
+      @text = RJava.cast_to_string(nil)
     end
     
     typesig { [SelectionListener] }
@@ -670,6 +654,24 @@ module Org::Eclipse::Swt::Widgets
       set_selection(true)
     end
     
+    typesig { [] }
+    def send_selection
+      if (!((self.attr_style & SWT::RADIO)).equal?(0))
+        if (((self.attr_parent.get_style & SWT::NO_RADIO_GROUP)).equal?(0))
+          select_radio
+        end
+      end
+      if (!((self.attr_style & SWT::CHECK)).equal?(0))
+        if (@grayed && ((self.attr_view).state).equal?(OS::NSOnState))
+          (self.attr_view).set_state(OS::NSOffState)
+        end
+        if (!@grayed && ((self.attr_view).state).equal?(OS::NSMixedState))
+          (self.attr_view).set_state(OS::NSOnState)
+        end
+      end
+      post_event(SWT::Selection)
+    end
+    
     typesig { [::Java::Int] }
     # Controls how text, images and arrows will be displayed
     # in the receiver. The argument should be one of
@@ -699,17 +701,11 @@ module Org::Eclipse::Swt::Widgets
         end
         self.attr_style &= ~(SWT::UP | SWT::DOWN | SWT::LEFT | SWT::RIGHT)
         self.attr_style |= alignment & (SWT::UP | SWT::DOWN | SWT::LEFT | SWT::RIGHT)
-        orientation = OS.attr_k_theme_disclosure_right
-        if (!((self.attr_style & SWT::UP)).equal?(0))
-          orientation = OS.attr_k_theme_disclosure_down
-        end
-        if (!((self.attr_style & SWT::DOWN)).equal?(0))
-          orientation = OS.attr_k_theme_disclosure_down
-        end
-        if (!((self.attr_style & SWT::LEFT)).equal?(0))
-          orientation = OS.attr_k_theme_disclosure_left
-        end
-        OS._set_control32bit_value(self.attr_handle, orientation)
+        # int orientation = OS.kThemeDisclosureRight;
+        # if ((style & SWT.UP) != 0) orientation = OS.kThemeDisclosureUp;
+        # if ((style & SWT.DOWN) != 0) orientation = OS.kThemeDisclosureDown;
+        # if ((style & SWT.LEFT) != 0) orientation = OS.kThemeDisclosureLeft;
+        # OS.SetControl32BitValue (handle, orientation);
         return
       end
       if (((alignment & (SWT::LEFT | SWT::RIGHT | SWT::CENTER))).equal?(0))
@@ -717,55 +713,64 @@ module Org::Eclipse::Swt::Widgets
       end
       self.attr_style &= ~(SWT::LEFT | SWT::RIGHT | SWT::CENTER)
       self.attr_style |= alignment & (SWT::LEFT | SWT::RIGHT | SWT::CENTER)
-      # Alignment not honoured when image and text is visible
-      both_visible = !(@text).nil? && @text.length > 0 && !(@image).nil?
-      if (both_visible)
-        if (!((self.attr_style & (SWT::RADIO | SWT::CHECK))).equal?(0))
-          alignment = SWT::LEFT
+      # text is still null when this is called from createHandle()
+      if (!(@text).nil?)
+        (self.attr_view).set_attributed_title(create_string)
+      end
+      # /* Alignment not honoured when image and text is visible */
+      # boolean bothVisible = text != null && text.length () > 0 && image != null;
+      # if (bothVisible) {
+      # if ((style & (SWT.RADIO | SWT.CHECK)) != 0) alignment = SWT.LEFT;
+      # if ((style & (SWT.PUSH | SWT.TOGGLE)) != 0) alignment = SWT.CENTER;
+      # }
+      # int textAlignment = 0;
+      # int graphicAlignment = 0;
+      # if ((alignment & SWT.LEFT) != 0) {
+      # textAlignment = OS.kControlBevelButtonAlignTextFlushLeft;
+      # graphicAlignment = OS.kControlBevelButtonAlignLeft;
+      # }
+      # if ((alignment & SWT.CENTER) != 0) {
+      # textAlignment = OS.kControlBevelButtonAlignTextCenter;
+      # graphicAlignment = OS.kControlBevelButtonAlignCenter;
+      # }
+      # if ((alignment & SWT.RIGHT) != 0) {
+      # textAlignment = OS.kControlBevelButtonAlignTextFlushRight;
+      # graphicAlignment = OS.kControlBevelButtonAlignRight;
+      # }
+      # OS.SetControlData (handle, OS.kControlEntireControl, OS.kControlBevelButtonTextAlignTag, 2, new short [] {(short)textAlignment});
+      # OS.SetControlData (handle, OS.kControlEntireControl, OS.kControlBevelButtonGraphicAlignTag, 2, new short [] {(short)graphicAlignment});
+      # if (bothVisible) {
+      # OS.SetControlData (handle, OS.kControlEntireControl, OS.kControlBevelButtonTextPlaceTag, 2, new short [] {(short)OS.kControlBevelButtonPlaceToRightOfGraphic});
+      # }
+    end
+    
+    typesig { [] }
+    def update_background
+      ns_color = nil
+      if (!(self.attr_background_image).nil?)
+        ns_color = NSColor.color_with_pattern_image(self.attr_background_image.attr_handle)
+      else
+        if (!(self.attr_background).nil?)
+          ns_color = NSColor.color_with_device_red(self.attr_background[0], self.attr_background[1], self.attr_background[2], self.attr_background[3])
+        else
+          return # TODO set to OS default
         end
-        if (!((self.attr_style & (SWT::PUSH | SWT::TOGGLE))).equal?(0))
-          alignment = SWT::CENTER
-        end
       end
-      text_alignment = 0
-      graphic_alignment = 0
-      if (!((alignment & SWT::LEFT)).equal?(0))
-        text_alignment = OS.attr_k_control_bevel_button_align_text_flush_left
-        graphic_alignment = OS.attr_k_control_bevel_button_align_left
-      end
-      if (!((alignment & SWT::CENTER)).equal?(0))
-        text_alignment = OS.attr_k_control_bevel_button_align_text_center
-        graphic_alignment = OS.attr_k_control_bevel_button_align_center
-      end
-      if (!((alignment & SWT::RIGHT)).equal?(0))
-        text_alignment = OS.attr_k_control_bevel_button_align_text_flush_right
-        graphic_alignment = OS.attr_k_control_bevel_button_align_right
-      end
-      OS._set_control_data(self.attr_handle, OS.attr_k_control_entire_control, OS.attr_k_control_bevel_button_text_align_tag, 2, Array.typed(::Java::Short).new([RJava.cast_to_short(text_alignment)]))
-      OS._set_control_data(self.attr_handle, OS.attr_k_control_entire_control, OS.attr_k_control_bevel_button_graphic_align_tag, 2, Array.typed(::Java::Short).new([RJava.cast_to_short(graphic_alignment)]))
-      if (both_visible)
-        OS._set_control_data(self.attr_handle, OS.attr_k_control_entire_control, OS.attr_k_control_bevel_button_text_place_tag, 2, Array.typed(::Java::Short).new([RJava.cast_to_short(OS.attr_k_control_bevel_button_place_to_right_of_graphic)]))
+      cell = NSButtonCell.new((self.attr_view).cell)
+      cell.set_background_color(ns_color)
+    end
+    
+    typesig { [NSFont] }
+    def set_font(font)
+      if (!(@text).nil?)
+        (self.attr_view).set_attributed_title(create_string)
       end
     end
     
-    typesig { [::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Boolean, ::Java::Boolean, ::Java::Boolean] }
-    def set_bounds(x, y, width, height, move, resize, events)
-      # Bug in MacOS X. When setting the height of a bevel button
-      # to a value less than 20, the button is drawn incorrectly.
-      # The fix is to force the height to be greater than or equal to 20.
-      if (resize && ((self.attr_style & SWT::ARROW)).equal?(0))
-        height = Math.max(20, height)
-      end
-      return super(x, y, width, height, move, resize, events)
-    end
-    
-    typesig { [::Java::Boolean] }
-    def set_default(value)
-      if (((self.attr_style & SWT::PUSH)).equal?(0))
-        return
-      end
-      window = OS._get_control_owner(self.attr_handle)
-      OS._set_window_default_button(window, value ? self.attr_handle : 0)
+    typesig { [Array.typed(::Java::Float)] }
+    # double
+    def set_foreground(color)
+      (self.attr_view).set_attributed_title(create_string)
     end
     
     typesig { [::Java::Boolean] }
@@ -786,20 +791,15 @@ module Org::Eclipse::Swt::Widgets
       if (((self.attr_style & SWT::CHECK)).equal?(0))
         return
       end
+      checked = get_selection
       @grayed = grayed
-      if (grayed)
-        if (!(OS._get_control32bit_value(self.attr_handle)).equal?(0))
-          OS._set_control32bit_maximum(self.attr_handle, 2)
-          OS._set_control32bit_value(self.attr_handle, 2)
+      (self.attr_view).set_allows_mixed_state(grayed)
+      if (checked)
+        if (grayed)
+          (self.attr_view).set_state(OS::NSMixedState)
         else
-          OS._set_control32bit_maximum(self.attr_handle, 0)
-          OS._set_control32bit_value(self.attr_handle, 0)
+          (self.attr_view).set_state(OS::NSOnState)
         end
-      else
-        if (!(OS._get_control32bit_value(self.attr_handle)).equal?(0))
-          OS._set_control32bit_value(self.attr_handle, 1)
-        end
-        OS._set_control32bit_maximum(self.attr_handle, 1)
       end
     end
     
@@ -823,50 +823,25 @@ module Org::Eclipse::Swt::Widgets
     # </ul>
     def set_image(image)
       check_widget
-      if (!((self.attr_style & SWT::ARROW)).equal?(0))
-        return
-      end
       if (!(image).nil? && image.is_disposed)
         error(SWT::ERROR_INVALID_ARGUMENT)
       end
-      if (!(@c_icon).equal?(0))
-        destroy_cicon(@c_icon)
-        @c_icon = 0
+      if (!((self.attr_style & SWT::ARROW)).equal?(0))
+        return
       end
       @image = image
-      @is_image = true
-      if (OS::VERSION < 0x1040)
-        if (!((self.attr_style & SWT::PUSH)).equal?(0) && ((self.attr_style & SWT::FLAT)).equal?(0))
-          if ((image).nil?)
-            set_text(@text)
-            return
-          end
-          if (@text.length > 0)
-            ptr = OS._cfstring_create_with_characters(OS.attr_k_cfallocator_default, nil, 0)
-            if ((ptr).equal?(0))
-              error(SWT::ERROR_CANNOT_SET_TEXT)
-            end
-            OS._set_control_title_with_cfstring(self.attr_handle, ptr)
-            OS._cfrelease(ptr)
-          end
-        end
-      end
-      in_content = ControlButtonContentInfo.new
-      if (!(image).nil?)
-        if (OS::VERSION < 0x1040)
-          @c_icon = create_cicon(image)
-          in_content.attr_content_type = RJava.cast_to_short(OS.attr_k_control_content_cicon_handle)
-          in_content.attr_icon_ref = @c_icon
-        else
-          in_content.attr_content_type = RJava.cast_to_short(OS.attr_k_control_content_cgimage_ref)
-          in_content.attr_icon_ref = image.attr_handle
-        end
+      if (((self.attr_style & (SWT::RADIO | SWT::CHECK))).equal?(0))
+        # Feature in Cocoa.  If the NSImage object being set into the button is
+        # the same NSImage object that is already there then the button does not
+        # redraw itself.  This results in the button's image not visually updating
+        # if the NSImage object's content has changed since it was last set
+        # into the button.  The workaround is to explicitly redraw the button.
+        (self.attr_view).set_image(!(image).nil? ? image.attr_handle : nil)
+        self.attr_view.set_needs_display(true)
       else
-        in_content.attr_content_type = RJava.cast_to_short(OS.attr_k_control_content_text_only)
+        (self.attr_view).set_attributed_title(create_string)
       end
-      OS._set_bevel_button_content_info(self.attr_handle, in_content)
-      __set_alignment(self.attr_style)
-      redraw
+      update_alignment
     end
     
     typesig { [::Java::Boolean] }
@@ -901,20 +876,11 @@ module Org::Eclipse::Swt::Widgets
       if (((self.attr_style & (SWT::CHECK | SWT::RADIO | SWT::TOGGLE))).equal?(0))
         return
       end
-      if (!((self.attr_style & SWT::CHECK)).equal?(0))
-        if (@grayed)
-          if (selected)
-            OS._set_control32bit_maximum(self.attr_handle, 2)
-            OS._set_control32bit_value(self.attr_handle, 2)
-          else
-            OS._set_control32bit_maximum(self.attr_handle, 0)
-            OS._set_control32bit_value(self.attr_handle, 0)
-          end
-          return
-        end
-        OS._set_control32bit_maximum(self.attr_handle, 1)
+      if (@grayed)
+        (self.attr_view).set_state(selected ? OS::NSMixedState : OS::NSOffState)
+      else
+        (self.attr_view).set_state(selected ? OS::NSOnState : OS::NSOffState)
       end
-      OS._set_control32bit_value(self.attr_handle, selected ? 1 : 0)
     end
     
     typesig { [String] }
@@ -956,30 +922,25 @@ module Org::Eclipse::Swt::Widgets
         return
       end
       @text = string
-      if (OS::VERSION < 0x1040)
-        if (!((self.attr_style & SWT::PUSH)).equal?(0) && ((self.attr_style & SWT::FLAT)).equal?(0))
-          if (@is_image)
-            in_content = ControlButtonContentInfo.new
-            in_content.attr_content_type = RJava.cast_to_short(OS.attr_k_control_content_text_only)
-            OS._set_bevel_button_content_info(self.attr_handle, in_content)
-          end
-          @is_image = false
-        end
-      end
-      buffer = CharArray.new(@text.length)
-      @text.get_chars(0, buffer.attr_length, buffer, 0)
-      length_ = fix_mnemonic(buffer)
-      ptr = OS._cfstring_create_with_characters(OS.attr_k_cfallocator_default, buffer, length_)
-      if ((ptr).equal?(0))
-        error(SWT::ERROR_CANNOT_SET_TEXT)
-      end
-      OS._set_control_title_with_cfstring(self.attr_handle, ptr)
-      OS._cfrelease(ptr)
-      __set_alignment(self.attr_style)
-      redraw
+      (self.attr_view).set_attributed_title(create_string)
+      update_alignment
     end
     
-    typesig { [::Java::Int, ::Java::Int] }
+    typesig { [::Java::Int, ::Java::Int, NSRect] }
+    # long
+    # long
+    def title_rect_for_bounds(id, sel, cell_frame)
+      rect = super(id, sel, cell_frame)
+      if (!(@image).nil? && (!((self.attr_style & (SWT::CHECK | SWT::RADIO))).equal?(0)))
+        image_size = @image.attr_handle.size
+        rect.attr_x += image_size.attr_width + IMAGE_GAP
+        rect.attr_width -= (image_size.attr_width + IMAGE_GAP)
+        rect.attr_width = Math.max(0, rect.attr_width)
+      end
+      return rect
+    end
+    
+    typesig { [::Java::Int, NSEvent] }
     def traversal_code(key, the_event)
       code = super(key, the_event)
       if (!((self.attr_style & SWT::ARROW)).equal?(0))
@@ -989,6 +950,18 @@ module Org::Eclipse::Swt::Widgets
         code |= SWT::TRAVERSE_ARROW_NEXT | SWT::TRAVERSE_ARROW_PREVIOUS
       end
       return code
+    end
+    
+    typesig { [] }
+    def update_alignment
+      widget = self.attr_view
+      if (!((self.attr_style & (SWT::PUSH | SWT::TOGGLE))).equal?(0))
+        if (!(@text.length).equal?(0) && !(@image).nil?)
+          widget.set_image_position(OS::NSImageLeft)
+        else
+          widget.set_image_position(!(@text.length).equal?(0) ? OS::NSNoImage : OS::NSImageOnly)
+        end
+      end
     end
     
     private

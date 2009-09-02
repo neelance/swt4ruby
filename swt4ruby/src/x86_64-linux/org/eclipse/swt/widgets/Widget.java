@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2008 IBM Corporation and others.
+ * Copyright (c) 2000, 2009 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -161,7 +161,11 @@ public abstract class Widget {
 	static final int ACTIVATE_INVERSE = 60;
 	static final int DAY_SELECTED = 61;
 	static final int MONTH_CHANGED = 62;
-	static final int LAST_SIGNAL = 63;
+	static final int STATUS_ICON_POPUP_MENU = 63;
+	static final int ROW_INSERTED = 64;
+	static final int ROW_DELETED = 65;
+	static final int DAY_SELECTED_DOUBLE_CLICK = 66;
+	static final int LAST_SIGNAL = 67;
 
 /**
  * Prevents uninitialized instances from being created outside the package.
@@ -632,6 +636,10 @@ long /*int*/ gtk_day_selected (long /*int*/ widget) {
 	return 0;
 }
 
+long /*int*/ gtk_day_selected_double_click (long /*int*/ widget) {
+	return 0;
+}
+
 long /*int*/ gtk_delete_event (long /*int*/ widget, long /*int*/ event) {
 	return 0;
 }
@@ -756,6 +764,14 @@ long /*int*/ gtk_row_activated (long /*int*/ tree, long /*int*/ path, long /*int
 	return 0;
 }
 
+long /*int*/ gtk_row_deleted (long /*int*/ model, long /*int*/ path) {
+	return 0;
+}
+
+long /*int*/ gtk_row_inserted (long /*int*/ model, long /*int*/ path, long /*int*/ iter) {
+	return 0;
+}
+
 long /*int*/ gtk_scroll_child (long /*int*/ widget, long /*int*/ scrollType, long /*int*/ horizontal) {
 	return 0;
 }
@@ -777,6 +793,10 @@ long /*int*/ gtk_show_help (long /*int*/ widget, long /*int*/ helpType) {
 }
 
 long /*int*/ gtk_size_allocate (long /*int*/ widget, long /*int*/ allocation) {
+	return 0;
+}
+
+long /*int*/ gtk_status_icon_popup_menu (long /*int*/ handle, long /*int*/ button, long /*int*/ activate_time) {
 	return 0;
 }
 
@@ -872,20 +892,18 @@ char [] fixMnemonic (String string, boolean replace) {
 		switch (text [i]) {
 			case '&':
 				if (i + 1 < length && text [i + 1] == '&') {
-					i++; 
+					result [j++] = text [i++];
 				} else {
-					if (replace) {
-						text [i] = '_';
-					} else {
-						i++;
-					}
+					if (replace) result [j++] = '_';
 				}
+				i++;
 				break;
 			case '_':
 				if (replace) result [j++] = '_';
-				break;
+				//FALL THROUGH
+			default:
+				result [j++] = text [i++];
 		}
-		result [j++] = text [i++];
 	}
 	return result;
 }
@@ -1447,6 +1465,14 @@ boolean setKeyState (Event event, GdkEventKey keyEvent) {
 void setOrientation () {
 }
 
+boolean setTabGroupFocus (boolean next) {
+	return setTabItemFocus (next);
+}
+
+boolean setTabItemFocus (boolean next) {
+	return false;
+}
+
 long /*int*/ shellMapProc (long /*int*/ handle, long /*int*/ arg0, long /*int*/ user_data) {
 	return 0;
 }
@@ -1496,6 +1522,7 @@ long /*int*/ windowProc (long /*int*/ handle, long /*int*/ user_data) {
 		case CHANGED: return gtk_changed (handle);
 		case CLICKED: return gtk_clicked (handle);
 		case DAY_SELECTED: return gtk_day_selected (handle);
+		case DAY_SELECTED_DOUBLE_CLICK: return gtk_day_selected_double_click (handle);
 		case HIDE: return gtk_hide (handle);
 		case GRAB_FOCUS: return gtk_grab_focus (handle);
 		case MAP: return gtk_map (handle);
@@ -1557,6 +1584,7 @@ long /*int*/ windowProc (long /*int*/ handle, long /*int*/ arg0, long /*int*/ us
 		case UNMAP_EVENT: return gtk_unmap_event (handle, arg0);
 		case VISIBILITY_NOTIFY_EVENT: return gtk_visibility_notify_event (handle, arg0);
 		case WINDOW_STATE_EVENT: return gtk_window_state_event (handle, arg0);
+		case ROW_DELETED: return gtk_row_deleted (handle, arg0);
 		default: return 0;
 	}
 }
@@ -1567,9 +1595,11 @@ long /*int*/ windowProc (long /*int*/ handle, long /*int*/ arg0, long /*int*/ ar
 		case DELETE_TEXT: return gtk_delete_text (handle, arg0, arg1);
 		case ROW_ACTIVATED: return gtk_row_activated (handle, arg0, arg1);
 		case SCROLL_CHILD: return gtk_scroll_child (handle, arg0, arg1);
+		case STATUS_ICON_POPUP_MENU: return gtk_status_icon_popup_menu (handle, arg0, arg1);
 		case SWITCH_PAGE: return gtk_switch_page (handle, arg0, arg1);
 		case TEST_COLLAPSE_ROW: return gtk_test_collapse_row (handle, arg0, arg1);
 		case TEST_EXPAND_ROW: return gtk_test_expand_row(handle, arg0, arg1);
+		case ROW_INSERTED: return gtk_row_inserted (handle, arg0, arg1);
 		default: return 0;
 	}
 }

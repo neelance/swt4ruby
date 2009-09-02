@@ -1,6 +1,6 @@
 require "rjava"
 
-# Copyright (c) 2000, 2008 IBM Corporation and others.
+# Copyright (c) 2000, 2009 IBM Corporation and others.
 # All rights reserved. This program and the accompanying materials
 # are made available under the terms of the Eclipse Public License v1.0
 # which accompanies this distribution, and is available at
@@ -16,6 +16,7 @@ module Org::Eclipse::Swt::Custom
       include ::Org::Eclipse::Swt
       include ::Org::Eclipse::Swt::Graphics
       include ::Org::Eclipse::Swt::Widgets
+      include ::Org::Eclipse::Swt::Accessibility
       include ::Org::Eclipse::Swt::Events
     }
   end
@@ -158,6 +159,12 @@ module Org::Eclipse::Swt::Custom
     alias_method :attr_column=, :column=
     undef_method :column=
     
+    attr_accessor :listener
+    alias_method :attr_listener, :listener
+    undef_method :listener
+    alias_method :attr_listener=, :listener=
+    undef_method :listener=
+    
     attr_accessor :table_listener
     alias_method :attr_table_listener, :table_listener
     undef_method :table_listener
@@ -234,6 +241,7 @@ module Org::Eclipse::Swt::Custom
       @table = nil
       @row = nil
       @column = nil
+      @listener = nil
       @table_listener = nil
       @resize_listener = nil
       @dispose_item_listener = nil
@@ -248,7 +256,7 @@ module Org::Eclipse::Swt::Custom
       @table = parent
       set_background(nil)
       set_foreground(nil)
-      listener = Class.new(Listener.class == Class ? Listener : Object) do
+      @listener = Class.new(Listener.class == Class ? Listener : Object) do
         extend LocalClass
         include_class_members TableCursor
         include Listener if Listener.class == Module
@@ -257,7 +265,7 @@ module Org::Eclipse::Swt::Custom
         define_method :handle_event do |event|
           case (event.attr_type)
           when SWT::Dispose
-            dispose(event)
+            on_dispose(event)
           when SWT::FocusIn, SWT::FocusOut
             redraw
           when SWT::KeyDown
@@ -284,7 +292,7 @@ module Org::Eclipse::Swt::Custom
       events = Array.typed(::Java::Int).new([SWT::Dispose, SWT::FocusIn, SWT::FocusOut, SWT::KeyDown, SWT::Paint, SWT::Traverse])
       i = 0
       while i < events.attr_length
-        add_listener(events[i], listener)
+        add_listener(events[i], @listener)
         i += 1
       end
       @table_listener = Class.new(Listener.class == Class ? Listener : Object) do
@@ -380,6 +388,46 @@ module Org::Eclipse::Swt::Custom
       if (!(v_bar).nil?)
         v_bar.add_listener(SWT::Selection, @resize_listener)
       end
+      get_accessible.add_accessible_control_listener(Class.new(AccessibleControlAdapter.class == Class ? AccessibleControlAdapter : Object) do
+        extend LocalClass
+        include_class_members TableCursor
+        include AccessibleControlAdapter if AccessibleControlAdapter.class == Module
+        
+        typesig { [AccessibleControlEvent] }
+        define_method :get_role do |e|
+          e.attr_detail = ACC::ROLE_TABLECELL
+        end
+        
+        typesig { [Vararg.new(Object)] }
+        define_method :initialize do |*args|
+          super(*args)
+        end
+        
+        private
+        alias_method :initialize_anonymous, :initialize
+      end.new_local(self))
+      get_accessible.add_accessible_listener(Class.new(AccessibleAdapter.class == Class ? AccessibleAdapter : Object) do
+        extend LocalClass
+        include_class_members TableCursor
+        include AccessibleAdapter if AccessibleAdapter.class == Module
+        
+        typesig { [AccessibleEvent] }
+        define_method :get_name do |e|
+          if ((self.attr_row).nil?)
+            return
+          end
+          column_index = (self.attr_column).nil? ? 0 : self.attr_table.index_of(self.attr_column)
+          e.attr_result = self.attr_row.get_text(column_index)
+        end
+        
+        typesig { [Vararg.new(Object)] }
+        define_method :initialize do |*args|
+          super(*args)
+        end
+        
+        private
+        alias_method :initialize_anonymous, :initialize
+      end.new_local(self))
     end
     
     typesig { [SelectionListener] }
@@ -418,7 +466,10 @@ module Org::Eclipse::Swt::Custom
     end
     
     typesig { [Event] }
-    def dispose(event)
+    def on_dispose(event)
+      remove_listener(SWT::Dispose, @listener)
+      notify_listeners(SWT::Dispose, event)
+      event.attr_type = SWT::None
       @table.remove_listener(SWT::FocusIn, @table_listener)
       @table.remove_listener(SWT::MouseDown, @table_listener)
       unhook_row_column_listeners
@@ -696,6 +747,7 @@ module Org::Eclipse::Swt::Custom
           notify_listeners(SWT::Selection, Event.new)
         end
       end
+      get_accessible.set_focus(ACC::CHILDID_SELF)
     end
     
     typesig { [::Java::Boolean] }

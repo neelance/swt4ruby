@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2008 IBM Corporation and others.
+ * Copyright (c) 2000, 2009 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -36,6 +36,7 @@ import org.eclipse.swt.events.*;
  * @see <a href="http://www.eclipse.org/swt/snippets/#list">List snippets</a>
  * @see <a href="http://www.eclipse.org/swt/examples.php">SWT Example: ControlExample</a>
  * @see <a href="http://www.eclipse.org/swt/">Sample code and further information</a>
+ * @noextend This class is not intended to be subclassed by clients.
  */
 
 public class List extends Scrollable {
@@ -183,7 +184,7 @@ int /*long*/ callWindowProc (int /*long*/ hwnd, int msg, int /*long*/ wParam, in
 	switch (msg) {
 		case OS.WM_HSCROLL:
 		case OS.WM_VSCROLL: {
-			redraw = findImageControl () != null && drawCount == 0 && OS.IsWindowVisible (handle);
+			redraw = findImageControl () != null && getDrawing() && OS.IsWindowVisible (handle);
 			if (redraw) OS.DefWindowProc (handle, OS.WM_SETREDRAW, 0, 0);
 			break;
 		}
@@ -1038,7 +1039,7 @@ void select (int index, boolean scroll) {
 	int topIndex = (int)/*64*/OS.SendMessage (handle, OS.LB_GETTOPINDEX, 0, 0);
 	RECT itemRect = new RECT (), selectedRect = null;
 	OS.SendMessage (handle, OS.LB_GETITEMRECT, index, itemRect);
-	boolean redraw = drawCount == 0 && OS.IsWindowVisible (handle);
+	boolean redraw = getDrawing () && OS.IsWindowVisible (handle);
 	if (redraw) {
 		OS.UpdateWindow (handle);
 		OS.SendMessage (handle, OS.WM_SETREDRAW, 0, 0);
@@ -1198,7 +1199,7 @@ public void setItems (String [] items) {
 	}
 	int /*long*/ oldProc = OS.GetWindowLongPtr (handle, OS.GWLP_WNDPROC);
 	OS.SetWindowLongPtr (handle, OS.GWLP_WNDPROC, ListProc);
-	boolean redraw = drawCount == 0 && OS.IsWindowVisible (handle);
+	boolean redraw = getDrawing () && OS.IsWindowVisible (handle);
 	if (redraw) {
 		OS.SendMessage (handle, OS.WM_SETREDRAW, 0, 0);
 	}
@@ -1564,7 +1565,7 @@ LRESULT WM_KEYDOWN (int /*long*/ wParam, int /*long*/ lParam) {
 	if (OS.GetKeyState (OS.VK_CONTROL) < 0 && OS.GetKeyState (OS.VK_SHIFT) >= 0) {
 		int bits = OS.GetWindowLong (handle, OS.GWL_STYLE);
 		if ((bits & OS.LBS_EXTENDEDSEL) != 0) {
-			int location = -1;
+			int newIndex = -1;
 			switch ((int)/*64*/wParam) {
 				case OS.VK_SPACE: {
 					/*
@@ -1577,89 +1578,95 @@ LRESULT WM_KEYDOWN (int /*long*/ wParam, int /*long*/ lParam) {
 				}
 				case OS.VK_UP:
 				case OS.VK_DOWN: {
-					int index = (int)/*64*/OS.SendMessage (handle, OS.LB_GETCARETINDEX, 0, 0);
-					location = Math.max (0, index + (((int)/*64*/wParam) == OS.VK_UP ? -1 : 1));
+					int oldIndex = (int)/*64*/OS.SendMessage (handle, OS.LB_GETCARETINDEX, 0, 0);
+					newIndex = Math.max (0, oldIndex + (((int)/*64*/wParam) == OS.VK_UP ? -1 : 1));
 					break;
 				}
 				case OS.VK_PRIOR: {
-					int index = (int)/*64*/OS.SendMessage (handle, OS.LB_GETCARETINDEX, 0, 0);
 					int topIndex = (int)/*64*/OS.SendMessage (handle, OS.LB_GETTOPINDEX, 0, 0);
-					if (index != topIndex) {
-						location = topIndex;
+					int oldIndex = (int)/*64*/OS.SendMessage (handle, OS.LB_GETCARETINDEX, 0, 0);
+					if (oldIndex != topIndex) {
+						newIndex = topIndex;
 					} else {
 						forceResize ();
 						RECT rect = new RECT ();
 						OS.GetClientRect (handle, rect);
 						int itemHeight = (int)/*64*/OS.SendMessage (handle, OS.LB_GETITEMHEIGHT, 0, 0);
 						int pageSize = Math.max (2, (rect.bottom / itemHeight));
-						location = Math.max (0, topIndex - (pageSize - 1));
+						newIndex = Math.max (0, topIndex - (pageSize - 1));
 					}
 					break;
 				}
 				case OS.VK_NEXT: {
-					int index = (int)/*64*/OS.SendMessage (handle, OS.LB_GETCARETINDEX, 0, 0);
 					int topIndex = (int)/*64*/OS.SendMessage (handle, OS.LB_GETTOPINDEX, 0, 0);
+					int oldIndex = (int)/*64*/OS.SendMessage (handle, OS.LB_GETCARETINDEX, 0, 0);
 					forceResize ();
 					RECT rect = new RECT ();
 					OS.GetClientRect (handle, rect);
 					int itemHeight = (int)/*64*/OS.SendMessage (handle, OS.LB_GETITEMHEIGHT, 0, 0);
 					int pageSize = Math.max (2, (rect.bottom / itemHeight));
 					int bottomIndex = topIndex + pageSize - 1;
-					if (index != bottomIndex) {
-						location = bottomIndex;
+					if (oldIndex != bottomIndex) {
+						newIndex = bottomIndex;
 					} else {
-						location = bottomIndex + pageSize - 1;
+						newIndex = bottomIndex + pageSize - 1;
 					}
 					int count = (int)/*64*/OS.SendMessage (handle, OS.LB_GETCOUNT, 0, 0);
-					if (count != OS.LB_ERR) location = Math.min (count - 1, location);
+					if (count != OS.LB_ERR) newIndex = Math.min (count - 1, newIndex);
 					break;
 				}
 				case OS.VK_HOME: {
-					location = 0;
+					newIndex = 0;
 					break;
 				}
 				case OS.VK_END: {
 					int count = (int)/*64*/OS.SendMessage (handle, OS.LB_GETCOUNT, 0, 0);
 					if (count == OS.LB_ERR) break;
-					location = count - 1;
+					newIndex = count - 1;
 					break;
 				}
 			}
-			if (location != -1) {
-				OS.SendMessage (handle, OS.WM_CHANGEUISTATE, OS.UIS_INITIALIZE, 0);
-				OS.SendMessage (handle, OS.LB_SETCARETINDEX, location, 0);
+			if (newIndex != -1) {
+				/*
+				* Feature in Windows.  When the user changes focus using
+				* the keyboard, the focus indicator does not draw.  The
+				* fix is to update the UI state for the control whenever
+				* the focus indicator changes as a result of something
+				* the user types.
+				*/
+				int uiState = (int)/*64*/OS.SendMessage (handle, OS.WM_QUERYUISTATE, 0, 0);
+				if ((uiState & OS.UISF_HIDEFOCUS) != 0) {
+					OS.SendMessage (handle, OS.WM_CHANGEUISTATE, OS.UIS_INITIALIZE, 0);
+					/*
+					* Bug in Windows.  When the WM_CHANGEUISTATE is used
+					* to update the UI state for a list that has been
+					* selected using Shift+Arrow, the focus indicator
+					* has pixel corruption.  The fix is to redraw the
+					* control.
+					*/
+					RECT itemRect = new RECT ();
+					int oldIndex = (int)/*64*/OS.SendMessage (handle, OS.LB_GETCARETINDEX, 0, 0);
+					OS.SendMessage (handle, OS.LB_GETITEMRECT, oldIndex, itemRect);
+					OS.InvalidateRect (handle, itemRect, true);
+				}
+				OS.SendMessage (handle, OS.LB_SETCARETINDEX, newIndex, 0);
 				return LRESULT.ZERO;
 			}
 		}
 	}
-	
+	return result;
+}
+
+LRESULT WM_SETREDRAW (int /*long*/ wParam, int /*long*/ lParam) {
+	LRESULT result = super.WM_SETREDRAW (wParam, lParam);
+	if (result != null) return result;
 	/*
-	* Feature in Windows.  When the user changes focus using
-	* the keyboard, the focus indicator does not draw.  The
-	* fix is to update the UI state for the control whenever
-	* the focus indicator changes as a result of something
-	* the user types.
+	* Bug in Windows.  When WM_SETREDRAW is used to turn off
+	* redraw for a list, table or tree, the background of the
+	* control is drawn.  The fix is to call DefWindowProc(),
+	* which stops all graphics output to the control.
 	*/
-	int uiState = (int)/*64*/OS.SendMessage (handle, OS.WM_QUERYUISTATE, 0, 0);
-	if ((uiState & OS.UISF_HIDEFOCUS) != 0) {
-		int oldIndex = (int)/*64*/OS.SendMessage (handle, OS.LB_GETCARETINDEX, 0, 0);
-		int /*long*/ code = callWindowProc (handle, OS.WM_KEYDOWN, wParam, lParam);
-		int newIndex = (int)/*64*/OS.SendMessage (handle, OS.LB_GETCARETINDEX, 0, 0);
-		if (oldIndex != newIndex) {
-			OS.SendMessage (handle, OS.WM_CHANGEUISTATE, OS.UIS_INITIALIZE, 0);
-			/*
-			* Bug in Windows.  When the WM_CHANGEUISTATE is used
-			* to update the UI state for a list that has been
-			* selected using Shift+Arrow, the focus indicator
-			* has pixel corruption.  The fix is to redraw the
-			* focus item.
-			*/
-			RECT itemRect = new RECT ();
-			OS.SendMessage (handle, OS.LB_GETITEMRECT, newIndex, itemRect);
-			OS.InvalidateRect (handle, itemRect, true);
-		}
-		return new LRESULT (code);
-	}
+	OS.DefWindowProc (handle, OS.WM_SETREDRAW, wParam, lParam);
 	return result;
 }
 

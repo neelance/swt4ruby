@@ -68,7 +68,7 @@ module Org::Eclipse::Swt::Graphics
     
     class_module.module_eval {
       typesig { [::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int] }
-      def carbon_new(ascent, descent, average_char_width, leading, height)
+      def cocoa_new(ascent, descent, average_char_width, leading, height)
         font_metrics = FontMetrics.new
         font_metrics.attr_ascent = ascent
         font_metrics.attr_descent = descent

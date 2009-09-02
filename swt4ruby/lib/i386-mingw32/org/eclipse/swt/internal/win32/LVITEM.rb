@@ -1,6 +1,6 @@
 require "rjava"
 
-# Copyright (c) 2000, 2006 IBM Corporation and others.
+# Copyright (c) 2000, 2008 IBM Corporation and others.
 # All rights reserved. This program and the accompanying materials
 # are made available under the terms of the Eclipse Public License v1.0
 # which accompanies this distribution, and is available at
@@ -49,6 +49,7 @@ module Org::Eclipse::Swt::Internal::Win32
     alias_method :attr_state_mask=, :state_mask=
     undef_method :state_mask=
     
+    # @field cast=(LPTSTR)
     # long
     attr_accessor :psz_text
     alias_method :attr_psz_text, :psz_text
@@ -81,18 +82,21 @@ module Org::Eclipse::Swt::Internal::Win32
     alias_method :attr_i_indent=, :i_indent=
     undef_method :i_indent=
     
+    # @field flags=no_wince
     attr_accessor :i_group_id
     alias_method :attr_i_group_id, :i_group_id
     undef_method :i_group_id
     alias_method :attr_i_group_id=, :i_group_id=
     undef_method :i_group_id=
     
+    # @field flags=no_wince
     attr_accessor :c_columns
     alias_method :attr_c_columns, :c_columns
     undef_method :c_columns
     alias_method :attr_c_columns=, :c_columns=
     undef_method :c_columns=
     
+    # @field cast=(PUINT),flags=no_wince
     # long
     attr_accessor :pu_columns
     alias_method :attr_pu_columns, :pu_columns

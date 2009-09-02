@@ -1,6 +1,6 @@
 require "rjava"
 
-# Copyright (c) 2000, 2008 IBM Corporation and others.
+# Copyright (c) 2000, 2009 IBM Corporation and others.
 # All rights reserved. This program and the accompanying materials
 # are made available under the terms of the Eclipse Public License v1.0
 # which accompanies this distribution, and is available at
@@ -14,7 +14,7 @@ module Org::Eclipse::Swt::Widgets
       include ::Java::Lang
       include ::Org::Eclipse::Swt::Widgets
       include ::Org::Eclipse::Swt
-      include ::Org::Eclipse::Swt::Internal::Carbon
+      include ::Org::Eclipse::Swt::Internal::Cocoa
     }
   end
   
@@ -39,6 +39,7 @@ module Org::Eclipse::Swt::Widgets
   # 
   # @see <a href="http://www.eclipse.org/swt/examples.php">SWT Example: ControlExample, Dialog tab</a>
   # @see <a href="http://www.eclipse.org/swt/">Sample code and further information</a>
+  # @noextend This class is not intended to be subclassed by clients.
   class MessageBox < MessageBoxImports.const_get :Dialog
     include_class_members MessageBoxImports
     
@@ -47,6 +48,12 @@ module Org::Eclipse::Swt::Widgets
     undef_method :message
     alias_method :attr_message=, :message=
     undef_method :message=
+    
+    attr_accessor :return_code
+    alias_method :attr_return_code, :return_code
+    undef_method :return_code
+    alias_method :attr_return_code=, :return_code=
+    undef_method :return_code=
     
     typesig { [Shell] }
     # Constructs a new instance of this class given only its parent.
@@ -86,10 +93,29 @@ module Org::Eclipse::Swt::Widgets
     # <li>ERROR_THREAD_INVALID_ACCESS - if not called from the thread that created the parent</li>
     # <li>ERROR_INVALID_SUBCLASS - if this class is not an allowed subclass</li>
     # </ul>
+    # 
+    # @see SWT#ICON_ERROR
+    # @see SWT#ICON_INFORMATION
+    # @see SWT#ICON_QUESTION
+    # @see SWT#ICON_WARNING
+    # @see SWT#ICON_WORKING
+    # @see SWT#OK
+    # @see SWT#CANCEL
+    # @see SWT#YES
+    # @see SWT#NO
+    # @see SWT#ABORT
+    # @see SWT#RETRY
+    # @see SWT#IGNORE
     def initialize(parent, style)
       @message = nil
+      @return_code = 0
       super(parent, check_style(parent, check_style(style)))
       @message = ""
+      if (Display.get_sheet_enabled)
+        if (!(parent).nil? && !((style & SWT::SHEET)).equal?(0))
+          self.attr_style |= SWT::SHEET
+        end
+      end
       check_subclass
     end
     
@@ -111,14 +137,6 @@ module Org::Eclipse::Swt::Widgets
         return style
       end
     }
-    
-    typesig { [String] }
-    def create_cfstring(id)
-      string = SWT.get_message(id)
-      buffer = CharArray.new(string.length)
-      string.get_chars(0, buffer.attr_length, buffer, 0)
-      return OS._cfstring_create_with_characters(OS.attr_k_cfallocator_default, buffer, buffer.attr_length)
-    end
     
     typesig { [] }
     # Returns the dialog's message, or an empty string if it does not have one.
@@ -142,154 +160,188 @@ module Org::Eclipse::Swt::Widgets
     # <li>ERROR_THREAD_INVALID_ACCESS - if not called from the thread that created the dialog</li>
     # </ul>
     def open
-      alert_type = OS.attr_k_alert_plain_alert
+      alert = NSAlert.new.alloc.init
+      alert_type = OS::NSInformationalAlertStyle
       if (!((self.attr_style & SWT::ICON_ERROR)).equal?(0))
-        alert_type = OS.attr_k_alert_stop_alert
+        alert_type = OS::NSCriticalAlertStyle
       end
       if (!((self.attr_style & SWT::ICON_INFORMATION)).equal?(0))
-        alert_type = OS.attr_k_alert_note_alert
+        alert_type = OS::NSInformationalAlertStyle
       end
       if (!((self.attr_style & SWT::ICON_QUESTION)).equal?(0))
-        alert_type = OS.attr_k_alert_note_alert
+        alert_type = OS::NSInformationalAlertStyle
       end
       if (!((self.attr_style & SWT::ICON_WARNING)).equal?(0))
-        alert_type = OS.attr_k_alert_caution_alert
+        alert_type = OS::NSWarningAlertStyle
       end
       if (!((self.attr_style & SWT::ICON_WORKING)).equal?(0))
-        alert_type = OS.attr_k_alert_note_alert
+        alert_type = OS::NSInformationalAlertStyle
       end
-      error = 0
-      explanation = 0
-      error_string = self.attr_title
-      explanation_string = @message
-      if (!(error_string).nil?)
-        buffer = CharArray.new(error_string.length)
-        error_string.get_chars(0, buffer.attr_length, buffer, 0)
-        error = OS._cfstring_create_with_characters(OS.attr_k_cfallocator_default, buffer, buffer.attr_length)
-      end
-      if (!(explanation_string).nil?)
-        buffer = CharArray.new(explanation_string.length)
-        explanation_string.get_chars(0, buffer.attr_length, buffer, 0)
-        explanation = OS._cfstring_create_with_characters(OS.attr_k_cfallocator_default, buffer, buffer.attr_length)
-      end
-      param = AlertStdCFStringAlertParamRec.new
-      param.attr_version = OS.attr_k_std_cfstring_alert_version_one
-      param.attr_position = RJava.cast_to_short(OS.attr_k_window_alert_position_parent_window_screen)
-      default_str = 0
-      cancel_str = 0
-      other_str = 0
+      alert.set_alert_style(alert_type)
       mask = (SWT::YES | SWT::NO | SWT::OK | SWT::CANCEL | SWT::ABORT | SWT::RETRY | SWT::IGNORE)
       bits = self.attr_style & mask
+      title = nil
       case (bits)
       when SWT::OK
-        param.attr_default_button = RJava.cast_to_short(OS.attr_k_alert_std_alert_okbutton)
-        param.attr_default_text = OS.attr_k_alert_default_oktext
+        title = NSString.string_with(SWT.get_message("SWT_OK"))
+        alert.add_button_with_title(title)
       when SWT::CANCEL
-        param.attr_default_button = RJava.cast_to_short(OS.attr_k_alert_std_alert_okbutton)
-        param.attr_default_text = default_str = create_cfstring("SWT_Cancel")
+        title = NSString.string_with(SWT.get_message("SWT_Cancel"))
+        alert.add_button_with_title(title)
       when SWT::OK | SWT::CANCEL
-        param.attr_default_button = RJava.cast_to_short(OS.attr_k_alert_std_alert_okbutton)
-        param.attr_default_text = OS.attr_k_alert_default_oktext
-        param.attr_cancel_button = RJava.cast_to_short(OS.attr_k_alert_std_alert_cancel_button)
-        param.attr_cancel_text = OS.attr_k_alert_default_cancel_text
+        title = NSString.string_with(SWT.get_message("SWT_OK"))
+        alert.add_button_with_title(title)
+        title = NSString.string_with(SWT.get_message("SWT_Cancel"))
+        alert.add_button_with_title(title)
       when SWT::YES
-        param.attr_default_button = RJava.cast_to_short(OS.attr_k_alert_std_alert_okbutton)
-        param.attr_default_text = default_str = create_cfstring("SWT_Yes")
+        title = NSString.string_with(SWT.get_message("SWT_Yes"))
+        alert.add_button_with_title(title)
       when SWT::NO
-        param.attr_cancel_button = RJava.cast_to_short(OS.attr_k_alert_std_alert_okbutton)
-        param.attr_cancel_text = default_str = create_cfstring("SWT_No")
+        title = NSString.string_with(SWT.get_message("SWT_No"))
+        alert.add_button_with_title(title)
       when SWT::YES | SWT::NO
-        param.attr_default_button = RJava.cast_to_short(OS.attr_k_alert_std_alert_okbutton)
-        param.attr_default_text = default_str = create_cfstring("SWT_Yes")
-        param.attr_cancel_button = RJava.cast_to_short(OS.attr_k_alert_std_alert_cancel_button)
-        param.attr_cancel_text = cancel_str = create_cfstring("SWT_No")
+        title = NSString.string_with(SWT.get_message("SWT_Yes"))
+        alert.add_button_with_title(title)
+        title = NSString.string_with(SWT.get_message("SWT_No"))
+        alert.add_button_with_title(title)
+        # no.setKeyEquivalent(NSString.stringWith("\033"));
       when SWT::YES | SWT::NO | SWT::CANCEL
-        param.attr_default_button = RJava.cast_to_short(OS.attr_k_alert_std_alert_okbutton)
-        param.attr_default_text = default_str = create_cfstring("SWT_Yes")
-        param.attr_other_text = cancel_str = create_cfstring("SWT_No")
-        param.attr_cancel_button = RJava.cast_to_short(OS.attr_k_alert_std_alert_cancel_button)
-        param.attr_cancel_text = OS.attr_k_alert_default_cancel_text
+        title = NSString.string_with(SWT.get_message("SWT_Yes"))
+        alert.add_button_with_title(title)
+        title = NSString.string_with(SWT.get_message("SWT_Cancel"))
+        alert.add_button_with_title(title)
+        title = NSString.string_with(SWT.get_message("SWT_No"))
+        alert.add_button_with_title(title)
       when SWT::RETRY | SWT::CANCEL
-        param.attr_default_button = RJava.cast_to_short(OS.attr_k_alert_std_alert_okbutton)
-        param.attr_default_text = default_str = create_cfstring("SWT_Retry")
-        param.attr_cancel_button = RJava.cast_to_short(OS.attr_k_alert_std_alert_cancel_button)
-        param.attr_cancel_text = OS.attr_k_alert_default_cancel_text
+        title = NSString.string_with(SWT.get_message("SWT_Retry"))
+        alert.add_button_with_title(title)
+        title = NSString.string_with(SWT.get_message("SWT_Cancel"))
+        alert.add_button_with_title(title)
       when SWT::ABORT | SWT::RETRY | SWT::IGNORE
-        param.attr_default_button = RJava.cast_to_short(OS.attr_k_alert_std_alert_okbutton)
-        param.attr_default_text = default_str = create_cfstring("SWT_Abort")
-        param.attr_other_text = cancel_str = create_cfstring("SWT_Retry")
-        param.attr_cancel_button = RJava.cast_to_short(OS.attr_k_alert_std_alert_cancel_button)
-        param.attr_cancel_text = other_str = create_cfstring("SWT_Ignore")
+        title = NSString.string_with(SWT.get_message("SWT_Abort"))
+        alert.add_button_with_title(title)
+        title = NSString.string_with(SWT.get_message("SWT_Ignore"))
+        alert.add_button_with_title(title)
+        title = NSString.string_with(SWT.get_message("SWT_Retry"))
+        alert.add_button_with_title(title)
       end
-      dialog_ref = Array.typed(::Java::Int).new(1) { 0 }
-      OS._create_standard_alert(RJava.cast_to_short(alert_type), error, explanation, param, dialog_ref)
-      if (!(error).equal?(0))
-        OS._cfrelease(error)
-      end
-      if (!(explanation).equal?(0))
-        OS._cfrelease(explanation)
-      end
-      if (!(default_str).equal?(0))
-        OS._cfrelease(default_str)
-      end
-      if (!(cancel_str).equal?(0))
-        OS._cfrelease(cancel_str)
-      end
-      if (!(other_str).equal?(0))
-        OS._cfrelease(other_str)
-      end
-      if (!(dialog_ref[0]).equal?(0))
-        # Force a system modal message box to the front
-        if (!((self.attr_style & SWT::SYSTEM_MODAL)).equal?(0))
-          OS._set_front_process_with_options(Array.typed(::Java::Int).new([0, OS.attr_k_current_process]), OS.attr_k_set_front_process_front_window_only)
+      title = NSString.string_with(!(self.attr_title).nil? ? self.attr_title : "")
+      alert.window.set_title(title)
+      message = NSString.string_with(!(@message).nil? ? @message : "")
+      alert.set_message_text(message)
+      response = 0
+      # long
+      jni_ref = 0
+      delegate = nil
+      if (!((self.attr_style & SWT::SHEET)).equal?(0))
+        delegate = SWTPanelDelegate.new.alloc.init
+        jni_ref = OS._new_global_ref(self)
+        if ((jni_ref).equal?(0))
+          SWT.error(SWT::ERROR_NO_HANDLES)
         end
-        out_item_hit = Array.typed(::Java::Short).new(1) { 0 }
-        OS._run_standard_alert(dialog_ref[0], 0, out_item_hit)
-        if (!(out_item_hit[0]).equal?(0))
-          case (bits)
-          when SWT::OK
-            return SWT::OK
-          when SWT::CANCEL
-            return SWT::CANCEL
-          when SWT::OK | SWT::CANCEL
-            if ((out_item_hit[0]).equal?(OS.attr_k_alert_std_alert_okbutton))
-              return SWT::OK
-            end
-            return SWT::CANCEL
-          when SWT::YES
-            return SWT::YES
-          when SWT::NO
-            return SWT::NO
-          when SWT::YES | SWT::NO
-            if ((out_item_hit[0]).equal?(OS.attr_k_alert_std_alert_okbutton))
-              return SWT::YES
-            end
-            return SWT::NO
-          when SWT::YES | SWT::NO | SWT::CANCEL
-            if ((out_item_hit[0]).equal?(OS.attr_k_alert_std_alert_okbutton))
-              return SWT::YES
-            end
-            if ((out_item_hit[0]).equal?(OS.attr_k_alert_std_alert_other_button))
-              return SWT::NO
-            end
-            return SWT::CANCEL
-          when SWT::RETRY | SWT::CANCEL
-            if ((out_item_hit[0]).equal?(OS.attr_k_alert_std_alert_okbutton))
-              return SWT::RETRY
-            end
-            return SWT::CANCEL
-          when SWT::ABORT | SWT::RETRY | SWT::IGNORE
-            if ((out_item_hit[0]).equal?(OS.attr_k_alert_std_alert_okbutton))
-              return SWT::ABORT
-            end
-            if ((out_item_hit[0]).equal?(OS.attr_k_alert_std_alert_other_button))
-              return SWT::RETRY
-            end
-            return SWT::IGNORE
+        OS.object_set_instance_variable(delegate.attr_id, Display::SWT_OBJECT, jni_ref)
+        alert.begin_sheet_modal_for_window(self.attr_parent.attr_window, delegate, OS.attr_sel_panel_did_end_return_code_context_info_, 0)
+        if (!((self.attr_style & SWT::APPLICATION_MODAL)).equal?(0))
+          # 64
+          response = RJava.cast_to_int(alert.run_modal)
+        else
+          @return_code = 0
+          window_ = alert.window
+          application = NSApplication.shared_application
+          while (window_.is_visible)
+            application.run
           end
+          response = @return_code
+        end
+      else
+        # 64
+        response = RJava.cast_to_int(alert.run_modal)
+      end
+      if (!(delegate).nil?)
+        delegate.release
+      end
+      if (!(jni_ref).equal?(0))
+        OS._delete_global_ref(jni_ref)
+      end
+      alert.release
+      case (bits)
+      when SWT::OK
+        case (response)
+        when OS::NSAlertFirstButtonReturn
+          return SWT::OK
+        end
+      when SWT::CANCEL
+        case (response)
+        when OS::NSAlertFirstButtonReturn
+          return SWT::CANCEL
+        end
+      when SWT::OK | SWT::CANCEL
+        case (response)
+        when OS::NSAlertFirstButtonReturn
+          return SWT::OK
+        when OS::NSAlertSecondButtonReturn
+          return SWT::CANCEL
+        end
+      when SWT::YES
+        case (response)
+        when OS::NSAlertFirstButtonReturn
+          return SWT::YES
+        end
+      when SWT::NO
+        case (response)
+        when OS::NSAlertFirstButtonReturn
+          return SWT::NO
+        end
+      when SWT::YES | SWT::NO
+        case (response)
+        when OS::NSAlertFirstButtonReturn
+          return SWT::YES
+        when OS::NSAlertSecondButtonReturn
+          return SWT::NO
+        end
+      when SWT::YES | SWT::NO | SWT::CANCEL
+        case (response)
+        when OS::NSAlertFirstButtonReturn
+          return SWT::YES
+        when OS::NSAlertSecondButtonReturn
+          return SWT::CANCEL
+        when OS::NSAlertThirdButtonReturn
+          return SWT::NO
+        end
+      when SWT::RETRY | SWT::CANCEL
+        case (response)
+        when OS::NSAlertFirstButtonReturn
+          return SWT::RETRY
+        when OS::NSAlertSecondButtonReturn
+          return SWT::CANCEL
+        end
+      when SWT::ABORT | SWT::RETRY | SWT::IGNORE
+        case (response)
+        when OS::NSAlertFirstButtonReturn
+          return SWT::ABORT
+        when OS::NSAlertSecondButtonReturn
+          return SWT::IGNORE
+        when OS::NSAlertThirdButtonReturn
+          return SWT::RETRY
         end
       end
       return SWT::CANCEL
+    end
+    
+    typesig { [::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int] }
+    # long
+    # long
+    # long
+    # long
+    # long
+    def panel_did_end_return_code_context_info(id, sel, alert, return_code, context_info)
+      # 64
+      @return_code = RJava.cast_to_int(return_code)
+      application = NSApplication.shared_application
+      application.end_sheet(NSAlert.new(alert).window, return_code)
+      if (!((self.attr_style & SWT::PRIMARY_MODAL)).equal?(0))
+        application.stop(nil)
+      end
     end
     
     typesig { [String] }

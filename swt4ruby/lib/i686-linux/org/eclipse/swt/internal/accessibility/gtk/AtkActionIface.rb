@@ -1,6 +1,6 @@
 require "rjava"
 
-# Copyright (c) 2000, 2006 IBM Corporation and others. All rights reserved.
+# Copyright (c) 2000, 2008 IBM Corporation and others. All rights reserved.
 # The contents of this file are made available under the terms
 # of the GNU Lesser General Public License (LGPL) Version 2.1 that
 # accompanies this distribution (lgpl-v21.txt).  The LGPL is also
@@ -26,6 +26,7 @@ module Org::Eclipse::Swt::Internal::Accessibility::Gtk
     include_class_members AtkActionIfaceImports
     
     # GTypeInterface parent;
+    # @field cast=(gboolean (*)())
     # long
     attr_accessor :do_action
     alias_method :attr_do_action, :do_action
@@ -33,6 +34,7 @@ module Org::Eclipse::Swt::Internal::Accessibility::Gtk
     alias_method :attr_do_action=, :do_action=
     undef_method :do_action=
     
+    # @field cast=(gint (*)())
     # long
     attr_accessor :get_n_actions
     alias_method :attr_get_n_actions, :get_n_actions
@@ -40,6 +42,7 @@ module Org::Eclipse::Swt::Internal::Accessibility::Gtk
     alias_method :attr_get_n_actions=, :get_n_actions=
     undef_method :get_n_actions=
     
+    # @field cast=(G_CONST_RETURN gchar *(*)())
     # long
     attr_accessor :get_description
     alias_method :attr_get_description, :get_description
@@ -47,6 +50,7 @@ module Org::Eclipse::Swt::Internal::Accessibility::Gtk
     alias_method :attr_get_description=, :get_description=
     undef_method :get_description=
     
+    # @field cast=(G_CONST_RETURN gchar *(*)())
     # long
     attr_accessor :get_name
     alias_method :attr_get_name, :get_name
@@ -54,6 +58,7 @@ module Org::Eclipse::Swt::Internal::Accessibility::Gtk
     alias_method :attr_get_name=, :get_name=
     undef_method :get_name=
     
+    # @field cast=(G_CONST_RETURN gchar *(*)())
     # long
     attr_accessor :get_keybinding
     alias_method :attr_get_keybinding, :get_keybinding
@@ -61,6 +66,7 @@ module Org::Eclipse::Swt::Internal::Accessibility::Gtk
     alias_method :attr_get_keybinding=, :get_keybinding=
     undef_method :get_keybinding=
     
+    # @field cast=(gboolean (*)())
     # long
     attr_accessor :set_description
     alias_method :attr_set_description, :set_description

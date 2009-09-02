@@ -1,6 +1,6 @@
 require "rjava"
 
-# Copyright (c) 2000, 2008 IBM Corporation and others.
+# Copyright (c) 2000, 2009 IBM Corporation and others.
 # All rights reserved. This program and the accompanying materials
 # are made available under the terms of the Eclipse Public License v1.0
 # which accompanies this distribution, and is available at
@@ -46,6 +46,7 @@ module Org::Eclipse::Swt::Widgets
   # @see <a href="http://www.eclipse.org/swt/snippets/#button">Button snippets</a>
   # @see <a href="http://www.eclipse.org/swt/examples.php">SWT Example: ControlExample</a>
   # @see <a href="http://www.eclipse.org/swt/">Sample code and further information</a>
+  # @noextend This class is not intended to be subclassed by clients.
   class Button < ButtonImports.const_get :Control
     include_class_members ButtonImports
     
@@ -107,8 +108,17 @@ module Org::Eclipse::Swt::Widgets
       const_set_lazy(:ICON_HEIGHT) { 128 }
       const_attr_reader  :ICON_HEIGHT
       
-      const_set_lazy(:COMMAND_LINK) { false }
-      const_attr_reader  :COMMAND_LINK
+      # final
+      
+      def command_link
+        defined?(@@command_link) ? @@command_link : @@command_link= false
+      end
+      alias_method :attr_command_link, :command_link
+      
+      def command_link=(value)
+        @@command_link = value
+      end
+      alias_method :attr_command_link=, :command_link=
       
       const_set_lazy(:ButtonClass) { TCHAR.new(0, "BUTTON", true) }
       const_attr_reader  :ButtonClass
@@ -162,6 +172,8 @@ module Org::Eclipse::Swt::Widgets
     # @see SWT#RADIO
     # @see SWT#TOGGLE
     # @see SWT#FLAT
+    # @see SWT#UP
+    # @see SWT#DOWN
     # @see SWT#LEFT
     # @see SWT#RIGHT
     # @see SWT#CENTER
@@ -454,7 +466,7 @@ module Org::Eclipse::Swt::Widgets
     class_module.module_eval {
       typesig { [::Java::Int] }
       def check_style(style)
-        style = check_bits(style, SWT::PUSH, SWT::ARROW, SWT::CHECK, SWT::RADIO, SWT::TOGGLE, COMMAND_LINK ? SWT::COMMAND : 0)
+        style = check_bits(style, SWT::PUSH, SWT::ARROW, SWT::CHECK, SWT::RADIO, SWT::TOGGLE, self.attr_command_link ? SWT::COMMAND : 0)
         if (!((style & (SWT::PUSH | SWT::TOGGLE))).equal?(0))
           return check_bits(style, SWT::CENTER, SWT::LEFT, SWT::RIGHT, 0, 0, 0)
         end
@@ -935,23 +947,6 @@ module Org::Eclipse::Swt::Widgets
       return (Character.to_upper_case(key)).equal?(Character.to_upper_case(mnemonic))
     end
     
-    typesig { [::Java::Int, SwtGC] }
-    # long
-    def print_widget(hwnd, gc)
-      # Bug in Windows.  For some reason, PrintWindow() fails
-      # when it is called on a push button.  The fix is to
-      # detect the failure and use WM_PRINT instead.  Note
-      # that WM_PRINT cannot be used all the time because it
-      # fails for browser controls when the browser has focus.
-      # 
-      # long
-      h_dc = gc.attr_handle
-      if (!OS._print_window(hwnd, h_dc, 0))
-        flags = OS::PRF_CLIENT | OS::PRF_NONCLIENT | OS::PRF_ERASEBKGND | OS::PRF_CHILDREN
-        OS._send_message(hwnd, OS::WM_PRINT, h_dc, flags)
-      end
-    end
-    
     typesig { [] }
     def release_widget
       super
@@ -1233,12 +1228,12 @@ module Org::Eclipse::Swt::Widgets
       end
     end
     
-    typesig { [] }
-    def set_radio_focus
+    typesig { [::Java::Boolean] }
+    def set_radio_focus(tabbing)
       if (((self.attr_style & SWT::RADIO)).equal?(0) || !get_selection)
         return false
       end
-      return set_focus
+      return tabbing ? set_tab_item_focus : set_focus
     end
     
     typesig { [::Java::Boolean] }
@@ -1421,6 +1416,8 @@ module Org::Eclipse::Swt::Widgets
     end
     
     typesig { [::Java::Int, ::Java::Int] }
+    # long
+    # long
     def _wm_erasebkgnd(w_param, l_param)
       result = super(w_param, l_param)
       if (!(result).nil?)
@@ -1585,6 +1582,16 @@ module Org::Eclipse::Swt::Widgets
           end
         end
       end
+      # Feature in Windows.  Push and toggle buttons draw directly
+      # in WM_UPDATEUISTATE rather than damaging and drawing later
+      # in WM_PAINT.  This means that clients who hook WM_PAINT
+      # expecting to get all the drawing will not.  The fix is to
+      # redraw the control when paint events are hooked.
+      if (!((self.attr_style & (SWT::PUSH | SWT::TOGGLE))).equal?(0))
+        if (hooks(SWT::Paint) || filters(SWT::Paint))
+          OS._invalidate_rect(self.attr_handle, nil, true)
+        end
+      end
       return result
     end
     
@@ -1655,6 +1662,16 @@ module Org::Eclipse::Swt::Widgets
           i_state_id = OS::ABS_LEFTNORMAL
         when SWT::RIGHT
           i_state_id = OS::ABS_RIGHTNORMAL
+        end
+        # Feature in Windows.  On Vista only, DrawThemeBackground()
+        # does not mirror the drawing. The fix is switch left to right
+        # and right to left.
+        if (!OS::IsWinCE && OS::WIN32_VERSION >= OS._version(6, 0))
+          if (!((self.attr_style & SWT::MIRRORED)).equal?(0))
+            if (!((self.attr_style & (SWT::LEFT | SWT::RIGHT))).equal?(0))
+              i_state_id = (i_state_id).equal?(OS::ABS_RIGHTNORMAL) ? OS::ABS_LEFTNORMAL : OS::ABS_RIGHTNORMAL
+            end
+          end
         end
         # NOTE: The normal, hot, pressed and disabled state is
         # computed relying on the fact that the increment between

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2008 IBM Corporation and others.
+ * Copyright (c) 2000, 2009 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -13,6 +13,7 @@ package org.eclipse.swt.custom;
 import org.eclipse.swt.*;
 import org.eclipse.swt.graphics.*;
 import org.eclipse.swt.widgets.*;
+import org.eclipse.swt.accessibility.*;
 import org.eclipse.swt.events.*;
 
 /**
@@ -138,7 +139,7 @@ public class TableCursor extends Canvas {
 	Table table;
 	TableItem row = null;
 	TableColumn column = null;
-	Listener tableListener, resizeListener, disposeItemListener, disposeColumnListener;
+	Listener listener, tableListener, resizeListener, disposeItemListener, disposeColumnListener;
 
 	Color background = null;
 	Color foreground = null;
@@ -181,11 +182,11 @@ public TableCursor(Table parent, int style) {
 	setBackground(null);
 	setForeground(null);
 	
-	Listener listener = new Listener() {
+	listener = new Listener() {
 		public void handleEvent(Event event) {
 			switch (event.type) {
 				case SWT.Dispose :
-					dispose(event);
+					onDispose(event);
 					break;
 				case SWT.FocusIn :
 				case SWT.FocusOut :
@@ -260,6 +261,19 @@ public TableCursor(Table parent, int style) {
 	if (vBar != null) {
 		vBar.addListener(SWT.Selection, resizeListener);
 	}
+
+	getAccessible().addAccessibleControlListener(new AccessibleControlAdapter() {
+		public void getRole(AccessibleControlEvent e) {
+			e.detail = ACC.ROLE_TABLECELL;
+		}
+	});
+	getAccessible().addAccessibleListener(new AccessibleAdapter() {
+		public void getName(AccessibleEvent e) {
+			if (row == null) return;
+			int columnIndex = column == null ? 0 : table.indexOf(column);
+			e.result = row.getText(columnIndex);
+		}
+	});
 }
 
 /**
@@ -298,7 +312,11 @@ public void addSelectionListener(SelectionListener listener) {
 	addListener(SWT.DefaultSelection, typedListener);
 }
 
-void dispose(Event event) {
+void onDispose(Event event) {
+	removeListener(SWT.Dispose, listener);
+	notifyListeners(SWT.Dispose, event);
+	event.type = SWT.None;
+
 	table.removeListener(SWT.FocusIn, tableListener);
 	table.removeListener(SWT.MouseDown, tableListener);
 	unhookRowColumnListeners();
@@ -557,6 +575,7 @@ void setRowColumn(TableItem row, TableColumn column, boolean notify) {
 			notifyListeners(SWT.Selection, new Event());
 		}
 	}
+	getAccessible().setFocus(ACC.CHILDID_SELF);
 }
 
 public void setVisible(boolean visible) {

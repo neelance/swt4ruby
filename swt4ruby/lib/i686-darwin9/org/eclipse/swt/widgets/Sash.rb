@@ -1,6 +1,6 @@
 require "rjava"
 
-# Copyright (c) 2000, 2008 IBM Corporation and others.
+# Copyright (c) 2000, 2009 IBM Corporation and others.
 # All rights reserved. This program and the accompanying materials
 # are made available under the terms of the Eclipse Public License v1.0
 # which accompanies this distribution, and is available at
@@ -13,12 +13,11 @@ module Org::Eclipse::Swt::Widgets
     class_module.module_eval {
       include ::Java::Lang
       include ::Org::Eclipse::Swt::Widgets
-      include_const ::Org::Eclipse::Swt::Internal::Carbon, :CFRange
-      include_const ::Org::Eclipse::Swt::Internal::Carbon, :OS
-      include_const ::Org::Eclipse::Swt::Internal::Carbon, :Rect
       include ::Org::Eclipse::Swt
-      include ::Org::Eclipse::Swt::Graphics
+      include ::Org::Eclipse::Swt::Accessibility
       include ::Org::Eclipse::Swt::Events
+      include ::Org::Eclipse::Swt::Graphics
+      include ::Org::Eclipse::Swt::Internal::Cocoa
     }
   end
   
@@ -41,6 +40,7 @@ module Org::Eclipse::Swt::Widgets
   # @see <a href="http://www.eclipse.org/swt/snippets/#sash">Sash snippets</a>
   # @see <a href="http://www.eclipse.org/swt/examples.php">SWT Example: ControlExample</a>
   # @see <a href="http://www.eclipse.org/swt/">Sample code and further information</a>
+  # @noextend This class is not intended to be subclassed by clients.
   class Sash < SashImports.const_get :Control
     include_class_members SashImports
     
@@ -86,10 +86,13 @@ module Org::Eclipse::Swt::Widgets
       
       const_set_lazy(:PAGE_INCREMENT) { 9 }
       const_attr_reader  :PAGE_INCREMENT
-      
-      const_set_lazy(:AX_ATTRIBUTES) { Array.typed(String).new([OS.attr_k_axorientation_attribute, OS.attr_k_axvalue_attribute, OS.attr_k_axmax_value_attribute, OS.attr_k_axmin_value_attribute, ]) }
-      const_attr_reader  :AX_ATTRIBUTES
     }
+    
+    attr_accessor :accessibility_attributes
+    alias_method :attr_accessibility_attributes, :accessibility_attributes
+    undef_method :accessibility_attributes
+    alias_method :attr_accessibility_attributes=, :accessibility_attributes=
+    undef_method :accessibility_attributes=
     
     typesig { [Composite, ::Java::Int] }
     # Constructs a new instance of this class given its parent
@@ -117,6 +120,7 @@ module Org::Eclipse::Swt::Widgets
     # 
     # @see SWT#HORIZONTAL
     # @see SWT#VERTICAL
+    # @see SWT#SMOOTH
     # @see Widget#checkSubclass
     # @see Widget#getStyle
     def initialize(parent, style)
@@ -126,9 +130,160 @@ module Org::Eclipse::Swt::Widgets
       @last_y = 0
       @start_x = 0
       @start_y = 0
+      @accessibility_attributes = nil
       super(parent, check_style(style))
+      @accessibility_attributes = nil
       cursor_style = !((style & SWT::VERTICAL)).equal?(0) ? SWT::CURSOR_SIZEWE : SWT::CURSOR_SIZENS
       @size_cursor = Cursor.new(self.attr_display, cursor_style)
+    end
+    
+    typesig { [::Java::Int, ::Java::Int] }
+    # long
+    # long
+    # long
+    def accessibility_attribute_names(id, sel)
+      if ((@accessibility_attributes).nil?)
+        our_attributes = NSMutableArray.array_with_capacity(10)
+        our_attributes.add_object(OS::NSAccessibilityRoleAttribute)
+        our_attributes.add_object(OS::NSAccessibilityRoleDescriptionAttribute)
+        our_attributes.add_object(OS::NSAccessibilityParentAttribute)
+        our_attributes.add_object(OS::NSAccessibilityPositionAttribute)
+        our_attributes.add_object(OS::NSAccessibilitySizeAttribute)
+        our_attributes.add_object(OS::NSAccessibilityWindowAttribute)
+        our_attributes.add_object(OS::NSAccessibilityTopLevelUIElementAttribute)
+        our_attributes.add_object(OS::NSAccessibilityFocusedAttribute)
+        our_attributes.add_object(OS::NSAccessibilityValueAttribute)
+        our_attributes.add_object(OS::NSAccessibilityMaxValueAttribute)
+        our_attributes.add_object(OS::NSAccessibilityMinValueAttribute)
+        # The accessibility documentation says that these next two are optional, but the
+        # Accessibility Verifier says they are required.
+        our_attributes.add_object(OS::NSAccessibilityNextContentsAttribute)
+        our_attributes.add_object(OS::NSAccessibilityPreviousContentsAttribute)
+        our_attributes.add_object(OS::NSAccessibilityOrientationAttribute)
+        if (!(self.attr_accessible).nil?)
+          # See if the accessible will override or augment the standard list.
+          # Help, title, and description can be overridden.
+          extra_attributes = NSMutableArray.array_with_capacity(3)
+          extra_attributes.add_object(OS::NSAccessibilityHelpAttribute)
+          extra_attributes.add_object(OS::NSAccessibilityDescriptionAttribute)
+          extra_attributes.add_object(OS::NSAccessibilityTitleAttribute)
+          # 64
+          i = RJava.cast_to_int(extra_attributes.count) - 1
+          while i >= 0
+            attribute = NSString.new(extra_attributes.object_at_index(i).attr_id)
+            if (!(self.attr_accessible.internal_accessibility_attribute_value(attribute, ACC::CHILDID_SELF)).nil?)
+              our_attributes.add_object(extra_attributes.object_at_index(i))
+            end
+            i -= 1
+          end
+        end
+        @accessibility_attributes = our_attributes
+        @accessibility_attributes.retain
+      end
+      return @accessibility_attributes.attr_id
+    end
+    
+    typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
+    # long
+    # long
+    # long
+    # long
+    def accessibility_attribute_value(id, sel, arg0)
+      # long
+      return_value = 0
+      attribute_name = NSString.new(arg0)
+      if (!(self.attr_accessible).nil?)
+        return_object = self.attr_accessible.internal_accessibility_attribute_value(attribute_name, ACC::CHILDID_SELF)
+        if (!(return_object).nil?)
+          return_value = return_object.attr_id
+        end
+      end
+      if (!(return_value).equal?(0))
+        return return_value
+      end
+      if (attribute_name.is_equal_to_string(OS::NSAccessibilityRoleAttribute) || attribute_name.is_equal_to_string(OS::NSAccessibilityRoleDescriptionAttribute))
+        role_text = OS::NSAccessibilitySplitterRole
+        if (attribute_name.is_equal_to_string(OS::NSAccessibilityRoleAttribute))
+          return role_text.attr_id
+        else
+          # NSAccessibilityRoleDescriptionAttribute
+          return OS._nsaccessibility_role_description(role_text.attr_id, 0)
+        end
+      else
+        if (attribute_name.is_equal_to_string(OS::NSAccessibilityEnabledAttribute))
+          return NSNumber.number_with_bool(is_enabled).attr_id
+        else
+          if (attribute_name.is_equal_to_string(OS::NSAccessibilityOrientationAttribute))
+            orientation = !((self.attr_style & SWT::VERTICAL)).equal?(0) ? OS::NSAccessibilityVerticalOrientationValue : OS::NSAccessibilityHorizontalOrientationValue
+            return orientation.attr_id
+          else
+            if (attribute_name.is_equal_to_string(OS::NSAccessibilityValueAttribute))
+              location = get_location
+              value = !((self.attr_style & SWT::VERTICAL)).equal?(0) ? location.attr_x : location.attr_y
+              return NSNumber.number_with_int(value).attr_id
+            else
+              if (attribute_name.is_equal_to_string(OS::NSAccessibilityMaxValueAttribute))
+                parent_bounds = self.attr_view.bounds
+                # double
+                max_value = !((self.attr_style & SWT::VERTICAL)).equal?(0) ? parent_bounds.attr_width : parent_bounds.attr_height
+                return NSNumber.number_with_int(RJava.cast_to_int(max_value)).attr_id
+              else
+                if (attribute_name.is_equal_to_string(OS::NSAccessibilityMinValueAttribute))
+                  return NSNumber.number_with_int(0).attr_id
+                else
+                  if (attribute_name.is_equal_to_string(OS::NSAccessibilityNextContentsAttribute))
+                    children = self.attr_parent.__get_children
+                    next_view = nil
+                    i = 0
+                    while i < children.attr_length
+                      if ((children[i]).equal?(self))
+                        if (i < children.attr_length - 1)
+                          next_view = children[i + 1]
+                          break
+                        end
+                      end
+                      i += 1
+                    end
+                    if (!(next_view).nil?)
+                      return NSArray.array_with_object(next_view.attr_view).attr_id
+                    else
+                      return NSArray.array.attr_id
+                    end
+                  else
+                    if (attribute_name.is_equal_to_string(OS::NSAccessibilityPreviousContentsAttribute))
+                      children = self.attr_parent.__get_children
+                      next_view = nil
+                      i = 0
+                      while i < children.attr_length
+                        if ((children[i]).equal?(self))
+                          if (i > 0)
+                            next_view = children[i - 1]
+                            break
+                          end
+                        end
+                        i += 1
+                      end
+                      if (!(next_view).nil?)
+                        return NSArray.array_with_object(next_view.attr_view).attr_id
+                      else
+                        return NSArray.array.attr_id
+                      end
+                    end
+                  end
+                end
+              end
+            end
+          end
+        end
+      end
+      return super(id, sel, arg0)
+    end
+    
+    typesig { [::Java::Int, ::Java::Int] }
+    # long
+    # long
+    def accessibility_is_ignored(id, sel)
+      return false
     end
     
     typesig { [SelectionListener] }
@@ -175,8 +330,14 @@ module Org::Eclipse::Swt::Widgets
     }
     
     typesig { [::Java::Int, ::Java::Int] }
-    def call_focus_event_handler(next_handler, the_event)
-      return OS.attr_no_err
+    # long
+    # long
+    def become_first_responder(id, sel)
+      result = super(id, sel)
+      frame_ = self.attr_view.frame
+      @last_x = RJava.cast_to_int(frame_.attr_x)
+      @last_y = RJava.cast_to_int(frame_.attr_y)
+      return result
     end
     
     typesig { [::Java::Int, ::Java::Int, ::Java::Boolean] }
@@ -202,218 +363,237 @@ module Org::Eclipse::Swt::Widgets
     
     typesig { [] }
     def create_handle
-      self.attr_state |= GRAB | THEME_BACKGROUND
-      features = OS.attr_k_control_supports_focus
-      out_control = Array.typed(::Java::Int).new(1) { 0 }
-      window = OS._get_control_owner(self.attr_parent.attr_handle)
-      OS._create_user_pane_control(window, nil, features, out_control)
-      if ((out_control[0]).equal?(0))
-        error(SWT::ERROR_NO_HANDLES)
-      end
-      self.attr_handle = out_control[0]
+      self.attr_state |= THEME_BACKGROUND
+      widget = SWTView.new.alloc
+      widget.init
+      self.attr_view = widget
     end
     
-    typesig { [::Java::Int, ::Java::Int] }
-    def draw_background(control, context)
-      fill_background(control, context, nil)
+    typesig { [::Java::Int, NSGraphicsContext, NSRect] }
+    # long
+    def draw_background(id, context, rect)
+      if (!(id).equal?(self.attr_view.attr_id))
+        return
+      end
+      fill_background(self.attr_view, context, rect, -1)
     end
     
     typesig { [] }
-    def get_ax_attributes
-      return AX_ATTRIBUTES
+    def find_cursor
+      cursor = super
+      if ((cursor).nil?)
+        cursor_type = !((self.attr_style & SWT::HORIZONTAL)).equal?(0) ? SWT::CURSOR_SIZENS : SWT::CURSOR_SIZEWE
+        cursor = self.attr_display.get_system_cursor(cursor_type)
+      end
+      return cursor
     end
     
-    typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
-    def k_event_accessible_get_named_attribute(next_handler, the_event, user_data)
-      code = OS.attr_event_not_handled_err
-      string_ref = Array.typed(::Java::Int).new(1) { 0 }
-      OS._get_event_parameter(the_event, OS.attr_k_event_param_accessible_attribute_name, OS.attr_type_cfstring_ref, nil, 4, nil, string_ref)
-      length = 0
-      if (!(string_ref[0]).equal?(0))
-        length = OS._cfstring_get_length(string_ref[0])
-      end
-      buffer = CharArray.new(length)
-      range = CFRange.new
-      range.attr_length = length
-      OS._cfstring_get_characters(string_ref[0], range, buffer)
-      attribute_name = String.new(buffer)
-      if ((attribute_name == OS.attr_k_axrole_attribute) || (attribute_name == OS.attr_k_axrole_description_attribute))
-        role_text = OS.attr_k_axsplitter_role
-        buffer = CharArray.new(role_text.length)
-        role_text.get_chars(0, buffer.attr_length, buffer, 0)
-        string_ref[0] = OS._cfstring_create_with_characters(OS.attr_k_cfallocator_default, buffer, buffer.attr_length)
-        if (!(string_ref[0]).equal?(0))
-          if ((attribute_name == OS.attr_k_axrole_attribute))
-            OS._set_event_parameter(the_event, OS.attr_k_event_param_accessible_attribute_value, OS.attr_type_cfstring_ref, 4, string_ref)
-          else
-            # kAXRoleDescriptionAttribute
-            string_ref2 = OS._hicopy_accessibility_role_description(string_ref[0], 0)
-            OS._set_event_parameter(the_event, OS.attr_k_event_param_accessible_attribute_value, OS.attr_type_cfstring_ref, 4, Array.typed(::Java::Int).new([string_ref2]))
-            OS._cfrelease(string_ref2)
-          end
-          OS._cfrelease(string_ref[0])
-          code = OS.attr_no_err
-        end
-      else
-        if ((attribute_name == OS.attr_k_axorientation_attribute))
-          orientation = !((self.attr_style & SWT::VERTICAL)).equal?(0) ? OS.attr_k_axvertical_orientation_value : OS.attr_k_axhorizontal_orientation_value
-          buffer = CharArray.new(orientation.length)
-          orientation.get_chars(0, buffer.attr_length, buffer, 0)
-          string_ref[0] = OS._cfstring_create_with_characters(OS.attr_k_cfallocator_default, buffer, buffer.attr_length)
-          if (!(string_ref[0]).equal?(0))
-            OS._set_event_parameter(the_event, OS.attr_k_event_param_accessible_attribute_value, OS.attr_type_cfstring_ref, 4, string_ref)
-            OS._cfrelease(string_ref[0])
-            code = OS.attr_no_err
-          end
-        else
-          if ((attribute_name == OS.attr_k_axvalue_attribute))
-            location = get_location
-            value = !((self.attr_style & SWT::VERTICAL)).equal?(0) ? location.attr_x : location.attr_y
-            OS._set_event_parameter(the_event, OS.attr_k_event_param_accessible_attribute_value, OS.attr_type_sint32, 4, Array.typed(::Java::Int).new([value]))
-            code = OS.attr_no_err
-          else
-            if ((attribute_name == OS.attr_k_axmax_value_attribute))
-              parent_bounds = Rect.new
-              OS._get_control_bounds(self.attr_parent.attr_handle, parent_bounds)
-              max_value = !((self.attr_style & SWT::VERTICAL)).equal?(0) ? parent_bounds.attr_right - parent_bounds.attr_left : parent_bounds.attr_bottom - parent_bounds.attr_top
-              OS._set_event_parameter(the_event, OS.attr_k_event_param_accessible_attribute_value, OS.attr_type_sint32, 4, Array.typed(::Java::Int).new([max_value]))
-              code = OS.attr_no_err
-            else
-              if ((attribute_name == OS.attr_k_axmin_value_attribute))
-                OS._set_event_parameter(the_event, OS.attr_k_event_param_accessible_attribute_value, OS.attr_type_sint32, 4, Array.typed(::Java::Int).new([0]))
-                code = OS.attr_no_err
-              end
+    typesig { [NSEvent, ::Java::Int] }
+    def send_key_event(ns_event, type)
+      super(ns_event, type)
+      if ((type).equal?(SWT::KeyDown))
+        key_code_ = ns_event.key_code
+        catch(:break_case) do
+          case (key_code_)
+          # Up arrow
+          # Left arrow
+          # Down arrow
+          when 126, 123, 125, 124
+            # Right arrow
+            x_change = 0
+            y_change = 0
+            step_size = PAGE_INCREMENT
+            # long
+            modifiers = ns_event.modifier_flags
+            if (!((modifiers & OS::NSControlKeyMask)).equal?(0))
+              step_size = INCREMENT
             end
-          end
-        end
-      end
-      if (!(self.attr_accessible).nil?)
-        code = self.attr_accessible.internal_k_event_accessible_get_named_attribute(next_handler, the_event, code)
-      end
-      return code
-    end
-    
-    typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
-    def k_event_control_click(next_handler, the_event, user_data)
-      result = super(next_handler, the_event, user_data)
-      if ((result).equal?(OS.attr_no_err))
-        return result
-      end
-      if (!is_enabled)
-        return OS.attr_no_err
-      end
-      return result
-    end
-    
-    typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
-    def k_event_control_get_focus_part(next_handler, the_event, user_data)
-      return OS.attr_no_err
-    end
-    
-    typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
-    def k_event_control_set_cursor(next_handler, the_event, user_data)
-      result = super(next_handler, the_event, user_data)
-      if ((result).equal?(OS.attr_no_err))
-        return result
-      end
-      self.attr_display.set_cursor(@size_cursor.attr_handle)
-      return OS.attr_no_err
-    end
-    
-    typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
-    def k_event_control_set_focus_part(next_handler, the_event, user_data)
-      result = super(next_handler, the_event, user_data)
-      if ((result).equal?(OS.attr_no_err))
-        location = get_location
-        @last_x = location.attr_x
-        @last_y = location.attr_y
-      end
-      return result
-    end
-    
-    typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
-    def k_event_unicode_key_pressed(next_handler, the_event, user_data)
-      result = super(next_handler, the_event, user_data)
-      if ((result).equal?(OS.attr_no_err))
-        return result
-      end
-      keyboard_event = Array.typed(::Java::Int).new(1) { 0 }
-      OS._get_event_parameter(the_event, OS.attr_k_event_param_text_input_send_keyboard_event, OS.attr_type_event_ref, nil, keyboard_event.attr_length * 4, nil, keyboard_event)
-      key_code = Array.typed(::Java::Int).new(1) { 0 }
-      OS._get_event_parameter(keyboard_event[0], OS.attr_k_event_param_key_code, OS.attr_type_uint32, nil, key_code.attr_length * 4, nil, key_code)
-      catch(:break_case) do
-        case (key_code[0])
-        # Up arrow
-        # Left arrow
-        # Down arrow
-        when 126, 123, 125, 124
-          # Right arrow
-          x_change = 0
-          y_change = 0
-          step_size = PAGE_INCREMENT
-          modifiers = Array.typed(::Java::Int).new(1) { 0 }
-          OS._get_event_parameter(the_event, OS.attr_k_event_param_key_modifiers, OS.attr_type_uint32, nil, 4, nil, modifiers)
-          if (!((modifiers[0] & OS.attr_control_key)).equal?(0))
-            step_size = INCREMENT
-          end
-          if (!((self.attr_style & SWT::VERTICAL)).equal?(0))
-            if ((key_code[0]).equal?(126) || (key_code[0]).equal?(125))
-              throw :break_case, :thrown
-            end
-            x_change = (key_code[0]).equal?(123) ? -step_size : step_size
-          else
-            if ((key_code[0]).equal?(123) || (key_code[0]).equal?(124))
-              throw :break_case, :thrown
-            end
-            y_change = (key_code[0]).equal?(126) ? -step_size : step_size
-          end
-          bounds = get_bounds
-          width = bounds.attr_width
-          height = bounds.attr_height
-          parent_bounds = self.attr_parent.get_bounds
-          parent_width = parent_bounds.attr_width
-          parent_height = parent_bounds.attr_height
-          new_x = @last_x
-          new_y = @last_y
-          if (!((self.attr_style & SWT::VERTICAL)).equal?(0))
-            new_x = Math.min(Math.max(0, @last_x + x_change), parent_width - width)
-          else
-            new_y = Math.min(Math.max(0, @last_y + y_change), parent_height - height)
-          end
-          if ((new_x).equal?(@last_x) && (new_y).equal?(@last_y))
-            return result
-          end
-          event = Event.new
-          event.attr_x = new_x
-          event.attr_y = new_y
-          event.attr_width = width
-          event.attr_height = height
-          send_event(SWT::Selection, event)
-          if (is_disposed)
-            throw :break_case, :thrown
-          end
-          if (event.attr_doit)
-            set_bounds(event.attr_x, event.attr_y, width, height)
-            if (is_disposed)
-              throw :break_case, :thrown
-            end
-            @last_x = event.attr_x
-            @last_y = event.attr_y
-            if (is_disposed)
-              return result
-            end
-            cursor_x = event.attr_x
-            cursor_y = event.attr_y
             if (!((self.attr_style & SWT::VERTICAL)).equal?(0))
-              cursor_y += height / 2
+              if ((key_code_).equal?(126) || (key_code_).equal?(125))
+                throw :break_case, :thrown
+              end
+              x_change = (key_code_).equal?(123) ? -step_size : step_size
             else
-              cursor_x += width / 2
+              if ((key_code_).equal?(123) || (key_code_).equal?(124))
+                throw :break_case, :thrown
+              end
+              y_change = (key_code_).equal?(126) ? -step_size : step_size
             end
-            self.attr_display.set_cursor_location(self.attr_parent.to_display(cursor_x, cursor_y))
+            bounds_ = get_bounds
+            width = bounds_.attr_width
+            height = bounds_.attr_height
+            parent_bounds = self.attr_parent.get_bounds
+            parent_width = parent_bounds.attr_width
+            parent_height = parent_bounds.attr_height
+            new_x = @last_x
+            new_y = @last_y
+            if (!((self.attr_style & SWT::VERTICAL)).equal?(0))
+              new_x = Math.min(Math.max(0, @last_x + x_change), parent_width - width)
+            else
+              new_y = Math.min(Math.max(0, @last_y + y_change), parent_height - height)
+            end
+            if ((new_x).equal?(@last_x) && (new_y).equal?(@last_y))
+              return true
+            end
+            event = Event.new
+            event.attr_x = new_x
+            event.attr_y = new_y
+            event.attr_width = width
+            event.attr_height = height
+            send_event(SWT::Selection, event)
+            if (is_disposed)
+              throw :break_case, :thrown
+            end
+            if (event.attr_doit)
+              set_bounds(event.attr_x, event.attr_y, width, height)
+              if (is_disposed)
+                throw :break_case, :thrown
+              end
+              @last_x = event.attr_x
+              @last_y = event.attr_y
+              if (is_disposed)
+                return false
+              end
+              cursor_x = event.attr_x
+              cursor_y = event.attr_y
+              if (!((self.attr_style & SWT::VERTICAL)).equal?(0))
+                cursor_y += height / 2
+              else
+                cursor_x += width / 2
+              end
+              self.attr_display.set_cursor_location(self.attr_parent.to_display(cursor_x, cursor_y))
+            end
           end
         end
       end
-      return result
+      return true
+    end
+    
+    typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
+    # long
+    # long
+    # long
+    def mouse_down(id, sel, the_event)
+      # TODO use sendMouseEvent
+      super(id, sel, the_event)
+      if (is_disposed)
+        return
+      end
+      ns_event = NSEvent.new(the_event)
+      if (!(ns_event.click_count).equal?(1))
+        return
+      end
+      location = ns_event.location_in_window
+      point = self.attr_view.convert_point_from_view_(location, nil)
+      @start_x = RJava.cast_to_int(point.attr_x)
+      @start_y = RJava.cast_to_int(point.attr_y)
+      frame_ = self.attr_view.frame
+      event = Event.new
+      event.attr_x = RJava.cast_to_int(frame_.attr_x)
+      event.attr_y = RJava.cast_to_int(frame_.attr_y)
+      event.attr_width = RJava.cast_to_int(frame_.attr_width)
+      event.attr_height = RJava.cast_to_int(frame_.attr_height)
+      send_event(SWT::Selection, event)
+      if (is_disposed)
+        return
+      end
+      if (event.attr_doit)
+        @last_x = event.attr_x
+        @last_y = event.attr_y
+        @dragging = true
+        set_location(event.attr_x, event.attr_y)
+      end
+    end
+    
+    typesig { [::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int] }
+    # long
+    # long
+    # long
+    def mouse_event(id, sel, the_event, type)
+      super(id, sel, the_event, type)
+      return !(NSEvent.new(the_event).type).equal?(OS::NSLeftMouseDown)
+    end
+    
+    typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
+    # long
+    # long
+    # long
+    def mouse_dragged(id, sel, the_event)
+      # TODO use sendMouseEvent
+      super(id, sel, the_event)
+      if (is_disposed)
+        return
+      end
+      if (!@dragging)
+        return
+      end
+      ns_event = NSEvent.new(the_event)
+      location = ns_event.location_in_window
+      point = self.attr_view.convert_point_from_view_(location, nil)
+      frame_ = self.attr_view.frame
+      parent_frame = self.attr_parent.top_view.frame
+      new_x = @last_x
+      new_y = @last_y
+      if (!((self.attr_style & SWT::VERTICAL)).equal?(0))
+        new_x = Math.min(Math.max(0, RJava.cast_to_int((point.attr_x + frame_.attr_x - @start_x))), RJava.cast_to_int((parent_frame.attr_width - frame_.attr_width)))
+      else
+        new_y = Math.min(Math.max(0, RJava.cast_to_int((point.attr_y + frame_.attr_y - @start_y))), RJava.cast_to_int((parent_frame.attr_height - frame_.attr_height)))
+      end
+      if ((new_x).equal?(@last_x) && (new_y).equal?(@last_y))
+        return
+      end
+      event = Event.new
+      event.attr_x = new_x
+      event.attr_y = new_y
+      event.attr_width = RJava.cast_to_int(frame_.attr_width)
+      event.attr_height = RJava.cast_to_int(frame_.attr_height)
+      send_event(SWT::Selection, event)
+      if (is_disposed)
+        return
+      end
+      if (event.attr_doit)
+        @last_x = event.attr_x
+        @last_y = event.attr_y
+        set_bounds(event.attr_x, event.attr_y, RJava.cast_to_int(frame_.attr_width), RJava.cast_to_int(frame_.attr_height))
+      end
+    end
+    
+    typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
+    # long
+    # long
+    # long
+    def mouse_up(id, sel, the_event)
+      # TODO use sendMouseEvent
+      super(id, sel, the_event)
+      if (is_disposed)
+        return
+      end
+      if (!@dragging)
+        return
+      end
+      @dragging = false
+      frame_ = self.attr_view.frame
+      event = Event.new
+      event.attr_x = @last_x
+      event.attr_y = @last_y
+      event.attr_width = RJava.cast_to_int(frame_.attr_width)
+      event.attr_height = RJava.cast_to_int(frame_.attr_height)
+      send_event(SWT::Selection, event)
+      if (is_disposed)
+        return
+      end
+      if (event.attr_doit)
+        set_bounds(event.attr_x, event.attr_y, RJava.cast_to_int(frame_.attr_width), RJava.cast_to_int(frame_.attr_height))
+      end
+    end
+    
+    typesig { [] }
+    def release_handle
+      super
+      if (!(@accessibility_attributes).nil?)
+        @accessibility_attributes.release
+      end
+      @accessibility_attributes = nil
     end
     
     typesig { [] }
@@ -453,92 +633,21 @@ module Org::Eclipse::Swt::Widgets
       self.attr_event_table.unhook(SWT::DefaultSelection, listener)
     end
     
-    typesig { [::Java::Int, ::Java::Short, ::Java::Int, ::Java::Int, ::Java::Boolean, ::Java::Int, ::Java::Short, ::Java::Short, ::Java::Int] }
-    def send_mouse_event(type, button, count, detail, send, chord, x, y, modifiers)
-      result = super(type, button, count, detail, send, chord, x, y, modifiers)
-      rect = Rect.new
-      OS._get_control_bounds(self.attr_handle, rect)
-      control_x = rect.attr_left
-      control_y = rect.attr_top
-      width = rect.attr_right - rect.attr_left
-      height = rect.attr_bottom - rect.attr_top
-      OS._get_control_bounds(self.attr_parent.attr_handle, rect)
-      parent_width = rect.attr_right - rect.attr_left
-      parent_height = rect.attr_bottom - rect.attr_top
-      catch(:break_case) do
-        case (type)
-        when SWT::MouseDown
-          if (!(button).equal?(1) || !(count).equal?(1))
-            throw :break_case, :thrown
-          end
-          @start_x = x
-          @start_y = y
-          event = Event.new
-          event.attr_x = control_x
-          event.attr_y = control_y
-          event.attr_width = width
-          event.attr_height = height
-          send_event(SWT::Selection, event)
-          if (is_disposed)
-            return result
-          end
-          if (event.attr_doit)
-            @last_x = event.attr_x
-            @last_y = event.attr_y
-            @dragging = true
-            set_bounds(event.attr_x, event.attr_y, width, height)
-          end
-        when SWT::MouseUp
-          if (!@dragging)
-            throw :break_case, :thrown
-          end
-          @dragging = false
-          self.attr_event = Event.new
-          self.attr_event.attr_x = @last_x
-          self.attr_event.attr_y = @last_y
-          self.attr_event.attr_width = width
-          self.attr_event.attr_height = height
-          send_event(SWT::Selection, self.attr_event)
-          if (is_disposed)
-            return result
-          end
-          if (self.attr_event.attr_doit)
-            set_bounds(self.attr_event.attr_x, self.attr_event.attr_y, width, height)
-          end
-        when SWT::MouseMove
-          if (!@dragging)
-            throw :break_case, :thrown
-          end
-          new_x = @last_x
-          new_y = @last_y
-          if (!((self.attr_style & SWT::VERTICAL)).equal?(0))
-            new_x = Math.min(Math.max(0, x + control_x - @start_x), parent_width - width)
-          else
-            new_y = Math.min(Math.max(0, y + control_y - @start_y), parent_height - height)
-          end
-          if ((new_x).equal?(@last_x) && (new_y).equal?(@last_y))
-            return result
-          end
-          self.attr_event = Event.new
-          self.attr_event.attr_x = new_x
-          self.attr_event.attr_y = new_y
-          self.attr_event.attr_width = width
-          self.attr_event.attr_height = height
-          send_event(SWT::Selection, self.attr_event)
-          if (is_disposed)
-            return result
-          end
-          if (self.attr_event.attr_doit)
-            @last_x = self.attr_event.attr_x
-            @last_y = self.attr_event.attr_y
-            set_bounds(self.attr_event.attr_x, self.attr_event.attr_y, width, height)
-          end
-        end
-      end
-      return result
+    typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
+    # long
+    # long
+    # long
+    def super_key_down(id, sel, the_event)
     end
     
-    typesig { [::Java::Int, ::Java::Int] }
+    typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
+    # long
+    # long
+    # long
+    def super_key_up(id, sel, the_event)
+    end
+    
+    typesig { [::Java::Int, NSEvent] }
     def traversal_code(key, the_event)
       return 0
     end

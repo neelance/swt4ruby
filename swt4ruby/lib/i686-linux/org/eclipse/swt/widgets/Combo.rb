@@ -1,6 +1,6 @@
 require "rjava"
 
-# Copyright (c) 2000, 2008 IBM Corporation and others.
+# Copyright (c) 2000, 2009 IBM Corporation and others.
 # All rights reserved. This program and the accompanying materials
 # are made available under the terms of the Eclipse Public License v1.0
 # which accompanies this distribution, and is available at
@@ -57,6 +57,7 @@ module Org::Eclipse::Swt::Widgets
   # @see <a href="http://www.eclipse.org/swt/snippets/#combo">Combo snippets</a>
   # @see <a href="http://www.eclipse.org/swt/examples.php">SWT Example: ControlExample</a>
   # @see <a href="http://www.eclipse.org/swt/">Sample code and further information</a>
+  # @noextend This class is not intended to be subclassed by clients.
   class Combo < ComboImports.const_get :Composite
     include_class_members ComboImports
     
@@ -147,9 +148,6 @@ module Org::Eclipse::Swt::Widgets
     undef_method :lock_text=
     
     class_module.module_eval {
-      const_set_lazy(:INNER_BORDER) { 2 }
-      const_attr_reader  :INNER_BORDER
-      
       # These values can be different on different platforms.
       # Therefore they are not initialized in the declaration
       # to stop the compiler from inlining.
@@ -490,8 +488,8 @@ module Org::Eclipse::Swt::Widgets
       # long
       layout = OS.gtk_entry_get_layout(@entry_handle)
       OS.pango_layout_get_size(layout, w, h)
-      xborder = INNER_BORDER
-      yborder = INNER_BORDER
+      xborder = Display::INNER_BORDER
+      yborder = Display::INNER_BORDER
       # long
       style = OS.gtk_widget_get_style(@entry_handle)
       xborder += OS.gtk_style_get_xthickness(style)
@@ -1320,8 +1318,8 @@ module Org::Eclipse::Swt::Widgets
       if (OS::GTK_VERSION >= OS._version(2, 4, 0))
         gdk_event = GdkEventButton.new
         OS.memmove(gdk_event, event, GdkEventButton.attr_sizeof)
-        if ((gdk_event.attr_type).equal?(OS::GDK_BUTTON_PRESS))
-          return 0
+        if ((gdk_event.attr_type).equal?(OS::GDK_BUTTON_PRESS) && (gdk_event.attr_button).equal?(1) && !((self.attr_style & SWT::READ_ONLY)).equal?(0))
+          return gtk_button_press_event(widget, event, false)
         end
       end
       return super(widget, event)
@@ -1505,7 +1503,7 @@ module Org::Eclipse::Swt::Widgets
           gdk_event_button = GdkEventButton.new
           OS.memmove(gdk_event_button, gdk_event, GdkEventButton.attr_sizeof)
           if ((gdk_event_button.attr_button).equal?(1))
-            if (!send_mouse_event(SWT::MouseDown, gdk_event_button.attr_button, self.attr_display.attr_click_count, 0, false, gdk_event_button.attr_time, gdk_event_button.attr_x_root, gdk_event_button.attr_y_root, false, gdk_event_button.attr_state))
+            if (!((self.attr_style & SWT::READ_ONLY)).equal?(0) && !send_mouse_event(SWT::MouseDown, gdk_event_button.attr_button, self.attr_display.attr_click_count, 0, false, gdk_event_button.attr_time, gdk_event_button.attr_x_root, gdk_event_button.attr_y_root, false, gdk_event_button.attr_state))
               return 1
             end
             if (OS::GTK_VERSION >= OS._version(2, 6, 0))
@@ -1639,9 +1637,7 @@ module Org::Eclipse::Swt::Widgets
           new_index = @items.attr_length - 1
         end
         if (!(new_index).equal?(old_index))
-          OS.g_signal_handlers_block_matched(self.attr_handle, OS::G_SIGNAL_MATCH_DATA, 0, 0, 0, 0, CHANGED)
           OS.gtk_combo_box_set_active(self.attr_handle, new_index)
-          OS.g_signal_handlers_unblock_matched(self.attr_handle, OS::G_SIGNAL_MATCH_DATA, 0, 0, 0, 0, CHANGED)
           return 1
         end
       end
@@ -2432,6 +2428,10 @@ module Org::Eclipse::Swt::Widgets
     # Sets the contents of the receiver's text field to the
     # given string.
     # <p>
+    # This call is ignored when the receiver is read only and
+    # the given string is not in the receiver's list.
+    # </p>
+    # <p>
     # Note: The text field in a <code>Combo</code> is typically
     # only capable of displaying a single line of text. Thus,
     # setting the text to a string containing line breaks or
@@ -2559,6 +2559,11 @@ module Org::Eclipse::Swt::Widgets
         return
       end
       @visible_count = count
+    end
+    
+    typesig { [] }
+    def check_subwindow
+      return false
     end
     
     typesig { [GdkEventKey] }

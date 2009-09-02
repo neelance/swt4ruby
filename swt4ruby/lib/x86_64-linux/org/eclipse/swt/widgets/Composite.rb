@@ -1,6 +1,6 @@
 require "rjava"
 
-# Copyright (c) 2000, 2008 IBM Corporation and others.
+# Copyright (c) 2000, 2009 IBM Corporation and others.
 # All rights reserved. This program and the accompanying materials
 # are made available under the terms of the Eclipse Public License v1.0
 # which accompanies this distribution, and is available at
@@ -36,10 +36,9 @@ module Org::Eclipse::Swt::Widgets
   # than <code>Canvas</code>.
   # </p><p>
   # Note: The <code>CENTER</code> style, although undefined for composites, has the
-  # same value as <code>EMBEDDED</code> (which is used to embed widgets from other
-  # widget toolkits into SWT).  On some operating systems (GTK, Motif), this may cause
-  # the children of this composite to be obscured.  The <code>EMBEDDED</code> style
-  # is for use by other widget toolkits and should normally never be used.
+  # same value as <code>EMBEDDED</code> which is used to embed widgets from other
+  # widget toolkits into SWT.  On some operating systems (GTK, Motif), this may cause
+  # the children of this composite to be obscured.
   # </p><p>
   # This class may be subclassed by custom control implementors
   # who are building controls that are constructed from aggregates
@@ -143,6 +142,8 @@ module Org::Eclipse::Swt::Widgets
     # @see SWT#NO_MERGE_PAINTS
     # @see SWT#NO_REDRAW_RESIZE
     # @see SWT#NO_RADIO_GROUP
+    # @see SWT#EMBEDDED
+    # @see SWT#DOUBLE_BUFFERED
     # @see Widget#getStyle
     def initialize(parent, style)
       @embedded_handle = 0
@@ -359,7 +360,7 @@ module Org::Eclipse::Swt::Widgets
         child = list[i]
         child_list = child.compute_tab_list
         if (!(child_list.attr_length).equal?(0))
-          new_result = Array.typed(Control).new(result.attr_length + child_list.attr_length) { nil }
+          new_result = Array.typed(Widget).new(result.attr_length + child_list.attr_length) { nil }
           System.arraycopy(result, 0, new_result, 0, result.attr_length)
           System.arraycopy(child_list, 0, new_result, result.attr_length, child_list.attr_length)
           result = new_result
@@ -1796,6 +1797,11 @@ module Org::Eclipse::Swt::Widgets
       if ((self.attr_scrolled_handle).equal?(0))
         fix_style(self.attr_handle)
       end
+    end
+    
+    typesig { [] }
+    def check_subwindow
+      return true
     end
     
     typesig { [Event, Control] }

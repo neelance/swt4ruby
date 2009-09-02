@@ -1,6 +1,6 @@
 require "rjava"
 
-# Copyright (c) 2000, 2008 IBM Corporation and others.
+# Copyright (c) 2000, 2009 IBM Corporation and others.
 # All rights reserved. This program and the accompanying materials
 # are made available under the terms of the Eclipse Public License v1.0
 # which accompanies this distribution, and is available at
@@ -48,6 +48,7 @@ module Org::Eclipse::Swt::Widgets
   # @see <a href="http://www.eclipse.org/swt/snippets/#tabfolder">TabFolder, TabItem snippets</a>
   # @see <a href="http://www.eclipse.org/swt/examples.php">SWT Example: ControlExample</a>
   # @see <a href="http://www.eclipse.org/swt/">Sample code and further information</a>
+  # @noextend This class is not intended to be subclassed by clients.
   class TabFolder < TabFolderImports.const_get :Composite
     include_class_members TabFolderImports
     
@@ -136,6 +137,8 @@ module Org::Eclipse::Swt::Widgets
     # </ul>
     # 
     # @see SWT
+    # @see SWT#TOP
+    # @see SWT#BOTTOM
     # @see Widget#checkSubclass
     # @see Widget#getStyle
     def initialize(parent, style)
@@ -932,7 +935,7 @@ module Org::Eclipse::Swt::Widgets
       if (!(result).nil?)
         return result
       end
-      return LRESULT.new(OS::DLGC_BUTTON)
+      return LRESULT.new(OS::DLGC_BUTTON | OS::DLGC_WANTARROWS)
     end
     
     typesig { [::Java::Int, ::Java::Int] }

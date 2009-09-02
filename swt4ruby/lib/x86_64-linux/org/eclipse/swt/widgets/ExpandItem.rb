@@ -1,6 +1,6 @@
 require "rjava"
 
-# Copyright (c) 2000, 2008 IBM Corporation and others.
+# Copyright (c) 2000, 2009 IBM Corporation and others.
 # All rights reserved. This program and the accompanying materials
 # are made available under the terms of the Eclipse Public License v1.0
 # which accompanies this distribution, and is available at
@@ -37,6 +37,7 @@ module Org::Eclipse::Swt::Widgets
   # @see <a href="http://www.eclipse.org/swt/">Sample code and further information</a>
   # 
   # @since 3.2
+  # @noextend This class is not intended to be subclassed by clients.
   class ExpandItem < ExpandItemImports.const_get :Item
     include_class_members ExpandItemImports
     
@@ -563,6 +564,18 @@ module Org::Eclipse::Swt::Widgets
             OS.gtk_widget_style_get(self.attr_handle, OS.attr_focus_line_width, property, 0)
             y += property[0] * 2
             height -= property[0] * 2
+            # Feature in GTK. When the ExpandBar is resize too small the control
+            # shows up on top of the vertical scrollbar. This happen because the
+            # GtkExpander does not set the size of child smaller than the request
+            # size of its parent and because the control is not parented in the
+            # hierarchy of the GtkScrolledWindow.
+            # The fix is calculate the width ourselves when the scrollbar is visible.
+            v_bar = @parent.attr_vertical_bar
+            if (!(v_bar).nil?)
+              if (OS._gtk_widget_visible(v_bar.attr_handle))
+                width = OS._gtk_widget_width(@parent.attr_scrolled_handle) - @parent.v_scroll_bar_width - 2 * @parent.attr_spacing
+              end
+            end
             @control.set_bounds(x, y - y_scroll, width, Math.max(0, height), true, true)
           end
         end

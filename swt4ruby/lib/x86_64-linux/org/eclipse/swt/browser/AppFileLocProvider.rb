@@ -58,6 +58,12 @@ module Org::Eclipse::Swt::Browser
     alias_method :attr_profile_path=, :profile_path=
     undef_method :profile_path=
     
+    attr_accessor :components_path
+    alias_method :attr_components_path, :components_path
+    undef_method :components_path
+    alias_method :attr_components_path=, :components_path=
+    undef_method :components_path=
+    
     attr_accessor :plugin_dirs
     alias_method :attr_plugin_dirs, :plugin_dirs
     undef_method :plugin_dirs
@@ -116,6 +122,7 @@ module Org::Eclipse::Swt::Browser
       @ref_count = 0
       @mozilla_path = nil
       @profile_path = nil
+      @components_path = nil
       @plugin_dirs = nil
       @is_xulrunner = false
       @mozilla_path = path + SEPARATOR_OS
@@ -320,6 +327,11 @@ module Org::Eclipse::Swt::Browser
     end
     
     typesig { [String] }
+    def set_components_path(path)
+      @components_path = path
+    end
+    
+    typesig { [String] }
     def set_profile_path(path)
       @profile_path = path
       if (!Compatibility.file_exists(path, ""))
@@ -500,7 +512,7 @@ module Org::Eclipse::Swt::Browser
                             property_value = @mozilla_path
                           else
                             if ((property_name == XPCOM::NS_GRE_COMPONENT_DIR))
-                              property_value = @mozilla_path + COMPONENTS_DIR
+                              property_value = RJava.cast_to_string(!(@components_path).nil? ? @components_path : @mozilla_path + COMPONENTS_DIR)
                             else
                               if ((property_name == XPCOM::NS_XPCOM_INIT_CURRENT_PROCESS_DIR))
                                 property_value = @mozilla_path

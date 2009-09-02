@@ -1,6 +1,6 @@
 require "rjava"
 
-# Copyright (c) 2005, 2008 IBM Corporation and others.
+# Copyright (c) 2005, 2009 IBM Corporation and others.
 # All rights reserved. This program and the accompanying materials
 # are made available under the terms of the Eclipse Public License v1.0
 # which accompanies this distribution, and is available at
@@ -14,7 +14,9 @@ module Org::Eclipse::Swt::Browser
       include ::Java::Lang
       include ::Org::Eclipse::Swt::Browser
       include_const ::Org::Eclipse::Swt::Browser, :Browser
-      include_const ::Org::Eclipse::Swt::Internal::Win32, :OS
+      include_const ::Org::Eclipse::Swt::Internal, :Callback
+      include ::Org::Eclipse::Swt::Internal::Mozilla
+      include ::Org::Eclipse::Swt::Internal::Win32
       include ::Org::Eclipse::Swt::Widgets
     }
   end
@@ -27,6 +29,31 @@ module Org::Eclipse::Swt::Browser
     undef_method :browser
     alias_method :attr_browser=, :browser=
     undef_method :browser=
+    
+    class_module.module_eval {
+      # long
+      
+      def mozilla_proc
+        defined?(@@mozilla_proc) ? @@mozilla_proc : @@mozilla_proc= 0
+      end
+      alias_method :attr_mozilla_proc, :mozilla_proc
+      
+      def mozilla_proc=(value)
+        @@mozilla_proc = value
+      end
+      alias_method :attr_mozilla_proc=, :mozilla_proc=
+      
+      
+      def subclass_proc
+        defined?(@@subclass_proc) ? @@subclass_proc : @@subclass_proc= nil
+      end
+      alias_method :attr_subclass_proc, :subclass_proc
+      
+      def subclass_proc=(value)
+        @@subclass_proc = value
+      end
+      alias_method :attr_subclass_proc=, :subclass_proc=
+    }
     
     typesig { [Browser] }
     def initialize(browser)
@@ -72,12 +99,51 @@ module Org::Eclipse::Swt::Browser
         end
         return bytes
       end
+      
+      typesig { [::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int] }
+      # long
+      # long
+      # long
+      # long
+      # long
+      def window_proc(hwnd, msg, w_param, l_param)
+        # 64
+        case (RJava.cast_to_int(msg))
+        when OS::WM_ERASEBKGND
+          rect = RECT.new
+          OS._get_client_rect(hwnd, rect)
+          OS._fill_rect(w_param, rect, OS._get_sys_color_brush(OS::COLOR_WINDOW))
+        end
+        # 64
+        return OS._call_window_proc(self.attr_mozilla_proc, hwnd, RJava.cast_to_int(msg), w_param, l_param)
+      end
     }
+    
+    typesig { [] }
+    def add_window_subclass
+      # long
+      hwnd_child = OS._get_window(@browser.attr_handle, OS::GW_CHILD)
+      if ((self.attr_subclass_proc).nil?)
+        self.attr_subclass_proc = Callback.new(MozillaDelegate, "windowProc", 4) # $NON-NLS-1$
+        self.attr_mozilla_proc = OS._get_window_long_ptr(hwnd_child, OS::GWL_WNDPROC)
+      end
+      OS._set_window_long_ptr(hwnd_child, OS::GWL_WNDPROC, self.attr_subclass_proc.get_address)
+    end
+    
+    typesig { [NsIBaseWindow] }
+    def create_base_window(base_window)
+      return base_window._create
+    end
     
     typesig { [] }
     # long
     def get_handle
       return @browser.attr_handle
+    end
+    
+    typesig { [] }
+    def get_jslibrary_name
+      return "js3250.dll" # $NON-NLS-1$
     end
     
     typesig { [] }
@@ -115,7 +181,18 @@ module Org::Eclipse::Swt::Browser
     typesig { [::Java::Int] }
     # long
     def on_dispose(embed_handle)
+      remove_window_subclass
       @browser = nil
+    end
+    
+    typesig { [] }
+    def remove_window_subclass
+      if ((self.attr_subclass_proc).nil?)
+        return
+      end
+      # long
+      hwnd_child = OS._get_window(@browser.attr_handle, OS::GW_CHILD)
+      OS._set_window_long_ptr(hwnd_child, OS::GWL_WNDPROC, self.attr_mozilla_proc)
     end
     
     typesig { [::Java::Int, ::Java::Int, ::Java::Int] }

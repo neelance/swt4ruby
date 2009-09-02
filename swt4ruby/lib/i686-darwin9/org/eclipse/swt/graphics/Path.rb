@@ -1,6 +1,6 @@
 require "rjava"
 
-# Copyright (c) 2000, 2008 IBM Corporation and others.
+# Copyright (c) 2000, 2009 IBM Corporation and others.
 # All rights reserved. This program and the accompanying materials
 # are made available under the terms of the Eclipse Public License v1.0
 # which accompanies this distribution, and is available at
@@ -14,8 +14,6 @@ module Org::Eclipse::Swt::Graphics
       include ::Java::Lang
       include ::Org::Eclipse::Swt::Graphics
       include ::Org::Eclipse::Swt
-      include ::Org::Eclipse::Swt::Internal
-      include ::Org::Eclipse::Swt::Internal::Carbon
       include ::Org::Eclipse::Swt::Internal::Cocoa
     }
   end
@@ -56,18 +54,6 @@ module Org::Eclipse::Swt::Graphics
     alias_method :attr_handle=, :handle=
     undef_method :handle=
     
-    attr_accessor :moved
-    alias_method :attr_moved, :moved
-    undef_method :moved
-    alias_method :attr_moved=, :moved=
-    undef_method :moved=
-    
-    attr_accessor :closed
-    alias_method :attr_closed, :closed
-    undef_method :closed
-    alias_method :attr_closed=, :closed=
-    undef_method :closed=
-    
     typesig { [Device] }
     # Constructs a new empty Path.
     # <p>
@@ -90,26 +76,25 @@ module Org::Eclipse::Swt::Graphics
     # 
     # @see #dispose()
     def initialize(device)
-      @handle = 0
-      @moved = false
-      @closed = false
-      @origin_x = 0.0
-      @origin_y = 0.0
-      @point = nil
-      @first = false
-      @element = nil
-      @count = 0
-      @type_count = 0
-      @types = nil
-      @points = nil
+      @handle = nil
       super(device)
-      @closed = true
-      @point = Array.typed(::Java::Float).new(2) { 0.0 }
-      @handle = OS._cgpath_create_mutable
-      if ((@handle).equal?(0))
-        SWT.error(SWT::ERROR_NO_HANDLES)
+      pool = nil
+      if (!NSThread.is_main_thread)
+        pool = NSAutoreleasePool.new.alloc.init
       end
-      init
+      begin
+        @handle = NSBezierPath.bezier_path
+        if ((@handle).nil?)
+          SWT.error(SWT::ERROR_NO_HANDLES)
+        end
+        @handle.retain
+        @handle.move_to_point(NSPoint.new)
+        init
+      ensure
+        if (!(pool).nil?)
+          pool.release
+        end
+      end
     end
     
     typesig { [Device, Path, ::Java::Float] }
@@ -143,121 +128,39 @@ module Org::Eclipse::Swt::Graphics
     # @see #dispose()
     # @since 3.4
     def initialize(device, path, flatness)
-      @handle = 0
-      @moved = false
-      @closed = false
-      @origin_x = 0.0
-      @origin_y = 0.0
-      @point = nil
-      @first = false
-      @element = nil
-      @count = 0
-      @type_count = 0
-      @types = nil
-      @points = nil
+      @handle = nil
       super(device)
-      @closed = true
-      @point = Array.typed(::Java::Float).new(2) { 0.0 }
-      if ((path).nil?)
-        SWT.error(SWT::ERROR_NULL_ARGUMENT)
+      pool = nil
+      if (!NSThread.is_main_thread)
+        pool = NSAutoreleasePool.new.alloc.init
       end
-      if (path.is_disposed)
-        SWT.error(SWT::ERROR_INVALID_ARGUMENT)
-      end
-      flatness = Math.max(0, flatness)
-      if ((flatness).equal?(0))
-        @handle = OS._cgpath_create_mutable_copy(path.attr_handle)
-        if ((@handle).equal?(0))
+      begin
+        if ((path).nil?)
+          SWT.error(SWT::ERROR_NULL_ARGUMENT)
+        end
+        if (path.is_disposed)
+          SWT.error(SWT::ERROR_INVALID_ARGUMENT)
+        end
+        flatness = Math.max(0, flatness)
+        if ((flatness).equal?(0))
+          @handle = NSBezierPath.new(path.attr_handle.copy.attr_id)
+        else
+          # double
+          default_flatness_ = NSBezierPath.default_flatness
+          NSBezierPath.set_default_flatness(flatness)
+          @handle = path.attr_handle.bezier_path_by_flattening_path
+          @handle.retain
+          NSBezierPath.set_default_flatness(default_flatness_)
+        end
+        if ((@handle).nil?)
           SWT.error(SWT::ERROR_NO_HANDLES)
         end
-      else
-        @handle = OS._cgpath_create_mutable
-        if ((@handle).equal?(0))
-          SWT.error(SWT::ERROR_NO_HANDLES)
+        init
+      ensure
+        if (!(pool).nil?)
+          pool.release
         end
-        data = path.get_path_data
-        bezier_path = Cocoa.objc_msg_send(Cocoa::C_NSBezierPath, Cocoa::S_bezierPath)
-        types = data.attr_types
-        points = data.attr_points
-        point = NSPoint.new
-        point2 = NSPoint.new
-        point3 = NSPoint.new
-        i = 0
-        j = 0
-        while i < types.attr_length
-          case (types[i])
-          when SWT::PATH_MOVE_TO
-            point.attr_x = points[((j += 1) - 1)]
-            point.attr_y = points[((j += 1) - 1)]
-            Cocoa.objc_msg_send(bezier_path, Cocoa::S_moveToPoint, point)
-          when SWT::PATH_LINE_TO
-            point.attr_x = points[((j += 1) - 1)]
-            point.attr_y = points[((j += 1) - 1)]
-            Cocoa.objc_msg_send(bezier_path, Cocoa::S_lineToPoint, point)
-          when SWT::PATH_CUBIC_TO
-            point2.attr_x = points[((j += 1) - 1)]
-            point2.attr_y = points[((j += 1) - 1)]
-            point3.attr_x = points[((j += 1) - 1)]
-            point3.attr_y = points[((j += 1) - 1)]
-            point.attr_x = points[((j += 1) - 1)]
-            point.attr_y = points[((j += 1) - 1)]
-            Cocoa.objc_msg_send(bezier_path, Cocoa::S_curveToPoint, point, point2, point3)
-          when SWT::PATH_QUAD_TO
-            current_x = point.attr_x
-            current_y = point.attr_y
-            point2.attr_x = points[((j += 1) - 1)]
-            point2.attr_y = points[((j += 1) - 1)]
-            point.attr_x = points[((j += 1) - 1)]
-            point.attr_y = points[((j += 1) - 1)]
-            x0 = current_x
-            y0 = current_y
-            cx1 = x0 + 2 * (point2.attr_x - x0) / 3
-            cy1 = y0 + 2 * (point2.attr_y - y0) / 3
-            cx2 = cx1 + (point.attr_x - x0) / 3
-            cy2 = cy1 + (point.attr_y - y0) / 3
-            point2.attr_x = cx1
-            point2.attr_y = cy1
-            point3.attr_x = cx2
-            point3.attr_y = cy2
-            Cocoa.objc_msg_send(bezier_path, Cocoa::S_curveToPoint, point, point2, point3)
-          when SWT::PATH_CLOSE
-            Cocoa.objc_msg_send(bezier_path, Cocoa::S_closePath)
-          else
-            dispose
-            SWT.error(SWT::ERROR_INVALID_ARGUMENT)
-          end
-          i += 1
-        end
-        Cocoa.objc_msg_send(Cocoa::C_NSBezierPath, Cocoa::S_setDefaultFlatness, flatness)
-        bezier_path = Cocoa.objc_msg_send(bezier_path, Cocoa::S_bezierPathByFlatteningPath)
-        count = Cocoa.objc_msg_send(bezier_path, Cocoa::S_elementCount)
-        points_ptr = OS.malloc(NSPoint.attr_sizeof * 3)
-        if ((points_ptr).equal?(0))
-          SWT.error(SWT::ERROR_NO_HANDLES)
-        end
-        i_ = 0
-        while i_ < count
-          element = Cocoa.objc_msg_send(bezier_path, Cocoa::S_elementAtIndex_associatedPoints, i_, points_ptr)
-          case (element)
-          when Cocoa::NSMoveToBezierPathElement
-            Cocoa.memmove(point, points_ptr, NSPoint.attr_sizeof)
-            move_to(point.attr_x, point.attr_y)
-          when Cocoa::NSLineToBezierPathElement
-            Cocoa.memmove(point, points_ptr, NSPoint.attr_sizeof)
-            line_to(point.attr_x, point.attr_y)
-          when Cocoa::NSCurveToBezierPathElement
-            Cocoa.memmove(point, points_ptr, NSPoint.attr_sizeof)
-            Cocoa.memmove(point2, points_ptr + NSPoint.attr_sizeof, NSPoint.attr_sizeof)
-            Cocoa.memmove(point3, points_ptr + NSPoint.attr_sizeof + NSPoint.attr_sizeof, NSPoint.attr_sizeof)
-            cubic_to(point2.attr_x, point2.attr_y, point3.attr_x, point3.attr_y, point.attr_x, point.attr_y)
-          when Cocoa::NSClosePathBezierPathElement
-            close
-          end
-          i_ += 1
-        end
-        OS.free(points_ptr)
       end
-      init
     end
     
     typesig { [Device, PathData] }
@@ -286,10 +189,20 @@ module Org::Eclipse::Swt::Graphics
     # @since 3.4
     def initialize(device, data)
       initialize__path(device)
-      if ((data).nil?)
-        SWT.error(SWT::ERROR_NULL_ARGUMENT)
+      pool = nil
+      if (!NSThread.is_main_thread)
+        pool = NSAutoreleasePool.new.alloc.init
       end
-      init(data)
+      begin
+        if ((data).nil?)
+          SWT.error(SWT::ERROR_NULL_ARGUMENT)
+        end
+        init(data)
+      ensure
+        if (!(pool).nil?)
+          pool.release
+        end
+      end
     end
     
     typesig { [::Java::Float, ::Java::Float, ::Java::Float, ::Java::Float, ::Java::Float, ::Java::Float] }
@@ -324,17 +237,28 @@ module Org::Eclipse::Swt::Graphics
       if (is_disposed)
         SWT.error(SWT::ERROR_GRAPHIC_DISPOSED)
       end
-      cmt = Array.typed(::Java::Float).new(6) { 0.0 }
-      OS._cgaffine_transform_make(width / 2, 0, 0, height / 2, x + width / 2, y + height / 2, cmt)
-      angle = -start_angle * (Compatibility.attr_pi).to_f / 180
-      if (@closed)
-        OS._cgpath_move_to_point(@handle, cmt, (Math.cos(angle)).to_f, (Math.sin(angle)).to_f)
+      pool = nil
+      if (!NSThread.is_main_thread)
+        pool = NSAutoreleasePool.new.alloc.init
       end
-      OS._cgpath_add_arc(@handle, cmt, 0, 0, 1, angle, -(start_angle + arc_angle) * (Compatibility.attr_pi).to_f / 180, arc_angle >= 0)
-      @moved = true
-      @closed = false
-      if (Math.abs(arc_angle) >= 360)
-        close
+      begin
+        transform_ = NSAffineTransform.transform
+        transform_.translate_xby(x + width / 2, y + height / 2)
+        transform_.scale_xby(width / 2, height / 2)
+        path = NSBezierPath.bezier_path
+        center = NSPoint.new
+        s_angle = -start_angle
+        e_angle = -(start_angle + arc_angle)
+        path.append_bezier_path_with_arc_with_center(center, 1, s_angle, e_angle, arc_angle > 0)
+        path.transform_using_affine_transform(transform_)
+        @handle.append_bezier_path(path)
+        if (Math.abs(arc_angle) >= 360)
+          @handle.close_path
+        end
+      ensure
+        if (!(pool).nil?)
+          pool.release
+        end
       end
     end
     
@@ -360,9 +284,17 @@ module Org::Eclipse::Swt::Graphics
       if (path.is_disposed)
         SWT.error(SWT::ERROR_INVALID_ARGUMENT)
       end
-      OS._cgpath_add_path(@handle, nil, path.attr_handle)
-      @moved = false
-      @closed = path.attr_closed
+      pool = nil
+      if (!NSThread.is_main_thread)
+        pool = NSAutoreleasePool.new.alloc.init
+      end
+      begin
+        @handle.append_bezier_path(path.attr_handle)
+      ensure
+        if (!(pool).nil?)
+          pool.release
+        end
+      end
     end
     
     typesig { [::Java::Float, ::Java::Float, ::Java::Float, ::Java::Float] }
@@ -380,78 +312,23 @@ module Org::Eclipse::Swt::Graphics
       if (is_disposed)
         SWT.error(SWT::ERROR_GRAPHIC_DISPOSED)
       end
-      rect = CGRect.new
+      rect = NSRect.new
       rect.attr_x = x
       rect.attr_y = y
       rect.attr_width = width
       rect.attr_height = height
-      OS._cgpath_add_rect(@handle, nil, rect)
-      @moved = false
-      @closed = true
-    end
-    
-    typesig { [::Java::Int] }
-    def new_path_proc(data)
-      @first = true
-      return 0
-    end
-    
-    typesig { [::Java::Int] }
-    def close_path_proc(data)
-      @first = true
-      return 0
-    end
-    
-    typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
-    def line_proc(pt1, pt2, data)
-      if (@first)
-        @first = false
-        OS.memmove(@point, pt1, 8)
-        OS._cgpath_move_to_point(@handle, nil, @origin_x + @point[0], @origin_y + @point[1])
+      pool = nil
+      if (!NSThread.is_main_thread)
+        pool = NSAutoreleasePool.new.alloc.init
       end
-      OS.memmove(@point, pt2, 8)
-      OS._cgpath_add_line_to_point(@handle, nil, @origin_x + @point[0], @origin_y + @point[1])
-      return 0
-    end
-    
-    typesig { [::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int] }
-    def curve_proc(pt1, control_pt, pt2, data)
-      if (@first)
-        @first = false
-        OS.memmove(@point, pt1, 8)
-        OS._cgpath_move_to_point(@handle, nil, @origin_x + @point[0], @origin_y + @point[1])
+      begin
+        @handle.append_bezier_path_with_rect(rect)
+      ensure
+        if (!(pool).nil?)
+          pool.release
+        end
       end
-      OS.memmove(@point, pt2, 8)
-      x2 = @point[0]
-      y2 = @point[1]
-      OS.memmove(@point, control_pt, 8)
-      OS._cgpath_add_quad_curve_to_point(@handle, nil, @origin_x + @point[0], @origin_y + @point[1], @origin_x + x2, @origin_y + y2)
-      return 0
     end
-    
-    attr_accessor :origin_x
-    alias_method :attr_origin_x, :origin_x
-    undef_method :origin_x
-    alias_method :attr_origin_x=, :origin_x=
-    undef_method :origin_x=
-    
-    attr_accessor :origin_y
-    alias_method :attr_origin_y, :origin_y
-    undef_method :origin_y
-    alias_method :attr_origin_y=, :origin_y=
-    undef_method :origin_y=
-    
-    attr_accessor :point
-    alias_method :attr_point, :point
-    undef_method :point
-    alias_method :attr_point=, :point=
-    undef_method :point=
-    
-    attr_accessor :first
-    alias_method :attr_first, :first
-    undef_method :first
-    alias_method :attr_first=, :first=
-    undef_method :first=
     
     typesig { [String, ::Java::Float, ::Java::Float, Font] }
     # Adds to the receiver the pattern of glyphs generated by drawing
@@ -479,164 +356,61 @@ module Org::Eclipse::Swt::Graphics
       if (font.is_disposed)
         SWT.error(SWT::ERROR_INVALID_ARGUMENT)
       end
-      length_ = string.length
-      if ((length_).equal?(0))
-        return
+      pool = nil
+      if (!NSThread.is_main_thread)
+        pool = NSAutoreleasePool.new.alloc.init
       end
-      @moved = false
-      @closed = true
-      new_path_callback = Callback.new(self, "newPathProc", 1)
-      new_path_proc = new_path_callback.get_address
-      if ((new_path_proc).equal?(0))
-        SWT.error(SWT::ERROR_NO_MORE_CALLBACKS)
-      end
-      line_callback = Callback.new(self, "lineProc", 3)
-      line_proc = line_callback.get_address
-      if ((line_proc).equal?(0))
-        SWT.error(SWT::ERROR_NO_MORE_CALLBACKS)
-      end
-      curve_callback = Callback.new(self, "curveProc", 4)
-      curve_proc = curve_callback.get_address
-      if ((curve_proc).equal?(0))
-        SWT.error(SWT::ERROR_NO_MORE_CALLBACKS)
-      end
-      close_path_callback = Callback.new(self, "closePathProc", 1)
-      close_path_proc = close_path_callback.get_address
-      if ((close_path_proc).equal?(0))
-        SWT.error(SWT::ERROR_NO_MORE_CALLBACKS)
-      end
-      style = font.attr_atsui_style
-      if ((style).equal?(0))
-        style = font.create_style
-      end
-      if ((style).equal?(0))
-        SWT.error(SWT::ERROR_NO_HANDLES)
-      end
-      buffer = Array.typed(::Java::Int).new(1) { 0 }
-      OS._atsucreate_text_layout(buffer)
-      if ((buffer[0]).equal?(0))
-        SWT.error(SWT::ERROR_NO_HANDLES)
-      end
-      layout = buffer[0]
-      chars = CharArray.new(length_)
-      string.get_chars(0, length_, chars, 0)
-      text_ptr = OS._new_ptr(length_ * 2)
-      if ((text_ptr).equal?(0))
-        SWT.error(SWT::ERROR_NO_HANDLES)
-      end
-      OS.memmove(text_ptr, chars, length_ * 2)
-      OS._atsuset_text_pointer_location(layout, text_ptr, 0, length_, length_)
-      OS._atsuset_run_style(layout, style, 0, length_)
-      OS._atsuset_transient_font_matching(layout, true)
-      ascent = Array.typed(::Java::Int).new(1) { 0 }
-      descent = Array.typed(::Java::Int).new(1) { 0 }
-      OS._atsuget_unjustified_bounds(layout, 0, length_, nil, nil, ascent, descent)
-      y += OS._fix2x(ascent[0])
-      layout_records = Array.typed(::Java::Int).new(1) { 0 }
-      num_records = Array.typed(::Java::Int).new(1) { 0 }
-      delta_ys = Array.typed(::Java::Int).new(1) { 0 }
-      num_delta_ys = Array.typed(::Java::Int).new(1) { 0 }
-      OS._atsudirect_get_layout_data_array_ptr_from_text_layout(layout, 0, OS.attr_k_atsudirect_data_layout_record_atslayout_record_current, layout_records, num_records)
-      OS._atsudirect_get_layout_data_array_ptr_from_text_layout(layout, 0, OS.attr_k_atsudirect_data_baseline_delta_fixed_array, delta_ys, num_delta_ys)
-      delta_y = Array.typed(::Java::Int).new(1) { 0 }
-      status = Array.typed(::Java::Int).new(1) { 0 }
-      record = ATSLayoutRecord.new
-      i = 0
-      while i < num_records[0]
-        OS.memmove(record, layout_records[0] + (i * ATSLayoutRecord.attr_sizeof), ATSLayoutRecord.attr_sizeof)
-        @origin_x = x + (OS._fix2x(record.attr_real_pos)).to_f
-        if ((delta_ys[0]).equal?(0))
-          @origin_y = y
-        else
-          OS.memmove(delta_y, delta_ys[0] + (i * 4), 4)
-          @origin_y = y - (OS._fix2x(delta_y[0])).to_f
+      begin
+        str = NSString.string_with(string)
+        text_storage = NSTextStorage.new.alloc.init
+        layout_manager = NSLayoutManager.new.alloc.init
+        text_container = NSTextContainer.new.alloc
+        size = NSSize.new
+        size.attr_width = Float::MAX_VALUE
+        size.attr_height = Float::MAX_VALUE
+        text_container.init_with_container_size(size)
+        text_storage.add_layout_manager(layout_manager)
+        layout_manager.add_text_container(text_container)
+        range = NSRange.new
+        range.attr_length = str.length
+        # Feature in Cocoa. Adding attributes directly to a NSTextStorage causes
+        # output to the console and eventually a segmentation fault when printing
+        # on a thread other than the main thread. The fix is to add attributes to
+        # a separate NSMutableAttributedString and add it to text storage when done.
+        attr_str = NSMutableAttributedString.new.alloc
+        attr_str.attr_id = attr_str.init_with_string(str).attr_id
+        attr_str.begin_editing
+        attr_str.add_attribute(OS::NSFontAttributeName, font.attr_handle, range)
+        font.add_traits(attr_str, range)
+        attr_str.end_editing
+        text_storage.set_attributed_string(attr_str)
+        attr_str.release
+        range = layout_manager.glyph_range_for_text_container(text_container)
+        if (!(range.attr_length).equal?(0))
+          # long
+          glyphs = OS.malloc(4 * range.attr_length * 2)
+          layout_manager.get_glyphs(glyphs, range)
+          path = NSBezierPath.bezier_path
+          point = NSPoint.new
+          path.move_to_point(point)
+          path.append_bezier_path_with_glyphs(glyphs, range.attr_length, font.attr_handle)
+          transform_ = NSAffineTransform.transform
+          transform_.scale_xby(1, -1)
+          # double
+          baseline = layout_manager.default_baseline_offset_for_font(font.attr_handle)
+          transform_.translate_xby(x, -(y + baseline))
+          path.transform_using_affine_transform(transform_)
+          OS.free(glyphs)
+          @handle.append_bezier_path(path)
         end
-        @first = true
-        if (!(record.attr_glyph_id).equal?(OS.attr_k_atsdeleted_glyphcode))
-          OS._atsuglyph_get_quadratic_paths(style, record.attr_glyph_id, new_path_proc, line_proc, curve_proc, close_path_proc, 0, status)
-        end
-        i += 1
-      end
-      OS._cgpath_close_subpath(@handle)
-      if (!(delta_ys[0]).equal?(0))
-        OS._atsudirect_release_layout_data_array_ptr(0, OS.attr_k_atsudirect_data_baseline_delta_fixed_array, delta_ys[0])
-      end
-      OS._atsudirect_release_layout_data_array_ptr(0, OS.attr_k_atsudirect_data_layout_record_atslayout_record_current, layout_records[0])
-      if (!(style).equal?(font.attr_atsui_style))
-        OS._atsudispose_style(style)
-      end
-      if (!(layout).equal?(0))
-        OS._atsudispose_text_layout(layout)
-      end
-      if (!(text_ptr).equal?(0))
-        OS._dispose_ptr(text_ptr)
-      end
-      new_path_callback.dispose
-      line_callback.dispose
-      curve_callback.dispose
-      close_path_callback.dispose
-    end
-    
-    attr_accessor :element
-    alias_method :attr_element, :element
-    undef_method :element
-    alias_method :attr_element=, :element=
-    undef_method :element=
-    
-    attr_accessor :count
-    alias_method :attr_count, :count
-    undef_method :count
-    alias_method :attr_count=, :count=
-    undef_method :count=
-    
-    attr_accessor :type_count
-    alias_method :attr_type_count, :type_count
-    undef_method :type_count
-    alias_method :attr_type_count=, :type_count=
-    undef_method :type_count=
-    
-    attr_accessor :types
-    alias_method :attr_types, :types
-    undef_method :types
-    alias_method :attr_types=, :types=
-    undef_method :types=
-    
-    attr_accessor :points
-    alias_method :attr_points, :points
-    undef_method :points
-    alias_method :attr_points=, :points=
-    undef_method :points=
-    
-    typesig { [::Java::Int, ::Java::Int] }
-    def applier_func(info, element_ptr)
-      OS.memmove(@element, element_ptr, CGPathElement.attr_sizeof)
-      type = 0
-      length_ = 1
-      case (@element.attr_type)
-      when OS.attr_k_cgpath_element_move_to_point
-        type = SWT::PATH_MOVE_TO
-      when OS.attr_k_cgpath_element_add_line_to_point
-        type = SWT::PATH_LINE_TO
-      when OS.attr_k_cgpath_element_add_quad_curve_to_point
-        type = SWT::PATH_QUAD_TO
-        length_ = 2
-      when OS.attr_k_cgpath_element_add_curve_to_point
-        type = SWT::PATH_CUBIC_TO
-        length_ = 3
-      when OS.attr_k_cgpath_element_close_subpath
-        type = SWT::PATH_CLOSE
-        length_ = 0
-      end
-      if (!(@types).nil?)
-        @types[@type_count] = type
-        if (length_ > 0)
-          OS.memmove(@point, @element.attr_points, length_ * 8)
-          System.arraycopy(@point, 0, @points, @count, length_ * 2)
+        text_container.release
+        layout_manager.release
+        text_storage.release
+      ensure
+        if (!(pool).nil?)
+          pool.release
         end
       end
-      @type_count += 1
-      @count += length_ * 2
-      return 0
     end
     
     typesig { [] }
@@ -651,9 +425,17 @@ module Org::Eclipse::Swt::Graphics
       if (is_disposed)
         SWT.error(SWT::ERROR_GRAPHIC_DISPOSED)
       end
-      OS._cgpath_close_subpath(@handle)
-      @moved = false
-      @closed = true
+      pool = nil
+      if (!NSThread.is_main_thread)
+        pool = NSAutoreleasePool.new.alloc.init
+      end
+      begin
+        @handle.close_path
+      ensure
+        if (!(pool).nil?)
+          pool.release
+        end
+      end
     end
     
     typesig { [::Java::Float, ::Java::Float, SwtGC, ::Java::Boolean] }
@@ -688,56 +470,72 @@ module Org::Eclipse::Swt::Graphics
       if (gc.is_disposed)
         SWT.error(SWT::ERROR_INVALID_ARGUMENT)
       end
-      gc.check_gc(SwtGC::LINE_CAP | SwtGC::LINE_JOIN | SwtGC::LINE_STYLE | SwtGC::LINE_WIDTH)
-      # TODO - see windows
-      pixel = OS._new_ptr(4)
-      if ((pixel).equal?(0))
-        SWT.error(SWT::ERROR_NO_HANDLES)
+      pool = nil
+      if (!NSThread.is_main_thread)
+        pool = NSAutoreleasePool.new.alloc.init
       end
-      buffer = Array.typed(::Java::Int).new([-0x1])
-      OS.memmove(pixel, buffer, 4)
-      context = OS._cgbitmap_context_create(pixel, 1, 1, 8, 4, self.attr_device.attr_colorspace, OS.attr_k_cgimage_alpha_none_skip_first)
-      if ((context).equal?(0))
-        OS._dispose_ptr(pixel)
-        SWT.error(SWT::ERROR_NO_HANDLES)
-      end
-      data = gc.attr_data
-      cap_style = 0
-      case (data.attr_line_cap)
-      when SWT::CAP_ROUND
-        cap_style = OS.attr_k_cgline_cap_round
-      when SWT::CAP_FLAT
-        cap_style = OS.attr_k_cgline_cap_butt
-      when SWT::CAP_SQUARE
-        cap_style = OS.attr_k_cgline_cap_square
-      end
-      OS._cgcontext_set_line_cap(context, cap_style)
-      join_style = 0
-      case (data.attr_line_join)
-      when SWT::JOIN_MITER
-        join_style = OS.attr_k_cgline_join_miter
-      when SWT::JOIN_ROUND
-        join_style = OS.attr_k_cgline_join_round
-      when SWT::JOIN_BEVEL
-        join_style = OS.attr_k_cgline_join_bevel
-      end
-      OS._cgcontext_set_line_join(context, join_style)
-      OS._cgcontext_set_line_width(context, data.attr_line_width)
-      OS._cgcontext_translate_ctm(context, -x + 0.5, -y + 0.5)
-      OS._cgcontext_add_path(context, @handle)
-      if (outline)
-        OS._cgcontext_stroke_path(context)
-      else
-        if ((data.attr_fill_rule).equal?(SWT::FILL_WINDING))
-          OS._cgcontext_fill_path(context)
+      begin
+        # TODO - see windows
+        if (outline)
+          # long
+          pixel = OS.malloc(4)
+          if ((pixel).equal?(0))
+            SWT.error(SWT::ERROR_NO_HANDLES)
+          end
+          buffer = Array.typed(::Java::Int).new([-0x1])
+          OS.memmove(pixel, buffer, 4)
+          # long
+          colorspace = OS._cgcolor_space_create_device_rgb
+          # long
+          context = OS._cgbitmap_context_create(pixel, 1, 1, 8, 4, colorspace, OS.attr_k_cgimage_alpha_none_skip_first)
+          OS._cgcolor_space_release(colorspace)
+          if ((context).equal?(0))
+            OS.free(pixel)
+            SWT.error(SWT::ERROR_NO_HANDLES)
+          end
+          data = gc.attr_data
+          cap_style = 0
+          case (data.attr_line_cap)
+          when SWT::CAP_ROUND
+            cap_style = OS.attr_k_cgline_cap_round
+          when SWT::CAP_FLAT
+            cap_style = OS.attr_k_cgline_cap_butt
+          when SWT::CAP_SQUARE
+            cap_style = OS.attr_k_cgline_cap_square
+          end
+          OS._cgcontext_set_line_cap(context, cap_style)
+          join_style = 0
+          case (data.attr_line_join)
+          when SWT::JOIN_MITER
+            join_style = OS.attr_k_cgline_join_miter
+          when SWT::JOIN_ROUND
+            join_style = OS.attr_k_cgline_join_round
+          when SWT::JOIN_BEVEL
+            join_style = OS.attr_k_cgline_join_bevel
+          end
+          OS._cgcontext_set_line_join(context, join_style)
+          OS._cgcontext_set_line_width(context, data.attr_line_width)
+          OS._cgcontext_translate_ctm(context, -x + 0.5, -y + 0.5)
+          # long
+          path = SwtGC.create_cgpath_ref(@handle)
+          OS._cgcontext_add_path(context, path)
+          OS._cgpath_release(path)
+          OS._cgcontext_stroke_path(context)
+          OS._cgcontext_release(context)
+          OS.memmove(buffer, pixel, 4)
+          OS.free(pixel)
+          return !(buffer[0]).equal?(-0x1)
         else
-          OS._cgcontext_eofill_path(context)
+          point = NSPoint.new
+          point.attr_x = x
+          point.attr_y = y
+          return @handle.contains_point(point)
+        end
+      ensure
+        if (!(pool).nil?)
+          pool.release
         end
       end
-      OS._cgcontext_release(context)
-      OS.memmove(buffer, pixel, 4)
-      OS._dispose_ptr(pixel)
-      return !(buffer[0]).equal?(-0x1)
     end
     
     typesig { [::Java::Float, ::Java::Float, ::Java::Float, ::Java::Float, ::Java::Float, ::Java::Float] }
@@ -757,22 +555,32 @@ module Org::Eclipse::Swt::Graphics
       if (is_disposed)
         SWT.error(SWT::ERROR_GRAPHIC_DISPOSED)
       end
-      if (!@moved)
-        pt = CGPoint.new
-        if (!OS._cgpath_is_empty(@handle))
-          OS._cgpath_get_current_point(@handle, pt)
-        end
-        OS._cgpath_move_to_point(@handle, nil, pt.attr_x, pt.attr_y)
-        @moved = true
+      pool = nil
+      if (!NSThread.is_main_thread)
+        pool = NSAutoreleasePool.new.alloc.init
       end
-      @closed = false
-      OS._cgpath_add_curve_to_point(@handle, nil, cx1, cy1, cx2, cy2, x, y)
+      begin
+        pt = NSPoint.new
+        pt.attr_x = x
+        pt.attr_y = y
+        ct1 = NSPoint.new
+        ct1.attr_x = cx1
+        ct1.attr_y = cy1
+        ct2 = NSPoint.new
+        ct2.attr_x = cx2
+        ct2.attr_y = cy2
+        @handle.curve_to_point(pt, ct1, ct2)
+      ensure
+        if (!(pool).nil?)
+          pool.release
+        end
+      end
     end
     
     typesig { [] }
     def destroy
-      OS._cgpath_release(@handle)
-      @handle = 0
+      @handle.release
+      @handle = nil
     end
     
     typesig { [Array.typed(::Java::Float)] }
@@ -799,12 +607,25 @@ module Org::Eclipse::Swt::Graphics
       if (bounds.attr_length < 4)
         SWT.error(SWT::ERROR_INVALID_ARGUMENT)
       end
-      rect = CGRect.new
-      OS._cgpath_get_bounding_box(@handle, rect)
-      bounds[0] = rect.attr_x
-      bounds[1] = rect.attr_y
-      bounds[2] = rect.attr_width
-      bounds[3] = rect.attr_height
+      pool = nil
+      if (!NSThread.is_main_thread)
+        pool = NSAutoreleasePool.new.alloc.init
+      end
+      begin
+        rect = @handle.control_point_bounds
+        # 64
+        bounds[0] = (rect.attr_x).to_f
+        # 64
+        bounds[1] = (rect.attr_y).to_f
+        # 64
+        bounds[2] = (rect.attr_width).to_f
+        # 64
+        bounds[3] = (rect.attr_height).to_f
+      ensure
+        if (!(pool).nil?)
+          pool.release
+        end
+      end
     end
     
     typesig { [Array.typed(::Java::Float)] }
@@ -830,12 +651,21 @@ module Org::Eclipse::Swt::Graphics
       if (point.attr_length < 2)
         SWT.error(SWT::ERROR_INVALID_ARGUMENT)
       end
-      pt = CGPoint.new
-      if (!OS._cgpath_is_empty(@handle))
-        OS._cgpath_get_current_point(@handle, pt)
+      pool = nil
+      if (!NSThread.is_main_thread)
+        pool = NSAutoreleasePool.new.alloc.init
       end
-      point[0] = pt.attr_x
-      point[1] = pt.attr_y
+      begin
+        pt = @handle.current_point
+        # 64
+        point[0] = (pt.attr_x).to_f
+        # 64
+        point[1] = (pt.attr_y).to_f
+      ensure
+        if (!(pool).nil?)
+          pool.release
+        end
+      end
     end
     
     typesig { [] }
@@ -852,28 +682,69 @@ module Org::Eclipse::Swt::Graphics
       if (is_disposed)
         SWT.error(SWT::ERROR_GRAPHIC_DISPOSED)
       end
-      callback = Callback.new(self, "applierFunc", 2)
-      proc = callback.get_address
-      if ((proc).equal?(0))
-        SWT.error(SWT::ERROR_NO_MORE_CALLBACKS)
+      pool = nil
+      if (!NSThread.is_main_thread)
+        pool = NSAutoreleasePool.new.alloc.init
       end
-      @count = @type_count = 0
-      @element = CGPathElement.new
-      OS._cgpath_apply(@handle, 0, proc)
-      @types = Array.typed(::Java::Byte).new(@type_count) { 0 }
-      @points = Array.typed(::Java::Float).new(@count) { 0.0 }
-      @point = Array.typed(::Java::Float).new(6) { 0.0 }
-      @count = @type_count = 0
-      OS._cgpath_apply(@handle, 0, proc)
-      callback.dispose
-      result = PathData.new
-      result.attr_types = @types
-      result.attr_points = @points
-      @element = nil
-      @types = nil
-      @points = nil
-      @point = nil
-      return result
+      begin
+        # 64
+        count = RJava.cast_to_int(@handle.element_count)
+        point_count = 0
+        type_count = 0
+        types = Array.typed(::Java::Byte).new(count) { 0 }
+        point_array = Array.typed(::Java::Float).new(count * 6) { 0.0 }
+        # long
+        points = OS.malloc(3 * NSPoint.attr_sizeof)
+        if ((points).equal?(0))
+          SWT.error(SWT::ERROR_NO_HANDLES)
+        end
+        pt = NSPoint.new
+        i = 0
+        while i < count
+          # 64
+          element = RJava.cast_to_int(@handle.element_at_index(i, points))
+          case (element)
+          when OS::NSMoveToBezierPathElement
+            types[((type_count += 1) - 1)] = SWT::PATH_MOVE_TO
+            OS.memmove(pt, points, NSPoint.attr_sizeof)
+            point_array[((point_count += 1) - 1)] = RJava.cast_to_int(pt.attr_x)
+            point_array[((point_count += 1) - 1)] = RJava.cast_to_int(pt.attr_y)
+          when OS::NSLineToBezierPathElement
+            types[((type_count += 1) - 1)] = SWT::PATH_LINE_TO
+            OS.memmove(pt, points, NSPoint.attr_sizeof)
+            point_array[((point_count += 1) - 1)] = RJava.cast_to_int(pt.attr_x)
+            point_array[((point_count += 1) - 1)] = RJava.cast_to_int(pt.attr_y)
+          when OS::NSCurveToBezierPathElement
+            types[((type_count += 1) - 1)] = SWT::PATH_CUBIC_TO
+            OS.memmove(pt, points, NSPoint.attr_sizeof)
+            point_array[((point_count += 1) - 1)] = RJava.cast_to_int(pt.attr_x)
+            point_array[((point_count += 1) - 1)] = RJava.cast_to_int(pt.attr_y)
+            OS.memmove(pt, points + NSPoint.attr_sizeof, NSPoint.attr_sizeof)
+            point_array[((point_count += 1) - 1)] = RJava.cast_to_int(pt.attr_x)
+            point_array[((point_count += 1) - 1)] = RJava.cast_to_int(pt.attr_y)
+            OS.memmove(pt, points + NSPoint.attr_sizeof + NSPoint.attr_sizeof, NSPoint.attr_sizeof)
+            point_array[((point_count += 1) - 1)] = RJava.cast_to_int(pt.attr_x)
+            point_array[((point_count += 1) - 1)] = RJava.cast_to_int(pt.attr_y)
+          when OS::NSClosePathBezierPathElement
+            types[((type_count += 1) - 1)] = SWT::PATH_CLOSE
+          end
+          i += 1
+        end
+        OS.free(points)
+        if (!(point_count).equal?(point_array.attr_length))
+          temp = Array.typed(::Java::Float).new(point_count) { 0.0 }
+          System.arraycopy(point_array, 0, temp, 0, point_count)
+          point_array = temp
+        end
+        data = PathData.new
+        data.attr_types = types
+        data.attr_points = point_array
+        return data
+      ensure
+        if (!(pool).nil?)
+          pool.release
+        end
+      end
     end
     
     typesig { [PathData] }
@@ -912,7 +783,7 @@ module Org::Eclipse::Swt::Graphics
     # 
     # @return <code>true</code> when the Path is disposed, and <code>false</code> otherwise
     def is_disposed
-      return (@handle).equal?(0)
+      return (@handle).nil?
     end
     
     typesig { [::Java::Float, ::Java::Float] }
@@ -929,16 +800,20 @@ module Org::Eclipse::Swt::Graphics
       if (is_disposed)
         SWT.error(SWT::ERROR_GRAPHIC_DISPOSED)
       end
-      if (!@moved)
-        pt = CGPoint.new
-        if (!OS._cgpath_is_empty(@handle))
-          OS._cgpath_get_current_point(@handle, pt)
-        end
-        OS._cgpath_move_to_point(@handle, nil, pt.attr_x, pt.attr_y)
-        @moved = true
+      pool = nil
+      if (!NSThread.is_main_thread)
+        pool = NSAutoreleasePool.new.alloc.init
       end
-      @closed = false
-      OS._cgpath_add_line_to_point(@handle, nil, x, y)
+      begin
+        pt = NSPoint.new
+        pt.attr_x = x
+        pt.attr_y = y
+        @handle.line_to_point(pt)
+      ensure
+        if (!(pool).nil?)
+          pool.release
+        end
+      end
     end
     
     typesig { [::Java::Float, ::Java::Float] }
@@ -956,13 +831,20 @@ module Org::Eclipse::Swt::Graphics
       if (is_disposed)
         SWT.error(SWT::ERROR_GRAPHIC_DISPOSED)
       end
-      OS._cgpath_move_to_point(@handle, nil, x, y)
-      # Bug in Quartz.  If CGPathMoveToPoint() is not called at the
-      # begining of a subpath, the following segments do not output
-      # anything.  The fix is to detect that the app did not call
-      # CGPathMoveToPoint() and call it explicitly.
-      @closed = true
-      @moved = true
+      pool = nil
+      if (!NSThread.is_main_thread)
+        pool = NSAutoreleasePool.new.alloc.init
+      end
+      begin
+        pt = NSPoint.new
+        pt.attr_x = x
+        pt.attr_y = y
+        @handle.move_to_point(pt)
+      ensure
+        if (!(pool).nil?)
+          pool.release
+        end
+      end
     end
     
     typesig { [::Java::Float, ::Java::Float, ::Java::Float, ::Java::Float] }
@@ -980,16 +862,23 @@ module Org::Eclipse::Swt::Graphics
       if (is_disposed)
         SWT.error(SWT::ERROR_GRAPHIC_DISPOSED)
       end
-      if (!@moved)
-        pt = CGPoint.new
-        if (!OS._cgpath_is_empty(@handle))
-          OS._cgpath_get_current_point(@handle, pt)
-        end
-        OS._cgpath_move_to_point(@handle, nil, pt.attr_x, pt.attr_y)
-        @moved = true
+      pool = nil
+      if (!NSThread.is_main_thread)
+        pool = NSAutoreleasePool.new.alloc.init
       end
-      @closed = false
-      OS._cgpath_add_quad_curve_to_point(@handle, nil, cx, cy, x, y)
+      begin
+        pt = NSPoint.new
+        pt.attr_x = x
+        pt.attr_y = y
+        ct = NSPoint.new
+        ct.attr_x = cx
+        ct.attr_y = cy
+        @handle.curve_to_point(pt, ct, ct)
+      ensure
+        if (!(pool).nil?)
+          pool.release
+        end
+      end
     end
     
     typesig { [] }

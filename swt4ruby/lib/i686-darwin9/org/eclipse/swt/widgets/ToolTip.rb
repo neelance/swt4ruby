@@ -1,6 +1,6 @@
 require "rjava"
 
-# Copyright (c) 2000, 2008 IBM Corporation and others.
+# Copyright (c) 2000, 2009 IBM Corporation and others.
 # All rights reserved. This program and the accompanying materials
 # are made available under the terms of the Eclipse Public License v1.0
 # which accompanies this distribution, and is available at
@@ -15,8 +15,6 @@ module Org::Eclipse::Swt::Widgets
       include ::Org::Eclipse::Swt::Widgets
       include ::Org::Eclipse::Swt
       include ::Org::Eclipse::Swt::Graphics
-      include_const ::Org::Eclipse::Swt::Internal::Carbon, :HMHelpContentRec
-      include_const ::Org::Eclipse::Swt::Internal::Carbon, :OS
       include ::Org::Eclipse::Swt::Events
     }
   end
@@ -43,6 +41,7 @@ module Org::Eclipse::Swt::Widgets
   # @see <a href="http://www.eclipse.org/swt/">Sample code and further information</a>
   # 
   # @since 3.2
+  # @noextend This class is not intended to be subclassed by clients.
   class ToolTip < ToolTipImports.const_get :Widget
     include_class_members ToolTipImports
     
@@ -58,6 +57,12 @@ module Org::Eclipse::Swt::Widgets
     alias_method :attr_tip=, :tip=
     undef_method :tip=
     
+    attr_accessor :item
+    alias_method :attr_item, :item
+    undef_method :item
+    alias_method :attr_item=, :item=
+    undef_method :item=
+    
     attr_accessor :x
     alias_method :attr_x, :x
     undef_method :x
@@ -69,6 +74,12 @@ module Org::Eclipse::Swt::Widgets
     undef_method :y
     alias_method :attr_y=, :y=
     undef_method :y=
+    
+    attr_accessor :border_polygon
+    alias_method :attr_border_polygon, :border_polygon
+    undef_method :border_polygon
+    alias_method :attr_border_polygon=, :border_polygon=
+    undef_method :border_polygon=
     
     attr_accessor :spike_above
     alias_method :attr_spike_above, :spike_above
@@ -82,6 +93,18 @@ module Org::Eclipse::Swt::Widgets
     alias_method :attr_autohide=, :autohide=
     undef_method :autohide=
     
+    attr_accessor :listener
+    alias_method :attr_listener, :listener
+    undef_method :listener
+    alias_method :attr_listener=, :listener=
+    undef_method :listener=
+    
+    attr_accessor :parent_listener
+    alias_method :attr_parent_listener, :parent_listener
+    undef_method :parent_listener
+    alias_method :attr_parent_listener=, :parent_listener=
+    undef_method :parent_listener=
+    
     attr_accessor :layout_text
     alias_method :attr_layout_text, :layout_text
     undef_method :layout_text
@@ -93,24 +116,6 @@ module Org::Eclipse::Swt::Widgets
     undef_method :layout_message
     alias_method :attr_layout_message=, :layout_message=
     undef_method :layout_message=
-    
-    attr_accessor :text
-    alias_method :attr_text, :text
-    undef_method :text
-    alias_method :attr_text=, :text=
-    undef_method :text=
-    
-    attr_accessor :message
-    alias_method :attr_message, :message
-    undef_method :message
-    alias_method :attr_message=, :message=
-    undef_method :message=
-    
-    attr_accessor :item
-    alias_method :attr_item, :item
-    undef_method :item
-    alias_method :attr_item=, :item=
-    undef_method :item=
     
     attr_accessor :region
     alias_method :attr_region, :region
@@ -129,12 +134,6 @@ module Org::Eclipse::Swt::Widgets
     undef_method :runnable
     alias_method :attr_runnable=, :runnable=
     undef_method :runnable=
-    
-    attr_accessor :help_string
-    alias_method :attr_help_string, :help_string
-    undef_method :help_string
-    alias_method :attr_help_string=, :help_string=
-    undef_method :help_string=
     
     class_module.module_eval {
       const_set_lazy(:BORDER) { 5 }
@@ -180,6 +179,7 @@ module Org::Eclipse::Swt::Widgets
     # <li>ERROR_INVALID_SUBCLASS - if this class is not an allowed subclass</li>
     # </ul>
     # 
+    # @see SWT#BALLOON
     # @see SWT#ICON_ERROR
     # @see SWT#ICON_INFORMATION
     # @see SWT#ICON_WARNING
@@ -188,22 +188,74 @@ module Org::Eclipse::Swt::Widgets
     def initialize(parent, style)
       @parent = nil
       @tip = nil
+      @item = nil
       @x = 0
       @y = 0
+      @border_polygon = nil
       @spike_above = false
       @autohide = false
+      @listener = nil
+      @parent_listener = nil
       @layout_text = nil
       @layout_message = nil
-      @text = nil
-      @message = nil
-      @item = nil
       @region = nil
       @bold_font = nil
       @runnable = nil
-      @help_string = 0
       super(parent, check_style(style))
       @parent = parent
-      create_widget
+      @autohide = true
+      @x = @y = -1
+      display = get_display
+      @tip = Shell.new(parent, SWT::ON_TOP | SWT::NO_TRIM)
+      background = display.get_system_color(SWT::COLOR_INFO_BACKGROUND)
+      @tip.set_background(background)
+      @listener = Class.new(Listener.class == Class ? Listener : Object) do
+        extend LocalClass
+        include_class_members ToolTip
+        include Listener if Listener.class == Module
+        
+        typesig { [Event] }
+        define_method :handle_event do |event|
+          case (event.attr_type)
+          when SWT::Dispose
+            on_dispose(event)
+          when SWT::Paint
+            on_paint(event)
+          when SWT::MouseDown
+            on_mouse_down(event)
+          end
+        end
+        
+        typesig { [Vararg.new(Object)] }
+        define_method :initialize do |*args|
+          super(*args)
+        end
+        
+        private
+        alias_method :initialize_anonymous, :initialize
+      end.new_local(self)
+      add_listener(SWT::Dispose, @listener)
+      @tip.add_listener(SWT::Paint, @listener)
+      @tip.add_listener(SWT::MouseDown, @listener)
+      @parent_listener = Class.new(Listener.class == Class ? Listener : Object) do
+        extend LocalClass
+        include_class_members ToolTip
+        include Listener if Listener.class == Module
+        
+        typesig { [Event] }
+        define_method :handle_event do |event|
+          dispose
+        end
+        
+        typesig { [Vararg.new(Object)] }
+        define_method :initialize do |*args|
+          super(*args)
+        end
+        
+        private
+        alias_method :initialize_anonymous, :initialize
+      end.new_local(self)
+      parent.add_listener(SWT::Dispose, @parent_listener)
     end
     
     class_module.module_eval {
@@ -278,17 +330,21 @@ module Org::Eclipse::Swt::Widgets
       if (dest.attr_width >= x + size.attr_x)
         if (dest.attr_height >= y + size.attr_y + t)
           polyline = Array.typed(::Java::Int).new([0, 5 + t, 1, 5 + t, 1, 3 + t, 3, 1 + t, 5, 1 + t, 5, t, 16, t, 16, 0, 35, t, w - 5, t, w - 5, 1 + t, w - 3, 1 + t, w - 1, 3 + t, w - 1, 5 + t, w, 5 + t, w, h - 5 + t, w - 1, h - 5 + t, w - 1, h - 3 + t, w - 2, h - 3 + t, w - 2, h - 2 + t, w - 3, h - 2 + t, w - 3, h - 1 + t, w - 5, h - 1 + t, w - 5, h + t, 5, h + t, 5, h - 1 + t, 3, h - 1 + t, 3, h - 2 + t, 2, h - 2 + t, 2, h - 3 + t, 1, h - 3 + t, 1, h - 5 + t, 0, h - 5 + t, 0, 5 + t])
+          @border_polygon = Array.typed(::Java::Int).new([0, 5 + t, 1, 4 + t, 1, 3 + t, 3, 1 + t, 4, 1 + t, 5, t, 16, t, 16, 1, 35, t, w - 6, 0 + t, w - 5, 1 + t, w - 4, 1 + t, w - 2, 3 + t, w - 2, 4 + t, w - 1, 5 + t, w - 1, h - 6 + t, w - 2, h - 5 + t, w - 2, h - 4 + t, w - 4, h - 2 + t, w - 5, h - 2 + t, w - 6, h - 1 + t, 5, h - 1 + t, 4, h - 2 + t, 3, h - 2 + t, 1, h - 4 + t, 1, h - 5 + t, 0, h - 6 + t, 0, 5 + t])
           @tip.set_location(Math.max(0, x - i), y)
         else
           polyline = Array.typed(::Java::Int).new([0, 5, 1, 5, 1, 3, 3, 1, 5, 1, 5, 0, w - 5, 0, w - 5, 1, w - 3, 1, w - 1, 3, w - 1, 5, w, 5, w, h - 5, w - 1, h - 5, w - 1, h - 3, w - 2, h - 3, w - 2, h - 2, w - 3, h - 2, w - 3, h - 1, w - 5, h - 1, w - 5, h, 35, h, 16, h + t, 16, h, 5, h, 5, h - 1, 3, h - 1, 3, h - 2, 2, h - 2, 2, h - 3, 1, h - 3, 1, h - 5, 0, h - 5, 0, 5])
+          @border_polygon = Array.typed(::Java::Int).new([0, 5, 1, 4, 1, 3, 3, 1, 4, 1, 5, 0, w - 6, 0, w - 5, 1, w - 4, 1, w - 2, 3, w - 2, 4, w - 1, 5, w - 1, h - 6, w - 2, h - 5, w - 2, h - 4, w - 4, h - 2, w - 5, h - 2, w - 6, h - 1, 36, h - 1, 16, h + t - 1, 16, h - 1, 5, h - 1, 4, h - 2, 3, h - 2, 1, h - 4, 1, h - 5, 0, h - 6, 0, 5])
           @tip.set_location(Math.max(0, x - i), y - size.attr_y - t)
         end
       else
         if (dest.attr_height >= y + size.attr_y + t)
           polyline = Array.typed(::Java::Int).new([0, 5 + t, 1, 5 + t, 1, 3 + t, 3, 1 + t, 5, 1 + t, 5, t, w - 35, t, w - 16, 0, w - 16, t, w - 5, t, w - 5, 1 + t, w - 3, 1 + t, w - 1, 3 + t, w - 1, 5 + t, w, 5 + t, w, h - 5 + t, w - 1, h - 5 + t, w - 1, h - 3 + t, w - 2, h - 3 + t, w - 2, h - 2 + t, w - 3, h - 2 + t, w - 3, h - 1 + t, w - 5, h - 1 + t, w - 5, h + t, 5, h + t, 5, h - 1 + t, 3, h - 1 + t, 3, h - 2 + t, 2, h - 2 + t, 2, h - 3 + t, 1, h - 3 + t, 1, h - 5 + t, 0, h - 5 + t, 0, 5 + t])
+          @border_polygon = Array.typed(::Java::Int).new([0, 5 + t, 1, 4 + t, 1, 3 + t, 3, 1 + t, 4, 1 + t, 5, t, w - 35, t, w - 17, 2, w - 17, t, w - 6, t, w - 5, 1 + t, w - 4, 1 + t, w - 2, 3 + t, w - 2, 4 + t, w - 1, 5 + t, w - 1, h - 6 + t, w - 2, h - 5 + t, w - 2, h - 4 + t, w - 4, h - 2 + t, w - 5, h - 2 + t, w - 6, h - 1 + t, 5, h - 1 + t, 4, h - 2 + t, 3, h - 2 + t, 1, h - 4 + t, 1, h - 5 + t, 0, h - 6 + t, 0, 5 + t])
           @tip.set_location(Math.min(dest.attr_width - size.attr_x, x - size.attr_x + i), y)
         else
           polyline = Array.typed(::Java::Int).new([0, 5, 1, 5, 1, 3, 3, 1, 5, 1, 5, 0, w - 5, 0, w - 5, 1, w - 3, 1, w - 1, 3, w - 1, 5, w, 5, w, h - 5, w - 1, h - 5, w - 1, h - 3, w - 2, h - 3, w - 2, h - 2, w - 3, h - 2, w - 3, h - 1, w - 5, h - 1, w - 5, h, w - 16, h, w - 16, h + t, w - 35, h, 5, h, 5, h - 1, 3, h - 1, 3, h - 2, 2, h - 2, 2, h - 3, 1, h - 3, 1, h - 5, 0, h - 5, 0, 5])
+          @border_polygon = Array.typed(::Java::Int).new([0, 5, 1, 4, 1, 3, 3, 1, 4, 1, 5, 0, w - 6, 0, w - 5, 1, w - 4, 1, w - 2, 3, w - 2, 4, w - 1, 5, w - 1, h - 6, w - 2, h - 5, w - 2, h - 4, w - 4, h - 2, w - 5, h - 2, w - 6, h - 1, w - 17, h - 1, w - 17, h + t - 2, w - 36, h - 1, 5, h - 1, 4, h - 2, 3, h - 2, 1, h - 4, 1, h - 5, 0, h - 6, 0, 5])
           @tip.set_location(Math.min(dest.attr_width - size.attr_x, x - size.attr_x + i), y - size.attr_y - t)
         end
       end
@@ -300,39 +356,6 @@ module Org::Eclipse::Swt::Widgets
         @region.add(polyline)
         @tip.set_region(@region)
       end
-    end
-    
-    typesig { [] }
-    def create_widget
-      super
-      @autohide = true
-      @x = @y = -1
-      @text = ""
-      @message = ""
-    end
-    
-    typesig { [] }
-    def dispose_tip
-      if (!(@tip).nil?)
-        @tip.dispose
-      end
-      @tip = nil
-      if (!(@region).nil?)
-        @region.dispose
-      end
-      @region = nil
-      if (!(@layout_text).nil?)
-        @layout_text.dispose
-      end
-      @layout_text = nil
-      if (!(@layout_message).nil?)
-        @layout_message.dispose
-      end
-      @layout_message = nil
-      if (!(@bold_font).nil?)
-        @bold_font.dispose
-      end
-      @bold_font = nil
     end
     
     typesig { [] }
@@ -348,35 +371,6 @@ module Org::Eclipse::Swt::Widgets
     def get_auto_hide
       check_widget
       return @autohide
-    end
-    
-    typesig { [] }
-    # Returns the receiver's message, which will be an empty
-    # string if it has never been set.
-    # 
-    # @return the receiver's message
-    # 
-    # @exception SWTException <ul>
-    # <li>ERROR_WIDGET_DISPOSED - if the receiver has been disposed</li>
-    # <li>ERROR_THREAD_INVALID_ACCESS - if not called from the thread that created the receiver</li>
-    # </ul>
-    def get_message
-      check_widget
-      return @message
-    end
-    
-    typesig { [] }
-    # Returns the receiver's parent, which must be a <code>Shell</code>.
-    # 
-    # @return the receiver's parent
-    # 
-    # @exception SWTException <ul>
-    # <li>ERROR_WIDGET_DISPOSED - if the receiver has been disposed</li>
-    # <li>ERROR_THREAD_INVALID_ACCESS - if not called from the thread that created the receiver</li>
-    # </ul>
-    def get_parent
-      check_widget
-      return @parent
     end
     
     typesig { [::Java::Int] }
@@ -413,6 +407,35 @@ module Org::Eclipse::Swt::Widgets
     end
     
     typesig { [] }
+    # Returns the receiver's message, which will be an empty
+    # string if it has never been set.
+    # 
+    # @return the receiver's message
+    # 
+    # @exception SWTException <ul>
+    # <li>ERROR_WIDGET_DISPOSED - if the receiver has been disposed</li>
+    # <li>ERROR_THREAD_INVALID_ACCESS - if not called from the thread that created the receiver</li>
+    # </ul>
+    def get_message
+      check_widget
+      return !(@layout_message).nil? ? @layout_message.get_text : ""
+    end
+    
+    typesig { [] }
+    # Returns the receiver's parent, which must be a <code>Shell</code>.
+    # 
+    # @return the receiver's parent
+    # 
+    # @exception SWTException <ul>
+    # <li>ERROR_WIDGET_DISPOSED - if the receiver has been disposed</li>
+    # <li>ERROR_THREAD_INVALID_ACCESS - if not called from the thread that created the receiver</li>
+    # </ul>
+    def get_parent
+      check_widget
+      return @parent
+    end
+    
+    typesig { [] }
     # Returns the receiver's text, which will be an empty
     # string if it has never been set.
     # 
@@ -424,7 +447,7 @@ module Org::Eclipse::Swt::Widgets
     # </ul>
     def get_text
       check_widget
-      return @text
+      return !(@layout_text).nil? ? @layout_text.get_text : ""
     end
     
     typesig { [] }
@@ -445,16 +468,7 @@ module Org::Eclipse::Swt::Widgets
     # </ul>
     def get_visible
       check_widget
-      if (!(@tip).nil?)
-        return @tip.get_visible
-      end
-      if ((self.attr_display.attr_help_widget).equal?(self))
-        window = OS._front_window
-        window_class = Array.typed(::Java::Int).new(1) { 0 }
-        OS._get_window_class(window, window_class)
-        return (window_class[0]).equal?(OS.attr_k_help_window_class)
-      end
-      return false
+      return @tip.get_visible
     end
     
     typesig { [] }
@@ -476,6 +490,39 @@ module Org::Eclipse::Swt::Widgets
     end
     
     typesig { [Event] }
+    def on_dispose(event)
+      parent = get_parent
+      parent.remove_listener(SWT::Dispose, @parent_listener)
+      remove_listener(SWT::Dispose, @listener)
+      notify_listeners(SWT::Dispose, event)
+      event.attr_type = SWT::None
+      if (!(@runnable).nil?)
+        display = get_display
+        display.timer_exec(-1, @runnable)
+      end
+      @runnable = nil
+      @tip.dispose
+      @tip = nil
+      if (!(@region).nil?)
+        @region.dispose
+      end
+      @region = nil
+      if (!(@layout_text).nil?)
+        @layout_text.dispose
+      end
+      @layout_text = nil
+      if (!(@layout_message).nil?)
+        @layout_message.dispose
+      end
+      @layout_message = nil
+      if (!(@bold_font).nil?)
+        @bold_font.dispose
+      end
+      @bold_font = nil
+      @border_polygon = nil
+    end
+    
+    typesig { [Event] }
     def on_mouse_down(event)
       notify_listeners(SWT::Selection, Event.new)
       set_visible(false)
@@ -486,8 +533,14 @@ module Org::Eclipse::Swt::Widgets
       gc = event.attr_gc
       x = BORDER + PADDING
       y = BORDER + PADDING
-      if (!((self.attr_style & SWT::BALLOON)).equal?(0) && @spike_above)
-        y += TIP_HEIGHT
+      if (!((self.attr_style & SWT::BALLOON)).equal?(0))
+        if (@spike_above)
+          y += TIP_HEIGHT
+        end
+        gc.draw_polygon(@border_polygon)
+      else
+        rect = @tip.get_client_area
+        gc.draw_rectangle(rect.attr_x, rect.attr_y, rect.attr_width - 1, rect.attr_height - 1)
       end
       if (!(@layout_text).nil?)
         id = self.attr_style & (SWT::ICON_ERROR | SWT::ICON_INFORMATION | SWT::ICON_WARNING)
@@ -506,21 +559,6 @@ module Org::Eclipse::Swt::Widgets
         x = BORDER + PADDING + INSET
         @layout_message.draw(gc, x, y)
       end
-    end
-    
-    typesig { [] }
-    def release_widget
-      super
-      if (!(@runnable).nil?)
-        display = get_display
-        display.timer_exec(-1, @runnable)
-      end
-      @runnable = nil
-      dispose_tip
-      if (!(@help_string).equal?(0))
-        OS._cfrelease(@help_string)
-      end
-      @help_string = 0
     end
     
     typesig { [SelectionListener] }
@@ -593,7 +631,7 @@ module Org::Eclipse::Swt::Widgets
       end
       @x = x
       @y = y
-      if (!(@tip).nil? && @tip.get_visible)
+      if (@tip.get_visible)
         configure
       end
     end
@@ -644,12 +682,17 @@ module Org::Eclipse::Swt::Widgets
       if ((string).nil?)
         error(SWT::ERROR_NULL_ARGUMENT)
       end
-      @message = string
-      if (!(@tip).nil?)
+      if (!(@layout_message).nil?)
+        @layout_message.dispose
+      end
+      @layout_message = nil
+      if (!(string.length).equal?(0))
+        display = get_display
+        @layout_message = TextLayout.new(display)
         @layout_message.set_text(string)
-        if (@tip.get_visible)
-          configure
-        end
+      end
+      if (@tip.get_visible)
+        configure
       end
     end
     
@@ -670,14 +713,26 @@ module Org::Eclipse::Swt::Widgets
       if ((string).nil?)
         error(SWT::ERROR_NULL_ARGUMENT)
       end
-      @text = string
-      if (!(@tip).nil?)
+      if (!(@layout_text).nil?)
+        @layout_text.dispose
+      end
+      @layout_text = nil
+      if (!(@bold_font).nil?)
+        @bold_font.dispose
+      end
+      @bold_font = nil
+      if (!(string.length).equal?(0))
+        display = get_display
+        @layout_text = TextLayout.new(display)
         @layout_text.set_text(string)
+        font = display.get_system_font
+        data = font.get_font_data[0]
+        @bold_font = Font.new(display, data.get_name, data.get_height, SWT::BOLD)
         style = TextStyle.new(@bold_font, nil, nil)
         @layout_text.set_style(style, 0, string.length)
-        if (@tip.get_visible)
-          configure
-        end
+      end
+      if (@tip.get_visible)
+        configure
       end
     end
     
@@ -697,129 +752,38 @@ module Org::Eclipse::Swt::Widgets
     # <li>ERROR_THREAD_INVALID_ACCESS - if not called from the thread that created the receiver</li>
     # </ul>
     def set_visible(visible)
-      if (!(@help_string).equal?(0))
-        OS._cfrelease(@help_string)
+      check_widget
+      if (visible)
+        configure
       end
-      @help_string = 0
+      @tip.set_visible(visible)
+      display = get_display
       if (!(@runnable).nil?)
-        self.attr_display.timer_exec(-1, @runnable)
+        display.timer_exec(-1, @runnable)
       end
       @runnable = nil
-      if (visible)
-        OS._hmhide_tag
-        self.attr_display.attr_help_widget = self
-        if (!@autohide || !((self.attr_style & SWT::BALLOON)).equal?(0))
-          # Show tip
-          if ((@tip).nil?)
-            @tip = Shell.new(@parent, SWT::ON_TOP | SWT::NO_TRIM)
-            background = self.attr_display.get_system_color(SWT::COLOR_INFO_BACKGROUND)
-            @tip.set_background(background)
-            listener = Class.new(Listener.class == Class ? Listener : Object) do
-              extend LocalClass
-              include_class_members ToolTip
-              include Listener if Listener.class == Module
-              
-              typesig { [Event] }
-              define_method :handle_event do |event|
-                case (event.attr_type)
-                when SWT::Paint
-                  on_paint(event)
-                when SWT::MouseDown
-                  on_mouse_down(event)
-                end
-              end
-              
-              typesig { [Vararg.new(Object)] }
-              define_method :initialize do |*args|
-                super(*args)
-              end
-              
-              private
-              alias_method :initialize_anonymous, :initialize
-            end.new_local(self)
-            @tip.add_listener(SWT::Paint, listener)
-            @tip.add_listener(SWT::MouseDown, listener)
-            @layout_text = TextLayout.new(self.attr_display)
-            @layout_text.set_text(@text)
-            font = self.attr_display.get_system_font
-            data = font.get_font_data[0]
-            @bold_font = Font.new(self.attr_display, data.get_name, data.get_height, SWT::BOLD)
-            style = TextStyle.new(@bold_font, nil, nil)
-            @layout_text.set_style(style, 0, @text.length)
-            @layout_message = TextLayout.new(self.attr_display)
-            @layout_message.set_text(@message)
-          end
-          configure
-          @tip.set_visible(true)
-          if (@autohide)
-            @runnable = Class.new(Runnable.class == Class ? Runnable : Object) do
-              extend LocalClass
-              include_class_members ToolTip
-              include Runnable if Runnable.class == Module
-              
-              typesig { [] }
-              define_method :run do
-                if (!is_disposed)
-                  set_visible(false)
-                end
-              end
-              
-              typesig { [Vararg.new(Object)] }
-              define_method :initialize do |*args|
-                super(*args)
-              end
-              
-              private
-              alias_method :initialize_anonymous, :initialize
-            end.new_local(self)
-            self.attr_display.timer_exec(DELAY, @runnable)
-          end
-        else
-          # Show HMTag
-          if (!(@tip).nil?)
-            dispose_tip
-          end
-          if ((@x).equal?(-1) || (@y).equal?(-1))
-            point = nil
-            if (!(@item).nil?)
-              point = @item.get_location
-              @x = point.attr_x
-              @y = point.attr_y
-            else
-              pt = Org::Eclipse::Swt::Internal::Carbon::Point.new
-              OS._get_global_mouse(pt)
-              @x = pt.attr_h
-              @y = pt.attr_v
+      if (@autohide && visible)
+        @runnable = Class.new(Runnable.class == Class ? Runnable : Object) do
+          extend LocalClass
+          include_class_members ToolTip
+          include Runnable if Runnable.class == Module
+          
+          typesig { [] }
+          define_method :run do
+            if (!is_disposed)
+              set_visible(false)
             end
           end
-          string = StringBuffer.new(@text)
-          if (@text.length > 0)
-            string.append("\n\n")
+          
+          typesig { [Vararg.new(Object)] }
+          define_method :initialize do |*args|
+            super(*args)
           end
-          string.append(@message)
-          buffer = CharArray.new(string.length)
-          string.get_chars(0, buffer.attr_length, buffer, 0)
-          @help_string = OS._cfstring_create_with_characters(OS.attr_k_cfallocator_default, buffer, buffer.attr_length)
-          help_content = HMHelpContentRec.new
-          help_content.attr_tag_side = RJava.cast_to_short(OS.attr_k_hmabsolute_center_aligned)
-          help_content.attr_abs_hot_rect_left = RJava.cast_to_short(@x)
-          help_content.attr_abs_hot_rect_top = RJava.cast_to_short(@y)
-          help_content.attr_abs_hot_rect_right = RJava.cast_to_short((@x + 1))
-          help_content.attr_abs_hot_rect_bottom = RJava.cast_to_short((@y + 1))
-          help_content.attr_content0_content_type = OS.attr_k_hmcfstring_content
-          help_content.attr_content0_tag_cfstring = @help_string
-          help_content.attr_content1_content_type = OS.attr_k_hmcfstring_content
-          help_content.attr_content1_tag_cfstring = @help_string
-          OS._hmdisplay_tag(help_content)
-        end
-      else
-        if ((self.attr_display.attr_help_widget).equal?(self))
-          self.attr_display.attr_help_widget = nil
-          OS._hmhide_tag
-          if (!(@tip).nil?)
-            @tip.set_visible(false)
-          end
-        end
+          
+          private
+          alias_method :initialize_anonymous, :initialize
+        end.new_local(self)
+        display.timer_exec(DELAY, @runnable)
       end
     end
     

@@ -17,7 +17,7 @@ require "rjava"
 # 
 # IBM
 # -  Binding to permit interfacing between Cairo and SWT
-# -  Copyright (C) 2005 IBM Corp.  All Rights Reserved.
+# -  Copyright (C) 2005, 2008 IBM Corp.  All Rights Reserved.
 # 
 # ***** END LICENSE BLOCK *****
 module Org::Eclipse::Swt::Internal::Cairo
@@ -276,6 +276,9 @@ module Org::Eclipse::Swt::Internal::Cairo
       
       JNI.native_method :Java_org_eclipse_swt_internal_cairo_Cairo__1cairo_1append_1path, [:pointer, :long, :int64, :int64], :void
       typesig { [::Java::Long, ::Java::Long] }
+      # @param cr cast=(cairo_t *)
+      # @param path cast=(cairo_path_t *)
+      # 
       # int
       # int
       def __cairo_append_path(cr, path)
@@ -296,6 +299,7 @@ module Org::Eclipse::Swt::Internal::Cairo
       
       JNI.native_method :Java_org_eclipse_swt_internal_cairo_Cairo__1cairo_1arc, [:pointer, :long, :int64, :double, :double, :double, :double, :double], :void
       typesig { [::Java::Long, ::Java::Double, ::Java::Double, ::Java::Double, ::Java::Double, ::Java::Double] }
+      # @param cr cast=(cairo_t *)
       # int
       def __cairo_arc(cr, xc, yc, radius, angle1, angle2)
         JNI.__send__(:Java_org_eclipse_swt_internal_cairo_Cairo__1cairo_1arc, JNI.env, self.jni_id, cr.to_int, xc, yc, radius, angle1, angle2)
@@ -314,6 +318,7 @@ module Org::Eclipse::Swt::Internal::Cairo
       
       JNI.native_method :Java_org_eclipse_swt_internal_cairo_Cairo__1cairo_1arc_1negative, [:pointer, :long, :int64, :double, :double, :double, :double, :double], :void
       typesig { [::Java::Long, ::Java::Double, ::Java::Double, ::Java::Double, ::Java::Double, ::Java::Double] }
+      # @param cr cast=(cairo_t *)
       # int
       def __cairo_arc_negative(cr, xc, yc, radius, angle1, angle2)
         JNI.__send__(:Java_org_eclipse_swt_internal_cairo_Cairo__1cairo_1arc_1negative, JNI.env, self.jni_id, cr.to_int, xc, yc, radius, angle1, angle2)
@@ -332,6 +337,7 @@ module Org::Eclipse::Swt::Internal::Cairo
       
       JNI.native_method :Java_org_eclipse_swt_internal_cairo_Cairo__1cairo_1clip, [:pointer, :long, :int64], :void
       typesig { [::Java::Long] }
+      # @param cr cast=(cairo_t *)
       # int
       def __cairo_clip(cr)
         JNI.__send__(:Java_org_eclipse_swt_internal_cairo_Cairo__1cairo_1clip, JNI.env, self.jni_id, cr.to_int)
@@ -350,6 +356,7 @@ module Org::Eclipse::Swt::Internal::Cairo
       
       JNI.native_method :Java_org_eclipse_swt_internal_cairo_Cairo__1cairo_1clip_1preserve, [:pointer, :long, :int64], :void
       typesig { [::Java::Long] }
+      # @param cr cast=(cairo_t *)
       # int
       def __cairo_clip_preserve(cr)
         JNI.__send__(:Java_org_eclipse_swt_internal_cairo_Cairo__1cairo_1clip_1preserve, JNI.env, self.jni_id, cr.to_int)
@@ -368,6 +375,7 @@ module Org::Eclipse::Swt::Internal::Cairo
       
       JNI.native_method :Java_org_eclipse_swt_internal_cairo_Cairo__1cairo_1close_1path, [:pointer, :long, :int64], :void
       typesig { [::Java::Long] }
+      # @param cr cast=(cairo_t *)
       # int
       def __cairo_close_path(cr)
         JNI.__send__(:Java_org_eclipse_swt_internal_cairo_Cairo__1cairo_1close_1path, JNI.env, self.jni_id, cr.to_int)
@@ -386,6 +394,7 @@ module Org::Eclipse::Swt::Internal::Cairo
       
       JNI.native_method :Java_org_eclipse_swt_internal_cairo_Cairo__1cairo_1copy_1page, [:pointer, :long, :int64], :void
       typesig { [::Java::Long] }
+      # @param cr cast=(cairo_t *)
       # int
       def __cairo_copy_page(cr)
         JNI.__send__(:Java_org_eclipse_swt_internal_cairo_Cairo__1cairo_1copy_1page, JNI.env, self.jni_id, cr.to_int)
@@ -404,6 +413,7 @@ module Org::Eclipse::Swt::Internal::Cairo
       
       JNI.native_method :Java_org_eclipse_swt_internal_cairo_Cairo__1cairo_1copy_1path, [:pointer, :long, :int64], :int64
       typesig { [::Java::Long] }
+      # @param cr cast=(cairo_t *)
       # int
       # int
       def __cairo_copy_path(cr)
@@ -424,6 +434,7 @@ module Org::Eclipse::Swt::Internal::Cairo
       
       JNI.native_method :Java_org_eclipse_swt_internal_cairo_Cairo__1cairo_1copy_1path_1flat, [:pointer, :long, :int64], :int64
       typesig { [::Java::Long] }
+      # @param cr cast=(cairo_t *)
       # int
       # int
       def __cairo_copy_path_flat(cr)
@@ -444,6 +455,7 @@ module Org::Eclipse::Swt::Internal::Cairo
       
       JNI.native_method :Java_org_eclipse_swt_internal_cairo_Cairo__1cairo_1create, [:pointer, :long, :int64], :int64
       typesig { [::Java::Long] }
+      # @param target cast=(cairo_surface_t *)
       # int
       # int
       def __cairo_create(target)
@@ -464,6 +476,7 @@ module Org::Eclipse::Swt::Internal::Cairo
       
       JNI.native_method :Java_org_eclipse_swt_internal_cairo_Cairo__1cairo_1curve_1to, [:pointer, :long, :int64, :double, :double, :double, :double, :double, :double], :void
       typesig { [::Java::Long, ::Java::Double, ::Java::Double, ::Java::Double, ::Java::Double, ::Java::Double, ::Java::Double] }
+      # @param cr cast=(cairo_t *)
       # int
       def __cairo_curve_to(cr, x1, y1, x2, y2, x3, y3)
         JNI.__send__(:Java_org_eclipse_swt_internal_cairo_Cairo__1cairo_1curve_1to, JNI.env, self.jni_id, cr.to_int, x1, y1, x2, y2, x3, y3)
@@ -482,6 +495,7 @@ module Org::Eclipse::Swt::Internal::Cairo
       
       JNI.native_method :Java_org_eclipse_swt_internal_cairo_Cairo__1cairo_1destroy, [:pointer, :long, :int64], :void
       typesig { [::Java::Long] }
+      # @param cr cast=(cairo_t *)
       # int
       def __cairo_destroy(cr)
         JNI.__send__(:Java_org_eclipse_swt_internal_cairo_Cairo__1cairo_1destroy, JNI.env, self.jni_id, cr.to_int)
@@ -500,6 +514,7 @@ module Org::Eclipse::Swt::Internal::Cairo
       
       JNI.native_method :Java_org_eclipse_swt_internal_cairo_Cairo__1cairo_1device_1to_1user, [:pointer, :long, :int64, :long, :long], :void
       typesig { [::Java::Long, Array.typed(::Java::Double), Array.typed(::Java::Double)] }
+      # @param cr cast=(cairo_t *)
       # int
       def __cairo_device_to_user(cr, x, y)
         JNI.__send__(:Java_org_eclipse_swt_internal_cairo_Cairo__1cairo_1device_1to_1user, JNI.env, self.jni_id, cr.to_int, x.jni_id, y.jni_id)
@@ -518,6 +533,7 @@ module Org::Eclipse::Swt::Internal::Cairo
       
       JNI.native_method :Java_org_eclipse_swt_internal_cairo_Cairo__1cairo_1device_1to_1user_1distance, [:pointer, :long, :int64, :long, :long], :void
       typesig { [::Java::Long, Array.typed(::Java::Double), Array.typed(::Java::Double)] }
+      # @param cr cast=(cairo_t *)
       # int
       def __cairo_device_to_user_distance(cr, dx, dy)
         JNI.__send__(:Java_org_eclipse_swt_internal_cairo_Cairo__1cairo_1device_1to_1user_1distance, JNI.env, self.jni_id, cr.to_int, dx.jni_id, dy.jni_id)
@@ -536,6 +552,7 @@ module Org::Eclipse::Swt::Internal::Cairo
       
       JNI.native_method :Java_org_eclipse_swt_internal_cairo_Cairo__1cairo_1fill, [:pointer, :long, :int64], :void
       typesig { [::Java::Long] }
+      # @param cr cast=(cairo_t *)
       # int
       def __cairo_fill(cr)
         JNI.__send__(:Java_org_eclipse_swt_internal_cairo_Cairo__1cairo_1fill, JNI.env, self.jni_id, cr.to_int)
@@ -554,6 +571,7 @@ module Org::Eclipse::Swt::Internal::Cairo
       
       JNI.native_method :Java_org_eclipse_swt_internal_cairo_Cairo__1cairo_1fill_1extents, [:pointer, :long, :int64, :long, :long, :long, :long], :void
       typesig { [::Java::Long, Array.typed(::Java::Double), Array.typed(::Java::Double), Array.typed(::Java::Double), Array.typed(::Java::Double)] }
+      # @param cr cast=(cairo_t *)
       # int
       def __cairo_fill_extents(cr, x1, y1, x2, y2)
         JNI.__send__(:Java_org_eclipse_swt_internal_cairo_Cairo__1cairo_1fill_1extents, JNI.env, self.jni_id, cr.to_int, x1.jni_id, y1.jni_id, x2.jni_id, y2.jni_id)
@@ -572,6 +590,7 @@ module Org::Eclipse::Swt::Internal::Cairo
       
       JNI.native_method :Java_org_eclipse_swt_internal_cairo_Cairo__1cairo_1fill_1preserve, [:pointer, :long, :int64], :void
       typesig { [::Java::Long] }
+      # @param cr cast=(cairo_t *)
       # int
       def __cairo_fill_preserve(cr)
         JNI.__send__(:Java_org_eclipse_swt_internal_cairo_Cairo__1cairo_1fill_1preserve, JNI.env, self.jni_id, cr.to_int)
@@ -590,6 +609,7 @@ module Org::Eclipse::Swt::Internal::Cairo
       
       JNI.native_method :Java_org_eclipse_swt_internal_cairo_Cairo__1cairo_1font_1extents, [:pointer, :long, :int64, :long], :void
       typesig { [::Java::Long, Cairo_font_extents_t] }
+      # @param cr cast=(cairo_t *)
       # int
       def __cairo_font_extents(cr, extents)
         JNI.__send__(:Java_org_eclipse_swt_internal_cairo_Cairo__1cairo_1font_1extents, JNI.env, self.jni_id, cr.to_int, extents.jni_id)
@@ -626,6 +646,7 @@ module Org::Eclipse::Swt::Internal::Cairo
       
       JNI.native_method :Java_org_eclipse_swt_internal_cairo_Cairo__1cairo_1font_1options_1destroy, [:pointer, :long, :int64], :void
       typesig { [::Java::Long] }
+      # @param options cast=(cairo_font_options_t *)
       # int
       def __cairo_font_options_destroy(options)
         JNI.__send__(:Java_org_eclipse_swt_internal_cairo_Cairo__1cairo_1font_1options_1destroy, JNI.env, self.jni_id, options.to_int)
@@ -644,6 +665,7 @@ module Org::Eclipse::Swt::Internal::Cairo
       
       JNI.native_method :Java_org_eclipse_swt_internal_cairo_Cairo__1cairo_1font_1options_1get_1antialias, [:pointer, :long, :int64], :int32
       typesig { [::Java::Long] }
+      # @param options cast=(cairo_font_options_t *)
       # int
       def __cairo_font_options_get_antialias(options)
         JNI.__send__(:Java_org_eclipse_swt_internal_cairo_Cairo__1cairo_1font_1options_1get_1antialias, JNI.env, self.jni_id, options.to_int)
@@ -662,6 +684,7 @@ module Org::Eclipse::Swt::Internal::Cairo
       
       JNI.native_method :Java_org_eclipse_swt_internal_cairo_Cairo__1cairo_1font_1options_1set_1antialias, [:pointer, :long, :int64, :int32], :void
       typesig { [::Java::Long, ::Java::Int] }
+      # @param options cast=(cairo_font_options_t *)
       # int
       def __cairo_font_options_set_antialias(options, antialias)
         JNI.__send__(:Java_org_eclipse_swt_internal_cairo_Cairo__1cairo_1font_1options_1set_1antialias, JNI.env, self.jni_id, options.to_int, antialias.to_int)
@@ -680,6 +703,7 @@ module Org::Eclipse::Swt::Internal::Cairo
       
       JNI.native_method :Java_org_eclipse_swt_internal_cairo_Cairo__1cairo_1get_1antialias, [:pointer, :long, :int64], :int32
       typesig { [::Java::Long] }
+      # @param cr cast=(cairo_t *)
       # int
       def __cairo_get_antialias(cr)
         JNI.__send__(:Java_org_eclipse_swt_internal_cairo_Cairo__1cairo_1get_1antialias, JNI.env, self.jni_id, cr.to_int)
@@ -698,6 +722,7 @@ module Org::Eclipse::Swt::Internal::Cairo
       
       JNI.native_method :Java_org_eclipse_swt_internal_cairo_Cairo__1cairo_1get_1current_1point, [:pointer, :long, :int64, :long, :long], :void
       typesig { [::Java::Long, Array.typed(::Java::Double), Array.typed(::Java::Double)] }
+      # @param cr cast=(cairo_t *)
       # int
       def __cairo_get_current_point(cr, x, y)
         JNI.__send__(:Java_org_eclipse_swt_internal_cairo_Cairo__1cairo_1get_1current_1point, JNI.env, self.jni_id, cr.to_int, x.jni_id, y.jni_id)
@@ -716,6 +741,7 @@ module Org::Eclipse::Swt::Internal::Cairo
       
       JNI.native_method :Java_org_eclipse_swt_internal_cairo_Cairo__1cairo_1get_1fill_1rule, [:pointer, :long, :int64], :int32
       typesig { [::Java::Long] }
+      # @param cr cast=(cairo_t *)
       # int
       def __cairo_get_fill_rule(cr)
         JNI.__send__(:Java_org_eclipse_swt_internal_cairo_Cairo__1cairo_1get_1fill_1rule, JNI.env, self.jni_id, cr.to_int)
@@ -734,6 +760,7 @@ module Org::Eclipse::Swt::Internal::Cairo
       
       JNI.native_method :Java_org_eclipse_swt_internal_cairo_Cairo__1cairo_1get_1font_1face, [:pointer, :long, :int64], :int64
       typesig { [::Java::Long] }
+      # @param cr cast=(cairo_t *)
       # int
       # int
       def __cairo_get_font_face(cr)
@@ -754,6 +781,9 @@ module Org::Eclipse::Swt::Internal::Cairo
       
       JNI.native_method :Java_org_eclipse_swt_internal_cairo_Cairo__1cairo_1get_1font_1matrix, [:pointer, :long, :int64, :long], :void
       typesig { [::Java::Long, Array.typed(::Java::Double)] }
+      # @param cr cast=(cairo_t *)
+      # @param matrix cast=(cairo_matrix_t *)
+      # 
       # int
       def __cairo_get_font_matrix(cr, matrix)
         JNI.__send__(:Java_org_eclipse_swt_internal_cairo_Cairo__1cairo_1get_1font_1matrix, JNI.env, self.jni_id, cr.to_int, matrix.jni_id)
@@ -772,6 +802,9 @@ module Org::Eclipse::Swt::Internal::Cairo
       
       JNI.native_method :Java_org_eclipse_swt_internal_cairo_Cairo__1cairo_1get_1font_1options, [:pointer, :long, :int64, :int64], :void
       typesig { [::Java::Long, ::Java::Long] }
+      # @param cr cast=(cairo_t *)
+      # @param options cast=(cairo_font_options_t *)
+      # 
       # int
       # int
       def __cairo_get_font_options(cr, options)
@@ -792,6 +825,7 @@ module Org::Eclipse::Swt::Internal::Cairo
       
       JNI.native_method :Java_org_eclipse_swt_internal_cairo_Cairo__1cairo_1get_1line_1cap, [:pointer, :long, :int64], :int32
       typesig { [::Java::Long] }
+      # @param cr cast=(cairo_t *)
       # int
       def __cairo_get_line_cap(cr)
         JNI.__send__(:Java_org_eclipse_swt_internal_cairo_Cairo__1cairo_1get_1line_1cap, JNI.env, self.jni_id, cr.to_int)
@@ -810,6 +844,7 @@ module Org::Eclipse::Swt::Internal::Cairo
       
       JNI.native_method :Java_org_eclipse_swt_internal_cairo_Cairo__1cairo_1get_1line_1join, [:pointer, :long, :int64], :int32
       typesig { [::Java::Long] }
+      # @param cr cast=(cairo_t *)
       # int
       def __cairo_get_line_join(cr)
         JNI.__send__(:Java_org_eclipse_swt_internal_cairo_Cairo__1cairo_1get_1line_1join, JNI.env, self.jni_id, cr.to_int)
@@ -828,6 +863,7 @@ module Org::Eclipse::Swt::Internal::Cairo
       
       JNI.native_method :Java_org_eclipse_swt_internal_cairo_Cairo__1cairo_1get_1line_1width, [:pointer, :long, :int64], :double
       typesig { [::Java::Long] }
+      # @param cr cast=(cairo_t *)
       # int
       def __cairo_get_line_width(cr)
         JNI.__send__(:Java_org_eclipse_swt_internal_cairo_Cairo__1cairo_1get_1line_1width, JNI.env, self.jni_id, cr.to_int)
@@ -846,6 +882,9 @@ module Org::Eclipse::Swt::Internal::Cairo
       
       JNI.native_method :Java_org_eclipse_swt_internal_cairo_Cairo__1cairo_1get_1matrix, [:pointer, :long, :int64, :long], :void
       typesig { [::Java::Long, Array.typed(::Java::Double)] }
+      # @param cr cast=(cairo_t *)
+      # @param matrix cast=(cairo_matrix_t *)
+      # 
       # int
       def __cairo_get_matrix(cr, matrix)
         JNI.__send__(:Java_org_eclipse_swt_internal_cairo_Cairo__1cairo_1get_1matrix, JNI.env, self.jni_id, cr.to_int, matrix.jni_id)
@@ -864,6 +903,7 @@ module Org::Eclipse::Swt::Internal::Cairo
       
       JNI.native_method :Java_org_eclipse_swt_internal_cairo_Cairo__1cairo_1get_1miter_1limit, [:pointer, :long, :int64], :double
       typesig { [::Java::Long] }
+      # @param cr cast=(cairo_t *)
       # int
       def __cairo_get_miter_limit(cr)
         JNI.__send__(:Java_org_eclipse_swt_internal_cairo_Cairo__1cairo_1get_1miter_1limit, JNI.env, self.jni_id, cr.to_int)
@@ -882,6 +922,7 @@ module Org::Eclipse::Swt::Internal::Cairo
       
       JNI.native_method :Java_org_eclipse_swt_internal_cairo_Cairo__1cairo_1get_1operator, [:pointer, :long, :int64], :int32
       typesig { [::Java::Long] }
+      # @param cr cast=(cairo_t *)
       # int
       def __cairo_get_operator(cr)
         JNI.__send__(:Java_org_eclipse_swt_internal_cairo_Cairo__1cairo_1get_1operator, JNI.env, self.jni_id, cr.to_int)
@@ -900,6 +941,7 @@ module Org::Eclipse::Swt::Internal::Cairo
       
       JNI.native_method :Java_org_eclipse_swt_internal_cairo_Cairo__1cairo_1get_1source, [:pointer, :long, :int64], :int64
       typesig { [::Java::Long] }
+      # @param cr cast=(cairo_t *)
       # int
       # int
       def __cairo_get_source(cr)
@@ -920,6 +962,7 @@ module Org::Eclipse::Swt::Internal::Cairo
       
       JNI.native_method :Java_org_eclipse_swt_internal_cairo_Cairo__1cairo_1get_1target, [:pointer, :long, :int64], :int64
       typesig { [::Java::Long] }
+      # @param cr cast=(cairo_t *)
       # int
       # int
       def __cairo_get_target(cr)
@@ -940,6 +983,7 @@ module Org::Eclipse::Swt::Internal::Cairo
       
       JNI.native_method :Java_org_eclipse_swt_internal_cairo_Cairo__1cairo_1get_1tolerance, [:pointer, :long, :int64], :double
       typesig { [::Java::Long] }
+      # @param cr cast=(cairo_t *)
       # int
       def __cairo_get_tolerance(cr)
         JNI.__send__(:Java_org_eclipse_swt_internal_cairo_Cairo__1cairo_1get_1tolerance, JNI.env, self.jni_id, cr.to_int)
@@ -958,6 +1002,10 @@ module Org::Eclipse::Swt::Internal::Cairo
       
       JNI.native_method :Java_org_eclipse_swt_internal_cairo_Cairo__1cairo_1glyph_1extents, [:pointer, :long, :int64, :int64, :int32, :int64], :void
       typesig { [::Java::Long, ::Java::Long, ::Java::Int, ::Java::Long] }
+      # @param cr cast=(cairo_t *)
+      # @param glyphs cast=(cairo_glyph_t *)
+      # @param extents cast=(cairo_text_extents_t *)
+      # 
       # int
       # int
       # int
@@ -980,6 +1028,9 @@ module Org::Eclipse::Swt::Internal::Cairo
       
       JNI.native_method :Java_org_eclipse_swt_internal_cairo_Cairo__1cairo_1glyph_1path, [:pointer, :long, :int64, :int64, :int32], :void
       typesig { [::Java::Long, ::Java::Long, ::Java::Int] }
+      # @param cr cast=(cairo_t *)
+      # @param glyphs cast=(cairo_glyph_t *)
+      # 
       # int
       # int
       def __cairo_glyph_path(cr, glyphs, num_glyphs)
@@ -1000,6 +1051,7 @@ module Org::Eclipse::Swt::Internal::Cairo
       
       JNI.native_method :Java_org_eclipse_swt_internal_cairo_Cairo__1cairo_1identity_1matrix, [:pointer, :long, :int64], :void
       typesig { [::Java::Long] }
+      # @param cr cast=(cairo_t *)
       # int
       def __cairo_identity_matrix(cr)
         JNI.__send__(:Java_org_eclipse_swt_internal_cairo_Cairo__1cairo_1identity_1matrix, JNI.env, self.jni_id, cr.to_int)
@@ -1036,6 +1088,7 @@ module Org::Eclipse::Swt::Internal::Cairo
       
       JNI.native_method :Java_org_eclipse_swt_internal_cairo_Cairo__1cairo_1image_1surface_1create_1for_1data, [:pointer, :long, :int64, :int32, :int32, :int32, :int32], :int64
       typesig { [::Java::Long, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int] }
+      # @param data cast=(unsigned char *)
       # int
       # int
       def __cairo_image_surface_create_for_data(data, format, width, height, stride)
@@ -1056,6 +1109,7 @@ module Org::Eclipse::Swt::Internal::Cairo
       
       JNI.native_method :Java_org_eclipse_swt_internal_cairo_Cairo__1cairo_1image_1surface_1get_1height, [:pointer, :long, :int64], :int32
       typesig { [::Java::Long] }
+      # @param surface cast=(cairo_surface_t *)
       # int
       def __cairo_image_surface_get_height(surface)
         JNI.__send__(:Java_org_eclipse_swt_internal_cairo_Cairo__1cairo_1image_1surface_1get_1height, JNI.env, self.jni_id, surface.to_int)
@@ -1074,6 +1128,7 @@ module Org::Eclipse::Swt::Internal::Cairo
       
       JNI.native_method :Java_org_eclipse_swt_internal_cairo_Cairo__1cairo_1image_1surface_1get_1width, [:pointer, :long, :int64], :int32
       typesig { [::Java::Long] }
+      # @param surface cast=(cairo_surface_t *)
       # int
       def __cairo_image_surface_get_width(surface)
         JNI.__send__(:Java_org_eclipse_swt_internal_cairo_Cairo__1cairo_1image_1surface_1get_1width, JNI.env, self.jni_id, surface.to_int)
@@ -1092,6 +1147,7 @@ module Org::Eclipse::Swt::Internal::Cairo
       
       JNI.native_method :Java_org_eclipse_swt_internal_cairo_Cairo__1cairo_1in_1fill, [:pointer, :long, :int64, :double, :double], :int32
       typesig { [::Java::Long, ::Java::Double, ::Java::Double] }
+      # @param cr cast=(cairo_t *)
       # int
       def __cairo_in_fill(cr, x, y)
         JNI.__send__(:Java_org_eclipse_swt_internal_cairo_Cairo__1cairo_1in_1fill, JNI.env, self.jni_id, cr.to_int, x, y)
@@ -1110,6 +1166,7 @@ module Org::Eclipse::Swt::Internal::Cairo
       
       JNI.native_method :Java_org_eclipse_swt_internal_cairo_Cairo__1cairo_1in_1stroke, [:pointer, :long, :int64, :double, :double], :int32
       typesig { [::Java::Long, ::Java::Double, ::Java::Double] }
+      # @param cr cast=(cairo_t *)
       # int
       def __cairo_in_stroke(cr, x, y)
         JNI.__send__(:Java_org_eclipse_swt_internal_cairo_Cairo__1cairo_1in_1stroke, JNI.env, self.jni_id, cr.to_int, x, y)
@@ -1128,6 +1185,7 @@ module Org::Eclipse::Swt::Internal::Cairo
       
       JNI.native_method :Java_org_eclipse_swt_internal_cairo_Cairo__1cairo_1line_1to, [:pointer, :long, :int64, :double, :double], :void
       typesig { [::Java::Long, ::Java::Double, ::Java::Double] }
+      # @param cr cast=(cairo_t *)
       # int
       def __cairo_line_to(cr, x, y)
         JNI.__send__(:Java_org_eclipse_swt_internal_cairo_Cairo__1cairo_1line_1to, JNI.env, self.jni_id, cr.to_int, x, y)
@@ -1146,6 +1204,9 @@ module Org::Eclipse::Swt::Internal::Cairo
       
       JNI.native_method :Java_org_eclipse_swt_internal_cairo_Cairo__1cairo_1mask, [:pointer, :long, :int64, :int64], :void
       typesig { [::Java::Long, ::Java::Long] }
+      # @param cr cast=(cairo_t *)
+      # @param pattern cast=(cairo_pattern_t *)
+      # 
       # int
       # int
       def __cairo_mask(cr, pattern)
@@ -1166,6 +1227,9 @@ module Org::Eclipse::Swt::Internal::Cairo
       
       JNI.native_method :Java_org_eclipse_swt_internal_cairo_Cairo__1cairo_1mask_1surface, [:pointer, :long, :int64, :int64, :double, :double], :void
       typesig { [::Java::Long, ::Java::Long, ::Java::Double, ::Java::Double] }
+      # @param cr cast=(cairo_t *)
+      # @param surface cast=(cairo_surface_t *)
+      # 
       # int
       # int
       def __cairo_mask_surface(cr, surface, surface_x, surface_y)
@@ -1186,6 +1250,7 @@ module Org::Eclipse::Swt::Internal::Cairo
       
       JNI.native_method :Java_org_eclipse_swt_internal_cairo_Cairo__1cairo_1matrix_1init, [:pointer, :long, :long, :double, :double, :double, :double, :double, :double], :void
       typesig { [Array.typed(::Java::Double), ::Java::Double, ::Java::Double, ::Java::Double, ::Java::Double, ::Java::Double, ::Java::Double] }
+      # @param matrix cast=(cairo_matrix_t *)
       def __cairo_matrix_init(matrix, xx, yx, xy, yy, x0, y0)
         JNI.__send__(:Java_org_eclipse_swt_internal_cairo_Cairo__1cairo_1matrix_1init, JNI.env, self.jni_id, matrix.jni_id, xx, yx, xy, yy, x0, y0)
       end
@@ -1202,6 +1267,7 @@ module Org::Eclipse::Swt::Internal::Cairo
       
       JNI.native_method :Java_org_eclipse_swt_internal_cairo_Cairo__1cairo_1matrix_1init_1identity, [:pointer, :long, :long], :void
       typesig { [Array.typed(::Java::Double)] }
+      # @param matrix cast=(cairo_matrix_t *)
       def __cairo_matrix_init_identity(matrix)
         JNI.__send__(:Java_org_eclipse_swt_internal_cairo_Cairo__1cairo_1matrix_1init_1identity, JNI.env, self.jni_id, matrix.jni_id)
       end
@@ -1218,6 +1284,7 @@ module Org::Eclipse::Swt::Internal::Cairo
       
       JNI.native_method :Java_org_eclipse_swt_internal_cairo_Cairo__1cairo_1matrix_1init_1rotate, [:pointer, :long, :long, :double], :void
       typesig { [Array.typed(::Java::Double), ::Java::Double] }
+      # @param matrix cast=(cairo_matrix_t *)
       def __cairo_matrix_init_rotate(matrix, radians)
         JNI.__send__(:Java_org_eclipse_swt_internal_cairo_Cairo__1cairo_1matrix_1init_1rotate, JNI.env, self.jni_id, matrix.jni_id, radians)
       end
@@ -1234,6 +1301,7 @@ module Org::Eclipse::Swt::Internal::Cairo
       
       JNI.native_method :Java_org_eclipse_swt_internal_cairo_Cairo__1cairo_1matrix_1init_1scale, [:pointer, :long, :long, :double, :double], :void
       typesig { [Array.typed(::Java::Double), ::Java::Double, ::Java::Double] }
+      # @param matrix cast=(cairo_matrix_t *)
       def __cairo_matrix_init_scale(matrix, sx, sy)
         JNI.__send__(:Java_org_eclipse_swt_internal_cairo_Cairo__1cairo_1matrix_1init_1scale, JNI.env, self.jni_id, matrix.jni_id, sx, sy)
       end
@@ -1250,6 +1318,7 @@ module Org::Eclipse::Swt::Internal::Cairo
       
       JNI.native_method :Java_org_eclipse_swt_internal_cairo_Cairo__1cairo_1matrix_1init_1translate, [:pointer, :long, :long, :double, :double], :void
       typesig { [Array.typed(::Java::Double), ::Java::Double, ::Java::Double] }
+      # @param matrix cast=(cairo_matrix_t *)
       def __cairo_matrix_init_translate(matrix, tx, ty)
         JNI.__send__(:Java_org_eclipse_swt_internal_cairo_Cairo__1cairo_1matrix_1init_1translate, JNI.env, self.jni_id, matrix.jni_id, tx, ty)
       end
@@ -1266,6 +1335,7 @@ module Org::Eclipse::Swt::Internal::Cairo
       
       JNI.native_method :Java_org_eclipse_swt_internal_cairo_Cairo__1cairo_1matrix_1invert, [:pointer, :long, :long], :int32
       typesig { [Array.typed(::Java::Double)] }
+      # @param matrix cast=(cairo_matrix_t *)
       def __cairo_matrix_invert(matrix)
         JNI.__send__(:Java_org_eclipse_swt_internal_cairo_Cairo__1cairo_1matrix_1invert, JNI.env, self.jni_id, matrix.jni_id)
       end
@@ -1282,6 +1352,9 @@ module Org::Eclipse::Swt::Internal::Cairo
       
       JNI.native_method :Java_org_eclipse_swt_internal_cairo_Cairo__1cairo_1matrix_1multiply, [:pointer, :long, :long, :long, :long], :void
       typesig { [Array.typed(::Java::Double), Array.typed(::Java::Double), Array.typed(::Java::Double)] }
+      # @param result cast=(cairo_matrix_t *)
+      # @param a cast=(cairo_matrix_t *)
+      # @param b cast=(cairo_matrix_t *)
       def __cairo_matrix_multiply(result, a, b)
         JNI.__send__(:Java_org_eclipse_swt_internal_cairo_Cairo__1cairo_1matrix_1multiply, JNI.env, self.jni_id, result.jni_id, a.jni_id, b.jni_id)
       end
@@ -1298,6 +1371,7 @@ module Org::Eclipse::Swt::Internal::Cairo
       
       JNI.native_method :Java_org_eclipse_swt_internal_cairo_Cairo__1cairo_1matrix_1rotate, [:pointer, :long, :long, :double], :void
       typesig { [Array.typed(::Java::Double), ::Java::Double] }
+      # @param matrix cast=(cairo_matrix_t *)
       def __cairo_matrix_rotate(matrix, radians)
         JNI.__send__(:Java_org_eclipse_swt_internal_cairo_Cairo__1cairo_1matrix_1rotate, JNI.env, self.jni_id, matrix.jni_id, radians)
       end
@@ -1314,6 +1388,7 @@ module Org::Eclipse::Swt::Internal::Cairo
       
       JNI.native_method :Java_org_eclipse_swt_internal_cairo_Cairo__1cairo_1matrix_1scale, [:pointer, :long, :long, :double, :double], :void
       typesig { [Array.typed(::Java::Double), ::Java::Double, ::Java::Double] }
+      # @param matrix cast=(cairo_matrix_t *)
       def __cairo_matrix_scale(matrix, sx, sy)
         JNI.__send__(:Java_org_eclipse_swt_internal_cairo_Cairo__1cairo_1matrix_1scale, JNI.env, self.jni_id, matrix.jni_id, sx, sy)
       end
@@ -1330,6 +1405,7 @@ module Org::Eclipse::Swt::Internal::Cairo
       
       JNI.native_method :Java_org_eclipse_swt_internal_cairo_Cairo__1cairo_1matrix_1transform_1distance, [:pointer, :long, :long, :long, :long], :void
       typesig { [Array.typed(::Java::Double), Array.typed(::Java::Double), Array.typed(::Java::Double)] }
+      # @param matrix cast=(cairo_matrix_t *)
       def __cairo_matrix_transform_distance(matrix, dx, dy)
         JNI.__send__(:Java_org_eclipse_swt_internal_cairo_Cairo__1cairo_1matrix_1transform_1distance, JNI.env, self.jni_id, matrix.jni_id, dx.jni_id, dy.jni_id)
       end
@@ -1346,6 +1422,7 @@ module Org::Eclipse::Swt::Internal::Cairo
       
       JNI.native_method :Java_org_eclipse_swt_internal_cairo_Cairo__1cairo_1matrix_1transform_1point, [:pointer, :long, :long, :long, :long], :void
       typesig { [Array.typed(::Java::Double), Array.typed(::Java::Double), Array.typed(::Java::Double)] }
+      # @param matrix cast=(cairo_matrix_t *)
       def __cairo_matrix_transform_point(matrix, x, y)
         JNI.__send__(:Java_org_eclipse_swt_internal_cairo_Cairo__1cairo_1matrix_1transform_1point, JNI.env, self.jni_id, matrix.jni_id, x.jni_id, y.jni_id)
       end
@@ -1362,6 +1439,7 @@ module Org::Eclipse::Swt::Internal::Cairo
       
       JNI.native_method :Java_org_eclipse_swt_internal_cairo_Cairo__1cairo_1matrix_1translate, [:pointer, :long, :long, :double, :double], :void
       typesig { [Array.typed(::Java::Double), ::Java::Double, ::Java::Double] }
+      # @param matrix cast=(cairo_matrix_t *)
       def __cairo_matrix_translate(matrix, tx, ty)
         JNI.__send__(:Java_org_eclipse_swt_internal_cairo_Cairo__1cairo_1matrix_1translate, JNI.env, self.jni_id, matrix.jni_id, tx, ty)
       end
@@ -1378,6 +1456,7 @@ module Org::Eclipse::Swt::Internal::Cairo
       
       JNI.native_method :Java_org_eclipse_swt_internal_cairo_Cairo__1cairo_1move_1to, [:pointer, :long, :int64, :double, :double], :void
       typesig { [::Java::Long, ::Java::Double, ::Java::Double] }
+      # @param cr cast=(cairo_t *)
       # int
       def __cairo_move_to(cr, x, y)
         JNI.__send__(:Java_org_eclipse_swt_internal_cairo_Cairo__1cairo_1move_1to, JNI.env, self.jni_id, cr.to_int, x, y)
@@ -1396,6 +1475,7 @@ module Org::Eclipse::Swt::Internal::Cairo
       
       JNI.native_method :Java_org_eclipse_swt_internal_cairo_Cairo__1cairo_1new_1path, [:pointer, :long, :int64], :void
       typesig { [::Java::Long] }
+      # @param cr cast=(cairo_t *)
       # int
       def __cairo_new_path(cr)
         JNI.__send__(:Java_org_eclipse_swt_internal_cairo_Cairo__1cairo_1new_1path, JNI.env, self.jni_id, cr.to_int)
@@ -1414,6 +1494,7 @@ module Org::Eclipse::Swt::Internal::Cairo
       
       JNI.native_method :Java_org_eclipse_swt_internal_cairo_Cairo__1cairo_1paint, [:pointer, :long, :int64], :void
       typesig { [::Java::Long] }
+      # @param cr cast=(cairo_t *)
       # int
       def __cairo_paint(cr)
         JNI.__send__(:Java_org_eclipse_swt_internal_cairo_Cairo__1cairo_1paint, JNI.env, self.jni_id, cr.to_int)
@@ -1432,6 +1513,7 @@ module Org::Eclipse::Swt::Internal::Cairo
       
       JNI.native_method :Java_org_eclipse_swt_internal_cairo_Cairo__1cairo_1paint_1with_1alpha, [:pointer, :long, :int64, :double], :void
       typesig { [::Java::Long, ::Java::Double] }
+      # @param cr cast=(cairo_t *)
       # int
       def __cairo_paint_with_alpha(cr, alpha)
         JNI.__send__(:Java_org_eclipse_swt_internal_cairo_Cairo__1cairo_1paint_1with_1alpha, JNI.env, self.jni_id, cr.to_int, alpha)
@@ -1450,6 +1532,7 @@ module Org::Eclipse::Swt::Internal::Cairo
       
       JNI.native_method :Java_org_eclipse_swt_internal_cairo_Cairo__1cairo_1path_1destroy, [:pointer, :long, :int64], :void
       typesig { [::Java::Long] }
+      # @param path cast=(cairo_path_t *)
       # int
       def __cairo_path_destroy(path)
         JNI.__send__(:Java_org_eclipse_swt_internal_cairo_Cairo__1cairo_1path_1destroy, JNI.env, self.jni_id, path.to_int)
@@ -1468,6 +1551,7 @@ module Org::Eclipse::Swt::Internal::Cairo
       
       JNI.native_method :Java_org_eclipse_swt_internal_cairo_Cairo__1cairo_1pattern_1add_1color_1stop_1rgb, [:pointer, :long, :int64, :double, :double, :double, :double], :void
       typesig { [::Java::Long, ::Java::Double, ::Java::Double, ::Java::Double, ::Java::Double] }
+      # @param pattern cast=(cairo_pattern_t *)
       # int
       def __cairo_pattern_add_color_stop_rgb(pattern, offset, red, green, blue)
         JNI.__send__(:Java_org_eclipse_swt_internal_cairo_Cairo__1cairo_1pattern_1add_1color_1stop_1rgb, JNI.env, self.jni_id, pattern.to_int, offset, red, green, blue)
@@ -1486,6 +1570,7 @@ module Org::Eclipse::Swt::Internal::Cairo
       
       JNI.native_method :Java_org_eclipse_swt_internal_cairo_Cairo__1cairo_1pattern_1add_1color_1stop_1rgba, [:pointer, :long, :int64, :double, :double, :double, :double, :double], :void
       typesig { [::Java::Long, ::Java::Double, ::Java::Double, ::Java::Double, ::Java::Double, ::Java::Double] }
+      # @param pattern cast=(cairo_pattern_t *)
       # int
       def __cairo_pattern_add_color_stop_rgba(pattern, offset, red, green, blue, alpha)
         JNI.__send__(:Java_org_eclipse_swt_internal_cairo_Cairo__1cairo_1pattern_1add_1color_1stop_1rgba, JNI.env, self.jni_id, pattern.to_int, offset, red, green, blue, alpha)
@@ -1504,6 +1589,7 @@ module Org::Eclipse::Swt::Internal::Cairo
       
       JNI.native_method :Java_org_eclipse_swt_internal_cairo_Cairo__1cairo_1pattern_1create_1for_1surface, [:pointer, :long, :int64], :int64
       typesig { [::Java::Long] }
+      # @param surface cast=(cairo_surface_t *)
       # int
       # int
       def __cairo_pattern_create_for_surface(surface)
@@ -1560,6 +1646,7 @@ module Org::Eclipse::Swt::Internal::Cairo
       
       JNI.native_method :Java_org_eclipse_swt_internal_cairo_Cairo__1cairo_1pattern_1destroy, [:pointer, :long, :int64], :void
       typesig { [::Java::Long] }
+      # @param pattern cast=(cairo_pattern_t *)
       # int
       def __cairo_pattern_destroy(pattern)
         JNI.__send__(:Java_org_eclipse_swt_internal_cairo_Cairo__1cairo_1pattern_1destroy, JNI.env, self.jni_id, pattern.to_int)
@@ -1578,6 +1665,7 @@ module Org::Eclipse::Swt::Internal::Cairo
       
       JNI.native_method :Java_org_eclipse_swt_internal_cairo_Cairo__1cairo_1pattern_1get_1extend, [:pointer, :long, :int64], :int32
       typesig { [::Java::Long] }
+      # @param pattern cast=(cairo_pattern_t *)
       # int
       def __cairo_pattern_get_extend(pattern)
         JNI.__send__(:Java_org_eclipse_swt_internal_cairo_Cairo__1cairo_1pattern_1get_1extend, JNI.env, self.jni_id, pattern.to_int)
@@ -1596,6 +1684,7 @@ module Org::Eclipse::Swt::Internal::Cairo
       
       JNI.native_method :Java_org_eclipse_swt_internal_cairo_Cairo__1cairo_1pattern_1get_1filter, [:pointer, :long, :int64], :int32
       typesig { [::Java::Long] }
+      # @param pattern cast=(cairo_pattern_t *)
       # int
       def __cairo_pattern_get_filter(pattern)
         JNI.__send__(:Java_org_eclipse_swt_internal_cairo_Cairo__1cairo_1pattern_1get_1filter, JNI.env, self.jni_id, pattern.to_int)
@@ -1614,6 +1703,9 @@ module Org::Eclipse::Swt::Internal::Cairo
       
       JNI.native_method :Java_org_eclipse_swt_internal_cairo_Cairo__1cairo_1pattern_1get_1matrix, [:pointer, :long, :int64, :long], :void
       typesig { [::Java::Long, Array.typed(::Java::Double)] }
+      # @param pattern cast=(cairo_pattern_t *)
+      # @param matrix cast=(cairo_matrix_t *)
+      # 
       # int
       def __cairo_pattern_get_matrix(pattern, matrix)
         JNI.__send__(:Java_org_eclipse_swt_internal_cairo_Cairo__1cairo_1pattern_1get_1matrix, JNI.env, self.jni_id, pattern.to_int, matrix.jni_id)
@@ -1632,6 +1724,7 @@ module Org::Eclipse::Swt::Internal::Cairo
       
       JNI.native_method :Java_org_eclipse_swt_internal_cairo_Cairo__1cairo_1pattern_1reference, [:pointer, :long, :int64], :void
       typesig { [::Java::Long] }
+      # @param pattern cast=(cairo_pattern_t *)
       # int
       def __cairo_pattern_reference(pattern)
         JNI.__send__(:Java_org_eclipse_swt_internal_cairo_Cairo__1cairo_1pattern_1reference, JNI.env, self.jni_id, pattern.to_int)
@@ -1650,6 +1743,7 @@ module Org::Eclipse::Swt::Internal::Cairo
       
       JNI.native_method :Java_org_eclipse_swt_internal_cairo_Cairo__1cairo_1pattern_1set_1extend, [:pointer, :long, :int64, :int32], :void
       typesig { [::Java::Long, ::Java::Int] }
+      # @param pattern cast=(cairo_pattern_t *)
       # int
       def __cairo_pattern_set_extend(pattern, extend)
         JNI.__send__(:Java_org_eclipse_swt_internal_cairo_Cairo__1cairo_1pattern_1set_1extend, JNI.env, self.jni_id, pattern.to_int, extend.to_int)
@@ -1668,6 +1762,7 @@ module Org::Eclipse::Swt::Internal::Cairo
       
       JNI.native_method :Java_org_eclipse_swt_internal_cairo_Cairo__1cairo_1pattern_1set_1filter, [:pointer, :long, :int64, :int32], :void
       typesig { [::Java::Long, ::Java::Int] }
+      # @param pattern cast=(cairo_pattern_t *)
       # int
       def __cairo_pattern_set_filter(pattern, filter)
         JNI.__send__(:Java_org_eclipse_swt_internal_cairo_Cairo__1cairo_1pattern_1set_1filter, JNI.env, self.jni_id, pattern.to_int, filter.to_int)
@@ -1686,6 +1781,9 @@ module Org::Eclipse::Swt::Internal::Cairo
       
       JNI.native_method :Java_org_eclipse_swt_internal_cairo_Cairo__1cairo_1pattern_1set_1matrix, [:pointer, :long, :int64, :long], :void
       typesig { [::Java::Long, Array.typed(::Java::Double)] }
+      # @param pattern cast=(cairo_pattern_t *)
+      # @param matrix cast=(cairo_matrix_t *)
+      # 
       # int
       def __cairo_pattern_set_matrix(pattern, matrix)
         JNI.__send__(:Java_org_eclipse_swt_internal_cairo_Cairo__1cairo_1pattern_1set_1matrix, JNI.env, self.jni_id, pattern.to_int, matrix.jni_id)
@@ -1704,6 +1802,9 @@ module Org::Eclipse::Swt::Internal::Cairo
       
       JNI.native_method :Java_org_eclipse_swt_internal_cairo_Cairo__1cairo_1pdf_1surface_1set_1size, [:pointer, :long, :int64, :double, :double], :void
       typesig { [::Java::Long, ::Java::Double, ::Java::Double] }
+      # @method flags=dynamic
+      # @param surface cast=(cairo_surface_t *)
+      # 
       # int
       def __cairo_pdf_surface_set_size(surface, width_in_points, height_in_points)
         JNI.__send__(:Java_org_eclipse_swt_internal_cairo_Cairo__1cairo_1pdf_1surface_1set_1size, JNI.env, self.jni_id, surface.to_int, width_in_points, height_in_points)
@@ -1722,6 +1823,9 @@ module Org::Eclipse::Swt::Internal::Cairo
       
       JNI.native_method :Java_org_eclipse_swt_internal_cairo_Cairo__1cairo_1ps_1surface_1set_1size, [:pointer, :long, :int64, :double, :double], :void
       typesig { [::Java::Long, ::Java::Double, ::Java::Double] }
+      # @method flags=dynamic
+      # @param surface cast=(cairo_surface_t *)
+      # 
       # int
       def __cairo_ps_surface_set_size(surface, width_in_points, height_in_points)
         JNI.__send__(:Java_org_eclipse_swt_internal_cairo_Cairo__1cairo_1ps_1surface_1set_1size, JNI.env, self.jni_id, surface.to_int, width_in_points, height_in_points)
@@ -1740,6 +1844,7 @@ module Org::Eclipse::Swt::Internal::Cairo
       
       JNI.native_method :Java_org_eclipse_swt_internal_cairo_Cairo__1cairo_1rectangle, [:pointer, :long, :int64, :double, :double, :double, :double], :void
       typesig { [::Java::Long, ::Java::Double, ::Java::Double, ::Java::Double, ::Java::Double] }
+      # @param cr cast=(cairo_t *)
       # int
       def __cairo_rectangle(cr, x, y, width, height)
         JNI.__send__(:Java_org_eclipse_swt_internal_cairo_Cairo__1cairo_1rectangle, JNI.env, self.jni_id, cr.to_int, x, y, width, height)
@@ -1758,6 +1863,7 @@ module Org::Eclipse::Swt::Internal::Cairo
       
       JNI.native_method :Java_org_eclipse_swt_internal_cairo_Cairo__1cairo_1reference, [:pointer, :long, :int64], :int64
       typesig { [::Java::Long] }
+      # @param cr cast=(cairo_t *)
       # int
       # int
       def __cairo_reference(cr)
@@ -1778,6 +1884,7 @@ module Org::Eclipse::Swt::Internal::Cairo
       
       JNI.native_method :Java_org_eclipse_swt_internal_cairo_Cairo__1cairo_1rel_1curve_1to, [:pointer, :long, :int64, :double, :double, :double, :double, :double, :double], :void
       typesig { [::Java::Long, ::Java::Double, ::Java::Double, ::Java::Double, ::Java::Double, ::Java::Double, ::Java::Double] }
+      # @param cr cast=(cairo_t *)
       # int
       def __cairo_rel_curve_to(cr, dx1, dy1, dx2, dy2, dx3, dy3)
         JNI.__send__(:Java_org_eclipse_swt_internal_cairo_Cairo__1cairo_1rel_1curve_1to, JNI.env, self.jni_id, cr.to_int, dx1, dy1, dx2, dy2, dx3, dy3)
@@ -1796,6 +1903,7 @@ module Org::Eclipse::Swt::Internal::Cairo
       
       JNI.native_method :Java_org_eclipse_swt_internal_cairo_Cairo__1cairo_1rel_1line_1to, [:pointer, :long, :int64, :double, :double], :void
       typesig { [::Java::Long, ::Java::Double, ::Java::Double] }
+      # @param cr cast=(cairo_t *)
       # int
       def __cairo_rel_line_to(cr, dx, dy)
         JNI.__send__(:Java_org_eclipse_swt_internal_cairo_Cairo__1cairo_1rel_1line_1to, JNI.env, self.jni_id, cr.to_int, dx, dy)
@@ -1814,6 +1922,7 @@ module Org::Eclipse::Swt::Internal::Cairo
       
       JNI.native_method :Java_org_eclipse_swt_internal_cairo_Cairo__1cairo_1rel_1move_1to, [:pointer, :long, :int64, :double, :double], :void
       typesig { [::Java::Long, ::Java::Double, ::Java::Double] }
+      # @param cr cast=(cairo_t *)
       # int
       def __cairo_rel_move_to(cr, dx, dy)
         JNI.__send__(:Java_org_eclipse_swt_internal_cairo_Cairo__1cairo_1rel_1move_1to, JNI.env, self.jni_id, cr.to_int, dx, dy)
@@ -1832,6 +1941,7 @@ module Org::Eclipse::Swt::Internal::Cairo
       
       JNI.native_method :Java_org_eclipse_swt_internal_cairo_Cairo__1cairo_1reset_1clip, [:pointer, :long, :int64], :void
       typesig { [::Java::Long] }
+      # @param cr cast=(cairo_t *)
       # int
       def __cairo_reset_clip(cr)
         JNI.__send__(:Java_org_eclipse_swt_internal_cairo_Cairo__1cairo_1reset_1clip, JNI.env, self.jni_id, cr.to_int)
@@ -1850,6 +1960,7 @@ module Org::Eclipse::Swt::Internal::Cairo
       
       JNI.native_method :Java_org_eclipse_swt_internal_cairo_Cairo__1cairo_1restore, [:pointer, :long, :int64], :void
       typesig { [::Java::Long] }
+      # @param cr cast=(cairo_t *)
       # int
       def __cairo_restore(cr)
         JNI.__send__(:Java_org_eclipse_swt_internal_cairo_Cairo__1cairo_1restore, JNI.env, self.jni_id, cr.to_int)
@@ -1868,6 +1979,7 @@ module Org::Eclipse::Swt::Internal::Cairo
       
       JNI.native_method :Java_org_eclipse_swt_internal_cairo_Cairo__1cairo_1rotate, [:pointer, :long, :int64, :double], :void
       typesig { [::Java::Long, ::Java::Double] }
+      # @param cr cast=(cairo_t *)
       # int
       def __cairo_rotate(cr, angle)
         JNI.__send__(:Java_org_eclipse_swt_internal_cairo_Cairo__1cairo_1rotate, JNI.env, self.jni_id, cr.to_int, angle)
@@ -1886,6 +1998,7 @@ module Org::Eclipse::Swt::Internal::Cairo
       
       JNI.native_method :Java_org_eclipse_swt_internal_cairo_Cairo__1cairo_1save, [:pointer, :long, :int64], :void
       typesig { [::Java::Long] }
+      # @param cr cast=(cairo_t *)
       # int
       def __cairo_save(cr)
         JNI.__send__(:Java_org_eclipse_swt_internal_cairo_Cairo__1cairo_1save, JNI.env, self.jni_id, cr.to_int)
@@ -1904,6 +2017,7 @@ module Org::Eclipse::Swt::Internal::Cairo
       
       JNI.native_method :Java_org_eclipse_swt_internal_cairo_Cairo__1cairo_1scale, [:pointer, :long, :int64, :double, :double], :void
       typesig { [::Java::Long, ::Java::Double, ::Java::Double] }
+      # @param cr cast=(cairo_t *)
       # int
       def __cairo_scale(cr, sx, sy)
         JNI.__send__(:Java_org_eclipse_swt_internal_cairo_Cairo__1cairo_1scale, JNI.env, self.jni_id, cr.to_int, sx, sy)
@@ -1922,6 +2036,9 @@ module Org::Eclipse::Swt::Internal::Cairo
       
       JNI.native_method :Java_org_eclipse_swt_internal_cairo_Cairo__1cairo_1select_1font_1face, [:pointer, :long, :int64, :long, :int32, :int32], :void
       typesig { [::Java::Long, Array.typed(::Java::Byte), ::Java::Int, ::Java::Int] }
+      # @param cr cast=(cairo_t *)
+      # @param family cast=(const char *)
+      # 
       # int
       def __cairo_select_font_face(cr, family, slant, weight)
         JNI.__send__(:Java_org_eclipse_swt_internal_cairo_Cairo__1cairo_1select_1font_1face, JNI.env, self.jni_id, cr.to_int, family.jni_id, slant.to_int, weight.to_int)
@@ -1940,6 +2057,7 @@ module Org::Eclipse::Swt::Internal::Cairo
       
       JNI.native_method :Java_org_eclipse_swt_internal_cairo_Cairo__1cairo_1set_1antialias, [:pointer, :long, :int64, :int32], :void
       typesig { [::Java::Long, ::Java::Int] }
+      # @param cr cast=(cairo_t *)
       # int
       def __cairo_set_antialias(cr, antialias)
         JNI.__send__(:Java_org_eclipse_swt_internal_cairo_Cairo__1cairo_1set_1antialias, JNI.env, self.jni_id, cr.to_int, antialias.to_int)
@@ -1958,6 +2076,7 @@ module Org::Eclipse::Swt::Internal::Cairo
       
       JNI.native_method :Java_org_eclipse_swt_internal_cairo_Cairo__1cairo_1set_1dash, [:pointer, :long, :int64, :long, :int32, :double], :void
       typesig { [::Java::Long, Array.typed(::Java::Double), ::Java::Int, ::Java::Double] }
+      # @param cr cast=(cairo_t *)
       # int
       def __cairo_set_dash(cr, dashes, ndash, offset)
         JNI.__send__(:Java_org_eclipse_swt_internal_cairo_Cairo__1cairo_1set_1dash, JNI.env, self.jni_id, cr.to_int, dashes.jni_id, ndash.to_int, offset)
@@ -1976,6 +2095,7 @@ module Org::Eclipse::Swt::Internal::Cairo
       
       JNI.native_method :Java_org_eclipse_swt_internal_cairo_Cairo__1cairo_1set_1fill_1rule, [:pointer, :long, :int64, :int32], :void
       typesig { [::Java::Long, ::Java::Int] }
+      # @param cr cast=(cairo_t *)
       # int
       def __cairo_set_fill_rule(cr, fill_rule)
         JNI.__send__(:Java_org_eclipse_swt_internal_cairo_Cairo__1cairo_1set_1fill_1rule, JNI.env, self.jni_id, cr.to_int, fill_rule.to_int)
@@ -1994,6 +2114,9 @@ module Org::Eclipse::Swt::Internal::Cairo
       
       JNI.native_method :Java_org_eclipse_swt_internal_cairo_Cairo__1cairo_1set_1font_1face, [:pointer, :long, :int64, :int64], :void
       typesig { [::Java::Long, ::Java::Long] }
+      # @param cr cast=(cairo_t *)
+      # @param font_face cast=(cairo_font_face_t *)
+      # 
       # int
       # int
       def __cairo_set_font_face(cr, font_face)
@@ -2014,6 +2137,9 @@ module Org::Eclipse::Swt::Internal::Cairo
       
       JNI.native_method :Java_org_eclipse_swt_internal_cairo_Cairo__1cairo_1set_1font_1matrix, [:pointer, :long, :int64, :long], :void
       typesig { [::Java::Long, Array.typed(::Java::Double)] }
+      # @param cr cast=(cairo_t *)
+      # @param matrix cast=(cairo_matrix_t *)
+      # 
       # int
       def __cairo_set_font_matrix(cr, matrix)
         JNI.__send__(:Java_org_eclipse_swt_internal_cairo_Cairo__1cairo_1set_1font_1matrix, JNI.env, self.jni_id, cr.to_int, matrix.jni_id)
@@ -2032,6 +2158,9 @@ module Org::Eclipse::Swt::Internal::Cairo
       
       JNI.native_method :Java_org_eclipse_swt_internal_cairo_Cairo__1cairo_1set_1font_1options, [:pointer, :long, :int64, :int64], :void
       typesig { [::Java::Long, ::Java::Long] }
+      # @param cr cast=(cairo_t *)
+      # @param options cast=(cairo_font_options_t *)
+      # 
       # int
       # int
       def __cairo_set_font_options(cr, options)
@@ -2052,6 +2181,7 @@ module Org::Eclipse::Swt::Internal::Cairo
       
       JNI.native_method :Java_org_eclipse_swt_internal_cairo_Cairo__1cairo_1set_1font_1size, [:pointer, :long, :int64, :double], :void
       typesig { [::Java::Long, ::Java::Double] }
+      # @param cr cast=(cairo_t *)
       # int
       def __cairo_set_font_size(cr, size)
         JNI.__send__(:Java_org_eclipse_swt_internal_cairo_Cairo__1cairo_1set_1font_1size, JNI.env, self.jni_id, cr.to_int, size)
@@ -2070,6 +2200,7 @@ module Org::Eclipse::Swt::Internal::Cairo
       
       JNI.native_method :Java_org_eclipse_swt_internal_cairo_Cairo__1cairo_1set_1line_1cap, [:pointer, :long, :int64, :int32], :void
       typesig { [::Java::Long, ::Java::Int] }
+      # @param cr cast=(cairo_t *)
       # int
       def __cairo_set_line_cap(cr, line_cap)
         JNI.__send__(:Java_org_eclipse_swt_internal_cairo_Cairo__1cairo_1set_1line_1cap, JNI.env, self.jni_id, cr.to_int, line_cap.to_int)
@@ -2088,6 +2219,7 @@ module Org::Eclipse::Swt::Internal::Cairo
       
       JNI.native_method :Java_org_eclipse_swt_internal_cairo_Cairo__1cairo_1set_1line_1join, [:pointer, :long, :int64, :int32], :void
       typesig { [::Java::Long, ::Java::Int] }
+      # @param cr cast=(cairo_t *)
       # int
       def __cairo_set_line_join(cr, line_join)
         JNI.__send__(:Java_org_eclipse_swt_internal_cairo_Cairo__1cairo_1set_1line_1join, JNI.env, self.jni_id, cr.to_int, line_join.to_int)
@@ -2106,6 +2238,7 @@ module Org::Eclipse::Swt::Internal::Cairo
       
       JNI.native_method :Java_org_eclipse_swt_internal_cairo_Cairo__1cairo_1set_1line_1width, [:pointer, :long, :int64, :double], :void
       typesig { [::Java::Long, ::Java::Double] }
+      # @param cr cast=(cairo_t *)
       # int
       def __cairo_set_line_width(cr, width)
         JNI.__send__(:Java_org_eclipse_swt_internal_cairo_Cairo__1cairo_1set_1line_1width, JNI.env, self.jni_id, cr.to_int, width)
@@ -2124,6 +2257,9 @@ module Org::Eclipse::Swt::Internal::Cairo
       
       JNI.native_method :Java_org_eclipse_swt_internal_cairo_Cairo__1cairo_1set_1matrix, [:pointer, :long, :int64, :long], :void
       typesig { [::Java::Long, Array.typed(::Java::Double)] }
+      # @param cr cast=(cairo_t *)
+      # @param matrix cast=(cairo_matrix_t *)
+      # 
       # int
       def __cairo_set_matrix(cr, matrix)
         JNI.__send__(:Java_org_eclipse_swt_internal_cairo_Cairo__1cairo_1set_1matrix, JNI.env, self.jni_id, cr.to_int, matrix.jni_id)
@@ -2142,6 +2278,7 @@ module Org::Eclipse::Swt::Internal::Cairo
       
       JNI.native_method :Java_org_eclipse_swt_internal_cairo_Cairo__1cairo_1set_1miter_1limit, [:pointer, :long, :int64, :double], :void
       typesig { [::Java::Long, ::Java::Double] }
+      # @param cr cast=(cairo_t *)
       # int
       def __cairo_set_miter_limit(cr, limit)
         JNI.__send__(:Java_org_eclipse_swt_internal_cairo_Cairo__1cairo_1set_1miter_1limit, JNI.env, self.jni_id, cr.to_int, limit)
@@ -2160,6 +2297,7 @@ module Org::Eclipse::Swt::Internal::Cairo
       
       JNI.native_method :Java_org_eclipse_swt_internal_cairo_Cairo__1cairo_1set_1operator, [:pointer, :long, :int64, :int32], :void
       typesig { [::Java::Long, ::Java::Int] }
+      # @param cr cast=(cairo_t *)
       # int
       def __cairo_set_operator(cr, op)
         JNI.__send__(:Java_org_eclipse_swt_internal_cairo_Cairo__1cairo_1set_1operator, JNI.env, self.jni_id, cr.to_int, op.to_int)
@@ -2178,6 +2316,9 @@ module Org::Eclipse::Swt::Internal::Cairo
       
       JNI.native_method :Java_org_eclipse_swt_internal_cairo_Cairo__1cairo_1set_1source, [:pointer, :long, :int64, :int64], :void
       typesig { [::Java::Long, ::Java::Long] }
+      # @param cr cast=(cairo_t *)
+      # @param source cast=(cairo_pattern_t *)
+      # 
       # int
       # int
       def __cairo_set_source(cr, source)
@@ -2198,6 +2339,7 @@ module Org::Eclipse::Swt::Internal::Cairo
       
       JNI.native_method :Java_org_eclipse_swt_internal_cairo_Cairo__1cairo_1set_1source_1rgb, [:pointer, :long, :int64, :double, :double, :double], :void
       typesig { [::Java::Long, ::Java::Double, ::Java::Double, ::Java::Double] }
+      # @param cr cast=(cairo_t *)
       # int
       def __cairo_set_source_rgb(cr, red, green, blue)
         JNI.__send__(:Java_org_eclipse_swt_internal_cairo_Cairo__1cairo_1set_1source_1rgb, JNI.env, self.jni_id, cr.to_int, red, green, blue)
@@ -2216,6 +2358,7 @@ module Org::Eclipse::Swt::Internal::Cairo
       
       JNI.native_method :Java_org_eclipse_swt_internal_cairo_Cairo__1cairo_1set_1source_1rgba, [:pointer, :long, :int64, :double, :double, :double, :double], :void
       typesig { [::Java::Long, ::Java::Double, ::Java::Double, ::Java::Double, ::Java::Double] }
+      # @param cr cast=(cairo_t *)
       # int
       def __cairo_set_source_rgba(cr, red, green, blue, alpha)
         JNI.__send__(:Java_org_eclipse_swt_internal_cairo_Cairo__1cairo_1set_1source_1rgba, JNI.env, self.jni_id, cr.to_int, red, green, blue, alpha)
@@ -2234,6 +2377,9 @@ module Org::Eclipse::Swt::Internal::Cairo
       
       JNI.native_method :Java_org_eclipse_swt_internal_cairo_Cairo__1cairo_1set_1source_1surface, [:pointer, :long, :int64, :int64, :double, :double], :void
       typesig { [::Java::Long, ::Java::Long, ::Java::Double, ::Java::Double] }
+      # @param cr cast=(cairo_t *)
+      # @param surface cast=(cairo_surface_t *)
+      # 
       # int
       # int
       def __cairo_set_source_surface(cr, surface, x, y)
@@ -2254,6 +2400,7 @@ module Org::Eclipse::Swt::Internal::Cairo
       
       JNI.native_method :Java_org_eclipse_swt_internal_cairo_Cairo__1cairo_1set_1tolerance, [:pointer, :long, :int64, :double], :void
       typesig { [::Java::Long, ::Java::Double] }
+      # @param cr cast=(cairo_t *)
       # int
       def __cairo_set_tolerance(cr, tolerance)
         JNI.__send__(:Java_org_eclipse_swt_internal_cairo_Cairo__1cairo_1set_1tolerance, JNI.env, self.jni_id, cr.to_int, tolerance)
@@ -2272,6 +2419,9 @@ module Org::Eclipse::Swt::Internal::Cairo
       
       JNI.native_method :Java_org_eclipse_swt_internal_cairo_Cairo__1cairo_1show_1glyphs, [:pointer, :long, :int64, :int64, :int32], :void
       typesig { [::Java::Long, ::Java::Long, ::Java::Int] }
+      # @param cr cast=(cairo_t *)
+      # @param glyphs cast=(cairo_glyph_t *)
+      # 
       # int
       # int
       def __cairo_show_glyphs(cr, glyphs, num_glyphs)
@@ -2292,6 +2442,7 @@ module Org::Eclipse::Swt::Internal::Cairo
       
       JNI.native_method :Java_org_eclipse_swt_internal_cairo_Cairo__1cairo_1show_1page, [:pointer, :long, :int64], :void
       typesig { [::Java::Long] }
+      # @param cr cast=(cairo_t *)
       # int
       def __cairo_show_page(cr)
         JNI.__send__(:Java_org_eclipse_swt_internal_cairo_Cairo__1cairo_1show_1page, JNI.env, self.jni_id, cr.to_int)
@@ -2310,6 +2461,9 @@ module Org::Eclipse::Swt::Internal::Cairo
       
       JNI.native_method :Java_org_eclipse_swt_internal_cairo_Cairo__1cairo_1show_1text, [:pointer, :long, :int64, :long], :void
       typesig { [::Java::Long, Array.typed(::Java::Byte)] }
+      # @param cr cast=(cairo_t *)
+      # @param utf8 cast=(const char *)
+      # 
       # int
       def __cairo_show_text(cr, utf8)
         JNI.__send__(:Java_org_eclipse_swt_internal_cairo_Cairo__1cairo_1show_1text, JNI.env, self.jni_id, cr.to_int, utf8.jni_id)
@@ -2328,6 +2482,7 @@ module Org::Eclipse::Swt::Internal::Cairo
       
       JNI.native_method :Java_org_eclipse_swt_internal_cairo_Cairo__1cairo_1status, [:pointer, :long, :int64], :int32
       typesig { [::Java::Long] }
+      # @param cr cast=(cairo_t *)
       # int
       def __cairo_status(cr)
         JNI.__send__(:Java_org_eclipse_swt_internal_cairo_Cairo__1cairo_1status, JNI.env, self.jni_id, cr.to_int)
@@ -2364,6 +2519,7 @@ module Org::Eclipse::Swt::Internal::Cairo
       
       JNI.native_method :Java_org_eclipse_swt_internal_cairo_Cairo__1cairo_1stroke, [:pointer, :long, :int64], :void
       typesig { [::Java::Long] }
+      # @param cr cast=(cairo_t *)
       # int
       def __cairo_stroke(cr)
         JNI.__send__(:Java_org_eclipse_swt_internal_cairo_Cairo__1cairo_1stroke, JNI.env, self.jni_id, cr.to_int)
@@ -2382,6 +2538,7 @@ module Org::Eclipse::Swt::Internal::Cairo
       
       JNI.native_method :Java_org_eclipse_swt_internal_cairo_Cairo__1cairo_1stroke_1extents, [:pointer, :long, :int64, :long, :long, :long, :long], :void
       typesig { [::Java::Long, Array.typed(::Java::Double), Array.typed(::Java::Double), Array.typed(::Java::Double), Array.typed(::Java::Double)] }
+      # @param cr cast=(cairo_t *)
       # int
       def __cairo_stroke_extents(cr, x1, y1, x2, y2)
         JNI.__send__(:Java_org_eclipse_swt_internal_cairo_Cairo__1cairo_1stroke_1extents, JNI.env, self.jni_id, cr.to_int, x1.jni_id, y1.jni_id, x2.jni_id, y2.jni_id)
@@ -2400,6 +2557,7 @@ module Org::Eclipse::Swt::Internal::Cairo
       
       JNI.native_method :Java_org_eclipse_swt_internal_cairo_Cairo__1cairo_1stroke_1preserve, [:pointer, :long, :int64], :void
       typesig { [::Java::Long] }
+      # @param cr cast=(cairo_t *)
       # int
       def __cairo_stroke_preserve(cr)
         JNI.__send__(:Java_org_eclipse_swt_internal_cairo_Cairo__1cairo_1stroke_1preserve, JNI.env, self.jni_id, cr.to_int)
@@ -2418,6 +2576,7 @@ module Org::Eclipse::Swt::Internal::Cairo
       
       JNI.native_method :Java_org_eclipse_swt_internal_cairo_Cairo__1cairo_1surface_1create_1similar, [:pointer, :long, :int64, :int32, :int32, :int32], :int64
       typesig { [::Java::Long, ::Java::Int, ::Java::Int, ::Java::Int] }
+      # @param other cast=(cairo_surface_t *)
       # int
       # int
       def __cairo_surface_create_similar(other, format, width, height)
@@ -2438,6 +2597,7 @@ module Org::Eclipse::Swt::Internal::Cairo
       
       JNI.native_method :Java_org_eclipse_swt_internal_cairo_Cairo__1cairo_1surface_1destroy, [:pointer, :long, :int64], :void
       typesig { [::Java::Long] }
+      # @param surface cast=(cairo_surface_t *)
       # int
       def __cairo_surface_destroy(surface)
         JNI.__send__(:Java_org_eclipse_swt_internal_cairo_Cairo__1cairo_1surface_1destroy, JNI.env, self.jni_id, surface.to_int)
@@ -2456,6 +2616,7 @@ module Org::Eclipse::Swt::Internal::Cairo
       
       JNI.native_method :Java_org_eclipse_swt_internal_cairo_Cairo__1cairo_1surface_1finish, [:pointer, :long, :int64], :void
       typesig { [::Java::Long] }
+      # @param surface cast=(cairo_surface_t *)
       # int
       def __cairo_surface_finish(surface)
         JNI.__send__(:Java_org_eclipse_swt_internal_cairo_Cairo__1cairo_1surface_1finish, JNI.env, self.jni_id, surface.to_int)
@@ -2474,6 +2635,9 @@ module Org::Eclipse::Swt::Internal::Cairo
       
       JNI.native_method :Java_org_eclipse_swt_internal_cairo_Cairo__1cairo_1surface_1get_1type, [:pointer, :long, :int64], :int32
       typesig { [::Java::Long] }
+      # @method flags=dynamic
+      # @param surface cast=(cairo_surface_t *)
+      # 
       # int
       def __cairo_surface_get_type(surface)
         JNI.__send__(:Java_org_eclipse_swt_internal_cairo_Cairo__1cairo_1surface_1get_1type, JNI.env, self.jni_id, surface.to_int)
@@ -2492,6 +2656,9 @@ module Org::Eclipse::Swt::Internal::Cairo
       
       JNI.native_method :Java_org_eclipse_swt_internal_cairo_Cairo__1cairo_1surface_1get_1user_1data, [:pointer, :long, :int64, :int64], :int64
       typesig { [::Java::Long, ::Java::Long] }
+      # @param surface cast=(cairo_surface_t *)
+      # @param key cast=(cairo_user_data_key_t *)
+      # 
       # int
       # int
       # int
@@ -2514,6 +2681,7 @@ module Org::Eclipse::Swt::Internal::Cairo
       
       JNI.native_method :Java_org_eclipse_swt_internal_cairo_Cairo__1cairo_1surface_1reference, [:pointer, :long, :int64], :void
       typesig { [::Java::Long] }
+      # @param surface cast=(cairo_surface_t *)
       # int
       def __cairo_surface_reference(surface)
         JNI.__send__(:Java_org_eclipse_swt_internal_cairo_Cairo__1cairo_1surface_1reference, JNI.env, self.jni_id, surface.to_int)
@@ -2532,6 +2700,7 @@ module Org::Eclipse::Swt::Internal::Cairo
       
       JNI.native_method :Java_org_eclipse_swt_internal_cairo_Cairo__1cairo_1surface_1set_1device_1offset, [:pointer, :long, :int64, :double, :double], :void
       typesig { [::Java::Long, ::Java::Double, ::Java::Double] }
+      # @param surface cast=(cairo_surface_t *)
       # int
       def __cairo_surface_set_device_offset(surface, x_offset, y_offset)
         JNI.__send__(:Java_org_eclipse_swt_internal_cairo_Cairo__1cairo_1surface_1set_1device_1offset, JNI.env, self.jni_id, surface.to_int, x_offset, y_offset)
@@ -2550,6 +2719,7 @@ module Org::Eclipse::Swt::Internal::Cairo
       
       JNI.native_method :Java_org_eclipse_swt_internal_cairo_Cairo__1cairo_1surface_1set_1fallback_1resolution, [:pointer, :long, :int64, :double, :double], :void
       typesig { [::Java::Long, ::Java::Double, ::Java::Double] }
+      # @method flags=dynamic
       # int
       def __cairo_surface_set_fallback_resolution(surface, x_pixels_per_inch, y_pixels_per_inch)
         JNI.__send__(:Java_org_eclipse_swt_internal_cairo_Cairo__1cairo_1surface_1set_1fallback_1resolution, JNI.env, self.jni_id, surface.to_int, x_pixels_per_inch, y_pixels_per_inch)
@@ -2568,6 +2738,11 @@ module Org::Eclipse::Swt::Internal::Cairo
       
       JNI.native_method :Java_org_eclipse_swt_internal_cairo_Cairo__1cairo_1surface_1set_1user_1data, [:pointer, :long, :int64, :int64, :int64, :int64], :int32
       typesig { [::Java::Long, ::Java::Long, ::Java::Long, ::Java::Long] }
+      # @param surface cast=(cairo_surface_t *)
+      # @param key cast=(cairo_user_data_key_t *)
+      # @param user_data cast=(void *)
+      # @param destroy cast=(cairo_destroy_func_t)
+      # 
       # int
       # int
       # int
@@ -2592,6 +2767,10 @@ module Org::Eclipse::Swt::Internal::Cairo
       
       JNI.native_method :Java_org_eclipse_swt_internal_cairo_Cairo__1cairo_1text_1extents, [:pointer, :long, :int64, :long, :long], :void
       typesig { [::Java::Long, Array.typed(::Java::Byte), Cairo_text_extents_t] }
+      # @param cr cast=(cairo_t *)
+      # @param utf8 cast=(const char *)
+      # @param extents cast=(cairo_text_extents_t *)
+      # 
       # int
       def __cairo_text_extents(cr, utf8, extents)
         JNI.__send__(:Java_org_eclipse_swt_internal_cairo_Cairo__1cairo_1text_1extents, JNI.env, self.jni_id, cr.to_int, utf8.jni_id, extents.jni_id)
@@ -2610,6 +2789,9 @@ module Org::Eclipse::Swt::Internal::Cairo
       
       JNI.native_method :Java_org_eclipse_swt_internal_cairo_Cairo__1cairo_1text_1path, [:pointer, :long, :int64, :long], :void
       typesig { [::Java::Long, Array.typed(::Java::Byte)] }
+      # @param cr cast=(cairo_t *)
+      # @param utf8 cast=(const char *)
+      # 
       # int
       def __cairo_text_path(cr, utf8)
         JNI.__send__(:Java_org_eclipse_swt_internal_cairo_Cairo__1cairo_1text_1path, JNI.env, self.jni_id, cr.to_int, utf8.jni_id)
@@ -2628,6 +2810,9 @@ module Org::Eclipse::Swt::Internal::Cairo
       
       JNI.native_method :Java_org_eclipse_swt_internal_cairo_Cairo__1cairo_1transform, [:pointer, :long, :int64, :long], :void
       typesig { [::Java::Long, Array.typed(::Java::Double)] }
+      # @param cr cast=(cairo_t *)
+      # @param matrix cast=(cairo_matrix_t *)
+      # 
       # int
       def __cairo_transform(cr, matrix)
         JNI.__send__(:Java_org_eclipse_swt_internal_cairo_Cairo__1cairo_1transform, JNI.env, self.jni_id, cr.to_int, matrix.jni_id)
@@ -2646,6 +2831,7 @@ module Org::Eclipse::Swt::Internal::Cairo
       
       JNI.native_method :Java_org_eclipse_swt_internal_cairo_Cairo__1cairo_1translate, [:pointer, :long, :int64, :double, :double], :void
       typesig { [::Java::Long, ::Java::Double, ::Java::Double] }
+      # @param cr cast=(cairo_t *)
       # int
       def __cairo_translate(cr, tx, ty)
         JNI.__send__(:Java_org_eclipse_swt_internal_cairo_Cairo__1cairo_1translate, JNI.env, self.jni_id, cr.to_int, tx, ty)
@@ -2664,6 +2850,7 @@ module Org::Eclipse::Swt::Internal::Cairo
       
       JNI.native_method :Java_org_eclipse_swt_internal_cairo_Cairo__1cairo_1user_1to_1device, [:pointer, :long, :int64, :long, :long], :void
       typesig { [::Java::Long, Array.typed(::Java::Double), Array.typed(::Java::Double)] }
+      # @param cr cast=(cairo_t *)
       # int
       def __cairo_user_to_device(cr, x, y)
         JNI.__send__(:Java_org_eclipse_swt_internal_cairo_Cairo__1cairo_1user_1to_1device, JNI.env, self.jni_id, cr.to_int, x.jni_id, y.jni_id)
@@ -2682,6 +2869,7 @@ module Org::Eclipse::Swt::Internal::Cairo
       
       JNI.native_method :Java_org_eclipse_swt_internal_cairo_Cairo__1cairo_1user_1to_1device_1distance, [:pointer, :long, :int64, :long, :long], :void
       typesig { [::Java::Long, Array.typed(::Java::Double), Array.typed(::Java::Double)] }
+      # @param cr cast=(cairo_t *)
       # int
       def __cairo_user_to_device_distance(cr, dx, dy)
         JNI.__send__(:Java_org_eclipse_swt_internal_cairo_Cairo__1cairo_1user_1to_1device_1distance, JNI.env, self.jni_id, cr.to_int, dx.jni_id, dy.jni_id)
@@ -2706,6 +2894,10 @@ module Org::Eclipse::Swt::Internal::Cairo
       
       JNI.native_method :Java_org_eclipse_swt_internal_cairo_Cairo__1cairo_1xlib_1surface_1create, [:pointer, :long, :int64, :int64, :int64, :int32, :int32], :int64
       typesig { [::Java::Long, ::Java::Long, ::Java::Long, ::Java::Int, ::Java::Int] }
+      # @param dpy cast=(Display *)
+      # @param drawable cast=(Drawable)
+      # @param visual cast=(Visual *)
+      # 
       # int
       # int
       # int
@@ -2730,6 +2922,10 @@ module Org::Eclipse::Swt::Internal::Cairo
       
       JNI.native_method :Java_org_eclipse_swt_internal_cairo_Cairo__1cairo_1xlib_1surface_1create_1for_1bitmap, [:pointer, :long, :int64, :int64, :int64, :int32, :int32], :int64
       typesig { [::Java::Long, ::Java::Long, ::Java::Long, ::Java::Int, ::Java::Int] }
+      # @param dpy cast=(Display *)
+      # @param pixmap cast=(Pixmap)
+      # @param screen cast=(Screen *)
+      # 
       # int
       # int
       # int
@@ -2754,6 +2950,7 @@ module Org::Eclipse::Swt::Internal::Cairo
       
       JNI.native_method :Java_org_eclipse_swt_internal_cairo_Cairo__1cairo_1xlib_1surface_1set_1size, [:pointer, :long, :int64, :int32, :int32], :void
       typesig { [::Java::Long, ::Java::Int, ::Java::Int] }
+      # @param surface cast=(cairo_surface_t *)
       # int
       def __cairo_xlib_surface_set_size(surface, width, height)
         JNI.__send__(:Java_org_eclipse_swt_internal_cairo_Cairo__1cairo_1xlib_1surface_1set_1size, JNI.env, self.jni_id, surface.to_int, width.to_int, height.to_int)
@@ -2772,6 +2969,10 @@ module Org::Eclipse::Swt::Internal::Cairo
       
       JNI.native_method "Java_org_eclipse_swt_internal_cairo_Cairo_memmove__L#{Cairo_path_t.jni_name}_2JJ".to_sym, [:pointer, :long, :long, :int64, :int64], :void
       typesig { [Cairo_path_t, ::Java::Long, ::Java::Long] }
+      # @param dest cast=(void *)
+      # @param src cast=(const void *)
+      # @param size cast=(size_t)
+      # 
       # int
       # int
       def memmove(dest, src, size)
@@ -2780,6 +2981,10 @@ module Org::Eclipse::Swt::Internal::Cairo
       
       JNI.native_method "Java_org_eclipse_swt_internal_cairo_Cairo_memmove__L#{Cairo_path_data_t.jni_name}_2JJ".to_sym, [:pointer, :long, :long, :int64, :int64], :void
       typesig { [Cairo_path_data_t, ::Java::Long, ::Java::Long] }
+      # @param dest cast=(void *)
+      # @param src cast=(const void *)
+      # @param size cast=(size_t)
+      # 
       # int
       # int
       def memmove(dest, src, size)
@@ -2788,6 +2993,10 @@ module Org::Eclipse::Swt::Internal::Cairo
       
       JNI.native_method :Java_org_eclipse_swt_internal_cairo_Cairo_memmove___3XdoubleXJJ, [:pointer, :long, :long, :int64, :int64], :void
       typesig { [Array.typed(::Java::Double), ::Java::Long, ::Java::Long] }
+      # @param dest cast=(void *)
+      # @param src cast=(const void *)
+      # @param size cast=(size_t)
+      # 
       # int
       # int
       def memmove(dest, src, size)

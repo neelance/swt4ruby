@@ -1,6 +1,6 @@
 require "rjava"
 
-# Copyright (c) 2000, 2006 IBM Corporation and others.
+# Copyright (c) 2000, 2008 IBM Corporation and others.
 # All rights reserved. This program and the accompanying materials
 # are made available under the terms of the Eclipse Public License v1.0
 # which accompanies this distribution, and is available at
@@ -19,12 +19,14 @@ module Org::Eclipse::Swt::Internal::Ole::Win32
   class FORMATETC 
     include_class_members FORMATETCImports
     
+    # @field cast=(CLIPFORMAT)
     attr_accessor :cf_format
     alias_method :attr_cf_format, :cf_format
     undef_method :cf_format
     alias_method :attr_cf_format=, :cf_format=
     undef_method :cf_format=
     
+    # @field cast=(DVTARGETDEVICE *)
     # long
     attr_accessor :ptd
     alias_method :attr_ptd, :ptd

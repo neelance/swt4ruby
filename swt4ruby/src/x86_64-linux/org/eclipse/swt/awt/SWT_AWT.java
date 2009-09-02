@@ -26,12 +26,16 @@ import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Event;
 
 /* AWT Imports */
+import java.awt.AWTEvent;
 import java.awt.Dimension;
 import java.awt.EventQueue;
 import java.awt.Canvas;
 import java.awt.Frame;
+import java.awt.Window;
+import java.awt.event.AWTEventListener;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
+import java.awt.event.ComponentListener;
 import java.awt.event.WindowEvent;
 
 
@@ -60,7 +64,7 @@ public class SWT_AWT {
 
 static boolean loaded, swingInitialized;
 
-static native final long /*int*/ getAWTHandle (Canvas canvas);
+static native final long /*int*/ getAWTHandle (Object canvas);
 static native final void setDebug (Frame canvas, boolean debug);
 
 static synchronized void loadLibrary () {
@@ -186,6 +190,27 @@ public static Frame new_Frame (final Composite parent) {
 		Method method = clazz.getMethod("registerListeners", null);
 		if (method != null) method.invoke(value, null);
 	} catch (Throwable e) {}
+	final AWTEventListener awtListener = new AWTEventListener() {
+		public void eventDispatched(AWTEvent event) {
+			if (event.getID() == WindowEvent.WINDOW_OPENED) {
+				final Window window = (Window) event.getSource();
+				if (window.getParent() == frame) {
+					parent.getDisplay().asyncExec(new Runnable() {
+						public void run() {
+							if (parent.isDisposed()) return;
+							Shell shell = parent.getShell();
+							loadLibrary();
+							long /*int*/ awtHandle = getAWTHandle(window);
+							if (awtHandle == 0) return;
+							long /*int*/ xWindow = OS.gdk_x11_drawable_get_xid(OS.GTK_WIDGET_WINDOW(OS.gtk_widget_get_toplevel(shell.handle)));
+							OS.XSetTransientForHint(OS.GDK_DISPLAY(), awtHandle, xWindow);
+						}
+					});
+				}
+			}
+		}
+	};
+	frame.getToolkit().addAWTEventListener(awtListener, AWTEvent.WINDOW_EVENT_MASK);
 	final Listener shellListener = new Listener () {
 		public void handleEvent (Event e) {
 			switch (e.type) {
@@ -220,6 +245,7 @@ public static Frame new_Frame (final Composite parent) {
 					parent.setVisible(false);
 					EventQueue.invokeLater(new Runnable () {
 						public void run () {
+							frame.getToolkit().removeAWTEventListener(awtListener);
 							frame.dispose ();
 						}
 					});
@@ -284,14 +310,21 @@ public static Shell new_Shell (final Display display, final Canvas parent) {
 	if (handle == 0) SWT.error (SWT.ERROR_INVALID_ARGUMENT, null, " [peer not created]");
 
 	final Shell shell = Shell.gtk_new (display, handle);
-	parent.addComponentListener(new ComponentAdapter () {
+	final ComponentListener listener = new ComponentAdapter () {
 		public void componentResized (ComponentEvent e) {
 			display.syncExec (new Runnable () {
 				public void run () {
+					if (shell.isDisposed()) return;
 					Dimension dim = parent.getSize ();
 					shell.setSize (dim.width, dim.height);
 				}
 			});
+		}
+	};
+	parent.addComponentListener(listener);
+	shell.addListener(SWT.Dispose, new Listener() {
+		public void handleEvent(Event event) {
+			parent.removeComponentListener(listener);
 		}
 	});
 	shell.setVisible (true);

@@ -1,6 +1,6 @@
 require "rjava"
 
-# Copyright (c) 2000, 2007 IBM Corporation and others.
+# Copyright (c) 2000, 2008 IBM Corporation and others.
 # All rights reserved. This program and the accompanying materials
 # are made available under the terms of the Eclipse Public License v1.0
 # which accompanies this distribution, and is available at
@@ -74,6 +74,12 @@ module Org::Eclipse::Swt::Custom
     alias_method :attr_size_image=, :size_image=
     undef_method :size_image=
     
+    attr_accessor :listener
+    alias_method :attr_listener, :listener
+    undef_method :listener
+    alias_method :attr_listener=, :listener=
+    undef_method :listener=
+    
     # TableTreeItems are not treated as children but rather as items.
     # When the TableTree is disposed, all children are disposed because
     # TableTree inherits this behaviour from Composite.  The items
@@ -140,6 +146,7 @@ module Org::Eclipse::Swt::Custom
       @plus_image = nil
       @minus_image = nil
       @size_image = nil
+      @listener = nil
       @in_dispose = false
       super(parent, check_style(style))
       @items = EMPTY_ITEMS
@@ -178,7 +185,7 @@ module Org::Eclipse::Swt::Custom
         @table.add_listener(table_events[i], table_listener)
         i += 1
       end
-      listener = Class.new(Listener.class == Class ? Listener : Object) do
+      @listener = Class.new(Listener.class == Class ? Listener : Object) do
         extend LocalClass
         include_class_members TableTree
         include Listener if Listener.class == Module
@@ -206,7 +213,7 @@ module Org::Eclipse::Swt::Custom
       events = Array.typed(::Java::Int).new([SWT::Dispose, SWT::Resize, SWT::FocusIn])
       i_ = 0
       while i_ < events.attr_length
-        add_listener(events[i_], listener)
+        add_listener(events[i_], @listener)
         i_ += 1
       end
     end
@@ -549,6 +556,9 @@ module Org::Eclipse::Swt::Custom
     
     typesig { [Event] }
     def on_dispose(e)
+      remove_listener(SWT::Dispose, @listener)
+      notify_listeners(SWT::Dispose, e)
+      e.attr_type = SWT::None
       # Usually when an item is disposed, destroyItem will change the size of the items array
       # and dispose of the underlying table items.
       # Since the whole table tree is being disposed, this is not necessary.  For speed

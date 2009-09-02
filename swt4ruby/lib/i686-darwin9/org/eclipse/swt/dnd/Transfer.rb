@@ -32,6 +32,19 @@ module Org::Eclipse::Swt::Dnd
   class Transfer 
     include_class_members TransferImports
     
+    class_module.module_eval {
+      
+      def types
+        defined?(@@types) ? @@types : @@types= Array.typed(String).new(4) { nil }
+      end
+      alias_method :attr_types, :types
+      
+      def types=(value)
+        @@types = value
+      end
+      alias_method :attr_types=, :types=
+    }
+    
     typesig { [] }
     # Returns a list of the platform specific data types that can be converted using
     # this transfer agent.
@@ -141,25 +154,22 @@ module Org::Eclipse::Swt::Dnd
       # 
       # @return the unique identifier associated with this data type
       def register_type(format_name)
-        length_ = format_name.length
-        # TODO - hashcode may not be unique - need another way
-        if (length_ > 4)
-          return format_name.hash_code
+        # Note the type 0 is not used
+        index = 1
+        while (index < self.attr_types.attr_length)
+          type = self.attr_types[index]
+          if (!(type).nil? && (format_name == type))
+            return index
+          end
+          index += 1
         end
-        type = 0
-        if (length_ > 0)
-          type |= (format_name.char_at(0) & 0xff) << 24
+        if ((index).equal?(self.attr_types.attr_length))
+          new_types = Array.typed(String).new(self.attr_types.attr_length + 4) { nil }
+          System.arraycopy(self.attr_types, 0, new_types, 0, self.attr_types.attr_length)
+          self.attr_types = new_types
         end
-        if (length_ > 1)
-          type |= (format_name.char_at(1) & 0xff) << 16
-        end
-        if (length_ > 2)
-          type |= (format_name.char_at(2) & 0xff) << 8
-        end
-        if (length_ > 3)
-          type |= format_name.char_at(3) & 0xff
-        end
-        return type
+        self.attr_types[index] = format_name
+        return index
       end
     }
     

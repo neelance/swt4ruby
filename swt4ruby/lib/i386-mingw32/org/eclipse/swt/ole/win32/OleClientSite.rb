@@ -1,6 +1,6 @@
 require "rjava"
 
-# Copyright (c) 2000, 2008 IBM Corporation and others.
+# Copyright (c) 2000, 2009 IBM Corporation and others.
 # All rights reserved. This program and the accompanying materials
 # are made available under the terms of the Eclipse Public License v1.0
 # which accompanies this distribution, and is available at
@@ -644,7 +644,21 @@ module Org::Eclipse::Swt::Ole::Win32
         OLE.error(OLE::ERROR_INTERFACE_NOT_FOUND, result)
       end
       @obj_iole_object = IOleObject.new(ppv_object[0])
-      @obj_iole_object._set_client_site(@i_ole_client_site.get_address)
+      # Feature in Windows. Despite the fact that the clientSite was provided during the
+      # creation of the OleObject (which is required by WMP11 - see bug 173556),
+      # some applications choose to ignore this optional parameter (see bug 211663)
+      # during OleCreate. The fix is to check whether the clientSite has already been set
+      # and set it. Note that setting it twice can result in assert failures.
+      # 
+      # long
+      # long
+      ppv_client_site = Array.typed(::Java::Int).new(1) { 0 }
+      result = @obj_iole_object._get_client_site(ppv_client_site)
+      if ((ppv_client_site[0]).equal?(0))
+        @obj_iole_object._set_client_site(@i_ole_client_site.get_address)
+      else
+        _release # GetClientSite performs an AddRef so we must release it.
+      end
       pdw_connection = Array.typed(::Java::Int).new(1) { 0 }
       @obj_iole_object._advise(@i_advise_sink.get_address, pdw_connection)
       @obj_iole_object._set_host_names("main", "main") # $NON-NLS-1$ //$NON-NLS-2$
@@ -1372,7 +1386,7 @@ module Org::Eclipse::Swt::Ole::Win32
       if (!(@obj_iole_object._query_interface(COM::IIDIPersistFile, address)).equal?(COM::S_OK))
         return true
       end
-      perm_storage = IPersistStorage.new(address[0])
+      perm_storage = IPersistFile.new(address[0])
       # Are the contents of the permanent storage different from the file?
       result = perm_storage._is_dirty
       perm_storage._release
@@ -1404,6 +1418,24 @@ module Org::Eclipse::Swt::Ole::Win32
     end
     
     typesig { [] }
+    def is_office2007
+      program_id = get_program_id
+      if ((program_id).nil?)
+        return false
+      end
+      if ((program_id == "Word.Document.12"))
+        return true
+      end # $NON-NLS-1$
+      if ((program_id == "Excel.Sheet.12"))
+        return true
+      end # $NON-NLS-1$
+      if ((program_id == "PowerPoint.Show.12"))
+        return true
+      end # $NON-NLS-1$
+      return false
+    end
+    
+    typesig { [] }
     def _on_close
       return COM::S_OK
     end
@@ -1418,18 +1450,19 @@ module Org::Eclipse::Swt::Ole::Win32
     typesig { [Event] }
     def on_dispose(e)
       @in_dispose = true
+      # remove listeners
+      remove_listener(SWT::Dispose, @listener)
+      remove_listener(SWT::FocusIn, @listener)
+      remove_listener(SWT::FocusOut, @listener)
+      remove_listener(SWT::Paint, @listener)
+      remove_listener(SWT::Traverse, @listener)
+      remove_listener(SWT::KeyDown, @listener)
       if (!(@state).equal?(STATE_NONE))
         do_verb(OLE::OLEIVERB_DISCARDUNDOSTATE)
       end
       deactivate_in_place_client
       release_object_interfaces # Note, must release object interfaces before releasing frame
       delete_temp_storage
-      # remove listeners
-      remove_listener(SWT::Dispose, @listener)
-      remove_listener(SWT::FocusIn, @listener)
-      remove_listener(SWT::Paint, @listener)
-      remove_listener(SWT::Traverse, @listener)
-      remove_listener(SWT::KeyDown, @listener)
       @frame.remove_listener(SWT::Resize, @listener)
       @frame.remove_listener(SWT::Move, @listener)
       @frame._release
@@ -1442,7 +1475,14 @@ module Org::Eclipse::Swt::Ole::Win32
         return
       end
       if (!(@state).equal?(STATE_UIACTIVE))
-        do_verb(OLE::OLEIVERB_SHOW)
+        # long
+        # long
+        ppv_object = Array.typed(::Java::Int).new(1) { 0 }
+        if ((@obj_iunknown._query_interface(COM::IIDIOleInPlaceObject, ppv_object)).equal?(COM::S_OK))
+          obj_iole_in_place_object = IOleInPlaceObject.new(ppv_object[0])
+          obj_iole_in_place_object._release
+          do_verb(OLE::OLEIVERB_SHOW)
+        end
       end
       if ((@obj_iole_in_place_object).nil?)
         return
@@ -1819,10 +1859,45 @@ module Org::Eclipse::Swt::Ole::Win32
       if (!update_storage)
         return false
       end
-      # get access to the persistent storage mechanism
       # long
       # long
       address = Array.typed(::Java::Int).new(1) { 0 }
+      if ((@obj_iole_object._query_interface(COM::IIDIPersistFile, address)).equal?(COM::S_OK))
+        file_name = nil
+        persist_file = IPersistFile.new(address[0])
+        # long
+        # long
+        ppsz_file_name = Array.typed(::Java::Int).new(1) { 0 }
+        if ((persist_file._get_cur_file(ppsz_file_name)).equal?(COM::S_OK))
+          # long
+          psz_file_name = ppsz_file_name[0]
+          length_ = OS.wcslen(psz_file_name)
+          buffer = CharArray.new(length_)
+          OS._move_memory(buffer, psz_file_name, length_ * 2)
+          file_name = RJava.cast_to_string(String.new(buffer, 0, length_))
+          # Doc says to use IMalloc::Free, but CoTaskMemFree() does the same
+          COM._co_task_mem_free(psz_file_name)
+        end
+        result = 0
+        new_file = file.get_absolute_path
+        if (!(file_name).nil? && file_name.equals_ignore_case(new_file))
+          result = persist_file._save(0, false)
+        else
+          length_ = new_file.length
+          buffer = CharArray.new(length_ + 1)
+          new_file.get_chars(0, length_, buffer, 0)
+          # long
+          lpsz_new_file = COM._co_task_mem_alloc(buffer.attr_length * 2)
+          COM._move_memory(lpsz_new_file, buffer, buffer.attr_length * 2)
+          result = persist_file._save(lpsz_new_file, false)
+          COM._co_task_mem_free(lpsz_new_file)
+        end
+        persist_file._release
+        if ((result).equal?(COM::S_OK))
+          return true
+        end
+      end
+      # get access to the persistent storage mechanism
       if (!(@obj_iole_object._query_interface(COM::IIDIPersistStorage, address)).equal?(COM::S_OK))
         return false
       end
@@ -1870,6 +1945,36 @@ module Org::Eclipse::Swt::Ole::Win32
       end
       if (!update_storage)
         return false
+      end
+      # Bug in Office 2007. Saving Office 2007 documents to compound file storage object
+      # causes the output file to be corrupted. The fix is to detect Office 2007 documents
+      # using the program ID and save only the content of the 'Package' stream.
+      if (is_office2007)
+        # Excel fails to open the package stream when the PersistStorage is not in hands off mode
+        # long
+        # long
+        ppv = Array.typed(::Java::Int).new(1) { 0 }
+        i_persist_storage = nil
+        if ((@obj_iunknown._query_interface(COM::IIDIPersistStorage, ppv)).equal?(COM::S_OK))
+          i_persist_storage = IPersistStorage.new(ppv[0])
+          @temp_storage._add_ref
+          i_persist_storage._hands_off_storage
+        end
+        result = false
+        # long
+        # long
+        address = Array.typed(::Java::Int).new(1) { 0 }
+        grf_mode = COM::STGM_DIRECT | COM::STGM_READ | COM::STGM_SHARE_EXCLUSIVE
+        if ((@temp_storage._open_stream("Package", 0, grf_mode, 0, address)).equal?(COM::S_OK))
+          # $NON-NLS-1$
+          result = save_from_contents(address[0], file)
+        end
+        if (!(i_persist_storage).nil?)
+          i_persist_storage._save_completed(@temp_storage.get_address)
+          @temp_storage._release
+          i_persist_storage._release
+        end
+        return result
       end
       # long
       # long

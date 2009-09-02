@@ -1,6 +1,6 @@
 require "rjava"
 
-# Copyright (c) 2000, 2008 IBM Corporation and others.
+# Copyright (c) 2000, 2009 IBM Corporation and others.
 # All rights reserved. This program and the accompanying materials
 # are made available under the terms of the Eclipse Public License v1.0
 # which accompanies this distribution, and is available at
@@ -13,9 +13,7 @@ module Org::Eclipse::Swt::Widgets
     class_module.module_eval {
       include ::Java::Lang
       include ::Org::Eclipse::Swt::Widgets
-      include_const ::Org::Eclipse::Swt::Internal::Carbon, :OS
-      include_const ::Org::Eclipse::Swt::Internal::Carbon, :Rect
-      include_const ::Org::Eclipse::Swt::Internal::Carbon, :CGRect
+      include ::Org::Eclipse::Swt::Internal::Cocoa
       include ::Org::Eclipse::Swt
       include ::Org::Eclipse::Swt::Events
       include ::Org::Eclipse::Swt::Graphics
@@ -49,6 +47,7 @@ module Org::Eclipse::Swt::Widgets
   # @see <a href="http://www.eclipse.org/swt/snippets/#tabfolder">TabFolder, TabItem snippets</a>
   # @see <a href="http://www.eclipse.org/swt/examples.php">SWT Example: ControlExample</a>
   # @see <a href="http://www.eclipse.org/swt/">Sample code and further information</a>
+  # @noextend This class is not intended to be subclassed by clients.
   class TabFolder < TabFolderImports.const_get :Composite
     include_class_members TabFolderImports
     
@@ -58,11 +57,17 @@ module Org::Eclipse::Swt::Widgets
     alias_method :attr_items=, :items=
     undef_method :items=
     
-    attr_accessor :last_selected
-    alias_method :attr_last_selected, :last_selected
-    undef_method :last_selected
-    alias_method :attr_last_selected=, :last_selected=
-    undef_method :last_selected=
+    attr_accessor :item_count
+    alias_method :attr_item_count, :item_count
+    undef_method :item_count
+    alias_method :attr_item_count=, :item_count=
+    undef_method :item_count=
+    
+    attr_accessor :ignore_select
+    alias_method :attr_ignore_select, :ignore_select
+    undef_method :ignore_select
+    alias_method :attr_ignore_select=, :ignore_select=
+    undef_method :ignore_select=
     
     typesig { [Composite, ::Java::Int] }
     # Constructs a new instance of this class given its parent
@@ -89,13 +94,15 @@ module Org::Eclipse::Swt::Widgets
     # </ul>
     # 
     # @see SWT
+    # @see SWT#TOP
+    # @see SWT#BOTTOM
     # @see Widget#checkSubclass
     # @see Widget#getStyle
     def initialize(parent, style)
       @items = nil
-      @last_selected = 0
+      @item_count = 0
+      @ignore_select = false
       super(parent, check_style(style))
-      @last_selected = -1
     end
     
     typesig { [SelectionListener] }
@@ -144,23 +151,6 @@ module Org::Eclipse::Swt::Widgets
       end
     }
     
-    typesig { [::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int] }
-    def call_paint_event_handler(control, damage_rgn, visible_rgn, the_event, next_handler)
-      # Bug in the Macintosh.  The tab folder tabs draw outside the widget
-      # bounds when they do not fit.  The fix is to clip the output to the
-      # widget bounds.
-      context = Array.typed(::Java::Int).new(1) { 0 }
-      OS._get_event_parameter(the_event, OS.attr_k_event_param_cgcontext_ref, OS.attr_type_cgcontext_ref, nil, 4, nil, context)
-      OS._cgcontext_save_gstate(context[0])
-      rect = CGRect.new
-      OS._hiview_get_bounds(self.attr_handle, rect)
-      OS._cgcontext_add_rect(context[0], rect)
-      OS._cgcontext_clip(context[0])
-      result = super(control, damage_rgn, visible_rgn, the_event, next_handler)
-      OS._cgcontext_restore_gstate(context[0])
-      return result
-    end
-    
     typesig { [] }
     def check_subclass
       if (!is_valid_subclass)
@@ -172,17 +162,8 @@ module Org::Eclipse::Swt::Widgets
     def compute_size(w_hint, h_hint, changed)
       size = super(w_hint, h_hint, changed)
       if ((w_hint).equal?(SWT::DEFAULT) && @items.attr_length > 0)
-        width = 0
-        gc = SwtGC.new(self)
-        i = 0
-        while i < @items.attr_length
-          if (!(@items[i]).nil?)
-            width += @items[i].calculate_width(gc)
-          end
-          i += 1
-        end
-        gc.dispose
-        trim = compute_trim(0, 0, width, 0)
+        min_size = (self.attr_view).minimum_size
+        trim = compute_trim(0, 0, RJava.cast_to_int(Math.ceil(min_size.attr_width)), 0)
         size.attr_x = Math.max(trim.attr_width, size.attr_x)
       end
       return size
@@ -191,53 +172,33 @@ module Org::Eclipse::Swt::Widgets
     typesig { [::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int] }
     def compute_trim(x, y, width, height)
       check_widget
-      old_bounds = CGRect.new
-      bounds = old_bounds
-      OS._hiview_get_frame(self.attr_handle, old_bounds)
-      min_size = 100
-      if (old_bounds.attr_width < min_size || old_bounds.attr_height < min_size)
-        OS._hiview_set_drawing_enabled(self.attr_handle, false)
-        bounds = CGRect.new
-        bounds.attr_width = bounds.attr_height = 100
-        OS._hiview_set_frame(self.attr_handle, bounds)
-      end
-      client = Rect.new
-      OS._get_tab_content_rect(self.attr_handle, client)
-      if (old_bounds.attr_width < min_size || old_bounds.attr_height < min_size)
-        OS._hiview_set_frame(self.attr_handle, old_bounds)
-        OS._hiview_set_drawing_enabled(self.attr_handle, (self.attr_draw_count).equal?(0))
-      end
-      x -= client.attr_left
-      y -= client.attr_top
-      width += RJava.cast_to_int(bounds.attr_width) - (client.attr_right - client.attr_left)
-      height += RJava.cast_to_int(bounds.attr_height) - (client.attr_bottom - client.attr_top)
-      inset = get_inset
-      x -= inset.attr_left
-      y -= inset.attr_top
-      width += inset.attr_left + inset.attr_right
-      height += inset.attr_top + inset.attr_bottom
-      return Rectangle.new(-client.attr_left, -client.attr_top, width, height)
+      widget = self.attr_view
+      rect = widget.content_rect
+      x -= rect.attr_x
+      y -= rect.attr_y
+      frame_ = widget.frame
+      width += Math.ceil(frame_.attr_width - rect.attr_width)
+      height += Math.ceil(frame_.attr_height - rect.attr_height)
+      return super(x, y, width, height)
     end
     
     typesig { [] }
     def create_handle
-      out_control = Array.typed(::Java::Int).new(1) { 0 }
-      window = OS._get_control_owner(self.attr_parent.attr_handle)
-      direction = !((self.attr_style & SWT::BOTTOM)).equal?(0) ? RJava.cast_to_short(OS.attr_k_control_tab_direction_south) : RJava.cast_to_short(OS.attr_k_control_tab_direction_north)
-      OS._create_tabs_control(window, Rect.new, RJava.cast_to_short(OS.attr_k_control_tab_size_large), direction, RJava.cast_to_short(0), 0, out_control)
-      if ((out_control[0]).equal?(0))
-        error(SWT::ERROR_NO_HANDLES)
+      widget = SWTTabView.new.alloc
+      widget.init
+      widget.set_delegate(widget)
+      if (!((self.attr_style & SWT::BOTTOM)).equal?(0))
+        widget.set_tab_view_type(OS::NSBottomTabsBezelBorder)
       end
-      self.attr_handle = out_control[0]
+      self.attr_view = widget
     end
     
     typesig { [TabItem, ::Java::Int] }
     def create_item(item, index)
-      count = OS._get_control32bit_maximum(self.attr_handle)
+      count = @item_count
       if (!(0 <= index && index <= count))
         error(SWT::ERROR_INVALID_RANGE)
       end
-      OS._set_control32bit_maximum(self.attr_handle, count + 1)
       if ((count).equal?(@items.attr_length))
         new_items = Array.typed(TabItem).new(@items.attr_length + 4) { nil }
         System.arraycopy(@items, 0, new_items, 0, @items.attr_length)
@@ -245,17 +206,10 @@ module Org::Eclipse::Swt::Widgets
       end
       System.arraycopy(@items, index, @items, index + 1, count - index)
       @items[index] = item
-      # Send a selection event when the item that is added becomes
-      # the new selection.  This only happens when the first item
-      # is added.
-      if ((count).equal?(0))
-        OS._set_control32bit_value(self.attr_handle, 1)
-        @last_selected = 0
-        event = Event.new
-        event.attr_item = @items[0]
-        send_event(SWT::Selection, event)
-        # the widget could be destroyed at this point
-      end
+      @item_count += 1
+      ns_item = NSTabViewItem.new.alloc.init
+      item.attr_ns_item = ns_item
+      (self.attr_view).insert_tab_view_item(ns_item, index)
     end
     
     typesig { [] }
@@ -264,9 +218,14 @@ module Org::Eclipse::Swt::Widgets
       @items = Array.typed(TabItem).new(4) { nil }
     end
     
+    typesig { [] }
+    def default_nsfont
+      return self.attr_display.attr_tab_view_font
+    end
+    
     typesig { [TabItem] }
     def destroy_item(item)
-      count = OS._get_control32bit_maximum(self.attr_handle)
+      count = @item_count
       index = 0
       while (index < count)
         if ((@items[index]).equal?(item))
@@ -277,37 +236,41 @@ module Org::Eclipse::Swt::Widgets
       if ((index).equal?(count))
         return
       end
-      redraw_widget(self.attr_handle, false)
-      selection_index = OS._get_control32bit_value(self.attr_handle) - 1
       (count -= 1)
-      OS._set_control32bit_maximum(self.attr_handle, count)
       System.arraycopy(@items, index + 1, @items, index, count - index)
       @items[count] = nil
       if ((count).equal?(0))
         @items = Array.typed(TabItem).new(4) { nil }
       end
-      i = index
-      while i < count
-        @items[i].update
-        i += 1
+      @item_count = count
+      (self.attr_view).remove_tab_view_item(item.attr_ns_item)
+    end
+    
+    typesig { [NSPoint] }
+    def find_tooltip(pt)
+      pt = self.attr_view.convert_point_from_view_(pt, nil)
+      ns_item = (self.attr_view).tab_view_item_at_point(pt)
+      if (!(ns_item).nil?)
+        i = 0
+        while i < @item_count
+          item = @items[i]
+          if ((item.attr_ns_item.attr_id).equal?(ns_item.attr_id))
+            return item
+          end
+          i += 1
+        end
       end
-      if (count > 0 && (index).equal?(selection_index))
-        set_selection(Math.max(0, selection_index - 1), true, true)
-      end
-      invalidate_visible_region(self.attr_handle)
+      return super(pt)
     end
     
     typesig { [] }
     def get_client_area
       check_widget
-      client = Rect.new
-      if (!(OS._get_control_data(self.attr_handle, RJava.cast_to_short(OS.attr_k_control_entire_control), OS.attr_k_control_tab_content_rect_tag, Rect.attr_sizeof, client, nil)).equal?(OS.attr_no_err))
-        return Rectangle.new(0, 0, 0, 0)
-      end
-      x = Math.max(0, client.attr_left)
-      y = Math.max(0, client.attr_top)
-      width = Math.max(0, client.attr_right - client.attr_left)
-      height = Math.max(0, client.attr_bottom - client.attr_top)
+      rect = (self.attr_view).content_rect
+      x = Math.max(0, RJava.cast_to_int(rect.attr_x))
+      y = Math.max(0, RJava.cast_to_int(rect.attr_y))
+      width = Math.max(0, RJava.cast_to_int(Math.ceil(rect.attr_width)))
+      height = Math.max(0, RJava.cast_to_int(Math.ceil(rect.attr_height)))
       return Rectangle.new(x, y, width, height)
     end
     
@@ -327,7 +290,7 @@ module Org::Eclipse::Swt::Widgets
     # </ul>
     def get_item(index)
       check_widget
-      count = OS._get_control32bit_maximum(self.attr_handle)
+      count = @item_count
       if (!(0 <= index && index < count))
         error(SWT::ERROR_INVALID_RANGE)
       end
@@ -356,15 +319,18 @@ module Org::Eclipse::Swt::Widgets
       if ((point).nil?)
         error(SWT::ERROR_NULL_ARGUMENT)
       end
-      count = OS._get_control32bit_maximum(self.attr_handle)
-      index = 0
-      while index < count
-        item = @items[index]
-        bounds = item.get_bounds
-        if (bounds.contains(point))
-          return item
+      ns_point = NSPoint.new
+      ns_point.attr_x = point.attr_x
+      ns_point.attr_y = point.attr_y
+      tab_view = self.attr_view
+      tab_view_item = tab_view.tab_view_item_at_point(ns_point)
+      i = 0
+      while i < @item_count
+        item = @items[i].attr_ns_item
+        if (item.is_equal(tab_view_item))
+          return @items[i]
         end
-        index += 1
+        i += 1
       end
       return nil
     end
@@ -380,7 +346,7 @@ module Org::Eclipse::Swt::Widgets
     # </ul>
     def get_item_count
       check_widget
-      return OS._get_control32bit_maximum(self.attr_handle)
+      return @item_count
     end
     
     typesig { [] }
@@ -400,7 +366,7 @@ module Org::Eclipse::Swt::Widgets
     # </ul>
     def get_items
       check_widget
-      count = OS._get_control32bit_maximum(self.attr_handle)
+      count = @item_count
       result = Array.typed(TabItem).new(count) { nil }
       System.arraycopy(@items, 0, result, 0, count)
       return result
@@ -423,7 +389,7 @@ module Org::Eclipse::Swt::Widgets
     # </ul>
     def get_selection
       check_widget
-      index = OS._get_control32bit_value(self.attr_handle) - 1
+      index = get_selection_index
       if ((index).equal?(-1))
         return Array.typed(TabItem).new(0) { nil }
       end
@@ -442,12 +408,23 @@ module Org::Eclipse::Swt::Widgets
     # </ul>
     def get_selection_index
       check_widget
-      return OS._get_control32bit_value(self.attr_handle) - 1
+      selected = (self.attr_view).selected_tab_view_item
+      if ((selected).nil?)
+        return -1
+      end
+      i = 0
+      while i < @item_count
+        if ((@items[i].attr_ns_item.attr_id).equal?(selected.attr_id))
+          return i
+        end
+        i += 1
+      end
+      return -1
     end
     
     typesig { [] }
     def get_theme_alpha
-      return 0.25 * self.attr_parent.get_theme_alpha
+      return (!(self.attr_background).nil? ? 1 : 0.25) * self.attr_parent.get_theme_alpha
     end
     
     typesig { [TabItem] }
@@ -471,7 +448,7 @@ module Org::Eclipse::Swt::Widgets
       if ((item).nil?)
         error(SWT::ERROR_NULL_ARGUMENT)
       end
-      count = OS._get_control32bit_maximum(self.attr_handle)
+      count = @item_count
       i = 0
       while i < count
         if ((@items[i]).equal?(item))
@@ -491,7 +468,7 @@ module Org::Eclipse::Swt::Widgets
       while i < children.attr_length
         child = children[i]
         index = 0
-        count = OS._get_control32bit_maximum(self.attr_handle)
+        count = @item_count
         while (index < count)
           if ((@items[index].attr_control).equal?(child))
             break
@@ -510,71 +487,6 @@ module Org::Eclipse::Swt::Widgets
         i += 1
       end
       return Point.new(width, height)
-    end
-    
-    typesig { [] }
-    def get_inset
-      if (OS::VERSION >= 0x1020)
-        return super
-      end
-      return !((self.attr_style & SWT::BOTTOM)).equal?(0) ? self.attr_display.attr_tab_folder_south_inset : self.attr_display.attr_tab_folder_north_inset
-    end
-    
-    typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
-    def k_event_control_apply_background(next_handler, the_event, user_data)
-      # Feature in the Macintosh.  For some reason, the tab folder applies the
-      # theme background when drawing even though a theme has not been set for
-      # the window.  The fix is to avoid running the default handler.
-      return OS.attr_no_err
-    end
-    
-    typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
-    def k_event_control_hit(next_handler, the_event, user_data)
-      result = super(next_handler, the_event, user_data)
-      if ((result).equal?(OS.attr_no_err))
-        return result
-      end
-      index = OS._get_control32bit_value(self.attr_handle) - 1
-      if ((index).equal?(@last_selected))
-        return result
-      end
-      @last_selected = index
-      count = OS._get_control32bit_maximum(self.attr_handle)
-      i = 0
-      while i < count
-        if (!(i).equal?(index))
-          control = @items[i].attr_control
-          if (!(control).nil? && !control.is_disposed)
-            control.set_visible(false)
-          end
-        end
-        i += 1
-      end
-      item = nil
-      if (!(index).equal?(-1))
-        item = @items[index]
-      end
-      if (!(item).nil?)
-        control = item.attr_control
-        if (!(control).nil? && !control.is_disposed)
-          control.set_bounds(get_client_area)
-          control.set_visible(true)
-        end
-      end
-      event = Event.new
-      event.attr_item = item
-      post_event(SWT::Selection, event)
-      return OS.attr_no_err
-    end
-    
-    typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
-    def k_event_control_set_focus_part(next_handler, the_event, user_data)
-      part = Array.typed(::Java::Short).new(1) { 0 }
-      OS._get_event_parameter(the_event, OS.attr_k_event_param_control_part, OS.attr_type_control_part_code, nil, 2, nil, part)
-      if ((part[0]).equal?(OS.attr_k_control_focus_no_part) || (part[0]).equal?(OS.attr_k_control_focus_next_part))
-        return super(next_handler, the_event, user_data)
-      end
-      return OS.attr_event_not_handled_err
     end
     
     typesig { [::Java::Boolean] }
@@ -596,7 +508,7 @@ module Org::Eclipse::Swt::Widgets
     typesig { [Control] }
     def remove_control(control)
       super(control)
-      count = OS._get_control32bit_maximum(self.attr_handle)
+      count = @item_count
       i = 0
       while i < count
         item = @items[i]
@@ -635,20 +547,9 @@ module Org::Eclipse::Swt::Widgets
       self.attr_event_table.unhook(SWT::DefaultSelection, listener)
     end
     
-    typesig { [::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Boolean, ::Java::Boolean, ::Java::Boolean] }
-    def set_bounds(x, y, width, height, move, resize, events)
-      result = super(x, y, width, height, move, resize, events)
-      if (!((result & RESIZED)).equal?(0))
-        index = OS._get_control32bit_value(self.attr_handle) - 1
-        if (!(index).equal?(-1))
-          item = @items[index]
-          control = item.attr_control
-          if (!(control).nil? && !control.is_disposed)
-            control.set_bounds(get_client_area)
-          end
-        end
-      end
-      return result
+    typesig { [NSFont] }
+    def set_font(font)
+      (self.attr_view).set_font(font)
     end
     
     typesig { [TabItem] }
@@ -722,7 +623,7 @@ module Org::Eclipse::Swt::Widgets
     # </ul>
     def set_selection(index)
       check_widget
-      count = OS._get_control32bit_maximum(self.attr_handle)
+      count = @item_count
       if (!(0 <= index && index < count))
         return
       end
@@ -731,10 +632,10 @@ module Org::Eclipse::Swt::Widgets
     
     typesig { [::Java::Int, ::Java::Boolean, ::Java::Boolean] }
     def set_selection(index, notify, force)
-      if (index >= OS._get_control32bit_maximum(self.attr_handle))
+      if (!(0 <= index && index < @item_count))
         return
       end
-      current_index = OS._get_control32bit_value(self.attr_handle) - 1
+      current_index = get_selection_index
       if (!force && (current_index).equal?(index))
         return
       end
@@ -747,19 +648,15 @@ module Org::Eclipse::Swt::Widgets
           end
         end
       end
-      OS._set_control32bit_value(self.attr_handle, index + 1)
-      index = OS._get_control32bit_value(self.attr_handle) - 1
-      if (has_focus)
-        window = OS._get_control_owner(self.attr_handle)
-        OS._set_keyboard_focus(window, self.attr_handle, RJava.cast_to_short((index + 1)))
-      end
-      @last_selected = index
+      @ignore_select = true
+      (self.attr_view).select_tab_view_item_at_index(index)
+      @ignore_select = false
+      index = get_selection_index
       if (!(index).equal?(-1))
         item = @items[index]
         if (!(item).nil?)
           control = item.attr_control
           if (!(control).nil? && !control.is_disposed)
-            control.set_bounds(get_client_area)
             control.set_visible(true)
           end
           if (notify)
@@ -769,6 +666,11 @@ module Org::Eclipse::Swt::Widgets
           end
         end
       end
+    end
+    
+    typesig { [] }
+    def set_small_size
+      (self.attr_view).set_control_size(OS::NSSmallControlSize)
     end
     
     typesig { [::Java::Boolean] }
@@ -786,6 +688,72 @@ module Org::Eclipse::Swt::Widgets
       end
       set_selection(index, true, false)
       return (index).equal?(get_selection_index)
+    end
+    
+    typesig { [::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int] }
+    # long
+    # long
+    # long
+    # long
+    def tab_view_will_select_tab_view_item(id, sel, tab_view, tab_view_item)
+      if ((tab_view_item).equal?(0))
+        return
+      end
+      i = 0
+      while i < @item_count
+        item = @items[i]
+        if ((item.attr_ns_item.attr_id).equal?(tab_view_item))
+          current_index = get_selection_index
+          if (!(current_index).equal?(-1))
+            selected = @items[current_index]
+            if (!(selected).nil?)
+              control = selected.attr_control
+              if (!(control).nil? && !control.is_disposed)
+                control.set_visible(false)
+              end
+            end
+          end
+          control = item.attr_control
+          if (!(control).nil? && !control.is_disposed)
+            control.set_visible(true)
+          end
+          break
+        end
+        i += 1
+      end
+    end
+    
+    typesig { [::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int] }
+    # long
+    # long
+    # long
+    # long
+    def tab_view_did_select_tab_view_item(id, sel, tab_view, tab_view_item)
+      if ((tab_view_item).equal?(0))
+        return
+      end
+      i = 0
+      while i < @item_count
+        item = @items[i]
+        # Feature in Cocoa.  For some reason the control on a tab being
+        # deselected has its parent removed natively.  The fix is to
+        # re-set the control's parent.
+        control = item.attr_control
+        if (!(control).nil?)
+          top_view_ = control.top_view
+          if ((top_view_.superview).nil?)
+            content_view.add_subview(top_view_, OS::NSWindowBelow, nil)
+          end
+        end
+        if ((item.attr_ns_item.attr_id).equal?(tab_view_item))
+          if (!@ignore_select)
+            event = Event.new
+            event.attr_item = item
+            post_event(SWT::Selection, event)
+          end
+        end
+        i += 1
+      end
     end
     
     private

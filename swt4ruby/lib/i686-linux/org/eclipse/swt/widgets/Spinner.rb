@@ -1,6 +1,6 @@
 require "rjava"
 
-# Copyright (c) 2000, 2008 IBM Corporation and others.
+# Copyright (c) 2000, 2009 IBM Corporation and others.
 # All rights reserved. This program and the accompanying materials
 # are made available under the terms of the Eclipse Public License v1.0
 # which accompanies this distribution, and is available at
@@ -43,13 +43,11 @@ module Org::Eclipse::Swt::Widgets
   # @see <a href="http://www.eclipse.org/swt/">Sample code and further information</a>
   # 
   # @since 3.1
+  # @noextend This class is not intended to be subclassed by clients.
   class Spinner < SpinnerImports.const_get :Composite
     include_class_members SpinnerImports
     
     class_module.module_eval {
-      const_set_lazy(:INNER_BORDER) { 2 }
-      const_attr_reader  :INNER_BORDER
-      
       const_set_lazy(:MIN_ARROW_WIDTH) { 6 }
       const_attr_reader  :MIN_ARROW_WIDTH
     }
@@ -298,8 +296,6 @@ module Org::Eclipse::Swt::Widgets
         xborder += OS.gtk_style_get_xthickness(style)
         yborder += OS.gtk_style_get_ythickness(style)
       end
-      xborder += INNER_BORDER
-      yborder += INNER_BORDER
       property = Array.typed(::Java::Int).new(1) { 0 }
       OS.gtk_widget_style_get(self.attr_handle, OS.attr_interior_focus, property, 0)
       if ((property[0]).equal?(0))
@@ -318,6 +314,11 @@ module Org::Eclipse::Swt::Widgets
       trim.attr_width += 2 * xborder
       trim.attr_height += 2 * yborder
       trim.attr_width += arrow_size + (2 * OS.gtk_style_get_xthickness(style))
+      inner_border = Display.get_entry_inner_border(self.attr_handle)
+      trim.attr_x -= inner_border.attr_left
+      trim.attr_y -= inner_border.attr_top
+      trim.attr_width += inner_border.attr_left + inner_border.attr_right
+      trim.attr_height += inner_border.attr_top + inner_border.attr_bottom
       return Rectangle.new(trim.attr_x, trim.attr_y, trim.attr_width, trim.attr_height)
     end
     
@@ -1366,6 +1367,11 @@ module Org::Eclipse::Swt::Widgets
       OS.gtk_spin_button_set_value(self.attr_handle, selection / factor)
       OS.gtk_spin_button_set_digits(self.attr_handle, digits)
       OS.g_signal_handlers_unblock_matched(self.attr_handle, OS::G_SIGNAL_MATCH_DATA, 0, 0, 0, 0, VALUE_CHANGED)
+    end
+    
+    typesig { [] }
+    def check_subwindow
+      return false
     end
     
     typesig { [GdkEventKey] }

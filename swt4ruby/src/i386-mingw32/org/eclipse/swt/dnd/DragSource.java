@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2008 IBM Corporation and others.
+ * Copyright (c) 2000, 2009 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -97,6 +97,7 @@ import org.eclipse.swt.internal.win32.*;
  * @see <a href="http://www.eclipse.org/swt/snippets/#dnd">Drag and Drop snippets</a>
  * @see <a href="http://www.eclipse.org/swt/examples.php">SWT Example: DNDExample</a>
  * @see <a href="http://www.eclipse.org/swt/">Sample code and further information</a>
+ * @noextend This class is not intended to be subclassed by clients.
  */
 public class DragSource extends Widget {
 
@@ -315,10 +316,10 @@ private void drag(Event dragEvent) {
 		 * area and use it during the drag to prevent the image from being inverted.
 		 * On XP if the shell is RTL, the image is not displayed.
 		 */
-		int offset = event.x - dragEvent.x;
+		int offsetX = event.offsetX;
 		hwndDrag = topControl.handle;
 		if ((topControl.getStyle() & SWT.RIGHT_TO_LEFT) != 0) {
-			offset = image.getBounds().width - offset;
+			offsetX = image.getBounds().width - offsetX;
 			RECT rect = new RECT ();
 			OS.GetClientRect (topControl.handle, rect);
 			hwndDrag = OS.CreateWindowEx (
@@ -334,7 +335,7 @@ private void drag(Event dragEvent) {
 				null);
 			OS.ShowWindow (hwndDrag, OS.SW_SHOW);
 		}
-		OS.ImageList_BeginDrag(imagelist.getHandle(), 0, offset, event.y - dragEvent.y);
+		OS.ImageList_BeginDrag(imagelist.getHandle(), 0, offsetX, event.offsetY);
         /*
         * Feature in Windows. When ImageList_DragEnter() is called,
         * it takes a snapshot of the screen  If a drag is started
@@ -454,6 +455,8 @@ private int GetData(int /*long*/ pFormatetc, int /*long*/ pmedium) {
 	event.time = OS.GetMessageTime();
 	event.dataType = transferData;
 	notifyListeners(DND.DragSetData,event);
+	
+	if (!event.doit) return COM.E_FAIL;
 	
 	// get matching transfer agent to perform conversion
 	Transfer transfer = null;

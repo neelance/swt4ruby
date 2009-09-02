@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2008 IBM Corporation and others.
+ * Copyright (c) 2000, 2009 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -67,6 +67,7 @@ import org.eclipse.swt.events.*;
  * @see <a href="http://www.eclipse.org/swt/snippets/#table">Table, TableItem, TableColumn snippets</a>
  * @see <a href="http://www.eclipse.org/swt/examples.php">SWT Example: ControlExample</a>
  * @see <a href="http://www.eclipse.org/swt/">Sample code and further information</a>
+ * @noextend This class is not intended to be subclassed by clients.
  */
 
 public class Table extends Composite {
@@ -79,7 +80,7 @@ public class Table extends Composite {
 	RECT focusRect;
 	int /*long*/ headerToolTipHandle;
 	boolean ignoreCustomDraw, ignoreDrawForeground, ignoreDrawBackground, ignoreDrawFocus, ignoreDrawSelection, ignoreDrawHot;
-	boolean customDraw, dragStarted, explorerTheme, firstColumnImage, fixScrollWidth, tipRequested, wasSelected, wasResized;
+	boolean customDraw, dragStarted, explorerTheme, firstColumnImage, fixScrollWidth, tipRequested, wasSelected, wasResized, painted;
 	boolean ignoreActivate, ignoreSelect, ignoreShrink, ignoreResize, ignoreColumnMove, ignoreColumnResize, fullRowSelect;
 	int itemHeight, lastIndexOf, lastWidth, sortDirection, resizeCount, selectionForeground, hotIndex;
 	static /*final*/ int /*long*/ HeaderProc;
@@ -233,7 +234,7 @@ int /*long*/ callWindowProc (int /*long*/ hwnd, int msg, int /*long*/ wParam, in
 						
 		/* Resize messages */
 		case OS.WM_WINDOWPOSCHANGED:
-			redraw = findImageControl () != null && drawCount == 0 && OS.IsWindowVisible (handle);
+			redraw = findImageControl () != null && getDrawing () && OS.IsWindowVisible (handle);
 			if (redraw) {
 				/*
 				* Feature in Windows.  When LVM_SETBKCOLOR is used with CLR_NONE
@@ -401,7 +402,12 @@ int /*long*/ callWindowProc (int /*long*/ hwnd, int msg, int /*long*/ wParam, in
 					OS.InvalidateRect (handle, null, true);
 				}
 			}
+			break;
 		}
+		
+		case OS.WM_PAINT:
+			painted = true;
+			break;
 	}
 	return code;
 }
@@ -745,7 +751,7 @@ LRESULT CDDS_SUBITEMPREPAINT (NMLVCUSTOMDRAW nmcd, int /*long*/ wParam, int /*lo
 	* null.
 	*/
 	TableItem item = _getItem ((int)/*64*/nmcd.dwItemSpec);
-	if (item == null) return null;
+	if (item == null || item.isDisposed ()) return null;
 	int /*long*/ hFont = item.fontHandle (nmcd.iSubItem);
 	if (hFont != -1) OS.SelectObject (hDC, hFont);
 	if (ignoreCustomDraw || (nmcd.left == nmcd.right)) {
@@ -994,7 +1000,7 @@ public void clear (int index) {
 			OS.SendMessage (handle, OS.LVM_SETITEM, 0, lvItem);
 			item.cached = false;
 		}
-		if (currentItem == null && drawCount == 0 && OS.IsWindowVisible (handle)) {
+		if (currentItem == null && getDrawing () && OS.IsWindowVisible (handle)) {
 			OS.SendMessage (handle, OS.LVM_REDRAWITEMS, index, index);
 		}
 		setScrollWidth (item, false);
@@ -1067,7 +1073,7 @@ public void clear (int start, int end) {
 			}
 		}
 		if (cleared) {
-			if (currentItem == null && drawCount == 0 && OS.IsWindowVisible (handle)) {
+			if (currentItem == null && getDrawing () && OS.IsWindowVisible (handle)) {
 				OS.SendMessage (handle, OS.LVM_REDRAWITEMS, start, end);
 			}
 			TableItem item = start == end ? items [start] : null; 
@@ -1139,7 +1145,7 @@ public void clear (int [] indices) {
 				OS.SendMessage (handle, OS.LVM_SETITEM, 0, lvItem);
 				item.cached = false;
 			}
-			if (currentItem == null && drawCount == 0 && OS.IsWindowVisible (handle)) {
+			if (currentItem == null && getDrawing () && OS.IsWindowVisible (handle)) {
 				OS.SendMessage (handle, OS.LVM_REDRAWITEMS, index, index);
 			}
 		}
@@ -1199,7 +1205,7 @@ public void clearAll () {
 		}
 	}
 	if (cleared) {
-		if (currentItem == null && drawCount == 0 && OS.IsWindowVisible (handle)) {
+		if (currentItem == null && getDrawing () && OS.IsWindowVisible (handle)) {
 			OS.SendMessage (handle, OS.LVM_REDRAWITEMS, 0, count - 1);
 		}
 		setScrollWidth (null, false);
@@ -1578,7 +1584,7 @@ void createItem (TableItem item, int index) {
 		* the items array is resized to be smaller to reduce
 		* memory usage.
 		*/
-		boolean small = drawCount == 0 && OS.IsWindowVisible (handle);
+		boolean small = getDrawing () && OS.IsWindowVisible (handle);
 		int length = small ? items.length + 4 : Math.max (4, items.length * 3 / 2);
 		TableItem [] newItems = new TableItem [length];
 		System.arraycopy (items, 0, newItems, 0, items.length);
@@ -2296,8 +2302,13 @@ public TableItem getItem (Point point) {
 	pinfo.y = point.y;
 	if ((style & SWT.FULL_SELECTION) == 0) {
 		if (hooks (SWT.MeasureItem)) {
-			OS.SendMessage (handle, OS.LVM_SUBITEMHITTEST, 0, pinfo);
-			if (pinfo.iItem == -1) {
+			/*
+			*  Bug in Windows.  When LVM_SUBITEMHITTEST is used to hittest
+			*  a point that is above the table, instead of returning -1 to
+			*  indicate that the hittest failed, a negative index is returned.
+			*  The fix is to consider any value that is negative a failure.
+			*/
+			if (OS.SendMessage (handle, OS.LVM_SUBITEMHITTEST, 0, pinfo) < 0) {
 				RECT rect = new RECT ();
 				rect.left = OS.LVIR_ICON;
 				ignoreCustomDraw = true;
@@ -2305,7 +2316,14 @@ public TableItem getItem (Point point) {
 				ignoreCustomDraw = false;
 				if (code != 0) {
 					pinfo.x = rect.left;
+					/*
+					*  Bug in Windows.  When LVM_SUBITEMHITTEST is used to hittest
+					*  a point that is above the table, instead of returning -1 to
+					*  indicate that the hittest failed, a negative index is returned.
+					*  The fix is to consider any value that is negative a failure.
+					*/
 					OS.SendMessage (handle, OS.LVM_SUBITEMHITTEST, 0, pinfo);
+					if (pinfo.iItem < 0) pinfo.iItem = -1;
 				}
 			}
 			if (pinfo.iItem != -1 && pinfo.iSubItem == 0) {
@@ -2374,6 +2392,7 @@ public int getItemCount () {
  */
 public int getItemHeight () {
 	checkWidget ();
+	if (!painted && hooks (SWT.MeasureItem)) hitTestSelection (0, 0, 0);
 	int /*long*/ empty = OS.SendMessage (handle, OS.LVM_APPROXIMATEVIEWRECT, 0, 0);
 	int /*long*/ oneItem = OS.SendMessage (handle, OS.LVM_APPROXIMATEVIEWRECT, 1, 0);
 	return OS.HIWORD (oneItem) - OS.HIWORD (empty);
@@ -2411,7 +2430,8 @@ public TableItem [] getItems () {
 
 /**
  * Returns <code>true</code> if the receiver's lines are visible,
- * and <code>false</code> otherwise.
+ * and <code>false</code> otherwise. Note that some platforms draw 
+ * grid lines while others may draw alternating row colors.
  * <p>
  * If one of the receiver's ancestors is not visible or some
  * other condition makes the receiver not visible, this method
@@ -3027,7 +3047,7 @@ public void removeAll () {
 	*/	
 	setDeferResize (true);
 	if (OS.IsWin95 && columnCount > 1) {
-		boolean redraw = drawCount == 0 && OS.IsWindowVisible (handle);
+		boolean redraw = getDrawing () && OS.IsWindowVisible (handle);
 		if (redraw) OS.SendMessage (handle, OS.WM_SETREDRAW, 0, 0);
 		int index = itemCount - 1;
 		while (index >= 0) {
@@ -3471,11 +3491,12 @@ Event sendMeasureItemEvent (TableItem item, int row, int column, int /*long*/ hD
 	if (!isDisposed () && !item.isDisposed ()) {
 		if (columnCount == 0) {
 			int width = (int)/*64*/OS.SendMessage (handle, OS.LVM_GETCOLUMNWIDTH, 0, 0);
-			if (event.x + event.width > width) {
-				OS.SendMessage (handle, OS.LVM_SETCOLUMNWIDTH, 0, event.x + event.width);
-			}
+			if (event.x + event.width > width) setScrollWidth (event.x + event.width);
 		}
-		if (event.height > getItemHeight ()) setItemHeight (event.height);
+		int /*long*/ empty = OS.SendMessage (handle, OS.LVM_APPROXIMATEVIEWRECT, 0, 0);
+		int /*long*/ oneItem = OS.SendMessage (handle, OS.LVM_APPROXIMATEVIEWRECT, 1, 0);
+		int itemHeight = OS.HIWORD (oneItem) - OS.HIWORD (empty);
+		if (event.height > itemHeight) setItemHeight (event.height);
 	}
 	return event;
 }
@@ -3508,8 +3529,13 @@ LRESULT sendMouseDownEvent (int type, int button, int msg, int /*long*/ wParam, 
 	OS.SendMessage (handle, OS.LVM_HITTEST, 0, pinfo);
 	if ((style & SWT.FULL_SELECTION) == 0) {
 		if (hooks (SWT.MeasureItem)) {
-			OS.SendMessage (handle, OS.LVM_SUBITEMHITTEST, 0, pinfo);
-			if (pinfo.iItem == -1) {
+			/*
+			*  Bug in Windows.  When LVM_SUBITEMHITTEST is used to hittest
+			*  a point that is above the table, instead of returning -1 to
+			*  indicate that the hittest failed, a negative index is returned.
+			*  The fix is to consider any value that is negative a failure.
+			*/
+			if (OS.SendMessage (handle, OS.LVM_SUBITEMHITTEST, 0, pinfo) < 0) {
 				int count = (int)/*64*/OS.SendMessage (handle, OS.LVM_GETITEMCOUNT, 0, 0);
 				if (count != 0) {
 					RECT rect = new RECT ();
@@ -3519,7 +3545,14 @@ LRESULT sendMouseDownEvent (int type, int button, int msg, int /*long*/ wParam, 
 					ignoreCustomDraw = false;
 					if (code != 0) {
 						pinfo.x = rect.left;
+						/*
+						*  Bug in Windows.  When LVM_SUBITEMHITTEST is used to hittest
+						*  a point that is above the table, instead of returning -1 to
+						*  indicate that the hittest failed, a negative index is returned.
+						*  The fix is to consider any value that is negative a failure.
+						*/
 						OS.SendMessage (handle, OS.LVM_SUBITEMHITTEST, 0, pinfo);
+						if (pinfo.iItem < 0) pinfo.iItem = -1;
 						pinfo.flags &= ~(OS.LVHT_ONITEMICON | OS.LVHT_ONITEMLABEL);
 					}
 				}
@@ -4411,7 +4444,8 @@ void setItemHeight (boolean fixScroll) {
 
 /**
  * Marks the receiver's lines as visible if the argument is <code>true</code>,
- * and marks it invisible otherwise. 
+ * and marks it invisible otherwise. Note that some platforms draw grid lines
+ * while others may draw alternating row colors.
  * <p>
  * If one of the receiver's ancestors is not visible or some
  * other condition makes the receiver not visible, marking
@@ -4521,12 +4555,43 @@ public void setRedraw (boolean redraw) {
 	}
 }
 
+void setScrollWidth (int width) {
+	if (width != (int)/*64*/OS.SendMessage (handle, OS.LVM_GETCOLUMNWIDTH, 0, 0)) {
+		/*
+		* Feature in Windows.  When LVM_SETCOLUMNWIDTH is sent,
+		* Windows draws right away instead of queuing a WM_PAINT.
+		* This can cause recursive calls when called from paint
+		* or from messages that are retrieving the item data,
+		* such as WM_NOTIFY, causing a stack overflow.  The fix
+		* is to turn off redraw and queue a repaint, collapsing
+		* the recursive calls.
+		*/
+		boolean redraw = false;
+		if (hooks (SWT.MeasureItem)) {
+			redraw = getDrawing () && OS.IsWindowVisible (handle);
+		}
+		if (redraw) OS.DefWindowProc (handle, OS.WM_SETREDRAW, 0, 0);
+		OS.SendMessage (handle, OS.LVM_SETCOLUMNWIDTH, 0, width);
+		if (redraw) {
+			OS.DefWindowProc (handle, OS.WM_SETREDRAW, 1, 0);
+			if (OS.IsWinCE) {
+				int /*long*/ hwndHeader = OS.SendMessage (handle, OS.LVM_GETHEADER, 0, 0);	
+				if (hwndHeader != 0) OS.InvalidateRect (hwndHeader, null, true);
+				OS.InvalidateRect (handle, null, true);
+			} else {
+				int flags = OS.RDW_ERASE | OS.RDW_FRAME | OS.RDW_INVALIDATE | OS.RDW_ALLCHILDREN;
+				OS.RedrawWindow (handle, null, 0, flags);
+			}
+		}
+	}
+}
+
 boolean setScrollWidth (TableItem item, boolean force) {
 	if (currentItem != null) {
 		if (currentItem != item) fixScrollWidth = true;
 		return false;
 	}
-	if (!force && (drawCount != 0 || !OS.IsWindowVisible (handle))) {
+	if (!force && (!getDrawing () || !OS.IsWindowVisible (handle))) {
 		fixScrollWidth = true;
 		return false;
 	}
@@ -4617,29 +4682,7 @@ boolean setScrollWidth (TableItem item, boolean force) {
 			newWidth += VISTA_EXTRA;
 		}
 		if (newWidth > oldWidth) {
-			/*
-			* Feature in Windows.  When LVM_SETCOLUMNWIDTH is sent,
-			* Windows draws right away instead of queuing a WM_PAINT.
-			* This can cause recursive calls when called from paint
-			* or from messages that are retrieving the item data,
-			* such as WM_NOTIFY, causing a stack overflow.  The fix
-			* is to turn off redraw and queue a repaint, collapsing
-			* the recursive calls.
-			*/
-			boolean redraw = drawCount == 0 && OS.IsWindowVisible (handle);
-			if (redraw) OS.DefWindowProc (handle, OS.WM_SETREDRAW, 0, 0);
-			OS.SendMessage (handle, OS.LVM_SETCOLUMNWIDTH, 0, newWidth);
-			if (redraw) {
-				OS.DefWindowProc (handle, OS.WM_SETREDRAW, 1, 0);
-				if (OS.IsWinCE) {
-					int /*long*/ hwndHeader = OS.SendMessage (handle, OS.LVM_GETHEADER, 0, 0);	
-					if (hwndHeader != 0) OS.InvalidateRect (hwndHeader, null, true);
-					OS.InvalidateRect (handle, null, true);
-				} else {
-					int flags = OS.RDW_ERASE | OS.RDW_FRAME | OS.RDW_INVALIDATE | OS.RDW_ALLCHILDREN;
-					OS.RedrawWindow (handle, null, 0, flags);
-				}
-			}
+			setScrollWidth (newWidth);
 			return true;
 		}
 	}
@@ -4918,6 +4961,7 @@ public void setTopIndex (int index) {
 	checkWidget (); 
 	int topIndex = (int)/*64*/OS.SendMessage (handle, OS.LVM_GETTOPINDEX, 0, 0);
 	if (index == topIndex) return;
+	if (!painted && hooks (SWT.MeasureItem)) hitTestSelection (index, 0, 0);
 	
 	/*
 	* Bug in Windows.  For some reason, LVM_SCROLL refuses to
@@ -5067,6 +5111,7 @@ public void showColumn (TableColumn column) {
 }
 
 void showItem (int index) {
+	if (!painted && hooks (SWT.MeasureItem)) hitTestSelection (index, 0, 0);
 	/*
 	* Bug in Windows.  For some reason, when there is insufficient space
 	* to show an item, LVM_ENSUREVISIBLE causes blank lines to be
@@ -5309,12 +5354,11 @@ int /*long*/ windowProc (int /*long*/ hwnd, int msg, int /*long*/ wParam, int /*
 	if (handle == 0) return 0;
 	if (hwnd != handle) {
 		switch (msg) {
-			/* This code is intentionally commented */
-//			case OS.WM_CONTEXTMENU: {
-//				LRESULT result = wmContextMenu (hwnd, wParam, lParam);
-//				if (result != null) return result.value;
-//				break;
-//			}
+			case OS.WM_CONTEXTMENU: {
+				LRESULT result = wmContextMenu (hwnd, wParam, lParam);
+				if (result != null) return result.value;
+				break;
+			}
 			case OS.WM_CAPTURECHANGED: {
 				/*
 				* Bug in Windows.  When the capture changes during a
@@ -5397,7 +5441,7 @@ int /*long*/ windowProc (int /*long*/ hwnd, int msg, int /*long*/ wParam, int /*
 		* 
 		* The fix for both cases is to create the image using PrintWindow(). 
 		*/
-		if ((!OS.IsWinCE && OS.WIN32_VERSION >= OS.VERSION (6, 0)) || hooks (SWT.EraseItem) || hooks (SWT.PaintItem)) {
+		if ((!OS.IsWinCE && OS.WIN32_VERSION >= OS.VERSION (6, 0)) || (style & SWT.VIRTUAL) != 0 || hooks (SWT.EraseItem) || hooks (SWT.PaintItem)) {
 			int topIndex = (int)/*64*/OS.SendMessage (handle, OS.LVM_GETTOPINDEX, 0, 0);
 			int selection = (int)/*64*/OS.SendMessage (handle, OS.LVM_GETNEXTITEM, topIndex - 1, OS.LVNI_SELECTED);
 			if (selection == -1) return 0;
@@ -5538,7 +5582,7 @@ LRESULT WM_CONTEXTMENU (int /*long*/ wParam, int /*long*/ lParam) {
 LRESULT WM_ERASEBKGND (int /*long*/ wParam, int /*long*/ lParam) {
 	LRESULT result = super.WM_ERASEBKGND (wParam, lParam);
 	if (findImageControl () != null) return LRESULT.ONE;
-	if (OS.COMCTL32_MAJOR < 6) {
+	if (!OS.IsWinCE && OS.COMCTL32_MAJOR < 6) {
 		if ((style & SWT.DOUBLE_BUFFERED) != 0) {
 			int bits = (int)/*64*/OS.SendMessage (handle, OS.LVM_GETEXTENDEDLISTVIEWSTYLE, 0, 0);
 			if ((bits & OS.LVS_EX_DOUBLEBUFFER) == 0) return LRESULT.ONE;
@@ -5752,14 +5796,14 @@ LRESULT WM_PAINT (int /*long*/ wParam, int /*long*/ lParam) {
 		}
 	}
 	if (fixScrollWidth) setScrollWidth (null, true);
-	if (OS.COMCTL32_MAJOR < 6) {
+	if (!OS.IsWinCE && OS.COMCTL32_MAJOR < 6) {
 		if ((style & SWT.DOUBLE_BUFFERED) != 0 || findImageControl () != null) {
 			int bits = (int)/*64*/OS.SendMessage (handle, OS.LVM_GETEXTENDEDLISTVIEWSTYLE, 0, 0);
 			if ((bits & OS.LVS_EX_DOUBLEBUFFER) == 0) {
 				GC gc = null;
 				int /*long*/ paintDC = 0;
 				PAINTSTRUCT ps = new PAINTSTRUCT ();
-				boolean hooksPaint = hooks (SWT.Paint);
+				boolean hooksPaint = hooks (SWT.Paint) || filters (SWT.Paint);
 				if (hooksPaint) {
 					GCData data = new GCData ();
 					data.ps = ps;
@@ -5924,6 +5968,13 @@ LRESULT WM_SETREDRAW (int /*long*/ wParam, int /*long*/ lParam) {
 			}
 		}
 	}
+	/*
+	* Bug in Windows.  When WM_SETREDRAW is used to turn off
+	* redraw for a list, table or tree, the background of the
+	* control is drawn.  The fix is to call DefWindowProc(),
+	* which stops all graphics output to the control.
+	*/
+	OS.DefWindowProc (handle, OS.WM_SETREDRAW, wParam, lParam);
 	int /*long*/ code = callWindowProc (handle, OS.WM_SETREDRAW, wParam, lParam);
 	if (wParam == 0) {
 		if ((int)/*64*/OS.SendMessage (handle, OS.LVM_GETBKCOLOR, 0, 0) == OS.CLR_NONE) {
@@ -6012,7 +6063,7 @@ LRESULT WM_HSCROLL (int /*long*/ wParam, int /*long*/ lParam) {
 		if (OS.COMCTL32_MAJOR >= 6) {
 			if (columnCount > H_SCROLL_LIMIT) {
 				int rowCount = (int)/*64*/OS.SendMessage (handle, OS.LVM_GETCOUNTPERPAGE, 0, 0);
-				if (rowCount > V_SCROLL_LIMIT) fixScroll = drawCount == 0 && OS.IsWindowVisible (handle);
+				if (rowCount > V_SCROLL_LIMIT) fixScroll = getDrawing () && OS.IsWindowVisible (handle);
 			}
 		}
 	}
@@ -6111,7 +6162,7 @@ LRESULT WM_VSCROLL (int /*long*/ wParam, int /*long*/ lParam) {
 		if (OS.COMCTL32_MAJOR >= 6) {
 			if (columnCount > H_SCROLL_LIMIT) {
 				int rowCount = (int)/*64*/OS.SendMessage (handle, OS.LVM_GETCOUNTPERPAGE, 0, 0);
-				if (rowCount > V_SCROLL_LIMIT) fixScroll = drawCount == 0 && OS.IsWindowVisible (handle);
+				if (rowCount > V_SCROLL_LIMIT) fixScroll = getDrawing () && OS.IsWindowVisible (handle);
 			}
 		}
 	}
@@ -6560,10 +6611,15 @@ LRESULT wmNotifyHeader (NMHDR hdr, int /*long*/ wParam, int /*long*/ lParam) {
 					* Bug in Windows.  When the first column of a table does not
 					* have an image and the user double clicks on the divider,
 					* Windows packs the column but does not take into account
-					* the empty space left for the image.  The fix is to measure
-					* each items ourselves rather than letting Windows do it.
+					* the empty space left for the image.  The fix is to pack
+					* the column explicitly rather than letting Windows do it.
+					* 
+					* NOTE:  This bug does not happen on Vista.
 					*/
-					boolean fixPack = phdn.iItem == 0 && !firstColumnImage;
+					boolean fixPack = false;
+					if (!OS.IsWinCE && OS.WIN32_VERSION < OS.VERSION (6, 0)) {
+						fixPack = phdn.iItem == 0 && !firstColumnImage;
+					}
 					if (column != null && (fixPack || hooks (SWT.MeasureItem))) {
 						column.pack ();
 						return LRESULT.ONE;
@@ -6729,8 +6785,14 @@ LRESULT wmNotifyToolTip (NMHDR hdr, int /*long*/ wParam, int /*long*/ lParam) {
 				OS.POINTSTOPOINT (pt, pos);
 				OS.ScreenToClient (handle, pt);
 				pinfo.x = pt.x;
-				pinfo.y = pt.y;
-				if (OS.SendMessage (handle, OS.LVM_SUBITEMHITTEST, 0, pinfo) != -1) {
+				pinfo.y = pt.y;	
+				/*
+				*  Bug in Windows.  When LVM_SUBITEMHITTEST is used to hittest
+				*  a point that is above the table, instead of returning -1 to
+				*  indicate that the hittest failed, a negative index is returned.
+				*  The fix is to consider any value that is negative a failure.
+				*/
+				if (OS.SendMessage (handle, OS.LVM_SUBITEMHITTEST, 0, pinfo) >= 0) {
 					TableItem item = _getItem (pinfo.iItem);
 					int /*long*/ hDC = OS.GetDC (handle);
 					int /*long*/ oldFont = 0, newFont = OS.SendMessage (handle, OS.WM_GETFONT, 0, 0);
@@ -6824,7 +6886,13 @@ LRESULT wmNotifyToolTip (NMTTCUSTOMDRAW nmcd, int /*long*/ lParam) {
 			OS.ScreenToClient (handle, pt);
 			pinfo.x = pt.x;
 			pinfo.y = pt.y;
-			if (OS.SendMessage (handle, OS.LVM_SUBITEMHITTEST, 0, pinfo) != -1) {
+			/*
+			*  Bug in Windows.  When LVM_SUBITEMHITTEST is used to hittest
+			*  a point that is above the table, instead of returning -1 to
+			*  indicate that the hittest failed, a negative index is returned.
+			*  The fix is to consider any value that is negative a failure.
+			*/
+			if (OS.SendMessage (handle, OS.LVM_SUBITEMHITTEST, 0, pinfo) >= 0) {
 				TableItem item = _getItem (pinfo.iItem);
 				int /*long*/ hDC = OS.GetDC (handle);
 				int /*long*/ hFont = item.fontHandle (pinfo.iSubItem);

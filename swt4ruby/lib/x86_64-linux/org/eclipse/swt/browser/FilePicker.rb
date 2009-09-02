@@ -351,6 +351,16 @@ module Org::Eclipse::Swt::Browser
     end
     
     typesig { [::Java::Long] }
+    # int
+    def get_browser(a_domwindow)
+      if ((a_domwindow).equal?(0))
+        return nil
+      end
+      window = NsIDOMWindow.new(a_domwindow)
+      return Mozilla.find_browser(window)
+    end
+    
+    typesig { [::Java::Long] }
     # As of Mozilla 1.8 some of nsIFilePicker's string arguments changed type.  This method
     # answers a java string based on the type of string that is appropriate for the Mozilla
     # version being used.
@@ -386,10 +396,12 @@ module Org::Eclipse::Swt::Browser
       if ((@mode).equal?(self.attr_ns_ifile_picker.attr_mode_open_multiple))
         style |= SWT::MULTI
       end
-      display = Display.get_current
-      parent = nil # TODO compute parent
-      if ((parent).nil?)
-        parent = Shell.new(display)
+      browser = get_browser(@parent_handle)
+      parent = nil
+      if (!(browser).nil?)
+        parent = browser.get_shell
+      else
+        parent = Shell.new
       end
       dialog = FileDialog.new(parent, style)
       if (!(@title).nil?)
@@ -417,10 +429,12 @@ module Org::Eclipse::Swt::Browser
     
     typesig { [] }
     def show_directory_picker
-      display = Display.get_current
-      parent = nil # TODO compute parent
-      if ((parent).nil?)
-        parent = Shell.new(display)
+      browser = get_browser(@parent_handle)
+      parent = nil
+      if (!(browser).nil?)
+        parent = browser.get_shell
+      else
+        parent = Shell.new
       end
       dialog = DirectoryDialog.new(parent, SWT::NONE)
       if (!(@title).nil?)

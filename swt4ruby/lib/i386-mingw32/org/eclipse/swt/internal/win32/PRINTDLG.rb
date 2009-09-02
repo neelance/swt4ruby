@@ -1,6 +1,6 @@
 require "rjava"
 
-# Copyright (c) 2000, 2006 IBM Corporation and others.
+# Copyright (c) 2000, 2008 IBM Corporation and others.
 # All rights reserved. This program and the accompanying materials
 # are made available under the terms of the Eclipse Public License v1.0
 # which accompanies this distribution, and is available at
@@ -26,6 +26,7 @@ module Org::Eclipse::Swt::Internal::Win32
     undef_method :l_struct_size=
     
     # DWORD
+    # @field cast=(HWND)
     # long
     attr_accessor :hwnd_owner
     alias_method :attr_hwnd_owner, :hwnd_owner
@@ -34,6 +35,7 @@ module Org::Eclipse::Swt::Internal::Win32
     undef_method :hwnd_owner=
     
     # HWND
+    # @field cast=(HGLOBAL)
     # long
     attr_accessor :h_dev_mode
     alias_method :attr_h_dev_mode, :h_dev_mode
@@ -42,6 +44,7 @@ module Org::Eclipse::Swt::Internal::Win32
     undef_method :h_dev_mode=
     
     # HGLOBAL
+    # @field cast=(HGLOBAL)
     # long
     attr_accessor :h_dev_names
     alias_method :attr_h_dev_names, :h_dev_names
@@ -50,6 +53,7 @@ module Org::Eclipse::Swt::Internal::Win32
     undef_method :h_dev_names=
     
     # HGLOBAL
+    # @field cast=(HDC)
     # long
     attr_accessor :h_dc
     alias_method :attr_h_dc, :h_dc
@@ -100,6 +104,7 @@ module Org::Eclipse::Swt::Internal::Win32
     undef_method :n_copies=
     
     # WORD
+    # @field cast=(HINSTANCE)
     # long
     attr_accessor :h_instance
     alias_method :attr_h_instance, :h_instance
@@ -116,6 +121,7 @@ module Org::Eclipse::Swt::Internal::Win32
     undef_method :l_cust_data=
     
     # LPARAM
+    # @field cast=(LPPRINTHOOKPROC)
     # long
     attr_accessor :lpfn_print_hook
     alias_method :attr_lpfn_print_hook, :lpfn_print_hook
@@ -124,6 +130,7 @@ module Org::Eclipse::Swt::Internal::Win32
     undef_method :lpfn_print_hook=
     
     # LPPRINTHOOKPROC
+    # @field cast=(LPPRINTHOOKPROC)
     # long
     attr_accessor :lpfn_setup_hook
     alias_method :attr_lpfn_setup_hook, :lpfn_setup_hook
@@ -132,6 +139,7 @@ module Org::Eclipse::Swt::Internal::Win32
     undef_method :lpfn_setup_hook=
     
     # LPSETUPHOOKPROC
+    # @field cast=(LPCTSTR)
     # long
     attr_accessor :lp_print_template_name
     alias_method :attr_lp_print_template_name, :lp_print_template_name
@@ -140,6 +148,7 @@ module Org::Eclipse::Swt::Internal::Win32
     undef_method :lp_print_template_name=
     
     # LPCTSTR
+    # @field cast=(LPCTSTR)
     # long
     attr_accessor :lp_setup_template_name
     alias_method :attr_lp_setup_template_name, :lp_setup_template_name
@@ -148,6 +157,7 @@ module Org::Eclipse::Swt::Internal::Win32
     undef_method :lp_setup_template_name=
     
     # LPCTSTR
+    # @field cast=(HGLOBAL)
     # long
     attr_accessor :h_print_template
     alias_method :attr_h_print_template, :h_print_template
@@ -156,6 +166,7 @@ module Org::Eclipse::Swt::Internal::Win32
     undef_method :h_print_template=
     
     # HGLOBAL
+    # @field cast=(HGLOBAL)
     # long
     attr_accessor :h_setup_template
     alias_method :attr_h_setup_template, :h_setup_template

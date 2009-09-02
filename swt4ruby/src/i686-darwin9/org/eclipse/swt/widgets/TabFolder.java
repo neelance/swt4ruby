@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2008 IBM Corporation and others.
+ * Copyright (c) 2000, 2009 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -11,9 +11,7 @@
 package org.eclipse.swt.widgets;
 
  
-import org.eclipse.swt.internal.carbon.OS;
-import org.eclipse.swt.internal.carbon.Rect;
-import org.eclipse.swt.internal.carbon.CGRect;
+import org.eclipse.swt.internal.cocoa.*;
 
 import org.eclipse.swt.*;
 import org.eclipse.swt.events.*;
@@ -47,10 +45,12 @@ import org.eclipse.swt.graphics.*;
  * @see <a href="http://www.eclipse.org/swt/snippets/#tabfolder">TabFolder, TabItem snippets</a>
  * @see <a href="http://www.eclipse.org/swt/examples.php">SWT Example: ControlExample</a>
  * @see <a href="http://www.eclipse.org/swt/">Sample code and further information</a>
+ * @noextend This class is not intended to be subclassed by clients.
  */
 public class TabFolder extends Composite {
 	TabItem [] items;
-	int lastSelected = -1;
+	int itemCount;
+	boolean ignoreSelect;
 	
 /**
  * Constructs a new instance of this class given its parent
@@ -77,6 +77,8 @@ public class TabFolder extends Composite {
  * </ul>
  *
  * @see SWT
+ * @see SWT#TOP
+ * @see SWT#BOTTOM
  * @see Widget#checkSubclass
  * @see Widget#getStyle
  */
@@ -128,24 +130,6 @@ static int checkStyle (int style) {
 	return style & ~(SWT.H_SCROLL | SWT.V_SCROLL);
 }
 
-int callPaintEventHandler (int control, int damageRgn, int visibleRgn, int theEvent, int nextHandler) {
-	/*
-	* Bug in the Macintosh.  The tab folder tabs draw outside the widget
-	* bounds when they do not fit.  The fix is to clip the output to the
-	* widget bounds.
-	*/
-	int [] context = new int [1];
-	OS.GetEventParameter (theEvent, OS.kEventParamCGContextRef, OS.typeCGContextRef, null, 4, null, context);
-	OS.CGContextSaveGState (context[0]);
-	CGRect rect = new CGRect ();
-	OS.HIViewGetBounds (handle, rect);
-	OS.CGContextAddRect (context[0], rect);
-	OS.CGContextClip (context [0]);
-	int result = super.callPaintEventHandler (control, damageRgn, visibleRgn, theEvent, nextHandler);
-	OS.CGContextRestoreGState (context[0]);
-	return result;
-}
-
 protected void checkSubclass () {
 	if (!isValidSubclass ()) error (SWT.ERROR_INVALID_SUBCLASS);
 }
@@ -153,15 +137,8 @@ protected void checkSubclass () {
 public Point computeSize (int wHint, int hHint, boolean changed) {
 	Point size = super.computeSize (wHint, hHint, changed);
 	if (wHint == SWT.DEFAULT && items.length > 0) {
-		int width = 0;
-		GC gc = new GC (this);
-		for (int i = 0; i < items.length; i++) {
-			if (items [i] != null) {
-				width += items [i].calculateWidth (gc);
-			}
-		}
-		gc.dispose ();
-		Rectangle trim = computeTrim (0, 0, width, 0);
+		NSSize minSize = ((NSTabView)view).minimumSize();
+		Rectangle trim = computeTrim (0, 0, (int)Math.ceil (minSize.width), 0);
 		size.x = Math.max (trim.width, size.x);
 	}
 	return size;
@@ -169,46 +146,29 @@ public Point computeSize (int wHint, int hHint, boolean changed) {
 
 public Rectangle computeTrim (int x, int y, int width, int height) {
 	checkWidget ();
-	CGRect oldBounds = new CGRect (), bounds = oldBounds;
-	OS.HIViewGetFrame (handle, oldBounds);
-	int MIN_SIZE = 100;
-	if (oldBounds.width < MIN_SIZE || oldBounds.height < MIN_SIZE) {
-		OS.HIViewSetDrawingEnabled (handle, false);
-		bounds = new CGRect ();
-		bounds.width = bounds.height = 100;
-		OS.HIViewSetFrame (handle, bounds);
-	}
-	Rect client = new Rect ();
-	OS.GetTabContentRect (handle, client);
-	if (oldBounds.width < MIN_SIZE || oldBounds.height < MIN_SIZE) {
-		OS.HIViewSetFrame (handle, oldBounds);
-		OS.HIViewSetDrawingEnabled (handle, drawCount == 0);
-	}
-	x -= client.left;
-	y -= client.top;
-	width += (int) bounds.width - (client.right - client.left);
-	height += (int) bounds.height - (client.bottom - client.top);
-	Rect inset = getInset ();
-	x -= inset.left;
-	y -= inset.top;
-	width += inset.left + inset.right;
-	height += inset.top + inset.bottom;
-	return new Rectangle (-client.left, -client.top, width, height);
+	NSTabView widget = (NSTabView)view;
+	NSRect rect = widget.contentRect ();
+	x -= rect.x;
+	y -= rect.y;
+	NSRect frame = widget.frame();
+	width += Math.ceil (frame.width - rect.width);
+	height += Math.ceil (frame.height - rect.height);
+	return super.computeTrim (x, y, width, height);
 }
 
 void createHandle () {
-	int [] outControl = new int [1];
-	int window = OS.GetControlOwner (parent.handle);
-	short direction = (style & SWT.BOTTOM) != 0 ? (short)OS.kControlTabDirectionSouth : (short)OS.kControlTabDirectionNorth;
-	OS.CreateTabsControl (window, new Rect (), (short)OS.kControlTabSizeLarge, direction, (short) 0, 0, outControl);
-	if (outControl [0] == 0) error (SWT.ERROR_NO_HANDLES);
-	handle = outControl [0];
+	NSTabView widget = (NSTabView)new SWTTabView().alloc();
+	widget.init ();
+	widget.setDelegate(widget);
+	if ((style & SWT.BOTTOM) != 0) {
+		widget.setTabViewType(OS.NSBottomTabsBezelBorder);
+	}
+	view = widget;
 }
 
 void createItem (TabItem item, int index) {
-	int count = OS.GetControl32BitMaximum (handle);
+	int count = itemCount;
 	if (!(0 <= index && index <= count)) error (SWT.ERROR_INVALID_RANGE);
-	OS.SetControl32BitMaximum (handle, count+1);
 	if (count == items.length) {
 		TabItem [] newItems = new TabItem [items.length + 4];
 		System.arraycopy (items, 0, newItems, 0, items.length);
@@ -216,20 +176,10 @@ void createItem (TabItem item, int index) {
 	}
 	System.arraycopy (items, index, items, index + 1, count - index);
 	items [index] = item;
-
-	/*
-	* Send a selection event when the item that is added becomes
-	* the new selection.  This only happens when the first item
-	* is added.
-	*/
-	if (count == 0) {
-		OS.SetControl32BitValue (handle, 1);
-		lastSelected = 0;
-		Event event = new Event ();
-		event.item = items [0];
-		sendEvent (SWT.Selection, event);
-		// the widget could be destroyed at this point
-	}
+	itemCount++;
+	NSTabViewItem nsItem = (NSTabViewItem)new NSTabViewItem().alloc().init();
+	item.nsItem = nsItem;
+	((NSTabView)view).insertTabViewItem(nsItem, index);
 }
 
 void createWidget () {
@@ -237,42 +187,47 @@ void createWidget () {
 	items = new TabItem [4];
 }
 
+NSFont defaultNSFont () {
+	return display.tabViewFont;
+}
+
 void destroyItem (TabItem item) {
-	int count = OS.GetControl32BitMaximum (handle);
+	int count = itemCount;
 	int index = 0;
 	while (index < count) {
 		if (items [index] == item) break;
 		index++;
 	}
 	if (index == count) return;
-	redrawWidget (handle, false);
-	int selectionIndex = OS.GetControl32BitValue (handle) - 1;
 	--count;
-	OS.SetControl32BitMaximum (handle, count);
 	System.arraycopy (items, index + 1, items, index, count - index);
 	items [count] = null;
 	if (count == 0) {
 		items = new TabItem [4];
 	}
-	for (int i = index; i < count; i++) {
-		items [i].update ();
+	itemCount = count;
+	((NSTabView)view).removeTabViewItem(item.nsItem);
+}
+
+Widget findTooltip (NSPoint pt) {
+	pt = view.convertPoint_fromView_ (pt, null);
+	NSTabViewItem nsItem = ((NSTabView)view).tabViewItemAtPoint (pt);
+	if (nsItem != null) {
+		for (int i = 0; i < itemCount; i++) {
+			TabItem item = items [i];
+			if (item.nsItem.id == nsItem.id) return item;
+		}
 	}
-	if (count > 0 && index == selectionIndex) {
-		setSelection (Math.max (0, selectionIndex - 1), true, true);
-	}
-	invalidateVisibleRegion (handle);
+	return super.findTooltip (pt);
 }
 
 public Rectangle getClientArea () {
 	checkWidget ();
-	Rect client = new Rect ();
-	if (OS.GetControlData (handle, (short)OS.kControlEntireControl, OS.kControlTabContentRectTag, Rect.sizeof, client, null) != OS.noErr) {
-		return new Rectangle(0, 0, 0, 0);
-	}
-	int x = Math.max (0, client.left);
-	int y = Math.max (0, client.top);
-	int width = Math.max (0, client.right - client.left);
-	int height = Math.max (0, client.bottom - client.top);
+	NSRect rect = ((NSTabView)view).contentRect();
+	int x = Math.max (0, (int)rect.x);
+	int y = Math.max (0, (int)rect.y);
+	int width = Math.max (0, (int)Math.ceil (rect.width));
+	int height = Math.max (0, (int)Math.ceil (rect.height));
 	return new Rectangle (x, y, width, height);
 }
 
@@ -293,7 +248,7 @@ public Rectangle getClientArea () {
  */
 public TabItem getItem (int index) {
 	checkWidget ();
-	int count = OS.GetControl32BitMaximum (handle);
+	int count = itemCount;
 	if (!(0 <= index && index < count)) error (SWT.ERROR_INVALID_RANGE);
 	return items [index];
 }
@@ -316,14 +271,19 @@ public TabItem getItem (int index) {
  * 
  * @since 3.4
  */
-public TabItem getItem(Point point) {
+public TabItem getItem (Point point) {
 	checkWidget ();
 	if (point == null) error (SWT.ERROR_NULL_ARGUMENT);
-	int count = OS.GetControl32BitMaximum (handle);
-	for (int index = 0; index < count; index++) {
-		TabItem item = items[index];
-		Rectangle bounds = item.getBounds();
-		if (bounds.contains(point)) return item;
+	NSPoint nsPoint = new NSPoint ();
+	nsPoint.x = point.x;
+	nsPoint.y = point.y;
+	NSTabView tabView = (NSTabView) view;
+	NSTabViewItem tabViewItem = tabView.tabViewItemAtPoint (nsPoint);
+	for (int i = 0; i < itemCount; i++) {
+		NSTabViewItem item = items[i].nsItem;
+		if (item.isEqual (tabViewItem)) {
+			return items [i];
+		}
 	}
 	return null;
 }
@@ -340,7 +300,7 @@ public TabItem getItem(Point point) {
  */
 public int getItemCount () {
 	checkWidget ();
-	return OS.GetControl32BitMaximum (handle);
+	return itemCount;
 }
 
 /**
@@ -361,7 +321,7 @@ public int getItemCount () {
  */
 public TabItem [] getItems () {
 	checkWidget ();
-	int count = OS.GetControl32BitMaximum (handle);
+	int count = itemCount;
 	TabItem [] result = new TabItem [count];
 	System.arraycopy (items, 0, result, 0, count);
 	return result;
@@ -385,7 +345,7 @@ public TabItem [] getItems () {
  */
 public TabItem [] getSelection () {
 	checkWidget ();
-	int index = OS.GetControl32BitValue(handle) - 1;
+	int index = getSelectionIndex ();
 	if (index == -1) return new TabItem [0];
 	return new TabItem [] {items [index]};
 }
@@ -403,11 +363,16 @@ public TabItem [] getSelection () {
  */
 public int getSelectionIndex () {
 	checkWidget ();
-	return OS.GetControl32BitValue (handle) - 1;
+	NSTabViewItem selected =  ((NSTabView)view).selectedTabViewItem();
+	if (selected == null) return -1;
+	for (int i = 0; i < itemCount; i++) {
+		if (items[i].nsItem.id == selected.id) return i;
+	}
+	return -1;
 }
 
 float getThemeAlpha () {
-	return 0.25f * parent.getThemeAlpha ();
+	return (background != null ? 1 : 0.25f) * parent.getThemeAlpha ();
 }
 
 /**
@@ -430,7 +395,7 @@ float getThemeAlpha () {
 public int indexOf (TabItem item) {
 	checkWidget ();
 	if (item == null) error (SWT.ERROR_NULL_ARGUMENT);
-	int count = OS.GetControl32BitMaximum (handle);
+	int count = itemCount;
 	for (int i=0; i<count; i++) {
 		if (items [i] == item) return i;
 	}
@@ -443,7 +408,7 @@ Point minimumSize (int wHint, int hHint, boolean flushCache) {
 	for (int i=0; i<children.length; i++) {
 		Control child = children [i];
 		int index = 0;
-		int count = OS.GetControl32BitMaximum (handle);
+		int count = itemCount;
 		while (index < count) {
 			if (items [index].control == child) break;
 			index++;
@@ -461,58 +426,6 @@ Point minimumSize (int wHint, int hHint, boolean flushCache) {
 	return new Point (width, height);
 }
 
-Rect getInset () {
-	if (OS.VERSION >= 0x1020) return super.getInset();
-	return (style & SWT.BOTTOM) != 0 ? display.tabFolderSouthInset : display.tabFolderNorthInset;
-}
-
-int kEventControlApplyBackground (int nextHandler, int theEvent, int userData) {
-	/*
-	* Feature in the Macintosh.  For some reason, the tab folder applies the
-	* theme background when drawing even though a theme has not been set for
-	* the window.  The fix is to avoid running the default handler. 
-	*/
-	return OS.noErr;
-}
-
-int kEventControlHit (int nextHandler, int theEvent, int userData) {
-	int result = super.kEventControlHit (nextHandler, theEvent, userData);
-	if (result == OS.noErr) return result;
-	int index = OS.GetControl32BitValue (handle) - 1;
-	if (index == lastSelected) return result;
-	lastSelected = index;
-	int count = OS.GetControl32BitMaximum (handle);
-	for (int i = 0; i < count; i++) {
-		if (i != index) {
-			Control control = items [i].control;
-			if (control != null && !control.isDisposed ())
-				control.setVisible (false);
-		}
-	}
-	TabItem item = null;
-	if (index != -1) item = items [index];
-	if (item != null) {
-		Control control = item.control;
-		if (control != null && !control.isDisposed ()) {
-			control.setBounds (getClientArea ());
-			control.setVisible (true);
-		}
-	}
-	Event event = new Event ();
-	event.item = item;
-	postEvent (SWT.Selection, event);
-	return OS.noErr;
-}
-
-int kEventControlSetFocusPart (int nextHandler, int theEvent, int userData) {
-	short [] part = new short [1];
-	OS.GetEventParameter (theEvent, OS.kEventParamControlPart, OS.typeControlPartCode, null, 2, null, part);
-	if (part [0] == OS.kControlFocusNoPart || part [0] == OS.kControlFocusNextPart) {
-		return super.kEventControlSetFocusPart (nextHandler, theEvent, userData);
-	}
-	return OS.eventNotHandledErr;
-}
-
 void releaseChildren (boolean destroy) {
 	if (items != null) {
 		for (int i=0; i<items.length; i++) {
@@ -528,7 +441,7 @@ void releaseChildren (boolean destroy) {
 
 void removeControl (Control control) {
 	super.removeControl (control);
-	int count = OS.GetControl32BitMaximum (handle);
+	int count = itemCount;
 	for (int i=0; i<count; i++) {
 		TabItem item = items [i];
 		if (item.control == control) item.setControl (null);
@@ -560,19 +473,8 @@ public void removeSelectionListener (SelectionListener listener) {
 	eventTable.unhook (SWT.DefaultSelection,listener);	
 }
 
-int setBounds (int x, int y, int width, int height, boolean move, boolean resize, boolean events) {
-	int result = super.setBounds(x, y, width, height, move, resize, events);
-	if ((result & RESIZED) != 0) {
-		int index = OS.GetControl32BitValue (handle) - 1;
-		if (index != -1) {
-			TabItem item = items [index];
-			Control control = item.control;
-			if (control != null && !control.isDisposed ()) {
-				control.setBounds (getClientArea ());
-			}
-		}
-	}
-	return result;
+void setFont (NSFont font) {
+	((NSTabView)view).setFont(font);
 }
 
 /**
@@ -641,14 +543,14 @@ public void setSelection (TabItem [] items) {
  */
 public void setSelection (int index) {
 	checkWidget ();
-	int count = OS.GetControl32BitMaximum (handle);
+	int count = itemCount;
 	if (!(0 <= index && index < count)) return;
 	setSelection (index, false, false);
 }
 
 void setSelection (int index, boolean notify, boolean force) {
-	if (index >= OS.GetControl32BitMaximum (handle)) return;
-	int currentIndex = OS.GetControl32BitValue (handle) - 1;
+	if (!(0 <= index && index < itemCount)) return;
+	int currentIndex = getSelectionIndex ();
 	if (!force && currentIndex == index) return;
 	if (currentIndex != -1) {
 		TabItem item = items [currentIndex];
@@ -659,19 +561,15 @@ void setSelection (int index, boolean notify, boolean force) {
 			}
 		}
 	}
-	OS.SetControl32BitValue (handle, index+1);
-	index = OS.GetControl32BitValue (handle) - 1;
-	if (hasFocus ()) {
-		int window = OS.GetControlOwner (handle);
-		OS.SetKeyboardFocus (window, handle, (short) (index + 1));
-	}
-	lastSelected = index;
+	ignoreSelect = true;
+	((NSTabView)view).selectTabViewItemAtIndex(index);
+	ignoreSelect = false;
+	index = getSelectionIndex();
 	if (index != -1) {
 		TabItem item = items [index];
 		if (item != null) {
 			Control control = item.control;
 			if (control != null && !control.isDisposed ()) {
-				control.setBounds (getClientArea ());
 				control.setVisible (true);
 			}
 			if (notify) {
@@ -681,6 +579,10 @@ void setSelection (int index, boolean notify, boolean force) {
 			}
 		}
 	}
+}
+
+void setSmallSize () {
+	((NSTabView)view).setControlSize (OS.NSSmallControlSize);
 }
 
 boolean traversePage (boolean next) {
@@ -696,4 +598,55 @@ boolean traversePage (boolean next) {
 	setSelection (index, true, false);
 	return index == getSelectionIndex ();
 }
+
+void tabView_willSelectTabViewItem(int /*long*/ id, int /*long*/ sel, int /*long*/ tabView, int /*long*/ tabViewItem) {
+	if (tabViewItem == 0) return;
+	for (int i = 0; i < itemCount; i++) {
+		TabItem item = items [i];
+		if (item.nsItem.id == tabViewItem) {
+			int currentIndex = getSelectionIndex ();
+			if (currentIndex != -1) {
+				TabItem selected = items [currentIndex];
+				if (selected != null) {
+					Control control = selected.control;
+					if (control != null && !control.isDisposed ()) {
+						control.setVisible (false);
+					}
+				}
+			}
+			Control control = item.control;
+			if (control != null && !control.isDisposed ()) {
+				control.setVisible (true);
+			}
+			break;
+		}
+	}
+}
+
+void tabView_didSelectTabViewItem(int /*long*/ id, int /*long*/ sel, int /*long*/ tabView, int /*long*/ tabViewItem) {
+	if (tabViewItem == 0) return;
+	for (int i = 0; i < itemCount; i++) {
+		TabItem item = items [i];
+		/*
+		* Feature in Cocoa.  For some reason the control on a tab being
+		* deselected has its parent removed natively.  The fix is to
+		* re-set the control's parent.
+		*/
+		Control control = item.control;
+		if (control != null) {
+			NSView topView = control.topView ();
+			if (topView.superview () == null) {
+				contentView ().addSubview (topView, OS.NSWindowBelow, null);
+			}
+		}
+		if (item.nsItem.id == tabViewItem) {
+			if (!ignoreSelect) {
+				Event event = new Event ();
+				event.item = item;
+				postEvent (SWT.Selection, event);
+			}
+		}
+	}
+}
+
 }

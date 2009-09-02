@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2008 IBM Corporation and others.
+ * Copyright (c) 2000, 2009 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -10,12 +10,10 @@
  *******************************************************************************/
 package org.eclipse.swt.widgets;
 
-
-import org.eclipse.swt.internal.carbon.ControlFontStyleRec;
-import org.eclipse.swt.internal.carbon.OS;
-
 import org.eclipse.swt.*;
+import org.eclipse.swt.accessibility.*;
 import org.eclipse.swt.graphics.*;
+import org.eclipse.swt.internal.cocoa.*;
 
 /**
  * Instances of this class represent a non-selectable
@@ -23,7 +21,7 @@ import org.eclipse.swt.graphics.*;
  * When SEPARATOR is specified, displays a single
  * vertical or horizontal line.
  * <p>
- * Shadow styles are hints and may not be honoured
+ * Shadow styles are hints and may not be honored
  * by the platform.  To create a separator label
  * with the default shadow style for the platform,
  * do not specify a shadow style.
@@ -48,11 +46,14 @@ import org.eclipse.swt.graphics.*;
  * @see <a href="http://www.eclipse.org/swt/snippets/#label">Label snippets</a>
  * @see <a href="http://www.eclipse.org/swt/examples.php">SWT Example: ControlExample</a>
  * @see <a href="http://www.eclipse.org/swt/">Sample code and further information</a>
+ * @noextend This class is not intended to be subclassed by clients.
  */
 public class Label extends Control {
-	String text = "";
+	String text;
 	Image image;
 	boolean isImage;
+	NSTextField textView;
+	NSImageView imageView;
 
 /**
  * Constructs a new instance of this class given its parent
@@ -95,29 +96,64 @@ public Label (Composite parent, int style) {
 	super (parent, checkStyle (style));
 }
 
+int /*long*/ accessibilityAttributeNames(int /*long*/ id, int /*long*/ sel) {
+	if (accessible != null) {		
+		if ((textView != null && (id == textView.id || id == textView.cell().id)) || (imageView != null && (id == imageView.id || id == imageView.cell().id))) {
+			// See if the accessible will override or augment the standard list.
+			// Help, title, and description can be overridden.
+			NSMutableArray extraAttributes = NSMutableArray.arrayWithCapacity(3);
+			extraAttributes.addObject(OS.NSAccessibilityHelpAttribute);
+			extraAttributes.addObject(OS.NSAccessibilityDescriptionAttribute);
+			extraAttributes.addObject(OS.NSAccessibilityTitleAttribute);
+
+			for (int i = (int)/*64*/extraAttributes.count() - 1; i >= 0; i--) {
+				NSString attribute = new NSString(extraAttributes.objectAtIndex(i).id);
+				if (accessible.internal_accessibilityAttributeValue(attribute, ACC.CHILDID_SELF) == null) {
+					extraAttributes.removeObjectAtIndex(i);
+				}
+			}
+
+			if (extraAttributes.count() > 0) {
+				int /*long*/ superResult = super.accessibilityAttributeNames(id, sel);
+				NSArray baseAttributes = new NSArray(superResult);
+				NSMutableArray mutableAttributes = NSMutableArray.arrayWithCapacity(baseAttributes.count() + 1);
+				mutableAttributes.addObjectsFromArray(baseAttributes);
+				
+				for (int i = 0; i < extraAttributes.count(); i++) {
+					id currAttribute = extraAttributes.objectAtIndex(i);
+					if (!mutableAttributes.containsObject(currAttribute)) {
+						mutableAttributes.addObject(currAttribute);
+					}
+				}
+				
+				return mutableAttributes.id;
+			}
+		}
+	}
+
+	return super.accessibilityAttributeNames(id, sel);
+}
+
+boolean accessibilityIsIgnored(int /*long*/ id, int /*long*/ sel) {
+	if (id == view.id) return true;
+	return super.accessibilityIsIgnored(id, sel);	
+}
+
 void addRelation (Control control) {
 	if (!control.isDescribedByLabel ()) return;
 	
-	int labelElement = OS.AXUIElementCreateWithHIObjectAndIdentifier (handle, 0);
-	String string = OS.kAXTitleUIElementAttribute;  // control LabeledBy this
-	char [] buffer = new char [string.length ()];
-	string.getChars (0, buffer.length, buffer, 0);
-	int stringRef = OS.CFStringCreateWithCharacters (OS.kCFAllocatorDefault, buffer, buffer.length);
-	OS.HIObjectSetAuxiliaryAccessibilityAttribute(control.focusHandle (), 0, stringRef, labelElement);
-	OS.CFRelease(labelElement);
-	OS.CFRelease(stringRef);
-	
-	int relatedElement = OS.AXUIElementCreateWithHIObjectAndIdentifier (control.focusHandle (), 0);
-	int array = OS.CFArrayCreateMutable(OS.kCFAllocatorDefault, 1, 0);
-	OS.CFArrayAppendValue(array, relatedElement);
-	string = OS.kAXServesAsTitleForUIElementsAttribute;  // this LabelFor control
-	buffer = new char [string.length ()];
-	string.getChars (0, buffer.length, buffer, 0);
-	stringRef = OS.CFStringCreateWithCharacters (OS.kCFAllocatorDefault, buffer, buffer.length);
-	OS.HIObjectSetAuxiliaryAccessibilityAttribute(handle, 0, stringRef, array);
-	OS.CFRelease(relatedElement);
-	OS.CFRelease(stringRef);
-	OS.CFRelease(array);
+	if (textView != null) {
+		NSObject accessibleElement = control.focusView();
+		
+		if (accessibleElement instanceof NSControl) {
+			NSControl viewAsControl = (NSControl)accessibleElement;
+			if (viewAsControl.cell() != null) accessibleElement = viewAsControl.cell();
+		}
+		
+		accessibleElement.accessibilitySetOverrideValue(textView.cell(), OS.NSAccessibilityTitleUIElementAttribute);
+		NSArray controlArray = NSArray.arrayWithObject(accessibleElement);
+		textView.cell().accessibilitySetOverrideValue(controlArray, OS.NSAccessibilityServesAsTitleForUIElementsAttribute);
+	}
 }
 
 static int checkStyle (int style) {
@@ -131,28 +167,42 @@ static int checkStyle (int style) {
 
 public Point computeSize (int wHint, int hHint, boolean changed) {
 	checkWidget();
-	int width = 0, height = 0;
+	int width = DEFAULT_WIDTH;
+	int height = DEFAULT_HEIGHT;
 	if ((style & SWT.SEPARATOR) != 0) {
+		float /*double*/ lineWidth = ((NSBox)view).borderWidth ();
 		if ((style & SWT.HORIZONTAL) != 0) {
-			width = DEFAULT_WIDTH;
-			height = 3;
+			height = (int)Math.ceil (lineWidth * 2);
 		} else {
-			width = 3;
-			height = DEFAULT_HEIGHT;
+			width = (int)Math.ceil (lineWidth * 2);
+		}
+		if (wHint != SWT.DEFAULT) width = wHint;
+		if (hHint != SWT.DEFAULT) height = hHint;
+		int border = getBorderWidth ();
+		width += border * 2; height += border * 2;
+		return new Point (width, height);
+	}
+	if (isImage) {
+		if (image != null) {
+			NSImage nsimage = image.handle;
+			NSSize size = nsimage.size ();
+			width = (int)size.width;
+			height = (int)size.height;
+		} else {
+			width = height = 0;
 		}
 	} else {
-		if (isImage && image != null) {
-			Rectangle r = image.getBounds ();
-			width = r.width;
-			height = r.height;
-		} else {			
-			int [] ptr = new int [1];
-			OS.GetControlData (handle, (short) 0 , OS.kControlStaticTextCFStringTag, 4, ptr, null);
-			Point size = textExtent (ptr [0], (style & SWT.WRAP) != 0 && wHint != SWT.DEFAULT ? wHint : 0);
-			if (ptr [0] != 0) OS.CFRelease (ptr [0]);
-			width = size.x;
-			height = size.y;			
+		NSSize size = null;
+		if ((style & SWT.WRAP) != 0 && wHint != SWT.DEFAULT) {
+			NSRect rect = new NSRect ();
+			rect.width = wHint;
+			rect.height = hHint != SWT.DEFAULT ? hHint : Float.MAX_VALUE;
+			size = textView.cell ().cellSizeForBounds (rect);
+		} else {
+			size = textView.cell ().cellSize ();
 		}
+		width = (int)Math.ceil (size.width);
+		height = (int)Math.ceil (size.height);
 	}
 	if (wHint != SWT.DEFAULT) width = wHint;
 	if (hHint != SWT.DEFAULT) height = hHint;
@@ -160,51 +210,74 @@ public Point computeSize (int wHint, int hHint, boolean changed) {
 }
 
 void createHandle () {
-	state |= GRAB | THEME_BACKGROUND;
-	int [] outControl = new int [1];
-	int window = OS.GetControlOwner (parent.handle);
+	state |= THEME_BACKGROUND;
+	NSBox widget = (NSBox)new SWTBox().alloc();
+	widget.init();
+	widget.setTitle(NSString.stringWith(""));
 	if ((style & SWT.SEPARATOR) != 0) {
-		OS.CreateSeparatorControl (window, null, outControl);
+		widget.setBoxType(OS.NSBoxSeparator);
+		NSView child = (NSView) new SWTView().alloc().init();
+		widget.setContentView(child);
+		child.release();
 	} else {
-		int just = OS.teFlushLeft;
-		if ((style & SWT.CENTER) != 0) just = OS.teCenter;
-		if ((style & SWT.RIGHT) != 0) just = OS.teFlushRight;
-		ControlFontStyleRec fontStyle = new ControlFontStyleRec ();
-		fontStyle.flags |= OS.kControlUseJustMask;
-		fontStyle.just = (short) just;
-		OS.CreateStaticTextControl (window, null, 0, fontStyle, outControl);
+		widget.setBorderType(OS.NSNoBorder);
+		widget.setBorderWidth (0);
+		widget.setBoxType (OS.NSBoxCustom);
+		NSSize offsetSize = new NSSize ();
+		widget.setContentViewMargins (offsetSize);
+
+		NSImageView imageWidget = (NSImageView) new SWTImageView ().alloc ();
+		imageWidget.init();
+		imageWidget.setImageScaling (OS.NSScaleNone);
+		
+		NSTextField textWidget = (NSTextField)new SWTTextField().alloc();
+		textWidget.init();
+		textWidget.setBordered(false);
+		textWidget.setEditable(false);
+		textWidget.setDrawsBackground(false);
+		NSTextFieldCell cell = new NSTextFieldCell(textWidget.cell());
+		cell.setWraps ((style & SWT.WRAP) != 0);
+		
+		widget.addSubview(imageWidget);
+		widget.addSubview(textWidget);
+		widget.setContentView(textWidget);
+		
+		imageView = imageWidget;
+		textView = textWidget;
+		_setAlignment();
 	}
-	if (outControl [0] == 0) error (SWT.ERROR_NO_HANDLES);
-	handle = outControl [0];
-	if ((style & SWT.WRAP) == 0) {
-		OS.SetControlData (handle, OS.kControlEntireControl, OS.kControlStaticTextIsMultilineTag, 1, new byte[] {0});
+	view = widget;
+}
+
+void createWidget() {
+	text = "";
+	super.createWidget ();
+}
+
+NSAttributedString createString() {
+	NSAttributedString attribStr = createString(text, null, foreground, (style & SWT.WRAP) == 0 ? style : 0, true, true);
+	attribStr.autorelease();
+	return attribStr;
+}
+
+NSFont defaultNSFont () {
+	return display.textFieldFont;
+}
+
+void deregister () {
+	super.deregister ();
+	if (textView != null) {
+		display.removeWidget(textView);
+		display.removeWidget(textView.cell());
+	}
+	if (imageView != null) {
+		display.removeWidget (imageView);
+		display.removeWidget (imageView.cell());
 	}
 }
 
-int defaultThemeFont () {
-	if (display.smallFonts) return OS.kThemeSmallSystemFont;
-	return OS.kThemePushButtonFont;
-}
-
-void drawBackground (int control, int context) {
-	fillBackground (control, context, null);
-}
-
-void drawWidget (int control, int context, int damageRgn, int visibleRgn, int theEvent) {
-	if (isImage && image != null) {
-		GCData data = new GCData ();
-		data.paintEvent = theEvent;
-		data.visibleRgn = visibleRgn;
-		GC gc = GC.carbon_new (this, data);
-		int x = 0;
-		Point size = getSize ();
-		Rectangle bounds = image.getBounds ();
-		if ((style & SWT.CENTER) != 0) x = (size.x - bounds.width) / 2;
-		if ((style & SWT.RIGHT) != 0) x = size.x - bounds.width;
-		gc.drawImage (image, x, 0);
-		gc.dispose ();
-	}
-	super.drawWidget (control, context, damageRgn, visibleRgn, theEvent);
+NSView eventView () {
+	return ((NSBox)view).contentView();
 }
 
 /**
@@ -271,16 +344,33 @@ boolean isDescribedByLabel () {
 	return false;
 }
 
+void register () {
+	super.register ();
+	if (textView != null) {
+		display.addWidget (textView, this);
+		display.addWidget (textView.cell(), this);
+	}
+	if (imageView != null) {
+		display.addWidget (imageView, this);
+		display.addWidget (imageView.cell(), this);
+	}
+}
+
+void releaseHandle () {
+	super.releaseHandle ();
+	if (textView != null) textView.release();
+	if (imageView != null) imageView.release();
+	textView = null;
+	imageView = null;
+}
+
 /*
- * Remove "Label for" relations from the receiver.
+ * Remove "Labeled by" relations from the receiver.
  */
 void removeRelation () {
-	String string = OS.kAXServesAsTitleForUIElementsAttribute;
-	char [] buffer = new char [string.length ()];
-	string.getChars (0, buffer.length, buffer, 0);
-	int stringRef = OS.CFStringCreateWithCharacters (OS.kCFAllocatorDefault, buffer, buffer.length);
-	OS.HIObjectSetAuxiliaryAccessibilityAttribute(handle, 0, stringRef, 0);
-	OS.CFRelease(stringRef);
+	if (textView != null) {
+		textView.cell().accessibilitySetOverrideValue(null, OS.NSAccessibilityServesAsTitleForUIElementsAttribute);
+	}
 }
 
 /**
@@ -302,15 +392,50 @@ public void setAlignment (int alignment) {
 	if ((alignment & (SWT.LEFT | SWT.RIGHT | SWT.CENTER)) == 0) return;
 	style &= ~(SWT.LEFT | SWT.RIGHT | SWT.CENTER);
 	style |= alignment & (SWT.LEFT | SWT.RIGHT | SWT.CENTER);
-	int just = OS.teFlushLeft;
-	if ((alignment & SWT.CENTER) != 0) just = OS.teCenter;
-	if ((alignment & SWT.RIGHT) != 0) just = OS.teFlushRight;
-	ControlFontStyleRec fontStyle = new ControlFontStyleRec ();
-	OS.GetControlData (handle, (short) OS.kControlEntireControl, OS.kControlFontStyleTag, ControlFontStyleRec.sizeof, fontStyle, null);
-	fontStyle.flags |= OS.kControlUseJustMask;
-	fontStyle.just = (short) just;
-	OS.SetControlFontStyle (handle, fontStyle);
-	redraw ();
+	_setAlignment();
+}
+
+void updateBackground () {
+	if ((style & SWT.SEPARATOR) != 0) return;
+	NSColor nsColor = null;
+	if (backgroundImage != null) {
+		nsColor = NSColor.colorWithPatternImage(backgroundImage.handle);
+	} else if (background != null) {
+		nsColor = NSColor.colorWithDeviceRed(background[0], background[1], background[2], background[3]);
+	} else {
+		nsColor = NSColor.clearColor();
+	}
+	((NSBox)view).setFillColor(nsColor);
+}
+
+void _setAlignment() {
+	if (image != null) {
+		if ((style & SWT.RIGHT) != 0) imageView.setImageAlignment(OS.NSImageAlignRight);
+		if ((style & SWT.LEFT) != 0) imageView.setImageAlignment(OS.NSImageAlignLeft);
+		if ((style & SWT.CENTER) != 0) imageView.setImageAlignment(OS.NSImageAlignCenter);
+	}
+	if (text != null) {
+		NSCell cell = new NSCell(textView.cell());
+		cell.setAttributedStringValue(createString());
+	}
+}
+
+void setFont(NSFont font) {
+	if (textView != null) {
+		NSCell cell = new NSCell(textView.cell());
+		cell.setAttributedStringValue(createString());
+		textView.setFont (font);
+	}
+}
+
+void setForeground (float /*double*/ [] color) {
+	if ((style & SWT.SEPARATOR) != 0) return;
+	NSCell cell = new NSCell(textView.cell());
+	cell.setAttributedStringValue(createString());
+}
+
+boolean setTabItemFocus () {
+	return false;
 }
 
 /**
@@ -335,17 +460,23 @@ public void setImage (Image image) {
 	}
 	this.image = image;
 	isImage = true;
-	if (image == null) {
-		setText (text);
-		return;
+
+	/*
+	 * Feature in Cocoa.  If the NSImage object being set into the view is
+	 * the same NSImage object that is already there then the new image is
+	 * not taken.  This results in the view's image not changing even if the
+	 * NSImage object's content has changed since it was last set into the
+	 * view.  The workaround is to temporarily set the view's image to null
+	 * so that the new image will then be taken.
+	 */
+	if (image != null) {
+		NSImage current = imageView.image ();
+		if (current != null && current.id == image.handle.id) {
+			imageView.setImage (null);
+		}
 	}
-	if (text.length () > 0) {
-		int ptr = OS.CFStringCreateWithCharacters (OS.kCFAllocatorDefault, null, 0);
-		if (ptr == 0) error (SWT.ERROR_CANNOT_SET_TEXT);
-		OS.SetControlData (handle, 0 , OS.kControlStaticTextCFStringTag, 4, new int[]{ptr});
-		OS.CFRelease (ptr);
-	}
-	redraw ();
+	imageView.setImage(image != null ? image.handle : null);
+	((NSBox)view).setContentView(imageView);
 }
 
 /**
@@ -381,14 +512,10 @@ public void setText (String string) {
 	if ((style & SWT.SEPARATOR) != 0) return;
 	isImage = false;
 	text = string;
-	char [] buffer = new char [text.length ()];
-	text.getChars (0, buffer.length, buffer, 0);
-	int length = fixMnemonic (buffer);
-	int ptr = OS.CFStringCreateWithCharacters (OS.kCFAllocatorDefault, buffer, length);
-	if (ptr == 0) error (SWT.ERROR_CANNOT_SET_TEXT);
-	OS.SetControlData (handle, 0 , OS.kControlStaticTextCFStringTag, 4, new int[]{ptr});
-	OS.CFRelease (ptr);
-	redraw ();
+	NSCell cell = new NSCell(textView.cell());
+	cell.setAttributedStringValue(createString());
+	((NSBox)view).setContentView(textView);
 }
+
 
 }

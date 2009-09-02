@@ -1,6 +1,6 @@
 require "rjava"
 
-# Copyright (c) 2000, 2008 IBM Corporation and others.
+# Copyright (c) 2000, 2009 IBM Corporation and others.
 # All rights reserved. This program and the accompanying materials
 # are made available under the terms of the Eclipse Public License v1.0
 # which accompanies this distribution, and is available at
@@ -43,6 +43,7 @@ module Org::Eclipse::Swt::Widgets
   # @see <a href="http://www.eclipse.org/swt/snippets/#coolbar">CoolBar snippets</a>
   # @see <a href="http://www.eclipse.org/swt/examples.php">SWT Example: ControlExample</a>
   # @see <a href="http://www.eclipse.org/swt/">Sample code and further information</a>
+  # @noextend This class is not intended to be subclassed by clients.
   class CoolBar < CoolBarImports.const_get :Composite
     include_class_members CoolBarImports
     
@@ -145,6 +146,9 @@ module Org::Eclipse::Swt::Widgets
     # </ul>
     # 
     # @see SWT
+    # @see SWT#FLAT
+    # @see SWT#HORIZONTAL
+    # @see SWT#VERTICAL
     # @see Widget#checkSubclass
     # @see Widget#getStyle
     def initialize(parent, style)
@@ -270,14 +274,15 @@ module Org::Eclipse::Swt::Widgets
       if ((height).equal?(0))
         height = DEFAULT_COOLBAR_HEIGHT
       end
+      size = fix_point(width, height)
       if (!(w_hint).equal?(SWT::DEFAULT))
-        width = w_hint
+        size.attr_x = w_hint
       end
       if (!(h_hint).equal?(SWT::DEFAULT))
-        height = h_hint
+        size.attr_y = h_hint
       end
-      trim = compute_trim(0, 0, width, height)
-      return fix_point(trim.attr_width, trim.attr_height)
+      trim = compute_trim(0, 0, size.attr_x, size.attr_y)
+      return Point.new(trim.attr_width, trim.attr_height)
     end
     
     typesig { [::Java::Int, ::Java::Int] }
@@ -467,8 +472,22 @@ module Org::Eclipse::Swt::Widgets
     # Insert the item into the row. Adjust the x and width values
     # appropriately.
     def insert_item_into_row(item, row_index, x_root)
+      if (row_index < 0 || row_index >= @items.attr_length)
+        # Create a new row for the item.
+        bottom = row_index >= @items.attr_length
+        new_rows = Array.typed(Array.typed(CoolItem)).new(@items.attr_length + 1) { nil }
+        System.arraycopy(@items, 0, new_rows, bottom ? 0 : 1, @items.attr_length)
+        row = bottom ? @items.attr_length : 0
+        new_rows[row] = Array.typed(CoolItem).new(1) { nil }
+        new_rows[row][0] = item
+        @items = new_rows
+        item.attr_wrap = true
+        return true
+      end
       bar_width = get_width
-      row_y = @items[row_index][0].internal_get_bounds.attr_y
+      bounds = @items[row_index][0].internal_get_bounds
+      row_y = bounds.attr_y
+      old_row_height = bounds.attr_height
       x = Math.max(0, Math.abs(x_root - to_display(Point.new(0, 0)).attr_x))
       # Find the insertion index and add the item.
       index = 0
@@ -503,7 +522,7 @@ module Org::Eclipse::Swt::Widgets
       end
       # Set the item's bounds.
       width = 0
-      height = item.internal_get_bounds.attr_height
+      height = item.attr_preferred_height
       if (index < @items[row_index].attr_length - 1)
         right = @items[row_index][index + 1]
         width = right.internal_get_bounds.attr_x - x
@@ -525,6 +544,7 @@ module Org::Eclipse::Swt::Widgets
       bounds = item.internal_get_bounds
       item.attr_requested_width = bounds.attr_width
       internal_redraw(bounds.attr_x, bounds.attr_y, item.internal_get_minimum_width, bounds.attr_height)
+      return height > old_row_height
     end
     
     typesig { [::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int] }
@@ -620,31 +640,17 @@ module Org::Eclipse::Swt::Widgets
     typesig { [CoolItem, ::Java::Int] }
     def move_down(item, x_root)
       old_row_index = find_item(item).attr_y
-      resize = false
       if ((@items[old_row_index].attr_length).equal?(1))
-        resize = true
         # If this is the only item in the bottom row, don't move it.
         if ((old_row_index).equal?(@items.attr_length - 1))
           return
         end
       end
       new_row_index = ((@items[old_row_index].attr_length).equal?(1)) ? old_row_index : old_row_index + 1
-      remove_item_from_row(item, old_row_index, false)
+      resize = remove_item_from_row(item, old_row_index, false)
       old = item.internal_get_bounds
       internal_redraw(old.attr_x, old.attr_y, CoolItem::MINIMUM_WIDTH, old.attr_height)
-      if ((new_row_index).equal?(@items.attr_length))
-        # Create a new bottom row for the item.
-        new_rows = Array.typed(Array.typed(CoolItem)).new(@items.attr_length + 1) { nil }
-        System.arraycopy(@items, 0, new_rows, 0, @items.attr_length)
-        row = @items.attr_length
-        new_rows[row] = Array.typed(CoolItem).new(1) { nil }
-        new_rows[row][0] = item
-        @items = new_rows
-        resize = true
-        item.attr_wrap = true
-      else
-        insert_item_into_row(item, new_row_index, x_root)
-      end
+      resize |= insert_item_into_row(item, new_row_index, x_root)
       if (resize)
         relayout
       else
@@ -734,30 +740,17 @@ module Org::Eclipse::Swt::Widgets
     def move_up(item, x_root)
       point = find_item(item)
       old_row_index = point.attr_y
-      resize = false
       if ((@items[old_row_index].attr_length).equal?(1))
-        resize = true
         # If this is the only item in the top row, don't move it.
         if ((old_row_index).equal?(0))
           return
         end
       end
-      remove_item_from_row(item, old_row_index, false)
+      resize = remove_item_from_row(item, old_row_index, false)
       old = item.internal_get_bounds
       internal_redraw(old.attr_x, old.attr_y, CoolItem::MINIMUM_WIDTH, old.attr_height)
-      new_row_index = Math.max(0, old_row_index - 1)
-      if ((old_row_index).equal?(0))
-        # Create a new top row for the item.
-        new_rows = Array.typed(Array.typed(CoolItem)).new(@items.attr_length + 1) { nil }
-        System.arraycopy(@items, 0, new_rows, 1, @items.attr_length)
-        new_rows[0] = Array.typed(CoolItem).new(1) { nil }
-        new_rows[0][0] = item
-        @items = new_rows
-        resize = true
-        item.attr_wrap = true
-      else
-        insert_item_into_row(item, new_row_index, x_root)
-      end
+      new_row_index = old_row_index - 1
+      resize |= insert_item_into_row(item, new_row_index, x_root)
       if (resize)
         relayout
       else
@@ -857,8 +850,13 @@ module Org::Eclipse::Swt::Widgets
     
     typesig { [Event] }
     def on_mouse_up(event)
-      __set_cursor(nil)
       @dragging = nil
+      grabbed = get_grabbed_item(event.attr_x, event.attr_y)
+      if (!(grabbed).nil?)
+        __set_cursor(@hover_cursor)
+      else
+        __set_cursor(nil)
+      end
     end
     
     typesig { [Event] }
@@ -1023,6 +1021,7 @@ module Org::Eclipse::Swt::Widgets
       index = find_item(item).attr_x
       new_length = @items[row_index].attr_length - 1
       item_bounds = item.internal_get_bounds
+      old_row_height = item_bounds.attr_height
       item.attr_wrap = false
       if (new_length > 0)
         new_row = Array.typed(CoolItem).new(new_length) { nil }
@@ -1035,7 +1034,7 @@ module Org::Eclipse::Swt::Widgets
         System.arraycopy(@items, 0, new_rows, 0, row_index)
         System.arraycopy(@items, row_index + 1, new_rows, row_index, new_rows.attr_length - row_index)
         @items = new_rows
-        return
+        return true
       end
       if (!disposed)
         if ((index).equal?(0))
@@ -1053,6 +1052,13 @@ module Org::Eclipse::Swt::Widgets
           previous.attr_requested_width = width
         end
       end
+      new_row_height = 0
+      i = 0
+      while i < new_length
+        new_row_height = Math.max(new_row_height, @items[row_index][i].attr_preferred_height)
+        i += 1
+      end
+      return !(new_row_height).equal?(old_row_height)
     end
     
     typesig { [] }
@@ -1078,7 +1084,7 @@ module Org::Eclipse::Swt::Widgets
         i = 0
         while i < count
           item = @items[row][i]
-          row_height = Math.max(row_height, item.internal_get_bounds.attr_height)
+          row_height = Math.max(row_height, item.attr_preferred_height)
           available -= item.internal_get_minimum_width
           i += 1
         end

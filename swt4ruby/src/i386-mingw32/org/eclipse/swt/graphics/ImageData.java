@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2008 IBM Corporation and others.
+ * Copyright (c) 2000, 2009 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -247,7 +247,7 @@ public final class ImageData implements CloneableCompatibility {
  * @param palette the palette of the image (must not be null)
  *
  * @exception IllegalArgumentException <ul>
- *    <li>ERROR_INVALID_ARGUMENT - if the width or height is negative, or if the depth is not
+ *    <li>ERROR_INVALID_ARGUMENT - if the width or height is zero or negative, or if the depth is not
  *        	one of 1, 2, 4, 8, 16, 24 or 32</li>
  *    <li>ERROR_NULL_ARGUMENT - if the palette is null</li>
  * </ul>
@@ -271,7 +271,7 @@ public ImageData(int width, int height, int depth, PaletteData palette) {
  * @param data the data of the image
  *
  * @exception IllegalArgumentException <ul>
- *    <li>ERROR_INVALID_ARGUMENT - if the width or height is negative, or if the depth is not
+ *    <li>ERROR_INVALID_ARGUMENT - if the width or height is zero or negative, or if the depth is not
  *        	one of 1, 2, 4, 8, 16, 24 or 32, or the data array is too small to contain the image data</li>
  *    <li>ERROR_NULL_ARGUMENT - if the palette or data is null</li>
  *    <li>ERROR_CANNOT_BE_ZERO - if the scanlinePad is zero</li>
@@ -1919,6 +1919,37 @@ static void blit(int op,
 		}
 		return;
 	}
+	/*Fast 32 to 32 blit */
+	if (alphaMode == 0x10000 && stype == TYPE_GENERIC_32_MSB && dtype == TYPE_GENERIC_32_MSB) {
+		if (srcRedMask == 0xFF00 && srcGreenMask == 0xff0000 && srcBlueMask == 0xff000000 && destRedMask == 0xFF0000 && destGreenMask == 0xff00 && destBlueMask == 0xff) {
+			for (int dy = destHeight, sfy = sfyi; dy > 0; --dy, sp = spr += (sfy >>> 16) * srcStride, sfy = (sfy & 0xffff) + sfyi, dp = dpr += dpryi) {
+				for (int dx = destWidth, sfx = sfxi; dx > 0; --dx, dp += dprxi, sfx = (sfx & 0xffff) + sfxi) {
+					destData[dp] = srcData[sp + 3];
+					destData[dp + 1] = srcData[sp + 2];
+					destData[dp + 2] = srcData[sp + 1];
+					destData[dp + 3] = srcData[sp];
+					sp += (sfx >>> 16) * 4;
+				}
+			}
+			return;
+		}
+	}
+	/*Fast 24 to 32 blit */
+	if (alphaMode == 0x10000 && stype == TYPE_GENERIC_24 && dtype == TYPE_GENERIC_32_MSB) {
+		if (srcRedMask == 0xFF && srcGreenMask == 0xff00 && srcBlueMask == 0xff0000 && destRedMask == 0xFF0000 && destGreenMask == 0xff00 && destBlueMask == 0xff) {
+			for (int dy = destHeight, sfy = sfyi; dy > 0; --dy, sp = spr += (sfy >>> 16) * srcStride, sfy = (sfy & 0xffff) + sfyi, dp = dpr += dpryi) {
+				for (int dx = destWidth, sfx = sfxi; dx > 0; --dx, dp += dprxi, sfx = (sfx & 0xffff) + sfxi) {
+					destData[dp] = 0;
+					destData[dp + 1] = srcData[sp + 2];
+					destData[dp + 2] = srcData[sp + 1];
+					destData[dp + 3] = srcData[sp];
+					sp += (sfx >>> 16) * 3;
+				}
+			}
+			return;
+		}
+	}
+
 	/*** Comprehensive blit (apply transformations) ***/
 	final int srcRedShift = getChannelShift(srcRedMask);
 	final byte[] srcReds = ANY_TO_EIGHT[getChannelWidth(srcRedMask, srcRedShift)];
@@ -2729,6 +2760,32 @@ static void blit(int op,
 	boolean flipX, boolean flipY) {
 	if ((destWidth <= 0) || (destHeight <= 0) || (alphaMode == ALPHA_TRANSPARENT)) return;
 
+	/*** Fast blit (straight copy) ***/
+	if (srcX == 0 && srcY == 0 && destX == 0 && destY == 0 && destWidth == srcWidth && destHeight == srcHeight) {
+		if (destDepth == 24 && srcDepth == 8 && (op & BLIT_ALPHA) == 0 && destRedMask == 0xFF0000 && destGreenMask == 0xFF00 && destBlueMask == 0xFF) {
+			for (int y = 0, sp = 0, dp = 0, spad = srcStride - srcWidth, dpad = destStride - (destWidth * 3); y < destHeight; y++, sp += spad, dp += dpad) {
+				for (int x = 0; x < destWidth; x++) {
+					int index = srcData[sp++] & 0xff;
+					destData[dp++] = srcReds[index];
+					destData[dp++] = srcGreens[index];
+					destData[dp++] = srcBlues[index];
+				}
+			}
+			return;
+		}
+		if (destDepth == 32 && destOrder == MSB_FIRST && srcDepth == 8 && (op & BLIT_ALPHA) == 0 && destRedMask == 0xFF0000 && destGreenMask == 0xFF00 && destBlueMask == 0xFF) {
+			for (int y = 0, sp = 0, dp = 0, spad = srcStride - srcWidth, dpad = destStride - (destWidth * 4); y < destHeight; y++, sp += spad, dp += dpad) {
+				for (int x = 0; x < destWidth; x++) {
+					int index = srcData[sp++] & 0xff;
+					dp++;
+					destData[dp++] = srcReds[index];
+					destData[dp++] = srcGreens[index];
+					destData[dp++] = srcBlues[index];
+				}
+			}
+			return;
+		}
+	}
 	// these should be supplied as params later
 	final int destAlphaMask = 0;
 

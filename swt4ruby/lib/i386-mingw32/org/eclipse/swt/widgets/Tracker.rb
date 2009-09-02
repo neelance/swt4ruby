@@ -1,6 +1,6 @@
 require "rjava"
 
-# Copyright (c) 2000, 2008 IBM Corporation and others.
+# Copyright (c) 2000, 2009 IBM Corporation and others.
 # All rights reserved. This program and the accompanying materials
 # are made available under the terms of the Eclipse Public License v1.0
 # which accompanies this distribution, and is available at
@@ -41,6 +41,7 @@ module Org::Eclipse::Swt::Widgets
   # 
   # @see <a href="http://www.eclipse.org/swt/snippets/#tracker">Tracker snippets</a>
   # @see <a href="http://www.eclipse.org/swt/">Sample code and further information</a>
+  # @noextend This class is not intended to be subclassed by clients.
   class Tracker < TrackerImports.const_get :Widget
     include_class_members TrackerImports
     
@@ -118,11 +119,23 @@ module Org::Eclipse::Swt::Widgets
     alias_method :attr_hwnd_transparent=, :hwnd_transparent=
     undef_method :hwnd_transparent=
     
-    attr_accessor :old_proc
-    alias_method :attr_old_proc, :old_proc
-    undef_method :old_proc
-    alias_method :attr_old_proc=, :old_proc=
-    undef_method :old_proc=
+    attr_accessor :hwnd_opaque
+    alias_method :attr_hwnd_opaque, :hwnd_opaque
+    undef_method :hwnd_opaque
+    alias_method :attr_hwnd_opaque=, :hwnd_opaque=
+    undef_method :hwnd_opaque=
+    
+    attr_accessor :old_transparent_proc
+    alias_method :attr_old_transparent_proc, :old_transparent_proc
+    undef_method :old_transparent_proc
+    alias_method :attr_old_transparent_proc=, :old_transparent_proc=
+    undef_method :old_transparent_proc=
+    
+    attr_accessor :old_opaque_proc
+    alias_method :attr_old_opaque_proc, :old_opaque_proc
+    undef_method :old_opaque_proc
+    alias_method :attr_old_opaque_proc=, :old_opaque_proc=
+    undef_method :old_opaque_proc=
     
     attr_accessor :old_x
     alias_method :attr_old_x, :old_x
@@ -189,7 +202,9 @@ module Org::Eclipse::Swt::Widgets
       @cursor_orientation = 0
       @in_event = false
       @hwnd_transparent = 0
-      @old_proc = 0
+      @hwnd_opaque = 0
+      @old_transparent_proc = 0
+      @old_opaque_proc = 0
       @old_x = 0
       @old_y = 0
       super(parent, check_style(style))
@@ -233,6 +248,7 @@ module Org::Eclipse::Swt::Widgets
     # @see SWT#RIGHT
     # @see SWT#UP
     # @see SWT#DOWN
+    # @see SWT#RESIZE
     def initialize(display, style)
       @parent = nil
       @tracking = false
@@ -246,7 +262,9 @@ module Org::Eclipse::Swt::Widgets
       @cursor_orientation = 0
       @in_event = false
       @hwnd_transparent = 0
-      @old_proc = 0
+      @hwnd_opaque = 0
+      @old_transparent_proc = 0
+      @old_opaque_proc = 0
       @old_x = 0
       @old_y = 0
       super()
@@ -504,7 +522,7 @@ module Org::Eclipse::Swt::Widgets
           rect1.attr_top = rect.attr_y - band_width
           rect1.attr_right = rect.attr_x + rect.attr_width + band_width * 2
           rect1.attr_bottom = rect.attr_y + rect.attr_height + band_width * 2
-          OS._redraw_window(@hwnd_transparent, rect1, 0, OS::RDW_INVALIDATE)
+          OS._redraw_window(@hwnd_opaque, rect1, 0, OS::RDW_INVALIDATE)
           i += 1
         end
         return
@@ -648,18 +666,27 @@ module Org::Eclipse::Swt::Widgets
         width = OS._get_system_metrics(OS::SM_CXSCREEN)
         height = OS._get_system_metrics(OS::SM_CYSCREEN)
         @hwnd_transparent = OS._create_window_ex(is_vista ? OS::WS_EX_LAYERED | OS::WS_EX_NOACTIVATE : OS::WS_EX_TRANSPARENT, self.attr_display.attr_window_class, nil, OS::WS_POPUP, 0, 0, width, height, 0, 0, OS._get_module_handle(nil), nil)
-        @old_proc = OS._get_window_long_ptr(@hwnd_transparent, OS::GWLP_WNDPROC)
+        if (is_vista)
+          OS._set_layered_window_attributes(@hwnd_transparent, 0xffffff, 0x1, OS::LWA_ALPHA)
+        end
+        OS._show_window(@hwnd_transparent, OS::SW_SHOWNOACTIVATE)
         new_proc = Callback.new(self, "transparentProc", 4) # $NON-NLS-1$
         # long
         new_proc_address = new_proc.get_address
         if ((new_proc_address).equal?(0))
           SWT.error(SWT::ERROR_NO_MORE_CALLBACKS)
         end
-        OS._set_window_long_ptr(@hwnd_transparent, OS::GWLP_WNDPROC, new_proc_address)
         if (is_vista)
-          OS._set_layered_window_attributes(@hwnd_transparent, 0xffffff, 0xff, OS::LWA_COLORKEY | OS::LWA_ALPHA)
+          @hwnd_opaque = OS._create_window_ex(OS::WS_EX_LAYERED | OS::WS_EX_NOACTIVATE, self.attr_display.attr_window_class, nil, OS::WS_POPUP, 0, 0, width, height, @hwnd_transparent, 0, OS._get_module_handle(nil), nil)
+          @old_opaque_proc = OS._get_window_long_ptr(@hwnd_opaque, OS::GWLP_WNDPROC)
+          OS._set_window_long_ptr(@hwnd_opaque, OS::GWLP_WNDPROC, new_proc_address)
+        else
+          @hwnd_opaque = @hwnd_transparent
         end
-        OS._show_window(@hwnd_transparent, OS::SW_SHOWNOACTIVATE)
+        @old_transparent_proc = OS._get_window_long_ptr(@hwnd_transparent, OS::GWLP_WNDPROC)
+        OS._set_window_long_ptr(@hwnd_transparent, OS::GWLP_WNDPROC, new_proc_address)
+        OS._set_layered_window_attributes(@hwnd_opaque, 0xffffff, 0xff, OS::LWA_COLORKEY | OS::LWA_ALPHA)
+        OS._show_window(@hwnd_opaque, OS::SW_SHOWNOACTIVATE)
       end
       update
       draw_rectangles(@rectangles, @stippled)
@@ -739,9 +766,10 @@ module Org::Eclipse::Swt::Widgets
           OS._destroy_window(@hwnd_transparent)
           @hwnd_transparent = 0
         end
+        @hwnd_opaque = 0
         if (!(new_proc).nil?)
           new_proc.dispose
-          @old_proc = 0
+          @old_transparent_proc = @old_opaque_proc = 0
         end
         # Cleanup: If this tracker was resizing then the last cursor that it created
         # needs to be destroyed.
@@ -1034,16 +1062,19 @@ module Org::Eclipse::Swt::Widgets
           return OS::HTTRANSPARENT
         end
       when OS::WM_SETCURSOR
-        if (!(@client_cursor).nil?)
-          OS._set_cursor(@client_cursor.attr_handle)
-          return 1
-        end
-        if (!(@resize_cursor).equal?(0))
-          OS._set_cursor(@resize_cursor)
-          return 1
+        if ((@hwnd_opaque).equal?(hwnd))
+          if (!(@client_cursor).nil?)
+            OS._set_cursor(@client_cursor.attr_handle)
+            return 1
+          end
+          if (!(@resize_cursor).equal?(0))
+            OS._set_cursor(@resize_cursor)
+            return 1
+          end
         end
       when OS::WM_PAINT
-        if ((@parent).nil? && !OS::IsWinCE && OS::WIN32_VERSION >= OS._version(6, 0))
+        is_vista = !OS::IsWinCE && OS::WIN32_VERSION >= OS._version(6, 0)
+        if ((@parent).nil? && is_vista && (@hwnd_opaque).equal?(hwnd))
           ps = PAINTSTRUCT.new
           # long
           h_dc = OS._begin_paint(hwnd, ps)
@@ -1088,7 +1119,7 @@ module Org::Eclipse::Swt::Widgets
         end
       end
       # 64
-      return OS._call_window_proc(@old_proc, hwnd, RJava.cast_to_int(msg), w_param, l_param)
+      return OS._call_window_proc((hwnd).equal?(@hwnd_transparent) ? @old_transparent_proc : @old_opaque_proc, hwnd, RJava.cast_to_int(msg), w_param, l_param)
     end
     
     typesig { [] }

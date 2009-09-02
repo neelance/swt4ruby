@@ -1,6 +1,6 @@
 require "rjava"
 
-# Copyright (c) 2003, 2008 IBM Corporation and others.
+# Copyright (c) 2003, 2009 IBM Corporation and others.
 # All rights reserved. This program and the accompanying materials
 # are made available under the terms of the Eclipse Public License v1.0
 # which accompanies this distribution, and is available at
@@ -42,9 +42,14 @@ module Org::Eclipse::Swt::Browser
     }
     
     typesig { [Widget] }
-    def initialize(w)
+    # Constructs a new instance of this class.
+    # 
+    # @param widget the widget that fired the event
+    # 
+    # @since 3.5
+    def initialize(widget)
       @text = nil
-      super(w)
+      super(widget)
     end
     
     typesig { [] }

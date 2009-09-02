@@ -1,6 +1,6 @@
 require "rjava"
 
-# Copyright (c) 2000, 2006 IBM Corporation and others.
+# Copyright (c) 2000, 2008 IBM Corporation and others.
 # All rights reserved. This program and the accompanying materials
 # are made available under the terms of the Eclipse Public License v1.0
 # which accompanies this distribution, and is available at
@@ -25,6 +25,7 @@ module Org::Eclipse::Swt::Internal::Win32
     alias_method :attr_style=, :style=
     undef_method :style=
     
+    # @field cast=(WNDPROC)
     # long
     attr_accessor :lpfn_wnd_proc
     alias_method :attr_lpfn_wnd_proc, :lpfn_wnd_proc
@@ -44,6 +45,7 @@ module Org::Eclipse::Swt::Internal::Win32
     alias_method :attr_cb_wnd_extra=, :cb_wnd_extra=
     undef_method :cb_wnd_extra=
     
+    # @field cast=(HINSTANCE)
     # long
     attr_accessor :h_instance
     alias_method :attr_h_instance, :h_instance
@@ -51,6 +53,7 @@ module Org::Eclipse::Swt::Internal::Win32
     alias_method :attr_h_instance=, :h_instance=
     undef_method :h_instance=
     
+    # @field cast=(HICON)
     # long
     attr_accessor :h_icon
     alias_method :attr_h_icon, :h_icon
@@ -58,6 +61,7 @@ module Org::Eclipse::Swt::Internal::Win32
     alias_method :attr_h_icon=, :h_icon=
     undef_method :h_icon=
     
+    # @field cast=(HCURSOR)
     # long
     attr_accessor :h_cursor
     alias_method :attr_h_cursor, :h_cursor
@@ -65,6 +69,7 @@ module Org::Eclipse::Swt::Internal::Win32
     alias_method :attr_h_cursor=, :h_cursor=
     undef_method :h_cursor=
     
+    # @field cast=(HBRUSH)
     # long
     attr_accessor :hbr_background
     alias_method :attr_hbr_background, :hbr_background
@@ -72,6 +77,7 @@ module Org::Eclipse::Swt::Internal::Win32
     alias_method :attr_hbr_background=, :hbr_background=
     undef_method :hbr_background=
     
+    # @field cast=(LPCTSTR)
     # long
     attr_accessor :lpsz_menu_name
     alias_method :attr_lpsz_menu_name, :lpsz_menu_name
@@ -79,6 +85,7 @@ module Org::Eclipse::Swt::Internal::Win32
     alias_method :attr_lpsz_menu_name=, :lpsz_menu_name=
     undef_method :lpsz_menu_name=
     
+    # @field cast=(LPCTSTR)
     # long
     attr_accessor :lpsz_class_name
     alias_method :attr_lpsz_class_name, :lpsz_class_name

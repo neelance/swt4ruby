@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2008 IBM Corporation and others.
+ * Copyright (c) 2000, 2009 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -47,6 +47,7 @@ import org.eclipse.swt.widgets.*;
  * @see <a href="http://www.eclipse.org/swt/snippets/#ctabfolder">CTabFolder, CTabItem snippets</a>
  * @see <a href="http://www.eclipse.org/swt/examples.php">SWT Example: CustomControlExample</a>
  * @see <a href="http://www.eclipse.org/swt/">Sample code and further information</a>
+ * @noextend This class is not intended to be subclassed by clients.
  */
  
 public class CTabFolder extends Composite {
@@ -121,6 +122,7 @@ public class CTabFolder extends Composite {
 	int[] priority = new int[0];
 	boolean mru = false;
 	Listener listener;
+	boolean ignoreTraverse;
 	
 	/* External Listener management */
 	CTabFolder2Listener[] folderListeners = new CTabFolder2Listener[0];
@@ -146,15 +148,13 @@ public class CTabFolder extends Composite {
 	Color[] selectionHighlightGradientColorsCache = null;  //null is a legal value, check on access
 	
 	/* Unselected item appearance */
-	Image bgImage;
 	Color[] gradientColors;
 	int[] gradientPercents;
 	boolean gradientVertical;
 	boolean showUnselectedImage = true;
 	
-	static Color borderColor;
-	
 	// close, min/max and chevron buttons
+	Color fillColor;
 	boolean showClose = false;
 	boolean showUnselectedClose = true;
 	
@@ -285,6 +285,10 @@ public class CTabFolder extends Composite {
  */
 public CTabFolder(Composite parent, int style) {
 	super(parent, checkStyle (parent, style));
+	init(style);
+}
+
+void init(int style) {
 	super.setLayout(new CTabFolderLayout());
 	int style2 = super.getStyle();
 	oldFont = getFont();
@@ -302,7 +306,6 @@ public CTabFolder(Composite parent, int style) {
 	Display display = getDisplay();
 	selectionForeground = display.getSystemColor(SELECTION_FOREGROUND);
 	selectionBackground = display.getSystemColor(SELECTION_BACKGROUND);
-	borderColor = display.getSystemColor(BORDER1_COLOR);
 	updateTabHeight(false);
 	
 	initAccessible();
@@ -369,7 +372,7 @@ static int checkStyle (Composite parent, int style) {
 	 * that use double buffering which is true in both of these cases.
 	 */
 	String platform = SWT.getPlatform();
-	if ("carbon".equals(platform) || "gtk".equals(platform)) return style; //$NON-NLS-1$ //$NON-NLS-2$
+	if ("cocoa".equals(platform) || "carbon".equals(platform) || "gtk".equals(platform)) return style; //$NON-NLS-1$ //$NON-NLS-2$
 	
 	//TEMPORARY CODE
 	/*
@@ -495,7 +498,11 @@ public void addSelectionListener(SelectionListener listener) {
 void antialias (int[] shape, RGB lineRGB, RGB innerRGB, RGB outerRGB, GC gc){
 	// Don't perform anti-aliasing on Mac and WPF because the platform
 	// already does it.  The simple style also does not require anti-aliasing.
-	if (simple || "carbon".equals(SWT.getPlatform()) || "wpf".equals(SWT.getPlatform())) return; //$NON-NLS-1$
+	if (simple) return;
+	String platform = SWT.getPlatform();
+	if ("cocoa".equals(platform)) return; //$NON-NLS-1$
+	if ("carbon".equals(platform)) return; //$NON-NLS-1$
+	if ("wpf".equals(platform)) return; //$NON-NLS-1$
 	// Don't perform anti-aliasing on low resolution displays
 	if (getDisplay().getDepth() < 15) return;
 	if (outerRGB != null) {
@@ -545,6 +552,17 @@ void antialias (int[] shape, RGB lineRGB, RGB innerRGB, RGB outerRGB, GC gc){
 		color.dispose();
 	}
 }
+/*
+* This class was not intended to be subclassed but this restriction
+* cannot be enforced without breaking backward compatibility.
+*/
+//protected void checkSubclass () {
+//	String name = getClass ().getName ();
+//	int index = name.lastIndexOf ('.');
+//	if (!name.substring (0, index + 1).equals ("org.eclipse.swt.custom.")) {
+//		SWT.error (SWT.ERROR_INVALID_SUBCLASS);
+//	}
+//}
 public Rectangle computeTrim (int x, int y, int width, int height) {
 	checkWidget();
 	int trimX = x - marginWidth - highlight_margin - borderLeft;
@@ -639,7 +657,7 @@ void destroyItem (CTabItem item) {
 }
 void drawBackground(GC gc, int[] shape, boolean selected) {
 	Color defaultBackground = selected ? selectionBackground : getBackground();
-	Image image = selected ? selectionBgImage : bgImage;
+	Image image = selected ? selectionBgImage : null;
 	Color[] colors = selected ? selectionGradientColors : gradientColors;
 	int[] percents = selected ? selectionGradientPercents : gradientPercents;
 	boolean vertical = selected ? selectionGradientVertical : gradientVertical; 
@@ -678,7 +696,7 @@ void drawBackground(GC gc, int[] shape, int x, int y, int width, int height, Col
 				if (onBottom) {
 					int pos = 0;
 					if (percents[percents.length - 1] < 100) {
-						pos = percents[percents.length - 1] * height / 100;
+						pos = (100 - percents[percents.length - 1]) * height / 100;
 						gc.setBackground(defaultBackground);
 						gc.fillRectangle(x, y, width, pos);
 					}
@@ -689,7 +707,8 @@ void drawBackground(GC gc, int[] shape, int x, int y, int width, int height, Col
 						lastColor = colors[i];
 						if (lastColor == null) lastColor = defaultBackground;
 						gc.setBackground(lastColor);
-						int gradientHeight = percents[i] * height / 100;
+						int percentage = i > 0 ? percents[i] - percents[i-1] : percents[i];
+						int gradientHeight = percentage * height / 100;
 						gc.fillGradientRectangle(x, y+pos, width, gradientHeight, true);
 						pos += gradientHeight;
 					}
@@ -702,7 +721,8 @@ void drawBackground(GC gc, int[] shape, int x, int y, int width, int height, Col
 						lastColor = colors[i + 1];
 						if (lastColor == null) lastColor = defaultBackground;
 						gc.setBackground(lastColor);
-						int gradientHeight = percents[i] * height / 100;
+						int percentage = i > 0 ? percents[i] - percents[i-1] : percents[i];
+						int gradientHeight = percentage * height / 100;
 						gc.fillGradientRectangle(x, y+pos, width, gradientHeight, true);
 						pos += gradientHeight;
 					}
@@ -798,7 +818,7 @@ void drawBody(Event event) {
 	
 	//draw 1 pixel border around outside
 	if (borderLeft > 0) {
-		gc.setForeground(borderColor);
+		gc.setForeground(getDisplay().getSystemColor(BORDER1_COLOR));
 		int x1 = borderLeft - 1;
 		int x2 = size.x - borderRight;
 		int y1 = onBottom ? borderTop - 1 : borderTop + tabHeight;
@@ -1015,6 +1035,7 @@ void drawTabArea(Event event) {
 	GC gc = event.gc;
 	Point size = getSize();
 	int[] shape = null;
+	Color borderColor = getDisplay().getSystemColor(BORDER1_COLOR);
 	
 	if (tabHeight == 0) {
 		int style = getStyle();
@@ -1170,6 +1191,12 @@ public Rectangle getClientArea() {
 	int height = size.y - borderTop - borderBottom - 2*marginHeight - highlight_margin - highlight_header;
 	height -= tabHeight;
 	return new Rectangle(xClient, yClient, width, height);
+}
+Color getFillColor() {
+	if (fillColor == null) {
+		fillColor = new Color(getDisplay(), CTabFolder.CLOSE_FILL);
+	}
+	return fillColor;
 }
 /**
  * Return the tab that is located at the specified index.
@@ -1869,6 +1896,10 @@ void onDispose(Event event) {
 			items[i].dispose();
 		}
 	}
+	if (fillColor != null) {
+	    fillColor.dispose();
+	    fillColor = null;
+	}
 	
 	selectionGradientColors = null;
 	selectionGradientPercents = null;
@@ -1904,14 +1935,14 @@ void onFocus(Event event) {
 		setSelection(0, true);
 	}
 }
-boolean onMnemonic (Event event) {
+boolean onMnemonic (Event event, boolean doit) {
 	char key = event.character;
 	for (int i = 0; i < items.length; i++) {
 		if (items[i] != null) {
 			char mnemonic = _findMnemonic (items[i].getText ());
 			if (mnemonic != '\0') {
 				if (Character.toLowerCase (key) == mnemonic) {
-					setSelection(i, true);
+					if (doit) setSelection(i, true);
 					return true;
 				}
 			}
@@ -1963,22 +1994,20 @@ void onMouse(Event event) {
 			break;
 		}
 		case SWT.MouseDown: {
+			if (event.button != 1) return;
 			if (minRect.contains(x, y)) {
-				if (event.button != 1) return;
 				minImageState = SELECTED;
 				redraw(minRect.x, minRect.y, minRect.width, minRect.height, false);
 				update();
 				return;
 			}
 			if (maxRect.contains(x, y)) {
-				if (event.button != 1) return;
 				maxImageState = SELECTED;
 				redraw(maxRect.x, maxRect.y, maxRect.width, maxRect.height, false);
 				update();
 				return;
 			}
 			if (chevronRect.contains(x, y)) {
-				if (event.button != 1) return;
 				if (chevronImageState != HOT) {
 					chevronImageState = HOT;
 				} else {
@@ -2006,7 +2035,6 @@ void onMouse(Event event) {
 			}
 			if (item != null) {
 				if (item.closeRect.contains(x,y)){
-					if (event.button != 1) return;
 					item.closeImageState = SELECTED;
 					redraw(item.closeRect.x, item.closeRect.y, item.closeRect.width, item.closeRect.height, false);
 					update();
@@ -2200,9 +2228,9 @@ void onMouse(Event event) {
 		}
 	}
 }
-boolean onPageTraversal(Event event) {
+void onPageTraversal(Event event) {
 	int count = items.length;
-	if (count == 0) return false;
+	if (count == 0) return;
 	int index = selectedIndex; 
 	if (index  == -1) {
 		index = 0;
@@ -2239,12 +2267,10 @@ boolean onPageTraversal(Event event) {
 						showList(chevronRect);
 					}
 				}
-				return true;
 			}
 		}
 	}
 	setSelection (index, true);
-	return true;
 }
 void onPaint(Event event) {
 	if (inDispose) return;
@@ -2308,6 +2334,7 @@ void onResize() {
 	oldSize = size;
 }
 void onTraverse (Event event) {
+	if (ignoreTraverse) return;
 	switch (event.detail) {
 		case SWT.TRAVERSE_ESCAPE:
 		case SWT.TRAVERSE_RETURN:
@@ -2317,12 +2344,27 @@ void onTraverse (Event event) {
 			if (focusControl == this) event.doit = true;
 			break;
 		case SWT.TRAVERSE_MNEMONIC:
-			event.doit = onMnemonic(event);
-			if (event.doit) event.detail = SWT.TRAVERSE_NONE;
+			event.doit = onMnemonic(event, false);
 			break;
 		case SWT.TRAVERSE_PAGE_NEXT:
 		case SWT.TRAVERSE_PAGE_PREVIOUS:
-			event.doit = onPageTraversal(event);
+			event.doit = items.length > 0;
+			break;
+	}
+	ignoreTraverse = true;
+	notifyListeners(SWT.Traverse, event);
+	ignoreTraverse = false;
+	event.type = SWT.None;
+	if (isDisposed()) return;
+	if (!event.doit) return;
+	switch (event.detail) {
+		case SWT.TRAVERSE_MNEMONIC:
+			onMnemonic(event, true);
+			event.detail = SWT.TRAVERSE_NONE;
+			break;
+		case SWT.TRAVERSE_PAGE_NEXT:
+		case SWT.TRAVERSE_PAGE_PREVIOUS:
+			onPageTraversal(event);
 			event.detail = SWT.TRAVERSE_NONE;
 			break;
 	}
@@ -2521,28 +2563,24 @@ void setBackground(Color[] colors, int[] percents, boolean vertical) {
 	}
 	
 	// Are these settings the same as before?
-	if (bgImage == null) {
-		if ((gradientColors != null) && (colors != null) && 
-			(gradientColors.length == colors.length)) {
-			boolean same = false;
-			for (int i = 0; i < gradientColors.length; i++) {
-				if (gradientColors[i] == null) {
-					same = colors[i] == null;
-				} else {
-					same = gradientColors[i].equals(colors[i]);
-				}
-				if (!same) break;
-			}
-			if (same) {
-				for (int i = 0; i < gradientPercents.length; i++) {
-					same = gradientPercents[i] == percents[i];
-					if (!same) break;
-				}
-			}
-			if (same && this.gradientVertical == vertical) return;
+	if ((gradientColors != null) && (colors != null) && 
+		(gradientColors.length == colors.length)) {
+		boolean same = false;
+		for (int i = 0; i < gradientColors.length; i++) {
+		    if (gradientColors[i] == null) {
+			same = colors[i] == null;
+		    } else {
+			same = gradientColors[i].equals(colors[i]);
+		    }
+		    if (!same) break;
 		}
-	} else {
-		bgImage = null;
+		if (same) {
+		    for (int i = 0; i < gradientPercents.length; i++) {
+			same = gradientPercents[i] == percents[i];
+			if (!same) break;
+		    }
+		}
+		if (same && this.gradientVertical == vertical) return;
 	}
 	// Store the new settings
 	if (colors == null) {
@@ -2564,30 +2602,6 @@ void setBackground(Color[] colors, int[] percents, boolean vertical) {
 	}
 
 	// Refresh with the new settings
-	redraw();
-}
-
-/**
- * Set the image to be drawn in the background of the unselected tab.  Image
- * is stretched or compressed to cover entire unselected tab area.
- * 
- * @param image the image to be drawn in the background
- * 
- * @exception SWTException <ul>
- *    <li>ERROR_WIDGET_DISPOSED - if the receiver has been disposed</li>
- *    <li>ERROR_THREAD_INVALID_ACCESS - if not called from the thread that created the receiver</li>
- * </ul>
- *
- * @since 3.0
- */
-void setBackground(Image image) {
-	checkWidget();
-	if (image == bgImage) return;
-	if (image != null) {
-		gradientColors = null;
-		gradientPercents = null;
-	}
-	bgImage = image;
 	redraw();
 }
 /**

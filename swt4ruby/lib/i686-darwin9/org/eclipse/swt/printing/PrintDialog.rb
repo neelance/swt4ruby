@@ -1,6 +1,6 @@
 require "rjava"
 
-# Copyright (c) 2000, 2008 IBM Corporation and others.
+# Copyright (c) 2000, 2009 IBM Corporation and others.
 # All rights reserved. This program and the accompanying materials
 # are made available under the terms of the Eclipse Public License v1.0
 # which accompanies this distribution, and is available at
@@ -16,7 +16,8 @@ module Org::Eclipse::Swt::Printing
       include ::Org::Eclipse::Swt
       include_const ::Org::Eclipse::Swt::Printing, :PrinterData
       include ::Org::Eclipse::Swt::Widgets
-      include_const ::Org::Eclipse::Swt::Internal::Carbon, :OS
+      include ::Org::Eclipse::Swt::Internal
+      include ::Org::Eclipse::Swt::Internal::Cocoa
     }
   end
   
@@ -31,6 +32,7 @@ module Org::Eclipse::Swt::Printing
   # @see <a href="http://www.eclipse.org/swt/snippets/#printing">Printing snippets</a>
   # @see <a href="http://www.eclipse.org/swt/examples.php">SWT Example: ControlExample, Dialog tab</a>
   # @see <a href="http://www.eclipse.org/swt/">Sample code and further information</a>
+  # @noextend This class is not intended to be subclassed by clients.
   class PrintDialog < PrintDialogImports.const_get :Dialog
     include_class_members PrintDialogImports
     
@@ -40,29 +42,28 @@ module Org::Eclipse::Swt::Printing
     alias_method :attr_printer_data=, :printer_data=
     undef_method :printer_data=
     
-    attr_accessor :scope
-    alias_method :attr_scope, :scope
-    undef_method :scope
-    alias_method :attr_scope=, :scope=
-    undef_method :scope=
+    attr_accessor :return_code
+    alias_method :attr_return_code, :return_code
+    undef_method :return_code
+    alias_method :attr_return_code=, :return_code=
+    undef_method :return_code=
     
-    attr_accessor :start_page
-    alias_method :attr_start_page, :start_page
-    undef_method :start_page
-    alias_method :attr_start_page=, :start_page=
-    undef_method :start_page=
-    
-    attr_accessor :end_page
-    alias_method :attr_end_page, :end_page
-    undef_method :end_page
-    alias_method :attr_end_page=, :end_page=
-    undef_method :end_page=
-    
-    attr_accessor :print_to_file
-    alias_method :attr_print_to_file, :print_to_file
-    undef_method :print_to_file
-    alias_method :attr_print_to_file=, :print_to_file=
-    undef_method :print_to_file=
+    class_module.module_eval {
+      # the following Callbacks are never freed
+      
+      def dialog_callback5
+        defined?(@@dialog_callback5) ? @@dialog_callback5 : @@dialog_callback5= nil
+      end
+      alias_method :attr_dialog_callback5, :dialog_callback5
+      
+      def dialog_callback5=(value)
+        @@dialog_callback5 = value
+      end
+      alias_method :attr_dialog_callback5=, :dialog_callback5=
+      
+      const_set_lazy(:SWT_OBJECT) { Array.typed(::Java::Byte).new([Character.new(?S.ord), Character.new(?W.ord), Character.new(?T.ord), Character.new(?_.ord), Character.new(?O.ord), Character.new(?B.ord), Character.new(?J.ord), Character.new(?E.ord), Character.new(?C.ord), Character.new(?T.ord), Character.new(?\0.ord)]) }
+      const_attr_reader  :SWT_OBJECT
+    }
     
     typesig { [Shell] }
     # Constructs a new instance of this class given only its parent.
@@ -113,23 +114,41 @@ module Org::Eclipse::Swt::Printing
     # @see Widget#getStyle
     def initialize(parent, style)
       @printer_data = nil
-      @scope = 0
-      @start_page = 0
-      @end_page = 0
-      @print_to_file = false
-      super(parent, style)
-      @scope = PrinterData::ALL_PAGES
-      @start_page = 1
-      @end_page = 1
-      @print_to_file = false
+      @return_code = 0
+      super(parent, check_style(parent, style))
+      @printer_data = PrinterData.new
       check_subclass
     end
+    
+    class_module.module_eval {
+      typesig { [Shell, ::Java::Int] }
+      def check_style(parent, style)
+        mask = SWT::PRIMARY_MODAL | SWT::APPLICATION_MODAL | SWT::SYSTEM_MODAL
+        if (!((style & SWT::SHEET)).equal?(0))
+          if (get_sheet_enabled)
+            if ((parent).nil?)
+              style &= ~SWT::SHEET
+            end
+          else
+            style &= ~SWT::SHEET
+          end
+          if (((style & mask)).equal?(0))
+            style |= (parent).nil? ? SWT::APPLICATION_MODAL : SWT::PRIMARY_MODAL
+          end
+        end
+        return style
+      end
+    }
     
     typesig { [PrinterData] }
     # Sets the printer data that will be used when the dialog
     # is opened.
+    # <p>
+    # Setting the printer data to null is equivalent to
+    # resetting all data fields to their default values.
+    # </p>
     # 
-    # @param data the data that will be used when the dialog is opened
+    # @param data the data that will be used when the dialog is opened or null to use default data
     # 
     # @since 3.4
     def set_printer_data(data)
@@ -151,100 +170,88 @@ module Org::Eclipse::Swt::Printing
     # Makes the receiver visible and brings it to the front
     # of the display.
     # 
-    # @return a printer data object describing the desired print job parameters
+    # @return a printer data object describing the desired print job parameters,
+    # or null if the dialog was canceled, no printers were found, or an error occurred
     # 
     # @exception SWTException <ul>
     # <li>ERROR_WIDGET_DISPOSED - if the receiver has been disposed</li>
     # <li>ERROR_THREAD_INVALID_ACCESS - if not called from the thread that created the receiver</li>
     # </ul>
     def open
-      buffer = Array.typed(::Java::Int).new(1) { 0 }
-      if ((OS._pmcreate_session(buffer)).equal?(OS.attr_no_err))
-        print_session = buffer[0]
-        if ((OS._pmcreate_print_settings(buffer)).equal?(OS.attr_no_err))
-          print_settings = buffer[0]
-          OS._pmsession_default_print_settings(print_session, print_settings)
-          if ((OS._pmcreate_page_format(buffer)).equal?(OS.attr_no_err))
-            page_format = buffer[0]
-            OS._pmsession_default_page_format(print_session, page_format)
-            OS._pmsession_set_destination(print_session, print_settings, RJava.cast_to_short((@print_to_file ? OS.attr_k_pmdestination_file : OS.attr_k_pmdestination_printer)), 0, 0)
-            if ((@scope).equal?(PrinterData::PAGE_RANGE))
-              OS._pmset_first_page(print_settings, @start_page, false)
-              OS._pmset_last_page(print_settings, @end_page, false)
-              OS._pmset_page_range(print_settings, @start_page, @end_page)
-            else
-              OS._pmset_page_range(print_settings, 1, OS.attr_k_pmprint_all_pages)
-            end
-            accepted = Array.typed(::Java::Boolean).new(1) { false }
-            OS._pmsession_page_setup_dialog(print_session, page_format, accepted)
-            if (accepted[0])
-              OS._pmsession_print_dialog(print_session, print_settings, page_format, accepted)
-              if (accepted[0])
-                dest_type = Array.typed(::Java::Short).new(1) { 0 }
-                OS._pmsession_get_destination_type(print_session, print_settings, dest_type)
-                name = Printer.get_current_printer_name(print_session)
-                driver = Printer::DRIVER
-                case (dest_type[0])
-                when OS.attr_k_pmdestination_fax
-                  driver = RJava.cast_to_string(Printer::FAX_DRIVER)
-                when OS.attr_k_pmdestination_file
-                  driver = RJava.cast_to_string(Printer::FILE_DRIVER)
-                when OS.attr_k_pmdestination_preview
-                  driver = RJava.cast_to_string(Printer::PREVIEW_DRIVER)
-                when OS.attr_k_pmdestination_printer
-                  driver = RJava.cast_to_string(Printer::PRINTER_DRIVER)
-                end
-                data = PrinterData.new(driver, name)
-                if ((dest_type[0]).equal?(OS.attr_k_pmdestination_file))
-                  data.attr_print_to_file = true
-                  OS._pmsession_copy_destination_location(print_session, print_settings, buffer)
-                  file_name = OS._cfurlcopy_file_system_path(buffer[0], OS.attr_k_cfurlposixpath_style)
-                  OS._cfrelease(buffer[0])
-                  data.attr_file_name = Printer.get_string(file_name)
-                  OS._cfrelease(file_name)
-                end
-                OS._pmget_copies(print_settings, buffer)
-                data.attr_copy_count = buffer[0]
-                OS._pmget_first_page(print_settings, buffer)
-                data.attr_start_page = buffer[0]
-                OS._pmget_last_page(print_settings, buffer)
-                data.attr_end_page = buffer[0]
-                OS._pmget_page_range(print_settings, nil, buffer)
-                if ((data.attr_start_page).equal?(1) && (data.attr_end_page).equal?(OS.attr_k_pmprint_all_pages))
-                  data.attr_scope = PrinterData::ALL_PAGES
-                else
-                  data.attr_scope = PrinterData::PAGE_RANGE
-                end
-                collate = Array.typed(::Java::Boolean).new(1) { false }
-                OS._pmget_collate(print_settings, collate)
-                data.attr_collate = collate[0]
-                # Serialize settings
-                flat_settings = Array.typed(::Java::Int).new(1) { 0 }
-                OS._pmflatten_print_settings(print_settings, flat_settings)
-                flat_format = Array.typed(::Java::Int).new(1) { 0 }
-                OS._pmflatten_page_format(page_format, flat_format)
-                settings_length = OS._get_handle_size(flat_settings[0])
-                format_length = OS._get_handle_size(flat_format[0])
-                other_data = data.attr_other_data = Array.typed(::Java::Byte).new(settings_length + format_length + 8) { 0 }
-                offset = 0
-                offset = Printer.pack_data(flat_settings[0], other_data, offset)
-                offset = Printer.pack_data(flat_format[0], other_data, offset)
-                OS._dispose_handle(flat_settings[0])
-                OS._dispose_handle(flat_format[0])
-                @scope = data.attr_scope
-                @start_page = data.attr_start_page
-                @end_page = data.attr_end_page
-                @print_to_file = data.attr_print_to_file
-                return data
-              end
-            end
-            OS._pmrelease(page_format)
-          end
-          OS._pmrelease(print_settings)
-        end
-        OS._pmrelease(print_session)
+      data = nil
+      panel = NSPrintPanel.print_panel
+      print_info = NSPrintInfo.new(NSPrintInfo.shared_print_info.copy)
+      print_info.set_orientation((@printer_data.attr_orientation).equal?(PrinterData::LANDSCAPE) ? OS::NSLandscapeOrientation : OS::NSPortraitOrientation)
+      dict = print_info.dictionary
+      dict.set_value(NSNumber.number_with_bool(@printer_data.attr_collate), OS::NSPrintMustCollate)
+      dict.set_value(NSNumber.number_with_int(@printer_data.attr_copy_count), OS::NSPrintCopies)
+      if (@printer_data.attr_print_to_file)
+        dict.set_value(OS::NSPrintSaveJob, OS::NSPrintJobDisposition)
       end
-      return nil
+      if (!(@printer_data.attr_file_name).nil? && @printer_data.attr_file_name.length > 0)
+        dict.set_value(NSString.string_with(@printer_data.attr_file_name), OS::NSPrintSavePath)
+      end
+      dict.set_value(NSNumber.number_with_bool((@printer_data.attr_scope).equal?(PrinterData::ALL_PAGES)), OS::NSPrintAllPages)
+      if ((@printer_data.attr_scope).equal?(PrinterData::PAGE_RANGE))
+        dict.set_value(NSNumber.number_with_int(@printer_data.attr_start_page), OS::NSPrintFirstPage)
+        dict.set_value(NSNumber.number_with_int(@printer_data.attr_end_page), OS::NSPrintLastPage)
+      end
+      panel.set_options(OS::NSPrintPanelShowsPageSetupAccessory | panel.options)
+      response = 0
+      if (!((get_style & SWT::SHEET)).equal?(0))
+        init_classes
+        delegate = SWTPrintPanelDelegate.new.alloc.init
+        # long
+        jni_ref = OS._new_global_ref(self)
+        if ((jni_ref).equal?(0))
+          SWT.error(SWT::ERROR_NO_HANDLES)
+        end
+        OS.object_set_instance_variable(delegate.attr_id, SWT_OBJECT, jni_ref)
+        @return_code = -1
+        parent = get_parent
+        panel.begin_sheet_with_print_info(print_info, parent.attr_view.window, delegate, OS.attr_sel_panel_did_end_return_code_context_info_, 0)
+        application = NSApplication.shared_application
+        while ((@return_code).equal?(-1))
+          application.run
+        end
+        if (!(delegate).nil?)
+          delegate.release
+        end
+        if (!(jni_ref).equal?(0))
+          OS._delete_global_ref(jni_ref)
+        end
+        response = @return_code
+      else
+        # 64
+        response = RJava.cast_to_int(panel.run_modal_with_print_info(print_info))
+      end
+      if (!(response).equal?(OS::NSCancelButton))
+        printer_ = print_info.printer
+        str = printer_.name
+        data = PrinterData.new(Printer::DRIVER, str.get_string)
+        data.attr_print_to_file = print_info.job_disposition.is_equal(OS::NSPrintSaveJob)
+        if (data.attr_print_to_file)
+          filename = NSString.new(dict.object_for_key(OS::NSPrintSavePath))
+          data.attr_file_name = filename.get_string
+        end
+        data.attr_scope = !(NSNumber.new(dict.object_for_key(OS::NSPrintAllPages)).int_value).equal?(0) ? PrinterData::ALL_PAGES : PrinterData::PAGE_RANGE
+        if ((data.attr_scope).equal?(PrinterData::PAGE_RANGE))
+          data.attr_start_page = NSNumber.new(dict.object_for_key(OS::NSPrintFirstPage)).int_value
+          data.attr_end_page = NSNumber.new(dict.object_for_key(OS::NSPrintLastPage)).int_value
+        end
+        data.attr_collate = !(NSNumber.new(dict.object_for_key(OS::NSPrintMustCollate)).int_value).equal?(0)
+        data.attr_collate = false # TODO: Only set to false if the printer does the collate internally (most printers do)
+        data.attr_copy_count = NSNumber.new(dict.object_for_key(OS::NSPrintCopies)).int_value
+        data.attr_copy_count = 1 # TODO: Only set to 1 if the printer does the copy internally (most printers do)
+        data.attr_orientation = (print_info.orientation).equal?(OS::NSLandscapeOrientation) ? PrinterData::LANDSCAPE : PrinterData::PORTRAIT
+        ns_data = NSKeyedArchiver.archived_data_with_root_object(print_info)
+        # 64
+        data.attr_other_data = Array.typed(::Java::Byte).new(RJava.cast_to_int(ns_data.length)) { 0 }
+        OS.memmove(data.attr_other_data, ns_data.bytes, data.attr_other_data.attr_length)
+        @printer_data = data
+      end
+      print_info.release
+      return data
     end
     
     typesig { [] }
@@ -262,7 +269,74 @@ module Org::Eclipse::Swt::Printing
     # 
     # @return the scope setting that the user selected
     def get_scope
-      return @scope
+      return @printer_data.attr_scope
+    end
+    
+    class_module.module_eval {
+      typesig { [] }
+      def get_sheet_enabled
+        return !("false" == System.get_property("org.eclipse.swt.sheet"))
+      end
+      
+      typesig { [::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int] }
+      # long
+      # long
+      # long
+      # long
+      # long
+      # long
+      def dialog_proc(id, sel, arg0, arg1, arg2)
+        # long
+        # long
+        jni_ref = Array.typed(::Java::Int).new(1) { 0 }
+        OS.object_get_instance_variable(id, SWT_OBJECT, jni_ref)
+        if ((jni_ref[0]).equal?(0))
+          return 0
+        end
+        if ((sel).equal?(OS.attr_sel_panel_did_end_return_code_context_info_))
+          dialog = OS._jniget_object(jni_ref[0])
+          if ((dialog).nil?)
+            return 0
+          end
+          dialog.panel_did_end_return_code_context_info(id, sel, arg0, arg1, arg2)
+        end
+        return 0
+      end
+    }
+    
+    typesig { [] }
+    def init_classes
+      class_name = "SWTPrintPanelDelegate"
+      if (!(OS.objc_look_up_class(class_name)).equal?(0))
+        return
+      end
+      self.attr_dialog_callback5 = Callback.new(get_class, "dialogProc", 5)
+      # long
+      dialog_proc5 = self.attr_dialog_callback5.get_address
+      if ((dialog_proc5).equal?(0))
+        SWT.error(SWT::ERROR_NO_MORE_CALLBACKS)
+      end
+      types = Array.typed(::Java::Byte).new([Character.new(?*.ord), Character.new(?\0.ord)])
+      size = C::PTR_SIZEOF
+      align = (C::PTR_SIZEOF).equal?(4) ? 2 : 3
+      # long
+      cls = OS.objc_allocate_class_pair(OS.attr_class_nsobject, class_name, 0)
+      OS.class_add_ivar(cls, SWT_OBJECT, size, align, types)
+      OS.class_add_method(cls, OS.attr_sel_panel_did_end_return_code_context_info_, dialog_proc5, "@:@i@")
+      OS.objc_register_class_pair(cls)
+    end
+    
+    typesig { [::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int] }
+    # long
+    # long
+    # long
+    # long
+    # long
+    def panel_did_end_return_code_context_info(id, sel, alert, return_code, context_info)
+      # 64
+      @return_code = RJava.cast_to_int(return_code)
+      application = NSApplication.shared_application
+      application.stop(nil)
     end
     
     typesig { [::Java::Int] }
@@ -280,7 +354,7 @@ module Org::Eclipse::Swt::Printing
     # 
     # @param scope the scope setting when the dialog is opened
     def set_scope(scope)
-      @scope = scope
+      @printer_data.attr_scope = scope
     end
     
     typesig { [] }
@@ -293,7 +367,7 @@ module Org::Eclipse::Swt::Printing
     # 
     # @return the start page setting that the user selected
     def get_start_page
-      return @start_page
+      return @printer_data.attr_start_page
     end
     
     typesig { [::Java::Int] }
@@ -306,7 +380,7 @@ module Org::Eclipse::Swt::Printing
     # 
     # @param startPage the startPage setting when the dialog is opened
     def set_start_page(start_page)
-      @start_page = start_page
+      @printer_data.attr_start_page = start_page
     end
     
     typesig { [] }
@@ -319,7 +393,7 @@ module Org::Eclipse::Swt::Printing
     # 
     # @return the end page setting that the user selected
     def get_end_page
-      return @end_page
+      return @printer_data.attr_end_page
     end
     
     typesig { [::Java::Int] }
@@ -332,7 +406,7 @@ module Org::Eclipse::Swt::Printing
     # 
     # @param endPage the end page setting when the dialog is opened
     def set_end_page(end_page)
-      @end_page = end_page
+      @printer_data.attr_end_page = end_page
     end
     
     typesig { [] }
@@ -341,7 +415,7 @@ module Org::Eclipse::Swt::Printing
     # 
     # @return the 'Print to file' setting that the user selected
     def get_print_to_file
-      return @print_to_file
+      return @printer_data.attr_print_to_file
     end
     
     typesig { [::Java::Boolean] }
@@ -350,14 +424,14 @@ module Org::Eclipse::Swt::Printing
     # 
     # @param printToFile the 'Print to file' setting when the dialog is opened
     def set_print_to_file(print_to_file)
-      @print_to_file = print_to_file
+      @printer_data.attr_print_to_file = print_to_file
     end
     
     typesig { [] }
     def check_subclass
-      name = get_class.get_name
+      name_ = get_class.get_name
       valid_name = PrintDialog.get_name
-      if (!(valid_name == name))
+      if (!(valid_name == name_))
         SWT.error(SWT::ERROR_INVALID_SUBCLASS)
       end
     end

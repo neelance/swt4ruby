@@ -14,8 +14,7 @@ module Org::Eclipse::Swt::Graphics
       include ::Java::Lang
       include ::Org::Eclipse::Swt::Graphics
       include ::Org::Eclipse::Swt
-      include_const ::Org::Eclipse::Swt::Internal, :Compatibility
-      include ::Org::Eclipse::Swt::Internal::Carbon
+      include ::Org::Eclipse::Swt::Internal::Cocoa
     }
   end
   
@@ -136,12 +135,23 @@ module Org::Eclipse::Swt::Graphics
     def initialize(device, m11, m12, m21, m22, dx, dy)
       @handle = nil
       super(device)
-      @handle = Array.typed(::Java::Float).new(6) { 0.0 }
-      OS._cgaffine_transform_make(m11, m12, m21, m22, dx, dy, @handle)
-      if ((@handle).nil?)
-        SWT.error(SWT::ERROR_NO_HANDLES)
+      pool = nil
+      if (!NSThread.is_main_thread)
+        pool = NSAutoreleasePool.new.alloc.init
       end
-      init
+      begin
+        @handle = NSAffineTransform.transform
+        if ((@handle).nil?)
+          SWT.error(SWT::ERROR_NO_HANDLES)
+        end
+        @handle.retain
+        set_elements(m11, m12, m21, m22, dx, dy)
+        init
+      ensure
+        if (!(pool).nil?)
+          pool.release
+        end
+      end
     end
     
     class_module.module_eval {
@@ -159,6 +169,7 @@ module Org::Eclipse::Swt::Graphics
     
     typesig { [] }
     def destroy
+      @handle.release
       @handle = nil
     end
     
@@ -185,7 +196,29 @@ module Org::Eclipse::Swt::Graphics
       if (elements.attr_length < 6)
         SWT.error(SWT::ERROR_INVALID_ARGUMENT)
       end
-      System.arraycopy(@handle, 0, elements, 0, @handle.attr_length)
+      pool = nil
+      if (!NSThread.is_main_thread)
+        pool = NSAutoreleasePool.new.alloc.init
+      end
+      begin
+        struct = @handle.transform_struct
+        # 64
+        elements[0] = (struct.attr_m11).to_f
+        # 64
+        elements[1] = (struct.attr_m12).to_f
+        # 64
+        elements[2] = (struct.attr_m21).to_f
+        # 64
+        elements[3] = (struct.attr_m22).to_f
+        # 64
+        elements[4] = (struct.attr_t_x).to_f
+        # 64
+        elements[5] = (struct.attr_t_y).to_f
+      ensure
+        if (!(pool).nil?)
+          pool.release
+        end
+      end
     end
     
     typesig { [] }
@@ -201,7 +234,20 @@ module Org::Eclipse::Swt::Graphics
       if (is_disposed)
         SWT.error(SWT::ERROR_GRAPHIC_DISPOSED)
       end
-      OS._cgaffine_transform_make(1, 0, 0, 1, 0, 0, @handle)
+      pool = nil
+      if (!NSThread.is_main_thread)
+        pool = NSAutoreleasePool.new.alloc.init
+      end
+      begin
+        struct = NSAffineTransformStruct.new
+        struct.attr_m11 = 1
+        struct.attr_m22 = 1
+        @handle.set_transform_struct(struct)
+      ensure
+        if (!(pool).nil?)
+          pool.release
+        end
+      end
     end
     
     typesig { [] }
@@ -216,10 +262,21 @@ module Org::Eclipse::Swt::Graphics
       if (is_disposed)
         SWT.error(SWT::ERROR_GRAPHIC_DISPOSED)
       end
-      if (((@handle[0] * @handle[3] - @handle[1] * @handle[2])).equal?(0))
-        SWT.error(SWT::ERROR_CANNOT_INVERT_MATRIX)
+      pool = nil
+      if (!NSThread.is_main_thread)
+        pool = NSAutoreleasePool.new.alloc.init
       end
-      OS._cgaffine_transform_invert(@handle, @handle)
+      begin
+        struct = @handle.transform_struct
+        if (((struct.attr_m11 * struct.attr_m22 - struct.attr_m12 * struct.attr_m21)).equal?(0))
+          SWT.error(SWT::ERROR_CANNOT_INVERT_MATRIX)
+        end
+        @handle.invert
+      ensure
+        if (!(pool).nil?)
+          pool.release
+        end
+      end
     end
     
     typesig { [] }
@@ -244,7 +301,18 @@ module Org::Eclipse::Swt::Graphics
       if (is_disposed)
         SWT.error(SWT::ERROR_GRAPHIC_DISPOSED)
       end
-      return (@handle[0]).equal?(1) && (@handle[1]).equal?(0) && (@handle[2]).equal?(0) && (@handle[3]).equal?(1) && (@handle[4]).equal?(0) && (@handle[5]).equal?(0)
+      pool = nil
+      if (!NSThread.is_main_thread)
+        pool = NSAutoreleasePool.new.alloc.init
+      end
+      begin
+        struct = @handle.transform_struct
+        return (struct.attr_m11).equal?(1) && (struct.attr_m12).equal?(0) && (struct.attr_m21).equal?(0) && (struct.attr_m22).equal?(1) && (struct.attr_t_x).equal?(0) && (struct.attr_t_y).equal?(0)
+      ensure
+        if (!(pool).nil?)
+          pool.release
+        end
+      end
     end
     
     typesig { [Transform] }
@@ -271,7 +339,17 @@ module Org::Eclipse::Swt::Graphics
       if (matrix.is_disposed)
         SWT.error(SWT::ERROR_INVALID_ARGUMENT)
       end
-      OS._cgaffine_transform_concat(matrix.attr_handle, @handle, @handle)
+      pool = nil
+      if (!NSThread.is_main_thread)
+        pool = NSAutoreleasePool.new.alloc.init
+      end
+      begin
+        @handle.prepend_transform(matrix.attr_handle)
+      ensure
+        if (!(pool).nil?)
+          pool.release
+        end
+      end
     end
     
     typesig { [::Java::Float] }
@@ -290,7 +368,17 @@ module Org::Eclipse::Swt::Graphics
       if (is_disposed)
         SWT.error(SWT::ERROR_GRAPHIC_DISPOSED)
       end
-      OS._cgaffine_transform_rotate(@handle, angle * (Compatibility.attr_pi).to_f / 180, @handle)
+      pool = nil
+      if (!NSThread.is_main_thread)
+        pool = NSAutoreleasePool.new.alloc.init
+      end
+      begin
+        @handle.rotate_by_degrees(angle)
+      ensure
+        if (!(pool).nil?)
+          pool.release
+        end
+      end
     end
     
     typesig { [::Java::Float, ::Java::Float] }
@@ -307,7 +395,17 @@ module Org::Eclipse::Swt::Graphics
       if (is_disposed)
         SWT.error(SWT::ERROR_GRAPHIC_DISPOSED)
       end
-      OS._cgaffine_transform_scale(@handle, scale_x, scale_y, @handle)
+      pool = nil
+      if (!NSThread.is_main_thread)
+        pool = NSAutoreleasePool.new.alloc.init
+      end
+      begin
+        @handle.scale_xby(scale_x, scale_y)
+      ensure
+        if (!(pool).nil?)
+          pool.release
+        end
+      end
     end
     
     typesig { [::Java::Float, ::Java::Float, ::Java::Float, ::Java::Float, ::Java::Float, ::Java::Float] }
@@ -328,7 +426,24 @@ module Org::Eclipse::Swt::Graphics
       if (is_disposed)
         SWT.error(SWT::ERROR_GRAPHIC_DISPOSED)
       end
-      OS._cgaffine_transform_make(m11, m12, m21, m22, dx, dy, @handle)
+      pool = nil
+      if (!NSThread.is_main_thread)
+        pool = NSAutoreleasePool.new.alloc.init
+      end
+      begin
+        struct = NSAffineTransformStruct.new
+        struct.attr_m11 = m11
+        struct.attr_m12 = m12
+        struct.attr_m21 = m21
+        struct.attr_m22 = m22
+        struct.attr_t_x = dx
+        struct.attr_t_y = dy
+        @handle.set_transform_struct(struct)
+      ensure
+        if (!(pool).nil?)
+          pool.release
+        end
+      end
     end
     
     typesig { [::Java::Float, ::Java::Float] }
@@ -347,8 +462,24 @@ module Org::Eclipse::Swt::Graphics
       if (is_disposed)
         SWT.error(SWT::ERROR_GRAPHIC_DISPOSED)
       end
-      matrix = Array.typed(::Java::Float).new([1, shear_x, shear_y, 1, 0, 0])
-      OS._cgaffine_transform_concat(matrix, @handle, @handle)
+      pool = nil
+      if (!NSThread.is_main_thread)
+        pool = NSAutoreleasePool.new.alloc.init
+      end
+      begin
+        struct = NSAffineTransformStruct.new
+        struct.attr_m11 = 1
+        struct.attr_m12 = shear_x
+        struct.attr_m21 = shear_y
+        struct.attr_m22 = 1
+        matrix = NSAffineTransform.transform
+        matrix.set_transform_struct(struct)
+        @handle.prepend_transform(matrix)
+      ensure
+        if (!(pool).nil?)
+          pool.release
+        end
+      end
     end
     
     typesig { [Array.typed(::Java::Float)] }
@@ -371,18 +502,30 @@ module Org::Eclipse::Swt::Graphics
       if ((point_array).nil?)
         SWT.error(SWT::ERROR_NULL_ARGUMENT)
       end
-      point = CGPoint.new
-      length = point_array.attr_length / 2
-      i = 0
-      j = 0
-      while i < length
-        point.attr_x = point_array[j]
-        point.attr_y = point_array[j + 1]
-        OS._cgpoint_apply_affine_transform(point, @handle, point)
-        point_array[j] = point.attr_x
-        point_array[j + 1] = point.attr_y
-        i += 1
-        j += 2
+      pool = nil
+      if (!NSThread.is_main_thread)
+        pool = NSAutoreleasePool.new.alloc.init
+      end
+      begin
+        point = NSPoint.new
+        length = point_array.attr_length / 2
+        i = 0
+        j = 0
+        while i < length
+          point.attr_x = point_array[j]
+          point.attr_y = point_array[j + 1]
+          point = @handle.transform_point(point)
+          # 64
+          point_array[j] = (point.attr_x).to_f
+          # 64
+          point_array[j + 1] = (point.attr_y).to_f
+          i += 1
+          j += 2
+        end
+      ensure
+        if (!(pool).nil?)
+          pool.release
+        end
       end
     end
     
@@ -400,7 +543,17 @@ module Org::Eclipse::Swt::Graphics
       if (is_disposed)
         SWT.error(SWT::ERROR_GRAPHIC_DISPOSED)
       end
-      OS._cgaffine_transform_translate(@handle, offset_x, offset_y, @handle)
+      pool = nil
+      if (!NSThread.is_main_thread)
+        pool = NSAutoreleasePool.new.alloc.init
+      end
+      begin
+        @handle.translate_xby(offset_x, offset_y)
+      ensure
+        if (!(pool).nil?)
+          pool.release
+        end
+      end
     end
     
     typesig { [] }

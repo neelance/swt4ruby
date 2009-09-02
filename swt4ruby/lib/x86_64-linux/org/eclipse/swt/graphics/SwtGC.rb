@@ -1,6 +1,6 @@
 require "rjava"
 
-# Copyright (c) 2000, 2008 IBM Corporation and others.
+# Copyright (c) 2000, 2009 IBM Corporation and others.
 # All rights reserved. This program and the accompanying materials
 # are made available under the terms of the Eclipse Public License v1.0
 # which accompanies this distribution, and is available at
@@ -32,6 +32,14 @@ module Org::Eclipse::Swt::Graphics
   # The SWT drawing coordinate system is the two-dimensional space with the origin
   # (0,0) at the top left corner of the drawing area and with (x,y) values increasing
   # to the right and downward respectively.
+  # </p>
+  # 
+  # <p>
+  # The result of drawing on an image that was created with an indexed
+  # palette using a color that is not in the palette is platform specific.
+  # Some platforms will match to the nearest color while other will draw
+  # the color itself. This happens because the allocated image might use
+  # a direct palette on platforms that do not support indexed palette.
   # </p>
   # 
   # <p>
@@ -1972,22 +1980,23 @@ module Org::Eclipse::Swt::Graphics
       end
       set_string(string, flags)
       if (!(cairo).equal?(0))
+        check_gc(FONT)
         if (((flags & SWT::DRAW_TRANSPARENT)).equal?(0))
           check_gc(BACKGROUND)
-          width = Array.typed(::Java::Int).new(1) { 0 }
-          height = Array.typed(::Java::Int).new(1) { 0 }
-          OS.pango_layout_get_size(@data.attr_layout, width, height)
-          SwtCairo.cairo_rectangle(cairo, x, y, OS._pango_pixels(width[0]), OS._pango_pixels(height[0]))
+          if ((@data.attr_string_width).equal?(-1))
+            compute_string_size
+          end
+          SwtCairo.cairo_rectangle(cairo, x, y, @data.attr_string_width, @data.attr_string_height)
           SwtCairo.cairo_fill(cairo)
         end
-        check_gc(FOREGROUND | FONT)
+        check_gc(FOREGROUND)
         if (!((@data.attr_style & SWT::MIRRORED)).equal?(0))
           SwtCairo.cairo_save(cairo)
-          width = Array.typed(::Java::Int).new(1) { 0 }
-          height = Array.typed(::Java::Int).new(1) { 0 }
-          OS.pango_layout_get_size(@data.attr_layout, width, height)
+          if ((@data.attr_string_width).equal?(-1))
+            compute_string_size
+          end
           SwtCairo.cairo_scale(cairo, -1, 1)
-          SwtCairo.cairo_translate(cairo, -2 * x - OS._pango_pixels(width[0]), 0)
+          SwtCairo.cairo_translate(cairo, -2 * x - @data.attr_string_width, 0)
         end
         SwtCairo.cairo_move_to(cairo, x, y)
         OS.pango_cairo_show_layout(cairo, @data.attr_layout)
@@ -2007,13 +2016,11 @@ module Org::Eclipse::Swt::Graphics
       else
         # int
         layout = @data.attr_layout
-        w = Array.typed(::Java::Int).new(1) { 0 }
-        h = Array.typed(::Java::Int).new(1) { 0 }
-        OS.pango_layout_get_size(layout, w, h)
-        width = OS._pango_pixels(w[0])
-        height = OS._pango_pixels(h[0])
+        if ((@data.attr_string_width).equal?(-1))
+          compute_string_size
+        end
         # int
-        pixmap = OS.gdk_pixmap_new(OS._gdk_root_parent, width, height, -1)
+        pixmap = OS.gdk_pixmap_new(OS._gdk_root_parent, @data.attr_string_width, @data.attr_string_height, -1)
         if ((pixmap).equal?(0))
           SWT.error(SWT::ERROR_NO_HANDLES)
         end
@@ -2024,11 +2031,11 @@ module Org::Eclipse::Swt::Graphics
         end
         black = GdkColor.new
         OS.gdk_gc_set_foreground(gdk_gc, black)
-        OS.gdk_draw_rectangle(pixmap, gdk_gc, 1, 0, 0, width, height)
+        OS.gdk_draw_rectangle(pixmap, gdk_gc, 1, 0, 0, @data.attr_string_width, @data.attr_string_height)
         OS.gdk_gc_set_foreground(gdk_gc, @data.attr_foreground)
         OS.gdk_draw_layout_with_colors(pixmap, gdk_gc, 0, 0, layout, nil, background)
         OS.g_object_unref(gdk_gc)
-        OS.gdk_draw_drawable(@data.attr_drawable, @handle, pixmap, 0, 0, x, y, width, height)
+        OS.gdk_draw_drawable(@data.attr_drawable, @handle, pixmap, 0, 0, x, y, @data.attr_string_width, @data.attr_string_height)
         OS.g_object_unref(pixmap)
       end
     end
@@ -2956,6 +2963,7 @@ module Org::Eclipse::Swt::Graphics
     # @see GCData
     # 
     # @since 3.2
+    # @noreference This method is not intended to be referenced by clients.
     def get_gcdata
       if ((@handle).equal?(0))
         SWT.error(SWT::ERROR_GRAPHIC_DISPOSED)
@@ -3354,7 +3362,16 @@ module Org::Eclipse::Swt::Graphics
       @data.attr_dispose_cairo = true
       SwtCairo.cairo_set_fill_rule(cairo, SwtCairo::CAIRO_FILL_RULE_EVEN_ODD)
       @data.attr_state &= ~(BACKGROUND | FOREGROUND | FONT | LINE_WIDTH | LINE_CAP | LINE_JOIN | LINE_STYLE | DRAW_OFFSET)
-      set_cairo_clip(cairo, @data.attr_clip_rgn)
+      set_cairo_clip(@data.attr_damage_rgn, @data.attr_clip_rgn)
+    end
+    
+    typesig { [] }
+    def compute_string_size
+      width = Array.typed(::Java::Int).new(1) { 0 }
+      height = Array.typed(::Java::Int).new(1) { 0 }
+      OS.pango_layout_get_size(@data.attr_layout, width, height)
+      @data.attr_string_height = OS._pango_pixels(height[0])
+      @data.attr_string_width = OS._pango_pixels(width[0])
     end
     
     typesig { [] }
@@ -3475,6 +3492,7 @@ module Org::Eclipse::Swt::Graphics
         end
         @data.attr_cairo = 0
         @data.attr_interpolation = SWT::DEFAULT
+        @data.attr_alpha = 0xff
         @data.attr_background_pattern = @data.attr_foreground_pattern = nil
         @data.attr_state = 0
         set_clipping(0)
@@ -3671,19 +3689,15 @@ module Org::Eclipse::Swt::Graphics
       typesig { [::Java::Long, ::Java::Long] }
       # int
       # int
-      def set_cairo_clip(cairo, clip_rgn)
-        SwtCairo.cairo_reset_clip(cairo)
-        if ((clip_rgn).equal?(0))
-          return
-        end
+      def set_cairo_region(cairo, rgn)
         if (OS::GTK_VERSION >= OS._version(2, 8, 0))
-          OS.gdk_cairo_region(cairo, clip_rgn)
+          OS.gdk_cairo_region(cairo, rgn)
         else
           n_rects = Array.typed(::Java::Int).new(1) { 0 }
           # int
           # int
           rects = Array.typed(::Java::Long).new(1) { 0 }
-          OS.gdk_region_get_rectangles(clip_rgn, rects, n_rects)
+          OS.gdk_region_get_rectangles(rgn, rects, n_rects)
           rect = GdkRectangle.new
           i = 0
           while i < n_rects[0]
@@ -3695,7 +3709,6 @@ module Org::Eclipse::Swt::Graphics
             OS.g_free(rects[0])
           end
         end
-        SwtCairo.cairo_clip(cairo)
       end
       
       typesig { [::Java::Long, ::Java::Int, Color, ::Java::Int] }
@@ -3710,6 +3723,29 @@ module Org::Eclipse::Swt::Graphics
       end
     }
     
+    typesig { [::Java::Long, ::Java::Long] }
+    # int
+    # int
+    def set_cairo_clip(damage_rgn, clip_rgn)
+      # int
+      cairo = @data.attr_cairo
+      SwtCairo.cairo_reset_clip(cairo)
+      if (!(damage_rgn).equal?(0))
+        matrix = Array.typed(::Java::Double).new(6) { 0.0 }
+        SwtCairo.cairo_get_matrix(cairo, matrix)
+        identity_ = Array.typed(::Java::Double).new(6) { 0.0 }
+        SwtCairo.cairo_matrix_init_identity(identity_)
+        SwtCairo.cairo_set_matrix(cairo, identity_)
+        set_cairo_region(cairo, damage_rgn)
+        SwtCairo.cairo_clip(cairo)
+        SwtCairo.cairo_set_matrix(cairo, matrix)
+      end
+      if (!(clip_rgn).equal?(0))
+        set_cairo_region(cairo, clip_rgn)
+        SwtCairo.cairo_clip(cairo)
+      end
+    end
+    
     typesig { [::Java::Long] }
     # int
     def set_clipping(clip_rgn)
@@ -3722,7 +3758,7 @@ module Org::Eclipse::Swt::Graphics
         end
         if (!(cairo).equal?(0))
           @data.attr_clipping_transform = nil
-          set_cairo_clip(cairo, clip_rgn)
+          set_cairo_clip(@data.attr_damage_rgn, 0)
         else
           # int
           clipping = !(@data.attr_damage_rgn).equal?(0) ? @data.attr_damage_rgn : 0
@@ -3739,7 +3775,7 @@ module Org::Eclipse::Swt::Graphics
             @data.attr_clipping_transform = Array.typed(::Java::Double).new(6) { 0.0 }
           end
           SwtCairo.cairo_get_matrix(cairo, @data.attr_clipping_transform)
-          set_cairo_clip(cairo, clip_rgn)
+          set_cairo_clip(@data.attr_damage_rgn, clip_rgn)
         else
           # int
           clipping = clip_rgn
@@ -4637,13 +4673,10 @@ module Org::Eclipse::Swt::Graphics
       end
       set_string(string, flags)
       check_gc(FONT)
-      if (!(@data.attr_string_width).equal?(-1))
-        return Point.new(@data.attr_string_width, @data.attr_string_height)
+      if ((@data.attr_string_width).equal?(-1))
+        compute_string_size
       end
-      width = Array.typed(::Java::Int).new(1) { 0 }
-      height = Array.typed(::Java::Int).new(1) { 0 }
-      OS.pango_layout_get_size(@data.attr_layout, width, height)
-      return Point.new(@data.attr_string_width = OS._pango_pixels(width[0]), @data.attr_string_height = OS._pango_pixels(height[0]))
+      return Point.new(@data.attr_string_width, @data.attr_string_height)
     end
     
     typesig { [] }

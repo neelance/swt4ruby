@@ -1,6 +1,6 @@
 require "rjava"
 
-# Copyright (c) 2007, 2008 IBM Corporation and others.
+# Copyright (c) 2007, 2009 IBM Corporation and others.
 # All rights reserved. This program and the accompanying materials
 # are made available under the terms of the Eclipse Public License v1.0
 # which accompanies this distribution, and is available at
@@ -38,6 +38,7 @@ module Org::Eclipse::Swt::Widgets
   # @see <a href="http://www.eclipse.org/swt/">Sample code and further information</a>
   # 
   # @since 3.4
+  # @noextend This class is not intended to be subclassed by clients.
   class IME < IMEImports.const_get :Widget
     include_class_members IMEImports
     
@@ -451,6 +452,16 @@ module Org::Eclipse::Swt::Widgets
       end
       if (!(chars).nil?)
         if ((@text.length).equal?(0))
+          # Bug in GTK. In Solaris, the IME sends multiple
+          # preedit_changed signals with an empty text.
+          # This behavior is not correct for SWT and can
+          # cause the editor to replace its current selection
+          # with an empty string. The fix is to ignore any
+          # preedit_changed signals with an empty text when
+          # the preedit buffer is already empty.
+          if ((chars.attr_length).equal?(0))
+            return 0
+          end
           @start_offset = -1
         end
         end_ = @start_offset + @text.length
@@ -509,7 +520,7 @@ module Org::Eclipse::Swt::Widgets
     # above the IME, then the IME must be informed that the composition
     # offset has changed.
     # 
-    # @return the offset of the composition
+    # @param offset the offset of the composition
     # 
     # @exception SWTException <ul>
     # <li>ERROR_WIDGET_DISPOSED - if the receiver has been disposed</li>

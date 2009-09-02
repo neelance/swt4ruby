@@ -1,6 +1,6 @@
 require "rjava"
 
-# Copyright (c) 2000, 2008 IBM Corporation and others.
+# Copyright (c) 2000, 2009 IBM Corporation and others.
 # All rights reserved. This program and the accompanying materials
 # are made available under the terms of the Eclipse Public License v1.0
 # which accompanies this distribution, and is available at
@@ -73,6 +73,16 @@ module Org::Eclipse::Swt::Accessibility
     undef_method :control
     alias_method :attr_control=, :control=
     undef_method :control=
+    
+    typesig { [] }
+    # @since 3.5
+    def initialize
+      @accessible_listeners = Vector.new
+      @control_listeners = Vector.new
+      @text_listeners = Vector.new
+      @accessible_object = nil
+      @control = nil
+    end
     
     typesig { [Control] }
     def initialize(control)
@@ -276,9 +286,6 @@ module Org::Eclipse::Swt::Accessibility
         @accessible_object.release
         @accessible_object = nil
       end
-      @accessible_listeners = nil
-      @control_listeners = nil
-      @text_listeners = nil
     end
     
     typesig { [AccessibleControlListener] }

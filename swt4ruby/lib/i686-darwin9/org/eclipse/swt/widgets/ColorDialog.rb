@@ -1,6 +1,6 @@
 require "rjava"
 
-# Copyright (c) 2000, 2008 IBM Corporation and others.
+# Copyright (c) 2000, 2009 IBM Corporation and others.
 # All rights reserved. This program and the accompanying materials
 # are made available under the terms of the Eclipse Public License v1.0
 # which accompanies this distribution, and is available at
@@ -14,8 +14,8 @@ module Org::Eclipse::Swt::Widgets
       include ::Java::Lang
       include ::Org::Eclipse::Swt::Widgets
       include ::Org::Eclipse::Swt
-      include ::Org::Eclipse::Swt::Internal::Carbon
-      include_const ::Org::Eclipse::Swt::Graphics, :RGB
+      include ::Org::Eclipse::Swt::Graphics
+      include ::Org::Eclipse::Swt::Internal::Cocoa
     }
   end
   
@@ -34,6 +34,7 @@ module Org::Eclipse::Swt::Widgets
   # 
   # @see <a href="http://www.eclipse.org/swt/examples.php">SWT Example: ControlExample, Dialog tab</a>
   # @see <a href="http://www.eclipse.org/swt/">Sample code and further information</a>
+  # @noextend This class is not intended to be subclassed by clients.
   class ColorDialog < ColorDialogImports.const_get :Dialog
     include_class_members ColorDialogImports
     
@@ -42,6 +43,12 @@ module Org::Eclipse::Swt::Widgets
     undef_method :rgb
     alias_method :attr_rgb=, :rgb=
     undef_method :rgb=
+    
+    attr_accessor :selected
+    alias_method :attr_selected, :selected
+    undef_method :selected
+    alias_method :attr_selected=, :selected=
+    undef_method :selected=
     
     typesig { [Shell] }
     # Constructs a new instance of this class given only its parent.
@@ -92,8 +99,17 @@ module Org::Eclipse::Swt::Widgets
     # @see Widget#getStyle
     def initialize(parent, style)
       @rgb = nil
+      @selected = false
       super(parent, check_style(parent, style))
       check_subclass
+    end
+    
+    typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
+    # long
+    # long
+    # long
+    def change_color(id, sel, sender)
+      @selected = true
     end
     
     typesig { [] }
@@ -119,43 +135,32 @@ module Org::Eclipse::Swt::Widgets
     # <li>ERROR_THREAD_INVALID_ACCESS - if not called from the thread that created the receiver</li>
     # </ul>
     def open
-      info = ColorPickerInfo.new
+      panel = NSColorPanel.shared_color_panel
       if (!(@rgb).nil?)
-        info.attr_red = RJava.cast_to_short((@rgb.attr_red * 257))
-        info.attr_green = RJava.cast_to_short((@rgb.attr_green * 257))
-        info.attr_blue = RJava.cast_to_short((@rgb.attr_blue * 257))
-      else
-        info.attr_red = RJava.cast_to_short((255 * 257))
-        info.attr_green = RJava.cast_to_short((255 * 257))
-        info.attr_blue = RJava.cast_to_short((255 * 257))
+        color = NSColor.color_with_device_red(@rgb.attr_red / 255, @rgb.attr_green / 255, @rgb.attr_blue / 255, 1)
+        panel.set_color(color)
       end
-      info.attr_flags = OS.attr_k_color_picker_dialog_is_moveable | OS.attr_k_color_picker_dialog_is_modal
-      # NEEDS WORK - shouldn't be at mouse location
-      info.attr_place_where = RJava.cast_to_short(OS.attr_k_at_specified_origin)
-      mp = Org::Eclipse::Swt::Internal::Carbon::Point.new
-      OS._get_global_mouse(mp)
-      info.attr_v = mp.attr_v
-      info.attr_h = mp.attr_h
-      if (!(self.attr_title).nil?)
-        # NEEDS WORK - no title displayed
-        info.attr_prompt = Array.typed(::Java::Byte).new(256) { 0 }
-        length_ = self.attr_title.length
-        if (length_ > 255)
-          length_ = 255
-        end
-        info.attr_prompt[0] = length_
-        i = 0
-        while i < length_
-          info.attr_prompt[i + 1] = self.attr_title.char_at(i)
-          i += 1
-        end
+      delegate = SWTPanelDelegate.new.alloc.init
+      # long
+      jni_ref = OS._new_global_ref(self)
+      if ((jni_ref).equal?(0))
+        SWT.error(SWT::ERROR_NO_HANDLES)
       end
+      OS.object_set_instance_variable(delegate.attr_id, Display::SWT_OBJECT, jni_ref)
+      panel.set_delegate(delegate)
       @rgb = nil
-      if ((OS._pick_color(info)).equal?(OS.attr_no_err) && info.attr_new_color_chosen)
-        red = (info.attr_red >> 8) & 0xff
-        green = (info.attr_green >> 8) & 0xff
-        blue = (info.attr_blue >> 8) & 0xff
-        @rgb = RGB.new(red, green, blue)
+      @selected = false
+      panel.order_front(nil)
+      NSApplication.shared_application.run_modal_for_window(panel)
+      panel.set_delegate(nil)
+      delegate.release
+      OS._delete_global_ref(jni_ref)
+      if (@selected)
+        color_ = panel.color
+        if (!(color_).nil?)
+          color_ = color_.color_using_color_space_name(OS::NSCalibratedRGBColorSpace)
+          @rgb = RGB.new(RJava.cast_to_int((color_.red_component * 255)), RJava.cast_to_int((color_.green_component * 255)), RJava.cast_to_int((color_.blue_component * 255)))
+        end
       end
       return @rgb
     end
@@ -169,6 +174,14 @@ module Org::Eclipse::Swt::Widgets
     # @see PaletteData#getRGBs
     def set_rgb(rgb)
       @rgb = rgb
+    end
+    
+    typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
+    # long
+    # long
+    # long
+    def window_will_close(id, sel, sender)
+      NSApplication.shared_application.stop(nil)
     end
     
     private

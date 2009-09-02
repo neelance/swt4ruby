@@ -1,6 +1,6 @@
 require "rjava"
 
-# Copyright (c) 2000, 2008 IBM Corporation and others.
+# Copyright (c) 2000, 2009 IBM Corporation and others.
 # All rights reserved. This program and the accompanying materials
 # are made available under the terms of the Eclipse Public License v1.0
 # which accompanies this distribution, and is available at
@@ -25,7 +25,7 @@ module Org::Eclipse::Swt::Widgets
   # When SEPARATOR is specified, displays a single
   # vertical or horizontal line.
   # <p>
-  # Shadow styles are hints and may not be honoured
+  # Shadow styles are hints and may not be honored
   # by the platform.  To create a separator label
   # with the default shadow style for the platform,
   # do not specify a shadow style.
@@ -50,6 +50,7 @@ module Org::Eclipse::Swt::Widgets
   # @see <a href="http://www.eclipse.org/swt/snippets/#label">Label snippets</a>
   # @see <a href="http://www.eclipse.org/swt/examples.php">SWT Example: ControlExample</a>
   # @see <a href="http://www.eclipse.org/swt/">Sample code and further information</a>
+  # @noextend This class is not intended to be subclassed by clients.
   class Label < LabelImports.const_get :Control
     include_class_members LabelImports
     
@@ -185,29 +186,52 @@ module Org::Eclipse::Swt::Widgets
           end
         end
       end
-      fix_wrap = !(@label_handle).equal?(0) && !((self.attr_style & SWT::WRAP)).equal?(0)
+      size = nil
+      # Feature in GTK. GTK has a predetermined maximum width for wrapping text.
+      # The fix is to use pango layout directly instead of the label size request
+      # to calculate its preferred size.
+      fix_wrap = !(@label_handle).equal?(0) && !((self.attr_style & SWT::WRAP)).equal?(0) && !((OS._gtk_widget_flags(@label_handle) & OS::GTK_VISIBLE)).equal?(0)
       if (fix_wrap || !(@frame_handle).equal?(0))
         force_resize
       end
-      label_width = Array.typed(::Java::Int).new(1) { 0 }
-      label_height = Array.typed(::Java::Int).new(1) { 0 }
       if (fix_wrap)
-        OS.gtk_widget_get_size_request(@label_handle, label_width, label_height)
-        OS.gtk_widget_set_size_request(@label_handle, w_hint, h_hint)
-      end
-      size = nil
-      if (!(@frame_handle).equal?(0))
-        req_width = Array.typed(::Java::Int).new(1) { 0 }
-        req_height = Array.typed(::Java::Int).new(1) { 0 }
-        OS.gtk_widget_get_size_request(self.attr_handle, req_width, req_height)
-        OS.gtk_widget_set_size_request(self.attr_handle, w_hint, h_hint)
-        size = compute_native_size(@frame_handle, -1, -1, changed)
-        OS.gtk_widget_set_size_request(self.attr_handle, req_width[0], req_height[0])
+        # long
+        label_layout = OS.gtk_label_get_layout(@label_handle)
+        pango_width = OS.pango_layout_get_width(label_layout)
+        if (!(w_hint).equal?(SWT::DEFAULT))
+          OS.pango_layout_set_width(label_layout, w_hint * OS::PANGO_SCALE)
+        else
+          OS.pango_layout_set_width(label_layout, -1)
+        end
+        w = Array.typed(::Java::Int).new(1) { 0 }
+        h = Array.typed(::Java::Int).new(1) { 0 }
+        OS.pango_layout_get_size(label_layout, w, h)
+        OS.pango_layout_set_width(label_layout, pango_width)
+        if (!(@frame_handle).equal?(0))
+          label_width = Array.typed(::Java::Int).new(1) { 0 }
+          label_height = Array.typed(::Java::Int).new(1) { 0 }
+          OS.gtk_widget_get_size_request(@label_handle, label_width, label_height)
+          OS.gtk_widget_set_size_request(@label_handle, 1, 1)
+          size = compute_native_size(@frame_handle, -1, -1, changed)
+          OS.gtk_widget_set_size_request(@label_handle, label_width[0], label_height[0])
+          size.attr_x = size.attr_x - 1
+          size.attr_y = size.attr_y - 1
+        else
+          size = Point.new(0, 0)
+        end
+        size.attr_x += (w_hint).equal?(SWT::DEFAULT) ? OS._pango_pixels(w[0]) : w_hint
+        size.attr_y += (h_hint).equal?(SWT::DEFAULT) ? OS._pango_pixels(h[0]) : h_hint
       else
-        size = compute_native_size(self.attr_handle, w_hint, h_hint, changed)
-      end
-      if (fix_wrap)
-        OS.gtk_widget_set_size_request(@label_handle, label_width[0], label_height[0])
+        if (!(@frame_handle).equal?(0))
+          req_width = Array.typed(::Java::Int).new(1) { 0 }
+          req_height = Array.typed(::Java::Int).new(1) { 0 }
+          OS.gtk_widget_get_size_request(self.attr_handle, req_width, req_height)
+          OS.gtk_widget_set_size_request(self.attr_handle, w_hint, h_hint)
+          size = compute_native_size(@frame_handle, -1, -1, changed)
+          OS.gtk_widget_set_size_request(self.attr_handle, req_width[0], req_height[0])
+        else
+          size = compute_native_size(self.attr_handle, w_hint, h_hint, changed)
+        end
       end
       # Feature in GTK.  Instead of using the font height to determine
       # the preferred height of the widget, GTK uses the text metrics.
@@ -519,22 +543,9 @@ module Org::Eclipse::Swt::Widgets
     
     typesig { [] }
     def set_alignment
-      is_rtl = !((self.attr_style & SWT::RIGHT_TO_LEFT)).equal?(0)
-      if (!(@text).nil? && !(@text.length).equal?(0))
-        if (OS::GTK_VERSION >= OS._version(2, 4, 0))
-          # long
-          layout = OS.gtk_label_get_layout(@label_handle)
-          # long
-          line_ptr = OS.pango_layout_get_line(layout, 0)
-          resolved_dir = OS.pango_layout_line_get_resolved_dir(line_ptr)
-          if ((resolved_dir).equal?(OS::PANGO_DIRECTION_RTL))
-            is_rtl = !is_rtl
-          end
-        end
-      end
       if (!((self.attr_style & SWT::LEFT)).equal?(0))
         OS.gtk_misc_set_alignment(@label_handle, 0.0, 0.0)
-        OS.gtk_label_set_justify(@label_handle, is_rtl ? OS::GTK_JUSTIFY_RIGHT : OS::GTK_JUSTIFY_LEFT)
+        OS.gtk_label_set_justify(@label_handle, OS::GTK_JUSTIFY_LEFT)
         OS.gtk_misc_set_alignment(@image_handle, 0.0, 0.5)
         return
       end
@@ -546,7 +557,7 @@ module Org::Eclipse::Swt::Widgets
       end
       if (!((self.attr_style & SWT::RIGHT)).equal?(0))
         OS.gtk_misc_set_alignment(@label_handle, 1.0, 0.0)
-        OS.gtk_label_set_justify(@label_handle, is_rtl ? OS::GTK_JUSTIFY_LEFT : OS::GTK_JUSTIFY_RIGHT)
+        OS.gtk_label_set_justify(@label_handle, OS::GTK_JUSTIFY_RIGHT)
         OS.gtk_misc_set_alignment(@image_handle, 1.0, 0.5)
         return
       end
@@ -723,7 +734,6 @@ module Org::Eclipse::Swt::Widgets
       OS.gtk_label_set_text_with_mnemonic(@label_handle, buffer)
       OS.gtk_widget_hide(@image_handle)
       OS.gtk_widget_show(@label_handle)
-      set_alignment
     end
     
     typesig { [] }

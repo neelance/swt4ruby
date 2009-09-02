@@ -1,6 +1,6 @@
 require "rjava"
 
-# Copyright (c) 2000, 2008 IBM Corporation and others.
+# Copyright (c) 2000, 2009 IBM Corporation and others.
 # All rights reserved. This program and the accompanying materials
 # are made available under the terms of the Eclipse Public License v1.0
 # which accompanies this distribution, and is available at
@@ -75,6 +75,7 @@ module Org::Eclipse::Swt::Widgets
   # @see <a href="http://www.eclipse.org/swt/snippets/#tree">Tree, TreeItem, TreeColumn snippets</a>
   # @see <a href="http://www.eclipse.org/swt/examples.php">SWT Example: ControlExample</a>
   # @see <a href="http://www.eclipse.org/swt/">Sample code and further information</a>
+  # @noextend This class is not intended to be subclassed by clients.
   class Tree < TreeImports.const_get :Composite
     include_class_members TreeImports
     
@@ -194,6 +195,12 @@ module Org::Eclipse::Swt::Widgets
     alias_method :attr_ignore_size=, :ignore_size=
     undef_method :ignore_size=
     
+    attr_accessor :ignore_accessibility
+    alias_method :attr_ignore_accessibility, :ignore_accessibility
+    undef_method :ignore_accessibility
+    alias_method :attr_ignore_accessibility=, :ignore_accessibility=
+    undef_method :ignore_accessibility=
+    
     class_module.module_eval {
       const_set_lazy(:ID_COLUMN) { 0 }
       const_attr_reader  :ID_COLUMN
@@ -287,6 +294,7 @@ module Org::Eclipse::Swt::Widgets
       @draw_foreground = nil
       @owner_draw = false
       @ignore_size = false
+      @ignore_accessibility = false
       super(parent, check_style(style))
     end
     
@@ -665,6 +673,10 @@ module Org::Eclipse::Swt::Widgets
       end
       if (!(path).equal?(0))
         OS.gtk_tree_path_free(path)
+      end
+      if (OS::GTK_VERSION >= OS._version(2, 12, 0) && OS.gtk_tree_view_get_rules_hint(self.attr_handle))
+        OS.gtk_widget_style_get(self.attr_handle, OS.attr_grid_line_width, w, 0)
+        width += 2 * w[0]
       end
       return width
     end
@@ -1238,6 +1250,7 @@ module Org::Eclipse::Swt::Widgets
       if (!(@check_renderer).equal?(0))
         self.attr_display.remove_widget(@check_renderer)
       end
+      self.attr_display.remove_widget(@model_handle)
     end
     
     typesig { [TreeItem] }
@@ -1451,6 +1464,20 @@ module Org::Eclipse::Swt::Widgets
     # long
     def event_window
       return paint_window
+    end
+    
+    typesig { [] }
+    def fix_accessibility
+      # Bug in GTK. With GTK 2.12, when assistive technologies is on, the time
+      # it takes to add or remove several rows to the model is very long. This
+      # happens because the accessible object asks each row for its data, including
+      # the rows that are not visible. The the fix is to block the accessible object
+      # from receiving row_added and row_removed signals and, at the end, send only
+      # a notify signal with the "model" detail.
+      # 
+      # Note: The test bellow has to be updated when the real problem is fixed in
+      # the accessible object.
+      return OS::GTK_VERSION >= OS._version(2, 12, 0)
     end
     
     typesig { [Shell, Shell, Decorations, Decorations, Array.typed(Menu)] }
@@ -1996,7 +2023,8 @@ module Org::Eclipse::Swt::Widgets
     
     typesig { [] }
     # Returns <code>true</code> if the receiver's lines are visible,
-    # and <code>false</code> otherwise.
+    # and <code>false</code> otherwise. Note that some platforms draw
+    # grid lines while others may draw alternating row colors.
     # <p>
     # If one of the receiver's ancestors is not visible or some
     # other condition makes the receiver not visible, this method
@@ -2438,6 +2466,22 @@ module Org::Eclipse::Swt::Widgets
       return 0
     end
     
+    typesig { [::Java::Int, ::Java::Int] }
+    def gtk_row_deleted(model, path)
+      if (@ignore_accessibility)
+        OS.g_signal_stop_emission_by_name(model, OS.attr_row_deleted)
+      end
+      return 0
+    end
+    
+    typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
+    def gtk_row_inserted(model, path, iter)
+      if (@ignore_accessibility)
+        OS.g_signal_stop_emission_by_name(model, OS.attr_row_inserted)
+      end
+      return 0
+    end
+    
     typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
     # long
     # long
@@ -2611,6 +2655,10 @@ module Org::Eclipse::Swt::Widgets
       if (!(@check_renderer).equal?(0))
         OS.g_signal_connect_closure(@check_renderer, OS.attr_toggled, self.attr_display.attr_closures[TOGGLED], false)
       end
+      if (fix_accessibility)
+        OS.g_signal_connect_closure(@model_handle, OS.attr_row_inserted, self.attr_display.attr_closures[ROW_INSERTED], true)
+        OS.g_signal_connect_closure(@model_handle, OS.attr_row_deleted, self.attr_display.attr_closures[ROW_DELETED], true)
+      end
     end
     
     typesig { [TreeColumn] }
@@ -2765,6 +2813,7 @@ module Org::Eclipse::Swt::Widgets
       if (!(@check_renderer).equal?(0))
         self.attr_display.add_widget(@check_renderer, self)
       end
+      self.attr_display.add_widget(@model_handle, self)
     end
     
     typesig { [TreeItem, ::Java::Boolean] }
@@ -2865,10 +2914,15 @@ module Org::Eclipse::Swt::Widgets
       selection = OS.gtk_tree_view_get_selection(self.attr_handle)
       # long
       iter = OS.g_malloc(OS._gtk_tree_iter_sizeof)
-      index = start
+      if ((iter).equal?(0))
+        error(SWT::ERROR_NO_HANDLES)
+      end
+      if (fix_accessibility)
+        @ignore_accessibility = true
+      end
       i = start
       while i <= end_
-        OS.gtk_tree_model_iter_nth_child(@model_handle, iter, parent_iter, index)
+        OS.gtk_tree_model_iter_nth_child(@model_handle, iter, parent_iter, start)
         value = Array.typed(::Java::Int).new(1) { 0 }
         OS.gtk_tree_model_get(@model_handle, iter, ID_COLUMN, value, -1)
         item = !(value[0]).equal?(-1) ? @items[value[0]] : nil
@@ -2880,6 +2934,10 @@ module Org::Eclipse::Swt::Widgets
           OS.g_signal_handlers_unblock_matched(selection, OS::G_SIGNAL_MATCH_DATA, 0, 0, 0, 0, CHANGED)
         end
         i += 1
+      end
+      if (fix_accessibility)
+        @ignore_accessibility = false
+        OS.g_object_notify(self.attr_handle, OS.attr_model)
       end
       OS.g_free(iter)
     end
@@ -2905,7 +2963,14 @@ module Org::Eclipse::Swt::Widgets
       # long
       selection = OS.gtk_tree_view_get_selection(self.attr_handle)
       OS.g_signal_handlers_block_matched(selection, OS::G_SIGNAL_MATCH_DATA, 0, 0, 0, 0, CHANGED)
+      if (fix_accessibility)
+        @ignore_accessibility = true
+      end
       OS.gtk_tree_store_clear(@model_handle)
+      if (fix_accessibility)
+        @ignore_accessibility = false
+        OS.g_object_notify(self.attr_handle, OS.attr_model)
+      end
       OS.g_signal_handlers_unblock_matched(selection, OS::G_SIGNAL_MATCH_DATA, 0, 0, 0, 0, CHANGED)
       # Disable searching when using VIRTUAL
       if (!((self.attr_style & SWT::VIRTUAL)).equal?(0))
@@ -3200,9 +3265,11 @@ module Org::Eclipse::Swt::Widgets
         if (OS._gtk_is_cell_renderer_text(cell))
           if (hooks(SWT::PaintItem))
             rect = GdkRectangle.new
+            clip_rect = GdkRectangle.new
             # long
             path = OS.gtk_tree_model_get_path(@model_handle, iter)
             OS.gtk_tree_view_get_cell_area(self.attr_handle, path, column_handle, rect)
+            OS.gtk_tree_view_get_background_area(self.attr_handle, path, column_handle, clip_rect)
             OS.gtk_tree_path_free(path)
             if (OS::GTK_VERSION < OS._version(2, 8, 18) && (OS.gtk_tree_view_get_expander_column(self.attr_handle)).equal?(column_handle))
               buffer = Array.typed(::Java::Int).new(1) { 0 }
@@ -3239,8 +3306,9 @@ module Org::Eclipse::Swt::Widgets
             gc.set_font(item.get_font(column_index))
             if (!((self.attr_style & SWT::MIRRORED)).equal?(0))
               rect.attr_x = get_client_width - rect.attr_width - rect.attr_x
+              clip_rect.attr_x = get_client_width - clip_rect.attr_width - clip_rect.attr_x
             end
-            gc.set_clipping(rect.attr_x, rect.attr_y, rect.attr_width, rect.attr_height)
+            gc.set_clipping(clip_rect.attr_x, clip_rect.attr_y, clip_rect.attr_width, clip_rect.attr_height)
             event = Event.new
             event.attr_item = item
             event.attr_index = column_index
@@ -3339,6 +3407,9 @@ module Org::Eclipse::Swt::Widgets
       end
       remove(parent_iter, count, item_count - 1)
       if (is_virtual)
+        if (fix_accessibility)
+          @ignore_accessibility = true
+        end
         i = item_count
         while i < count
           # long
@@ -3350,6 +3421,10 @@ module Org::Eclipse::Swt::Widgets
           OS.gtk_tree_store_set(@model_handle, iter, ID_COLUMN, -1, -1)
           OS.g_free(iter)
           i += 1
+        end
+        if (fix_accessibility)
+          @ignore_accessibility = false
+          OS.g_object_notify(self.attr_handle, OS.attr_model)
         end
       else
         i = item_count
@@ -3578,7 +3653,8 @@ module Org::Eclipse::Swt::Widgets
     
     typesig { [::Java::Boolean] }
     # Marks the receiver's lines as visible if the argument is <code>true</code>,
-    # and marks it invisible otherwise.
+    # and marks it invisible otherwise. Note that some platforms draw
+    # grid lines while others may draw alternating row colors.
     # <p>
     # If one of the receiver's ancestors is not visible or some
     # other condition makes the receiver not visible, marking
@@ -3596,6 +3672,9 @@ module Org::Eclipse::Swt::Widgets
     def set_lines_visible(show)
       check_widget
       OS.gtk_tree_view_set_rules_hint(self.attr_handle, show)
+      if (OS::GTK_VERSION >= OS._version(2, 12, 0))
+        OS.gtk_tree_view_set_grid_lines(self.attr_handle, show ? OS::GTK_TREE_VIEW_GRID_LINES_VERTICAL : OS::GTK_TREE_VIEW_GRID_LINES_NONE)
+      end
     end
     
     typesig { [] }

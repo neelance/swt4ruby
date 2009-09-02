@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2008 IBM Corporation and others.
+ * Copyright (c) 2000, 2009 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -23,7 +23,10 @@ class WebSite extends OleControlSite {
 	COMObject iServiceProvider;
 	COMObject iInternetSecurityManager;
 	COMObject iOleCommandTarget;
+	COMObject iAuthenticate;
+	COMObject iDispatch;
 	boolean ignoreNextMessage;
+	Boolean canExecuteApplets;
 
 	static final int OLECMDID_SHOWSCRIPTERROR = 40;
 	static final short [] ACCENTS = new short [] {'~', '`', '\'', '^', '"'};
@@ -94,6 +97,35 @@ protected void createCOMInterfaces () {
 		public int /*long*/ method3(int /*long*/[] args) {return QueryStatus(args[0], (int)/*64*/args[1], args[2], args[3]);}		
 		public int /*long*/ method4(int /*long*/[] args) {return Exec(args[0], (int)/*64*/args[1], (int)/*64*/args[2], args[3], args[4]);}
 	};
+	iAuthenticate = new COMObject(new int[]{2, 0, 0, 3}){
+		public int /*long*/ method0(int /*long*/[] args) {return QueryInterface(args[0], args[1]);}
+		public int /*long*/ method1(int /*long*/[] args) {return AddRef();}
+		public int /*long*/ method2(int /*long*/[] args) {return Release();}
+		public int /*long*/ method3(int /*long*/[] args) {return Authenticate(args[0], args[1], args[2]);}
+	};
+	iDispatch = new COMObject (new int[] {2, 0, 0, 1, 3, 5, 8}) {
+		public int /*long*/ method0 (int /*long*/[] args) {
+			/* 
+			 * IDispatch check must be done here instead of in the shared QueryInterface
+			 * implementation, to avoid answering the superclass's IDispatch implementation
+			 * instead of this one.
+			 */
+			GUID guid = new GUID ();
+			COM.MoveMemory (guid, args[0], GUID.sizeof);
+			if (COM.IsEqualGUID (guid, COM.IIDIDispatch)) {
+				COM.MoveMemory (args[1], new int /*long*/[] {iDispatch.getAddress ()}, OS.PTR_SIZEOF);
+				AddRef ();
+				return COM.S_OK;
+			}
+			return QueryInterface (args[0], args[1]);
+		}
+		public int /*long*/ method1 (int /*long*/[] args) {return AddRef ();}
+		public int /*long*/ method2 (int /*long*/[] args) {return Release ();}
+		public int /*long*/ method3 (int /*long*/[] args) {return GetTypeInfoCount (args[0]);}
+		public int /*long*/ method4 (int /*long*/[] args) {return GetTypeInfo ((int)/*64*/args[0], (int)/*64*/args[1], args[2]);}
+		public int /*long*/ method5 (int /*long*/[] args) {return GetIDsOfNames ((int)/*64*/args[0], args[1], (int)/*64*/args[2], (int)/*64*/args[3], args[4]);}
+		public int /*long*/ method6 (int /*long*/[] args) {return Invoke ((int)/*64*/args[0], (int)/*64*/args[1], (int)/*64*/args[2], (int)/*64*/args[3], args[4], args[5], args[6], args[7]);}
+	};
 }
 
 protected void disposeCOMInterfaces() {
@@ -117,6 +149,14 @@ protected void disposeCOMInterfaces() {
 	if (iOleCommandTarget != null) {
 		iOleCommandTarget.dispose();
 		iOleCommandTarget = null;
+	}
+	if (iAuthenticate != null) {
+		iAuthenticate.dispose();
+		iAuthenticate = null;
+	}
+	if (iDispatch != null) {
+		iDispatch.dispose ();
+		iDispatch = null;
 	}
 }
 
@@ -175,8 +215,9 @@ int GetDropTarget(int /*long*/ pDropTarget, int /*long*/ ppDropTarget) {
 }
 
 int GetExternal(int /*long*/ ppDispatch) {
-	OS.MoveMemory(ppDispatch, new int /*long*/ [] {0}, OS.PTR_SIZEOF);
-	return COM.S_FALSE;
+	OS.MoveMemory (ppDispatch, new int /*long*/[] {iDispatch.getAddress()}, C.PTR_SIZEOF);
+	AddRef ();
+	return COM.S_OK;
 }
 
 int GetHostInfo(int /*long*/ pInfo) {
@@ -273,7 +314,7 @@ int TranslateAccelerator(int /*long*/ lpMsg, int /*long*/ pguidCmdGroup, int nCm
 	* By default the IE shortcuts are run.  However, F5 causes a refresh, which is not
 	* appropriate when rendering HTML from memory, and CTRL-N opens a standalone IE,
 	* which is undesirable and can cause a crash in some contexts.  The workaround is
-	* to block the handling of these shortcuts by IE.
+	* to block IE from handling these shortcuts by answering COM.S_OK.
 	*/
 	int result = COM.S_FALSE;
 	MSG msg = new MSG();
@@ -306,11 +347,10 @@ int TranslateAccelerator(int /*long*/ lpMsg, int /*long*/ pguidCmdGroup, int nCm
 				* translated here, and instead is explicitly handled in the keypress
 				* handler.
 				*/
-				frame.setData(CONSUME_KEY, "true"); //$NON-NLS-1$
 				break;
 			case OS.VK_N:
-				/* If the exact keypress is Ctrl+N, which opens a new external IE, then eat this key */
 				if (OS.GetKeyState (OS.VK_CONTROL) < 0 && OS.GetKeyState (OS.VK_MENU) >= 0 && OS.GetKeyState (OS.VK_SHIFT) >= 0) {
+					frame.setData(CONSUME_KEY, "false"); //$NON-NLS-1$
 					result = COM.S_OK;
 					break;
 				}
@@ -322,44 +362,50 @@ int TranslateAccelerator(int /*long*/ lpMsg, int /*long*/ pguidCmdGroup, int nCm
 		}
 	}
 
-	boolean isAccent = false;
-	switch ((int)/*64*/msg.wParam) {
-		case OS.VK_SHIFT:
-		case OS.VK_MENU:
-		case OS.VK_CONTROL:
-		case OS.VK_CAPITAL:
-		case OS.VK_NUMLOCK:
-		case OS.VK_SCROLL:
-			break;
-		default: {
-			/* 
-			* Bug in Windows. The high bit in the result of MapVirtualKey() on
-			* Windows NT is bit 32 while the high bit on Windows 95 is bit 16.
-			* They should both be bit 32.  The fix is to test the right bit.
-			*/
-			int mapKey = OS.MapVirtualKey ((int)/*64*/msg.wParam, 2);
-			if (mapKey != 0) {
-				isAccent = (mapKey & (OS.IsWinNT ? 0x80000000 : 0x8000)) != 0;
-				if (!isAccent) {
-					for (int i=0; i<ACCENTS.length; i++) {
-						int value = OS.VkKeyScan (ACCENTS [i]);
-						if (value != -1 && (value & 0xFF) == msg.wParam) {
-							int state = value >> 8;
-							if ((OS.GetKeyState (OS.VK_SHIFT) < 0) == ((state & 0x1) != 0) &&
-								(OS.GetKeyState (OS.VK_CONTROL) < 0) == ((state & 0x2) != 0) &&
-								(OS.GetKeyState (OS.VK_MENU) < 0) == ((state & 0x4) != 0)) {
-									if ((state & 0x7) != 0) isAccent = true;
-									break;
+	switch (msg.message) {
+		case OS.WM_KEYDOWN:
+		case OS.WM_KEYUP: {
+			if (!OS.IsWinCE) {
+				boolean isAccent = false;
+				switch ((int)/*64*/msg.wParam) {
+					case OS.VK_SHIFT:
+					case OS.VK_MENU:
+					case OS.VK_CONTROL:
+					case OS.VK_CAPITAL:
+					case OS.VK_NUMLOCK:
+					case OS.VK_SCROLL:
+						break;
+					default: {
+						/*
+						* Bug in Windows. The high bit in the result of MapVirtualKey() on
+						* Windows NT is bit 32 while the high bit on Windows 95 is bit 16.
+						* They should both be bit 32.  The fix is to test the right bit.
+						*/
+						int mapKey = OS.MapVirtualKey ((int)/*64*/msg.wParam, 2);
+						if (mapKey != 0) {
+							isAccent = (mapKey & (OS.IsWinNT ? 0x80000000 : 0x8000)) != 0;
+							if (!isAccent) {
+								for (int i=0; i<ACCENTS.length; i++) {
+									int value = OS.VkKeyScan (ACCENTS [i]);
+									if (value != -1 && (value & 0xFF) == msg.wParam) {
+										int state = value >> 8;
+										if ((OS.GetKeyState (OS.VK_SHIFT) < 0) == ((state & 0x1) != 0) &&
+											(OS.GetKeyState (OS.VK_CONTROL) < 0) == ((state & 0x2) != 0) &&
+											(OS.GetKeyState (OS.VK_MENU) < 0) == ((state & 0x4) != 0)) {
+												if ((state & 0x7) != 0) isAccent = true;
+												break;
+										}
+									}
+								}
 							}
 						}
+						break;
 					}
-				}
+				};
+				if (isAccent) result = COM.S_OK;
 			}
-			break;
 		}
-	};
-	if (isAccent) result = COM.S_OK;
-
+	}
 	return result;
 }
 
@@ -420,6 +466,11 @@ int QueryService(int /*long*/ guidService, int /*long*/ riid, int /*long*/ ppvOb
 		AddRef();
 		return COM.S_OK;
 	}
+	if (COM.IsEqualGUID(guid, COM.IIDIAuthenticate)) {
+		COM.MoveMemory(ppvObject, new int /*long*/[] {iAuthenticate.getAddress()}, OS.PTR_SIZEOF);
+		AddRef();
+		return COM.S_OK;
+	}
 	COM.MoveMemory(ppvObject, new int /*long*/[] {0}, OS.PTR_SIZEOF);
 	return COM.E_NOINTERFACE;
 }
@@ -468,35 +519,73 @@ int ProcessUrlAction(int /*long*/ pwszUrl, int dwAction, int /*long*/ pPolicy, i
 	* all URLs by default.
 	*/
 	int policy = IE.URLPOLICY_ALLOW;
-	/*
-	* The URLACTION_JAVA flags refer to the <applet> tag, which resolves to
-	* the Microsoft VM if the applet is java 1.1.x compliant, or to the OS's
-	* java plug-in VM otherwise.  Applets launched with the MS VM work in the
-	* Browser, but applets launched with the OS's java plug-in VM crash as a
-	* result of the VM failing to load.  Set the policy to URLPOLICY_JAVA_PROHIBIT
-	* so that applets compiled with java compliance > 1.1.x will not crash. 
-	*/
+
 	if (dwAction >= IE.URLACTION_JAVA_MIN && dwAction <= IE.URLACTION_JAVA_MAX) {
-		policy = IE.URLPOLICY_JAVA_PROHIBIT;
-		ignoreNextMessage = true;
+		if (canExecuteApplets ()) {
+			policy = IE.URLPOLICY_JAVA_LOW;
+		} else {
+			policy = IE.URLPOLICY_JAVA_PROHIBIT;
+			ignoreNextMessage = true;
+		}
 	}
-	/*
-	* Note.  Some ActiveX plugins crash when executing
-	* inside the embedded explorer itself running into
-	* a JVM.  The current workaround is to detect when
-	* such ActiveX is about to be started and refuse
-	* to execute it.
-	*/
 	if (dwAction == IE.URLACTION_ACTIVEX_RUN) {
 		GUID guid = new GUID();
 		COM.MoveMemory(guid, pContext, GUID.sizeof);
-		if (COM.IsEqualGUID(guid, COM.IIDJavaBeansBridge) || COM.IsEqualGUID(guid, COM.IIDShockwaveActiveXControl)) {
+		if (COM.IsEqualGUID(guid, COM.IIDJavaBeansBridge) && !canExecuteApplets ()) {
+			policy = IE.URLPOLICY_DISALLOW;
+			ignoreNextMessage = true;
+		}
+		if (COM.IsEqualGUID(guid, COM.IIDShockwaveActiveXControl)) {
 			policy = IE.URLPOLICY_DISALLOW;
 			ignoreNextMessage = true;
 		}
 	}
+	if (dwAction == IE.URLACTION_SCRIPT_RUN) {
+		IE browser = (IE)((Browser)getParent ().getParent ()).webBrowser;
+		if (!browser.jsEnabled) {
+			policy = IE.URLPOLICY_DISALLOW;
+		}
+	}
+
 	if (cbPolicy >= 4) COM.MoveMemory(pPolicy, new int[] {policy}, 4);
 	return policy == IE.URLPOLICY_ALLOW ? COM.S_OK : COM.S_FALSE;
+}
+
+boolean canExecuteApplets () {
+	/*
+	* Executing an applet in embedded IE will crash if IE's Java plug-in
+	* launches its jre in IE's process, because this new jre conflicts
+	* with the one running eclipse.  These cases need to be avoided by
+	* vetoing the running of applets.
+	* 
+	* However as of Sun jre 1.6u10, applets can be launched in a separate
+	* process, which avoids the conflict with the jre running eclipse.
+	* Therefore if this condition is detected, and if the required jar 
+	* libraries are available, then applets can be executed. 
+	*/
+
+	/* 
+	* executing applets with IE6 embedded can crash, so do not
+	* attempt this if the version is less than IE7
+	*/
+	if (!IE.IsIE7) return false;
+
+	if (canExecuteApplets == null) {
+		WebBrowser webBrowser = ((Browser)getParent ().getParent ()).webBrowser;
+		String script = "try {var element = document.createElement('object');element.classid='clsid:CAFEEFAC-DEC7-0000-0000-ABCDEFFEDCBA';return element.object.isPlugin2();} catch (err) {};return false;"; //$NON-NLS-1$
+		canExecuteApplets = ((Boolean)webBrowser.evaluate (script)); 
+		if (canExecuteApplets.booleanValue ()) {
+			try {
+				Class.forName ("sun.plugin2.main.server.IExplorerPlugin"); /* plugin.jar */	//$NON-NLS-1$
+				Class.forName ("com.sun.deploy.services.Service"); /* deploy.jar */	//$NON-NLS-1$
+				Class.forName ("com.sun.javaws.Globals"); /* javaws.jar */	//$NON-NLS-1$
+			} catch (ClassNotFoundException e) {
+				/* one or more of the required jar libraries are not available */
+				canExecuteApplets = Boolean.FALSE;
+			}
+		}
+	}
+	return canExecuteApplets.booleanValue ();
 }
 
 int QueryCustomPolicy(int /*long*/ pwszUrl, int /*long*/ guidKey, int /*long*/ ppPolicy, int /*long*/ pcbPolicy, int /*long*/ pContext, int cbContext, int dwReserved) {
@@ -541,6 +630,292 @@ int Exec(int /*long*/ pguidCmdGroup, int nCmdID, int nCmdExecOpt, int /*long*/ p
 		}
 	}
 	return COM.E_NOTSUPPORTED;
+}
+
+/* IAuthenticate */
+
+int Authenticate (int /*long*/ hwnd, int /*long*/ szUsername, int /*long*/ szPassword) {
+	IE browser = (IE)((Browser)getParent ().getParent ()).webBrowser;
+	for (int i = 0; i < browser.authenticationListeners.length; i++) {
+		AuthenticationEvent event = new AuthenticationEvent (browser.browser);
+		event.location = browser.lastNavigateURL;
+		browser.authenticationListeners[i].authenticate (event);
+		if (!event.doit) return COM.E_ACCESSDENIED;
+		if (event.user != null && event.password != null) {
+			TCHAR user = new TCHAR (0, event.user, true);
+			int size = user.length () * TCHAR.sizeof;
+			int /*long*/ userPtr = COM.CoTaskMemAlloc (size);
+			OS.MoveMemory (userPtr, user, size);
+			TCHAR password = new TCHAR (0, event.password, true);
+			size = password.length () * TCHAR.sizeof;
+			int /*long*/ passwordPtr = COM.CoTaskMemAlloc (size);
+			OS.MoveMemory (passwordPtr, password, size);
+			C.memmove (hwnd, new int /*long*/[] {0}, C.PTR_SIZEOF);
+			C.memmove (szUsername, new int /*long*/[] {userPtr}, C.PTR_SIZEOF);
+			C.memmove (szPassword, new int /*long*/[] {passwordPtr}, C.PTR_SIZEOF);
+			return COM.S_OK;
+		}
+	}
+
+	/* no listener handled the challenge, so defer to the native dialog */
+	C.memmove (hwnd, new int /*long*/[] {getShell().handle}, C.PTR_SIZEOF);
+	return COM.S_OK;
+}
+
+/* IDispatch */
+
+int GetTypeInfoCount (int /*long*/ pctinfo) {
+	C.memmove (pctinfo, new int[] {0}, 4);
+	return COM.S_OK;
+}
+
+int GetTypeInfo (int iTInfo, int lcid, int /*long*/ ppTInfo) {
+	return COM.S_OK;
+}
+
+int GetIDsOfNames (int riid, int /*long*/ rgszNames, int cNames, int lcid, int /*long*/ rgDispId) {
+    int /*long*/[] ptr = new int /*long*/[1];
+    OS.MoveMemory (ptr, rgszNames, C.PTR_SIZEOF);
+    int length = OS.wcslen (ptr[0]);
+    char[] buffer = new char[length];
+    OS.MoveMemory (buffer, ptr[0], length * 2);
+    String functionName = String.valueOf (buffer);
+    int result = COM.S_OK; 
+    int[] ids = new int[cNames];	/* DISPIDs */
+    if (functionName.equals ("callJava")) { //$NON-NLS-1$
+	    for (int i = 0; i < cNames; i++) {
+	        ids[i] = i + 1;
+	    }
+    } else {
+    	result = COM.DISP_E_UNKNOWNNAME;
+	    for (int i = 0; i < cNames; i++) {
+	        ids[i] = COM.DISPID_UNKNOWN;
+	    }
+    }
+    OS.MoveMemory (rgDispId, ids, cNames * 4);
+	return result;
+}
+
+int Invoke (int dispIdMember, int /*long*/ riid, int lcid, int dwFlags, int /*long*/ pDispParams, int /*long*/ pVarResult, int /*long*/ pExcepInfo, int /*long*/ pArgErr) {
+	DISPPARAMS dispParams = new DISPPARAMS ();
+	COM.MoveMemory (dispParams, pDispParams, DISPPARAMS.sizeof);
+	if (dispParams.cArgs != 2) {
+		if (pVarResult != 0) {
+			COM.MoveMemory (pVarResult, new int /*long*/[] {0}, C.PTR_SIZEOF);
+		}
+		return COM.S_OK;
+	}
+
+	int /*long*/ ptr = dispParams.rgvarg + Variant.sizeof;
+	Variant variant = Variant.win32_new (ptr);
+	int index = variant.getInt ();
+	variant.dispose ();
+	if (index <= 0) {
+		if (pVarResult != 0) {
+			COM.MoveMemory (pVarResult, new int /*long*/[] {0}, C.PTR_SIZEOF);
+		}
+		return COM.S_OK;
+	}
+
+	variant = Variant.win32_new (dispParams.rgvarg);
+	IE ie = (IE)((Browser)getParent ().getParent ()).webBrowser;
+	Object key = new Integer (index);
+	BrowserFunction function = (BrowserFunction)ie.functions.get (key);
+	Object returnValue = null;
+	if (function != null) {
+		try {
+			Object temp = convertToJava (variant);
+			if (temp instanceof Object[]) {
+				Object[] args = (Object[])temp;
+				try {
+					returnValue = function.function (args);
+				} catch (Exception e) {
+					/* exception during function invocation */
+					returnValue = WebBrowser.CreateErrorString (e.getLocalizedMessage ());
+				}
+			}
+		} catch (IllegalArgumentException e) {
+			/* invalid argument value type */
+			if (function.isEvaluate) {
+				/* notify the function so that a java exception can be thrown */
+				function.function (new String[] {WebBrowser.CreateErrorString (new SWTException (SWT.ERROR_INVALID_RETURN_VALUE).getLocalizedMessage ())});
+			}
+			returnValue = WebBrowser.CreateErrorString (e.getLocalizedMessage ());
+		}
+	}
+	variant.dispose ();
+
+	if (pVarResult != 0) {
+		if (returnValue == null) {
+			COM.MoveMemory (pVarResult, new int /*long*/[] {0}, C.PTR_SIZEOF);
+		} else {
+			try {
+				variant = convertToJS (returnValue);
+			} catch (SWTException e) {
+				/* invalid return value type */
+				variant = convertToJS (WebBrowser.CreateErrorString (e.getLocalizedMessage ()));
+			}
+			Variant.win32_copy (pVarResult, variant);
+			variant.dispose ();
+		}
+	}
+	return COM.S_OK;
+}
+
+Object convertToJava (Variant variant) {
+	switch (variant.getType ()) {
+		case OLE.VT_NULL: return null;
+		case OLE.VT_BSTR: return variant.getString ();
+		case OLE.VT_BOOL: return new Boolean (variant.getBoolean ());
+		case OLE.VT_I2:
+		case OLE.VT_I4:
+		case OLE.VT_I8:
+		case OLE.VT_R4:
+		case OLE.VT_R8:
+			return new Double (variant.getDouble ());
+		case OLE.VT_DISPATCH: {
+			Object[] args = null;
+			OleAutomation auto = variant.getAutomation ();
+			TYPEATTR typeattr = auto.getTypeInfoAttributes ();
+			if (typeattr != null) {
+				GUID guid = new GUID ();
+				guid.Data1 = typeattr.guid_Data1;
+				guid.Data2 = typeattr.guid_Data2;
+				guid.Data3 = typeattr.guid_Data3;
+				guid.Data4 = typeattr.guid_Data4;
+				if (COM.IsEqualGUID (guid, COM.IIDIJScriptTypeInfo)) {
+					int[] rgdispid = auto.getIDsOfNames (new String[] {"length"}); //$NON-NLS-1$
+					if (rgdispid != null) {
+						Variant varLength = auto.getProperty (rgdispid[0]);
+						int length = varLength.getInt ();
+						varLength.dispose ();
+						args = new Object[length];
+						for (int i = 0; i < length; i++) {
+							rgdispid = auto.getIDsOfNames (new String[] {String.valueOf (i)});
+							if (rgdispid != null) {
+								Variant current = auto.getProperty (rgdispid[0]);
+								try {
+									args[i] = convertToJava (current);
+									current.dispose ();
+								} catch (IllegalArgumentException e) {
+									/* invalid argument value type */
+									current.dispose ();
+									auto.dispose ();
+									throw e;
+								}
+							}
+						}
+					}
+				} else {
+					auto.dispose ();
+					SWT.error (SWT.ERROR_INVALID_ARGUMENT);
+				}
+			}
+			auto.dispose ();
+			return args;
+		}
+	}
+	SWT.error (SWT.ERROR_INVALID_ARGUMENT);
+	return null;
+}
+
+Variant convertToJS (Object value) {
+	if (value == null) {
+		return new Variant ();
+	}
+	if (value instanceof String) {
+		return new Variant ((String)value);
+	}
+	if (value instanceof Boolean) {
+		return new Variant (((Boolean)value).booleanValue ());
+	}
+	if (value instanceof Number) {
+		return new Variant (((Number)value).doubleValue ());
+	}
+	if (value instanceof Object[]) {
+		Object[] arrayValue = (Object[])value;
+		int length = arrayValue.length;
+		if (length > 0) {
+			/* get IHTMLDocument2 */
+			IE browser = (IE)((Browser)getParent ().getParent ()).webBrowser;
+			OleAutomation auto = browser.auto;
+			int[] rgdispid = auto.getIDsOfNames (new String[] {"Document"}); //$NON-NLS-1$
+			if (rgdispid == null) return new Variant ();
+			Variant pVarResult = auto.getProperty (rgdispid[0]);
+			if (pVarResult == null) return new Variant ();
+			if (pVarResult.getType () == COM.VT_EMPTY) {
+				pVarResult.dispose ();
+				return new Variant ();
+			}
+			OleAutomation document = pVarResult.getAutomation ();
+			pVarResult.dispose ();
+
+			/* get IHTMLWindow2 */
+			rgdispid = document.getIDsOfNames (new String[] {"parentWindow"}); //$NON-NLS-1$
+			if (rgdispid == null) {
+				document.dispose ();
+				return new Variant ();
+			}
+			pVarResult = document.getProperty (rgdispid[0]);
+			if (pVarResult == null || pVarResult.getType () == COM.VT_EMPTY) {
+				if (pVarResult != null) pVarResult.dispose ();
+				document.dispose ();
+				return new Variant ();	
+			}
+			OleAutomation ihtmlWindow2 = pVarResult.getAutomation ();
+			pVarResult.dispose ();
+			document.dispose ();
+
+			/* create a new JS array to be returned */
+			rgdispid = ihtmlWindow2.getIDsOfNames (new String[] {"Array"}); //$NON-NLS-1$
+			if (rgdispid == null) {
+				ihtmlWindow2.dispose ();
+				return new Variant ();
+			}
+			Variant arrayType = ihtmlWindow2.getProperty (rgdispid[0]);
+			ihtmlWindow2.dispose ();
+			IDispatch arrayTypeDispatch = arrayType.getDispatch ();
+			arrayType.dispose ();
+
+			int /*long*/[] result = new int /*long*/[1];
+			int rc = arrayTypeDispatch.QueryInterface (COM.IIDIDispatchEx, result);
+			if (rc != COM.S_OK) return new Variant ();
+			IDispatchEx arrayTypeDispatchEx = new IDispatchEx (result[0]);
+			result[0] = 0;
+			int /*long*/ resultPtr = OS.GlobalAlloc (OS.GMEM_FIXED | OS.GMEM_ZEROINIT, VARIANT.sizeof);
+			DISPPARAMS params = new DISPPARAMS ();
+			rc = arrayTypeDispatchEx.InvokeEx (COM.DISPID_VALUE, COM.LOCALE_USER_DEFAULT, COM.DISPATCH_CONSTRUCT, params, resultPtr, null, 0);
+			if (rc != COM.S_OK) {
+				OS.GlobalFree (resultPtr);
+				return new Variant ();	
+			}
+			Variant array = Variant.win32_new (resultPtr);
+			OS.GlobalFree (resultPtr);
+
+			/* populate the array */
+			auto = array.getAutomation ();
+			int[] rgdispids = auto.getIDsOfNames (new String[] {"push"}); //$NON-NLS-1$
+			if (rgdispids != null) {
+				for (int i = 0; i < length; i++) {
+					Object currentObject = arrayValue[i];
+					try {
+						Variant variant = convertToJS (currentObject);
+						auto.invoke (rgdispids[0], new Variant[] {variant});
+						variant.dispose ();
+					} catch (SWTException e) {
+						/* invalid return value type */
+						auto.dispose ();
+						array.dispose ();
+						throw e;
+					}
+				}
+			}
+			auto.dispose ();
+			return array;
+		}
+	}
+	SWT.error (SWT.ERROR_INVALID_RETURN_VALUE);
+	return null;
 }
 
 }

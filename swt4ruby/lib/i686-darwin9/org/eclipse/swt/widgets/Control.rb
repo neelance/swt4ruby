@@ -1,6 +1,6 @@
 require "rjava"
 
-# Copyright (c) 2000, 2008 IBM Corporation and others.
+# Copyright (c) 2000, 2009 IBM Corporation and others.
 # All rights reserved. This program and the accompanying materials
 # are made available under the terms of the Eclipse Public License v1.0
 # which accompanies this distribution, and is available at
@@ -13,20 +13,12 @@ module Org::Eclipse::Swt::Widgets
     class_module.module_eval {
       include ::Java::Lang
       include ::Org::Eclipse::Swt::Widgets
-      include_const ::Org::Eclipse::Swt::Internal::Carbon, :ATSFontMetrics
-      include_const ::Org::Eclipse::Swt::Internal::Carbon, :CFRange
-      include_const ::Org::Eclipse::Swt::Internal::Carbon, :HIThemeTextInfo
-      include_const ::Org::Eclipse::Swt::Internal::Carbon, :OS
-      include_const ::Org::Eclipse::Swt::Internal::Carbon, :CGRect
-      include_const ::Org::Eclipse::Swt::Internal::Carbon, :CGPoint
-      include_const ::Org::Eclipse::Swt::Internal::Carbon, :ControlFontStyleRec
-      include_const ::Org::Eclipse::Swt::Internal::Carbon, :HMHelpContentRec
-      include_const ::Org::Eclipse::Swt::Internal::Carbon, :HIThemeFrameDrawInfo
-      include_const ::Org::Eclipse::Swt::Internal::Carbon, :Rect
       include ::Org::Eclipse::Swt
+      include ::Org::Eclipse::Swt::Accessibility
       include ::Org::Eclipse::Swt::Events
       include ::Org::Eclipse::Swt::Graphics
-      include_const ::Org::Eclipse::Swt::Accessibility, :Accessible
+      include ::Org::Eclipse::Swt::Internal
+      include ::Org::Eclipse::Swt::Internal::Cocoa
     }
   end
   
@@ -50,6 +42,7 @@ module Org::Eclipse::Swt::Widgets
   # @see <a href="http://www.eclipse.org/swt/snippets/#control">Control snippets</a>
   # @see <a href="http://www.eclipse.org/swt/examples.php">SWT Example: ControlExample</a>
   # @see <a href="http://www.eclipse.org/swt/">Sample code and further information</a>
+  # @noextend This class is not intended to be subclassed by clients.
   class Control < ControlImports.const_get :Widget
     include_class_members ControlImports
     overload_protected {
@@ -64,11 +57,11 @@ module Org::Eclipse::Swt::Widgets
     # within the packages provided by SWT. It is not available on all
     # platforms and should never be accessed from application code.
     # </p>
-    attr_accessor :handle
-    alias_method :attr_handle, :handle
-    undef_method :handle
-    alias_method :attr_handle=, :handle=
-    undef_method :handle=
+    attr_accessor :view
+    alias_method :attr_view, :view
+    undef_method :view
+    alias_method :attr_view=, :view=
+    undef_method :view=
     
     attr_accessor :parent
     alias_method :attr_parent, :parent
@@ -94,18 +87,13 @@ module Org::Eclipse::Swt::Widgets
     alias_method :attr_draw_count=, :draw_count=
     undef_method :draw_count=
     
-    attr_accessor :visible_rgn
-    alias_method :attr_visible_rgn, :visible_rgn
-    undef_method :visible_rgn
-    alias_method :attr_visible_rgn=, :visible_rgn=
-    undef_method :visible_rgn=
-    
     attr_accessor :menu
     alias_method :attr_menu, :menu
     undef_method :menu
     alias_method :attr_menu=, :menu=
     undef_method :menu=
     
+    # double
     attr_accessor :foreground
     alias_method :attr_foreground, :foreground
     undef_method :foreground
@@ -142,11 +130,18 @@ module Org::Eclipse::Swt::Widgets
     alias_method :attr_region=, :region=
     undef_method :region=
     
-    attr_accessor :gcs
-    alias_method :attr_gcs, :gcs
-    undef_method :gcs
-    alias_method :attr_gcs=, :gcs=
-    undef_method :gcs=
+    attr_accessor :region_path
+    alias_method :attr_region_path, :region_path
+    undef_method :region_path
+    alias_method :attr_region_path=, :region_path=
+    undef_method :region_path=
+    
+    # long
+    attr_accessor :visible_rgn
+    alias_method :attr_visible_rgn, :visible_rgn
+    undef_method :visible_rgn
+    alias_method :attr_visible_rgn=, :visible_rgn=
+    undef_method :visible_rgn=
     
     attr_accessor :accessible
     alias_method :attr_accessible, :accessible
@@ -155,19 +150,24 @@ module Org::Eclipse::Swt::Widgets
     undef_method :accessible=
     
     class_module.module_eval {
-      const_set_lazy(:RESET_VISIBLE_REGION) { "org.eclipse.swt.internal.resetVisibleRegion" }
-      const_attr_reader  :RESET_VISIBLE_REGION
+      const_set_lazy(:CLIPPING) { 1 << 10 }
+      const_attr_reader  :CLIPPING
+      
+      const_set_lazy(:VISIBLE_REGION) { 1 << 12 }
+      const_attr_reader  :VISIBLE_REGION
+      
+      # Magic number comes from experience. There's no API for this value in Cocoa or Carbon.
+      const_set_lazy(:DEFAULT_DRAG_HYSTERESIS) { 5 }
+      const_attr_reader  :DEFAULT_DRAG_HYSTERESIS
     }
     
     typesig { [] }
-    # $NON-NLS-1$
     def initialize
-      @handle = 0
+      @view = nil
       @parent = nil
       @tool_tip_text = nil
       @layout_data = nil
       @draw_count = 0
-      @visible_rgn = 0
       @menu = nil
       @foreground = nil
       @background = nil
@@ -175,7 +175,8 @@ module Org::Eclipse::Swt::Widgets
       @font = nil
       @cursor = nil
       @region = nil
-      @gcs = nil
+      @region_path = nil
+      @visible_rgn = 0
       @accessible = nil
       super()
       # Do nothing
@@ -206,15 +207,16 @@ module Org::Eclipse::Swt::Widgets
     # </ul>
     # 
     # @see SWT#BORDER
+    # @see SWT#LEFT_TO_RIGHT
+    # @see SWT#RIGHT_TO_LEFT
     # @see Widget#checkSubclass
     # @see Widget#getStyle
     def initialize(parent, style)
-      @handle = 0
+      @view = nil
       @parent = nil
       @tool_tip_text = nil
       @layout_data = nil
       @draw_count = 0
-      @visible_rgn = 0
       @menu = nil
       @foreground = nil
       @background = nil
@@ -222,24 +224,188 @@ module Org::Eclipse::Swt::Widgets
       @font = nil
       @cursor = nil
       @region = nil
-      @gcs = nil
+      @region_path = nil
+      @visible_rgn = 0
       @accessible = nil
       super(parent, style)
       @parent = parent
       create_widget
     end
     
+    typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
+    # long
+    # long
+    # long
+    def accepts_first_mouse(id, sel, the_event)
+      shell = get_shell
+      if (!((shell.attr_style & SWT::ON_TOP)).equal?(0))
+        return true
+      end
+      return super(id, sel, the_event)
+    end
+    
     typesig { [::Java::Int, ::Java::Int] }
-    def action_proc(the_control, part_code)
-      result = super(the_control, part_code)
-      if ((result).equal?(OS.attr_no_err))
-        return result
+    # long
+    # long
+    # long
+    def accessibility_action_names(id, sel)
+      if (!(@accessible).nil?)
+        return_value = @accessible.internal_accessibility_action_names(ACC::CHILDID_SELF)
+        if (!(return_value).nil?)
+          return return_value.attr_id
+        end
       end
-      if (is_disposed)
-        return OS.attr_no_err
+      return super(id, sel)
+    end
+    
+    typesig { [::Java::Int, ::Java::Int] }
+    # long
+    # long
+    # long
+    def accessibility_attribute_names(id, sel)
+      if ((id).equal?(@view.attr_id) || (@view.is_a?(NSControl) && !((@view).cell).nil? && ((@view).cell.attr_id).equal?(id)))
+        if (!(@accessible).nil?)
+          # First, see if the accessible is going to define a set of attributes for the control.
+          # If it does, return that.
+          return_value = @accessible.internal_accessibility_attribute_names(ACC::CHILDID_SELF)
+          if (!(return_value).nil?)
+            return return_value.attr_id
+          end
+          # If not, see if it will override or augment the standard list.
+          # Help, title, and description can be overridden.
+          extra_attributes = NSMutableArray.array_with_capacity(3)
+          extra_attributes.add_object(OS::NSAccessibilityHelpAttribute)
+          extra_attributes.add_object(OS::NSAccessibilityDescriptionAttribute)
+          extra_attributes.add_object(OS::NSAccessibilityTitleAttribute)
+          # 64
+          i = RJava.cast_to_int(extra_attributes.count) - 1
+          while i >= 0
+            attribute = NSString.new(extra_attributes.object_at_index(i).attr_id)
+            if ((@accessible.internal_accessibility_attribute_value(attribute, ACC::CHILDID_SELF)).nil?)
+              extra_attributes.remove_object_at_index(i)
+            end
+            i -= 1
+          end
+          if (extra_attributes.count > 0)
+            # long
+            super_result = super(id, sel)
+            base_attributes = NSArray.new(super_result)
+            mutable_attributes = NSMutableArray.array_with_capacity(base_attributes.count + 1)
+            mutable_attributes.add_objects_from_array(base_attributes)
+            i_ = 0
+            while i_ < extra_attributes.count
+              curr_attribute = extra_attributes.object_at_index(i_)
+              if (!mutable_attributes.contains_object(curr_attribute))
+                mutable_attributes.add_object(curr_attribute)
+              end
+              i_ += 1
+            end
+            return mutable_attributes.attr_id
+          end
+        end
       end
-      send_track_events
-      return result
+      return super(id, sel)
+    end
+    
+    typesig { [::Java::Int, ::Java::Int] }
+    # long
+    # long
+    # long
+    def accessibility_parameterized_attribute_names(id, sel)
+      if ((id).equal?(@view.attr_id) || (@view.is_a?(NSControl) && !((@view).cell).nil? && ((@view).cell.attr_id).equal?(id)))
+        if (!(@accessible).nil?)
+          return_value = @accessible.internal_accessibility_parameterized_attribute_names(ACC::CHILDID_SELF)
+          if (!(return_value).nil?)
+            return return_value.attr_id
+          end
+        end
+      end
+      return super(id, sel)
+    end
+    
+    typesig { [::Java::Int, ::Java::Int] }
+    # long
+    # long
+    # long
+    def accessibility_focused_uielement(id, sel)
+      return_value = nil
+      if ((id).equal?(@view.attr_id) || (@view.is_a?(NSControl) && !((@view).cell).nil? && ((@view).cell.attr_id).equal?(id)))
+        if (!(@accessible).nil?)
+          return_value = @accessible.internal_accessibility_focused_uielement(ACC::CHILDID_SELF)
+        end
+      end
+      # If we had an accessible and it didn't handle the attribute request, let the
+      # superclass handle it.
+      if ((return_value).nil?)
+        return super(id, sel)
+      else
+        return return_value.attr_id
+      end
+    end
+    
+    typesig { [::Java::Int, ::Java::Int, NSPoint] }
+    # long
+    # long
+    # long
+    def accessibility_hit_test(id, sel, point)
+      return_value = nil
+      if ((id).equal?(@view.attr_id) || (@view.is_a?(NSControl) && !((@view).cell).nil? && ((@view).cell.attr_id).equal?(id)))
+        if (!(@accessible).nil?)
+          return_value = @accessible.internal_accessibility_hit_test(point, ACC::CHILDID_SELF)
+        end
+      end
+      # If we had an accessible and it didn't handle the attribute request, let the
+      # superclass handle it.
+      if ((return_value).nil?)
+        return super(id, sel, point)
+      else
+        return return_value.attr_id
+      end
+    end
+    
+    typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
+    # long
+    # long
+    # long
+    # long
+    def accessibility_attribute_value(id, sel, arg0)
+      attribute = NSString.new(arg0)
+      # long
+      return_value = 0
+      return_object = nil
+      if (!(@accessible).nil?)
+        return_object = @accessible.internal_accessibility_attribute_value(attribute, ACC::CHILDID_SELF)
+      end
+      # If we had an accessible and it didn't handle the attribute request, let the
+      # superclass handle it.
+      if ((return_object).nil?)
+        return_value = super(id, sel, arg0)
+      else
+        return_value = return_object.attr_id
+      end
+      return return_value
+    end
+    
+    typesig { [::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int] }
+    # long
+    # long
+    # long
+    # long
+    # long
+    def accessibility_attribute_value_for_parameter(id, sel, arg0, arg1)
+      attribute = NSString.new(arg0)
+      return_value = nil
+      if (!(@accessible).nil?)
+        parameter = Id.new(arg1)
+        return_value = @accessible.internal_accessibility_attribute_value_for_parameter(attribute, parameter, ACC::CHILDID_SELF)
+      end
+      # If we had an accessible and it didn't handle the attribute request, let the
+      # superclass handle it.
+      if ((return_value).nil?)
+        return super(id, sel, arg0, arg1)
+      else
+        return return_value.attr_id
+      end
     end
     
     typesig { [ControlListener] }
@@ -567,6 +733,24 @@ module Org::Eclipse::Swt::Widgets
       add_listener(SWT::Paint, typed_listener)
     end
     
+    class_module.module_eval {
+      const_set_lazy(:SYNTHETIC_BOLD) { -2.5 }
+      const_attr_reader  :SYNTHETIC_BOLD
+      
+      const_set_lazy(:SYNTHETIC_ITALIC) { 0.2 }
+      const_attr_reader  :SYNTHETIC_ITALIC
+    }
+    
+    typesig { [NSMutableDictionary, Font] }
+    def add_traits(dict, font)
+      if (!((font.attr_extra_traits & OS::NSBoldFontMask)).equal?(0))
+        dict.set_object(NSNumber.number_with_double(SYNTHETIC_BOLD), OS::NSStrokeWidthAttributeName)
+      end
+      if (!((font.attr_extra_traits & OS::NSItalicFontMask)).equal?(0))
+        dict.set_object(NSNumber.number_with_double(SYNTHETIC_ITALIC), OS::NSObliquenessAttributeName)
+      end
+    end
+    
     typesig { [TraverseListener] }
     # Adds the listener to the collection of listeners who will
     # be notified when traversal events occur, by sending it
@@ -594,31 +778,74 @@ module Org::Eclipse::Swt::Widgets
       add_listener(SWT::Traverse, typed_listener)
     end
     
-    typesig { [::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int] }
-    def color_proc(in_control, in_message, in_draw_depth, in_draw_in_color)
-      case (in_message)
-      when OS.attr_k_control_msg_apply_text_color
-        if (!(@foreground).nil?)
-          OS._rgbfore_color(to_rgbcolor(@foreground))
-        else
-          OS._set_theme_text_color(RJava.cast_to_short(OS.attr_k_theme_text_color_dialog_active), RJava.cast_to_short(in_draw_depth), !(in_draw_in_color).equal?(0))
-        end
-        return OS.attr_no_err
-      when OS.attr_k_control_msg_set_up_background
-        background = !(@background).nil? ? @background : get_parent_background
-        if (!(background).nil?)
-          OS._rgbback_color(to_rgbcolor(background))
-        else
-          OS._set_theme_background(RJava.cast_to_short(OS.attr_k_theme_brush_dialog_background_active), RJava.cast_to_short(in_draw_depth), !(in_draw_in_color).equal?(0))
-        end
-        return OS.attr_no_err
+    typesig { [::Java::Int, ::Java::Int] }
+    # long
+    # long
+    def become_first_responder(id, sel)
+      if (!((self.attr_state & DISABLED)).equal?(0))
+        return false
       end
-      return OS.attr_event_not_handled_err
+      return super(id, sel)
     end
     
-    typesig { [::Java::Int, ::Java::Int] }
-    def call_focus_event_handler(next_handler, the_event)
-      return OS._call_next_event_handler(next_handler, the_event)
+    typesig { [NSView, ::Java::Int, ::Java::Boolean] }
+    # long
+    def calculate_visible_region(view, visible_rgn, clip_children)
+      # long
+      temp_rgn = OS._new_rgn
+      if (!view.is_hidden_or_has_hidden_ancestor && is_drawing)
+        # long
+        child_rgn = OS._new_rgn
+        window_ = view.window
+        content_view_ = window_.content_view
+        frame_view = content_view_.superview
+        bounds = content_view_.visible_rect
+        bounds = content_view_.convert_rect_to_view_(bounds, view)
+        rect = Array.typed(::Java::Short).new(4) { 0 }
+        OS._set_rect(rect, RJava.cast_to_short(bounds.attr_x), RJava.cast_to_short(bounds.attr_y), RJava.cast_to_short((bounds.attr_x + bounds.attr_width)), RJava.cast_to_short((bounds.attr_y + bounds.attr_height)))
+        OS._rect_rgn(visible_rgn, rect)
+        temp_view = view
+        last_control = nil
+        while (!(temp_view.attr_id).equal?(frame_view.attr_id))
+          bounds = temp_view.visible_rect
+          bounds = temp_view.convert_rect_to_view_(bounds, view)
+          OS._set_rect(rect, RJava.cast_to_short(bounds.attr_x), RJava.cast_to_short(bounds.attr_y), RJava.cast_to_short((bounds.attr_x + bounds.attr_width)), RJava.cast_to_short((bounds.attr_y + bounds.attr_height)))
+          OS._rect_rgn(temp_rgn, rect)
+          OS._sect_rgn(temp_rgn, visible_rgn, visible_rgn)
+          if (OS._empty_rgn(visible_rgn))
+            break
+          end
+          if (clip_children || !(temp_view.attr_id).equal?(view.attr_id))
+            subviews_ = temp_view.subviews
+            # long
+            count_ = subviews_.count
+            i = 0
+            while i < count_
+              child = NSView.new(subviews_.object_at_index(count_ - i - 1))
+              if (!(last_control).nil? && (child.attr_id).equal?(last_control.attr_id))
+                break
+              end
+              if (child.is_hidden)
+                i += 1
+                next
+              end
+              bounds = child.visible_rect
+              bounds = child.convert_rect_to_view_(bounds, view)
+              OS._set_rect(rect, RJava.cast_to_short(bounds.attr_x), RJava.cast_to_short(bounds.attr_y), RJava.cast_to_short((bounds.attr_x + bounds.attr_width)), RJava.cast_to_short((bounds.attr_y + bounds.attr_height)))
+              OS._rect_rgn(temp_rgn, rect)
+              OS._union_rgn(temp_rgn, child_rgn, child_rgn)
+              i += 1
+            end
+          end
+          last_control = temp_view
+          temp_view = temp_view.superview
+        end
+        OS._diff_rgn(visible_rgn, child_rgn, visible_rgn)
+        OS._dispose_rgn(child_rgn)
+      else
+        OS._copy_rgn(temp_rgn, visible_rgn)
+      end
+      OS._dispose_rgn(temp_rgn)
     end
     
     typesig { [] }
@@ -654,6 +881,15 @@ module Org::Eclipse::Swt::Widgets
     typesig { [] }
     def check_buffered
       self.attr_style |= SWT::DOUBLE_BUFFERED
+    end
+    
+    typesig { [Widget] }
+    def check_tool_tip(target)
+      if (is_visible && (self.attr_display.attr_tooltip_control).equal?(self) && ((target).nil? || (self.attr_display.attr_tooltip_target).equal?(target)))
+        shell = get_shell
+        shell.send_tool_tip_event(false)
+        shell.send_tool_tip_event(true)
+      end
     end
     
     typesig { [::Java::Int, ::Java::Int] }
@@ -747,10 +983,10 @@ module Org::Eclipse::Swt::Widgets
     def compute_tab_list
       if (is_tab_group)
         if (get_visible && get_enabled)
-          return Array.typed(Control).new([self])
+          return Array.typed(Widget).new([self])
         end
       end
-      return Array.typed(Control).new(0) { nil }
+      return Array.typed(Widget).new(0) { nil }
     end
     
     typesig { [] }
@@ -773,16 +1009,54 @@ module Org::Eclipse::Swt::Widgets
       return @parent.compute_tab_root
     end
     
-    typesig { [Array.typed(String), String] }
-    def contains(array, element)
-      i = 0
-      while i < array.attr_length
-        if ((array[i] == element))
-          return true
-        end
-        i += 1
+    typesig { [] }
+    def content_view
+      return @view
+    end
+    
+    typesig { [String, Font, Array.typed(::Java::Float), ::Java::Int, ::Java::Boolean, ::Java::Boolean] }
+    # double
+    def create_string(string, font, foreground, style, enabled, mnemonics)
+      dict = (NSMutableDictionary.new.alloc).init_with_capacity(5)
+      if ((font).nil?)
+        font = !(@font).nil? ? @font : default_font
       end
-      return false
+      dict.set_object(font.attr_handle, OS::NSFontAttributeName)
+      add_traits(dict, font)
+      if (enabled)
+        if (!(foreground).nil?)
+          color = NSColor.color_with_device_red(foreground[0], foreground[1], foreground[2], foreground[3])
+          dict.set_object(color, OS::NSForegroundColorAttributeName)
+        end
+      else
+        dict.set_object(NSColor.disabled_control_text_color, OS::NSForegroundColorAttributeName)
+      end
+      if (!(style).equal?(0))
+        paragraph_style = NSMutableParagraphStyle.new.alloc.init
+        paragraph_style.set_line_break_mode(OS::NSLineBreakByClipping)
+        alignment = SWT::LEFT
+        if (!((style & SWT::CENTER)).equal?(0))
+          alignment = OS::NSCenterTextAlignment
+        else
+          if (!((style & SWT::RIGHT)).equal?(0))
+            alignment = OS::NSRightTextAlignment
+          end
+        end
+        paragraph_style.set_alignment(alignment)
+        dict.set_object(paragraph_style, OS::NSParagraphStyleAttributeName)
+        paragraph_style.release
+      end
+      length_ = string.length
+      chars = CharArray.new(length_)
+      string.get_chars(0, chars.attr_length, chars, 0)
+      if (mnemonics)
+        length_ = fix_mnemonic(chars)
+      end
+      str = (NSString.new.alloc).init_with_characters(chars, length_)
+      attrib_str = (NSAttributedString.new.alloc).init_with_string(str, dict)
+      str.release
+      dict.release
+      return attrib_str
     end
     
     typesig { [] }
@@ -795,56 +1069,88 @@ module Org::Eclipse::Swt::Widgets
       set_default_font
       set_zorder
       set_relations
+      self.attr_display.clear_pool
     end
     
     typesig { [] }
     def default_background
-      return self.attr_display.get_system_color(SWT::COLOR_WIDGET_BACKGROUND)
+      return self.attr_display.get_widget_color(SWT::COLOR_WIDGET_BACKGROUND)
     end
     
     typesig { [] }
     def default_font
-      family = Array.typed(::Java::Byte).new(256) { 0 }
-      size = Array.typed(::Java::Short).new(1) { 0 }
-      style = Array.typed(::Java::Byte).new(1) { 0 }
-      OS._get_theme_font(RJava.cast_to_short(default_theme_font), RJava.cast_to_short(OS.attr_sm_system_script), family, size, style)
-      id = OS._fmget_font_family_from_name(family)
-      font = Array.typed(::Java::Int).new(1) { 0 }
-      OS._fmget_font_from_font_family_instance(id, style[0], font, nil)
-      return Font.carbon_new(self.attr_display, OS._fmget_atsfont_ref_from_font(font[0]), style[0], size[0])
+      if (self.attr_display.attr_small_fonts)
+        return self.attr_display.get_system_font
+      end
+      return Font.cocoa_new(self.attr_display, default_nsfont)
     end
     
     typesig { [] }
     def default_foreground
-      return self.attr_display.get_system_color(SWT::COLOR_WIDGET_FOREGROUND)
+      return self.attr_display.get_widget_color(SWT::COLOR_WIDGET_FOREGROUND)
     end
     
     typesig { [] }
-    def default_theme_font
-      if (self.attr_display.attr_small_fonts)
-        return OS.attr_k_theme_small_system_font
-      end
-      return OS.attr_k_theme_system_font
+    def default_nsfont
+      return self.attr_display.get_system_font.attr_handle
     end
     
     typesig { [] }
     def deregister
       super
-      self.attr_display.remove_widget(@handle)
+      self.attr_display.remove_widget(@view)
     end
     
     typesig { [] }
     def destroy_widget
-      display = self.attr_display
-      the_control = top_handle
+      view = top_view
+      view.remove_from_superview
       release_handle
-      if (!(the_control).equal?(0))
-        if (display.attr_delay_dispose)
-          display.add_to_dispose_window(the_control)
-        else
-          OS._dispose_control(the_control)
+    end
+    
+    typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
+    # long
+    # long
+    # long
+    def do_command_by_selector(id, sel, selector)
+      if ((@view.window.first_responder.attr_id).equal?(id))
+        if (ime_in_composition)
+          return
+        end
+        s = self.get_shell
+        ns_event = NSApplication.shared_application.current_event
+        if (!(ns_event).nil? && (ns_event.type).equal?(OS::NSKeyDown))
+          # Feature in Cocoa.  Pressing Alt+UpArrow invokes doCommandBySelector
+          # twice, with selectors moveBackward and moveToBeginningOfParagraph
+          # (Alt+DownArrow behaves similarly).  In order to avoid sending
+          # multiple events for these keys, do not send a KeyDown if we already sent one
+          # during this keystroke. This rule does not apply if the command key
+          # is down, because we likely triggered the current key sequence via flagsChanged.
+          # 
+          # long
+          modifiers = ns_event.modifier_flags
+          if ((s.attr_key_input_happened).equal?(false) || !((modifiers & OS::NSCommandKeyMask)).equal?(0))
+            s.attr_key_input_happened = true
+            consume = Array.typed(::Java::Boolean).new(1) { false }
+            if (translate_traversal(ns_event.key_code, ns_event, consume))
+              return
+            end
+            if (is_disposed)
+              return
+            end
+            if (!send_key_event(ns_event, SWT::KeyDown))
+              return
+            end
+            if (consume[0])
+              return
+            end
+          end
+        end
+        if (!((self.attr_state & CANVAS)).equal?(0))
+          return
         end
       end
+      super(id, sel, selector)
     end
     
     typesig { [Event] }
@@ -934,8 +1240,8 @@ module Org::Eclipse::Swt::Widgets
     end
     
     typesig { [::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int] }
-    def drag_detect(button, count, state_mask, x, y)
-      if (!(button).equal?(1) || !(count).equal?(1))
+    def drag_detect(button, count_, state_mask, x, y)
+      if (!(button).equal?(1) || !(count_).equal?(1))
         return false
       end
       if (!drag_detect(x, y, false, nil))
@@ -946,52 +1252,55 @@ module Org::Eclipse::Swt::Widgets
     
     typesig { [::Java::Int, ::Java::Int, ::Java::Boolean, Array.typed(::Java::Boolean)] }
     def drag_detect(x, y, filter, consume)
-      rect = Rect.new
-      window = OS._get_control_owner(@handle)
-      pt = CGPoint.new
-      OS._hiview_convert_point(pt, @handle, 0)
-      x += RJava.cast_to_int(pt.attr_x)
-      y += RJava.cast_to_int(pt.attr_y)
-      OS._get_window_bounds(window, RJava.cast_to_short(OS.attr_k_window_structure_rgn), rect)
-      x += rect.attr_left
-      y += rect.attr_top
-      pt1 = Org::Eclipse::Swt::Internal::Carbon::Point.new
-      pt1.attr_h = RJava.cast_to_short(x)
-      pt1.attr_v = RJava.cast_to_short(y)
-      return OS._wait_mouse_moved(pt1)
-    end
-    
-    typesig { [::Java::Int, ::Java::Int, ::Java::Boolean, ::Java::Boolean, ::Java::Boolean, Rect] }
-    def draw_focus(control, context, has_focus, has_border, draw_background, inset)
-      if (draw_background)
-        fill_background(control, context, nil)
+      # Feature in Cocoa. Mouse drag events do not account for hysteresis.
+      # As soon as the mouse drags a mouse dragged event is fired.  Fix is to
+      # check for another mouse drag event that is at least 5 pixels away
+      # from the start of the drag.
+      application = NSApplication.shared_application
+      dragging = false
+      # long
+      event_type = OS::NSLeftMouseDown
+      # double
+      drag_x = x
+      # double
+      drag_y = y
+      # To check for an actual drag we need to pull off mouse moved and mouse up events
+      # to detect if the user dragged outside of a 10 x 10 box centered on the mouse down location.
+      # We still want the view to see the events, so save them and re-post when done checking.
+      mouse_up_event = nil
+      drag_events = NSMutableArray.array_with_capacity(10)
+      while (!(event_type).equal?(OS::NSLeftMouseUp))
+        event = application.next_event_matching_mask((OS::NSLeftMouseUpMask | OS::NSLeftMouseDraggedMask), NSDate.distant_future, OS::NSEventTrackingRunLoopMode, true)
+        event_type = event.type
+        if ((event_type).equal?(OS::NSLeftMouseDragged))
+          drag_events.add_object(event)
+          window_loc = event.location_in_window
+          view_loc = @view.convert_point_from_view_(window_loc, nil)
+          if (!@view.is_flipped)
+            view_loc.attr_y = @view.bounds.attr_height - view_loc.attr_y
+          end
+          if ((Math.abs(view_loc.attr_x - drag_x) > DEFAULT_DRAG_HYSTERESIS) || (Math.abs(view_loc.attr_y - drag_y) > DEFAULT_DRAG_HYSTERESIS))
+            dragging = true
+            break
+          end
+        else
+          if ((event_type).equal?(OS::NSLeftMouseUp))
+            mouse_up_event = event
+          end
+        end
       end
-      rect = CGRect.new
-      OS._hiview_get_bounds(control, rect)
-      rect.attr_x += inset.attr_left
-      rect.attr_y += inset.attr_top
-      rect.attr_width -= inset.attr_right + inset.attr_left
-      rect.attr_height -= inset.attr_bottom + inset.attr_top
-      state = 0
-      if (OS._is_control_enabled(control))
-        state = OS._is_control_active(control) ? OS.attr_k_theme_state_active : OS.attr_k_theme_state_inactive
-      else
-        state = OS._is_control_active(control) ? OS.attr_k_theme_state_unavailable : OS.attr_k_theme_state_unavailable_inactive
+      # Push back any events we took out of the queue so the control can receive them.
+      if (!(mouse_up_event).nil?)
+        application.post_event(mouse_up_event, true)
       end
-      if (has_border)
-        info = HIThemeFrameDrawInfo.new
-        info.attr_state = state
-        info.attr_kind = OS.attr_k_hitheme_frame_text_field_square
-        info.attr_is_focused = has_focus
-        OS._hitheme_draw_frame(rect, info, context, OS.attr_k_hitheme_orientation_normal)
-      else
-        OS._hitheme_draw_focus_rect(rect, has_focus, context, OS.attr_k_hitheme_orientation_normal)
+      if (drag_events.count > 0)
+        while (drag_events.count > 0)
+          curr_event = NSEvent.new(drag_events.object_at_index(drag_events.count - 1).attr_id)
+          drag_events.remove_last_object
+          application.post_event(curr_event, true)
+        end
       end
-    end
-    
-    typesig { [] }
-    def draw_focus_ring
-      return has_border
+      return dragging
     end
     
     typesig { [::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Boolean] }
@@ -999,31 +1308,25 @@ module Org::Eclipse::Swt::Widgets
       return false
     end
     
-    typesig { [::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int] }
-    def draw_widget(control, context, damage_rgn, visible_rgn, the_event)
-      if (!(control).equal?(@handle))
+    typesig { [::Java::Int, NSGraphicsContext, NSRect] }
+    # long
+    def draw_widget(id, context, rect)
+      if (!(id).equal?(paint_view.attr_id))
         return
       end
       if (!hooks(SWT::Paint) && !filters(SWT::Paint))
         return
       end
-      # Retrieve the damage rect
-      rect = Rect.new
-      OS._get_region_bounds(visible_rgn, rect)
       # Send paint event
-      port = Array.typed(::Java::Int).new(1) { 0 }
-      OS._get_port(port)
       data = SwtGCData.new
-      data.attr_port = port[0]
-      data.attr_paint_event = the_event
-      data.attr_visible_rgn = visible_rgn
-      gc = SwtGC.carbon_new(self, data)
+      data.attr_paint_rect = rect
+      gc = SwtGC.cocoa_new(self, data)
       event = Event.new
       event.attr_gc = gc
-      event.attr_x = rect.attr_left
-      event.attr_y = rect.attr_top
-      event.attr_width = rect.attr_right - rect.attr_left
-      event.attr_height = rect.attr_bottom - rect.attr_top
+      event.attr_x = RJava.cast_to_int(rect.attr_x)
+      event.attr_y = RJava.cast_to_int(rect.attr_y)
+      event.attr_width = RJava.cast_to_int(rect.attr_width)
+      event.attr_height = RJava.cast_to_int(rect.attr_height)
       send_event(SWT::Paint, event)
       event.attr_gc = nil
       gc.dispose
@@ -1031,15 +1334,15 @@ module Org::Eclipse::Swt::Widgets
     
     typesig { [::Java::Boolean] }
     def enable_widget(enabled)
-      top_handle_ = top_handle
-      if (enabled)
-        OS._enable_control(top_handle_)
-      else
-        OS._disable_control(top_handle_)
+      if (@view.is_a?(NSControl))
+        (@view).set_enabled(enabled)
       end
+      update_cursor_rects(is_enabled)
     end
     
     typesig { [Array.typed(::Java::Float), Array.typed(::Java::Float)] }
+    # double
+    # double
     def ==(color1, color2)
       if ((color1).equal?(color2))
         return true
@@ -1060,57 +1363,50 @@ module Org::Eclipse::Swt::Widgets
       return true
     end
     
-    typesig { [::Java::Int, ::Java::Int, Rectangle] }
-    def fill_background(control, context, bounds)
-      OS._cgcontext_save_gstate(context)
-      rect = CGRect.new
-      if (!(bounds).nil?)
-        rect.attr_x = bounds.attr_x
-        rect.attr_y = bounds.attr_y
-        rect.attr_width = bounds.attr_width
-        rect.attr_height = bounds.attr_height
-      else
-        OS._hiview_get_bounds(control, rect)
+    typesig { [] }
+    def event_view
+      return @view
+    end
+    
+    typesig { [NSView, NSGraphicsContext, NSRect, ::Java::Int] }
+    def fill_background(view, context, rect, img_height)
+      control = find_background_control
+      if ((control).nil?)
+        control = self
       end
-      widget = find_background_control
-      if (!(widget).nil? && !(widget.attr_background_image).nil?)
-        pt = CGPoint.new
-        OS._hiview_convert_point(pt, control, widget.attr_handle)
-        OS._cgcontext_translate_ctm(context, -pt.attr_x, -pt.attr_y)
-        pattern = Pattern.new(self.attr_display, widget.attr_background_image)
-        data = SwtGCData.new
-        data.attr_device = self.attr_display
-        data.attr_background = widget.get_background_color.attr_handle
-        gc = SwtGC.carbon_new(context, data)
-        gc.set_background_pattern(pattern)
-        gc.fill_rectangle(RJava.cast_to_int((rect.attr_x + pt.attr_x)), RJava.cast_to_int((rect.attr_y + pt.attr_y)), RJava.cast_to_int(rect.attr_width), RJava.cast_to_int(rect.attr_height))
-        gc.dispose
-        pattern.dispose
-      else
-        if (!(widget).nil? && !(widget.attr_background).nil?)
-          colorspace = OS._cgcolor_space_create_device_rgb
-          OS._cgcontext_set_fill_color_space(context, colorspace)
-          OS._cgcontext_set_fill_color(context, widget.attr_background)
-          OS._cgcolor_space_release(colorspace)
-          OS._cgcontext_set_alpha(context, get_theme_alpha)
-          OS._cgcontext_fill_rect(context, rect)
+      image = control.attr_background_image
+      if (!(image).nil? && !image.is_disposed)
+        context.save_graphics_state
+        NSColor.color_with_pattern_image(image.attr_handle).set_fill
+        phase = NSPoint.new
+        control_view = control.attr_view
+        if ((img_height).equal?(-1))
+          content_view_ = control_view.window.content_view
+          phase = control_view.convert_point_to_view_(phase, content_view_)
+          phase.attr_y = content_view_.bounds.attr_height - phase.attr_y
         else
-          if (OS::VERSION >= 0x1040)
-            OS._hitheme_set_fill(OS.attr_k_theme_brush_dialog_background_active, 0, context, OS.attr_k_hitheme_orientation_normal)
-            OS._cgcontext_set_alpha(context, get_theme_alpha)
-            OS._cgcontext_fill_rect(context, rect)
-          else
-            rect1 = Rect.new
-            rect1.attr_left = RJava.cast_to_short(rect.attr_x)
-            rect1.attr_top = RJava.cast_to_short(rect.attr_y)
-            rect1.attr_right = RJava.cast_to_short((rect.attr_x + rect.attr_width))
-            rect1.attr_bottom = RJava.cast_to_short((rect.attr_y + rect.attr_height))
-            OS._set_theme_background(RJava.cast_to_short(OS.attr_k_theme_brush_dialog_background_active), RJava.cast_to_short(0), true)
-            OS._erase_rect(rect1)
-          end
+          phase = view.convert_point_to_view_(phase, control_view)
+          phase.attr_y += img_height - @background_image.get_bounds.attr_height
         end
+        context.set_pattern_phase(phase)
+        NSBezierPath.fill_rect(rect)
+        context.restore_graphics_state
+        return
       end
-      OS._cgcontext_restore_gstate(context)
+      # double
+      background = control.attr_background
+      # double
+      alpha = 0.0
+      if ((background).nil?)
+        background = control.default_background.attr_handle
+        alpha = get_theme_alpha
+      else
+        alpha = background[3]
+      end
+      context.save_graphics_state
+      NSColor.color_with_device_red(background[0], background[1], background[2], alpha).set_fill
+      NSBezierPath.fill_rect(rect)
+      context.restore_graphics_state
     end
     
     typesig { [] }
@@ -1137,6 +1433,11 @@ module Org::Eclipse::Swt::Widgets
       return Array.typed(Menu).new(0) { nil }
     end
     
+    typesig { [NSPoint] }
+    def find_tooltip(pt)
+      return self
+    end
+    
     typesig { [Shell, Shell, Decorations, Decorations, Array.typed(Menu)] }
     def fix_children(new_shell, old_shell, new_decorations, old_decorations, menus)
       old_shell.fix_shell(new_shell, self)
@@ -1153,18 +1454,62 @@ module Org::Eclipse::Swt::Widgets
         end
       end
       shell.set_saved_focus(focus_control)
-      window = OS._get_control_owner(@handle)
-      OS._clear_keyboard_focus(window)
+      # int window = OS.GetControlOwner (handle);
+      # OS.ClearKeyboardFocus (window);
+    end
+    
+    typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
+    # long
+    # long
+    # long
+    def flags_changed(id, sel, the_event)
+      if ((@view.window.first_responder.attr_id).equal?(id))
+        if (((self.attr_state & SAFARI_EVENTS_FIX)).equal?(0))
+          s = self.get_shell
+          s.attr_key_input_happened = false
+          mask = 0
+          ns_event = NSEvent.new(the_event)
+          # long
+          modifiers = ns_event.modifier_flags
+          key_code_ = Display.translate_key(ns_event.key_code)
+          case (key_code_)
+          when SWT::ALT
+            mask = OS::NSAlternateKeyMask
+          when SWT::CONTROL
+            mask = OS::NSControlKeyMask
+          when SWT::COMMAND
+            mask = OS::NSCommandKeyMask
+          when SWT::SHIFT
+            mask = OS::NSShiftKeyMask
+          when SWT::CAPS_LOCK
+            event = Event.new
+            event.attr_key_code = key_code_
+            set_input_state(event, ns_event, SWT::KeyDown)
+            send_key_event(SWT::KeyDown, event)
+            set_input_state(event, ns_event, SWT::KeyUp)
+            send_key_event(SWT::KeyUp, event)
+          end
+          if (!(mask).equal?(0))
+            s.attr_key_input_happened = true
+            type_ = !((mask & modifiers)).equal?(0) ? SWT::KeyDown : SWT::KeyUp
+            if ((type_).equal?(SWT::KeyDown))
+              s.attr_key_input_happened = true
+            end
+            event = Event.new
+            event.attr_key_code = key_code_
+            set_input_state(event, ns_event, type_)
+            if (!send_key_event(type_, event))
+              return
+            end
+          end
+        end
+      end
+      super(id, sel, the_event)
     end
     
     typesig { [] }
-    def focus_handle
-      return @handle
-    end
-    
-    typesig { [] }
-    def focus_part
-      return OS.attr_k_control_focus_next_part
+    def focus_view
+      return @view
     end
     
     typesig { [] }
@@ -1186,49 +1531,27 @@ module Org::Eclipse::Swt::Widgets
       end
       shell = menu_shell
       shell.set_saved_focus(self)
-      # || !isActive ()
-      if (!is_enabled || !is_visible)
+      if (!is_enabled || !is_visible || !is_active)
         return false
       end
       if (is_focus_control)
         return true
       end
       shell.set_saved_focus(nil)
+      focus_view_ = focus_view
+      if (!focus_view_.can_become_key_view)
+        return false
+      end
+      result = @view.window.make_first_responder(focus_view_)
+      if (is_disposed)
+        return false
+      end
       shell.bring_to_top(false)
       if (is_disposed)
         return false
       end
-      # Feature in the Macintosh.  SetKeyboardFocus() sends kEventControlSetFocusPart
-      # with the part code equal to kControlFocusNoPart to the control that is about
-      # to lose focus and then sends kEventControlSetFocusPart with part code equal
-      # to kControlFocusNextPart to this control (the one that is about to get focus).
-      # If the control does not accept focus because of the full keyboard access mode,
-      # kEventControlSetFocusPart is sent again to the control in focus causing multiple
-      # focus events to happen.  The fix is to ignore focus events and issue them only
-      # if the focus control changed.
-      focus_handle_ = focus_handle
-      window = OS._get_control_owner(focus_handle_)
-      old_focus = self.attr_display.get_focus_control(window, true)
-      if ((old_focus).equal?(self))
-        return true
-      end
-      self.attr_display.attr_ignore_focus = true
-      OS._set_keyboard_focus(window, focus_handle_, RJava.cast_to_short(focus_part))
-      self.attr_display.attr_ignore_focus = false
-      new_focus = self.attr_display.get_focus_control
-      if (!(old_focus).equal?(new_focus))
-        if (!(old_focus).nil? && !old_focus.is_disposed)
-          old_focus.send_focus_event(SWT::FocusOut, false)
-        end
-        if (!(new_focus).nil? && !new_focus.is_disposed && new_focus.is_enabled)
-          new_focus.send_focus_event(SWT::FocusIn, false)
-        end
-      end
-      if (is_disposed)
-        return false
-      end
       shell.set_saved_focus(self)
-      return has_focus
+      return result
     end
     
     typesig { [] }
@@ -1256,13 +1579,12 @@ module Org::Eclipse::Swt::Widgets
     end
     
     typesig { [] }
-    def get_ax_attributes
-      return nil
-    end
-    
-    typesig { [] }
     # Returns the receiver's background color.
-    # 
+    # <p>
+    # Note: This operation is a hint and may be overridden by the platform.
+    # For example, on some versions of Windows the background of a TabFolder,
+    # is a gradient rather than a solid color.
+    # </p>
     # @return the background color
     # 
     # @exception SWTException <ul>
@@ -1280,7 +1602,7 @@ module Org::Eclipse::Swt::Widgets
     
     typesig { [] }
     def get_background_color
-      return !(@background).nil? ? Color.carbon_new(self.attr_display, @background) : default_background
+      return !(@background).nil? ? Color.cocoa_new(self.attr_display, @background) : default_background
     end
     
     typesig { [] }
@@ -1331,7 +1653,8 @@ module Org::Eclipse::Swt::Widgets
     # </ul>
     def get_bounds
       check_widget
-      return get_control_bounds(top_handle)
+      rect = top_view.frame
+      return Rectangle.new(RJava.cast_to_int(rect.attr_x), RJava.cast_to_int(rect.attr_y), RJava.cast_to_int(rect.attr_width), RJava.cast_to_int(rect.attr_height))
     end
     
     typesig { [] }
@@ -1351,12 +1674,9 @@ module Org::Eclipse::Swt::Widgets
       return !((self.attr_state & DRAG_DETECT)).equal?(0)
     end
     
-    typesig { [::Java::Int] }
-    def get_draw_count(control)
-      if (!is_trim_handle(control) && @draw_count > 0)
-        return @draw_count
-      end
-      return @parent.get_draw_count(control)
+    typesig { [] }
+    def get_drawing
+      return @draw_count <= 0
     end
     
     typesig { [] }
@@ -1428,7 +1748,7 @@ module Org::Eclipse::Swt::Widgets
     
     typesig { [] }
     def get_foreground_color
-      return !(@foreground).nil? ? Color.carbon_new(self.attr_display, @foreground) : default_foreground
+      return !(@foreground).nil? ? Color.cocoa_new(self.attr_display, @foreground) : default_foreground
     end
     
     typesig { [] }
@@ -1459,8 +1779,8 @@ module Org::Eclipse::Swt::Widgets
     # </ul>
     def get_location
       check_widget
-      rect = get_control_bounds(top_handle)
-      return Point.new(rect.attr_x, rect.attr_y)
+      rect = top_view.frame
+      return Point.new(RJava.cast_to_int(rect.attr_x), RJava.cast_to_int(rect.attr_y))
     end
     
     typesig { [] }
@@ -1501,13 +1821,13 @@ module Org::Eclipse::Swt::Widgets
       end
       index = -1
       value = -1
-      bounds = get_bounds
+      bounds_ = get_bounds
       if (!(self).equal?(get_shell))
-        bounds = self.attr_display.map(@parent, nil, bounds)
+        bounds_ = self.attr_display.map(@parent, nil, bounds_)
       end
       i = 0
       while i < monitors.attr_length
-        rect = bounds.intersection(monitors[i].get_bounds)
+        rect = bounds_.intersection(monitors[i].get_bounds)
         area = rect.attr_width * rect.attr_height
         if (area > 0 && area > value)
           index = i
@@ -1518,8 +1838,8 @@ module Org::Eclipse::Swt::Widgets
       if (index >= 0)
         return monitors[index]
       end
-      center_x = bounds.attr_x + bounds.attr_width / 2
-      center_y = bounds.attr_y + bounds.attr_height / 2
+      center_x = bounds_.attr_x + bounds_.attr_width / 2
+      center_y = bounds_.attr_y + bounds_.attr_height / 2
       i_ = 0
       while i_ < monitors.attr_length
         rect = monitors[i_].get_bounds
@@ -1552,26 +1872,46 @@ module Org::Eclipse::Swt::Widgets
     end
     
     typesig { [] }
-    def get_parent_background
-      return @parent.attr_background
-    end
-    
-    typesig { [] }
     def get_path
-      count = 0
+      count_ = 0
       shell = get_shell
       control = self
       while (!(control).equal?(shell))
-        count += 1
+        count_ += 1
         control = control.attr_parent
       end
       control = self
-      result = Array.typed(Control).new(count) { nil }
+      result = Array.typed(Control).new(count_) { nil }
       while (!(control).equal?(shell))
-        result[(count -= 1)] = control
+        result[(count_ -= 1)] = control
         control = control.attr_parent
       end
       return result
+    end
+    
+    typesig { [Region] }
+    def get_path(region)
+      if ((region).nil?)
+        return nil
+      end
+      return get_path(region.attr_handle)
+    end
+    
+    typesig { [::Java::Int] }
+    # long
+    def get_path(region)
+      callback = Callback.new(self, "regionToRects", 4)
+      if ((callback.get_address).equal?(0))
+        SWT.error(SWT::ERROR_NO_MORE_CALLBACKS)
+      end
+      path = NSBezierPath.bezier_path
+      path.retain
+      OS._qdregion_to_rects(region, OS.attr_k_qdparse_region_from_top_left, callback.get_address, path.attr_id)
+      callback.dispose
+      if (path.is_empty)
+        path.append_bezier_path_with_rect(NSRect.new)
+      end
+      return path
     end
     
     typesig { [] }
@@ -1624,7 +1964,13 @@ module Org::Eclipse::Swt::Widgets
     # </ul>
     def get_size
       check_widget
-      return get_control_size(top_handle)
+      rect = top_view.frame
+      return Point.new(RJava.cast_to_int(rect.attr_width), RJava.cast_to_int(rect.attr_height))
+    end
+    
+    typesig { [] }
+    def get_theme_alpha
+      return 1 * @parent.get_theme_alpha
     end
     
     typesig { [] }
@@ -1640,11 +1986,6 @@ module Org::Eclipse::Swt::Widgets
     def get_tool_tip_text
       check_widget
       return @tool_tip_text
-    end
-    
-    typesig { [] }
-    def get_theme_alpha
-      return 1 * @parent.get_theme_alpha
     end
     
     typesig { [] }
@@ -1668,15 +2009,14 @@ module Org::Eclipse::Swt::Widgets
       return ((self.attr_state & HIDDEN)).equal?(0)
     end
     
-    typesig { [::Java::Int, ::Java::Boolean] }
-    def get_visible_region(control, clip_children)
-      if (!clip_children)
-        return super(control, clip_children)
-      end
+    typesig { [] }
+    # long
+    def get_visible_region
       if ((@visible_rgn).equal?(0))
         @visible_rgn = OS._new_rgn
-        calculate_visible_region(control, @visible_rgn, clip_children)
+        calculate_visible_region(@view, @visible_rgn, true)
       end
+      # long
       result = OS._new_rgn
       OS._copy_rgn(@visible_rgn, result)
       return result
@@ -1689,91 +2029,80 @@ module Org::Eclipse::Swt::Widgets
     
     typesig { [] }
     def has_focus
-      return (self).equal?(self.attr_display.get_focus_control)
+      return (self.attr_display.get_focus_control).equal?(self)
     end
     
-    typesig { [::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int] }
-    def help_proc(in_control, in_global_mouse, in_request, out_content_provided, io_help_content)
-      case (in_request)
-      when OS.attr_k_hmsupply_content
-        content_provided = Array.typed(::Java::Short).new([OS.attr_k_hmcontent_not_provided_dont_propagate])
-        if (!(@tool_tip_text).nil? && !(@tool_tip_text.length).equal?(0))
-          buffer = CharArray.new(@tool_tip_text.length)
-          @tool_tip_text.get_chars(0, buffer.attr_length, buffer, 0)
-          length_ = fix_mnemonic(buffer)
-          if (!(self.attr_display.attr_help_string).equal?(0))
-            OS._cfrelease(self.attr_display.attr_help_string)
-          end
-          self.attr_display.attr_help_string = OS._cfstring_create_with_characters(OS.attr_k_cfallocator_default, buffer, length_)
-          help_content = HMHelpContentRec.new
-          OS.memmove(help_content, io_help_content, HMHelpContentRec.attr_sizeof)
-          help_content.attr_version = OS.attr_k_mac_help_version
-          # Feature in the Macintosh.  Despite the fact that the Mac
-          # provides 23 different types of alignment for the help text,
-          # it does not allow the text to be positioned at the current
-          # mouse position.  The fix is to center the text in a rectangle
-          # that surrounds the original position of the mouse.  As the
-          # mouse is moved, this rectangle is grown to include the new
-          # location of the mouse.  The help text is then centered by
-          # the  Mac in the new rectangle that was carefully constructed
-          # such that the help text will stay in the same position.
-          cursor_height = 16
-          help_content.attr_tag_side = RJava.cast_to_short(OS.attr_k_hmabsolute_center_aligned)
-          pt = Org::Eclipse::Swt::Internal::Carbon::Point.new
-          OS.memmove(pt, Array.typed(::Java::Int).new([in_global_mouse]), 4)
-          x = pt.attr_h
-          y = pt.attr_v
-          if (!(self.attr_display.attr_help_widget).equal?(self))
-            self.attr_display.attr_last_help_x = x + cursor_height / 2
-            self.attr_display.attr_last_help_y = y + cursor_height + cursor_height / 2
-          end
-          jitter = 4
-          delta_x = Math.abs(self.attr_display.attr_last_help_x - x) + jitter
-          delta_y = Math.abs(self.attr_display.attr_last_help_y - y) + jitter
-          x = self.attr_display.attr_last_help_x - delta_x
-          y = self.attr_display.attr_last_help_y - delta_y
-          width = delta_x * 2
-          height = delta_y * 2
-          self.attr_display.attr_help_widget = self
-          help_content.attr_abs_hot_rect_left = RJava.cast_to_short(x)
-          help_content.attr_abs_hot_rect_top = RJava.cast_to_short(y)
-          help_content.attr_abs_hot_rect_right = RJava.cast_to_short((x + width))
-          help_content.attr_abs_hot_rect_bottom = RJava.cast_to_short((y + height))
-          help_content.attr_content0_content_type = OS.attr_k_hmcfstring_content
-          help_content.attr_content0_tag_cfstring = self.attr_display.attr_help_string
-          help_content.attr_content1_content_type = OS.attr_k_hmcfstring_content
-          help_content.attr_content1_tag_cfstring = self.attr_display.attr_help_string
-          OS.memmove(io_help_content, help_content, HMHelpContentRec.attr_sizeof)
-          content_provided[0] = OS.attr_k_hmcontent_provided
-        end
-        OS.memmove(out_content_provided, content_provided, 2)
-      when OS.attr_k_hmdispose_content
-        if (!(self.attr_display.attr_help_string).equal?(0))
-          OS._cfrelease(self.attr_display.attr_help_string)
-        end
-        self.attr_display.attr_help_widget = nil
-        self.attr_display.attr_help_string = 0
+    typesig { [::Java::Int, ::Java::Int, NSPoint] }
+    # long
+    # long
+    # long
+    def hit_test(id, sel, point)
+      if (!((self.attr_state & DISABLED)).equal?(0))
+        return 0
       end
-      return OS.attr_no_err
+      if (!is_active)
+        return 0
+      end
+      if (!(@region_path).nil?)
+        superview_ = NSView.new(id).superview
+        if (!(superview_).nil?)
+          pt = superview_.convert_point_to_view_(point, @view)
+          if (!@view.is_flipped)
+            pt.attr_y = @view.bounds.attr_height - pt.attr_y
+          end
+          if (!@region_path.contains_point(pt))
+            return 0
+          end
+        end
+      end
+      return super(id, sel, point)
     end
     
     typesig { [] }
-    def hook_events
-      super
-      control_proc = self.attr_display.attr_control_proc
-      mask = Array.typed(::Java::Int).new([OS.attr_k_event_class_control, OS.attr_k_event_control_activate, OS.attr_k_event_class_control, OS.attr_k_event_control_apply_background, OS.attr_k_event_class_control, OS.attr_k_event_control_bounds_changed, OS.attr_k_event_class_control, OS.attr_k_event_control_click, OS.attr_k_event_class_control, OS.attr_k_event_control_contextual_menu_click, OS.attr_k_event_class_control, OS.attr_k_event_control_deactivate, OS.attr_k_event_class_control, OS.attr_k_event_control_draw, OS.attr_k_event_class_control, OS.attr_k_event_control_get_click_activation, OS.attr_k_event_class_control, OS.attr_k_event_control_get_focus_part, OS.attr_k_event_class_control, OS.attr_k_event_control_get_part_region, OS.attr_k_event_class_control, OS.attr_k_event_control_hit, OS.attr_k_event_class_control, OS.attr_k_event_control_hit_test, OS.attr_k_event_class_control, OS.attr_k_event_control_set_cursor, OS.attr_k_event_class_control, OS.attr_k_event_control_set_focus_part, OS.attr_k_event_class_control, OS.attr_k_event_control_track, ])
-      control_target = OS._get_control_event_target(@handle)
-      OS._install_event_handler(control_target, control_proc, mask.attr_length / 2, mask, @handle, nil)
-      accessibility_proc = self.attr_display.attr_accessibility_proc
-      mask = Array.typed(::Java::Int).new([OS.attr_k_event_class_accessibility, OS.attr_k_event_accessible_get_child_at_point, OS.attr_k_event_class_accessibility, OS.attr_k_event_accessible_get_focused_child, OS.attr_k_event_class_accessibility, OS.attr_k_event_accessible_get_all_attribute_names, OS.attr_k_event_class_accessibility, OS.attr_k_event_accessible_get_named_attribute, ])
-      OS._install_event_handler(control_target, accessibility_proc, mask.attr_length / 2, mask, @handle, nil)
-      help_proc = self.attr_display.attr_help_proc
-      OS._hminstall_control_content_callback(@handle, help_proc)
-      color_proc = self.attr_display.attr_color_proc
-      OS._set_control_color_proc(@handle, color_proc)
-      if ((OS._get_control_action(@handle)).equal?(0))
-        OS._set_control_action(@handle, self.attr_display.attr_action_proc)
+    def ime_in_composition
+      return false
+    end
+    
+    typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
+    # long
+    # long
+    # long
+    def insert_text(id, sel, string)
+      if ((@view.window.first_responder.attr_id).equal?(id))
+        s = self.get_shell
+        ns_event = NSApplication.shared_application.current_event
+        if (!(ns_event).nil?)
+          # long
+          type_ = ns_event.type
+          if ((!s.attr_key_input_happened && (type_).equal?(OS::NSKeyDown)) || (type_).equal?(OS::NSSystemDefined))
+            str = NSString.new(string)
+            if (str.is_kind_of_class(OS.objc_get_class("NSAttributedString")))
+              str = NSAttributedString.new(string).string
+            end
+            # 64
+            length_ = RJava.cast_to_int(str.length)
+            buffer = CharArray.new(length_)
+            str.get_characters(buffer)
+            i = 0
+            while i < buffer.attr_length
+              s.attr_key_input_happened = true
+              event = Event.new
+              if ((i).equal?(0) && (type_).equal?(OS::NSKeyDown))
+                set_key_state(event, SWT::KeyDown, ns_event)
+              end
+              event.attr_character = buffer[i]
+              if (!send_key_event(SWT::KeyDown, event))
+                return false
+              end
+              i += 1
+            end
+          end
+        end
+        if (!((self.attr_state & CANVAS)).equal?(0))
+          return true
+        end
       end
+      return super(id, sel, string)
     end
     
     typesig { [SwtGCData] }
@@ -1788,56 +2117,30 @@ module Org::Eclipse::Swt::Widgets
     # 
     # @param data the platform specific GC data
     # @return the platform specific GC handle
+    # 
+    # long
     def internal_new__gc(data)
       check_widget
-      window = OS._get_control_owner(@handle)
-      port = !(data).nil? ? data.attr_port : 0
-      if ((port).equal?(0))
-        port = OS._get_window_port(window)
-      end
+      view = paint_view
+      # long
       context = 0
-      buffer = Array.typed(::Java::Int).new(1) { 0 }
-      is_paint = !(data).nil? && !(data.attr_paint_event).equal?(0)
-      if (is_paint)
-        OS._get_event_parameter(data.attr_paint_event, OS.attr_k_event_param_cgcontext_ref, OS.attr_type_cgcontext_ref, nil, 4, nil, buffer)
-      else
-        OS._create_cgcontext_for_port(port, buffer)
-      end
-      context = buffer[0]
-      if ((context).equal?(0))
-        SWT.error(SWT::ERROR_NO_HANDLES)
-      end
-      visible_rgn = 0
-      if (!(data).nil? && !(data.attr_paint_event).equal?(0))
-        visible_rgn = data.attr_visible_rgn
-      else
-        if (get_draw_count(@handle) > 0)
-          visible_rgn = OS._new_rgn
-        else
-          visible_rgn = get_visible_region(@handle, true)
+      if (!(data).nil? && !(data.attr_paint_rect).nil?)
+        graphics_context = NSGraphicsContext.current_context
+        context = graphics_context.attr_id
+        if (!view.is_flipped)
+          data.attr_state &= ~VISIBLE_REGION
         end
-      end
-      rect = Rect.new
-      port_rect = Rect.new
-      OS._get_control_bounds(@handle, rect)
-      OS._get_port_bounds(port, port_rect)
-      if (is_paint)
-        rect.attr_right += rect.attr_left
-        rect.attr_bottom += rect.attr_top
-        rect.attr_left = rect.attr_top = 0
       else
-        content_view = Array.typed(::Java::Int).new(1) { 0 }
-        OS._hiview_find_by_id(OS._hiview_get_root(window), OS.k_hiview_window_content_id, content_view)
-        pt = CGPoint.new
-        OS._hiview_convert_point(pt, OS._hiview_get_superview(@handle), content_view[0])
-        rect.attr_left += RJava.cast_to_int(pt.attr_x)
-        rect.attr_top += RJava.cast_to_int(pt.attr_y)
-        rect.attr_right += RJava.cast_to_int(pt.attr_x)
-        rect.attr_bottom += RJava.cast_to_int(pt.attr_y)
-        OS._clip_cgcontext_to_region(context, port_rect, visible_rgn)
-        port_height = port_rect.attr_bottom - port_rect.attr_top
-        OS._cgcontext_scale_ctm(context, 1, -1)
-        OS._cgcontext_translate_ctm(context, rect.attr_left, -port_height + rect.attr_top)
+        graphics_context = NSGraphicsContext.graphics_context_with_window(view.window)
+        flipped_context = NSGraphicsContext.graphics_context_with_graphics_port(graphics_context.graphics_port, true)
+        graphics_context = flipped_context
+        context = graphics_context.attr_id
+        if (!(data).nil?)
+          data.attr_flipped_context = flipped_context
+          data.attr_state &= ~VISIBLE_REGION
+          data.attr_visible_rgn = get_visible_region
+          self.attr_display.add_context(data)
+        end
       end
       if (!(data).nil?)
         mask = SWT::LEFT_TO_RIGHT | SWT::RIGHT_TO_LEFT
@@ -1846,6 +2149,7 @@ module Org::Eclipse::Swt::Widgets
         end
         data.attr_device = self.attr_display
         data.attr_thread = self.attr_display.attr_thread
+        data.attr_view = view
         data.attr_foreground = get_foreground_color.attr_handle
         control = find_background_control
         if ((control).nil?)
@@ -1853,26 +2157,6 @@ module Org::Eclipse::Swt::Widgets
         end
         data.attr_background = control.get_background_color.attr_handle
         data.attr_font = !(@font).nil? ? @font : default_font
-        data.attr_visible_rgn = visible_rgn
-        data.attr_control = @handle
-        data.attr_port_rect = port_rect
-        data.attr_control_rect = rect
-        data.attr_inset_rect = get_inset
-        if ((data.attr_paint_event).equal?(0))
-          if ((@gcs).nil?)
-            @gcs = Array.typed(SwtGCData).new(4) { nil }
-          end
-          index = 0
-          while (index < @gcs.attr_length && !(@gcs[index]).nil?)
-            index += 1
-          end
-          if ((index).equal?(@gcs.attr_length))
-            new_gcs = Array.typed(SwtGCData).new(@gcs.attr_length + 4) { nil }
-            System.arraycopy(@gcs, 0, new_gcs, 0, @gcs.attr_length)
-            @gcs = new_gcs
-          end
-          @gcs[index] = data
-        end
       end
       return context
     end
@@ -1889,46 +2173,29 @@ module Org::Eclipse::Swt::Widgets
     # 
     # @param hDC the platform specific GC handle
     # @param data the platform specific GC data
+    # 
+    # long
     def internal_dispose__gc(context, data)
       check_widget
+      graphics_context = NSGraphicsContext.new(context)
+      self.attr_display.remove_context(data)
       if (!(data).nil?)
-        if ((data.attr_paint_event).equal?(0))
-          if (!(data.attr_visible_rgn).equal?(0))
-            OS._dispose_rgn(data.attr_visible_rgn)
-            data.attr_visible_rgn = 0
-          end
-          index = 0
-          while (index < @gcs.attr_length && !(@gcs[index]).equal?(data))
-            index += 1
-          end
-          if (index < @gcs.attr_length)
-            @gcs[index] = nil
-            index = 0
-            while (index < @gcs.attr_length && (@gcs[index]).nil?)
-              index += 1
-            end
-            if ((index).equal?(@gcs.attr_length))
-              @gcs = nil
-            end
-          end
-        else
-          return
+        if ((data.attr_paint_rect).nil?)
+          graphics_context.flush_graphics
         end
+        if (!(data.attr_visible_rgn).equal?(0))
+          OS._dispose_rgn(data.attr_visible_rgn)
+        end
+        data.attr_visible_rgn = 0
       end
-      # This code is intentionally commented. Use CGContextSynchronize
-      # instead of CGContextFlush to improve performance.
-      # 
-      # OS.CGContextFlush (context);
-      OS._cgcontext_synchronize(context)
-      OS._cgcontext_release(context)
     end
     
-    typesig { [::Java::Int] }
-    def invalidate_children_visible_region(control)
+    typesig { [] }
+    def invalidate_children_visible_region
     end
     
-    typesig { [::Java::Int] }
-    def invalidate_visible_region(control)
+    typesig { [] }
+    def invalidate_visible_region
       index = 0
       siblings = @parent.__get_children
       while (index < siblings.attr_length && !(siblings[index]).equal?(self))
@@ -1937,16 +2204,16 @@ module Org::Eclipse::Swt::Widgets
       i = index
       while i < siblings.attr_length
         sibling = siblings[i]
-        sibling.reset_visible_region(control)
-        sibling.invalidate_children_visible_region(control)
+        sibling.reset_visible_region
+        sibling.invalidate_children_visible_region
         i += 1
       end
-      @parent.reset_visible_region(control)
+      @parent.reset_visible_region
     end
     
-    typesig { [::Java::Int, ::Java::Int] }
-    def inval_window_rgn(window, rgn)
-      @parent.inval_window_rgn(window, rgn)
+    typesig { [] }
+    def is_active
+      return (get_shell.get_modal_shell).nil?
     end
     
     typesig { [] }
@@ -1954,6 +2221,11 @@ module Org::Eclipse::Swt::Widgets
     # a layout should be read by screen readers as the recevier's label.
     def is_described_by_label
       return true
+    end
+    
+    typesig { [] }
+    def is_drawing
+      return get_drawing && @parent.is_drawing
     end
     
     typesig { [] }
@@ -1981,39 +2253,6 @@ module Org::Eclipse::Swt::Widgets
       return is_enabled
     end
     
-    typesig { [] }
-    def is_enabled_modal
-      # NOT DONE - fails for multiple APP MODAL shells
-      shells = self.attr_display.get_shells
-      i = 0
-      while i < shells.attr_length
-        modal = shells[i]
-        if (!(modal).equal?(self) && modal.is_visible)
-          if (!((modal.attr_style & SWT::PRIMARY_MODAL)).equal?(0))
-            shell = get_shell
-            if ((modal.attr_parent).equal?(shell))
-              return false
-            end
-          end
-          bits = SWT::APPLICATION_MODAL | SWT::SYSTEM_MODAL
-          if (!((modal.attr_style & bits)).equal?(0))
-            control = self
-            while (!(control).nil?)
-              if ((control).equal?(modal))
-                break
-              end
-              control = control.attr_parent
-            end
-            if (!(control).equal?(modal))
-              return false
-            end
-          end
-        end
-        i += 1
-      end
-      return true
-    end
-    
     typesig { [Control] }
     def is_focus_ancestor(control)
       while (!(control).nil? && !(control).equal?(self) && !(control.is_a?(Shell)))
@@ -2039,6 +2278,22 @@ module Org::Eclipse::Swt::Widgets
         return (self).equal?(focus_control)
       end
       return has_focus
+    end
+    
+    typesig { [] }
+    def is_obscured
+      # long
+      visible_rgn = get_visible_region
+      bounds_rgn = OS._new_rgn
+      rect = Array.typed(::Java::Short).new(4) { 0 }
+      bounds_ = @view.visible_rect
+      OS._set_rect(rect, RJava.cast_to_short(bounds_.attr_x), RJava.cast_to_short(bounds_.attr_y), RJava.cast_to_short((bounds_.attr_x + bounds_.attr_width)), RJava.cast_to_short((bounds_.attr_y + bounds_.attr_height)))
+      OS._rect_rgn(bounds_rgn, rect)
+      OS._diff_rgn(bounds_rgn, visible_rgn, bounds_rgn)
+      obscured = !OS._empty_rgn(bounds_rgn)
+      OS._dispose_rgn(bounds_rgn)
+      OS._dispose_rgn(visible_rgn)
+      return obscured
     end
     
     typesig { [] }
@@ -2086,7 +2341,7 @@ module Org::Eclipse::Swt::Widgets
           i += 1
         end
       end
-      code = traversal_code(0, 0)
+      code = traversal_code(0, nil)
       if (!((code & (SWT::TRAVERSE_ARROW_PREVIOUS | SWT::TRAVERSE_ARROW_NEXT))).equal?(0))
         return false
       end
@@ -2105,8 +2360,13 @@ module Org::Eclipse::Swt::Widgets
           i += 1
         end
       end
-      code = traversal_code(0, 0)
+      code = traversal_code(0, nil)
       return !((code & (SWT::TRAVERSE_ARROW_PREVIOUS | SWT::TRAVERSE_ARROW_NEXT))).equal?(0)
+    end
+    
+    typesig { [NSView] }
+    def is_trim(view)
+      return false
     end
     
     typesig { [] }
@@ -2127,492 +2387,304 @@ module Org::Eclipse::Swt::Widgets
       return get_visible && @parent.is_visible
     end
     
+    typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
+    # long
+    # long
+    # long
+    def key_down(id, sel, the_event)
+      if ((@view.window.first_responder.attr_id).equal?(id))
+        s = self.get_shell
+        s.attr_key_input_happened = false
+        text_input = !(OS.objc_msg_send(id, OS.attr_sel_conforms_to_protocol_, OS.objc_get_protocol("NSTextInput"))).equal?(0)
+        if (!text_input)
+          # Not a text field, so send a key event here.
+          ns_event = NSEvent.new(the_event)
+          consume = Array.typed(::Java::Boolean).new(1) { false }
+          if (translate_traversal(ns_event.key_code, ns_event, consume))
+            return
+          end
+          if (is_disposed)
+            return
+          end
+          if (!send_key_event(ns_event, SWT::KeyDown))
+            return
+          end
+          if (consume[0])
+            return
+          end
+        else
+          # Control is some kind of text field, so the key event will be sent from insertText: or doCommandBySelector:
+          super(id, sel, the_event)
+          if (ime_in_composition)
+            return
+          end
+          # If none of those methods triggered a key event send one now.
+          if (!s.attr_key_input_happened)
+            ns_event = NSEvent.new(the_event)
+            consume = Array.typed(::Java::Boolean).new(1) { false }
+            if (translate_traversal(ns_event.key_code, ns_event, consume))
+              return
+            end
+            if (is_disposed)
+              return
+            end
+            if (!send_key_event(ns_event, SWT::KeyDown))
+              return
+            end
+            if (consume[0])
+              return
+            end
+          end
+          return
+        end
+      end
+      super(id, sel, the_event)
+    end
+    
+    typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
+    # long
+    # long
+    # long
+    def key_up(id, sel, the_event)
+      if ((@view.window.first_responder.attr_id).equal?(id))
+        ns_event = NSEvent.new(the_event)
+        if (!send_key_event(ns_event, SWT::KeyUp))
+          return
+        end
+      end
+      super(id, sel, the_event)
+    end
+    
+    typesig { [::Java::Boolean, ::Java::Boolean] }
+    def mark_layout(changed, all)
+      # Do nothing
+    end
+    
+    typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
+    # long
+    # long
+    # long
+    # long
+    def menu_for_event(id, sel, the_event)
+      if (!is_enabled)
+        return 0
+      end
+      pt = NSEvent.mouse_location
+      pt.attr_y = RJava.cast_to_int((self.attr_display.get_primary_frame.attr_height - pt.attr_y))
+      x = RJava.cast_to_int(pt.attr_x)
+      y = RJava.cast_to_int(pt.attr_y)
+      event = Event.new
+      event.attr_x = x
+      event.attr_y = y
+      send_event(SWT::MenuDetect, event)
+      # widget could be disposed at this point
+      if (is_disposed)
+        return 0
+      end
+      if (!event.attr_doit)
+        return 0
+      end
+      menu = get_menu
+      if (!(menu).nil? && !menu.is_disposed)
+        if (!(x).equal?(event.attr_x) || !(y).equal?(event.attr_y))
+          menu.set_location(event.attr_x, event.attr_y)
+        end
+        menu.set_visible(true)
+        return 0
+      end
+      return super(id, sel, the_event)
+    end
+    
     typesig { [] }
     def menu_shell
       return @parent.menu_shell
     end
     
     typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
-    def k_event_accessible_get_child_at_point(next_handler, the_event, user_data)
-      if (!(@accessible).nil?)
-        return @accessible.internal_k_event_accessible_get_child_at_point(next_handler, the_event, user_data)
-      end
-      return OS.attr_event_not_handled_err
-    end
-    
-    typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
-    def k_event_accessible_get_focused_child(next_handler, the_event, user_data)
-      if (!(@accessible).nil?)
-        return @accessible.internal_k_event_accessible_get_focused_child(next_handler, the_event, user_data)
-      end
-      return OS.attr_event_not_handled_err
-    end
-    
-    typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
-    def k_event_accessible_get_all_attribute_names(next_handler, the_event, user_data)
-      code = OS.attr_event_not_handled_err
-      attributes = get_ax_attributes
-      if (!(attributes).nil?)
-        OS._call_next_event_handler(next_handler, the_event)
-        array_ref = Array.typed(::Java::Int).new(1) { 0 }
-        OS._get_event_parameter(the_event, OS.attr_k_event_param_accessible_attribute_names, OS.attr_type_cfmutable_array_ref, nil, 4, nil, array_ref)
-        attributes_array_ref = array_ref[0]
-        length_ = OS._cfarray_get_count(attributes_array_ref)
-        os_attributes = Array.typed(String).new(length_) { nil }
-        i = 0
-        while i < length_
-          string_ref = OS._cfarray_get_value_at_index(attributes_array_ref, i)
-          str_length = OS._cfstring_get_length(string_ref)
-          buffer = CharArray.new(str_length)
-          range = CFRange.new
-          range.attr_length = str_length
-          OS._cfstring_get_characters(string_ref, range, buffer)
-          os_attributes[i] = String.new(buffer)
-          i += 1
-        end
-        i_ = 0
-        while i_ < attributes.attr_length
-          if (!contains(os_attributes, attributes[i_]))
-            string = attributes[i_]
-            buffer = CharArray.new(string.length)
-            string.get_chars(0, buffer.attr_length, buffer, 0)
-            string_ref = OS._cfstring_create_with_characters(OS.attr_k_cfallocator_default, buffer, buffer.attr_length)
-            OS._cfarray_append_value(attributes_array_ref, string_ref)
-            OS._cfrelease(string_ref)
-          end
-          i_ += 1
-        end
-        code = OS.attr_no_err
-      end
-      if (!(@accessible).nil?)
-        code = @accessible.internal_k_event_accessible_get_all_attribute_names(next_handler, the_event, code)
-      end
-      return code
-    end
-    
-    typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
-    def k_event_accessible_get_named_attribute(next_handler, the_event, user_data)
-      if (!(@accessible).nil?)
-        return @accessible.internal_k_event_accessible_get_named_attribute(next_handler, the_event, OS.attr_event_not_handled_err)
-      end
-      return OS.attr_event_not_handled_err
-    end
-    
-    typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
-    def k_event_control_contextual_menu_click(next_handler, the_event, user_data)
-      the_control = Array.typed(::Java::Int).new(1) { 0 }
-      OS._get_event_parameter(the_event, OS.attr_k_event_param_direct_object, OS.attr_type_control_ref, nil, 4, nil, the_control)
-      widget = self.attr_display.get_widget(the_control[0])
-      while (!(widget).nil? && !(widget.is_a?(Control)))
-        OS._get_super_control(the_control[0], the_control)
-        widget = self.attr_display.get_widget(the_control[0])
-      end
-      if ((widget).equal?(self) && is_enabled)
-        x = 0
-        y = 0
-        rect = Rect.new
-        window = OS._get_control_owner(@handle)
-        pt = CGPoint.new
-        OS._get_event_parameter(the_event, OS.attr_k_event_param_window_mouse_location, OS.attr_type_hipoint, nil, CGPoint.attr_sizeof, nil, pt)
-        x = RJava.cast_to_int(pt.attr_x)
-        y = RJava.cast_to_int(pt.attr_y)
-        OS._get_window_bounds(window, RJava.cast_to_short(OS.attr_k_window_structure_rgn), rect)
-        x += rect.attr_left
-        y += rect.attr_top
-        event = Event.new
-        event.attr_x = x
-        event.attr_y = y
-        send_event(SWT::MenuDetect, event)
-        if (event.attr_doit)
-          if (!(@menu).nil? && !@menu.is_disposed)
-            if (!(event.attr_x).equal?(x) || !(event.attr_y).equal?(y))
-              @menu.set_location(event.attr_x, event.attr_y)
+    # long
+    # long
+    # long
+    def scroll_wheel(id, sel, the_event)
+      if ((id).equal?(@view.attr_id))
+        if (hooks(SWT::MouseWheel) || filters(SWT::MouseWheel))
+          ns_event = NSEvent.new(the_event)
+          if (!(ns_event.delta_y).equal?(0))
+            if (!send_mouse_event(ns_event, SWT::MouseWheel, true))
+              return
             end
-            @menu.set_visible(true)
           end
         end
       end
-      return OS.attr_event_not_handled_err
+      super(id, sel, the_event)
     end
     
-    typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
-    def k_event_control_get_click_activation(next_handler, the_event, user_data)
-      if (!((get_shell.attr_style & SWT::ON_TOP)).equal?(0))
-        OS._set_event_parameter(the_event, OS.attr_k_event_param_click_activation, OS.attr_type_click_activation_result, 4, Array.typed(::Java::Int).new([OS.attr_k_activate_and_handle_click]))
-        return OS.attr_no_err
-      end
-      return super(next_handler, the_event, user_data)
+    typesig { [::Java::Int] }
+    # long
+    def is_event_view(id)
+      return true
     end
     
-    typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
-    def k_event_control_get_part_region(next_handler, the_event, user_data)
-      result = super(next_handler, the_event, user_data)
-      if ((result).equal?(OS.attr_no_err))
-        return result
+    typesig { [::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int] }
+    # long
+    # long
+    # long
+    def mouse_event(id, sel, the_event, type_)
+      if (!self.attr_display.attr_send_event)
+        return true
       end
-      if (!(@region).nil? && !(self).equal?(get_shell))
-        part = Array.typed(::Java::Short).new(1) { 0 }
-        OS._get_event_parameter(the_event, OS.attr_k_event_param_control_part, OS.attr_type_control_part_code, nil, 2, nil, part)
-        if ((part[0]).equal?(OS.attr_k_control_structure_meta_part) || (part[0]).equal?(OS.attr_k_control_clickable_meta_part))
-          rgn = Array.typed(::Java::Int).new(1) { 0 }
-          OS._get_event_parameter(the_event, OS.attr_k_event_param_control_region, OS.attr_type_qdrgn_handle, nil, 4, nil, rgn)
-          OS._copy_rgn(@region.attr_handle, rgn[0])
-          rect = get_inset
-          OS._offset_rgn(rgn[0], RJava.cast_to_short(-rect.attr_left), RJava.cast_to_short(-rect.attr_top))
-          return OS.attr_no_err
+      self.attr_display.attr_send_event = false
+      if (!is_event_view(id))
+        return true
+      end
+      dragging = false
+      consume = nil
+      ns_event = NSEvent.new(the_event)
+      # 64
+      ns_type = RJava.cast_to_int(ns_event.type)
+      manager = NSInputManager.current_input_manager
+      if (!(manager).nil? && manager.wants_to_handle_mouse_events)
+        if (manager.handle_mouse_event(ns_event))
+          return true
         end
       end
-      return result
-    end
-    
-    typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
-    def k_event_control_hit_test(next_handler, the_event, user_data)
-      result = super(next_handler, the_event, user_data)
-      if ((result).equal?(OS.attr_no_err))
-        return result
-      end
-      if (!(@region).nil? && !(self).equal?(get_shell))
-        result = OS._call_next_event_handler(next_handler, the_event)
-        pt = CGPoint.new
-        OS._get_event_parameter(the_event, OS.attr_k_event_param_mouse_location, OS.attr_type_hipoint, nil, CGPoint.attr_sizeof, nil, pt)
-        if (!@region.contains(RJava.cast_to_int(pt.attr_x), RJava.cast_to_int(pt.attr_y)))
-          OS._set_event_parameter(the_event, OS.attr_k_event_param_control_part, OS.attr_type_control_part_code, 2, Array.typed(::Java::Short).new([0]))
-          return result
-        end
-      end
-      if (!((self.attr_state & GRAB)).equal?(0))
-        rect = CGRect.new
-        OS._hiview_get_bounds(@handle, rect)
-        pt = CGPoint.new
-        OS._get_event_parameter(the_event, OS.attr_k_event_param_mouse_location, OS.attr_type_hipoint, nil, CGPoint.attr_sizeof, nil, pt)
-        if (!(OS._cgrect_contains_point(rect, pt)).equal?(0))
-          OS._set_event_parameter(the_event, OS.attr_k_event_param_control_part, OS.attr_type_control_part_code, 2, Array.typed(::Java::Short).new([1]))
-        end
-        return OS.attr_no_err
-      end
-      return result
-    end
-    
-    typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
-    def k_event_control_set_cursor(next_handler, the_event, user_data)
-      if (!is_enabled_cursor)
-        return OS.attr_no_err
-      end
-      cursor = nil
-      if (is_enabled_modal)
-        if (!((cursor = find_cursor)).nil?)
-          self.attr_display.set_cursor(cursor.attr_handle)
-        end
-      end
-      return !(cursor).nil? ? OS.attr_no_err : OS.attr_event_not_handled_err
-    end
-    
-    typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
-    def k_event_control_set_focus_part(next_handler, the_event, user_data)
-      self.attr_display.attr_focus_combo = nil
-      result = call_focus_event_handler(next_handler, the_event)
-      if (!self.attr_display.attr_ignore_focus)
-        if ((result).equal?(OS.attr_no_err))
-          window = OS._get_control_owner(@handle)
-          if ((window).equal?(OS._get_user_focus_window))
-            focus_handle_ = focus_handle
-            focus_control = Array.typed(::Java::Int).new(1) { 0 }
-            OS._get_keyboard_focus(window, focus_control)
-            part = Array.typed(::Java::Short).new(1) { 0 }
-            OS._get_event_parameter(the_event, OS.attr_k_event_param_control_part, OS.attr_type_control_part_code, nil, 2, nil, part)
-            display = self.attr_display
-            display.attr_delay_dispose = true
-            if ((part[0]).equal?(OS.attr_k_control_focus_no_part))
-              if ((focus_control[0]).equal?(focus_handle_))
-                send_focus_event(SWT::FocusOut, false)
-              end
-            else
-              if (!(focus_control[0]).equal?(focus_handle_))
-                send_focus_event(SWT::FocusIn, false)
-              end
-            end
-            display.attr_delay_dispose = false
+      case (ns_type)
+      when OS::NSLeftMouseDown
+        if ((ns_event.click_count).equal?(1) && !((self.attr_state & DRAG_DETECT)).equal?(0) && hooks(SWT::DragDetect))
+          consume = Array.typed(::Java::Boolean).new(1) { false }
+          location = @view.convert_point_from_view_(ns_event.location_in_window, nil)
+          if (!@view.is_flipped)
+            location.attr_y = @view.bounds.attr_height - location.attr_y
           end
-          # widget could be disposed at this point
-          if (is_disposed)
-            return OS.attr_no_err
-          end
+          dragging = drag_detect(RJava.cast_to_int(location.attr_x), RJava.cast_to_int(location.attr_y), false, consume)
         end
+      when OS::NSLeftMouseDragged, OS::NSRightMouseDragged, OS::NSOtherMouseDragged
+        self.attr_display.check_enter_exit(self, ns_event, false)
+      when OS::NSLeftMouseUp, OS::NSRightMouseUp, OS::NSOtherMouseUp
+        self.attr_display.check_enter_exit(self.attr_display.find_control(true), ns_event, false)
       end
-      return result
+      send_mouse_event(ns_event, type_, false)
+      if ((type_).equal?(SWT::MouseDown) && (ns_event.click_count).equal?(2))
+        send_mouse_event(ns_event, SWT::MouseDoubleClick, false)
+      end
+      if (dragging)
+        send_mouse_event(ns_event, SWT::DragDetect, false)
+      end
+      if (!(consume).nil? && consume[0])
+        return false
+      end
+      return true
     end
     
     typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
-    def k_event_control_track(next_handler, the_event, user_data)
-      # Feature in the Macintosh.  The default handler of kEventControlTrack
-      # calls TrackControl() which consumes key and mouse events until the
-      # tracking is canceled.  The fix is to send those events from the
-      # action proc of the widget by diffing the mouse and modifier keys
-      # state.
+    # long
+    # long
+    # long
+    def mouse_down(id, sel, the_event)
+      if (!mouse_event(id, sel, the_event, SWT::MouseDown))
+        return
+      end
+      tracking = is_event_view(id)
       display = self.attr_display
-      # display.runDeferredEvents ();
-      if (is_disposed)
-        return OS.attr_no_err
+      if (tracking)
+        display.attr_tracking_control = self
       end
-      if (display.run_popups)
-        return OS.attr_no_err
+      super(id, sel, the_event)
+      if (tracking)
+        display.attr_tracking_control = nil
       end
-      if (is_disposed)
-        return OS.attr_no_err
-      end
-      display.attr_last_state = OS._get_current_event_button_state
-      display.attr_last_modifiers = OS._get_current_event_key_modifiers
-      display.attr_grab_control = self
-      timer = 0
-      if (poll_track_event)
-        if ((display.attr_polling_timer).equal?(0))
-          id = Array.typed(::Java::Int).new(1) { 0 }
-          event_loop = OS._get_current_event_loop
-          OS._install_event_loop_timer(event_loop, Display::POLLING_TIMEOUT / 1000.0, Display::POLLING_TIMEOUT / 1000.0, display.attr_polling_proc, 0, id)
-          display.attr_polling_timer = timer = id[0]
-        end
-      end
-      result = super(next_handler, the_event, user_data)
-      if (!(timer).equal?(0))
-        OS._remove_event_loop_timer(timer)
-        display.attr_polling_timer = 0
-      end
-      display.attr_grab_control = nil
-      if (is_disposed)
-        return OS.attr_no_err
-      end
-      send_track_events
-      return result
     end
     
     typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
-    def k_event_mouse_down(next_handler, the_event, user_data)
-      shell = get_shell
-      self.attr_display.attr_dragging = false
-      consume = Array.typed(::Java::Boolean).new(1) { false }
-      button = Array.typed(::Java::Short).new(1) { 0 }
-      OS._get_event_parameter(the_event, OS.attr_k_event_param_mouse_button, OS.attr_type_mouse_button, nil, 2, nil, button)
-      click_count = Array.typed(::Java::Int).new(1) { 0 }
-      OS._get_event_parameter(the_event, OS.attr_k_event_param_click_count, OS.attr_type_uint32, nil, 4, nil, click_count)
-      if ((button[0]).equal?(1) && (click_count[0]).equal?(1) && !((self.attr_state & DRAG_DETECT)).equal?(0) && hooks(SWT::DragDetect))
-        pt = CGPoint.new
-        OS._get_event_parameter(the_event, OS.attr_k_event_param_window_mouse_location, OS.attr_type_hipoint, nil, CGPoint.attr_sizeof, nil, pt)
-        OS._hiview_convert_point(pt, 0, @handle)
-        x = RJava.cast_to_int(pt.attr_x)
-        y = RJava.cast_to_int(pt.attr_y)
-        if (drag_detect(x, y, true, consume))
-          self.attr_display.attr_dragging = true
-          self.attr_display.attr_drag_button = button[0]
-          self.attr_display.attr_drag_x = x
-          self.attr_display.attr_drag_y = y
-          chord = Array.typed(::Java::Int).new(1) { 0 }
-          OS._get_event_parameter(the_event, OS.attr_k_event_param_mouse_chord, OS.attr_type_uint32, nil, 4, nil, chord)
-          self.attr_display.attr_drag_state = chord[0]
-          modifiers = Array.typed(::Java::Int).new(1) { 0 }
-          OS._get_event_parameter(the_event, OS.attr_k_event_param_key_modifiers, OS.attr_type_uint32, nil, 4, nil, modifiers)
-          self.attr_display.attr_drag_modifiers = modifiers[0]
-        end
-        if (is_disposed)
-          return OS.attr_no_err
-        end
+    # long
+    # long
+    # long
+    def mouse_up(id, sel, the_event)
+      if (!mouse_event(id, sel, the_event, SWT::MouseUp))
+        return
       end
-      if (!send_mouse_event(SWT::MouseDown, button[0], self.attr_display.attr_click_count, 0, false, the_event))
-        consume[0] = true
-      end
-      if (is_disposed)
-        return OS.attr_no_err
-      end
-      if ((self.attr_display.attr_click_count).equal?(2))
-        if (!send_mouse_event(SWT::MouseDoubleClick, button[0], self.attr_display.attr_click_count, 0, false, the_event))
-          consume[0] = true
-        end
-        if (is_disposed)
-          return OS.attr_no_err
-        end
-      end
-      if (!shell.is_disposed)
-        shell.set_active_control(self)
-      end
-      return consume[0] ? OS.attr_no_err : OS.attr_event_not_handled_err
+      super(id, sel, the_event)
     end
     
     typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
-    def k_event_mouse_dragged(next_handler, the_event, user_data)
-      if (is_enabled_modal)
-        if (self.attr_display.attr_dragging)
-          self.attr_display.attr_dragging = false
-          send_drag_event(self.attr_display.attr_drag_button, self.attr_display.attr_drag_state, self.attr_display.attr_drag_modifiers, self.attr_display.attr_drag_x, self.attr_display.attr_drag_y)
-          if (is_disposed)
-            return OS.attr_no_err
-          end
-        end
-        result = send_mouse_event(SWT::MouseMove, RJava.cast_to_short(0), 0, 0, false, the_event) ? OS.attr_event_not_handled_err : OS.attr_no_err
-        if (is_disposed)
-          return OS.attr_no_err
-        end
-        return result
+    # long
+    # long
+    # long
+    def mouse_dragged(id, sel, the_event)
+      if (!mouse_event(id, sel, the_event, SWT::MouseMove))
+        return
       end
-      return OS.attr_event_not_handled_err
+      super(id, sel, the_event)
     end
     
     typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
-    def k_event_mouse_moved(next_handler, the_event, user_data)
-      if (is_enabled_modal)
-        return send_mouse_event(SWT::MouseMove, RJava.cast_to_short(0), 0, 0, false, the_event) ? OS.attr_event_not_handled_err : OS.attr_no_err
+    # long
+    # long
+    # long
+    def right_mouse_down(id, sel, the_event)
+      if (!mouse_event(id, sel, the_event, SWT::MouseDown))
+        return
       end
-      return OS.attr_event_not_handled_err
+      super(id, sel, the_event)
     end
     
     typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
-    def k_event_mouse_up(next_handler, the_event, user_data)
-      button = Array.typed(::Java::Short).new(1) { 0 }
-      OS._get_event_parameter(the_event, OS.attr_k_event_param_mouse_button, OS.attr_type_mouse_button, nil, 2, nil, button)
-      return send_mouse_event(SWT::MouseUp, button[0], self.attr_display.attr_click_count, 0, false, the_event) ? OS.attr_event_not_handled_err : OS.attr_no_err
+    # long
+    # long
+    # long
+    def right_mouse_up(id, sel, the_event)
+      if (!mouse_event(id, sel, the_event, SWT::MouseUp))
+        return
+      end
+      super(id, sel, the_event)
     end
     
     typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
-    def k_event_mouse_wheel_moved(next_handler, the_event, user_data)
-      if (!((self.attr_state & IGNORE_WHEEL)).equal?(0))
-        return OS.attr_event_not_handled_err
+    # long
+    # long
+    # long
+    def right_mouse_dragged(id, sel, the_event)
+      if (!mouse_event(id, sel, the_event, SWT::MouseMove))
+        return
       end
-      # Bug in the Macintosh.  Mouse Wheel events are still processed when the
-      # window is not enabled due to a modal dialog.  The fix is to not let the
-      # default handlers run when window is modal disabled.
-      window = OS._get_control_owner(@handle)
-      if (OS._hiwindow_is_document_modal_target(window, nil))
-        return OS.attr_no_err
-      end
-      event = Array.typed(::Java::Int).new(1) { 0 }
-      OS._create_event(0, OS.attr_k_event_class_window, OS.attr_k_event_window_get_click_modality, 0.0, 0, event)
-      if (!(event[0]).equal?(0))
-        part = Array.typed(::Java::Short).new(1) { 0 }
-        OS._get_event_parameter(the_event, OS.attr_k_event_param_window_part_code, OS.attr_type_window_part_code, nil, 2, nil, part)
-        modifiers = Array.typed(::Java::Int).new(1) { 0 }
-        OS._get_event_parameter(the_event, OS.attr_k_event_param_key_modifiers, OS.attr_type_uint32, nil, modifiers.attr_length * 4, nil, modifiers)
-        OS._set_event_parameter(event[0], OS.attr_k_event_param_direct_object, OS.attr_type_window_ref, 4, Array.typed(::Java::Int).new([window]))
-        OS._set_event_parameter(event[0], OS.attr_k_event_param_window_part_code, OS.attr_type_window_part_code, 2, part)
-        OS._set_event_parameter(event[0], OS.attr_k_event_param_key_modifiers, OS.attr_type_uint32, 4, modifiers)
-        OS._set_event_parameter(event[0], OS.attr_k_event_param_event_ref, OS.attr_type_event_ref, 4, Array.typed(::Java::Int).new([the_event]))
-        OS._send_event_to_event_target(event[0], OS._get_application_event_target)
-        click_result = Array.typed(::Java::Int).new(1) { 0 }
-        OS._get_event_parameter(event[0], OS.attr_k_event_param_modal_click_result, OS.attr_type_modal_click_result, nil, 4, nil, click_result)
-        OS._release_event(event[0])
-        if (!((click_result[0] & OS.attr_k_himodal_click_is_modal)).equal?(0))
-          if (((click_result[0] & OS.attr_k_himodal_click_allow_event)).equal?(0))
-            return OS.attr_no_err
-          end
-        end
-      end
-      wheel_axis = Array.typed(::Java::Short).new(1) { 0 }
-      OS._get_event_parameter(the_event, OS.attr_k_event_param_mouse_wheel_axis, OS.attr_type_mouse_wheel_axis, nil, 2, nil, wheel_axis)
-      wheel_delta = Array.typed(::Java::Int).new(1) { 0 }
-      OS._get_event_parameter(the_event, OS.attr_k_event_param_mouse_wheel_delta, OS.attr_type_sint32, nil, 4, nil, wheel_delta)
-      shell = get_shell
-      control = self
-      while (!(control).nil?)
-        if (!control.send_mouse_event(SWT::MouseWheel, RJava.cast_to_short(0), wheel_delta[0], SWT::SCROLL_LINE, true, the_event))
-          break
-        end
-        if (control.send_mouse_wheel(wheel_axis[0], wheel_delta[0]))
-          break
-        end
-        if ((control).equal?(self))
-          # Feature in the Macintosh.  For some reason, the kEventMouseWheelMoved
-          # event is sent twice to each application handler with the same mouse wheel
-          # data.  The fix is to set an ignore flag before calling the next handler
-          # in the handler chain.
-          self.attr_state |= IGNORE_WHEEL
-          result = OS._call_next_event_handler(next_handler, the_event)
-          self.attr_state &= ~IGNORE_WHEEL
-          if ((result).equal?(OS.attr_no_err))
-            break
-          end
-        end
-        if ((control).equal?(shell))
-          break
-        end
-        control = control.attr_parent
-      end
-      return OS.attr_no_err
+      super(id, sel, the_event)
     end
     
     typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
-    def k_event_text_input_unicode_for_key_event(next_handler, the_event, user_data)
-      keyboard_event = Array.typed(::Java::Int).new(1) { 0 }
-      OS._get_event_parameter(the_event, OS.attr_k_event_param_text_input_send_keyboard_event, OS.attr_type_event_ref, nil, keyboard_event.attr_length * 4, nil, keyboard_event)
-      key_code = Array.typed(::Java::Int).new(1) { 0 }
-      OS._get_event_parameter(keyboard_event[0], OS.attr_k_event_param_key_code, OS.attr_type_uint32, nil, key_code.attr_length * 4, nil, key_code)
-      consume = Array.typed(::Java::Boolean).new(1) { false }
-      if (translate_traversal(key_code[0], keyboard_event[0], consume))
-        return OS.attr_no_err
+    # long
+    # long
+    # long
+    def other_mouse_down(id, sel, the_event)
+      if (!mouse_event(id, sel, the_event, SWT::MouseDown))
+        return
       end
-      if (is_disposed)
-        return OS.attr_no_err
-      end
-      if ((key_code[0]).equal?(114))
-        # Help
-        control = self
-        while (!(control).nil?)
-          if (control.hooks(SWT::Help))
-            control.post_event(SWT::Help)
-            break
-          end
-          control = control.attr_parent
-        end
-      end
-      result = k_event_unicode_key_pressed(next_handler, the_event, user_data)
-      if ((result).equal?(OS.attr_no_err) || consume[0])
-        return OS.attr_no_err
-      end
-      # Feature in the Macintosh.  If the focus target is changed
-      # before the default handler for the widget has run, the key
-      # goes to the new focus widget.  The fix is to explicitly
-      # send the event to the original focus widget and stop
-      # the chain of handlers.
-      if (!is_disposed)
-        focus_control = self.attr_display.get_focus_control
-        if (!(focus_control).equal?(self))
-          window = OS._get_control_owner(@handle)
-          new_window = 0
-          if (!(focus_control).nil?)
-            new_window = OS._get_control_owner(focus_control.attr_handle)
-          end
-          self.attr_display.attr_ignore_focus = true
-          if (!(window).equal?(new_window))
-            OS._set_user_focus_window(window)
-          end
-          OS._set_keyboard_focus(window, focus_handle, RJava.cast_to_short(focus_part))
-          self.attr_display.attr_ignore_focus = false
-          result = OS._call_next_event_handler(next_handler, the_event)
-          self.attr_display.attr_ignore_focus = true
-          if (!(window).equal?(new_window) && !(new_window).equal?(0))
-            OS._set_user_focus_window(new_window)
-          end
-          if ((window).equal?(new_window) && !(focus_control).nil?)
-            OS._set_keyboard_focus(window, focus_control.focus_handle, RJava.cast_to_short(focus_control.focus_part))
-          else
-            OS._clear_keyboard_focus(window)
-          end
-          self.attr_display.attr_ignore_focus = false
-          return OS.attr_no_err
-        end
-      end
-      return result
+      super(id, sel, the_event)
     end
     
     typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
-    def k_event_unicode_key_pressed(next_handler, the_event, user_data)
-      keyboard_event = Array.typed(::Java::Int).new(1) { 0 }
-      OS._get_event_parameter(the_event, OS.attr_k_event_param_text_input_send_keyboard_event, OS.attr_type_event_ref, nil, keyboard_event.attr_length * 4, nil, keyboard_event)
-      if (!send_key_event(SWT::KeyDown, keyboard_event[0]))
-        return OS.attr_no_err
+    # long
+    # long
+    # long
+    def other_mouse_up(id, sel, the_event)
+      if (!mouse_event(id, sel, the_event, SWT::MouseUp))
+        return
       end
-      return OS.attr_event_not_handled_err
+      super(id, sel, the_event)
     end
     
-    typesig { [::Java::Boolean, ::Java::Boolean] }
-    def mark_layout(changed, all)
-      # Do nothing
+    typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
+    # long
+    # long
+    # long
+    def other_mouse_dragged(id, sel, the_event)
+      if (!mouse_event(id, sel, the_event, SWT::MouseMove))
+        return
+      end
+      super(id, sel, the_event)
+    end
+    
+    typesig { [] }
+    def moved
+      send_event(SWT::Move)
     end
     
     typesig { [Control] }
@@ -2725,6 +2797,11 @@ module Org::Eclipse::Swt::Widgets
       set_size(compute_size(SWT::DEFAULT, SWT::DEFAULT, changed))
     end
     
+    typesig { [] }
+    def paint_view
+      return event_view
+    end
+    
     typesig { [SwtGC] }
     # Prints the receiver and all children.
     # 
@@ -2749,24 +2826,15 @@ module Org::Eclipse::Swt::Widgets
       if (gc.is_disposed)
         error(SWT::ERROR_INVALID_ARGUMENT)
       end
-      out_image = Array.typed(::Java::Int).new(1) { 0 }
-      out_frame = CGRect.new
-      if ((OS._hiview_create_offscreen_image(@handle, 0, out_frame, out_image)).equal?(OS.attr_no_err))
-        width = OS._cgimage_get_width(out_image[0])
-        height = OS._cgimage_get_height(out_image[0])
-        rect = CGRect.new
-        rect.attr_width = width
-        rect.attr_height = height
-        # TODO - does not draw the browser (cocoa widgets?)
-        OS._hiview_draw_cgimage(gc.attr_handle, rect, out_image[0])
-        OS._cgimage_release(out_image[0])
-      end
+      gc.attr_handle.save_graphics_state
+      NSGraphicsContext.set_current_context(gc.attr_handle)
+      transform_ = NSAffineTransform.transform
+      transform_.translate_xby(0, @view.bounds.attr_height)
+      transform_.scale_xby(1, -1)
+      transform_.concat
+      @view.display_rect_ignoring_opacity(@view.bounds, gc.attr_handle)
+      gc.attr_handle.restore_graphics_state
       return true
-    end
-    
-    typesig { [] }
-    def poll_track_event
-      return false
     end
     
     typesig { [] }
@@ -2789,13 +2857,13 @@ module Org::Eclipse::Swt::Widgets
     # @see SWT#DOUBLE_BUFFERED
     def redraw
       check_widget
-      redraw_widget(@handle, false)
+      @view.set_needs_display(true)
     end
     
     typesig { [::Java::Boolean] }
     def redraw(children)
       # checkWidget();
-      redraw_widget(@handle, children)
+      @view.set_needs_display(true)
     end
     
     typesig { [::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Boolean] }
@@ -2829,13 +2897,44 @@ module Org::Eclipse::Swt::Widgets
     # @see SWT#DOUBLE_BUFFERED
     def redraw(x, y, width, height, all)
       check_widget
-      redraw_widget(@handle, x, y, width, height, all)
+      rect = NSRect.new
+      rect.attr_x = x
+      rect.attr_y = y
+      rect.attr_width = width
+      rect.attr_height = height
+      @view.set_needs_display_in_rect(rect)
+    end
+    
+    typesig { [::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int] }
+    # long
+    # long
+    # long
+    # long
+    # long
+    def region_to_rects(message, rgn, r, path)
+      pt = NSPoint.new
+      rect = Array.typed(::Java::Short).new(4) { 0 }
+      if ((message).equal?(OS.attr_k_qdregion_to_rects_msg_parse))
+        OS.memmove(rect, r, rect.attr_length * 2)
+        pt.attr_x = rect[1]
+        pt.attr_y = rect[0]
+        OS.objc_msg_send(path, OS.attr_sel_move_to_point_, pt)
+        pt.attr_x = rect[3]
+        OS.objc_msg_send(path, OS.attr_sel_line_to_point_, pt)
+        pt.attr_x = rect[3]
+        pt.attr_y = rect[2]
+        OS.objc_msg_send(path, OS.attr_sel_line_to_point_, pt)
+        pt.attr_x = rect[1]
+        OS.objc_msg_send(path, OS.attr_sel_line_to_point_, pt)
+        OS.objc_msg_send(path, OS.attr_sel_close_path)
+      end
+      return 0
     end
     
     typesig { [] }
     def register
       super
-      self.attr_display.add_widget(@handle, self)
+      self.attr_display.add_widget(@view, self)
     end
     
     typesig { [::Java::Boolean] }
@@ -2867,33 +2966,50 @@ module Org::Eclipse::Swt::Widgets
     typesig { [] }
     def release_handle
       super
-      @handle = 0
+      if (!(@view).nil?)
+        @view.release
+      end
+      @view = nil
       @parent = nil
     end
     
     typesig { [] }
     def release_parent
-      set_visible(top_handle, false)
+      invalidate_visible_region
       @parent.remove_control(self)
     end
     
     typesig { [] }
     def release_widget
       super
+      if ((self.attr_display.attr_current_control).equal?(self))
+        self.attr_display.attr_current_control = nil
+        self.attr_display.timer_exec(-1, self.attr_display.attr_hover_timer)
+      end
+      if ((self.attr_display.attr_tracking_control).equal?(self))
+        self.attr_display.attr_tracking_control = nil
+      end
+      if ((self.attr_display.attr_tooltip_control).equal?(self))
+        self.attr_display.attr_tooltip_control = nil
+      end
       if (!(@menu).nil? && !@menu.is_disposed)
         @menu.dispose
       end
+      @menu = nil
       if (!(@visible_rgn).equal?(0))
         OS._dispose_rgn(@visible_rgn)
       end
       @visible_rgn = 0
-      @menu = nil
       @layout_data = nil
       if (!(@accessible).nil?)
         @accessible.internal_dispose__accessible
       end
       @accessible = nil
       @region = nil
+      if (!(@region_path).nil?)
+        @region_path.release
+      end
+      @region_path = nil
     end
     
     typesig { [ControlListener] }
@@ -3213,13 +3329,14 @@ module Org::Eclipse::Swt::Widgets
       if (!is_described_by_label)
         return
       end
-      # there will not be any
-      string = OS.attr_k_axtitle_uielement_attribute
-      buffer = CharArray.new(string.length)
-      string.get_chars(0, buffer.attr_length, buffer, 0)
-      string_ref = OS._cfstring_create_with_characters(OS.attr_k_cfallocator_default, buffer, buffer.attr_length)
-      OS._hiobject_set_auxiliary_accessibility_attribute(@handle, 0, string_ref, 0)
-      OS._cfrelease(string_ref)
+      accessible_element = focus_view
+      if (accessible_element.is_a?(NSControl))
+        view_as_control = accessible_element
+        if (!(view_as_control.cell).nil?)
+          accessible_element = view_as_control.cell
+        end
+      end
+      accessible_element.accessibility_set_override_value(accessible_element, OS::NSAccessibilityTitleUIElementAttribute)
     end
     
     typesig { [TraverseListener] }
@@ -3249,29 +3366,39 @@ module Org::Eclipse::Swt::Widgets
       self.attr_event_table.unhook(SWT::Traverse, listener)
     end
     
-    typesig { [::Java::Int] }
-    def reset_visible_region(control)
+    typesig { [] }
+    def reset_visible_region
       if (!(@visible_rgn).equal?(0))
         OS._dispose_rgn(@visible_rgn)
         @visible_rgn = 0
       end
-      if (!(@gcs).nil?)
-        visible_rgn = get_visible_region(@handle, true)
+      gcs = self.attr_display.attr_contexts
+      if (!(gcs).nil?)
+        # long
+        visible_rgn = 0
         i = 0
-        while i < @gcs.attr_length
-          data = @gcs[i]
+        while i < gcs.attr_length
+          data = gcs[i]
           if (!(data).nil?)
-            data.attr_update_clip = true
-            OS._copy_rgn(visible_rgn, data.attr_visible_rgn)
+            if ((data.attr_view).equal?(@view))
+              if ((visible_rgn).equal?(0))
+                visible_rgn = get_visible_region
+              end
+              data.attr_state &= ~VISIBLE_REGION
+              OS._copy_rgn(visible_rgn, data.attr_visible_rgn)
+            end
           end
           i += 1
         end
-        OS._dispose_rgn(visible_rgn)
+        if (!(visible_rgn).equal?(0))
+          OS._dispose_rgn(visible_rgn)
+        end
       end
-      runnable = get_data(RESET_VISIBLE_REGION)
-      if (!(runnable).nil? && runnable.is_a?(Runnable))
-        (runnable).run
-      end
+    end
+    
+    typesig { [] }
+    def resized
+      send_event(SWT::Resize)
     end
     
     typesig { [::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int] }
@@ -3285,49 +3412,22 @@ module Org::Eclipse::Swt::Widgets
       return event.attr_doit
     end
     
-    typesig { [::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int] }
-    def send_drag_event(button, chord, modifiers, x, y)
-      event = Event.new
-      case (button)
-      when 1
-        event.attr_button = 1
-      when 2
-        event.attr_button = 3
-      when 3
-        event.attr_button = 2
-      when 4
-        event.attr_button = 4
-      when 5
-        event.attr_button = 5
-      end
-      event.attr_x = x
-      event.attr_y = y
-      set_input_state(event, SWT::DragDetect, chord, modifiers)
-      post_event(SWT::DragDetect, event)
-      return event.attr_doit
-    end
-    
-    typesig { [::Java::Int, ::Java::Boolean] }
-    def send_focus_event(type, post)
+    typesig { [::Java::Int] }
+    def send_focus_event(type_)
       display = self.attr_display
       shell = get_shell
-      # Feature in the Macintosh.  GetKeyboardFocus() returns NULL during
-      # kEventControlSetFocusPart if the focus part is not kControlFocusNoPart.
-      # The fix is to remember the focus control and return it during
-      # kEventControlSetFocusPart.
+      display.attr_focus_event = type_
       display.attr_focus_control = self
-      display.attr_focus_event = type
-      if (post)
-        post_event(type)
-      else
-        send_event(type)
-      end
+      send_event(type_)
+      # widget could be disposed at this point
+      display.attr_focus_event = SWT::None
+      display.attr_focus_control = nil
       # It is possible that the shell may be
       # disposed at this point.  If this happens
       # don't send the activate and deactivate
       # events.
       if (!shell.is_disposed)
-        case (type)
+        case (type_)
         when SWT::FocusIn
           shell.set_active_control(self)
         when SWT::FocusOut
@@ -3336,219 +3436,97 @@ module Org::Eclipse::Swt::Widgets
           end
         end
       end
-      display.attr_focus_event = SWT::None
-      display.attr_focus_control = nil
     end
     
-    typesig { [::Java::Int, ::Java::Short, ::Java::Int, ::Java::Int, ::Java::Boolean, ::Java::Int] }
-    def send_mouse_event(type, button, count, detail, send, the_event)
-      pt = CGPoint.new
-      OS._get_event_parameter(the_event, OS.attr_k_event_param_window_mouse_location, OS.attr_type_hipoint, nil, CGPoint.attr_sizeof, nil, pt)
-      OS._hiview_convert_point(pt, 0, @handle)
-      x = RJava.cast_to_int(pt.attr_x)
-      y = RJava.cast_to_int(pt.attr_y)
-      self.attr_display.attr_last_x = x
-      self.attr_display.attr_last_y = y
-      chord = Array.typed(::Java::Int).new(1) { 0 }
-      OS._get_event_parameter(the_event, OS.attr_k_event_param_mouse_chord, OS.attr_type_uint32, nil, 4, nil, chord)
-      modifiers = Array.typed(::Java::Int).new(1) { 0 }
-      OS._get_event_parameter(the_event, OS.attr_k_event_param_key_modifiers, OS.attr_type_uint32, nil, 4, nil, modifiers)
-      return send_mouse_event(type, button, count, detail, send, chord[0], RJava.cast_to_short(x), RJava.cast_to_short(y), modifiers[0])
-    end
-    
-    typesig { [::Java::Int, ::Java::Short, ::Java::Int, ::Java::Boolean, ::Java::Int, ::Java::Short, ::Java::Short, ::Java::Int] }
-    def send_mouse_event(type, button, count, send, chord, x, y, modifiers)
-      return send_mouse_event(type, button, count, 0, send, chord, x, y, modifiers)
-    end
-    
-    typesig { [::Java::Int, ::Java::Short, ::Java::Int, ::Java::Int, ::Java::Boolean, ::Java::Int, ::Java::Short, ::Java::Short, ::Java::Int] }
-    def send_mouse_event(type, button, count, detail, send, chord, x, y, modifiers)
-      if (!hooks(type) && !filters(type))
-        return true
-      end
-      if (!((self.attr_state & SAFARI_EVENTS_FIX)).equal?(0))
-        case (type)
-        when SWT::MouseUp, SWT::MouseMove, SWT::MouseDoubleClick
-          return true
-        when SWT::MouseDown
-          if ((button).equal?(1))
-            return true
-          end
-        end
-      end
+    typesig { [NSEvent, ::Java::Int, ::Java::Boolean] }
+    def send_mouse_event(ns_event, type_, send)
+      shell = nil
       event = Event.new
-      case (button)
-      when 1
-        event.attr_button = 1
-      when 2
-        event.attr_button = 3
-      when 3
-        event.attr_button = 2
-      when 4
-        event.attr_button = 4
-      when 5
-        event.attr_button = 5
+      case (type_)
+      # FALL THROUGH
+      when SWT::MouseDown
+        shell = get_shell
+        # 64
+        button = RJava.cast_to_int(ns_event.button_number)
+        case (button)
+        when 0
+          event.attr_button = 1
+        when 1
+          event.attr_button = 3
+        when 2
+          event.attr_button = 2
+        when 3
+          event.attr_button = 4
+        when 4
+          event.attr_button = 5
+        end
+      when SWT::MouseUp, SWT::MouseDoubleClick, SWT::DragDetect
+        # 64
+        button = RJava.cast_to_int(ns_event.button_number)
+        case (button)
+        when 0
+          event.attr_button = 1
+          event.attr_button = 3
+          event.attr_button = 2
+          event.attr_button = 4
+          event.attr_button = 5
+        when 1
+          event.attr_button = 3
+          event.attr_button = 2
+          event.attr_button = 4
+          event.attr_button = 5
+        when 2
+          event.attr_button = 2
+          event.attr_button = 4
+          event.attr_button = 5
+        when 3
+          event.attr_button = 4
+          event.attr_button = 5
+        when 4
+          event.attr_button = 5
+        end
+      when SWT::MouseWheel
+        event.attr_detail = SWT::SCROLL_LINE
+        # double
+        delta = ns_event.delta_y
+        event.attr_count = delta > 0 ? Math.max(1, RJava.cast_to_int(delta)) : Math.min(-1, RJava.cast_to_int(delta))
       end
-      event.attr_x = x
-      event.attr_y = y
-      event.attr_count = count
-      event.attr_detail = detail
-      set_input_state(event, type, chord, modifiers)
+      if (!(event.attr_button).equal?(0))
+        # 64
+        event.attr_count = RJava.cast_to_int(ns_event.click_count)
+      end
+      window_point = nil
+      view = event_view
+      if ((ns_event).nil? || (ns_event.type).equal?(OS::NSMouseMoved))
+        window_ = view.window
+        window_point = window_.convert_screen_to_base(NSEvent.mouse_location)
+      else
+        window_point = ns_event.location_in_window
+      end
+      point = view.convert_point_from_view_(window_point, nil)
+      if (!view.is_flipped)
+        point.attr_y = view.bounds.attr_height - point.attr_y
+      end
+      event.attr_x = RJava.cast_to_int(point.attr_x)
+      event.attr_y = RJava.cast_to_int(point.attr_y)
+      set_input_state(event, ns_event, type_)
       if (send)
-        send_event(type, event)
+        send_event(type_, event)
         if (is_disposed)
           return false
         end
       else
-        post_event(type, event)
+        post_event(type_, event)
+      end
+      if (!(shell).nil?)
+        shell.set_active_control(self)
       end
       return event.attr_doit
     end
     
-    typesig { [::Java::Short, ::Java::Int] }
-    def send_mouse_wheel(wheel_axis, wheel_delta)
-      return false
-    end
-    
-    typesig { [] }
-    def send_track_events
-      display = self.attr_display
-      display.run_deferred_events
-      if (is_disposed)
-        return
-      end
-      events = false
-      if (display.attr_dragging)
-        display.attr_dragging = false
-        send_drag_event(display.attr_drag_button, display.attr_drag_state, display.attr_drag_modifiers, display.attr_drag_x, display.attr_drag_y)
-        if (is_disposed)
-          return
-        end
-        events = true
-      end
-      out_pt = Org::Eclipse::Swt::Internal::Carbon::Point.new
-      OS._get_global_mouse(out_pt)
-      rect = Rect.new
-      window = OS._get_control_owner(@handle)
-      new_x = 0
-      new_y = 0
-      pt = CGPoint.new
-      pt.attr_x = out_pt.attr_h
-      pt.attr_y = out_pt.attr_v
-      OS._hiview_convert_point(pt, 0, @handle)
-      new_x = RJava.cast_to_int(pt.attr_x)
-      new_y = RJava.cast_to_int(pt.attr_y)
-      OS._get_window_bounds(window, RJava.cast_to_short(OS.attr_k_window_structure_rgn), rect)
-      new_x -= rect.attr_left
-      new_y -= rect.attr_top
-      new_modifiers = OS._get_current_event_key_modifiers
-      new_state = OS._get_current_event_button_state
-      old_x = display.attr_last_x
-      old_y = display.attr_last_y
-      old_state = display.attr_last_state
-      old_modifiers = display.attr_last_modifiers
-      display.attr_last_x = new_x
-      display.attr_last_y = new_y
-      display.attr_last_modifiers = new_modifiers
-      display.attr_last_state = new_state
-      if (!(new_state).equal?(old_state))
-        button = 0
-        type = SWT::MouseDown
-        if (((old_state & 0x1)).equal?(0) && !((new_state & 0x1)).equal?(0))
-          button = 1
-        end
-        if (((old_state & 0x2)).equal?(0) && !((new_state & 0x2)).equal?(0))
-          button = 2
-        end
-        if (((old_state & 0x4)).equal?(0) && !((new_state & 0x4)).equal?(0))
-          button = 3
-        end
-        if (((old_state & 0x8)).equal?(0) && !((new_state & 0x8)).equal?(0))
-          button = 4
-        end
-        if (((old_state & 0x10)).equal?(0) && !((new_state & 0x10)).equal?(0))
-          button = 5
-        end
-        if ((button).equal?(0))
-          type = SWT::MouseUp
-          if (!((old_state & 0x1)).equal?(0) && ((new_state & 0x1)).equal?(0))
-            button = 1
-          end
-          if (!((old_state & 0x2)).equal?(0) && ((new_state & 0x2)).equal?(0))
-            button = 2
-          end
-          if (!((old_state & 0x4)).equal?(0) && ((new_state & 0x4)).equal?(0))
-            button = 3
-          end
-          if (!((old_state & 0x8)).equal?(0) && ((new_state & 0x8)).equal?(0))
-            button = 4
-          end
-          if (!((old_state & 0x10)).equal?(0) && ((new_state & 0x10)).equal?(0))
-            button = 5
-          end
-        end
-        if (!(button).equal?(0))
-          send_mouse_event(type, RJava.cast_to_short(button), 1, false, new_state, RJava.cast_to_short(new_x), RJava.cast_to_short(new_y), new_modifiers)
-          events = true
-        end
-      end
-      if (!(new_modifiers).equal?(old_modifiers) && !is_disposed)
-        key = 0
-        type = SWT::KeyDown
-        if (!((new_modifiers & OS.attr_alpha_lock)).equal?(0) && ((old_modifiers & OS.attr_alpha_lock)).equal?(0))
-          key = SWT::CAPS_LOCK
-        end
-        if (!((new_modifiers & OS.attr_shift_key)).equal?(0) && ((old_modifiers & OS.attr_shift_key)).equal?(0))
-          key = SWT::SHIFT
-        end
-        if (!((new_modifiers & OS.attr_control_key)).equal?(0) && ((old_modifiers & OS.attr_control_key)).equal?(0))
-          key = SWT::CONTROL
-        end
-        if (!((new_modifiers & OS.attr_cmd_key)).equal?(0) && ((old_modifiers & OS.attr_cmd_key)).equal?(0))
-          key = SWT::COMMAND
-        end
-        if (!((new_modifiers & OS.attr_option_key)).equal?(0) && ((old_modifiers & OS.attr_option_key)).equal?(0))
-          key = SWT::ALT
-        end
-        if ((key).equal?(0))
-          type = SWT::KeyUp
-          if (((new_modifiers & OS.attr_alpha_lock)).equal?(0) && !((old_modifiers & OS.attr_alpha_lock)).equal?(0))
-            key = SWT::CAPS_LOCK
-          end
-          if (((new_modifiers & OS.attr_shift_key)).equal?(0) && !((old_modifiers & OS.attr_shift_key)).equal?(0))
-            key = SWT::SHIFT
-          end
-          if (((new_modifiers & OS.attr_control_key)).equal?(0) && !((old_modifiers & OS.attr_control_key)).equal?(0))
-            key = SWT::CONTROL
-          end
-          if (((new_modifiers & OS.attr_cmd_key)).equal?(0) && !((old_modifiers & OS.attr_cmd_key)).equal?(0))
-            key = SWT::COMMAND
-          end
-          if (((new_modifiers & OS.attr_option_key)).equal?(0) && !((old_modifiers & OS.attr_option_key)).equal?(0))
-            key = SWT::ALT
-          end
-        end
-        if (!(key).equal?(0))
-          event = Event.new
-          event.attr_key_code = key
-          set_input_state(event, type, new_state, new_modifiers)
-          send_key_event(type, event)
-          events = true
-        end
-      end
-      if (!(new_x).equal?(old_x) || !(new_y).equal?(old_y) && !is_disposed)
-        display.attr_mouse_moved = true
-        send_mouse_event(SWT::MouseMove, RJava.cast_to_short(0), 0, false, new_state, RJava.cast_to_short(new_x), RJava.cast_to_short(new_y), new_modifiers)
-        events = true
-      end
-      if (events)
-        display.run_deferred_events
-      end
-    end
-    
     typesig { [] }
     def set_background
-      redraw_widget(@handle, false)
+      # redrawWidget (handle, false);
     end
     
     typesig { [Color] }
@@ -3575,13 +3553,14 @@ module Org::Eclipse::Swt::Widgets
           SWT.error(SWT::ERROR_INVALID_ARGUMENT)
         end
       end
+      # double
       background = !(color).nil? ? color.attr_handle : nil
       if (self.==(background, @background))
         return
       end
       @background = background
-      set_background(background)
-      redraw_widget(@handle, false)
+      update_background
+      redraw_widget(@view, true)
     end
     
     typesig { [Image] }
@@ -3614,27 +3593,16 @@ module Org::Eclipse::Swt::Widgets
         return
       end
       @background_image = image
-      redraw_widget(@handle, false)
+      update_background
+      redraw_widget(@view, false)
     end
     
-    typesig { [Array.typed(::Java::Float)] }
-    def set_background(color)
-      set_background(@handle, color)
+    typesig { [] }
+    def update_background
     end
     
-    typesig { [::Java::Int, Array.typed(::Java::Float)] }
-    def set_background(control, color)
-      font_style = ControlFontStyleRec.new
-      OS._get_control_data(control, RJava.cast_to_short(OS.attr_k_control_entire_control), OS.attr_k_control_font_style_tag, ControlFontStyleRec.attr_sizeof, font_style, nil)
-      if (!(color).nil?)
-        font_style.attr_back_color_red = RJava.cast_to_short((color[0] * 0xffff))
-        font_style.attr_back_color_green = RJava.cast_to_short((color[1] * 0xffff))
-        font_style.attr_back_color_blue = RJava.cast_to_short((color[2] * 0xffff))
-        font_style.attr_flags |= OS.attr_k_control_use_back_color_mask
-      else
-        font_style.attr_flags &= ~OS.attr_k_control_use_back_color_mask
-      end
-      OS._set_control_font_style(control, font_style)
+    typesig { [NSColor] }
+    def set_background(ns_color)
     end
     
     typesig { [::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int] }
@@ -3661,12 +3629,34 @@ module Org::Eclipse::Swt::Widgets
     # </ul>
     def set_bounds(x, y, width, height)
       check_widget
-      set_bounds(x, y, Math.max(0, width), Math.max(0, height), true, true, true)
+      set_bounds(x, y, Math.max(0, width), Math.max(0, height), true, true)
     end
     
-    typesig { [::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Boolean, ::Java::Boolean, ::Java::Boolean] }
-    def set_bounds(x, y, width, height, move, resize, events)
-      return set_bounds(top_handle, x, y, width, height, move, resize, events)
+    typesig { [::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Boolean, ::Java::Boolean] }
+    def set_bounds(x, y, width, height, move, resize)
+      top_view_ = top_view
+      if (move && resize)
+        rect = NSRect.new
+        rect.attr_x = x
+        rect.attr_y = y
+        rect.attr_width = width
+        rect.attr_height = height
+        top_view_.set_frame(rect)
+      else
+        if (move)
+          point = NSPoint.new
+          point.attr_x = x
+          point.attr_y = y
+          top_view_.set_frame_origin(point)
+        else
+          if (resize)
+            size = NSSize.new
+            size.attr_width = width
+            size.attr_height = height
+            top_view_.set_frame_size(size)
+          end
+        end
+      end
     end
     
     typesig { [Rectangle] }
@@ -3691,7 +3681,7 @@ module Org::Eclipse::Swt::Widgets
       if ((rect).nil?)
         error(SWT::ERROR_NULL_ARGUMENT)
       end
-      set_bounds(rect.attr_x, rect.attr_y, Math.max(0, rect.attr_width), Math.max(0, rect.attr_height), true, true, true)
+      set_bounds(rect.attr_x, rect.attr_y, Math.max(0, rect.attr_width), Math.max(0, rect.attr_height), true, true)
     end
     
     typesig { [::Java::Boolean] }
@@ -3708,6 +3698,22 @@ module Org::Eclipse::Swt::Widgets
     # </ul>
     def set_capture(capture)
       check_widget
+    end
+    
+    typesig { [::Java::Float, ::Java::Float] }
+    # double
+    # double
+    def set_clip_region(x, y)
+      if (!(@region_path).nil?)
+        transform_ = NSAffineTransform.transform
+        transform_.translate_xby(-x, -y)
+        @region_path.transform_using_affine_transform(transform_)
+        @region_path.add_clip
+        transform_.translate_xby(2 * x, 2 * y)
+        @region_path.transform_using_affine_transform(transform_)
+      end
+      frame = top_view.frame
+      @parent.set_clip_region(frame.attr_x + x, frame.attr_y + y)
     end
     
     typesig { [Cursor] }
@@ -3737,79 +3743,17 @@ module Org::Eclipse::Swt::Widgets
       if (!is_enabled)
         return
       end
-      where = Org::Eclipse::Swt::Internal::Carbon::Point.new
-      OS._get_global_mouse(where)
-      the_window = Array.typed(::Java::Int).new(1) { 0 }
-      if ((self.attr_display.attr_grab_control).equal?(self))
-        the_window[0] = OS._get_control_owner(@handle)
-      else
-        if (!(OS._find_window(where, the_window)).equal?(OS.attr_in_content))
-          return
-        end
-        if ((the_window[0]).equal?(0))
-          return
-        end
+      if (!@view.window.are_cursor_rects_enabled)
+        return
       end
-      rect = Rect.new
-      OS._get_window_bounds(the_window[0], RJava.cast_to_short(OS.attr_k_window_content_rgn), rect)
-      the_control = Array.typed(::Java::Int).new(1) { 0 }
-      if ((self.attr_display.attr_grab_control).equal?(self))
-        the_control[0] = @handle
-      else
-        in_point = CGPoint.new
-        in_point.attr_x = where.attr_h - rect.attr_left
-        in_point.attr_y = where.attr_v - rect.attr_top
-        the_root = Array.typed(::Java::Int).new(1) { 0 }
-        OS._get_root_control(the_window[0], the_root)
-        OS._hiview_get_subview_hit(the_root[0], in_point, true, the_control)
-        cursor_control = the_control[0]
-        while (!(the_control[0]).equal?(0) && !(the_control[0]).equal?(@handle))
-          OS._get_super_control(the_control[0], the_control)
-        end
-        if ((the_control[0]).equal?(0))
-          return
-        end
-        the_control[0] = cursor_control
-        begin
-          widget = self.attr_display.get_widget(the_control[0])
-          if (!(widget).nil?)
-            if (widget.is_a?(Control))
-              control = widget
-              if (control.is_enabled)
-                break
-              end
-            end
-          end
-          OS._get_super_control(the_control[0], the_control)
-        end while (!(the_control[0]).equal?(0))
-        if ((the_control[0]).equal?(0))
-          the_control[0] = the_root[0]
-          widget = self.attr_display.get_widget(the_control[0])
-          if (!(widget).nil? && widget.is_a?(Control))
-            control = widget
-            the_control[0] = control.attr_handle
-          end
-        end
-      end
-      pt = CGPoint.new
-      OS._hiview_convert_point(pt, the_control[0], 0)
-      where.attr_h -= RJava.cast_to_int(pt.attr_x)
-      where.attr_v -= RJava.cast_to_int(pt.attr_y)
-      OS._get_window_bounds(the_window[0], RJava.cast_to_short(OS.attr_k_window_structure_rgn), rect)
-      where.attr_h -= rect.attr_left
-      where.attr_v -= rect.attr_top
-      modifiers = OS._get_current_event_key_modifiers
-      cursor_was_set = Array.typed(::Java::Boolean).new(1) { false }
-      OS._handle_control_set_cursor(the_control[0], where, RJava.cast_to_short(modifiers), cursor_was_set)
-      if (!cursor_was_set[0])
-        OS._set_theme_cursor(OS.attr_k_theme_arrow_cursor)
-      end
+      self.attr_display.set_cursor(self.attr_display.attr_current_control)
     end
     
     typesig { [] }
     def set_default_font
       if (self.attr_display.attr_small_fonts)
-        set_font_style(default_font)
+        set_font(default_font.attr_handle)
+        set_small_size
       end
     end
     
@@ -3914,30 +3858,14 @@ module Org::Eclipse::Swt::Widgets
         end
       end
       @font = font
-      set_font_style(self.attr_display.attr_small_fonts ? (!(font).nil? ? font : default_font) : font)
-      redraw_widget(@handle, false)
+      set_font(!(font).nil? ? font.attr_handle : default_font.attr_handle)
     end
     
-    typesig { [Font] }
-    def set_font_style(font)
-      set_font_style(@handle, font)
-    end
-    
-    typesig { [::Java::Int, Font] }
-    def set_font_style(control, font)
-      font_style = ControlFontStyleRec.new
-      OS._get_control_data(control, RJava.cast_to_short(OS.attr_k_control_entire_control), OS.attr_k_control_font_style_tag, ControlFontStyleRec.attr_sizeof, font_style, nil)
-      font_style.attr_flags &= ~(OS.attr_k_control_use_font_mask | OS.attr_k_control_use_size_mask | OS.attr_k_control_use_face_mask | OS.attr_k_control_use_theme_font_idmask)
-      if (!(font).nil?)
-        family = Array.typed(::Java::Short).new(1) { 0 }
-        style = Array.typed(::Java::Short).new(1) { 0 }
-        OS._fmget_font_family_instance_from_font(font.attr_handle, family, style)
-        font_style.attr_flags |= OS.attr_k_control_use_font_mask | OS.attr_k_control_use_size_mask | OS.attr_k_control_use_face_mask
-        font_style.attr_font = family[0]
-        font_style.attr_style = RJava.cast_to_short((style[0] | font.attr_style))
-        font_style.attr_size = RJava.cast_to_short(font.attr_size)
+    typesig { [NSFont] }
+    def set_font(font)
+      if (@view.is_a?(NSControl))
+        (@view).set_font(font)
       end
-      OS._set_control_font_style(control, font_style)
     end
     
     typesig { [Color] }
@@ -3963,33 +3891,53 @@ module Org::Eclipse::Swt::Widgets
           SWT.error(SWT::ERROR_INVALID_ARGUMENT)
         end
       end
+      # double
       foreground = !(color).nil? ? color.attr_handle : nil
       if (self.==(foreground, @foreground))
         return
       end
       @foreground = foreground
       set_foreground(foreground)
-      redraw_widget(@handle, false)
+      redraw_widget(@view, false)
     end
     
     typesig { [Array.typed(::Java::Float)] }
+    # double
     def set_foreground(color)
-      set_foreground(@handle, color)
     end
     
-    typesig { [::Java::Int, Array.typed(::Java::Float)] }
-    def set_foreground(control, color)
-      font_style = ControlFontStyleRec.new
-      OS._get_control_data(control, RJava.cast_to_short(OS.attr_k_control_entire_control), OS.attr_k_control_font_style_tag, ControlFontStyleRec.attr_sizeof, font_style, nil)
-      if (!(color).nil?)
-        font_style.attr_fore_color_red = RJava.cast_to_short((color[0] * 0xffff))
-        font_style.attr_fore_color_green = RJava.cast_to_short((color[1] * 0xffff))
-        font_style.attr_fore_color_blue = RJava.cast_to_short((color[2] * 0xffff))
-        font_style.attr_flags |= OS.attr_k_control_use_fore_color_mask
-      else
-        font_style.attr_flags &= ~OS.attr_k_control_use_fore_color_mask
+    typesig { [::Java::Int, ::Java::Int, NSPoint] }
+    # long
+    # long
+    def set_frame_origin(id, sel, point)
+      top_view_ = top_view
+      if (!(top_view_.attr_id).equal?(id))
+        super(id, sel, point)
+        return
       end
-      OS._set_control_font_style(control, font_style)
+      frame_ = top_view_.frame
+      super(id, sel, point)
+      if (!(frame_.attr_x).equal?(point.attr_x) || !(frame_.attr_y).equal?(point.attr_y))
+        invalidate_visible_region
+        moved
+      end
+    end
+    
+    typesig { [::Java::Int, ::Java::Int, NSSize] }
+    # long
+    # long
+    def set_frame_size(id, sel, size)
+      top_view_ = top_view
+      if (!(top_view_.attr_id).equal?(id))
+        super(id, sel, size)
+        return
+      end
+      frame_ = top_view_.frame
+      super(id, sel, size)
+      if (!(frame_.attr_width).equal?(size.attr_width) || !(frame_.attr_height).equal?(size.attr_height))
+        invalidate_visible_region
+        resized
+      end
     end
     
     typesig { [Object] }
@@ -4022,7 +3970,7 @@ module Org::Eclipse::Swt::Widgets
     # </ul>
     def set_location(x, y)
       check_widget
-      set_bounds(x, y, 0, 0, true, false, true)
+      set_bounds(x, y, 0, 0, true, false)
     end
     
     typesig { [Point] }
@@ -4043,7 +3991,7 @@ module Org::Eclipse::Swt::Widgets
       if ((location).nil?)
         error(SWT::ERROR_NULL_ARGUMENT)
       end
-      set_bounds(location.attr_x, location.attr_y, 0, 0, true, false, true)
+      set_bounds(location.attr_x, location.attr_y, 0, 0, true, false)
     end
     
     typesig { [Menu] }
@@ -4125,10 +4073,11 @@ module Org::Eclipse::Swt::Widgets
         menus = old_shell.find_menus(self)
         fix_children(new_shell, old_shell, new_decorations, old_decorations, menus)
       end
-      top_handle_ = top_handle
-      OS._hiview_add_subview(parent.attr_handle, top_handle_)
-      OS._hiview_set_visible(top_handle_, ((self.attr_state & HIDDEN)).equal?(0))
-      OS._hiview_set_zorder(top_handle_, OS.attr_k_hiview_zorder_below, 0)
+      top_view_ = top_view
+      top_view_.retain
+      top_view_.remove_from_superview
+      parent.content_view.add_subview(top_view_, OS::NSWindowBelow, nil)
+      top_view_.release
       @parent = parent
       return true
     end
@@ -4159,14 +4108,12 @@ module Org::Eclipse::Swt::Widgets
       check_widget
       if (redraw)
         if (((@draw_count -= 1)).equal?(0))
-          OS._hiview_set_drawing_enabled(@handle, true)
-          invalidate_visible_region(@handle)
-          redraw_widget(@handle, true)
+          invalidate_visible_region
+          redraw_widget(top_view, true)
         end
       else
         if ((@draw_count).equal?(0))
-          OS._hiview_set_drawing_enabled(@handle, false)
-          invalidate_visible_region(@handle)
+          invalidate_visible_region
         end
         @draw_count += 1
       end
@@ -4194,13 +4141,11 @@ module Org::Eclipse::Swt::Widgets
         error(SWT::ERROR_INVALID_ARGUMENT)
       end
       @region = region
-      OS._hiview_region_changed(@handle, OS.attr_k_control_structure_meta_part)
-      redraw_widget(@handle, true)
-    end
-    
-    typesig { [::Java::Boolean] }
-    def set_radio_selection(value)
-      return false
+      if (!(@region_path).nil?)
+        @region_path.release
+      end
+      @region_path = get_path(region)
+      redraw_widget(@view, true)
     end
     
     typesig { [] }
@@ -4209,15 +4154,20 @@ module Org::Eclipse::Swt::Widgets
         return
       end
       children = @parent.__get_children
-      count = children.attr_length
-      if (count > 1)
+      count_ = children.attr_length
+      if (count_ > 1)
         # the receiver is the last item in the list, so its predecessor will
         # be the second-last item in the list
-        child = children[count - 2]
+        child = children[count_ - 2]
         if (!(child).equal?(self))
           child.add_relation(self)
         end
       end
+    end
+    
+    typesig { [::Java::Boolean] }
+    def set_radio_selection(value)
+      return false
     end
     
     typesig { [::Java::Int, ::Java::Int] }
@@ -4237,7 +4187,7 @@ module Org::Eclipse::Swt::Widgets
     # </ul>
     def set_size(width, height)
       check_widget
-      set_bounds(0, 0, Math.max(0, width), Math.max(0, height), false, true, true)
+      set_bounds(0, 0, Math.max(0, width), Math.max(0, height), false, true)
     end
     
     typesig { [Point] }
@@ -4262,12 +4212,17 @@ module Org::Eclipse::Swt::Widgets
       if ((size).nil?)
         error(SWT::ERROR_NULL_ARGUMENT)
       end
-      set_bounds(0, 0, Math.max(0, size.attr_x), Math.max(0, size.attr_y), false, true, true)
+      set_bounds(0, 0, Math.max(0, size.attr_x), Math.max(0, size.attr_y), false, true)
     end
     
     typesig { [] }
-    def set_tab_group_focus
-      return set_tab_item_focus
+    def set_small_size
+      if (@view.is_a?(NSControl))
+        cell_ = (@view).cell
+        if (!(cell_).nil?)
+          cell_.set_control_size(OS::NSSmallControlSize)
+        end
+      end
     end
     
     typesig { [] }
@@ -4280,7 +4235,16 @@ module Org::Eclipse::Swt::Widgets
     
     typesig { [String] }
     # Sets the receiver's tool tip text to the argument, which
-    # may be null indicating that no tool tip text should be shown.
+    # may be null indicating that the default tool tip for the
+    # control will be shown. For a control that has a default
+    # tool tip, such as the Tree control on Windows, setting
+    # the tool tip text to an empty string replaces the default,
+    # causing no tool tip text to be shown.
+    # <p>
+    # The mnemonic indicator (character '&amp;') is not displayed in a tool tip.
+    # To display a single '&amp;' in the tool tip, the character '&amp;' can be
+    # escaped by doubling it in the string.
+    # </p>
     # 
     # @param string the new tool tip text (or null)
     # 
@@ -4291,11 +4255,7 @@ module Org::Eclipse::Swt::Widgets
     def set_tool_tip_text(string)
       check_widget
       @tool_tip_text = string
-      if ((self.attr_display.attr_help_widget).equal?(self))
-        self.attr_display.attr_help_widget = nil
-        OS._hminstall_control_content_callback(@handle, 0)
-        OS._hminstall_control_content_callback(@handle, self.attr_display.attr_help_proc)
-      end
+      check_tool_tip(nil)
     end
     
     typesig { [::Java::Boolean] }
@@ -4349,7 +4309,8 @@ module Org::Eclipse::Swt::Widgets
           fix_focus_ = is_focus_ancestor(control)
         end
       end
-      set_visible(top_handle, visible)
+      top_view.set_hidden(!visible)
+      invalidate_visible_region
       if (!visible)
         # It is possible (but unlikely), that application
         # code could have disposed the widget in the show
@@ -4366,20 +4327,24 @@ module Org::Eclipse::Swt::Widgets
     
     typesig { [] }
     def set_zorder
-      top_handle_ = top_handle
-      parent_handle = @parent.attr_handle
-      OS._hiview_add_subview(parent_handle, top_handle_)
-      OS._hiview_set_zorder(top_handle_, OS.attr_k_hiview_zorder_below, 0)
-      inset = get_inset
-      rect = Rect.new
-      rect.attr_left = rect.attr_right = inset.attr_left
-      rect.attr_top = rect.attr_bottom = inset.attr_top
-      OS._set_control_bounds(top_handle_, rect)
+      top_view_ = top_view
+      @parent.content_view.add_subview(top_view_, OS::NSWindowBelow, nil)
+    end
+    
+    typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
+    # long
+    # long
+    # long
+    def should_delay_window_ordering_for_event(id, sel, the_event)
+      shell = get_shell
+      if (!((shell.attr_style & SWT::ON_TOP)).equal?(0))
+        return false
+      end
+      return super(id, sel, the_event)
     end
     
     typesig { [Control, ::Java::Boolean] }
     def set_zorder(sibling, above)
-      sibling_handle = (sibling).nil? ? 0 : sibling.top_handle
       index = 0
       sibling_index = 0
       old_next_index = -1
@@ -4415,7 +4380,12 @@ module Org::Eclipse::Swt::Widgets
           end
         end
       end
-      set_zorder(top_handle, sibling_handle, above)
+      other_view = (sibling).nil? ? nil : sibling.top_view
+      @view.retain
+      @view.remove_from_superview
+      @parent.content_view.add_subview(@view, above ? OS::NSWindowAbove : OS::NSWindowBelow, other_view)
+      @view.release
+      invalidate_visible_region
       # determine the receiver's new index in the parent
       if (!(sibling).nil?)
         if (above)
@@ -4472,43 +4442,17 @@ module Org::Eclipse::Swt::Widgets
       end
     end
     
-    typesig { [::Java::Int, ::Java::Int] }
-    def text_extent(ptr, w_hint)
-      if (!(ptr).equal?(0) && OS._cfstring_get_length(ptr) > 0)
-        w = Array.typed(::Java::Float).new(1) { 0.0 }
-        h = Array.typed(::Java::Float).new(1) { 0.0 }
-        info = HIThemeTextInfo.new
-        info.attr_state = OS.attr_k_theme_state_active
-        if (!(@font).nil?)
-          family = Array.typed(::Java::Short).new(1) { 0 }
-          style = Array.typed(::Java::Short).new(1) { 0 }
-          OS._fmget_font_family_instance_from_font(@font.attr_handle, family, style)
-          OS._text_font(family[0])
-          OS._text_face(RJava.cast_to_short((style[0] | @font.attr_style)))
-          OS._text_size(RJava.cast_to_short(@font.attr_size))
-          info.attr_font_id = RJava.cast_to_short(OS.attr_k_theme_current_port_font)
-        else
-          info.attr_font_id = RJava.cast_to_short(default_theme_font)
-        end
-        OS._hitheme_get_text_dimensions(ptr, (w_hint).equal?(SWT::DEFAULT) ? 0 : w_hint, info, w, h, nil)
-        return Point.new(RJava.cast_to_int(w[0]), RJava.cast_to_int(h[0]))
-      else
-        font = get_font
-        metrics = ATSFontMetrics.new
-        OS._atsfont_get_vertical_metrics(font.attr_handle, OS.attr_k_atsoption_flags_default, metrics)
-        OS._atsfont_get_horizontal_metrics(font.attr_handle, OS.attr_k_atsoption_flags_default, metrics)
-        return Point.new(0, RJava.cast_to_int((0.5 + (metrics.attr_ascent - metrics.attr_descent + metrics.attr_leading) * font.attr_size)))
-      end
+    typesig { [String] }
+    def text_extent(string)
+      attrib_str = create_string(string, nil, nil, 0, true, false)
+      size_ = attrib_str.size
+      attrib_str.release
+      return size_
     end
     
-    typesig { [Array.typed(::Java::Char), ::Java::Int] }
-    def text_extent(chars, w_hint)
-      ptr = OS._cfstring_create_with_characters(OS.attr_k_cfallocator_default, chars, chars.attr_length)
-      result = text_extent(ptr, w_hint)
-      if (!(ptr).equal?(0))
-        OS._cfrelease(ptr)
-      end
-      return result
+    typesig { [] }
+    def tooltip_text
+      return @tool_tip_text
     end
     
     typesig { [::Java::Int, ::Java::Int] }
@@ -4528,19 +4472,7 @@ module Org::Eclipse::Swt::Widgets
     # @since 2.1
     def to_control(x, y)
       check_widget
-      rect = Rect.new
-      window = OS._get_control_owner(@handle)
-      pt = CGPoint.new
-      OS._hiview_convert_point(pt, @handle, 0)
-      x -= RJava.cast_to_int(pt.attr_x)
-      y -= RJava.cast_to_int(pt.attr_y)
-      OS._get_window_bounds(window, RJava.cast_to_short(OS.attr_k_window_structure_rgn), rect)
-      x -= rect.attr_left
-      y -= rect.attr_top
-      inset = get_inset
-      x += inset.attr_left
-      y += inset.attr_top
-      return Point.new(x, y)
+      return self.attr_display.map(nil, self, x, y)
     end
     
     typesig { [Point] }
@@ -4583,19 +4515,7 @@ module Org::Eclipse::Swt::Widgets
     # @since 2.1
     def to_display(x, y)
       check_widget
-      rect = Rect.new
-      window = OS._get_control_owner(@handle)
-      pt = CGPoint.new
-      OS._hiview_convert_point(pt, @handle, 0)
-      x += RJava.cast_to_int(pt.attr_x)
-      y += RJava.cast_to_int(pt.attr_y)
-      OS._get_window_bounds(window, RJava.cast_to_short(OS.attr_k_window_structure_rgn), rect)
-      x += rect.attr_left
-      y += rect.attr_top
-      inset = get_inset
-      x -= inset.attr_left
-      y -= inset.attr_top
-      return Point.new(x, y)
+      return self.attr_display.map(self, nil, x, y)
     end
     
     typesig { [Point] }
@@ -4622,11 +4542,11 @@ module Org::Eclipse::Swt::Widgets
     end
     
     typesig { [] }
-    def top_handle
-      return @handle
+    def top_view
+      return @view
     end
     
-    typesig { [::Java::Int, ::Java::Int, Array.typed(::Java::Boolean)] }
+    typesig { [::Java::Int, NSEvent, Array.typed(::Java::Boolean)] }
     def translate_traversal(key, the_event, consume)
       detail = SWT::TRAVERSE_NONE
       code = traversal_code(key, the_event)
@@ -4647,9 +4567,9 @@ module Org::Eclipse::Swt::Widgets
         detail = SWT::TRAVERSE_RETURN
       when 48
         # Tab
-        modifiers = Array.typed(::Java::Int).new(1) { 0 }
-        OS._get_event_parameter(the_event, OS.attr_k_event_param_key_modifiers, OS.attr_type_uint32, nil, 4, nil, modifiers)
-        next_ = ((modifiers[0] & OS.attr_shift_key)).equal?(0)
+        # long
+        modifiers = the_event.modifier_flags
+        next_ = ((modifiers & OS::NSShiftKeyMask)).equal?(0)
         detail = next_ ? SWT::TRAVERSE_TAB_NEXT : SWT::TRAVERSE_TAB_PREVIOUS
       when 126, 123, 125, 124
         # Right arrow
@@ -4660,9 +4580,9 @@ module Org::Eclipse::Swt::Widgets
       when 116, 121
         # Page down
         all = true
-        modifiers = Array.typed(::Java::Int).new(1) { 0 }
-        OS._get_event_parameter(the_event, OS.attr_k_event_param_key_modifiers, OS.attr_type_uint32, nil, 4, nil, modifiers)
-        if (((modifiers[0] & OS.attr_control_key)).equal?(0))
+        # long
+        modifiers = the_event.modifier_flags
+        if (((modifiers & OS::NSControlKeyMask)).equal?(0))
           return false
         end
         # Page down
@@ -4693,9 +4613,9 @@ module Org::Eclipse::Swt::Widgets
       return false
     end
     
-    typesig { [::Java::Int, ::Java::Int] }
+    typesig { [::Java::Int, NSEvent] }
     def traversal_code(key, the_event)
-      code = SWT::TRAVERSE_RETURN | SWT::TRAVERSE_TAB_NEXT | SWT::TRAVERSE_TAB_PREVIOUS
+      code = SWT::TRAVERSE_RETURN | SWT::TRAVERSE_TAB_NEXT | SWT::TRAVERSE_TAB_PREVIOUS | SWT::TRAVERSE_PAGE_NEXT | SWT::TRAVERSE_PAGE_PREVIOUS
       shell = get_shell
       if (!(shell.attr_parent).nil?)
         code |= SWT::TRAVERSE_ESCAPE
@@ -4792,8 +4712,8 @@ module Org::Eclipse::Swt::Widgets
       start = index
       offset = (next_) ? 1 : -1
       while (!((index = ((index + offset + length_) % length_))).equal?(start))
-        control = list[index]
-        if (!control.is_disposed && control.set_tab_group_focus)
+        widget = list[index]
+        if (!widget.is_disposed && widget.set_tab_group_focus)
           return true
         end
       end
@@ -4875,15 +4795,11 @@ module Org::Eclipse::Swt::Widgets
     typesig { [::Java::Boolean] }
     def update(all)
       # checkWidget();
+      if (self.attr_display.attr_is_painting.contains_object(@view))
+        return
+      end
       # TODO - not all
-      if (self.attr_display.attr_in_paint)
-        return
-      end
-      OS._hiview_render(@handle)
-      if (is_disposed)
-        return
-      end
-      OS._hiwindow_flush(OS._get_control_owner(@handle))
+      @view.display_if_needed
     end
     
     typesig { [] }
@@ -4892,6 +4808,45 @@ module Org::Eclipse::Swt::Widgets
       check_background
       if (!(old_state).equal?((self.attr_state & PARENT_BACKGROUND)))
         set_background
+      end
+    end
+    
+    typesig { [::Java::Int, ::Java::Int] }
+    # long
+    # long
+    def reset_cursor_rects(id, sel)
+      if (is_enabled)
+        call_super(id, sel)
+      end
+    end
+    
+    typesig { [::Java::Int, ::Java::Int] }
+    # long
+    # long
+    def update_tracking_areas(id, sel)
+      if (is_enabled)
+        call_super(id, sel)
+      end
+    end
+    
+    typesig { [::Java::Boolean] }
+    def update_cursor_rects(enabled)
+      update_cursor_rects(enabled, @view)
+    end
+    
+    typesig { [::Java::Boolean, NSView] }
+    def update_cursor_rects(enabled, widget)
+      if (enabled)
+        widget.reset_cursor_rects
+        widget.update_tracking_areas
+      else
+        widget.discard_cursor_rects
+        areas = widget.tracking_areas
+        i = 0
+        while i < areas.count
+          widget.remove_tracking_area(NSTrackingArea.new(areas.object_at_index(i)))
+          i += 1
+        end
       end
     end
     

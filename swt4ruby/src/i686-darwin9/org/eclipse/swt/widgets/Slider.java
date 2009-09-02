@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2008 IBM Corporation and others.
+ * Copyright (c) 2000, 2009 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -11,7 +11,7 @@
 package org.eclipse.swt.widgets;
 
  
-import org.eclipse.swt.internal.carbon.OS;
+import org.eclipse.swt.internal.cocoa.*;
 
 import org.eclipse.swt.*;
 import org.eclipse.swt.events.*;
@@ -67,9 +67,11 @@ import org.eclipse.swt.graphics.*;
  * @see <a href="http://www.eclipse.org/swt/snippets/#slider">Slider snippets</a>
  * @see <a href="http://www.eclipse.org/swt/examples.php">SWT Example: ControlExample</a>
  * @see <a href="http://www.eclipse.org/swt/">Sample code and further information</a>
+ * @noextend This class is not intended to be subclassed by clients.
  */
 public class Slider extends Control {
 	boolean dragging;
+	int minimum, maximum, thumb;
 	int increment = 1;
 	int pageIncrement = 10;
 
@@ -150,50 +152,14 @@ static int checkStyle (int style) {
 	return checkBits (style, SWT.HORIZONTAL, SWT.VERTICAL, 0, 0, 0, 0);
 }
 
-int actionProc (int theControl, int partCode) {
-	int result = super.actionProc (theControl, partCode);
-	if (result == OS.noErr) return result;
-	Event event = new Event ();
-	int value = OS.GetControl32BitValue (handle);
-    switch (partCode) {
-	    case OS.kControlUpButtonPart:
-			value -= increment;
-	        event.detail = SWT.ARROW_UP;
-	        break;
-	    case OS.kControlPageUpPart:
-			value -= pageIncrement;
-	        event.detail = SWT.PAGE_UP;
-	        break;
-	    case OS.kControlPageDownPart:
-			value += pageIncrement;
-	        event.detail = SWT.PAGE_DOWN;
-	        break;
-	    case OS.kControlDownButtonPart:
-			value += increment;
-	        event.detail = SWT.ARROW_DOWN;
-	        break;
-	    case OS.kControlIndicatorPart:
-	    		dragging = true;
-			event.detail = SWT.DRAG;
-	        break;
-		default:
-			return result;
-	}
-	OS.SetControl32BitValue (handle, value);
-	sendEvent (SWT.Selection, event);
-	return result;
-}
-
 public Point computeSize (int wHint, int hHint, boolean changed) {
 	checkWidget();
-	int [] outMetric = new int [1];
-	OS.GetThemeMetric (OS.kThemeMetricScrollBarWidth, outMetric);
 	int width = 0, height = 0;
 	if ((style & SWT.HORIZONTAL) != 0) {
-		height = outMetric [0];
+		height = (int)NSScroller.scrollerWidthForControlSize(((NSScroller)view).controlSize());
 		width = height * 10;
 	} else {
-		width = outMetric [0];
+		width = (int)NSScroller.scrollerWidthForControlSize(((NSScroller)view).controlSize());
 		height = width * 10;
 	}
 	if (wHint != SWT.DEFAULT) width = wHint;
@@ -202,16 +168,29 @@ public Point computeSize (int wHint, int hHint, boolean changed) {
 }
 
 void createHandle () {
-	int actionProc = display.actionProc;
-	int [] outControl = new int [1];
-	int window = OS.GetControlOwner (parent.handle);
-	OS.CreateScrollBarControl (window, null, 0, 0, 90, 10, true, actionProc, outControl);
-	if (outControl [0] == 0) error (SWT.ERROR_NO_HANDLES);
-	handle = outControl [0];
+	NSScroller widget = (NSScroller)new SWTScroller().alloc();
+	NSRect rect = new NSRect();
+	if ((style & SWT.HORIZONTAL) != 0) {
+		rect.width = 1;
+	} else {
+		rect.height = 1;
+	}
+	widget.initWithFrame(rect);
+	widget.setEnabled(true);
+	widget.setTarget(widget);
+	widget.setAction(OS.sel_sendSelection);
+	view = widget;
+	updateBar(0, minimum, maximum, thumb);
 }
 
-void drawBackground (int control, int context) {
-	fillBackground (control, context, null);
+void createWidget () {
+	maximum = 100;
+	thumb = 10;
+	super.createWidget();
+}
+
+NSFont defaultNSFont () {
+	return display.scrollerFont;
 }
 
 /**
@@ -243,9 +222,7 @@ public int getIncrement () {
  */
 public int getMaximum () {
 	checkWidget();
-	int maximum = OS.GetControl32BitMaximum (handle);
-	int viewSize = OS.GetControlViewSize (handle);
-    return maximum + viewSize;
+	return maximum; 
 }
 
 /**
@@ -260,7 +237,7 @@ public int getMaximum () {
  */
 public int getMinimum () {
 	checkWidget();
-    return OS.GetControl32BitMinimum (handle);
+    return minimum;
 }
 
 /**
@@ -292,7 +269,9 @@ public int getPageIncrement () {
  */
 public int getSelection () {
 	checkWidget();
-    return OS.GetControl32BitValue (handle);
+	NSScroller widget = (NSScroller)view;
+	double value = widget.doubleValue();
+    return (int)(0.5f + ((maximum - thumb - minimum) * value + minimum));
 }
 
 /**
@@ -308,20 +287,7 @@ public int getSelection () {
  */
 public int getThumb () {
 	checkWidget();
-    return OS.GetControlViewSize (handle);
-}
-
-int kEventMouseDown (int nextHandler, int theEvent, int userData) {
-	int status = super.kEventMouseDown (nextHandler, theEvent, userData);
-	if (status == OS.noErr) return status;
-	dragging = false;
-	status = OS.CallNextEventHandler (nextHandler, theEvent);
-	if (dragging) {
-		Event event = new Event ();
-		sendEvent (SWT.Selection, event);
-	}
-	dragging = false;
-	return status;
+    return thumb;
 }
 
 /**
@@ -347,6 +313,37 @@ public void removeSelectionListener(SelectionListener listener) {
 	if (eventTable == null) return;
 	eventTable.unhook(SWT.Selection, listener);
 	eventTable.unhook(SWT.DefaultSelection,listener);
+}
+
+void sendSelection () {
+	Event event = new Event();
+	int hitPart = (int)/*64*/((NSScroller)view).hitPart();
+	int value = getSelection ();
+	switch (hitPart) {
+	    case OS.NSScrollerDecrementLine:
+	        event.detail = SWT.ARROW_UP;
+	        value -= increment;
+	        break;
+	    case OS.NSScrollerDecrementPage:
+	        value -= pageIncrement;
+	        event.detail = SWT.PAGE_UP;
+	        break;
+	    case OS.NSScrollerIncrementLine:
+	        value += increment;
+	        event.detail = SWT.ARROW_DOWN;
+	        break;
+	    case OS.NSScrollerIncrementPage:
+	        value += pageIncrement;
+	        event.detail = SWT.PAGE_DOWN;
+	        break;
+	    case OS.NSScrollerKnob:
+			event.detail = SWT.DRAG;
+	        break;
+	}
+	if (event.detail != SWT.DRAG) {
+		setSelection(value);
+	}
+	sendEvent(SWT.Selection, event);
 }
 
 /**
@@ -384,14 +381,13 @@ public void setIncrement (int value) {
 public void setMaximum (int value) {
 	checkWidget();
 	if (value < 0) return;
-	int minimum = OS.GetControl32BitMinimum (handle);
 	if (value <= minimum) return;
-	int viewSize = OS.GetControlViewSize (handle);
-	if (value - minimum < viewSize) {
-		viewSize = value - minimum;
-		OS.SetControlViewSize (handle, viewSize);
+	if (value - minimum < thumb) {
+		thumb = value - minimum;
 	}
-	OS.SetControl32BitMaximum (handle, value - viewSize);
+	int selection = Math.max(minimum, Math.min (getSelection (), value - thumb));
+	this.maximum = value;
+	updateBar(selection, minimum, value, thumb);
 }
 
 /**
@@ -410,15 +406,13 @@ public void setMaximum (int value) {
 public void setMinimum (int value) {
 	checkWidget();
 	if (value < 0) return;
-	int viewSize = OS.GetControlViewSize (handle);
-	int maximum = OS.GetControl32BitMaximum (handle) + viewSize;
 	if (value >= maximum) return;
-	if (maximum - value < viewSize) {
-		viewSize = maximum - value;
-		OS.SetControl32BitMaximum (handle, maximum - viewSize);
-		OS.SetControlViewSize (handle, viewSize);
+	if (maximum - value < thumb) {
+		thumb = maximum - value;
 	}
-	OS.SetControl32BitMinimum (handle, value);
+	int selection = Math.min(maximum - thumb, Math.max (getSelection (), value));
+	this.minimum = value;
+	updateBar(selection, value, maximum, thumb);
 }
 
 /**
@@ -454,7 +448,21 @@ public void setPageIncrement (int value) {
  */
 public void setSelection (int value) {
 	checkWidget();
-	OS.SetControl32BitValue (handle, value);
+	updateBar(value, minimum, maximum, thumb);
+}
+
+void setSmallSize () {
+	/* This code is intentionally comment */
+//	((NSScroller)view).setControlSize (OS.NSSmallControlSize);
+}
+
+void updateBar (int selection, int minimum, int maximum, int thumb) {
+	NSScroller widget = (NSScroller)view;
+	selection = Math.max (minimum, Math.min (maximum - thumb, selection));
+	int range = maximum - thumb - minimum;
+	float fraction = range <= 0 ? 1 : (float)(selection - minimum) / range;
+	float knob = range <= 0 ? 1 : (float)thumb / (maximum - minimum);
+	widget.setFloatValue (fraction, knob);
 }
 
 /**
@@ -474,12 +482,9 @@ public void setSelection (int value) {
 public void setThumb (int value) {
 	checkWidget();
 	if (value < 1) return;
-	int minimum = OS.GetControl32BitMinimum (handle);
-	int viewSize = OS.GetControlViewSize (handle);
-	int maximum = OS.GetControl32BitMaximum (handle) + viewSize;
 	value = Math.min (value, maximum - minimum);
-	OS.SetControl32BitMaximum (handle, maximum - value);
-	OS.SetControlViewSize (handle, value);
+	updateBar(getSelection(), minimum, maximum, value);
+	this.thumb = value;
 }
 
 /**
@@ -511,12 +516,12 @@ public void setValues (int selection, int minimum, int maximum, int thumb, int i
 	if (increment < 1) return;
 	if (pageIncrement < 1) return;
 	thumb = Math.min (thumb, maximum - minimum);
-	OS.SetControl32BitMinimum (handle, minimum);
-	OS.SetControl32BitMaximum (handle, maximum - thumb);
-	OS.SetControlViewSize (handle, thumb);
-	OS.SetControl32BitValue (handle, selection);
+	this.thumb = thumb;
+	this.maximum = maximum;
+	this.minimum = minimum;
 	this.increment = increment;
 	this.pageIncrement = pageIncrement;
+	updateBar(selection, minimum, maximum, thumb);
 }
 
 }

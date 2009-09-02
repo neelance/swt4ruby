@@ -1,6 +1,6 @@
 require "rjava"
 
-# Copyright (c) 2000, 2008 IBM Corporation and others.
+# Copyright (c) 2000, 2009 IBM Corporation and others.
 # All rights reserved. This program and the accompanying materials
 # are made available under the terms of the Eclipse Public License v1.0
 # which accompanies this distribution, and is available at
@@ -13,8 +13,7 @@ module Org::Eclipse::Swt::Widgets
     class_module.module_eval {
       include ::Java::Lang
       include ::Org::Eclipse::Swt::Widgets
-      include_const ::Org::Eclipse::Swt::Internal::Carbon, :DataBrowserListViewHeaderDesc
-      include_const ::Org::Eclipse::Swt::Internal::Carbon, :OS
+      include ::Org::Eclipse::Swt::Internal::Cocoa
       include ::Org::Eclipse::Swt
       include ::Org::Eclipse::Swt::Graphics
       include ::Org::Eclipse::Swt::Events
@@ -38,8 +37,15 @@ module Org::Eclipse::Swt::Widgets
   # @see <a href="http://www.eclipse.org/swt/">Sample code and further information</a>
   # 
   # @since 3.1
+  # @noextend This class is not intended to be subclassed by clients.
   class TreeColumn < TreeColumnImports.const_get :Item
     include_class_members TreeColumnImports
+    
+    attr_accessor :ns_column
+    alias_method :attr_ns_column, :ns_column
+    undef_method :ns_column
+    alias_method :attr_ns_column=, :ns_column=
+    undef_method :ns_column=
     
     attr_accessor :parent
     alias_method :attr_parent, :parent
@@ -47,41 +53,28 @@ module Org::Eclipse::Swt::Widgets
     alias_method :attr_parent=, :parent=
     undef_method :parent=
     
-    attr_accessor :id
-    alias_method :attr_id, :id
-    undef_method :id
-    alias_method :attr_id=, :id=
-    undef_method :id=
-    
-    attr_accessor :last_width
-    alias_method :attr_last_width, :last_width
-    undef_method :last_width
-    alias_method :attr_last_width=, :last_width=
-    undef_method :last_width=
-    
-    attr_accessor :last_position
-    alias_method :attr_last_position, :last_position
-    undef_method :last_position
-    alias_method :attr_last_position=, :last_position=
-    undef_method :last_position=
-    
-    attr_accessor :icon_ref
-    alias_method :attr_icon_ref, :icon_ref
-    undef_method :icon_ref
-    alias_method :attr_icon_ref=, :icon_ref=
-    undef_method :icon_ref=
-    
-    attr_accessor :resizable
-    alias_method :attr_resizable, :resizable
-    undef_method :resizable
-    alias_method :attr_resizable=, :resizable=
-    undef_method :resizable=
-    
     attr_accessor :tool_tip_text
     alias_method :attr_tool_tip_text, :tool_tip_text
     undef_method :tool_tip_text
     alias_method :attr_tool_tip_text=, :tool_tip_text=
     undef_method :tool_tip_text=
+    
+    attr_accessor :display_text
+    alias_method :attr_display_text, :display_text
+    undef_method :display_text
+    alias_method :attr_display_text=, :display_text=
+    undef_method :display_text=
+    
+    attr_accessor :movable
+    alias_method :attr_movable, :movable
+    undef_method :movable
+    alias_method :attr_movable=, :movable=
+    undef_method :movable=
+    
+    class_module.module_eval {
+      const_set_lazy(:MARGIN) { 2 }
+      const_attr_reader  :MARGIN
+    }
     
     typesig { [Tree, ::Java::Int] }
     # Constructs a new instance of this class given its parent
@@ -115,17 +108,14 @@ module Org::Eclipse::Swt::Widgets
     # @see Widget#checkSubclass
     # @see Widget#getStyle
     def initialize(parent, style)
+      @ns_column = nil
       @parent = nil
-      @id = 0
-      @last_width = 0
-      @last_position = 0
-      @icon_ref = 0
-      @resizable = false
       @tool_tip_text = nil
+      @display_text = nil
+      @movable = false
       super(parent, check_style(style))
-      @resizable = true
       @parent = parent
-      parent.create_item(self, parent.get_column_count)
+      parent.create_item(self, parent.attr_column_count)
     end
     
     typesig { [Tree, ::Java::Int, ::Java::Int] }
@@ -165,15 +155,12 @@ module Org::Eclipse::Swt::Widgets
     # @see Widget#checkSubclass
     # @see Widget#getStyle
     def initialize(parent, style, index)
+      @ns_column = nil
       @parent = nil
-      @id = 0
-      @last_width = 0
-      @last_position = 0
-      @icon_ref = 0
-      @resizable = false
       @tool_tip_text = nil
+      @display_text = nil
+      @movable = false
       super(parent, check_style(style))
-      @resizable = true
       @parent = parent
       parent.create_item(self, index)
     end
@@ -254,9 +241,109 @@ module Org::Eclipse::Swt::Widgets
     end
     
     typesig { [] }
+    def deregister
+      super
+      self.attr_display.remove_widget(@ns_column.header_cell)
+    end
+    
+    typesig { [] }
     def destroy_widget
       @parent.destroy_item(self)
       release_handle
+    end
+    
+    typesig { [::Java::Int, ::Java::Int, NSRect, ::Java::Int] }
+    # long
+    # long
+    # long
+    def draw_interior_with_frame_in_view(id, sel, cell_rect, view)
+      # Feature in Cocoa.  When the last column in a tree does not reach the
+      # rightmost edge of the tree view, the cell that draws the rightmost-
+      # column's header is also invoked to draw the header space between its
+      # right edge and the tree's right edge.  If this case is detected then
+      # nothing should be drawn.
+      column_index = @parent.index_of(@ns_column)
+      header_rect = @parent.attr_header_view.header_rect_of_column(column_index)
+      if (!(header_rect.attr_x).equal?(cell_rect.attr_x) || !(header_rect.attr_width).equal?(cell_rect.attr_width))
+        return
+      end
+      context = NSGraphicsContext.current_context
+      context.save_graphics_state
+      content_width = 0
+      string_size = nil
+      image_size = nil
+      attr_string = nil
+      header_cell_ = @ns_column.header_cell
+      if (!(@display_text).nil?)
+        font_ = Font.cocoa_new(self.attr_display, header_cell_.font)
+        attr_string = @parent.create_string(@display_text, font_, nil, SWT::LEFT, ((@parent.attr_state & DISABLED)).equal?(0), false)
+        string_size = attr_string.size
+        content_width += Math.ceil(string_size.attr_width)
+        if (!(self.attr_image).nil?)
+          content_width += MARGIN
+        end
+        # space between image and text
+      end
+      if (!(self.attr_image).nil?)
+        image_size = self.attr_image.attr_handle.size
+        content_width += Math.ceil(image_size.attr_width)
+      end
+      if ((@parent.attr_sort_column).equal?(self) && !(@parent.attr_sort_direction).equal?(SWT::NONE))
+        ascending = (@parent.attr_sort_direction).equal?(SWT::UP)
+        header_cell_.draw_sort_indicator_with_frame(cell_rect, NSView.new(view), ascending, 0)
+        # remove the arrow's space from the available drawing width
+        sort_rect = header_cell_.sort_indicator_rect_for_bounds(cell_rect)
+        cell_rect.attr_width = Math.max(0, sort_rect.attr_x - cell_rect.attr_x)
+      end
+      draw_x = 0
+      if (!((self.attr_style & SWT::CENTER)).equal?(0))
+        draw_x = RJava.cast_to_int((cell_rect.attr_x + Math.max(MARGIN, ((cell_rect.attr_width - content_width) / 2))))
+      else
+        if (!((self.attr_style & SWT::RIGHT)).equal?(0))
+          draw_x = RJava.cast_to_int((cell_rect.attr_x + Math.max(MARGIN, cell_rect.attr_width - content_width - MARGIN)))
+        else
+          draw_x = RJava.cast_to_int(cell_rect.attr_x) + MARGIN
+        end
+      end
+      if (!(self.attr_image).nil?)
+        dest_rect = NSRect.new
+        dest_rect.attr_x = draw_x
+        dest_rect.attr_y = cell_rect.attr_y
+        dest_rect.attr_width = Math.min(image_size.attr_width, cell_rect.attr_width - 2 * MARGIN)
+        dest_rect.attr_height = Math.min(image_size.attr_height, cell_rect.attr_height)
+        is_flipped = NSView.new(view).is_flipped
+        if (is_flipped)
+          context.save_graphics_state
+          transform_ = NSAffineTransform.transform
+          transform_.scale_xby(1, -1)
+          transform_.translate_xby(0, -(dest_rect.attr_height + 2 * dest_rect.attr_y))
+          transform_.concat
+        end
+        source_rect = NSRect.new
+        source_rect.attr_width = dest_rect.attr_width
+        source_rect.attr_height = dest_rect.attr_height
+        self.attr_image.attr_handle.draw_in_rect(dest_rect, source_rect, OS::NSCompositeSourceOver, 1)
+        if (is_flipped)
+          context.restore_graphics_state
+        end
+        draw_x += dest_rect.attr_width
+      end
+      if (!(@display_text).nil? && @display_text.length > 0)
+        if (!(self.attr_image).nil?)
+          draw_x += MARGIN
+        end
+        # space between image and text
+        dest_rect = NSRect.new
+        dest_rect.attr_x = draw_x
+        dest_rect.attr_y = cell_rect.attr_y
+        dest_rect.attr_width = Math.min(string_size.attr_width, cell_rect.attr_x + cell_rect.attr_width - MARGIN - draw_x)
+        dest_rect.attr_height = Math.min(string_size.attr_height, cell_rect.attr_height)
+        attr_string.draw_in_rect(dest_rect)
+      end
+      if (!(attr_string).nil?)
+        attr_string.release
+      end
+      context.restore_graphics_state
     end
     
     typesig { [] }
@@ -324,9 +411,7 @@ module Org::Eclipse::Swt::Widgets
     # @since 3.2
     def get_moveable
       check_widget
-      flags = Array.typed(::Java::Int).new(1) { 0 }
-      OS._get_data_browser_property_flags(@parent.attr_handle, @id, flags)
-      return !((flags[0] & OS.attr_k_data_browser_list_view_movable_column)).equal?(0)
+      return @movable
     end
     
     typesig { [] }
@@ -342,7 +427,7 @@ module Org::Eclipse::Swt::Widgets
     # </ul>
     def get_resizable
       check_widget
-      return @resizable
+      return !(@ns_column.resizing_mask).equal?(OS::NSTableColumnNoResizing)
     end
     
     typesig { [] }
@@ -373,9 +458,12 @@ module Org::Eclipse::Swt::Widgets
     # </ul>
     def get_width
       check_widget
-      width = Array.typed(::Java::Short).new(1) { 0 }
-      OS._get_data_browser_table_view_named_column_width(@parent.attr_handle, @id, width)
-      return Math.max(0, width[0] + @parent.get_left_disclosure_inset(@id))
+      width_ = RJava.cast_to_int(@ns_column.width)
+      # TODO how to differentiate 0 and 1 cases?
+      if (width_ > 0)
+        width_ += Tree::CELL_GAP
+      end
+      return width_
     end
     
     typesig { [] }
@@ -389,45 +477,48 @@ module Org::Eclipse::Swt::Widgets
     # </ul>
     def pack
       check_widget
+      width_ = 0
+      # compute header width
+      if (!(@display_text).nil?)
+        header_cell_ = @ns_column.header_cell
+        font_ = Font.cocoa_new(self.attr_display, header_cell_.font)
+        attr_string = @parent.create_string(@display_text, font_, nil, 0, true, false)
+        string_size = attr_string.size
+        attr_string.release
+        width_ += Math.ceil(string_size.attr_width)
+        if (!(self.attr_image).nil?)
+          width_ += MARGIN
+        end
+        # space between image and text
+      end
+      if (!(self.attr_image).nil?)
+        image_size = self.attr_image.attr_handle.size
+        width_ += Math.ceil(image_size.attr_width)
+      end
+      if ((@parent.attr_sort_column).equal?(self) && !(@parent.attr_sort_direction).equal?(SWT::NONE))
+        header_cell_ = @ns_column.header_cell
+        rect = NSRect.new
+        rect.attr_width = rect.attr_height = Float::MAX_VALUE
+        cell_size = header_cell_.cell_size_for_bounds(rect)
+        rect.attr_height = cell_size.attr_height
+        sort_rect = header_cell_.sort_indicator_rect_for_bounds(rect)
+        width_ += Math.ceil(sort_rect.attr_width)
+      end
+      # compute item widths down column
       gc = SwtGC.new(@parent)
-      width = gc.string_extent(self.attr_text).attr_x
-      if (!(@icon_ref).equal?(0) || (!(self.attr_image).nil? && OS::VERSION >= 0x1040))
-        # Note that the image is stretched to the header height
-        width += @parent.attr_header_height
-        if (!(self.attr_text.length).equal?(0))
-          width += @parent.get_gap
-        end
-      end
-      index = @parent.index_of(self)
-      width = Math.max(width, calculate_width(@parent.attr_child_ids, index, gc, width))
+      width_ = Math.max(width_, @parent.calculate_width(@parent.attr_items, @parent.index_of(self), gc, true))
       gc.dispose
-      set_width(width + @parent.get_inset_width(@id, true))
-    end
-    
-    typesig { [Array.typed(::Java::Int), ::Java::Int, SwtGC, ::Java::Int] }
-    def calculate_width(ids, index, gc, width)
-      max_ = width
-      if ((ids).nil?)
-        return max_
-      end
-      i = 0
-      while i < ids.attr_length
-        item = @parent.__get_item(ids[i], false)
-        if (!(item).nil? && item.attr_cached)
-          max_ = Math.max(max_, item.calculate_width(index, gc))
-          if (item.get_expanded)
-            max_ = Math.max(max_, calculate_width(item.attr_child_ids, index, gc, max_))
-          end
-        end
-        i += 1
-      end
-      return max_
+      set_width(width_)
     end
     
     typesig { [] }
     def release_handle
       super
-      @id = -1
+      if (!(@ns_column).nil?)
+        @ns_column.header_cell.release
+        @ns_column.release
+      end
+      @ns_column = nil
       @parent = nil
     end
     
@@ -437,10 +528,6 @@ module Org::Eclipse::Swt::Widgets
       if ((@parent.attr_sort_column).equal?(self))
         @parent.attr_sort_column = nil
       end
-      if (!(@icon_ref).equal?(0))
-        OS._release_icon_ref(@icon_ref)
-      end
-      @icon_ref = 0
     end
     
     typesig { [ControlListener] }
@@ -500,29 +587,6 @@ module Org::Eclipse::Swt::Widgets
     end
     
     typesig { [::Java::Int] }
-    def resized(new_width)
-      @last_width = new_width
-      send_event(SWT::Resize)
-      if (is_disposed)
-        return
-      end
-      moved = false
-      order = @parent.get_column_order
-      columns = @parent.get_columns
-      i = 0
-      while i < order.attr_length
-        column = columns[order[i]]
-        if (moved && !column.is_disposed)
-          column.send_event(SWT::Move)
-        end
-        if ((column).equal?(self))
-          moved = true
-        end
-        i += 1
-      end
-    end
-    
-    typesig { [::Java::Int] }
     # Controls how text and images will be displayed in the receiver.
     # The argument should be one of <code>LEFT</code>, <code>RIGHT</code>
     # or <code>CENTER</code>.
@@ -547,7 +611,16 @@ module Org::Eclipse::Swt::Widgets
       end
       self.attr_style &= ~(SWT::LEFT | SWT::RIGHT | SWT::CENTER)
       self.attr_style |= alignment & (SWT::LEFT | SWT::RIGHT | SWT::CENTER)
-      update_header
+      outline_view = (@parent.attr_view)
+      header_view_ = outline_view.header_view
+      if ((header_view_).nil?)
+        return
+      end
+      index = @parent.index_of(@ns_column)
+      rect = header_view_.header_rect_of_column(index)
+      header_view_.set_needs_display_in_rect(rect)
+      rect = outline_view.rect_of_column(index)
+      @parent.attr_view.set_needs_display_in_rect(rect)
     end
     
     typesig { [Image] }
@@ -556,21 +629,14 @@ module Org::Eclipse::Swt::Widgets
       if (!(image).nil? && image.is_disposed)
         error(SWT::ERROR_INVALID_ARGUMENT)
       end
-      index = @parent.index_of(self)
-      if ((index).equal?(-1))
+      super(image)
+      header_view_ = (@parent.attr_view).header_view
+      if ((header_view_).nil?)
         return
       end
-      if (!(@icon_ref).equal?(0))
-        OS._release_icon_ref(@icon_ref)
-        @icon_ref = 0
-      end
-      super(image)
-      if (!(image).nil?)
-        if (OS::VERSION < 0x1040)
-          @icon_ref = create_icon_ref(image)
-        end
-      end
-      update_header
+      index = @parent.index_of(@ns_column)
+      rect = header_view_.header_rect_of_column(index)
+      header_view_.set_needs_display_in_rect(rect)
     end
     
     typesig { [::Java::Boolean] }
@@ -595,14 +661,7 @@ module Org::Eclipse::Swt::Widgets
     # @since 3.2
     def set_moveable(moveable)
       check_widget
-      flags = Array.typed(::Java::Int).new(1) { 0 }
-      OS._get_data_browser_property_flags(@parent.attr_handle, @id, flags)
-      if (moveable)
-        flags[0] |= OS.attr_k_data_browser_list_view_movable_column
-      else
-        flags[0] &= ~OS.attr_k_data_browser_list_view_movable_column
-      end
-      OS._set_data_browser_property_flags(@parent.attr_handle, @id, flags[0])
+      @movable = moveable
     end
     
     typesig { [::Java::Boolean] }
@@ -618,8 +677,7 @@ module Org::Eclipse::Swt::Widgets
     # </ul>
     def set_resizable(resizable)
       check_widget
-      @resizable = resizable
-      update_header
+      @ns_column.set_resizing_mask(resizable ? OS::NSTableColumnUserResizingMask : OS::NSTableColumnNoResizing)
     end
     
     typesig { [String] }
@@ -629,12 +687,33 @@ module Org::Eclipse::Swt::Widgets
         error(SWT::ERROR_NULL_ARGUMENT)
       end
       super(string)
-      update_header
+      buffer = CharArray.new(self.attr_text.length)
+      self.attr_text.get_chars(0, buffer.attr_length, buffer, 0)
+      length_ = fix_mnemonic(buffer)
+      @display_text = RJava.cast_to_string(String.new(buffer, 0, length_))
+      title = NSString.string_with(@display_text)
+      @ns_column.header_cell.set_title(title)
+      header_view_ = (@parent.attr_view).header_view
+      if ((header_view_).nil?)
+        return
+      end
+      index = @parent.index_of(@ns_column)
+      rect = header_view_.header_rect_of_column(index)
+      header_view_.set_needs_display_in_rect(rect)
     end
     
     typesig { [String] }
     # Sets the receiver's tool tip text to the argument, which
-    # may be null indicating that no tool tip text should be shown.
+    # may be null indicating that the default tool tip for the
+    # control will be shown. For a control that has a default
+    # tool tip, such as the Tree control on Windows, setting
+    # the tool tip text to an empty string replaces the default,
+    # causing no tool tip text to be shown.
+    # <p>
+    # The mnemonic indicator (character '&amp;') is not displayed in a tool tip.
+    # To display a single '&amp;' in the tool tip, the character '&amp;' can be
+    # escaped by doubling it in the string.
+    # </p>
     # 
     # @param string the new tool tip text (or null)
     # 
@@ -647,6 +726,7 @@ module Org::Eclipse::Swt::Widgets
     def set_tool_tip_text(string)
       check_widget
       @tool_tip_text = string
+      @parent.check_tool_tip(self)
     end
     
     typesig { [::Java::Int] }
@@ -658,66 +738,19 @@ module Org::Eclipse::Swt::Widgets
     # <li>ERROR_WIDGET_DISPOSED - if the receiver has been disposed</li>
     # <li>ERROR_THREAD_INVALID_ACCESS - if not called from the thread that created the receiver</li>
     # </ul>
-    def set_width(width)
+    def set_width(width_)
       check_widget
-      if (width < 0)
+      if (width_ < 0)
         return
       end
-      # Feature in the Macintosh. The data browser widget adds the left inset
-      # of the disclosure column to the specified width making the column too
-      # wide. The fix is to subtract this value from the column width.
-      width -= @parent.get_left_disclosure_inset(@id)
-      if (width < 0)
-        width = 0
-      end
-      OS._set_data_browser_table_view_named_column_width(@parent.attr_handle, @id, RJava.cast_to_short(width))
-      update_header
-      if (!(width).equal?(@last_width))
-        resized(width)
-      end
+      # TODO how to differentiate 0 and 1 cases?
+      width_ = Math.max(0, width_ - Tree::CELL_GAP)
+      @ns_column.set_width(width_)
     end
     
     typesig { [] }
-    def update_header
-      buffer = CharArray.new(self.attr_text.length)
-      self.attr_text.get_chars(0, buffer.attr_length, buffer, 0)
-      length_ = fix_mnemonic(buffer)
-      str = OS._cfstring_create_with_characters(OS.attr_k_cfallocator_default, buffer, length_)
-      if ((str).equal?(0))
-        error(SWT::ERROR_CANNOT_SET_TEXT)
-      end
-      desc = DataBrowserListViewHeaderDesc.new
-      desc.attr_version = OS.attr_k_data_browser_list_view_latest_header_desc
-      desc.attr_btn_font_style_just = OS.attr_te_flush_left
-      if (!(@parent.index_of(self)).equal?(0))
-        if (!((self.attr_style & SWT::CENTER)).equal?(0))
-          desc.attr_btn_font_style_just = OS.attr_te_center
-        end
-        if (!((self.attr_style & SWT::RIGHT)).equal?(0))
-          desc.attr_btn_font_style_just = OS.attr_te_flush_right
-        end
-      end
-      desc.attr_btn_font_style_flags |= OS.attr_k_control_use_just_mask
-      if (@resizable)
-        desc.attr_minimum_width = 0
-        desc.attr_maximum_width = 0x7fff
-      else
-        width = Array.typed(::Java::Short).new(1) { 0 }
-        OS._get_data_browser_table_view_named_column_width(@parent.attr_handle, @id, width)
-        desc.attr_minimum_width = desc.attr_maximum_width = width[0]
-      end
-      desc.attr_title_string = str
-      if (OS::VERSION < 0x1040)
-        desc.attr_btn_content_info_content_type = RJava.cast_to_short((!(@icon_ref).equal?(0) ? OS.attr_k_control_content_icon_ref : OS.attr_k_control_content_text_only))
-        desc.attr_btn_content_info_icon_ref = @icon_ref
-      else
-        if (!(self.attr_image).nil?)
-          desc.attr_btn_content_info_content_type = OS.attr_k_control_content_cgimage_ref
-          desc.attr_btn_content_info_icon_ref = self.attr_image.attr_handle
-        end
-      end
-      OS._set_data_browser_list_view_header_desc(@parent.attr_handle, @id, desc)
-      OS._cfrelease(str)
+    def tooltip_text
+      return @tool_tip_text
     end
     
     private

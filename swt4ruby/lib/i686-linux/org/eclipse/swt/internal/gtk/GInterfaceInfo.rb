@@ -1,6 +1,6 @@
 require "rjava"
 
-# Copyright (c) 2000, 2006 IBM Corporation and others. All rights reserved.
+# Copyright (c) 2000, 2008 IBM Corporation and others. All rights reserved.
 # The contents of this file are made available under the terms
 # of the GNU Lesser General Public License (LGPL) Version 2.1 that
 # accompanies this distribution (lgpl-v21.txt).  The LGPL is also
@@ -23,6 +23,7 @@ module Org::Eclipse::Swt::Internal::Gtk
   class GInterfaceInfo 
     include_class_members GInterfaceInfoImports
     
+    # @field cast=(GInterfaceInitFunc)
     # long
     attr_accessor :interface_init
     alias_method :attr_interface_init, :interface_init
@@ -30,6 +31,7 @@ module Org::Eclipse::Swt::Internal::Gtk
     alias_method :attr_interface_init=, :interface_init=
     undef_method :interface_init=
     
+    # @field cast=(GInterfaceFinalizeFunc)
     # long
     attr_accessor :interface_finalize
     alias_method :attr_interface_finalize, :interface_finalize
@@ -37,6 +39,7 @@ module Org::Eclipse::Swt::Internal::Gtk
     alias_method :attr_interface_finalize=, :interface_finalize=
     undef_method :interface_finalize=
     
+    # @field cast=(gpointer)
     # long
     attr_accessor :interface_data
     alias_method :attr_interface_data, :interface_data

@@ -1,6 +1,6 @@
 require "rjava"
 
-# Copyright (c) 2000, 2008 IBM Corporation and others.
+# Copyright (c) 2000, 2009 IBM Corporation and others.
 # All rights reserved. This program and the accompanying materials
 # are made available under the terms of the Eclipse Public License v1.0
 # which accompanies this distribution, and is available at
@@ -75,6 +75,7 @@ module Org::Eclipse::Swt::Widgets
   # @see <a href="http://www.eclipse.org/swt/snippets/#tree">Tree, TreeItem, TreeColumn snippets</a>
   # @see <a href="http://www.eclipse.org/swt/examples.php">SWT Example: ControlExample</a>
   # @see <a href="http://www.eclipse.org/swt/">Sample code and further information</a>
+  # @noextend This class is not intended to be subclassed by clients.
   class Tree < TreeImports.const_get :Composite
     include_class_members TreeImports
     
@@ -2046,7 +2047,7 @@ module Org::Eclipse::Swt::Widgets
         if ((w_param).equal?(OS::VK_CONTROL) || (w_param).equal?(OS::VK_SHIFT))
         end
       when OS::WM_CHAR, OS::WM_IME_CHAR, OS::WM_KEYUP, OS::WM_SYSCHAR, OS::WM_SYSKEYDOWN, OS::WM_SYSKEYUP, OS::WM_HSCROLL, OS::WM_VSCROLL, OS::WM_SIZE
-        redraw = !(find_image_control).nil? && (self.attr_draw_count).equal?(0) && OS._is_window_visible(self.attr_handle)
+        redraw = !(find_image_control).nil? && get_drawing && OS._is_window_visible(self.attr_handle)
         if (redraw)
           OS._def_window_proc(self.attr_handle, OS::WM_SETREDRAW, 0, 0)
         end
@@ -2143,6 +2144,13 @@ module Org::Eclipse::Swt::Widgets
         event.attr_index = index
         old_item = @current_item
         @current_item = item
+        # Bug in Windows.  If the tree scrolls during WM_NOTIFY
+        # with TVN_GETDISPINFO, pixel corruption occurs.  The fix
+        # is to detect that the top item has changed and redraw
+        # the entire tree.
+        # 
+        # long
+        h_top_item = OS._send_message(self.attr_handle, OS::TVM_GETNEXTITEM, OS::TVGN_FIRSTVISIBLE, 0)
         send_event(SWT::SetData, event)
         # widget could be disposed at this point
         @current_item = old_item
@@ -2151,6 +2159,9 @@ module Org::Eclipse::Swt::Widgets
         end
         if (redraw)
           item.redraw
+        end
+        if (!(h_top_item).equal?(OS._send_message(self.attr_handle, OS::TVM_GETNEXTITEM, OS::TVGN_FIRSTVISIBLE, 0)))
+          OS._invalidate_rect(self.attr_handle, nil, true)
         end
       end
       return true
@@ -2174,7 +2185,7 @@ module Org::Eclipse::Swt::Widgets
       # 
       # NOTE:  The code that actually works around the problem is in the
       # callers of this method.
-      if ((self.attr_draw_count).equal?(0))
+      if (get_drawing)
         return false
       end
       # long
@@ -2638,7 +2649,7 @@ module Org::Eclipse::Swt::Widgets
           # the items array is resized to be smaller to reduce
           # memory usage.
           length_ = 0
-          if ((self.attr_draw_count).equal?(0) && OS._is_window_visible(self.attr_handle))
+          if (get_drawing && OS._is_window_visible(self.attr_handle))
             length_ = @items.attr_length + 4
           else
             @shrink = true
@@ -2708,7 +2719,7 @@ module Org::Eclipse::Swt::Widgets
         # indicator.  The fix is to detect the case when the first
         # child is added to a visible parent item and redraw the parent.
         if (fix_parent)
-          if ((self.attr_draw_count).equal?(0) && OS._is_window_visible(self.attr_handle))
+          if (get_drawing && OS._is_window_visible(self.attr_handle))
             rect = RECT.new
             if (OS._tree_view_get_item_rect(self.attr_handle, h_parent, rect, false))
               OS._invalidate_rect(self.attr_handle, rect, true)
@@ -3161,7 +3172,7 @@ module Org::Eclipse::Swt::Widgets
       h_parent = 0
       fix_redraw = false
       if (((self.attr_style & SWT::DOUBLE_BUFFERED)).equal?(0))
-        if ((self.attr_draw_count).equal?(0) && OS._is_window_visible(self.attr_handle))
+        if (get_drawing && OS._is_window_visible(self.attr_handle))
           rect = RECT.new
           fix_redraw = !OS._tree_view_get_item_rect(self.attr_handle, h_item, rect, false)
         end
@@ -3599,7 +3610,7 @@ module Org::Eclipse::Swt::Widgets
       index = 0
       # 64
       count = RJava.cast_to_int(OS._send_message(self.attr_handle, OS::TVM_GETVISIBLECOUNT, 0, 0))
-      while (index < count)
+      while (index <= count)
         # long
         h_next_item = OS._send_message(self.attr_handle, OS::TVM_GETNEXTITEM, OS::TVGN_NEXTVISIBLE, h_item)
         if ((h_next_item).equal?(0))
@@ -3973,7 +3984,8 @@ module Org::Eclipse::Swt::Widgets
     
     typesig { [] }
     # Returns <code>true</code> if the receiver's lines are visible,
-    # and <code>false</code> otherwise.
+    # and <code>false</code> otherwise. Note that some platforms draw
+    # grid lines while others may draw alternating row colors.
     # <p>
     # If one of the receiver's ancestors is not visible or some
     # other condition makes the receiver not visible, this method
@@ -4754,7 +4766,7 @@ module Org::Eclipse::Swt::Widgets
         i += 1
       end
       @ignore_deselect = @ignore_select = true
-      redraw_ = (self.attr_draw_count).equal?(0) && OS._is_window_visible(self.attr_handle)
+      redraw_ = get_drawing && OS._is_window_visible(self.attr_handle)
       if (redraw_)
         OS._def_window_proc(self.attr_handle, OS::WM_SETREDRAW, 0, 0)
       end
@@ -4897,7 +4909,7 @@ module Org::Eclipse::Swt::Widgets
     def set_item_count(count, h_parent, h_item)
       redraw_ = false
       if ((OS._send_message(self.attr_handle, OS::TVM_GETCOUNT, 0, 0)).equal?(0))
-        redraw_ = (self.attr_draw_count).equal?(0) && OS._is_window_visible(self.attr_handle)
+        redraw_ = get_drawing && OS._is_window_visible(self.attr_handle)
         if (redraw_)
           OS._def_window_proc(self.attr_handle, OS::WM_SETREDRAW, 0, 0)
         end
@@ -4994,7 +5006,8 @@ module Org::Eclipse::Swt::Widgets
     
     typesig { [::Java::Boolean] }
     # Marks the receiver's lines as visible if the argument is <code>true</code>,
-    # and marks it invisible otherwise.
+    # and marks it invisible otherwise. Note that some platforms draw
+    # grid lines while others may draw alternating row colors.
     # <p>
     # If one of the receiver's ancestors is not visible or some
     # other condition makes the receiver not visible, marking
@@ -5104,7 +5117,7 @@ module Org::Eclipse::Swt::Widgets
         v_info.attr_cb_size = SCROLLINFO.attr_sizeof
         v_info.attr_f_mask = OS::SIF_ALL
         OS._get_scroll_info(self.attr_handle, OS::SB_VERT, v_info)
-        redraw_ = (self.attr_draw_count).equal?(0) && OS._is_window_visible(self.attr_handle)
+        redraw_ = get_drawing && OS._is_window_visible(self.attr_handle)
         if (redraw_)
           OS._update_window(self.attr_handle)
           OS._def_window_proc(self.attr_handle, OS::WM_SETREDRAW, 0, 0)
@@ -5114,6 +5127,16 @@ module Org::Eclipse::Swt::Widgets
           # long
           h_thumb = OS._makelparam(OS::SB_THUMBPOSITION, h_info.attr_n_pos)
           OS._send_message(self.attr_handle, OS::WM_HSCROLL, h_thumb, 0)
+        end
+        # Feature in Windows.  It seems that Vista does not
+        # use wParam to get the new position when WM_VSCROLL
+        # is sent with SB_THUMBPOSITION.  The fix is to use
+        # SetScrollInfo() to move the scroll bar thumb before
+        # calling WM_VSCROLL.
+        # 
+        # NOTE: This code is only necessary on Windows Vista.
+        if (!OS::IsWinCE && OS::WIN32_VERSION >= OS._version(6, 0))
+          OS._set_scroll_info(self.attr_handle, OS::SB_VERT, v_info, true)
         end
         # long
         v_thumb = OS._makelparam(OS::SB_THUMBPOSITION, v_info.attr_n_pos)
@@ -6043,7 +6066,7 @@ module Org::Eclipse::Swt::Widgets
         OS._send_message(self.attr_handle, OS::WM_SETREDRAW, 1, 0)
         OS._def_window_proc(self.attr_handle, OS::WM_SETREDRAW, 0, 0)
       else
-        redraw_ = (self.attr_draw_count).equal?(0) && OS._is_window_visible(self.attr_handle)
+        redraw_ = get_drawing && OS._is_window_visible(self.attr_handle)
         if (redraw_)
           OS._def_window_proc(self.attr_handle, OS::WM_SETREDRAW, 0, 0)
         end
@@ -6625,12 +6648,11 @@ module Org::Eclipse::Swt::Widgets
     def window_proc(hwnd, msg, w_param, l_param)
       if (!(@hwnd_header).equal?(0) && (hwnd).equal?(@hwnd_header))
         case (msg)
-        # This code is intentionally commented
-        # case OS.WM_CONTEXTMENU: {
-        # LRESULT result = wmContextMenu (hwnd, wParam, lParam);
-        # if (result != null) return result.value;
-        # break;
-        # }
+        when OS::WM_CONTEXTMENU
+          result = wm_context_menu(hwnd, w_param, l_param)
+          if (!(result).nil?)
+            return result.attr_value
+          end
         when OS::WM_CAPTURECHANGED
           # Bug in Windows.  When the capture changes during a
           # header drag, Windows does not redraw the header item
@@ -6791,6 +6813,9 @@ module Org::Eclipse::Swt::Widgets
               rect.attr_right = client_rect.attr_right
               rect.attr_left = Math.max(client_rect.attr_left, rect.attr_right - width)
             end
+          else
+            rect.attr_left = Math.max(rect.attr_left, client_rect.attr_left)
+            rect.attr_right = Math.min(rect.attr_right, client_rect.attr_right)
           end
           # long
           h_rgn = OS._create_rect_rgn(rect.attr_left, rect.attr_top, rect.attr_right, rect.attr_bottom)
@@ -6806,6 +6831,9 @@ module Org::Eclipse::Swt::Widgets
             if (!((self.attr_style & SWT::FULL_SELECTION)).equal?(0))
               item_rect.attr_left = rect.attr_left
               item_rect.attr_right = rect.attr_right
+            else
+              item_rect.attr_left = Math.max(item_rect.attr_left, client_rect.attr_left)
+              item_rect.attr_right = Math.min(item_rect.attr_right, client_rect.attr_right)
             end
             # long
             rect_rgn = OS._create_rect_rgn(item_rect.attr_left, item_rect.attr_top, item_rect.attr_right, item_rect.attr_bottom)
@@ -7053,6 +7081,9 @@ module Org::Eclipse::Swt::Widgets
           end
         when OS::VK_UP, OS::VK_DOWN, OS::VK_PRIOR, OS::VK_NEXT, OS::VK_HOME, OS::VK_END
           OS._send_message(self.attr_handle, OS::WM_CHANGEUISTATE, OS::UIS_INITIALIZE, 0)
+          if (!(@item_tool_tip_handle).equal?(0))
+            OS._show_window(@item_tool_tip_handle, OS::SW_HIDE)
+          end
           if (!((self.attr_style & SWT::SINGLE)).equal?(0))
             throw :break_case, :thrown
           end
@@ -7165,7 +7196,7 @@ module Org::Eclipse::Swt::Widgets
                 tv_item.attr_h_item = h_new_item
                 OS._send_message(self.attr_handle, OS::TVM_GETITEM, 0, tv_item)
                 new_selected = !((tv_item.attr_state & OS::TVIS_SELECTED)).equal?(0)
-                redraw_ = !new_selected && (self.attr_draw_count).equal?(0) && OS._is_window_visible(self.attr_handle)
+                redraw_ = !new_selected && get_drawing && OS._is_window_visible(self.attr_handle)
                 if (redraw_)
                   OS._update_window(self.attr_handle)
                   OS._def_window_proc(self.attr_handle, OS::WM_SETREDRAW, 0, 0)
@@ -7837,7 +7868,21 @@ module Org::Eclipse::Swt::Widgets
     typesig { [::Java::Int, ::Java::Int] }
     # long
     # long
+    def _wm_mousewheel(w_param, l_param)
+      result = super(w_param, l_param)
+      if (!(@item_tool_tip_handle).equal?(0))
+        OS._show_window(@item_tool_tip_handle, OS::SW_HIDE)
+      end
+      return result
+    end
+    
+    typesig { [::Java::Int, ::Java::Int] }
+    # long
+    # long
     def _wm_move(w_param, l_param)
+      if (!(@item_tool_tip_handle).equal?(0))
+        OS._show_window(@item_tool_tip_handle, OS::SW_HIDE)
+      end
       if (@ignore_resize)
         return nil
       end
@@ -7950,7 +7995,7 @@ module Org::Eclipse::Swt::Widgets
           # long
           paint_dc = 0
           ps = PAINTSTRUCT.new
-          hooks_paint = hooks(SWT::Paint)
+          hooks_paint = hooks(SWT::Paint) || filters(SWT::Paint)
           if (hooks_paint)
             data = SwtGCData.new
             data.attr_ps = ps
@@ -8080,10 +8125,12 @@ module Org::Eclipse::Swt::Widgets
         OS._send_message(@hwnd_header, OS::WM_SETFONT, w_param, l_param)
       end
       if (!(@item_tool_tip_handle).equal?(0))
+        OS._show_window(@item_tool_tip_handle, OS::SW_HIDE)
         OS._send_message(@item_tool_tip_handle, OS::WM_SETFONT, w_param, l_param)
       end
       if (!(@header_tool_tip_handle).equal?(0))
         OS._send_message(@header_tool_tip_handle, OS::WM_SETFONT, w_param, l_param)
+        update_header_tool_tips
       end
       return result
     end
@@ -8095,6 +8142,9 @@ module Org::Eclipse::Swt::Widgets
       result = super(w_param, l_param)
       if (!(result).nil?)
         return result
+      end
+      if (!(@item_tool_tip_handle).equal?(0))
+        OS._show_window(@item_tool_tip_handle, OS::SW_HIDE)
       end
       # Bug in Windows.  Under certain circumstances, when
       # WM_SETREDRAW is used to turn off drawing and then
@@ -8117,6 +8167,9 @@ module Org::Eclipse::Swt::Widgets
     # long
     # long
     def _wm_size(w_param, l_param)
+      if (!(@item_tool_tip_handle).equal?(0))
+        OS._show_window(@item_tool_tip_handle, OS::SW_HIDE)
+      end
       # Bug in Windows.  When TVS_NOHSCROLL is set when the
       # size of the tree is zero, the scroll bar is shown the
       # next time the tree resizes.  The fix is to hide the
@@ -8275,7 +8328,7 @@ module Org::Eclipse::Swt::Widgets
               end
             end
             if (check_visible)
-              if (!(self.attr_draw_count).equal?(0) || !OS._is_window_visible(self.attr_handle))
+              if (!get_drawing || !OS._is_window_visible(self.attr_handle))
                 throw :break_case, :thrown
               end
               item_rect = RECT.new
@@ -8516,6 +8569,9 @@ module Org::Eclipse::Swt::Widgets
           end
           update_scroll_bar
         when OS::TVN_ITEMEXPANDINGA, OS::TVN_ITEMEXPANDINGW
+          if (!(@item_tool_tip_handle).equal?(0))
+            OS._show_window(@item_tool_tip_handle, OS::SW_HIDE)
+          end
           run_expanded = false
           if (!((self.attr_style & SWT::VIRTUAL)).equal?(0))
             self.attr_style &= ~SWT::DOUBLE_BUFFERED
@@ -8523,7 +8579,7 @@ module Org::Eclipse::Swt::Widgets
           if (hooks(SWT::EraseItem) || hooks(SWT::PaintItem))
             self.attr_style &= ~SWT::DOUBLE_BUFFERED
           end
-          if (!(find_image_control).nil? && (self.attr_draw_count).equal?(0) && OS._is_window_visible(self.attr_handle))
+          if (!(find_image_control).nil? && get_drawing && OS._is_window_visible(self.attr_handle))
             OS._def_window_proc(self.attr_handle, OS::WM_SETREDRAW, 0, 0)
           end
           # Bug in Windows.  When TVM_SETINSERTMARK is used to set
@@ -8593,7 +8649,7 @@ module Org::Eclipse::Swt::Widgets
             self.attr_style |= SWT::DOUBLE_BUFFERED
           end
           # && OS.IsWindowVisible (handle)
-          if (!(find_image_control).nil? && (self.attr_draw_count).equal?(0))
+          if (!(find_image_control).nil? && get_drawing)
             OS._def_window_proc(self.attr_handle, OS::WM_SETREDRAW, 1, 0)
             OS._invalidate_rect(self.attr_handle, nil, true)
           end

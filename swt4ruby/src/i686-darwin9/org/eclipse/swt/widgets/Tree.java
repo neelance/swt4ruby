@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2008 IBM Corporation and others.
+ * Copyright (c) 2000, 2009 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -10,21 +10,11 @@
  *******************************************************************************/
 package org.eclipse.swt.widgets;
 
- 
-import org.eclipse.swt.internal.carbon.CFRange;
-import org.eclipse.swt.internal.carbon.DataBrowserAccessibilityItemInfo;
-import org.eclipse.swt.internal.carbon.OS;
-import org.eclipse.swt.internal.carbon.DataBrowserCallbacks;
-import org.eclipse.swt.internal.carbon.DataBrowserCustomCallbacks;
-import org.eclipse.swt.internal.carbon.DataBrowserListViewColumnDesc;
-import org.eclipse.swt.internal.carbon.DataBrowserListViewHeaderDesc;
-import org.eclipse.swt.internal.carbon.HMHelpContentRec;
-import org.eclipse.swt.internal.carbon.Rect;
-import org.eclipse.swt.internal.carbon.CGPoint;
-
 import org.eclipse.swt.*;
+import org.eclipse.swt.accessibility.*;
 import org.eclipse.swt.events.*;
 import org.eclipse.swt.graphics.*;
+import org.eclipse.swt.internal.cocoa.*;
 
 /**
  * Instances of this class provide a selectable user interface object
@@ -81,33 +71,30 @@ import org.eclipse.swt.graphics.*;
  * @see <a href="http://www.eclipse.org/swt/snippets/#tree">Tree, TreeItem, TreeColumn snippets</a>
  * @see <a href="http://www.eclipse.org/swt/examples.php">SWT Example: ControlExample</a>
  * @see <a href="http://www.eclipse.org/swt/">Sample code and further information</a>
+ * @noextend This class is not intended to be subclassed by clients.
  */
 public class Tree extends Composite {
+	NSTableColumn firstColumn, checkColumn;
+	NSTextFieldCell dataCell;
+	NSButtonCell buttonCell;
+	NSTableHeaderView headerView;
 	TreeItem [] items;
+	int itemCount;
 	TreeColumn [] columns;
 	TreeColumn sortColumn;
-	int [] childIds;
-	GC paintGC;
+	int columnCount;
 	int sortDirection;
-	int columnCount, column_id, idCount, anchorFirst, anchorLast, headerHeight;
-	boolean ignoreRedraw, ignoreSelect, wasSelected, ignoreExpand, wasExpanded, inClearAll, drawBackground;
+	boolean ignoreExpand, ignoreSelect, ignoreRedraw, reloadPending, drawExpansion;
 	Rectangle imageBounds;
-	TreeItem showItem;
 	TreeItem insertItem;
 	boolean insertBefore;
-	int lastHittest, lastHittestColumn, visibleCount;
-	static final int CHECK_COLUMN_ID = 1024;
-	static final int COLUMN_ID = 1025;
-	static final int GRID_WIDTH = 1;
-	static final int ICON_AND_TEXT_GAP = 4;
-	static final int CELL_CONTENT_INSET = 12;
-	static final int BORDER_INSET = 1;
-	static final int DISCLOSURE_COLUMN_EDGE_INSET = 8;
-	static final int DISCLOSURE_COLUMN_LEVEL_INDENT = 24;
-	static final int DISCLOSURE_TRIANGLE_AND_CONTENT_GAP = 8;
-	static final String [] AX_ATTRIBUTES = {
-		OS.kAXTitleAttribute,
-	};
+
+	static int NEXT_ID;
+
+	static final int FIRST_COLUMN_MINIMUM_WIDTH = 5;
+	static final int IMAGE_GAP = 3;
+	static final int TEXT_GAP = 2;
+	static final int CELL_GAP = 1;
 
 /**
  * Constructs a new instance of this class given its parent
@@ -148,126 +135,46 @@ public Tree (Composite parent, int style) {
 
 void _addListener (int eventType, Listener listener) {
 	super._addListener (eventType, listener);
-	for (int i = 0; i < items.length; i++) {
-		if (items [i] != null) items [i].width = -1;		
-	}
+	clearCachedWidth (items);
 }
 
-int _getId () {
-	return _getIds (1) [0];
-}
-
-int [] _getIds (int count) {
-	int [] newIds = new int [count];
-	int index = 0;
-	if ((style & SWT.VIRTUAL) == 0) {
-		for (int i=0; i<items.length; i++) {
-			if (items [i] == null) {
-				newIds [index++] = i + 1;
-				if (index == count) return newIds;
-			}
-		}
-		int next = items.length;
-		while (index < count) {
-			newIds [index++] = next + 1;
-			next++;
-		}
-		return newIds;
+TreeItem _getItem (TreeItem parentItem, int index, boolean create) {
+	int count;
+	TreeItem[] items;
+	if (parentItem != null) {
+		count = parentItem.itemCount;
+		items = parentItem.items;
+	} else {
+		count = this.itemCount;
+		items = this.items;
 	}
-	
-	boolean [] reserved = new boolean [items.length];
-	if (childIds != null) {
-		for (int i=0; i<childIds.length; i++) {
-			int usedId = childIds [i]; 
-			if (usedId != 0) {
-				if (usedId > reserved.length) {
-					boolean [] newReserved = new boolean [usedId + 4];
-					System.arraycopy (reserved, 0, newReserved, 0, reserved.length);
-					reserved = newReserved;
-				}
-				reserved [usedId - 1] = true;
-			}
-		}
-	}
-	for (int i=0; i<items.length; i++) {
-		if (items [i] != null) {
-			reserved [i] = true;
-			int [] ids =  items [i].childIds;
-			if (ids != null) {
-				for (int j=0; j<ids.length; j++) {
-					int usedId = ids [j];
-					if (usedId != 0) {
-						if (usedId > reserved.length) {
-							boolean [] newReserved = new boolean [usedId + 4];
-							System.arraycopy (reserved, 0, newReserved, 0, reserved.length);
-							reserved = newReserved;
-						}
-						reserved [usedId - 1] = true;
-					}
-				}
-			}
-		}
-	}
-	for (int i=0; i<reserved.length; i++) {
-		if (!reserved [i]) {
-			newIds [index++] = i + 1;
-			if (index == count) return newIds;
-		}
-	}
-	int next = reserved.length;
-	while (index < count) {
-		newIds [index++] = next + 1;
-		next++;
-	}
-	return newIds;
-}
-
-TreeItem _getItem (int id, boolean create) {
-	if (id < 1) return null;
-	TreeItem item = id - 1 < items.length ? items [id - 1] : null;
-	if (item != null ||  (style & SWT.VIRTUAL) == 0 || !create) return item;
-	if (childIds != null) {
-		for (int i=0; i<childIds.length; i++) {
-			if (childIds [i] == id) {
-				return _getItem (null, i);
-			}
-		}
-	}
-	for (int i=0; i<items.length; i++) {
-		TreeItem parentItem = items [i];
-		if (parentItem != null && parentItem.childIds != null) {
-			int [] ids = parentItem.childIds;
-			for (int j=0; j<ids.length; j++) {
-				if (ids [j] == id) {
-					return _getItem (parentItem, j);
-				}
-			}
-		}
-	}
-	return null;
-}
-
-TreeItem _getItem (TreeItem parentItem, int index) {
-	int count = getItemCount (parentItem);
 	if (index < 0 || index >= count) return null;
-	int [] ids = parentItem == null ? childIds : parentItem.childIds;
-	int id = ids [index];
-	if (id == 0) {
-		id = _getId ();
-		ids [index] = id;
-	}
-	if (id > items.length) {
-		TreeItem [] newItems = new TreeItem [id + 4];
-		System.arraycopy(items, 0, newItems, 0, items.length);
-		items = newItems;
-	}
-	TreeItem item = items [id - 1]; 
-	if (item != null || (style & SWT.VIRTUAL) == 0) return item;
+	TreeItem item = items [index]; 
+	if (item != null || (style & SWT.VIRTUAL) == 0 || !create) return item;
 	item = new TreeItem (this, parentItem, SWT.NONE, index, false);
-	item.id = id;
-	items [id - 1] = item;
+	items [index] = item;
 	return item;
 }
+
+int /*long*/ accessibilityAttributeValue (int /*long*/ id, int /*long*/ sel, int /*long*/ arg0) {
+
+	if (accessible != null) {
+		NSString attribute = new NSString(arg0);
+		id returnValue = accessible.internal_accessibilityAttributeValue(attribute, ACC.CHILDID_SELF);
+		if (returnValue != null) return returnValue.id;
+	}
+	
+	NSString attributeName = new NSString(arg0);
+	
+	// Accessibility Verifier queries for a title or description.  NSOutlineView doesn't
+	// seem to return either, so we return a default description value here.
+	if (attributeName.isEqualToString (OS.NSAccessibilityDescriptionAttribute)) {
+		return NSString.stringWith("").id;
+	}
+	
+	return super.accessibilityAttributeValue(id, sel, arg0);
+}
+
 
 /**
  * Adds the listener to the collection of listeners who will
@@ -331,68 +238,68 @@ public void addTreeListener(TreeListener listener) {
 	addListener (SWT.Collapse, typedListener);
 }
 
-int calculateWidth (int [] ids, GC gc, boolean recurse, int level, int levelIndent) {
-	if (ids == null) return 0;
+int calculateWidth (TreeItem[] items, int index, GC gc, boolean recurse) {
+	if (items == null) return 0;
 	int width = 0;
-	for (int i=0; i<ids.length; i++) {
-		TreeItem item = _getItem (ids [i], false);
+	for (int i=0; i<items.length; i++) {
+		TreeItem item = items [i];
 		if (item != null) {
-			int itemWidth = item.calculateWidth (0, gc);
-			itemWidth += level * levelIndent;
+			int itemWidth = item.calculateWidth (index, gc);
 			width = Math.max (width, itemWidth);
-			if (recurse && item._getExpanded ()) {
-				width = Math.max (width, calculateWidth (item.childIds, gc, recurse, level + 1, levelIndent));
+			if (recurse && item.getExpanded ()) {
+				width = Math.max (width, calculateWidth (item.items, index, gc, recurse));
 			}
 		}
 	}
 	return width;
 }
 
-int callPaintEventHandler (int control, int damageRgn, int visibleRgn, int theEvent, int nextHandler) {
-	/*
-	* Feature in the Macintosh.  The draw item proc is not called if the column width
-	* is zero. This means that the SWT.MeasureItem listener is not called and the column
-	* does not get wider ever.  The fix is to change the column width to one.
-	*/
-	if (columnCount == 0 && (hooks (SWT.MeasureItem) || hooks (SWT.EraseItem) || hooks (SWT.PaintItem))) {
-		short [] width = new short [1];
-		OS.GetDataBrowserTableViewNamedColumnWidth (handle, column_id, width);
-		if (width [0] == 0) {
-			OS.SetDataBrowserTableViewNamedColumnWidth (handle, column_id, (short) 1);
+NSSize cellSize (int /*long*/ id, int /*long*/ sel) {
+	NSSize size = super.cellSize(id, sel);
+	NSImage image = new NSCell(id).image();
+	if (image != null) size.width += imageBounds.width + IMAGE_GAP;
+	if (hooks(SWT.MeasureItem)) {
+		int /*long*/ [] outValue = new int /*long*/ [1];
+		OS.object_getInstanceVariable(id, Display.SWT_ROW, outValue);
+		TreeItem item = (TreeItem) display.getWidget (outValue [0]);
+		OS.object_getInstanceVariable(id, Display.SWT_COLUMN, outValue);
+		int /*long*/ tableColumn = outValue[0];
+		int columnIndex = 0;
+		for (int i=0; i<columnCount; i++) {
+			if (columns [i].nsColumn.id == tableColumn) {
+				columnIndex = i;
+				break;
+			}
 		}
+		sendMeasureItem (item, columnIndex, size);
 	}
-	GC currentGC = paintGC;
-	if (currentGC == null) {
-		GCData data = new GCData ();
-		data.paintEvent = theEvent;
-		data.visibleRgn = visibleRgn;
-		paintGC = GC.carbon_new (this, data);
-	}
-	drawBackground = findBackgroundControl () != null;
-	int result = super.callPaintEventHandler (control, damageRgn, visibleRgn, theEvent, nextHandler);
-	if (getItemCount () == 0 && drawBackground) {
-		drawBackground = false;
-		Rectangle rect = getClientArea ();
-		int headerHeight = getHeaderHeight ();
-		rect.y += headerHeight;
-		rect.height -= headerHeight;
-		fillBackground (handle, paintGC.handle, rect);
-	}
-	if (insertItem != null && !insertItem.isDisposed()) {
-		Rectangle itemRect = insertItem.getImageBounds(0).union(insertItem.getBounds());
-		Rectangle clientRect = getClientArea();
-		int x = clientRect.x + clientRect.width;
-		int posY = insertBefore ? itemRect.y : itemRect.y + itemRect.height - 1;
-		paintGC.drawLine(itemRect.x, posY, x, posY);
-	}
-	if (currentGC == null) {
-		paintGC.dispose ();
-		paintGC = null;
-	}
-	return result;
+	return size;
 }
 
-boolean checkData (TreeItem item, boolean redraw) {
+boolean canDragRowsWithIndexes_atPoint(int /*long*/ id, int /*long*/ sel, int /*long*/ arg0, int /*long*/ arg1) {
+	NSPoint clickPoint = new NSPoint();
+	OS.memmove(clickPoint, arg1, NSPoint.sizeof);
+	NSOutlineView tree = (NSOutlineView)view;
+	
+	// If the current row is not selected and the user is not attempting to modify the selection, select the row first.
+	int /*long*/ row = tree.rowAtPoint(clickPoint);
+	int /*long*/ modifiers = NSApplication.sharedApplication().currentEvent().modifierFlags();
+	
+	boolean drag = (state & DRAG_DETECT) != 0 && hooks (SWT.DragDetect);
+	if (drag) {
+		if (!tree.isRowSelected(row) && (modifiers & (OS.NSCommandKeyMask | OS.NSShiftKeyMask | OS.NSAlternateKeyMask | OS.NSControlKeyMask)) == 0) {
+			NSIndexSet set = (NSIndexSet)new NSIndexSet().alloc();
+			set = set.initWithIndex(row);
+			tree.selectRowIndexes (set, false);
+			set.release();
+		}
+	}
+	
+	// The clicked row must be selected to initiate a drag.
+	return (tree.isRowSelected(row) && drag);
+}
+
+boolean checkData (TreeItem item) {
 	if (item.cached) return true;
 	if ((style & SWT.VIRTUAL) != 0) {
 		item.cached = true;
@@ -405,9 +312,7 @@ boolean checkData (TreeItem item, boolean redraw) {
 		//widget could be disposed at this point
 		ignoreRedraw = false;
 		if (isDisposed () || item.isDisposed ()) return false;
-		if (redraw) {
-			if (!setScrollWidth (item)) item.redraw (OS.kDataBrowserNoItem);
-		}
+		if (!setScrollWidth (item)) item.redraw (-1);
 	}
 	return true;
 }
@@ -425,6 +330,8 @@ static int checkStyle (int style) {
 	if ((style & SWT.NO_SCROLL) == 0) {
 		style |= SWT.H_SCROLL | SWT.V_SCROLL;
 	}
+	/* This platform is always FULL_SELECTION */
+	style |= SWT.FULL_SELECTION;
 	return checkBits (style, SWT.SINGLE, SWT.MULTI, 0, 0, 0, 0);
 }
 
@@ -432,36 +339,41 @@ protected void checkSubclass () {
 	if (!isValidSubclass ()) error (SWT.ERROR_INVALID_SUBCLASS);
 }
 
+void checkItems () {
+	if (!reloadPending) return;
+	reloadPending = false;
+	TreeItem[] selectedItems = getSelection ();
+	((NSOutlineView)view).reloadData ();
+	selectItems (selectedItems, true);
+	ignoreExpand = true;
+	for (int i = 0; i < itemCount; i++) {
+		if (items[i] != null) items[i].updateExpanded ();
+	}
+	ignoreExpand = false;
+}
+
 void clear (TreeItem parentItem, int index, boolean all) {
-	int [] ids = parentItem == null ? childIds : parentItem.childIds;
-	TreeItem item = _getItem (ids [index], false);
+	TreeItem item = _getItem (parentItem, index, false);
 	if (item != null) {
 		item.clear();
+		item.redraw (-1);
 		if (all) {
 			clearAll (item, true);
-		} else {
-			int container = parentItem == null ? OS.kDataBrowserNoItem : parentItem.id;
-			OS.UpdateDataBrowserItems (handle, container, 1, new int[] {item.id}, OS.kDataBrowserItemNoProperty, OS.kDataBrowserNoItem);
 		}
 	}
 }
 
 void clearAll (TreeItem parentItem, boolean all) {
-	boolean update = !inClearAll;
 	int count = getItemCount (parentItem);
 	if (count == 0) return;
-	inClearAll = true;
-	int [] ids = parentItem == null ? childIds : parentItem.childIds;
+	TreeItem [] children = parentItem == null ? items : parentItem.items; 
 	for (int i=0; i<count; i++) {
-		TreeItem item = _getItem (ids [i], false);
+		TreeItem item = children [i];
 		if (item != null) {
 			item.clear ();
+			item.redraw (-1);
 			if (all) clearAll (item, true);
 		}
-	}
-	if (update) {
-		OS.UpdateDataBrowserItems (handle, 0, 0, null, OS.kDataBrowserItemNoProperty, OS.kDataBrowserNoItem);
-		inClearAll = false;
 	}
 }
 
@@ -490,7 +402,7 @@ void clearAll (TreeItem parentItem, boolean all) {
  */
 public void clear (int index, boolean all) {
 	checkWidget ();
-	int count = getItemCount (null);
+	int count = getItemCount ();
 	if (index < 0 || index >= count) error (SWT.ERROR_INVALID_RANGE);
 	clear (null, index, all);
 }
@@ -519,143 +431,170 @@ public void clearAll (boolean all) {
 	clearAll (null, all);
 }
 
+void clearCachedWidth (TreeItem[] items) {
+	if (items == null) return;
+	for (int i = 0; i < items.length; i++) {
+		TreeItem item = items [i];
+		if (item == null) break;
+		item.width = -1;
+		clearCachedWidth (item.items);
+	}
+}
+
+void collapseItem_collapseChildren (int /*long*/ id, int /*long*/ sel, int /*long*/ itemID, boolean children) {
+	TreeItem item = (TreeItem)display.getWidget(itemID);
+	if (!ignoreExpand) item.sendExpand (false, children);
+	ignoreExpand = true;
+	super.collapseItem_collapseChildren (id, sel, itemID, children);
+	ignoreExpand = false;
+	if (isDisposed() || item.isDisposed()) return;
+	setScrollWidth ();
+}
+
 public Point computeSize (int wHint, int hHint, boolean changed) {
 	checkWidget ();
-	int width = 0;
+	int width = 0, height = 0;
 	if (wHint == SWT.DEFAULT) {
 		if (columnCount != 0) {
 			for (int i=0; i<columnCount; i++) {
 				width += columns [i].getWidth ();
 			}
 		} else {
-			int levelIndent = DISCLOSURE_COLUMN_LEVEL_INDENT;
-			if (OS.VERSION >= 0x1040) {
-				float [] metric = new float [1];
-				OS.DataBrowserGetMetric (handle, OS.kDataBrowserMetricDisclosureColumnPerDepthGap, null, metric);
-				levelIndent = (int) metric [0];
-			}
 			GC gc = new GC (this);
-			width = calculateWidth (childIds, gc, true, 0, levelIndent);
+			width = calculateWidth (items, 0, gc, true) + CELL_GAP;
 			gc.dispose ();
-			width += getInsetWidth (column_id, true);
 		}
 		if ((style & SWT.CHECK) != 0) width += getCheckColumnWidth ();
 	} else {
 		width = wHint;
 	}
-	if (width <= 0) width = DEFAULT_WIDTH;
-	int height = 0;
 	if (hHint == SWT.DEFAULT) {
-		height = visibleCount * getItemHeight () + getHeaderHeight();
+		height = (int)/*64*/((NSOutlineView) view).numberOfRows () * getItemHeight () + getHeaderHeight ();
 	} else {
 		height = hHint;
 	}
+	if (width <= 0) width = DEFAULT_WIDTH;
 	if (height <= 0) height = DEFAULT_HEIGHT;
 	Rectangle rect = computeTrim (0, 0, width, height);
 	return new Point (rect.width, rect.height);
 }
 
-public Rectangle computeTrim (int x, int y, int width, int height) {
-	checkWidget();
-	int border = getBorderWidth ();
-	Rect rect = new Rect ();
-	OS.GetDataBrowserScrollBarInset (handle, rect);
-	x -= rect.left + border;
-	y -= rect.top + border;
-	width += rect.left + rect.right + border + border;
-	height += rect.top + rect.bottom + border + border;
-	return new Rectangle (x, y, width, height);
-}
-
-boolean contains(int shellX, int shellY) {
-	CGPoint pt = new CGPoint ();
-	int [] contentView = new int [1];
-	OS.HIViewFindByID (OS.HIViewGetRoot (OS.GetControlOwner (handle)), OS.kHIViewWindowContentID (), contentView);
-	OS.HIViewConvertPoint (pt, handle, contentView [0]);
-	int x = shellX - (int) pt.x;
-	int y = shellY - (int) pt.y;
-	if (y < getHeaderHeight ()) return false;
-	return getClientArea ().contains (x, y);
+void createColumn (TreeItem item, int index) {
+	if (item.items != null) {
+		for (int i = 0; i < item.items.length; i++) {
+			if (item.items[i] != null) createColumn (item.items[i], index);
+		}
+	}
+	String [] strings = item.strings;
+	if (strings != null) {
+		String [] temp = new String [columnCount];
+		System.arraycopy (strings, 0, temp, 0, index);
+		System.arraycopy (strings, index, temp, index+1, columnCount-index-1);
+		temp [index] = "";
+		item.strings = temp;
+	}
+	if (index == 0) item.text = "";
+	Image [] images = item.images;
+	if (images != null) {
+		Image [] temp = new Image [columnCount];
+		System.arraycopy (images, 0, temp, 0, index);
+		System.arraycopy (images, index, temp, index+1, columnCount-index-1);
+		item.images = temp;
+	}
+	if (index == 0) item.image = null;
+	Color [] cellBackground = item.cellBackground;
+	if (cellBackground != null) {
+		Color [] temp = new Color [columnCount];
+		System.arraycopy (cellBackground, 0, temp, 0, index);
+		System.arraycopy (cellBackground, index, temp, index+1, columnCount-index-1);
+		item.cellBackground = temp;
+	}
+	Color [] cellForeground = item.cellForeground;
+	if (cellForeground != null) {
+		Color [] temp = new Color [columnCount];
+		System.arraycopy (cellForeground, 0, temp, 0, index);
+		System.arraycopy (cellForeground, index, temp, index+1, columnCount-index-1);
+		item.cellForeground = temp;
+	}
+	Font [] cellFont = item.cellFont;
+	if (cellFont != null) {
+		Font [] temp = new Font [columnCount];
+		System.arraycopy (cellFont, 0, temp, 0, index);
+		System.arraycopy (cellFont, index, temp, index+1, columnCount-index-1);
+		item.cellFont = temp;
+	}
 }
 
 void createHandle () {
-	column_id = COLUMN_ID;
-	int [] outControl = new int [1];
-	int window = OS.GetControlOwner (parent.handle);
-	OS.CreateDataBrowserControl (window, null, OS.kDataBrowserListView, outControl);
-	OS.SetAutomaticControlDragTrackingEnabledForWindow (window, true);
-	if (outControl [0] == 0) error (SWT.ERROR_NO_HANDLES);
-	handle = outControl [0];
-	if (!drawFocusRing ()) {
-		OS.SetControlData (handle, OS.kControlEntireControl, OS.kControlDataBrowserIncludesFrameAndFocusTag, 1, new byte[] {0});
-	}
-	int selectionFlags = (style & SWT.SINGLE) != 0 ? OS.kDataBrowserSelectOnlyOne | OS.kDataBrowserNeverEmptySelectionSet : OS.kDataBrowserCmdTogglesSelection;
-	OS.SetDataBrowserSelectionFlags (handle, selectionFlags);
-	short [] height = new short [1];
-	OS.GetDataBrowserListViewHeaderBtnHeight (handle, height);
-	headerHeight = height [0];
-	OS.SetDataBrowserListViewHeaderBtnHeight (handle, (short) 0);
-	OS.SetDataBrowserHasScrollBars (handle, (style & SWT.H_SCROLL) != 0, (style & SWT.V_SCROLL) != 0);
-	if (OS.VERSION >= 0x1040) {
-		int inset = 4;
-		OS.DataBrowserSetMetric (handle, OS.kDataBrowserMetricCellContentInset, false, inset);
-		OS.DataBrowserSetMetric (handle, OS.kDataBrowserMetricDisclosureColumnEdgeInset, false, inset);		
-		OS.DataBrowserSetMetric (handle, OS.kDataBrowserMetricDisclosureTriangleAndContentGap, false, inset);
-		OS.DataBrowserSetMetric (handle, OS.kDataBrowserMetricIconAndTextGap, false, inset);
-	}
-	int position = 0;
-	if ((style & SWT.CHECK) != 0) {
-		DataBrowserListViewColumnDesc checkColumn = new DataBrowserListViewColumnDesc ();
-		checkColumn.headerBtnDesc_version = OS.kDataBrowserListViewLatestHeaderDesc;
-		checkColumn.propertyDesc_propertyID = CHECK_COLUMN_ID;
-		checkColumn.propertyDesc_propertyType = OS.kDataBrowserCheckboxType;
-		checkColumn.propertyDesc_propertyFlags = OS.kDataBrowserPropertyIsMutable;
-		int checkWidth = getCheckColumnWidth ();
-		checkColumn.headerBtnDesc_minimumWidth = (short) checkWidth;
-		checkColumn.headerBtnDesc_maximumWidth = (short) checkWidth;
-		checkColumn.headerBtnDesc_initialOrder = (short) OS.kDataBrowserOrderIncreasing;
-		OS.AddDataBrowserListViewColumn (handle, checkColumn, position++);
-	}
-	DataBrowserListViewColumnDesc column = new DataBrowserListViewColumnDesc ();
-	column.headerBtnDesc_version = OS.kDataBrowserListViewLatestHeaderDesc;
-	column.propertyDesc_propertyID = column_id;
-	column.propertyDesc_propertyType = OS.kDataBrowserCustomType;
-	column.propertyDesc_propertyFlags = OS.kDataBrowserListViewSelectionColumn | OS.kDataBrowserDefaultPropertyFlags | OS.kDataBrowserListViewSortableColumn;
-	column.headerBtnDesc_maximumWidth = 0x7fff;
-	column.headerBtnDesc_initialOrder = (short) OS.kDataBrowserOrderIncreasing;
-	OS.AddDataBrowserListViewColumn (handle, column, position);
-	OS.SetDataBrowserListViewDisclosureColumn (handle, column_id, false);
-	OS.SetDataBrowserTableViewNamedColumnWidth (handle, column_id, (short) 0);
-
+	NSScrollView scrollWidget = (NSScrollView) new SWTScrollView ().alloc ();
+	scrollWidget.init ();
+	scrollWidget.setHasHorizontalScroller ((style & SWT.H_SCROLL) != 0);
+	scrollWidget.setHasVerticalScroller ((style & SWT.V_SCROLL) != 0);
+	scrollWidget.setAutohidesScrollers (true);
+	scrollWidget.setBorderType(hasBorder () ? OS.NSBezelBorder : OS.NSNoBorder);
+	
+	NSOutlineView widget = (NSOutlineView) new SWTOutlineView ().alloc ();
 	/*
-	* Feature in the Macintosh.  Scroll bars are not created until
-	* the data browser needs to draw them.  The fix is to force the scroll
-	* bars to be created by temporarily giving the widget a size, drawing
-	* it on a offscreen buffer to avoid flashes and then restoring it to
-	* size zero.
+	* Bug in Cocoa.  Calling init, instead of initWithFrame on an NSOutlineView
+	* cause the NSOutlineView to leak some memory.  The work around is to call 
+	* initWithFrame and pass an empty NSRect instead of calling init. 
 	*/
-	if (OS.VERSION < 0x1040) {
-		OS.HIViewSetDrawingEnabled (handle, false);
-		int size = 50;
-		Rect rect = new Rect ();
-		rect.right = rect.bottom = (short) size;
-		OS.SetControlBounds (handle, rect);
-		int bpl = size * 4;
-		int [] gWorld = new int [1];
-		int data = OS.NewPtr (bpl * size);
-		OS.NewGWorldFromPtr (gWorld, OS.k32ARGBPixelFormat, rect, 0, 0, 0, data, bpl);
-		int [] curPort = new int [1];
-		int [] curGWorld = new int [1];
-		OS.GetGWorld (curPort, curGWorld);	
-		OS.SetGWorld (gWorld [0], curGWorld [0]);
-		OS.DrawControlInCurrentPort (handle);
-		OS.SetGWorld (curPort [0], curGWorld [0]);
-		OS.DisposeGWorld (gWorld [0]);
-		OS.DisposePtr (data);
-		rect.right = rect.bottom = (short) 0;
-		OS.SetControlBounds (handle, rect);
-		OS.HIViewSetDrawingEnabled (handle, true);
+	widget.initWithFrame(new NSRect());
+	widget.setAllowsMultipleSelection ((style & SWT.MULTI) != 0);
+	widget.setAllowsColumnReordering (false);
+	widget.setAutoresizesOutlineColumn (false);
+	widget.setAutosaveExpandedItems (true);
+	widget.setDataSource (widget);
+	widget.setDelegate (widget);
+	widget.setColumnAutoresizingStyle (OS.NSTableViewNoColumnAutoresizing);
+	NSSize spacing = new NSSize();
+	spacing.width = spacing.height = CELL_GAP;
+	widget.setIntercellSpacing(spacing);
+	widget.setDoubleAction (OS.sel_sendDoubleSelection);
+	if (!hasBorder ()) widget.setFocusRingType (OS.NSFocusRingTypeNone);
+	
+	headerView = (NSTableHeaderView)new SWTTableHeaderView ().alloc ().init ();
+	widget.setHeaderView (null);
+	
+	NSString str = NSString.stringWith ("");  //$NON-NLS-1$
+	if ((style & SWT.CHECK) != 0) {
+		checkColumn = (NSTableColumn) new NSTableColumn ().alloc ();
+		checkColumn = checkColumn.initWithIdentifier(NSString.stringWith(String.valueOf(++NEXT_ID)));
+		checkColumn.headerCell ().setTitle (str);
+		widget.addTableColumn (checkColumn);
+		widget.setOutlineTableColumn (checkColumn);
+		checkColumn.setResizingMask (OS.NSTableColumnNoResizing);
+		checkColumn.setEditable (false);
+		int /*long*/ cls = NSButton.cellClass (); /* use our custom cell class */
+		buttonCell = new NSButtonCell (OS.class_createInstance (cls, 0));
+		buttonCell.init ();
+		checkColumn.setDataCell (buttonCell);
+		buttonCell.setButtonType (OS.NSSwitchButton);
+		buttonCell.setImagePosition (OS.NSImageOnly);
+		buttonCell.setAllowsMixedState (true);
+		checkColumn.setWidth (getCheckColumnWidth ());
 	}
+	
+	firstColumn = (NSTableColumn) new NSTableColumn ().alloc ();
+	firstColumn = firstColumn.initWithIdentifier(NSString.stringWith(String.valueOf(++NEXT_ID)));
+	/*
+	* Feature in Cocoa.  If a column's width is too small to show any content
+	* then outlineView_objectValueForTableColumn_byItem is never invoked to
+	* query for item values, which is a problem for VIRTUAL Trees.  The
+	* workaround is to ensure that, for 0-column Trees, the internal first
+	* column always has a minimal width that makes this call come in.
+	*/
+	firstColumn.setMinWidth (FIRST_COLUMN_MINIMUM_WIDTH);
+	firstColumn.setWidth(0);
+	firstColumn.headerCell ().setTitle (str);
+	widget.addTableColumn (firstColumn);
+	widget.setOutlineTableColumn (firstColumn);
+	dataCell = (NSTextFieldCell)new SWTImageTextCell ().alloc ().init ();
+	dataCell.setLineBreakMode(OS.NSLineBreakByClipping);
+	firstColumn.setDataCell (dataCell);
+	
+	scrollView = scrollWidget;
+	view = widget;
 }
 
 void createItem (TreeColumn column, int index) {
@@ -665,130 +604,91 @@ void createItem (TreeColumn column, int index) {
 		column.style &= ~(SWT.LEFT | SWT.RIGHT | SWT.CENTER);
 		column.style |= SWT.LEFT;
 	}
-	column.id = column_id + idCount++;
-	int position = index + ((style & SWT.CHECK) != 0 ? 1 : 0);
-	if (columnCount != 0) {
-		DataBrowserListViewColumnDesc desc = new DataBrowserListViewColumnDesc ();
-		desc.headerBtnDesc_version = OS.kDataBrowserListViewLatestHeaderDesc;
-		desc.propertyDesc_propertyID = column.id;
-		desc.propertyDesc_propertyType = OS.kDataBrowserCustomType;
-		desc.propertyDesc_propertyFlags = OS.kDataBrowserListViewSelectionColumn | OS.kDataBrowserDefaultPropertyFlags | OS.kDataBrowserListViewSortableColumn;
-		desc.headerBtnDesc_maximumWidth = 0x7fff;
-		desc.headerBtnDesc_initialOrder = OS.kDataBrowserOrderIncreasing;
-		desc.headerBtnDesc_btnFontStyle_just = OS.teFlushLeft;
-		if ((style & SWT.CENTER) != 0) desc.headerBtnDesc_btnFontStyle_just = OS.teCenter;
-		if ((style & SWT.RIGHT) != 0) desc.headerBtnDesc_btnFontStyle_just = OS.teFlushRight;
-		desc.headerBtnDesc_btnFontStyle_flags |= OS.kControlUseJustMask;
-		OS.AddDataBrowserListViewColumn (handle, desc, position);
-		OS.SetDataBrowserTableViewNamedColumnWidth (handle, column.id, (short)0);
-		
-		if (index == 0) {
-			int [] disclosure = new int [1];
-			boolean [] expandableRows = new boolean [1];
-			OS.GetDataBrowserListViewDisclosureColumn (handle, disclosure, expandableRows);
-			OS.SetDataBrowserListViewDisclosureColumn (handle, column.id, expandableRows [0]);
-		}
-	} 
 	if (columnCount == columns.length) {
 		TreeColumn [] newColumns = new TreeColumn [columnCount + 4];
 		System.arraycopy (columns, 0, newColumns, 0, columns.length);
 		columns = newColumns;
 	}
+	NSTableColumn nsColumn;
+	if (columnCount == 0) {
+		//TODO - clear attributes, alignment etc.
+		nsColumn = firstColumn;
+		nsColumn.setMinWidth (0);
+		firstColumn = null;
+	} else {
+		//TODO - set attributes, alignment etc.
+		NSOutlineView outlineView = (NSOutlineView)view;
+		NSString str = NSString.stringWith ("");
+		nsColumn = (NSTableColumn) new NSTableColumn ().alloc ();
+		nsColumn = nsColumn.initWithIdentifier(NSString.stringWith(String.valueOf(++NEXT_ID)));
+		nsColumn.setMinWidth(0);
+		nsColumn.headerCell ().setTitle (str);
+		outlineView.addTableColumn (nsColumn);
+		int checkColumn = (style & SWT.CHECK) != 0 ? 1 : 0;
+		outlineView.moveColumn (columnCount + checkColumn, index + checkColumn);
+		nsColumn.setDataCell (dataCell);
+		if (index == 0) {
+			outlineView.setOutlineTableColumn (nsColumn);
+		}
+	}
+	column.createJNIRef ();
+	NSTableHeaderCell headerCell = (NSTableHeaderCell)new SWTTableHeaderCell ().alloc ().init ();
+	nsColumn.setHeaderCell (headerCell);
+	display.addWidget (headerCell, column);
+	column.nsColumn = nsColumn;
+	nsColumn.setWidth (0);
 	System.arraycopy (columns, index, columns, index + 1, columnCount++ - index);
 	columns [index] = column;
-	if (columnCount > 1) {
-		for (int i=0; i<items.length; i++) {
-			TreeItem item = items [i];
-			if (item != null) {
-				String [] strings = item.strings;
-				if (strings != null) {
-					String [] temp = new String [columnCount];
-					System.arraycopy (strings, 0, temp, 0, index);
-					System.arraycopy (strings, index, temp, index+1, columnCount-index-1);
-					temp [index] = "";
-					item.strings = temp;
-				}
-				if (index == 0) item.text = "";
-				Image [] images = item.images;
-				if (images != null) {
-					Image [] temp = new Image [columnCount];
-					System.arraycopy (images, 0, temp, 0, index);
-					System.arraycopy (images, index, temp, index+1, columnCount-index-1);
-					item.images = temp;
-				}
-				if (index == 0) item.image = null;
-				Color [] cellBackground = item.cellBackground;
-				if (cellBackground != null) {
-					Color [] temp = new Color [columnCount];
-					System.arraycopy (cellBackground, 0, temp, 0, index);
-					System.arraycopy (cellBackground, index, temp, index+1, columnCount-index-1);
-					item.cellBackground = temp;
-				}
-				Color [] cellForeground = item.cellForeground;
-				if (cellForeground != null) {
-					Color [] temp = new Color [columnCount];
-					System.arraycopy (cellForeground, 0, temp, 0, index);
-					System.arraycopy (cellForeground, index, temp, index+1, columnCount-index-1);
-					item.cellForeground = temp;
-				}
-				Font [] cellFont = item.cellFont;
-				if (cellFont != null) {
-					Font [] temp = new Font [columnCount];
-					System.arraycopy (cellFont, 0, temp, 0, index);
-					System.arraycopy (cellFont, index, temp, index+1, columnCount-index-1);
-					item.cellFont = temp;
-				}
+	for (int i = 0; i < itemCount; i++) {
+		TreeItem item = items [i];
+		if (item != null) {
+			if (columnCount > 1) {
+				createColumn (item, index);
 			}
 		}
 	}
 }
 
 void createItem (TreeItem item, TreeItem parentItem, int index) {
-	int count = getItemCount (parentItem);
+	int count;
+	TreeItem [] items;
+	if (parentItem != null) {
+		count = parentItem.itemCount;
+		items = parentItem.items;
+	} else {
+		count = this.itemCount;
+		items = this.items;
+	}
 	if (index == -1) index = count;
 	if (!(0 <= index && index <= count)) error (SWT.ERROR_INVALID_RANGE);
-	int id = _getId ();
-	if (id > items.length) {
-		TreeItem [] newItems = new TreeItem [id + 4];
+	if (count == items.length) {
+		TreeItem [] newItems = new TreeItem [items.length + 4];
 		System.arraycopy (items, 0, newItems, 0, items.length);
 		items = newItems;
-	}
-	item.id = id;
-	items [id - 1] = item;
-	int [] ids = parentItem == null ? childIds : parentItem.childIds;
-	if (ids == null || count + 1 > ids.length) {
-		int [] newIds = new int [count + 4];
-		if (ids != null) System.arraycopy (ids, 0, newIds, 0, ids.length);
-		ids = newIds;
-		if (parentItem == null) {
-			childIds = ids;
+		if (parentItem != null) {
+			parentItem.items = items;
 		} else {
-			parentItem.childIds = ids;
+			this.items = items;
 		}
 	}
-	System.arraycopy (ids, index, ids, index + 1, ids.length - index - 1);
-	ids [index] = id;
-	if (parentItem != null) parentItem.itemCount++;
-	if (parentItem == null || (parentItem.getExpanded ())) {
-		int parentID = parentItem == null ? OS.kDataBrowserNoItem : parentItem.id;
-		if (OS.AddDataBrowserItems (handle, parentID, 1, new int [] {item.id}, OS.kDataBrowserItemNoProperty) != OS.noErr) {
-			items [id - 1] = null;
-			System.arraycopy (ids, index+1, ids, index, ids.length - index - 1);
-			error (SWT.ERROR_ITEM_NOT_ADDED);
-		}
-		visibleCount++;
-	} else {	
-		/*
-		* Bug in the Macintosh.  When the first child of a tree item is
-		* added and the parent is not expanded, the parent does not
-		* redraw to show the expander.  The fix is to force a redraw.
-		*/
-		if (parentItem != null && parentItem.itemCount == 1) parentItem.redraw (OS.kDataBrowserNoItem);
+	System.arraycopy (items, index, items, index + 1, count++ - index);
+	items [index] = item;
+	item.items = new TreeItem [4];
+	SWTTreeItem handle = (SWTTreeItem) new SWTTreeItem ().alloc ().init ();
+	item.handle = handle;
+	item.createJNIRef ();
+	item.register ();
+	if (parentItem != null) {
+		parentItem.itemCount = count;
+	} else {
+		this.itemCount = count;
 	}
-}
-
-ScrollBar createScrollBar (int style) {
-	return createStandardBar (style);
+	ignoreExpand = true;
+	reloadItem (parentItem, true);
+	if (parentItem != null && parentItem.itemCount == 1 && parentItem.expanded) {
+		((NSOutlineView)view).expandItem (parentItem.handle);
+	}
+	ignoreExpand = false;
 }
 
 void createWidget () {
@@ -798,16 +698,15 @@ void createWidget () {
 }
 
 Color defaultBackground () {
-	return display.getSystemColor (SWT.COLOR_LIST_BACKGROUND);
+	return display.getWidgetColor (SWT.COLOR_LIST_BACKGROUND);
+}
+
+NSFont defaultNSFont () {
+	return display.outlineViewFont;
 }
 
 Color defaultForeground () {
-	return display.getSystemColor (SWT.COLOR_LIST_FOREGROUND);
-}
-
-int defaultThemeFont () {
-	if (display.smallFonts) return OS.kThemeSmallSystemFont;
-	return OS.kThemeViewsFont;
+	return display.getWidgetColor (SWT.COLOR_LIST_FOREGROUND);
 }
 
 /**
@@ -820,27 +719,17 @@ int defaultThemeFont () {
  */
 public void deselectAll () {
 	checkWidget ();
+	NSTableView widget = (NSOutlineView) view;
 	ignoreSelect = true;
-	/*
-	* Bug in the Macintosh.  When the DataBroswer selection flags includes
-	* both kDataBrowserNeverEmptySelectionSet and kDataBrowserSelectOnlyOne,
-	* two items are selected when SetDataBrowserSelectedItems() is called
-	* with kDataBrowserItemsAssign to assign a new seletion despite the fact
-	* that kDataBrowserSelectOnlyOne was specified.  The fix is to save and
-	* restore kDataBrowserNeverEmptySelectionSet around each call to
-	* SetDataBrowserSelectedItems().
-	*/
-	int [] selectionFlags = null;
-	if ((style & SWT.SINGLE) != 0) {
-		selectionFlags = new int [1];
-		OS.GetDataBrowserSelectionFlags (handle, selectionFlags);
-		OS.SetDataBrowserSelectionFlags (handle, selectionFlags [0] & ~OS.kDataBrowserNeverEmptySelectionSet);
-	}
-	OS.SetDataBrowserSelectedItems (handle, 0, null, OS.kDataBrowserItemsRemove);
-	if ((style & SWT.SINGLE) != 0) {
-		OS.SetDataBrowserSelectionFlags (handle, selectionFlags [0]);
-	}
+	widget.deselectAll (null);
 	ignoreSelect = false;
+}
+
+void deregister () {
+	super.deregister ();
+	display.removeWidget (headerView);
+	display.removeWidget (dataCell);
+	if (buttonCell != null) display.removeWidget (buttonCell);
 }
 
 /**
@@ -864,29 +753,12 @@ public void deselect (TreeItem item) {
 	checkWidget ();
 	if (item == null) error (SWT.ERROR_NULL_ARGUMENT);
 	if (item.isDisposed ()) error (SWT.ERROR_INVALID_ARGUMENT);
+	NSOutlineView widget = (NSOutlineView)view;
+	int /*long*/ row = widget.rowForItem(item.handle);
 	ignoreSelect = true;
-	/*
-	* Bug in the Macintosh.  When the DataBroswer selection flags includes
-	* both kDataBrowserNeverEmptySelectionSet and kDataBrowserSelectOnlyOne,
-	* two items are selected when SetDataBrowserSelectedItems() is called
-	* with kDataBrowserItemsAssign to assign a new seletion despite the fact
-	* that kDataBrowserSelectOnlyOne was specified.  The fix is to save and
-	* restore kDataBrowserNeverEmptySelectionSet around each call to
-	* SetDataBrowserSelectedItems().
-	*/
-	int [] selectionFlags = null;
-	if ((style & SWT.SINGLE) != 0) {
-		selectionFlags = new int [1];
-		OS.GetDataBrowserSelectionFlags (handle, selectionFlags);
-		OS.SetDataBrowserSelectionFlags (handle, selectionFlags [0] & ~OS.kDataBrowserNeverEmptySelectionSet);
-	}
-	OS.SetDataBrowserSelectedItems (handle, 1, new int [] {item.id}, OS.kDataBrowserItemsRemove);
-	if ((style & SWT.SINGLE) != 0) {
-		OS.SetDataBrowserSelectionFlags (handle, selectionFlags [0]);
-	}
+	widget.deselectRow (row);
 	ignoreSelect = false;
 }
-
 
 void destroyItem (TreeColumn column) {
 	int index = 0;
@@ -950,351 +822,432 @@ void destroyItem (TreeColumn column) {
 			}
 		}
 	}
-	if (columnCount == 1) {
-		column_id = column.id; idCount = 0;
-		DataBrowserListViewHeaderDesc desc = new DataBrowserListViewHeaderDesc ();
-		desc.version = OS.kDataBrowserListViewLatestHeaderDesc;
-		short [] width = new short [1];
-		OS.GetDataBrowserTableViewNamedColumnWidth (handle, column_id, width);
-		desc.minimumWidth = desc.maximumWidth = width [0];
-		int str = OS.CFStringCreateWithCharacters (OS.kCFAllocatorDefault, null, 0);
-		desc.titleString = str;
-		OS.SetDataBrowserListViewHeaderDesc (handle, column_id, desc);
-		OS.CFRelease (str);
-	} else {
-		int [] disclosure = new int [1];
-		boolean [] expandableRows = new boolean [1];
-		OS.GetDataBrowserListViewDisclosureColumn (handle, disclosure, expandableRows);
-		if (disclosure [0] == column.id) {
-			TreeColumn firstColumn = columns [1];
-			firstColumn.style &= ~(SWT.LEFT | SWT.RIGHT | SWT.CENTER);
-			firstColumn.style |= SWT.LEFT;
-			firstColumn.updateHeader();
-			OS.SetDataBrowserListViewDisclosureColumn (handle, firstColumn.id, expandableRows [0]);
-		}
-		if (OS.RemoveDataBrowserTableViewColumn (handle, column.id) != OS.noErr) {
-			error (SWT.ERROR_ITEM_NOT_REMOVED);
-		}
-	}
+
+	int oldIndex = indexOf (column.nsColumn);
+
 	System.arraycopy (columns, index + 1, columns, index, --columnCount - index);
 	columns [columnCount] = null;
-	for (int i=index; i<columnCount; i++) {
-		columns [i].sendEvent (SWT.Move);
+	if (columnCount == 0) {
+		//TODO - reset attributes
+		firstColumn = column.nsColumn;
+		firstColumn.retain ();
+		/*
+		* Feature in Cocoa.  If a column's width is too small to show any content
+		* then outlineView_objectValueForTableColumn_byItem is never invoked to
+		* query for item values, which is a problem for VIRTUAL Trees.  The
+		* workaround is to ensure that, for 0-column Trees, the internal first
+		* column always has a minimal width that makes this call come in.
+		*/
+		firstColumn.setMinWidth (FIRST_COLUMN_MINIMUM_WIDTH);
+		setScrollWidth ();
+	} else {
+		if (index == 0) {
+			((NSOutlineView)view).setOutlineTableColumn(columns[0].nsColumn);
+		}
+		((NSOutlineView)view).removeTableColumn(column.nsColumn);
+	}
+
+	NSArray array = ((NSOutlineView)view).tableColumns ();
+	int arraySize = (int)/*64*/array.count ();
+	for (int i = oldIndex; i < arraySize; i++) {
+		int /*long*/ columnId = array.objectAtIndex (i).id;
+		for (int j = 0; j < columnCount; j++) {
+			if (columns[j].nsColumn.id == columnId) {
+				columns [j].sendEvent (SWT.Move);
+				break;
+			}
+		}
 	}
 }
 
 void destroyItem (TreeItem item) {
+	int count;
+	TreeItem[] items;
 	TreeItem parentItem = item.parentItem;
-	if (parentItem == null || parentItem.getExpanded ()) {
-		int parentID = parentItem == null ? OS.kDataBrowserNoItem : parentItem.id;
-		ignoreExpand = true;
-		if (OS.RemoveDataBrowserItems (handle, parentID, 1, new int [] {item.id}, 0) != OS.noErr) {
-			error (SWT.ERROR_ITEM_NOT_REMOVED);
-		}
-		visibleCount--;
-		ignoreExpand = false;
-	}
-	/*
-	* Bug in the Macintosh.  When the last child of a tree item is
-	* removed and the parent is not expanded, the parent does not
-	* redraw to remove the expander.  The fix is to force a redraw.
-	*/
-	if (parentItem != null && !parentItem.getExpanded () && parentItem.itemCount > 0) {
-		parentItem.redraw (OS.kDataBrowserNoItem);
-	}
-	//TEMPORARY CODE
-	releaseItem (item, false);
-	setScrollWidth (true);
-	fixScrollBar ();
-}
-
-void destroyScrollBar (ScrollBar bar) {
-	if ((bar.style & SWT.H_SCROLL) != 0) style &= ~SWT.H_SCROLL;
-	if ((bar.style & SWT.V_SCROLL) != 0) style &= ~SWT.V_SCROLL;
-	OS.SetDataBrowserHasScrollBars (handle, (style & SWT.H_SCROLL) != 0, (style & SWT.V_SCROLL) != 0);
-}
-
-int drawItemProc (int browser, int id, int property, int itemState, int theRect, int gdDepth, int colorDevice) {
-	if (id < 0) return OS.noErr;
-	int columnIndex = 0;
-	if (columnCount > 0) {
-		for (columnIndex=0; columnIndex<columnCount; columnIndex++) {
-			if (columns [columnIndex].id == property) break;
-		}
-		if (columnIndex == columnCount) return OS.noErr;
-	}
-	Rect rect = new Rect ();
-	TreeItem item = _getItem (id, true);
-	if ((style & SWT.VIRTUAL) != 0) {
-		if (!item.cached) {
-			if (!checkData (item, false)) return OS.noErr;
-			if (setScrollWidth (item)) {
-				if (OS.GetDataBrowserItemPartBounds (handle, id, property, OS.kDataBrowserPropertyEnclosingPart, rect) == OS.noErr) {
-					int x = rect.left;
-					int y = rect.top;
-					int width = rect.right - rect.left;
-					int height = rect.bottom - rect.top;
-					redrawWidget (handle, x, y, width, height, false);
-				}
-				return OS.noErr;
-			}
-		}
-	}
-	OS.memmove (rect, theRect, Rect.sizeof);
-	int x = rect.left;
-	int y = rect.top;
-	int width = rect.right - rect.left;
-	int height = rect.bottom - rect.top;
-	GC gc = paintGC;
-	if (gc == null) {
-		GCData data = new GCData ();
-		int [] port = new int [1];
-		OS.GetPort (port);
-		data.port = port [0];
-		gc = GC.carbon_new (this, data);
-	}
-	OS.GetDataBrowserItemPartBounds (handle, id, property, OS.kDataBrowserPropertyEnclosingPart, rect);
-	int gridWidth = getLinesVisible () ? GRID_WIDTH : 0;
-	int itemX = rect.left + gridWidth;
-	int itemY = rect.top;
-	int itemWidth = rect.right - rect.left - gridWidth;
-	int itemHeight = rect.bottom - rect.top + 1;
-	if (drawBackground) {
-		drawBackground = false;
-		Region region = new Region (display);
-		Rectangle clientArea = getClientArea ();
-		int headerHeight = getHeaderHeight ();
-		clientArea.y += headerHeight;
-		clientArea.height -= headerHeight;
-		if (clientArea.height < 0) clientArea.height = 0;
-		region.add (clientArea);
-		if ((style & SWT.CHECK) != 0 || gridWidth != 0) {
-			int rgn = OS.NewRgn();
-			if ((style & SWT.CHECK) != 0) {
-				if (OS.GetDataBrowserItemPartBounds (handle, id, Table.CHECK_COLUMN_ID, OS.kDataBrowserPropertyEnclosingPart, rect) == OS.noErr) {
-					OS.SetRectRgn (rgn, (short)rect.left, (short)clientArea.y, (short)(rect.right + gridWidth), (short)(clientArea.y + clientArea.height));
-					OS.DiffRgn (region.handle, rgn, region.handle);
-				}
-			}
-			if (gridWidth != 0) {
-				if (columnCount == 0) {
-					if (OS.GetDataBrowserItemPartBounds (handle, id, Table.COLUMN_ID, OS.kDataBrowserPropertyEnclosingPart, rect) == OS.noErr) {
-						OS.SetRectRgn (rgn, (short)rect.right, (short)clientArea.y, (short)(rect.right + gridWidth), (short)(clientArea.y + clientArea.height));
-						OS.DiffRgn (region.handle, rgn, region.handle);					
-					}
-				} else {
-					for (int i = 0; i < columnCount; i++) {
-						if (OS.GetDataBrowserItemPartBounds (handle, id, columns[i].id, OS.kDataBrowserPropertyEnclosingPart, rect) == OS.noErr) {
-							OS.SetRectRgn (rgn, (short)rect.right, (short)clientArea.y, (short)(rect.right + gridWidth), (short)(clientArea.y + clientArea.height));
-							OS.DiffRgn (region.handle, rgn, region.handle);
-						}
-					}
-				}
-			}
-			OS.DisposeRgn (rgn);
-		}
-		if (region != null) gc.setClipping (region);
-		fillBackground (handle, gc.handle, null);
-		if (region != null) {
-			gc.setClipping ((Rectangle)null);
-			region.dispose ();
-		}
-	}
-	OS.CGContextSaveGState (gc.handle);
-	int itemRgn = OS.NewRgn ();
-	OS.SetRectRgn (itemRgn, (short) itemX, (short) itemY, (short) (itemX + itemWidth), (short) (itemY + itemHeight));
-	int clip = OS.NewRgn ();
-	OS.GetClip (clip);
-	OS.SectRgn (clip, itemRgn, itemRgn);
-	OS.DisposeRgn (clip);
-	Region region = Region.carbon_new (display, itemRgn);
-	Font font = item.getFont (columnIndex);
-	Color background = item.getBackground (columnIndex);
-	Color foreground = item.getForeground (columnIndex);
-	Image image = item.getImage (columnIndex);
-	String text = item.getText (columnIndex);	
-	gc.setClipping (region);
-	gc.setFont (font);
-	Point extent = gc.stringExtent (text);
-	int contentWidth = extent.x;
-	Rectangle imageBounds = null;
-	int gap = 0;
-	if (image != null) {
-		gap = getGap ();
-		imageBounds = image.getBounds ();
-		contentWidth += this.imageBounds.width + gap;
-	}
-	int paintWidth = contentWidth;
-	if (hooks (SWT.MeasureItem)) {
-		Event event = new Event ();
-		event.item = item;
-		event.index = columnIndex;
-		event.gc = gc;
-		event.width = contentWidth;
-		event.height = itemHeight;
-		sendEvent (SWT.MeasureItem, event);
-		if (itemHeight < event.height) {
-			itemHeight = event.height;
-			OS.SetDataBrowserTableViewRowHeight (handle, (short) event.height);
-			redrawWidget (handle, false);
-		}
-		if (setScrollWidth (item)) {
-			redrawWidget (handle, false);
-		}
-		contentWidth = event.width;
-		gc.setClipping (region);
-		gc.setFont (font);
-	}
-	int drawState = SWT.FOREGROUND;
-	if (item.background != null || (item.cellBackground != null && item.cellBackground [columnIndex] != null)) drawState |= SWT.BACKGROUND;
-	if ((itemState & (OS.kDataBrowserItemIsSelected | OS.kDataBrowserItemIsDragTarget)) != 0) drawState |= SWT.SELECTED;
-	boolean wasSelected = (drawState & SWT.SELECTED) != 0;
-	if ((drawState & SWT.SELECTED) != 0 && ((style & SWT.FULL_SELECTION) != 0 || columnIndex == 0)) {
-		gc.setBackground (display.getSystemColor (SWT.COLOR_LIST_SELECTION));
-		gc.setForeground (display.getSystemColor (SWT.COLOR_LIST_SELECTION_TEXT));
+	if (parentItem != null) {
+		count = parentItem.itemCount;
+		items = parentItem.items;
 	} else {
-		gc.setBackground (background);
-		gc.setForeground (foreground);
+		count = this.itemCount;
+		items = this.items;
 	}
-	if (hooks (SWT.EraseItem)) {
+	int index = 0;
+	while (index < count) {
+		if (items [index] == item) break;
+		index++;
+	}
+	System.arraycopy (items, index + 1, items, index, --count - index);
+	items [count] = null;
+	if (parentItem != null) {
+		parentItem.itemCount = count;
+	} else {
+		this.itemCount = count;
+	}
+	reloadItem (parentItem, true);
+	setScrollWidth ();
+	if (this.itemCount == 0) imageBounds = null;
+}
+
+boolean dragDetect(int x, int y, boolean filter, boolean[] consume) {
+	// Let Cocoa determine if a drag is starting and fire the notification when we get the callback.
+	return false;
+}
+
+void drawInteriorWithFrame_inView (int /*long*/ id, int /*long*/ sel, NSRect rect, int /*long*/ view) {
+	boolean hooksErase = hooks (SWT.EraseItem);
+	boolean hooksPaint = hooks (SWT.PaintItem);
+	boolean hooksMeasure = hooks (SWT.MeasureItem);
+
+	NSTextFieldCell cell = new NSTextFieldCell (id);
+
+	NSOutlineView widget = (NSOutlineView)this.view;
+	int /*long*/ [] outValue = new int /*long*/ [1];
+	OS.object_getInstanceVariable(id, Display.SWT_ROW, outValue);
+	TreeItem item = (TreeItem) display.getWidget (outValue [0]);
+	int /*long*/ rowIndex = widget.rowForItem(item.handle);
+	OS.object_getInstanceVariable(id, Display.SWT_COLUMN, outValue);
+	int /*long*/ tableColumn = outValue[0];
+	int /*long*/ nsColumnIndex = widget.tableColumns().indexOfObjectIdenticalTo(new id(tableColumn));
+	int columnIndex = 0;
+	for (int i=0; i<columnCount; i++) {
+		if (columns [i].nsColumn.id == tableColumn) {
+			columnIndex = i;
+			break;
+		}
+	}
+
+	Color background = item.cellBackground != null ? item.cellBackground [columnIndex] : null;
+	if (background == null) background = item.background;
+	boolean drawBackground = background != null;
+	boolean drawForeground = true;
+	boolean isSelected = cell.isHighlighted();
+	boolean drawSelection = isSelected;
+	boolean hasFocus = hooksErase && hasFocus ();
+
+	Color selectionBackground = null, selectionForeground = null;
+	if (isSelected && (hooksErase || hooksPaint)) {
+		selectionForeground = Color.cocoa_new(display, hasFocus ? display.alternateSelectedControlTextColor : display.selectedControlTextColor);
+		selectionBackground = Color.cocoa_new(display, hasFocus ? display.alternateSelectedControlColor : display.secondarySelectedControlColor);
+	}
+	
+	NSSize contentSize = super.cellSize(id, OS.sel_cellSize);
+	NSImage image = cell.image();
+	if (image != null) contentSize.width += imageBounds.width + IMAGE_GAP;
+	int contentWidth = (int)Math.ceil (contentSize.width);
+	NSSize spacing = widget.intercellSpacing();
+	int itemHeight = (int)Math.ceil (widget.rowHeight() + spacing.height);
+	
+	NSRect cellRect = widget.rectOfColumn (nsColumnIndex);
+	cellRect.y = rect.y;
+	cellRect.height = rect.height + spacing.height;
+	if (columnCount == 0) {
+		NSRect rowRect = widget.rectOfRow (rowIndex);
+		cellRect.width = rowRect.width;
+	}
+	float /*double*/ offsetX = 0, offsetY = 0;
+	if (hooksPaint || hooksErase) {
+		NSRect frameCell = widget.frameOfCellAtColumn(nsColumnIndex, rowIndex);
+		offsetX = rect.x - frameCell.x;
+		offsetY = rect.y - frameCell.y;
+		if (drawExpansion) {
+			offsetX -= 0.5f;
+			offsetY -= 0.5f;
+		}
+	}
+	int itemX = (int)(rect.x - offsetX), itemY = (int)(rect.y - offsetY);
+	NSGraphicsContext context = NSGraphicsContext.currentContext ();
+	
+	if (hooksMeasure) {
+		sendMeasureItem(item, columnIndex, contentSize);
+	}
+
+	Color userForeground = null;
+	if (hooksErase) {
+		context.saveGraphicsState();
+		NSAffineTransform transform = NSAffineTransform.transform();
+		transform.translateXBy(offsetX, offsetY);
+		transform.concat();
+
+		GCData data = new GCData ();
+		data.paintRect = cellRect;
+		GC gc = GC.cocoa_new (this, data);
+		gc.setFont (item.getFont (columnIndex));
+		if (isSelected) {
+			gc.setForeground (selectionForeground);
+			gc.setBackground (selectionBackground);
+		} else {
+			gc.setForeground (item.getForeground (columnIndex));
+			gc.setBackground (item.getBackground (columnIndex));
+		}
+		if (!drawExpansion) {
+			gc.setClipping ((int)(cellRect.x - offsetX), (int)(cellRect.y - offsetY), (int)cellRect.width, (int)cellRect.height);
+		}
 		Event event = new Event ();
 		event.item = item;
-		event.index = columnIndex;
 		event.gc = gc;
+		event.index = columnIndex;
+		event.detail = SWT.FOREGROUND;
+		if (drawBackground) event.detail |= SWT.BACKGROUND;
+		if (isSelected) event.detail |= SWT.SELECTED;
+		event.x = (int)cellRect.x;
+		event.y = (int)cellRect.y;
+		event.width = (int)cellRect.width;
+		event.height = (int)cellRect.height;
+		sendEvent (SWT.EraseItem, event);
+		if (!event.doit) {
+			drawForeground = drawBackground = drawSelection = false; 
+		} else {
+			drawBackground = drawBackground && (event.detail & SWT.BACKGROUND) != 0;
+			drawForeground = (event.detail & SWT.FOREGROUND) != 0;
+			drawSelection = drawSelection && (event.detail & SWT.SELECTED) != 0;			
+		}
+		if (!drawSelection && isSelected) {
+			userForeground = Color.cocoa_new(display, gc.getForeground().handle);
+		}
+		gc.dispose ();
+		
+		context.restoreGraphicsState();
+
+		if (isDisposed ()) return;
+		if (item.isDisposed ()) return;
+
+		if (drawSelection && ((style & SWT.HIDE_SELECTION) == 0 || hasFocus)) {
+			cellRect.height -= spacing.height;
+			callSuper (widget.id, OS.sel_highlightSelectionInClipRect_, cellRect);
+			cellRect.height += spacing.height;
+		}
+	}
+
+	if (drawBackground && !drawSelection) {
+		context.saveGraphicsState ();
+		float /*double*/ [] colorRGB = background.handle;
+		NSColor color = NSColor.colorWithDeviceRed (colorRGB[0], colorRGB[1], colorRGB[2], 1f);
+		color.setFill ();
+		NSBezierPath.fillRect (cellRect);
+		context.restoreGraphicsState ();
+	}
+	
+	if (insertItem != null && !insertItem.isDisposed()) {
+		context.saveGraphicsState ();
+		NSRect contentRect = cell.titleRectForBounds (rect);
+		GCData data = new GCData ();
+		data.paintRect = contentRect;
+		GC gc = GC.cocoa_new (this, data);
+		gc.setClipping ((int)(contentRect.x - offsetX), (int)(contentRect.y - offsetY), (int)contentRect.width, (int)contentRect.height);
+		Rectangle itemRect = insertItem.getImageBounds(0).union(insertItem.getBounds());
+		Rectangle clientRect = getClientArea();
+		int x = clientRect.x + clientRect.width;
+		int posY = insertBefore ? itemRect.y : itemRect.y + itemRect.height - 1;
+		gc.drawLine(itemRect.x, posY, x, posY);
+		gc.dispose ();
+		context.restoreGraphicsState ();
+	}
+
+	if (drawForeground) {
+		if ((!drawExpansion || hooksMeasure) && image != null) {
+			NSRect destRect = new NSRect();
+			destRect.x = rect.x + IMAGE_GAP;
+			destRect.y = rect.y + (float)Math.ceil((rect.height - imageBounds.height) / 2);
+			destRect.width = imageBounds.width;
+			destRect.height = imageBounds.height;
+			NSRect srcRect = new NSRect();
+			NSSize size = image.size();
+			srcRect.width = size.width;
+			srcRect.height = size.height;
+			context.saveGraphicsState();
+			NSBezierPath.bezierPathWithRect(rect).addClip();
+			NSAffineTransform transform = NSAffineTransform.transform();
+			transform.scaleXBy(1, -1);
+			transform.translateXBy(0, -(destRect.height + 2 * destRect.y));
+			transform.concat();
+			image.drawInRect(destRect, srcRect, OS.NSCompositeSourceOver, 1);
+			context.restoreGraphicsState();
+			int imageWidth = imageBounds.width + IMAGE_GAP;
+			rect.x += imageWidth;
+			rect.width -= imageWidth;
+		}
+		cell.setHighlighted (false);
+		boolean callSuper = false;
+		if (userForeground != null) {
+			/*
+			* Bug in Cocoa.  For some reason, it is not possible to change the
+			* foreground color to black when the cell is highlighted. The text
+			* still draws white.  The fix is to draw the text and not call super.
+			*/
+			float /*double*/ [] color = userForeground.handle;
+			if (color[0] == 0 && color[1] == 0 && color[2] == 0 && color[3] == 1) {
+				NSMutableAttributedString newStr = new NSMutableAttributedString(cell.attributedStringValue().mutableCopy());
+				NSRange range = new NSRange();
+				range.length = newStr.length();
+				newStr.removeAttribute(OS.NSForegroundColorAttributeName, range);
+				NSRect newRect = new NSRect();
+				newRect.x = rect.x + TEXT_GAP;
+				newRect.y = rect.y;
+				newRect.width = rect.width - TEXT_GAP;
+				newRect.height = rect.height;
+				NSSize size = newStr.size();
+				if (newRect.height > size.height) {
+					newRect.y += (newRect.height - size.height) / 2;
+					newRect.height = size.height;
+				}
+				newStr.drawInRect(newRect);
+				newStr.release();
+			} else {
+				NSColor nsColor = NSColor.colorWithDeviceRed(color[0], color[1], color[2], color[3]);
+				cell.setTextColor(nsColor);
+				callSuper = true;
+			}			
+		} else {
+			callSuper = true;
+		}
+		if (callSuper) {
+			NSAttributedString attrStr = cell.attributedStringValue();
+			NSSize size = attrStr.size();
+			if (rect.height > size.height) {
+				rect.y += (rect.height - size.height) / 2;
+				rect.height = size.height;
+			}
+			super.drawInteriorWithFrame_inView(id, sel, rect, view);
+		}
+	}
+
+	if (hooksPaint) {
+		context.saveGraphicsState();
+		NSAffineTransform transform = NSAffineTransform.transform();
+		transform.translateXBy(offsetX, offsetY);
+		transform.concat();
+
+		GCData data = new GCData ();
+		data.paintRect = cellRect;
+		GC gc = GC.cocoa_new (this, data);
+		gc.setFont (item.getFont (columnIndex));
+		if (drawSelection) {
+			gc.setForeground (selectionForeground);
+			gc.setBackground (selectionBackground);
+		} else {
+			gc.setForeground (userForeground != null ? userForeground : item.getForeground (columnIndex));
+			gc.setBackground (item.getBackground (columnIndex));
+		}
+		if (!drawExpansion) {
+			gc.setClipping ((int)(cellRect.x - offsetX), (int)(cellRect.y - offsetY), (int)cellRect.width, (int)cellRect.height);
+		}
+		Event event = new Event ();
+		event.item = item;
+		event.gc = gc;
+		event.index = columnIndex;
+		if (drawForeground) event.detail |= SWT.FOREGROUND;
+		if (drawBackground) event.detail |= SWT.BACKGROUND;
+		if (drawSelection) event.detail |= SWT.SELECTED;
 		event.x = itemX;
 		event.y = itemY;
-		event.width = itemWidth;
+		event.width = contentWidth;
 		event.height = itemHeight;
-		event.detail = drawState;
-		sendEvent (SWT.EraseItem, event);
-		drawState = event.doit ? event.detail : 0;
-		gc.setClipping (region);
-		gc.setFont (font);
-		if ((drawState & SWT.SELECTED) != 0 && ((style & SWT.FULL_SELECTION) != 0 || columnIndex == 0)) {
-			gc.setBackground (display.getSystemColor (SWT.COLOR_LIST_SELECTION));
-			gc.setForeground (display.getSystemColor (SWT.COLOR_LIST_SELECTION_TEXT));
-		} else {
-			gc.setBackground (background);
-			if (!wasSelected) gc.setForeground (foreground);
-		}
-	}
-	if (columnCount != 0 && columnIndex != 0) {
-		TreeColumn column = columns [columnIndex];
-		if ((column.style & SWT.CENTER) != 0) x += (width - contentWidth) / 2;
-		if ((column.style & SWT.RIGHT) != 0) x += width - contentWidth;
-	}
-	int stringX = x, imageWidth = 0;
-	if (image != null) stringX += imageWidth = this.imageBounds.width + gap;
-	if ((drawState & SWT.SELECTED) != 0 && ((style & SWT.FULL_SELECTION) != 0 || columnIndex == 0)) {
-		if ((style & SWT.HIDE_SELECTION) == 0 || hasFocus ()) {
-			if ((style & SWT.FULL_SELECTION) != 0) {
-				gc.fillRectangle (itemX, itemY, itemWidth, itemHeight - 1);
-				drawState &= ~SWT.BACKGROUND;
-			} else if (columnIndex == 0) {
-				gc.fillRectangle (stringX - 1, y, (contentWidth - imageWidth) + 2, itemHeight - 1);
-				drawState &= ~SWT.BACKGROUND;
-			}
-		 } else {
-			 if ((drawState & SWT.BACKGROUND) != 0) gc.setBackground (background);
-		 }
-	}
-	if ((drawState & SWT.BACKGROUND) != 0) {
-		if (columnCount == 0) {
-			gc.fillRectangle (stringX - 1, y, (contentWidth - imageWidth) + 2, itemHeight - 1);
-		} else {
-			gc.fillRectangle (itemX, itemY, itemWidth, itemHeight);
-		}
-	}
-	if ((drawState & SWT.FOREGROUND) != 0) {
-		if (image != null) {
-			int imageX = x, imageY = y + (height - this.imageBounds.height) / 2;
-			gc.drawImage (image, 0, 0, imageBounds.width, imageBounds.height, imageX, imageY, this.imageBounds.width, this.imageBounds.height);
-		}
-		gc.drawString (text, stringX, y + (height - extent.y) / 2, true);
-	}
-	if (hooks (SWT.PaintItem)) {
-		Event event = new Event ();
-		event.item = item;
-		event.index = columnIndex;
-		event.gc = gc;
-		event.x = x;
-		event.y = y;
-		event.width = paintWidth;
-		event.height = itemHeight;
-		event.detail = drawState;
 		sendEvent (SWT.PaintItem, event);
-	}
-	OS.CGContextRestoreGState (gc.handle);
-	OS.DisposeRgn (itemRgn);
-	if (gc != paintGC) gc.dispose ();
-	return OS.noErr;
-}
+		gc.dispose ();
 
-void enableWidget (boolean enabled) {
-	super.enableWidget (enabled);
-	/*
-	* Bug in the Macintosh. For some reason, the data browser does not
-	* redraw the checkboxes when the enable state changes. The fix is
-	* to force a redraw.
-	*/
-	redrawWidget (handle, false);
-}
-
-void fixScrollBar () {
-	/*
-	* Bug in the Macintosh. For some reason, the data browser does not update
-	* the vertical scrollbar when it is scrolled to the bottom and items are
-	* removed.  The fix is to check if the scrollbar value is bigger the
-	* maximum number of visible items and clamp it when needed.
-	*/
-	int [] top = new int [1], left = new int [1];
-	OS.GetDataBrowserScrollPosition (handle, top, left);
-	int maximum = Math.max (0, getItemHeight () * visibleCount - getClientArea ().height);
-	if (top [0] > maximum) {
-		OS.SetDataBrowserScrollPosition (handle, maximum, left [0]);
+		context.restoreGraphicsState();
 	}
 }
 
-String [] getAxAttributes () {
-	return AX_ATTRIBUTES;
+void drawWithExpansionFrame_inView (int /*long*/ id, int /*long*/ sel, NSRect cellFrame, int /*long*/ view) {
+	drawExpansion = true;
+	super.drawWithExpansionFrame_inView(id, sel, cellFrame, view);
+	drawExpansion = false;
 }
 
-public int getBorderWidth () {
-	checkWidget ();
-	int border = 0;
-	byte [] hasBorder = new byte [1];
-	OS.GetControlData (handle, (short) OS.kControlEntireControl, OS.kControlDataBrowserIncludesFrameAndFocusTag, 1, hasBorder, null);
-	if (hasBorder [0] != 0) {
-		int [] outMetric = new int [1];
-		OS.GetThemeMetric (OS.kThemeMetricFocusRectOutset, outMetric);
-		border += outMetric [0] - BORDER_INSET;
+void expandItem_expandChildren (int /*long*/ id, int /*long*/ sel, int /*long*/ itemID, boolean children) {
+	TreeItem item = (TreeItem)display.getWidget(itemID);
+	if (!ignoreExpand) item.sendExpand (true, children);
+	ignoreExpand = true;
+	super.expandItem_expandChildren (id, sel, itemID, children);
+	ignoreExpand = false;
+	if (isDisposed() || item.isDisposed()) return;
+	if (!children) {
+		ignoreExpand = true;
+		TreeItem[] items = item.items;
+		for (int i = 0; i < item.itemCount; i++) {
+			if (items[i] != null) items[i].updateExpanded ();
+		}
+		ignoreExpand = false;
 	}
-	return border;
+	setScrollWidth (false, item.items, true);
+}
+
+NSRect expansionFrameWithFrame_inView(int /*long*/ id, int /*long*/ sel, NSRect cellRect, int /*long*/ view) {
+	if (toolTipText == null) {
+		NSRect rect = super.expansionFrameWithFrame_inView(id, sel, cellRect, view);
+		NSCell cell = new NSCell(id);
+		if (rect.width != 0 && rect.height != 0) {
+			if (hooks(SWT.MeasureItem)) {
+				NSSize cellSize = cell.cellSize();
+				cellRect.width = cellSize.width;
+				return cellRect;
+			}
+		} else {
+			NSRect expansionRect;
+			if (hooks(SWT.MeasureItem)) {
+				expansionRect = cellRect;
+				NSSize cellSize = cell.cellSize();
+				expansionRect.width = cellSize.width;
+			} else {
+				expansionRect = cell.titleRectForBounds(cellRect);
+				NSSize cellSize = super.cellSize(id, OS.sel_cellSize);
+				expansionRect.width = cellSize.width;
+			}
+			NSRect contentRect = scrollView.contentView().bounds();
+			OS.NSIntersectionRect(contentRect, expansionRect, contentRect);
+			if (!OS.NSEqualRects(expansionRect, contentRect)) {
+				return expansionRect;
+			}
+		}
+		return rect;
+	}
+	return new NSRect();
+}
+
+Widget findTooltip (NSPoint pt) {
+	NSTableView widget = (NSTableView)view;
+	NSTableHeaderView headerView = widget.headerView();
+	if (headerView != null) {
+		pt = headerView.convertPoint_fromView_ (pt, null);
+		int /*long*/ index = headerView.columnAtPoint (pt);
+		if (index != -1) {
+			NSArray nsColumns = widget.tableColumns ();
+			id nsColumn = nsColumns.objectAtIndex (index);
+			for (int i = 0; i < columnCount; i++) {
+				TreeColumn column = columns [i];
+				if (column.nsColumn.id == nsColumn.id) {
+					return column;
+				}
+			}
+		}
+	}
+	return super.findTooltip (pt);
 }
 
 int getCheckColumnWidth () {
-	int inset = 0;
-	if (OS.VERSION >= 0x1040) {
-		float [] metric = new float [1];
-		OS.DataBrowserGetMetric (handle, OS.kDataBrowserMetricCellContentInset, null, metric);
-		inset = (int) metric [0];
-	} else {
-		inset = CELL_CONTENT_INSET;
-	}
-	int [] checkWidth = new int [1];
-	OS.GetThemeMetric (OS.kThemeMetricCheckBoxWidth, checkWidth);
-	return checkWidth [0] + inset * 2;
+	return (int)checkColumn.dataCell().cellSize().width;
 }
 
 public Rectangle getClientArea () {
-	checkWidget();
-	int border = getBorderWidth ();
-	Rect rect = new Rect (), inset = new Rect ();
-	OS.GetControlBounds (handle, rect);
-	OS.GetDataBrowserScrollBarInset (handle, inset);
-	int width = Math.max (0, rect.right - rect.left - inset.right - border - border);
-	int height = Math.max (0, rect.bottom - rect.top - inset.bottom - border - border);
-	return new Rectangle (inset.left + border, inset.top + border, width, height);
+	checkWidget ();
+	Rectangle rect = super.getClientArea ();
+	NSTableHeaderView headerView = ((NSTableView) view).headerView ();
+	if (headerView != null) {
+		int height =  (int) headerView.bounds ().height;
+		rect.y -= height;
+		rect.height += height;
+	}
+	return rect;
+}
+
+TreeColumn getColumn (id id) {
+	for (int i = 0; i < columnCount; i++) {
+		if (columns[i].nsColumn.id == id.id) {
+			return columns[i]; 
+		}
+	}
+	return null;
 }
 
 /**
@@ -1384,12 +1337,11 @@ public int getColumnCount () {
 public int [] getColumnOrder () {
 	checkWidget ();
 	int [] order = new int [columnCount];
-	int [] position = new int [1];
-	for (int i=0; i<columnCount; i++) {
+	for (int i = 0; i < columnCount; i++) {
 		TreeColumn column = columns [i];
-		OS.GetDataBrowserTableViewColumnPosition (handle, column.id, position);
-		if ((style & SWT.CHECK) != 0) position [0] -= 1;
-		order [position [0]] = i;
+		int index = indexOf (column.nsColumn);
+		if ((style & SWT.CHECK) != 0) index -= 1;
+		order [index] = i;
 	}
 	return order;
 }
@@ -1430,15 +1382,6 @@ public TreeColumn [] getColumns () {
 	return result;
 }
 
-int getGap () {
-	if (OS.VERSION >= 0x1040) {
-		float [] metric = new float [1];
-		OS.DataBrowserGetMetric (handle, OS.kDataBrowserMetricIconAndTextGap, null, metric);
-		return (int) metric [0];
-	}
-	return ICON_AND_TEXT_GAP;
-}
-
 /**
  * Returns the width in pixels of a grid line.
  *
@@ -1470,9 +1413,9 @@ public int getGridLineWidth () {
  */
 public int getHeaderHeight () {
 	checkWidget ();
-	short [] height = new short [1];
-	OS.GetDataBrowserListViewHeaderBtnHeight (handle, height);
-	return height [0];
+	NSTableHeaderView headerView = ((NSOutlineView) view).headerView ();
+	if (headerView == null) return 0;
+	return (int) headerView.bounds ().height;
 }
 
 /**
@@ -1496,52 +1439,7 @@ public int getHeaderHeight () {
  */
 public boolean getHeaderVisible () {
 	checkWidget ();
-	short [] height = new short [1];
-	OS.GetDataBrowserListViewHeaderBtnHeight (handle, height);
-	return height [0] != 0;
-}
-
-int getLeftDisclosureInset (int column_id) {
-	int [] disclosure = new int [1];
-	OS.GetDataBrowserListViewDisclosureColumn (handle, disclosure, new boolean [1]);
-	if (disclosure [0] == column_id) {
-		int width = 0;
-		int [] metric1 = new int [1];
-		OS.GetThemeMetric (OS.kThemeMetricDisclosureTriangleWidth, metric1);
-		width += metric1 [0];
-		if (OS.VERSION >= 0x1040) {
-			float [] metric = new float [1];
-			OS.DataBrowserGetMetric (handle, OS.kDataBrowserMetricDisclosureColumnEdgeInset, null, metric);
-			width += (int) metric [0];
-			OS.DataBrowserGetMetric (handle, OS.kDataBrowserMetricDisclosureTriangleAndContentGap, null, metric);
-			width += (int) metric [0];
-		} else {
-			width += DISCLOSURE_COLUMN_EDGE_INSET + DISCLOSURE_TRIANGLE_AND_CONTENT_GAP;
-		}
-		return width;
-	}
-	return 0;
-}
-
-int getInsetWidth (int column_id, boolean leftInset) {
-	int inset = 0;
-	if (OS.VERSION >= 0x1040) {
-		float [] metric = new float [1];
-		OS.DataBrowserGetMetric (handle, OS.kDataBrowserMetricCellContentInset, null, metric);
-		inset = (int) metric [0];
-	} else {
-		inset = CELL_CONTENT_INSET;
-	}
-	int width = 0;
-	int [] disclosure = new int [1];
-	OS.GetDataBrowserListViewDisclosureColumn (handle, disclosure, new boolean [1]);
-	if (disclosure [0] != column_id) {
-		width += inset * 2;
-	} else {
-		width += inset;
-		if (leftInset) width += getLeftDisclosureInset (column_id);
-	}
-	return width;
+	return ((NSOutlineView) view).headerView () != null;
 }
 
 /**
@@ -1563,9 +1461,9 @@ int getInsetWidth (int column_id, boolean leftInset) {
  */
 public TreeItem getItem (int index) {
 	checkWidget ();
-	int count = getItemCount (null);
+	int count = getItemCount ();
 	if (index < 0 || index >= count) error (SWT.ERROR_INVALID_RANGE);
-	return _getItem (null, index);
+	return _getItem (null, index, true);
 }
 
 /**
@@ -1594,86 +1492,19 @@ public TreeItem getItem (int index) {
 public TreeItem getItem (Point point) {
 	checkWidget ();
 	if (point == null) error (SWT.ERROR_NULL_ARGUMENT);
-	int [] disclosure = new int [1];
-	OS.GetDataBrowserListViewDisclosureColumn (handle, disclosure, new boolean [1]);
-	short [] height = new short [1];
-	if (OS.GetDataBrowserTableViewRowHeight (handle, height) != OS.noErr) {
-		error (SWT.ERROR_CANNOT_GET_ITEM_HEIGHT);
-	}
-	Rect rect = new Rect ();
-	org.eclipse.swt.internal.carbon.Point pt = new org.eclipse.swt.internal.carbon.Point ();
-	OS.SetPt (pt, (short) point.x, (short) point.y);
-	if (0 < lastHittest && lastHittest <= items.length && lastHittestColumn != 0) {
-		TreeItem item = _getItem (lastHittest, false);
-		if (item != null) {
-			int lastPosColumnId = column_id;
-			for (int i=0; i<columnCount; i++) {
-				TreeColumn column = columns [i];
-				int [] position = new int [1];
-				OS.GetDataBrowserTableViewColumnPosition (handle, column.id, position);
-				if ((style & SWT.CHECK) != 0) position [0] -= 1;
-				if (position [0] == columnCount - 1) {
-					lastPosColumnId = column.id;
-					break;
-				}
-			}
-			if (OS.GetDataBrowserItemPartBounds (handle, item.id, lastPosColumnId, OS.kDataBrowserPropertyEnclosingPart, rect) == OS.noErr) {
-				if (pt.h > rect.right) return null;
-			}
-			if (OS.GetDataBrowserItemPartBounds (handle, item.id, disclosure[0], OS.kDataBrowserPropertyDisclosurePart, rect) == OS.noErr) {
-				if (OS.PtInRect (pt, rect)) return null;
-			}
-			if (OS.GetDataBrowserItemPartBounds (handle, item.id, lastHittestColumn, OS.kDataBrowserPropertyEnclosingPart, rect) == OS.noErr) {
-				rect.bottom = (short)(rect.top + height [0]);
-				if (OS.PtInRect (pt, rect)) return item;
-				if (rect.top <= pt.v && pt.v < rect.bottom) {
-					for (int j = 0; j < columnCount; j++) {
-						if (OS.GetDataBrowserItemPartBounds (handle, item.id, columns [j].id, OS.kDataBrowserPropertyEnclosingPart, rect) == OS.noErr) {
-							rect.bottom = (short)(rect.top + height [0]);
-							if (OS.PtInRect (pt, rect)) return item;
-						}
-					}
-					return null;
-				}
-			}
-		}
-	}
-	/* Find the item by approximating its row position */
-	int[] top = new int[1];
-	int[] left = new int[1];
-	OS.GetDataBrowserScrollPosition (handle, top, left);		
-	short [] header = new short [1];
-	OS.GetDataBrowserListViewHeaderBtnHeight (handle, header);
-	int [] offsets = new int [] {0, 1, -1};
-	for (int i = 0; i < offsets.length; i++) {
-		int row = (top[0] - header [0] + point.y) / height [0] + offsets [i];
-		if (row >= 0) {
-			int [] itemId = new int[1];
-			int result = OS.GetDataBrowserTableViewItemID (handle, row, itemId);
-			if (result != OS.noErr) return null;
-			TreeItem item = _getItem(itemId[0], false);
-			if (item == null) return null;
-			if (OS.GetDataBrowserItemPartBounds (handle, item.id, disclosure [0], OS.kDataBrowserPropertyDisclosurePart, rect) == OS.noErr) {
-				if (OS.PtInRect (pt, rect)) return null;
-			}
-			int columnId = columnCount == 0 ? column_id : columns [0].id;
-			if (OS.GetDataBrowserItemPartBounds (handle, item.id, columnId, OS.kDataBrowserPropertyEnclosingPart, rect) == OS.noErr) {
-				rect.bottom = (short)(rect.top + height [0]);
-				if (rect.top <= pt.v && pt.v < rect.bottom) {
-					if (columnCount == 0) {
-						if (OS.PtInRect (pt, rect)) return item;
-					} else {
-						for (int j = 0; j < columnCount; j++) {
-							if (OS.GetDataBrowserItemPartBounds (handle, item.id, columns [j].id, OS.kDataBrowserPropertyEnclosingPart, rect) == OS.noErr) {
-								rect.bottom = (short)(rect.top + height [0]);
-								if (OS.PtInRect (pt, rect)) return item;
-							}
-						}
-					}
-					return null;
-				}
-			}
-		}
+	checkItems ();
+	NSOutlineView widget = (NSOutlineView)view;
+	NSPoint pt = new NSPoint();
+	pt.x = point.x;
+	pt.y = point.y;
+	int row = (int)/*64*/widget.rowAtPoint(pt);
+	if (row == -1) return null;
+	NSRect rect = widget.frameOfOutlineCellAtRow(row);
+	if (OS.NSPointInRect(pt, rect)) return null;
+	id id = widget.itemAtRow(row);
+	Widget item = display.getWidget (id.id);
+	if (item != null && item instanceof TreeItem) {
+		return (TreeItem)item;
 	}
 	return null;
 }
@@ -1693,18 +1524,11 @@ public TreeItem getItem (Point point) {
  */
 public int getItemCount () {
 	checkWidget ();
-	return getItemCount (null);
+	return itemCount;
 }
 
-int getItemCount (TreeItem parentItem) {
-	if (parentItem == null) {
-		int [] count = new int [1];
-		if (OS.GetDataBrowserItemCount (handle, OS.kDataBrowserNoItem, false, OS.kDataBrowserItemAnyState, count) == OS.noErr) {
-			return count [0];
-		}
-		return 0;
-	}
-	return parentItem.itemCount;
+int getItemCount (TreeItem item) {
+	return item == null ? itemCount : item.itemCount;
 }
 
 /**
@@ -1720,11 +1544,7 @@ int getItemCount (TreeItem parentItem) {
  */
 public int getItemHeight () {
 	checkWidget ();
-	short [] height = new short [1];
-	if (OS.GetDataBrowserTableViewRowHeight (handle, height) != OS.noErr) {
-		error (SWT.ERROR_CANNOT_GET_ITEM_HEIGHT);
-	}
-	return height [0];
+	return (int)((NSOutlineView) view).rowHeight () + CELL_GAP;
 }
 
 /**
@@ -1746,22 +1566,17 @@ public int getItemHeight () {
  */
 public TreeItem [] getItems () {
 	checkWidget ();
-	return getItems (null);
-}
-
-TreeItem [] getItems (TreeItem parentItem) {
-	if (items == null) return new TreeItem [0];
-	int count = getItemCount (parentItem);
-	TreeItem [] result = new TreeItem [count];
-	for (int i=0; i<count; i++) {
-		result [i] = _getItem (parentItem, i);
+	TreeItem [] result = new TreeItem [itemCount];
+	for (int i=0; i<itemCount; i++) {
+		result [i] = _getItem (null, i, true);
 	}
 	return result;
 }
 
 /**
  * Returns <code>true</code> if the receiver's lines are visible,
- * and <code>false</code> otherwise.
+ * and <code>false</code> otherwise. Note that some platforms draw 
+ * grid lines while others may draw alternating row colors.
  * <p>
  * If one of the receiver's ancestors is not visible or some
  * other condition makes the receiver not visible, this method
@@ -1780,12 +1595,7 @@ TreeItem [] getItems (TreeItem parentItem) {
  */
 public boolean getLinesVisible () {
 	checkWidget ();
-	if (OS.VERSION >= 0x1040) {
-		int [] attrib = new int [1];
-		OS.DataBrowserGetAttributes (handle, attrib);
-		return (attrib [0] & (OS.kDataBrowserAttributeListViewAlternatingRowColors | OS.kDataBrowserAttributeListViewDrawColumnDividers)) != 0;
-	}
-	return false;
+	return ((NSOutlineView) view).usesAlternatingRowBackgroundColors ();
 }
 
 /**
@@ -1823,65 +1633,23 @@ public TreeItem getParentItem () {
  */
 public TreeItem [] getSelection () {
 	checkWidget ();
-	int [] count = new int [1];
-	if (OS.GetDataBrowserItemCount (handle, OS.kDataBrowserNoItem, true, OS.kDataBrowserItemIsSelected, count) != OS.noErr) {
-		error (SWT.ERROR_CANNOT_GET_COUNT);
+	NSOutlineView widget = (NSOutlineView) view;
+	if (widget.numberOfSelectedRows () == 0) {
+		return new TreeItem [0];
 	}
-	TreeItem [] result = new TreeItem [count[0]];
-	if (count[0] > 0) {
-		int ptr = OS.NewHandle (0);
-		if (count[0] == 1) {
-			if (OS.GetDataBrowserItems (handle, OS.kDataBrowserNoItem, true, OS.kDataBrowserItemIsSelected, ptr) != OS.noErr) {
-				error (SWT.ERROR_CANNOT_GET_SELECTION);
-			}
-			OS.HLock (ptr);
-			int [] id = new int [1];
-			OS.memmove (id, ptr, 4);
-			OS.memmove (id, id [0], 4);
-			result [0] = _getItem (id [0], true);
-			OS.HUnlock (ptr);
-		} else {
-			getSelection (result, OS.kDataBrowserNoItem, ptr, 0);
+	NSIndexSet selection = widget.selectedRowIndexes ();
+	int count = (int)/*64*/selection.count ();
+	int /*long*/ [] indexBuffer = new int /*long*/ [count];
+	selection.getIndexes (indexBuffer, count, 0);
+	TreeItem [] result = new TreeItem [count];
+	for (int i=0; i<count; i++) {
+		id id = widget.itemAtRow (indexBuffer [i]);
+		Widget item = display.getWidget (id.id);
+		if (item != null && item instanceof TreeItem) {
+			result[i] = (TreeItem) item;
 		}
-		OS.DisposeHandle (ptr);
 	}
 	return result;
-}
-
-int getSelection(TreeItem[] result, int item, int ptr, int index) {
-	OS.SetHandleSize (ptr, 0);
-	if (OS.GetDataBrowserItems (handle, item, false, OS.kDataBrowserItemIsSelected, ptr) != OS.noErr) {
-		error (SWT.ERROR_CANNOT_GET_SELECTION);
-	}
-	int count = OS.GetHandleSize (ptr) / 4;
-	if (count > 0) {
-		OS.HLock (ptr);
-		int [] id = new int [count];
-		OS.memmove (id, ptr, 4);
-		OS.memmove (id, id [0], count * 4);
-		for (int i=0; i<count; i++) {
-			result [index++] = _getItem (id [count - i - 1], true);
-		}
-		OS.HUnlock (ptr);
-		if (index == result.length) return index;
-	}
-	OS.SetHandleSize (ptr, 0);
-	if (OS.GetDataBrowserItems (handle, item, false, OS.kDataBrowserContainerIsOpen, ptr) != OS.noErr) {
-		error (SWT.ERROR_CANNOT_GET_SELECTION);
-	}
-	count = OS.GetHandleSize (ptr) / 4;
-	if (count > 0) {
-		OS.HLock (ptr);
-		int [] id = new int [count];
-		OS.memmove (id, ptr, 4);
-		OS.memmove (id, id [0], count * 4);
-		for (int i=0; i<count; i++) {
-			index = getSelection(result, id [count - i - 1], ptr, index);
-			if (index == result.length) return index;
-		}
-		OS.HUnlock (ptr);
-	}
-	return index;
 }
 
 /**
@@ -1896,11 +1664,7 @@ int getSelection(TreeItem[] result, int item, int ptr, int index) {
  */
 public int getSelectionCount () {
 	checkWidget ();
-	int [] count = new int [1];
-	if (OS.GetDataBrowserItemCount (handle, OS.kDataBrowserNoItem, true, OS.kDataBrowserItemIsSelected, count) != OS.noErr) {
-		error (SWT.ERROR_CANNOT_GET_COUNT);
-	}
-	return count [0];
+	return (int)/*64*/((NSOutlineView) view).numberOfSelectedRows ();
 }
 
 /**
@@ -1961,161 +1725,52 @@ public int getSortDirection () {
  */
 public TreeItem getTopItem () {
 	checkWidget ();
-	/* Find the topItem by calculating its row position */
-	int[] top = new int[1], left = new int[1];
-	OS.GetDataBrowserScrollPosition (handle, top, left);		
-	int row = top[0] / getItemHeight ();;
-	int [] itemId = new int[1];
-	int result = OS.GetDataBrowserTableViewItemID (handle, row, itemId);
-	if (result == OS.noErr) return _getItem (itemId[0], false);
-	return null;
+	//TODO - partial item at the top
+	NSRect rect = scrollView.documentVisibleRect ();
+	NSPoint point = new NSPoint ();
+	point.x = rect.x;
+	point.y = rect.y;
+	NSOutlineView outlineView = (NSOutlineView)view;
+	int /*long*/ index = outlineView.rowAtPoint (point);
+	if (index == -1) return null; /* empty */
+	id item = outlineView.itemAtRow (index);
+	return (TreeItem)display.getWidget (item.id);
 }
 
-int helpProc (int inControl, int inGlobalMouse, int inRequest, int outContentProvided, int ioHelpContent) {
-	if (toolTipText == null) {
-	    switch (inRequest) {
-			case OS.kHMSupplyContent: {
-				if (!(toolTipText != null && toolTipText.length () != 0)) {
-					Rect rect = new Rect ();
-					int window = OS.GetControlOwner (handle);
-					OS.GetWindowBounds (window, (short) OS.kWindowContentRgn, rect);
-					short windowLeft = rect.left, windowTop = rect.top;
-					org.eclipse.swt.internal.carbon.Point pt = new org.eclipse.swt.internal.carbon.Point ();
-					OS.memmove(pt, new int[] {inGlobalMouse}, 4);
-					pt.h -= windowLeft;
-					pt.v -= windowTop;
-					String toolTipText = null;
-					int tagSide = OS.kHMAbsoluteCenterAligned;
-					CGPoint inPt = new CGPoint ();
-					int [] contentView = new int [1];
-					OS.HIViewFindByID (OS.HIViewGetRoot (OS.GetControlOwner (handle)), OS.kHIViewWindowContentID (), contentView);
-					OS.HIViewConvertPoint (inPt, handle, contentView [0]);
-					pt.h -= (int) inPt.x;
-					pt.v -= (int) inPt.y;
-					windowLeft += (int) inPt.x;
-					windowTop += (int) inPt.y;
-					int x = pt.h;
-					int y = pt.v;
-					int headerHeight = getHeaderHeight ();
-					if (headerHeight != 0 && (0 <= y && y < headerHeight) ) {
-						int startX = 0;
-						for (int i = 0; i < columnCount; i++) {
-							TreeColumn column = columns [i];
-							int width = column.lastWidth + getLeftDisclosureInset (column.id);
-							if (startX <= x && x < startX + width) {
-								toolTipText = column.toolTipText;
-								rect.left = (short) startX;
-								rect.top = (short) 0;
-								rect.right = (short) (rect.left + width);
-								rect.bottom = (short) (rect.top + headerHeight);
-								tagSide = OS.kHMOutsideBottomRightAligned;
-								break;
-							}
-							startX += width;
-						}
-					} else {
-						TreeItem item = null;
-						if (0 < lastHittest && lastHittest <= items.length && lastHittestColumn != 0) {
-							if (OS.GetDataBrowserItemPartBounds (handle, lastHittest, lastHittestColumn, OS.kDataBrowserPropertyContentPart, rect) == OS.noErr) {
-								item = _getItem (lastHittest, false);
-							}
-						}
-						if (item != null) {
-							int columnIndex = 0;
-							TreeColumn column = null;
-							if (columnCount > 0) {
-								for (int i = 0; i < columnCount; i++) {
-									if (columns[i].id == lastHittestColumn) {
-										column = columns[i];
-										columnIndex = i;
-										break;
-									}
-								}
-							}
-							int columnId = lastHittestColumn;
-							GC gc = new GC (this);
-							int inset = getInsetWidth (columnId, false);
-							int width = item.calculateWidth (columnIndex, gc) + inset;
-							gc.dispose ();
-							int columnWidth;
-							if (columnCount == 0) {
-								columnWidth = getClientArea ().width;
-							} else {
-								short [] w = new short [1];
-								OS.GetDataBrowserTableViewNamedColumnWidth (handle, columnId, w);
-								columnWidth = w[0];
-							}
-							if (width > columnWidth) {
-								toolTipText = item.getText (columnIndex);
-								Image image = item.getImage (columnIndex);
-								int imageWidth = image != null ? image.getBounds ().width + getGap () : 0;
-								int style = column == null ? SWT.LEFT : column.style;
-								if ((style & SWT.LEFT) != 0) {
-									rect.left += imageWidth;
-									rect.right = (short) (rect.left + width - imageWidth - inset);
-								}
-								if ((style & SWT.RIGHT) != 0) {
-									rect.left = (short) (rect.right - width + imageWidth + inset);
-								}
-								if ((style & SWT.CENTER) != 0) {
-									rect.left += imageWidth;
-								}
-							}
-						}
-					}
-					if (toolTipText != null && toolTipText.length () != 0) {
-						char [] buffer = new char [toolTipText.length ()];
-						toolTipText.getChars (0, buffer.length, buffer, 0);
-						int length = fixMnemonic (buffer);
-						if (display.helpString != 0) OS.CFRelease (display.helpString);
-						display.helpString = OS.CFStringCreateWithCharacters (OS.kCFAllocatorDefault, buffer, length);
-						HMHelpContentRec helpContent = new HMHelpContentRec ();
-						OS.memmove (helpContent, ioHelpContent, HMHelpContentRec.sizeof);
-						display.helpWidget = this;
-						helpContent.version = OS.kMacHelpVersion;
-						helpContent.tagSide = (short) tagSide;
-						helpContent.absHotRect_left = (short) (rect.left + windowLeft);
-						helpContent.absHotRect_top = (short) (rect.top + windowTop);
-						helpContent.absHotRect_right = (short) (rect.right + windowLeft);
-						helpContent.absHotRect_bottom = (short) (rect.bottom + windowTop);	
-						helpContent.content0_contentType = OS.kHMCFStringContent;
-						helpContent.content0_tagCFString = display.helpString;
-						helpContent.content1_contentType = OS.kHMCFStringContent;
-						helpContent.content1_tagCFString = display.helpString;
-						OS.memmove (ioHelpContent, helpContent, HMHelpContentRec.sizeof);
-						OS.memmove (outContentProvided, new short[]{OS.kHMContentProvided}, 2);
-						return OS.noErr;
-					}
-				}
-				break;
-			}
-		}
+void highlightSelectionInClipRect(int /*long*/ id, int /*long*/ sel, int /*long*/ rect) {
+	if (hooks (SWT.EraseItem)) return;
+	if ((style & SWT.HIDE_SELECTION) != 0 && !hasFocus()) return;
+	NSRect clipRect = new NSRect ();
+	OS.memmove (clipRect, rect, NSRect.sizeof);
+	callSuper (id, sel, clipRect);
+}
+
+int /*long*/ hitTestForEvent (int /*long*/ id, int /*long*/ sel, int /*long*/ event, NSRect rect, int /*long*/ controlView) {
+	/*
+	* For some reason, the cell class needs to implement hitTestForEvent:inRect:ofView:,
+	* otherwise the double action selector is not called properly.
+	*/
+	return callSuper(id, sel, event, rect, controlView);
+}
+
+int /*long*/ image (int /*long*/ id, int /*long*/ sel) {
+	int /*long*/ [] image = new int /*long*/ [1];
+	OS.object_getInstanceVariable(id, Display.SWT_IMAGE, image);
+	return image[0];
+}
+
+NSRect imageRectForBounds (int /*long*/ id, int /*long*/ sel, NSRect cellFrame) {
+	NSImage image = new NSCell(id).image();
+	if (image != null) {
+		cellFrame.x += IMAGE_GAP;
+		cellFrame.width = imageBounds.width;
+		cellFrame.height = imageBounds.height;
 	}
-	return super.helpProc (inControl, inGlobalMouse, inRequest, outContentProvided, ioHelpContent);
+	return cellFrame;
 }
 
-int hitTestProc (int browser, int id, int property, int theRect, int mouseRect) {
-	lastHittest = id;
-	lastHittestColumn = property;
-	return 1;
-}
-
-void hookEvents () {
-	super.hookEvents ();
-	DataBrowserCallbacks callbacks = new DataBrowserCallbacks ();
-	callbacks.version = OS.kDataBrowserLatestCallbacks;
-	OS.InitDataBrowserCallbacks (callbacks);
-	callbacks.v1_itemDataCallback = display.itemDataProc;
-	callbacks.v1_itemNotificationCallback = display.itemNotificationProc;
-	callbacks.v1_itemCompareCallback = display.itemCompareProc;
-	OS.SetDataBrowserCallbacks (handle, callbacks);
-	DataBrowserCustomCallbacks custom = new DataBrowserCustomCallbacks ();
-	custom.version = OS.kDataBrowserLatestCustomCallbacks;
-	OS.InitDataBrowserCustomCallbacks (custom);
-	custom.v1_drawItemCallback = display.drawItemProc;
-	custom.v1_hitTestCallback = display.hitTestProc;
-	custom.v1_trackingCallback = display.trackingProc;
-	OS.SetDataBrowserCustomCallbacks (handle, custom);
+int indexOf (NSTableColumn column) {
+	return (int)/*64*/((NSTableView)view).tableColumns().indexOfObjectIdenticalTo(column);
 }
 
 /**
@@ -2172,479 +1827,277 @@ public int indexOf (TreeItem item) {
 	if (item == null) error (SWT.ERROR_NULL_ARGUMENT);
 	if (item.isDisposed ()) error (SWT.ERROR_INVALID_ARGUMENT);
 	if (item.parentItem != null) return -1;
-	return _indexOf (null, item);
-}
-
-int _indexOf (TreeItem parentItem, TreeItem item) {
-	int [] ids = parentItem == null ? childIds : parentItem.childIds;
-	if (ids != null) {
-		for (int i=0; i<ids.length; i++) {
-			if (ids [i] == item.id) return i;
-		}
+	for (int i = 0; i < itemCount; i++) {
+		if (item == items[i]) return i;
 	}
 	return -1;
 }
 
-int itemCompareProc (int browser, int itemOne, int itemTwo, int sortProperty) {
-	boolean create = (style & SWT.VIRTUAL) != 0 && sortColumn != null  
-					&& !sortColumn.isDisposed () && sortDirection == SWT.DOWN; 
-	TreeItem item1 = _getItem (itemOne, create);
-	TreeItem item2 = _getItem (itemTwo, create);
-	if (item1 == null || item2 == null) return OS.noErr;
-	int index1 = _indexOf (item1.parentItem, item1);
-	int index2 = _indexOf (item2.parentItem , item2);
-	if (sortDirection == SWT.DOWN && sortColumn != null) {
-		return index1 > index2 ? 1 : 0;
-	}
-	return index1 < index2 ? 1 : 0;
+boolean isTrim (NSView view) {
+	if (super.isTrim (view)) return true;
+	return view.id == headerView.id;
 }
 
-int itemDataProc (int browser, int id, int property, int itemData, int setValue) {
-	switch (property) {
-		case CHECK_COLUMN_ID: {
-			TreeItem item = _getItem (id, true);
-			if (setValue != 0) {
-				item.checked = !item.checked;
-				if (item.checked && item.grayed) {
-					OS.SetDataBrowserItemDataButtonValue (itemData, (short) OS.kThemeButtonMixed);
-				} else {
-					int theData = item.checked ? OS.kThemeButtonOn : OS.kThemeButtonOff;
-					OS.SetDataBrowserItemDataButtonValue (itemData, (short) theData);
-				}
-				Event event = new Event ();
-				event.item = item;
-				event.detail = SWT.CHECK;
-				postEvent (SWT.Selection, event);
-				/*
-				* Bug in the Macintosh. When the height of the row is smaller than the
-				* check box, the tail of the check mark draws outside of the item part
-				* bounds. This means it will not be redrawn when the item is unckeched.
-				* The fix is to redraw the area.
-				*/
-				if (!item.checked) item.redraw(Tree.CHECK_COLUMN_ID);
-			} else {
-				int theData = OS.kThemeButtonOff;
-				if (item.checked) theData = item.grayed ? OS.kThemeButtonMixed : OS.kThemeButtonOn;
-				OS.SetDataBrowserItemDataButtonValue (itemData, (short) theData);
-			}
-			break;
+int /*long*/ menuForEvent(int /*long*/ id, int /*long*/ sel, int /*long*/ theEvent) {
+	if (id != headerView.id) {
+		/*
+		 * Feature in Cocoa: Table views do not change the selection when the user
+		 * right-clicks or control-clicks on an NSTableView or its subclasses. Fix is to select the 
+		 * clicked-on row ourselves.
+		 */
+		NSEvent event = new NSEvent(theEvent);
+		NSOutlineView tree = (NSOutlineView)view;
+		
+		// get the current selections for the outline view. 
+		NSIndexSet selectedRowIndexes = tree.selectedRowIndexes();
+		
+		// select the row that was clicked before showing the menu for the event
+		NSPoint mousePoint = view.convertPoint_fromView_(event.locationInWindow(), null);
+		int /*long*/ row = tree.rowAtPoint(mousePoint);
+		
+		// figure out if the row that was just clicked on is currently selected
+		if (selectedRowIndexes.containsIndex(row) == false) {
+			NSIndexSet set = (NSIndexSet)new NSIndexSet().alloc();
+			set = set.initWithIndex(row);
+			tree.selectRowIndexes (set, false);
+			set.release();
 		}
-		case OS.kDataBrowserItemIsContainerProperty: {
-			TreeItem item = _getItem (id, true);
-			if (item.itemCount > 0) {
-				OS.SetDataBrowserItemDataBooleanValue (itemData, true);
-			}
-			break;
-		}
+		// else that row is currently selected, so don't change anything.
 	}
-	return OS.noErr;
+	
+	return super.menuForEvent(id, sel, theEvent);
 }
 
-int itemNotificationProc (int browser, int id, int message) {
-	if (message == OS.kDataBrowserUserStateChanged) {
-		boolean resized = false;
-		short [] width = new short [1];
-		TreeColumn [] newColumns = getColumns ();
-		for (int i = 0; i < columnCount; i++) {
-			TreeColumn column = newColumns [i];
-			if (!column.isDisposed ()) {
-				OS.GetDataBrowserTableViewNamedColumnWidth (handle, column.id, width);
-				if (width [0] != column.lastWidth) {
-					column.resized (width [0]);
-					resized = true;
+void mouseDown (int /*long*/ id, int /*long*/ sel, int /*long*/ theEvent) {
+	if (headerView != null && id == headerView.id) {
+		NSTableView widget = (NSTableView)view;
+		widget.setAllowsColumnReordering(false);
+		NSPoint pt = headerView.convertPoint_fromView_(new NSEvent(theEvent).locationInWindow(), null);
+		int /*long*/ nsIndex = headerView.columnAtPoint(pt);
+		if (nsIndex != -1) {
+			id nsColumn = widget.tableColumns().objectAtIndex(nsIndex);
+			for (int i = 0; i < columnCount; i++) {
+				if (columns[i].nsColumn.id == nsColumn.id) {
+					widget.setAllowsColumnReordering(columns[i].movable);
+					break;
 				}
 			}
-			if (!column.isDisposed ()) {
-				int [] position = new int[1];
-				OS.GetDataBrowserTableViewColumnPosition (handle, column.id, position);
-				if (position [0] != column.lastPosition) {
-					column.lastPosition = position [0];
-					int order = (style & SWT.CHECK) != 0 ? position [0] - 1 : position [0];
-					if (order == 0) {
-						int [] disclosure = new int [1];
-						boolean [] expandableRows = new boolean [1];
-						OS.GetDataBrowserListViewDisclosureColumn (handle, disclosure, expandableRows);
-						if (disclosure [0] != column.id) {
-							OS.SetDataBrowserListViewDisclosureColumn (handle, column.id, expandableRows [0]);
-						}
-					}
-					column.sendEvent (SWT.Move);
-					resized = true;
-				}
-			}
-		}
-		int [] property = new int [1];
-		OS.GetDataBrowserSortProperty (handle, property);
-		if (property [0] != 0) {
-			if (!resized) {
-				for (int i = 0; i < columnCount; i++) {
-					TreeColumn column = columns [i];
-					if (property [0] == column.id) {
-						column.postEvent (display.clickCount == 2 ? SWT.DefaultSelection : SWT.Selection);
-						break;
-					}
-				}
-			}
-			OS.SetDataBrowserSortProperty (handle, 0);
-			if (sortColumn != null && !sortColumn.isDisposed () && sortDirection != SWT.NONE) {
-				OS.SetDataBrowserSortProperty (handle, sortColumn.id);
-				int order = sortDirection == SWT.DOWN ? OS.kDataBrowserOrderDecreasing : OS.kDataBrowserOrderIncreasing;
-				OS.SetDataBrowserSortOrder (handle, (short) order);
-			}
-		}
-		return OS.noErr;
-	}
-	switch (message) {
-		case OS.kDataBrowserItemSelected:
-		case OS.kDataBrowserItemDeselected: {
-			wasSelected = true;
-			if (ignoreSelect) break;
-			int [] first = new int [1], last = new int [1];
-			OS.GetDataBrowserSelectionAnchor (handle, first, last);
-			boolean selected = false;
-			if ((style & SWT.MULTI) != 0) {
-				int modifiers = OS.GetCurrentEventKeyModifiers ();
-				if ((modifiers & OS.shiftKey) != 0) {
-					if (message == OS.kDataBrowserItemSelected) {
-						selected = first [0] == id || last [0] == id;
-					} else {
-						selected = id == anchorFirst || id == anchorLast;
-					}
-				} else {
-					if ((modifiers & OS.cmdKey) != 0) {
-						selected = true;
-					} else {
-						selected = first [0] == last [0];
-					}
-				}
-			} else {
-				selected = message == OS.kDataBrowserItemSelected;
-			}
-			if (selected) {
-				anchorFirst = first [0];
-				anchorLast = last [0];
-				Event event = new Event ();
-				event.item = _getItem (id, true);
-				postEvent (SWT.Selection, event);
-			}
-			break;
-		}	
-		case OS.kDataBrowserItemDoubleClicked: {
-			wasSelected = true;
-			if (display.clickCount == 2) {
-				Event event = new Event ();
-				event.item = _getItem (id, true);
-				postEvent (SWT.DefaultSelection, event);
-			}
-			break;
-		}
-		case OS.kDataBrowserContainerClosing: {
-			int ptr = OS.NewHandle (0);
-			if (OS.GetDataBrowserItems (handle, id, false, OS.kDataBrowserItemAnyState, ptr) == OS.noErr) {
-				int count = OS.GetHandleSize (ptr) / 4;
-				visibleCount -= count;
-			}
-			OS.DisposeHandle (ptr);
-
-			/*
-			* Bug in the Macintosh.  For some reason, if the selected sub items of an item
-			* get a kDataBrowserItemDeselected notificaton when the item is collapsed, a
-			* call to GetDataBrowserSelectionAnchor () will cause a segment fault.  The
-			* fix is to deselect these items ignoring kDataBrowserItemDeselected and then
-			* issue a selection event.
-			*/
-			ptr = OS.NewHandle (0);
-			if (OS.GetDataBrowserItems (handle, id, true, OS.kDataBrowserItemIsSelected, ptr) == OS.noErr) {
-				int count = OS.GetHandleSize (ptr) / 4;
-				if (count > 0) {
-					int [] ids = new int [count];
-					OS.HLock (ptr);
-					int [] start = new int [1];
-					OS.memmove (start, ptr, 4);
-					OS.memmove (ids, start [0], count * 4);
-					OS.HUnlock (ptr);
-					boolean oldIgnore = ignoreSelect;
-					ignoreSelect = true;
-					/*
-					* Bug in the Macintosh.  When the DataBrowser selection flags includes
-					* both kDataBrowserNeverEmptySelectionSet and kDataBrowserSelectOnlyOne,
-					* two items are selected when SetDataBrowserSelectedItems() is called
-					* with kDataBrowserItemsAssign to assign a new seletion despite the fact
-					* that kDataBrowserSelectOnlyOne was specified.  The fix is to save and
-					* restore kDataBrowserNeverEmptySelectionSet around each call to
-					* SetDataBrowserSelectedItems().
-					*/
-					int [] selectionFlags = null;
-					if ((style & SWT.SINGLE) != 0) {
-						selectionFlags = new int [1];
-						OS.GetDataBrowserSelectionFlags (handle, selectionFlags);
-						OS.SetDataBrowserSelectionFlags (handle, selectionFlags [0] & ~OS.kDataBrowserNeverEmptySelectionSet);
-					}
-					OS.SetDataBrowserSelectedItems (handle, ids.length, ids, OS.kDataBrowserItemsRemove);
-					if ((style & SWT.SINGLE) != 0) {
-						OS.SetDataBrowserSelectionFlags (handle, selectionFlags [0]);
-					}
-					ignoreSelect = oldIgnore;
-					if (!ignoreSelect) {
-						Event event = new Event ();
-						event.item = _getItem (id, true);
-						sendEvent (SWT.Selection, event);
-					}
-				}
-			}
-			OS.DisposeHandle (ptr);
-			break;
-		}
-		case OS.kDataBrowserContainerClosed: {
-			TreeItem parentItem = _getItem (id, true);
-			if (parentItem == null) break; // can happen when removing all items
-			int [] ids = parentItem.childIds;
-			if (ids != null) {
-				for (int i=0; i<parentItem.itemCount; i++) {
-					TreeItem item = _getItem (ids [i], false); 
-					if (item == null) ids [i] = 0;
-				}
-			}
-			wasExpanded = true;
-			if (!ignoreExpand) {
-				Event event = new Event ();
-				event.item = parentItem;
-				sendEvent (SWT.Collapse, event);
-				if (isDisposed ()) break;
-				setScrollWidth (true);
-				fixScrollBar ();
-			}
-			break;
-		}
-		case OS.kDataBrowserContainerOpened: {
-			TreeItem item = _getItem (id, true);
-			wasExpanded = true;
-			if (!ignoreExpand) {
-				Event event = new Event ();
-				event.item = item;
-				try {
-					item.state |= EXPANDING;
-					sendEvent (SWT.Expand, event);
-					if (isDisposed ()) break;
-				} finally {
-					item.state &= ~EXPANDING;
-				}
-			}
-			int newIdCount = 0;
-			for (int i=0; i<item.itemCount; i++) {
-				if (item.childIds [i] == 0) newIdCount++;
-			}
-			if (newIdCount > 0) {
-				int [] newIds = _getIds (newIdCount);
-				int index = 0;
-				for (int i=0; i<item.itemCount; i++) {
-					if (item.childIds [i] == 0) item.childIds [i] = newIds [index++];   
-				}
-			}
-			OS.AddDataBrowserItems (handle, id, item.itemCount, item.childIds, OS.kDataBrowserItemNoProperty);
-			visibleCount += item.itemCount;
-			if (!ignoreExpand) {
-				setScrollWidth (false, item.childIds, false);
-			}
-			break;
 		}
 	}
-	return OS.noErr;
+	else if (id == view.id) {
+		// Bug/feature in Cocoa:  If the tree has a context menu we just set it visible instead of returning
+		// it from menuForEvent:.  This has the side effect, however, of sending control-click to the NSTableView,
+		// which is interpreted as a single click that clears the selection.  Fix is to ignore control-click,
+		NSEvent event = new NSEvent(theEvent);
+		if ((event.modifierFlags() & OS.NSControlKeyMask) != 0) return;
+	}
+	super.mouseDown(id, sel, theEvent);
 }
 
-int kEventAccessibleGetNamedAttribute (int nextHandler, int theEvent, int userData) {
-	int code = OS.eventNotHandledErr;
-	int [] stringRef = new int [1];
-	OS.GetEventParameter (theEvent, OS.kEventParamAccessibleAttributeName, OS.typeCFStringRef, null, 4, null, stringRef);
-	int length = 0;
-	if (stringRef [0] != 0) length = OS.CFStringGetLength (stringRef [0]);
-	char [] buffer = new char [length];
-	CFRange range = new CFRange ();
-	range.length = length;
-	OS.CFStringGetCharacters (stringRef [0], range, buffer);
-	String attributeName = new String(buffer);
-	if (attributeName.equals(OS.kAXHeaderAttribute)) {
-		short [] height = new short [1];
-		OS.GetDataBrowserListViewHeaderBtnHeight (handle, height);
-		if (height [0] == 0) {
-			/*
-			* Bug in the Macintosh.  Even when the header is not visible,
-			* VoiceOver still reports each column header's role for every row.
-			* This is confusing and overly verbose.  The fix is to return
-			* "no header" when the screen reader asks for the header, by
-			* returning noErr without setting the event parameter.
-			*/
-			code = OS.noErr;
+/*
+ * Feature in Cocoa.  If a checkbox is in multi-state mode, nextState cycles
+ * from off to mixed to on and back to off again.  This will cause the on state
+ * to momentarily appear while clicking on the checkbox.  To avoid this, 
+ * override [NSCell nextState] to go directly to the desired state.
+ */
+int /*long*/ nextState (int /*long*/ id, int /*long*/ sel) {
+	NSOutlineView outlineView = (NSOutlineView)view;
+	int index = (int)/*64*/outlineView.selectedRow ();
+	TreeItem item = (TreeItem)display.getWidget (outlineView.itemAtRow (index).id);
+	if (item.grayed) {
+		return item.checked ? OS.NSOffState : OS.NSMixedState;
+	}
+	return item.checked ? OS.NSOffState : OS.NSOnState;
+}
+
+int /*long*/ outlineView_child_ofItem (int /*long*/ id, int /*long*/ sel, int /*long*/ outlineView, int /*long*/ index, int /*long*/ itemID) {
+	TreeItem parent = (TreeItem) display.getWidget (itemID);
+	TreeItem item = _getItem (parent, (int)/*64*/index, true);
+	return item.handle.id;
+}
+
+void outlineView_didClickTableColumn (int /*long*/ id, int /*long*/ sel, int /*long*/ outlineView, int /*long*/ tableColumn) {
+	TreeColumn column = getColumn (new id (tableColumn));
+	if (column == null) return; /* either CHECK column or firstColumn in 0-column Tree */
+	column.postEvent (SWT.Selection);
+}
+
+int /*long*/ outlineView_objectValueForTableColumn_byItem (int /*long*/ id, int /*long*/ sel, int /*long*/ outlineView, int /*long*/ tableColumn, int /*long*/ itemID) {
+	TreeItem item = (TreeItem) display.getWidget (itemID);
+	checkData (item);
+	if (checkColumn != null && tableColumn == checkColumn.id) {
+		NSNumber value;
+		if (item.checked && item.grayed) {
+			value = NSNumber.numberWithInt (OS.NSMixedState);
+		} else {
+			value = NSNumber.numberWithInt (item.checked ? OS.NSOnState : OS.NSOffState);
+		}
+		return value.id;
+	}
+	for (int i=0; i<columnCount; i++) {
+		if (columns [i].nsColumn.id == tableColumn) {
+			return item.createString (i).id;
+		}
+	}
+	return item.createString (0).id;
+}
+
+boolean outlineView_isItemExpandable (int /*long*/ id, int /*long*/ sel, int /*long*/ outlineView, int /*long*/ item) {
+	if (item == 0) return true;
+	return ((TreeItem) display.getWidget (item)).itemCount != 0;
+}
+
+int /*long*/ outlineView_numberOfChildrenOfItem (int /*long*/ id, int /*long*/ sel, int /*long*/ outlineView, int /*long*/ item) {
+	if (item == 0) return itemCount;
+	return ((TreeItem) display.getWidget (item)).itemCount;
+}
+
+void outlineView_willDisplayCell_forTableColumn_item (int /*long*/ id, int /*long*/ sel, int /*long*/ outlineView, int /*long*/ cell, int /*long*/ tableColumn, int /*long*/ itemID) {
+	if (checkColumn != null && tableColumn == checkColumn.id) return;
+	TreeItem item = (TreeItem) display.getWidget(itemID);
+	int index = 0;
+	for (int i=0; i<columnCount; i++) {
+		if (columns [i].nsColumn.id == tableColumn) {
+			index = i;
+			break;
+		}
+	}
+	NSTextFieldCell textCell = new NSTextFieldCell (cell);
+	OS.object_setInstanceVariable(cell, Display.SWT_ROW, itemID);
+	OS.object_setInstanceVariable(cell, Display.SWT_COLUMN, tableColumn);
+	Image image = index == 0 ? item.image : (item.images == null ? null : item.images [index]);
+	textCell.setImage (image != null ? image.handle : null);
+	NSColor color;
+	if (textCell.isEnabled()) {
+		if (textCell.isHighlighted ()) {
+			color = NSColor.selectedControlTextColor();
+		} else {
+			Color foreground = item.cellForeground != null ? item.cellForeground [index] : null;
+			if (foreground == null) foreground = item.foreground;
+			if (foreground == null) foreground = getForegroundColor ();
+			color = NSColor.colorWithDeviceRed (foreground.handle [0], foreground.handle [1], foreground.handle [2], 1);
 		}
 	} else {
-		int [] ref = new int [1];
-		OS.GetEventParameter (theEvent, OS.kEventParamAccessibleObject, OS.typeCFTypeRef, null, 4, null, ref);
-		int axuielementref = ref [0];
-		DataBrowserAccessibilityItemInfo itemInfo = new DataBrowserAccessibilityItemInfo ();
-		int err = OS.AXUIElementGetDataBrowserItemInfo (axuielementref, handle, 0, itemInfo);
-		if (err == OS.noErr && itemInfo.v0_columnProperty != OS.kDataBrowserItemNoProperty && itemInfo.v0_item != OS.kDataBrowserNoItem && itemInfo.v0_propertyPart == OS.kDataBrowserPropertyEnclosingPart) {
-			int columnIndex = 0;
-			for (columnIndex = 0; columnIndex < columnCount; columnIndex++) {
-				if (columns [columnIndex].id == itemInfo.v0_columnProperty) break;
-			}
-			if (columnIndex != columnCount || columnCount == 0) {
-				int id = itemInfo.v0_item;
-				TreeItem treeItem = _getItem (id, false);
-				if (attributeName.equals (OS.kAXRoleAttribute) || attributeName.equals (OS.kAXRoleDescriptionAttribute)) {
-					String roleText = OS.kAXStaticTextRole;
-					buffer = new char [roleText.length ()];
-					roleText.getChars (0, buffer.length, buffer, 0);
-					stringRef [0] = OS.CFStringCreateWithCharacters (OS.kCFAllocatorDefault, buffer, buffer.length);
-					if (stringRef [0] != 0) {
-						if (attributeName.equals (OS.kAXRoleAttribute)) {
-							OS.SetEventParameter (theEvent, OS.kEventParamAccessibleAttributeValue, OS.typeCFStringRef, 4, stringRef);
-						} else { // kAXRoleDescriptionAttribute
-							int stringRef2 = OS.HICopyAccessibilityRoleDescription (stringRef [0], 0);
-							OS.SetEventParameter (theEvent, OS.kEventParamAccessibleAttributeValue, OS.typeCFStringRef, 4, new int [] {stringRef2});
-							OS.CFRelease(stringRef2);
-						}
-						OS.CFRelease(stringRef [0]);
-						code = OS.noErr;
-					}
-				} else if (attributeName.equals(OS.kAXChildrenAttribute)) {
-					int children = OS.CFArrayCreateMutable (OS.kCFAllocatorDefault, 0, 0);
-					OS.SetEventParameter (theEvent, OS.kEventParamAccessibleAttributeValue, OS.typeCFMutableArrayRef, 4, new int [] {children});
-					OS.CFRelease(children);
-					code = OS.noErr;
-				} else if (attributeName.equals (OS.kAXTitleAttribute) || attributeName.equals (OS.kAXDescriptionAttribute)) {
-					String text = treeItem.getText (columnIndex);
-					buffer = new char [text.length ()];
-					text.getChars (0, buffer.length, buffer, 0);
-					stringRef [0] = OS.CFStringCreateWithCharacters (OS.kCFAllocatorDefault, buffer, buffer.length);
-					if (stringRef [0] != 0) {
-						OS.SetEventParameter (theEvent, OS.kEventParamAccessibleAttributeValue, OS.typeCFStringRef, 4, stringRef);
-						OS.CFRelease(stringRef [0]);
-						code = OS.noErr;
-					}
-				}
-			}
+		color = NSColor.disabledControlTextColor();
+	}
+	int alignment = OS.NSLeftTextAlignment;
+	if (columnCount > 0) {
+		int style = columns [index].style;
+		if ((style & SWT.CENTER) != 0) {
+			alignment = OS.NSCenterTextAlignment;
+		} else if ((style & SWT.RIGHT) != 0) {
+			alignment = OS.NSRightTextAlignment;
 		}
 	}
-	if (accessible != null) {
-		code = accessible.internal_kEventAccessibleGetNamedAttribute (nextHandler, theEvent, code);
-	}
-	return code;
-}
-
-int kEventControlGetClickActivation (int nextHandler, int theEvent, int userData) {
-	OS.SetEventParameter (theEvent, OS.kEventParamClickActivation, OS.typeClickActivationResult, 4, new int [] {OS.kActivateAndHandleClick});
-	return OS.noErr;
-}
-
-int kEventControlSetCursor (int nextHandler, int theEvent, int userData) {
-	if (!isEnabledCursor ()) return OS.noErr;
-	if (isEnabledModal ()) {
-		org.eclipse.swt.internal.carbon.Point pt = new org.eclipse.swt.internal.carbon.Point ();
-		int sizeof = org.eclipse.swt.internal.carbon.Point.sizeof;
-		OS.GetEventParameter (theEvent, OS.kEventParamMouseLocation, OS.typeQDPoint, null, sizeof, null, pt);
-		if (!contains (pt.h, pt.v)) return OS.eventNotHandledErr;
-	}
-	return super.kEventControlSetCursor (nextHandler, theEvent, userData);
-}
-
-int kEventUnicodeKeyPressed (int nextHandler, int theEvent, int userData) {
-	int result = super.kEventUnicodeKeyPressed (nextHandler, theEvent, userData);
-	if (result == OS.noErr) return result;
-	int [] keyboardEvent = new int [1];
-	OS.GetEventParameter (theEvent, OS.kEventParamTextInputSendKeyboardEvent, OS.typeEventRef, null, keyboardEvent.length * 4, null, keyboardEvent);
-	int [] keyCode = new int [1];
-	OS.GetEventParameter (keyboardEvent [0], OS.kEventParamKeyCode, OS.typeUInt32, null, keyCode.length * 4, null, keyCode);
-	switch (keyCode [0]) {
-		case 49: { /* Space */
-			int [] first = new int [1], last = new int [1];
-			if (OS.GetDataBrowserSelectionAnchor (handle, first, last) == OS.noErr) {
-				if (first [0] != 0) {
-					TreeItem item = _getItem (first [0], true);
-					if ((style & SWT.CHECK) != 0) {
-						item.setChecked (!item.getChecked (), true);
-					}
-				}
-			}
-			break;
-		}
-		case 76: /* KP Enter */
-		case 36: { /* Return */
-			postEvent (SWT.DefaultSelection);
-			break;
-		}
-		/*
-		* Feature in the Macintosh.  For some reason, when the user hits an
-		* up or down arrow to traverse the items in a Data Browser, the item
-		* scrolls to the left such that the white space that is normally
-		* visible to the right of the every item is scrolled out of view.
-		* The fix is to save and restore the horizontal scroll position.
-		*/
-		case 125: /* Down */
-		case 126: /* Up*/
-			int [] top = new int [1], left = new int [1];
-			OS.GetDataBrowserScrollPosition (handle, top, left);
-			result = OS.CallNextEventHandler (nextHandler, theEvent);
-			OS.GetDataBrowserScrollPosition (handle, top, null);
-			OS.SetDataBrowserScrollPosition (handle, top [0], left [0]);
-			
-			redrawBackgroundImage ();
-	}
-	return result;
-}
-
-int kEventMouseDown (int nextHandler, int theEvent, int userData) {
-	int result = super.kEventMouseDown (nextHandler, theEvent, userData);
-	if (result == OS.noErr) return result;
-	wasSelected = wasExpanded = false;
-	result = OS.CallNextEventHandler (nextHandler, theEvent);
-	if (isDisposed ()) return OS.noErr;
-	if (!wasSelected && !wasExpanded) {
-		if (OS.IsDataBrowserItemSelected (handle, lastHittest)) {
-			if (0 < lastHittest && lastHittest <= items.length) {
-				Event event = new Event ();
-				event.item = _getItem (lastHittest, true);
-				postEvent (SWT.Selection, event);
-			}
-		}
-	}
-	wasSelected = wasExpanded = false;
-	return result;
-}
-
-void releaseItem (TreeItem item, boolean release) {
-	int id = item.id;
-	if (release) item.release (false);
-	items [id - 1] = null;
-	TreeItem parentItem = item.parentItem;
-	int [] ids = parentItem == null ? childIds : parentItem.childIds;
-	int index = -1;
-	for (int i = 0; i < ids.length; i++) {
-		if (ids [i] == id) {
-			index = i; break;
-		}
-	}
-	if (index != -1) {
-		System.arraycopy(ids, 0, ids, 0, index);
-		System.arraycopy(ids, index+1, ids, index, ids.length - index - 1);
-		ids [ids.length - 1] = 0;
-	}
-	if (parentItem != null) {
-		parentItem.itemCount--;
-		if (parentItem.itemCount == 0) parentItem.childIds = null;
+	Font font = item.cellFont != null ? item.cellFont [index] : null;
+	if (font == null) font = item.font;
+	if (font == null) font = this.font;
+	if (font == null) font = defaultFont ();
+	if (font.extraTraits != 0) {
+		NSMutableDictionary dict = ((NSMutableDictionary)new NSMutableDictionary().alloc()).initWithCapacity(5);
+		dict.setObject (color, OS.NSForegroundColorAttributeName);
+		dict.setObject (font.handle, OS.NSFontAttributeName);
+		addTraits(dict, font);
+		NSMutableParagraphStyle paragraphStyle = (NSMutableParagraphStyle)new NSMutableParagraphStyle ().alloc ().init ();
+		paragraphStyle.setLineBreakMode (OS.NSLineBreakByClipping);
+		paragraphStyle.setAlignment (alignment);
+		dict.setObject (paragraphStyle, OS.NSParagraphStyleAttributeName);
+		paragraphStyle.release ();
+		NSAttributedString attribStr = ((NSAttributedString) new NSAttributedString ().alloc ()).initWithString (textCell.title(), dict);
+		textCell.setAttributedStringValue(attribStr);
+		attribStr.release();
+		dict.release();
+	} else {
+		textCell.setFont(font.handle);
+		textCell.setTextColor(color);
+		textCell.setAlignment (alignment);
 	}
 }
 
-void releaseItems (int [] ids) {
-	if (ids == null) return;
-	for (int i=ids.length-1; i>= 0; i--) {
-		TreeItem item = _getItem (ids [i], false);
-		if (item != null) {
-			releaseItems (item.childIds);
-			if (!isDisposed ()) {
-				releaseItem (item, true);
-			}
+void outlineViewColumnDidMove (int /*long*/ id, int /*long*/ sel, int /*long*/ aNotification) {
+	NSNotification notification = new NSNotification (aNotification);
+	NSDictionary userInfo = notification.userInfo ();
+	id nsOldIndex = userInfo.valueForKey (NSString.stringWith ("NSOldColumn")); //$NON-NLS-1$
+	id nsNewIndex = userInfo.valueForKey (NSString.stringWith ("NSNewColumn")); //$NON-NLS-1$
+	int oldIndex = new NSNumber (nsOldIndex).intValue ();
+	int newIndex = new NSNumber (nsNewIndex).intValue ();
+	int startIndex = Math.min (oldIndex, newIndex);
+	int endIndex = Math.max (oldIndex, newIndex);
+	NSOutlineView outlineView = (NSOutlineView)view;
+	NSArray nsColumns = outlineView.tableColumns ();
+	for (int i = startIndex; i <= endIndex; i++) {
+		id columnId = nsColumns.objectAtIndex (i);
+		TreeColumn column = getColumn (columnId);
+		if (column != null) {
+			column.sendEvent (SWT.Move);
+			if (isDisposed ()) return;
 		}
 	}
+}
+
+void outlineViewColumnDidResize (int /*long*/ id, int /*long*/ sel, int /*long*/ aNotification) {
+	NSNotification notification = new NSNotification (aNotification);
+	NSDictionary userInfo = notification.userInfo ();
+	id columnId = userInfo.valueForKey (NSString.stringWith ("NSTableColumn")); //$NON-NLS-1$
+	TreeColumn column = getColumn (columnId);
+	if (column == null) return; /* either CHECK column or firstColumn in 0-column Tree */
+
+	column.sendEvent (SWT.Resize);
+	if (isDisposed ()) return;
+
+	NSOutlineView outlineView = (NSOutlineView)view;
+	int index = indexOf (column.nsColumn);
+	if (index == -1) return; /* column was disposed in Resize callback */
+
+	NSArray nsColumns = outlineView.tableColumns ();
+	int columnCount = (int)/*64*/outlineView.numberOfColumns ();
+	for (int i = index + 1; i < columnCount; i++) {
+		columnId = nsColumns.objectAtIndex (i);
+		column = getColumn (columnId);
+		if (column != null) {
+			column.sendEvent (SWT.Move);
+			if (isDisposed ()) return;
+		}
+	}
+}
+
+void outlineViewSelectionDidChange (int /*long*/ id, int /*long*/ sel, int /*long*/ notification) {
+	if (ignoreSelect) return;
+	NSOutlineView widget = (NSOutlineView) view;
+	int row = (int)/*64*/widget.selectedRow ();
+	if (row == -1)
+		postEvent (SWT.Selection);
+	else {
+		id _id = widget.itemAtRow (row);
+		TreeItem item = (TreeItem) display.getWidget (_id.id);
+		Event event = new Event ();
+		event.item = item;
+		event.index = row;
+		postEvent (SWT.Selection, event);
+	}
+}
+
+void outlineView_setObjectValue_forTableColumn_byItem (int /*long*/ id, int /*long*/ sel, int /*long*/ outlineView, int /*long*/ object, int /*long*/ tableColumn, int /*long*/ itemID) {
+	if (checkColumn != null && tableColumn == checkColumn.id)  {
+		TreeItem item = (TreeItem) display.getWidget (itemID);
+		item.checked = !item.checked;
+		Event event = new Event ();
+		event.detail = SWT.CHECK;
+		event.item = item;
+		postEvent (SWT.Selection, event);
+		item.redraw (-1);
+	}
+}
+
+boolean outlineView_writeItems_toPasteboard(int /*long*/ id, int /*long*/ sel, int /*long*/ arg0, int /*long*/ arg1, int /*long*/ arg2) {
+	return sendMouseEvent(NSApplication.sharedApplication().currentEvent(), SWT.DragDetect, true);
+}
+
+void register () {
+	super.register ();
+	display.addWidget (headerView, this);
+	display.addWidget (dataCell, this);
+	if (buttonCell != null) display.addWidget (buttonCell, this);
 }
 
 void releaseChildren (boolean destroy) {
@@ -2655,7 +2108,6 @@ void releaseChildren (boolean destroy) {
 		}
 	}
 	items = null;
-	childIds = null;
 	if (columns != null) {
 		for (int i=0; i<columnCount; i++) {
 			TreeColumn column = columns [i];
@@ -2668,24 +2120,38 @@ void releaseChildren (boolean destroy) {
 	super.releaseChildren (destroy);
 }
 
+void releaseHandle () {
+	super.releaseHandle ();
+	if (headerView != null) headerView.release ();
+	headerView = null;
+	if (firstColumn != null) firstColumn.release ();
+	firstColumn = null;
+	if (checkColumn != null) checkColumn.release ();
+	checkColumn = null;
+	if (dataCell != null) dataCell.release ();
+	dataCell = null;
+	if (buttonCell != null) buttonCell.release();
+	buttonCell = null;
+}
+
 void releaseWidget () {
 	super.releaseWidget ();
 	sortColumn = null;
-	paintGC = null;
-	imageBounds = null;
-	showItem = null;
-	/*
-	* Feature in the Mac. When RemoveDataBrowserItems() is used
-	* to remove items, item notification callbacks are issued with
-	* the message kDataBrowserItemRemoved  When many items are
-	* removed, this is slow.  The fix is to temporarily remove
-	* the item notification callback.
-	*/
-	DataBrowserCallbacks callbacks = new DataBrowserCallbacks ();
-	OS.GetDataBrowserCallbacks (handle, callbacks);
-	callbacks.v1_itemNotificationCallback = 0;
-	callbacks.v1_itemCompareCallback = 0;
-	OS.SetDataBrowserCallbacks (handle, callbacks);
+}
+
+void reloadItem (TreeItem item, boolean recurse) {
+	if (getDrawing()) {
+		NSOutlineView widget = (NSOutlineView)view;
+		TreeItem[] selectedItems = getSelection ();
+		if (item != null) {
+			widget.reloadItem (item.handle, recurse);
+		} else {
+			widget.reloadData ();
+		}
+		selectItems (selectedItems, true);
+	} else {
+		reloadPending = true;
+	}
 }
 
 /**
@@ -2703,30 +2169,10 @@ public void removeAll () {
 		if (item != null && !item.isDisposed ()) item.release (false);
 	}
 	items = new TreeItem [4];
-	childIds = null;
-	/*
-	* Feature in the Mac. When RemoveDataBrowserItems() is used
-	* to remove items, item notification callbacks are issued with
-	* the message kDataBrowserItemRemoved  When many items are
-	* removed, this is slow.  The fix is to temporarily remove
-	* the item notification callback.
-	*/
-	DataBrowserCallbacks callbacks = new DataBrowserCallbacks ();
-	OS.GetDataBrowserCallbacks (handle, callbacks);
-	callbacks.v1_itemNotificationCallback = 0;
-	callbacks.v1_itemCompareCallback = 0;
-	OS.SetDataBrowserCallbacks (handle, callbacks);
-	ignoreExpand = ignoreSelect = true;
-	int result = OS.RemoveDataBrowserItems (handle, OS.kDataBrowserNoItem, 0, null, 0);
-	ignoreExpand = ignoreSelect = false;
-	callbacks.v1_itemNotificationCallback = display.itemNotificationProc;
-	callbacks.v1_itemCompareCallback = display.itemCompareProc;
-	OS.SetDataBrowserCallbacks (handle, callbacks);
-	if (result != OS.noErr) error (SWT.ERROR_ITEM_NOT_REMOVED);
-	OS.SetDataBrowserScrollPosition (handle, 0, 0);
-	anchorFirst = anchorLast = 0;
-	visibleCount = 0;
-	setScrollWidth (true);
+	itemCount = 0;
+	imageBounds = null;
+	((NSOutlineView) view).reloadData ();
+	setScrollWidth ();
 }
 
 /**
@@ -2770,7 +2216,7 @@ public void removeSelectionListener (SelectionListener listener) {
  * @see TreeListener
  * @see #addTreeListener
  */
-public void removeTreeListener(TreeListener listener) {
+public void removeTreeListener (TreeListener listener) {
 	checkWidget ();
 	if (listener == null) error (SWT.ERROR_NULL_ARGUMENT);
 	if (eventTable == null) return;
@@ -2778,11 +2224,8 @@ public void removeTreeListener(TreeListener listener) {
 	eventTable.unhook (SWT.Collapse, listener);
 }
 
-void resetVisibleRegion (int control) {
-	super.resetVisibleRegion (control);
-	if (showItem != null && !showItem.isDisposed ()) {
-		showItem (showItem , true);
-	}	
+void setImage (int /*long*/ id, int /*long*/ sel, int /*long*/ arg0) {
+	OS.object_setInstanceVariable(id, Display.SWT_IMAGE, arg0);
 }
 
 /**
@@ -2808,8 +2251,8 @@ public void setInsertMark (TreeItem item, boolean before) {
 	TreeItem oldMark = insertItem;
 	insertItem = item;
 	insertBefore = before;
-	if (oldMark != null && !oldMark.isDisposed()) oldMark.redraw (OS.kDataBrowserNoItem);
-	if (item != null) item.redraw (OS.kDataBrowserNoItem);
+	if (oldMark != null && !oldMark.isDisposed()) oldMark.redraw (-1);
+	if (item != null) item.redraw (-1);
 }
 
 /**
@@ -2826,8 +2269,10 @@ public void setInsertMark (TreeItem item, boolean before) {
 public void selectAll () {
 	checkWidget ();
 	if ((style & SWT.SINGLE) != 0) return;
+	checkItems ();
+	NSOutlineView widget = (NSOutlineView) view;
 	ignoreSelect = true;
-	OS.SetDataBrowserSelectedItems (handle, 0, null, OS.kDataBrowserItemsAssign);
+	widget.selectAll (null);
 	ignoreSelect = false;
 }
 
@@ -2852,50 +2297,124 @@ public void select (TreeItem item) {
 	checkWidget ();
 	if (item == null) error (SWT.ERROR_NULL_ARGUMENT);
 	if (item.isDisposed ()) error (SWT.ERROR_INVALID_ARGUMENT);
-	showItem (item, false);
+	checkItems ();
+	showItem (item);
+	NSOutlineView outlineView = (NSOutlineView) view;
+	int /*long*/ row = outlineView.rowForItem (item.handle);
+	NSIndexSet set = (NSIndexSet)new NSIndexSet().alloc();
+	set = set.initWithIndex(row);
 	ignoreSelect = true;
-	/*
-	* Bug in the Macintosh.  When the DataBroswer selection flags includes
-	* both kDataBrowserNeverEmptySelectionSet and kDataBrowserSelectOnlyOne,
-    * two items are selected when SetDataBrowserSelectedItems() is called
-    * with kDataBrowserItemsAssign to assign a new seletion despite the fact
-	* that kDataBrowserSelectOnlyOne was specified.  The fix is to save and
-	* restore kDataBrowserNeverEmptySelectionSet around each call to
-	* SetDataBrowserSelectedItems().
-	*/
-	int [] selectionFlags = null;
-	if ((style & SWT.SINGLE) != 0) {
-		selectionFlags = new int [1];
-		OS.GetDataBrowserSelectionFlags (handle, selectionFlags);
-		OS.SetDataBrowserSelectionFlags (handle, selectionFlags [0] & ~OS.kDataBrowserNeverEmptySelectionSet);
-	}
-	OS.SetDataBrowserSelectedItems (handle, 1, new int [] {item.id}, OS.kDataBrowserItemsAssign);
-	if ((style & SWT.SINGLE) != 0) {
-		OS.SetDataBrowserSelectionFlags (handle, selectionFlags [0]);
-	}
+	outlineView.selectRowIndexes (set, false);
 	ignoreSelect = false;
+	set.release();
 }
 
-void setBackground (float [] color) {
-	/*
-	* Bug in the Macintosh.  The default background of a window changes when
-	* the background of a data browser is set using SetControlFontStyle().  This
-	* also affects the background of any TNXObject created on that window.  The
-	* fix is to avoid calling SetControlFontStyle() which has no effect
-	* in a data browser anyways.
-	*/
+void sendDoubleSelection() {
+	NSOutlineView outlineView = (NSOutlineView)view;
+	int rowIndex = (int)/*64*/outlineView.clickedRow (); 
+	if (rowIndex != -1) {
+		if ((style & SWT.CHECK) != 0) {
+			NSArray columns = outlineView.tableColumns ();
+			int columnIndex = (int)/*64*/outlineView.clickedColumn ();
+			id column = columns.objectAtIndex (columnIndex);
+			if (column.id == checkColumn.id) return;
+		}
+		TreeItem item = (TreeItem) display.getWidget (outlineView.itemAtRow (rowIndex).id);
+		Event event = new Event ();
+		event.item = item;
+		postEvent (SWT.DefaultSelection, event);
+	}
 }
 
-int setBounds (int x, int y, int width, int height, boolean move, boolean resize, boolean events) {
-	/*
-	* Ensure that the selection is visible when the tree is resized
-	* from a zero size to a size that can show the selection.
-	*/
-	int result = super.setBounds (x, y, width, height, move, resize, events);
-	if (showItem != null && !showItem.isDisposed ()) {
-		showItem (showItem , true);
-	}		 
+boolean sendKeyEvent (NSEvent nsEvent, int type) {
+	boolean result = super.sendKeyEvent (nsEvent, type);
+	if (!result) return result;
+	if (type != SWT.KeyDown) return result;
+	short keyCode = nsEvent.keyCode ();
+	switch (keyCode) {
+		case 76: /* KP Enter */
+		case 36: { /* Return */
+			postEvent (SWT.DefaultSelection);
+			break;
+		}
+	}
 	return result;
+}
+
+void sendMeasureItem (TreeItem item, int columnIndex, NSSize size) {
+	NSOutlineView widget = (NSOutlineView)this.view;
+	int contentWidth = (int)Math.ceil (size.width);
+	NSSize spacing = widget.intercellSpacing();
+	int itemHeight = (int)Math.ceil (widget.rowHeight() + spacing.height);
+	GCData data = new GCData ();
+	data.paintRect = widget.frame ();
+	GC gc = GC.cocoa_new (this, data);
+	gc.setFont (item.getFont (columnIndex));
+	Event event = new Event ();
+	event.item = item;
+	event.gc = gc;
+	event.index = columnIndex;
+	event.width = contentWidth;
+	event.height = itemHeight;
+	sendEvent (SWT.MeasureItem, event);
+	gc.dispose ();
+	if (!isDisposed () && !item.isDisposed ()) {
+		size.width = event.width;
+		size.height = event.height;
+		if (itemHeight < event.height) {
+			widget.setRowHeight (event.height);
+		}
+		if (contentWidth != event.width) {
+			if (columnCount == 0 && columnIndex == 0) {
+				item.width = event.width;
+				item.width += widget.indentationPerLevel () * (1 + widget.levelForItem (item.handle));
+				if (setScrollWidth (item)) {
+					widget.setNeedsDisplay(true);
+				}
+			}
+		}
+	}
+}
+
+void selectItems (TreeItem[] items, boolean ignoreDisposed) {
+	NSOutlineView outlineView = (NSOutlineView) view;
+	NSMutableIndexSet set = (NSMutableIndexSet) new NSMutableIndexSet ().alloc ().init ();
+	int length = items.length;
+	for (int i=0; i<length; i++) {
+		if (items [i] != null) {
+			if (items [i].isDisposed ()) {
+				if (ignoreDisposed) continue;
+				error (SWT.ERROR_INVALID_ARGUMENT);
+			}
+			TreeItem item = items [i];
+			if (!ignoreDisposed) showItem (items [i], false);
+			set.addIndex (outlineView.rowForItem (item.handle));
+		}
+	}
+	ignoreSelect = true;
+	outlineView.selectRowIndexes (set, false);
+	ignoreSelect = false;
+	set.release();
+}
+
+NSRect titleRectForBounds (int /*long*/ id, int /*long*/ sel, NSRect cellFrame) {
+	NSImage image = new NSCell(id).image();
+	if (image != null) {
+		int imageWidth = imageBounds.width + IMAGE_GAP;
+		cellFrame.x += imageWidth;
+		cellFrame.width -= imageWidth;
+	}
+	return cellFrame;
+}
+
+void updateBackground () {
+	NSColor nsColor = null;
+	if (backgroundImage != null) {
+		nsColor = NSColor.colorWithPatternImage(backgroundImage.handle);
+	} else if (background != null) {
+		nsColor = NSColor.colorWithDeviceRed(background[0], background[1], background[2], background[3]);
+	}
+	((NSOutlineView) view).setBackgroundColor (nsColor);
 }
 
 /**
@@ -2941,35 +2460,23 @@ public void setColumnOrder (int [] order) {
 		if (order [i] != oldOrder [i]) reorder = true;
 	}
 	if (reorder) {
-		int [] disclosure = new int [1];
-		boolean [] expandableRows = new boolean [1];
-		OS.GetDataBrowserListViewDisclosureColumn (handle, disclosure, expandableRows);
-		TreeColumn firstColumn = columns [order [0]];
-		if (disclosure [0] != firstColumn.id) {
-			OS.SetDataBrowserListViewDisclosureColumn (handle, firstColumn.id, expandableRows [0]);
-		}
-		int x = 0;
-		short [] width = new short [1];
+		NSOutlineView outlineView = (NSOutlineView)view;
 		int [] oldX = new int [oldOrder.length];
+		int check = (style & SWT.CHECK) != 0 ? 1 : 0;
 		for (int i=0; i<oldOrder.length; i++) {
-			int index = oldOrder [i];
-			TreeColumn column = columns [index];
-			oldX [index] =  x;
-			OS.GetDataBrowserTableViewNamedColumnWidth(handle, column.id, width);
-			x += width [0];
+			int index = oldOrder[i];
+			oldX [index] = (int)outlineView.rectOfColumn (i + check).x;
 		}
-		x = 0;
 		int [] newX = new int [order.length];
 		for (int i=0; i<order.length; i++) {
 			int index = order [i];
-			TreeColumn column = columns [index];
-			int position = (style & SWT.CHECK) != 0 ? i + 1 : i;
-			OS.SetDataBrowserTableViewColumnPosition(handle, column.id, position);
-			column.lastPosition = position;
-			newX [index] =  x;
-			OS.GetDataBrowserTableViewNamedColumnWidth(handle, column.id, width);
-			x += width [0];
+			TreeColumn column = columns[index];
+			int oldIndex = indexOf (column.nsColumn);
+			int newIndex = i + check;
+			outlineView.moveColumn (oldIndex, newIndex);
+			newX [index] = (int)outlineView.rectOfColumn (newIndex).x;
 		}
+
 		TreeColumn[] newColumns = new TreeColumn [columnCount];
 		System.arraycopy (columns, 0, newColumns, 0, columnCount);
 		for (int i=0; i<columnCount; i++) {
@@ -2983,14 +2490,12 @@ public void setColumnOrder (int [] order) {
 	}
 }
 
-void setFontStyle (Font font) {
-	super.setFontStyle (font);
-	if (items == null) return;
-	for (int i = 0; i < items.length; i++) {
-		TreeItem item = items [i];
-		if (item != null) item.width = -1;
-	}
-	setScrollWidth (true);
+void setFont (NSFont font) {
+	super.setFont (font);
+	setItemHeight (null, font, !hooks (SWT.MeasureItem));
+	view.setNeedsDisplay (true);
+	clearCachedWidth (items);
+	setScrollWidth ();
 }
 
 /**
@@ -3013,12 +2518,7 @@ void setFontStyle (Font font) {
  */
 public void setHeaderVisible (boolean show) {
 	checkWidget ();
-	short [] height = new short [1];
-	OS.GetDataBrowserListViewHeaderBtnHeight (handle, height);
-	if ((height [0] != 0) != show) {
-		OS.SetDataBrowserListViewHeaderBtnHeight (handle, (short) (show ? headerHeight : 0));
-		invalidateVisibleRegion (handle);
-	}
+	((NSOutlineView) view).setHeaderView (show ? headerView : null);
 }
 
 /**
@@ -3035,6 +2535,7 @@ public void setHeaderVisible (boolean show) {
  */
 public void setItemCount (int count) {
 	checkWidget ();
+	checkItems ();
 	count = Math.max (0, count);
 	setItemCount (null, count);
 }
@@ -3042,130 +2543,109 @@ public void setItemCount (int count) {
 void setItemCount (TreeItem parentItem, int count) {
 	int itemCount = getItemCount (parentItem);
 	if (count == itemCount) return;
-	setRedraw (false);
-	int [] top = new int [1], left = new int [1];
-    OS.GetDataBrowserScrollPosition (handle, top, left);
-    DataBrowserCallbacks callbacks = new DataBrowserCallbacks ();
-	OS.GetDataBrowserCallbacks (handle, callbacks);
-	callbacks.v1_itemNotificationCallback = 0;
-	callbacks.v1_itemCompareCallback = 0;
-	OS.SetDataBrowserCallbacks (handle, callbacks);
-	int [] ids = parentItem == null ? childIds : parentItem.childIds;
-	int removeCount = 0;
-	if (count < itemCount) {
-		int [] removeIds = new int [itemCount - count];
-		for (int index = ids.length - 1; index >= count; index--) {
-			int id = ids [index];
-			if (id != 0) {
-				TreeItem item = _getItem (id, false);
-				if (item != null && !item.isDisposed ()) {
-					item.dispose ();
-				} else {
-					if (parentItem == null || parentItem.getExpanded ()) {
-						removeIds [removeIds.length - removeCount - 1] = id;
-						removeCount++;
-						visibleCount--;
-					}
-				}
-			}
-		}
-		if (removeCount != 0 && removeCount != removeIds.length) {
-			int [] tmp = new int [removeCount];
-			System.arraycopy(removeIds, removeIds.length - removeCount, tmp, 0, removeCount);
-			removeIds = tmp;
-		}
-		if (removeCount != 0 && OS.RemoveDataBrowserItems (handle, OS.kDataBrowserNoItem, removeCount, removeIds, 0) != OS.noErr) {
-			error (SWT.ERROR_ITEM_NOT_REMOVED);
-		}
-		//TODO - move shrink to paint event
-		// shrink items array
-		int lastIndex = items.length;
-		for (int i=items.length; i>0; i--) {
-			if (items [i-1] != null) {
-				lastIndex = i;
-				break;
-			}
-		}
-		if (lastIndex < items.length - 4) {
-			int length = Math.max (4, (lastIndex + 3) / 4 * 4);
-			TreeItem [] newItems = new TreeItem [length];
-			System.arraycopy(items, 0, newItems, 0, Math.min(items.length, lastIndex));
-			items = newItems;
-		}
-	}
-	
-	if (parentItem != null) parentItem.itemCount = count;
+	NSOutlineView widget = (NSOutlineView) view;
 	int length = Math.max (4, (count + 3) / 4 * 4);
-	int [] newIds = new int [length];
-	if (ids != null) {
-		System.arraycopy (ids, 0, newIds, 0, Math.min (count, itemCount));
-	}
-	ids = newIds;
-	if (parentItem == null) {
-		childIds = newIds;
+	TreeItem [] children = parentItem == null ? items : parentItem.items;
+	boolean expanded = parentItem == null || parentItem.getExpanded();
+	if (count < itemCount) {
+		/*
+		* Note that the item count has to be updated before the call to reloadItem(), but
+		* the items have to be released after.
+		*/
+		if (parentItem == null) {
+			this.itemCount = count;
+		} else {
+			parentItem.itemCount = count;
+		}
+		/*
+		* Bug in Cocoa.  When removing selected items from an NSOutlineView, the selection
+		* is not properly updated.  The fix is to ensure that the item and its subitems
+		* are deselected before the item is removed by the reloadItem call. 
+		*/
+		if (expanded) {
+			for (int index = count; index < itemCount; index ++) {
+				TreeItem item = children [index];
+				if (item != null && !item.isDisposed ()) item.clearSelection ();
+			}
+		}
+		TreeItem[] selectedItems = getSelection ();
+		widget.reloadItem (parentItem != null ? parentItem.handle : null, expanded);
+		selectItems (selectedItems, true);
+		for (int index = count; index < itemCount; index ++) {
+			TreeItem item = children [index];
+			if (item != null && !item.isDisposed()) item.release (false);
+		}
+		TreeItem [] newItems = new TreeItem [length];
+		if (children != null) {
+			System.arraycopy (children, 0, newItems, 0, count);
+		}
+		children = newItems;
+		if (parentItem == null) {
+			this.items = newItems;
+		} else {
+			parentItem.items = newItems;
+		}
 	} else {
-		parentItem.childIds = newIds;
-	}
-	
-	if (count > itemCount) {
-		if ((getStyle() & SWT.VIRTUAL) == 0) {
-			int delta = Math.max (4, (count - itemCount + 3) / 4 * 4);
-			TreeItem [] newItems = new TreeItem [items.length + delta];
-			System.arraycopy (items, 0, newItems, 0, items.length);
-			items = newItems;
+		if ((style & SWT.VIRTUAL) == 0) {
 			for (int i=itemCount; i<count; i++) {
-				items [i] = new TreeItem (this, parentItem, SWT.NONE, i, true);
+				new TreeItem (this, parentItem, SWT.NONE, i, true);
 			}
 		} else {
-			if (parentItem == null || parentItem.getExpanded ()) {
-				int parentID = parentItem == null ? OS.kDataBrowserNoItem : parentItem.id;
-				int [] addIds = _getIds (count - itemCount);
-				if (OS.AddDataBrowserItems (handle, parentID, addIds.length, addIds, OS.kDataBrowserItemNoProperty) != OS.noErr) {
-					error (SWT.ERROR_ITEM_NOT_ADDED);
-				}
-				visibleCount += (count - itemCount);
-				System.arraycopy (addIds, 0, ids, itemCount, addIds.length);
+			TreeItem [] newItems = new TreeItem [length];
+			if (children != null) {
+				System.arraycopy (children, 0, newItems, 0, itemCount);
+			}
+			children = newItems;
+			if (parentItem == null) {
+				this.items = newItems;
+				this.itemCount = count;
+			} else {
+				parentItem.items = newItems;
+				parentItem.itemCount = count;
+			}
+			TreeItem[] selectedItems = getSelection ();
+			widget.reloadItem (parentItem != null ? parentItem.handle : null, expanded);
+			selectItems (selectedItems, true);
+
+			if (parentItem != null && itemCount == 0 && parentItem.expanded) {
+				ignoreExpand = true;
+				widget.expandItem (parentItem.handle);
+				ignoreExpand = false;
 			}
 		}
 	}
-	
-	callbacks.v1_itemNotificationCallback = display.itemNotificationProc;
-	callbacks.v1_itemCompareCallback = display.itemCompareProc;
-	OS.SetDataBrowserCallbacks (handle, callbacks);
-	if ((style & SWT.VIRTUAL) != 0 && sortColumn != null  
-			&& !sortColumn.isDisposed () && sortDirection == SWT.DOWN) {
-		OS.UpdateDataBrowserItems (handle, 0, 0, null, OS.kDataBrowserItemNoProperty, OS.kDataBrowserNoItem);
-	}
-	setRedraw (true);
-	if (itemCount == 0 && parentItem != null) parentItem.redraw (OS.kDataBrowserNoItem);
-	if (removeCount != 0) fixScrollBar ();
 }
 
 /*public*/ void setItemHeight (int itemHeight) {
 	checkWidget ();
 	if (itemHeight < -1) error (SWT.ERROR_INVALID_ARGUMENT);
 	if (itemHeight == -1) {
-		//TODO - reset item height, ensure other API's such as setFont don't do this
+		setItemHeight (null, null, true);
 	} else {
-		OS.SetDataBrowserTableViewRowHeight (handle, (short) itemHeight);
+		((NSOutlineView)view).setRowHeight (itemHeight);
 	}
 }
 
-void setItemHeight (Image image) {
+void setItemHeight (Image image, NSFont font, boolean set) {
+	if (font == null) font = getFont ().handle;
+	float /*double*/ ascent = font.ascender ();
+	float /*double*/ descent = -font.descender () + font.leading ();
+	int height = (int)Math.ceil (ascent + descent) + 1;
 	Rectangle bounds = image != null ? image.getBounds () : imageBounds;
-	if (bounds == null) return;
-	imageBounds = bounds;
-	short [] height = new short [1];
-	if (OS.GetDataBrowserTableViewRowHeight (handle, height) == OS.noErr) {
-		if (height [0] < bounds.height) {
-			OS.SetDataBrowserTableViewRowHeight (handle, (short) bounds.height);
-		}
+	if (bounds != null) {
+		imageBounds = bounds;
+		height = Math.max (height, bounds.height);
+	}
+	NSTableView widget = (NSTableView)view;
+	if (set || widget.rowHeight () < height) {
+		widget.setRowHeight (height);
 	}
 }
 
 /**
  * Marks the receiver's lines as visible if the argument is <code>true</code>,
- * and marks it invisible otherwise. 
+ * and marks it invisible otherwise. Note that some platforms draw 
+ * grid lines while others may draw alternating row colors.
  * <p>
  * If one of the receiver's ancestors is not visible or some
  * other condition makes the receiver not visible, marking
@@ -3183,84 +2663,53 @@ void setItemHeight (Image image) {
  */
 public void setLinesVisible (boolean show) {
 	checkWidget ();
-	if (OS.VERSION >= 0x1040) {
-		int attrib = OS.kDataBrowserAttributeListViewAlternatingRowColors | OS.kDataBrowserAttributeListViewDrawColumnDividers;
-		OS.DataBrowserChangeAttributes (handle, show ? attrib : 0, !show ? attrib : 0);
-		redraw ();
-	}
+	((NSOutlineView) view).setUsesAlternatingRowBackgroundColors (show);
 }
 
 public void setRedraw (boolean redraw) {
-	checkWidget();
+	checkWidget ();
 	super.setRedraw (redraw);
 	if (redraw && drawCount == 0) {
-		setScrollWidth (true);
+		checkItems ();
+		setScrollWidth ();
 	}
+}
+
+boolean setScrollWidth () {
+	return setScrollWidth (true, items, true);
+}
+
+boolean setScrollWidth (boolean set, TreeItem[] items, boolean recurse) {
+	if (items == null) return false;
+	if (ignoreRedraw || !getDrawing()) return false;
+	if (columnCount != 0) return false;
+	GC gc = new GC (this);
+	int newWidth = calculateWidth (items, 0, gc, recurse);
+	gc.dispose ();
+	if (!set) {
+		int oldWidth = (int)firstColumn.width ();
+		if (oldWidth >= newWidth) return false;
+	}
+	firstColumn.setWidth (newWidth);
+	if (horizontalBar != null && horizontalBar.view != null) redrawWidget (horizontalBar.view, false);
+	return true;
 }
 
 boolean setScrollWidth (TreeItem item) {
-	if (ignoreRedraw || drawCount != 0) return false;
+	if (ignoreRedraw || !getDrawing()) return false;
 	if (columnCount != 0) return false;
 	TreeItem parentItem = item.parentItem;
-	if (parentItem != null && !parentItem._getExpanded ()) return false;
+	if (parentItem != null && !parentItem.getExpanded ()) return false;
 	GC gc = new GC (this);
 	int newWidth = item.calculateWidth (0, gc);
 	gc.dispose ();
-	newWidth += getInsetWidth (column_id, false);
-	short [] width = new short [1];
-	OS.GetDataBrowserTableViewNamedColumnWidth (handle, column_id, width);
-	if (width [0] < newWidth) {
-		OS.SetDataBrowserTableViewNamedColumnWidth (handle, column_id, (short) newWidth);
+	int oldWidth = (int)firstColumn.width ();
+	if (oldWidth < newWidth) {
+		firstColumn.setWidth (newWidth);
+		if (horizontalBar != null && horizontalBar.view != null) redrawWidget (horizontalBar.view, false);
 		return true;
 	}
 	return false;
-}
-
-boolean setScrollBarVisible (ScrollBar bar, boolean visible) {
-	boolean [] horiz = new boolean [1], vert = new boolean [1];
-	OS.GetDataBrowserHasScrollBars (handle, horiz, vert);
-	if ((bar.style & SWT.H_SCROLL) != 0) horiz [0] = visible;
-	if ((bar.style & SWT.V_SCROLL) != 0) vert [0] = visible;
-	if (!visible) {
-		bar.redraw ();
-		bar.deregister ();
-	}
-	if (OS.SetDataBrowserHasScrollBars (handle, horiz [0], vert [0]) == OS.noErr) {
-		if (visible) {
-			bar.handle = findStandardBar (bar.style);
-			bar.register ();
-			bar.hookEvents ();
-			bar.redraw ();
-		} else {
-			bar.handle = 0;
-		}
-		return true;
-	} else {
-		if (!visible) {
-			bar.register ();
-		}
-	}
-	return false;
-}
-
-boolean setScrollWidth (boolean set) {
-	return setScrollWidth(set, childIds, true);
-}
-
-boolean setScrollWidth (boolean set, int[] childIds, boolean recurse) {
-	if (ignoreRedraw || drawCount != 0) return false;
-	if (columnCount != 0 || childIds == null) return false;
-	GC gc = new GC (this);
-	int newWidth = calculateWidth (childIds, gc, recurse, 0, 0);
-	gc.dispose ();
-	newWidth += getInsetWidth (column_id, false);
-	if (!set) {
-		short [] width = new short [1];
-		OS.GetDataBrowserTableViewNamedColumnWidth (handle, column_id, width);
-		if (width [0] >= newWidth) return false;
-	}
-	OS.SetDataBrowserTableViewNamedColumnWidth (handle, column_id, (short) newWidth);
-	return true;
 }
 
 /**
@@ -3314,49 +2763,26 @@ public void setSelection (TreeItem item) {
 public void setSelection (TreeItem [] items) {
 	checkWidget ();
 	if (items == null) error (SWT.ERROR_NULL_ARGUMENT);
+	checkItems ();
 	deselectAll ();
 	int length = items.length;
 	if (length == 0 || ((style & SWT.SINGLE) != 0 && length > 1)) return;
-	int count = 0;
-	int[] ids = new int [length];
-	for (int i=0; i<length; i++) {
-		if (items [i] != null) {
-			if (items [i].isDisposed ()) error (SWT.ERROR_INVALID_ARGUMENT);
-			ids [count++] = items [i].id;
-			showItem (items [i], false);
-		}
-	}
-	ignoreSelect = true;
-	/*
-	* Bug in the Macintosh.  When the DataBroswer selection flags includes
-	* both kDataBrowserNeverEmptySelectionSet and kDataBrowserSelectOnlyOne,
-    * two items are selected when SetDataBrowserSelectedItems() is called
-    * with kDataBrowserItemsAssign to assign a new seletion despite the fact
-	* that kDataBrowserSelectOnlyOne was specified.  The fix is to save and
-	* restore kDataBrowserNeverEmptySelectionSet around each call to
-	* SetDataBrowserSelectedItems().
-	*/
-	int [] selectionFlags = null;
-	if ((style & SWT.SINGLE) != 0) {
-		selectionFlags = new int [1];
-		OS.GetDataBrowserSelectionFlags (handle, selectionFlags);
-		OS.SetDataBrowserSelectionFlags (handle, selectionFlags [0] & ~OS.kDataBrowserNeverEmptySelectionSet);
-	}
-	OS.SetDataBrowserSelectedItems (handle, count, ids, OS.kDataBrowserItemsAssign);
-	if ((style & SWT.SINGLE) != 0) {
-		OS.SetDataBrowserSelectionFlags (handle, selectionFlags [0]);
-	}
-	ignoreSelect = false;
-	if (length > 0) {
-		int index = -1;
-		for (int i=0; i<items.length; i++) {
-			if (items [i] != null) {
-				index = i;
+	selectItems (items, false);
+	if (items.length > 0) {
+		for (int i = 0; i < items.length; i++) {
+			TreeItem item = items[i];
+			if (item != null) {
+				showItem(item, true);			
 				break;
 			}
 		}
-		if (index != -1) showItem (items [index], true);
 	}
+}
+
+void setSmallSize () {
+	if (checkColumn == null) return;
+	checkColumn.dataCell ().setControlSize (OS.NSSmallControlSize);
+	checkColumn.setWidth (getCheckColumnWidth ());
 }
 
 /**
@@ -3380,19 +2806,8 @@ public void setSortColumn (TreeColumn column) {
 	checkWidget ();
 	if (column != null && column.isDisposed ()) error (SWT.ERROR_INVALID_ARGUMENT);
 	if (column == sortColumn) return;
-	if (column == null) {
-		if (sortColumn != null  && !sortColumn.isDisposed ()  && sortDirection != SWT.NONE) {
-			OS.SetDataBrowserSortOrder (handle, (short) OS.kDataBrowserOrderIncreasing);
-			sortColumn = null; 
-			OS.SetDataBrowserSortProperty (handle, 0);
-		}
-	}
 	sortColumn = column;
-	if (sortColumn != null  && !sortColumn.isDisposed () && sortDirection != SWT.NONE) {
-		OS.SetDataBrowserSortProperty (handle, sortColumn.id);
-		int order = sortDirection == SWT.DOWN ? OS.kDataBrowserOrderDecreasing : OS.kDataBrowserOrderIncreasing;
-		OS.SetDataBrowserSortOrder (handle, (short) order);
-	}
+	((NSOutlineView)view).setHighlightedTableColumn (column == null ? null : column.nsColumn);
 }
 
 /**
@@ -3413,20 +2828,12 @@ public void setSortDirection  (int direction) {
 	if (direction != SWT.UP && direction != SWT.DOWN && direction != SWT.NONE) return;
 	if (direction == sortDirection) return;
 	sortDirection = direction;
-	if (sortColumn != null && !sortColumn.isDisposed ()) {
-		if (sortDirection == SWT.NONE) {
-			OS.SetDataBrowserSortOrder (handle, (short) OS.kDataBrowserOrderIncreasing);
-			TreeColumn column = sortColumn;
-			sortColumn = null; 
-			OS.SetDataBrowserSortProperty (handle, 0);
-			sortColumn = column;
-		} else {
-			OS.SetDataBrowserSortProperty (handle, 0);
-			OS.SetDataBrowserSortProperty (handle, sortColumn.id);
-			int order = sortDirection == SWT.DOWN ? OS.kDataBrowserOrderDecreasing : OS.kDataBrowserOrderIncreasing;
-			OS.SetDataBrowserSortOrder (handle, (short) order);
-		}
-	}
+	if (sortColumn == null) return;
+	NSTableHeaderView headerView = ((NSOutlineView)view).headerView ();
+	if (headerView == null) return;
+	int index = indexOf (sortColumn.nsColumn);
+	NSRect rect = headerView.headerRectOfColumn (index);
+	headerView.setNeedsDisplayInRect (rect);
 }
 
 /**
@@ -3453,14 +2860,15 @@ public void setTopItem (TreeItem item) {
 	checkWidget();
 	if (item == null) error (SWT.ERROR_NULL_ARGUMENT);
 	if (item.isDisposed ()) error (SWT.ERROR_INVALID_ARGUMENT);
+	checkItems ();
 	showItem (item, false);
-	int itemHeight = getItemHeight ();
-    int [] top = new int [1], left = new int [1];
-    OS.GetDataBrowserScrollPosition (handle, top, left);
-    int [] index = new int [1];
-    OS.GetDataBrowserTableViewItemRow (handle, item.id, index);
-    top [0] = Math.max (0, Math.min (itemHeight * visibleCount + getHeaderHeight () - getClientArea ().height, index [0] * itemHeight));
-    OS.SetDataBrowserScrollPosition (handle, top [0], item.parentItem != null ? left [0] : 0);
+	NSOutlineView widget = (NSOutlineView) view;
+	int /*long*/ row = widget.rowForItem (item.handle);
+	if (row == -1) return;
+	NSPoint pt = new NSPoint();
+	pt.x = scrollView.contentView().bounds().x;
+	pt.y = widget.frameOfCellAtColumn(0, row).y;
+	view.scrollPoint(pt);
 }
 
 /**
@@ -3484,35 +2892,12 @@ public void setTopItem (TreeItem item) {
 public void showColumn (TreeColumn column) {
 	checkWidget ();
 	if (column == null) error (SWT.ERROR_NULL_ARGUMENT);
-	if (column.isDisposed()) error(SWT.ERROR_INVALID_ARGUMENT);
+	if (column.isDisposed()) error (SWT.ERROR_INVALID_ARGUMENT);
 	if (column.parent != this) return;
-	int index = indexOf (column);
-	if (columnCount <= 1 || !(0 <= index && index < columnCount)) return;
-	// Get width and horizontal position of column
-	short [] w = new short [1];
-	OS.GetDataBrowserTableViewNamedColumnWidth (handle, column.id, w);
-	int width = w [0];
-	int x = 0;
-	for (int i = 0; i < index; i++) {
-		w = new short [1];
-		OS.GetDataBrowserTableViewNamedColumnWidth (handle, columns[i].id, w);
-		x += w [0];
-	}
-	// Get current scroll position
-	int [] top = new int [1], left = new int [1];
-	OS.GetDataBrowserScrollPosition (handle, top, left);
-	// Scroll column into view
-	if (x < left[0]) {
-		OS.SetDataBrowserScrollPosition(handle, top [0], x);
-	} else {
-		Rectangle rect = getClientArea ();
-		int maxWidth = rect.width;
-		width = Math.min(width, maxWidth);
-		if (x + width > left [0] + maxWidth) {
-			left [0] = x + width - maxWidth;
-			OS.SetDataBrowserScrollPosition(handle, top [0], left [0]);
-		}
-	}
+	if (columnCount <= 1) return;
+	int index = indexOf (column.nsColumn);
+	if (!(0 <= index && index < columnCount + ((style & SWT.CHECK) != 0 ? 1 : 0))) return;
+	((NSOutlineView)view).scrollColumnToVisible (index);
 }
 
 /**
@@ -3537,102 +2922,19 @@ public void showItem (TreeItem item) {
 	checkWidget ();
 	if (item == null) error (SWT.ERROR_NULL_ARGUMENT);
 	if (item.isDisposed ()) error (SWT.ERROR_INVALID_ARGUMENT);
+	checkItems ();
 	showItem (item, true);
 }
 
 void showItem (TreeItem item, boolean scroll) {
-	int count = 0;
 	TreeItem parentItem = item.parentItem;
-	while (parentItem != null && !parentItem._getExpanded ()) {
-		count++;
-		parentItem = parentItem.parentItem;
-	}
-	int index = 0;
-	parentItem = item.parentItem;
-	TreeItem [] path = new TreeItem [count];
-	while (parentItem != null && !parentItem._getExpanded ()) {
-		path [index++] = parentItem;
-		parentItem = parentItem.parentItem;
-	}
-	for (int i=path.length-1; i>=0; --i) {
-		path [i].setExpanded (true);
+	if (parentItem != null) {
+		showItem (parentItem, false);
+		parentItem.setExpanded (true);
 	}
 	if (scroll) {
-		/*
-		* Bug in the Macintosh.  When there is not room to show a
-		* single item in the data browser, RevealDataBrowserItem()
-		* scrolls the item such that it is above the top of the data
-		* browser.  The fix is to remember the index and scroll when
-		* the data browser is resized.
-		* 
-		* Bug in the Macintosh.  When items are added to the data
-		* browser after is has been hidden, RevealDataBrowserItem()
-		* when called before the controls behind the data browser
-		* are repainted causes a redraw.  This redraw happens right
-		* away causing pixel corruption.  The fix is to remember the
-		* index and scroll when the data browser is shown.
-		*/
-		Rectangle rect = getClientArea ();
-		if (rect.height < getItemHeight () || !OS.IsControlVisible (handle)) {
-			showItem = item;
-			return;
-		}
-		showItem = null;
-		Rectangle itemRect = item.getBounds ();
-		if (!itemRect.isEmpty()) {
-			if (rect.contains (itemRect.x, itemRect.y)
-				&& rect.contains (itemRect.x, itemRect.y + itemRect.height)) return;
-		}
-		int [] top = new int [1], left = new int [1];
-		OS.GetDataBrowserScrollPosition (handle, top, left);
-		int columnId = (style & SWT.CHECK) != 0 ? CHECK_COLUMN_ID : columnCount == 0 ? column_id : columns [0].id;
-		int options = OS.kDataBrowserRevealWithoutSelecting;
-		/*
-		* This code is intentionally commented, since kDataBrowserRevealAndCenterInView
-		* does not scroll the item to the center always (it seems to scroll to the
-		* end in some cases).
-		*/
-		//options |= OS.kDataBrowserRevealAndCenterInView;
-		OS.RevealDataBrowserItem (handle, item.id, columnId, (byte) options);
-		int [] newTop = new int [1], newLeft = new int [1];
-		if (columnCount == 0) {
-			boolean fixScroll = false;
-			Rect content = new Rect ();
-			if (OS.GetDataBrowserItemPartBounds (handle, item.id, columnId, OS.kDataBrowserPropertyContentPart, content) == OS.noErr) {
-				fixScroll = content.left < rect.x || content.left >= rect.x + rect.width;
-				if (!fixScroll) {
-					GC gc = new GC (this);
-					int contentWidth = calculateWidth (new int[]{item.id}, gc, false, 0, 0);
-					gc.dispose ();
-					fixScroll =  content.left + contentWidth > rect.x + rect.width;
-				}
-			}
-			if (fixScroll) {
-				int leftScroll = getLeftDisclosureInset (columnId);
-				int levelIndent = DISCLOSURE_COLUMN_LEVEL_INDENT;
-				if (OS.VERSION >= 0x1040) {
-					float [] metric = new float [1];
-					OS.DataBrowserGetMetric (handle, OS.kDataBrowserMetricDisclosureColumnPerDepthGap, null, metric);
-					levelIndent = (int) metric [0];
-				}
-				TreeItem temp = item;
-				while (temp.parentItem != null) {
-					leftScroll += levelIndent;
-					temp = temp.parentItem;
-				}
-				OS.GetDataBrowserScrollPosition (handle, newTop, newLeft);
-				OS.SetDataBrowserScrollPosition (handle, newTop [0], leftScroll);
-			}
-		}
-
-		/*
-		* Bug in the Macintosh.  For some reason, when the DataBrowser is scrolled
-		* by RevealDataBrowserItem(), the scrollbars are not redrawn.  The fix is to
-		* force a redraw.
-		*/
-		OS.GetDataBrowserScrollPosition (handle, newTop, newLeft);
-		if (horizontalBar != null && newLeft [0] != left [0]) horizontalBar.redraw ();
-		if (verticalBar != null && newTop [0] != top [0]) verticalBar.redraw ();
+		NSOutlineView outlineView = (NSOutlineView) view;
+		outlineView.scrollRowToVisible (outlineView.rowForItem (item.handle));
 	}
 }
 
@@ -3650,14 +2952,19 @@ void showItem (TreeItem item, boolean scroll) {
  */
 public void showSelection () {
 	checkWidget ();
-	//checkItems (false);
+	checkItems ();
 	//TODO - optimize
 	TreeItem [] selection = getSelection ();
-	if (selection.length > 0) showItem (selection [0], true);
+	if (selection.length > 0) {
+		checkData(selection [0]);
+		showItem (selection [0], true);
+	}
 }
 
-int trackingProc (int browser, int id, int property, int theRect, int startPt, int modifiers) {
-	return 1;
+void updateCursorRects (boolean enabled) {
+	super.updateCursorRects (enabled);
+	if (headerView == null) return;
+	updateCursorRects (enabled, headerView);
 }
 
 }

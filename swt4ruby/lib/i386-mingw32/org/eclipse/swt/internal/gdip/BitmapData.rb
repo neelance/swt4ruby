@@ -1,6 +1,6 @@
 require "rjava"
 
-# Copyright (c) 2000, 2006 IBM Corporation and others.
+# Copyright (c) 2000, 2008 IBM Corporation and others.
 # All rights reserved. This program and the accompanying materials
 # are made available under the terms of the Eclipse Public License v1.0
 # which accompanies this distribution, and is available at
@@ -37,12 +37,14 @@ module Org::Eclipse::Swt::Internal::Gdip
     alias_method :attr_stride=, :stride=
     undef_method :stride=
     
+    # @field cast=(PixelFormat)
     attr_accessor :pixel_format
     alias_method :attr_pixel_format, :pixel_format
     undef_method :pixel_format
     alias_method :attr_pixel_format=, :pixel_format=
     undef_method :pixel_format=
     
+    # @field cast=(void*)
     # long
     attr_accessor :scan0
     alias_method :attr_scan0, :scan0
@@ -50,6 +52,7 @@ module Org::Eclipse::Swt::Internal::Gdip
     alias_method :attr_scan0=, :scan0=
     undef_method :scan0=
     
+    # @field cast=(UINT_PTR)
     # long
     attr_accessor :reserved
     alias_method :attr_reserved, :reserved

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2008 IBM Corporation and others.
+ * Copyright (c) 2000, 2009 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -21,7 +21,7 @@ import org.eclipse.swt.internal.gtk.*;
  *
  * Class <code>DropTarget</code> defines the target object for a drag and drop transfer.
  *
- * IMPORTANT: This class is <em>not</em> intended to be subclassed.
+ * <p>IMPORTANT: This class is <em>not</em> intended to be subclassed.</p>
  *
  * <p>This class identifies the <code>Control</code> over which the user must position the cursor
  * in order to drop the data being transferred.  It also specifies what data types can be dropped on 
@@ -71,6 +71,7 @@ import org.eclipse.swt.internal.gtk.*;
  * @see <a href="http://www.eclipse.org/swt/snippets/#dnd">Drag and Drop snippets</a>
  * @see <a href="http://www.eclipse.org/swt/examples.php">SWT Example: DNDExample</a>
  * @see <a href="http://www.eclipse.org/swt/">Sample code and further information</a>
+ * @noextend This class is not intended to be subclassed by clients.
  */
 public class DropTarget extends Widget {
 
@@ -97,6 +98,7 @@ public class DropTarget extends Widget {
 	int drag_drop_handler;
 	
 	static final String DEFAULT_DROP_TARGET_EFFECT = "DEFAULT_DROP_TARGET_EFFECT"; //$NON-NLS-1$
+	static final String IS_ACTIVE = "org.eclipse.swt.internal.control.isactive"; //$NON-NLS-1$
 	static final int DRAGOVER_HYSTERESIS = 50;
 	
 	static Callback Drag_Motion;
@@ -431,11 +433,16 @@ void drag_leave ( int /*long*/ widget, int /*long*/ context, int time){
 boolean drag_motion ( int /*long*/ widget, int /*long*/ context, int x, int y, int time){
 	int oldKeyOperation = keyOperation;
 	
-	if (oldKeyOperation == -1) { //drag enter
+	/*
+	* Bug in GTK. GTK allows drag & drop on a shell even if a modal 
+	* dialog/window is opened on that shell. The fix is to check for 
+	* any active modal dialogs/shells before allowing the drop. 
+	*/
+	if ((oldKeyOperation == -1) || !((Boolean) control.getData(IS_ACTIVE)).booleanValue()) { //drag enter  
 		selectedDataType = null;
 		selectedOperation = DND.DROP_NONE;
 	}
-		
+	
 	DNDEvent event = new DNDEvent();
 	if (!setEventData(context, x, y, time, event)) {
 		keyOperation = -1;

@@ -35,6 +35,7 @@ module Org::Eclipse::Swt::Internal::Mozilla
     }
   end
   
+  # @jniclass flags=cpp
   class NsID 
     include_class_members NsIDImports
     

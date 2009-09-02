@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2003, 2008 IBM Corporation and others.
+ * Copyright (c) 2003, 2009 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -36,6 +36,7 @@ import org.eclipse.swt.widgets.*;
  * @see <a href="http://www.eclipse.org/swt/">Sample code and further information</a>
  *
  * @since 3.0
+ * @noextend This class is not intended to be subclassed by clients.
  */
 
 public class Browser extends Composite {
@@ -159,6 +160,10 @@ static int checkStyle(int style) {
 	return style;
 }
 
+protected void checkWidget () {
+	super.checkWidget ();
+}
+
 /**
  * Clears all session cookies from all current Browser instances.
  * 
@@ -166,6 +171,84 @@ static int checkStyle(int style) {
  */
 public static void clearSessions () {
 	WebBrowser.clearSessions ();
+}
+
+/**
+ * Returns the value of a cookie that is associated with a URL.
+ * Note that cookies are shared amongst all Browser instances.
+ * 
+ * @param name the cookie name
+ * @param url the URL that the cookie is associated with
+ * @return the cookie value, or <code>null</code> if no such cookie exists
+ * 
+ * @exception IllegalArgumentException <ul>
+ *    <li>ERROR_NULL_ARGUMENT - if the name is null</li>
+ *    <li>ERROR_NULL_ARGUMENT - if the url is null</li>
+ * </ul>
+ * 
+ * @since 3.5
+ */
+public static String getCookie (String name, String url) {
+	if (name == null) SWT.error (SWT.ERROR_NULL_ARGUMENT);
+	if (url == null) SWT.error (SWT.ERROR_NULL_ARGUMENT);
+	return WebBrowser.GetCookie (name, url);
+}
+
+/**
+ * Sets a cookie on a URL.  Note that cookies are shared amongst all Browser instances.
+ * 
+ * The <code>value</code> parameter must be a cookie header string that
+ * complies with <a href="http://www.ietf.org/rfc/rfc2109.txt">RFC 2109</code>.
+ * The value is passed through to the native browser unchanged.
+ * <p>
+ * Example value strings:
+ * <code>foo=bar</code> (basic session cookie)
+ * <code>foo=bar; path=/; domain=.eclipse.org</code> (session cookie)
+ * <code>foo=bar; expires=Thu, 01-Jan-2030 00:00:01 GMT</code> (persistent cookie)
+ * <code>foo=; expires=Thu, 01-Jan-1970 00:00:01 GMT</code> (deletes cookie <code>foo</code>)
+ * 
+ * @param value the cookie value
+ * @param url the URL to associate the cookie with
+ * @return <code>true</code> if the cookie was successfully set and <code>false</code> otherwise
+ * 
+ * @exception IllegalArgumentException <ul>
+ *    <li>ERROR_NULL_ARGUMENT - if the value is null</li>
+ *    <li>ERROR_NULL_ARGUMENT - if the url is null</li>
+ * </ul>
+ * 
+ * @since 3.5
+ */
+public static boolean setCookie (String value, String url) {
+	if (value == null) SWT.error (SWT.ERROR_NULL_ARGUMENT);
+	if (url == null) SWT.error (SWT.ERROR_NULL_ARGUMENT);
+	return WebBrowser.SetCookie (value, url);
+}
+
+/**	 
+ * Adds the listener to the collection of listeners who will be
+ * notified when authentication is required.
+ * <p>
+ * This notification occurs when a page requiring authentication is
+ * encountered.
+ * </p>
+ *
+ * @param listener the listener which should be notified
+ *
+ * @exception IllegalArgumentException <ul>
+ *    <li>ERROR_NULL_ARGUMENT - if the listener is null</li>
+ * </ul>
+ * 
+ * @exception SWTException <ul>
+ *    <li>ERROR_THREAD_INVALID_ACCESS when called from the wrong thread</li>
+ *    <li>ERROR_WIDGET_DISPOSED when the widget has been disposed</li>
+ * </ul>
+ *
+ * @since 3.5
+ */
+public void addAuthenticationListener (AuthenticationListener listener) {
+	checkWidget();
+	if (listener == null) SWT.error (SWT.ERROR_NULL_ARGUMENT);
+	webBrowser.addAuthenticationListener (listener);
 }
 
 /**	 
@@ -377,10 +460,12 @@ protected void checkSubclass () {
 }
 
 /**
- * Execute the specified script.
- *
+ * Executes the specified script.
  * <p>
- * Execute a script containing javascript commands in the context of the current document. 
+ * Executes a script containing javascript commands in the context of the current document.
+ * If document-defined functions or properties are accessed by the script then this method
+ * should not be invoked until the document has finished loading (<code>ProgressListener.completed()</code>
+ * gives notification of this).
  * 
  * @param script the script with javascript commands
  *  
@@ -395,12 +480,63 @@ protected void checkSubclass () {
  *    <li>ERROR_WIDGET_DISPOSED when the widget has been disposed</li>
  * </ul>
  *
+ * @see ProgressListener#completed(ProgressEvent)
+ * 
  * @since 3.1
  */
 public boolean execute (String script) {
 	checkWidget();
 	if (script == null) SWT.error (SWT.ERROR_NULL_ARGUMENT);
 	return webBrowser.execute (script);
+}
+
+/**
+ * Returns the result, if any, of executing the specified script.
+ * <p>
+ * Evaluates a script containing javascript commands in the context of
+ * the current document.  If document-defined functions or properties
+ * are accessed by the script then this method should not be invoked
+ * until the document has finished loading (<code>ProgressListener.completed()</code>
+ * gives notification of this).
+ * </p><p>
+ * If the script returns a value with a supported type then a java
+ * representation of the value is returned.  The supported
+ * javascript -> java mappings are:
+ * <ul>
+ * <li>javascript null or undefined -> <code>null</code></li>
+ * <li>javascript number -> <code>java.lang.Double</code></li>
+ * <li>javascript string -> <code>java.lang.String</code></li>
+ * <li>javascript boolean -> <code>java.lang.Boolean</code></li>
+ * <li>javascript array whose elements are all of supported types -> <code>java.lang.Object[]</code></li>
+ * </ul>
+ *
+ * An <code>SWTException</code> is thrown if the return value has an
+ * unsupported type, or if evaluating the script causes a javascript
+ * error to be thrown.
+ *
+ * @param script the script with javascript commands
+ *  
+ * @return the return value, if any, of executing the script
+ *
+ * @exception IllegalArgumentException <ul>
+ *    <li>ERROR_NULL_ARGUMENT - if the script is null</li>
+ * </ul>
+ * 
+ * @exception SWTException <ul>
+ *    <li>ERROR_FAILED_EVALUATE when the script evaluation causes a javascript error to be thrown</li>
+ *    <li>ERROR_INVALID_RETURN_VALUE when the script returns a value of unsupported type</li>
+ *    <li>ERROR_THREAD_INVALID_ACCESS when called from the wrong thread</li>
+ *    <li>ERROR_WIDGET_DISPOSED when the widget has been disposed</li>
+ * </ul>
+ * 
+ * @see ProgressListener#completed(ProgressEvent)
+ * 
+ * @since 3.5
+ */
+public Object evaluate (String script) throws SWTException {
+	checkWidget();
+	if (script == null) SWT.error (SWT.ERROR_NULL_ARGUMENT);
+	return webBrowser.evaluate (script);
 }
 
 /**
@@ -420,6 +556,39 @@ public boolean execute (String script) {
 public boolean forward () {
 	checkWidget();
 	return webBrowser.forward ();
+}
+
+/**
+ * Returns the type of native browser being used by this instance.
+ * Examples: "mozilla", "ie", "safari", "voyager"
+ *
+ * @return the type of the native browser
+ * 
+ * @since 3.5
+ */
+public String getBrowserType () {
+	checkWidget();
+	return webBrowser.getBrowserType ();
+}
+
+/**
+ * Returns <code>true</code> if javascript will be allowed to run in pages
+ * subsequently viewed in the receiver, and <code>false</code> otherwise.
+ *
+ * @return the receiver's javascript enabled state
+ *
+ * @exception SWTException <ul>
+ *    <li>ERROR_WIDGET_DISPOSED - if the receiver has been disposed</li>
+ *    <li>ERROR_THREAD_INVALID_ACCESS - if not called from the thread that created the receiver</li>
+ * </ul>
+ * 
+ * @see #setJavascriptEnabled
+ * 
+ * @since 3.5
+ */
+public boolean getJavascriptEnabled () {
+	checkWidget();
+	return webBrowser.jsEnabled;
 }
 
 public int getStyle () {
@@ -540,6 +709,29 @@ public boolean isForwardEnabled () {
 public void refresh () {
 	checkWidget();
 	webBrowser.refresh ();
+}
+
+/**	 
+ * Removes the listener from the collection of listeners who will
+ * be notified when authentication is required.
+ *
+ * @param listener the listener which should no longer be notified
+ *
+ * @exception IllegalArgumentException <ul>
+ *    <li>ERROR_NULL_ARGUMENT - if the listener is null</li>
+ * </ul>
+ * 
+ * @exception SWTException <ul>
+ *    <li>ERROR_THREAD_INVALID_ACCESS when called from the wrong thread</li>
+ *    <li>ERROR_WIDGET_DISPOSED when the widget has been disposed</li>
+ * </ul>
+ * 
+ * @since 3.5
+ */
+public void removeAuthenticationListener (AuthenticationListener listener) {
+	checkWidget();
+	if (listener == null) SWT.error (SWT.ERROR_NULL_ARGUMENT);
+	webBrowser.removeAuthenticationListener (listener);
 }
 
 /**	 
@@ -707,7 +899,27 @@ public void removeVisibilityWindowListener (VisibilityWindowListener listener) {
 }
 
 /**
- * Renders HTML.
+ * Sets whether javascript will be allowed to run in pages subsequently
+ * viewed in the receiver.  Note that setting this value does not affect
+ * the running of javascript in the current page.
+ *
+ * @param enabled the receiver's new javascript enabled state
+ *
+ * @exception SWTException <ul>
+ *    <li>ERROR_WIDGET_DISPOSED - if the receiver has been disposed</li>
+ *    <li>ERROR_THREAD_INVALID_ACCESS - if not called from the thread that created the receiver</li>
+ * </ul>
+ * 
+ * @since 3.5
+ */
+public void setJavascriptEnabled (boolean enabled) {
+	checkWidget();
+	webBrowser.jsEnabled = enabled;
+	webBrowser.jsEnabledChanged = true;
+}
+
+/**
+ * Renders a string containing HTML.  The rendering of the content occurs asynchronously.
  * 
  * <p>
  * The html parameter is Unicode encoded since it is a java <code>String</code>.
@@ -738,7 +950,7 @@ public boolean setText (String html) {
 }
 
 /**
- * Loads a URL.
+ * Begins loading a URL.  The loading of its content occurs asynchronously.
  * 
  * @param url the URL to be loaded
  *

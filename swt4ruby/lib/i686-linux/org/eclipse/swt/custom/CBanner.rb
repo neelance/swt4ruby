@@ -1,6 +1,6 @@
 require "rjava"
 
-# Copyright (c) 2000, 2008 IBM Corporation and others.
+# Copyright (c) 2000, 2009 IBM Corporation and others.
 # All rights reserved. This program and the accompanying materials
 # are made available under the terms of the Eclipse Public License v1.0
 # which accompanies this distribution, and is available at
@@ -42,6 +42,7 @@ module Org::Eclipse::Swt::Custom
   # @see <a href="http://www.eclipse.org/swt/">Sample code and further information</a>
   # 
   # @since 3.0
+  # @noextend This class is not intended to be subclassed by clients.
   class CBanner < CBannerImports.const_get :Composite
     include_class_members CBannerImports
     
@@ -135,6 +136,12 @@ module Org::Eclipse::Swt::Custom
     alias_method :attr_right_drag_displacement=, :right_drag_displacement=
     undef_method :right_drag_displacement=
     
+    attr_accessor :listener
+    alias_method :attr_listener, :listener
+    undef_method :listener
+    alias_method :attr_listener=, :listener=
+    undef_method :listener=
+    
     class_module.module_eval {
       const_set_lazy(:OFFSCREEN) { -200 }
       const_attr_reader  :OFFSCREEN
@@ -210,6 +217,7 @@ module Org::Eclipse::Swt::Custom
       @resize_cursor = nil
       @dragging = false
       @right_drag_displacement = 0
+      @listener = nil
       super(parent, check_style(style))
       @simple = true
       @curve = Array.typed(::Java::Int).new(0) { 0 }
@@ -224,7 +232,7 @@ module Org::Eclipse::Swt::Custom
       @right_drag_displacement = 0
       Composite.instance_method(:set_layout).bind(self).call(CBannerLayout.new)
       @resize_cursor = Cursor.new(get_display, SWT::CURSOR_SIZEWE)
-      listener = Class.new(Listener.class == Class ? Listener : Object) do
+      @listener = Class.new(Listener.class == Class ? Listener : Object) do
         extend LocalClass
         include_class_members CBanner
         include Listener if Listener.class == Module
@@ -233,7 +241,7 @@ module Org::Eclipse::Swt::Custom
         define_method :handle_event do |e|
           case (e.attr_type)
           when SWT::Dispose
-            on_dispose
+            on_dispose(e)
           when SWT::MouseDown
             on_mouse_down(e.attr_x, e.attr_y)
           when SWT::MouseExit
@@ -260,7 +268,7 @@ module Org::Eclipse::Swt::Custom
       events = Array.typed(::Java::Int).new([SWT::Dispose, SWT::MouseDown, SWT::MouseExit, SWT::MouseMove, SWT::MouseUp, SWT::Paint, SWT::Resize])
       i = 0
       while i < events.attr_length
-        add_listener(events[i], listener)
+        add_listener(events[i], @listener)
         i += 1
       end
     end
@@ -297,6 +305,17 @@ module Org::Eclipse::Swt::Custom
     }
     
     typesig { [] }
+    # This class was not intended to be subclassed but this restriction
+    # cannot be enforced without breaking backward compatibility.
+    # 
+    # protected void checkSubclass () {
+    # String name = getClass ().getName ();
+    # int index = name.lastIndexOf ('.');
+    # if (!name.substring (0, index + 1).equals ("org.eclipse.swt.custom.")) {
+    # SWT.error (SWT.ERROR_INVALID_SUBCLASS);
+    # }
+    # }
+    # 
     # Returns the Control that appears on the bottom side of the banner.
     # 
     # @return the control that appears on the bottom side of the banner or null
@@ -390,8 +409,11 @@ module Org::Eclipse::Swt::Custom
       return @simple
     end
     
-    typesig { [] }
-    def on_dispose
+    typesig { [Event] }
+    def on_dispose(event)
+      remove_listener(SWT::Dispose, @listener)
+      notify_listeners(SWT::Dispose, event)
+      event.attr_type = SWT::None
       if (!(@resize_cursor).nil?)
         @resize_cursor.dispose
       end

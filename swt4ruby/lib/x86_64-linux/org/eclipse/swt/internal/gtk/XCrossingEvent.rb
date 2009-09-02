@@ -1,6 +1,6 @@
 require "rjava"
 
-# Copyright (c) 2000, 2004 IBM Corporation and others.
+# Copyright (c) 2000, 2008 IBM Corporation and others.
 # All rights reserved. This program and the accompanying materials
 # are made available under the terms of the Eclipse Public License v1.0
 # which accompanies this distribution, and is available at
@@ -19,6 +19,7 @@ module Org::Eclipse::Swt::Internal::Gtk
   class XCrossingEvent < XCrossingEventImports.const_get :XAnyEvent
     include_class_members XCrossingEventImports
     
+    # @field cast=(Window)
     # int
     attr_accessor :root
     alias_method :attr_root, :root
@@ -26,6 +27,7 @@ module Org::Eclipse::Swt::Internal::Gtk
     alias_method :attr_root=, :root=
     undef_method :root=
     
+    # @field cast=(Window)
     # int
     attr_accessor :subwindow
     alias_method :attr_subwindow, :subwindow
@@ -33,6 +35,7 @@ module Org::Eclipse::Swt::Internal::Gtk
     alias_method :attr_subwindow=, :subwindow=
     undef_method :subwindow=
     
+    # @field cast=(Time)
     attr_accessor :time
     alias_method :attr_time, :time
     undef_method :time
@@ -75,18 +78,21 @@ module Org::Eclipse::Swt::Internal::Gtk
     alias_method :attr_detail=, :detail=
     undef_method :detail=
     
+    # @field cast=(Bool)
     attr_accessor :same_screen
     alias_method :attr_same_screen, :same_screen
     undef_method :same_screen
     alias_method :attr_same_screen=, :same_screen=
     undef_method :same_screen=
     
+    # @field cast=(Bool)
     attr_accessor :focus
     alias_method :attr_focus, :focus
     undef_method :focus
     alias_method :attr_focus=, :focus=
     undef_method :focus=
     
+    # @field cast=(unsigned int)
     attr_accessor :state
     alias_method :attr_state, :state
     undef_method :state

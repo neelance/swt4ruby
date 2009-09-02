@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2006 IBM Corporation and others. All rights reserved.
+ * Copyright (c) 2000, 2008 IBM Corporation and others. All rights reserved.
  * The contents of this file are made available under the terms
  * of the GNU Lesser General Public License (LGPL) Version 2.1 that
  * accompanies this distribution (lgpl-v21.txt).  The LGPL is also
@@ -34,6 +34,8 @@ public static final int GNOME_VFS_MAKE_URI_DIR_CURRENT = 1<<1;
 public static final native int GnomeVFSMimeApplication_sizeof();
 
 /** Natives */
+
+/** @param mem cast=(gpointer) */
 public static final native void _g_free(long /*int*/ mem);
 public static final void g_free(long /*int*/ mem) {
 	lock.lock();
@@ -43,6 +45,10 @@ public static final void g_free(long /*int*/ mem) {
 		lock.unlock();
 	}
 }
+/**
+ * @param list cast=(GList *)
+ * @param data cast=(gpointer)
+ */
 public static final native long /*int*/ _g_list_append(long /*int*/ list, long /*int*/ data);
 public static final long /*int*/ g_list_append(long /*int*/ list, long /*int*/ data) {
 	lock.lock();
@@ -52,6 +58,7 @@ public static final long /*int*/ g_list_append(long /*int*/ list, long /*int*/ d
 		lock.unlock();
 	}
 }
+/** @param list cast=(GList *) */
 public static final native void _g_list_free(long /*int*/ list);
 public static final void g_list_free(long /*int*/ list) {
 	lock.lock();
@@ -70,6 +77,7 @@ public static final long /*int*/ g_list_next(long /*int*/ list) {
 		lock.unlock();
 	}
 }
+/** @param object cast=(gpointer) */
 public static final native void _g_object_unref(long /*int*/ object);
 public static final void g_object_unref(long /*int*/ object) {
 	lock.lock();
@@ -79,6 +87,16 @@ public static final void g_object_unref(long /*int*/ object) {
 		lock.unlock();
 	}
 }
+/**
+ * @param icon_theme cast=(GnomeIconTheme *)
+ * @param thumbnail_factory cast=(GnomeThumbnailFactory *)
+ * @param file_uri cast=(const char *)
+ * @param custom_icon cast=(const char *)
+ * @param file_info cast=(GnomeVFSFileInfo *)
+ * @param mime_type cast=(const char *)
+ * @param flags cast=(GnomeIconLookupFlags)
+ * @param result cast=(GnomeIconLookupResultFlags *)
+ */
 public static final native long /*int*/ _gnome_icon_lookup(long /*int*/ icon_theme, long /*int*/ thumbnail_factory, byte[] file_uri, byte[] custom_icon, long /*int*/ file_info, byte[] mime_type, int flags, int[] result);
 public static final long /*int*/ gnome_icon_lookup(long /*int*/ icon_theme, long /*int*/ thumbnail_factory, byte[] file_uri, byte[] custom_icon, long /*int*/ file_info, byte[] mime_type, int flags, int[] result) {
 	lock.lock();
@@ -88,6 +106,11 @@ public static final long /*int*/ gnome_icon_lookup(long /*int*/ icon_theme, long
 		lock.unlock();
 	}
 }
+/**
+ * @param theme cast=(GnomeIconTheme *)
+ * @param icon_name cast=(const char *)
+ * @param icon_data cast=(const GnomeIconData **)
+ */
 public static final native long /*int*/ _gnome_icon_theme_lookup_icon(long /*int*/ theme, long /*int*/ icon_name, int size, long /*int*/[] icon_data, int[] base_size);
 public static final long /*int*/ gnome_icon_theme_lookup_icon(long /*int*/ theme, long /*int*/ icon_name, int size, long /*int*/[] icon_data, int[] base_size) {
 	lock.lock();
@@ -124,6 +147,7 @@ public static final boolean gnome_vfs_init() {
 		lock.unlock();
 	}
 }
+/** @param uri cast=(const char *) */
 public static final native long /*int*/ _gnome_vfs_make_uri_from_input(byte[] uri);
 public static final long /*int*/ gnome_vfs_make_uri_from_input(byte[] uri) {
 	lock.lock();
@@ -133,6 +157,10 @@ public static final long /*int*/ gnome_vfs_make_uri_from_input(byte[] uri) {
 		lock.unlock();
 	}
 }
+/**
+ * @method flags=dynamic
+ * @param uri cast=(const char *)
+ */
 public static final native long /*int*/ _gnome_vfs_make_uri_from_input_with_dirs(byte[] uri, int dirs);
 public static final long /*int*/ gnome_vfs_make_uri_from_input_with_dirs(byte[] uri, int dirs) {
 	lock.lock();
@@ -142,6 +170,7 @@ public static final long /*int*/ gnome_vfs_make_uri_from_input_with_dirs(byte[] 
 		lock.unlock();
 	}
 }
+/** @param application cast=(GnomeVFSMimeApplication *) */
 public static final native void _gnome_vfs_mime_application_free(long /*int*/ application);
 public static final void gnome_vfs_mime_application_free(long /*int*/ application) {
 	lock.lock();
@@ -151,6 +180,11 @@ public static final void gnome_vfs_mime_application_free(long /*int*/ applicatio
 		lock.unlock();
 	}
 }
+/**
+ * @method flags=dynamic
+ * @param application cast=(GnomeVFSMimeApplication *)
+ * @param uris cast=(GList *)
+ */
 public static final native int _gnome_vfs_mime_application_launch(long /*int*/ application, long /*int*/ uris);
 public static final int gnome_vfs_mime_application_launch(long /*int*/ application, long /*int*/ uris) {	
 	lock.lock();
@@ -160,6 +194,7 @@ public static final int gnome_vfs_mime_application_launch(long /*int*/ applicati
 		lock.unlock();
 	}
 }
+/** @param list cast=(GList *) */
 public static final native void _gnome_vfs_mime_extensions_list_free(long /*int*/ list);
 public static final void gnome_vfs_mime_extensions_list_free(long /*int*/ list) {
 	lock.lock();
@@ -169,6 +204,7 @@ public static final void gnome_vfs_mime_extensions_list_free(long /*int*/ list) 
 		lock.unlock();
 	}
 }
+/** @param mimeType cast=(const char *) */
 public static final native long /*int*/ _gnome_vfs_mime_get_default_application(byte[] mimeType);
 public static final long /*int*/ gnome_vfs_mime_get_default_application(byte[] mimeType) {
 	lock.lock();
@@ -178,6 +214,7 @@ public static final long /*int*/ gnome_vfs_mime_get_default_application(byte[] m
 		lock.unlock();
 	}
 }
+/** @param mime_type cast=(const char *) */
 public static final native long /*int*/ _gnome_vfs_mime_get_extensions_list(long /*int*/ mime_type);
 public static final long /*int*/ gnome_vfs_mime_get_extensions_list(long /*int*/ mime_type) {
 	lock.lock();
@@ -187,6 +224,7 @@ public static final long /*int*/ gnome_vfs_mime_get_extensions_list(long /*int*/
 		lock.unlock();
 	}
 }
+/** @param list cast=(GList *) */
 public static final native void _gnome_vfs_mime_registered_mime_type_list_free(long /*int*/ list);
 public static final void gnome_vfs_mime_registered_mime_type_list_free(long /*int*/ list) {
 	lock.lock();
@@ -196,6 +234,7 @@ public static final void gnome_vfs_mime_registered_mime_type_list_free(long /*in
 		lock.unlock();
 	}
 }
+/** @param file cast=(const char *) */
 public static final native long /*int*/ _gnome_vfs_mime_type_from_name(byte[] file);
 public static final long /*int*/ gnome_vfs_mime_type_from_name(byte[] file) {
 	lock.lock();
@@ -205,6 +244,10 @@ public static final long /*int*/ gnome_vfs_mime_type_from_name(byte[] file) {
 		lock.unlock();
 	}
 }
+/**
+ * @method flags=dynamic
+ * @param url cast=(const char *)
+ */
 public static final native int _gnome_vfs_url_show(long /*int*/ url);
 public static final int gnome_vfs_url_show(long /*int*/ url) {
 	lock.lock();
@@ -214,5 +257,10 @@ public static final int gnome_vfs_url_show(long /*int*/ url) {
 		lock.unlock();
 	}
 }
+/**
+ * @param dest cast=(void *),flags=no_in
+ * @param src cast=(const void *)
+ * @param count cast=(size_t)
+ */
 public static final native void memmove (GnomeVFSMimeApplication dest, long /*int*/ src, long /*int*/ count);
 }

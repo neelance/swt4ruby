@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2008 IBM Corporation and others.
+ * Copyright (c) 2000, 2009 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -32,6 +32,7 @@ import org.eclipse.swt.internal.gtk.*;
  * @see <a href="http://www.eclipse.org/swt/snippets/#directorydialog">DirectoryDialog snippets</a>
  * @see <a href="http://www.eclipse.org/swt/examples.php">SWT Example: ControlExample, Dialog tab</a>
  * @see <a href="http://www.eclipse.org/swt/">Sample code and further information</a>
+ * @noextend This class is not intended to be subclassed by clients.
  */
 public class DirectoryDialog extends Dialog {
 	String message = "", filterPath = "";
@@ -125,13 +126,14 @@ public String open () {
 String openChooserDialog () {
 	byte [] titleBytes = Converter.wcsToMbcs (null, title, true);
 	long /*int*/ shellHandle = parent.topHandle ();
-	long /*int*/ handle = OS.gtk_file_chooser_dialog_new (
-		titleBytes,
-		shellHandle,
-		OS.GTK_FILE_CHOOSER_ACTION_SELECT_FOLDER,
-		OS.GTK_STOCK_CANCEL (), OS.GTK_RESPONSE_CANCEL,
-		OS.GTK_STOCK_OK (), OS.GTK_RESPONSE_OK,
-		0);
+	Display display = parent != null ? parent.getDisplay (): Display.getCurrent ();
+	long /*int*/ handle = 0;
+	if (display.getDismissalAlignment() == SWT.RIGHT) {
+		handle = OS.gtk_file_chooser_dialog_new (titleBytes, shellHandle, OS.GTK_FILE_CHOOSER_ACTION_SELECT_FOLDER, OS.GTK_STOCK_CANCEL (), OS.GTK_RESPONSE_CANCEL, OS.GTK_STOCK_OK (), OS.GTK_RESPONSE_OK, 0);
+	} else {
+		handle = OS.gtk_file_chooser_dialog_new (titleBytes, shellHandle, OS.GTK_FILE_CHOOSER_ACTION_SELECT_FOLDER, OS.GTK_STOCK_OK (), OS.GTK_RESPONSE_OK, OS.GTK_STOCK_CANCEL (), OS.GTK_RESPONSE_CANCEL, 0);
+	}
+	OS.gtk_window_set_modal (handle, true);
 	long /*int*/ pixbufs = OS.gtk_window_get_icon_list (shellHandle);
 	if (pixbufs != 0) {
 		OS.gtk_window_set_icon_list (handle, pixbufs);
@@ -169,7 +171,6 @@ String openChooserDialog () {
 		OS.gtk_file_chooser_set_extra_widget (handle, box);
 	}
 	String answer = null;
-	Display display = parent != null ? parent.getDisplay (): Display.getCurrent ();
 	display.addIdleProc ();
 	Dialog oldModal = null;
 	if (OS.gtk_window_get_modal (handle)) {
@@ -225,6 +226,7 @@ String openClassicDialog () {
 			OS.g_list_free (pixbufs);
 		}
 	}
+	OS.gtk_window_set_modal (handle, true);
 	String answer = null;
 	if (filterPath != null) {
 		String path = filterPath;

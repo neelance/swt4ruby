@@ -1,6 +1,6 @@
 require "rjava"
 
-# Copyright (c) 2000, 2008 IBM Corporation and others.
+# Copyright (c) 2000, 2009 IBM Corporation and others.
 # All rights reserved. This program and the accompanying materials
 # are made available under the terms of the Eclipse Public License v1.0
 # which accompanies this distribution, and is available at
@@ -45,6 +45,7 @@ module Org::Eclipse::Swt::Widgets
   # @see <a href="http://www.eclipse.org/swt/">Sample code and further information</a>
   # 
   # @since 3.2
+  # @noextend This class is not intended to be subclassed by clients.
   class ExpandBar < ExpandBarImports.const_get :Composite
     include_class_members ExpandBarImports
     
@@ -102,6 +103,7 @@ module Org::Eclipse::Swt::Widgets
     # <li>ERROR_INVALID_SUBCLASS - if this class is not an allowed subclass</li>
     # </ul>
     # 
+    # @see SWT#V_SCROLL
     # @see Widget#checkSubclass
     # @see Widget#getStyle
     def initialize(parent, style)
@@ -217,10 +219,12 @@ module Org::Eclipse::Swt::Widgets
           if ((self.attr_scrolled_handle).equal?(0))
             error(SWT::ERROR_NO_HANDLES)
           end
-          vsp = !((self.attr_style & SWT::V_SCROLL)).equal?(0) ? OS::GTK_POLICY_AUTOMATIC : OS::GTK_POLICY_NEVER
-          OS.gtk_scrolled_window_set_policy(self.attr_scrolled_handle, OS::GTK_POLICY_NEVER, vsp)
+          OS.gtk_scrolled_window_set_policy(self.attr_scrolled_handle, OS::GTK_POLICY_NEVER, OS::GTK_POLICY_AUTOMATIC)
           OS.gtk_container_add(self.attr_fixed_handle, self.attr_scrolled_handle)
           OS.gtk_scrolled_window_add_with_viewport(self.attr_scrolled_handle, self.attr_handle)
+          # int
+          viewport = OS.gtk_bin_get_child(self.attr_scrolled_handle)
+          OS.gtk_viewport_set_shadow_type(viewport, OS::GTK_SHADOW_NONE)
         else
           OS.gtk_container_add(self.attr_fixed_handle, self.attr_handle)
         end
@@ -353,6 +357,16 @@ module Org::Eclipse::Swt::Widgets
         end
       end
       return super
+    end
+    
+    typesig { [] }
+    def hook_events
+      super
+      if (OS::GTK_VERSION >= OS._version(2, 4, 0))
+        if (!(self.attr_scrolled_handle).equal?(0))
+          OS.g_signal_connect_closure(self.attr_scrolled_handle, OS.attr_size_allocate, self.attr_display.attr_closures[SIZE_ALLOCATE], true)
+        end
+      end
     end
     
     typesig { [] }
@@ -691,6 +705,17 @@ module Org::Eclipse::Swt::Widgets
           set_scrollbar
         end
       end
+    end
+    
+    typesig { [::Java::Long, ::Java::Long] }
+    # int
+    # int
+    # int
+    def gtk_size_allocate(widget, allocation)
+      # int
+      result = super(widget, allocation)
+      layout_items(0, false)
+      return result
     end
     
     typesig { [] }

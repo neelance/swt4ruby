@@ -1,6 +1,6 @@
 require "rjava"
 
-# Copyright (c) 2000, 2007 IBM Corporation and others.
+# Copyright (c) 2000, 2008 IBM Corporation and others.
 # All rights reserved. This program and the accompanying materials
 # are made available under the terms of the Eclipse Public License v1.0
 # which accompanies this distribution, and is available at
@@ -19,6 +19,7 @@ module Org::Eclipse::Swt::Internal::Win32
   class TVSORTCB 
     include_class_members TVSORTCBImports
     
+    # @field cast=(HTREEITEM)
     # long
     attr_accessor :h_parent
     alias_method :attr_h_parent, :h_parent
@@ -26,6 +27,7 @@ module Org::Eclipse::Swt::Internal::Win32
     alias_method :attr_h_parent=, :h_parent=
     undef_method :h_parent=
     
+    # @field cast=(PFNTVCOMPARE)
     # long
     attr_accessor :lpfn_compare
     alias_method :attr_lpfn_compare, :lpfn_compare
@@ -33,6 +35,7 @@ module Org::Eclipse::Swt::Internal::Win32
     alias_method :attr_lpfn_compare=, :lpfn_compare=
     undef_method :lpfn_compare=
     
+    # @field cast=(LPARAM)
     # long
     attr_accessor :l_param
     alias_method :attr_l_param, :l_param

@@ -1,6 +1,6 @@
 require "rjava"
 
-# Copyright (c) 2000, 2008 IBM Corporation and others.
+# Copyright (c) 2000, 2009 IBM Corporation and others.
 # All rights reserved. This program and the accompanying materials
 # are made available under the terms of the Eclipse Public License v1.0
 # which accompanies this distribution, and is available at
@@ -57,6 +57,7 @@ module Org::Eclipse::Swt::Widgets
   # @see <a href="http://www.eclipse.org/swt/snippets/#combo">Combo snippets</a>
   # @see <a href="http://www.eclipse.org/swt/examples.php">SWT Example: ControlExample</a>
   # @see <a href="http://www.eclipse.org/swt/">Sample code and further information</a>
+  # @noextend This class is not intended to be subclassed by clients.
   class Combo < ComboImports.const_get :Composite
     include_class_members ComboImports
     
@@ -89,6 +90,12 @@ module Org::Eclipse::Swt::Widgets
     undef_method :ignore_resize
     alias_method :attr_ignore_resize=, :ignore_resize=
     undef_method :ignore_resize=
+    
+    attr_accessor :lock_text
+    alias_method :attr_lock_text, :lock_text
+    undef_method :lock_text
+    alias_method :attr_lock_text=, :lock_text=
+    undef_method :lock_text=
     
     attr_accessor :scroll_width
     alias_method :attr_scroll_width, :scroll_width
@@ -196,6 +203,7 @@ module Org::Eclipse::Swt::Widgets
       @ignore_character = false
       @ignore_modify = false
       @ignore_resize = false
+      @lock_text = false
       @scroll_width = 0
       @visible_count = 0
       @cbt_hook = 0
@@ -394,6 +402,9 @@ module Org::Eclipse::Swt::Widgets
       # long
       hwnd_text = OS._get_dlg_item(self.attr_handle, CBID_EDIT)
       if ((hwnd).equal?(hwnd_text))
+        if (@lock_text && (msg).equal?(OS::WM_SETTEXT))
+          return 0
+        end
         return OS._call_window_proc(self.attr_edit_proc, hwnd, msg, w_param, l_param)
       end
       # long
@@ -2053,6 +2064,16 @@ module Org::Eclipse::Swt::Widgets
         end
         scroll = scroll_width > max_width
       end
+      # Feature in Windows.  For some reason, in a editable combo box,
+      # when CB_SETDROPPEDWIDTH is used to set the width of the drop
+      # down list and the current text does not match an item in the
+      # list, Windows selects the item that most closely matches the
+      # contents of the combo.  The fix is to lock the current text
+      # by ignoring all WM_SETTEXT messages during processing of
+      # CB_SETDROPPEDWIDTH.
+      if (((self.attr_style & SWT::READ_ONLY)).equal?(0))
+        @lock_text = true
+      end
       if (scroll)
         OS._send_message(self.attr_handle, OS::CB_SETDROPPEDWIDTH, 0, 0)
         OS._send_message(self.attr_handle, OS::CB_SETHORIZONTALEXTENT, scroll_width, 0)
@@ -2060,6 +2081,9 @@ module Org::Eclipse::Swt::Widgets
         scroll_width += OS._get_system_metrics(OS::SM_CYHSCROLL)
         OS._send_message(self.attr_handle, OS::CB_SETDROPPEDWIDTH, scroll_width, 0)
         OS._send_message(self.attr_handle, OS::CB_SETHORIZONTALEXTENT, 0, 0)
+      end
+      if (((self.attr_style & SWT::READ_ONLY)).equal?(0))
+        @lock_text = false
       end
     end
     
@@ -2133,6 +2157,10 @@ module Org::Eclipse::Swt::Widgets
     typesig { [String] }
     # Sets the contents of the receiver's text field to the
     # given string.
+    # <p>
+    # This call is ignored when the receiver is read only and
+    # the given string is not in the receiver's list.
+    # </p>
     # <p>
     # Note: The text field in a <code>Combo</code> is typically
     # only capable of displaying a single line of text. Thus,
@@ -2646,50 +2674,15 @@ module Org::Eclipse::Swt::Widgets
       # Feature in Windows.  When an editable drop down combo box
       # contains text that does not correspond to an item in the
       # list, when the widget is resized, it selects the closest
-      # match from the list.  The fix is to remember the original
-      # text and reset it after the widget is resized.
-      result = nil
-      if (!((self.attr_style & SWT::READ_ONLY)).equal?(0))
-        result = super(w_param, l_param)
-      else
-        # 64
-        index = RJava.cast_to_int(OS._send_message(self.attr_handle, OS::CB_GETCURSEL, 0, 0))
-        redraw = false
-        buffer = nil
-        start = nil
-        end_ = nil
-        if ((index).equal?(OS::CB_ERR))
-          length_ = OS._get_window_text_length(self.attr_handle)
-          if (!(length_).equal?(0))
-            buffer = TCHAR.new(get_code_page, length_ + 1)
-            OS._get_window_text(self.attr_handle, buffer, length_ + 1)
-            start = Array.typed(::Java::Int).new(1) { 0 }
-            end_ = Array.typed(::Java::Int).new(1) { 0 }
-            OS._send_message(self.attr_handle, OS::CB_GETEDITSEL, start, end_)
-            redraw = (self.attr_draw_count).equal?(0) && OS._is_window_visible(self.attr_handle)
-            if (redraw)
-              set_redraw(false)
-            end
-          end
-        end
-        result = super(w_param, l_param)
-        # It is possible (but unlikely), that application
-        # code could have disposed the widget in the resize
-        # event.  If this happens, end the processing of the
-        # Windows message by returning the result of the
-        # WM_SIZE message.
-        if (is_disposed)
-          return result
-        end
-        if (!(buffer).nil?)
-          OS._set_window_text(self.attr_handle, buffer)
-          # long
-          bits = OS._makelparam(start[0], end_[0])
-          OS._send_message(self.attr_handle, OS::CB_SETEDITSEL, 0, bits)
-          if (redraw)
-            set_redraw(true)
-          end
-        end
+      # match from the list.  The fix is to lock the current text
+      # by ignoring all WM_SETTEXT messages during processing of
+      # WM_SIZE.
+      if (((self.attr_style & SWT::READ_ONLY)).equal?(0))
+        @lock_text = true
+      end
+      result = super(w_param, l_param)
+      if (((self.attr_style & SWT::READ_ONLY)).equal?(0))
+        @lock_text = false
       end
       # Feature in Windows.  When CB_SETDROPPEDWIDTH is called with
       # a width that is smaller than the current size of the combo
@@ -2721,7 +2714,7 @@ module Org::Eclipse::Swt::Widgets
       if (OS::IsWinCE)
         return result
       end
-      if (!(self.attr_draw_count).equal?(0))
+      if (!get_drawing)
         return result
       end
       if (!OS._is_window_visible(self.attr_handle))
@@ -2840,7 +2833,6 @@ module Org::Eclipse::Swt::Widgets
       when OS::EM_UNDO, OS::WM_UNDO
         if (!(OS._send_message(hwnd_text, OS::EM_CANUNDO, 0, 0)).equal?(0))
           @ignore_modify = true
-          OS._send_message(hwnd_text, OS::EM_GETSEL, start, end_)
           OS._call_window_proc(self.attr_edit_proc, hwnd_text, msg, w_param, l_param)
           length_ = OS._get_window_text_length(hwnd_text)
           new_start = Array.typed(::Java::Int).new(1) { 0 }
@@ -2854,6 +2846,7 @@ module Org::Eclipse::Swt::Widgets
             new_text = ""
           end
           OS._call_window_proc(self.attr_edit_proc, hwnd_text, msg, w_param, l_param)
+          OS._send_message(hwnd_text, OS::EM_GETSEL, start, end_)
           @ignore_modify = false
         end
       when OS::WM_SETTEXT

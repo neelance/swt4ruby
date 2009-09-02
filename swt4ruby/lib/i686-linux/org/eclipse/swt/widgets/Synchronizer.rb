@@ -1,6 +1,6 @@
 require "rjava"
 
-# Copyright (c) 2000, 2008 IBM Corporation and others.
+# Copyright (c) 2000, 2009 IBM Corporation and others.
 # All rights reserved. This program and the accompanying materials
 # are made available under the terms of the Eclipse Public License v1.0
 # which accompanies this distribution, and is available at
@@ -78,6 +78,9 @@ module Org::Eclipse::Swt::Widgets
       # TEMPORARY CODE
       const_set_lazy(:IS_CARBON) { ("carbon" == SWT.get_platform) }
       const_attr_reader  :IS_CARBON
+      
+      const_set_lazy(:IS_GTK) { ("gtk" == SWT.get_platform) }
+      const_attr_reader  :IS_GTK
     }
     
     typesig { [Display] }
@@ -126,7 +129,7 @@ module Org::Eclipse::Swt::Widgets
     def async_exec(runnable)
       if ((runnable).nil?)
         # TEMPORARY CODE
-        if (!IS_CARBON)
+        if (!(IS_CARBON || IS_GTK))
           @display.wake
           return
         end

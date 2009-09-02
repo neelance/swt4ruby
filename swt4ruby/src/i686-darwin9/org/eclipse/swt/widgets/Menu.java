@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2008 IBM Corporation and others.
+ * Copyright (c) 2000, 2009 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -11,11 +11,7 @@
 package org.eclipse.swt.widgets;
 
 
-import org.eclipse.swt.internal.carbon.ATSFontMetrics;
-import org.eclipse.swt.internal.carbon.GDevice;
-import org.eclipse.swt.internal.carbon.OS;
-import org.eclipse.swt.internal.carbon.MenuTrackingData;
-import org.eclipse.swt.internal.carbon.Rect;
+import org.eclipse.swt.internal.cocoa.*;
  
 import org.eclipse.swt.*;
 import org.eclipse.swt.events.*;
@@ -41,6 +37,7 @@ import org.eclipse.swt.graphics.*;
  * @see <a href="http://www.eclipse.org/swt/snippets/#menu">Menu snippets</a>
  * @see <a href="http://www.eclipse.org/swt/examples.php">SWT Example: ControlExample</a>
  * @see <a href="http://www.eclipse.org/swt/">Sample code and further information</a>
+ * @noextend This class is not intended to be subclassed by clients.
  */
 public class Menu extends Widget {
 	/**
@@ -53,13 +50,11 @@ public class Menu extends Widget {
 	 * platforms and should never be accessed from application code.
 	 * </p>
 	 */
-	int handle;
-	short id;
+	NSMenu nsMenu;
 	int x, y, itemCount;
-//	int width, height;
-	boolean hasLocation, modified, closed;
+	boolean hasLocation, visible;
 	MenuItem [] items;
-	MenuItem cascade, defaultItem, lastTarget;
+	MenuItem cascade, defaultItem;
 	Decorations parent;
 
 /**
@@ -121,6 +116,9 @@ public Menu (Control parent) {
  * @see SWT#BAR
  * @see SWT#DROP_DOWN
  * @see SWT#POP_UP
+ * @see SWT#NO_RADIO_GROUP
+ * @see SWT#LEFT_TO_RIGHT
+ * @see SWT#RIGHT_TO_LEFT
  * @see Widget#checkSubclass
  * @see Widget#getStyle
  */
@@ -207,31 +205,32 @@ static int checkStyle (int style) {
 
 void _setVisible (boolean visible) {
 	if ((style & (SWT.BAR | SWT.DROP_DOWN)) != 0) return;
+	TrayItem trayItem = display.currentTrayItem;
+	if (trayItem != null && visible) {
+		trayItem.showMenu (this);
+		return;
+	}
 	if (visible) {
-		org.eclipse.swt.internal.carbon.Point where = new org.eclipse.swt.internal.carbon.Point ();
+		Shell shell = getShell ();
+		NSWindow window = shell.window;
+		NSPoint location = null;
 		if (hasLocation) {
-			where.h = (short) x;
-			where.v = (short) y;
+			NSView topView = window.contentView();
+			Point shellCoord = display.map(null, shell, new Point(x,y));
+			location = new NSPoint ();
+			location.x = shellCoord.x;
+			location.y = topView.frame().height - shellCoord.y;
 		} else {
-			OS.GetGlobalMouse (where);
+			location = window.mouseLocationOutsideOfEventStream();
 		}
-		/*
-		* Bug in the Macintosh.  When a menu is open with ContextualMenuSelect() the
-		* system will add other items before displaying it and remove the items before
-		* returning from the function.  If the menu is changed in kEventMenuOpening, the
-		* system will fail to remove those items.  The fix is to send SWT.Show before
-		* calling ContextualMenuSelect() instead of in kEventMenuOpening.
-		*/		
-		sendEvent (SWT.Show);
-		modified = false;
-		/*
-		* Feature in the Macintosh.  When the application FruitMenu is installed,
-		* the output parameters cannot be NULL or ContextualMenuSelect() crashes.
-		* The fix is to ensure they are not NULL.
-		*/
-		OS.ContextualMenuSelect (handle, where, false, OS.kCMHelpItemRemoveHelp, null, null, new int [1], new short [1], new short [1]);
+	
+		// Hold on to window in case it is disposed while the popup is open.
+		window.retain();
+		NSEvent nsEvent = NSEvent.otherEventWithType(OS.NSApplicationDefined, location, 0, 0.0, window.windowNumber(), window.graphicsContext(), (short)0, 0, 0);
+		NSMenu.popUpContextMenu(nsMenu, nsEvent, shell.view);
+		window.release();
 	} else {
-		OS.CancelMenuTracking (handle, true, 0);
+		nsMenu.cancelTracking ();
 	}
 }
 
@@ -290,24 +289,29 @@ public void addMenuListener (MenuListener listener) {
 
 void createHandle () {
 	display.addMenu (this);
-	int outMenuRef [] = new int [1];
-	OS.CreateNewMenu (id, 0, outMenuRef);
-	if (outMenuRef [0] == 0) {
-		display.removeMenu (this);
-		error (SWT.ERROR_NO_HANDLES);
-	}
-	handle = outMenuRef [0];
+	NSMenu widget = (NSMenu)new SWTMenu().alloc();
+	widget = widget.initWithTitle(NSString.stringWith(""));
+	widget.setAutoenablesItems(false);
+	widget.setDelegate(widget);	
+	nsMenu = widget;	
 }
 
 void createItem (MenuItem item, int index) {
-	checkWidget ();
 	if (!(0 <= index && index <= itemCount)) error (SWT.ERROR_INVALID_RANGE);
-	int attributes = OS.kMenuItemAttrAutoRepeat | OS.kMenuItemAttrCustomDraw;
-	if ((item.style & SWT.SEPARATOR) != 0) attributes = OS.kMenuItemAttrSeparator;
-	int result = OS.InsertMenuItemTextWithCFString (handle, 0, (short) index, attributes, 0);
-	if (result != OS.noErr) {
-		error (SWT.ERROR_ITEM_NOT_ADDED);
+	NSMenuItem nsItem = null;
+	if ((item.style & SWT.SEPARATOR) != 0) {
+		nsItem = NSMenuItem.separatorItem();
+		nsItem.retain();
+	} else {
+		nsItem = (NSMenuItem)new SWTMenuItem().alloc();
+		nsItem.initWithTitle(NSString.stringWith(""), 0, NSString.stringWith(""));
+		nsItem.setTarget(nsItem);
+		nsItem.setAction(OS.sel_sendSelection);
 	}
+	item.nsItem = nsItem;
+	item.createJNIRef();
+	item.register();
+	nsMenu.insertItem(nsItem, index);
 	if (itemCount == items.length) {
 		MenuItem [] newItems = new MenuItem [items.length + 4];
 		System.arraycopy (items, 0, newItems, 0, items.length);
@@ -315,18 +319,32 @@ void createItem (MenuItem item, int index) {
 	}
 	System.arraycopy (items, index, items, index + 1, itemCount++ - index);
 	items [index] = item;
-	modified = true;
-	int emptyMenu = item.createEmptyMenu ();
-	if (emptyMenu != 0) {
-		OS.SetMenuItemHierarchicalMenu (handle, (short) (index + 1), emptyMenu);
-		OS.ReleaseMenu (emptyMenu);
+	NSMenu emptyMenu = item.createEmptyMenu ();
+	if (emptyMenu != null) {
+		nsItem.setSubmenu (emptyMenu);
+		emptyMenu.release();
 	}
+	if (display.menuBar == this) {
+		NSApplication application = display.application;
+		NSMenu menubar = application.mainMenu();
+		if (menubar != null) {
+			nsItem.setMenu(null);
+			menubar.insertItem(nsItem, index + 1);
+		}
+	}
+	//TODO - find a way to disable the menu instead of each item
+	if (!getEnabled ()) nsItem.setEnabled (false);
 }
 
 void createWidget () {
 	checkOrientation (parent);
 	super.createWidget ();
 	items = new MenuItem [4];
+}
+
+void deregister () {
+	super.deregister ();
+	display.removeWidget (nsMenu);
 }
 
 void destroyItem (MenuItem item) {
@@ -339,38 +357,19 @@ void destroyItem (MenuItem item) {
 	System.arraycopy (items, index + 1, items, index, --itemCount - index);
 	items [itemCount] = null;
 	if (itemCount == 0) items = new MenuItem [4];
-	modified = true;
-	OS.DeleteMenuItem (handle, (short) (index + 1));
-}
-
-void destroyWidget () {
-	int theMenu = handle;
-	releaseHandle ();
-	if (theMenu != 0) {
-		OS.DisposeMenu (theMenu);
+	nsMenu.removeItem (item.nsItem);
+	if (display.menuBar == this) {
+		NSApplication application = display.application;
+		NSMenu menubar = application.mainMenu();
+		if (menubar != null) {
+			NSMenuItem nsItem = item.nsItem;
+			menubar.removeItem(nsItem);
+		}
 	}
 }
 
 void fixMenus (Decorations newParent) {
 	this.parent = newParent;
-}
-
-/*public*/ Rectangle getBounds () {
-	checkWidget ();
-	if ((style & SWT.BAR) != 0) {
-		Menu menu = display.getMenuBar ();
-		if (this != menu) return new Rectangle (0, 0, 0, 0);
-		int height = OS.GetMBarHeight ();
-		int gdevice = OS.GetMainDevice ();
-		int [] ptr = new int [1];
-		OS.memmove (ptr, gdevice, 4);
-		GDevice device = new GDevice ();
-		OS.memmove (device, ptr [0], GDevice.sizeof);
-		return new Rectangle (0, 0, device.right - device.left, height);
-	}
-	OS.CalcMenuSize (handle);
-	return new Rectangle (x, y, 0, 0);
-//	return new Rectangle (x, y, width, height);
 }
 
 /**
@@ -594,254 +593,7 @@ public boolean getVisible () {
 			if (popups [i] == this) return true;
 		}
 	}
-	MenuTrackingData outData = new MenuTrackingData ();
-	return OS.GetMenuTrackingData (handle, outData) == OS.noErr;
-}
-
-void hookEvents () {
-	super.hookEvents ();
-	int menuProc = display.menuProc;
-	int [] mask = new int [] {
-		OS.kEventClassMenu, OS.kEventMenuCalculateSize,
-		OS.kEventClassMenu, OS.kEventMenuClosed,
-		OS.kEventClassMenu, OS.kEventMenuCreateFrameView,
-		OS.kEventClassMenu, OS.kEventMenuDrawItem,
-		OS.kEventClassMenu, OS.kEventMenuDrawItemContent,
-		OS.kEventClassMenu, OS.kEventMenuMeasureItemWidth,
-		OS.kEventClassMenu, OS.kEventMenuOpening,
-		OS.kEventClassMenu, OS.kEventMenuTargetItem,
-	};
-	int menuTarget = OS.GetMenuEventTarget (handle);
-	OS.InstallEventHandler (menuTarget, menuProc, mask.length / 2, mask, handle, null);
-}
-
-int kEventMenuCalculateSize (int nextHandler, int theEvent, int userData) {
-	int result = super.kEventMenuCalculateSize (nextHandler, theEvent, userData);
-	if (result == OS.noErr) return result;
-	int [] theControl = new int [1];
-	OS.GetEventParameter (theEvent, OS.kEventParamControlRef, OS.typeControlRef, null, 4, null, theControl);
-	int menuProc = display.menuProc;
-	int [] mask = new int [] {
-		OS.kEventClassMenu, OS.kEventMenuGetFrameBounds,
-	};
-	int controlTarget = OS.GetControlEventTarget (theControl [0]);
-	//TODO - installed multi-times, does this matter?
-	OS.InstallEventHandler (controlTarget, menuProc, mask.length / 2, mask, handle, null);
-	return result;
-}
-
-int kEventMenuClosed (int nextHandler, int theEvent, int userData) {
-	int result = super.kEventMenuClosed (nextHandler, theEvent, userData);
-	if (result == OS.noErr) return result;
-	closed = true;
-//	width = height = 0;
-//	int count = OS.CountMenuItems (handle);
-//	for (int i=0; i<count; i++) {
-//		MenuItem item = items [i];
-//		item.x = item.y = item.width = item.height = 0;
-//	}
-	/*
-	* Feature in the Macintosh.  In order to populate the search field of
-	* the help menu, the events kEventMenuOpening, kEventMenuClosed and
-	* others are sent to sub menus even when the cascade item of the submenu
-	* is disabled.  Normally, the user can never get to these submenus.
-	* This means that application code does not expect SWT.Show and SWT.Hide
-	* events.  The fix is to avoid the events when the cascade item is
-	* disabled.
-	*/
-	boolean send = true;
-	if (cascade != null && !cascade.getEnabled ()) send = false;
-	if (send) sendEvent (SWT.Hide);
-	return OS.eventNotHandledErr;
-}
-
-int kEventMenuCreateFrameView (int nextHandler, int theEvent, int userData) {
-	int result = super.kEventMenuCreateFrameView (nextHandler, theEvent, userData);
-	if (result == OS.noErr) return result;
-	int [] theControl = new int [1];
-	OS.GetEventParameter (theEvent, OS.kEventParamControlRef, OS.typeControlRef, null, 4, null, theControl);
-	int menuProc = display.menuProc;
-	int [] mask = new int [] {
-		OS.kEventClassMenu, OS.kEventMenuGetFrameBounds,
-	};
-	int controlTarget = OS.GetControlEventTarget (theControl [0]);
-	OS.InstallEventHandler (controlTarget, menuProc, mask.length / 2, mask, handle, null);
-	return OS.eventNotHandledErr;
-}
-
-int kEventMenuDrawItem (int nextHandler, int theEvent, int userData) {
-	int result = super.kEventMenuDrawItem (nextHandler, theEvent, userData);
-	if (result == OS.noErr) return result;
-//	short [] index = new short [1];
-//	OS.GetEventParameter (theEvent, OS.kEventParamMenuItemIndex, OS.typeMenuItemIndex, null, 2, null, index);
-//	MenuItem item = items [index [0] - 1];
-//	Rect rect = new Rect ();
-//	OS.GetEventParameter (theEvent, OS.kEventParamMenuItemBounds, OS.typeQDRectangle, null, Rect.sizeof, null, rect);
-//	item.x = rect.left - x;
-//	item.y = rect.top - y;
-//	item.width = rect.right - rect.left;
-//	item.height = rect.bottom - rect.top;
-	return OS.eventNotHandledErr;
-}
-
-int kEventMenuDrawItemContent (int nextHandler, int theEvent, int userData) {
-	int result = super.kEventMenuDrawItemContent (nextHandler, theEvent, userData);
-	if (result == OS.noErr) return result;
-	short [] index = new short [1];
-	OS.GetEventParameter (theEvent, OS.kEventParamMenuItemIndex, OS.typeMenuItemIndex, null, 2, null, index);
-	if (!(0 < index [0] && index [0] <= itemCount)) return result;
-	MenuItem item = items [index [0] - 1];
-	if (item.accelerator == 0) {
-		int accelIndex = item.text.indexOf ('\t');
-		if (accelIndex != -1) {
-			String accelText = item.text.substring (accelIndex + 1);
-			int length = accelText.length ();
-			if (length != 0) {
-				result = OS.CallNextEventHandler (nextHandler, theEvent);
-				Rect rect = new Rect ();
-				OS.GetEventParameter (theEvent, OS.kEventParamMenuItemBounds, OS.typeQDRectangle, null, Rect.sizeof, null, rect);
-				int [] context = new int [1];
-				OS.GetEventParameter (theEvent, OS.kEventParamCGContextRef, OS.typeCGContextRef, null, 4, null, context);
-
-				/* Draw the key */
-				int modifierIndex = modifierIndex (accelText);
-				char [] buffer = new char [length - modifierIndex - 1];
-				accelText.getChars (modifierIndex + 1, length, buffer, 0);
-				int themeFont = OS.kThemeMenuItemFont;
-				if (buffer.length > 1) themeFont = OS.kThemeMenuItemCmdKeyFont;
-				byte [] family = new byte [256];
-				short [] size = new short [1];
-				byte [] style = new byte [1];
-				OS.GetThemeFont ((short) themeFont, (short) OS.smSystemScript, family, size, style);
-				short id = OS.FMGetFontFamilyFromName (family);
-				int [] font = new int [1]; 
-				OS.FMGetFontFromFontFamilyInstance (id, style [0], font, null);
-				int atsFont = OS.FMGetATSFontRefFromFont (font [0]);
-				ATSFontMetrics fontMetrics = new ATSFontMetrics ();
-				OS.ATSFontGetVerticalMetrics (atsFont, OS.kATSOptionFlagsDefault, fontMetrics);
-				OS.ATSFontGetHorizontalMetrics (atsFont, OS.kATSOptionFlagsDefault, fontMetrics);
-				int [] metric = new int [1];
-				OS.GetThemeMetric (OS.kThemeMetricMenuIconTrailingEdgeMargin, metric);
-				int str = OS.CFStringCreateWithCharacters (OS.kCFAllocatorDefault, buffer, buffer.length);
-				org.eclipse.swt.internal.carbon.Point size1 = new org.eclipse.swt.internal.carbon.Point ();
-				OS.GetThemeTextDimensions (str, (short) themeFont, 0, false, size1, null);
-				rect.left = (short) (rect.right - Math.max ((int)(fontMetrics.maxAdvanceWidth * size[0]), size1.h) - metric [0]);
-				OS.DrawThemeTextBox (str, (short) themeFont, OS.kThemeStateActive, false, rect, (short) OS.teFlushLeft, context [0]);
-				OS.CFRelease (str);
-				
-				/* Draw the modifiers */
-				if (modifierIndex != -1) {
-					buffer = new char [modifierIndex + 1];
-					accelText.getChars (0, buffer.length, buffer, 0);
-					str = OS.CFStringCreateWithCharacters (OS.kCFAllocatorDefault, buffer, buffer.length);
-					OS.GetThemeTextDimensions (str, (short) OS.kThemeMenuItemCmdKeyFont, 0, false, size1, null);
-					rect.right = rect.left;
-					rect.left = (short) (rect.right - size1.h);
-					OS.DrawThemeTextBox (str, (short) OS.kThemeMenuItemCmdKeyFont, OS.kThemeStateActive, false, rect, (short) OS.teFlushLeft, context [0]);
-					OS.CFRelease (str);
-				}
-				return result;
-			}
-		}			
-	}
-	return OS.eventNotHandledErr;
-}
-
-int kEventMenuGetFrameBounds (int nextHandler, int theEvent, int userData) {
-	int result = super.kEventMenuGetFrameBounds (nextHandler, theEvent, userData);
-	if (result == OS.noErr) return result;
-	result = OS.CallNextEventHandler (nextHandler, theEvent);
-//	CGRect rect = new CGRect ();
-//	OS.GetEventParameter (theEvent, OS.kEventParamBounds, OS.typeHIRect, null, CGRect.sizeof, null, rect);
-//	x = (int) rect.x;
-//	y = (int) rect.y;
-//	width = (int) rect.width;
-//	height = (int) rect.height;
-//	if (cascade != null) {
-//		OS.GetEventParameter (theEvent, OS.kEventParamMenuItemBounds, OS.typeHIRect, null, CGRect.sizeof, null, rect);
-//		cascade.x = (int) rect.x - x;
-//		cascade.y = (int) rect.y - y;
-//		cascade.width = (int) rect.width;
-//		cascade.height = (int) rect.height;
-//	}
-	return result;
-}
-
-int kEventMenuMeasureItemWidth (int nextHandler, int theEvent, int userData) {
-	int result = super.kEventMenuMeasureItemWidth (nextHandler, theEvent, userData);
-	if (result == OS.noErr) return result;
-	short [] index = new short [1];
-	OS.GetEventParameter (theEvent, OS.kEventParamMenuItemIndex, OS.typeMenuItemIndex, null, 2, null, index);
-	if (!(0 < index [0] && index [0] <= itemCount)) return result;
-	MenuItem item = items [index [0] - 1];
-	if (item.accelerator == 0) {
-		int accelIndex = item.text.indexOf ('\t');
-		if (accelIndex != -1) {
-			String accelText = item.text.substring (accelIndex + 1);
-			if (accelText.length () != 0) {
-				result = OS.CallNextEventHandler (nextHandler, theEvent);
-				char [] buffer = new char [accelText.length ()];
-				accelText.getChars (0, buffer.length, buffer, 0);
-				int str = OS.CFStringCreateWithCharacters (OS.kCFAllocatorDefault, buffer, buffer.length);
-				org.eclipse.swt.internal.carbon.Point size = new org.eclipse.swt.internal.carbon.Point ();
-				OS.GetThemeTextDimensions (str, (short) OS.kThemeMenuItemCmdKeyFont, 0, false, size, null);
-				OS.CFRelease (str);
-				short [] width = new short [1];
-				OS.GetEventParameter (theEvent, OS.kEventParamMenuItemWidth, OS.typeSInt16, null, 2, null, width);
-				int [] metric = new int [1];
-				OS.GetThemeMetric (OS.kThemeMetricMenuTextTrailingEdgeMargin, metric);
-				width [0] += metric [0] + size.h;
-				OS.SetEventParameter (theEvent, OS.kEventParamMenuItemWidth, OS.typeSInt16, 2, width);
-				return result;
-			}
-		}			
-	}
-	return OS.eventNotHandledErr;
-}
-
-int kEventMenuOpening (int nextHandler, int theEvent, int userData) {
-	int result = super.kEventMenuOpening (nextHandler, theEvent, userData);
-	if (result == OS.noErr) return result;
-	closed = false;
-	/*
-	* Bug in the Macintosh.  When a menu is open with ContextualMenuSelect() the
-	* system will add other items before displaying it and remove the items before
-	* returning from the function.  If the menu is changed in kEventMenuOpening, the
-	* system will fail to remove those items.  The fix is to send SWT.Show before
-	* calling ContextualMenuSelect() instead of in kEventMenuOpening.
-	*/	
-	if ((style & SWT.POP_UP) == 0) {
-		/*
-		* Feature in the Macintosh.  In order to populate the search field of
-		* the help menu, the events kEventMenuOpening, kEventMenuClosed and
-		* others are sent to sub menus even when the cascade item of the submenu
-		* is disabled.  Normally, the user can never get to these submenus.
-		* This means that application code does not expect SWT.Show and SWT.Hide
-		* events.  The fix is to avoid the events when the cascade item is
-		* disabled.
-		*/
-		boolean send = true;
-		if (cascade != null && !cascade.getEnabled ()) send = false;
-		if (send) {
-			sendEvent (SWT.Show);
-			modified = false;
-		}
-	}
-	return OS.eventNotHandledErr;
-}
-
-int kEventMenuTargetItem (int nextHandler, int theEvent, int userData) {
-	int result = super.kEventMenuTargetItem (nextHandler, theEvent, userData);
-	if (result == OS.noErr) return result;
-	lastTarget = null;
-	short [] index = new short [1];
-	if (OS.GetEventParameter (theEvent, OS.kEventParamMenuItemIndex, OS.typeMenuItemIndex, null, 2, null, index) == OS.noErr) {
-		if (0 < index [0] && index [0] <= itemCount) lastTarget = items [index [0] - 1];
-		if (lastTarget != null) {
-			lastTarget.sendEvent (SWT.Arm);
-		}
-	}
-	return OS.eventNotHandledErr;
+	return visible;
 }
 
 /**
@@ -913,24 +665,40 @@ public boolean isVisible () {
 	return getVisible ();
 }
 
-int modifierIndex (String accelText) {
-	int start = accelText.length () - 1;
-	int index = start;
-	while (index >= 0) {
-		char c = accelText.charAt (index);
-		switch (c) {
-			case ' ':
-				if (index != start) return index;
-				break;
-			case '\u2303':
-			case '\u2325':
-			case '\u21E7':
-			case '\u2318':
-				return index;
-		}
-		index--;
+void menu_willHighlightItem(int /*long*/ id, int /*long*/ sel, int /*long*/ menu, int /*long*/ itemID) {
+	Widget widget = display.getWidget(itemID);
+	if (widget instanceof MenuItem) {
+		MenuItem item = (MenuItem)widget;
+		item.sendEvent (SWT.Arm);
 	}
-	return -1;
+}
+
+void menuNeedsUpdate(int /*long*/ id, int /*long*/ sel, int /*long*/ menu) {
+	//This code is intentionally commented
+	//sendEvent (SWT.Show);
+}
+
+void menuWillOpen(int /*long*/ id, int /*long*/ sel, int /*long*/ menu) {
+	visible = true;
+	sendEvent (SWT.Show);
+	for (int i=0; i<items.length; i++) {
+		MenuItem item = items [i];
+		if (item != null)  item.updateAccelerator (true);
+	}
+}
+
+void menuDidClose(int /*long*/ id, int /*long*/ sel, int /*long*/ menu) {
+	sendEvent (SWT.Hide);
+	visible = false;
+	for (int i=0; i<items.length; i++) {
+		MenuItem item = items [i];
+		if (item != null)  item.updateAccelerator (false);
+	}
+}
+
+void register () {
+	super.register ();
+	display.addWidget (nsMenu, this);
 }
 
 void releaseChildren (boolean destroy) {
@@ -948,7 +716,8 @@ void releaseChildren (boolean destroy) {
 
 void releaseHandle () {
 	super.releaseHandle ();
-	handle = 0;
+	if (nsMenu != null) nsMenu.release();
+	nsMenu = null;
 }
 
 void releaseParent () {
@@ -963,7 +732,7 @@ void releaseWidget () {
 	super.releaseWidget ();
 	display.removeMenu (this);
 	parent = null;
-	cascade = defaultItem = lastTarget = null;
+	cascade = defaultItem = null;
 }
 
 /**
@@ -1052,10 +821,22 @@ public void setEnabled (boolean enabled) {
 	checkWidget();
 	if (enabled) {
 		state &= ~DISABLED;
-		OS.EnableMenuItem (handle, (short)0);
 	} else {
 		state |= DISABLED;
-		OS.DisableMenuItem (handle, (short)0);
+	}
+	//TODO - find a way to disable the menu instead of each item
+	for (int i=0; i<items.length; i++) {
+		MenuItem item = items [i];
+		if (item != null) {
+			/*
+			* Feature in the Macintosh.  When a cascade menu
+			* item is disabled, rather than disabling the item,
+			* the submenu is disabled.
+			* 
+			* There is no fix for this at this time.
+			*/
+			item.nsItem.setEnabled (enabled && item.getEnabled ());
+		}
 	}
 }
 
@@ -1139,7 +920,6 @@ public void setVisible (boolean visible) {
 		display.addPopup (this);
 	} else {
 		display.removePopup (this);
-		_setVisible (false);
 	}
 }
 	

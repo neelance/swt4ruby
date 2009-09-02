@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2008 IBM Corporation and others.
+ * Copyright (c) 2000, 2009 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -33,10 +33,9 @@ import org.eclipse.swt.graphics.*;
  * than <code>Canvas</code>.
  * </p><p>
  * Note: The <code>CENTER</code> style, although undefined for composites, has the
- * same value as <code>EMBEDDED</code> (which is used to embed widgets from other
- * widget toolkits into SWT).  On some operating systems (GTK, Motif), this may cause
- * the children of this composite to be obscured.  The <code>EMBEDDED</code> style
- * is for use by other widget toolkits and should normally never be used.
+ * same value as <code>EMBEDDED</code> which is used to embed widgets from other
+ * widget toolkits into SWT.  On some operating systems (GTK, Motif), this may cause
+ * the children of this composite to be obscured.
  * </p><p>
  * This class may be subclassed by custom control implementors
  * who are building controls that are constructed from aggregates
@@ -88,6 +87,8 @@ Composite () {
  * @see SWT#NO_MERGE_PAINTS
  * @see SWT#NO_REDRAW_RESIZE
  * @see SWT#NO_RADIO_GROUP
+ * @see SWT#EMBEDDED
+ * @see SWT#DOUBLE_BUFFERED
  * @see Widget#getStyle
  */
 public Composite (Composite parent, int style) {
@@ -231,15 +232,15 @@ public Point computeSize (int wHint, int hHint, boolean changed) {
 	return new Point (trim.width, trim.height);
 }
 
-Control [] computeTabList () {
-	Control result [] = super.computeTabList ();
+Widget [] computeTabList () {
+	Widget result [] = super.computeTabList ();
 	if (result.length == 0) return result;
 	Control [] list = tabList != null ? _getTabList () : _getChildren ();
 	for (int i=0; i<list.length; i++) {
 		Control child = list [i];
-		Control [] childList = child.computeTabList ();
+		Widget [] childList = child.computeTabList ();
 		if (childList.length != 0) {
-			Control [] newResult = new Control [result.length + childList.length];
+			Widget [] newResult = new Widget [result.length + childList.length];
 			System.arraycopy (result, 0, newResult, 0, result.length);
 			System.arraycopy (childList, 0, newResult, result.length, childList.length);
 			result = newResult;
@@ -1376,6 +1377,10 @@ void showWidget () {
 		embeddedHandle = OS.gtk_socket_get_id (socketHandle);
 	}
 	if (scrolledHandle == 0) fixStyle (handle);
+}
+
+boolean checkSubwindow () {
+	return true;
 }
 
 boolean translateMnemonic (Event event, Control control) {

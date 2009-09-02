@@ -1,6 +1,6 @@
 require "rjava"
 
-# Copyright (c) 2000, 2008 IBM Corporation and others.
+# Copyright (c) 2000, 2009 IBM Corporation and others.
 # All rights reserved. This program and the accompanying materials
 # are made available under the terms of the Eclipse Public License v1.0
 # which accompanies this distribution, and is available at
@@ -13,11 +13,7 @@ module Org::Eclipse::Swt::Widgets
     class_module.module_eval {
       include ::Java::Lang
       include ::Org::Eclipse::Swt::Widgets
-      include_const ::Org::Eclipse::Swt::Internal::Carbon, :ATSFontMetrics
-      include_const ::Org::Eclipse::Swt::Internal::Carbon, :GDevice
-      include_const ::Org::Eclipse::Swt::Internal::Carbon, :OS
-      include_const ::Org::Eclipse::Swt::Internal::Carbon, :MenuTrackingData
-      include_const ::Org::Eclipse::Swt::Internal::Carbon, :Rect
+      include ::Org::Eclipse::Swt::Internal::Cocoa
       include ::Org::Eclipse::Swt
       include ::Org::Eclipse::Swt::Events
       include ::Org::Eclipse::Swt::Graphics
@@ -43,6 +39,7 @@ module Org::Eclipse::Swt::Widgets
   # @see <a href="http://www.eclipse.org/swt/snippets/#menu">Menu snippets</a>
   # @see <a href="http://www.eclipse.org/swt/examples.php">SWT Example: ControlExample</a>
   # @see <a href="http://www.eclipse.org/swt/">Sample code and further information</a>
+  # @noextend This class is not intended to be subclassed by clients.
   class Menu < MenuImports.const_get :Widget
     include_class_members MenuImports
     
@@ -54,17 +51,11 @@ module Org::Eclipse::Swt::Widgets
     # within the packages provided by SWT. It is not available on all
     # platforms and should never be accessed from application code.
     # </p>
-    attr_accessor :handle
-    alias_method :attr_handle, :handle
-    undef_method :handle
-    alias_method :attr_handle=, :handle=
-    undef_method :handle=
-    
-    attr_accessor :id
-    alias_method :attr_id, :id
-    undef_method :id
-    alias_method :attr_id=, :id=
-    undef_method :id=
+    attr_accessor :ns_menu
+    alias_method :attr_ns_menu, :ns_menu
+    undef_method :ns_menu
+    alias_method :attr_ns_menu=, :ns_menu=
+    undef_method :ns_menu=
     
     attr_accessor :x
     alias_method :attr_x, :x
@@ -84,24 +75,17 @@ module Org::Eclipse::Swt::Widgets
     alias_method :attr_item_count=, :item_count=
     undef_method :item_count=
     
-    # int width, height;
     attr_accessor :has_location
     alias_method :attr_has_location, :has_location
     undef_method :has_location
     alias_method :attr_has_location=, :has_location=
     undef_method :has_location=
     
-    attr_accessor :modified
-    alias_method :attr_modified, :modified
-    undef_method :modified
-    alias_method :attr_modified=, :modified=
-    undef_method :modified=
-    
-    attr_accessor :closed
-    alias_method :attr_closed, :closed
-    undef_method :closed
-    alias_method :attr_closed=, :closed=
-    undef_method :closed=
+    attr_accessor :visible
+    alias_method :attr_visible, :visible
+    undef_method :visible
+    alias_method :attr_visible=, :visible=
+    undef_method :visible=
     
     attr_accessor :items
     alias_method :attr_items, :items
@@ -120,12 +104,6 @@ module Org::Eclipse::Swt::Widgets
     undef_method :default_item
     alias_method :attr_default_item=, :default_item=
     undef_method :default_item=
-    
-    attr_accessor :last_target
-    alias_method :attr_last_target, :last_target
-    undef_method :last_target
-    alias_method :attr_last_target=, :last_target=
-    undef_method :last_target=
     
     attr_accessor :parent
     alias_method :attr_parent, :parent
@@ -191,21 +169,21 @@ module Org::Eclipse::Swt::Widgets
     # @see SWT#BAR
     # @see SWT#DROP_DOWN
     # @see SWT#POP_UP
+    # @see SWT#NO_RADIO_GROUP
+    # @see SWT#LEFT_TO_RIGHT
+    # @see SWT#RIGHT_TO_LEFT
     # @see Widget#checkSubclass
     # @see Widget#getStyle
     def initialize(parent, style)
-      @handle = 0
-      @id = 0
+      @ns_menu = nil
       @x = 0
       @y = 0
       @item_count = 0
       @has_location = false
-      @modified = false
-      @closed = false
+      @visible = false
       @items = nil
       @cascade = nil
       @default_item = nil
-      @last_target = nil
       @parent = nil
       super(parent, check_style(style))
       @parent = parent
@@ -302,27 +280,31 @@ module Org::Eclipse::Swt::Widgets
       if (!((self.attr_style & (SWT::BAR | SWT::DROP_DOWN))).equal?(0))
         return
       end
+      tray_item = self.attr_display.attr_current_tray_item
+      if (!(tray_item).nil? && visible)
+        tray_item.show_menu(self)
+        return
+      end
       if (visible)
-        where = Org::Eclipse::Swt::Internal::Carbon::Point.new
+        shell = get_shell
+        window = shell.attr_window
+        location = nil
         if (@has_location)
-          where.attr_h = RJava.cast_to_short(@x)
-          where.attr_v = RJava.cast_to_short(@y)
+          top_view = window.content_view
+          shell_coord = self.attr_display.map(nil, shell, Point.new(@x, @y))
+          location = NSPoint.new
+          location.attr_x = shell_coord.attr_x
+          location.attr_y = top_view.frame.attr_height - shell_coord.attr_y
         else
-          OS._get_global_mouse(where)
+          location = window.mouse_location_outside_of_event_stream
         end
-        # Bug in the Macintosh.  When a menu is open with ContextualMenuSelect() the
-        # system will add other items before displaying it and remove the items before
-        # returning from the function.  If the menu is changed in kEventMenuOpening, the
-        # system will fail to remove those items.  The fix is to send SWT.Show before
-        # calling ContextualMenuSelect() instead of in kEventMenuOpening.
-        send_event(SWT::Show)
-        @modified = false
-        # Feature in the Macintosh.  When the application FruitMenu is installed,
-        # the output parameters cannot be NULL or ContextualMenuSelect() crashes.
-        # The fix is to ensure they are not NULL.
-        OS._contextual_menu_select(@handle, where, false, OS.attr_k_cmhelp_item_remove_help, nil, nil, Array.typed(::Java::Int).new(1) { 0 }, Array.typed(::Java::Short).new(1) { 0 }, Array.typed(::Java::Short).new(1) { 0 })
+        # Hold on to window in case it is disposed while the popup is open.
+        window.retain
+        ns_event = NSEvent.other_event_with_type(OS::NSApplicationDefined, location, 0, 0.0, window.window_number, window.graphics_context, RJava.cast_to_short(0), 0, 0)
+        NSMenu.pop_up_context_menu(@ns_menu, ns_event, shell.attr_view)
+        window.release
       else
-        OS._cancel_menu_tracking(@handle, true, 0)
+        @ns_menu.cancel_tracking
       end
     end
     
@@ -384,29 +366,32 @@ module Org::Eclipse::Swt::Widgets
     typesig { [] }
     def create_handle
       self.attr_display.add_menu(self)
-      out_menu_ref = Array.typed(::Java::Int).new(1) { 0 }
-      OS._create_new_menu(@id, 0, out_menu_ref)
-      if ((out_menu_ref[0]).equal?(0))
-        self.attr_display.remove_menu(self)
-        error(SWT::ERROR_NO_HANDLES)
-      end
-      @handle = out_menu_ref[0]
+      widget = SWTMenu.new.alloc
+      widget = widget.init_with_title(NSString.string_with(""))
+      widget.set_autoenables_items(false)
+      widget.set_delegate(widget)
+      @ns_menu = widget
     end
     
     typesig { [MenuItem, ::Java::Int] }
     def create_item(item, index)
-      check_widget
       if (!(0 <= index && index <= @item_count))
         error(SWT::ERROR_INVALID_RANGE)
       end
-      attributes = OS.attr_k_menu_item_attr_auto_repeat | OS.attr_k_menu_item_attr_custom_draw
+      ns_item = nil
       if (!((item.attr_style & SWT::SEPARATOR)).equal?(0))
-        attributes = OS.attr_k_menu_item_attr_separator
+        ns_item = NSMenuItem.separator_item
+        ns_item.retain
+      else
+        ns_item = SWTMenuItem.new.alloc
+        ns_item.init_with_title(NSString.string_with(""), 0, NSString.string_with(""))
+        ns_item.set_target(ns_item)
+        ns_item.set_action(OS.attr_sel_send_selection)
       end
-      result = OS._insert_menu_item_text_with_cfstring(@handle, 0, RJava.cast_to_short(index), attributes, 0)
-      if (!(result).equal?(OS.attr_no_err))
-        error(SWT::ERROR_ITEM_NOT_ADDED)
-      end
+      item.attr_ns_item = ns_item
+      item.create_jniref
+      item.register
+      @ns_menu.insert_item(ns_item, index)
       if ((@item_count).equal?(@items.attr_length))
         new_items = Array.typed(MenuItem).new(@items.attr_length + 4) { nil }
         System.arraycopy(@items, 0, new_items, 0, @items.attr_length)
@@ -414,11 +399,22 @@ module Org::Eclipse::Swt::Widgets
       end
       System.arraycopy(@items, index, @items, index + 1, ((@item_count += 1) - 1) - index)
       @items[index] = item
-      @modified = true
       empty_menu = item.create_empty_menu
-      if (!(empty_menu).equal?(0))
-        OS._set_menu_item_hierarchical_menu(@handle, RJava.cast_to_short((index + 1)), empty_menu)
-        OS._release_menu(empty_menu)
+      if (!(empty_menu).nil?)
+        ns_item.set_submenu(empty_menu)
+        empty_menu.release
+      end
+      if ((self.attr_display.attr_menu_bar).equal?(self))
+        application = self.attr_display.attr_application
+        menubar = application.main_menu
+        if (!(menubar).nil?)
+          ns_item.set_menu(nil)
+          menubar.insert_item(ns_item, index + 1)
+        end
+      end
+      # TODO - find a way to disable the menu instead of each item
+      if (!get_enabled)
+        ns_item.set_enabled(false)
       end
     end
     
@@ -427,6 +423,12 @@ module Org::Eclipse::Swt::Widgets
       check_orientation(@parent)
       super
       @items = Array.typed(MenuItem).new(4) { nil }
+    end
+    
+    typesig { [] }
+    def deregister
+      super
+      self.attr_display.remove_widget(@ns_menu)
     end
     
     typesig { [MenuItem] }
@@ -446,44 +448,20 @@ module Org::Eclipse::Swt::Widgets
       if ((@item_count).equal?(0))
         @items = Array.typed(MenuItem).new(4) { nil }
       end
-      @modified = true
-      OS._delete_menu_item(@handle, RJava.cast_to_short((index + 1)))
-    end
-    
-    typesig { [] }
-    def destroy_widget
-      the_menu = @handle
-      release_handle
-      if (!(the_menu).equal?(0))
-        OS._dispose_menu(the_menu)
+      @ns_menu.remove_item(item.attr_ns_item)
+      if ((self.attr_display.attr_menu_bar).equal?(self))
+        application = self.attr_display.attr_application
+        menubar = application.main_menu
+        if (!(menubar).nil?)
+          ns_item = item.attr_ns_item
+          menubar.remove_item(ns_item)
+        end
       end
     end
     
     typesig { [Decorations] }
     def fix_menus(new_parent)
       @parent = new_parent
-    end
-    
-    typesig { [] }
-    # public
-    def get_bounds
-      check_widget
-      if (!((self.attr_style & SWT::BAR)).equal?(0))
-        menu = self.attr_display.get_menu_bar
-        if (!(self).equal?(menu))
-          return Rectangle.new(0, 0, 0, 0)
-        end
-        height = OS._get_mbar_height
-        gdevice = OS._get_main_device
-        ptr = Array.typed(::Java::Int).new(1) { 0 }
-        OS.memmove(ptr, gdevice, 4)
-        device = GDevice.new
-        OS.memmove(device, ptr[0], GDevice.attr_sizeof)
-        return Rectangle.new(0, 0, device.attr_right - device.attr_left, height)
-      end
-      OS._calc_menu_size(@handle)
-      return Rectangle.new(@x, @y, 0, 0)
-      # return new Rectangle (x, y, width, height);
     end
     
     typesig { [] }
@@ -712,276 +690,7 @@ module Org::Eclipse::Swt::Widgets
           i += 1
         end
       end
-      out_data = MenuTrackingData.new
-      return (OS._get_menu_tracking_data(@handle, out_data)).equal?(OS.attr_no_err)
-    end
-    
-    typesig { [] }
-    def hook_events
-      super
-      menu_proc = self.attr_display.attr_menu_proc
-      mask = Array.typed(::Java::Int).new([OS.attr_k_event_class_menu, OS.attr_k_event_menu_calculate_size, OS.attr_k_event_class_menu, OS.attr_k_event_menu_closed, OS.attr_k_event_class_menu, OS.attr_k_event_menu_create_frame_view, OS.attr_k_event_class_menu, OS.attr_k_event_menu_draw_item, OS.attr_k_event_class_menu, OS.attr_k_event_menu_draw_item_content, OS.attr_k_event_class_menu, OS.attr_k_event_menu_measure_item_width, OS.attr_k_event_class_menu, OS.attr_k_event_menu_opening, OS.attr_k_event_class_menu, OS.attr_k_event_menu_target_item, ])
-      menu_target = OS._get_menu_event_target(@handle)
-      OS._install_event_handler(menu_target, menu_proc, mask.attr_length / 2, mask, @handle, nil)
-    end
-    
-    typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
-    def k_event_menu_calculate_size(next_handler, the_event, user_data)
-      result = super(next_handler, the_event, user_data)
-      if ((result).equal?(OS.attr_no_err))
-        return result
-      end
-      the_control = Array.typed(::Java::Int).new(1) { 0 }
-      OS._get_event_parameter(the_event, OS.attr_k_event_param_control_ref, OS.attr_type_control_ref, nil, 4, nil, the_control)
-      menu_proc = self.attr_display.attr_menu_proc
-      mask = Array.typed(::Java::Int).new([OS.attr_k_event_class_menu, OS.attr_k_event_menu_get_frame_bounds, ])
-      control_target = OS._get_control_event_target(the_control[0])
-      # TODO - installed multi-times, does this matter?
-      OS._install_event_handler(control_target, menu_proc, mask.attr_length / 2, mask, @handle, nil)
-      return result
-    end
-    
-    typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
-    def k_event_menu_closed(next_handler, the_event, user_data)
-      result = super(next_handler, the_event, user_data)
-      if ((result).equal?(OS.attr_no_err))
-        return result
-      end
-      @closed = true
-      # width = height = 0;
-      # int count = OS.CountMenuItems (handle);
-      # for (int i=0; i<count; i++) {
-      # MenuItem item = items [i];
-      # item.x = item.y = item.width = item.height = 0;
-      # }
-      # 
-      # Feature in the Macintosh.  In order to populate the search field of
-      # the help menu, the events kEventMenuOpening, kEventMenuClosed and
-      # others are sent to sub menus even when the cascade item of the submenu
-      # is disabled.  Normally, the user can never get to these submenus.
-      # This means that application code does not expect SWT.Show and SWT.Hide
-      # events.  The fix is to avoid the events when the cascade item is
-      # disabled.
-      send = true
-      if (!(@cascade).nil? && !@cascade.get_enabled)
-        send = false
-      end
-      if (send)
-        send_event(SWT::Hide)
-      end
-      return OS.attr_event_not_handled_err
-    end
-    
-    typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
-    def k_event_menu_create_frame_view(next_handler, the_event, user_data)
-      result = super(next_handler, the_event, user_data)
-      if ((result).equal?(OS.attr_no_err))
-        return result
-      end
-      the_control = Array.typed(::Java::Int).new(1) { 0 }
-      OS._get_event_parameter(the_event, OS.attr_k_event_param_control_ref, OS.attr_type_control_ref, nil, 4, nil, the_control)
-      menu_proc = self.attr_display.attr_menu_proc
-      mask = Array.typed(::Java::Int).new([OS.attr_k_event_class_menu, OS.attr_k_event_menu_get_frame_bounds, ])
-      control_target = OS._get_control_event_target(the_control[0])
-      OS._install_event_handler(control_target, menu_proc, mask.attr_length / 2, mask, @handle, nil)
-      return OS.attr_event_not_handled_err
-    end
-    
-    typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
-    def k_event_menu_draw_item(next_handler, the_event, user_data)
-      result = super(next_handler, the_event, user_data)
-      if ((result).equal?(OS.attr_no_err))
-        return result
-      end
-      # short [] index = new short [1];
-      # OS.GetEventParameter (theEvent, OS.kEventParamMenuItemIndex, OS.typeMenuItemIndex, null, 2, null, index);
-      # MenuItem item = items [index [0] - 1];
-      # Rect rect = new Rect ();
-      # OS.GetEventParameter (theEvent, OS.kEventParamMenuItemBounds, OS.typeQDRectangle, null, Rect.sizeof, null, rect);
-      # item.x = rect.left - x;
-      # item.y = rect.top - y;
-      # item.width = rect.right - rect.left;
-      # item.height = rect.bottom - rect.top;
-      return OS.attr_event_not_handled_err
-    end
-    
-    typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
-    def k_event_menu_draw_item_content(next_handler, the_event, user_data)
-      result = super(next_handler, the_event, user_data)
-      if ((result).equal?(OS.attr_no_err))
-        return result
-      end
-      index = Array.typed(::Java::Short).new(1) { 0 }
-      OS._get_event_parameter(the_event, OS.attr_k_event_param_menu_item_index, OS.attr_type_menu_item_index, nil, 2, nil, index)
-      if (!(0 < index[0] && index[0] <= @item_count))
-        return result
-      end
-      item = @items[index[0] - 1]
-      if ((item.attr_accelerator).equal?(0))
-        accel_index = item.attr_text.index_of(Character.new(?\t.ord))
-        if (!(accel_index).equal?(-1))
-          accel_text = item.attr_text.substring(accel_index + 1)
-          length_ = accel_text.length
-          if (!(length_).equal?(0))
-            result = OS._call_next_event_handler(next_handler, the_event)
-            rect = Rect.new
-            OS._get_event_parameter(the_event, OS.attr_k_event_param_menu_item_bounds, OS.attr_type_qdrectangle, nil, Rect.attr_sizeof, nil, rect)
-            context = Array.typed(::Java::Int).new(1) { 0 }
-            OS._get_event_parameter(the_event, OS.attr_k_event_param_cgcontext_ref, OS.attr_type_cgcontext_ref, nil, 4, nil, context)
-            # Draw the key
-            modifier_index_ = modifier_index(accel_text)
-            buffer = CharArray.new(length_ - modifier_index_ - 1)
-            accel_text.get_chars(modifier_index_ + 1, length_, buffer, 0)
-            theme_font = OS.attr_k_theme_menu_item_font
-            if (buffer.attr_length > 1)
-              theme_font = OS.attr_k_theme_menu_item_cmd_key_font
-            end
-            family = Array.typed(::Java::Byte).new(256) { 0 }
-            size = Array.typed(::Java::Short).new(1) { 0 }
-            style = Array.typed(::Java::Byte).new(1) { 0 }
-            OS._get_theme_font(RJava.cast_to_short(theme_font), RJava.cast_to_short(OS.attr_sm_system_script), family, size, style)
-            id = OS._fmget_font_family_from_name(family)
-            font = Array.typed(::Java::Int).new(1) { 0 }
-            OS._fmget_font_from_font_family_instance(id, style[0], font, nil)
-            ats_font = OS._fmget_atsfont_ref_from_font(font[0])
-            font_metrics = ATSFontMetrics.new
-            OS._atsfont_get_vertical_metrics(ats_font, OS.attr_k_atsoption_flags_default, font_metrics)
-            OS._atsfont_get_horizontal_metrics(ats_font, OS.attr_k_atsoption_flags_default, font_metrics)
-            metric = Array.typed(::Java::Int).new(1) { 0 }
-            OS._get_theme_metric(OS.attr_k_theme_metric_menu_icon_trailing_edge_margin, metric)
-            str = OS._cfstring_create_with_characters(OS.attr_k_cfallocator_default, buffer, buffer.attr_length)
-            size1 = Org::Eclipse::Swt::Internal::Carbon::Point.new
-            OS._get_theme_text_dimensions(str, RJava.cast_to_short(theme_font), 0, false, size1, nil)
-            rect.attr_left = RJava.cast_to_short((rect.attr_right - Math.max(RJava.cast_to_int((font_metrics.attr_max_advance_width * size[0])), size1.attr_h) - metric[0]))
-            OS._draw_theme_text_box(str, RJava.cast_to_short(theme_font), OS.attr_k_theme_state_active, false, rect, RJava.cast_to_short(OS.attr_te_flush_left), context[0])
-            OS._cfrelease(str)
-            # Draw the modifiers
-            if (!(modifier_index_).equal?(-1))
-              buffer = CharArray.new(modifier_index_ + 1)
-              accel_text.get_chars(0, buffer.attr_length, buffer, 0)
-              str = OS._cfstring_create_with_characters(OS.attr_k_cfallocator_default, buffer, buffer.attr_length)
-              OS._get_theme_text_dimensions(str, RJava.cast_to_short(OS.attr_k_theme_menu_item_cmd_key_font), 0, false, size1, nil)
-              rect.attr_right = rect.attr_left
-              rect.attr_left = RJava.cast_to_short((rect.attr_right - size1.attr_h))
-              OS._draw_theme_text_box(str, RJava.cast_to_short(OS.attr_k_theme_menu_item_cmd_key_font), OS.attr_k_theme_state_active, false, rect, RJava.cast_to_short(OS.attr_te_flush_left), context[0])
-              OS._cfrelease(str)
-            end
-            return result
-          end
-        end
-      end
-      return OS.attr_event_not_handled_err
-    end
-    
-    typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
-    def k_event_menu_get_frame_bounds(next_handler, the_event, user_data)
-      result = super(next_handler, the_event, user_data)
-      if ((result).equal?(OS.attr_no_err))
-        return result
-      end
-      result = OS._call_next_event_handler(next_handler, the_event)
-      # CGRect rect = new CGRect ();
-      # OS.GetEventParameter (theEvent, OS.kEventParamBounds, OS.typeHIRect, null, CGRect.sizeof, null, rect);
-      # x = (int) rect.x;
-      # y = (int) rect.y;
-      # width = (int) rect.width;
-      # height = (int) rect.height;
-      # if (cascade != null) {
-      # OS.GetEventParameter (theEvent, OS.kEventParamMenuItemBounds, OS.typeHIRect, null, CGRect.sizeof, null, rect);
-      # cascade.x = (int) rect.x - x;
-      # cascade.y = (int) rect.y - y;
-      # cascade.width = (int) rect.width;
-      # cascade.height = (int) rect.height;
-      # }
-      return result
-    end
-    
-    typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
-    def k_event_menu_measure_item_width(next_handler, the_event, user_data)
-      result = super(next_handler, the_event, user_data)
-      if ((result).equal?(OS.attr_no_err))
-        return result
-      end
-      index = Array.typed(::Java::Short).new(1) { 0 }
-      OS._get_event_parameter(the_event, OS.attr_k_event_param_menu_item_index, OS.attr_type_menu_item_index, nil, 2, nil, index)
-      if (!(0 < index[0] && index[0] <= @item_count))
-        return result
-      end
-      item = @items[index[0] - 1]
-      if ((item.attr_accelerator).equal?(0))
-        accel_index = item.attr_text.index_of(Character.new(?\t.ord))
-        if (!(accel_index).equal?(-1))
-          accel_text = item.attr_text.substring(accel_index + 1)
-          if (!(accel_text.length).equal?(0))
-            result = OS._call_next_event_handler(next_handler, the_event)
-            buffer = CharArray.new(accel_text.length)
-            accel_text.get_chars(0, buffer.attr_length, buffer, 0)
-            str = OS._cfstring_create_with_characters(OS.attr_k_cfallocator_default, buffer, buffer.attr_length)
-            size = Org::Eclipse::Swt::Internal::Carbon::Point.new
-            OS._get_theme_text_dimensions(str, RJava.cast_to_short(OS.attr_k_theme_menu_item_cmd_key_font), 0, false, size, nil)
-            OS._cfrelease(str)
-            width = Array.typed(::Java::Short).new(1) { 0 }
-            OS._get_event_parameter(the_event, OS.attr_k_event_param_menu_item_width, OS.attr_type_sint16, nil, 2, nil, width)
-            metric = Array.typed(::Java::Int).new(1) { 0 }
-            OS._get_theme_metric(OS.attr_k_theme_metric_menu_text_trailing_edge_margin, metric)
-            width[0] += metric[0] + size.attr_h
-            OS._set_event_parameter(the_event, OS.attr_k_event_param_menu_item_width, OS.attr_type_sint16, 2, width)
-            return result
-          end
-        end
-      end
-      return OS.attr_event_not_handled_err
-    end
-    
-    typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
-    def k_event_menu_opening(next_handler, the_event, user_data)
-      result = super(next_handler, the_event, user_data)
-      if ((result).equal?(OS.attr_no_err))
-        return result
-      end
-      @closed = false
-      # Bug in the Macintosh.  When a menu is open with ContextualMenuSelect() the
-      # system will add other items before displaying it and remove the items before
-      # returning from the function.  If the menu is changed in kEventMenuOpening, the
-      # system will fail to remove those items.  The fix is to send SWT.Show before
-      # calling ContextualMenuSelect() instead of in kEventMenuOpening.
-      if (((self.attr_style & SWT::POP_UP)).equal?(0))
-        # Feature in the Macintosh.  In order to populate the search field of
-        # the help menu, the events kEventMenuOpening, kEventMenuClosed and
-        # others are sent to sub menus even when the cascade item of the submenu
-        # is disabled.  Normally, the user can never get to these submenus.
-        # This means that application code does not expect SWT.Show and SWT.Hide
-        # events.  The fix is to avoid the events when the cascade item is
-        # disabled.
-        send = true
-        if (!(@cascade).nil? && !@cascade.get_enabled)
-          send = false
-        end
-        if (send)
-          send_event(SWT::Show)
-          @modified = false
-        end
-      end
-      return OS.attr_event_not_handled_err
-    end
-    
-    typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
-    def k_event_menu_target_item(next_handler, the_event, user_data)
-      result = super(next_handler, the_event, user_data)
-      if ((result).equal?(OS.attr_no_err))
-        return result
-      end
-      @last_target = nil
-      index = Array.typed(::Java::Short).new(1) { 0 }
-      if ((OS._get_event_parameter(the_event, OS.attr_k_event_param_menu_item_index, OS.attr_type_menu_item_index, nil, 2, nil, index)).equal?(OS.attr_no_err))
-        if (0 < index[0] && index[0] <= @item_count)
-          @last_target = @items[index[0] - 1]
-        end
-        if (!(@last_target).nil?)
-          @last_target.send_event(SWT::Arm)
-        end
-      end
-      return OS.attr_event_not_handled_err
+      return @visible
     end
     
     typesig { [MenuItem] }
@@ -1056,23 +765,66 @@ module Org::Eclipse::Swt::Widgets
       return get_visible
     end
     
-    typesig { [String] }
-    def modifier_index(accel_text)
-      start = accel_text.length - 1
-      index = start
-      while (index >= 0)
-        c = accel_text.char_at(index)
-        case (c)
-        when Character.new(?\s.ord)
-          if (!(index).equal?(start))
-            return index
-          end
-        when Character.new(0x2303), Character.new(0x2325), Character.new(0x21E7), Character.new(0x2318)
-          return index
-        end
-        index -= 1
+    typesig { [::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int] }
+    # long
+    # long
+    # long
+    # long
+    def menu_will_highlight_item(id, sel, menu, item_id)
+      widget = self.attr_display.get_widget(item_id)
+      if (widget.is_a?(MenuItem))
+        item = widget
+        item.send_event(SWT::Arm)
       end
-      return -1
+    end
+    
+    typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
+    # long
+    # long
+    # long
+    def menu_needs_update(id, sel, menu)
+      # This code is intentionally commented
+      # sendEvent (SWT.Show);
+    end
+    
+    typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
+    # long
+    # long
+    # long
+    def menu_will_open(id, sel, menu)
+      @visible = true
+      send_event(SWT::Show)
+      i = 0
+      while i < @items.attr_length
+        item = @items[i]
+        if (!(item).nil?)
+          item.update_accelerator(true)
+        end
+        i += 1
+      end
+    end
+    
+    typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
+    # long
+    # long
+    # long
+    def menu_did_close(id, sel, menu)
+      send_event(SWT::Hide)
+      @visible = false
+      i = 0
+      while i < @items.attr_length
+        item = @items[i]
+        if (!(item).nil?)
+          item.update_accelerator(false)
+        end
+        i += 1
+      end
+    end
+    
+    typesig { [] }
+    def register
+      super
+      self.attr_display.add_widget(@ns_menu, self)
     end
     
     typesig { [::Java::Boolean] }
@@ -1094,7 +846,10 @@ module Org::Eclipse::Swt::Widgets
     typesig { [] }
     def release_handle
       super
-      @handle = 0
+      if (!(@ns_menu).nil?)
+        @ns_menu.release
+      end
+      @ns_menu = nil
     end
     
     typesig { [] }
@@ -1113,7 +868,7 @@ module Org::Eclipse::Swt::Widgets
       super
       self.attr_display.remove_menu(self)
       @parent = nil
-      @cascade = @default_item = @last_target = nil
+      @cascade = @default_item = nil
     end
     
     typesig { [HelpListener] }
@@ -1208,10 +963,22 @@ module Org::Eclipse::Swt::Widgets
       check_widget
       if (enabled)
         self.attr_state &= ~DISABLED
-        OS._enable_menu_item(@handle, RJava.cast_to_short(0))
       else
         self.attr_state |= DISABLED
-        OS._disable_menu_item(@handle, RJava.cast_to_short(0))
+      end
+      # TODO - find a way to disable the menu instead of each item
+      i = 0
+      while i < @items.attr_length
+        item = @items[i]
+        if (!(item).nil?)
+          # Feature in the Macintosh.  When a cascade menu
+          # item is disabled, rather than disabling the item,
+          # the submenu is disabled.
+          # 
+          # There is no fix for this at this time.
+          item.attr_ns_item.set_enabled(enabled && item.get_enabled)
+        end
+        i += 1
       end
     end
     
@@ -1296,7 +1063,6 @@ module Org::Eclipse::Swt::Widgets
         self.attr_display.add_popup(self)
       else
         self.attr_display.remove_popup(self)
-        __set_visible(false)
       end
     end
     

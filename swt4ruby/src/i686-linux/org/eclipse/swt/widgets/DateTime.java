@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2008 IBM Corporation and others.
+ * Copyright (c) 2000, 2009 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -28,13 +28,14 @@ import org.eclipse.swt.internal.gtk.OS;
  * </p>
  * <dl>
  * <dt><b>Styles:</b></dt>
- * <dd>DATE, TIME, CALENDAR, SHORT, MEDIUM, LONG</dd>
+ * <dd>DATE, TIME, CALENDAR, SHORT, MEDIUM, LONG, DROP_DOWN</dd>
  * <dt><b>Events:</b></dt>
- * <dd>Selection</dd>
+ * <dd>DefaultSelection, Selection</dd>
  * </dl>
  * <p>
  * Note: Only one of the styles DATE, TIME, or CALENDAR may be specified,
  * and only one of the styles SHORT, MEDIUM, or LONG may be specified.
+ * The DROP_DOWN style is a <em>HINT</em>, and it is only valid with the DATE style.
  * </p><p>
  * IMPORTANT: This class is <em>not</em> intended to be subclassed.
  * </p>
@@ -44,6 +45,7 @@ import org.eclipse.swt.internal.gtk.OS;
  * @see <a href="http://www.eclipse.org/swt/">Sample code and further information</a>
  *
  * @since 3.3
+ * @noextend This class is not intended to be subclassed by clients.
  */
 public class DateTime extends Composite {
 	int day, month, year, hours, minutes, seconds;
@@ -95,6 +97,10 @@ public class DateTime extends Composite {
  * @see SWT#DATE
  * @see SWT#TIME
  * @see SWT#CALENDAR
+ * @see SWT#SHORT
+ * @see SWT#MEDIUM
+ * @see SWT#LONG
+ * @see SWT#DROP_DOWN
  * @see Widget#checkSubclass
  * @see Widget#getStyle
  */
@@ -175,7 +181,7 @@ static int checkStyle (int style) {
  * interface.
  * <p>
  * <code>widgetSelected</code> is called when the user changes the control's value.
- * <code>widgetDefaultSelected</code> is not called.
+ * <code>widgetDefaultSelected</code> is typically called when ENTER is pressed.
  * </p>
  *
  * @param listener the listener which should be notified
@@ -249,6 +255,10 @@ void createHandle (int index) {
 	} else {
 		super.createHandle(index);
 	}
+}
+
+boolean checkSubwindow () {
+	return false;
 }
 
 void createWidget (int index) {
@@ -478,6 +488,11 @@ int /*long*/ gtk_day_selected (int /*long*/ widget) {
 	return 0;
 }
 
+int /*long*/ gtk_day_selected_double_click (int /*long*/ widget) {
+	postEvent(SWT.DefaultSelection);
+	return 0;
+}
+
 int /*long*/ gtk_month_changed (int /*long*/ widget) {
 	sendSelectionEvent ();
 	return 0;
@@ -487,16 +502,15 @@ void hookEvents () {
 	super.hookEvents();
 	if ((style & SWT.CALENDAR) != 0) {
 		OS.g_signal_connect_closure (handle, OS.day_selected, display.closures [DAY_SELECTED], false);
+		OS.g_signal_connect_closure (handle, OS.day_selected_double_click, display.closures [DAY_SELECTED_DOUBLE_CLICK], false);
 		OS.g_signal_connect_closure (handle, OS.month_changed, display.closures [MONTH_CHANGED], false);
 	}
 }
 
-boolean isValid(int fieldName, int value) {
+boolean isValidTime(int fieldName, int value) {
 	Calendar validCalendar;
 	if ((style & SWT.CALENDAR) != 0) {
 		validCalendar = Calendar.getInstance();
-		validCalendar.set(Calendar.YEAR, year);
-		validCalendar.set(Calendar.MONTH, month);
 	} else {
 		validCalendar = calendar;
 	}
@@ -505,10 +519,13 @@ boolean isValid(int fieldName, int value) {
 	return value >= min && value <= max;
 }
 
-boolean isValid(int year, int month, int day) {
+boolean isValidDate(int year, int month, int day) {
+	if (year < MIN_YEAR || year > MAX_YEAR) return false;
 	Calendar valid = Calendar.getInstance();
 	valid.set(year, month, day);
-	return valid.get(Calendar.YEAR) == year && valid.get(Calendar.MONTH) == month && valid.get(Calendar.DAY_OF_MONTH) == day;
+	return valid.get(Calendar.YEAR) == year
+		&& valid.get(Calendar.MONTH) == month
+		&& valid.get(Calendar.DAY_OF_MONTH) == day;
 }
 
 void incrementField(int amount) {
@@ -562,6 +579,9 @@ void onKeyDown(Event event) {
 			fieldName = fieldNames[currentField];
 			setTextField(fieldName, calendar.getActualMaximum(fieldName), true, true);
 			break;
+		case SWT.CR:
+			postEvent(SWT.DefaultSelection);
+			break;
 		default:
 			switch (event.character) {
 				case '/':
@@ -587,12 +607,11 @@ void onMouseClick(Event event) {
 	if (event.button != 1) return;
 	Point sel = text.getSelection();
 	for (int i = 0; i < fieldCount; i++) {
-		if (sel.x >= fieldIndices[i].x && sel.x <= fieldIndices[i].y) {
-			currentField = i;
+		if (fieldIndices[i].x <= sel.x && sel.x <= fieldIndices[i].y) {
+			selectField(i);
 			break;
 		}
 	}
-	selectField(currentField);
 }
 
 void onResize(Event event) {
@@ -855,7 +874,7 @@ void setTextField(int fieldName, int value, boolean commit, boolean adjust) {
  */
 public void setDate (int year, int month, int day) {
 	checkWidget ();
-	if (!isValid(year, month, day)) return;
+	if (!isValidDate(year, month, day)) return;
 	if ((style & SWT.CALENDAR) != 0) {
 		this.year = year;
 		this.month = month;
@@ -863,9 +882,7 @@ public void setDate (int year, int month, int day) {
 		OS.gtk_calendar_select_month(handle, month, year);
 		OS.gtk_calendar_select_day(handle, day);
 	} else {
-		calendar.set(Calendar.YEAR, year);
-		calendar.set(Calendar.MONTH, month);
-		calendar.set(Calendar.DAY_OF_MONTH, day);
+		calendar.set(year, month, day);
 		updateControl();
 	}
 }
@@ -874,6 +891,7 @@ public void setDate (int year, int month, int day) {
  * Sets the receiver's date, or day of the month, to the specified day.
  * <p>
  * The first day of the month is 1, and the last day depends on the month and year.
+ * If the specified day is not valid for the receiver's month and year, then it is ignored. 
  * </p>
  *
  * @param day a positive integer beginning with 1
@@ -882,10 +900,12 @@ public void setDate (int year, int month, int day) {
  *    <li>ERROR_WIDGET_DISPOSED - if the receiver has been disposed</li>
  *    <li>ERROR_THREAD_INVALID_ACCESS - if not called from the thread that created the receiver</li>
  * </ul>
+ * 
+ * @see #setDate
  */
 public void setDay (int day) {
 	checkWidget ();
-	if (!isValid(Calendar.DAY_OF_MONTH, day)) return;
+	if (!isValidDate(getYear(), getMonth(), day)) return;
 	if ((style & SWT.CALENDAR) != 0) {
 		this.day = day;
 		OS.gtk_calendar_select_day(handle, day);
@@ -910,7 +930,7 @@ public void setDay (int day) {
  */
 public void setHours (int hours) {
 	checkWidget ();
-	if (!isValid(Calendar.HOUR_OF_DAY, hours)) return;
+	if (!isValidTime(Calendar.HOUR_OF_DAY, hours)) return;
 	if ((style & SWT.CALENDAR) != 0) {
 		this.hours = hours;
 	} else {
@@ -934,7 +954,7 @@ public void setHours (int hours) {
  */
 public void setMinutes (int minutes) {
 	checkWidget ();
-	if (!isValid(Calendar.MINUTE, minutes)) return;
+	if (!isValidTime(Calendar.MINUTE, minutes)) return;
 	if ((style & SWT.CALENDAR) != 0) {
 		this.minutes = minutes;
 	} else {
@@ -947,6 +967,7 @@ public void setMinutes (int minutes) {
  * Sets the receiver's month.
  * <p>
  * The first month of the year is 0, and the last month is 11.
+ * If the specified month is not valid for the receiver's day and year, then it is ignored. 
  * </p>
  *
  * @param month an integer between 0 and 11
@@ -955,10 +976,12 @@ public void setMinutes (int minutes) {
  *    <li>ERROR_WIDGET_DISPOSED - if the receiver has been disposed</li>
  *    <li>ERROR_THREAD_INVALID_ACCESS - if not called from the thread that created the receiver</li>
  * </ul>
+ * 
+ * @see #setDate
  */
 public void setMonth (int month) {
 	checkWidget ();
-	if (!isValid(Calendar.MONTH, month)) return;
+	if (!isValidDate(getYear(), month, getDay())) return;
 	if ((style & SWT.CALENDAR) != 0) {
 		this.month = month;
 		OS.gtk_calendar_select_month(handle, month, year);
@@ -983,7 +1006,7 @@ public void setMonth (int month) {
  */
 public void setSeconds (int seconds) {
 	checkWidget ();
-	if (!isValid(Calendar.SECOND, seconds)) return;
+	if (!isValidTime(Calendar.SECOND, seconds)) return;
 	if ((style & SWT.CALENDAR) != 0) {
 		this.seconds = seconds;
 	} else {
@@ -1008,9 +1031,9 @@ public void setSeconds (int seconds) {
  */
 public void setTime (int hours, int minutes, int seconds) {
 	checkWidget ();
-	if (!isValid(Calendar.HOUR_OF_DAY, hours)) return;
-	if (!isValid(Calendar.MINUTE, minutes)) return;
-	if (!isValid(Calendar.SECOND, seconds)) return;
+	if (!isValidTime(Calendar.HOUR_OF_DAY, hours)) return;
+	if (!isValidTime(Calendar.MINUTE, minutes)) return;
+	if (!isValidTime(Calendar.SECOND, seconds)) return;
 	if ((style & SWT.CALENDAR) != 0) {
 		this.hours = hours;
 		this.minutes = minutes;
@@ -1027,6 +1050,7 @@ public void setTime (int hours, int minutes, int seconds) {
  * Sets the receiver's year.
  * <p>
  * The first year is 1752 and the last year is 9999.
+ * If the specified year is not valid for the receiver's day and month, then it is ignored. 
  * </p>
  *
  * @param year an integer between 1752 and 9999
@@ -1035,11 +1059,12 @@ public void setTime (int hours, int minutes, int seconds) {
  *    <li>ERROR_WIDGET_DISPOSED - if the receiver has been disposed</li>
  *    <li>ERROR_THREAD_INVALID_ACCESS - if not called from the thread that created the receiver</li>
  * </ul>
+ * 
+ * @see #setDate
  */
 public void setYear (int year) {
 	checkWidget ();
-	//if (!isValid(Calendar.YEAR, year)) return;
-	if (year < MIN_YEAR || year > MAX_YEAR) return;
+	if (!isValidDate(year, getMonth(), getDay())) return;
 	if ((style & SWT.CALENDAR) != 0) {
 		this.year = year;
 		OS.gtk_calendar_select_month(handle, month, year);

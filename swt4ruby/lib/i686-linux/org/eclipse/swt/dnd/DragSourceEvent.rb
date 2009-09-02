@@ -1,6 +1,6 @@
 require "rjava"
 
-# Copyright (c) 2000, 2008 IBM Corporation and others.
+# Copyright (c) 2000, 2009 IBM Corporation and others.
 # All rights reserved. This program and the accompanying materials
 # are made available under the terms of the Eclipse Public License v1.0
 # which accompanies this distribution, and is available at
@@ -45,7 +45,9 @@ module Org::Eclipse::Swt::Dnd
     # <p>Flag to determine if the drag and drop operation should proceed.
     # The application can set this value to false to prevent the drag from starting.
     # Set to true by default.</p>
-    # 
+    # <p>In dragSetData:</p>
+    # <p>This will be set to true when the call to dragSetData is made.  Set it to
+    # false to cancel the drag.</p>
     # <p>In dragFinished:</p>
     # <p>Flag to indicate if the operation was performed successfully.
     # True if the operation was performed successfully.</p>
@@ -57,6 +59,7 @@ module Org::Eclipse::Swt::Dnd
     
     # In dragStart, the x coordinate (relative to the control) of the
     # position the mouse went down to start the drag.
+    # 
     # @since 3.2
     attr_accessor :x
     alias_method :attr_x, :x
@@ -65,7 +68,8 @@ module Org::Eclipse::Swt::Dnd
     undef_method :x=
     
     # In dragStart, the y coordinate (relative to the control) of the
-    # position the mouse went down to start the drag .
+    # position the mouse went down to start the drag.
+    # 
     # @since 3.2
     attr_accessor :y
     alias_method :attr_y, :y
@@ -92,6 +96,24 @@ module Org::Eclipse::Swt::Dnd
     alias_method :attr_image=, :image=
     undef_method :image=
     
+    # In dragStart, the x offset (relative to the image) where the drag source image will be displayed.
+    # 
+    # @since 3.5
+    attr_accessor :offset_x
+    alias_method :attr_offset_x, :offset_x
+    undef_method :offset_x
+    alias_method :attr_offset_x=, :offset_x=
+    undef_method :offset_x=
+    
+    # In dragStart, the y offset (relative to the image) where the drag source image will be displayed.
+    # 
+    # @since 3.5
+    attr_accessor :offset_y
+    alias_method :attr_offset_y, :offset_y
+    undef_method :offset_y
+    alias_method :attr_offset_y=, :offset_y=
+    undef_method :offset_y=
+    
     class_module.module_eval {
       const_set_lazy(:SerialVersionUID) { 3257002142513770808 }
       const_attr_reader  :SerialVersionUID
@@ -109,6 +131,8 @@ module Org::Eclipse::Swt::Dnd
       @y = 0
       @data_type = nil
       @image = nil
+      @offset_x = 0
+      @offset_y = 0
       super(e)
       self.attr_data = e.attr_data
       @detail = e.attr_detail
@@ -117,6 +141,8 @@ module Org::Eclipse::Swt::Dnd
       @x = e.attr_x
       @y = e.attr_y
       @image = e.attr_image
+      @offset_x = e.attr_offset_x
+      @offset_y = e.attr_offset_y
     end
     
     typesig { [DNDEvent] }
@@ -130,6 +156,19 @@ module Org::Eclipse::Swt::Dnd
       e.attr_x = @x
       e.attr_y = @y
       e.attr_image = @image
+      e.attr_offset_x = @offset_x
+      e.attr_offset_y = @offset_y
+    end
+    
+    typesig { [] }
+    # Returns a string containing a concise, human-readable
+    # description of the receiver.
+    # 
+    # @return a string representation of the event
+    def to_s
+      string = super
+      # remove trailing '}'
+      return RJava.cast_to_string(string.substring(0, string.length - 1)) + " operation=" + RJava.cast_to_string(@detail) + " type=" + RJava.cast_to_string((!(@data_type).nil? ? @data_type.attr_type : 0)) + " doit=" + RJava.cast_to_string(@doit) + "}"
     end
     
     private

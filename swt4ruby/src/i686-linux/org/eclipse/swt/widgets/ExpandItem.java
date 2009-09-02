@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2008 IBM Corporation and others.
+ * Copyright (c) 2000, 2009 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -33,6 +33,7 @@ import org.eclipse.swt.graphics.*;
  * @see <a href="http://www.eclipse.org/swt/">Sample code and further information</a>
  * 
  * @since 3.2
+ * @noextend This class is not intended to be subclassed by clients.
  */
 public class ExpandItem extends Item {
 	ExpandBar parent;
@@ -409,6 +410,21 @@ void resizeControl (int yScroll) {
 				OS.gtk_widget_style_get (handle, OS.focus_line_width, property, 0);				
 				y += property [0] * 2;
 				height -= property [0] * 2;
+				
+				/*
+				* Feature in GTK. When the ExpandBar is resize too small the control
+				* shows up on top of the vertical scrollbar. This happen because the 
+				* GtkExpander does not set the size of child smaller than the request
+				* size of its parent and because the control is not parented in the 
+				* hierarchy of the GtkScrolledWindow.
+				* The fix is calculate the width ourselves when the scrollbar is visible.
+				*/
+				ScrollBar vBar = parent.verticalBar;
+				if (vBar != null) {
+					if (OS.GTK_WIDGET_VISIBLE (vBar.handle)) {
+						width = OS.GTK_WIDGET_WIDTH (parent.scrolledHandle) - parent.vScrollBarWidth () - 2 * parent.spacing;
+					}
+				}
 				control.setBounds (x, y - yScroll, width, Math.max (0, height), true, true);
 			}
 		}

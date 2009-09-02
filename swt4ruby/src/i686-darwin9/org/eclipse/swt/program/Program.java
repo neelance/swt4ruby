@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2008 IBM Corporation and others.
+ * Copyright (c) 2000, 2009 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -11,14 +11,12 @@
 package org.eclipse.swt.program;
 
 
-import org.eclipse.swt.internal.carbon.CFRange;
-import org.eclipse.swt.internal.carbon.LSApplicationParameters;
-import org.eclipse.swt.internal.carbon.OS;
+import org.eclipse.swt.internal.C;
+import org.eclipse.swt.internal.cocoa.*;
 import org.eclipse.swt.*;
 import org.eclipse.swt.graphics.*;
 
-import java.util.Enumeration;
-import java.util.Hashtable;
+import java.util.Vector;
 
 /**
  * Instances of this class represent programs and
@@ -29,12 +27,11 @@ import java.util.Hashtable;
  * @see <a href="http://www.eclipse.org/swt/">Sample code and further information</a>
  */
 public final class Program {
-	String name;
-	byte[] fsRef;
+	String name, fullPath, identifier;
 
+	static final String PREFIX_FILE = "file:"; //$NON-NLS-1$
 	static final String PREFIX_HTTP = "http://"; //$NON-NLS-1$
 	static final String PREFIX_HTTPS = "https://"; //$NON-NLS-1$
-	static final String PREFIX_FILE = "file://"; //$NON-NLS-1$
 
 /**
  * Prevents uninitialized instances from being created outside the package.
@@ -58,24 +55,64 @@ Program () {
 public static Program findProgram (String extension) {
 	if (extension == null) SWT.error (SWT.ERROR_NULL_ARGUMENT);
 	if (extension.length () == 0) return null;
-	char[] chars;
-	if (extension.charAt (0) != '.') {
-		chars = new char[extension.length()];
-		extension.getChars(0, chars.length, chars, 0);
-	} else {
-		chars = new char[extension.length() - 1];
-		extension.getChars(1, extension.length(), chars, 0);		
-	}
-	int ext = OS.CFStringCreateWithCharacters(OS.kCFAllocatorDefault, chars, chars.length);
-	Program program = null;
-	if (ext != 0) {
-		byte[] fsRef = new byte[80];
-		if (OS.LSGetApplicationForInfo(OS.kLSUnknownType, OS.kLSUnknownCreator, ext, OS.kLSRolesAll, fsRef, null) == OS.noErr) {
-			program = getProgram(fsRef);
+	if (extension.charAt(0) != '.') extension = "." + extension;
+	NSAutoreleasePool pool = (NSAutoreleasePool) new NSAutoreleasePool().alloc().init();
+	try {
+		NSWorkspace workspace = NSWorkspace.sharedWorkspace();
+		int /*long*/ appName = OS.malloc(C.PTR_SIZEOF);
+		int /*long*/ type = OS.malloc(C.PTR_SIZEOF);
+		NSString temp = new NSString(OS.NSTemporaryDirectory());
+		NSString fileName = NSString.stringWith("swt" + System.currentTimeMillis() + extension);
+		NSString fullPath = temp.stringByAppendingPathComponent(fileName);
+		NSFileManager fileManager = NSFileManager.defaultManager();
+		fileManager.createFileAtPath(fullPath, null, null);
+		if (!workspace.getInfoForFile(fullPath, appName, type)) return null;
+		fileManager.removeItemAtPath(fullPath, 0);
+		int /*long*/ [] buffer = new int /*long*/[1];
+		int /*long*/ [] buffer2 = new int /*long*/[1];
+		OS.memmove(buffer, appName, C.PTR_SIZEOF);
+		OS.memmove(buffer2, type, C.PTR_SIZEOF);
+		OS.free(appName);
+		OS.free(type);
+		if (buffer [0] != 0) {
+			NSString appPath = new NSString(buffer[0]);
+			NSString appType = new NSString(buffer2[0]);
+			NSBundle bundle = NSBundle.bundleWithPath(appPath);
+			if (bundle != null) {
+				NSString textEditId = NSString.stringWith("com.apple.TextEdit");
+				NSString bundleId = NSString.stringWith("CFBundleIdentifier");
+				NSDictionary infoDictionary = bundle.infoDictionary();
+				boolean textEdit = textEditId.isEqual(infoDictionary.objectForKey(bundleId));
+				if (!textEdit) return getProgram(bundle);
+				// if text edit, make sure we're really one of the extensions that
+				// text edit says it can handle.
+				NSString CFBundleDocumentTypes = NSString.stringWith("CFBundleDocumentTypes");
+				NSString CFBundleTypeExtensions = NSString.stringWith("CFBundleTypeExtensions");
+				id id = infoDictionary.objectForKey(CFBundleDocumentTypes);
+				if (id != null) {
+					NSDictionary documentTypes = new NSDictionary(id.id);
+					NSEnumerator documentTypesEnumerator = documentTypes.objectEnumerator();
+					while ((id = documentTypesEnumerator.nextObject()) != null) {
+						NSDictionary documentType = new NSDictionary(id.id);
+						NSDictionary supportedExtensions = new NSDictionary(documentType.objectForKey(CFBundleTypeExtensions));
+						if (supportedExtensions != null) {
+							NSEnumerator supportedExtensionsEnumerator = supportedExtensions.objectEnumerator();
+							if (supportedExtensionsEnumerator != null) {
+								id ext = null;
+								while((ext = supportedExtensionsEnumerator.nextObject()) != null) {
+									NSString strExt = new NSString(ext);
+									if (appType.isEqual(strExt)) return getProgram (bundle);
+								}
+							}
+						}
+					}
+				}
+			}
 		}
-		OS.CFRelease(ext);
+		return null;
+	} finally {
+		pool.release();
 	}
-	return program;
 }
 
 /**
@@ -86,199 +123,79 @@ public static Program findProgram (String extension) {
  * @return an array of extensions
  */
 public static String [] getExtensions () {
-	return new String [] {
-		// From System-Declared Uniform Type Identifiers
-		".txt",
-		".rtf",
-		".html",
-		".htm",
-		".xml",
-		".c",
-		".m",
-		".cp", ".cpp", ".c++", ".cc", ".cxx",
-		".mm",
-		".h",
-		".hpp",
-		".h++",
-		".hxx",
-		".java",
-		".jav",
-		".s",
-		".r",
-		".defs",
-		".mig",
-		".exp",
-		".js",
-		".jscript",
-		".javascript",
-		".sh",
-		".command",
-		".csh",
-		".pl",
-		".pm",
-		".py",
-		".rb",
-		".rbw",
-		".php",
-		".php3",
-		".php4",
-		".ph3",
-		".ph4",
-		".phtml",
-		".jnlp",
-		".applescript",
-		".scpt",
-		".o",
-		".exe",
-		".dll",
-		".class",
-		".jar",
-		".qtz",
-		".gtar",
-		".tar",
-		".gz",
-		".gzip",
-		".tgz",
-		".hqx",
-		".bin",
-		".vcf",
-		".vcard",
-		".jpg",
-		".jpeg",
-		".jp2",
-		".tif",
-		".tiff",
-		".pic",
-		".pct",
-		".pict",
-		".pntg",
-		".png",
-		".xbm",
-		".qif",
-		".qtif",
-		".icns",
-		".mov",
-		".qt",
-		".avi",
-		".vfw",
-		".mpg",
-		".mpeg",
-		".m75",
-		".m15",
-		".mp4",
-		".3gp",
-		".3gpp",
-		".3g2",
-		".3gp2",
-		".mp3",
-		".m4a",
-		".m4p",
-		".m4b",
-		".au",
-		".ulw",
-		".snd",
-		".aifc",
-		".aiff",
-		".aif",
-		".caf",
-		".bundle",
-		".app",
-		".plugin",
-		".mdimporter",
-		".wdgt",
-		".cpio",
-		".zip",
-		".framework",
-		".rtfd",
-		".dfont",
-		".otf",
-		".ttf",
-		".ttc",
-		".suit",
-		".pfb",
-		".pfa",
-		".icc",
-		".icm",
-		".pf",
-		".pdf",
-		".ps",
-		".eps",
-		".psd",
-		".ai",
-		".gif",
-		".bmp",
-		".ico",
-		".doc",
-		".xls",
-		".ppt",
-		".wav",
-		".wave",
-		".asf",
-		".wm",
-		".wmv",
-		".wmp",
-		".wma",
-		".asx",
-		".wmx",
-		".wvx",
-		".wax",
-		".key",
-		".kth",
-		".tga",
-		".sgi",
-		".exr",
-		".fpx",
-		".jfx",
-		".efx",
-		".sd2",
-		".rm",
-		".ram",
-		".ra",
-		".smil",
-		".sit",
-		".sitx",
-		// Others
-		".plist",
-		".nib",
-		".lproj",
-		// iChat
-		".iPhoto",
-		// iChat
-		".iChat",
-		".chat",
-		// acrobat reader
-		".rmf",
-		".xfdf",
-		".fdf",
-		// Chess
-		".game",
-		".pgn",
-		// iCal
-		".ics",
-		".vcs",
-		".aplmodel",
-		".icbu",
-		".icalevent",
-		".icaltodo",
-		// Mail
-		".mailhold",
-		".mbox",
-		".imapmbox",
-		".emlx",
-		".mailextract",
-		// Sherlock
-		".sherlock",
-		// Stickies
-		".tpl",
-		// System Preferences
-		".prefPane",
-		".sliderSaver",
-		".saver",
-		// Console
-		".log",
-		// Grapher
-		".gcx",
-	};
+	NSAutoreleasePool pool = (NSAutoreleasePool) new NSAutoreleasePool().alloc().init();
+	try {
+		NSMutableSet supportedDocumentTypes = (NSMutableSet)NSMutableSet.set();
+		NSWorkspace workspace = NSWorkspace.sharedWorkspace();
+		NSString CFBundleDocumentTypes = NSString.stringWith("CFBundleDocumentTypes");
+		NSString CFBundleTypeExtensions = NSString.stringWith("CFBundleTypeExtensions");
+		NSArray array = new NSArray(OS.NSSearchPathForDirectoriesInDomains(OS.NSAllApplicationsDirectory, OS.NSAllDomainsMask, true));
+		int count = (int)/*64*/array.count();
+		for (int i = 0; i < count; i++) {
+			NSString path = new NSString(array.objectAtIndex(i));
+			NSFileManager fileManager = NSFileManager.defaultManager();
+			NSDirectoryEnumerator enumerator = fileManager.enumeratorAtPath(path);
+			if (enumerator != null) {
+				id id;
+				while ((id = enumerator.nextObject()) != null) {
+					enumerator.skipDescendents();
+					NSString filePath = new NSString(id.id);
+					NSString fullPath = path.stringByAppendingPathComponent(filePath);
+					if (workspace.isFilePackageAtPath(fullPath)) {
+						NSBundle bundle = NSBundle.bundleWithPath(fullPath);
+						id = bundle.infoDictionary().objectForKey(CFBundleDocumentTypes);
+						if (id != null) {
+							NSDictionary documentTypes = new NSDictionary(id.id);
+							NSEnumerator documentTypesEnumerator = documentTypes.objectEnumerator();
+							while ((id = documentTypesEnumerator.nextObject()) != null) {
+								NSDictionary documentType = new NSDictionary(id.id);
+								id = documentType.objectForKey(CFBundleTypeExtensions);
+								if (id != null) {
+									supportedDocumentTypes.addObjectsFromArray(new NSArray(id.id));
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+		int i = 0;
+		String[] exts = new String[(int)/*64*/supportedDocumentTypes.count()];
+		NSEnumerator enumerator = supportedDocumentTypes.objectEnumerator();
+		id id;
+		while ((id = enumerator.nextObject()) != null) {
+			String ext = new NSString(id.id).getString();
+			if (!ext.equals("*")) exts[i++] = "." + ext;
+		}
+		if (i != exts.length) {
+			String[] temp = new String[i];
+			System.arraycopy(exts, 0, temp, 0, i);
+			exts = temp;
+		}
+		return exts;
+	} finally {
+		pool.release();
+	}
+}
+
+static Program getProgram(NSBundle bundle) {
+	NSString CFBundleName = NSString.stringWith("CFBundleName");
+	NSString CFBundleDisplayName = NSString.stringWith("CFBundleDisplayName");
+	NSString fullPath = bundle.bundlePath();
+	NSString identifier = bundle.bundleIdentifier();
+	id bundleName = bundle.objectForInfoDictionaryKey(CFBundleDisplayName);
+    if (bundleName == null) {
+        bundleName = bundle.objectForInfoDictionaryKey(CFBundleName);
+    }
+    if (bundleName == null) {
+        bundleName = fullPath.lastPathComponent().stringByDeletingPathExtension();
+    }
+    NSString name = new NSString(bundleName.id);
+    Program program = new Program();
+    program.name = name.getString();
+    program.fullPath = fullPath.getString();
+    program.identifier = identifier != null ? identifier.getString() : "";
+    return program;
 }
 
 /**
@@ -289,61 +206,34 @@ public static String [] getExtensions () {
  * @return an array of programs
  */
 public static Program [] getPrograms () {
-	Hashtable bundles = new Hashtable();
-	String[] extensions = getExtensions();
-	byte[] fsRef = new byte[80];
-	for (int i = 0; i < extensions.length; i++) {
-		String extension = extensions[i];
-		char[] chars = new char[extension.length() - 1];
-		extension.getChars(1, extension.length(), chars, 0);
-		int ext = OS.CFStringCreateWithCharacters(OS.kCFAllocatorDefault, chars, chars.length);
-		if (ext != 0) {
-			if (OS.LSGetApplicationForInfo(OS.kLSUnknownType, OS.kLSUnknownCreator, ext, OS.kLSRolesAll, fsRef, null) == OS.noErr) {
-				Program program = getProgram(fsRef);
-				if (program != null && bundles.get(program.getName()) == null) {
-					bundles.put(program.getName(), program);
-					fsRef = new byte[80];
-				}
-			}
-			if (OS.VERSION >= 0x1040) {
-				int utis = OS.UTTypeCreateAllIdentifiersForTag(OS.kUTTagClassFilenameExtension(), ext, 0);
-				if (utis != 0) {
-					int utiCount = OS.CFArrayGetCount(utis);
-					for (int j = 0; j < utiCount; j++) {
-						int uti = OS.CFArrayGetValueAtIndex(utis, j);
-						if (uti != 0) {
-							int apps = OS.LSCopyAllRoleHandlersForContentType(uti, OS.kLSRolesAll);
-							if (apps != 0) {
-								int appCount = OS.CFArrayGetCount(apps);
-								for (int k = 0; k < appCount; k++) {
-									int app = OS.CFArrayGetValueAtIndex(apps, k);
-									if (app != 0) {;
-										if (OS.LSFindApplicationForInfo(OS.kLSUnknownCreator, app, 0, fsRef, null) == OS.noErr) {
-											Program program = getProgram(fsRef);
-											if (program != null && bundles.get(program.getName()) == null) {
-												bundles.put(program.getName(), program);
-												fsRef = new byte[80];
-											}
-										}
-									}
-								}
-								OS.CFRelease(apps);
-							}
-						}
+	NSAutoreleasePool pool = (NSAutoreleasePool) new NSAutoreleasePool().alloc().init();
+	try {
+		Vector vector = new Vector();
+		NSWorkspace workspace = NSWorkspace.sharedWorkspace();
+		NSArray array = new NSArray(OS.NSSearchPathForDirectoriesInDomains(OS.NSAllApplicationsDirectory, OS.NSAllDomainsMask, true));
+		int count = (int)/*64*/array.count();
+		for (int i = 0; i < count; i++) {
+			NSString path = new NSString(array.objectAtIndex(i));
+			NSFileManager fileManager = NSFileManager.defaultManager();
+			NSDirectoryEnumerator enumerator = fileManager.enumeratorAtPath(path);
+			if (enumerator != null) {
+				id id;
+				while ((id = enumerator.nextObject()) != null) {
+					enumerator.skipDescendents();
+					NSString fullPath = path.stringByAppendingPathComponent(new NSString(id.id));
+					if (workspace.isFilePackageAtPath(fullPath)) {
+						NSBundle bundle = NSBundle.bundleWithPath(fullPath);
+						if (bundle != null) vector.addElement(getProgram(bundle));
 					}
-					OS.CFRelease(utis);
 				}
 			}
-			OS.CFRelease(ext);
 		}
+		Program[] programs = new Program[vector.size()];
+		vector.copyInto(programs);
+		return programs;
+	} finally {
+		pool.release();
 	}
-	int count = 0;
-	Program[] programs = new Program[bundles.size()];
-	Enumeration values = bundles.elements();
-	while (values.hasMoreElements()) {
-		programs[count++] = (Program)values.nextElement();
-	}
-	return programs;
 }
 
 /**
@@ -361,34 +251,27 @@ public static Program [] getPrograms () {
  */
 public static boolean launch (String fileName) {
 	if (fileName == null) SWT.error (SWT.ERROR_NULL_ARGUMENT);
-	int rc = -1;
-	char[] unescapedChars = new char[] {'%'};
-	if (fileName.indexOf(':') == -1) {
-		fileName = PREFIX_FILE + fileName;
-	} else {
+	NSAutoreleasePool pool = (NSAutoreleasePool) new NSAutoreleasePool().alloc().init();
+	try {
+		NSString unescapedStr = NSString.stringWith("%"); //$NON-NLS-1$
 		String lowercaseName = fileName.toLowerCase ();
 		if (lowercaseName.startsWith (PREFIX_HTTP) || lowercaseName.startsWith (PREFIX_HTTPS)) {
-			unescapedChars = new char[] {'%', '#'};
-		}
-	}
-	char[] chars = new char[fileName.length()];
-	fileName.getChars(0, chars.length, chars, 0);
-	int str = OS.CFStringCreateWithCharacters(0, chars, chars.length);
-	if (str != 0) {
-		int unescapedStr = OS.CFStringCreateWithCharacters(0, unescapedChars, unescapedChars.length);
-		int escapedStr = OS.CFURLCreateStringByAddingPercentEscapes(OS.kCFAllocatorDefault, str, unescapedStr, 0, OS.kCFStringEncodingUTF8);
-		if (escapedStr != 0) {
-			int url = OS.CFURLCreateWithString(OS.kCFAllocatorDefault, escapedStr, 0);
-			if (url != 0) {
-				rc = OS.LSOpenCFURLRef(url, null);
-				OS.CFRelease(url);
+			unescapedStr = NSString.stringWith("%#"); //$NON-NLS-1$
+		} else {
+			if (!lowercaseName.startsWith (PREFIX_FILE)) {
+				fileName = PREFIX_FILE + fileName;
 			}
-			OS.CFRelease(escapedStr);
 		}
-		if (unescapedStr != 0) OS.CFRelease(unescapedStr);
-		OS.CFRelease(str);
+		NSString fullPath = NSString.stringWith(fileName);
+		int /*long*/ ptr = OS.CFURLCreateStringByAddingPercentEscapes(0, fullPath.id, unescapedStr.id, 0, OS.kCFStringEncodingUTF8);
+		NSString escapedString = new NSString(ptr);
+		NSWorkspace workspace = NSWorkspace.sharedWorkspace();
+		boolean result = workspace.openURL(NSURL.URLWithString(escapedString));
+		OS.CFRelease(ptr);
+		return result;
+	} finally {
+		pool.release();
 	}
-	return rc == OS.noErr;
 }
 
 /**
@@ -406,88 +289,28 @@ public static boolean launch (String fileName) {
  */
 public boolean execute (String fileName) {
 	if (fileName == null) SWT.error(SWT.ERROR_NULL_ARGUMENT);
-	if (OS.VERSION < 0x1040) return launch(fileName);
-	int rc = -1;
-	int fsRefPtr = OS.NewPtr(fsRef.length);
-	if (fsRefPtr != 0) {
-		OS.memmove(fsRefPtr, fsRef, fsRef.length);
-		LSApplicationParameters params = new LSApplicationParameters();
-		params.version = 0;
-		params.flags = 0;
-		params.application = fsRefPtr;
-		if (fileName.length() == 0) {
-			rc = OS.LSOpenApplication(params, null);
+	NSAutoreleasePool pool = (NSAutoreleasePool) new NSAutoreleasePool().alloc().init();
+	try {
+		NSWorkspace workspace = NSWorkspace.sharedWorkspace();
+		String lowercaseName = fileName.toLowerCase ();
+		if (lowercaseName.startsWith (PREFIX_HTTP) || lowercaseName.startsWith (PREFIX_HTTPS)) {
+			NSString fullPath = NSString.stringWith(fileName);
+			NSString unescapedStr = NSString.stringWith("%#"); //$NON-NLS-1$
+			int /*long*/ ptr = OS.CFURLCreateStringByAddingPercentEscapes(0, fullPath.id, unescapedStr.id, 0, OS.kCFStringEncodingUTF8);
+			NSString escapedString = new NSString(ptr);
+			NSArray urls = NSArray.arrayWithObject(NSURL.URLWithString(escapedString));
+			OS.CFRelease(ptr);
+			return workspace.openURLs(urls, NSString.stringWith(identifier), 0, null, 0);
 		} else {
-			char[] unescapedChars = new char[] {'%'};
-			if (fileName.indexOf(':') == -1) {
-				fileName = PREFIX_FILE + fileName;
-			} else {
-				String lowercaseName = fileName.toLowerCase ();
-				if (lowercaseName.startsWith (PREFIX_HTTP) || lowercaseName.startsWith (PREFIX_HTTPS)) {
-					unescapedChars = new char[] {'%', '#'};
-				}
+			if (fileName.startsWith (PREFIX_FILE)) {
+				fileName = fileName.substring (PREFIX_FILE.length ());
 			}
-			char[] chars = new char[fileName.length()];
-			fileName.getChars(0, chars.length, chars, 0);
-			int str = OS.CFStringCreateWithCharacters(0, chars, chars.length);
-			if (str != 0) {
-				int unescapedStr = OS.CFStringCreateWithCharacters(0, unescapedChars, unescapedChars.length);
-				int escapedStr = OS.CFURLCreateStringByAddingPercentEscapes(OS.kCFAllocatorDefault, str, unescapedStr, 0, OS.kCFStringEncodingUTF8);
-				if (escapedStr != 0) {
-					int urls = OS.CFArrayCreateMutable(OS.kCFAllocatorDefault, 1, 0);
-					if (urls != 0) {
-						int url = OS.CFURLCreateWithString(OS.kCFAllocatorDefault, escapedStr, 0);
-						if (url != 0) {
-							OS.CFArrayAppendValue(urls, url);
-							rc = OS.LSOpenURLsWithRole(urls, OS.kLSRolesAll, 0, params, null, 0);
-						}
-						OS.CFRelease(urls);
-					}
-					OS.CFRelease(escapedStr);
-				}
-				if (unescapedStr != 0) OS.CFRelease(unescapedStr);
-				OS.CFRelease(str);
-			}
+			NSString fullPath = NSString.stringWith (fileName);
+			return workspace.openFile (fullPath, NSString.stringWith (name));
 		}
-		OS.DisposePtr(fsRefPtr);
+	} finally {
+		pool.release();
 	}
-	return rc == OS.noErr;
-}
-
-ImageData createImageFromFamily (int family, int type, int maskType, int width, int height) {
-	int dataHandle = OS.NewHandle (0);
-	int result = OS.GetIconFamilyData (family, type, dataHandle);
-	if (result != OS.noErr) {
-		OS.DisposeHandle (dataHandle);
-		return null;
-	}
-	int maskHandle = OS.NewHandle (0);
-	result = OS.GetIconFamilyData (family, maskType, maskHandle);
-	if (result != OS.noErr) {
-		OS.DisposeHandle (maskHandle);
-		OS.DisposeHandle (dataHandle);
-		return null;
-	}
-	int dataSize = OS.GetHandleSize (dataHandle);
-	OS.HLock (dataHandle);
-	OS.HLock (maskHandle);
-	int[] iconPtr = new int [1];
-	int[] maskPtr = new int [1];
-	OS.memmove (iconPtr, dataHandle, 4);
-	OS.memmove (maskPtr, maskHandle, 4);
-	byte[] data = new byte[dataSize];
-	OS.memmove (data, iconPtr [0], dataSize);
-	byte[] alphaData = new byte[width * height];
-	OS.memmove(alphaData, maskPtr[0], alphaData.length);
-	OS.HUnlock (maskHandle);
-	OS.HUnlock (dataHandle);
-	OS.DisposeHandle (maskHandle);
-	OS.DisposeHandle (dataHandle);
-
-	ImageData image = new ImageData(width, height, 32, new PaletteData(0xFF0000, 0xFF00, 0xFF), 4, data);
-	image.alphaData = alphaData;
-
-	return image;
 }
 
 /**
@@ -498,50 +321,50 @@ ImageData createImageFromFamily (int family, int type, int maskType, int width, 
  * @return the image data for the program, may be null
  */
 public ImageData getImageData () {
-	int[] iconRef = new int[1];
-	OS.GetIconRefFromFileInfo(fsRef, 0, null, 0, 0, 0, iconRef, null);
-	int[] family = new int[1];
-	int rc = OS.IconRefToIconFamily(iconRef[0], OS.kSelectorAlLAvailableData, family);
-	OS.ReleaseIconRef(iconRef[0]);
-	if (rc != OS.noErr) return null;
-//	ImageData result = createImageFromFamily(family[0], OS.kLarge32BitData, OS.kLarge8BitMask, 32, 32);
-	ImageData result = createImageFromFamily(family[0], OS.kSmall32BitData, OS.kSmall8BitMask, 16, 16);
-	OS.DisposeHandle(family[0]);
-	if (result == null) {
-		RGB[] rgbs = new RGB[] {
-			new RGB(0xff, 0xff, 0xff), 
-			new RGB(0x5f, 0x5f, 0x5f),
-			new RGB(0x80, 0x80, 0x80),
-			new RGB(0xC0, 0xC0, 0xC0),
-			new RGB(0xDF, 0xDF, 0xBF),
-			new RGB(0xFF, 0xDF, 0x9F),
-			new RGB(0x00, 0x00, 0x00),
-		};  
-		result = new ImageData(16, 16, 4, new PaletteData(rgbs)	);
-		result.transparentPixel = 6; // use black for transparency
-		String[] p= {
-			"CCCCCCCCGGG",
-			"CFAAAAACBGG",
-			"CAAAAAACFBG",
-			"CAAAAAACBBB",
-			"CAAAAAAAAEB",
-			"CAAAAAAAAEB",
-			"CAAAAAAAAEB",
-			"CAAAAAAAAEB",
-			"CAAAAAAAAEB",
-			"CAAAAAAAAEB",
-			"CAAAAAAAAEB",
-			"CAAAAAAAAEB",
-			"CDDDDDDDDDB",
-			"CBBBBBBBBBB",
-		};
-		for (int y= 0; y < p.length; y++) {
-			for (int x= 0; x < 11; x++) {
-				result.setPixel(x+3, y+1, p[y].charAt(x)-'A');
+	NSAutoreleasePool pool = (NSAutoreleasePool) new NSAutoreleasePool().alloc().init();
+	try {
+		NSWorkspace workspace = NSWorkspace.sharedWorkspace();
+		NSString fullPath;
+		if (this.fullPath != null) {
+			fullPath = NSString.stringWith(this.fullPath);
+		} else {
+			fullPath = workspace.fullPathForApplication(NSString.stringWith(name));
+		}
+		if (fullPath != null) {
+			NSImage nsImage = workspace.iconForFile(fullPath);
+			if (nsImage != null) {
+				NSSize size = new NSSize();
+				size.width = size.height = 16;
+				nsImage.setSize(size);
+				NSBitmapImageRep imageRep = null;
+				NSImageRep rep = nsImage.bestRepresentationForDevice(null);
+				if (rep.isKindOfClass(OS.class_NSBitmapImageRep)) { 
+					imageRep = new NSBitmapImageRep(rep.id);
+				}
+				if (imageRep != null) {
+					int width = (int)/*64*/imageRep.pixelsWide();
+					int height = (int)/*64*/imageRep.pixelsHigh();
+					int bpr = (int)/*64*/imageRep.bytesPerRow();
+					int bpp = (int)/*64*/imageRep.bitsPerPixel();
+					int dataSize = height * bpr;
+					byte[] srcData = new byte[dataSize];
+					OS.memmove(srcData, imageRep.bitmapData(), dataSize);
+					//TODO: Image representation wrong???
+					PaletteData palette = new PaletteData(0xFF000000, 0xFF0000, 0xFF00);
+					ImageData data = new ImageData(width, height, bpp, palette, 4, srcData);
+					data.bytesPerLine = bpr;
+					data.alphaData = new byte[width * height];
+					for (int i = 3, o = 0; i < srcData.length; i+= 4, o++) {
+						data.alphaData[o] = srcData[i];
+					}
+					return data;
+				}
 			}
 		}
+		return null;
+	} finally {
+		pool.release();
 	}
-	return result;
 }
 
 /**
@@ -554,27 +377,6 @@ public ImageData getImageData () {
  */
 public String getName () {
 	return name;
-}
-
-static Program getProgram(byte[] fsRef) {
-	String name = "";
-	int[] namePtr = new int[1];
-	OS.LSCopyDisplayNameForRef(fsRef, namePtr);
-	if (namePtr[0] != 0) {
-		int length = OS.CFStringGetLength(namePtr[0]);
-		if (length != 0) {
-			char[] buffer= new char[length];
-			CFRange range = new CFRange();
-			range.length = length;
-			OS.CFStringGetCharacters(namePtr[0], range, buffer);
-			name = new String(buffer);
-		}
-		OS.CFRelease(namePtr[0]);
-	}
-	Program program = new Program();
-	program.fsRef = fsRef;
-	program.name = name;
-	return program;
 }
 
 /**

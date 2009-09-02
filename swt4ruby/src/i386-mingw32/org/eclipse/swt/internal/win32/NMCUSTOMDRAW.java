@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2006 IBM Corporation and others.
+ * Copyright (c) 2000, 2008 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -12,9 +12,17 @@ package org.eclipse.swt.internal.win32;
 
 public class NMCUSTOMDRAW extends NMHDR {
 	public int dwDrawStage; 
+	/** @field cast=(HDC) */
 	public int /*long*/ hdc;
 //	RECT rc;
-	public int left, top, right, bottom;
+	/** @field accessor=rc.left */
+	public int left; 
+	/** @field accessor=rc.top */
+	public int top; 
+	/** @field accessor=rc.right */
+	public int right; 
+	/** @field accessor=rc.bottom */
+	public int bottom;
 	public int /*long*/ dwItemSpec;
 	public int uItemState;
 	public int /*long*/ lItemlParam;

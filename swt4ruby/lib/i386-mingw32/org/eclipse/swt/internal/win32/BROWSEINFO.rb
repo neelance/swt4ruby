@@ -1,6 +1,6 @@
 require "rjava"
 
-# Copyright (c) 2000, 2006 IBM Corporation and others.
+# Copyright (c) 2000, 2008 IBM Corporation and others.
 # All rights reserved. This program and the accompanying materials
 # are made available under the terms of the Eclipse Public License v1.0
 # which accompanies this distribution, and is available at
@@ -19,6 +19,7 @@ module Org::Eclipse::Swt::Internal::Win32
   class BROWSEINFO 
     include_class_members BROWSEINFOImports
     
+    # @field cast=(HWND)
     # long
     attr_accessor :hwnd_owner
     alias_method :attr_hwnd_owner, :hwnd_owner
@@ -26,6 +27,7 @@ module Org::Eclipse::Swt::Internal::Win32
     alias_method :attr_hwnd_owner=, :hwnd_owner=
     undef_method :hwnd_owner=
     
+    # @field cast=(LPCITEMIDLIST)
     # long
     attr_accessor :pidl_root
     alias_method :attr_pidl_root, :pidl_root
@@ -33,6 +35,7 @@ module Org::Eclipse::Swt::Internal::Win32
     alias_method :attr_pidl_root=, :pidl_root=
     undef_method :pidl_root=
     
+    # @field cast=(LPTSTR)
     # long
     attr_accessor :psz_display_name
     alias_method :attr_psz_display_name, :psz_display_name
@@ -40,6 +43,7 @@ module Org::Eclipse::Swt::Internal::Win32
     alias_method :attr_psz_display_name=, :psz_display_name=
     undef_method :psz_display_name=
     
+    # @field cast=(LPCTSTR)
     # long
     attr_accessor :lpsz_title
     alias_method :attr_lpsz_title, :lpsz_title
@@ -53,6 +57,7 @@ module Org::Eclipse::Swt::Internal::Win32
     alias_method :attr_ul_flags=, :ul_flags=
     undef_method :ul_flags=
     
+    # @field cast=(BFFCALLBACK)
     # long
     attr_accessor :lpfn
     alias_method :attr_lpfn, :lpfn

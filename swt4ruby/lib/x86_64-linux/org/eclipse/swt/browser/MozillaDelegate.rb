@@ -1,6 +1,6 @@
 require "rjava"
 
-# Copyright (c) 2003, 2008 IBM Corporation and others.
+# Copyright (c) 2003, 2009 IBM Corporation and others.
 # All rights reserved. This program and the accompanying materials
 # are made available under the terms of the Eclipse Public License v1.0
 # which accompanies this distribution, and is available at
@@ -17,6 +17,7 @@ module Org::Eclipse::Swt::Browser
       include_const ::Org::Eclipse::Swt::Browser, :Browser
       include ::Org::Eclipse::Swt::Internal
       include ::Org::Eclipse::Swt::Internal::Gtk
+      include ::Org::Eclipse::Swt::Internal::Mozilla
       include ::Org::Eclipse::Swt::Widgets
     }
   end
@@ -83,19 +84,20 @@ module Org::Eclipse::Swt::Browser
       const_attr_reader  :STOP_PROPOGATE
       
       
-      def is_linux
-        defined?(@@is_linux) ? @@is_linux : @@is_linux= false
+      def is_sparc
+        defined?(@@is_sparc) ? @@is_sparc : @@is_sparc= false
       end
-      alias_method :attr_is_linux, :is_linux
+      alias_method :attr_is_sparc, :is_sparc
       
-      def is_linux=(value)
-        @@is_linux = value
+      def is_sparc=(value)
+        @@is_sparc = value
       end
-      alias_method :attr_is_linux=, :is_linux=
+      alias_method :attr_is_sparc=, :is_sparc=
       
       when_class_loaded do
         os_name = System.get_property("os.name").to_lower_case # $NON-NLS-1$
-        self.attr_is_linux = os_name.starts_with("linux") # $NON-NLS-1$
+        os_arch = System.get_property("os.arch").to_lower_case # $NON-NLS-1$
+        self.attr_is_sparc = (os_name.starts_with("sunos") || os_name.starts_with("solaris")) && os_arch.starts_with("sparc") # $NON-NLS-1$
       end
     }
     
@@ -106,7 +108,7 @@ module Org::Eclipse::Swt::Browser
       @embed_handle = 0
       @has_focus = false
       @listener = nil
-      if (!self.attr_is_linux)
+      if (self.attr_is_sparc)
         browser.dispose
         SWT.error(SWT::ERROR_NO_HANDLES, nil, " [Unsupported platform]") # $NON-NLS-1$
       end
@@ -157,6 +159,15 @@ module Org::Eclipse::Swt::Browser
     }
     
     typesig { [] }
+    def add_window_subclass
+    end
+    
+    typesig { [NsIBaseWindow] }
+    def create_base_window(base_window)
+      return base_window._create
+    end
+    
+    typesig { [] }
     # int
     def get_handle
       # Bug in Mozilla Linux GTK.  Embedding Mozilla into a GtkFixed
@@ -171,6 +182,11 @@ module Org::Eclipse::Swt::Browser
       OS.gtk_container_add(@browser.attr_handle, @embed_handle)
       OS.gtk_widget_show(@embed_handle)
       return @embed_handle
+    end
+    
+    typesig { [] }
+    def get_jslibrary_name
+      return "libmozjs.so" # $NON-NLS-1$
     end
     
     typesig { [] }
@@ -322,6 +338,10 @@ module Org::Eclipse::Swt::Browser
         @listener = nil
       end
       @browser = nil
+    end
+    
+    typesig { [] }
+    def remove_window_subclass
     end
     
     typesig { [::Java::Long, ::Java::Int, ::Java::Int] }

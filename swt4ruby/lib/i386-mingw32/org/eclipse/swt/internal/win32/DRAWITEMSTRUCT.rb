@@ -1,6 +1,6 @@
 require "rjava"
 
-# Copyright (c) 2000, 2006 IBM Corporation and others.
+# Copyright (c) 2000, 2008 IBM Corporation and others.
 # All rights reserved. This program and the accompanying materials
 # are made available under the terms of the Eclipse Public License v1.0
 # which accompanies this distribution, and is available at
@@ -49,6 +49,7 @@ module Org::Eclipse::Swt::Internal::Win32
     alias_method :attr_item_state=, :item_state=
     undef_method :item_state=
     
+    # @field cast=(HWND)
     # long
     attr_accessor :hwnd_item
     alias_method :attr_hwnd_item, :hwnd_item
@@ -56,6 +57,7 @@ module Org::Eclipse::Swt::Internal::Win32
     alias_method :attr_hwnd_item=, :hwnd_item=
     undef_method :hwnd_item=
     
+    # @field cast=(HDC)
     # long
     attr_accessor :h_dc
     alias_method :attr_h_dc, :h_dc
@@ -64,24 +66,28 @@ module Org::Eclipse::Swt::Internal::Win32
     undef_method :h_dc=
     
     # RECT rcItem;
+    # @field accessor=rcItem.left
     attr_accessor :left
     alias_method :attr_left, :left
     undef_method :left
     alias_method :attr_left=, :left=
     undef_method :left=
     
+    # @field accessor=rcItem.top
     attr_accessor :top
     alias_method :attr_top, :top
     undef_method :top
     alias_method :attr_top=, :top=
     undef_method :top=
     
+    # @field accessor=rcItem.bottom
     attr_accessor :bottom
     alias_method :attr_bottom, :bottom
     undef_method :bottom
     alias_method :attr_bottom=, :bottom=
     undef_method :bottom=
     
+    # @field accessor=rcItem.right
     attr_accessor :right
     alias_method :attr_right, :right
     undef_method :right

@@ -11,9 +11,6 @@
 package org.eclipse.swt.internal.theme;
 
 import org.eclipse.swt.graphics.*;
-import org.eclipse.swt.internal.carbon.OS;
-import org.eclipse.swt.internal.carbon.CGRect;
-import org.eclipse.swt.internal.carbon.HIThemeTextInfo;
 
 public class DrawData {
 	public int style;
@@ -66,6 +63,7 @@ public class DrawData {
 	/** Combo parts */
 	public static final int COMBO_ARROW = 1;
 	
+
 public DrawData() {
 	state = new int[1];
 }
@@ -74,117 +72,25 @@ Rectangle computeTrim(Theme theme, GC gc) {
 	return new Rectangle(clientArea.x, clientArea.y, clientArea.width, clientArea.height);
 }
 
-void draw(Theme theme, GC gc, Rectangle bounds) {
+void draw(Theme theme, GC gc, Rectangle bounds) {	
 }
 
 void drawImage(Theme theme, Image image, GC gc, Rectangle bounds) {
-	Image drawImage = image;
-	Rectangle rect = drawImage.getBounds();
-	int state = this.state[DrawData.WIDGET_WHOLE];
-	if (OS.VERSION >= 0x1040) {
-		if ((state & (DrawData.PRESSED | DrawData.DISABLED)) != 0) {
-			int transform = OS.kHITransformNone;
-			if ((state & DrawData.DISABLED) != 0) {
-				transform = OS.kHITransformDisabled;
-			} else {
-				if ((state & DrawData.PRESSED) != 0) {
-					transform = OS.kHITransformSelected;
-				}
-			}
-			if (transform != OS.kHITransformNone) {
-				int[] buffer = new int[1];
-				OS.HICreateTransformedCGImage(drawImage.handle, transform, buffer);
-				if (buffer[0] != 0) {
-					//TODO - get device
-					//TODO - is data needed
-					drawImage = Image.carbon_new(null, drawImage.type, buffer[0], 0);
-				}
-			}
-		}
-	}		
-	gc.drawImage(drawImage, 0, 0, rect.width, rect.height, bounds.x, bounds.y, bounds.width, bounds.height);
-	if (drawImage != image) {
-		drawImage.dispose();
-	}
 }
 
 void drawText(Theme theme, String text, int flags, GC gc, Rectangle bounds) {
-	int state = this.state[DrawData.WIDGET_WHOLE];
-	char[] chars = new char[text.length()];
-	text.getChars(0, chars.length, chars, 0);
-	int ptr = OS.CFStringCreateWithCharacters(OS.kCFAllocatorDefault, chars, chars.length);	
-	OS.CGContextSaveGState(gc.handle);
-	if ((state & DrawData.DISABLED) != 0) {
-		//TODO - find out disable color
-		OS.CGContextSetFillColor(gc.handle, new float[]{0.5f, 0.5f, 0.5f, 1});
-	} else {
-		if ((state & DrawData.ACTIVE) != 0) {
-			OS.CGContextSetFillColor(gc.handle, new float[]{0, 0, 0, 1});
-		} else {
-			//TODO - find out inative color
-			OS.CGContextSetFillColor(gc.handle, new float[]{0.6f, 0.6f, 0.6f, 1});					
-		}
-	}
-	CGRect rect = new CGRect();
-	rect.x = bounds.x;
-	rect.y = bounds.y;
-	rect.width = bounds.width;
-	rect.height = bounds.height;
-	HIThemeTextInfo info = getTextInfo(flags);
-	OS.HIThemeDrawTextBox(ptr, rect, info, gc.handle, OS.kHIThemeOrientationNormal);
-	OS.CGContextRestoreGState(gc.handle);
-	OS.CFRelease(ptr);
 }
 
 Rectangle getBounds(int part, Rectangle bounds) {
 	return new Rectangle(bounds.x, bounds.y, bounds.width, bounds.height);
 }
 
-int getFontId() {
-	return OS.kThemeSmallSystemFont;
-}
-
-HIThemeTextInfo getTextInfo(int flags) {
-	int state = this.state[DrawData.WIDGET_WHOLE];
-	HIThemeTextInfo info = new HIThemeTextInfo();
-	if ((state & DrawData.PRESSED) != 0) {
-		info.state = OS.kThemeStatePressed;
-	} else {
-		if ((state & DrawData.ACTIVE) != 0) {
-			info.state = (state & DrawData.DISABLED) == 0 ? OS.kThemeStateActive : OS.kThemeStateUnavailable;
-		} else {
-			info.state = (state & DrawData.DISABLED) == 0 ? OS.kThemeStateInactive : OS.kThemeStateUnavailableInactive;
-		}
-	}
-	info.state = info.state;
-	info.fontID = (short)getFontId();
-	if ((flags & DrawData.DRAW_LEFT) != 0) info.horizontalFlushness = OS.kHIThemeTextHorizontalFlushLeft;
-	if ((flags & DrawData.DRAW_HCENTER) != 0) info.horizontalFlushness = OS.kHIThemeTextHorizontalFlushCenter;
-	if ((flags & DrawData.DRAW_RIGHT) != 0) info.horizontalFlushness = OS.kHIThemeTextHorizontalFlushRight;
-	if ((flags & DrawData.DRAW_TOP) != 0) info.verticalFlushness = OS.kHIThemeTextVerticalFlushTop;
-	if ((flags & DrawData.DRAW_VCENTER) != 0) info.verticalFlushness = OS.kHIThemeTextVerticalFlushCenter;
-	if ((flags & DrawData.DRAW_BOTTOM) != 0) info.verticalFlushness = OS.kHIThemeTextVerticalFlushBottom;
-	info.truncationMaxLines = 0;
-	info.truncationPosition = 0;
-	info.options = 0;
-	return info;
-}
-
 int hit(Theme theme, Point position, Rectangle bounds) {
-	return -1;
+	return bounds.contains(position) ? DrawData.WIDGET_WHOLE : DrawData.WIDGET_NOWHERE;
 }
 
 Rectangle measureText(Theme theme, String text, int flags, GC gc, Rectangle bounds) {
-	//TODO - decide if should take only width and return only width/height
-	char[] chars = new char[text.length()];
-	text.getChars(0, chars.length, chars, 0);
-	int ptr = OS.CFStringCreateWithCharacters(OS.kCFAllocatorDefault, chars, chars.length);
-	int width = bounds != null ? bounds.width : 0;
-	float[] outWidth = new float[1], outHeight = new float[1];
-	HIThemeTextInfo info = getTextInfo(flags);
-	OS.HIThemeGetTextDimensions(ptr, width, info, outWidth, outHeight, null);
-	OS.CFRelease(ptr);
-	return new Rectangle(0, 0, (int)outWidth[0], (int)outHeight[0]);
+	return new Rectangle(0, 0, 0, 0);
 }
 
 }

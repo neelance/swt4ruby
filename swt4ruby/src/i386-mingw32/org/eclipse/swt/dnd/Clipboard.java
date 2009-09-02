@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2008 IBM Corporation and others.
+ * Copyright (c) 2000, 2009 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -25,9 +25,11 @@ import org.eclipse.swt.internal.ole.win32.*;
  * @see <a href="http://www.eclipse.org/swt/snippets/#clipboard">Clipboard snippets</a>
  * @see <a href="http://www.eclipse.org/swt/examples.php">SWT Example: ClipboardExample</a>
  * @see <a href="http://www.eclipse.org/swt/">Sample code and further information</a>
+ * @noextend This class is not intended to be subclassed by clients.
  */
 public class Clipboard {
 
+	private static final int RETRY_LIMIT = 10;
 	private Display display;
 	
 	// ole interfaces
@@ -319,7 +321,7 @@ public Object getContents(Transfer transfer, int clipboards) {
 	 * AddRef has already been called on ppDataObject by the callee and must be released by the caller.
 	 */
 	int result = COM.OleGetClipboard(ppv);
-	while (result != COM.S_OK && retryCount++ < 10) {
+	while (result != COM.S_OK && retryCount++ < RETRY_LIMIT) {
 		try {Thread.sleep(50);} catch (Throwable t) {}
 		MSG msg = new MSG();
 		OS.PeekMessage(msg, 0, 0, 0, OS.PM_NOREMOVE | OS.PM_NOYIELD);
@@ -498,7 +500,7 @@ public void setContents(Object[] data, Transfer[] dataTypes, int clipboards) {
 	* message sends.
 	*/
 	int retryCount = 0;
-	while (result != COM.S_OK && retryCount++ < 10) {
+	while (result != COM.S_OK && retryCount++ < RETRY_LIMIT) {
 		try {Thread.sleep(50);} catch (Throwable t) {}
 		MSG msg = new MSG();
 		OS.PeekMessage(msg, 0, 0, 0, OS.PM_NOREMOVE | OS.PM_NOYIELD);

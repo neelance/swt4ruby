@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2006 IBM Corporation and others. All rights reserved.
+ * Copyright (c) 2000, 2008 IBM Corporation and others. All rights reserved.
  * The contents of this file are made available under the terms
  * of the GNU Lesser General Public License (LGPL) Version 2.1 that
  * accompanies this distribution (lgpl-v21.txt).  The LGPL is also
@@ -16,11 +16,17 @@ package org.eclipse.swt.internal.gtk;
 
 
 public class GtkSelectionData {
+	/** @field cast=(GdkAtom) */
 	public int /*long*/  selection;
+	/** @field cast=(GdkAtom) */
 	public int /*long*/  target;
+	/** @field cast=(GdkAtom) */
 	public int /*long*/  type;
+	/** @field cast=(gint) */
 	public int  format;
+	/** @field cast=(guchar *) */
 	public int /*long*/  data;  
+	/** @field cast=(gint) */
 	public int  length;
 	public static final int sizeof = OS.GtkSelectionData_sizeof();
 }

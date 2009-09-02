@@ -324,6 +324,11 @@ public void setIME (IME ime) {
 	this.ime = ime;
 }
 
+TCHAR windowClass () {
+	if (display.useOwnDC) return display.windowOwnDCClass;
+	return super.windowClass ();
+}
+
 int /*long*/ windowProc (int /*long*/ hwnd, int msg, int /*long*/ wParam, int /*long*/ lParam) {
 	if (msg == Display.SWT_RESTORECARET) {
 		if ((state & CANVAS) != 0) {
@@ -426,6 +431,7 @@ LRESULT WM_KILLFOCUS (int /*long*/ wParam, int /*long*/ lParam) {
 		LRESULT result = ime.WM_KILLFOCUS (wParam, lParam);
 		if (result != null) return result;
 	}
+	Caret caret = this.caret;
 	LRESULT result  = super.WM_KILLFOCUS (wParam, lParam);
 	if (caret != null) caret.killFocus ();
 	return result;
@@ -441,7 +447,7 @@ LRESULT WM_LBUTTONDOWN (int /*long*/ wParam, int /*long*/ lParam) {
 
 LRESULT WM_SETFOCUS (int /*long*/ wParam, int /*long*/ lParam) {
 	LRESULT result  = super.WM_SETFOCUS (wParam, lParam);
-	if (caret != null) caret.setFocus ();
+	if (caret != null && caret.isFocusCaret ()) caret.setFocus ();
 	return result;
 }
 

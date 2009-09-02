@@ -1,6 +1,6 @@
 require "rjava"
 
-# Copyright (c) 2000, 2006 IBM Corporation and others.
+# Copyright (c) 2000, 2008 IBM Corporation and others.
 # All rights reserved. This program and the accompanying materials
 # are made available under the terms of the Eclipse Public License v1.0
 # which accompanies this distribution, and is available at
@@ -25,6 +25,7 @@ module Org::Eclipse::Swt::Internal::Win32
     alias_method :attr_l_struct_size=, :l_struct_size=
     undef_method :l_struct_size=
     
+    # @field cast=(HWND)
     # long
     attr_accessor :hwnd_owner
     alias_method :attr_hwnd_owner, :hwnd_owner
@@ -32,6 +33,7 @@ module Org::Eclipse::Swt::Internal::Win32
     alias_method :attr_hwnd_owner=, :hwnd_owner=
     undef_method :hwnd_owner=
     
+    # @field cast=(HDC)
     # long
     attr_accessor :h_dc
     alias_method :attr_h_dc, :h_dc
@@ -39,6 +41,7 @@ module Org::Eclipse::Swt::Internal::Win32
     alias_method :attr_h_dc=, :h_dc=
     undef_method :h_dc=
     
+    # @field cast=(LPLOGFONT)
     # long
     attr_accessor :lp_log_font
     alias_method :attr_lp_log_font, :lp_log_font
@@ -71,6 +74,7 @@ module Org::Eclipse::Swt::Internal::Win32
     alias_method :attr_l_cust_data=, :l_cust_data=
     undef_method :l_cust_data=
     
+    # @field cast=(LPCFHOOKPROC)
     # long
     attr_accessor :lpfn_hook
     alias_method :attr_lpfn_hook, :lpfn_hook
@@ -78,6 +82,7 @@ module Org::Eclipse::Swt::Internal::Win32
     alias_method :attr_lpfn_hook=, :lpfn_hook=
     undef_method :lpfn_hook=
     
+    # @field cast=(LPCTSTR)
     # long
     attr_accessor :lp_template_name
     alias_method :attr_lp_template_name, :lp_template_name
@@ -85,6 +90,7 @@ module Org::Eclipse::Swt::Internal::Win32
     alias_method :attr_lp_template_name=, :lp_template_name=
     undef_method :lp_template_name=
     
+    # @field cast=(HINSTANCE)
     # long
     attr_accessor :h_instance
     alias_method :attr_h_instance, :h_instance
@@ -92,6 +98,7 @@ module Org::Eclipse::Swt::Internal::Win32
     alias_method :attr_h_instance=, :h_instance=
     undef_method :h_instance=
     
+    # @field cast=(LPTSTR)
     # long
     attr_accessor :lpsz_style
     alias_method :attr_lpsz_style, :lpsz_style

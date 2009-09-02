@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2008 IBM Corporation and others.
+ * Copyright (c) 2000, 2009 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -72,6 +72,7 @@ import org.eclipse.swt.events.*;
  * @see <a href="http://www.eclipse.org/swt/snippets/#tree">Tree, TreeItem, TreeColumn snippets</a>
  * @see <a href="http://www.eclipse.org/swt/examples.php">SWT Example: ControlExample</a>
  * @see <a href="http://www.eclipse.org/swt/">Sample code and further information</a>
+ * @noextend This class is not intended to be subclassed by clients.
  */
 public class Tree extends Composite {
 	TreeItem [] items;
@@ -1494,7 +1495,7 @@ int /*long*/ callWindowProc (int /*long*/ hwnd, int msg, int /*long*/ wParam, in
 			
 		/* Resize messages */
 		case OS.WM_SIZE:
-			redraw = findImageControl () != null && drawCount == 0 && OS.IsWindowVisible (handle);
+			redraw = findImageControl () != null && getDrawing () && OS.IsWindowVisible (handle);
 			if (redraw) OS.DefWindowProc (handle, OS.WM_SETREDRAW, 0, 0);
 			//FALL THROUGH
 			
@@ -1624,11 +1625,21 @@ boolean checkData (TreeItem item, int index, boolean redraw) {
 		event.index = index;
 		TreeItem oldItem = currentItem;
 		currentItem = item;
+		/*
+		* Bug in Windows.  If the tree scrolls during WM_NOTIFY
+		* with TVN_GETDISPINFO, pixel corruption occurs.  The fix
+		* is to detect that the top item has changed and redraw
+		* the entire tree.
+		*/
+		int /*long*/ hTopItem = OS.SendMessage (handle, OS.TVM_GETNEXTITEM, OS.TVGN_FIRSTVISIBLE, 0);
 		sendEvent (SWT.SetData, event);
 		//widget could be disposed at this point
 		currentItem = oldItem;
 		if (isDisposed () || item.isDisposed ()) return false;
 		if (redraw) item.redraw ();
+		if (hTopItem != OS.SendMessage (handle, OS.TVM_GETNEXTITEM, OS.TVGN_FIRSTVISIBLE, 0)) {
+			OS.InvalidateRect (handle, null, true);
+		}
 	}
 	return true;
 }
@@ -1649,7 +1660,7 @@ boolean checkScroll (int /*long*/ hItem) {
 	* NOTE:  The code that actually works around the problem is in the
 	* callers of this method.
 	*/
-	if (drawCount == 0) return false;
+	if (getDrawing ()) return false;
 	int /*long*/ hRoot = OS.SendMessage (handle, OS.TVM_GETNEXTITEM, OS.TVGN_ROOT, 0);
 	int /*long*/ hParent = OS.SendMessage (handle, OS.TVM_GETNEXTITEM, OS.TVGN_PARENT, hItem);
 	while (hParent != hRoot && hParent != 0) {
@@ -2054,7 +2065,7 @@ void createItem (TreeItem item, int /*long*/ hParent, int /*long*/ hInsertAfter,
 			* memory usage.
 			*/
 			int length = 0;
-			if (drawCount == 0 && OS.IsWindowVisible (handle)) {
+			if (getDrawing () && OS.IsWindowVisible (handle)) {
 				length = items.length + 4;
 			} else {
 				shrink = true;
@@ -2121,7 +2132,7 @@ void createItem (TreeItem item, int /*long*/ hParent, int /*long*/ hInsertAfter,
 		* child is added to a visible parent item and redraw the parent.
 		*/
 		if (fixParent) {
-			if (drawCount == 0 && OS.IsWindowVisible (handle)) {
+			if (getDrawing () && OS.IsWindowVisible (handle)) {
 				RECT rect = new RECT ();
 				if (OS.TreeView_GetItemRect (handle, hParent, rect, false)) {
 					OS.InvalidateRect (handle, rect, true);
@@ -2540,7 +2551,7 @@ void destroyItem (TreeItem item, int /*long*/ hItem) {
 	int /*long*/ hParent = 0;
 	boolean fixRedraw = false;
 	if ((style & SWT.DOUBLE_BUFFERED) == 0) {
-		if (drawCount == 0 && OS.IsWindowVisible (handle)) {
+		if (getDrawing () && OS.IsWindowVisible (handle)) {
 			RECT rect = new RECT ();
 			fixRedraw = !OS.TreeView_GetItemRect (handle, hItem, rect, false);
 		}
@@ -2925,7 +2936,7 @@ int /*long*/ getBottomItem () {
 	int /*long*/ hItem = OS.SendMessage (handle, OS.TVM_GETNEXTITEM, OS.TVGN_FIRSTVISIBLE, 0);
 	if (hItem == 0) return 0;
 	int index = 0, count = (int)/*64*/OS.SendMessage (handle, OS.TVM_GETVISIBLECOUNT, 0, 0);
-	while (index < count) {
+	while (index <= count) {
 		int /*long*/ hNextItem = OS.SendMessage (handle, OS.TVM_GETNEXTITEM, OS.TVGN_NEXTVISIBLE, hItem);
 		if (hNextItem == 0) return hItem;
 		hItem = hNextItem;
@@ -3269,7 +3280,8 @@ TreeItem [] getItems (int /*long*/ hTreeItem) {
 
 /**
  * Returns <code>true</code> if the receiver's lines are visible,
- * and <code>false</code> otherwise.
+ * and <code>false</code> otherwise. Note that some platforms draw 
+ * grid lines while others may draw alternating row colors.
  * <p>
  * If one of the receiver's ancestors is not visible or some
  * other condition makes the receiver not visible, this method
@@ -3924,7 +3936,7 @@ public void removeAll () {
 		}
 	}
 	ignoreDeselect = ignoreSelect = true;
-	boolean redraw = drawCount == 0 && OS.IsWindowVisible (handle);
+	boolean redraw = getDrawing () && OS.IsWindowVisible (handle);
 	if (redraw) OS.DefWindowProc (handle, OS.WM_SETREDRAW, 0, 0);
 	shrink = ignoreShrink = true;
 	int /*long*/ result = OS.SendMessage (handle, OS.TVM_DELETEITEM, 0, OS.TVI_ROOT);
@@ -4053,7 +4065,7 @@ public void setItemCount (int count) {
 void setItemCount (int count, int /*long*/ hParent, int /*long*/ hItem) {
 	boolean redraw = false;
 	if (OS.SendMessage (handle, OS.TVM_GETCOUNT, 0, 0) == 0) {
-		redraw = drawCount == 0 && OS.IsWindowVisible (handle);
+		redraw = getDrawing () && OS.IsWindowVisible (handle);
 		if (redraw) OS.DefWindowProc (handle, OS.WM_SETREDRAW, 0, 0);
 	}
 	int itemCount = 0;
@@ -4136,7 +4148,8 @@ void setItemCount (int count, int /*long*/ hParent, int /*long*/ hItem) {
 
 /**
  * Marks the receiver's lines as visible if the argument is <code>true</code>,
- * and marks it invisible otherwise. 
+ * and marks it invisible otherwise. Note that some platforms draw 
+ * grid lines while others may draw alternating row colors.
  * <p>
  * If one of the receiver's ancestors is not visible or some
  * other condition makes the receiver not visible, marking
@@ -4231,7 +4244,7 @@ public void select (TreeItem item) {
 		vInfo.cbSize = SCROLLINFO.sizeof;
 		vInfo.fMask = OS.SIF_ALL;
 		OS.GetScrollInfo (handle, OS.SB_VERT, vInfo);
-		boolean redraw = drawCount == 0 && OS.IsWindowVisible (handle);
+		boolean redraw = getDrawing () && OS.IsWindowVisible (handle);
 		if (redraw) {
 			OS.UpdateWindow (handle);
 			OS.DefWindowProc (handle, OS.WM_SETREDRAW, 0, 0);
@@ -4240,6 +4253,18 @@ public void select (TreeItem item) {
 		if (hInfo != null) {
 			int /*long*/ hThumb = OS.MAKELPARAM (OS.SB_THUMBPOSITION, hInfo.nPos);
 			OS.SendMessage (handle, OS.WM_HSCROLL, hThumb, 0);
+		}
+		/*
+		* Feature in Windows.  It seems that Vista does not
+		* use wParam to get the new position when WM_VSCROLL
+		* is sent with SB_THUMBPOSITION.  The fix is to use
+		* SetScrollInfo() to move the scroll bar thumb before
+		* calling WM_VSCROLL.
+		* 
+		* NOTE: This code is only necessary on Windows Vista.
+		*/
+		if (!OS.IsWinCE && OS.WIN32_VERSION >= OS.VERSION (6, 0)) {
+			OS.SetScrollInfo (handle, OS.SB_VERT, vInfo, true);
 		}
 		int /*long*/ vThumb = OS.MAKELPARAM (OS.SB_THUMBPOSITION, vInfo.nPos);
 		OS.SendMessage (handle, OS.WM_VSCROLL, vThumb, 0);
@@ -5055,7 +5080,7 @@ public void setTopItem (TreeItem item) {
 		OS.SendMessage (handle, OS.WM_SETREDRAW, 1, 0);
 		OS.DefWindowProc (handle, OS.WM_SETREDRAW, 0, 0);
 	} else {
-		redraw = drawCount == 0 && OS.IsWindowVisible (handle);
+		redraw = getDrawing () && OS.IsWindowVisible (handle);
 		if (redraw) OS.DefWindowProc (handle, OS.WM_SETREDRAW, 0, 0);
 	}
 	OS.SendMessage (handle, OS.TVM_SELECTITEM, OS.TVGN_FIRSTVISIBLE, hItem);
@@ -5544,12 +5569,11 @@ int /*long*/ windowProc () {
 int /*long*/ windowProc (int /*long*/ hwnd, int msg, int /*long*/ wParam, int /*long*/ lParam) {
 	if (hwndHeader != 0 && hwnd == hwndHeader) {
 		switch (msg) {
-			/* This code is intentionally commented */
-//			case OS.WM_CONTEXTMENU: {
-//				LRESULT result = wmContextMenu (hwnd, wParam, lParam);
-//				if (result != null) return result.value;
-//				break;
-//			}
+			case OS.WM_CONTEXTMENU: {
+				LRESULT result = wmContextMenu (hwnd, wParam, lParam);
+				if (result != null) return result.value;
+				break;
+			}
 			case OS.WM_CAPTURECHANGED: {
 				/*
 				* Bug in Windows.  When the capture changes during a
@@ -5727,6 +5751,9 @@ int /*long*/ windowProc (int /*long*/ hwnd, int msg, int /*long*/ wParam, int /*
 					rect.right = clientRect.right;
 					rect.left = Math.max (clientRect.left, rect.right - width);
 				}
+			} else {
+				rect.left = Math.max (rect.left, clientRect.left);
+				rect.right = Math.min (rect.right, clientRect.right);
 			}
 			int /*long*/ hRgn = OS.CreateRectRgn (rect.left, rect.top, rect.right, rect.bottom);
 			for (int i = 1; i < count; i++) {
@@ -5736,6 +5763,9 @@ int /*long*/ windowProc (int /*long*/ hwnd, int msg, int /*long*/ wParam, int /*
 				if ((style & SWT.FULL_SELECTION) != 0) {
 					itemRect.left = rect.left;
 					itemRect.right = rect.right;
+				} else {
+					itemRect.left = Math.max (itemRect.left, clientRect.left);
+					itemRect.right = Math.min (itemRect.right, clientRect.right);
 				}
 				int /*long*/ rectRgn = OS.CreateRectRgn (itemRect.left, itemRect.top, itemRect.right, itemRect.bottom);
 				OS.CombineRgn (hRgn, hRgn, rectRgn, OS.RGN_OR);
@@ -5952,6 +5982,7 @@ LRESULT WM_KEYDOWN (int /*long*/ wParam, int /*long*/ lParam) {
 		case OS.VK_HOME:
 		case OS.VK_END: {
 			OS.SendMessage (handle, OS.WM_CHANGEUISTATE, OS.UIS_INITIALIZE, 0);
+			if (itemToolTipHandle != 0) OS.ShowWindow (itemToolTipHandle, OS.SW_HIDE);
 			if ((style & SWT.SINGLE) != 0) break;
 			if (OS.GetKeyState (OS.VK_SHIFT) < 0) {
 				int /*long*/ hItem = OS.SendMessage (handle, OS.TVM_GETNEXTITEM, OS.TVGN_CARET, 0);
@@ -6049,7 +6080,7 @@ LRESULT WM_KEYDOWN (int /*long*/ wParam, int /*long*/ lParam) {
 						tvItem.hItem = hNewItem;
 						OS.SendMessage (handle, OS.TVM_GETITEM, 0, tvItem);
 						boolean newSelected = (tvItem.state & OS.TVIS_SELECTED) != 0;
-						boolean redraw = !newSelected && drawCount == 0 && OS.IsWindowVisible (handle);
+						boolean redraw = !newSelected && getDrawing () && OS.IsWindowVisible (handle);
 						if (redraw) {
 							OS.UpdateWindow (handle);
 							OS.DefWindowProc (handle, OS.WM_SETREDRAW, 0, 0);
@@ -6644,7 +6675,14 @@ LRESULT WM_MOUSEMOVE (int /*long*/ wParam, int /*long*/ lParam) {
 	return result;
 }
 
+LRESULT WM_MOUSEWHEEL (int /*long*/ wParam, int /*long*/ lParam) {
+	LRESULT result = super.WM_MOUSEWHEEL (wParam, lParam);
+	if (itemToolTipHandle != 0) OS.ShowWindow (itemToolTipHandle, OS.SW_HIDE);
+	return result;
+}
+
 LRESULT WM_MOVE (int /*long*/ wParam, int /*long*/ lParam) {
+	if (itemToolTipHandle != 0) OS.ShowWindow (itemToolTipHandle, OS.SW_HIDE);
 	if (ignoreResize) return null;
 	return super.WM_MOVE (wParam, lParam);
 }
@@ -6745,7 +6783,7 @@ LRESULT WM_PAINT (int /*long*/ wParam, int /*long*/ lParam) {
 			GC gc = null;
 			int /*long*/ paintDC = 0;
 			PAINTSTRUCT ps = new PAINTSTRUCT ();
-			boolean hooksPaint = hooks (SWT.Paint);
+			boolean hooksPaint = hooks (SWT.Paint) || filters (SWT.Paint);
 			if (hooksPaint) {
 				GCData data = new GCData ();
 				data.ps = ps;
@@ -6861,10 +6899,12 @@ LRESULT WM_SETFONT (int /*long*/ wParam, int /*long*/ lParam) {
 		OS.SendMessage (hwndHeader, OS.WM_SETFONT, wParam, lParam);
 	}
 	if (itemToolTipHandle != 0) {
+		OS.ShowWindow (itemToolTipHandle, OS.SW_HIDE);
 		OS.SendMessage (itemToolTipHandle, OS.WM_SETFONT, wParam, lParam);
 	}
 	if (headerToolTipHandle != 0) {
 		OS.SendMessage (headerToolTipHandle, OS.WM_SETFONT, wParam, lParam);
+		updateHeaderToolTips ();
 	}
 	return result;
 }
@@ -6872,6 +6912,7 @@ LRESULT WM_SETFONT (int /*long*/ wParam, int /*long*/ lParam) {
 LRESULT WM_SETREDRAW (int /*long*/ wParam, int /*long*/ lParam) {
 	LRESULT result = super.WM_SETREDRAW (wParam, lParam);
 	if (result != null) return result;
+	if (itemToolTipHandle != 0) OS.ShowWindow (itemToolTipHandle, OS.SW_HIDE);
 	/*
 	* Bug in Windows.  Under certain circumstances, when
 	* WM_SETREDRAW is used to turn off drawing and then
@@ -6891,6 +6932,7 @@ LRESULT WM_SETREDRAW (int /*long*/ wParam, int /*long*/ lParam) {
 }
 
 LRESULT WM_SIZE (int /*long*/ wParam, int /*long*/ lParam) {
+	if (itemToolTipHandle != 0) OS.ShowWindow (itemToolTipHandle, OS.SW_HIDE);
 	/*
 	* Bug in Windows.  When TVS_NOHSCROLL is set when the
 	* size of the tree is zero, the scroll bar is shown the
@@ -7026,7 +7068,7 @@ LRESULT wmNotifyChild (NMHDR hdr, int /*long*/ wParam, int /*long*/ lParam) {
 					}
 				}
 				if (checkVisible) {
-					if (drawCount != 0 || !OS.IsWindowVisible (handle)) break;
+					if (!getDrawing () || !OS.IsWindowVisible (handle)) break;
 					RECT itemRect = new RECT ();
 					if (!OS.TreeView_GetItemRect (handle, lptvdi.hItem, itemRect, false)) {
 						break;
@@ -7260,10 +7302,11 @@ LRESULT wmNotifyChild (NMHDR hdr, int /*long*/ wParam, int /*long*/ lParam) {
 		}
 		case OS.TVN_ITEMEXPANDINGA:
 		case OS.TVN_ITEMEXPANDINGW: {
+			if (itemToolTipHandle != 0) OS.ShowWindow (itemToolTipHandle, OS.SW_HIDE);
 			boolean runExpanded = false;
 			if ((style & SWT.VIRTUAL) != 0) style &= ~SWT.DOUBLE_BUFFERED;
 			if (hooks (SWT.EraseItem) || hooks (SWT.PaintItem)) style &= ~SWT.DOUBLE_BUFFERED;
-			if (findImageControl () != null && drawCount == 0 && OS.IsWindowVisible (handle)) {
+			if (findImageControl () != null && getDrawing () && OS.IsWindowVisible (handle)) {
 				OS.DefWindowProc (handle, OS.WM_SETREDRAW, 0, 0);
 			}
 			/*
@@ -7328,7 +7371,7 @@ LRESULT wmNotifyChild (NMHDR hdr, int /*long*/ wParam, int /*long*/ lParam) {
 		case OS.TVN_ITEMEXPANDEDW: {
 			if ((style & SWT.VIRTUAL) != 0) style |= SWT.DOUBLE_BUFFERED;
 			if (hooks (SWT.EraseItem) || hooks (SWT.PaintItem)) style |= SWT.DOUBLE_BUFFERED;
-			if (findImageControl () != null && drawCount == 0 /*&& OS.IsWindowVisible (handle)*/) {
+			if (findImageControl () != null && getDrawing () /*&& OS.IsWindowVisible (handle)*/) {
 				OS.DefWindowProc (handle, OS.WM_SETREDRAW, 1, 0);
 				OS.InvalidateRect (handle, null, true);
 			}

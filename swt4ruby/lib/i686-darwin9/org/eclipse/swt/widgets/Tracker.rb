@@ -1,6 +1,6 @@
 require "rjava"
 
-# Copyright (c) 2000, 2008 IBM Corporation and others.
+# Copyright (c) 2000, 2009 IBM Corporation and others.
 # All rights reserved. This program and the accompanying materials
 # are made available under the terms of the Eclipse Public License v1.0
 # which accompanies this distribution, and is available at
@@ -16,10 +16,7 @@ module Org::Eclipse::Swt::Widgets
       include ::Org::Eclipse::Swt::Graphics
       include ::Org::Eclipse::Swt
       include ::Org::Eclipse::Swt::Events
-      include_const ::Org::Eclipse::Swt::Internal::Carbon, :OS
-      include_const ::Org::Eclipse::Swt::Internal::Carbon, :CGPoint
-      include_const ::Org::Eclipse::Swt::Internal::Carbon, :CGRect
-      include_const ::Org::Eclipse::Swt::Internal::Carbon, :Rect
+      include ::Org::Eclipse::Swt::Internal::Cocoa
     }
   end
   
@@ -43,6 +40,7 @@ module Org::Eclipse::Swt::Widgets
   # 
   # @see <a href="http://www.eclipse.org/swt/snippets/#tracker">Tracker snippets</a>
   # @see <a href="http://www.eclipse.org/swt/">Sample code and further information</a>
+  # @noextend This class is not intended to be subclassed by clients.
   class Tracker < TrackerImports.const_get :Widget
     include_class_members TrackerImports
     
@@ -182,7 +180,7 @@ module Org::Eclipse::Swt::Widgets
       @bounds = nil
       @cursor_orientation = 0
       @in_event = false
-      @window = 0
+      @window = nil
       @old_x = 0
       @old_y = 0
       super(parent, check_style(style))
@@ -226,6 +224,7 @@ module Org::Eclipse::Swt::Widgets
     # @see SWT#RIGHT
     # @see SWT#UP
     # @see SWT#DOWN
+    # @see SWT#RESIZE
     def initialize(display, style)
       @parent = nil
       @tracking = false
@@ -238,7 +237,7 @@ module Org::Eclipse::Swt::Widgets
       @bounds = nil
       @cursor_orientation = 0
       @in_event = false
-      @window = 0
+      @window = nil
       @old_x = 0
       @old_y = 0
       super()
@@ -328,11 +327,8 @@ module Org::Eclipse::Swt::Widgets
         new_x = pt.attr_x
         new_y = pt.attr_y
       end
-      pt = CGPoint.new
-      pt.attr_x = new_x
-      pt.attr_y = new_y
-      OS._cgwarp_mouse_cursor_position(pt)
-      return Point.new(RJava.cast_to_int(pt.attr_x), RJava.cast_to_int(pt.attr_y))
+      self.attr_display.set_cursor_location(new_x, new_y)
+      return Point.new(new_x, new_y)
     end
     
     typesig { [::Java::Boolean] }
@@ -367,10 +363,7 @@ module Org::Eclipse::Swt::Widgets
         new_y = pt.attr_y
       end
       if (move_pointer)
-        pt = CGPoint.new
-        pt.attr_x = new_x
-        pt.attr_y = new_y
-        OS._cgwarp_mouse_cursor_position(pt)
+        self.attr_display.set_cursor_location(new_x, new_y)
       end
       # If the client has not provided a custom cursor then determine
       # the appropriate resize cursor.
@@ -396,7 +389,9 @@ module Org::Eclipse::Swt::Widgets
         else
           new_cursor = Cursor.new(self.attr_display, SWT::CURSOR_SIZEALL)
         end
-        self.attr_display.set_cursor(new_cursor.attr_handle)
+        self.attr_display.attr_lock_cursor = false
+        new_cursor.attr_handle.set
+        self.attr_display.attr_lock_cursor = true
         if (!(@resize_cursor).nil?)
           @resize_cursor.dispose
         end
@@ -488,42 +483,51 @@ module Org::Eclipse::Swt::Widgets
       return result
     end
     
-    typesig { [::Java::Int, Array.typed(Rectangle), ::Java::Boolean] }
+    typesig { [NSWindow, Array.typed(Rectangle), ::Java::Boolean] }
     def draw_rectangles(window, rects, erase)
-      context = Array.typed(::Java::Int).new(1) { 0 }
-      port = OS._get_window_port(window)
-      port_rect = Rect.new
-      OS._get_port_bounds(port, port_rect)
-      OS._qdbegin_cgcontext(port, context)
-      OS._cgcontext_scale_ctm(context[0], 1, -1)
-      OS._cgcontext_translate_ctm(context[0], 0, port_rect.attr_top - port_rect.attr_bottom)
-      cg_rect = CGRect.new
+      context = window.graphics_context
+      NSGraphicsContext.static_save_graphics_state
+      NSGraphicsContext.set_current_context(context)
+      context.save_graphics_state
       parent_origin = nil
       if (!(@parent).nil?)
         parent_origin = self.attr_display.map(@parent, nil, 0, 0)
       else
         parent_origin = Point.new(0, 0)
       end
+      context.set_compositing_operation(erase ? OS::NSCompositeClear : OS::NSCompositeSourceOver)
+      rect_frame = NSRect.new
+      global_point = NSPoint.new
+      # double
+      screen_height = self.attr_display.get_primary_frame.attr_height
       i = 0
       while i < rects.attr_length
         rect = rects[i]
-        cg_rect.attr_x = rect.attr_x + parent_origin.attr_x
-        cg_rect.attr_y = rect.attr_y + parent_origin.attr_y
-        cg_rect.attr_width = rect.attr_width
-        cg_rect.attr_height = rect.attr_height
+        rect_frame.attr_x = rect.attr_x + parent_origin.attr_x
+        rect_frame.attr_y = screen_height - RJava.cast_to_int(((rect.attr_y + parent_origin.attr_y) + rect.attr_height))
+        rect_frame.attr_width = rect.attr_width
+        rect_frame.attr_height = rect.attr_height
+        global_point.attr_x = rect_frame.attr_x
+        global_point.attr_y = rect_frame.attr_y
+        global_point = window.convert_screen_to_base(global_point)
+        rect_frame.attr_x = global_point.attr_x
+        rect_frame.attr_y = global_point.attr_y
         if (erase)
-          cg_rect.attr_width += 1
-          cg_rect.attr_height += 1
-          OS._cgcontext_clear_rect(context[0], cg_rect)
+          rect_frame.attr_width += 1
+          rect_frame.attr_height += 1
+          NSBezierPath.fill_rect(rect_frame)
         else
-          cg_rect.attr_x += 0.5
-          cg_rect.attr_y += 0.5
-          OS._cgcontext_stroke_rect(context[0], cg_rect)
+          rect_frame.attr_x += 0.5
+          rect_frame.attr_y += 0.5
+          NSBezierPath.stroke_rect(rect_frame)
         end
         i += 1
       end
-      OS._cgcontext_synchronize(context[0])
-      OS._qdend_cgcontext(port, context)
+      if (!erase)
+        context.flush_graphics
+      end
+      context.restore_graphics_state
+      NSGraphicsContext.static_restore_graphics_state
     end
     
     typesig { [] }
@@ -563,13 +567,18 @@ module Org::Eclipse::Swt::Widgets
       return @stippled
     end
     
-    typesig { [::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int] }
-    def k_event_mouse(event_kind, next_handler, the_event, user_data)
-      sizeof = Org::Eclipse::Swt::Internal::Carbon::Point.attr_sizeof
-      where = Org::Eclipse::Swt::Internal::Carbon::Point.new
-      OS._get_event_parameter(the_event, OS.attr_k_event_param_mouse_location, OS.attr_type_qdpoint, nil, sizeof, nil, where)
-      new_x = where.attr_h
-      new_y = where.attr_v
+    typesig { [NSEvent] }
+    def mouse(ns_event)
+      location = nil
+      if ((ns_event).nil? || (ns_event.type).equal?(OS::NSMouseMoved))
+        location = NSEvent.mouse_location
+      else
+        location = ns_event.location_in_window
+        location = ns_event.window.convert_base_to_screen(location)
+      end
+      location.attr_y = self.attr_display.get_primary_frame.attr_height - location.attr_y
+      new_x = RJava.cast_to_int(location.attr_x)
+      new_y = RJava.cast_to_int(location.attr_y)
       if (!(new_x).equal?(@old_x) || !(new_y).equal?(@old_y))
         old_rectangles = @rectangles
         rects_to_erase = Array.typed(Rectangle).new(@rectangles.attr_length) { nil }
@@ -593,7 +602,7 @@ module Org::Eclipse::Swt::Widgets
           # that the tracking has failed.
           if (is_disposed)
             @cancelled = true
-            return OS.attr_no_err
+            return
           end
           draw = false
           # It is possible that application code could have
@@ -637,7 +646,7 @@ module Org::Eclipse::Swt::Widgets
           # that the tracking has failed.
           if (is_disposed)
             @cancelled = true
-            return OS.attr_no_err
+            return
           end
           draw = false
           # It is possible that application code could have
@@ -669,28 +678,23 @@ module Org::Eclipse::Swt::Widgets
         @old_x = new_x
         @old_y = new_y
       end
-      @tracking = !(event_kind).equal?(OS.attr_k_event_mouse_up)
-      return 0
-    end
-    
-    typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
-    def k_event_mouse_dragged(next_handler, the_event, user_data)
-      return k_event_mouse(OS.attr_k_event_mouse_dragged, next_handler, the_event, user_data)
-    end
-    
-    typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
-    def k_event_raw_key_pressed(next_handler, the_event, user_data)
-      if (!send_key_event(SWT::KeyDown, the_event))
-        return OS.attr_no_err
+      # 64
+      case (RJava.cast_to_int(ns_event.type))
+      when OS::NSLeftMouseUp, OS::NSRightMouseUp, OS::NSOtherMouseUp
+        @tracking = false
       end
-      key_code = Array.typed(::Java::Int).new(1) { 0 }
-      OS._get_event_parameter(the_event, OS.attr_k_event_param_key_code, OS.attr_type_uint32, nil, key_code.attr_length * 4, nil, key_code)
-      modifiers = Array.typed(::Java::Int).new(1) { 0 }
-      OS._get_event_parameter(the_event, OS.attr_k_event_param_key_modifiers, OS.attr_type_uint32, nil, 4, nil, modifiers)
-      step_size = !((modifiers[0] & OS.attr_control_key)).equal?(0) ? STEPSIZE_SMALL : STEPSIZE_LARGE
+    end
+    
+    typesig { [NSEvent] }
+    def key(ns_event)
+      # TODO send event
+      # if (!sendKeyEvent (SWT.KeyDown, theEvent)) return OS.noErr;
+      # long
+      modifier_flags_ = ns_event.modifier_flags
+      step_size = !((modifier_flags_ & OS::NSControlKeyMask)).equal?(0) ? STEPSIZE_SMALL : STEPSIZE_LARGE
       x_change = 0
       y_change = 0
-      case (key_code[0])
+      case (ns_event.key_code)
       # KP Enter
       when 53
         # Esc
@@ -738,7 +742,7 @@ module Org::Eclipse::Swt::Widgets
           # that the tracking has failed.
           if (is_disposed)
             @cancelled = true
-            return OS.attr_no_err
+            return
           end
           draw = false
           # It is possible that application code could have
@@ -778,7 +782,7 @@ module Org::Eclipse::Swt::Widgets
           # that the tracking has failed.
           if (is_disposed)
             @cancelled = true
-            return OS.attr_no_err
+            return
           end
           draw = false
           # It is possible that application code could have
@@ -813,17 +817,6 @@ module Org::Eclipse::Swt::Widgets
           @old_y = cursor_pos.attr_y
         end
       end
-      return 0
-    end
-    
-    typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
-    def k_event_mouse_moved(next_handler, the_event, user_data)
-      return k_event_mouse(OS.attr_k_event_mouse_moved, next_handler, the_event, user_data)
-    end
-    
-    typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
-    def k_event_mouse_up(next_handler, the_event, user_data)
-      return k_event_mouse(OS.attr_k_event_mouse_up, next_handler, the_event, user_data)
     end
     
     typesig { [::Java::Int, ::Java::Int] }
@@ -869,10 +862,72 @@ module Org::Eclipse::Swt::Widgets
     # </ul>
     def open
       check_widget
+      display = self.attr_display
       @cancelled = false
       @tracking = true
-      @window = self.attr_display.create_overlay_window
-      OS._show_window(@window)
+      @window = NSWindow.new.alloc
+      screens_ = NSScreen.screens
+      # double
+      min_x = Float::MAX_VALUE
+      max_x = Float::MIN_VALUE
+      # double
+      min_y = Float::MAX_VALUE
+      max_y = Float::MIN_VALUE
+      # 64
+      count_ = RJava.cast_to_int(screens_.count)
+      i = 0
+      while i < count_
+        screen = NSScreen.new(screens_.object_at_index(i))
+        frame_ = screen.frame
+        # double
+        x1 = frame_.attr_x
+        x2 = frame_.attr_x + frame_.attr_width
+        # double
+        y1 = frame_.attr_y
+        y2 = frame_.attr_y + frame_.attr_height
+        if (x1 < min_x)
+          min_x = x1
+        end
+        if (x2 < min_x)
+          min_x = x2
+        end
+        if (x1 > max_x)
+          max_x = x1
+        end
+        if (x2 > max_x)
+          max_x = x2
+        end
+        if (y1 < min_y)
+          min_y = y1
+        end
+        if (y2 < min_y)
+          min_y = y2
+        end
+        if (y1 > max_y)
+          max_y = y1
+        end
+        if (y2 > max_y)
+          max_y = y2
+        end
+        i += 1
+      end
+      frame_ = NSRect.new
+      frame_.attr_x = min_x
+      frame_.attr_y = min_y
+      frame_.attr_width = max_x - min_x
+      frame_.attr_height = max_y - min_y
+      @window = @window.init_with_content_rect(frame_, OS::NSBorderlessWindowMask, OS::NSBackingStoreBuffered, false)
+      @window.set_opaque(false)
+      @window.set_content_view(nil)
+      @window.set_background_color(NSColor.clear_color)
+      context = @window.graphics_context
+      NSGraphicsContext.static_save_graphics_state
+      NSGraphicsContext.set_current_context(context)
+      context.set_compositing_operation(OS::NSCompositeClear)
+      frame_.attr_x = frame_.attr_y = 0
+      NSBezierPath.fill_rect(frame_)
+      NSGraphicsContext.static_restore_graphics_state
+      @window.order_front_regardless
       draw_rectangles(@window, @rectangles, false)
       # If exactly one of UP/DOWN is specified as a style then set the cursor
       # orientation accordingly (the same is done for LEFT/RIGHT styles below).
@@ -885,10 +940,18 @@ module Org::Eclipse::Swt::Widgets
         @cursor_orientation |= h_style
       end
       cursor_pos = nil
-      if (OS._still_down)
-        pt = Org::Eclipse::Swt::Internal::Carbon::Point.new
-        OS._get_global_mouse(pt)
-        cursor_pos = Point.new(pt.attr_h, pt.attr_v)
+      down = false
+      application = NSApplication.shared_application
+      current_event_ = application.current_event
+      if (!(current_event_).nil?)
+        # 64
+        case (RJava.cast_to_int(current_event_.type))
+        when OS::NSLeftMouseDown, OS::NSLeftMouseDragged, OS::NSRightMouseDown, OS::NSRightMouseDragged, OS::NSOtherMouseDown, OS::NSOtherMouseDragged
+          down = true
+        end
+      end
+      if (down)
+        cursor_pos = display.get_cursor_location
       else
         if (!((self.attr_style & SWT::RESIZE)).equal?(0))
           cursor_pos = adjust_resize_cursor(true)
@@ -900,64 +963,54 @@ module Org::Eclipse::Swt::Widgets
         @old_x = cursor_pos.attr_x
         @old_y = cursor_pos.attr_y
       end
+      old_tracking_control = display.attr_tracking_control
+      display.attr_tracking_control = nil
       # Tracker behaves like a Dialog with its own OS event loop.
-      out_event = Array.typed(::Java::Int).new(1) { 0 }
       while (@tracking && !@cancelled)
-        status = OS._receive_next_event(0, nil, OS.attr_k_event_duration_no_wait, true, out_event)
-        if (!(status).equal?(OS.attr_no_err))
-          next
-        end
-        event = out_event[0]
-        event_class = OS._get_event_class(event)
-        event_kind = OS._get_event_kind(event)
-        next_handler = 0
-        case (event_class)
-        when OS.attr_k_event_class_mouse
-          case (event_kind)
-          when OS.attr_k_event_mouse_up
-            k_event_mouse_up(next_handler, event, 0)
-          when OS.attr_k_event_mouse_moved
-            k_event_mouse_moved(next_handler, event, 0)
-          when OS.attr_k_event_mouse_dragged
-            k_event_mouse_dragged(next_handler, event, 0)
+        display.add_pool
+        begin
+          event = application.next_event_matching_mask(0, NSDate.distant_future, OS::NSDefaultRunLoopMode, true)
+          if ((event).nil?)
+            next
           end
-        when OS.attr_k_event_class_keyboard
-          case (event_kind)
-          when OS.attr_k_event_raw_key_down
-            k_event_raw_key_down(next_handler, event, 0)
-          when OS.attr_k_event_raw_key_modifiers_changed
-            k_event_raw_key_modifiers_changed(next_handler, event, 0)
-          when OS.attr_k_event_raw_key_repeat
-            k_event_raw_key_repeat(next_handler, event, 0)
-          when OS.attr_k_event_raw_key_up
-            k_event_raw_key_up(next_handler, event, 0)
+          # 64
+          type_ = RJava.cast_to_int(event.type)
+          case (type_)
+          # case OS.NSKeyUp:
+          when OS::NSLeftMouseUp, OS::NSRightMouseUp, OS::NSOtherMouseUp, OS::NSMouseMoved, OS::NSLeftMouseDragged, OS::NSRightMouseDragged, OS::NSOtherMouseDragged
+            mouse(event)
+          when OS::NSKeyDown, OS::NSFlagsChanged
+            key(event)
           end
-        end
-        # Don't dispatch mouse and key events in general, EXCEPT once this
-        # tracker has finished its work.
-        dispatch = true
-        if (@tracking && !@cancelled)
-          if ((event_class).equal?(OS.attr_k_event_class_mouse))
+          dispatch = true
+          case (type_)
+          when OS::NSLeftMouseDown, OS::NSLeftMouseUp, OS::NSRightMouseDown, OS::NSRightMouseUp, OS::NSOtherMouseDown, OS::NSOtherMouseUp, OS::NSMouseMoved, OS::NSLeftMouseDragged, OS::NSRightMouseDragged, OS::NSOtherMouseDragged, OS::NSMouseEntered, OS::NSMouseExited, OS::NSKeyDown, OS::NSKeyUp, OS::NSFlagsChanged
             dispatch = false
           end
-          if ((event_class).equal?(OS.attr_k_event_class_keyboard))
-            dispatch = false
+          if (dispatch)
+            application.send_event(event)
           end
-        end
-        if (dispatch)
-          OS._send_event_to_event_target(event, OS._get_event_dispatcher_target)
-        end
-        OS._release_event(event)
-        if (!(@client_cursor).nil? && (@resize_cursor).nil?)
-          self.attr_display.set_cursor(@client_cursor.attr_handle)
+          if (!(@client_cursor).nil? && (@resize_cursor).nil?)
+            display.attr_lock_cursor = false
+            @client_cursor.attr_handle.set
+            display.attr_lock_cursor = true
+          end
+        ensure
+          display.remove_pool
         end
       end
+      if (!(old_tracking_control).nil? && !old_tracking_control.is_disposed)
+        display.attr_tracking_control = old_tracking_control
+      end
+      display.set_cursor(display.find_control(true))
       if (!is_disposed)
         draw_rectangles(@window, @rectangles, true)
       end
-      OS._dispose_window(@window)
+      if (!(@window).nil?)
+        @window.close
+      end
       @tracking = false
-      @window = 0
+      @window = nil
       return !@cancelled
     end
     
@@ -1185,9 +1238,11 @@ module Org::Eclipse::Swt::Widgets
       check_widget
       @client_cursor = new_cursor
       if (!(new_cursor).nil?)
+        self.attr_display.attr_lock_cursor = false
         if (@in_event)
-          self.attr_display.set_cursor(new_cursor.attr_handle)
+          new_cursor.attr_handle.set
         end
+        self.attr_display.attr_lock_cursor = true
       end
     end
     

@@ -1,6 +1,6 @@
 require "rjava"
 
-# Copyright (c) 2000, 2008 IBM Corporation and others.
+# Copyright (c) 2000, 2009 IBM Corporation and others.
 # All rights reserved. This program and the accompanying materials
 # are made available under the terms of the Eclipse Public License v1.0
 # which accompanies this distribution, and is available at
@@ -434,7 +434,7 @@ module Org::Eclipse::Swt::Program
         end
       end
       length_ = file_name.length
-      if (!(length_).equal?(0) && (file_name.char_at(0)).equal?(Character.new(?\".ord)))
+      if (length_ > 1 && (file_name.char_at(0)).equal?(Character.new(?\".ord)))
         if ((file_name.char_at(length_ - 1)).equal?(Character.new(?\".ord)))
           file_name = RJava.cast_to_string(file_name.substring(1, length_ - 1))
         end

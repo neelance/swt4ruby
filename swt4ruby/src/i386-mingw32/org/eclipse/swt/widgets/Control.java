@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2008 IBM Corporation and others.
+ * Copyright (c) 2000, 2009 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -11,6 +11,7 @@
 package org.eclipse.swt.widgets;
 
 
+import org.eclipse.swt.internal.gdip.*;
 import org.eclipse.swt.internal.win32.*;
 import org.eclipse.swt.graphics.*;
 import org.eclipse.swt.*;
@@ -38,6 +39,7 @@ import org.eclipse.swt.accessibility.*;
  * @see <a href="http://www.eclipse.org/swt/snippets/#control">Control snippets</a>
  * @see <a href="http://www.eclipse.org/swt/examples.php">SWT Example: ControlExample</a>
  * @see <a href="http://www.eclipse.org/swt/">Sample code and further information</a>
+ * @noextend This class is not intended to be subclassed by clients.
  */
 
 public abstract class Control extends Widget implements Drawable {
@@ -94,6 +96,8 @@ Control () {
  * </ul>
  *
  * @see SWT#BORDER
+ * @see SWT#LEFT_TO_RIGHT
+ * @see SWT#RIGHT_TO_LEFT
  * @see Widget#checkSubclass
  * @see Widget#getStyle
  */
@@ -568,7 +572,7 @@ public Point computeSize (int wHint, int hHint, boolean changed) {
 	return new Point (width, height);
 }
 
-Control computeTabGroup () {
+Widget computeTabGroup () {
 	if (isTabGroup ()) return this;
 	return parent.computeTabGroup ();
 }
@@ -588,13 +592,13 @@ Control computeTabRoot () {
 	return parent.computeTabRoot ();
 }
 
-Control [] computeTabList () {
+Widget [] computeTabList () {
 	if (isTabGroup ()) {
 		if (getVisible () && getEnabled ()) {
-			return new Control [] {this};
+			return new Widget [] {this};
 		}
 	}
-	return new Control [0];
+	return new Widget [0];
 }
 
 void createHandle () {
@@ -1026,7 +1030,11 @@ public Accessible getAccessible () {
 
 /**
  * Returns the receiver's background color.
- *
+ * <p>
+ * Note: This operation is a hint and may be overridden by the platform.
+ * For example, on some versions of Windows the background of a TabFolder,
+ * is a gradient rather than a solid color.
+ * </p>
  * @return the background color
  *
  * @exception SWTException <ul>
@@ -1181,6 +1189,10 @@ public Cursor getCursor () {
 public boolean getDragDetect () {
 	checkWidget ();
 	return (state & DRAG_DETECT) != 0;
+}
+
+boolean getDrawing () {
+	return drawCount <= 0;
 }
 
 /**
@@ -1457,7 +1469,7 @@ public String getToolTipText () {
  */
 public boolean getVisible () {
 	checkWidget ();
-	if (drawCount != 0) return (state & HIDDEN) == 0;
+	if (!getDrawing()) return (state & HIDDEN) == 0;
 	int bits = OS.GetWindowLong (handle, OS.GWL_STYLE);
 	return (bits & OS.WS_VISIBLE) != 0;
 }
@@ -1946,21 +1958,163 @@ public boolean print (GC gc) {
 	if (gc.isDisposed ()) error (SWT.ERROR_INVALID_ARGUMENT);
 	if (!OS.IsWinCE && OS.WIN32_VERSION >= OS.VERSION (5, 1)) {
 		int /*long*/ topHandle = topHandle ();
-		int bits = OS.GetWindowLong (topHandle, OS.GWL_STYLE);
-		if ((bits & OS.WS_VISIBLE) == 0) {
-			OS.DefWindowProc (topHandle, OS.WM_SETREDRAW, 1, 0);
+		int /*long*/ hdc = gc.handle;
+		int state = 0;
+		int /*long*/ gdipGraphics = gc.getGCData().gdipGraphics;
+		if (gdipGraphics != 0) {
+			int /*long*/ clipRgn = 0;
+			Gdip.Graphics_SetPixelOffsetMode(gdipGraphics, Gdip.PixelOffsetModeNone);
+			int /*long*/ rgn = Gdip.Region_new();
+			if (rgn == 0) SWT.error(SWT.ERROR_NO_HANDLES);
+			Gdip.Graphics_GetClip(gdipGraphics, rgn);
+			if (!Gdip.Region_IsInfinite(rgn, gdipGraphics)) {
+				clipRgn = Gdip.Region_GetHRGN(rgn, gdipGraphics);
+			}
+			Gdip.Region_delete(rgn);
+			Gdip.Graphics_SetPixelOffsetMode(gdipGraphics, Gdip.PixelOffsetModeHalf);
+			float[] lpXform = null;
+			int /*long*/ matrix = Gdip.Matrix_new(1, 0, 0, 1, 0, 0);
+			if (matrix == 0) SWT.error(SWT.ERROR_NO_HANDLES);
+			Gdip.Graphics_GetTransform(gdipGraphics, matrix);
+			if (!Gdip.Matrix_IsIdentity(matrix)) {
+				lpXform = new float[6];
+				Gdip.Matrix_GetElements(matrix, lpXform);
+			}
+			Gdip.Matrix_delete(matrix);
+			hdc = Gdip.Graphics_GetHDC(gdipGraphics);
+			state = OS.SaveDC(hdc);
+			if (lpXform != null) {
+				OS.SetGraphicsMode(hdc, OS.GM_ADVANCED);
+				OS.SetWorldTransform(hdc, lpXform);
+			}
+			if (clipRgn != 0) {
+				OS.SelectClipRgn(hdc, clipRgn);
+				OS.DeleteObject(clipRgn);
+			}
 		}
-		printWidget (topHandle, gc);
-		if ((bits & OS.WS_VISIBLE) == 0) {
-			OS.DefWindowProc (topHandle, OS.WM_SETREDRAW, 0, 0);
+		if (OS.IsWinCE) {
+			OS.UpdateWindow (topHandle);
+		} else {
+			int flags = OS.RDW_UPDATENOW | OS.RDW_ALLCHILDREN;
+			OS.RedrawWindow (topHandle, null, 0, flags);
+		}
+		printWidget (topHandle, hdc, gc);
+		if (gdipGraphics != 0) {
+			OS.RestoreDC(hdc, state);
+			Gdip.Graphics_ReleaseHDC(gdipGraphics, hdc);
 		}
 		return true;
 	}
 	return false;
 }
 
-void printWidget (int /*long*/ hwnd, GC gc) {
-	OS.PrintWindow (hwnd, gc.handle, 0);
+void printWidget (int /*long*/ hwnd, int /*long*/ hdc, GC gc) {
+	/*
+	* Bug in Windows.  For some reason, PrintWindow()
+	* returns success but does nothing when it is called
+	* on a printer.  The fix is to just go directly to
+	* WM_PRINT in this case.
+	*/
+	boolean success = false;
+	if (!(OS.GetDeviceCaps(gc.handle, OS.TECHNOLOGY) == OS.DT_RASPRINTER)) {
+		/*
+		* Bug in Windows.  When PrintWindow() will only draw that
+		* portion of a control that is not obscured by the shell.
+		* The fix is temporarily reparent the window to the desktop,
+		* call PrintWindow() then reparent the window back.
+		*/
+		int /*long*/ hwndParent = OS.GetParent (hwnd);
+		int /*long*/ hwndShell = hwndParent;
+		while (OS.GetParent (hwndShell) != 0) {
+			if (OS.GetWindow (hwndShell, OS.GW_OWNER) != 0) break;
+			hwndShell = OS.GetParent (hwndShell);
+		}
+		RECT rect1 = new RECT ();
+		OS.GetWindowRect (hwnd, rect1);
+		boolean fixPrintWindow = !OS.IsWindowVisible(hwnd);
+		if (!fixPrintWindow) {
+			RECT rect2 = new RECT ();
+			OS.GetWindowRect (hwndShell, rect2);
+			OS.IntersectRect (rect2, rect1, rect2);
+			fixPrintWindow = !OS.EqualRect (rect2, rect1);
+		}
+		/*
+		* Bug in Windows. PrintWindow() does not print portions
+		* of the receiver that are clipped out using SetWindowRgn()
+		* in a parent.  The fix is temporarily reparent the window
+		* to the desktop, call PrintWindow() then reparent the window
+		* back.
+		*/
+		if (!fixPrintWindow) {
+			int /*long*/ rgn = OS.CreateRectRgn(0, 0, 0, 0);
+			int /*long*/ parent = OS.GetParent(hwnd);
+			while (parent != hwndShell && !fixPrintWindow) {
+				if (OS.GetWindowRgn(parent, rgn) != 0) {
+					fixPrintWindow = true;
+				}
+				parent = OS.GetParent(parent);
+			}
+			OS.DeleteObject(rgn);
+		}
+		int bits = OS.GetWindowLong (hwnd, OS.GWL_STYLE);
+		int /*long*/ hwndInsertAfter = OS.GetWindow (hwnd, OS.GW_HWNDPREV);
+		/*
+		* Bug in Windows.  For some reason, when GetWindow ()
+		* with GW_HWNDPREV is used to query the previous window
+		* in the z-order with the first child, Windows returns
+		* the first child instead of NULL.  The fix is to detect
+		* this case and move the control to the top.
+		*/
+		if (hwndInsertAfter == 0 || hwndInsertAfter == hwnd) {
+			hwndInsertAfter = OS.HWND_TOP;
+		}
+		if (fixPrintWindow) {
+			int x = OS.GetSystemMetrics (OS.SM_XVIRTUALSCREEN);
+			int y = OS.GetSystemMetrics (OS.SM_YVIRTUALSCREEN);	
+			int width = OS.GetSystemMetrics (OS.SM_CXVIRTUALSCREEN);
+			int height = OS.GetSystemMetrics (OS.SM_CYVIRTUALSCREEN);
+			int flags = OS.SWP_NOSIZE | OS.SWP_NOZORDER | OS.SWP_NOACTIVATE | OS.SWP_DRAWFRAME;
+			if ((bits & OS.WS_VISIBLE) != 0) {
+				OS.DefWindowProc (hwnd, OS.WM_SETREDRAW, 0, 0);
+			}
+			SetWindowPos (hwnd, 0, x + width, y + height, 0, 0, flags);
+			OS.SetParent (hwnd, 0);
+			if ((bits & OS.WS_VISIBLE) != 0) {
+				OS.DefWindowProc (hwnd, OS.WM_SETREDRAW, 1, 0);
+			}
+		}
+		if ((bits & OS.WS_VISIBLE) == 0) {
+			OS.DefWindowProc (hwnd, OS.WM_SETREDRAW, 1, 0);
+		}
+		success = OS.PrintWindow (hwnd, hdc, 0);
+		if ((bits & OS.WS_VISIBLE) == 0) {
+			OS.DefWindowProc (hwnd, OS.WM_SETREDRAW, 0, 0);
+		}
+		if (fixPrintWindow) {
+			if ((bits & OS.WS_VISIBLE) != 0) {
+				OS.DefWindowProc (hwnd, OS.WM_SETREDRAW, 0, 0);
+			}
+			OS.SetParent (hwnd, hwndParent);
+			OS.MapWindowPoints (0, hwndParent, rect1, 2);
+			int flags = OS.SWP_NOSIZE | OS.SWP_NOACTIVATE | OS.SWP_DRAWFRAME;
+			SetWindowPos (hwnd, hwndInsertAfter, rect1.left, rect1.top, rect1.right - rect1.left, rect1.bottom - rect1.top, flags);
+			if ((bits & OS.WS_VISIBLE) != 0) {
+				OS.DefWindowProc (hwnd, OS.WM_SETREDRAW, 1, 0);
+			}
+		}
+	}
+	
+	/*
+	* Bug in Windows.  For some reason, PrintWindow() fails
+	* when it is called on a push button.  The fix is to
+	* detect the failure and use WM_PRINT instead.  Note
+	* that WM_PRINT cannot be used all the time because it
+	* fails for browser controls when the browser has focus.
+	*/
+	if (!success) {
+		int flags = OS.PRF_CLIENT | OS.PRF_NONCLIENT | OS.PRF_ERASEBKGND | OS.PRF_CHILDREN;
+		OS.SendMessage (hwnd, OS.WM_PRINT, hdc, flags);
+	}
 }
 
 /**
@@ -2973,7 +3127,7 @@ public void setMenu (Menu menu) {
 	this.menu = menu;
 }
 
-boolean setRadioFocus () {
+boolean setRadioFocus (boolean tabbing) {
 	return false;
 }
 
@@ -3126,10 +3280,6 @@ public void setSize (Point size) {
 	setSize (size.x, size.y);
 }
 
-boolean setTabGroupFocus () {
-	return setTabItemFocus ();
-}
-
 boolean setTabItemFocus () {
 	if (!isShowing ()) return false;
 	return forceFocus ();
@@ -3137,8 +3287,17 @@ boolean setTabItemFocus () {
 
 /**
  * Sets the receiver's tool tip text to the argument, which
- * may be null indicating that no tool tip text should be shown.
- *
+ * may be null indicating that the default tool tip for the 
+ * control will be shown. For a control that has a default
+ * tool tip, such as the Tree control on Windows, setting
+ * the tool tip text to an empty string replaces the default,
+ * causing no tool tip text to be shown.
+ * <p>
+ * The mnemonic indicator (character '&amp;') is not displayed in a tool tip.
+ * To display a single '&amp;' in the tool tip, the character '&amp;' can be 
+ * escaped by doubling it in the string.
+ * </p>
+ * 
  * @param string the new tool tip text (or null)
  *
  * @exception SWTException <ul>
@@ -3174,7 +3333,7 @@ void setToolTipText (Shell shell, String string) {
  */
 public void setVisible (boolean visible) {
 	checkWidget ();
-	if (drawCount != 0) {
+	if (!getDrawing()) {
 		if (((state & HIDDEN) == 0) == visible) return;
 	} else {
 		int bits = OS.GetWindowLong (handle, OS.GWL_STYLE);
@@ -3200,7 +3359,7 @@ public void setVisible (boolean visible) {
 			fixFocus = isFocusAncestor (control);
 		}
 	}
-	if (drawCount != 0) {
+	if (!getDrawing()) {
 		state = visible ? state & ~HIDDEN : state | HIDDEN;
 	} else {
 		showWidget (visible);
@@ -3543,8 +3702,8 @@ boolean traverseEscape () {
 
 boolean traverseGroup (boolean next) {
 	Control root = computeTabRoot ();
-	Control group = computeTabGroup ();
-	Control [] list = root.computeTabList ();
+	Widget group = computeTabGroup ();
+	Widget [] list = root.computeTabList ();
 	int length = list.length;
 	int index = 0;
 	while (index < length) {
@@ -3560,8 +3719,8 @@ boolean traverseGroup (boolean next) {
 	if (index == length) return false;
 	int start = index, offset = (next) ? 1 : -1;
 	while ((index = ((index + offset + length) % length)) != start) {
-		Control control = list [index];
-		if (!control.isDisposed () && control.setTabGroupFocus ()) {
+		Widget widget = list [index];
+		if (!widget.isDisposed () && widget.setTabGroupFocus ()) {
 			return true;
 		}
 	}
@@ -4603,7 +4762,7 @@ LRESULT WM_WINDOWPOSCHANGING (int /*long*/ wParam, int /*long*/ lParam) {
 	* not redraw the area where the control once was in the parent.
 	* The fix is to detect this case and redraw the area.
 	*/
-	if (drawCount != 0) {
+	if (!getDrawing()) {
 		Shell shell = getShell ();
 		if (shell != this) {
 			WINDOWPOS lpwp = new WINDOWPOS ();

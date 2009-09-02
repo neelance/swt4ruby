@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2008 IBM Corporation and others.
+ * Copyright (c) 2000, 2009 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -28,7 +28,7 @@ import org.eclipse.swt.internal.opengl.win32.*;
 public class GLCanvas extends Canvas {
 	int /*long*/ context;
 	int pixelFormat;
-
+	static final String USE_OWNDC_KEY = "org.eclipse.swt.internal.win32.useOwnDC"; //$NON-NLS-1$
 /**
  * Create a GLCanvas widget using the attributes described in the GLData
  * object provided.
@@ -43,7 +43,8 @@ public class GLCanvas extends Canvas {
  * </ul>
  */
 public GLCanvas (Composite parent, int style, GLData data) {
-	super (parent, style);
+	super (parent, checkStyle (parent, style));
+	parent.getDisplay ().setData (USE_OWNDC_KEY, new Boolean (false));
 	if (data == null) SWT.error (SWT.ERROR_NULL_ARGUMENT);
 	PIXELFORMATDESCRIPTOR pfd = new PIXELFORMATDESCRIPTOR ();
 	pfd.nSize = (short) PIXELFORMATDESCRIPTOR.sizeof;
@@ -88,8 +89,9 @@ public GLCanvas (Composite parent, int style, GLData data) {
 		SWT.error (SWT.ERROR_NO_HANDLES);
 	}
 	OS.ReleaseDC (handle, hDC);
-	//FIXME- share lists
-	//if (share != null) WGL.wglShareLists (context, share.context);
+	if (data.shareContext != null) {
+		WGL.wglShareLists (data.shareContext.context, context);
+	}
 	
 	Listener listener = new Listener () {
 		public void handleEvent (Event event) {
@@ -101,6 +103,15 @@ public GLCanvas (Composite parent, int style, GLData data) {
 		}
 	};
 	addListener (SWT.Dispose, listener);
+}
+
+static int checkStyle(Composite parent, int style) {
+	if (parent != null) {
+		if (!OS.IsWinCE && OS.WIN32_VERSION >= OS.VERSION (6, 0)) {
+			parent.getDisplay ().setData (USE_OWNDC_KEY, new Boolean (true));
+		}
+	}
+	return style;
 }
 
 /**

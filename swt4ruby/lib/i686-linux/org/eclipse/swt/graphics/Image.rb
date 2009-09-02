@@ -709,6 +709,15 @@ module Org::Eclipse::Swt::Graphics
       if ((filename).nil?)
         SWT.error(SWT::ERROR_NULL_ARGUMENT)
       end
+      init_native(filename)
+      if ((@pixmap).equal?(0))
+        init(ImageData.new(filename))
+      end
+      init
+    end
+    
+    typesig { [String] }
+    def init_native(filename)
       begin
         length_ = filename.length
         chars = CharArray.new(length_)
@@ -755,12 +764,9 @@ module Org::Eclipse::Swt::Graphics
             SWT.error(SWT::ERROR_NO_HANDLES)
           end
           OS.g_object_unref(pixbuf)
-          return
         end
       rescue SWTException => e
       end
-      init(ImageData.new(filename))
-      init
     end
     
     typesig { [::Java::Int, ::Java::Int] }
@@ -1133,8 +1139,7 @@ module Org::Eclipse::Swt::Graphics
       OS.memmove(src_data, pixels, src_data.attr_length)
       OS.g_object_unref(pixbuf)
       palette = PaletteData.new(0xff0000, 0xff00, 0xff)
-      data = ImageData.new(width, height, 24, palette)
-      data.attr_data = src_data
+      data = ImageData.new(width, height, 24, palette, 4, src_data)
       data.attr_bytes_per_line = stride
       if ((@transparent_pixel).equal?(-1) && (@type).equal?(SWT::ICON) && !(@mask).equal?(0))
         # Get the icon mask data

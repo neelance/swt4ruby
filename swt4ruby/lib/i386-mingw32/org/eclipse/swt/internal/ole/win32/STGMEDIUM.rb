@@ -1,6 +1,6 @@
 require "rjava"
 
-# Copyright (c) 2000, 2006 IBM Corporation and others.
+# Copyright (c) 2000, 2008 IBM Corporation and others.
 # All rights reserved. This program and the accompanying materials
 # are made available under the terms of the Eclipse Public License v1.0
 # which accompanies this distribution, and is available at
@@ -25,6 +25,7 @@ module Org::Eclipse::Swt::Internal::Ole::Win32
     alias_method :attr_tymed=, :tymed=
     undef_method :tymed=
     
+    # @field accessor=hGlobal,cast=(HGLOBAL)
     # long
     attr_accessor :union_field
     alias_method :attr_union_field, :union_field
@@ -32,6 +33,7 @@ module Org::Eclipse::Swt::Internal::Ole::Win32
     alias_method :attr_union_field=, :union_field=
     undef_method :union_field=
     
+    # @field cast=(IUnknown *)
     # long
     attr_accessor :p_unk_for_release
     alias_method :attr_p_unk_for_release, :p_unk_for_release

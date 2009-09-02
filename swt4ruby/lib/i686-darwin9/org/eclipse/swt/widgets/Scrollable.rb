@@ -1,6 +1,6 @@
 require "rjava"
 
-# Copyright (c) 2000, 2008 IBM Corporation and others.
+# Copyright (c) 2000, 2009 IBM Corporation and others.
 # All rights reserved. This program and the accompanying materials
 # are made available under the terms of the Eclipse Public License v1.0
 # which accompanies this distribution, and is available at
@@ -13,10 +13,7 @@ module Org::Eclipse::Swt::Widgets
     class_module.module_eval {
       include ::Java::Lang
       include ::Org::Eclipse::Swt::Widgets
-      include_const ::Org::Eclipse::Swt::Internal::Carbon, :OS
-      include_const ::Org::Eclipse::Swt::Internal::Carbon, :CGRect
-      include_const ::Org::Eclipse::Swt::Internal::Carbon, :Rect
-      include_const ::Org::Eclipse::Swt::Internal::Carbon, :ControlKind
+      include ::Org::Eclipse::Swt::Internal::Cocoa
       include ::Org::Eclipse::Swt
       include ::Org::Eclipse::Swt::Graphics
     }
@@ -36,14 +33,15 @@ module Org::Eclipse::Swt::Widgets
   # </p>
   # 
   # @see <a href="http://www.eclipse.org/swt/">Sample code and further information</a>
+  # @noextend This class is not intended to be subclassed by clients.
   class Scrollable < ScrollableImports.const_get :Control
     include_class_members ScrollableImports
     
-    attr_accessor :scrolled_handle
-    alias_method :attr_scrolled_handle, :scrolled_handle
-    undef_method :scrolled_handle
-    alias_method :attr_scrolled_handle=, :scrolled_handle=
-    undef_method :scrolled_handle=
+    attr_accessor :scroll_view
+    alias_method :attr_scroll_view, :scroll_view
+    undef_method :scroll_view
+    alias_method :attr_scroll_view=, :scroll_view=
+    undef_method :scroll_view=
     
     attr_accessor :horizontal_bar
     alias_method :attr_horizontal_bar, :horizontal_bar
@@ -59,7 +57,7 @@ module Org::Eclipse::Swt::Widgets
     
     typesig { [] }
     def initialize
-      @scrolled_handle = 0
+      @scroll_view = nil
       @horizontal_bar = nil
       @vertical_bar = nil
       super()
@@ -95,10 +93,21 @@ module Org::Eclipse::Swt::Widgets
     # @see Widget#checkSubclass
     # @see Widget#getStyle
     def initialize(parent, style)
-      @scrolled_handle = 0
+      @scroll_view = nil
       @horizontal_bar = nil
       @vertical_bar = nil
       super(parent, style)
+    end
+    
+    typesig { [::Java::Int, ::Java::Int] }
+    # long
+    # long
+    def accessibility_is_ignored(id, sel)
+      # Always ignore scrollers.
+      if (!(@scroll_view).nil? && (id).equal?(@scroll_view.attr_id))
+        return true
+      end
+      return super(id, sel)
     end
     
     typesig { [::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int] }
@@ -129,40 +138,60 @@ module Org::Eclipse::Swt::Widgets
     # @see #getClientArea
     def compute_trim(x, y, width, height)
       check_widget
-      out_metric = Array.typed(::Java::Int).new(1) { 0 }
-      OS._get_theme_metric(OS.attr_k_theme_metric_scroll_bar_width, out_metric)
-      if (!(@horizontal_bar).nil?)
-        height += out_metric[0]
+      if (!(@scroll_view).nil?)
+        size = NSSize.new
+        size.attr_width = width
+        size.attr_height = height
+        border = has_border ? OS::NSBezelBorder : OS::NSNoBorder
+        size = NSScrollView.frame_size_for_content_size(size, !((self.attr_style & SWT::H_SCROLL)).equal?(0), !((self.attr_style & SWT::V_SCROLL)).equal?(0), border)
+        width = RJava.cast_to_int(size.attr_width)
+        height = RJava.cast_to_int(size.attr_height)
+        frame = @scroll_view.content_view.frame
+        x -= frame.attr_x
+        y -= frame.attr_y
       end
-      if (!(@vertical_bar).nil?)
-        width += out_metric[0]
-      end
-      inset_ = inset
-      x -= inset_.attr_left
-      y -= inset_.attr_top
-      width += inset_.attr_left + inset_.attr_right
-      height += inset_.attr_top + inset_.attr_bottom
       return Rectangle.new(x, y, width, height)
     end
     
     typesig { [::Java::Int] }
     def create_scroll_bar(style)
-      return ScrollBar.new(self, style)
-    end
-    
-    typesig { [::Java::Int] }
-    def create_standard_bar(style)
-      bar_handle = find_standard_bar(style)
-      if ((bar_handle).equal?(0))
+      if ((@scroll_view).nil?)
         return nil
       end
       bar = ScrollBar.new
       bar.attr_parent = self
       bar.attr_style = style
       bar.attr_display = self.attr_display
-      bar.attr_handle = bar_handle
+      scroller = nil
+      # long
+      action_selector = 0
+      rect = NSRect.new
+      if (!((style & SWT::H_SCROLL)).equal?(0))
+        rect.attr_width = 1
+      else
+        rect.attr_height = 1
+      end
+      scroller = SWTScroller.new.alloc
+      scroller.init_with_frame(rect)
+      if (!((style & SWT::H_SCROLL)).equal?(0))
+        @scroll_view.set_horizontal_scroller(scroller)
+        action_selector = OS.attr_sel_send_horizontal_selection
+      else
+        @scroll_view.set_vertical_scroller(scroller)
+        action_selector = OS.attr_sel_send_vertical_selection
+      end
+      bar.attr_view = scroller
+      bar.create_jniref
       bar.register
-      bar.hook_events
+      if (((self.attr_state & CANVAS)).equal?(0))
+        bar.attr_target = scroller.target
+        bar.attr_action_selector = scroller.action
+      end
+      scroller.set_target(@scroll_view)
+      scroller.set_action(action_selector)
+      if (!((self.attr_state & CANVAS)).equal?(0))
+        bar.update_bar(0, 0, 100, 10)
+      end
       return bar
     end
     
@@ -180,65 +209,9 @@ module Org::Eclipse::Swt::Widgets
     typesig { [] }
     def deregister
       super
-      if (!(@scrolled_handle).equal?(0))
-        self.attr_display.remove_widget(@scrolled_handle)
+      if (!(@scroll_view).nil?)
+        self.attr_display.remove_widget(@scroll_view)
       end
-    end
-    
-    typesig { [ScrollBar] }
-    def destroy_scroll_bar(bar)
-      set_scroll_bar_visible(bar, false)
-      bar.destroy_handle
-    end
-    
-    typesig { [::Java::Int] }
-    def find_standard_bar(style)
-      parent_handle = !(@scrolled_handle).equal?(0) ? @scrolled_handle : self.attr_handle
-      count = Array.typed(::Java::Short).new(1) { 0 }
-      OS._count_sub_controls(parent_handle, count)
-      if ((count[0]).equal?(0))
-        return 0
-      end
-      bar_handle = 0
-      out_metric = Array.typed(::Java::Int).new(1) { 0 }
-      OS._get_theme_metric(OS.attr_k_theme_metric_scroll_bar_width, out_metric)
-      out_control = Array.typed(::Java::Int).new(1) { 0 }
-      kind = ControlKind.new
-      property = Array.typed(::Java::Int).new(1) { 0 }
-      i = 0
-      while i < count[0]
-        OS._get_indexed_sub_control(parent_handle, RJava.cast_to_short((i + 1)), out_control)
-        OS._get_control_kind(out_control[0], kind)
-        if ((kind.attr_kind).equal?(OS.attr_k_control_kind_scroll_bar))
-          property[0] = 0
-          OS._get_control_property(out_control[0], Display::SWT0, Display::SWT0, 4, nil, property)
-          if ((property[0]).equal?(0))
-            point = get_control_size(out_control[0])
-            if (!((style & SWT::H_SCROLL)).equal?(0))
-              if ((point.attr_y).equal?(out_metric[0]))
-                bar_handle = out_control[0]
-              end
-            else
-              if ((point.attr_x).equal?(out_metric[0]))
-                bar_handle = out_control[0]
-              end
-            end
-          end
-        end
-        i += 1
-      end
-      return bar_handle
-    end
-    
-    typesig { [] }
-    def get_border_width
-      check_widget
-      if (!((self.attr_state & CANVAS)).equal?(0) && has_border)
-        out_metric = Array.typed(::Java::Int).new(1) { 0 }
-        OS._get_theme_metric(OS.attr_k_theme_metric_edit_text_frame_outset, out_metric)
-        return out_metric[0]
-      end
-      return 0
     end
     
     typesig { [] }
@@ -256,9 +229,15 @@ module Org::Eclipse::Swt::Widgets
     # @see #computeTrim
     def get_client_area
       check_widget
-      rect = Rect.new
-      OS._get_control_bounds(self.attr_handle, rect)
-      return Rectangle.new(0, 0, rect.attr_right - rect.attr_left, rect.attr_bottom - rect.attr_top)
+      if (!(@scroll_view).nil?)
+        size = @scroll_view.content_size
+        content_view_ = @scroll_view.content_view
+        bounds_ = content_view_.bounds
+        return Rectangle.new(RJava.cast_to_int(bounds_.attr_x), RJava.cast_to_int(bounds_.attr_y), RJava.cast_to_int(size.attr_width), RJava.cast_to_int(size.attr_height))
+      else
+        rect = self.attr_view.bounds
+        return Rectangle.new(0, 0, RJava.cast_to_int(rect.attr_width), RJava.cast_to_int(rect.attr_height))
+      end
     end
     
     typesig { [] }
@@ -292,108 +271,47 @@ module Org::Eclipse::Swt::Widgets
     end
     
     typesig { [] }
-    def hook_events
-      super
-      if (!((self.attr_state & CANVAS)).equal?(0) && !(@scrolled_handle).equal?(0))
-        control_proc = self.attr_display.attr_control_proc
-        mask = Array.typed(::Java::Int).new([OS.attr_k_event_class_control, OS.attr_k_event_control_draw, ])
-        control_target = OS._get_control_event_target(@scrolled_handle)
-        OS._install_event_handler(control_target, control_proc, mask.attr_length / 2, mask, @scrolled_handle, nil)
-      end
-    end
-    
-    typesig { [] }
     def hooks_keys
       return hooks(SWT::KeyDown) || hooks(SWT::KeyUp) || hooks(SWT::Traverse)
     end
     
-    typesig { [] }
-    def inset
-      if (!((self.attr_state & CANVAS)).equal?(0))
-        rect = Rect.new
-        out_metric = Array.typed(::Java::Int).new(1) { 0 }
-        if (draw_focus_ring && ((self.attr_style & SWT::NO_FOCUS)).equal?(0) && hooks_keys)
-          OS._get_theme_metric(OS.attr_k_theme_metric_focus_rect_outset, out_metric)
-          rect.attr_left += out_metric[0]
-          rect.attr_top += out_metric[0]
-          rect.attr_right += out_metric[0]
-          rect.attr_bottom += out_metric[0]
-        end
-        if (has_border)
-          OS._get_theme_metric(OS.attr_k_theme_metric_edit_text_frame_outset, out_metric)
-          rect.attr_left += out_metric[0]
-          rect.attr_top += out_metric[0]
-          rect.attr_right += out_metric[0]
-          rect.attr_bottom += out_metric[0]
-        end
-        return rect
-      end
-      return EMPTY_RECT
-    end
-    
     typesig { [::Java::Int] }
-    def is_trim_handle(trim_handle)
-      if (!(@horizontal_bar).nil? && (@horizontal_bar.attr_handle).equal?(trim_handle))
-        return true
-      end
-      if (!(@vertical_bar).nil? && (@vertical_bar.attr_handle).equal?(trim_handle))
-        return true
-      end
-      return (trim_handle).equal?(@scrolled_handle)
+    # long
+    def is_event_view(id)
+      return (id).equal?(event_view.attr_id)
     end
     
-    typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
-    def k_event_mouse_wheel_moved(next_handler, the_event, user_data)
-      v_position = (@vertical_bar).nil? ? 0 : @vertical_bar.get_selection
-      h_position = (@horizontal_bar).nil? ? 0 : @horizontal_bar.get_selection
-      result = super(next_handler, the_event, user_data)
-      redraw = false
-      if (!(@vertical_bar).nil?)
-        position = @vertical_bar.get_selection
-        if (!(position).equal?(v_position))
-          event = Event.new
-          event.attr_detail = position < v_position ? SWT::PAGE_UP : SWT::PAGE_DOWN
-          @vertical_bar.send_event(SWT::Selection, event)
-          redraw = true
+    typesig { [NSView] }
+    def is_trim(view)
+      if (!(@scroll_view).nil?)
+        if ((@scroll_view.attr_id).equal?(view.attr_id))
+          return true
+        end
+        if (!(@horizontal_bar).nil? && (@horizontal_bar.attr_view.attr_id).equal?(view.attr_id))
+          return true
+        end
+        if (!(@vertical_bar).nil? && (@vertical_bar.attr_view.attr_id).equal?(view.attr_id))
+          return true
         end
       end
-      if (!(@horizontal_bar).nil?)
-        position = @horizontal_bar.get_selection
-        if (!(position).equal?(h_position))
-          event = Event.new
-          event.attr_detail = position < v_position ? SWT::PAGE_UP : SWT::PAGE_DOWN
-          @horizontal_bar.send_event(SWT::Selection, event)
-          redraw = true
-        end
-      end
-      if (redraw)
-        redraw_background_image
-      end
-      return result
-    end
-    
-    typesig { [] }
-    def redraw_background_image
-      if ((@scrolled_handle).equal?(0))
-        control = find_background_control
-        if (!(control).nil? && !(control.attr_background_image).nil?)
-          redraw_widget(self.attr_handle, false)
-        end
-      end
+      return super(view)
     end
     
     typesig { [] }
     def register
       super
-      if (!(@scrolled_handle).equal?(0))
-        self.attr_display.add_widget(@scrolled_handle, self)
+      if (!(@scroll_view).nil?)
+        self.attr_display.add_widget(@scroll_view, self)
       end
     end
     
     typesig { [] }
     def release_handle
       super
-      @scrolled_handle = 0
+      if (!(@scroll_view).nil?)
+        @scroll_view.release
+      end
+      @scroll_view = nil
     end
     
     typesig { [::Java::Boolean] }
@@ -409,114 +327,87 @@ module Org::Eclipse::Swt::Widgets
       super(destroy)
     end
     
-    typesig { [::Java::Int] }
-    def reset_visible_region(control)
-      if (!(@vertical_bar).nil?)
-        @vertical_bar.reset_visible_region(control)
+    typesig { [] }
+    def send_horizontal_selection
+      if (((self.attr_state & CANVAS)).equal?(0) && !(@scroll_view).nil? && (self.attr_visible_rgn).equal?(0))
+        @scroll_view.content_view.set_copies_on_scroll(!is_obscured)
       end
-      if (!(@horizontal_bar).nil?)
-        @horizontal_bar.reset_visible_region(control)
-      end
-      super(control)
+      @horizontal_bar.send_selection
     end
     
     typesig { [] }
-    def resize_client_area
-      if ((@scrolled_handle).equal?(0))
-        return
+    def send_vertical_selection
+      if (((self.attr_state & CANVAS)).equal?(0) && !(@scroll_view).nil? && (self.attr_visible_rgn).equal?(0))
+        @scroll_view.content_view.set_copies_on_scroll(!is_obscured)
       end
-      if (((self.attr_state & CANVAS)).equal?(0))
-        return
-      end
-      v_width = 0
-      h_height = 0
-      out_metric = Array.typed(::Java::Int).new(1) { 0 }
-      OS._get_theme_metric(OS.attr_k_theme_metric_scroll_bar_width, out_metric)
-      is_visible_hbar = !(@horizontal_bar).nil? && @horizontal_bar.get_visible
-      is_visible_vbar = !(@vertical_bar).nil? && @vertical_bar.get_visible
-      if (is_visible_hbar)
-        h_height = out_metric[0]
-      end
-      if (is_visible_vbar)
-        v_width = out_metric[0]
-      end
-      width = 0
-      height = 0
-      rect = CGRect.new
-      OS._hiview_get_bounds(@scrolled_handle, rect)
-      width = RJava.cast_to_int(rect.attr_width)
-      height = RJava.cast_to_int(rect.attr_height)
-      inset_ = inset
-      width = Math.max(0, width - v_width - inset_.attr_left - inset_.attr_right)
-      height = Math.max(0, height - h_height - inset_.attr_top - inset_.attr_bottom)
-      set_bounds(self.attr_handle, inset_.attr_left, inset_.attr_top, width, height, true, true, false)
-      if (is_visible_hbar)
-        set_bounds(@horizontal_bar.attr_handle, inset_.attr_left, inset_.attr_top + height, width, h_height, true, true, false)
-      end
-      if (is_visible_vbar)
-        set_bounds(@vertical_bar.attr_handle, inset_.attr_left + width, inset_.attr_top, v_width, height, true, true, false)
-      end
+      @vertical_bar.send_selection
     end
     
-    typesig { [::Java::Short, ::Java::Int] }
-    def send_mouse_wheel(wheel_axis, wheel_delta)
-      if (!((self.attr_state & CANVAS)).equal?(0))
-        bar = (wheel_axis).equal?(OS.attr_k_event_mouse_wheel_axis_x) ? @horizontal_bar : @vertical_bar
-        if (!(bar).nil? && bar.get_enabled)
-          bar.set_selection(Math.max(0, bar.get_selection - bar.get_increment * wheel_delta))
-          event = Event.new
-          event.attr_detail = wheel_delta > 0 ? SWT::PAGE_UP : SWT::PAGE_DOWN
-          bar.send_event(SWT::Selection, event)
-          return true
-        end
+    typesig { [::Java::Boolean] }
+    def enable_widget(enabled)
+      super(enabled)
+      if (!(@horizontal_bar).nil?)
+        @horizontal_bar.enable_widget(enabled)
       end
-      return false
-    end
-    
-    typesig { [::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Boolean, ::Java::Boolean, ::Java::Boolean] }
-    def set_bounds(x, y, width, height, move, resize, events)
-      result = super(x, y, width, height, move, resize, false)
-      if (!((result & MOVED)).equal?(0))
-        if (events)
-          send_event(SWT::Move)
-        end
+      if (!(@vertical_bar).nil?)
+        @vertical_bar.enable_widget(enabled)
       end
-      if (!((result & RESIZED)).equal?(0))
-        resize_client_area
-        if (events)
-          send_event(SWT::Resize)
-        end
-      end
-      return result
     end
     
     typesig { [ScrollBar, ::Java::Boolean] }
     def set_scroll_bar_visible(bar, visible)
-      if ((@scrolled_handle).equal?(0))
+      if ((@scroll_view).nil?)
         return false
       end
       if (((self.attr_state & CANVAS)).equal?(0))
         return false
       end
-      resize_client_area
-      set_visible(bar.attr_handle, visible)
+      if (visible)
+        if (((bar.attr_state & HIDDEN)).equal?(0))
+          return false
+        end
+        bar.attr_state &= ~HIDDEN
+      else
+        if (!((bar.attr_state & HIDDEN)).equal?(0))
+          return false
+        end
+        bar.attr_state |= HIDDEN
+      end
+      if (!((bar.attr_style & SWT::HORIZONTAL)).equal?(0))
+        @scroll_view.set_has_horizontal_scroller(visible)
+      else
+        @scroll_view.set_has_vertical_scroller(visible)
+      end
+      bar.send_event(visible ? SWT::Show : SWT::Hide)
+      send_event(SWT::Resize)
       return true
     end
     
     typesig { [] }
     def set_zorder
       super
-      if (!(@scrolled_handle).equal?(0))
-        OS._hiview_add_subview(@scrolled_handle, self.attr_handle)
+      if (!(@scroll_view).nil?)
+        @scroll_view.set_document_view(self.attr_view)
       end
     end
     
     typesig { [] }
-    def top_handle
-      if (!(@scrolled_handle).equal?(0))
-        return @scrolled_handle
+    def top_view
+      if (!(@scroll_view).nil?)
+        return @scroll_view
       end
-      return self.attr_handle
+      return super
+    end
+    
+    typesig { [::Java::Boolean] }
+    def update_cursor_rects(enabled)
+      super(enabled)
+      if ((@scroll_view).nil?)
+        return
+      end
+      update_cursor_rects(enabled, @scroll_view)
+      content_view_ = @scroll_view.content_view
+      update_cursor_rects(enabled, content_view_)
     end
     
     private

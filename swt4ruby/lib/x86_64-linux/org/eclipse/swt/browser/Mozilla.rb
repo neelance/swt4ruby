@@ -1,6 +1,6 @@
 require "rjava"
 
-# Copyright (c) 2003, 2008 IBM Corporation and others.
+# Copyright (c) 2003, 2009 IBM Corporation and others.
 # All rights reserved. This program and the accompanying materials
 # are made available under the terms of the Eclipse Public License v1.0
 # which accompanies this distribution, and is available at
@@ -21,6 +21,7 @@ module Org::Eclipse::Swt::Browser
       include ::Org::Eclipse::Swt::Graphics
       include ::Org::Eclipse::Swt::Internal
       include ::Org::Eclipse::Swt::Internal::Mozilla
+      include ::Org::Eclipse::Swt::Internal::Mozilla::Init
       include ::Org::Eclipse::Swt::Layout
     }
   end
@@ -150,6 +151,12 @@ module Org::Eclipse::Swt::Browser
     alias_method :attr_last_char_code=, :last_char_code=
     undef_method :last_char_code=
     
+    attr_accessor :auth_count
+    alias_method :attr_auth_count, :auth_count
+    undef_method :auth_count
+    alias_method :attr_auth_count=, :auth_count=
+    undef_method :auth_count=
+    
     # int
     attr_accessor :request
     alias_method :attr_request, :request
@@ -187,12 +194,6 @@ module Org::Eclipse::Swt::Browser
     alias_method :attr_ignore_dispose=, :ignore_dispose=
     undef_method :ignore_dispose=
     
-    attr_accessor :awaiting_navigate
-    alias_method :attr_awaiting_navigate, :awaiting_navigate
-    undef_method :awaiting_navigate
-    alias_method :attr_awaiting_navigate=, :awaiting_navigate=
-    undef_method :awaiting_navigate=
-    
     attr_accessor :tip
     alias_method :attr_tip, :tip
     undef_method :tip
@@ -210,6 +211,18 @@ module Org::Eclipse::Swt::Browser
     undef_method :unhooked_domwindows
     alias_method :attr_unhooked_domwindows=, :unhooked_domwindows=
     undef_method :unhooked_domwindows=
+    
+    attr_accessor :last_navigate_url
+    alias_method :attr_last_navigate_url, :last_navigate_url
+    undef_method :last_navigate_url
+    alias_method :attr_last_navigate_url=, :last_navigate_url=
+    undef_method :last_navigate_url=
+    
+    attr_accessor :html_bytes
+    alias_method :attr_html_bytes, :html_bytes
+    undef_method :html_bytes
+    alias_method :attr_html_bytes=, :html_bytes=
+    undef_method :html_bytes=
     
     class_module.module_eval {
       
@@ -257,6 +270,28 @@ module Org::Eclipse::Swt::Browser
       alias_method :attr_browser_count=, :browser_count=
       
       
+      def next_jsfunction_index
+        defined?(@@next_jsfunction_index) ? @@next_jsfunction_index : @@next_jsfunction_index= 1
+      end
+      alias_method :attr_next_jsfunction_index, :next_jsfunction_index
+      
+      def next_jsfunction_index=(value)
+        @@next_jsfunction_index = value
+      end
+      alias_method :attr_next_jsfunction_index=, :next_jsfunction_index=
+      
+      
+      def all_functions
+        defined?(@@all_functions) ? @@all_functions : @@all_functions= Hashtable.new
+      end
+      alias_method :attr_all_functions, :all_functions
+      
+      def all_functions=(value)
+        @@all_functions = value
+      end
+      alias_method :attr_all_functions=, :all_functions=
+      
+      
       def initialized
         defined?(@@initialized) ? @@initialized : @@initialized= false
       end
@@ -277,6 +312,17 @@ module Org::Eclipse::Swt::Browser
         @@is_pre_1_8 = value
       end
       alias_method :attr_is_pre_1_8=, :is_pre_1_8=
+      
+      
+      def is_pre_1_9
+        defined?(@@is_pre_1_9) ? @@is_pre_1_9 : @@is_pre_1_9= false
+      end
+      alias_method :attr_is_pre_1_9, :is_pre_1_9
+      
+      def is_pre_1_9=(value)
+        @@is_pre_1_9 = value
+      end
+      alias_method :attr_is_pre_1_9=, :is_pre_1_9=
       
       
       def performed_version_check
@@ -484,7 +530,6 @@ module Org::Eclipse::Swt::Browser
             if (!(rc).equal?(XPCOM::NS_OK))
               error(rc)
             end
-            manager._release
             enumerator = NsISimpleEnumerator.new(result[0])
             more_elements = Array.typed(::Java::Int).new(1) { 0 }
             # PRBool
@@ -527,6 +572,204 @@ module Org::Eclipse::Swt::Browser
               end
             end
             enumerator._release
+            manager._release
+          end
+          
+          typesig { [Vararg.new(Object)] }
+          define_method :initialize do |*args|
+            super(*args)
+          end
+          
+          private
+          alias_method :initialize_anonymous, :initialize
+        end.new_local(self)
+        MozillaGetCookie = Class.new(Runnable.class == Class ? Runnable : Object) do
+          extend LocalClass
+          include_class_members Mozilla
+          include Runnable if Runnable.class == Module
+          
+          typesig { [] }
+          define_method :run do
+            if (!self.attr_initialized)
+              return
+            end
+            # int
+            # int
+            result = Array.typed(::Java::Long).new(1) { 0 }
+            rc = XPCOM._ns_get_service_manager(result)
+            if (!(rc).equal?(XPCOM::NS_OK))
+              error(rc)
+            end
+            if ((result[0]).equal?(0))
+              error(XPCOM::NS_NOINTERFACE)
+            end
+            service_manager = NsIServiceManager.new(result[0])
+            result[0] = 0
+            rc = service_manager._get_service(XPCOM::NS_IOSERVICE_CID, NsIIOService::NS_IIOSERVICE_IID, result)
+            if (!(rc).equal?(XPCOM::NS_OK))
+              error(rc)
+            end
+            if ((result[0]).equal?(0))
+              error(XPCOM::NS_NOINTERFACE)
+            end
+            io_service = NsIIOService.new(result[0])
+            result[0] = 0
+            bytes = MozillaDelegate.wcs_to_mbcs(nil, CookieUrl, false)
+            # int
+            a_spec = XPCOM.ns_embed_cstring_new(bytes, bytes.attr_length)
+            rc = io_service._new_uri(a_spec, nil, 0, result)
+            XPCOM.ns_embed_cstring_delete(a_spec)
+            io_service._release
+            if (!(rc).equal?(XPCOM::NS_OK))
+              service_manager._release
+              return
+            end
+            if ((result[0]).equal?(0))
+              error(XPCOM::NS_ERROR_NULL_POINTER)
+            end
+            a_uri = NsIURI.new(result[0])
+            result[0] = 0
+            a_contract_id = MozillaDelegate.wcs_to_mbcs(nil, XPCOM::NS_COOKIESERVICE_CONTRACTID, true)
+            rc = service_manager._get_service_by_contract_id(a_contract_id, NsICookieService::NS_ICOOKIESERVICE_IID, result)
+            # int
+            cookie_string = 0
+            if ((rc).equal?(XPCOM::NS_OK) && !(result[0]).equal?(0))
+              cookie_service = NsICookieService.new(result[0])
+              result[0] = 0
+              rc = cookie_service._get_cookie_string(a_uri.get_address, 0, result)
+              cookie_service._release
+              if (!(rc).equal?(XPCOM::NS_OK))
+                error(rc)
+              end
+              if ((result[0]).equal?(0))
+                a_uri._release
+                service_manager._release
+                return
+              end
+              cookie_string = result[0]
+            else
+              result[0] = 0
+              rc = service_manager._get_service_by_contract_id(a_contract_id, NsICookieService_1_9::NS_ICOOKIESERVICE_IID, result)
+              if (!(rc).equal?(XPCOM::NS_OK))
+                error(rc)
+              end
+              if ((result[0]).equal?(0))
+                error(XPCOM::NS_NOINTERFACE)
+              end
+              cookie_service = NsICookieService_1_9.new(result[0])
+              result[0] = 0
+              rc = cookie_service._get_cookie_string(a_uri.get_address, 0, result)
+              cookie_service._release
+              if (!(rc).equal?(XPCOM::NS_OK))
+                error(rc)
+              end
+              if ((result[0]).equal?(0))
+                a_uri._release
+                service_manager._release
+                return
+              end
+              cookie_string = result[0]
+            end
+            a_uri._release
+            service_manager._release
+            result[0] = 0
+            length = C.strlen(cookie_string)
+            bytes = Array.typed(::Java::Byte).new(length) { 0 }
+            XPCOM.memmove(bytes, cookie_string, length)
+            C.free(cookie_string)
+            all_cookies = String.new(MozillaDelegate.mbcs_to_wcs(nil, bytes))
+            tokenizer = self.class::StringTokenizer.new(all_cookies, ";") # $NON-NLS-1$
+            while (tokenizer.has_more_tokens)
+              cookie = tokenizer.next_token
+              index = cookie.index_of(Character.new(?=.ord))
+              if (!(index).equal?(-1))
+                name = cookie.substring(0, index).trim
+                if ((name == CookieName))
+                  CookieValue = cookie.substring(index + 1).trim
+                  return
+                end
+              end
+            end
+          end
+          
+          typesig { [Vararg.new(Object)] }
+          define_method :initialize do |*args|
+            super(*args)
+          end
+          
+          private
+          alias_method :initialize_anonymous, :initialize
+        end.new_local(self)
+        MozillaSetCookie = Class.new(Runnable.class == Class ? Runnable : Object) do
+          extend LocalClass
+          include_class_members Mozilla
+          include Runnable if Runnable.class == Module
+          
+          typesig { [] }
+          define_method :run do
+            if (!self.attr_initialized)
+              return
+            end
+            # int
+            # int
+            result = Array.typed(::Java::Long).new(1) { 0 }
+            rc = XPCOM._ns_get_service_manager(result)
+            if (!(rc).equal?(XPCOM::NS_OK))
+              error(rc)
+            end
+            if ((result[0]).equal?(0))
+              error(XPCOM::NS_NOINTERFACE)
+            end
+            service_manager = NsIServiceManager.new(result[0])
+            result[0] = 0
+            rc = service_manager._get_service(XPCOM::NS_IOSERVICE_CID, NsIIOService::NS_IIOSERVICE_IID, result)
+            if (!(rc).equal?(XPCOM::NS_OK))
+              error(rc)
+            end
+            if ((result[0]).equal?(0))
+              error(XPCOM::NS_NOINTERFACE)
+            end
+            io_service = NsIIOService.new(result[0])
+            result[0] = 0
+            bytes = MozillaDelegate.wcs_to_mbcs(nil, CookieUrl, false)
+            # int
+            a_spec = XPCOM.ns_embed_cstring_new(bytes, bytes.attr_length)
+            rc = io_service._new_uri(a_spec, nil, 0, result)
+            XPCOM.ns_embed_cstring_delete(a_spec)
+            io_service._release
+            if (!(rc).equal?(XPCOM::NS_OK))
+              service_manager._release
+              return
+            end
+            if ((result[0]).equal?(0))
+              error(XPCOM::NS_ERROR_NULL_POINTER)
+            end
+            a_uri = NsIURI.new(result[0])
+            result[0] = 0
+            a_cookie = MozillaDelegate.wcs_to_mbcs(nil, CookieValue, true)
+            a_contract_id = MozillaDelegate.wcs_to_mbcs(nil, XPCOM::NS_COOKIESERVICE_CONTRACTID, true)
+            rc = service_manager._get_service_by_contract_id(a_contract_id, NsICookieService::NS_ICOOKIESERVICE_IID, result)
+            if ((rc).equal?(XPCOM::NS_OK) && !(result[0]).equal?(0))
+              cookie_service = NsICookieService.new(result[0])
+              rc = cookie_service._set_cookie_string(a_uri.get_address, 0, a_cookie, 0)
+              cookie_service._release
+            else
+              result[0] = 0
+              rc = service_manager._get_service_by_contract_id(a_contract_id, NsICookieService_1_9::NS_ICOOKIESERVICE_IID, result)
+              if (!(rc).equal?(XPCOM::NS_OK))
+                error(rc)
+              end
+              if ((result[0]).equal?(0))
+                error(XPCOM::NS_NOINTERFACE)
+              end
+              cookie_service = NsICookieService_1_9.new(result[0])
+              rc = cookie_service._set_cookie_string(a_uri.get_address, 0, a_cookie, 0)
+              cookie_service._release
+            end
+            result[0] = 0
+            a_uri._release
+            service_manager._release
+            CookieResult = (rc).equal?(0)
           end
           
           typesig { [Vararg.new(Object)] }
@@ -640,13 +883,40 @@ module Org::Eclipse::Swt::Browser
               path = MozillaDelegate.wcs_to_mbcs(nil, mozilla_path, true)
               rc = XPCOMInit._xpcomglue_startup(path)
               if (!(rc).equal?(XPCOM::NS_OK))
-                is_xulrunner = false
-                # failed
                 mozilla_path = RJava.cast_to_string(mozilla_path.substring(0, mozilla_path.last_index_of(SEPARATOR_OS)))
                 if (Device.attr_debug)
                   System.out.println("cannot use detected XULRunner: " + mozilla_path)
                 end # $NON-NLS-1$
-              else
+                # attempt to XPCOMGlueStartup the GRE pointed at by MOZILLA_FIVE_HOME
+                # int
+                ptr = C.getenv(MozillaDelegate.wcs_to_mbcs(nil, XPCOM::MOZILLA_FIVE_HOME, true))
+                if ((ptr).equal?(0))
+                  is_xulrunner = false
+                else
+                  length = C.strlen(ptr)
+                  buffer = Array.typed(::Java::Byte).new(length) { 0 }
+                  C.memmove(buffer, ptr, length)
+                  mozilla_path = RJava.cast_to_string(String.new(MozillaDelegate.mbcs_to_wcs(nil, buffer)))
+                  # Attempting to XPCOMGlueStartup a mozilla-based GRE != xulrunner can
+                  # crash, so don't attempt unless the GRE appears to be xulrunner.
+                  if ((mozilla_path.index_of("xulrunner")).equal?(-1))
+                    # $NON-NLS-1$
+                    is_xulrunner = false
+                  else
+                    mozilla_path += SEPARATOR_OS + RJava.cast_to_string(@delegate.get_library_name)
+                    path = MozillaDelegate.wcs_to_mbcs(nil, mozilla_path, true)
+                    rc = XPCOMInit._xpcomglue_startup(path)
+                    if (!(rc).equal?(XPCOM::NS_OK))
+                      is_xulrunner = false
+                      mozilla_path = RJava.cast_to_string(mozilla_path.substring(0, mozilla_path.last_index_of(SEPARATOR_OS)))
+                      if (Device.attr_debug)
+                        System.out.println("failed to start as XULRunner: " + mozilla_path)
+                      end # $NON-NLS-1$
+                    end
+                  end
+                end
+              end
+              if (is_xulrunner)
                 self.attr_xpcominit_was_glued = true
               end
             end
@@ -719,6 +989,33 @@ module Org::Eclipse::Swt::Browser
           end
         end
         if (!self.attr_initialized)
+          self.attr_location_provider = AppFileLocProvider.new(mozilla_path)
+          self.attr_location_provider._add_ref
+          # extract external.xpt to temp
+          temp_path = System.get_property("java.io.tmpdir") # $NON-NLS-1$
+          components_dir = JavaFile.new(temp_path, "eclipse/mozillaComponents") # $NON-NLS-1$
+          is = Library.get_resource_as_stream("/external.xpt") # $NON-NLS-1$
+          if (!(is).nil?)
+            if (!components_dir.exists)
+              components_dir.mkdirs
+            end
+            read = 0
+            buffer = Array.typed(::Java::Byte).new(4096) { 0 }
+            file = JavaFile.new(components_dir, "external.xpt") # $NON-NLS-1$
+            begin
+              os = FileOutputStream.new(file)
+              while (!((read = is.read(buffer))).equal?(-1))
+                os.write(buffer, 0, read)
+              end
+              os.close
+              is.close
+            rescue FileNotFoundException => e
+            rescue IOException => e
+            end
+          end
+          if (components_dir.exists && components_dir.is_directory)
+            self.attr_location_provider.set_components_path(components_dir.get_absolute_path)
+          end
           # int
           # int
           ret_val = Array.typed(::Java::Long).new(1) { 0 }
@@ -733,19 +1030,42 @@ module Org::Eclipse::Swt::Browser
             self.attr_browser.dispose
             error(XPCOM::NS_ERROR_NULL_POINTER)
           end
-          self.attr_location_provider = AppFileLocProvider.new(mozilla_path)
-          self.attr_location_provider._add_ref
           local_file = NsILocalFile.new(ret_val[0])
-          rc = XPCOM._ns_init_xpcom2(0, local_file.get_address, self.attr_location_provider.get_address)
+          if (is_xulrunner)
+            size = XPCOM.ns_dynamic_function_load_sizeof
+            # alloc memory for two structs, the second is empty to signify the end of the list
+            # int
+            ptr = C.malloc(size * 2)
+            C.memset(ptr, 0, size * 2)
+            function_load = NsDynamicFunctionLoad.new
+            bytes = MozillaDelegate.wcs_to_mbcs(nil, "XRE_InitEmbedding", true) # $NON-NLS-1$
+            function_load.attr_function_name = C.malloc(bytes.attr_length)
+            C.memmove(function_load.attr_function_name, bytes, bytes.attr_length)
+            function_load.attr_function = C.malloc(C::PTR_SIZEOF)
+            # int
+            C.memmove(function_load.attr_function, Array.typed(::Java::Long).new([0]), C::PTR_SIZEOF)
+            XPCOM.memmove(ptr, function_load, XPCOM.ns_dynamic_function_load_sizeof)
+            XPCOM._xpcomglue_load_xulfunctions(ptr)
+            C.memmove(result, function_load.attr_function, C::PTR_SIZEOF)
+            # int
+            function_ptr = result[0]
+            result[0] = 0
+            C.free(function_load.attr_function)
+            C.free(function_load.attr_function_name)
+            C.free(ptr)
+            rc = XPCOM._call(function_ptr, local_file.get_address, local_file.get_address, self.attr_location_provider.get_address, 0, 0)
+            if ((rc).equal?(XPCOM::NS_OK))
+              System.set_property(XULRUNNER_PATH, mozilla_path)
+            end
+          else
+            rc = XPCOM._ns_init_xpcom2(0, local_file.get_address, self.attr_location_provider.get_address)
+          end
           local_file._release
           if (!(rc).equal?(XPCOM::NS_OK))
             self.attr_browser.dispose
             SWT.error(SWT::ERROR_NO_HANDLES, nil, " [MOZILLA_FIVE_HOME may not point at an embeddable GRE] [NS_InitEmbedding " + mozilla_path + " error " + RJava.cast_to_string(rc) + "]") # $NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
           end
           System.set_property(GRE_INITIALIZED, "true") # $NON-NLS-1$
-          if (is_xulrunner)
-            System.set_property(XULRUNNER_PATH, mozilla_path)
-          end
         end
         # If JavaXPCOM is detected then attempt to initialize it with the XULRunner being used
         if (is_xulrunner)
@@ -933,7 +1253,6 @@ module Org::Eclipse::Swt::Browser
         # preference values according to the user's current locale and charset.
         a_contract_id = MozillaDelegate.wcs_to_mbcs(nil, XPCOM::NS_PREFSERVICE_CONTRACTID, true)
         rc = service_manager._get_service_by_contract_id(a_contract_id, NsIPrefService::NS_IPREFSERVICE_IID, result)
-        service_manager._release
         if (!(rc).equal?(XPCOM::NS_OK))
           self.attr_browser.dispose
           error(rc)
@@ -1215,6 +1534,8 @@ module Org::Eclipse::Swt::Browser
         end
         component_registrar = NsIComponentRegistrar.new(result[0])
         result[0] = 0
+        component_registrar._auto_register(0)
+        # detect the External component
         a_contract_id = MozillaDelegate.wcs_to_mbcs(nil, XPCOM::NS_PROMPTSERVICE_CONTRACTID, true)
         a_class_name = MozillaDelegate.wcs_to_mbcs(nil, "Prompt Service", true) # $NON-NLS-1$
         rc = component_registrar._register_factory(XPCOM::NS_PROMPTSERVICE_CID, a_class_name, a_contract_id, factory.get_address)
@@ -1223,16 +1544,31 @@ module Org::Eclipse::Swt::Browser
           error(rc)
         end
         factory._release
-        dialog_factory = HelperAppLauncherDialogFactory.new
-        dialog_factory._add_ref
-        a_contract_id = MozillaDelegate.wcs_to_mbcs(nil, XPCOM::NS_HELPERAPPLAUNCHERDIALOG_CONTRACTID, true)
-        a_class_name = MozillaDelegate.wcs_to_mbcs(nil, "Helper App Launcher Dialog", true) # $NON-NLS-1$
-        rc = component_registrar._register_factory(XPCOM::NS_HELPERAPPLAUNCHERDIALOG_CID, a_class_name, a_contract_id, dialog_factory.get_address)
+        external_factory = ExternalFactory.new
+        external_factory._add_ref
+        a_contract_id = MozillaDelegate.wcs_to_mbcs(nil, XPCOM::EXTERNAL_CONTRACTID, true)
+        a_class_name = MozillaDelegate.wcs_to_mbcs(nil, "External", true) # $NON-NLS-1$
+        rc = component_registrar._register_factory(XPCOM::EXTERNAL_CID, a_class_name, a_contract_id, external_factory.get_address)
         if (!(rc).equal?(XPCOM::NS_OK))
           self.attr_browser.dispose
           error(rc)
         end
-        dialog_factory._release
+        external_factory._release
+        rc = service_manager._get_service(XPCOM::NS_CATEGORYMANAGER_CID, NsICategoryManager::NS_ICATEGORYMANAGER_IID, result)
+        if (!(rc).equal?(XPCOM::NS_OK))
+          error(rc)
+        end
+        if ((result[0]).equal?(0))
+          error(XPCOM::NS_NOINTERFACE)
+        end
+        service_manager._release
+        category_manager = NsICategoryManager.new(result[0])
+        result[0] = 0
+        category = MozillaDelegate.wcs_to_mbcs(nil, "JavaScript global property", true) # $NON-NLS-1$
+        entry = MozillaDelegate.wcs_to_mbcs(nil, "external", true) # $NON-NLS-1$
+        rc = category_manager._add_category_entry(category, entry, a_contract_id, 1, 1, result)
+        result[0] = 0
+        category_manager._release
         # This Download factory will be used if the GRE version is < 1.8.
         # If the GRE version is 1.8.x then the Download factory that is registered later for
         # contract "Transfer" will be used.
@@ -1345,7 +1681,50 @@ module Org::Eclipse::Swt::Browser
             end
             service_manager._release
             if (self.attr_xpcomwas_glued)
-              XPCOM._xpcomglue_shutdown
+              # XULRunner 1.9 can crash on Windows if XPCOMGlueShutdown is invoked here,
+              # presumably because one or more of its unloaded symbols are referenced when
+              # this callback returns.  The workaround is to delay invoking XPCOMGlueShutdown
+              # so that its symbols are still available once this callback returns.
+              listener_class = self.class
+              display.async_exec(Class.new(self.class::Runnable.class == Class ? self.class::Runnable : Object) do
+                extend LocalClass
+                include_class_members listener_class
+                include class_self::Runnable if class_self::Runnable.class == Module
+                
+                typesig { [] }
+                define_method :run do
+                  XPCOM._xpcomglue_shutdown
+                end
+                
+                typesig { [Vararg.new(Object)] }
+                define_method :initialize do |*args|
+                  super(*args)
+                end
+                
+                private
+                alias_method :initialize_anonymous, :initialize
+              end.new_local(self))
+              # the following is intentionally commented, because calling XRE_TermEmbedding
+              # causes subsequent browser instantiations within the process to fail
+              # int size = XPCOM.nsDynamicFunctionLoad_sizeof ();
+              # /* alloc memory for two structs, the second is empty to signify the end of the list */
+              # long /*int*/ ptr = C.malloc (size * 2);
+              # C.memset (ptr, 0, size * 2);
+              # nsDynamicFunctionLoad functionLoad = new nsDynamicFunctionLoad ();
+              # byte[] bytes = MozillaDelegate.wcsToMbcs (null, "XRE_TermEmbedding", true); //$NON-NLS-1$
+              # functionLoad.functionName = C.malloc (bytes.length);
+              # C.memmove (functionLoad.functionName, bytes, bytes.length);
+              # functionLoad.function = C.malloc (C.PTR_SIZEOF);
+              # C.memmove (functionLoad.function, new long /*int*/[] {0} , C.PTR_SIZEOF);
+              # XPCOM.memmove (ptr, functionLoad, XPCOM.nsDynamicFunctionLoad_sizeof ());
+              # XPCOM.XPCOMGlueLoadXULFunctions (ptr);
+              # C.memmove (result, functionLoad.function, C.PTR_SIZEOF);
+              # long /*int*/ functionPtr = result[0];
+              # result[0] = 0;
+              # C.free (functionLoad.function);
+              # C.free (functionLoad.functionName);
+              # C.free (ptr);
+              # XPCOM.Call (functionPtr);
               self.attr_xpcomwas_glued = false
             end
             if (self.attr_xpcominit_was_glued)
@@ -1417,7 +1796,7 @@ module Org::Eclipse::Swt::Browser
         self.attr_browser.dispose
         error(XPCOM::NS_ERROR_FAILURE)
       end
-      rc = base_window._create
+      rc = @delegate.create_base_window(base_window)
       if (!(rc).equal?(XPCOM::NS_OK))
         self.attr_browser.dispose
         error(XPCOM::NS_ERROR_FAILURE)
@@ -1430,6 +1809,27 @@ module Org::Eclipse::Swt::Browser
       base_window._release
       if (!self.attr_performed_version_check)
         self.attr_performed_version_check = true
+        rc = component_manager._query_interface(NsIComponentRegistrar::NS_ICOMPONENTREGISTRAR_IID, result)
+        if (!(rc).equal?(XPCOM::NS_OK))
+          self.attr_browser.dispose
+          error(rc)
+        end
+        if ((result[0]).equal?(0))
+          self.attr_browser.dispose
+          error(XPCOM::NS_NOINTERFACE)
+        end
+        component_registrar = NsIComponentRegistrar.new(result[0])
+        result[0] = 0
+        dialog_factory = HelperAppLauncherDialogFactory.new
+        dialog_factory._add_ref
+        a_contract_id = MozillaDelegate.wcs_to_mbcs(nil, XPCOM::NS_HELPERAPPLAUNCHERDIALOG_CONTRACTID, true)
+        a_class_name = MozillaDelegate.wcs_to_mbcs(nil, "Helper App Launcher Dialog", true) # $NON-NLS-1$
+        rc = component_registrar._register_factory(XPCOM::NS_HELPERAPPLAUNCHERDIALOG_CID, a_class_name, a_contract_id, dialog_factory.get_address)
+        if (!(rc).equal?(XPCOM::NS_OK))
+          self.attr_browser.dispose
+          error(rc)
+        end
+        dialog_factory._release
         # Check for the availability of the pre-1.8 implementation of nsIDocShell
         # to determine if the GRE's version is < 1.8.
         rc = @web_browser._query_interface(NsIInterfaceRequestor::NS_IINTERFACEREQUESTOR_IID, result)
@@ -1449,6 +1849,7 @@ module Org::Eclipse::Swt::Browser
           NsISupports.new(result[0])._release
         end
         result[0] = 0
+        self.attr_is_pre_1_9 = true
         # A Download factory for contract "Transfer" must be registered iff the GRE's version is 1.8.x.
         # Check for the availability of the 1.8 implementation of nsIDocShell to determine if the
         # GRE's version is 1.8.x.
@@ -1462,16 +1863,6 @@ module Org::Eclipse::Swt::Browser
             # 1.8
             NsISupports.new(result[0])._release
             result[0] = 0
-            rc = component_manager._query_interface(NsIComponentRegistrar::NS_ICOMPONENTREGISTRAR_IID, result)
-            if (!(rc).equal?(XPCOM::NS_OK))
-              self.attr_browser.dispose
-              error(rc)
-            end
-            if ((result[0]).equal?(0))
-              self.attr_browser.dispose
-              error(XPCOM::NS_NOINTERFACE)
-            end
-            component_registrar = NsIComponentRegistrar.new(result[0])
             download_factory_1_8 = DownloadFactory_1_8.new
             download_factory_1_8._add_ref
             a_contract_id = MozillaDelegate.wcs_to_mbcs(nil, XPCOM::NS_TRANSFER_CONTRACTID, true)
@@ -1482,37 +1873,25 @@ module Org::Eclipse::Swt::Browser
               error(rc)
             end
             download_factory_1_8._release
-            component_registrar._release
           else
             # >= 1.9
-            # 
-            # Bug in XULRunner 1.9.  Mozilla no longer clears its background before initial content has
-            # been set.  As a result embedders appear broken if they do not immediately navigate to a url.
-            # The workaround for this is to navigate to about:blank immediately so that the background is
-            # cleared, but do not fire any corresponding events or allow Browser API calls to reveal this.
-            # Once the client does a proper navigate with either setUrl() or setText() then resume as
-            # normal.  The Mozilla bug for this is https://bugzilla.mozilla.org/show_bug.cgi?id=415789.
-            @awaiting_navigate = true
-            rc = @web_browser._query_interface(NsIWebNavigation::NS_IWEBNAVIGATION_IID, result)
-            if (!(rc).equal?(XPCOM::NS_OK))
-              self.attr_browser.dispose
-              error(rc)
-            end
-            if ((result[0]).equal?(0))
-              self.attr_browser.dispose
-              error(XPCOM::NS_ERROR_NO_INTERFACE)
-            end
-            web_navigation = NsIWebNavigation.new(result[0])
-            uri = CharArray.new(ABOUT_BLANK.length + 1)
-            ABOUT_BLANK.get_chars(0, ABOUT_BLANK.length, uri, 0)
-            rc = web_navigation._load_uri(uri, NsIWebNavigation::LOAD_FLAGS_NONE, 0, 0, 0)
-            web_navigation._release
+            self.attr_is_pre_1_9 = false
           end
         end
         result[0] = 0
         interface_requestor._release
+        component_registrar._release
       end
       component_manager._release
+      # Bug in XULRunner 1.9.  On win32, Mozilla does not clear its background before content has
+      # been set into it.  As a result, embedders appear broken if they do not immediately display
+      # a URL or text.  The Mozilla bug for this is https://bugzilla.mozilla.org/show_bug.cgi?id=453523.
+      # 
+      # The workaround is to subclass the Mozilla window and clear it whenever WM_ERASEBKGND is received.
+      # This subclass should be removed once content has been set into the browser.
+      if (!self.attr_is_pre_1_9)
+        @delegate.add_window_subclass
+      end
       rc = @web_browser._add_web_browser_listener(@weak_reference.get_address, NsIWebProgressListener::NS_IWEBPROGRESSLISTENER_IID)
       if (!(rc).equal?(XPCOM::NS_OK))
         self.attr_browser.dispose
@@ -1605,9 +1984,7 @@ module Org::Eclipse::Swt::Browser
     
     typesig { [] }
     def back
-      if (@awaiting_navigate)
-        return false
-      end
+      @html_bytes = nil
       # int
       # int
       result = Array.typed(::Java::Long).new(1) { 0 }
@@ -2342,6 +2719,12 @@ module Org::Eclipse::Swt::Browser
       end.new_local(self, Array.typed(::Java::Int).new([2, 0, 0, 1]))
     end
     
+    typesig { [BrowserFunction] }
+    def deregister_function(function)
+      super(function)
+      self.attr_all_functions.remove(function.attr_index)
+    end
+    
     typesig { [] }
     def dispose_cominterfaces
       if (!(@supports).nil?)
@@ -2396,13 +2779,136 @@ module Org::Eclipse::Swt::Browser
     
     typesig { [String] }
     def execute(script)
-      if (@awaiting_navigate)
-        return false
-      end
-      url = PREFIX_JAVASCRIPT + script + ";void(0);" # $NON-NLS-1$
+      # This could be the first content that is set into the browser, so
+      # ensure that the custom subclass that works around Mozilla bug
+      # https://bugzilla.mozilla.org/show_bug.cgi?id=453523 is removed.
+      @delegate.remove_window_subclass
+      # As of mozilla 1.9 executing javascript via the javascript: protocol no
+      # longer happens synchronously.  As a result, the result of executing JS
+      # is not returned to the java side when expected by the client.  The
+      # workaround is to invoke the javascript handler directly via C++, which is
+      # exposed as of mozilla 1.9.
+      # 
       # int
       # int
       result = Array.typed(::Java::Long).new(1) { 0 }
+      if (!self.attr_is_pre_1_9)
+        rc = XPCOM._ns_get_service_manager(result)
+        if (!(rc).equal?(XPCOM::NS_OK))
+          error(rc)
+        end
+        if ((result[0]).equal?(0))
+          error(XPCOM::NS_NOINTERFACE)
+        end
+        service_manager = NsIServiceManager.new(result[0])
+        result[0] = 0
+        principal = nil
+        a_contract_id = MozillaDelegate.wcs_to_mbcs(nil, XPCOM::NS_SCRIPTSECURITYMANAGER_CONTRACTID, true)
+        rc = service_manager._get_service_by_contract_id(a_contract_id, NsIScriptSecurityManager_1_9_1::NS_ISCRIPTSECURITYMANAGER_IID, result)
+        if ((rc).equal?(XPCOM::NS_OK) && !(result[0]).equal?(0))
+          security_manager = NsIScriptSecurityManager_1_9_1.new(result[0])
+          result[0] = 0
+          rc = security_manager._get_system_principal(result)
+          if (!(rc).equal?(XPCOM::NS_OK))
+            error(rc)
+          end
+          if ((result[0]).equal?(0))
+            error(XPCOM::NS_ERROR_NULL_POINTER)
+          end
+          principal = NsIPrincipal.new(result[0])
+          result[0] = 0
+          security_manager._release
+        else
+          rc = service_manager._get_service_by_contract_id(a_contract_id, NsIScriptSecurityManager_1_9::NS_ISCRIPTSECURITYMANAGER_IID, result)
+          if ((rc).equal?(XPCOM::NS_OK) && !(result[0]).equal?(0))
+            security_manager = NsIScriptSecurityManager_1_9.new(result[0])
+            result[0] = 0
+            rc = security_manager._get_system_principal(result)
+            if (!(rc).equal?(XPCOM::NS_OK))
+              error(rc)
+            end
+            if ((result[0]).equal?(0))
+              error(XPCOM::NS_ERROR_NULL_POINTER)
+            end
+            principal = NsIPrincipal.new(result[0])
+            result[0] = 0
+            security_manager._release
+          end
+        end
+        service_manager._release
+        if (!(principal).nil?)
+          rc = @web_browser._query_interface(NsIInterfaceRequestor::NS_IINTERFACEREQUESTOR_IID, result)
+          if (!(rc).equal?(XPCOM::NS_OK))
+            error(rc)
+          end
+          if ((result[0]).equal?(0))
+            error(XPCOM::NS_ERROR_NO_INTERFACE)
+          end
+          interface_requestor = NsIInterfaceRequestor.new(result[0])
+          result[0] = 0
+          script_global_object_nsid = NsID.new("6afecd40-0b9a-4cfd-8c42-0f645cd91829")
+          # nsIScriptGlobalObject
+          # $NON-NLS-1$
+          rc = interface_requestor._get_interface(script_global_object_nsid, result)
+          interface_requestor._release
+          if ((rc).equal?(XPCOM::NS_OK) && !(result[0]).equal?(0))
+            # int
+            script_global_object = result[0]
+            result[0] = 0
+            # 64
+            rc = RJava.cast_to_int(XPCOM.ns_iscript_global_object_ensure_script_environment(script_global_object, 2))
+            # nsIProgrammingLanguage.JAVASCRIPT
+            if (!(rc).equal?(XPCOM::NS_OK))
+              error(rc)
+            end
+            # int
+            script_context = XPCOM.ns_iscript_global_object_get_script_context(script_global_object, 2)
+            # nsIProgrammingLanguage.JAVASCRIPT
+            # int
+            global_jsobject = XPCOM.ns_iscript_global_object_get_script_global(script_global_object, 2)
+            # nsIProgrammingLanguage.JAVASCRIPT
+            NsISupports.new(script_global_object)._release
+            if (!(script_context).equal?(0) && !(global_jsobject).equal?(0))
+              # ensure that the received nsIScriptContext implements the expected interface
+              script_context_nsid = NsID.new("e7b9871d-3adc-4bf7-850d-7fb9554886bf")
+              # nsIScriptContext
+              # $NON-NLS-1$
+              rc = NsISupports.new(script_context)._query_interface(script_context_nsid, result)
+              if ((rc).equal?(XPCOM::NS_OK) && !(result[0]).equal?(0))
+                NsISupports.new(result[0])._release
+                result[0] = 0
+                # int
+                native_context = XPCOM.ns_iscript_context_get_native_context(script_context)
+                if (!(native_context).equal?(0))
+                  length_ = script.length
+                  script_chars = CharArray.new(length_)
+                  script.get_chars(0, length_, script_chars, 0)
+                  urlbytes = MozillaDelegate.wcs_to_mbcs(nil, get_url, true)
+                  rc = principal._get_jsprincipals(native_context, result)
+                  if ((rc).equal?(XPCOM::NS_OK) && !(result[0]).equal?(0))
+                    # int
+                    principals = result[0]
+                    result[0] = 0
+                    principal._release
+                    mozilla_path = self.attr_location_provider.attr_mozilla_path + @delegate.get_jslibrary_name + Character.new(?\0.ord)
+                    path_bytes = nil
+                    begin
+                      path_bytes = mozilla_path.get_bytes("UTF-8") # $NON-NLS-1$
+                    rescue UnsupportedEncodingException => e
+                      path_bytes = mozilla_path.get_bytes
+                    end
+                    rc = XPCOM._js_evaluate_ucscript_for_principals(path_bytes, native_context, global_jsobject, principals, script_chars, length_, urlbytes, 0, result)
+                    return !(rc).equal?(0)
+                  end
+                end
+              end
+            end
+          end
+          principal._release
+        end
+      end
+      # fall back to the pre-1.9 approach
+      url = PREFIX_JAVASCRIPT + script + ";void(0);" # $NON-NLS-1$
       rc = @web_browser._query_interface(NsIWebNavigation::NS_IWEBNAVIGATION_IID, result)
       if (!(rc).equal?(XPCOM::NS_OK))
         error(rc)
@@ -2425,13 +2931,80 @@ module Org::Eclipse::Swt::Browser
       def find_browser(handle)
         return MozillaDelegate.find_browser(handle)
       end
+      
+      typesig { [NsIDOMWindow] }
+      def find_browser(a_domwindow)
+        # int
+        # int
+        result = Array.typed(::Java::Long).new(1) { 0 }
+        rc = XPCOM._ns_get_service_manager(result)
+        if (!(rc).equal?(XPCOM::NS_OK))
+          Mozilla.error(rc)
+        end
+        if ((result[0]).equal?(0))
+          Mozilla.error(XPCOM::NS_NOINTERFACE)
+        end
+        service_manager = NsIServiceManager.new(result[0])
+        result[0] = 0
+        a_contract_id = MozillaDelegate.wcs_to_mbcs(nil, XPCOM::NS_WINDOWWATCHER_CONTRACTID, true)
+        rc = service_manager._get_service_by_contract_id(a_contract_id, NsIWindowWatcher::NS_IWINDOWWATCHER_IID, result)
+        if (!(rc).equal?(XPCOM::NS_OK))
+          Mozilla.error(rc)
+        end
+        if ((result[0]).equal?(0))
+          Mozilla.error(XPCOM::NS_NOINTERFACE)
+        end
+        service_manager._release
+        window_watcher = NsIWindowWatcher.new(result[0])
+        result[0] = 0
+        # the chrome will only be answered for the top-level nsIDOMWindow
+        rc = a_domwindow._get_top(result)
+        if (!(rc).equal?(XPCOM::NS_OK))
+          Mozilla.error(rc)
+        end
+        if ((result[0]).equal?(0))
+          Mozilla.error(XPCOM::NS_NOINTERFACE)
+        end
+        # int
+        top_domwindow = result[0]
+        result[0] = 0
+        rc = window_watcher._get_chrome_for_window(top_domwindow, result)
+        if (!(rc).equal?(XPCOM::NS_OK))
+          Mozilla.error(rc)
+        end
+        NsISupports.new(top_domwindow)._release
+        window_watcher._release
+        if ((result[0]).equal?(0))
+          return nil
+        end
+        # the parent chrome is disconnected
+        web_browser_chrome = NsIWebBrowserChrome.new(result[0])
+        result[0] = 0
+        rc = web_browser_chrome._query_interface(NsIEmbeddingSiteWindow::NS_IEMBEDDINGSITEWINDOW_IID, result)
+        if (!(rc).equal?(XPCOM::NS_OK))
+          Mozilla.error(rc)
+        end
+        if ((result[0]).equal?(0))
+          Mozilla.error(XPCOM::NS_NOINTERFACE)
+        end
+        web_browser_chrome._release
+        embedding_site_window = NsIEmbeddingSiteWindow.new(result[0])
+        result[0] = 0
+        rc = embedding_site_window._get_site_window(result)
+        if (!(rc).equal?(XPCOM::NS_OK))
+          Mozilla.error(rc)
+        end
+        if ((result[0]).equal?(0))
+          Mozilla.error(XPCOM::NS_NOINTERFACE)
+        end
+        embedding_site_window._release
+        return find_browser(result[0])
+      end
     }
     
     typesig { [] }
     def forward
-      if (@awaiting_navigate)
-        return false
-      end
+      @html_bytes = nil
       # int
       # int
       result = Array.typed(::Java::Long).new(1) { 0 }
@@ -2449,10 +3022,17 @@ module Org::Eclipse::Swt::Browser
     end
     
     typesig { [] }
+    def get_browser_type
+      return "mozilla" # $NON-NLS-1$
+    end
+    
+    typesig { [] }
+    def get_next_function_index
+      return ((self.attr_next_jsfunction_index += 1) - 1)
+    end
+    
+    typesig { [] }
     def get_text
-      if (@awaiting_navigate)
-        return ""
-      end # $NON-NLS-1$
       # int
       # int
       result = Array.typed(::Java::Long).new(1) { 0 }
@@ -2529,9 +3109,6 @@ module Org::Eclipse::Swt::Browser
     
     typesig { [] }
     def get_url
-      if (@awaiting_navigate)
-        return ""
-      end # $NON-NLS-1$
       # int
       # int
       result = Array.typed(::Java::Long).new(1) { 0 }
@@ -2609,9 +3186,6 @@ module Org::Eclipse::Swt::Browser
     
     typesig { [] }
     def is_back_enabled
-      if (@awaiting_navigate)
-        return false
-      end
       # int
       # int
       result = Array.typed(::Java::Long).new(1) { 0 }
@@ -2632,9 +3206,6 @@ module Org::Eclipse::Swt::Browser
     
     typesig { [] }
     def is_forward_enabled
-      if (@awaiting_navigate)
-        return false
-      end
       # int
       # int
       result = Array.typed(::Java::Long).new(1) { 0 }
@@ -2670,6 +3241,10 @@ module Org::Eclipse::Swt::Browser
       if (!(rc).equal?(XPCOM::NS_OK))
         error(rc)
       end
+      rc = @web_browser._set_container_window(0)
+      if (!(rc).equal?(XPCOM::NS_OK))
+        error(rc)
+      end
       unhook_domlisteners
       if (!(@listener).nil?)
         folder_events = Array.typed(::Java::Int).new([SWT::Dispose, SWT::Resize, SWT::FocusIn, SWT::Activate, SWT::Deactivate, SWT::Show, SWT::KeyDown, ])
@@ -2700,6 +3275,8 @@ module Org::Eclipse::Swt::Browser
       @web_browser._release
       @web_browser = nil
       @web_browser_object = nil
+      @last_navigate_url = RJava.cast_to_string(nil)
+      @html_bytes = nil
       if (!(@tip).nil? && !@tip.is_disposed)
         @tip.dispose
       end
@@ -2711,6 +3288,13 @@ module Org::Eclipse::Swt::Browser
         NsISupports.new(ptr_object.attr_value)._release
       end
       @unhooked_domwindows = nil
+      elements_ = self.attr_functions.elements
+      while (elements_.has_more_elements)
+        function = (elements_.next_element)
+        self.attr_all_functions.remove(function.attr_index)
+        function.dispose(false)
+      end
+      self.attr_functions = nil
       @delegate.on_dispose(@embed_handle)
       @delegate = nil
       @embed_handle = 0
@@ -2783,9 +3367,7 @@ module Org::Eclipse::Swt::Browser
     
     typesig { [] }
     def refresh
-      if (@awaiting_navigate)
-        return
-      end
+      @html_bytes = nil
       # int
       # int
       result = Array.typed(::Java::Long).new(1) { 0 }
@@ -2815,6 +3397,12 @@ module Org::Eclipse::Swt::Browser
       end
     end
     
+    typesig { [BrowserFunction] }
+    def register_function(function)
+      super(function)
+      self.attr_all_functions.put(function.attr_index, function)
+    end
+    
     typesig { [String] }
     def set_text(html)
       # Feature in Mozilla.  The focus memory of Mozilla must be
@@ -2842,114 +3430,126 @@ module Org::Eclipse::Swt::Browser
       rescue UnsupportedEncodingException => e
         return false
       end
-      @awaiting_navigate = false
-      content_type_buffer = MozillaDelegate.wcs_to_mbcs(nil, "text/html", true) # $NON-NLS-1$
-      # int
-      a_content_type = XPCOM.ns_embed_cstring_new(content_type_buffer, content_type_buffer.attr_length)
-      content_charset_buffer = MozillaDelegate.wcs_to_mbcs(nil, "UTF-8", true) # $NON-NLS-1$
-      # int
-      a_content_charset = XPCOM.ns_embed_cstring_new(content_charset_buffer, content_charset_buffer.attr_length)
+      # This could be the first content that is set into the browser, so
+      # ensure that the custom subclass that works around Mozilla bug
+      # https://bugzilla.mozilla.org/show_bug.cgi?id=453523 is removed.
+      @delegate.remove_window_subclass
       # int
       # int
       result = Array.typed(::Java::Long).new(1) { 0 }
-      rc = XPCOM._ns_get_service_manager(result)
-      if (!(rc).equal?(XPCOM::NS_OK))
-        error(rc)
-      end
-      if ((result[0]).equal?(0))
-        error(XPCOM::NS_NOINTERFACE)
-      end
-      service_manager = NsIServiceManager.new(result[0])
-      result[0] = 0
-      rc = service_manager._get_service(XPCOM::NS_IOSERVICE_CID, NsIIOService::NS_IIOSERVICE_IID, result)
-      if (!(rc).equal?(XPCOM::NS_OK))
-        error(rc)
-      end
-      if ((result[0]).equal?(0))
-        error(XPCOM::NS_NOINTERFACE)
-      end
-      service_manager._release
-      io_service = NsIIOService.new(result[0])
-      result[0] = 0
-      # Note.  Mozilla ignores LINK tags used to load CSS stylesheets
-      # when the URI protocol for the nsInputStreamChannel
-      # is about:blank.  The fix is to specify the file protocol.
-      a_string = MozillaDelegate.wcs_to_mbcs(nil, URI_FROMMEMORY, false)
-      # int
-      a_spec = XPCOM.ns_embed_cstring_new(a_string, a_string.attr_length)
-      rc = io_service._new_uri(a_spec, nil, 0, result)
-      if (!(rc).equal?(XPCOM::NS_OK))
-        error(rc)
-      end
-      if ((result[0]).equal?(0))
-        error(XPCOM::NS_NOINTERFACE)
-      end
-      XPCOM.ns_embed_cstring_delete(a_spec)
-      io_service._release
-      uri = NsIURI.new(result[0])
-      result[0] = 0
-      rc = @web_browser._query_interface(NsIInterfaceRequestor::NS_IINTERFACEREQUESTOR_IID, result)
-      if (!(rc).equal?(XPCOM::NS_OK))
-        error(rc)
-      end
-      if ((result[0]).equal?(0))
-        error(XPCOM::NS_ERROR_NO_INTERFACE)
-      end
-      interface_requestor = NsIInterfaceRequestor.new(result[0])
-      result[0] = 0
-      # Feature in Mozilla. LoadStream invokes the nsIInputStream argument
-      # through a different thread.  The callback mechanism must attach
-      # a non java thread to the JVM otherwise the nsIInputStream Read and
-      # Close methods never get called.
-      input_stream = InputStream.new(data)
-      input_stream._add_ref
-      rc = interface_requestor._get_interface(NsIDocShell_1_9::NS_IDOCSHELL_IID, result)
-      if ((rc).equal?(XPCOM::NS_OK))
+      rc = @web_browser._query_interface(NsIWebBrowserStream::NS_IWEBBROWSERSTREAM_IID, result)
+      if ((rc).equal?(XPCOM::NS_OK) && !(result[0]).equal?(0))
+        # Setting mozilla's content through nsIWebBrowserStream does not cause a page
+        # load to occur, so the events that usually accompany a page change are not
+        # fired.  To make this behave as expected, navigate to about:blank first and
+        # then set the html content once the page has loaded.
+        NsISupports.new(result[0])._release
+        result[0] = 0
+        # If htmlBytes is not null then the about:blank page is already being loaded,
+        # so no Navigate is required.  Just set the html that is to be shown.
+        blank_loading = !(@html_bytes).nil?
+        @html_bytes = data
+        if (blank_loading)
+          return true
+        end
+        # navigate to about:blank
+        rc = @web_browser._query_interface(NsIWebNavigation::NS_IWEBNAVIGATION_IID, result)
+        if (!(rc).equal?(XPCOM::NS_OK))
+          error(rc)
+        end
         if ((result[0]).equal?(0))
           error(XPCOM::NS_ERROR_NO_INTERFACE)
         end
-        doc_shell = NsIDocShell_1_9.new(result[0])
+        web_navigation = NsIWebNavigation.new(result[0])
+        result[0] = 0
+        uri = CharArray.new(ABOUT_BLANK.length + 1)
+        ABOUT_BLANK.get_chars(0, ABOUT_BLANK.length, uri, 0)
+        rc = web_navigation._load_uri(uri, NsIWebNavigation::LOAD_FLAGS_NONE, 0, 0, 0)
+        if (!(rc).equal?(XPCOM::NS_OK))
+          error(rc)
+        end
+        web_navigation._release
+      else
+        content_charset_buffer = MozillaDelegate.wcs_to_mbcs(nil, "UTF-8", true) # $NON-NLS-1$
+        # int
+        a_content_charset = XPCOM.ns_embed_cstring_new(content_charset_buffer, content_charset_buffer.attr_length)
+        content_type_buffer = MozillaDelegate.wcs_to_mbcs(nil, "text/html", true) # $NON-NLS-1$
+        # int
+        a_content_type = XPCOM.ns_embed_cstring_new(content_type_buffer, content_type_buffer.attr_length)
+        rc = XPCOM._ns_get_service_manager(result)
+        if (!(rc).equal?(XPCOM::NS_OK))
+          error(rc)
+        end
+        if ((result[0]).equal?(0))
+          error(XPCOM::NS_NOINTERFACE)
+        end
+        service_manager = NsIServiceManager.new(result[0])
+        result[0] = 0
+        rc = service_manager._get_service(XPCOM::NS_IOSERVICE_CID, NsIIOService::NS_IIOSERVICE_IID, result)
+        if (!(rc).equal?(XPCOM::NS_OK))
+          error(rc)
+        end
+        if ((result[0]).equal?(0))
+          error(XPCOM::NS_NOINTERFACE)
+        end
+        service_manager._release
+        io_service = NsIIOService.new(result[0])
+        result[0] = 0
+        # Note.  Mozilla ignores LINK tags used to load CSS stylesheets
+        # when the URI protocol for the nsInputStreamChannel
+        # is about:blank.  The fix is to specify the file protocol.
+        a_string = MozillaDelegate.wcs_to_mbcs(nil, URI_FROMMEMORY, false)
+        # int
+        a_spec = XPCOM.ns_embed_cstring_new(a_string, a_string.attr_length)
+        rc = io_service._new_uri(a_spec, nil, 0, result)
+        if (!(rc).equal?(XPCOM::NS_OK))
+          error(rc)
+        end
+        if ((result[0]).equal?(0))
+          error(XPCOM::NS_NOINTERFACE)
+        end
+        XPCOM.ns_embed_cstring_delete(a_spec)
+        io_service._release
+        uri = NsIURI.new(result[0])
+        result[0] = 0
+        rc = @web_browser._query_interface(NsIInterfaceRequestor::NS_IINTERFACEREQUESTOR_IID, result)
+        if (!(rc).equal?(XPCOM::NS_OK))
+          error(rc)
+        end
+        if ((result[0]).equal?(0))
+          error(XPCOM::NS_ERROR_NO_INTERFACE)
+        end
+        interface_requestor = NsIInterfaceRequestor.new(result[0])
+        result[0] = 0
+        # Feature in Mozilla. LoadStream invokes the nsIInputStream argument
+        # through a different thread.  The callback mechanism must attach
+        # a non java thread to the JVM otherwise the nsIInputStream Read and
+        # Close methods never get called.
+        input_stream = InputStream.new(data)
+        input_stream._add_ref
+        rc = interface_requestor._get_interface(NsIDocShell::NS_IDOCSHELL_IID, result)
+        if (!(rc).equal?(XPCOM::NS_OK))
+          error(rc)
+        end
+        if ((result[0]).equal?(0))
+          error(XPCOM::NS_ERROR_NO_INTERFACE)
+        end
+        doc_shell = NsIDocShell.new(result[0])
+        result[0] = 0
         rc = doc_shell._load_stream(input_stream.get_address, uri.get_address, a_content_type, a_content_charset, 0)
         doc_shell._release
-      else
-        result[0] = 0
-        rc = interface_requestor._get_interface(NsIDocShell_1_8::NS_IDOCSHELL_IID, result)
-        if ((rc).equal?(XPCOM::NS_OK))
-          if ((result[0]).equal?(0))
-            error(XPCOM::NS_ERROR_NO_INTERFACE)
-          end
-          doc_shell = NsIDocShell_1_8.new(result[0])
-          rc = doc_shell._load_stream(input_stream.get_address, uri.get_address, a_content_type, a_content_charset, 0)
-          doc_shell._release
-        else
-          result[0] = 0
-          rc = interface_requestor._get_interface(NsIDocShell::NS_IDOCSHELL_IID, result)
-          if (!(rc).equal?(XPCOM::NS_OK))
-            error(rc)
-          end
-          if ((result[0]).equal?(0))
-            error(XPCOM::NS_ERROR_NO_INTERFACE)
-          end
-          doc_shell = NsIDocShell.new(result[0])
-          rc = doc_shell._load_stream(input_stream.get_address, uri.get_address, a_content_type, a_content_charset, 0)
-          doc_shell._release
-        end
+        input_stream._release
+        interface_requestor._release
+        uri._release
+        XPCOM.ns_embed_cstring_delete(a_content_type)
+        XPCOM.ns_embed_cstring_delete(a_content_charset)
       end
-      if (!(rc).equal?(XPCOM::NS_OK))
-        error(rc)
-      end
-      result[0] = 0
-      input_stream._release
-      interface_requestor._release
-      uri._release
-      XPCOM.ns_embed_cstring_delete(a_content_charset)
-      XPCOM.ns_embed_cstring_delete(a_content_type)
       return true
     end
     
     typesig { [String] }
     def set_url(url)
-      @awaiting_navigate = false
+      @html_bytes = nil
       # int
       # int
       result = Array.typed(::Java::Long).new(1) { 0 }
@@ -2960,6 +3560,10 @@ module Org::Eclipse::Swt::Browser
       if ((result[0]).equal?(0))
         error(XPCOM::NS_ERROR_NO_INTERFACE)
       end
+      # This could be the first content that is set into the browser, so
+      # ensure that the custom subclass that works around Mozilla bug
+      # https://bugzilla.mozilla.org/show_bug.cgi?id=453523 is removed.
+      @delegate.remove_window_subclass
       web_navigation = NsIWebNavigation.new(result[0])
       uri = CharArray.new(url.length + 1)
       url.get_chars(0, url.length, uri, 0)
@@ -2970,9 +3574,7 @@ module Org::Eclipse::Swt::Browser
     
     typesig { [] }
     def stop
-      if (@awaiting_navigate)
-        return
-      end
+      @html_bytes = nil
       # int
       # int
       result = Array.typed(::Java::Long).new(1) { 0 }
@@ -3300,25 +3902,23 @@ module Org::Eclipse::Swt::Browser
         if ((@request).equal?(0))
           @request = a_request
         end
-        if (!@awaiting_navigate)
-          # Add the page's nsIDOMWindow to the collection of windows that will
-          # have DOM listeners added to them later on in the page loading
-          # process.  These listeners cannot be added yet because the
-          # nsIDOMWindow is not ready to take them at this stage.
-          # 
-          # int
-          # int
-          result = Array.typed(::Java::Long).new(1) { 0 }
-          progress = NsIWebProgress.new(a_web_progress)
-          rc = progress._get_domwindow(result)
-          if (!(rc).equal?(XPCOM::NS_OK))
-            error(rc)
-          end
-          if ((result[0]).equal?(0))
-            error(XPCOM::NS_NOINTERFACE)
-          end
-          @unhooked_domwindows.add_element(SwtLONG.new(result[0]))
+        # Add the page's nsIDOMWindow to the collection of windows that will
+        # have DOM listeners added to them later on in the page loading
+        # process.  These listeners cannot be added yet because the
+        # nsIDOMWindow is not ready to take them at this stage.
+        # 
+        # int
+        # int
+        result = Array.typed(::Java::Long).new(1) { 0 }
+        progress = NsIWebProgress.new(a_web_progress)
+        rc = progress._get_domwindow(result)
+        if (!(rc).equal?(XPCOM::NS_OK))
+          error(rc)
         end
+        if ((result[0]).equal?(0))
+          error(XPCOM::NS_NOINTERFACE)
+        end
+        @unhooked_domwindows.add_element(SwtLONG.new(result[0]))
       else
         if (!((a_state_flags & NsIWebProgressListener::STATE_REDIRECTING)).equal?(0))
           if ((@request).equal?(a_request))
@@ -3374,6 +3974,131 @@ module Org::Eclipse::Swt::Browser
               @unhooked_domwindows.remove(ptr_object)
               NsISupports.new(ptr_object.attr_value)._release
             end
+            # If htmlBytes is not null then there is html from a previous setText() call
+            # waiting to be set into the about:blank page once it has completed loading.
+            if (!(@html_bytes).nil?)
+              req = NsIRequest.new(a_request)
+              # int
+              name = XPCOM.ns_embed_cstring_new
+              rc = req._get_name(name)
+              if (!(rc).equal?(XPCOM::NS_OK))
+                error(rc)
+              end
+              length_ = XPCOM.ns_embed_cstring_length(name)
+              # int
+              buffer = XPCOM.ns_embed_cstring_get(name)
+              dest = Array.typed(::Java::Byte).new(length_) { 0 }
+              XPCOM.memmove(dest, buffer, length_)
+              url = String.new(dest)
+              XPCOM.ns_embed_cstring_delete(name)
+              if (url.starts_with(ABOUT_BLANK))
+                # Setting mozilla's content with nsIWebBrowserStream invalidates the
+                # DOM listeners that were hooked on it (about:blank), so remove them and
+                # add new ones after the content has been set.
+                unhook_domlisteners
+                rc = XPCOM._ns_get_service_manager(result)
+                if (!(rc).equal?(XPCOM::NS_OK))
+                  error(rc)
+                end
+                if ((result[0]).equal?(0))
+                  error(XPCOM::NS_NOINTERFACE)
+                end
+                service_manager = NsIServiceManager.new(result[0])
+                result[0] = 0
+                rc = service_manager._get_service(XPCOM::NS_IOSERVICE_CID, NsIIOService::NS_IIOSERVICE_IID, result)
+                if (!(rc).equal?(XPCOM::NS_OK))
+                  error(rc)
+                end
+                if ((result[0]).equal?(0))
+                  error(XPCOM::NS_NOINTERFACE)
+                end
+                service_manager._release
+                io_service = NsIIOService.new(result[0])
+                result[0] = 0
+                # Note.  Mozilla ignores LINK tags used to load CSS stylesheets
+                # when the URI protocol for the nsInputStreamChannel
+                # is about:blank.  The fix is to specify the file protocol.
+                a_string = MozillaDelegate.wcs_to_mbcs(nil, URI_FROMMEMORY, false)
+                # int
+                a_spec = XPCOM.ns_embed_cstring_new(a_string, a_string.attr_length)
+                rc = io_service._new_uri(a_spec, nil, 0, result)
+                if (!(rc).equal?(XPCOM::NS_OK))
+                  error(rc)
+                end
+                if ((result[0]).equal?(0))
+                  error(XPCOM::NS_NOINTERFACE)
+                end
+                XPCOM.ns_embed_cstring_delete(a_spec)
+                io_service._release
+                uri = NsIURI.new(result[0])
+                result[0] = 0
+                rc = @web_browser._query_interface(NsIWebBrowserStream::NS_IWEBBROWSERSTREAM_IID, result)
+                if (!(rc).equal?(XPCOM::NS_OK))
+                  error(rc)
+                end
+                if ((result[0]).equal?(0))
+                  error(XPCOM::NS_NOINTERFACE)
+                end
+                stream = NsIWebBrowserStream.new(result[0])
+                result[0] = 0
+                content_type_buffer = MozillaDelegate.wcs_to_mbcs(nil, "text/html", true) # $NON-NLS-1$
+                # int
+                a_content_type = XPCOM.ns_embed_cstring_new(content_type_buffer, content_type_buffer.attr_length)
+                rc = stream._open_stream(uri.get_address, a_content_type)
+                if (!(rc).equal?(XPCOM::NS_OK))
+                  error(rc)
+                end
+                # int
+                ptr = C.malloc(@html_bytes.attr_length)
+                XPCOM.memmove(ptr, @html_bytes, @html_bytes.attr_length)
+                page_size = 8192
+                page_count = @html_bytes.attr_length / page_size + 1
+                # int
+                current = ptr
+                i = 0
+                while i < page_count
+                  length_ = (i).equal?(page_count - 1) ? @html_bytes.attr_length % page_size : page_size
+                  if (length_ > 0)
+                    rc = stream._append_to_stream(current, length_)
+                    if (!(rc).equal?(XPCOM::NS_OK))
+                      error(rc)
+                    end
+                  end
+                  current += page_size
+                  i += 1
+                end
+                rc = stream._close_stream
+                if (!(rc).equal?(XPCOM::NS_OK))
+                  error(rc)
+                end
+                C.free(ptr)
+                XPCOM.ns_embed_cstring_delete(a_content_type)
+                stream._release
+                uri._release
+                @html_bytes = nil
+                rc = @web_browser._get_content_domwindow(result)
+                if (!(rc).equal?(XPCOM::NS_OK))
+                  error(rc)
+                end
+                if ((result[0]).equal?(0))
+                  error(XPCOM::NS_ERROR_NO_INTERFACE)
+                end
+                is_top = (result[0]).equal?(dom_window.get_address)
+                NsISupports.new(result[0])._release
+                result[0] = 0
+                rc = dom_window._query_interface(NsIDOMEventTarget::NS_IDOMEVENTTARGET_IID, result)
+                if (!(rc).equal?(XPCOM::NS_OK))
+                  error(rc)
+                end
+                if ((result[0]).equal?(0))
+                  error(XPCOM::NS_ERROR_NO_INTERFACE)
+                end
+                target = NsIDOMEventTarget.new(result[0])
+                result[0] = 0
+                hook_domlisteners(target, is_top)
+                target._release
+              end
+            end
             dom_window._release
             # Feature in Mozilla.  When a request is redirected (STATE_REDIRECTING),
             # it never reaches the state STATE_STOP and it is replaced with a new request.
@@ -3384,24 +4109,28 @@ module Org::Eclipse::Swt::Browser
             # the ProgressListener.completed event.
             if ((@request).equal?(a_request) || (@request).equal?(0))
               @request = 0
-              if (!@awaiting_navigate)
-                event = StatusTextEvent.new(self.attr_browser)
-                event.attr_display = self.attr_browser.get_display
-                event.attr_widget = self.attr_browser
-                event.attr_text = "" # $NON-NLS-1$
-                i = 0
-                while i < self.attr_status_text_listeners.attr_length
-                  self.attr_status_text_listeners[i].changed(event)
-                  i += 1
-                end
-                event2 = ProgressEvent.new(self.attr_browser)
-                event2.attr_display = self.attr_browser.get_display
-                event2.attr_widget = self.attr_browser
-                i_ = 0
-                while i_ < self.attr_progress_listeners.attr_length
-                  self.attr_progress_listeners[i_].completed(event2)
-                  i_ += 1
-                end
+              event = StatusTextEvent.new(self.attr_browser)
+              event.attr_display = self.attr_browser.get_display
+              event.attr_widget = self.attr_browser
+              event.attr_text = "" # $NON-NLS-1$
+              i = 0
+              while i < self.attr_status_text_listeners.attr_length
+                self.attr_status_text_listeners[i].changed(event)
+                i += 1
+              end
+              # re-install registered functions
+              elements_ = self.attr_functions.elements
+              while (elements_.has_more_elements)
+                function = elements_.next_element
+                execute(function.attr_function_string)
+              end
+              event2 = ProgressEvent.new(self.attr_browser)
+              event2.attr_display = self.attr_browser.get_display
+              event2.attr_widget = self.attr_browser
+              i_ = 0
+              while i_ < self.attr_progress_listeners.attr_length
+                self.attr_progress_listeners[i_].completed(event2)
+                i_ += 1
               end
             end
           else
@@ -3463,7 +4192,7 @@ module Org::Eclipse::Swt::Browser
     # int
     # int
     def _on_progress_change(a_web_progress, a_request, a_cur_self_progress, a_max_self_progress, a_cur_total_progress, a_max_total_progress)
-      if (@awaiting_navigate || (self.attr_progress_listeners.attr_length).equal?(0))
+      if ((self.attr_progress_listeners.attr_length).equal?(0))
         return XPCOM::NS_OK
       end
       event = ProgressEvent.new(self.attr_browser)
@@ -3494,7 +4223,7 @@ module Org::Eclipse::Swt::Browser
       if (!(@request).equal?(0) && !(@request).equal?(a_request))
         @request = a_request
       end
-      if (@awaiting_navigate || (self.attr_location_listeners.attr_length).equal?(0))
+      if ((self.attr_location_listeners.attr_length).equal?(0))
         return XPCOM::NS_OK
       end
       web_progress = NsIWebProgress.new(a_web_progress)
@@ -3563,7 +4292,7 @@ module Org::Eclipse::Swt::Browser
     # int
     # int
     def _on_status_change(a_web_progress, a_request, a_status, a_message)
-      if (@awaiting_navigate || (self.attr_status_text_listeners.attr_length).equal?(0))
+      if ((self.attr_status_text_listeners.attr_length).equal?(0))
         return XPCOM::NS_OK
       end
       event = StatusTextEvent.new(self.attr_browser)
@@ -3592,7 +4321,7 @@ module Org::Eclipse::Swt::Browser
     # nsIWebBrowserChrome
     # int
     def _set_status(status_type, status)
-      if (@awaiting_navigate || (self.attr_status_text_listeners.attr_length).equal?(0))
+      if ((self.attr_status_text_listeners.attr_length).equal?(0))
         return XPCOM::NS_OK
       end
       event = StatusTextEvent.new(self.attr_browser)
@@ -3878,7 +4607,7 @@ module Org::Eclipse::Swt::Browser
     typesig { [::Java::Long] }
     # int
     def _set_title(a_title)
-      if (@awaiting_navigate || (self.attr_title_listeners.attr_length).equal?(0))
+      if ((self.attr_title_listeners.attr_length).equal?(0))
         return XPCOM::NS_OK
       end
       event = TitleEvent.new(self.attr_browser)
@@ -3983,9 +4712,6 @@ module Org::Eclipse::Swt::Browser
     # int
     # int
     def _on_show_context_menu(a_context_flags, a_event, a_node)
-      if (@awaiting_navigate)
-        return XPCOM::NS_OK
-      end
       dom_event = NsIDOMEvent.new(a_event)
       # int
       # int
@@ -4031,11 +4757,7 @@ module Org::Eclipse::Swt::Browser
     # int
     # int
     def _on_start_uriopen(a_uri, retval)
-      if (@awaiting_navigate || (self.attr_location_listeners.attr_length).equal?(0))
-        XPCOM.memmove(retval, Array.typed(::Java::Int).new([0]), 4)
-        # PRBool
-        return XPCOM::NS_OK
-      end
+      @auth_count = 0
       location = NsIURI.new(a_uri)
       # int
       a_spec = XPCOM.ns_embed_cstring_new
@@ -4050,25 +4772,50 @@ module Org::Eclipse::Swt::Browser
       value = String.new(dest)
       doit = true
       if ((@request).equal?(0))
-        # listeners should not be notified of internal transitions like "javascipt:..."
+        # listeners should not be notified of internal transitions like "javascript:..."
         # because this is an implementation side-effect, not a true navigate
         if (!value.starts_with(PREFIX_JAVASCRIPT))
-          event = LocationEvent.new(self.attr_browser)
-          event.attr_display = self.attr_browser.get_display
-          event.attr_widget = self.attr_browser
-          event.attr_location = value
-          # If the URI indicates that the page is being rendered from memory
-          # (via setText()) then set it to about:blank to be consistent with IE.
-          if ((event.attr_location == URI_FROMMEMORY))
-            event.attr_location = ABOUT_BLANK
+          if (self.attr_location_listeners.attr_length > 0)
+            event = LocationEvent.new(self.attr_browser)
+            event.attr_display = self.attr_browser.get_display
+            event.attr_widget = self.attr_browser
+            event.attr_location = value
+            # If the URI indicates that the page is being rendered from memory
+            # (via setText()) then set it to about:blank to be consistent with IE.
+            if ((event.attr_location == URI_FROMMEMORY))
+              event.attr_location = ABOUT_BLANK
+            end
+            event.attr_doit = doit
+            i = 0
+            while i < self.attr_location_listeners.attr_length
+              self.attr_location_listeners[i].changing(event)
+              i += 1
+            end
+            doit = event.attr_doit && !self.attr_browser.is_disposed
           end
-          event.attr_doit = doit
-          i = 0
-          while i < self.attr_location_listeners.attr_length
-            self.attr_location_listeners[i].changing(event)
-            i += 1
+          if (doit)
+            if (self.attr_js_enabled_changed)
+              self.attr_js_enabled_changed = false
+              # int
+              # int
+              result = Array.typed(::Java::Long).new(1) { 0 }
+              rc = @web_browser._query_interface(NsIWebBrowserSetup::NS_IWEBBROWSERSETUP_IID, result)
+              if (!(rc).equal?(XPCOM::NS_OK))
+                error(rc)
+              end
+              if ((result[0]).equal?(0))
+                error(XPCOM::NS_NOINTERFACE)
+              end
+              setup = NsIWebBrowserSetup.new(result[0])
+              result[0] = 0
+              rc = setup._set_property(NsIWebBrowserSetup::SETUP_ALLOW_JAVASCRIPT, self.attr_js_enabled ? 1 : 0)
+              if (!(rc).equal?(XPCOM::NS_OK))
+                error(rc)
+              end
+              setup._release
+            end
+            @last_navigate_url = value
           end
-          doit = event.attr_doit && !self.attr_browser.is_disposed
         end
       end
       XPCOM.memmove(retval, Array.typed(::Java::Int).new([doit ? 0 : 1]), 4)
@@ -4114,7 +4861,7 @@ module Org::Eclipse::Swt::Browser
           # First try to use the nsIWebNavigationInfo if it's available (>= mozilla 1.8)
           a_contract_id = MozillaDelegate.wcs_to_mbcs(nil, XPCOM::NS_WEBNAVIGATIONINFO_CONTRACTID, true)
           rc = service_manager._get_service_by_contract_id(a_contract_id, NsIWebNavigationInfo::NS_IWEBNAVIGATIONINFO_IID, result)
-          if ((rc).equal?(0))
+          if ((rc).equal?(XPCOM::NS_OK))
             bytes = MozillaDelegate.wcs_to_mbcs(nil, content_type, true)
             # int
             type_ptr = XPCOM.ns_embed_cstring_new(bytes, bytes.attr_length)
@@ -4195,9 +4942,6 @@ module Org::Eclipse::Swt::Browser
     # nsITooltipListener
     # int
     def _on_show_tooltip(a_xcoords, a_ycoords, a_tip_text)
-      if (@awaiting_navigate)
-        return XPCOM::NS_OK
-      end
       length_ = XPCOM.strlen__prunichar(a_tip_text)
       dest = CharArray.new(length_)
       XPCOM.memmove(dest, a_tip_text, length_ * 2)
@@ -4709,16 +5453,18 @@ module Org::Eclipse::Swt::Browser
       @ref_count = 0
       @last_key_code = 0
       @last_char_code = 0
+      @auth_count = 0
       @request = 0
       @location = nil
       @size = nil
       @visible = false
       @is_child = false
       @ignore_dispose = false
-      @awaiting_navigate = false
       @tip = nil
       @listener = nil
       @unhooked_domwindows = nil
+      @last_navigate_url = nil
+      @html_bytes = nil
       super()
       @chrome_flags = NsIWebBrowserChrome::CHROME_DEFAULT
       @tip = nil

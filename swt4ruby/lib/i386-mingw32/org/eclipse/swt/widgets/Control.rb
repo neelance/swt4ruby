@@ -1,6 +1,6 @@
 require "rjava"
 
-# Copyright (c) 2000, 2008 IBM Corporation and others.
+# Copyright (c) 2000, 2009 IBM Corporation and others.
 # All rights reserved. This program and the accompanying materials
 # are made available under the terms of the Eclipse Public License v1.0
 # which accompanies this distribution, and is available at
@@ -13,6 +13,7 @@ module Org::Eclipse::Swt::Widgets
     class_module.module_eval {
       include ::Java::Lang
       include ::Org::Eclipse::Swt::Widgets
+      include ::Org::Eclipse::Swt::Internal::Gdip
       include ::Org::Eclipse::Swt::Internal::Win32
       include ::Org::Eclipse::Swt::Graphics
       include ::Org::Eclipse::Swt
@@ -41,6 +42,7 @@ module Org::Eclipse::Swt::Widgets
   # @see <a href="http://www.eclipse.org/swt/snippets/#control">Control snippets</a>
   # @see <a href="http://www.eclipse.org/swt/examples.php">SWT Example: ControlExample</a>
   # @see <a href="http://www.eclipse.org/swt/">Sample code and further information</a>
+  # @noextend This class is not intended to be subclassed by clients.
   class Control < ControlImports.const_get :Widget
     include_class_members ControlImports
     overload_protected {
@@ -179,6 +181,8 @@ module Org::Eclipse::Swt::Widgets
     # </ul>
     # 
     # @see SWT#BORDER
+    # @see SWT#LEFT_TO_RIGHT
+    # @see SWT#RIGHT_TO_LEFT
     # @see Widget#checkSubclass
     # @see Widget#getStyle
     def initialize(parent, style)
@@ -728,10 +732,10 @@ module Org::Eclipse::Swt::Widgets
     def compute_tab_list
       if (is_tab_group)
         if (get_visible && get_enabled)
-          return Array.typed(Control).new([self])
+          return Array.typed(Widget).new([self])
         end
       end
-      return Array.typed(Control).new(0) { nil }
+      return Array.typed(Widget).new(0) { nil }
     end
     
     typesig { [] }
@@ -1261,7 +1265,11 @@ module Org::Eclipse::Swt::Widgets
     
     typesig { [] }
     # Returns the receiver's background color.
-    # 
+    # <p>
+    # Note: This operation is a hint and may be overridden by the platform.
+    # For example, on some versions of Windows the background of a TabFolder,
+    # is a gradient rather than a solid color.
+    # </p>
     # @return the background color
     # 
     # @exception SWTException <ul>
@@ -1430,6 +1438,11 @@ module Org::Eclipse::Swt::Widgets
     def get_drag_detect
       check_widget
       return !((self.attr_state & DRAG_DETECT)).equal?(0)
+    end
+    
+    typesig { [] }
+    def get_drawing
+      return @draw_count <= 0
     end
     
     typesig { [] }
@@ -1702,7 +1715,7 @@ module Org::Eclipse::Swt::Widgets
     # </ul>
     def get_visible
       check_widget
-      if (!(@draw_count).equal?(0))
+      if (!get_drawing)
         return ((self.attr_state & HIDDEN)).equal?(0)
       end
       bits = OS._get_window_long(@handle, OS::GWL_STYLE)
@@ -2276,23 +2289,172 @@ module Org::Eclipse::Swt::Widgets
       if (!OS::IsWinCE && OS::WIN32_VERSION >= OS._version(5, 1))
         # long
         top_handle_ = top_handle
-        bits = OS._get_window_long(top_handle_, OS::GWL_STYLE)
-        if (((bits & OS::WS_VISIBLE)).equal?(0))
-          OS._def_window_proc(top_handle_, OS::WM_SETREDRAW, 1, 0)
+        # long
+        hdc = gc.attr_handle
+        state = 0
+        # long
+        gdip_graphics = gc.get_gcdata.attr_gdip_graphics
+        if (!(gdip_graphics).equal?(0))
+          # long
+          clip_rgn = 0
+          Gdip._graphics_set_pixel_offset_mode(gdip_graphics, Gdip::PixelOffsetModeNone)
+          # long
+          rgn = Gdip._region_new
+          if ((rgn).equal?(0))
+            SWT.error(SWT::ERROR_NO_HANDLES)
+          end
+          Gdip._graphics_get_clip(gdip_graphics, rgn)
+          if (!Gdip._region_is_infinite(rgn, gdip_graphics))
+            clip_rgn = Gdip._region_get_hrgn(rgn, gdip_graphics)
+          end
+          Gdip._region_delete(rgn)
+          Gdip._graphics_set_pixel_offset_mode(gdip_graphics, Gdip::PixelOffsetModeHalf)
+          lp_xform = nil
+          # long
+          matrix = Gdip._matrix_new(1, 0, 0, 1, 0, 0)
+          if ((matrix).equal?(0))
+            SWT.error(SWT::ERROR_NO_HANDLES)
+          end
+          Gdip._graphics_get_transform(gdip_graphics, matrix)
+          if (!Gdip._matrix_is_identity(matrix))
+            lp_xform = Array.typed(::Java::Float).new(6) { 0.0 }
+            Gdip._matrix_get_elements(matrix, lp_xform)
+          end
+          Gdip._matrix_delete(matrix)
+          hdc = Gdip._graphics_get_hdc(gdip_graphics)
+          state = OS._save_dc(hdc)
+          if (!(lp_xform).nil?)
+            OS._set_graphics_mode(hdc, OS::GM_ADVANCED)
+            OS._set_world_transform(hdc, lp_xform)
+          end
+          if (!(clip_rgn).equal?(0))
+            OS._select_clip_rgn(hdc, clip_rgn)
+            OS._delete_object(clip_rgn)
+          end
         end
-        print_widget(top_handle_, gc)
-        if (((bits & OS::WS_VISIBLE)).equal?(0))
-          OS._def_window_proc(top_handle_, OS::WM_SETREDRAW, 0, 0)
+        if (OS::IsWinCE)
+          OS._update_window(top_handle_)
+        else
+          flags = OS::RDW_UPDATENOW | OS::RDW_ALLCHILDREN
+          OS._redraw_window(top_handle_, nil, 0, flags)
+        end
+        print_widget(top_handle_, hdc, gc)
+        if (!(gdip_graphics).equal?(0))
+          OS._restore_dc(hdc, state)
+          Gdip._graphics_release_hdc(gdip_graphics, hdc)
         end
         return true
       end
       return false
     end
     
-    typesig { [::Java::Int, SwtGC] }
+    typesig { [::Java::Int, ::Java::Int, SwtGC] }
     # long
-    def print_widget(hwnd, gc)
-      OS._print_window(hwnd, gc.attr_handle, 0)
+    # long
+    def print_widget(hwnd, hdc, gc)
+      # Bug in Windows.  For some reason, PrintWindow()
+      # returns success but does nothing when it is called
+      # on a printer.  The fix is to just go directly to
+      # WM_PRINT in this case.
+      success = false
+      if (!((OS._get_device_caps(gc.attr_handle, OS::TECHNOLOGY)).equal?(OS::DT_RASPRINTER)))
+        # Bug in Windows.  When PrintWindow() will only draw that
+        # portion of a control that is not obscured by the shell.
+        # The fix is temporarily reparent the window to the desktop,
+        # call PrintWindow() then reparent the window back.
+        # 
+        # long
+        hwnd_parent = OS._get_parent(hwnd)
+        # long
+        hwnd_shell = hwnd_parent
+        while (!(OS._get_parent(hwnd_shell)).equal?(0))
+          if (!(OS._get_window(hwnd_shell, OS::GW_OWNER)).equal?(0))
+            break
+          end
+          hwnd_shell = OS._get_parent(hwnd_shell)
+        end
+        rect1 = RECT.new
+        OS._get_window_rect(hwnd, rect1)
+        fix_print_window = !OS._is_window_visible(hwnd)
+        if (!fix_print_window)
+          rect2 = RECT.new
+          OS._get_window_rect(hwnd_shell, rect2)
+          OS._intersect_rect(rect2, rect1, rect2)
+          fix_print_window = !OS._equal_rect(rect2, rect1)
+        end
+        # Bug in Windows. PrintWindow() does not print portions
+        # of the receiver that are clipped out using SetWindowRgn()
+        # in a parent.  The fix is temporarily reparent the window
+        # to the desktop, call PrintWindow() then reparent the window
+        # back.
+        if (!fix_print_window)
+          # long
+          rgn = OS._create_rect_rgn(0, 0, 0, 0)
+          # long
+          parent = OS._get_parent(hwnd)
+          while (!(parent).equal?(hwnd_shell) && !fix_print_window)
+            if (!(OS._get_window_rgn(parent, rgn)).equal?(0))
+              fix_print_window = true
+            end
+            parent = OS._get_parent(parent)
+          end
+          OS._delete_object(rgn)
+        end
+        bits = OS._get_window_long(hwnd, OS::GWL_STYLE)
+        # long
+        hwnd_insert_after = OS._get_window(hwnd, OS::GW_HWNDPREV)
+        # Bug in Windows.  For some reason, when GetWindow ()
+        # with GW_HWNDPREV is used to query the previous window
+        # in the z-order with the first child, Windows returns
+        # the first child instead of NULL.  The fix is to detect
+        # this case and move the control to the top.
+        if ((hwnd_insert_after).equal?(0) || (hwnd_insert_after).equal?(hwnd))
+          hwnd_insert_after = OS::HWND_TOP
+        end
+        if (fix_print_window)
+          x = OS._get_system_metrics(OS::SM_XVIRTUALSCREEN)
+          y = OS._get_system_metrics(OS::SM_YVIRTUALSCREEN)
+          width = OS._get_system_metrics(OS::SM_CXVIRTUALSCREEN)
+          height = OS._get_system_metrics(OS::SM_CYVIRTUALSCREEN)
+          flags = OS::SWP_NOSIZE | OS::SWP_NOZORDER | OS::SWP_NOACTIVATE | OS::SWP_DRAWFRAME
+          if (!((bits & OS::WS_VISIBLE)).equal?(0))
+            OS._def_window_proc(hwnd, OS::WM_SETREDRAW, 0, 0)
+          end
+          _set_window_pos(hwnd, 0, x + width, y + height, 0, 0, flags)
+          OS._set_parent(hwnd, 0)
+          if (!((bits & OS::WS_VISIBLE)).equal?(0))
+            OS._def_window_proc(hwnd, OS::WM_SETREDRAW, 1, 0)
+          end
+        end
+        if (((bits & OS::WS_VISIBLE)).equal?(0))
+          OS._def_window_proc(hwnd, OS::WM_SETREDRAW, 1, 0)
+        end
+        success = OS._print_window(hwnd, hdc, 0)
+        if (((bits & OS::WS_VISIBLE)).equal?(0))
+          OS._def_window_proc(hwnd, OS::WM_SETREDRAW, 0, 0)
+        end
+        if (fix_print_window)
+          if (!((bits & OS::WS_VISIBLE)).equal?(0))
+            OS._def_window_proc(hwnd, OS::WM_SETREDRAW, 0, 0)
+          end
+          OS._set_parent(hwnd, hwnd_parent)
+          OS._map_window_points(0, hwnd_parent, rect1, 2)
+          flags = OS::SWP_NOSIZE | OS::SWP_NOACTIVATE | OS::SWP_DRAWFRAME
+          _set_window_pos(hwnd, hwnd_insert_after, rect1.attr_left, rect1.attr_top, rect1.attr_right - rect1.attr_left, rect1.attr_bottom - rect1.attr_top, flags)
+          if (!((bits & OS::WS_VISIBLE)).equal?(0))
+            OS._def_window_proc(hwnd, OS::WM_SETREDRAW, 1, 0)
+          end
+        end
+      end
+      # Bug in Windows.  For some reason, PrintWindow() fails
+      # when it is called on a push button.  The fix is to
+      # detect the failure and use WM_PRINT instead.  Note
+      # that WM_PRINT cannot be used all the time because it
+      # fails for browser controls when the browser has focus.
+      if (!success)
+        flags = OS::PRF_CLIENT | OS::PRF_NONCLIENT | OS::PRF_ERASEBKGND | OS::PRF_CHILDREN
+        OS._send_message(hwnd, OS::WM_PRINT, hdc, flags)
+      end
     end
     
     typesig { [] }
@@ -3403,8 +3565,8 @@ module Org::Eclipse::Swt::Widgets
       @menu = menu
     end
     
-    typesig { [] }
-    def set_radio_focus
+    typesig { [::Java::Boolean] }
+    def set_radio_focus(tabbing)
       return false
     end
     
@@ -3571,11 +3733,6 @@ module Org::Eclipse::Swt::Widgets
     end
     
     typesig { [] }
-    def set_tab_group_focus
-      return set_tab_item_focus
-    end
-    
-    typesig { [] }
     def set_tab_item_focus
       if (!is_showing)
         return false
@@ -3585,7 +3742,16 @@ module Org::Eclipse::Swt::Widgets
     
     typesig { [String] }
     # Sets the receiver's tool tip text to the argument, which
-    # may be null indicating that no tool tip text should be shown.
+    # may be null indicating that the default tool tip for the
+    # control will be shown. For a control that has a default
+    # tool tip, such as the Tree control on Windows, setting
+    # the tool tip text to an empty string replaces the default,
+    # causing no tool tip text to be shown.
+    # <p>
+    # The mnemonic indicator (character '&amp;') is not displayed in a tool tip.
+    # To display a single '&amp;' in the tool tip, the character '&amp;' can be
+    # escaped by doubling it in the string.
+    # </p>
     # 
     # @param string the new tool tip text (or null)
     # 
@@ -3621,7 +3787,7 @@ module Org::Eclipse::Swt::Widgets
     # </ul>
     def set_visible(visible)
       check_widget
-      if (!(@draw_count).equal?(0))
+      if (!get_drawing)
         if (((((self.attr_state & HIDDEN)).equal?(0))).equal?(visible))
           return
         end
@@ -3650,7 +3816,7 @@ module Org::Eclipse::Swt::Widgets
           fix_focus_ = is_focus_ancestor(control)
         end
       end
-      if (!(@draw_count).equal?(0))
+      if (!get_drawing)
         self.attr_state = visible ? self.attr_state & ~HIDDEN : self.attr_state | HIDDEN
       else
         show_widget(visible)
@@ -4074,8 +4240,8 @@ module Org::Eclipse::Swt::Widgets
       start = index
       offset = (next_) ? 1 : -1
       while (!((index = ((index + offset + length_) % length_))).equal?(start))
-        control = list[index]
-        if (!control.is_disposed && control.set_tab_group_focus)
+        widget = list[index]
+        if (!widget.is_disposed && widget.set_tab_group_focus)
           return true
         end
       end
@@ -5556,7 +5722,7 @@ module Org::Eclipse::Swt::Widgets
       # for a control and the control is moved or resized, Windows does
       # not redraw the area where the control once was in the parent.
       # The fix is to detect this case and redraw the area.
-      if (!(@draw_count).equal?(0))
+      if (!get_drawing)
         shell = get_shell
         if (!(shell).equal?(self))
           lpwp = WINDOWPOS.new

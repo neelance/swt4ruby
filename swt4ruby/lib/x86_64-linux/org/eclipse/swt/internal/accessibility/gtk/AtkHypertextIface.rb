@@ -1,6 +1,6 @@
 require "rjava"
 
-# Copyright (c) 2000, 2006 IBM Corporation and others. All rights reserved.
+# Copyright (c) 2000, 2008 IBM Corporation and others. All rights reserved.
 # The contents of this file are made available under the terms
 # of the GNU Lesser General Public License (LGPL) Version 2.1 that
 # accompanies this distribution (lgpl-v21.txt).  The LGPL is also
@@ -23,6 +23,7 @@ module Org::Eclipse::Swt::Internal::Accessibility::Gtk
   class AtkHypertextIface 
     include_class_members AtkHypertextIfaceImports
     
+    # @field cast=(AtkHyperlink *(*)())
     # int
     attr_accessor :get_link
     alias_method :attr_get_link, :get_link
@@ -30,6 +31,7 @@ module Org::Eclipse::Swt::Internal::Accessibility::Gtk
     alias_method :attr_get_link=, :get_link=
     undef_method :get_link=
     
+    # @field cast=(gint (*)())
     # int
     attr_accessor :get_n_links
     alias_method :attr_get_n_links, :get_n_links
@@ -37,6 +39,7 @@ module Org::Eclipse::Swt::Internal::Accessibility::Gtk
     alias_method :attr_get_n_links=, :get_n_links=
     undef_method :get_n_links=
     
+    # @field cast=(gint (*)())
     # int
     attr_accessor :get_link_index
     alias_method :attr_get_link_index, :get_link_index

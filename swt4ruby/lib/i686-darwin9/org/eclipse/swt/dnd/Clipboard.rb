@@ -1,6 +1,6 @@
 require "rjava"
 
-# Copyright (c) 2000, 2008 IBM Corporation and others.
+# Copyright (c) 2000, 2009 IBM Corporation and others.
 # All rights reserved. This program and the accompanying materials
 # are made available under the terms of the Eclipse Public License v1.0
 # which accompanies this distribution, and is available at
@@ -15,7 +15,7 @@ module Org::Eclipse::Swt::Dnd
       include ::Org::Eclipse::Swt::Dnd
       include ::Org::Eclipse::Swt
       include ::Org::Eclipse::Swt::Widgets
-      include_const ::Org::Eclipse::Swt::Internal::Carbon, :OS
+      include ::Org::Eclipse::Swt::Internal::Cocoa
     }
   end
   
@@ -27,6 +27,7 @@ module Org::Eclipse::Swt::Dnd
   # @see <a href="http://www.eclipse.org/swt/snippets/#clipboard">Clipboard snippets</a>
   # @see <a href="http://www.eclipse.org/swt/examples.php">SWT Example: ClipboardExample</a>
   # @see <a href="http://www.eclipse.org/swt/">Sample code and further information</a>
+  # @noextend This class is not intended to be subclassed by clients.
   class Clipboard 
     include_class_members ClipboardImports
     
@@ -35,12 +36,6 @@ module Org::Eclipse::Swt::Dnd
     undef_method :display
     alias_method :attr_display=, :display=
     undef_method :display=
-    
-    attr_accessor :scrap
-    alias_method :attr_scrap, :scrap
-    undef_method :scrap
-    alias_method :attr_scrap=, :scrap=
-    undef_method :scrap=
     
     typesig { [Display] }
     # Constructs a new instance of this class.  Creating an instance of a Clipboard
@@ -58,7 +53,6 @@ module Org::Eclipse::Swt::Dnd
     # @see Clipboard#checkSubclass
     def initialize(display)
       @display = nil
-      @scrap = 0
       check_subclass
       if ((display).nil?)
         display = Display.get_current
@@ -184,18 +178,11 @@ module Org::Eclipse::Swt::Dnd
     # @since 3.1
     def clear_contents(clipboards)
       check_widget
-      if (((clipboards & DND::CLIPBOARD)).equal?(0) || (@scrap).equal?(0))
+      if (((clipboards & DND::CLIPBOARD)).equal?(0))
         return
       end
-      old_scrap = @scrap
-      @scrap = 0
-      current_scrap = Array.typed(::Java::Int).new(1) { 0 }
-      if (!(OS._get_current_scrap(current_scrap)).equal?(OS.attr_no_err))
-        return
-      end
-      if ((current_scrap[0]).equal?(old_scrap))
-        OS._clear_current_scrap
-      end
+      pasteboard = NSPasteboard.general_pasteboard
+      pasteboard.declare_types(NSMutableArray.array_with_capacity(0), nil)
     end
     
     typesig { [] }
@@ -304,30 +291,39 @@ module Org::Eclipse::Swt::Dnd
       if (((clipboards & DND::CLIPBOARD)).equal?(0))
         return nil
       end
-      scrap = Array.typed(::Java::Int).new(1) { 0 }
-      if (!(OS._get_current_scrap(scrap)).equal?(OS.attr_no_err))
+      pasteboard = NSPasteboard.general_pasteboard
+      if ((pasteboard).nil?)
         return nil
       end
-      type_ids = transfer.get_type_ids
-      size = Array.typed(::Java::Int).new(1) { 0 }
-      # get data from system clipboard
+      type_names = transfer.get_type_names
+      types = NSMutableArray.array_with_capacity(type_names.attr_length)
       i = 0
-      while i < type_ids.attr_length
-        type = type_ids[i]
-        size[0] = 0
-        if ((OS._get_scrap_flavor_size(scrap[0], type, size)).equal?(OS.attr_no_err) && size[0] > 0)
-          buffer = Array.typed(::Java::Byte).new(size[0]) { 0 }
-          if ((OS._get_scrap_flavor_data(scrap[0], type, size, buffer)).equal?(OS.attr_no_err))
-            tdata = TransferData.new
-            tdata.attr_type = type
-            tdata.attr_data = Array.typed(Array.typed(::Java::Byte)).new(1) { nil }
-            tdata.attr_data[0] = buffer
-            return transfer.native_to_java(tdata)
-          end
-        end
+      while i < type_names.attr_length
+        types.add_object(NSString.string_with(type_names[i]))
         i += 1
       end
-      return nil # No data available for this transfer
+      type = pasteboard.available_type_from_array(types)
+      if (!(type).nil?)
+        tdata = TransferData.new
+        tdata.attr_type = Transfer.register_type(type.get_string)
+        if (type.is_equal(OS::NSStringPboardType) || type.is_equal(OS::NSRTFPboardType) || type.is_equal(OS::NSHTMLPboardType))
+          tdata.attr_data = pasteboard.string_for_type(type)
+        else
+          if (type.is_equal(OS::NSFilenamesPboardType))
+            tdata.attr_data = NSArray.new(pasteboard.property_list_for_type(type).attr_id)
+          else
+            if (type.is_equal(OS::NSURLPboardType))
+              tdata.attr_data = NSURL._urlfrom_pasteboard(pasteboard)
+            else
+              tdata.attr_data = pasteboard.data_for_type(type)
+            end
+          end
+        end
+        if (!(tdata.attr_data).nil?)
+          return transfer.native_to_java(tdata)
+        end
+      end
+      return nil
     end
     
     typesig { [] }
@@ -469,32 +465,35 @@ module Org::Eclipse::Swt::Dnd
       if (((clipboards & DND::CLIPBOARD)).equal?(0))
         return
       end
-      if (!(OS._clear_current_scrap).equal?(OS.attr_no_err))
+      pasteboard = NSPasteboard.general_pasteboard
+      if ((pasteboard).nil?)
         DND.error(DND::ERROR_CANNOT_SET_CLIPBOARD)
       end
-      @scrap = 0
-      current_scrap = Array.typed(::Java::Int).new(1) { 0 }
-      if (!(OS._get_current_scrap(current_scrap)).equal?(OS.attr_no_err))
-        DND.error(DND::ERROR_CANNOT_SET_CLIPBOARD)
-      end
-      @scrap = current_scrap[0]
-      # copy data directly over to System clipboard (not deferred)
+      pasteboard.declare_types(NSMutableArray.array_with_capacity(0), nil)
       i_ = 0
       while i_ < data_types.attr_length
-        type_ids = data_types[i_].get_type_ids
+        type_names = data_types[i_].get_type_names
         j = 0
-        while j < type_ids.attr_length
+        while j < type_names.attr_length
           transfer_data = TransferData.new
-          transfer_data.attr_type = type_ids[j]
+          transfer_data.attr_type = Transfer.register_type(type_names[j])
           data_types[i_].java_to_native(data[i_], transfer_data)
-          if (!(transfer_data.attr_result).equal?(OS.attr_no_err))
-            DND.error(DND::ERROR_CANNOT_SET_CLIPBOARD)
-          end
-          # Drag and Drop can handle multiple items in one transfer but the
-          # Clipboard can not.
-          datum = transfer_data.attr_data[0]
-          if (!(OS._put_scrap_flavor(@scrap, transfer_data.attr_type, 0, datum.attr_length, datum)).equal?(OS.attr_no_err))
-            DND.error(DND::ERROR_CANNOT_SET_CLIPBOARD)
+          tdata = transfer_data.attr_data
+          data_type = NSString.string_with(type_names[j])
+          pasteboard.add_types(NSArray.array_with_object(data_type), nil)
+          if (data_type.is_equal(OS::NSStringPboardType) || data_type.is_equal(OS::NSRTFPboardType) || data_type.is_equal(OS::NSHTMLPboardType))
+            pasteboard.set_string(tdata, data_type)
+          else
+            if (data_type.is_equal(OS::NSURLPboardType))
+              url = tdata
+              url.write_to_pasteboard(pasteboard)
+            else
+              if (data_type.is_equal(OS::NSFilenamesPboardType))
+                pasteboard.set_property_list(tdata, data_type)
+              else
+                pasteboard.set_data(tdata, data_type)
+              end
+            end
           end
           j += 1
         end
@@ -547,12 +546,15 @@ module Org::Eclipse::Swt::Dnd
       if (((clipboards & DND::CLIPBOARD)).equal?(0))
         return Array.typed(TransferData).new(0) { nil }
       end
-      types = __get_available_types
-      result = Array.typed(TransferData).new(types.attr_length) { nil }
+      pasteboard = NSPasteboard.general_pasteboard
+      types_ = pasteboard.types
+      # 64
+      count_ = RJava.cast_to_int(types_.count)
+      result = Array.typed(TransferData).new(count_) { nil }
       i = 0
-      while i < types.attr_length
+      while i < count_
         result[i] = TransferData.new
-        result[i].attr_type = types[i]
+        result[i].attr_type = Transfer.register_type(NSString.new(types_.object_at_index(i)).get_string)
         i += 1
       end
       return result
@@ -575,44 +577,17 @@ module Org::Eclipse::Swt::Dnd
     # </ul>
     def get_available_type_names
       check_widget
-      types = __get_available_types
-      names = Array.typed(String).new(types.attr_length) { nil }
+      pasteboard = NSPasteboard.general_pasteboard
+      types_ = pasteboard.types
+      # 64
+      count_ = RJava.cast_to_int(types_.count)
+      result = Array.typed(String).new(count_) { nil }
       i = 0
-      while i < types.attr_length
-        type = types[i]
-        sb = StringBuffer.new
-        sb.append(RJava.cast_to_char(((type & -0x1000000) >> 24)))
-        sb.append(RJava.cast_to_char(((type & 0xff0000) >> 16)))
-        sb.append(RJava.cast_to_char(((type & 0xff00) >> 8)))
-        sb.append(RJava.cast_to_char(((type & 0xff) >> 0)))
-        names[i] = sb.to_s
+      while i < count_
+        result[i] = NSString.new(types_.object_at_index(i)).get_string
         i += 1
       end
-      return names
-    end
-    
-    typesig { [] }
-    def __get_available_types
-      types = Array.typed(::Java::Int).new(0) { 0 }
-      scrap = Array.typed(::Java::Int).new(1) { 0 }
-      if (!(OS._get_current_scrap(scrap)).equal?(OS.attr_no_err))
-        return types
-      end
-      count = Array.typed(::Java::Int).new(1) { 0 }
-      if (!(OS._get_scrap_flavor_count(scrap[0], count)).equal?(OS.attr_no_err) || (count[0]).equal?(0))
-        return types
-      end
-      info = Array.typed(::Java::Int).new(count[0] * 2) { 0 }
-      if (!(OS._get_scrap_flavor_info_list(scrap[0], count, info)).equal?(OS.attr_no_err))
-        return types
-      end
-      types = Array.typed(::Java::Int).new(count[0]) { 0 }
-      i = 0
-      while i < count[0]
-        types[i] = info[i * 2]
-        i += 1
-      end
-      return types
+      return result
     end
     
     private

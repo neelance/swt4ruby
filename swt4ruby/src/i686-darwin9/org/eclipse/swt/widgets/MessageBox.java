@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2008 IBM Corporation and others.
+ * Copyright (c) 2000, 2009 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -12,7 +12,7 @@ package org.eclipse.swt.widgets;
 
 
 import org.eclipse.swt.*;
-import org.eclipse.swt.internal.carbon.*;
+import org.eclipse.swt.internal.cocoa.*;
 
 /**
  * Instances of this class are used to inform or warn the user.
@@ -36,10 +36,11 @@ import org.eclipse.swt.internal.carbon.*;
  *
  * @see <a href="http://www.eclipse.org/swt/examples.php">SWT Example: ControlExample, Dialog tab</a>
  * @see <a href="http://www.eclipse.org/swt/">Sample code and further information</a>
+ * @noextend This class is not intended to be subclassed by clients.
  */
 public  class MessageBox extends Dialog {
 	String message = "";
-	
+	int returnCode;
 
 /**
  * Constructs a new instance of this class given only its parent.
@@ -80,9 +81,25 @@ public MessageBox (Shell parent) {
  *    <li>ERROR_THREAD_INVALID_ACCESS - if not called from the thread that created the parent</li>
  *    <li>ERROR_INVALID_SUBCLASS - if this class is not an allowed subclass</li>
  * </ul>
+ * 
+ * @see SWT#ICON_ERROR
+ * @see SWT#ICON_INFORMATION
+ * @see SWT#ICON_QUESTION
+ * @see SWT#ICON_WARNING
+ * @see SWT#ICON_WORKING
+ * @see SWT#OK
+ * @see SWT#CANCEL
+ * @see SWT#YES
+ * @see SWT#NO
+ * @see SWT#ABORT
+ * @see SWT#RETRY
+ * @see SWT#IGNORE
  */
 public MessageBox (Shell parent, int style) {
 	super (parent, checkStyle (parent, checkStyle (style)));
+	if (Display.getSheetEnabled ()) {
+		if (parent != null && (style & SWT.SHEET) != 0) this.style |= SWT.SHEET;
+	}
 	checkSubclass ();
 }
 
@@ -94,13 +111,6 @@ static int checkStyle (int style) {
 	if (bits == (SWT.RETRY | SWT.CANCEL) || bits == (SWT.ABORT | SWT.RETRY | SWT.IGNORE)) return style;
 	style = (style & ~mask) | SWT.OK;
 	return style;
-}
-
-int createCFString (String id) {
-	String string = SWT.getMessage(id);
-	char [] buffer = new char [string.length ()];
-	string.getChars (0, buffer.length, buffer, 0);
-	return OS.CFStringCreateWithCharacters (OS.kCFAllocatorDefault, buffer, buffer.length);
 }
 
 /**
@@ -127,131 +137,179 @@ public String getMessage () {
  * </ul>
  */
 public int open () {
-	int alertType = OS.kAlertPlainAlert;
-	if ((style & SWT.ICON_ERROR) != 0) alertType = OS.kAlertStopAlert;
-	if ((style & SWT.ICON_INFORMATION) != 0) alertType = OS.kAlertNoteAlert;
-	if ((style & SWT.ICON_QUESTION) != 0) alertType = OS.kAlertNoteAlert;
-	if ((style & SWT.ICON_WARNING) != 0) alertType = OS.kAlertCautionAlert;
-	if ((style & SWT.ICON_WORKING) != 0) alertType = OS.kAlertNoteAlert;
+	NSAlert alert = (NSAlert) new NSAlert().alloc().init();
+	int alertType = OS.NSInformationalAlertStyle;
+	if ((style & SWT.ICON_ERROR) != 0) alertType = OS.NSCriticalAlertStyle;
+	if ((style & SWT.ICON_INFORMATION) != 0) alertType = OS.NSInformationalAlertStyle;
+	if ((style & SWT.ICON_QUESTION) != 0) alertType = OS.NSInformationalAlertStyle;
+	if ((style & SWT.ICON_WARNING) != 0) alertType = OS.NSWarningAlertStyle;
+	if ((style & SWT.ICON_WORKING) != 0) alertType = OS.NSInformationalAlertStyle;
+	alert.setAlertStyle(alertType);
 	
-	int error = 0;
-	int explanation = 0;
-	String errorString = title;
-	String explanationString = message;
-	if (errorString != null) {
-		char [] buffer = new char [errorString.length ()];
-		errorString.getChars (0, buffer.length, buffer, 0);
-		error = OS.CFStringCreateWithCharacters (OS.kCFAllocatorDefault, buffer, buffer.length);
-	} 
-	if (explanationString != null) {
-		char [] buffer = new char [explanationString.length ()];
-		explanationString.getChars (0, buffer.length, buffer, 0);
-		explanation = OS.CFStringCreateWithCharacters (OS.kCFAllocatorDefault, buffer, buffer.length);		
-	}
-	
-	AlertStdCFStringAlertParamRec param = new AlertStdCFStringAlertParamRec ();
-	param.version = OS.kStdCFStringAlertVersionOne;
-	param.position = (short)OS.kWindowAlertPositionParentWindowScreen;
-	int defaultStr = 0, cancelStr = 0, otherStr = 0;
 	int mask = (SWT.YES | SWT.NO | SWT.OK | SWT.CANCEL | SWT.ABORT | SWT.RETRY | SWT.IGNORE);
 	int bits = style & mask;
+	NSString title;
 	switch (bits) {
 		case SWT.OK:
-			param.defaultButton = (short)OS.kAlertStdAlertOKButton;
-			param.defaultText = OS.kAlertDefaultOKText;
+			title = NSString.stringWith(SWT.getMessage("SWT_OK"));
+			alert.addButtonWithTitle(title);
 			break;
 		case SWT.CANCEL:
-			param.defaultButton = (short)OS.kAlertStdAlertOKButton;
-			param.defaultText = defaultStr = createCFString ("SWT_Cancel");
+			title = NSString.stringWith(SWT.getMessage("SWT_Cancel"));
+			alert.addButtonWithTitle(title);
 			break;
 		case SWT.OK | SWT.CANCEL:
-			param.defaultButton = (short)OS.kAlertStdAlertOKButton;
-			param.defaultText = OS.kAlertDefaultOKText;
-			param.cancelButton = (short)OS.kAlertStdAlertCancelButton;
-			param.cancelText = OS.kAlertDefaultCancelText;
+			title = NSString.stringWith(SWT.getMessage("SWT_OK"));
+			alert.addButtonWithTitle(title);
+			title = NSString.stringWith(SWT.getMessage("SWT_Cancel"));
+			alert.addButtonWithTitle(title);
 			break;
 		case SWT.YES:
-			param.defaultButton = (short)OS.kAlertStdAlertOKButton;
-			param.defaultText = defaultStr = createCFString ("SWT_Yes");
+			title = NSString.stringWith(SWT.getMessage("SWT_Yes"));
+			alert.addButtonWithTitle(title);
 			break;
 		case SWT.NO:
-			param.cancelButton = (short)OS.kAlertStdAlertOKButton;
-			param.cancelText = defaultStr = createCFString ("SWT_No");
+			title = NSString.stringWith(SWT.getMessage("SWT_No"));
+			alert.addButtonWithTitle(title);
 			break;
 		case SWT.YES | SWT.NO:
-			param.defaultButton = (short)OS.kAlertStdAlertOKButton;
-			param.defaultText = defaultStr = createCFString ("SWT_Yes");
-			param.cancelButton = (short)OS.kAlertStdAlertCancelButton;
-			param.cancelText = cancelStr = createCFString ("SWT_No");
+			title = NSString.stringWith(SWT.getMessage("SWT_Yes"));
+			alert.addButtonWithTitle(title);
+			title = NSString.stringWith(SWT.getMessage("SWT_No"));
+			alert.addButtonWithTitle(title);
+//			no.setKeyEquivalent(NSString.stringWith("\033"));
 			break;
 		case SWT.YES | SWT.NO | SWT.CANCEL:				
-			param.defaultButton = (short)OS.kAlertStdAlertOKButton;
-			param.defaultText = defaultStr = createCFString ("SWT_Yes");
-			param.otherText = cancelStr = createCFString ("SWT_No");
-			param.cancelButton = (short)OS.kAlertStdAlertCancelButton;
-			param.cancelText = OS.kAlertDefaultCancelText;
+			title = NSString.stringWith(SWT.getMessage("SWT_Yes"));
+			alert.addButtonWithTitle(title);
+			title = NSString.stringWith(SWT.getMessage("SWT_Cancel"));
+			alert.addButtonWithTitle(title);
+			title = NSString.stringWith(SWT.getMessage("SWT_No"));
+			alert.addButtonWithTitle(title);
 			break;
 		case SWT.RETRY | SWT.CANCEL:
-			param.defaultButton = (short)OS.kAlertStdAlertOKButton;
-			param.defaultText = defaultStr = createCFString ("SWT_Retry");
-			param.cancelButton = (short)OS.kAlertStdAlertCancelButton;
-			param.cancelText = OS.kAlertDefaultCancelText;
+			title = NSString.stringWith(SWT.getMessage("SWT_Retry"));
+			alert.addButtonWithTitle(title);
+			title = NSString.stringWith(SWT.getMessage("SWT_Cancel"));
+			alert.addButtonWithTitle(title);
 			break;
 		case SWT.ABORT | SWT.RETRY | SWT.IGNORE:
-			param.defaultButton = (short)OS.kAlertStdAlertOKButton;
-			param.defaultText = defaultStr = createCFString ("SWT_Abort");
-			param.otherText = cancelStr = createCFString ("SWT_Retry");
-			param.cancelButton = (short)OS.kAlertStdAlertCancelButton;
-			param.cancelText = otherStr = createCFString ("SWT_Ignore");
+			title = NSString.stringWith(SWT.getMessage("SWT_Abort"));
+			alert.addButtonWithTitle(title);
+			title = NSString.stringWith(SWT.getMessage("SWT_Ignore"));
+			alert.addButtonWithTitle(title);
+			title = NSString.stringWith(SWT.getMessage("SWT_Retry"));
+			alert.addButtonWithTitle(title);
 			break;
 	}
-	
-	int [] dialogRef= new int [1];
-	OS.CreateStandardAlert ((short) alertType, error, explanation, param, dialogRef);
-	if (error != 0) OS.CFRelease(error);
-	if (explanation != 0) OS.CFRelease(explanation);
-	if (defaultStr != 0) OS.CFRelease(defaultStr);
-	if (cancelStr != 0) OS.CFRelease(cancelStr);
-	if (otherStr != 0) OS.CFRelease(otherStr);
-	
-	if (dialogRef[0] != 0) {
-		/* Force a system modal message box to the front */
-		if ((style & SWT.SYSTEM_MODAL) != 0) {
-			OS.SetFrontProcessWithOptions (new int [] {0, OS.kCurrentProcess}, OS.kSetFrontProcessFrontWindowOnly);
+	title = NSString.stringWith(this.title != null ? this.title : "");
+	alert.window().setTitle(title);
+	NSString message = NSString.stringWith(this.message != null ? this.message : "");
+	alert.setMessageText(message);
+	int response = 0;
+	int /*long*/ jniRef = 0;
+	SWTPanelDelegate delegate = null;
+	if ((style & SWT.SHEET) != 0) {
+		delegate = (SWTPanelDelegate)new SWTPanelDelegate().alloc().init();
+		jniRef = OS.NewGlobalRef(this);
+		if (jniRef == 0) SWT.error(SWT.ERROR_NO_HANDLES);
+		OS.object_setInstanceVariable(delegate.id, Display.SWT_OBJECT, jniRef);
+		alert.beginSheetModalForWindow(parent.window, delegate, OS.sel_panelDidEnd_returnCode_contextInfo_, 0);
+		if ((style & SWT.APPLICATION_MODAL) != 0) {
+			response = (int)/*64*/alert.runModal();
+		} else {
+			this.returnCode = 0;
+			NSWindow window = alert.window();
+			NSApplication application = NSApplication.sharedApplication();
+			while (window.isVisible()) application.run();
+			response = this.returnCode;
 		}
-		short [] outItemHit = new short [1];
-		OS.RunStandardAlert(dialogRef[0], 0, outItemHit);
-		if (outItemHit [0] != 0) {
-			switch (bits) {
-				case SWT.OK:
+	} else {
+		response = (int)/*64*/alert.runModal();
+	}
+	if (delegate != null) delegate.release();
+	if (jniRef != 0) OS.DeleteGlobalRef(jniRef);
+	alert.release();
+	switch (bits) {
+		case SWT.OK:
+			switch (response) {
+				case OS.NSAlertFirstButtonReturn:
 					return SWT.OK;
-				case SWT.CANCEL:
-					return SWT.CANCEL;
-				case SWT.OK | SWT.CANCEL:
-					if (outItemHit [0] == OS.kAlertStdAlertOKButton) return SWT.OK;
-					return SWT.CANCEL;
-				case SWT.YES:
-					return SWT.YES;
-				case SWT.NO:
-					return SWT.NO;
-				case SWT.YES | SWT.NO:
-					if (outItemHit [0] == OS.kAlertStdAlertOKButton) return SWT.YES;
-					return SWT.NO;
-				case SWT.YES | SWT.NO | SWT.CANCEL:
-					if (outItemHit [0] == OS.kAlertStdAlertOKButton) return SWT.YES;
-					if (outItemHit [0] == OS.kAlertStdAlertOtherButton) return SWT.NO;
-					return SWT.CANCEL;
-				case SWT.RETRY | SWT.CANCEL:
-					if (outItemHit [0] == OS.kAlertStdAlertOKButton) return SWT.RETRY;
-					return SWT.CANCEL;
-				case SWT.ABORT | SWT.RETRY | SWT.IGNORE:
-					if (outItemHit [0] == OS.kAlertStdAlertOKButton) return SWT.ABORT;
-					if (outItemHit [0] == OS.kAlertStdAlertOtherButton) return SWT.RETRY;
-					return SWT.IGNORE;
 			}
-		}
+			break;
+		case SWT.CANCEL:
+			switch (response) {
+				case OS.NSAlertFirstButtonReturn:
+					return SWT.CANCEL;
+			}
+			break;
+		case SWT.OK | SWT.CANCEL:
+			switch (response) {
+				case OS.NSAlertFirstButtonReturn:
+					return SWT.OK;
+				case OS.NSAlertSecondButtonReturn:
+					return SWT.CANCEL;
+			}
+			break;
+		case SWT.YES:
+			switch (response) {
+				case OS.NSAlertFirstButtonReturn:
+					return SWT.YES;
+			}
+			break;
+		case SWT.NO:
+			switch (response) {
+				case OS.NSAlertFirstButtonReturn:
+					return SWT.NO;
+			}
+			break;
+		case SWT.YES | SWT.NO:
+			switch (response) {
+				case OS.NSAlertFirstButtonReturn:
+					return SWT.YES;
+				case OS.NSAlertSecondButtonReturn:
+					return SWT.NO;
+			}
+			break;
+		case SWT.YES | SWT.NO | SWT.CANCEL:				
+			switch (response) {
+				case OS.NSAlertFirstButtonReturn:
+					return SWT.YES;
+				case OS.NSAlertSecondButtonReturn:
+					return SWT.CANCEL;
+				case OS.NSAlertThirdButtonReturn:
+					return SWT.NO;
+			}
+			break;
+		case SWT.RETRY | SWT.CANCEL:
+			switch (response) {
+				case OS.NSAlertFirstButtonReturn:
+					return SWT.RETRY;
+				case OS.NSAlertSecondButtonReturn:
+					return SWT.CANCEL;
+			}
+			break;
+		case SWT.ABORT | SWT.RETRY | SWT.IGNORE:
+			switch (response) {
+				case OS.NSAlertFirstButtonReturn:
+					return SWT.ABORT;
+				case OS.NSAlertSecondButtonReturn:
+					return SWT.IGNORE;
+				case OS.NSAlertThirdButtonReturn:
+					return SWT.RETRY;
+			}
+			break;
 	}
 	return SWT.CANCEL;
+}
+
+void panelDidEnd_returnCode_contextInfo(int /*long*/ id, int /*long*/ sel, int /*long*/ alert, int /*long*/ returnCode, int /*long*/ contextInfo) {
+	this.returnCode = (int)/*64*/returnCode;
+	NSApplication application = NSApplication.sharedApplication();
+	application.endSheet(new NSAlert(alert).window(), returnCode);
+	if ((style & SWT.PRIMARY_MODAL) != 0) {
+		application.stop(null);
+	}
 }
 
 /**

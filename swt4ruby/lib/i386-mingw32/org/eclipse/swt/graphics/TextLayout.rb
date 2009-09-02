@@ -1,6 +1,6 @@
 require "rjava"
 
-# Copyright (c) 2000, 2008 IBM Corporation and others.
+# Copyright (c) 2000, 2009 IBM Corporation and others.
 # All rights reserved. This program and the accompanying materials
 # are made available under the terms of the Eclipse Public License v1.0
 # which accompanies this distribution, and is available at
@@ -190,6 +190,12 @@ module Org::Eclipse::Swt::Graphics
         OS._iidfrom_string("{275c23e2-3747-11d0-9fea-00aa003f8646}\0".to_char_array, CLSID_CMultiLanguage)
         OS._iidfrom_string("{DCCFC162-2B38-11d2-B7EC-00C04F8F5D9A}\0".to_char_array, IID_IMLangFontLink2)
       end
+      
+      const_set_lazy(:MERGE_MAX) { 512 }
+      const_attr_reader  :MERGE_MAX
+      
+      const_set_lazy(:TOO_MANY_RUNS) { 1024 }
+      const_attr_reader  :TOO_MANY_RUNS
       
       # IME has a copy of these constants
       const_set_lazy(:UNDERLINE_IME_DOT) { 1 << 16 }
@@ -515,6 +521,32 @@ module Org::Eclipse::Swt::Graphics
       init
     end
     
+    typesig { [StyleItem, RECT, RECT, ::Java::Int, ::Java::Int] }
+    def add_clip_rect(run, clip_rect, rect, selection_start, selection_end)
+      if (!(rect).nil?)
+        if ((clip_rect).nil?)
+          clip_rect = RECT.new
+          OS._set_rect(clip_rect, -1, rect.attr_top, -1, rect.attr_bottom)
+        end
+        is_rtl = !((@orientation & SWT::RIGHT_TO_LEFT)).equal?(0)
+        if (run.attr_start <= selection_start && selection_start <= run.attr_start + run.attr_length)
+          if (run.attr_analysis.attr_f_rtl ^ is_rtl)
+            clip_rect.attr_right = rect.attr_left
+          else
+            clip_rect.attr_left = rect.attr_left
+          end
+        end
+        if (run.attr_start <= selection_end && selection_end <= run.attr_start + run.attr_length)
+          if (run.attr_analysis.attr_f_rtl ^ is_rtl)
+            clip_rect.attr_left = rect.attr_right
+          else
+            clip_rect.attr_right = rect.attr_right
+          end
+        end
+      end
+      return clip_rect
+    end
+    
     typesig { [StyleItem] }
     def break_run(run)
       if (!(run.attr_psla).equal?(0))
@@ -565,50 +597,41 @@ module Org::Eclipse::Swt::Graphics
       i_ = 0
       while i_ < @all_runs.attr_length - 1
         run = @all_runs[i_]
-        if ((run.attr_length).equal?(1))
-          ch = @segments_text.char_at(run.attr_start)
-          catch(:break_case) do
-            case (ch)
-            when Character.new(?\t.ord)
-              run.attr_tab = true
-              if ((@tabs).nil?)
-                throw :break_case, :thrown
-              end
-              tabs_length = @tabs.attr_length
-              j = 0
-              j = 0
-              while j < tabs_length
-                if (@tabs[j] > line_width)
-                  run.attr_width = @tabs[j] - line_width
-                  break
-                end
-                j += 1
-              end
-              if ((j).equal?(tabs_length))
-                tab_x = @tabs[tabs_length - 1]
-                last_tab_width = tabs_length > 1 ? @tabs[tabs_length - 1] - @tabs[tabs_length - 2] : @tabs[0]
-                if (last_tab_width > 0)
-                  while (tab_x <= line_width)
-                    tab_x += last_tab_width
-                  end
-                  run.attr_width = tab_x - line_width
-                end
-              end
-            when Character.new(?\n.ord)
-              run.attr_line_break = true
-            when Character.new(?\r.ord)
-              run.attr_line_break = true
-              next_ = @all_runs[i_ + 1]
-              if (!(next_.attr_length).equal?(0) && (@segments_text.char_at(next_.attr_start)).equal?(Character.new(?\n.ord)))
-                run.attr_length += 1
-                next_.free
-                new_all_runs = Array.typed(StyleItem).new(@all_runs.attr_length - 1) { nil }
-                System.arraycopy(@all_runs, 0, new_all_runs, 0, i_ + 1)
-                System.arraycopy(@all_runs, i_ + 2, new_all_runs, i_ + 1, @all_runs.attr_length - i_ - 2)
-                @all_runs = new_all_runs
-              end
+        if (!(@tabs).nil? && run.attr_tab)
+          tabs_length = @tabs.attr_length
+          j = 0
+          j = 0
+          while j < tabs_length
+            if (@tabs[j] > line_width)
+              run.attr_width = @tabs[j] - line_width
+              break
             end
-          end == :thrown or break
+            j += 1
+          end
+          if ((j).equal?(tabs_length))
+            tab_x = @tabs[tabs_length - 1]
+            last_tab_width = tabs_length > 1 ? @tabs[tabs_length - 1] - @tabs[tabs_length - 2] : @tabs[0]
+            if (last_tab_width > 0)
+              while (tab_x <= line_width)
+                tab_x += last_tab_width
+              end
+              run.attr_width = tab_x - line_width
+            end
+          end
+          length = run.attr_length
+          if (length > 1)
+            stop = j + length - 1
+            if (stop < tabs_length)
+              run.attr_width += @tabs[stop] - @tabs[j]
+            else
+              if (j < tabs_length)
+                run.attr_width += @tabs[tabs_length - 1] - @tabs[j]
+                length -= (tabs_length - 1) - j
+              end
+              last_tab_width = tabs_length > 1 ? @tabs[tabs_length - 1] - @tabs[tabs_length - 2] : @tabs[0]
+              run.attr_width += last_tab_width * (length - 1)
+            end
+          end
         end
         if (!(@wrap_width).equal?(-1) && line_width + run.attr_width > @wrap_width && !run.attr_tab)
           start = 0
@@ -732,7 +755,7 @@ module Org::Eclipse::Swt::Graphics
         descent = Math.max(descent, run.attr_descent)
         if (run.attr_line_break || (i__).equal?(@all_runs.attr_length - 1))
           # Update the run metrics if the last run is a hard break.
-          if ((line_run_count).equal?(1) && (i__).equal?(@all_runs.attr_length - 1))
+          if ((line_run_count).equal?(1) && ((i__).equal?(@all_runs.attr_length - 1) || !run.attr_soft_break))
             lptm = OS::IsUnicode ? TEXTMETRICW.new : TEXTMETRICA.new
             OS._select_object(src_hdc, get_item_font(run))
             OS._get_text_metrics(src_hdc, lptm)
@@ -851,6 +874,51 @@ module Org::Eclipse::Swt::Graphics
       return dst
     end
     
+    typesig { [::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int] }
+    def compute_polyline(left, top, right, bottom)
+      height = bottom - top # can be any number
+      width = 2 * height # must be even
+      peaks = Compatibility.ceil(right - left, width)
+      if ((peaks).equal?(0) && right - left > 2)
+        peaks = 1
+      end
+      length = ((2 * peaks) + 1) * 2
+      if (length < 0)
+        return Array.typed(::Java::Int).new(0) { 0 }
+      end
+      coordinates = Array.typed(::Java::Int).new(length) { 0 }
+      i = 0
+      while i < peaks
+        index = 4 * i
+        coordinates[index] = left + (width * i)
+        coordinates[index + 1] = bottom
+        coordinates[index + 2] = coordinates[index] + width / 2
+        coordinates[index + 3] = top
+        i += 1
+      end
+      coordinates[length - 2] = left + (width * peaks)
+      coordinates[length - 1] = bottom
+      return coordinates
+    end
+    
+    typesig { [::Java::Int, ::Java::Int] }
+    # long
+    def create_gdip_brush(pixel, alpha)
+      argb = ((alpha & 0xff) << 24) | ((pixel >> 16) & 0xff) | (pixel & 0xff00) | ((pixel & 0xff) << 16)
+      # long
+      gdi_color = Gdip._color_new(argb)
+      # long
+      brush = Gdip._solid_brush_new(gdi_color)
+      Gdip._color_delete(gdi_color)
+      return brush
+    end
+    
+    typesig { [Color, ::Java::Int] }
+    # long
+    def create_gdip_brush(color, alpha)
+      return create_gdip_brush(color.attr_handle, alpha)
+    end
+    
     typesig { [SwtGC, ::Java::Int, ::Java::Int] }
     # Draws the receiver's text using the specified GC at the specified
     # point.
@@ -943,103 +1011,48 @@ module Org::Eclipse::Swt::Graphics
       # long
       gdip_graphics = data.attr_gdip_graphics
       foreground = data.attr_foreground
+      link_color = OS._get_sys_color(OS::COLOR_HOTLIGHT)
       alpha = data.attr_alpha
-      gdip = !(gdip_graphics).equal?(0) && (!(alpha).equal?(0xff) || !(data.attr_foreground_pattern).nil?)
+      gdip = !(gdip_graphics).equal?(0)
       # long
-      clip_rgn = 0
-      lp_xform = nil
-      gdip_rect = Rect.new
-      if (!(gdip_graphics).equal?(0) && !gdip)
-        # long
-        matrix = Gdip._matrix_new(1, 0, 0, 1, 0, 0)
-        if ((matrix).equal?(0))
-          SWT.error(SWT::ERROR_NO_HANDLES)
-        end
-        Gdip._graphics_get_transform(gdip_graphics, matrix)
-        # long
-        identity_ = gc.identity
-        Gdip._matrix_invert(identity_)
-        Gdip._matrix_multiply(matrix, identity_, Gdip::MatrixOrderAppend)
-        Gdip._matrix_delete(identity_)
-        if (!Gdip._matrix_is_identity(matrix))
-          lp_xform = Array.typed(::Java::Float).new(6) { 0.0 }
-          Gdip._matrix_get_elements(matrix, lp_xform)
-        end
-        Gdip._matrix_delete(matrix)
-        if (!((data.attr_style & SWT::MIRRORED)).equal?(0) && !(lp_xform).nil?)
-          gdip = true
-          lp_xform = nil
-        else
-          Gdip._graphics_set_pixel_offset_mode(gdip_graphics, Gdip::PixelOffsetModeNone)
-          # long
-          rgn = Gdip._region_new
-          Gdip._graphics_get_clip(gdip_graphics, rgn)
-          if (!Gdip._region_is_infinite(rgn, gdip_graphics))
-            clip_rgn = Gdip._region_get_hrgn(rgn, gdip_graphics)
-          end
-          Gdip._region_delete(rgn)
-          Gdip._graphics_set_pixel_offset_mode(gdip_graphics, Gdip::PixelOffsetModeHalf)
-          hdc = Gdip._graphics_get_hdc(gdip_graphics)
-        end
-      end
+      gdip_foreground = 0
       # long
-      foreground_brush = 0
+      gdip_link_color = 0
       state = 0
       if (gdip)
         gc.check_gc(SwtGC::FOREGROUND)
-        foreground_brush = gc.get_fg_brush
+        gdip_foreground = gc.get_fg_brush
       else
         state = OS._save_dc(hdc)
         if (!((data.attr_style & SWT::MIRRORED)).equal?(0))
           OS._set_layout(hdc, OS._get_layout(hdc) | OS::LAYOUT_RTL)
         end
-        if (!(lp_xform).nil?)
-          OS._set_graphics_mode(hdc, OS::GM_ADVANCED)
-          OS._set_world_transform(hdc, lp_xform)
-        end
-        if (!(clip_rgn).equal?(0))
-          OS._select_clip_rgn(hdc, clip_rgn)
-          OS._delete_object(clip_rgn)
-        end
       end
       has_selection = selection_start <= selection_end && !(selection_start).equal?(-1) && !(selection_end).equal?(-1)
+      # long
+      gdip_sel_background = 0
+      gdip_sel_foreground = 0
+      gdip_font = 0
+      last_hfont = 0
+      # long
+      sel_background = 0
+      sel_foreground = 0
       if (has_selection || !((flags & SWT::LAST_LINE_SELECTION)).equal?(0))
-        selection_start = Math.min(Math.max(0, selection_start), length_ - 1)
-        selection_end = Math.min(Math.max(0, selection_end), length_ - 1)
-        if ((selection_foreground).nil?)
-          selection_foreground = self.attr_device.get_system_color(SWT::COLOR_LIST_SELECTION_TEXT)
+        fg_sel = !(selection_foreground).nil? ? selection_foreground.attr_handle : OS._get_sys_color(OS::COLOR_HIGHLIGHTTEXT)
+        bg_sel = !(selection_background).nil? ? selection_background.attr_handle : OS._get_sys_color(OS::COLOR_HIGHLIGHT)
+        if (gdip)
+          gdip_sel_background = create_gdip_brush(bg_sel, alpha)
+          gdip_sel_foreground = create_gdip_brush(fg_sel, alpha)
+        else
+          sel_background = OS._create_solid_brush(bg_sel)
+          sel_foreground = fg_sel
         end
-        if ((selection_background).nil?)
-          selection_background = self.attr_device.get_system_color(SWT::COLOR_LIST_SELECTION)
+        if (has_selection)
+          selection_start = translate_offset(Math.min(Math.max(0, selection_start), length_ - 1))
+          selection_end = translate_offset(Math.min(Math.max(0, selection_end), length_ - 1))
         end
-        selection_start = translate_offset(selection_start)
-        selection_end = translate_offset(selection_end)
       end
       rect = RECT.new
-      # long
-      sel_brush = 0
-      sel_pen = 0
-      sel_brush_fg = 0
-      if (has_selection || !((flags & SWT::LAST_LINE_SELECTION)).equal?(0))
-        if (gdip)
-          bg = selection_background.attr_handle
-          argb = ((alpha & 0xff) << 24) | ((bg >> 16) & 0xff) | (bg & 0xff00) | ((bg & 0xff) << 16)
-          # long
-          color = Gdip._color_new(argb)
-          sel_brush = Gdip._solid_brush_new(color)
-          Gdip._color_delete(color)
-          fg = selection_foreground.attr_handle
-          argb = ((alpha & 0xff) << 24) | ((fg >> 16) & 0xff) | (fg & 0xff00) | ((fg & 0xff) << 16)
-          color = Gdip._color_new(argb)
-          sel_brush_fg = Gdip._solid_brush_new(color)
-          sel_pen = Gdip._pen_new(sel_brush_fg, 1)
-          Gdip._color_delete(color)
-        else
-          sel_brush = OS._create_solid_brush(selection_background.attr_handle)
-          sel_pen = OS._create_pen(OS::PS_SOLID, 1, selection_foreground.attr_handle)
-        end
-      end
-      offset = !((@orientation & SWT::RIGHT_TO_LEFT)).equal?(0) ? -1 : 0
       OS._set_bk_mode(hdc, OS::TRANSPARENT)
       line = 0
       while line < @runs.attr_length
@@ -1047,6 +1060,7 @@ module Org::Eclipse::Swt::Graphics
         draw_y = y + @line_y[line]
         line_runs = @runs[line]
         line_height = @line_y[line + 1] - @line_y[line] - @line_spacing
+        # Draw last line selection
         if (!(flags).equal?(0) && (has_selection || !((flags & SWT::LAST_LINE_SELECTION)).equal?(0)))
           extents = false
           if ((line).equal?(@runs.attr_length - 1) && !((flags & SWT::LAST_LINE_SELECTION)).equal?(0))
@@ -1072,9 +1086,9 @@ module Org::Eclipse::Swt::Graphics
               width = line_height / 3
             end
             if (gdip)
-              Gdip._graphics_fill_rectangle(gdip_graphics, sel_brush, draw_x + @line_width[line], draw_y, width, line_height)
+              Gdip._graphics_fill_rectangle(gdip_graphics, gdip_sel_background, draw_x + @line_width[line], draw_y, width, line_height)
             else
-              OS._select_object(hdc, sel_brush)
+              OS._select_object(hdc, sel_background)
               OS._pat_blt(hdc, draw_x + @line_width[line], draw_y, width, line_height, OS::PATCOPY)
             end
           end
@@ -1087,20 +1101,13 @@ module Org::Eclipse::Swt::Graphics
           line += 1
           next
         end
-        baseline = Math.max(0, @ascent)
-        line_underline_pos = 0
+        # Draw the background of the runs in the line
+        alignment_x = draw_x
         i = 0
         while i < line_runs.attr_length
-          baseline = Math.max(baseline, line_runs[i].attr_ascent)
-          line_underline_pos = Math.min(line_underline_pos, line_runs[i].attr_underline_pos)
-          i += 1
-        end
-        alignment_x = draw_x
-        i_ = 0
-        while i_ < line_runs.attr_length
-          run = line_runs[i_]
+          run = line_runs[i]
           if ((run.attr_length).equal?(0))
-            i_ += 1
+            i += 1
             next
           end
           if (draw_x > clip.attr_x + clip.attr_width)
@@ -1108,228 +1115,87 @@ module Org::Eclipse::Swt::Graphics
           end
           if (draw_x + run.attr_width >= clip.attr_x)
             if (!run.attr_line_break || run.attr_soft_break)
-              end_ = run.attr_start + run.attr_length - 1
-              full_selection = has_selection && selection_start <= run.attr_start && selection_end >= end_
-              if (full_selection)
-                if (gdip)
-                  Gdip._graphics_fill_rectangle(gdip_graphics, sel_brush, draw_x, draw_y, run.attr_width, line_height)
-                else
-                  OS._select_object(hdc, sel_brush)
-                  OS._pat_blt(hdc, draw_x, draw_y, run.attr_width, line_height, OS::PATCOPY)
-                end
+              OS._set_rect(rect, draw_x, draw_y, draw_x + run.attr_width, draw_y + line_height)
+              if (gdip)
+                draw_run_background_gdip(run, gdip_graphics, rect, selection_start, selection_end, alpha, gdip_sel_background, has_selection)
               else
-                if (!(run.attr_style).nil? && !(run.attr_style.attr_background).nil?)
-                  bg = run.attr_style.attr_background.attr_handle
-                  if (gdip)
-                    argb = ((alpha & 0xff) << 24) | ((bg >> 16) & 0xff) | (bg & 0xff00) | ((bg & 0xff) << 16)
-                    # long
-                    color = Gdip._color_new(argb)
-                    # long
-                    brush = Gdip._solid_brush_new(color)
-                    Gdip._graphics_fill_rectangle(gdip_graphics, brush, draw_x, draw_y, run.attr_width, line_height)
-                    Gdip._color_delete(color)
-                    Gdip._solid_brush_delete(brush)
-                  else
-                    # long
-                    h_brush = OS._create_solid_brush(bg)
-                    # long
-                    old_brush = OS._select_object(hdc, h_brush)
-                    OS._pat_blt(hdc, draw_x, draw_y, run.attr_width, line_height, OS::PATCOPY)
-                    OS._select_object(hdc, old_brush)
-                    OS._delete_object(h_brush)
-                  end
-                end
-                partial_selection = has_selection && !(selection_start > end_ || run.attr_start > selection_end)
-                if (partial_selection)
-                  sel_start = Math.max(selection_start, run.attr_start) - run.attr_start
-                  sel_end = Math.min(selection_end, end_) - run.attr_start
-                  c_chars = run.attr_length
-                  g_glyphs = run.attr_glyph_count
-                  pi_x = Array.typed(::Java::Int).new(1) { 0 }
-                  # long
-                  advances = !(run.attr_justify).equal?(0) ? run.attr_justify : run.attr_advances
-                  OS._script_cpto_x(sel_start, false, c_chars, g_glyphs, run.attr_clusters, run.attr_vis_attrs, advances, run.attr_analysis, pi_x)
-                  run_x = !((@orientation & SWT::RIGHT_TO_LEFT)).equal?(0) ? run.attr_width - pi_x[0] : pi_x[0]
-                  rect.attr_left = draw_x + run_x
-                  rect.attr_top = draw_y
-                  OS._script_cpto_x(sel_end, true, c_chars, g_glyphs, run.attr_clusters, run.attr_vis_attrs, advances, run.attr_analysis, pi_x)
-                  run_x = !((@orientation & SWT::RIGHT_TO_LEFT)).equal?(0) ? run.attr_width - pi_x[0] : pi_x[0]
-                  rect.attr_right = draw_x + run_x
-                  rect.attr_bottom = draw_y + line_height
-                  if (gdip)
-                    if (rect.attr_left > rect.attr_right)
-                      tmp = rect.attr_left
-                      rect.attr_left = rect.attr_right
-                      rect.attr_right = tmp
-                    end
-                    Gdip._graphics_fill_rectangle(gdip_graphics, sel_brush, rect.attr_left, rect.attr_top, rect.attr_right - rect.attr_left, rect.attr_bottom - rect.attr_top)
-                  else
-                    OS._select_object(hdc, sel_brush)
-                    OS._pat_blt(hdc, rect.attr_left, rect.attr_top, rect.attr_right - rect.attr_left, rect.attr_bottom - rect.attr_top, OS::PATCOPY)
-                  end
-                end
+                draw_run_background(run, hdc, rect, selection_start, selection_end, sel_background, has_selection)
               end
             end
           end
           draw_x += run.attr_width
+          i += 1
+        end
+        # Draw the text, underline, strikeout, and border of the runs in the line
+        baseline = Math.max(0, @ascent)
+        line_underline_pos = 0
+        i_ = 0
+        while i_ < line_runs.attr_length
+          baseline = Math.max(baseline, line_runs[i_].attr_ascent)
+          line_underline_pos = Math.min(line_underline_pos, line_runs[i_].attr_underline_pos)
           i_ += 1
         end
         border_clip = nil
+        underline_clip = nil
+        strikeout_clip = nil
+        p_rect = nil
         draw_x = alignment_x
         i__ = 0
         while i__ < line_runs.attr_length
           run = line_runs[i__]
+          style = run.attr_style
+          has_adorners = !(style).nil? && (style.attr_underline || style.attr_strikeout || !(style.attr_border_style).equal?(SWT::NONE))
           if ((run.attr_length).equal?(0))
             i__ += 1
             next
           end
-          if (draw_x > clip.attr_x + clip.attr_width)
+          if (draw_x > clip.attr_x + clip.attr_width && !has_adorners)
             break
           end
-          if (draw_x + run.attr_width >= clip.attr_x)
-            if (!run.attr_tab && (!run.attr_line_break || run.attr_soft_break) && !(!(run.attr_style).nil? && !(run.attr_style.attr_metrics).nil?))
-              end_ = run.attr_start + run.attr_length - 1
-              full_selection = has_selection && selection_start <= run.attr_start && selection_end >= end_
-              partial_selection = has_selection && !full_selection && !(selection_start > end_ || run.attr_start > selection_end)
-              OS._select_object(hdc, get_item_font(run))
-              draw_run_y = draw_y + (baseline - run.attr_ascent)
-              if (partial_selection)
-                sel_start = Math.max(selection_start, run.attr_start) - run.attr_start
-                sel_end = Math.min(selection_end, end_) - run.attr_start
-                c_chars = run.attr_length
-                g_glyphs = run.attr_glyph_count
-                pi_x = Array.typed(::Java::Int).new(1) { 0 }
-                # long
-                advances = !(run.attr_justify).equal?(0) ? run.attr_justify : run.attr_advances
-                OS._script_cpto_x(sel_start, false, c_chars, g_glyphs, run.attr_clusters, run.attr_vis_attrs, advances, run.attr_analysis, pi_x)
-                run_x = !((@orientation & SWT::RIGHT_TO_LEFT)).equal?(0) ? run.attr_width - pi_x[0] : pi_x[0]
-                rect.attr_left = draw_x + run_x
-                rect.attr_top = draw_y
-                OS._script_cpto_x(sel_end, true, c_chars, g_glyphs, run.attr_clusters, run.attr_vis_attrs, advances, run.attr_analysis, pi_x)
-                run_x = !((@orientation & SWT::RIGHT_TO_LEFT)).equal?(0) ? run.attr_width - pi_x[0] : pi_x[0]
-                rect.attr_right = draw_x + run_x
-                rect.attr_bottom = draw_y + line_height
-              end
+          if (draw_x + run.attr_width >= clip.attr_x || has_adorners)
+            skip_tab = run.attr_tab && !has_adorners
+            if (!skip_tab && (!run.attr_line_break || run.attr_soft_break) && !(!(style).nil? && !(style.attr_metrics).nil?))
+              OS._set_rect(rect, draw_x, draw_y, draw_x + run.attr_width, draw_y + line_height)
               if (gdip)
-                OS._begin_path(hdc)
-                OS._script_text_out(hdc, run.attr_psc, draw_x, draw_run_y, 0, nil, run.attr_analysis, 0, 0, run.attr_glyphs, run.attr_glyph_count, run.attr_advances, run.attr_justify, run.attr_goffsets)
-                OS._end_path(hdc)
-                count = OS._get_path(hdc, nil, nil, 0)
-                points = Array.typed(::Java::Int).new(count * 2) { 0 }
-                types = Array.typed(::Java::Byte).new(count) { 0 }
-                OS._get_path(hdc, points, types, count)
-                type_index = 0
-                while type_index < types.attr_length
-                  new_type = 0
-                  type = types[type_index] & 0xff
-                  case (type & ~OS::PT_CLOSEFIGURE)
-                  when OS::PT_MOVETO
-                    new_type = Gdip::PathPointTypeStart
-                  when OS::PT_LINETO
-                    new_type = Gdip::PathPointTypeLine
-                  when OS::PT_BEZIERTO
-                    new_type = Gdip::PathPointTypeBezier
+                # long
+                h_font = get_item_font(run)
+                if (!(h_font).equal?(last_hfont))
+                  last_hfont = h_font
+                  if (!(gdip_font).equal?(0))
+                    Gdip._font_delete(gdip_font)
                   end
-                  if (!((type & OS::PT_CLOSEFIGURE)).equal?(0))
-                    new_type |= Gdip::PathPointTypeCloseSubpath
+                  gdip_font = Gdip._font_new(hdc, h_font)
+                  if ((gdip_font).equal?(0))
+                    SWT.error(SWT::ERROR_NO_HANDLES)
                   end
-                  types[type_index] = new_type
-                  type_index += 1
+                  if (!Gdip._font_is_available(gdip_font))
+                    Gdip._font_delete(gdip_font)
+                    gdip_font = 0
+                  end
                 end
                 # long
-                path = Gdip._graphics_path_new(points, types, count, Gdip::FillModeAlternate)
-                if ((path).equal?(0))
-                  SWT.error(SWT::ERROR_NO_HANDLES)
+                gdip_fg = gdip_foreground
+                if (!(style).nil? && style.attr_underline && (style.attr_underline_style).equal?(SWT::UNDERLINE_LINK))
+                  if ((gdip_link_color).equal?(0))
+                    gdip_link_color = create_gdip_brush(link_color, alpha)
+                  end
+                  gdip_fg = gdip_link_color
                 end
-                # long
-                brush = foreground_brush
-                if (full_selection)
-                  brush = sel_brush_fg
+                if (!(gdip_font).equal?(0))
+                  p_rect = draw_run_text_gdip(gdip_graphics, run, rect, gdip_font, baseline, gdip_fg, gdip_sel_foreground, selection_start, selection_end, alpha)
                 else
-                  if (!(run.attr_style).nil? && !(run.attr_style.attr_foreground).nil?)
-                    fg = run.attr_style.attr_foreground.attr_handle
-                    argb = ((alpha & 0xff) << 24) | ((fg >> 16) & 0xff) | (fg & 0xff00) | ((fg & 0xff) << 16)
-                    # long
-                    color = Gdip._color_new(argb)
-                    brush = Gdip._solid_brush_new(color)
-                    Gdip._color_delete(color)
-                  end
+                  fg = !(style).nil? && style.attr_underline && (style.attr_underline_style).equal?(SWT::UNDERLINE_LINK) ? link_color : foreground
+                  p_rect = draw_run_text_gdipraster(gdip_graphics, run, rect, baseline, fg, sel_foreground, selection_start, selection_end)
                 end
-                gstate = 0
-                if (partial_selection)
-                  gdip_rect.attr_x = rect.attr_left
-                  gdip_rect.attr_y = rect.attr_top
-                  gdip_rect.attr_width = rect.attr_right - rect.attr_left
-                  gdip_rect.attr_height = rect.attr_bottom - rect.attr_top
-                  gstate = Gdip._graphics_save(gdip_graphics)
-                  Gdip._graphics_set_clip(gdip_graphics, gdip_rect, Gdip::CombineModeExclude)
-                end
-                antialias = Gdip._graphics_get_smoothing_mode(gdip_graphics)
-                text_antialias = 0
-                mode = Gdip._graphics_get_text_rendering_hint(data.attr_gdip_graphics)
-                case (mode)
-                when Gdip::TextRenderingHintSystemDefault
-                  text_antialias = Gdip::SmoothingModeAntiAlias
-                when Gdip::TextRenderingHintSingleBitPerPixel, Gdip::TextRenderingHintSingleBitPerPixelGridFit
-                  text_antialias = Gdip::SmoothingModeNone
-                when Gdip::TextRenderingHintAntiAlias, Gdip::TextRenderingHintAntiAliasGridFit, Gdip::TextRenderingHintClearTypeGridFit
-                  text_antialias = Gdip::SmoothingModeAntiAlias
-                end
-                Gdip._graphics_set_smoothing_mode(gdip_graphics, text_antialias)
-                gstate2 = 0
-                if (!((data.attr_style & SWT::MIRRORED)).equal?(0))
-                  gstate2 = Gdip._graphics_save(gdip_graphics)
-                  Gdip._graphics_scale_transform(gdip_graphics, -1, 1, Gdip::MatrixOrderPrepend)
-                  Gdip._graphics_translate_transform(gdip_graphics, -2 * draw_x - run.attr_width, 0, Gdip::MatrixOrderPrepend)
-                end
-                Gdip._graphics_fill_path(gdip_graphics, brush, path)
-                if (!((data.attr_style & SWT::MIRRORED)).equal?(0))
-                  Gdip._graphics_restore(gdip_graphics, gstate2)
-                end
-                Gdip._graphics_set_smoothing_mode(gdip_graphics, antialias)
-                draw_lines(gdip, gdip_graphics, x, draw_y + baseline, line_underline_pos, draw_y + line_height, line_runs, i__, brush, nil, alpha)
-                if (partial_selection)
-                  Gdip._graphics_restore(gdip_graphics, gstate)
-                  gstate = Gdip._graphics_save(gdip_graphics)
-                  Gdip._graphics_set_clip(gdip_graphics, gdip_rect, Gdip::CombineModeIntersect)
-                  Gdip._graphics_set_smoothing_mode(gdip_graphics, text_antialias)
-                  if (!((data.attr_style & SWT::MIRRORED)).equal?(0))
-                    gstate2 = Gdip._graphics_save(gdip_graphics)
-                    Gdip._graphics_scale_transform(gdip_graphics, -1, 1, Gdip::MatrixOrderPrepend)
-                    Gdip._graphics_translate_transform(gdip_graphics, -2 * draw_x - run.attr_width, 0, Gdip::MatrixOrderPrepend)
-                  end
-                  Gdip._graphics_fill_path(gdip_graphics, sel_brush_fg, path)
-                  if (!((data.attr_style & SWT::MIRRORED)).equal?(0))
-                    Gdip._graphics_restore(gdip_graphics, gstate2)
-                  end
-                  Gdip._graphics_set_smoothing_mode(gdip_graphics, antialias)
-                  draw_lines(gdip, gdip_graphics, x, draw_y + baseline, line_underline_pos, draw_y + line_height, line_runs, i__, sel_brush_fg, rect, alpha)
-                  Gdip._graphics_restore(gdip_graphics, gstate)
-                end
-                border_clip = draw_border(gdip, gdip_graphics, x, draw_y, line_height, foreground_brush, sel_brush_fg, full_selection, border_clip, partial_selection ? rect : nil, alpha, line_runs, i__, selection_start, selection_end)
-                Gdip._graphics_path_delete(path)
-                if (!(brush).equal?(sel_brush_fg) && !(brush).equal?(foreground_brush))
-                  Gdip._solid_brush_delete(brush)
-                end
+                underline_clip = draw_underline_gdip(gdip_graphics, x, draw_y + baseline, line_underline_pos, draw_y + line_height, line_runs, i__, gdip_fg, gdip_sel_foreground, underline_clip, p_rect, selection_start, selection_end, alpha)
+                strikeout_clip = draw_strikeout_gdip(gdip_graphics, x, draw_y + baseline, line_runs, i__, gdip_fg, gdip_sel_foreground, strikeout_clip, p_rect, selection_start, selection_end, alpha)
+                border_clip = draw_border_gdip(gdip_graphics, x, draw_y, line_height, line_runs, i__, gdip_fg, gdip_sel_foreground, border_clip, p_rect, selection_start, selection_end, alpha)
               else
-                fg = foreground
-                if (full_selection)
-                  fg = selection_foreground.attr_handle
-                else
-                  if (!(run.attr_style).nil? && !(run.attr_style.attr_foreground).nil?)
-                    fg = run.attr_style.attr_foreground.attr_handle
-                  end
-                end
-                OS._set_text_color(hdc, fg)
-                OS._script_text_out(hdc, run.attr_psc, draw_x + offset, draw_run_y, 0, nil, run.attr_analysis, 0, 0, run.attr_glyphs, run.attr_glyph_count, run.attr_advances, run.attr_justify, run.attr_goffsets)
-                draw_lines(gdip, hdc, x, draw_y + baseline, line_underline_pos, draw_y + line_height, line_runs, i__, fg, nil, alpha)
-                if (partial_selection && !(fg).equal?(selection_foreground.attr_handle))
-                  OS._set_text_color(hdc, selection_foreground.attr_handle)
-                  OS._script_text_out(hdc, run.attr_psc, draw_x + offset, draw_run_y, OS::ETO_CLIPPED, rect, run.attr_analysis, 0, 0, run.attr_glyphs, run.attr_glyph_count, run.attr_advances, run.attr_justify, run.attr_goffsets)
-                  draw_lines(gdip, hdc, x, draw_y + baseline, line_underline_pos, draw_y + line_height, line_runs, i__, selection_foreground.attr_handle, rect, alpha)
-                end
-                sel_foreground = !(selection_foreground).nil? ? selection_foreground.attr_handle : 0
-                border_clip = draw_border(gdip, hdc, x, draw_y, line_height, foreground, sel_foreground, full_selection, border_clip, partial_selection ? rect : nil, alpha, line_runs, i__, selection_start, selection_end)
+                fg = !(style).nil? && style.attr_underline && (style.attr_underline_style).equal?(SWT::UNDERLINE_LINK) ? link_color : foreground
+                p_rect = draw_run_text(hdc, run, rect, baseline, fg, sel_foreground, selection_start, selection_end)
+                underline_clip = draw_underline(hdc, x, draw_y + baseline, line_underline_pos, draw_y + line_height, line_runs, i__, fg, sel_foreground, underline_clip, p_rect, selection_start, selection_end)
+                strikeout_clip = draw_strikeout(hdc, x, draw_y + baseline, line_runs, i__, fg, sel_foreground, strikeout_clip, p_rect, selection_start, selection_end)
+                border_clip = draw_border(hdc, x, draw_y, line_height, line_runs, i__, fg, sel_foreground, border_clip, p_rect, selection_start, selection_end)
               end
             end
           end
@@ -1338,243 +1204,29 @@ module Org::Eclipse::Swt::Graphics
         end
         line += 1
       end
-      if (gdip)
-        if (!(sel_brush).equal?(0))
-          Gdip._solid_brush_delete(sel_brush)
-        end
-        if (!(sel_brush_fg).equal?(0))
-          Gdip._solid_brush_delete(sel_brush_fg)
-        end
-        if (!(sel_pen).equal?(0))
-          Gdip._pen_delete(sel_pen)
-        end
-      else
+      if (!(gdip_sel_background).equal?(0))
+        Gdip._solid_brush_delete(gdip_sel_background)
+      end
+      if (!(gdip_sel_foreground).equal?(0))
+        Gdip._solid_brush_delete(gdip_sel_foreground)
+      end
+      if (!(gdip_link_color).equal?(0))
+        Gdip._solid_brush_delete(gdip_link_color)
+      end
+      if (!(gdip_font).equal?(0))
+        Gdip._font_delete(gdip_font)
+      end
+      if (!(state).equal?(0))
         OS._restore_dc(hdc, state)
-        if (!(gdip_graphics).equal?(0))
-          Gdip._graphics_release_hdc(gdip_graphics, hdc)
-        end
-        if (!(sel_brush).equal?(0))
-          OS._delete_object(sel_brush)
-        end
-        if (!(sel_pen).equal?(0))
-          OS._delete_object(sel_pen)
-        end
+      end
+      if (!(sel_background).equal?(0))
+        OS._delete_object(sel_background)
       end
     end
     
-    typesig { [::Java::Boolean, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, Array.typed(StyleItem), ::Java::Int, ::Java::Int, RECT, ::Java::Int] }
+    typesig { [::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, Array.typed(StyleItem), ::Java::Int, ::Java::Int, ::Java::Int, RECT, RECT, ::Java::Int, ::Java::Int] }
     # long
-    # long
-    def draw_lines(advance, graphics, x, line_baseline, line_underline_pos, line_bottom, line, index, color, clip_rect, alpha)
-      run = line[index]
-      style = run.attr_style
-      if ((style).nil?)
-        return
-      end
-      if (!style.attr_underline && !style.attr_strikeout)
-        return
-      end
-      run_x = x + run.attr_x
-      underline_y = line_baseline - line_underline_pos
-      strikeout_y = line_baseline - run.attr_strikeout_pos
-      if (advance)
-        Gdip._graphics_set_pixel_offset_mode(graphics, Gdip::PixelOffsetModeNone)
-        # long
-        brush = color
-        if (style.attr_underline)
-          if (!(style.attr_underline_color).nil?)
-            fg = style.attr_underline_color.attr_handle
-            argb = ((alpha & 0xff) << 24) | ((fg >> 16) & 0xff) | (fg & 0xff00) | ((fg & 0xff) << 16)
-            # long
-            gdi_color = Gdip._color_new(argb)
-            brush = Gdip._solid_brush_new(gdi_color)
-            Gdip._color_delete(gdi_color)
-          end
-          case (style.attr_underline_style)
-          when SWT::UNDERLINE_SQUIGGLE, SWT::UNDERLINE_ERROR
-            squiggly_thickness = 1
-            squiggly_height = 2 * squiggly_thickness
-            squiggly_y = Math.min(underline_y - squiggly_height / 2, line_bottom - squiggly_height - 1)
-            squiggly_x = run_x
-            i = index
-            while i > 0 && style.is_adherent_underline(line[i - 1].attr_style)
-              squiggly_x = x + line[i - 1].attr_x
-              i -= 1
-            end
-            gstate = 0
-            if ((clip_rect).nil?)
-              gstate = Gdip._graphics_save(graphics)
-              gdip_rect = Rect.new
-              gdip_rect.attr_x = run_x
-              gdip_rect.attr_y = squiggly_y
-              gdip_rect.attr_width = run.attr_width + 1
-              gdip_rect.attr_height = squiggly_y + squiggly_height + 1
-              Gdip._graphics_set_clip(graphics, gdip_rect, Gdip::CombineModeIntersect)
-            end
-            points = compute_polyline(squiggly_x, squiggly_y, run_x + run.attr_width, squiggly_y + squiggly_height)
-            # long
-            pen = Gdip._pen_new(brush, squiggly_thickness)
-            Gdip._graphics_draw_lines(graphics, pen, points, points.attr_length / 2)
-            Gdip._pen_delete(pen)
-            if (!(gstate).equal?(0))
-              Gdip._graphics_restore(graphics, gstate)
-            end
-          when SWT::UNDERLINE_SINGLE
-            Gdip._graphics_fill_rectangle(graphics, brush, run_x, underline_y, run.attr_width, run.attr_underline_thickness)
-          when SWT::UNDERLINE_DOUBLE
-            Gdip._graphics_fill_rectangle(graphics, brush, run_x, underline_y, run.attr_width, run.attr_underline_thickness)
-            Gdip._graphics_fill_rectangle(graphics, brush, run_x, underline_y + run.attr_underline_thickness * 2, run.attr_width, run.attr_underline_thickness)
-          when UNDERLINE_IME_THICK
-            Gdip._graphics_fill_rectangle(graphics, brush, run_x - run.attr_underline_thickness, underline_y, run.attr_width, run.attr_underline_thickness * 2)
-          when UNDERLINE_IME_DOT, UNDERLINE_IME_DASH
-            # long
-            pen = Gdip._pen_new(brush, 1)
-            dash_style = (style.attr_underline_style).equal?(UNDERLINE_IME_DOT) ? Gdip::DashStyleDot : Gdip::DashStyleDash
-            Gdip._pen_set_dash_style(pen, dash_style)
-            Gdip._graphics_draw_line(graphics, pen, run_x, underline_y, run_x + run.attr_width, underline_y)
-            Gdip._pen_delete(pen)
-          end
-          if (!(brush).equal?(color))
-            Gdip._solid_brush_delete(brush)
-          end
-        end
-        if (style.attr_strikeout)
-          if (!(style.attr_strikeout_color).nil?)
-            fg = style.attr_strikeout_color.attr_handle
-            argb = ((alpha & 0xff) << 24) | ((fg >> 16) & 0xff) | (fg & 0xff00) | ((fg & 0xff) << 16)
-            # long
-            gdi_color = Gdip._color_new(argb)
-            brush = Gdip._solid_brush_new(gdi_color)
-            Gdip._color_delete(gdi_color)
-          end
-          Gdip._graphics_fill_rectangle(graphics, brush, run_x, strikeout_y, run.attr_width, run.attr_strikeout_thickness)
-          if (!(brush).equal?(color))
-            Gdip._solid_brush_delete(brush)
-          end
-        end
-        Gdip._graphics_set_pixel_offset_mode(graphics, Gdip::PixelOffsetModeHalf)
-      else
-        # 64
-        color_ref_underline = RJava.cast_to_int(color)
-        # 64
-        color_ref_strikeout = RJava.cast_to_int(color)
-        # long
-        brush_underline = 0
-        # long
-        brush_strikeout = 0
-        rect = RECT.new
-        if (style.attr_underline)
-          if (!(style.attr_underline_color).nil?)
-            color_ref_underline = style.attr_underline_color.attr_handle
-          end
-          case (style.attr_underline_style)
-          when SWT::UNDERLINE_SQUIGGLE, SWT::UNDERLINE_ERROR
-            squiggly_thickness = 1
-            squiggly_height = 2 * squiggly_thickness
-            squiggly_y = Math.min(underline_y - squiggly_height / 2, line_bottom - squiggly_height - 1)
-            squiggly_x = run_x
-            i = index
-            while i > 0 && style.is_adherent_underline(line[i - 1].attr_style)
-              squiggly_x = x + line[i - 1].attr_x
-              i -= 1
-            end
-            state = OS._save_dc(graphics)
-            if (!(clip_rect).nil?)
-              OS._intersect_clip_rect(graphics, clip_rect.attr_left, clip_rect.attr_top, clip_rect.attr_right, clip_rect.attr_bottom)
-            else
-              OS._intersect_clip_rect(graphics, run_x, squiggly_y, run_x + run.attr_width + 1, squiggly_y + squiggly_height + 1)
-            end
-            points = compute_polyline(squiggly_x, squiggly_y, run_x + run.attr_width, squiggly_y + squiggly_height)
-            # long
-            pen = OS._create_pen(OS::PS_SOLID, squiggly_thickness, color_ref_underline)
-            # long
-            old_pen = OS._select_object(graphics, pen)
-            OS._polyline(graphics, points, points.attr_length / 2)
-            length_ = points.attr_length
-            if (length_ >= 2 && squiggly_thickness <= 1)
-              OS._set_pixel(graphics, points[length_ - 2], points[length_ - 1], color_ref_underline)
-            end
-            OS._restore_dc(graphics, state)
-            OS._select_object(graphics, old_pen)
-            OS._delete_object(pen)
-          when SWT::UNDERLINE_SINGLE
-            brush_underline = OS._create_solid_brush(color_ref_underline)
-            OS._set_rect(rect, run_x, underline_y, run_x + run.attr_width, underline_y + run.attr_underline_thickness)
-            if (!(clip_rect).nil?)
-              rect.attr_left = Math.max(rect.attr_left, clip_rect.attr_left)
-              rect.attr_right = Math.min(rect.attr_right, clip_rect.attr_right)
-            end
-            OS._fill_rect(graphics, rect, brush_underline)
-          when SWT::UNDERLINE_DOUBLE
-            brush_underline = OS._create_solid_brush(color_ref_underline)
-            OS._set_rect(rect, run_x, underline_y, run_x + run.attr_width, underline_y + run.attr_underline_thickness)
-            if (!(clip_rect).nil?)
-              rect.attr_left = Math.max(rect.attr_left, clip_rect.attr_left)
-              rect.attr_right = Math.min(rect.attr_right, clip_rect.attr_right)
-            end
-            OS._fill_rect(graphics, rect, brush_underline)
-            OS._set_rect(rect, run_x, underline_y + run.attr_underline_thickness * 2, run_x + run.attr_width, underline_y + run.attr_underline_thickness * 3)
-            if (!(clip_rect).nil?)
-              rect.attr_left = Math.max(rect.attr_left, clip_rect.attr_left)
-              rect.attr_right = Math.min(rect.attr_right, clip_rect.attr_right)
-            end
-            OS._fill_rect(graphics, rect, brush_underline)
-          when UNDERLINE_IME_THICK
-            brush_underline = OS._create_solid_brush(color_ref_underline)
-            OS._set_rect(rect, run_x, underline_y - run.attr_underline_thickness, run_x + run.attr_width, underline_y + run.attr_underline_thickness)
-            if (!(clip_rect).nil?)
-              rect.attr_left = Math.max(rect.attr_left, clip_rect.attr_left)
-              rect.attr_right = Math.min(rect.attr_right, clip_rect.attr_right)
-            end
-            OS._fill_rect(graphics, rect, brush_underline)
-          when UNDERLINE_IME_DASH, UNDERLINE_IME_DOT
-            underline_y = line_baseline + run.attr_descent
-            pen_style = (style.attr_underline_style).equal?(UNDERLINE_IME_DASH) ? OS::PS_DASH : OS::PS_DOT
-            # long
-            pen = OS._create_pen(pen_style, 1, color_ref_underline)
-            # long
-            old_pen = OS._select_object(graphics, pen)
-            OS._set_rect(rect, run_x, underline_y, run_x + run.attr_width, underline_y + run.attr_underline_thickness)
-            if (!(clip_rect).nil?)
-              rect.attr_left = Math.max(rect.attr_left, clip_rect.attr_left)
-              rect.attr_right = Math.min(rect.attr_right, clip_rect.attr_right)
-            end
-            OS._move_to_ex(graphics, rect.attr_left, rect.attr_top, 0)
-            OS._line_to(graphics, rect.attr_right, rect.attr_top)
-            OS._select_object(graphics, old_pen)
-            OS._delete_object(pen)
-          end
-        end
-        if (style.attr_strikeout)
-          if (!(style.attr_strikeout_color).nil?)
-            color_ref_strikeout = style.attr_strikeout_color.attr_handle
-          end
-          if (!(brush_underline).equal?(0) && (color_ref_strikeout).equal?(color_ref_underline))
-            brush_strikeout = brush_underline
-          else
-            brush_strikeout = OS._create_solid_brush(color_ref_strikeout)
-          end
-          OS._set_rect(rect, run_x, strikeout_y, run_x + run.attr_width, strikeout_y + run.attr_strikeout_thickness)
-          if (!(clip_rect).nil?)
-            rect.attr_left = Math.max(rect.attr_left, clip_rect.attr_left)
-            rect.attr_right = Math.min(rect.attr_right, clip_rect.attr_right)
-          end
-          OS._fill_rect(graphics, rect, brush_strikeout)
-        end
-        if (!(brush_underline).equal?(0))
-          OS._delete_object(brush_underline)
-        end
-        if (!(brush_strikeout).equal?(0) && !(brush_strikeout).equal?(brush_underline))
-          OS._delete_object(brush_strikeout)
-        end
-      end
-    end
-    
-    typesig { [::Java::Boolean, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Boolean, RECT, RECT, ::Java::Int, Array.typed(StyleItem), ::Java::Int, ::Java::Int, ::Java::Int] }
-    # long
-    # long
-    # long
-    def draw_border(advance, graphics, x, y, line_height, color, selection_color, full_selection, clip_rect, rect, alpha, line, index, selection_start, selection_end)
+    def draw_border(hdc, x, y, line_height, line, index, color, selection_color, clip_rect, p_rect, selection_start, selection_end)
       run = line[index]
       style = run.attr_style
       if ((style).nil?)
@@ -1583,187 +1235,833 @@ module Org::Eclipse::Swt::Graphics
       if ((style.attr_border_style).equal?(SWT::NONE))
         return nil
       end
-      if (!(rect).nil?)
-        if ((clip_rect).nil?)
-          clip_rect = RECT.new
-          OS._set_rect(clip_rect, -1, rect.attr_top, -1, rect.attr_bottom)
-        end
-        is_rtl = !((@orientation & SWT::RIGHT_TO_LEFT)).equal?(0)
-        if (run.attr_start <= selection_start && selection_start <= run.attr_start + run.attr_length)
-          if (run.attr_analysis.attr_f_rtl ^ is_rtl)
-            clip_rect.attr_right = rect.attr_left
-          else
-            clip_rect.attr_left = rect.attr_left
-          end
-        end
-        if (run.attr_start <= selection_end && selection_end <= run.attr_start + run.attr_length)
-          if (run.attr_analysis.attr_f_rtl ^ is_rtl)
-            clip_rect.attr_left = rect.attr_right
-          else
-            clip_rect.attr_right = rect.attr_right
-          end
-        end
-      end
+      clip_rect = add_clip_rect(run, clip_rect, p_rect, selection_start, selection_end)
       if (index + 1 >= line.attr_length || !style.is_adherent_border(line[index + 1].attr_style))
         left = run.attr_x
+        start = run.attr_start
+        end_ = run.attr_start + run.attr_length - 1
         i = index
         while i > 0 && style.is_adherent_border(line[i - 1].attr_style)
           left = line[i - 1].attr_x
+          start = Math.min(start, line[i - 1].attr_start)
+          end_ = Math.max(end_, line[i - 1].attr_start + line[i - 1].attr_length - 1)
           i -= 1
         end
-        if (advance)
-          # long
-          brush = color
-          custom_color = -1
-          if (!(style.attr_border_color).nil?)
-            custom_color = style.attr_border_color.attr_handle
-          else
-            if (!(style.attr_foreground).nil?)
-              custom_color = style.attr_foreground.attr_handle
-            end
-            if (full_selection && (clip_rect).nil?)
-              custom_color = -1
-              brush = selection_color
-            end
-          end
-          if (!(custom_color).equal?(-1))
-            argb = ((alpha & 0xff) << 24) | ((custom_color >> 16) & 0xff) | (custom_color & 0xff00) | ((custom_color & 0xff) << 16)
-            # long
-            gdi_color = Gdip._color_new(argb)
-            brush = Gdip._solid_brush_new(gdi_color)
-            Gdip._color_delete(gdi_color)
-          end
-          line_width = 1
-          line_style = Gdip::DashStyleSolid
-          case (style.attr_border_style)
-          when SWT::BORDER_SOLID
-          when SWT::BORDER_DASH
-            line_style = Gdip::DashStyleDash
-          when SWT::BORDER_DOT
-            line_style = Gdip::DashStyleDot
-          end
-          # long
-          pen = Gdip._pen_new(brush, line_width)
-          Gdip._pen_set_dash_style(pen, line_style)
-          gdip_xoffset = 0.5
-          gdip_yoffset = 0.5
-          Gdip._graphics_translate_transform(graphics, gdip_xoffset, gdip_yoffset, Gdip::MatrixOrderPrepend)
-          if ((style.attr_border_color).nil? && !(clip_rect).nil?)
-            gstate = Gdip._graphics_save(graphics)
-            if ((clip_rect.attr_left).equal?(-1))
-              clip_rect.attr_left = 0
-            end
-            if ((clip_rect.attr_right).equal?(-1))
-              clip_rect.attr_right = 0x7ffff
-            end
-            gdip_rect = Rect.new
-            gdip_rect.attr_x = clip_rect.attr_left
-            gdip_rect.attr_y = clip_rect.attr_top
-            gdip_rect.attr_width = clip_rect.attr_right - clip_rect.attr_left
-            gdip_rect.attr_height = clip_rect.attr_bottom - clip_rect.attr_top
-            Gdip._graphics_set_clip(graphics, gdip_rect, Gdip::CombineModeExclude)
-            Gdip._graphics_draw_rectangle(graphics, pen, x + left, y, run.attr_x + run.attr_width - left - 1, line_height - 1)
-            Gdip._graphics_restore(graphics, gstate)
-            gstate = Gdip._graphics_save(graphics)
-            Gdip._graphics_set_clip(graphics, gdip_rect, Gdip::CombineModeIntersect)
-            # long
-            sel_pen = Gdip._pen_new(selection_color, line_width)
-            Gdip._pen_set_dash_style(pen, line_style)
-            Gdip._graphics_draw_rectangle(graphics, sel_pen, x + left, y, run.attr_x + run.attr_width - left - 1, line_height - 1)
-            Gdip._pen_delete(sel_pen)
-            Gdip._graphics_restore(graphics, gstate)
-          else
-            Gdip._graphics_draw_rectangle(graphics, pen, x + left, y, run.attr_x + run.attr_width - left - 1, line_height - 1)
-          end
-          Gdip._graphics_translate_transform(graphics, -gdip_xoffset, -gdip_yoffset, Gdip::MatrixOrderPrepend)
-          Gdip._pen_delete(pen)
-          if (!(custom_color).equal?(-1))
-            Gdip._solid_brush_delete(brush)
-          end
+        has_selection = selection_start <= selection_end && !(selection_start).equal?(-1) && !(selection_end).equal?(-1)
+        full_selection = has_selection && selection_start <= start && end_ <= selection_end
+        if (!(style.attr_border_color).nil?)
+          color = style.attr_border_color.attr_handle
+          clip_rect = nil
         else
-          if (!(style.attr_border_color).nil?)
-            color = style.attr_border_color.attr_handle
+          if (full_selection)
+            color = selection_color
+            clip_rect = nil
           else
             if (!(style.attr_foreground).nil?)
               color = style.attr_foreground.attr_handle
             end
-            if (full_selection && (clip_rect).nil?)
-              color = selection_color
-            end
           end
-          line_width = 1
-          line_style = OS::PS_SOLID
-          case (style.attr_border_style)
-          when SWT::BORDER_SOLID
-          when SWT::BORDER_DASH
-            line_style = OS::PS_DASH
-          when SWT::BORDER_DOT
-            line_style = OS::PS_DOT
+        end
+        line_width = 1
+        line_style = OS::PS_SOLID
+        case (style.attr_border_style)
+        when SWT::BORDER_SOLID
+        when SWT::BORDER_DASH
+          line_style = OS::PS_DASH
+        when SWT::BORDER_DOT
+          line_style = OS::PS_DOT
+        end
+        # long
+        old_brush = OS._select_object(hdc, OS._get_stock_object(OS::NULL_BRUSH))
+        log_brush = LOGBRUSH.new
+        log_brush.attr_lb_style = OS::BS_SOLID
+        # 64
+        log_brush.attr_lb_color = RJava.cast_to_int(color)
+        # long
+        new_pen = OS._ext_create_pen(line_style | OS::PS_GEOMETRIC, Math.max(1, line_width), log_brush, 0, nil)
+        # long
+        old_pen = OS._select_object(hdc, new_pen)
+        OS._rectangle(hdc, x + left, y, x + run.attr_x + run.attr_width, y + line_height)
+        OS._select_object(hdc, old_pen)
+        OS._delete_object(new_pen)
+        if (!(clip_rect).nil?)
+          state = OS._save_dc(hdc)
+          if ((clip_rect.attr_left).equal?(-1))
+            clip_rect.attr_left = 0
           end
-          log_brush = LOGBRUSH.new
-          log_brush.attr_lb_style = OS::BS_SOLID
+          if ((clip_rect.attr_right).equal?(-1))
+            clip_rect.attr_right = 0x7ffff
+          end
+          OS._intersect_clip_rect(hdc, clip_rect.attr_left, clip_rect.attr_top, clip_rect.attr_right, clip_rect.attr_bottom)
           # 64
-          log_brush.attr_lb_color = RJava.cast_to_int(color)
+          log_brush.attr_lb_color = RJava.cast_to_int(selection_color)
           # long
-          new_pen = OS._ext_create_pen(line_style | OS::PS_GEOMETRIC, Math.max(1, line_width), log_brush, 0, nil)
-          # long
-          old_pen = OS._select_object(graphics, new_pen)
-          # long
-          old_brush = OS._select_object(graphics, OS._get_stock_object(OS::NULL_BRUSH))
-          OS._rectangle(graphics, x + left, y, x + run.attr_x + run.attr_width, y + line_height)
-          if ((style.attr_border_color).nil? && !(clip_rect).nil? && !(color).equal?(selection_color))
-            state = OS._save_dc(graphics)
-            if ((clip_rect.attr_left).equal?(-1))
-              clip_rect.attr_left = 0
+          sel_pen = OS._ext_create_pen(line_style | OS::PS_GEOMETRIC, Math.max(1, line_width), log_brush, 0, nil)
+          old_pen = OS._select_object(hdc, sel_pen)
+          OS._rectangle(hdc, x + left, y, x + run.attr_x + run.attr_width, y + line_height)
+          OS._restore_dc(hdc, state)
+          OS._select_object(hdc, old_pen)
+          OS._delete_object(sel_pen)
+        end
+        OS._select_object(hdc, old_brush)
+        return nil
+      end
+      return clip_rect
+    end
+    
+    typesig { [::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, Array.typed(StyleItem), ::Java::Int, ::Java::Int, ::Java::Int, RECT, RECT, ::Java::Int, ::Java::Int, ::Java::Int] }
+    # long
+    # long
+    # long
+    def draw_border_gdip(graphics, x, y, line_height, line, index, color, selection_color, clip_rect, p_rect, selection_start, selection_end, alpha)
+      run = line[index]
+      style = run.attr_style
+      if ((style).nil?)
+        return nil
+      end
+      if ((style.attr_border_style).equal?(SWT::NONE))
+        return nil
+      end
+      clip_rect = add_clip_rect(run, clip_rect, p_rect, selection_start, selection_end)
+      if (index + 1 >= line.attr_length || !style.is_adherent_border(line[index + 1].attr_style))
+        left = run.attr_x
+        start = run.attr_start
+        end_ = run.attr_start + run.attr_length - 1
+        i = index
+        while i > 0 && style.is_adherent_border(line[i - 1].attr_style)
+          left = line[i - 1].attr_x
+          start = Math.min(start, line[i - 1].attr_start)
+          end_ = Math.max(end_, line[i - 1].attr_start + line[i - 1].attr_length - 1)
+          i -= 1
+        end
+        has_selection = selection_start <= selection_end && !(selection_start).equal?(-1) && !(selection_end).equal?(-1)
+        full_selection = has_selection && selection_start <= start && end_ <= selection_end
+        # long
+        brush = color
+        if (!(style.attr_border_color).nil?)
+          brush = create_gdip_brush(style.attr_border_color, alpha)
+          clip_rect = nil
+        else
+          if (full_selection)
+            brush = selection_color
+            clip_rect = nil
+          else
+            if (!(style.attr_foreground).nil?)
+              brush = create_gdip_brush(style.attr_foreground, alpha)
             end
-            if ((clip_rect.attr_right).equal?(-1))
-              clip_rect.attr_right = 0x7ffff
-            end
-            OS._intersect_clip_rect(graphics, clip_rect.attr_left, clip_rect.attr_top, clip_rect.attr_right, clip_rect.attr_bottom)
-            # 64
-            log_brush.attr_lb_color = RJava.cast_to_int(selection_color)
-            # long
-            sel_pen = OS._ext_create_pen(line_style | OS::PS_GEOMETRIC, Math.max(1, line_width), log_brush, 0, nil)
-            OS._select_object(graphics, sel_pen)
-            OS._rectangle(graphics, x + left, y, x + run.attr_x + run.attr_width, y + line_height)
-            OS._restore_dc(graphics, state)
-            OS._select_object(graphics, new_pen)
-            OS._delete_object(sel_pen)
           end
-          OS._select_object(graphics, old_brush)
-          OS._select_object(graphics, old_pen)
-          OS._delete_object(new_pen)
+        end
+        line_width = 1
+        line_style = Gdip::DashStyleSolid
+        case (style.attr_border_style)
+        when SWT::BORDER_SOLID
+        when SWT::BORDER_DASH
+          line_style = Gdip::DashStyleDash
+        when SWT::BORDER_DOT
+          line_style = Gdip::DashStyleDot
+        end
+        # long
+        pen = Gdip._pen_new(brush, line_width)
+        Gdip._pen_set_dash_style(pen, line_style)
+        Gdip._graphics_set_pixel_offset_mode(graphics, Gdip::PixelOffsetModeNone)
+        if (!(clip_rect).nil?)
+          gstate = Gdip._graphics_save(graphics)
+          if ((clip_rect.attr_left).equal?(-1))
+            clip_rect.attr_left = 0
+          end
+          if ((clip_rect.attr_right).equal?(-1))
+            clip_rect.attr_right = 0x7ffff
+          end
+          gdip_rect = Rect.new
+          gdip_rect.attr_x = clip_rect.attr_left
+          gdip_rect.attr_y = clip_rect.attr_top
+          gdip_rect.attr_width = clip_rect.attr_right - clip_rect.attr_left
+          gdip_rect.attr_height = clip_rect.attr_bottom - clip_rect.attr_top
+          Gdip._graphics_set_clip(graphics, gdip_rect, Gdip::CombineModeExclude)
+          Gdip._graphics_draw_rectangle(graphics, pen, x + left, y, run.attr_x + run.attr_width - left - 1, line_height - 1)
+          Gdip._graphics_restore(graphics, gstate)
+          gstate = Gdip._graphics_save(graphics)
+          Gdip._graphics_set_clip(graphics, gdip_rect, Gdip::CombineModeIntersect)
+          # long
+          sel_pen = Gdip._pen_new(selection_color, line_width)
+          Gdip._pen_set_dash_style(sel_pen, line_style)
+          Gdip._graphics_draw_rectangle(graphics, sel_pen, x + left, y, run.attr_x + run.attr_width - left - 1, line_height - 1)
+          Gdip._pen_delete(sel_pen)
+          Gdip._graphics_restore(graphics, gstate)
+        else
+          Gdip._graphics_draw_rectangle(graphics, pen, x + left, y, run.attr_x + run.attr_width - left - 1, line_height - 1)
+        end
+        Gdip._graphics_set_pixel_offset_mode(graphics, Gdip::PixelOffsetModeHalf)
+        Gdip._pen_delete(pen)
+        if (!(brush).equal?(selection_color) && !(brush).equal?(color))
+          Gdip._solid_brush_delete(brush)
         end
         return nil
       end
       return clip_rect
     end
     
-    typesig { [::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int] }
-    def compute_polyline(left, top, right, bottom)
-      height = bottom - top # can be any number
-      width = 2 * height # must be even
-      peaks = Compatibility.ceil(right - left, width)
-      if ((peaks).equal?(0) && right - left > 2)
-        peaks = 1
+    typesig { [StyleItem, ::Java::Int, RECT, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Boolean] }
+    # long
+    # long
+    def draw_run_background(run, hdc, rect, selection_start, selection_end, sel_brush, has_selection)
+      end_ = run.attr_start + run.attr_length - 1
+      full_selection = has_selection && selection_start <= run.attr_start && selection_end >= end_
+      if (full_selection)
+        OS._select_object(hdc, sel_brush)
+        OS._pat_blt(hdc, rect.attr_left, rect.attr_top, rect.attr_right - rect.attr_left, rect.attr_bottom - rect.attr_top, OS::PATCOPY)
+      else
+        if (!(run.attr_style).nil? && !(run.attr_style.attr_background).nil?)
+          bg = run.attr_style.attr_background.attr_handle
+          # long
+          h_brush = OS._create_solid_brush(bg)
+          # long
+          old_brush = OS._select_object(hdc, h_brush)
+          OS._pat_blt(hdc, rect.attr_left, rect.attr_top, rect.attr_right - rect.attr_left, rect.attr_bottom - rect.attr_top, OS::PATCOPY)
+          OS._select_object(hdc, old_brush)
+          OS._delete_object(h_brush)
+        end
+        partial_selection = has_selection && !(selection_start > end_ || run.attr_start > selection_end)
+        if (partial_selection)
+          get_partial_selection(run, selection_start, selection_end, rect)
+          OS._select_object(hdc, sel_brush)
+          OS._pat_blt(hdc, rect.attr_left, rect.attr_top, rect.attr_right - rect.attr_left, rect.attr_bottom - rect.attr_top, OS::PATCOPY)
+        end
       end
-      length_ = ((2 * peaks) + 1) * 2
-      if (length_ < 0)
-        return Array.typed(::Java::Int).new(0) { 0 }
+    end
+    
+    typesig { [StyleItem, ::Java::Int, RECT, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Boolean] }
+    # long
+    # long
+    def draw_run_background_gdip(run, graphics, rect, selection_start, selection_end, alpha, sel_brush, has_selection)
+      end_ = run.attr_start + run.attr_length - 1
+      full_selection = has_selection && selection_start <= run.attr_start && selection_end >= end_
+      if (full_selection)
+        Gdip._graphics_fill_rectangle(graphics, sel_brush, rect.attr_left, rect.attr_top, rect.attr_right - rect.attr_left, rect.attr_bottom - rect.attr_top)
+      else
+        if (!(run.attr_style).nil? && !(run.attr_style.attr_background).nil?)
+          # long
+          brush = create_gdip_brush(run.attr_style.attr_background, alpha)
+          Gdip._graphics_fill_rectangle(graphics, brush, rect.attr_left, rect.attr_top, rect.attr_right - rect.attr_left, rect.attr_bottom - rect.attr_top)
+          Gdip._solid_brush_delete(brush)
+        end
+        partial_selection = has_selection && !(selection_start > end_ || run.attr_start > selection_end)
+        if (partial_selection)
+          get_partial_selection(run, selection_start, selection_end, rect)
+          if (rect.attr_left > rect.attr_right)
+            tmp = rect.attr_left
+            rect.attr_left = rect.attr_right
+            rect.attr_right = tmp
+          end
+          Gdip._graphics_fill_rectangle(graphics, sel_brush, rect.attr_left, rect.attr_top, rect.attr_right - rect.attr_left, rect.attr_bottom - rect.attr_top)
+        end
       end
-      coordinates = Array.typed(::Java::Int).new(length_) { 0 }
-      i = 0
-      while i < peaks
-        index = 4 * i
-        coordinates[index] = left + (width * i)
-        coordinates[index + 1] = bottom
-        coordinates[index + 2] = coordinates[index] + width / 2
-        coordinates[index + 3] = top
-        i += 1
+    end
+    
+    typesig { [::Java::Int, StyleItem, RECT, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int] }
+    # long
+    def draw_run_text(hdc, run, rect, baseline, color, selection_color, selection_start, selection_end)
+      end_ = run.attr_start + run.attr_length - 1
+      has_selection = selection_start <= selection_end && !(selection_start).equal?(-1) && !(selection_end).equal?(-1)
+      full_selection = has_selection && selection_start <= run.attr_start && selection_end >= end_
+      partial_selection = has_selection && !full_selection && !(selection_start > end_ || run.attr_start > selection_end)
+      offset = !((@orientation & SWT::RIGHT_TO_LEFT)).equal?(0) ? -1 : 0
+      x = rect.attr_left + offset
+      y = rect.attr_top + (baseline - run.attr_ascent)
+      # long
+      h_font = get_item_font(run)
+      OS._select_object(hdc, h_font)
+      if (full_selection)
+        color = selection_color
+      else
+        if (!(run.attr_style).nil? && !(run.attr_style.attr_foreground).nil?)
+          color = run.attr_style.attr_foreground.attr_handle
+        end
       end
-      coordinates[length_ - 2] = left + (width * peaks)
-      coordinates[length_ - 1] = bottom
-      return coordinates
+      OS._set_text_color(hdc, color)
+      OS._script_text_out(hdc, run.attr_psc, x, y, 0, nil, run.attr_analysis, 0, 0, run.attr_glyphs, run.attr_glyph_count, run.attr_advances, run.attr_justify, run.attr_goffsets)
+      if (partial_selection)
+        get_partial_selection(run, selection_start, selection_end, rect)
+        OS._set_text_color(hdc, selection_color)
+        OS._script_text_out(hdc, run.attr_psc, x, y, OS::ETO_CLIPPED, rect, run.attr_analysis, 0, 0, run.attr_glyphs, run.attr_glyph_count, run.attr_advances, run.attr_justify, run.attr_goffsets)
+      end
+      return full_selection || partial_selection ? rect : nil
+    end
+    
+    typesig { [::Java::Int, StyleItem, RECT, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int] }
+    # long
+    # long
+    # long
+    # long
+    def draw_run_text_gdip(graphics, run, rect, gdip_font, baseline, color, selection_color, selection_start, selection_end, alpha)
+      end_ = run.attr_start + run.attr_length - 1
+      has_selection = selection_start <= selection_end && !(selection_start).equal?(-1) && !(selection_end).equal?(-1)
+      full_selection = has_selection && selection_start <= run.attr_start && selection_end >= end_
+      partial_selection = has_selection && !full_selection && !(selection_start > end_ || run.attr_start > selection_end)
+      draw_y = rect.attr_top + baseline
+      draw_x = rect.attr_left
+      # long
+      brush = color
+      if (full_selection)
+        brush = selection_color
+      else
+        if (!(run.attr_style).nil? && !(run.attr_style.attr_foreground).nil?)
+          brush = create_gdip_brush(run.attr_style.attr_foreground, alpha)
+        end
+      end
+      gstate = 0
+      gdip_rect = nil
+      if (partial_selection)
+        gdip_rect = Rect.new
+        get_partial_selection(run, selection_start, selection_end, rect)
+        gdip_rect.attr_x = rect.attr_left
+        gdip_rect.attr_y = rect.attr_top
+        gdip_rect.attr_width = rect.attr_right - rect.attr_left
+        gdip_rect.attr_height = rect.attr_bottom - rect.attr_top
+        gstate = Gdip._graphics_save(graphics)
+        Gdip._graphics_set_clip(graphics, gdip_rect, Gdip::CombineModeExclude)
+      end
+      gstate_mirrored = 0
+      is_mirrored = !((@orientation & SWT::RIGHT_TO_LEFT)).equal?(0)
+      if (is_mirrored)
+        case (Gdip._brush_get_type(brush))
+        when Gdip::BrushTypeLinearGradient
+          Gdip._linear_gradient_brush_scale_transform(brush, -1, 1, Gdip::MatrixOrderPrepend)
+          Gdip._linear_gradient_brush_translate_transform(brush, -2 * draw_x - run.attr_width, 0, Gdip::MatrixOrderPrepend)
+        when Gdip::BrushTypeTextureFill
+          Gdip._texture_brush_scale_transform(brush, -1, 1, Gdip::MatrixOrderPrepend)
+          Gdip._texture_brush_translate_transform(brush, -2 * draw_x - run.attr_width, 0, Gdip::MatrixOrderPrepend)
+        end
+        gstate_mirrored = Gdip._graphics_save(graphics)
+        Gdip._graphics_scale_transform(graphics, -1, 1, Gdip::MatrixOrderPrepend)
+        Gdip._graphics_translate_transform(graphics, -2 * draw_x - run.attr_width, 0, Gdip::MatrixOrderPrepend)
+      end
+      advances = Array.typed(::Java::Int).new(run.attr_glyph_count) { 0 }
+      points = Array.typed(::Java::Float).new(run.attr_glyph_count * 2) { 0.0 }
+      OS.memmove(advances, !(run.attr_justify).equal?(0) ? run.attr_justify : run.attr_advances, run.attr_glyph_count * 4)
+      glyph_x = draw_x
+      h = 0
+      j = 0
+      while h < advances.attr_length
+        points[((j += 1) - 1)] = glyph_x
+        points[((j += 1) - 1)] = draw_y
+        glyph_x += advances[h]
+        h += 1
+      end
+      Gdip._graphics_draw_driver_string(graphics, run.attr_glyphs, run.attr_glyph_count, gdip_font, brush, points, 0, 0)
+      if (partial_selection)
+        if (is_mirrored)
+          Gdip._graphics_restore(graphics, gstate_mirrored)
+        end
+        Gdip._graphics_restore(graphics, gstate)
+        gstate = Gdip._graphics_save(graphics)
+        Gdip._graphics_set_clip(graphics, gdip_rect, Gdip::CombineModeIntersect)
+        if (is_mirrored)
+          gstate_mirrored = Gdip._graphics_save(graphics)
+          Gdip._graphics_scale_transform(graphics, -1, 1, Gdip::MatrixOrderPrepend)
+          Gdip._graphics_translate_transform(graphics, -2 * draw_x - run.attr_width, 0, Gdip::MatrixOrderPrepend)
+        end
+        Gdip._graphics_draw_driver_string(graphics, run.attr_glyphs, run.attr_glyph_count, gdip_font, selection_color, points, 0, 0)
+        Gdip._graphics_restore(graphics, gstate)
+      end
+      if (is_mirrored)
+        case (Gdip._brush_get_type(brush))
+        when Gdip::BrushTypeLinearGradient
+          Gdip._linear_gradient_brush_reset_transform(brush)
+        when Gdip::BrushTypeTextureFill
+          Gdip._texture_brush_reset_transform(brush)
+        end
+        Gdip._graphics_restore(graphics, gstate_mirrored)
+      end
+      if (!(brush).equal?(selection_color) && !(brush).equal?(color))
+        Gdip._solid_brush_delete(brush)
+      end
+      return full_selection || partial_selection ? rect : nil
+    end
+    
+    typesig { [::Java::Int, StyleItem, RECT, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int] }
+    # long
+    def draw_run_text_gdipraster(graphics, run, rect, baseline, color, selection_color, selection_start, selection_end)
+      # long
+      clip_rgn = 0
+      Gdip._graphics_set_pixel_offset_mode(graphics, Gdip::PixelOffsetModeNone)
+      # long
+      rgn = Gdip._region_new
+      if ((rgn).equal?(0))
+        SWT.error(SWT::ERROR_NO_HANDLES)
+      end
+      Gdip._graphics_get_clip(graphics, rgn)
+      if (!Gdip._region_is_infinite(rgn, graphics))
+        clip_rgn = Gdip._region_get_hrgn(rgn, graphics)
+      end
+      Gdip._region_delete(rgn)
+      Gdip._graphics_set_pixel_offset_mode(graphics, Gdip::PixelOffsetModeHalf)
+      lp_xform = nil
+      # long
+      matrix = Gdip._matrix_new(1, 0, 0, 1, 0, 0)
+      if ((matrix).equal?(0))
+        SWT.error(SWT::ERROR_NO_HANDLES)
+      end
+      Gdip._graphics_get_transform(graphics, matrix)
+      if (!Gdip._matrix_is_identity(matrix))
+        lp_xform = Array.typed(::Java::Float).new(6) { 0.0 }
+        Gdip._matrix_get_elements(matrix, lp_xform)
+      end
+      Gdip._matrix_delete(matrix)
+      # long
+      hdc = Gdip._graphics_get_hdc(graphics)
+      state = OS._save_dc(hdc)
+      if (!(lp_xform).nil?)
+        OS._set_graphics_mode(hdc, OS::GM_ADVANCED)
+        OS._set_world_transform(hdc, lp_xform)
+      end
+      if (!(clip_rgn).equal?(0))
+        OS._select_clip_rgn(hdc, clip_rgn)
+        OS._delete_object(clip_rgn)
+      end
+      if (!((@orientation & SWT::RIGHT_TO_LEFT)).equal?(0))
+        OS._set_layout(hdc, OS._get_layout(hdc) | OS::LAYOUT_RTL)
+      end
+      OS._set_bk_mode(hdc, OS::TRANSPARENT)
+      p_rect = draw_run_text(hdc, run, rect, baseline, color, selection_color, selection_start, selection_end)
+      OS._restore_dc(hdc, state)
+      Gdip._graphics_release_hdc(graphics, hdc)
+      return p_rect
+    end
+    
+    typesig { [::Java::Int, ::Java::Int, ::Java::Int, Array.typed(StyleItem), ::Java::Int, ::Java::Int, ::Java::Int, RECT, RECT, ::Java::Int, ::Java::Int] }
+    # long
+    def draw_strikeout(hdc, x, baseline, line, index, color, selection_color, clip_rect, p_rect, selection_start, selection_end)
+      run = line[index]
+      style = run.attr_style
+      if ((style).nil?)
+        return nil
+      end
+      if (!style.attr_strikeout)
+        return nil
+      end
+      clip_rect = add_clip_rect(run, clip_rect, p_rect, selection_start, selection_end)
+      if (index + 1 >= line.attr_length || !style.is_adherent_strikeout(line[index + 1].attr_style))
+        left = run.attr_x
+        start = run.attr_start
+        end_ = run.attr_start + run.attr_length - 1
+        i = index
+        while i > 0 && style.is_adherent_strikeout(line[i - 1].attr_style)
+          left = line[i - 1].attr_x
+          start = Math.min(start, line[i - 1].attr_start)
+          end_ = Math.max(end_, line[i - 1].attr_start + line[i - 1].attr_length - 1)
+          i -= 1
+        end
+        has_selection = selection_start <= selection_end && !(selection_start).equal?(-1) && !(selection_end).equal?(-1)
+        full_selection = has_selection && selection_start <= start && end_ <= selection_end
+        if (!(style.attr_strikeout_color).nil?)
+          color = style.attr_strikeout_color.attr_handle
+          clip_rect = nil
+        else
+          if (full_selection)
+            color = selection_color
+            clip_rect = nil
+          else
+            if (!(style.attr_foreground).nil?)
+              color = style.attr_foreground.attr_handle
+            end
+          end
+        end
+        rect = RECT.new
+        OS._set_rect(rect, x + left, baseline - run.attr_strikeout_pos, x + run.attr_x + run.attr_width, baseline - run.attr_strikeout_pos + run.attr_strikeout_thickness)
+        # long
+        brush = OS._create_solid_brush(color)
+        OS._fill_rect(hdc, rect, brush)
+        OS._delete_object(brush)
+        if (!(clip_rect).nil?)
+          # long
+          sel_brush = OS._create_solid_brush(selection_color)
+          if ((clip_rect.attr_left).equal?(-1))
+            clip_rect.attr_left = 0
+          end
+          if ((clip_rect.attr_right).equal?(-1))
+            clip_rect.attr_right = 0x7ffff
+          end
+          OS._set_rect(clip_rect, Math.max(rect.attr_left, clip_rect.attr_left), rect.attr_top, Math.min(rect.attr_right, clip_rect.attr_right), rect.attr_bottom)
+          OS._fill_rect(hdc, clip_rect, sel_brush)
+          OS._delete_object(sel_brush)
+        end
+        return nil
+      end
+      return clip_rect
+    end
+    
+    typesig { [::Java::Int, ::Java::Int, ::Java::Int, Array.typed(StyleItem), ::Java::Int, ::Java::Int, ::Java::Int, RECT, RECT, ::Java::Int, ::Java::Int, ::Java::Int] }
+    # long
+    # long
+    # long
+    def draw_strikeout_gdip(graphics, x, baseline, line, index, color, selection_color, clip_rect, p_rect, selection_start, selection_end, alpha)
+      run = line[index]
+      style = run.attr_style
+      if ((style).nil?)
+        return nil
+      end
+      if (!style.attr_strikeout)
+        return nil
+      end
+      clip_rect = add_clip_rect(run, clip_rect, p_rect, selection_start, selection_end)
+      if (index + 1 >= line.attr_length || !style.is_adherent_strikeout(line[index + 1].attr_style))
+        left = run.attr_x
+        start = run.attr_start
+        end_ = run.attr_start + run.attr_length - 1
+        i = index
+        while i > 0 && style.is_adherent_strikeout(line[i - 1].attr_style)
+          left = line[i - 1].attr_x
+          start = Math.min(start, line[i - 1].attr_start)
+          end_ = Math.max(end_, line[i - 1].attr_start + line[i - 1].attr_length - 1)
+          i -= 1
+        end
+        has_selection = selection_start <= selection_end && !(selection_start).equal?(-1) && !(selection_end).equal?(-1)
+        full_selection = has_selection && selection_start <= start && end_ <= selection_end
+        # long
+        brush = color
+        if (!(style.attr_strikeout_color).nil?)
+          brush = create_gdip_brush(style.attr_strikeout_color, alpha)
+          clip_rect = nil
+        else
+          if (full_selection)
+            color = selection_color
+            clip_rect = nil
+          else
+            if (!(style.attr_foreground).nil?)
+              brush = create_gdip_brush(style.attr_foreground, alpha)
+            end
+          end
+        end
+        if (!(clip_rect).nil?)
+          gstate = Gdip._graphics_save(graphics)
+          if ((clip_rect.attr_left).equal?(-1))
+            clip_rect.attr_left = 0
+          end
+          if ((clip_rect.attr_right).equal?(-1))
+            clip_rect.attr_right = 0x7ffff
+          end
+          gdip_rect = Rect.new
+          gdip_rect.attr_x = clip_rect.attr_left
+          gdip_rect.attr_y = clip_rect.attr_top
+          gdip_rect.attr_width = clip_rect.attr_right - clip_rect.attr_left
+          gdip_rect.attr_height = clip_rect.attr_bottom - clip_rect.attr_top
+          Gdip._graphics_set_clip(graphics, gdip_rect, Gdip::CombineModeExclude)
+          Gdip._graphics_fill_rectangle(graphics, brush, x + left, baseline - run.attr_strikeout_pos, run.attr_x + run.attr_width - left, run.attr_strikeout_thickness)
+          Gdip._graphics_restore(graphics, gstate)
+          gstate = Gdip._graphics_save(graphics)
+          Gdip._graphics_set_clip(graphics, gdip_rect, Gdip::CombineModeIntersect)
+          Gdip._graphics_fill_rectangle(graphics, selection_color, x + left, baseline - run.attr_strikeout_pos, run.attr_x + run.attr_width - left, run.attr_strikeout_thickness)
+          Gdip._graphics_restore(graphics, gstate)
+        else
+          Gdip._graphics_fill_rectangle(graphics, brush, x + left, baseline - run.attr_strikeout_pos, run.attr_x + run.attr_width - left, run.attr_strikeout_thickness)
+        end
+        if (!(brush).equal?(selection_color) && !(brush).equal?(color))
+          Gdip._solid_brush_delete(brush)
+        end
+        return nil
+      end
+      return clip_rect
+    end
+    
+    typesig { [::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, Array.typed(StyleItem), ::Java::Int, ::Java::Int, ::Java::Int, RECT, RECT, ::Java::Int, ::Java::Int] }
+    # long
+    def draw_underline(hdc, x, baseline, line_underline_pos, line_bottom, line, index, color, selection_color, clip_rect, p_rect, selection_start, selection_end)
+      run = line[index]
+      style = run.attr_style
+      if ((style).nil?)
+        return nil
+      end
+      if (!style.attr_underline)
+        return nil
+      end
+      clip_rect = add_clip_rect(run, clip_rect, p_rect, selection_start, selection_end)
+      if (index + 1 >= line.attr_length || !style.is_adherent_underline(line[index + 1].attr_style))
+        left = run.attr_x
+        start = run.attr_start
+        end_ = run.attr_start + run.attr_length - 1
+        i = index
+        while i > 0 && style.is_adherent_underline(line[i - 1].attr_style)
+          left = line[i - 1].attr_x
+          start = Math.min(start, line[i - 1].attr_start)
+          end_ = Math.max(end_, line[i - 1].attr_start + line[i - 1].attr_length - 1)
+          i -= 1
+        end
+        has_selection = selection_start <= selection_end && !(selection_start).equal?(-1) && !(selection_end).equal?(-1)
+        full_selection = has_selection && selection_start <= start && end_ <= selection_end
+        if (!(style.attr_underline_color).nil?)
+          color = style.attr_underline_color.attr_handle
+          clip_rect = nil
+        else
+          if (full_selection)
+            color = selection_color
+            clip_rect = nil
+          else
+            if (!(style.attr_foreground).nil?)
+              color = style.attr_foreground.attr_handle
+            end
+          end
+        end
+        rect = RECT.new
+        OS._set_rect(rect, x + left, baseline - line_underline_pos, x + run.attr_x + run.attr_width, baseline - line_underline_pos + run.attr_underline_thickness)
+        if (!(clip_rect).nil?)
+          if ((clip_rect.attr_left).equal?(-1))
+            clip_rect.attr_left = 0
+          end
+          if ((clip_rect.attr_right).equal?(-1))
+            clip_rect.attr_right = 0x7ffff
+          end
+          OS._set_rect(clip_rect, Math.max(rect.attr_left, clip_rect.attr_left), rect.attr_top, Math.min(rect.attr_right, clip_rect.attr_right), rect.attr_bottom)
+        end
+        case (style.attr_underline_style)
+        when SWT::UNDERLINE_SQUIGGLE, SWT::UNDERLINE_ERROR
+          squiggly_thickness = 1
+          squiggly_height = 2 * squiggly_thickness
+          squiggly_y = Math.min(rect.attr_top - squiggly_height / 2, line_bottom - squiggly_height - 1)
+          points = compute_polyline(rect.attr_left, squiggly_y, rect.attr_right, squiggly_y + squiggly_height)
+          # long
+          pen = OS._create_pen(OS::PS_SOLID, squiggly_thickness, color)
+          # long
+          old_pen = OS._select_object(hdc, pen)
+          state = OS._save_dc(hdc)
+          OS._intersect_clip_rect(hdc, rect.attr_left, squiggly_y, rect.attr_right + 1, squiggly_y + squiggly_height + 1)
+          OS._polyline(hdc, points, points.attr_length / 2)
+          length_ = points.attr_length
+          if (length_ >= 2 && squiggly_thickness <= 1)
+            OS._set_pixel(hdc, points[length_ - 2], points[length_ - 1], color)
+          end
+          OS._select_object(hdc, old_pen)
+          OS._delete_object(pen)
+          OS._restore_dc(hdc, state)
+          if (!(clip_rect).nil?)
+            pen = OS._create_pen(OS::PS_SOLID, squiggly_thickness, selection_color)
+            old_pen = OS._select_object(hdc, pen)
+            state = OS._save_dc(hdc)
+            OS._intersect_clip_rect(hdc, clip_rect.attr_left, squiggly_y, clip_rect.attr_right + 1, squiggly_y + squiggly_height + 1)
+            OS._polyline(hdc, points, points.attr_length / 2)
+            if (length_ >= 2 && squiggly_thickness <= 1)
+              OS._set_pixel(hdc, points[length_ - 2], points[length_ - 1], selection_color)
+            end
+            OS._select_object(hdc, old_pen)
+            OS._delete_object(pen)
+            OS._restore_dc(hdc, state)
+          end
+        when SWT::UNDERLINE_SINGLE, SWT::UNDERLINE_DOUBLE, SWT::UNDERLINE_LINK, UNDERLINE_IME_THICK
+          if ((style.attr_underline_style).equal?(UNDERLINE_IME_THICK))
+            rect.attr_top -= run.attr_underline_thickness
+            if (!(clip_rect).nil?)
+              clip_rect.attr_top -= run.attr_underline_thickness
+            end
+          end
+          bottom = (style.attr_underline_style).equal?(SWT::UNDERLINE_DOUBLE) ? rect.attr_bottom + run.attr_underline_thickness * 2 : rect.attr_bottom
+          if (bottom > line_bottom)
+            OS._offset_rect(rect, 0, line_bottom - bottom)
+            if (!(clip_rect).nil?)
+              OS._offset_rect(clip_rect, 0, line_bottom - bottom)
+            end
+          end
+          # long
+          brush = OS._create_solid_brush(color)
+          OS._fill_rect(hdc, rect, brush)
+          if ((style.attr_underline_style).equal?(SWT::UNDERLINE_DOUBLE))
+            OS._set_rect(rect, rect.attr_left, rect.attr_top + run.attr_underline_thickness * 2, rect.attr_right, rect.attr_bottom + run.attr_underline_thickness * 2)
+            OS._fill_rect(hdc, rect, brush)
+          end
+          OS._delete_object(brush)
+          if (!(clip_rect).nil?)
+            # long
+            sel_brush = OS._create_solid_brush(selection_color)
+            OS._fill_rect(hdc, clip_rect, sel_brush)
+            if ((style.attr_underline_style).equal?(SWT::UNDERLINE_DOUBLE))
+              OS._set_rect(clip_rect, clip_rect.attr_left, rect.attr_top, clip_rect.attr_right, rect.attr_bottom)
+              OS._fill_rect(hdc, clip_rect, sel_brush)
+            end
+            OS._delete_object(sel_brush)
+          end
+        when UNDERLINE_IME_DASH, UNDERLINE_IME_DOT
+          pen_style = (style.attr_underline_style).equal?(UNDERLINE_IME_DASH) ? OS::PS_DASH : OS::PS_DOT
+          # long
+          pen = OS._create_pen(pen_style, 1, color)
+          # long
+          old_pen = OS._select_object(hdc, pen)
+          OS._set_rect(rect, rect.attr_left, baseline + run.attr_descent, rect.attr_right, baseline + run.attr_descent + run.attr_underline_thickness)
+          OS._move_to_ex(hdc, rect.attr_left, rect.attr_top, 0)
+          OS._line_to(hdc, rect.attr_right, rect.attr_top)
+          OS._select_object(hdc, old_pen)
+          OS._delete_object(pen)
+          if (!(clip_rect).nil?)
+            pen = OS._create_pen(pen_style, 1, selection_color)
+            old_pen = OS._select_object(hdc, pen)
+            OS._set_rect(clip_rect, clip_rect.attr_left, rect.attr_top, clip_rect.attr_right, rect.attr_bottom)
+            OS._move_to_ex(hdc, clip_rect.attr_left, clip_rect.attr_top, 0)
+            OS._line_to(hdc, clip_rect.attr_right, clip_rect.attr_top)
+            OS._select_object(hdc, old_pen)
+            OS._delete_object(pen)
+          end
+        end
+        return nil
+      end
+      return clip_rect
+    end
+    
+    typesig { [::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, Array.typed(StyleItem), ::Java::Int, ::Java::Int, ::Java::Int, RECT, RECT, ::Java::Int, ::Java::Int, ::Java::Int] }
+    # long
+    # long
+    # long
+    def draw_underline_gdip(graphics, x, baseline, line_underline_pos, line_bottom, line, index, color, selection_color, clip_rect, p_rect, selection_start, selection_end, alpha)
+      run = line[index]
+      style = run.attr_style
+      if ((style).nil?)
+        return nil
+      end
+      if (!style.attr_underline)
+        return nil
+      end
+      clip_rect = add_clip_rect(run, clip_rect, p_rect, selection_start, selection_end)
+      if (index + 1 >= line.attr_length || !style.is_adherent_underline(line[index + 1].attr_style))
+        left = run.attr_x
+        start = run.attr_start
+        end_ = run.attr_start + run.attr_length - 1
+        i = index
+        while i > 0 && style.is_adherent_underline(line[i - 1].attr_style)
+          left = line[i - 1].attr_x
+          start = Math.min(start, line[i - 1].attr_start)
+          end_ = Math.max(end_, line[i - 1].attr_start + line[i - 1].attr_length - 1)
+          i -= 1
+        end
+        has_selection = selection_start <= selection_end && !(selection_start).equal?(-1) && !(selection_end).equal?(-1)
+        full_selection = has_selection && selection_start <= start && end_ <= selection_end
+        # long
+        brush = color
+        if (!(style.attr_underline_color).nil?)
+          brush = create_gdip_brush(style.attr_underline_color, alpha)
+          clip_rect = nil
+        else
+          if (full_selection)
+            brush = selection_color
+            clip_rect = nil
+          else
+            if (!(style.attr_foreground).nil?)
+              brush = create_gdip_brush(style.attr_foreground, alpha)
+            end
+          end
+        end
+        rect = RECT.new
+        OS._set_rect(rect, x + left, baseline - line_underline_pos, x + run.attr_x + run.attr_width, baseline - line_underline_pos + run.attr_underline_thickness)
+        gdip_rect = nil
+        if (!(clip_rect).nil?)
+          if ((clip_rect.attr_left).equal?(-1))
+            clip_rect.attr_left = 0
+          end
+          if ((clip_rect.attr_right).equal?(-1))
+            clip_rect.attr_right = 0x7ffff
+          end
+          OS._set_rect(clip_rect, Math.max(rect.attr_left, clip_rect.attr_left), rect.attr_top, Math.min(rect.attr_right, clip_rect.attr_right), rect.attr_bottom)
+          gdip_rect = Rect.new
+          gdip_rect.attr_x = clip_rect.attr_left
+          gdip_rect.attr_y = clip_rect.attr_top
+          gdip_rect.attr_width = clip_rect.attr_right - clip_rect.attr_left
+          gdip_rect.attr_height = clip_rect.attr_bottom - clip_rect.attr_top
+        end
+        gstate = 0
+        Gdip._graphics_set_pixel_offset_mode(graphics, Gdip::PixelOffsetModeNone)
+        case (style.attr_underline_style)
+        when SWT::UNDERLINE_SQUIGGLE, SWT::UNDERLINE_ERROR
+          squiggly_thickness = 1
+          squiggly_height = 2 * squiggly_thickness
+          squiggly_y = Math.min(rect.attr_top - squiggly_height / 2, line_bottom - squiggly_height - 1)
+          points = compute_polyline(rect.attr_left, squiggly_y, rect.attr_right, squiggly_y + squiggly_height)
+          # long
+          pen = Gdip._pen_new(brush, squiggly_thickness)
+          gstate = Gdip._graphics_save(graphics)
+          if (!(gdip_rect).nil?)
+            Gdip._graphics_set_clip(graphics, gdip_rect, Gdip::CombineModeExclude)
+          else
+            r = Rect.new
+            r.attr_x = rect.attr_left
+            r.attr_y = squiggly_y
+            r.attr_width = rect.attr_right - rect.attr_left
+            r.attr_height = squiggly_height + 1
+            Gdip._graphics_set_clip(graphics, r, Gdip::CombineModeIntersect)
+          end
+          Gdip._graphics_draw_lines(graphics, pen, points, points.attr_length / 2)
+          if (!(gdip_rect).nil?)
+            # long
+            sel_pen = Gdip._pen_new(selection_color, squiggly_thickness)
+            Gdip._graphics_restore(graphics, gstate)
+            gstate = Gdip._graphics_save(graphics)
+            Gdip._graphics_set_clip(graphics, gdip_rect, Gdip::CombineModeIntersect)
+            Gdip._graphics_draw_lines(graphics, sel_pen, points, points.attr_length / 2)
+            Gdip._pen_delete(sel_pen)
+          end
+          Gdip._graphics_restore(graphics, gstate)
+          Gdip._pen_delete(pen)
+          if (!(gstate).equal?(0))
+            Gdip._graphics_restore(graphics, gstate)
+          end
+        when SWT::UNDERLINE_SINGLE, SWT::UNDERLINE_DOUBLE, SWT::UNDERLINE_LINK, UNDERLINE_IME_THICK
+          if ((style.attr_underline_style).equal?(UNDERLINE_IME_THICK))
+            rect.attr_top -= run.attr_underline_thickness
+          end
+          bottom = (style.attr_underline_style).equal?(SWT::UNDERLINE_DOUBLE) ? rect.attr_bottom + run.attr_underline_thickness * 2 : rect.attr_bottom
+          if (bottom > line_bottom)
+            OS._offset_rect(rect, 0, line_bottom - bottom)
+          end
+          if (!(gdip_rect).nil?)
+            gdip_rect.attr_y = rect.attr_top
+            if ((style.attr_underline_style).equal?(UNDERLINE_IME_THICK))
+              gdip_rect.attr_height = run.attr_underline_thickness * 2
+            end
+            if ((style.attr_underline_style).equal?(SWT::UNDERLINE_DOUBLE))
+              gdip_rect.attr_height = run.attr_underline_thickness * 3
+            end
+            gstate = Gdip._graphics_save(graphics)
+            Gdip._graphics_set_clip(graphics, gdip_rect, Gdip::CombineModeExclude)
+          end
+          Gdip._graphics_fill_rectangle(graphics, brush, rect.attr_left, rect.attr_top, rect.attr_right - rect.attr_left, rect.attr_bottom - rect.attr_top)
+          if ((style.attr_underline_style).equal?(SWT::UNDERLINE_DOUBLE))
+            Gdip._graphics_fill_rectangle(graphics, brush, rect.attr_left, rect.attr_top + run.attr_underline_thickness * 2, rect.attr_right - rect.attr_left, rect.attr_bottom - rect.attr_top)
+          end
+          if (!(gdip_rect).nil?)
+            Gdip._graphics_restore(graphics, gstate)
+            gstate = Gdip._graphics_save(graphics)
+            Gdip._graphics_set_clip(graphics, gdip_rect, Gdip::CombineModeIntersect)
+            Gdip._graphics_fill_rectangle(graphics, selection_color, rect.attr_left, rect.attr_top, rect.attr_right - rect.attr_left, rect.attr_bottom - rect.attr_top)
+            if ((style.attr_underline_style).equal?(SWT::UNDERLINE_DOUBLE))
+              Gdip._graphics_fill_rectangle(graphics, selection_color, rect.attr_left, rect.attr_top + run.attr_underline_thickness * 2, rect.attr_right - rect.attr_left, rect.attr_bottom - rect.attr_top)
+            end
+            Gdip._graphics_restore(graphics, gstate)
+          end
+        when UNDERLINE_IME_DOT, UNDERLINE_IME_DASH
+          # long
+          pen = Gdip._pen_new(brush, 1)
+          dash_style = (style.attr_underline_style).equal?(UNDERLINE_IME_DOT) ? Gdip::DashStyleDot : Gdip::DashStyleDash
+          Gdip._pen_set_dash_style(pen, dash_style)
+          if (!(gdip_rect).nil?)
+            gstate = Gdip._graphics_save(graphics)
+            Gdip._graphics_set_clip(graphics, gdip_rect, Gdip::CombineModeExclude)
+          end
+          Gdip._graphics_draw_line(graphics, pen, rect.attr_left, baseline + run.attr_descent, run.attr_width - run.attr_length, baseline + run.attr_descent)
+          if (!(gdip_rect).nil?)
+            Gdip._graphics_restore(graphics, gstate)
+            gstate = Gdip._graphics_save(graphics)
+            Gdip._graphics_set_clip(graphics, gdip_rect, Gdip::CombineModeIntersect)
+            # long
+            sel_pen = Gdip._pen_new(brush, 1)
+            Gdip._pen_set_dash_style(sel_pen, dash_style)
+            Gdip._graphics_draw_line(graphics, sel_pen, rect.attr_left, baseline + run.attr_descent, run.attr_width - run.attr_length, baseline + run.attr_descent)
+            Gdip._graphics_restore(graphics, gstate)
+            Gdip._pen_delete(sel_pen)
+          end
+          Gdip._pen_delete(pen)
+        end
+        if (!(brush).equal?(selection_color) && !(brush).equal?(color))
+          Gdip._solid_brush_delete(brush)
+        end
+        Gdip._graphics_set_pixel_offset_mode(graphics, Gdip::PixelOffsetModeHalf)
+        return nil
+      end
+      return clip_rect
     end
     
     typesig { [] }
@@ -2531,6 +2829,12 @@ module Org::Eclipse::Swt::Graphics
       if (!(trailing).nil?)
         trailing[0] = 0
       end
+      if ((line_runs.attr_length).equal?(1))
+        run = line_runs[0]
+        if (run.attr_line_break && !run.attr_soft_break)
+          return untranslate_offset(run.attr_start)
+        end
+      end
       return untranslate_offset(@line_offset[line + 1])
     end
     
@@ -2545,6 +2849,25 @@ module Org::Eclipse::Swt::Graphics
     def get_orientation
       check_layout
       return @orientation
+    end
+    
+    typesig { [StyleItem, ::Java::Int, ::Java::Int, RECT] }
+    def get_partial_selection(run, selection_start, selection_end, rect)
+      end_ = run.attr_start + run.attr_length - 1
+      sel_start = Math.max(selection_start, run.attr_start) - run.attr_start
+      sel_end = Math.min(selection_end, end_) - run.attr_start
+      c_chars = run.attr_length
+      g_glyphs = run.attr_glyph_count
+      pi_x = Array.typed(::Java::Int).new(1) { 0 }
+      x = rect.attr_left
+      # long
+      advances = !(run.attr_justify).equal?(0) ? run.attr_justify : run.attr_advances
+      OS._script_cpto_x(sel_start, false, c_chars, g_glyphs, run.attr_clusters, run.attr_vis_attrs, advances, run.attr_analysis, pi_x)
+      run_x = !((@orientation & SWT::RIGHT_TO_LEFT)).equal?(0) ? run.attr_width - pi_x[0] : pi_x[0]
+      rect.attr_left = x + run_x
+      OS._script_cpto_x(sel_end, true, c_chars, g_glyphs, run.attr_clusters, run.attr_vis_attrs, advances, run.attr_analysis, pi_x)
+      run_x = !((@orientation & SWT::RIGHT_TO_LEFT)).equal?(0) ? run.attr_width - pi_x[0] : pi_x[0]
+      rect.attr_right = x + run_x
     end
     
     typesig { [::Java::Int, ::Java::Int] }
@@ -2829,7 +3152,11 @@ module Org::Eclipse::Swt::Graphics
       style_index = 0
       runs = Array.typed(StyleItem).new(item_count + @styles_count) { nil }
       script_item = SCRIPT_ITEM.new
+      item_limit = -1
+      next_item_index = 0
       link_before = false
+      merge_ = item_count > TOO_MANY_RUNS
+      sp = SCRIPT_PROPERTIES.new
       while (start < end_)
         item = StyleItem.new_local(self)
         item.attr_start = start
@@ -2837,13 +3164,56 @@ module Org::Eclipse::Swt::Graphics
         runs[((count += 1) - 1)] = item
         OS._move_memory(script_item, items + item_index * SCRIPT_ITEM.attr_sizeof, SCRIPT_ITEM.attr_sizeof)
         item.attr_analysis = script_item.attr_a
+        script_item.attr_a = SCRIPT_ANALYSIS.new
         if (link_before)
           item.attr_analysis.attr_f_link_before = true
           link_before = false
         end
-        script_item.attr_a = SCRIPT_ANALYSIS.new
-        OS._move_memory(script_item, items + (item_index + 1) * SCRIPT_ITEM.attr_sizeof, SCRIPT_ITEM.attr_sizeof)
-        item_limit = script_item.attr_i_char_pos
+        ch = @segments_text.char_at(start)
+        case (ch)
+        when Character.new(?\r.ord), Character.new(?\n.ord)
+          item.attr_line_break = true
+        when Character.new(?\t.ord)
+          item.attr_tab = true
+        end
+        if ((item_limit).equal?(-1))
+          next_item_index = item_index + 1
+          OS._move_memory(script_item, items + next_item_index * SCRIPT_ITEM.attr_sizeof, SCRIPT_ITEM.attr_sizeof)
+          item_limit = script_item.attr_i_char_pos
+          if (next_item_index < item_count && (ch).equal?(Character.new(?\r.ord)) && (@segments_text.char_at(item_limit)).equal?(Character.new(?\n.ord)))
+            next_item_index = item_index + 2
+            OS._move_memory(script_item, items + next_item_index * SCRIPT_ITEM.attr_sizeof, SCRIPT_ITEM.attr_sizeof)
+            item_limit = script_item.attr_i_char_pos
+          end
+          if (next_item_index < item_count && merge_)
+            if (!item.attr_line_break)
+              OS._move_memory(sp, self.attr_device.attr_scripts[item.attr_analysis.attr_e_script], SCRIPT_PROPERTIES.attr_sizeof)
+              if (!sp.attr_f_complex || item.attr_tab)
+                i = 0
+                while i < MERGE_MAX
+                  if ((next_item_index).equal?(item_count))
+                    break
+                  end
+                  c = @segments_text.char_at(item_limit)
+                  if ((c).equal?(Character.new(?\n.ord)) || (c).equal?(Character.new(?\r.ord)))
+                    break
+                  end
+                  if (!((c).equal?(Character.new(?\t.ord))).equal?(item.attr_tab))
+                    break
+                  end
+                  OS._move_memory(sp, self.attr_device.attr_scripts[script_item.attr_a.attr_e_script], SCRIPT_PROPERTIES.attr_sizeof)
+                  if (!item.attr_tab && sp.attr_f_complex)
+                    break
+                  end
+                  next_item_index += 1
+                  OS._move_memory(script_item, items + next_item_index * SCRIPT_ITEM.attr_sizeof, SCRIPT_ITEM.attr_sizeof)
+                  item_limit = script_item.attr_i_char_pos
+                  i += 1
+                end
+              end
+            end
+          end
+        end
         style_limit = translate_offset(@styles[style_index + 1].attr_start)
         if (style_limit <= item_limit)
           style_index += 1
@@ -2858,8 +3228,9 @@ module Org::Eclipse::Swt::Graphics
           end
         end
         if (item_limit <= style_limit)
-          item_index += 1
+          item_index = next_item_index
           start = item_limit
+          item_limit = -1
         end
         item.attr_length = start - item.attr_start
       end
@@ -3322,6 +3693,11 @@ module Org::Eclipse::Swt::Graphics
     
     typesig { [String] }
     # Sets the receiver's text.
+    # <p>
+    # Note: Setting the text also clears all the styles. This method
+    # returns without doing anything if the new text is the same as
+    # the current text.
+    # </p>
     # 
     # @param text the new text
     # 
@@ -3432,6 +3808,12 @@ module Org::Eclipse::Swt::Graphics
     # 
     # long
     def shape(hdc, run)
+      if (run.attr_tab || run.attr_line_break)
+        return
+      end
+      if (!(run.attr_glyphs).equal?(0))
+        return
+      end
       buffer = Array.typed(::Java::Int).new(1) { 0 }
       chars = CharArray.new(run.attr_length)
       @segments_text.get_chars(run.attr_start, run.attr_start + run.attr_length, chars, 0)
@@ -3462,69 +3844,127 @@ module Org::Eclipse::Swt::Graphics
         # long
         h_font = OS._get_current_object(hdc, OS::OBJ_FONT)
         # long
-        ssa = OS._heap_alloc(h_heap, OS::HEAP_ZERO_MEMORY, OS._script_string_analysis_sizeof)
-        # long
-        meta_file_dc = OS._create_enh_meta_file(hdc, nil, nil, nil)
-        # long
-        old_meta_font = OS._select_object(meta_file_dc, h_font)
-        flags = OS::SSA_METAFILE | OS::SSA_FALLBACK | OS::SSA_GLYPHS | OS::SSA_LINK
-        if ((OS._script_string_analyse(meta_file_dc, chars, chars.attr_length, 0, -1, flags, 0, nil, nil, 0, 0, 0, ssa)).equal?(OS::S_OK))
-          OS._script_string_out(ssa, 0, 0, 0, nil, 0, 0, false)
-          OS._script_string_free(ssa)
-        end
-        OS._heap_free(h_heap, 0, ssa)
-        OS._select_object(meta_file_dc, old_meta_font)
-        # long
-        meta_file = OS._close_enh_meta_file(meta_file_dc)
-        emr = EMREXTCREATEFONTINDIRECTW.new
-        meta_file_enum_proc_class = Class.new do
-          extend LocalClass
-          include_class_members TextLayout
-          
-          typesig { [::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int] }
-          # long
-          # long
-          # long
-          # long
-          # long
-          # long
-          define_method :meta_file_enum_proc do |h_dc, table, record, n_obj, lp_data|
-            OS._move_memory(emr.attr_emr, record, EMR.attr_sizeof)
-            case (emr.attr_emr.attr_i_type)
-            when OS::EMR_EXTCREATEFONTINDIRECTW
-              OS._move_memory(emr, record, EMREXTCREATEFONTINDIRECTW.attr_sizeof)
-            when OS::EMR_EXTTEXTOUTW
-              return 0
+        new_font = 0
+        # Bug in Uniscribe. In some version of Uniscribe, ScriptStringAnalyse crashes
+        # when the character array is too long. The fix is to limit the size of character
+        # array to two. Note, limiting the array to only one character would cause surrogate
+        # pairs to stop working.
+        sample_chars = CharArray.new(Math.min(chars.attr_length, 2))
+        log_attr = SCRIPT_LOGATTR.new
+        break_run(run)
+        count = 0
+        i = 0
+        while i < chars.attr_length
+          OS._move_memory(log_attr, run.attr_psla + (i * SCRIPT_LOGATTR.attr_sizeof), SCRIPT_LOGATTR.attr_sizeof)
+          if (!log_attr.attr_f_white_space)
+            sample_chars[((count += 1) - 1)] = chars[i]
+            if ((count).equal?(sample_chars.attr_length))
+              break
             end
-            return 1
           end
-          
-          typesig { [] }
-          define_method :initialize do
+          i += 1
+        end
+        if (count > 0)
+          # long
+          ssa = OS._heap_alloc(h_heap, OS::HEAP_ZERO_MEMORY, OS._script_string_analysis_sizeof)
+          # long
+          meta_file_dc = OS._create_enh_meta_file(hdc, nil, nil, nil)
+          # long
+          old_meta_font = OS._select_object(meta_file_dc, h_font)
+          flags = OS::SSA_METAFILE | OS::SSA_FALLBACK | OS::SSA_GLYPHS | OS::SSA_LINK
+          if ((OS._script_string_analyse(meta_file_dc, sample_chars, count, 0, -1, flags, 0, nil, nil, 0, 0, 0, ssa)).equal?(OS::S_OK))
+            OS._script_string_out(ssa, 0, 0, 0, nil, 0, 0, false)
+            OS._script_string_free(ssa)
           end
-          
-          private
-          alias_method :initialize__meta_file_enum_proc, :initialize
+          OS._heap_free(h_heap, 0, ssa)
+          OS._select_object(meta_file_dc, old_meta_font)
+          # long
+          meta_file = OS._close_enh_meta_file(meta_file_dc)
+          emr = EMREXTCREATEFONTINDIRECTW.new
+          meta_file_enum_proc_class = Class.new do
+            extend LocalClass
+            include_class_members TextLayout
+            
+            typesig { [::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int] }
+            # long
+            # long
+            # long
+            # long
+            # long
+            # long
+            define_method :meta_file_enum_proc do |h_dc, table, record, n_obj, lp_data|
+              OS._move_memory(emr.attr_emr, record, EMR.attr_sizeof)
+              case (emr.attr_emr.attr_i_type)
+              when OS::EMR_EXTCREATEFONTINDIRECTW
+                OS._move_memory(emr, record, EMREXTCREATEFONTINDIRECTW.attr_sizeof)
+              when OS::EMR_EXTTEXTOUTW
+                return 0
+              end
+              return 1
+            end
+            
+            typesig { [] }
+            define_method :initialize do
+            end
+            
+            private
+            alias_method :initialize__meta_file_enum_proc, :initialize
+          end
+          object = meta_file_enum_proc_class.new
+          # Avoid compiler warnings
+          compiler_warning_workaround = false
+          if (compiler_warning_workaround)
+            object.meta_file_enum_proc(0, 0, 0, 0, 0)
+          end
+          callback = Callback.new(object, "metaFileEnumProc", 5)
+          # long
+          address = callback.get_address
+          if ((address).equal?(0))
+            SWT.error(SWT::ERROR_NO_MORE_CALLBACKS)
+          end
+          OS._enum_enh_meta_file(0, meta_file, address, 0, nil)
+          OS._delete_enh_meta_file(meta_file)
+          callback.dispose
+          new_font = OS._create_font_indirect_w(emr.attr_elfw.attr_elf_log_font)
+        else
+          # The run is composed only by white spaces, this happens when a run is split
+          # by a visual style. The font fallback for the script can not be determined
+          # using only white spaces. The solution is to use the font fallback of the
+          # previous or next run of the same script.
+          index = 0
+          while (index < @all_runs.attr_length - 1)
+            if ((@all_runs[index]).equal?(run))
+              if (index > 0)
+                p_run = @all_runs[index - 1]
+                if (!(p_run.attr_fallback_font).equal?(0) && (p_run.attr_analysis.attr_e_script).equal?(run.attr_analysis.attr_e_script))
+                  log_font = OS::IsUnicode ? LOGFONTW.new : LOGFONTA.new
+                  OS._get_object(p_run.attr_fallback_font, LOGFONT.attr_sizeof, log_font)
+                  new_font = OS._create_font_indirect(log_font)
+                end
+              end
+              if ((new_font).equal?(0))
+                if (index + 1 < @all_runs.attr_length - 1)
+                  n_run = @all_runs[index + 1]
+                  if ((n_run.attr_analysis.attr_e_script).equal?(run.attr_analysis.attr_e_script))
+                    shape(hdc, n_run)
+                    if (!(n_run.attr_fallback_font).equal?(0))
+                      log_font = OS::IsUnicode ? LOGFONTW.new : LOGFONTA.new
+                      OS._get_object(n_run.attr_fallback_font, LOGFONT.attr_sizeof, log_font)
+                      new_font = OS._create_font_indirect(log_font)
+                    end
+                  end
+                end
+              end
+              break
+            end
+            index += 1
+          end
         end
-        object = meta_file_enum_proc_class.new
-        # Avoid compiler warnings
-        if (false)
-          object.meta_file_enum_proc(0, 0, 0, 0, 0)
-        end
-        callback = Callback.new(object, "metaFileEnumProc", 5)
-        # long
-        address = callback.get_address
-        if ((address).equal?(0))
-          SWT.error(SWT::ERROR_NO_MORE_CALLBACKS)
-        end
-        OS._enum_enh_meta_file(0, meta_file, address, 0, nil)
-        OS._delete_enh_meta_file(meta_file)
-        callback.dispose
-        # long
-        new_font = OS._create_font_indirect_w(emr.attr_elfw.attr_elf_log_font)
-        OS._select_object(hdc, new_font)
-        if (shape_succeed = shape(hdc, run, chars, buffer, max_glyphs, sp))
-          run.attr_fallback_font = new_font
+        if (!(new_font).equal?(0))
+          OS._select_object(hdc, new_font)
+          if (shape_succeed = shape(hdc, run, chars, buffer, max_glyphs, sp))
+            run.attr_fallback_font = new_font
+          end
         end
         if (!shape_succeed)
           if (!sp.attr_f_complex)
@@ -3567,7 +4007,7 @@ module Org::Eclipse::Swt::Graphics
         if (!shape_succeed)
           OS._select_object(hdc, h_font)
         end
-        if (!(new_font).equal?(run.attr_fallback_font))
+        if (!(new_font).equal?(0) && !(new_font).equal?(run.attr_fallback_font))
           OS._delete_object(new_font)
         end
       end

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2008 IBM Corporation and others.
+ * Copyright (c) 2000, 2009 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -29,20 +29,30 @@ import org.eclipse.swt.events.*;
  * <p>
  * <dl>
  * <dt><b>Styles:</b></dt>
- * <dd>CANCEL, CENTER, LEFT, MULTI, PASSWORD, SEARCH, SINGLE, RIGHT, READ_ONLY, WRAP</dd>
+ * <dd>CENTER, ICON_CANCEL, ICON_SEARCH, LEFT, MULTI, PASSWORD, SEARCH, SINGLE, RIGHT, READ_ONLY, WRAP</dd>
  * <dt><b>Events:</b></dt>
  * <dd>DefaultSelection, Modify, Verify</dd>
  * </dl>
  * <p>
  * Note: Only one of the styles MULTI and SINGLE may be specified,
  * and only one of the styles LEFT, CENTER, and RIGHT may be specified.
- * </p><p>
+ * </p>
+ * <p>
+ * Note: The styles ICON_CANCEL and ICON_SEARCH are hints used in combination with SEARCH.
+ * When the platform supports the hint, the text control shows these icons.  When an icon
+ * is selected, a default selection event is sent with the detail field set to one of
+ * ICON_CANCEL or ICON_SEARCH.  Normally, application code does not need to check the
+ * detail.  In the case of ICON_CANCEL, the text is cleared before the default selection
+ * event is sent causing the application to search for an empty string.
+ * </p>
+ * <p>
  * IMPORTANT: This class is <em>not</em> intended to be subclassed.
  * </p>
  *
  * @see <a href="http://www.eclipse.org/swt/snippets/#text">Text snippets</a>
  * @see <a href="http://www.eclipse.org/swt/examples.php">SWT Example: ControlExample</a>
  * @see <a href="http://www.eclipse.org/swt/">Sample code and further information</a>
+ * @noextend This class is not intended to be subclassed by clients.
  */
 public class Text extends Scrollable {
 	int tabs, oldStart, oldEnd;
@@ -132,6 +142,13 @@ public class Text extends Scrollable {
  * @see SWT#MULTI
  * @see SWT#READ_ONLY
  * @see SWT#WRAP
+ * @see SWT#LEFT
+ * @see SWT#RIGHT
+ * @see SWT#CENTER
+ * @see SWT#PASSWORD
+ * @see SWT#SEARCH
+ * @see SWT#ICON_SEARCH
+ * @see SWT#ICON_CANCEL
  * @see Widget#checkSubclass
  * @see Widget#getStyle
  */
@@ -149,34 +166,85 @@ int /*long*/ callWindowProc (int /*long*/ hwnd, int msg, int /*long*/ wParam, in
 		}
 		case OS.WM_HSCROLL:
 		case OS.WM_VSCROLL: {
-			redraw = findImageControl () != null && drawCount == 0 && OS.IsWindowVisible (handle);
+			redraw = findImageControl () != null && getDrawing () && OS.IsWindowVisible (handle);
 			if (redraw) OS.DefWindowProc (handle, OS.WM_SETREDRAW, 0, 0);
 			break;
 		}
 		case OS.WM_PAINT: {
-			if (findImageControl () != null) {
+			boolean doubleBuffer = findImageControl () != null;
+			boolean drawMessage = false;
+			if ((style & SWT.SINGLE) != 0 && message.length () > 0) {
+				if (!OS.IsWinCE && OS.WIN32_VERSION < OS.VERSION (6, 0)) {
+					drawMessage = hwnd != OS.GetFocus () && OS.GetWindowTextLength (handle) == 0;
+				}
+			}
+			if (doubleBuffer || drawMessage) {
 				int /*long*/ paintDC = 0;
 				PAINTSTRUCT ps = new PAINTSTRUCT ();
 				paintDC = OS.BeginPaint (handle, ps);
 				int width = ps.right - ps.left;
 				int height = ps.bottom - ps.top;
 				if (width != 0 && height != 0) {
-					int /*long*/ hDC = OS.CreateCompatibleDC (paintDC);
-					POINT lpPoint1 = new POINT (), lpPoint2 = new POINT ();
-					OS.SetWindowOrgEx (hDC, ps.left, ps.top, lpPoint1);
-					OS.SetBrushOrgEx (hDC, ps.left, ps.top, lpPoint2);
-					int /*long*/ hBitmap = OS.CreateCompatibleBitmap (paintDC, width, height);
-					int /*long*/ hOldBitmap = OS.SelectObject (hDC, hBitmap);
-					RECT rect = new RECT ();
-					OS.SetRect (rect, ps.left, ps.top, ps.right, ps.bottom);
-					drawBackground (hDC, rect);
+					int /*long*/ hDC = paintDC, hBitmap = 0, hOldBitmap = 0;
+					POINT lpPoint1 = null, lpPoint2 = null;
+					if (doubleBuffer) {
+						hDC = OS.CreateCompatibleDC (paintDC);
+						lpPoint1 = new POINT ();
+						lpPoint2 = new POINT ();
+						OS.SetWindowOrgEx (hDC, ps.left, ps.top, lpPoint1);
+						OS.SetBrushOrgEx (hDC, ps.left, ps.top, lpPoint2);
+						hBitmap = OS.CreateCompatibleBitmap (paintDC, width, height);
+						hOldBitmap = OS.SelectObject (hDC, hBitmap);
+						RECT rect = new RECT ();
+						OS.SetRect (rect, ps.left, ps.top, ps.right, ps.bottom);
+						drawBackground (hDC, rect);
+					}
+					
 					OS.CallWindowProc (EditProc, hwnd, OS.WM_PAINT, hDC, lParam);
-					OS.SetWindowOrgEx (hDC, lpPoint1.x, lpPoint1.y, null);
-					OS.SetBrushOrgEx (hDC, lpPoint2.x, lpPoint2.y, null);
-					OS.BitBlt (paintDC, ps.left, ps.top, width, height, hDC, 0, 0, OS.SRCCOPY);
-					OS.SelectObject (hDC, hOldBitmap);
-					OS.DeleteObject (hBitmap);
-					OS.DeleteObject (hDC);
+					/*
+					* Bug in XP. Windows does not draw the cue message on XP when
+					* East Asian language pack is installed. The fix is to draw
+					* the cue messages ourselves.
+					* Note:  This bug is fixed on Vista.
+					*/
+					if (drawMessage) {
+						RECT rect = new RECT();
+						OS.GetClientRect(handle, rect);
+						int /*long*/ margins = OS.SendMessage (handle, OS.EM_GETMARGINS, 0, 0);
+						rect.left += OS.LOWORD (margins);
+						rect.right -= OS.HIWORD (margins);
+						if ((style & SWT.BORDER) != 0) {
+							rect.left++;
+							rect.top++;
+							rect.right--;
+							rect.bottom--;
+						}
+						TCHAR buffer = new TCHAR (getCodePage (), message, false);
+						int uFormat = OS.DT_EDITCONTROL;
+						boolean rtl = (style & SWT.RIGHT_TO_LEFT) != 0;
+						if (rtl) uFormat |= OS.DT_RTLREADING; 
+						int alignment = style & (SWT.LEFT | SWT.CENTER | SWT.RIGHT);
+						switch (alignment) {
+							case SWT.LEFT: uFormat |= (rtl ? OS.DT_RIGHT : OS.DT_LEFT); break;
+							case SWT.CENTER: uFormat |= OS.DT_CENTER;
+							case SWT.RIGHT: uFormat |= (rtl ? OS.DT_LEFT : OS.DT_RIGHT); break;
+						}
+						int /*long*/ hFont = OS.SendMessage (hwnd, OS.WM_GETFONT, 0, 0);
+						int /*long*/ hOldFont = OS.SelectObject (hDC, hFont);
+						OS.SetTextColor (hDC, OS.GetSysColor (OS.COLOR_GRAYTEXT));
+						OS.SetBkMode (hDC, OS.TRANSPARENT);
+						OS.DrawText (hDC, buffer, buffer.length (), rect, uFormat);
+						OS.SelectObject (hDC, hOldFont);
+					}
+					
+					if (doubleBuffer) {
+						OS.SetWindowOrgEx (hDC, lpPoint1.x, lpPoint1.y, null);
+						OS.SetBrushOrgEx (hDC, lpPoint2.x, lpPoint2.y, null);
+						OS.BitBlt (paintDC, ps.left, ps.top, width, height, hDC, 0, 0, OS.SRCCOPY);
+						OS.SelectObject (hDC, hOldBitmap);
+						OS.DeleteObject (hBitmap);
+						OS.DeleteObject (hDC);
+					}
 				}
 				OS.EndPaint (handle, ps);
 				return 0;
@@ -343,8 +411,12 @@ static int checkStyle (int style) {
 	if ((style & SWT.SEARCH) != 0) {
 		style |= SWT.SINGLE | SWT.BORDER;
 		style &= ~SWT.PASSWORD;
+		/* 
+		* NOTE: ICON_CANCEL has the same value as H_SCROLL and
+		* ICON_SEARCH has the same value as V_SCROLL so they are
+		* cleared because SWT.SINGLE is set. 
+		*/
 	}
-	if (OS.COMCTL32_MAJOR < 6) style &= ~SWT.SEARCH;
 	if ((style & SWT.SINGLE) != 0 && (style & SWT.MULTI) != 0) {
 		style &= ~SWT.MULTI;
 	}
@@ -412,22 +484,15 @@ public Point computeSize (int wHint, int hHint, boolean changed) {
 			OS.DrawText (hDC, buffer, length, rect, flags);
 			width = rect.right - rect.left;
 		}
-		//This code is intentionally commented
-//		if (OS.COMCTL32_MAJOR >= 6) {
-//			if ((style & SWT.SEARCH) != 0) {
-//				length = message.length ();
-//				if (length != 0) {
-//					char [] buffer = new char [length + 1];
-//					message.getChars (0, length, buffer, 0);
-//					SIZE size = new SIZE ();
-//					OS.GetTextExtentPoint32W (hDC, buffer, length, size);
-//					width = Math.max (width, size.cx);
-//				}
-//			}
-//		}
 		if (wrap && hHint == SWT.DEFAULT) {
 			int newHeight = rect.bottom - rect.top;
 			if (newHeight != 0) height = newHeight;
+		}
+		if ((style & SWT.SINGLE) != 0 && message.length () > 0) {
+			OS.SetRect (rect, 0, 0, 0, 0);
+			TCHAR buffer = new TCHAR (getCodePage (), message, false);
+			OS.DrawText (hDC, buffer, buffer.length (), rect, flags);
+			width = Math.max (width, rect.right - rect.left);
 		}
 		if (newFont != 0) OS.SelectObject (hDC, oldFont);
 		OS.ReleaseDC (handle, hDC);
@@ -887,13 +952,10 @@ public int getOrientation () {
 }
 
 /**
- * Returns the widget message. When the widget is created
- * with the style <code>SWT.SEARCH</code>, the message text
- * is displayed as a hint for the user, indicating the
- * purpose of the field.
+ * Returns the widget message.  The message text is displayed
+ * as a hint for the user, indicating the purpose of the field.
  * <p>
- * Note: This operation is a <em>HINT</em> and is not
- * supported on platforms that do not have this concept.
+ * Typically this is used in conjunction with <code>SWT.SEARCH</code>.
  * </p>
  * 
  * @return the widget message
@@ -1084,8 +1146,9 @@ public String getText (int start, int end) {
 	if (!(start <= end && 0 <= end)) return "";
 	int length = OS.GetWindowTextLength (handle);
 	if (!OS.IsUnicode && OS.IsDBLocale) length = mbcsToWcsPos (length);
-	start = Math.max (0, start);
 	end = Math.min (end, length - 1);
+	if (start > end) return "";
+	start = Math.max (0, start);
 	/*
 	* NOTE: The current implementation uses substring ()
 	* which can reference a potentially large character
@@ -1505,8 +1568,38 @@ void setBounds (int x, int y, int width, int height, int flags) {
 				return;
 			}
 		}
-	}	
+	}
 	super.setBounds (x, y, width, height, flags);
+	
+	/*
+	* Bug in Windows. If the client area height is smaller than 
+	* the font height, then the multi-line text widget does not
+	* update the formatting rectangle when resized. The fix is to
+	* detect this case and explicitly set the formatting rectangle.
+	*/
+	if ((flags & OS.SWP_NOSIZE) == 0) {
+		int bits = OS.GetWindowLong (handle, OS.GWL_STYLE);
+		if ((bits & OS.ES_MULTILINE) != 0) {
+			int /*long*/ newFont, oldFont = 0;
+			int /*long*/ hDC = OS.GetDC (handle);
+			newFont = OS.SendMessage (handle, OS.WM_GETFONT, 0, 0);
+			if (newFont != 0) oldFont = OS.SelectObject (hDC, newFont);
+			TEXTMETRIC tm = OS.IsUnicode ? (TEXTMETRIC) new TEXTMETRICW () : new TEXTMETRICA ();
+			OS.GetTextMetrics (hDC, tm);
+			if (newFont != 0) OS.SelectObject (hDC, oldFont);
+			OS.ReleaseDC (handle, hDC);
+			RECT rect = new RECT();
+			OS.GetClientRect (handle, rect);
+			if ((rect.bottom - rect.top) < tm.tmHeight) {
+				int /*long*/ margins = OS.SendMessage (handle, OS.EM_GETMARGINS, 0, 0);
+				rect.left += OS.LOWORD (margins);
+				rect.right -= OS.HIWORD (margins);
+				rect.top = 0;
+				rect.bottom = tm.tmHeight;
+				OS.SendMessage (handle, OS.EM_SETRECT, 0, rect);
+			}
+		}
+	}
 }
 
 void setDefaultFont () {
@@ -1604,21 +1697,18 @@ void setMargins () {
 	* margins, causing the first character to be clipped.  The
 	* fix is to set the margins to zero.
 	*/
-	if (OS.COMCTL32_MAJOR >= 6) {
-		if ((style & SWT.SEARCH) != 0) {
+	if ((style & SWT.SEARCH) != 0) {
+		if (!OS.IsWinCE && OS.WIN32_VERSION >= OS.VERSION (6, 0)) {
 			OS.SendMessage (handle, OS.EM_SETMARGINS, OS.EC_LEFTMARGIN | OS.EC_RIGHTMARGIN, 0);
 		}
 	}
 }
 
 /**
- * Sets the widget message. When the widget is created
- * with the style <code>SWT.SEARCH</code>, the message text
- * is displayed as a hint for the user, indicating the
- * purpose of the field.
+ * Sets the widget message. The message text is displayed
+ * as a hint for the user, indicating the purpose of the field.
  * <p>
- * Note: This operation is a <em>HINT</em> and is not
- * supported on platforms that do not have this concept.
+ * Typically this is used in conjunction with <code>SWT.SEARCH</code>.
  * </p>
  * 
  * @param message the new message
@@ -1637,8 +1727,8 @@ public void setMessage (String message) {
 	checkWidget ();
 	if (message == null) error (SWT.ERROR_NULL_ARGUMENT);
 	this.message = message;
-	if (OS.COMCTL32_MAJOR >= 6) {
-		if ((style & SWT.SEARCH) != 0) {
+	if (!OS.IsWinCE) {
+		if (OS.WIN32_VERSION >= OS.VERSION (6, 0)) {
 			int bits = OS.GetWindowLong (handle, OS.GWL_STYLE);
 			if ((bits & OS.ES_MULTILINE) == 0) {
 				int length = message.length ();
@@ -1646,6 +1736,8 @@ public void setMessage (String message) {
 				message.getChars(0, length, chars, 0);
 				OS.SendMessage (handle, OS.EM_SETCUEBANNER, 0, chars);
 			}
+		} else {
+			OS.InvalidateRect (handle, null, true);
 		}
 	}
 }
@@ -1760,7 +1852,7 @@ public void setRedraw (boolean redraw) {
 	* while redraw is turned off and force it to be visible
 	* when redraw is restored.
 	*/
-	if (drawCount != 0) return;
+	if (!getDrawing ()) return;
 	int [] start = new int [1], end = new int [1];
 	OS.SendMessage (handle, OS.EM_GETSEL, start, end);
 	if (!redraw) {
@@ -2338,7 +2430,6 @@ LRESULT wmClipboard (int msg, int /*long*/ wParam, int /*long*/ lParam) {
 		case OS.WM_UNDO:
 			if (OS.SendMessage (handle, OS.EM_CANUNDO, 0, 0) != 0) {
 				ignoreModify = ignoreCharacter = true;
-				OS.SendMessage (handle, OS.EM_GETSEL, start, end);
 				callWindowProc (handle, msg, wParam, lParam);
 				int length = OS.GetWindowTextLength (handle);
 				int [] newStart = new int [1], newEnd = new int [1];
@@ -2351,6 +2442,7 @@ LRESULT wmClipboard (int msg, int /*long*/ wParam, int /*long*/ lParam) {
 					newText = "";
 				}
 				callWindowProc (handle, msg, wParam, lParam);
+				OS.SendMessage (handle, OS.EM_GETSEL, start, end);
 				ignoreModify = ignoreCharacter = false;
 			}
 			break;

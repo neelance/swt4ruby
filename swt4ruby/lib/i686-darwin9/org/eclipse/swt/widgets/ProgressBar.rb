@@ -1,6 +1,6 @@
 require "rjava"
 
-# Copyright (c) 2000, 2008 IBM Corporation and others.
+# Copyright (c) 2000, 2009 IBM Corporation and others.
 # All rights reserved. This program and the accompanying materials
 # are made available under the terms of the Eclipse Public License v1.0
 # which accompanies this distribution, and is available at
@@ -13,8 +13,8 @@ module Org::Eclipse::Swt::Widgets
     class_module.module_eval {
       include ::Java::Lang
       include ::Org::Eclipse::Swt::Widgets
-      include_const ::Org::Eclipse::Swt::Graphics, :Point
-      include_const ::Org::Eclipse::Swt::Internal::Carbon, :OS
+      include ::Org::Eclipse::Swt::Graphics
+      include ::Org::Eclipse::Swt::Internal::Cocoa
       include ::Org::Eclipse::Swt
     }
   end
@@ -38,8 +38,15 @@ module Org::Eclipse::Swt::Widgets
   # @see <a href="http://www.eclipse.org/swt/snippets/#progressbar">ProgressBar snippets</a>
   # @see <a href="http://www.eclipse.org/swt/examples.php">SWT Example: ControlExample</a>
   # @see <a href="http://www.eclipse.org/swt/">Sample code and further information</a>
+  # @noextend This class is not intended to be subclassed by clients.
   class ProgressBar < ProgressBarImports.const_get :Control
     include_class_members ProgressBarImports
+    
+    attr_accessor :visible_path
+    alias_method :attr_visible_path, :visible_path
+    undef_method :visible_path
+    alias_method :attr_visible_path=, :visible_path=
+    undef_method :visible_path=
     
     typesig { [Composite, ::Java::Int] }
     # Constructs a new instance of this class given its parent
@@ -68,9 +75,11 @@ module Org::Eclipse::Swt::Widgets
     # @see SWT#SMOOTH
     # @see SWT#HORIZONTAL
     # @see SWT#VERTICAL
+    # @see SWT#INDETERMINATE
     # @see Widget#checkSubclass
     # @see Widget#getStyle
     def initialize(parent, style)
+      @visible_path = nil
       super(parent, check_style(style))
     end
     
@@ -85,15 +94,14 @@ module Org::Eclipse::Swt::Widgets
     typesig { [::Java::Int, ::Java::Int, ::Java::Boolean] }
     def compute_size(w_hint, h_hint, changed)
       check_widget
-      out_metric = Array.typed(::Java::Int).new(1) { 0 }
-      OS._get_theme_metric(OS.attr_k_theme_metric_normal_progress_bar_thickness, out_metric)
+      size = OS::NSProgressIndicatorPreferredThickness
       width = 0
       height = 0
       if (!((self.attr_style & SWT::HORIZONTAL)).equal?(0))
-        height = out_metric[0]
+        height = size
         width = height * 10
       else
-        width = out_metric[0]
+        width = size
         height = width * 10
       end
       if (!(w_hint).equal?(SWT::DEFAULT))
@@ -107,18 +115,47 @@ module Org::Eclipse::Swt::Widgets
     
     typesig { [] }
     def create_handle
-      out_control = Array.typed(::Java::Int).new(1) { 0 }
-      window = OS._get_control_owner(self.attr_parent.attr_handle)
-      OS._create_progress_bar_control(window, nil, 0, 0, 100, !((self.attr_style & SWT::INDETERMINATE)).equal?(0), out_control)
-      if ((out_control[0]).equal?(0))
-        error(SWT::ERROR_NO_HANDLES)
-      end
-      self.attr_handle = out_control[0]
+      widget = SWTProgressIndicator.new.alloc
+      widget.init
+      widget.set_uses_threaded_animation(false)
+      widget.set_indeterminate(!((self.attr_style & SWT::INDETERMINATE)).equal?(0))
+      self.attr_view = widget
     end
     
-    typesig { [::Java::Int, ::Java::Int] }
-    def draw_background(control, context)
-      fill_background(control, context, nil)
+    typesig { [] }
+    def default_nsfont
+      return self.attr_display.attr_progress_indicator_font
+    end
+    
+    typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
+    # long
+    # long
+    # long
+    def __draw_theme_progress_area(id, sel, arg0)
+      # Bug in Cocoa.  When the threaded animation is turned off by calling
+      # setUsesThreadedAnimation(), _drawThemeProgressArea() attempts to
+      # access a deallocated NSBitmapGraphicsContext when drawing a zero sized
+      # progress bar.  The fix is to avoid calling super when the progress bar
+      # is zero sized.
+      frame_ = self.attr_view.frame
+      if ((frame_.attr_width).equal?(0) || (frame_.attr_height).equal?(0))
+        return
+      end
+      # Bug in Cocoa. When the progress bar is animating it calls
+      # _drawThemeProgressArea() directly without taking into account
+      # obscured areas. The fix is to clip the drawing to the visible
+      # region of the progress bar before calling super.
+      if ((@visible_path).nil?)
+        # long
+        visible_region = get_visible_region
+        @visible_path = get_path(visible_region)
+        OS._dispose_rgn(visible_region)
+      end
+      context = NSGraphicsContext.current_context
+      context.save_graphics_state
+      @visible_path.set_clip
+      super(id, sel, arg0)
+      context.restore_graphics_state
     end
     
     typesig { [] }
@@ -132,7 +169,7 @@ module Org::Eclipse::Swt::Widgets
     # </ul>
     def get_maximum
       check_widget
-      return OS._get_control32bit_maximum(self.attr_handle)
+      return RJava.cast_to_int((self.attr_view).max_value)
     end
     
     typesig { [] }
@@ -146,7 +183,7 @@ module Org::Eclipse::Swt::Widgets
     # </ul>
     def get_minimum
       check_widget
-      return OS._get_control32bit_minimum(self.attr_handle)
+      return RJava.cast_to_int((self.attr_view).min_value)
     end
     
     typesig { [] }
@@ -160,7 +197,7 @@ module Org::Eclipse::Swt::Widgets
     # </ul>
     def get_selection
       check_widget
-      return OS._get_control32bit_value(self.attr_handle)
+      return RJava.cast_to_int((self.attr_view).double_value)
     end
     
     typesig { [] }
@@ -198,12 +235,15 @@ module Org::Eclipse::Swt::Widgets
     # </ul>
     def set_maximum(value)
       check_widget
-      if (value < 0)
+      minimum = RJava.cast_to_int((self.attr_view).min_value)
+      if (value <= minimum)
         return
       end
-      minimum = OS._get_control32bit_minimum(self.attr_handle)
-      if (value > minimum)
-        OS._set_control32bit_maximum(self.attr_handle, value)
+      (self.attr_view).set_max_value(value)
+      selection = RJava.cast_to_int((self.attr_view).double_value)
+      new_selection = Math.min(selection, value)
+      if (!(selection).equal?(new_selection))
+        (self.attr_view).set_double_value(new_selection)
       end
     end
     
@@ -221,12 +261,15 @@ module Org::Eclipse::Swt::Widgets
     # </ul>
     def set_minimum(value)
       check_widget
-      if (value < 0)
+      maximum = RJava.cast_to_int((self.attr_view).max_value)
+      if (!(0 <= value && value < maximum))
         return
       end
-      maximum = OS._get_control32bit_maximum(self.attr_handle)
-      if (value < maximum)
-        OS._set_control32bit_minimum(self.attr_handle, value)
+      (self.attr_view).set_min_value(value)
+      selection = RJava.cast_to_int((self.attr_view).double_value)
+      new_selection = Math.max(selection, value)
+      if (!(selection).equal?(new_selection))
+        (self.attr_view).set_double_value(new_selection)
       end
     end
     
@@ -243,13 +286,13 @@ module Org::Eclipse::Swt::Widgets
     # </ul>
     def set_selection(value)
       check_widget
-      OS._set_control32bit_value(self.attr_handle, value)
-      # Feature in the Macintosh.  Progress bars are always updated
-      # using an event loop timer, even when they are not indeterminate.
-      # This means that nothing is drawn until the event loop.  The
-      # fix is to allow operating system timers to run without dispatching
-      # any other events.
-      self.attr_display.run_event_loop_timers
+      (self.attr_view).set_double_value(value)
+      # Feature in Cocoa.  The progress bar does
+      # not redraw right away when a value is
+      # changed.  This is not strictly incorrect
+      # but unexpected.  The fix is to force all
+      # outstanding redraws to be delivered.
+      update(false)
     end
     
     typesig { [::Java::Int] }
@@ -271,6 +314,38 @@ module Org::Eclipse::Swt::Widgets
     def set_state(state)
       check_widget
       # NOT IMPLEMENTED
+    end
+    
+    typesig { [] }
+    def release_widget
+      super
+      if (!(@visible_path).nil?)
+        @visible_path.release
+      end
+      @visible_path = nil
+    end
+    
+    typesig { [] }
+    def reset_visible_region
+      super
+      if (!(@visible_path).nil?)
+        @visible_path.release
+      end
+      @visible_path = nil
+    end
+    
+    typesig { [::Java::Int, ::Java::Int] }
+    # long
+    # long
+    def view_did_move_to_window(id, sel)
+      # Bug in Cocoa. An indeterminate progress indicator doesn't start animating until it is in
+      # a visible window.  Workaround is to catch when the bar has been added to a window and start
+      # the animation there.
+      if (!(self.attr_view.window).nil?)
+        if (!((self.attr_style & SWT::INDETERMINATE)).equal?(0))
+          (self.attr_view).start_animation(nil)
+        end
+      end
     end
     
     private

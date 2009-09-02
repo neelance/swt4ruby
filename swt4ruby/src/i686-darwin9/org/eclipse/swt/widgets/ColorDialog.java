@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2008 IBM Corporation and others.
+ * Copyright (c) 2000, 2009 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -12,8 +12,8 @@ package org.eclipse.swt.widgets;
 
 
 import org.eclipse.swt.*;
-import org.eclipse.swt.internal.carbon.*;
-import org.eclipse.swt.graphics.RGB;
+import org.eclipse.swt.graphics.*;
+import org.eclipse.swt.internal.cocoa.*;
 
 /**
  * Instances of this class allow the user to select a color
@@ -31,10 +31,12 @@ import org.eclipse.swt.graphics.RGB;
  * 
  * @see <a href="http://www.eclipse.org/swt/examples.php">SWT Example: ControlExample, Dialog tab</a>
  * @see <a href="http://www.eclipse.org/swt/">Sample code and further information</a>
+ * @noextend This class is not intended to be subclassed by clients.
  */
 public class ColorDialog extends Dialog {
 	RGB rgb;
-	
+	boolean selected;
+
 /**
  * Constructs a new instance of this class given only its parent.
  *
@@ -89,6 +91,10 @@ public ColorDialog(Shell parent, int style) {
 	checkSubclass ();
 }
 
+void changeColor(int /*long*/ id, int /*long*/ sel, int /*long*/ sender) {
+	selected = true;
+}
+
 /**
  * Returns the currently selected color in the receiver.
  *
@@ -114,39 +120,29 @@ public RGB getRGB() {
  * </ul>
  */
 public RGB open() {	
-	ColorPickerInfo info = new ColorPickerInfo ();
+	NSColorPanel panel = NSColorPanel.sharedColorPanel();
 	if (rgb != null) {
-		info.red = (short)(rgb.red * 257);
-		info.green = (short)(rgb.green * 257);
-		info.blue = (short)(rgb.blue * 257);
-	} else {
-		info.red = (short)(255 * 257);
-		info.green = (short)(255 * 257);
-		info.blue = (short)(255 * 257);		
+		NSColor color = NSColor.colorWithDeviceRed(rgb.red / 255f, rgb.green / 255f, rgb.blue / 255f, 1);
+		panel.setColor(color);
 	}
-	info.flags = OS.kColorPickerDialogIsMoveable | OS.kColorPickerDialogIsModal;
-	// NEEDS WORK - shouldn't be at mouse location
-	info.placeWhere = (short)OS.kAtSpecifiedOrigin;
-	org.eclipse.swt.internal.carbon.Point mp = new org.eclipse.swt.internal.carbon.Point ();
-	OS.GetGlobalMouse (mp);
-	info.v = mp.v;
-	info.h = mp.h;
-	if (title != null) {
-		// NEEDS WORK - no title displayed		
-		info.prompt = new byte[256];
-		int length = title.length();
-		if (length > 255) length = 255;
-		info.prompt [0] = (byte)length;
-		for (int i=0; i<length; i++) {
-			info.prompt [i+1] = (byte)title.charAt (i);
-		}
-	}
+	SWTPanelDelegate delegate = (SWTPanelDelegate)new SWTPanelDelegate().alloc().init();
+	int /*long*/ jniRef = OS.NewGlobalRef(this);
+	if (jniRef == 0) SWT.error(SWT.ERROR_NO_HANDLES);
+	OS.object_setInstanceVariable(delegate.id, Display.SWT_OBJECT, jniRef);
+	panel.setDelegate(delegate);
 	rgb = null;
-	if (OS.PickColor (info) == OS.noErr && info.newColorChosen) {
-		int red = (info.red >> 8) & 0xFF;
-		int green = (info.green >> 8) & 0xFF;
-		int blue =	(info.blue >> 8) & 0xFF;
-		rgb = new RGB(red, green, blue);
+	selected = false;
+	panel.orderFront(null);
+	NSApplication.sharedApplication().runModalForWindow(panel);
+	panel.setDelegate(null);
+	delegate.release();
+	OS.DeleteGlobalRef(jniRef);
+	if (selected) {
+		NSColor color = panel.color();
+		if (color != null) {
+			color = color.colorUsingColorSpaceName(OS.NSCalibratedRGBColorSpace);
+			rgb = new RGB((int)(color.redComponent() * 255), (int)(color.greenComponent() * 255), (int)(color.blueComponent() * 255));
+		}
 	}
 	return rgb;
 }
@@ -161,5 +157,9 @@ public RGB open() {
  */
 public void setRGB(RGB rgb) {
 	this.rgb = rgb;
+}
+
+void windowWillClose(int /*long*/ id, int /*long*/ sel, int /*long*/ sender) {
+	NSApplication.sharedApplication().stop(null);
 }
 }

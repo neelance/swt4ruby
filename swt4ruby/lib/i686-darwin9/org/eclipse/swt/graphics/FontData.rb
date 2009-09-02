@@ -1,6 +1,6 @@
 require "rjava"
 
-# Copyright (c) 2000, 2008 IBM Corporation and others.
+# Copyright (c) 2000, 2009 IBM Corporation and others.
 # All rights reserved. This program and the accompanying materials
 # are made available under the terms of the Eclipse Public License v1.0
 # which accompanies this distribution, and is available at
@@ -85,7 +85,7 @@ module Org::Eclipse::Swt::Graphics
     alias_method :attr_style=, :style=
     undef_method :style=
     
-    # the ATS font name
+    # the NSFont font name
     # (Warning: This field is platform dependent)
     # <p>
     # <b>IMPORTANT:</b> This field is <em>not</em> part of the SWT
@@ -93,11 +93,11 @@ module Org::Eclipse::Swt::Graphics
     # within the packages provided by SWT. It is not available on all
     # platforms and should never be accessed from application code.
     # </p>
-    attr_accessor :ats_name
-    alias_method :attr_ats_name, :ats_name
-    undef_method :ats_name
-    alias_method :attr_ats_name=, :ats_name=
-    undef_method :ats_name=
+    attr_accessor :ns_name
+    alias_method :attr_ns_name, :ns_name
+    undef_method :ns_name
+    alias_method :attr_ns_name=, :ns_name=
+    undef_method :ns_name=
     
     # The locales of the font
     attr_accessor :lang
@@ -146,7 +146,7 @@ module Org::Eclipse::Swt::Graphics
       @name = nil
       @height = 0.0
       @style = 0
-      @ats_name = nil
+      @ns_name = nil
       @lang = nil
       @country = nil
       @variant = nil
@@ -209,11 +209,11 @@ module Org::Eclipse::Swt::Graphics
         return
       end
       version2 = string.substring(start, end_)
-      if ((platform == "CARBON") && (version2 == "1"))
+      if ((platform == "COCOA") && (version2 == "1"))
         start = end_ + 1
         end_ = string.length
         if (start < end_)
-          @ats_name = RJava.cast_to_string(string.substring(start, end_))
+          @ns_name = RJava.cast_to_string(string.substring(start, end_))
         end
       end
     end
@@ -235,7 +235,7 @@ module Org::Eclipse::Swt::Graphics
       @name = nil
       @height = 0.0
       @style = 0
-      @ats_name = nil
+      @ns_name = nil
       @lang = nil
       @country = nil
       @variant = nil
@@ -250,7 +250,7 @@ module Org::Eclipse::Swt::Graphics
       @name = nil
       @height = 0.0
       @style = 0
-      @ats_name = nil
+      @ns_name = nil
       @lang = nil
       @country = nil
       @variant = nil
@@ -473,7 +473,7 @@ module Org::Eclipse::Swt::Graphics
         SWT.error(SWT::ERROR_NULL_ARGUMENT)
       end
       @name = name
-      @ats_name = RJava.cast_to_string(nil)
+      @ns_name = RJava.cast_to_string(nil)
     end
     
     typesig { [::Java::Int] }
@@ -487,7 +487,7 @@ module Org::Eclipse::Swt::Graphics
     # @see #getStyle
     def set_style(style)
       @style = style
-      @ats_name = RJava.cast_to_string(nil)
+      @ns_name = RJava.cast_to_string(nil)
     end
     
     typesig { [] }
@@ -499,7 +499,7 @@ module Org::Eclipse::Swt::Graphics
     # 
     # @see FontData
     def to_s
-      buffer = StringBuffer.new
+      buffer = StringBuffer.new(128)
       buffer.append("1|")
       buffer.append(get_name)
       buffer.append("|")
@@ -507,9 +507,9 @@ module Org::Eclipse::Swt::Graphics
       buffer.append("|")
       buffer.append(get_style)
       buffer.append("|")
-      buffer.append("CARBON|1|")
-      if (!(@ats_name).nil?)
-        buffer.append(@ats_name)
+      buffer.append("COCOA|1|")
+      if (!(@ns_name).nil?)
+        buffer.append(@ns_name)
       end
       return buffer.to_s
     end

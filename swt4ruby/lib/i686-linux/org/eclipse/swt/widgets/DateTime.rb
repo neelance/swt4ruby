@@ -1,6 +1,6 @@
 require "rjava"
 
-# Copyright (c) 2000, 2008 IBM Corporation and others.
+# Copyright (c) 2000, 2009 IBM Corporation and others.
 # All rights reserved. This program and the accompanying materials
 # are made available under the terms of the Eclipse Public License v1.0
 # which accompanies this distribution, and is available at
@@ -31,13 +31,14 @@ module Org::Eclipse::Swt::Widgets
   # </p>
   # <dl>
   # <dt><b>Styles:</b></dt>
-  # <dd>DATE, TIME, CALENDAR, SHORT, MEDIUM, LONG</dd>
+  # <dd>DATE, TIME, CALENDAR, SHORT, MEDIUM, LONG, DROP_DOWN</dd>
   # <dt><b>Events:</b></dt>
-  # <dd>Selection</dd>
+  # <dd>DefaultSelection, Selection</dd>
   # </dl>
   # <p>
   # Note: Only one of the styles DATE, TIME, or CALENDAR may be specified,
   # and only one of the styles SHORT, MEDIUM, or LONG may be specified.
+  # The DROP_DOWN style is a <em>HINT</em>, and it is only valid with the DATE style.
   # </p><p>
   # IMPORTANT: This class is <em>not</em> intended to be subclassed.
   # </p>
@@ -47,6 +48,7 @@ module Org::Eclipse::Swt::Widgets
   # @see <a href="http://www.eclipse.org/swt/">Sample code and further information</a>
   # 
   # @since 3.3
+  # @noextend This class is not intended to be subclassed by clients.
   class DateTime < DateTimeImports.const_get :Composite
     include_class_members DateTimeImports
     
@@ -215,6 +217,10 @@ module Org::Eclipse::Swt::Widgets
     # @see SWT#DATE
     # @see SWT#TIME
     # @see SWT#CALENDAR
+    # @see SWT#SHORT
+    # @see SWT#MEDIUM
+    # @see SWT#LONG
+    # @see SWT#DROP_DOWN
     # @see Widget#checkSubclass
     # @see Widget#getStyle
     def initialize(parent, style)
@@ -375,7 +381,7 @@ module Org::Eclipse::Swt::Widgets
     # interface.
     # <p>
     # <code>widgetSelected</code> is called when the user changes the control's value.
-    # <code>widgetDefaultSelected</code> is not called.
+    # <code>widgetDefaultSelected</code> is typically called when ENTER is pressed.
     # </p>
     # 
     # @param listener the listener which should be notified
@@ -469,6 +475,11 @@ module Org::Eclipse::Swt::Widgets
       else
         super(index)
       end
+    end
+    
+    typesig { [] }
+    def check_subwindow
+      return false
     end
     
     typesig { [::Java::Int] }
@@ -718,6 +729,14 @@ module Org::Eclipse::Swt::Widgets
     typesig { [::Java::Int] }
     # long
     # long
+    def gtk_day_selected_double_click(widget)
+      post_event(SWT::DefaultSelection)
+      return 0
+    end
+    
+    typesig { [::Java::Int] }
+    # long
+    # long
     def gtk_month_changed(widget)
       send_selection_event
       return 0
@@ -728,17 +747,16 @@ module Org::Eclipse::Swt::Widgets
       super
       if (!((self.attr_style & SWT::CALENDAR)).equal?(0))
         OS.g_signal_connect_closure(self.attr_handle, OS.attr_day_selected, self.attr_display.attr_closures[DAY_SELECTED], false)
+        OS.g_signal_connect_closure(self.attr_handle, OS.attr_day_selected_double_click, self.attr_display.attr_closures[DAY_SELECTED_DOUBLE_CLICK], false)
         OS.g_signal_connect_closure(self.attr_handle, OS.attr_month_changed, self.attr_display.attr_closures[MONTH_CHANGED], false)
       end
     end
     
     typesig { [::Java::Int, ::Java::Int] }
-    def is_valid(field_name, value)
+    def is_valid_time(field_name, value)
       valid_calendar = nil
       if (!((self.attr_style & SWT::CALENDAR)).equal?(0))
         valid_calendar = Calendar.get_instance
-        valid_calendar.set(Calendar::YEAR, @year)
-        valid_calendar.set(Calendar::MONTH, @month)
       else
         valid_calendar = @calendar
       end
@@ -748,7 +766,10 @@ module Org::Eclipse::Swt::Widgets
     end
     
     typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
-    def is_valid(year, month, day)
+    def is_valid_date(year, month, day)
+      if (year < MIN_YEAR || year > MAX_YEAR)
+        return false
+      end
       valid = Calendar.get_instance
       valid.set(year, month, day)
       return (valid.get(Calendar::YEAR)).equal?(year) && (valid.get(Calendar::MONTH)).equal?(month) && (valid.get(Calendar::DAY_OF_MONTH)).equal?(day)
@@ -798,6 +819,8 @@ module Org::Eclipse::Swt::Widgets
         # set the value of the current field to its maximum
         field_name = @field_names[@current_field]
         set_text_field(field_name, @calendar.get_actual_maximum(field_name), true, true)
+      when SWT::CR
+        post_event(SWT::DefaultSelection)
       else
         case (event.attr_character)
         when Character.new(?/.ord), Character.new(?:.ord), Character.new(?-.ord), Character.new(?..ord)
@@ -825,13 +848,12 @@ module Org::Eclipse::Swt::Widgets
       sel = @text.get_selection
       i = 0
       while i < @field_count
-        if (sel.attr_x >= @field_indices[i].attr_x && sel.attr_x <= @field_indices[i].attr_y)
-          @current_field = i
+        if (@field_indices[i].attr_x <= sel.attr_x && sel.attr_x <= @field_indices[i].attr_y)
+          select_field(i)
           break
         end
         i += 1
       end
-      select_field(@current_field)
     end
     
     typesig { [Event] }
@@ -1151,7 +1173,7 @@ module Org::Eclipse::Swt::Widgets
     # @since 3.4
     def set_date(year, month, day)
       check_widget
-      if (!is_valid(year, month, day))
+      if (!is_valid_date(year, month, day))
         return
       end
       if (!((self.attr_style & SWT::CALENDAR)).equal?(0))
@@ -1161,9 +1183,7 @@ module Org::Eclipse::Swt::Widgets
         OS.gtk_calendar_select_month(self.attr_handle, month, year)
         OS.gtk_calendar_select_day(self.attr_handle, day)
       else
-        @calendar.set(Calendar::YEAR, year)
-        @calendar.set(Calendar::MONTH, month)
-        @calendar.set(Calendar::DAY_OF_MONTH, day)
+        @calendar.set(year, month, day)
         update_control
       end
     end
@@ -1172,6 +1192,7 @@ module Org::Eclipse::Swt::Widgets
     # Sets the receiver's date, or day of the month, to the specified day.
     # <p>
     # The first day of the month is 1, and the last day depends on the month and year.
+    # If the specified day is not valid for the receiver's month and year, then it is ignored.
     # </p>
     # 
     # @param day a positive integer beginning with 1
@@ -1180,9 +1201,11 @@ module Org::Eclipse::Swt::Widgets
     # <li>ERROR_WIDGET_DISPOSED - if the receiver has been disposed</li>
     # <li>ERROR_THREAD_INVALID_ACCESS - if not called from the thread that created the receiver</li>
     # </ul>
+    # 
+    # @see #setDate
     def set_day(day)
       check_widget
-      if (!is_valid(Calendar::DAY_OF_MONTH, day))
+      if (!is_valid_date(get_year, get_month, day))
         return
       end
       if (!((self.attr_style & SWT::CALENDAR)).equal?(0))
@@ -1208,7 +1231,7 @@ module Org::Eclipse::Swt::Widgets
     # </ul>
     def set_hours(hours)
       check_widget
-      if (!is_valid(Calendar::HOUR_OF_DAY, hours))
+      if (!is_valid_time(Calendar::HOUR_OF_DAY, hours))
         return
       end
       if (!((self.attr_style & SWT::CALENDAR)).equal?(0))
@@ -1233,7 +1256,7 @@ module Org::Eclipse::Swt::Widgets
     # </ul>
     def set_minutes(minutes)
       check_widget
-      if (!is_valid(Calendar::MINUTE, minutes))
+      if (!is_valid_time(Calendar::MINUTE, minutes))
         return
       end
       if (!((self.attr_style & SWT::CALENDAR)).equal?(0))
@@ -1248,6 +1271,7 @@ module Org::Eclipse::Swt::Widgets
     # Sets the receiver's month.
     # <p>
     # The first month of the year is 0, and the last month is 11.
+    # If the specified month is not valid for the receiver's day and year, then it is ignored.
     # </p>
     # 
     # @param month an integer between 0 and 11
@@ -1256,9 +1280,11 @@ module Org::Eclipse::Swt::Widgets
     # <li>ERROR_WIDGET_DISPOSED - if the receiver has been disposed</li>
     # <li>ERROR_THREAD_INVALID_ACCESS - if not called from the thread that created the receiver</li>
     # </ul>
+    # 
+    # @see #setDate
     def set_month(month)
       check_widget
-      if (!is_valid(Calendar::MONTH, month))
+      if (!is_valid_date(get_year, month, get_day))
         return
       end
       if (!((self.attr_style & SWT::CALENDAR)).equal?(0))
@@ -1284,7 +1310,7 @@ module Org::Eclipse::Swt::Widgets
     # </ul>
     def set_seconds(seconds)
       check_widget
-      if (!is_valid(Calendar::SECOND, seconds))
+      if (!is_valid_time(Calendar::SECOND, seconds))
         return
       end
       if (!((self.attr_style & SWT::CALENDAR)).equal?(0))
@@ -1310,13 +1336,13 @@ module Org::Eclipse::Swt::Widgets
     # @since 3.4
     def set_time(hours, minutes, seconds)
       check_widget
-      if (!is_valid(Calendar::HOUR_OF_DAY, hours))
+      if (!is_valid_time(Calendar::HOUR_OF_DAY, hours))
         return
       end
-      if (!is_valid(Calendar::MINUTE, minutes))
+      if (!is_valid_time(Calendar::MINUTE, minutes))
         return
       end
-      if (!is_valid(Calendar::SECOND, seconds))
+      if (!is_valid_time(Calendar::SECOND, seconds))
         return
       end
       if (!((self.attr_style & SWT::CALENDAR)).equal?(0))
@@ -1335,6 +1361,7 @@ module Org::Eclipse::Swt::Widgets
     # Sets the receiver's year.
     # <p>
     # The first year is 1752 and the last year is 9999.
+    # If the specified year is not valid for the receiver's day and month, then it is ignored.
     # </p>
     # 
     # @param year an integer between 1752 and 9999
@@ -1343,10 +1370,11 @@ module Org::Eclipse::Swt::Widgets
     # <li>ERROR_WIDGET_DISPOSED - if the receiver has been disposed</li>
     # <li>ERROR_THREAD_INVALID_ACCESS - if not called from the thread that created the receiver</li>
     # </ul>
+    # 
+    # @see #setDate
     def set_year(year)
       check_widget
-      # if (!isValid(Calendar.YEAR, year)) return;
-      if (year < MIN_YEAR || year > MAX_YEAR)
+      if (!is_valid_date(year, get_month, get_day))
         return
       end
       if (!((self.attr_style & SWT::CALENDAR)).equal?(0))

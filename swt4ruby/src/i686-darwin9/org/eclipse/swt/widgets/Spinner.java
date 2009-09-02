@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2008 IBM Corporation and others.
+ * Copyright (c) 2000, 2009 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -10,14 +10,10 @@
  *******************************************************************************/
 package org.eclipse.swt.widgets;
 
-
-import org.eclipse.swt.internal.carbon.CFRange;
-import org.eclipse.swt.internal.carbon.OS;
-import org.eclipse.swt.internal.carbon.Rect;
-
 import org.eclipse.swt.*;
 import org.eclipse.swt.events.*;
 import org.eclipse.swt.graphics.*;
+import org.eclipse.swt.internal.cocoa.*;
 
 /**
  * Instances of this class are selectable user interface
@@ -42,15 +38,16 @@ import org.eclipse.swt.graphics.*;
  * @see <a href="http://www.eclipse.org/swt/">Sample code and further information</a>
  * 
  * @since 3.1
+ * @noextend This class is not intended to be subclassed by clients.
  */
 public class Spinner extends Composite {
-	int textHandle, buttonHandle;
-	int textVisibleRgn, buttonVisibleRgn;
-	int increment = 1;
+	NSTextField textView;
+	NSNumberFormatter textFormatter;
+	NSStepper buttonView;
 	int pageIncrement = 10;
 	int digits = 0;
 	int textLimit = LIMIT;
-	static int GAP = 3;
+	static int GAP = 0;
 	
 	/**
 	 * the operating system limit for the number of characters
@@ -68,7 +65,7 @@ public class Spinner extends Composite {
 	static {
 		LIMIT = 0x7FFFFFFF;
 	}
-	
+
 /**
  * Constructs a new instance of this class given its parent
  * and a style value describing its behavior and appearance.
@@ -102,34 +99,9 @@ public Spinner (Composite parent, int style) {
 	super (parent, checkStyle (style));
 }
 
-int actionProc (int theControl, int partCode) {
-	int result = super.actionProc (theControl, partCode);
-	if (result == OS.noErr) return result;
-	if (theControl == buttonHandle) {
-		boolean [] parseFail = new boolean [1];
-		int value = getSelectionText (parseFail);
-		if (parseFail [0]) {
-			value = OS.GetControl32BitValue (buttonHandle);
-		}
-		int newValue = value;
-	    switch (partCode) {
-		    case OS.kControlUpButtonPart:
-				newValue += increment;
-		        break;
-		    case OS.kControlDownButtonPart:
-				newValue -= increment;
-		        break;
-		}
-		int max = OS.GetControl32BitMaximum (buttonHandle);
-		int min = OS.GetControl32BitMinimum (buttonHandle);
-		if ((style & SWT.WRAP) != 0) {
-			if (newValue > max) newValue = min;
-			if (newValue < min) newValue = max;
-		}
-		newValue = Math.min (Math.max (min, newValue), max);
-		if (value != newValue) setSelection (newValue, true, true, true);
-	}
-	return result;
+boolean acceptsFirstResponder(int /*long*/ id, int /*long*/ sel) {
+	if (id == view.id) return false;
+	return super.acceptsFirstResponder (id, sel);
 }
 
 /**
@@ -233,47 +205,27 @@ protected void checkSubclass () {
 
 public Point computeSize (int wHint, int hHint, boolean changed) {
 	checkWidget ();
-	int width = 0, height = 0;
-	int max = OS.GetControl32BitMaximum (buttonHandle);
-	String string = String.valueOf (max);
-	if (digits > 0) {
-		StringBuffer buffer = new StringBuffer ();
-		buffer.append (string);
-		buffer.append (getDecimalSeparator ());
-		int count = digits - string.length ();
-		while (count >= 0) {
-			buffer.append ("0");
-			count--;
-		}
-		string = buffer.toString ();
-	}
-	char [] buffer = new char [string.length ()];
-	string.getChars (0, buffer.length, buffer, 0);
-	int ptr = OS.CFStringCreateWithCharacters (OS.kCFAllocatorDefault, buffer, buffer.length);
-	Point size = textExtent (ptr, 0);
-	if (ptr != 0) OS.CFRelease (ptr);
-	width = Math.max (width, size.x);
-	height = Math.max (height, size.y);
-	int [] metric = new int [1];
-	OS.GetThemeMetric (OS.kThemeMetricEditTextWhitespace, metric);
-	width += metric [0] * 2;
+	float /*double*/ width = 0, height = 0;
+	String string = Double.toString (buttonView.maxValue ());
+	Font font = Font.cocoa_new(display, textView.font ());
+	NSAttributedString str = parent.createString(string, font, null, 0, true, false);
+	NSSize size = str.size ();
+	str.release ();
+	width = (float)/*64*/size.width;
+	height = (float)/*64*/size.height;
+	NSRect frameRect = textView.frame();
+	NSCell cell = new NSCell (textView.cell ());
+	NSRect cellRect = cell.drawingRectForBounds(frameRect);
+	width += frameRect.width - cellRect.width;
+	height += frameRect.height - cellRect.height;
+	width += GAP;
+	size = buttonView.cell ().cellSize ();
+	width += (int)/*64*/size.width;
+	height = Math.max (height, size.height);
 	if (wHint != SWT.DEFAULT) width = wHint;
 	if (hHint != SWT.DEFAULT) height = hHint;
-	Rectangle trim = computeTrim (0, 0, width, height);
-	OS.GetThemeMetric (OS.kThemeMetricLittleArrowsHeight, metric);
-	trim.height = Math.max (trim.height, metric [0]);
+	Rectangle trim = computeTrim (0, 0, (int)Math.ceil (width), (int)Math.ceil (height));
 	return new Point (trim.width, trim.height);
-}
-
-public Rectangle computeTrim (int x, int y, int width, int height) {
-	checkWidget ();
-	Rect inset = inset ();
-	width += inset.left + inset.right;
-	height += inset.top + inset.bottom;
-	int [] outMetric = new int [1];
-	OS.GetThemeMetric (OS.kThemeMetricLittleArrowsWidth, outMetric);
-	width += outMetric [0] + GAP;
-	return new Rectangle (x, y, width, height);
 }
 
 /**
@@ -289,42 +241,35 @@ public Rectangle computeTrim (int x, int y, int width, int height) {
  */
 public void copy () {
 	checkWidget ();
-	short [] selection = new short [2];
-	if (OS.GetControlData (textHandle, (short)OS.kControlEntireControl, OS.kControlEditTextSelectionTag, 4, selection, null) != OS.noErr) return;
-	if (selection [0] == selection [1]) return;
-	int [] actualSize = new int [1];
-	int [] ptr = new int [1];
-	if (OS.GetControlData (textHandle, (short)OS.kControlEntireControl, OS.kControlEditTextCFStringTag, 4, ptr, actualSize) != OS.noErr) return;
-	CFRange range = new CFRange ();
-	range.location = selection [0];
-	range.length = selection [1] - selection [0];
-	char [] buffer= new char [range.length];
-	OS.CFStringGetCharacters (ptr [0], range, buffer);
-	OS.CFRelease (ptr [0]);
-	copyToClipboard (buffer);
+	NSText fieldEditor = textView.currentEditor();
+	if (fieldEditor != null) {
+		fieldEditor.copy(null);
+	} else {
+		//TODO
+	}
 }
 
 void createHandle () {
-	int window = OS.GetControlOwner (parent.handle);
-	int actionProc = display.actionProc;
-	int features = OS.kControlSupportsEmbedding | OS.kControlSupportsFocus;
-	int [] outControl = new int [1];
-	OS.CreateUserPaneControl (window, null, features, outControl);
-	if (outControl [0] == 0) error (SWT.ERROR_NO_HANDLES);
-	handle = outControl [0];
-	
-	OS.CreateLittleArrowsControl (window, null, 0, 0, 100, 1, outControl);
-	if (outControl [0] == 0) error (SWT.ERROR_NO_HANDLES);
-	buttonHandle = outControl [0];
-	OS.SetControlAction (buttonHandle, actionProc);
-	
-	OS.CreateEditUnicodeTextControl (window, null, 0, false, null, outControl);
-	if (outControl [0] == 0) error (SWT.ERROR_NO_HANDLES);
-	textHandle = outControl [0];
-	OS.SetControlData (textHandle, OS.kControlEntireControl, OS.kControlEditTextSingleLineTag, 1, new byte [] {1});
-	if ((style & SWT.READ_ONLY) != 0) {
-		OS.SetControlData (textHandle, OS.kControlEntireControl, OS.kControlEditTextLockedTag, 1, new byte [] {1});
-	}
+	NSView widget = (NSView)new SWTView().alloc();
+	widget.init();
+//	widget.setDrawsBackground(false);
+	NSStepper buttonWidget = (NSStepper)new SWTStepper().alloc();
+	buttonWidget.init();
+	buttonWidget.setValueWraps((style & SWT.WRAP) != 0);
+	buttonWidget.setTarget(buttonWidget);
+	buttonWidget.setAction(OS.sel_sendSelection);
+	buttonWidget.setMaxValue(100);
+	NSTextField textWidget = (NSTextField)new SWTTextField().alloc();
+	textWidget.init();
+//	textWidget.setTarget(widget);
+	textWidget.setEditable((style & SWT.READ_ONLY) == 0);
+	textFormatter = (NSNumberFormatter)new NSNumberFormatter().alloc();
+	textFormatter.init();
+	widget.addSubview(textWidget);
+	widget.addSubview(buttonWidget);
+	buttonView = buttonWidget;
+	textView = textWidget;
+	view = widget;
 	setSelection (0, false, true, false);
 }
 
@@ -343,31 +288,39 @@ void createHandle () {
 public void cut () {
 	checkWidget ();
 	if ((style & SWT.READ_ONLY) != 0) return;
-	short [] selection = new short [2];
-	if (OS.GetControlData (textHandle, (short)OS.kControlEntireControl, OS.kControlEditTextSelectionTag, 4, selection, null) != OS.noErr) return;
-	if (selection [0] == selection [1]) return;
-	char [] buffer = setText ("", selection [0], selection [1], true);
-	if (buffer != null) {
-		copyToClipboard (buffer);
+	NSText fieldEditor = textView.currentEditor();
+	if (fieldEditor != null) {
+		fieldEditor.cut(null);
+	} else {
+		//TODO
 	}
+}
+
+void enableWidget (boolean enabled) {
+	super.enableWidget(enabled);
+	buttonView.setEnabled(enabled);
+	textView.setEnabled(enabled);
+}
+
+NSFont defaultNSFont () {
+	return display.textFieldFont;
 }
 
 void deregister () {
 	super.deregister ();
-	display.removeWidget(textHandle);
-	display.removeWidget(buttonHandle);
-}
-
-void drawBackground (int control, int context) {
-	if (control == textHandle) {
-		fillBackground (control, context, null);
-	} else {
-		parent.fillBackground (control, context, null);
+	if (textView != null) {
+		display.removeWidget (textView);
+		display.removeWidget (textView.cell());
+	}
+	
+	if (buttonView != null) {
+		display.removeWidget (buttonView);
+		display.removeWidget (buttonView.cell());
 	}
 }
 
-int focusHandle () {
-	return textHandle;
+NSView focusView () {
+	return textView;
 }
 
 /**
@@ -385,22 +338,6 @@ public int getDigits () {
 	return digits;
 }
 
-String getDecimalSeparator () {
-	int locale = OS.CFLocaleCopyCurrent ();
-	int formatter = OS.CFNumberFormatterCreate (OS.kCFAllocatorDefault, locale, OS.kCFNumberFormatterDecimalStyle);
-	int key = OS.kCFNumberFormatterDecimalSeparator ();
-	int result = OS.CFNumberFormatterCopyProperty (formatter, key);
-	CFRange range = new CFRange ();
-	range.location = 0;
-	range.length = OS.CFStringGetLength (result);
-	char [] buffer= new char [range.length];
-	OS.CFStringGetCharacters (result, range, buffer);
-	OS.CFRelease (result);
-	OS.CFRelease (formatter);
-	OS.CFRelease (locale);
-	return new String (buffer);
-}
-
 /**
  * Returns the amount that the receiver's value will be
  * modified by when the up/down arrows are pressed.
@@ -414,7 +351,7 @@ String getDecimalSeparator () {
  */
 public int getIncrement () {
 	checkWidget ();
-	return increment;
+	return (int)buttonView.increment();
 }
 
 /**
@@ -429,7 +366,7 @@ public int getIncrement () {
  */
 public int getMaximum () {
 	checkWidget ();
-	return OS.GetControl32BitMaximum (buttonHandle);
+	return (int)buttonView.maxValue();
 }
 
 /**
@@ -444,7 +381,7 @@ public int getMaximum () {
  */
 public int getMinimum () {
 	checkWidget ();
-	return OS.GetControl32BitMinimum (buttonHandle);
+	return (int)buttonView.minValue();
 }
 
 /**
@@ -475,54 +412,44 @@ public int getPageIncrement () {
  */
 public int getSelection () {
 	checkWidget ();
-	return OS.GetControl32BitValue (buttonHandle);
+	return (int)((NSStepper)buttonView).doubleValue();
 }
 
-int getSelectionText (boolean [] parseFail) {
-	int [] actualSize = new int [1];
-	int [] ptr = new int [1];
-	if (OS.GetControlData (textHandle, (short)OS.kControlEntireControl, OS.kControlEditTextCFStringTag, 4, ptr, actualSize) == OS.noErr) {
-		CFRange range = new CFRange ();
-		range.location = 0;
-		range.length = OS.CFStringGetLength (ptr [0]);
-		char [] buffer= new char [range.length];
-		OS.CFStringGetCharacters (ptr [0], range, buffer);
-		OS.CFRelease (ptr [0]);
-		String string = new String (buffer);
-		try {
-			int value;
-			if (digits > 0) {
-				String decimalSeparator = getDecimalSeparator ();
-				int index = string.indexOf (decimalSeparator);
-				if (index != -1)  {
-					int startIndex = string.startsWith ("+") || string.startsWith ("-") ? 1 : 0;
-					String wholePart = startIndex != index ? string.substring (startIndex, index) : "0";
-					String decimalPart = string.substring (index + 1);
-					if (decimalPart.length () > digits) {
-						decimalPart = decimalPart.substring (0, digits);
-					} else {
-						int i = digits - decimalPart.length ();
-						for (int j = 0; j < i; j++) {
-							decimalPart = decimalPart + "0";
-						}
-					}
-					int wholeValue = Integer.parseInt (wholePart);
-					int decimalValue = Integer.parseInt (decimalPart);
-					for (int i = 0; i < digits; i++) wholeValue *= 10;
-					value = wholeValue + decimalValue;
-					if (string.startsWith ("-")) value = -value;
+int getSelectionText (boolean[] parseFail) {
+	String string = textView.stringValue().getString();
+	try {
+		int value;
+		if (digits > 0) {
+			String decimalSeparator = textFormatter.decimalSeparator().getString();
+			int index = string.indexOf (decimalSeparator);
+			if (index != -1)  {
+				int startIndex = string.startsWith ("+") || string.startsWith ("-") ? 1 : 0;
+				String wholePart = startIndex != index ? string.substring (startIndex, index) : "0";
+				String decimalPart = string.substring (index + 1);
+				if (decimalPart.length () > digits) {
+					decimalPart = decimalPart.substring (0, digits);
 				} else {
-					value = Integer.parseInt (string);
-					for (int i = 0; i < digits; i++) value *= 10;
+					int i = digits - decimalPart.length ();
+					for (int j = 0; j < i; j++) {
+						decimalPart = decimalPart + "0";
+					}
 				}
+				int wholeValue = Integer.parseInt (wholePart);
+				int decimalValue = Integer.parseInt (decimalPart);
+				for (int i = 0; i < digits; i++) wholeValue *= 10;
+				value = wholeValue + decimalValue;
+				if (string.startsWith ("-")) value = -value;
 			} else {
 				value = Integer.parseInt (string);
+				for (int i = 0; i < digits; i++) value *= 10;
 			}
-			int max = OS.GetControl32BitMaximum (buttonHandle);
-			int min = OS.GetControl32BitMinimum (buttonHandle);
-			if (min <= value && value <= max) return value;
-		} catch (NumberFormatException e) {
+		} else {
+			value = Integer.parseInt (string);
 		}
+		int max = getMaximum();
+		int min = getMinimum();
+		if (min <= value && value <= max) return value;
+	} catch (NumberFormatException e) {
 	}
 	parseFail [0] = true;
 	return -1;
@@ -542,17 +469,10 @@ int getSelectionText (boolean [] parseFail) {
  * 
  * @since 3.4
  */
-public String getText() {
-	int [] ptr = new int [1];
-	int [] actualSize = new int [1];
-	int result = OS.GetControlData (textHandle, (short)OS.kControlEntireControl, OS.kControlEditTextCFStringTag, 4, ptr, actualSize);
-	if (result != OS.noErr) return "";
-	CFRange range = new CFRange ();
-	range.length = OS.CFStringGetLength (ptr [0]);
-	char [] buffer= new char [range.length];
-	OS.CFStringGetCharacters (ptr [0], range, buffer);
-	OS.CFRelease (ptr [0]);
-	return new String (buffer);
+public String getText () {
+	checkWidget ();
+	NSString str = new NSTextFieldCell (textView.cell ()).title ();
+	return str.getString ();
 }
 
 /**
@@ -577,170 +497,8 @@ public int getTextLimit () {
     return textLimit;
 }
 
-int getVisibleRegion (int control, boolean clipChildren) {
-	if (control == textHandle) {
-		if (!clipChildren) return super.getVisibleRegion (control, clipChildren);
-		if (textVisibleRgn == 0) {
-			textVisibleRgn = OS.NewRgn ();
-			calculateVisibleRegion (control, textVisibleRgn, clipChildren);
-		}
-		int result = OS.NewRgn ();
-		OS.CopyRgn (textVisibleRgn, result);
-		return result;
-	}
-	if (control == buttonHandle) {
-		if (!clipChildren) return super.getVisibleRegion (control, clipChildren);
-		if (buttonVisibleRgn == 0) {
-			buttonVisibleRgn = OS.NewRgn ();
-			calculateVisibleRegion (control, buttonVisibleRgn, clipChildren);
-		}
-		int result = OS.NewRgn ();
-		OS.CopyRgn (buttonVisibleRgn, result);
-		return result;
-	}
-	return super.getVisibleRegion (control, clipChildren);
-}
-
-void hookEvents () {
-	super.hookEvents ();
-	int controlProc = display.controlProc;
-	int [] mask = new int [] {
-		OS.kEventClassControl, OS.kEventControlDraw,
-		OS.kEventClassControl, OS.kEventControlSetFocusPart,
-		OS.kEventClassControl, OS.kEventControlTrack,
-		OS.kEventClassControl, OS.kEventControlGetClickActivation,
-	};
-	int controlTarget = OS.GetControlEventTarget (textHandle);
-	OS.InstallEventHandler (controlTarget, controlProc, mask.length / 2, mask, handle, null);
-	controlTarget = OS.GetControlEventTarget (buttonHandle);
-	OS.InstallEventHandler (controlTarget, controlProc, mask.length / 2, mask, handle, null);
-}
-
-Rect inset () {
-	return display.editTextInset;
-}
-
-int kEventAccessibleGetNamedAttribute (int nextHandler, int theEvent, int userData) {
-	int code = OS.eventNotHandledErr;
-	int [] stringRef = new int [1];
-	OS.GetEventParameter (theEvent, OS.kEventParamAccessibleAttributeName, OS.typeCFStringRef, null, 4, null, stringRef);
-	int length = 0;
-	if (stringRef [0] != 0) length = OS.CFStringGetLength (stringRef [0]);
-	char [] buffer = new char [length];
-	CFRange range = new CFRange ();
-	range.length = length;
-	OS.CFStringGetCharacters (stringRef [0], range, buffer);
-	String attributeName = new String(buffer);
-	if (attributeName.equals (OS.kAXRoleAttribute) || attributeName.equals (OS.kAXRoleDescriptionAttribute)) {
-		String roleText = OS.kAXGroupRole;
-		buffer = new char [roleText.length ()];
-		roleText.getChars (0, buffer.length, buffer, 0);
-		stringRef [0] = OS.CFStringCreateWithCharacters (OS.kCFAllocatorDefault, buffer, buffer.length);
-		if (stringRef [0] != 0) {
-			if (attributeName.equals (OS.kAXRoleAttribute)) {
-				OS.SetEventParameter (theEvent, OS.kEventParamAccessibleAttributeValue, OS.typeCFStringRef, 4, stringRef);
-			} else { // kAXRoleDescriptionAttribute
-				int stringRef2 = OS.HICopyAccessibilityRoleDescription (stringRef [0], 0);
-				OS.SetEventParameter (theEvent, OS.kEventParamAccessibleAttributeValue, OS.typeCFStringRef, 4, new int [] {stringRef2});
-				OS.CFRelease(stringRef2);
-			}
-			OS.CFRelease(stringRef [0]);
-			code = OS.noErr;
-		}
-	}
-	if (accessible != null) {
-		code = accessible.internal_kEventAccessibleGetNamedAttribute (nextHandler, theEvent, code);
-	}
-	return code;
-}
-
-int kEventControlSetFocusPart (int nextHandler, int theEvent, int userData) {
-	int result = super.kEventControlSetFocusPart (nextHandler, theEvent, userData);
-	if (result == OS.noErr) {
-		short [] part = new short [1];
-		OS.GetEventParameter (theEvent, OS.kEventParamControlPart, OS.typeControlPartCode, null, 2, null, part);
-		if (part [0] == OS.kControlFocusNoPart) {
-			boolean [] parseFail = new boolean [1];
-			int value = getSelectionText (parseFail);
-			if (parseFail [0]) {
-				value = OS.GetControl32BitValue (buttonHandle);
-				setSelection (value, false, true, false);
-			}
-		}
-	}
-	return result;
-}
-
-int kEventUnicodeKeyPressed (int nextHandler, int theEvent, int userData) {
-	int result = super.kEventUnicodeKeyPressed (nextHandler, theEvent, userData);
-	if (result == OS.noErr) return result;
-	int [] keyboardEvent = new int [1];
-	OS.GetEventParameter (theEvent, OS.kEventParamTextInputSendKeyboardEvent, OS.typeEventRef, null, keyboardEvent.length * 4, null, keyboardEvent);
-	int [] keyCode = new int [1];
-	OS.GetEventParameter (keyboardEvent [0], OS.kEventParamKeyCode, OS.typeUInt32, null, keyCode.length * 4, null, keyCode);
-	int [] modifiers = new int [1];
-	OS.GetEventParameter (keyboardEvent [0], OS.kEventParamKeyModifiers, OS.typeUInt32, null, 4, null, modifiers);
-	if (modifiers [0] == OS.cmdKey) {
-		switch (keyCode [0]) {
-			case 7: /* X */
-				cut ();
-				return OS.noErr;
-			case 8: /* C */
-				copy ();
-				return OS.noErr;
-			case 9: /* V */
-				paste ();
-				return OS.noErr;
-		}
-	}
-	int delta = 0;
-	switch (keyCode [0]) {
-		case 76: /* KP Enter */
-		case 36: /* Return */
-			postEvent (SWT.DefaultSelection);
-			return OS.noErr;
-		case 116: /* Page Up */ delta = pageIncrement; break;
-		case 121: /* Page Down */ delta = -pageIncrement; break;
-		case 125: /* Down */ delta = -increment; break;
-		case 126: /* Up */ delta = increment; break;
-	}
-	if (delta != 0) {
-		boolean [] parseFail = new boolean [1];
-		int value = getSelectionText (parseFail);
-		if (parseFail [0]) {
-			value = OS.GetControl32BitValue (buttonHandle);
-		}
-		int newValue = value + delta;
-		int max = OS.GetControl32BitMaximum (buttonHandle);
-		int min = OS.GetControl32BitMinimum (buttonHandle);
-		if ((style & SWT.WRAP) != 0) {
-			if (newValue > max) newValue = min;
-			if (newValue < min) newValue = max;
-		}
-		newValue = Math.min (Math.max (min, newValue), max);
-		if (value != newValue) setSelection (newValue, true, true, true);
-		return OS.noErr;
-	} else {
-		result = OS.CallNextEventHandler (nextHandler, theEvent);
-		boolean [] parseFail = new boolean [1];
-		int value = getSelectionText (parseFail);
-		if (!parseFail [0]) {
-			int pos = OS.GetControl32BitValue (buttonHandle);
-			if (pos != value) setSelection (value, true, false, true);
-		}
-	}
-	return result;
-}
-
-int kEventTextInputUpdateActiveInputArea (int nextHandler, int theEvent, int userData) {
-	int [] length = new int [1];
-	OS.GetEventParameter (theEvent, OS.kEventParamTextInputSendText, OS.typeUnicodeText, null, 0, length, (char [])null);
-	int [] fixed_length = new int [1];
-	OS.GetEventParameter (theEvent, OS.kEventParamTextInputSendFixLen, OS.typeLongInteger, null, 4, null, fixed_length);
-	if (fixed_length [0] == -1 || fixed_length [0] == length [0]) {
-		postEvent (SWT.Modify);
-	}
-	return OS.eventNotHandledErr;
+boolean isEventView (int /*long*/ id) {
+	return true;
 }
 
 /**
@@ -758,27 +516,40 @@ int kEventTextInputUpdateActiveInputArea (int nextHandler, int theEvent, int use
 public void paste () {
 	checkWidget ();
 	if ((style & SWT.READ_ONLY) != 0) return;
-	String text = getClipboardText ();
-	short [] selection = new short [2];
-	if (OS.GetControlData (textHandle, (short)OS.kControlEntireControl, OS.kControlEditTextSelectionTag, 4, selection, null) != OS.noErr) return;
-	setText (text, selection [0], selection [1], true);
-}
-
-boolean pollTrackEvent() {
-	return true;
-}
-
-public void redraw () {
-	checkWidget();
-	super.redraw ();
-	redrawWidget (textHandle, false);
-	redrawWidget (buttonHandle, false);
+	NSText fieldEditor = textView.currentEditor();
+	if (fieldEditor != null) {
+		fieldEditor.paste(null);
+	} else {
+		//TODO
+	}
 }
 
 void register () {
 	super.register ();
-	display.addWidget (textHandle, this);
-	display.addWidget (buttonHandle, this);
+	if (textView != null) {
+		display.addWidget (textView, this);
+		display.addWidget (textView.cell(), this);
+	}
+	
+	if (buttonView != null) {
+		display.addWidget (buttonView, this);
+		display.addWidget (buttonView.cell(), this);
+	}
+}
+
+void releaseHandle () {
+	super.releaseHandle();
+	if (textFormatter != null) textFormatter.release();
+	if (buttonView != null) buttonView.release();
+	if (textView != null) textView.release();
+	textFormatter = null;
+	buttonView = null;
+	textView = null;
+}
+
+void releaseWidget () {	
+	super.releaseWidget ();
+	if (textView != null) textView.abortEditing();
 }
 
 /**
@@ -854,97 +625,85 @@ void removeVerifyListener (VerifyListener listener) {
 	eventTable.unhook (SWT.Verify, listener);	
 }
 
-void resetVisibleRegion (int control) {
-	if (textVisibleRgn != 0) {
-		OS.DisposeRgn (textVisibleRgn);
-		textVisibleRgn = 0;
-	}
-	if (buttonVisibleRgn != 0) {
-		OS.DisposeRgn (buttonVisibleRgn);
-		buttonVisibleRgn = 0;
-	}
-	super.resetVisibleRegion (control);
+void resized () {
+	super.resized ();
+	buttonView.sizeToFit();
+	NSSize textSize = textView.cell ().cellSize ();
+	NSRect buttonFrame = buttonView.bounds();
+	NSRect frame = view.frame();
+	buttonFrame.x = frame.width - buttonFrame.width;
+	buttonFrame.y = (frame.height - buttonFrame.height) / 2;
+	int textHeight = (int)Math.min(textSize.height, frame.height);
+	frame.x = 0;
+	frame.y = (frame.height - textHeight) / 2;
+	frame.width -= buttonFrame.width + GAP;
+	frame.height = textHeight;
+	textView.setFrame(frame);
+	buttonView.setFrame(buttonFrame);
 }
 
-void resizeClientArea () {
-	int [] outMetric = new int [1];
-	OS.GetThemeMetric (OS.kThemeMetricLittleArrowsWidth, outMetric);
-	int buttonWidth = outMetric [0] + GAP;
-	OS.GetThemeMetric (OS.kThemeMetricLittleArrowsHeight, outMetric);
-	int buttonHeight = outMetric [0];	
-	Rect rect = new Rect ();
-	OS.GetControlBounds (handle, rect);
-	Rect inset = inset ();
-	int width = Math.max (0, rect.right - rect.left - inset.left - inset.right - buttonWidth);
-	int height = Math.max (0, rect.bottom - rect.top - inset.top - inset.bottom);
-	buttonHeight = Math.min (buttonHeight, rect.bottom - rect.top);
-	setBounds (textHandle, inset.left, inset.top, width, height, true, true, false);
-	setBounds (buttonHandle, inset.left + inset.right + width + GAP, inset.top + (height - buttonHeight) / 2, buttonWidth, buttonHeight, true, true, false);
-}
-
-boolean sendKeyEvent (int type, Event event) {
-	if (!super.sendKeyEvent (type, event)) {
-		return false;
-	}
-	if (type != SWT.KeyDown) return true;
-	if ((style & SWT.READ_ONLY) != 0) return true;
-	if (event.character == 0) return true;
-	if ((event.stateMask & SWT.COMMAND) != 0) return true;
-//	if (!hooks (SWT.Verify) && !filters (SWT.Verify)) return true;
-	String oldText = "", newText = "";
-	int [] actualSize = new int [1];
-	int [] ptr = new int [1];
-	int charCount = 0;
-	if (OS.GetControlData (textHandle, (short)OS.kControlEntireControl, OS.kControlEditTextCFStringTag, 4, ptr, actualSize) == OS.noErr) {
-		charCount = OS.CFStringGetLength (ptr [0]);
-		OS.CFRelease (ptr [0]);
-	} 
-	short [] selection = new short [2];
-	OS.GetControlData (textHandle, (short)OS.kControlEntireControl, OS.kControlEditTextSelectionTag, 4, selection, null);
-	int start = selection [0], end = selection [1];
-	switch (event.character) {
-		case SWT.BS:
-			if (start == end) {
-				if (start == 0) return true;
-				start = Math.max (0, start - 1);
-			}
-			break;
-		case SWT.DEL:
-			if (start == end) {
-				if (start == charCount) return true;
-				end = Math.min (end + 1, charCount);
-			}
-			break;
-		case SWT.CR:
+boolean sendKeyEvent (NSEvent nsEvent, int type) {
+	boolean result = super.sendKeyEvent (nsEvent, type);
+	if (!result) return result;
+	if (type != SWT.KeyDown) return result;
+	int delta = 0;
+	short keyCode = nsEvent.keyCode ();
+	switch (keyCode) {
+		case 76: /* KP Enter */
+		case 36: { /* Return */
+			postEvent (SWT.DefaultSelection);
 			return true;
-		default:
-			if (event.character != '\t' && event.character < 0x20) return true;
-			oldText = new String (new char [] {event.character});
-	}
-	newText = verifyText (oldText, start, end, event);
-	if (newText == null) return false;
-	if (charCount - (end - start) + newText.length () > textLimit) {
-		return false;
-	}
-	if (newText != oldText) {
-		setText (newText, start, end, false);
-		start += newText.length ();
-		selection = new short [] {(short)start, (short)start};
-		OS.SetControlData (textHandle, (short)OS.kControlEntireControl, OS.kControlEditTextSelectionTag, 4, selection);
-	}
-	/*
-	* Post the modify event so that the character will be inserted
-	* into the widget when the modify event is delivered.  Normally,
-	* modify events are sent but it is safe to post the event here
-	* because this method is called from the event loop.
-	*/
-	postEvent (SWT.Modify);
-	return newText == oldText;	
+		}
+
+	    case 116: delta = pageIncrement; break; /* Page Up */
+	    case 121: delta = -pageIncrement; break; /* Page Down */
+	    case 125: delta = -getIncrement(); break; /* Down arrow */
+	    case 126: delta = getIncrement(); break; /* Up arrow */
+    }
+
+    if (delta != 0) {
+    	boolean [] parseFail = new boolean [1];
+    	int value = getSelectionText (parseFail);
+    	if (parseFail [0]) {
+    		value = (int)buttonView.doubleValue();
+    	}
+    	int newValue = value + delta;
+    	int max = (int)buttonView.maxValue();
+    	int min = (int)buttonView.minValue();
+    	if ((style & SWT.WRAP) != 0) {
+    		if (newValue > max) newValue = min;
+    		if (newValue < min) newValue = max;
+    	}
+    	newValue = Math.min (Math.max (min, newValue), max);
+    	if (value != newValue) setSelection (newValue, true, true, true);
+    	// Prevent the arrow or page up/down from being handled by the text field.
+    	result = false;
+    } else {
+    	boolean [] parseFail = new boolean [1];
+    	int value = getSelectionText (parseFail);
+    	if (!parseFail [0]) {
+    		int pos = (int)buttonView.doubleValue();
+    		if (pos != value) setSelection (value, true, false, true);
+    	}
+    }
+
+    return result;
 }
 
-void setBackground (float [] color) {
-	super.setBackground (color);
-	setBackground (textHandle, color);
+void sendSelection () {	
+	setSelection (getSelection(), false, true, true);
+}
+
+void updateBackground () {
+	NSColor nsColor = null;
+	if (backgroundImage != null) {
+		nsColor = NSColor.colorWithPatternImage(backgroundImage.handle);
+	} else if (background != null) {
+		nsColor = NSColor.colorWithDeviceRed(background[0], background[1], background[2], background[3]);
+	} else {
+		nsColor = NSColor.textBackgroundColor ();
+	}
+	((NSTextField) textView).setBackgroundColor (nsColor);
 }
 
 /**
@@ -972,18 +731,22 @@ public void setDigits (int value) {
 	if (value < 0) error (SWT.ERROR_INVALID_ARGUMENT);
 	if (value == digits) return;
 	digits = value;
-	int pos = OS.GetControl32BitValue (buttonHandle);	
+	int pos = (int)buttonView.doubleValue();	
 	setSelection (pos, false, true, false);
 }
 
-void setFontStyle (Font font) {
-	super.setFontStyle (font);
-	setFontStyle (textHandle, font);
+void setFont(NSFont font) {
+	textView.setFont(font);
 }
 
-void setForeground (float [] color) {
-	super.setForeground (color);
-	setForeground (textHandle, color);
+void setForeground (float /*double*/ [] color) {
+	NSColor nsColor;
+	if (color == null) {
+		nsColor = NSColor.textColor ();
+	} else {
+		nsColor = NSColor.colorWithDeviceRed (color [0], color [1], color [2], 1);
+	}
+	((NSTextField) textView).setTextColor (nsColor);
 }
 
 /**
@@ -1001,7 +764,7 @@ void setForeground (float [] color) {
 public void setIncrement (int value) {
 	checkWidget ();
 	if (value < 1) return;
-	increment = value;
+	buttonView.setIncrement(value);
 }
 
 /**
@@ -1019,10 +782,10 @@ public void setIncrement (int value) {
  */
 public void setMaximum (int value) {
 	checkWidget ();
-	int min = OS.GetControl32BitMinimum (buttonHandle);
+	int min = getMinimum ();
 	if (value <= min) return;
-	int pos = OS.GetControl32BitValue (buttonHandle);
-	OS.SetControl32BitMaximum (buttonHandle, value);
+	int pos = getSelection();
+	buttonView.setMaxValue(value);
 	if (pos > value) setSelection (value, true, true, false);	
 }
 
@@ -1041,10 +804,10 @@ public void setMaximum (int value) {
  */
 public void setMinimum (int value) {
 	checkWidget ();
-	int max = OS.GetControl32BitMaximum (buttonHandle);
+	int max = getMaximum();
 	if (value >= max) return;
-	int pos = OS.GetControl32BitValue (buttonHandle);
-	OS.SetControl32BitMinimum (buttonHandle, value);
+	int pos = getSelection();
+	buttonView.setMinValue(value);
 	if (pos < value) setSelection (value, true, true, false);
 }
 
@@ -1081,26 +844,22 @@ public void setPageIncrement (int value) {
  */
 public void setSelection (int value) {
 	checkWidget ();
-	int min = OS.GetControl32BitMinimum (buttonHandle);
-	int max = OS.GetControl32BitMaximum (buttonHandle);
+	int min = getMinimum();
+	int max = getMaximum();
 	value = Math.min (Math.max (min, value), max);
 	setSelection (value, true, true, false);
 }
 
 void setSelection (int value, boolean setPos, boolean setText, boolean notify) {
 	if (setPos) {
-		OS.SetControl32BitValue (buttonHandle, value);
+		((NSStepper)buttonView).setDoubleValue(value);
 	}
 	if (setText) {
-		String string;
-		if (digits == 0) {
-			string = String.valueOf (value);
-		} else {
-			string = String.valueOf (Math.abs (value));
-			String decimalSeparator = getDecimalSeparator ();
+		String string = String.valueOf (value);
+		if (digits > 0) {
+			String decimalSeparator = textFormatter.decimalSeparator().getString();
 			int index = string.length () - digits;
 			StringBuffer buffer = new StringBuffer ();
-			if (value < 0) buffer.append ("-");
 			if (index > 0) {
 				buffer.append (string.substring (0, index));
 				buffer.append (decimalSeparator);
@@ -1113,74 +872,26 @@ void setSelection (int value, boolean setPos, boolean setText, boolean notify) {
 			}
 			string = buffer.toString ();
 		}
+		NSCell cell = new NSCell(textView.cell());
 		if (hooks (SWT.Verify) || filters (SWT.Verify)) {
-			int [] actualSize = new int [1];
-			int [] ptr = new int [1];
-			int length = 0;
-			if (OS.GetControlData (textHandle, (short)OS.kControlEntireControl, OS.kControlEditTextCFStringTag, 4, ptr, actualSize) == OS.noErr) {
-				length = OS.CFStringGetLength (ptr [0]);
-				OS.CFRelease (ptr [0]);
-			}
+			int length = (int)/*64*/cell.title().length();
 			string = verifyText (string, 0, length, null);
 			if (string == null) return;
 		}
-		char [] buffer = new char [string.length ()];
-		string.getChars (0, buffer.length, buffer, 0);
-		int ptr = OS.CFStringCreateWithCharacters (OS.kCFAllocatorDefault, buffer, buffer.length);
-		if (ptr == 0) error (SWT.ERROR_CANNOT_SET_TEXT);
-		OS.SetControlData (textHandle, OS.kControlEntireControl, OS.kControlEditTextCFStringTag, 4, new int[] {ptr});
-		OS.CFRelease (ptr);
-		short [] selection = new short [] {0, (short)string.length ()};
-		OS.SetControlData (textHandle, (short)OS.kControlEntireControl, OS.kControlEditTextSelectionTag, 4, selection);
+		textView.setStringValue(NSString.stringWith(string));
+		NSRange selection = new NSRange();
+		selection.location = 0;
+		selection.length = string.length();
+		NSText fieldEditor = textView.currentEditor();
+		if (fieldEditor != null) fieldEditor.setSelectedRange(selection);
 		sendEvent (SWT.Modify);
 	}
 	if (notify) postEvent (SWT.Selection);
 }
 
-char [] setText (String string, int start, int end, boolean notify) {
-	if (notify) {
-		if (hooks (SWT.Verify) || filters (SWT.Verify)) {
-			string = verifyText (string, start, end, null);
-			if (string == null) return null;
-		}
-	}
-	int [] actualSize = new int [1];
-	int [] ptr = new int [1];
-	if (OS.GetControlData (textHandle, (short)OS.kControlEntireControl, OS.kControlEditTextCFStringTag, 4, ptr, actualSize) != OS.noErr) return null;
-	int charCount = OS.CFStringGetLength (ptr [0]);
-	int length = string.length ();
-	if (textLimit != LIMIT) {
-		if (charCount - (end - start) + length > textLimit) {
-			length = textLimit - charCount + (end - start);
-		}
-	}
-	char [] text = new char [charCount - (end - start) + length];
-	CFRange range = new CFRange ();
-	range.location = 0;
-	range.length = start;
-	char [] buffer = new char [range.length];
-	OS.CFStringGetCharacters (ptr [0], range, buffer);
-	System.arraycopy (buffer, 0, text, 0, range.length);
-	string.getChars (0, length, text, start);
-	range.location = end;
-	range.length = charCount - end;
-	buffer = new char [range.length];
-	OS.CFStringGetCharacters (ptr [0], range, buffer);
-	System.arraycopy (buffer, 0, text, start + length, range.length);
-	
-	/* Copying the return value to buffer */
-	range.location = start;
-	range.length = end - start;
-	buffer = new char [range.length];
-	OS.CFStringGetCharacters (ptr [0], range, buffer);	
-	OS.CFRelease (ptr [0]);
-	
-	ptr [0] = OS.CFStringCreateWithCharacters (OS.kCFAllocatorDefault, text, text.length);
-	if (ptr [0] == 0) error (SWT.ERROR_CANNOT_SET_TEXT);			
-	OS.SetControlData (textHandle, OS.kControlEntireControl, OS.kControlEditTextCFStringTag, 4, ptr);
-	OS.CFRelease (ptr [0]);
-	if (notify) sendEvent (SWT.Modify);
-	return buffer;
+void setSmallSize () {
+	textView.cell ().setControlSize (OS.NSSmallControlSize);
+	buttonView.cell ().setControlSize (OS.NSSmallControlSize);
 }
 
 /**
@@ -1241,42 +952,98 @@ public void setValues (int selection, int minimum, int maximum, int digits, int 
 	if (increment < 1) return;
 	if (pageIncrement < 1) return;
 	selection = Math.min (Math.max (minimum, selection), maximum);
-	this.increment = increment;
 	this.pageIncrement = pageIncrement;
 	this.digits = digits;
-	OS.SetControl32BitMaximum (buttonHandle, maximum);
-	OS.SetControl32BitMinimum (buttonHandle, minimum);
+	buttonView.setIncrement(increment);
+	buttonView.setMaxValue(maximum);
+	buttonView.setMinValue(minimum);
 	setSelection (selection, true, true, false);
 }
 
-void setZOrder () {
-	super.setZOrder ();
-	if (textHandle != 0) OS.HIViewAddSubview (handle, textHandle);
-	if (buttonHandle != 0) OS.HIViewAddSubview (handle, buttonHandle);
+boolean shouldChangeTextInRange_replacementString(int /*long*/ id, int /*long*/ sel, int /*long*/ affectedCharRange, int /*long*/ replacementString) {
+	NSRange range = new NSRange();
+	OS.memmove(range, affectedCharRange, NSRange.sizeof);
+	boolean result = callSuperBoolean(id, sel, range, replacementString);
+	if (hooks (SWT.Verify)) {
+		String text = new NSString(replacementString).getString();
+		NSEvent currentEvent = display.application.currentEvent();
+		int /*long*/ type = currentEvent.type();
+		if (type != OS.NSKeyDown && type != OS.NSKeyUp) currentEvent = null;
+		String newText = verifyText(text, (int)/*64*/range.location, (int)/*64*/(range.location+range.length), currentEvent);
+		if (newText == null) return false;
+		if (text != newText) {
+			int length = newText.length();
+			NSText fieldEditor = textView.currentEditor ();
+			if (fieldEditor != null) {
+				NSRange selectedRange = fieldEditor.selectedRange();
+				if (textLimit != LIMIT) {
+					int /*long*/ charCount = fieldEditor.string().length();
+					if (charCount - selectedRange.length + length > textLimit) {
+						length = (int)/*64*/(textLimit - charCount + selectedRange.length);
+					}
+				}
+				char [] buffer = new char [length];
+				newText.getChars (0, buffer.length, buffer, 0);
+				NSString nsstring = NSString.stringWithCharacters (buffer, buffer.length);
+				fieldEditor.replaceCharactersInRange (fieldEditor.selectedRange (), nsstring);
+				result = false;
+			}
+		}
+		if (!result) sendEvent (SWT.Modify);
+	}
+	return result;
 }
 
-String verifyText (String string, int start, int end, Event keyEvent) {
+void textDidChange (int /*long*/ id, int /*long*/ sel, int /*long*/ aNotification) {
+	super.textDidChange (id, sel, aNotification);
+	boolean [] parseFail = new boolean [1];
+	int value = getSelectionText (parseFail);
+	if (!parseFail [0]) {
+		int pos = (int)buttonView.doubleValue();
+		if (value != pos) {
+			setSelection (value, true, false, true);
+		}
+	}
+	postEvent (SWT.Modify);
+}
+
+NSRange textView_willChangeSelectionFromCharacterRange_toCharacterRange (int /*long*/ id, int /*long*/ sel, int /*long*/ aTextView, int /*long*/ oldSelectedCharRange, int /*long*/ newSelectedCharRange) {
+	/* allow the selection change to proceed */
+	NSRange result = new NSRange ();
+	OS.memmove(result, newSelectedCharRange, NSRange.sizeof);
+	return result;
+}
+
+void textDidEndEditing(int /*long*/ id, int /*long*/ sel, int /*long*/ aNotification) {
+	boolean [] parseFail = new boolean [1];
+	int value = getSelectionText (parseFail);
+	if (parseFail [0]) {
+		value = (int)buttonView.doubleValue();
+		setSelection (value, false, true, false);
+	}
+	super.textDidEndEditing(id, sel, aNotification);
+}
+
+void updateCursorRects (boolean enabled) {
+	super.updateCursorRects (enabled);
+	updateCursorRects (enabled, textView);
+	updateCursorRects (enabled, buttonView);
+}
+
+String verifyText (String string, int start, int end, NSEvent keyEvent) {
 	Event event = new Event ();
+	if (keyEvent != null) setKeyState(event, SWT.MouseDown, keyEvent);
 	event.text = string;
 	event.start = start;
 	event.end = end;
-	if (keyEvent != null) {
-		event.character = keyEvent.character;
-		event.keyCode = keyEvent.keyCode;
-		event.stateMask = keyEvent.stateMask;
-	}
 	int index = 0;
 	if (digits > 0) {
-		String decimalSeparator = getDecimalSeparator ();
+		String decimalSeparator = ".";//getDecimalSeparator ();
 		index = string.indexOf (decimalSeparator);
 		if (index != -1) {
 			string = string.substring (0, index) + string.substring (index + 1);
 		}
 		index = 0;
-	}
-	if (string.length() > 0) {
-		int minimum = OS.GetControl32BitMinimum (buttonHandle);
-		if (minimum < 0 && string.charAt (0) == '-') index++;
 	}
 	while (index < string.length ()) {
 		if (!Character.isDigit (string.charAt (index))) break;

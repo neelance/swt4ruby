@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2006 IBM Corporation and others.
+ * Copyright (c) 2000, 2008 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -12,8 +12,11 @@ package org.eclipse.swt.internal.win32;
 
 public class STARTUPINFO {
 	public int cb;
+	/** @field cast=(LPTSTR) */
 	public int /*long*/ lpReserved;
+	/** @field cast=(LPTSTR) */
 	public int /*long*/ lpDesktop;
+	/** @field cast=(LPTSTR) */
 	public int /*long*/ lpTitle;
 	public int dwX;
 	public int dwY;
@@ -25,9 +28,13 @@ public class STARTUPINFO {
 	public int dwFlags;
 	public short wShowWindow;
 	public short cbReserved2;
+	/** @field cast=(LPBYTE) */
 	public int /*long*/ lpReserved2;
+	/** @field cast=(HANDLE) */
 	public int /*long*/ hStdInput;
+	/** @field cast=(HANDLE) */
 	public int /*long*/ hStdOutput;
+	/** @field cast=(HANDLE) */
 	public int /*long*/ hStdError;
 	public static int sizeof = OS.STARTUPINFO_sizeof ();
 }

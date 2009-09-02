@@ -1,6 +1,6 @@
 require "rjava"
 
-# Copyright (c) 2007 IBM Corporation and others.
+# Copyright (c) 2007, 2008 IBM Corporation and others.
 # All rights reserved. This program and the accompanying materials
 # are made available under the terms of the Eclipse Public License v1.0
 # which accompanies this distribution, and is available at
@@ -31,60 +31,70 @@ module Org::Eclipse::Swt::Internal::Win32
     alias_method :attr_otm_filler=, :otm_filler=
     undef_method :otm_filler=
     
+    # @field accessor=otmPanoseNumber.bFamilyType
     attr_accessor :otm_panose_number_b_family_type
     alias_method :attr_otm_panose_number_b_family_type, :otm_panose_number_b_family_type
     undef_method :otm_panose_number_b_family_type
     alias_method :attr_otm_panose_number_b_family_type=, :otm_panose_number_b_family_type=
     undef_method :otm_panose_number_b_family_type=
     
+    # @field accessor=otmPanoseNumber.bSerifStyle
     attr_accessor :otm_panose_number_b_serif_style
     alias_method :attr_otm_panose_number_b_serif_style, :otm_panose_number_b_serif_style
     undef_method :otm_panose_number_b_serif_style
     alias_method :attr_otm_panose_number_b_serif_style=, :otm_panose_number_b_serif_style=
     undef_method :otm_panose_number_b_serif_style=
     
+    # @field accessor=otmPanoseNumber.bWeight
     attr_accessor :otm_panose_number_b_weight
     alias_method :attr_otm_panose_number_b_weight, :otm_panose_number_b_weight
     undef_method :otm_panose_number_b_weight
     alias_method :attr_otm_panose_number_b_weight=, :otm_panose_number_b_weight=
     undef_method :otm_panose_number_b_weight=
     
+    # @field accessor=otmPanoseNumber.bProportion
     attr_accessor :otm_panose_number_b_proportion
     alias_method :attr_otm_panose_number_b_proportion, :otm_panose_number_b_proportion
     undef_method :otm_panose_number_b_proportion
     alias_method :attr_otm_panose_number_b_proportion=, :otm_panose_number_b_proportion=
     undef_method :otm_panose_number_b_proportion=
     
+    # @field accessor=otmPanoseNumber.bContrast
     attr_accessor :otm_panose_number_b_contrast
     alias_method :attr_otm_panose_number_b_contrast, :otm_panose_number_b_contrast
     undef_method :otm_panose_number_b_contrast
     alias_method :attr_otm_panose_number_b_contrast=, :otm_panose_number_b_contrast=
     undef_method :otm_panose_number_b_contrast=
     
+    # @field accessor=otmPanoseNumber.bStrokeVariation
     attr_accessor :otm_panose_number_b_stroke_variation
     alias_method :attr_otm_panose_number_b_stroke_variation, :otm_panose_number_b_stroke_variation
     undef_method :otm_panose_number_b_stroke_variation
     alias_method :attr_otm_panose_number_b_stroke_variation=, :otm_panose_number_b_stroke_variation=
     undef_method :otm_panose_number_b_stroke_variation=
     
+    # @field accessor=otmPanoseNumber.bArmStyle
     attr_accessor :otm_panose_number_b_arm_style
     alias_method :attr_otm_panose_number_b_arm_style, :otm_panose_number_b_arm_style
     undef_method :otm_panose_number_b_arm_style
     alias_method :attr_otm_panose_number_b_arm_style=, :otm_panose_number_b_arm_style=
     undef_method :otm_panose_number_b_arm_style=
     
+    # @field accessor=otmPanoseNumber.bLetterform
     attr_accessor :otm_panose_number_b_letterform
     alias_method :attr_otm_panose_number_b_letterform, :otm_panose_number_b_letterform
     undef_method :otm_panose_number_b_letterform
     alias_method :attr_otm_panose_number_b_letterform=, :otm_panose_number_b_letterform=
     undef_method :otm_panose_number_b_letterform=
     
+    # @field accessor=otmPanoseNumber.bMidline
     attr_accessor :otm_panose_number_b_midline
     alias_method :attr_otm_panose_number_b_midline, :otm_panose_number_b_midline
     undef_method :otm_panose_number_b_midline
     alias_method :attr_otm_panose_number_b_midline=, :otm_panose_number_b_midline=
     undef_method :otm_panose_number_b_midline=
     
+    # @field accessor=otmPanoseNumber.bXHeight
     attr_accessor :otm_panose_number_b_xheight
     alias_method :attr_otm_panose_number_b_xheight, :otm_panose_number_b_xheight
     undef_method :otm_panose_number_b_xheight
@@ -235,6 +245,7 @@ module Org::Eclipse::Swt::Internal::Win32
     alias_method :attr_otms_underscore_position=, :otms_underscore_position=
     undef_method :otms_underscore_position=
     
+    # @field cast=(PSTR)
     # long
     attr_accessor :otmp_family_name
     alias_method :attr_otmp_family_name, :otmp_family_name
@@ -242,6 +253,7 @@ module Org::Eclipse::Swt::Internal::Win32
     alias_method :attr_otmp_family_name=, :otmp_family_name=
     undef_method :otmp_family_name=
     
+    # @field cast=(PSTR)
     # long
     attr_accessor :otmp_face_name
     alias_method :attr_otmp_face_name, :otmp_face_name
@@ -249,6 +261,7 @@ module Org::Eclipse::Swt::Internal::Win32
     alias_method :attr_otmp_face_name=, :otmp_face_name=
     undef_method :otmp_face_name=
     
+    # @field cast=(PSTR)
     # long
     attr_accessor :otmp_style_name
     alias_method :attr_otmp_style_name, :otmp_style_name
@@ -256,6 +269,7 @@ module Org::Eclipse::Swt::Internal::Win32
     alias_method :attr_otmp_style_name=, :otmp_style_name=
     undef_method :otmp_style_name=
     
+    # @field cast=(PSTR)
     # long
     attr_accessor :otmp_full_name
     alias_method :attr_otmp_full_name, :otmp_full_name

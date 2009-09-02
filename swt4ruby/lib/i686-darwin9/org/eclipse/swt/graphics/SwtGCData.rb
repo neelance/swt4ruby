@@ -1,6 +1,6 @@
 require "rjava"
 
-# Copyright (c) 2000, 2008 IBM Corporation and others.
+# Copyright (c) 2000, 2009 IBM Corporation and others.
 # All rights reserved. This program and the accompanying materials
 # are made available under the terms of the Eclipse Public License v1.0
 # which accompanies this distribution, and is available at
@@ -14,7 +14,7 @@ module Org::Eclipse::Swt::Graphics
       include ::Java::Lang
       include ::Org::Eclipse::Swt::Graphics
       include ::Org::Eclipse::Swt
-      include_const ::Org::Eclipse::Swt::Internal::Carbon, :Rect
+      include ::Org::Eclipse::Swt::Internal::Cocoa
     }
   end
   
@@ -27,6 +27,7 @@ module Org::Eclipse::Swt::Graphics
   # platforms, and should never be called from application code.
   # </p>
   # @see <a href="http://www.eclipse.org/swt/">Sample code and further information</a>
+  # @noinstantiate This class is not intended to be instantiated by clients.
   class SwtGCData 
     include_class_members GCDataImports
     
@@ -48,12 +49,14 @@ module Org::Eclipse::Swt::Graphics
     alias_method :attr_state=, :state=
     undef_method :state=
     
+    # double
     attr_accessor :foreground
     alias_method :attr_foreground, :foreground
     undef_method :foreground
     alias_method :attr_foreground=, :foreground=
     undef_method :foreground=
     
+    # double
     attr_accessor :background
     alias_method :attr_background, :background
     undef_method :background
@@ -83,30 +86,6 @@ module Org::Eclipse::Swt::Graphics
     undef_method :alpha
     alias_method :attr_alpha=, :alpha=
     undef_method :alpha=
-    
-    attr_accessor :transform
-    alias_method :attr_transform, :transform
-    undef_method :transform
-    alias_method :attr_transform=, :transform=
-    undef_method :transform=
-    
-    attr_accessor :inverse_transform
-    alias_method :attr_inverse_transform, :inverse_transform
-    undef_method :inverse_transform
-    alias_method :attr_inverse_transform=, :inverse_transform=
-    undef_method :inverse_transform=
-    
-    attr_accessor :clipping_transform
-    alias_method :attr_clipping_transform, :clipping_transform
-    undef_method :clipping_transform
-    alias_method :attr_clipping_transform=, :clipping_transform=
-    undef_method :clipping_transform=
-    
-    attr_accessor :clip_rgn
-    alias_method :attr_clip_rgn, :clip_rgn
-    undef_method :clip_rgn
-    alias_method :attr_clip_rgn=, :clip_rgn=
-    undef_method :clip_rgn=
     
     attr_accessor :line_width
     alias_method :attr_line_width, :line_width
@@ -174,6 +153,25 @@ module Org::Eclipse::Swt::Graphics
     alias_method :attr_fill_rule=, :fill_rule=
     undef_method :fill_rule=
     
+    attr_accessor :image
+    alias_method :attr_image, :image
+    undef_method :image
+    alias_method :attr_image=, :image=
+    undef_method :image=
+    
+    attr_accessor :fg
+    alias_method :attr_fg, :fg
+    undef_method :fg
+    alias_method :attr_fg=, :fg=
+    undef_method :fg=
+    
+    attr_accessor :bg
+    alias_method :attr_bg, :bg
+    undef_method :bg
+    alias_method :attr_bg=, :bg=
+    undef_method :bg=
+    
+    # double
     attr_accessor :draw_xoffset
     alias_method :attr_draw_xoffset, :draw_xoffset
     undef_method :draw_xoffset
@@ -186,89 +184,60 @@ module Org::Eclipse::Swt::Graphics
     alias_method :attr_draw_yoffset=, :draw_yoffset=
     undef_method :draw_yoffset=
     
-    attr_accessor :fore_pattern
-    alias_method :attr_fore_pattern, :fore_pattern
-    undef_method :fore_pattern
-    alias_method :attr_fore_pattern=, :fore_pattern=
-    undef_method :fore_pattern=
+    attr_accessor :paint_rect
+    alias_method :attr_paint_rect, :paint_rect
+    undef_method :paint_rect
+    alias_method :attr_paint_rect=, :paint_rect=
+    undef_method :paint_rect=
     
-    attr_accessor :back_pattern
-    alias_method :attr_back_pattern, :back_pattern
-    undef_method :back_pattern
-    alias_method :attr_back_pattern=, :back_pattern=
-    undef_method :back_pattern=
+    attr_accessor :path
+    alias_method :attr_path, :path
+    undef_method :path
+    alias_method :attr_path=, :path=
+    undef_method :path=
     
-    attr_accessor :image
-    alias_method :attr_image, :image
-    undef_method :image
-    alias_method :attr_image=, :image=
-    undef_method :image=
+    attr_accessor :transform
+    alias_method :attr_transform, :transform
+    undef_method :transform
+    alias_method :attr_transform=, :transform=
+    undef_method :transform=
     
-    attr_accessor :font_ascent
-    alias_method :attr_font_ascent, :font_ascent
-    undef_method :font_ascent
-    alias_method :attr_font_ascent=, :font_ascent=
-    undef_method :font_ascent=
+    attr_accessor :inverse_transform
+    alias_method :attr_inverse_transform, :inverse_transform
+    undef_method :inverse_transform
+    alias_method :attr_inverse_transform=, :inverse_transform=
+    undef_method :inverse_transform=
     
-    attr_accessor :font_descent
-    alias_method :attr_font_descent, :font_descent
-    undef_method :font_descent
-    alias_method :attr_font_descent=, :font_descent=
-    undef_method :font_descent=
+    attr_accessor :clip_path
+    alias_method :attr_clip_path, :clip_path
+    undef_method :clip_path
+    alias_method :attr_clip_path=, :clip_path=
+    undef_method :clip_path=
     
-    attr_accessor :layout
-    alias_method :attr_layout, :layout
-    undef_method :layout
-    alias_method :attr_layout=, :layout=
-    undef_method :layout=
+    attr_accessor :visible_path
+    alias_method :attr_visible_path, :visible_path
+    undef_method :visible_path
+    alias_method :attr_visible_path=, :visible_path=
+    undef_method :visible_path=
     
-    attr_accessor :atsui_style
-    alias_method :attr_atsui_style, :atsui_style
-    undef_method :atsui_style
-    alias_method :attr_atsui_style=, :atsui_style=
-    undef_method :atsui_style=
+    # long
+    attr_accessor :visible_rgn
+    alias_method :attr_visible_rgn, :visible_rgn
+    undef_method :visible_rgn
+    alias_method :attr_visible_rgn=, :visible_rgn=
+    undef_method :visible_rgn=
     
-    attr_accessor :tabs
-    alias_method :attr_tabs, :tabs
-    undef_method :tabs
-    alias_method :attr_tabs=, :tabs=
-    undef_method :tabs=
+    attr_accessor :view
+    alias_method :attr_view, :view
+    undef_method :view
+    alias_method :attr_view=, :view=
+    undef_method :view=
     
-    attr_accessor :string
-    alias_method :attr_string, :string
-    undef_method :string
-    alias_method :attr_string=, :string=
-    undef_method :string=
-    
-    attr_accessor :string_length
-    alias_method :attr_string_length, :string_length
-    undef_method :string_length
-    alias_method :attr_string_length=, :string_length=
-    undef_method :string_length=
-    
-    attr_accessor :string_width
-    alias_method :attr_string_width, :string_width
-    undef_method :string_width
-    alias_method :attr_string_width=, :string_width=
-    undef_method :string_width=
-    
-    attr_accessor :string_height
-    alias_method :attr_string_height, :string_height
-    undef_method :string_height
-    alias_method :attr_string_height=, :string_height=
-    undef_method :string_height=
-    
-    attr_accessor :draw_flags
-    alias_method :attr_draw_flags, :draw_flags
-    undef_method :draw_flags
-    alias_method :attr_draw_flags=, :draw_flags=
-    undef_method :draw_flags=
-    
-    attr_accessor :string_ptr
-    alias_method :attr_string_ptr, :string_ptr
-    undef_method :string_ptr
-    alias_method :attr_string_ptr=, :string_ptr=
-    undef_method :string_ptr=
+    attr_accessor :size
+    alias_method :attr_size, :size
+    undef_method :size
+    alias_method :attr_size=, :size=
+    undef_method :size=
     
     attr_accessor :thread
     alias_method :attr_thread, :thread
@@ -276,59 +245,17 @@ module Org::Eclipse::Swt::Graphics
     alias_method :attr_thread=, :thread=
     undef_method :thread=
     
-    attr_accessor :window
-    alias_method :attr_window, :window
-    undef_method :window
-    alias_method :attr_window=, :window=
-    undef_method :window=
+    attr_accessor :flipped_context
+    alias_method :attr_flipped_context, :flipped_context
+    undef_method :flipped_context
+    alias_method :attr_flipped_context=, :flipped_context=
+    undef_method :flipped_context=
     
-    attr_accessor :paint_event
-    alias_method :attr_paint_event, :paint_event
-    undef_method :paint_event
-    alias_method :attr_paint_event=, :paint_event=
-    undef_method :paint_event=
-    
-    attr_accessor :visible_rgn
-    alias_method :attr_visible_rgn, :visible_rgn
-    undef_method :visible_rgn
-    alias_method :attr_visible_rgn=, :visible_rgn=
-    undef_method :visible_rgn=
-    
-    attr_accessor :control
-    alias_method :attr_control, :control
-    undef_method :control
-    alias_method :attr_control=, :control=
-    undef_method :control=
-    
-    attr_accessor :port
-    alias_method :attr_port, :port
-    undef_method :port
-    alias_method :attr_port=, :port=
-    undef_method :port=
-    
-    attr_accessor :port_rect
-    alias_method :attr_port_rect, :port_rect
-    undef_method :port_rect
-    alias_method :attr_port_rect=, :port_rect=
-    undef_method :port_rect=
-    
-    attr_accessor :control_rect
-    alias_method :attr_control_rect, :control_rect
-    undef_method :control_rect
-    alias_method :attr_control_rect=, :control_rect=
-    undef_method :control_rect=
-    
-    attr_accessor :inset_rect
-    alias_method :attr_inset_rect, :inset_rect
-    undef_method :inset_rect
-    alias_method :attr_inset_rect=, :inset_rect=
-    undef_method :inset_rect=
-    
-    attr_accessor :update_clip
-    alias_method :attr_update_clip, :update_clip
-    undef_method :update_clip
-    alias_method :attr_update_clip=, :update_clip=
-    undef_method :update_clip=
+    attr_accessor :restore_context
+    alias_method :attr_restore_context, :restore_context
+    undef_method :restore_context
+    alias_method :attr_restore_context=, :restore_context=
+    undef_method :restore_context=
     
     typesig { [] }
     def initialize
@@ -341,10 +268,6 @@ module Org::Eclipse::Swt::Graphics
       @background_pattern = nil
       @font = nil
       @alpha = 0xff
-      @transform = nil
-      @inverse_transform = nil
-      @clipping_transform = nil
-      @clip_rgn = 0
       @line_width = 0.0
       @line_style = SWT::LINE_SOLID
       @line_cap = SWT::CAP_FLAT
@@ -356,32 +279,23 @@ module Org::Eclipse::Swt::Graphics
       @antialias = SWT::DEFAULT
       @text_antialias = SWT::DEFAULT
       @fill_rule = SWT::FILL_EVEN_ODD
+      @image = nil
+      @fg = nil
+      @bg = nil
       @draw_xoffset = 0.0
       @draw_yoffset = 0.0
-      @fore_pattern = 0
-      @back_pattern = 0
-      @image = nil
-      @font_ascent = 0
-      @font_descent = 0
-      @layout = 0
-      @atsui_style = 0
-      @tabs = 0
-      @string = nil
-      @string_length = 0
-      @string_width = -1
-      @string_height = -1
-      @draw_flags = 0
-      @string_ptr = 0
-      @thread = nil
-      @window = 0
-      @paint_event = 0
+      @paint_rect = nil
+      @path = nil
+      @transform = nil
+      @inverse_transform = nil
+      @clip_path = nil
+      @visible_path = nil
       @visible_rgn = 0
-      @control = 0
-      @port = 0
-      @port_rect = nil
-      @control_rect = nil
-      @inset_rect = nil
-      @update_clip = false
+      @view = nil
+      @size = nil
+      @thread = nil
+      @flipped_context = nil
+      @restore_context = false
     end
     
     private

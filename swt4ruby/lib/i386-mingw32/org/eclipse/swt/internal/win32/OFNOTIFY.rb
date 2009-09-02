@@ -1,6 +1,6 @@
 require "rjava"
 
-# Copyright (c) 2000, 2006 IBM Corporation and others.
+# Copyright (c) 2000, 2008 IBM Corporation and others.
 # All rights reserved. This program and the accompanying materials
 # are made available under the terms of the Eclipse Public License v1.0
 # which accompanies this distribution, and is available at
@@ -19,6 +19,7 @@ module Org::Eclipse::Swt::Internal::Win32
   class OFNOTIFY < OFNOTIFYImports.const_get :NMHDR
     include_class_members OFNOTIFYImports
     
+    # @field cast=(LPOPENFILENAME)
     # long
     attr_accessor :lp_ofn
     alias_method :attr_lp_ofn, :lp_ofn
@@ -26,6 +27,7 @@ module Org::Eclipse::Swt::Internal::Win32
     alias_method :attr_lp_ofn=, :lp_ofn=
     undef_method :lp_ofn=
     
+    # @field cast=(LPTSTR)
     # long
     attr_accessor :psz_file
     alias_method :attr_psz_file, :psz_file

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2008 IBM Corporation and others.
+ * Copyright (c) 2000, 2009 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -30,6 +30,7 @@ import org.eclipse.swt.graphics.*;
  * </p>
  * 
  * @see <a href="http://www.eclipse.org/swt/">Sample code and further information</a>
+ * @noextend This class is not intended to be subclassed by clients.
  */
 public class CoolItem extends Item {
 	Control control;
@@ -435,7 +436,11 @@ void setBounds (int x, int y, int width, int height) {
 		if ((style & SWT.DROP_DOWN) != 0 && width < preferredWidth) {
 			controlWidth -= CHEVRON_IMAGE_WIDTH + CHEVRON_HORIZONTAL_TRIM + CHEVRON_LEFT_MARGIN;
 		}
-		control.setBounds (parent.fixRectangle(x + MINIMUM_WIDTH,	y, controlWidth, height));
+		if (height > preferredHeight) {
+			y += (height - preferredHeight) / 2;
+			height = preferredHeight;
+		}
+		control.setBounds (parent.fixRectangle(x + MINIMUM_WIDTH, y, controlWidth, height));
 	}
 	updateChevron();
 }

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2006 IBM Corporation and others. All rights reserved.
+ * Copyright (c) 2000, 2008 IBM Corporation and others. All rights reserved.
  * The contents of this file are made available under the terms
  * of the GNU Lesser General Public License (LGPL) Version 2.1 that
  * accompanies this distribution (lgpl-v21.txt).  The LGPL is also
@@ -16,8 +16,11 @@ package org.eclipse.swt.internal.gtk;
 
 
 public class GdkEventVisibility extends GdkEvent {
+	/** @field cast=(GdkWindow *) */
 	public int /*long*/ window;
+	/** @field cast=(gint8) */
 	public byte send_event; 
+	/** @field cast=(GdkVisibilityState) */
 	public int state;
 	public static final int sizeof = OS.GdkEventVisibility_sizeof();
 }

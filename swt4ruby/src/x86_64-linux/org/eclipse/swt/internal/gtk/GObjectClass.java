@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2006 IBM Corporation and others. All rights reserved.
+ * Copyright (c) 2000, 2008 IBM Corporation and others. All rights reserved.
  * The contents of this file are made available under the terms
  * of the GNU Lesser General Public License (LGPL) Version 2.1 that
  * accompanies this distribution (lgpl-v21.txt).  The LGPL is also
@@ -16,11 +16,18 @@ package org.eclipse.swt.internal.gtk;
 
 
 public class GObjectClass {
+	/** @field cast=(GObject *(*)()) */
 	public long /*int*/ constructor;
+	/** @field cast=(void (*)()) */
 	public long /*int*/ set_property;
+	/** @field cast=(void (*)()) */
 	public long /*int*/ get_property;
+	/** @field cast=(void (*)()) */
 	public long /*int*/ dispose;
+	/** @field cast=(void (*)()) */
 	public long /*int*/ finalize;
+	/** @field cast=(void (*)()) */
 	public long /*int*/ dispatch_properties_changed;
+	/** @field cast=(void (*)()) */
 	public long /*int*/ notify;
 }

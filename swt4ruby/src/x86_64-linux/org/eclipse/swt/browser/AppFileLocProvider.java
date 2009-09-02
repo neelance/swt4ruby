@@ -20,7 +20,7 @@ class AppFileLocProvider {
 	XPCOMObject directoryServiceProvider;
 	XPCOMObject directoryServiceProvider2;	
 	int refCount = 0;
-	String mozillaPath, profilePath;
+	String mozillaPath, profilePath, componentsPath;
 	String[] pluginDirs;
 	boolean isXULRunner;
 	
@@ -116,6 +116,10 @@ int Release () {
 	refCount--;
 	if (refCount == 0) disposeCOMInterfaces ();
 	return refCount;
+}
+
+void setComponentsPath (String path) {
+	componentsPath = path;
 }
 
 void setProfilePath (String path) {
@@ -264,7 +268,7 @@ int getFile(long /*int*/ prop, long /*int*/ persistent, long /*int*/ _retval) {
 	} else if (propertyName.equals (XPCOM.NS_GRE_DIR)) {
 		propertyValue = mozillaPath;
 	} else if (propertyName.equals (XPCOM.NS_GRE_COMPONENT_DIR)) {
-		propertyValue = mozillaPath + COMPONENTS_DIR;
+		propertyValue = componentsPath != null ? componentsPath : mozillaPath + COMPONENTS_DIR;
 	} else if (propertyName.equals (XPCOM.NS_XPCOM_INIT_CURRENT_PROCESS_DIR)) {
 		propertyValue = mozillaPath;
 	} else if (propertyName.equals (XPCOM.NS_OS_CURRENT_PROCESS_DIR)) {

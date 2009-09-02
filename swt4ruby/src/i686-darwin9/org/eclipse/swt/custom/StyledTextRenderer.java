@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2008 IBM Corporation and others.
+ * Copyright (c) 2000, 2009 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -52,6 +52,7 @@ class StyledTextRenderer {
 	StyleRange[] styles;
 	StyleRange[] stylesSet;
 	int stylesSetCount = 0;
+	boolean hasLinks, fixedPitch;
 	final static int BULLET_MARGIN = 8;
 	
 	final static boolean COMPACT_STYLES = true;
@@ -358,6 +359,9 @@ int drawLine(int lineIndex, int paintX, int paintY, GC gc, Color widgetBackgroun
 	Point selection = styledText.getSelection();
 	int selectionStart = selection.x - lineOffset;
 	int selectionEnd = selection.y - lineOffset;
+	if (styledText.getBlockSelection()) {
+		selectionStart = selectionEnd = 0;
+	}
 	Rectangle client = styledText.getClientArea();  
 	Color lineBackground = getLineBackground(lineIndex, null);
 	StyledTextEvent event = styledText.getLineBackgroundData(lineOffset, line);
@@ -465,7 +469,7 @@ FontData[] getFontData(int style) {
 int getHeight () {
 	int defaultLineHeight = getLineHeight();
 	if (styledText.isFixedLineHeight()) {
-		return lineCount * defaultLineHeight;
+		return lineCount * defaultLineHeight + styledText.topMargin + styledText.bottomMargin;
 	}
 	int totalHeight = 0;
 	int width = styledText.getWrapWidth();
@@ -482,6 +486,45 @@ int getHeight () {
 		totalHeight += height;
 	}
 	return totalHeight + styledText.topMargin + styledText.bottomMargin;
+}
+boolean hasLink(int offset) {
+	if (offset == -1) return false;
+	int lineIndex = content.getLineAtOffset(offset);
+	int lineOffset = content.getOffsetAtLine(lineIndex);
+	String line = content.getLine(lineIndex);
+	StyledTextEvent event = styledText.getLineStyleData(lineOffset, line);
+	if (event != null) {
+		StyleRange[] styles = event.styles;
+		if (styles != null) {
+			int[] ranges = event.ranges; 
+			if (ranges != null) {
+				for (int i = 0; i < ranges.length; i+=2) {
+					if (ranges[i] <= offset && offset < ranges[i] + ranges[i+1] && styles[i >> 1].underline && styles[i >> 1].underlineStyle == SWT.UNDERLINE_LINK) {
+						return true;
+					}
+				}
+			} else {
+				for (int i = 0; i < styles.length; i++) {
+					if (styles[i].start <= offset && offset < styles[i].start + styles[i].length && styles[i >> 1].underline && styles[i >> 1].underlineStyle == SWT.UNDERLINE_LINK) {
+						return true;
+					}
+				}
+			}
+		}
+	}  else {
+		if (ranges != null) {
+			int rangeCount = styleCount << 1;
+			int index = getRangeIndex(offset, -1, rangeCount);
+			if (index >= rangeCount) return false;
+			int rangeStart = ranges[index]; 
+			int rangeLength = ranges[index + 1];
+			StyleRange rangeStyle = styles[index >> 1];
+			if (rangeStart <= offset && offset < rangeStart + rangeLength && rangeStyle.underline && rangeStyle.underlineStyle == SWT.UNDERLINE_LINK) {
+				return true;
+			}
+		}
+	}
+	return false;
 }
 int getLineAlignment(int index, int defaultAlignment) {
 	if (lines == null) return defaultAlignment;
@@ -567,6 +610,7 @@ int getRangeIndex(int offset, int low, int high) {
 	return high;
 }
 int[] getRanges(int start, int length) {
+	if (length == 0) return null;
 	int[] newRanges;
 	int end = start + length - 1;
 	if (ranges != null) {
@@ -574,7 +618,8 @@ int[] getRanges(int start, int length) {
 		int rangeStart = getRangeIndex(start, -1, rangeCount);
 		if (rangeStart >= rangeCount) return null;
 		if (ranges[rangeStart] > end) return null;
-		int rangeEnd = Math.min(rangeCount - 2, getRangeIndex(end, rangeStart - 1, rangeCount) + 1);
+		int rangeEnd = Math.min(rangeCount - 2, getRangeIndex(end, rangeStart - 1, rangeCount));
+		if (ranges[rangeEnd] > end) rangeEnd = Math.max(rangeStart, rangeEnd - 2);
 		newRanges = new int[rangeEnd - rangeStart + 2];
 		System.arraycopy(ranges, rangeStart, newRanges, 0, newRanges.length);
 	} else {
@@ -582,12 +627,13 @@ int[] getRanges(int start, int length) {
 		if (rangeStart >= styleCount) return null;
 		if (styles[rangeStart].start > end) return null;
 		int rangeEnd = Math.min(styleCount - 1, getRangeIndex(end, rangeStart - 1, styleCount));
+		if (styles[rangeEnd].start > end) rangeEnd = Math.max(rangeStart, rangeEnd - 1);
 		newRanges = new int[(rangeEnd - rangeStart + 1) << 1];
 		for (int i = rangeStart, j = 0; i <= rangeEnd; i++, j += 2) {
 			StyleRange style = styles[i];
 			newRanges[j] = style.start;
 			newRanges[j + 1] = style.length;
-		}		
+		}
 	}
 	if (start > newRanges[0]) {
 		newRanges[1] = newRanges[0] + newRanges[1] - start;
@@ -599,6 +645,7 @@ int[] getRanges(int start, int length) {
 	return newRanges;
 }
 StyleRange[] getStyleRanges(int start, int length, boolean includeRanges) {
+	if (length == 0) return null;
 	StyleRange[] newStyles;
 	int end = start + length - 1;
 	if (ranges != null) {
@@ -606,7 +653,8 @@ StyleRange[] getStyleRanges(int start, int length, boolean includeRanges) {
 		int rangeStart = getRangeIndex(start, -1, rangeCount);
 		if (rangeStart >= rangeCount) return null;
 		if (ranges[rangeStart] > end) return null;
-		int rangeEnd = Math.min(rangeCount - 2, getRangeIndex(end, rangeStart - 1, rangeCount) + 1);
+		int rangeEnd = Math.min(rangeCount - 2, getRangeIndex(end, rangeStart - 1, rangeCount));
+		if (ranges[rangeEnd] > end) rangeEnd = Math.max(rangeStart, rangeEnd - 2);
 		newStyles = new StyleRange[((rangeEnd - rangeStart) >> 1) + 1];
 		if (includeRanges) {
 			for (int i = rangeStart, j = 0; i <= rangeEnd; i += 2, j++) {
@@ -622,29 +670,27 @@ StyleRange[] getStyleRanges(int start, int length, boolean includeRanges) {
 		if (rangeStart >= styleCount) return null;
 		if (styles[rangeStart].start > end) return null;
 		int rangeEnd = Math.min(styleCount - 1, getRangeIndex(end, rangeStart - 1, styleCount));
+		if (styles[rangeEnd].start > end) rangeEnd = Math.max(rangeStart, rangeEnd - 1);
 		newStyles = new StyleRange[rangeEnd - rangeStart + 1];
 		System.arraycopy(styles, rangeStart, newStyles, 0, newStyles.length);
 	}
-	StyleRange style = newStyles[0];
-	if (start > style.start) {
-		if (!includeRanges || ranges == null) newStyles[0] = style = (StyleRange)style.clone();
-		style.length = style.start + style.length - start;
-		style.start = start;
-	}
-	style = newStyles[newStyles.length - 1];
-	if (end < style.start + style.length - 1) {
-		if (end < style.start) {
-			StyleRange[] tmp = new StyleRange[newStyles.length - 1];
-			System.arraycopy(newStyles, 0, tmp, 0, newStyles.length - 1);
-			newStyles = tmp;
-		} else {
-			if (!includeRanges || ranges == null) newStyles[newStyles.length - 1] = style = (StyleRange)style.clone();
+	if (includeRanges || ranges == null) {
+		StyleRange style = newStyles[0];
+		if (start > style.start) {
+			newStyles[0] = style = (StyleRange)style.clone();
+			style.length = style.start + style.length - start;
+			style.start = start;
+		}
+		style = newStyles[newStyles.length - 1];
+		if (end < style.start + style.length - 1) {
+			newStyles[newStyles.length - 1] = style = (StyleRange)style.clone();
 			style.length = end - style.start + 1;
 		}
 	}
 	return newStyles;
 }
 StyleRange getStyleRange(StyleRange style) {
+	if (style.underline && style.underlineStyle == SWT.UNDERLINE_LINK) hasLinks = true;
 	if (style.start == 0 && style.length == 0 && style.fontStyle == SWT.NORMAL) return style;
 	StyleRange clone = (StyleRange)style.clone();
 	clone.start = clone.length = 0;
@@ -960,6 +1006,7 @@ void reset() {
 	bullets = null;
 	bulletsIndices = null;
 	redrawLines = null;
+	hasLinks = false;
 }
 void reset(int startLine, int lineCount) {
 	int endLine = startLine + lineCount;
@@ -1025,6 +1072,7 @@ void setFont(Font font, int tabs) {
 	if (styledText != null) {
 		GC gc = new GC(styledText);
 		averageCharWidth = gc.getFontMetrics().getAverageCharWidth();
+		fixedPitch = gc.stringExtent("l").x == gc.stringExtent("W").x; //$NON-NLS-1$ //$NON-NLS-2$
 		gc.dispose();
 	}
 }
@@ -1113,6 +1161,7 @@ void setStyleRanges (int[] newRanges, StyleRange[] newStyles) {
 		ranges = null;
 		styles = null;
 		stylesSet = null;
+		hasLinks = false;
 		return;
 	}
 	if (newRanges == null && COMPACT_STYLES) {

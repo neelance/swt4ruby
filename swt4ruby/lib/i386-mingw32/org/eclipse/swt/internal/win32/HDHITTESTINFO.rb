@@ -1,6 +1,6 @@
 require "rjava"
 
-# Copyright (c) 2000, 2006 IBM Corporation and others.
+# Copyright (c) 2000, 2008 IBM Corporation and others.
 # All rights reserved. This program and the accompanying materials
 # are made available under the terms of the Eclipse Public License v1.0
 # which accompanies this distribution, and is available at
@@ -20,12 +20,14 @@ module Org::Eclipse::Swt::Internal::Win32
     include_class_members HDHITTESTINFOImports
     
     # POINT pt;
+    # @field accessor=pt.x
     attr_accessor :x
     alias_method :attr_x, :x
     undef_method :x
     alias_method :attr_x=, :x=
     undef_method :x=
     
+    # @field accessor=pt.y
     attr_accessor :y
     alias_method :attr_y, :y
     undef_method :y

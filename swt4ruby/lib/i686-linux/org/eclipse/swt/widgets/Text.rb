@@ -1,6 +1,6 @@
 require "rjava"
 
-# Copyright (c) 2000, 2008 IBM Corporation and others.
+# Copyright (c) 2000, 2009 IBM Corporation and others.
 # All rights reserved. This program and the accompanying materials
 # are made available under the terms of the Eclipse Public License v1.0
 # which accompanies this distribution, and is available at
@@ -33,20 +33,30 @@ module Org::Eclipse::Swt::Widgets
   # <p>
   # <dl>
   # <dt><b>Styles:</b></dt>
-  # <dd>CANCEL, CENTER, LEFT, MULTI, PASSWORD, SEARCH, SINGLE, RIGHT, READ_ONLY, WRAP</dd>
+  # <dd>CENTER, ICON_CANCEL, ICON_SEARCH, LEFT, MULTI, PASSWORD, SEARCH, SINGLE, RIGHT, READ_ONLY, WRAP</dd>
   # <dt><b>Events:</b></dt>
   # <dd>DefaultSelection, Modify, Verify</dd>
   # </dl>
   # <p>
   # Note: Only one of the styles MULTI and SINGLE may be specified,
   # and only one of the styles LEFT, CENTER, and RIGHT may be specified.
-  # </p><p>
+  # </p>
+  # <p>
+  # Note: The styles ICON_CANCEL and ICON_SEARCH are hints used in combination with SEARCH.
+  # When the platform supports the hint, the text control shows these icons.  When an icon
+  # is selected, a default selection event is sent with the detail field set to one of
+  # ICON_CANCEL or ICON_SEARCH.  Normally, application code does not need to check the
+  # detail.  In the case of ICON_CANCEL, the text is cleared before the default selection
+  # event is sent causing the application to search for an empty string.
+  # </p>
+  # <p>
   # IMPORTANT: This class is <em>not</em> intended to be subclassed.
   # </p>
   # 
   # @see <a href="http://www.eclipse.org/swt/snippets/#text">Text snippets</a>
   # @see <a href="http://www.eclipse.org/swt/examples.php">SWT Example: ControlExample</a>
   # @see <a href="http://www.eclipse.org/swt/">Sample code and further information</a>
+  # @noextend This class is not intended to be subclassed by clients.
   class Text < TextImports.const_get :Scrollable
     include_class_members TextImports
     
@@ -101,11 +111,11 @@ module Org::Eclipse::Swt::Widgets
     undef_method :message=
     
     class_module.module_eval {
-      const_set_lazy(:INNER_BORDER) { 2 }
-      const_attr_reader  :INNER_BORDER
-      
       const_set_lazy(:ITER_SIZEOF) { OS._gtk_text_iter_sizeof }
       const_attr_reader  :ITER_SIZEOF
+      
+      const_set_lazy(:SPACE_FOR_CURSOR) { 1 }
+      const_attr_reader  :SPACE_FOR_CURSOR
       
       # These values can be different on different platforms.
       # Therefore they are not initialized in the declaration
@@ -144,6 +154,13 @@ module Org::Eclipse::Swt::Widgets
     # @see SWT#MULTI
     # @see SWT#READ_ONLY
     # @see SWT#WRAP
+    # @see SWT#LEFT
+    # @see SWT#RIGHT
+    # @see SWT#CENTER
+    # @see SWT#PASSWORD
+    # @see SWT#SEARCH
+    # @see SWT#ICON_SEARCH
+    # @see SWT#ICON_CANCEL
     # @see Widget#checkSubclass
     # @see Widget#getStyle
     def initialize(parent, style)
@@ -170,8 +187,10 @@ module Org::Eclipse::Swt::Widgets
         if (!((style & SWT::SEARCH)).equal?(0))
           style |= SWT::SINGLE | SWT::BORDER
           style &= ~SWT::PASSWORD
+          # NOTE: ICON_CANCEL has the same value as H_SCROLL and
+          # ICON_SEARCH has the same value as V_SCROLL so they are
+          # cleared because SWT.SINGLE is set.
         end
-        style &= ~SWT::SEARCH
         if (!((style & SWT::SINGLE)).equal?(0) && !((style & SWT::MULTI)).equal?(0))
           style &= ~SWT::MULTI
         end
@@ -199,6 +218,11 @@ module Org::Eclipse::Swt::Widgets
     typesig { [::Java::Int] }
     def create_handle(index)
       self.attr_state |= HANDLE | MENU
+      if (!((self.attr_style & SWT::READ_ONLY)).equal?(0))
+        if (((self.attr_style & (SWT::BORDER | SWT::H_SCROLL | SWT::V_SCROLL))).equal?(0))
+          self.attr_state |= THEME_BACKGROUND
+        end
+      end
       self.attr_fixed_handle = OS.g_object_new(self.attr_display.gtk_fixed_get_type, 0)
       if ((self.attr_fixed_handle).equal?(0))
         error(SWT::ERROR_NO_HANDLES)
@@ -240,7 +264,7 @@ module Org::Eclipse::Swt::Widgets
         OS.gtk_container_add(self.attr_scrolled_handle, self.attr_handle)
         OS.gtk_text_view_set_editable(self.attr_handle, ((self.attr_style & SWT::READ_ONLY)).equal?(0))
         if (!((self.attr_style & SWT::WRAP)).equal?(0))
-          OS.gtk_text_view_set_wrap_mode(self.attr_handle, OS::GTK_WRAP_WORD_CHAR)
+          OS.gtk_text_view_set_wrap_mode(self.attr_handle, OS::GTK_VERSION < OS._version(2, 4, 0) ? OS::GTK_WRAP_WORD : OS::GTK_WRAP_WORD_CHAR)
         end
         hsp = !((self.attr_style & SWT::H_SCROLL)).equal?(0) ? OS::GTK_POLICY_ALWAYS : OS::GTK_POLICY_NEVER
         vsp = !((self.attr_style & SWT::V_SCROLL)).equal?(0) ? OS::GTK_POLICY_ALWAYS : OS::GTK_POLICY_NEVER
@@ -445,13 +469,14 @@ module Org::Eclipse::Swt::Widgets
       end
       width = OS._pango_pixels(w[0])
       height = OS._pango_pixels(h[0])
-      # This code is intentionally commented
-      # if ((style & SWT.SEARCH) != 0 && message.length () != 0) {
-      # GC gc = new GC (this);
-      # Point size = gc.stringExtent (message);
-      # width = Math.max (width, size.x);
-      # gc.dispose ();
-      # }
+      if (!((self.attr_style & SWT::SINGLE)).equal?(0) && @message.length > 0)
+        buffer = Converter.wcs_to_mbcs(nil, @message, true)
+        # long
+        layout = OS.gtk_widget_create_pango_layout(self.attr_handle, buffer)
+        OS.pango_layout_get_size(layout, w, h)
+        OS.g_object_unref(layout)
+        width = Math.max(width, OS._pango_pixels(w[0]))
+      end
       if ((width).equal?(0))
         width = DEFAULT_WIDTH
       end
@@ -477,8 +502,11 @@ module Org::Eclipse::Swt::Widgets
           xborder += OS.gtk_style_get_xthickness(style)
           yborder += OS.gtk_style_get_ythickness(style)
         end
-        xborder += INNER_BORDER
-        yborder += INNER_BORDER
+        inner_border = Display.get_entry_inner_border(self.attr_handle)
+        trim.attr_x -= inner_border.attr_left
+        trim.attr_y -= inner_border.attr_top
+        trim.attr_width += inner_border.attr_left + inner_border.attr_right
+        trim.attr_height += inner_border.attr_top + inner_border.attr_bottom
       else
         border_width = OS.gtk_container_get_border_width(self.attr_handle)
         xborder += border_width
@@ -495,6 +523,7 @@ module Org::Eclipse::Swt::Widgets
       trim.attr_y -= yborder
       trim.attr_width += 2 * xborder
       trim.attr_height += 2 * yborder
+      trim.attr_width += SPACE_FOR_CURSOR
       return Rectangle.new(trim.attr_x, trim.attr_y, trim.attr_width, trim.attr_height)
     end
     
@@ -684,7 +713,7 @@ module Org::Eclipse::Swt::Widgets
     def get_caret_line_number
       check_widget
       if (!((self.attr_style & SWT::SINGLE)).equal?(0))
-        return 1
+        return 0
       end
       position = Array.typed(::Java::Byte).new(ITER_SIZEOF) { 0 }
       # long
@@ -895,13 +924,10 @@ module Org::Eclipse::Swt::Widgets
     end
     
     typesig { [] }
-    # Returns the widget message. When the widget is created
-    # with the style <code>SWT.SEARCH</code>, the message text
-    # is displayed as a hint for the user, indicating the
-    # purpose of the field.
+    # Returns the widget message.  The message text is displayed
+    # as a hint for the user, indicating the purpose of the field.
     # <p>
-    # Note: This operation is a <em>HINT</em> and is not
-    # supported on platforms that do not have this concept.
+    # Typically this is used in conjunction with <code>SWT.SEARCH</code>.
     # </p>
     # 
     # @return the widget message
@@ -1080,9 +1106,9 @@ module Org::Eclipse::Swt::Widgets
       if ((address).equal?(0))
         return ""
       end
-      length = OS.strlen(address)
-      buffer = Array.typed(::Java::Byte).new(length) { 0 }
-      OS.memmove(buffer, address, length)
+      length_ = OS.strlen(address)
+      buffer = Array.typed(::Java::Byte).new(length_) { 0 }
+      OS.memmove(buffer, address, length_)
       if (!((self.attr_style & SWT::MULTI)).equal?(0))
         OS.g_free(address)
       end
@@ -1111,14 +1137,18 @@ module Org::Eclipse::Swt::Widgets
       if (!(start <= end_ && 0 <= end_))
         return ""
       end
-      start = Math.max(0, start)
       # long
       address = 0
       if (!((self.attr_style & SWT::SINGLE)).equal?(0))
+        start = Math.max(0, start)
         address = OS.gtk_editable_get_chars(self.attr_handle, start, end_ + 1)
       else
-        length = OS.gtk_text_buffer_get_char_count(@buffer_handle)
-        end_ = Math.min(end_, length - 1)
+        length_ = OS.gtk_text_buffer_get_char_count(@buffer_handle)
+        end_ = Math.min(end_, length_ - 1)
+        if (start > end_)
+          return ""
+        end
+        start = Math.max(0, start)
         start_iter = Array.typed(::Java::Byte).new(ITER_SIZEOF) { 0 }
         end_iter = Array.typed(::Java::Byte).new(ITER_SIZEOF) { 0 }
         OS.gtk_text_buffer_get_iter_at_offset(@buffer_handle, start_iter, start)
@@ -1128,9 +1158,9 @@ module Org::Eclipse::Swt::Widgets
       if ((address).equal?(0))
         error(SWT::ERROR_CANNOT_GET_TEXT)
       end
-      length = OS.strlen(address)
-      buffer = Array.typed(::Java::Byte).new(length) { 0 }
-      OS.memmove(buffer, address, length)
+      length_ = OS.strlen(address)
+      buffer = Array.typed(::Java::Byte).new(length_) { 0 }
+      OS.memmove(buffer, address, length_)
       OS.g_free(address)
       return String.new(Converter.mbcs_to_wcs(nil, buffer))
     end
@@ -1287,12 +1317,12 @@ module Org::Eclipse::Swt::Widgets
           return 0
         end
       end
-      length = OS.strlen(text)
-      if ((length).equal?(0))
+      length_ = OS.strlen(text)
+      if ((length_).equal?(0))
         return 0
       end
-      buffer = Array.typed(::Java::Byte).new(length) { 0 }
-      OS.memmove(buffer, text, length)
+      buffer = Array.typed(::Java::Byte).new(length_) { 0 }
+      OS.memmove(buffer, text, length_)
       chars = Converter.mbcs_to_wcs(nil, buffer)
       new_chars = send_imkey_event(SWT::KeyDown, nil, chars)
       if ((new_chars).nil?)
@@ -1435,6 +1465,89 @@ module Org::Eclipse::Swt::Widgets
         end
       end
       return super(widget, gdk_event)
+    end
+    
+    typesig { [::Java::Int, ::Java::Int] }
+    # long
+    # long
+    # long
+    def gtk_expose_event(widget, event)
+      if (!((self.attr_state & OBSCURED)).equal?(0))
+        return 0
+      end
+      # long
+      result = super(widget, event)
+      if (!((self.attr_style & SWT::SINGLE)).equal?(0) && @message.length > 0)
+        # long
+        str = OS.gtk_entry_get_text(self.attr_handle)
+        if (!OS._gtk_widget_has_focus(self.attr_handle) && (OS.strlen(str)).equal?(0))
+          gdk_event = GdkEventExpose.new
+          OS.memmove(gdk_event, event, GdkEventExpose.attr_sizeof)
+          # long
+          window = paint_window
+          w = Array.typed(::Java::Int).new(1) { 0 }
+          h = Array.typed(::Java::Int).new(1) { 0 }
+          OS.gdk_drawable_get_size(window, w, h)
+          inner_border = Display.get_entry_inner_border(self.attr_handle)
+          width = w[0] - inner_border.attr_left - inner_border.attr_right
+          height = h[0] - inner_border.attr_top - inner_border.attr_bottom
+          # long
+          context = OS.gtk_widget_get_pango_context(self.attr_handle)
+          # long
+          lang = OS.pango_context_get_language(context)
+          # long
+          metrics = OS.pango_context_get_metrics(context, get_font_description, lang)
+          ascent = OS._pango_pixels(OS.pango_font_metrics_get_ascent(metrics))
+          descent = OS._pango_pixels(OS.pango_font_metrics_get_descent(metrics))
+          OS.pango_font_metrics_unref(metrics)
+          buffer = Converter.wcs_to_mbcs(nil, @message, true)
+          # long
+          layout = OS.gtk_widget_create_pango_layout(self.attr_handle, buffer)
+          # long
+          line = OS.pango_layout_get_line(layout, 0)
+          rect = PangoRectangle.new
+          OS.pango_layout_line_get_extents(line, nil, rect)
+          rect.attr_y = OS._pango_pixels(rect.attr_y)
+          rect.attr_height = OS._pango_pixels(rect.attr_height)
+          rect.attr_width = OS._pango_pixels(rect.attr_width)
+          y = (height - ascent - descent) / 2 + ascent + rect.attr_y
+          if (rect.attr_height > height)
+            y = (height - rect.attr_height) / 2
+          else
+            if (y < 0)
+              y = 0
+            else
+              if (y + rect.attr_height > height)
+                y = height - rect.attr_height
+              end
+            end
+          end
+          y += inner_border.attr_top
+          x = inner_border.attr_left
+          rtl = !((self.attr_style & SWT::RIGHT_TO_LEFT)).equal?(0)
+          alignment = self.attr_style & (SWT::LEFT | SWT::CENTER | SWT::RIGHT)
+          case (alignment)
+          when SWT::LEFT
+            x = rtl ? width - rect.attr_width : inner_border.attr_left
+          when SWT::CENTER
+            x = (width - rect.attr_width) / 2
+          when SWT::RIGHT
+            x = rtl ? inner_border.attr_left : width - rect.attr_width
+          end
+          # long
+          gc = OS.gdk_gc_new(window)
+          # long
+          style = OS.gtk_widget_get_style(self.attr_handle)
+          text_color = GdkColor.new
+          OS.gtk_style_get_text(style, OS::GTK_STATE_INSENSITIVE, text_color)
+          base_color = GdkColor.new
+          OS.gtk_style_get_base(style, OS::GTK_STATE_NORMAL, base_color)
+          OS.gdk_draw_layout_with_colors(window, gc, x, y, layout, text_color, base_color)
+          OS.g_object_unref(gc)
+          OS.g_object_unref(layout)
+        end
+      end
+      return result
     end
     
     typesig { [::Java::Int, ::Java::Int] }
@@ -1951,13 +2064,10 @@ module Org::Eclipse::Swt::Widgets
     end
     
     typesig { [String] }
-    # Sets the widget message. When the widget is created
-    # with the style <code>SWT.SEARCH</code>, the message text
-    # is displayed as a hint for the user, indicating the
-    # purpose of the field.
+    # Sets the widget message. The message text is displayed
+    # as a hint for the user, indicating the purpose of the field.
     # <p>
-    # Note: This operation is a <em>HINT</em> and is not
-    # supported on platforms that do not have this concept.
+    # Typically this is used in conjunction with <code>SWT.SEARCH</code>.
     # </p>
     # 
     # @param message the new message
@@ -1977,6 +2087,7 @@ module Org::Eclipse::Swt::Widgets
         error(SWT::ERROR_NULL_ARGUMENT)
       end
       @message = message
+      redraw(false)
     end
     
     typesig { [::Java::Int] }

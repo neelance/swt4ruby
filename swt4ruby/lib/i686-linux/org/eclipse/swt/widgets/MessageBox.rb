@@ -1,6 +1,6 @@
 require "rjava"
 
-# Copyright (c) 2000, 2008 IBM Corporation and others.
+# Copyright (c) 2000, 2009 IBM Corporation and others.
 # All rights reserved. This program and the accompanying materials
 # are made available under the terms of the Eclipse Public License v1.0
 # which accompanies this distribution, and is available at
@@ -40,6 +40,7 @@ module Org::Eclipse::Swt::Widgets
   # 
   # @see <a href="http://www.eclipse.org/swt/examples.php">SWT Example: ControlExample, Dialog tab</a>
   # @see <a href="http://www.eclipse.org/swt/">Sample code and further information</a>
+  # @noextend This class is not intended to be subclassed by clients.
   class MessageBox < MessageBoxImports.const_get :Dialog
     include_class_members MessageBoxImports
     
@@ -94,6 +95,19 @@ module Org::Eclipse::Swt::Widgets
     # <li>ERROR_THREAD_INVALID_ACCESS - if not called from the thread that created the parent</li>
     # <li>ERROR_INVALID_SUBCLASS - if this class is not an allowed subclass</li>
     # </ul>
+    # 
+    # @see SWT#ICON_ERROR
+    # @see SWT#ICON_INFORMATION
+    # @see SWT#ICON_QUESTION
+    # @see SWT#ICON_WARNING
+    # @see SWT#ICON_WORKING
+    # @see SWT#OK
+    # @see SWT#CANCEL
+    # @see SWT#YES
+    # @see SWT#NO
+    # @see SWT#ABORT
+    # @see SWT#RETRY
+    # @see SWT#IGNORE
     def initialize(parent, style)
       @message = nil
       @handle = 0
@@ -170,10 +184,10 @@ module Org::Eclipse::Swt::Widgets
           OS.g_list_free(pixbufs)
         end
       end
-      create_buttons
+      display = !(self.attr_parent).nil? ? self.attr_parent.get_display : Display.get_current
+      create_buttons(display.get_dismissal_alignment)
       buffer = Converter.wcs_to_mbcs(nil, self.attr_title, true)
       OS.gtk_window_set_title(@handle, buffer)
-      display = !(self.attr_parent).nil? ? self.attr_parent.get_display : Display.get_current
       display.add_idle_proc
       old_modal = nil
       if (OS.gtk_window_get_modal(@handle))
@@ -199,28 +213,52 @@ module Org::Eclipse::Swt::Widgets
       return response
     end
     
-    typesig { [] }
-    def create_buttons
-      if (!((self.attr_style & SWT::OK)).equal?(0))
-        OS.gtk_dialog_add_button(@handle, Converter.wcs_to_mbcs(nil, "gtk-ok", true), SWT::OK)
-      end
-      if (!((self.attr_style & SWT::CANCEL)).equal?(0))
-        OS.gtk_dialog_add_button(@handle, Converter.wcs_to_mbcs(nil, "gtk-cancel", true), SWT::CANCEL)
-      end
-      if (!((self.attr_style & SWT::YES)).equal?(0))
-        OS.gtk_dialog_add_button(@handle, Converter.wcs_to_mbcs(nil, "gtk-yes", true), SWT::YES)
-      end
-      if (!((self.attr_style & SWT::NO)).equal?(0))
-        OS.gtk_dialog_add_button(@handle, Converter.wcs_to_mbcs(nil, "gtk-no", true), SWT::NO)
-      end
-      if (!((self.attr_style & SWT::ABORT)).equal?(0))
-        OS.gtk_dialog_add_button(@handle, Converter.wcs_to_mbcs(nil, SWT.get_message("SWT_Abort"), true), SWT::ABORT)
-      end
-      if (!((self.attr_style & SWT::RETRY)).equal?(0))
-        OS.gtk_dialog_add_button(@handle, Converter.wcs_to_mbcs(nil, SWT.get_message("SWT_Retry"), true), SWT::RETRY)
-      end
-      if (!((self.attr_style & SWT::IGNORE)).equal?(0))
-        OS.gtk_dialog_add_button(@handle, Converter.wcs_to_mbcs(nil, SWT.get_message("SWT_Ignore"), true), SWT::IGNORE)
+    typesig { [::Java::Int] }
+    def create_buttons(alignment)
+      if ((alignment).equal?(SWT::LEFT))
+        if (!((self.attr_style & SWT::OK)).equal?(0))
+          OS.gtk_dialog_add_button(@handle, Converter.wcs_to_mbcs(nil, "gtk-ok", true), SWT::OK)
+        end
+        if (!((self.attr_style & SWT::ABORT)).equal?(0))
+          OS.gtk_dialog_add_button(@handle, Converter.wcs_to_mbcs(nil, SWT.get_message("SWT_Abort"), true), SWT::ABORT)
+        end
+        if (!((self.attr_style & SWT::RETRY)).equal?(0))
+          OS.gtk_dialog_add_button(@handle, Converter.wcs_to_mbcs(nil, SWT.get_message("SWT_Retry"), true), SWT::RETRY)
+        end
+        if (!((self.attr_style & SWT::YES)).equal?(0))
+          OS.gtk_dialog_add_button(@handle, Converter.wcs_to_mbcs(nil, "gtk-yes", true), SWT::YES)
+        end
+        if (!((self.attr_style & SWT::NO)).equal?(0))
+          OS.gtk_dialog_add_button(@handle, Converter.wcs_to_mbcs(nil, "gtk-no", true), SWT::NO)
+        end
+        if (!((self.attr_style & SWT::IGNORE)).equal?(0))
+          OS.gtk_dialog_add_button(@handle, Converter.wcs_to_mbcs(nil, SWT.get_message("SWT_Ignore"), true), SWT::IGNORE)
+        end
+        if (!((self.attr_style & SWT::CANCEL)).equal?(0))
+          OS.gtk_dialog_add_button(@handle, Converter.wcs_to_mbcs(nil, "gtk-cancel", true), SWT::CANCEL)
+        end
+      else
+        if (!((self.attr_style & SWT::CANCEL)).equal?(0))
+          OS.gtk_dialog_add_button(@handle, Converter.wcs_to_mbcs(nil, "gtk-cancel", true), SWT::CANCEL)
+        end
+        if (!((self.attr_style & SWT::OK)).equal?(0))
+          OS.gtk_dialog_add_button(@handle, Converter.wcs_to_mbcs(nil, "gtk-ok", true), SWT::OK)
+        end
+        if (!((self.attr_style & SWT::NO)).equal?(0))
+          OS.gtk_dialog_add_button(@handle, Converter.wcs_to_mbcs(nil, "gtk-no", true), SWT::NO)
+        end
+        if (!((self.attr_style & SWT::YES)).equal?(0))
+          OS.gtk_dialog_add_button(@handle, Converter.wcs_to_mbcs(nil, "gtk-yes", true), SWT::YES)
+        end
+        if (!((self.attr_style & SWT::IGNORE)).equal?(0))
+          OS.gtk_dialog_add_button(@handle, Converter.wcs_to_mbcs(nil, SWT.get_message("SWT_Ignore"), true), SWT::IGNORE)
+        end
+        if (!((self.attr_style & SWT::RETRY)).equal?(0))
+          OS.gtk_dialog_add_button(@handle, Converter.wcs_to_mbcs(nil, SWT.get_message("SWT_Retry"), true), SWT::RETRY)
+        end
+        if (!((self.attr_style & SWT::ABORT)).equal?(0))
+          OS.gtk_dialog_add_button(@handle, Converter.wcs_to_mbcs(nil, SWT.get_message("SWT_Abort"), true), SWT::ABORT)
+        end
       end
     end
     

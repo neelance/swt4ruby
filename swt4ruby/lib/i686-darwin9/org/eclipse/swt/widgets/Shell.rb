@@ -1,6 +1,6 @@
 require "rjava"
 
-# Copyright (c) 2000, 2008 IBM Corporation and others.
+# Copyright (c) 2000, 2009 IBM Corporation and others.
 # All rights reserved. This program and the accompanying materials
 # are made available under the terms of the Eclipse Public License v1.0
 # which accompanies this distribution, and is available at
@@ -13,13 +13,10 @@ module Org::Eclipse::Swt::Widgets
     class_module.module_eval {
       include ::Java::Lang
       include ::Org::Eclipse::Swt::Widgets
-      include_const ::Org::Eclipse::Swt::Internal::Carbon, :OS
-      include_const ::Org::Eclipse::Swt::Internal::Carbon, :Rect
-      include_const ::Org::Eclipse::Swt::Internal::Carbon, :CGPoint
-      include_const ::Org::Eclipse::Swt::Internal::Carbon, :CGRect
       include_const ::Org::Eclipse::Swt, :SWT
       include ::Org::Eclipse::Swt::Events
       include ::Org::Eclipse::Swt::Graphics
+      include ::Org::Eclipse::Swt::Internal::Cocoa
     }
   end
   
@@ -86,7 +83,7 @@ module Org::Eclipse::Swt::Widgets
   # downgraded to <code>APPLICATION_MODAL</code>.
   # <dl>
   # <dt><b>Styles:</b></dt>
-  # <dd>BORDER, CLOSE, MIN, MAX, NO_TRIM, RESIZE, TITLE, ON_TOP, TOOL</dd>
+  # <dd>BORDER, CLOSE, MIN, MAX, NO_TRIM, RESIZE, TITLE, ON_TOP, TOOL, SHEET</dd>
   # <dd>APPLICATION_MODAL, MODELESS, PRIMARY_MODAL, SYSTEM_MODAL</dd>
   # <dt><b>Events:</b></dt>
   # <dd>Activate, Close, Deactivate, Deiconify, Iconify</dd>
@@ -123,65 +120,36 @@ module Org::Eclipse::Swt::Widgets
   class Shell < ShellImports.const_get :Decorations
     include_class_members ShellImports
     
-    attr_accessor :shell_handle
-    alias_method :attr_shell_handle, :shell_handle
-    undef_method :shell_handle
-    alias_method :attr_shell_handle=, :shell_handle=
-    undef_method :shell_handle=
+    attr_accessor :window
+    alias_method :attr_window, :window
+    undef_method :window
+    alias_method :attr_window=, :window=
+    undef_method :window=
     
-    attr_accessor :window_group
-    alias_method :attr_window_group, :window_group
-    undef_method :window_group
-    alias_method :attr_window_group=, :window_group=
-    undef_method :window_group=
+    attr_accessor :window_delegate
+    alias_method :attr_window_delegate, :window_delegate
+    undef_method :window_delegate
+    alias_method :attr_window_delegate=, :window_delegate=
+    undef_method :window_delegate=
     
-    attr_accessor :resized
-    alias_method :attr_resized, :resized
-    undef_method :resized
-    alias_method :attr_resized=, :resized=
-    undef_method :resized=
+    # long
+    attr_accessor :tooltip_owner
+    alias_method :attr_tooltip_owner, :tooltip_owner
+    undef_method :tooltip_owner
+    alias_method :attr_tooltip_owner=, :tooltip_owner=
+    undef_method :tooltip_owner=
     
-    attr_accessor :moved
-    alias_method :attr_moved, :moved
-    undef_method :moved
-    alias_method :attr_moved=, :moved=
-    undef_method :moved=
+    attr_accessor :tooltip_tag
+    alias_method :attr_tooltip_tag, :tooltip_tag
+    undef_method :tooltip_tag
+    alias_method :attr_tooltip_tag=, :tooltip_tag=
+    undef_method :tooltip_tag=
     
-    attr_accessor :drawing
-    alias_method :attr_drawing, :drawing
-    undef_method :drawing
-    alias_method :attr_drawing=, :drawing=
-    undef_method :drawing=
-    
-    attr_accessor :reshape
-    alias_method :attr_reshape, :reshape
-    undef_method :reshape
-    alias_method :attr_reshape=, :reshape=
-    undef_method :reshape=
-    
-    attr_accessor :update
-    alias_method :attr_update, :update
-    undef_method :update
-    alias_method :attr_update=, :update=
-    undef_method :update=
-    
-    attr_accessor :defer_dispose
-    alias_method :attr_defer_dispose, :defer_dispose
-    undef_method :defer_dispose
-    alias_method :attr_defer_dispose=, :defer_dispose=
-    undef_method :defer_dispose=
-    
-    attr_accessor :active
-    alias_method :attr_active, :active
-    undef_method :active
-    alias_method :attr_active=, :active=
-    undef_method :active=
-    
-    attr_accessor :disposed
-    alias_method :attr_disposed, :disposed
-    undef_method :disposed
-    alias_method :attr_disposed=, :disposed=
-    undef_method :disposed=
+    attr_accessor :tooltip_user_data
+    alias_method :attr_tooltip_user_data, :tooltip_user_data
+    undef_method :tooltip_user_data
+    alias_method :attr_tooltip_user_data=, :tooltip_user_data=
+    undef_method :tooltip_user_data=
     
     attr_accessor :opened
     alias_method :attr_opened, :opened
@@ -189,23 +157,29 @@ module Org::Eclipse::Swt::Widgets
     alias_method :attr_opened=, :opened=
     undef_method :opened=
     
+    attr_accessor :moved
+    alias_method :attr_moved, :moved
+    undef_method :moved
+    alias_method :attr_moved=, :moved=
+    undef_method :moved=
+    
+    attr_accessor :resized
+    alias_method :attr_resized, :resized
+    undef_method :resized
+    alias_method :attr_resized=, :resized=
+    undef_method :resized=
+    
     attr_accessor :full_screen
     alias_method :attr_full_screen, :full_screen
     undef_method :full_screen
     alias_method :attr_full_screen=, :full_screen=
     undef_method :full_screen=
     
-    attr_accessor :show_with_parent
-    alias_method :attr_show_with_parent, :show_with_parent
-    undef_method :show_with_parent
-    alias_method :attr_show_with_parent=, :show_with_parent=
-    undef_method :show_with_parent=
-    
-    attr_accessor :inval_rgn
-    alias_method :attr_inval_rgn, :inval_rgn
-    undef_method :inval_rgn
-    alias_method :attr_inval_rgn=, :inval_rgn=
-    undef_method :inval_rgn=
+    attr_accessor :center
+    alias_method :attr_center, :center
+    undef_method :center
+    alias_method :attr_center=, :center=
+    undef_method :center=
     
     attr_accessor :last_active
     alias_method :attr_last_active, :last_active
@@ -213,23 +187,29 @@ module Org::Eclipse::Swt::Widgets
     alias_method :attr_last_active=, :last_active=
     undef_method :last_active=
     
-    attr_accessor :rgn_rect
-    alias_method :attr_rgn_rect, :rgn_rect
-    undef_method :rgn_rect
-    alias_method :attr_rgn_rect=, :rgn_rect=
-    undef_method :rgn_rect=
-    
     attr_accessor :normal_bounds
     alias_method :attr_normal_bounds, :normal_bounds
     undef_method :normal_bounds
     alias_method :attr_normal_bounds=, :normal_bounds=
     undef_method :normal_bounds=
     
-    attr_accessor :im_handle
-    alias_method :attr_im_handle, :im_handle
-    undef_method :im_handle
-    alias_method :attr_im_handle=, :im_handle=
-    undef_method :im_handle=
+    attr_accessor :key_input_happened
+    alias_method :attr_key_input_happened, :key_input_happened
+    undef_method :key_input_happened
+    alias_method :attr_key_input_happened=, :key_input_happened=
+    undef_method :key_input_happened=
+    
+    attr_accessor :current_frame
+    alias_method :attr_current_frame, :current_frame
+    undef_method :current_frame
+    alias_method :attr_current_frame=, :current_frame=
+    undef_method :current_frame=
+    
+    attr_accessor :full_screen_frame
+    alias_method :attr_full_screen_frame, :full_screen_frame
+    undef_method :full_screen_frame
+    alias_method :attr_full_screen_frame=, :full_screen_frame=
+    undef_method :full_screen_frame=
     
     class_module.module_eval {
       
@@ -294,13 +274,16 @@ module Org::Eclipse::Swt::Widgets
     # @see SWT#MAX
     # @see SWT#RESIZE
     # @see SWT#TITLE
+    # @see SWT#TOOL
     # @see SWT#NO_TRIM
     # @see SWT#SHELL_TRIM
     # @see SWT#DIALOG_TRIM
+    # @see SWT#ON_TOP
     # @see SWT#MODELESS
     # @see SWT#PRIMARY_MODAL
     # @see SWT#APPLICATION_MODAL
     # @see SWT#SYSTEM_MODAL
+    # @see SWT#SHEET
     def initialize(style)
       initialize__shell(nil, style)
     end
@@ -362,37 +345,38 @@ module Org::Eclipse::Swt::Widgets
     # @see SWT#MAX
     # @see SWT#RESIZE
     # @see SWT#TITLE
+    # @see SWT#TOOL
     # @see SWT#NO_TRIM
     # @see SWT#SHELL_TRIM
     # @see SWT#DIALOG_TRIM
+    # @see SWT#ON_TOP
     # @see SWT#MODELESS
     # @see SWT#PRIMARY_MODAL
     # @see SWT#APPLICATION_MODAL
     # @see SWT#SYSTEM_MODAL
+    # @see SWT#SHEET
     def initialize(display, style)
       initialize__shell(display, nil, style, 0, false)
     end
     
     typesig { [Display, Shell, ::Java::Int, ::Java::Int, ::Java::Boolean] }
+    # long
     def initialize(display, parent, style, handle, embedded)
-      @shell_handle = 0
-      @window_group = 0
-      @resized = false
-      @moved = false
-      @drawing = false
-      @reshape = false
-      @update = false
-      @defer_dispose = false
-      @active = false
-      @disposed = false
+      @window = nil
+      @window_delegate = nil
+      @tooltip_owner = 0
+      @tooltip_tag = 0
+      @tooltip_user_data = 0
       @opened = false
+      @moved = false
+      @resized = false
       @full_screen = false
-      @show_with_parent = false
-      @inval_rgn = 0
+      @center = false
       @last_active = nil
-      @rgn_rect = nil
       @normal_bounds = nil
-      @im_handle = 0
+      @key_input_happened = false
+      @current_frame = nil
+      @full_screen_frame = nil
       super()
       check_subclass
       if ((display).nil?)
@@ -407,14 +391,17 @@ module Org::Eclipse::Swt::Widgets
       if (!(parent).nil? && parent.is_disposed)
         error(SWT::ERROR_INVALID_ARGUMENT)
       end
-      self.attr_style = check_style(style)
+      if (!Display.get_sheet_enabled)
+        @center = !(parent).nil? && !((style & SWT::SHEET)).equal?(0)
+      end
+      self.attr_style = check_style(parent, style)
       self.attr_parent = parent
       self.attr_display = display
       if (!(handle).equal?(0))
         if (embedded)
-          self.attr_handle = handle
+          self.attr_view = NSView.new(handle)
         else
-          @shell_handle = handle
+          @window = NSWindow.new(handle)
           self.attr_state |= FOREIGN_HANDLE
         end
       end
@@ -492,6 +479,7 @@ module Org::Eclipse::Swt::Widgets
     # @see SWT#PRIMARY_MODAL
     # @see SWT#APPLICATION_MODAL
     # @see SWT#SYSTEM_MODAL
+    # @see SWT#SHEET
     def initialize(parent, style)
       initialize__shell(!(parent).nil? ? parent.attr_display : nil, parent, style, 0, false)
     end
@@ -513,15 +501,55 @@ module Org::Eclipse::Swt::Widgets
       # @return a new shell object containing the specified display and handle
       # 
       # @since 3.3
+      # 
+      # long
       def internal_new(display, handle)
         return Shell.new(display, nil, SWT::NO_TRIM, handle, false)
       end
       
-      typesig { [::Java::Int] }
-      def check_style(style)
+      typesig { [Display, ::Java::Int] }
+      # Invokes platform specific functionality to allocate a new shell
+      # that is 'embedded'.  In this case, the handle represents an NSView
+      # that acts as an embedded SWT Shell in an AWT Canvas.
+      # <p>
+      # <b>IMPORTANT:</b> This method is <em>not</em> part of the public
+      # API for <code>Shell</code>. It is marked public only so that it
+      # can be shared within the packages provided by SWT. It is not
+      # available on all platforms, and should never be called from
+      # application code.
+      # </p>
+      # 
+      # @param display the display for the shell
+      # @param handle the handle for the shell
+      # @return a new shell object containing the specified display and handle
+      # 
+      # @since 3.5
+      # 
+      # long
+      def cocoa_new(display, handle)
+        return Shell.new(display, nil, SWT::NO_TRIM, handle, true)
+      end
+      
+      typesig { [Shell, ::Java::Int] }
+      def check_style(parent, style)
         style = Decorations.check_style(style)
         style &= ~SWT::TRANSPARENT
         mask = SWT::SYSTEM_MODAL | SWT::APPLICATION_MODAL | SWT::PRIMARY_MODAL
+        if (!((style & SWT::SHEET)).equal?(0))
+          if (Display.get_sheet_enabled)
+            style &= ~(SWT::CLOSE | SWT::TITLE | SWT::MIN | SWT::MAX)
+            if ((parent).nil?)
+              style &= ~SWT::SHEET
+              style |= SWT::SHELL_TRIM
+            end
+          else
+            style &= ~SWT::SHEET
+            style |= (parent).nil? ? SWT::SHELL_TRIM : SWT::DIALOG_TRIM
+          end
+          if (((style & mask)).equal?(0))
+            style |= (parent).nil? ? SWT::APPLICATION_MODAL : SWT::PRIMARY_MODAL
+          end
+        end
         bits = style & ~mask
         if (!((style & SWT::SYSTEM_MODAL)).equal?(0))
           return bits | SWT::SYSTEM_MODAL
@@ -535,6 +563,17 @@ module Org::Eclipse::Swt::Widgets
         return bits
       end
     }
+    
+    typesig { [::Java::Int, ::Java::Int] }
+    # long
+    # long
+    def accessibility_is_ignored(id, sel)
+      # The content view of a shell is always ignored.
+      if ((id).equal?(self.attr_view.attr_id))
+        return true
+      end
+      return super(id, sel)
+    end
     
     typesig { [ShellListener] }
     # Adds the listener to the collection of listeners who will
@@ -567,6 +606,17 @@ module Org::Eclipse::Swt::Widgets
       add_listener(SWT::Deiconify, typed_listener)
     end
     
+    typesig { [::Java::Int, ::Java::Int] }
+    # long
+    # long
+    def become_key_window(id, sel)
+      display = self.attr_display
+      display.attr_key_window = @window
+      super(id, sel)
+      display.check_focus
+      display.attr_key_window = nil
+    end
+    
     typesig { [::Java::Boolean] }
     def bring_to_top(force)
       if (get_minimized)
@@ -579,11 +629,44 @@ module Org::Eclipse::Swt::Widgets
       end
     end
     
+    typesig { [::Java::Int, ::Java::Int] }
+    # long
+    # long
+    def can_become_key_window(id, sel)
+      if ((@window.style_mask).equal?(OS::NSBorderlessWindowMask))
+        return true
+      end
+      return super(id, sel)
+    end
+    
     typesig { [] }
     def check_open
       if (!@opened)
         @resized = false
       end
+    end
+    
+    typesig { [] }
+    def center
+      if ((self.attr_parent).nil?)
+        return
+      end
+      rect = get_bounds
+      parent_rect = self.attr_display.map(self.attr_parent, nil, self.attr_parent.get_client_area)
+      x = Math.max(parent_rect.attr_x, parent_rect.attr_x + (parent_rect.attr_width - rect.attr_width) / 2)
+      y = Math.max(parent_rect.attr_y, parent_rect.attr_y + (parent_rect.attr_height - rect.attr_height) / 2)
+      monitor_rect = self.attr_parent.get_monitor.get_client_area
+      if (x + rect.attr_width > monitor_rect.attr_x + monitor_rect.attr_width)
+        x = Math.max(monitor_rect.attr_x, monitor_rect.attr_x + monitor_rect.attr_width - rect.attr_width)
+      else
+        x = Math.max(x, monitor_rect.attr_x)
+      end
+      if (y + rect.attr_height > monitor_rect.attr_y + monitor_rect.attr_height)
+        y = Math.max(monitor_rect.attr_y, monitor_rect.attr_y + monitor_rect.attr_height - rect.attr_height)
+      else
+        y = Math.max(y, monitor_rect.attr_y)
+      end
+      set_location(x, y)
     end
     
     typesig { [] }
@@ -618,227 +701,141 @@ module Org::Eclipse::Swt::Widgets
     def compute_trim(x, y, width, height)
       check_widget
       trim = super(x, y, width, height)
-      rect = Rect.new
-      OS._get_window_structure_widths(@shell_handle, rect)
-      trim.attr_x -= rect.attr_left
-      trim.attr_y -= rect.attr_top
-      trim.attr_width += rect.attr_left + rect.attr_right
-      trim.attr_height += rect.attr_top + rect.attr_bottom
-      return trim
+      rect = NSRect.new
+      rect.attr_x = trim.attr_x
+      rect.attr_y = trim.attr_y
+      rect.attr_width = trim.attr_width
+      rect.attr_height = trim.attr_height
+      if (!(@window).nil?)
+        if (!fix_resize)
+          rect = @window.frame_rect_for_content_rect(rect)
+        end
+      end
+      return Rectangle.new(RJava.cast_to_int(rect.attr_x), RJava.cast_to_int(rect.attr_y), RJava.cast_to_int(rect.attr_width), RJava.cast_to_int(rect.attr_height))
     end
     
     typesig { [] }
     def create_handle
-      self.attr_state |= CANVAS | GRAB | HIDDEN
-      attributes = OS.attr_k_window_standard_handler_attribute
-      attributes |= OS.attr_k_window_compositing_attribute
-      if (((self.attr_style & SWT::NO_TRIM)).equal?(0))
-        if (!((self.attr_style & SWT::CLOSE)).equal?(0))
-          attributes |= OS.attr_k_window_close_box_attribute
-        end
-        if (!((self.attr_style & SWT::MIN)).equal?(0))
-          attributes |= OS.attr_k_window_collapse_box_attribute
-        end
-        if (!((self.attr_style & SWT::MAX)).equal?(0))
-          attributes |= OS.attr_k_window_full_zoom_attribute
-        end
-        if (!((self.attr_style & SWT::RESIZE)).equal?(0))
-          attributes |= OS.attr_k_window_resizable_attribute
-          # Bug in the Macintosh.  For some reason, a window has no title bar
-          # and the kWindowResizableAttribute, no rubber banding feedback is
-          # given while the window is resizing.  The fix is to create the window
-          # with kWindowLiveResizeAttribute in this case.  This is inconsistent
-          # with other windows, but the user will get feedback when resizing.
-          if (((self.attr_style & SWT::TITLE)).equal?(0))
-            attributes |= OS.attr_k_window_live_resize_attribute
+      self.attr_state |= HIDDEN
+      if ((@window).nil?)
+        @window = SWTWindow.new.alloc
+        style_mask_ = OS::NSBorderlessWindowMask
+        if (((self.attr_style & SWT::NO_TRIM)).equal?(0))
+          if (!((self.attr_style & SWT::TITLE)).equal?(0))
+            style_mask_ |= OS::NSTitledWindowMask
           end
-          if (!OS.____big_endian__)
-            attributes |= OS.attr_k_window_live_resize_attribute
+          if (!((self.attr_style & SWT::CLOSE)).equal?(0))
+            style_mask_ |= OS::NSClosableWindowMask
+          end
+          if (!((self.attr_style & SWT::MIN)).equal?(0))
+            style_mask_ |= OS::NSMiniaturizableWindowMask
+          end
+          if (!((self.attr_style & SWT::MAX)).equal?(0))
+            style_mask_ |= OS::NSResizableWindowMask
+          end
+          if (!((self.attr_style & SWT::RESIZE)).equal?(0))
+            style_mask_ |= OS::NSResizableWindowMask
           end
         end
-      else
-        if (((self.attr_style & SWT::TOOL)).equal?(0))
-          attributes |= OS.attr_k_window_no_shadow_attribute
-        end
-      end
-      window_class = OS.attr_k_document_window_class
-      if (((self.attr_style & (SWT::CLOSE | SWT::TITLE))).equal?(0))
-        window_class = OS.attr_k_sheet_window_class
-      end
-      if (!((self.attr_style & (SWT::APPLICATION_MODAL | SWT::PRIMARY_MODAL | SWT::SYSTEM_MODAL))).equal?(0))
-        if (((self.attr_style & (SWT::CLOSE | SWT::MAX | SWT::MIN))).equal?(0))
-          window_class = !((self.attr_style & SWT::TITLE)).equal?(0) ? OS.attr_k_movable_modal_window_class : OS.attr_k_modal_window_class
-        end
-      end
-      if ((@shell_handle).equal?(0))
-        monitor = get_monitor
-        rect = monitor.get_client_area
-        width = rect.attr_width * 5 / 8
-        height = rect.attr_height * 5 / 8
-        bounds = Rect.new
-        OS._set_rect(bounds, RJava.cast_to_short(0), RJava.cast_to_short(0), RJava.cast_to_short(width), RJava.cast_to_short(height))
-        out_window = Array.typed(::Java::Int).new(1) { 0 }
-        attributes &= OS._get_available_window_attributes(window_class)
-        OS._create_new_window(window_class, attributes, bounds, out_window)
-        if ((out_window[0]).equal?(0))
-          error(SWT::ERROR_NO_HANDLES)
-        end
-        @shell_handle = out_window[0]
-        OS._reposition_window(@shell_handle, 0, OS.attr_k_window_cascade_on_main_screen)
-        # OS.SetThemeWindowBackground (shellHandle, (short) OS.kThemeBrushDialogBackgroundActive, false);
-        the_root = Array.typed(::Java::Int).new(1) { 0 }
-        OS._hiview_find_by_id(OS._hiview_get_root(@shell_handle), OS.k_hiview_window_content_id, the_root)
-        # Bug in the Macintosh.  When the window class is kMovableModalWindowClass or
-        # kModalWindowClass, HIViewFindByID() fails to find the control identified by
-        # kHIViewWindowContentID.  The fix is to call GetRootControl() if the call
-        # failed.
-        if ((the_root[0]).equal?(0))
-          OS._get_root_control(@shell_handle, the_root)
-        end
-        if ((the_root[0]).equal?(0))
-          error(SWT::ERROR_NO_HANDLES)
-        end
-        if (!((self.attr_style & (SWT::H_SCROLL | SWT::V_SCROLL))).equal?(0))
-          create_scrolled_handle(the_root[0])
-        else
-          create_handle(the_root[0])
-        end
-        OS._set_control_visibility(top_handle, false, false)
-      else
-        the_root = Array.typed(::Java::Int).new(1) { 0 }
-        OS._hiview_find_by_id(@shell_handle, OS.k_hiview_window_content_id, the_root)
-        if ((the_root[0]).equal?(0))
-          OS._get_root_control(@shell_handle, the_root)
-        end
-        self.attr_handle = OS._hiview_get_first_subview(the_root[0])
-        if ((self.attr_handle).equal?(0))
-          error(SWT::ERROR_NO_HANDLES)
-        end
-        if (OS._is_window_visible(@shell_handle))
-          self.attr_state &= ~HIDDEN
-        end
-      end
-      out_group = Array.typed(::Java::Int).new(1) { 0 }
-      OS._create_window_group(OS.attr_k_window_group_attr_hide_on_collapse, out_group)
-      if ((out_group[0]).equal?(0))
-        error(SWT::ERROR_NO_HANDLES)
-      end
-      @window_group = out_group[0]
-      parent_group = 0
-      if (!((self.attr_style & SWT::ON_TOP)).equal?(0))
-        parent_group = OS._get_window_group_of_class(OS.attr_k_floating_window_class)
-      else
+        screen = nil
+        primary_screen = NSScreen.new(NSScreen.screens.object_at_index(0))
         if (!(self.attr_parent).nil?)
-          parent_group = self.attr_parent.get_shell.attr_window_group
-        else
-          parent_group = OS._get_window_group_of_class(OS.attr_k_document_window_class)
+          screen = self.attr_parent.get_shell.attr_window.screen
         end
+        if ((screen).nil?)
+          screen = primary_screen
+        end
+        @window = @window.init_with_content_rect(NSRect.new, style_mask_, OS::NSBackingStoreBuffered, false, screen)
+        if (((self.attr_style & (SWT::NO_TRIM | SWT::BORDER | SWT::SHELL_TRIM))).equal?(0) || !((self.attr_style & (SWT::TOOL | SWT::SHEET))).equal?(0))
+          @window.set_has_shadow(true)
+        end
+        if (((self.attr_style & SWT::NO_TRIM)).equal?(0))
+          size = @window.min_size
+          size.attr_width = NSWindow.min_frame_width_with_title(NSString.string_with(""), style_mask_)
+          @window.set_min_size(size)
+        end
+        if (fix_resize)
+          if (@window.responds_to_selector(OS.attr_sel_set_movable_))
+            OS.objc_msg_send(@window.attr_id, OS.attr_sel_set_movable_, 0)
+          end
+        end
+        self.attr_display.cascade_window(@window, screen)
+        screen_frame = screen.frame
+        # double
+        width = screen_frame.attr_width * 5 / 8
+        height = screen_frame.attr_height * 5 / 8
+        frame_ = @window.frame
+        primary_frame = primary_screen.frame
+        frame_.attr_y = primary_frame.attr_height - ((primary_frame.attr_height - (frame_.attr_y + frame_.attr_height)) + height)
+        frame_.attr_width = width
+        frame_.attr_height = height
+        @window.set_frame(frame_, false)
+        if (!((self.attr_style & SWT::ON_TOP)).equal?(0))
+          @window.set_level(OS::NSStatusWindowLevel)
+        end
+        super
+        top_view.set_hidden(true)
+      else
+        # int /*long*/ cls = OS.objc_lookUpClass ("SWTWindow");
+        # OS.object_setClass(window.id, cls);
+        self.attr_state &= ~HIDDEN
+        # TODO - get the content of the foreign window instead of creating it
+        super
+        self.attr_style |= SWT::NO_BACKGROUND
       end
-      OS._set_window_group(@shell_handle, parent_group)
-      OS._set_window_group_parent(@window_group, parent_group)
-      OS._set_window_group_owner(@window_group, @shell_handle)
-      in_min_limits = CGPoint.new
-      in_max_limits = CGPoint.new
-      OS._get_window_resize_limits(@shell_handle, in_min_limits, in_max_limits)
-      if ((self.attr_default_client_width).equal?(-1))
-        self.attr_default_client_width = RJava.cast_to_int(in_min_limits.attr_x)
+      @window.set_accepts_mouse_moved_events(true)
+      @window_delegate = SWTWindowDelegate.new.alloc.init
+      @window.set_delegate(@window_delegate)
+      id = @window.field_editor(true, nil)
+      if (!(id).nil?)
+        OS.object_set_class(id.attr_id, OS.objc_get_class("SWTEditorView"))
       end
-      if ((self.attr_default_client_height).equal?(-1))
-        self.attr_default_client_height = 0
-      end
-      in_min_limits.attr_y = RJava.cast_to_int(0)
-      trim = SWT::TITLE | SWT::CLOSE | SWT::MIN | SWT::MAX
-      if (!((self.attr_style & SWT::NO_TRIM)).equal?(0) || ((self.attr_style & trim)).equal?(0))
-        in_min_limits.attr_x = RJava.cast_to_int(0)
-      end
-      OS._set_window_resize_limits(@shell_handle, in_min_limits, in_max_limits)
-      doc_id = Array.typed(::Java::Int).new(1) { 0 }
-      OS._new_tsmdocument(RJava.cast_to_short(1), Array.typed(::Java::Int).new([OS.attr_k_unicode_document]), doc_id, 0)
-      if ((doc_id[0]).equal?(0))
-        error(SWT::ERROR_NO_HANDLES)
-      end
-      @im_handle = doc_id[0]
-    end
-    
-    typesig { [] }
-    def create_widget
-      super
-      resize_bounds
     end
     
     typesig { [] }
     def deregister
       super
-      the_root = Array.typed(::Java::Int).new(1) { 0 }
-      OS._get_root_control(@shell_handle, the_root)
-      self.attr_display.remove_widget(the_root[0])
+      if (!(@window).nil?)
+        self.attr_display.remove_widget(@window)
+      end
+      if (!(@window_delegate).nil?)
+        self.attr_display.remove_widget(@window_delegate)
+      end
     end
     
     typesig { [] }
     def destroy_widget
-      the_window = @shell_handle
-      # Bug in the Macintosh.  Under certain circumstances, yet to
-      # be determined, calling HideWindow() and then DisposeWindow()
-      # causes a segment fault when an application is exiting.  This
-      # seems to happen to large applications.  The fix is to avoid
-      # calling HideWindow() when a shell is about to be disposed.
-      # 
-      # Bug in the Macintosh.  Disposing a window from kEventWindowDeactivated
-      # causes a segment fault. The fix is to defer disposing the window until
-      # the event loop becomes idle.
+      window = @window
       display = self.attr_display
-      parent = self.attr_parent
-      while (!@defer_dispose && !(parent).nil?)
-        shell = parent.get_shell
-        @defer_dispose = shell.attr_defer_dispose
-        parent = shell.attr_parent
-      end
-      if (@defer_dispose)
-        OS._hide_window(@shell_handle)
-      end
+      sheet = !((self.attr_style & (SWT::SHEET))).equal?(0)
       release_handle
-      if (!(the_window).equal?(0))
-        if (@defer_dispose)
-          display.add_dispose_window(the_window)
-        else
-          OS._dispose_window(the_window)
+      if (!(window).nil?)
+        if (sheet)
+          application = NSApplication.shared_application
+          application.end_sheet(window, 0)
         end
+        window.close
+      end
+      # If another shell is not going to become active, clear the menu bar.
+      if (!display.is_disposed && (display.get_shells.attr_length).equal?(0))
+        display.set_menu_bar(nil)
       end
     end
     
-    typesig { [::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int] }
-    def draw_widget(control, context, damage_rgn, visible_rgn, the_event)
-      super(control, context, damage_rgn, visible_rgn, the_event)
-      # Bug in the Macintosh. In kEventWindowGetRegion,
-      # Carbon assumes the origin of the Region is (0, 0)
-      # and ignores the actual origin.  This causes the
-      # window to be shifted for a non zero origin.  Also,
-      # the size of the window is the size of the region
-      # which may be less then the size specified in
-      # setSize or setBounds.
-      # The fix is to include (0, 0) and the bottom
-      # right corner of the size in the region and to
-      # make these points transparent.
-      if ((self.attr_region).nil? || self.attr_region.is_disposed)
+    typesig { [::Java::Int, NSGraphicsContext, NSRect] }
+    # long
+    def draw_background(id, context, rect)
+      if (!(id).equal?(self.attr_view.attr_id))
         return
       end
-      origin = self.attr_region.contains(0, 0)
-      limit = self.attr_region.contains(@rgn_rect.attr_right - 1, @rgn_rect.attr_bottom - 1)
-      if (origin && limit)
+      if (!(self.attr_region_path).nil? && (self.attr_background).nil?)
+        context.save_graphics_state
+        NSColor.window_background_color.set_fill
+        NSBezierPath.fill_rect(rect)
+        context.restore_graphics_state
         return
       end
-      cg_rect = CGRect.new
-      cg_rect.attr_width = 1
-      cg_rect.attr_height = 1
-      if (!origin)
-        OS._cgcontext_clear_rect(context, cg_rect)
-      end
-      if (!limit)
-        cg_rect.attr_x = @rgn_rect.attr_right - 1
-        cg_rect.attr_y = @rgn_rect.attr_bottom - 1
-        OS._cgcontext_clear_rect(context, cg_rect)
-      end
-      OS._cgcontext_synchronize(context)
+      super(id, context, rect)
     end
     
     typesig { [] }
@@ -854,6 +851,19 @@ module Org::Eclipse::Swt::Widgets
     typesig { [] }
     def find_cursor
       return self.attr_cursor
+    end
+    
+    typesig { [] }
+    def fix_resize
+      # Feature in Cocoa.  It is not possible to have a resizable window
+      # without the title bar.  The fix is to resize the content view on
+      # top of the title bar.
+      if (((self.attr_style & SWT::NO_TRIM)).equal?(0))
+        if (!((self.attr_style & SWT::RESIZE)).equal?(0) && ((self.attr_style & (SWT::TITLE | SWT::CLOSE | SWT::MIN | SWT::MAX))).equal?(0))
+          return true
+        end
+      end
+      return false
     end
     
     typesig { [Shell, Control] }
@@ -891,9 +901,12 @@ module Org::Eclipse::Swt::Widgets
       if (!is_visible)
         return
       end
-      OS._select_window(@shell_handle)
-      OS._set_user_focus_window(@shell_handle)
-      OS._set_front_process_with_options(Array.typed(::Java::Int).new([0, OS.attr_k_current_process]), OS.attr_k_set_front_process_front_window_only)
+      if ((@window).nil?)
+        return
+      end
+      make_key_and_order_front
+      application = NSApplication.shared_application
+      application.activate_ignoring_other_apps(true)
     end
     
     typesig { [] }
@@ -910,27 +923,45 @@ module Org::Eclipse::Swt::Widgets
     # @since 3.4
     def get_alpha
       check_widget
-      alpha = Array.typed(::Java::Float).new(1) { 0.0 }
-      if ((OS._get_window_alpha(@shell_handle, alpha)).equal?(OS.attr_no_err))
-        return RJava.cast_to_int((alpha[0] * 255))
+      # TODO: Should we support embedded frame alpha?
+      if ((@window).nil?)
+        return 255
       end
-      return 0xff
+      return RJava.cast_to_int((@window.alpha_value * 255))
     end
     
     typesig { [] }
     def get_bounds
       check_widget
-      rect = Rect.new
-      OS._get_window_bounds(@shell_handle, RJava.cast_to_short(OS.attr_k_window_structure_rgn), rect)
-      return Rectangle.new(rect.attr_left, rect.attr_top, rect.attr_right - rect.attr_left, rect.attr_bottom - rect.attr_top)
+      frame_ = ((@window).nil? ? self.attr_view.frame : @window.frame)
+      # double
+      y = self.attr_display.get_primary_frame.attr_height - RJava.cast_to_int((frame_.attr_y + frame_.attr_height))
+      return Rectangle.new(RJava.cast_to_int(frame_.attr_x), RJava.cast_to_int(y), RJava.cast_to_int(frame_.attr_width), RJava.cast_to_int(frame_.attr_height))
     end
     
-    typesig { [::Java::Int] }
-    def get_draw_count(control)
-      if (!is_trim_handle(control))
-        return self.attr_draw_count
+    typesig { [] }
+    def get_client_area
+      check_widget
+      rect = nil
+      if (!(@window).nil?)
+        rect = @window.frame
+        if (!fix_resize)
+          rect = @window.content_rect_for_frame_rect(rect)
+        end
+      else
+        rect = !(self.attr_scroll_view).nil? ? self.attr_scroll_view.frame : self.attr_view.frame
       end
-      return 0
+      width = RJava.cast_to_int(rect.attr_width)
+      height = RJava.cast_to_int(rect.attr_height)
+      if (!(self.attr_scroll_view).nil?)
+        size = NSSize.new
+        size.attr_width = width
+        size.attr_height = height
+        size = NSScrollView.content_size_for_frame_size(size, !((self.attr_style & SWT::H_SCROLL)).equal?(0), !((self.attr_style & SWT::V_SCROLL)).equal?(0), OS::NSNoBorder)
+        width = RJava.cast_to_int(size.attr_width)
+        height = RJava.cast_to_int(size.attr_height)
+      end
+      return Rectangle.new(0, 0, width, height)
     end
     
     typesig { [] }
@@ -975,51 +1006,20 @@ module Org::Eclipse::Swt::Widgets
     typesig { [] }
     def get_location
       check_widget
-      rect = Rect.new
-      OS._get_window_bounds(@shell_handle, RJava.cast_to_short(OS.attr_k_window_structure_rgn), rect)
-      return Point.new(rect.attr_left, rect.attr_top)
+      # TODO: frame is relative to superview. What does getLocation mean in the embedded case?
+      frame_ = (!(@window).nil? ? @window.frame : self.attr_view.frame)
+      # double
+      y = self.attr_display.get_primary_frame.attr_height - RJava.cast_to_int((frame_.attr_y + frame_.attr_height))
+      return Point.new(RJava.cast_to_int(frame_.attr_x), RJava.cast_to_int(y))
     end
     
     typesig { [] }
     def get_maximized
       check_widget
-      # NOT DONE
-      return !@full_screen && super
-    end
-    
-    typesig { [] }
-    def get_minimized
-      check_widget
-      if (!get_visible)
-        return super
+      if ((@window).nil?)
+        return false
       end
-      return OS._is_window_collapsed(@shell_handle)
-    end
-    
-    typesig { [] }
-    # Returns a point describing the minimum receiver's size. The
-    # x coordinate of the result is the minimum width of the receiver.
-    # The y coordinate of the result is the minimum height of the
-    # receiver.
-    # 
-    # @return the receiver's size
-    # 
-    # @exception SWTException <ul>
-    # <li>ERROR_WIDGET_DISPOSED - if the receiver has been disposed</li>
-    # <li>ERROR_THREAD_INVALID_ACCESS - if not called from the thread that created the receiver</li>
-    # </ul>
-    # 
-    # @since 3.1
-    def get_minimum_size
-      check_widget
-      rect = Rect.new
-      OS._get_window_structure_widths(@shell_handle, rect)
-      in_min_limits = CGPoint.new
-      in_max_limits = CGPoint.new
-      OS._get_window_resize_limits(@shell_handle, in_min_limits, in_max_limits)
-      width = Math.max(1, RJava.cast_to_int(in_min_limits.attr_x) + (rect.attr_left + rect.attr_right))
-      height = Math.max(1, RJava.cast_to_int(in_min_limits.attr_y) + (rect.attr_top + rect.attr_bottom))
-      return Point.new(width, height)
+      return !@full_screen && @window.is_zoomed
     end
     
     typesig { [] }
@@ -1060,8 +1060,53 @@ module Org::Eclipse::Swt::Widgets
     end
     
     typesig { [] }
-    def get_parent_background
-      return nil
+    # Gets the receiver's modified state.
+    # 
+    # </ul>
+    # @exception SWTException <ul>
+    # <li>ERROR_WIDGET_DISPOSED - if the receiver has been disposed</li>
+    # <li>ERROR_THREAD_INVALID_ACCESS - if not called from the thread that created the receiver</li>
+    # </ul>
+    # 
+    # @since 3.5
+    def get_modified
+      check_widget
+      return @window.is_document_edited
+    end
+    
+    typesig { [] }
+    def get_minimized
+      check_widget
+      if (!get_visible)
+        return super
+      end
+      if ((@window).nil?)
+        return false
+      end
+      return @window.is_miniaturized
+    end
+    
+    typesig { [] }
+    # Returns a point describing the minimum receiver's size. The
+    # x coordinate of the result is the minimum width of the receiver.
+    # The y coordinate of the result is the minimum height of the
+    # receiver.
+    # 
+    # @return the receiver's size
+    # 
+    # @exception SWTException <ul>
+    # <li>ERROR_WIDGET_DISPOSED - if the receiver has been disposed</li>
+    # <li>ERROR_THREAD_INVALID_ACCESS - if not called from the thread that created the receiver</li>
+    # </ul>
+    # 
+    # @since 3.1
+    def get_minimum_size
+      check_widget
+      if ((@window).nil?)
+        return Point.new(0, 0)
+      end
+      size = @window.min_size
+      return Point.new(RJava.cast_to_int(size.attr_width), RJava.cast_to_int(size.attr_height))
     end
     
     typesig { [] }
@@ -1132,9 +1177,8 @@ module Org::Eclipse::Swt::Widgets
     typesig { [] }
     def get_size
       check_widget
-      rect = Rect.new
-      OS._get_window_bounds(@shell_handle, RJava.cast_to_short(OS.attr_k_window_structure_rgn), rect)
-      return Point.new(rect.attr_right - rect.attr_left, rect.attr_bottom - rect.attr_top)
+      frame_ = (!(@window).nil? ? @window.frame : self.attr_view.frame)
+      return Point.new(RJava.cast_to_int(frame_.attr_width), RJava.cast_to_int(frame_.attr_height))
     end
     
     typesig { [] }
@@ -1147,33 +1191,30 @@ module Org::Eclipse::Swt::Widgets
       return false
     end
     
-    typesig { [] }
-    def hook_events
-      super
-      mouse_proc = self.attr_display.attr_mouse_proc
-      window_proc = self.attr_display.attr_window_proc
-      mask1 = Array.typed(::Java::Int).new([OS.attr_k_event_class_window, OS.attr_k_event_window_activated, OS.attr_k_event_class_window, OS.attr_k_event_window_bounds_changed, OS.attr_k_event_class_window, OS.attr_k_event_window_close, OS.attr_k_event_class_window, OS.attr_k_event_window_collapsing, OS.attr_k_event_class_window, OS.attr_k_event_window_collapsed, OS.attr_k_event_class_window, OS.attr_k_event_window_deactivated, OS.attr_k_event_class_window, OS.attr_k_event_window_draw_content, OS.attr_k_event_class_window, OS.attr_k_event_window_expanded, OS.attr_k_event_class_window, OS.attr_k_event_window_get_region, OS.attr_k_event_class_window, OS.attr_k_event_window_hidden, OS.attr_k_event_class_window, OS.attr_k_event_window_hit_test, OS.attr_k_event_class_window, OS.attr_k_event_window_shown, OS.attr_k_event_class_window, OS.attr_k_event_window_update, OS.attr_k_event_class_window, OS.attr_k_event_window_get_click_modality, ])
-      window_target = OS._get_window_event_target(@shell_handle)
-      OS._install_event_handler(window_target, window_proc, mask1.attr_length / 2, mask1, @shell_handle, nil)
-      # OS.kEventClassMouse, OS.kEventMouseEntered,
-      # OS.kEventClassMouse, OS.kEventMouseExited,
-      mask2 = Array.typed(::Java::Int).new([OS.attr_k_event_class_mouse, OS.attr_k_event_mouse_down, OS.attr_k_event_class_mouse, OS.attr_k_event_mouse_dragged, OS.attr_k_event_class_mouse, OS.attr_k_event_mouse_moved, OS.attr_k_event_class_mouse, OS.attr_k_event_mouse_up, OS.attr_k_event_class_mouse, OS.attr_k_event_mouse_wheel_moved, ])
-      OS._install_event_handler(window_target, mouse_proc, mask2.attr_length / 2, mask2, @shell_handle, nil)
-    end
-    
-    typesig { [::Java::Int] }
-    def invalidate_visible_region(control)
-      reset_visible_region(control)
-      invalidate_children_visible_region(control)
-    end
-    
-    typesig { [::Java::Int, ::Java::Int] }
-    def inval_window_rgn(window, rgn)
-      self.attr_display.attr_needs_paint = true
-      if ((@inval_rgn).equal?(0))
-        @inval_rgn = OS._new_rgn
+    typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
+    # long
+    # long
+    # long
+    def help_requested(id, sel, the_event)
+      control = self.attr_display.get_focus_control
+      while (!(control).nil?)
+        if (control.hooks(SWT::Help))
+          control.post_event(SWT::Help)
+          break
+        end
+        control = control.attr_parent
       end
-      OS._union_rgn(rgn, @inval_rgn, @inval_rgn)
+    end
+    
+    typesig { [] }
+    def invalidate_visible_region
+      reset_visible_region
+      invalidate_children_visible_region
+    end
+    
+    typesig { [] }
+    def is_drawing
+      return get_drawing
     end
     
     typesig { [] }
@@ -1194,353 +1235,46 @@ module Org::Eclipse::Swt::Widgets
     end
     
     typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
-    def k_event_window_activated(next_handler, the_event, user_data)
-      result = super(next_handler, the_event, user_data)
-      if ((result).equal?(OS.attr_no_err))
-        return result
-      end
-      # Bug in the Macintosh.  Despite the that a window has scope
-      # kWindowActivationScopeNone, it gets kEventWindowActivated
-      # events but does not get kEventWindowDeactivated events.  The
-      # fix is to ignore kEventWindowActivated events.
-      out_scope = Array.typed(::Java::Int).new(1) { 0 }
-      OS._get_window_activation_scope(@shell_handle, out_scope)
-      if ((out_scope[0]).equal?(OS.attr_k_window_activation_scope_none))
-        return result
-      end
-      if (!@active)
-        @active = true
-        @defer_dispose = true
-        display = self.attr_display
-        display.attr_active_shell = self
-        display.set_menu_bar(self.attr_menu_bar)
-        if (!(self.attr_menu_bar).nil?)
-          OS._draw_menu_bar
-        end
-        send_event(SWT::Activate)
-        if (is_disposed)
-          return result
-        end
-        if (!restore_focus && !traverse_group(true))
-          set_focus
-        end
-        if (is_disposed)
-          return result
-        end
-        display.attr_active_shell = nil
-        parent_shell = self
-        while (!(parent_shell.attr_parent).nil?)
-          parent_shell = parent_shell.attr_parent
-          if (parent_shell.attr_full_screen)
-            break
-          end
-        end
-        if (!parent_shell.attr_full_screen || !(self.attr_menu_bar).nil?)
-          update_system_uimode
-        else
-          parent_shell.update_system_uimode
-        end
-        @defer_dispose = false
-      end
-      return result
-    end
-    
-    typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
-    def k_event_window_bounds_changed(next_handler, the_event, user_data)
-      result = super(next_handler, the_event, user_data)
-      if ((result).equal?(OS.attr_no_err))
-        return result
-      end
-      attributes = Array.typed(::Java::Int).new(1) { 0 }
-      OS._get_event_parameter(the_event, OS.attr_k_event_param_attributes, OS.attr_type_uint32, nil, attributes.attr_length * 4, nil, attributes)
-      if (!((attributes[0] & OS.attr_k_window_bounds_change_origin_changed)).equal?(0))
-        @moved = true
-        send_event(SWT::Move)
-        if (is_disposed)
-          return OS.attr_no_err
-        end
-      end
-      if (!((attributes[0] & OS.attr_k_window_bounds_change_size_changed)).equal?(0))
-        @resized = true
-        resize_bounds
-        send_event(SWT::Resize)
-        if (is_disposed)
-          return OS.attr_no_err
-        end
-        if (!(self.attr_layout).nil?)
-          mark_layout(false, false)
-          update_layout(false)
-        end
-        if (!(self.attr_region).nil? && !self.attr_region.is_disposed)
-          OS._get_event_parameter(the_event, OS.attr_k_event_param_current_bounds, OS.attr_type_qdrectangle, nil, Rect.attr_sizeof, nil, @rgn_rect)
-          OS._set_rect(@rgn_rect, RJava.cast_to_short(0), RJava.cast_to_short(0), RJava.cast_to_short((@rgn_rect.attr_right - @rgn_rect.attr_left)), RJava.cast_to_short((@rgn_rect.attr_bottom - @rgn_rect.attr_top)))
-          OS._reshape_custom_window(@shell_handle)
-        end
-      end
-      return result
-    end
-    
-    typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
-    def k_event_window_close(next_handler, the_event, user_data)
-      result = super(next_handler, the_event, user_data)
-      if ((result).equal?(OS.attr_no_err))
-        return result
-      end
-      if (is_enabled)
-        close_widget
-      end
-      return OS.attr_no_err
-    end
-    
-    typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
-    def k_event_window_collapsed(next_handler, the_event, user_data)
-      result = super(next_handler, the_event, user_data)
-      if ((result).equal?(OS.attr_no_err))
-        return result
-      end
-      self.attr_minimized = true
-      send_event(SWT::Iconify)
-      return result
-    end
-    
-    typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
-    def k_event_window_collapsing(next_handler, the_event, user_data)
-      result = super(next_handler, the_event, user_data)
-      if ((result).equal?(OS.attr_no_err))
-        return result
-      end
-      update_minimized(true)
-      return result
-    end
-    
-    typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
-    def k_event_window_deactivated(next_handler, the_event, user_data)
-      result = super(next_handler, the_event, user_data)
-      if ((result).equal?(OS.attr_no_err))
-        return result
-      end
-      if (@active)
-        @active = false
-        @defer_dispose = true
-        display = self.attr_display
-        display.attr_active_shell = self
-        send_event(SWT::Deactivate)
-        if (is_disposed)
-          return result
-        end
-        set_active_control(nil)
-        if (is_disposed)
-          return result
-        end
-        display.attr_active_shell = nil
-        save_focus
-        if (!(self.attr_saved_focus).nil?)
-          # Bug in the Macintosh.  When ClearKeyboardFocus() is called,
-          # the control that has focus gets two kEventControlSetFocus
-          # events indicating that focus was lost.  The fix is to ignore
-          # both of these and send the focus lost event explicitly.
-          display.attr_ignore_focus = true
-          OS._clear_keyboard_focus(@shell_handle)
-          display.attr_ignore_focus = false
-          if (!self.attr_saved_focus.is_disposed)
-            self.attr_saved_focus.send_focus_event(SWT::FocusOut, false)
-          end
-        end
-        display.set_menu_bar(nil)
-        @defer_dispose = false
-      end
-      return result
-    end
-    
-    typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
-    def k_event_window_draw_content(next_handler, the_event, user_data)
-      @drawing = true
-      result = OS._call_next_event_handler(next_handler, the_event)
-      @drawing = false
-      if (@reshape)
-        @reshape = false
-        OS._reshape_custom_window(@shell_handle)
-      end
-      return result
-    end
-    
-    typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
-    def k_event_window_expanded(next_handler, the_event, user_data)
-      result = super(next_handler, the_event, user_data)
-      if ((result).equal?(OS.attr_no_err))
-        return result
-      end
-      self.attr_minimized = false
-      update_minimized(false)
-      send_event(SWT::Deiconify)
-      return result
-    end
-    
-    typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
-    def k_event_window_get_click_modality(next_handler, the_event, user_data)
-      # Bug in the Macintosh.  When the user clicks in an Expose window that is
-      # disabled because of a modal dialog, the modal dialog does not come to
-      # front and is obscured by the Expose window.  The fix is to select the
-      # modal dialog.
-      result = OS._call_next_event_handler(next_handler, the_event)
-      modal = Array.typed(::Java::Int).new(1) { 0 }
-      OS._get_event_parameter(the_event, OS.attr_k_event_param_modal_window, OS.attr_type_window_ref, nil, 4, nil, modal)
-      if (!(modal[0]).equal?(0))
-        OS._select_window(modal[0])
-      end
-      # Feature in the Macintosh. ON_TOP shells are in the kFloatingWindowClass window
-      # group and are not modal disabled by default. The fix is to detect that it should
-      # be disabled and update the event parameters.
-      # 
-      # Bug in Macintosh.  When a kWindowModalityWindowModal window is active the
-      # default handler of kEventWindowGetClickModality does not properly set the
-      # kEventParamModalClickResult. The fix is to set it ourselves.
-      modal_shell = get_modal_shell
-      if (!(modal_shell).nil?)
-        modality = Array.typed(::Java::Int).new(1) { 0 }
-        OS._get_window_modality(modal_shell.attr_shell_handle, modality, nil)
-        if (!((self.attr_style & SWT::ON_TOP)).equal?(0) || (modality[0]).equal?(OS.attr_k_window_modality_window_modal))
-          click_result = OS.attr_k_himodal_click_is_modal | OS.attr_k_himodal_click_announce
-          OS._set_event_parameter(the_event, OS.attr_k_event_param_window_modality, OS.attr_type_window_modality, 4, modality)
-          OS._set_event_parameter(the_event, OS.attr_k_event_param_modal_click_result, OS.attr_type_modal_click_result, 4, Array.typed(::Java::Int).new([click_result]))
-          OS._set_event_parameter(the_event, OS.attr_k_event_param_modal_window, OS.attr_type_window_ref, 4, Array.typed(::Java::Int).new([modal_shell.attr_shell_handle]))
-        end
-      end
-      return result
-    end
-    
-    typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
-    def k_event_window_get_region(next_handler, the_event, user_data)
-      result = super(next_handler, the_event, user_data)
-      if ((result).equal?(OS.attr_no_err))
-        return result
-      end
-      if ((self.attr_region).nil? || self.attr_region.is_disposed)
-        return OS.attr_event_not_handled_err
-      end
-      region_code = Array.typed(::Java::Short).new(1) { 0 }
-      OS._get_event_parameter(the_event, OS.attr_k_event_param_window_region_code, OS.attr_type_window_region_code, nil, 2, nil, region_code)
-      temp = Array.typed(::Java::Int).new(1) { 0 }
-      OS._get_event_parameter(the_event, OS.attr_k_event_param_rgn_handle, OS.attr_type_qdrgn_handle, nil, 4, nil, temp)
-      h_region = temp[0]
-      case (region_code[0])
-      when OS.attr_k_window_content_rgn, OS.attr_k_window_structure_rgn
-        OS._rect_rgn(h_region, @rgn_rect)
-        OS._sect_rgn(h_region, self.attr_region.attr_handle, h_region)
-        # Bug in the Macintosh. In kEventWindowGetRegion,
-        # Carbon assumes the origin of the Region is (0, 0)
-        # and ignores the actual origin.  This causes the
-        # window to be shifted for a non zero origin.  Also,
-        # the size of the window is the size of the region
-        # which may be less then the size specified in
-        # setSize or setBounds.
-        # The fix is to include (0, 0) and the bottom
-        # right corner of the size in the region and to
-        # make these points transparent.
-        if (!self.attr_region.contains(0, 0))
-          r = Rect.new
-          OS._set_rect(r, RJava.cast_to_short(0), RJava.cast_to_short(0), RJava.cast_to_short(1), RJava.cast_to_short(1))
-          rect_rgn = OS._new_rgn
-          OS._rect_rgn(rect_rgn, r)
-          OS._union_rgn(rect_rgn, h_region, h_region)
-          OS._dispose_rgn(rect_rgn)
-        end
-        if (!self.attr_region.contains(@rgn_rect.attr_right - 1, @rgn_rect.attr_bottom - 1))
-          r = Rect.new
-          OS._set_rect(r, RJava.cast_to_short((@rgn_rect.attr_right - 1)), RJava.cast_to_short((@rgn_rect.attr_bottom - 1)), @rgn_rect.attr_right, @rgn_rect.attr_bottom)
-          rect_rgn = OS._new_rgn
-          OS._rect_rgn(rect_rgn, r)
-          OS._union_rgn(rect_rgn, h_region, h_region)
-          OS._dispose_rgn(rect_rgn)
-        end
-        return OS.attr_no_err
-      else
-        OS._diff_rgn(h_region, h_region, h_region)
-        return OS.attr_no_err
-      end
-    end
-    
-    typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
-    def k_event_window_hidden(next_handler, the_event, user_data)
-      result = super(next_handler, the_event, user_data)
-      if ((result).equal?(OS.attr_no_err))
-        return result
-      end
-      shells = get_shells
-      i = 0
-      while i < shells.attr_length
-        shell = shells[i]
-        if (!shell.is_disposed)
-          shell.set_window_visible(false)
-        end
-        i += 1
-      end
-      return OS.attr_event_not_handled_err
-    end
-    
-    typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
-    def k_event_window_hit_test(next_handler, the_event, user_data)
-      result = super(next_handler, the_event, user_data)
-      if ((result).equal?(OS.attr_no_err))
-        return result
-      end
-      if ((self.attr_region).nil? || self.attr_region.is_disposed)
-        return OS.attr_event_not_handled_err
-      end
-      pt = Org::Eclipse::Swt::Internal::Carbon::Point.new
-      sizeof = Org::Eclipse::Swt::Internal::Carbon::Point.attr_sizeof
-      OS._get_event_parameter(the_event, OS.attr_k_event_param_mouse_location, OS.attr_type_qdpoint, nil, sizeof, nil, pt)
-      rect = Rect.new
-      OS._get_window_bounds(@shell_handle, RJava.cast_to_short(OS.attr_k_window_content_rgn), rect)
-      OS._set_pt(pt, RJava.cast_to_short((pt.attr_h - rect.attr_left)), RJava.cast_to_short((pt.attr_v - rect.attr_top)))
-      rgn = OS._new_rgn
-      OS._rect_rgn(rgn, @rgn_rect)
-      OS._sect_rgn(rgn, self.attr_region.attr_handle, rgn)
-      in_data = OS._pt_in_rgn(pt, rgn) ? OS.attr_w_in_content : OS.attr_w_no_hit
-      OS._dispose_rgn(rgn)
-      OS._set_event_parameter(the_event, OS.attr_k_event_param_window_def_part, OS.attr_type_window_def_part_code, 2, Array.typed(::Java::Short).new([in_data]))
-      return OS.attr_no_err
-    end
-    
-    typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
-    def k_event_window_shown(next_handler, the_event, user_data)
-      result = super(next_handler, the_event, user_data)
-      if ((result).equal?(OS.attr_no_err))
-        return result
-      end
-      invalidate_visible_region(top_handle)
-      shells = get_shells
-      i = 0
-      while i < shells.attr_length
-        shell = shells[i]
-        if (!shell.is_disposed && shell.get_visible)
-          shell.set_window_visible(true)
-        end
-        i += 1
-      end
-      return OS.attr_event_not_handled_err
-    end
-    
-    typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
-    def k_event_window_update(next_handler, the_event, user_data)
-      @update = true
-      result = OS._call_next_event_handler(next_handler, the_event)
-      @update = false
-      if (!(@inval_rgn).equal?(0))
-        OS._inval_window_rgn(@shell_handle, @inval_rgn)
-        OS._dispose_rgn(@inval_rgn)
-        @inval_rgn = 0
-      end
+    # long
+    # long
+    # long
+    def make_first_responder(id, sel, responder)
+      display = self.attr_display
+      result = super(id, sel, responder)
+      display.check_focus
       return result
     end
     
     typesig { [] }
-    def resize_bounds
-      rect = Rect.new
-      OS._get_window_bounds(@shell_handle, RJava.cast_to_short(OS.attr_k_window_content_rgn), rect)
-      control = !(self.attr_scrolled_handle).equal?(0) ? self.attr_scrolled_handle : self.attr_handle
-      set_bounds(control, 0, 0, rect.attr_right - rect.attr_left, rect.attr_bottom - rect.attr_top, false, true, false)
-      resize_client_area
+    def make_key_and_order_front
+      # Bug in Cocoa.  If a child window becomes the key window when its
+      # parent window is miniaturized, the parent window appears as if
+      # restored to its full size without actually being restored. In this
+      # case the parent window does become active when its child is closed
+      # and the user is forced to restore the window from the dock.
+      # The fix is to be sure that the parent window is deminiaturized before
+      # making the child a key window.
+      if (!(self.attr_parent).nil?)
+        shell = self.attr_parent
+        if (shell.attr_window.is_miniaturized)
+          shell.attr_window.deminiaturize(nil)
+        end
+      end
+      @window.make_key_and_order_front(nil)
+    end
+    
+    typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
+    # long
+    # long
+    # long
+    def no_responder_for(id, sel, selector)
+      # Feature in Cocoa.  If the selector is keyDown and nothing has handled the event
+      # a system beep is generated.  There's no need to beep, as many keystrokes in the SWT
+      # are listened for and acted upon but not explicitly handled in a keyDown handler.  Fix is to
+      # not call the default implementation when a keyDown: is being handled.
+      if (!(selector).equal?(OS.attr_sel_key_down_))
+        super(id, sel, selector)
+      end
     end
     
     typesig { [] }
@@ -1565,13 +1299,21 @@ module Org::Eclipse::Swt::Widgets
     # @see Shell#forceActive
     def open
       check_widget
+      mask = SWT::PRIMARY_MODAL | SWT::APPLICATION_MODAL | SWT::SYSTEM_MODAL
+      if (!((self.attr_style & mask)).equal?(0))
+        self.attr_display.set_modal_shell(self)
+      else
+        update_modal
+      end
       bring_to_top(false)
-      set_visible(true)
+      set_window_visible(true, true)
       if (is_disposed)
         return
       end
-      if (@active)
-        if (!restore_focus && !traverse_group(true))
+      if (!restore_focus && !traverse_group(true))
+        # if the parent shell is minimized, setting focus will cause it
+        # to become unminimized.
+        if ((self.attr_parent).nil? || !(self.attr_parent).attr_window.is_miniaturized)
           set_focus
         end
       end
@@ -1592,9 +1334,12 @@ module Org::Eclipse::Swt::Widgets
     typesig { [] }
     def register
       super
-      the_root = Array.typed(::Java::Int).new(1) { 0 }
-      OS._get_root_control(@shell_handle, the_root)
-      self.attr_display.add_widget(the_root[0], self)
+      if (!(@window).nil?)
+        self.attr_display.add_widget(@window, self)
+      end
+      if (!(@window_delegate).nil?)
+        self.attr_display.add_widget(@window_delegate, self)
+      end
     end
     
     typesig { [::Java::Boolean] }
@@ -1613,8 +1358,15 @@ module Org::Eclipse::Swt::Widgets
     
     typesig { [] }
     def release_handle
+      if (!(@window).nil?)
+        @window.set_delegate(nil)
+      end
+      if (!(@window_delegate).nil?)
+        @window_delegate.release
+      end
+      @window_delegate = nil
       super
-      @shell_handle = 0
+      @window = nil
     end
     
     typesig { [] }
@@ -1626,18 +1378,8 @@ module Org::Eclipse::Swt::Widgets
     def release_widget
       super
       self.attr_display.clear_modal(self)
-      @disposed = true
-      if (!(@window_group).equal?(0))
-        OS._release_window_group(@window_group)
-      end
+      update_parent(false)
       self.attr_display.update_quit_menu
-      if (!(@inval_rgn).equal?(0))
-        OS._dispose_rgn(@inval_rgn)
-      end
-      if (!(@im_handle).equal?(0))
-        OS._delete_tsmdocument(@im_handle)
-      end
-      @im_handle = @inval_rgn = @window_group = 0
       @last_active = nil
     end
     
@@ -1672,6 +1414,40 @@ module Org::Eclipse::Swt::Widgets
       self.attr_event_table.unhook(SWT::Deiconify, listener)
     end
     
+    typesig { [::Java::Boolean] }
+    def send_tool_tip_event(enter)
+      if (!is_visible)
+        return
+      end
+      if ((@tooltip_tag).equal?(0))
+        view = @window.content_view
+        @tooltip_tag = view.add_tool_tip_rect(NSRect.new, @window, 0)
+        if (!(@tooltip_tag).equal?(0))
+          tracking_area = NSTrackingArea.new(@tooltip_tag)
+          owner_ = tracking_area.owner
+          if (!(owner_).nil?)
+            @tooltip_owner = owner_.attr_id
+          end
+          user_info_ = tracking_area.user_info
+          if (!(user_info_).nil?)
+            @tooltip_user_data = user_info_.attr_id
+          else
+            # long
+            # long
+            value = Array.typed(::Java::Int).new(1) { 0 }
+            OS.object_get_instance_variable(@tooltip_tag, Array.typed(::Java::Byte).new([Character.new(?_.ord), Character.new(?u.ord), Character.new(?s.ord), Character.new(?e.ord), Character.new(?r.ord), Character.new(?I.ord), Character.new(?n.ord), Character.new(?f.ord), Character.new(?o.ord)]), value)
+            @tooltip_user_data = value[0]
+          end
+        end
+      end
+      if ((@tooltip_tag).equal?(0) || (@tooltip_owner).equal?(0) || (@tooltip_user_data).equal?(0))
+        return
+      end
+      pt = @window.convert_screen_to_base(NSEvent.mouse_location)
+      event = NSEvent.enter_exit_event_with_type(enter ? OS::NSMouseEntered : OS::NSMouseExited, pt, 0, 0, @window.window_number, nil, 0, @tooltip_tag, @tooltip_user_data)
+      OS.objc_msg_send(@tooltip_owner, enter ? OS.attr_sel_mouse_entered_ : OS.attr_sel_mouse_exited_, event.attr_id)
+    end
+    
     typesig { [] }
     # If the receiver is visible, moves it to the top of the
     # drawing order for the display on which it was created
@@ -1693,12 +1469,14 @@ module Org::Eclipse::Swt::Widgets
     # @see Shell#open
     # @see Shell#setActive
     def set_active
+      if ((@window).nil?)
+        return
+      end
       check_widget
       if (!is_visible)
         return
       end
-      OS._select_window(@shell_handle)
-      OS._set_user_focus_window(@shell_handle)
+      make_key_and_order_front
     end
     
     typesig { [Control] }
@@ -1763,40 +1541,70 @@ module Org::Eclipse::Swt::Widgets
     # 
     # @since 3.4
     def set_alpha(alpha)
+      if ((@window).nil?)
+        return
+      end
       check_widget
       alpha &= 0xff
-      OS._set_window_alpha(@shell_handle, alpha / 255)
+      @window.set_alpha_value(alpha / 255)
     end
     
-    typesig { [::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Boolean, ::Java::Boolean, ::Java::Boolean] }
-    def set_bounds(x, y, width, height, move, resize, events)
+    typesig { [::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Boolean, ::Java::Boolean] }
+    def set_bounds(x, y, width, height, move, resize)
+      # Embedded Shells are not resizable.
+      if ((@window).nil?)
+        return
+      end
       if (@full_screen)
         set_full_screen(false)
       end
-      rect = Rect.new
+      sheet = @window.is_sheet
+      if (sheet && move && !resize)
+        return
+      end
+      screen_height = RJava.cast_to_int(self.attr_display.get_primary_frame.attr_height)
+      frame_ = @window.frame
       if (!move)
-        OS._get_window_bounds(@shell_handle, RJava.cast_to_short(OS.attr_k_window_structure_rgn), rect)
-        x = rect.attr_left
-        y = rect.attr_top
+        x = RJava.cast_to_int(frame_.attr_x)
+        y = screen_height - RJava.cast_to_int((frame_.attr_y + frame_.attr_height))
       end
-      if (!resize)
-        OS._get_window_bounds(@shell_handle, RJava.cast_to_short(OS.attr_k_window_structure_rgn), rect)
-        width = rect.attr_right - rect.attr_left
-        height = rect.attr_bottom - rect.attr_top
+      if (resize)
+        min_size_ = @window.min_size
+        width = Math.max(width, RJava.cast_to_int(min_size_.attr_width))
+        height = Math.max(height, RJava.cast_to_int(min_size_.attr_height))
       else
-        OS._get_window_structure_widths(@shell_handle, rect)
-        in_min_limits = CGPoint.new
-        in_max_limits = CGPoint.new
-        OS._get_window_resize_limits(@shell_handle, in_min_limits, in_max_limits)
-        width = Math.max(1, Math.max(width, RJava.cast_to_int(in_min_limits.attr_x) + (rect.attr_left + rect.attr_right)))
-        height = Math.max(1, Math.max(height, RJava.cast_to_int(in_min_limits.attr_y) + (rect.attr_top + rect.attr_bottom)))
+        width = RJava.cast_to_int(frame_.attr_width)
+        height = RJava.cast_to_int(frame_.attr_height)
       end
-      if (!(@rgn_rect).nil?)
-        OS._set_rect(@rgn_rect, RJava.cast_to_short(0), RJava.cast_to_short(0), RJava.cast_to_short(width), RJava.cast_to_short(height))
+      if (sheet)
+        y = screen_height - RJava.cast_to_int((frame_.attr_y + frame_.attr_height))
+        parent_rect = self.attr_parent.get_shell.attr_window.frame
+        frame_.attr_width = width
+        frame_.attr_height = height
+        frame_.attr_x = parent_rect.attr_x + (parent_rect.attr_width - frame_.attr_width) / 2
+        frame_.attr_y = screen_height - RJava.cast_to_int((y + frame_.attr_height))
+        @window.set_frame(frame_, is_visible, true)
+      else
+        frame_.attr_x = x
+        frame_.attr_y = screen_height - RJava.cast_to_int((y + height))
+        frame_.attr_width = width
+        frame_.attr_height = height
+        @window.set_frame(frame_, is_visible)
       end
-      OS._set_rect(rect, RJava.cast_to_short(x), RJava.cast_to_short(y), RJava.cast_to_short((x + width)), RJava.cast_to_short((y + height)))
-      OS._set_window_bounds(@shell_handle, RJava.cast_to_short(OS.attr_k_window_structure_rgn), rect)
-      return 0
+    end
+    
+    typesig { [::Java::Float, ::Java::Float] }
+    # double
+    # double
+    def set_clip_region(x, y)
+      if (!(self.attr_region_path).nil?)
+        transform_ = NSAffineTransform.transform
+        transform_.translate_xby(-x, -y)
+        self.attr_region_path.transform_using_affine_transform(transform_)
+        self.attr_region_path.add_clip
+        transform_.translate_xby(2 * x, 2 * y)
+        self.attr_region_path.transform_using_affine_transform(transform_)
+      end
     end
     
     typesig { [::Java::Boolean] }
@@ -1806,11 +1614,9 @@ module Org::Eclipse::Swt::Widgets
         return
       end
       super(enabled)
-      if (enabled && OS._is_window_active(@shell_handle))
-        if (!restore_focus)
-          traverse_group(false)
-        end
-      end
+      # if (enabled && OS.IsWindowActive (shellHandle)) {
+      # if (!restoreFocus ()) traverseGroup (false);
+      # }
     end
     
     typesig { [::Java::Boolean] }
@@ -1819,7 +1625,7 @@ module Org::Eclipse::Swt::Widgets
     # to switch to the full screen state, and if the argument is
     # <code>false</code> and the receiver was previously switched
     # into full screen state, causes the receiver to switch back
-    # to either the maximmized or normal states.
+    # to either the maximized or normal states.
     # <p>
     # Note: The result of intermixing calls to <code>setFullScreen(true)</code>,
     # <code>setMaximized(true)</code> and <code>setMinimized(true)</code> will
@@ -1837,50 +1643,36 @@ module Org::Eclipse::Swt::Widgets
     # @since 3.4
     def set_full_screen(full_screen)
       check_widget
+      if ((@full_screen).equal?(full_screen))
+        return
+      end
       @full_screen = full_screen
       if (full_screen)
-        @normal_bounds = get_bounds
-        OS._change_window_attributes(@shell_handle, OS.attr_k_window_no_title_bar_attribute, OS.attr_k_window_resizable_attribute | OS.attr_k_window_live_resize_attribute)
-        update_system_uimode
-        screen = get_monitor.get_bounds
-        if (!(self.attr_menu_bar).nil? && (get_monitor == self.attr_display.get_primary_monitor))
-          rect = Rect.new
-          gdevice = OS._get_main_device
-          OS._get_available_window_positioning_bounds(gdevice, rect)
-          screen.attr_height -= rect.attr_top
-          screen.attr_y += rect.attr_top
+        @current_frame = @window.frame
+        @window.set_shows_resize_indicator(false) # only hides resize indicator
+        if (@window.responds_to_selector(OS.attr_sel_set_movable_))
+          OS.objc_msg_send(@window.attr_id, OS.attr_sel_set_movable_, 0)
         end
-        rect = Rect.new
-        OS._set_rect(rect, RJava.cast_to_short(screen.attr_x), RJava.cast_to_short(screen.attr_y), RJava.cast_to_short((screen.attr_x + screen.attr_width)), RJava.cast_to_short((screen.attr_y + screen.attr_height)))
-        OS._set_window_bounds(@shell_handle, RJava.cast_to_short(OS.attr_k_window_structure_rgn), rect)
+        @full_screen_frame = NSScreen.main_screen.frame
+        if ((get_monitor == self.attr_display.get_primary_monitor))
+          if (!(self.attr_menu_bar).nil?)
+            # double
+            menu_bar_ht = @current_frame.attr_height - content_view.frame.attr_height
+            @full_screen_frame.attr_height -= menu_bar_ht
+            OS._set_system_uimode(OS.attr_k_uimode_content_hidden, 0)
+          else
+            OS._set_system_uimode(OS.attr_k_uimode_all_hidden, 0)
+          end
+        end
+        @window.set_frame(@full_screen_frame, true)
+        @window.content_view.set_frame(@full_screen_frame)
       else
-        attributes = 0
-        if (!((self.attr_style & SWT::RESIZE)).equal?(0))
-          attributes |= OS.attr_k_window_resizable_attribute
-          # Bug in the Macintosh.  For some reason, a window has no title bar
-          # and the kWindowResizableAttribute, no rubber banding feedback is
-          # given while the window is resizing.  The fix is to create the window
-          # with kWindowLiveResizeAttribute in this case.  This is inconsistent
-          # with other windows, but the user will get feedback when resizing.
-          if (((self.attr_style & SWT::TITLE)).equal?(0))
-            attributes |= OS.attr_k_window_live_resize_attribute
-          end
-          if (!OS.____big_endian__)
-            attributes |= OS.attr_k_window_live_resize_attribute
-          end
+        @window.set_shows_resize_indicator(true)
+        if (@window.responds_to_selector(OS.attr_sel_set_movable_))
+          OS.objc_msg_send(@window.attr_id, OS.attr_sel_set_movable_, 1)
         end
-        OS._change_window_attributes(@shell_handle, attributes, OS.attr_k_window_no_title_bar_attribute)
         OS._set_system_uimode(OS.attr_k_uimode_normal, 0)
-        if (self.attr_maximized)
-          set_maximized(true)
-        else
-          rect = Rect.new
-          if (!(@normal_bounds).nil?)
-            OS._set_rect(rect, RJava.cast_to_short(@normal_bounds.attr_x), RJava.cast_to_short(@normal_bounds.attr_y), RJava.cast_to_short((@normal_bounds.attr_x + @normal_bounds.attr_width)), RJava.cast_to_short((@normal_bounds.attr_y + @normal_bounds.attr_height)))
-          end
-          OS._set_window_bounds(@shell_handle, RJava.cast_to_short(OS.attr_k_window_structure_rgn), rect)
-        end
-        @normal_bounds = nil
+        @window.set_frame(@current_frame, true)
       end
     end
     
@@ -1916,29 +1708,27 @@ module Org::Eclipse::Swt::Widgets
     def set_maximized(maximized)
       check_widget
       super(maximized)
-      pt = Org::Eclipse::Swt::Internal::Carbon::Point.new
-      if (maximized)
-        rect = Rect.new
-        gdevice = OS._get_main_device
-        OS._get_available_window_positioning_bounds(gdevice, rect)
-        pt.attr_h = RJava.cast_to_short((rect.attr_right - rect.attr_left))
-        pt.attr_v = RJava.cast_to_short((rect.attr_bottom - rect.attr_top))
+      if ((@window).nil?)
+        return
       end
-      in_part_code = RJava.cast_to_short((maximized ? OS.attr_in_zoom_out : OS.attr_in_zoom_in))
-      OS._zoom_window_ideal(@shell_handle, in_part_code, pt)
+      if ((@window.is_zoomed).equal?(maximized))
+        return
+      end
+      @window.zoom(nil)
     end
     
     typesig { [::Java::Boolean] }
     def set_minimized(minimized)
       check_widget
-      if ((self.attr_minimized).equal?(minimized))
+      super(minimized)
+      if ((@window).nil?)
         return
       end
-      super(minimized)
-      if (!minimized && OS._is_window_collapsed(@shell_handle))
-        OS._select_window(@shell_handle)
+      if (minimized)
+        @window.miniaturize(nil)
+      else
+        @window.deminiaturize(nil)
       end
-      OS._collapse_window(@shell_handle, minimized)
     end
     
     typesig { [::Java::Int, ::Java::Int] }
@@ -1957,28 +1747,18 @@ module Org::Eclipse::Swt::Widgets
     # @since 3.1
     def set_minimum_size(width, height)
       check_widget
-      client_width = 0
-      client_height = 0
-      trim = SWT::TITLE | SWT::CLOSE | SWT::MIN | SWT::MAX
-      if (((self.attr_style & SWT::NO_TRIM)).equal?(0) && !((self.attr_style & trim)).equal?(0))
-        client_width = self.attr_default_client_width
-        client_height = self.attr_default_client_height
+      if ((@window).nil?)
+        return
       end
-      rect = Rect.new
-      OS._get_window_structure_widths(@shell_handle, rect)
-      in_min_limits = CGPoint.new
-      in_max_limits = CGPoint.new
-      OS._get_window_resize_limits(@shell_handle, in_min_limits, in_max_limits)
-      width = Math.max(width, client_width + rect.attr_left + rect.attr_right)
-      height = Math.max(height, client_height + rect.attr_top + rect.attr_bottom)
-      in_min_limits.attr_x = width - (rect.attr_left + rect.attr_right)
-      in_min_limits.attr_y = height - (rect.attr_top + rect.attr_bottom)
-      OS._set_window_resize_limits(@shell_handle, in_min_limits, in_max_limits)
-      size = get_size
-      new_width = Math.max(size.attr_x, width)
-      new_height = Math.max(size.attr_y, height)
-      if (!(new_width).equal?(size.attr_x) || !(new_height).equal?(size.attr_y))
-        set_size(new_width, new_height)
+      size = NSSize.new
+      size.attr_width = width
+      size.attr_height = height
+      @window.set_min_size(size)
+      frame_ = @window.frame
+      if (width > frame_.attr_width || height > frame_.attr_height)
+        width = RJava.cast_to_int((width > frame_.attr_width ? width : frame_.attr_width))
+        height = RJava.cast_to_int((height > frame_.attr_height ? height : frame_.attr_height))
+        set_bounds(0, 0, width, height, false, true)
       end
     end
     
@@ -2006,6 +1786,23 @@ module Org::Eclipse::Swt::Widgets
       set_minimum_size(size.attr_x, size.attr_y)
     end
     
+    typesig { [::Java::Boolean] }
+    # Sets the receiver's modified state as specified by the argument.
+    # 
+    # @param modified the new modified state for the receiver
+    # 
+    # </ul>
+    # @exception SWTException <ul>
+    # <li>ERROR_WIDGET_DISPOSED - if the receiver has been disposed</li>
+    # <li>ERROR_THREAD_INVALID_ACCESS - if not called from the thread that created the receiver</li>
+    # </ul>
+    # 
+    # @since 3.5
+    def set_modified(modified)
+      check_widget
+      @window.set_document_edited(modified)
+    end
+    
     typesig { [Region] }
     # Sets the shape of the shell to the region specified
     # by the argument.  When the argument is null, the
@@ -2029,28 +1826,28 @@ module Org::Eclipse::Swt::Widgets
       if (((self.attr_style & SWT::NO_TRIM)).equal?(0))
         return
       end
+      if ((@window).nil?)
+        return
+      end
       if (!(region).nil? && region.is_disposed)
         error(SWT::ERROR_INVALID_ARGUMENT)
       end
-      if ((region).nil?)
-        @rgn_rect = nil
-      else
-        if ((@rgn_rect).nil?)
-          @rgn_rect = Rect.new
-          OS._get_window_bounds(@shell_handle, RJava.cast_to_short(OS.attr_k_window_structure_rgn), @rgn_rect)
-          OS._set_rect(@rgn_rect, RJava.cast_to_short(0), RJava.cast_to_short(0), RJava.cast_to_short((@rgn_rect.attr_right - @rgn_rect.attr_left)), RJava.cast_to_short((@rgn_rect.attr_bottom - @rgn_rect.attr_top)))
-        end
-      end
       self.attr_region = region
-      # Bug in the Macintosh.  Calling ReshapeCustomWindow() from a
-      # kEventWindowDrawContent handler originating from ShowWindow()
-      # will deadlock.  The fix is to detected this case and only call
-      # ReshapeCustomWindow() after the default handler is done.
-      if (@drawing)
-        @reshape = true
+      if (!(self.attr_region_path).nil?)
+        self.attr_region_path.release
+      end
+      self.attr_region_path = get_path(region)
+      if (!(region).nil?)
+        @window.set_background_color(NSColor.clear_color)
+        @window.set_opaque(false)
       else
-        OS._reshape_custom_window(@shell_handle)
-        redraw_widget(self.attr_handle, true)
+        @window.set_background_color(NSColor.window_background_color)
+        @window.set_opaque(true)
+      end
+      @window.content_view.set_needs_display(true)
+      if (is_visible && @window.has_shadow)
+        @window.display
+        @window.invalidate_shadow
       end
     end
     
@@ -2060,15 +1857,12 @@ module Org::Eclipse::Swt::Widgets
       if ((string).nil?)
         error(SWT::ERROR_NULL_ARGUMENT)
       end
-      super(string)
-      buffer = CharArray.new(string.length)
-      string.get_chars(0, buffer.attr_length, buffer, 0)
-      ptr = OS._cfstring_create_with_characters(OS.attr_k_cfallocator_default, buffer, buffer.attr_length)
-      if ((ptr).equal?(0))
-        error(SWT::ERROR_CANNOT_SET_TEXT)
+      if ((@window).nil?)
+        return
       end
-      OS._set_window_title_with_cfstring(@shell_handle, ptr)
-      OS._cfrelease(ptr)
+      super(string)
+      str = NSString.string_with(string)
+      @window.set_title(str)
     end
     
     typesig { [::Java::Boolean] }
@@ -2084,6 +1878,15 @@ module Org::Eclipse::Swt::Widgets
       else
         update_modal
       end
+      if ((@window).nil?)
+        super(visible)
+      else
+        set_window_visible(visible, false)
+      end
+    end
+    
+    typesig { [::Java::Boolean, ::Java::Boolean] }
+    def set_window_visible(visible, key)
       if (visible)
         if (((self.attr_state & HIDDEN)).equal?(0))
           return
@@ -2095,77 +1898,42 @@ module Org::Eclipse::Swt::Widgets
         end
         self.attr_state |= HIDDEN
       end
-      @show_with_parent = visible
-      set_window_visible(visible)
-    end
-    
-    typesig { [::Java::Boolean] }
-    def set_window_visible(visible)
-      if ((OS._is_window_visible(@shell_handle)).equal?(visible))
+      if (!(@window).nil? && ((@window.is_visible).equal?(visible)))
         return
       end
       if (visible)
+        self.attr_display.clear_pool
+        if (@center && !@moved)
+          if (is_disposed)
+            return
+          end
+          center
+        end
         send_event(SWT::Show)
         if (is_disposed)
           return
         end
-        in_modal_kind = OS.attr_k_window_modality_none
-        if (!((self.attr_style & SWT::PRIMARY_MODAL)).equal?(0))
-          in_modal_kind = OS.attr_k_window_modality_window_modal
-        end
-        if (!((self.attr_style & SWT::APPLICATION_MODAL)).equal?(0))
-          in_modal_kind = OS.attr_k_window_modality_app_modal
-        end
-        if (!((self.attr_style & SWT::SYSTEM_MODAL)).equal?(0))
-          in_modal_kind = OS.attr_k_window_modality_system_modal
-        end
-        if (!(in_modal_kind).equal?(OS.attr_k_window_modality_none))
-          in_unavailable_window = 0
-          if (!(self.attr_parent).nil?)
-            in_unavailable_window = OS._get_control_owner(self.attr_parent.attr_handle)
+        top_view.set_hidden(false)
+        invalidate_visible_region
+        if (!((self.attr_style & (SWT::SHEET))).equal?(0))
+          application = NSApplication.shared_application
+          application.begin_sheet(@window, (self.attr_parent).attr_window, nil, 0, 0)
+          if (OS::VERSION <= 0x1060 && @window.responds_to_selector(OS.attr_sel__set_needs_to_use_heart_beat_window_))
+            OS.objc_msg_send(@window.attr_id, OS.attr_sel__set_needs_to_use_heart_beat_window_, 0)
           end
-          OS._set_window_modality(@shell_handle, in_modal_kind, in_unavailable_window)
-          if (!(in_unavailable_window).equal?(0))
-            OS._collapse_window(in_unavailable_window, false)
-          end
-        end
-        top_handle_ = top_handle
-        OS._set_control_visibility(top_handle_, true, false)
-        scope = Array.typed(::Java::Int).new(1) { 0 }
-        if (!((self.attr_style & SWT::ON_TOP)).equal?(0))
-          OS._get_window_activation_scope(@shell_handle, scope)
-          OS._set_window_activation_scope(@shell_handle, OS.attr_k_window_activation_scope_none)
-        end
-        shell_handle = @shell_handle
-        OS._retain_window(shell_handle)
-        OS._show_window(shell_handle)
-        OS._release_window(shell_handle)
-        if (is_disposed)
-          return
-        end
-        if (!(self.attr_minimized).equal?(OS._is_window_collapsed(shell_handle)))
-          OS._collapse_window(shell_handle, self.attr_minimized)
-        end
-        if (!((self.attr_style & SWT::ON_TOP)).equal?(0))
-          OS._set_window_activation_scope(shell_handle, scope[0])
-          OS._bring_to_front(shell_handle)
         else
-          # Bug in the Macintosh.  ShowWindow() does not activate the shell when an ON_TOP
-          # shell is visible. The fix is to detect that the shell was not activated and
-          # activate it.
-          if (!(self.attr_display.get_active_shell).equal?(self))
-            shells = self.attr_display.get_shells
-            i = 0
-            while i < shells.attr_length
-              shell = shells[i]
-              if (!((shell.attr_style & SWT::ON_TOP)).equal?(0) && shell.is_visible)
-                bring_to_top(false)
-                break
-              end
-              i += 1
+          # If the parent window is miniaturized, the window will be shown
+          # when its parent is shown.
+          parent_minimized = !(self.attr_parent).nil? && (self.attr_parent).attr_window.is_miniaturized
+          if (!parent_minimized)
+            if (key)
+              make_key_and_order_front
+            else
+              @window.order_front(nil)
             end
           end
         end
+        update_parent(visible)
         @opened = true
         if (!@moved)
           @moved = true
@@ -2186,20 +1954,14 @@ module Org::Eclipse::Swt::Widgets
           end
         end
       else
-        # Bug in the Macintosh.  Under certain circumstances, yet to
-        # be determined, calling HideWindow() and then DisposeWindow()
-        # causes a segment fault when an application is exiting.  This
-        # seems to happen to large applications.  The fix is to avoid
-        # calling HideWindow() when a shell is about to be disposed.
-        if (!@disposed)
-          OS._hide_window(@shell_handle)
+        update_parent(visible)
+        if (!((self.attr_style & (SWT::SHEET))).equal?(0))
+          application = NSApplication.shared_application
+          application.end_sheet(@window, 0)
         end
-        if (is_disposed)
-          return
-        end
-        top_handle_ = top_handle
-        OS._set_control_visibility(top_handle_, false, false)
-        invalidate_visible_region(top_handle_)
+        @window.order_out(nil)
+        top_view.set_hidden(true)
+        invalidate_visible_region
         send_event(SWT::Hide)
       end
       self.attr_display.update_quit_menu
@@ -2207,19 +1969,34 @@ module Org::Eclipse::Swt::Widgets
     
     typesig { [] }
     def set_zorder
-      if (!(self.attr_scrolled_handle).equal?(0))
-        OS._hiview_add_subview(self.attr_scrolled_handle, self.attr_handle)
+      if (!(self.attr_scroll_view).nil?)
+        self.attr_scroll_view.set_document_view(self.attr_view)
+      end
+      if ((@window).nil?)
+        return
+      end
+      @window.set_content_view(!(self.attr_scroll_view).nil? ? self.attr_scroll_view : self.attr_view)
+      if (fix_resize)
+        rect = @window.frame
+        rect.attr_x = rect.attr_y = 0
+        @window.content_view.set_frame(rect)
       end
     end
     
     typesig { [Control, ::Java::Boolean] }
     def set_zorder(control, above)
-      if (above)
-        # NOT DONE - move one window above another
-        OS._bring_to_front(@shell_handle)
+      if ((@window).nil?)
+        return
+      end
+      if ((control).nil?)
+        if (above)
+          @window.order_front(nil)
+        else
+          @window.order_back(nil)
+        end
       else
-        window = (control).nil? ? 0 : OS._get_control_owner(control.attr_handle)
-        OS._send_behind(@shell_handle, window)
+        other_window = control.get_shell.attr_window
+        @window.order_window(above ? OS::NSWindowAbove : OS::NSWindowBelow, other_window.window_number)
       end
     end
     
@@ -2235,52 +2012,37 @@ module Org::Eclipse::Swt::Widgets
       return true
     end
     
+    typesig { [] }
+    def update_modal
+      # do nothing
+    end
+    
     typesig { [::Java::Boolean] }
-    def update_minimized(minimized)
-      # Need to handle ON_TOP child shells ourselves, since they
-      # are not in the same group hierarchy of this shell.
+    def update_parent(visible)
+      if (visible)
+        if (!(self.attr_parent).nil? && self.attr_parent.get_visible)
+          (self.attr_parent).attr_window.add_child_window(@window, OS::NSWindowAbove)
+        end
+      else
+        parent_window_ = @window.parent_window
+        if (!(parent_window_).nil?)
+          parent_window_.remove_child_window(@window)
+        end
+      end
       shells = get_shells
       i = 0
       while i < shells.attr_length
         shell = shells[i]
-        if ((self).equal?(shell.attr_parent) && !((shell.attr_style & SWT::ON_TOP)).equal?(0))
-          if (minimized)
-            if (shells[i].is_visible)
-              shells[i].attr_show_with_parent = true
-              OS._hide_window(shell.attr_shell_handle)
-            end
-          else
-            if (shells[i].attr_show_with_parent)
-              shells[i].attr_show_with_parent = false
-              OS._show_window(shell.attr_shell_handle)
-            end
-          end
+        if ((shell.attr_parent).equal?(self) && shell.get_visible)
+          shell.update_parent(visible)
         end
         i += 1
       end
     end
     
     typesig { [] }
-    def update_modal
-      # do nothing
-    end
-    
-    typesig { [] }
     def update_system_uimode
       if (!(get_monitor == self.attr_display.get_primary_monitor))
-        return
-      end
-      is_active = false
-      active_shell = self.attr_display.get_active_shell
-      current = self
-      while (!(current).nil?)
-        if ((current == active_shell))
-          is_active = true
-          break
-        end
-        current = current.attr_parent
-      end
-      if (!is_active)
         return
       end
       if (@full_screen)
@@ -2289,9 +2051,177 @@ module Org::Eclipse::Swt::Widgets
           mode = OS.attr_k_uimode_content_hidden
         end
         OS._set_system_uimode(mode, 0)
+        @window.set_frame(@full_screen_frame, true)
       else
         OS._set_system_uimode(OS.attr_k_uimode_normal, 0)
       end
+    end
+    
+    typesig { [::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int] }
+    # long
+    # long
+    # long
+    # long
+    # long
+    # long
+    # long
+    def view_string_for_tool_tip_point_user_data(id, sel, view, tag, point, user_data)
+      pt = NSPoint.new
+      OS.memmove(pt, point, NSPoint.attr_sizeof)
+      control = self.attr_display.find_control(false)
+      if ((control).nil?)
+        return 0
+      end
+      target = control.find_tooltip(NSView.new(view).convert_point_to_view_(pt, nil))
+      string = target.tooltip_text
+      if ((string).nil?)
+        return 0
+      end
+      chars = CharArray.new(string.length)
+      string.get_chars(0, chars.attr_length, chars, 0)
+      length_ = fix_mnemonic(chars)
+      return NSString.string_with_characters(chars, length_).attr_id
+    end
+    
+    typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
+    # long
+    # long
+    # long
+    def window_did_become_key(id, sel, notification)
+      super(id, sel, notification)
+      display_ = self.attr_display
+      display_.set_menu_bar(self.attr_menu_bar)
+      send_event(SWT::Activate)
+      if (is_disposed)
+        return
+      end
+      parent_shell = self
+      while (!(parent_shell.attr_parent).nil?)
+        parent_shell = parent_shell.attr_parent
+        if (parent_shell.attr_full_screen)
+          break
+        end
+      end
+      if (!parent_shell.attr_full_screen || !(self.attr_menu_bar).nil?)
+        update_system_uimode
+      else
+        parent_shell.update_system_uimode
+      end
+    end
+    
+    typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
+    # long
+    # long
+    # long
+    def window_did_move(id, sel, notification)
+      @moved = true
+      send_event(SWT::Move)
+    end
+    
+    typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
+    # long
+    # long
+    # long
+    def window_did_resize(id, sel, notification)
+      if (@full_screen)
+        @window.set_frame(@full_screen_frame, true)
+        @window.content_view.set_frame(@full_screen_frame)
+      end
+      if (fix_resize)
+        rect = @window.frame
+        rect.attr_x = rect.attr_y = 0
+        @window.content_view.set_frame(rect)
+      end
+      @resized = true
+      send_event(SWT::Resize)
+      if (is_disposed)
+        return
+      end
+      if (!(self.attr_layout).nil?)
+        mark_layout(false, false)
+        update_layout(false)
+      end
+    end
+    
+    typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
+    # long
+    # long
+    # long
+    def window_did_resign_key(id, sel, notification)
+      super(id, sel, notification)
+      send_event(SWT::Deactivate)
+    end
+    
+    typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
+    # long
+    # long
+    # long
+    def window_send_event(id, sel, event)
+      ns_event = NSEvent.new(event)
+      # 64
+      type_ = RJava.cast_to_int(ns_event.type)
+      case (type_)
+      when OS::NSLeftMouseUp, OS::NSRightMouseUp, OS::NSOtherMouseUp, OS::NSMouseMoved
+        hit_view = Array.typed(NSView).new(1) { nil }
+        control = self.attr_display.find_control(false, hit_view)
+        if (!(control).nil? && (!control.is_active || !control.is_enabled))
+          control = nil
+        end
+        if ((type_).equal?(OS::NSMouseMoved))
+          trim_control = control
+          if (!(trim_control).nil? && trim_control.is_trim(hit_view[0]))
+            trim_control = nil
+          end
+          self.attr_display.check_enter_exit(trim_control, ns_event, false)
+          if (!(trim_control).nil?)
+            trim_control.send_mouse_event(ns_event, type_, false)
+          end
+        end
+        target = nil
+        if (!(control).nil?)
+          target = control.find_tooltip(ns_event.location_in_window)
+        end
+        if (!(self.attr_display.attr_tooltip_control).equal?(control) || !(self.attr_display.attr_tooltip_target).equal?(target))
+          old_control = self.attr_display.attr_tooltip_control
+          old_shell = !(old_control).nil? && !old_control.is_disposed ? old_control.get_shell : nil
+          shell = !(control).nil? && !control.is_disposed ? control.get_shell : nil
+          if (!(old_shell).nil?)
+            old_shell.send_tool_tip_event(false)
+          end
+          if (!(shell).nil?)
+            shell.send_tool_tip_event(true)
+          end
+        end
+        self.attr_display.attr_tooltip_control = control
+        self.attr_display.attr_tooltip_target = target
+      when OS::NSKeyDown
+        # Feature in cocoa.  Control+Tab, Ctrl+Shift+Tab, Ctrl+PageDown and Ctrl+PageUp are
+        # swallowed to handle native traversal. If we find that, force the key event to
+        # the first responder.
+        if (!((ns_event.modifier_flags & OS::NSControlKeyMask)).equal?(0))
+          chars = ns_event.characters
+          if (!(chars).nil? && (chars.length).equal?(1))
+            # 64
+            first_char = RJava.cast_to_int(chars.character_at_index(0))
+            # Shift-tab appears as control-Y.
+            case (first_char)
+            when Character.new(?\t.ord), 25, OS::NSPageDownFunctionKey, OS::NSPageUpFunctionKey
+              @window.first_responder.key_down(ns_event)
+              return
+            end
+          end
+        end
+      end
+      super(id, sel, event)
+    end
+    
+    typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
+    # long
+    # long
+    # long
+    def window_should_close(id, sel, window)
+      close_widget
+      return false
     end
     
     private

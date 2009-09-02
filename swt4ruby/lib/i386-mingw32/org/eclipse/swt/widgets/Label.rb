@@ -1,6 +1,6 @@
 require "rjava"
 
-# Copyright (c) 2000, 2008 IBM Corporation and others.
+# Copyright (c) 2000, 2009 IBM Corporation and others.
 # All rights reserved. This program and the accompanying materials
 # are made available under the terms of the Eclipse Public License v1.0
 # which accompanies this distribution, and is available at
@@ -24,7 +24,7 @@ module Org::Eclipse::Swt::Widgets
   # When SEPARATOR is specified, displays a single
   # vertical or horizontal line.
   # <p>
-  # Shadow styles are hints and may not be honoured
+  # Shadow styles are hints and may not be honored
   # by the platform.  To create a separator label
   # with the default shadow style for the platform,
   # do not specify a shadow style.
@@ -49,6 +49,7 @@ module Org::Eclipse::Swt::Widgets
   # @see <a href="http://www.eclipse.org/swt/snippets/#label">Label snippets</a>
   # @see <a href="http://www.eclipse.org/swt/examples.php">SWT Example: ControlExample</a>
   # @see <a href="http://www.eclipse.org/swt/">Sample code and further information</a>
+  # @noextend This class is not intended to be subclassed by clients.
   class Label < LabelImports.const_get :Control
     include_class_members LabelImports
     
@@ -68,8 +69,17 @@ module Org::Eclipse::Swt::Widgets
       const_set_lazy(:MARGIN) { 4 }
       const_attr_reader  :MARGIN
       
-      const_set_lazy(:IMAGE_AND_TEXT) { false }
-      const_attr_reader  :IMAGE_AND_TEXT
+      # final
+      
+      def image_and_text
+        defined?(@@image_and_text) ? @@image_and_text : @@image_and_text= false
+      end
+      alias_method :attr_image_and_text, :image_and_text
+      
+      def image_and_text=(value)
+        @@image_and_text = value
+      end
+      alias_method :attr_image_and_text=, :image_and_text=
       
       const_set_lazy(:LabelClass) { TCHAR.new(0, "STATIC", true) }
       const_attr_reader  :LabelClass
@@ -181,7 +191,7 @@ module Org::Eclipse::Swt::Widgets
           rect = @image.get_bounds
           width += rect.attr_width
           height += rect.attr_height
-          if (IMAGE_AND_TEXT)
+          if (self.attr_image_and_text)
             if (!(@text.length).equal?(0))
               width += MARGIN
             end
@@ -468,7 +478,7 @@ module Org::Eclipse::Swt::Widgets
         return
       end
       @text = string
-      if ((@image).nil? || !IMAGE_AND_TEXT)
+      if ((@image).nil? || !self.attr_image_and_text)
         old_bits = OS._get_window_long(self.attr_handle, OS::GWL_STYLE)
         new_bits = old_bits
         new_bits &= ~OS::SS_OWNERDRAW
@@ -753,7 +763,7 @@ module Org::Eclipse::Swt::Widgets
         height = struct.attr_bottom - struct.attr_top
         if (!(width).equal?(0) && !(height).equal?(0))
           draw_image_ = !(@image).nil?
-          draw_text = IMAGE_AND_TEXT && !(@text.length).equal?(0)
+          draw_text = self.attr_image_and_text && !(@text.length).equal?(0)
           margin = draw_text && draw_image_ ? MARGIN : 0
           image_width = 0
           image_height = 0

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2008 IBM Corporation and others.
+ * Copyright (c) 2000, 2009 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -11,7 +11,7 @@
 package org.eclipse.swt.graphics;
 
 
-import org.eclipse.swt.internal.carbon.*;
+import org.eclipse.swt.internal.cocoa.*;
 import org.eclipse.swt.*;
 
 /**
@@ -42,10 +42,10 @@ public final class Font extends Resource {
 	 * platforms and should never be accessed from application code.
 	 * </p>
 	 */
-	public int handle;
+	public NSFont handle;
 	
 	/**
-	 * the style to the OS font (a FMFontStyle)
+	 * the traits not supported to the OS font resource
 	 * (Warning: This field is platform dependent)
 	 * <p>
 	 * <b>IMPORTANT:</b> This field is <em>not</em> part of the SWT
@@ -54,32 +54,11 @@ public final class Font extends Resource {
 	 * platforms and should never be accessed from application code.
 	 * </p>
 	 */
-	public short style;
+	public int extraTraits;
+	
+	static final double SYNTHETIC_BOLD = -2.5;
+	static final double SYNTHETIC_ITALIC = 0.2;
 
-	/**
-	 * the size to the OS font
-	 * (Warning: This field is platform dependent)
-	 * <p>
-	 * <b>IMPORTANT:</b> This field is <em>not</em> part of the SWT
-	 * public API. It is marked public only so that it can be shared
-	 * within the packages provided by SWT. It is not available on all
-	 * platforms and should never be accessed from application code.
-	 * </p>
-	 */
-	public float size;
-	
-	/**
-	 * the ATSUI style for the OS font
-	 * (Warning: This field is platform dependent)
-	 * <p>
-	 * <b>IMPORTANT:</b> This field is <em>not</em> part of the SWT
-	 * public API. It is marked public only so that it can be shared
-	 * within the packages provided by SWT. It is not available on all
-	 * platforms and should never be accessed from application code.
-	 * </p>
-	 */
-	public int atsuiStyle;
-	
 Font(Device device) {
 	super(device);
 }
@@ -105,8 +84,14 @@ Font(Device device) {
 public Font(Device device, FontData fd) {
 	super(device);
 	if (fd == null) SWT.error(SWT.ERROR_NULL_ARGUMENT);
-	init(fd.getName(), fd.getHeightF(), fd.getStyle(), fd.atsName);
-	init();
+	NSAutoreleasePool pool = null;
+	if (!NSThread.isMainThread()) pool = (NSAutoreleasePool) new NSAutoreleasePool().alloc().init();
+	try {
+		init(fd.getName(), fd.getHeightF(), fd.getStyle(), fd.nsName);
+		init();
+	} finally {
+		if (pool != null) pool.release();
+	}
 }
 
 /**	 
@@ -139,9 +124,15 @@ public Font(Device device, FontData[] fds) {
 	for (int i=0; i<fds.length; i++) {
 		if (fds[i] == null) SWT.error(SWT.ERROR_INVALID_ARGUMENT);
 	}
-	FontData fd = fds[0];
-	init(fd.getName(), fd.getHeightF(), fd.getStyle(), fd.atsName);
-	init();
+	NSAutoreleasePool pool = null;
+	if (!NSThread.isMainThread()) pool = (NSAutoreleasePool) new NSAutoreleasePool().alloc().init();
+	try {
+		FontData fd = fds[0];
+		init(fd.getName(), fd.getHeightF(), fd.getStyle(), fd.nsName);
+		init();
+	} finally {
+		if (pool != null) pool.release();
+	}
 }
 
 /**	 
@@ -168,8 +159,14 @@ public Font(Device device, FontData[] fds) {
  */
 public Font(Device device, String name, int height, int style) {
 	super(device);
-	init(name, height, style, null);
-	init();
+	NSAutoreleasePool pool = null;
+	if (!NSThread.isMainThread()) pool = (NSAutoreleasePool) new NSAutoreleasePool().alloc().init();
+	try {
+		init(name, height, style, null);
+		init();
+	} finally {
+		if (pool != null) pool.release();
+	}
 }
 
 /*public*/ Font(Device device, String name, float height, int style) {
@@ -178,61 +175,27 @@ public Font(Device device, String name, int height, int style) {
 	init();
 }
 
-int createStyle () {
-	int[] buffer = new int[1];
-	OS.ATSUCreateStyle(buffer);
-	if (buffer[0] == 0) SWT.error(SWT.ERROR_NO_HANDLES);
-	int atsuStyle = buffer[0];
-
-	boolean synthesize = style != 0;
-	int ptr = OS.NewPtr(8 + (synthesize ? 8 : 0));
-	OS.memmove(ptr, new int[]{OS.FMGetFontFromATSFontRef(handle)}, 4); 
-	OS.memmove(ptr + 4, new int[]{OS.X2Fix(size)}, 4);
-	int[] tags, sizes, values;
-	if (synthesize) {
-		OS.memmove(ptr + 8, new byte[]{(style & OS.bold) != 0 ? (byte)1 : 0}, 1); 
-		OS.memmove(ptr + 9, new byte[]{(style & OS.italic) != 0 ? (byte)1 : 0}, 1);
-		tags = new int[]{OS.kATSUFontTag, OS.kATSUSizeTag, OS.kATSUQDBoldfaceTag, OS.kATSUQDItalicTag};
-		sizes = new int[]{4, 4, 1, 1};
-		values = new int[]{ptr, ptr + 4, ptr + 8, ptr + 9};
-	} else {
-		tags = new int[]{OS.kATSUFontTag, OS.kATSUSizeTag};
-		sizes = new int[]{4, 4};
-		values = new int[]{ptr, ptr + 4};
+void addTraits(NSMutableAttributedString attrStr, NSRange range) {
+	if ((extraTraits & OS.NSBoldFontMask) != 0) {
+		attrStr.addAttribute(OS.NSStrokeWidthAttributeName, NSNumber.numberWithDouble(SYNTHETIC_BOLD), range);
 	}
-	OS.ATSUSetAttributes(atsuStyle, tags.length, tags, sizes, values);
-	OS.DisposePtr(ptr);
-	
-	short[] types = {
-		(short)OS.kLigaturesType,
-		(short)OS.kLigaturesType,
-		(short)OS.kLigaturesType,
-		(short)OS.kLigaturesType,
-		(short)OS.kLigaturesType,
-		(short)OS.kLigaturesType,
-		(short)OS.kLigaturesType,
-		(short)OS.kLigaturesType,
-	};
-	short[] selectors = {
-		(short)OS.kRequiredLigaturesOffSelector,
-		(short)OS.kCommonLigaturesOffSelector,
-		(short)OS.kRareLigaturesOffSelector,
-		(short)OS.kLogosOffSelector,
-		(short)OS.kRebusPicturesOffSelector,
-		(short)OS.kDiphthongLigaturesOffSelector,
-		(short)OS.kSquaredLigaturesOffSelector,
-		(short)OS.kAbbrevSquaredLigaturesOffSelector,
-		(short)OS.kSymbolLigaturesOffSelector,
-	};
-	OS.ATSUSetFontFeatures(atsuStyle, types.length, types, selectors);
-	return atsuStyle;
+	if ((extraTraits & OS.NSItalicFontMask) != 0) {
+		attrStr.addAttribute(OS.NSObliquenessAttributeName, NSNumber.numberWithDouble(SYNTHETIC_ITALIC), range);
+	}
+}
+
+void addTraits(NSMutableDictionary dict) {
+	if ((extraTraits & OS.NSBoldFontMask) != 0) {
+		dict.setObject(NSNumber.numberWithDouble(SYNTHETIC_BOLD), OS.NSStrokeWidthAttributeName);
+	}
+	if ((extraTraits & OS.NSItalicFontMask) != 0) {
+		dict.setObject(NSNumber.numberWithDouble(SYNTHETIC_ITALIC), OS.NSObliquenessAttributeName);
+	}
 }
 
 void destroy() {
-	if (handle == 0) return;
-	handle = 0;
-	if (atsuiStyle != 0) OS.ATSUDisposeStyle(atsuiStyle);
-	atsuiStyle = 0;
+	handle.release();
+	handle = null;
 }
 
 /**
@@ -249,7 +212,7 @@ public boolean equals(Object object) {
 	if (object == this) return true;
 	if (!(object instanceof Font)) return false;
 	Font font = (Font)object;
-	return handle == font.handle && size == font.size;
+	return handle == font.handle;
 }
 
 /**
@@ -266,55 +229,27 @@ public boolean equals(Object object) {
  */
 public FontData[] getFontData() {
 	if (isDisposed()) SWT.error(SWT.ERROR_GRAPHIC_DISPOSED);
-	int[] buffer = new int[1];
-	OS.ATSFontGetName(handle, 0, buffer);
-	CFRange range = new CFRange();
-	range.length = OS.CFStringGetLength(buffer[0]);
-	char [] chars = new char[range.length];
-	OS.CFStringGetCharacters(buffer[0], range, chars);
-	OS.CFRelease(buffer[0]);
-	String atsName = new String(chars);
-	int platformCode = OS.kFontUnicodePlatform, encoding = OS.kCFStringEncodingUnicode;
-	if (OS.ATSUFindFontName(handle, OS.kFontFamilyName, platformCode, OS.kFontNoScriptCode, OS.kFontNoLanguageCode, 0, null, buffer, null) != OS.noErr) {
-		platformCode = OS.kFontNoPlatformCode;
-		encoding = OS.kCFStringEncodingMacRoman;
-		OS.ATSUFindFontName (handle, OS.kFontFamilyName, platformCode, OS.kFontNoScriptCode, OS.kFontNoLanguageCode, 0, null, buffer, null);
-	}	
-	byte[] bytes = new byte[buffer[0]];
-	OS.ATSUFindFontName(handle, OS.kFontFamilyName, platformCode, OS.kFontNoScriptCode, OS.kFontNoLanguageCode, bytes.length, bytes, buffer, null);
-	String name = "";
-	int ptr = OS.CFStringCreateWithBytes(0, bytes, bytes.length, encoding, false);
-	if (ptr != 0) {
-		range.length = OS.CFStringGetLength(ptr);
-		if (range.length != 0) {
-			chars = new char[range.length];
-			OS.CFStringGetCharacters(ptr, range, chars);
-			name = new String(chars);
-		}
-		OS.CFRelease(ptr);
+	NSAutoreleasePool pool = null;
+	if (!NSThread.isMainThread()) pool = (NSAutoreleasePool) new NSAutoreleasePool().alloc().init();
+	try {
+		NSString family = handle.familyName();
+		String name = family.getString();
+		NSString str = handle.fontName();
+		String nsName = str.getString();
+		NSFontManager manager = NSFontManager.sharedFontManager();
+		int /*long*/ traits = manager.traitsOfFont(handle);
+		int style = SWT.NORMAL;
+		if ((traits & OS.NSItalicFontMask) != 0) style |= SWT.ITALIC;
+		if ((traits & OS.NSBoldFontMask) != 0) style |= SWT.BOLD;
+		if ((extraTraits & OS.NSItalicFontMask) != 0) style |= SWT.ITALIC;
+		if ((extraTraits & OS.NSBoldFontMask) != 0) style |= SWT.BOLD;
+		Point dpi = device.dpi, screenDPI = device.getScreenDPI();
+		FontData data = new FontData(name, (float)/*64*/handle.pointSize() * screenDPI.y / dpi.y, style);
+		data.nsName = nsName;
+		return new FontData[]{data};
+	} finally {
+		if (pool != null) pool.release();
 	}
-	int style = 0;
-	if ((this.style & OS.italic) != 0) style |= SWT.ITALIC;
-	if ((this.style & OS.bold) != 0) style |= SWT.BOLD;
-	if (atsName.indexOf("Italic") != -1) style |= SWT.ITALIC;
-	if (atsName.indexOf("Bold") != -1) style |= SWT.BOLD;
-	int deviceDPI = device.getDPI().y;
-	int screenDPI = getScreenDPI().y;
-	FontData data = new FontData(name, size * screenDPI/deviceDPI, style);
-	data.atsName = atsName;
-	return new FontData[]{data};
-}
-
-Point getScreenDPI() {
-	int gdevice = OS.GetMainDevice();
-	int[] ptr = new int[1];
-	OS.memmove(ptr, gdevice, 4);
-	GDevice device = new GDevice();
-	OS.memmove(device, ptr[0], GDevice.sizeof);
-	OS.memmove(ptr, device.gdPMap, 4);
-	PixMap pixmap = new PixMap();
-	OS.memmove(pixmap, ptr[0], PixMap.sizeof);
-	return new Point (OS.Fix2Long (pixmap.hRes), OS.Fix2Long (pixmap.vRes));
 }
 
 /**	 
@@ -334,11 +269,9 @@ Point getScreenDPI() {
  * 
  * @private
  */
-public static Font carbon_new(Device device, int handle, short style, float size) {
+public static Font cocoa_new(Device device, NSFont handle) {
 	Font font = new Font(device);
 	font.handle = handle;
-	font.style = style;
-	font.size = size;
 	return font;
 }
 
@@ -353,64 +286,60 @@ public static Font carbon_new(Device device, int handle, short style, float size
  * @see #equals
  */
 public int hashCode() {
-	return handle;
+	return handle != null ? (int)/*64*/handle.id : 0;
 }
 
-void init(String name, float height, int style, String atsName) {
+void init(String name, float height, int style, String nsName) {
 	if (name == null) SWT.error(SWT.ERROR_NULL_ARGUMENT);
 	if (height < 0) SWT.error(SWT.ERROR_INVALID_ARGUMENT);
-	int font = 0;
-	if (atsName != null) {		
-		int ptr = createCFString(atsName);
-		if (ptr != 0) {
-			font = OS.ATSFontFindFromName(ptr, OS.kATSOptionFlagsDefault);
-			OS.CFRelease(ptr);
-		}
+	Point dpi = device.dpi, screenDPI = device.getScreenDPI();
+	float size = height * dpi.y / screenDPI.y;
+	if (nsName != null) {
+		handle = NSFont.fontWithName(NSString.stringWith(nsName), size);
 	} else {
-		atsName = name;
-		if ((style & SWT.BOLD) != 0) atsName += " Bold";
-		if ((style & SWT.ITALIC) != 0) atsName += " Italic";
-		int ptr = createCFString(atsName);
-		if (ptr != 0) {
-			font = OS.ATSFontFindFromName(ptr, OS.kATSOptionFlagsDefault);
-			OS.CFRelease(ptr);
-		}
-		if (font == 0 && (style & SWT.ITALIC) != 0) {
-			this.style |= OS.italic;
-			atsName = name;
-			if ((style & SWT.BOLD) != 0) atsName += " Bold";
-			ptr = createCFString(atsName);
-			if (ptr != 0) {
-				font = OS.ATSFontFindFromName(ptr, OS.kATSOptionFlagsDefault);
-				OS.CFRelease(ptr);
+		NSString family = NSString.stringWith(name);
+		NSFont nsFont = NSFont.fontWithName(family, size);
+		if (nsFont == null) nsFont = NSFont.systemFontOfSize(size);
+		NSFontManager manager = NSFontManager.sharedFontManager();
+		if (nsFont != null) {
+			if ((style & (SWT.BOLD | SWT.ITALIC)) == 0) {
+				handle = nsFont;
+			} else {
+				int traits = 0;
+				if ((style & SWT.ITALIC) != 0) traits |= OS.NSItalicFontMask;
+				if ((style & SWT.BOLD) != 0) traits |= OS.NSBoldFontMask;
+				handle = manager.convertFont(nsFont, traits);
+				if ((style & SWT.ITALIC) != 0 && (handle == null || (manager.traitsOfFont(handle) & OS.NSItalicFontMask) == 0)) {
+					traits &= ~OS.NSItalicFontMask;
+					handle = null;
+					if ((style & SWT.BOLD) != 0) {
+						handle = manager.convertFont(nsFont, traits);
+					}
+				}
+				if ((style & SWT.BOLD) != 0 && handle == null) {
+					traits &= ~OS.NSBoldFontMask;
+					if ((style & SWT.ITALIC) != 0) {
+						traits |= OS.NSItalicFontMask;
+						handle = manager.convertFont(nsFont, traits);
+					}
+				}
+				if (handle == null) handle = nsFont;
 			}
 		}
-		if (font == 0 && (style & SWT.BOLD) != 0) {
-			this.style |= OS.bold;
-			atsName = name;
-			ptr = createCFString(atsName);
-			if (ptr != 0) {
-				font = OS.ATSFontFindFromName(ptr, OS.kATSOptionFlagsDefault);
-				OS.CFRelease(ptr);
-			}
+		if (handle == null) {
+			handle = NSFont.systemFontOfSize(size);
+		}
+		if ((style & SWT.ITALIC) != 0 && (manager.traitsOfFont(handle) & OS.NSItalicFontMask) == 0) {
+			extraTraits |= OS.NSItalicFontMask;
+		}
+		if ((style & SWT.BOLD) != 0 && (manager.traitsOfFont(handle) & OS.NSBoldFontMask) == 0) {
+			extraTraits |= OS.NSBoldFontMask;
 		}
 	}
-	int deviceDPI = device.getDPI().y;
-	int screenDPI = getScreenDPI().y;
-	this.size = height * deviceDPI/screenDPI;
-	if (font == 0) {
-		Font systemFont = device.systemFont;
-		this.handle = systemFont.handle;
-	} else {
-		this.handle = font;
+	if (handle == null) {
+		handle = device.systemFont.handle;
 	}
-	this.atsuiStyle = createStyle();
-}
-
-int createCFString(String str) {
-	char[] chars = new char[str.length()];
-	str.getChars(0, chars.length, chars, 0);
-	return OS.CFStringCreateWithCharacters(OS.kCFAllocatorDefault, chars, chars.length);
+	handle.retain();
 }
 
 /**
@@ -424,7 +353,7 @@ int createCFString(String str) {
  * @return <code>true</code> when the font is disposed and <code>false</code> otherwise
  */
 public boolean isDisposed() {
-	return handle == 0;
+	return handle == null;
 }
 
 /**

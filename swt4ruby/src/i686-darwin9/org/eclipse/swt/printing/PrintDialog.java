@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2008 IBM Corporation and others.
+ * Copyright (c) 2000, 2009 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -13,7 +13,8 @@ package org.eclipse.swt.printing;
 import org.eclipse.swt.*;
 import org.eclipse.swt.printing.PrinterData;
 import org.eclipse.swt.widgets.*;
-import org.eclipse.swt.internal.carbon.OS;
+import org.eclipse.swt.internal.*;
+import org.eclipse.swt.internal.cocoa.*;
 
 /**
  * Instances of this class allow the user to select
@@ -27,12 +28,15 @@ import org.eclipse.swt.internal.carbon.OS;
  * @see <a href="http://www.eclipse.org/swt/snippets/#printing">Printing snippets</a>
  * @see <a href="http://www.eclipse.org/swt/examples.php">SWT Example: ControlExample, Dialog tab</a>
  * @see <a href="http://www.eclipse.org/swt/">Sample code and further information</a>
+ * @noextend This class is not intended to be subclassed by clients.
  */
 public class PrintDialog extends Dialog {
-	PrinterData printerData;
-	int scope = PrinterData.ALL_PAGES;
-	int startPage = 1, endPage = 1;
-	boolean printToFile = false;
+	PrinterData printerData = new PrinterData();
+	int returnCode;
+	
+	// the following Callbacks are never freed
+	static Callback dialogCallback5;
+	static final byte[] SWT_OBJECT = {'S', 'W', 'T', '_', 'O', 'B', 'J', 'E', 'C', 'T', '\0'};
 
 /**
  * Constructs a new instance of this class given only its parent.
@@ -84,15 +88,36 @@ public PrintDialog (Shell parent) {
  * @see Widget#getStyle
  */
 public PrintDialog (Shell parent, int style) {
-	super (parent, style);
+	super (parent, checkStyle(parent, style));
 	checkSubclass ();
+}
+
+static int checkStyle (Shell parent, int style) {
+	int mask = SWT.PRIMARY_MODAL | SWT.APPLICATION_MODAL | SWT.SYSTEM_MODAL;
+	if ((style & SWT.SHEET) != 0) {
+		if (getSheetEnabled ()) {
+			if (parent == null) {
+				style &= ~SWT.SHEET;
+			}
+		} else {
+			style &= ~SWT.SHEET;
+		}
+		if ((style & mask) == 0) {
+			style |= parent == null ? SWT.APPLICATION_MODAL : SWT.PRIMARY_MODAL;
+		}
+	}
+	return style;
 }
 
 /**
  * Sets the printer data that will be used when the dialog
  * is opened.
+ * <p>
+ * Setting the printer data to null is equivalent to
+ * resetting all data fields to their default values.
+ * </p>
  * 
- * @param data the data that will be used when the dialog is opened
+ * @param data the data that will be used when the dialog is opened or null to use default data
  * 
  * @since 3.4
  */
@@ -116,7 +141,8 @@ public PrinterData getPrinterData() {
  * Makes the receiver visible and brings it to the front
  * of the display.
  *
- * @return a printer data object describing the desired print job parameters
+ * @return a printer data object describing the desired print job parameters,
+ *         or null if the dialog was canceled, no printers were found, or an error occurred
  *
  * @exception SWTException <ul>
  *    <li>ERROR_WIDGET_DISPOSED - if the receiver has been disposed</li>
@@ -124,91 +150,69 @@ public PrinterData getPrinterData() {
  * </ul>
  */
 public PrinterData open() {
-	int[] buffer = new int[1];
-	if (OS.PMCreateSession(buffer) == OS.noErr) {
-		int printSession = buffer[0];
-		if (OS.PMCreatePrintSettings(buffer) == OS.noErr) {
-			int printSettings = buffer[0];
-			OS.PMSessionDefaultPrintSettings(printSession, printSettings);
-			if (OS.PMCreatePageFormat(buffer) == OS.noErr) {
-				int pageFormat = buffer[0];
-				OS.PMSessionDefaultPageFormat(printSession, pageFormat);
-				OS.PMSessionSetDestination(printSession, printSettings, (short) (printToFile ? OS.kPMDestinationFile : OS.kPMDestinationPrinter), 0, 0);
-				if (scope == PrinterData.PAGE_RANGE) {
-					OS.PMSetFirstPage(printSettings, startPage, false);
-					OS.PMSetLastPage(printSettings, endPage, false);
-					OS.PMSetPageRange(printSettings, startPage, endPage);
-				} else {
-					OS.PMSetPageRange(printSettings, 1, OS.kPMPrintAllPages);
-				}
-				boolean[] accepted = new boolean [1];
-				OS.PMSessionPageSetupDialog(printSession, pageFormat, accepted);	
-				if (accepted[0]) {		
-					OS.PMSessionPrintDialog(printSession, printSettings, pageFormat, accepted);
-					if (accepted[0]) {
-						short[] destType = new short[1];
-						OS.PMSessionGetDestinationType(printSession, printSettings, destType);
-						String name = Printer.getCurrentPrinterName(printSession);
-						String driver = Printer.DRIVER;
-						switch (destType[0]) {
-							case OS.kPMDestinationFax: driver = Printer.FAX_DRIVER; break;
-							case OS.kPMDestinationFile: driver = Printer.FILE_DRIVER; break;
-							case OS.kPMDestinationPreview: driver = Printer.PREVIEW_DRIVER; break;
-							case OS.kPMDestinationPrinter: driver = Printer.PRINTER_DRIVER; break;
-						}
-						PrinterData data = new PrinterData(driver, name);
-						if (destType[0] == OS.kPMDestinationFile) {
-							data.printToFile = true;
-							OS.PMSessionCopyDestinationLocation(printSession, printSettings, buffer);
-							int fileName = OS.CFURLCopyFileSystemPath(buffer[0],OS.kCFURLPOSIXPathStyle);
-							OS.CFRelease(buffer[0]);
-							data.fileName = Printer.getString(fileName);
-							OS.CFRelease(fileName);
-						}
-						OS.PMGetCopies(printSettings, buffer);
-						data.copyCount = buffer[0];						
-						OS.PMGetFirstPage(printSettings, buffer);
-						data.startPage = buffer[0];
-						OS.PMGetLastPage(printSettings, buffer);
-						data.endPage = buffer[0];
-						OS.PMGetPageRange(printSettings, null, buffer);
-						if (data.startPage == 1 && data.endPage == OS.kPMPrintAllPages) {
-							data.scope = PrinterData.ALL_PAGES;
-						} else {
-							data.scope = PrinterData.PAGE_RANGE;
-						}
-						boolean[] collate = new boolean[1];
-						OS.PMGetCollate(printSettings, collate);
-						data.collate = collate[0];
-						
-						/* Serialize settings */
-						int[] flatSettings = new int[1];
-						OS.PMFlattenPrintSettings(printSettings, flatSettings);
-						int[] flatFormat = new int[1];
-						OS.PMFlattenPageFormat(pageFormat, flatFormat);
-						int settingsLength = OS.GetHandleSize (flatSettings[0]);
-						int formatLength = OS.GetHandleSize (flatFormat[0]);
-						byte[] otherData = data.otherData = new byte[settingsLength + formatLength + 8];
-						int offset = 0;
-						offset = Printer.packData(flatSettings[0], otherData, offset);
-						offset = Printer.packData(flatFormat[0], otherData, offset);
-						OS.DisposeHandle(flatSettings[0]);
-						OS.DisposeHandle(flatFormat[0]);
-						
-						scope = data.scope;
-						startPage = data.startPage;
-						endPage = data.endPage;
-						printToFile = data.printToFile;
-						return data;
-					}
-				}
-				OS.PMRelease(pageFormat);
-			}
-			OS.PMRelease(printSettings);
-		}
-		OS.PMRelease(printSession);
+	PrinterData data = null;
+	NSPrintPanel panel = NSPrintPanel.printPanel();
+	NSPrintInfo printInfo = new NSPrintInfo(NSPrintInfo.sharedPrintInfo().copy());
+	printInfo.setOrientation(printerData.orientation == PrinterData.LANDSCAPE ? OS.NSLandscapeOrientation : OS.NSPortraitOrientation);
+	NSMutableDictionary dict = printInfo.dictionary();	
+	dict.setValue(NSNumber.numberWithBool(printerData.collate), OS.NSPrintMustCollate);
+	dict.setValue(NSNumber.numberWithInt(printerData.copyCount), OS.NSPrintCopies);
+	if (printerData.printToFile) {
+		dict.setValue(OS.NSPrintSaveJob, OS.NSPrintJobDisposition);
 	}
-	return null;
+	if (printerData.fileName != null && printerData.fileName.length() > 0) {
+		dict.setValue(NSString.stringWith(printerData.fileName), OS.NSPrintSavePath);
+	}
+	dict.setValue(NSNumber.numberWithBool(printerData.scope == PrinterData.ALL_PAGES), OS.NSPrintAllPages);
+	if (printerData.scope == PrinterData.PAGE_RANGE) {
+		dict.setValue(NSNumber.numberWithInt(printerData.startPage), OS.NSPrintFirstPage);
+		dict.setValue(NSNumber.numberWithInt(printerData.endPage), OS.NSPrintLastPage);
+	}
+	panel.setOptions(OS.NSPrintPanelShowsPageSetupAccessory | panel.options());
+	int response;
+	if ((getStyle () & SWT.SHEET) != 0) {
+		initClasses();
+		SWTPrintPanelDelegate delegate = (SWTPrintPanelDelegate)new SWTPrintPanelDelegate().alloc().init();
+		int /*long*/ jniRef = OS.NewGlobalRef(this);
+		if (jniRef == 0) SWT.error(SWT.ERROR_NO_HANDLES);
+		OS.object_setInstanceVariable(delegate.id, SWT_OBJECT, jniRef);
+		returnCode = -1;
+		Shell parent = getParent();
+		panel.beginSheetWithPrintInfo(printInfo, parent.view.window(), delegate, OS.sel_panelDidEnd_returnCode_contextInfo_, 0);
+		NSApplication application = NSApplication.sharedApplication();
+		while (returnCode == -1) application.run();
+		if (delegate != null) delegate.release();
+		if (jniRef != 0) OS.DeleteGlobalRef(jniRef);
+		response = returnCode;
+	} else {
+		response = (int)/*64*/panel.runModalWithPrintInfo(printInfo);
+	}
+	if (response != OS.NSCancelButton) {
+		NSPrinter printer = printInfo.printer();
+		NSString str = printer.name();
+		data = new PrinterData(Printer.DRIVER, str.getString());
+		data.printToFile = printInfo.jobDisposition().isEqual(OS.NSPrintSaveJob);
+		if (data.printToFile) {
+			NSString filename = new NSString(dict.objectForKey(OS.NSPrintSavePath));
+			data.fileName = filename.getString();
+		}
+		data.scope = new NSNumber(dict.objectForKey(OS.NSPrintAllPages)).intValue() != 0 ? PrinterData.ALL_PAGES : PrinterData.PAGE_RANGE;
+		if (data.scope == PrinterData.PAGE_RANGE) {
+			data.startPage = new NSNumber(dict.objectForKey(OS.NSPrintFirstPage)).intValue();
+			data.endPage = new NSNumber(dict.objectForKey(OS.NSPrintLastPage)).intValue();
+		}
+		data.collate = new NSNumber(dict.objectForKey(OS.NSPrintMustCollate)).intValue() != 0;
+		data.collate = false; //TODO: Only set to false if the printer does the collate internally (most printers do)
+		data.copyCount = new NSNumber(dict.objectForKey(OS.NSPrintCopies)).intValue();
+		data.copyCount = 1; //TODO: Only set to 1 if the printer does the copy internally (most printers do)
+		data.orientation = printInfo.orientation() == OS.NSLandscapeOrientation ? PrinterData.LANDSCAPE : PrinterData.PORTRAIT;
+		NSData nsData = NSKeyedArchiver.archivedDataWithRootObject(printInfo);
+		data.otherData = new byte[(int)/*64*/nsData.length()];
+		OS.memmove(data.otherData, nsData.bytes(), data.otherData.length);
+		printerData = data;
+	}
+	printInfo.release();
+	return data;
 }
 
 /**
@@ -227,7 +231,45 @@ public PrinterData open() {
  * @return the scope setting that the user selected
  */
 public int getScope() {
-	return scope;
+	return printerData.scope;
+}
+
+static boolean getSheetEnabled () {
+	return !"false".equals(System.getProperty("org.eclipse.swt.sheet"));
+}
+
+static int /*long*/ dialogProc(int /*long*/ id, int /*long*/ sel, int /*long*/ arg0, int /*long*/ arg1, int /*long*/ arg2) {
+	int /*long*/ [] jniRef = new int /*long*/ [1];
+	OS.object_getInstanceVariable(id, SWT_OBJECT, jniRef);
+	if (jniRef[0] == 0) return 0;
+	if (sel == OS.sel_panelDidEnd_returnCode_contextInfo_) {
+		PrintDialog dialog = (PrintDialog)OS.JNIGetObject(jniRef[0]);
+		if (dialog == null) return 0;
+		dialog.panelDidEnd_returnCode_contextInfo(id, sel, arg0, arg1, arg2);
+	}
+	return 0;
+}
+
+void initClasses () {
+	String className = "SWTPrintPanelDelegate";
+	if (OS.objc_lookUpClass (className) != 0) return;
+	
+	dialogCallback5 = new Callback(getClass(), "dialogProc", 5);
+	int /*long*/ dialogProc5 = dialogCallback5.getAddress();
+	if (dialogProc5 == 0) SWT.error (SWT.ERROR_NO_MORE_CALLBACKS);	
+	
+	byte[] types = {'*','\0'};
+	int size = C.PTR_SIZEOF, align = C.PTR_SIZEOF == 4 ? 2 : 3;
+	int /*long*/ cls = OS.objc_allocateClassPair(OS.class_NSObject, className, 0);
+	OS.class_addIvar(cls, SWT_OBJECT, size, (byte)align, types);
+	OS.class_addMethod(cls, OS.sel_panelDidEnd_returnCode_contextInfo_, dialogProc5, "@:@i@");
+	OS.objc_registerClassPair(cls);
+}
+
+void panelDidEnd_returnCode_contextInfo(int /*long*/ id, int /*long*/ sel, int /*long*/ alert, int /*long*/ returnCode, int /*long*/ contextInfo) {
+	this.returnCode = (int)/*64*/returnCode;
+	NSApplication application = NSApplication.sharedApplication();
+	application.stop(null);
 }
 
 /**
@@ -246,7 +288,7 @@ public int getScope() {
  * @param scope the scope setting when the dialog is opened
  */
 public void setScope(int scope) {
-	this.scope = scope;
+	printerData.scope = scope;
 }
 
 /**
@@ -260,7 +302,7 @@ public void setScope(int scope) {
  * @return the start page setting that the user selected
  */
 public int getStartPage() {
-	return startPage;
+	return printerData.startPage;
 }
 
 /**
@@ -274,7 +316,7 @@ public int getStartPage() {
  * @param startPage the startPage setting when the dialog is opened
  */
 public void setStartPage(int startPage) {
-	this.startPage = startPage;
+	printerData.startPage = startPage;
 }
 
 /**
@@ -288,7 +330,7 @@ public void setStartPage(int startPage) {
  * @return the end page setting that the user selected
  */
 public int getEndPage() {
-	return endPage;
+	return printerData.endPage;
 }
 
 /**
@@ -302,7 +344,7 @@ public int getEndPage() {
  * @param endPage the end page setting when the dialog is opened
  */
 public void setEndPage(int endPage) {
-	this.endPage = endPage;
+	printerData.endPage = endPage;
 }
 
 /**
@@ -312,7 +354,7 @@ public void setEndPage(int endPage) {
  * @return the 'Print to file' setting that the user selected
  */
 public boolean getPrintToFile() {
-	return printToFile;
+	return printerData.printToFile;
 }
 
 /**
@@ -322,7 +364,7 @@ public boolean getPrintToFile() {
  * @param printToFile the 'Print to file' setting when the dialog is opened
  */
 public void setPrintToFile(boolean printToFile) {
-	this.printToFile = printToFile;
+	printerData.printToFile = printToFile;
 }
 
 protected void checkSubclass() {

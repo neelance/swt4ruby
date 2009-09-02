@@ -1,6 +1,6 @@
 require "rjava"
 
-# Copyright (c) 2000, 2006 IBM Corporation and others. All rights reserved.
+# Copyright (c) 2000, 2008 IBM Corporation and others. All rights reserved.
 # The contents of this file are made available under the terms
 # of the GNU Lesser General Public License (LGPL) Version 2.1 that
 # accompanies this distribution (lgpl-v21.txt).  The LGPL is also
@@ -23,12 +23,14 @@ module Org::Eclipse::Swt::Internal::Gtk
   class GdkImage 
     include_class_members GdkImageImports
     
+    # @field cast=(GdkImageType)
     attr_accessor :type
     alias_method :attr_type, :type
     undef_method :type
     alias_method :attr_type=, :type=
     undef_method :type=
     
+    # @field cast=(GdkVisual *)
     # int
     attr_accessor :visual
     alias_method :attr_visual, :visual
@@ -36,48 +38,56 @@ module Org::Eclipse::Swt::Internal::Gtk
     alias_method :attr_visual=, :visual=
     undef_method :visual=
     
+    # @field cast=(GdkByteOrder)
     attr_accessor :byte_order
     alias_method :attr_byte_order, :byte_order
     undef_method :byte_order
     alias_method :attr_byte_order=, :byte_order=
     undef_method :byte_order=
     
+    # @field cast=(gint)
     attr_accessor :width
     alias_method :attr_width, :width
     undef_method :width
     alias_method :attr_width=, :width=
     undef_method :width=
     
+    # @field cast=(gint)
     attr_accessor :height
     alias_method :attr_height, :height
     undef_method :height
     alias_method :attr_height=, :height=
     undef_method :height=
     
+    # @field cast=(guint16)
     attr_accessor :depth
     alias_method :attr_depth, :depth
     undef_method :depth
     alias_method :attr_depth=, :depth=
     undef_method :depth=
     
+    # @field cast=(guint16)
     attr_accessor :bpp
     alias_method :attr_bpp, :bpp
     undef_method :bpp
     alias_method :attr_bpp=, :bpp=
     undef_method :bpp=
     
+    # @field cast=(guint16)
     attr_accessor :bpl
     alias_method :attr_bpl, :bpl
     undef_method :bpl
     alias_method :attr_bpl=, :bpl=
     undef_method :bpl=
     
+    # @field cast=(guint16)
     attr_accessor :bits_per_pixel
     alias_method :attr_bits_per_pixel, :bits_per_pixel
     undef_method :bits_per_pixel
     alias_method :attr_bits_per_pixel=, :bits_per_pixel=
     undef_method :bits_per_pixel=
     
+    # @field cast=(gpointer)
     # int
     attr_accessor :mem
     alias_method :attr_mem, :mem
@@ -85,6 +95,7 @@ module Org::Eclipse::Swt::Internal::Gtk
     alias_method :attr_mem=, :mem=
     undef_method :mem=
     
+    # @field cast=(GdkColormap *)
     # int
     attr_accessor :colormap
     alias_method :attr_colormap, :colormap
@@ -92,6 +103,7 @@ module Org::Eclipse::Swt::Internal::Gtk
     alias_method :attr_colormap=, :colormap=
     undef_method :colormap=
     
+    # @field cast=(gpointer)
     # int
     attr_accessor :windowing_data
     alias_method :attr_windowing_data, :windowing_data

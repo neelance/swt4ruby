@@ -1,6 +1,6 @@
 require "rjava"
 
-# Copyright (c) 2000, 2008 IBM Corporation and others.
+# Copyright (c) 2000, 2009 IBM Corporation and others.
 # All rights reserved. This program and the accompanying materials
 # are made available under the terms of the Eclipse Public License v1.0
 # which accompanies this distribution, and is available at
@@ -39,6 +39,7 @@ module Org::Eclipse::Swt::Widgets
   # @see <a href="http://www.eclipse.org/swt/snippets/#list">List snippets</a>
   # @see <a href="http://www.eclipse.org/swt/examples.php">SWT Example: ControlExample</a>
   # @see <a href="http://www.eclipse.org/swt/">Sample code and further information</a>
+  # @noextend This class is not intended to be subclassed by clients.
   class SwtList < ListImports.const_get :Scrollable
     include_class_members ListImports
     
@@ -216,7 +217,7 @@ module Org::Eclipse::Swt::Widgets
       redraw = false
       case (msg)
       when OS::WM_HSCROLL, OS::WM_VSCROLL
-        redraw = !(find_image_control).nil? && (self.attr_draw_count).equal?(0) && OS._is_window_visible(self.attr_handle)
+        redraw = !(find_image_control).nil? && get_drawing && OS._is_window_visible(self.attr_handle)
         if (redraw)
           OS._def_window_proc(self.attr_handle, OS::WM_SETREDRAW, 0, 0)
         end
@@ -1253,7 +1254,7 @@ module Org::Eclipse::Swt::Widgets
       item_rect = RECT.new
       selected_rect = nil
       OS._send_message(self.attr_handle, OS::LB_GETITEMRECT, index, item_rect)
-      redraw = (self.attr_draw_count).equal?(0) && OS._is_window_visible(self.attr_handle)
+      redraw = get_drawing && OS._is_window_visible(self.attr_handle)
       if (redraw)
         OS._update_window(self.attr_handle)
         OS._send_message(self.attr_handle, OS::WM_SETREDRAW, 0, 0)
@@ -1437,7 +1438,7 @@ module Org::Eclipse::Swt::Widgets
       # long
       old_proc = OS._get_window_long_ptr(self.attr_handle, OS::GWLP_WNDPROC)
       OS._set_window_long_ptr(self.attr_handle, OS::GWLP_WNDPROC, ListProc)
-      redraw = (self.attr_draw_count).equal?(0) && OS._is_window_visible(self.attr_handle)
+      redraw = get_drawing && OS._is_window_visible(self.attr_handle)
       if (redraw)
         OS._send_message(self.attr_handle, OS::WM_SETREDRAW, 0, 0)
       end
@@ -1895,7 +1896,7 @@ module Org::Eclipse::Swt::Widgets
       if (OS._get_key_state(OS::VK_CONTROL) < 0 && OS._get_key_state(OS::VK_SHIFT) >= 0)
         bits = OS._get_window_long(self.attr_handle, OS::GWL_STYLE)
         if (!((bits & OS::LBS_EXTENDEDSEL)).equal?(0))
-          location = -1
+          new_index = -1
           catch(:break_case) do
             # 64
             case (RJava.cast_to_int(w_param))
@@ -1907,16 +1908,16 @@ module Org::Eclipse::Swt::Widgets
               return LRESULT::ZERO
             when OS::VK_UP, OS::VK_DOWN
               # 64
-              index = RJava.cast_to_int(OS._send_message(self.attr_handle, OS::LB_GETCARETINDEX, 0, 0))
+              old_index = RJava.cast_to_int(OS._send_message(self.attr_handle, OS::LB_GETCARETINDEX, 0, 0))
               # 64
-              location = Math.max(0, index + (((RJava.cast_to_int(w_param))).equal?(OS::VK_UP) ? -1 : 1))
+              new_index = Math.max(0, old_index + (((RJava.cast_to_int(w_param))).equal?(OS::VK_UP) ? -1 : 1))
             when OS::VK_PRIOR
               # 64
-              index = RJava.cast_to_int(OS._send_message(self.attr_handle, OS::LB_GETCARETINDEX, 0, 0))
-              # 64
               top_index = RJava.cast_to_int(OS._send_message(self.attr_handle, OS::LB_GETTOPINDEX, 0, 0))
-              if (!(index).equal?(top_index))
-                location = top_index
+              # 64
+              old_index = RJava.cast_to_int(OS._send_message(self.attr_handle, OS::LB_GETCARETINDEX, 0, 0))
+              if (!(old_index).equal?(top_index))
+                new_index = top_index
               else
                 force_resize
                 rect = RECT.new
@@ -1924,13 +1925,13 @@ module Org::Eclipse::Swt::Widgets
                 # 64
                 item_height = RJava.cast_to_int(OS._send_message(self.attr_handle, OS::LB_GETITEMHEIGHT, 0, 0))
                 page_size = Math.max(2, (rect.attr_bottom / item_height))
-                location = Math.max(0, top_index - (page_size - 1))
+                new_index = Math.max(0, top_index - (page_size - 1))
               end
             when OS::VK_NEXT
               # 64
-              index = RJava.cast_to_int(OS._send_message(self.attr_handle, OS::LB_GETCARETINDEX, 0, 0))
-              # 64
               top_index = RJava.cast_to_int(OS._send_message(self.attr_handle, OS::LB_GETTOPINDEX, 0, 0))
+              # 64
+              old_index = RJava.cast_to_int(OS._send_message(self.attr_handle, OS::LB_GETCARETINDEX, 0, 0))
               force_resize
               rect = RECT.new
               OS._get_client_rect(self.attr_handle, rect)
@@ -1938,62 +1939,70 @@ module Org::Eclipse::Swt::Widgets
               item_height = RJava.cast_to_int(OS._send_message(self.attr_handle, OS::LB_GETITEMHEIGHT, 0, 0))
               page_size = Math.max(2, (rect.attr_bottom / item_height))
               bottom_index = top_index + page_size - 1
-              if (!(index).equal?(bottom_index))
-                location = bottom_index
+              if (!(old_index).equal?(bottom_index))
+                new_index = bottom_index
               else
-                location = bottom_index + page_size - 1
+                new_index = bottom_index + page_size - 1
               end
               # 64
               count = RJava.cast_to_int(OS._send_message(self.attr_handle, OS::LB_GETCOUNT, 0, 0))
               if (!(count).equal?(OS::LB_ERR))
-                location = Math.min(count - 1, location)
+                new_index = Math.min(count - 1, new_index)
               end
             when OS::VK_HOME
-              location = 0
+              new_index = 0
             when OS::VK_END
               # 64
               count = RJava.cast_to_int(OS._send_message(self.attr_handle, OS::LB_GETCOUNT, 0, 0))
               if ((count).equal?(OS::LB_ERR))
                 throw :break_case, :thrown
               end
-              location = count - 1
+              new_index = count - 1
             end
           end
-          if (!(location).equal?(-1))
-            OS._send_message(self.attr_handle, OS::WM_CHANGEUISTATE, OS::UIS_INITIALIZE, 0)
-            OS._send_message(self.attr_handle, OS::LB_SETCARETINDEX, location, 0)
+          if (!(new_index).equal?(-1))
+            # Feature in Windows.  When the user changes focus using
+            # the keyboard, the focus indicator does not draw.  The
+            # fix is to update the UI state for the control whenever
+            # the focus indicator changes as a result of something
+            # the user types.
+            # 
+            # 64
+            ui_state = RJava.cast_to_int(OS._send_message(self.attr_handle, OS::WM_QUERYUISTATE, 0, 0))
+            if (!((ui_state & OS::UISF_HIDEFOCUS)).equal?(0))
+              OS._send_message(self.attr_handle, OS::WM_CHANGEUISTATE, OS::UIS_INITIALIZE, 0)
+              # Bug in Windows.  When the WM_CHANGEUISTATE is used
+              # to update the UI state for a list that has been
+              # selected using Shift+Arrow, the focus indicator
+              # has pixel corruption.  The fix is to redraw the
+              # control.
+              item_rect = RECT.new
+              # 64
+              old_index = RJava.cast_to_int(OS._send_message(self.attr_handle, OS::LB_GETCARETINDEX, 0, 0))
+              OS._send_message(self.attr_handle, OS::LB_GETITEMRECT, old_index, item_rect)
+              OS._invalidate_rect(self.attr_handle, item_rect, true)
+            end
+            OS._send_message(self.attr_handle, OS::LB_SETCARETINDEX, new_index, 0)
             return LRESULT::ZERO
           end
         end
       end
-      # Feature in Windows.  When the user changes focus using
-      # the keyboard, the focus indicator does not draw.  The
-      # fix is to update the UI state for the control whenever
-      # the focus indicator changes as a result of something
-      # the user types.
-      # 
-      # 64
-      ui_state = RJava.cast_to_int(OS._send_message(self.attr_handle, OS::WM_QUERYUISTATE, 0, 0))
-      if (!((ui_state & OS::UISF_HIDEFOCUS)).equal?(0))
-        # 64
-        old_index = RJava.cast_to_int(OS._send_message(self.attr_handle, OS::LB_GETCARETINDEX, 0, 0))
-        # long
-        code = call_window_proc(self.attr_handle, OS::WM_KEYDOWN, w_param, l_param)
-        # 64
-        new_index = RJava.cast_to_int(OS._send_message(self.attr_handle, OS::LB_GETCARETINDEX, 0, 0))
-        if (!(old_index).equal?(new_index))
-          OS._send_message(self.attr_handle, OS::WM_CHANGEUISTATE, OS::UIS_INITIALIZE, 0)
-          # Bug in Windows.  When the WM_CHANGEUISTATE is used
-          # to update the UI state for a list that has been
-          # selected using Shift+Arrow, the focus indicator
-          # has pixel corruption.  The fix is to redraw the
-          # focus item.
-          item_rect = RECT.new
-          OS._send_message(self.attr_handle, OS::LB_GETITEMRECT, new_index, item_rect)
-          OS._invalidate_rect(self.attr_handle, item_rect, true)
-        end
-        return LRESULT.new(code)
+      return result
+    end
+    
+    typesig { [::Java::Int, ::Java::Int] }
+    # long
+    # long
+    def _wm_setredraw(w_param, l_param)
+      result = super(w_param, l_param)
+      if (!(result).nil?)
+        return result
       end
+      # Bug in Windows.  When WM_SETREDRAW is used to turn off
+      # redraw for a list, table or tree, the background of the
+      # control is drawn.  The fix is to call DefWindowProc(),
+      # which stops all graphics output to the control.
+      OS._def_window_proc(self.attr_handle, OS::WM_SETREDRAW, w_param, l_param)
       return result
     end
     

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2008 IBM Corporation and others.
+ * Copyright (c) 2000, 2009 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -12,7 +12,7 @@ package org.eclipse.swt.graphics;
 
 
 import org.eclipse.swt.*;
-import org.eclipse.swt.internal.carbon.Rect;
+import org.eclipse.swt.internal.cocoa.*;
 
 /**
  * Instances of this class are descriptions of GCs in terms
@@ -24,20 +24,17 @@ import org.eclipse.swt.internal.carbon.Rect;
  * platforms, and should never be called from application code.
  * </p>
  * @see <a href="http://www.eclipse.org/swt/">Sample code and further information</a>
+ * @noinstantiate This class is not intended to be instantiated by clients.
  */
 public final class GCData {
 	public Device device;
 	public int style, state = -1;
-	public float[] foreground;
-	public float[] background;
+	public float /*double*/ [] foreground;
+	public float /*double*/ [] background;
 	public Pattern foregroundPattern;
 	public Pattern backgroundPattern;
 	public Font font;
 	public int alpha = 0xFF;
-	public float[] transform;
-	public float[] inverseTransform;
-	public float[] clippingTransform;
-	public int clipRgn;
 	public float lineWidth;
 	public int lineStyle = SWT.LINE_SOLID;
 	public int lineCap = SWT.CAP_FLAT;
@@ -49,30 +46,18 @@ public final class GCData {
 	public int antialias = SWT.DEFAULT;
 	public int textAntialias = SWT.DEFAULT;
 	public int fillRule = SWT.FILL_EVEN_ODD;
-
-	public float drawXOffset, drawYOffset;
-	public int forePattern;
-	public int backPattern;
 	public Image image;
-	public int fontAscent;
-	public int fontDescent;
-	public int layout;
-	public int atsuiStyle;
-	public int tabs;
-	public String string;
-	public int stringLength;
-	public int stringWidth = -1;
-	public int stringHeight = -1;
-	public int drawFlags;
-	public int stringPtr;
+	
+	public NSColor fg, bg;
+	public float /*double*/ drawXOffset, drawYOffset;
+	public NSRect paintRect;
+	public NSBezierPath path;
+	public NSAffineTransform transform, inverseTransform;
+	public NSBezierPath clipPath, visiblePath;
+	public int /*long*/ visibleRgn;
+	public NSView view;
+	public NSSize size;
 	public Thread thread;
-	public int window;
-	public int paintEvent;
-	public int visibleRgn;
-	public int control;
-	public int port;
-	public Rect portRect;
-	public Rect controlRect;
-	public Rect insetRect;
-	public boolean updateClip;
+	public NSGraphicsContext flippedContext;
+	public boolean restoreContext;
 }

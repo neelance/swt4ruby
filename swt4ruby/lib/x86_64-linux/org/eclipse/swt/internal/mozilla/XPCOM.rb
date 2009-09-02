@@ -36,6 +36,7 @@ module Org::Eclipse::Swt::Internal::Mozilla
     }
   end
   
+  # @jniclass flags=cpp
   class XPCOM < XPCOMImports.const_get :C
     include_class_members XPCOMImports
     
@@ -105,6 +106,10 @@ module Org::Eclipse::Swt::Internal::Mozilla
       
       # $NON-NLS-1$
       # CID constants
+      const_set_lazy(:EXTERNAL_CID) { NsID.new("f2c59ad0-bd76-11dd-ad8b-0800200c9a66") }
+      const_attr_reader  :EXTERNAL_CID
+      
+      # $NON-NLS-1$
       const_set_lazy(:NS_APPSHELL_CID) { NsID.new("2d96b3df-c051-11d1-a827-0040959a28c9") }
       const_attr_reader  :NS_APPSHELL_CID
       
@@ -141,12 +146,20 @@ module Org::Eclipse::Swt::Internal::Mozilla
       const_attr_reader  :NS_PROMPTSERVICE_CID
       
       # $NON-NLS-1$
+      const_set_lazy(:EXTERNAL_CONTRACTID) { "@eclipse.org/external;1" }
+      const_attr_reader  :EXTERNAL_CONTRACTID
+      
+      # $NON-NLS-1$
       const_set_lazy(:NS_CONTEXTSTACK_CONTRACTID) { "@mozilla.org/js/xpc/ContextStack;1" }
       const_attr_reader  :NS_CONTEXTSTACK_CONTRACTID
       
       # $NON-NLS-1$
       const_set_lazy(:NS_COOKIEMANAGER_CONTRACTID) { "@mozilla.org/cookiemanager;1" }
       const_attr_reader  :NS_COOKIEMANAGER_CONTRACTID
+      
+      # $NON-NLS-1$
+      const_set_lazy(:NS_COOKIESERVICE_CONTRACTID) { "@mozilla.org/cookieService;1" }
+      const_attr_reader  :NS_COOKIESERVICE_CONTRACTID
       
       # $NON-NLS-1$
       const_set_lazy(:NS_DIRECTORYSERVICE_CONTRACTID) { "@mozilla.org/file/directory_service;1" }
@@ -173,6 +186,10 @@ module Org::Eclipse::Swt::Internal::Mozilla
       const_attr_reader  :NS_MEMORY_CONTRACTID
       
       # $NON-NLS-1$
+      const_set_lazy(:NS_SCRIPTSECURITYMANAGER_CONTRACTID) { "@mozilla.org/scriptsecuritymanager;1" }
+      const_attr_reader  :NS_SCRIPTSECURITYMANAGER_CONTRACTID
+      
+      # $NON-NLS-1$
       const_set_lazy(:NS_OBSERVER_CONTRACTID) { "@mozilla.org/observer-service;1" }
       const_attr_reader  :NS_OBSERVER_CONTRACTID
       
@@ -191,6 +208,10 @@ module Org::Eclipse::Swt::Internal::Mozilla
       # $NON-NLS-1$
       const_set_lazy(:NS_TRANSFER_CONTRACTID) { "@mozilla.org/transfer;1" }
       const_attr_reader  :NS_TRANSFER_CONTRACTID
+      
+      # $NON-NLS-1$
+      const_set_lazy(:NS_VARIANT_CONTRACTID) { "@mozilla.org/variant;1" }
+      const_attr_reader  :NS_VARIANT_CONTRACTID
       
       # $NON-NLS-1$
       const_set_lazy(:NS_WEBNAVIGATIONINFO_CONTRACTID) { "@mozilla.org/webnavigation-info;1" }
@@ -360,8 +381,30 @@ module Org::Eclipse::Swt::Internal::Mozilla
       const_set_lazy(:NS_ERROR_FILE_UNRECOGNIZED_PATH) { -0x7fadffff }
       const_attr_reader  :NS_ERROR_FILE_UNRECOGNIZED_PATH
       
+      JNI.native_method :Java_org_eclipse_swt_internal_mozilla_XPCOM_nsDynamicFunctionLoad_1sizeof, [:pointer, :long], :int32
+      typesig { [] }
+      def ns_dynamic_function_load_sizeof
+        JNI.__send__(:Java_org_eclipse_swt_internal_mozilla_XPCOM_nsDynamicFunctionLoad_1sizeof, JNI.env, self.jni_id)
+      end
+      
+      JNI.native_method "Java_org_eclipse_swt_internal_mozilla_XPCOM_memmove__JL#{NsDynamicFunctionLoad.jni_name}_2J".to_sym, [:pointer, :long, :int64, :long, :int64], :void
+      typesig { [::Java::Long, NsDynamicFunctionLoad, ::Java::Long] }
+      # @param dest cast=(void *)
+      # @param src cast=(const void *),flags=no_out critical
+      # @param size cast=(size_t)
+      # 
+      # int
+      # int
+      def memmove(dest, src, size)
+        JNI.__send__("Java_org_eclipse_swt_internal_mozilla_XPCOM_memmove__JL#{NsDynamicFunctionLoad.jni_name}_2J".to_sym, JNI.env, self.jni_id, dest.to_int, src.jni_id, size.to_int)
+      end
+      
       JNI.native_method "Java_org_eclipse_swt_internal_mozilla_XPCOM_memmove__L#{NsID.jni_name}_2JI".to_sym, [:pointer, :long, :long, :int64, :int32], :void
       typesig { [NsID, ::Java::Long, ::Java::Int] }
+      # @param dest cast=(void *)
+      # @param src cast=(const void *)
+      # @param nbytes cast=(size_t)
+      # 
       # int
       def memmove(dest, src, nbytes)
         JNI.__send__("Java_org_eclipse_swt_internal_mozilla_XPCOM_memmove__L#{NsID.jni_name}_2JI".to_sym, JNI.env, self.jni_id, dest.jni_id, src.to_int, nbytes.to_int)
@@ -369,1178 +412,3878 @@ module Org::Eclipse::Swt::Internal::Mozilla
       
       JNI.native_method "Java_org_eclipse_swt_internal_mozilla_XPCOM_memmove__JL#{NsID.jni_name}_2I".to_sym, [:pointer, :long, :int64, :long, :int32], :void
       typesig { [::Java::Long, NsID, ::Java::Int] }
+      # @param dest cast=(void *)
+      # @param src cast=(const void *)
+      # @param nbytes cast=(size_t)
+      # 
       # int
       def memmove(dest, src, nbytes)
         JNI.__send__("Java_org_eclipse_swt_internal_mozilla_XPCOM_memmove__JL#{NsID.jni_name}_2I".to_sym, JNI.env, self.jni_id, dest.to_int, src.jni_id, nbytes.to_int)
       end
       
-      JNI.native_method :Java_org_eclipse_swt_internal_mozilla_XPCOM_NS_1GetComponentManager, [:pointer, :long, :long], :int32
-      typesig { [Array.typed(::Java::Long)] }
-      # int
-      def _ns_get_component_manager(result)
-        JNI.__send__(:Java_org_eclipse_swt_internal_mozilla_XPCOM_NS_1GetComponentManager, JNI.env, self.jni_id, result.jni_id)
-      end
-      
-      JNI.native_method :Java_org_eclipse_swt_internal_mozilla_XPCOM_NS_1GetServiceManager, [:pointer, :long, :long], :int32
-      typesig { [Array.typed(::Java::Long)] }
-      # int
-      def _ns_get_service_manager(result)
-        JNI.__send__(:Java_org_eclipse_swt_internal_mozilla_XPCOM_NS_1GetServiceManager, JNI.env, self.jni_id, result.jni_id)
-      end
-      
-      JNI.native_method :Java_org_eclipse_swt_internal_mozilla_XPCOM_NS_1InitXPCOM2, [:pointer, :long, :int64, :int64, :int64], :int32
-      typesig { [::Java::Long, ::Java::Long, ::Java::Long] }
-      # int
-      # int
-      # int
-      def _ns_init_xpcom2(result, bin_directory, app_file_location_provider)
-        JNI.__send__(:Java_org_eclipse_swt_internal_mozilla_XPCOM_NS_1InitXPCOM2, JNI.env, self.jni_id, result.to_int, bin_directory.to_int, app_file_location_provider.to_int)
-      end
-      
-      JNI.native_method :Java_org_eclipse_swt_internal_mozilla_XPCOM_NS_1NewLocalFile, [:pointer, :long, :int64, :int32, :long], :int32
-      typesig { [::Java::Long, ::Java::Int, Array.typed(::Java::Long)] }
-      # int
-      # int
-      def _ns_new_local_file(path, follow_links, result)
-        JNI.__send__(:Java_org_eclipse_swt_internal_mozilla_XPCOM_NS_1NewLocalFile, JNI.env, self.jni_id, path.to_int, follow_links.to_int, result.jni_id)
-      end
-      
       JNI.native_method :Java_org_eclipse_swt_internal_mozilla_XPCOM_strlen_1PRUnichar, [:pointer, :long, :int64], :int32
       typesig { [::Java::Long] }
+      # @method flags=no_gen
       # int
       def strlen__prunichar(s)
         JNI.__send__(:Java_org_eclipse_swt_internal_mozilla_XPCOM_strlen_1PRUnichar, JNI.env, self.jni_id, s.to_int)
       end
       
-      JNI.native_method :Java_org_eclipse_swt_internal_mozilla_XPCOM_nsEmbedCString_1new__, [:pointer, :long], :int64
+      JNI.native_method :Java_org_eclipse_swt_internal_mozilla_XPCOM__1JS_1EvaluateUCScriptForPrincipals, [:pointer, :long, :long, :int64, :int64, :int64, :long, :int32, :long, :int32, :long], :int32
+      typesig { [Array.typed(::Java::Byte), ::Java::Long, ::Java::Long, ::Java::Long, Array.typed(::Java::Char), ::Java::Int, Array.typed(::Java::Byte), ::Java::Int, Array.typed(::Java::Long)] }
+      # @method flags=no_gen
+      # int
+      # int
+      # int
+      # int
+      def ___js_evaluate_ucscript_for_principals(mozilla_path, cx, obj, principals, chars, length, filename, lineno, ret_val)
+        JNI.__send__(:Java_org_eclipse_swt_internal_mozilla_XPCOM__1JS_1EvaluateUCScriptForPrincipals, JNI.env, self.jni_id, mozilla_path.jni_id, cx.to_int, obj.to_int, principals.to_int, chars.jni_id, length.to_int, filename.jni_id, lineno.to_int, ret_val.jni_id)
+      end
+      
+      typesig { [Array.typed(::Java::Byte), ::Java::Long, ::Java::Long, ::Java::Long, Array.typed(::Java::Char), ::Java::Int, Array.typed(::Java::Byte), ::Java::Int, Array.typed(::Java::Long)] }
+      # int
+      # int
+      # int
+      # int
+      def _js_evaluate_ucscript_for_principals(mozilla_path, cx, obj, principals, chars, length, filename, lineno, ret_val)
+        PLATFORM_LOCK.lock
+        begin
+          return ___js_evaluate_ucscript_for_principals(mozilla_path, cx, obj, principals, chars, length, filename, lineno, ret_val)
+        ensure
+          PLATFORM_LOCK.unlock
+        end
+      end
+      
+      JNI.native_method :Java_org_eclipse_swt_internal_mozilla_XPCOM__1NS_1GetComponentManager, [:pointer, :long, :long], :int32
+      typesig { [Array.typed(::Java::Long)] }
+      # @param result cast=(nsIComponentManager**)
+      # int
+      def ___ns_get_component_manager(result)
+        JNI.__send__(:Java_org_eclipse_swt_internal_mozilla_XPCOM__1NS_1GetComponentManager, JNI.env, self.jni_id, result.jni_id)
+      end
+      
+      typesig { [Array.typed(::Java::Long)] }
+      # int
+      def _ns_get_component_manager(result)
+        PLATFORM_LOCK.lock
+        begin
+          return ___ns_get_component_manager(result)
+        ensure
+          PLATFORM_LOCK.unlock
+        end
+      end
+      
+      JNI.native_method :Java_org_eclipse_swt_internal_mozilla_XPCOM__1NS_1GetServiceManager, [:pointer, :long, :long], :int32
+      typesig { [Array.typed(::Java::Long)] }
+      # @param result cast=(nsIServiceManager**)
+      # int
+      def ___ns_get_service_manager(result)
+        JNI.__send__(:Java_org_eclipse_swt_internal_mozilla_XPCOM__1NS_1GetServiceManager, JNI.env, self.jni_id, result.jni_id)
+      end
+      
+      typesig { [Array.typed(::Java::Long)] }
+      # int
+      def _ns_get_service_manager(result)
+        PLATFORM_LOCK.lock
+        begin
+          return ___ns_get_service_manager(result)
+        ensure
+          PLATFORM_LOCK.unlock
+        end
+      end
+      
+      JNI.native_method :Java_org_eclipse_swt_internal_mozilla_XPCOM__1NS_1InitXPCOM2, [:pointer, :long, :int64, :int64, :int64], :int32
+      typesig { [::Java::Long, ::Java::Long, ::Java::Long] }
+      # @param result cast=(nsIServiceManager **)
+      # @param binDirectory cast=(nsIFile *)
+      # @param appFileLocationProvider cast=(nsIDirectoryServiceProvider *)
+      # 
+      # int
+      # int
+      # int
+      def ___ns_init_xpcom2(result, bin_directory, app_file_location_provider)
+        JNI.__send__(:Java_org_eclipse_swt_internal_mozilla_XPCOM__1NS_1InitXPCOM2, JNI.env, self.jni_id, result.to_int, bin_directory.to_int, app_file_location_provider.to_int)
+      end
+      
+      typesig { [::Java::Long, ::Java::Long, ::Java::Long] }
+      # int
+      # int
+      # int
+      def _ns_init_xpcom2(result, bin_directory, app_file_location_provider)
+        PLATFORM_LOCK.lock
+        begin
+          return ___ns_init_xpcom2(result, bin_directory, app_file_location_provider)
+        ensure
+          PLATFORM_LOCK.unlock
+        end
+      end
+      
+      JNI.native_method :Java_org_eclipse_swt_internal_mozilla_XPCOM__1NS_1NewLocalFile, [:pointer, :long, :int64, :int32, :long], :int32
+      typesig { [::Java::Long, ::Java::Int, Array.typed(::Java::Long)] }
+      # @param path cast=(nsAString *),flags=struct
+      # @param result cast=(nsILocalFile**)
+      # 
+      # int
+      # int
+      def ___ns_new_local_file(path, follow_links, result)
+        JNI.__send__(:Java_org_eclipse_swt_internal_mozilla_XPCOM__1NS_1NewLocalFile, JNI.env, self.jni_id, path.to_int, follow_links.to_int, result.jni_id)
+      end
+      
+      typesig { [::Java::Long, ::Java::Int, Array.typed(::Java::Long)] }
+      # int
+      # int
+      def _ns_new_local_file(path, follow_links, result)
+        PLATFORM_LOCK.lock
+        begin
+          return ___ns_new_local_file(path, follow_links, result)
+        ensure
+          PLATFORM_LOCK.unlock
+        end
+      end
+      
+      JNI.native_method :Java_org_eclipse_swt_internal_mozilla_XPCOM__1nsEmbedCString_1new__, [:pointer, :long], :int64
+      typesig { [] }
+      # @method flags=new
+      # int
+      def __ns_embed_cstring_new
+        JNI.__send__(:Java_org_eclipse_swt_internal_mozilla_XPCOM__1nsEmbedCString_1new__, JNI.env, self.jni_id)
+      end
+      
       typesig { [] }
       # int
       def ns_embed_cstring_new
-        JNI.__send__(:Java_org_eclipse_swt_internal_mozilla_XPCOM_nsEmbedCString_1new__, JNI.env, self.jni_id)
+        PLATFORM_LOCK.lock
+        begin
+          return __ns_embed_cstring_new
+        ensure
+          PLATFORM_LOCK.unlock
+        end
       end
       
-      JNI.native_method :Java_org_eclipse_swt_internal_mozilla_XPCOM_nsEmbedCString_1new___3BI, [:pointer, :long, :long, :int32], :int64
+      JNI.native_method :Java_org_eclipse_swt_internal_mozilla_XPCOM__1nsEmbedCString_1new___3BI, [:pointer, :long, :long, :int32], :int64
+      typesig { [Array.typed(::Java::Byte), ::Java::Int] }
+      # @method flags=new
+      # @param aString cast=(const char *)
+      # 
+      # int
+      def __ns_embed_cstring_new(a_string, length)
+        JNI.__send__(:Java_org_eclipse_swt_internal_mozilla_XPCOM__1nsEmbedCString_1new___3BI, JNI.env, self.jni_id, a_string.jni_id, length.to_int)
+      end
+      
       typesig { [Array.typed(::Java::Byte), ::Java::Int] }
       # int
       def ns_embed_cstring_new(a_string, length)
-        JNI.__send__(:Java_org_eclipse_swt_internal_mozilla_XPCOM_nsEmbedCString_1new___3BI, JNI.env, self.jni_id, a_string.jni_id, length.to_int)
+        PLATFORM_LOCK.lock
+        begin
+          return __ns_embed_cstring_new(a_string, length)
+        ensure
+          PLATFORM_LOCK.unlock
+        end
       end
       
-      JNI.native_method :Java_org_eclipse_swt_internal_mozilla_XPCOM_nsEmbedCString_1new__II, [:pointer, :long, :int32, :int32], :int64
-      typesig { [::Java::Int, ::Java::Int] }
+      JNI.native_method :Java_org_eclipse_swt_internal_mozilla_XPCOM__1nsEmbedCString_1new__JI, [:pointer, :long, :int64, :int32], :int64
+      typesig { [::Java::Long, ::Java::Int] }
+      # @method flags=new
+      # @param aString cast=(const char *)
+      # 
+      # int
+      # int
+      def __ns_embed_cstring_new(a_string, length)
+        JNI.__send__(:Java_org_eclipse_swt_internal_mozilla_XPCOM__1nsEmbedCString_1new__JI, JNI.env, self.jni_id, a_string.to_int, length.to_int)
+      end
+      
+      typesig { [::Java::Long, ::Java::Int] }
+      # int
       # int
       def ns_embed_cstring_new(a_string, length)
-        JNI.__send__(:Java_org_eclipse_swt_internal_mozilla_XPCOM_nsEmbedCString_1new__II, JNI.env, self.jni_id, a_string.to_int, length.to_int)
+        PLATFORM_LOCK.lock
+        begin
+          return __ns_embed_cstring_new(a_string, length)
+        ensure
+          PLATFORM_LOCK.unlock
+        end
       end
       
-      JNI.native_method :Java_org_eclipse_swt_internal_mozilla_XPCOM_nsEmbedCString_1delete, [:pointer, :long, :int64], :void
+      JNI.native_method :Java_org_eclipse_swt_internal_mozilla_XPCOM__1nsEmbedCString_1delete, [:pointer, :long, :int64], :void
+      typesig { [::Java::Long] }
+      # @method flags=delete
+      # @param ptr cast=(nsEmbedCString *)
+      # 
+      # int
+      def __ns_embed_cstring_delete(ptr)
+        JNI.__send__(:Java_org_eclipse_swt_internal_mozilla_XPCOM__1nsEmbedCString_1delete, JNI.env, self.jni_id, ptr.to_int)
+      end
+      
       typesig { [::Java::Long] }
       # int
       def ns_embed_cstring_delete(ptr)
-        JNI.__send__(:Java_org_eclipse_swt_internal_mozilla_XPCOM_nsEmbedCString_1delete, JNI.env, self.jni_id, ptr.to_int)
+        PLATFORM_LOCK.lock
+        begin
+          __ns_embed_cstring_delete(ptr)
+        ensure
+          PLATFORM_LOCK.unlock
+        end
       end
       
-      JNI.native_method :Java_org_eclipse_swt_internal_mozilla_XPCOM_nsEmbedCString_1Length, [:pointer, :long, :int64], :int32
+      JNI.native_method :Java_org_eclipse_swt_internal_mozilla_XPCOM__1nsEmbedCString_1Length, [:pointer, :long, :int64], :int32
+      typesig { [::Java::Long] }
+      # @method flags=cpp
+      # @param ptr cast=(nsEmbedCString *)
+      # 
+      # int
+      def __ns_embed_cstring_length(ptr)
+        JNI.__send__(:Java_org_eclipse_swt_internal_mozilla_XPCOM__1nsEmbedCString_1Length, JNI.env, self.jni_id, ptr.to_int)
+      end
+      
       typesig { [::Java::Long] }
       # int
       def ns_embed_cstring_length(ptr)
-        JNI.__send__(:Java_org_eclipse_swt_internal_mozilla_XPCOM_nsEmbedCString_1Length, JNI.env, self.jni_id, ptr.to_int)
+        PLATFORM_LOCK.lock
+        begin
+          return __ns_embed_cstring_length(ptr)
+        ensure
+          PLATFORM_LOCK.unlock
+        end
       end
       
-      JNI.native_method :Java_org_eclipse_swt_internal_mozilla_XPCOM_nsEmbedCString_1get, [:pointer, :long, :int64], :int64
+      JNI.native_method :Java_org_eclipse_swt_internal_mozilla_XPCOM__1nsIScriptGlobalObject_1EnsureScriptEnvironment, [:pointer, :long, :int64, :int32], :int32
+      typesig { [::Java::Long, ::Java::Int] }
+      # @method flags=cpp
+      # @param ptr cast=(nsIScriptGlobalObject *)
+      # 
+      # int
+      def __ns_iscript_global_object_ensure_script_environment(ptr, lang)
+        JNI.__send__(:Java_org_eclipse_swt_internal_mozilla_XPCOM__1nsIScriptGlobalObject_1EnsureScriptEnvironment, JNI.env, self.jni_id, ptr.to_int, lang.to_int)
+      end
+      
+      typesig { [::Java::Long, ::Java::Int] }
+      # int
+      def ns_iscript_global_object_ensure_script_environment(ptr, lang)
+        PLATFORM_LOCK.lock
+        begin
+          return __ns_iscript_global_object_ensure_script_environment(ptr, lang)
+        ensure
+          PLATFORM_LOCK.unlock
+        end
+      end
+      
+      JNI.native_method :Java_org_eclipse_swt_internal_mozilla_XPCOM__1nsIScriptGlobalObject_1GetScriptGlobal, [:pointer, :long, :int64, :int32], :int64
+      typesig { [::Java::Long, ::Java::Int] }
+      # @method flags=cpp
+      # @param ptr cast=(nsIScriptGlobalObject *)
+      # 
+      # int
+      # int
+      def __ns_iscript_global_object_get_script_global(ptr, lang)
+        JNI.__send__(:Java_org_eclipse_swt_internal_mozilla_XPCOM__1nsIScriptGlobalObject_1GetScriptGlobal, JNI.env, self.jni_id, ptr.to_int, lang.to_int)
+      end
+      
+      typesig { [::Java::Long, ::Java::Int] }
+      # int
+      # int
+      def ns_iscript_global_object_get_script_global(ptr, lang)
+        PLATFORM_LOCK.lock
+        begin
+          return __ns_iscript_global_object_get_script_global(ptr, lang)
+        ensure
+          PLATFORM_LOCK.unlock
+        end
+      end
+      
+      JNI.native_method :Java_org_eclipse_swt_internal_mozilla_XPCOM__1nsIScriptGlobalObject_1GetScriptContext, [:pointer, :long, :int64, :int32], :int64
+      typesig { [::Java::Long, ::Java::Int] }
+      # @method flags=cpp
+      # @param ptr cast=(nsIScriptGlobalObject *)
+      # 
+      # int
+      # int
+      def __ns_iscript_global_object_get_script_context(ptr, lang)
+        JNI.__send__(:Java_org_eclipse_swt_internal_mozilla_XPCOM__1nsIScriptGlobalObject_1GetScriptContext, JNI.env, self.jni_id, ptr.to_int, lang.to_int)
+      end
+      
+      typesig { [::Java::Long, ::Java::Int] }
+      # int
+      # int
+      def ns_iscript_global_object_get_script_context(ptr, lang)
+        PLATFORM_LOCK.lock
+        begin
+          return __ns_iscript_global_object_get_script_context(ptr, lang)
+        ensure
+          PLATFORM_LOCK.unlock
+        end
+      end
+      
+      JNI.native_method :Java_org_eclipse_swt_internal_mozilla_XPCOM__1nsIScriptContext_1GetNativeContext, [:pointer, :long, :int64], :int64
+      typesig { [::Java::Long] }
+      # @method flags=cpp
+      # @param ptr cast=(nsIScriptContext *)
+      # 
+      # int
+      # int
+      def __ns_iscript_context_get_native_context(ptr)
+        JNI.__send__(:Java_org_eclipse_swt_internal_mozilla_XPCOM__1nsIScriptContext_1GetNativeContext, JNI.env, self.jni_id, ptr.to_int)
+      end
+      
+      typesig { [::Java::Long] }
+      # int
+      # int
+      def ns_iscript_context_get_native_context(ptr)
+        PLATFORM_LOCK.lock
+        begin
+          return __ns_iscript_context_get_native_context(ptr)
+        ensure
+          PLATFORM_LOCK.unlock
+        end
+      end
+      
+      JNI.native_method :Java_org_eclipse_swt_internal_mozilla_XPCOM__1nsEmbedCString_1get, [:pointer, :long, :int64], :int64
+      typesig { [::Java::Long] }
+      # @method flags=cpp
+      # @param ptr cast=(nsEmbedCString *)
+      # 
+      # int
+      # int
+      def __ns_embed_cstring_get(ptr)
+        JNI.__send__(:Java_org_eclipse_swt_internal_mozilla_XPCOM__1nsEmbedCString_1get, JNI.env, self.jni_id, ptr.to_int)
+      end
+      
       typesig { [::Java::Long] }
       # int
       # int
       def ns_embed_cstring_get(ptr)
-        JNI.__send__(:Java_org_eclipse_swt_internal_mozilla_XPCOM_nsEmbedCString_1get, JNI.env, self.jni_id, ptr.to_int)
+        PLATFORM_LOCK.lock
+        begin
+          return __ns_embed_cstring_get(ptr)
+        ensure
+          PLATFORM_LOCK.unlock
+        end
       end
       
-      JNI.native_method :Java_org_eclipse_swt_internal_mozilla_XPCOM_nsID_1delete, [:pointer, :long, :int64], :void
+      JNI.native_method :Java_org_eclipse_swt_internal_mozilla_XPCOM__1nsID_1delete, [:pointer, :long, :int64], :void
+      typesig { [::Java::Long] }
+      # @method flags=delete
+      # @param ptr cast=(nsID *)
+      # 
+      # int
+      def __ns_id_delete(ptr)
+        JNI.__send__(:Java_org_eclipse_swt_internal_mozilla_XPCOM__1nsID_1delete, JNI.env, self.jni_id, ptr.to_int)
+      end
+      
       typesig { [::Java::Long] }
       # int
       def ns_id_delete(ptr)
-        JNI.__send__(:Java_org_eclipse_swt_internal_mozilla_XPCOM_nsID_1delete, JNI.env, self.jni_id, ptr.to_int)
+        PLATFORM_LOCK.lock
+        begin
+          __ns_id_delete(ptr)
+        ensure
+          PLATFORM_LOCK.unlock
+        end
       end
       
-      JNI.native_method :Java_org_eclipse_swt_internal_mozilla_XPCOM_nsID_1new, [:pointer, :long], :int64
+      JNI.native_method :Java_org_eclipse_swt_internal_mozilla_XPCOM__1nsID_1new, [:pointer, :long], :int64
+      typesig { [] }
+      # @method flags=new
+      # int
+      def __ns_id_new
+        JNI.__send__(:Java_org_eclipse_swt_internal_mozilla_XPCOM__1nsID_1new, JNI.env, self.jni_id)
+      end
+      
       typesig { [] }
       # int
       def ns_id_new
-        JNI.__send__(:Java_org_eclipse_swt_internal_mozilla_XPCOM_nsID_1new, JNI.env, self.jni_id)
+        PLATFORM_LOCK.lock
+        begin
+          return __ns_id_new
+        ensure
+          PLATFORM_LOCK.unlock
+        end
       end
       
-      JNI.native_method :Java_org_eclipse_swt_internal_mozilla_XPCOM_nsID_1Equals, [:pointer, :long, :int64, :int64], :int32
+      JNI.native_method :Java_org_eclipse_swt_internal_mozilla_XPCOM__1nsID_1Equals, [:pointer, :long, :int64, :int64], :int32
+      typesig { [::Java::Long, ::Java::Long] }
+      # @method flags=cpp
+      # @param ptr cast=(nsID *)
+      # @param other cast=(nsID *),flags=struct
+      # 
+      # int
+      # int
+      def __ns_id_equals(ptr, other)
+        JNI.__send__(:Java_org_eclipse_swt_internal_mozilla_XPCOM__1nsID_1Equals, JNI.env, self.jni_id, ptr.to_int, other.to_int)
+      end
+      
       typesig { [::Java::Long, ::Java::Long] }
       # int
       # int
       def ns_id_equals(ptr, other)
-        JNI.__send__(:Java_org_eclipse_swt_internal_mozilla_XPCOM_nsID_1Equals, JNI.env, self.jni_id, ptr.to_int, other.to_int)
+        PLATFORM_LOCK.lock
+        begin
+          return __ns_id_equals(ptr, other)
+        ensure
+          PLATFORM_LOCK.unlock
+        end
       end
       
-      JNI.native_method :Java_org_eclipse_swt_internal_mozilla_XPCOM_nsEmbedString_1new__, [:pointer, :long], :int64
+      JNI.native_method :Java_org_eclipse_swt_internal_mozilla_XPCOM__1nsEmbedString_1new__, [:pointer, :long], :int64
+      typesig { [] }
+      # @method flags=new
+      # int
+      def __ns_embed_string_new
+        JNI.__send__(:Java_org_eclipse_swt_internal_mozilla_XPCOM__1nsEmbedString_1new__, JNI.env, self.jni_id)
+      end
+      
       typesig { [] }
       # int
       def ns_embed_string_new
-        JNI.__send__(:Java_org_eclipse_swt_internal_mozilla_XPCOM_nsEmbedString_1new__, JNI.env, self.jni_id)
+        PLATFORM_LOCK.lock
+        begin
+          return __ns_embed_string_new
+        ensure
+          PLATFORM_LOCK.unlock
+        end
       end
       
-      JNI.native_method :Java_org_eclipse_swt_internal_mozilla_XPCOM_nsEmbedString_1new___3C, [:pointer, :long, :long], :int64
+      JNI.native_method :Java_org_eclipse_swt_internal_mozilla_XPCOM__1nsEmbedString_1new___3C, [:pointer, :long, :long], :int64
+      typesig { [Array.typed(::Java::Char)] }
+      # @method flags=new
+      # @param aString cast=(PRUnichar *)
+      # 
+      # int
+      def __ns_embed_string_new(a_string)
+        JNI.__send__(:Java_org_eclipse_swt_internal_mozilla_XPCOM__1nsEmbedString_1new___3C, JNI.env, self.jni_id, a_string.jni_id)
+      end
+      
       typesig { [Array.typed(::Java::Char)] }
       # int
       def ns_embed_string_new(a_string)
-        JNI.__send__(:Java_org_eclipse_swt_internal_mozilla_XPCOM_nsEmbedString_1new___3C, JNI.env, self.jni_id, a_string.jni_id)
+        PLATFORM_LOCK.lock
+        begin
+          return __ns_embed_string_new(a_string)
+        ensure
+          PLATFORM_LOCK.unlock
+        end
       end
       
-      JNI.native_method :Java_org_eclipse_swt_internal_mozilla_XPCOM_nsEmbedString_1delete, [:pointer, :long, :int64], :void
+      JNI.native_method :Java_org_eclipse_swt_internal_mozilla_XPCOM__1nsEmbedString_1delete, [:pointer, :long, :int64], :void
+      typesig { [::Java::Long] }
+      # @method flags=delete
+      # @param ptr cast=(nsEmbedString *)
+      # 
+      # int
+      def __ns_embed_string_delete(ptr)
+        JNI.__send__(:Java_org_eclipse_swt_internal_mozilla_XPCOM__1nsEmbedString_1delete, JNI.env, self.jni_id, ptr.to_int)
+      end
+      
       typesig { [::Java::Long] }
       # int
       def ns_embed_string_delete(ptr)
-        JNI.__send__(:Java_org_eclipse_swt_internal_mozilla_XPCOM_nsEmbedString_1delete, JNI.env, self.jni_id, ptr.to_int)
+        PLATFORM_LOCK.lock
+        begin
+          __ns_embed_string_delete(ptr)
+        ensure
+          PLATFORM_LOCK.unlock
+        end
       end
       
-      JNI.native_method :Java_org_eclipse_swt_internal_mozilla_XPCOM_nsEmbedString_1Length, [:pointer, :long, :int64], :int32
+      JNI.native_method :Java_org_eclipse_swt_internal_mozilla_XPCOM__1nsEmbedString_1Length, [:pointer, :long, :int64], :int32
+      typesig { [::Java::Long] }
+      # @method flags=cpp
+      # @param ptr cast=(nsEmbedString *)
+      # 
+      # int
+      def __ns_embed_string_length(ptr)
+        JNI.__send__(:Java_org_eclipse_swt_internal_mozilla_XPCOM__1nsEmbedString_1Length, JNI.env, self.jni_id, ptr.to_int)
+      end
+      
       typesig { [::Java::Long] }
       # int
       def ns_embed_string_length(ptr)
-        JNI.__send__(:Java_org_eclipse_swt_internal_mozilla_XPCOM_nsEmbedString_1Length, JNI.env, self.jni_id, ptr.to_int)
+        PLATFORM_LOCK.lock
+        begin
+          return __ns_embed_string_length(ptr)
+        ensure
+          PLATFORM_LOCK.unlock
+        end
       end
       
-      JNI.native_method :Java_org_eclipse_swt_internal_mozilla_XPCOM_nsEmbedString_1get, [:pointer, :long, :int64], :int64
+      JNI.native_method :Java_org_eclipse_swt_internal_mozilla_XPCOM__1nsEmbedString_1get, [:pointer, :long, :int64], :int64
+      typesig { [::Java::Long] }
+      # @method flags=cpp
+      # @param ptr cast=(nsEmbedString *)
+      # 
+      # int
+      # int
+      def __ns_embed_string_get(ptr)
+        JNI.__send__(:Java_org_eclipse_swt_internal_mozilla_XPCOM__1nsEmbedString_1get, JNI.env, self.jni_id, ptr.to_int)
+      end
+      
       typesig { [::Java::Long] }
       # int
       # int
       def ns_embed_string_get(ptr)
-        JNI.__send__(:Java_org_eclipse_swt_internal_mozilla_XPCOM_nsEmbedString_1get, JNI.env, self.jni_id, ptr.to_int)
+        PLATFORM_LOCK.lock
+        begin
+          return __ns_embed_string_get(ptr)
+        ensure
+          PLATFORM_LOCK.unlock
+        end
       end
       
-      JNI.native_method :Java_org_eclipse_swt_internal_mozilla_XPCOM_XPCOMGlueStartup, [:pointer, :long, :long], :int32
+      JNI.native_method :Java_org_eclipse_swt_internal_mozilla_XPCOM__1nsIMemory_1Alloc, [:pointer, :long, :int64, :int32], :int64
+      typesig { [::Java::Long, ::Java::Int] }
+      # @method flags=cpp
+      # @param ptr cast=(nsIMemory *)
+      # @param size cast=(size_t)
+      # 
+      # int
+      # int
+      def __ns_imemory_alloc(ptr, size)
+        JNI.__send__(:Java_org_eclipse_swt_internal_mozilla_XPCOM__1nsIMemory_1Alloc, JNI.env, self.jni_id, ptr.to_int, size.to_int)
+      end
+      
+      typesig { [::Java::Long, ::Java::Int] }
+      # int
+      # int
+      def ns_imemory_alloc(ptr, size)
+        PLATFORM_LOCK.lock
+        begin
+          return __ns_imemory_alloc(ptr, size)
+        ensure
+          PLATFORM_LOCK.unlock
+        end
+      end
+      
+      JNI.native_method :Java_org_eclipse_swt_internal_mozilla_XPCOM__1nsIMemory_1Realloc, [:pointer, :long, :int64, :int64, :int32], :int64
+      typesig { [::Java::Long, ::Java::Long, ::Java::Int] }
+      # @method flags=cpp
+      # @param ptr1 cast=(nsIMemory *)
+      # @param ptr2 cast=(void *)
+      # @param size cast=(size_t)
+      # 
+      # int
+      # int
+      # int
+      def __ns_imemory_realloc(ptr1, ptr2, size)
+        JNI.__send__(:Java_org_eclipse_swt_internal_mozilla_XPCOM__1nsIMemory_1Realloc, JNI.env, self.jni_id, ptr1.to_int, ptr2.to_int, size.to_int)
+      end
+      
+      typesig { [::Java::Long, ::Java::Long, ::Java::Int] }
+      # int
+      # int
+      # int
+      def ns_imemory_realloc(ptr1, ptr2, size)
+        PLATFORM_LOCK.lock
+        begin
+          return __ns_imemory_realloc(ptr1, ptr2, size)
+        ensure
+          PLATFORM_LOCK.unlock
+        end
+      end
+      
+      JNI.native_method :Java_org_eclipse_swt_internal_mozilla_XPCOM__1XPCOMGlueLoadXULFunctions, [:pointer, :long, :int64], :int32
+      typesig { [::Java::Long] }
+      # @param functionLoad cast=(const nsDynamicFunctionLoad *)
+      # int
+      def ___xpcomglue_load_xulfunctions(function_load)
+        JNI.__send__(:Java_org_eclipse_swt_internal_mozilla_XPCOM__1XPCOMGlueLoadXULFunctions, JNI.env, self.jni_id, function_load.to_int)
+      end
+      
+      typesig { [::Java::Long] }
+      # int
+      def _xpcomglue_load_xulfunctions(function_load)
+        PLATFORM_LOCK.lock
+        begin
+          return ___xpcomglue_load_xulfunctions(function_load)
+        ensure
+          PLATFORM_LOCK.unlock
+        end
+      end
+      
+      JNI.native_method :Java_org_eclipse_swt_internal_mozilla_XPCOM__1XPCOMGlueStartup, [:pointer, :long, :long], :int32
+      typesig { [Array.typed(::Java::Byte)] }
+      # @param place cast=(const char *)
+      def ___xpcomglue_startup(place)
+        JNI.__send__(:Java_org_eclipse_swt_internal_mozilla_XPCOM__1XPCOMGlueStartup, JNI.env, self.jni_id, place.jni_id)
+      end
+      
       typesig { [Array.typed(::Java::Byte)] }
       def _xpcomglue_startup(place)
-        JNI.__send__(:Java_org_eclipse_swt_internal_mozilla_XPCOM_XPCOMGlueStartup, JNI.env, self.jni_id, place.jni_id)
+        PLATFORM_LOCK.lock
+        begin
+          return ___xpcomglue_startup(place)
+        ensure
+          PLATFORM_LOCK.unlock
+        end
       end
       
-      JNI.native_method :Java_org_eclipse_swt_internal_mozilla_XPCOM_XPCOMGlueShutdown, [:pointer, :long], :int32
+      JNI.native_method :Java_org_eclipse_swt_internal_mozilla_XPCOM__1XPCOMGlueShutdown, [:pointer, :long], :int32
+      typesig { [] }
+      def ___xpcomglue_shutdown
+        JNI.__send__(:Java_org_eclipse_swt_internal_mozilla_XPCOM__1XPCOMGlueShutdown, JNI.env, self.jni_id)
+      end
+      
       typesig { [] }
       def _xpcomglue_shutdown
-        JNI.__send__(:Java_org_eclipse_swt_internal_mozilla_XPCOM_XPCOMGlueShutdown, JNI.env, self.jni_id)
+        PLATFORM_LOCK.lock
+        begin
+          return ___xpcomglue_shutdown
+        ensure
+          PLATFORM_LOCK.unlock
+        end
       end
       
-      JNI.native_method :Java_org_eclipse_swt_internal_mozilla_XPCOM_Call, [:pointer, :long, :int64, :int64, :int64, :long, :int32, :int32, :long], :int64
+      JNI.native_method :Java_org_eclipse_swt_internal_mozilla_XPCOM__1Call__J, [:pointer, :long, :int64], :int32
+      typesig { [::Java::Long] }
+      # int
+      def ___call(ptr)
+        JNI.__send__(:Java_org_eclipse_swt_internal_mozilla_XPCOM__1Call__J, JNI.env, self.jni_id, ptr.to_int)
+      end
+      
+      typesig { [::Java::Long] }
+      # int
+      def _call(ptr)
+        PLATFORM_LOCK.lock
+        begin
+          return ___call(ptr)
+        ensure
+          PLATFORM_LOCK.unlock
+        end
+      end
+      
+      JNI.native_method :Java_org_eclipse_swt_internal_mozilla_XPCOM__1Call__JJJ_3BII_3I, [:pointer, :long, :int64, :int64, :int64, :long, :int32, :int32, :long], :int64
+      typesig { [::Java::Long, ::Java::Long, ::Java::Long, Array.typed(::Java::Byte), ::Java::Int, ::Java::Int, Array.typed(::Java::Int)] }
+      # @param ptr cast=(nsWriteSegmentFun)
+      # @param aInStream cast=(nsIInputStream *)
+      # @param aClosure cast=(void *)
+      # @param aFromSegment cast=(const char *)
+      # @param aWriteCount cast=(PRUint32 *)
+      # 
+      # int
+      # int
+      # int
+      # int
+      def ___call(ptr, a_in_stream, a_closure, a_from_segment, a_to_offset, a_count, a_write_count)
+        JNI.__send__(:Java_org_eclipse_swt_internal_mozilla_XPCOM__1Call__JJJ_3BII_3I, JNI.env, self.jni_id, ptr.to_int, a_in_stream.to_int, a_closure.to_int, a_from_segment.jni_id, a_to_offset.to_int, a_count.to_int, a_write_count.jni_id)
+      end
+      
       typesig { [::Java::Long, ::Java::Long, ::Java::Long, Array.typed(::Java::Byte), ::Java::Int, ::Java::Int, Array.typed(::Java::Int)] }
       # int
       # int
       # int
       # int
       def _call(ptr, a_in_stream, a_closure, a_from_segment, a_to_offset, a_count, a_write_count)
-        JNI.__send__(:Java_org_eclipse_swt_internal_mozilla_XPCOM_Call, JNI.env, self.jni_id, ptr.to_int, a_in_stream.to_int, a_closure.to_int, a_from_segment.jni_id, a_to_offset.to_int, a_count.to_int, a_write_count.jni_id)
+        PLATFORM_LOCK.lock
+        begin
+          return ___call(ptr, a_in_stream, a_closure, a_from_segment, a_to_offset, a_count, a_write_count)
+        ensure
+          PLATFORM_LOCK.unlock
+        end
       end
       
-      JNI.native_method :Java_org_eclipse_swt_internal_mozilla_XPCOM_VtblCall__IJ, [:pointer, :long, :int32, :int64], :int32
+      JNI.native_method :Java_org_eclipse_swt_internal_mozilla_XPCOM__1Call__JJJJJI, [:pointer, :long, :int64, :int64, :int64, :int64, :int64, :int32], :int32
+      typesig { [::Java::Long, ::Java::Long, ::Java::Long, ::Java::Long, ::Java::Long, ::Java::Int] }
+      # @param ptr cast=(SWT_XREInitEmbedding)
+      # @param aLibXULDirectory cast=(nsILocalFile *)
+      # @param aAppDirectory cast=(nsILocalFile *)
+      # @param aAppDirProvider cast=(nsIDirectoryServiceProvider *)
+      # @param aStaticComponents cast=(nsStaticModuleInfo const *)
+      # 
+      # int
+      # int
+      # int
+      # int
+      # int
+      def ___call(ptr, a_lib_xuldirectory, a_app_directory, a_app_dir_provider, a_static_components, a_static_components_count)
+        JNI.__send__(:Java_org_eclipse_swt_internal_mozilla_XPCOM__1Call__JJJJJI, JNI.env, self.jni_id, ptr.to_int, a_lib_xuldirectory.to_int, a_app_directory.to_int, a_app_dir_provider.to_int, a_static_components.to_int, a_static_components_count.to_int)
+      end
+      
+      typesig { [::Java::Long, ::Java::Long, ::Java::Long, ::Java::Long, ::Java::Long, ::Java::Int] }
+      # int
+      # int
+      # int
+      # int
+      # int
+      def _call(ptr, a_lib_xuldirectory, a_app_directory, a_app_dir_provider, a_static_components, a_static_components_count)
+        PLATFORM_LOCK.lock
+        begin
+          return ___call(ptr, a_lib_xuldirectory, a_app_directory, a_app_dir_provider, a_static_components, a_static_components_count)
+        ensure
+          PLATFORM_LOCK.unlock
+        end
+      end
+      
+      JNI.native_method :Java_org_eclipse_swt_internal_mozilla_XPCOM__1VtblCall__IJ, [:pointer, :long, :int32, :int64], :int32
+      typesig { [::Java::Int, ::Java::Long] }
+      # int
+      def ___vtbl_call(fn_number, pp_vtbl)
+        JNI.__send__(:Java_org_eclipse_swt_internal_mozilla_XPCOM__1VtblCall__IJ, JNI.env, self.jni_id, fn_number.to_int, pp_vtbl.to_int)
+      end
+      
       typesig { [::Java::Int, ::Java::Long] }
       # int
       def _vtbl_call(fn_number, pp_vtbl)
-        JNI.__send__(:Java_org_eclipse_swt_internal_mozilla_XPCOM_VtblCall__IJ, JNI.env, self.jni_id, fn_number.to_int, pp_vtbl.to_int)
+        PLATFORM_LOCK.lock
+        begin
+          return ___vtbl_call(fn_number, pp_vtbl)
+        ensure
+          PLATFORM_LOCK.unlock
+        end
       end
       
-      JNI.native_method :Java_org_eclipse_swt_internal_mozilla_XPCOM_VtblCall__IJ_3B, [:pointer, :long, :int32, :int64, :long], :int32
+      JNI.native_method :Java_org_eclipse_swt_internal_mozilla_XPCOM__1VtblCall__IJ_3B, [:pointer, :long, :int32, :int64, :long], :int32
+      typesig { [::Java::Int, ::Java::Long, Array.typed(::Java::Byte)] }
+      # int
+      def ___vtbl_call(fn_number, pp_vtbl, arg0)
+        JNI.__send__(:Java_org_eclipse_swt_internal_mozilla_XPCOM__1VtblCall__IJ_3B, JNI.env, self.jni_id, fn_number.to_int, pp_vtbl.to_int, arg0.jni_id)
+      end
+      
       typesig { [::Java::Int, ::Java::Long, Array.typed(::Java::Byte)] }
       # int
       def _vtbl_call(fn_number, pp_vtbl, arg0)
-        JNI.__send__(:Java_org_eclipse_swt_internal_mozilla_XPCOM_VtblCall__IJ_3B, JNI.env, self.jni_id, fn_number.to_int, pp_vtbl.to_int, arg0.jni_id)
+        PLATFORM_LOCK.lock
+        begin
+          return ___vtbl_call(fn_number, pp_vtbl, arg0)
+        ensure
+          PLATFORM_LOCK.unlock
+        end
       end
       
-      JNI.native_method :Java_org_eclipse_swt_internal_mozilla_XPCOM_VtblCall__IJ_3C, [:pointer, :long, :int32, :int64, :long], :int32
+      JNI.native_method :Java_org_eclipse_swt_internal_mozilla_XPCOM__1VtblCall__IJ_3C, [:pointer, :long, :int32, :int64, :long], :int32
+      typesig { [::Java::Int, ::Java::Long, Array.typed(::Java::Char)] }
+      # int
+      def ___vtbl_call(fn_number, pp_vtbl, arg0)
+        JNI.__send__(:Java_org_eclipse_swt_internal_mozilla_XPCOM__1VtblCall__IJ_3C, JNI.env, self.jni_id, fn_number.to_int, pp_vtbl.to_int, arg0.jni_id)
+      end
+      
       typesig { [::Java::Int, ::Java::Long, Array.typed(::Java::Char)] }
       # int
       def _vtbl_call(fn_number, pp_vtbl, arg0)
-        JNI.__send__(:Java_org_eclipse_swt_internal_mozilla_XPCOM_VtblCall__IJ_3C, JNI.env, self.jni_id, fn_number.to_int, pp_vtbl.to_int, arg0.jni_id)
+        PLATFORM_LOCK.lock
+        begin
+          return ___vtbl_call(fn_number, pp_vtbl, arg0)
+        ensure
+          PLATFORM_LOCK.unlock
+        end
       end
       
-      JNI.native_method :Java_org_eclipse_swt_internal_mozilla_XPCOM_VtblCall__IJXfloatX, [:pointer, :long, :int32, :int64, :float], :int32
+      JNI.native_method :Java_org_eclipse_swt_internal_mozilla_XPCOM__1VtblCall__IJXdoubleX, [:pointer, :long, :int32, :int64, :double], :int32
+      typesig { [::Java::Int, ::Java::Long, ::Java::Double] }
+      # int
+      def ___vtbl_call(fn_number, pp_vtbl, arg0)
+        JNI.__send__(:Java_org_eclipse_swt_internal_mozilla_XPCOM__1VtblCall__IJXdoubleX, JNI.env, self.jni_id, fn_number.to_int, pp_vtbl.to_int, arg0)
+      end
+      
+      typesig { [::Java::Int, ::Java::Long, ::Java::Double] }
+      # int
+      def _vtbl_call(fn_number, pp_vtbl, arg0)
+        PLATFORM_LOCK.lock
+        begin
+          return ___vtbl_call(fn_number, pp_vtbl, arg0)
+        ensure
+          PLATFORM_LOCK.unlock
+        end
+      end
+      
+      JNI.native_method :Java_org_eclipse_swt_internal_mozilla_XPCOM__1VtblCall__IJXfloatX, [:pointer, :long, :int32, :int64, :float], :int32
+      typesig { [::Java::Int, ::Java::Long, ::Java::Float] }
+      # int
+      def ___vtbl_call(fn_number, pp_vtbl, arg0)
+        JNI.__send__(:Java_org_eclipse_swt_internal_mozilla_XPCOM__1VtblCall__IJXfloatX, JNI.env, self.jni_id, fn_number.to_int, pp_vtbl.to_int, arg0)
+      end
+      
       typesig { [::Java::Int, ::Java::Long, ::Java::Float] }
       # int
       def _vtbl_call(fn_number, pp_vtbl, arg0)
-        JNI.__send__(:Java_org_eclipse_swt_internal_mozilla_XPCOM_VtblCall__IJXfloatX, JNI.env, self.jni_id, fn_number.to_int, pp_vtbl.to_int, arg0)
+        PLATFORM_LOCK.lock
+        begin
+          return ___vtbl_call(fn_number, pp_vtbl, arg0)
+        ensure
+          PLATFORM_LOCK.unlock
+        end
       end
       
-      JNI.native_method :Java_org_eclipse_swt_internal_mozilla_XPCOM_VtblCall__IJ_3XfloatX, [:pointer, :long, :int32, :int64, :long], :int32
+      JNI.native_method :Java_org_eclipse_swt_internal_mozilla_XPCOM__1VtblCall__IJ_3XfloatX, [:pointer, :long, :int32, :int64, :long], :int32
+      typesig { [::Java::Int, ::Java::Long, Array.typed(::Java::Float)] }
+      # int
+      def ___vtbl_call(fn_number, pp_vtbl, arg0)
+        JNI.__send__(:Java_org_eclipse_swt_internal_mozilla_XPCOM__1VtblCall__IJ_3XfloatX, JNI.env, self.jni_id, fn_number.to_int, pp_vtbl.to_int, arg0.jni_id)
+      end
+      
       typesig { [::Java::Int, ::Java::Long, Array.typed(::Java::Float)] }
       # int
       def _vtbl_call(fn_number, pp_vtbl, arg0)
-        JNI.__send__(:Java_org_eclipse_swt_internal_mozilla_XPCOM_VtblCall__IJ_3XfloatX, JNI.env, self.jni_id, fn_number.to_int, pp_vtbl.to_int, arg0.jni_id)
+        PLATFORM_LOCK.lock
+        begin
+          return ___vtbl_call(fn_number, pp_vtbl, arg0)
+        ensure
+          PLATFORM_LOCK.unlock
+        end
       end
       
-      JNI.native_method :Java_org_eclipse_swt_internal_mozilla_XPCOM_VtblCall__IJI, [:pointer, :long, :int32, :int64, :int32], :int32
+      JNI.native_method :Java_org_eclipse_swt_internal_mozilla_XPCOM__1VtblCall__IJI, [:pointer, :long, :int32, :int64, :int32], :int32
+      typesig { [::Java::Int, ::Java::Long, ::Java::Int] }
+      # int
+      def ___vtbl_call(fn_number, pp_vtbl, arg0)
+        JNI.__send__(:Java_org_eclipse_swt_internal_mozilla_XPCOM__1VtblCall__IJI, JNI.env, self.jni_id, fn_number.to_int, pp_vtbl.to_int, arg0.to_int)
+      end
+      
       typesig { [::Java::Int, ::Java::Long, ::Java::Int] }
       # int
       def _vtbl_call(fn_number, pp_vtbl, arg0)
-        JNI.__send__(:Java_org_eclipse_swt_internal_mozilla_XPCOM_VtblCall__IJI, JNI.env, self.jni_id, fn_number.to_int, pp_vtbl.to_int, arg0.to_int)
+        PLATFORM_LOCK.lock
+        begin
+          return ___vtbl_call(fn_number, pp_vtbl, arg0)
+        ensure
+          PLATFORM_LOCK.unlock
+        end
       end
       
-      JNI.native_method :Java_org_eclipse_swt_internal_mozilla_XPCOM_VtblCall__IJ_3I, [:pointer, :long, :int32, :int64, :long], :int32
+      JNI.native_method :Java_org_eclipse_swt_internal_mozilla_XPCOM__1VtblCall__IJ_3I, [:pointer, :long, :int32, :int64, :long], :int32
+      typesig { [::Java::Int, ::Java::Long, Array.typed(::Java::Int)] }
+      # int
+      def ___vtbl_call(fn_number, pp_vtbl, arg0)
+        JNI.__send__(:Java_org_eclipse_swt_internal_mozilla_XPCOM__1VtblCall__IJ_3I, JNI.env, self.jni_id, fn_number.to_int, pp_vtbl.to_int, arg0.jni_id)
+      end
+      
       typesig { [::Java::Int, ::Java::Long, Array.typed(::Java::Int)] }
       # int
       def _vtbl_call(fn_number, pp_vtbl, arg0)
-        JNI.__send__(:Java_org_eclipse_swt_internal_mozilla_XPCOM_VtblCall__IJ_3I, JNI.env, self.jni_id, fn_number.to_int, pp_vtbl.to_int, arg0.jni_id)
+        PLATFORM_LOCK.lock
+        begin
+          return ___vtbl_call(fn_number, pp_vtbl, arg0)
+        ensure
+          PLATFORM_LOCK.unlock
+        end
       end
       
-      JNI.native_method :Java_org_eclipse_swt_internal_mozilla_XPCOM_VtblCall__IJJ, [:pointer, :long, :int32, :int64, :int64], :int32
+      JNI.native_method :Java_org_eclipse_swt_internal_mozilla_XPCOM__1VtblCall__IJJ, [:pointer, :long, :int32, :int64, :int64], :int32
+      typesig { [::Java::Int, ::Java::Long, ::Java::Long] }
+      # int
+      def ___vtbl_call(fn_number, pp_vtbl, arg0)
+        JNI.__send__(:Java_org_eclipse_swt_internal_mozilla_XPCOM__1VtblCall__IJJ, JNI.env, self.jni_id, fn_number.to_int, pp_vtbl.to_int, arg0.to_int)
+      end
+      
       typesig { [::Java::Int, ::Java::Long, ::Java::Long] }
       # int
       def _vtbl_call(fn_number, pp_vtbl, arg0)
-        JNI.__send__(:Java_org_eclipse_swt_internal_mozilla_XPCOM_VtblCall__IJJ, JNI.env, self.jni_id, fn_number.to_int, pp_vtbl.to_int, arg0.to_int)
+        PLATFORM_LOCK.lock
+        begin
+          return ___vtbl_call(fn_number, pp_vtbl, arg0)
+        ensure
+          PLATFORM_LOCK.unlock
+        end
       end
       
-      JNI.native_method :Java_org_eclipse_swt_internal_mozilla_XPCOM_VtblCall__IJ_3J, [:pointer, :long, :int32, :int64, :long], :int32
+      JNI.native_method :Java_org_eclipse_swt_internal_mozilla_XPCOM__1VtblCall__IJ_3J, [:pointer, :long, :int32, :int64, :long], :int32
+      typesig { [::Java::Int, ::Java::Long, Array.typed(::Java::Long)] }
+      # int
+      def ___vtbl_call(fn_number, pp_vtbl, arg0)
+        JNI.__send__(:Java_org_eclipse_swt_internal_mozilla_XPCOM__1VtblCall__IJ_3J, JNI.env, self.jni_id, fn_number.to_int, pp_vtbl.to_int, arg0.jni_id)
+      end
+      
       typesig { [::Java::Int, ::Java::Long, Array.typed(::Java::Long)] }
       # int
       def _vtbl_call(fn_number, pp_vtbl, arg0)
-        JNI.__send__(:Java_org_eclipse_swt_internal_mozilla_XPCOM_VtblCall__IJ_3J, JNI.env, self.jni_id, fn_number.to_int, pp_vtbl.to_int, arg0.jni_id)
+        PLATFORM_LOCK.lock
+        begin
+          return ___vtbl_call(fn_number, pp_vtbl, arg0)
+        ensure
+          PLATFORM_LOCK.unlock
+        end
       end
       
-      JNI.native_method :Java_org_eclipse_swt_internal_mozilla_XPCOM_VtblCall__IJ_3S, [:pointer, :long, :int32, :int64, :long], :int32
+      JNI.native_method :Java_org_eclipse_swt_internal_mozilla_XPCOM__1VtblCall__IJ_3S, [:pointer, :long, :int32, :int64, :long], :int32
+      typesig { [::Java::Int, ::Java::Long, Array.typed(::Java::Short)] }
+      # int
+      def ___vtbl_call(fn_number, pp_vtbl, arg0)
+        JNI.__send__(:Java_org_eclipse_swt_internal_mozilla_XPCOM__1VtblCall__IJ_3S, JNI.env, self.jni_id, fn_number.to_int, pp_vtbl.to_int, arg0.jni_id)
+      end
+      
       typesig { [::Java::Int, ::Java::Long, Array.typed(::Java::Short)] }
       # int
       def _vtbl_call(fn_number, pp_vtbl, arg0)
-        JNI.__send__(:Java_org_eclipse_swt_internal_mozilla_XPCOM_VtblCall__IJ_3S, JNI.env, self.jni_id, fn_number.to_int, pp_vtbl.to_int, arg0.jni_id)
+        PLATFORM_LOCK.lock
+        begin
+          return ___vtbl_call(fn_number, pp_vtbl, arg0)
+        ensure
+          PLATFORM_LOCK.unlock
+        end
       end
       
-      JNI.native_method :Java_org_eclipse_swt_internal_mozilla_XPCOM_VtblCall__IJII, [:pointer, :long, :int32, :int64, :int32, :int32], :int32
+      JNI.native_method :Java_org_eclipse_swt_internal_mozilla_XPCOM__1VtblCall__IJII, [:pointer, :long, :int32, :int64, :int32, :int32], :int32
+      typesig { [::Java::Int, ::Java::Long, ::Java::Int, ::Java::Int] }
+      # int
+      def ___vtbl_call(fn_number, pp_vtbl, arg0, arg1)
+        JNI.__send__(:Java_org_eclipse_swt_internal_mozilla_XPCOM__1VtblCall__IJII, JNI.env, self.jni_id, fn_number.to_int, pp_vtbl.to_int, arg0.to_int, arg1.to_int)
+      end
+      
       typesig { [::Java::Int, ::Java::Long, ::Java::Int, ::Java::Int] }
       # int
       def _vtbl_call(fn_number, pp_vtbl, arg0, arg1)
-        JNI.__send__(:Java_org_eclipse_swt_internal_mozilla_XPCOM_VtblCall__IJII, JNI.env, self.jni_id, fn_number.to_int, pp_vtbl.to_int, arg0.to_int, arg1.to_int)
+        PLATFORM_LOCK.lock
+        begin
+          return ___vtbl_call(fn_number, pp_vtbl, arg0, arg1)
+        ensure
+          PLATFORM_LOCK.unlock
+        end
       end
       
-      JNI.native_method :Java_org_eclipse_swt_internal_mozilla_XPCOM_VtblCall__IJJI, [:pointer, :long, :int32, :int64, :int64, :int32], :int32
+      JNI.native_method :Java_org_eclipse_swt_internal_mozilla_XPCOM__1VtblCall__IJJI, [:pointer, :long, :int32, :int64, :int64, :int32], :int32
+      typesig { [::Java::Int, ::Java::Long, ::Java::Long, ::Java::Int] }
+      # int
+      def ___vtbl_call(fn_number, pp_vtbl, arg0, arg1)
+        JNI.__send__(:Java_org_eclipse_swt_internal_mozilla_XPCOM__1VtblCall__IJJI, JNI.env, self.jni_id, fn_number.to_int, pp_vtbl.to_int, arg0.to_int, arg1.to_int)
+      end
+      
       typesig { [::Java::Int, ::Java::Long, ::Java::Long, ::Java::Int] }
       # int
       def _vtbl_call(fn_number, pp_vtbl, arg0, arg1)
-        JNI.__send__(:Java_org_eclipse_swt_internal_mozilla_XPCOM_VtblCall__IJJI, JNI.env, self.jni_id, fn_number.to_int, pp_vtbl.to_int, arg0.to_int, arg1.to_int)
+        PLATFORM_LOCK.lock
+        begin
+          return ___vtbl_call(fn_number, pp_vtbl, arg0, arg1)
+        ensure
+          PLATFORM_LOCK.unlock
+        end
       end
       
-      JNI.native_method :Java_org_eclipse_swt_internal_mozilla_XPCOM_VtblCall__IJJJ, [:pointer, :long, :int32, :int64, :int64, :int64], :int32
+      JNI.native_method :Java_org_eclipse_swt_internal_mozilla_XPCOM__1VtblCall__IJJJ, [:pointer, :long, :int32, :int64, :int64, :int64], :int32
+      typesig { [::Java::Int, ::Java::Long, ::Java::Long, ::Java::Long] }
+      # int
+      def ___vtbl_call(fn_number, pp_vtbl, arg0, arg1)
+        JNI.__send__(:Java_org_eclipse_swt_internal_mozilla_XPCOM__1VtblCall__IJJJ, JNI.env, self.jni_id, fn_number.to_int, pp_vtbl.to_int, arg0.to_int, arg1.to_int)
+      end
+      
       typesig { [::Java::Int, ::Java::Long, ::Java::Long, ::Java::Long] }
       # int
       def _vtbl_call(fn_number, pp_vtbl, arg0, arg1)
-        JNI.__send__(:Java_org_eclipse_swt_internal_mozilla_XPCOM_VtblCall__IJJJ, JNI.env, self.jni_id, fn_number.to_int, pp_vtbl.to_int, arg0.to_int, arg1.to_int)
+        PLATFORM_LOCK.lock
+        begin
+          return ___vtbl_call(fn_number, pp_vtbl, arg0, arg1)
+        ensure
+          PLATFORM_LOCK.unlock
+        end
       end
       
-      JNI.native_method :Java_org_eclipse_swt_internal_mozilla_XPCOM_VtblCall__IJI_3I, [:pointer, :long, :int32, :int64, :int32, :long], :int32
+      JNI.native_method :Java_org_eclipse_swt_internal_mozilla_XPCOM__1VtblCall__IJI_3I, [:pointer, :long, :int32, :int64, :int32, :long], :int32
+      typesig { [::Java::Int, ::Java::Long, ::Java::Int, Array.typed(::Java::Int)] }
+      # int
+      def ___vtbl_call(fn_number, pp_vtbl, arg0, arg1)
+        JNI.__send__(:Java_org_eclipse_swt_internal_mozilla_XPCOM__1VtblCall__IJI_3I, JNI.env, self.jni_id, fn_number.to_int, pp_vtbl.to_int, arg0.to_int, arg1.jni_id)
+      end
+      
       typesig { [::Java::Int, ::Java::Long, ::Java::Int, Array.typed(::Java::Int)] }
       # int
       def _vtbl_call(fn_number, pp_vtbl, arg0, arg1)
-        JNI.__send__(:Java_org_eclipse_swt_internal_mozilla_XPCOM_VtblCall__IJI_3I, JNI.env, self.jni_id, fn_number.to_int, pp_vtbl.to_int, arg0.to_int, arg1.jni_id)
+        PLATFORM_LOCK.lock
+        begin
+          return ___vtbl_call(fn_number, pp_vtbl, arg0, arg1)
+        ensure
+          PLATFORM_LOCK.unlock
+        end
       end
       
-      JNI.native_method :Java_org_eclipse_swt_internal_mozilla_XPCOM_VtblCall__IJJ_3J, [:pointer, :long, :int32, :int64, :int64, :long], :int32
+      JNI.native_method :Java_org_eclipse_swt_internal_mozilla_XPCOM__1VtblCall__IJJ_3J, [:pointer, :long, :int32, :int64, :int64, :long], :int32
+      typesig { [::Java::Int, ::Java::Long, ::Java::Long, Array.typed(::Java::Long)] }
+      # int
+      def ___vtbl_call(fn_number, pp_vtbl, arg0, arg1)
+        JNI.__send__(:Java_org_eclipse_swt_internal_mozilla_XPCOM__1VtblCall__IJJ_3J, JNI.env, self.jni_id, fn_number.to_int, pp_vtbl.to_int, arg0.to_int, arg1.jni_id)
+      end
+      
       typesig { [::Java::Int, ::Java::Long, ::Java::Long, Array.typed(::Java::Long)] }
       # int
       def _vtbl_call(fn_number, pp_vtbl, arg0, arg1)
-        JNI.__send__(:Java_org_eclipse_swt_internal_mozilla_XPCOM_VtblCall__IJJ_3J, JNI.env, self.jni_id, fn_number.to_int, pp_vtbl.to_int, arg0.to_int, arg1.jni_id)
+        PLATFORM_LOCK.lock
+        begin
+          return ___vtbl_call(fn_number, pp_vtbl, arg0, arg1)
+        ensure
+          PLATFORM_LOCK.unlock
+        end
       end
       
-      JNI.native_method :Java_org_eclipse_swt_internal_mozilla_XPCOM_VtblCall__IJJ_3I, [:pointer, :long, :int32, :int64, :int64, :long], :int32
+      JNI.native_method :Java_org_eclipse_swt_internal_mozilla_XPCOM__1VtblCall__IJJ_3I, [:pointer, :long, :int32, :int64, :int64, :long], :int32
+      typesig { [::Java::Int, ::Java::Long, ::Java::Long, Array.typed(::Java::Int)] }
+      # int
+      def ___vtbl_call(fn_number, pp_vtbl, arg0, arg1)
+        JNI.__send__(:Java_org_eclipse_swt_internal_mozilla_XPCOM__1VtblCall__IJJ_3I, JNI.env, self.jni_id, fn_number.to_int, pp_vtbl.to_int, arg0.to_int, arg1.jni_id)
+      end
+      
       typesig { [::Java::Int, ::Java::Long, ::Java::Long, Array.typed(::Java::Int)] }
       # int
       def _vtbl_call(fn_number, pp_vtbl, arg0, arg1)
-        JNI.__send__(:Java_org_eclipse_swt_internal_mozilla_XPCOM_VtblCall__IJJ_3I, JNI.env, self.jni_id, fn_number.to_int, pp_vtbl.to_int, arg0.to_int, arg1.jni_id)
+        PLATFORM_LOCK.lock
+        begin
+          return ___vtbl_call(fn_number, pp_vtbl, arg0, arg1)
+        ensure
+          PLATFORM_LOCK.unlock
+        end
       end
       
-      JNI.native_method :Java_org_eclipse_swt_internal_mozilla_XPCOM_VtblCall__IJ_3B_3I, [:pointer, :long, :int32, :int64, :long, :long], :int32
+      JNI.native_method :Java_org_eclipse_swt_internal_mozilla_XPCOM__1VtblCall__IJ_3B_3I, [:pointer, :long, :int32, :int64, :long, :long], :int32
+      typesig { [::Java::Int, ::Java::Long, Array.typed(::Java::Byte), Array.typed(::Java::Int)] }
+      # int
+      def ___vtbl_call(fn_number, pp_vtbl, arg0, arg1)
+        JNI.__send__(:Java_org_eclipse_swt_internal_mozilla_XPCOM__1VtblCall__IJ_3B_3I, JNI.env, self.jni_id, fn_number.to_int, pp_vtbl.to_int, arg0.jni_id, arg1.jni_id)
+      end
+      
       typesig { [::Java::Int, ::Java::Long, Array.typed(::Java::Byte), Array.typed(::Java::Int)] }
       # int
       def _vtbl_call(fn_number, pp_vtbl, arg0, arg1)
-        JNI.__send__(:Java_org_eclipse_swt_internal_mozilla_XPCOM_VtblCall__IJ_3B_3I, JNI.env, self.jni_id, fn_number.to_int, pp_vtbl.to_int, arg0.jni_id, arg1.jni_id)
+        PLATFORM_LOCK.lock
+        begin
+          return ___vtbl_call(fn_number, pp_vtbl, arg0, arg1)
+        ensure
+          PLATFORM_LOCK.unlock
+        end
       end
       
-      JNI.native_method :Java_org_eclipse_swt_internal_mozilla_XPCOM_VtblCall__IJ_3B_3J, [:pointer, :long, :int32, :int64, :long, :long], :int32
+      JNI.native_method :Java_org_eclipse_swt_internal_mozilla_XPCOM__1VtblCall__IJ_3B_3J, [:pointer, :long, :int32, :int64, :long, :long], :int32
+      typesig { [::Java::Int, ::Java::Long, Array.typed(::Java::Byte), Array.typed(::Java::Long)] }
+      # int
+      def ___vtbl_call(fn_number, pp_vtbl, arg0, arg1)
+        JNI.__send__(:Java_org_eclipse_swt_internal_mozilla_XPCOM__1VtblCall__IJ_3B_3J, JNI.env, self.jni_id, fn_number.to_int, pp_vtbl.to_int, arg0.jni_id, arg1.jni_id)
+      end
+      
       typesig { [::Java::Int, ::Java::Long, Array.typed(::Java::Byte), Array.typed(::Java::Long)] }
       # int
       def _vtbl_call(fn_number, pp_vtbl, arg0, arg1)
-        JNI.__send__(:Java_org_eclipse_swt_internal_mozilla_XPCOM_VtblCall__IJ_3B_3J, JNI.env, self.jni_id, fn_number.to_int, pp_vtbl.to_int, arg0.jni_id, arg1.jni_id)
+        PLATFORM_LOCK.lock
+        begin
+          return ___vtbl_call(fn_number, pp_vtbl, arg0, arg1)
+        ensure
+          PLATFORM_LOCK.unlock
+        end
       end
       
-      JNI.native_method :Java_org_eclipse_swt_internal_mozilla_XPCOM_VtblCall__IJ_3BJ, [:pointer, :long, :int32, :int64, :long, :int64], :int32
+      JNI.native_method :Java_org_eclipse_swt_internal_mozilla_XPCOM__1VtblCall__IJ_3BJ, [:pointer, :long, :int32, :int64, :long, :int64], :int32
+      typesig { [::Java::Int, ::Java::Long, Array.typed(::Java::Byte), ::Java::Long] }
+      # int
+      def ___vtbl_call(fn_number, pp_vtbl, arg0, arg1)
+        JNI.__send__(:Java_org_eclipse_swt_internal_mozilla_XPCOM__1VtblCall__IJ_3BJ, JNI.env, self.jni_id, fn_number.to_int, pp_vtbl.to_int, arg0.jni_id, arg1.to_int)
+      end
+      
       typesig { [::Java::Int, ::Java::Long, Array.typed(::Java::Byte), ::Java::Long] }
       # int
       def _vtbl_call(fn_number, pp_vtbl, arg0, arg1)
-        JNI.__send__(:Java_org_eclipse_swt_internal_mozilla_XPCOM_VtblCall__IJ_3BJ, JNI.env, self.jni_id, fn_number.to_int, pp_vtbl.to_int, arg0.jni_id, arg1.to_int)
+        PLATFORM_LOCK.lock
+        begin
+          return ___vtbl_call(fn_number, pp_vtbl, arg0, arg1)
+        ensure
+          PLATFORM_LOCK.unlock
+        end
       end
       
-      JNI.native_method :Java_org_eclipse_swt_internal_mozilla_XPCOM_VtblCall__IJ_3BI, [:pointer, :long, :int32, :int64, :long, :int32], :int32
+      JNI.native_method :Java_org_eclipse_swt_internal_mozilla_XPCOM__1VtblCall__IJ_3BI, [:pointer, :long, :int32, :int64, :long, :int32], :int32
+      typesig { [::Java::Int, ::Java::Long, Array.typed(::Java::Byte), ::Java::Int] }
+      # int
+      def ___vtbl_call(fn_number, pp_vtbl, arg0, arg1)
+        JNI.__send__(:Java_org_eclipse_swt_internal_mozilla_XPCOM__1VtblCall__IJ_3BI, JNI.env, self.jni_id, fn_number.to_int, pp_vtbl.to_int, arg0.jni_id, arg1.to_int)
+      end
+      
       typesig { [::Java::Int, ::Java::Long, Array.typed(::Java::Byte), ::Java::Int] }
       # int
       def _vtbl_call(fn_number, pp_vtbl, arg0, arg1)
-        JNI.__send__(:Java_org_eclipse_swt_internal_mozilla_XPCOM_VtblCall__IJ_3BI, JNI.env, self.jni_id, fn_number.to_int, pp_vtbl.to_int, arg0.jni_id, arg1.to_int)
+        PLATFORM_LOCK.lock
+        begin
+          return ___vtbl_call(fn_number, pp_vtbl, arg0, arg1)
+        ensure
+          PLATFORM_LOCK.unlock
+        end
       end
       
-      JNI.native_method "Java_org_eclipse_swt_internal_mozilla_XPCOM_VtblCall__IJIL#{NsID.jni_name}_2".to_sym, [:pointer, :long, :int32, :int64, :int32, :long], :int32
+      JNI.native_method "Java_org_eclipse_swt_internal_mozilla_XPCOM__1VtblCall__IJIL#{NsID.jni_name}_2".to_sym, [:pointer, :long, :int32, :int64, :int32, :long], :int32
+      typesig { [::Java::Int, ::Java::Long, ::Java::Int, NsID] }
+      # int
+      def ___vtbl_call(fn_number, pp_vtbl, arg0, arg1)
+        JNI.__send__("Java_org_eclipse_swt_internal_mozilla_XPCOM__1VtblCall__IJIL#{NsID.jni_name}_2".to_sym, JNI.env, self.jni_id, fn_number.to_int, pp_vtbl.to_int, arg0.to_int, arg1.jni_id)
+      end
+      
       typesig { [::Java::Int, ::Java::Long, ::Java::Int, NsID] }
       # int
       def _vtbl_call(fn_number, pp_vtbl, arg0, arg1)
-        JNI.__send__("Java_org_eclipse_swt_internal_mozilla_XPCOM_VtblCall__IJIL#{NsID.jni_name}_2".to_sym, JNI.env, self.jni_id, fn_number.to_int, pp_vtbl.to_int, arg0.to_int, arg1.jni_id)
+        PLATFORM_LOCK.lock
+        begin
+          return ___vtbl_call(fn_number, pp_vtbl, arg0, arg1)
+        ensure
+          PLATFORM_LOCK.unlock
+        end
       end
       
-      JNI.native_method "Java_org_eclipse_swt_internal_mozilla_XPCOM_VtblCall__IJJL#{NsID.jni_name}_2".to_sym, [:pointer, :long, :int32, :int64, :int64, :long], :int32
+      JNI.native_method "Java_org_eclipse_swt_internal_mozilla_XPCOM__1VtblCall__IJJL#{NsID.jni_name}_2".to_sym, [:pointer, :long, :int32, :int64, :int64, :long], :int32
+      typesig { [::Java::Int, ::Java::Long, ::Java::Long, NsID] }
+      # int
+      def ___vtbl_call(fn_number, pp_vtbl, arg0, arg1)
+        JNI.__send__("Java_org_eclipse_swt_internal_mozilla_XPCOM__1VtblCall__IJJL#{NsID.jni_name}_2".to_sym, JNI.env, self.jni_id, fn_number.to_int, pp_vtbl.to_int, arg0.to_int, arg1.jni_id)
+      end
+      
       typesig { [::Java::Int, ::Java::Long, ::Java::Long, NsID] }
       # int
       def _vtbl_call(fn_number, pp_vtbl, arg0, arg1)
-        JNI.__send__("Java_org_eclipse_swt_internal_mozilla_XPCOM_VtblCall__IJJL#{NsID.jni_name}_2".to_sym, JNI.env, self.jni_id, fn_number.to_int, pp_vtbl.to_int, arg0.to_int, arg1.jni_id)
+        PLATFORM_LOCK.lock
+        begin
+          return ___vtbl_call(fn_number, pp_vtbl, arg0, arg1)
+        ensure
+          PLATFORM_LOCK.unlock
+        end
       end
       
-      JNI.native_method :Java_org_eclipse_swt_internal_mozilla_XPCOM_VtblCall__IJI_3C, [:pointer, :long, :int32, :int64, :int32, :long], :int32
+      JNI.native_method :Java_org_eclipse_swt_internal_mozilla_XPCOM__1VtblCall__IJI_3C, [:pointer, :long, :int32, :int64, :int32, :long], :int32
+      typesig { [::Java::Int, ::Java::Long, ::Java::Int, Array.typed(::Java::Char)] }
+      # int
+      def ___vtbl_call(fn_number, pp_vtbl, arg0, arg1)
+        JNI.__send__(:Java_org_eclipse_swt_internal_mozilla_XPCOM__1VtblCall__IJI_3C, JNI.env, self.jni_id, fn_number.to_int, pp_vtbl.to_int, arg0.to_int, arg1.jni_id)
+      end
+      
       typesig { [::Java::Int, ::Java::Long, ::Java::Int, Array.typed(::Java::Char)] }
       # int
       def _vtbl_call(fn_number, pp_vtbl, arg0, arg1)
-        JNI.__send__(:Java_org_eclipse_swt_internal_mozilla_XPCOM_VtblCall__IJI_3C, JNI.env, self.jni_id, fn_number.to_int, pp_vtbl.to_int, arg0.to_int, arg1.jni_id)
+        PLATFORM_LOCK.lock
+        begin
+          return ___vtbl_call(fn_number, pp_vtbl, arg0, arg1)
+        ensure
+          PLATFORM_LOCK.unlock
+        end
       end
       
-      JNI.native_method :Java_org_eclipse_swt_internal_mozilla_XPCOM_VtblCall__IJ_3I_3I, [:pointer, :long, :int32, :int64, :long, :long], :int32
+      JNI.native_method :Java_org_eclipse_swt_internal_mozilla_XPCOM__1VtblCall__IJ_3I_3I, [:pointer, :long, :int32, :int64, :long, :long], :int32
+      typesig { [::Java::Int, ::Java::Long, Array.typed(::Java::Int), Array.typed(::Java::Int)] }
+      # int
+      def ___vtbl_call(fn_number, pp_vtbl, arg0, arg1)
+        JNI.__send__(:Java_org_eclipse_swt_internal_mozilla_XPCOM__1VtblCall__IJ_3I_3I, JNI.env, self.jni_id, fn_number.to_int, pp_vtbl.to_int, arg0.jni_id, arg1.jni_id)
+      end
+      
       typesig { [::Java::Int, ::Java::Long, Array.typed(::Java::Int), Array.typed(::Java::Int)] }
       # int
       def _vtbl_call(fn_number, pp_vtbl, arg0, arg1)
-        JNI.__send__(:Java_org_eclipse_swt_internal_mozilla_XPCOM_VtblCall__IJ_3I_3I, JNI.env, self.jni_id, fn_number.to_int, pp_vtbl.to_int, arg0.jni_id, arg1.jni_id)
+        PLATFORM_LOCK.lock
+        begin
+          return ___vtbl_call(fn_number, pp_vtbl, arg0, arg1)
+        ensure
+          PLATFORM_LOCK.unlock
+        end
       end
       
-      JNI.native_method :Java_org_eclipse_swt_internal_mozilla_XPCOM_VtblCall__IJ_3I_3J, [:pointer, :long, :int32, :int64, :long, :long], :int32
+      JNI.native_method :Java_org_eclipse_swt_internal_mozilla_XPCOM__1VtblCall__IJ_3I_3J, [:pointer, :long, :int32, :int64, :long, :long], :int32
+      typesig { [::Java::Int, ::Java::Long, Array.typed(::Java::Int), Array.typed(::Java::Long)] }
+      # int
+      def ___vtbl_call(fn_number, pp_vtbl, arg0, arg1)
+        JNI.__send__(:Java_org_eclipse_swt_internal_mozilla_XPCOM__1VtblCall__IJ_3I_3J, JNI.env, self.jni_id, fn_number.to_int, pp_vtbl.to_int, arg0.jni_id, arg1.jni_id)
+      end
+      
       typesig { [::Java::Int, ::Java::Long, Array.typed(::Java::Int), Array.typed(::Java::Long)] }
       # int
       def _vtbl_call(fn_number, pp_vtbl, arg0, arg1)
-        JNI.__send__(:Java_org_eclipse_swt_internal_mozilla_XPCOM_VtblCall__IJ_3I_3J, JNI.env, self.jni_id, fn_number.to_int, pp_vtbl.to_int, arg0.jni_id, arg1.jni_id)
+        PLATFORM_LOCK.lock
+        begin
+          return ___vtbl_call(fn_number, pp_vtbl, arg0, arg1)
+        ensure
+          PLATFORM_LOCK.unlock
+        end
       end
       
-      JNI.native_method "Java_org_eclipse_swt_internal_mozilla_XPCOM_VtblCall__IJL#{NsID.jni_name}_2I".to_sym, [:pointer, :long, :int32, :int64, :long, :int32], :int32
+      JNI.native_method "Java_org_eclipse_swt_internal_mozilla_XPCOM__1VtblCall__IJL#{NsID.jni_name}_2I".to_sym, [:pointer, :long, :int32, :int64, :long, :int32], :int32
+      typesig { [::Java::Int, ::Java::Long, NsID, ::Java::Int] }
+      # int
+      def ___vtbl_call(fn_number, pp_vtbl, arg0, arg1)
+        JNI.__send__("Java_org_eclipse_swt_internal_mozilla_XPCOM__1VtblCall__IJL#{NsID.jni_name}_2I".to_sym, JNI.env, self.jni_id, fn_number.to_int, pp_vtbl.to_int, arg0.jni_id, arg1.to_int)
+      end
+      
       typesig { [::Java::Int, ::Java::Long, NsID, ::Java::Int] }
       # int
       def _vtbl_call(fn_number, pp_vtbl, arg0, arg1)
-        JNI.__send__("Java_org_eclipse_swt_internal_mozilla_XPCOM_VtblCall__IJL#{NsID.jni_name}_2I".to_sym, JNI.env, self.jni_id, fn_number.to_int, pp_vtbl.to_int, arg0.jni_id, arg1.to_int)
+        PLATFORM_LOCK.lock
+        begin
+          return ___vtbl_call(fn_number, pp_vtbl, arg0, arg1)
+        ensure
+          PLATFORM_LOCK.unlock
+        end
       end
       
-      JNI.native_method "Java_org_eclipse_swt_internal_mozilla_XPCOM_VtblCall__IJL#{NsID.jni_name}_2J".to_sym, [:pointer, :long, :int32, :int64, :long, :int64], :int32
+      JNI.native_method "Java_org_eclipse_swt_internal_mozilla_XPCOM__1VtblCall__IJL#{NsID.jni_name}_2J".to_sym, [:pointer, :long, :int32, :int64, :long, :int64], :int32
+      typesig { [::Java::Int, ::Java::Long, NsID, ::Java::Long] }
+      # int
+      def ___vtbl_call(fn_number, pp_vtbl, arg0, arg1)
+        JNI.__send__("Java_org_eclipse_swt_internal_mozilla_XPCOM__1VtblCall__IJL#{NsID.jni_name}_2J".to_sym, JNI.env, self.jni_id, fn_number.to_int, pp_vtbl.to_int, arg0.jni_id, arg1.to_int)
+      end
+      
       typesig { [::Java::Int, ::Java::Long, NsID, ::Java::Long] }
       # int
       def _vtbl_call(fn_number, pp_vtbl, arg0, arg1)
-        JNI.__send__("Java_org_eclipse_swt_internal_mozilla_XPCOM_VtblCall__IJL#{NsID.jni_name}_2J".to_sym, JNI.env, self.jni_id, fn_number.to_int, pp_vtbl.to_int, arg0.jni_id, arg1.to_int)
+        PLATFORM_LOCK.lock
+        begin
+          return ___vtbl_call(fn_number, pp_vtbl, arg0, arg1)
+        ensure
+          PLATFORM_LOCK.unlock
+        end
       end
       
-      JNI.native_method "Java_org_eclipse_swt_internal_mozilla_XPCOM_VtblCall__IJL#{NsID.jni_name}_2_3I".to_sym, [:pointer, :long, :int32, :int64, :long, :long], :int32
+      JNI.native_method "Java_org_eclipse_swt_internal_mozilla_XPCOM__1VtblCall__IJL#{NsID.jni_name}_2_3I".to_sym, [:pointer, :long, :int32, :int64, :long, :long], :int32
+      typesig { [::Java::Int, ::Java::Long, NsID, Array.typed(::Java::Int)] }
+      # int
+      def ___vtbl_call(fn_number, pp_vtbl, arg0, arg1)
+        JNI.__send__("Java_org_eclipse_swt_internal_mozilla_XPCOM__1VtblCall__IJL#{NsID.jni_name}_2_3I".to_sym, JNI.env, self.jni_id, fn_number.to_int, pp_vtbl.to_int, arg0.jni_id, arg1.jni_id)
+      end
+      
       typesig { [::Java::Int, ::Java::Long, NsID, Array.typed(::Java::Int)] }
       # int
       def _vtbl_call(fn_number, pp_vtbl, arg0, arg1)
-        JNI.__send__("Java_org_eclipse_swt_internal_mozilla_XPCOM_VtblCall__IJL#{NsID.jni_name}_2_3I".to_sym, JNI.env, self.jni_id, fn_number.to_int, pp_vtbl.to_int, arg0.jni_id, arg1.jni_id)
+        PLATFORM_LOCK.lock
+        begin
+          return ___vtbl_call(fn_number, pp_vtbl, arg0, arg1)
+        ensure
+          PLATFORM_LOCK.unlock
+        end
       end
       
-      JNI.native_method "Java_org_eclipse_swt_internal_mozilla_XPCOM_VtblCall__IJL#{NsID.jni_name}_2_3J".to_sym, [:pointer, :long, :int32, :int64, :long, :long], :int32
+      JNI.native_method "Java_org_eclipse_swt_internal_mozilla_XPCOM__1VtblCall__IJL#{NsID.jni_name}_2_3J".to_sym, [:pointer, :long, :int32, :int64, :long, :long], :int32
+      typesig { [::Java::Int, ::Java::Long, NsID, Array.typed(::Java::Long)] }
+      # int
+      def ___vtbl_call(fn_number, pp_vtbl, arg0, arg1)
+        JNI.__send__("Java_org_eclipse_swt_internal_mozilla_XPCOM__1VtblCall__IJL#{NsID.jni_name}_2_3J".to_sym, JNI.env, self.jni_id, fn_number.to_int, pp_vtbl.to_int, arg0.jni_id, arg1.jni_id)
+      end
+      
       typesig { [::Java::Int, ::Java::Long, NsID, Array.typed(::Java::Long)] }
       # int
       def _vtbl_call(fn_number, pp_vtbl, arg0, arg1)
-        JNI.__send__("Java_org_eclipse_swt_internal_mozilla_XPCOM_VtblCall__IJL#{NsID.jni_name}_2_3J".to_sym, JNI.env, self.jni_id, fn_number.to_int, pp_vtbl.to_int, arg0.jni_id, arg1.jni_id)
+        PLATFORM_LOCK.lock
+        begin
+          return ___vtbl_call(fn_number, pp_vtbl, arg0, arg1)
+        ensure
+          PLATFORM_LOCK.unlock
+        end
       end
       
-      JNI.native_method :Java_org_eclipse_swt_internal_mozilla_XPCOM_VtblCall__IJ_3C_3C, [:pointer, :long, :int32, :int64, :long, :long], :int32
+      JNI.native_method :Java_org_eclipse_swt_internal_mozilla_XPCOM__1VtblCall__IJ_3C_3C, [:pointer, :long, :int32, :int64, :long, :long], :int32
+      typesig { [::Java::Int, ::Java::Long, Array.typed(::Java::Char), Array.typed(::Java::Char)] }
+      # int
+      def ___vtbl_call(fn_number, pp_vtbl, arg0, arg1)
+        JNI.__send__(:Java_org_eclipse_swt_internal_mozilla_XPCOM__1VtblCall__IJ_3C_3C, JNI.env, self.jni_id, fn_number.to_int, pp_vtbl.to_int, arg0.jni_id, arg1.jni_id)
+      end
+      
       typesig { [::Java::Int, ::Java::Long, Array.typed(::Java::Char), Array.typed(::Java::Char)] }
       # int
       def _vtbl_call(fn_number, pp_vtbl, arg0, arg1)
-        JNI.__send__(:Java_org_eclipse_swt_internal_mozilla_XPCOM_VtblCall__IJ_3C_3C, JNI.env, self.jni_id, fn_number.to_int, pp_vtbl.to_int, arg0.jni_id, arg1.jni_id)
+        PLATFORM_LOCK.lock
+        begin
+          return ___vtbl_call(fn_number, pp_vtbl, arg0, arg1)
+        ensure
+          PLATFORM_LOCK.unlock
+        end
       end
       
-      JNI.native_method :Java_org_eclipse_swt_internal_mozilla_XPCOM_VtblCall__IJ_3B_3B, [:pointer, :long, :int32, :int64, :long, :long], :int32
+      JNI.native_method :Java_org_eclipse_swt_internal_mozilla_XPCOM__1VtblCall__IJ_3B_3B, [:pointer, :long, :int32, :int64, :long, :long], :int32
+      typesig { [::Java::Int, ::Java::Long, Array.typed(::Java::Byte), Array.typed(::Java::Byte)] }
+      # int
+      def ___vtbl_call(fn_number, pp_vtbl, arg0, arg1)
+        JNI.__send__(:Java_org_eclipse_swt_internal_mozilla_XPCOM__1VtblCall__IJ_3B_3B, JNI.env, self.jni_id, fn_number.to_int, pp_vtbl.to_int, arg0.jni_id, arg1.jni_id)
+      end
+      
       typesig { [::Java::Int, ::Java::Long, Array.typed(::Java::Byte), Array.typed(::Java::Byte)] }
       # int
       def _vtbl_call(fn_number, pp_vtbl, arg0, arg1)
-        JNI.__send__(:Java_org_eclipse_swt_internal_mozilla_XPCOM_VtblCall__IJ_3B_3B, JNI.env, self.jni_id, fn_number.to_int, pp_vtbl.to_int, arg0.jni_id, arg1.jni_id)
+        PLATFORM_LOCK.lock
+        begin
+          return ___vtbl_call(fn_number, pp_vtbl, arg0, arg1)
+        ensure
+          PLATFORM_LOCK.unlock
+        end
       end
       
-      JNI.native_method :Java_org_eclipse_swt_internal_mozilla_XPCOM_VtblCall__IJI_3B, [:pointer, :long, :int32, :int64, :int32, :long], :int32
+      JNI.native_method :Java_org_eclipse_swt_internal_mozilla_XPCOM__1VtblCall__IJI_3B, [:pointer, :long, :int32, :int64, :int32, :long], :int32
+      typesig { [::Java::Int, ::Java::Long, ::Java::Int, Array.typed(::Java::Byte)] }
+      # int
+      def ___vtbl_call(fn_number, pp_vtbl, arg0, arg1)
+        JNI.__send__(:Java_org_eclipse_swt_internal_mozilla_XPCOM__1VtblCall__IJI_3B, JNI.env, self.jni_id, fn_number.to_int, pp_vtbl.to_int, arg0.to_int, arg1.jni_id)
+      end
+      
       typesig { [::Java::Int, ::Java::Long, ::Java::Int, Array.typed(::Java::Byte)] }
       # int
       def _vtbl_call(fn_number, pp_vtbl, arg0, arg1)
-        JNI.__send__(:Java_org_eclipse_swt_internal_mozilla_XPCOM_VtblCall__IJI_3B, JNI.env, self.jni_id, fn_number.to_int, pp_vtbl.to_int, arg0.to_int, arg1.jni_id)
+        PLATFORM_LOCK.lock
+        begin
+          return ___vtbl_call(fn_number, pp_vtbl, arg0, arg1)
+        ensure
+          PLATFORM_LOCK.unlock
+        end
       end
       
-      JNI.native_method :Java_org_eclipse_swt_internal_mozilla_XPCOM_VtblCall__IJJ_3B, [:pointer, :long, :int32, :int64, :int64, :long], :int32
+      JNI.native_method :Java_org_eclipse_swt_internal_mozilla_XPCOM__1VtblCall__IJJ_3B, [:pointer, :long, :int32, :int64, :int64, :long], :int32
+      typesig { [::Java::Int, ::Java::Long, ::Java::Long, Array.typed(::Java::Byte)] }
+      # int
+      def ___vtbl_call(fn_number, pp_vtbl, arg0, arg1)
+        JNI.__send__(:Java_org_eclipse_swt_internal_mozilla_XPCOM__1VtblCall__IJJ_3B, JNI.env, self.jni_id, fn_number.to_int, pp_vtbl.to_int, arg0.to_int, arg1.jni_id)
+      end
+      
       typesig { [::Java::Int, ::Java::Long, ::Java::Long, Array.typed(::Java::Byte)] }
       # int
       def _vtbl_call(fn_number, pp_vtbl, arg0, arg1)
-        JNI.__send__(:Java_org_eclipse_swt_internal_mozilla_XPCOM_VtblCall__IJJ_3B, JNI.env, self.jni_id, fn_number.to_int, pp_vtbl.to_int, arg0.to_int, arg1.jni_id)
+        PLATFORM_LOCK.lock
+        begin
+          return ___vtbl_call(fn_number, pp_vtbl, arg0, arg1)
+        ensure
+          PLATFORM_LOCK.unlock
+        end
       end
       
-      JNI.native_method :Java_org_eclipse_swt_internal_mozilla_XPCOM_VtblCall__IJI_3CI, [:pointer, :long, :int32, :int64, :int32, :long, :int32], :int32
+      JNI.native_method :Java_org_eclipse_swt_internal_mozilla_XPCOM__1VtblCall__IJI_3CI, [:pointer, :long, :int32, :int64, :int32, :long, :int32], :int32
+      typesig { [::Java::Int, ::Java::Long, ::Java::Int, Array.typed(::Java::Char), ::Java::Int] }
+      # int
+      def ___vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2)
+        JNI.__send__(:Java_org_eclipse_swt_internal_mozilla_XPCOM__1VtblCall__IJI_3CI, JNI.env, self.jni_id, fn_number.to_int, pp_vtbl.to_int, arg0.to_int, arg1.jni_id, arg2.to_int)
+      end
+      
       typesig { [::Java::Int, ::Java::Long, ::Java::Int, Array.typed(::Java::Char), ::Java::Int] }
       # int
       def _vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2)
-        JNI.__send__(:Java_org_eclipse_swt_internal_mozilla_XPCOM_VtblCall__IJI_3CI, JNI.env, self.jni_id, fn_number.to_int, pp_vtbl.to_int, arg0.to_int, arg1.jni_id, arg2.to_int)
+        PLATFORM_LOCK.lock
+        begin
+          return ___vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2)
+        ensure
+          PLATFORM_LOCK.unlock
+        end
       end
       
-      JNI.native_method :Java_org_eclipse_swt_internal_mozilla_XPCOM_VtblCall__IJJ_3CI, [:pointer, :long, :int32, :int64, :int64, :long, :int32], :int32
+      JNI.native_method :Java_org_eclipse_swt_internal_mozilla_XPCOM__1VtblCall__IJI_3C_3I, [:pointer, :long, :int32, :int64, :int32, :long, :long], :int32
+      typesig { [::Java::Int, ::Java::Long, ::Java::Int, Array.typed(::Java::Char), Array.typed(::Java::Int)] }
+      # int
+      def ___vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2)
+        JNI.__send__(:Java_org_eclipse_swt_internal_mozilla_XPCOM__1VtblCall__IJI_3C_3I, JNI.env, self.jni_id, fn_number.to_int, pp_vtbl.to_int, arg0.to_int, arg1.jni_id, arg2.jni_id)
+      end
+      
+      typesig { [::Java::Int, ::Java::Long, ::Java::Int, Array.typed(::Java::Char), Array.typed(::Java::Int)] }
+      # int
+      def _vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2)
+        PLATFORM_LOCK.lock
+        begin
+          return ___vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2)
+        ensure
+          PLATFORM_LOCK.unlock
+        end
+      end
+      
+      JNI.native_method :Java_org_eclipse_swt_internal_mozilla_XPCOM__1VtblCall__IJJ_3C_3J, [:pointer, :long, :int32, :int64, :int64, :long, :long], :int32
+      typesig { [::Java::Int, ::Java::Long, ::Java::Long, Array.typed(::Java::Char), Array.typed(::Java::Long)] }
+      # int
+      def ___vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2)
+        JNI.__send__(:Java_org_eclipse_swt_internal_mozilla_XPCOM__1VtblCall__IJJ_3C_3J, JNI.env, self.jni_id, fn_number.to_int, pp_vtbl.to_int, arg0.to_int, arg1.jni_id, arg2.jni_id)
+      end
+      
+      typesig { [::Java::Int, ::Java::Long, ::Java::Long, Array.typed(::Java::Char), Array.typed(::Java::Long)] }
+      # int
+      def _vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2)
+        PLATFORM_LOCK.lock
+        begin
+          return ___vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2)
+        ensure
+          PLATFORM_LOCK.unlock
+        end
+      end
+      
+      JNI.native_method :Java_org_eclipse_swt_internal_mozilla_XPCOM__1VtblCall__IJJ_3CI, [:pointer, :long, :int32, :int64, :int64, :long, :int32], :int32
+      typesig { [::Java::Int, ::Java::Long, ::Java::Long, Array.typed(::Java::Char), ::Java::Int] }
+      # int
+      def ___vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2)
+        JNI.__send__(:Java_org_eclipse_swt_internal_mozilla_XPCOM__1VtblCall__IJJ_3CI, JNI.env, self.jni_id, fn_number.to_int, pp_vtbl.to_int, arg0.to_int, arg1.jni_id, arg2.to_int)
+      end
+      
       typesig { [::Java::Int, ::Java::Long, ::Java::Long, Array.typed(::Java::Char), ::Java::Int] }
       # int
       def _vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2)
-        JNI.__send__(:Java_org_eclipse_swt_internal_mozilla_XPCOM_VtblCall__IJJ_3CI, JNI.env, self.jni_id, fn_number.to_int, pp_vtbl.to_int, arg0.to_int, arg1.jni_id, arg2.to_int)
+        PLATFORM_LOCK.lock
+        begin
+          return ___vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2)
+        ensure
+          PLATFORM_LOCK.unlock
+        end
       end
       
-      JNI.native_method :Java_org_eclipse_swt_internal_mozilla_XPCOM_VtblCall__IJ_3I_3I_3I, [:pointer, :long, :int32, :int64, :long, :long, :long], :int32
+      JNI.native_method :Java_org_eclipse_swt_internal_mozilla_XPCOM__1VtblCall__IJ_3I_3I_3I, [:pointer, :long, :int32, :int64, :long, :long, :long], :int32
+      typesig { [::Java::Int, ::Java::Long, Array.typed(::Java::Int), Array.typed(::Java::Int), Array.typed(::Java::Int)] }
+      # int
+      def ___vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2)
+        JNI.__send__(:Java_org_eclipse_swt_internal_mozilla_XPCOM__1VtblCall__IJ_3I_3I_3I, JNI.env, self.jni_id, fn_number.to_int, pp_vtbl.to_int, arg0.jni_id, arg1.jni_id, arg2.jni_id)
+      end
+      
       typesig { [::Java::Int, ::Java::Long, Array.typed(::Java::Int), Array.typed(::Java::Int), Array.typed(::Java::Int)] }
       # int
       def _vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2)
-        JNI.__send__(:Java_org_eclipse_swt_internal_mozilla_XPCOM_VtblCall__IJ_3I_3I_3I, JNI.env, self.jni_id, fn_number.to_int, pp_vtbl.to_int, arg0.jni_id, arg1.jni_id, arg2.jni_id)
+        PLATFORM_LOCK.lock
+        begin
+          return ___vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2)
+        ensure
+          PLATFORM_LOCK.unlock
+        end
       end
       
-      JNI.native_method :Java_org_eclipse_swt_internal_mozilla_XPCOM_VtblCall__IJ_3J_3J_3J, [:pointer, :long, :int32, :int64, :long, :long, :long], :int32
+      JNI.native_method :Java_org_eclipse_swt_internal_mozilla_XPCOM__1VtblCall__IJ_3J_3J, [:pointer, :long, :int32, :int64, :long, :long], :int32
+      typesig { [::Java::Int, ::Java::Long, Array.typed(::Java::Long), Array.typed(::Java::Long)] }
+      # int
+      def ___vtbl_call(fn_number, pp_vtbl, arg0, arg1)
+        JNI.__send__(:Java_org_eclipse_swt_internal_mozilla_XPCOM__1VtblCall__IJ_3J_3J, JNI.env, self.jni_id, fn_number.to_int, pp_vtbl.to_int, arg0.jni_id, arg1.jni_id)
+      end
+      
+      typesig { [::Java::Int, ::Java::Long, Array.typed(::Java::Long), Array.typed(::Java::Long)] }
+      # int
+      def _vtbl_call(fn_number, pp_vtbl, arg0, arg1)
+        PLATFORM_LOCK.lock
+        begin
+          return ___vtbl_call(fn_number, pp_vtbl, arg0, arg1)
+        ensure
+          PLATFORM_LOCK.unlock
+        end
+      end
+      
+      JNI.native_method :Java_org_eclipse_swt_internal_mozilla_XPCOM__1VtblCall__IJ_3J_3J_3J, [:pointer, :long, :int32, :int64, :long, :long, :long], :int32
+      typesig { [::Java::Int, ::Java::Long, Array.typed(::Java::Long), Array.typed(::Java::Long), Array.typed(::Java::Long)] }
+      # int
+      def ___vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2)
+        JNI.__send__(:Java_org_eclipse_swt_internal_mozilla_XPCOM__1VtblCall__IJ_3J_3J_3J, JNI.env, self.jni_id, fn_number.to_int, pp_vtbl.to_int, arg0.jni_id, arg1.jni_id, arg2.jni_id)
+      end
+      
       typesig { [::Java::Int, ::Java::Long, Array.typed(::Java::Long), Array.typed(::Java::Long), Array.typed(::Java::Long)] }
       # int
       def _vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2)
-        JNI.__send__(:Java_org_eclipse_swt_internal_mozilla_XPCOM_VtblCall__IJ_3J_3J_3J, JNI.env, self.jni_id, fn_number.to_int, pp_vtbl.to_int, arg0.jni_id, arg1.jni_id, arg2.jni_id)
+        PLATFORM_LOCK.lock
+        begin
+          return ___vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2)
+        ensure
+          PLATFORM_LOCK.unlock
+        end
       end
       
-      JNI.native_method :Java_org_eclipse_swt_internal_mozilla_XPCOM_VtblCall__IJ_3I_3J_3I, [:pointer, :long, :int32, :int64, :long, :long, :long], :int32
+      JNI.native_method :Java_org_eclipse_swt_internal_mozilla_XPCOM__1VtblCall__IJSIII, [:pointer, :long, :int32, :int64, :int16, :int32, :int32, :int32], :int32
+      typesig { [::Java::Int, ::Java::Long, ::Java::Short, ::Java::Int, ::Java::Int, ::Java::Int] }
+      # int
+      def ___vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2, arg3)
+        JNI.__send__(:Java_org_eclipse_swt_internal_mozilla_XPCOM__1VtblCall__IJSIII, JNI.env, self.jni_id, fn_number.to_int, pp_vtbl.to_int, arg0.to_int, arg1.to_int, arg2.to_int, arg3.to_int)
+      end
+      
+      typesig { [::Java::Int, ::Java::Long, ::Java::Short, ::Java::Int, ::Java::Int, ::Java::Int] }
+      # int
+      def _vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2, arg3)
+        PLATFORM_LOCK.lock
+        begin
+          return ___vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2, arg3)
+        ensure
+          PLATFORM_LOCK.unlock
+        end
+      end
+      
+      JNI.native_method :Java_org_eclipse_swt_internal_mozilla_XPCOM__1VtblCall__IJSJIJ, [:pointer, :long, :int32, :int64, :int16, :int64, :int32, :int64], :int32
+      typesig { [::Java::Int, ::Java::Long, ::Java::Short, ::Java::Long, ::Java::Int, ::Java::Long] }
+      # int
+      def ___vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2, arg3)
+        JNI.__send__(:Java_org_eclipse_swt_internal_mozilla_XPCOM__1VtblCall__IJSJIJ, JNI.env, self.jni_id, fn_number.to_int, pp_vtbl.to_int, arg0.to_int, arg1.to_int, arg2.to_int, arg3.to_int)
+      end
+      
+      typesig { [::Java::Int, ::Java::Long, ::Java::Short, ::Java::Long, ::Java::Int, ::Java::Long] }
+      # int
+      def _vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2, arg3)
+        PLATFORM_LOCK.lock
+        begin
+          return ___vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2, arg3)
+        ensure
+          PLATFORM_LOCK.unlock
+        end
+      end
+      
+      JNI.native_method :Java_org_eclipse_swt_internal_mozilla_XPCOM__1VtblCall__IJ_3I_3J_3I, [:pointer, :long, :int32, :int64, :long, :long, :long], :int32
+      typesig { [::Java::Int, ::Java::Long, Array.typed(::Java::Int), Array.typed(::Java::Long), Array.typed(::Java::Int)] }
+      # int
+      def ___vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2)
+        JNI.__send__(:Java_org_eclipse_swt_internal_mozilla_XPCOM__1VtblCall__IJ_3I_3J_3I, JNI.env, self.jni_id, fn_number.to_int, pp_vtbl.to_int, arg0.jni_id, arg1.jni_id, arg2.jni_id)
+      end
+      
       typesig { [::Java::Int, ::Java::Long, Array.typed(::Java::Int), Array.typed(::Java::Long), Array.typed(::Java::Int)] }
       # int
       def _vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2)
-        JNI.__send__(:Java_org_eclipse_swt_internal_mozilla_XPCOM_VtblCall__IJ_3I_3J_3I, JNI.env, self.jni_id, fn_number.to_int, pp_vtbl.to_int, arg0.jni_id, arg1.jni_id, arg2.jni_id)
+        PLATFORM_LOCK.lock
+        begin
+          return ___vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2)
+        ensure
+          PLATFORM_LOCK.unlock
+        end
       end
       
-      JNI.native_method :Java_org_eclipse_swt_internal_mozilla_XPCOM_VtblCall__IJ_3I_3J_3J, [:pointer, :long, :int32, :int64, :long, :long, :long], :int32
+      JNI.native_method :Java_org_eclipse_swt_internal_mozilla_XPCOM__1VtblCall__IJ_3I_3J_3J, [:pointer, :long, :int32, :int64, :long, :long, :long], :int32
+      typesig { [::Java::Int, ::Java::Long, Array.typed(::Java::Int), Array.typed(::Java::Long), Array.typed(::Java::Long)] }
+      # int
+      def ___vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2)
+        JNI.__send__(:Java_org_eclipse_swt_internal_mozilla_XPCOM__1VtblCall__IJ_3I_3J_3J, JNI.env, self.jni_id, fn_number.to_int, pp_vtbl.to_int, arg0.jni_id, arg1.jni_id, arg2.jni_id)
+      end
+      
       typesig { [::Java::Int, ::Java::Long, Array.typed(::Java::Int), Array.typed(::Java::Long), Array.typed(::Java::Long)] }
       # int
       def _vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2)
-        JNI.__send__(:Java_org_eclipse_swt_internal_mozilla_XPCOM_VtblCall__IJ_3I_3J_3J, JNI.env, self.jni_id, fn_number.to_int, pp_vtbl.to_int, arg0.jni_id, arg1.jni_id, arg2.jni_id)
+        PLATFORM_LOCK.lock
+        begin
+          return ___vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2)
+        ensure
+          PLATFORM_LOCK.unlock
+        end
       end
       
-      JNI.native_method :Java_org_eclipse_swt_internal_mozilla_XPCOM_VtblCall__IJ_3BI_3I, [:pointer, :long, :int32, :int64, :long, :int32, :long], :int32
+      JNI.native_method :Java_org_eclipse_swt_internal_mozilla_XPCOM__1VtblCall__IJ_3BI_3I, [:pointer, :long, :int32, :int64, :long, :int32, :long], :int32
+      typesig { [::Java::Int, ::Java::Long, Array.typed(::Java::Byte), ::Java::Int, Array.typed(::Java::Int)] }
+      # int
+      def ___vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2)
+        JNI.__send__(:Java_org_eclipse_swt_internal_mozilla_XPCOM__1VtblCall__IJ_3BI_3I, JNI.env, self.jni_id, fn_number.to_int, pp_vtbl.to_int, arg0.jni_id, arg1.to_int, arg2.jni_id)
+      end
+      
       typesig { [::Java::Int, ::Java::Long, Array.typed(::Java::Byte), ::Java::Int, Array.typed(::Java::Int)] }
       # int
       def _vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2)
-        JNI.__send__(:Java_org_eclipse_swt_internal_mozilla_XPCOM_VtblCall__IJ_3BI_3I, JNI.env, self.jni_id, fn_number.to_int, pp_vtbl.to_int, arg0.jni_id, arg1.to_int, arg2.jni_id)
+        PLATFORM_LOCK.lock
+        begin
+          return ___vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2)
+        ensure
+          PLATFORM_LOCK.unlock
+        end
       end
       
-      JNI.native_method "Java_org_eclipse_swt_internal_mozilla_XPCOM_VtblCall__IJ_3BL#{NsID.jni_name}_2_3J".to_sym, [:pointer, :long, :int32, :int64, :long, :long, :long], :int32
+      JNI.native_method :Java_org_eclipse_swt_internal_mozilla_XPCOM__1VtblCall__IJ_3BJ_3I, [:pointer, :long, :int32, :int64, :long, :int64, :long], :int32
+      typesig { [::Java::Int, ::Java::Long, Array.typed(::Java::Byte), ::Java::Long, Array.typed(::Java::Int)] }
+      # int
+      def ___vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2)
+        JNI.__send__(:Java_org_eclipse_swt_internal_mozilla_XPCOM__1VtblCall__IJ_3BJ_3I, JNI.env, self.jni_id, fn_number.to_int, pp_vtbl.to_int, arg0.jni_id, arg1.to_int, arg2.jni_id)
+      end
+      
+      typesig { [::Java::Int, ::Java::Long, Array.typed(::Java::Byte), ::Java::Long, Array.typed(::Java::Int)] }
+      # int
+      def _vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2)
+        PLATFORM_LOCK.lock
+        begin
+          return ___vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2)
+        ensure
+          PLATFORM_LOCK.unlock
+        end
+      end
+      
+      JNI.native_method "Java_org_eclipse_swt_internal_mozilla_XPCOM__1VtblCall__IJ_3BL#{NsID.jni_name}_2_3J".to_sym, [:pointer, :long, :int32, :int64, :long, :long, :long], :int32
+      typesig { [::Java::Int, ::Java::Long, Array.typed(::Java::Byte), NsID, Array.typed(::Java::Long)] }
+      # int
+      def ___vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2)
+        JNI.__send__("Java_org_eclipse_swt_internal_mozilla_XPCOM__1VtblCall__IJ_3BL#{NsID.jni_name}_2_3J".to_sym, JNI.env, self.jni_id, fn_number.to_int, pp_vtbl.to_int, arg0.jni_id, arg1.jni_id, arg2.jni_id)
+      end
+      
       typesig { [::Java::Int, ::Java::Long, Array.typed(::Java::Byte), NsID, Array.typed(::Java::Long)] }
       # int
       def _vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2)
-        JNI.__send__("Java_org_eclipse_swt_internal_mozilla_XPCOM_VtblCall__IJ_3BL#{NsID.jni_name}_2_3J".to_sym, JNI.env, self.jni_id, fn_number.to_int, pp_vtbl.to_int, arg0.jni_id, arg1.jni_id, arg2.jni_id)
+        PLATFORM_LOCK.lock
+        begin
+          return ___vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2)
+        ensure
+          PLATFORM_LOCK.unlock
+        end
       end
       
-      JNI.native_method "Java_org_eclipse_swt_internal_mozilla_XPCOM_VtblCall__IJ_3BL#{NsID.jni_name}_2_3I".to_sym, [:pointer, :long, :int32, :int64, :long, :long, :long], :int32
+      JNI.native_method "Java_org_eclipse_swt_internal_mozilla_XPCOM__1VtblCall__IJ_3BL#{NsID.jni_name}_2_3I".to_sym, [:pointer, :long, :int32, :int64, :long, :long, :long], :int32
+      typesig { [::Java::Int, ::Java::Long, Array.typed(::Java::Byte), NsID, Array.typed(::Java::Int)] }
+      # int
+      def ___vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2)
+        JNI.__send__("Java_org_eclipse_swt_internal_mozilla_XPCOM__1VtblCall__IJ_3BL#{NsID.jni_name}_2_3I".to_sym, JNI.env, self.jni_id, fn_number.to_int, pp_vtbl.to_int, arg0.jni_id, arg1.jni_id, arg2.jni_id)
+      end
+      
       typesig { [::Java::Int, ::Java::Long, Array.typed(::Java::Byte), NsID, Array.typed(::Java::Int)] }
       # int
       def _vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2)
-        JNI.__send__("Java_org_eclipse_swt_internal_mozilla_XPCOM_VtblCall__IJ_3BL#{NsID.jni_name}_2_3I".to_sym, JNI.env, self.jni_id, fn_number.to_int, pp_vtbl.to_int, arg0.jni_id, arg1.jni_id, arg2.jni_id)
+        PLATFORM_LOCK.lock
+        begin
+          return ___vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2)
+        ensure
+          PLATFORM_LOCK.unlock
+        end
       end
       
-      JNI.native_method :Java_org_eclipse_swt_internal_mozilla_XPCOM_VtblCall__IJ_3CI_3I, [:pointer, :long, :int32, :int64, :long, :int32, :long], :int32
+      JNI.native_method :Java_org_eclipse_swt_internal_mozilla_XPCOM__1VtblCall__IJ_3CI_3I, [:pointer, :long, :int32, :int64, :long, :int32, :long], :int32
+      typesig { [::Java::Int, ::Java::Long, Array.typed(::Java::Char), ::Java::Int, Array.typed(::Java::Int)] }
+      # int
+      def ___vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2)
+        JNI.__send__(:Java_org_eclipse_swt_internal_mozilla_XPCOM__1VtblCall__IJ_3CI_3I, JNI.env, self.jni_id, fn_number.to_int, pp_vtbl.to_int, arg0.jni_id, arg1.to_int, arg2.jni_id)
+      end
+      
       typesig { [::Java::Int, ::Java::Long, Array.typed(::Java::Char), ::Java::Int, Array.typed(::Java::Int)] }
       # int
       def _vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2)
-        JNI.__send__(:Java_org_eclipse_swt_internal_mozilla_XPCOM_VtblCall__IJ_3CI_3I, JNI.env, self.jni_id, fn_number.to_int, pp_vtbl.to_int, arg0.jni_id, arg1.to_int, arg2.jni_id)
+        PLATFORM_LOCK.lock
+        begin
+          return ___vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2)
+        ensure
+          PLATFORM_LOCK.unlock
+        end
       end
       
-      JNI.native_method :Java_org_eclipse_swt_internal_mozilla_XPCOM_VtblCall__IJ_3CJ_3J, [:pointer, :long, :int32, :int64, :long, :int64, :long], :int32
+      JNI.native_method :Java_org_eclipse_swt_internal_mozilla_XPCOM__1VtblCall__IJ_3CJ_3J, [:pointer, :long, :int32, :int64, :long, :int64, :long], :int32
+      typesig { [::Java::Int, ::Java::Long, Array.typed(::Java::Char), ::Java::Long, Array.typed(::Java::Long)] }
+      # int
+      def ___vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2)
+        JNI.__send__(:Java_org_eclipse_swt_internal_mozilla_XPCOM__1VtblCall__IJ_3CJ_3J, JNI.env, self.jni_id, fn_number.to_int, pp_vtbl.to_int, arg0.jni_id, arg1.to_int, arg2.jni_id)
+      end
+      
       typesig { [::Java::Int, ::Java::Long, Array.typed(::Java::Char), ::Java::Long, Array.typed(::Java::Long)] }
       # int
       def _vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2)
-        JNI.__send__(:Java_org_eclipse_swt_internal_mozilla_XPCOM_VtblCall__IJ_3CJ_3J, JNI.env, self.jni_id, fn_number.to_int, pp_vtbl.to_int, arg0.jni_id, arg1.to_int, arg2.jni_id)
+        PLATFORM_LOCK.lock
+        begin
+          return ___vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2)
+        ensure
+          PLATFORM_LOCK.unlock
+        end
       end
       
-      JNI.native_method :Java_org_eclipse_swt_internal_mozilla_XPCOM_VtblCall__IJI_3C_3C, [:pointer, :long, :int32, :int64, :int32, :long, :long], :int32
+      JNI.native_method :Java_org_eclipse_swt_internal_mozilla_XPCOM__1VtblCall__IJI_3C_3C, [:pointer, :long, :int32, :int64, :int32, :long, :long], :int32
+      typesig { [::Java::Int, ::Java::Long, ::Java::Int, Array.typed(::Java::Char), Array.typed(::Java::Char)] }
+      # int
+      def ___vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2)
+        JNI.__send__(:Java_org_eclipse_swt_internal_mozilla_XPCOM__1VtblCall__IJI_3C_3C, JNI.env, self.jni_id, fn_number.to_int, pp_vtbl.to_int, arg0.to_int, arg1.jni_id, arg2.jni_id)
+      end
+      
       typesig { [::Java::Int, ::Java::Long, ::Java::Int, Array.typed(::Java::Char), Array.typed(::Java::Char)] }
       # int
       def _vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2)
-        JNI.__send__(:Java_org_eclipse_swt_internal_mozilla_XPCOM_VtblCall__IJI_3C_3C, JNI.env, self.jni_id, fn_number.to_int, pp_vtbl.to_int, arg0.to_int, arg1.jni_id, arg2.jni_id)
+        PLATFORM_LOCK.lock
+        begin
+          return ___vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2)
+        ensure
+          PLATFORM_LOCK.unlock
+        end
       end
       
-      JNI.native_method :Java_org_eclipse_swt_internal_mozilla_XPCOM_VtblCall__IJJ_3C_3C, [:pointer, :long, :int32, :int64, :int64, :long, :long], :int32
+      JNI.native_method :Java_org_eclipse_swt_internal_mozilla_XPCOM__1VtblCall__IJJ_3C_3C, [:pointer, :long, :int32, :int64, :int64, :long, :long], :int32
+      typesig { [::Java::Int, ::Java::Long, ::Java::Long, Array.typed(::Java::Char), Array.typed(::Java::Char)] }
+      # int
+      def ___vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2)
+        JNI.__send__(:Java_org_eclipse_swt_internal_mozilla_XPCOM__1VtblCall__IJJ_3C_3C, JNI.env, self.jni_id, fn_number.to_int, pp_vtbl.to_int, arg0.to_int, arg1.jni_id, arg2.jni_id)
+      end
+      
       typesig { [::Java::Int, ::Java::Long, ::Java::Long, Array.typed(::Java::Char), Array.typed(::Java::Char)] }
       # int
       def _vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2)
-        JNI.__send__(:Java_org_eclipse_swt_internal_mozilla_XPCOM_VtblCall__IJJ_3C_3C, JNI.env, self.jni_id, fn_number.to_int, pp_vtbl.to_int, arg0.to_int, arg1.jni_id, arg2.jni_id)
+        PLATFORM_LOCK.lock
+        begin
+          return ___vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2)
+        ensure
+          PLATFORM_LOCK.unlock
+        end
       end
       
-      JNI.native_method :Java_org_eclipse_swt_internal_mozilla_XPCOM_VtblCall__IJJJJ, [:pointer, :long, :int32, :int64, :int64, :int64, :int64], :int32
+      JNI.native_method :Java_org_eclipse_swt_internal_mozilla_XPCOM__1VtblCall__IJJJJ, [:pointer, :long, :int32, :int64, :int64, :int64, :int64], :int32
+      typesig { [::Java::Int, ::Java::Long, ::Java::Long, ::Java::Long, ::Java::Long] }
+      # int
+      def ___vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2)
+        JNI.__send__(:Java_org_eclipse_swt_internal_mozilla_XPCOM__1VtblCall__IJJJJ, JNI.env, self.jni_id, fn_number.to_int, pp_vtbl.to_int, arg0.to_int, arg1.to_int, arg2.to_int)
+      end
+      
       typesig { [::Java::Int, ::Java::Long, ::Java::Long, ::Java::Long, ::Java::Long] }
       # int
       def _vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2)
-        JNI.__send__(:Java_org_eclipse_swt_internal_mozilla_XPCOM_VtblCall__IJJJJ, JNI.env, self.jni_id, fn_number.to_int, pp_vtbl.to_int, arg0.to_int, arg1.to_int, arg2.to_int)
+        PLATFORM_LOCK.lock
+        begin
+          return ___vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2)
+        ensure
+          PLATFORM_LOCK.unlock
+        end
       end
       
-      JNI.native_method :Java_org_eclipse_swt_internal_mozilla_XPCOM_VtblCall__IJJJI, [:pointer, :long, :int32, :int64, :int64, :int64, :int32], :int32
+      JNI.native_method :Java_org_eclipse_swt_internal_mozilla_XPCOM__1VtblCall__IJJJI, [:pointer, :long, :int32, :int64, :int64, :int64, :int32], :int32
+      typesig { [::Java::Int, ::Java::Long, ::Java::Long, ::Java::Long, ::Java::Int] }
+      # int
+      def ___vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2)
+        JNI.__send__(:Java_org_eclipse_swt_internal_mozilla_XPCOM__1VtblCall__IJJJI, JNI.env, self.jni_id, fn_number.to_int, pp_vtbl.to_int, arg0.to_int, arg1.to_int, arg2.to_int)
+      end
+      
       typesig { [::Java::Int, ::Java::Long, ::Java::Long, ::Java::Long, ::Java::Int] }
       # int
       def _vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2)
-        JNI.__send__(:Java_org_eclipse_swt_internal_mozilla_XPCOM_VtblCall__IJJJI, JNI.env, self.jni_id, fn_number.to_int, pp_vtbl.to_int, arg0.to_int, arg1.to_int, arg2.to_int)
+        PLATFORM_LOCK.lock
+        begin
+          return ___vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2)
+        ensure
+          PLATFORM_LOCK.unlock
+        end
       end
       
-      JNI.native_method :Java_org_eclipse_swt_internal_mozilla_XPCOM_VtblCall__IJIJJ, [:pointer, :long, :int32, :int64, :int32, :int64, :int64], :int32
+      JNI.native_method :Java_org_eclipse_swt_internal_mozilla_XPCOM__1VtblCall__IJIJJ, [:pointer, :long, :int32, :int64, :int32, :int64, :int64], :int32
+      typesig { [::Java::Int, ::Java::Long, ::Java::Int, ::Java::Long, ::Java::Long] }
+      # int
+      def ___vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2)
+        JNI.__send__(:Java_org_eclipse_swt_internal_mozilla_XPCOM__1VtblCall__IJIJJ, JNI.env, self.jni_id, fn_number.to_int, pp_vtbl.to_int, arg0.to_int, arg1.to_int, arg2.to_int)
+      end
+      
       typesig { [::Java::Int, ::Java::Long, ::Java::Int, ::Java::Long, ::Java::Long] }
       # int
       def _vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2)
-        JNI.__send__(:Java_org_eclipse_swt_internal_mozilla_XPCOM_VtblCall__IJIJJ, JNI.env, self.jni_id, fn_number.to_int, pp_vtbl.to_int, arg0.to_int, arg1.to_int, arg2.to_int)
+        PLATFORM_LOCK.lock
+        begin
+          return ___vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2)
+        ensure
+          PLATFORM_LOCK.unlock
+        end
       end
       
-      JNI.native_method :Java_org_eclipse_swt_internal_mozilla_XPCOM_VtblCall__IJIII, [:pointer, :long, :int32, :int64, :int32, :int32, :int32], :int32
+      JNI.native_method :Java_org_eclipse_swt_internal_mozilla_XPCOM__1VtblCall__IJIII, [:pointer, :long, :int32, :int64, :int32, :int32, :int32], :int32
+      typesig { [::Java::Int, ::Java::Long, ::Java::Int, ::Java::Int, ::Java::Int] }
+      # int
+      def ___vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2)
+        JNI.__send__(:Java_org_eclipse_swt_internal_mozilla_XPCOM__1VtblCall__IJIII, JNI.env, self.jni_id, fn_number.to_int, pp_vtbl.to_int, arg0.to_int, arg1.to_int, arg2.to_int)
+      end
+      
       typesig { [::Java::Int, ::Java::Long, ::Java::Int, ::Java::Int, ::Java::Int] }
       # int
       def _vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2)
-        JNI.__send__(:Java_org_eclipse_swt_internal_mozilla_XPCOM_VtblCall__IJIII, JNI.env, self.jni_id, fn_number.to_int, pp_vtbl.to_int, arg0.to_int, arg1.to_int, arg2.to_int)
+        PLATFORM_LOCK.lock
+        begin
+          return ___vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2)
+        ensure
+          PLATFORM_LOCK.unlock
+        end
       end
       
-      JNI.native_method :Java_org_eclipse_swt_internal_mozilla_XPCOM_VtblCall__IJII_3J, [:pointer, :long, :int32, :int64, :int32, :int32, :long], :int32
+      JNI.native_method :Java_org_eclipse_swt_internal_mozilla_XPCOM__1VtblCall__IJII_3J, [:pointer, :long, :int32, :int64, :int32, :int32, :long], :int32
+      typesig { [::Java::Int, ::Java::Long, ::Java::Int, ::Java::Int, Array.typed(::Java::Long)] }
+      # int
+      def ___vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2)
+        JNI.__send__(:Java_org_eclipse_swt_internal_mozilla_XPCOM__1VtblCall__IJII_3J, JNI.env, self.jni_id, fn_number.to_int, pp_vtbl.to_int, arg0.to_int, arg1.to_int, arg2.jni_id)
+      end
+      
       typesig { [::Java::Int, ::Java::Long, ::Java::Int, ::Java::Int, Array.typed(::Java::Long)] }
       # int
       def _vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2)
-        JNI.__send__(:Java_org_eclipse_swt_internal_mozilla_XPCOM_VtblCall__IJII_3J, JNI.env, self.jni_id, fn_number.to_int, pp_vtbl.to_int, arg0.to_int, arg1.to_int, arg2.jni_id)
+        PLATFORM_LOCK.lock
+        begin
+          return ___vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2)
+        ensure
+          PLATFORM_LOCK.unlock
+        end
       end
       
-      JNI.native_method :Java_org_eclipse_swt_internal_mozilla_XPCOM_VtblCall__IJII_3I, [:pointer, :long, :int32, :int64, :int32, :int32, :long], :int32
+      JNI.native_method :Java_org_eclipse_swt_internal_mozilla_XPCOM__1VtblCall__IJII_3I, [:pointer, :long, :int32, :int64, :int32, :int32, :long], :int32
+      typesig { [::Java::Int, ::Java::Long, ::Java::Int, ::Java::Int, Array.typed(::Java::Int)] }
+      # int
+      def ___vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2)
+        JNI.__send__(:Java_org_eclipse_swt_internal_mozilla_XPCOM__1VtblCall__IJII_3I, JNI.env, self.jni_id, fn_number.to_int, pp_vtbl.to_int, arg0.to_int, arg1.to_int, arg2.jni_id)
+      end
+      
       typesig { [::Java::Int, ::Java::Long, ::Java::Int, ::Java::Int, Array.typed(::Java::Int)] }
       # int
       def _vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2)
-        JNI.__send__(:Java_org_eclipse_swt_internal_mozilla_XPCOM_VtblCall__IJII_3I, JNI.env, self.jni_id, fn_number.to_int, pp_vtbl.to_int, arg0.to_int, arg1.to_int, arg2.jni_id)
+        PLATFORM_LOCK.lock
+        begin
+          return ___vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2)
+        ensure
+          PLATFORM_LOCK.unlock
+        end
       end
       
-      JNI.native_method :Java_org_eclipse_swt_internal_mozilla_XPCOM_VtblCall__IJJI_3J, [:pointer, :long, :int32, :int64, :int64, :int32, :long], :int32
+      JNI.native_method :Java_org_eclipse_swt_internal_mozilla_XPCOM__1VtblCall__IJJJ_3J, [:pointer, :long, :int32, :int64, :int64, :int64, :long], :int32
+      typesig { [::Java::Int, ::Java::Long, ::Java::Long, ::Java::Long, Array.typed(::Java::Long)] }
+      # int
+      def ___vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2)
+        JNI.__send__(:Java_org_eclipse_swt_internal_mozilla_XPCOM__1VtblCall__IJJJ_3J, JNI.env, self.jni_id, fn_number.to_int, pp_vtbl.to_int, arg0.to_int, arg1.to_int, arg2.jni_id)
+      end
+      
+      typesig { [::Java::Int, ::Java::Long, ::Java::Long, ::Java::Long, Array.typed(::Java::Long)] }
+      # int
+      def _vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2)
+        PLATFORM_LOCK.lock
+        begin
+          return ___vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2)
+        ensure
+          PLATFORM_LOCK.unlock
+        end
+      end
+      
+      JNI.native_method :Java_org_eclipse_swt_internal_mozilla_XPCOM__1VtblCall__IJJI_3J, [:pointer, :long, :int32, :int64, :int64, :int32, :long], :int32
+      typesig { [::Java::Int, ::Java::Long, ::Java::Long, ::Java::Int, Array.typed(::Java::Long)] }
+      # int
+      def ___vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2)
+        JNI.__send__(:Java_org_eclipse_swt_internal_mozilla_XPCOM__1VtblCall__IJJI_3J, JNI.env, self.jni_id, fn_number.to_int, pp_vtbl.to_int, arg0.to_int, arg1.to_int, arg2.jni_id)
+      end
+      
       typesig { [::Java::Int, ::Java::Long, ::Java::Long, ::Java::Int, Array.typed(::Java::Long)] }
       # int
       def _vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2)
-        JNI.__send__(:Java_org_eclipse_swt_internal_mozilla_XPCOM_VtblCall__IJJI_3J, JNI.env, self.jni_id, fn_number.to_int, pp_vtbl.to_int, arg0.to_int, arg1.to_int, arg2.jni_id)
+        PLATFORM_LOCK.lock
+        begin
+          return ___vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2)
+        ensure
+          PLATFORM_LOCK.unlock
+        end
       end
       
-      JNI.native_method :Java_org_eclipse_swt_internal_mozilla_XPCOM_VtblCall__IJJJ_3I, [:pointer, :long, :int32, :int64, :int64, :int64, :long], :int32
+      JNI.native_method :Java_org_eclipse_swt_internal_mozilla_XPCOM__1VtblCall__IJJJ_3I, [:pointer, :long, :int32, :int64, :int64, :int64, :long], :int32
+      typesig { [::Java::Int, ::Java::Long, ::Java::Long, ::Java::Long, Array.typed(::Java::Int)] }
+      # int
+      def ___vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2)
+        JNI.__send__(:Java_org_eclipse_swt_internal_mozilla_XPCOM__1VtblCall__IJJJ_3I, JNI.env, self.jni_id, fn_number.to_int, pp_vtbl.to_int, arg0.to_int, arg1.to_int, arg2.jni_id)
+      end
+      
       typesig { [::Java::Int, ::Java::Long, ::Java::Long, ::Java::Long, Array.typed(::Java::Int)] }
       # int
       def _vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2)
-        JNI.__send__(:Java_org_eclipse_swt_internal_mozilla_XPCOM_VtblCall__IJJJ_3I, JNI.env, self.jni_id, fn_number.to_int, pp_vtbl.to_int, arg0.to_int, arg1.to_int, arg2.jni_id)
+        PLATFORM_LOCK.lock
+        begin
+          return ___vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2)
+        ensure
+          PLATFORM_LOCK.unlock
+        end
       end
       
-      JNI.native_method "Java_org_eclipse_swt_internal_mozilla_XPCOM_VtblCall__IJIL#{NsID.jni_name}_2_3I".to_sym, [:pointer, :long, :int32, :int64, :int32, :long, :long], :int32
+      JNI.native_method "Java_org_eclipse_swt_internal_mozilla_XPCOM__1VtblCall__IJIL#{NsID.jni_name}_2_3I".to_sym, [:pointer, :long, :int32, :int64, :int32, :long, :long], :int32
+      typesig { [::Java::Int, ::Java::Long, ::Java::Int, NsID, Array.typed(::Java::Int)] }
+      # int
+      def ___vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2)
+        JNI.__send__("Java_org_eclipse_swt_internal_mozilla_XPCOM__1VtblCall__IJIL#{NsID.jni_name}_2_3I".to_sym, JNI.env, self.jni_id, fn_number.to_int, pp_vtbl.to_int, arg0.to_int, arg1.jni_id, arg2.jni_id)
+      end
+      
       typesig { [::Java::Int, ::Java::Long, ::Java::Int, NsID, Array.typed(::Java::Int)] }
       # int
       def _vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2)
-        JNI.__send__("Java_org_eclipse_swt_internal_mozilla_XPCOM_VtblCall__IJIL#{NsID.jni_name}_2_3I".to_sym, JNI.env, self.jni_id, fn_number.to_int, pp_vtbl.to_int, arg0.to_int, arg1.jni_id, arg2.jni_id)
+        PLATFORM_LOCK.lock
+        begin
+          return ___vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2)
+        ensure
+          PLATFORM_LOCK.unlock
+        end
       end
       
-      JNI.native_method "Java_org_eclipse_swt_internal_mozilla_XPCOM_VtblCall__IJJL#{NsID.jni_name}_2_3J".to_sym, [:pointer, :long, :int32, :int64, :int64, :long, :long], :int32
+      JNI.native_method "Java_org_eclipse_swt_internal_mozilla_XPCOM__1VtblCall__IJJL#{NsID.jni_name}_2_3J".to_sym, [:pointer, :long, :int32, :int64, :int64, :long, :long], :int32
+      typesig { [::Java::Int, ::Java::Long, ::Java::Long, NsID, Array.typed(::Java::Long)] }
+      # int
+      def ___vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2)
+        JNI.__send__("Java_org_eclipse_swt_internal_mozilla_XPCOM__1VtblCall__IJJL#{NsID.jni_name}_2_3J".to_sym, JNI.env, self.jni_id, fn_number.to_int, pp_vtbl.to_int, arg0.to_int, arg1.jni_id, arg2.jni_id)
+      end
+      
       typesig { [::Java::Int, ::Java::Long, ::Java::Long, NsID, Array.typed(::Java::Long)] }
       # int
       def _vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2)
-        JNI.__send__("Java_org_eclipse_swt_internal_mozilla_XPCOM_VtblCall__IJJL#{NsID.jni_name}_2_3J".to_sym, JNI.env, self.jni_id, fn_number.to_int, pp_vtbl.to_int, arg0.to_int, arg1.jni_id, arg2.jni_id)
+        PLATFORM_LOCK.lock
+        begin
+          return ___vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2)
+        ensure
+          PLATFORM_LOCK.unlock
+        end
       end
       
-      JNI.native_method :Java_org_eclipse_swt_internal_mozilla_XPCOM_VtblCall__IJII_3C, [:pointer, :long, :int32, :int64, :int32, :int32, :long], :int32
+      JNI.native_method :Java_org_eclipse_swt_internal_mozilla_XPCOM__1VtblCall__IJII_3C, [:pointer, :long, :int32, :int64, :int32, :int32, :long], :int32
+      typesig { [::Java::Int, ::Java::Long, ::Java::Int, ::Java::Int, Array.typed(::Java::Char)] }
+      # int
+      def ___vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2)
+        JNI.__send__(:Java_org_eclipse_swt_internal_mozilla_XPCOM__1VtblCall__IJII_3C, JNI.env, self.jni_id, fn_number.to_int, pp_vtbl.to_int, arg0.to_int, arg1.to_int, arg2.jni_id)
+      end
+      
       typesig { [::Java::Int, ::Java::Long, ::Java::Int, ::Java::Int, Array.typed(::Java::Char)] }
       # int
       def _vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2)
-        JNI.__send__(:Java_org_eclipse_swt_internal_mozilla_XPCOM_VtblCall__IJII_3C, JNI.env, self.jni_id, fn_number.to_int, pp_vtbl.to_int, arg0.to_int, arg1.to_int, arg2.jni_id)
+        PLATFORM_LOCK.lock
+        begin
+          return ___vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2)
+        ensure
+          PLATFORM_LOCK.unlock
+        end
       end
       
-      JNI.native_method "Java_org_eclipse_swt_internal_mozilla_XPCOM_VtblCall__IJL#{NsID.jni_name}_2L#{NsID.jni_name}_2_3J".to_sym, [:pointer, :long, :int32, :int64, :long, :long, :long], :int32
+      JNI.native_method "Java_org_eclipse_swt_internal_mozilla_XPCOM__1VtblCall__IJL#{NsID.jni_name}_2L#{NsID.jni_name}_2_3J".to_sym, [:pointer, :long, :int32, :int64, :long, :long, :long], :int32
+      typesig { [::Java::Int, ::Java::Long, NsID, NsID, Array.typed(::Java::Long)] }
+      # int
+      def ___vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2)
+        JNI.__send__("Java_org_eclipse_swt_internal_mozilla_XPCOM__1VtblCall__IJL#{NsID.jni_name}_2L#{NsID.jni_name}_2_3J".to_sym, JNI.env, self.jni_id, fn_number.to_int, pp_vtbl.to_int, arg0.jni_id, arg1.jni_id, arg2.jni_id)
+      end
+      
       typesig { [::Java::Int, ::Java::Long, NsID, NsID, Array.typed(::Java::Long)] }
       # int
       def _vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2)
-        JNI.__send__("Java_org_eclipse_swt_internal_mozilla_XPCOM_VtblCall__IJL#{NsID.jni_name}_2L#{NsID.jni_name}_2_3J".to_sym, JNI.env, self.jni_id, fn_number.to_int, pp_vtbl.to_int, arg0.jni_id, arg1.jni_id, arg2.jni_id)
+        PLATFORM_LOCK.lock
+        begin
+          return ___vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2)
+        ensure
+          PLATFORM_LOCK.unlock
+        end
       end
       
-      JNI.native_method "Java_org_eclipse_swt_internal_mozilla_XPCOM_VtblCall__IJL#{NsID.jni_name}_2L#{NsID.jni_name}_2_3I".to_sym, [:pointer, :long, :int32, :int64, :long, :long, :long], :int32
+      JNI.native_method "Java_org_eclipse_swt_internal_mozilla_XPCOM__1VtblCall__IJL#{NsID.jni_name}_2L#{NsID.jni_name}_2_3I".to_sym, [:pointer, :long, :int32, :int64, :long, :long, :long], :int32
+      typesig { [::Java::Int, ::Java::Long, NsID, NsID, Array.typed(::Java::Int)] }
+      # int
+      def ___vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2)
+        JNI.__send__("Java_org_eclipse_swt_internal_mozilla_XPCOM__1VtblCall__IJL#{NsID.jni_name}_2L#{NsID.jni_name}_2_3I".to_sym, JNI.env, self.jni_id, fn_number.to_int, pp_vtbl.to_int, arg0.jni_id, arg1.jni_id, arg2.jni_id)
+      end
+      
       typesig { [::Java::Int, ::Java::Long, NsID, NsID, Array.typed(::Java::Int)] }
       # int
       def _vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2)
-        JNI.__send__("Java_org_eclipse_swt_internal_mozilla_XPCOM_VtblCall__IJL#{NsID.jni_name}_2L#{NsID.jni_name}_2_3I".to_sym, JNI.env, self.jni_id, fn_number.to_int, pp_vtbl.to_int, arg0.jni_id, arg1.jni_id, arg2.jni_id)
+        PLATFORM_LOCK.lock
+        begin
+          return ___vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2)
+        ensure
+          PLATFORM_LOCK.unlock
+        end
       end
       
-      JNI.native_method :Java_org_eclipse_swt_internal_mozilla_XPCOM_VtblCall__IJ_3B_3B_3I, [:pointer, :long, :int32, :int64, :long, :long, :long], :int32
+      JNI.native_method :Java_org_eclipse_swt_internal_mozilla_XPCOM__1VtblCall__IJ_3B_3B_3I, [:pointer, :long, :int32, :int64, :long, :long, :long], :int32
+      typesig { [::Java::Int, ::Java::Long, Array.typed(::Java::Byte), Array.typed(::Java::Byte), Array.typed(::Java::Int)] }
+      # int
+      def ___vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2)
+        JNI.__send__(:Java_org_eclipse_swt_internal_mozilla_XPCOM__1VtblCall__IJ_3B_3B_3I, JNI.env, self.jni_id, fn_number.to_int, pp_vtbl.to_int, arg0.jni_id, arg1.jni_id, arg2.jni_id)
+      end
+      
       typesig { [::Java::Int, ::Java::Long, Array.typed(::Java::Byte), Array.typed(::Java::Byte), Array.typed(::Java::Int)] }
       # int
       def _vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2)
-        JNI.__send__(:Java_org_eclipse_swt_internal_mozilla_XPCOM_VtblCall__IJ_3B_3B_3I, JNI.env, self.jni_id, fn_number.to_int, pp_vtbl.to_int, arg0.jni_id, arg1.jni_id, arg2.jni_id)
+        PLATFORM_LOCK.lock
+        begin
+          return ___vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2)
+        ensure
+          PLATFORM_LOCK.unlock
+        end
       end
       
-      JNI.native_method :Java_org_eclipse_swt_internal_mozilla_XPCOM_VtblCall__IJ_3B_3B_3J, [:pointer, :long, :int32, :int64, :long, :long, :long], :int32
+      JNI.native_method :Java_org_eclipse_swt_internal_mozilla_XPCOM__1VtblCall__IJ_3B_3B_3J, [:pointer, :long, :int32, :int64, :long, :long, :long], :int32
+      typesig { [::Java::Int, ::Java::Long, Array.typed(::Java::Byte), Array.typed(::Java::Byte), Array.typed(::Java::Long)] }
+      # int
+      def ___vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2)
+        JNI.__send__(:Java_org_eclipse_swt_internal_mozilla_XPCOM__1VtblCall__IJ_3B_3B_3J, JNI.env, self.jni_id, fn_number.to_int, pp_vtbl.to_int, arg0.jni_id, arg1.jni_id, arg2.jni_id)
+      end
+      
       typesig { [::Java::Int, ::Java::Long, Array.typed(::Java::Byte), Array.typed(::Java::Byte), Array.typed(::Java::Long)] }
       # int
       def _vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2)
-        JNI.__send__(:Java_org_eclipse_swt_internal_mozilla_XPCOM_VtblCall__IJ_3B_3B_3J, JNI.env, self.jni_id, fn_number.to_int, pp_vtbl.to_int, arg0.jni_id, arg1.jni_id, arg2.jni_id)
+        PLATFORM_LOCK.lock
+        begin
+          return ___vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2)
+        ensure
+          PLATFORM_LOCK.unlock
+        end
       end
       
-      JNI.native_method :Java_org_eclipse_swt_internal_mozilla_XPCOM_VtblCall__IJ_3B_3I_3I, [:pointer, :long, :int32, :int64, :long, :long, :long], :int32
+      JNI.native_method :Java_org_eclipse_swt_internal_mozilla_XPCOM__1VtblCall__IJ_3B_3I_3I, [:pointer, :long, :int32, :int64, :long, :long, :long], :int32
+      typesig { [::Java::Int, ::Java::Long, Array.typed(::Java::Byte), Array.typed(::Java::Int), Array.typed(::Java::Int)] }
+      # int
+      def ___vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2)
+        JNI.__send__(:Java_org_eclipse_swt_internal_mozilla_XPCOM__1VtblCall__IJ_3B_3I_3I, JNI.env, self.jni_id, fn_number.to_int, pp_vtbl.to_int, arg0.jni_id, arg1.jni_id, arg2.jni_id)
+      end
+      
       typesig { [::Java::Int, ::Java::Long, Array.typed(::Java::Byte), Array.typed(::Java::Int), Array.typed(::Java::Int)] }
       # int
       def _vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2)
-        JNI.__send__(:Java_org_eclipse_swt_internal_mozilla_XPCOM_VtblCall__IJ_3B_3I_3I, JNI.env, self.jni_id, fn_number.to_int, pp_vtbl.to_int, arg0.jni_id, arg1.jni_id, arg2.jni_id)
+        PLATFORM_LOCK.lock
+        begin
+          return ___vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2)
+        ensure
+          PLATFORM_LOCK.unlock
+        end
       end
       
-      JNI.native_method :Java_org_eclipse_swt_internal_mozilla_XPCOM_VtblCall__IJ_3B_3I_3J, [:pointer, :long, :int32, :int64, :long, :long, :long], :int32
+      JNI.native_method :Java_org_eclipse_swt_internal_mozilla_XPCOM__1VtblCall__IJ_3B_3I_3J, [:pointer, :long, :int32, :int64, :long, :long, :long], :int32
+      typesig { [::Java::Int, ::Java::Long, Array.typed(::Java::Byte), Array.typed(::Java::Int), Array.typed(::Java::Long)] }
+      # int
+      def ___vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2)
+        JNI.__send__(:Java_org_eclipse_swt_internal_mozilla_XPCOM__1VtblCall__IJ_3B_3I_3J, JNI.env, self.jni_id, fn_number.to_int, pp_vtbl.to_int, arg0.jni_id, arg1.jni_id, arg2.jni_id)
+      end
+      
       typesig { [::Java::Int, ::Java::Long, Array.typed(::Java::Byte), Array.typed(::Java::Int), Array.typed(::Java::Long)] }
       # int
       def _vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2)
-        JNI.__send__(:Java_org_eclipse_swt_internal_mozilla_XPCOM_VtblCall__IJ_3B_3I_3J, JNI.env, self.jni_id, fn_number.to_int, pp_vtbl.to_int, arg0.jni_id, arg1.jni_id, arg2.jni_id)
+        PLATFORM_LOCK.lock
+        begin
+          return ___vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2)
+        ensure
+          PLATFORM_LOCK.unlock
+        end
       end
       
-      JNI.native_method :Java_org_eclipse_swt_internal_mozilla_XPCOM_VtblCall__IJ_3B_3J_3I, [:pointer, :long, :int32, :int64, :long, :long, :long], :int32
+      JNI.native_method :Java_org_eclipse_swt_internal_mozilla_XPCOM__1VtblCall__IJ_3B_3J_3I, [:pointer, :long, :int32, :int64, :long, :long, :long], :int32
+      typesig { [::Java::Int, ::Java::Long, Array.typed(::Java::Byte), Array.typed(::Java::Long), Array.typed(::Java::Int)] }
+      # int
+      def ___vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2)
+        JNI.__send__(:Java_org_eclipse_swt_internal_mozilla_XPCOM__1VtblCall__IJ_3B_3J_3I, JNI.env, self.jni_id, fn_number.to_int, pp_vtbl.to_int, arg0.jni_id, arg1.jni_id, arg2.jni_id)
+      end
+      
       typesig { [::Java::Int, ::Java::Long, Array.typed(::Java::Byte), Array.typed(::Java::Long), Array.typed(::Java::Int)] }
       # int
       def _vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2)
-        JNI.__send__(:Java_org_eclipse_swt_internal_mozilla_XPCOM_VtblCall__IJ_3B_3J_3I, JNI.env, self.jni_id, fn_number.to_int, pp_vtbl.to_int, arg0.jni_id, arg1.jni_id, arg2.jni_id)
+        PLATFORM_LOCK.lock
+        begin
+          return ___vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2)
+        ensure
+          PLATFORM_LOCK.unlock
+        end
       end
       
-      JNI.native_method "Java_org_eclipse_swt_internal_mozilla_XPCOM_VtblCall__IJ_3BL#{NsID.jni_name}_2I".to_sym, [:pointer, :long, :int32, :int64, :long, :long, :int32], :int32
+      JNI.native_method "Java_org_eclipse_swt_internal_mozilla_XPCOM__1VtblCall__IJ_3BL#{NsID.jni_name}_2I".to_sym, [:pointer, :long, :int32, :int64, :long, :long, :int32], :int32
+      typesig { [::Java::Int, ::Java::Long, Array.typed(::Java::Byte), NsID, ::Java::Int] }
+      # int
+      def ___vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2)
+        JNI.__send__("Java_org_eclipse_swt_internal_mozilla_XPCOM__1VtblCall__IJ_3BL#{NsID.jni_name}_2I".to_sym, JNI.env, self.jni_id, fn_number.to_int, pp_vtbl.to_int, arg0.jni_id, arg1.jni_id, arg2.to_int)
+      end
+      
       typesig { [::Java::Int, ::Java::Long, Array.typed(::Java::Byte), NsID, ::Java::Int] }
       # int
       def _vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2)
-        JNI.__send__("Java_org_eclipse_swt_internal_mozilla_XPCOM_VtblCall__IJ_3BL#{NsID.jni_name}_2I".to_sym, JNI.env, self.jni_id, fn_number.to_int, pp_vtbl.to_int, arg0.jni_id, arg1.jni_id, arg2.to_int)
+        PLATFORM_LOCK.lock
+        begin
+          return ___vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2)
+        ensure
+          PLATFORM_LOCK.unlock
+        end
       end
       
-      JNI.native_method "Java_org_eclipse_swt_internal_mozilla_XPCOM_VtblCall__IJ_3BL#{NsID.jni_name}_2J".to_sym, [:pointer, :long, :int32, :int64, :long, :long, :int64], :int32
+      JNI.native_method "Java_org_eclipse_swt_internal_mozilla_XPCOM__1VtblCall__IJ_3BL#{NsID.jni_name}_2J".to_sym, [:pointer, :long, :int32, :int64, :long, :long, :int64], :int32
+      typesig { [::Java::Int, ::Java::Long, Array.typed(::Java::Byte), NsID, ::Java::Long] }
+      # int
+      def ___vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2)
+        JNI.__send__("Java_org_eclipse_swt_internal_mozilla_XPCOM__1VtblCall__IJ_3BL#{NsID.jni_name}_2J".to_sym, JNI.env, self.jni_id, fn_number.to_int, pp_vtbl.to_int, arg0.jni_id, arg1.jni_id, arg2.to_int)
+      end
+      
       typesig { [::Java::Int, ::Java::Long, Array.typed(::Java::Byte), NsID, ::Java::Long] }
       # int
       def _vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2)
-        JNI.__send__("Java_org_eclipse_swt_internal_mozilla_XPCOM_VtblCall__IJ_3BL#{NsID.jni_name}_2J".to_sym, JNI.env, self.jni_id, fn_number.to_int, pp_vtbl.to_int, arg0.jni_id, arg1.jni_id, arg2.to_int)
+        PLATFORM_LOCK.lock
+        begin
+          return ___vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2)
+        ensure
+          PLATFORM_LOCK.unlock
+        end
       end
       
-      JNI.native_method :Java_org_eclipse_swt_internal_mozilla_XPCOM_VtblCall__IJI_3B_3C, [:pointer, :long, :int32, :int64, :int32, :long, :long], :int32
+      JNI.native_method :Java_org_eclipse_swt_internal_mozilla_XPCOM__1VtblCall__IJI_3B_3C, [:pointer, :long, :int32, :int64, :int32, :long, :long], :int32
+      typesig { [::Java::Int, ::Java::Long, ::Java::Int, Array.typed(::Java::Byte), Array.typed(::Java::Char)] }
+      # int
+      def ___vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2)
+        JNI.__send__(:Java_org_eclipse_swt_internal_mozilla_XPCOM__1VtblCall__IJI_3B_3C, JNI.env, self.jni_id, fn_number.to_int, pp_vtbl.to_int, arg0.to_int, arg1.jni_id, arg2.jni_id)
+      end
+      
       typesig { [::Java::Int, ::Java::Long, ::Java::Int, Array.typed(::Java::Byte), Array.typed(::Java::Char)] }
       # int
       def _vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2)
-        JNI.__send__(:Java_org_eclipse_swt_internal_mozilla_XPCOM_VtblCall__IJI_3B_3C, JNI.env, self.jni_id, fn_number.to_int, pp_vtbl.to_int, arg0.to_int, arg1.jni_id, arg2.jni_id)
+        PLATFORM_LOCK.lock
+        begin
+          return ___vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2)
+        ensure
+          PLATFORM_LOCK.unlock
+        end
       end
       
-      JNI.native_method :Java_org_eclipse_swt_internal_mozilla_XPCOM_VtblCall__IJJ_3B_3C, [:pointer, :long, :int32, :int64, :int64, :long, :long], :int32
+      JNI.native_method :Java_org_eclipse_swt_internal_mozilla_XPCOM__1VtblCall__IJJ_3B_3C, [:pointer, :long, :int32, :int64, :int64, :long, :long], :int32
+      typesig { [::Java::Int, ::Java::Long, ::Java::Long, Array.typed(::Java::Byte), Array.typed(::Java::Char)] }
+      # int
+      def ___vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2)
+        JNI.__send__(:Java_org_eclipse_swt_internal_mozilla_XPCOM__1VtblCall__IJJ_3B_3C, JNI.env, self.jni_id, fn_number.to_int, pp_vtbl.to_int, arg0.to_int, arg1.jni_id, arg2.jni_id)
+      end
+      
       typesig { [::Java::Int, ::Java::Long, ::Java::Long, Array.typed(::Java::Byte), Array.typed(::Java::Char)] }
       # int
       def _vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2)
-        JNI.__send__(:Java_org_eclipse_swt_internal_mozilla_XPCOM_VtblCall__IJJ_3B_3C, JNI.env, self.jni_id, fn_number.to_int, pp_vtbl.to_int, arg0.to_int, arg1.jni_id, arg2.jni_id)
+        PLATFORM_LOCK.lock
+        begin
+          return ___vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2)
+        ensure
+          PLATFORM_LOCK.unlock
+        end
       end
       
-      JNI.native_method :Java_org_eclipse_swt_internal_mozilla_XPCOM_VtblCall__IJII_3B, [:pointer, :long, :int32, :int64, :int32, :int32, :long], :int32
+      JNI.native_method :Java_org_eclipse_swt_internal_mozilla_XPCOM__1VtblCall__IJII_3B, [:pointer, :long, :int32, :int64, :int32, :int32, :long], :int32
+      typesig { [::Java::Int, ::Java::Long, ::Java::Int, ::Java::Int, Array.typed(::Java::Byte)] }
+      # int
+      def ___vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2)
+        JNI.__send__(:Java_org_eclipse_swt_internal_mozilla_XPCOM__1VtblCall__IJII_3B, JNI.env, self.jni_id, fn_number.to_int, pp_vtbl.to_int, arg0.to_int, arg1.to_int, arg2.jni_id)
+      end
+      
       typesig { [::Java::Int, ::Java::Long, ::Java::Int, ::Java::Int, Array.typed(::Java::Byte)] }
       # int
       def _vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2)
-        JNI.__send__(:Java_org_eclipse_swt_internal_mozilla_XPCOM_VtblCall__IJII_3B, JNI.env, self.jni_id, fn_number.to_int, pp_vtbl.to_int, arg0.to_int, arg1.to_int, arg2.jni_id)
+        PLATFORM_LOCK.lock
+        begin
+          return ___vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2)
+        ensure
+          PLATFORM_LOCK.unlock
+        end
       end
       
-      JNI.native_method :Java_org_eclipse_swt_internal_mozilla_XPCOM_VtblCall__IJJJ_3B, [:pointer, :long, :int32, :int64, :int64, :int64, :long], :int32
+      JNI.native_method :Java_org_eclipse_swt_internal_mozilla_XPCOM__1VtblCall__IJJJ_3B, [:pointer, :long, :int32, :int64, :int64, :int64, :long], :int32
+      typesig { [::Java::Int, ::Java::Long, ::Java::Long, ::Java::Long, Array.typed(::Java::Byte)] }
+      # int
+      def ___vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2)
+        JNI.__send__(:Java_org_eclipse_swt_internal_mozilla_XPCOM__1VtblCall__IJJJ_3B, JNI.env, self.jni_id, fn_number.to_int, pp_vtbl.to_int, arg0.to_int, arg1.to_int, arg2.jni_id)
+      end
+      
       typesig { [::Java::Int, ::Java::Long, ::Java::Long, ::Java::Long, Array.typed(::Java::Byte)] }
       # int
       def _vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2)
-        JNI.__send__(:Java_org_eclipse_swt_internal_mozilla_XPCOM_VtblCall__IJJJ_3B, JNI.env, self.jni_id, fn_number.to_int, pp_vtbl.to_int, arg0.to_int, arg1.to_int, arg2.jni_id)
+        PLATFORM_LOCK.lock
+        begin
+          return ___vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2)
+        ensure
+          PLATFORM_LOCK.unlock
+        end
       end
       
-      JNI.native_method :Java_org_eclipse_swt_internal_mozilla_XPCOM_VtblCall__IJ_3B_3BI, [:pointer, :long, :int32, :int64, :long, :long, :int32], :int32
+      JNI.native_method :Java_org_eclipse_swt_internal_mozilla_XPCOM__1VtblCall__IJ_3B_3BI, [:pointer, :long, :int32, :int64, :long, :long, :int32], :int32
+      typesig { [::Java::Int, ::Java::Long, Array.typed(::Java::Byte), Array.typed(::Java::Byte), ::Java::Int] }
+      # int
+      def ___vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2)
+        JNI.__send__(:Java_org_eclipse_swt_internal_mozilla_XPCOM__1VtblCall__IJ_3B_3BI, JNI.env, self.jni_id, fn_number.to_int, pp_vtbl.to_int, arg0.jni_id, arg1.jni_id, arg2.to_int)
+      end
+      
       typesig { [::Java::Int, ::Java::Long, Array.typed(::Java::Byte), Array.typed(::Java::Byte), ::Java::Int] }
       # int
       def _vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2)
-        JNI.__send__(:Java_org_eclipse_swt_internal_mozilla_XPCOM_VtblCall__IJ_3B_3BI, JNI.env, self.jni_id, fn_number.to_int, pp_vtbl.to_int, arg0.jni_id, arg1.jni_id, arg2.to_int)
+        PLATFORM_LOCK.lock
+        begin
+          return ___vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2)
+        ensure
+          PLATFORM_LOCK.unlock
+        end
       end
       
-      JNI.native_method :Java_org_eclipse_swt_internal_mozilla_XPCOM_VtblCall__IJI_3B_3I, [:pointer, :long, :int32, :int64, :int32, :long, :long], :int32
+      JNI.native_method :Java_org_eclipse_swt_internal_mozilla_XPCOM__1VtblCall__IJI_3B_3I, [:pointer, :long, :int32, :int64, :int32, :long, :long], :int32
+      typesig { [::Java::Int, ::Java::Long, ::Java::Int, Array.typed(::Java::Byte), Array.typed(::Java::Int)] }
+      # int
+      def ___vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2)
+        JNI.__send__(:Java_org_eclipse_swt_internal_mozilla_XPCOM__1VtblCall__IJI_3B_3I, JNI.env, self.jni_id, fn_number.to_int, pp_vtbl.to_int, arg0.to_int, arg1.jni_id, arg2.jni_id)
+      end
+      
       typesig { [::Java::Int, ::Java::Long, ::Java::Int, Array.typed(::Java::Byte), Array.typed(::Java::Int)] }
       # int
       def _vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2)
-        JNI.__send__(:Java_org_eclipse_swt_internal_mozilla_XPCOM_VtblCall__IJI_3B_3I, JNI.env, self.jni_id, fn_number.to_int, pp_vtbl.to_int, arg0.to_int, arg1.jni_id, arg2.jni_id)
+        PLATFORM_LOCK.lock
+        begin
+          return ___vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2)
+        ensure
+          PLATFORM_LOCK.unlock
+        end
       end
       
-      JNI.native_method :Java_org_eclipse_swt_internal_mozilla_XPCOM_VtblCall__IJI_3BI, [:pointer, :long, :int32, :int64, :int32, :long, :int32], :int32
+      JNI.native_method :Java_org_eclipse_swt_internal_mozilla_XPCOM__1VtblCall__IJJ_3BJ, [:pointer, :long, :int32, :int64, :int64, :long, :int64], :int32
+      typesig { [::Java::Int, ::Java::Long, ::Java::Long, Array.typed(::Java::Byte), ::Java::Long] }
+      # int
+      def ___vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2)
+        JNI.__send__(:Java_org_eclipse_swt_internal_mozilla_XPCOM__1VtblCall__IJJ_3BJ, JNI.env, self.jni_id, fn_number.to_int, pp_vtbl.to_int, arg0.to_int, arg1.jni_id, arg2.to_int)
+      end
+      
+      typesig { [::Java::Int, ::Java::Long, ::Java::Long, Array.typed(::Java::Byte), ::Java::Long] }
+      # int
+      def _vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2)
+        PLATFORM_LOCK.lock
+        begin
+          return ___vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2)
+        ensure
+          PLATFORM_LOCK.unlock
+        end
+      end
+      
+      JNI.native_method :Java_org_eclipse_swt_internal_mozilla_XPCOM__1VtblCall__IJI_3BI, [:pointer, :long, :int32, :int64, :int32, :long, :int32], :int32
+      typesig { [::Java::Int, ::Java::Long, ::Java::Int, Array.typed(::Java::Byte), ::Java::Int] }
+      # int
+      def ___vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2)
+        JNI.__send__(:Java_org_eclipse_swt_internal_mozilla_XPCOM__1VtblCall__IJI_3BI, JNI.env, self.jni_id, fn_number.to_int, pp_vtbl.to_int, arg0.to_int, arg1.jni_id, arg2.to_int)
+      end
+      
       typesig { [::Java::Int, ::Java::Long, ::Java::Int, Array.typed(::Java::Byte), ::Java::Int] }
       # int
       def _vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2)
-        JNI.__send__(:Java_org_eclipse_swt_internal_mozilla_XPCOM_VtblCall__IJI_3BI, JNI.env, self.jni_id, fn_number.to_int, pp_vtbl.to_int, arg0.to_int, arg1.jni_id, arg2.to_int)
+        PLATFORM_LOCK.lock
+        begin
+          return ___vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2)
+        ensure
+          PLATFORM_LOCK.unlock
+        end
       end
       
-      JNI.native_method :Java_org_eclipse_swt_internal_mozilla_XPCOM_VtblCall__IJJ_3BI, [:pointer, :long, :int32, :int64, :int64, :long, :int32], :int32
+      JNI.native_method :Java_org_eclipse_swt_internal_mozilla_XPCOM__1VtblCall__IJJ_3BI, [:pointer, :long, :int32, :int64, :int64, :long, :int32], :int32
+      typesig { [::Java::Int, ::Java::Long, ::Java::Long, Array.typed(::Java::Byte), ::Java::Int] }
+      # int
+      def ___vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2)
+        JNI.__send__(:Java_org_eclipse_swt_internal_mozilla_XPCOM__1VtblCall__IJJ_3BI, JNI.env, self.jni_id, fn_number.to_int, pp_vtbl.to_int, arg0.to_int, arg1.jni_id, arg2.to_int)
+      end
+      
       typesig { [::Java::Int, ::Java::Long, ::Java::Long, Array.typed(::Java::Byte), ::Java::Int] }
       # int
       def _vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2)
-        JNI.__send__(:Java_org_eclipse_swt_internal_mozilla_XPCOM_VtblCall__IJJ_3BI, JNI.env, self.jni_id, fn_number.to_int, pp_vtbl.to_int, arg0.to_int, arg1.jni_id, arg2.to_int)
+        PLATFORM_LOCK.lock
+        begin
+          return ___vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2)
+        ensure
+          PLATFORM_LOCK.unlock
+        end
       end
       
-      JNI.native_method "Java_org_eclipse_swt_internal_mozilla_XPCOM_VtblCall__IJ_3BIL#{NsID.jni_name}_2_3I".to_sym, [:pointer, :long, :int32, :int64, :long, :int32, :long, :long], :int32
+      JNI.native_method :Java_org_eclipse_swt_internal_mozilla_XPCOM__1VtblCall__IJI_3BS, [:pointer, :long, :int32, :int64, :int32, :long, :int16], :int32
+      typesig { [::Java::Int, ::Java::Long, ::Java::Int, Array.typed(::Java::Byte), ::Java::Short] }
+      # int
+      def ___vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2)
+        JNI.__send__(:Java_org_eclipse_swt_internal_mozilla_XPCOM__1VtblCall__IJI_3BS, JNI.env, self.jni_id, fn_number.to_int, pp_vtbl.to_int, arg0.to_int, arg1.jni_id, arg2.to_int)
+      end
+      
+      typesig { [::Java::Int, ::Java::Long, ::Java::Int, Array.typed(::Java::Byte), ::Java::Short] }
+      # int
+      def _vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2)
+        PLATFORM_LOCK.lock
+        begin
+          return ___vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2)
+        ensure
+          PLATFORM_LOCK.unlock
+        end
+      end
+      
+      JNI.native_method :Java_org_eclipse_swt_internal_mozilla_XPCOM__1VtblCall__IJJ_3BS, [:pointer, :long, :int32, :int64, :int64, :long, :int16], :int32
+      typesig { [::Java::Int, ::Java::Long, ::Java::Long, Array.typed(::Java::Byte), ::Java::Short] }
+      # int
+      def ___vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2)
+        JNI.__send__(:Java_org_eclipse_swt_internal_mozilla_XPCOM__1VtblCall__IJJ_3BS, JNI.env, self.jni_id, fn_number.to_int, pp_vtbl.to_int, arg0.to_int, arg1.jni_id, arg2.to_int)
+      end
+      
+      typesig { [::Java::Int, ::Java::Long, ::Java::Long, Array.typed(::Java::Byte), ::Java::Short] }
+      # int
+      def _vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2)
+        PLATFORM_LOCK.lock
+        begin
+          return ___vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2)
+        ensure
+          PLATFORM_LOCK.unlock
+        end
+      end
+      
+      JNI.native_method "Java_org_eclipse_swt_internal_mozilla_XPCOM__1VtblCall__IJ_3BIL#{NsID.jni_name}_2_3I".to_sym, [:pointer, :long, :int32, :int64, :long, :int32, :long, :long], :int32
+      typesig { [::Java::Int, ::Java::Long, Array.typed(::Java::Byte), ::Java::Int, NsID, Array.typed(::Java::Int)] }
+      # int
+      def ___vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2, arg3)
+        JNI.__send__("Java_org_eclipse_swt_internal_mozilla_XPCOM__1VtblCall__IJ_3BIL#{NsID.jni_name}_2_3I".to_sym, JNI.env, self.jni_id, fn_number.to_int, pp_vtbl.to_int, arg0.jni_id, arg1.to_int, arg2.jni_id, arg3.jni_id)
+      end
+      
       typesig { [::Java::Int, ::Java::Long, Array.typed(::Java::Byte), ::Java::Int, NsID, Array.typed(::Java::Int)] }
       # int
       def _vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2, arg3)
-        JNI.__send__("Java_org_eclipse_swt_internal_mozilla_XPCOM_VtblCall__IJ_3BIL#{NsID.jni_name}_2_3I".to_sym, JNI.env, self.jni_id, fn_number.to_int, pp_vtbl.to_int, arg0.jni_id, arg1.to_int, arg2.jni_id, arg3.jni_id)
+        PLATFORM_LOCK.lock
+        begin
+          return ___vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2, arg3)
+        ensure
+          PLATFORM_LOCK.unlock
+        end
       end
       
-      JNI.native_method "Java_org_eclipse_swt_internal_mozilla_XPCOM_VtblCall__IJ_3BJL#{NsID.jni_name}_2_3J".to_sym, [:pointer, :long, :int32, :int64, :long, :int64, :long, :long], :int32
+      JNI.native_method "Java_org_eclipse_swt_internal_mozilla_XPCOM__1VtblCall__IJ_3BJL#{NsID.jni_name}_2_3J".to_sym, [:pointer, :long, :int32, :int64, :long, :int64, :long, :long], :int32
+      typesig { [::Java::Int, ::Java::Long, Array.typed(::Java::Byte), ::Java::Long, NsID, Array.typed(::Java::Long)] }
+      # int
+      def ___vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2, arg3)
+        JNI.__send__("Java_org_eclipse_swt_internal_mozilla_XPCOM__1VtblCall__IJ_3BJL#{NsID.jni_name}_2_3J".to_sym, JNI.env, self.jni_id, fn_number.to_int, pp_vtbl.to_int, arg0.jni_id, arg1.to_int, arg2.jni_id, arg3.jni_id)
+      end
+      
       typesig { [::Java::Int, ::Java::Long, Array.typed(::Java::Byte), ::Java::Long, NsID, Array.typed(::Java::Long)] }
       # int
       def _vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2, arg3)
-        JNI.__send__("Java_org_eclipse_swt_internal_mozilla_XPCOM_VtblCall__IJ_3BJL#{NsID.jni_name}_2_3J".to_sym, JNI.env, self.jni_id, fn_number.to_int, pp_vtbl.to_int, arg0.jni_id, arg1.to_int, arg2.jni_id, arg3.jni_id)
+        PLATFORM_LOCK.lock
+        begin
+          return ___vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2, arg3)
+        ensure
+          PLATFORM_LOCK.unlock
+        end
       end
       
-      JNI.native_method :Java_org_eclipse_swt_internal_mozilla_XPCOM_VtblCall__IJI_3BI_3I, [:pointer, :long, :int32, :int64, :int32, :long, :int32, :long], :int32
+      JNI.native_method :Java_org_eclipse_swt_internal_mozilla_XPCOM__1VtblCall__IJI_3BI_3I, [:pointer, :long, :int32, :int64, :int32, :long, :int32, :long], :int32
+      typesig { [::Java::Int, ::Java::Long, ::Java::Int, Array.typed(::Java::Byte), ::Java::Int, Array.typed(::Java::Int)] }
+      # int
+      def ___vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2, arg3)
+        JNI.__send__(:Java_org_eclipse_swt_internal_mozilla_XPCOM__1VtblCall__IJI_3BI_3I, JNI.env, self.jni_id, fn_number.to_int, pp_vtbl.to_int, arg0.to_int, arg1.jni_id, arg2.to_int, arg3.jni_id)
+      end
+      
       typesig { [::Java::Int, ::Java::Long, ::Java::Int, Array.typed(::Java::Byte), ::Java::Int, Array.typed(::Java::Int)] }
       # int
       def _vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2, arg3)
-        JNI.__send__(:Java_org_eclipse_swt_internal_mozilla_XPCOM_VtblCall__IJI_3BI_3I, JNI.env, self.jni_id, fn_number.to_int, pp_vtbl.to_int, arg0.to_int, arg1.jni_id, arg2.to_int, arg3.jni_id)
+        PLATFORM_LOCK.lock
+        begin
+          return ___vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2, arg3)
+        ensure
+          PLATFORM_LOCK.unlock
+        end
       end
       
-      JNI.native_method :Java_org_eclipse_swt_internal_mozilla_XPCOM_VtblCall__IJJ_3BJ_3J, [:pointer, :long, :int32, :int64, :int64, :long, :int64, :long], :int32
+      JNI.native_method :Java_org_eclipse_swt_internal_mozilla_XPCOM__1VtblCall__IJJ_3BJ_3J, [:pointer, :long, :int32, :int64, :int64, :long, :int64, :long], :int32
+      typesig { [::Java::Int, ::Java::Long, ::Java::Long, Array.typed(::Java::Byte), ::Java::Long, Array.typed(::Java::Long)] }
+      # int
+      def ___vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2, arg3)
+        JNI.__send__(:Java_org_eclipse_swt_internal_mozilla_XPCOM__1VtblCall__IJJ_3BJ_3J, JNI.env, self.jni_id, fn_number.to_int, pp_vtbl.to_int, arg0.to_int, arg1.jni_id, arg2.to_int, arg3.jni_id)
+      end
+      
       typesig { [::Java::Int, ::Java::Long, ::Java::Long, Array.typed(::Java::Byte), ::Java::Long, Array.typed(::Java::Long)] }
       # int
       def _vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2, arg3)
-        JNI.__send__(:Java_org_eclipse_swt_internal_mozilla_XPCOM_VtblCall__IJJ_3BJ_3J, JNI.env, self.jni_id, fn_number.to_int, pp_vtbl.to_int, arg0.to_int, arg1.jni_id, arg2.to_int, arg3.jni_id)
+        PLATFORM_LOCK.lock
+        begin
+          return ___vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2, arg3)
+        ensure
+          PLATFORM_LOCK.unlock
+        end
       end
       
-      JNI.native_method :Java_org_eclipse_swt_internal_mozilla_XPCOM_VtblCall__IJI_3C_3C_3I, [:pointer, :long, :int32, :int64, :int32, :long, :long, :long], :int32
+      JNI.native_method :Java_org_eclipse_swt_internal_mozilla_XPCOM__1VtblCall__IJI_3C_3C_3I, [:pointer, :long, :int32, :int64, :int32, :long, :long, :long], :int32
+      typesig { [::Java::Int, ::Java::Long, ::Java::Int, Array.typed(::Java::Char), Array.typed(::Java::Char), Array.typed(::Java::Int)] }
+      # int
+      def ___vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2, arg3)
+        JNI.__send__(:Java_org_eclipse_swt_internal_mozilla_XPCOM__1VtblCall__IJI_3C_3C_3I, JNI.env, self.jni_id, fn_number.to_int, pp_vtbl.to_int, arg0.to_int, arg1.jni_id, arg2.jni_id, arg3.jni_id)
+      end
+      
       typesig { [::Java::Int, ::Java::Long, ::Java::Int, Array.typed(::Java::Char), Array.typed(::Java::Char), Array.typed(::Java::Int)] }
       # int
       def _vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2, arg3)
-        JNI.__send__(:Java_org_eclipse_swt_internal_mozilla_XPCOM_VtblCall__IJI_3C_3C_3I, JNI.env, self.jni_id, fn_number.to_int, pp_vtbl.to_int, arg0.to_int, arg1.jni_id, arg2.jni_id, arg3.jni_id)
+        PLATFORM_LOCK.lock
+        begin
+          return ___vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2, arg3)
+        ensure
+          PLATFORM_LOCK.unlock
+        end
       end
       
-      JNI.native_method :Java_org_eclipse_swt_internal_mozilla_XPCOM_VtblCall__IJJ_3C_3C_3J, [:pointer, :long, :int32, :int64, :int64, :long, :long, :long], :int32
+      JNI.native_method :Java_org_eclipse_swt_internal_mozilla_XPCOM__1VtblCall__IJJ_3C_3C_3J, [:pointer, :long, :int32, :int64, :int64, :long, :long, :long], :int32
+      typesig { [::Java::Int, ::Java::Long, ::Java::Long, Array.typed(::Java::Char), Array.typed(::Java::Char), Array.typed(::Java::Long)] }
+      # int
+      def ___vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2, arg3)
+        JNI.__send__(:Java_org_eclipse_swt_internal_mozilla_XPCOM__1VtblCall__IJJ_3C_3C_3J, JNI.env, self.jni_id, fn_number.to_int, pp_vtbl.to_int, arg0.to_int, arg1.jni_id, arg2.jni_id, arg3.jni_id)
+      end
+      
       typesig { [::Java::Int, ::Java::Long, ::Java::Long, Array.typed(::Java::Char), Array.typed(::Java::Char), Array.typed(::Java::Long)] }
       # int
       def _vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2, arg3)
-        JNI.__send__(:Java_org_eclipse_swt_internal_mozilla_XPCOM_VtblCall__IJJ_3C_3C_3J, JNI.env, self.jni_id, fn_number.to_int, pp_vtbl.to_int, arg0.to_int, arg1.jni_id, arg2.jni_id, arg3.jni_id)
+        PLATFORM_LOCK.lock
+        begin
+          return ___vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2, arg3)
+        ensure
+          PLATFORM_LOCK.unlock
+        end
       end
       
-      JNI.native_method :Java_org_eclipse_swt_internal_mozilla_XPCOM_VtblCall__IJJ_3C_3C_3I, [:pointer, :long, :int32, :int64, :int64, :long, :long, :long], :int32
+      JNI.native_method :Java_org_eclipse_swt_internal_mozilla_XPCOM__1VtblCall__IJJ_3C_3C_3I, [:pointer, :long, :int32, :int64, :int64, :long, :long, :long], :int32
+      typesig { [::Java::Int, ::Java::Long, ::Java::Long, Array.typed(::Java::Char), Array.typed(::Java::Char), Array.typed(::Java::Int)] }
+      # int
+      def ___vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2, arg3)
+        JNI.__send__(:Java_org_eclipse_swt_internal_mozilla_XPCOM__1VtblCall__IJJ_3C_3C_3I, JNI.env, self.jni_id, fn_number.to_int, pp_vtbl.to_int, arg0.to_int, arg1.jni_id, arg2.jni_id, arg3.jni_id)
+      end
+      
       typesig { [::Java::Int, ::Java::Long, ::Java::Long, Array.typed(::Java::Char), Array.typed(::Java::Char), Array.typed(::Java::Int)] }
       # int
       def _vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2, arg3)
-        JNI.__send__(:Java_org_eclipse_swt_internal_mozilla_XPCOM_VtblCall__IJJ_3C_3C_3I, JNI.env, self.jni_id, fn_number.to_int, pp_vtbl.to_int, arg0.to_int, arg1.jni_id, arg2.jni_id, arg3.jni_id)
+        PLATFORM_LOCK.lock
+        begin
+          return ___vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2, arg3)
+        ensure
+          PLATFORM_LOCK.unlock
+        end
       end
       
-      JNI.native_method :Java_org_eclipse_swt_internal_mozilla_XPCOM_VtblCall__IJIII_3C, [:pointer, :long, :int32, :int64, :int32, :int32, :int32, :long], :int32
+      JNI.native_method :Java_org_eclipse_swt_internal_mozilla_XPCOM__1VtblCall__IJIII_3C, [:pointer, :long, :int32, :int64, :int32, :int32, :int32, :long], :int32
+      typesig { [::Java::Int, ::Java::Long, ::Java::Int, ::Java::Int, ::Java::Int, Array.typed(::Java::Char)] }
+      # int
+      def ___vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2, arg3)
+        JNI.__send__(:Java_org_eclipse_swt_internal_mozilla_XPCOM__1VtblCall__IJIII_3C, JNI.env, self.jni_id, fn_number.to_int, pp_vtbl.to_int, arg0.to_int, arg1.to_int, arg2.to_int, arg3.jni_id)
+      end
+      
       typesig { [::Java::Int, ::Java::Long, ::Java::Int, ::Java::Int, ::Java::Int, Array.typed(::Java::Char)] }
       # int
       def _vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2, arg3)
-        JNI.__send__(:Java_org_eclipse_swt_internal_mozilla_XPCOM_VtblCall__IJIII_3C, JNI.env, self.jni_id, fn_number.to_int, pp_vtbl.to_int, arg0.to_int, arg1.to_int, arg2.to_int, arg3.jni_id)
+        PLATFORM_LOCK.lock
+        begin
+          return ___vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2, arg3)
+        ensure
+          PLATFORM_LOCK.unlock
+        end
       end
       
-      JNI.native_method :Java_org_eclipse_swt_internal_mozilla_XPCOM_VtblCall__IJJJI_3C, [:pointer, :long, :int32, :int64, :int64, :int64, :int32, :long], :int32
+      JNI.native_method :Java_org_eclipse_swt_internal_mozilla_XPCOM__1VtblCall__IJJJI_3C, [:pointer, :long, :int32, :int64, :int64, :int64, :int32, :long], :int32
+      typesig { [::Java::Int, ::Java::Long, ::Java::Long, ::Java::Long, ::Java::Int, Array.typed(::Java::Char)] }
+      # int
+      def ___vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2, arg3)
+        JNI.__send__(:Java_org_eclipse_swt_internal_mozilla_XPCOM__1VtblCall__IJJJI_3C, JNI.env, self.jni_id, fn_number.to_int, pp_vtbl.to_int, arg0.to_int, arg1.to_int, arg2.to_int, arg3.jni_id)
+      end
+      
       typesig { [::Java::Int, ::Java::Long, ::Java::Long, ::Java::Long, ::Java::Int, Array.typed(::Java::Char)] }
       # int
       def _vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2, arg3)
-        JNI.__send__(:Java_org_eclipse_swt_internal_mozilla_XPCOM_VtblCall__IJJJI_3C, JNI.env, self.jni_id, fn_number.to_int, pp_vtbl.to_int, arg0.to_int, arg1.to_int, arg2.to_int, arg3.jni_id)
+        PLATFORM_LOCK.lock
+        begin
+          return ___vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2, arg3)
+        ensure
+          PLATFORM_LOCK.unlock
+        end
       end
       
-      JNI.native_method :Java_org_eclipse_swt_internal_mozilla_XPCOM_VtblCall__IJIIII, [:pointer, :long, :int32, :int64, :int32, :int32, :int32, :int32], :int32
+      JNI.native_method :Java_org_eclipse_swt_internal_mozilla_XPCOM__1VtblCall__IJIIII, [:pointer, :long, :int32, :int64, :int32, :int32, :int32, :int32], :int32
+      typesig { [::Java::Int, ::Java::Long, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int] }
+      # int
+      def ___vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2, arg3)
+        JNI.__send__(:Java_org_eclipse_swt_internal_mozilla_XPCOM__1VtblCall__IJIIII, JNI.env, self.jni_id, fn_number.to_int, pp_vtbl.to_int, arg0.to_int, arg1.to_int, arg2.to_int, arg3.to_int)
+      end
+      
       typesig { [::Java::Int, ::Java::Long, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int] }
       # int
       def _vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2, arg3)
-        JNI.__send__(:Java_org_eclipse_swt_internal_mozilla_XPCOM_VtblCall__IJIIII, JNI.env, self.jni_id, fn_number.to_int, pp_vtbl.to_int, arg0.to_int, arg1.to_int, arg2.to_int, arg3.to_int)
+        PLATFORM_LOCK.lock
+        begin
+          return ___vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2, arg3)
+        ensure
+          PLATFORM_LOCK.unlock
+        end
       end
       
-      JNI.native_method :Java_org_eclipse_swt_internal_mozilla_XPCOM_VtblCall__IJJJII, [:pointer, :long, :int32, :int64, :int64, :int64, :int32, :int32], :int32
+      JNI.native_method :Java_org_eclipse_swt_internal_mozilla_XPCOM__1VtblCall__IJJJII, [:pointer, :long, :int32, :int64, :int64, :int64, :int32, :int32], :int32
+      typesig { [::Java::Int, ::Java::Long, ::Java::Long, ::Java::Long, ::Java::Int, ::Java::Int] }
+      # int
+      def ___vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2, arg3)
+        JNI.__send__(:Java_org_eclipse_swt_internal_mozilla_XPCOM__1VtblCall__IJJJII, JNI.env, self.jni_id, fn_number.to_int, pp_vtbl.to_int, arg0.to_int, arg1.to_int, arg2.to_int, arg3.to_int)
+      end
+      
       typesig { [::Java::Int, ::Java::Long, ::Java::Long, ::Java::Long, ::Java::Int, ::Java::Int] }
       # int
       def _vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2, arg3)
-        JNI.__send__(:Java_org_eclipse_swt_internal_mozilla_XPCOM_VtblCall__IJJJII, JNI.env, self.jni_id, fn_number.to_int, pp_vtbl.to_int, arg0.to_int, arg1.to_int, arg2.to_int, arg3.to_int)
+        PLATFORM_LOCK.lock
+        begin
+          return ___vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2, arg3)
+        ensure
+          PLATFORM_LOCK.unlock
+        end
       end
       
-      JNI.native_method :Java_org_eclipse_swt_internal_mozilla_XPCOM_VtblCall__IJJJJI, [:pointer, :long, :int32, :int64, :int64, :int64, :int64, :int32], :int32
+      JNI.native_method :Java_org_eclipse_swt_internal_mozilla_XPCOM__1VtblCall__IJJJJI, [:pointer, :long, :int32, :int64, :int64, :int64, :int64, :int32], :int32
+      typesig { [::Java::Int, ::Java::Long, ::Java::Long, ::Java::Long, ::Java::Long, ::Java::Int] }
+      # int
+      def ___vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2, arg3)
+        JNI.__send__(:Java_org_eclipse_swt_internal_mozilla_XPCOM__1VtblCall__IJJJJI, JNI.env, self.jni_id, fn_number.to_int, pp_vtbl.to_int, arg0.to_int, arg1.to_int, arg2.to_int, arg3.to_int)
+      end
+      
       typesig { [::Java::Int, ::Java::Long, ::Java::Long, ::Java::Long, ::Java::Long, ::Java::Int] }
       # int
       def _vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2, arg3)
-        JNI.__send__(:Java_org_eclipse_swt_internal_mozilla_XPCOM_VtblCall__IJJJJI, JNI.env, self.jni_id, fn_number.to_int, pp_vtbl.to_int, arg0.to_int, arg1.to_int, arg2.to_int, arg3.to_int)
+        PLATFORM_LOCK.lock
+        begin
+          return ___vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2, arg3)
+        ensure
+          PLATFORM_LOCK.unlock
+        end
       end
       
-      JNI.native_method :Java_org_eclipse_swt_internal_mozilla_XPCOM_VtblCall__IJIII_3I, [:pointer, :long, :int32, :int64, :int32, :int32, :int32, :long], :int32
+      JNI.native_method :Java_org_eclipse_swt_internal_mozilla_XPCOM__1VtblCall__IJIII_3I, [:pointer, :long, :int32, :int64, :int32, :int32, :int32, :long], :int32
+      typesig { [::Java::Int, ::Java::Long, ::Java::Int, ::Java::Int, ::Java::Int, Array.typed(::Java::Int)] }
+      # int
+      def ___vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2, arg3)
+        JNI.__send__(:Java_org_eclipse_swt_internal_mozilla_XPCOM__1VtblCall__IJIII_3I, JNI.env, self.jni_id, fn_number.to_int, pp_vtbl.to_int, arg0.to_int, arg1.to_int, arg2.to_int, arg3.jni_id)
+      end
+      
       typesig { [::Java::Int, ::Java::Long, ::Java::Int, ::Java::Int, ::Java::Int, Array.typed(::Java::Int)] }
       # int
       def _vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2, arg3)
-        JNI.__send__(:Java_org_eclipse_swt_internal_mozilla_XPCOM_VtblCall__IJIII_3I, JNI.env, self.jni_id, fn_number.to_int, pp_vtbl.to_int, arg0.to_int, arg1.to_int, arg2.to_int, arg3.jni_id)
+        PLATFORM_LOCK.lock
+        begin
+          return ___vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2, arg3)
+        ensure
+          PLATFORM_LOCK.unlock
+        end
       end
       
-      JNI.native_method :Java_org_eclipse_swt_internal_mozilla_XPCOM_VtblCall__IJJJI_3I, [:pointer, :long, :int32, :int64, :int64, :int64, :int32, :long], :int32
+      JNI.native_method :Java_org_eclipse_swt_internal_mozilla_XPCOM__1VtblCall__IJJJJ_3J, [:pointer, :long, :int32, :int64, :int64, :int64, :int64, :long], :int32
+      typesig { [::Java::Int, ::Java::Long, ::Java::Long, ::Java::Long, ::Java::Long, Array.typed(::Java::Long)] }
+      # int
+      def ___vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2, arg3)
+        JNI.__send__(:Java_org_eclipse_swt_internal_mozilla_XPCOM__1VtblCall__IJJJJ_3J, JNI.env, self.jni_id, fn_number.to_int, pp_vtbl.to_int, arg0.to_int, arg1.to_int, arg2.to_int, arg3.jni_id)
+      end
+      
+      typesig { [::Java::Int, ::Java::Long, ::Java::Long, ::Java::Long, ::Java::Long, Array.typed(::Java::Long)] }
+      # int
+      def _vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2, arg3)
+        PLATFORM_LOCK.lock
+        begin
+          return ___vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2, arg3)
+        ensure
+          PLATFORM_LOCK.unlock
+        end
+      end
+      
+      JNI.native_method :Java_org_eclipse_swt_internal_mozilla_XPCOM__1VtblCall__IJJJI_3I, [:pointer, :long, :int32, :int64, :int64, :int64, :int32, :long], :int32
+      typesig { [::Java::Int, ::Java::Long, ::Java::Long, ::Java::Long, ::Java::Int, Array.typed(::Java::Int)] }
+      # int
+      def ___vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2, arg3)
+        JNI.__send__(:Java_org_eclipse_swt_internal_mozilla_XPCOM__1VtblCall__IJJJI_3I, JNI.env, self.jni_id, fn_number.to_int, pp_vtbl.to_int, arg0.to_int, arg1.to_int, arg2.to_int, arg3.jni_id)
+      end
+      
       typesig { [::Java::Int, ::Java::Long, ::Java::Long, ::Java::Long, ::Java::Int, Array.typed(::Java::Int)] }
       # int
       def _vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2, arg3)
-        JNI.__send__(:Java_org_eclipse_swt_internal_mozilla_XPCOM_VtblCall__IJJJI_3I, JNI.env, self.jni_id, fn_number.to_int, pp_vtbl.to_int, arg0.to_int, arg1.to_int, arg2.to_int, arg3.jni_id)
+        PLATFORM_LOCK.lock
+        begin
+          return ___vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2, arg3)
+        ensure
+          PLATFORM_LOCK.unlock
+        end
       end
       
-      JNI.native_method :Java_org_eclipse_swt_internal_mozilla_XPCOM_VtblCall__IJ_3I_3I_3I_3I, [:pointer, :long, :int32, :int64, :long, :long, :long, :long], :int32
+      JNI.native_method :Java_org_eclipse_swt_internal_mozilla_XPCOM__1VtblCall__IJ_3I_3I_3I_3I, [:pointer, :long, :int32, :int64, :long, :long, :long, :long], :int32
+      typesig { [::Java::Int, ::Java::Long, Array.typed(::Java::Int), Array.typed(::Java::Int), Array.typed(::Java::Int), Array.typed(::Java::Int)] }
+      # int
+      def ___vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2, arg3)
+        JNI.__send__(:Java_org_eclipse_swt_internal_mozilla_XPCOM__1VtblCall__IJ_3I_3I_3I_3I, JNI.env, self.jni_id, fn_number.to_int, pp_vtbl.to_int, arg0.jni_id, arg1.jni_id, arg2.jni_id, arg3.jni_id)
+      end
+      
       typesig { [::Java::Int, ::Java::Long, Array.typed(::Java::Int), Array.typed(::Java::Int), Array.typed(::Java::Int), Array.typed(::Java::Int)] }
       # int
       def _vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2, arg3)
-        JNI.__send__(:Java_org_eclipse_swt_internal_mozilla_XPCOM_VtblCall__IJ_3I_3I_3I_3I, JNI.env, self.jni_id, fn_number.to_int, pp_vtbl.to_int, arg0.jni_id, arg1.jni_id, arg2.jni_id, arg3.jni_id)
+        PLATFORM_LOCK.lock
+        begin
+          return ___vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2, arg3)
+        ensure
+          PLATFORM_LOCK.unlock
+        end
       end
       
-      JNI.native_method "Java_org_eclipse_swt_internal_mozilla_XPCOM_VtblCall__IJL#{NsID.jni_name}_2_3B_3BI".to_sym, [:pointer, :long, :int32, :int64, :long, :long, :long, :int32], :int32
+      JNI.native_method "Java_org_eclipse_swt_internal_mozilla_XPCOM__1VtblCall__IJL#{NsID.jni_name}_2_3B_3BI".to_sym, [:pointer, :long, :int32, :int64, :long, :long, :long, :int32], :int32
+      typesig { [::Java::Int, ::Java::Long, NsID, Array.typed(::Java::Byte), Array.typed(::Java::Byte), ::Java::Int] }
+      # int
+      def ___vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2, arg3)
+        JNI.__send__("Java_org_eclipse_swt_internal_mozilla_XPCOM__1VtblCall__IJL#{NsID.jni_name}_2_3B_3BI".to_sym, JNI.env, self.jni_id, fn_number.to_int, pp_vtbl.to_int, arg0.jni_id, arg1.jni_id, arg2.jni_id, arg3.to_int)
+      end
+      
       typesig { [::Java::Int, ::Java::Long, NsID, Array.typed(::Java::Byte), Array.typed(::Java::Byte), ::Java::Int] }
       # int
       def _vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2, arg3)
-        JNI.__send__("Java_org_eclipse_swt_internal_mozilla_XPCOM_VtblCall__IJL#{NsID.jni_name}_2_3B_3BI".to_sym, JNI.env, self.jni_id, fn_number.to_int, pp_vtbl.to_int, arg0.jni_id, arg1.jni_id, arg2.jni_id, arg3.to_int)
+        PLATFORM_LOCK.lock
+        begin
+          return ___vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2, arg3)
+        ensure
+          PLATFORM_LOCK.unlock
+        end
       end
       
-      JNI.native_method "Java_org_eclipse_swt_internal_mozilla_XPCOM_VtblCall__IJL#{NsID.jni_name}_2_3B_3BJ".to_sym, [:pointer, :long, :int32, :int64, :long, :long, :long, :int64], :int32
+      JNI.native_method "Java_org_eclipse_swt_internal_mozilla_XPCOM__1VtblCall__IJL#{NsID.jni_name}_2_3B_3BJ".to_sym, [:pointer, :long, :int32, :int64, :long, :long, :long, :int64], :int32
+      typesig { [::Java::Int, ::Java::Long, NsID, Array.typed(::Java::Byte), Array.typed(::Java::Byte), ::Java::Long] }
+      # int
+      def ___vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2, arg3)
+        JNI.__send__("Java_org_eclipse_swt_internal_mozilla_XPCOM__1VtblCall__IJL#{NsID.jni_name}_2_3B_3BJ".to_sym, JNI.env, self.jni_id, fn_number.to_int, pp_vtbl.to_int, arg0.jni_id, arg1.jni_id, arg2.jni_id, arg3.to_int)
+      end
+      
       typesig { [::Java::Int, ::Java::Long, NsID, Array.typed(::Java::Byte), Array.typed(::Java::Byte), ::Java::Long] }
       # int
       def _vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2, arg3)
-        JNI.__send__("Java_org_eclipse_swt_internal_mozilla_XPCOM_VtblCall__IJL#{NsID.jni_name}_2_3B_3BJ".to_sym, JNI.env, self.jni_id, fn_number.to_int, pp_vtbl.to_int, arg0.jni_id, arg1.jni_id, arg2.jni_id, arg3.to_int)
+        PLATFORM_LOCK.lock
+        begin
+          return ___vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2, arg3)
+        ensure
+          PLATFORM_LOCK.unlock
+        end
       end
       
-      JNI.native_method "Java_org_eclipse_swt_internal_mozilla_XPCOM_VtblCall__IJL#{NsID.jni_name}_2IL#{NsID.jni_name}_2_3I".to_sym, [:pointer, :long, :int32, :int64, :long, :int32, :long, :long], :int32
+      JNI.native_method "Java_org_eclipse_swt_internal_mozilla_XPCOM__1VtblCall__IJL#{NsID.jni_name}_2IL#{NsID.jni_name}_2_3I".to_sym, [:pointer, :long, :int32, :int64, :long, :int32, :long, :long], :int32
+      typesig { [::Java::Int, ::Java::Long, NsID, ::Java::Int, NsID, Array.typed(::Java::Int)] }
+      # int
+      def ___vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2, arg3)
+        JNI.__send__("Java_org_eclipse_swt_internal_mozilla_XPCOM__1VtblCall__IJL#{NsID.jni_name}_2IL#{NsID.jni_name}_2_3I".to_sym, JNI.env, self.jni_id, fn_number.to_int, pp_vtbl.to_int, arg0.jni_id, arg1.to_int, arg2.jni_id, arg3.jni_id)
+      end
+      
       typesig { [::Java::Int, ::Java::Long, NsID, ::Java::Int, NsID, Array.typed(::Java::Int)] }
       # int
       def _vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2, arg3)
-        JNI.__send__("Java_org_eclipse_swt_internal_mozilla_XPCOM_VtblCall__IJL#{NsID.jni_name}_2IL#{NsID.jni_name}_2_3I".to_sym, JNI.env, self.jni_id, fn_number.to_int, pp_vtbl.to_int, arg0.jni_id, arg1.to_int, arg2.jni_id, arg3.jni_id)
+        PLATFORM_LOCK.lock
+        begin
+          return ___vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2, arg3)
+        ensure
+          PLATFORM_LOCK.unlock
+        end
       end
       
-      JNI.native_method "Java_org_eclipse_swt_internal_mozilla_XPCOM_VtblCall__IJL#{NsID.jni_name}_2JL#{NsID.jni_name}_2_3J".to_sym, [:pointer, :long, :int32, :int64, :long, :int64, :long, :long], :int32
+      JNI.native_method "Java_org_eclipse_swt_internal_mozilla_XPCOM__1VtblCall__IJL#{NsID.jni_name}_2JL#{NsID.jni_name}_2_3J".to_sym, [:pointer, :long, :int32, :int64, :long, :int64, :long, :long], :int32
+      typesig { [::Java::Int, ::Java::Long, NsID, ::Java::Long, NsID, Array.typed(::Java::Long)] }
+      # int
+      def ___vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2, arg3)
+        JNI.__send__("Java_org_eclipse_swt_internal_mozilla_XPCOM__1VtblCall__IJL#{NsID.jni_name}_2JL#{NsID.jni_name}_2_3J".to_sym, JNI.env, self.jni_id, fn_number.to_int, pp_vtbl.to_int, arg0.jni_id, arg1.to_int, arg2.jni_id, arg3.jni_id)
+      end
+      
       typesig { [::Java::Int, ::Java::Long, NsID, ::Java::Long, NsID, Array.typed(::Java::Long)] }
       # int
       def _vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2, arg3)
-        JNI.__send__("Java_org_eclipse_swt_internal_mozilla_XPCOM_VtblCall__IJL#{NsID.jni_name}_2JL#{NsID.jni_name}_2_3J".to_sym, JNI.env, self.jni_id, fn_number.to_int, pp_vtbl.to_int, arg0.jni_id, arg1.to_int, arg2.jni_id, arg3.jni_id)
+        PLATFORM_LOCK.lock
+        begin
+          return ___vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2, arg3)
+        ensure
+          PLATFORM_LOCK.unlock
+        end
       end
       
-      JNI.native_method :Java_org_eclipse_swt_internal_mozilla_XPCOM_VtblCall__IJ_3BI_3I_3I, [:pointer, :long, :int32, :int64, :long, :int32, :long, :long], :int32
+      JNI.native_method :Java_org_eclipse_swt_internal_mozilla_XPCOM__1VtblCall__IJ_3BI_3I_3I, [:pointer, :long, :int32, :int64, :long, :int32, :long, :long], :int32
+      typesig { [::Java::Int, ::Java::Long, Array.typed(::Java::Byte), ::Java::Int, Array.typed(::Java::Int), Array.typed(::Java::Int)] }
+      # int
+      def ___vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2, arg3)
+        JNI.__send__(:Java_org_eclipse_swt_internal_mozilla_XPCOM__1VtblCall__IJ_3BI_3I_3I, JNI.env, self.jni_id, fn_number.to_int, pp_vtbl.to_int, arg0.jni_id, arg1.to_int, arg2.jni_id, arg3.jni_id)
+      end
+      
       typesig { [::Java::Int, ::Java::Long, Array.typed(::Java::Byte), ::Java::Int, Array.typed(::Java::Int), Array.typed(::Java::Int)] }
       # int
       def _vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2, arg3)
-        JNI.__send__(:Java_org_eclipse_swt_internal_mozilla_XPCOM_VtblCall__IJ_3BI_3I_3I, JNI.env, self.jni_id, fn_number.to_int, pp_vtbl.to_int, arg0.jni_id, arg1.to_int, arg2.jni_id, arg3.jni_id)
+        PLATFORM_LOCK.lock
+        begin
+          return ___vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2, arg3)
+        ensure
+          PLATFORM_LOCK.unlock
+        end
       end
       
-      JNI.native_method :Java_org_eclipse_swt_internal_mozilla_XPCOM_VtblCall__IJ_3BI_3J_3I, [:pointer, :long, :int32, :int64, :long, :int32, :long, :long], :int32
+      JNI.native_method :Java_org_eclipse_swt_internal_mozilla_XPCOM__1VtblCall__IJ_3BI_3J_3I, [:pointer, :long, :int32, :int64, :long, :int32, :long, :long], :int32
+      typesig { [::Java::Int, ::Java::Long, Array.typed(::Java::Byte), ::Java::Int, Array.typed(::Java::Long), Array.typed(::Java::Int)] }
+      # int
+      def ___vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2, arg3)
+        JNI.__send__(:Java_org_eclipse_swt_internal_mozilla_XPCOM__1VtblCall__IJ_3BI_3J_3I, JNI.env, self.jni_id, fn_number.to_int, pp_vtbl.to_int, arg0.jni_id, arg1.to_int, arg2.jni_id, arg3.jni_id)
+      end
+      
       typesig { [::Java::Int, ::Java::Long, Array.typed(::Java::Byte), ::Java::Int, Array.typed(::Java::Long), Array.typed(::Java::Int)] }
       # int
       def _vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2, arg3)
-        JNI.__send__(:Java_org_eclipse_swt_internal_mozilla_XPCOM_VtblCall__IJ_3BI_3J_3I, JNI.env, self.jni_id, fn_number.to_int, pp_vtbl.to_int, arg0.jni_id, arg1.to_int, arg2.jni_id, arg3.jni_id)
+        PLATFORM_LOCK.lock
+        begin
+          return ___vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2, arg3)
+        ensure
+          PLATFORM_LOCK.unlock
+        end
       end
       
-      JNI.native_method :Java_org_eclipse_swt_internal_mozilla_XPCOM_VtblCall__IJ_3CIIII, [:pointer, :long, :int32, :int64, :long, :int32, :int32, :int32, :int32], :int32
+      JNI.native_method :Java_org_eclipse_swt_internal_mozilla_XPCOM__1VtblCall__IJII_3B_3B, [:pointer, :long, :int32, :int64, :int32, :int32, :long, :long], :int32
+      typesig { [::Java::Int, ::Java::Long, ::Java::Int, ::Java::Int, Array.typed(::Java::Byte), Array.typed(::Java::Byte)] }
+      # int
+      def ___vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2, arg3)
+        JNI.__send__(:Java_org_eclipse_swt_internal_mozilla_XPCOM__1VtblCall__IJII_3B_3B, JNI.env, self.jni_id, fn_number.to_int, pp_vtbl.to_int, arg0.to_int, arg1.to_int, arg2.jni_id, arg3.jni_id)
+      end
+      
+      typesig { [::Java::Int, ::Java::Long, ::Java::Int, ::Java::Int, Array.typed(::Java::Byte), Array.typed(::Java::Byte)] }
+      # int
+      def _vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2, arg3)
+        PLATFORM_LOCK.lock
+        begin
+          return ___vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2, arg3)
+        ensure
+          PLATFORM_LOCK.unlock
+        end
+      end
+      
+      JNI.native_method :Java_org_eclipse_swt_internal_mozilla_XPCOM__1VtblCall__IJJJ_3B_3B, [:pointer, :long, :int32, :int64, :int64, :int64, :long, :long], :int32
+      typesig { [::Java::Int, ::Java::Long, ::Java::Long, ::Java::Long, Array.typed(::Java::Byte), Array.typed(::Java::Byte)] }
+      # int
+      def ___vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2, arg3)
+        JNI.__send__(:Java_org_eclipse_swt_internal_mozilla_XPCOM__1VtblCall__IJJJ_3B_3B, JNI.env, self.jni_id, fn_number.to_int, pp_vtbl.to_int, arg0.to_int, arg1.to_int, arg2.jni_id, arg3.jni_id)
+      end
+      
+      typesig { [::Java::Int, ::Java::Long, ::Java::Long, ::Java::Long, Array.typed(::Java::Byte), Array.typed(::Java::Byte)] }
+      # int
+      def _vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2, arg3)
+        PLATFORM_LOCK.lock
+        begin
+          return ___vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2, arg3)
+        ensure
+          PLATFORM_LOCK.unlock
+        end
+      end
+      
+      JNI.native_method :Java_org_eclipse_swt_internal_mozilla_XPCOM__1VtblCall__IJII_3BI, [:pointer, :long, :int32, :int64, :int32, :int32, :long, :int32], :int32
+      typesig { [::Java::Int, ::Java::Long, ::Java::Int, ::Java::Int, Array.typed(::Java::Byte), ::Java::Int] }
+      # int
+      def ___vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2, arg3)
+        JNI.__send__(:Java_org_eclipse_swt_internal_mozilla_XPCOM__1VtblCall__IJII_3BI, JNI.env, self.jni_id, fn_number.to_int, pp_vtbl.to_int, arg0.to_int, arg1.to_int, arg2.jni_id, arg3.to_int)
+      end
+      
+      typesig { [::Java::Int, ::Java::Long, ::Java::Int, ::Java::Int, Array.typed(::Java::Byte), ::Java::Int] }
+      # int
+      def _vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2, arg3)
+        PLATFORM_LOCK.lock
+        begin
+          return ___vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2, arg3)
+        ensure
+          PLATFORM_LOCK.unlock
+        end
+      end
+      
+      JNI.native_method :Java_org_eclipse_swt_internal_mozilla_XPCOM__1VtblCall__IJJJ_3BJ, [:pointer, :long, :int32, :int64, :int64, :int64, :long, :int64], :int32
+      typesig { [::Java::Int, ::Java::Long, ::Java::Long, ::Java::Long, Array.typed(::Java::Byte), ::Java::Long] }
+      # int
+      def ___vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2, arg3)
+        JNI.__send__(:Java_org_eclipse_swt_internal_mozilla_XPCOM__1VtblCall__IJJJ_3BJ, JNI.env, self.jni_id, fn_number.to_int, pp_vtbl.to_int, arg0.to_int, arg1.to_int, arg2.jni_id, arg3.to_int)
+      end
+      
+      typesig { [::Java::Int, ::Java::Long, ::Java::Long, ::Java::Long, Array.typed(::Java::Byte), ::Java::Long] }
+      # int
+      def _vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2, arg3)
+        PLATFORM_LOCK.lock
+        begin
+          return ___vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2, arg3)
+        ensure
+          PLATFORM_LOCK.unlock
+        end
+      end
+      
+      JNI.native_method :Java_org_eclipse_swt_internal_mozilla_XPCOM__1VtblCall__IJ_3SI_3I_3I, [:pointer, :long, :int32, :int64, :long, :int32, :long, :long], :int32
+      typesig { [::Java::Int, ::Java::Long, Array.typed(::Java::Short), ::Java::Int, Array.typed(::Java::Int), Array.typed(::Java::Int)] }
+      # int
+      def ___vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2, arg3)
+        JNI.__send__(:Java_org_eclipse_swt_internal_mozilla_XPCOM__1VtblCall__IJ_3SI_3I_3I, JNI.env, self.jni_id, fn_number.to_int, pp_vtbl.to_int, arg0.jni_id, arg1.to_int, arg2.jni_id, arg3.jni_id)
+      end
+      
+      typesig { [::Java::Int, ::Java::Long, Array.typed(::Java::Short), ::Java::Int, Array.typed(::Java::Int), Array.typed(::Java::Int)] }
+      # int
+      def _vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2, arg3)
+        PLATFORM_LOCK.lock
+        begin
+          return ___vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2, arg3)
+        ensure
+          PLATFORM_LOCK.unlock
+        end
+      end
+      
+      JNI.native_method :Java_org_eclipse_swt_internal_mozilla_XPCOM__1VtblCall__IJ_3SJ_3I_3J, [:pointer, :long, :int32, :int64, :long, :int64, :long, :long], :int32
+      typesig { [::Java::Int, ::Java::Long, Array.typed(::Java::Short), ::Java::Long, Array.typed(::Java::Int), Array.typed(::Java::Long)] }
+      # int
+      def ___vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2, arg3)
+        JNI.__send__(:Java_org_eclipse_swt_internal_mozilla_XPCOM__1VtblCall__IJ_3SJ_3I_3J, JNI.env, self.jni_id, fn_number.to_int, pp_vtbl.to_int, arg0.jni_id, arg1.to_int, arg2.jni_id, arg3.jni_id)
+      end
+      
+      typesig { [::Java::Int, ::Java::Long, Array.typed(::Java::Short), ::Java::Long, Array.typed(::Java::Int), Array.typed(::Java::Long)] }
+      # int
+      def _vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2, arg3)
+        PLATFORM_LOCK.lock
+        begin
+          return ___vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2, arg3)
+        ensure
+          PLATFORM_LOCK.unlock
+        end
+      end
+      
+      JNI.native_method :Java_org_eclipse_swt_internal_mozilla_XPCOM__1VtblCall__IJ_3CIIII, [:pointer, :long, :int32, :int64, :long, :int32, :int32, :int32, :int32], :int32
+      typesig { [::Java::Int, ::Java::Long, Array.typed(::Java::Char), ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int] }
+      # int
+      def ___vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2, arg3, arg4)
+        JNI.__send__(:Java_org_eclipse_swt_internal_mozilla_XPCOM__1VtblCall__IJ_3CIIII, JNI.env, self.jni_id, fn_number.to_int, pp_vtbl.to_int, arg0.jni_id, arg1.to_int, arg2.to_int, arg3.to_int, arg4.to_int)
+      end
+      
       typesig { [::Java::Int, ::Java::Long, Array.typed(::Java::Char), ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int] }
       # int
       def _vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2, arg3, arg4)
-        JNI.__send__(:Java_org_eclipse_swt_internal_mozilla_XPCOM_VtblCall__IJ_3CIIII, JNI.env, self.jni_id, fn_number.to_int, pp_vtbl.to_int, arg0.jni_id, arg1.to_int, arg2.to_int, arg3.to_int, arg4.to_int)
+        PLATFORM_LOCK.lock
+        begin
+          return ___vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2, arg3, arg4)
+        ensure
+          PLATFORM_LOCK.unlock
+        end
       end
       
-      JNI.native_method :Java_org_eclipse_swt_internal_mozilla_XPCOM_VtblCall__IJ_3CIJJJ, [:pointer, :long, :int32, :int64, :long, :int32, :int64, :int64, :int64], :int32
+      JNI.native_method :Java_org_eclipse_swt_internal_mozilla_XPCOM__1VtblCall__IJ_3CIJJJ, [:pointer, :long, :int32, :int64, :long, :int32, :int64, :int64, :int64], :int32
+      typesig { [::Java::Int, ::Java::Long, Array.typed(::Java::Char), ::Java::Int, ::Java::Long, ::Java::Long, ::Java::Long] }
+      # int
+      def ___vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2, arg3, arg4)
+        JNI.__send__(:Java_org_eclipse_swt_internal_mozilla_XPCOM__1VtblCall__IJ_3CIJJJ, JNI.env, self.jni_id, fn_number.to_int, pp_vtbl.to_int, arg0.jni_id, arg1.to_int, arg2.to_int, arg3.to_int, arg4.to_int)
+      end
+      
       typesig { [::Java::Int, ::Java::Long, Array.typed(::Java::Char), ::Java::Int, ::Java::Long, ::Java::Long, ::Java::Long] }
       # int
       def _vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2, arg3, arg4)
-        JNI.__send__(:Java_org_eclipse_swt_internal_mozilla_XPCOM_VtblCall__IJ_3CIJJJ, JNI.env, self.jni_id, fn_number.to_int, pp_vtbl.to_int, arg0.jni_id, arg1.to_int, arg2.to_int, arg3.to_int, arg4.to_int)
+        PLATFORM_LOCK.lock
+        begin
+          return ___vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2, arg3, arg4)
+        ensure
+          PLATFORM_LOCK.unlock
+        end
       end
       
-      JNI.native_method :Java_org_eclipse_swt_internal_mozilla_XPCOM_VtblCall__IJJJJJJ, [:pointer, :long, :int32, :int64, :int64, :int64, :int64, :int64, :int64], :int32
+      JNI.native_method :Java_org_eclipse_swt_internal_mozilla_XPCOM__1VtblCall__IJJJJJJ, [:pointer, :long, :int32, :int64, :int64, :int64, :int64, :int64, :int64], :int32
+      typesig { [::Java::Int, ::Java::Long, ::Java::Long, ::Java::Long, ::Java::Long, ::Java::Long, ::Java::Long] }
+      # int
+      def ___vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2, arg3, arg4)
+        JNI.__send__(:Java_org_eclipse_swt_internal_mozilla_XPCOM__1VtblCall__IJJJJJJ, JNI.env, self.jni_id, fn_number.to_int, pp_vtbl.to_int, arg0.to_int, arg1.to_int, arg2.to_int, arg3.to_int, arg4.to_int)
+      end
+      
       typesig { [::Java::Int, ::Java::Long, ::Java::Long, ::Java::Long, ::Java::Long, ::Java::Long, ::Java::Long] }
       # int
       def _vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2, arg3, arg4)
-        JNI.__send__(:Java_org_eclipse_swt_internal_mozilla_XPCOM_VtblCall__IJJJJJJ, JNI.env, self.jni_id, fn_number.to_int, pp_vtbl.to_int, arg0.to_int, arg1.to_int, arg2.to_int, arg3.to_int, arg4.to_int)
+        PLATFORM_LOCK.lock
+        begin
+          return ___vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2, arg3, arg4)
+        ensure
+          PLATFORM_LOCK.unlock
+        end
       end
       
-      JNI.native_method :Java_org_eclipse_swt_internal_mozilla_XPCOM_VtblCall__IJIIIII, [:pointer, :long, :int32, :int64, :int32, :int32, :int32, :int32, :int32], :int32
+      JNI.native_method :Java_org_eclipse_swt_internal_mozilla_XPCOM__1VtblCall__IJIIIII, [:pointer, :long, :int32, :int64, :int32, :int32, :int32, :int32, :int32], :int32
+      typesig { [::Java::Int, ::Java::Long, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int] }
+      # int
+      def ___vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2, arg3, arg4)
+        JNI.__send__(:Java_org_eclipse_swt_internal_mozilla_XPCOM__1VtblCall__IJIIIII, JNI.env, self.jni_id, fn_number.to_int, pp_vtbl.to_int, arg0.to_int, arg1.to_int, arg2.to_int, arg3.to_int, arg4.to_int)
+      end
+      
       typesig { [::Java::Int, ::Java::Long, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int] }
       # int
       def _vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2, arg3, arg4)
-        JNI.__send__(:Java_org_eclipse_swt_internal_mozilla_XPCOM_VtblCall__IJIIIII, JNI.env, self.jni_id, fn_number.to_int, pp_vtbl.to_int, arg0.to_int, arg1.to_int, arg2.to_int, arg3.to_int, arg4.to_int)
+        PLATFORM_LOCK.lock
+        begin
+          return ___vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2, arg3, arg4)
+        ensure
+          PLATFORM_LOCK.unlock
+        end
       end
       
-      JNI.native_method :Java_org_eclipse_swt_internal_mozilla_XPCOM_VtblCall__IJI_3I_3I_3I_3I, [:pointer, :long, :int32, :int64, :int32, :long, :long, :long, :long], :int32
+      JNI.native_method :Java_org_eclipse_swt_internal_mozilla_XPCOM__1VtblCall__IJI_3I_3I_3I_3I, [:pointer, :long, :int32, :int64, :int32, :long, :long, :long, :long], :int32
+      typesig { [::Java::Int, ::Java::Long, ::Java::Int, Array.typed(::Java::Int), Array.typed(::Java::Int), Array.typed(::Java::Int), Array.typed(::Java::Int)] }
+      # int
+      def ___vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2, arg3, arg4)
+        JNI.__send__(:Java_org_eclipse_swt_internal_mozilla_XPCOM__1VtblCall__IJI_3I_3I_3I_3I, JNI.env, self.jni_id, fn_number.to_int, pp_vtbl.to_int, arg0.to_int, arg1.jni_id, arg2.jni_id, arg3.jni_id, arg4.jni_id)
+      end
+      
       typesig { [::Java::Int, ::Java::Long, ::Java::Int, Array.typed(::Java::Int), Array.typed(::Java::Int), Array.typed(::Java::Int), Array.typed(::Java::Int)] }
       # int
       def _vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2, arg3, arg4)
-        JNI.__send__(:Java_org_eclipse_swt_internal_mozilla_XPCOM_VtblCall__IJI_3I_3I_3I_3I, JNI.env, self.jni_id, fn_number.to_int, pp_vtbl.to_int, arg0.to_int, arg1.jni_id, arg2.jni_id, arg3.jni_id, arg4.jni_id)
+        PLATFORM_LOCK.lock
+        begin
+          return ___vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2, arg3, arg4)
+        ensure
+          PLATFORM_LOCK.unlock
+        end
       end
       
-      JNI.native_method :Java_org_eclipse_swt_internal_mozilla_XPCOM_VtblCall__IJI_3C_3C_3C_3I, [:pointer, :long, :int32, :int64, :int32, :long, :long, :long, :long], :int32
+      JNI.native_method :Java_org_eclipse_swt_internal_mozilla_XPCOM__1VtblCall__IJI_3C_3C_3C_3I, [:pointer, :long, :int32, :int64, :int32, :long, :long, :long, :long], :int32
+      typesig { [::Java::Int, ::Java::Long, ::Java::Int, Array.typed(::Java::Char), Array.typed(::Java::Char), Array.typed(::Java::Char), Array.typed(::Java::Int)] }
+      # int
+      def ___vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2, arg3, arg4)
+        JNI.__send__(:Java_org_eclipse_swt_internal_mozilla_XPCOM__1VtblCall__IJI_3C_3C_3C_3I, JNI.env, self.jni_id, fn_number.to_int, pp_vtbl.to_int, arg0.to_int, arg1.jni_id, arg2.jni_id, arg3.jni_id, arg4.jni_id)
+      end
+      
       typesig { [::Java::Int, ::Java::Long, ::Java::Int, Array.typed(::Java::Char), Array.typed(::Java::Char), Array.typed(::Java::Char), Array.typed(::Java::Int)] }
       # int
       def _vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2, arg3, arg4)
-        JNI.__send__(:Java_org_eclipse_swt_internal_mozilla_XPCOM_VtblCall__IJI_3C_3C_3C_3I, JNI.env, self.jni_id, fn_number.to_int, pp_vtbl.to_int, arg0.to_int, arg1.jni_id, arg2.jni_id, arg3.jni_id, arg4.jni_id)
+        PLATFORM_LOCK.lock
+        begin
+          return ___vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2, arg3, arg4)
+        ensure
+          PLATFORM_LOCK.unlock
+        end
       end
       
-      JNI.native_method :Java_org_eclipse_swt_internal_mozilla_XPCOM_VtblCall__IJJ_3C_3C_3C_3I, [:pointer, :long, :int32, :int64, :int64, :long, :long, :long, :long], :int32
+      JNI.native_method :Java_org_eclipse_swt_internal_mozilla_XPCOM__1VtblCall__IJJ_3C_3C_3C_3I, [:pointer, :long, :int32, :int64, :int64, :long, :long, :long, :long], :int32
+      typesig { [::Java::Int, ::Java::Long, ::Java::Long, Array.typed(::Java::Char), Array.typed(::Java::Char), Array.typed(::Java::Char), Array.typed(::Java::Int)] }
+      # int
+      def ___vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2, arg3, arg4)
+        JNI.__send__(:Java_org_eclipse_swt_internal_mozilla_XPCOM__1VtblCall__IJJ_3C_3C_3C_3I, JNI.env, self.jni_id, fn_number.to_int, pp_vtbl.to_int, arg0.to_int, arg1.jni_id, arg2.jni_id, arg3.jni_id, arg4.jni_id)
+      end
+      
       typesig { [::Java::Int, ::Java::Long, ::Java::Long, Array.typed(::Java::Char), Array.typed(::Java::Char), Array.typed(::Java::Char), Array.typed(::Java::Int)] }
       # int
       def _vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2, arg3, arg4)
-        JNI.__send__(:Java_org_eclipse_swt_internal_mozilla_XPCOM_VtblCall__IJJ_3C_3C_3C_3I, JNI.env, self.jni_id, fn_number.to_int, pp_vtbl.to_int, arg0.to_int, arg1.jni_id, arg2.jni_id, arg3.jni_id, arg4.jni_id)
+        PLATFORM_LOCK.lock
+        begin
+          return ___vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2, arg3, arg4)
+        ensure
+          PLATFORM_LOCK.unlock
+        end
       end
       
-      JNI.native_method :Java_org_eclipse_swt_internal_mozilla_XPCOM_VtblCall__IJ_3BII_3I_3I, [:pointer, :long, :int32, :int64, :long, :int32, :int32, :long, :long], :int32
+      JNI.native_method :Java_org_eclipse_swt_internal_mozilla_XPCOM__1VtblCall__IJ_3BII_3I_3I, [:pointer, :long, :int32, :int64, :long, :int32, :int32, :long, :long], :int32
+      typesig { [::Java::Int, ::Java::Long, Array.typed(::Java::Byte), ::Java::Int, ::Java::Int, Array.typed(::Java::Int), Array.typed(::Java::Int)] }
+      # int
+      def ___vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2, arg3, arg4)
+        JNI.__send__(:Java_org_eclipse_swt_internal_mozilla_XPCOM__1VtblCall__IJ_3BII_3I_3I, JNI.env, self.jni_id, fn_number.to_int, pp_vtbl.to_int, arg0.jni_id, arg1.to_int, arg2.to_int, arg3.jni_id, arg4.jni_id)
+      end
+      
       typesig { [::Java::Int, ::Java::Long, Array.typed(::Java::Byte), ::Java::Int, ::Java::Int, Array.typed(::Java::Int), Array.typed(::Java::Int)] }
       # int
       def _vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2, arg3, arg4)
-        JNI.__send__(:Java_org_eclipse_swt_internal_mozilla_XPCOM_VtblCall__IJ_3BII_3I_3I, JNI.env, self.jni_id, fn_number.to_int, pp_vtbl.to_int, arg0.jni_id, arg1.to_int, arg2.to_int, arg3.jni_id, arg4.jni_id)
+        PLATFORM_LOCK.lock
+        begin
+          return ___vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2, arg3, arg4)
+        ensure
+          PLATFORM_LOCK.unlock
+        end
       end
       
-      JNI.native_method :Java_org_eclipse_swt_internal_mozilla_XPCOM_VtblCall__IJ_3BIJ_3J_3I, [:pointer, :long, :int32, :int64, :long, :int32, :int64, :long, :long], :int32
+      JNI.native_method :Java_org_eclipse_swt_internal_mozilla_XPCOM__1VtblCall__IJ_3BIJ_3J_3I, [:pointer, :long, :int32, :int64, :long, :int32, :int64, :long, :long], :int32
+      typesig { [::Java::Int, ::Java::Long, Array.typed(::Java::Byte), ::Java::Int, ::Java::Long, Array.typed(::Java::Long), Array.typed(::Java::Int)] }
+      # int
+      def ___vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2, arg3, arg4)
+        JNI.__send__(:Java_org_eclipse_swt_internal_mozilla_XPCOM__1VtblCall__IJ_3BIJ_3J_3I, JNI.env, self.jni_id, fn_number.to_int, pp_vtbl.to_int, arg0.jni_id, arg1.to_int, arg2.to_int, arg3.jni_id, arg4.jni_id)
+      end
+      
       typesig { [::Java::Int, ::Java::Long, Array.typed(::Java::Byte), ::Java::Int, ::Java::Long, Array.typed(::Java::Long), Array.typed(::Java::Int)] }
       # int
       def _vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2, arg3, arg4)
-        JNI.__send__(:Java_org_eclipse_swt_internal_mozilla_XPCOM_VtblCall__IJ_3BIJ_3J_3I, JNI.env, self.jni_id, fn_number.to_int, pp_vtbl.to_int, arg0.jni_id, arg1.to_int, arg2.to_int, arg3.jni_id, arg4.jni_id)
+        PLATFORM_LOCK.lock
+        begin
+          return ___vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2, arg3, arg4)
+        ensure
+          PLATFORM_LOCK.unlock
+        end
       end
       
-      JNI.native_method :Java_org_eclipse_swt_internal_mozilla_XPCOM_VtblCall__IJI_3B_3B_3BI_3I, [:pointer, :long, :int32, :int64, :int32, :long, :long, :long, :int32, :long], :int32
+      JNI.native_method :Java_org_eclipse_swt_internal_mozilla_XPCOM__1VtblCall__IJII_3BII, [:pointer, :long, :int32, :int64, :int32, :int32, :long, :int32, :int32], :int32
+      typesig { [::Java::Int, ::Java::Long, ::Java::Int, ::Java::Int, Array.typed(::Java::Byte), ::Java::Int, ::Java::Int] }
+      # int
+      def ___vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2, arg3, arg4)
+        JNI.__send__(:Java_org_eclipse_swt_internal_mozilla_XPCOM__1VtblCall__IJII_3BII, JNI.env, self.jni_id, fn_number.to_int, pp_vtbl.to_int, arg0.to_int, arg1.to_int, arg2.jni_id, arg3.to_int, arg4.to_int)
+      end
+      
+      typesig { [::Java::Int, ::Java::Long, ::Java::Int, ::Java::Int, Array.typed(::Java::Byte), ::Java::Int, ::Java::Int] }
+      # int
+      def _vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2, arg3, arg4)
+        PLATFORM_LOCK.lock
+        begin
+          return ___vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2, arg3, arg4)
+        ensure
+          PLATFORM_LOCK.unlock
+        end
+      end
+      
+      JNI.native_method :Java_org_eclipse_swt_internal_mozilla_XPCOM__1VtblCall__IJJJ_3BJI, [:pointer, :long, :int32, :int64, :int64, :int64, :long, :int64, :int32], :int32
+      typesig { [::Java::Int, ::Java::Long, ::Java::Long, ::Java::Long, Array.typed(::Java::Byte), ::Java::Long, ::Java::Int] }
+      # int
+      def ___vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2, arg3, arg4)
+        JNI.__send__(:Java_org_eclipse_swt_internal_mozilla_XPCOM__1VtblCall__IJJJ_3BJI, JNI.env, self.jni_id, fn_number.to_int, pp_vtbl.to_int, arg0.to_int, arg1.to_int, arg2.jni_id, arg3.to_int, arg4.to_int)
+      end
+      
+      typesig { [::Java::Int, ::Java::Long, ::Java::Long, ::Java::Long, Array.typed(::Java::Byte), ::Java::Long, ::Java::Int] }
+      # int
+      def _vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2, arg3, arg4)
+        PLATFORM_LOCK.lock
+        begin
+          return ___vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2, arg3, arg4)
+        ensure
+          PLATFORM_LOCK.unlock
+        end
+      end
+      
+      JNI.native_method "Java_org_eclipse_swt_internal_mozilla_XPCOM__1VtblCall__IJIL#{NsID.jni_name}_2II_3I".to_sym, [:pointer, :long, :int32, :int64, :int32, :long, :int32, :int32, :long], :int32
+      typesig { [::Java::Int, ::Java::Long, ::Java::Int, NsID, ::Java::Int, ::Java::Int, Array.typed(::Java::Int)] }
+      # int
+      def ___vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2, arg3, arg4)
+        JNI.__send__("Java_org_eclipse_swt_internal_mozilla_XPCOM__1VtblCall__IJIL#{NsID.jni_name}_2II_3I".to_sym, JNI.env, self.jni_id, fn_number.to_int, pp_vtbl.to_int, arg0.to_int, arg1.jni_id, arg2.to_int, arg3.to_int, arg4.jni_id)
+      end
+      
+      typesig { [::Java::Int, ::Java::Long, ::Java::Int, NsID, ::Java::Int, ::Java::Int, Array.typed(::Java::Int)] }
+      # int
+      def _vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2, arg3, arg4)
+        PLATFORM_LOCK.lock
+        begin
+          return ___vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2, arg3, arg4)
+        ensure
+          PLATFORM_LOCK.unlock
+        end
+      end
+      
+      JNI.native_method "Java_org_eclipse_swt_internal_mozilla_XPCOM__1VtblCall__IJJL#{NsID.jni_name}_2JJ_3J".to_sym, [:pointer, :long, :int32, :int64, :int64, :long, :int64, :int64, :long], :int32
+      typesig { [::Java::Int, ::Java::Long, ::Java::Long, NsID, ::Java::Long, ::Java::Long, Array.typed(::Java::Long)] }
+      # int
+      def ___vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2, arg3, arg4)
+        JNI.__send__("Java_org_eclipse_swt_internal_mozilla_XPCOM__1VtblCall__IJJL#{NsID.jni_name}_2JJ_3J".to_sym, JNI.env, self.jni_id, fn_number.to_int, pp_vtbl.to_int, arg0.to_int, arg1.jni_id, arg2.to_int, arg3.to_int, arg4.jni_id)
+      end
+      
+      typesig { [::Java::Int, ::Java::Long, ::Java::Long, NsID, ::Java::Long, ::Java::Long, Array.typed(::Java::Long)] }
+      # int
+      def _vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2, arg3, arg4)
+        PLATFORM_LOCK.lock
+        begin
+          return ___vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2, arg3, arg4)
+        ensure
+          PLATFORM_LOCK.unlock
+        end
+      end
+      
+      JNI.native_method :Java_org_eclipse_swt_internal_mozilla_XPCOM__1VtblCall__IJI_3B_3B_3BI_3I, [:pointer, :long, :int32, :int64, :int32, :long, :long, :long, :int32, :long], :int32
+      typesig { [::Java::Int, ::Java::Long, ::Java::Int, Array.typed(::Java::Byte), Array.typed(::Java::Byte), Array.typed(::Java::Byte), ::Java::Int, Array.typed(::Java::Int)] }
+      # int
+      def ___vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2, arg3, arg4, arg5)
+        JNI.__send__(:Java_org_eclipse_swt_internal_mozilla_XPCOM__1VtblCall__IJI_3B_3B_3BI_3I, JNI.env, self.jni_id, fn_number.to_int, pp_vtbl.to_int, arg0.to_int, arg1.jni_id, arg2.jni_id, arg3.jni_id, arg4.to_int, arg5.jni_id)
+      end
+      
       typesig { [::Java::Int, ::Java::Long, ::Java::Int, Array.typed(::Java::Byte), Array.typed(::Java::Byte), Array.typed(::Java::Byte), ::Java::Int, Array.typed(::Java::Int)] }
       # int
       def _vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2, arg3, arg4, arg5)
-        JNI.__send__(:Java_org_eclipse_swt_internal_mozilla_XPCOM_VtblCall__IJI_3B_3B_3BI_3I, JNI.env, self.jni_id, fn_number.to_int, pp_vtbl.to_int, arg0.to_int, arg1.jni_id, arg2.jni_id, arg3.jni_id, arg4.to_int, arg5.jni_id)
+        PLATFORM_LOCK.lock
+        begin
+          return ___vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2, arg3, arg4, arg5)
+        ensure
+          PLATFORM_LOCK.unlock
+        end
       end
       
-      JNI.native_method :Java_org_eclipse_swt_internal_mozilla_XPCOM_VtblCall__IJJ_3B_3B_3BJ_3J, [:pointer, :long, :int32, :int64, :int64, :long, :long, :long, :int64, :long], :int32
+      JNI.native_method :Java_org_eclipse_swt_internal_mozilla_XPCOM__1VtblCall__IJJ_3B_3B_3BJ_3J, [:pointer, :long, :int32, :int64, :int64, :long, :long, :long, :int64, :long], :int32
+      typesig { [::Java::Int, ::Java::Long, ::Java::Long, Array.typed(::Java::Byte), Array.typed(::Java::Byte), Array.typed(::Java::Byte), ::Java::Long, Array.typed(::Java::Long)] }
+      # int
+      def ___vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2, arg3, arg4, arg5)
+        JNI.__send__(:Java_org_eclipse_swt_internal_mozilla_XPCOM__1VtblCall__IJJ_3B_3B_3BJ_3J, JNI.env, self.jni_id, fn_number.to_int, pp_vtbl.to_int, arg0.to_int, arg1.jni_id, arg2.jni_id, arg3.jni_id, arg4.to_int, arg5.jni_id)
+      end
+      
       typesig { [::Java::Int, ::Java::Long, ::Java::Long, Array.typed(::Java::Byte), Array.typed(::Java::Byte), Array.typed(::Java::Byte), ::Java::Long, Array.typed(::Java::Long)] }
       # int
       def _vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2, arg3, arg4, arg5)
-        JNI.__send__(:Java_org_eclipse_swt_internal_mozilla_XPCOM_VtblCall__IJJ_3B_3B_3BJ_3J, JNI.env, self.jni_id, fn_number.to_int, pp_vtbl.to_int, arg0.to_int, arg1.jni_id, arg2.jni_id, arg3.jni_id, arg4.to_int, arg5.jni_id)
+        PLATFORM_LOCK.lock
+        begin
+          return ___vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2, arg3, arg4, arg5)
+        ensure
+          PLATFORM_LOCK.unlock
+        end
       end
       
-      JNI.native_method :Java_org_eclipse_swt_internal_mozilla_XPCOM_VtblCall__IJII_3CIJI, [:pointer, :long, :int32, :int64, :int32, :int32, :long, :int32, :int64, :int32], :int32
+      JNI.native_method :Java_org_eclipse_swt_internal_mozilla_XPCOM__1VtblCall__IJII_3CIJI, [:pointer, :long, :int32, :int64, :int32, :int32, :long, :int32, :int64, :int32], :int32
+      typesig { [::Java::Int, ::Java::Long, ::Java::Int, ::Java::Int, Array.typed(::Java::Char), ::Java::Int, ::Java::Long, ::Java::Int] }
+      # int
+      def ___vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2, arg3, arg4, arg5)
+        JNI.__send__(:Java_org_eclipse_swt_internal_mozilla_XPCOM__1VtblCall__IJII_3CIJI, JNI.env, self.jni_id, fn_number.to_int, pp_vtbl.to_int, arg0.to_int, arg1.to_int, arg2.jni_id, arg3.to_int, arg4.to_int, arg5.to_int)
+      end
+      
       typesig { [::Java::Int, ::Java::Long, ::Java::Int, ::Java::Int, Array.typed(::Java::Char), ::Java::Int, ::Java::Long, ::Java::Int] }
       # int
       def _vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2, arg3, arg4, arg5)
-        JNI.__send__(:Java_org_eclipse_swt_internal_mozilla_XPCOM_VtblCall__IJII_3CIJI, JNI.env, self.jni_id, fn_number.to_int, pp_vtbl.to_int, arg0.to_int, arg1.to_int, arg2.jni_id, arg3.to_int, arg4.to_int, arg5.to_int)
+        PLATFORM_LOCK.lock
+        begin
+          return ___vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2, arg3, arg4, arg5)
+        ensure
+          PLATFORM_LOCK.unlock
+        end
       end
       
-      JNI.native_method :Java_org_eclipse_swt_internal_mozilla_XPCOM_VtblCall__IJJJ_3CIJI, [:pointer, :long, :int32, :int64, :int64, :int64, :long, :int32, :int64, :int32], :int32
+      JNI.native_method :Java_org_eclipse_swt_internal_mozilla_XPCOM__1VtblCall__IJJJ_3CIJI, [:pointer, :long, :int32, :int64, :int64, :int64, :long, :int32, :int64, :int32], :int32
+      typesig { [::Java::Int, ::Java::Long, ::Java::Long, ::Java::Long, Array.typed(::Java::Char), ::Java::Int, ::Java::Long, ::Java::Int] }
+      # int
+      def ___vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2, arg3, arg4, arg5)
+        JNI.__send__(:Java_org_eclipse_swt_internal_mozilla_XPCOM__1VtblCall__IJJJ_3CIJI, JNI.env, self.jni_id, fn_number.to_int, pp_vtbl.to_int, arg0.to_int, arg1.to_int, arg2.jni_id, arg3.to_int, arg4.to_int, arg5.to_int)
+      end
+      
       typesig { [::Java::Int, ::Java::Long, ::Java::Long, ::Java::Long, Array.typed(::Java::Char), ::Java::Int, ::Java::Long, ::Java::Int] }
       # int
       def _vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2, arg3, arg4, arg5)
-        JNI.__send__(:Java_org_eclipse_swt_internal_mozilla_XPCOM_VtblCall__IJJJ_3CIJI, JNI.env, self.jni_id, fn_number.to_int, pp_vtbl.to_int, arg0.to_int, arg1.to_int, arg2.jni_id, arg3.to_int, arg4.to_int, arg5.to_int)
+        PLATFORM_LOCK.lock
+        begin
+          return ___vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2, arg3, arg4, arg5)
+        ensure
+          PLATFORM_LOCK.unlock
+        end
       end
       
-      JNI.native_method :Java_org_eclipse_swt_internal_mozilla_XPCOM_VtblCall__IJII_3CJJJ, [:pointer, :long, :int32, :int64, :int32, :int32, :long, :int64, :int64, :int64], :int32
+      JNI.native_method :Java_org_eclipse_swt_internal_mozilla_XPCOM__1VtblCall__IJII_3CJJJ, [:pointer, :long, :int32, :int64, :int32, :int32, :long, :int64, :int64, :int64], :int32
+      typesig { [::Java::Int, ::Java::Long, ::Java::Int, ::Java::Int, Array.typed(::Java::Char), ::Java::Long, ::Java::Long, ::Java::Long] }
+      # int
+      def ___vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2, arg3, arg4, arg5)
+        JNI.__send__(:Java_org_eclipse_swt_internal_mozilla_XPCOM__1VtblCall__IJII_3CJJJ, JNI.env, self.jni_id, fn_number.to_int, pp_vtbl.to_int, arg0.to_int, arg1.to_int, arg2.jni_id, arg3.to_int, arg4.to_int, arg5.to_int)
+      end
+      
       typesig { [::Java::Int, ::Java::Long, ::Java::Int, ::Java::Int, Array.typed(::Java::Char), ::Java::Long, ::Java::Long, ::Java::Long] }
       # int
       def _vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2, arg3, arg4, arg5)
-        JNI.__send__(:Java_org_eclipse_swt_internal_mozilla_XPCOM_VtblCall__IJII_3CJJJ, JNI.env, self.jni_id, fn_number.to_int, pp_vtbl.to_int, arg0.to_int, arg1.to_int, arg2.jni_id, arg3.to_int, arg4.to_int, arg5.to_int)
+        PLATFORM_LOCK.lock
+        begin
+          return ___vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2, arg3, arg4, arg5)
+        ensure
+          PLATFORM_LOCK.unlock
+        end
       end
       
-      JNI.native_method :Java_org_eclipse_swt_internal_mozilla_XPCOM_VtblCall__IJJJ_3CJJJ, [:pointer, :long, :int32, :int64, :int64, :int64, :long, :int64, :int64, :int64], :int32
+      JNI.native_method :Java_org_eclipse_swt_internal_mozilla_XPCOM__1VtblCall__IJJJ_3CJJJ, [:pointer, :long, :int32, :int64, :int64, :int64, :long, :int64, :int64, :int64], :int32
+      typesig { [::Java::Int, ::Java::Long, ::Java::Long, ::Java::Long, Array.typed(::Java::Char), ::Java::Long, ::Java::Long, ::Java::Long] }
+      # int
+      def ___vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2, arg3, arg4, arg5)
+        JNI.__send__(:Java_org_eclipse_swt_internal_mozilla_XPCOM__1VtblCall__IJJJ_3CJJJ, JNI.env, self.jni_id, fn_number.to_int, pp_vtbl.to_int, arg0.to_int, arg1.to_int, arg2.jni_id, arg3.to_int, arg4.to_int, arg5.to_int)
+      end
+      
       typesig { [::Java::Int, ::Java::Long, ::Java::Long, ::Java::Long, Array.typed(::Java::Char), ::Java::Long, ::Java::Long, ::Java::Long] }
       # int
       def _vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2, arg3, arg4, arg5)
-        JNI.__send__(:Java_org_eclipse_swt_internal_mozilla_XPCOM_VtblCall__IJJJ_3CJJJ, JNI.env, self.jni_id, fn_number.to_int, pp_vtbl.to_int, arg0.to_int, arg1.to_int, arg2.jni_id, arg3.to_int, arg4.to_int, arg5.to_int)
+        PLATFORM_LOCK.lock
+        begin
+          return ___vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2, arg3, arg4, arg5)
+        ensure
+          PLATFORM_LOCK.unlock
+        end
       end
       
-      JNI.native_method :Java_org_eclipse_swt_internal_mozilla_XPCOM_VtblCall__IJIIIIII, [:pointer, :long, :int32, :int64, :int32, :int32, :int32, :int32, :int32, :int32], :int32
+      JNI.native_method :Java_org_eclipse_swt_internal_mozilla_XPCOM__1VtblCall__IJ_3I_3I_3I_3I_3I_3I, [:pointer, :long, :int32, :int64, :long, :long, :long, :long, :long, :long], :int32
+      typesig { [::Java::Int, ::Java::Long, Array.typed(::Java::Int), Array.typed(::Java::Int), Array.typed(::Java::Int), Array.typed(::Java::Int), Array.typed(::Java::Int), Array.typed(::Java::Int)] }
+      # int
+      def ___vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2, arg3, arg4, arg5)
+        JNI.__send__(:Java_org_eclipse_swt_internal_mozilla_XPCOM__1VtblCall__IJ_3I_3I_3I_3I_3I_3I, JNI.env, self.jni_id, fn_number.to_int, pp_vtbl.to_int, arg0.jni_id, arg1.jni_id, arg2.jni_id, arg3.jni_id, arg4.jni_id, arg5.jni_id)
+      end
+      
+      typesig { [::Java::Int, ::Java::Long, Array.typed(::Java::Int), Array.typed(::Java::Int), Array.typed(::Java::Int), Array.typed(::Java::Int), Array.typed(::Java::Int), Array.typed(::Java::Int)] }
+      # int
+      def _vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2, arg3, arg4, arg5)
+        PLATFORM_LOCK.lock
+        begin
+          return ___vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2, arg3, arg4, arg5)
+        ensure
+          PLATFORM_LOCK.unlock
+        end
+      end
+      
+      JNI.native_method :Java_org_eclipse_swt_internal_mozilla_XPCOM__1VtblCall__IJ_3J_3J_3J_3J_3J_3I, [:pointer, :long, :int32, :int64, :long, :long, :long, :long, :long, :long], :int32
+      typesig { [::Java::Int, ::Java::Long, Array.typed(::Java::Long), Array.typed(::Java::Long), Array.typed(::Java::Long), Array.typed(::Java::Long), Array.typed(::Java::Long), Array.typed(::Java::Int)] }
+      # int
+      def ___vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2, arg3, arg4, arg5)
+        JNI.__send__(:Java_org_eclipse_swt_internal_mozilla_XPCOM__1VtblCall__IJ_3J_3J_3J_3J_3J_3I, JNI.env, self.jni_id, fn_number.to_int, pp_vtbl.to_int, arg0.jni_id, arg1.jni_id, arg2.jni_id, arg3.jni_id, arg4.jni_id, arg5.jni_id)
+      end
+      
+      typesig { [::Java::Int, ::Java::Long, Array.typed(::Java::Long), Array.typed(::Java::Long), Array.typed(::Java::Long), Array.typed(::Java::Long), Array.typed(::Java::Long), Array.typed(::Java::Int)] }
+      # int
+      def _vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2, arg3, arg4, arg5)
+        PLATFORM_LOCK.lock
+        begin
+          return ___vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2, arg3, arg4, arg5)
+        ensure
+          PLATFORM_LOCK.unlock
+        end
+      end
+      
+      JNI.native_method :Java_org_eclipse_swt_internal_mozilla_XPCOM__1VtblCall__IJIIIIII, [:pointer, :long, :int32, :int64, :int32, :int32, :int32, :int32, :int32, :int32], :int32
+      typesig { [::Java::Int, ::Java::Long, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int] }
+      # int
+      def ___vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2, arg3, arg4, arg5)
+        JNI.__send__(:Java_org_eclipse_swt_internal_mozilla_XPCOM__1VtblCall__IJIIIIII, JNI.env, self.jni_id, fn_number.to_int, pp_vtbl.to_int, arg0.to_int, arg1.to_int, arg2.to_int, arg3.to_int, arg4.to_int, arg5.to_int)
+      end
+      
       typesig { [::Java::Int, ::Java::Long, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int] }
       # int
       def _vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2, arg3, arg4, arg5)
-        JNI.__send__(:Java_org_eclipse_swt_internal_mozilla_XPCOM_VtblCall__IJIIIIII, JNI.env, self.jni_id, fn_number.to_int, pp_vtbl.to_int, arg0.to_int, arg1.to_int, arg2.to_int, arg3.to_int, arg4.to_int, arg5.to_int)
+        PLATFORM_LOCK.lock
+        begin
+          return ___vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2, arg3, arg4, arg5)
+        ensure
+          PLATFORM_LOCK.unlock
+        end
       end
       
-      JNI.native_method :Java_org_eclipse_swt_internal_mozilla_XPCOM_VtblCall__IJJJIIII, [:pointer, :long, :int32, :int64, :int64, :int64, :int32, :int32, :int32, :int32], :int32
+      JNI.native_method :Java_org_eclipse_swt_internal_mozilla_XPCOM__1VtblCall__IJJJIIII, [:pointer, :long, :int32, :int64, :int64, :int64, :int32, :int32, :int32, :int32], :int32
+      typesig { [::Java::Int, ::Java::Long, ::Java::Long, ::Java::Long, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int] }
+      # int
+      def ___vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2, arg3, arg4, arg5)
+        JNI.__send__(:Java_org_eclipse_swt_internal_mozilla_XPCOM__1VtblCall__IJJJIIII, JNI.env, self.jni_id, fn_number.to_int, pp_vtbl.to_int, arg0.to_int, arg1.to_int, arg2.to_int, arg3.to_int, arg4.to_int, arg5.to_int)
+      end
+      
       typesig { [::Java::Int, ::Java::Long, ::Java::Long, ::Java::Long, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int] }
       # int
       def _vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2, arg3, arg4, arg5)
-        JNI.__send__(:Java_org_eclipse_swt_internal_mozilla_XPCOM_VtblCall__IJJJIIII, JNI.env, self.jni_id, fn_number.to_int, pp_vtbl.to_int, arg0.to_int, arg1.to_int, arg2.to_int, arg3.to_int, arg4.to_int, arg5.to_int)
+        PLATFORM_LOCK.lock
+        begin
+          return ___vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2, arg3, arg4, arg5)
+        ensure
+          PLATFORM_LOCK.unlock
+        end
       end
       
-      JNI.native_method "Java_org_eclipse_swt_internal_mozilla_XPCOM_VtblCall__IJL#{NsID.jni_name}_2_3B_3BI_3B_3B".to_sym, [:pointer, :long, :int32, :int64, :long, :long, :long, :int32, :long, :long], :int32
+      JNI.native_method :Java_org_eclipse_swt_internal_mozilla_XPCOM__1VtblCall__IJIIIII_3I, [:pointer, :long, :int32, :int64, :int32, :int32, :int32, :int32, :int32, :long], :int32
+      typesig { [::Java::Int, ::Java::Long, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, Array.typed(::Java::Int)] }
+      # int
+      def ___vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2, arg3, arg4, arg5)
+        JNI.__send__(:Java_org_eclipse_swt_internal_mozilla_XPCOM__1VtblCall__IJIIIII_3I, JNI.env, self.jni_id, fn_number.to_int, pp_vtbl.to_int, arg0.to_int, arg1.to_int, arg2.to_int, arg3.to_int, arg4.to_int, arg5.jni_id)
+      end
+      
+      typesig { [::Java::Int, ::Java::Long, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, Array.typed(::Java::Int)] }
+      # int
+      def _vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2, arg3, arg4, arg5)
+        PLATFORM_LOCK.lock
+        begin
+          return ___vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2, arg3, arg4, arg5)
+        ensure
+          PLATFORM_LOCK.unlock
+        end
+      end
+      
+      JNI.native_method :Java_org_eclipse_swt_internal_mozilla_XPCOM__1VtblCall__IJJJJJJ_3J, [:pointer, :long, :int32, :int64, :int64, :int64, :int64, :int64, :int64, :long], :int32
+      typesig { [::Java::Int, ::Java::Long, ::Java::Long, ::Java::Long, ::Java::Long, ::Java::Long, ::Java::Long, Array.typed(::Java::Long)] }
+      # int
+      def ___vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2, arg3, arg4, arg5)
+        JNI.__send__(:Java_org_eclipse_swt_internal_mozilla_XPCOM__1VtblCall__IJJJJJJ_3J, JNI.env, self.jni_id, fn_number.to_int, pp_vtbl.to_int, arg0.to_int, arg1.to_int, arg2.to_int, arg3.to_int, arg4.to_int, arg5.jni_id)
+      end
+      
+      typesig { [::Java::Int, ::Java::Long, ::Java::Long, ::Java::Long, ::Java::Long, ::Java::Long, ::Java::Long, Array.typed(::Java::Long)] }
+      # int
+      def _vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2, arg3, arg4, arg5)
+        PLATFORM_LOCK.lock
+        begin
+          return ___vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2, arg3, arg4, arg5)
+        ensure
+          PLATFORM_LOCK.unlock
+        end
+      end
+      
+      JNI.native_method "Java_org_eclipse_swt_internal_mozilla_XPCOM__1VtblCall__IJL#{NsID.jni_name}_2_3B_3BI_3B_3B".to_sym, [:pointer, :long, :int32, :int64, :long, :long, :long, :int32, :long, :long], :int32
+      typesig { [::Java::Int, ::Java::Long, NsID, Array.typed(::Java::Byte), Array.typed(::Java::Byte), ::Java::Int, Array.typed(::Java::Byte), Array.typed(::Java::Byte)] }
+      # int
+      def ___vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2, arg3, arg4, arg5)
+        JNI.__send__("Java_org_eclipse_swt_internal_mozilla_XPCOM__1VtblCall__IJL#{NsID.jni_name}_2_3B_3BI_3B_3B".to_sym, JNI.env, self.jni_id, fn_number.to_int, pp_vtbl.to_int, arg0.jni_id, arg1.jni_id, arg2.jni_id, arg3.to_int, arg4.jni_id, arg5.jni_id)
+      end
+      
       typesig { [::Java::Int, ::Java::Long, NsID, Array.typed(::Java::Byte), Array.typed(::Java::Byte), ::Java::Int, Array.typed(::Java::Byte), Array.typed(::Java::Byte)] }
       # int
       def _vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2, arg3, arg4, arg5)
-        JNI.__send__("Java_org_eclipse_swt_internal_mozilla_XPCOM_VtblCall__IJL#{NsID.jni_name}_2_3B_3BI_3B_3B".to_sym, JNI.env, self.jni_id, fn_number.to_int, pp_vtbl.to_int, arg0.jni_id, arg1.jni_id, arg2.jni_id, arg3.to_int, arg4.jni_id, arg5.jni_id)
+        PLATFORM_LOCK.lock
+        begin
+          return ___vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2, arg3, arg4, arg5)
+        ensure
+          PLATFORM_LOCK.unlock
+        end
       end
       
-      JNI.native_method "Java_org_eclipse_swt_internal_mozilla_XPCOM_VtblCall__IJL#{NsID.jni_name}_2_3B_3BJ_3B_3B".to_sym, [:pointer, :long, :int32, :int64, :long, :long, :long, :int64, :long, :long], :int32
+      JNI.native_method "Java_org_eclipse_swt_internal_mozilla_XPCOM__1VtblCall__IJL#{NsID.jni_name}_2_3B_3BJ_3B_3B".to_sym, [:pointer, :long, :int32, :int64, :long, :long, :long, :int64, :long, :long], :int32
+      typesig { [::Java::Int, ::Java::Long, NsID, Array.typed(::Java::Byte), Array.typed(::Java::Byte), ::Java::Long, Array.typed(::Java::Byte), Array.typed(::Java::Byte)] }
+      # int
+      def ___vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2, arg3, arg4, arg5)
+        JNI.__send__("Java_org_eclipse_swt_internal_mozilla_XPCOM__1VtblCall__IJL#{NsID.jni_name}_2_3B_3BJ_3B_3B".to_sym, JNI.env, self.jni_id, fn_number.to_int, pp_vtbl.to_int, arg0.jni_id, arg1.jni_id, arg2.jni_id, arg3.to_int, arg4.jni_id, arg5.jni_id)
+      end
+      
       typesig { [::Java::Int, ::Java::Long, NsID, Array.typed(::Java::Byte), Array.typed(::Java::Byte), ::Java::Long, Array.typed(::Java::Byte), Array.typed(::Java::Byte)] }
       # int
       def _vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2, arg3, arg4, arg5)
-        JNI.__send__("Java_org_eclipse_swt_internal_mozilla_XPCOM_VtblCall__IJL#{NsID.jni_name}_2_3B_3BJ_3B_3B".to_sym, JNI.env, self.jni_id, fn_number.to_int, pp_vtbl.to_int, arg0.jni_id, arg1.jni_id, arg2.jni_id, arg3.to_int, arg4.jni_id, arg5.jni_id)
+        PLATFORM_LOCK.lock
+        begin
+          return ___vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2, arg3, arg4, arg5)
+        ensure
+          PLATFORM_LOCK.unlock
+        end
       end
       
-      JNI.native_method :Java_org_eclipse_swt_internal_mozilla_XPCOM_VtblCall__IJIIJJJJ, [:pointer, :long, :int32, :int64, :int32, :int32, :int64, :int64, :int64, :int64], :int32
+      JNI.native_method :Java_org_eclipse_swt_internal_mozilla_XPCOM__1VtblCall__IJIIJJJJ, [:pointer, :long, :int32, :int64, :int32, :int32, :int64, :int64, :int64, :int64], :int32
+      typesig { [::Java::Int, ::Java::Long, ::Java::Int, ::Java::Int, ::Java::Long, ::Java::Long, ::Java::Long, ::Java::Long] }
+      # int
+      def ___vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2, arg3, arg4, arg5)
+        JNI.__send__(:Java_org_eclipse_swt_internal_mozilla_XPCOM__1VtblCall__IJIIJJJJ, JNI.env, self.jni_id, fn_number.to_int, pp_vtbl.to_int, arg0.to_int, arg1.to_int, arg2.to_int, arg3.to_int, arg4.to_int, arg5.to_int)
+      end
+      
       typesig { [::Java::Int, ::Java::Long, ::Java::Int, ::Java::Int, ::Java::Long, ::Java::Long, ::Java::Long, ::Java::Long] }
       # int
       def _vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2, arg3, arg4, arg5)
-        JNI.__send__(:Java_org_eclipse_swt_internal_mozilla_XPCOM_VtblCall__IJIIJJJJ, JNI.env, self.jni_id, fn_number.to_int, pp_vtbl.to_int, arg0.to_int, arg1.to_int, arg2.to_int, arg3.to_int, arg4.to_int, arg5.to_int)
+        PLATFORM_LOCK.lock
+        begin
+          return ___vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2, arg3, arg4, arg5)
+        ensure
+          PLATFORM_LOCK.unlock
+        end
       end
       
-      JNI.native_method :Java_org_eclipse_swt_internal_mozilla_XPCOM_VtblCall__IJJJJJJJ, [:pointer, :long, :int32, :int64, :int64, :int64, :int64, :int64, :int64, :int64], :int32
+      JNI.native_method :Java_org_eclipse_swt_internal_mozilla_XPCOM__1VtblCall__IJJJJJJJ, [:pointer, :long, :int32, :int64, :int64, :int64, :int64, :int64, :int64, :int64], :int32
+      typesig { [::Java::Int, ::Java::Long, ::Java::Long, ::Java::Long, ::Java::Long, ::Java::Long, ::Java::Long, ::Java::Long] }
+      # int
+      def ___vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2, arg3, arg4, arg5)
+        JNI.__send__(:Java_org_eclipse_swt_internal_mozilla_XPCOM__1VtblCall__IJJJJJJJ, JNI.env, self.jni_id, fn_number.to_int, pp_vtbl.to_int, arg0.to_int, arg1.to_int, arg2.to_int, arg3.to_int, arg4.to_int, arg5.to_int)
+      end
+      
       typesig { [::Java::Int, ::Java::Long, ::Java::Long, ::Java::Long, ::Java::Long, ::Java::Long, ::Java::Long, ::Java::Long] }
       # int
       def _vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2, arg3, arg4, arg5)
-        JNI.__send__(:Java_org_eclipse_swt_internal_mozilla_XPCOM_VtblCall__IJJJJJJJ, JNI.env, self.jni_id, fn_number.to_int, pp_vtbl.to_int, arg0.to_int, arg1.to_int, arg2.to_int, arg3.to_int, arg4.to_int, arg5.to_int)
+        PLATFORM_LOCK.lock
+        begin
+          return ___vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2, arg3, arg4, arg5)
+        ensure
+          PLATFORM_LOCK.unlock
+        end
       end
       
-      JNI.native_method :Java_org_eclipse_swt_internal_mozilla_XPCOM_VtblCall__IJI_3C_3C_3C_3I_3I, [:pointer, :long, :int32, :int64, :int32, :long, :long, :long, :long, :long], :int32
+      JNI.native_method :Java_org_eclipse_swt_internal_mozilla_XPCOM__1VtblCall__IJI_3C_3C_3C_3I_3I, [:pointer, :long, :int32, :int64, :int32, :long, :long, :long, :long, :long], :int32
+      typesig { [::Java::Int, ::Java::Long, ::Java::Int, Array.typed(::Java::Char), Array.typed(::Java::Char), Array.typed(::Java::Char), Array.typed(::Java::Int), Array.typed(::Java::Int)] }
+      # int
+      def ___vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2, arg3, arg4, arg5)
+        JNI.__send__(:Java_org_eclipse_swt_internal_mozilla_XPCOM__1VtblCall__IJI_3C_3C_3C_3I_3I, JNI.env, self.jni_id, fn_number.to_int, pp_vtbl.to_int, arg0.to_int, arg1.jni_id, arg2.jni_id, arg3.jni_id, arg4.jni_id, arg5.jni_id)
+      end
+      
       typesig { [::Java::Int, ::Java::Long, ::Java::Int, Array.typed(::Java::Char), Array.typed(::Java::Char), Array.typed(::Java::Char), Array.typed(::Java::Int), Array.typed(::Java::Int)] }
       # int
       def _vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2, arg3, arg4, arg5)
-        JNI.__send__(:Java_org_eclipse_swt_internal_mozilla_XPCOM_VtblCall__IJI_3C_3C_3C_3I_3I, JNI.env, self.jni_id, fn_number.to_int, pp_vtbl.to_int, arg0.to_int, arg1.jni_id, arg2.jni_id, arg3.jni_id, arg4.jni_id, arg5.jni_id)
+        PLATFORM_LOCK.lock
+        begin
+          return ___vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2, arg3, arg4, arg5)
+        ensure
+          PLATFORM_LOCK.unlock
+        end
       end
       
-      JNI.native_method :Java_org_eclipse_swt_internal_mozilla_XPCOM_VtblCall__IJJ_3C_3C_3C_3I_3I, [:pointer, :long, :int32, :int64, :int64, :long, :long, :long, :long, :long], :int32
+      JNI.native_method :Java_org_eclipse_swt_internal_mozilla_XPCOM__1VtblCall__IJJ_3C_3C_3C_3I_3I, [:pointer, :long, :int32, :int64, :int64, :long, :long, :long, :long, :long], :int32
+      typesig { [::Java::Int, ::Java::Long, ::Java::Long, Array.typed(::Java::Char), Array.typed(::Java::Char), Array.typed(::Java::Char), Array.typed(::Java::Int), Array.typed(::Java::Int)] }
+      # int
+      def ___vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2, arg3, arg4, arg5)
+        JNI.__send__(:Java_org_eclipse_swt_internal_mozilla_XPCOM__1VtblCall__IJJ_3C_3C_3C_3I_3I, JNI.env, self.jni_id, fn_number.to_int, pp_vtbl.to_int, arg0.to_int, arg1.jni_id, arg2.jni_id, arg3.jni_id, arg4.jni_id, arg5.jni_id)
+      end
+      
       typesig { [::Java::Int, ::Java::Long, ::Java::Long, Array.typed(::Java::Char), Array.typed(::Java::Char), Array.typed(::Java::Char), Array.typed(::Java::Int), Array.typed(::Java::Int)] }
       # int
       def _vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2, arg3, arg4, arg5)
-        JNI.__send__(:Java_org_eclipse_swt_internal_mozilla_XPCOM_VtblCall__IJJ_3C_3C_3C_3I_3I, JNI.env, self.jni_id, fn_number.to_int, pp_vtbl.to_int, arg0.to_int, arg1.jni_id, arg2.jni_id, arg3.jni_id, arg4.jni_id, arg5.jni_id)
+        PLATFORM_LOCK.lock
+        begin
+          return ___vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2, arg3, arg4, arg5)
+        ensure
+          PLATFORM_LOCK.unlock
+        end
       end
       
-      JNI.native_method :Java_org_eclipse_swt_internal_mozilla_XPCOM_VtblCall__IJ_3B_3B_3BII_3I, [:pointer, :long, :int32, :int64, :long, :long, :long, :int32, :int32, :long], :int32
+      JNI.native_method :Java_org_eclipse_swt_internal_mozilla_XPCOM__1VtblCall__IJ_3B_3B_3BII_3I, [:pointer, :long, :int32, :int64, :long, :long, :long, :int32, :int32, :long], :int32
+      typesig { [::Java::Int, ::Java::Long, Array.typed(::Java::Byte), Array.typed(::Java::Byte), Array.typed(::Java::Byte), ::Java::Int, ::Java::Int, Array.typed(::Java::Int)] }
+      # int
+      def ___vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2, arg3, arg4, arg5)
+        JNI.__send__(:Java_org_eclipse_swt_internal_mozilla_XPCOM__1VtblCall__IJ_3B_3B_3BII_3I, JNI.env, self.jni_id, fn_number.to_int, pp_vtbl.to_int, arg0.jni_id, arg1.jni_id, arg2.jni_id, arg3.to_int, arg4.to_int, arg5.jni_id)
+      end
+      
       typesig { [::Java::Int, ::Java::Long, Array.typed(::Java::Byte), Array.typed(::Java::Byte), Array.typed(::Java::Byte), ::Java::Int, ::Java::Int, Array.typed(::Java::Int)] }
       # int
       def _vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2, arg3, arg4, arg5)
-        JNI.__send__(:Java_org_eclipse_swt_internal_mozilla_XPCOM_VtblCall__IJ_3B_3B_3BII_3I, JNI.env, self.jni_id, fn_number.to_int, pp_vtbl.to_int, arg0.jni_id, arg1.jni_id, arg2.jni_id, arg3.to_int, arg4.to_int, arg5.jni_id)
+        PLATFORM_LOCK.lock
+        begin
+          return ___vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2, arg3, arg4, arg5)
+        ensure
+          PLATFORM_LOCK.unlock
+        end
       end
       
-      JNI.native_method :Java_org_eclipse_swt_internal_mozilla_XPCOM_VtblCall__IJ_3B_3B_3BII_3J, [:pointer, :long, :int32, :int64, :long, :long, :long, :int32, :int32, :long], :int32
+      JNI.native_method :Java_org_eclipse_swt_internal_mozilla_XPCOM__1VtblCall__IJ_3B_3B_3BII_3J, [:pointer, :long, :int32, :int64, :long, :long, :long, :int32, :int32, :long], :int32
+      typesig { [::Java::Int, ::Java::Long, Array.typed(::Java::Byte), Array.typed(::Java::Byte), Array.typed(::Java::Byte), ::Java::Int, ::Java::Int, Array.typed(::Java::Long)] }
+      # int
+      def ___vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2, arg3, arg4, arg5)
+        JNI.__send__(:Java_org_eclipse_swt_internal_mozilla_XPCOM__1VtblCall__IJ_3B_3B_3BII_3J, JNI.env, self.jni_id, fn_number.to_int, pp_vtbl.to_int, arg0.jni_id, arg1.jni_id, arg2.jni_id, arg3.to_int, arg4.to_int, arg5.jni_id)
+      end
+      
       typesig { [::Java::Int, ::Java::Long, Array.typed(::Java::Byte), Array.typed(::Java::Byte), Array.typed(::Java::Byte), ::Java::Int, ::Java::Int, Array.typed(::Java::Long)] }
       # int
       def _vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2, arg3, arg4, arg5)
-        JNI.__send__(:Java_org_eclipse_swt_internal_mozilla_XPCOM_VtblCall__IJ_3B_3B_3BII_3J, JNI.env, self.jni_id, fn_number.to_int, pp_vtbl.to_int, arg0.jni_id, arg1.jni_id, arg2.jni_id, arg3.to_int, arg4.to_int, arg5.jni_id)
+        PLATFORM_LOCK.lock
+        begin
+          return ___vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2, arg3, arg4, arg5)
+        ensure
+          PLATFORM_LOCK.unlock
+        end
       end
       
-      JNI.native_method :Java_org_eclipse_swt_internal_mozilla_XPCOM_VtblCall__IJIIII_3I_3I, [:pointer, :long, :int32, :int64, :int32, :int32, :int32, :int32, :long, :long], :int32
+      JNI.native_method :Java_org_eclipse_swt_internal_mozilla_XPCOM__1VtblCall__IJIIII_3I_3I, [:pointer, :long, :int32, :int64, :int32, :int32, :int32, :int32, :long, :long], :int32
+      typesig { [::Java::Int, ::Java::Long, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, Array.typed(::Java::Int), Array.typed(::Java::Int)] }
+      # int
+      def ___vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2, arg3, arg4, arg5)
+        JNI.__send__(:Java_org_eclipse_swt_internal_mozilla_XPCOM__1VtblCall__IJIIII_3I_3I, JNI.env, self.jni_id, fn_number.to_int, pp_vtbl.to_int, arg0.to_int, arg1.to_int, arg2.to_int, arg3.to_int, arg4.jni_id, arg5.jni_id)
+      end
+      
       typesig { [::Java::Int, ::Java::Long, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, Array.typed(::Java::Int), Array.typed(::Java::Int)] }
       # int
       def _vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2, arg3, arg4, arg5)
-        JNI.__send__(:Java_org_eclipse_swt_internal_mozilla_XPCOM_VtblCall__IJIIII_3I_3I, JNI.env, self.jni_id, fn_number.to_int, pp_vtbl.to_int, arg0.to_int, arg1.to_int, arg2.to_int, arg3.to_int, arg4.jni_id, arg5.jni_id)
+        PLATFORM_LOCK.lock
+        begin
+          return ___vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2, arg3, arg4, arg5)
+        ensure
+          PLATFORM_LOCK.unlock
+        end
       end
       
-      JNI.native_method :Java_org_eclipse_swt_internal_mozilla_XPCOM_VtblCall__IJJIIJ_3I_3J, [:pointer, :long, :int32, :int64, :int64, :int32, :int32, :int64, :long, :long], :int32
+      JNI.native_method :Java_org_eclipse_swt_internal_mozilla_XPCOM__1VtblCall__IJJIIJ_3I_3J, [:pointer, :long, :int32, :int64, :int64, :int32, :int32, :int64, :long, :long], :int32
+      typesig { [::Java::Int, ::Java::Long, ::Java::Long, ::Java::Int, ::Java::Int, ::Java::Long, Array.typed(::Java::Int), Array.typed(::Java::Long)] }
+      # int
+      def ___vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2, arg3, arg4, arg5)
+        JNI.__send__(:Java_org_eclipse_swt_internal_mozilla_XPCOM__1VtblCall__IJJIIJ_3I_3J, JNI.env, self.jni_id, fn_number.to_int, pp_vtbl.to_int, arg0.to_int, arg1.to_int, arg2.to_int, arg3.to_int, arg4.jni_id, arg5.jni_id)
+      end
+      
       typesig { [::Java::Int, ::Java::Long, ::Java::Long, ::Java::Int, ::Java::Int, ::Java::Long, Array.typed(::Java::Int), Array.typed(::Java::Long)] }
       # int
       def _vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2, arg3, arg4, arg5)
-        JNI.__send__(:Java_org_eclipse_swt_internal_mozilla_XPCOM_VtblCall__IJJIIJ_3I_3J, JNI.env, self.jni_id, fn_number.to_int, pp_vtbl.to_int, arg0.to_int, arg1.to_int, arg2.to_int, arg3.to_int, arg4.jni_id, arg5.jni_id)
+        PLATFORM_LOCK.lock
+        begin
+          return ___vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2, arg3, arg4, arg5)
+        ensure
+          PLATFORM_LOCK.unlock
+        end
       end
       
-      JNI.native_method :Java_org_eclipse_swt_internal_mozilla_XPCOM_VtblCall__IJI_3C_3CI_3I_3I_3I, [:pointer, :long, :int32, :int64, :int32, :long, :long, :int32, :long, :long, :long], :int32
+      JNI.native_method :Java_org_eclipse_swt_internal_mozilla_XPCOM__1VtblCall__IJII_3C_3CI_3I, [:pointer, :long, :int32, :int64, :int32, :int32, :long, :long, :int32, :long], :int32
+      typesig { [::Java::Int, ::Java::Long, ::Java::Int, ::Java::Int, Array.typed(::Java::Char), Array.typed(::Java::Char), ::Java::Int, Array.typed(::Java::Int)] }
+      # int
+      def ___vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2, arg3, arg4, arg5)
+        JNI.__send__(:Java_org_eclipse_swt_internal_mozilla_XPCOM__1VtblCall__IJII_3C_3CI_3I, JNI.env, self.jni_id, fn_number.to_int, pp_vtbl.to_int, arg0.to_int, arg1.to_int, arg2.jni_id, arg3.jni_id, arg4.to_int, arg5.jni_id)
+      end
+      
+      typesig { [::Java::Int, ::Java::Long, ::Java::Int, ::Java::Int, Array.typed(::Java::Char), Array.typed(::Java::Char), ::Java::Int, Array.typed(::Java::Int)] }
+      # int
+      def _vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2, arg3, arg4, arg5)
+        PLATFORM_LOCK.lock
+        begin
+          return ___vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2, arg3, arg4, arg5)
+        ensure
+          PLATFORM_LOCK.unlock
+        end
+      end
+      
+      JNI.native_method :Java_org_eclipse_swt_internal_mozilla_XPCOM__1VtblCall__IJJJ_3C_3CI_3J, [:pointer, :long, :int32, :int64, :int64, :int64, :long, :long, :int32, :long], :int32
+      typesig { [::Java::Int, ::Java::Long, ::Java::Long, ::Java::Long, Array.typed(::Java::Char), Array.typed(::Java::Char), ::Java::Int, Array.typed(::Java::Long)] }
+      # int
+      def ___vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2, arg3, arg4, arg5)
+        JNI.__send__(:Java_org_eclipse_swt_internal_mozilla_XPCOM__1VtblCall__IJJJ_3C_3CI_3J, JNI.env, self.jni_id, fn_number.to_int, pp_vtbl.to_int, arg0.to_int, arg1.to_int, arg2.jni_id, arg3.jni_id, arg4.to_int, arg5.jni_id)
+      end
+      
+      typesig { [::Java::Int, ::Java::Long, ::Java::Long, ::Java::Long, Array.typed(::Java::Char), Array.typed(::Java::Char), ::Java::Int, Array.typed(::Java::Long)] }
+      # int
+      def _vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2, arg3, arg4, arg5)
+        PLATFORM_LOCK.lock
+        begin
+          return ___vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2, arg3, arg4, arg5)
+        ensure
+          PLATFORM_LOCK.unlock
+        end
+      end
+      
+      JNI.native_method :Java_org_eclipse_swt_internal_mozilla_XPCOM__1VtblCall__IJIII_3B_3BI, [:pointer, :long, :int32, :int64, :int32, :int32, :int32, :long, :long, :int32], :int32
+      typesig { [::Java::Int, ::Java::Long, ::Java::Int, ::Java::Int, ::Java::Int, Array.typed(::Java::Byte), Array.typed(::Java::Byte), ::Java::Int] }
+      # int
+      def ___vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2, arg3, arg4, arg5)
+        JNI.__send__(:Java_org_eclipse_swt_internal_mozilla_XPCOM__1VtblCall__IJIII_3B_3BI, JNI.env, self.jni_id, fn_number.to_int, pp_vtbl.to_int, arg0.to_int, arg1.to_int, arg2.to_int, arg3.jni_id, arg4.jni_id, arg5.to_int)
+      end
+      
+      typesig { [::Java::Int, ::Java::Long, ::Java::Int, ::Java::Int, ::Java::Int, Array.typed(::Java::Byte), Array.typed(::Java::Byte), ::Java::Int] }
+      # int
+      def _vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2, arg3, arg4, arg5)
+        PLATFORM_LOCK.lock
+        begin
+          return ___vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2, arg3, arg4, arg5)
+        ensure
+          PLATFORM_LOCK.unlock
+        end
+      end
+      
+      JNI.native_method :Java_org_eclipse_swt_internal_mozilla_XPCOM__1VtblCall__IJJJJ_3B_3BJ, [:pointer, :long, :int32, :int64, :int64, :int64, :int64, :long, :long, :int64], :int32
+      typesig { [::Java::Int, ::Java::Long, ::Java::Long, ::Java::Long, ::Java::Long, Array.typed(::Java::Byte), Array.typed(::Java::Byte), ::Java::Long] }
+      # int
+      def ___vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2, arg3, arg4, arg5)
+        JNI.__send__(:Java_org_eclipse_swt_internal_mozilla_XPCOM__1VtblCall__IJJJJ_3B_3BJ, JNI.env, self.jni_id, fn_number.to_int, pp_vtbl.to_int, arg0.to_int, arg1.to_int, arg2.to_int, arg3.jni_id, arg4.jni_id, arg5.to_int)
+      end
+      
+      typesig { [::Java::Int, ::Java::Long, ::Java::Long, ::Java::Long, ::Java::Long, Array.typed(::Java::Byte), Array.typed(::Java::Byte), ::Java::Long] }
+      # int
+      def _vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2, arg3, arg4, arg5)
+        PLATFORM_LOCK.lock
+        begin
+          return ___vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2, arg3, arg4, arg5)
+        ensure
+          PLATFORM_LOCK.unlock
+        end
+      end
+      
+      JNI.native_method :Java_org_eclipse_swt_internal_mozilla_XPCOM__1VtblCall__IJI_3C_3CI_3I_3I_3I, [:pointer, :long, :int32, :int64, :int32, :long, :long, :int32, :long, :long, :long], :int32
+      typesig { [::Java::Int, ::Java::Long, ::Java::Int, Array.typed(::Java::Char), Array.typed(::Java::Char), ::Java::Int, Array.typed(::Java::Int), Array.typed(::Java::Int), Array.typed(::Java::Int)] }
+      # int
+      def ___vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2, arg3, arg4, arg5, arg6)
+        JNI.__send__(:Java_org_eclipse_swt_internal_mozilla_XPCOM__1VtblCall__IJI_3C_3CI_3I_3I_3I, JNI.env, self.jni_id, fn_number.to_int, pp_vtbl.to_int, arg0.to_int, arg1.jni_id, arg2.jni_id, arg3.to_int, arg4.jni_id, arg5.jni_id, arg6.jni_id)
+      end
+      
       typesig { [::Java::Int, ::Java::Long, ::Java::Int, Array.typed(::Java::Char), Array.typed(::Java::Char), ::Java::Int, Array.typed(::Java::Int), Array.typed(::Java::Int), Array.typed(::Java::Int)] }
       # int
       def _vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2, arg3, arg4, arg5, arg6)
-        JNI.__send__(:Java_org_eclipse_swt_internal_mozilla_XPCOM_VtblCall__IJI_3C_3CI_3I_3I_3I, JNI.env, self.jni_id, fn_number.to_int, pp_vtbl.to_int, arg0.to_int, arg1.jni_id, arg2.jni_id, arg3.to_int, arg4.jni_id, arg5.jni_id, arg6.jni_id)
+        PLATFORM_LOCK.lock
+        begin
+          return ___vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2, arg3, arg4, arg5, arg6)
+        ensure
+          PLATFORM_LOCK.unlock
+        end
       end
       
-      JNI.native_method :Java_org_eclipse_swt_internal_mozilla_XPCOM_VtblCall__IJJ_3C_3CI_3J_3I_3I, [:pointer, :long, :int32, :int64, :int64, :long, :long, :int32, :long, :long, :long], :int32
+      JNI.native_method :Java_org_eclipse_swt_internal_mozilla_XPCOM__1VtblCall__IJJ_3C_3CI_3J_3I_3I, [:pointer, :long, :int32, :int64, :int64, :long, :long, :int32, :long, :long, :long], :int32
+      typesig { [::Java::Int, ::Java::Long, ::Java::Long, Array.typed(::Java::Char), Array.typed(::Java::Char), ::Java::Int, Array.typed(::Java::Long), Array.typed(::Java::Int), Array.typed(::Java::Int)] }
+      # int
+      def ___vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2, arg3, arg4, arg5, arg6)
+        JNI.__send__(:Java_org_eclipse_swt_internal_mozilla_XPCOM__1VtblCall__IJJ_3C_3CI_3J_3I_3I, JNI.env, self.jni_id, fn_number.to_int, pp_vtbl.to_int, arg0.to_int, arg1.jni_id, arg2.jni_id, arg3.to_int, arg4.jni_id, arg5.jni_id, arg6.jni_id)
+      end
+      
       typesig { [::Java::Int, ::Java::Long, ::Java::Long, Array.typed(::Java::Char), Array.typed(::Java::Char), ::Java::Int, Array.typed(::Java::Long), Array.typed(::Java::Int), Array.typed(::Java::Int)] }
       # int
       def _vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2, arg3, arg4, arg5, arg6)
-        JNI.__send__(:Java_org_eclipse_swt_internal_mozilla_XPCOM_VtblCall__IJJ_3C_3CI_3J_3I_3I, JNI.env, self.jni_id, fn_number.to_int, pp_vtbl.to_int, arg0.to_int, arg1.jni_id, arg2.jni_id, arg3.to_int, arg4.jni_id, arg5.jni_id, arg6.jni_id)
+        PLATFORM_LOCK.lock
+        begin
+          return ___vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2, arg3, arg4, arg5, arg6)
+        ensure
+          PLATFORM_LOCK.unlock
+        end
       end
       
-      JNI.native_method :Java_org_eclipse_swt_internal_mozilla_XPCOM_VtblCall__IJI_3C_3C_3I_3C_3I_3I, [:pointer, :long, :int32, :int64, :int32, :long, :long, :long, :long, :long, :long], :int32
+      JNI.native_method :Java_org_eclipse_swt_internal_mozilla_XPCOM__1VtblCall__IJI_3C_3C_3I_3C_3I_3I, [:pointer, :long, :int32, :int64, :int32, :long, :long, :long, :long, :long, :long], :int32
+      typesig { [::Java::Int, ::Java::Long, ::Java::Int, Array.typed(::Java::Char), Array.typed(::Java::Char), Array.typed(::Java::Int), Array.typed(::Java::Char), Array.typed(::Java::Int), Array.typed(::Java::Int)] }
+      # int
+      def ___vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2, arg3, arg4, arg5, arg6)
+        JNI.__send__(:Java_org_eclipse_swt_internal_mozilla_XPCOM__1VtblCall__IJI_3C_3C_3I_3C_3I_3I, JNI.env, self.jni_id, fn_number.to_int, pp_vtbl.to_int, arg0.to_int, arg1.jni_id, arg2.jni_id, arg3.jni_id, arg4.jni_id, arg5.jni_id, arg6.jni_id)
+      end
+      
       typesig { [::Java::Int, ::Java::Long, ::Java::Int, Array.typed(::Java::Char), Array.typed(::Java::Char), Array.typed(::Java::Int), Array.typed(::Java::Char), Array.typed(::Java::Int), Array.typed(::Java::Int)] }
       # int
       def _vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2, arg3, arg4, arg5, arg6)
-        JNI.__send__(:Java_org_eclipse_swt_internal_mozilla_XPCOM_VtblCall__IJI_3C_3C_3I_3C_3I_3I, JNI.env, self.jni_id, fn_number.to_int, pp_vtbl.to_int, arg0.to_int, arg1.jni_id, arg2.jni_id, arg3.jni_id, arg4.jni_id, arg5.jni_id, arg6.jni_id)
+        PLATFORM_LOCK.lock
+        begin
+          return ___vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2, arg3, arg4, arg5, arg6)
+        ensure
+          PLATFORM_LOCK.unlock
+        end
       end
       
-      JNI.native_method :Java_org_eclipse_swt_internal_mozilla_XPCOM_VtblCall__IJJ_3C_3C_3J_3C_3I_3I, [:pointer, :long, :int32, :int64, :int64, :long, :long, :long, :long, :long, :long], :int32
+      JNI.native_method :Java_org_eclipse_swt_internal_mozilla_XPCOM__1VtblCall__IJJ_3C_3C_3J_3C_3I_3I, [:pointer, :long, :int32, :int64, :int64, :long, :long, :long, :long, :long, :long], :int32
+      typesig { [::Java::Int, ::Java::Long, ::Java::Long, Array.typed(::Java::Char), Array.typed(::Java::Char), Array.typed(::Java::Long), Array.typed(::Java::Char), Array.typed(::Java::Int), Array.typed(::Java::Int)] }
+      # int
+      def ___vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2, arg3, arg4, arg5, arg6)
+        JNI.__send__(:Java_org_eclipse_swt_internal_mozilla_XPCOM__1VtblCall__IJJ_3C_3C_3J_3C_3I_3I, JNI.env, self.jni_id, fn_number.to_int, pp_vtbl.to_int, arg0.to_int, arg1.jni_id, arg2.jni_id, arg3.jni_id, arg4.jni_id, arg5.jni_id, arg6.jni_id)
+      end
+      
       typesig { [::Java::Int, ::Java::Long, ::Java::Long, Array.typed(::Java::Char), Array.typed(::Java::Char), Array.typed(::Java::Long), Array.typed(::Java::Char), Array.typed(::Java::Int), Array.typed(::Java::Int)] }
       # int
       def _vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2, arg3, arg4, arg5, arg6)
-        JNI.__send__(:Java_org_eclipse_swt_internal_mozilla_XPCOM_VtblCall__IJJ_3C_3C_3J_3C_3I_3I, JNI.env, self.jni_id, fn_number.to_int, pp_vtbl.to_int, arg0.to_int, arg1.jni_id, arg2.jni_id, arg3.jni_id, arg4.jni_id, arg5.jni_id, arg6.jni_id)
+        PLATFORM_LOCK.lock
+        begin
+          return ___vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2, arg3, arg4, arg5, arg6)
+        ensure
+          PLATFORM_LOCK.unlock
+        end
       end
       
-      JNI.native_method :Java_org_eclipse_swt_internal_mozilla_XPCOM_VtblCall__IJIIII_3C_3I_3I, [:pointer, :long, :int32, :int64, :int32, :int32, :int32, :int32, :long, :long, :long], :int32
+      JNI.native_method :Java_org_eclipse_swt_internal_mozilla_XPCOM__1VtblCall__IJIIII_3C_3I_3I, [:pointer, :long, :int32, :int64, :int32, :int32, :int32, :int32, :long, :long, :long], :int32
+      typesig { [::Java::Int, ::Java::Long, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, Array.typed(::Java::Char), Array.typed(::Java::Int), Array.typed(::Java::Int)] }
+      # int
+      def ___vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2, arg3, arg4, arg5, arg6)
+        JNI.__send__(:Java_org_eclipse_swt_internal_mozilla_XPCOM__1VtblCall__IJIIII_3C_3I_3I, JNI.env, self.jni_id, fn_number.to_int, pp_vtbl.to_int, arg0.to_int, arg1.to_int, arg2.to_int, arg3.to_int, arg4.jni_id, arg5.jni_id, arg6.jni_id)
+      end
+      
       typesig { [::Java::Int, ::Java::Long, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, Array.typed(::Java::Char), Array.typed(::Java::Int), Array.typed(::Java::Int)] }
       # int
       def _vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2, arg3, arg4, arg5, arg6)
-        JNI.__send__(:Java_org_eclipse_swt_internal_mozilla_XPCOM_VtblCall__IJIIII_3C_3I_3I, JNI.env, self.jni_id, fn_number.to_int, pp_vtbl.to_int, arg0.to_int, arg1.to_int, arg2.to_int, arg3.to_int, arg4.jni_id, arg5.jni_id, arg6.jni_id)
+        PLATFORM_LOCK.lock
+        begin
+          return ___vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2, arg3, arg4, arg5, arg6)
+        ensure
+          PLATFORM_LOCK.unlock
+        end
       end
       
-      JNI.native_method :Java_org_eclipse_swt_internal_mozilla_XPCOM_VtblCall__IJJJIJ_3C_3I_3I, [:pointer, :long, :int32, :int64, :int64, :int64, :int32, :int64, :long, :long, :long], :int32
+      JNI.native_method :Java_org_eclipse_swt_internal_mozilla_XPCOM__1VtblCall__IJJJIJ_3C_3I_3I, [:pointer, :long, :int32, :int64, :int64, :int64, :int32, :int64, :long, :long, :long], :int32
+      typesig { [::Java::Int, ::Java::Long, ::Java::Long, ::Java::Long, ::Java::Int, ::Java::Long, Array.typed(::Java::Char), Array.typed(::Java::Int), Array.typed(::Java::Int)] }
+      # int
+      def ___vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2, arg3, arg4, arg5, arg6)
+        JNI.__send__(:Java_org_eclipse_swt_internal_mozilla_XPCOM__1VtblCall__IJJJIJ_3C_3I_3I, JNI.env, self.jni_id, fn_number.to_int, pp_vtbl.to_int, arg0.to_int, arg1.to_int, arg2.to_int, arg3.to_int, arg4.jni_id, arg5.jni_id, arg6.jni_id)
+      end
+      
       typesig { [::Java::Int, ::Java::Long, ::Java::Long, ::Java::Long, ::Java::Int, ::Java::Long, Array.typed(::Java::Char), Array.typed(::Java::Int), Array.typed(::Java::Int)] }
       # int
       def _vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2, arg3, arg4, arg5, arg6)
-        JNI.__send__(:Java_org_eclipse_swt_internal_mozilla_XPCOM_VtblCall__IJJJIJ_3C_3I_3I, JNI.env, self.jni_id, fn_number.to_int, pp_vtbl.to_int, arg0.to_int, arg1.to_int, arg2.to_int, arg3.to_int, arg4.jni_id, arg5.jni_id, arg6.jni_id)
+        PLATFORM_LOCK.lock
+        begin
+          return ___vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2, arg3, arg4, arg5, arg6)
+        ensure
+          PLATFORM_LOCK.unlock
+        end
       end
       
-      JNI.native_method :Java_org_eclipse_swt_internal_mozilla_XPCOM_VtblCall__IJIIIIJII, [:pointer, :long, :int32, :int64, :int32, :int32, :int32, :int32, :int64, :int32, :int32], :int32
+      JNI.native_method :Java_org_eclipse_swt_internal_mozilla_XPCOM__1VtblCall__IJIIIIJII, [:pointer, :long, :int32, :int64, :int32, :int32, :int32, :int32, :int64, :int32, :int32], :int32
+      typesig { [::Java::Int, ::Java::Long, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Long, ::Java::Int, ::Java::Int] }
+      # int
+      def ___vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2, arg3, arg4, arg5, arg6)
+        JNI.__send__(:Java_org_eclipse_swt_internal_mozilla_XPCOM__1VtblCall__IJIIIIJII, JNI.env, self.jni_id, fn_number.to_int, pp_vtbl.to_int, arg0.to_int, arg1.to_int, arg2.to_int, arg3.to_int, arg4.to_int, arg5.to_int, arg6.to_int)
+      end
+      
       typesig { [::Java::Int, ::Java::Long, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Long, ::Java::Int, ::Java::Int] }
       # int
       def _vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2, arg3, arg4, arg5, arg6)
-        JNI.__send__(:Java_org_eclipse_swt_internal_mozilla_XPCOM_VtblCall__IJIIIIJII, JNI.env, self.jni_id, fn_number.to_int, pp_vtbl.to_int, arg0.to_int, arg1.to_int, arg2.to_int, arg3.to_int, arg4.to_int, arg5.to_int, arg6.to_int)
+        PLATFORM_LOCK.lock
+        begin
+          return ___vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2, arg3, arg4, arg5, arg6)
+        ensure
+          PLATFORM_LOCK.unlock
+        end
       end
       
-      JNI.native_method :Java_org_eclipse_swt_internal_mozilla_XPCOM_VtblCall__IJJJJJJJJ, [:pointer, :long, :int32, :int64, :int64, :int64, :int64, :int64, :int64, :int64, :int64], :int32
+      JNI.native_method :Java_org_eclipse_swt_internal_mozilla_XPCOM__1VtblCall__IJJJJJJJJ, [:pointer, :long, :int32, :int64, :int64, :int64, :int64, :int64, :int64, :int64, :int64], :int32
+      typesig { [::Java::Int, ::Java::Long, ::Java::Long, ::Java::Long, ::Java::Long, ::Java::Long, ::Java::Long, ::Java::Long, ::Java::Long] }
+      # int
+      def ___vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2, arg3, arg4, arg5, arg6)
+        JNI.__send__(:Java_org_eclipse_swt_internal_mozilla_XPCOM__1VtblCall__IJJJJJJJJ, JNI.env, self.jni_id, fn_number.to_int, pp_vtbl.to_int, arg0.to_int, arg1.to_int, arg2.to_int, arg3.to_int, arg4.to_int, arg5.to_int, arg6.to_int)
+      end
+      
       typesig { [::Java::Int, ::Java::Long, ::Java::Long, ::Java::Long, ::Java::Long, ::Java::Long, ::Java::Long, ::Java::Long, ::Java::Long] }
       # int
       def _vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2, arg3, arg4, arg5, arg6)
-        JNI.__send__(:Java_org_eclipse_swt_internal_mozilla_XPCOM_VtblCall__IJJJJJJJJ, JNI.env, self.jni_id, fn_number.to_int, pp_vtbl.to_int, arg0.to_int, arg1.to_int, arg2.to_int, arg3.to_int, arg4.to_int, arg5.to_int, arg6.to_int)
+        PLATFORM_LOCK.lock
+        begin
+          return ___vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2, arg3, arg4, arg5, arg6)
+        ensure
+          PLATFORM_LOCK.unlock
+        end
       end
       
-      JNI.native_method :Java_org_eclipse_swt_internal_mozilla_XPCOM_VtblCall__IJI_3C_3C_3I_3I_3C_3I_3I, [:pointer, :long, :int32, :int64, :int32, :long, :long, :long, :long, :long, :long, :long], :int32
+      JNI.native_method :Java_org_eclipse_swt_internal_mozilla_XPCOM__1VtblCall__IJI_3C_3C_3I_3I_3C_3I_3I, [:pointer, :long, :int32, :int64, :int32, :long, :long, :long, :long, :long, :long, :long], :int32
+      typesig { [::Java::Int, ::Java::Long, ::Java::Int, Array.typed(::Java::Char), Array.typed(::Java::Char), Array.typed(::Java::Int), Array.typed(::Java::Int), Array.typed(::Java::Char), Array.typed(::Java::Int), Array.typed(::Java::Int)] }
+      # int
+      def ___vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7)
+        JNI.__send__(:Java_org_eclipse_swt_internal_mozilla_XPCOM__1VtblCall__IJI_3C_3C_3I_3I_3C_3I_3I, JNI.env, self.jni_id, fn_number.to_int, pp_vtbl.to_int, arg0.to_int, arg1.jni_id, arg2.jni_id, arg3.jni_id, arg4.jni_id, arg5.jni_id, arg6.jni_id, arg7.jni_id)
+      end
+      
       typesig { [::Java::Int, ::Java::Long, ::Java::Int, Array.typed(::Java::Char), Array.typed(::Java::Char), Array.typed(::Java::Int), Array.typed(::Java::Int), Array.typed(::Java::Char), Array.typed(::Java::Int), Array.typed(::Java::Int)] }
       # int
       def _vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7)
-        JNI.__send__(:Java_org_eclipse_swt_internal_mozilla_XPCOM_VtblCall__IJI_3C_3C_3I_3I_3C_3I_3I, JNI.env, self.jni_id, fn_number.to_int, pp_vtbl.to_int, arg0.to_int, arg1.jni_id, arg2.jni_id, arg3.jni_id, arg4.jni_id, arg5.jni_id, arg6.jni_id, arg7.jni_id)
+        PLATFORM_LOCK.lock
+        begin
+          return ___vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7)
+        ensure
+          PLATFORM_LOCK.unlock
+        end
       end
       
-      JNI.native_method :Java_org_eclipse_swt_internal_mozilla_XPCOM_VtblCall__IJJ_3C_3C_3J_3J_3C_3I_3I, [:pointer, :long, :int32, :int64, :int64, :long, :long, :long, :long, :long, :long, :long], :int32
+      JNI.native_method :Java_org_eclipse_swt_internal_mozilla_XPCOM__1VtblCall__IJJ_3C_3C_3J_3J_3C_3I_3I, [:pointer, :long, :int32, :int64, :int64, :long, :long, :long, :long, :long, :long, :long], :int32
+      typesig { [::Java::Int, ::Java::Long, ::Java::Long, Array.typed(::Java::Char), Array.typed(::Java::Char), Array.typed(::Java::Long), Array.typed(::Java::Long), Array.typed(::Java::Char), Array.typed(::Java::Int), Array.typed(::Java::Int)] }
+      # int
+      def ___vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7)
+        JNI.__send__(:Java_org_eclipse_swt_internal_mozilla_XPCOM__1VtblCall__IJJ_3C_3C_3J_3J_3C_3I_3I, JNI.env, self.jni_id, fn_number.to_int, pp_vtbl.to_int, arg0.to_int, arg1.jni_id, arg2.jni_id, arg3.jni_id, arg4.jni_id, arg5.jni_id, arg6.jni_id, arg7.jni_id)
+      end
+      
       typesig { [::Java::Int, ::Java::Long, ::Java::Long, Array.typed(::Java::Char), Array.typed(::Java::Char), Array.typed(::Java::Long), Array.typed(::Java::Long), Array.typed(::Java::Char), Array.typed(::Java::Int), Array.typed(::Java::Int)] }
       # int
       def _vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7)
-        JNI.__send__(:Java_org_eclipse_swt_internal_mozilla_XPCOM_VtblCall__IJJ_3C_3C_3J_3J_3C_3I_3I, JNI.env, self.jni_id, fn_number.to_int, pp_vtbl.to_int, arg0.to_int, arg1.jni_id, arg2.jni_id, arg3.jni_id, arg4.jni_id, arg5.jni_id, arg6.jni_id, arg7.jni_id)
+        PLATFORM_LOCK.lock
+        begin
+          return ___vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7)
+        ensure
+          PLATFORM_LOCK.unlock
+        end
       end
       
-      JNI.native_method :Java_org_eclipse_swt_internal_mozilla_XPCOM_VtblCall__IJIIIIII_3C_3I_3I, [:pointer, :long, :int32, :int64, :int32, :int32, :int32, :int32, :int32, :int32, :long, :long, :long], :int32
+      JNI.native_method :Java_org_eclipse_swt_internal_mozilla_XPCOM__1VtblCall__IJIIIIIII_3I, [:pointer, :long, :int32, :int64, :int32, :int32, :int32, :int32, :int32, :int32, :int32, :long], :int32
+      typesig { [::Java::Int, ::Java::Long, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, Array.typed(::Java::Int)] }
+      # int
+      def ___vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7)
+        JNI.__send__(:Java_org_eclipse_swt_internal_mozilla_XPCOM__1VtblCall__IJIIIIIII_3I, JNI.env, self.jni_id, fn_number.to_int, pp_vtbl.to_int, arg0.to_int, arg1.to_int, arg2.to_int, arg3.to_int, arg4.to_int, arg5.to_int, arg6.to_int, arg7.jni_id)
+      end
+      
+      typesig { [::Java::Int, ::Java::Long, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, Array.typed(::Java::Int)] }
+      # int
+      def _vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7)
+        PLATFORM_LOCK.lock
+        begin
+          return ___vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7)
+        ensure
+          PLATFORM_LOCK.unlock
+        end
+      end
+      
+      JNI.native_method :Java_org_eclipse_swt_internal_mozilla_XPCOM__1VtblCall__IJIJJJJJJ_3J, [:pointer, :long, :int32, :int64, :int32, :int64, :int64, :int64, :int64, :int64, :int64, :long], :int32
+      typesig { [::Java::Int, ::Java::Long, ::Java::Int, ::Java::Long, ::Java::Long, ::Java::Long, ::Java::Long, ::Java::Long, ::Java::Long, Array.typed(::Java::Long)] }
+      # int
+      def ___vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7)
+        JNI.__send__(:Java_org_eclipse_swt_internal_mozilla_XPCOM__1VtblCall__IJIJJJJJJ_3J, JNI.env, self.jni_id, fn_number.to_int, pp_vtbl.to_int, arg0.to_int, arg1.to_int, arg2.to_int, arg3.to_int, arg4.to_int, arg5.to_int, arg6.to_int, arg7.jni_id)
+      end
+      
+      typesig { [::Java::Int, ::Java::Long, ::Java::Int, ::Java::Long, ::Java::Long, ::Java::Long, ::Java::Long, ::Java::Long, ::Java::Long, Array.typed(::Java::Long)] }
+      # int
+      def _vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7)
+        PLATFORM_LOCK.lock
+        begin
+          return ___vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7)
+        ensure
+          PLATFORM_LOCK.unlock
+        end
+      end
+      
+      JNI.native_method :Java_org_eclipse_swt_internal_mozilla_XPCOM__1VtblCall__IJIIIIII_3C_3I_3I, [:pointer, :long, :int32, :int64, :int32, :int32, :int32, :int32, :int32, :int32, :long, :long, :long], :int32
+      typesig { [::Java::Int, ::Java::Long, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, Array.typed(::Java::Char), Array.typed(::Java::Int), Array.typed(::Java::Int)] }
+      # int
+      def ___vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8)
+        JNI.__send__(:Java_org_eclipse_swt_internal_mozilla_XPCOM__1VtblCall__IJIIIIII_3C_3I_3I, JNI.env, self.jni_id, fn_number.to_int, pp_vtbl.to_int, arg0.to_int, arg1.to_int, arg2.to_int, arg3.to_int, arg4.to_int, arg5.to_int, arg6.jni_id, arg7.jni_id, arg8.jni_id)
+      end
+      
       typesig { [::Java::Int, ::Java::Long, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, Array.typed(::Java::Char), Array.typed(::Java::Int), Array.typed(::Java::Int)] }
       # int
       def _vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8)
-        JNI.__send__(:Java_org_eclipse_swt_internal_mozilla_XPCOM_VtblCall__IJIIIIII_3C_3I_3I, JNI.env, self.jni_id, fn_number.to_int, pp_vtbl.to_int, arg0.to_int, arg1.to_int, arg2.to_int, arg3.to_int, arg4.to_int, arg5.to_int, arg6.jni_id, arg7.jni_id, arg8.jni_id)
+        PLATFORM_LOCK.lock
+        begin
+          return ___vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8)
+        ensure
+          PLATFORM_LOCK.unlock
+        end
       end
       
-      JNI.native_method :Java_org_eclipse_swt_internal_mozilla_XPCOM_VtblCall__IJJJJJIJ_3C_3I_3J, [:pointer, :long, :int32, :int64, :int64, :int64, :int64, :int64, :int32, :int64, :long, :long, :long], :int32
+      JNI.native_method :Java_org_eclipse_swt_internal_mozilla_XPCOM__1VtblCall__IJJJJJIJ_3C_3I_3J, [:pointer, :long, :int32, :int64, :int64, :int64, :int64, :int64, :int32, :int64, :long, :long, :long], :int32
+      typesig { [::Java::Int, ::Java::Long, ::Java::Long, ::Java::Long, ::Java::Long, ::Java::Long, ::Java::Int, ::Java::Long, Array.typed(::Java::Char), Array.typed(::Java::Int), Array.typed(::Java::Long)] }
+      # int
+      def ___vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8)
+        JNI.__send__(:Java_org_eclipse_swt_internal_mozilla_XPCOM__1VtblCall__IJJJJJIJ_3C_3I_3J, JNI.env, self.jni_id, fn_number.to_int, pp_vtbl.to_int, arg0.to_int, arg1.to_int, arg2.to_int, arg3.to_int, arg4.to_int, arg5.to_int, arg6.jni_id, arg7.jni_id, arg8.jni_id)
+      end
+      
       typesig { [::Java::Int, ::Java::Long, ::Java::Long, ::Java::Long, ::Java::Long, ::Java::Long, ::Java::Int, ::Java::Long, Array.typed(::Java::Char), Array.typed(::Java::Int), Array.typed(::Java::Long)] }
       # int
       def _vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8)
-        JNI.__send__(:Java_org_eclipse_swt_internal_mozilla_XPCOM_VtblCall__IJJJJJIJ_3C_3I_3J, JNI.env, self.jni_id, fn_number.to_int, pp_vtbl.to_int, arg0.to_int, arg1.to_int, arg2.to_int, arg3.to_int, arg4.to_int, arg5.to_int, arg6.jni_id, arg7.jni_id, arg8.jni_id)
+        PLATFORM_LOCK.lock
+        begin
+          return ___vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8)
+        ensure
+          PLATFORM_LOCK.unlock
+        end
       end
       
-      JNI.native_method :Java_org_eclipse_swt_internal_mozilla_XPCOM_VtblCall__IJIIIIIIIIII, [:pointer, :long, :int32, :int64, :int32, :int32, :int32, :int32, :int32, :int32, :int32, :int32, :int32, :int32], :int32
+      JNI.native_method :Java_org_eclipse_swt_internal_mozilla_XPCOM__1VtblCall__IJIIIIIIIIII, [:pointer, :long, :int32, :int64, :int32, :int32, :int32, :int32, :int32, :int32, :int32, :int32, :int32, :int32], :int32
+      typesig { [::Java::Int, ::Java::Long, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int] }
+      # int
+      def ___vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9)
+        JNI.__send__(:Java_org_eclipse_swt_internal_mozilla_XPCOM__1VtblCall__IJIIIIIIIIII, JNI.env, self.jni_id, fn_number.to_int, pp_vtbl.to_int, arg0.to_int, arg1.to_int, arg2.to_int, arg3.to_int, arg4.to_int, arg5.to_int, arg6.to_int, arg7.to_int, arg8.to_int, arg9.to_int)
+      end
+      
       typesig { [::Java::Int, ::Java::Long, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int] }
       # int
       def _vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9)
-        JNI.__send__(:Java_org_eclipse_swt_internal_mozilla_XPCOM_VtblCall__IJIIIIIIIIII, JNI.env, self.jni_id, fn_number.to_int, pp_vtbl.to_int, arg0.to_int, arg1.to_int, arg2.to_int, arg3.to_int, arg4.to_int, arg5.to_int, arg6.to_int, arg7.to_int, arg8.to_int, arg9.to_int)
+        PLATFORM_LOCK.lock
+        begin
+          return ___vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9)
+        ensure
+          PLATFORM_LOCK.unlock
+        end
       end
       
-      JNI.native_method :Java_org_eclipse_swt_internal_mozilla_XPCOM_VtblCall__IJJIIJIIIIII, [:pointer, :long, :int32, :int64, :int64, :int32, :int32, :int64, :int32, :int32, :int32, :int32, :int32, :int32], :int32
+      JNI.native_method :Java_org_eclipse_swt_internal_mozilla_XPCOM__1VtblCall__IJJIIJIIIIII, [:pointer, :long, :int32, :int64, :int64, :int32, :int32, :int64, :int32, :int32, :int32, :int32, :int32, :int32], :int32
+      typesig { [::Java::Int, ::Java::Long, ::Java::Long, ::Java::Int, ::Java::Int, ::Java::Long, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int] }
+      # int
+      def ___vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9)
+        JNI.__send__(:Java_org_eclipse_swt_internal_mozilla_XPCOM__1VtblCall__IJJIIJIIIIII, JNI.env, self.jni_id, fn_number.to_int, pp_vtbl.to_int, arg0.to_int, arg1.to_int, arg2.to_int, arg3.to_int, arg4.to_int, arg5.to_int, arg6.to_int, arg7.to_int, arg8.to_int, arg9.to_int)
+      end
+      
       typesig { [::Java::Int, ::Java::Long, ::Java::Long, ::Java::Int, ::Java::Int, ::Java::Long, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int] }
       # int
       def _vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9)
-        JNI.__send__(:Java_org_eclipse_swt_internal_mozilla_XPCOM_VtblCall__IJJIIJIIIIII, JNI.env, self.jni_id, fn_number.to_int, pp_vtbl.to_int, arg0.to_int, arg1.to_int, arg2.to_int, arg3.to_int, arg4.to_int, arg5.to_int, arg6.to_int, arg7.to_int, arg8.to_int, arg9.to_int)
+        PLATFORM_LOCK.lock
+        begin
+          return ___vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9)
+        ensure
+          PLATFORM_LOCK.unlock
+        end
       end
       
-      JNI.native_method :Java_org_eclipse_swt_internal_mozilla_XPCOM_VtblCall__IJI_3C_3CI_3C_3C_3C_3C_3I_3I, [:pointer, :long, :int32, :int64, :int32, :long, :long, :int32, :long, :long, :long, :long, :long, :long], :int32
+      JNI.native_method :Java_org_eclipse_swt_internal_mozilla_XPCOM__1VtblCall__IJI_3C_3CI_3C_3C_3C_3C_3I_3I, [:pointer, :long, :int32, :int64, :int32, :long, :long, :int32, :long, :long, :long, :long, :long, :long], :int32
+      typesig { [::Java::Int, ::Java::Long, ::Java::Int, Array.typed(::Java::Char), Array.typed(::Java::Char), ::Java::Int, Array.typed(::Java::Char), Array.typed(::Java::Char), Array.typed(::Java::Char), Array.typed(::Java::Char), Array.typed(::Java::Int), Array.typed(::Java::Int)] }
+      # int
+      def ___vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9)
+        JNI.__send__(:Java_org_eclipse_swt_internal_mozilla_XPCOM__1VtblCall__IJI_3C_3CI_3C_3C_3C_3C_3I_3I, JNI.env, self.jni_id, fn_number.to_int, pp_vtbl.to_int, arg0.to_int, arg1.jni_id, arg2.jni_id, arg3.to_int, arg4.jni_id, arg5.jni_id, arg6.jni_id, arg7.jni_id, arg8.jni_id, arg9.jni_id)
+      end
+      
       typesig { [::Java::Int, ::Java::Long, ::Java::Int, Array.typed(::Java::Char), Array.typed(::Java::Char), ::Java::Int, Array.typed(::Java::Char), Array.typed(::Java::Char), Array.typed(::Java::Char), Array.typed(::Java::Char), Array.typed(::Java::Int), Array.typed(::Java::Int)] }
       # int
       def _vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9)
-        JNI.__send__(:Java_org_eclipse_swt_internal_mozilla_XPCOM_VtblCall__IJI_3C_3CI_3C_3C_3C_3C_3I_3I, JNI.env, self.jni_id, fn_number.to_int, pp_vtbl.to_int, arg0.to_int, arg1.jni_id, arg2.jni_id, arg3.to_int, arg4.jni_id, arg5.jni_id, arg6.jni_id, arg7.jni_id, arg8.jni_id, arg9.jni_id)
+        PLATFORM_LOCK.lock
+        begin
+          return ___vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9)
+        ensure
+          PLATFORM_LOCK.unlock
+        end
       end
       
-      JNI.native_method :Java_org_eclipse_swt_internal_mozilla_XPCOM_VtblCall__IJJ_3C_3CI_3C_3C_3C_3C_3I_3I, [:pointer, :long, :int32, :int64, :int64, :long, :long, :int32, :long, :long, :long, :long, :long, :long], :int32
+      JNI.native_method :Java_org_eclipse_swt_internal_mozilla_XPCOM__1VtblCall__IJJ_3C_3CI_3C_3C_3C_3C_3I_3I, [:pointer, :long, :int32, :int64, :int64, :long, :long, :int32, :long, :long, :long, :long, :long, :long], :int32
+      typesig { [::Java::Int, ::Java::Long, ::Java::Long, Array.typed(::Java::Char), Array.typed(::Java::Char), ::Java::Int, Array.typed(::Java::Char), Array.typed(::Java::Char), Array.typed(::Java::Char), Array.typed(::Java::Char), Array.typed(::Java::Int), Array.typed(::Java::Int)] }
+      # int
+      def ___vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9)
+        JNI.__send__(:Java_org_eclipse_swt_internal_mozilla_XPCOM__1VtblCall__IJJ_3C_3CI_3C_3C_3C_3C_3I_3I, JNI.env, self.jni_id, fn_number.to_int, pp_vtbl.to_int, arg0.to_int, arg1.jni_id, arg2.jni_id, arg3.to_int, arg4.jni_id, arg5.jni_id, arg6.jni_id, arg7.jni_id, arg8.jni_id, arg9.jni_id)
+      end
+      
       typesig { [::Java::Int, ::Java::Long, ::Java::Long, Array.typed(::Java::Char), Array.typed(::Java::Char), ::Java::Int, Array.typed(::Java::Char), Array.typed(::Java::Char), Array.typed(::Java::Char), Array.typed(::Java::Char), Array.typed(::Java::Int), Array.typed(::Java::Int)] }
       # int
       def _vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9)
-        JNI.__send__(:Java_org_eclipse_swt_internal_mozilla_XPCOM_VtblCall__IJJ_3C_3CI_3C_3C_3C_3C_3I_3I, JNI.env, self.jni_id, fn_number.to_int, pp_vtbl.to_int, arg0.to_int, arg1.jni_id, arg2.jni_id, arg3.to_int, arg4.jni_id, arg5.jni_id, arg6.jni_id, arg7.jni_id, arg8.jni_id, arg9.jni_id)
+        PLATFORM_LOCK.lock
+        begin
+          return ___vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9)
+        ensure
+          PLATFORM_LOCK.unlock
+        end
       end
       
-      JNI.native_method :Java_org_eclipse_swt_internal_mozilla_XPCOM_VtblCall__IJIIII_3CIIIII_3I_3I, [:pointer, :long, :int32, :int64, :int32, :int32, :int32, :int32, :long, :int32, :int32, :int32, :int32, :int32, :long, :long], :int32
+      JNI.native_method :Java_org_eclipse_swt_internal_mozilla_XPCOM__1VtblCall__IJIIII_3CIIIII_3I_3I, [:pointer, :long, :int32, :int64, :int32, :int32, :int32, :int32, :long, :int32, :int32, :int32, :int32, :int32, :long, :long], :int32
+      typesig { [::Java::Int, ::Java::Long, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, Array.typed(::Java::Char), ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, Array.typed(::Java::Int), Array.typed(::Java::Int)] }
+      # int
+      def ___vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10, arg11)
+        JNI.__send__(:Java_org_eclipse_swt_internal_mozilla_XPCOM__1VtblCall__IJIIII_3CIIIII_3I_3I, JNI.env, self.jni_id, fn_number.to_int, pp_vtbl.to_int, arg0.to_int, arg1.to_int, arg2.to_int, arg3.to_int, arg4.jni_id, arg5.to_int, arg6.to_int, arg7.to_int, arg8.to_int, arg9.to_int, arg10.jni_id, arg11.jni_id)
+      end
+      
       typesig { [::Java::Int, ::Java::Long, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, Array.typed(::Java::Char), ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, Array.typed(::Java::Int), Array.typed(::Java::Int)] }
       # int
       def _vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10, arg11)
-        JNI.__send__(:Java_org_eclipse_swt_internal_mozilla_XPCOM_VtblCall__IJIIII_3CIIIII_3I_3I, JNI.env, self.jni_id, fn_number.to_int, pp_vtbl.to_int, arg0.to_int, arg1.to_int, arg2.to_int, arg3.to_int, arg4.jni_id, arg5.to_int, arg6.to_int, arg7.to_int, arg8.to_int, arg9.to_int, arg10.jni_id, arg11.jni_id)
+        PLATFORM_LOCK.lock
+        begin
+          return ___vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10, arg11)
+        ensure
+          PLATFORM_LOCK.unlock
+        end
       end
       
-      JNI.native_method :Java_org_eclipse_swt_internal_mozilla_XPCOM_VtblCall__IJJJJI_3CJJIJI_3J_3J, [:pointer, :long, :int32, :int64, :int64, :int64, :int64, :int32, :long, :int64, :int64, :int32, :int64, :int32, :long, :long], :int32
+      JNI.native_method :Java_org_eclipse_swt_internal_mozilla_XPCOM__1VtblCall__IJJJJI_3CJJIJI_3J_3J, [:pointer, :long, :int32, :int64, :int64, :int64, :int64, :int32, :long, :int64, :int64, :int32, :int64, :int32, :long, :long], :int32
+      typesig { [::Java::Int, ::Java::Long, ::Java::Long, ::Java::Long, ::Java::Long, ::Java::Int, Array.typed(::Java::Char), ::Java::Long, ::Java::Long, ::Java::Int, ::Java::Long, ::Java::Int, Array.typed(::Java::Long), Array.typed(::Java::Long)] }
+      # int
+      def ___vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10, arg11)
+        JNI.__send__(:Java_org_eclipse_swt_internal_mozilla_XPCOM__1VtblCall__IJJJJI_3CJJIJI_3J_3J, JNI.env, self.jni_id, fn_number.to_int, pp_vtbl.to_int, arg0.to_int, arg1.to_int, arg2.to_int, arg3.to_int, arg4.jni_id, arg5.to_int, arg6.to_int, arg7.to_int, arg8.to_int, arg9.to_int, arg10.jni_id, arg11.jni_id)
+      end
+      
       typesig { [::Java::Int, ::Java::Long, ::Java::Long, ::Java::Long, ::Java::Long, ::Java::Int, Array.typed(::Java::Char), ::Java::Long, ::Java::Long, ::Java::Int, ::Java::Long, ::Java::Int, Array.typed(::Java::Long), Array.typed(::Java::Long)] }
       # int
       def _vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10, arg11)
-        JNI.__send__(:Java_org_eclipse_swt_internal_mozilla_XPCOM_VtblCall__IJJJJI_3CJJIJI_3J_3J, JNI.env, self.jni_id, fn_number.to_int, pp_vtbl.to_int, arg0.to_int, arg1.to_int, arg2.to_int, arg3.to_int, arg4.jni_id, arg5.to_int, arg6.to_int, arg7.to_int, arg8.to_int, arg9.to_int, arg10.jni_id, arg11.jni_id)
+        PLATFORM_LOCK.lock
+        begin
+          return ___vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10, arg11)
+        ensure
+          PLATFORM_LOCK.unlock
+        end
       end
       
-      JNI.native_method :Java_org_eclipse_swt_internal_mozilla_XPCOM_VtblCall__IJIIII_3C_3BIIIII_3I_3I, [:pointer, :long, :int32, :int64, :int32, :int32, :int32, :int32, :long, :long, :int32, :int32, :int32, :int32, :int32, :long, :long], :int32
+      JNI.native_method :Java_org_eclipse_swt_internal_mozilla_XPCOM__1VtblCall__IJIIII_3C_3BIIIII_3I_3I, [:pointer, :long, :int32, :int64, :int32, :int32, :int32, :int32, :long, :long, :int32, :int32, :int32, :int32, :int32, :long, :long], :int32
+      typesig { [::Java::Int, ::Java::Long, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, Array.typed(::Java::Char), Array.typed(::Java::Byte), ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, Array.typed(::Java::Int), Array.typed(::Java::Int)] }
+      # int
+      def ___vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10, arg11, arg12)
+        JNI.__send__(:Java_org_eclipse_swt_internal_mozilla_XPCOM__1VtblCall__IJIIII_3C_3BIIIII_3I_3I, JNI.env, self.jni_id, fn_number.to_int, pp_vtbl.to_int, arg0.to_int, arg1.to_int, arg2.to_int, arg3.to_int, arg4.jni_id, arg5.jni_id, arg6.to_int, arg7.to_int, arg8.to_int, arg9.to_int, arg10.to_int, arg11.jni_id, arg12.jni_id)
+      end
+      
       typesig { [::Java::Int, ::Java::Long, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, Array.typed(::Java::Char), Array.typed(::Java::Byte), ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, Array.typed(::Java::Int), Array.typed(::Java::Int)] }
       # int
       def _vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10, arg11, arg12)
-        JNI.__send__(:Java_org_eclipse_swt_internal_mozilla_XPCOM_VtblCall__IJIIII_3C_3BIIIII_3I_3I, JNI.env, self.jni_id, fn_number.to_int, pp_vtbl.to_int, arg0.to_int, arg1.to_int, arg2.to_int, arg3.to_int, arg4.jni_id, arg5.jni_id, arg6.to_int, arg7.to_int, arg8.to_int, arg9.to_int, arg10.to_int, arg11.jni_id, arg12.jni_id)
+        PLATFORM_LOCK.lock
+        begin
+          return ___vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10, arg11, arg12)
+        ensure
+          PLATFORM_LOCK.unlock
+        end
       end
       
-      JNI.native_method :Java_org_eclipse_swt_internal_mozilla_XPCOM_VtblCall__IJJJJI_3C_3BJJIJI_3J_3J, [:pointer, :long, :int32, :int64, :int64, :int64, :int64, :int32, :long, :long, :int64, :int64, :int32, :int64, :int32, :long, :long], :int32
+      JNI.native_method :Java_org_eclipse_swt_internal_mozilla_XPCOM__1VtblCall__IJJJJI_3C_3BJJIJI_3J_3J, [:pointer, :long, :int32, :int64, :int64, :int64, :int64, :int32, :long, :long, :int64, :int64, :int32, :int64, :int32, :long, :long], :int32
+      typesig { [::Java::Int, ::Java::Long, ::Java::Long, ::Java::Long, ::Java::Long, ::Java::Int, Array.typed(::Java::Char), Array.typed(::Java::Byte), ::Java::Long, ::Java::Long, ::Java::Int, ::Java::Long, ::Java::Int, Array.typed(::Java::Long), Array.typed(::Java::Long)] }
+      # int
+      def ___vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10, arg11, arg12)
+        JNI.__send__(:Java_org_eclipse_swt_internal_mozilla_XPCOM__1VtblCall__IJJJJI_3C_3BJJIJI_3J_3J, JNI.env, self.jni_id, fn_number.to_int, pp_vtbl.to_int, arg0.to_int, arg1.to_int, arg2.to_int, arg3.to_int, arg4.jni_id, arg5.jni_id, arg6.to_int, arg7.to_int, arg8.to_int, arg9.to_int, arg10.to_int, arg11.jni_id, arg12.jni_id)
+      end
+      
       typesig { [::Java::Int, ::Java::Long, ::Java::Long, ::Java::Long, ::Java::Long, ::Java::Int, Array.typed(::Java::Char), Array.typed(::Java::Byte), ::Java::Long, ::Java::Long, ::Java::Int, ::Java::Long, ::Java::Int, Array.typed(::Java::Long), Array.typed(::Java::Long)] }
       # int
       def _vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10, arg11, arg12)
-        JNI.__send__(:Java_org_eclipse_swt_internal_mozilla_XPCOM_VtblCall__IJJJJI_3C_3BJJIJI_3J_3J, JNI.env, self.jni_id, fn_number.to_int, pp_vtbl.to_int, arg0.to_int, arg1.to_int, arg2.to_int, arg3.to_int, arg4.jni_id, arg5.jni_id, arg6.to_int, arg7.to_int, arg8.to_int, arg9.to_int, arg10.to_int, arg11.jni_id, arg12.jni_id)
+        PLATFORM_LOCK.lock
+        begin
+          return ___vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10, arg11, arg12)
+        ensure
+          PLATFORM_LOCK.unlock
+        end
       end
       
-      JNI.native_method :Java_org_eclipse_swt_internal_mozilla_XPCOM_VtblCall__IJIIIIIIIIIIIIISI, [:pointer, :long, :int32, :int64, :int32, :int32, :int32, :int32, :int32, :int32, :int32, :int32, :int32, :int32, :int32, :int32, :int32, :int16, :int32], :int32
+      JNI.native_method :Java_org_eclipse_swt_internal_mozilla_XPCOM__1VtblCall__IJIIIIIIIIIIIIISI, [:pointer, :long, :int32, :int64, :int32, :int32, :int32, :int32, :int32, :int32, :int32, :int32, :int32, :int32, :int32, :int32, :int32, :int16, :int32], :int32
+      typesig { [::Java::Int, ::Java::Long, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Short, ::Java::Int] }
+      # int
+      def ___vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10, arg11, arg12, arg13, arg14)
+        JNI.__send__(:Java_org_eclipse_swt_internal_mozilla_XPCOM__1VtblCall__IJIIIIIIIIIIIIISI, JNI.env, self.jni_id, fn_number.to_int, pp_vtbl.to_int, arg0.to_int, arg1.to_int, arg2.to_int, arg3.to_int, arg4.to_int, arg5.to_int, arg6.to_int, arg7.to_int, arg8.to_int, arg9.to_int, arg10.to_int, arg11.to_int, arg12.to_int, arg13.to_int, arg14.to_int)
+      end
+      
       typesig { [::Java::Int, ::Java::Long, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Short, ::Java::Int] }
       # int
       def _vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10, arg11, arg12, arg13, arg14)
-        JNI.__send__(:Java_org_eclipse_swt_internal_mozilla_XPCOM_VtblCall__IJIIIIIIIIIIIIISI, JNI.env, self.jni_id, fn_number.to_int, pp_vtbl.to_int, arg0.to_int, arg1.to_int, arg2.to_int, arg3.to_int, arg4.to_int, arg5.to_int, arg6.to_int, arg7.to_int, arg8.to_int, arg9.to_int, arg10.to_int, arg11.to_int, arg12.to_int, arg13.to_int, arg14.to_int)
+        PLATFORM_LOCK.lock
+        begin
+          return ___vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10, arg11, arg12, arg13, arg14)
+        ensure
+          PLATFORM_LOCK.unlock
+        end
       end
       
-      JNI.native_method :Java_org_eclipse_swt_internal_mozilla_XPCOM_VtblCall__IJJIIJIIIIIIIIISJ, [:pointer, :long, :int32, :int64, :int64, :int32, :int32, :int64, :int32, :int32, :int32, :int32, :int32, :int32, :int32, :int32, :int32, :int16, :int64], :int32
+      JNI.native_method :Java_org_eclipse_swt_internal_mozilla_XPCOM__1VtblCall__IJJIIJIIIIIIIIISJ, [:pointer, :long, :int32, :int64, :int64, :int32, :int32, :int64, :int32, :int32, :int32, :int32, :int32, :int32, :int32, :int32, :int32, :int16, :int64], :int32
+      typesig { [::Java::Int, ::Java::Long, ::Java::Long, ::Java::Int, ::Java::Int, ::Java::Long, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Short, ::Java::Long] }
+      # int
+      def ___vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10, arg11, arg12, arg13, arg14)
+        JNI.__send__(:Java_org_eclipse_swt_internal_mozilla_XPCOM__1VtblCall__IJJIIJIIIIIIIIISJ, JNI.env, self.jni_id, fn_number.to_int, pp_vtbl.to_int, arg0.to_int, arg1.to_int, arg2.to_int, arg3.to_int, arg4.to_int, arg5.to_int, arg6.to_int, arg7.to_int, arg8.to_int, arg9.to_int, arg10.to_int, arg11.to_int, arg12.to_int, arg13.to_int, arg14.to_int)
+      end
+      
       typesig { [::Java::Int, ::Java::Long, ::Java::Long, ::Java::Int, ::Java::Int, ::Java::Long, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Short, ::Java::Long] }
       # int
       def _vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10, arg11, arg12, arg13, arg14)
-        JNI.__send__(:Java_org_eclipse_swt_internal_mozilla_XPCOM_VtblCall__IJJIIJIIIIIIIIISJ, JNI.env, self.jni_id, fn_number.to_int, pp_vtbl.to_int, arg0.to_int, arg1.to_int, arg2.to_int, arg3.to_int, arg4.to_int, arg5.to_int, arg6.to_int, arg7.to_int, arg8.to_int, arg9.to_int, arg10.to_int, arg11.to_int, arg12.to_int, arg13.to_int, arg14.to_int)
+        PLATFORM_LOCK.lock
+        begin
+          return ___vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10, arg11, arg12, arg13, arg14)
+        ensure
+          PLATFORM_LOCK.unlock
+        end
+      end
+      
+      JNI.native_method :Java_org_eclipse_swt_internal_mozilla_XPCOM_GetAddress, [:pointer, :long, :int32, :int32], :int32
+      typesig { [::Java::Int, ::Java::Int] }
+      # @method flags=no_gen
+      def _get_address(ptr, index)
+        JNI.__send__(:Java_org_eclipse_swt_internal_mozilla_XPCOM_GetAddress, JNI.env, self.jni_id, ptr.to_int, index.to_int)
       end
     }
     

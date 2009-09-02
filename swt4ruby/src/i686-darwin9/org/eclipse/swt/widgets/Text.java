@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2008 IBM Corporation and others.
+ * Copyright (c) 2000, 2009 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -10,22 +10,11 @@
  *******************************************************************************/
 package org.eclipse.swt.widgets;
 
-import org.eclipse.swt.internal.carbon.HILayoutInfo;
-import org.eclipse.swt.internal.carbon.HISideBinding;
-import org.eclipse.swt.internal.carbon.HIThemeFrameDrawInfo;
-import org.eclipse.swt.internal.carbon.OS;
-import org.eclipse.swt.internal.carbon.RGBColor;
-import org.eclipse.swt.internal.carbon.Rect;
-import org.eclipse.swt.internal.carbon.ControlEditTextSelectionRec;
-import org.eclipse.swt.internal.carbon.ControlFontStyleRec;
-import org.eclipse.swt.internal.carbon.CFRange;
-import org.eclipse.swt.internal.carbon.CGRect;
-import org.eclipse.swt.internal.carbon.TXNTab;
-import org.eclipse.swt.internal.carbon.CGPoint;
-
 import org.eclipse.swt.*;
 import org.eclipse.swt.events.*;
 import org.eclipse.swt.graphics.*;
+import org.eclipse.swt.internal.*;
+import org.eclipse.swt.internal.cocoa.*;
 
 /**
  * Instances of this class are selectable user interface
@@ -40,28 +29,39 @@ import org.eclipse.swt.graphics.*;
  * <p>
  * <dl>
  * <dt><b>Styles:</b></dt>
- * <dd>CANCEL, CENTER, LEFT, MULTI, PASSWORD, SEARCH, SINGLE, RIGHT, READ_ONLY, WRAP</dd>
+ * <dd>CENTER, ICON_CANCEL, ICON_SEARCH, LEFT, MULTI, PASSWORD, SEARCH, SINGLE, RIGHT, READ_ONLY, WRAP</dd>
  * <dt><b>Events:</b></dt>
  * <dd>DefaultSelection, Modify, Verify</dd>
  * </dl>
  * <p>
  * Note: Only one of the styles MULTI and SINGLE may be specified,
  * and only one of the styles LEFT, CENTER, and RIGHT may be specified.
- * </p><p>
+ * </p>
+ * <p>
+ * Note: The styles ICON_CANCEL and ICON_SEARCH are hints used in combination with SEARCH.
+ * When the platform supports the hint, the text control shows these icons.  When an icon
+ * is selected, a default selection event is sent with the detail field set to one of
+ * ICON_CANCEL or ICON_SEARCH.  Normally, application code does not need to check the
+ * detail.  In the case of ICON_CANCEL, the text is cleared before the default selection
+ * event is sent causing the application to search for an empty string.
+ * </p>
+ * <p>
  * IMPORTANT: This class is <em>not</em> intended to be subclassed.
  * </p>
  *
  * @see <a href="http://www.eclipse.org/swt/snippets/#text">Text snippets</a>
  * @see <a href="http://www.eclipse.org/swt/examples.php">SWT Example: ControlExample</a>
  * @see <a href="http://www.eclipse.org/swt/">Sample code and further information</a>
+ * @noextend This class is not intended to be subclassed by clients.
  */
 public class Text extends Scrollable {
-	int txnObject, frameHandle;
 	int textLimit = LIMIT, tabs = 8;
-	ControlEditTextSelectionRec selection;
 	char echoCharacter;
-	boolean doubleClick;
+	boolean doubleClick, receivingFocus;
 	String hiddenText, message;
+	NSRange selectionRange;
+	id targetSearch, targetCancel;
+	int /*long*/ actionSearch, actionCancel;
 	
 	/**
 	* The maximum number of characters that can be entered
@@ -91,15 +91,6 @@ public class Text extends Scrollable {
 		DELIMITER = "\r";
 	}
 
-	static final String [] AX_ATTRIBUTES = {
-		OS.kAXTitleAttribute,
-		OS.kAXValueAttribute,
-		OS.kAXNumberOfCharactersAttribute,
-		OS.kAXSelectedTextAttribute,
-		OS.kAXSelectedTextRangeAttribute,
-		OS.kAXStringForRangeParameterizedAttribute,
-	};
-
 /**
  * Constructs a new instance of this class given its parent
  * and a style value describing its behavior and appearance.
@@ -128,22 +119,48 @@ public class Text extends Scrollable {
  * @see SWT#MULTI
  * @see SWT#READ_ONLY
  * @see SWT#WRAP
+ * @see SWT#LEFT
+ * @see SWT#RIGHT
+ * @see SWT#CENTER
+ * @see SWT#PASSWORD
+ * @see SWT#SEARCH
+ * @see SWT#ICON_SEARCH
+ * @see SWT#ICON_CANCEL
  * @see Widget#checkSubclass
  * @see Widget#getStyle
  */
 public Text (Composite parent, int style) {
 	super (parent, checkStyle (style));
 	if ((style & SWT.SEARCH) != 0) {
-		int inAttributesToSet = (style & SWT.CANCEL) != 0 ? OS.kHISearchFieldAttributesCancel : 0;
-		OS.HISearchFieldChangeAttributes (handle, inAttributesToSet, 0);
 		/*
-		* Ensure that SWT.CANCEL is set.
-		* NOTE: CANCEL has the same value as H_SCROLL so it is
+		* Ensure that SWT.ICON_CANCEL and ICON_SEARCH are set.
+		* NOTE: ICON_CANCEL has the same value as H_SCROLL and
+		* ICON_SEARCH has the same value as V_SCROLL so it is
 		* necessary to first clear these bits to avoid a scroll
 		* bar and then reset the bit using the original style
 		* supplied by the programmer.
 		*/
-		if ((style & SWT.CANCEL) != 0) this.style |= SWT.CANCEL;
+		NSSearchFieldCell cell = new NSSearchFieldCell (((NSSearchField) view).cell ());
+		if ((style & SWT.ICON_CANCEL) != 0) {
+			this.style |= SWT.ICON_CANCEL;
+			NSButtonCell cancelCell = cell.cancelButtonCell();
+			targetCancel = cancelCell.target();
+			actionCancel = cancelCell.action();
+			cancelCell.setTarget (view);
+			cancelCell.setAction (OS.sel_sendCancelSelection);
+		} else {
+			cell.setCancelButtonCell (null);
+		}
+		if ((style & SWT.ICON_SEARCH) != 0) {
+			this.style |= SWT.ICON_SEARCH;
+			NSButtonCell searchCell = cell.searchButtonCell();
+			targetSearch = searchCell.target();
+			actionSearch = searchCell.action();
+			searchCell.setTarget (view);
+			searchCell.setAction (OS.sel_sendSearchSelection);
+		} else {
+			cell.setSearchButtonCell (null);
+		}
 	}
 }
 
@@ -167,7 +184,7 @@ public Text (Composite parent, int style) {
  * @see #removeModifyListener
  */
 public void addModifyListener (ModifyListener listener) {
-	checkWidget();
+	checkWidget ();
 	if (listener == null) error (SWT.ERROR_NULL_ARGUMENT);
 	TypedListener typedListener = new TypedListener (listener);
 	addListener (SWT.Modify, typedListener);
@@ -200,11 +217,11 @@ public void addModifyListener (ModifyListener listener) {
  * @see SelectionEvent
  */
 public void addSelectionListener(SelectionListener listener) {
-	checkWidget();
+	checkWidget ();
 	if (listener == null) error (SWT.ERROR_NULL_ARGUMENT);
-	TypedListener typedListener = new TypedListener(listener);
-	addListener(SWT.Selection,typedListener);
-	addListener(SWT.DefaultSelection,typedListener);
+	TypedListener typedListener = new TypedListener (listener);
+	addListener (SWT.Selection,typedListener);
+	addListener (SWT.DefaultSelection,typedListener);
 }
 
 /**
@@ -227,7 +244,7 @@ public void addSelectionListener(SelectionListener listener) {
  * @see #removeVerifyListener
  */
 public void addVerifyListener (VerifyListener listener) {
-	checkWidget();
+	checkWidget ();
 	if (listener == null) error (SWT.ERROR_NULL_ARGUMENT);
 	TypedListener typedListener = new TypedListener (listener);
 	addListener (SWT.Verify, typedListener);
@@ -251,28 +268,46 @@ public void addVerifyListener (VerifyListener listener) {
  * </ul>
  */
 public void append (String string) {
-	checkWidget();
+	checkWidget ();
 	if (string == null) error (SWT.ERROR_NULL_ARGUMENT);
 	if (hooks (SWT.Verify) || filters (SWT.Verify)) {
 		int charCount = getCharCount ();
 		string = verifyText (string, charCount, charCount, null);
 		if (string == null) return;
 	}
-	if (txnObject == 0) {
+	NSString str = NSString.stringWith (string);
+	if ((style & SWT.SINGLE) != 0) {
 		setSelection (getCharCount ());
 		insertEditText (string);
 	} else {
-		setTXNText (OS.kTXNEndOffset, OS.kTXNEndOffset, string);
-		OS.TXNSetSelection (txnObject, OS.kTXNEndOffset, OS.kTXNEndOffset);
-		OS.TXNShowSelection (txnObject, false);
+		NSTextView widget = (NSTextView) view;
+		NSTextStorage storage = widget.textStorage ();
+		NSRange range = new NSRange();
+		range.location = storage.length();
+		storage.replaceCharactersInRange (range, str);
+		range.location = storage.length();
+		widget.scrollRangeToVisible (range);
+		widget.setSelectedRange(range);
 	}
-	if (string.length () != 0) sendModifyEvent (true);
+	if (string.length () != 0) sendEvent (SWT.Modify);
+}
+
+boolean becomeFirstResponder (int /*long*/ id, int /*long*/ sel) {
+	receivingFocus = true;
+	boolean result = super.becomeFirstResponder (id, sel);
+	receivingFocus = false;
+	return result;
 }
 
 static int checkStyle (int style) {
 	if ((style & SWT.SEARCH) != 0) {
 		style |= SWT.SINGLE | SWT.BORDER;
 		style &= ~SWT.PASSWORD;
+		/* 
+		* NOTE: ICON_CANCEL has the same value as H_SCROLL and
+		* ICON_SEARCH has the same value as V_SCROLL so they are
+		* cleared because SWT.SINGLE is set. 
+		*/
 	}
 	if ((style & SWT.SINGLE) != 0 && (style & SWT.MULTI) != 0) {
 		style &= ~SWT.MULTI;
@@ -289,73 +324,6 @@ static int checkStyle (int style) {
 	return style | SWT.SINGLE;
 }
 
-int callPaintEventHandler (int control, int damageRgn, int visibleRgn, int theEvent, int nextHandler) {
-	int result = super.callPaintEventHandler (control, damageRgn, visibleRgn, theEvent, nextHandler);
-	if (frameHandle == control) {
-		int [] context = new int [1];
-		OS.GetEventParameter (theEvent, OS.kEventParamCGContextRef, OS.typeCGContextRef, null, 4, null, context);
-		OS.CGContextSaveGState (context[0]);
-		int [] outMetric = new int [1];
-		OS.GetThemeMetric (OS.kThemeMetricFocusRectOutset, outMetric);
-		CGRect rect = new CGRect ();
-		OS.HIViewGetBounds (frameHandle, rect);
-		rect.x += outMetric [0];
-		rect.y += outMetric [0];
-		rect.width -= outMetric [0] * 2;
-		rect.height -= outMetric [0] * 2;
-		int state;
-		if (OS.IsControlEnabled (control)) {
-			state = OS.IsControlActive (control) ? OS.kThemeStateActive : OS.kThemeStateInactive;
-		} else {
-			state = OS.IsControlActive (control) ? OS.kThemeStateUnavailable : OS.kThemeStateUnavailableInactive;
-		}
-		HIThemeFrameDrawInfo info = new HIThemeFrameDrawInfo ();
-		info.state = state;
-		info.isFocused = hasFocus ();
-		info.kind = OS.kHIThemeFrameTextFieldSquare;
-		OS.HIThemeDrawFrame (rect, info, context [0], OS.kHIThemeOrientationNormal);
-		if ((style & (SWT.H_SCROLL | SWT.V_SCROLL)) == (SWT.V_SCROLL | SWT.H_SCROLL)) {
-			OS.HIViewGetBounds (frameHandle, rect);
-			rect.x = rect.width - outMetric [0];
-			rect.y = rect.height - outMetric [0];
-			OS.GetThemeMetric (OS.kThemeMetricEditTextFrameOutset, outMetric);
-			rect.x -= outMetric [0];
-			rect.y -= outMetric [0];
-			OS.GetThemeMetric (OS.kThemeMetricScrollBarWidth, outMetric);
-			rect.x -= outMetric [0];
-			rect.y -= outMetric [0];
-			rect.width = rect.height = outMetric [0];
-			OS.CGContextSetFillColor (context [0], new float[]{1, 1, 1, 1});
-			OS.CGContextFillRect (context [0], rect);
-		}
-		OS.CGContextRestoreGState (context[0]);
-	}
-	return result;
-}
-
-int callFocusEventHandler (int nextHandler, int theEvent) {
-	short [] part = new short [1];
-	if (txnObject == 0) {
-		OS.GetEventParameter (theEvent, OS.kEventParamControlPart, OS.typeControlPartCode, null, 2, null, part);
-		if (part [0] == OS.kControlFocusNoPart) {
-			selection = new ControlEditTextSelectionRec ();
-			OS.GetControlData (handle, (short) OS.kControlEntireControl, OS.kControlEditTextSelectionTag, 4, selection, null);
-		}
-	}
-	int result = super.callFocusEventHandler (nextHandler, theEvent);
-	if (isDisposed () ) return result;
-	if (frameHandle != 0) {
-		OS.HIViewSetNeedsDisplay (frameHandle, true);
-	}
-	if (txnObject == 0) {
-		if (part [0] != OS.kControlFocusNoPart && selection != null) {
-			OS.SetControlData (handle, (short) OS.kControlEntireControl, OS.kControlEditTextSelectionTag, 4, selection);
-			selection = null;
-		}
-	}
-	return result;
-}
-
 /**
  * Clears the selection.
  *
@@ -365,115 +333,94 @@ int callFocusEventHandler (int nextHandler, int theEvent) {
  * </ul>
  */
 public void clearSelection () {
-	checkWidget();
-	if (txnObject == 0) {
-		Point selection = getSelection ();
-		setSelection (selection.x);
-	} else {
-		int [] oStartOffset = new int [1], oEndOffset = new int [1];
-		OS.TXNGetSelection (txnObject, oStartOffset, oEndOffset);
-		OS.TXNSetSelection (txnObject, oStartOffset [0], oStartOffset [0]);
-	}
+	checkWidget ();
+	Point selection = getSelection ();
+	setSelection (selection.x);	
 }
 
 public Point computeSize (int wHint, int hHint, boolean changed) {
-	checkWidget();
+	checkWidget ();
 	int width = 0, height = 0;
-	if (txnObject == 0) {
-		if ((style & SWT.SEARCH) != 0) {
-			int [] ptr1 = new int [1];
-			OS.GetControlData (handle, (short)OS.kControlEntireControl, OS.kControlEditTextCFStringTag, 4, ptr1, null);
-			Point size1 = textExtent (ptr1 [0], 0);
-			if (ptr1 [0] != 0) OS.CFRelease (ptr1 [0]);
-			width = size1.x;
-			height = size1.y;
-			int [] metric = new int [1];
-			OS.GetThemeMetric (OS.kThemeMetricEditTextWhitespace, metric);
-			height += metric [0] * 2;
-			OS.GetThemeMetric (OS.kThemeMetricEditTextFrameOutset, metric);
-			height += metric [0] * 2;
-			//This code is intentionally commented
-//			int [] ptr2 = new int [1];
-//			OS.HISearchFieldCopyDescriptiveText (handle, ptr2);
-//			Point size2 = textExtent (ptr2 [0], 0);
-//			width = Math.max (width, size2.x);
-//			if (ptr2 [0] != 0) OS.CFRelease (ptr2 [0]);
-		} else {
-			if ((style & SWT.RIGHT) != 0) {
-				OS.SetControlData (handle, OS.kControlEntireControl, OS.kControlEditTextSingleLineTag, 1, new byte [] {1});
-			}
-			Rect rect = new Rect ();
-			OS.GetBestControlRect (handle, rect, null);
-			if ((style & SWT.RIGHT) != 0) {
-				OS.SetControlData (handle, OS.kControlEntireControl, OS.kControlEditTextSingleLineTag, 1, new byte [] {0});
-			}
-			width = rect.right - rect.left;
-			height = rect.bottom - rect.top;
+	if ((style & SWT.SINGLE) != 0) {
+		NSTextField widget = (NSTextField) view;
+		NSSize size = widget.cell ().cellSize ();
+		width = (int)Math.ceil (size.width);
+		height = (int)Math.ceil (size.height);
+
+		Point border = null;
+		if ((style & SWT.BORDER) != 0 && (wHint != SWT.DEFAULT || hHint != SWT.DEFAULT)) {
+			/* determine the size of the cell without its border */
+			NSRect insets = widget.cell ().titleRectForBounds (new NSRect ());
+			border = new Point (-(int)Math.ceil (insets.width), -(int)Math.ceil (insets.height));
+			width -= border.x;
+			height -= border.y;
+		}
+		if (width <= 0) width = DEFAULT_WIDTH;
+		if (height <= 0) height = DEFAULT_HEIGHT;
+		if (wHint != SWT.DEFAULT) width = wHint;
+		if (hHint != SWT.DEFAULT) height = hHint;
+		if (border != null) {
+			/* re-add the border size (if any) now that wHint/hHint is taken */
+			width += border.x;
+			height += border.y;
 		}
 	} else {
-		int [] oDataHandle = new int [1];
-		OS.TXNGetData (txnObject, OS.kTXNStartOffset, OS.kTXNEndOffset, oDataHandle);
-		if (oDataHandle [0] != 0) {
-			int length = OS.GetHandleSize (oDataHandle [0]), str = 0;
-			if (length != 0) {
-				int [] ptr = new int [1];
-				OS.HLock (oDataHandle [0]);
-				OS.memmove (ptr, oDataHandle [0], 4);
-				str = OS.CFStringCreateWithCharacters (OS.kCFAllocatorDefault, ptr [0], length / 2);					
-				OS.HUnlock (oDataHandle[0]);
-			}
-			OS.DisposeHandle (oDataHandle[0]);
-			Point size = textExtent (str, wHint != SWT.DEFAULT && (style & SWT.WRAP) != 0 ? wHint : 0);
-			if (str != 0) OS.CFRelease(str);
-			width = size.x;
-			height = size.y;
+		NSLayoutManager layoutManager = (NSLayoutManager)new NSLayoutManager ().alloc ().init ();
+		NSTextContainer textContainer = (NSTextContainer)new NSTextContainer ().alloc ();
+		NSSize size = new NSSize ();
+		size.width = size.height = Float.MAX_VALUE;
+		if ((style & SWT.WRAP) != 0) {
+			if (wHint != SWT.DEFAULT) size.width = wHint;
+			if (hHint != SWT.DEFAULT) size.height = hHint;
 		}
+		textContainer.initWithContainerSize (size);
+		layoutManager.addTextContainer (textContainer);
+
+		NSTextStorage textStorage = (NSTextStorage)new NSTextStorage ().alloc ().init ();
+		textStorage.setAttributedString (((NSTextView)view).textStorage ());
+		layoutManager.setTextStorage (textStorage);
+		layoutManager.glyphRangeForTextContainer (textContainer);
+
+		NSRect rect = layoutManager.usedRectForTextContainer (textContainer);
+		width = layoutManager.numberOfGlyphs () == 0 ? DEFAULT_WIDTH : (int)Math.ceil (rect.width);
+		height = (int)Math.ceil (rect.height);
+		textStorage.release ();
+		textContainer.release ();
+		layoutManager.release ();
+
+		if (width <= 0) width = DEFAULT_WIDTH;
+		if (height <= 0) height = DEFAULT_HEIGHT;
+		if (wHint != SWT.DEFAULT) width = wHint;
+		if (hHint != SWT.DEFAULT) height = hHint;
+		Rectangle trim = computeTrim (0, 0, width, height);
+		width = trim.width;
+		height = trim.height;
 	}
-	if (width <= 0) width = DEFAULT_WIDTH;
-	if (height <= 0) height = DEFAULT_HEIGHT;
-	if (wHint != SWT.DEFAULT) width = wHint;
-	if (hHint != SWT.DEFAULT) height = hHint;
-	Rectangle trim = computeTrim (0, 0, width, height);
-	width = trim.width;
-	height = trim.height;
 	return new Point (width, height);
 }
 
 public Rectangle computeTrim (int x, int y, int width, int height) {
-	checkWidget ();
-	int [] size = new int [1];
-	OS.GetThemeMetric(OS.kThemeMetricScrollBarWidth, size);
-	if (horizontalBar != null) height += size [0];
-	if (verticalBar != null) width += size [0];
-	Rect inset = inset ();
-	x -= inset.left;
-	y -= inset.top;
-	width += inset.left + inset.right;
-	height += inset.top + inset.bottom;
-	if (txnObject == 0) {
-		inset = getInset ();
-		x -= inset.left;
-		y -= inset.top;
-		width += inset.left + inset.right;
-		height += inset.top + inset.bottom;
-	}
-	if ((style & SWT.SEARCH) != 0) {
-		int [] left = new int [1], right = new int [1];
-		int [] outAttributes = new int [1];
-		OS.HISearchFieldGetAttributes (handle, outAttributes);
-		if ((outAttributes [0] & OS.kHISearchFieldAttributesSearchIcon) != 0) {
-			OS.GetThemeMetric (display.smallFonts ? OS.kThemeMetricRoundTextFieldSmallContentInsetWithIconLeft : OS.kThemeMetricRoundTextFieldContentInsetWithIconLeft, left);
-		} else {
-			OS.GetThemeMetric (display.smallFonts ? OS.kThemeMetricRoundTextFieldSmallContentInsetLeft : OS.kThemeMetricRoundTextFieldContentInsetLeft, left);			
+	Rectangle result = super.computeTrim (x, y, width, height);
+	if ((style & SWT.SINGLE) != 0) {
+		NSTextField widget = (NSTextField) view;
+		if ((style & SWT.SEARCH) != 0) {
+			NSSearchFieldCell cell = new NSSearchFieldCell (widget.cell ());
+			int testWidth = 100;
+			NSRect rect = new NSRect ();
+			rect.width = testWidth;
+			rect = cell.searchTextRectForBounds (rect);
+			int leftIndent = (int)rect.x;
+			int rightIndent = testWidth - leftIndent - (int)Math.ceil (rect.width);
+			result.x -= leftIndent;
+			result.width += leftIndent + rightIndent;
 		}
-		if ((outAttributes [0] & OS.kHISearchFieldAttributesCancel) != 0) {
-			OS.GetThemeMetric (display.smallFonts ? OS.kThemeMetricRoundTextFieldSmallContentInsetWithIconRight : OS.kThemeMetricRoundTextFieldContentInsetWithIconRight, right);
-		} else {
-			OS.GetThemeMetric (display.smallFonts ? OS.kThemeMetricRoundTextFieldSmallContentInsetRight : OS.kThemeMetricRoundTextFieldContentInsetRight, right);			
-		}
-		width += left [0] + right [0];
+		NSRect inset = widget.cell ().titleRectForBounds (new NSRect ());
+		result.x -= inset.x;
+		result.y -= inset.y;
+		result.width -= inset.width;
+		result.height -= inset.height;
 	}
-	return new Rectangle (x, y, width, height);
+	return result;
 }
 
 /**
@@ -489,126 +436,93 @@ public Rectangle computeTrim (int x, int y, int width, int height) {
  */
 public void copy () {
 	checkWidget ();
-	if (txnObject == 0) {
+	if ((style & SWT.SINGLE) != 0) {
 		Point selection = getSelection ();
 		if (selection.x == selection.y) return;
-		copyToClipboard (getEditText (selection.x, selection.y - 1));	
+		copyToClipboard (getEditText (selection.x, selection.y - 1));
 	} else {
-		OS.TXNCopy (txnObject);
+		NSText text = (NSText) view;
+		if (text.selectedRange ().length == 0) return;
+		text.copy (null);
 	}
 }
 
 void createHandle () {
-	int [] outControl = new int [1];
-	if ((style & SWT.MULTI) != 0 || (style & (SWT.BORDER | SWT.SEARCH)) == 0) {
-		if ((style & (SWT.H_SCROLL | SWT.V_SCROLL)) != 0 || OS.VERSION >= 0x1050) {
-			int options = 0;
-			if ((style & (SWT.H_SCROLL | SWT.V_SCROLL)) == (SWT.H_SCROLL | SWT.V_SCROLL)) options |= OS.kHIScrollViewOptionsAllowGrow;
-			if ((style & SWT.H_SCROLL) != 0) options |= OS.kHIScrollViewOptionsHorizScroll;
-			if ((style & SWT.V_SCROLL) != 0) options |= OS.kHIScrollViewOptionsVertScroll;
-			/*
-			* Bug in the Macintosh.  HIScrollViewCreate() fails if no scroll bit is
-			* specified. In order to get horizontal scrolling in a single line text, a
-			* scroll view is created with the vertical bit set and the scroll bars
-			* are set to auto hide.  But calling HIScrollViewSetScrollBarAutoHide()
-			* before the view has been resized still leaves space for the vertical
-			* scroll bar.  The fix is to call HIScrollViewSetScrollBarAutoHide()
-			* once the widget has been resized.
-			*/
-			if (options == 0) options |= OS.kHIScrollViewOptionsVertScroll;
-			OS.HIScrollViewCreate (options, outControl);
-			if (outControl [0] == 0) error (SWT.ERROR_NO_HANDLES);
-			scrolledHandle = outControl [0];
-			OS.HIViewSetVisible (scrolledHandle, true);
-		}
-		int iFrameOptions = OS.kTXNDontDrawCaretWhenInactiveMask | OS.kTXNMonostyledTextMask;
-		/*
-		* Bug in the Macintosh.  For some reason a single line text does not
-		* display properly when it is right aligned.  The fix is to use a
-		* multi line text when right aligned.
-		*/
-		if ((style & SWT.RIGHT) == 0) {
-			if ((style & SWT.SINGLE) != 0) iFrameOptions |= OS.kTXNSingleLineOnlyMask;
-		}
-		if ((style & SWT.WRAP) != 0) iFrameOptions |= OS.kTXNAlwaysWrapAtViewEdgeMask;
-		OS.HITextViewCreate (null, 0, iFrameOptions, outControl);
-		if (outControl [0] == 0) error (SWT.ERROR_NO_HANDLES);
-		handle = outControl [0];
-		OS.HIViewSetVisible (handle, true);
-		if ((style & SWT.MULTI) != 0 && (style & SWT.BORDER) != 0) {
-			int features = OS.kControlSupportsEmbedding;
-			OS.CreateUserPaneControl (0, null, features, outControl);
-			if (outControl [0] == 0) error (SWT.ERROR_NO_HANDLES);
-			frameHandle = outControl [0];			
-		}
-		txnObject = OS.HITextViewGetTXNObject (handle);			
-		int ptr = OS.NewPtr (Rect.sizeof);
-		Rect rect = (style & SWT.SINGLE) != 0 ? inset () : new Rect ();
-		OS.memmove (ptr, rect, Rect.sizeof);
-		int [] tags = new int [] {
-			OS.kTXNDisableDragAndDropTag,
-			OS.kTXNDoFontSubstitution,
-			OS.kTXNIOPrivilegesTag,
-			OS.kTXNMarginsTag,
-			OS.kTXNJustificationTag,
-		};
-		int just = OS.kTXNFlushLeft;
-		if ((style & SWT.CENTER) != 0) just = OS.kTXNCenter;
-		if ((style & SWT.RIGHT) != 0) just = OS.kTXNFlushRight;
-		int [] datas = new int [] {
-			1,
-			1,
-			(style & SWT.READ_ONLY) != 0 ? 1 : 0,
-			ptr,
-			just,
-		};
-		OS.TXNSetTXNObjectControls (txnObject, false, tags.length, tags, datas);
-		OS.DisposePtr (ptr);
-	} else {
-		if ((style & SWT.SEARCH) != 0) {
-			int attributes = (style & SWT.CANCEL) != 0 ? OS.kHISearchFieldAttributesCancel : 0;
-			OS.HISearchFieldCreate (null, attributes, 0, 0, outControl);
-		} else {
-			int window = OS.GetControlOwner (parent.handle);
-			OS.CreateEditUnicodeTextControl (window, null, 0, (style & SWT.PASSWORD) != 0, null, outControl);
-		}
-		if (outControl [0] == 0) error (SWT.ERROR_NO_HANDLES);
-		handle = outControl [0];
-		if ((style & SWT.SEARCH) != 0 && display.smallFonts) {
-			OS.SetControlData (handle, OS.kControlEntireControl, OS.kControlSizeTag, 2, new short [] {OS.kControlSizeSmall});
-		}
-		/*
-		* Bug in the Macintosh.  For some reason a single line text does not
-		* display selection properly when it is right aligned.  The fix is to use a
-		* multi line text when right aligned.
-		*/
-		if ((style & SWT.RIGHT) == 0) {
-			OS.SetControlData (handle, OS.kControlEntireControl, OS.kControlEditTextSingleLineTag, 1, new byte [] {1});
-		}
-		if ((style & SWT.READ_ONLY) != 0) {
-			OS.SetControlData (handle, OS.kControlEntireControl, OS.kControlEditTextLockedTag, 1, new byte [] {1});
-		}
-		if ((style & (SWT.RIGHT | SWT.CENTER)) != 0) {
-			ControlFontStyleRec fontStyle = new ControlFontStyleRec ();
-			fontStyle.flags |= OS.kControlUseJustMask;
-			if ((style & SWT.CENTER) != 0) fontStyle.just = OS.teJustCenter;
-			if ((style & SWT.RIGHT) != 0) fontStyle.just = OS.teJustRight;
-			OS.SetControlFontStyle (handle, fontStyle);
-		}
-		if ((style & SWT.SEARCH) != 0) {
-			OS.HIViewSetVisible (handle, true);
+	if ((style & SWT.READ_ONLY) != 0) {
+		if ((style & (SWT.BORDER | SWT.H_SCROLL | SWT.V_SCROLL)) == 0) {
+			state |= THEME_BACKGROUND;
 		}
 	}
-}
+	if ((style & SWT.SINGLE) != 0) {
+		NSTextField widget;
+		if ((style & SWT.PASSWORD) != 0) {
+			widget = (NSTextField) new SWTSecureTextField ().alloc ();
+		} else if ((style & SWT.SEARCH) != 0) {
+			widget = (NSTextField) new SWTSearchField ().alloc ();
+		} else {
+			widget = (NSTextField) new SWTTextField ().alloc ();
+		}
+		widget.init ();
+		widget.setSelectable (true);
+		widget.setEditable((style & SWT.READ_ONLY) == 0);
+		if ((style & SWT.BORDER) == 0) {
+			widget.setFocusRingType (OS.NSFocusRingTypeNone);
+			widget.setBordered (false);
+		}
+		int align = OS.NSLeftTextAlignment;
+		if ((style & SWT.CENTER) != 0) align = OS.NSCenterTextAlignment;
+		if ((style & SWT.RIGHT) != 0) align = OS.NSRightTextAlignment;
+		widget.setAlignment (align);
+		NSCell cell = widget.cell();
+		cell.setWraps(false);
+		cell.setScrollable(true);
+//		widget.setTarget(widget);
+//		widget.setAction(OS.sel_sendSelection);
+		view = widget;
+	} else {
+		NSScrollView scrollWidget = (NSScrollView) new SWTScrollView ().alloc ();
+		scrollWidget.init ();
+		scrollWidget.setHasVerticalScroller ((style & SWT.VERTICAL) != 0);
+		scrollWidget.setHasHorizontalScroller ((style & SWT.HORIZONTAL) != 0);
+		scrollWidget.setAutoresizesSubviews (true);
+		if ((style & SWT.BORDER) != 0) scrollWidget.setBorderType (OS.NSBezelBorder);
+		
+		NSTextView widget = (NSTextView) new SWTTextView ().alloc ();
+		widget.init ();
+		widget.setEditable ((style & SWT.READ_ONLY) == 0);
+		
+		NSSize size = new NSSize ();
+		size.width = size.height = Float.MAX_VALUE;
+		widget.setMaxSize (size);
+		widget.setAutoresizingMask (OS.NSViewWidthSizable | OS.NSViewHeightSizable);
 
-ScrollBar createScrollBar (int style) {
-	return createStandardBar (style);
+		if ((style & SWT.WRAP) == 0) {
+			NSTextContainer textContainer = widget.textContainer ();
+			widget.setHorizontallyResizable (true);
+			textContainer.setWidthTracksTextView (false);
+			NSSize csize = new NSSize ();
+			csize.width = csize.height = Float.MAX_VALUE;
+			textContainer.setContainerSize (csize);
+		}
+
+		int align = OS.NSLeftTextAlignment;
+		if ((style & SWT.CENTER) != 0) align = OS.NSCenterTextAlignment;
+		if ((style & SWT.RIGHT) != 0) align = OS.NSRightTextAlignment;
+		widget.setAlignment (align);
+//		widget.setTarget(widget);
+//		widget.setAction(OS.sel_sendSelection);
+		widget.setRichText (false);
+		widget.setDelegate(widget);
+		widget.setFont (display.getSystemFont ().handle);
+
+		view = widget;
+		scrollView = scrollWidget;
+	}
 }
 
 void createWidget () {
 	super.createWidget ();
 	doubleClick = true;
-	if ((style & SWT.PASSWORD) != 0) setEchoChar (PASSWORD);
 	message = "";
 }
 
@@ -625,7 +539,7 @@ void createWidget () {
  * </ul>
  */
 public void cut () {
-	checkWidget();
+	checkWidget ();
 	if ((style & SWT.READ_ONLY) != 0) return;
 	boolean cut = true;
 	char [] oldText = null;
@@ -637,82 +551,64 @@ public void cut () {
 			if (newText == null) return;
 			if (newText.length () != 0) {
 				copyToClipboard (oldText);
-				if (txnObject == 0) {
+				if ((style & SWT.SINGLE) != 0) {
 					insertEditText (newText);
 				} else {
-					setTXNText (OS.kTXNUseCurrentSelection, OS.kTXNUseCurrentSelection, newText);
-					OS.TXNShowSelection (txnObject, false);
+					NSTextView widget = (NSTextView) view;
+					widget.replaceCharactersInRange (widget.selectedRange (), NSString.stringWith (newText));
 				}
 				cut = false;
 			}
 		}
 	}
 	if (cut) {
-		if (txnObject == 0) {
+		if ((style & SWT.SINGLE) != 0) {
 			if (oldText == null) oldText = getEditText (oldSelection.x, oldSelection.y - 1);
 			copyToClipboard (oldText);
 			insertEditText ("");
 		} else {
-			OS.TXNCut (txnObject);
-	
-			/*
-			* Feature in the Macintosh.  When an empty string is set in the TXNObject,
-			* the font attributes are cleared.  The fix is to reset them.
-			*/
-			if (OS.TXNDataSize (txnObject) / 2 == 0) setFontStyle (font);
+			((NSTextView) view).cut (null);
 		}
 	}
 	Point newSelection = getSelection ();
-	if (!cut || !oldSelection.equals (newSelection)) sendModifyEvent (true);
+	if (!cut || !oldSelection.equals (newSelection)) sendEvent (SWT.Modify);
 }
 
 Color defaultBackground () {
-	return display.getSystemColor (SWT.COLOR_LIST_BACKGROUND);
+	return display.getWidgetColor (SWT.COLOR_LIST_BACKGROUND);
+}
+
+NSFont defaultNSFont () {
+	if ((style & SWT.MULTI) != 0) return display.textViewFont;
+	if ((style & SWT.SEARCH) != 0) return display.searchFieldFont;
+	if ((style & SWT.PASSWORD) != 0) return display.secureTextFieldFont;
+	return display.textFieldFont;
 }
 
 Color defaultForeground () {
-	return display.getSystemColor (SWT.COLOR_LIST_FOREGROUND);
+	return display.getWidgetColor (SWT.COLOR_LIST_FOREGROUND);
 }
 
-void deregister () {
-	super.deregister ();
-	if (frameHandle != 0) display.removeWidget (frameHandle);
+void deregister() {
+	super.deregister();
+	
+	if ((style & SWT.SINGLE) != 0) {
+		display.removeWidget(((NSControl)view).cell());
+	}
 }
 
 boolean dragDetect (int x, int y, boolean filter, boolean [] consume) {
-	if (filter) {
-		Point selection = getSelection ();
-		if (selection.x != selection.y) {
-			int position = getPosition (x, y);
-			if (selection.x <= position && position < selection.y) {
-				if (super.dragDetect (x, y, filter, consume)) {
-					if (consume != null) consume [0] = true;
-					return true;
-				}
+	Point selection = getSelection ();
+	if (selection.x != selection.y) {
+		int /*long*/ position = getPosition (x, y);
+		if (selection.x <= position && position < selection.y) {
+			if (super.dragDetect (x, y, filter, consume)) {
+				if (consume != null) consume [0] = true;
+				return true;
 			}
 		}
-		return false;
 	}
-	return super.dragDetect (x, y, filter, consume);
-}
-
-int focusPart () {
-	if ((style & SWT.SEARCH) != 0) return OS.kControlEditTextPart;
-	return super.focusPart ();
-}
-
-String [] getAxAttributes () {
-	return AX_ATTRIBUTES;
-}
-
-public int getBorderWidth () {
-	checkWidget();
-	if (hasBorder ()) {
-		int [] outMetric = new int [1];
-		OS.GetThemeMetric (OS.kThemeMetricEditTextFrameOutset, outMetric);
-		return outMetric [0];
-	}
-	return 0;
+	return false;
 }
 
 /**
@@ -729,9 +625,14 @@ public int getBorderWidth () {
  * </ul>
  */
 public int getCaretLineNumber () {
-	checkWidget();
+	checkWidget ();
 	if ((style & SWT.SINGLE) != 0) return 0;
     return (getTopPixel () + getCaretLocation ().y) / getLineHeight ();
+}
+
+boolean acceptsFirstResponder(int /*long*/ id, int /*long*/ sel) {
+	if ((style & SWT.READ_ONLY) != 0) return true;
+	return super.acceptsFirstResponder(id, sel);
 }
 
 /**
@@ -749,18 +650,23 @@ public int getCaretLineNumber () {
  * </ul>
  */
 public Point getCaretLocation () {
-	checkWidget();
-	if (txnObject == 0) {
-		//TODO - caret location for unicode text
+	checkWidget ();
+	if ((style & SWT.SINGLE) != 0) {
+		//TODO - caret location for single text
 		return new Point (0, 0);
 	}
-	CGPoint oPoint = new CGPoint ();
-	int [] oStartOffset = new int [1], oEndOffset = new int [1];
-	OS.TXNGetSelection (txnObject, oStartOffset, oEndOffset);
-	OS.TXNOffsetToHIPoint (txnObject, oStartOffset [0], oPoint);
-	Rect oViewRect = new Rect ();
-	OS.TXNGetViewRect (txnObject, oViewRect);
-	return new Point ((int) oPoint.x - oViewRect.left, (int) oPoint.y - oViewRect.top);
+	NSTextView widget = (NSTextView)view;
+	NSLayoutManager layoutManager = widget.layoutManager();
+	NSTextContainer container = widget.textContainer();
+	NSRange range = widget.selectedRange();
+	int /*long*/ pRectCount = OS.malloc(C.PTR_SIZEOF);
+	int /*long*/ pArray = layoutManager.rectArrayForCharacterRange(range, range, container, pRectCount);
+	int /*long*/ [] rectCount = new int /*long*/ [1];
+	OS.memmove(rectCount, pRectCount, C.PTR_SIZEOF);
+	OS.free(pRectCount);
+	NSRect rect = new NSRect();
+	if (rectCount[0] > 0) OS.memmove(rect, pArray, NSRect.sizeof);
+	return new Point((int)rect.x, (int)rect.y);
 }
 
 /**
@@ -777,13 +683,13 @@ public Point getCaretLocation () {
  * </ul>
  */
 public int getCaretPosition () {
-	checkWidget();
-	if (txnObject == 0) {
-		return getSelection ().x;
+	checkWidget ();
+	if ((style & SWT.SINGLE) != 0) {
+		return selectionRange != null ? (int)/*64*/selectionRange.location : 0;
+	} else {
+		NSRange range = ((NSTextView)view).selectedRange();
+		return (int)/*64*/range.location;
 	}
-	int [] oStartOffset = new int [1], oEndOffset = new int [1];
-	OS.TXNGetSelection (txnObject, oStartOffset, oEndOffset);
-	return oStartOffset [0];
 }
 
 /**
@@ -798,15 +704,11 @@ public int getCaretPosition () {
  */
 public int getCharCount () {
 	checkWidget ();
-	if (txnObject == 0) {
-		int [] ptr = new int [1];
-		int result = OS.GetControlData (handle, (short)OS.kControlEntireControl, OS.kControlEditTextCFStringTag, 4, ptr, null);
-		if (result != OS.noErr) return 0;
-		int length = OS.CFStringGetLength (ptr [0]);
-		OS.CFRelease (ptr[0]);
-		return length;
+	if ((style & SWT.SINGLE) != 0) {
+		return (int)/*64*/new NSCell (((NSControl) view).cell ()).title ().length ();
+	} else {
+		return (int)/*64*/((NSTextView) view).textStorage ().length ();
 	}
-	return OS.TXNDataSize (txnObject) / 2;
 }
 
 /**
@@ -825,7 +727,7 @@ public int getCharCount () {
  * </ul>
  */
 public boolean getDoubleClickEnabled () {
-	checkWidget();
+	checkWidget ();
     return doubleClick;
 }
 
@@ -847,7 +749,7 @@ public boolean getDoubleClickEnabled () {
  * @see #setEchoChar
  */
 public char getEchoChar () {
-	checkWidget();
+	checkWidget ();
 	return echoCharacter;
 }
 
@@ -862,14 +764,52 @@ public char getEchoChar () {
  * </ul>
  */
 public boolean getEditable () {
-	checkWidget();
+	checkWidget ();
 	return (style & SWT.READ_ONLY) == 0;
 }
 
-Rect getInset () {
-	if ((style & SWT.SEARCH) != 0) return display.searchTextInset;
-	if (txnObject != 0) return super.getInset ();
-	return display.editTextInset;
+char [] getEditText () {
+	NSString str = null;
+	if ((style & SWT.SINGLE) != 0) {
+		str = new NSTextFieldCell (((NSTextField) view).cell ()).title ();
+	} else {
+		str = ((NSTextView)view).textStorage().string();
+	}
+
+	int length = (int)/*64*/str.length ();
+	char [] buffer = new char [length];
+	if (hiddenText != null) {
+		hiddenText.getChars (0, length, buffer, 0);
+	} else {
+		NSRange range = new NSRange ();
+		range.length = length;
+		str.getCharacters (buffer, range);
+	}
+	return buffer;
+}
+
+char [] getEditText (int start, int end) {
+	NSString str = null;
+	if ((style & SWT.SINGLE) != 0) {
+		str = new NSTextFieldCell (((NSTextField) view).cell ()).title ();
+	} else {
+		str = ((NSTextView)view).textStorage().string();
+	}
+
+	int length = (int)/*64*/str.length ();
+	end = Math.min (end, length - 1);
+	if (start > end) return new char [0];
+	start = Math.max (0, start);
+	NSRange range = new NSRange ();
+	range.location = start;
+	range.length = Math.max (0, end - start + 1);
+	char [] buffer = new char [(int)/*64*/range.length];
+	if (hiddenText != null) {
+		hiddenText.getChars ((int)/*64*/range.location, (int)/*64*/(range.location + range.length), buffer, 0);
+	} else {
+		str.getCharacters (buffer, range);
+	}
+	return buffer;
 }
 
 /**
@@ -883,11 +823,16 @@ Rect getInset () {
  * </ul>
  */
 public int getLineCount () {
-	checkWidget();
+	checkWidget ();
 	if ((style & SWT.SINGLE) != 0) return 1;
-	int [] oLineTotal = new int [1];
-	OS.TXNGetLineCount (txnObject, oLineTotal);
-	return oLineTotal [0];
+	NSTextStorage storage = ((NSTextView) view).textStorage ();
+	int count = (int)/*64*/storage.paragraphs ().count ();
+	NSString string = storage.string();
+	int /*long*/ length = string.length(), c;
+	if (length == 0 || (c = string.characterAtIndex(length - 1)) == '\n' || c == '\r') {
+		count++;
+	}
+	return count;
 }
 
 /**
@@ -903,7 +848,7 @@ public int getLineCount () {
  * @see #DELIMITER
  */
 public String getLineDelimiter () {
-	checkWidget();
+	checkWidget ();
 	return DELIMITER;
 }
 
@@ -918,13 +863,19 @@ public String getLineDelimiter () {
  * </ul>
  */
 public int getLineHeight () {
-	checkWidget();
-	if (txnObject == 0) {
-		return textExtent (new char[]{' '}, 0).y;
-	} 
-	int [] oLineWidth = new int [1], oLineHeight = new int [1];
-	OS.TXNGetLineMetrics (txnObject, 0, oLineWidth, oLineHeight);
-	return OS.Fix2Long (oLineHeight [0]);
+	checkWidget ();
+	Font font = this.font != null ? this.font : defaultFont();
+	if ((style & SWT.SINGLE) != 0) {
+		NSDictionary dict = NSDictionary.dictionaryWithObject(font.handle, OS.NSFontAttributeName);
+		NSString str = NSString.stringWith(" ");
+		NSAttributedString attribStr = ((NSAttributedString)new NSAttributedString().alloc()).initWithString(str, dict);
+		NSSize size = attribStr.size();
+		attribStr.release();
+		return (int) size.height;
+	} else {
+		NSTextView widget = (NSTextView)view;
+		return (int)Math.ceil(widget.layoutManager().defaultLineHeightForFont(font.handle));
+	}
 }
 
 /**
@@ -941,18 +892,15 @@ public int getLineHeight () {
  * @since 2.1.2
  */
 public int getOrientation () {
-	checkWidget();
+	checkWidget ();
 	return style & (SWT.LEFT_TO_RIGHT | SWT.RIGHT_TO_LEFT);
 }
 
 /**
- * Returns the widget message. When the widget is created
- * with the style <code>SWT.SEARCH</code>, the message text
- * is displayed as a hint for the user, indicating the
- * purpose of the field.
+ * Returns the widget message.  The message text is displayed
+ * as a hint for the user, indicating the purpose of the field.
  * <p>
- * Note: This operation is a <em>HINT</em> and is not
- * supported on platforms that do not have this concept.
+ * Typically this is used in conjunction with <code>SWT.SEARCH</code>.
  * </p>
  * 
  * @return the widget message
@@ -969,22 +917,18 @@ public String getMessage () {
 	return message;
 }
 
-int getPosition (int x, int y) {
+int /*long*/ getPosition (int /*long*/ x, int /*long*/ y) {
 //	checkWidget ();
-	if (txnObject == 0) return -1;
-	int [] oOffset = new int [1];
-	Rect oViewRect = new Rect ();
-	OS.TXNGetViewRect (txnObject, oViewRect);
-	CGPoint iPoint = new CGPoint ();
-	iPoint.x = x + oViewRect.left;
-	iPoint.y = y + oViewRect.top;
-	return OS.TXNHIPointToOffset (txnObject, iPoint, oOffset) == OS.noErr ? oOffset [0] : -1;
-}
-
-/*public*/ int getPosition (Point point) {
-	checkWidget ();
-	if (point == null) error (SWT.ERROR_NULL_ARGUMENT);
-	return getPosition (point.x, point.y);
+	if ((style & SWT.MULTI) != 0) {
+		NSTextView widget = (NSTextView) view;
+		NSPoint viewLocation = new NSPoint();
+		viewLocation.x = x;
+		viewLocation.y = y;
+		return widget.characterIndexForInsertionAtPoint(viewLocation);
+	} else {
+		//TODO 
+		return 0;
+	}
 }
 
 /**
@@ -1006,20 +950,17 @@ int getPosition (int x, int y) {
  * </ul>
  */
 public Point getSelection () {
-	checkWidget();
-	if (txnObject == 0) {
-		ControlEditTextSelectionRec selection;
-		if (this.selection != null) {
-			selection = this.selection;
-		} else {
-			selection = new ControlEditTextSelectionRec ();
-			OS.GetControlData (handle, (short) OS.kControlEntireControl, OS.kControlEditTextSelectionTag, 4, selection, null);
+	checkWidget ();
+	if ((style & SWT.SINGLE) != 0) {
+		if (selectionRange == null) {
+			NSString str = new NSTextFieldCell (((NSTextField) view).cell ()).title ();
+			return new Point((int)/*64*/str.length (), (int)/*64*/str.length ());
 		}
-		return new Point (selection.selStart, selection.selEnd);
+		return new Point ((int)/*64*/selectionRange.location, (int)/*64*/(selectionRange.location + selectionRange.length));
 	} else {
-		int [] oStartOffset = new int [1], oEndOffset = new int [1];
-		OS.TXNGetSelection (txnObject, oStartOffset, oEndOffset);
-		return new Point (oStartOffset [0], oEndOffset [0]);
+		NSTextView widget = (NSTextView) view;
+		NSRange range = widget.selectedRange ();
+		return new Point ((int)/*64*/range.location, (int)/*64*/(range.location + range.length));
 	}
 }
 
@@ -1034,14 +975,13 @@ public Point getSelection () {
  * </ul>
  */
 public int getSelectionCount () {
-	checkWidget();
-	if (txnObject == 0) {
-		Point selection = getSelection ();
-		return selection.y - selection.x;
+	checkWidget ();
+	if ((style & SWT.SINGLE) != 0) {
+		return selectionRange != null ? (int)/*64*/selectionRange.length : 0;
 	} else {
-		int [] oStartOffset = new int [1], oEndOffset = new int [1];
-		OS.TXNGetSelection (txnObject, oStartOffset, oEndOffset);
-		return oEndOffset [0] - oStartOffset [0];
+		NSTextView widget = (NSTextView) view;
+		NSRange range = widget.selectedRange ();
+		return (int)/*64*/range.length;
 	}
 }
 
@@ -1056,13 +996,18 @@ public int getSelectionCount () {
  * </ul>
  */
 public String getSelectionText () {
-	checkWidget();
-	if (txnObject == 0) {
+	checkWidget ();
+	if ((style & SWT.SINGLE) != 0) {
 		Point selection = getSelection ();
 		if (selection.x == selection.y) return "";
 		return new String (getEditText (selection.x, selection.y - 1));
 	} else {
-		return getTXNText (OS.kTXNUseCurrentSelection, OS.kTXNUseCurrentSelection);
+		NSTextView widget = (NSTextView) view;
+		NSRange range = widget.selectedRange ();
+		NSString str = widget.textStorage ().string ();
+		char[] buffer = new char [(int)/*64*/range.length];
+		str.getCharacters (buffer, range);
+		return new String (buffer);
 	}
 }
 
@@ -1082,7 +1027,7 @@ public String getSelectionText () {
  * </ul>
  */
 public int getTabs () {
-	checkWidget();
+	checkWidget ();
 	return tabs;
 }
 
@@ -1101,12 +1046,14 @@ public int getTabs () {
  * </ul>
  */
 public String getText () {
-	checkWidget();
-	if (txnObject == 0) {
-		return new String (getEditText (0, -1));
+	checkWidget ();
+	NSString str;
+	if ((style & SWT.SINGLE) != 0) {
+		return new String (getEditText ());
 	} else {
-		return getTXNText (OS.kTXNStartOffset, OS.kTXNEndOffset);
+		str = ((NSTextView)view).textStorage ().string ();
 	}
+	return str.getString();
 }
 
 /**
@@ -1129,40 +1076,20 @@ public String getText () {
  */
 public String getText (int start, int end) {
 	checkWidget ();
-	if (txnObject == 0) {
+	if (!(start <= end && 0 <= end)) return ""; //$NON-NLS-1$
+	if ((style & SWT.SINGLE) != 0) {
 		return new String (getEditText (start, end));
-	} else {
-		if (!(start <= end && 0 <= end)) return "";
-		int length = OS.TXNDataSize (txnObject) / 2;
-		start = Math.max (0, start);
-		end = Math.min (end, length - 1);
-		return getTXNText (start, end + 1);
 	}
-}
-
-char [] getEditText (int start, int end) {
-	int [] ptr = new int [1];
-	int [] actualSize = new int [1];
-	int result = OS.GetControlData (handle, (short)OS.kControlEntireControl, OS.kControlEditTextCFStringTag, 4, ptr, actualSize);
-	if (result != OS.noErr) return new char [0];
-	int length = OS.CFStringGetLength (ptr [0]);
-	CFRange range = new CFRange ();
-	start = Math.min (Math.max (0, start), length);
+	NSTextStorage storage = ((NSTextView) view).textStorage ();
+	end = Math.min (end, (int)/*64*/storage.length () - 1);
+	if (start > end) return ""; //$NON-NLS-1$
+	start = Math.max (0, start);
+	NSRange range = new NSRange ();
 	range.location = start;
-	if (end == -1) {
-		range.length = Math.max (0, length - start);
-	} else {
-		end = Math.min (Math.max (0, end), length - 1);
-		range.length = Math.max (0, end - start + 1);
-	}
-	char [] buffer = new char [range.length];
-	if (hiddenText != null) {
-		hiddenText.getChars (range.location, range.location + range.length, buffer, 0);
-	} else {
-		OS.CFStringGetCharacters (ptr [0], range, buffer);
-	}
-	OS.CFRelease (ptr [0]);
-	return buffer;
+	range.length = end - start + 1;
+	NSAttributedString substring = storage.attributedSubstringFromRange (range);
+	NSString string = substring.string ();
+	return string.getString();
 }
 
 /**
@@ -1182,7 +1109,7 @@ char [] getEditText (int start, int end) {
  * @see #LIMIT
  */
 public int getTextLimit () {
-	checkWidget();
+	checkWidget ();
     return textLimit;
 }
 
@@ -1201,7 +1128,7 @@ public int getTextLimit () {
  * </ul>
  */
 public int getTopIndex () {
-	checkWidget();
+	checkWidget ();
 	if ((style & SWT.SINGLE) != 0) return 0;
     return getTopPixel () / getLineHeight ();
 }
@@ -1227,79 +1154,10 @@ public int getTopIndex () {
  * </ul>
  */
 public int getTopPixel () {
-	checkWidget();
+	checkWidget ();
 	if ((style & SWT.SINGLE) != 0) return 0;
-	CGRect rect = new CGRect ();
-	OS.TXNGetHIRect (txnObject, OS.kTXNDestinationRectKey, rect);
-	int destY = (int) rect.y;
-	OS.TXNGetHIRect (txnObject, OS.kTXNTextRectKey, rect);
-	return destY - (int) rect.y;
+	return (int)scrollView.contentView().bounds().y;
 }
-
-char [] getTXNChars (int iStartOffset, int iEndOffset) {
-	int [] oDataHandle = new int [1];
-	OS.TXNGetData (txnObject, iStartOffset, iEndOffset, oDataHandle);
-	if (oDataHandle [0] == 0) return new char [0];
-	int length = OS.GetHandleSize (oDataHandle [0]);
-	if (length == 0) return new char [0];
-	int [] ptr = new int [1];
-	OS.HLock (oDataHandle [0]);
-	OS.memmove (ptr, oDataHandle [0], 4);
-	char [] buffer = new char [length / 2];
-	OS.memmove (buffer, ptr [0], length);
-	OS.HUnlock (oDataHandle[0]);
-	OS.DisposeHandle (oDataHandle[0]);
-	return buffer;
-}
-
-String getTXNText (int iStartOffset, int iEndOffset) {
-	return new String (getTXNChars (iStartOffset, iEndOffset));
-}
-
-void hookEvents () {
-	super.hookEvents ();
-	if ((style & SWT.SEARCH) != 0) {
-		int searchProc = display.searchProc;
-		int [] mask = new int [] {
-			OS.kEventClassSearchField, OS.kEventSearchFieldCancelClicked,
-		};
-		int controlTarget = OS.GetControlEventTarget (handle);
-		OS.InstallEventHandler (controlTarget, searchProc, mask.length / 2, mask, handle, null);
-	}
-	if (frameHandle != 0) {
-		int controlProc = display.controlProc;
-		int [] mask = new int [] {
-			OS.kEventClassControl, OS.kEventControlDraw,
-		};
-		int controlTarget = OS.GetControlEventTarget (frameHandle);
-		OS.InstallEventHandler (controlTarget, controlProc, mask.length / 2, mask, frameHandle, null);
-	}
-}
-
-Rect inset () {
-	if ((style & SWT.SEARCH) != 0) return super.inset ();
-	if ((style & SWT.SINGLE) != 0 && (style & SWT.BORDER) == 0) {
-		Rect rect = new Rect ();
-		rect.left = rect.top = rect.right = rect.bottom = 1;
-		return rect; 
-	}
-	if ((style & SWT.MULTI) != 0 && (style & SWT.BORDER) != 0) {
-		int [] outMetric = new int [1];
-		OS.GetThemeMetric (OS.kThemeMetricFocusRectOutset, outMetric);
-		Rect rect = new Rect ();
-		rect.left += outMetric [0];
-		rect.top += outMetric [0];
-		rect.right += outMetric [0];
-		rect.bottom += outMetric [0];
-		OS.GetThemeMetric (OS.kThemeMetricEditTextFrameOutset, outMetric);
-		rect.left += outMetric [0];
-		rect.top += outMetric [0];
-		rect.right += outMetric [0];
-		rect.bottom += outMetric [0];		
-		return rect;
-	}
-	return new Rect ();
-} 
 
 /**
  * Inserts a string.
@@ -1318,20 +1176,22 @@ Rect inset () {
  * </ul>
  */
 public void insert (String string) {
-	checkWidget();
+	checkWidget ();
 	if (string == null) error (SWT.ERROR_NULL_ARGUMENT);
 	if (hooks (SWT.Verify) || filters (SWT.Verify)) {
 		Point selection = getSelection ();
 		string = verifyText (string, selection.x, selection.y, null);
 		if (string == null) return;
 	}
-	if (txnObject == 0) {
+	if ((style & SWT.SINGLE) != 0) {
 		insertEditText (string);
 	} else {
-		setTXNText (OS.kTXNUseCurrentSelection, OS.kTXNUseCurrentSelection, string);
-		OS.TXNShowSelection (txnObject, false);
+		NSString str = NSString.stringWith (string);
+		NSTextView widget = (NSTextView) view;
+		NSRange range = widget.selectedRange ();
+		widget.textStorage ().replaceCharactersInRange (range, str);
 	}
-	if (string.length () != 0) sendModifyEvent (true);
+	if (string.length () != 0) sendEvent (SWT.Modify);
 }
 
 void insertEditText (String string) {
@@ -1346,10 +1206,10 @@ void insertEditText (String string) {
 		}
 		char [] buffer = new char [length];
 		string.getChars (0, buffer.length, buffer, 0);
-		int ptr = OS.CFStringCreateWithCharacters (OS.kCFAllocatorDefault, buffer, buffer.length);
-		if (ptr == 0) error (SWT.ERROR_CANNOT_SET_TEXT);
-		OS.SetControlData (handle, OS.kControlEntireControl, OS.kControlEditTextInsertCFStringRefTag, 4, new int[] {ptr});
-		OS.CFRelease (ptr);
+		NSString nsstring = NSString.stringWithCharacters (buffer, buffer.length);
+		NSText fieldEditor = ((NSTextField) view).currentEditor ();
+		if (fieldEditor != null) fieldEditor.replaceCharactersInRange (fieldEditor.selectedRange (), nsstring);
+		selectionRange = null;
 	} else {
 		String oldText = getText ();
 		if (textLimit != LIMIT) {
@@ -1364,172 +1224,9 @@ void insertEditText (String string) {
 	}
 }
 
-int kEventAccessibleGetNamedAttribute (int nextHandler, int theEvent, int userData) {
-	int code = OS.eventNotHandledErr;
-	if (txnObject != 0) {
-		int [] stringRef = new int [1];
-		OS.GetEventParameter (theEvent, OS.kEventParamAccessibleAttributeName, OS.typeCFStringRef, null, 4, null, stringRef);
-		int length = 0;
-		if (stringRef [0] != 0) length = OS.CFStringGetLength (stringRef [0]);
-		char [] buffer = new char [length];
-		CFRange range = new CFRange ();
-		range.length = length;
-		OS.CFStringGetCharacters (stringRef [0], range, buffer);
-		String attributeName = new String(buffer);
-		if (attributeName.equals (OS.kAXRoleAttribute) || attributeName.equals (OS.kAXRoleDescriptionAttribute)) {
-			String roleText = (style & SWT.MULTI) != 0 ? OS.kAXTextAreaRole : OS.kAXTextFieldRole;
-			buffer = new char [roleText.length ()];
-			roleText.getChars (0, buffer.length, buffer, 0);
-			stringRef [0] = OS.CFStringCreateWithCharacters (OS.kCFAllocatorDefault, buffer, buffer.length);
-			if (stringRef [0] != 0) {
-				if (attributeName.equals (OS.kAXRoleAttribute)) {
-					OS.SetEventParameter (theEvent, OS.kEventParamAccessibleAttributeValue, OS.typeCFStringRef, 4, stringRef);
-				} else { // kAXRoleDescriptionAttribute
-					int stringRef2 = OS.HICopyAccessibilityRoleDescription (stringRef [0], 0);
-					OS.SetEventParameter (theEvent, OS.kEventParamAccessibleAttributeValue, OS.typeCFStringRef, 4, new int [] {stringRef2});
-					OS.CFRelease(stringRef2);
-				}
-				OS.CFRelease(stringRef [0]);
-				code = OS.noErr;
-			}
-		} else if (OS.VERSION < 0x1050 && attributeName.equals (OS.kAXFocusedAttribute)) {
-			OS.SetEventParameter (theEvent, OS.kEventParamAccessibleAttributeValue, OS.typeBoolean, 4, new boolean [] {hasFocus ()});
-			code = OS.noErr;
-		} else if (attributeName.equals (OS.kAXTitleAttribute)) {
-			/*
-			* Feature of the Macintosh.  For some reason, AXTextFields return their text contents
-			* when they are asked for their title.  Since they also return their text contents
-			* when they are asked for their value, this causes screen readers to speak the text
-			* twice.  The fix is to return nothing when asked for a title.
-			*/
-			code = OS.noErr;
-		} else if (attributeName.equals (OS.kAXValueAttribute)) {
-			buffer = getTXNChars (OS.kTXNStartOffset, OS.kTXNEndOffset);
-			stringRef [0] = OS.CFStringCreateWithCharacters (OS.kCFAllocatorDefault, buffer, buffer.length);
-			if (stringRef [0] != 0) {
-				OS.SetEventParameter (theEvent, OS.kEventParamAccessibleAttributeValue, OS.typeCFStringRef, 4, stringRef);
-				OS.CFRelease(stringRef [0]);
-				code = OS.noErr;
-			}
-		} else if (attributeName.equals (OS.kAXNumberOfCharactersAttribute)) {
-			OS.SetEventParameter (theEvent, OS.kEventParamAccessibleAttributeValue, OS.typeSInt32, 4, new int [] {getCharCount()});
-			code = OS.noErr;
-		} else if (attributeName.equals (OS.kAXSelectedTextAttribute)) {
-			Point sel = getSelection ();
-			buffer = getTXNChars (sel.x, sel.y);
-			stringRef [0] = OS.CFStringCreateWithCharacters (OS.kCFAllocatorDefault, buffer, buffer.length);
-			if (stringRef [0] != 0) {
-				OS.SetEventParameter (theEvent, OS.kEventParamAccessibleAttributeValue, OS.typeCFStringRef, 4, stringRef);
-				OS.CFRelease(stringRef [0]);
-				code = OS.noErr;
-			}
-		} else if (attributeName.equals (OS.kAXSelectedTextRangeAttribute)) {
-			Point sel = getSelection ();
-			range = new CFRange();
-			range.location = sel.x;
-			range.length = sel.y - sel.x;
-			int valueRef = OS.AXValueCreate(OS.kAXValueCFRangeType, range);
-			OS.SetEventParameter (theEvent, OS.kEventParamAccessibleAttributeValue, OS.typeCFTypeRef, 4, new int [] {valueRef});
-			OS.CFRelease(valueRef);
-			code = OS.noErr;
-		} else if (attributeName.equals (OS.kAXStringForRangeParameterizedAttribute)) {
-			int valueRef [] = new int [1];
-			int status = OS.GetEventParameter (theEvent, OS.kEventParamAccessibleAttributeParameter, OS.typeCFTypeRef, null, 4, null, valueRef);
-			if (status == OS.noErr) {
-				range = new CFRange();
-				boolean ok = OS.AXValueGetValue(valueRef[0], OS.kAXValueCFRangeType, range);
-				if (ok) {
-					buffer = getTXNChars (range.location, range.location + range.length);
-					stringRef [0] = OS.CFStringCreateWithCharacters (OS.kCFAllocatorDefault, buffer, buffer.length);
-					if (stringRef [0] != 0) {
-						OS.SetEventParameter (theEvent, OS.kEventParamAccessibleAttributeValue, OS.typeCFStringRef, 4, stringRef);
-						OS.CFRelease(stringRef [0]);
-						code = OS.noErr;
-					}
-				}
-			}
-		}
-	}
-	if (accessible != null) {
-		code = accessible.internal_kEventAccessibleGetNamedAttribute (nextHandler, theEvent, code);
-	}
-	return code;
-}
-
-int kEventMouseDown (int nextHandler, int theEvent, int userData) {
-	int result = super.kEventMouseDown (nextHandler, theEvent, userData);
-	if (result == OS.noErr) return result;
-	if (!doubleClick) {
-		int [] clickCount = new int [1];
-		OS.GetEventParameter (theEvent, OS.kEventParamClickCount, OS.typeUInt32, null, 4, null, clickCount);
-		if (clickCount [0] > 1) return OS.noErr;
-	}
-	return result;
-}
-
-int kEventSearchFieldCancelClicked (int nextHandler, int theEvent, int userData) {
-	int result = super.kEventSearchFieldCancelClicked (nextHandler, theEvent, userData);
-	if (result == OS.noErr) return result;
-	setText ("");
-	Event event = new Event ();
-	event.detail = SWT.CANCEL;
-	postEvent (SWT.DefaultSelection, event);
-	return result;
-}
-
-int kEventUnicodeKeyPressed (int nextHandler, int theEvent, int userData) {
-	int result = super.kEventUnicodeKeyPressed (nextHandler, theEvent, userData);
-	if (result == OS.noErr) return result;
-	int [] keyboardEvent = new int [1];
-	OS.GetEventParameter (theEvent, OS.kEventParamTextInputSendKeyboardEvent, OS.typeEventRef, null, keyboardEvent.length * 4, null, keyboardEvent);
-	int [] modifiers = new int [1];
-	OS.GetEventParameter (keyboardEvent [0], OS.kEventParamKeyModifiers, OS.typeUInt32, null, 4, null, modifiers);
-	if (modifiers [0] == OS.cmdKey) {
-		int [] keyCode = new int [1];
-		OS.GetEventParameter (keyboardEvent [0], OS.kEventParamKeyCode, OS.typeUInt32, null, keyCode.length * 4, null, keyCode);
-		switch (keyCode [0]) {
-			case 7: /* X */
-				cut ();
-				return OS.noErr;
-			case 8: /* C */
-				copy ();
-				return OS.noErr;
-			case 9: /* V */
-				paste ();
-				return OS.noErr;
-		}
-	}
-	if ((style & SWT.SINGLE) != 0) {
-		int [] keyCode = new int [1];
-		OS.GetEventParameter (keyboardEvent [0], OS.kEventParamKeyCode, OS.typeUInt32, null, keyCode.length * 4, null, keyCode);
-		switch (keyCode [0]) {
-			/*
-			* Feature in the Macintosh.  Tab and Return characters are inserted into a
-			* single line TXN Object.  While this may be correct platform behavior, it is
-			* unexpected.  The fix is to avoid calling the default handler. 
-			*/
-			case 76: /* KP Enter */
-			case 36: { /* Return */
-				postEvent (SWT.DefaultSelection);
-				return OS.noErr;
-			}
-			case 48: { /* Tab */
-				return OS.noErr;
-			}
-		}
-	}
-	return result;
-}
-
-int kEventTextInputUpdateActiveInputArea (int nextHandler, int theEvent, int userData) {
-	int [] length = new int [1];
-	OS.GetEventParameter (theEvent, OS.kEventParamTextInputSendText, OS.typeUnicodeText, null, 0, length, (char [])null);
-	int [] fixed_length = new int [1];
-	OS.GetEventParameter (theEvent, OS.kEventParamTextInputSendFixLen, OS.typeLongInteger, null, 4, null, fixed_length);
-	if (fixed_length [0] == -1 || fixed_length [0] == length [0]) {
-		sendModifyEvent (false);
-	}
-	return OS.eventNotHandledErr;
+boolean isEventView (int /*long*/ id) {
+	if ((style & SWT.MULTI) != 0) return super.isEventView (id);
+	return true;
 }
 
 /**
@@ -1545,7 +1242,7 @@ int kEventTextInputUpdateActiveInputArea (int nextHandler, int theEvent, int use
  * </ul>
  */
 public void paste () {
-	checkWidget();
+	checkWidget ();
 	if ((style & SWT.READ_ONLY) != 0) return;
 	boolean paste = true;
 	String oldText = null;
@@ -1556,46 +1253,42 @@ public void paste () {
 			String newText = verifyText (oldText, selection.x, selection.y, null);
 			if (newText == null) return;
 			if (!newText.equals (oldText)) {
-				if (txnObject == 0) {
+				if ((style & SWT.SINGLE) != 0) {
 					insertEditText (newText);
 				} else {
-					setTXNText (OS.kTXNUseCurrentSelection, OS.kTXNUseCurrentSelection, newText);
-					OS.TXNShowSelection (txnObject, false);
+					NSTextView textView = (NSTextView) view;
+					textView.replaceCharactersInRange (textView.selectedRange (), NSString.stringWith (newText));
 				}
 				paste = false;
 			}
 		}
 	}
 	if (paste) {
-		if (txnObject == 0) {
+		if ((style & SWT.SINGLE) != 0) {
 			if (oldText == null) oldText = getClipboardText ();
+			if (oldText == null) return;
 			insertEditText (oldText);
 		} else {
-			if (textLimit != LIMIT) {
-				if (oldText == null) oldText = getClipboardText ();
-				setTXNText (OS.kTXNUseCurrentSelection, OS.kTXNUseCurrentSelection, oldText);
-				OS.TXNShowSelection (txnObject, false);
-			} else {
-				OS.TXNPaste (txnObject);
-			}
+			//TODO check text limit
+			((NSTextView) view).paste (null);
 		}
 	}
-	sendModifyEvent (true);
+	sendEvent (SWT.Modify);
 }
 
-boolean pollTrackEvent() {
-	return true;
-}
-
-void register () {
-	super.register ();
-	if (frameHandle != 0) display.addWidget (frameHandle, this);
+void register() {
+	super.register();
+	
+	if ((style & SWT.SINGLE) != 0) {
+		display.addWidget(((NSControl)view).cell(), this);
+	}
 }
 
 void releaseWidget () {
 	super.releaseWidget ();
-	txnObject = 0;
+	if ((style & SWT.SINGLE) != 0) ((NSControl)view).abortEditing();
 	hiddenText = message = null;
+	selectionRange = null;
 }
 
 /**
@@ -1616,7 +1309,7 @@ void releaseWidget () {
  * @see #addModifyListener
  */
 public void removeModifyListener (ModifyListener listener) {
-	checkWidget();
+	checkWidget ();
 	if (listener == null) error (SWT.ERROR_NULL_ARGUMENT);
 	if (eventTable == null) return;
 	eventTable.unhook (SWT.Modify, listener);
@@ -1640,11 +1333,11 @@ public void removeModifyListener (ModifyListener listener) {
  * @see #addSelectionListener
  */
 public void removeSelectionListener(SelectionListener listener) {
-	checkWidget();
+	checkWidget ();
 	if (listener == null) error (SWT.ERROR_NULL_ARGUMENT);
 	if (eventTable == null) return;
-	eventTable.unhook(SWT.Selection, listener);
-	eventTable.unhook(SWT.DefaultSelection,listener);
+	eventTable.unhook (SWT.Selection, listener);
+	eventTable.unhook (SWT.DefaultSelection,listener);
 }
 
 /**
@@ -1665,7 +1358,7 @@ public void removeSelectionListener(SelectionListener listener) {
  * @see #addVerifyListener
  */
 public void removeVerifyListener (VerifyListener listener) {
-	checkWidget();
+	checkWidget ();
 	if (listener == null) error (SWT.ERROR_NULL_ARGUMENT);
 	if (eventTable == null) return;
 	eventTable.unhook (SWT.Verify, listener);
@@ -1680,178 +1373,81 @@ public void removeVerifyListener (VerifyListener listener) {
  * </ul>
  */
 public void selectAll () {
-	checkWidget();
-	if (txnObject == 0) {
+	checkWidget ();
+	if ((style & SWT.SINGLE) != 0) {
 		setSelection (0, getCharCount ());
 	} else {
-		OS.TXNSelectAll (txnObject);
+		((NSTextView) view).selectAll (null);
 	}
 }
 
-boolean sendKeyEvent (int type, Event event) {
-	if (!super.sendKeyEvent (type, event)) {
-		return false;
-	}
-	if (type != SWT.KeyDown) return true;
-	if ((style & SWT.READ_ONLY) != 0) return true;
-	if (event.character == 0) return true;
-	if ((event.stateMask & SWT.COMMAND) != 0) return true;
-	String oldText = "";
-	int charCount = getCharCount ();
-	Point selection = getSelection ();
-	int start = selection.x, end = selection.y;
-	switch (event.character) {
-		case SWT.BS:
-			if (start == end) {
-				if (start == 0) return true;
-				start = Math.max (0, start - 1);
-			}
-			break;
-		case SWT.DEL:
-			if (start == end) {
-				if (start == charCount) return true;
-				end = Math.min (end + 1, charCount);
-			}
-			break;
-		case SWT.CR:
-			if ((style & SWT.SINGLE) != 0) return true;
-			oldText = DELIMITER;
-			break;
-		default:
-			if (event.character != '\t' && event.character < 0x20) return true;
-			oldText = new String (new char [] {event.character});
-	}
-	String newText = verifyText (oldText, start, end, event);
-	if (newText == null) return false;
-	if (charCount - (end - start) + newText.length () > textLimit) {
-		return false;
-	}
-	boolean result = newText == oldText;
-	if (newText != oldText || hiddenText != null) {
-		if (txnObject == 0) {
-			String text = new String (getEditText (0, -1));
-			String leftText = text.substring (0, start);
-			String rightText = text.substring (end, text.length ());
-			setEditText (leftText + newText + rightText);
-			start += newText.length ();
-			setSelection (new Point (start, start));
-			result = false;
-		} else {
-			setTXNText (start, end, newText);
+boolean sendKeyEvent (NSEvent nsEvent, int type) {
+	boolean result = super.sendKeyEvent (nsEvent, type);
+	if (!result) return result;
+	if (type != SWT.KeyDown) return result;
+	int stateMask = 0;
+	int /*long*/ modifierFlags = nsEvent.modifierFlags();
+	if ((modifierFlags & OS.NSAlternateKeyMask) != 0) stateMask |= SWT.ALT;
+	if ((modifierFlags & OS.NSShiftKeyMask) != 0) stateMask |= SWT.SHIFT;
+	if ((modifierFlags & OS.NSControlKeyMask) != 0) stateMask |= SWT.CONTROL;
+	if ((modifierFlags & OS.NSCommandKeyMask) != 0) stateMask |= SWT.COMMAND;
+	if (stateMask == SWT.COMMAND) {
+		short keyCode = nsEvent.keyCode ();
+		switch (keyCode) {
+			case 7: /* X */
+				cut ();
+				return false;
+			case 8: /* C */
+				copy ();
+				return false;
+			case 9: /* V */
+				paste ();
+				return false;
 		}
 	}
-	/*
-	* Post the modify event so that the character will be inserted
-	* into the widget when the modify event is delivered.  Normally,
-	* modify events are sent but it is safe to post the event here
-	* because this method is called from the event loop.
-	*/
-	sendModifyEvent (false);
+	if ((style & SWT.SINGLE) != 0) {
+		short keyCode = nsEvent.keyCode ();
+		switch (keyCode) {
+			case 76: /* KP Enter */
+			case 36: /* Return */
+				postEvent (SWT.DefaultSelection);
+		}
+	}
 	return result;
 }
 
-void sendModifyEvent (boolean send) {
-	String string = OS.kAXSelectedTextChangedNotification;
-	char [] buffer = new char [string.length ()];
-	string.getChars (0, buffer.length, buffer, 0);
-	int stringRef = OS.CFStringCreateWithCharacters (OS.kCFAllocatorDefault, buffer, buffer.length);
-	OS.AXNotificationHIObjectNotify(stringRef, handle, 0);
-	OS.CFRelease(stringRef);
-	string = OS.kAXValueChangedNotification;
-	buffer = new char [string.length ()];
-	string.getChars (0, buffer.length, buffer, 0);
-	stringRef = OS.CFStringCreateWithCharacters (OS.kCFAllocatorDefault, buffer, buffer.length);
-	OS.AXNotificationHIObjectNotify(stringRef, handle, 0);
-	OS.CFRelease(stringRef);
-	
-	if (send) {
-		sendEvent (SWT.Modify);
+void sendSearchSelection () {
+	if (targetSearch != null) {
+		((NSSearchField)view).sendAction(actionSearch, targetSearch);
+	}
+	Event event = new Event ();
+	event.detail = SWT.ICON_SEARCH;
+	postEvent (SWT.DefaultSelection, event);
+}
+
+void sendCancelSelection () {
+	if (targetCancel != null) {
+		((NSSearchField)view).sendAction(actionCancel, targetCancel);
+	}
+	Event event = new Event ();
+	event.detail = SWT.ICON_CANCEL;
+	postEvent (SWT.DefaultSelection, event);
+}
+
+void updateBackground () {
+	NSColor nsColor = null;
+	if (backgroundImage != null) {
+		nsColor = NSColor.colorWithPatternImage(backgroundImage.handle);
+	} else if (background != null) {
+		nsColor = NSColor.colorWithDeviceRed(background[0], background[1], background[2], background[3]);
 	} else {
-		postEvent (SWT.Modify);
+		nsColor = NSColor.textBackgroundColor ();
 	}
-}
-
-void setBackground (float [] color) {
-	if (txnObject == 0) {
-		super.setBackground (color);
+	if ((style & SWT.SINGLE) != 0) {
+		((NSTextField) view).setBackgroundColor (nsColor);
 	} else {
-		int colorspace = OS.CGColorSpaceCreateDeviceRGB ();
-		int colorRef = OS.CGColorCreate (colorspace, color);
-		OS.HITextViewSetBackgroundColor (handle, colorRef);
-		OS.CGColorRelease (colorRef);
-		OS.CGColorSpaceRelease (colorspace);
+		((NSTextView) view).setBackgroundColor (nsColor);
 	}
-}
-
-void setBackground (int control, float [] color) {
-	/*
-	* Bug in the Macintosh. For some reason, when the same background
-	* color is set in two instances of an EditUnicodeTextControl, the
-	* color is not set in the second instance.  It seems that the edit
-	* control is checking globally that the last color that was set is the
-	* same.  The fix is to ensure the that the color that is about to
-	* be set is not the same as the last globally remembered color by
-	* first setting it to black, then white and finally the color.
-	*/
-	if (handle == control) {
-		ControlFontStyleRec fontStyle = new ControlFontStyleRec ();
-		OS.GetControlData (control, (short) OS.kControlEntireControl, OS.kControlFontStyleTag, ControlFontStyleRec.sizeof, fontStyle, null);
-		fontStyle.flags |= OS.kControlUseBackColorMask;
-		OS.SetControlFontStyle (control, fontStyle);
-		fontStyle.backColor_red = fontStyle.backColor_green = fontStyle.backColor_blue = (short) 0xffff;
-		OS.SetControlFontStyle (control, fontStyle);
-	}
-	super.setBackground (control, color);
-}
-
-int setBounds (int x, int y, int width, int height, boolean move, boolean resize, boolean events) {
-	Rectangle bounds = null;
-	if (txnObject == 0 && resize) bounds = getBounds ();
-	int result = super.setBounds(x, y, width, height, move, resize, events);
-	if (bounds != null && (result & RESIZED) != 0) {
-		/*
-		* Feature in the Macintosh.  When the caret is moved,
-		* the text widget scrolls to show the new location.
-		* This means that the text widget may be scrolled
-		* to the right in order to show the caret when the
-		* widget is not large enough to show both the caret
-		* location and all the text.  Unfortunately, when
-		* the text widget is resized such that all the text
-		* and the caret could be visible, Macintosh does not
-		* scroll the widget back.  The fix is to reset the
-		* selection or the text depend on if the widget
-		* is on focus or not.
-		*/
-		Rect inset = getInset ();
-		int minWidth = inset.left + inset.right;
-		if (bounds.width <= minWidth && width > minWidth) {
-			if (hasFocus ()) {
-				ControlEditTextSelectionRec selection = new ControlEditTextSelectionRec ();
-				if (OS.GetControlData (handle, (short) OS.kControlEntireControl, OS.kControlEditTextSelectionTag, 4, selection, null) == OS.noErr) {
-					OS.SetControlData (handle, OS.kControlEntireControl, OS.kControlEditTextSelectionTag, 4, selection);
-				}
-			} else {
-				int [] ptr = new int [1];
-				if (OS.GetControlData (handle, (short)OS.kControlEntireControl, OS.kControlEditTextCFStringTag, 4, ptr, null) == OS.noErr) {
-					OS.SetControlData (handle, OS.kControlEntireControl, OS.kControlEditTextCFStringTag, 4, ptr);
-				}
-				if (ptr [0] != 0) OS.CFRelease (ptr [0]);				
-			}
-		}
-	}
-	/*
-	* Bug in the Macintosh.  HIScrollViewCreate() fails if no scroll bit is
-	* specified. In order to get horizontal scrolling in a single line text, a
-	* scroll view is created with the vertical bit set and the scroll bars
-	* are set to auto hide.  But calling HIScrollViewSetScrollBarAutoHide()
-	* before the view has been resized still leaves space for the vertical
-	* scroll bar.  The fix is to call HIScrollViewSetScrollBarAutoHide()
-	* once the widget has been resized.
-	*/
-	if (scrolledHandle != 0 && (style & (SWT.H_SCROLL | SWT.V_SCROLL)) == 0) {
-		OS.HIScrollViewSetScrollBarAutoHide (scrolledHandle, true);
-	}
-	return result;
 }
 
 /**
@@ -1873,7 +1469,7 @@ int setBounds (int x, int y, int width, int height, boolean move, boolean resize
  * </ul>
  */
 public void setDoubleClickEnabled (boolean doubleClick) {
-	checkWidget();
+	checkWidget ();
 	this.doubleClick = doubleClick;
 }
 
@@ -1899,18 +1495,14 @@ public void setDoubleClickEnabled (boolean doubleClick) {
  * </ul>
  */
 public void setEchoChar (char echo) {
-	checkWidget();
+	checkWidget ();
 	if ((style & SWT.MULTI) != 0) return;
-	if (txnObject == 0) {
-		if ((style & SWT.PASSWORD) == 0) {
-			Point selection = getSelection ();
-			String text = getText ();
-			echoCharacter = echo;
-			setEditText (text);
-			setSelection (selection);
-		}
-	} else {
-		OS.TXNEchoMode (txnObject, echo, OS.kTextEncodingMacUnicode, echo != '\0');
+	if ((style & SWT.PASSWORD) == 0) {
+		Point selection = getSelection ();
+		String text = getText ();
+		echoCharacter = echo;
+		setEditText (text);
+		setSelection (selection);
 	}
 	echoCharacter = echo;
 }
@@ -1926,79 +1518,54 @@ public void setEchoChar (char echo) {
  * </ul>
  */
 public void setEditable (boolean editable) {
-	checkWidget();
+	checkWidget ();
 	if (editable) {
 		style &= ~SWT.READ_ONLY;
 	} else {
 		style |= SWT.READ_ONLY;
 	}
-	if (txnObject == 0) {
-		OS.SetControlData (handle, OS.kControlEntireControl, OS.kControlEditTextLockedTag, 1, new byte [] {(byte) ((style & SWT.READ_ONLY) != 0 ? 1 : 0)});
+	if ((style & SWT.SINGLE) != 0) {
+		((NSTextField) view).setEditable (editable);
 	} else {
-		OS.TXNSetTXNObjectControls (txnObject, false, 1, new int [] {OS.kTXNIOPrivilegesTag}, new int [] {((style & SWT.READ_ONLY) != 0) ? 1 : 0});
+		((NSTextView) view).setEditable (editable);
 	}
 }
 
-void setForeground (float [] color) {
-	if (txnObject == 0) {
-		super.setForeground (color);
+void setEditText (String string) {
+	char [] buffer;
+	if ((style & SWT.PASSWORD) == 0 && echoCharacter != '\0') {
+		hiddenText = string;
+		buffer = new char [Math.min(hiddenText.length (), textLimit)];
+		for (int i = 0; i < buffer.length; i++) buffer [i] = echoCharacter;
 	} else {
-		int ptr2 = OS.NewPtr (OS.kTXNQDFontColorAttributeSize);
-		RGBColor rgb;
-		if (color == null) {	
-			rgb = new RGBColor ();
-		} else {
-			rgb = toRGBColor (color);
-		}
-		OS.memmove (ptr2, rgb, RGBColor.sizeof);
-		int [] attribs = new int [] {
-			OS.kTXNQDFontColorAttribute,
-			OS.kTXNQDFontColorAttributeSize,
-			ptr2,
-		};
-		int ptr1 = OS.NewPtr (attribs.length * 4);
-		OS.memmove (ptr1, attribs, attribs.length * 4);
-		boolean readOnly = (style & SWT.READ_ONLY) != 0;
-		int [] tag = new int [] {OS.kTXNIOPrivilegesTag};
-		if (readOnly) OS.TXNSetTXNObjectControls (txnObject, false, 1, tag, new int [] {0});
-		OS.TXNSetTypeAttributes (txnObject, attribs.length / 3, ptr1, 0, 0);
-		if (readOnly) OS.TXNSetTXNObjectControls (txnObject, false, 1, tag, new int [] {1});
-		OS.DisposePtr (ptr1);
-		OS.DisposePtr (ptr2);
+		hiddenText = null;
+		buffer = new char [Math.min(string.length (), textLimit)];
+		string.getChars (0, buffer.length, buffer, 0);
 	}
+	NSString nsstring = NSString.stringWithCharacters (buffer, buffer.length);
+	new NSCell (((NSTextField) view).cell ()).setTitle (nsstring);
+	selectionRange = null;
 }
 
-void setFontStyle (Font font) {
-	if (txnObject == 0) {
-		super.setFontStyle (font);
+void setFont(NSFont font) {
+	if ((style & SWT.MULTI) !=  0) {
+		((NSTextView) view).setFont (font);
+		return;
+	}
+	super.setFont (font);
+}
+
+void setForeground (float /*double*/ [] color) {
+	NSColor nsColor;
+	if (color == null) {
+		nsColor = NSColor.textColor ();
 	} else {
-		int family = OS.kTXNDefaultFontName, fontStyle = OS.kTXNDefaultFontStyle, size = OS.kTXNDefaultFontSize;
-		if (font != null) {
-			short [] id = new short [1], s = new short [1];
-			OS.FMGetFontFamilyInstanceFromFont (font.handle, id, s);
-			family = id [0];
-			fontStyle = s [0] | font.style;
-			size = OS.X2Fix (font.size);
-		}
-		int [] attribs = new int [] {
-			OS.kTXNQDFontSizeAttribute,
-			OS.kTXNQDFontSizeAttributeSize,
-			size,
-			OS.kTXNQDFontStyleAttribute,
-			OS.kTXNQDFontStyleAttributeSize,
-			fontStyle,
-			OS.kTXNQDFontFamilyIDAttribute,
-			OS.kTXNQDFontFamilyIDAttributeSize,
-			family,
-		};
-		int ptr = OS.NewPtr (attribs.length * 4);
-		OS.memmove (ptr, attribs, attribs.length * 4);
-		boolean readOnly = (style & SWT.READ_ONLY) != 0;
-		int [] tag = new int [] {OS.kTXNIOPrivilegesTag};
-		if (readOnly) OS.TXNSetTXNObjectControls (txnObject, false, 1, tag, new int [] {0});
-		OS.TXNSetTypeAttributes (txnObject, attribs.length / 3, ptr, 0, 0);
-		if (readOnly) OS.TXNSetTXNObjectControls (txnObject, false, 1, tag, new int [] {1});
-		OS.DisposePtr (ptr);
+		nsColor = NSColor.colorWithDeviceRed (color [0], color [1], color [2], 1);
+	}
+	if ((style & SWT.SINGLE) != 0) {
+		((NSTextField) view).setTextColor (nsColor);
+	} else {
+		((NSTextView) view).setTextColor (nsColor);
 	}
 }
 
@@ -2020,17 +1587,14 @@ void setFontStyle (Font font) {
  * @since 2.1.2
  */
 public void setOrientation (int orientation) {
-	checkWidget();
+	checkWidget ();
 }
 
 /**
- * Sets the widget message. When the widget is created
- * with the style <code>SWT.SEARCH</code>, the message text
- * is displayed as a hint for the user, indicating the
- * purpose of the field.
+ * Sets the widget message. The message text is displayed
+ * as a hint for the user, indicating the purpose of the field.
  * <p>
- * Note: This operation is a <em>HINT</em> and is not
- * supported on platforms that do not have this concept.
+ * Typically this is used in conjunction with <code>SWT.SEARCH</code>.
  * </p>
  * 
  * @param message the new message
@@ -2049,13 +1613,10 @@ public void setMessage (String message) {
 	checkWidget ();
 	if (message == null) error (SWT.ERROR_NULL_ARGUMENT);
 	this.message = message;
-	if ((style & SWT.SEARCH) != 0) {
-		char [] buffer = new char [message.length ()];
-		message.getChars (0, buffer.length, buffer, 0);
-		int ptr = OS.CFStringCreateWithCharacters (OS.kCFAllocatorDefault, buffer, buffer.length);
-		if (ptr == 0) error (SWT.ERROR_CANNOT_SET_TEXT);
-		OS.HISearchFieldSetDescriptiveText (handle, ptr);
-		OS.CFRelease (ptr);
+	if ((style & SWT.SINGLE) != 0) {
+		NSString str = NSString.stringWith (message);
+		NSTextFieldCell cell = new NSTextFieldCell (((NSTextField) view).cell ());
+		cell.setPlaceholderString (str);
 	}
 }
 
@@ -2083,7 +1644,7 @@ public void setMessage (String message) {
  * </ul>
  */
 public void setSelection (int start) {
-	checkWidget();
+	checkWidget ();
 	setSelection (start, start);
 }
 
@@ -2113,23 +1674,27 @@ public void setSelection (int start) {
  * </ul>
  */
 public void setSelection (int start, int end) {
-	checkWidget();
-	if (txnObject == 0) {
-		int length = getCharCount ();
-		ControlEditTextSelectionRec selection = new ControlEditTextSelectionRec ();
-		selection.selStart = (short) Math.min (Math.max (Math.min (start, end), 0), length);
-		selection.selEnd = (short) Math.min (Math.max (Math.max (start, end), 0), length);
-		if (hasFocus ()) {
-			OS.SetControlData (handle, OS.kControlEntireControl, OS.kControlEditTextSelectionTag, 4, selection);
-		} else {
-			this.selection = selection;
+	checkWidget ();
+	if ((style & SWT.SINGLE) != 0) {
+		NSString str = new NSCell (((NSTextField) view).cell ()).title ();
+		int length = (int)/*64*/str.length ();
+		int selStart = Math.min (Math.max (Math.min (start, end), 0), length);
+		int selEnd = Math.min (Math.max (Math.max (start, end), 0), length);
+		selectionRange = new NSRange ();
+		selectionRange.location = selStart;
+		selectionRange.length = selEnd - selStart;
+		NSText fieldEditor = ((NSControl)view).currentEditor();
+		if (fieldEditor != null) {
+			fieldEditor.setSelectedRange (selectionRange);
 		}
 	} else {
-		int length = OS.TXNDataSize (txnObject) / 2;
-		int nStart = Math.min (Math.max (Math.min (start, end), 0), length);
-		int nEnd = Math.min (Math.max (Math.max (start, end), 0), length);
-		OS.TXNSetSelection (txnObject, nStart, nEnd);
-		OS.TXNShowSelection (txnObject, false);
+		int length = (int)/*64*/((NSTextView) view).textStorage ().length ();
+		int selStart = Math.min (Math.max (Math.min (start, end), 0), length);
+		int selEnd = Math.min (Math.max (Math.max (start, end), 0), length);
+		NSRange range = new NSRange ();
+		range.location = selStart;
+		range.length = selEnd - selStart;
+		((NSTextView) view).setSelectedRange (range);
 	}
 }
 
@@ -2163,7 +1728,7 @@ public void setSelection (int start, int end) {
  * </ul>
  */
 public void setSelection (Point selection) {
-	checkWidget();
+	checkWidget ();
 	if (selection == null) error (SWT.ERROR_NULL_ARGUMENT);
 	setSelection (selection.x, selection.y);
 }
@@ -2185,16 +1750,22 @@ public void setSelection (Point selection) {
  * </ul>
  */
 public void setTabs (int tabs) {
-	checkWidget();
+	checkWidget ();
 	if (this.tabs == tabs) return;
-	if (txnObject == 0) return;
 	this.tabs = tabs;
-	TXNTab tab = new TXNTab ();
-	tab.value = (short) (textExtent (new char[]{' '}, 0).x * tabs);
-	int [] tags = new int [] {OS.kTXNTabSettingsTag};
-	int [] datas = new int [1];
-	OS.memmove (datas, tab, TXNTab.sizeof);
-	OS.TXNSetTXNObjectControls (txnObject, false, tags.length, tags, datas);
+	if ((style & SWT.SINGLE) != 0) return;
+	float /*double*/ size = textExtent("s").width * tabs;
+	NSTextView widget = (NSTextView)view;
+	NSParagraphStyle defaultStyle = widget.defaultParagraphStyle();
+	NSMutableParagraphStyle paragraphStyle = new NSMutableParagraphStyle(defaultStyle.mutableCopy());
+	paragraphStyle.setTabStops(NSArray.array());
+	NSTextTab tab = (NSTextTab)new NSTextTab().alloc();
+	tab = tab.initWithType(OS.NSLeftTabStopType, size);
+	paragraphStyle.addTabStop(tab);
+	tab.release();
+	paragraphStyle.setDefaultTabInterval(size);
+	widget.setDefaultParagraphStyle(paragraphStyle);
+	paragraphStyle.release();
 }
 
 /**
@@ -2213,106 +1784,21 @@ public void setTabs (int tabs) {
  * </ul>
  */
 public void setText (String string) {
-	checkWidget();
+	checkWidget ();
 	if (string == null) error (SWT.ERROR_NULL_ARGUMENT);
 	if (hooks (SWT.Verify) || filters (SWT.Verify)) {
 		string = verifyText (string, 0, getCharCount (), null);
 		if (string == null) return;
 	}
-	if (txnObject == 0) {
+	if ((style & SWT.SINGLE) != 0) {
 		setEditText (string);
 	} else {
-		setTXNText (OS.kTXNStartOffset, OS.kTXNEndOffset, string);
-		OS.TXNSetSelection (txnObject, OS.kTXNStartOffset, OS.kTXNStartOffset);
-		OS.TXNShowSelection (txnObject, false);
+		NSTextView widget = (NSTextView)view;
+		NSString str = NSString.stringWith (string);
+		widget.setString (str);
+		widget.setSelectedRange(new NSRange());
 	}
-	sendModifyEvent (true);
-}
-
-void setEditText (String string) {
-	char [] buffer;
-	if ((style & SWT.PASSWORD) == 0 && echoCharacter != '\0') {
-		hiddenText = string;
-		buffer = new char [Math.min(hiddenText.length (), textLimit)];
-		for (int i = 0; i < buffer.length; i++) buffer [i] = echoCharacter;
-	} else {
-		hiddenText = null;
-		buffer = new char [Math.min(string.length (), textLimit)];
-		string.getChars (0, buffer.length, buffer, 0);
-	}
-	int ptr = OS.CFStringCreateWithCharacters (OS.kCFAllocatorDefault, buffer, buffer.length);
-	if (ptr == 0) error (SWT.ERROR_CANNOT_SET_TEXT);
-	OS.SetControlData (handle, OS.kControlEntireControl, OS.kControlEditTextCFStringTag, 4, new int[] {ptr});
-	OS.CFRelease (ptr);
-	if (selection != null) selection = null;
-}
-
-void setTXNText (int iStartOffset, int iEndOffset, String string) {
-	int length = string.length ();
-	if (textLimit != LIMIT) {
-		int charCount = OS.TXNDataSize (txnObject) / 2;
-		int start = iStartOffset, end = iEndOffset;
-		if (iStartOffset == OS.kTXNUseCurrentSelection || iEndOffset == OS.kTXNUseCurrentSelection) {
-			int [] oStartOffset = new int [1], oEndOffset = new int [1];
-			OS.TXNGetSelection (txnObject, oStartOffset, oEndOffset);
-			start = oStartOffset [0];
-			end = oEndOffset [0];
-		} else {
-			if (iStartOffset == OS.kTXNEndOffset) start = charCount;
-			if (iEndOffset == OS.kTXNEndOffset) end = charCount;
-		}
-		if (charCount - (end - start) + length > textLimit) length = textLimit - charCount + (end - start);
-	}
-	char [] buffer = new char [length];
-	string.getChars (0, buffer.length, buffer, 0);
-	boolean readOnly = (style & SWT.READ_ONLY) != 0;
-	int [] tag = new int [] {OS.kTXNIOPrivilegesTag};
-	if (readOnly) OS.TXNSetTXNObjectControls (txnObject, false, 1, tag, new int [] {0});
-	OS.TXNSetData (txnObject, OS.kTXNUnicodeTextData, buffer, buffer.length * 2, iStartOffset, iEndOffset);
-	if (readOnly) OS.TXNSetTXNObjectControls (txnObject, false, 1, tag, new int [] {1});
-
-	/*
-	* Feature in the Macintosh.  When an empty string is set in the TXNObject,
-	* the font attributes are cleared.  The fix is to reset them.
-	*/
-	if (OS.TXNDataSize (txnObject) / 2 == 0) setFontStyle (font);
-}
-
-void setZOrder () {
-	if (frameHandle != 0) {
-		int child = scrolledHandle != 0 ? scrolledHandle : handle;
-		OS.HIViewAddSubview (frameHandle, child);
-		HILayoutInfo layout = new HILayoutInfo ();
-		layout.version = 0;
-		OS.HIViewGetLayoutInfo (child, layout);
-		HISideBinding biding = layout.binding.top;
-		biding.toView = 0;
-		biding.kind = OS.kHILayoutBindMin;
-		biding.offset = 0;
-		biding = layout.binding.left;
-		biding.toView = 0;
-		biding.kind = OS.kHILayoutBindMin;
-		biding.offset = 0;
-		biding = layout.binding.bottom;
-		biding.toView = 0;
-		biding.kind = OS.kHILayoutBindMax;
-		biding.offset = 0;
-		biding = layout.binding.right;
-		biding.toView = 0;
-		biding.kind = OS.kHILayoutBindMax;
-		biding.offset = 0;
-		CGRect r = new CGRect();
-		r.width = r.height = 100;
-		OS.HIViewSetFrame (frameHandle, r);
-		Rect inset = inset ();
-		r.x += inset.left;
-		r.y += inset.top;
-		r.width -= inset.left + inset.right;
-		r.height -= inset.top + inset.bottom;
-		OS.HIViewSetFrame (child, r);
-		OS.HIViewSetLayoutInfo (child, layout);
-	}
-	super.setZOrder ();
+	sendEvent (SWT.Modify);
 }
 
 /**
@@ -2340,7 +1826,7 @@ void setZOrder () {
  * @see #LIMIT
  */
 public void setTextLimit (int limit) {
-	checkWidget();
+	checkWidget ();
 	if (limit == 0) error (SWT.ERROR_CANNOT_BE_ZERO);
 	textLimit = limit;
 }
@@ -2358,19 +1844,54 @@ public void setTextLimit (int limit) {
  * </ul>
  */
 public void setTopIndex (int index) {
-	checkWidget();
+	checkWidget ();
 	if ((style & SWT.SINGLE) != 0) return;
-	int[] event = new int[1];
-	OS.CreateEvent (0, OS.kEventClassScrollable, OS.kEventScrollableScrollTo, 0.0, 0, event);
-	if (event [0] != 0) {
-		int lineHeight = getLineHeight ();
-		CGPoint pt = new CGPoint ();
-		pt.y = lineHeight * Math.min(getLineCount (), index);
-		OS.SetEventParameter (event[0], OS.kEventParamOrigin, OS.typeHIPoint, CGPoint.sizeof, pt);
-		OS.SendEventToEventTarget (event[0], OS.GetControlEventTarget (handle));
-		OS.ReleaseEvent (event[0]);
-	}
+	int row = Math.max(0, Math.min(index, getLineCount() - 1));
+	NSPoint pt = new NSPoint();
+	pt.x = scrollView.contentView().bounds().x;
+	pt.y = getLineHeight() * row;
+	view.scrollPoint(pt);
 }
+
+boolean shouldChangeTextInRange_replacementString(int /*long*/ id, int /*long*/ sel, int /*long*/ affectedCharRange, int /*long*/ replacementString) {
+	NSRange range = new NSRange();
+	OS.memmove(range, affectedCharRange, NSRange.sizeof);
+	boolean result = callSuperBoolean(id, sel, range, replacementString);
+	if (!hooks(SWT.Verify) && echoCharacter =='\0') return result;
+	String text = new NSString(replacementString).getString();
+	String newText = text;
+	if (hooks (SWT.Verify)) {
+		NSEvent currentEvent = display.application.currentEvent();
+		int /*long*/ type = currentEvent.type();
+		if (type != OS.NSKeyDown && type != OS.NSKeyUp) currentEvent = null;
+		newText = verifyText(text, (int)/*64*/range.location, (int)/*64*/(range.location+range.length),  currentEvent);
+	}
+	if (newText == null) return false;
+	if ((style & SWT.SINGLE) != 0) {
+		if (text != newText || echoCharacter != '\0') {
+			 //handle backspace and delete
+			if (range.length == 1) {
+				NSText editor = new NSText(id);
+				editor.setSelectedRange (range);
+			}
+			insertEditText(newText);
+			result = false;
+		}
+	} else {
+		if (text != newText) {
+			NSTextView widget = (NSTextView) view;
+			Point selection = getSelection();
+			NSRange selRange = new NSRange();
+			selRange.location = selection.x;
+			selRange.length = selection.x + selection.y;
+			widget.textStorage ().replaceCharactersInRange (selRange, NSString.stringWith(newText));
+			result = false;
+		}
+	}
+	if (!result) sendEvent (SWT.Modify);
+	return result;
+}
+
 /**
  * Shows the selection.
  * <p>
@@ -2385,29 +1906,49 @@ public void setTopIndex (int index) {
  * </ul>
  */
 public void showSelection () {
-	checkWidget();
-	if (txnObject == 0) {
-		setSelection (getSelection());
+	checkWidget ();
+	if ((style & SWT.SINGLE) != 0)  {
+		setSelection (getSelection ());
 	} else {
-		OS.TXNShowSelection (txnObject, false);
+		NSTextView widget = (NSTextView) view;
+		widget.scrollRangeToVisible (widget.selectedRange ());
 	}
 }
 
-int topHandle () {
-	if (frameHandle != 0) return frameHandle;
-	return super.topHandle ();
+void textViewDidChangeSelection(int /*long*/ id, int /*long*/ sel, int /*long*/ aNotification) {
+	NSNotification notification = new NSNotification (aNotification);
+	NSText editor = new NSText (notification.object ().id);
+	selectionRange = editor.selectedRange ();
 }
 
-int traversalCode (int key, int theEvent) {
+void textDidChange (int /*long*/ id, int /*long*/ sel, int /*long*/ aNotification) {
+	if ((style & SWT.SINGLE) != 0) super.textDidChange (id, sel, aNotification);
+	postEvent (SWT.Modify);
+}
+
+NSRange textView_willChangeSelectionFromCharacterRange_toCharacterRange (int /*long*/ id, int /*long*/ sel, int /*long*/ aTextView, int /*long*/ oldSelectedCharRange, int /*long*/ newSelectedCharRange) {
+	/*
+	* If the selection is changing as a result of the receiver getting focus
+	* then return the receiver's last selection range, otherwise the full
+	* text will be automatically selected.
+	*/
+	if (receivingFocus && selectionRange != null) return selectionRange;
+
+	/* allow the selection change to proceed */
+	NSRange result = new NSRange ();
+	OS.memmove(result, newSelectedCharRange, NSRange.sizeof);
+	return result;
+}
+
+int traversalCode (int key, NSEvent theEvent) {
 	int bits = super.traversalCode (key, theEvent);
 	if ((style & SWT.READ_ONLY) != 0) return bits;
 	if ((style & SWT.MULTI) != 0) {
 		bits &= ~SWT.TRAVERSE_RETURN;
-		if (key == 48 /* Tab */ && theEvent != 0) {
-			int [] modifiers = new int [1];
-			OS.GetEventParameter (theEvent, OS.kEventParamKeyModifiers, OS.typeUInt32, null, 4, null, modifiers);
-			boolean next = (modifiers [0] & OS.shiftKey) == 0;
-			if (next && (modifiers [0] & OS.controlKey) == 0) {
+		if (key == 48 /* Tab */ && theEvent != null) {
+			int /*long*/ modifiers = theEvent.modifierFlags ();
+			boolean next = (modifiers & OS.NSShiftKeyMask) == 0;
+			if (next && (modifiers & OS.NSControlKeyMask) == 0) {
 				bits &= ~(SWT.TRAVERSE_TAB_NEXT | SWT.TRAVERSE_TAB_PREVIOUS);
 			}
 		}
@@ -2415,16 +1956,19 @@ int traversalCode (int key, int theEvent) {
 	return bits;
 }
 
-String verifyText (String string, int start, int end, Event keyEvent) {
+void updateCursorRects (boolean enabled) {
+	super.updateCursorRects (enabled);
+	if (scrollView == null) return;
+	NSClipView contentView = scrollView.contentView ();
+	contentView.setDocumentCursor (enabled ? NSCursor.IBeamCursor () : null);
+}
+
+String verifyText (String string, int start, int end, NSEvent keyEvent) {
 	Event event = new Event ();
+	if (keyEvent != null) setKeyState(event, SWT.MouseDown, keyEvent);
 	event.text = string;
 	event.start = start;
 	event.end = end;
-	if (keyEvent != null) {
-		event.character = keyEvent.character;
-		event.keyCode = keyEvent.keyCode;
-		event.stateMask = keyEvent.stateMask;
-	}
 	/*
 	 * It is possible (but unlikely), that application
 	 * code could have disposed the widget in the verify

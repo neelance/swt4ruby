@@ -1,6 +1,6 @@
 require "rjava"
 
-# Copyright (c) 2000, 2008 IBM Corporation and others.
+# Copyright (c) 2000, 2009 IBM Corporation and others.
 # All rights reserved. This program and the accompanying materials
 # are made available under the terms of the Eclipse Public License v1.0
 # which accompanies this distribution, and is available at
@@ -13,10 +13,11 @@ module Org::Eclipse::Swt::Accessibility
     class_module.module_eval {
       include ::Java::Lang
       include ::Org::Eclipse::Swt::Accessibility
-      include_const ::Java::Util, :Vector
+      include ::Java::Util
       include ::Org::Eclipse::Swt
+      include ::Org::Eclipse::Swt::Graphics
+      include ::Org::Eclipse::Swt::Internal::Cocoa
       include ::Org::Eclipse::Swt::Widgets
-      include ::Org::Eclipse::Swt::Internal::Carbon
     }
   end
   
@@ -45,12 +46,57 @@ module Org::Eclipse::Swt::Accessibility
     include_class_members AccessibleImports
     
     class_module.module_eval {
-      const_set_lazy(:RequiredAttributes) { Array.typed(String).new([OS.attr_k_axrole_attribute, OS.attr_k_axsubrole_attribute, OS.attr_k_axrole_description_attribute, OS.attr_k_axhelp_attribute, OS.attr_k_axtitle_attribute, OS.attr_k_axvalue_attribute, OS.attr_k_axenabled_attribute, OS.attr_k_axfocused_attribute, OS.attr_k_axparent_attribute, OS.attr_k_axchildren_attribute, OS.attr_k_axselected_children_attribute, OS.attr_k_axvisible_children_attribute, OS.attr_k_axwindow_attribute, OS.attr_k_axtop_level_uielement_attribute, OS.attr_k_axposition_attribute, OS.attr_k_axsize_attribute, OS.attr_k_axdescription_attribute, ]) }
-      const_attr_reader  :RequiredAttributes
       
-      const_set_lazy(:TextAttributes) { Array.typed(String).new([OS.attr_k_axnumber_of_characters_attribute, OS.attr_k_axselected_text_attribute, OS.attr_k_axselected_text_range_attribute, OS.attr_k_axstring_for_range_parameterized_attribute, OS.attr_k_axinsertion_point_line_number_attribute, OS.attr_k_axrange_for_line_parameterized_attribute, ]) }
-      const_attr_reader  :TextAttributes
+      def base_attributes
+        defined?(@@base_attributes) ? @@base_attributes : @@base_attributes= Array.typed(NSString).new([OS::NSAccessibilityRoleAttribute, OS::NSAccessibilityRoleDescriptionAttribute, OS::NSAccessibilityHelpAttribute, OS::NSAccessibilityFocusedAttribute, OS::NSAccessibilityParentAttribute, OS::NSAccessibilityChildrenAttribute, OS::NSAccessibilityPositionAttribute, OS::NSAccessibilitySizeAttribute, OS::NSAccessibilityWindowAttribute, OS::NSAccessibilityTopLevelUIElementAttribute])
+      end
+      alias_method :attr_base_attributes, :base_attributes
+      
+      def base_attributes=(value)
+        @@base_attributes = value
+      end
+      alias_method :attr_base_attributes=, :base_attributes=
+      
+      
+      def base_text_attributes
+        defined?(@@base_text_attributes) ? @@base_text_attributes : @@base_text_attributes= Array.typed(NSString).new([OS::NSAccessibilityNumberOfCharactersAttribute, OS::NSAccessibilitySelectedTextAttribute, OS::NSAccessibilitySelectedTextRangeAttribute, OS::NSAccessibilityInsertionPointLineNumberAttribute, OS::NSAccessibilitySelectedTextRangesAttribute, OS::NSAccessibilityVisibleCharacterRangeAttribute, OS::NSAccessibilityValueAttribute, ])
+      end
+      alias_method :attr_base_text_attributes, :base_text_attributes
+      
+      def base_text_attributes=(value)
+        @@base_text_attributes = value
+      end
+      alias_method :attr_base_text_attributes=, :base_text_attributes=
+      
+      
+      def base_parameterized_attributes
+        defined?(@@base_parameterized_attributes) ? @@base_parameterized_attributes : @@base_parameterized_attributes= Array.typed(NSString).new([OS::NSAccessibilityStringForRangeParameterizedAttribute, OS::NSAccessibilityRangeForLineParameterizedAttribute, ])
+      end
+      alias_method :attr_base_parameterized_attributes, :base_parameterized_attributes
+      
+      def base_parameterized_attributes=(value)
+        @@base_parameterized_attributes = value
+      end
+      alias_method :attr_base_parameterized_attributes=, :base_parameterized_attributes=
     }
+    
+    attr_accessor :attribute_names
+    alias_method :attr_attribute_names, :attribute_names
+    undef_method :attribute_names
+    alias_method :attr_attribute_names=, :attribute_names=
+    undef_method :attribute_names=
+    
+    attr_accessor :parameterized_attribute_names
+    alias_method :attr_parameterized_attribute_names, :parameterized_attribute_names
+    undef_method :parameterized_attribute_names
+    alias_method :attr_parameterized_attribute_names=, :parameterized_attribute_names=
+    undef_method :parameterized_attribute_names=
+    
+    attr_accessor :action_names
+    alias_method :attr_action_names, :action_names
+    undef_method :action_names
+    alias_method :attr_action_names=, :action_names=
+    undef_method :action_names=
     
     attr_accessor :accessible_listeners
     alias_method :attr_accessible_listeners, :accessible_listeners
@@ -76,29 +122,37 @@ module Org::Eclipse::Swt::Accessibility
     alias_method :attr_control=, :control=
     undef_method :control=
     
-    attr_accessor :axuielementref
-    alias_method :attr_axuielementref, :axuielementref
-    undef_method :axuielementref
-    alias_method :attr_axuielementref=, :axuielementref=
-    undef_method :axuielementref=
+    # <Integer, SWTAccessibleDelegate>
+    attr_accessor :children
+    alias_method :attr_children, :children
+    undef_method :children
+    alias_method :attr_children=, :children=
+    undef_method :children=
     
-    attr_accessor :os_child_idcache
-    alias_method :attr_os_child_idcache, :os_child_idcache
-    undef_method :os_child_idcache
-    alias_method :attr_os_child_idcache=, :os_child_idcache=
-    undef_method :os_child_idcache=
-    
-    typesig { [Control] }
-    def initialize(control)
+    typesig { [] }
+    # @since 3.5
+    def initialize
+      @attribute_names = nil
+      @parameterized_attribute_names = nil
+      @action_names = nil
       @accessible_listeners = Vector.new
       @accessible_control_listeners = Vector.new
       @accessible_text_listeners = Vector.new
       @control = nil
-      @axuielementref = 0
-      @os_child_idcache = Array.typed(::Java::Int).new(0) { 0 }
+      @children = HashMap.new
+    end
+    
+    typesig { [Control] }
+    def initialize(control)
+      @attribute_names = nil
+      @parameterized_attribute_names = nil
+      @action_names = nil
+      @accessible_listeners = Vector.new
+      @accessible_control_listeners = Vector.new
+      @accessible_text_listeners = Vector.new
+      @control = nil
+      @children = HashMap.new
       @control = control
-      @axuielementref = OS._axuielement_create_with_hiobject_and_identifier(control.attr_handle, 0)
-      OS._hiobject_set_accessibility_ignored(control.attr_handle, false)
     end
     
     class_module.module_eval {
@@ -205,6 +259,321 @@ module Org::Eclipse::Swt::Accessibility
       @accessible_text_listeners.add_element(listener)
     end
     
+    typesig { [NSString, ::Java::Int] }
+    def internal_accessibility_action_description(action, child_id)
+      # TODO No action support for now.
+      return NSString.string_with("")
+    end
+    
+    typesig { [::Java::Int] }
+    def internal_accessibility_action_names(child_id)
+      # The supported action list depends on the role played by the control.
+      event = AccessibleControlEvent.new(self)
+      event.attr_child_id = child_id
+      event.attr_detail = -1
+      i = 0
+      while i < @accessible_control_listeners.size
+        listener = @accessible_control_listeners.element_at(i)
+        listener.get_role(event)
+        i += 1
+      end
+      # No accessible listener is overriding the role of the control, so let Cocoa return the default set for the control.
+      if ((event.attr_detail).equal?(-1))
+        return nil
+      end
+      if (((child_id).equal?(ACC::CHILDID_SELF)) && (!(@action_names).nil?))
+        return retained_autoreleased(@action_names)
+      end
+      return_value = NSMutableArray.array_with_capacity(5)
+      case (event.attr_detail)
+      when ACC::ROLE_PUSHBUTTON, ACC::ROLE_RADIOBUTTON, ACC::ROLE_CHECKBUTTON, ACC::ROLE_TABITEM
+        return_value.add_object(OS::NSAccessibilityPressAction)
+      end
+      case (event.attr_detail)
+      when ACC::ROLE_COMBOBOX
+        return_value.add_object(OS::NSAccessibilityConfirmAction)
+      end
+      if ((child_id).equal?(ACC::CHILDID_SELF))
+        @action_names = return_value
+        @action_names.retain
+        return retained_autoreleased(@action_names)
+      else
+        # Caller must retain if they want to hold on to it.
+        return return_value
+      end
+    end
+    
+    typesig { [::Java::Int] }
+    def internal_accessibility_attribute_names(child_id)
+      # The supported attribute set depends on the role played by the control.
+      # We may need to add or remove from the base set as needed.
+      event = AccessibleControlEvent.new(self)
+      event.attr_child_id = child_id
+      event.attr_detail = -1
+      i = 0
+      while i < @accessible_control_listeners.size
+        listener = @accessible_control_listeners.element_at(i)
+        listener.get_role(event)
+        i += 1
+      end
+      # No accessible listener is overriding the role of the control, so let Cocoa
+      # return the default set for the control.
+      if ((event.attr_detail).equal?(-1))
+        return nil
+      end
+      if (((child_id).equal?(ACC::CHILDID_SELF)) && (!(@attribute_names).nil?))
+        return retained_autoreleased(@attribute_names)
+      end
+      return_value = NSMutableArray.array_with_capacity(self.attr_base_attributes.attr_length)
+      # Add our list of supported attributes to the array.
+      # Make sure each attribute name is not already in the array before appending.
+      i_ = 0
+      while i_ < self.attr_base_attributes.attr_length
+        if (!return_value.contains_object(self.attr_base_attributes[i_]))
+          return_value.add_object(self.attr_base_attributes[i_])
+        end
+        i_ += 1
+      end
+      if (@accessible_text_listeners.size > 0)
+        i__ = 0
+        while i__ < self.attr_base_text_attributes.attr_length
+          if (!return_value.contains_object(self.attr_base_text_attributes[i__]))
+            return_value.add_object(self.attr_base_text_attributes[i__])
+          end
+          i__ += 1
+        end
+      end
+      # The following are expected to have a value (AXValue)
+      case (event.attr_detail)
+      when ACC::ROLE_CHECKBUTTON, ACC::ROLE_RADIOBUTTON, ACC::ROLE_LABEL, ACC::ROLE_TABITEM, ACC::ROLE_TABFOLDER
+        return_value.add_object(OS::NSAccessibilityValueAttribute)
+      end
+      # The following are expected to report their enabled status (AXEnabled)
+      case (event.attr_detail)
+      when ACC::ROLE_CHECKBUTTON, ACC::ROLE_RADIOBUTTON, ACC::ROLE_LABEL, ACC::ROLE_TABITEM, ACC::ROLE_PUSHBUTTON, ACC::ROLE_COMBOBOX
+        return_value.add_object(OS::NSAccessibilityEnabledAttribute)
+      end
+      # The following are expected to report a title (AXTitle)
+      case (event.attr_detail)
+      when ACC::ROLE_CHECKBUTTON, ACC::ROLE_RADIOBUTTON, ACC::ROLE_PUSHBUTTON, ACC::ROLE_TABITEM
+        return_value.add_object(OS::NSAccessibilityTitleAttribute)
+      end
+      # Accessibility verifier says these attributes must be reported for combo boxes.
+      if ((event.attr_detail).equal?(ACC::ROLE_COMBOBOX))
+        return_value.add_object(OS::NSAccessibilityExpandedAttribute)
+      end
+      # Accessibility verifier says these attributes must be reported for tab folders.
+      if ((event.attr_detail).equal?(ACC::ROLE_TABFOLDER))
+        return_value.add_object(OS::NSAccessibilityContentsAttribute)
+        return_value.add_object(OS::NSAccessibilityTabsAttribute)
+      end
+      # Only report back sub-roles when the SWT role maps to a sub-role.
+      if (!(event.attr_detail).equal?(-1))
+        os_role = role_to_os(event.attr_detail)
+        if ((os_role.index_of(Character.new(?:.ord))).equal?(-1))
+          return_value.remove_object(OS::NSAccessibilitySubroleAttribute)
+        end
+      end
+      # Children never return their own children, so remove that attribute.
+      if (!(child_id).equal?(ACC::CHILDID_SELF))
+        return_value.remove_object(OS::NSAccessibilityChildrenAttribute)
+      end
+      if ((child_id).equal?(ACC::CHILDID_SELF))
+        @attribute_names = return_value
+        @attribute_names.retain
+        return retained_autoreleased(@attribute_names)
+      else
+        # Caller must retain if necessary.
+        return return_value
+      end
+    end
+    
+    typesig { [NSString, ::Java::Int] }
+    def internal_accessibility_attribute_value(attribute, child_id)
+      if (attribute.is_equal_to_string(OS::NSAccessibilityRoleAttribute))
+        return get_role_attribute(child_id)
+      end
+      if (attribute.is_equal_to_string(OS::NSAccessibilitySubroleAttribute))
+        return get_subrole_attribute(child_id)
+      end
+      if (attribute.is_equal_to_string(OS::NSAccessibilityRoleDescriptionAttribute))
+        return get_role_description_attribute(child_id)
+      end
+      if (attribute.is_equal_to_string(OS::NSAccessibilityExpandedAttribute))
+        return get_expanded_attribute(child_id)
+      end
+      if (attribute.is_equal_to_string(OS::NSAccessibilityHelpAttribute))
+        return get_help_attribute(child_id)
+      end
+      if (attribute.is_equal_to_string(OS::NSAccessibilityTitleAttribute))
+        return get_title_attribute(child_id)
+      end
+      if (attribute.is_equal_to_string(OS::NSAccessibilityValueAttribute))
+        return get_value_attribute(child_id)
+      end
+      if (attribute.is_equal_to_string(OS::NSAccessibilityEnabledAttribute))
+        return get_enabled_attribute(child_id)
+      end
+      if (attribute.is_equal_to_string(OS::NSAccessibilityFocusedAttribute))
+        return get_focused_attribute(child_id)
+      end
+      if (attribute.is_equal_to_string(OS::NSAccessibilityParentAttribute))
+        return get_parent_attribute(child_id)
+      end
+      if (attribute.is_equal_to_string(OS::NSAccessibilityChildrenAttribute))
+        return get_children_attribute(child_id)
+      end
+      if (attribute.is_equal_to_string(OS::NSAccessibilityContentsAttribute))
+        return get_children_attribute(child_id)
+      end
+      # FIXME:  There's no specific API just for tabs, which won't include the buttons (if any.)
+      if (attribute.is_equal_to_string(OS::NSAccessibilityTabsAttribute))
+        return get_tabs_attribute(child_id)
+      end
+      if (attribute.is_equal_to_string(OS::NSAccessibilityWindowAttribute))
+        return get_window_attribute(child_id)
+      end
+      if (attribute.is_equal_to_string(OS::NSAccessibilityTopLevelUIElementAttribute))
+        return get_top_level_uielement_attribute(child_id)
+      end
+      if (attribute.is_equal_to_string(OS::NSAccessibilityPositionAttribute))
+        return get_position_attribute(child_id)
+      end
+      if (attribute.is_equal_to_string(OS::NSAccessibilitySizeAttribute))
+        return get_size_attribute(child_id)
+      end
+      if (attribute.is_equal_to_string(OS::NSAccessibilityDescriptionAttribute))
+        return get_description_attribute(child_id)
+      end
+      if (attribute.is_equal_to_string(OS::NSAccessibilityNumberOfCharactersAttribute))
+        return get_number_of_characters_attribute(child_id)
+      end
+      if (attribute.is_equal_to_string(OS::NSAccessibilitySelectedTextAttribute))
+        return get_selected_text_attribute(child_id)
+      end
+      if (attribute.is_equal_to_string(OS::NSAccessibilitySelectedTextRangeAttribute))
+        return get_selected_text_range_attribute(child_id)
+      end
+      if (attribute.is_equal_to_string(OS::NSAccessibilityInsertionPointLineNumberAttribute))
+        return get_insertion_point_line_number_attribute(child_id)
+      end
+      if (attribute.is_equal_to_string(OS::NSAccessibilitySelectedTextRangesAttribute))
+        return get_selected_text_ranges_attribute(child_id)
+      end
+      if (attribute.is_equal_to_string(OS::NSAccessibilityVisibleCharacterRangeAttribute))
+        return get_visible_character_range_attribute(child_id)
+      end
+      # If this object don't know how to get the value it's up to the control itself to return an attribute value.
+      return nil
+    end
+    
+    typesig { [NSString, Id, ::Java::Int] }
+    def internal_accessibility_attribute_value_for_parameter(attribute, parameter, child_id)
+      if (attribute.is_equal_to_string(OS::NSAccessibilityStringForRangeParameterizedAttribute))
+        return get_string_for_range_attribute(parameter, child_id)
+      end
+      if (attribute.is_equal_to_string(OS::NSAccessibilityRangeForLineParameterizedAttribute))
+        return get_range_for_line_parameterized_attribute(parameter, child_id)
+      end
+      return nil
+    end
+    
+    typesig { [::Java::Int] }
+    # Returns the UI Element that has the focus. You can assume that the search for the focus has already been narrowed down to the receiver.
+    # Override this method to do a deeper search with a UIElement - e.g. a NSMatrix would determine if one of its cells has the focus.
+    def internal_accessibility_focused_uielement(child_id)
+      event = AccessibleControlEvent.new(self)
+      event.attr_child_id = ACC::CHILDID_MULTIPLE # set to invalid value, to test if the application sets it in getFocus()
+      event.attr_accessible = nil
+      i = 0
+      while i < @accessible_control_listeners.size
+        listener = @accessible_control_listeners.element_at(i)
+        listener.get_focus(event)
+        i += 1
+      end
+      # The listener did not respond, so let Cocoa figure it out.
+      if ((event.attr_child_id).equal?(ACC::CHILDID_MULTIPLE))
+        return nil
+      end
+      # The application can optionally answer an accessible.
+      if (!(event.attr_accessible).nil?)
+        return Id.new(OS._nsaccessibility_unignored_ancestor(event.attr_accessible.attr_control.attr_view.attr_id))
+      end
+      # Or the application can answer a valid child ID, including CHILDID_SELF and CHILDID_NONE.
+      if ((event.attr_child_id).equal?(ACC::CHILDID_SELF) || (event.attr_child_id).equal?(ACC::CHILDID_NONE))
+        return Id.new(OS._nsaccessibility_unignored_ancestor(@control.attr_view.attr_id))
+      end
+      return Id.new(OS._nsaccessibility_unignored_ancestor(child_idto_os(event.attr_child_id).attr_id))
+    end
+    
+    typesig { [NSPoint, ::Java::Int] }
+    # Returns the deepest descendant of the UIElement hierarchy that contains the point.
+    # You can assume the point has already been determined to lie within the receiver.
+    # Override this method to do deeper hit testing within a UIElement - e.g. a NSMatrix would test its cells. The point is bottom-left relative screen coordinates.
+    def internal_accessibility_hit_test(point, child_id)
+      event = AccessibleControlEvent.new(self)
+      event.attr_x = RJava.cast_to_int(point.attr_x)
+      primary_monitor = Display.get_current.get_primary_monitor
+      event.attr_y = RJava.cast_to_int((primary_monitor.get_bounds.attr_height - point.attr_y))
+      # Set an impossible value to determine if anything responded to the event.
+      event.attr_child_id = ACC::CHILDID_MULTIPLE
+      i = 0
+      while i < @accessible_control_listeners.size
+        listener = @accessible_control_listeners.element_at(i)
+        listener.get_child_at_point(event)
+        i += 1
+      end
+      # The listener did not respond, so let Cocoa figure it out.
+      if ((event.attr_child_id).equal?(ACC::CHILDID_MULTIPLE))
+        return nil
+      end
+      if (!(event.attr_accessible).nil?)
+        return Id.new(OS._nsaccessibility_unignored_ancestor(event.attr_accessible.attr_control.attr_view.attr_id))
+      end
+      if ((event.attr_child_id).equal?(ACC::CHILDID_SELF) || (event.attr_child_id).equal?(ACC::CHILDID_NONE))
+        return Id.new(OS._nsaccessibility_unignored_ancestor(@control.attr_view.attr_id))
+      end
+      return Id.new(OS._nsaccessibility_unignored_ancestor(child_idto_os(event.attr_child_id).attr_id))
+    end
+    
+    typesig { [::Java::Int] }
+    # Return YES if the UIElement doesn't show up to the outside world - i.e. its parent should return the UIElement's children as its own - cutting the UIElement out. E.g. NSControls are ignored when they are single-celled.
+    def internal_accessibility_is_ignored(child_id)
+      return false
+    end
+    
+    typesig { [::Java::Int] }
+    # parameterized attribute methods
+    def internal_accessibility_parameterized_attribute_names(child_id)
+      if (((child_id).equal?(ACC::CHILDID_SELF)) && (!(@parameterized_attribute_names).nil?))
+        return retained_autoreleased(@parameterized_attribute_names)
+      end
+      return_value = NSMutableArray.array_with_capacity(4)
+      if (@accessible_text_listeners.size > 0)
+        i = 0
+        while i < self.attr_base_parameterized_attributes.attr_length
+          if (!return_value.contains_object(self.attr_base_parameterized_attributes[i]))
+            return_value.add_object(self.attr_base_parameterized_attributes[i])
+          end
+          i += 1
+        end
+      end
+      if ((child_id).equal?(ACC::CHILDID_SELF))
+        @parameterized_attribute_names = return_value
+        @parameterized_attribute_names.retain
+        return retained_autoreleased(@parameterized_attribute_names)
+      else
+        # Caller must retain if they want to keep it.
+        return return_value
+      end
+    end
+    
+    typesig { [NSString, ::Java::Int] }
+    def internal_accessibility_perform_action(action, child_id)
+      # TODO Auto-generated method stub
+      # No action support for now.
+    end
+    
     typesig { [] }
     # Returns the control for this Accessible object.
     # 
@@ -224,294 +593,38 @@ module Org::Eclipse::Swt::Accessibility
     # application code.
     # </p>
     def internal_dispose__accessible
-      if (!(@axuielementref).equal?(0))
-        OS._cfrelease(@axuielementref)
-        @axuielementref = 0
-        index = 1
-        while index < @os_child_idcache.attr_length
-          OS._cfrelease(@os_child_idcache[index])
-          index += 2
-        end
-        @os_child_idcache = Array.typed(::Java::Int).new(0) { 0 }
+      if (!(@action_names).nil?)
+        @action_names.release
       end
+      @action_names = nil
+      if (!(@attribute_names).nil?)
+        @attribute_names.release
+      end
+      @attribute_names = nil
+      if (!(@parameterized_attribute_names).nil?)
+        @parameterized_attribute_names.release
+      end
+      @parameterized_attribute_names = nil
+      delegates = @children.values
+      iter = delegates.iterator
+      while (iter.has_next)
+        child_delegate = iter.next_
+        child_delegate.internal_dispose__swtaccessible_delegate
+      end
+      @children.clear
     end
     
-    typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
-    # Invokes platform specific functionality to handle a window message.
-    # <p>
-    # <b>IMPORTANT:</b> This method is <em>not</em> part of the public
-    # API for <code>Accessible</code>. It is marked public only so that it
-    # can be shared within the packages provided by SWT. It is not
-    # available on all platforms, and should never be called from
-    # application code.
-    # </p>
-    def internal_k_event_accessible_get_child_at_point(next_handler, the_event, user_data)
-      if (!(@axuielementref).equal?(0))
-        OS._call_next_event_handler(next_handler, the_event)
-        # TODO: check error?
-        child_id = get_child_idfrom_event(the_event)
-        pt = CGPoint.new
-        OS._get_event_parameter(the_event, OS.attr_k_event_param_mouse_location, OS.attr_type_hipoint, nil, CGPoint.attr_sizeof, nil, pt)
-        event = AccessibleControlEvent.new(self)
-        event.attr_x = RJava.cast_to_int(pt.attr_x)
-        event.attr_y = RJava.cast_to_int(pt.attr_y)
-        event.attr_child_id = ACC::CHILDID_SELF
-        i = 0
-        while i < @accessible_control_listeners.size
-          listener = @accessible_control_listeners.element_at(i)
-          listener.get_child_at_point(event)
-          i += 1
-        end
-        if (!(event.attr_accessible).nil?)
-          OS._set_event_parameter(the_event, OS.attr_k_event_param_accessible_child, OS.attr_type_cftype_ref, 4, Array.typed(::Java::Int).new([event.attr_accessible.attr_axuielementref]))
-          return OS.attr_no_err
-        end
-        if ((event.attr_child_id).equal?(ACC::CHILDID_SELF) || (event.attr_child_id).equal?(ACC::CHILDID_NONE) || (event.attr_child_id).equal?(child_id))
-          # From the Carbon doc for kEventAccessibleGetChildAtPoint: "If there is no child at the given point,
-          # you should still return noErr, but leave the parameter empty (do not call SetEventParameter)."
-          return OS.attr_no_err
-        end
-        OS._set_event_parameter(the_event, OS.attr_k_event_param_accessible_child, OS.attr_type_cftype_ref, 4, Array.typed(::Java::Int).new([child_idto_os(event.attr_child_id)]))
-        return OS.attr_no_err
-      end
-      return OS.attr_event_not_handled_err
+    typesig { [::Java::Int] }
+    def get_expanded_attribute(child_id)
+      # TODO: May need to expand the API so the combo box state can be reported.
+      return NSNumber.number_with_bool(false)
     end
     
-    typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
-    # Invokes platform specific functionality to handle a window message.
-    # <p>
-    # <b>IMPORTANT:</b> This method is <em>not</em> part of the public
-    # API for <code>Accessible</code>. It is marked public only so that it
-    # can be shared within the packages provided by SWT. It is not
-    # available on all platforms, and should never be called from
-    # application code.
-    # </p>
-    def internal_k_event_accessible_get_focused_child(next_handler, the_event, user_data)
-      if (!(@axuielementref).equal?(0))
-        result = OS._call_next_event_handler(next_handler, the_event)
-        # TODO: check error?
-        child_id = get_child_idfrom_event(the_event)
-        if (!(child_id).equal?(ACC::CHILDID_SELF))
-          # From the Carbon doc for kEventAccessibleGetFocusedChild:
-          # "Only return immediate children; do not return grandchildren of yourself."
-          return OS.attr_no_err # TODO: should this return eventNotHandledErr?
-        end
-        event = AccessibleControlEvent.new(self)
-        event.attr_child_id = ACC::CHILDID_MULTIPLE # set to invalid value, to test if the application sets it in getFocus()
-        event.attr_accessible = nil
-        i = 0
-        while i < @accessible_control_listeners.size
-          listener = @accessible_control_listeners.element_at(i)
-          listener.get_focus(event)
-          i += 1
-        end
-        # The application can optionally answer an accessible.
-        if (!(event.attr_accessible).nil?)
-          OS._set_event_parameter(the_event, OS.attr_k_event_param_accessible_child, OS.attr_type_cftype_ref, 4, Array.typed(::Java::Int).new([event.attr_accessible.attr_axuielementref]))
-          return OS.attr_no_err
-        end
-        # Or the application can answer a valid child ID, including CHILDID_SELF and CHILDID_NONE.
-        if ((event.attr_child_id).equal?(ACC::CHILDID_SELF))
-          OS._set_event_parameter(the_event, OS.attr_k_event_param_accessible_child, OS.attr_type_cftype_ref, 4, Array.typed(::Java::Int).new([0]))
-          return OS.attr_no_err
-        end
-        if ((event.attr_child_id).equal?(ACC::CHILDID_NONE))
-          # From the Carbon doc for kEventAccessibleGetFocusedChild: "If there is no child in the
-          # focus chain, your handler should leave the kEventParamAccessibleChild parameter empty
-          # and return noErr."
-          return OS.attr_no_err
-        end
-        if (!(event.attr_child_id).equal?(ACC::CHILDID_MULTIPLE))
-          # Other valid childID.
-          OS._set_event_parameter(the_event, OS.attr_k_event_param_accessible_child, OS.attr_type_cftype_ref, 4, Array.typed(::Java::Int).new([child_idto_os(event.attr_child_id)]))
-          return OS.attr_no_err
-        end
-        # Invalid childID means the application did not implement getFocus, so just go with the default handler.
-        return result
-      end
-      return OS.attr_event_not_handled_err
-    end
-    
-    typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
-    # Invokes platform specific functionality to handle a window message.
-    # <p>
-    # <b>IMPORTANT:</b> This method is <em>not</em> part of the public
-    # API for <code>Accessible</code>. It is marked public only so that it
-    # can be shared within the packages provided by SWT. It is not
-    # available on all platforms, and should never be called from
-    # application code.
-    # </p>
-    def internal_k_event_accessible_get_all_attribute_names(next_handler, the_event, user_data)
-      code = user_data # userData flags whether nextHandler has already been called
-      if (!(@axuielementref).equal?(0))
-        if ((code).equal?(OS.attr_event_not_handled_err))
-          OS._call_next_event_handler(next_handler, the_event)
-        end
-        array_ref = Array.typed(::Java::Int).new(1) { 0 }
-        OS._get_event_parameter(the_event, OS.attr_k_event_param_accessible_attribute_names, OS.attr_type_cfmutable_array_ref, nil, 4, nil, array_ref)
-        string_array_ref = array_ref[0]
-        length = OS._cfarray_get_count(string_array_ref)
-        os_all_attributes = Array.typed(String).new(length) { nil }
-        i = 0
-        while i < length
-          string_ref = OS._cfarray_get_value_at_index(string_array_ref, i)
-          os_all_attributes[i] = string_ref_to_string(string_ref)
-          i += 1
-        end
-        # Add our list of supported attributes to the array.
-        # Make sure each attribute name is not already in the array before appending.
-        i_ = 0
-        while i_ < RequiredAttributes.attr_length
-          if (!contains(os_all_attributes, RequiredAttributes[i_]))
-            string_ref = string_to_string_ref(RequiredAttributes[i_])
-            OS._cfarray_append_value(string_array_ref, string_ref)
-            OS._cfrelease(string_ref)
-          end
-          i_ += 1
-        end
-        if (@accessible_text_listeners.size > 0)
-          i__ = 0
-          while i__ < TextAttributes.attr_length
-            if (!contains(os_all_attributes, TextAttributes[i__]))
-              string_ref = string_to_string_ref(TextAttributes[i__])
-              OS._cfarray_append_value(string_array_ref, string_ref)
-              OS._cfrelease(string_ref)
-            end
-            i__ += 1
-          end
-        end
-        code = OS.attr_no_err
-      end
-      return code
-    end
-    
-    typesig { [Array.typed(String), String] }
-    def contains(array, element)
-      i = 0
-      while i < array.attr_length
-        if ((array[i] == element))
-          return true
-        end
-        i += 1
-      end
-      return false
-    end
-    
-    typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
-    # Invokes platform specific functionality to handle a window message.
-    # <p>
-    # <b>IMPORTANT:</b> This method is <em>not</em> part of the public
-    # API for <code>Accessible</code>. It is marked public only so that it
-    # can be shared within the packages provided by SWT. It is not
-    # available on all platforms, and should never be called from
-    # application code.
-    # </p>
-    def internal_k_event_accessible_get_named_attribute(next_handler, the_event, user_data)
-      if (!(@axuielementref).equal?(0))
-        string_ref = Array.typed(::Java::Int).new(1) { 0 }
-        OS._get_event_parameter(the_event, OS.attr_k_event_param_accessible_attribute_name, OS.attr_type_cfstring_ref, nil, 4, nil, string_ref)
-        length = 0
-        if (!(string_ref[0]).equal?(0))
-          length = OS._cfstring_get_length(string_ref[0])
-        end
-        buffer = CharArray.new(length)
-        range = CFRange.new
-        range.attr_length = length
-        OS._cfstring_get_characters(string_ref[0], range, buffer)
-        attribute_name = String.new(buffer)
-        if ((attribute_name == OS.attr_k_axrole_attribute))
-          return get_role_attribute(next_handler, the_event, user_data)
-        end
-        if ((attribute_name == OS.attr_k_axsubrole_attribute))
-          return get_subrole_attribute(next_handler, the_event, user_data)
-        end
-        if ((attribute_name == OS.attr_k_axrole_description_attribute))
-          return get_role_description_attribute(next_handler, the_event, user_data)
-        end
-        if ((attribute_name == OS.attr_k_axhelp_attribute))
-          return get_help_attribute(next_handler, the_event, user_data)
-        end
-        if ((attribute_name == OS.attr_k_axtitle_attribute))
-          return get_title_attribute(next_handler, the_event, user_data)
-        end
-        if ((attribute_name == OS.attr_k_axvalue_attribute))
-          return get_value_attribute(next_handler, the_event, user_data)
-        end
-        if ((attribute_name == OS.attr_k_axenabled_attribute))
-          return get_enabled_attribute(next_handler, the_event, user_data)
-        end
-        if ((attribute_name == OS.attr_k_axfocused_attribute))
-          return get_focused_attribute(next_handler, the_event, user_data)
-        end
-        if ((attribute_name == OS.attr_k_axparent_attribute))
-          return get_parent_attribute(next_handler, the_event, user_data)
-        end
-        if ((attribute_name == OS.attr_k_axchildren_attribute))
-          return get_children_attribute(next_handler, the_event, user_data)
-        end
-        if ((attribute_name == OS.attr_k_axselected_children_attribute))
-          return get_selected_children_attribute(next_handler, the_event, user_data)
-        end
-        if ((attribute_name == OS.attr_k_axvisible_children_attribute))
-          return get_visible_children_attribute(next_handler, the_event, user_data)
-        end
-        if ((attribute_name == OS.attr_k_axposition_attribute))
-          return get_position_attribute(next_handler, the_event, user_data)
-        end
-        if ((attribute_name == OS.attr_k_axsize_attribute))
-          return get_size_attribute(next_handler, the_event, user_data)
-        end
-        if ((attribute_name == OS.attr_k_axdescription_attribute))
-          return get_description_attribute(next_handler, the_event, user_data)
-        end
-        if ((attribute_name == OS.attr_k_axnumber_of_characters_attribute))
-          return get_number_of_characters_attribute(next_handler, the_event, user_data)
-        end
-        if ((attribute_name == OS.attr_k_axselected_text_attribute))
-          return get_selected_text_attribute(next_handler, the_event, user_data)
-        end
-        if ((attribute_name == OS.attr_k_axselected_text_range_attribute))
-          return get_selected_text_range_attribute(next_handler, the_event, user_data)
-        end
-        if ((attribute_name == OS.attr_k_axstring_for_range_parameterized_attribute))
-          return get_string_for_range_attribute(next_handler, the_event, user_data)
-        end
-        if ((attribute_name == OS.attr_k_axinsertion_point_line_number_attribute))
-          return get_insertion_point_line_number_attribute(next_handler, the_event, user_data)
-        end
-        if ((attribute_name == OS.attr_k_axrange_for_line_parameterized_attribute))
-          return get_range_for_line_parameterized_attribute(next_handler, the_event, user_data)
-        end
-        return get_attribute(next_handler, the_event, user_data)
-      end
-      return user_data
-    end
-    
-    typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
-    def get_attribute(next_handler, the_event, user_data)
-      # Generic handler: first try just calling the default handler.
-      code = !(user_data).equal?(OS.attr_event_not_handled_err) ? user_data : OS._call_next_event_handler(next_handler, the_event)
-      if (!(code).equal?(OS.attr_no_err) && !(get_child_idfrom_event(the_event)).equal?(ACC::CHILDID_SELF))
-        # If the childID is unknown to the control, then it was created by the application,
-        # so delegate to the application's accessible UIElement for the control.
-        OS._set_event_parameter(the_event, OS.attr_k_event_param_accessible_object, OS.attr_type_cftype_ref, 4, Array.typed(::Java::Int).new([@axuielementref]))
-        code = OS._call_next_event_handler(next_handler, the_event)
-      end
-      return code
-    end
-    
-    typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
-    def get_help_attribute(next_handler, the_event, user_data)
-      code = !(user_data).equal?(OS.attr_event_not_handled_err) ? user_data : OS._call_next_event_handler(next_handler, the_event)
-      os_help_attribute = nil
-      string_ref = Array.typed(::Java::Int).new(1) { 0 }
-      if ((code).equal?(OS.attr_no_err))
-        OS._get_event_parameter(the_event, OS.attr_k_event_param_accessible_attribute_value, OS.attr_type_cfstring_ref, nil, 4, nil, string_ref)
-        os_help_attribute = RJava.cast_to_string(string_ref_to_string(string_ref[0]))
-      end
+    typesig { [::Java::Int] }
+    def get_help_attribute(child_id)
+      return_value = nil
       event = AccessibleEvent.new(self)
-      event.attr_child_id = get_child_idfrom_event(the_event)
-      event.attr_result = os_help_attribute
+      event.attr_child_id = child_id
       i = 0
       while i < @accessible_listeners.size
         listener = @accessible_listeners.element_at(i)
@@ -519,21 +632,16 @@ module Org::Eclipse::Swt::Accessibility
         i += 1
       end
       if (!(event.attr_result).nil?)
-        string_ref[0] = string_to_string_ref(event.attr_result)
-        if (!(string_ref[0]).equal?(0))
-          OS._set_event_parameter(the_event, OS.attr_k_event_param_accessible_attribute_value, OS.attr_type_cfstring_ref, 4, string_ref)
-          OS._cfrelease(string_ref[0])
-          code = OS.attr_no_err
-        end
+        return_value = NSString.string_with(event.attr_result)
       end
-      return code
+      return return_value
     end
     
-    typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
-    def get_role_attribute(next_handler, the_event, user_data)
-      code = user_data
+    typesig { [::Java::Int] }
+    def get_role_attribute(child_id)
+      return_value = nil
       event = AccessibleControlEvent.new(self)
-      event.attr_child_id = get_child_idfrom_event(the_event)
+      event.attr_child_id = child_id
       event.attr_detail = -1
       i = 0
       while i < @accessible_control_listeners.size
@@ -547,21 +655,16 @@ module Org::Eclipse::Swt::Accessibility
         if (!(index).equal?(-1))
           app_role = RJava.cast_to_string(app_role.substring(0, index))
         end
-        string_ref = string_to_string_ref(app_role)
-        if (!(string_ref).equal?(0))
-          OS._set_event_parameter(the_event, OS.attr_k_event_param_accessible_attribute_value, OS.attr_type_cfstring_ref, 4, Array.typed(::Java::Int).new([string_ref]))
-          OS._cfrelease(string_ref)
-          code = OS.attr_no_err
-        end
+        return_value = NSString.string_with(app_role)
       end
-      return code
+      return return_value
     end
     
-    typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
-    def get_subrole_attribute(next_handler, the_event, user_data)
-      code = user_data
+    typesig { [::Java::Int] }
+    def get_subrole_attribute(child_id)
+      return_value = nil
       event = AccessibleControlEvent.new(self)
-      event.attr_child_id = get_child_idfrom_event(the_event)
+      event.attr_child_id = child_id
       event.attr_detail = -1
       i = 0
       while i < @accessible_control_listeners.size
@@ -574,22 +677,17 @@ module Org::Eclipse::Swt::Accessibility
         index = app_role.index_of(Character.new(?:.ord))
         if (!(index).equal?(-1))
           app_role = RJava.cast_to_string(app_role.substring(index + 1))
-          string_ref = string_to_string_ref(app_role)
-          if (!(string_ref).equal?(0))
-            OS._set_event_parameter(the_event, OS.attr_k_event_param_accessible_attribute_value, OS.attr_type_cfstring_ref, 4, Array.typed(::Java::Int).new([string_ref]))
-            OS._cfrelease(string_ref)
-          end
+          return_value = NSString.string_with(app_role)
         end
-        code = OS.attr_no_err
       end
-      return code
+      return return_value
     end
     
-    typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
-    def get_role_description_attribute(next_handler, the_event, user_data)
-      code = user_data
+    typesig { [::Java::Int] }
+    def get_role_description_attribute(child_id)
+      return_value = nil
       event = AccessibleControlEvent.new(self)
-      event.attr_child_id = get_child_idfrom_event(the_event)
+      event.attr_child_id = child_id
       event.attr_detail = -1
       i = 0
       while i < @accessible_control_listeners.size
@@ -605,31 +703,19 @@ module Org::Eclipse::Swt::Accessibility
           app_subrole = RJava.cast_to_string(app_role.substring(index + 1))
           app_role = RJava.cast_to_string(app_role.substring(0, index))
         end
-        string_ref1 = string_to_string_ref(app_role)
-        if (!(string_ref1).equal?(0))
-          string_ref2 = 0
-          if (!(app_subrole).nil?)
-            string_ref2 = string_to_string_ref(app_subrole)
-          end
-          string_ref3 = OS._hicopy_accessibility_role_description(string_ref1, string_ref2)
-          OS._cfrelease(string_ref1)
-          if (!(string_ref2).equal?(0))
-            OS._cfrelease(string_ref2)
-          end
-          if (!(string_ref3).equal?(0))
-            OS._set_event_parameter(the_event, OS.attr_k_event_param_accessible_attribute_value, OS.attr_type_cfstring_ref, 4, Array.typed(::Java::Int).new([string_ref3]))
-            OS._cfrelease(string_ref3)
-            code = OS.attr_no_err
-          end
+        ns_app_role = NSString.string_with(app_role)
+        ns_app_subrole = nil
+        if (!(app_subrole).nil?)
+          ns_app_subrole = NSString.string_with(app_subrole)
         end
+        return_value = NSString.new(OS._nsaccessibility_role_description(((!(ns_app_role).nil?) ? ns_app_role.attr_id : 0), (!(ns_app_subrole).nil?) ? ns_app_subrole.attr_id : 0))
       end
-      return code
+      return return_value
     end
     
-    typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
-    def get_title_attribute(next_handler, the_event, user_data)
-      code = !(user_data).equal?(OS.attr_event_not_handled_err) ? user_data : OS._call_next_event_handler(next_handler, the_event)
-      child_id = get_child_idfrom_event(the_event)
+    typesig { [::Java::Int] }
+    def get_title_attribute(child_id)
+      return_value = nil # NSString.stringWith("");
       # Feature of the Macintosh.  The text of a Label is returned in its value,
       # not its title, so ensure that the role is not Label before asking for the title.
       role_event = AccessibleControlEvent.new(self)
@@ -642,17 +728,9 @@ module Org::Eclipse::Swt::Accessibility
         i += 1
       end
       if (!(role_event.attr_detail).equal?(ACC::ROLE_LABEL))
-        os_title_attribute = nil
-        string_ref = Array.typed(::Java::Int).new(1) { 0 }
-        if ((code).equal?(OS.attr_no_err))
-          status = OS._get_event_parameter(the_event, OS.attr_k_event_param_accessible_attribute_value, OS.attr_type_cfstring_ref, nil, 4, nil, string_ref)
-          if ((status).equal?(OS.attr_no_err))
-            os_title_attribute = RJava.cast_to_string(string_ref_to_string(string_ref[0]))
-          end
-        end
         event = AccessibleEvent.new(self)
         event.attr_child_id = child_id
-        event.attr_result = os_title_attribute
+        event.attr_result = nil
         i_ = 0
         while i_ < @accessible_listeners.size
           listener = @accessible_listeners.element_at(i_)
@@ -660,21 +738,15 @@ module Org::Eclipse::Swt::Accessibility
           i_ += 1
         end
         if (!(event.attr_result).nil?)
-          string_ref[0] = string_to_string_ref(event.attr_result)
-          if (!(string_ref[0]).equal?(0))
-            OS._set_event_parameter(the_event, OS.attr_k_event_param_accessible_attribute_value, OS.attr_type_cfstring_ref, 4, string_ref)
-            OS._cfrelease(string_ref[0])
-            code = OS.attr_no_err
-          end
+          return_value = NSString.string_with(event.attr_result)
         end
       end
-      return code
+      return return_value
     end
     
-    typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
-    def get_value_attribute(next_handler, the_event, user_data)
-      code = !(user_data).equal?(OS.attr_event_not_handled_err) ? user_data : OS._call_next_event_handler(next_handler, the_event)
-      child_id = get_child_idfrom_event(the_event)
+    typesig { [::Java::Int] }
+    def get_value_attribute(child_id)
+      return_value = nil
       event = AccessibleControlEvent.new(self)
       event.attr_child_id = child_id
       event.attr_detail = -1
@@ -688,80 +760,93 @@ module Org::Eclipse::Swt::Accessibility
       end
       role = event.attr_detail
       value = event.attr_result
-      if (!(value).nil? || (role).equal?(ACC::ROLE_LABEL))
-        string_ref = 0
-        case (role)
-        # 1 = on, 0 = off
-        # 1 = checked, 0 = unchecked, 2 = mixed
-        # numeric value representing the position of the scroller
-        # 1 = selected, 0 = not selected
-        # the value associated with the position of the slider thumb
-        # the accessibility object representing the currently selected tab item
-        # break;
-        # text of the currently selected item
-        when ACC::ROLE_RADIOBUTTON, ACC::ROLE_CHECKBUTTON, ACC::ROLE_SCROLLBAR, ACC::ROLE_TABITEM, ACC::ROLE_SLIDER, ACC::ROLE_PROGRESSBAR
-          # the value associated with the fill level of the progress bar
+      case (role)
+      # 1 = on, 0 = off
+      # 1 = checked, 0 = unchecked, 2 = mixed
+      # numeric value representing the position of the scroller
+      # the value associated with the position of the slider thumb
+      # the accessibility object representing the currently selected tab item
+      # text of the currently selected item
+      when ACC::ROLE_RADIOBUTTON, ACC::ROLE_CHECKBUTTON, ACC::ROLE_SCROLLBAR, ACC::ROLE_SLIDER, ACC::ROLE_PROGRESSBAR
+        # the value associated with the fill level of the progress bar
+        if (!(value).nil?)
           begin
             number = JavaInteger.parse_int(value)
-            OS._set_event_parameter(the_event, OS.attr_k_event_param_accessible_attribute_value, OS.attr_type_sint32, 4, Array.typed(::Java::Int).new([number]))
-            code = OS.attr_no_err
+            return_value = NSNumber.number_with_int(number)
           rescue NumberFormatException => ex
             if (value.equals_ignore_case("true"))
-              OS._set_event_parameter(the_event, OS.attr_k_event_param_accessible_attribute_value, OS.attr_type_boolean, 4, Array.typed(::Java::Boolean).new([true]))
-              code = OS.attr_no_err
+              return_value = NSNumber.number_with_bool(true)
             else
               if (value.equals_ignore_case("false"))
-                OS._set_event_parameter(the_event, OS.attr_k_event_param_accessible_attribute_value, OS.attr_type_boolean, 4, Array.typed(::Java::Boolean).new([false]))
-                code = OS.attr_no_err
+                return_value = NSNumber.number_with_bool(false)
               end
             end
           end
-        when ACC::ROLE_TABFOLDER, ACC::ROLE_COMBOBOX, ACC::ROLE_TEXT
-          # text in the text field
-          string_ref = string_to_string_ref(value)
-        when ACC::ROLE_LABEL
-          # text in the label
-          # On a Mac, the 'value' of a label is the same as the 'name' of the label.
-          e = AccessibleEvent.new(self)
-          e.attr_child_id = child_id
-          e.attr_result = nil
-          i_ = 0
-          while i_ < @accessible_listeners.size
-            listener = @accessible_listeners.element_at(i_)
-            listener.get_name(e)
-            i_ += 1
-          end
-          if (!(e.attr_result).nil?)
-            string_ref = string_to_string_ref(e.attr_result)
+        else
+          return_value = NSNumber.number_with_bool(false)
+        end
+      when ACC::ROLE_TABFOLDER, ACC::ROLE_TABITEM
+        # 1 = selected, 0 = not selected
+        ace = AccessibleControlEvent.new(self)
+        ace.attr_child_id = -4
+        i_ = 0
+        while i_ < @accessible_control_listeners.size
+          listener = @accessible_control_listeners.element_at(i_)
+          listener.get_selection(ace)
+          i_ += 1
+        end
+        if (ace.attr_child_id >= ACC::CHILDID_SELF)
+          if ((role).equal?(ACC::ROLE_TABITEM))
+            return_value = NSNumber.number_with_bool((ace.attr_child_id).equal?(child_id))
           else
-            if (!(value).nil?)
-              string_ref = string_to_string_ref(value)
-            end
+            return_value = Id.new(OS._nsaccessibility_unignored_ancestor(child_idto_os(ace.attr_child_id).attr_id))
+          end
+        else
+          return_value = NSNumber.number_with_bool(false)
+        end
+      when ACC::ROLE_COMBOBOX, ACC::ROLE_TEXT
+        # text in the text field
+        if (!(value).nil?)
+          return_value = NSString.string_with(value)
+        end
+      when ACC::ROLE_LABEL
+        # text in the label
+        # On a Mac, the 'value' of a label is the same as the 'name' of the label.
+        e = AccessibleEvent.new(self)
+        e.attr_child_id = child_id
+        e.attr_result = nil
+        i_ = 0
+        while i_ < @accessible_listeners.size
+          listener = @accessible_listeners.element_at(i_)
+          listener.get_name(e)
+          i_ += 1
+        end
+        if (!(e.attr_result).nil?)
+          return_value = NSString.string_with(e.attr_result)
+        else
+          if (!(value).nil?)
+            return_value = NSString.string_with(value)
           end
         end
-        if (!(string_ref).equal?(0))
-          OS._set_event_parameter(the_event, OS.attr_k_event_param_accessible_attribute_value, OS.attr_type_cfstring_ref, 4, Array.typed(::Java::Int).new([string_ref]))
-          OS._cfrelease(string_ref)
-          code = OS.attr_no_err
-        end
       end
-      return code
+      return return_value
     end
     
-    typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
-    def get_enabled_attribute(next_handler, the_event, user_data)
-      code = !(user_data).equal?(OS.attr_event_not_handled_err) ? user_data : OS._call_next_event_handler(next_handler, the_event)
-      if ((code).equal?(OS.attr_event_not_handled_err))
-        OS._set_event_parameter(the_event, OS.attr_k_event_param_accessible_attribute_value, OS.attr_type_boolean, 4, Array.typed(::Java::Boolean).new([@control.is_enabled]))
-        code = OS.attr_no_err
+    typesig { [::Java::Int] }
+    def get_enabled_attribute(child_id)
+      event = AccessibleControlEvent.new(self)
+      event.attr_detail = -1
+      i = 0
+      while i < @accessible_control_listeners.size
+        listener = @accessible_control_listeners.element_at(i)
+        listener.get_state(event)
+        i += 1
       end
-      return code
+      return NSNumber.number_with_bool(@control.is_enabled)
     end
     
-    typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
-    def get_focused_attribute(next_handler, the_event, user_data)
-      os_child_id = Array.typed(::Java::Int).new(1) { 0 }
-      OS._get_event_parameter(the_event, OS.attr_k_event_param_accessible_object, OS.attr_type_cftype_ref, nil, 4, nil, os_child_id)
+    typesig { [::Java::Int] }
+    def get_focused_attribute(child_id)
       event = AccessibleControlEvent.new(self)
       event.attr_child_id = ACC::CHILDID_MULTIPLE # set to invalid value, to test if the application sets it in getFocus()
       event.attr_accessible = nil
@@ -772,56 +857,42 @@ module Org::Eclipse::Swt::Accessibility
         i += 1
       end
       # The application can optionally answer an accessible.
-      if (!(event.attr_accessible).nil?)
-        has_focus = OS._cfequal(event.attr_accessible.attr_axuielementref, os_child_id[0])
-        OS._set_event_parameter(the_event, OS.attr_k_event_param_accessible_attribute_value, OS.attr_type_boolean, 4, Array.typed(::Java::Boolean).new([has_focus]))
-        return OS.attr_no_err
-      end
+      # FIXME:
+      # if (event.accessible != null) {
+      # boolean hasFocus = (event.accessible.childID == childID) && (event.accessible.control == this.control);
+      # return NSNumber.numberWithBool(hasFocus);
+      # }
       # Or the application can answer a valid child ID, including CHILDID_SELF and CHILDID_NONE.
       if ((event.attr_child_id).equal?(ACC::CHILDID_SELF))
-        has_focus = OS._cfequal(@axuielementref, os_child_id[0])
-        OS._set_event_parameter(the_event, OS.attr_k_event_param_accessible_attribute_value, OS.attr_type_boolean, 4, Array.typed(::Java::Boolean).new([has_focus]))
-        return OS.attr_no_err
+        has_focus = ((event.attr_child_id).equal?(child_id))
+        return NSNumber.number_with_bool(has_focus)
       end
       if ((event.attr_child_id).equal?(ACC::CHILDID_NONE))
-        OS._set_event_parameter(the_event, OS.attr_k_event_param_accessible_attribute_value, OS.attr_type_boolean, 4, Array.typed(::Java::Boolean).new([false]))
-        return OS.attr_no_err
+        return NSNumber.number_with_bool(false)
       end
       if (!(event.attr_child_id).equal?(ACC::CHILDID_MULTIPLE))
         # Other valid childID.
-        child_id = os_to_child_id(os_child_id[0])
-        OS._set_event_parameter(the_event, OS.attr_k_event_param_accessible_attribute_value, OS.attr_type_boolean, 4, Array.typed(::Java::Boolean).new([(event.attr_child_id).equal?(child_id)]))
-        return OS.attr_no_err
+        return NSNumber.number_with_bool((event.attr_child_id).equal?(child_id))
       end
-      # Invalid childID at this point means the application did not implement getFocus, so return the native focus.
-      has_focus = false
-      focus_window = OS._get_user_focus_window
-      if (!(focus_window).equal?(0))
-        focus_control = Array.typed(::Java::Int).new(1) { 0 }
-        OS._get_keyboard_focus(focus_window, focus_control)
-        if ((focus_control[0]).equal?(@control.attr_handle))
-          has_focus = true
-        end
-      end
-      OS._set_event_parameter(the_event, OS.attr_k_event_param_accessible_attribute_value, OS.attr_type_boolean, 4, Array.typed(::Java::Boolean).new([has_focus]))
-      return OS.attr_no_err
+      # Invalid childID at this point means the application did not implement getFocus, so
+      # let the default handler return the native focus.
+      has_focus = ((@control.attr_view.window.first_responder).equal?(@control.attr_view))
+      return NSNumber.number_with_bool(has_focus)
     end
     
-    typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
-    def get_parent_attribute(next_handler, the_event, user_data)
-      code = !(user_data).equal?(OS.attr_event_not_handled_err) ? user_data : OS._call_next_event_handler(next_handler, the_event)
-      if ((code).equal?(OS.attr_event_not_handled_err))
-        # If the childID was created by the application, the parent is the accessible for the control.
-        OS._set_event_parameter(the_event, OS.attr_k_event_param_accessible_attribute_value, OS.attr_type_cftype_ref, 4, Array.typed(::Java::Int).new([@axuielementref]))
-        code = OS.attr_no_err
+    typesig { [::Java::Int] }
+    def get_parent_attribute(child_id)
+      # Returning null here means 'let Cocoa figure it out.'
+      if ((child_id).equal?(ACC::CHILDID_SELF))
+        return nil
+      else
+        return Id.new(OS._nsaccessibility_unignored_ancestor(@control.attr_view.attr_id))
       end
-      return code
     end
     
-    typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
-    def get_children_attribute(next_handler, the_event, user_data)
-      code = user_data
-      child_id = get_child_idfrom_event(the_event)
+    typesig { [::Java::Int] }
+    def get_children_attribute(child_id)
+      return_value = nil
       if ((child_id).equal?(ACC::CHILDID_SELF))
         event = AccessibleControlEvent.new(self)
         event.attr_child_id = child_id
@@ -832,145 +903,200 @@ module Org::Eclipse::Swt::Accessibility
           listener.get_child_count(event)
           i += 1
         end
-        if ((event.attr_detail).equal?(0))
-          code = OS.attr_no_err
-        else
-          if (event.attr_detail > 0)
-            i_ = 0
-            while i_ < @accessible_control_listeners.size
-              listener = @accessible_control_listeners.element_at(i_)
-              listener.get_children(event)
-              i_ += 1
-            end
-            app_children = event.attr_children
-            if (!(app_children).nil? && app_children.attr_length > 0)
-              # return a CFArrayRef of AXUIElementRefs
-              children = OS._cfarray_create_mutable(OS.attr_k_cfallocator_default, 0, 0)
-              if (!(children).equal?(0))
-                i__ = 0
-                while i__ < app_children.attr_length
-                  child = app_children[i__]
-                  if (child.is_a?(JavaInteger))
-                    OS._cfarray_append_value(children, child_idto_os((child).int_value))
-                  else
-                    OS._cfarray_append_value(children, (child).attr_axuielementref)
-                  end
-                  i__ += 1
-                end
-                OS._set_event_parameter(the_event, OS.attr_k_event_param_accessible_attribute_value, OS.attr_type_cfmutable_array_ref, 4, Array.typed(::Java::Int).new([children]))
-                OS._cfrelease(children)
-                code = OS.attr_no_err
+        if (event.attr_detail > 0)
+          i_ = 0
+          while i_ < @accessible_control_listeners.size
+            listener = @accessible_control_listeners.element_at(i_)
+            listener.get_children(event)
+            i_ += 1
+          end
+          app_children = event.attr_children
+          if (!(app_children).nil? && app_children.attr_length > 0)
+            # return an NSArray of NSAccessible objects.
+            child_array = NSMutableArray.array_with_capacity(app_children.attr_length)
+            i__ = 0
+            while i__ < app_children.attr_length
+              child = app_children[i__]
+              if (child.is_a?(JavaInteger))
+                acc_child = child_idto_os((child).int_value)
+                child_array.add_object(acc_child)
+              else
+                child_array.add_object((child).attr_control.attr_view)
               end
+              i__ += 1
             end
+            return_value = Id.new(OS._nsaccessibility_unignored_children(child_array.attr_id))
           end
         end
+      else
+        # Lightweight children have no children of their own.
+        # Don't return null if there are no children -- always return an empty array.
+        return_value = NSArray.array
       end
-      return code
+      # Returning null here means we want the control itself to determine its children. If the accessible listener
+      # implemented getChildCount/getChildren, references to those objects would have been returned above.
+      return return_value
     end
     
-    typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
-    def get_selected_children_attribute(next_handler, the_event, user_data)
-      # TODO
-      return get_attribute(next_handler, the_event, user_data)
-    end
-    
-    typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
-    def get_visible_children_attribute(next_handler, the_event, user_data)
-      # TODO
-      return get_attribute(next_handler, the_event, user_data)
-    end
-    
-    typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
-    def get_position_attribute(next_handler, the_event, user_data)
-      code = !(user_data).equal?(OS.attr_event_not_handled_err) ? user_data : OS._call_next_event_handler(next_handler, the_event)
-      os_position_attribute = CGPoint.new
-      if ((code).equal?(OS.attr_no_err))
-        OS._get_event_parameter(the_event, OS.attr_k_event_param_accessible_attribute_value, OS.attr_type_hipoint, nil, CGPoint.attr_sizeof, nil, os_position_attribute)
+    typesig { [::Java::Int] }
+    def get_tabs_attribute(child_id)
+      return_value = nil
+      if ((child_id).equal?(ACC::CHILDID_SELF))
+        event = AccessibleControlEvent.new(self)
+        event.attr_child_id = child_id
+        event.attr_detail = -1 # set to impossible value to test if app resets
+        i = 0
+        while i < @accessible_control_listeners.size
+          listener = @accessible_control_listeners.element_at(i)
+          listener.get_child_count(event)
+          i += 1
+        end
+        if (event.attr_detail > 0)
+          i_ = 0
+          while i_ < @accessible_control_listeners.size
+            listener = @accessible_control_listeners.element_at(i_)
+            listener.get_children(event)
+            i_ += 1
+          end
+          app_children = event.attr_children
+          if (!(app_children).nil? && app_children.attr_length > 0)
+            # return an NSArray of NSAccessible objects.
+            child_array = NSMutableArray.array_with_capacity(app_children.attr_length)
+            i__ = 0
+            while i__ < app_children.attr_length
+              child = app_children[i__]
+              if (child.is_a?(JavaInteger))
+                sub_child_id = (child).int_value
+                event.attr_child_id = sub_child_id
+                event.attr_detail = -1
+                j = 0
+                while j < @accessible_control_listeners.size
+                  listener = @accessible_control_listeners.element_at(j)
+                  listener.get_role(event)
+                  j += 1
+                end
+                if ((event.attr_detail).equal?(ACC::ROLE_TABITEM))
+                  acc_child = child_idto_os((child).int_value)
+                  child_array.add_object(acc_child)
+                end
+              else
+                child_array.add_object((child).attr_control.attr_view)
+              end
+              i__ += 1
+            end
+            return_value = Id.new(OS._nsaccessibility_unignored_children(child_array.attr_id))
+          end
+        end
+      else
+        # Lightweight children have no children of their own.
+        # Don't return null if there are no children -- always return an empty array.
+        return_value = NSArray.array
       end
+      # Returning null here means we want the control itself to determine its children. If the accessible listener
+      # implemented getChildCount/getChildren, references to those objects would have been returned above.
+      return return_value
+    end
+    
+    typesig { [::Java::Int] }
+    def get_window_attribute(child_id)
+      return @control.attr_view.window
+    end
+    
+    typesig { [::Java::Int] }
+    def get_top_level_uielement_attribute(child_id)
+      return @control.attr_view.window
+    end
+    
+    typesig { [::Java::Int] }
+    def get_position_attribute(child_id)
+      return_value = nil
       event = AccessibleControlEvent.new(self)
-      event.attr_child_id = get_child_idfrom_event(the_event)
-      event.attr_x = RJava.cast_to_int(os_position_attribute.attr_x)
-      event.attr_y = RJava.cast_to_int(os_position_attribute.attr_y)
-      if (!(code).equal?(OS.attr_no_err))
-        event.attr_width = -1
-      end
+      event.attr_child_id = child_id
+      event.attr_width = -1
       i = 0
       while i < @accessible_control_listeners.size
         listener = @accessible_control_listeners.element_at(i)
         listener.get_location(event)
         i += 1
       end
+      primary_monitor = Display.get_current.get_primary_monitor
+      os_position_attribute = NSPoint.new
       if (!(event.attr_width).equal?(-1))
+        # The point returned is the lower-left coordinate of the widget in lower-left relative screen coordinates.
         os_position_attribute.attr_x = event.attr_x
-        os_position_attribute.attr_y = event.attr_y
-        OS._set_event_parameter(the_event, OS.attr_k_event_param_accessible_attribute_value, OS.attr_type_hipoint, CGPoint.attr_sizeof, os_position_attribute)
-        code = OS.attr_no_err
-      end
-      return code
-    end
-    
-    typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
-    def get_size_attribute(next_handler, the_event, user_data)
-      code = !(user_data).equal?(OS.attr_event_not_handled_err) ? user_data : OS._call_next_event_handler(next_handler, the_event)
-      os_size_attribute = CGPoint.new
-      if ((code).equal?(OS.attr_no_err))
-        OS._get_event_parameter(the_event, OS.attr_k_event_param_accessible_attribute_value, OS.attr_type_hisize, nil, CGPoint.attr_sizeof, nil, os_size_attribute)
-      end
-      event = AccessibleControlEvent.new(self)
-      event.attr_child_id = get_child_idfrom_event(the_event)
-      event.attr_width = (!(code).equal?(OS.attr_no_err)) ? -1 : RJava.cast_to_int(os_size_attribute.attr_x)
-      event.attr_height = RJava.cast_to_int(os_size_attribute.attr_y)
-      i = 0
-      while i < @accessible_control_listeners.size
-        listener = @accessible_control_listeners.element_at(i)
-        listener.get_location(event)
-        i += 1
-      end
-      if (!(event.attr_width).equal?(-1))
-        os_size_attribute.attr_x = event.attr_width
-        os_size_attribute.attr_y = event.attr_height
-        OS._set_event_parameter(the_event, OS.attr_k_event_param_accessible_attribute_value, OS.attr_type_hisize, CGPoint.attr_sizeof, os_size_attribute)
-        code = OS.attr_no_err
-      end
-      return code
-    end
-    
-    typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
-    def get_description_attribute(next_handler, the_event, user_data)
-      code = !(user_data).equal?(OS.attr_event_not_handled_err) ? user_data : OS._call_next_event_handler(next_handler, the_event)
-      os_description_attribute = nil
-      string_ref = Array.typed(::Java::Int).new(1) { 0 }
-      if ((code).equal?(OS.attr_no_err))
-        status = OS._get_event_parameter(the_event, OS.attr_k_event_param_accessible_attribute_value, OS.attr_type_cfstring_ref, nil, 4, nil, string_ref)
-        if ((status).equal?(OS.attr_no_err))
-          os_description_attribute = RJava.cast_to_string(string_ref_to_string(string_ref[0]))
+        os_position_attribute.attr_y = primary_monitor.get_bounds.attr_height - event.attr_y - event.attr_height
+        return_value = NSValue.value_with_point(os_position_attribute)
+      else
+        if (!(child_id).equal?(ACC::CHILDID_SELF))
+          pt = nil
+          location = @control.get_bounds
+          if (!(@control.get_parent).nil?)
+            pt = @control.get_parent.to_display(location.attr_x, location.attr_y)
+          else
+            pt = (@control).to_display(location.attr_x, location.attr_y)
+          end
+          os_position_attribute.attr_x = pt.attr_x
+          os_position_attribute.attr_y = pt.attr_y
+          return_value = NSValue.value_with_point(os_position_attribute)
         end
       end
+      return return_value
+    end
+    
+    typesig { [::Java::Int] }
+    def get_size_attribute(child_id)
+      return_value = nil
+      event = AccessibleControlEvent.new(self)
+      event.attr_child_id = child_id
+      event.attr_width = -1
+      i = 0
+      while i < @accessible_control_listeners.size
+        listener = @accessible_control_listeners.element_at(i)
+        listener.get_location(event)
+        i += 1
+      end
+      control_size = NSSize.new
+      if (!(event.attr_width).equal?(-1))
+        control_size.attr_width = event.attr_width
+        control_size.attr_height = event.attr_height
+        return_value = NSValue.value_with_size(control_size)
+      else
+        if (!(child_id).equal?(ACC::CHILDID_SELF))
+          control_size.attr_width = control_size.attr_height = 0
+          return_value = NSValue.value_with_size(control_size)
+        end
+      end
+      return return_value
+    end
+    
+    typesig { [::Java::Int] }
+    def get_description_attribute(child_id)
       event = AccessibleEvent.new(self)
-      event.attr_child_id = get_child_idfrom_event(the_event)
-      event.attr_result = os_description_attribute
+      event.attr_child_id = child_id
+      event.attr_result = nil
+      return_value = nil
       i = 0
       while i < @accessible_listeners.size
         listener = @accessible_listeners.element_at(i)
         listener.get_description(event)
         i += 1
       end
-      if (!(event.attr_result).nil?)
-        string_ref[0] = string_to_string_ref(event.attr_result)
-        if (!(string_ref[0]).equal?(0))
-          OS._set_event_parameter(the_event, OS.attr_k_event_param_accessible_attribute_value, OS.attr_type_cfstring_ref, 4, string_ref)
-          OS._cfrelease(string_ref[0])
-          code = OS.attr_no_err
+      return_value = (!(event.attr_result).nil? ? NSString.string_with(event.attr_result) : nil)
+      # If no description was provided, and this is a composite or canvas, return a blank string
+      # -- otherwise, let the Cocoa control handle it.
+      if ((return_value).nil?)
+        if (@control.is_a?(Composite))
+          return_value = NSString.string_with("")
         end
       end
-      return code
+      return return_value
     end
     
-    typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
-    def get_insertion_point_line_number_attribute(next_handler, the_event, user_data)
-      code = user_data
+    typesig { [::Java::Int] }
+    def get_insertion_point_line_number_attribute(child_id)
+      return_value = nil
       control_event = AccessibleControlEvent.new(self)
-      control_event.attr_child_id = get_child_idfrom_event(the_event)
+      control_event.attr_child_id = child_id
       control_event.attr_result = nil
       i = 0
       while i < @accessible_control_listeners.size
@@ -979,7 +1105,7 @@ module Org::Eclipse::Swt::Accessibility
         i += 1
       end
       text_event = AccessibleTextEvent.new(self)
-      text_event.attr_child_id = get_child_idfrom_event(the_event)
+      text_event.attr_child_id = child_id
       text_event.attr_offset = -1
       i_ = 0
       while i_ < @accessible_text_listeners.size
@@ -989,17 +1115,16 @@ module Org::Eclipse::Swt::Accessibility
       end
       if (!(control_event.attr_result).nil? && !(text_event.attr_offset).equal?(-1))
         line_number = line_number_for_offset(control_event.attr_result, text_event.attr_offset)
-        OS._set_event_parameter(the_event, OS.attr_k_event_param_accessible_attribute_value, OS.attr_type_sint32, 4, Array.typed(::Java::Int).new([line_number]))
-        code = OS.attr_no_err
+        return_value = NSNumber.number_with_int(line_number)
       end
-      return code
+      return return_value
     end
     
-    typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
-    def get_number_of_characters_attribute(next_handler, the_event, user_data)
-      code = user_data
+    typesig { [::Java::Int] }
+    def get_number_of_characters_attribute(child_id)
+      return_value = nil
       event = AccessibleControlEvent.new(self)
-      event.attr_child_id = get_child_idfrom_event(the_event)
+      event.attr_child_id = child_id
       event.attr_result = nil
       i = 0
       while i < @accessible_control_listeners.size
@@ -1009,45 +1134,40 @@ module Org::Eclipse::Swt::Accessibility
       end
       app_value = event.attr_result
       if (!(app_value).nil?)
-        OS._set_event_parameter(the_event, OS.attr_k_event_param_accessible_attribute_value, OS.attr_type_sint32, 4, Array.typed(::Java::Int).new([app_value.length]))
-        code = OS.attr_no_err
+        return_value = NSNumber.number_with_int(app_value.length)
       end
-      return code
+      return return_value
     end
     
-    typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
-    def get_range_for_line_parameterized_attribute(next_handler, the_event, user_data)
-      code = user_data
-      line_number = Array.typed(::Java::Int).new(1) { 0 }
-      status = OS._get_event_parameter(the_event, OS.attr_k_event_param_accessible_attribute_parameter, OS.attr_type_sint32, nil, 4, nil, line_number)
-      if ((status).equal?(OS.attr_no_err))
-        event = AccessibleControlEvent.new(self)
-        event.attr_child_id = get_child_idfrom_event(the_event)
-        event.attr_result = nil
-        i = 0
-        while i < @accessible_control_listeners.size
-          listener = @accessible_control_listeners.element_at(i)
-          listener.get_value(event)
-          i += 1
-        end
-        if (!(event.attr_result).nil?)
-          range = range_for_line_number(line_number[0], event.attr_result)
-          if (!(range.attr_location).equal?(-1))
-            value_ref = OS._axvalue_create(OS.attr_k_axvalue_cfrange_type, range)
-            OS._set_event_parameter(the_event, OS.attr_k_event_param_accessible_attribute_value, OS.attr_type_cftype_ref, 4, Array.typed(::Java::Int).new([value_ref]))
-            OS._cfrelease(value_ref)
-            code = OS.attr_no_err
-          end
+    typesig { [Id, ::Java::Int] }
+    def get_range_for_line_parameterized_attribute(parameter, child_id)
+      return_value = nil
+      # The parameter is an NSNumber with the line number.
+      line_number_obj = NSNumber.new(parameter.attr_id)
+      line_number = line_number_obj.int_value
+      event = AccessibleControlEvent.new(self)
+      event.attr_child_id = child_id
+      event.attr_result = nil
+      i = 0
+      while i < @accessible_control_listeners.size
+        listener = @accessible_control_listeners.element_at(i)
+        listener.get_value(event)
+        i += 1
+      end
+      if (!(event.attr_result).nil?)
+        range = range_for_line_number(line_number, event.attr_result)
+        if (!(range.attr_location).equal?(-1))
+          return_value = NSValue.value_with_range(range)
         end
       end
-      return code
+      return return_value
     end
     
-    typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
-    def get_selected_text_attribute(next_handler, the_event, user_data)
-      code = user_data
+    typesig { [::Java::Int] }
+    def get_selected_text_attribute(child_id)
+      return_value = NSString.string_with("")
       event = AccessibleTextEvent.new(self)
-      event.attr_child_id = get_child_idfrom_event(the_event)
+      event.attr_child_id = child_id
       event.attr_offset = -1
       event.attr_length = -1
       i = 0
@@ -1071,24 +1191,19 @@ module Org::Eclipse::Swt::Accessibility
         end
         app_value = event2.attr_result
         if (!(app_value).nil?)
-          string_ref = string_to_string_ref(app_value.substring(offset, offset + length_))
-          if (!(string_ref).equal?(0))
-            OS._set_event_parameter(the_event, OS.attr_k_event_param_accessible_attribute_value, OS.attr_type_cfstring_ref, 4, Array.typed(::Java::Int).new([string_ref]))
-            OS._cfrelease(string_ref)
-            code = OS.attr_no_err
-          end
+          return_value = NSString.string_with(app_value.substring(offset, offset + length_))
         end
       end
-      return code
+      return return_value
     end
     
-    typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
-    def get_selected_text_range_attribute(next_handler, the_event, user_data)
-      code = user_data
+    typesig { [::Java::Int] }
+    def get_selected_text_range_attribute(child_id)
+      return_value = nil
       event = AccessibleTextEvent.new(self)
-      event.attr_child_id = get_child_idfrom_event(the_event)
+      event.attr_child_id = child_id
       event.attr_offset = -1
-      event.attr_length = -1
+      event.attr_length = 0
       i = 0
       while i < @accessible_text_listeners.size
         listener = @accessible_text_listeners.element_at(i)
@@ -1096,47 +1211,81 @@ module Org::Eclipse::Swt::Accessibility
         i += 1
       end
       if (!(event.attr_offset).equal?(-1))
-        range = CFRange.new
+        range = NSRange.new
         range.attr_location = event.attr_offset
         range.attr_length = event.attr_length
-        value_ref = OS._axvalue_create(OS.attr_k_axvalue_cfrange_type, range)
-        OS._set_event_parameter(the_event, OS.attr_k_event_param_accessible_attribute_value, OS.attr_type_cftype_ref, 4, Array.typed(::Java::Int).new([value_ref]))
-        OS._cfrelease(value_ref)
-        code = OS.attr_no_err
+        return_value = NSValue.value_with_range(range)
       end
-      return code
+      return return_value
     end
     
-    typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
-    def get_string_for_range_attribute(next_handler, the_event, user_data)
-      code = user_data
-      value_ref = Array.typed(::Java::Int).new(1) { 0 }
-      status = OS._get_event_parameter(the_event, OS.attr_k_event_param_accessible_attribute_parameter, OS.attr_type_cftype_ref, nil, 4, nil, value_ref)
-      if ((status).equal?(OS.attr_no_err))
-        range = CFRange.new
-        ok = OS._axvalue_get_value(value_ref[0], OS.attr_k_axvalue_cfrange_type, range)
-        if (ok)
-          event = AccessibleControlEvent.new(self)
-          event.attr_child_id = get_child_idfrom_event(the_event)
-          event.attr_result = nil
-          i = 0
-          while i < @accessible_control_listeners.size
-            listener = @accessible_control_listeners.element_at(i)
-            listener.get_value(event)
-            i += 1
-          end
-          app_value = event.attr_result
-          if (!(app_value).nil?)
-            string_ref = string_to_string_ref(app_value.substring(range.attr_location, range.attr_location + range.attr_length))
-            if (!(string_ref).equal?(0))
-              OS._set_event_parameter(the_event, OS.attr_k_event_param_accessible_attribute_value, OS.attr_type_cfstring_ref, 4, Array.typed(::Java::Int).new([string_ref]))
-              OS._cfrelease(string_ref)
-              code = OS.attr_no_err
-            end
-          end
-        end
+    typesig { [Id, ::Java::Int] }
+    def get_string_for_range_attribute(parameter, child_id)
+      return_value = nil
+      # Parameter is an NSRange wrapped in an NSValue.
+      parameter_object = NSValue.new(parameter.attr_id)
+      range = parameter_object.range_value
+      event = AccessibleControlEvent.new(self)
+      event.attr_child_id = child_id
+      event.attr_result = nil
+      i = 0
+      while i < @accessible_control_listeners.size
+        listener = @accessible_control_listeners.element_at(i)
+        listener.get_value(event)
+        i += 1
       end
-      return code
+      app_value = event.attr_result
+      if (!(app_value).nil?)
+        # 64
+        # 64
+        return_value = NSString.string_with(app_value.substring(RJava.cast_to_int(range.attr_location), RJava.cast_to_int((range.attr_location + range.attr_length))))
+      end
+      return return_value
+    end
+    
+    typesig { [::Java::Int] }
+    def get_selected_text_ranges_attribute(child_id)
+      return_value = nil
+      event = AccessibleTextEvent.new(self)
+      event.attr_child_id = child_id
+      event.attr_offset = -1
+      event.attr_length = 0
+      i = 0
+      while i < @accessible_text_listeners.size
+        listener = @accessible_text_listeners.element_at(i)
+        listener.get_selection_range(event)
+        i += 1
+      end
+      if (!(event.attr_offset).equal?(-1))
+        return_value = NSMutableArray.array_with_capacity(1)
+        range = NSRange.new
+        range.attr_location = event.attr_offset
+        range.attr_length = event.attr_length
+        return_value.add_object(NSValue.value_with_range(range))
+      end
+      return return_value
+    end
+    
+    typesig { [::Java::Int] }
+    def get_visible_character_range_attribute(child_id)
+      event = AccessibleControlEvent.new(self)
+      event.attr_child_id = child_id
+      event.attr_result = nil
+      i = 0
+      while i < @accessible_control_listeners.size
+        listener = @accessible_control_listeners.element_at(i)
+        listener.get_value(event)
+        i += 1
+      end
+      range = NSRange.new
+      if (!(event.attr_result).nil?)
+        range.attr_location = 0
+        range.attr_length = event.attr_result.length
+      else
+        return nil
+        # range.location = range.length = 0;
+      end
+      return NSValue.value_with_range(range)
     end
     
     typesig { [String, ::Java::Int] }
@@ -1164,7 +1313,7 @@ module Org::Eclipse::Swt::Accessibility
     
     typesig { [::Java::Int, String] }
     def range_for_line_number(line_number, text)
-      range = CFRange.new
+      range = NSRange.new
       range.attr_location = -1
       line = 1
       count = 0
@@ -1276,6 +1425,15 @@ module Org::Eclipse::Swt::Accessibility
       @accessible_text_listeners.remove_element(listener)
     end
     
+    class_module.module_eval {
+      typesig { [NSArray] }
+      def retained_autoreleased(in_object)
+        temp = in_object.retain
+        temp2 = NSObject.new(temp.attr_id).autorelease
+        return NSArray.new(temp2.attr_id)
+      end
+    }
+    
     typesig { [] }
     # Sends a message to accessible clients that the child selection
     # within a custom container control has changed.
@@ -1288,9 +1446,7 @@ module Org::Eclipse::Swt::Accessibility
     # @since 3.0
     def selection_changed
       check_widget
-      string_ref = string_to_string_ref(OS.attr_k_axselected_children_changed_notification)
-      OS._axnotification_hiobject_notify(string_ref, @control.attr_handle, 0)
-      OS._cfrelease(string_ref)
+      OS._nsaccessibility_post_notification(@control.attr_view.attr_id, OS::NSAccessibilitySelectedChildrenChangedNotification.attr_id)
     end
     
     typesig { [::Java::Int] }
@@ -1305,10 +1461,7 @@ module Org::Eclipse::Swt::Accessibility
     # </ul>
     def set_focus(child_id)
       check_widget
-      child_idto_os(child_id) # Make sure the childID is cached
-      string_ref = string_to_string_ref(OS.attr_k_axfocused_uielement_changed_notification)
-      OS._axnotification_hiobject_notify(string_ref, @control.attr_handle, 0)
-      OS._cfrelease(string_ref)
+      OS._nsaccessibility_post_notification(@control.attr_view.attr_id, OS::NSAccessibilityFocusedUIElementChangedNotification.attr_id)
     end
     
     typesig { [::Java::Int] }
@@ -1325,9 +1478,7 @@ module Org::Eclipse::Swt::Accessibility
     # @since 3.0
     def text_caret_moved(index)
       check_widget
-      string_ref = string_to_string_ref(OS.attr_k_axselected_text_changed_notification)
-      OS._axnotification_hiobject_notify(string_ref, @control.attr_handle, 0)
-      OS._cfrelease(string_ref)
+      OS._nsaccessibility_post_notification(@control.attr_view.attr_id, OS::NSAccessibilitySelectedTextChangedNotification.attr_id)
     end
     
     typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
@@ -1350,9 +1501,7 @@ module Org::Eclipse::Swt::Accessibility
     # @since 3.0
     def text_changed(type, start_index, length_)
       check_widget
-      string_ref = string_to_string_ref(OS.attr_k_axvalue_changed_notification)
-      OS._axnotification_hiobject_notify(string_ref, @control.attr_handle, 0)
-      OS._cfrelease(string_ref)
+      OS._nsaccessibility_post_notification(@control.attr_view.attr_id, OS::NSAccessibilityValueChangedNotification.attr_id)
     end
     
     typesig { [] }
@@ -1367,256 +1516,200 @@ module Org::Eclipse::Swt::Accessibility
     # @since 3.0
     def text_selection_changed
       check_widget
-      string_ref = string_to_string_ref(OS.attr_k_axselected_text_changed_notification)
-      OS._axnotification_hiobject_notify(string_ref, @control.attr_handle, 0)
-      OS._cfrelease(string_ref)
-    end
-    
-    typesig { [::Java::Int] }
-    def get_child_idfrom_event(the_event)
-      ref = Array.typed(::Java::Int).new(1) { 0 }
-      OS._get_event_parameter(the_event, OS.attr_k_event_param_accessible_object, OS.attr_type_cftype_ref, nil, 4, nil, ref)
-      return os_to_child_id(ref[0])
+      OS._nsaccessibility_post_notification(@control.attr_view.attr_id, OS::NSAccessibilitySelectedTextChangedNotification.attr_id)
     end
     
     typesig { [::Java::Int] }
     def child_idto_os(child_id)
       if ((child_id).equal?(ACC::CHILDID_SELF))
-        return @axuielementref
+        return @control.attr_view
       end
       # Check cache for childID, if found, return corresponding osChildID.
-      index = 0
-      index = 0
-      while index < @os_child_idcache.attr_length
-        if ((child_id).equal?(@os_child_idcache[index]))
-          return @os_child_idcache[index + 1]
-        end
-        index += 2
+      child_ref = @children.get(child_id)
+      if ((child_ref).nil?)
+        child_ref = SWTAccessibleDelegate.new(self, child_id)
+        @children.put(child_id, child_ref)
       end
-      # If childID not in cache, create osChildID, grow cache by 2,
-      # add childID/osChildID to cache, and return new osChildID.
-      os_child_id = OS._axuielement_create_with_hiobject_and_identifier(@control.attr_handle, child_id + 1)
-      new_cache = Array.typed(::Java::Int).new(@os_child_idcache.attr_length + 2) { 0 }
-      System.arraycopy(@os_child_idcache, 0, new_cache, 0, @os_child_idcache.attr_length)
-      @os_child_idcache = new_cache
-      @os_child_idcache[index] = child_id
-      @os_child_idcache[index + 1] = os_child_id
-      return os_child_id
+      return child_ref
     end
     
-    typesig { [::Java::Int] }
-    def os_to_child_id(os_child_id)
-      if (OS._cfequal(os_child_id, @axuielementref))
-        return ACC::CHILDID_SELF
-      end
-      # osChildID is an AXUIElementRef containing the control handle and a long identifier.
-      child_id = Array.typed(::Java::Long).new(1) { 0 }
-      OS._axuielement_get_identifier(os_child_id, child_id)
-      if ((child_id[0]).equal?(0))
-        return ACC::CHILDID_SELF
-      end
-      return RJava.cast_to_int(child_id[0]) - 1
-    end
-    
-    typesig { [::Java::Int] }
-    def state_to_os(state)
-      # int osState = 0;
-      # if ((state & ACC.STATE_SELECTED) != 0) osState |= OS.;
-      # return osState;
-      return state
-    end
-    
-    typesig { [::Java::Int] }
-    def os_to_state(os_state)
-      # int state = ACC.STATE_NORMAL;
-      # if ((osState & OS.) != 0) state |= ACC.STATE_SELECTED;
-      # return state;
-      return os_state
+    typesig { [NSString, NSString] }
+    def concat_strings_as_role(str1, str2)
+      return_value = str1
+      return_value = return_value.string_by_appending_string(NSString.string_with(":"))
+      return_value = return_value.string_by_appending_string(str2)
+      return return_value
     end
     
     typesig { [::Java::Int] }
     def role_to_os(role)
+      ns_return_value = nil # OS.NSAccessibilityUnknownRole;
       case (role)
       when ACC::ROLE_CLIENT_AREA
-        return OS.attr_k_axgroup_role
+        ns_return_value = OS::NSAccessibilityGroupRole
       when ACC::ROLE_WINDOW
-        return OS.attr_k_axwindow_role
+        ns_return_value = OS::NSAccessibilityWindowRole
       when ACC::ROLE_MENUBAR
-        return OS.attr_k_axmenu_bar_role
+        ns_return_value = OS::NSAccessibilityMenuBarRole
       when ACC::ROLE_MENU
-        return OS.attr_k_axmenu_role
+        ns_return_value = OS::NSAccessibilityMenuRole
       when ACC::ROLE_MENUITEM
-        return OS.attr_k_axmenu_item_role
+        ns_return_value = OS::NSAccessibilityMenuItemRole
       when ACC::ROLE_SEPARATOR
-        return OS.attr_k_axsplitter_role
+        ns_return_value = OS::NSAccessibilitySplitterRole
       when ACC::ROLE_TOOLTIP
-        return OS.attr_k_axhelp_tag_role
+        ns_return_value = OS::NSAccessibilityHelpTagRole
       when ACC::ROLE_SCROLLBAR
-        return OS.attr_k_axscroll_bar_role
+        ns_return_value = OS::NSAccessibilityScrollBarRole
       when ACC::ROLE_DIALOG
-        return OS.attr_k_axwindow_role + Character.new(?:.ord) + OS.attr_k_axdialog_subrole
+        ns_return_value = concat_strings_as_role(OS::NSAccessibilityWindowRole, OS::NSAccessibilityDialogSubrole)
       when ACC::ROLE_LABEL
-        return OS.attr_k_axstatic_text_role
+        ns_return_value = OS::NSAccessibilityStaticTextRole
       when ACC::ROLE_PUSHBUTTON
-        return OS.attr_k_axbutton_role
+        ns_return_value = OS::NSAccessibilityButtonRole
       when ACC::ROLE_CHECKBUTTON
-        return OS.attr_k_axcheck_box_role
+        ns_return_value = OS::NSAccessibilityCheckBoxRole
       when ACC::ROLE_RADIOBUTTON
-        return OS.attr_k_axradio_button_role
+        ns_return_value = OS::NSAccessibilityRadioButtonRole
+      when ACC::ROLE_SPLITBUTTON
+        ns_return_value = OS::NSAccessibilityMenuButtonRole
       when ACC::ROLE_COMBOBOX
-        return OS.attr_k_axcombo_box_role
+        ns_return_value = OS::NSAccessibilityComboBoxRole
       when ACC::ROLE_TEXT
-        return !((@control.get_style & SWT::MULTI)).equal?(0) ? OS.attr_k_axtext_area_role : OS.attr_k_axtext_field_role
+        style = @control.get_style
+        if (!((style & SWT::MULTI)).equal?(0))
+          ns_return_value = OS::NSAccessibilityTextAreaRole
+        else
+          ns_return_value = OS::NSAccessibilityTextFieldRole
+        end
       when ACC::ROLE_TOOLBAR
-        return OS.attr_k_axtoolbar_role
+        ns_return_value = OS::NSAccessibilityToolbarRole
       when ACC::ROLE_LIST
-        return OS.attr_k_axoutline_role
+        ns_return_value = OS::NSAccessibilityOutlineRole
       when ACC::ROLE_LISTITEM
-        return OS.attr_k_axstatic_text_role
+        ns_return_value = OS::NSAccessibilityStaticTextRole
       when ACC::ROLE_TABLE
-        return OS.attr_k_axtable_role
+        ns_return_value = OS::NSAccessibilityTableRole
       when ACC::ROLE_TABLECELL
-        return OS.attr_k_axrow_role + Character.new(?:.ord) + OS.attr_k_axtable_row_subrole
+        ns_return_value = concat_strings_as_role(OS::NSAccessibilityRowRole, OS::NSAccessibilityTableRowSubrole)
       when ACC::ROLE_TABLECOLUMNHEADER
-        return OS.attr_k_axbutton_role + Character.new(?:.ord) + OS.attr_k_axsort_button_subrole
+        ns_return_value = OS::NSAccessibilitySortButtonRole
       when ACC::ROLE_TABLEROWHEADER
-        return OS.attr_k_axrow_role + Character.new(?:.ord) + OS.attr_k_axtable_row_subrole
+        ns_return_value = concat_strings_as_role(OS::NSAccessibilityRowRole, OS::NSAccessibilityTableRowSubrole)
       when ACC::ROLE_TREE
-        return OS.attr_k_axoutline_role
+        ns_return_value = OS::NSAccessibilityOutlineRole
       when ACC::ROLE_TREEITEM
-        return OS.attr_k_axoutline_role + Character.new(?:.ord) + OS.attr_k_axoutline_row_subrole
+        ns_return_value = concat_strings_as_role(OS::NSAccessibilityOutlineRole, OS::NSAccessibilityOutlineRowSubrole)
       when ACC::ROLE_TABFOLDER
-        return OS.attr_k_axtab_group_role
+        ns_return_value = OS::NSAccessibilityTabGroupRole
       when ACC::ROLE_TABITEM
-        return OS.attr_k_axradio_button_role
+        ns_return_value = OS::NSAccessibilityRadioButtonRole
       when ACC::ROLE_PROGRESSBAR
-        return OS.attr_k_axprogress_indicator_role
+        ns_return_value = OS::NSAccessibilityProgressIndicatorRole
       when ACC::ROLE_SLIDER
-        return OS.attr_k_axslider_role
+        ns_return_value = OS::NSAccessibilitySliderRole
       when ACC::ROLE_LINK
-        return OS.attr_k_axlink_role
+        ns_return_value = OS::NSAccessibilityLinkRole
       end
-      return OS.attr_k_axunknown_role
+      return ns_return_value.get_string
     end
     
-    typesig { [String] }
+    typesig { [NSString] }
     def os_to_role(os_role)
       if ((os_role).nil?)
         return 0
       end
-      if ((os_role == OS.attr_k_axwindow_role))
+      if (os_role.is_equal_to_string(OS::NSAccessibilityWindowRole))
         return ACC::ROLE_WINDOW
       end
-      if ((os_role == OS.attr_k_axmenu_bar_role))
+      if (os_role.is_equal_to_string(OS::NSAccessibilityMenuBarRole))
         return ACC::ROLE_MENUBAR
       end
-      if ((os_role == OS.attr_k_axmenu_role))
+      if (os_role.is_equal_to_string(OS::NSAccessibilityMenuRole))
         return ACC::ROLE_MENU
       end
-      if ((os_role == OS.attr_k_axmenu_item_role))
+      if (os_role.is_equal_to_string(OS::NSAccessibilityMenuItemRole))
         return ACC::ROLE_MENUITEM
       end
-      if ((os_role == OS.attr_k_axsplitter_role))
+      if (os_role.is_equal_to_string(OS::NSAccessibilitySplitterRole))
         return ACC::ROLE_SEPARATOR
       end
-      if ((os_role == OS.attr_k_axhelp_tag_role))
+      if (os_role.is_equal_to_string(OS::NSAccessibilityHelpTagRole))
         return ACC::ROLE_TOOLTIP
       end
-      if ((os_role == OS.attr_k_axscroll_bar_role))
+      if (os_role.is_equal_to_string(OS::NSAccessibilityScrollBarRole))
         return ACC::ROLE_SCROLLBAR
       end
-      if ((os_role == OS.attr_k_axscroll_area_role))
+      if (os_role.is_equal_to_string(OS::NSAccessibilityScrollAreaRole))
         return ACC::ROLE_LIST
       end
-      if ((os_role == OS.attr_k_axwindow_role + Character.new(?:.ord) + OS.attr_k_axdialog_subrole))
+      if (os_role.is_equal_to_string(concat_strings_as_role(OS::NSAccessibilityWindowRole, OS::NSAccessibilityDialogSubrole)))
         return ACC::ROLE_DIALOG
       end
-      if ((os_role == OS.attr_k_axwindow_role + Character.new(?:.ord) + OS.attr_k_axsystem_dialog_subrole))
+      if (os_role.is_equal_to_string(concat_strings_as_role(OS::NSAccessibilityWindowRole, OS::NSAccessibilitySystemDialogSubrole)))
         return ACC::ROLE_DIALOG
       end
-      if ((os_role == OS.attr_k_axstatic_text_role))
+      if (os_role.is_equal_to_string(OS::NSAccessibilityStaticTextRole))
         return ACC::ROLE_LABEL
       end
-      if ((os_role == OS.attr_k_axbutton_role))
+      if (os_role.is_equal_to_string(OS::NSAccessibilityButtonRole))
         return ACC::ROLE_PUSHBUTTON
       end
-      if ((os_role == OS.attr_k_axcheck_box_role))
+      if (os_role.is_equal_to_string(OS::NSAccessibilityCheckBoxRole))
         return ACC::ROLE_CHECKBUTTON
       end
-      if ((os_role == OS.attr_k_axradio_button_role))
+      if (os_role.is_equal_to_string(OS::NSAccessibilityRadioButtonRole))
         return ACC::ROLE_RADIOBUTTON
       end
-      if ((os_role == OS.attr_k_axcombo_box_role))
+      if (os_role.is_equal_to_string(OS::NSAccessibilityMenuButtonRole))
+        return ACC::ROLE_SPLITBUTTON
+      end
+      if (os_role.is_equal_to_string(OS::NSAccessibilityComboBoxRole))
         return ACC::ROLE_COMBOBOX
       end
-      if ((os_role == OS.attr_k_axtext_field_role))
+      if (os_role.is_equal_to_string(OS::NSAccessibilityTextFieldRole))
         return ACC::ROLE_TEXT
       end
-      if ((os_role == OS.attr_k_axtext_area_role))
+      if (os_role.is_equal_to_string(OS::NSAccessibilityTextAreaRole))
         return ACC::ROLE_TEXT
       end
-      if ((os_role == OS.attr_k_axtoolbar_role))
+      if (os_role.is_equal_to_string(OS::NSAccessibilityToolbarRole))
         return ACC::ROLE_TOOLBAR
       end
-      if ((os_role == OS.attr_k_axlist_role))
+      if (os_role.is_equal_to_string(OS::NSAccessibilityListRole))
         return ACC::ROLE_LIST
       end
-      if ((os_role == OS.attr_k_axtable_role))
+      if (os_role.is_equal_to_string(OS::NSAccessibilityTableRole))
         return ACC::ROLE_TABLE
       end
-      if ((os_role == OS.attr_k_axcolumn_role))
+      if (os_role.is_equal_to_string(OS::NSAccessibilityColumnRole))
         return ACC::ROLE_TABLECOLUMNHEADER
       end
-      if ((os_role == OS.attr_k_axbutton_role + Character.new(?:.ord) + OS.attr_k_axsort_button_subrole))
+      if (os_role.is_equal_to_string(concat_strings_as_role(OS::NSAccessibilityButtonRole, OS::NSAccessibilitySortButtonRole)))
         return ACC::ROLE_TABLECOLUMNHEADER
       end
-      if ((os_role == OS.attr_k_axrow_role + Character.new(?:.ord) + OS.attr_k_axtable_row_subrole))
+      if (os_role.is_equal_to_string(concat_strings_as_role(OS::NSAccessibilityRowRole, OS::NSAccessibilityTableRowSubrole)))
         return ACC::ROLE_TABLEROWHEADER
       end
-      if ((os_role == OS.attr_k_axoutline_role))
+      if (os_role.is_equal_to_string(OS::NSAccessibilityOutlineRole))
         return ACC::ROLE_TREE
       end
-      if ((os_role == OS.attr_k_axoutline_role + Character.new(?:.ord) + OS.attr_k_axoutline_row_subrole))
+      if (os_role.is_equal_to_string(concat_strings_as_role(OS::NSAccessibilityOutlineRole, OS::NSAccessibilityOutlineRowSubrole)))
         return ACC::ROLE_TREEITEM
       end
-      if ((os_role == OS.attr_k_axtab_group_role))
+      if (os_role.is_equal_to_string(OS::NSAccessibilityTabGroupRole))
         return ACC::ROLE_TABFOLDER
       end
-      if ((os_role == OS.attr_k_axprogress_indicator_role))
+      if (os_role.is_equal_to_string(OS::NSAccessibilityProgressIndicatorRole))
         return ACC::ROLE_PROGRESSBAR
       end
-      if ((os_role == OS.attr_k_axslider_role))
+      if (os_role.is_equal_to_string(OS::NSAccessibilitySliderRole))
         return ACC::ROLE_SLIDER
       end
-      if ((os_role == OS.attr_k_axlink_role))
+      if (os_role.is_equal_to_string(OS::NSAccessibilityLinkRole))
         return ACC::ROLE_LINK
       end
       return ACC::ROLE_CLIENT_AREA
-    end
-    
-    typesig { [String] }
-    # Return a CFStringRef representing the given java String.
-    # Note that the caller is responsible for calling OS.CFRelease
-    # when they are done with the stringRef.
-    def string_to_string_ref(string)
-      buffer = CharArray.new(string.length)
-      string.get_chars(0, buffer.attr_length, buffer, 0)
-      return OS._cfstring_create_with_characters(OS.attr_k_cfallocator_default, buffer, buffer.attr_length)
-    end
-    
-    typesig { [::Java::Int] }
-    # Return a Java String representing the given CFStringRef.
-    # Note that this method does not call OS.CFRelease(stringRef).
-    def string_ref_to_string(string_ref)
-      if ((string_ref).equal?(0))
-        return ""
-      end
-      length_ = OS._cfstring_get_length(string_ref)
-      buffer = CharArray.new(length_)
-      range = CFRange.new
-      range.attr_length = length_
-      OS._cfstring_get_characters(string_ref, range, buffer)
-      return String.new(buffer)
     end
     
     typesig { [] }

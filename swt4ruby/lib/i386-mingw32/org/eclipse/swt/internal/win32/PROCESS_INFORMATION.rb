@@ -1,6 +1,6 @@
 require "rjava"
 
-# Copyright (c) 2000, 2006 IBM Corporation and others.
+# Copyright (c) 2000, 2008 IBM Corporation and others.
 # All rights reserved. This program and the accompanying materials
 # are made available under the terms of the Eclipse Public License v1.0
 # which accompanies this distribution, and is available at
@@ -19,6 +19,7 @@ module Org::Eclipse::Swt::Internal::Win32
   class PROCESS_INFORMATION 
     include_class_members PROCESS_INFORMATIONImports
     
+    # @field cast=(HANDLE)
     # long
     attr_accessor :h_process
     alias_method :attr_h_process, :h_process
@@ -26,6 +27,7 @@ module Org::Eclipse::Swt::Internal::Win32
     alias_method :attr_h_process=, :h_process=
     undef_method :h_process=
     
+    # @field cast=(HANDLE)
     # long
     attr_accessor :h_thread
     alias_method :attr_h_thread, :h_thread

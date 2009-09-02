@@ -1,6 +1,6 @@
 require "rjava"
 
-# Copyright (c) 2000, 2006 IBM Corporation and others.
+# Copyright (c) 2000, 2008 IBM Corporation and others.
 # All rights reserved. This program and the accompanying materials
 # are made available under the terms of the Eclipse Public License v1.0
 # which accompanies this distribution, and is available at
@@ -19,6 +19,7 @@ module Org::Eclipse::Swt::Internal::Win32
   class WINDOWPOS 
     include_class_members WINDOWPOSImports
     
+    # @field cast=(HWND)
     # long
     attr_accessor :hwnd
     alias_method :attr_hwnd, :hwnd
@@ -26,6 +27,7 @@ module Org::Eclipse::Swt::Internal::Win32
     alias_method :attr_hwnd=, :hwnd=
     undef_method :hwnd=
     
+    # @field cast=(HWND)
     # long
     attr_accessor :hwnd_insert_after
     alias_method :attr_hwnd_insert_after, :hwnd_insert_after

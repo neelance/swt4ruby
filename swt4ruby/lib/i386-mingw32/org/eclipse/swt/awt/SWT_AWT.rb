@@ -32,6 +32,7 @@ module Org::Eclipse::Swt::Awt
       include_const ::Java::Awt, :Toolkit
       include_const ::Java::Awt::Event, :ComponentAdapter
       include_const ::Java::Awt::Event, :ComponentEvent
+      include_const ::Java::Awt::Event, :ComponentListener
       include_const ::Java::Awt::Event, :WindowEvent
       include_const ::Java::Awt::Event, :FocusEvent
     }
@@ -398,7 +399,7 @@ module Org::Eclipse::Swt::Awt
                 private
                 alias_method :initialize_anonymous, :initialize
               end.new_local(self))
-            when SWT::Activate
+            when SWT::FocusIn, SWT::Activate
               listener_class = self.class
               EventQueue.invoke_later(Class.new(self.class::Runnable.class == Class ? self.class::Runnable : Object) do
                 extend LocalClass
@@ -416,8 +417,10 @@ module Org::Eclipse::Swt::Awt
                       # WindowEvent.WINDOW_GAINED_FOCUS
                       frame.dispatch_event(self.class::WindowEvent.new(frame, 207))
                     else
+                      if (frame.is_active)
+                        return
+                      end
                       begin
-                        # Initialize the default focus traversal policy
                         clazz = frame.get_class
                         method = clazz.get_method("synthesizeWindowActivation", Array.typed(self.class::Class).new([Array]))
                         if (!(method).nil?)
@@ -455,8 +458,10 @@ module Org::Eclipse::Swt::Awt
                       frame.dispatch_event(self.class::WindowEvent.new(frame, 208))
                       frame.dispatch_event(self.class::WindowEvent.new(frame, WindowEvent::WINDOW_DEACTIVATED))
                     else
+                      if (!frame.is_active)
+                        return
+                      end
                       begin
-                        # Initialize the default focus traversal policy
                         clazz = frame.get_class
                         method = clazz.get_method("synthesizeWindowActivation", Array.typed(self.class::Class).new([Array]))
                         if (!(method).nil?)
@@ -487,7 +492,11 @@ module Org::Eclipse::Swt::Awt
           private
           alias_method :initialize_anonymous, :initialize
         end.new_local(self)
-        parent.add_listener(SWT::Activate, listener)
+        if (Library::JAVA_VERSION < Library._java_version(1, 5, 0))
+          parent.add_listener(SWT::Activate, listener)
+        else
+          parent.add_listener(SWT::FocusIn, listener)
+        end
         parent.add_listener(SWT::Deactivate, listener)
         parent.add_listener(SWT::Dispose, listener)
         parent.get_display.async_exec(Class.new(Runnable.class == Class ? Runnable : Object) do
@@ -568,7 +577,7 @@ module Org::Eclipse::Swt::Awt
           SWT.error(SWT::ERROR_INVALID_ARGUMENT, nil, " [peer not created]")
         end
         shell = Shell.win32_new(display, handle)
-        parent.add_component_listener(Class.new(ComponentAdapter.class == Class ? ComponentAdapter : Object) do
+        listener = Class.new(ComponentAdapter.class == Class ? ComponentAdapter : Object) do
           extend LocalClass
           include_class_members SWT_AWT
           include ComponentAdapter if ComponentAdapter.class == Module
@@ -583,6 +592,9 @@ module Org::Eclipse::Swt::Awt
               
               typesig { [] }
               define_method :run do
+                if (shell.is_disposed)
+                  return
+                end
                 dim = parent.get_size
                 shell.set_size(dim.attr_width, dim.attr_height)
               end
@@ -595,6 +607,25 @@ module Org::Eclipse::Swt::Awt
               private
               alias_method :initialize_anonymous, :initialize
             end.new_local(self))
+          end
+          
+          typesig { [Vararg.new(Object)] }
+          define_method :initialize do |*args|
+            super(*args)
+          end
+          
+          private
+          alias_method :initialize_anonymous, :initialize
+        end.new_local(self)
+        parent.add_component_listener(listener)
+        shell.add_listener(SWT::Dispose, Class.new(Listener.class == Class ? Listener : Object) do
+          extend LocalClass
+          include_class_members SWT_AWT
+          include Listener if Listener.class == Module
+          
+          typesig { [Event] }
+          define_method :handle_event do |event|
+            parent.remove_component_listener(listener)
           end
           
           typesig { [Vararg.new(Object)] }

@@ -1,6 +1,6 @@
 require "rjava"
 
-# Copyright (c) 2000, 2006 IBM Corporation and others.
+# Copyright (c) 2000, 2008 IBM Corporation and others.
 # All rights reserved. This program and the accompanying materials
 # are made available under the terms of the Eclipse Public License v1.0
 # which accompanies this distribution, and is available at
@@ -26,12 +26,14 @@ module Org::Eclipse::Swt::Internal::Win32
     undef_method :dw_style=
     
     # POINT ptCurrentPos;
+    # @field accessor=ptCurrentPos.x
     attr_accessor :x
     alias_method :attr_x, :x
     undef_method :x
     alias_method :attr_x=, :x=
     undef_method :x=
     
+    # @field accessor=ptCurrentPos.y
     attr_accessor :y
     alias_method :attr_y, :y
     undef_method :y
@@ -39,24 +41,28 @@ module Org::Eclipse::Swt::Internal::Win32
     undef_method :y=
     
     # RECT rcArea;
+    # @field accessor=rcArea.left
     attr_accessor :left
     alias_method :attr_left, :left
     undef_method :left
     alias_method :attr_left=, :left=
     undef_method :left=
     
+    # @field accessor=rcArea.top
     attr_accessor :top
     alias_method :attr_top, :top
     undef_method :top
     alias_method :attr_top=, :top=
     undef_method :top=
     
+    # @field accessor=rcArea.right
     attr_accessor :right
     alias_method :attr_right, :right
     undef_method :right
     alias_method :attr_right=, :right=
     undef_method :right=
     
+    # @field accessor=rcArea.bottom
     attr_accessor :bottom
     alias_method :attr_bottom, :bottom
     undef_method :bottom

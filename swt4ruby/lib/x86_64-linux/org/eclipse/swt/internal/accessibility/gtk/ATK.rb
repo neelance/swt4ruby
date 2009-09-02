@@ -1,6 +1,6 @@
 require "rjava"
 
-# Copyright (c) 2000, 2006 IBM Corporation and others. All rights reserved.
+# Copyright (c) 2000, 2008 IBM Corporation and others. All rights reserved.
 # The contents of this file are made available under the terms
 # of the GNU Lesser General Public License (LGPL) Version 2.1 that
 # accompanies this distribution (lgpl-v21.txt).  The LGPL is also
@@ -342,6 +342,7 @@ module Org::Eclipse::Swt::Internal::Accessibility::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_accessibility_gtk_ATK__1atk_1focus_1tracker_1notify, [:pointer, :long, :int64], :void
       typesig { [::Java::Long] }
+      # @param object cast=(AtkObject *)
       # int
       def __atk_focus_tracker_notify(object)
         JNI.__send__(:Java_org_eclipse_swt_internal_accessibility_gtk_ATK__1atk_1focus_1tracker_1notify, JNI.env, self.jni_id, object.to_int)
@@ -378,6 +379,9 @@ module Org::Eclipse::Swt::Internal::Accessibility::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_accessibility_gtk_ATK__1atk_1object_1factory_1create_1accessible, [:pointer, :long, :int64, :int64], :int64
       typesig { [::Java::Long, ::Java::Long] }
+      # @param factory cast=(AtkObjectFactory *)
+      # @param obj cast=(GObject *)
+      # 
       # int
       # int
       # int
@@ -400,6 +404,7 @@ module Org::Eclipse::Swt::Internal::Accessibility::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_accessibility_gtk_ATK__1atk_1object_1factory_1get_1accessible_1type, [:pointer, :long, :int64], :int64
       typesig { [::Java::Long] }
+      # @param factory cast=(AtkObjectFactory *)
       # int
       # int
       def __atk_object_factory_get_accessible_type(factory)
@@ -420,6 +425,9 @@ module Org::Eclipse::Swt::Internal::Accessibility::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_accessibility_gtk_ATK__1atk_1object_1initialize, [:pointer, :long, :int64, :int64], :void
       typesig { [::Java::Long, ::Java::Long] }
+      # @param accessible cast=(AtkObject *)
+      # @param data cast=(gpointer)
+      # 
       # int
       # int
       def __atk_object_initialize(accessible, data)
@@ -440,6 +448,7 @@ module Org::Eclipse::Swt::Internal::Accessibility::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_accessibility_gtk_ATK__1atk_1object_1ref_1relation_1set, [:pointer, :long, :int64], :int64
       typesig { [::Java::Long] }
+      # @param accessible cast=(AtkObject *)
       # int
       # int
       def __atk_object_ref_relation_set(accessible)
@@ -460,6 +469,9 @@ module Org::Eclipse::Swt::Internal::Accessibility::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_accessibility_gtk_ATK__1atk_1registry_1get_1factory, [:pointer, :long, :int64, :int64], :int64
       typesig { [::Java::Long, ::Java::Long] }
+      # @param registry cast=(AtkRegistry *)
+      # @param type cast=(GType)
+      # 
       # int
       # int
       # int
@@ -482,6 +494,10 @@ module Org::Eclipse::Swt::Internal::Accessibility::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_accessibility_gtk_ATK__1atk_1registry_1set_1factory_1type, [:pointer, :long, :int64, :int64, :int64], :void
       typesig { [::Java::Long, ::Java::Long, ::Java::Long] }
+      # @param registry cast=(AtkRegistry *)
+      # @param type cast=(GType)
+      # @param factory_type cast=(GType)
+      # 
       # int
       # int
       # int
@@ -504,6 +520,7 @@ module Org::Eclipse::Swt::Internal::Accessibility::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_accessibility_gtk_ATK__1atk_1relation_1set_1get_1n_1relations, [:pointer, :long, :int64], :int32
       typesig { [::Java::Long] }
+      # @param set cast=(AtkRelationSet *)
       # int
       def __atk_relation_set_get_n_relations(set)
         JNI.__send__(:Java_org_eclipse_swt_internal_accessibility_gtk_ATK__1atk_1relation_1set_1get_1n_1relations, JNI.env, self.jni_id, set.to_int)
@@ -522,6 +539,7 @@ module Org::Eclipse::Swt::Internal::Accessibility::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_accessibility_gtk_ATK__1atk_1relation_1set_1get_1relation, [:pointer, :long, :int64, :int32], :int64
       typesig { [::Java::Long, ::Java::Int] }
+      # @param set cast=(AtkRelationSet *)
       # int
       # int
       def __atk_relation_set_get_relation(set, i)
@@ -542,6 +560,9 @@ module Org::Eclipse::Swt::Internal::Accessibility::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_accessibility_gtk_ATK__1atk_1relation_1set_1remove, [:pointer, :long, :int64, :int64], :void
       typesig { [::Java::Long, ::Java::Long] }
+      # @param set cast=(AtkRelationSet *)
+      # @param relation cast=(AtkRelation *)
+      # 
       # int
       # int
       def __atk_relation_set_remove(set, relation)
@@ -562,6 +583,9 @@ module Org::Eclipse::Swt::Internal::Accessibility::Gtk
       
       JNI.native_method :Java_org_eclipse_swt_internal_accessibility_gtk_ATK__1atk_1state_1set_1add_1state, [:pointer, :long, :int64, :int32], :int8
       typesig { [::Java::Long, ::Java::Int] }
+      # @param set cast=(AtkStateSet *)
+      # @param type cast=(AtkStateType)
+      # 
       # int
       def __atk_state_set_add_state(set, type)
         JNI.__send__(:Java_org_eclipse_swt_internal_accessibility_gtk_ATK__1atk_1state_1set_1add_1state, JNI.env, self.jni_id, set.to_int, type.to_int) != 0

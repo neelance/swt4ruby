@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2008 IBM Corporation and others.
+ * Copyright (c) 2000, 2009 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -116,9 +116,8 @@ public GLCanvas (Composite parent, int style, GLData data) {
 	OS.XFree (infoPtr);
 	int /*long*/ screen = OS.gdk_screen_get_default ();
 	int /*long*/ gdkvisual = OS.gdk_x11_screen_lookup_visual (screen, vinfo.visualid);
-	//FIXME- share lists
-	//context = GLX.glXCreateContext (xDisplay, info, share == null ? 0 : share.context, true);
-	context = GLX.glXCreateContext (xDisplay, vinfo, 0, true);
+	int /*long*/ share = data.shareContext != null ? data.shareContext.context : 0;
+	context = GLX.glXCreateContext (xDisplay, vinfo, share, true);
 	if (context == 0) SWT.error (SWT.ERROR_NO_HANDLES);
 	GdkWindowAttr attrs = new GdkWindowAttr ();
 	attrs.width = 1;

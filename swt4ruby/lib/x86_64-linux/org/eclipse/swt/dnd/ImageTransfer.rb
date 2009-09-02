@@ -1,6 +1,6 @@
 require "rjava"
 
-# Copyright (c) 2000, 2008 IBM Corporation and others.
+# Copyright (c) 2000, 2009 IBM Corporation and others.
 # All rights reserved. This program and the accompanying materials
 # are made available under the terms of the Eclipse Public License v1.0
 # which accompanies this distribution, and is available at
@@ -50,7 +50,7 @@ module Org::Eclipse::Swt::Dnd
       end
       alias_method :attr__instance=, :_instance=
       
-      const_set_lazy(:JPEG) { "image/jpge" }
+      const_set_lazy(:JPEG) { "image/jpeg" }
       const_attr_reader  :JPEG
       
       # $NON-NLS-1$
@@ -214,15 +214,17 @@ module Org::Eclipse::Swt::Dnd
       # int
       # int
       buffer = Array.typed(::Java::Long).new(1) { 0 }
-      len = Array.typed(::Java::Int).new(1) { 0 }
+      # int
+      # int
+      len = Array.typed(::Java::Long).new(1) { 0 }
       if ((type).nil?)
         return
       end
-      OS.gdk_pixbuf_save_to_buffer(pixbuf, buffer, len, type, nil, nil)
+      OS.gdk_pixbuf_save_to_bufferv(pixbuf, buffer, len, type, nil, nil, nil)
       OS.g_object_unref(pixbuf)
       image.dispose
       transfer_data.attr_p_value = buffer[0]
-      transfer_data.attr_length = (len[0] + 3) / 4 * 4
+      transfer_data.attr_length = RJava.cast_to_int((len[0] + 3)) / 4 * 4
       transfer_data.attr_result = 1
       transfer_data.attr_format = 32
     end

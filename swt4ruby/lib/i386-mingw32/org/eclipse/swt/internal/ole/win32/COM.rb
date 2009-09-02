@@ -1,6 +1,6 @@
 require "rjava"
 
-# Copyright (c) 2000, 2008 IBM Corporation and others.
+# Copyright (c) 2000, 2009 IBM Corporation and others.
 # All rights reserved. This program and the accompanying materials
 # are made available under the terms of the Eclipse Public License v1.0
 # which accompanies this distribution, and is available at
@@ -110,6 +110,10 @@ module Org::Eclipse::Swt::Internal::Ole::Win32
       const_attr_reader  :IIDIDispatch
       
       # $NON-NLS-1$
+      const_set_lazy(:IIDIDispatchEx) { _iidfrom_string("{A6EF9860-C720-11D0-9337-00A0C90DCAA9}") }
+      const_attr_reader  :IIDIDispatchEx
+      
+      # $NON-NLS-1$
       const_set_lazy(:IIDIDocHostUIHandler) { _iidfrom_string("{BD3F23C0-D43E-11CF-893B-00AA00BDCE1A}") }
       const_attr_reader  :IIDIDocHostUIHandler
       
@@ -158,6 +162,14 @@ module Org::Eclipse::Swt::Internal::Ole::Win32
       # )
       const_set_lazy(:IIDIInternetSecurityManager) { _iidfrom_string("{79eac9ee-baf9-11ce-8c82-00aa004ba90b}") }
       const_attr_reader  :IIDIInternetSecurityManager
+      
+      # $NON-NLS-1$
+      const_set_lazy(:IIDIAuthenticate) { _iidfrom_string("{79eac9d0-baf9-11ce-8c82-00aa004ba90b}") }
+      const_attr_reader  :IIDIAuthenticate
+      
+      # $NON-NLS-1$
+      const_set_lazy(:IIDIJScriptTypeInfo) { _iidfrom_string("{C59C6B12-F6C1-11CF-8835-00A0C911E8B2}") }
+      const_attr_reader  :IIDIJScriptTypeInfo
       
       # $NON-NLS-1$
       # public static final GUID IIDILockBytes = IIDFromString("{0000000A-0000-0000-C000-000000000046}"); //$NON-NLS-1$
@@ -403,6 +415,9 @@ module Org::Eclipse::Swt::Internal::Ole::Win32
       const_set_lazy(:DATADIR_SET) { 2 }
       const_attr_reader  :DATADIR_SET
       
+      const_set_lazy(:DISPATCH_CONSTRUCT) { 0x4000 }
+      const_attr_reader  :DISPATCH_CONSTRUCT
+      
       const_set_lazy(:DISP_E_EXCEPTION) { -0x7ffdfff7 }
       const_attr_reader  :DISP_E_EXCEPTION
       
@@ -411,6 +426,9 @@ module Org::Eclipse::Swt::Internal::Ole::Win32
       
       const_set_lazy(:DISP_E_UNKNOWNINTERFACE) { -0x7ffdffff }
       const_attr_reader  :DISP_E_UNKNOWNINTERFACE
+      
+      const_set_lazy(:DISP_E_UNKNOWNNAME) { -0x7ffdfffa }
+      const_attr_reader  :DISP_E_UNKNOWNNAME
       
       # public static final int DISPID_AMBIENT_APPEARANCE = -716;
       # public static final int DISPID_AMBIENT_AUTOCLIP = -715;
@@ -573,6 +591,9 @@ module Org::Eclipse::Swt::Internal::Ole::Win32
       # public static final int DVASPECT_DOCPRINT = 8;
       # public static final int DVASPECT_ICON = 4;
       # public static final int DVASPECT_THUMBNAIL = 2;
+      const_set_lazy(:E_ACCESSDENIED) { -0x7ff8fffb }
+      const_attr_reader  :E_ACCESSDENIED
+      
       const_set_lazy(:E_FAIL) { -2147467259 }
       const_attr_reader  :E_FAIL
       
@@ -823,8 +844,12 @@ module Org::Eclipse::Swt::Internal::Ole::Win32
       const_set_lazy(:DISPID_PROPERTYPUT) { -3 }
       const_attr_reader  :DISPID_PROPERTYPUT
       
-      # public static final short DISPID_UNKNOWN = -1;
-      # public static final short DISPID_VALUE = 0;
+      const_set_lazy(:DISPID_UNKNOWN) { -1 }
+      const_attr_reader  :DISPID_UNKNOWN
+      
+      const_set_lazy(:DISPID_VALUE) { 0 }
+      const_attr_reader  :DISPID_VALUE
+      
       const_set_lazy(:VT_BOOL) { 11 }
       const_attr_reader  :VT_BOOL
       
@@ -906,18 +931,23 @@ module Org::Eclipse::Swt::Internal::Ole::Win32
       JNI.native_method :Java_org_eclipse_swt_internal_ole_win32_COM_CLSIDFromProgID, [:pointer, :long, :long, :long], :int32
       typesig { [Array.typed(::Java::Char), GUID] }
       # Natives
+      # @param lpszProgID cast=(LPCOLESTR)
       def _clsidfrom_prog_id(lpsz_prog_id, pclsid)
         JNI.__send__(:Java_org_eclipse_swt_internal_ole_win32_COM_CLSIDFromProgID, JNI.env, self.jni_id, lpsz_prog_id.jni_id, pclsid.jni_id)
       end
       
       JNI.native_method :Java_org_eclipse_swt_internal_ole_win32_COM_CLSIDFromString, [:pointer, :long, :long, :long], :int32
       typesig { [Array.typed(::Java::Char), GUID] }
+      # @param lpsz cast=(LPOLESTR)
       def _clsidfrom_string(lpsz, pclsid)
         JNI.__send__(:Java_org_eclipse_swt_internal_ole_win32_COM_CLSIDFromString, JNI.env, self.jni_id, lpsz.jni_id, pclsid.jni_id)
       end
       
       JNI.native_method :Java_org_eclipse_swt_internal_ole_win32_COM_CoCreateInstance, [:pointer, :long, :long, :int32, :int32, :long, :long], :int32
       typesig { [GUID, ::Java::Int, ::Java::Int, GUID, Array.typed(::Java::Int)] }
+      # @param pUnkOuter cast=(LPUNKNOWN)
+      # @param ppv cast=(LPVOID *)
+      # 
       # long
       # long
       def _co_create_instance(rclsid, p_unk_outer, dw_cls_context, riid, ppv)
@@ -932,6 +962,9 @@ module Org::Eclipse::Swt::Internal::Ole::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_ole_win32_COM_CoGetClassObject, [:pointer, :long, :long, :int32, :int32, :long, :long], :int32
       typesig { [GUID, ::Java::Int, ::Java::Int, GUID, Array.typed(::Java::Int)] }
+      # @param pServerInfo cast=(COSERVERINFO *)
+      # @param ppv cast=(LPVOID *)
+      # 
       # long
       # long
       def _co_get_class_object(rclsid, dw_cls_context, p_server_info, riid, ppv)
@@ -940,6 +973,10 @@ module Org::Eclipse::Swt::Internal::Ole::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_ole_win32_COM_CoLockObjectExternal, [:pointer, :long, :int32, :int8, :int8], :int32
       typesig { [::Java::Int, ::Java::Boolean, ::Java::Boolean] }
+      # @param pUnk cast=(IUnknown *)
+      # @param fLock cast=(BOOL)
+      # @param fLastUnlockReleases cast=(BOOL)
+      # 
       # long
       def _co_lock_object_external(p_unk, f_lock, f_last_unlock_releases)
         JNI.__send__(:Java_org_eclipse_swt_internal_ole_win32_COM_CoLockObjectExternal, JNI.env, self.jni_id, p_unk.to_int, f_lock ? 1 : 0, f_last_unlock_releases ? 1 : 0)
@@ -947,6 +984,7 @@ module Org::Eclipse::Swt::Internal::Ole::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_ole_win32_COM_CoTaskMemAlloc, [:pointer, :long, :int32], :int32
       typesig { [::Java::Int] }
+      # @param cb cast=(ULONG)
       # long
       def _co_task_mem_alloc(cb)
         JNI.__send__(:Java_org_eclipse_swt_internal_ole_win32_COM_CoTaskMemAlloc, JNI.env, self.jni_id, cb.to_int)
@@ -954,6 +992,7 @@ module Org::Eclipse::Swt::Internal::Ole::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_ole_win32_COM_CoTaskMemFree, [:pointer, :long, :int32], :void
       typesig { [::Java::Int] }
+      # @param pv cast=(LPVOID)
       # long
       def _co_task_mem_free(pv)
         JNI.__send__(:Java_org_eclipse_swt_internal_ole_win32_COM_CoTaskMemFree, JNI.env, self.jni_id, pv.to_int)
@@ -961,6 +1000,10 @@ module Org::Eclipse::Swt::Internal::Ole::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_ole_win32_COM_DoDragDrop, [:pointer, :long, :int32, :int32, :int32, :long], :int32
       typesig { [::Java::Int, ::Java::Int, ::Java::Int, Array.typed(::Java::Int)] }
+      # @param pDataObject cast=(IDataObject *)
+      # @param pDropSource cast=(IDropSource *)
+      # @param pdwEffect cast=(LPDWORD)
+      # 
       # long
       # long
       def _do_drag_drop(p_data_object, p_drop_source, dw_okeffect, pdw_effect)
@@ -969,12 +1012,14 @@ module Org::Eclipse::Swt::Internal::Ole::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_ole_win32_COM_GetClassFile, [:pointer, :long, :long, :long], :int32
       typesig { [Array.typed(::Java::Char), GUID] }
+      # @param szFileName cast=(LPCWSTR)
       def _get_class_file(sz_file_name, clsid)
         JNI.__send__(:Java_org_eclipse_swt_internal_ole_win32_COM_GetClassFile, JNI.env, self.jni_id, sz_file_name.jni_id, clsid.jni_id)
       end
       
       JNI.native_method :Java_org_eclipse_swt_internal_ole_win32_COM_IIDFromString, [:pointer, :long, :long, :long], :int32
       typesig { [Array.typed(::Java::Char), GUID] }
+      # @param lpsz cast=(LPOLESTR)
       def _iidfrom_string(lpsz, lpiid)
         JNI.__send__(:Java_org_eclipse_swt_internal_ole_win32_COM_IIDFromString, JNI.env, self.jni_id, lpsz.jni_id, lpiid.jni_id)
       end
@@ -987,6 +1032,9 @@ module Org::Eclipse::Swt::Internal::Ole::Win32
       
       JNI.native_method "Java_org_eclipse_swt_internal_ole_win32_COM_MoveMemory__IL#{FORMATETC.jni_name}_2I".to_sym, [:pointer, :long, :int32, :long, :int32], :void
       typesig { [::Java::Int, FORMATETC, ::Java::Int] }
+      # @param Destination cast=(PVOID)
+      # @param Source cast=(CONST VOID *),flags=no_out
+      # 
       # long
       def _move_memory(destination, source, length_)
         JNI.__send__("Java_org_eclipse_swt_internal_ole_win32_COM_MoveMemory__IL#{FORMATETC.jni_name}_2I".to_sym, JNI.env, self.jni_id, destination.to_int, source.jni_id, length_.to_int)
@@ -994,6 +1042,9 @@ module Org::Eclipse::Swt::Internal::Ole::Win32
       
       JNI.native_method "Java_org_eclipse_swt_internal_ole_win32_COM_MoveMemory__IL#{GUID.jni_name}_2I".to_sym, [:pointer, :long, :int32, :long, :int32], :void
       typesig { [::Java::Int, GUID, ::Java::Int] }
+      # @param DestinationPtr cast=(PVOID)
+      # @param Source cast=(CONST VOID *),flags=no_out
+      # 
       # long
       def _move_memory(destination_ptr, source, length_)
         JNI.__send__("Java_org_eclipse_swt_internal_ole_win32_COM_MoveMemory__IL#{GUID.jni_name}_2I".to_sym, JNI.env, self.jni_id, destination_ptr.to_int, source.jni_id, length_.to_int)
@@ -1001,6 +1052,9 @@ module Org::Eclipse::Swt::Internal::Ole::Win32
       
       JNI.native_method "Java_org_eclipse_swt_internal_ole_win32_COM_MoveMemory__IL#{OLEINPLACEFRAMEINFO.jni_name}_2I".to_sym, [:pointer, :long, :int32, :long, :int32], :void
       typesig { [::Java::Int, OLEINPLACEFRAMEINFO, ::Java::Int] }
+      # @param DestinationPtr cast=(PVOID)
+      # @param Source cast=(CONST VOID *),flags=no_out
+      # 
       # long
       def _move_memory(destination_ptr, source, length_)
         JNI.__send__("Java_org_eclipse_swt_internal_ole_win32_COM_MoveMemory__IL#{OLEINPLACEFRAMEINFO.jni_name}_2I".to_sym, JNI.env, self.jni_id, destination_ptr.to_int, source.jni_id, length_.to_int)
@@ -1008,6 +1062,9 @@ module Org::Eclipse::Swt::Internal::Ole::Win32
       
       JNI.native_method "Java_org_eclipse_swt_internal_ole_win32_COM_MoveMemory__IL#{STATSTG.jni_name}_2I".to_sym, [:pointer, :long, :int32, :long, :int32], :void
       typesig { [::Java::Int, STATSTG, ::Java::Int] }
+      # @param Destination cast=(PVOID)
+      # @param Source cast=(CONST VOID *),flags=no_out
+      # 
       # long
       def _move_memory(destination, source, length_)
         JNI.__send__("Java_org_eclipse_swt_internal_ole_win32_COM_MoveMemory__IL#{STATSTG.jni_name}_2I".to_sym, JNI.env, self.jni_id, destination.to_int, source.jni_id, length_.to_int)
@@ -1015,6 +1072,9 @@ module Org::Eclipse::Swt::Internal::Ole::Win32
       
       JNI.native_method "Java_org_eclipse_swt_internal_ole_win32_COM_MoveMemory__IL#{STGMEDIUM.jni_name}_2I".to_sym, [:pointer, :long, :int32, :long, :int32], :void
       typesig { [::Java::Int, STGMEDIUM, ::Java::Int] }
+      # @param Destination cast=(PVOID)
+      # @param Source cast=(CONST VOID *),flags=no_out
+      # 
       # long
       def _move_memory(destination, source, length_)
         JNI.__send__("Java_org_eclipse_swt_internal_ole_win32_COM_MoveMemory__IL#{STGMEDIUM.jni_name}_2I".to_sym, JNI.env, self.jni_id, destination.to_int, source.jni_id, length_.to_int)
@@ -1022,6 +1082,9 @@ module Org::Eclipse::Swt::Internal::Ole::Win32
       
       JNI.native_method "Java_org_eclipse_swt_internal_ole_win32_COM_MoveMemory__L#{STGMEDIUM.jni_name}_2II".to_sym, [:pointer, :long, :long, :int32, :int32], :void
       typesig { [STGMEDIUM, ::Java::Int, ::Java::Int] }
+      # @param Destination cast=(PVOID),flags=no_in
+      # @param SourcePtr cast=(CONST VOID *)
+      # 
       # long
       def _move_memory(destination, source_ptr, length_)
         JNI.__send__("Java_org_eclipse_swt_internal_ole_win32_COM_MoveMemory__L#{STGMEDIUM.jni_name}_2II".to_sym, JNI.env, self.jni_id, destination.jni_id, source_ptr.to_int, length_.to_int)
@@ -1029,6 +1092,9 @@ module Org::Eclipse::Swt::Internal::Ole::Win32
       
       JNI.native_method "Java_org_eclipse_swt_internal_ole_win32_COM_MoveMemory__L#{DISPPARAMS.jni_name}_2II".to_sym, [:pointer, :long, :long, :int32, :int32], :void
       typesig { [DISPPARAMS, ::Java::Int, ::Java::Int] }
+      # @param Destination cast=(PVOID),flags=no_in
+      # @param SourcePtr cast=(CONST VOID *)
+      # 
       # long
       def _move_memory(destination, source_ptr, length_)
         JNI.__send__("Java_org_eclipse_swt_internal_ole_win32_COM_MoveMemory__L#{DISPPARAMS.jni_name}_2II".to_sym, JNI.env, self.jni_id, destination.jni_id, source_ptr.to_int, length_.to_int)
@@ -1036,6 +1102,9 @@ module Org::Eclipse::Swt::Internal::Ole::Win32
       
       JNI.native_method "Java_org_eclipse_swt_internal_ole_win32_COM_MoveMemory__L#{FORMATETC.jni_name}_2II".to_sym, [:pointer, :long, :long, :int32, :int32], :void
       typesig { [FORMATETC, ::Java::Int, ::Java::Int] }
+      # @param Destination cast=(PVOID),flags=no_in
+      # @param Source cast=(CONST VOID *)
+      # 
       # long
       def _move_memory(destination, source, length_)
         JNI.__send__("Java_org_eclipse_swt_internal_ole_win32_COM_MoveMemory__L#{FORMATETC.jni_name}_2II".to_sym, JNI.env, self.jni_id, destination.jni_id, source.to_int, length_.to_int)
@@ -1043,6 +1112,9 @@ module Org::Eclipse::Swt::Internal::Ole::Win32
       
       JNI.native_method "Java_org_eclipse_swt_internal_ole_win32_COM_MoveMemory__L#{GUID.jni_name}_2II".to_sym, [:pointer, :long, :long, :int32, :int32], :void
       typesig { [GUID, ::Java::Int, ::Java::Int] }
+      # @param Destination cast=(PVOID),flags=no_in
+      # @param SourcePtr cast=(CONST VOID *)
+      # 
       # long
       def _move_memory(destination, source_ptr, length_)
         JNI.__send__("Java_org_eclipse_swt_internal_ole_win32_COM_MoveMemory__L#{GUID.jni_name}_2II".to_sym, JNI.env, self.jni_id, destination.jni_id, source_ptr.to_int, length_.to_int)
@@ -1050,6 +1122,9 @@ module Org::Eclipse::Swt::Internal::Ole::Win32
       
       JNI.native_method "Java_org_eclipse_swt_internal_ole_win32_COM_MoveMemory__L#{STATSTG.jni_name}_2II".to_sym, [:pointer, :long, :long, :int32, :int32], :void
       typesig { [STATSTG, ::Java::Int, ::Java::Int] }
+      # @param Destination cast=(PVOID),flags=no_in
+      # @param Source cast=(CONST VOID *)
+      # 
       # long
       def _move_memory(destination, source, length_)
         JNI.__send__("Java_org_eclipse_swt_internal_ole_win32_COM_MoveMemory__L#{STATSTG.jni_name}_2II".to_sym, JNI.env, self.jni_id, destination.jni_id, source.to_int, length_.to_int)
@@ -1057,6 +1132,9 @@ module Org::Eclipse::Swt::Internal::Ole::Win32
       
       JNI.native_method "Java_org_eclipse_swt_internal_ole_win32_COM_MoveMemory__L#{TYPEATTR.jni_name}_2II".to_sym, [:pointer, :long, :long, :int32, :int32], :void
       typesig { [TYPEATTR, ::Java::Int, ::Java::Int] }
+      # @param Destination cast=(PVOID),flags=no_in
+      # @param SourcePtr cast=(CONST VOID *)
+      # 
       # long
       def _move_memory(destination, source_ptr, length_)
         JNI.__send__("Java_org_eclipse_swt_internal_ole_win32_COM_MoveMemory__L#{TYPEATTR.jni_name}_2II".to_sym, JNI.env, self.jni_id, destination.jni_id, source_ptr.to_int, length_.to_int)
@@ -1064,6 +1142,9 @@ module Org::Eclipse::Swt::Internal::Ole::Win32
       
       JNI.native_method "Java_org_eclipse_swt_internal_ole_win32_COM_MoveMemory__L#{RECT.jni_name}_2II".to_sym, [:pointer, :long, :long, :int32, :int32], :void
       typesig { [RECT, ::Java::Int, ::Java::Int] }
+      # @param Destination cast=(PVOID),flags=no_in
+      # @param Source cast=(CONST VOID *)
+      # 
       # long
       def _move_memory(destination, source, length_)
         JNI.__send__("Java_org_eclipse_swt_internal_ole_win32_COM_MoveMemory__L#{RECT.jni_name}_2II".to_sym, JNI.env, self.jni_id, destination.jni_id, source.to_int, length_.to_int)
@@ -1071,6 +1152,9 @@ module Org::Eclipse::Swt::Internal::Ole::Win32
       
       JNI.native_method "Java_org_eclipse_swt_internal_ole_win32_COM_MoveMemory__L#{FUNCDESC.jni_name}_2II".to_sym, [:pointer, :long, :long, :int32, :int32], :void
       typesig { [FUNCDESC, ::Java::Int, ::Java::Int] }
+      # @param Destination cast=(PVOID),flags=no_in
+      # @param Source cast=(CONST VOID *)
+      # 
       # long
       def _move_memory(destination, source, length_)
         JNI.__send__("Java_org_eclipse_swt_internal_ole_win32_COM_MoveMemory__L#{FUNCDESC.jni_name}_2II".to_sym, JNI.env, self.jni_id, destination.jni_id, source.to_int, length_.to_int)
@@ -1078,6 +1162,9 @@ module Org::Eclipse::Swt::Internal::Ole::Win32
       
       JNI.native_method "Java_org_eclipse_swt_internal_ole_win32_COM_MoveMemory__L#{VARDESC.jni_name}_2II".to_sym, [:pointer, :long, :long, :int32, :int32], :void
       typesig { [VARDESC, ::Java::Int, ::Java::Int] }
+      # @param Destination cast=(PVOID),flags=no_in
+      # @param Source cast=(CONST VOID *)
+      # 
       # long
       def _move_memory(destination, source, length_)
         JNI.__send__("Java_org_eclipse_swt_internal_ole_win32_COM_MoveMemory__L#{VARDESC.jni_name}_2II".to_sym, JNI.env, self.jni_id, destination.jni_id, source.to_int, length_.to_int)
@@ -1085,6 +1172,9 @@ module Org::Eclipse::Swt::Internal::Ole::Win32
       
       JNI.native_method "Java_org_eclipse_swt_internal_ole_win32_COM_MoveMemory__L#{VARIANT.jni_name}_2II".to_sym, [:pointer, :long, :long, :int32, :int32], :void
       typesig { [VARIANT, ::Java::Int, ::Java::Int] }
+      # @param Destination cast=(PVOID),flags=no_in
+      # @param Source cast=(CONST VOID *)
+      # 
       # long
       def _move_memory(destination, source, length_)
         JNI.__send__("Java_org_eclipse_swt_internal_ole_win32_COM_MoveMemory__L#{VARIANT.jni_name}_2II".to_sym, JNI.env, self.jni_id, destination.jni_id, source.to_int, length_.to_int)
@@ -1092,6 +1182,10 @@ module Org::Eclipse::Swt::Internal::Ole::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_ole_win32_COM_OleCreate, [:pointer, :long, :long, :long, :int32, :long, :int32, :int32, :long], :int32
       typesig { [GUID, GUID, ::Java::Int, FORMATETC, ::Java::Int, ::Java::Int, Array.typed(::Java::Int)] }
+      # @param pClientSite cast=(IOleClientSite *)
+      # @param pStg cast=(IStorage *)
+      # @param ppvObject cast=(void **)
+      # 
       # long
       # long
       # long
@@ -1101,6 +1195,11 @@ module Org::Eclipse::Swt::Internal::Ole::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_ole_win32_COM_OleCreateFromFile, [:pointer, :long, :long, :long, :long, :int32, :long, :int32, :int32, :long], :int32
       typesig { [GUID, Array.typed(::Java::Char), GUID, ::Java::Int, FORMATETC, ::Java::Int, ::Java::Int, Array.typed(::Java::Int)] }
+      # @param lpszFileName cast=(LPCOLESTR)
+      # @param pClientSite cast=(LPOLECLIENTSITE)
+      # @param pStg cast=(LPSTORAGE)
+      # @param ppvObj cast=(LPVOID *)
+      # 
       # long
       # long
       # long
@@ -1110,6 +1209,13 @@ module Org::Eclipse::Swt::Internal::Ole::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_ole_win32_COM_OleCreatePropertyFrame, [:pointer, :long, :int32, :int32, :int32, :long, :int32, :long, :int32, :int32, :int32, :int32, :int32], :int32
       typesig { [::Java::Int, ::Java::Int, ::Java::Int, Array.typed(::Java::Char), ::Java::Int, Array.typed(::Java::Int), ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int] }
+      # @param hwndOwner cast=(HWND)
+      # @param lpszCaption cast=(LPCOLESTR)
+      # @param lplpUnk cast=(LPUNKNOWN FAR*)
+      # @param lpPageClsID cast=(LPCLSID)
+      # @param lcid cast=(LCID)
+      # @param lpvReserved cast=(LPVOID)
+      # 
       # long
       # long
       # long
@@ -1120,6 +1226,11 @@ module Org::Eclipse::Swt::Internal::Ole::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_ole_win32_COM_OleDraw, [:pointer, :long, :int32, :int32, :int32, :int32], :int32
       typesig { [::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int] }
+      # @param pUnk cast=(LPUNKNOWN)
+      # @param dwAspect cast=(DWORD)
+      # @param hdcDraw cast=(HDC)
+      # @param lprcBounds cast=(LPRECT)
+      # 
       # long
       # long
       # long
@@ -1135,6 +1246,7 @@ module Org::Eclipse::Swt::Internal::Ole::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_ole_win32_COM_OleGetClipboard, [:pointer, :long, :long], :int32
       typesig { [Array.typed(::Java::Int)] }
+      # @param ppDataObject cast=(IDataObject **)
       # long
       def _ole_get_clipboard(pp_data_object)
         JNI.__send__(:Java_org_eclipse_swt_internal_ole_win32_COM_OleGetClipboard, JNI.env, self.jni_id, pp_data_object.jni_id)
@@ -1142,6 +1254,7 @@ module Org::Eclipse::Swt::Internal::Ole::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_ole_win32_COM_OleIsCurrentClipboard, [:pointer, :long, :int32], :int32
       typesig { [::Java::Int] }
+      # @param pDataObject cast=(IDataObject *)
       # long
       def _ole_is_current_clipboard(p_data_object)
         JNI.__send__(:Java_org_eclipse_swt_internal_ole_win32_COM_OleIsCurrentClipboard, JNI.env, self.jni_id, p_data_object.to_int)
@@ -1149,6 +1262,7 @@ module Org::Eclipse::Swt::Internal::Ole::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_ole_win32_COM_OleIsRunning, [:pointer, :long, :int32], :int8
       typesig { [::Java::Int] }
+      # @param pObject cast=(LPOLEOBJECT)
       # long
       def _ole_is_running(p_object)
         JNI.__send__(:Java_org_eclipse_swt_internal_ole_win32_COM_OleIsRunning, JNI.env, self.jni_id, p_object.to_int) != 0
@@ -1156,6 +1270,10 @@ module Org::Eclipse::Swt::Internal::Ole::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_ole_win32_COM_OleLoad, [:pointer, :long, :int32, :long, :int32, :long], :int32
       typesig { [::Java::Int, GUID, ::Java::Int, Array.typed(::Java::Int)] }
+      # @param pStg cast=(IStorage *)
+      # @param pClientSite cast=(IOleClientSite *)
+      # @param ppvObj cast=(LPVOID *)
+      # 
       # long
       # long
       # long
@@ -1165,6 +1283,7 @@ module Org::Eclipse::Swt::Internal::Ole::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_ole_win32_COM_OleRun, [:pointer, :long, :int32], :int32
       typesig { [::Java::Int] }
+      # @param pUnknown cast=(LPUNKNOWN)
       # long
       def _ole_run(p_unknown)
         JNI.__send__(:Java_org_eclipse_swt_internal_ole_win32_COM_OleRun, JNI.env, self.jni_id, p_unknown.to_int)
@@ -1172,6 +1291,9 @@ module Org::Eclipse::Swt::Internal::Ole::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_ole_win32_COM_OleSave, [:pointer, :long, :int32, :int32, :int8], :int32
       typesig { [::Java::Int, ::Java::Int, ::Java::Boolean] }
+      # @param pPS cast=(IPersistStorage *)
+      # @param pStg cast=(IStorage *)
+      # 
       # long
       # long
       def _ole_save(p_ps, p_stg, f_same_as_load)
@@ -1180,6 +1302,7 @@ module Org::Eclipse::Swt::Internal::Ole::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_ole_win32_COM_OleSetClipboard, [:pointer, :long, :int32], :int32
       typesig { [::Java::Int] }
+      # @param pDataObject cast=(IDataObject *)
       # long
       def _ole_set_clipboard(p_data_object)
         JNI.__send__(:Java_org_eclipse_swt_internal_ole_win32_COM_OleSetClipboard, JNI.env, self.jni_id, p_data_object.to_int)
@@ -1187,6 +1310,7 @@ module Org::Eclipse::Swt::Internal::Ole::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_ole_win32_COM_OleSetContainedObject, [:pointer, :long, :int32, :int8], :int32
       typesig { [::Java::Int, ::Java::Boolean] }
+      # @param pUnk cast=(LPUNKNOWN)
       # long
       def _ole_set_contained_object(p_unk, f_contained)
         JNI.__send__(:Java_org_eclipse_swt_internal_ole_win32_COM_OleSetContainedObject, JNI.env, self.jni_id, p_unk.to_int, f_contained ? 1 : 0)
@@ -1194,6 +1318,12 @@ module Org::Eclipse::Swt::Internal::Ole::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_ole_win32_COM_OleSetMenuDescriptor, [:pointer, :long, :int32, :int32, :int32, :int32, :int32], :int32
       typesig { [::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int] }
+      # @param holemenu cast=(HOLEMENU)
+      # @param hwndFrame cast=(HWND)
+      # @param hwndActiveObject cast=(HWND)
+      # @param lpFrame cast=(LPOLEINPLACEFRAME)
+      # @param lpActiveObj cast=(LPOLEINPLACEACTIVEOBJECT)
+      # 
       # long
       # long
       # long
@@ -1205,6 +1335,10 @@ module Org::Eclipse::Swt::Internal::Ole::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_ole_win32_COM_OleTranslateColor, [:pointer, :long, :int32, :int32, :long], :int32
       typesig { [::Java::Int, ::Java::Int, Array.typed(::Java::Int)] }
+      # @param clr cast=(OLE_COLOR)
+      # @param hpal cast=(HPALETTE)
+      # @param pcolorref cast=(COLORREF *)
+      # 
       # long
       def _ole_translate_color(clr, hpal, pcolorref)
         JNI.__send__(:Java_org_eclipse_swt_internal_ole_win32_COM_OleTranslateColor, JNI.env, self.jni_id, clr.to_int, hpal.to_int, pcolorref.jni_id)
@@ -1212,6 +1346,7 @@ module Org::Eclipse::Swt::Internal::Ole::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_ole_win32_COM_ProgIDFromCLSID, [:pointer, :long, :long, :long], :int32
       typesig { [GUID, Array.typed(::Java::Int)] }
+      # @param lplpszProgID cast=(LPOLESTR *)
       # long
       def _prog_idfrom_clsid(clsid, lplpsz_prog_id)
         JNI.__send__(:Java_org_eclipse_swt_internal_ole_win32_COM_ProgIDFromCLSID, JNI.env, self.jni_id, clsid.jni_id, lplpsz_prog_id.jni_id)
@@ -1219,6 +1354,9 @@ module Org::Eclipse::Swt::Internal::Ole::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_ole_win32_COM_RegisterDragDrop, [:pointer, :long, :int32, :int32], :int32
       typesig { [::Java::Int, ::Java::Int] }
+      # @param hwnd cast=(HWND)
+      # @param pDropTarget cast=(IDropTarget *)
+      # 
       # long
       # long
       def _register_drag_drop(hwnd, p_drop_target)
@@ -1227,6 +1365,7 @@ module Org::Eclipse::Swt::Internal::Ole::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_ole_win32_COM_ReleaseStgMedium, [:pointer, :long, :int32], :void
       typesig { [::Java::Int] }
+      # @param pmedium cast=(STGMEDIUM *)
       # long
       def _release_stg_medium(pmedium)
         JNI.__send__(:Java_org_eclipse_swt_internal_ole_win32_COM_ReleaseStgMedium, JNI.env, self.jni_id, pmedium.to_int)
@@ -1234,6 +1373,7 @@ module Org::Eclipse::Swt::Internal::Ole::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_ole_win32_COM_RevokeDragDrop, [:pointer, :long, :int32], :int32
       typesig { [::Java::Int] }
+      # @param hwnd cast=(HWND)
       # long
       def _revoke_drag_drop(hwnd)
         JNI.__send__(:Java_org_eclipse_swt_internal_ole_win32_COM_RevokeDragDrop, JNI.env, self.jni_id, hwnd.to_int)
@@ -1241,6 +1381,11 @@ module Org::Eclipse::Swt::Internal::Ole::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_ole_win32_COM_SHDoDragDrop, [:pointer, :long, :int32, :int32, :int32, :int32, :long], :int32
       typesig { [::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, Array.typed(::Java::Int)] }
+      # @param hwnd cast=(HWND)
+      # @param pDataObject cast=(IDataObject *)
+      # @param pDropSource cast=(IDropSource *)
+      # @param pdwEffect cast=(DWORD *)
+      # 
       # long
       # long
       # long
@@ -1250,6 +1395,7 @@ module Org::Eclipse::Swt::Internal::Ole::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_ole_win32_COM_StgCreateDocfile, [:pointer, :long, :long, :int32, :int32, :long], :int32
       typesig { [Array.typed(::Java::Char), ::Java::Int, ::Java::Int, Array.typed(::Java::Int)] }
+      # @param ppstgOpen cast=(IStorage **)
       # long
       def _stg_create_docfile(pwcs_name, grf_mode, reserved, ppstg_open)
         JNI.__send__(:Java_org_eclipse_swt_internal_ole_win32_COM_StgCreateDocfile, JNI.env, self.jni_id, pwcs_name.jni_id, grf_mode.to_int, reserved.to_int, ppstg_open.jni_id)
@@ -1257,12 +1403,18 @@ module Org::Eclipse::Swt::Internal::Ole::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_ole_win32_COM_StgIsStorageFile, [:pointer, :long, :long], :int32
       typesig { [Array.typed(::Java::Char)] }
+      # @param pwcsName cast=(const WCHAR *)
       def _stg_is_storage_file(pwcs_name)
         JNI.__send__(:Java_org_eclipse_swt_internal_ole_win32_COM_StgIsStorageFile, JNI.env, self.jni_id, pwcs_name.jni_id)
       end
       
       JNI.native_method :Java_org_eclipse_swt_internal_ole_win32_COM_StgOpenStorage, [:pointer, :long, :long, :int32, :int32, :int32, :int32, :long], :int32
       typesig { [Array.typed(::Java::Char), ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, Array.typed(::Java::Int)] }
+      # @param pwcsName cast=(const WCHAR *)
+      # @param pstgPriority cast=(IStorage *)
+      # @param snbExclude cast=(SNB)
+      # @param ppstgOpen cast=(IStorage **)
+      # 
       # long
       # long
       # long
@@ -1272,6 +1424,7 @@ module Org::Eclipse::Swt::Internal::Ole::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_ole_win32_COM_StringFromCLSID, [:pointer, :long, :long, :long], :int32
       typesig { [GUID, Array.typed(::Java::Int)] }
+      # @param ppsz cast=(LPOLESTR *)
       # long
       def _string_from_clsid(rclsid, ppsz)
         JNI.__send__(:Java_org_eclipse_swt_internal_ole_win32_COM_StringFromCLSID, JNI.env, self.jni_id, rclsid.jni_id, ppsz.jni_id)
@@ -1279,6 +1432,7 @@ module Org::Eclipse::Swt::Internal::Ole::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_ole_win32_COM_SysAllocString, [:pointer, :long, :long], :int32
       typesig { [Array.typed(::Java::Char)] }
+      # @param sz cast=(OLECHAR *)
       # long
       def _sys_alloc_string(sz)
         JNI.__send__(:Java_org_eclipse_swt_internal_ole_win32_COM_SysAllocString, JNI.env, self.jni_id, sz.jni_id)
@@ -1286,6 +1440,7 @@ module Org::Eclipse::Swt::Internal::Ole::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_ole_win32_COM_SysFreeString, [:pointer, :long, :int32], :void
       typesig { [::Java::Int] }
+      # @param bstr cast=(BSTR)
       # long
       def _sys_free_string(bstr)
         JNI.__send__(:Java_org_eclipse_swt_internal_ole_win32_COM_SysFreeString, JNI.env, self.jni_id, bstr.to_int)
@@ -1293,6 +1448,7 @@ module Org::Eclipse::Swt::Internal::Ole::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_ole_win32_COM_SysStringByteLen, [:pointer, :long, :int32], :int32
       typesig { [::Java::Int] }
+      # @param bstr cast=(BSTR)
       # long
       def _sys_string_byte_len(bstr)
         JNI.__send__(:Java_org_eclipse_swt_internal_ole_win32_COM_SysStringByteLen, JNI.env, self.jni_id, bstr.to_int)
@@ -1300,6 +1456,10 @@ module Org::Eclipse::Swt::Internal::Ole::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_ole_win32_COM_VariantChangeType, [:pointer, :long, :int32, :int32, :int16, :int16], :int32
       typesig { [::Java::Int, ::Java::Int, ::Java::Short, ::Java::Short] }
+      # @param pvargDest cast=(VARIANTARG FAR* )
+      # @param pvarSrc cast=(VARIANTARG FAR* )
+      # @param vt cast=(VARTYPE)
+      # 
       # long
       # long
       def _variant_change_type(pvarg_dest, pvar_src, w_flags, vt)
@@ -1308,6 +1468,7 @@ module Org::Eclipse::Swt::Internal::Ole::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_ole_win32_COM_VariantClear, [:pointer, :long, :int32], :int32
       typesig { [::Java::Int] }
+      # @param pvarg cast=(VARIANTARG FAR* )
       # long
       def _variant_clear(pvarg)
         JNI.__send__(:Java_org_eclipse_swt_internal_ole_win32_COM_VariantClear, JNI.env, self.jni_id, pvarg.to_int)
@@ -1315,6 +1476,7 @@ module Org::Eclipse::Swt::Internal::Ole::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_ole_win32_COM_VariantInit, [:pointer, :long, :int32], :void
       typesig { [::Java::Int] }
+      # @param pvarg cast=(VARIANTARG FAR* )
       # long
       def _variant_init(pvarg)
         JNI.__send__(:Java_org_eclipse_swt_internal_ole_win32_COM_VariantInit, JNI.env, self.jni_id, pvarg.to_int)
@@ -1337,27 +1499,43 @@ module Org::Eclipse::Swt::Internal::Ole::Win32
       JNI.native_method :Java_org_eclipse_swt_internal_ole_win32_COM_VtblCall__II_3CI, [:pointer, :long, :int32, :int32, :long, :int32], :int32
       typesig { [::Java::Int, ::Java::Int, Array.typed(::Java::Char), ::Java::Int] }
       # long
-      # long
       def _vtbl_call(fn_number, pp_vtbl, arg0, arg1)
         JNI.__send__(:Java_org_eclipse_swt_internal_ole_win32_COM_VtblCall__II_3CI, JNI.env, self.jni_id, fn_number.to_int, pp_vtbl.to_int, arg0.jni_id, arg1.to_int)
+      end
+      
+      JNI.native_method :Java_org_eclipse_swt_internal_ole_win32_COM_VtblCall__II_3CJ, [:pointer, :long, :int32, :int32, :long, :int64], :int32
+      typesig { [::Java::Int, ::Java::Int, Array.typed(::Java::Char), ::Java::Long] }
+      # long
+      def _vtbl_call(fn_number, pp_vtbl, arg0, arg1)
+        JNI.__send__(:Java_org_eclipse_swt_internal_ole_win32_COM_VtblCall__II_3CJ, JNI.env, self.jni_id, fn_number.to_int, pp_vtbl.to_int, arg0.jni_id, arg1.to_int)
       end
       
       JNI.native_method "Java_org_eclipse_swt_internal_ole_win32_COM_VtblCall__IIIIL#{POINT.jni_name}_2I".to_sym, [:pointer, :long, :int32, :int32, :int32, :int32, :long, :int32], :int32
       typesig { [::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, POINT, ::Java::Int] }
       # long
-      # long
-      # long
       def _vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2, arg3)
         JNI.__send__("Java_org_eclipse_swt_internal_ole_win32_COM_VtblCall__IIIIL#{POINT.jni_name}_2I".to_sym, JNI.env, self.jni_id, fn_number.to_int, pp_vtbl.to_int, arg0.to_int, arg1.to_int, arg2.jni_id, arg3.to_int)
+      end
+      
+      JNI.native_method "Java_org_eclipse_swt_internal_ole_win32_COM_VtblCall__IIJJL#{POINT.jni_name}_2I".to_sym, [:pointer, :long, :int32, :int32, :int64, :int64, :long, :int32], :int32
+      typesig { [::Java::Int, ::Java::Int, ::Java::Long, ::Java::Long, POINT, ::Java::Int] }
+      # long
+      def _vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2, arg3)
+        JNI.__send__("Java_org_eclipse_swt_internal_ole_win32_COM_VtblCall__IIJJL#{POINT.jni_name}_2I".to_sym, JNI.env, self.jni_id, fn_number.to_int, pp_vtbl.to_int, arg0.to_int, arg1.to_int, arg2.jni_id, arg3.to_int)
       end
       
       JNI.native_method "Java_org_eclipse_swt_internal_ole_win32_COM_VtblCall__IIIL#{POINT.jni_name}_2I".to_sym, [:pointer, :long, :int32, :int32, :int32, :long, :int32], :int32
       typesig { [::Java::Int, ::Java::Int, ::Java::Int, POINT, ::Java::Int] }
       # long
-      # long
-      # long
       def _vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2)
         JNI.__send__("Java_org_eclipse_swt_internal_ole_win32_COM_VtblCall__IIIL#{POINT.jni_name}_2I".to_sym, JNI.env, self.jni_id, fn_number.to_int, pp_vtbl.to_int, arg0.to_int, arg1.jni_id, arg2.to_int)
+      end
+      
+      JNI.native_method "Java_org_eclipse_swt_internal_ole_win32_COM_VtblCall__IIJL#{POINT.jni_name}_2J".to_sym, [:pointer, :long, :int32, :int32, :int64, :long, :int64], :int32
+      typesig { [::Java::Int, ::Java::Int, ::Java::Long, POINT, ::Java::Long] }
+      # long
+      def _vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2)
+        JNI.__send__("Java_org_eclipse_swt_internal_ole_win32_COM_VtblCall__IIJL#{POINT.jni_name}_2J".to_sym, JNI.env, self.jni_id, fn_number.to_int, pp_vtbl.to_int, arg0.to_int, arg1.jni_id, arg2.to_int)
       end
       
       JNI.native_method "Java_org_eclipse_swt_internal_ole_win32_COM_VtblCall__IIL#{POINT.jni_name}_2I".to_sym, [:pointer, :long, :int32, :int32, :long, :int32], :int32
@@ -1370,9 +1548,15 @@ module Org::Eclipse::Swt::Internal::Ole::Win32
       JNI.native_method "Java_org_eclipse_swt_internal_ole_win32_COM_VtblCall__IIL#{SHDRAGIMAGE.jni_name}_2I".to_sym, [:pointer, :long, :int32, :int32, :long, :int32], :int32
       typesig { [::Java::Int, ::Java::Int, SHDRAGIMAGE, ::Java::Int] }
       # long
-      # long
       def _vtbl_call(fn_number, pp_vtbl, arg0, arg1)
         JNI.__send__("Java_org_eclipse_swt_internal_ole_win32_COM_VtblCall__IIL#{SHDRAGIMAGE.jni_name}_2I".to_sym, JNI.env, self.jni_id, fn_number.to_int, pp_vtbl.to_int, arg0.jni_id, arg1.to_int)
+      end
+      
+      JNI.native_method "Java_org_eclipse_swt_internal_ole_win32_COM_VtblCall__IIL#{SHDRAGIMAGE.jni_name}_2J".to_sym, [:pointer, :long, :int32, :int32, :long, :int64], :int32
+      typesig { [::Java::Int, ::Java::Int, SHDRAGIMAGE, ::Java::Long] }
+      # long
+      def _vtbl_call(fn_number, pp_vtbl, arg0, arg1)
+        JNI.__send__("Java_org_eclipse_swt_internal_ole_win32_COM_VtblCall__IIL#{SHDRAGIMAGE.jni_name}_2J".to_sym, JNI.env, self.jni_id, fn_number.to_int, pp_vtbl.to_int, arg0.jni_id, arg1.to_int)
       end
       
       JNI.native_method :Java_org_eclipse_swt_internal_ole_win32_COM_VtblCall__II_3CIII_3I, [:pointer, :long, :int32, :int32, :long, :int32, :int32, :int32, :long], :int32
@@ -1399,10 +1583,15 @@ module Org::Eclipse::Swt::Internal::Ole::Win32
       JNI.native_method :Java_org_eclipse_swt_internal_ole_win32_COM_VtblCall__II_3CIIII_3I, [:pointer, :long, :int32, :int32, :long, :int32, :int32, :int32, :int32, :long], :int32
       typesig { [::Java::Int, ::Java::Int, Array.typed(::Java::Char), ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, Array.typed(::Java::Int)] }
       # long
-      # long
-      # long
       def _vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2, arg3, arg4, arg5)
         JNI.__send__(:Java_org_eclipse_swt_internal_ole_win32_COM_VtblCall__II_3CIIII_3I, JNI.env, self.jni_id, fn_number.to_int, pp_vtbl.to_int, arg0.jni_id, arg1.to_int, arg2.to_int, arg3.to_int, arg4.to_int, arg5.jni_id)
+      end
+      
+      JNI.native_method :Java_org_eclipse_swt_internal_ole_win32_COM_VtblCall__II_3CJIII_3J, [:pointer, :long, :int32, :int32, :long, :int64, :int32, :int32, :int32, :long], :int32
+      typesig { [::Java::Int, ::Java::Int, Array.typed(::Java::Char), ::Java::Long, ::Java::Int, ::Java::Int, ::Java::Int, Array.typed(::Java::Long)] }
+      # long
+      def _vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2, arg3, arg4, arg5)
+        JNI.__send__(:Java_org_eclipse_swt_internal_ole_win32_COM_VtblCall__II_3CJIII_3J, JNI.env, self.jni_id, fn_number.to_int, pp_vtbl.to_int, arg0.jni_id, arg1.to_int, arg2.to_int, arg3.to_int, arg4.to_int, arg5.jni_id)
       end
       
       JNI.native_method :Java_org_eclipse_swt_internal_ole_win32_COM_VtblCall__III_3I, [:pointer, :long, :int32, :int32, :int32, :long], :int32
@@ -1412,13 +1601,6 @@ module Org::Eclipse::Swt::Internal::Ole::Win32
         JNI.__send__(:Java_org_eclipse_swt_internal_ole_win32_COM_VtblCall__III_3I, JNI.env, self.jni_id, fn_number.to_int, pp_vtbl.to_int, arg0.to_int, arg1.jni_id)
       end
       
-      JNI.native_method :Java_org_eclipse_swt_internal_ole_win32_COM_VtblCall__IIJ_3I, [:pointer, :long, :int32, :int32, :int64, :long], :int32
-      typesig { [::Java::Int, ::Java::Int, ::Java::Long, Array.typed(::Java::Int)] }
-      # long
-      def _vtbl_call(fn_number, pp_vtbl, arg0, arg1)
-        JNI.__send__(:Java_org_eclipse_swt_internal_ole_win32_COM_VtblCall__IIJ_3I, JNI.env, self.jni_id, fn_number.to_int, pp_vtbl.to_int, arg0.to_int, arg1.jni_id)
-      end
-      
       JNI.native_method :Java_org_eclipse_swt_internal_ole_win32_COM_VtblCall__III_3J, [:pointer, :long, :int32, :int32, :int32, :long], :int32
       typesig { [::Java::Int, ::Java::Int, ::Java::Int, Array.typed(::Java::Long)] }
       # long
@@ -1426,13 +1608,46 @@ module Org::Eclipse::Swt::Internal::Ole::Win32
         JNI.__send__(:Java_org_eclipse_swt_internal_ole_win32_COM_VtblCall__III_3J, JNI.env, self.jni_id, fn_number.to_int, pp_vtbl.to_int, arg0.to_int, arg1.jni_id)
       end
       
+      JNI.native_method :Java_org_eclipse_swt_internal_ole_win32_COM_VtblCall__IIJ_3I, [:pointer, :long, :int32, :int32, :int64, :long], :int32
+      typesig { [::Java::Int, ::Java::Int, ::Java::Long, Array.typed(::Java::Int)] }
+      # long
+      def _vtbl_call(fn_number, pp_vtbl, arg0, arg1)
+        JNI.__send__(:Java_org_eclipse_swt_internal_ole_win32_COM_VtblCall__IIJ_3I, JNI.env, self.jni_id, fn_number.to_int, pp_vtbl.to_int, arg0.to_int, arg1.jni_id)
+      end
+      
+      JNI.native_method :Java_org_eclipse_swt_internal_ole_win32_COM_VtblCall__IIJ_3J, [:pointer, :long, :int32, :int32, :int64, :long], :int32
+      typesig { [::Java::Int, ::Java::Int, ::Java::Long, Array.typed(::Java::Long)] }
+      # long
+      def _vtbl_call(fn_number, pp_vtbl, arg0, arg1)
+        JNI.__send__(:Java_org_eclipse_swt_internal_ole_win32_COM_VtblCall__IIJ_3J, JNI.env, self.jni_id, fn_number.to_int, pp_vtbl.to_int, arg0.to_int, arg1.jni_id)
+      end
+      
       JNI.native_method :Java_org_eclipse_swt_internal_ole_win32_COM_VtblCall__IIII, [:pointer, :long, :int32, :int32, :int32, :int32], :int32
       typesig { [::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int] }
       # long
-      # long
-      # long
       def _vtbl_call(fn_number, pp_vtbl, arg0, arg1)
         JNI.__send__(:Java_org_eclipse_swt_internal_ole_win32_COM_VtblCall__IIII, JNI.env, self.jni_id, fn_number.to_int, pp_vtbl.to_int, arg0.to_int, arg1.to_int)
+      end
+      
+      JNI.native_method :Java_org_eclipse_swt_internal_ole_win32_COM_VtblCall__IIIJ, [:pointer, :long, :int32, :int32, :int32, :int64], :int32
+      typesig { [::Java::Int, ::Java::Int, ::Java::Int, ::Java::Long] }
+      # long
+      def _vtbl_call(fn_number, pp_vtbl, arg0, arg1)
+        JNI.__send__(:Java_org_eclipse_swt_internal_ole_win32_COM_VtblCall__IIIJ, JNI.env, self.jni_id, fn_number.to_int, pp_vtbl.to_int, arg0.to_int, arg1.to_int)
+      end
+      
+      JNI.native_method :Java_org_eclipse_swt_internal_ole_win32_COM_VtblCall__IIJI, [:pointer, :long, :int32, :int32, :int64, :int32], :int32
+      typesig { [::Java::Int, ::Java::Int, ::Java::Long, ::Java::Int] }
+      # long
+      def _vtbl_call(fn_number, pp_vtbl, arg0, arg1)
+        JNI.__send__(:Java_org_eclipse_swt_internal_ole_win32_COM_VtblCall__IIJI, JNI.env, self.jni_id, fn_number.to_int, pp_vtbl.to_int, arg0.to_int, arg1.to_int)
+      end
+      
+      JNI.native_method :Java_org_eclipse_swt_internal_ole_win32_COM_VtblCall__IIJJ, [:pointer, :long, :int32, :int32, :int64, :int64], :int32
+      typesig { [::Java::Int, ::Java::Int, ::Java::Long, ::Java::Long] }
+      # long
+      def _vtbl_call(fn_number, pp_vtbl, arg0, arg1)
+        JNI.__send__(:Java_org_eclipse_swt_internal_ole_win32_COM_VtblCall__IIJJ, JNI.env, self.jni_id, fn_number.to_int, pp_vtbl.to_int, arg0.to_int, arg1.to_int)
       end
       
       JNI.native_method :Java_org_eclipse_swt_internal_ole_win32_COM_VtblCall__IIII_3I, [:pointer, :long, :int32, :int32, :int32, :int32, :long], :int32
@@ -1440,6 +1655,13 @@ module Org::Eclipse::Swt::Internal::Ole::Win32
       # long
       def _vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2)
         JNI.__send__(:Java_org_eclipse_swt_internal_ole_win32_COM_VtblCall__IIII_3I, JNI.env, self.jni_id, fn_number.to_int, pp_vtbl.to_int, arg0.to_int, arg1.to_int, arg2.jni_id)
+      end
+      
+      JNI.native_method :Java_org_eclipse_swt_internal_ole_win32_COM_VtblCall__IIJI_3J, [:pointer, :long, :int32, :int32, :int64, :int32, :long], :int32
+      typesig { [::Java::Int, ::Java::Int, ::Java::Long, ::Java::Int, Array.typed(::Java::Long)] }
+      # long
+      def _vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2)
+        JNI.__send__(:Java_org_eclipse_swt_internal_ole_win32_COM_VtblCall__IIJI_3J, JNI.env, self.jni_id, fn_number.to_int, pp_vtbl.to_int, arg0.to_int, arg1.to_int, arg2.jni_id)
       end
       
       JNI.native_method :Java_org_eclipse_swt_internal_ole_win32_COM_VtblCall__IIII_3J, [:pointer, :long, :int32, :int32, :int32, :int32, :long], :int32
@@ -1466,9 +1688,15 @@ module Org::Eclipse::Swt::Internal::Ole::Win32
       JNI.native_method :Java_org_eclipse_swt_internal_ole_win32_COM_VtblCall__IIIII, [:pointer, :long, :int32, :int32, :int32, :int32, :int32], :int32
       typesig { [::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int] }
       # long
-      # long
       def _vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2)
         JNI.__send__(:Java_org_eclipse_swt_internal_ole_win32_COM_VtblCall__IIIII, JNI.env, self.jni_id, fn_number.to_int, pp_vtbl.to_int, arg0.to_int, arg1.to_int, arg2.to_int)
+      end
+      
+      JNI.native_method :Java_org_eclipse_swt_internal_ole_win32_COM_VtblCall__IIIIJ, [:pointer, :long, :int32, :int32, :int32, :int32, :int64], :int32
+      typesig { [::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Long] }
+      # long
+      def _vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2)
+        JNI.__send__(:Java_org_eclipse_swt_internal_ole_win32_COM_VtblCall__IIIIJ, JNI.env, self.jni_id, fn_number.to_int, pp_vtbl.to_int, arg0.to_int, arg1.to_int, arg2.to_int)
       end
       
       JNI.native_method "Java_org_eclipse_swt_internal_ole_win32_COM_VtblCall__IIIIL#{DVTARGETDEVICE.jni_name}_2L#{SIZE.jni_name}_2".to_sym, [:pointer, :long, :int32, :int32, :int32, :int32, :long, :long], :int32
@@ -1481,21 +1709,29 @@ module Org::Eclipse::Swt::Internal::Ole::Win32
       JNI.native_method "Java_org_eclipse_swt_internal_ole_win32_COM_VtblCall__IIIIL#{GUID.jni_name}_2I_3I".to_sym, [:pointer, :long, :int32, :int32, :int32, :int32, :long, :int32, :long], :int32
       typesig { [::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, GUID, ::Java::Int, Array.typed(::Java::Int)] }
       # long
-      # long
-      # long
-      # long
-      # long
       def _vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2, arg3, arg4)
         JNI.__send__("Java_org_eclipse_swt_internal_ole_win32_COM_VtblCall__IIIIL#{GUID.jni_name}_2I_3I".to_sym, JNI.env, self.jni_id, fn_number.to_int, pp_vtbl.to_int, arg0.to_int, arg1.to_int, arg2.jni_id, arg3.to_int, arg4.jni_id)
+      end
+      
+      JNI.native_method "Java_org_eclipse_swt_internal_ole_win32_COM_VtblCall__IIJJL#{GUID.jni_name}_2J_3J".to_sym, [:pointer, :long, :int32, :int32, :int64, :int64, :long, :int64, :long], :int32
+      typesig { [::Java::Int, ::Java::Int, ::Java::Long, ::Java::Long, GUID, ::Java::Long, Array.typed(::Java::Long)] }
+      # long
+      def _vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2, arg3, arg4)
+        JNI.__send__("Java_org_eclipse_swt_internal_ole_win32_COM_VtblCall__IIJJL#{GUID.jni_name}_2J_3J".to_sym, JNI.env, self.jni_id, fn_number.to_int, pp_vtbl.to_int, arg0.to_int, arg1.to_int, arg2.jni_id, arg3.to_int, arg4.jni_id)
       end
       
       JNI.native_method "Java_org_eclipse_swt_internal_ole_win32_COM_VtblCall__IIIL#{FORMATETC.jni_name}_2_3I".to_sym, [:pointer, :long, :int32, :int32, :int32, :long, :long], :int32
       typesig { [::Java::Int, ::Java::Int, ::Java::Int, FORMATETC, Array.typed(::Java::Int)] }
       # long
-      # long
-      # long
       def _vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2)
         JNI.__send__("Java_org_eclipse_swt_internal_ole_win32_COM_VtblCall__IIIL#{FORMATETC.jni_name}_2_3I".to_sym, JNI.env, self.jni_id, fn_number.to_int, pp_vtbl.to_int, arg0.to_int, arg1.jni_id, arg2.jni_id)
+      end
+      
+      JNI.native_method "Java_org_eclipse_swt_internal_ole_win32_COM_VtblCall__IIJL#{FORMATETC.jni_name}_2_3J".to_sym, [:pointer, :long, :int32, :int32, :int64, :long, :long], :int32
+      typesig { [::Java::Int, ::Java::Int, ::Java::Long, FORMATETC, Array.typed(::Java::Long)] }
+      # long
+      def _vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2)
+        JNI.__send__("Java_org_eclipse_swt_internal_ole_win32_COM_VtblCall__IIJL#{FORMATETC.jni_name}_2_3J".to_sym, JNI.env, self.jni_id, fn_number.to_int, pp_vtbl.to_int, arg0.to_int, arg1.jni_id, arg2.jni_id)
       end
       
       JNI.native_method "Java_org_eclipse_swt_internal_ole_win32_COM_VtblCall__IIIL#{GUID.jni_name}_2".to_sym, [:pointer, :long, :int32, :int32, :int32, :long], :int32
@@ -1508,27 +1744,43 @@ module Org::Eclipse::Swt::Internal::Ole::Win32
       JNI.native_method "Java_org_eclipse_swt_internal_ole_win32_COM_VtblCall__IIIL#{GUID.jni_name}_2II".to_sym, [:pointer, :long, :int32, :int32, :int32, :long, :int32, :int32], :int32
       typesig { [::Java::Int, ::Java::Int, ::Java::Int, GUID, ::Java::Int, ::Java::Int] }
       # long
-      # long
-      # long
       def _vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2, arg3)
         JNI.__send__("Java_org_eclipse_swt_internal_ole_win32_COM_VtblCall__IIIL#{GUID.jni_name}_2II".to_sym, JNI.env, self.jni_id, fn_number.to_int, pp_vtbl.to_int, arg0.to_int, arg1.jni_id, arg2.to_int, arg3.to_int)
+      end
+      
+      JNI.native_method "Java_org_eclipse_swt_internal_ole_win32_COM_VtblCall__IIIL#{GUID.jni_name}_2JJ".to_sym, [:pointer, :long, :int32, :int32, :int32, :long, :int64, :int64], :int32
+      typesig { [::Java::Int, ::Java::Int, ::Java::Int, GUID, ::Java::Long, ::Java::Long] }
+      # long
+      def _vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2, arg3)
+        JNI.__send__("Java_org_eclipse_swt_internal_ole_win32_COM_VtblCall__IIIL#{GUID.jni_name}_2JJ".to_sym, JNI.env, self.jni_id, fn_number.to_int, pp_vtbl.to_int, arg0.to_int, arg1.jni_id, arg2.to_int, arg3.to_int)
       end
       
       JNI.native_method "Java_org_eclipse_swt_internal_ole_win32_COM_VtblCall__IIIL#{GUID.jni_name}_2IIL#{DISPPARAMS.jni_name}_2IL#{EXCEPINFO.jni_name}_2_3I".to_sym, [:pointer, :long, :int32, :int32, :int32, :long, :int32, :int32, :long, :int32, :long, :long], :int32
       typesig { [::Java::Int, ::Java::Int, ::Java::Int, GUID, ::Java::Int, ::Java::Int, DISPPARAMS, ::Java::Int, EXCEPINFO, Array.typed(::Java::Int)] }
       # long
-      # long
       def _vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7)
         JNI.__send__("Java_org_eclipse_swt_internal_ole_win32_COM_VtblCall__IIIL#{GUID.jni_name}_2IIL#{DISPPARAMS.jni_name}_2IL#{EXCEPINFO.jni_name}_2_3I".to_sym, JNI.env, self.jni_id, fn_number.to_int, pp_vtbl.to_int, arg0.to_int, arg1.jni_id, arg2.to_int, arg3.to_int, arg4.jni_id, arg5.to_int, arg6.jni_id, arg7.jni_id)
+      end
+      
+      JNI.native_method "Java_org_eclipse_swt_internal_ole_win32_COM_VtblCall__IIIL#{GUID.jni_name}_2IIL#{DISPPARAMS.jni_name}_2JL#{EXCEPINFO.jni_name}_2_3I".to_sym, [:pointer, :long, :int32, :int32, :int32, :long, :int32, :int32, :long, :int64, :long, :long], :int32
+      typesig { [::Java::Int, ::Java::Int, ::Java::Int, GUID, ::Java::Int, ::Java::Int, DISPPARAMS, ::Java::Long, EXCEPINFO, Array.typed(::Java::Int)] }
+      # long
+      def _vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7)
+        JNI.__send__("Java_org_eclipse_swt_internal_ole_win32_COM_VtblCall__IIIL#{GUID.jni_name}_2IIL#{DISPPARAMS.jni_name}_2JL#{EXCEPINFO.jni_name}_2_3I".to_sym, JNI.env, self.jni_id, fn_number.to_int, pp_vtbl.to_int, arg0.to_int, arg1.jni_id, arg2.to_int, arg3.to_int, arg4.jni_id, arg5.to_int, arg6.jni_id, arg7.jni_id)
       end
       
       JNI.native_method "Java_org_eclipse_swt_internal_ole_win32_COM_VtblCall__IIIL#{STATSTG.jni_name}_2_3I".to_sym, [:pointer, :long, :int32, :int32, :int32, :long, :long], :int32
       typesig { [::Java::Int, ::Java::Int, ::Java::Int, STATSTG, Array.typed(::Java::Int)] }
       # long
-      # long
-      # long
       def _vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2)
         JNI.__send__("Java_org_eclipse_swt_internal_ole_win32_COM_VtblCall__IIIL#{STATSTG.jni_name}_2_3I".to_sym, JNI.env, self.jni_id, fn_number.to_int, pp_vtbl.to_int, arg0.to_int, arg1.jni_id, arg2.jni_id)
+      end
+      
+      JNI.native_method "Java_org_eclipse_swt_internal_ole_win32_COM_VtblCall__IIJL#{STATSTG.jni_name}_2_3J".to_sym, [:pointer, :long, :int32, :int32, :int64, :long, :long], :int32
+      typesig { [::Java::Int, ::Java::Int, ::Java::Long, STATSTG, Array.typed(::Java::Long)] }
+      # long
+      def _vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2)
+        JNI.__send__("Java_org_eclipse_swt_internal_ole_win32_COM_VtblCall__IIJL#{STATSTG.jni_name}_2_3J".to_sym, JNI.env, self.jni_id, fn_number.to_int, pp_vtbl.to_int, arg0.to_int, arg1.jni_id, arg2.jni_id)
       end
       
       JNI.native_method "Java_org_eclipse_swt_internal_ole_win32_COM_VtblCall__IIL#{MSG.jni_name}_2".to_sym, [:pointer, :long, :int32, :int32, :long], :int32
@@ -1541,10 +1793,15 @@ module Org::Eclipse::Swt::Internal::Ole::Win32
       JNI.native_method "Java_org_eclipse_swt_internal_ole_win32_COM_VtblCall__IIIL#{MSG.jni_name}_2IIIL#{RECT.jni_name}_2".to_sym, [:pointer, :long, :int32, :int32, :int32, :long, :int32, :int32, :int32, :long], :int32
       typesig { [::Java::Int, ::Java::Int, ::Java::Int, MSG, ::Java::Int, ::Java::Int, ::Java::Int, RECT] }
       # long
-      # long
-      # long
       def _vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2, arg3, arg4, arg5)
         JNI.__send__("Java_org_eclipse_swt_internal_ole_win32_COM_VtblCall__IIIL#{MSG.jni_name}_2IIIL#{RECT.jni_name}_2".to_sym, JNI.env, self.jni_id, fn_number.to_int, pp_vtbl.to_int, arg0.to_int, arg1.jni_id, arg2.to_int, arg3.to_int, arg4.to_int, arg5.jni_id)
+      end
+      
+      JNI.native_method "Java_org_eclipse_swt_internal_ole_win32_COM_VtblCall__IIIL#{MSG.jni_name}_2JIJL#{RECT.jni_name}_2".to_sym, [:pointer, :long, :int32, :int32, :int32, :long, :int64, :int32, :int64, :long], :int32
+      typesig { [::Java::Int, ::Java::Int, ::Java::Int, MSG, ::Java::Long, ::Java::Int, ::Java::Long, RECT] }
+      # long
+      def _vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2, arg3, arg4, arg5)
+        JNI.__send__("Java_org_eclipse_swt_internal_ole_win32_COM_VtblCall__IIIL#{MSG.jni_name}_2JIJL#{RECT.jni_name}_2".to_sym, JNI.env, self.jni_id, fn_number.to_int, pp_vtbl.to_int, arg0.to_int, arg1.jni_id, arg2.to_int, arg3.to_int, arg4.to_int, arg5.jni_id)
       end
       
       JNI.native_method "Java_org_eclipse_swt_internal_ole_win32_COM_VtblCall__IIIL#{SIZE.jni_name}_2".to_sym, [:pointer, :long, :int32, :int32, :int32, :long], :int32
@@ -1557,9 +1814,15 @@ module Org::Eclipse::Swt::Internal::Ole::Win32
       JNI.native_method :Java_org_eclipse_swt_internal_ole_win32_COM_VtblCall__IIIZ, [:pointer, :long, :int32, :int32, :int32, :int8], :int32
       typesig { [::Java::Int, ::Java::Int, ::Java::Int, ::Java::Boolean] }
       # long
-      # long
       def _vtbl_call(fn_number, pp_vtbl, arg0, arg1)
         JNI.__send__(:Java_org_eclipse_swt_internal_ole_win32_COM_VtblCall__IIIZ, JNI.env, self.jni_id, fn_number.to_int, pp_vtbl.to_int, arg0.to_int, arg1 ? 1 : 0)
+      end
+      
+      JNI.native_method :Java_org_eclipse_swt_internal_ole_win32_COM_VtblCall__IIJZ, [:pointer, :long, :int32, :int32, :int64, :int8], :int32
+      typesig { [::Java::Int, ::Java::Int, ::Java::Long, ::Java::Boolean] }
+      # long
+      def _vtbl_call(fn_number, pp_vtbl, arg0, arg1)
+        JNI.__send__(:Java_org_eclipse_swt_internal_ole_win32_COM_VtblCall__IIJZ, JNI.env, self.jni_id, fn_number.to_int, pp_vtbl.to_int, arg0.to_int, arg1 ? 1 : 0)
       end
       
       JNI.native_method :Java_org_eclipse_swt_internal_ole_win32_COM_VtblCall__IIZ, [:pointer, :long, :int32, :int32, :int8], :int32
@@ -1614,34 +1877,57 @@ module Org::Eclipse::Swt::Internal::Ole::Win32
       JNI.native_method "Java_org_eclipse_swt_internal_ole_win32_COM_VtblCall__IIL#{GUID.jni_name}_2_3I".to_sym, [:pointer, :long, :int32, :int32, :long, :long], :int32
       typesig { [::Java::Int, ::Java::Int, GUID, Array.typed(::Java::Int)] }
       # long
-      # long
       def _vtbl_call(fn_number, pp_vtbl, arg0, arg1)
         JNI.__send__("Java_org_eclipse_swt_internal_ole_win32_COM_VtblCall__IIL#{GUID.jni_name}_2_3I".to_sym, JNI.env, self.jni_id, fn_number.to_int, pp_vtbl.to_int, arg0.jni_id, arg1.jni_id)
+      end
+      
+      JNI.native_method "Java_org_eclipse_swt_internal_ole_win32_COM_VtblCall__IIL#{GUID.jni_name}_2_3J".to_sym, [:pointer, :long, :int32, :int32, :long, :long], :int32
+      typesig { [::Java::Int, ::Java::Int, GUID, Array.typed(::Java::Long)] }
+      # long
+      def _vtbl_call(fn_number, pp_vtbl, arg0, arg1)
+        JNI.__send__("Java_org_eclipse_swt_internal_ole_win32_COM_VtblCall__IIL#{GUID.jni_name}_2_3J".to_sym, JNI.env, self.jni_id, fn_number.to_int, pp_vtbl.to_int, arg0.jni_id, arg1.jni_id)
       end
       
       JNI.native_method "Java_org_eclipse_swt_internal_ole_win32_COM_VtblCall__IIL#{GUID.jni_name}_2L#{GUID.jni_name}_2_3I".to_sym, [:pointer, :long, :int32, :int32, :long, :long, :long], :int32
       typesig { [::Java::Int, ::Java::Int, GUID, GUID, Array.typed(::Java::Int)] }
       # long
-      # long
       def _vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2)
         JNI.__send__("Java_org_eclipse_swt_internal_ole_win32_COM_VtblCall__IIL#{GUID.jni_name}_2L#{GUID.jni_name}_2_3I".to_sym, JNI.env, self.jni_id, fn_number.to_int, pp_vtbl.to_int, arg0.jni_id, arg1.jni_id, arg2.jni_id)
+      end
+      
+      JNI.native_method "Java_org_eclipse_swt_internal_ole_win32_COM_VtblCall__IIL#{GUID.jni_name}_2L#{GUID.jni_name}_2_3J".to_sym, [:pointer, :long, :int32, :int32, :long, :long, :long], :int32
+      typesig { [::Java::Int, ::Java::Int, GUID, GUID, Array.typed(::Java::Long)] }
+      # long
+      def _vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2)
+        JNI.__send__("Java_org_eclipse_swt_internal_ole_win32_COM_VtblCall__IIL#{GUID.jni_name}_2L#{GUID.jni_name}_2_3J".to_sym, JNI.env, self.jni_id, fn_number.to_int, pp_vtbl.to_int, arg0.jni_id, arg1.jni_id, arg2.jni_id)
       end
       
       JNI.native_method "Java_org_eclipse_swt_internal_ole_win32_COM_VtblCall__IIL#{GUID.jni_name}_2III_3I".to_sym, [:pointer, :long, :int32, :int32, :long, :int32, :int32, :int32, :long], :int32
       typesig { [::Java::Int, ::Java::Int, GUID, ::Java::Int, ::Java::Int, ::Java::Int, Array.typed(::Java::Int)] }
       # long
-      # long
       def _vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2, arg3, arg4)
         JNI.__send__("Java_org_eclipse_swt_internal_ole_win32_COM_VtblCall__IIL#{GUID.jni_name}_2III_3I".to_sym, JNI.env, self.jni_id, fn_number.to_int, pp_vtbl.to_int, arg0.jni_id, arg1.to_int, arg2.to_int, arg3.to_int, arg4.jni_id)
+      end
+      
+      JNI.native_method "Java_org_eclipse_swt_internal_ole_win32_COM_VtblCall__IIL#{GUID.jni_name}_2JII_3I".to_sym, [:pointer, :long, :int32, :int32, :long, :int64, :int32, :int32, :long], :int32
+      typesig { [::Java::Int, ::Java::Int, GUID, ::Java::Long, ::Java::Int, ::Java::Int, Array.typed(::Java::Int)] }
+      # long
+      def _vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2, arg3, arg4)
+        JNI.__send__("Java_org_eclipse_swt_internal_ole_win32_COM_VtblCall__IIL#{GUID.jni_name}_2JII_3I".to_sym, JNI.env, self.jni_id, fn_number.to_int, pp_vtbl.to_int, arg0.jni_id, arg1.to_int, arg2.to_int, arg3.to_int, arg4.jni_id)
       end
       
       JNI.native_method "Java_org_eclipse_swt_internal_ole_win32_COM_VtblCall__IIL#{GUID.jni_name}_2IIII".to_sym, [:pointer, :long, :int32, :int32, :long, :int32, :int32, :int32, :int32], :int32
       typesig { [::Java::Int, ::Java::Int, GUID, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int] }
       # long
-      # long
-      # long
       def _vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2, arg3, arg4)
         JNI.__send__("Java_org_eclipse_swt_internal_ole_win32_COM_VtblCall__IIL#{GUID.jni_name}_2IIII".to_sym, JNI.env, self.jni_id, fn_number.to_int, pp_vtbl.to_int, arg0.jni_id, arg1.to_int, arg2.to_int, arg3.to_int, arg4.to_int)
+      end
+      
+      JNI.native_method "Java_org_eclipse_swt_internal_ole_win32_COM_VtblCall__IIL#{GUID.jni_name}_2IIJJ".to_sym, [:pointer, :long, :int32, :int32, :long, :int32, :int32, :int64, :int64], :int32
+      typesig { [::Java::Int, ::Java::Int, GUID, ::Java::Int, ::Java::Int, ::Java::Long, ::Java::Long] }
+      # long
+      def _vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2, arg3, arg4)
+        JNI.__send__("Java_org_eclipse_swt_internal_ole_win32_COM_VtblCall__IIL#{GUID.jni_name}_2IIJJ".to_sym, JNI.env, self.jni_id, fn_number.to_int, pp_vtbl.to_int, arg0.jni_id, arg1.to_int, arg2.to_int, arg3.to_int, arg4.to_int)
       end
       
       JNI.native_method "Java_org_eclipse_swt_internal_ole_win32_COM_VtblCall__IIL#{GUID.jni_name}_2IL#{OLECMD.jni_name}_2L#{OLECMDTEXT.jni_name}_2".to_sym, [:pointer, :long, :int32, :int32, :long, :int32, :long, :long], :int32
@@ -1661,9 +1947,15 @@ module Org::Eclipse::Swt::Internal::Ole::Win32
       JNI.native_method "Java_org_eclipse_swt_internal_ole_win32_COM_VtblCall__IIL#{RECT.jni_name}_2IZ".to_sym, [:pointer, :long, :int32, :int32, :long, :int32, :int8], :int32
       typesig { [::Java::Int, ::Java::Int, RECT, ::Java::Int, ::Java::Boolean] }
       # long
-      # long
       def _vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2)
         JNI.__send__("Java_org_eclipse_swt_internal_ole_win32_COM_VtblCall__IIL#{RECT.jni_name}_2IZ".to_sym, JNI.env, self.jni_id, fn_number.to_int, pp_vtbl.to_int, arg0.jni_id, arg1.to_int, arg2 ? 1 : 0)
+      end
+      
+      JNI.native_method "Java_org_eclipse_swt_internal_ole_win32_COM_VtblCall__IIL#{RECT.jni_name}_2JZ".to_sym, [:pointer, :long, :int32, :int32, :long, :int64, :int8], :int32
+      typesig { [::Java::Int, ::Java::Int, RECT, ::Java::Long, ::Java::Boolean] }
+      # long
+      def _vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2)
+        JNI.__send__("Java_org_eclipse_swt_internal_ole_win32_COM_VtblCall__IIL#{RECT.jni_name}_2JZ".to_sym, JNI.env, self.jni_id, fn_number.to_int, pp_vtbl.to_int, arg0.jni_id, arg1.to_int, arg2 ? 1 : 0)
       end
       
       JNI.native_method "Java_org_eclipse_swt_internal_ole_win32_COM_VtblCall__IIL#{RECT.jni_name}_2L#{RECT.jni_name}_2".to_sym, [:pointer, :long, :int32, :int32, :long, :long], :int32
@@ -1683,23 +1975,48 @@ module Org::Eclipse::Swt::Internal::Ole::Win32
       JNI.native_method :Java_org_eclipse_swt_internal_ole_win32_COM_VtblCall__III_3I_3I_3I_3I, [:pointer, :long, :int32, :int32, :int32, :long, :long, :long, :long], :int32
       typesig { [::Java::Int, ::Java::Int, ::Java::Int, Array.typed(::Java::Int), Array.typed(::Java::Int), Array.typed(::Java::Int), Array.typed(::Java::Int)] }
       # long
-      # long
-      # long
-      # long
       def _vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2, arg3, arg4)
         JNI.__send__(:Java_org_eclipse_swt_internal_ole_win32_COM_VtblCall__III_3I_3I_3I_3I, JNI.env, self.jni_id, fn_number.to_int, pp_vtbl.to_int, arg0.to_int, arg1.jni_id, arg2.jni_id, arg3.jni_id, arg4.jni_id)
+      end
+      
+      JNI.native_method :Java_org_eclipse_swt_internal_ole_win32_COM_VtblCall__III_3J_3J_3I_3J, [:pointer, :long, :int32, :int32, :int32, :long, :long, :long, :long], :int32
+      typesig { [::Java::Int, ::Java::Int, ::Java::Int, Array.typed(::Java::Long), Array.typed(::Java::Long), Array.typed(::Java::Int), Array.typed(::Java::Long)] }
+      # long
+      def _vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2, arg3, arg4)
+        JNI.__send__(:Java_org_eclipse_swt_internal_ole_win32_COM_VtblCall__III_3J_3J_3I_3J, JNI.env, self.jni_id, fn_number.to_int, pp_vtbl.to_int, arg0.to_int, arg1.jni_id, arg2.jni_id, arg3.jni_id, arg4.jni_id)
       end
       
       JNI.native_method :Java_org_eclipse_swt_internal_ole_win32_COM_VtblCall__III_3II_3I, [:pointer, :long, :int32, :int32, :int32, :long, :int32, :long], :int32
       typesig { [::Java::Int, ::Java::Int, ::Java::Int, Array.typed(::Java::Int), ::Java::Int, Array.typed(::Java::Int)] }
       # long
-      # long
       def _vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2, arg3)
         JNI.__send__(:Java_org_eclipse_swt_internal_ole_win32_COM_VtblCall__III_3II_3I, JNI.env, self.jni_id, fn_number.to_int, pp_vtbl.to_int, arg0.to_int, arg1.jni_id, arg2.to_int, arg3.jni_id)
       end
       
+      JNI.native_method :Java_org_eclipse_swt_internal_ole_win32_COM_VtblCall__III_3JI_3I, [:pointer, :long, :int32, :int32, :int32, :long, :int32, :long], :int32
+      typesig { [::Java::Int, ::Java::Int, ::Java::Int, Array.typed(::Java::Long), ::Java::Int, Array.typed(::Java::Int)] }
+      # long
+      def _vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2, arg3)
+        JNI.__send__(:Java_org_eclipse_swt_internal_ole_win32_COM_VtblCall__III_3JI_3I, JNI.env, self.jni_id, fn_number.to_int, pp_vtbl.to_int, arg0.to_int, arg1.jni_id, arg2.to_int, arg3.jni_id)
+      end
+      
+      JNI.native_method "Java_org_eclipse_swt_internal_ole_win32_COM_VtblCall__IIIIIL#{DISPPARAMS.jni_name}_2IL#{EXCEPINFO.jni_name}_2I".to_sym, [:pointer, :long, :int32, :int32, :int32, :int32, :int32, :long, :int32, :long, :int32], :int32
+      typesig { [::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, DISPPARAMS, ::Java::Int, EXCEPINFO, ::Java::Int] }
+      # long
+      def _vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2, arg3, arg4, arg5, arg6)
+        JNI.__send__("Java_org_eclipse_swt_internal_ole_win32_COM_VtblCall__IIIIIL#{DISPPARAMS.jni_name}_2IL#{EXCEPINFO.jni_name}_2I".to_sym, JNI.env, self.jni_id, fn_number.to_int, pp_vtbl.to_int, arg0.to_int, arg1.to_int, arg2.to_int, arg3.jni_id, arg4.to_int, arg5.jni_id, arg6.to_int)
+      end
+      
+      JNI.native_method "Java_org_eclipse_swt_internal_ole_win32_COM_VtblCall__IIIIIL#{DISPPARAMS.jni_name}_2JL#{EXCEPINFO.jni_name}_2J".to_sym, [:pointer, :long, :int32, :int32, :int32, :int32, :int32, :long, :int64, :long, :int64], :int32
+      typesig { [::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, DISPPARAMS, ::Java::Long, EXCEPINFO, ::Java::Long] }
+      # long
+      def _vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2, arg3, arg4, arg5, arg6)
+        JNI.__send__("Java_org_eclipse_swt_internal_ole_win32_COM_VtblCall__IIIIIL#{DISPPARAMS.jni_name}_2JL#{EXCEPINFO.jni_name}_2J".to_sym, JNI.env, self.jni_id, fn_number.to_int, pp_vtbl.to_int, arg0.to_int, arg1.to_int, arg2.to_int, arg3.jni_id, arg4.to_int, arg5.jni_id, arg6.to_int)
+      end
+      
       JNI.native_method :Java_org_eclipse_swt_internal_ole_win32_COM_WriteClassStg, [:pointer, :long, :int32, :long], :int32
       typesig { [::Java::Int, GUID] }
+      # @param pStg cast=(IStorage *)
       # long
       def _write_class_stg(p_stg, rclsid)
         JNI.__send__(:Java_org_eclipse_swt_internal_ole_win32_COM_WriteClassStg, JNI.env, self.jni_id, p_stg.to_int, rclsid.jni_id)
@@ -1831,6 +2148,9 @@ module Org::Eclipse::Swt::Internal::Ole::Win32
       const_attr_reader  :ROLE_SYSTEM_PAGETABLIST
       
       # public static final int ROLE_SYSTEM_CLOCK = 0x3d;
+      const_set_lazy(:ROLE_SYSTEM_SPLITBUTTON) { 0x3e }
+      const_attr_reader  :ROLE_SYSTEM_SPLITBUTTON
+      
       const_set_lazy(:STATE_SYSTEM_NORMAL) { 0 }
       const_attr_reader  :STATE_SYSTEM_NORMAL
       
@@ -1903,6 +2223,12 @@ module Org::Eclipse::Swt::Internal::Ole::Win32
       # public static final int STATE_SYSTEM_PROTECTED = 0x20000000;
       # public static final int STATE_SYSTEM_VALID = 0x3fffffff;
       # Accessibility natives
+      # 
+      # @method flags=dynamic
+      # @param hwnd cast=(HWND)
+      # @param dwObjectID cast=(DWORD)
+      # @param ppvObject cast=(LPVOID *)
+      # 
       # long
       # long
       def _accessible_object_from_window(hwnd, dw_object_id, riid, ppv_object)
@@ -1911,6 +2237,10 @@ module Org::Eclipse::Swt::Internal::Ole::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_ole_win32_COM_CreateStdAccessibleObject, [:pointer, :long, :int32, :int32, :long, :long], :int32
       typesig { [::Java::Int, ::Java::Int, GUID, Array.typed(::Java::Int)] }
+      # @method flags=dynamic
+      # @param hwnd cast=(HWND)
+      # @param ppvObject cast=(LPVOID *)
+      # 
       # long
       # long
       def _create_std_accessible_object(hwnd, id_object, riid_interface, ppv_object)
@@ -1919,6 +2249,9 @@ module Org::Eclipse::Swt::Internal::Ole::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_ole_win32_COM_LresultFromObject, [:pointer, :long, :long, :int32, :int32], :int32
       typesig { [GUID, ::Java::Int, ::Java::Int] }
+      # @method flags=dynamic
+      # @param pAcc cast=(LPUNKNOWN)
+      # 
       # long
       # long
       # long
@@ -1981,6 +2314,7 @@ module Org::Eclipse::Swt::Internal::Ole::Win32
       JNI.native_method :Java_org_eclipse_swt_internal_ole_win32_COM_VtblCall_1VARIANT, [:pointer, :long, :int32, :int32, :int32], :int32
       typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
       # Custom accessibility natives
+      # @method flags=no_gen
       # long
       # long
       def _vtbl_call_variant(fn_number, pp_vtbl, arg0)
@@ -1989,6 +2323,7 @@ module Org::Eclipse::Swt::Internal::Ole::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_ole_win32_COM_VtblCall_1VARIANTP, [:pointer, :long, :int32, :int32, :int32, :int32], :int32
       typesig { [::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int] }
+      # @method flags=no_gen
       # long
       # long
       # long
@@ -1998,6 +2333,7 @@ module Org::Eclipse::Swt::Internal::Ole::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_ole_win32_COM_VtblCall_1IVARIANT, [:pointer, :long, :int32, :int32, :int32, :int32], :int32
       typesig { [::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int] }
+      # @method flags=no_gen
       # long
       # long
       def _vtbl_call_ivariant(fn_number, pp_vtbl, arg0, arg1)
@@ -2006,6 +2342,7 @@ module Org::Eclipse::Swt::Internal::Ole::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_ole_win32_COM_VtblCall_1IVARIANTP, [:pointer, :long, :int32, :int32, :int32, :int32, :int32], :int32
       typesig { [::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int] }
+      # @method flags=no_gen
       # long
       # long
       # long
@@ -2015,6 +2352,7 @@ module Org::Eclipse::Swt::Internal::Ole::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_ole_win32_COM_VtblCall_1PVARIANTP, [:pointer, :long, :int32, :int32, :int32, :int32, :int32], :int32
       typesig { [::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int] }
+      # @method flags=no_gen
       # long
       # long
       # long
@@ -2025,6 +2363,7 @@ module Org::Eclipse::Swt::Internal::Ole::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_ole_win32_COM_VtblCall_1PPPPVARIANT, [:pointer, :long, :int32, :int32, :int32, :int32, :int32, :int32, :int32], :int32
       typesig { [::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int] }
+      # @method flags=no_gen
       # long
       # long
       # long
@@ -2037,6 +2376,7 @@ module Org::Eclipse::Swt::Internal::Ole::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_ole_win32_COM_get_1accChild_1CALLBACK, [:pointer, :long, :int32], :int32
       typesig { [::Java::Int] }
+      # @method flags=no_gen
       # long
       # long
       def get_acc_child_callback(func)
@@ -2045,6 +2385,7 @@ module Org::Eclipse::Swt::Internal::Ole::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_ole_win32_COM_get_1accName_1CALLBACK, [:pointer, :long, :int32], :int32
       typesig { [::Java::Int] }
+      # @method flags=no_gen
       # long
       # long
       def get_acc_name_callback(func)
@@ -2053,6 +2394,7 @@ module Org::Eclipse::Swt::Internal::Ole::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_ole_win32_COM_get_1accValue_1CALLBACK, [:pointer, :long, :int32], :int32
       typesig { [::Java::Int] }
+      # @method flags=no_gen
       # long
       # long
       def get_acc_value_callback(func)
@@ -2061,6 +2403,7 @@ module Org::Eclipse::Swt::Internal::Ole::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_ole_win32_COM_get_1accDescription_1CALLBACK, [:pointer, :long, :int32], :int32
       typesig { [::Java::Int] }
+      # @method flags=no_gen
       # long
       # long
       def get_acc_description_callback(func)
@@ -2069,6 +2412,7 @@ module Org::Eclipse::Swt::Internal::Ole::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_ole_win32_COM_get_1accRole_1CALLBACK, [:pointer, :long, :int32], :int32
       typesig { [::Java::Int] }
+      # @method flags=no_gen
       # long
       # long
       def get_acc_role_callback(func)
@@ -2077,6 +2421,7 @@ module Org::Eclipse::Swt::Internal::Ole::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_ole_win32_COM_get_1accState_1CALLBACK, [:pointer, :long, :int32], :int32
       typesig { [::Java::Int] }
+      # @method flags=no_gen
       # long
       # long
       def get_acc_state_callback(func)
@@ -2085,6 +2430,7 @@ module Org::Eclipse::Swt::Internal::Ole::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_ole_win32_COM_get_1accHelp_1CALLBACK, [:pointer, :long, :int32], :int32
       typesig { [::Java::Int] }
+      # @method flags=no_gen
       # long
       # long
       def get_acc_help_callback(func)
@@ -2093,6 +2439,7 @@ module Org::Eclipse::Swt::Internal::Ole::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_ole_win32_COM_get_1accHelpTopic_1CALLBACK, [:pointer, :long, :int32], :int32
       typesig { [::Java::Int] }
+      # @method flags=no_gen
       # long
       # long
       def get_acc_help_topic_callback(func)
@@ -2101,6 +2448,7 @@ module Org::Eclipse::Swt::Internal::Ole::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_ole_win32_COM_get_1accKeyboardShortcut_1CALLBACK, [:pointer, :long, :int32], :int32
       typesig { [::Java::Int] }
+      # @method flags=no_gen
       # long
       # long
       def get_acc_keyboard_shortcut_callback(func)
@@ -2109,6 +2457,7 @@ module Org::Eclipse::Swt::Internal::Ole::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_ole_win32_COM_get_1accDefaultAction_1CALLBACK, [:pointer, :long, :int32], :int32
       typesig { [::Java::Int] }
+      # @method flags=no_gen
       # long
       # long
       def get_acc_default_action_callback(func)
@@ -2117,6 +2466,7 @@ module Org::Eclipse::Swt::Internal::Ole::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_ole_win32_COM_accSelect_1CALLBACK, [:pointer, :long, :int32], :int32
       typesig { [::Java::Int] }
+      # @method flags=no_gen
       # long
       # long
       def acc_select_callback(func)
@@ -2125,6 +2475,7 @@ module Org::Eclipse::Swt::Internal::Ole::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_ole_win32_COM_accLocation_1CALLBACK, [:pointer, :long, :int32], :int32
       typesig { [::Java::Int] }
+      # @method flags=no_gen
       # long
       # long
       def acc_location_callback(func)
@@ -2133,6 +2484,7 @@ module Org::Eclipse::Swt::Internal::Ole::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_ole_win32_COM_accNavigate_1CALLBACK, [:pointer, :long, :int32], :int32
       typesig { [::Java::Int] }
+      # @method flags=no_gen
       # long
       # long
       def acc_navigate_callback(func)
@@ -2141,6 +2493,7 @@ module Org::Eclipse::Swt::Internal::Ole::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_ole_win32_COM_accDoDefaultAction_1CALLBACK, [:pointer, :long, :int32], :int32
       typesig { [::Java::Int] }
+      # @method flags=no_gen
       # long
       # long
       def acc_do_default_action_callback(func)
@@ -2149,6 +2502,7 @@ module Org::Eclipse::Swt::Internal::Ole::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_ole_win32_COM_put_1accName_1CALLBACK, [:pointer, :long, :int32], :int32
       typesig { [::Java::Int] }
+      # @method flags=no_gen
       # long
       # long
       def put_acc_name_callback(func)
@@ -2157,6 +2511,7 @@ module Org::Eclipse::Swt::Internal::Ole::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_ole_win32_COM_put_1accValue_1CALLBACK, [:pointer, :long, :int32], :int32
       typesig { [::Java::Int] }
+      # @method flags=no_gen
       # long
       # long
       def put_acc_value_callback(func)

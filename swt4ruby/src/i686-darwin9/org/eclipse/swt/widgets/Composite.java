@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2008 IBM Corporation and others.
+ * Copyright (c) 2000, 2009 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -11,10 +11,10 @@
 package org.eclipse.swt.widgets;
 
 
-import org.eclipse.swt.internal.carbon.OS;
-
 import org.eclipse.swt.*;
+import org.eclipse.swt.accessibility.*;
 import org.eclipse.swt.graphics.*;
+import org.eclipse.swt.internal.cocoa.*;
 
 /**
  * Instances of this class are controls which are capable
@@ -33,10 +33,9 @@ import org.eclipse.swt.graphics.*;
  * than <code>Canvas</code>.
  * </p><p>
  * Note: The <code>CENTER</code> style, although undefined for composites, has the
- * same value as <code>EMBEDDED</code> (which is used to embed widgets from other
- * widget toolkits into SWT).  On some operating systems (GTK, Motif), this may cause
- * the children of this composite to be obscured.  The <code>EMBEDDED</code> style
- * is for use by other widget toolkits and should normally never be used.
+ * same value as <code>EMBEDDED</code> which is used to embed widgets from other
+ * widget toolkits into SWT.  On some operating systems (GTK, Motif), this may cause
+ * the children of this composite to be obscured.
  * </p><p>
  * This class may be subclassed by custom control implementors
  * who are building controls that are constructed from aggregates
@@ -50,9 +49,8 @@ import org.eclipse.swt.graphics.*;
 public class Composite extends Scrollable {
 	Layout layout;
 	Control[] tabList;
-	int scrolledVisibleRgn, siblingsVisibleRgn;
 	int layoutCount, backgroundMode;
-
+	
 Composite () {
 	/* Do nothing */
 }
@@ -85,6 +83,8 @@ Composite () {
  * @see SWT#NO_MERGE_PAINTS
  * @see SWT#NO_REDRAW_RESIZE
  * @see SWT#NO_RADIO_GROUP
+ * @see SWT#EMBEDDED
+ * @see SWT#DOUBLE_BUFFERED
  * @see Widget#getStyle
  */
 public Composite (Composite parent, int style) {
@@ -92,23 +92,16 @@ public Composite (Composite parent, int style) {
 }
 
 Control [] _getChildren () {
-	short [] buffer = new short [1];
-	OS.CountSubControls (handle, buffer);
-	int count = buffer [0];
+	NSArray views = contentView().subviews();
+	int count = (int)/*64*/views.count();
 	Control [] children = new Control [count];
-	int i = 0, j = 0;
-	int child = OS.HIViewGetFirstSubview (handle);
-	while (i < count) {
-		if (child != 0) {
-			Widget widget = display.getWidget (child);
-			if (widget != null && widget != this) {
-				if (widget instanceof Control) {
-					children [j++] = (Control) widget;
-				}
-			}
+	if (count == 0) return children;
+	int j = 0;
+	for (int i=0; i<count; i++){
+		Widget widget = display.getWidget (views.objectAtIndex (count - i - 1).id);
+		if (widget != null && widget != this && widget instanceof Control) {
+			children [j++] = (Control) widget;
 		}
-		child = OS.HIViewGetNextView (child);
-		i++;
 	}
 	if (j == count) return children;
 	Control [] newChildren = new Control [j];
@@ -134,9 +127,40 @@ Control [] _getTabList () {
 	return tabList;
 }
 
-int callFocusEventHandler (int nextHandler, int theEvent) {
-	if ((state & CANVAS) != 0) return OS.noErr;
-	return super.callFocusEventHandler (nextHandler, theEvent);
+boolean acceptsFirstResponder (int /*long*/ id, int /*long*/ sel) {
+	if ((state & CANVAS) != 0) {
+		if ((style & SWT.NO_FOCUS) == 0 && hooksKeys ()) {
+			if (contentView().subviews().count() == 0) return true;
+		}
+		return false;
+	}
+	return super.acceptsFirstResponder (id, sel);
+}
+
+int /*long*/ accessibilityAttributeNames(int /*long*/ id, int /*long*/ sel) {
+	
+	if (id == view.id) {
+		if (accessible != null) {
+			// If there is an accessible, it may provide its own list of attributes if it's a lightweight control.
+			// If not, let Cocoa handle it for this view.
+			id returnObject = accessible.internal_accessibilityAttributeNames(ACC.CHILDID_SELF);
+			if (returnObject != null) return returnObject.id;
+		}
+	}
+	
+	return super.accessibilityAttributeNames(id, sel);
+}
+
+boolean accessibilityIsIgnored(int /*long*/ id, int /*long*/ sel) {
+	// If we have an accessible and it represents a valid accessible role, this view is not ignored.
+	if (view != null && id == view.id) {
+		if (accessible != null) {
+			id role = accessible.internal_accessibilityAttributeValue(OS.NSAccessibilityRoleAttribute, ACC.CHILDID_SELF);
+			if (role != null) return false; 
+		}
+	}
+
+	return super.accessibilityIsIgnored(id, sel);	
 }
 
 /**
@@ -212,15 +236,15 @@ protected void checkSubclass () {
 	/* Do nothing - Subclassing is allowed */
 }
 
-Control [] computeTabList () {
-	Control result [] = super.computeTabList ();
+Widget [] computeTabList () {
+	Widget result [] = super.computeTabList ();
 	if (result.length == 0) return result;
 	Control [] list = tabList != null ? _getTabList () : _getChildren ();
 	for (int i=0; i<list.length; i++) {
 		Control child = list [i];
-		Control [] childList = child.computeTabList ();
+		Widget [] childList = child.computeTabList ();
 		if (childList.length != 0) {
-			Control [] newResult = new Control [result.length + childList.length];
+			Widget [] newResult = new Widget [result.length + childList.length];
 			System.arraycopy (result, 0, newResult, 0, result.length);
 			System.arraycopy (childList, 0, newResult, result.length, childList.length);
 			result = newResult;
@@ -230,74 +254,37 @@ Control [] computeTabList () {
 }
 
 void createHandle () {
-	state |= CANVAS | GRAB;
-	boolean scrolled = (style & (SWT.H_SCROLL | SWT.V_SCROLL)) != 0;
+	state |= CANVAS;
+	boolean scrolled = (style & (SWT.V_SCROLL | SWT.H_SCROLL)) != 0;
 	if (!scrolled)  state |= THEME_BACKGROUND;
-	if (scrolled || (style & SWT.BORDER) != 0) {
-		createScrolledHandle (parent.handle);
-	} else {
-		createHandle (parent.handle);
+	NSRect rect = new NSRect();
+	if (scrolled || hasBorder ()) {
+		NSScrollView scrollWidget = (NSScrollView)new SWTScrollView().alloc();
+		scrollWidget.initWithFrame (rect);
+		scrollWidget.setDrawsBackground(false);
+		if ((style & SWT.H_SCROLL) != 0) scrollWidget.setHasHorizontalScroller(true);
+		if ((style & SWT.V_SCROLL) != 0) scrollWidget.setHasVerticalScroller(true);
+		scrollWidget.setBorderType(hasBorder() ? OS.NSBezelBorder : OS.NSNoBorder);
+		scrollView = scrollWidget;
+	}
+	NSView widget = (NSView)new SWTCanvasView().alloc();
+	widget.initWithFrame (rect);
+//	widget.setFocusRingType(OS.NSFocusRingTypeExterior);
+	view = widget;
+	if (scrollView != null) {
+		NSClipView contentView = scrollView.contentView();
+		contentView.setAutoresizesSubviews(true);
+		view.setAutoresizingMask(OS.NSViewWidthSizable | OS.NSViewHeightSizable);
 	}
 }
 
-void createHandle (int parentHandle) {
-	int features = OS.kControlSupportsEmbedding | OS.kControlSupportsFocus;
-	int [] outControl = new int [1];
-	int window = OS.GetControlOwner (parentHandle);
-	OS.CreateUserPaneControl (window, null, features, outControl);
-	if (outControl [0] == 0) error (SWT.ERROR_NO_HANDLES);
-	handle = outControl [0];
-	OS.HIObjectSetAccessibilityIgnored (handle, true);
-}
-
-void createScrolledHandle (int parentHandle) {
-	int features = OS.kControlSupportsEmbedding;
-	int [] outControl = new int [1];
-	int window = OS.GetControlOwner (parentHandle);
-	OS.CreateUserPaneControl (window, null, features, outControl);
-	if (outControl [0] == 0) error (SWT.ERROR_NO_HANDLES);
-	scrolledHandle = outControl [0];
-	outControl [0] = 0;
-	features |= OS.kControlSupportsFocus;
-	OS.CreateUserPaneControl (window, null, features, outControl);
-	if (outControl [0] == 0) error (SWT.ERROR_NO_HANDLES);
-	handle = outControl [0];
-	OS.HIObjectSetAccessibilityIgnored (scrolledHandle, true);
-	OS.HIObjectSetAccessibilityIgnored (handle, true);
-}
-
-void drawBackground (int control, int context) {
-	if (control == scrolledHandle) {
-		Composite parent = this;
-		Shell shell = getShell ();
-		if (shell != this) parent = this.parent;
-		boolean drawBackground = (style & SWT.TRANSPARENT) == 0;
-		if ((style & SWT.NO_FOCUS) == 0 && hooksKeys ()) {
-			parent.drawFocus (control, context, hasFocus () && drawFocusRing (), hasBorder (), drawBackground, inset ());
-		} else {
-			if (hasBorder ()) {
-				parent.drawFocus (control, context, false, hasBorder (), drawBackground, inset ());
-			} else {
-				parent.fillBackground (control, context, null);
-			}
-		}
-	} else {
-		if ((state & CANVAS) != 0) {
-			if ((style & (SWT.NO_BACKGROUND | SWT.TRANSPARENT)) == 0) {
-				fillBackground (control, context, null);
-			}	
-		}
-	}
-}
-
-void enableWidget (boolean enabled) {
-	//NOT DONE - take into account current scroll bar state
+void drawBackground (int /*long*/ id, NSGraphicsContext context, NSRect rect) {
+	if (id != view.id) return;
 	if ((state & CANVAS) != 0) {
-		if (horizontalBar != null) horizontalBar.enableWidget (enabled);
-		if (verticalBar != null) verticalBar.enableWidget (enabled);
-		return;
+		if ((style & SWT.NO_BACKGROUND) == 0) {
+			fillBackground (view, context, rect, -1);
+		}
 	}
-	super.enableWidget (enabled);
 }
 
 Composite findDeferredControl () {
@@ -399,16 +386,6 @@ public Control [] getChildren () {
 	return _getChildren ();
 }
 
-int getChildrenCount () {
-	/*
-	* NOTE:  The current implementation will count
-	* non-registered children.
-	*/
-	short [] count = new short [1];
-	OS.CountSubControls (handle, count);
-	return count [0];
-}
-
 /**
  * Returns layout which is associated with the receiver, or
  * null if one has not been set.
@@ -478,141 +455,16 @@ public Control [] getTabList () {
 	return tabList;
 }
 
-int getVisibleRegion (int control, boolean clipChildren) {
-	if (!clipChildren && control == handle) {
-		if (siblingsVisibleRgn == 0) {
-			siblingsVisibleRgn = OS.NewRgn ();
-			calculateVisibleRegion (control, siblingsVisibleRgn, clipChildren);
-		}
-		int result = OS.NewRgn ();
-		OS.CopyRgn (siblingsVisibleRgn, result);
-		return result;
-	}
-	if (control == scrolledHandle) {
-		if (!clipChildren) return super.getVisibleRegion (control, clipChildren);
-		if (scrolledVisibleRgn == 0) {
-			scrolledVisibleRgn = OS.NewRgn ();
-			calculateVisibleRegion (control, scrolledVisibleRgn, clipChildren);
-		}
-		int result = OS.NewRgn ();
-		OS.CopyRgn (scrolledVisibleRgn, result);
-		return result;
-	}
-	return super.getVisibleRegion (control, clipChildren);
-}
-
-int kEventControlClick (int nextHandler, int theEvent, int userData) {
-	int result = super.kEventControlClick (nextHandler, theEvent, userData);
-	if (result == OS.noErr) return result;
-	if ((state & CANVAS) != 0) {
-		if (!isEnabled ()) return result;
-		if ((style & SWT.NO_FOCUS) == 0 && hooksKeys ()) {
-			int [] theControl = new int [1];
-			int window = OS.GetControlOwner (handle);
-			OS.GetKeyboardFocus (window, theControl);
-			if (handle != theControl [0]) {
-				short [] count = new short [1];
-				OS.CountSubControls (handle, count);
-				if (count [0] == 0) {
-					if (OS.SetKeyboardFocus (window, handle, (short) focusPart ()) == OS.noErr) {
-						return OS.noErr;
-					}
-				}
-			}
-		}
-	}
-	return result;
-}
-
-int kEventControlGetFocusPart (int nextHandler, int theEvent, int userData) {
-	if ((state & CANVAS) != 0) return OS.noErr;
-	return super.kEventControlGetFocusPart (nextHandler, theEvent, userData);
-}
-
-int kEventControlSetFocusPart (int nextHandler, int theEvent, int userData) {
-	int result = super.kEventControlSetFocusPart (nextHandler, theEvent, userData);
-	if (result == OS.noErr) {
-		if ((state & CANVAS) != 0) {
-			if (scrolledHandle != 0) {
-				if ((style & SWT.NO_FOCUS) == 0 && hooksKeys ()) {
-					short [] part = new short [1];
-					OS.GetEventParameter (theEvent, OS.kEventParamControlPart, OS.typeControlPartCode, null, 2, null, part);
-					redrawWidget (scrolledHandle, false);
-				}
-			}
-		}
-	}
-	return result;
-}
-
-int kEventMouseDown (int nextHandler, int theEvent, int userData) {
-	int result = super.kEventMouseDown (nextHandler, theEvent, userData);
-	if (result == OS.noErr) return result;
-	if ((state & CANVAS) != 0) {
-		if ((style & SWT.NO_FOCUS) != 0) {
-			Shell shell = getShell ();
-			int bits = SWT.ON_TOP | SWT.NO_FOCUS;
-			if ((shell.style & bits) == bits) return OS.noErr;
-		}
-	}
-	return result;
-}
-
-int kEventRawKeyPressed (int nextHandler, int theEvent, int userData) {
-	/*
-	* Feature in the Macintosh.  For some reason, the default handler
-	* does not issue kEventTextInputUnicodeForKeyEvent when the user
-	* types Command+Space.  The fix is to look for this case and
-	* send the key from kEventRawKeyDown instead.
-	* 
-	* NOTE: This code relies on Command+Space being consumed and
-	* will deliver two events if this ever changes.
-	*/	
-	if ((state & CANVAS) != 0) {
-		int [] keyCode = new int [1];
-		OS.GetEventParameter (theEvent, OS.kEventParamKeyCode, OS.typeUInt32, null, keyCode.length * 4, null, keyCode);
-		if (keyCode [0] == 49 /* Space */) {
-			int [] modifiers = new int [1];
-			OS.GetEventParameter (theEvent, OS.kEventParamKeyModifiers, OS.typeUInt32, null, 4, null, modifiers);
-			if (modifiers [0] == OS.cmdKey) {
-				if (!sendKeyEvent (SWT.KeyDown, theEvent)) return OS.noErr;
-			}
-		}
-	}
-	return OS.eventNotHandledErr;
-}
-
-int kEventUnicodeKeyPressed (int nextHandler, int theEvent, int userData) {
-	int result = super.kEventUnicodeKeyPressed (nextHandler, theEvent, userData);
-	if ((state & CANVAS) != 0) {
-		int [] keyboardEvent = new int [1];
-		OS.GetEventParameter (theEvent, OS.kEventParamTextInputSendKeyboardEvent, OS.typeEventRef, null, keyboardEvent.length * 4, null, keyboardEvent);
-		int [] keyCode = new int [1];
-		OS.GetEventParameter (keyboardEvent [0], OS.kEventParamKeyCode, OS.typeUInt32, null, keyCode.length * 4, null, keyCode);
-		switch (keyCode [0]) {
-			case 76: /* KP Enter */
-			case 36: /* Return */
-				/*
-				* Feature in the Macintosh.  The default behaviour when the return key is pressed is
-				* to select the default button.  This is not the expected behaviour for Composite and
-				* its subclasses.  The fix is to avoid calling the default handler.
-				*/
-				return OS.noErr;
-		}
-	}
-	return result;
-}
-
 boolean hooksKeys () {
 	return hooks (SWT.KeyDown) || hooks (SWT.KeyUp);
 }
 
-void invalidateChildrenVisibleRegion (int control) {
+void invalidateChildrenVisibleRegion () {
 	Control [] children = _getChildren ();
 	for (int i=0; i<children.length; i++) {
 		Control child = children [i];
-		child.resetVisibleRegion (control);
-		child.invalidateChildrenVisibleRegion (control);
+		child.resetVisibleRegion ();
+		child.invalidateChildrenVisibleRegion ();
 	}
 }
 
@@ -639,9 +491,42 @@ public boolean isLayoutDeferred () {
 	return findDeferredControl () != null;
 }
 
+boolean isOpaque (int /*long*/ id, int /*long*/ sel) {
+	if ((state & CANVAS) != 0) {
+		if (id == view.id) {
+			if (region == null && background != null && background[3] == 1) {
+				return true;
+			}
+		}
+	}
+	return super.isOpaque (id, sel);
+}
+
 boolean isTabGroup () {
 	if ((state & CANVAS) != 0) return true;
 	return super.isTabGroup ();
+}
+
+void keyDown (int /*long*/ id, int /*long*/ sel, int /*long*/ theEvent) {
+	if (view.window ().firstResponder ().id == id) {
+		if ((state & CANVAS) != 0) {
+			Shell s = this.getShell();
+			NSArray array = NSArray.arrayWithObject (new NSEvent (theEvent));
+			s.keyInputHappened = false;
+			view.interpretKeyEvents (array);
+			if (imeInComposition ()) return;
+			if (!s.keyInputHappened) {
+				NSEvent nsEvent = new NSEvent (theEvent);
+				boolean [] consume = new boolean [1];
+				if (translateTraversal (nsEvent.keyCode (), nsEvent, consume)) return;
+				if (isDisposed ()) return;
+				if (!sendKeyEvent (nsEvent, SWT.KeyDown)) return;
+				if (consume [0]) return;
+			}
+			return;
+		}
+	}
+	super.keyDown (id, sel, theEvent);
 }
 
 /**
@@ -841,6 +726,26 @@ Point minimumSize (int wHint, int Hint, boolean changed) {
 	return new Point (width, height);
 }
 
+boolean mouseEvent (int /*long*/ id, int /*long*/ sel, int /*long*/ theEvent, int type) {
+	boolean result = super.mouseEvent (id, sel, theEvent, type);
+	return (state & CANVAS) == 0 ? result : new NSEvent (theEvent).type () != OS.NSLeftMouseDown;
+}
+
+void pageDown(int /*long*/ id, int /*long*/ sel, int /*long*/ sender) {
+	if ((state & CANVAS) != 0) return;
+	super.pageDown(id, sel, sender);
+}
+
+void pageUp(int /*long*/ id, int /*long*/ sel, int /*long*/ sender) {
+	if ((state & CANVAS) != 0) return;
+	super.pageUp(id, sel, sender);
+}
+
+void reflectScrolledClipView (int /*long*/ id, int /*long*/ sel, int /*long*/ aClipView) {
+	if ((state & CANVAS) != 0) return;
+	super.reflectScrolledClipView (id, sel, aClipView);
+}
+
 void releaseChildren (boolean destroy) {
 	Control [] children = _getChildren ();
 	for (int i=0; i<children.length; i++) {
@@ -854,9 +759,6 @@ void releaseChildren (boolean destroy) {
 
 void releaseWidget () {
 	super.releaseWidget ();
-	if (scrolledVisibleRgn != 0) OS.DisposeRgn (scrolledVisibleRgn);
-	if (siblingsVisibleRgn != 0) OS.DisposeRgn (siblingsVisibleRgn);
-	siblingsVisibleRgn = scrolledVisibleRgn = 0;
 	layout = null;
 	tabList = null;
 }
@@ -865,16 +767,56 @@ void removeControl (Control control) {
 	fixTabList (control);
 }
 
-void resetVisibleRegion (int control) {
-	if (scrolledVisibleRgn != 0) {
-		OS.DisposeRgn (scrolledVisibleRgn);
-		scrolledVisibleRgn = 0;
+void resized () {
+	super.resized ();
+	if (layout != null) {
+		markLayout (false, false);
+		updateLayout (false);
 	}
-	if (siblingsVisibleRgn != 0) {
-		OS.DisposeRgn (siblingsVisibleRgn);
-		siblingsVisibleRgn = 0;
+}
+
+void scrollWheel (int /*long*/ id, int /*long*/ sel, int /*long*/ theEvent) {
+	if ((state & CANVAS) != 0) {
+		NSView view = scrollView != null ? scrollView : this.view;
+		if (id == view.id) {
+			NSEvent nsEvent = new NSEvent(theEvent);
+			float /*double*/ delta = nsEvent.deltaY();
+			if (delta != 0) {
+				if (hooks (SWT.MouseWheel) || filters (SWT.MouseWheel)) {
+					if (!sendMouseEvent(nsEvent, SWT.MouseWheel, true)) {
+						return;
+					}
+				}
+			}
+			boolean handled = false;
+			ScrollBar bar = verticalBar;
+			if (delta != 0 && bar != null && bar.getEnabled ()) {
+				if (-1 < delta && delta < 0) delta = -1;
+				if (0 < delta && delta < 1) delta = 1;
+				int selection = Math.max (0, (int)(0.5f + bar.getSelection () - bar.getIncrement () * delta));
+				bar.setSelection (selection);
+				Event event = new Event ();
+			    event.detail = delta > 0 ? SWT.PAGE_UP : SWT.PAGE_DOWN;	
+				bar.sendEvent (SWT.Selection, event);
+				handled = true;
+			}
+			bar = horizontalBar;
+			delta = nsEvent.deltaX ();
+			if (delta != 0 && bar != null && bar.getEnabled ()) {
+				int selection = Math.max (0, (int)(0.5f + bar.getSelection () - bar.getIncrement () * delta));
+				bar.setSelection (selection);
+				Event event = new Event ();
+			    event.detail = delta > 0 ? SWT.PAGE_UP : SWT.PAGE_DOWN;	
+				bar.sendEvent (SWT.Selection, event);
+				handled = true;
+			}
+			if (!handled) view.superview().scrollWheel(nsEvent);
+			return;
+		}
+		callSuper(id, sel, theEvent);
+		return;
 	}
-	super.resetVisibleRegion (control);
+	super.scrollWheel (id, sel, theEvent);
 }
 
 /**
@@ -901,15 +843,6 @@ public void setBackgroundMode (int mode) {
 	for (int i = 0; i < children.length; i++) {
 		children [i].updateBackgroundMode ();
 	}
-}
-
-int setBounds (int x, int y, int width, int height, boolean move, boolean resize, boolean events) {
-	int result = super.setBounds (x, y, width, height, move, resize, events);
-	if (layout != null && (result & RESIZED) != 0) {
-		markLayout (false, false);
-		updateLayout (false);
-	}
-	return result;
 }
 
 public boolean setFocus () {
@@ -1024,7 +957,7 @@ public void setTabList (Control [] tabList) {
 	this.tabList = tabList;
 }
 
-int traversalCode (int key, int theEvent) {
+int traversalCode (int key, NSEvent theEvent) {
 	if ((state & CANVAS) != 0) {
 		if ((style & SWT.NO_FOCUS) != 0) return 0;
 		if (hooksKeys ()) return 0;
@@ -1037,6 +970,15 @@ void updateBackgroundMode () {
 	Control [] children = _getChildren ();
 	for (int i = 0; i < children.length; i++) {
 		children [i].updateBackgroundMode ();
+	}
+}
+
+void updateCursorRects (boolean enabled) {
+	super.updateCursorRects (enabled);
+	Control [] children = _getChildren ();
+	for (int i = 0; i < children.length; i++) {
+		Control control = children [i];
+		control.updateCursorRects (enabled && control.isEnabled ());
 	}
 }
 

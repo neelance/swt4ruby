@@ -1,6 +1,6 @@
 require "rjava"
 
-# Copyright (c) 2000, 2008 IBM Corporation and others.
+# Copyright (c) 2000, 2009 IBM Corporation and others.
 # All rights reserved. This program and the accompanying materials
 # are made available under the terms of the Eclipse Public License v1.0
 # which accompanies this distribution, and is available at
@@ -32,6 +32,7 @@ module Org::Eclipse::Swt::Printing
   # @see <a href="http://www.eclipse.org/swt/snippets/#printing">Printing snippets</a>
   # @see <a href="http://www.eclipse.org/swt/examples.php">SWT Example: ControlExample, Dialog tab</a>
   # @see <a href="http://www.eclipse.org/swt/">Sample code and further information</a>
+  # @noextend This class is not intended to be subclassed by clients.
   class PrintDialog < PrintDialogImports.const_get :Dialog
     include_class_members PrintDialogImports
     
@@ -40,30 +41,6 @@ module Org::Eclipse::Swt::Printing
     undef_method :printer_data
     alias_method :attr_printer_data=, :printer_data=
     undef_method :printer_data=
-    
-    attr_accessor :scope
-    alias_method :attr_scope, :scope
-    undef_method :scope
-    alias_method :attr_scope=, :scope=
-    undef_method :scope=
-    
-    attr_accessor :start_page
-    alias_method :attr_start_page, :start_page
-    undef_method :start_page
-    alias_method :attr_start_page=, :start_page=
-    undef_method :start_page=
-    
-    attr_accessor :end_page
-    alias_method :attr_end_page, :end_page
-    undef_method :end_page
-    alias_method :attr_end_page=, :end_page=
-    undef_method :end_page=
-    
-    attr_accessor :print_to_file
-    alias_method :attr_print_to_file, :print_to_file
-    undef_method :print_to_file
-    alias_method :attr_print_to_file=, :print_to_file=
-    undef_method :print_to_file=
     
     # int
     attr_accessor :handle
@@ -150,26 +127,23 @@ module Org::Eclipse::Swt::Printing
     # @see Widget#getStyle
     def initialize(parent, style)
       @printer_data = nil
-      @scope = 0
-      @start_page = 0
-      @end_page = 0
-      @print_to_file = false
       @handle = 0
       @index = 0
       @settings_data = nil
-      super(parent, (parent).nil? ? style : check_style_bit(parent, style))
-      @scope = PrinterData::ALL_PAGES
-      @start_page = 1
-      @end_page = 1
-      @print_to_file = false
+      super(parent, check_style_bit(parent, style))
+      @printer_data = PrinterData.new
       check_subclass
     end
     
     typesig { [PrinterData] }
     # Sets the printer data that will be used when the dialog
     # is opened.
+    # <p>
+    # Setting the printer data to null is equivalent to
+    # resetting all data fields to their default values.
+    # </p>
     # 
-    # @param data the data that will be used when the dialog is opened
+    # @param data the data that will be used when the dialog is opened or null to use default data
     # 
     # @since 3.4
     def set_printer_data(data)
@@ -217,6 +191,16 @@ module Org::Eclipse::Swt::Printing
       
       typesig { [Shell, ::Java::Int] }
       def check_style_bit(parent, style)
+        mask = SWT::PRIMARY_MODAL | SWT::APPLICATION_MODAL | SWT::SYSTEM_MODAL
+        if (!((style & SWT::SHEET)).equal?(0))
+          style &= ~SWT::SHEET
+          if (((style & mask)).equal?(0))
+            style |= (parent).nil? ? SWT::APPLICATION_MODAL : SWT::PRIMARY_MODAL
+          end
+        end
+        if (((style & mask)).equal?(0))
+          style |= SWT::APPLICATION_MODAL
+        end
         style &= ~SWT::MIRRORED
         if (((style & (SWT::LEFT_TO_RIGHT | SWT::RIGHT_TO_LEFT))).equal?(0))
           if (!(parent).nil?)
@@ -251,7 +235,7 @@ module Org::Eclipse::Swt::Printing
     # 
     # @return the scope setting that the user selected
     def get_scope
-      return @scope
+      return @printer_data.attr_scope
     end
     
     typesig { [::Java::Int] }
@@ -269,7 +253,7 @@ module Org::Eclipse::Swt::Printing
     # 
     # @param scope the scope setting when the dialog is opened
     def set_scope(scope)
-      @scope = scope
+      @printer_data.attr_scope = scope
     end
     
     typesig { [] }
@@ -282,7 +266,7 @@ module Org::Eclipse::Swt::Printing
     # 
     # @return the start page setting that the user selected
     def get_start_page
-      return @start_page
+      return @printer_data.attr_start_page
     end
     
     typesig { [::Java::Int] }
@@ -295,7 +279,7 @@ module Org::Eclipse::Swt::Printing
     # 
     # @param startPage the startPage setting when the dialog is opened
     def set_start_page(start_page)
-      @start_page = start_page
+      @printer_data.attr_start_page = start_page
     end
     
     typesig { [] }
@@ -308,7 +292,7 @@ module Org::Eclipse::Swt::Printing
     # 
     # @return the end page setting that the user selected
     def get_end_page
-      return @end_page
+      return @printer_data.attr_end_page
     end
     
     typesig { [::Java::Int] }
@@ -321,7 +305,7 @@ module Org::Eclipse::Swt::Printing
     # 
     # @param endPage the end page setting when the dialog is opened
     def set_end_page(end_page)
-      @end_page = end_page
+      @printer_data.attr_end_page = end_page
     end
     
     typesig { [] }
@@ -330,7 +314,7 @@ module Org::Eclipse::Swt::Printing
     # 
     # @return the 'Print to file' setting that the user selected
     def get_print_to_file
-      return @print_to_file
+      return @printer_data.attr_print_to_file
     end
     
     typesig { [::Java::Boolean] }
@@ -339,14 +323,15 @@ module Org::Eclipse::Swt::Printing
     # 
     # @param printToFile the 'Print to file' setting when the dialog is opened
     def set_print_to_file(print_to_file)
-      @print_to_file = print_to_file
+      @printer_data.attr_print_to_file = print_to_file
     end
     
     typesig { [] }
     # Makes the receiver visible and brings it to the front
     # of the display.
     # 
-    # @return a printer data object describing the desired print job parameters
+    # @return a printer data object describing the desired print job parameters,
+    # or null if the dialog was canceled, no printers were found, or an error occurred
     # 
     # @exception SWTException <ul>
     # <li>ERROR_WIDGET_DISPOSED - if the receiver has been disposed</li>
@@ -371,34 +356,51 @@ module Org::Eclipse::Swt::Printing
         settings = OS.gtk_print_settings_new
         # int
         page_setup = OS.gtk_page_setup_new
-        if (!(@printer_data).nil?)
-          if (!(@printer_data.attr_other_data).nil?)
-            Printer.restore(@printer_data.attr_other_data, settings, page_setup)
-          end
-          # Set values of settings from PrinterData.
-          Printer.set_scope(settings, @printer_data.attr_scope, @printer_data.attr_start_page, @printer_data.attr_end_page)
+        if (!(@printer_data.attr_other_data).nil?)
+          Printer.restore(@printer_data.attr_other_data, settings, page_setup)
+        end
+        # Set values of print_settings and page_setup from PrinterData.
+        case (@printer_data.attr_scope)
+        when PrinterData::ALL_PAGES
+          OS.gtk_print_settings_set_print_pages(settings, OS::GTK_PRINT_PAGES_ALL)
+        when PrinterData::PAGE_RANGE
+          OS.gtk_print_settings_set_print_pages(settings, OS::GTK_PRINT_PAGES_RANGES)
+          page_range = Array.typed(::Java::Int).new(2) { 0 }
+          page_range[0] = @printer_data.attr_start_page - 1
+          page_range[1] = @printer_data.attr_end_page - 1
+          OS.gtk_print_settings_set_page_ranges(settings, page_range, 1)
+        when PrinterData::SELECTION
+          # TODO: Not correctly implemented. May need new API. For now, set to ALL. (see gtk bug 344519)
+          OS.gtk_print_settings_set_print_pages(settings, OS::GTK_PRINT_PAGES_ALL)
+        end
+        if (!(@printer_data.attr_file_name).nil?)
           # TODO: Should we look at printToFile, or driver/name for "Print to File", or both? (see gtk bug 345590)
           if (@printer_data.attr_print_to_file)
             buffer = Converter.wcs_to_mbcs(nil, @printer_data.attr_file_name, true)
             OS.gtk_print_settings_set(settings, OS::GTK_PRINT_SETTINGS_OUTPUT_URI, buffer)
           end
-          if ((@printer_data.attr_driver == "GtkPrintBackendFile") && (@printer_data.attr_name == "Print to File"))
-            # $NON-NLS-1$ //$NON-NLS-2$
-            buffer = Converter.wcs_to_mbcs(nil, @printer_data.attr_file_name, true)
-            OS.gtk_print_settings_set(settings, OS::GTK_PRINT_SETTINGS_OUTPUT_URI, buffer)
+          if (!(@printer_data.attr_driver).nil? && !(@printer_data.attr_name).nil?)
+            if ((@printer_data.attr_driver == "GtkPrintBackendFile") && (@printer_data.attr_name == "Print to File"))
+              # $NON-NLS-1$ //$NON-NLS-2$
+              buffer = Converter.wcs_to_mbcs(nil, @printer_data.attr_file_name, true)
+              OS.gtk_print_settings_set(settings, OS::GTK_PRINT_SETTINGS_OUTPUT_URI, buffer)
+            end
           end
-          OS.gtk_print_settings_set_n_copies(settings, @printer_data.attr_copy_count)
-          OS.gtk_print_settings_set_collate(settings, @printer_data.attr_collate)
         end
-        Printer.set_scope(settings, @scope, @start_page, @end_page)
-        if (@print_to_file)
+        if (@printer_data.attr_print_to_file)
           buffer = Converter.wcs_to_mbcs(nil, "Print to File", true) # $NON-NLS-1$
           OS.gtk_print_settings_set_printer(settings, buffer)
         end
+        OS.gtk_print_settings_set_n_copies(settings, @printer_data.attr_copy_count)
+        OS.gtk_print_settings_set_collate(settings, @printer_data.attr_collate)
+        orientation = (@printer_data.attr_orientation).equal?(PrinterData::LANDSCAPE) ? OS::GTK_PAGE_ORIENTATION_LANDSCAPE : OS::GTK_PAGE_ORIENTATION_PORTRAIT
+        OS.gtk_print_settings_set_orientation(settings, orientation)
+        OS.gtk_page_setup_set_orientation(page_setup, orientation)
         OS.gtk_print_unix_dialog_set_settings(@handle, settings)
         OS.gtk_print_unix_dialog_set_page_setup(@handle, page_setup)
         OS.g_object_unref(settings)
         OS.g_object_unref(page_setup)
+        OS.gtk_window_set_modal(@handle, true)
         data = nil
         # TODO: Handle 'Print Preview' (GTK_RESPONSE_APPLY).
         display = !(get_parent).nil? ? get_parent.get_display : Display.get_current
@@ -433,9 +435,9 @@ module Org::Eclipse::Swt::Printing
             print_pages = OS.gtk_print_settings_get_print_pages(settings)
             case (print_pages)
             when OS::GTK_PRINT_PAGES_ALL
-              @scope = PrinterData::ALL_PAGES
+              data.attr_scope = PrinterData::ALL_PAGES
             when OS::GTK_PRINT_PAGES_RANGES
-              @scope = PrinterData::PAGE_RANGE
+              data.attr_scope = PrinterData::PAGE_RANGE
               num_ranges = Array.typed(::Java::Int).new(1) { 0 }
               # int
               page_ranges = OS.gtk_print_settings_get_page_ranges(settings, num_ranges)
@@ -451,15 +453,15 @@ module Org::Eclipse::Swt::Printing
                 i += 1
               end
               OS.g_free(page_ranges)
-              @start_page = (min).equal?(JavaInteger::MAX_VALUE) ? 1 : min
-              @end_page = (max).equal?(0) ? 1 : max
+              data.attr_start_page = (min).equal?(JavaInteger::MAX_VALUE) ? 1 : min
+              data.attr_end_page = (max).equal?(0) ? 1 : max
             when OS::GTK_PRINT_PAGES_CURRENT
               # TODO: Disabled in dialog (see above). This code will not run. (see gtk bug 344519)
-              @scope = PrinterData::SELECTION
-              @start_page = @end_page = OS.gtk_print_unix_dialog_get_current_page(@handle)
+              data.attr_scope = PrinterData::SELECTION
+              data.attr_start_page = data.attr_end_page = OS.gtk_print_unix_dialog_get_current_page(@handle)
             end
-            @print_to_file = (data.attr_name == "Print to File") # $NON-NLS-1$
-            if (@print_to_file)
+            data.attr_print_to_file = (data.attr_name == "Print to File") # $NON-NLS-1$
+            if (data.attr_print_to_file)
               # int
               address = OS.gtk_print_settings_get(settings, OS::GTK_PRINT_SETTINGS_OUTPUT_URI)
               length = OS.strlen(address)
@@ -467,12 +469,9 @@ module Org::Eclipse::Swt::Printing
               OS.memmove(buffer, address, length)
               data.attr_file_name = String.new(Converter.mbcs_to_wcs(nil, buffer))
             end
-            data.attr_scope = @scope
-            data.attr_start_page = @start_page
-            data.attr_end_page = @end_page
-            data.attr_print_to_file = @print_to_file
             data.attr_copy_count = OS.gtk_print_settings_get_n_copies(settings)
             data.attr_collate = OS.gtk_print_settings_get_collate(settings)
+            data.attr_orientation = (OS.gtk_page_setup_get_orientation(page_setup)).equal?(OS::GTK_PAGE_ORIENTATION_LANDSCAPE) ? PrinterData::LANDSCAPE : PrinterData::PORTRAIT
             # Save other print_settings data as key/value pairs in otherData.
             print_settings_callback = Callback.new(self, "GtkPrintSettingsFunc", 3) # $NON-NLS-1$
             # int
@@ -502,6 +501,7 @@ module Org::Eclipse::Swt::Printing
             store("paper_size_is_custom", OS.gtk_paper_size_is_custom(paper_size)) # $NON-NLS-1$
             data.attr_other_data = @settings_data
             OS.g_object_unref(settings)
+            @printer_data = data
           end
         end
         display.set_data(REMOVE_IDLE_PROC_KEY, nil)

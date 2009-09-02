@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2008 IBM Corporation and others.
+ * Copyright (c) 2000, 2009 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -11,9 +11,7 @@
 package org.eclipse.swt.widgets;
 
 
-import org.eclipse.swt.internal.carbon.DataBrowserCallbacks;
-import org.eclipse.swt.internal.carbon.OS;
-import org.eclipse.swt.internal.carbon.Rect;
+import org.eclipse.swt.internal.cocoa.*;
 
 import org.eclipse.swt.*;
 import org.eclipse.swt.graphics.*;
@@ -34,21 +32,33 @@ import org.eclipse.swt.graphics.*;
  *
  * @see <a href="http://www.eclipse.org/swt/snippets/#tree">Tree, TreeItem, TreeColumn snippets</a>
  * @see <a href="http://www.eclipse.org/swt/">Sample code and further information</a>
+ * @noextend This class is not intended to be subclassed by clients.
  */
 public class TreeItem extends Item {
 	Tree parent;
 	TreeItem parentItem;
+	TreeItem[] items;
+	int itemCount;
 	String [] strings;
 	Image [] images;
-	boolean checked, grayed, cached;
+	boolean checked, grayed, cached, expanded;
 	Color foreground, background;
-	Color[] cellForeground, cellBackground;
+	Color [] cellForeground, cellBackground;
 	Font font;
-	Font[] cellFont;
-	int id, width = -1;
-	int itemCount = 0;
-	int [] childIds;
-	
+	Font [] cellFont;
+	int width = -1;
+	/**
+	 * the handle to the OS resource 
+	 * (Warning: This field is platform dependent)
+	 * <p>
+	 * <b>IMPORTANT:</b> This field is <em>not</em> part of the SWT
+	 * public API. It is marked public only so that it can be shared
+	 * within the packages provided by SWT. It is not available on all
+	 * platforms and should never be accessed from application code.
+	 * </p>
+	 */
+	public SWTTreeItem handle;
+
 /**
  * Constructs a new instance of this class given its parent
  * (which must be a <code>Tree</code> or a <code>TreeItem</code>)
@@ -193,13 +203,14 @@ TreeItem (Tree parent, TreeItem parentItem, int style, int index, boolean create
 	super (parent, style);
 	this.parent = parent;
 	this.parentItem = parentItem;
-	if (create) parent.createItem (this, parentItem, index);
-}
-
-boolean _getExpanded () {
-	int [] state = new int [1];
-	OS.GetDataBrowserItemState (parent.handle, id, state);
-	return (state [0] & OS.kDataBrowserContainerIsOpen) != 0;
+	if (create) {
+		parent.createItem (this, parentItem, index);
+	} else {
+		handle = (SWTTreeItem) new SWTTreeItem ().alloc ().init ();
+		createJNIRef ();
+		register ();
+		items = new TreeItem[4];
+	}
 }
 
 static TreeItem checkNull (TreeItem item) {
@@ -219,33 +230,60 @@ static int checkIndex (int index) {
 
 int calculateWidth (int index, GC gc) {
 	if (index == 0 && width != -1) return width;
-	int width = 0;
-	Image image = index == 0 ? this.image : (images == null ? null : images [index]);
-	String text = index == 0 ? this.text : (strings == null ? "" : strings [index]);
 	Font font = null;
 	if (cellFont != null) font = cellFont[index];
 	if (font == null) font = this.font;
-	if (font == null) font = parent.getFont();
-	gc.setFont (font);
-	if (image != null) width += image.getBounds ().width + parent.getGap ();
-	if (text != null && text.length () > 0) width += gc.stringExtent (text).x;
-	if (parent.hooks (SWT.MeasureItem)) {
+	if (font == null) font = parent.font;
+	if (font == null) font = parent.defaultFont();
+	String text = index == 0 ? this.text : (strings == null ? "" : strings [index]);
+	Image image = index == 0 ? this.image : (images == null ? null : images [index]);
+	NSCell cell = parent.dataCell;
+	if (font.extraTraits != 0) {
+		NSAttributedString attribStr = parent.createString(text, font, null, 0, true, false);
+		cell.setAttributedStringValue(attribStr);
+		attribStr.release();
+	} else {
+		cell.setFont (font.handle);
+		cell.setTitle (NSString.stringWith(text != null ? text : ""));
+	}
+
+	/* This code is inlined for performance */
+	objc_super super_struct = new objc_super();
+	super_struct.receiver = cell.id;
+	super_struct.super_class = OS.objc_msgSend(cell.id, OS.sel_superclass);
+	NSSize size = new NSSize();
+	OS.objc_msgSendSuper_stret(size, super_struct, OS.sel_cellSize);
+	if (image != null) size.width += parent.imageBounds.width + Table.IMAGE_GAP;
+//	cell.setImage (image != null ? image.handle : null);
+//	NSSize size = cell.cellSize ();
+
+	int width = (int)Math.ceil (size.width);
+	boolean sendMeasure = true;
+	if ((parent.style & SWT.VIRTUAL) != 0) {
+		sendMeasure = cached;
+	}
+	if (sendMeasure && parent.hooks (SWT.MeasureItem)) {
+		gc.setFont (font);
 		Event event = new Event ();
 		event.item = this;
 		event.index = index;
 		event.gc = gc;
-		short [] height = new short [1];
-		OS.GetDataBrowserTableViewRowHeight (parent.handle, height);
+		NSTableView widget = (NSTableView)parent.view;
+		int height = (int)widget.rowHeight ();
 		event.width = width;
-		event.height = height [0];
+		event.height = height;
 		parent.sendEvent (SWT.MeasureItem, event);
-		if (height [0] < event.height) {
-			OS.SetDataBrowserTableViewRowHeight (parent.handle, (short) event.height);
-			redrawWidget (parent.handle, false);
+		if (height < event.height) {
+			widget.setRowHeight (event.height);
+			widget.setNeedsDisplay (true);
 		}
 		width = event.width;
 	}
-	if (index == 0) this.width = width;
+	if (index == 0) {
+		NSOutlineView outlineView = (NSOutlineView)parent.view;
+		width += outlineView.indentationPerLevel () * (1 + outlineView.levelForItem (handle));
+		this.width = width;
+	}
 	return width;
 }
 
@@ -264,6 +302,7 @@ void clear () {
 	cellForeground = cellBackground = null;
 	font = null;
 	cellFont = null;
+	width = -1;
 }
 
 /**
@@ -291,8 +330,9 @@ void clear () {
  */
 public void clear (int index, boolean all) {
 	checkWidget ();
-	int count = parent.getItemCount (this);
-	if (index < 0 || index >= count) SWT.error (SWT.ERROR_INVALID_RANGE);
+	int count = getItemCount ();
+	if (index < 0 || index >= count) 
+		SWT.error (SWT.ERROR_INVALID_RANGE);
 	parent.clear (this, index, all);
 }
 
@@ -321,9 +361,29 @@ public void clearAll (boolean all) {
 	parent.clearAll (this, all);
 }
 
+void clearSelection () {
+	NSOutlineView widget = (NSOutlineView) parent.view;
+	int /*long*/ row = widget.rowForItem (handle);
+	if (widget.isRowSelected(row)) widget.deselectRow (row);
+	if (items != null && getExpanded ()) {
+		for (int i = 0; i < items.length; i++) {
+			TreeItem item = items [i];
+			if (item != null && !item.isDisposed ()) item.clearSelection ();
+		}
+	}
+}
+
+NSObject createString(int index) {
+	String text = index == 0 ? this.text : (strings == null ? "" : strings [index]);
+	return NSString.stringWith(text != null ? text : "");
+}
+
+void deregister () {
+	super.deregister ();
+	display.removeWidget (handle);
+}
+
 void destroyWidget () {
-	//TEMPORARY CODE
-//	parent.releaseItem (this, false);
 	parent.destroyItem (this);
 	releaseHandle ();
 }
@@ -343,7 +403,7 @@ void destroyWidget () {
  */
 public Color getBackground () {
 	checkWidget ();
-	if (!parent.checkData (this, true)) error (SWT.ERROR_WIDGET_DISPOSED);
+	if (!parent.checkData (this)) error (SWT.ERROR_WIDGET_DISPOSED);
 	return background != null ? background : parent.getBackground ();
 }
 
@@ -362,7 +422,7 @@ public Color getBackground () {
  */
 public Color getBackground (int index) {
 	checkWidget ();
-	if (!parent.checkData (this, true)) error (SWT.ERROR_WIDGET_DISPOSED);
+	if (!parent.checkData (this)) error (SWT.ERROR_WIDGET_DISPOSED);
 	int count = Math.max (1, parent.columnCount);
 	if (0 > index || index > count -1) return getBackground ();
 	if (cellBackground == null || cellBackground [index] == null) return getBackground ();
@@ -382,27 +442,11 @@ public Color getBackground (int index) {
  */
 public Rectangle getBounds () {
 	checkWidget ();
-	if (!parent.checkData (this, true)) error (SWT.ERROR_WIDGET_DISPOSED);
-	Rect rect = new Rect();
-	int columnId = parent.columnCount == 0 ? parent.column_id : parent.columns [0].id;
-	if (OS.GetDataBrowserItemPartBounds (parent.handle, id, columnId, OS.kDataBrowserPropertyContentPart, rect) != OS.noErr) {
-		return new Rectangle (0, 0, 0, 0);
-	}
-	int x = rect.left, y = rect.top;
-	int width = 0;
-	if (image != null) {
-		Rectangle bounds = image.getBounds ();
-		x += bounds.width + parent.getGap ();
-	}
-	GC gc = new GC (parent);
-	Point extent = gc.stringExtent (text);
-	gc.dispose ();
-	width += extent.x;
-	if (parent.columnCount > 0) {
-		width = Math.min (width, rect.right - x);
-	}
-	int height = rect.bottom - rect.top;
-	return new Rectangle (x, y, width, height);
+	if (!parent.checkData (this)) error (SWT.ERROR_WIDGET_DISPOSED);
+	parent.checkItems ();
+	NSOutlineView outlineView = (NSOutlineView) parent.view;
+	NSRect rect = outlineView.rectOfRow (outlineView.rowForItem (handle));
+	return new Rectangle((int) rect.x, (int) rect.y, (int) rect.width, (int) rect.height);
 }
 
 /**
@@ -421,36 +465,19 @@ public Rectangle getBounds () {
  */
 public Rectangle getBounds (int index) {
 	checkWidget ();
-	if (!parent.checkData (this, true)) error (SWT.ERROR_WIDGET_DISPOSED);
-	if (index != 0 && !(0 <= index && index < parent.columnCount)) return new Rectangle (0, 0, 0, 0);
-	Rect rect = new Rect();
-	int columnId = parent.columnCount == 0 ? parent.column_id : parent.columns [index].id;
-	if (OS.GetDataBrowserItemPartBounds (parent.handle, id, columnId, OS.kDataBrowserPropertyEnclosingPart, rect) != OS.noErr) {
-		return new Rectangle (0, 0, 0, 0);
-	}
-	int[] disclosure = new int [1];
-	OS.GetDataBrowserListViewDisclosureColumn (parent.handle, disclosure, new boolean [1]);
-	int x, y, width, height;
-	if (OS.VERSION >= 0x1040 && disclosure [0] != columnId) {
-		if (parent.getLinesVisible ()) {
-			rect.left += Tree.GRID_WIDTH;
-			rect.top += Tree.GRID_WIDTH;
-		}
-		x = rect.left;
-		y = rect.top;
-		width = rect.right - rect.left;
-		height = rect.bottom - rect.top;
+	if (!parent.checkData (this)) error (SWT.ERROR_WIDGET_DISPOSED);
+	if (!(0 <= index && index < Math.max (1, parent.columnCount))) return new Rectangle (0, 0, 0, 0);
+
+	parent.checkItems ();
+	NSOutlineView outlineView = (NSOutlineView) parent.view;
+	if (parent.columnCount == 0) {
+		index = (parent.style & SWT.CHECK) != 0 ? 1 : 0;
 	} else {
-		Rect rect2 = new Rect();
-		if (OS.GetDataBrowserItemPartBounds (parent.handle, id, columnId, OS.kDataBrowserPropertyContentPart, rect2) != OS.noErr) {
-			return new Rectangle (0, 0, 0, 0);
-		}
-		x = rect2.left;
-		y = rect2.top;
-		width = rect.right - rect2.left + 1;
-		height = rect2.bottom - rect2.top + 1;
+		TreeColumn column = parent.getColumn (index);
+		index = parent.indexOf (column.nsColumn);
 	}
-	return new Rectangle (x, y, width, height);
+	NSRect rect = outlineView.frameOfCellAtColumn (index, outlineView.rowForItem (handle));
+	return new Rectangle ((int) rect.x, (int) rect.y, (int) rect.width, (int) rect.height);
 }
 
 /**
@@ -468,7 +495,7 @@ public Rectangle getBounds (int index) {
  */
 public boolean getChecked () {
 	checkWidget ();
-	if (!parent.checkData (this, true)) error (SWT.ERROR_WIDGET_DISPOSED);
+	if (!parent.checkData (this)) error (SWT.ERROR_WIDGET_DISPOSED);
 	if ((parent.style & SWT.CHECK) == 0) return false;
 	return checked;
 }
@@ -487,7 +514,7 @@ public boolean getChecked () {
  */
 public boolean getExpanded () {
 	checkWidget ();
-	return (state & EXPANDING) != 0 ? false : _getExpanded ();
+	return expanded;
 }
 
 /**
@@ -504,7 +531,7 @@ public boolean getExpanded () {
  */
 public Font getFont () {
 	checkWidget ();
-	if (!parent.checkData (this, true)) error (SWT.ERROR_WIDGET_DISPOSED);
+	if (!parent.checkData (this)) error (SWT.ERROR_WIDGET_DISPOSED);
 	return font != null ? font : parent.getFont ();
 }
 
@@ -524,7 +551,7 @@ public Font getFont () {
  */
 public Font getFont (int index) {
 	checkWidget ();
-	if (!parent.checkData (this, true)) error (SWT.ERROR_WIDGET_DISPOSED);
+	if (!parent.checkData (this)) error (SWT.ERROR_WIDGET_DISPOSED);
 	int count = Math.max (1, parent.columnCount);
 	if (0 > index || index > count -1) return getFont ();
 	if (cellFont == null || cellFont [index] == null) return getFont ();
@@ -546,7 +573,7 @@ public Font getFont (int index) {
  */
 public Color getForeground () {
 	checkWidget ();
-	if (!parent.checkData (this, true)) error (SWT.ERROR_WIDGET_DISPOSED);
+	if (!parent.checkData (this)) error (SWT.ERROR_WIDGET_DISPOSED);
 	return foreground != null ? foreground : parent.getForeground ();
 }
 
@@ -566,7 +593,7 @@ public Color getForeground () {
  */
 public Color getForeground (int index) {
 	checkWidget ();
-	if (!parent.checkData (this, true)) error (SWT.ERROR_WIDGET_DISPOSED);
+	if (!parent.checkData (this)) error (SWT.ERROR_WIDGET_DISPOSED);
 	int count = Math.max (1, parent.columnCount);
 	if (0 > index || index > count -1) return getForeground ();
 	if (cellForeground == null || cellForeground [index] == null) return getForeground ();
@@ -588,14 +615,14 @@ public Color getForeground (int index) {
  */
 public boolean getGrayed () {
 	checkWidget ();
-	if (!parent.checkData (this, true)) error (SWT.ERROR_WIDGET_DISPOSED);
+	if (!parent.checkData (this)) error (SWT.ERROR_WIDGET_DISPOSED);
 	if ((parent.style & SWT.CHECK) == 0) return false;
 	return grayed;
 }
 
 public Image getImage () {
 	checkWidget ();
-	if (!parent.checkData (this, true)) error (SWT.ERROR_WIDGET_DISPOSED);
+	if (!parent.checkData (this)) error (SWT.ERROR_WIDGET_DISPOSED);
 	return super.getImage ();
 }
 
@@ -615,7 +642,7 @@ public Image getImage () {
  */
 public Image getImage (int index) {
 	checkWidget ();
-	if (!parent.checkData (this, true)) error (SWT.ERROR_WIDGET_DISPOSED);
+	if (!parent.checkData (this)) error (SWT.ERROR_WIDGET_DISPOSED);
 	if (index == 0) return getImage ();
 	if (images != null) {
 		if (0 <= index && index < images.length) return images [index];
@@ -640,25 +667,26 @@ public Image getImage (int index) {
  */
 public Rectangle getImageBounds (int index) {
 	checkWidget ();
-	if (!parent.checkData (this, true)) error (SWT.ERROR_WIDGET_DISPOSED);
-	if (index != 0 && !(0 <= index && index < parent.columnCount)) return new Rectangle (0, 0, 0, 0);
-	Rect rect = new Rect();
-	int columnId = parent.columnCount == 0 ? parent.column_id : parent.columns [index].id;
-	if (OS.GetDataBrowserItemPartBounds (parent.handle, id, columnId, OS.kDataBrowserPropertyContentPart, rect) != OS.noErr) {
-		return new Rectangle (0, 0, 0, 0);
+	if (!parent.checkData (this)) error (SWT.ERROR_WIDGET_DISPOSED);
+	if (!(0 <= index && index < Math.max (1, parent.columnCount))) return new Rectangle (0, 0, 0, 0);
+
+	parent.checkItems ();
+	NSOutlineView outlineView = (NSOutlineView) parent.view;
+	Image image = index == 0 ? this.image : (images != null) ? images [index] : null;
+	if (parent.columnCount == 0) {
+		index = (parent.style & SWT.CHECK) != 0 ? 1 : 0;
+	} else {
+		TreeColumn column = parent.getColumn (index);
+		index = parent.indexOf (column.nsColumn);
 	}
-	int x = rect.left, y = rect.top;
-	int width = 0;
-	if (index == 0 && image != null) {
-		Rectangle bounds = image.getBounds ();
-		width += bounds.width;
+	NSRect rect = outlineView.frameOfCellAtColumn (index, outlineView.rowForItem (handle));
+	rect.x += Tree.IMAGE_GAP;
+	if (image != null) {
+		rect.width = parent.imageBounds.width;
+	} else {
+		rect.width = 0;
 	}
-	if (index != 0 && images != null && images[index] != null) {
-		Rectangle bounds = images [index].getBounds ();
-		width += bounds.width;
-	}
-	int height = rect.bottom - rect.top + 1;
-	return new Rectangle (x, y, width, height);
+	return new Rectangle((int) rect.x, (int) rect.y, (int) rect.width, (int) rect.height);
 }
 
 /**
@@ -681,9 +709,9 @@ public Rectangle getImageBounds (int index) {
 public TreeItem getItem (int index) {
 	checkWidget ();
 	if (index < 0) error (SWT.ERROR_INVALID_RANGE);
-	if (!parent.checkData (this, true)) error (SWT.ERROR_WIDGET_DISPOSED);
+	if (!parent.checkData (this)) error (SWT.ERROR_WIDGET_DISPOSED);
 	if (index >= itemCount) error (SWT.ERROR_INVALID_RANGE);
-	return parent._getItem (this, index);
+	return parent._getItem (this, index, true);
 }
 
 /**
@@ -699,8 +727,8 @@ public TreeItem getItem (int index) {
  */
 public int getItemCount () {
 	checkWidget ();
-	if (!parent.checkData (this, true)) error (SWT.ERROR_WIDGET_DISPOSED);
-	return parent.getItemCount (this);
+	if (!parent.checkData (this)) error (SWT.ERROR_WIDGET_DISPOSED);
+	return itemCount;
 }
 
 /**
@@ -721,8 +749,12 @@ public int getItemCount () {
  */
 public TreeItem [] getItems () {
 	checkWidget ();
-	if (!parent.checkData (this, true)) error (SWT.ERROR_WIDGET_DISPOSED);
-	return parent.getItems (this);
+	if (!parent.checkData (this)) error (SWT.ERROR_WIDGET_DISPOSED);
+	TreeItem [] result = new TreeItem [itemCount];
+	for (int i=0; i<itemCount; i++) {
+		result [i] = parent._getItem (this, i, true);
+	}
+	return result;
 }
 
 String getNameText () {
@@ -766,7 +798,7 @@ public TreeItem getParentItem () {
 
 public String getText () {
 	checkWidget ();
-	if (!parent.checkData (this, true)) error (SWT.ERROR_WIDGET_DISPOSED);
+	if (!parent.checkData (this)) error (SWT.ERROR_WIDGET_DISPOSED);
 	return super.getText ();
 }
 
@@ -786,7 +818,7 @@ public String getText () {
  */
 public String getText (int index) {
 	checkWidget ();
-	if (!parent.checkData (this, true)) error (SWT.ERROR_WIDGET_DISPOSED);
+	if (!parent.checkData (this)) error (SWT.ERROR_WIDGET_DISPOSED);
 	if (index == 0) return getText ();
 	if (strings != null) {
 		if (0 <= index && index < strings.length) {
@@ -814,43 +846,27 @@ public String getText (int index) {
  */
 public Rectangle getTextBounds (int index) {
 	checkWidget ();
-	if (!parent.checkData (this, true)) error (SWT.ERROR_WIDGET_DISPOSED);
-	if (index != 0 && !(0 <= index && index < parent.columnCount)) return new Rectangle (0, 0, 0, 0);
-	Rect rect = new Rect();
-	int columnId = parent.columnCount == 0 ? parent.column_id : parent.columns [index].id;
-	if (OS.GetDataBrowserItemPartBounds (parent.handle, id, columnId, OS.kDataBrowserPropertyEnclosingPart, rect) != OS.noErr) {
-		return new Rectangle (0, 0, 0, 0);
-	}
-	int[] disclosure = new int [1];
-	OS.GetDataBrowserListViewDisclosureColumn (parent.handle, disclosure, new boolean [1]);
-	int imageWidth = 0;
-	int margin = index == 0 ? 0 : parent.getInsetWidth (columnId, false) / 2;
-	Image image = getImage (index);
-	if (image != null) {
-		Rectangle bounds = image.getBounds ();
-		imageWidth = bounds.width + parent.getGap ();
-	}
-	int x, y, width, height;
-	if (OS.VERSION >= 0x1040 && disclosure [0] != columnId) {
-		if (parent.getLinesVisible ()) {
-			rect.left += Tree.GRID_WIDTH;
-			rect.top += Tree.GRID_WIDTH;
-		}
-		x = rect.left + imageWidth + margin;
-		y = rect.top;
-		width = Math.max (0, rect.right - rect.left - imageWidth - margin * 2);;
-		height = rect.bottom - rect.top;
+	if (!parent.checkData (this)) error (SWT.ERROR_WIDGET_DISPOSED);
+	if (!(0 <= index && index < Math.max (1, parent.columnCount))) return new Rectangle (0, 0, 0, 0);
+
+	parent.checkItems ();
+	NSOutlineView outlineView = (NSOutlineView) parent.view;
+	Image image = index == 0 ? this.image : (images != null) ? images [index] : null;
+	if (parent.columnCount == 0) {
+		index = (parent.style & SWT.CHECK) != 0 ? 1 : 0;
 	} else {
-		Rect rect2 = new Rect();
-		if (OS.GetDataBrowserItemPartBounds (parent.handle, id, columnId, OS.kDataBrowserPropertyContentPart, rect2) != OS.noErr) {
-			return new Rectangle (0, 0, 0, 0);
-		}
-		x = rect2.left + imageWidth + margin;
-		y = rect2.top;
-		width = Math.max (0, rect.right - rect2.left + 1 - imageWidth - margin * 2);
-		height = rect2.bottom - rect2.top + 1;
+		TreeColumn column = parent.getColumn (index);
+		index = parent.indexOf (column.nsColumn);
 	}
-	return new Rectangle (x, y, width, height);
+	NSRect rect = outlineView.frameOfCellAtColumn (index, outlineView.rowForItem (handle));
+	rect.x += Tree.TEXT_GAP;
+	rect.width -= Tree.TEXT_GAP;
+	if (image != null) {
+		int offset = parent.imageBounds.width + Tree.IMAGE_GAP;
+		rect.x += offset;
+		rect.width -= offset;
+	}
+	return new Rectangle((int) rect.x, (int) rect.y, (int) rect.width, (int) rect.height);
 }
 
 /**
@@ -878,70 +894,70 @@ public int indexOf (TreeItem item) {
 	if (item == null) error (SWT.ERROR_NULL_ARGUMENT);
 	if (item.isDisposed ()) error (SWT.ERROR_INVALID_ARGUMENT);
 	if (item.parentItem != this) return -1;
-	return parent._indexOf (this, item);
+	for (int i = 0; i < itemCount; i++) {
+		if (item == items [i]) return i;
+	}
+	return -1;
 }
 
-void redraw (int propertyID) {
-	if (parent.ignoreRedraw) return;
-	if (parent.drawCount != 0 && propertyID != Tree.CHECK_COLUMN_ID) return;
-	int parentHandle = parent.handle;
-	int parentID = parentItem == null ? OS.kDataBrowserNoItem : parentItem.id;
-	/*
-	* Feature in Carbon.  Calling UpdateDataBrowserItems with kDataBrowserNoItem
-	* updates all columns associated with the items in the items array.  This is
-	* much slower than updating the items array for a specific column.  The fix
-	* is to give the specific column ids instead.
-	*/
-	DataBrowserCallbacks callbacks = new DataBrowserCallbacks ();
-	OS.GetDataBrowserCallbacks (parent.handle, callbacks);
-	callbacks.v1_itemCompareCallback = 0;
-	OS.SetDataBrowserCallbacks (parent.handle, callbacks);
-	int [] ids = new int [] {id};
-	if (propertyID == OS.kDataBrowserNoItem) {
-		if ((parent.style & SWT.CHECK) != 0) {
-			OS.UpdateDataBrowserItems (parentHandle, parentID, ids.length, ids, OS.kDataBrowserItemNoProperty, Tree.CHECK_COLUMN_ID);
-		}
+void redraw (int columnIndex) {
+	if (parent.ignoreRedraw || !isDrawing()) return;
+	/* redraw the full item if columnIndex == -1 */
+	NSOutlineView outlineView = (NSOutlineView) parent.view;
+	NSRect rect;
+	if (columnIndex == -1 || parent.hooks (SWT.MeasureItem) || parent.hooks (SWT.EraseItem) || parent.hooks (SWT.PaintItem)) {
+		rect = outlineView.rectOfRow (outlineView.rowForItem (handle));
+	} else {
+		int index;
 		if (parent.columnCount == 0) {
-			OS.UpdateDataBrowserItems (parentHandle, parentID, ids.length, ids, OS.kDataBrowserItemNoProperty, parent.column_id);
+			index = (parent.style & SWT.CHECK) != 0 ? 1 : 0;
 		} else {
-			for (int i=0; i<parent.columnCount; i++) {
-				OS.UpdateDataBrowserItems (parentHandle, parentID, ids.length, ids, OS.kDataBrowserItemNoProperty, parent.columns[i].id);				
+			if (0 <= columnIndex && columnIndex < parent.columnCount) {
+				index = parent.indexOf (parent.columns[columnIndex].nsColumn);
+			} else {
+				return;
 			}
 		}
-	} else {
-		OS.UpdateDataBrowserItems (parentHandle, parentID, ids.length, ids, OS.kDataBrowserItemNoProperty, propertyID);
+		rect = outlineView.frameOfCellAtColumn (index, outlineView.rowForItem (handle));
 	}
-	callbacks.v1_itemCompareCallback = display.itemCompareProc;
-	OS.SetDataBrowserCallbacks (parent.handle, callbacks);
+	outlineView.setNeedsDisplayInRect (rect);
+}
+
+void register () {
+	super.register ();
+	display.addWidget (handle, this);
+}
+
+void release(boolean destroy) {
 	/*
-	* Bug in the Macintosh. When the height of the row is smaller than the
-	* check box, the tail of the check mark draws outside of the item part
-	* bounds. This means it will not be redrawn when the item is unckeched.
-	* The fix is to redraw the area.
+	* Bug in Cocoa.  When removing selected items from an NSOutlineView, the selection
+	* is not properly updated.  The fix is to ensure that the item and its subitems
+	* are deselected before the item is removed by the reloadItem call. 
+	* 
+	* This has to be done in release to avoid traversing the tree twice when items are
+	* removed from the tree by setItemCount. 
 	*/
-	if (propertyID == Tree.CHECK_COLUMN_ID) {
-		Rect rect = new Rect();
-		if (OS.GetDataBrowserItemPartBounds (parentHandle, id, propertyID, OS.kDataBrowserPropertyEnclosingPart, rect) == OS.noErr) {
-			int x = rect.left;
-			int y = rect.top - 1;
-			int width = rect.right - rect.left;
-			int height = 1;
-			redrawWidget (parentHandle, x, y, width, height, false);
-		}
-	}
+	if (destroy) clearSelection ();
+	super.release(destroy);
 }
 
 void releaseChildren (boolean destroy) {
-	if (destroy) {
-		parent.releaseItems (childIds);
+	for (int i=0; i<items.length; i++) {
+		TreeItem item = items [i];
+		if (item != null && !item.isDisposed ()) {
+			item.release (false);
+		}
 	}
+	items = null;
+	itemCount = 0;
 	super.releaseChildren (destroy);
 }
 
 void releaseHandle () {
 	super.releaseHandle ();
+	if (handle != null) handle.release ();
+	handle = null;
 	parentItem = null;
-	id = 0;
 	parent = null;
 }
 
@@ -967,10 +983,21 @@ void releaseWidget () {
  */
 public void removeAll () {
 	checkWidget ();
-	for (int i=itemCount - 1; i >= 0; i--) {
-		TreeItem item = parent._getItem (childIds [i], false);
-		if (item != null && !item.isDisposed ()) {
-			item.dispose ();
+	parent.setItemCount (0);
+}
+
+void sendExpand (boolean expand, boolean recurse) {
+	if (itemCount == 0) return;
+	if (expanded != expand) {
+		Event event = new Event ();
+		event.item = this;
+		parent.sendEvent (expand ? SWT.Expand : SWT.Collapse, event);
+		if (isDisposed ()) return;
+		expanded = expand;
+	}
+	if (recurse) {
+		for (int i = 0; i < itemCount; i++) {
+			if (items[i] != null) items[i].sendExpand (expand, recurse);
 		}
 	}
 }
@@ -1003,7 +1030,7 @@ public void setBackground (Color color) {
 	background = color;
 	if (oldColor != null && oldColor.equals (color)) return;
 	cached = true;
-	redraw (OS.kDataBrowserNoItem);
+	redraw (-1);
 }
 
 /**
@@ -1040,9 +1067,8 @@ public void setBackground (int index, Color color) {
 	if (oldColor == color) return;
 	cellBackground [index] = color;
 	if (oldColor != null && oldColor.equals (color)) return;
-	cached = true;
-	int columnId = parent.columnCount == 0 ? parent.column_id : parent.columns [index].id;
-	redraw (columnId);
+	cached = true; 
+	redraw (index);
 }
 
 /**
@@ -1060,19 +1086,9 @@ public void setChecked (boolean checked) {
 	checkWidget ();
 	if ((parent.style & SWT.CHECK) == 0) return;
 	if (this.checked == checked) return;
-	setChecked (checked, false);
-}
-
-void setChecked (boolean checked, boolean notify) {
 	this.checked = checked;
 	cached = true;
-	redraw (Tree.CHECK_COLUMN_ID);
-	if (notify) {
-		Event event = new Event ();
-		event.item = this;
-		event.detail = SWT.CHECK;
-		parent.postEvent (SWT.Selection, event);
-	}
+	redraw (-1);
 }
 
 /**
@@ -1088,20 +1104,22 @@ void setChecked (boolean checked, boolean notify) {
  */
 public void setExpanded (boolean expanded) {
 	checkWidget ();
-	if (expanded == getExpanded ()) return;
+
+	/* Do nothing when the item is a leaf or already expanded */
+	if (itemCount == 0 || expanded == getExpanded ()) return;
+
+	parent.checkItems ();
 	parent.ignoreExpand = true;
+	this.expanded = expanded;
 	if (expanded) {
-		OS.OpenDataBrowserContainer (parent.handle, id);
+		((NSOutlineView) parent.view).expandItem (handle);
 	} else {
-		OS.CloseDataBrowserContainer (parent.handle, id);
+		((NSOutlineView) parent.view).collapseItem (handle);
 	}
 	parent.ignoreExpand = false;
 	cached = true;
-	if (expanded) {
-		parent.setScrollWidth (false, childIds, false);
-	} else {
-		parent.setScrollWidth (true);
-		parent.fixScrollBar ();
+	if (!expanded) {
+		parent.setScrollWidth ();
 	}
 }
 
@@ -1131,8 +1149,9 @@ public void setFont (Font font) {
 	if (oldFont == font) return;
 	this.font = font;
 	if (oldFont != null && oldFont.equals (font)) return;
+	width = -1;
 	cached = true;
-	redraw (OS.kDataBrowserNoItem);
+	redraw (-1);
 }
 
 /**
@@ -1169,9 +1188,9 @@ public void setFont (int index, Font font) {
 	if (oldFont == font) return;
 	cellFont [index] = font;
 	if (oldFont != null && oldFont.equals (font)) return;
+	width = -1;
 	cached = true;
-	int columnId = parent.columnCount == 0 ? parent.column_id : parent.columns [index].id;
-	redraw (columnId);
+	redraw (index);
 }
 
 /**
@@ -1199,12 +1218,12 @@ public void setForeground (Color color) {
 	if (color != null && color.isDisposed ()) {
 		SWT.error (SWT.ERROR_INVALID_ARGUMENT);
 	}
-	Color oldColor = this.foreground;
+	Color oldColor = foreground;
 	if (oldColor == color) return;
 	foreground = color;
 	if (oldColor != null && oldColor.equals (color)) return;
 	cached = true;
-	redraw (OS.kDataBrowserNoItem);
+	redraw (-1);
 }
 
 /**
@@ -1242,8 +1261,7 @@ public void setForeground (int index, Color color){
 	cellForeground [index] = color;
 	if (oldColor != null && oldColor.equals (color)) return;
 	cached = true;
-	int columnId = parent.columnCount == 0 ? parent.column_id : parent.columns [index].id;
-	redraw (columnId);
+	redraw (index);
 }
 
 /**
@@ -1263,7 +1281,7 @@ public void setGrayed (boolean grayed) {
 	if (this.grayed == grayed) return;
 	this.grayed = grayed;
 	cached = true;
-	redraw (Tree.CHECK_COLUMN_ID);
+	redraw (-1);
 }
 
 /**
@@ -1309,10 +1327,10 @@ public void setImage (Image [] images) {
 public void setImage (int index, Image image) {
 	checkWidget ();
 	if (image != null && image.isDisposed ()) {
-		error(SWT.ERROR_INVALID_ARGUMENT);
+		error (SWT.ERROR_INVALID_ARGUMENT);
 	}
 	if (parent.imageBounds == null && image != null) {
-		parent.setItemHeight (image);
+		parent.setItemHeight (image, null, false);
 	}
 	if (index == 0)  {
 		if (image != null && image.type == SWT.ICON) {
@@ -1331,10 +1349,7 @@ public void setImage (int index, Image image) {
 	}
 	cached = true;
 	if (index == 0) parent.setScrollWidth (this);
-	if (0 <= index && index < count) {
-		int columnId = parent.columnCount == 0 ? parent.column_id : parent.columns [index].id;
-		redraw (columnId);
-	}
+	if (0 <= index && index < count) redraw (index);
 }
 
 public void setImage (Image image) {
@@ -1416,10 +1431,7 @@ public void setText (int index, String string) {
 	}
 	cached = true;
 	if (index == 0) parent.setScrollWidth (this);
-	if (0 <= index && index < count) {
-		int columnId = parent.columnCount == 0 ? parent.column_id : parent.columns [index].id;
-		redraw (columnId);
-	}
+	if (0 <= index && index < count) redraw (index);
 }
 
 public void setText (String string) {
@@ -1427,4 +1439,18 @@ public void setText (String string) {
 	setText (0, string);
 }
 
+void updateExpanded () {
+	if (itemCount == 0) return;
+	NSOutlineView outlineView = (NSOutlineView)parent.view;
+	if (expanded != outlineView.isItemExpanded (handle)) {
+		if (expanded) {
+			outlineView.expandItem (handle);
+		} else {
+			outlineView.collapseItem (handle);
+		}
+	}
+	for (int i = 0; i < itemCount; i++) {
+		if (items[i] != null) items[i].updateExpanded ();
+	}
+}
 }

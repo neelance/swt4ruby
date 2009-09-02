@@ -1,6 +1,6 @@
 require "rjava"
 
-# Copyright (c) 2000, 2008 IBM Corporation and others.
+# Copyright (c) 2000, 2009 IBM Corporation and others.
 # All rights reserved. This program and the accompanying materials
 # are made available under the terms of the Eclipse Public License v1.0
 # which accompanies this distribution, and is available at
@@ -38,6 +38,7 @@ module Org::Eclipse::Swt::Widgets
   # @see <a href="http://www.eclipse.org/swt/">Sample code and further information</a>
   # 
   # @since 3.1
+  # @noextend This class is not intended to be subclassed by clients.
   class TreeColumn < TreeColumnImports.const_get :Item
     include_class_members TreeColumnImports
     
@@ -482,6 +483,24 @@ module Org::Eclipse::Swt::Widgets
     # long
     # long
     # long
+    def gtk_event_after(widget, gdk_event)
+      event = GdkEvent.new
+      OS.memmove(event, gdk_event, GdkEvent.attr_sizeof)
+      case (event.attr_type)
+      when OS::GDK_BUTTON_PRESS
+        gdk_event_button = GdkEventButton.new
+        OS.memmove(gdk_event_button, gdk_event, GdkEventButton.attr_sizeof)
+        if ((gdk_event_button.attr_button).equal?(3))
+          @parent.show_menu(RJava.cast_to_int(gdk_event_button.attr_x_root), RJava.cast_to_int(gdk_event_button.attr_y_root))
+        end
+      end
+      return 0
+    end
+    
+    typesig { [::Java::Int, ::Java::Int] }
+    # long
+    # long
+    # long
     def gtk_mnemonic_activate(widget, arg1)
       return @parent.gtk_mnemonic_activate(widget, arg1)
     end
@@ -511,6 +530,7 @@ module Org::Eclipse::Swt::Widgets
       OS.g_signal_connect_closure(self.attr_handle, OS.attr_clicked, self.attr_display.attr_closures[CLICKED], false)
       if (!(@button_handle).equal?(0))
         OS.g_signal_connect_closure_by_id(@button_handle, self.attr_display.attr_signal_ids[SIZE_ALLOCATE], 0, self.attr_display.attr_closures[SIZE_ALLOCATE], false)
+        OS.g_signal_connect_closure_by_id(@button_handle, self.attr_display.attr_signal_ids[EVENT_AFTER], 0, self.attr_display.attr_closures[EVENT_AFTER], false)
       end
       if (!(@label_handle).equal?(0))
         OS.g_signal_connect_closure_by_id(@label_handle, self.attr_display.attr_signal_ids[MNEMONIC_ACTIVATE], 0, self.attr_display.attr_closures[MNEMONIC_ACTIVATE], false)
@@ -761,7 +781,16 @@ module Org::Eclipse::Swt::Widgets
     
     typesig { [String] }
     # Sets the receiver's tool tip text to the argument, which
-    # may be null indicating that no tool tip text should be shown.
+    # may be null indicating that the default tool tip for the
+    # control will be shown. For a control that has a default
+    # tool tip, such as the Tree control on Windows, setting
+    # the tool tip text to an empty string replaces the default,
+    # causing no tool tip text to be shown.
+    # <p>
+    # The mnemonic indicator (character '&amp;') is not displayed in a tool tip.
+    # To display a single '&amp;' in the tool tip, the character '&amp;' can be
+    # escaped by doubling it in the string.
+    # </p>
     # 
     # @param string the new tool tip text (or null)
     # 

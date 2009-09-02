@@ -1,6 +1,6 @@
 require "rjava"
 
-# Copyright (c) 2000, 2008 IBM Corporation and others.
+# Copyright (c) 2000, 2009 IBM Corporation and others.
 # All rights reserved. This program and the accompanying materials
 # are made available under the terms of the Eclipse Public License v1.0
 # which accompanies this distribution, and is available at
@@ -13,16 +13,30 @@ module Org::Eclipse::Swt::Widgets
     class_module.module_eval {
       include ::Java::Lang
       include ::Org::Eclipse::Swt::Widgets
-      include_const ::Org::Eclipse::Swt::Internal::Carbon, :CFRange
-      include_const ::Org::Eclipse::Swt::Internal::Carbon, :OS
-      include_const ::Org::Eclipse::Swt::Internal::Carbon, :Rect
-      include_const ::Org::Eclipse::Swt::Internal::Carbon, :CGPoint
+      include ::Org::Eclipse::Swt::Internal::Cocoa
       include ::Org::Eclipse::Swt
       include ::Org::Eclipse::Swt::Events
       include ::Org::Eclipse::Swt::Graphics
     }
   end
   
+  # int traversalCode (int key, int theEvent) {
+  # if (offsets.length == 0) return 0;
+  # int bits = super.traversalCode (key, theEvent);
+  # if (key == 48 /* Tab */ && theEvent != 0) {
+  # int [] modifiers = new int [1];
+  # OS.GetEventParameter (theEvent, OS.kEventParamKeyModifiers, OS.typeUInt32, null, 4, null, modifiers);
+  # boolean next = (modifiers [0] & OS.shiftKey) == 0;
+  # if (next && focusIndex < offsets.length - 1) {
+  # return bits & ~ SWT.TRAVERSE_TAB_NEXT;
+  # }
+  # if (!next && focusIndex > 0) {
+  # return bits & ~ SWT.TRAVERSE_TAB_PREVIOUS;
+  # }
+  # }
+  # return bits;
+  # }
+  # 
   # Instances of this class represent a selectable
   # user interface object that displays a text with
   # links.
@@ -42,32 +56,21 @@ module Org::Eclipse::Swt::Widgets
   # @see <a href="http://www.eclipse.org/swt/">Sample code and further information</a>
   # 
   # @since 3.1
+  # @noextend This class is not intended to be subclassed by clients.
   class Link < LinkImports.const_get :Control
     include_class_members LinkImports
+    
+    attr_accessor :scroll_view
+    alias_method :attr_scroll_view, :scroll_view
+    undef_method :scroll_view
+    alias_method :attr_scroll_view=, :scroll_view=
+    undef_method :scroll_view=
     
     attr_accessor :text
     alias_method :attr_text, :text
     undef_method :text
     alias_method :attr_text=, :text=
     undef_method :text=
-    
-    attr_accessor :layout
-    alias_method :attr_layout, :layout
-    undef_method :layout
-    alias_method :attr_layout=, :layout=
-    undef_method :layout=
-    
-    attr_accessor :link_color
-    alias_method :attr_link_color, :link_color
-    undef_method :link_color
-    alias_method :attr_link_color=, :link_color=
-    undef_method :link_color=
-    
-    attr_accessor :disabled_color
-    alias_method :attr_disabled_color, :disabled_color
-    undef_method :disabled_color
-    alias_method :attr_disabled_color=, :disabled_color=
-    undef_method :disabled_color=
     
     attr_accessor :offsets
     alias_method :attr_offsets, :offsets
@@ -93,22 +96,11 @@ module Org::Eclipse::Swt::Widgets
     alias_method :attr_mnemonics=, :mnemonics=
     undef_method :mnemonics=
     
-    attr_accessor :focus_index
-    alias_method :attr_focus_index, :focus_index
-    undef_method :focus_index
-    alias_method :attr_focus_index=, :focus_index=
-    undef_method :focus_index=
-    
-    class_module.module_eval {
-      const_set_lazy(:LINK_FOREGROUND) { RGB.new(0, 51, 153) }
-      const_attr_reader  :LINK_FOREGROUND
-      
-      const_set_lazy(:LINK_DISABLED_FOREGROUND) { RGB.new(172, 168, 153) }
-      const_attr_reader  :LINK_DISABLED_FOREGROUND
-      
-      const_set_lazy(:AX_ATTRIBUTES) { Array.typed(String).new([OS.attr_k_axtitle_attribute, ]) }
-      const_attr_reader  :AX_ATTRIBUTES
-    }
+    attr_accessor :link_color
+    alias_method :attr_link_color, :link_color
+    undef_method :link_color
+    alias_method :attr_link_color=, :link_color=
+    undef_method :link_color=
     
     typesig { [Composite, ::Java::Int] }
     # Constructs a new instance of this class given its parent
@@ -137,15 +129,13 @@ module Org::Eclipse::Swt::Widgets
     # @see Widget#checkSubclass
     # @see Widget#getStyle
     def initialize(parent, style)
+      @scroll_view = nil
       @text = nil
-      @layout = nil
-      @link_color = nil
-      @disabled_color = nil
       @offsets = nil
       @selection = nil
       @ids = nil
       @mnemonics = nil
-      @focus_index = 0
+      @link_color = nil
       super(parent, style)
     end
     
@@ -182,9 +172,18 @@ module Org::Eclipse::Swt::Widgets
       add_listener(SWT::DefaultSelection, typed_listener)
     end
     
-    typesig { [::Java::Int, ::Java::Int] }
-    def call_focus_event_handler(next_handler, the_event)
-      return OS.attr_no_err
+    typesig { [::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int] }
+    # long
+    # long
+    # long
+    # long
+    # long
+    def text_view_click_on_link_at_index(id, sel, text_view, link, char_index)
+      str = NSString.new(link)
+      event = Event.new
+      event.attr_text = str.get_string
+      send_event(SWT::Selection, event)
+      return true
     end
     
     typesig { [::Java::Int, ::Java::Int, ::Java::Boolean] }
@@ -198,20 +197,13 @@ module Org::Eclipse::Swt::Widgets
       end
       width = 0
       height = 0
-      layout_width = @layout.get_width
-      # TEMPORARY CODE
-      if ((w_hint).equal?(0))
-        @layout.set_width(1)
-        rect = @layout.get_bounds
-        width = 0
-        height = rect.attr_height
-      else
-        @layout.set_width(w_hint)
-        rect = @layout.get_bounds
-        width = rect.attr_width
-        height = rect.attr_height
-      end
-      @layout.set_width(layout_width)
+      # TODO wrapping, wHint
+      border_style = has_border ? OS::NSBezelBorder : OS::NSNoBorder
+      border_size = NSScrollView.frame_size_for_content_size(NSSize.new, false, false, border_style)
+      widget = self.attr_view
+      size = widget.text_storage.size
+      width = RJava.cast_to_int((size.attr_width + border_size.attr_width))
+      height = RJava.cast_to_int((size.attr_height + border_size.attr_height))
       if (!(w_hint).equal?(SWT::DEFAULT))
         width = w_hint
       end
@@ -221,140 +213,82 @@ module Org::Eclipse::Swt::Widgets
       border = get_border_width
       width += border * 2
       height += border * 2
+      # TODO is this true?  if so, can this rounding be turned off?
+      # 
+      # Bug in Cocoa.  NSTextStorage.size() seems to return a width
+      # value that is rounded down, because its result is never
+      # fractional.  The workaround is to increment width by 1
+      # to ensure that it is wide enough to show the full text.
+      width += 1
       return Point.new(width, height)
     end
     
     typesig { [] }
     def create_handle
-      self.attr_state |= GRAB | THEME_BACKGROUND
-      features = OS.attr_k_control_supports_focus
-      out_control = Array.typed(::Java::Int).new(1) { 0 }
-      window = OS._get_control_owner(self.attr_parent.attr_handle)
-      OS._create_user_pane_control(window, nil, features, out_control)
-      if ((out_control[0]).equal?(0))
-        error(SWT::ERROR_NO_HANDLES)
-      end
-      self.attr_handle = out_control[0]
-      @layout = TextLayout.new(self.attr_display)
-      @link_color = Color.new(self.attr_display, LINK_FOREGROUND)
-      @disabled_color = Color.new(self.attr_display, LINK_DISABLED_FOREGROUND)
-      @offsets = Array.typed(Point).new(0) { nil }
-      @ids = Array.typed(String).new(0) { nil }
-      @mnemonics = Array.typed(::Java::Int).new(0) { 0 }
-      @selection = Point.new(-1, -1)
-      @focus_index = -1
+      self.attr_state |= THEME_BACKGROUND
+      scroll_widget = SWTScrollView.new.alloc
+      scroll_widget.init
+      scroll_widget.set_draws_background(false)
+      scroll_widget.set_border_type(has_border ? OS::NSBezelBorder : OS::NSNoBorder)
+      widget = SWTTextView.new.alloc
+      widget.init
+      widget.set_editable(false)
+      widget.set_draws_background(false)
+      widget.set_delegate(widget)
+      widget.set_autoresizing_mask(OS::NSViewWidthSizable | OS::NSViewHeightSizable)
+      widget.text_container.set_line_fragment_padding(0)
+      @scroll_view = scroll_widget
+      self.attr_view = widget
     end
     
     typesig { [] }
     def create_widget
       super
-      @layout.set_font(get_font)
       @text = ""
+      dict = (self.attr_view).link_text_attributes
+      @link_color = NSColor.new(dict.value_for_key(OS::NSForegroundColorAttributeName))
     end
     
-    typesig { [::Java::Int, ::Java::Int] }
-    def draw_background(control, context)
-      fill_background(control, context, nil)
-      if (!has_focus || !draw_focus_ring || (@focus_index).equal?(-1))
-        return
-      end
-      out_metric = Array.typed(::Java::Int).new(1) { 0 }
-      OS._get_theme_metric(OS.attr_k_theme_metric_focus_rect_outset, out_metric)
-      out_metric[0] -= 1
-      r = Rect.new
-      rects = get_rectangles(@focus_index)
-      i = 0
-      while i < rects.attr_length
-        rect = rects[i]
-        r.attr_left = RJava.cast_to_short((rect.attr_x + out_metric[0]))
-        r.attr_top = RJava.cast_to_short((rect.attr_y + out_metric[0]))
-        r.attr_right = RJava.cast_to_short((r.attr_left + rect.attr_width - (out_metric[0] * 2)))
-        r.attr_bottom = RJava.cast_to_short((r.attr_top + rect.attr_height - (out_metric[0] * 2)))
-        OS._draw_theme_focus_rect(r, true)
-        i += 1
-      end
+    typesig { [] }
+    def default_nsfont
+      return self.attr_display.attr_text_view_font
     end
     
-    typesig { [::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int] }
-    def draw_widget(control, context, damage_rgn, visible_rgn, the_event)
-      data = SwtGCData.new
-      data.attr_paint_event = the_event
-      data.attr_visible_rgn = visible_rgn
-      gc = SwtGC.carbon_new(self, data)
-      sel_start = @selection.attr_x
-      sel_end = @selection.attr_y
-      if (sel_start > sel_end)
-        sel_start = @selection.attr_y
-        sel_end = @selection.attr_x
+    typesig { [] }
+    def deregister
+      super
+      if (!(@scroll_view).nil?)
+        self.attr_display.remove_widget(@scroll_view)
       end
-      # temporary code to disable text selection
-      sel_start = sel_end = -1
-      if (!((self.attr_state & DISABLED)).equal?(0))
-        gc.set_foreground(@disabled_color)
-      end
-      @layout.draw(gc, 0, 0, sel_start, sel_end, nil, nil)
-      gc.dispose
-      super(control, context, damage_rgn, visible_rgn, the_event)
     end
     
     typesig { [::Java::Boolean] }
     def enable_widget(enabled)
       super(enabled)
-      link_style = TextStyle.new(nil, enabled ? @link_color : @disabled_color, nil)
-      link_style.attr_underline = true
-      i = 0
-      while i < @offsets.attr_length
-        point = @offsets[i]
-        @layout.set_style(link_style, point.attr_x, point.attr_y)
-        i += 1
+      ns_color = nil
+      if (enabled)
+        if ((self.attr_foreground).nil?)
+          ns_color = NSColor.text_color
+        else
+          ns_color = NSColor.color_with_device_red(self.attr_foreground[0], self.attr_foreground[1], self.attr_foreground[2], self.attr_foreground[3])
+        end
+      else
+        ns_color = NSColor.disabled_control_text_color
       end
-      redraw
-    end
-    
-    typesig { [] }
-    def get_ax_attributes
-      return AX_ATTRIBUTES
+      widget = self.attr_view
+      widget.set_text_color(ns_color)
+      link_text_attributes_ = widget.link_text_attributes
+      # 64
+      count_ = RJava.cast_to_int(link_text_attributes_.count)
+      dict = NSMutableDictionary.dictionary_with_capacity(count_)
+      dict.set_dictionary(link_text_attributes_)
+      dict.set_value(enabled ? @link_color : ns_color, OS::NSForegroundColorAttributeName)
+      widget.set_link_text_attributes(dict)
     end
     
     typesig { [] }
     def get_name_text
       return get_text
-    end
-    
-    typesig { [::Java::Int] }
-    def get_rectangles(link_index)
-      line_count = @layout.get_line_count
-      rects = Array.typed(Rectangle).new(line_count) { nil }
-      line_offsets = @layout.get_line_offsets
-      point = @offsets[link_index]
-      line_start = 1
-      while (point.attr_x > line_offsets[line_start])
-        line_start += 1
-      end
-      line_end = 1
-      while (point.attr_y > line_offsets[line_end])
-        line_end += 1
-      end
-      index = 0
-      if ((line_start).equal?(line_end))
-        rects[((index += 1) - 1)] = @layout.get_bounds(point.attr_x, point.attr_y)
-      else
-        rects[((index += 1) - 1)] = @layout.get_bounds(point.attr_x, line_offsets[line_start] - 1)
-        rects[((index += 1) - 1)] = @layout.get_bounds(line_offsets[line_end - 1], point.attr_y)
-        if (line_end - line_start > 1)
-          i = line_start
-          while i < line_end - 1
-            rects[((index += 1) - 1)] = @layout.get_line_bounds(i)
-            i += 1
-          end
-        end
-      end
-      if (!(rects.attr_length).equal?(index))
-        tmp = Array.typed(Rectangle).new(index) { nil }
-        System.arraycopy(rects, 0, tmp, 0, index)
-        rects = tmp
-      end
-      return rects
     end
     
     typesig { [] }
@@ -372,161 +306,22 @@ module Org::Eclipse::Swt::Widgets
       return @text
     end
     
-    typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
-    def k_event_accessible_get_named_attribute(next_handler, the_event, user_data)
-      code = OS.attr_event_not_handled_err
-      string_ref = Array.typed(::Java::Int).new(1) { 0 }
-      OS._get_event_parameter(the_event, OS.attr_k_event_param_accessible_attribute_name, OS.attr_type_cfstring_ref, nil, 4, nil, string_ref)
-      length = 0
-      if (!(string_ref[0]).equal?(0))
-        length = OS._cfstring_get_length(string_ref[0])
+    typesig { [] }
+    def register
+      super
+      if (!(@scroll_view).nil?)
+        self.attr_display.add_widget(@scroll_view, self)
       end
-      buffer = CharArray.new(length)
-      range = CFRange.new
-      range.attr_length = length
-      OS._cfstring_get_characters(string_ref[0], range, buffer)
-      attribute_name = String.new(buffer)
-      if ((attribute_name == OS.attr_k_axrole_attribute) || (attribute_name == OS.attr_k_axrole_description_attribute))
-        role_text = OS.attr_k_axlink_role
-        buffer = CharArray.new(role_text.length)
-        role_text.get_chars(0, buffer.attr_length, buffer, 0)
-        string_ref[0] = OS._cfstring_create_with_characters(OS.attr_k_cfallocator_default, buffer, buffer.attr_length)
-        if (!(string_ref[0]).equal?(0))
-          if ((attribute_name == OS.attr_k_axrole_attribute))
-            OS._set_event_parameter(the_event, OS.attr_k_event_param_accessible_attribute_value, OS.attr_type_cfstring_ref, 4, string_ref)
-          else
-            # kAXRoleDescriptionAttribute
-            string_ref2 = OS._hicopy_accessibility_role_description(string_ref[0], 0)
-            OS._set_event_parameter(the_event, OS.attr_k_event_param_accessible_attribute_value, OS.attr_type_cfstring_ref, 4, Array.typed(::Java::Int).new([string_ref2]))
-            OS._cfrelease(string_ref2)
-          end
-          OS._cfrelease(string_ref[0])
-          code = OS.attr_no_err
-        end
-      else
-        if ((attribute_name == OS.attr_k_axtitle_attribute) || (attribute_name == OS.attr_k_axdescription_attribute))
-          text = parse(get_text)
-          if (!(text).nil?)
-            buffer = CharArray.new(text.length)
-            text.get_chars(0, buffer.attr_length, buffer, 0)
-            string_ref[0] = OS._cfstring_create_with_characters(OS.attr_k_cfallocator_default, buffer, buffer.attr_length)
-            if (!(string_ref[0]).equal?(0))
-              OS._set_event_parameter(the_event, OS.attr_k_event_param_accessible_attribute_value, OS.attr_type_cfstring_ref, 4, string_ref)
-              OS._cfrelease(string_ref[0])
-              code = OS.attr_no_err
-            end
-          end
-        end
-      end
-      if (!(self.attr_accessible).nil?)
-        code = self.attr_accessible.internal_k_event_accessible_get_named_attribute(next_handler, the_event, code)
-      end
-      return code
-    end
-    
-    typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
-    def k_event_control_get_focus_part(next_handler, the_event, user_data)
-      return OS.attr_no_err
-    end
-    
-    typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
-    def k_event_control_set_focus_part(next_handler, the_event, user_data)
-      result = super(next_handler, the_event, user_data)
-      if ((result).equal?(OS.attr_no_err))
-        redraw
-      end
-      return result
-    end
-    
-    typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
-    def k_event_mouse_moved(next_handler, the_event, user_data)
-      result = super(next_handler, the_event, user_data)
-      if ((result).equal?(OS.attr_no_err))
-        return result
-      end
-      pt = CGPoint.new
-      OS._get_event_parameter(the_event, OS.attr_k_event_param_window_mouse_location, OS.attr_type_hipoint, nil, CGPoint.attr_sizeof, nil, pt)
-      OS._hiview_convert_point(pt, 0, self.attr_handle)
-      x = RJava.cast_to_int(pt.attr_x)
-      y = RJava.cast_to_int(pt.attr_y)
-      j = 0
-      while j < @offsets.attr_length
-        rects = get_rectangles(j)
-        i = 0
-        while i < rects.attr_length
-          rectangle = rects[i]
-          if (rectangle.contains(x, y))
-            set_cursor(self.attr_display.get_system_cursor(SWT::CURSOR_HAND))
-            return result
-          end
-          i += 1
-        end
-        j += 1
-      end
-      set_cursor(nil)
-      return result
-    end
-    
-    typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
-    def k_event_unicode_key_pressed(next_handler, the_event, user_data)
-      result = super(next_handler, the_event, user_data)
-      if ((result).equal?(OS.attr_no_err))
-        return result
-      end
-      if ((@focus_index).equal?(-1))
-        return result
-      end
-      keyboard_event = Array.typed(::Java::Int).new(1) { 0 }
-      OS._get_event_parameter(the_event, OS.attr_k_event_param_text_input_send_keyboard_event, OS.attr_type_event_ref, nil, keyboard_event.attr_length * 4, nil, keyboard_event)
-      key_code = Array.typed(::Java::Int).new(1) { 0 }
-      OS._get_event_parameter(keyboard_event[0], OS.attr_k_event_param_key_code, OS.attr_type_uint32, nil, key_code.attr_length * 4, nil, key_code)
-      case (key_code[0])
-      # Return
-      # Space
-      when 36, 49, 76
-        # Enter
-        event = Event.new
-        event.attr_text = @ids[@focus_index]
-        send_event(SWT::Selection, event)
-      when 48
-        # Tab
-        modifiers = Array.typed(::Java::Int).new(1) { 0 }
-        OS._get_event_parameter(keyboard_event[0], OS.attr_k_event_param_key_modifiers, OS.attr_type_uint32, nil, 4, nil, modifiers)
-        next_ = ((modifiers[0] & OS.attr_shift_key)).equal?(0)
-        if (next_)
-          if (@focus_index < @offsets.attr_length - 1)
-            @focus_index += 1
-            redraw
-          end
-        else
-          if (@focus_index > 0)
-            @focus_index -= 1
-            redraw
-          end
-        end
-      end
-      return result
     end
     
     typesig { [] }
     def release_widget
       super
-      if (!(@layout).nil?)
-        @layout.dispose
-      end
-      @layout = nil
-      if (!(@link_color).nil?)
-        @link_color.dispose
-      end
-      @link_color = nil
-      if (!(@disabled_color).nil?)
-        @disabled_color.dispose
-      end
-      @disabled_color = nil
       @offsets = nil
       @ids = nil
       @mnemonics = nil
       @text = RJava.cast_to_string(nil)
+      @link_color = nil
     end
     
     typesig { [SelectionListener] }
@@ -706,95 +501,48 @@ module Org::Eclipse::Swt::Widgets
       return mnemonic
     end
     
-    typesig { [::Java::Int, ::Java::Short, ::Java::Int, ::Java::Int, ::Java::Boolean, ::Java::Int, ::Java::Short, ::Java::Short, ::Java::Int] }
-    def send_mouse_event(type, button, count, detail, send, chord, x, y, modifiers)
-      result = super(type, button, count, detail, send, chord, x, y, modifiers)
-      catch(:break_case) do
-        case (type)
-        when SWT::MouseDown
-          if ((button).equal?(1) && (count).equal?(1))
-            offset = @layout.get_offset(x, y, nil)
-            old_selection_x = @selection.attr_x
-            old_selection_y = @selection.attr_y
-            @selection.attr_x = offset
-            @selection.attr_y = -1
-            if (!(old_selection_x).equal?(-1) && !(old_selection_y).equal?(-1))
-              if (old_selection_x > old_selection_y)
-                temp = old_selection_x
-                old_selection_x = old_selection_y
-                old_selection_y = temp
-              end
-              rectangle = @layout.get_bounds(old_selection_x, old_selection_y)
-              redraw(rectangle.attr_x, rectangle.attr_y, rectangle.attr_width, rectangle.attr_height, false)
-            end
-            j = 0
-            while j < @offsets.attr_length
-              rects = get_rectangles(j)
-              i = 0
-              while i < rects.attr_length
-                rectangle = rects[i]
-                if (rectangle.contains(x, y))
-                  @focus_index = j
-                  redraw
-                  set_focus
-                  return result
-                end
-                i += 1
-              end
-              j += 1
-            end
-          end
-        when SWT::MouseMove
-          if (!((chord & 0x1)).equal?(0))
-            old_selection = @selection.attr_y
-            @selection.attr_y = @layout.get_offset(x, y, nil)
-            if (!(@selection.attr_y).equal?(old_selection))
-              new_selection = @selection.attr_y
-              if (old_selection > new_selection)
-                temp = old_selection
-                old_selection = new_selection
-                new_selection = temp
-              end
-              rectangle = @layout.get_bounds(old_selection, new_selection)
-              redraw(rectangle.attr_x, rectangle.attr_y, rectangle.attr_width, rectangle.attr_height, false)
-            end
-          end
-        when SWT::MouseUp
-          if ((@focus_index).equal?(-1))
-            throw :break_case, :thrown
-          end
-          if ((button).equal?(1))
-            rects = get_rectangles(@focus_index)
-            i = 0
-            while i < rects.attr_length
-              rectangle = rects[i]
-              if (rectangle.contains(x, y))
-                event = Event.new
-                event.attr_text = @ids[@focus_index]
-                notify_listeners(SWT::Selection, event)
-                return result
-              end
-              i += 1
-            end
-          end
+    typesig { [] }
+    def update_background
+      ns_color = nil
+      if (!(self.attr_background_image).nil?)
+        ns_color = NSColor.color_with_pattern_image(self.attr_background_image.attr_handle)
+      else
+        if (!(self.attr_background).nil?)
+          ns_color = NSColor.color_with_device_red(self.attr_background[0], self.attr_background[1], self.attr_background[2], self.attr_background[3])
         end
       end
-      return result
+      set_background(ns_color)
     end
     
-    typesig { [::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Boolean, ::Java::Boolean, ::Java::Boolean] }
-    def set_bounds(x, y, width, height, move, resize, events)
-      result = super(x, y, width, height, move, resize, events)
-      if (!((result & RESIZED)).equal?(0))
-        @layout.set_width(width > 0 ? width : -1)
+    typesig { [NSColor] }
+    def set_background(ns_color)
+      widget = self.attr_view
+      if ((ns_color).nil?)
+        widget.set_draws_background(false)
+      else
+        widget.set_draws_background(true)
+        widget.set_background_color(ns_color)
       end
-      return result
     end
     
-    typesig { [Font] }
-    def set_font_style(font)
-      super(font)
-      @layout.set_font(get_font)
+    typesig { [NSFont] }
+    def set_font(font)
+      (self.attr_view).set_font(font)
+    end
+    
+    typesig { [Array.typed(::Java::Float)] }
+    # double
+    def set_foreground(color)
+      if (!get_enabled)
+        return
+      end
+      ns_color = nil
+      if ((color).nil?)
+        ns_color = NSColor.text_color
+      else
+        ns_color = NSColor.color_with_device_red(color[0], color[1], color[2], 1)
+      end
+      (self.attr_view).set_text_color(ns_color)
     end
     
     typesig { [String] }
@@ -806,8 +554,9 @@ module Org::Eclipse::Swt::Widgets
     # selected, the text field of the selection event contains either the
     # text of the hyperlink or the value of its HREF, if one was specified.
     # In the rare case of identical hyperlinks within the same string, the
-    # HREF tag can be used to distinguish between them.  The string may
-    # include the mnemonic character and line delimiters.
+    # HREF attribute can be used to distinguish between them.  The string may
+    # include the mnemonic character and line delimiters. The only delimiter
+    # the HREF attribute supports is the quotation mark (").
     # </p>
     # 
     # @param string the new text
@@ -828,51 +577,42 @@ module Org::Eclipse::Swt::Widgets
         return
       end
       @text = string
-      @layout.set_text(parse(string))
-      @focus_index = @offsets.attr_length > 0 ? 0 : -1
-      @selection.attr_x = @selection.attr_y = -1
-      enabled = ((self.attr_state & DISABLED)).equal?(0)
-      link_style = TextStyle.new(nil, enabled ? @link_color : @disabled_color, nil)
-      link_style.attr_underline = true
+      widget = self.attr_view
+      widget.set_string(NSString.string_with(parse(string)))
+      text_storage_ = widget.text_storage
+      range = NSRange.new
       i = 0
       while i < @offsets.attr_length
-        point = @offsets[i]
-        @layout.set_style(link_style, point.attr_x, point.attr_y)
+        range.attr_location = @offsets[i].attr_x
+        range.attr_length = @offsets[i].attr_y - @offsets[i].attr_x + 1
+        text_storage_.add_attribute(OS::NSLinkAttributeName, NSString.string_with(@ids[i]), range)
         i += 1
       end
-      # This code is intentionally commented. Mnemonics are
-      # not drawn on the Macintosh.
-      # 
-      # TextStyle mnemonicStyle = new TextStyle (null, null, null);
-      # mnemonicStyle.underline = true;
-      # for (int i = 0; i < mnemonics.length; i++) {
-      # int mnemonic  = mnemonics [i];
-      # if (mnemonic != -1) {
-      # layout.setStyle (mnemonicStyle, mnemonic, mnemonic);
-      # }
-      # }
-      redraw
     end
     
-    typesig { [::Java::Int, ::Java::Int] }
-    def traversal_code(key, the_event)
-      if ((@offsets.attr_length).equal?(0))
-        return 0
+    typesig { [] }
+    def set_zorder
+      super
+      if (!(@scroll_view).nil?)
+        @scroll_view.set_document_view(self.attr_view)
       end
-      bits = super(key, the_event)
-      # Tab
-      if ((key).equal?(48) && !(the_event).equal?(0))
-        modifiers = Array.typed(::Java::Int).new(1) { 0 }
-        OS._get_event_parameter(the_event, OS.attr_k_event_param_key_modifiers, OS.attr_type_uint32, nil, 4, nil, modifiers)
-        next_ = ((modifiers[0] & OS.attr_shift_key)).equal?(0)
-        if (next_ && @focus_index < @offsets.attr_length - 1)
-          return bits & ~SWT::TRAVERSE_TAB_NEXT
-        end
-        if (!next_ && @focus_index > 0)
-          return bits & ~SWT::TRAVERSE_TAB_PREVIOUS
-        end
+    end
+    
+    typesig { [] }
+    def top_view
+      return @scroll_view
+    end
+    
+    typesig { [::Java::Boolean] }
+    def update_cursor_rects(enabled)
+      super(enabled)
+      if ((@scroll_view).nil?)
+        return
       end
-      return bits
+      update_cursor_rects(enabled, @scroll_view)
+      content_view_ = @scroll_view.content_view
+      update_cursor_rects(enabled, content_view_)
+      content_view_.set_document_cursor(enabled ? NSCursor._ibeam_cursor : nil)
     end
     
     private

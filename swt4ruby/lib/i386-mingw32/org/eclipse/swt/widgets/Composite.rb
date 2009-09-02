@@ -1,6 +1,6 @@
 require "rjava"
 
-# Copyright (c) 2000, 2008 IBM Corporation and others.
+# Copyright (c) 2000, 2009 IBM Corporation and others.
 # All rights reserved. This program and the accompanying materials
 # are made available under the terms of the Eclipse Public License v1.0
 # which accompanies this distribution, and is available at
@@ -36,10 +36,9 @@ module Org::Eclipse::Swt::Widgets
   # than <code>Canvas</code>.
   # </p><p>
   # Note: The <code>CENTER</code> style, although undefined for composites, has the
-  # same value as <code>EMBEDDED</code> (which is used to embed widgets from other
-  # widget toolkits into SWT).  On some operating systems (GTK, Motif), this may cause
-  # the children of this composite to be obscured.  The <code>EMBEDDED</code> style
-  # is for use by other widget toolkits and should normally never be used.
+  # same value as <code>EMBEDDED</code> which is used to embed widgets from other
+  # widget toolkits into SWT.  On some operating systems (GTK, Motif), this may cause
+  # the children of this composite to be obscured.
   # </p><p>
   # This class may be subclassed by custom control implementors
   # who are building controls that are constructed from aggregates
@@ -121,6 +120,8 @@ module Org::Eclipse::Swt::Widgets
     # @see SWT#NO_MERGE_PAINTS
     # @see SWT#NO_REDRAW_RESIZE
     # @see SWT#NO_RADIO_GROUP
+    # @see SWT#EMBEDDED
+    # @see SWT#DOUBLE_BUFFERED
     # @see Widget#getStyle
     def initialize(parent, style)
       @layout = nil
@@ -287,7 +288,7 @@ module Org::Eclipse::Swt::Widgets
         child = list[i]
         child_list = child.compute_tab_list
         if (!(child_list.attr_length).equal?(0))
-          new_result = Array.typed(Control).new(result.attr_length + child_list.attr_length) { nil }
+          new_result = Array.typed(Widget).new(result.attr_length + child_list.attr_length) { nil }
           System.arraycopy(result, 0, new_result, 0, result.attr_length)
           System.arraycopy(child_list, 0, new_result, result.attr_length, child_list.attr_length)
           result = new_result
@@ -1065,7 +1066,7 @@ module Org::Eclipse::Swt::Widgets
         defer = false
       end
       if (!defer && !((self.attr_state & CANVAS)).equal?(0))
-        self.attr_state &= ~RESIZE_OCCURRED | MOVE_OCCURRED
+        self.attr_state &= ~(RESIZE_OCCURRED | MOVE_OCCURRED)
         self.attr_state |= RESIZE_DEFERRED | MOVE_DEFERRED
       end
       super(x, y, width, height, flags, defer)
@@ -1089,7 +1090,7 @@ module Org::Eclipse::Swt::Widgets
       i = 0
       while i < children.attr_length
         child = children[i]
-        if (child.set_radio_focus)
+        if (child.set_radio_focus(false))
           return true
         end
         i += 1
@@ -1112,7 +1113,7 @@ module Org::Eclipse::Swt::Widgets
       i = 0
       while i < children.attr_length
         child = children[i]
-        if (child.set_radio_focus)
+        if (child.set_radio_focus(false))
           return true
         end
         i += 1
@@ -1248,7 +1249,7 @@ module Org::Eclipse::Swt::Widgets
       i = 0
       while i < children.attr_length
         child = children[i]
-        if (child.is_tab_item && child.set_radio_focus)
+        if (child.is_tab_item && child.set_radio_focus(true))
           return true
         end
         i += 1
@@ -1571,7 +1572,7 @@ module Org::Eclipse::Swt::Widgets
       end
       # Paint the control and the background
       ps = PAINTSTRUCT.new
-      if (hooks(SWT::Paint))
+      if (hooks(SWT::Paint) || filters(SWT::Paint))
         # Use the buffered paint when possible
         buffered_paint = false
         if (!((self.attr_style & SWT::DOUBLE_BUFFERED)).equal?(0))
@@ -1643,7 +1644,7 @@ module Org::Eclipse::Swt::Widgets
           if (!((self.attr_style & (SWT::DOUBLE_BUFFERED | SWT::TRANSPARENT))).equal?(0) || !((self.attr_style & SWT::NO_MERGE_PAINTS)).equal?(0))
             sys_rgn = OS._create_rect_rgn(0, 0, 0, 0)
             if ((OS._get_random_rgn(gc.attr_handle, sys_rgn, OS::SYSRGN)).equal?(1))
-              if (OS::WIN32_VERSION >= OS._version(4, 10))
+              if (!OS::IsWinCE && OS::WIN32_VERSION >= OS._version(4, 10))
                 if (!((OS._get_layout(gc.attr_handle) & OS::LAYOUT_RTL)).equal?(0))
                   n_bytes = OS._get_region_data(sys_rgn, 0, nil)
                   lp_rgn_data = Array.typed(::Java::Int).new(n_bytes / 4) { 0 }

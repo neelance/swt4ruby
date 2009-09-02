@@ -23,6 +23,7 @@ module Org::Eclipse::Swt::Internal::Gtk
   class PangoLayoutLine 
     include_class_members PangoLayoutLineImports
     
+    # @field cast=(PangoLayout *)
     # long
     attr_accessor :layout
     alias_method :attr_layout, :layout
@@ -42,6 +43,7 @@ module Org::Eclipse::Swt::Internal::Gtk
     alias_method :attr_length=, :length=
     undef_method :length=
     
+    # @field cast=(GSList *)
     # long
     attr_accessor :runs
     alias_method :attr_runs, :runs

@@ -1,6 +1,6 @@
 require "rjava"
 
-# Copyright (c) 2000, 2008 IBM Corporation and others.
+# Copyright (c) 2000, 2009 IBM Corporation and others.
 # All rights reserved. This program and the accompanying materials
 # are made available under the terms of the Eclipse Public License v1.0
 # which accompanies this distribution, and is available at
@@ -34,6 +34,7 @@ module Org::Eclipse::Swt::Custom
   # 
   # @see <a href="http://www.eclipse.org/swt/snippets/#ctabfolder">CTabFolder, CTabItem snippets</a>
   # @see <a href="http://www.eclipse.org/swt/">Sample code and further information</a>
+  # @noextend This class is not intended to be subclassed by clients.
   class CTabItem < CTabItemImports.const_get :Item
     include_class_members CTabItemImports
     
@@ -310,18 +311,14 @@ module Org::Eclipse::Swt::Custom
         gc.draw_polygon(shape)
       when CTabFolder::HOT
         shape = Array.typed(::Java::Int).new([x, y, x + 2, y, x + 4, y + 2, x + 5, y + 2, x + 7, y, x + 9, y, x + 9, y + 2, x + 7, y + 4, x + 7, y + 5, x + 9, y + 7, x + 9, y + 9, x + 7, y + 9, x + 5, y + 7, x + 4, y + 7, x + 2, y + 9, x, y + 9, x, y + 7, x + 2, y + 5, x + 2, y + 4, x, y + 2])
-        fill = Color.new(display, CTabFolder::CLOSE_FILL)
-        gc.set_background(fill)
+        gc.set_background(@parent.get_fill_color)
         gc.fill_polygon(shape)
-        fill.dispose
         gc.set_foreground(close_border)
         gc.draw_polygon(shape)
       when CTabFolder::SELECTED
         shape = Array.typed(::Java::Int).new([x + 1, y + 1, x + 3, y + 1, x + 5, y + 3, x + 6, y + 3, x + 8, y + 1, x + 10, y + 1, x + 10, y + 3, x + 8, y + 5, x + 8, y + 6, x + 10, y + 8, x + 10, y + 10, x + 8, y + 10, x + 6, y + 8, x + 5, y + 8, x + 3, y + 10, x + 1, y + 10, x + 1, y + 8, x + 3, y + 6, x + 3, y + 5, x + 1, y + 3])
-        fill = Color.new(display, CTabFolder::CLOSE_FILL)
-        gc.set_background(fill)
+        gc.set_background(@parent.get_fill_color)
         gc.fill_polygon(shape)
-        fill.dispose
         gc.set_foreground(close_border)
         gc.draw_polygon(shape)
       when CTabFolder::NONE
@@ -330,11 +327,10 @@ module Org::Eclipse::Swt::Custom
           @parent.draw_background(gc, shape, false)
         else
           default_background = @parent.get_background
-          image = @parent.attr_bg_image
           colors = @parent.attr_gradient_colors
           percents = @parent.attr_gradient_percents
           vertical = @parent.attr_gradient_vertical
-          @parent.draw_background(gc, shape, x, y, 10, 10, default_background, image, colors, percents, vertical)
+          @parent.draw_background(gc, shape, x, y, 10, 10, default_background, nil, colors, percents, vertical)
         end
       end
     end
@@ -366,7 +362,7 @@ module Org::Eclipse::Swt::Custom
           x1 = Math.max(0, @parent.attr_border_left - 1)
           y1 = (@parent.attr_on_bottom) ? @y - 1 : @y + @height
           x2 = size.attr_x - @parent.attr_border_right
-          gc.set_foreground(CTabFolder.attr_border_color)
+          gc.set_foreground(get_display.get_system_color(CTabFolder::BORDER1_COLOR))
           gc.draw_line(x1, y1, x2, y1)
           return
         end
@@ -478,11 +474,12 @@ module Org::Eclipse::Swt::Custom
           inside = nil
         end
         outside = @parent.get_background.get_rgb
-        if (!(@parent.attr_bg_image).nil? || (!(@parent.attr_gradient_colors).nil? && @parent.attr_gradient_colors.attr_length > 1))
+        if (!(@parent.attr_gradient_colors).nil? && @parent.attr_gradient_colors.attr_length > 1)
           outside = nil
         end
-        @parent.antialias(shape, CTabFolder.attr_border_color.get_rgb, inside, outside, gc)
-        gc.set_foreground(CTabFolder.attr_border_color)
+        border_color = get_display.get_system_color(CTabFolder::BORDER1_COLOR)
+        @parent.antialias(shape, border_color.get_rgb, inside, outside, gc)
+        gc.set_foreground(border_color)
         gc.draw_polyline(shape)
         if (!tab_in_paint)
           return
@@ -677,7 +674,7 @@ module Org::Eclipse::Swt::Custom
     # @param gc
     # @param shape
     def draw_border(gc, shape)
-      gc.set_foreground(CTabFolder.attr_border_color)
+      gc.set_foreground(get_display.get_system_color(CTabFolder::BORDER1_COLOR))
       gc.draw_polyline(shape)
     end
     
@@ -1191,7 +1188,11 @@ module Org::Eclipse::Swt::Custom
     
     typesig { [String] }
     # Sets the receiver's tool tip text to the argument, which
-    # may be null indicating that no tool tip text should be shown.
+    # may be null indicating that the default tool tip for the
+    # control will be shown. For a control that has a default
+    # tool tip, such as the Tree control on Windows, setting
+    # the tool tip text to an empty string replaces the default,
+    # causing no tool tip text to be shown.
     # 
     # @param string the new tool tip text (or null)
     # 

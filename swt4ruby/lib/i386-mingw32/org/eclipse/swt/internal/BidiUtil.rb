@@ -1,6 +1,6 @@
 require "rjava"
 
-# Copyright (c) 2000, 2007 IBM Corporation and others.
+# Copyright (c) 2000, 2008 IBM Corporation and others.
 # All rights reserved. This program and the accompanying materials
 # are made available under the terms of the Eclipse Public License v1.0
 # which accompanies this distribution, and is available at
@@ -165,6 +165,9 @@ module Org::Eclipse::Swt::Internal
       
       const_set_lazy(:LANG_HEBREW) { 0xd }
       const_attr_reader  :LANG_HEBREW
+      
+      const_set_lazy(:LANG_FARSI) { 0x29 }
+      const_attr_reader  :LANG_FARSI
       
       # code page identifiers
       const_set_lazy(:CD_PG_HEBREW) { "1255" }
@@ -530,15 +533,7 @@ module Org::Eclipse::Swt::Internal
       def get_keyboard_language
         # long
         layout = OS._get_keyboard_layout(0)
-        lang_id = OS._primarylangid(OS._loword(layout))
-        if ((lang_id).equal?(LANG_HEBREW))
-          return KEYBOARD_BIDI
-        end
-        if ((lang_id).equal?(LANG_ARABIC))
-          return KEYBOARD_BIDI
-        end
-        # return non-bidi for all other languages
-        return KEYBOARD_NON_BIDI
+        return is_bidi_lang(layout) ? KEYBOARD_BIDI : KEYBOARD_NON_BIDI
       end
       
       typesig { [] }
@@ -559,6 +554,13 @@ module Org::Eclipse::Swt::Internal
         list = Array.typed(::Java::Int).new(size) { 0 }
         System.arraycopy(temp_list, 0, list, 0, size)
         return list
+      end
+      
+      typesig { [::Java::Int] }
+      # long
+      def is_bidi_lang(lang)
+        id = OS._primarylangid(OS._loword(lang))
+        return (id).equal?(LANG_ARABIC) || (id).equal?(LANG_HEBREW) || (id).equal?(LANG_FARSI)
       end
       
       typesig { [] }
@@ -625,8 +627,7 @@ module Org::Eclipse::Swt::Internal
         list = get_keyboard_language_list
         i = 0
         while i < list.attr_length
-          id = OS._primarylangid(OS._loword(list[i]))
-          if (((id).equal?(LANG_ARABIC)) || ((id).equal?(LANG_HEBREW)))
+          if (is_bidi_lang(list[i]))
             return true
           end
           i += 1
@@ -660,39 +661,19 @@ module Org::Eclipse::Swt::Internal
       # @param language integer representing language. One of
       # KEYBOARD_BIDI, KEYBOARD_NON_BIDI.
       def set_keyboard_language(language)
-        # don't switch the keyboard if it doesn't need to be
         if ((language).equal?(get_keyboard_language))
           return
         end
-        if ((language).equal?(KEYBOARD_BIDI))
-          # get the list of active languages
-          # long
-          list = get_keyboard_language_list
-          # set to first bidi language
-          i = 0
-          while i < list.attr_length
-            id = OS._primarylangid(OS._loword(list[i]))
-            if (((id).equal?(LANG_ARABIC)) || ((id).equal?(LANG_HEBREW)))
-              OS._activate_keyboard_layout(list[i], 0)
-              return
-            end
-            i += 1
+        bidi = (language).equal?(KEYBOARD_BIDI)
+        # long
+        list = get_keyboard_language_list
+        i = 0
+        while i < list.attr_length
+          if ((bidi).equal?(is_bidi_lang(list[i])))
+            OS._activate_keyboard_layout(list[i], 0)
+            return
           end
-        else
-          # get the list of active languages
-          # long
-          list = get_keyboard_language_list
-          # set to the first non-bidi language (anything not
-          # Hebrew or Arabic)
-          i = 0
-          while i < list.attr_length
-            id = OS._primarylangid(OS._loword(list[i]))
-            if ((!(id).equal?(LANG_HEBREW)) && (!(id).equal?(LANG_ARABIC)))
-              OS._activate_keyboard_layout(list[i], 0)
-              return
-            end
-            i += 1
-          end
+          i += 1
         end
       end
       

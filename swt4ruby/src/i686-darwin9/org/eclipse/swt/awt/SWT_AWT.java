@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2008 IBM Corporation and others.
+ * Copyright (c) 2000, 2009 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -14,9 +14,12 @@ package org.eclipse.swt.awt;
 import java.awt.Canvas;
 import java.awt.EventQueue;
 import java.awt.Frame;
+import java.awt.Toolkit;
 import java.lang.reflect.Constructor;
+import java.lang.reflect.Method;
 
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.internal.Library;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
@@ -48,6 +51,39 @@ public class SWT_AWT {
 
 	static {
 		System.setProperty("apple.awt.usingSWT", "true");
+	}
+
+	static boolean loaded, swingInitialized;
+
+	static native final int /*long*/ getAWTHandle (Canvas canvas);
+
+	static synchronized void loadLibrary () {
+		if (loaded) return;
+		loaded = true;
+		Toolkit.getDefaultToolkit();
+		/*
+		 * Note that the jawt library is loaded explicitly
+		 * because it cannot be found by the library loader.
+		 * All exceptions are caught because the library may
+		 * have been loaded already.
+		 */
+		try {
+			System.loadLibrary("jawt");
+		} catch (Throwable e) {}
+		Library.loadLibrary("swt-awt");
+	}
+
+	static synchronized void initializeSwing() {
+		if (swingInitialized) return;
+		swingInitialized = true;
+		try {
+			/* Initialize the default focus traversal policy */
+			Class[] emptyClass = new Class[0];
+			Object[] emptyObject = new Object[0];
+			Class clazz = Class.forName("javax.swing.UIManager");
+			Method method = clazz.getMethod("getDefaults", emptyClass);
+			if (method != null) method.invoke(clazz, emptyObject);
+		} catch (Throwable e) {}
 	}
 
 /**
@@ -97,11 +133,12 @@ public static Frame new_Frame(final Composite parent) {
 	if ((parent.getStyle() & SWT.EMBEDDED) == 0) {
 		SWT.error(SWT.ERROR_INVALID_ARGUMENT);
 	}
-	final int handle = parent.handle;
+
+	final int /*long*/ handle = parent.view.id;
 
 	Class clazz = null;
 	try {
-		String className = embeddedFrameClass != null ? embeddedFrameClass : "apple.awt.CHIViewEmbeddedFrame";
+		String className = embeddedFrameClass != null ? embeddedFrameClass : "apple.awt.CEmbeddedFrame";
 		if (embeddedFrameClass == null) {
 			clazz = Class.forName(className, true, ClassLoader.getSystemClassLoader());
 		} else {
@@ -141,7 +178,7 @@ public static Frame new_Frame(final Composite parent) {
 	};
 
 	parent.addListener(SWT.Dispose, listener);
-	
+
 	return frame;
 }
 
@@ -162,9 +199,41 @@ public static Frame new_Frame(final Composite parent) {
  * @since 3.0
  */
 public static Shell new_Shell(final Display display, final Canvas parent) {
-	if (display == null) SWT.error(SWT.ERROR_NULL_ARGUMENT);
-	if (parent == null) SWT.error(SWT.ERROR_NULL_ARGUMENT);
+	if (display == null) SWT.error (SWT.ERROR_NULL_ARGUMENT);
+	if (parent == null) SWT.error (SWT.ERROR_NULL_ARGUMENT);
 	SWT.error(SWT.ERROR_NOT_IMPLEMENTED);
 	return null;
+
+// TODO: Uncomment this code once Display/Shell related issues are ironed out.
+//		int /*long*/ handle = 0;
+//
+//		try {
+//			loadLibrary ();
+//			handle = getAWTHandle (parent);
+//		} catch (Throwable e) {
+//			SWT.error (SWT.ERROR_NOT_IMPLEMENTED, e);
+//		}
+//		if (handle == 0) SWT.error (SWT.ERROR_INVALID_ARGUMENT, null, " [peer not created]");
+//
+//		final Shell shell = Shell.cocoa_new (display, handle);
+//		final ComponentListener listener = new ComponentAdapter () {
+//			public void componentResized (ComponentEvent e) {
+//				display.asyncExec (new Runnable () {
+//					public void run () {
+//						if (shell.isDisposed()) return;
+//						Dimension dim = parent.getSize ();
+//						shell.setSize (dim.width, dim.height);
+//					}
+//				});
+//			}
+//		};
+//		parent.addComponentListener(listener);
+//		shell.addListener(SWT.Dispose, new Listener() {
+//			public void handleEvent(Event event) {
+//				parent.removeComponentListener(listener);
+//			}
+//		});
+//		shell.setVisible (true);
+//		return shell;
 }
 }

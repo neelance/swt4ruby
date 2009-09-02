@@ -1,6 +1,6 @@
 require "rjava"
 
-# Copyright (c) 2000, 2008 IBM Corporation and others.
+# Copyright (c) 2000, 2009 IBM Corporation and others.
 # All rights reserved. This program and the accompanying materials
 # are made available under the terms of the Eclipse Public License v1.0
 # which accompanies this distribution, and is available at
@@ -40,6 +40,7 @@ module Org::Eclipse::Swt::Widgets
   # 
   # @see <a href="http://www.eclipse.org/swt/examples.php">SWT Example: ControlExample</a>
   # @see <a href="http://www.eclipse.org/swt/">Sample code and further information</a>
+  # @noextend This class is not intended to be subclassed by clients.
   class Group < GroupImports.const_get :Composite
     include_class_members GroupImports
     
@@ -236,7 +237,7 @@ module Org::Eclipse::Swt::Widgets
       trim.attr_x -= CLIENT_INSET
       trim.attr_y -= tm.attr_tm_height + offset_y
       trim.attr_width += CLIENT_INSET * 2
-      trim.attr_height += tm.attr_tm_height + CLIENT_INSET
+      trim.attr_height += tm.attr_tm_height + CLIENT_INSET + offset_y
       return trim
     end
     
@@ -335,37 +336,65 @@ module Org::Eclipse::Swt::Widgets
       return (Character.to_upper_case(key)).equal?(Character.to_upper_case(mnemonic))
     end
     
-    typesig { [::Java::Int, SwtGC] }
+    typesig { [::Java::Int, ::Java::Int, SwtGC] }
     # long
-    def print_widget(hwnd, gc)
+    # long
+    def print_widget(hwnd, hdc, gc)
+      # Bug in Windows.  For some reason, PrintWindow()
+      # returns success but does nothing when it is called
+      # on a printer.  The fix is to just go directly to
+      # WM_PRINT in this case.
+      success = false
+      if (!((OS._get_device_caps(gc.attr_handle, OS::TECHNOLOGY)).equal?(OS::DT_RASPRINTER)))
+        bits = OS._get_window_long(hwnd, OS::GWL_STYLE)
+        if (((bits & OS::WS_VISIBLE)).equal?(0))
+          OS._def_window_proc(hwnd, OS::WM_SETREDRAW, 1, 0)
+        end
+        success = OS._print_window(hwnd, hdc, 0)
+        if (((bits & OS::WS_VISIBLE)).equal?(0))
+          OS._def_window_proc(hwnd, OS::WM_SETREDRAW, 0, 0)
+        end
+      end
       # Bug in Windows.  For some reason, PrintWindow() fails
       # when it is called on a push button.  The fix is to
       # detect the failure and use WM_PRINT instead.  Note
       # that WM_PRINT cannot be used all the time because it
       # fails for browser controls when the browser has focus.
-      # 
-      # long
-      h_dc = gc.attr_handle
-      if (!OS._print_window(hwnd, h_dc, 0))
+      if (!success)
         # Bug in Windows.  For some reason, WM_PRINT when called
         # with PRF_CHILDREN will not draw the tool bar divider
         # for tool bar children that do not have CCS_NODIVIDER.
         # The fix is to draw the group box and iterate through
         # the children, drawing each one.
         flags = OS::PRF_CLIENT | OS::PRF_NONCLIENT | OS::PRF_ERASEBKGND
-        OS._send_message(hwnd, OS::WM_PRINT, h_dc, flags)
-        n_saved_dc = OS._save_dc(h_dc)
+        OS._send_message(hwnd, OS::WM_PRINT, hdc, flags)
+        n_saved_dc = OS._save_dc(hdc)
         children = __get_children
         rect = get_bounds
-        OS._intersect_clip_rect(h_dc, 0, 0, rect.attr_width, rect.attr_height)
+        OS._intersect_clip_rect(hdc, 0, 0, rect.attr_width, rect.attr_height)
         i = children.attr_length - 1
         while i >= 0
           location = children[i].get_location
-          OS._set_window_org_ex(h_dc, -location.attr_x, -location.attr_y, nil)
-          children[i].print(gc)
+          graphics_mode = OS._get_graphics_mode(hdc)
+          if ((graphics_mode).equal?(OS::GM_ADVANCED))
+            lp_xform = Array.typed(::Java::Float).new([1, 0, 0, 1, location.attr_x, location.attr_y])
+            OS._modify_world_transform(hdc, lp_xform, OS::MWT_LEFTMULTIPLY)
+          else
+            OS._set_window_org_ex(hdc, -location.attr_x, -location.attr_y, nil)
+          end
+          # long
+          top_handle = children[i].top_handle
+          bits = OS._get_window_long(top_handle, OS::GWL_STYLE)
+          if (!((bits & OS::WS_VISIBLE)).equal?(0))
+            children[i].print_widget(top_handle, hdc, gc)
+          end
+          if ((graphics_mode).equal?(OS::GM_ADVANCED))
+            lp_xform = Array.typed(::Java::Float).new([1, 0, 0, 1, -location.attr_x, -location.attr_y])
+            OS._modify_world_transform(hdc, lp_xform, OS::MWT_LEFTMULTIPLY)
+          end
           (i -= 1)
         end
-        OS._restore_dc(h_dc, n_saved_dc)
+        OS._restore_dc(hdc, n_saved_dc)
       end
     end
     

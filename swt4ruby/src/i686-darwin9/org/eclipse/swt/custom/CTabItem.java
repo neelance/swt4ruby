@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2008 IBM Corporation and others.
+ * Copyright (c) 2000, 2009 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -31,6 +31,7 @@ import org.eclipse.swt.widgets.*;
  *
  * @see <a href="http://www.eclipse.org/swt/snippets/#ctabfolder">CTabFolder, CTabItem snippets</a>
  * @see <a href="http://www.eclipse.org/swt/">Sample code and further information</a>
+ * @noextend This class is not intended to be subclassed by clients.
  */
 public class CTabItem extends Item {
 	CTabFolder parent;
@@ -197,10 +198,8 @@ void drawClose(GC gc) {
 					                 x+9,y+2, x+7,y+4, x+7,y+5, x+9,y+7, x+9,y+9,
 			                         x+7,y+9, x+5,y+7, x+4,y+7, x+2,y+9, x,y+9,
 			                         x,y+7, x+2,y+5, x+2,y+4, x,y+2};
-			Color fill = new Color(display, CTabFolder.CLOSE_FILL);
-			gc.setBackground(fill);
+			gc.setBackground(parent.getFillColor());
 			gc.fillPolygon(shape);
-			fill.dispose();
 			gc.setForeground(closeBorder);
 			gc.drawPolygon(shape);
 			break;
@@ -210,10 +209,8 @@ void drawClose(GC gc) {
 					                 x+10,y+3, x+8,y+5, x+8,y+6, x+10,y+8, x+10,y+10,
 			                         x+8,y+10, x+6,y+8, x+5,y+8, x+3,y+10, x+1,y+10,
 			                         x+1,y+8, x+3,y+6, x+3,y+5, x+1,y+3};
-			Color fill = new Color(display, CTabFolder.CLOSE_FILL);
-			gc.setBackground(fill);
+			gc.setBackground(parent.getFillColor());
 			gc.fillPolygon(shape);
-			fill.dispose();
 			gc.setForeground(closeBorder);
 			gc.drawPolygon(shape);
 			break;
@@ -224,11 +221,10 @@ void drawClose(GC gc) {
 				parent.drawBackground(gc, shape, false);
 			} else {
 				Color defaultBackground = parent.getBackground();
-				Image image = parent.bgImage;
 				Color[] colors = parent.gradientColors;
 				int[] percents = parent.gradientPercents;
 				boolean vertical = parent.gradientVertical; 
-				parent.drawBackground(gc, shape, x, y, 10, 10, defaultBackground, image, colors, percents, vertical);
+				parent.drawBackground(gc, shape, x, y, 10, 10, defaultBackground, null, colors, percents, vertical);
 			}
 			break;
 		}
@@ -260,7 +256,7 @@ void drawSelected(GC gc ) {
 			int x1 = Math.max(0, parent.borderLeft - 1);
 			int y1 = (parent.onBottom) ? y - 1 : y + height;
 			int x2 = size.x - parent.borderRight;
-			gc.setForeground(CTabFolder.borderColor);
+			gc.setForeground(getDisplay().getSystemColor(CTabFolder.BORDER1_COLOR));
 			gc.drawLine(x1, y1, x2, y1);
 			return;
 		}
@@ -362,12 +358,12 @@ void drawSelected(GC gc ) {
 		    inside = null;
 		}
 		RGB outside = parent.getBackground().getRGB();		
-		if (parent.bgImage != null || 
-		    (parent.gradientColors != null && parent.gradientColors.length > 1)) {
+		if (parent.gradientColors != null && parent.gradientColors.length > 1) {
 		    outside = null;
 		}
-		parent.antialias(shape, CTabFolder.borderColor.getRGB(), inside, outside, gc);
-		gc.setForeground(CTabFolder.borderColor);
+		Color borderColor = getDisplay().getSystemColor(CTabFolder.BORDER1_COLOR);
+		parent.antialias(shape, borderColor.getRGB(), inside, outside, gc);
+		gc.setForeground(borderColor);
 		gc.drawPolyline(shape);
 		
 		if (!tabInPaint) return;
@@ -569,7 +565,7 @@ void drawRightUnselectedBorder(GC gc) {
  */
 void drawBorder(GC gc, int[] shape) {
 
-	gc.setForeground(CTabFolder.borderColor);
+	gc.setForeground(getDisplay().getSystemColor(CTabFolder.BORDER1_COLOR));
 	gc.drawPolyline(shape);
 }
 
@@ -1036,7 +1032,11 @@ public void setText (String string) {
 }
 /**
  * Sets the receiver's tool tip text to the argument, which
- * may be null indicating that no tool tip text should be shown.
+ * may be null indicating that the default tool tip for the 
+ * control will be shown. For a control that has a default
+ * tool tip, such as the Tree control on Windows, setting
+ * the tool tip text to an empty string replaces the default,
+ * causing no tool tip text to be shown.
  *
  * @param string the new tool tip text (or null)
  *

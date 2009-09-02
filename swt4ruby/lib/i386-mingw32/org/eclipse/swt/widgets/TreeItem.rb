@@ -1,6 +1,6 @@
 require "rjava"
 
-# Copyright (c) 2000, 2008 IBM Corporation and others.
+# Copyright (c) 2000, 2009 IBM Corporation and others.
 # All rights reserved. This program and the accompanying materials
 # are made available under the terms of the Eclipse Public License v1.0
 # which accompanies this distribution, and is available at
@@ -34,6 +34,7 @@ module Org::Eclipse::Swt::Widgets
   # 
   # @see <a href="http://www.eclipse.org/swt/snippets/#tree">Tree, TreeItem, TreeColumn snippets</a>
   # @see <a href="http://www.eclipse.org/swt/">Sample code and further information</a>
+  # @noextend This class is not intended to be subclassed by clients.
   class TreeItem < TreeItemImports.const_get :Item
     include_class_members TreeItemImports
     
@@ -1189,7 +1190,7 @@ module Org::Eclipse::Swt::Widgets
     
     typesig { [] }
     def redraw
-      if ((@parent.attr_current_item).equal?(self) || !(@parent.attr_draw_count).equal?(0))
+      if ((@parent.attr_current_item).equal?(self) || !@parent.get_drawing)
         return
       end
       # long
@@ -1217,7 +1218,7 @@ module Org::Eclipse::Swt::Widgets
     
     typesig { [::Java::Int, ::Java::Boolean, ::Java::Boolean] }
     def redraw(column, draw_text, draw_image)
-      if ((@parent.attr_current_item).equal?(self) || !(@parent.attr_draw_count).equal?(0))
+      if ((@parent.attr_current_item).equal?(self) || !@parent.get_drawing)
         return
       end
       # long
@@ -1491,7 +1492,7 @@ module Org::Eclipse::Swt::Widgets
         if (!OS._get_scroll_info(hwnd, OS::SB_HORZ, old_info))
           old_info = nil
         end
-        if ((@parent.attr_draw_count).equal?(0) && OS._is_window_visible(hwnd))
+        if (@parent.get_drawing && OS._is_window_visible(hwnd))
           no_animate = true
           # 64
           count = RJava.cast_to_int(OS._send_message(hwnd, OS::TVM_GETVISIBLECOUNT, 0, 0))

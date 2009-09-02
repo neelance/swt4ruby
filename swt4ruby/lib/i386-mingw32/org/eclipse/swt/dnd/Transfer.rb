@@ -13,6 +13,7 @@ module Org::Eclipse::Swt::Dnd
     class_module.module_eval {
       include ::Java::Lang
       include ::Org::Eclipse::Swt::Dnd
+      include ::Org::Eclipse::Swt::Internal::Ole::Win32
       include ::Org::Eclipse::Swt::Internal::Win32
     }
   end
@@ -32,6 +33,40 @@ module Org::Eclipse::Swt::Dnd
   # @see <a href="http://www.eclipse.org/swt/">Sample code and further information</a>
   class Transfer 
     include_class_members TransferImports
+    
+    class_module.module_eval {
+      const_set_lazy(:RETRY_LIMIT) { 10 }
+      const_attr_reader  :RETRY_LIMIT
+    }
+    
+    typesig { [IDataObject, FORMATETC, STGMEDIUM] }
+    # Feature in Windows. When another application has control
+    # of the clipboard, the clipboard is locked and it's not
+    # possible to retrieve data until the other application is
+    # finished. To allow other applications to get the
+    # data, use PeekMessage() to enable cross thread
+    # message sends.
+    def get_data(data_object, p_formatetc, pmedium)
+      if ((data_object._get_data(p_formatetc, pmedium)).equal?(COM::S_OK))
+        return COM::S_OK
+      end
+      begin
+        JavaThread.sleep(50)
+      rescue JavaThrowable => t
+      end
+      result = data_object._get_data(p_formatetc, pmedium)
+      retry_count = 0
+      while (!(result).equal?(COM::S_OK) && ((retry_count += 1) - 1) < RETRY_LIMIT)
+        msg = MSG.new
+        OS._peek_message(msg, 0, 0, 0, OS::PM_NOREMOVE | OS::PM_NOYIELD)
+        begin
+          JavaThread.sleep(50)
+        rescue JavaThrowable => t
+        end
+        result = data_object._get_data(p_formatetc, pmedium)
+      end
+      return result
+    end
     
     typesig { [] }
     # Returns a list of the platform specific data types that can be converted using

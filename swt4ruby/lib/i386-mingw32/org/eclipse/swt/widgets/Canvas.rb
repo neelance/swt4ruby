@@ -359,6 +359,14 @@ module Org::Eclipse::Swt::Widgets
       @ime = ime
     end
     
+    typesig { [] }
+    def window_class
+      if (self.attr_display.attr_use_own_dc)
+        return self.attr_display.attr_window_own_dcclass
+      end
+      return super
+    end
+    
     typesig { [::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int] }
     # long
     # long
@@ -491,9 +499,10 @@ module Org::Eclipse::Swt::Widgets
           return result
         end
       end
+      caret = @caret
       result = super(w_param, l_param)
-      if (!(@caret).nil?)
-        @caret.kill_focus
+      if (!(caret).nil?)
+        caret.kill_focus
       end
       return result
     end
@@ -516,7 +525,7 @@ module Org::Eclipse::Swt::Widgets
     # long
     def _wm_setfocus(w_param, l_param)
       result = super(w_param, l_param)
-      if (!(@caret).nil?)
+      if (!(@caret).nil? && @caret.is_focus_caret)
         @caret.set_focus
       end
       return result

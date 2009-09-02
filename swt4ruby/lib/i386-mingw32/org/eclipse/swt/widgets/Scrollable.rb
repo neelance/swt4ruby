@@ -1,6 +1,6 @@
 require "rjava"
 
-# Copyright (c) 2000, 2008 IBM Corporation and others.
+# Copyright (c) 2000, 2009 IBM Corporation and others.
 # All rights reserved. This program and the accompanying materials
 # are made available under the terms of the Eclipse Public License v1.0
 # which accompanies this distribution, and is available at
@@ -33,6 +33,7 @@ module Org::Eclipse::Swt::Widgets
   # </p>
   # 
   # @see <a href="http://www.eclipse.org/swt/">Sample code and further information</a>
+  # @noextend This class is not intended to be subclassed by clients.
   class Scrollable < ScrollableImports.const_get :Control
     include_class_members ScrollableImports
     
@@ -327,92 +328,7 @@ module Org::Eclipse::Swt::Widgets
     # long
     # long
     def _wm_mousewheel(w_param, l_param)
-      scroll_remainder = self.attr_display.attr_scroll_remainder
-      result = super(w_param, l_param)
-      if (!(result).nil?)
-        return result
-      end
-      # Translate WM_MOUSEWHEEL to WM_VSCROLL or WM_HSCROLL.
-      if (!((self.attr_state & CANVAS)).equal?(0))
-        if (!((w_param & (OS::MK_SHIFT | OS::MK_CONTROL))).equal?(0))
-          return result
-        end
-        vertical = !(@vertical_bar).nil? && @vertical_bar.get_enabled
-        horizontal = !(@horizontal_bar).nil? && @horizontal_bar.get_enabled
-        msg = vertical ? OS::WM_VSCROLL : horizontal ? OS::WM_HSCROLL : 0
-        if ((msg).equal?(0))
-          return result
-        end
-        lines_to_scroll = Array.typed(::Java::Int).new(1) { 0 }
-        OS._system_parameters_info(OS::SPI_GETWHEELSCROLLLINES, 0, lines_to_scroll, 0)
-        delta = OS._get_wheel_delta_wparam(w_param)
-        page_scroll = (lines_to_scroll[0]).equal?(OS::WHEEL_PAGESCROLL)
-        if (!OS::IsWinCE && OS::WIN32_VERSION >= OS._version(6, 0))
-          bar = vertical ? @vertical_bar : @horizontal_bar
-          info = SCROLLINFO.new
-          info.attr_cb_size = SCROLLINFO.attr_sizeof
-          info.attr_f_mask = OS::SIF_POS
-          OS._get_scroll_info(self.attr_handle, bar.scroll_bar_type, info)
-          if (vertical && !page_scroll)
-            delta *= lines_to_scroll[0]
-          end
-          increment = page_scroll ? bar.get_page_increment : bar.get_increment
-          info.attr_n_pos -= increment * delta / OS::WHEEL_DELTA
-          OS._set_scroll_info(self.attr_handle, bar.scroll_bar_type, info, true)
-          OS._send_message(self.attr_handle, msg, OS::SB_THUMBPOSITION, 0)
-        else
-          code = 0
-          if (page_scroll)
-            code = delta < 0 ? OS::SB_PAGEDOWN : OS::SB_PAGEUP
-          else
-            code = delta < 0 ? OS::SB_LINEDOWN : OS::SB_LINEUP
-            if ((msg).equal?(OS::WM_VSCROLL))
-              delta *= lines_to_scroll[0]
-            end
-          end
-          # Check if the delta and the remainder have the same direction (sign)
-          if ((delta ^ scroll_remainder) >= 0)
-            delta += scroll_remainder
-          end
-          count = Math.abs(delta) / OS::WHEEL_DELTA
-          i = 0
-          while i < count
-            OS._send_message(self.attr_handle, msg, code, 0)
-            i += 1
-          end
-        end
-        return LRESULT::ZERO
-      end
-      # When the native widget scrolls inside WM_MOUSEWHEEL, it
-      # may or may not send a WM_VSCROLL or WM_HSCROLL to do the
-      # actual scrolling.  This depends on the implementation of
-      # each native widget.  In order to ensure that application
-      # code is notified when the scroll bar moves, compare the
-      # scroll bar position before and after the WM_MOUSEWHEEL.
-      # If the native control sends a WM_VSCROLL or WM_HSCROLL,
-      # then the application has already been notified.  If not
-      # explicitly send the event.
-      v_position = (@vertical_bar).nil? ? 0 : @vertical_bar.get_selection
-      h_position = (@horizontal_bar).nil? ? 0 : @horizontal_bar.get_selection
-      # long
-      code = call_window_proc(self.attr_handle, OS::WM_MOUSEWHEEL, w_param, l_param)
-      if (!(@vertical_bar).nil?)
-        position = @vertical_bar.get_selection
-        if (!(position).equal?(v_position))
-          event = Event.new
-          event.attr_detail = position < v_position ? SWT::PAGE_UP : SWT::PAGE_DOWN
-          @vertical_bar.send_event(SWT::Selection, event)
-        end
-      end
-      if (!(@horizontal_bar).nil?)
-        position = @horizontal_bar.get_selection
-        if (!(position).equal?(h_position))
-          event = Event.new
-          event.attr_detail = position < h_position ? SWT::PAGE_UP : SWT::PAGE_DOWN
-          @horizontal_bar.send_event(SWT::Selection, event)
-        end
-      end
-      return LRESULT.new(code)
+      return wm_scroll_wheel(!((self.attr_state & CANVAS)).equal?(0), w_param, l_param)
     end
     
     typesig { [::Java::Int, ::Java::Int] }
@@ -510,6 +426,98 @@ module Org::Eclipse::Swt::Widgets
         end
       end
       return result
+    end
+    
+    typesig { [::Java::Boolean, ::Java::Int, ::Java::Int] }
+    # long
+    # long
+    def wm_scroll_wheel(update, w_param, l_param)
+      scroll_remainder = self.attr_display.attr_scroll_remainder
+      result = Control.instance_method(:_wm_mousewheel).bind(self).call(w_param, l_param)
+      if (!(result).nil?)
+        return result
+      end
+      # Translate WM_MOUSEWHEEL to WM_VSCROLL or WM_HSCROLL.
+      if (update)
+        if (!((w_param & (OS::MK_SHIFT | OS::MK_CONTROL))).equal?(0))
+          return result
+        end
+        vertical = !(@vertical_bar).nil? && @vertical_bar.get_enabled
+        horizontal = !(@horizontal_bar).nil? && @horizontal_bar.get_enabled
+        msg = vertical ? OS::WM_VSCROLL : horizontal ? OS::WM_HSCROLL : 0
+        if ((msg).equal?(0))
+          return result
+        end
+        lines_to_scroll = Array.typed(::Java::Int).new(1) { 0 }
+        OS._system_parameters_info(OS::SPI_GETWHEELSCROLLLINES, 0, lines_to_scroll, 0)
+        delta = OS._get_wheel_delta_wparam(w_param)
+        page_scroll = (lines_to_scroll[0]).equal?(OS::WHEEL_PAGESCROLL)
+        if (!OS::IsWinCE && OS::WIN32_VERSION >= OS._version(5, 1))
+          bar = vertical ? @vertical_bar : @horizontal_bar
+          info = SCROLLINFO.new
+          info.attr_cb_size = SCROLLINFO.attr_sizeof
+          info.attr_f_mask = OS::SIF_POS
+          OS._get_scroll_info(self.attr_handle, bar.scroll_bar_type, info)
+          if (vertical && !page_scroll)
+            delta *= lines_to_scroll[0]
+          end
+          increment = page_scroll ? bar.get_page_increment : bar.get_increment
+          info.attr_n_pos -= increment * delta / OS::WHEEL_DELTA
+          OS._set_scroll_info(self.attr_handle, bar.scroll_bar_type, info, true)
+          OS._send_message(self.attr_handle, msg, OS::SB_THUMBPOSITION, 0)
+        else
+          code = 0
+          if (page_scroll)
+            code = delta < 0 ? OS::SB_PAGEDOWN : OS::SB_PAGEUP
+          else
+            code = delta < 0 ? OS::SB_LINEDOWN : OS::SB_LINEUP
+            if ((msg).equal?(OS::WM_VSCROLL))
+              delta *= lines_to_scroll[0]
+            end
+          end
+          # Check if the delta and the remainder have the same direction (sign)
+          if ((delta ^ scroll_remainder) >= 0)
+            delta += scroll_remainder
+          end
+          count = Math.abs(delta) / OS::WHEEL_DELTA
+          i = 0
+          while i < count
+            OS._send_message(self.attr_handle, msg, code, 0)
+            i += 1
+          end
+        end
+        return LRESULT::ZERO
+      end
+      # When the native widget scrolls inside WM_MOUSEWHEEL, it
+      # may or may not send a WM_VSCROLL or WM_HSCROLL to do the
+      # actual scrolling.  This depends on the implementation of
+      # each native widget.  In order to ensure that application
+      # code is notified when the scroll bar moves, compare the
+      # scroll bar position before and after the WM_MOUSEWHEEL.
+      # If the native control sends a WM_VSCROLL or WM_HSCROLL,
+      # then the application has already been notified.  If not
+      # explicitly send the event.
+      v_position = (@vertical_bar).nil? ? 0 : @vertical_bar.get_selection
+      h_position = (@horizontal_bar).nil? ? 0 : @horizontal_bar.get_selection
+      # long
+      code = call_window_proc(self.attr_handle, OS::WM_MOUSEWHEEL, w_param, l_param)
+      if (!(@vertical_bar).nil?)
+        position = @vertical_bar.get_selection
+        if (!(position).equal?(v_position))
+          event = Event.new
+          event.attr_detail = position < v_position ? SWT::PAGE_UP : SWT::PAGE_DOWN
+          @vertical_bar.send_event(SWT::Selection, event)
+        end
+      end
+      if (!(@horizontal_bar).nil?)
+        position = @horizontal_bar.get_selection
+        if (!(position).equal?(h_position))
+          event = Event.new
+          event.attr_detail = position < h_position ? SWT::PAGE_UP : SWT::PAGE_DOWN
+          @horizontal_bar.send_event(SWT::Selection, event)
+        end
+      end
+      return LRESULT.new(code)
     end
     
     typesig { [ScrollBar, ::Java::Boolean, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int] }

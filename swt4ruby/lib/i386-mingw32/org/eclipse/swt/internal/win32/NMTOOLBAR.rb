@@ -1,6 +1,6 @@
 require "rjava"
 
-# Copyright (c) 2000, 2006 IBM Corporation and others.
+# Copyright (c) 2000, 2008 IBM Corporation and others.
 # All rights reserved. This program and the accompanying materials
 # are made available under the terms of the Eclipse Public License v1.0
 # which accompanies this distribution, and is available at
@@ -26,30 +26,35 @@ module Org::Eclipse::Swt::Internal::Win32
     undef_method :i_item=
     
     # TBBUTTON tbButton;
+    # @field accessor=tbButton.iBitmap
     attr_accessor :i_bitmap
     alias_method :attr_i_bitmap, :i_bitmap
     undef_method :i_bitmap
     alias_method :attr_i_bitmap=, :i_bitmap=
     undef_method :i_bitmap=
     
+    # @field accessor=tbButton.idCommand
     attr_accessor :id_command
     alias_method :attr_id_command, :id_command
     undef_method :id_command
     alias_method :attr_id_command=, :id_command=
     undef_method :id_command=
     
+    # @field accessor=tbButton.fsState
     attr_accessor :fs_state
     alias_method :attr_fs_state, :fs_state
     undef_method :fs_state
     alias_method :attr_fs_state=, :fs_state=
     undef_method :fs_state=
     
+    # @field accessor=tbButton.fsStyle
     attr_accessor :fs_style
     alias_method :attr_fs_style, :fs_style
     undef_method :fs_style
     alias_method :attr_fs_style=, :fs_style=
     undef_method :fs_style=
     
+    # @field accessor=tbButton.dwData
     # long
     attr_accessor :dw_data
     alias_method :attr_dw_data, :dw_data
@@ -57,6 +62,7 @@ module Org::Eclipse::Swt::Internal::Win32
     alias_method :attr_dw_data=, :dw_data=
     undef_method :dw_data=
     
+    # @field accessor=tbButton.iString
     # long
     attr_accessor :i_string
     alias_method :attr_i_string, :i_string
@@ -70,6 +76,7 @@ module Org::Eclipse::Swt::Internal::Win32
     alias_method :attr_cch_text=, :cch_text=
     undef_method :cch_text=
     
+    # @field cast=(LPTSTR)
     # long
     attr_accessor :psz_text
     alias_method :attr_psz_text, :psz_text
@@ -78,24 +85,28 @@ module Org::Eclipse::Swt::Internal::Win32
     undef_method :psz_text=
     
     # RECT rcButton;
+    # @field accessor=rcButton.left,flags=no_wince
     attr_accessor :left
     alias_method :attr_left, :left
     undef_method :left
     alias_method :attr_left=, :left=
     undef_method :left=
     
+    # @field accessor=rcButton.top,flags=no_wince
     attr_accessor :top
     alias_method :attr_top, :top
     undef_method :top
     alias_method :attr_top=, :top=
     undef_method :top=
     
+    # @field accessor=rcButton.right,flags=no_wince
     attr_accessor :right
     alias_method :attr_right, :right
     undef_method :right
     alias_method :attr_right=, :right=
     undef_method :right=
     
+    # @field accessor=rcButton.bottom,flags=no_wince
     attr_accessor :bottom
     alias_method :attr_bottom, :bottom
     undef_method :bottom

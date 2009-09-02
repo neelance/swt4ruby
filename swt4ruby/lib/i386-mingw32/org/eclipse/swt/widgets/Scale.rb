@@ -1,6 +1,6 @@
 require "rjava"
 
-# Copyright (c) 2000, 2008 IBM Corporation and others.
+# Copyright (c) 2000, 2009 IBM Corporation and others.
 # All rights reserved. This program and the accompanying materials
 # are made available under the terms of the Eclipse Public License v1.0
 # which accompanies this distribution, and is available at
@@ -40,6 +40,7 @@ module Org::Eclipse::Swt::Widgets
   # @see <a href="http://www.eclipse.org/swt/snippets/#scale">Scale snippets</a>
   # @see <a href="http://www.eclipse.org/swt/examples.php">SWT Example: ControlExample</a>
   # @see <a href="http://www.eclipse.org/swt/">Sample code and further information</a>
+  # @noextend This class is not intended to be subclassed by clients.
   class Scale < ScaleImports.const_get :Control
     include_class_members ScaleImports
     
@@ -563,7 +564,7 @@ module Org::Eclipse::Swt::Widgets
         end
       end
       if (fix_paint)
-        redraw = (self.attr_draw_count).equal?(0) && OS._is_window_visible(self.attr_handle)
+        redraw = get_drawing && OS._is_window_visible(self.attr_handle)
         if (redraw)
           OS._send_message(self.attr_handle, OS::WM_SETREDRAW, 0, 0)
         end

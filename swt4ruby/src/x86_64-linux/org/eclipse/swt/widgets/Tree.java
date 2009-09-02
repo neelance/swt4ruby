@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2008 IBM Corporation and others.
+ * Copyright (c) 2000, 2009 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -72,6 +72,7 @@ import org.eclipse.swt.events.*;
  * @see <a href="http://www.eclipse.org/swt/snippets/#tree">Tree, TreeItem, TreeColumn snippets</a>
  * @see <a href="http://www.eclipse.org/swt/examples.php">SWT Example: ControlExample</a>
  * @see <a href="http://www.eclipse.org/swt/">Sample code and further information</a>
+ * @noextend This class is not intended to be subclassed by clients.
  */
 public class Tree extends Composite {
 	long /*int*/ modelHandle, checkRenderer;
@@ -87,7 +88,7 @@ public class Tree extends Composite {
 	boolean expandAll;
 	int drawState, drawFlags;
 	GdkColor drawForeground;
-	boolean ownerDraw, ignoreSize;
+	boolean ownerDraw, ignoreSize, ignoreAccessibility;
 	
 	static final int ID_COLUMN = 0;
 	static final int CHECKED_COLUMN = 1;
@@ -462,6 +463,10 @@ int calculateWidth (long /*int*/ column, long /*int*/ iter, boolean recurse) {
 	}
 
 	if (path != 0) OS.gtk_tree_path_free (path);
+	if (OS.GTK_VERSION >= OS.VERSION (2, 12, 0) && OS.gtk_tree_view_get_rules_hint (handle)) {
+		OS.gtk_widget_style_get (handle, OS.grid_line_width, w, 0) ;
+		width += 2 * w [0];
+	}
 	return width;
 }
 
@@ -941,6 +946,7 @@ void deregister () {
 	super.deregister ();
 	display.removeWidget (OS.gtk_tree_view_get_selection (handle));
 	if (checkRenderer != 0) display.removeWidget (checkRenderer);
+	display.removeWidget (modelHandle);
 }
 
 /**
@@ -1124,6 +1130,21 @@ boolean dragDetect (int x, int y, boolean filter, boolean [] consume) {
 
 long /*int*/ eventWindow () {
 	return paintWindow ();
+}
+
+boolean fixAccessibility () {
+	/*
+	* Bug in GTK. With GTK 2.12, when assistive technologies is on, the time
+	* it takes to add or remove several rows to the model is very long. This
+	* happens because the accessible object asks each row for its data, including
+	* the rows that are not visible. The the fix is to block the accessible object
+	* from receiving row_added and row_removed signals and, at the end, send only
+	* a notify signal with the "model" detail.
+	*  
+	* Note: The test bellow has to be updated when the real problem is fixed in 
+	* the accessible object. 
+	*/
+	return OS.GTK_VERSION >= OS.VERSION (2, 12, 0);
 }
 
 void fixChildren (Shell newShell, Shell oldShell, Decorations newDecorations, Decorations oldDecorations, Menu [] menus) {
@@ -1610,7 +1631,8 @@ TreeItem [] getItems (long /*int*/ parent) {
 
 /**
  * Returns <code>true</code> if the receiver's lines are visible,
- * and <code>false</code> otherwise.
+ * and <code>false</code> otherwise. Note that some platforms draw 
+ * grid lines while others may draw alternating row colors.
  * <p>
  * If one of the receiver's ancestors is not visible or some
  * other condition makes the receiver not visible, this method
@@ -1977,6 +1999,20 @@ long /*int*/ gtk_row_activated (long /*int*/ tree, long /*int*/ path, long /*int
 	return 0;
 }
 
+int gtk_row_deleted (int model, int path) {
+	if (ignoreAccessibility) {
+		OS.g_signal_stop_emission_by_name (model, OS.row_deleted);
+	}
+	return 0;
+}
+
+int gtk_row_inserted (int model, int path, int iter) {
+	if (ignoreAccessibility) {
+		OS.g_signal_stop_emission_by_name (model, OS.row_inserted);
+	}
+	return 0;
+}
+
 long /*int*/ gtk_test_collapse_row (long /*int*/ tree, long /*int*/ iter, long /*int*/ path) {
 	int [] index = new int [1];
 	OS.gtk_tree_model_get (modelHandle, iter, ID_COLUMN, index, -1);
@@ -2126,6 +2162,10 @@ void hookEvents () {
 	if (checkRenderer != 0) {
 		OS.g_signal_connect_closure (checkRenderer, OS.toggled, display.closures [TOGGLED], false);
 	}
+	if (fixAccessibility ()) {
+		OS.g_signal_connect_closure (modelHandle, OS.row_inserted, display.closures [ROW_INSERTED], true);
+		OS.g_signal_connect_closure (modelHandle, OS.row_deleted, display.closures [ROW_DELETED], true);
+	}
 }
 
 /**
@@ -2247,6 +2287,7 @@ void register () {
 	super.register ();
 	display.addWidget (OS.gtk_tree_view_get_selection (handle), this);
 	if (checkRenderer != 0) display.addWidget (checkRenderer, this);
+	display.addWidget (modelHandle, this);
 }
 
 void releaseItem (TreeItem item, boolean release) {
@@ -2317,9 +2358,12 @@ void remove (long /*int*/ parentIter, int start, int end) {
 	}
 	long /*int*/ selection = OS.gtk_tree_view_get_selection (handle);
 	long /*int*/ iter = OS.g_malloc (OS.GtkTreeIter_sizeof ());
-	int index = start;
+	if (iter == 0) error (SWT.ERROR_NO_HANDLES);
+	if (fixAccessibility ()) {
+		ignoreAccessibility = true;
+	}
 	for (int i = start; i <= end; i++) {
-		OS.gtk_tree_model_iter_nth_child (modelHandle, iter, parentIter, index);
+		OS.gtk_tree_model_iter_nth_child (modelHandle, iter, parentIter, start);
 		int[] value = new int[1];
 		OS.gtk_tree_model_get (modelHandle, iter, ID_COLUMN, value, -1);
 		TreeItem item = value [0] != -1 ? items [value [0]] : null;
@@ -2330,6 +2374,10 @@ void remove (long /*int*/ parentIter, int start, int end) {
 			OS.gtk_tree_store_remove (modelHandle, iter);
 			OS.g_signal_handlers_unblock_matched (selection, OS.G_SIGNAL_MATCH_DATA, 0, 0, 0, 0, CHANGED);
 		}
+	}
+	if (fixAccessibility ()) {
+		ignoreAccessibility = false;
+		OS.g_object_notify (handle, OS.model);
 	}
 	OS.g_free (iter);
 }
@@ -2351,7 +2399,14 @@ public void removeAll () {
 	items = new TreeItem[4];
 	long /*int*/ selection = OS.gtk_tree_view_get_selection (handle);
 	OS.g_signal_handlers_block_matched (selection, OS.G_SIGNAL_MATCH_DATA, 0, 0, 0, 0, CHANGED);
+	if (fixAccessibility ()) {
+		ignoreAccessibility = true;
+	}
 	OS.gtk_tree_store_clear (modelHandle);
+	if (fixAccessibility ()) {
+		ignoreAccessibility = false;
+		OS.g_object_notify (handle, OS.model);
+	}
 	OS.g_signal_handlers_unblock_matched (selection, OS.G_SIGNAL_MATCH_DATA, 0, 0, 0, 0, CHANGED);
 	
 	/* Disable searching when using VIRTUAL */
@@ -2584,8 +2639,10 @@ long /*int*/ rendererRenderProc (long /*int*/ cell, long /*int*/ window, long /*
 		if (OS.GTK_IS_CELL_RENDERER_TEXT (cell)) {
 			if (hooks (SWT.PaintItem)) {
 				GdkRectangle rect = new GdkRectangle ();
+				GdkRectangle clipRect = new GdkRectangle ();
 				long /*int*/ path = OS.gtk_tree_model_get_path (modelHandle, iter);
 				OS.gtk_tree_view_get_cell_area (handle, path, columnHandle, rect);
+				OS.gtk_tree_view_get_background_area (handle, path, columnHandle, clipRect);
 				OS.gtk_tree_path_free (path);
 				if (OS.GTK_VERSION < OS.VERSION (2, 8, 18) && OS.gtk_tree_view_get_expander_column (handle) == columnHandle) {
 					int [] buffer = new int [1];
@@ -2619,8 +2676,11 @@ long /*int*/ rendererRenderProc (long /*int*/ cell, long /*int*/ window, long /*
 					gc.setForeground (foreground);
 				}
 				gc.setFont (item.getFont (columnIndex));
-				if ((style & SWT.MIRRORED) != 0) rect.x = getClientWidth () - rect.width - rect.x;
-				gc.setClipping (rect.x, rect.y, rect.width, rect.height);
+				if ((style & SWT.MIRRORED) != 0) {
+					rect.x = getClientWidth () - rect.width - rect.x;
+					clipRect.x = getClientWidth () - clipRect.width - clipRect.x;
+				}
+				gc.setClipping (clipRect.x, clipRect.y, clipRect.width, clipRect.height);
 				Event event = new Event ();
 				event.item = item;
 				event.index = columnIndex;
@@ -2695,12 +2755,19 @@ void setItemCount (long /*int*/ parentIter, int count) {
 	if (!isVirtual) setRedraw (false);
 	remove (parentIter, count, itemCount - 1);
 	if (isVirtual) {
+		if (fixAccessibility ()) {
+			ignoreAccessibility = true;
+		}
 		for (int i=itemCount; i<count; i++) {
 			long /*int*/ iter = OS.g_malloc (OS.GtkTreeIter_sizeof ());
 			if (iter == 0) error (SWT.ERROR_NO_HANDLES);
 			OS.gtk_tree_store_append (modelHandle, iter, parentIter);
 			OS.gtk_tree_store_set (modelHandle, iter, ID_COLUMN, -1, -1);
 			OS.g_free (iter);
+		}
+		if (fixAccessibility ()) {
+			ignoreAccessibility = false;
+			OS.g_object_notify (handle, OS.model);
 		}
 	} else {
 		for (int i=itemCount; i<count; i++) {
@@ -2895,7 +2962,8 @@ public void setHeaderVisible (boolean show) {
 
 /**
  * Marks the receiver's lines as visible if the argument is <code>true</code>,
- * and marks it invisible otherwise. 
+ * and marks it invisible otherwise. Note that some platforms draw 
+ * grid lines while others may draw alternating row colors.
  * <p>
  * If one of the receiver's ancestors is not visible or some
  * other condition makes the receiver not visible, marking
@@ -2914,6 +2982,9 @@ public void setHeaderVisible (boolean show) {
 public void setLinesVisible (boolean show) {
 	checkWidget();
 	OS.gtk_tree_view_set_rules_hint (handle, show);
+	if (OS.GTK_VERSION >= OS.VERSION (2, 12, 0)) {
+		OS.gtk_tree_view_set_grid_lines (handle, show ? OS.GTK_TREE_VIEW_GRID_LINES_VERTICAL : OS.GTK_TREE_VIEW_GRID_LINES_NONE);
+	}
 }
 
 void setParentBackground () {

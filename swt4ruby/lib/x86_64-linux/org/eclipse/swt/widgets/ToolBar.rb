@@ -1,6 +1,6 @@
 require "rjava"
 
-# Copyright (c) 2000, 2008 IBM Corporation and others.
+# Copyright (c) 2000, 2009 IBM Corporation and others.
 # All rights reserved. This program and the accompanying materials
 # are made available under the terms of the Eclipse Public License v1.0
 # which accompanies this distribution, and is available at
@@ -45,6 +45,7 @@ module Org::Eclipse::Swt::Widgets
   # @see <a href="http://www.eclipse.org/swt/snippets/#toolbar">ToolBar, ToolItem snippets</a>
   # @see <a href="http://www.eclipse.org/swt/examples.php">SWT Example: ControlExample</a>
   # @see <a href="http://www.eclipse.org/swt/">Sample code and further information</a>
+  # @noextend This class is not intended to be subclassed by clients.
   class ToolBar < ToolBarImports.const_get :Composite
     include_class_members ToolBarImports
     
@@ -53,6 +54,12 @@ module Org::Eclipse::Swt::Widgets
     undef_method :last_focus
     alias_method :attr_last_focus=, :last_focus=
     undef_method :last_focus=
+    
+    attr_accessor :tab_item_list
+    alias_method :attr_tab_item_list, :tab_item_list
+    undef_method :tab_item_list
+    alias_method :attr_tab_item_list=, :tab_item_list=
+    undef_method :tab_item_list=
     
     attr_accessor :image_list
     alias_method :attr_image_list, :image_list
@@ -94,6 +101,7 @@ module Org::Eclipse::Swt::Widgets
     # @see Widget#getStyle()
     def initialize(parent, style)
       @last_focus = nil
+      @tab_item_list = nil
       @image_list = nil
       super(parent, check_style(style))
       # Ensure that either of HORIZONTAL or VERTICAL is set.
@@ -166,6 +174,70 @@ module Org::Eclipse::Swt::Widgets
         h_hint = 0
       end
       return compute_native_size(self.attr_handle, w_hint, h_hint, changed)
+    end
+    
+    typesig { [] }
+    def compute_tab_group
+      items = __get_items
+      if ((@tab_item_list).nil?)
+        i = 0
+        while (i < items.attr_length && (items[i].attr_control).nil?)
+          i += 1
+        end
+        if ((i).equal?(items.attr_length))
+          return super
+        end
+      end
+      index = 0
+      while (index < items.attr_length)
+        if (items[index].has_focus)
+          break
+        end
+        index += 1
+      end
+      while (index >= 0)
+        item = items[index]
+        if (item.is_tab_group)
+          return item
+        end
+        index -= 1
+      end
+      return super
+    end
+    
+    typesig { [] }
+    def compute_tab_list
+      items = __get_items
+      if ((@tab_item_list).nil?)
+        i = 0
+        while (i < items.attr_length && (items[i].attr_control).nil?)
+          i += 1
+        end
+        if ((i).equal?(items.attr_length))
+          return super
+        end
+      end
+      result = Array.typed(Widget).new([])
+      if (!is_tab_group || !is_enabled || !is_visible)
+        return result
+      end
+      list = !(self.attr_tab_list).nil? ? __get_tab_item_list : items
+      i = 0
+      while i < list.attr_length
+        child = list[i]
+        child_list = child.compute_tab_list
+        if (!(child_list.attr_length).equal?(0))
+          new_result = Array.typed(Widget).new(result.attr_length + child_list.attr_length) { nil }
+          System.arraycopy(result, 0, new_result, 0, result.attr_length)
+          System.arraycopy(child_list, 0, new_result, result.attr_length, child_list.attr_length)
+          result = new_result
+        end
+        i += 1
+      end
+      if ((result.attr_length).equal?(0))
+        result = Array.typed(Widget).new([self])
+      end
+      return result
     end
     
     typesig { [] }
@@ -306,23 +378,36 @@ module Org::Eclipse::Swt::Widgets
     # </ul>
     def get_items
       check_widget
+      return __get_items
+    end
+    
+    typesig { [] }
+    def __get_items
       # int
       list = OS.gtk_container_get_children(self.attr_handle)
       if ((list).equal?(0))
         return Array.typed(ToolItem).new(0) { nil }
       end
       count = OS.g_list_length(list)
-      result = Array.typed(ToolItem).new(count) { nil }
+      items = Array.typed(ToolItem).new(count) { nil }
+      index = 0
       i = 0
       while i < count
         # int
         data = OS.g_list_nth_data(list, i)
         widget = self.attr_display.get_widget(data)
-        result[i] = widget
+        if (!(widget).nil?)
+          items[((index += 1) - 1)] = widget
+        end
         i += 1
       end
       OS.g_list_free(list)
-      return result
+      if (!(index).equal?(items.attr_length))
+        new_items = Array.typed(ToolItem).new(index) { nil }
+        System.arraycopy(items, 0, new_items, 0, index)
+        items = new_items
+      end
+      return items
     end
     
     typesig { [] }
@@ -341,6 +426,35 @@ module Org::Eclipse::Swt::Widgets
       check_widget
       # On GTK, toolbars cannot wrap
       return 1
+    end
+    
+    typesig { [] }
+    def __get_tab_item_list
+      if ((@tab_item_list).nil?)
+        return @tab_item_list
+      end
+      count = 0
+      i = 0
+      while i < @tab_item_list.attr_length
+        if (!@tab_item_list[i].is_disposed)
+          count += 1
+        end
+        i += 1
+      end
+      if ((count).equal?(@tab_item_list.attr_length))
+        return @tab_item_list
+      end
+      new_list = Array.typed(ToolItem).new(count) { nil }
+      index = 0
+      i_ = 0
+      while i_ < @tab_item_list.attr_length
+        if (!@tab_item_list[i_].is_disposed)
+          new_list[((index += 1) - 1)] = @tab_item_list[i_]
+        end
+        i_ += 1
+      end
+      @tab_item_list = new_list
+      return @tab_item_list
     end
     
     typesig { [::Java::Long, ::Java::Long] }
@@ -566,6 +680,32 @@ module Org::Eclipse::Swt::Widgets
         items[i].set_foreground_color(color)
         i += 1
       end
+    end
+    
+    typesig { [Array.typed(ToolItem)] }
+    # public
+    def set_tab_item_list(tab_list)
+      check_widget
+      if (!(tab_list).nil?)
+        i = 0
+        while i < tab_list.attr_length
+          item = tab_list[i]
+          if ((item).nil?)
+            error(SWT::ERROR_INVALID_ARGUMENT)
+          end
+          if (item.is_disposed)
+            error(SWT::ERROR_INVALID_ARGUMENT)
+          end
+          if (!(item.attr_parent).equal?(self))
+            error(SWT::ERROR_INVALID_PARENT)
+          end
+          i += 1
+        end
+        new_list = Array.typed(ToolItem).new(tab_list.attr_length) { nil }
+        System.arraycopy(tab_list, 0, new_list, 0, tab_list.attr_length)
+        tab_list = new_list
+      end
+      @tab_item_list = tab_list
     end
     
     typesig { [String] }

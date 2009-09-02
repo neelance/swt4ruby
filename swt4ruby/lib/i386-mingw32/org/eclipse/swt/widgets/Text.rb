@@ -1,6 +1,6 @@
 require "rjava"
 
-# Copyright (c) 2000, 2008 IBM Corporation and others.
+# Copyright (c) 2000, 2009 IBM Corporation and others.
 # All rights reserved. This program and the accompanying materials
 # are made available under the terms of the Eclipse Public License v1.0
 # which accompanies this distribution, and is available at
@@ -32,20 +32,30 @@ module Org::Eclipse::Swt::Widgets
   # <p>
   # <dl>
   # <dt><b>Styles:</b></dt>
-  # <dd>CANCEL, CENTER, LEFT, MULTI, PASSWORD, SEARCH, SINGLE, RIGHT, READ_ONLY, WRAP</dd>
+  # <dd>CENTER, ICON_CANCEL, ICON_SEARCH, LEFT, MULTI, PASSWORD, SEARCH, SINGLE, RIGHT, READ_ONLY, WRAP</dd>
   # <dt><b>Events:</b></dt>
   # <dd>DefaultSelection, Modify, Verify</dd>
   # </dl>
   # <p>
   # Note: Only one of the styles MULTI and SINGLE may be specified,
   # and only one of the styles LEFT, CENTER, and RIGHT may be specified.
-  # </p><p>
+  # </p>
+  # <p>
+  # Note: The styles ICON_CANCEL and ICON_SEARCH are hints used in combination with SEARCH.
+  # When the platform supports the hint, the text control shows these icons.  When an icon
+  # is selected, a default selection event is sent with the detail field set to one of
+  # ICON_CANCEL or ICON_SEARCH.  Normally, application code does not need to check the
+  # detail.  In the case of ICON_CANCEL, the text is cleared before the default selection
+  # event is sent causing the application to search for an empty string.
+  # </p>
+  # <p>
   # IMPORTANT: This class is <em>not</em> intended to be subclassed.
   # </p>
   # 
   # @see <a href="http://www.eclipse.org/swt/snippets/#text">Text snippets</a>
   # @see <a href="http://www.eclipse.org/swt/examples.php">SWT Example: ControlExample</a>
   # @see <a href="http://www.eclipse.org/swt/">Sample code and further information</a>
+  # @noextend This class is not intended to be subclassed by clients.
   class Text < TextImports.const_get :Scrollable
     include_class_members TextImports
     
@@ -162,6 +172,13 @@ module Org::Eclipse::Swt::Widgets
     # @see SWT#MULTI
     # @see SWT#READ_ONLY
     # @see SWT#WRAP
+    # @see SWT#LEFT
+    # @see SWT#RIGHT
+    # @see SWT#CENTER
+    # @see SWT#PASSWORD
+    # @see SWT#SEARCH
+    # @see SWT#ICON_SEARCH
+    # @see SWT#ICON_CANCEL
     # @see Widget#checkSubclass
     # @see Widget#getStyle
     def initialize(parent, style)
@@ -192,12 +209,19 @@ module Org::Eclipse::Swt::Widgets
           return 0
         end
       when OS::WM_HSCROLL, OS::WM_VSCROLL
-        redraw = !(find_image_control).nil? && (self.attr_draw_count).equal?(0) && OS._is_window_visible(self.attr_handle)
+        redraw = !(find_image_control).nil? && get_drawing && OS._is_window_visible(self.attr_handle)
         if (redraw)
           OS._def_window_proc(self.attr_handle, OS::WM_SETREDRAW, 0, 0)
         end
       when OS::WM_PAINT
-        if (!(find_image_control).nil?)
+        double_buffer = !(find_image_control).nil?
+        draw_message = false
+        if (!((self.attr_style & SWT::SINGLE)).equal?(0) && @message.length > 0)
+          if (!OS::IsWinCE && OS::WIN32_VERSION < OS._version(6, 0))
+            draw_message = !(hwnd).equal?(OS._get_focus) && (OS._get_window_text_length(self.attr_handle)).equal?(0)
+          end
+        end
+        if (double_buffer || draw_message)
           # long
           paint_dc = 0
           ps = PAINTSTRUCT.new
@@ -206,25 +230,74 @@ module Org::Eclipse::Swt::Widgets
           height = ps.attr_bottom - ps.attr_top
           if (!(width).equal?(0) && !(height).equal?(0))
             # long
-            h_dc = OS._create_compatible_dc(paint_dc)
-            lp_point1 = POINT.new
-            lp_point2 = POINT.new
-            OS._set_window_org_ex(h_dc, ps.attr_left, ps.attr_top, lp_point1)
-            OS._set_brush_org_ex(h_dc, ps.attr_left, ps.attr_top, lp_point2)
-            # long
-            h_bitmap = OS._create_compatible_bitmap(paint_dc, width, height)
-            # long
-            h_old_bitmap = OS._select_object(h_dc, h_bitmap)
-            rect = RECT.new
-            OS._set_rect(rect, ps.attr_left, ps.attr_top, ps.attr_right, ps.attr_bottom)
-            draw_background(h_dc, rect)
+            h_dc = paint_dc
+            h_bitmap = 0
+            h_old_bitmap = 0
+            lp_point1 = nil
+            lp_point2 = nil
+            if (double_buffer)
+              h_dc = OS._create_compatible_dc(paint_dc)
+              lp_point1 = POINT.new
+              lp_point2 = POINT.new
+              OS._set_window_org_ex(h_dc, ps.attr_left, ps.attr_top, lp_point1)
+              OS._set_brush_org_ex(h_dc, ps.attr_left, ps.attr_top, lp_point2)
+              h_bitmap = OS._create_compatible_bitmap(paint_dc, width, height)
+              h_old_bitmap = OS._select_object(h_dc, h_bitmap)
+              rect = RECT.new
+              OS._set_rect(rect, ps.attr_left, ps.attr_top, ps.attr_right, ps.attr_bottom)
+              draw_background(h_dc, rect)
+            end
             OS._call_window_proc(EditProc, hwnd, OS::WM_PAINT, h_dc, l_param)
-            OS._set_window_org_ex(h_dc, lp_point1.attr_x, lp_point1.attr_y, nil)
-            OS._set_brush_org_ex(h_dc, lp_point2.attr_x, lp_point2.attr_y, nil)
-            OS._bit_blt(paint_dc, ps.attr_left, ps.attr_top, width, height, h_dc, 0, 0, OS::SRCCOPY)
-            OS._select_object(h_dc, h_old_bitmap)
-            OS._delete_object(h_bitmap)
-            OS._delete_object(h_dc)
+            # Bug in XP. Windows does not draw the cue message on XP when
+            # East Asian language pack is installed. The fix is to draw
+            # the cue messages ourselves.
+            # Note:  This bug is fixed on Vista.
+            if (draw_message)
+              rect = RECT.new
+              OS._get_client_rect(self.attr_handle, rect)
+              # long
+              margins = OS._send_message(self.attr_handle, OS::EM_GETMARGINS, 0, 0)
+              rect.attr_left += OS._loword(margins)
+              rect.attr_right -= OS._hiword(margins)
+              if (!((self.attr_style & SWT::BORDER)).equal?(0))
+                rect.attr_left += 1
+                rect.attr_top += 1
+                rect.attr_right -= 1
+                rect.attr_bottom -= 1
+              end
+              buffer = TCHAR.new(get_code_page, @message, false)
+              u_format = OS::DT_EDITCONTROL
+              rtl = !((self.attr_style & SWT::RIGHT_TO_LEFT)).equal?(0)
+              if (rtl)
+                u_format |= OS::DT_RTLREADING
+              end
+              alignment = self.attr_style & (SWT::LEFT | SWT::CENTER | SWT::RIGHT)
+              case (alignment)
+              when SWT::LEFT
+                u_format |= (rtl ? OS::DT_RIGHT : OS::DT_LEFT)
+              when SWT::CENTER
+                u_format |= OS::DT_CENTER
+                u_format |= (rtl ? OS::DT_LEFT : OS::DT_RIGHT)
+              when SWT::RIGHT
+                u_format |= (rtl ? OS::DT_LEFT : OS::DT_RIGHT)
+              end
+              # long
+              h_font = OS._send_message(hwnd, OS::WM_GETFONT, 0, 0)
+              # long
+              h_old_font = OS._select_object(h_dc, h_font)
+              OS._set_text_color(h_dc, OS._get_sys_color(OS::COLOR_GRAYTEXT))
+              OS._set_bk_mode(h_dc, OS::TRANSPARENT)
+              OS._draw_text(h_dc, buffer, buffer.length, rect, u_format)
+              OS._select_object(h_dc, h_old_font)
+            end
+            if (double_buffer)
+              OS._set_window_org_ex(h_dc, lp_point1.attr_x, lp_point1.attr_y, nil)
+              OS._set_brush_org_ex(h_dc, lp_point2.attr_x, lp_point2.attr_y, nil)
+              OS._bit_blt(paint_dc, ps.attr_left, ps.attr_top, width, height, h_dc, 0, 0, OS::SRCCOPY)
+              OS._select_object(h_dc, h_old_bitmap)
+              OS._delete_object(h_bitmap)
+              OS._delete_object(h_dc)
+            end
           end
           OS._end_paint(self.attr_handle, ps)
           return 0
@@ -364,14 +437,14 @@ module Org::Eclipse::Swt::Widgets
         error(SWT::ERROR_NULL_ARGUMENT)
       end
       string = RJava.cast_to_string(Display.with_cr_lf(string))
-      length = OS._get_window_text_length(self.attr_handle)
+      length_ = OS._get_window_text_length(self.attr_handle)
       if (hooks(SWT::Verify) || filters(SWT::Verify))
-        string = RJava.cast_to_string(verify_text(string, length, length, nil))
+        string = RJava.cast_to_string(verify_text(string, length_, length_, nil))
         if ((string).nil?)
           return
         end
       end
-      OS._send_message(self.attr_handle, OS::EM_SETSEL, length, length)
+      OS._send_message(self.attr_handle, OS::EM_SETSEL, length_, length_)
       buffer = TCHAR.new(get_code_page, string, true)
       # Feature in Windows.  When an edit control with ES_MULTILINE
       # style that does not have the WS_VSCROLL style is full (i.e.
@@ -394,9 +467,9 @@ module Org::Eclipse::Swt::Widgets
         if (!((style & SWT::SEARCH)).equal?(0))
           style |= SWT::SINGLE | SWT::BORDER
           style &= ~SWT::PASSWORD
-        end
-        if (OS::COMCTL32_MAJOR < 6)
-          style &= ~SWT::SEARCH
+          # NOTE: ICON_CANCEL has the same value as H_SCROLL and
+          # ICON_SEARCH has the same value as V_SCROLL so they are
+          # cleared because SWT.SINGLE is set.
         end
         if (!((style & SWT::SINGLE)).equal?(0) && !((style & SWT::MULTI)).equal?(0))
           style &= ~SWT::MULTI
@@ -472,31 +545,24 @@ module Org::Eclipse::Swt::Widgets
           flags |= OS::DT_WORDBREAK
           rect.attr_right = w_hint
         end
-        length = OS._get_window_text_length(self.attr_handle)
-        if (!(length).equal?(0))
-          buffer = TCHAR.new(get_code_page, length + 1)
-          OS._get_window_text(self.attr_handle, buffer, length + 1)
-          OS._draw_text(h_dc, buffer, length, rect, flags)
+        length_ = OS._get_window_text_length(self.attr_handle)
+        if (!(length_).equal?(0))
+          buffer = TCHAR.new(get_code_page, length_ + 1)
+          OS._get_window_text(self.attr_handle, buffer, length_ + 1)
+          OS._draw_text(h_dc, buffer, length_, rect, flags)
           width = rect.attr_right - rect.attr_left
         end
-        # This code is intentionally commented
-        # if (OS.COMCTL32_MAJOR >= 6) {
-        # if ((style & SWT.SEARCH) != 0) {
-        # length = message.length ();
-        # if (length != 0) {
-        # char [] buffer = new char [length + 1];
-        # message.getChars (0, length, buffer, 0);
-        # SIZE size = new SIZE ();
-        # OS.GetTextExtentPoint32W (hDC, buffer, length, size);
-        # width = Math.max (width, size.cx);
-        # }
-        # }
-        # }
         if (wrap && (h_hint).equal?(SWT::DEFAULT))
           new_height = rect.attr_bottom - rect.attr_top
           if (!(new_height).equal?(0))
             height = new_height
           end
+        end
+        if (!((self.attr_style & SWT::SINGLE)).equal?(0) && @message.length > 0)
+          OS._set_rect(rect, 0, 0, 0, 0)
+          buffer = TCHAR.new(get_code_page, @message, false)
+          OS._draw_text(h_dc, buffer, buffer.length, rect, flags)
+          width = Math.max(width, rect.attr_right - rect.attr_left)
         end
         if (!(new_font).equal?(0))
           OS._select_object(h_dc, old_font)
@@ -845,11 +911,11 @@ module Org::Eclipse::Swt::Widgets
     # </ul>
     def get_char_count
       check_widget
-      length = OS._get_window_text_length(self.attr_handle)
+      length_ = OS._get_window_text_length(self.attr_handle)
       if (!OS::IsUnicode && OS::IsDBLocale)
-        length = mbcs_to_wcs_pos(length)
+        length_ = mbcs_to_wcs_pos(length_)
       end
-      return length
+      return length_
     end
     
     typesig { [] }
@@ -989,13 +1055,10 @@ module Org::Eclipse::Swt::Widgets
     end
     
     typesig { [] }
-    # Returns the widget message. When the widget is created
-    # with the style <code>SWT.SEARCH</code>, the message text
-    # is displayed as a hint for the user, indicating the
-    # purpose of the field.
+    # Returns the widget message.  The message text is displayed
+    # as a hint for the user, indicating the purpose of the field.
     # <p>
-    # Note: This operation is a <em>HINT</em> and is not
-    # supported on platforms that do not have this concept.
+    # Typically this is used in conjunction with <code>SWT.SEARCH</code>.
     # </p>
     # 
     # @return the widget message
@@ -1099,8 +1162,8 @@ module Org::Eclipse::Swt::Widgets
     # </ul>
     def get_selection_text
       check_widget
-      length = OS._get_window_text_length(self.attr_handle)
-      if ((length).equal?(0))
+      length_ = OS._get_window_text_length(self.attr_handle)
+      if ((length_).equal?(0))
         return ""
       end
       start = Array.typed(::Java::Int).new(1) { 0 }
@@ -1109,8 +1172,8 @@ module Org::Eclipse::Swt::Widgets
       if ((start[0]).equal?(end_[0]))
         return ""
       end
-      buffer = TCHAR.new(get_code_page, length + 1)
-      OS._get_window_text(self.attr_handle, buffer, length + 1)
+      buffer = TCHAR.new(get_code_page, length_ + 1)
+      OS._get_window_text(self.attr_handle, buffer, length_ + 1)
       return buffer.to_s(start[0], end_[0] - start[0])
     end
     
@@ -1205,8 +1268,11 @@ module Org::Eclipse::Swt::Widgets
       if (!OS::IsUnicode && OS::IsDBLocale)
         length_ = mbcs_to_wcs_pos(length_)
       end
-      start = Math.max(0, start)
       end_ = Math.min(end_, length_ - 1)
+      if (start > end_)
+        return ""
+      end
+      start = Math.max(0, start)
       # NOTE: The current implementation uses substring ()
       # which can reference a potentially large character
       # array.
@@ -1685,6 +1751,41 @@ module Org::Eclipse::Swt::Widgets
         end
       end
       super(x, y, width, height, flags)
+      # Bug in Windows. If the client area height is smaller than
+      # the font height, then the multi-line text widget does not
+      # update the formatting rectangle when resized. The fix is to
+      # detect this case and explicitly set the formatting rectangle.
+      if (((flags & OS::SWP_NOSIZE)).equal?(0))
+        bits = OS._get_window_long(self.attr_handle, OS::GWL_STYLE)
+        if (!((bits & OS::ES_MULTILINE)).equal?(0))
+          # long
+          new_font = 0
+          old_font = 0
+          # long
+          h_dc = OS._get_dc(self.attr_handle)
+          new_font = OS._send_message(self.attr_handle, OS::WM_GETFONT, 0, 0)
+          if (!(new_font).equal?(0))
+            old_font = OS._select_object(h_dc, new_font)
+          end
+          tm = OS::IsUnicode ? TEXTMETRICW.new : TEXTMETRICA.new
+          OS._get_text_metrics(h_dc, tm)
+          if (!(new_font).equal?(0))
+            OS._select_object(h_dc, old_font)
+          end
+          OS._release_dc(self.attr_handle, h_dc)
+          rect = RECT.new
+          OS._get_client_rect(self.attr_handle, rect)
+          if ((rect.attr_bottom - rect.attr_top) < tm.attr_tm_height)
+            # long
+            margins = OS._send_message(self.attr_handle, OS::EM_GETMARGINS, 0, 0)
+            rect.attr_left += OS._loword(margins)
+            rect.attr_right -= OS._hiword(margins)
+            rect.attr_top = 0
+            rect.attr_bottom = tm.attr_tm_height
+            OS._send_message(self.attr_handle, OS::EM_SETRECT, 0, rect)
+          end
+        end
+      end
     end
     
     typesig { [] }
@@ -1784,21 +1885,18 @@ module Org::Eclipse::Swt::Widgets
       # banner text, the control does not take into account the
       # margins, causing the first character to be clipped.  The
       # fix is to set the margins to zero.
-      if (OS::COMCTL32_MAJOR >= 6)
-        if (!((self.attr_style & SWT::SEARCH)).equal?(0))
+      if (!((self.attr_style & SWT::SEARCH)).equal?(0))
+        if (!OS::IsWinCE && OS::WIN32_VERSION >= OS._version(6, 0))
           OS._send_message(self.attr_handle, OS::EM_SETMARGINS, OS::EC_LEFTMARGIN | OS::EC_RIGHTMARGIN, 0)
         end
       end
     end
     
     typesig { [String] }
-    # Sets the widget message. When the widget is created
-    # with the style <code>SWT.SEARCH</code>, the message text
-    # is displayed as a hint for the user, indicating the
-    # purpose of the field.
+    # Sets the widget message. The message text is displayed
+    # as a hint for the user, indicating the purpose of the field.
     # <p>
-    # Note: This operation is a <em>HINT</em> and is not
-    # supported on platforms that do not have this concept.
+    # Typically this is used in conjunction with <code>SWT.SEARCH</code>.
     # </p>
     # 
     # @param message the new message
@@ -1818,8 +1916,8 @@ module Org::Eclipse::Swt::Widgets
         error(SWT::ERROR_NULL_ARGUMENT)
       end
       @message = message
-      if (OS::COMCTL32_MAJOR >= 6)
-        if (!((self.attr_style & SWT::SEARCH)).equal?(0))
+      if (!OS::IsWinCE)
+        if (OS::WIN32_VERSION >= OS._version(6, 0))
           bits = OS._get_window_long(self.attr_handle, OS::GWL_STYLE)
           if (((bits & OS::ES_MULTILINE)).equal?(0))
             length_ = message.length
@@ -1827,6 +1925,8 @@ module Org::Eclipse::Swt::Widgets
             message.get_chars(0, length_, chars, 0)
             OS._send_message(self.attr_handle, OS::EM_SETCUEBANNER, 0, chars)
           end
+        else
+          OS._invalidate_rect(self.attr_handle, nil, true)
         end
       end
     end
@@ -1945,7 +2045,7 @@ module Org::Eclipse::Swt::Widgets
       # i-beam.  The fix is to detect that the i-beam has moved
       # while redraw is turned off and force it to be visible
       # when redraw is restored.
-      if (!(self.attr_draw_count).equal?(0))
+      if (!get_drawing)
         return
       end
       start = Array.typed(::Java::Int).new(1) { 0 }
@@ -2616,7 +2716,6 @@ module Org::Eclipse::Swt::Widgets
       when OS::EM_UNDO, OS::WM_UNDO
         if (!(OS._send_message(self.attr_handle, OS::EM_CANUNDO, 0, 0)).equal?(0))
           @ignore_modify = @ignore_character = true
-          OS._send_message(self.attr_handle, OS::EM_GETSEL, start, end_)
           call_window_proc(self.attr_handle, msg, w_param, l_param)
           length_ = OS._get_window_text_length(self.attr_handle)
           new_start = Array.typed(::Java::Int).new(1) { 0 }
@@ -2630,6 +2729,7 @@ module Org::Eclipse::Swt::Widgets
             new_text = ""
           end
           call_window_proc(self.attr_handle, msg, w_param, l_param)
+          OS._send_message(self.attr_handle, OS::EM_GETSEL, start, end_)
           @ignore_modify = @ignore_character = false
         end
       end

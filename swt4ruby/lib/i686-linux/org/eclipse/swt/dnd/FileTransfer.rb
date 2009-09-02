@@ -1,6 +1,6 @@
 require "rjava"
 
-# Copyright (c) 2000, 2008 IBM Corporation and others.
+# Copyright (c) 2000, 2009 IBM Corporation and others.
 # All rights reserved. This program and the accompanying materials
 # are made available under the terms of the Eclipse Public License v1.0
 # which accompanies this distribution, and is available at
@@ -57,8 +57,12 @@ module Org::Eclipse::Swt::Dnd
       const_set_lazy(:URI_LIST_ID) { register_type(URI_LIST) }
       const_attr_reader  :URI_LIST_ID
       
-      const_set_lazy(:Separator) { Array.typed(::Java::Byte).new([Character.new(?\r.ord), Character.new(?\n.ord)]) }
-      const_attr_reader  :Separator
+      const_set_lazy(:GNOME_LIST) { "x-special/gnome-copied-files" }
+      const_attr_reader  :GNOME_LIST
+      
+      # $NON-NLS-1$
+      const_set_lazy(:GNOME_LIST_ID) { register_type(GNOME_LIST) }
+      const_attr_reader  :GNOME_LIST_ID
     }
     
     typesig { [] }
@@ -92,8 +96,17 @@ module Org::Eclipse::Swt::Dnd
       if (!check_file(object) || !is_supported_type(transfer_data))
         DND.error(DND::ERROR_INVALID_DATA)
       end
+      gnome_list = (transfer_data.attr_type).equal?(GNOME_LIST_ID)
+      buffer = nil
+      separator = nil
+      if (gnome_list)
+        buffer = Array.typed(::Java::Byte).new([Character.new(?c.ord), Character.new(?o.ord), Character.new(?p.ord), Character.new(?y.ord)])
+        separator = Array.typed(::Java::Byte).new([Character.new(?\n.ord)])
+      else
+        buffer = Array.typed(::Java::Byte).new(0) { 0 }
+        separator = Array.typed(::Java::Byte).new([Character.new(?\r.ord), Character.new(?\n.ord)])
+      end
       files = object
-      buffer = Array.typed(::Java::Byte).new(0) { 0 }
       i = 0
       while i < files.attr_length
         string = files[i]
@@ -135,14 +148,14 @@ module Org::Eclipse::Swt::Dnd
         temp = Array.typed(::Java::Byte).new(length_) { 0 }
         OS.memmove(temp, uri_ptr, length_)
         OS.g_free(uri_ptr)
-        new_length = (i > 0) ? buffer.attr_length + Separator.attr_length + temp.attr_length : temp.attr_length
+        new_length = (buffer.attr_length > 0) ? buffer.attr_length + separator.attr_length + temp.attr_length : temp.attr_length
         new_buffer = Array.typed(::Java::Byte).new(new_length) { 0 }
         offset = 0
-        if (i > 0)
+        if (buffer.attr_length > 0)
           System.arraycopy(buffer, 0, new_buffer, 0, buffer.attr_length)
           offset += buffer.attr_length
-          System.arraycopy(Separator, 0, new_buffer, offset, Separator.attr_length)
-          offset += Separator.attr_length
+          System.arraycopy(separator, 0, new_buffer, offset, separator.attr_length)
+          offset += separator.attr_length
         end
         System.arraycopy(temp, 0, new_buffer, offset, temp.attr_length)
         buffer = new_buffer
@@ -178,30 +191,36 @@ module Org::Eclipse::Swt::Dnd
       length_ = transfer_data.attr_length
       temp = Array.typed(::Java::Byte).new(length_) { 0 }
       OS.memmove(temp, transfer_data.attr_p_value, length_)
+      gnome_list = (transfer_data.attr_type).equal?(GNOME_LIST_ID)
+      sep_length = gnome_list ? 1 : 2
       # long
       # long
       files = Array.typed(::Java::Int).new(0) { 0 }
       offset = 0
       i = 0
       while i < temp.attr_length - 1
-        if ((temp[i]).equal?(Character.new(?\r.ord)) && (temp[i + 1]).equal?(Character.new(?\n.ord)))
-          size = i - offset
-          # long
-          file = OS.g_malloc(size + 1)
-          file_buffer = Array.typed(::Java::Byte).new(size + 1) { 0 }
-          System.arraycopy(temp, offset, file_buffer, 0, size)
-          OS.memmove(file, file_buffer, size + 1)
-          # long
-          # long
-          new_files = Array.typed(::Java::Int).new(files.attr_length + 1) { 0 }
-          System.arraycopy(files, 0, new_files, 0, files.attr_length)
-          new_files[files.attr_length] = file
-          files = new_files
-          offset = i + 2
+        terminator = gnome_list ? (temp[i]).equal?(Character.new(?\n.ord)) : (temp[i]).equal?(Character.new(?\r.ord)) && (temp[i + 1]).equal?(Character.new(?\n.ord))
+        if (terminator)
+          if (!(gnome_list && (offset).equal?(0)))
+            # The content of the first line in a gnome-list is always either 'copy' or 'cut'
+            size = i - offset
+            # long
+            file = OS.g_malloc(size + 1)
+            file_buffer = Array.typed(::Java::Byte).new(size + 1) { 0 }
+            System.arraycopy(temp, offset, file_buffer, 0, size)
+            OS.memmove(file, file_buffer, size + 1)
+            # long
+            # long
+            new_files = Array.typed(::Java::Int).new(files.attr_length + 1) { 0 }
+            System.arraycopy(files, 0, new_files, 0, files.attr_length)
+            new_files[files.attr_length] = file
+            files = new_files
+          end
+          offset = i + sep_length
         end
         i += 1
       end
-      if (offset < temp.attr_length - 2)
+      if (offset < temp.attr_length - sep_length)
         size = temp.attr_length - offset
         # long
         file = OS.g_malloc(size + 1)
@@ -261,12 +280,12 @@ module Org::Eclipse::Swt::Dnd
     
     typesig { [] }
     def get_type_ids
-      return Array.typed(::Java::Int).new([URI_LIST_ID])
+      return Array.typed(::Java::Int).new([URI_LIST_ID, GNOME_LIST_ID])
     end
     
     typesig { [] }
     def get_type_names
-      return Array.typed(String).new([URI_LIST])
+      return Array.typed(String).new([URI_LIST, GNOME_LIST])
     end
     
     typesig { [Object] }

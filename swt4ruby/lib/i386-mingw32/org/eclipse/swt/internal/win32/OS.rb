@@ -1,6 +1,6 @@
 require "rjava"
 
-# Copyright (c) 2000, 2008 IBM Corporation and others.
+# Copyright (c) 2000, 2009 IBM Corporation and others.
 # All rights reserved. This program and the accompanying materials
 # are made available under the terms of the Eclipse Public License v1.0
 # which accompanies this distribution, and is available at
@@ -109,7 +109,7 @@ module Org::Eclipse::Swt::Internal::Win32
             end
             # long
             h_heap = OS._get_process_heap
-            byte_count = buffer.length * TCHAR.attr_sizeof
+            byte_count = buffer.length * (OS::IsUnicode ? 2 : 1)
             # long
             psz_text = OS._heap_alloc(h_heap, HEAP_ZERO_MEMORY, byte_count)
             OS._move_memory(psz_text, buffer, byte_count)
@@ -762,6 +762,12 @@ module Org::Eclipse::Swt::Internal::Win32
       const_set_lazy(:CBXS_DISABLED) { 4 }
       const_attr_reader  :CBXS_DISABLED
       
+      const_set_lazy(:CCHDEVICENAME) { 32 }
+      const_attr_reader  :CCHDEVICENAME
+      
+      const_set_lazy(:CCHFORMNAME) { 32 }
+      const_attr_reader  :CCHFORMNAME
+      
       const_set_lazy(:CCHILDREN_SCROLLBAR) { 5 }
       const_attr_reader  :CCHILDREN_SCROLLBAR
       
@@ -1095,6 +1101,9 @@ module Org::Eclipse::Swt::Internal::Win32
       const_set_lazy(:CS_VREDRAW) { 0x1 }
       const_attr_reader  :CS_VREDRAW
       
+      const_set_lazy(:CS_OWNDC) { 0x20 }
+      const_attr_reader  :CS_OWNDC
+      
       const_set_lazy(:CW_USEDEFAULT) { -0x80000000 }
       const_attr_reader  :CW_USEDEFAULT
       
@@ -1199,8 +1208,29 @@ module Org::Eclipse::Swt::Internal::Win32
       const_set_lazy(:DLGC_WANTTAB) { 0x2 }
       const_attr_reader  :DLGC_WANTTAB
       
+      const_set_lazy(:DMCOLLATE_FALSE) { 0 }
+      const_attr_reader  :DMCOLLATE_FALSE
+      
+      const_set_lazy(:DMCOLLATE_TRUE) { 1 }
+      const_attr_reader  :DMCOLLATE_TRUE
+      
       const_set_lazy(:DM_SETDEFID) { 0x401 }
       const_attr_reader  :DM_SETDEFID
+      
+      const_set_lazy(:DM_COLLATE) { 0x8000 }
+      const_attr_reader  :DM_COLLATE
+      
+      const_set_lazy(:DM_COPIES) { 0x100 }
+      const_attr_reader  :DM_COPIES
+      
+      const_set_lazy(:DM_ORIENTATION) { 0x1 }
+      const_attr_reader  :DM_ORIENTATION
+      
+      const_set_lazy(:DMORIENT_PORTRAIT) { 1 }
+      const_attr_reader  :DMORIENT_PORTRAIT
+      
+      const_set_lazy(:DMORIENT_LANDSCAPE) { 2 }
+      const_attr_reader  :DMORIENT_LANDSCAPE
       
       const_set_lazy(:DSS_DISABLED) { 0x20 }
       const_attr_reader  :DSS_DISABLED
@@ -1246,6 +1276,9 @@ module Org::Eclipse::Swt::Internal::Win32
       
       const_set_lazy(:DT_RIGHT) { 0x2 }
       const_attr_reader  :DT_RIGHT
+      
+      const_set_lazy(:DT_RTLREADING) { 0x20000 }
+      const_attr_reader  :DT_RTLREADING
       
       const_set_lazy(:DT_SINGLELINE) { 0x20 }
       const_attr_reader  :DT_SINGLELINE
@@ -1445,6 +1478,9 @@ module Org::Eclipse::Swt::Internal::Win32
       const_set_lazy(:EM_SETREADONLY) { 0xcf }
       const_attr_reader  :EM_SETREADONLY
       
+      const_set_lazy(:EM_SETRECT) { 0xb3 }
+      const_attr_reader  :EM_SETRECT
+      
       const_set_lazy(:EM_SETSEL) { 0xb1 }
       const_attr_reader  :EM_SETSEL
       
@@ -1536,6 +1572,7 @@ module Org::Eclipse::Swt::Internal::Win32
       const_set_lazy(:EVENT_OBJECT_SELECTIONWITHIN) { 0x8009 }
       const_attr_reader  :EVENT_OBJECT_SELECTIONWITHIN
       
+      # public static final int EVENT_OBJECT_STATECHANGE = 0x800A;
       const_set_lazy(:EVENT_OBJECT_VALUECHANGE) { 0x800e }
       const_attr_reader  :EVENT_OBJECT_VALUECHANGE
       
@@ -1583,6 +1620,18 @@ module Org::Eclipse::Swt::Internal::Win32
       
       const_set_lazy(:GBS_DISABLED) { 2 }
       const_attr_reader  :GBS_DISABLED
+      
+      const_set_lazy(:GCP_REORDER) { 0x2 }
+      const_attr_reader  :GCP_REORDER
+      
+      const_set_lazy(:GCP_GLYPHSHAPE) { 0x10 }
+      const_attr_reader  :GCP_GLYPHSHAPE
+      
+      const_set_lazy(:GCP_CLASSIN) { 0x80000 }
+      const_attr_reader  :GCP_CLASSIN
+      
+      const_set_lazy(:GCP_LIGATE) { 0x20 }
+      const_attr_reader  :GCP_LIGATE
       
       const_set_lazy(:GCS_COMPSTR) { 0x8 }
       const_attr_reader  :GCS_COMPSTR
@@ -1908,6 +1957,12 @@ module Org::Eclipse::Swt::Internal::Win32
       
       const_set_lazy(:HICF_ARROWKEYS) { 0x2 }
       const_attr_reader  :HICF_ARROWKEYS
+      
+      const_set_lazy(:HICF_LEAVING) { 0x20 }
+      const_attr_reader  :HICF_LEAVING
+      
+      const_set_lazy(:HICF_MOUSE) { 0x1 }
+      const_attr_reader  :HICF_MOUSE
       
       const_set_lazy(:HINST_COMMCTRL) { -0x1 }
       const_attr_reader  :HINST_COMMCTRL
@@ -2830,6 +2885,9 @@ module Org::Eclipse::Swt::Internal::Win32
       const_set_lazy(:MB_RETRYCANCEL) { 0x5 }
       const_attr_reader  :MB_RETRYCANCEL
       
+      const_set_lazy(:MB_RIGHT) { 0x80000 }
+      const_attr_reader  :MB_RIGHT
+      
       const_set_lazy(:MB_RTLREADING) { 0x100000 }
       const_attr_reader  :MB_RTLREADING
       
@@ -2848,11 +2906,23 @@ module Org::Eclipse::Swt::Internal::Win32
       const_set_lazy(:MB_YESNOCANCEL) { 0x3 }
       const_attr_reader  :MB_YESNOCANCEL
       
+      const_set_lazy(:MCHT_CALENDAR) { 0x20000 }
+      const_attr_reader  :MCHT_CALENDAR
+      
+      const_set_lazy(:MCHT_CALENDARDATE) { MCHT_CALENDAR | 0x1 }
+      const_attr_reader  :MCHT_CALENDARDATE
+      
       const_set_lazy(:MCM_FIRST) { 0x1000 }
       const_attr_reader  :MCM_FIRST
       
       const_set_lazy(:MCM_GETCURSEL) { MCM_FIRST + 1 }
       const_attr_reader  :MCM_GETCURSEL
+      
+      const_set_lazy(:MCM_GETMINREQRECT) { MCM_FIRST + 9 }
+      const_attr_reader  :MCM_GETMINREQRECT
+      
+      const_set_lazy(:MCM_HITTEST) { MCM_FIRST + 14 }
+      const_attr_reader  :MCM_HITTEST
       
       const_set_lazy(:MCM_SETCURSEL) { MCM_FIRST + 2 }
       const_attr_reader  :MCM_SETCURSEL
@@ -2865,9 +2935,6 @@ module Org::Eclipse::Swt::Internal::Win32
       
       const_set_lazy(:MCN_SELECT) { MCN_FIRST + 4 }
       const_attr_reader  :MCN_SELECT
-      
-      const_set_lazy(:MCM_GETMINREQRECT) { MCM_FIRST + 9 }
-      const_attr_reader  :MCM_GETMINREQRECT
       
       const_set_lazy(:MCS_NOTODAY) { 0x10 }
       const_attr_reader  :MCS_NOTODAY
@@ -3080,6 +3147,9 @@ module Org::Eclipse::Swt::Internal::Win32
       const_set_lazy(:MWMO_INPUTAVAILABLE) { 0x4 }
       const_attr_reader  :MWMO_INPUTAVAILABLE
       
+      const_set_lazy(:MWT_LEFTMULTIPLY) { 2 }
+      const_attr_reader  :MWT_LEFTMULTIPLY
+      
       const_set_lazy(:NI_COMPOSITIONSTR) { 0x15 }
       const_attr_reader  :NI_COMPOSITIONSTR
       
@@ -3188,17 +3258,47 @@ module Org::Eclipse::Swt::Internal::Win32
       const_set_lazy(:NUMRESERVED) { 106 }
       const_attr_reader  :NUMRESERVED
       
-      const_set_lazy(:OBJID_CARET) { -0x8 }
-      const_attr_reader  :OBJID_CARET
+      const_set_lazy(:OBJID_WINDOW) { 0x0 }
+      const_attr_reader  :OBJID_WINDOW
       
-      const_set_lazy(:OBJID_CLIENT) { -0x4 }
-      const_attr_reader  :OBJID_CLIENT
+      const_set_lazy(:OBJID_SYSMENU) { -0x1 }
+      const_attr_reader  :OBJID_SYSMENU
+      
+      const_set_lazy(:OBJID_TITLEBAR) { -0x2 }
+      const_attr_reader  :OBJID_TITLEBAR
       
       const_set_lazy(:OBJID_MENU) { -0x3 }
       const_attr_reader  :OBJID_MENU
       
-      const_set_lazy(:OBJID_WINDOW) { 0x0 }
-      const_attr_reader  :OBJID_WINDOW
+      const_set_lazy(:OBJID_CLIENT) { -0x4 }
+      const_attr_reader  :OBJID_CLIENT
+      
+      const_set_lazy(:OBJID_VSCROLL) { -0x5 }
+      const_attr_reader  :OBJID_VSCROLL
+      
+      const_set_lazy(:OBJID_HSCROLL) { -0x6 }
+      const_attr_reader  :OBJID_HSCROLL
+      
+      const_set_lazy(:OBJID_SIZEGRIP) { -0x7 }
+      const_attr_reader  :OBJID_SIZEGRIP
+      
+      const_set_lazy(:OBJID_CARET) { -0x8 }
+      const_attr_reader  :OBJID_CARET
+      
+      const_set_lazy(:OBJID_CURSOR) { -0x9 }
+      const_attr_reader  :OBJID_CURSOR
+      
+      const_set_lazy(:OBJID_ALERT) { -0xa }
+      const_attr_reader  :OBJID_ALERT
+      
+      const_set_lazy(:OBJID_SOUND) { -0xb }
+      const_attr_reader  :OBJID_SOUND
+      
+      const_set_lazy(:OBJID_QUERYCLASSNAMEIDX) { -0xc }
+      const_attr_reader  :OBJID_QUERYCLASSNAMEIDX
+      
+      const_set_lazy(:OBJID_NATIVEOM) { -0x10 }
+      const_attr_reader  :OBJID_NATIVEOM
       
       const_set_lazy(:OBJ_BITMAP) { 0x7 }
       const_attr_reader  :OBJ_BITMAP
@@ -3208,12 +3308,6 @@ module Org::Eclipse::Swt::Internal::Win32
       
       const_set_lazy(:OBJ_PEN) { 0x1 }
       const_attr_reader  :OBJ_PEN
-      
-      const_set_lazy(:OBJID_HSCROLL) { -0x6 }
-      const_attr_reader  :OBJID_HSCROLL
-      
-      const_set_lazy(:OBJID_VSCROLL) { -0x5 }
-      const_attr_reader  :OBJID_VSCROLL
       
       const_set_lazy(:OBM_CHECKBOXES) { 0x7ff7 }
       const_attr_reader  :OBM_CHECKBOXES
@@ -3232,6 +3326,9 @@ module Org::Eclipse::Swt::Internal::Win32
       
       const_set_lazy(:OFN_ENABLEHOOK) { 0x20 }
       const_attr_reader  :OFN_ENABLEHOOK
+      
+      const_set_lazy(:OFN_ENABLESIZING) { 0x800000 }
+      const_attr_reader  :OFN_ENABLESIZING
       
       const_set_lazy(:OFN_HIDEREADONLY) { 0x4 }
       const_attr_reader  :OFN_HIDEREADONLY
@@ -3343,6 +3440,9 @@ module Org::Eclipse::Swt::Internal::Win32
       
       const_set_lazy(:PD_RETURNDC) { 0x100 }
       const_attr_reader  :PD_RETURNDC
+      
+      const_set_lazy(:PD_RETURNDEFAULT) { 0x400 }
+      const_attr_reader  :PD_RETURNDEFAULT
       
       const_set_lazy(:PD_SELECTION) { 0x1 }
       const_attr_reader  :PD_SELECTION
@@ -6005,6 +6105,18 @@ module Org::Eclipse::Swt::Internal::Win32
         JNI.__send__(:Java_org_eclipse_swt_internal_win32_OS_CREATESTRUCT_1sizeof, JNI.env, self.jni_id)
       end
       
+      JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_DEVMODEA_1sizeof, [:pointer, :long], :int32
+      typesig { [] }
+      def _devmodea_sizeof
+        JNI.__send__(:Java_org_eclipse_swt_internal_win32_OS_DEVMODEA_1sizeof, JNI.env, self.jni_id)
+      end
+      
+      JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_DEVMODEW_1sizeof, [:pointer, :long], :int32
+      typesig { [] }
+      def _devmodew_sizeof
+        JNI.__send__(:Java_org_eclipse_swt_internal_win32_OS_DEVMODEW_1sizeof, JNI.env, self.jni_id)
+      end
+      
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_DIBSECTION_1sizeof, [:pointer, :long], :int32
       typesig { [] }
       def _dibsection_sizeof
@@ -6203,6 +6315,12 @@ module Org::Eclipse::Swt::Internal::Win32
         JNI.__send__(:Java_org_eclipse_swt_internal_win32_OS_MARGINS_1sizeof, JNI.env, self.jni_id)
       end
       
+      JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_MCHITTESTINFO_1sizeof, [:pointer, :long], :int32
+      typesig { [] }
+      def _mchittestinfo_sizeof
+        JNI.__send__(:Java_org_eclipse_swt_internal_win32_OS_MCHITTESTINFO_1sizeof, JNI.env, self.jni_id)
+      end
+      
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_MEASUREITEMSTRUCT_1sizeof, [:pointer, :long], :int32
       typesig { [] }
       def _measureitemstruct_sizeof
@@ -6397,12 +6515,14 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_NOTIFYICONDATAA_1V2_1SIZE, [:pointer, :long], :int32
       typesig { [] }
+      # @method flags=const
       def _notifyicondataa_v2_size
         JNI.__send__(:Java_org_eclipse_swt_internal_win32_OS_NOTIFYICONDATAA_1V2_1SIZE, JNI.env, self.jni_id)
       end
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_NOTIFYICONDATAW_1V2_1SIZE, [:pointer, :long], :int32
       typesig { [] }
+      # @method flags=const
       def _notifyicondataw_v2_size
         JNI.__send__(:Java_org_eclipse_swt_internal_win32_OS_NOTIFYICONDATAW_1V2_1SIZE, JNI.env, self.jni_id)
       end
@@ -7486,6 +7606,24 @@ module Org::Eclipse::Swt::Internal::Win32
         return _imm_set_composition_font_a(h_imc, lplf)
       end
       
+      typesig { [::Java::Int, ::Java::Int, Array.typed(::Java::Byte), ::Java::Int] }
+      # long
+      def _imm_get_composition_string(h_imc, dw_index, lp_buf, dw_buf_len)
+        if (IsUnicode)
+          return _imm_get_composition_string_w(h_imc, dw_index, lp_buf, dw_buf_len)
+        end
+        return _imm_get_composition_string_a(h_imc, dw_index, lp_buf, dw_buf_len)
+      end
+      
+      typesig { [::Java::Int, ::Java::Int, Array.typed(::Java::Int), ::Java::Int] }
+      # long
+      def _imm_get_composition_string(h_imc, dw_index, lp_buf, dw_buf_len)
+        if (IsUnicode)
+          return _imm_get_composition_string_w(h_imc, dw_index, lp_buf, dw_buf_len)
+        end
+        return _imm_get_composition_string_a(h_imc, dw_index, lp_buf, dw_buf_len)
+      end
+      
       typesig { [::Java::Int, ::Java::Int, TCHAR, ::Java::Int] }
       # long
       def _imm_get_composition_string(h_imc, dw_index, lp_buf, dw_buf_len)
@@ -7495,6 +7633,34 @@ module Org::Eclipse::Swt::Internal::Win32
         end
         lp_buf1 = (lp_buf).nil? ? nil : lp_buf.attr_bytes
         return _imm_get_composition_string_a(h_imc, dw_index, lp_buf1, dw_buf_len)
+      end
+      
+      typesig { [TCHAR, TCHAR, TCHAR, Array.typed(::Java::Int)] }
+      def _internet_get_cookie(lpsz_url, lpsz_cookie_name, lpsz_cookie_data, lpdw_size)
+        if (IsUnicode)
+          url = (lpsz_url).nil? ? nil : lpsz_url.attr_chars
+          cookie_name = (lpsz_cookie_name).nil? ? nil : lpsz_cookie_name.attr_chars
+          cookie_data = (lpsz_cookie_data).nil? ? nil : lpsz_cookie_data.attr_chars
+          return _internet_get_cookie_w(url, cookie_name, cookie_data, lpdw_size)
+        end
+        url = (lpsz_url).nil? ? nil : lpsz_url.attr_bytes
+        cookie_name = (lpsz_cookie_name).nil? ? nil : lpsz_cookie_name.attr_bytes
+        cookie_data = (lpsz_cookie_data).nil? ? nil : lpsz_cookie_data.attr_bytes
+        return _internet_get_cookie_a(url, cookie_name, cookie_data, lpdw_size)
+      end
+      
+      typesig { [TCHAR, TCHAR, TCHAR] }
+      def _internet_set_cookie(lpsz_url, lpsz_cookie_name, lpsz_cookie_data)
+        if (IsUnicode)
+          url = (lpsz_url).nil? ? nil : lpsz_url.attr_chars
+          cookie_name = (lpsz_cookie_name).nil? ? nil : lpsz_cookie_name.attr_chars
+          cookie_data = (lpsz_cookie_data).nil? ? nil : lpsz_cookie_data.attr_chars
+          return _internet_set_cookie_w(url, cookie_name, cookie_data)
+        end
+        url = (lpsz_url).nil? ? nil : lpsz_url.attr_bytes
+        cookie_name = (lpsz_cookie_name).nil? ? nil : lpsz_cookie_name.attr_bytes
+        cookie_data = (lpsz_cookie_data).nil? ? nil : lpsz_cookie_data.attr_bytes
+        return _internet_set_cookie_a(url, cookie_name, cookie_data)
       end
       
       typesig { [::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, TCHAR] }
@@ -7638,6 +7804,26 @@ module Org::Eclipse::Swt::Internal::Win32
         else
           destination1 = (destination).nil? ? nil : destination.attr_bytes
           _move_memory(destination1, source, length_)
+        end
+      end
+      
+      typesig { [::Java::Int, DEVMODE, ::Java::Int] }
+      # long
+      def _move_memory(destination, source, length_)
+        if (IsUnicode)
+          _move_memory(destination, source, length_)
+        else
+          _move_memory(destination, source, length_)
+        end
+      end
+      
+      typesig { [DEVMODE, ::Java::Int, ::Java::Int] }
+      # long
+      def _move_memory(destination, source, length_)
+        if (IsUnicode)
+          _move_memory(destination, source, length_)
+        else
+          _move_memory(destination, source, length_)
         end
       end
       
@@ -7978,6 +8164,17 @@ module Org::Eclipse::Swt::Internal::Win32
       end
       
       typesig { [::Java::Int, ::Java::Int, ::Java::Int, POINT] }
+      # long
+      # long
+      # long
+      def _send_message(h_wnd, msg, w_param, l_param)
+        if (IsUnicode)
+          return _send_message_w(h_wnd, msg, w_param, l_param)
+        end
+        return _send_message_a(h_wnd, msg, w_param, l_param)
+      end
+      
+      typesig { [::Java::Int, ::Java::Int, ::Java::Int, MCHITTESTINFO] }
       # long
       # long
       # long
@@ -8368,6 +8565,7 @@ module Org::Eclipse::Swt::Internal::Win32
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_AbortDoc, [:pointer, :long, :int32], :int32
       typesig { [::Java::Int] }
       # Natives
+      # @param hdc cast=(HDC)
       # long
       def _abort_doc(hdc)
         JNI.__send__(:Java_org_eclipse_swt_internal_win32_OS_AbortDoc, JNI.env, self.jni_id, hdc.to_int)
@@ -8375,6 +8573,9 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_ActivateActCtx, [:pointer, :long, :int32, :long], :int8
       typesig { [::Java::Int, Array.typed(::Java::Int)] }
+      # @method flags=dynamic
+      # @param lpCookie cast=(ULONG_PTR*)
+      # 
       # long
       # long
       def _activate_act_ctx(h_act_ctx, lp_cookie)
@@ -8383,6 +8584,7 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_ActivateKeyboardLayout, [:pointer, :long, :int32, :int32], :int32
       typesig { [::Java::Int, ::Java::Int] }
+      # @param hkl cast=(HKL)
       # long
       # long
       def _activate_keyboard_layout(hkl, flags)
@@ -8391,6 +8593,7 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_AddFontResourceExW, [:pointer, :long, :long, :int32, :int32], :int32
       typesig { [Array.typed(::Java::Char), ::Java::Int, ::Java::Int] }
+      # @method flags=dynamic
       # long
       def _add_font_resource_ex_w(lpsz_filename, fl, pdv)
         JNI.__send__(:Java_org_eclipse_swt_internal_win32_OS_AddFontResourceExW, JNI.env, self.jni_id, lpsz_filename.jni_id, fl.to_int, pdv.to_int)
@@ -8398,6 +8601,7 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_AddFontResourceExA, [:pointer, :long, :long, :int32, :int32], :int32
       typesig { [Array.typed(::Java::Byte), ::Java::Int, ::Java::Int] }
+      # @method flags=dynamic
       # long
       def _add_font_resource_ex_a(lpsz_filename, fl, pdv)
         JNI.__send__(:Java_org_eclipse_swt_internal_win32_OS_AddFontResourceExA, JNI.env, self.jni_id, lpsz_filename.jni_id, fl.to_int, pdv.to_int)
@@ -8411,12 +8615,16 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_AllowSetForegroundWindow, [:pointer, :long, :int32], :int8
       typesig { [::Java::Int] }
+      # @method flags=dynamic
       def _allow_set_foreground_window(dw_process_id)
         JNI.__send__(:Java_org_eclipse_swt_internal_win32_OS_AllowSetForegroundWindow, JNI.env, self.jni_id, dw_process_id.to_int) != 0
       end
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_AlphaBlend, [:pointer, :long, :int32, :int32, :int32, :int32, :int32, :int32, :int32, :int32, :int32, :int32, :long], :int8
       typesig { [::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, BLENDFUNCTION] }
+      # @method flags=dynamic
+      # @param blendFunction flags=struct
+      # 
       # long
       # long
       def _alpha_blend(hdc_dest, n_xorigin_dest, n_yorigin_dest, n_width_dest, n_height_dest, hdc_src, n_xorigin_src, n_yorigin_src, n_width_src, n_height_src, blend_function)
@@ -8425,6 +8633,9 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_AnimateWindow, [:pointer, :long, :int32, :int32, :int32], :int8
       typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
+      # @method flags=dynamic
+      # @param hwnd cast=(HWND)
+      # 
       # long
       def _animate_window(hwnd, dw_time, dw_flags)
         JNI.__send__(:Java_org_eclipse_swt_internal_win32_OS_AnimateWindow, JNI.env, self.jni_id, hwnd.to_int, dw_time.to_int, dw_flags.to_int) != 0
@@ -8432,6 +8643,7 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_Arc, [:pointer, :long, :int32, :int32, :int32, :int32, :int32, :int32, :int32, :int32, :int32], :int8
       typesig { [::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int] }
+      # @param hdc cast=(HDC)
       # long
       def _arc(hdc, n_left_rect, n_top_rect, n_right_rect, n_bottom_rect, n_xstart_arc, n_ystart_arc, n_xend_arc, n_yend_arc)
         JNI.__send__(:Java_org_eclipse_swt_internal_win32_OS_Arc, JNI.env, self.jni_id, hdc.to_int, n_left_rect.to_int, n_top_rect.to_int, n_right_rect.to_int, n_bottom_rect.to_int, n_xstart_arc.to_int, n_ystart_arc.to_int, n_xend_arc.to_int, n_yend_arc.to_int) != 0
@@ -8439,24 +8651,32 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_AssocQueryStringA, [:pointer, :long, :int32, :int32, :long, :long, :long, :long], :int32
       typesig { [::Java::Int, ::Java::Int, Array.typed(::Java::Byte), Array.typed(::Java::Byte), Array.typed(::Java::Byte), Array.typed(::Java::Int)] }
+      # @method flags=dynamic
       def _assoc_query_string_a(flags, str, psz_assoc, psz_extra, psz_out, pcch_out)
         JNI.__send__(:Java_org_eclipse_swt_internal_win32_OS_AssocQueryStringA, JNI.env, self.jni_id, flags.to_int, str.to_int, psz_assoc.jni_id, psz_extra.jni_id, psz_out.jni_id, pcch_out.jni_id)
       end
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_AssocQueryStringW, [:pointer, :long, :int32, :int32, :long, :long, :long, :long], :int32
       typesig { [::Java::Int, ::Java::Int, Array.typed(::Java::Char), Array.typed(::Java::Char), Array.typed(::Java::Char), Array.typed(::Java::Int)] }
+      # @method flags=dynamic
       def _assoc_query_string_w(flags, str, psz_assoc, psz_extra, psz_out, pcch_out)
         JNI.__send__(:Java_org_eclipse_swt_internal_win32_OS_AssocQueryStringW, JNI.env, self.jni_id, flags.to_int, str.to_int, psz_assoc.jni_id, psz_extra.jni_id, psz_out.jni_id, pcch_out.jni_id)
       end
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_AttachThreadInput, [:pointer, :long, :int32, :int32, :int8], :int8
       typesig { [::Java::Int, ::Java::Int, ::Java::Boolean] }
+      # @param idAttach cast=(DWORD)
+      # @param idAttachTo cast=(DWORD)
       def _attach_thread_input(id_attach, id_attach_to, f_attach)
         JNI.__send__(:Java_org_eclipse_swt_internal_win32_OS_AttachThreadInput, JNI.env, self.jni_id, id_attach.to_int, id_attach_to.to_int, f_attach ? 1 : 0) != 0
       end
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_BeginBufferedPaint, [:pointer, :long, :int32, :long, :int32, :long, :long], :int32
       typesig { [::Java::Int, RECT, ::Java::Int, BP_PAINTPARAMS, Array.typed(::Java::Int)] }
+      # @method flags=dynamic
+      # @param hdcTarget cast=(HDC)
+      # @param phdc cast=(HDC*)
+      # 
       # long
       # long
       # long
@@ -8473,6 +8693,7 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_BeginPaint, [:pointer, :long, :int32, :long], :int32
       typesig { [::Java::Int, PAINTSTRUCT] }
+      # @param hWnd cast=(HWND)
       # long
       # long
       def _begin_paint(h_wnd, lp_paint)
@@ -8481,6 +8702,7 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_BeginPath, [:pointer, :long, :int32], :int8
       typesig { [::Java::Int] }
+      # @param hdc cast=(HDC)
       # long
       def _begin_path(hdc)
         JNI.__send__(:Java_org_eclipse_swt_internal_win32_OS_BeginPath, JNI.env, self.jni_id, hdc.to_int) != 0
@@ -8488,6 +8710,9 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_BitBlt, [:pointer, :long, :int32, :int32, :int32, :int32, :int32, :int32, :int32, :int32, :int32], :int8
       typesig { [::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int] }
+      # @param hdcDest cast=(HDC)
+      # @param hdcSrc cast=(HDC)
+      # 
       # long
       # long
       def _bit_blt(hdc_dest, n_xdest, n_ydest, n_width, n_height, hdc_src, n_xsrc, n_ysrc, dw_rop)
@@ -8496,6 +8721,7 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_BringWindowToTop, [:pointer, :long, :int32], :int8
       typesig { [::Java::Int] }
+      # @param hWnd cast=(HWND)
       # long
       def _bring_window_to_top(h_wnd)
         JNI.__send__(:Java_org_eclipse_swt_internal_win32_OS_BringWindowToTop, JNI.env, self.jni_id, h_wnd.to_int) != 0
@@ -8503,12 +8729,16 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_BufferedPaintInit, [:pointer, :long], :int32
       typesig { [] }
+      # @method flags=dynamic
       def _buffered_paint_init
         JNI.__send__(:Java_org_eclipse_swt_internal_win32_OS_BufferedPaintInit, JNI.env, self.jni_id)
       end
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_BufferedPaintSetAlpha, [:pointer, :long, :int32, :long, :int8], :int32
       typesig { [::Java::Int, RECT, ::Java::Byte] }
+      # @method flags=dynamic
+      # @param hBufferedPaint cast=(HPAINTBUFFER)
+      # 
       # long
       def _buffered_paint_set_alpha(h_buffered_paint, prc, alpha)
         JNI.__send__(:Java_org_eclipse_swt_internal_win32_OS_BufferedPaintSetAlpha, JNI.env, self.jni_id, h_buffered_paint.to_int, prc.jni_id, alpha.to_int)
@@ -8516,12 +8746,14 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_BufferedPaintUnInit, [:pointer, :long], :int32
       typesig { [] }
+      # @method flags=dynamic
       def _buffered_paint_un_init
         JNI.__send__(:Java_org_eclipse_swt_internal_win32_OS_BufferedPaintUnInit, JNI.env, self.jni_id)
       end
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_Call, [:pointer, :long, :int32, :long], :int32
       typesig { [::Java::Int, DLLVERSIONINFO] }
+      # @param address cast=(DLLGETVERSIONPROC)
       # long
       def _call(address, arg0)
         JNI.__send__(:Java_org_eclipse_swt_internal_win32_OS_Call, JNI.env, self.jni_id, address.to_int, arg0.jni_id)
@@ -8529,6 +8761,10 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_CallNextHookEx, [:pointer, :long, :int32, :int32, :int32, :int32], :int32
       typesig { [::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int] }
+      # @param hhk cast=(HHOOK)
+      # @param wParam cast=(WPARAM)
+      # @param lParam cast=(LPARAM)
+      # 
       # long
       # long
       # long
@@ -8539,6 +8775,9 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_CallWindowProcW, [:pointer, :long, :int32, :int32, :int32, :int32, :int32], :int32
       typesig { [::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int] }
+      # @param lpPrevWndFunc cast=(WNDPROC)
+      # @param hWnd cast=(HWND)
+      # 
       # long
       # long
       # long
@@ -8550,6 +8789,9 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_CallWindowProcA, [:pointer, :long, :int32, :int32, :int32, :int32, :int32], :int32
       typesig { [::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int] }
+      # @param lpPrevWndFunc cast=(WNDPROC)
+      # @param hWnd cast=(HWND)
+      # 
       # long
       # long
       # long
@@ -8561,6 +8803,7 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_CharLowerW, [:pointer, :long, :int32], :int32
       typesig { [::Java::Int] }
+      # @param ch cast=(LPWSTR)
       # long
       # long
       def _char_lower_w(ch)
@@ -8569,6 +8812,7 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_CharLowerA, [:pointer, :long, :int32], :int32
       typesig { [::Java::Int] }
+      # @param ch cast=(LPSTR)
       # long
       # long
       def _char_lower_a(ch)
@@ -8577,6 +8821,7 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_CharUpperW, [:pointer, :long, :int32], :int32
       typesig { [::Java::Int] }
+      # @param ch cast=(LPWSTR)
       # long
       # long
       def _char_upper_w(ch)
@@ -8585,6 +8830,7 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_CharUpperA, [:pointer, :long, :int32], :int32
       typesig { [::Java::Int] }
+      # @param ch cast=(LPSTR)
       # long
       # long
       def _char_upper_a(ch)
@@ -8593,6 +8839,10 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_CheckMenuItem, [:pointer, :long, :int32, :int32, :int32], :int8
       typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
+      # @param hmenu cast=(HMENU)
+      # @param uIDCheckItem cast=(UINT)
+      # @param uCheck cast=(UINT)
+      # 
       # long
       def _check_menu_item(hmenu, u_idcheck_item, u_check)
         JNI.__send__(:Java_org_eclipse_swt_internal_win32_OS_CheckMenuItem, JNI.env, self.jni_id, hmenu.to_int, u_idcheck_item.to_int, u_check.to_int) != 0
@@ -8600,6 +8850,7 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_ChooseColorW, [:pointer, :long, :long], :int8
       typesig { [CHOOSECOLOR] }
+      # @param lpcc cast=(LPCHOOSECOLORW)
       def _choose_color_w(lpcc)
         JNI.__send__(:Java_org_eclipse_swt_internal_win32_OS_ChooseColorW, JNI.env, self.jni_id, lpcc.jni_id) != 0
       end
@@ -8612,6 +8863,7 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_ChooseFontW, [:pointer, :long, :long], :int8
       typesig { [CHOOSEFONT] }
+      # @param chooseFont cast=(LPCHOOSEFONTW)
       def _choose_font_w(choose_font)
         JNI.__send__(:Java_org_eclipse_swt_internal_win32_OS_ChooseFontW, JNI.env, self.jni_id, choose_font.jni_id) != 0
       end
@@ -8624,6 +8876,7 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_ClientToScreen, [:pointer, :long, :int32, :long], :int8
       typesig { [::Java::Int, POINT] }
+      # @param hWnd cast=(HWND)
       # long
       def _client_to_screen(h_wnd, lp_point)
         JNI.__send__(:Java_org_eclipse_swt_internal_win32_OS_ClientToScreen, JNI.env, self.jni_id, h_wnd.to_int, lp_point.jni_id) != 0
@@ -8637,6 +8890,7 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_CloseEnhMetaFile, [:pointer, :long, :int32], :int32
       typesig { [::Java::Int] }
+      # @param hdc cast=(HDC)
       # long
       # long
       def _close_enh_meta_file(hdc)
@@ -8645,6 +8899,7 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_CloseHandle, [:pointer, :long, :int32], :int8
       typesig { [::Java::Int] }
+      # @param hObject cast=(HANDLE)
       # long
       def _close_handle(h_object)
         JNI.__send__(:Java_org_eclipse_swt_internal_win32_OS_CloseHandle, JNI.env, self.jni_id, h_object.to_int) != 0
@@ -8652,6 +8907,9 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_CloseThemeData, [:pointer, :long, :int32], :int32
       typesig { [::Java::Int] }
+      # @method flags=dynamic
+      # @param hTheme cast=(HTHEME)
+      # 
       # long
       def _close_theme_data(h_theme)
         JNI.__send__(:Java_org_eclipse_swt_internal_win32_OS_CloseThemeData, JNI.env, self.jni_id, h_theme.to_int)
@@ -8659,6 +8917,11 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_CoCreateInstance, [:pointer, :long, :long, :int32, :int32, :long, :long], :int32
       typesig { [Array.typed(::Java::Byte), ::Java::Int, ::Java::Int, Array.typed(::Java::Byte), Array.typed(::Java::Int)] }
+      # @param rclsid cast=(REFCLSID)
+      # @param pUnkOuter cast=(LPUNKNOWN)
+      # @param riid cast=(REFIID)
+      # @param ppv cast=(LPVOID *)
+      # 
       # long
       # long
       def _co_create_instance(rclsid, p_unk_outer, dw_cls_context, riid, ppv)
@@ -8667,18 +8930,25 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_CoInternetIsFeatureEnabled, [:pointer, :long, :int32, :int32], :int32
       typesig { [::Java::Int, ::Java::Int] }
+      # @method flags=dynamic
       def _co_internet_is_feature_enabled(feature_entry, dw_flags)
         JNI.__send__(:Java_org_eclipse_swt_internal_win32_OS_CoInternetIsFeatureEnabled, JNI.env, self.jni_id, feature_entry.to_int, dw_flags.to_int)
       end
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_CoInternetSetFeatureEnabled, [:pointer, :long, :int32, :int32, :int8], :int32
       typesig { [::Java::Int, ::Java::Int, ::Java::Boolean] }
+      # @method flags=dynamic
+      # @param fEnable cast=(BOOL)
       def _co_internet_set_feature_enabled(feature_entry, dw_flags, f_enable)
         JNI.__send__(:Java_org_eclipse_swt_internal_win32_OS_CoInternetSetFeatureEnabled, JNI.env, self.jni_id, feature_entry.to_int, dw_flags.to_int, f_enable ? 1 : 0)
       end
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_CombineRgn, [:pointer, :long, :int32, :int32, :int32, :int32], :int32
       typesig { [::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int] }
+      # @param hrgnDest cast=(HRGN)
+      # @param hrgnSrc1 cast=(HRGN)
+      # @param hrgnSrc2 cast=(HRGN)
+      # 
       # long
       # long
       # long
@@ -8688,6 +8958,7 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_CommandBar_1AddAdornments, [:pointer, :long, :int32, :int32, :int32], :int8
       typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
+      # @param hwndCB cast=(HWND)
       # long
       def _command_bar_add_adornments(hwnd_cb, dw_flags, dw_reserved)
         JNI.__send__(:Java_org_eclipse_swt_internal_win32_OS_CommandBar_1AddAdornments, JNI.env, self.jni_id, hwnd_cb.to_int, dw_flags.to_int, dw_reserved.to_int) != 0
@@ -8695,6 +8966,9 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_CommandBar_1Create, [:pointer, :long, :int32, :int32, :int32], :int32
       typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
+      # @param hInst cast=(HINSTANCE)
+      # @param hwndParent cast=(HWND)
+      # 
       # long
       # long
       # long
@@ -8704,6 +8978,7 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_CommandBar_1Destroy, [:pointer, :long, :int32], :void
       typesig { [::Java::Int] }
+      # @param hwndCB cast=(HWND)
       # long
       def _command_bar_destroy(hwnd_cb)
         JNI.__send__(:Java_org_eclipse_swt_internal_win32_OS_CommandBar_1Destroy, JNI.env, self.jni_id, hwnd_cb.to_int)
@@ -8711,6 +8986,9 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_CommandBar_1DrawMenuBar, [:pointer, :long, :int32, :int32], :int8
       typesig { [::Java::Int, ::Java::Int] }
+      # @param hwndCB cast=(HWND)
+      # @param iButton cast=(WORD)
+      # 
       # long
       def _command_bar_draw_menu_bar(hwnd_cb, i_button)
         JNI.__send__(:Java_org_eclipse_swt_internal_win32_OS_CommandBar_1DrawMenuBar, JNI.env, self.jni_id, hwnd_cb.to_int, i_button.to_int) != 0
@@ -8718,6 +8996,7 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_CommandBar_1Height, [:pointer, :long, :int32], :int32
       typesig { [::Java::Int] }
+      # @param hdnwCB cast=(HWND)
       # long
       def _command_bar_height(hdnw_cb)
         JNI.__send__(:Java_org_eclipse_swt_internal_win32_OS_CommandBar_1Height, JNI.env, self.jni_id, hdnw_cb.to_int)
@@ -8725,6 +9004,11 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_CommandBar_1InsertMenubarEx, [:pointer, :long, :int32, :int32, :int32, :int32], :int8
       typesig { [::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int] }
+      # @param hwndCB cast=(HWND)
+      # @param hInst cast=(HINSTANCE)
+      # @param pszMenu cast=(LPTSTR)
+      # @param iButton cast=(WORD)
+      # 
       # long
       # long
       # long
@@ -8734,6 +9018,9 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_CommandBar_1Show, [:pointer, :long, :int32, :int8], :int8
       typesig { [::Java::Int, ::Java::Boolean] }
+      # @param hwndCB cast=(HWND)
+      # @param fShow cast=(BOOL)
+      # 
       # long
       def _command_bar_show(hwnd_cb, f_show)
         JNI.__send__(:Java_org_eclipse_swt_internal_win32_OS_CommandBar_1Show, JNI.env, self.jni_id, hwnd_cb.to_int, f_show ? 1 : 0) != 0
@@ -8747,6 +9034,7 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_CopyImage, [:pointer, :long, :int32, :int32, :int32, :int32, :int32], :int32
       typesig { [::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int] }
+      # @param hImage cast=(HANDLE)
       # long
       # long
       def _copy_image(h_image, u_type, cx_desired, cy_desired, fu_flags)
@@ -8755,6 +9043,7 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_CreateAcceleratorTableW, [:pointer, :long, :long, :int32], :int32
       typesig { [Array.typed(::Java::Byte), ::Java::Int] }
+      # @param lpaccl cast=(LPACCEL)
       # long
       def _create_accelerator_table_w(lpaccl, c_entries)
         JNI.__send__(:Java_org_eclipse_swt_internal_win32_OS_CreateAcceleratorTableW, JNI.env, self.jni_id, lpaccl.jni_id, c_entries.to_int)
@@ -8762,6 +9051,7 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_CreateAcceleratorTableA, [:pointer, :long, :long, :int32], :int32
       typesig { [Array.typed(::Java::Byte), ::Java::Int] }
+      # @param lpaccl cast=(LPACCEL)
       # long
       def _create_accelerator_table_a(lpaccl, c_entries)
         JNI.__send__(:Java_org_eclipse_swt_internal_win32_OS_CreateAcceleratorTableA, JNI.env, self.jni_id, lpaccl.jni_id, c_entries.to_int)
@@ -8769,6 +9059,9 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_CreateActCtxW, [:pointer, :long, :long], :int32
       typesig { [ACTCTX] }
+      # @method flags=dynamic
+      # @param pActCtx flags=no_out
+      # 
       # long
       def _create_act_ctx_w(p_act_ctx)
         JNI.__send__(:Java_org_eclipse_swt_internal_win32_OS_CreateActCtxW, JNI.env, self.jni_id, p_act_ctx.jni_id)
@@ -8776,6 +9069,9 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_CreateActCtxA, [:pointer, :long, :long], :int32
       typesig { [ACTCTX] }
+      # @method flags=dynamic
+      # @param pActCtx flags=no_out
+      # 
       # long
       def _create_act_ctx_a(p_act_ctx)
         JNI.__send__(:Java_org_eclipse_swt_internal_win32_OS_CreateActCtxA, JNI.env, self.jni_id, p_act_ctx.jni_id)
@@ -8783,6 +9079,7 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_CreateBitmap, [:pointer, :long, :int32, :int32, :int32, :int32, :long], :int32
       typesig { [::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, Array.typed(::Java::Byte)] }
+      # @param lpvBits cast=(CONST VOID *),flags=no_out critical
       # long
       def _create_bitmap(n_width, n_height, c_planes, c_bits_per_pel, lpv_bits)
         JNI.__send__(:Java_org_eclipse_swt_internal_win32_OS_CreateBitmap, JNI.env, self.jni_id, n_width.to_int, n_height.to_int, c_planes.to_int, c_bits_per_pel.to_int, lpv_bits.jni_id)
@@ -8790,6 +9087,9 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_CreateCaret, [:pointer, :long, :int32, :int32, :int32, :int32], :int8
       typesig { [::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int] }
+      # @param hWnd cast=(HWND)
+      # @param hBitmap cast=(HBITMAP)
+      # 
       # long
       # long
       def _create_caret(h_wnd, h_bitmap, n_width, n_height)
@@ -8798,6 +9098,7 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_CreateCompatibleBitmap, [:pointer, :long, :int32, :int32, :int32], :int32
       typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
+      # @param hdc cast=(HDC)
       # long
       # long
       def _create_compatible_bitmap(hdc, n_width, n_height)
@@ -8806,6 +9107,7 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_CreateCompatibleDC, [:pointer, :long, :int32], :int32
       typesig { [::Java::Int] }
+      # @param hdc cast=(HDC)
       # long
       # long
       def _create_compatible_dc(hdc)
@@ -8814,6 +9116,10 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_CreateCursor, [:pointer, :long, :int32, :int32, :int32, :int32, :int32, :long, :long], :int32
       typesig { [::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, Array.typed(::Java::Byte), Array.typed(::Java::Byte)] }
+      # @param hInst cast=(HINSTANCE)
+      # @param pvANDPlane cast=(CONST VOID *),flags=no_out critical
+      # @param pvXORPlane cast=(CONST VOID *),flags=no_out critical
+      # 
       # long
       # long
       def _create_cursor(h_inst, x_hot_spot, y_hot_spot, n_width, n_height, pv_andplane, pv_xorplane)
@@ -8822,6 +9128,11 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_CreateDCW, [:pointer, :long, :long, :long, :int32, :int32], :int32
       typesig { [Array.typed(::Java::Char), Array.typed(::Java::Char), ::Java::Int, ::Java::Int] }
+      # @param lpszDriver cast=(LPWSTR)
+      # @param lpszDevice cast=(LPWSTR)
+      # @param lpszOutput cast=(LPWSTR)
+      # @param lpInitData cast=(CONST DEVMODEW *)
+      # 
       # long
       # long
       # long
@@ -8831,6 +9142,11 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_CreateDCA, [:pointer, :long, :long, :long, :int32, :int32], :int32
       typesig { [Array.typed(::Java::Byte), Array.typed(::Java::Byte), ::Java::Int, ::Java::Int] }
+      # @param lpszDriver cast=(LPSTR)
+      # @param lpszDevice cast=(LPSTR)
+      # @param lpszOutput cast=(LPSTR)
+      # @param lpInitData cast=(CONST DEVMODE *)
+      # 
       # long
       # long
       # long
@@ -8840,6 +9156,11 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_CreateDIBSection__I_3BI_3III, [:pointer, :long, :int32, :long, :int32, :long, :int32, :int32], :int32
       typesig { [::Java::Int, Array.typed(::Java::Byte), ::Java::Int, Array.typed(::Java::Int), ::Java::Int, ::Java::Int] }
+      # @param hdc cast=(HDC)
+      # @param pbmi cast=(BITMAPINFO *),flags=no_out critical
+      # @param ppvBits cast=(VOID **),flags=no_in critical
+      # @param hSection cast=(HANDLE)
+      # 
       # long
       # long
       # long
@@ -8850,6 +9171,11 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_CreateDIBSection__III_3III, [:pointer, :long, :int32, :int32, :int32, :long, :int32, :int32], :int32
       typesig { [::Java::Int, ::Java::Int, ::Java::Int, Array.typed(::Java::Int), ::Java::Int, ::Java::Int] }
+      # @param hdc cast=(HDC)
+      # @param pbmi cast=(BITMAPINFO *),flags=no_out critical
+      # @param ppvBits cast=(VOID **),flags=no_in critical
+      # @param hSection cast=(HANDLE)
+      # 
       # long
       # long
       # long
@@ -8861,6 +9187,10 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_CreateEnhMetaFileW, [:pointer, :long, :int32, :long, :long, :long], :int32
       typesig { [::Java::Int, Array.typed(::Java::Char), RECT, Array.typed(::Java::Char)] }
+      # @param hdcRef cast=(HDC)
+      # @param lpFilename cast=(LPCWSTR)
+      # @param lpDescription cast=(LPCWSTR)
+      # 
       # long
       # long
       def _create_enh_meta_file_w(hdc_ref, lp_filename, lp_rect, lp_description)
@@ -8869,6 +9199,10 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_CreateEnhMetaFileA, [:pointer, :long, :int32, :long, :long, :long], :int32
       typesig { [::Java::Int, Array.typed(::Java::Byte), RECT, Array.typed(::Java::Byte)] }
+      # @param hdcRef cast=(HDC)
+      # @param lpFilename cast=(LPCSTR)
+      # @param lpDescription cast=(LPCSTR)
+      # 
       # long
       # long
       def _create_enh_meta_file_a(hdc_ref, lp_filename, lp_rect, lp_description)
@@ -8877,6 +9211,7 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_CreateFontIndirectW__I, [:pointer, :long, :int32], :int32
       typesig { [::Java::Int] }
+      # @param lplf cast=(LPLOGFONTW)
       # long
       # long
       def _create_font_indirect_w(lplf)
@@ -8885,6 +9220,7 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_CreateFontIndirectA__I, [:pointer, :long, :int32], :int32
       typesig { [::Java::Int] }
+      # @param lplf cast=(LPLOGFONTA)
       # long
       # long
       def _create_font_indirect_a(lplf)
@@ -8893,6 +9229,7 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method "Java_org_eclipse_swt_internal_win32_OS_CreateFontIndirectW__L#{LOGFONTW.jni_name}_2".to_sym, [:pointer, :long, :long], :int32
       typesig { [LOGFONTW] }
+      # @param lplf flags=no_out
       # long
       def _create_font_indirect_w(lplf)
         JNI.__send__("Java_org_eclipse_swt_internal_win32_OS_CreateFontIndirectW__L#{LOGFONTW.jni_name}_2".to_sym, JNI.env, self.jni_id, lplf.jni_id)
@@ -8900,6 +9237,7 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method "Java_org_eclipse_swt_internal_win32_OS_CreateFontIndirectA__L#{LOGFONTA.jni_name}_2".to_sym, [:pointer, :long, :long], :int32
       typesig { [LOGFONTA] }
+      # @param lplf flags=no_out
       # long
       def _create_font_indirect_a(lplf)
         JNI.__send__("Java_org_eclipse_swt_internal_win32_OS_CreateFontIndirectA__L#{LOGFONTA.jni_name}_2".to_sym, JNI.env, self.jni_id, lplf.jni_id)
@@ -8907,6 +9245,7 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_CreateIconIndirect, [:pointer, :long, :long], :int32
       typesig { [ICONINFO] }
+      # @param lplf flags=no_out
       # long
       def _create_icon_indirect(lplf)
         JNI.__send__(:Java_org_eclipse_swt_internal_win32_OS_CreateIconIndirect, JNI.env, self.jni_id, lplf.jni_id)
@@ -8921,6 +9260,7 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_CreatePalette, [:pointer, :long, :long], :int32
       typesig { [Array.typed(::Java::Byte)] }
+      # @param logPalette cast=(LOGPALETTE *),flags=no_out critical
       # long
       def _create_palette(log_palette)
         JNI.__send__(:Java_org_eclipse_swt_internal_win32_OS_CreatePalette, JNI.env, self.jni_id, log_palette.jni_id)
@@ -8928,6 +9268,7 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_CreatePatternBrush, [:pointer, :long, :int32], :int32
       typesig { [::Java::Int] }
+      # @param hbmp cast=(HBITMAP)
       # long
       # long
       def _create_pattern_brush(hbmp)
@@ -8936,6 +9277,7 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_CreatePen, [:pointer, :long, :int32, :int32, :int32], :int32
       typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
+      # @param crColor cast=(COLORREF)
       # long
       def _create_pen(fn_pen_style, n_width, cr_color)
         JNI.__send__(:Java_org_eclipse_swt_internal_win32_OS_CreatePen, JNI.env, self.jni_id, fn_pen_style.to_int, n_width.to_int, cr_color.to_int)
@@ -8943,6 +9285,7 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_CreatePolygonRgn, [:pointer, :long, :long, :int32, :int32], :int32
       typesig { [Array.typed(::Java::Int), ::Java::Int, ::Java::Int] }
+      # @param lppt cast=(CONST POINT *)
       # long
       def _create_polygon_rgn(lppt, c_points, fn_poly_fill_mode)
         JNI.__send__(:Java_org_eclipse_swt_internal_win32_OS_CreatePolygonRgn, JNI.env, self.jni_id, lppt.jni_id, c_points.to_int, fn_poly_fill_mode.to_int)
@@ -8957,6 +9300,15 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_CreateProcessW, [:pointer, :long, :int32, :int32, :int32, :int32, :int8, :int32, :int32, :int32, :long, :long], :int8
       typesig { [::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Boolean, ::Java::Int, ::Java::Int, ::Java::Int, STARTUPINFO, PROCESS_INFORMATION] }
+      # @param lpApplicationName cast=(LPCWSTR)
+      # @param lpCommandLine cast=(LPWSTR)
+      # @param lpProcessAttributes cast=(LPSECURITY_ATTRIBUTES)
+      # @param lpThreadAttributes cast=(LPSECURITY_ATTRIBUTES)
+      # @param lpEnvironment cast=(LPVOID)
+      # @param lpCurrentDirectory cast=(LPWSTR)
+      # @param lpStartupInfo cast=(LPSTARTUPINFOW)
+      # @param lpProcessInformation cast=(LPPROCESS_INFORMATION)
+      # 
       # long
       # long
       # long
@@ -8969,6 +9321,15 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_CreateProcessA, [:pointer, :long, :int32, :int32, :int32, :int32, :int8, :int32, :int32, :int32, :long, :long], :int8
       typesig { [::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Boolean, ::Java::Int, ::Java::Int, ::Java::Int, STARTUPINFO, PROCESS_INFORMATION] }
+      # @param lpApplicationName cast=(LPCSTR)
+      # @param lpCommandLine cast=(LPSTR)
+      # @param lpProcessAttributes cast=(LPSECURITY_ATTRIBUTES)
+      # @param lpThreadAttributes cast=(LPSECURITY_ATTRIBUTES)
+      # @param lpEnvironment cast=(LPVOID)
+      # @param lpCurrentDirectory cast=(LPSTR)
+      # @param lpStartupInfo cast=(LPSTARTUPINFOA)
+      # @param lpProcessInformation cast=(LPPROCESS_INFORMATION)
+      # 
       # long
       # long
       # long
@@ -8988,6 +9349,7 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_CreateSolidBrush, [:pointer, :long, :int32], :int32
       typesig { [::Java::Int] }
+      # @param colorRef cast=(COLORREF)
       # long
       def _create_solid_brush(color_ref)
         JNI.__send__(:Java_org_eclipse_swt_internal_win32_OS_CreateSolidBrush, JNI.env, self.jni_id, color_ref.to_int)
@@ -8995,6 +9357,10 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_CreateStreamOnHGlobal, [:pointer, :long, :int32, :int8, :long], :int32
       typesig { [::Java::Int, ::Java::Boolean, Array.typed(::Java::Int)] }
+      # @param hGlobal cast=(HGLOBAL)
+      # @param fDeleteOnRelease cast=(BOOL)
+      # @param ppstm cast=(LPSTREAM *)
+      # 
       # long
       # long
       def _create_stream_on_hglobal(h_global, f_delete_on_release, ppstm)
@@ -9003,6 +9369,12 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_CreateWindowExW, [:pointer, :long, :int32, :long, :long, :int32, :int32, :int32, :int32, :int32, :int32, :int32, :int32, :long], :int32
       typesig { [::Java::Int, Array.typed(::Java::Char), Array.typed(::Java::Char), ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, CREATESTRUCT] }
+      # @param lpClassName cast=(LPWSTR)
+      # @param lpWindowName cast=(LPWSTR)
+      # @param hWndParent cast=(HWND)
+      # @param hMenu cast=(HMENU)
+      # @param hInstance cast=(HINSTANCE)
+      # 
       # long
       # long
       # long
@@ -9013,6 +9385,11 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_CreateWindowExA, [:pointer, :long, :int32, :long, :long, :int32, :int32, :int32, :int32, :int32, :int32, :int32, :int32, :long], :int32
       typesig { [::Java::Int, Array.typed(::Java::Byte), Array.typed(::Java::Byte), ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, CREATESTRUCT] }
+      # @param lpClassName cast=(LPSTR)
+      # @param hWndParent cast=(HWND)
+      # @param hMenu cast=(HMENU)
+      # @param hInstance cast=(HINSTANCE)
+      # 
       # long
       # long
       # long
@@ -9023,6 +9400,10 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_DeferWindowPos, [:pointer, :long, :int32, :int32, :int32, :int32, :int32, :int32, :int32, :int32], :int32
       typesig { [::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int] }
+      # @param hWinPosInfo cast=(HDWP)
+      # @param hWnd cast=(HWND)
+      # @param hWndInsertAfter cast=(HWND)
+      # 
       # long
       # long
       # long
@@ -9033,6 +9414,10 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_DefMDIChildProcW, [:pointer, :long, :int32, :int32, :int32, :int32], :int32
       typesig { [::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int] }
+      # @param hWnd cast=(HWND)
+      # @param wParam cast=(WPARAM)
+      # @param lParam cast=(LPARAM)
+      # 
       # long
       # long
       # long
@@ -9043,6 +9428,10 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_DefMDIChildProcA, [:pointer, :long, :int32, :int32, :int32, :int32], :int32
       typesig { [::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int] }
+      # @param hWnd cast=(HWND)
+      # @param wParam cast=(WPARAM)
+      # @param lParam cast=(LPARAM)
+      # 
       # long
       # long
       # long
@@ -9053,6 +9442,11 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_DefFrameProcW, [:pointer, :long, :int32, :int32, :int32, :int32, :int32], :int32
       typesig { [::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int] }
+      # @param hWnd cast=(HWND)
+      # @param hWndMDIClient cast=(HWND)
+      # @param wParam cast=(WPARAM)
+      # @param lParam cast=(LPARAM)
+      # 
       # long
       # long
       # long
@@ -9064,6 +9458,11 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_DefFrameProcA, [:pointer, :long, :int32, :int32, :int32, :int32, :int32], :int32
       typesig { [::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int] }
+      # @param hWnd cast=(HWND)
+      # @param hWndMDIClient cast=(HWND)
+      # @param wParam cast=(WPARAM)
+      # @param lParam cast=(LPARAM)
+      # 
       # long
       # long
       # long
@@ -9075,6 +9474,10 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_DefWindowProcW, [:pointer, :long, :int32, :int32, :int32, :int32], :int32
       typesig { [::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int] }
+      # @param hWnd cast=(HWND)
+      # @param wParam cast=(WPARAM)
+      # @param lParam cast=(LPARAM)
+      # 
       # long
       # long
       # long
@@ -9085,6 +9488,10 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_DefWindowProcA, [:pointer, :long, :int32, :int32, :int32, :int32], :int32
       typesig { [::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int] }
+      # @param hWnd cast=(HWND)
+      # @param wParam cast=(WPARAM)
+      # @param lParam cast=(LPARAM)
+      # 
       # long
       # long
       # long
@@ -9095,6 +9502,7 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_DeleteDC, [:pointer, :long, :int32], :int8
       typesig { [::Java::Int] }
+      # @param hdc cast=(HDC)
       # long
       def _delete_dc(hdc)
         JNI.__send__(:Java_org_eclipse_swt_internal_win32_OS_DeleteDC, JNI.env, self.jni_id, hdc.to_int) != 0
@@ -9102,6 +9510,7 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_DeleteEnhMetaFile, [:pointer, :long, :int32], :int8
       typesig { [::Java::Int] }
+      # @param hemf cast=(HENHMETAFILE)
       # long
       def _delete_enh_meta_file(hemf)
         JNI.__send__(:Java_org_eclipse_swt_internal_win32_OS_DeleteEnhMetaFile, JNI.env, self.jni_id, hemf.to_int) != 0
@@ -9109,6 +9518,7 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_DeleteMenu, [:pointer, :long, :int32, :int32, :int32], :int8
       typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
+      # @param hMenu cast=(HMENU)
       # long
       def _delete_menu(h_menu, u_position, u_flags)
         JNI.__send__(:Java_org_eclipse_swt_internal_win32_OS_DeleteMenu, JNI.env, self.jni_id, h_menu.to_int, u_position.to_int, u_flags.to_int) != 0
@@ -9116,6 +9526,7 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_DeleteObject, [:pointer, :long, :int32], :int8
       typesig { [::Java::Int] }
+      # @param hGdiObj cast=(HGDIOBJ)
       # long
       def _delete_object(h_gdi_obj)
         JNI.__send__(:Java_org_eclipse_swt_internal_win32_OS_DeleteObject, JNI.env, self.jni_id, h_gdi_obj.to_int) != 0
@@ -9123,6 +9534,7 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_DestroyAcceleratorTable, [:pointer, :long, :int32], :int8
       typesig { [::Java::Int] }
+      # @param hAccel cast=(HACCEL)
       # long
       def _destroy_accelerator_table(h_accel)
         JNI.__send__(:Java_org_eclipse_swt_internal_win32_OS_DestroyAcceleratorTable, JNI.env, self.jni_id, h_accel.to_int) != 0
@@ -9136,6 +9548,7 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_DestroyCursor, [:pointer, :long, :int32], :int8
       typesig { [::Java::Int] }
+      # @param hCursor cast=(HCURSOR)
       # long
       def _destroy_cursor(h_cursor)
         JNI.__send__(:Java_org_eclipse_swt_internal_win32_OS_DestroyCursor, JNI.env, self.jni_id, h_cursor.to_int) != 0
@@ -9143,6 +9556,7 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_DestroyIcon, [:pointer, :long, :int32], :int8
       typesig { [::Java::Int] }
+      # @param hIcon cast=(HICON)
       # long
       def _destroy_icon(h_icon)
         JNI.__send__(:Java_org_eclipse_swt_internal_win32_OS_DestroyIcon, JNI.env, self.jni_id, h_icon.to_int) != 0
@@ -9150,6 +9564,7 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_DestroyMenu, [:pointer, :long, :int32], :int8
       typesig { [::Java::Int] }
+      # @param hMenu cast=(HMENU)
       # long
       def _destroy_menu(h_menu)
         JNI.__send__(:Java_org_eclipse_swt_internal_win32_OS_DestroyMenu, JNI.env, self.jni_id, h_menu.to_int) != 0
@@ -9157,6 +9572,7 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_DestroyWindow, [:pointer, :long, :int32], :int8
       typesig { [::Java::Int] }
+      # @param hWnd cast=(HWND)
       # long
       def _destroy_window(h_wnd)
         JNI.__send__(:Java_org_eclipse_swt_internal_win32_OS_DestroyWindow, JNI.env, self.jni_id, h_wnd.to_int) != 0
@@ -9178,6 +9594,7 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_DPtoLP, [:pointer, :long, :int32, :long, :int32], :int8
       typesig { [::Java::Int, POINT, ::Java::Int] }
+      # @param hdc cast=(HDC)
       # long
       def _dpto_lp(hdc, lp_points, n_count)
         JNI.__send__(:Java_org_eclipse_swt_internal_win32_OS_DPtoLP, JNI.env, self.jni_id, hdc.to_int, lp_points.jni_id, n_count.to_int) != 0
@@ -9185,6 +9602,9 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_DragDetect, [:pointer, :long, :int32, :long], :int8
       typesig { [::Java::Int, POINT] }
+      # @param hwnd cast=(HWND)
+      # @param pt flags=struct
+      # 
       # long
       def _drag_detect(hwnd, pt)
         JNI.__send__(:Java_org_eclipse_swt_internal_win32_OS_DragDetect, JNI.env, self.jni_id, hwnd.to_int, pt.jni_id) != 0
@@ -9192,6 +9612,7 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_DragFinish, [:pointer, :long, :int32], :void
       typesig { [::Java::Int] }
+      # @param hDrop cast=(HDROP)
       # long
       def _drag_finish(h_drop)
         JNI.__send__(:Java_org_eclipse_swt_internal_win32_OS_DragFinish, JNI.env, self.jni_id, h_drop.to_int)
@@ -9199,6 +9620,9 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_DragQueryFileA, [:pointer, :long, :int32, :int32, :long, :int32], :int32
       typesig { [::Java::Int, ::Java::Int, Array.typed(::Java::Byte), ::Java::Int] }
+      # @param hDrop cast=(HDROP)
+      # @param lpszFile cast=(LPTSTR)
+      # 
       # long
       def _drag_query_file_a(h_drop, i_file, lpsz_file, cch)
         JNI.__send__(:Java_org_eclipse_swt_internal_win32_OS_DragQueryFileA, JNI.env, self.jni_id, h_drop.to_int, i_file.to_int, lpsz_file.jni_id, cch.to_int)
@@ -9206,6 +9630,9 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_DragQueryFileW, [:pointer, :long, :int32, :int32, :long, :int32], :int32
       typesig { [::Java::Int, ::Java::Int, Array.typed(::Java::Char), ::Java::Int] }
+      # @param hDrop cast=(HDROP)
+      # @param lpszFile cast=(LPWSTR)
+      # 
       # long
       def _drag_query_file_w(h_drop, i_file, lpsz_file, cch)
         JNI.__send__(:Java_org_eclipse_swt_internal_win32_OS_DragQueryFileW, JNI.env, self.jni_id, h_drop.to_int, i_file.to_int, lpsz_file.jni_id, cch.to_int)
@@ -9213,6 +9640,7 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_DrawAnimatedRects, [:pointer, :long, :int32, :int32, :long, :long], :int8
       typesig { [::Java::Int, ::Java::Int, RECT, RECT] }
+      # @param hwnd cast=(HWND)
       # long
       def _draw_animated_rects(hwnd, id_ani, lprc_from, lprc_to)
         JNI.__send__(:Java_org_eclipse_swt_internal_win32_OS_DrawAnimatedRects, JNI.env, self.jni_id, hwnd.to_int, id_ani.to_int, lprc_from.jni_id, lprc_to.jni_id) != 0
@@ -9220,6 +9648,7 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_DrawEdge, [:pointer, :long, :int32, :long, :int32, :int32], :int8
       typesig { [::Java::Int, RECT, ::Java::Int, ::Java::Int] }
+      # @param hdc cast=(HDC)
       # long
       def _draw_edge(hdc, qrc, edge, grf_flags)
         JNI.__send__(:Java_org_eclipse_swt_internal_win32_OS_DrawEdge, JNI.env, self.jni_id, hdc.to_int, qrc.jni_id, edge.to_int, grf_flags.to_int) != 0
@@ -9227,6 +9656,7 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_DrawFocusRect, [:pointer, :long, :int32, :long], :int8
       typesig { [::Java::Int, RECT] }
+      # @param hDC cast=(HDC)
       # long
       def _draw_focus_rect(h_dc, lp_rect)
         JNI.__send__(:Java_org_eclipse_swt_internal_win32_OS_DrawFocusRect, JNI.env, self.jni_id, h_dc.to_int, lp_rect.jni_id) != 0
@@ -9234,6 +9664,7 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_DrawFrameControl, [:pointer, :long, :int32, :long, :int32, :int32], :int8
       typesig { [::Java::Int, RECT, ::Java::Int, ::Java::Int] }
+      # @param hdc cast=(HDC)
       # long
       def _draw_frame_control(hdc, lprc, u_type, u_state)
         JNI.__send__(:Java_org_eclipse_swt_internal_win32_OS_DrawFrameControl, JNI.env, self.jni_id, hdc.to_int, lprc.jni_id, u_type.to_int, u_state.to_int) != 0
@@ -9241,6 +9672,10 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_DrawIconEx, [:pointer, :long, :int32, :int32, :int32, :int32, :int32, :int32, :int32, :int32, :int32], :int8
       typesig { [::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int] }
+      # @param hdc cast=(HDC)
+      # @param hIcon cast=(HICON)
+      # @param hbrFlickerFreeDraw cast=(HBRUSH)
+      # 
       # long
       # long
       # long
@@ -9250,6 +9685,7 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_DrawMenuBar, [:pointer, :long, :int32], :int8
       typesig { [::Java::Int] }
+      # @param hWnd cast=(HWND)
       # long
       def _draw_menu_bar(h_wnd)
         JNI.__send__(:Java_org_eclipse_swt_internal_win32_OS_DrawMenuBar, JNI.env, self.jni_id, h_wnd.to_int) != 0
@@ -9257,6 +9693,12 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_DrawStateW, [:pointer, :long, :int32, :int32, :int32, :int32, :int32, :int32, :int32, :int32, :int32, :int32], :int8
       typesig { [::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int] }
+      # @param hdc cast=(HDC)
+      # @param hbr cast=(HBRUSH)
+      # @param lpOutputFunc cast=(DRAWSTATEPROC)
+      # @param lData cast=(LPARAM)
+      # @param wData cast=(WPARAM)
+      # 
       # long
       # long
       # long
@@ -9268,6 +9710,12 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_DrawStateA, [:pointer, :long, :int32, :int32, :int32, :int32, :int32, :int32, :int32, :int32, :int32, :int32], :int8
       typesig { [::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int] }
+      # @param hdc cast=(HDC)
+      # @param hbr cast=(HBRUSH)
+      # @param lpOutputFunc cast=(DRAWSTATEPROC)
+      # @param lData cast=(LPARAM)
+      # @param wData cast=(WPARAM)
+      # 
       # long
       # long
       # long
@@ -9279,6 +9727,9 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_DrawTextW, [:pointer, :long, :int32, :long, :int32, :long, :int32], :int32
       typesig { [::Java::Int, Array.typed(::Java::Char), ::Java::Int, RECT, ::Java::Int] }
+      # @param hDC cast=(HDC)
+      # @param lpString cast=(LPWSTR),flags=no_out critical
+      # 
       # long
       def _draw_text_w(h_dc, lp_string, n_count, lp_rect, u_format)
         JNI.__send__(:Java_org_eclipse_swt_internal_win32_OS_DrawTextW, JNI.env, self.jni_id, h_dc.to_int, lp_string.jni_id, n_count.to_int, lp_rect.jni_id, u_format.to_int)
@@ -9286,6 +9737,9 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_DrawTextA, [:pointer, :long, :int32, :long, :int32, :long, :int32], :int32
       typesig { [::Java::Int, Array.typed(::Java::Byte), ::Java::Int, RECT, ::Java::Int] }
+      # @param hDC cast=(HDC)
+      # @param lpString cast=(LPSTR),flags=no_out critical
+      # 
       # long
       def _draw_text_a(h_dc, lp_string, n_count, lp_rect, u_format)
         JNI.__send__(:Java_org_eclipse_swt_internal_win32_OS_DrawTextA, JNI.env, self.jni_id, h_dc.to_int, lp_string.jni_id, n_count.to_int, lp_rect.jni_id, u_format.to_int)
@@ -9293,6 +9747,12 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_DrawThemeBackground, [:pointer, :long, :int32, :int32, :int32, :int32, :long, :long], :int32
       typesig { [::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, RECT, RECT] }
+      # @method flags=dynamic
+      # @param hTheme cast=(HTHEME)
+      # @param hdc cast=(HDC)
+      # @param pRect cast=(const RECT *)
+      # @param pClipRect cast=(const RECT *)
+      # 
       # long
       # long
       def _draw_theme_background(h_theme, hdc, i_part_id, i_state_id, p_rect, p_clip_rect)
@@ -9301,6 +9761,7 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_DrawThemeEdge, [:pointer, :long, :int32, :int32, :int32, :int32, :long, :int32, :int32, :long], :int32
       typesig { [::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, RECT, ::Java::Int, ::Java::Int, RECT] }
+      # @method flags=dynamic
       # long
       # long
       def _draw_theme_edge(h_theme, hdc, i_part_id, i_state_id, p_dest_rect, u_edge, u_flags, p_content_rect)
@@ -9309,6 +9770,7 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_DrawThemeIcon, [:pointer, :long, :int32, :int32, :int32, :int32, :long, :int32, :int32], :int32
       typesig { [::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, RECT, ::Java::Int, ::Java::Int] }
+      # @method flags=dynamic
       # long
       # long
       # long
@@ -9318,6 +9780,7 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_DrawThemeParentBackground, [:pointer, :long, :int32, :int32, :long], :int32
       typesig { [::Java::Int, ::Java::Int, RECT] }
+      # @method flags=dynamic
       # long
       # long
       def _draw_theme_parent_background(hwnd, hdc, prc)
@@ -9326,6 +9789,7 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_DrawThemeText, [:pointer, :long, :int32, :int32, :int32, :int32, :long, :int32, :int32, :int32, :long], :int32
       typesig { [::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, Array.typed(::Java::Char), ::Java::Int, ::Java::Int, ::Java::Int, RECT] }
+      # @method flags=dynamic
       # long
       # long
       def _draw_theme_text(h_theme, hdc, i_part_id, i_state_id, psz_text, i_char_count, dw_text_flags, dw_text_flags2, p_rect)
@@ -9334,6 +9798,9 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_DwmEnableBlurBehindWindow, [:pointer, :long, :int32, :long], :int32
       typesig { [::Java::Int, DWM_BLURBEHIND] }
+      # @method flags=dynamic
+      # @param hWnd cast=(HWND)
+      # 
       # long
       def _dwm_enable_blur_behind_window(h_wnd, p_blur_behind)
         JNI.__send__(:Java_org_eclipse_swt_internal_win32_OS_DwmEnableBlurBehindWindow, JNI.env, self.jni_id, h_wnd.to_int, p_blur_behind.jni_id)
@@ -9341,6 +9808,9 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_DwmExtendFrameIntoClientArea, [:pointer, :long, :int32, :long], :int32
       typesig { [::Java::Int, MARGINS] }
+      # @method flags=dynamic
+      # @param hWnd cast=(HWND)
+      # 
       # long
       def _dwm_extend_frame_into_client_area(h_wnd, p_mar_inset)
         JNI.__send__(:Java_org_eclipse_swt_internal_win32_OS_DwmExtendFrameIntoClientArea, JNI.env, self.jni_id, h_wnd.to_int, p_mar_inset.jni_id)
@@ -9348,6 +9818,7 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_Ellipse, [:pointer, :long, :int32, :int32, :int32, :int32, :int32], :int8
       typesig { [::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int] }
+      # @param hdc cast=(HDC)
       # long
       def _ellipse(hdc, n_left_rect, n_top_rect, n_right_rect, n_bottom_rect)
         JNI.__send__(:Java_org_eclipse_swt_internal_win32_OS_Ellipse, JNI.env, self.jni_id, hdc.to_int, n_left_rect.to_int, n_top_rect.to_int, n_right_rect.to_int, n_bottom_rect.to_int) != 0
@@ -9355,6 +9826,7 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_EnableMenuItem, [:pointer, :long, :int32, :int32, :int32], :int8
       typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
+      # @param hMenu cast=(HMENU)
       # long
       def _enable_menu_item(h_menu, u_idenable_item, u_enable)
         JNI.__send__(:Java_org_eclipse_swt_internal_win32_OS_EnableMenuItem, JNI.env, self.jni_id, h_menu.to_int, u_idenable_item.to_int, u_enable.to_int) != 0
@@ -9362,6 +9834,7 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_EnableScrollBar, [:pointer, :long, :int32, :int32, :int32], :int8
       typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
+      # @param hWnd cast=(HWND)
       # long
       def _enable_scroll_bar(h_wnd, w_sbflags, w_arrows)
         JNI.__send__(:Java_org_eclipse_swt_internal_win32_OS_EnableScrollBar, JNI.env, self.jni_id, h_wnd.to_int, w_sbflags.to_int, w_arrows.to_int) != 0
@@ -9369,6 +9842,7 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_EnableWindow, [:pointer, :long, :int32, :int8], :int8
       typesig { [::Java::Int, ::Java::Boolean] }
+      # @param hWnd cast=(HWND)
       # long
       def _enable_window(h_wnd, b_enable)
         JNI.__send__(:Java_org_eclipse_swt_internal_win32_OS_EnableWindow, JNI.env, self.jni_id, h_wnd.to_int, b_enable ? 1 : 0) != 0
@@ -9376,6 +9850,10 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_EnumSystemLanguageGroupsW, [:pointer, :long, :int32, :int32, :int32], :int8
       typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
+      # @method flags=dynamic
+      # @param pLangGroupEnumProc cast=(LANGUAGEGROUP_ENUMPROCW)
+      # @param lParam cast=(LONG_PTR)
+      # 
       # long
       # long
       def _enum_system_language_groups_w(p_lang_group_enum_proc, dw_flags, l_param)
@@ -9384,6 +9862,10 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_EnumSystemLanguageGroupsA, [:pointer, :long, :int32, :int32, :int32], :int8
       typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
+      # @method flags=dynamic
+      # @param pLangGroupEnumProc cast=(LANGUAGEGROUP_ENUMPROCA)
+      # @param lParam cast=(LONG_PTR)
+      # 
       # long
       # long
       def _enum_system_language_groups_a(p_lang_group_enum_proc, dw_flags, l_param)
@@ -9392,6 +9874,7 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_EnumSystemLocalesW, [:pointer, :long, :int32, :int32], :int8
       typesig { [::Java::Int, ::Java::Int] }
+      # @param lpLocaleEnumProc cast=(LOCALE_ENUMPROCW)
       # long
       def _enum_system_locales_w(lp_locale_enum_proc, dw_flags)
         JNI.__send__(:Java_org_eclipse_swt_internal_win32_OS_EnumSystemLocalesW, JNI.env, self.jni_id, lp_locale_enum_proc.to_int, dw_flags.to_int) != 0
@@ -9399,6 +9882,7 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_EnumSystemLocalesA, [:pointer, :long, :int32, :int32], :int8
       typesig { [::Java::Int, ::Java::Int] }
+      # @param lpLocaleEnumProc cast=(LOCALE_ENUMPROCA)
       # long
       def _enum_system_locales_a(lp_locale_enum_proc, dw_flags)
         JNI.__send__(:Java_org_eclipse_swt_internal_win32_OS_EnumSystemLocalesA, JNI.env, self.jni_id, lp_locale_enum_proc.to_int, dw_flags.to_int) != 0
@@ -9406,6 +9890,7 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_EndDeferWindowPos, [:pointer, :long, :int32], :int8
       typesig { [::Java::Int] }
+      # @param hWinPosInfo cast=(HDWP)
       # long
       def _end_defer_window_pos(h_win_pos_info)
         JNI.__send__(:Java_org_eclipse_swt_internal_win32_OS_EndDeferWindowPos, JNI.env, self.jni_id, h_win_pos_info.to_int) != 0
@@ -9413,6 +9898,9 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_EndBufferedPaint, [:pointer, :long, :int32, :int8], :int32
       typesig { [::Java::Int, ::Java::Boolean] }
+      # @method flags=dynamic
+      # @param hBufferedPaint cast=(HPAINTBUFFER)
+      # 
       # long
       def _end_buffered_paint(h_buffered_paint, f_update_target)
         JNI.__send__(:Java_org_eclipse_swt_internal_win32_OS_EndBufferedPaint, JNI.env, self.jni_id, h_buffered_paint.to_int, f_update_target ? 1 : 0)
@@ -9420,6 +9908,7 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_EndDoc, [:pointer, :long, :int32], :int32
       typesig { [::Java::Int] }
+      # @param hdc cast=(HDC)
       # long
       def _end_doc(hdc)
         JNI.__send__(:Java_org_eclipse_swt_internal_win32_OS_EndDoc, JNI.env, self.jni_id, hdc.to_int)
@@ -9427,6 +9916,7 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_EndPage, [:pointer, :long, :int32], :int32
       typesig { [::Java::Int] }
+      # @param hdc cast=(HDC)
       # long
       def _end_page(hdc)
         JNI.__send__(:Java_org_eclipse_swt_internal_win32_OS_EndPage, JNI.env, self.jni_id, hdc.to_int)
@@ -9434,6 +9924,7 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_EndPaint, [:pointer, :long, :int32, :long], :int32
       typesig { [::Java::Int, PAINTSTRUCT] }
+      # @param hWnd cast=(HWND)
       # long
       def _end_paint(h_wnd, lp_paint)
         JNI.__send__(:Java_org_eclipse_swt_internal_win32_OS_EndPaint, JNI.env, self.jni_id, h_wnd.to_int, lp_paint.jni_id)
@@ -9441,6 +9932,7 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_EndPath, [:pointer, :long, :int32], :int8
       typesig { [::Java::Int] }
+      # @param hdc cast=(HDC)
       # long
       def _end_path(hdc)
         JNI.__send__(:Java_org_eclipse_swt_internal_win32_OS_EndPath, JNI.env, self.jni_id, hdc.to_int) != 0
@@ -9448,6 +9940,12 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_EnumDisplayMonitors, [:pointer, :long, :int32, :long, :int32, :int32], :int8
       typesig { [::Java::Int, RECT, ::Java::Int, ::Java::Int] }
+      # @method flags=dynamic
+      # @param hdc cast=(HDC)
+      # @param lprcClip cast=(LPCRECT)
+      # @param lpfnEnum cast=(MONITORENUMPROC)
+      # @param dwData cast=(LPARAM)
+      # 
       # long
       # long
       def _enum_display_monitors(hdc, lprc_clip, lpfn_enum, dw_data)
@@ -9456,6 +9954,11 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_EnumEnhMetaFile, [:pointer, :long, :int32, :int32, :int32, :int32, :long], :int8
       typesig { [::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, RECT] }
+      # @param hdc cast=(HDC)
+      # @param hemf cast=(HENHMETAFILE)
+      # @param lpEnhMetaFunc cast=(ENHMFENUMPROC)
+      # @param lpData cast=(LPVOID)
+      # 
       # long
       # long
       # long
@@ -9466,6 +9969,11 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_EnumFontFamiliesW, [:pointer, :long, :int32, :long, :int32, :int32], :int32
       typesig { [::Java::Int, Array.typed(::Java::Char), ::Java::Int, ::Java::Int] }
+      # @param hdc cast=(HDC)
+      # @param lpszFamily cast=(LPCWSTR)
+      # @param lpEnumFontFamProc cast=(FONTENUMPROCW)
+      # @param lParam cast=(LPARAM)
+      # 
       # long
       # long
       # long
@@ -9475,6 +9983,11 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_EnumFontFamiliesA, [:pointer, :long, :int32, :long, :int32, :int32], :int32
       typesig { [::Java::Int, Array.typed(::Java::Byte), ::Java::Int, ::Java::Int] }
+      # @param hdc cast=(HDC)
+      # @param lpszFamily cast=(LPSTR)
+      # @param lpEnumFontFamProc cast=(FONTENUMPROC)
+      # @param lParam cast=(LPARAM)
+      # 
       # long
       # long
       # long
@@ -9484,6 +9997,11 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_EnumFontFamiliesExW, [:pointer, :long, :int32, :long, :int32, :int32, :int32], :int32
       typesig { [::Java::Int, LOGFONTW, ::Java::Int, ::Java::Int, ::Java::Int] }
+      # @param hdc cast=(HDC)
+      # @param lpLogfont cast=(LPLOGFONTW)
+      # @param lpEnumFontFamExProc cast=(FONTENUMPROCW)
+      # @param lParam cast=(LPARAM)
+      # 
       # long
       # long
       # long
@@ -9493,6 +10011,11 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_EnumFontFamiliesExA, [:pointer, :long, :int32, :long, :int32, :int32, :int32], :int32
       typesig { [::Java::Int, LOGFONTA, ::Java::Int, ::Java::Int, ::Java::Int] }
+      # @param hdc cast=(HDC)
+      # @param lpLogfont cast=(LPLOGFONTA)
+      # @param lpEnumFontFamExProc cast=(FONTENUMPROCA)
+      # @param lParam cast=(LPARAM)
+      # 
       # long
       # long
       # long
@@ -9502,12 +10025,17 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_EqualRect, [:pointer, :long, :long, :long], :int8
       typesig { [RECT, RECT] }
+      # @param lprc1 cast=(CONST RECT *),flags=no_out
+      # @param lprc2 cast=(CONST RECT *),flags=no_out
       def _equal_rect(lprc1, lprc2)
         JNI.__send__(:Java_org_eclipse_swt_internal_win32_OS_EqualRect, JNI.env, self.jni_id, lprc1.jni_id, lprc2.jni_id) != 0
       end
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_EqualRgn, [:pointer, :long, :int32, :int32], :int8
       typesig { [::Java::Int, ::Java::Int] }
+      # @param hSrcRgn1 cast=(HRGN)
+      # @param hSrcRgn2 cast=(HRGN)
+      # 
       # long
       # long
       def _equal_rgn(h_src_rgn1, h_src_rgn2)
@@ -9516,6 +10044,7 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_ExcludeClipRect, [:pointer, :long, :int32, :int32, :int32, :int32, :int32], :int32
       typesig { [::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int] }
+      # @param hdc cast=(HDC)
       # long
       def _exclude_clip_rect(hdc, n_left_rect, n_top_rect, n_right_rect, n_bottom_rect)
         JNI.__send__(:Java_org_eclipse_swt_internal_win32_OS_ExcludeClipRect, JNI.env, self.jni_id, hdc.to_int, n_left_rect.to_int, n_top_rect.to_int, n_right_rect.to_int, n_bottom_rect.to_int)
@@ -9535,6 +10064,9 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_ExtCreatePen, [:pointer, :long, :int32, :int32, :long, :int32, :long], :int32
       typesig { [::Java::Int, ::Java::Int, LOGBRUSH, ::Java::Int, Array.typed(::Java::Int)] }
+      # @param lplb cast=(CONST LOGBRUSH *)
+      # @param lpStyle cast=(CONST DWORD *)
+      # 
       # long
       def _ext_create_pen(dw_pen_style, dw_width, lplb, dw_style_count, lp_style)
         JNI.__send__(:Java_org_eclipse_swt_internal_win32_OS_ExtCreatePen, JNI.env, self.jni_id, dw_pen_style.to_int, dw_width.to_int, lplb.jni_id, dw_style_count.to_int, lp_style.jni_id)
@@ -9542,6 +10074,9 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_ExtCreateRegion, [:pointer, :long, :long, :int32, :long], :int32
       typesig { [Array.typed(::Java::Float), ::Java::Int, Array.typed(::Java::Int)] }
+      # @param lpXform cast=(XFORM *)
+      # @param lpRgnData cast=(CONST RGNDATA *)
+      # 
       # long
       def _ext_create_region(lp_xform, n_count, lp_rgn_data)
         JNI.__send__(:Java_org_eclipse_swt_internal_win32_OS_ExtCreateRegion, JNI.env, self.jni_id, lp_xform.jni_id, n_count.to_int, lp_rgn_data.jni_id)
@@ -9549,6 +10084,11 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_ExtTextOutW, [:pointer, :long, :int32, :int32, :int32, :int32, :long, :long, :int32, :long], :int8
       typesig { [::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, RECT, Array.typed(::Java::Char), ::Java::Int, Array.typed(::Java::Int)] }
+      # @param hdc cast=(HDC)
+      # @param lprc flags=no_out
+      # @param lpString cast=(LPWSTR),flags=no_out critical
+      # @param lpDx cast=(CONST INT *),flags=no_out critical
+      # 
       # long
       def _ext_text_out_w(hdc, x, y, fu_options, lprc, lp_string, cb_count, lp_dx)
         JNI.__send__(:Java_org_eclipse_swt_internal_win32_OS_ExtTextOutW, JNI.env, self.jni_id, hdc.to_int, x.to_int, y.to_int, fu_options.to_int, lprc.jni_id, lp_string.jni_id, cb_count.to_int, lp_dx.jni_id) != 0
@@ -9556,6 +10096,11 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_ExtTextOutA, [:pointer, :long, :int32, :int32, :int32, :int32, :long, :long, :int32, :long], :int8
       typesig { [::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, RECT, Array.typed(::Java::Byte), ::Java::Int, Array.typed(::Java::Int)] }
+      # @param hdc cast=(HDC)
+      # @param lprc flags=no_out
+      # @param lpString cast=(LPSTR),flags=no_out critical
+      # @param lpDx cast=(CONST INT *),flags=no_out critical
+      # 
       # long
       def _ext_text_out_a(hdc, x, y, fu_options, lprc, lp_string, cb_count, lp_dx)
         JNI.__send__(:Java_org_eclipse_swt_internal_win32_OS_ExtTextOutA, JNI.env, self.jni_id, hdc.to_int, x.to_int, y.to_int, fu_options.to_int, lprc.jni_id, lp_string.jni_id, cb_count.to_int, lp_dx.jni_id) != 0
@@ -9563,6 +10108,10 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_ExtractIconExW, [:pointer, :long, :long, :int32, :long, :long, :int32], :int32
       typesig { [Array.typed(::Java::Char), ::Java::Int, Array.typed(::Java::Int), Array.typed(::Java::Int), ::Java::Int] }
+      # @param lpszFile cast=(LPWSTR)
+      # @param phiconLarge cast=(HICON FAR *)
+      # @param phiconSmall cast=(HICON FAR *)
+      # 
       # long
       # long
       def _extract_icon_ex_w(lpsz_file, n_icon_index, phicon_large, phicon_small, n_icons)
@@ -9571,6 +10120,10 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_ExtractIconExA, [:pointer, :long, :long, :int32, :long, :long, :int32], :int32
       typesig { [Array.typed(::Java::Byte), ::Java::Int, Array.typed(::Java::Int), Array.typed(::Java::Int), ::Java::Int] }
+      # @param lpszFile cast=(LPSTR)
+      # @param phiconLarge cast=(HICON FAR *)
+      # @param phiconSmall cast=(HICON FAR *)
+      # 
       # long
       # long
       def _extract_icon_ex_a(lpsz_file, n_icon_index, phicon_large, phicon_small, n_icons)
@@ -9579,6 +10132,10 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_FillRect, [:pointer, :long, :int32, :long, :int32], :int32
       typesig { [::Java::Int, RECT, ::Java::Int] }
+      # @param hDC cast=(HDC)
+      # @param lprc flags=no_out
+      # @param hbr cast=(HBRUSH)
+      # 
       # long
       # long
       def _fill_rect(h_dc, lprc, hbr)
@@ -9587,6 +10144,7 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_FillPath, [:pointer, :long, :int32], :int8
       typesig { [::Java::Int] }
+      # @param hdc cast=(HDC)
       # long
       def _fill_path(hdc)
         JNI.__send__(:Java_org_eclipse_swt_internal_win32_OS_FillPath, JNI.env, self.jni_id, hdc.to_int) != 0
@@ -9594,6 +10152,9 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_FindWindowA, [:pointer, :long, :long, :long], :int32
       typesig { [Array.typed(::Java::Byte), Array.typed(::Java::Byte)] }
+      # @param lpClassName cast=(LPSTR)
+      # @param lpWindowName cast=(LPSTR)
+      # 
       # long
       def _find_window_a(lp_class_name, lp_window_name)
         JNI.__send__(:Java_org_eclipse_swt_internal_win32_OS_FindWindowA, JNI.env, self.jni_id, lp_class_name.jni_id, lp_window_name.jni_id)
@@ -9601,6 +10162,9 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_FindWindowW, [:pointer, :long, :long, :long], :int32
       typesig { [Array.typed(::Java::Char), Array.typed(::Java::Char)] }
+      # @param lpClassName cast=(LPWSTR)
+      # @param lpWindowName cast=(LPWSTR)
+      # 
       # long
       def _find_window_w(lp_class_name, lp_window_name)
         JNI.__send__(:Java_org_eclipse_swt_internal_win32_OS_FindWindowW, JNI.env, self.jni_id, lp_class_name.jni_id, lp_window_name.jni_id)
@@ -9608,6 +10172,10 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_FormatMessageA, [:pointer, :long, :int32, :int32, :int32, :int32, :long, :int32, :int32], :int32
       typesig { [::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, Array.typed(::Java::Int), ::Java::Int, ::Java::Int] }
+      # @param lpSource cast=(LPCVOID)
+      # @param lpBuffer cast=(LPSTR)
+      # @param Arguments cast=(va_list*)
+      # 
       # long
       # long
       # long
@@ -9617,6 +10185,10 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_FormatMessageW, [:pointer, :long, :int32, :int32, :int32, :int32, :long, :int32, :int32], :int32
       typesig { [::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, Array.typed(::Java::Int), ::Java::Int, ::Java::Int] }
+      # @param lpSource cast=(LPCVOID)
+      # @param lpBuffer cast=(LPWSTR)
+      # @param Arguments cast=(va_list*)
+      # 
       # long
       # long
       # long
@@ -9626,6 +10198,7 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_FreeLibrary, [:pointer, :long, :int32], :int8
       typesig { [::Java::Int] }
+      # @param hLibModule cast=(HMODULE)
       # long
       def _free_library(h_lib_module)
         JNI.__send__(:Java_org_eclipse_swt_internal_win32_OS_FreeLibrary, JNI.env, self.jni_id, h_lib_module.to_int) != 0
@@ -9633,6 +10206,7 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_GdiSetBatchLimit, [:pointer, :long, :int32], :int32
       typesig { [::Java::Int] }
+      # @param dwLimit cast=(DWORD)
       def _gdi_set_batch_limit(dw_limit)
         JNI.__send__(:Java_org_eclipse_swt_internal_win32_OS_GdiSetBatchLimit, JNI.env, self.jni_id, dw_limit.to_int)
       end
@@ -9679,6 +10253,7 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_GetBkColor, [:pointer, :long, :int32], :int32
       typesig { [::Java::Int] }
+      # @param hDC cast=(HDC)
       # long
       def _get_bk_color(h_dc)
         JNI.__send__(:Java_org_eclipse_swt_internal_win32_OS_GetBkColor, JNI.env, self.jni_id, h_dc.to_int)
@@ -9699,6 +10274,9 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_GetCharABCWidthsA, [:pointer, :long, :int32, :int32, :int32, :long], :int8
       typesig { [::Java::Int, ::Java::Int, ::Java::Int, Array.typed(::Java::Int)] }
+      # @param hdc cast=(HDC)
+      # @param lpabc cast=(LPABC),flags=no_in critical
+      # 
       # long
       def _get_char_abcwidths_a(hdc, i_first_char, i_last_char, lpabc)
         JNI.__send__(:Java_org_eclipse_swt_internal_win32_OS_GetCharABCWidthsA, JNI.env, self.jni_id, hdc.to_int, i_first_char.to_int, i_last_char.to_int, lpabc.jni_id) != 0
@@ -9706,6 +10284,9 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_GetCharABCWidthsW, [:pointer, :long, :int32, :int32, :int32, :long], :int8
       typesig { [::Java::Int, ::Java::Int, ::Java::Int, Array.typed(::Java::Int)] }
+      # @param hdc cast=(HDC)
+      # @param lpabc cast=(LPABC),flags=no_in critical
+      # 
       # long
       def _get_char_abcwidths_w(hdc, i_first_char, i_last_char, lpabc)
         JNI.__send__(:Java_org_eclipse_swt_internal_win32_OS_GetCharABCWidthsW, JNI.env, self.jni_id, hdc.to_int, i_first_char.to_int, i_last_char.to_int, lpabc.jni_id) != 0
@@ -9713,6 +10294,10 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_GetCharacterPlacementW, [:pointer, :long, :int32, :long, :int32, :int32, :long, :int32], :int32
       typesig { [::Java::Int, Array.typed(::Java::Char), ::Java::Int, ::Java::Int, GCP_RESULTS, ::Java::Int] }
+      # @param hdc cast=(HDC)
+      # @param lpString cast=(LPWSTR),flags=no_out critical
+      # @param lpResults cast=(LPGCP_RESULTSW)
+      # 
       # long
       def _get_character_placement_w(hdc, lp_string, n_count, n_max_extent, lp_results, dw_flags)
         JNI.__send__(:Java_org_eclipse_swt_internal_win32_OS_GetCharacterPlacementW, JNI.env, self.jni_id, hdc.to_int, lp_string.jni_id, n_count.to_int, n_max_extent.to_int, lp_results.jni_id, dw_flags.to_int)
@@ -9720,6 +10305,9 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_GetCharacterPlacementA, [:pointer, :long, :int32, :long, :int32, :int32, :long, :int32], :int32
       typesig { [::Java::Int, Array.typed(::Java::Byte), ::Java::Int, ::Java::Int, GCP_RESULTS, ::Java::Int] }
+      # @param hdc cast=(HDC)
+      # @param lpString cast=(LPSTR),flags=no_out critical
+      # 
       # long
       def _get_character_placement_a(hdc, lp_string, n_count, n_max_extent, lp_results, dw_flags)
         JNI.__send__(:Java_org_eclipse_swt_internal_win32_OS_GetCharacterPlacementA, JNI.env, self.jni_id, hdc.to_int, lp_string.jni_id, n_count.to_int, n_max_extent.to_int, lp_results.jni_id, dw_flags.to_int)
@@ -9727,6 +10315,9 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_GetCharWidthA, [:pointer, :long, :int32, :int32, :int32, :long], :int8
       typesig { [::Java::Int, ::Java::Int, ::Java::Int, Array.typed(::Java::Int)] }
+      # @param hdc cast=(HDC)
+      # @param lpBuffer cast=(LPINT),flags=no_in critical
+      # 
       # long
       def _get_char_width_a(hdc, i_first_char, i_last_char, lp_buffer)
         JNI.__send__(:Java_org_eclipse_swt_internal_win32_OS_GetCharWidthA, JNI.env, self.jni_id, hdc.to_int, i_first_char.to_int, i_last_char.to_int, lp_buffer.jni_id) != 0
@@ -9734,6 +10325,9 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_GetCharWidthW, [:pointer, :long, :int32, :int32, :int32, :long], :int8
       typesig { [::Java::Int, ::Java::Int, ::Java::Int, Array.typed(::Java::Int)] }
+      # @param hdc cast=(HDC)
+      # @param lpBuffer cast=(LPINT),flags=no_in critical
+      # 
       # long
       def _get_char_width_w(hdc, i_first_char, i_last_char, lp_buffer)
         JNI.__send__(:Java_org_eclipse_swt_internal_win32_OS_GetCharWidthW, JNI.env, self.jni_id, hdc.to_int, i_first_char.to_int, i_last_char.to_int, lp_buffer.jni_id) != 0
@@ -9741,6 +10335,10 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_GetClassInfoW, [:pointer, :long, :int32, :long, :long], :int8
       typesig { [::Java::Int, Array.typed(::Java::Char), WNDCLASS] }
+      # @param hInstance cast=(HINSTANCE)
+      # @param lpClassName cast=(LPWSTR)
+      # @param lpWndClass cast=(LPWNDCLASSW)
+      # 
       # long
       def _get_class_info_w(h_instance, lp_class_name, lp_wnd_class)
         JNI.__send__(:Java_org_eclipse_swt_internal_win32_OS_GetClassInfoW, JNI.env, self.jni_id, h_instance.to_int, lp_class_name.jni_id, lp_wnd_class.jni_id) != 0
@@ -9748,6 +10346,9 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_GetClassInfoA, [:pointer, :long, :int32, :long, :long], :int8
       typesig { [::Java::Int, Array.typed(::Java::Byte), WNDCLASS] }
+      # @param hInstance cast=(HINSTANCE)
+      # @param lpClassName cast=(LPSTR)
+      # 
       # long
       def _get_class_info_a(h_instance, lp_class_name, lp_wnd_class)
         JNI.__send__(:Java_org_eclipse_swt_internal_win32_OS_GetClassInfoA, JNI.env, self.jni_id, h_instance.to_int, lp_class_name.jni_id, lp_wnd_class.jni_id) != 0
@@ -9755,6 +10356,7 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_GetClassNameW, [:pointer, :long, :int32, :long, :int32], :int32
       typesig { [::Java::Int, Array.typed(::Java::Char), ::Java::Int] }
+      # @param hWnd cast=(HWND)
       # long
       def _get_class_name_w(h_wnd, lp_class_name, n_max_count)
         JNI.__send__(:Java_org_eclipse_swt_internal_win32_OS_GetClassNameW, JNI.env, self.jni_id, h_wnd.to_int, lp_class_name.jni_id, n_max_count.to_int)
@@ -9762,6 +10364,7 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_GetClassNameA, [:pointer, :long, :int32, :long, :int32], :int32
       typesig { [::Java::Int, Array.typed(::Java::Byte), ::Java::Int] }
+      # @param hWnd cast=(HWND)
       # long
       def _get_class_name_a(h_wnd, lp_class_name, n_max_count)
         JNI.__send__(:Java_org_eclipse_swt_internal_win32_OS_GetClassNameA, JNI.env, self.jni_id, h_wnd.to_int, lp_class_name.jni_id, n_max_count.to_int)
@@ -9769,6 +10372,7 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_GetClientRect, [:pointer, :long, :int32, :long], :int8
       typesig { [::Java::Int, RECT] }
+      # @param hWnd cast=(HWND)
       # long
       def _get_client_rect(h_wnd, lp_rect)
         JNI.__send__(:Java_org_eclipse_swt_internal_win32_OS_GetClientRect, JNI.env, self.jni_id, h_wnd.to_int, lp_rect.jni_id) != 0
@@ -9789,12 +10393,14 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_GetClipboardFormatNameW, [:pointer, :long, :int32, :long, :int32], :int32
       typesig { [::Java::Int, Array.typed(::Java::Char), ::Java::Int] }
+      # @param lpszFormatName cast=(LPWSTR)
       def _get_clipboard_format_name_w(format, lpsz_format_name, cch_max_count)
         JNI.__send__(:Java_org_eclipse_swt_internal_win32_OS_GetClipboardFormatNameW, JNI.env, self.jni_id, format.to_int, lpsz_format_name.jni_id, cch_max_count.to_int)
       end
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_GetClipBox, [:pointer, :long, :int32, :long], :int32
       typesig { [::Java::Int, RECT] }
+      # @param hdc cast=(HDC)
       # long
       def _get_clip_box(hdc, lprc)
         JNI.__send__(:Java_org_eclipse_swt_internal_win32_OS_GetClipBox, JNI.env, self.jni_id, hdc.to_int, lprc.jni_id)
@@ -9802,6 +10408,9 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_GetClipRgn, [:pointer, :long, :int32, :int32], :int32
       typesig { [::Java::Int, ::Java::Int] }
+      # @param hdc cast=(HDC)
+      # @param hrgn cast=(HRGN)
+      # 
       # long
       # long
       def _get_clip_rgn(hdc, hrgn)
@@ -9810,6 +10419,9 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_GetComboBoxInfo, [:pointer, :long, :int32, :long], :int8
       typesig { [::Java::Int, COMBOBOXINFO] }
+      # @method flags=dynamic
+      # @param hwndCombo cast=(HWND)
+      # 
       # long
       def _get_combo_box_info(hwnd_combo, pcbi)
         JNI.__send__(:Java_org_eclipse_swt_internal_win32_OS_GetComboBoxInfo, JNI.env, self.jni_id, hwnd_combo.to_int, pcbi.jni_id) != 0
@@ -9817,6 +10429,7 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_GetCurrentObject, [:pointer, :long, :int32, :int32], :int32
       typesig { [::Java::Int, ::Java::Int] }
+      # @param hdc cast=(HDC)
       # long
       # long
       def _get_current_object(hdc, u_object_type)
@@ -9850,18 +10463,27 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_GetDateFormatW, [:pointer, :long, :int32, :int32, :long, :long, :long, :int32], :int32
       typesig { [::Java::Int, ::Java::Int, SYSTEMTIME, Array.typed(::Java::Char), Array.typed(::Java::Char), ::Java::Int] }
+      # @param Locale cast=(LCID)
+      # @param dwFlags cast=(DWORD)
+      # @param lpFormat cast=(LPWSTR)
+      # @param lpDateStr cast=(LPWSTR)
       def _get_date_format_w(locale, dw_flags, lp_date, lp_format, lp_date_str, cch_date)
         JNI.__send__(:Java_org_eclipse_swt_internal_win32_OS_GetDateFormatW, JNI.env, self.jni_id, locale.to_int, dw_flags.to_int, lp_date.jni_id, lp_format.jni_id, lp_date_str.jni_id, cch_date.to_int)
       end
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_GetDateFormatA, [:pointer, :long, :int32, :int32, :long, :long, :long, :int32], :int32
       typesig { [::Java::Int, ::Java::Int, SYSTEMTIME, Array.typed(::Java::Byte), Array.typed(::Java::Byte), ::Java::Int] }
+      # @param Locale cast=(LCID)
+      # @param dwFlags cast=(DWORD)
+      # @param lpFormat cast=(LPSTR)
+      # @param lpDateStr cast=(LPSTR)
       def _get_date_format_a(locale, dw_flags, lp_date, lp_format, lp_date_str, cch_date)
         JNI.__send__(:Java_org_eclipse_swt_internal_win32_OS_GetDateFormatA, JNI.env, self.jni_id, locale.to_int, dw_flags.to_int, lp_date.jni_id, lp_format.jni_id, lp_date_str.jni_id, cch_date.to_int)
       end
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_GetDC, [:pointer, :long, :int32], :int32
       typesig { [::Java::Int] }
+      # @param hwnd cast=(HWND)
       # long
       # long
       def _get_dc(hwnd)
@@ -9870,6 +10492,9 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_GetDCEx, [:pointer, :long, :int32, :int32, :int32], :int32
       typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
+      # @param hWnd cast=(HWND)
+      # @param hrgnClip cast=(HRGN)
+      # 
       # long
       # long
       # long
@@ -9886,6 +10511,7 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_GetDeviceCaps, [:pointer, :long, :int32, :int32], :int32
       typesig { [::Java::Int, ::Java::Int] }
+      # @param hdc cast=(HDC)
       # long
       def _get_device_caps(hdc, n_index)
         JNI.__send__(:Java_org_eclipse_swt_internal_win32_OS_GetDeviceCaps, JNI.env, self.jni_id, hdc.to_int, n_index.to_int)
@@ -9899,6 +10525,9 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_GetDIBColorTable, [:pointer, :long, :int32, :int32, :int32, :long], :int32
       typesig { [::Java::Int, ::Java::Int, ::Java::Int, Array.typed(::Java::Byte)] }
+      # @param hdc cast=(HDC)
+      # @param pColors cast=(RGBQUAD *),flags=no_in critical
+      # 
       # long
       def _get_dibcolor_table(hdc, u_start_index, c_entries, p_colors)
         JNI.__send__(:Java_org_eclipse_swt_internal_win32_OS_GetDIBColorTable, JNI.env, self.jni_id, hdc.to_int, u_start_index.to_int, c_entries.to_int, p_colors.jni_id)
@@ -9906,6 +10535,11 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_GetDIBits, [:pointer, :long, :int32, :int32, :int32, :int32, :int32, :long, :int32], :int32
       typesig { [::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, Array.typed(::Java::Byte), ::Java::Int] }
+      # @param hdc cast=(HDC)
+      # @param hbmp cast=(HBITMAP)
+      # @param lpvBits cast=(LPVOID)
+      # @param lpbi cast=(LPBITMAPINFO),flags=critical
+      # 
       # long
       # long
       # long
@@ -9915,6 +10549,7 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_GetDlgItem, [:pointer, :long, :int32, :int32], :int32
       typesig { [::Java::Int, ::Java::Int] }
+      # @param hDlg cast=(HWND)
       # long
       # long
       def _get_dlg_item(h_dlg, n_iddlg_item)
@@ -9936,6 +10571,7 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_GetFontLanguageInfo, [:pointer, :long, :int32], :int32
       typesig { [::Java::Int] }
+      # @param hdc cast=(HDC)
       # long
       def _get_font_language_info(hdc)
         JNI.__send__(:Java_org_eclipse_swt_internal_win32_OS_GetFontLanguageInfo, JNI.env, self.jni_id, hdc.to_int)
@@ -9948,14 +10584,27 @@ module Org::Eclipse::Swt::Internal::Win32
         JNI.__send__(:Java_org_eclipse_swt_internal_win32_OS_GetForegroundWindow, JNI.env, self.jni_id)
       end
       
+      JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_GetGraphicsMode, [:pointer, :long, :int32], :int32
+      typesig { [::Java::Int] }
+      # @param hdc cast=(HDC)
+      # long
+      def _get_graphics_mode(hdc)
+        JNI.__send__(:Java_org_eclipse_swt_internal_win32_OS_GetGraphicsMode, JNI.env, self.jni_id, hdc.to_int)
+      end
+      
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_GetGUIThreadInfo, [:pointer, :long, :int32, :long], :int8
       typesig { [::Java::Int, GUITHREADINFO] }
+      # @param idThread cast=(DWORD)
+      # @param lpgui cast=(LPGUITHREADINFO)
       def _get_guithread_info(id_thread, lpgui)
         JNI.__send__(:Java_org_eclipse_swt_internal_win32_OS_GetGUIThreadInfo, JNI.env, self.jni_id, id_thread.to_int, lpgui.jni_id) != 0
       end
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_GetIconInfo, [:pointer, :long, :int32, :long], :int8
       typesig { [::Java::Int, ICONINFO] }
+      # @param hIcon cast=(HICON)
+      # @param piconinfo flags=no_in
+      # 
       # long
       def _get_icon_info(h_icon, piconinfo)
         JNI.__send__(:Java_org_eclipse_swt_internal_win32_OS_GetIconInfo, JNI.env, self.jni_id, h_icon.to_int, piconinfo.jni_id) != 0
@@ -9963,6 +10612,7 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_GetKeyboardLayoutList, [:pointer, :long, :int32, :long], :int32
       typesig { [::Java::Int, Array.typed(::Java::Int)] }
+      # @param lpList cast=(HKL FAR *)
       # long
       def _get_keyboard_layout_list(n_buff, lp_list)
         JNI.__send__(:Java_org_eclipse_swt_internal_win32_OS_GetKeyboardLayoutList, JNI.env, self.jni_id, n_buff.to_int, lp_list.jni_id)
@@ -9983,24 +10633,28 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_GetKeyboardState, [:pointer, :long, :long], :int8
       typesig { [Array.typed(::Java::Byte)] }
+      # @param lpKeyState cast=(PBYTE)
       def _get_keyboard_state(lp_key_state)
         JNI.__send__(:Java_org_eclipse_swt_internal_win32_OS_GetKeyboardState, JNI.env, self.jni_id, lp_key_state.jni_id) != 0
       end
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_GetKeyNameTextW, [:pointer, :long, :int32, :long, :int32], :int32
       typesig { [::Java::Int, Array.typed(::Java::Char), ::Java::Int] }
+      # @param lpString cast=(LPWSTR)
       def _get_key_name_text_w(l_param, lp_string, n_size)
         JNI.__send__(:Java_org_eclipse_swt_internal_win32_OS_GetKeyNameTextW, JNI.env, self.jni_id, l_param.to_int, lp_string.jni_id, n_size.to_int)
       end
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_GetKeyNameTextA, [:pointer, :long, :int32, :long, :int32], :int32
       typesig { [::Java::Int, Array.typed(::Java::Byte), ::Java::Int] }
+      # @param lpString cast=(LPSTR)
       def _get_key_name_text_a(l_param, lp_string, n_size)
         JNI.__send__(:Java_org_eclipse_swt_internal_win32_OS_GetKeyNameTextA, JNI.env, self.jni_id, l_param.to_int, lp_string.jni_id, n_size.to_int)
       end
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_GetLastActivePopup, [:pointer, :long, :int32], :int32
       typesig { [::Java::Int] }
+      # @param hWnd cast=(HWND)
       # long
       # long
       def _get_last_active_popup(h_wnd)
@@ -10015,6 +10669,9 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_GetLayeredWindowAttributes, [:pointer, :long, :int32, :long, :long, :long], :int8
       typesig { [::Java::Int, Array.typed(::Java::Int), Array.typed(::Java::Byte), Array.typed(::Java::Int)] }
+      # @method flags=dynamic
+      # @param hwnd cast=(HWND)
+      # 
       # long
       def _get_layered_window_attributes(hwnd, pcr_key, pb_alpha, pdw_flags)
         JNI.__send__(:Java_org_eclipse_swt_internal_win32_OS_GetLayeredWindowAttributes, JNI.env, self.jni_id, hwnd.to_int, pcr_key.jni_id, pb_alpha.jni_id, pdw_flags.jni_id) != 0
@@ -10022,6 +10679,9 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_GetLayout, [:pointer, :long, :int32], :int32
       typesig { [::Java::Int] }
+      # @method flags=dynamic
+      # @param hdc cast=(HDC)
+      # 
       # long
       def _get_layout(hdc)
         JNI.__send__(:Java_org_eclipse_swt_internal_win32_OS_GetLayout, JNI.env, self.jni_id, hdc.to_int)
@@ -10030,6 +10690,7 @@ module Org::Eclipse::Swt::Internal::Win32
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_GetLibraryHandle, [:pointer, :long], :int32
       typesig { [] }
       # returns the instance handle to the swt library
+      # @method flags=no_gen
       # long
       def _get_library_handle
         JNI.__send__(:Java_org_eclipse_swt_internal_win32_OS_GetLibraryHandle, JNI.env, self.jni_id)
@@ -10037,18 +10698,21 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_GetLocaleInfoW, [:pointer, :long, :int32, :int32, :long, :int32], :int32
       typesig { [::Java::Int, ::Java::Int, Array.typed(::Java::Char), ::Java::Int] }
+      # @param lpLCData cast=(LPWSTR)
       def _get_locale_info_w(locale, lctype, lp_lcdata, cch_data)
         JNI.__send__(:Java_org_eclipse_swt_internal_win32_OS_GetLocaleInfoW, JNI.env, self.jni_id, locale.to_int, lctype.to_int, lp_lcdata.jni_id, cch_data.to_int)
       end
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_GetLocaleInfoA, [:pointer, :long, :int32, :int32, :long, :int32], :int32
       typesig { [::Java::Int, ::Java::Int, Array.typed(::Java::Byte), ::Java::Int] }
+      # @param lpLCData cast=(LPSTR)
       def _get_locale_info_a(locale, lctype, lp_lcdata, cch_data)
         JNI.__send__(:Java_org_eclipse_swt_internal_win32_OS_GetLocaleInfoA, JNI.env, self.jni_id, locale.to_int, lctype.to_int, lp_lcdata.jni_id, cch_data.to_int)
       end
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_GetMenu, [:pointer, :long, :int32], :int32
       typesig { [::Java::Int] }
+      # @param hWnd cast=(HWND)
       # long
       # long
       def _get_menu(h_wnd)
@@ -10057,6 +10721,7 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_GetMenuBarInfo, [:pointer, :long, :int32, :int32, :int32, :long], :int8
       typesig { [::Java::Int, ::Java::Int, ::Java::Int, MENUBARINFO] }
+      # @method flags=dynamic
       # long
       def _get_menu_bar_info(h_wnd, id_object, id_item, pmbi)
         JNI.__send__(:Java_org_eclipse_swt_internal_win32_OS_GetMenuBarInfo, JNI.env, self.jni_id, h_wnd.to_int, id_object.to_int, id_item.to_int, pmbi.jni_id) != 0
@@ -10064,6 +10729,7 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_GetMenuDefaultItem, [:pointer, :long, :int32, :int32, :int32], :int32
       typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
+      # @param hMenu cast=(HMENU)
       # long
       def _get_menu_default_item(h_menu, f_by_pos, gmdi_flags)
         JNI.__send__(:Java_org_eclipse_swt_internal_win32_OS_GetMenuDefaultItem, JNI.env, self.jni_id, h_menu.to_int, f_by_pos.to_int, gmdi_flags.to_int)
@@ -10071,6 +10737,9 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_GetMenuInfo, [:pointer, :long, :int32, :long], :int8
       typesig { [::Java::Int, MENUINFO] }
+      # @method flags=dynamic
+      # @param hmenu cast=(HMENU)
+      # 
       # long
       def _get_menu_info(hmenu, lpcmi)
         JNI.__send__(:Java_org_eclipse_swt_internal_win32_OS_GetMenuInfo, JNI.env, self.jni_id, hmenu.to_int, lpcmi.jni_id) != 0
@@ -10078,6 +10747,7 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_GetMenuItemCount, [:pointer, :long, :int32], :int32
       typesig { [::Java::Int] }
+      # @param hMenu cast=(HMENU)
       # long
       def _get_menu_item_count(h_menu)
         JNI.__send__(:Java_org_eclipse_swt_internal_win32_OS_GetMenuItemCount, JNI.env, self.jni_id, h_menu.to_int)
@@ -10085,6 +10755,9 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_GetMenuItemInfoW, [:pointer, :long, :int32, :int32, :int8, :long], :int8
       typesig { [::Java::Int, ::Java::Int, ::Java::Boolean, MENUITEMINFO] }
+      # @param hMenu cast=(HMENU)
+      # @param lpmii cast=(LPMENUITEMINFOW)
+      # 
       # long
       def _get_menu_item_info_w(h_menu, u_item, f_by_position, lpmii)
         JNI.__send__(:Java_org_eclipse_swt_internal_win32_OS_GetMenuItemInfoW, JNI.env, self.jni_id, h_menu.to_int, u_item.to_int, f_by_position ? 1 : 0, lpmii.jni_id) != 0
@@ -10092,6 +10765,7 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_GetMenuItemInfoA, [:pointer, :long, :int32, :int32, :int8, :long], :int8
       typesig { [::Java::Int, ::Java::Int, ::Java::Boolean, MENUITEMINFO] }
+      # @param hMenu cast=(HMENU)
       # long
       def _get_menu_item_info_a(h_menu, u_item, f_by_position, lpmii)
         JNI.__send__(:Java_org_eclipse_swt_internal_win32_OS_GetMenuItemInfoA, JNI.env, self.jni_id, h_menu.to_int, u_item.to_int, f_by_position ? 1 : 0, lpmii.jni_id) != 0
@@ -10099,6 +10773,9 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_GetMenuItemRect, [:pointer, :long, :int32, :int32, :int32, :long], :int8
       typesig { [::Java::Int, ::Java::Int, ::Java::Int, RECT] }
+      # @param hWnd cast=(HWND)
+      # @param hMenu cast=(HMENU)
+      # 
       # long
       # long
       def _get_menu_item_rect(h_wnd, h_menu, u_item, lprc_item)
@@ -10107,6 +10784,7 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_GetMessageW, [:pointer, :long, :long, :int32, :int32, :int32], :int8
       typesig { [MSG, ::Java::Int, ::Java::Int, ::Java::Int] }
+      # @param hWnd cast=(HWND)
       # long
       def _get_message_w(lp_msg, h_wnd, w_msg_filter_min, w_msg_filter_max)
         JNI.__send__(:Java_org_eclipse_swt_internal_win32_OS_GetMessageW, JNI.env, self.jni_id, lp_msg.jni_id, h_wnd.to_int, w_msg_filter_min.to_int, w_msg_filter_max.to_int) != 0
@@ -10114,6 +10792,7 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_GetMessageA, [:pointer, :long, :long, :int32, :int32, :int32], :int8
       typesig { [MSG, ::Java::Int, ::Java::Int, ::Java::Int] }
+      # @param hWnd cast=(HWND)
       # long
       def _get_message_a(lp_msg, h_wnd, w_msg_filter_min, w_msg_filter_max)
         JNI.__send__(:Java_org_eclipse_swt_internal_win32_OS_GetMessageA, JNI.env, self.jni_id, lp_msg.jni_id, h_wnd.to_int, w_msg_filter_min.to_int, w_msg_filter_max.to_int) != 0
@@ -10133,6 +10812,9 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_GetMetaRgn, [:pointer, :long, :int32, :int32], :int32
       typesig { [::Java::Int, ::Java::Int] }
+      # @param hdc cast=(HDC)
+      # @param hrgn cast=(HRGN)
+      # 
       # long
       # long
       def _get_meta_rgn(hdc, hrgn)
@@ -10141,6 +10823,7 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_GetThemeColor, [:pointer, :long, :int32, :int32, :int32, :int32, :long], :int32
       typesig { [::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, Array.typed(::Java::Int)] }
+      # @method flags=dynamic
       # long
       def _get_theme_color(h_theme, i_part_id, i_state_id, i_prop_id, p_color)
         JNI.__send__(:Java_org_eclipse_swt_internal_win32_OS_GetThemeColor, JNI.env, self.jni_id, h_theme.to_int, i_part_id.to_int, i_state_id.to_int, i_prop_id.to_int, p_color.jni_id)
@@ -10148,6 +10831,7 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_GetThemeTextExtent, [:pointer, :long, :int32, :int32, :int32, :int32, :long, :int32, :int32, :long, :long], :int32
       typesig { [::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, Array.typed(::Java::Char), ::Java::Int, ::Java::Int, RECT, RECT] }
+      # @method flags=dynamic
       # long
       # long
       def _get_theme_text_extent(h_theme, hdc, i_part_id, i_state_id, psz_text, i_char_count, dw_text_flags, p_bounding_rect, p_extent_rect)
@@ -10156,6 +10840,7 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_GetTextCharset, [:pointer, :long, :int32], :int32
       typesig { [::Java::Int] }
+      # @param hdc cast=(HDC)
       # long
       def _get_text_charset(hdc)
         JNI.__send__(:Java_org_eclipse_swt_internal_win32_OS_GetTextCharset, JNI.env, self.jni_id, hdc.to_int)
@@ -10169,6 +10854,7 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_GetMapMode, [:pointer, :long, :int32], :int32
       typesig { [::Java::Int] }
+      # @param hdc cast=(HDC)
       # long
       def _get_map_mode(hdc)
         JNI.__send__(:Java_org_eclipse_swt_internal_win32_OS_GetMapMode, JNI.env, self.jni_id, hdc.to_int)
@@ -10176,6 +10862,9 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_GetModuleFileNameW, [:pointer, :long, :int32, :long, :int32], :int32
       typesig { [::Java::Int, Array.typed(::Java::Char), ::Java::Int] }
+      # @param hModule cast=(HMODULE)
+      # @param lpFilename cast=(LPWSTR)
+      # 
       # long
       def _get_module_file_name_w(h_module, lp_filename, in_size)
         JNI.__send__(:Java_org_eclipse_swt_internal_win32_OS_GetModuleFileNameW, JNI.env, self.jni_id, h_module.to_int, lp_filename.jni_id, in_size.to_int)
@@ -10183,6 +10872,9 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_GetModuleFileNameA, [:pointer, :long, :int32, :long, :int32], :int32
       typesig { [::Java::Int, Array.typed(::Java::Byte), ::Java::Int] }
+      # @param hModule cast=(HMODULE)
+      # @param lpFilename cast=(LPSTR)
+      # 
       # long
       def _get_module_file_name_a(h_module, lp_filename, in_size)
         JNI.__send__(:Java_org_eclipse_swt_internal_win32_OS_GetModuleFileNameA, JNI.env, self.jni_id, h_module.to_int, lp_filename.jni_id, in_size.to_int)
@@ -10190,6 +10882,7 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_GetModuleHandleW, [:pointer, :long, :long], :int32
       typesig { [Array.typed(::Java::Char)] }
+      # @param lpModuleName cast=(LPWSTR)
       # long
       def _get_module_handle_w(lp_module_name)
         JNI.__send__(:Java_org_eclipse_swt_internal_win32_OS_GetModuleHandleW, JNI.env, self.jni_id, lp_module_name.jni_id)
@@ -10197,6 +10890,7 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_GetModuleHandleA, [:pointer, :long, :long], :int32
       typesig { [Array.typed(::Java::Byte)] }
+      # @param lpModuleName cast=(LPSTR)
       # long
       def _get_module_handle_a(lp_module_name)
         JNI.__send__(:Java_org_eclipse_swt_internal_win32_OS_GetModuleHandleA, JNI.env, self.jni_id, lp_module_name.jni_id)
@@ -10204,6 +10898,10 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_GetMonitorInfoW, [:pointer, :long, :int32, :long], :int8
       typesig { [::Java::Int, MONITORINFO] }
+      # @method flags=dynamic
+      # @param hmonitor cast=(HMONITOR)
+      # @param lpmi cast=(LPMONITORINFO)
+      # 
       # long
       def _get_monitor_info_w(hmonitor, lpmi)
         JNI.__send__(:Java_org_eclipse_swt_internal_win32_OS_GetMonitorInfoW, JNI.env, self.jni_id, hmonitor.to_int, lpmi.jni_id) != 0
@@ -10211,6 +10909,10 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_GetMonitorInfoA, [:pointer, :long, :int32, :long], :int8
       typesig { [::Java::Int, MONITORINFO] }
+      # @method flags=dynamic
+      # @param hmonitor cast=(HMONITOR)
+      # @param lpmi cast=(LPMONITORINFO)
+      # 
       # long
       def _get_monitor_info_a(hmonitor, lpmi)
         JNI.__send__(:Java_org_eclipse_swt_internal_win32_OS_GetMonitorInfoA, JNI.env, self.jni_id, hmonitor.to_int, lpmi.jni_id) != 0
@@ -10218,6 +10920,9 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_GetNearestPaletteIndex, [:pointer, :long, :int32, :int32], :int32
       typesig { [::Java::Int, ::Java::Int] }
+      # @param hPal cast=(HPALETTE)
+      # @param crColor cast=(COLORREF)
+      # 
       # long
       def _get_nearest_palette_index(h_pal, cr_color)
         JNI.__send__(:Java_org_eclipse_swt_internal_win32_OS_GetNearestPaletteIndex, JNI.env, self.jni_id, h_pal.to_int, cr_color.to_int)
@@ -10225,6 +10930,9 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method "Java_org_eclipse_swt_internal_win32_OS_GetObjectA__IIL#{BITMAP.jni_name}_2".to_sym, [:pointer, :long, :int32, :int32, :long], :int32
       typesig { [::Java::Int, ::Java::Int, BITMAP] }
+      # @param hgdiobj cast=(HGDIOBJ)
+      # @param lpvObject flags=no_in
+      # 
       # long
       def _get_object_a(hgdiobj, cb_buffer, lpv_object)
         JNI.__send__("Java_org_eclipse_swt_internal_win32_OS_GetObjectA__IIL#{BITMAP.jni_name}_2".to_sym, JNI.env, self.jni_id, hgdiobj.to_int, cb_buffer.to_int, lpv_object.jni_id)
@@ -10232,6 +10940,9 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method "Java_org_eclipse_swt_internal_win32_OS_GetObjectW__IIL#{BITMAP.jni_name}_2".to_sym, [:pointer, :long, :int32, :int32, :long], :int32
       typesig { [::Java::Int, ::Java::Int, BITMAP] }
+      # @param hgdiobj cast=(HGDIOBJ)
+      # @param lpvObject flags=no_in
+      # 
       # long
       def _get_object_w(hgdiobj, cb_buffer, lpv_object)
         JNI.__send__("Java_org_eclipse_swt_internal_win32_OS_GetObjectW__IIL#{BITMAP.jni_name}_2".to_sym, JNI.env, self.jni_id, hgdiobj.to_int, cb_buffer.to_int, lpv_object.jni_id)
@@ -10239,6 +10950,9 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method "Java_org_eclipse_swt_internal_win32_OS_GetObjectA__IIL#{DIBSECTION.jni_name}_2".to_sym, [:pointer, :long, :int32, :int32, :long], :int32
       typesig { [::Java::Int, ::Java::Int, DIBSECTION] }
+      # @param hgdiobj cast=(HGDIOBJ)
+      # @param lpvObject flags=no_in
+      # 
       # long
       def _get_object_a(hgdiobj, cb_buffer, lpv_object)
         JNI.__send__("Java_org_eclipse_swt_internal_win32_OS_GetObjectA__IIL#{DIBSECTION.jni_name}_2".to_sym, JNI.env, self.jni_id, hgdiobj.to_int, cb_buffer.to_int, lpv_object.jni_id)
@@ -10246,6 +10960,9 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method "Java_org_eclipse_swt_internal_win32_OS_GetObjectW__IIL#{DIBSECTION.jni_name}_2".to_sym, [:pointer, :long, :int32, :int32, :long], :int32
       typesig { [::Java::Int, ::Java::Int, DIBSECTION] }
+      # @param hgdiobj cast=(HGDIOBJ)
+      # @param lpvObject flags=no_in
+      # 
       # long
       def _get_object_w(hgdiobj, cb_buffer, lpv_object)
         JNI.__send__("Java_org_eclipse_swt_internal_win32_OS_GetObjectW__IIL#{DIBSECTION.jni_name}_2".to_sym, JNI.env, self.jni_id, hgdiobj.to_int, cb_buffer.to_int, lpv_object.jni_id)
@@ -10253,6 +10970,9 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method "Java_org_eclipse_swt_internal_win32_OS_GetObjectA__IIL#{EXTLOGPEN.jni_name}_2".to_sym, [:pointer, :long, :int32, :int32, :long], :int32
       typesig { [::Java::Int, ::Java::Int, EXTLOGPEN] }
+      # @param hgdiobj cast=(HGDIOBJ)
+      # @param lpvObject flags=no_in
+      # 
       # long
       def _get_object_a(hgdiobj, cb_buffer, lpv_object)
         JNI.__send__("Java_org_eclipse_swt_internal_win32_OS_GetObjectA__IIL#{EXTLOGPEN.jni_name}_2".to_sym, JNI.env, self.jni_id, hgdiobj.to_int, cb_buffer.to_int, lpv_object.jni_id)
@@ -10260,6 +10980,9 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method "Java_org_eclipse_swt_internal_win32_OS_GetObjectW__IIL#{EXTLOGPEN.jni_name}_2".to_sym, [:pointer, :long, :int32, :int32, :long], :int32
       typesig { [::Java::Int, ::Java::Int, EXTLOGPEN] }
+      # @param hgdiobj cast=(HGDIOBJ)
+      # @param lpvObject flags=no_in
+      # 
       # long
       def _get_object_w(hgdiobj, cb_buffer, lpv_object)
         JNI.__send__("Java_org_eclipse_swt_internal_win32_OS_GetObjectW__IIL#{EXTLOGPEN.jni_name}_2".to_sym, JNI.env, self.jni_id, hgdiobj.to_int, cb_buffer.to_int, lpv_object.jni_id)
@@ -10267,6 +10990,9 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method "Java_org_eclipse_swt_internal_win32_OS_GetObjectA__IIL#{LOGBRUSH.jni_name}_2".to_sym, [:pointer, :long, :int32, :int32, :long], :int32
       typesig { [::Java::Int, ::Java::Int, LOGBRUSH] }
+      # @param hgdiobj cast=(HGDIOBJ)
+      # @param lpvObject flags=no_in
+      # 
       # long
       def _get_object_a(hgdiobj, cb_buffer, lpv_object)
         JNI.__send__("Java_org_eclipse_swt_internal_win32_OS_GetObjectA__IIL#{LOGBRUSH.jni_name}_2".to_sym, JNI.env, self.jni_id, hgdiobj.to_int, cb_buffer.to_int, lpv_object.jni_id)
@@ -10274,6 +11000,9 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method "Java_org_eclipse_swt_internal_win32_OS_GetObjectW__IIL#{LOGBRUSH.jni_name}_2".to_sym, [:pointer, :long, :int32, :int32, :long], :int32
       typesig { [::Java::Int, ::Java::Int, LOGBRUSH] }
+      # @param hgdiobj cast=(HGDIOBJ)
+      # @param lpvObject flags=no_in
+      # 
       # long
       def _get_object_w(hgdiobj, cb_buffer, lpv_object)
         JNI.__send__("Java_org_eclipse_swt_internal_win32_OS_GetObjectW__IIL#{LOGBRUSH.jni_name}_2".to_sym, JNI.env, self.jni_id, hgdiobj.to_int, cb_buffer.to_int, lpv_object.jni_id)
@@ -10281,6 +11010,9 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method "Java_org_eclipse_swt_internal_win32_OS_GetObjectA__IIL#{LOGFONTA.jni_name}_2".to_sym, [:pointer, :long, :int32, :int32, :long], :int32
       typesig { [::Java::Int, ::Java::Int, LOGFONTA] }
+      # @param hgdiobj cast=(HGDIOBJ)
+      # @param lpvObject flags=no_in
+      # 
       # long
       def _get_object_a(hgdiobj, cb_buffer, lpv_object)
         JNI.__send__("Java_org_eclipse_swt_internal_win32_OS_GetObjectA__IIL#{LOGFONTA.jni_name}_2".to_sym, JNI.env, self.jni_id, hgdiobj.to_int, cb_buffer.to_int, lpv_object.jni_id)
@@ -10288,6 +11020,9 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method "Java_org_eclipse_swt_internal_win32_OS_GetObjectW__IIL#{LOGFONTW.jni_name}_2".to_sym, [:pointer, :long, :int32, :int32, :long], :int32
       typesig { [::Java::Int, ::Java::Int, LOGFONTW] }
+      # @param hgdiobj cast=(HGDIOBJ)
+      # @param lpvObject flags=no_in
+      # 
       # long
       def _get_object_w(hgdiobj, cb_buffer, lpv_object)
         JNI.__send__("Java_org_eclipse_swt_internal_win32_OS_GetObjectW__IIL#{LOGFONTW.jni_name}_2".to_sym, JNI.env, self.jni_id, hgdiobj.to_int, cb_buffer.to_int, lpv_object.jni_id)
@@ -10295,6 +11030,9 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method "Java_org_eclipse_swt_internal_win32_OS_GetObjectA__IIL#{LOGPEN.jni_name}_2".to_sym, [:pointer, :long, :int32, :int32, :long], :int32
       typesig { [::Java::Int, ::Java::Int, LOGPEN] }
+      # @param hgdiobj cast=(HGDIOBJ)
+      # @param lpvObject flags=no_in
+      # 
       # long
       def _get_object_a(hgdiobj, cb_buffer, lpv_object)
         JNI.__send__("Java_org_eclipse_swt_internal_win32_OS_GetObjectA__IIL#{LOGPEN.jni_name}_2".to_sym, JNI.env, self.jni_id, hgdiobj.to_int, cb_buffer.to_int, lpv_object.jni_id)
@@ -10302,6 +11040,9 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method "Java_org_eclipse_swt_internal_win32_OS_GetObjectW__IIL#{LOGPEN.jni_name}_2".to_sym, [:pointer, :long, :int32, :int32, :long], :int32
       typesig { [::Java::Int, ::Java::Int, LOGPEN] }
+      # @param hgdiobj cast=(HGDIOBJ)
+      # @param lpvObject flags=no_in
+      # 
       # long
       def _get_object_w(hgdiobj, cb_buffer, lpv_object)
         JNI.__send__("Java_org_eclipse_swt_internal_win32_OS_GetObjectW__IIL#{LOGPEN.jni_name}_2".to_sym, JNI.env, self.jni_id, hgdiobj.to_int, cb_buffer.to_int, lpv_object.jni_id)
@@ -10309,6 +11050,9 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_GetObjectA__III, [:pointer, :long, :int32, :int32, :int32], :int32
       typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
+      # @param hgdiobj cast=(HGDIOBJ)
+      # @param lpvObject cast=(LPVOID),flags=no_in
+      # 
       # long
       # long
       def _get_object_a(hgdiobj, cb_buffer, lpv_object)
@@ -10317,6 +11061,9 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_GetObjectW__III, [:pointer, :long, :int32, :int32, :int32], :int32
       typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
+      # @param hgdiobj cast=(HGDIOBJ)
+      # @param lpvObject cast=(LPVOID),flags=no_in
+      # 
       # long
       # long
       def _get_object_w(hgdiobj, cb_buffer, lpv_object)
@@ -10325,6 +11072,7 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_GetOpenFileNameW, [:pointer, :long, :long], :int8
       typesig { [OPENFILENAME] }
+      # @param lpofn cast=(LPOPENFILENAMEW)
       def _get_open_file_name_w(lpofn)
         JNI.__send__(:Java_org_eclipse_swt_internal_win32_OS_GetOpenFileNameW, JNI.env, self.jni_id, lpofn.jni_id) != 0
       end
@@ -10337,6 +11085,7 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_GetOutlineTextMetricsW, [:pointer, :long, :int32, :int32, :long], :int32
       typesig { [::Java::Int, ::Java::Int, OUTLINETEXTMETRICW] }
+      # @param hdc cast=(HDC)
       # long
       def _get_outline_text_metrics_w(hdc, cb_data, lp_otm)
         JNI.__send__(:Java_org_eclipse_swt_internal_win32_OS_GetOutlineTextMetricsW, JNI.env, self.jni_id, hdc.to_int, cb_data.to_int, lp_otm.jni_id)
@@ -10344,6 +11093,7 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_GetOutlineTextMetricsA, [:pointer, :long, :int32, :int32, :long], :int32
       typesig { [::Java::Int, ::Java::Int, OUTLINETEXTMETRICA] }
+      # @param hdc cast=(HDC)
       # long
       def _get_outline_text_metrics_a(hdc, cb_data, lp_otm)
         JNI.__send__(:Java_org_eclipse_swt_internal_win32_OS_GetOutlineTextMetricsA, JNI.env, self.jni_id, hdc.to_int, cb_data.to_int, lp_otm.jni_id)
@@ -10351,6 +11101,10 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_GetPath, [:pointer, :long, :int32, :long, :long, :int32], :int32
       typesig { [::Java::Int, Array.typed(::Java::Int), Array.typed(::Java::Byte), ::Java::Int] }
+      # @param hdc cast=(HDC)
+      # @param lpPoints cast=(LPPOINT)
+      # @param lpTypes cast=(LPBYTE)
+      # 
       # long
       def _get_path(hdc, lp_points, lp_types, n_size)
         JNI.__send__(:Java_org_eclipse_swt_internal_win32_OS_GetPath, JNI.env, self.jni_id, hdc.to_int, lp_points.jni_id, lp_types.jni_id, n_size.to_int)
@@ -10358,6 +11112,9 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_GetPaletteEntries, [:pointer, :long, :int32, :int32, :int32, :long], :int32
       typesig { [::Java::Int, ::Java::Int, ::Java::Int, Array.typed(::Java::Byte)] }
+      # @param hPalette cast=(HPALETTE)
+      # @param logPalette cast=(LPPALETTEENTRY),flags=no_in critical
+      # 
       # long
       def _get_palette_entries(h_palette, i_start_index, n_entries, log_palette)
         JNI.__send__(:Java_org_eclipse_swt_internal_win32_OS_GetPaletteEntries, JNI.env, self.jni_id, h_palette.to_int, i_start_index.to_int, n_entries.to_int, log_palette.jni_id)
@@ -10365,6 +11122,7 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_GetParent, [:pointer, :long, :int32], :int32
       typesig { [::Java::Int] }
+      # @param hWnd cast=(HWND)
       # long
       # long
       def _get_parent(h_wnd)
@@ -10373,6 +11131,7 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_GetPixel, [:pointer, :long, :int32, :int32, :int32], :int32
       typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
+      # @param hdc cast=(HDC)
       # long
       def _get_pixel(hdc, x, y)
         JNI.__send__(:Java_org_eclipse_swt_internal_win32_OS_GetPixel, JNI.env, self.jni_id, hdc.to_int, x.to_int, y.to_int)
@@ -10380,6 +11139,7 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_GetPolyFillMode, [:pointer, :long, :int32], :int32
       typesig { [::Java::Int] }
+      # @param hdc cast=(HDC)
       # long
       def _get_poly_fill_mode(hdc)
         JNI.__send__(:Java_org_eclipse_swt_internal_win32_OS_GetPolyFillMode, JNI.env, self.jni_id, hdc.to_int)
@@ -10387,6 +11147,9 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_GetProcAddress, [:pointer, :long, :int32, :long], :int32
       typesig { [::Java::Int, Array.typed(::Java::Byte)] }
+      # @param hModule cast=(HMODULE)
+      # @param lpProcName cast=(LPCTSTR)
+      # 
       # long
       # long
       def _get_proc_address(h_module, lp_proc_name)
@@ -10402,6 +11165,7 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_GetProcessHeaps, [:pointer, :long, :int32, :long], :int32
       typesig { [::Java::Int, Array.typed(::Java::Int)] }
+      # @param ProcessHeaps cast=(PHANDLE)
       # long
       def _get_process_heaps(number_of_heaps, process_heaps)
         JNI.__send__(:Java_org_eclipse_swt_internal_win32_OS_GetProcessHeaps, JNI.env, self.jni_id, number_of_heaps.to_int, process_heaps.jni_id)
@@ -10409,18 +11173,29 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_GetProfileStringW, [:pointer, :long, :long, :long, :long, :long, :int32], :int32
       typesig { [Array.typed(::Java::Char), Array.typed(::Java::Char), Array.typed(::Java::Char), Array.typed(::Java::Char), ::Java::Int] }
+      # @param lpAppName cast=(LPWSTR)
+      # @param lpKeyName cast=(LPWSTR)
+      # @param lpDefault cast=(LPWSTR)
+      # @param lpReturnedString cast=(LPWSTR)
       def _get_profile_string_w(lp_app_name, lp_key_name, lp_default, lp_returned_string, n_size)
         JNI.__send__(:Java_org_eclipse_swt_internal_win32_OS_GetProfileStringW, JNI.env, self.jni_id, lp_app_name.jni_id, lp_key_name.jni_id, lp_default.jni_id, lp_returned_string.jni_id, n_size.to_int)
       end
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_GetProfileStringA, [:pointer, :long, :long, :long, :long, :long, :int32], :int32
       typesig { [Array.typed(::Java::Byte), Array.typed(::Java::Byte), Array.typed(::Java::Byte), Array.typed(::Java::Byte), ::Java::Int] }
+      # @param lpAppName cast=(LPSTR)
+      # @param lpKeyName cast=(LPSTR)
+      # @param lpDefault cast=(LPSTR)
+      # @param lpReturnedString cast=(LPSTR)
       def _get_profile_string_a(lp_app_name, lp_key_name, lp_default, lp_returned_string, n_size)
         JNI.__send__(:Java_org_eclipse_swt_internal_win32_OS_GetProfileStringA, JNI.env, self.jni_id, lp_app_name.jni_id, lp_key_name.jni_id, lp_default.jni_id, lp_returned_string.jni_id, n_size.to_int)
       end
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_GetPropW, [:pointer, :long, :int32, :int32], :int32
       typesig { [::Java::Int, ::Java::Int] }
+      # @param hWnd cast=(HWND)
+      # @param lpString cast=(LPCWSTR)
+      # 
       # long
       # long
       # long
@@ -10430,6 +11205,9 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_GetPropA, [:pointer, :long, :int32, :int32], :int32
       typesig { [::Java::Int, ::Java::Int] }
+      # @param hWnd cast=(HWND)
+      # @param lpString cast=(LPCTSTR)
+      # 
       # long
       # long
       # long
@@ -10439,6 +11217,9 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_GetRandomRgn, [:pointer, :long, :int32, :int32, :int32], :int32
       typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
+      # @param hdc cast=(HDC)
+      # @param hrgn cast=(HRGN)
+      # 
       # long
       # long
       def _get_random_rgn(hdc, hrgn, i_num)
@@ -10447,6 +11228,9 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_GetRegionData, [:pointer, :long, :int32, :int32, :long], :int32
       typesig { [::Java::Int, ::Java::Int, Array.typed(::Java::Int)] }
+      # @param hRgn cast=(HRGN)
+      # @param lpRgnData cast=(RGNDATA *),flags=no_in critical
+      # 
       # long
       def _get_region_data(h_rgn, dw_count, lp_rgn_data)
         JNI.__send__(:Java_org_eclipse_swt_internal_win32_OS_GetRegionData, JNI.env, self.jni_id, h_rgn.to_int, dw_count.to_int, lp_rgn_data.jni_id)
@@ -10454,6 +11238,9 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_GetRgnBox, [:pointer, :long, :int32, :long], :int32
       typesig { [::Java::Int, RECT] }
+      # @param hrgn cast=(HRGN)
+      # @param lprc flags=no_in
+      # 
       # long
       def _get_rgn_box(hrgn, lprc)
         JNI.__send__(:Java_org_eclipse_swt_internal_win32_OS_GetRgnBox, JNI.env, self.jni_id, hrgn.to_int, lprc.jni_id)
@@ -10461,6 +11248,7 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_GetROP2, [:pointer, :long, :int32], :int32
       typesig { [::Java::Int] }
+      # @param hdc cast=(HDC)
       # long
       def _get_rop2(hdc)
         JNI.__send__(:Java_org_eclipse_swt_internal_win32_OS_GetROP2, JNI.env, self.jni_id, hdc.to_int)
@@ -10468,6 +11256,7 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_GetSaveFileNameW, [:pointer, :long, :long], :int8
       typesig { [OPENFILENAME] }
+      # @param lpofn cast=(LPOPENFILENAMEW)
       def _get_save_file_name_w(lpofn)
         JNI.__send__(:Java_org_eclipse_swt_internal_win32_OS_GetSaveFileNameW, JNI.env, self.jni_id, lpofn.jni_id) != 0
       end
@@ -10480,6 +11269,7 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_GetScrollBarInfo, [:pointer, :long, :int32, :int32, :long], :int8
       typesig { [::Java::Int, ::Java::Int, SCROLLBARINFO] }
+      # @param hwnd cast=(HWND)
       # long
       def _get_scroll_bar_info(hwnd, id_object, psbi)
         JNI.__send__(:Java_org_eclipse_swt_internal_win32_OS_GetScrollBarInfo, JNI.env, self.jni_id, hwnd.to_int, id_object.to_int, psbi.jni_id) != 0
@@ -10487,6 +11277,7 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_GetScrollInfo, [:pointer, :long, :int32, :int32, :long], :int8
       typesig { [::Java::Int, ::Java::Int, SCROLLINFO] }
+      # @param hwnd cast=(HWND)
       # long
       def _get_scroll_info(hwnd, flags, info)
         JNI.__send__(:Java_org_eclipse_swt_internal_win32_OS_GetScrollInfo, JNI.env, self.jni_id, hwnd.to_int, flags.to_int, info.jni_id) != 0
@@ -10494,12 +11285,14 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_GetStartupInfoW, [:pointer, :long, :long], :void
       typesig { [STARTUPINFO] }
+      # @param lpStartupInfo cast=(LPSTARTUPINFOW)
       def _get_startup_info_w(lp_startup_info)
         JNI.__send__(:Java_org_eclipse_swt_internal_win32_OS_GetStartupInfoW, JNI.env, self.jni_id, lp_startup_info.jni_id)
       end
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_GetStartupInfoA, [:pointer, :long, :long], :void
       typesig { [STARTUPINFO] }
+      # @param lpStartupInfo cast=(LPSTARTUPINFOA)
       def _get_startup_info_a(lp_startup_info)
         JNI.__send__(:Java_org_eclipse_swt_internal_win32_OS_GetStartupInfoA, JNI.env, self.jni_id, lp_startup_info.jni_id)
       end
@@ -10526,12 +11319,14 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_GetSystemDefaultUILanguage, [:pointer, :long], :int16
       typesig { [] }
+      # @method flags=dynamic
       def _get_system_default_uilanguage
         JNI.__send__(:Java_org_eclipse_swt_internal_win32_OS_GetSystemDefaultUILanguage, JNI.env, self.jni_id)
       end
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_GetSystemMenu, [:pointer, :long, :int32, :int8], :int32
       typesig { [::Java::Int, ::Java::Boolean] }
+      # @param hWnd cast=(HWND)
       # long
       # long
       def _get_system_menu(h_wnd, b_revert)
@@ -10546,6 +11341,11 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_GetSystemPaletteEntries, [:pointer, :long, :int32, :int32, :int32, :long], :int32
       typesig { [::Java::Int, ::Java::Int, ::Java::Int, Array.typed(::Java::Byte)] }
+      # @param hdc cast=(HDC)
+      # @param iStartIndex cast=(UINT)
+      # @param nEntries cast=(UINT)
+      # @param lppe cast=(LPPALETTEENTRY),flags=no_in critical
+      # 
       # long
       def _get_system_palette_entries(hdc, i_start_index, n_entries, lppe)
         JNI.__send__(:Java_org_eclipse_swt_internal_win32_OS_GetSystemPaletteEntries, JNI.env, self.jni_id, hdc.to_int, i_start_index.to_int, n_entries.to_int, lppe.jni_id)
@@ -10553,6 +11353,7 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_GetTextColor, [:pointer, :long, :int32], :int32
       typesig { [::Java::Int] }
+      # @param hDC cast=(HDC)
       # long
       def _get_text_color(h_dc)
         JNI.__send__(:Java_org_eclipse_swt_internal_win32_OS_GetTextColor, JNI.env, self.jni_id, h_dc.to_int)
@@ -10560,6 +11361,10 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_GetTextExtentPoint32W, [:pointer, :long, :int32, :long, :int32, :long], :int8
       typesig { [::Java::Int, Array.typed(::Java::Char), ::Java::Int, SIZE] }
+      # @param hdc cast=(HDC)
+      # @param lpString cast=(LPWSTR),flags=no_out critical
+      # @param lpSize flags=no_in
+      # 
       # long
       def _get_text_extent_point32w(hdc, lp_string, cb_string, lp_size)
         JNI.__send__(:Java_org_eclipse_swt_internal_win32_OS_GetTextExtentPoint32W, JNI.env, self.jni_id, hdc.to_int, lp_string.jni_id, cb_string.to_int, lp_size.jni_id) != 0
@@ -10567,6 +11372,10 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_GetTextExtentPoint32A, [:pointer, :long, :int32, :long, :int32, :long], :int8
       typesig { [::Java::Int, Array.typed(::Java::Byte), ::Java::Int, SIZE] }
+      # @param hdc cast=(HDC)
+      # @param lpString cast=(LPSTR),flags=no_out critical
+      # @param lpSize flags=no_in
+      # 
       # long
       def _get_text_extent_point32a(hdc, lp_string, cb_string, lp_size)
         JNI.__send__(:Java_org_eclipse_swt_internal_win32_OS_GetTextExtentPoint32A, JNI.env, self.jni_id, hdc.to_int, lp_string.jni_id, cb_string.to_int, lp_size.jni_id) != 0
@@ -10574,6 +11383,9 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_GetTextMetricsW, [:pointer, :long, :int32, :long], :int8
       typesig { [::Java::Int, TEXTMETRICW] }
+      # @param hdc cast=(HDC)
+      # @param lptm flags=no_in
+      # 
       # long
       def _get_text_metrics_w(hdc, lptm)
         JNI.__send__(:Java_org_eclipse_swt_internal_win32_OS_GetTextMetricsW, JNI.env, self.jni_id, hdc.to_int, lptm.jni_id) != 0
@@ -10581,6 +11393,9 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_GetTextMetricsA, [:pointer, :long, :int32, :long], :int8
       typesig { [::Java::Int, TEXTMETRICA] }
+      # @param hdc cast=(HDC)
+      # @param lptm flags=no_in
+      # 
       # long
       def _get_text_metrics_a(hdc, lptm)
         JNI.__send__(:Java_org_eclipse_swt_internal_win32_OS_GetTextMetricsA, JNI.env, self.jni_id, hdc.to_int, lptm.jni_id) != 0
@@ -10588,6 +11403,7 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_GetThemeInt, [:pointer, :long, :int32, :int32, :int32, :int32, :long], :int32
       typesig { [::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, Array.typed(::Java::Int)] }
+      # @method flags=dynamic
       # long
       def _get_theme_int(h_theme, i_part_id, i_state_id, i_prop_id, pi_val)
         JNI.__send__(:Java_org_eclipse_swt_internal_win32_OS_GetThemeInt, JNI.env, self.jni_id, h_theme.to_int, i_part_id.to_int, i_state_id.to_int, i_prop_id.to_int, pi_val.jni_id)
@@ -10595,6 +11411,7 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_GetThemeMargins, [:pointer, :long, :int32, :int32, :int32, :int32, :int32, :long, :long], :int32
       typesig { [::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, RECT, MARGINS] }
+      # @method flags=dynamic
       # long
       # long
       def _get_theme_margins(h_theme, hdc, i_part_id, i_state_id, i_prop_id, prc, p_margins)
@@ -10603,6 +11420,7 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_GetThemeBackgroundContentRect, [:pointer, :long, :int32, :int32, :int32, :int32, :long, :long], :int32
       typesig { [::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, RECT, RECT] }
+      # @method flags=dynamic
       # long
       # long
       def _get_theme_background_content_rect(h_theme, hdc, i_part_id, i_state_id, p_bounding_rect, p_content_rect)
@@ -10611,6 +11429,9 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_GetThemeBackgroundExtent, [:pointer, :long, :int32, :int32, :int32, :int32, :long, :long], :int32
       typesig { [::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, RECT, RECT] }
+      # @method flags=dynamic
+      # @param pContentRect flags=no_out
+      # 
       # long
       # long
       def _get_theme_background_extent(h_theme, hdc, i_part_id, i_state_id, p_content_rect, p_extent_rect)
@@ -10619,6 +11440,7 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_GetThemePartSize, [:pointer, :long, :int32, :int32, :int32, :int32, :long, :int32, :long], :int32
       typesig { [::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, RECT, ::Java::Int, SIZE] }
+      # @method flags=dynamic
       # long
       # long
       def _get_theme_part_size(h_theme, hdc, i_part_id, i_state_id, prc, e_size, psz)
@@ -10627,6 +11449,7 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_GetThemeMetric, [:pointer, :long, :int32, :int32, :int32, :int32, :int32, :long], :int32
       typesig { [::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, Array.typed(::Java::Int)] }
+      # @method flags=dynamic
       # long
       # long
       def _get_theme_metric(h_theme, hdc, i_part_id, i_state_id, i_prop_id, pi_val)
@@ -10635,6 +11458,7 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_GetThemeRect, [:pointer, :long, :int32, :int32, :int32, :int32, :long], :int32
       typesig { [::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, RECT] }
+      # @method flags=dynamic
       # long
       def _get_theme_rect(h_theme, i_part_id, i_state_id, i_prop_id, p_rect)
         JNI.__send__(:Java_org_eclipse_swt_internal_win32_OS_GetThemeRect, JNI.env, self.jni_id, h_theme.to_int, i_part_id.to_int, i_state_id.to_int, i_prop_id.to_int, p_rect.jni_id)
@@ -10642,6 +11466,7 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_GetThemeSysSize, [:pointer, :long, :int32, :int32], :int32
       typesig { [::Java::Int, ::Java::Int] }
+      # @method flags=dynamic
       # long
       def _get_theme_sys_size(h_theme, i_size_id)
         JNI.__send__(:Java_org_eclipse_swt_internal_win32_OS_GetThemeSysSize, JNI.env, self.jni_id, h_theme.to_int, i_size_id.to_int)
@@ -10649,18 +11474,30 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_GetTimeFormatW, [:pointer, :long, :int32, :int32, :long, :long, :long, :int32], :int32
       typesig { [::Java::Int, ::Java::Int, SYSTEMTIME, Array.typed(::Java::Char), Array.typed(::Java::Char), ::Java::Int] }
+      # @param Locale cast=(LCID)
+      # @param dwFlags cast=(DWORD)
+      # @param lpFormat cast=(LPWSTR)
+      # @param lpTimeStr cast=(LPWSTR)
       def _get_time_format_w(locale, dw_flags, lp_time, lp_format, lp_time_str, cch_time)
         JNI.__send__(:Java_org_eclipse_swt_internal_win32_OS_GetTimeFormatW, JNI.env, self.jni_id, locale.to_int, dw_flags.to_int, lp_time.jni_id, lp_format.jni_id, lp_time_str.jni_id, cch_time.to_int)
       end
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_GetTimeFormatA, [:pointer, :long, :int32, :int32, :long, :long, :long, :int32], :int32
       typesig { [::Java::Int, ::Java::Int, SYSTEMTIME, Array.typed(::Java::Byte), Array.typed(::Java::Byte), ::Java::Int] }
+      # @param Locale cast=(LCID)
+      # @param dwFlags cast=(DWORD)
+      # @param lpFormat cast=(LPSTR)
+      # @param lpTimeStr cast=(LPSTR)
       def _get_time_format_a(locale, dw_flags, lp_time, lp_format, lp_time_str, cch_time)
         JNI.__send__(:Java_org_eclipse_swt_internal_win32_OS_GetTimeFormatA, JNI.env, self.jni_id, locale.to_int, dw_flags.to_int, lp_time.jni_id, lp_format.jni_id, lp_time_str.jni_id, cch_time.to_int)
       end
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_GetUpdateRect, [:pointer, :long, :int32, :long, :int8], :int8
       typesig { [::Java::Int, RECT, ::Java::Boolean] }
+      # @param hWnd cast=(HWND)
+      # @param lpRect cast=(LPRECT)
+      # @param bErase cast=(BOOL)
+      # 
       # long
       def _get_update_rect(h_wnd, lp_rect, b_erase)
         JNI.__send__(:Java_org_eclipse_swt_internal_win32_OS_GetUpdateRect, JNI.env, self.jni_id, h_wnd.to_int, lp_rect.jni_id, b_erase ? 1 : 0) != 0
@@ -10668,6 +11505,9 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_GetUpdateRgn, [:pointer, :long, :int32, :int32, :int8], :int32
       typesig { [::Java::Int, ::Java::Int, ::Java::Boolean] }
+      # @param hWnd cast=(HWND)
+      # @param hRgn cast=(HRGN)
+      # 
       # long
       # long
       def _get_update_rgn(h_wnd, h_rgn, b_erase)
@@ -10676,12 +11516,14 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method "Java_org_eclipse_swt_internal_win32_OS_GetVersionExW__L#{OSVERSIONINFOEXW.jni_name}_2".to_sym, [:pointer, :long, :long], :int8
       typesig { [OSVERSIONINFOEXW] }
+      # @param lpVersionInfo cast=(LPOSVERSIONINFOW)
       def _get_version_ex_w(lp_version_info)
         JNI.__send__("Java_org_eclipse_swt_internal_win32_OS_GetVersionExW__L#{OSVERSIONINFOEXW.jni_name}_2".to_sym, JNI.env, self.jni_id, lp_version_info.jni_id) != 0
       end
       
       JNI.native_method "Java_org_eclipse_swt_internal_win32_OS_GetVersionExA__L#{OSVERSIONINFOEXA.jni_name}_2".to_sym, [:pointer, :long, :long], :int8
       typesig { [OSVERSIONINFOEXA] }
+      # @param lpVersionInfo cast=(LPOSVERSIONINFOA)
       def _get_version_ex_a(lp_version_info)
         JNI.__send__("Java_org_eclipse_swt_internal_win32_OS_GetVersionExA__L#{OSVERSIONINFOEXA.jni_name}_2".to_sym, JNI.env, self.jni_id, lp_version_info.jni_id) != 0
       end
@@ -10700,6 +11542,7 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_GetWindow, [:pointer, :long, :int32, :int32], :int32
       typesig { [::Java::Int, ::Java::Int] }
+      # @param hWnd cast=(HWND)
       # long
       # long
       def _get_window(h_wnd, u_cmd)
@@ -10708,6 +11551,7 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_GetWindowLongW, [:pointer, :long, :int32, :int32], :int32
       typesig { [::Java::Int, ::Java::Int] }
+      # @param hWnd cast=(HWND)
       # long
       def _get_window_long_w(h_wnd, n_index)
         JNI.__send__(:Java_org_eclipse_swt_internal_win32_OS_GetWindowLongW, JNI.env, self.jni_id, h_wnd.to_int, n_index.to_int)
@@ -10715,6 +11559,7 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_GetWindowLongA, [:pointer, :long, :int32, :int32], :int32
       typesig { [::Java::Int, ::Java::Int] }
+      # @param hWnd cast=(HWND)
       # long
       def _get_window_long_a(h_wnd, n_index)
         JNI.__send__(:Java_org_eclipse_swt_internal_win32_OS_GetWindowLongA, JNI.env, self.jni_id, h_wnd.to_int, n_index.to_int)
@@ -10722,6 +11567,7 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_GetWindowLongPtrW, [:pointer, :long, :int32, :int32], :int32
       typesig { [::Java::Int, ::Java::Int] }
+      # @param hWnd cast=(HWND)
       # long
       # long
       def _get_window_long_ptr_w(h_wnd, n_index)
@@ -10730,6 +11576,7 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_GetWindowLongPtrA, [:pointer, :long, :int32, :int32], :int32
       typesig { [::Java::Int, ::Java::Int] }
+      # @param hWnd cast=(HWND)
       # long
       # long
       def _get_window_long_ptr_a(h_wnd, n_index)
@@ -10738,6 +11585,7 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_GetWindowDC, [:pointer, :long, :int32], :int32
       typesig { [::Java::Int] }
+      # @param hWnd cast=(HWND)
       # long
       # long
       def _get_window_dc(h_wnd)
@@ -10746,6 +11594,7 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_GetWindowOrgEx, [:pointer, :long, :int32, :long], :int8
       typesig { [::Java::Int, POINT] }
+      # @param hdc cast=(HDC)
       # long
       def _get_window_org_ex(hdc, lp_point)
         JNI.__send__(:Java_org_eclipse_swt_internal_win32_OS_GetWindowOrgEx, JNI.env, self.jni_id, hdc.to_int, lp_point.jni_id) != 0
@@ -10753,6 +11602,7 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_GetWindowPlacement, [:pointer, :long, :int32, :long], :int8
       typesig { [::Java::Int, WINDOWPLACEMENT] }
+      # @param hWnd cast=(HWND)
       # long
       def _get_window_placement(h_wnd, lpwndpl)
         JNI.__send__(:Java_org_eclipse_swt_internal_win32_OS_GetWindowPlacement, JNI.env, self.jni_id, h_wnd.to_int, lpwndpl.jni_id) != 0
@@ -10760,6 +11610,7 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_GetWindowRect, [:pointer, :long, :int32, :long], :int8
       typesig { [::Java::Int, RECT] }
+      # @param hWnd cast=(HWND)
       # long
       def _get_window_rect(h_wnd, lp_rect)
         JNI.__send__(:Java_org_eclipse_swt_internal_win32_OS_GetWindowRect, JNI.env, self.jni_id, h_wnd.to_int, lp_rect.jni_id) != 0
@@ -10767,6 +11618,9 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_GetWindowRgn, [:pointer, :long, :int32, :int32], :int32
       typesig { [::Java::Int, ::Java::Int] }
+      # @param hWnd cast=(HWND)
+      # @param hRgn cast=(HRGN)
+      # 
       # long
       # long
       def _get_window_rgn(h_wnd, h_rgn)
@@ -10775,6 +11629,9 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_GetWindowTextW, [:pointer, :long, :int32, :long, :int32], :int32
       typesig { [::Java::Int, Array.typed(::Java::Char), ::Java::Int] }
+      # @param hWnd cast=(HWND)
+      # @param lpString cast=(LPWSTR)
+      # 
       # long
       def _get_window_text_w(h_wnd, lp_string, n_max_count)
         JNI.__send__(:Java_org_eclipse_swt_internal_win32_OS_GetWindowTextW, JNI.env, self.jni_id, h_wnd.to_int, lp_string.jni_id, n_max_count.to_int)
@@ -10782,6 +11639,9 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_GetWindowTextA, [:pointer, :long, :int32, :long, :int32], :int32
       typesig { [::Java::Int, Array.typed(::Java::Byte), ::Java::Int] }
+      # @param hWnd cast=(HWND)
+      # @param lpString cast=(LPSTR)
+      # 
       # long
       def _get_window_text_a(h_wnd, lp_string, n_max_count)
         JNI.__send__(:Java_org_eclipse_swt_internal_win32_OS_GetWindowTextA, JNI.env, self.jni_id, h_wnd.to_int, lp_string.jni_id, n_max_count.to_int)
@@ -10789,6 +11649,7 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_GetWindowTextLengthW, [:pointer, :long, :int32], :int32
       typesig { [::Java::Int] }
+      # @param hWnd cast=(HWND)
       # long
       def _get_window_text_length_w(h_wnd)
         JNI.__send__(:Java_org_eclipse_swt_internal_win32_OS_GetWindowTextLengthW, JNI.env, self.jni_id, h_wnd.to_int)
@@ -10796,6 +11657,7 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_GetWindowTextLengthA, [:pointer, :long, :int32], :int32
       typesig { [::Java::Int] }
+      # @param hWnd cast=(HWND)
       # long
       def _get_window_text_length_a(h_wnd)
         JNI.__send__(:Java_org_eclipse_swt_internal_win32_OS_GetWindowTextLengthA, JNI.env, self.jni_id, h_wnd.to_int)
@@ -10803,6 +11665,9 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_GetWindowTheme, [:pointer, :long, :int32], :int32
       typesig { [::Java::Int] }
+      # @method flags=dynamic
+      # @param hWnd cast=(HWND)
+      # 
       # long
       # long
       def _get_window_theme(h_wnd)
@@ -10811,6 +11676,9 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_GetWindowThreadProcessId, [:pointer, :long, :int32, :long], :int32
       typesig { [::Java::Int, Array.typed(::Java::Int)] }
+      # @param hWnd cast=(HWND)
+      # @param lpdwProcessId cast=(LPDWORD)
+      # 
       # long
       def _get_window_thread_process_id(h_wnd, lpdw_process_id)
         JNI.__send__(:Java_org_eclipse_swt_internal_win32_OS_GetWindowThreadProcessId, JNI.env, self.jni_id, h_wnd.to_int, lpdw_process_id.jni_id)
@@ -10818,6 +11686,9 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_GetWorldTransform, [:pointer, :long, :int32, :long], :int8
       typesig { [::Java::Int, Array.typed(::Java::Float)] }
+      # @param hdc cast=(HDC)
+      # @param lpXform cast=(LPXFORM)
+      # 
       # long
       def _get_world_transform(hdc, lp_xform)
         JNI.__send__(:Java_org_eclipse_swt_internal_win32_OS_GetWorldTransform, JNI.env, self.jni_id, hdc.to_int, lp_xform.jni_id) != 0
@@ -10825,12 +11696,14 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_GlobalAddAtomW, [:pointer, :long, :long], :int32
       typesig { [Array.typed(::Java::Char)] }
+      # @param lpString cast=(LPCWSTR)
       def _global_add_atom_w(lp_string)
         JNI.__send__(:Java_org_eclipse_swt_internal_win32_OS_GlobalAddAtomW, JNI.env, self.jni_id, lp_string.jni_id)
       end
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_GlobalAddAtomA, [:pointer, :long, :long], :int32
       typesig { [Array.typed(::Java::Byte)] }
+      # @param lpString cast=(LPCTSTR)
       def _global_add_atom_a(lp_string)
         JNI.__send__(:Java_org_eclipse_swt_internal_win32_OS_GlobalAddAtomA, JNI.env, self.jni_id, lp_string.jni_id)
       end
@@ -10844,6 +11717,7 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_GlobalFree, [:pointer, :long, :int32], :int32
       typesig { [::Java::Int] }
+      # @param hMem cast=(HANDLE)
       # long
       # long
       def _global_free(h_mem)
@@ -10852,6 +11726,7 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_GlobalLock, [:pointer, :long, :int32], :int32
       typesig { [::Java::Int] }
+      # @param hMem cast=(HANDLE)
       # long
       # long
       def _global_lock(h_mem)
@@ -10860,6 +11735,7 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_GlobalSize, [:pointer, :long, :int32], :int32
       typesig { [::Java::Int] }
+      # @param hMem cast=(HANDLE)
       # long
       def _global_size(h_mem)
         JNI.__send__(:Java_org_eclipse_swt_internal_win32_OS_GlobalSize, JNI.env, self.jni_id, h_mem.to_int)
@@ -10867,6 +11743,7 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_GlobalUnlock, [:pointer, :long, :int32], :int8
       typesig { [::Java::Int] }
+      # @param hMem cast=(HANDLE)
       # long
       def _global_unlock(h_mem)
         JNI.__send__(:Java_org_eclipse_swt_internal_win32_OS_GlobalUnlock, JNI.env, self.jni_id, h_mem.to_int) != 0
@@ -10874,6 +11751,14 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_GradientFill, [:pointer, :long, :int32, :int32, :int32, :int32, :int32, :int32], :int8
       typesig { [::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int] }
+      # @method flags=dynamic
+      # @param hdc cast=(HDC)
+      # @param pVertex cast=(PTRIVERTEX)
+      # @param dwNumVertex cast=(ULONG)
+      # @param pMesh cast=(PVOID)
+      # @param dwNumMesh cast=(ULONG)
+      # @param dwMode cast=(ULONG)
+      # 
       # long
       # long
       # long
@@ -10890,6 +11775,7 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_HeapAlloc, [:pointer, :long, :int32, :int32, :int32], :int32
       typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
+      # @param hHeap cast=(HANDLE)
       # long
       # long
       def _heap_alloc(h_heap, dw_flags, dw_bytes)
@@ -10898,6 +11784,9 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_HeapFree, [:pointer, :long, :int32, :int32, :int32], :int8
       typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
+      # @param hHeap cast=(HANDLE)
+      # @param lpMem cast=(LPVOID)
+      # 
       # long
       # long
       def _heap_free(h_heap, dw_flags, lp_mem)
@@ -10906,6 +11795,9 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_HeapValidate, [:pointer, :long, :int32, :int32, :int32], :int8
       typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
+      # @param hHeap cast=(HANDLE)
+      # @param lpMem cast=(LPCVOID)
+      # 
       # long
       # long
       def _heap_validate(h_heap, dw_flags, lp_mem)
@@ -10914,6 +11806,7 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_HideCaret, [:pointer, :long, :int32], :int8
       typesig { [::Java::Int] }
+      # @param hWnd cast=(HWND)
       # long
       def _hide_caret(h_wnd)
         JNI.__send__(:Java_org_eclipse_swt_internal_win32_OS_HideCaret, JNI.env, self.jni_id, h_wnd.to_int) != 0
@@ -10921,6 +11814,9 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_HitTestThemeBackground, [:pointer, :long, :int32, :int32, :int32, :int32, :int32, :long, :int32, :long, :long], :int32
       typesig { [::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, RECT, ::Java::Int, POINT, Array.typed(::Java::Short)] }
+      # @method flags=dynamic
+      # @param ptTest flags=struct
+      # 
       # long
       # long
       # long
@@ -10930,12 +11826,18 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_IIDFromString, [:pointer, :long, :long, :long], :int32
       typesig { [Array.typed(::Java::Char), Array.typed(::Java::Byte)] }
+      # @param lpsz cast=(LPOLESTR)
+      # @param lpiid cast=(LPIID)
       def _iidfrom_string(lpsz, lpiid)
         JNI.__send__(:Java_org_eclipse_swt_internal_win32_OS_IIDFromString, JNI.env, self.jni_id, lpsz.jni_id, lpiid.jni_id)
       end
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_ImageList_1Add, [:pointer, :long, :int32, :int32, :int32], :int32
       typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
+      # @param himl cast=(HIMAGELIST)
+      # @param hbmImage cast=(HBITMAP)
+      # @param hbmMask cast=(HBITMAP)
+      # 
       # long
       # long
       # long
@@ -10945,6 +11847,10 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_ImageList_1AddMasked, [:pointer, :long, :int32, :int32, :int32], :int32
       typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
+      # @param himl cast=(HIMAGELIST)
+      # @param hbmImage cast=(HBITMAP)
+      # @param crMask cast=(COLORREF)
+      # 
       # long
       # long
       def _image_list_add_masked(himl, hbm_image, cr_mask)
@@ -10953,6 +11859,7 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_ImageList_1BeginDrag, [:pointer, :long, :int32, :int32, :int32, :int32], :int8
       typesig { [::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int] }
+      # @param himl cast=(HIMAGELIST)
       # long
       def _image_list_begin_drag(himl, i_track, dx_hotspot, dy_hotspot)
         JNI.__send__(:Java_org_eclipse_swt_internal_win32_OS_ImageList_1BeginDrag, JNI.env, self.jni_id, himl.to_int, i_track.to_int, dx_hotspot.to_int, dy_hotspot.to_int) != 0
@@ -10967,6 +11874,7 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_ImageList_1Destroy, [:pointer, :long, :int32], :int8
       typesig { [::Java::Int] }
+      # @param himl cast=(HIMAGELIST)
       # long
       def _image_list_destroy(himl)
         JNI.__send__(:Java_org_eclipse_swt_internal_win32_OS_ImageList_1Destroy, JNI.env, self.jni_id, himl.to_int) != 0
@@ -10974,6 +11882,7 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_ImageList_1DragEnter, [:pointer, :long, :int32, :int32, :int32], :int8
       typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
+      # @param hwndLock cast=(HWND)
       # long
       def _image_list_drag_enter(hwnd_lock, x, y)
         JNI.__send__(:Java_org_eclipse_swt_internal_win32_OS_ImageList_1DragEnter, JNI.env, self.jni_id, hwnd_lock.to_int, x.to_int, y.to_int) != 0
@@ -10981,6 +11890,7 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_ImageList_1DragLeave, [:pointer, :long, :int32], :int8
       typesig { [::Java::Int] }
+      # @param hwndLock cast=(HWND)
       # long
       def _image_list_drag_leave(hwnd_lock)
         JNI.__send__(:Java_org_eclipse_swt_internal_win32_OS_ImageList_1DragLeave, JNI.env, self.jni_id, hwnd_lock.to_int) != 0
@@ -10994,12 +11904,17 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_ImageList_1DragShowNolock, [:pointer, :long, :int8], :int8
       typesig { [::Java::Boolean] }
+      # @param fShow cast=(BOOL)
       def _image_list_drag_show_nolock(f_show)
         JNI.__send__(:Java_org_eclipse_swt_internal_win32_OS_ImageList_1DragShowNolock, JNI.env, self.jni_id, f_show ? 1 : 0) != 0
       end
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_ImageList_1Draw, [:pointer, :long, :int32, :int32, :int32, :int32, :int32, :int32], :int8
       typesig { [::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int] }
+      # @param himl cast=(HIMAGELIST)
+      # @param hdcDst cast=(HDC)
+      # @param fStyle cast=(UINT)
+      # 
       # long
       # long
       def _image_list_draw(himl, i, hdc_dst, x, y, f_style)
@@ -11014,6 +11929,9 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_ImageList_1GetDragImage, [:pointer, :long, :long, :long], :int32
       typesig { [POINT, POINT] }
+      # @param ppt cast=(POINT *)
+      # @param pptHotspot cast=(POINT *)
+      # 
       # long
       def _image_list_get_drag_image(ppt, ppt_hotspot)
         JNI.__send__(:Java_org_eclipse_swt_internal_win32_OS_ImageList_1GetDragImage, JNI.env, self.jni_id, ppt.jni_id, ppt_hotspot.jni_id)
@@ -11021,6 +11939,7 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_ImageList_1GetIcon, [:pointer, :long, :int32, :int32, :int32], :int32
       typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
+      # @param himl cast=(HIMAGELIST)
       # long
       # long
       def _image_list_get_icon(himl, i, flags)
@@ -11029,6 +11948,10 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_ImageList_1GetIconSize, [:pointer, :long, :int32, :long, :long], :int8
       typesig { [::Java::Int, Array.typed(::Java::Int), Array.typed(::Java::Int)] }
+      # @param himl cast=(HIMAGELIST)
+      # @param cx cast=(int *)
+      # @param cy cast=(int *)
+      # 
       # long
       def _image_list_get_icon_size(himl, cx, cy)
         JNI.__send__(:Java_org_eclipse_swt_internal_win32_OS_ImageList_1GetIconSize, JNI.env, self.jni_id, himl.to_int, cx.jni_id, cy.jni_id) != 0
@@ -11036,6 +11959,7 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_ImageList_1GetImageCount, [:pointer, :long, :int32], :int32
       typesig { [::Java::Int] }
+      # @param himl cast=(HIMAGELIST)
       # long
       def _image_list_get_image_count(himl)
         JNI.__send__(:Java_org_eclipse_swt_internal_win32_OS_ImageList_1GetImageCount, JNI.env, self.jni_id, himl.to_int)
@@ -11043,6 +11967,7 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_ImageList_1Remove, [:pointer, :long, :int32, :int32], :int8
       typesig { [::Java::Int, ::Java::Int] }
+      # @param himl cast=(HIMAGELIST)
       # long
       def _image_list_remove(himl, i)
         JNI.__send__(:Java_org_eclipse_swt_internal_win32_OS_ImageList_1Remove, JNI.env, self.jni_id, himl.to_int, i.to_int) != 0
@@ -11050,6 +11975,10 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_ImageList_1Replace, [:pointer, :long, :int32, :int32, :int32, :int32], :int8
       typesig { [::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int] }
+      # @param himl cast=(HIMAGELIST)
+      # @param hbmImage cast=(HBITMAP)
+      # @param hbmMask cast=(HBITMAP)
+      # 
       # long
       # long
       # long
@@ -11059,6 +11988,9 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_ImageList_1ReplaceIcon, [:pointer, :long, :int32, :int32, :int32], :int32
       typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
+      # @param himl cast=(HIMAGELIST)
+      # @param hicon cast=(HICON)
+      # 
       # long
       # long
       def _image_list_replace_icon(himl, i, hicon)
@@ -11067,6 +11999,7 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_ImageList_1SetIconSize, [:pointer, :long, :int32, :int32, :int32], :int8
       typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
+      # @param himl cast=(HIMAGELIST)
       # long
       def _image_list_set_icon_size(himl, cx, cy)
         JNI.__send__(:Java_org_eclipse_swt_internal_win32_OS_ImageList_1SetIconSize, JNI.env, self.jni_id, himl.to_int, cx.to_int, cy.to_int) != 0
@@ -11074,6 +12007,9 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_ImmAssociateContext, [:pointer, :long, :int32, :int32], :int32
       typesig { [::Java::Int, ::Java::Int] }
+      # @param hWnd cast=(HWND)
+      # @param hIMC cast=(HIMC)
+      # 
       # long
       # long
       # long
@@ -11090,6 +12026,7 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_ImmDestroyContext, [:pointer, :long, :int32], :int8
       typesig { [::Java::Int] }
+      # @param hIMC cast=(HIMC)
       # long
       def _imm_destroy_context(h_imc)
         JNI.__send__(:Java_org_eclipse_swt_internal_win32_OS_ImmDestroyContext, JNI.env, self.jni_id, h_imc.to_int) != 0
@@ -11097,12 +12034,14 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_ImmDisableTextFrameService, [:pointer, :long, :int32], :int8
       typesig { [::Java::Int] }
+      # @method flags=dynamic
       def _imm_disable_text_frame_service(id_thread)
         JNI.__send__(:Java_org_eclipse_swt_internal_win32_OS_ImmDisableTextFrameService, JNI.env, self.jni_id, id_thread.to_int) != 0
       end
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_ImmGetCompositionFontW, [:pointer, :long, :int32, :long], :int8
       typesig { [::Java::Int, LOGFONTW] }
+      # @param hIMC cast=(HIMC)
       # long
       def _imm_get_composition_font_w(h_imc, lplf)
         JNI.__send__(:Java_org_eclipse_swt_internal_win32_OS_ImmGetCompositionFontW, JNI.env, self.jni_id, h_imc.to_int, lplf.jni_id) != 0
@@ -11110,6 +12049,7 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_ImmGetCompositionFontA, [:pointer, :long, :int32, :long], :int8
       typesig { [::Java::Int, LOGFONTA] }
+      # @param hIMC cast=(HIMC)
       # long
       def _imm_get_composition_font_a(h_imc, lplf)
         JNI.__send__(:Java_org_eclipse_swt_internal_win32_OS_ImmGetCompositionFontA, JNI.env, self.jni_id, h_imc.to_int, lplf.jni_id) != 0
@@ -11117,27 +12057,57 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_ImmGetCompositionStringW__II_3CI, [:pointer, :long, :int32, :int32, :long, :int32], :int32
       typesig { [::Java::Int, ::Java::Int, Array.typed(::Java::Char), ::Java::Int] }
+      # @param hIMC cast=(HIMC)
+      # @param lpBuf cast=(LPWSTR)
+      # 
       # long
       def _imm_get_composition_string_w(h_imc, dw_index, lp_buf, dw_buf_len)
         JNI.__send__(:Java_org_eclipse_swt_internal_win32_OS_ImmGetCompositionStringW__II_3CI, JNI.env, self.jni_id, h_imc.to_int, dw_index.to_int, lp_buf.jni_id, dw_buf_len.to_int)
       end
       
-      JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_ImmGetCompositionStringA, [:pointer, :long, :int32, :int32, :long, :int32], :int32
+      JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_ImmGetCompositionStringA__II_3BI, [:pointer, :long, :int32, :int32, :long, :int32], :int32
       typesig { [::Java::Int, ::Java::Int, Array.typed(::Java::Byte), ::Java::Int] }
+      # @param hIMC cast=(HIMC)
+      # @param lpBuf cast=(LPSTR)
+      # 
       # long
       def _imm_get_composition_string_a(h_imc, dw_index, lp_buf, dw_buf_len)
-        JNI.__send__(:Java_org_eclipse_swt_internal_win32_OS_ImmGetCompositionStringA, JNI.env, self.jni_id, h_imc.to_int, dw_index.to_int, lp_buf.jni_id, dw_buf_len.to_int)
+        JNI.__send__(:Java_org_eclipse_swt_internal_win32_OS_ImmGetCompositionStringA__II_3BI, JNI.env, self.jni_id, h_imc.to_int, dw_index.to_int, lp_buf.jni_id, dw_buf_len.to_int)
       end
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_ImmGetCompositionStringW__II_3II, [:pointer, :long, :int32, :int32, :long, :int32], :int32
       typesig { [::Java::Int, ::Java::Int, Array.typed(::Java::Int), ::Java::Int] }
+      # @param hIMC cast=(HIMC)
+      # @param lpBuf cast=(LPWSTR)
+      # 
       # long
       def _imm_get_composition_string_w(h_imc, dw_index, lp_buf, dw_buf_len)
         JNI.__send__(:Java_org_eclipse_swt_internal_win32_OS_ImmGetCompositionStringW__II_3II, JNI.env, self.jni_id, h_imc.to_int, dw_index.to_int, lp_buf.jni_id, dw_buf_len.to_int)
       end
       
+      JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_ImmGetCompositionStringA__II_3II, [:pointer, :long, :int32, :int32, :long, :int32], :int32
+      typesig { [::Java::Int, ::Java::Int, Array.typed(::Java::Int), ::Java::Int] }
+      # @param hIMC cast=(HIMC)
+      # @param lpBuf cast=(LPWSTR)
+      # 
+      # long
+      def _imm_get_composition_string_a(h_imc, dw_index, lp_buf, dw_buf_len)
+        JNI.__send__(:Java_org_eclipse_swt_internal_win32_OS_ImmGetCompositionStringA__II_3II, JNI.env, self.jni_id, h_imc.to_int, dw_index.to_int, lp_buf.jni_id, dw_buf_len.to_int)
+      end
+      
+      JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_ImmGetCompositionStringW__II_3BI, [:pointer, :long, :int32, :int32, :long, :int32], :int32
+      typesig { [::Java::Int, ::Java::Int, Array.typed(::Java::Byte), ::Java::Int] }
+      # @param hIMC cast=(HIMC)
+      # @param lpBuf cast=(LPWSTR)
+      # 
+      # long
+      def _imm_get_composition_string_w(h_imc, dw_index, lp_buf, dw_buf_len)
+        JNI.__send__(:Java_org_eclipse_swt_internal_win32_OS_ImmGetCompositionStringW__II_3BI, JNI.env, self.jni_id, h_imc.to_int, dw_index.to_int, lp_buf.jni_id, dw_buf_len.to_int)
+      end
+      
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_ImmGetContext, [:pointer, :long, :int32], :int32
       typesig { [::Java::Int] }
+      # @param hWnd cast=(HWND)
       # long
       # long
       def _imm_get_context(h_wnd)
@@ -11146,6 +12116,10 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_ImmGetConversionStatus, [:pointer, :long, :int32, :long, :long], :int8
       typesig { [::Java::Int, Array.typed(::Java::Int), Array.typed(::Java::Int)] }
+      # @param hIMC cast=(HIMC)
+      # @param lpfdwConversion cast=(LPDWORD)
+      # @param lpfdwSentence cast=(LPDWORD)
+      # 
       # long
       def _imm_get_conversion_status(h_imc, lpfdw_conversion, lpfdw_sentence)
         JNI.__send__(:Java_org_eclipse_swt_internal_win32_OS_ImmGetConversionStatus, JNI.env, self.jni_id, h_imc.to_int, lpfdw_conversion.jni_id, lpfdw_sentence.jni_id) != 0
@@ -11153,6 +12127,7 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_ImmGetDefaultIMEWnd, [:pointer, :long, :int32], :int32
       typesig { [::Java::Int] }
+      # @param hWnd cast=(HWND)
       # long
       # long
       def _imm_get_default_imewnd(h_wnd)
@@ -11161,6 +12136,7 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_ImmGetOpenStatus, [:pointer, :long, :int32], :int8
       typesig { [::Java::Int] }
+      # @param hIMC cast=(HIMC)
       # long
       def _imm_get_open_status(h_imc)
         JNI.__send__(:Java_org_eclipse_swt_internal_win32_OS_ImmGetOpenStatus, JNI.env, self.jni_id, h_imc.to_int) != 0
@@ -11168,6 +12144,7 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_ImmNotifyIME, [:pointer, :long, :int32, :int32, :int32, :int32], :int8
       typesig { [::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int] }
+      # @param hIMC cast=(HIMC)
       # long
       def _imm_notify_ime(h_imc, dw_action, dw_index, dw_value)
         JNI.__send__(:Java_org_eclipse_swt_internal_win32_OS_ImmNotifyIME, JNI.env, self.jni_id, h_imc.to_int, dw_action.to_int, dw_index.to_int, dw_value.to_int) != 0
@@ -11175,6 +12152,9 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_ImmReleaseContext, [:pointer, :long, :int32, :int32], :int8
       typesig { [::Java::Int, ::Java::Int] }
+      # @param hWnd cast=(HWND)
+      # @param hIMC cast=(HIMC)
+      # 
       # long
       # long
       def _imm_release_context(h_wnd, h_imc)
@@ -11183,6 +12163,7 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_ImmSetCompositionFontW, [:pointer, :long, :int32, :long], :int8
       typesig { [::Java::Int, LOGFONTW] }
+      # @param hIMC cast=(HIMC)
       # long
       def _imm_set_composition_font_w(h_imc, lplf)
         JNI.__send__(:Java_org_eclipse_swt_internal_win32_OS_ImmSetCompositionFontW, JNI.env, self.jni_id, h_imc.to_int, lplf.jni_id) != 0
@@ -11190,6 +12171,7 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_ImmSetCompositionFontA, [:pointer, :long, :int32, :long], :int8
       typesig { [::Java::Int, LOGFONTA] }
+      # @param hIMC cast=(HIMC)
       # long
       def _imm_set_composition_font_a(h_imc, lplf)
         JNI.__send__(:Java_org_eclipse_swt_internal_win32_OS_ImmSetCompositionFontA, JNI.env, self.jni_id, h_imc.to_int, lplf.jni_id) != 0
@@ -11197,6 +12179,7 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_ImmSetCompositionWindow, [:pointer, :long, :int32, :long], :int8
       typesig { [::Java::Int, COMPOSITIONFORM] }
+      # @param hIMC cast=(HIMC)
       # long
       def _imm_set_composition_window(h_imc, lp_comp_form)
         JNI.__send__(:Java_org_eclipse_swt_internal_win32_OS_ImmSetCompositionWindow, JNI.env, self.jni_id, h_imc.to_int, lp_comp_form.jni_id) != 0
@@ -11204,6 +12187,7 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_ImmSetCandidateWindow, [:pointer, :long, :int32, :long], :int8
       typesig { [::Java::Int, CANDIDATEFORM] }
+      # @param hIMC cast=(HIMC)
       # long
       def _imm_set_candidate_window(h_imc, lp_candidate)
         JNI.__send__(:Java_org_eclipse_swt_internal_win32_OS_ImmSetCandidateWindow, JNI.env, self.jni_id, h_imc.to_int, lp_candidate.jni_id) != 0
@@ -11211,6 +12195,7 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_ImmSetConversionStatus, [:pointer, :long, :int32, :int32, :int32], :int8
       typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
+      # @param hIMC cast=(HIMC)
       # long
       def _imm_set_conversion_status(h_imc, fdw_conversion, dw_sentence)
         JNI.__send__(:Java_org_eclipse_swt_internal_win32_OS_ImmSetConversionStatus, JNI.env, self.jni_id, h_imc.to_int, fdw_conversion.to_int, dw_sentence.to_int) != 0
@@ -11218,6 +12203,7 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_ImmSetOpenStatus, [:pointer, :long, :int32, :int8], :int8
       typesig { [::Java::Int, ::Java::Boolean] }
+      # @param hIMC cast=(HIMC)
       # long
       def _imm_set_open_status(h_imc, f_open)
         JNI.__send__(:Java_org_eclipse_swt_internal_win32_OS_ImmSetOpenStatus, JNI.env, self.jni_id, h_imc.to_int, f_open ? 1 : 0) != 0
@@ -11243,6 +12229,7 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_InsertMenuW, [:pointer, :long, :int32, :int32, :int32, :int32, :long], :int8
       typesig { [::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, Array.typed(::Java::Char)] }
+      # @param hMenu cast=(HMENU)
       # long
       # long
       def _insert_menu_w(h_menu, u_position, u_flags, u_idnew_item, lp_new_item)
@@ -11251,6 +12238,7 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_InsertMenuA, [:pointer, :long, :int32, :int32, :int32, :int32, :long], :int8
       typesig { [::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, Array.typed(::Java::Byte)] }
+      # @param hMenu cast=(HMENU)
       # long
       # long
       def _insert_menu_a(h_menu, u_position, u_flags, u_idnew_item, lp_new_item)
@@ -11259,6 +12247,9 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_InsertMenuItemW, [:pointer, :long, :int32, :int32, :int8, :long], :int8
       typesig { [::Java::Int, ::Java::Int, ::Java::Boolean, MENUITEMINFO] }
+      # @param hMenu cast=(HMENU)
+      # @param lpmii cast=(LPMENUITEMINFOW)
+      # 
       # long
       def _insert_menu_item_w(h_menu, u_item, f_by_position, lpmii)
         JNI.__send__(:Java_org_eclipse_swt_internal_win32_OS_InsertMenuItemW, JNI.env, self.jni_id, h_menu.to_int, u_item.to_int, f_by_position ? 1 : 0, lpmii.jni_id) != 0
@@ -11266,13 +12257,55 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_InsertMenuItemA, [:pointer, :long, :int32, :int32, :int8, :long], :int8
       typesig { [::Java::Int, ::Java::Int, ::Java::Boolean, MENUITEMINFO] }
+      # @param hMenu cast=(HMENU)
       # long
       def _insert_menu_item_a(h_menu, u_item, f_by_position, lpmii)
         JNI.__send__(:Java_org_eclipse_swt_internal_win32_OS_InsertMenuItemA, JNI.env, self.jni_id, h_menu.to_int, u_item.to_int, f_by_position ? 1 : 0, lpmii.jni_id) != 0
       end
       
+      JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_InternetGetCookieA, [:pointer, :long, :long, :long, :long, :long], :int8
+      typesig { [Array.typed(::Java::Byte), Array.typed(::Java::Byte), Array.typed(::Java::Byte), Array.typed(::Java::Int)] }
+      # @param lpszUrl cast=(LPCTSTR)
+      # @param lpszCookieName cast=(LPCTSTR)
+      # @param lpszCookieData cast=(LPSTR)
+      # @param lpdwSize cast=(LPDWORD)
+      def _internet_get_cookie_a(lpsz_url, lpsz_cookie_name, lpsz_cookie_data, lpdw_size)
+        JNI.__send__(:Java_org_eclipse_swt_internal_win32_OS_InternetGetCookieA, JNI.env, self.jni_id, lpsz_url.jni_id, lpsz_cookie_name.jni_id, lpsz_cookie_data.jni_id, lpdw_size.jni_id) != 0
+      end
+      
+      JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_InternetGetCookieW, [:pointer, :long, :long, :long, :long, :long], :int8
+      typesig { [Array.typed(::Java::Char), Array.typed(::Java::Char), Array.typed(::Java::Char), Array.typed(::Java::Int)] }
+      # @param lpszUrl cast=(LPCWSTR)
+      # @param lpszCookieName cast=(LPCWSTR)
+      # @param lpszCookieData cast=(LPWSTR)
+      # @param lpdwSize cast=(LPDWORD)
+      def _internet_get_cookie_w(lpsz_url, lpsz_cookie_name, lpsz_cookie_data, lpdw_size)
+        JNI.__send__(:Java_org_eclipse_swt_internal_win32_OS_InternetGetCookieW, JNI.env, self.jni_id, lpsz_url.jni_id, lpsz_cookie_name.jni_id, lpsz_cookie_data.jni_id, lpdw_size.jni_id) != 0
+      end
+      
+      JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_InternetSetCookieA, [:pointer, :long, :long, :long, :long], :int8
+      typesig { [Array.typed(::Java::Byte), Array.typed(::Java::Byte), Array.typed(::Java::Byte)] }
+      # @param lpszUrl cast=(LPCTSTR)
+      # @param lpszCookieName cast=(LPCTSTR)
+      # @param lpszCookieData cast=(LPCTSTR)
+      def _internet_set_cookie_a(lpsz_url, lpsz_cookie_name, lpsz_cookie_data)
+        JNI.__send__(:Java_org_eclipse_swt_internal_win32_OS_InternetSetCookieA, JNI.env, self.jni_id, lpsz_url.jni_id, lpsz_cookie_name.jni_id, lpsz_cookie_data.jni_id) != 0
+      end
+      
+      JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_InternetSetCookieW, [:pointer, :long, :long, :long, :long], :int8
+      typesig { [Array.typed(::Java::Char), Array.typed(::Java::Char), Array.typed(::Java::Char)] }
+      # @param lpszUrl cast=(LPCWSTR)
+      # @param lpszCookieName cast=(LPCWSTR)
+      # @param lpszCookieData cast=(LPCWSTR)
+      def _internet_set_cookie_w(lpsz_url, lpsz_cookie_name, lpsz_cookie_data)
+        JNI.__send__(:Java_org_eclipse_swt_internal_win32_OS_InternetSetCookieW, JNI.env, self.jni_id, lpsz_url.jni_id, lpsz_cookie_name.jni_id, lpsz_cookie_data.jni_id) != 0
+      end
+      
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_InternetSetOption, [:pointer, :long, :int32, :int32, :int32, :int32], :int8
       typesig { [::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int] }
+      # @param hInternet cast=(HINTERNET)
+      # @param lpBuffer cast=(LPVOID)
+      # 
       # long
       # long
       def _internet_set_option(h_internet, dw_option, lp_buffer, dw_buffer_length)
@@ -11281,6 +12314,7 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_IntersectClipRect, [:pointer, :long, :int32, :int32, :int32, :int32, :int32], :int32
       typesig { [::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int] }
+      # @param hdc cast=(HDC)
       # long
       def _intersect_clip_rect(hdc, n_left_rect, n_top_rect, n_right_rect, n_bottom_rect)
         JNI.__send__(:Java_org_eclipse_swt_internal_win32_OS_IntersectClipRect, JNI.env, self.jni_id, hdc.to_int, n_left_rect.to_int, n_top_rect.to_int, n_right_rect.to_int, n_bottom_rect.to_int)
@@ -11288,12 +12322,16 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_IntersectRect, [:pointer, :long, :long, :long, :long], :int8
       typesig { [RECT, RECT, RECT] }
+      # @param lprcDst flags=no_in
+      # @param lprcSrc1 flags=no_out
+      # @param lprcSrc2 flags=no_out
       def _intersect_rect(lprc_dst, lprc_src1, lprc_src2)
         JNI.__send__(:Java_org_eclipse_swt_internal_win32_OS_IntersectRect, JNI.env, self.jni_id, lprc_dst.jni_id, lprc_src1.jni_id, lprc_src2.jni_id) != 0
       end
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_InvalidateRect, [:pointer, :long, :int32, :long, :int8], :int8
       typesig { [::Java::Int, RECT, ::Java::Boolean] }
+      # @param hWnd cast=(HWND)
       # long
       def _invalidate_rect(h_wnd, lp_rect, b_erase)
         JNI.__send__(:Java_org_eclipse_swt_internal_win32_OS_InvalidateRect, JNI.env, self.jni_id, h_wnd.to_int, lp_rect.jni_id, b_erase ? 1 : 0) != 0
@@ -11301,6 +12339,9 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_InvalidateRgn, [:pointer, :long, :int32, :int32, :int8], :int8
       typesig { [::Java::Int, ::Java::Int, ::Java::Boolean] }
+      # @param hWnd cast=(HWND)
+      # @param hRgn cast=(HRGN)
+      # 
       # long
       # long
       def _invalidate_rgn(h_wnd, h_rgn, b_erase)
@@ -11309,12 +12350,16 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_IsAppThemed, [:pointer, :long], :int8
       typesig { [] }
+      # @method flags=dynamic
       def _is_app_themed
         JNI.__send__(:Java_org_eclipse_swt_internal_win32_OS_IsAppThemed, JNI.env, self.jni_id) != 0
       end
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_IsBadReadPtr, [:pointer, :long, :int32, :int32], :int8
       typesig { [::Java::Int, ::Java::Int] }
+      # @param lp cast=(LPVOID)
+      # @param ucb cast=(UINT_PTR)
+      # 
       # long
       def _is_bad_read_ptr(lp, ucb)
         JNI.__send__(:Java_org_eclipse_swt_internal_win32_OS_IsBadReadPtr, JNI.env, self.jni_id, lp.to_int, ucb.to_int) != 0
@@ -11322,6 +12367,9 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_IsBadWritePtr, [:pointer, :long, :int32, :int32], :int8
       typesig { [::Java::Int, ::Java::Int] }
+      # @param lp cast=(LPVOID)
+      # @param ucb cast=(UINT_PTR)
+      # 
       # long
       def _is_bad_write_ptr(lp, ucb)
         JNI.__send__(:Java_org_eclipse_swt_internal_win32_OS_IsBadWritePtr, JNI.env, self.jni_id, lp.to_int, ucb.to_int) != 0
@@ -11335,6 +12383,9 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_IsHungAppWindow, [:pointer, :long, :int32], :int8
       typesig { [::Java::Int] }
+      # @method flags=dynamic
+      # @param hWnd cast=(HWND)
+      # 
       # long
       def _is_hung_app_window(h_wnd)
         JNI.__send__(:Java_org_eclipse_swt_internal_win32_OS_IsHungAppWindow, JNI.env, self.jni_id, h_wnd.to_int) != 0
@@ -11342,6 +12393,7 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_IsIconic, [:pointer, :long, :int32], :int8
       typesig { [::Java::Int] }
+      # @param hWnd cast=(HWND)
       # long
       def _is_iconic(h_wnd)
         JNI.__send__(:Java_org_eclipse_swt_internal_win32_OS_IsIconic, JNI.env, self.jni_id, h_wnd.to_int) != 0
@@ -11349,18 +12401,21 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_IsPPC, [:pointer, :long], :int8
       typesig { [] }
+      # @method flags=no_gen
       def _is_ppc
         JNI.__send__(:Java_org_eclipse_swt_internal_win32_OS_IsPPC, JNI.env, self.jni_id) != 0
       end
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_IsSP, [:pointer, :long], :int8
       typesig { [] }
+      # @method flags=no_gen
       def _is_sp
         JNI.__send__(:Java_org_eclipse_swt_internal_win32_OS_IsSP, JNI.env, self.jni_id) != 0
       end
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_IsWindowEnabled, [:pointer, :long, :int32], :int8
       typesig { [::Java::Int] }
+      # @param hWnd cast=(HWND)
       # long
       def _is_window_enabled(h_wnd)
         JNI.__send__(:Java_org_eclipse_swt_internal_win32_OS_IsWindowEnabled, JNI.env, self.jni_id, h_wnd.to_int) != 0
@@ -11368,6 +12423,7 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_IsWindowVisible, [:pointer, :long, :int32], :int8
       typesig { [::Java::Int] }
+      # @param hWnd cast=(HWND)
       # long
       def _is_window_visible(h_wnd)
         JNI.__send__(:Java_org_eclipse_swt_internal_win32_OS_IsWindowVisible, JNI.env, self.jni_id, h_wnd.to_int) != 0
@@ -11375,6 +12431,7 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_IsZoomed, [:pointer, :long, :int32], :int8
       typesig { [::Java::Int] }
+      # @param hWnd cast=(HWND)
       # long
       def _is_zoomed(h_wnd)
         JNI.__send__(:Java_org_eclipse_swt_internal_win32_OS_IsZoomed, JNI.env, self.jni_id, h_wnd.to_int) != 0
@@ -11382,6 +12439,7 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_KillTimer, [:pointer, :long, :int32, :int32], :int8
       typesig { [::Java::Int, ::Java::Int] }
+      # @param hWnd cast=(HWND)
       # long
       # long
       def _kill_timer(h_wnd, u_idevent)
@@ -11390,6 +12448,7 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_LineTo, [:pointer, :long, :int32, :int32, :int32], :int8
       typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
+      # @param hdc cast=(HDC)
       # long
       def _line_to(hdc, x1, x2)
         JNI.__send__(:Java_org_eclipse_swt_internal_win32_OS_LineTo, JNI.env, self.jni_id, hdc.to_int, x1.to_int, x2.to_int) != 0
@@ -11397,6 +12456,9 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_LoadBitmapW, [:pointer, :long, :int32, :int32], :int32
       typesig { [::Java::Int, ::Java::Int] }
+      # @param hInstance cast=(HINSTANCE)
+      # @param lpBitmapName cast=(LPWSTR)
+      # 
       # long
       # long
       # long
@@ -11406,6 +12468,9 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_LoadBitmapA, [:pointer, :long, :int32, :int32], :int32
       typesig { [::Java::Int, ::Java::Int] }
+      # @param hInstance cast=(HINSTANCE)
+      # @param lpBitmapName cast=(LPSTR)
+      # 
       # long
       # long
       # long
@@ -11415,6 +12480,9 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_LoadCursorW, [:pointer, :long, :int32, :int32], :int32
       typesig { [::Java::Int, ::Java::Int] }
+      # @param hInstance cast=(HINSTANCE)
+      # @param lpCursorName cast=(LPWSTR)
+      # 
       # long
       # long
       # long
@@ -11424,6 +12492,9 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_LoadCursorA, [:pointer, :long, :int32, :int32], :int32
       typesig { [::Java::Int, ::Java::Int] }
+      # @param hInstance cast=(HINSTANCE)
+      # @param lpCursorName cast=(LPSTR)
+      # 
       # long
       # long
       # long
@@ -11433,6 +12504,9 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_LoadIconW, [:pointer, :long, :int32, :int32], :int32
       typesig { [::Java::Int, ::Java::Int] }
+      # @param hInstance cast=(HINSTANCE)
+      # @param lpIconName cast=(LPWSTR)
+      # 
       # long
       # long
       # long
@@ -11442,6 +12516,9 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_LoadIconA, [:pointer, :long, :int32, :int32], :int32
       typesig { [::Java::Int, ::Java::Int] }
+      # @param hInstance cast=(HINSTANCE)
+      # @param lpIconName cast=(LPSTR)
+      # 
       # long
       # long
       # long
@@ -11451,6 +12528,9 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_LoadImageW__I_3CIIII, [:pointer, :long, :int32, :long, :int32, :int32, :int32, :int32], :int32
       typesig { [::Java::Int, Array.typed(::Java::Char), ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int] }
+      # @param hinst cast=(HINSTANCE)
+      # @param lpszName cast=(LPWSTR)
+      # 
       # long
       # long
       def _load_image_w(hinst, lpsz_name, u_type, cx_desired, cy_desired, fu_load)
@@ -11459,6 +12539,9 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_LoadImageA__I_3BIIII, [:pointer, :long, :int32, :long, :int32, :int32, :int32, :int32], :int32
       typesig { [::Java::Int, Array.typed(::Java::Byte), ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int] }
+      # @param hinst cast=(HINSTANCE)
+      # @param lpszName cast=(LPSTR)
+      # 
       # long
       # long
       def _load_image_a(hinst, lpsz_name, u_type, cx_desired, cy_desired, fu_load)
@@ -11467,6 +12550,9 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_LoadImageW__IIIIII, [:pointer, :long, :int32, :int32, :int32, :int32, :int32, :int32], :int32
       typesig { [::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int] }
+      # @param hinst cast=(HINSTANCE)
+      # @param lpszName cast=(LPWSTR)
+      # 
       # long
       # long
       # long
@@ -11476,6 +12562,9 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_LoadImageA__IIIIII, [:pointer, :long, :int32, :int32, :int32, :int32, :int32, :int32], :int32
       typesig { [::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int] }
+      # @param hinst cast=(HINSTANCE)
+      # @param lpszName cast=(LPSTR)
+      # 
       # long
       # long
       # long
@@ -11485,6 +12574,9 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_LoadStringW, [:pointer, :long, :int32, :int32, :long, :int32], :int32
       typesig { [::Java::Int, ::Java::Int, Array.typed(::Java::Char), ::Java::Int] }
+      # @param hinst cast=(HINSTANCE)
+      # @param lpBuffer cast=(LPWSTR)
+      # 
       # long
       def _load_string_w(hinst, u_id, lp_buffer, n_buffer_max)
         JNI.__send__(:Java_org_eclipse_swt_internal_win32_OS_LoadStringW, JNI.env, self.jni_id, hinst.to_int, u_id.to_int, lp_buffer.jni_id, n_buffer_max.to_int)
@@ -11492,6 +12584,9 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_LoadStringA, [:pointer, :long, :int32, :int32, :long, :int32], :int32
       typesig { [::Java::Int, ::Java::Int, Array.typed(::Java::Byte), ::Java::Int] }
+      # @param hinst cast=(HINSTANCE)
+      # @param lpBuffer cast=(LPSTR)
+      # 
       # long
       def _load_string_a(hinst, u_id, lp_buffer, n_buffer_max)
         JNI.__send__(:Java_org_eclipse_swt_internal_win32_OS_LoadStringA, JNI.env, self.jni_id, hinst.to_int, u_id.to_int, lp_buffer.jni_id, n_buffer_max.to_int)
@@ -11499,6 +12594,7 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_LoadLibraryW, [:pointer, :long, :long], :int32
       typesig { [Array.typed(::Java::Char)] }
+      # @param lpLibFileName cast=(LPWSTR)
       # long
       def _load_library_w(lp_lib_file_name)
         JNI.__send__(:Java_org_eclipse_swt_internal_win32_OS_LoadLibraryW, JNI.env, self.jni_id, lp_lib_file_name.jni_id)
@@ -11506,6 +12602,7 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_LoadLibraryA, [:pointer, :long, :long], :int32
       typesig { [Array.typed(::Java::Byte)] }
+      # @param lpLibFileName cast=(LPSTR)
       # long
       def _load_library_a(lp_lib_file_name)
         JNI.__send__(:Java_org_eclipse_swt_internal_win32_OS_LoadLibraryA, JNI.env, self.jni_id, lp_lib_file_name.jni_id)
@@ -11513,6 +12610,7 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_LocalFree, [:pointer, :long, :int32], :int32
       typesig { [::Java::Int] }
+      # @param hMem cast=(HLOCAL)
       # long
       # long
       def _local_free(h_mem)
@@ -11521,6 +12619,7 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_LockWindowUpdate, [:pointer, :long, :int32], :int8
       typesig { [::Java::Int] }
+      # @param hWndLock cast=(HWND)
       # long
       def _lock_window_update(h_wnd_lock)
         JNI.__send__(:Java_org_eclipse_swt_internal_win32_OS_LockWindowUpdate, JNI.env, self.jni_id, h_wnd_lock.to_int) != 0
@@ -11535,6 +12634,7 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_LPtoDP, [:pointer, :long, :int32, :long, :int32], :int8
       typesig { [::Java::Int, POINT, ::Java::Int] }
+      # @param hdc cast=(HDC)
       # long
       def _lpto_dp(hdc, lp_points, n_count)
         JNI.__send__(:Java_org_eclipse_swt_internal_win32_OS_LPtoDP, JNI.env, self.jni_id, hdc.to_int, lp_points.jni_id, n_count.to_int) != 0
@@ -11581,6 +12681,10 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method "Java_org_eclipse_swt_internal_win32_OS_MapWindowPoints__IIL#{POINT.jni_name}_2I".to_sym, [:pointer, :long, :int32, :int32, :long, :int32], :int32
       typesig { [::Java::Int, ::Java::Int, POINT, ::Java::Int] }
+      # @param hWndFrom cast=(HWND)
+      # @param hWndTo cast=(HWND)
+      # @param lpPoints cast=(LPPOINT)
+      # 
       # long
       # long
       def _map_window_points(h_wnd_from, h_wnd_to, lp_points, c_points)
@@ -11589,6 +12693,10 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method "Java_org_eclipse_swt_internal_win32_OS_MapWindowPoints__IIL#{RECT.jni_name}_2I".to_sym, [:pointer, :long, :int32, :int32, :long, :int32], :int32
       typesig { [::Java::Int, ::Java::Int, RECT, ::Java::Int] }
+      # @param hWndFrom cast=(HWND)
+      # @param hWndTo cast=(HWND)
+      # @param lpPoints cast=(LPPOINT)
+      # 
       # long
       # long
       def _map_window_points(h_wnd_from, h_wnd_to, lp_points, c_points)
@@ -11597,6 +12705,7 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_MCIWndRegisterClass, [:pointer, :long], :int8
       typesig { [] }
+      # @method flags=dynamic
       def _mciwnd_register_class
         JNI.__send__(:Java_org_eclipse_swt_internal_win32_OS_MCIWndRegisterClass, JNI.env, self.jni_id) != 0
       end
@@ -11609,6 +12718,10 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_MessageBoxW, [:pointer, :long, :int32, :long, :long, :int32], :int32
       typesig { [::Java::Int, Array.typed(::Java::Char), Array.typed(::Java::Char), ::Java::Int] }
+      # @param hWnd cast=(HWND)
+      # @param lpText cast=(LPWSTR)
+      # @param lpCaption cast=(LPWSTR)
+      # 
       # long
       def _message_box_w(h_wnd, lp_text, lp_caption, u_type)
         JNI.__send__(:Java_org_eclipse_swt_internal_win32_OS_MessageBoxW, JNI.env, self.jni_id, h_wnd.to_int, lp_text.jni_id, lp_caption.jni_id, u_type.to_int)
@@ -11616,13 +12729,28 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_MessageBoxA, [:pointer, :long, :int32, :long, :long, :int32], :int32
       typesig { [::Java::Int, Array.typed(::Java::Byte), Array.typed(::Java::Byte), ::Java::Int] }
+      # @param hWnd cast=(HWND)
+      # @param lpText cast=(LPSTR)
+      # @param lpCaption cast=(LPSTR)
+      # 
       # long
       def _message_box_a(h_wnd, lp_text, lp_caption, u_type)
         JNI.__send__(:Java_org_eclipse_swt_internal_win32_OS_MessageBoxA, JNI.env, self.jni_id, h_wnd.to_int, lp_text.jni_id, lp_caption.jni_id, u_type.to_int)
       end
       
+      JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_ModifyWorldTransform, [:pointer, :long, :int32, :long, :int32], :int8
+      typesig { [::Java::Int, Array.typed(::Java::Float), ::Java::Int] }
+      # @param hdc cast=(HDC)
+      # @param lpXform cast=(XFORM *)
+      # 
+      # long
+      def _modify_world_transform(hdc, lp_xform, i_mode)
+        JNI.__send__(:Java_org_eclipse_swt_internal_win32_OS_ModifyWorldTransform, JNI.env, self.jni_id, hdc.to_int, lp_xform.jni_id, i_mode.to_int) != 0
+      end
+      
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_MonitorFromWindow, [:pointer, :long, :int32, :int32], :int32
       typesig { [::Java::Int, ::Java::Int] }
+      # @method flags=dynamic
       # long
       # long
       def _monitor_from_window(hwnd, dw_flags)
@@ -11631,6 +12759,9 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_MoveMemory___3CII, [:pointer, :long, :long, :int32, :int32], :void
       typesig { [Array.typed(::Java::Char), ::Java::Int, ::Java::Int] }
+      # @param Destination cast=(PVOID),flags=no_in critical
+      # @param SourcePtr cast=(CONST VOID *)
+      # 
       # long
       def _move_memory(destination, source_ptr, length_)
         JNI.__send__(:Java_org_eclipse_swt_internal_win32_OS_MoveMemory___3CII, JNI.env, self.jni_id, destination.jni_id, source_ptr.to_int, length_.to_int)
@@ -11638,6 +12769,9 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_MoveMemory___3BII, [:pointer, :long, :long, :int32, :int32], :void
       typesig { [Array.typed(::Java::Byte), ::Java::Int, ::Java::Int] }
+      # @param Destination cast=(PVOID),flags=no_in critical
+      # @param Source cast=(CONST VOID *)
+      # 
       # long
       def _move_memory(destination, source, length_)
         JNI.__send__(:Java_org_eclipse_swt_internal_win32_OS_MoveMemory___3BII, JNI.env, self.jni_id, destination.jni_id, source.to_int, length_.to_int)
@@ -11645,18 +12779,25 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method "Java_org_eclipse_swt_internal_win32_OS_MoveMemory___3BL#{ACCEL.jni_name}_2I".to_sym, [:pointer, :long, :long, :long, :int32], :void
       typesig { [Array.typed(::Java::Byte), ACCEL, ::Java::Int] }
+      # @param Destination cast=(PVOID),flags=no_in critical
+      # @param Source cast=(CONST VOID *),flags=no_out
       def _move_memory(destination, source, length_)
         JNI.__send__("Java_org_eclipse_swt_internal_win32_OS_MoveMemory___3BL#{ACCEL.jni_name}_2I".to_sym, JNI.env, self.jni_id, destination.jni_id, source.jni_id, length_.to_int)
       end
       
       JNI.native_method "Java_org_eclipse_swt_internal_win32_OS_MoveMemory___3BL#{BITMAPINFOHEADER.jni_name}_2I".to_sym, [:pointer, :long, :long, :long, :int32], :void
       typesig { [Array.typed(::Java::Byte), BITMAPINFOHEADER, ::Java::Int] }
+      # @param Destination cast=(PVOID),flags=no_in critical
+      # @param Source cast=(CONST VOID *),flags=no_out
       def _move_memory(destination, source, length_)
         JNI.__send__("Java_org_eclipse_swt_internal_win32_OS_MoveMemory___3BL#{BITMAPINFOHEADER.jni_name}_2I".to_sym, JNI.env, self.jni_id, destination.jni_id, source.jni_id, length_.to_int)
       end
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_MoveMemory___3III, [:pointer, :long, :long, :int32, :int32], :void
       typesig { [Array.typed(::Java::Int), ::Java::Int, ::Java::Int] }
+      # @param Destination cast=(PVOID),flags=no_in critical
+      # @param Source cast=(CONST VOID *)
+      # 
       # long
       def _move_memory(destination, source, length_)
         JNI.__send__(:Java_org_eclipse_swt_internal_win32_OS_MoveMemory___3III, JNI.env, self.jni_id, destination.jni_id, source.to_int, length_.to_int)
@@ -11664,6 +12805,9 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_MoveMemory___3JII, [:pointer, :long, :long, :int32, :int32], :void
       typesig { [Array.typed(::Java::Long), ::Java::Int, ::Java::Int] }
+      # @param Destination cast=(PVOID),flags=no_in critical
+      # @param SourcePtr cast=(CONST VOID *)
+      # 
       # long
       def _move_memory(destination, source_ptr, length_)
         JNI.__send__(:Java_org_eclipse_swt_internal_win32_OS_MoveMemory___3JII, JNI.env, self.jni_id, destination.jni_id, source_ptr.to_int, length_.to_int)
@@ -11671,6 +12815,9 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_MoveMemory___3XdoubleXII, [:pointer, :long, :long, :int32, :int32], :void
       typesig { [Array.typed(::Java::Double), ::Java::Int, ::Java::Int] }
+      # @param Destination cast=(PVOID),flags=no_in critical
+      # @param SourcePtr cast=(CONST VOID *)
+      # 
       # long
       def _move_memory(destination, source_ptr, length_)
         JNI.__send__(:Java_org_eclipse_swt_internal_win32_OS_MoveMemory___3XdoubleXII, JNI.env, self.jni_id, destination.jni_id, source_ptr.to_int, length_.to_int)
@@ -11678,6 +12825,9 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_MoveMemory___3XfloatXII, [:pointer, :long, :long, :int32, :int32], :void
       typesig { [Array.typed(::Java::Float), ::Java::Int, ::Java::Int] }
+      # @param Destination cast=(PVOID),flags=no_in critical
+      # @param SourcePtr cast=(CONST VOID *)
+      # 
       # long
       def _move_memory(destination, source_ptr, length_)
         JNI.__send__(:Java_org_eclipse_swt_internal_win32_OS_MoveMemory___3XfloatXII, JNI.env, self.jni_id, destination.jni_id, source_ptr.to_int, length_.to_int)
@@ -11685,6 +12835,9 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_MoveMemory___3SII, [:pointer, :long, :long, :int32, :int32], :void
       typesig { [Array.typed(::Java::Short), ::Java::Int, ::Java::Int] }
+      # @param Destination cast=(PVOID),flags=no_in critical
+      # @param SourcePtr cast=(CONST VOID *)
+      # 
       # long
       def _move_memory(destination, source_ptr, length_)
         JNI.__send__(:Java_org_eclipse_swt_internal_win32_OS_MoveMemory___3SII, JNI.env, self.jni_id, destination.jni_id, source_ptr.to_int, length_.to_int)
@@ -11692,6 +12845,9 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_MoveMemory__I_3BI, [:pointer, :long, :int32, :long, :int32], :void
       typesig { [::Java::Int, Array.typed(::Java::Byte), ::Java::Int] }
+      # @param Destination cast=(PVOID)
+      # @param Source cast=(CONST VOID *),flags=no_out critical
+      # 
       # long
       def _move_memory(destination, source, length_)
         JNI.__send__(:Java_org_eclipse_swt_internal_win32_OS_MoveMemory__I_3BI, JNI.env, self.jni_id, destination.to_int, source.jni_id, length_.to_int)
@@ -11699,6 +12855,9 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_MoveMemory__I_3CI, [:pointer, :long, :int32, :long, :int32], :void
       typesig { [::Java::Int, Array.typed(::Java::Char), ::Java::Int] }
+      # @param Destination cast=(PVOID)
+      # @param Source cast=(CONST VOID *),flags=no_out critical
+      # 
       # long
       def _move_memory(destination, source, length_)
         JNI.__send__(:Java_org_eclipse_swt_internal_win32_OS_MoveMemory__I_3CI, JNI.env, self.jni_id, destination.to_int, source.jni_id, length_.to_int)
@@ -11706,6 +12865,9 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_MoveMemory__I_3II, [:pointer, :long, :int32, :long, :int32], :void
       typesig { [::Java::Int, Array.typed(::Java::Int), ::Java::Int] }
+      # @param Destination cast=(PVOID)
+      # @param Source cast=(CONST VOID *),flags=no_out critical
+      # 
       # long
       def _move_memory(destination, source, length_)
         JNI.__send__(:Java_org_eclipse_swt_internal_win32_OS_MoveMemory__I_3II, JNI.env, self.jni_id, destination.to_int, source.jni_id, length_.to_int)
@@ -11713,14 +12875,40 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_MoveMemory__III, [:pointer, :long, :int32, :int32, :int32], :void
       typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
+      # @param Destination cast=(PVOID)
+      # @param Source cast=(CONST VOID *)
+      # 
       # long
       # long
       def _move_memory(destination, source, length_)
         JNI.__send__(:Java_org_eclipse_swt_internal_win32_OS_MoveMemory__III, JNI.env, self.jni_id, destination.to_int, source.to_int, length_.to_int)
       end
       
+      JNI.native_method "Java_org_eclipse_swt_internal_win32_OS_MoveMemory__IL#{DEVMODEW.jni_name}_2I".to_sym, [:pointer, :long, :int32, :long, :int32], :void
+      typesig { [::Java::Int, DEVMODEW, ::Java::Int] }
+      # @param Destination cast=(PVOID)
+      # @param Source cast=(CONST VOID *),flags=no_out
+      # 
+      # long
+      def _move_memory(destination, source, length_)
+        JNI.__send__("Java_org_eclipse_swt_internal_win32_OS_MoveMemory__IL#{DEVMODEW.jni_name}_2I".to_sym, JNI.env, self.jni_id, destination.to_int, source.jni_id, length_.to_int)
+      end
+      
+      JNI.native_method "Java_org_eclipse_swt_internal_win32_OS_MoveMemory__IL#{DEVMODEA.jni_name}_2I".to_sym, [:pointer, :long, :int32, :long, :int32], :void
+      typesig { [::Java::Int, DEVMODEA, ::Java::Int] }
+      # @param Destination cast=(PVOID)
+      # @param Source cast=(CONST VOID *),flags=no_out
+      # 
+      # long
+      def _move_memory(destination, source, length_)
+        JNI.__send__("Java_org_eclipse_swt_internal_win32_OS_MoveMemory__IL#{DEVMODEA.jni_name}_2I".to_sym, JNI.env, self.jni_id, destination.to_int, source.jni_id, length_.to_int)
+      end
+      
       JNI.native_method "Java_org_eclipse_swt_internal_win32_OS_MoveMemory__IL#{DOCHOSTUIINFO.jni_name}_2I".to_sym, [:pointer, :long, :int32, :long, :int32], :void
       typesig { [::Java::Int, DOCHOSTUIINFO, ::Java::Int] }
+      # @param Destination cast=(PVOID)
+      # @param Source cast=(CONST VOID *),flags=no_out
+      # 
       # long
       def _move_memory(destination, source, length_)
         JNI.__send__("Java_org_eclipse_swt_internal_win32_OS_MoveMemory__IL#{DOCHOSTUIINFO.jni_name}_2I".to_sym, JNI.env, self.jni_id, destination.to_int, source.jni_id, length_.to_int)
@@ -11728,6 +12916,9 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method "Java_org_eclipse_swt_internal_win32_OS_MoveMemory__IL#{GRADIENT_RECT.jni_name}_2I".to_sym, [:pointer, :long, :int32, :long, :int32], :void
       typesig { [::Java::Int, GRADIENT_RECT, ::Java::Int] }
+      # @param Destination cast=(PVOID)
+      # @param Source cast=(CONST VOID *),flags=no_out
+      # 
       # long
       def _move_memory(destination, source, length_)
         JNI.__send__("Java_org_eclipse_swt_internal_win32_OS_MoveMemory__IL#{GRADIENT_RECT.jni_name}_2I".to_sym, JNI.env, self.jni_id, destination.to_int, source.jni_id, length_.to_int)
@@ -11735,6 +12926,9 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method "Java_org_eclipse_swt_internal_win32_OS_MoveMemory__IL#{LOGFONTW.jni_name}_2I".to_sym, [:pointer, :long, :int32, :long, :int32], :void
       typesig { [::Java::Int, LOGFONTW, ::Java::Int] }
+      # @param Destination cast=(PVOID)
+      # @param Source cast=(CONST VOID *),flags=no_out
+      # 
       # long
       def _move_memory(destination, source, length_)
         JNI.__send__("Java_org_eclipse_swt_internal_win32_OS_MoveMemory__IL#{LOGFONTW.jni_name}_2I".to_sym, JNI.env, self.jni_id, destination.to_int, source.jni_id, length_.to_int)
@@ -11742,6 +12936,9 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method "Java_org_eclipse_swt_internal_win32_OS_MoveMemory__IL#{LOGFONTA.jni_name}_2I".to_sym, [:pointer, :long, :int32, :long, :int32], :void
       typesig { [::Java::Int, LOGFONTA, ::Java::Int] }
+      # @param Destination cast=(PVOID)
+      # @param Source cast=(CONST VOID *),flags=no_out
+      # 
       # long
       def _move_memory(destination, source, length_)
         JNI.__send__("Java_org_eclipse_swt_internal_win32_OS_MoveMemory__IL#{LOGFONTA.jni_name}_2I".to_sym, JNI.env, self.jni_id, destination.to_int, source.jni_id, length_.to_int)
@@ -11749,6 +12946,9 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method "Java_org_eclipse_swt_internal_win32_OS_MoveMemory__IL#{MEASUREITEMSTRUCT.jni_name}_2I".to_sym, [:pointer, :long, :int32, :long, :int32], :void
       typesig { [::Java::Int, MEASUREITEMSTRUCT, ::Java::Int] }
+      # @param Destination cast=(PVOID)
+      # @param Source cast=(CONST VOID *),flags=no_out
+      # 
       # long
       def _move_memory(destination, source, length_)
         JNI.__send__("Java_org_eclipse_swt_internal_win32_OS_MoveMemory__IL#{MEASUREITEMSTRUCT.jni_name}_2I".to_sym, JNI.env, self.jni_id, destination.to_int, source.jni_id, length_.to_int)
@@ -11756,6 +12956,9 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method "Java_org_eclipse_swt_internal_win32_OS_MoveMemory__IL#{MINMAXINFO.jni_name}_2I".to_sym, [:pointer, :long, :int32, :long, :int32], :void
       typesig { [::Java::Int, MINMAXINFO, ::Java::Int] }
+      # @param Destination cast=(PVOID)
+      # @param Source cast=(CONST VOID *),flags=no_out
+      # 
       # long
       def _move_memory(destination, source, length_)
         JNI.__send__("Java_org_eclipse_swt_internal_win32_OS_MoveMemory__IL#{MINMAXINFO.jni_name}_2I".to_sym, JNI.env, self.jni_id, destination.to_int, source.jni_id, length_.to_int)
@@ -11763,6 +12966,9 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method "Java_org_eclipse_swt_internal_win32_OS_MoveMemory__IL#{MSG.jni_name}_2I".to_sym, [:pointer, :long, :int32, :long, :int32], :void
       typesig { [::Java::Int, MSG, ::Java::Int] }
+      # @param Destination cast=(PVOID)
+      # @param Source cast=(CONST VOID *),flags=no_out
+      # 
       # long
       def _move_memory(destination, source, length_)
         JNI.__send__("Java_org_eclipse_swt_internal_win32_OS_MoveMemory__IL#{MSG.jni_name}_2I".to_sym, JNI.env, self.jni_id, destination.to_int, source.jni_id, length_.to_int)
@@ -11770,6 +12976,9 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method "Java_org_eclipse_swt_internal_win32_OS_MoveMemory__IL#{UDACCEL.jni_name}_2I".to_sym, [:pointer, :long, :int32, :long, :int32], :void
       typesig { [::Java::Int, UDACCEL, ::Java::Int] }
+      # @param Destination cast=(PVOID)
+      # @param Source cast=(CONST VOID *),flags=no_out
+      # 
       # long
       def _move_memory(destination, source, length_)
         JNI.__send__("Java_org_eclipse_swt_internal_win32_OS_MoveMemory__IL#{UDACCEL.jni_name}_2I".to_sym, JNI.env, self.jni_id, destination.to_int, source.jni_id, length_.to_int)
@@ -11777,6 +12986,9 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method "Java_org_eclipse_swt_internal_win32_OS_MoveMemory__IL#{NMTTDISPINFOW.jni_name}_2I".to_sym, [:pointer, :long, :int32, :long, :int32], :void
       typesig { [::Java::Int, NMTTDISPINFOW, ::Java::Int] }
+      # @param Destination cast=(PVOID)
+      # @param Source cast=(CONST VOID *),flags=no_out
+      # 
       # long
       def _move_memory(destination, source, length_)
         JNI.__send__("Java_org_eclipse_swt_internal_win32_OS_MoveMemory__IL#{NMTTDISPINFOW.jni_name}_2I".to_sym, JNI.env, self.jni_id, destination.to_int, source.jni_id, length_.to_int)
@@ -11784,6 +12996,9 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method "Java_org_eclipse_swt_internal_win32_OS_MoveMemory__IL#{NMTTDISPINFOA.jni_name}_2I".to_sym, [:pointer, :long, :int32, :long, :int32], :void
       typesig { [::Java::Int, NMTTDISPINFOA, ::Java::Int] }
+      # @param Destination cast=(PVOID)
+      # @param Source cast=(CONST VOID *),flags=no_out
+      # 
       # long
       def _move_memory(destination, source, length_)
         JNI.__send__("Java_org_eclipse_swt_internal_win32_OS_MoveMemory__IL#{NMTTDISPINFOA.jni_name}_2I".to_sym, JNI.env, self.jni_id, destination.to_int, source.jni_id, length_.to_int)
@@ -11791,6 +13006,9 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method "Java_org_eclipse_swt_internal_win32_OS_MoveMemory__IL#{OPENFILENAME.jni_name}_2I".to_sym, [:pointer, :long, :int32, :long, :int32], :void
       typesig { [::Java::Int, OPENFILENAME, ::Java::Int] }
+      # @param Destination cast=(PVOID)
+      # @param Source cast=(CONST VOID *)
+      # 
       # long
       def _move_memory(destination, source, length_)
         JNI.__send__("Java_org_eclipse_swt_internal_win32_OS_MoveMemory__IL#{OPENFILENAME.jni_name}_2I".to_sym, JNI.env, self.jni_id, destination.to_int, source.jni_id, length_.to_int)
@@ -11798,6 +13016,9 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method "Java_org_eclipse_swt_internal_win32_OS_MoveMemory__IL#{RECT.jni_name}_2I".to_sym, [:pointer, :long, :int32, :long, :int32], :void
       typesig { [::Java::Int, RECT, ::Java::Int] }
+      # @param Destination cast=(PVOID)
+      # @param Source cast=(CONST VOID *),flags=no_out
+      # 
       # long
       def _move_memory(destination, source, length_)
         JNI.__send__("Java_org_eclipse_swt_internal_win32_OS_MoveMemory__IL#{RECT.jni_name}_2I".to_sym, JNI.env, self.jni_id, destination.to_int, source.jni_id, length_.to_int)
@@ -11805,6 +13026,9 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method "Java_org_eclipse_swt_internal_win32_OS_MoveMemory__IL#{TRIVERTEX.jni_name}_2I".to_sym, [:pointer, :long, :int32, :long, :int32], :void
       typesig { [::Java::Int, TRIVERTEX, ::Java::Int] }
+      # @param Destination cast=(PVOID)
+      # @param Source cast=(CONST VOID *),flags=no_out
+      # 
       # long
       def _move_memory(destination, source, length_)
         JNI.__send__("Java_org_eclipse_swt_internal_win32_OS_MoveMemory__IL#{TRIVERTEX.jni_name}_2I".to_sym, JNI.env, self.jni_id, destination.to_int, source.jni_id, length_.to_int)
@@ -11812,6 +13036,9 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method "Java_org_eclipse_swt_internal_win32_OS_MoveMemory__IL#{WINDOWPOS.jni_name}_2I".to_sym, [:pointer, :long, :int32, :long, :int32], :void
       typesig { [::Java::Int, WINDOWPOS, ::Java::Int] }
+      # @param Destination cast=(PVOID)
+      # @param Source cast=(CONST VOID *),flags=no_out
+      # 
       # long
       def _move_memory(destination, source, length_)
         JNI.__send__("Java_org_eclipse_swt_internal_win32_OS_MoveMemory__IL#{WINDOWPOS.jni_name}_2I".to_sym, JNI.env, self.jni_id, destination.to_int, source.jni_id, length_.to_int)
@@ -11819,19 +13046,47 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method "Java_org_eclipse_swt_internal_win32_OS_MoveMemory__L#{BITMAPINFOHEADER.jni_name}_2_3BI".to_sym, [:pointer, :long, :long, :long, :int32], :void
       typesig { [BITMAPINFOHEADER, Array.typed(::Java::Byte), ::Java::Int] }
+      # @param Destination cast=(PVOID),flags=no_in
+      # @param Source cast=(CONST VOID *),flags=no_out critical
       def _move_memory(destination, source, length_)
         JNI.__send__("Java_org_eclipse_swt_internal_win32_OS_MoveMemory__L#{BITMAPINFOHEADER.jni_name}_2_3BI".to_sym, JNI.env, self.jni_id, destination.jni_id, source.jni_id, length_.to_int)
       end
       
       JNI.native_method "Java_org_eclipse_swt_internal_win32_OS_MoveMemory__L#{BITMAPINFOHEADER.jni_name}_2II".to_sym, [:pointer, :long, :long, :int32, :int32], :void
       typesig { [BITMAPINFOHEADER, ::Java::Int, ::Java::Int] }
+      # @param Destination cast=(PVOID),flags=no_in
+      # @param Source cast=(CONST VOID *),flags=no_out critical
+      # 
       # long
       def _move_memory(destination, source, length_)
         JNI.__send__("Java_org_eclipse_swt_internal_win32_OS_MoveMemory__L#{BITMAPINFOHEADER.jni_name}_2II".to_sym, JNI.env, self.jni_id, destination.jni_id, source.to_int, length_.to_int)
       end
       
+      JNI.native_method "Java_org_eclipse_swt_internal_win32_OS_MoveMemory__L#{DEVMODEW.jni_name}_2II".to_sym, [:pointer, :long, :long, :int32, :int32], :void
+      typesig { [DEVMODEW, ::Java::Int, ::Java::Int] }
+      # @param Destination cast=(PVOID),flags=no_in
+      # @param Source cast=(CONST VOID *)
+      # 
+      # long
+      def _move_memory(destination, source, length_)
+        JNI.__send__("Java_org_eclipse_swt_internal_win32_OS_MoveMemory__L#{DEVMODEW.jni_name}_2II".to_sym, JNI.env, self.jni_id, destination.jni_id, source.to_int, length_.to_int)
+      end
+      
+      JNI.native_method "Java_org_eclipse_swt_internal_win32_OS_MoveMemory__L#{DEVMODEA.jni_name}_2II".to_sym, [:pointer, :long, :long, :int32, :int32], :void
+      typesig { [DEVMODEA, ::Java::Int, ::Java::Int] }
+      # @param Destination cast=(PVOID),flags=no_in
+      # @param Source cast=(CONST VOID *)
+      # 
+      # long
+      def _move_memory(destination, source, length_)
+        JNI.__send__("Java_org_eclipse_swt_internal_win32_OS_MoveMemory__L#{DEVMODEA.jni_name}_2II".to_sym, JNI.env, self.jni_id, destination.jni_id, source.to_int, length_.to_int)
+      end
+      
       JNI.native_method "Java_org_eclipse_swt_internal_win32_OS_MoveMemory__L#{DOCHOSTUIINFO.jni_name}_2II".to_sym, [:pointer, :long, :long, :int32, :int32], :void
       typesig { [DOCHOSTUIINFO, ::Java::Int, ::Java::Int] }
+      # @param Destination cast=(PVOID),flags=no_in
+      # @param Source cast=(CONST VOID *)
+      # 
       # long
       def _move_memory(destination, source, length_)
         JNI.__send__("Java_org_eclipse_swt_internal_win32_OS_MoveMemory__L#{DOCHOSTUIINFO.jni_name}_2II".to_sym, JNI.env, self.jni_id, destination.jni_id, source.to_int, length_.to_int)
@@ -11839,6 +13094,9 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method "Java_org_eclipse_swt_internal_win32_OS_MoveMemory__L#{DRAWITEMSTRUCT.jni_name}_2II".to_sym, [:pointer, :long, :long, :int32, :int32], :void
       typesig { [DRAWITEMSTRUCT, ::Java::Int, ::Java::Int] }
+      # @param Destination cast=(PVOID),flags=no_in
+      # @param Source cast=(CONST VOID *)
+      # 
       # long
       def _move_memory(destination, source, length_)
         JNI.__send__("Java_org_eclipse_swt_internal_win32_OS_MoveMemory__L#{DRAWITEMSTRUCT.jni_name}_2II".to_sym, JNI.env, self.jni_id, destination.jni_id, source.to_int, length_.to_int)
@@ -11846,6 +13104,9 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method "Java_org_eclipse_swt_internal_win32_OS_MoveMemory__L#{EXTLOGPEN.jni_name}_2II".to_sym, [:pointer, :long, :long, :int32, :int32], :void
       typesig { [EXTLOGPEN, ::Java::Int, ::Java::Int] }
+      # @param Destination cast=(PVOID),flags=no_in
+      # @param Source cast=(CONST VOID *)
+      # 
       # long
       def _move_memory(destination, source, length_)
         JNI.__send__("Java_org_eclipse_swt_internal_win32_OS_MoveMemory__L#{EXTLOGPEN.jni_name}_2II".to_sym, JNI.env, self.jni_id, destination.jni_id, source.to_int, length_.to_int)
@@ -11853,6 +13114,9 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method "Java_org_eclipse_swt_internal_win32_OS_MoveMemory__L#{HDITEM.jni_name}_2II".to_sym, [:pointer, :long, :long, :int32, :int32], :void
       typesig { [HDITEM, ::Java::Int, ::Java::Int] }
+      # @param Destination cast=(PVOID),flags=no_in
+      # @param Source cast=(CONST VOID *)
+      # 
       # long
       def _move_memory(destination, source, length_)
         JNI.__send__("Java_org_eclipse_swt_internal_win32_OS_MoveMemory__L#{HDITEM.jni_name}_2II".to_sym, JNI.env, self.jni_id, destination.jni_id, source.to_int, length_.to_int)
@@ -11860,6 +13124,9 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method "Java_org_eclipse_swt_internal_win32_OS_MoveMemory__L#{HELPINFO.jni_name}_2II".to_sym, [:pointer, :long, :long, :int32, :int32], :void
       typesig { [HELPINFO, ::Java::Int, ::Java::Int] }
+      # @param Destination cast=(PVOID),flags=no_in
+      # @param Source cast=(CONST VOID *)
+      # 
       # long
       def _move_memory(destination, source, length_)
         JNI.__send__("Java_org_eclipse_swt_internal_win32_OS_MoveMemory__L#{HELPINFO.jni_name}_2II".to_sym, JNI.env, self.jni_id, destination.jni_id, source.to_int, length_.to_int)
@@ -11867,6 +13134,9 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method "Java_org_eclipse_swt_internal_win32_OS_MoveMemory__L#{LOGFONTW.jni_name}_2II".to_sym, [:pointer, :long, :long, :int32, :int32], :void
       typesig { [LOGFONTW, ::Java::Int, ::Java::Int] }
+      # @param Destination cast=(PVOID),flags=no_in
+      # @param Source cast=(CONST VOID *)
+      # 
       # long
       def _move_memory(destination, source, length_)
         JNI.__send__("Java_org_eclipse_swt_internal_win32_OS_MoveMemory__L#{LOGFONTW.jni_name}_2II".to_sym, JNI.env, self.jni_id, destination.jni_id, source.to_int, length_.to_int)
@@ -11874,6 +13144,9 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method "Java_org_eclipse_swt_internal_win32_OS_MoveMemory__L#{LOGFONTA.jni_name}_2II".to_sym, [:pointer, :long, :long, :int32, :int32], :void
       typesig { [LOGFONTA, ::Java::Int, ::Java::Int] }
+      # @param Destination cast=(PVOID),flags=no_in
+      # @param Source cast=(CONST VOID *)
+      # 
       # long
       def _move_memory(destination, source, length_)
         JNI.__send__("Java_org_eclipse_swt_internal_win32_OS_MoveMemory__L#{LOGFONTA.jni_name}_2II".to_sym, JNI.env, self.jni_id, destination.jni_id, source.to_int, length_.to_int)
@@ -11881,6 +13154,9 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method "Java_org_eclipse_swt_internal_win32_OS_MoveMemory__L#{MEASUREITEMSTRUCT.jni_name}_2II".to_sym, [:pointer, :long, :long, :int32, :int32], :void
       typesig { [MEASUREITEMSTRUCT, ::Java::Int, ::Java::Int] }
+      # @param Destination cast=(PVOID),flags=no_in
+      # @param Source cast=(CONST VOID *)
+      # 
       # long
       def _move_memory(destination, source, length_)
         JNI.__send__("Java_org_eclipse_swt_internal_win32_OS_MoveMemory__L#{MEASUREITEMSTRUCT.jni_name}_2II".to_sym, JNI.env, self.jni_id, destination.jni_id, source.to_int, length_.to_int)
@@ -11888,6 +13164,9 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method "Java_org_eclipse_swt_internal_win32_OS_MoveMemory__L#{MINMAXINFO.jni_name}_2II".to_sym, [:pointer, :long, :long, :int32, :int32], :void
       typesig { [MINMAXINFO, ::Java::Int, ::Java::Int] }
+      # @param Destination cast=(PVOID),flags=no_in
+      # @param Source cast=(CONST VOID *)
+      # 
       # long
       def _move_memory(destination, source, length_)
         JNI.__send__("Java_org_eclipse_swt_internal_win32_OS_MoveMemory__L#{MINMAXINFO.jni_name}_2II".to_sym, JNI.env, self.jni_id, destination.jni_id, source.to_int, length_.to_int)
@@ -11895,6 +13174,9 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method "Java_org_eclipse_swt_internal_win32_OS_MoveMemory__L#{OFNOTIFY.jni_name}_2II".to_sym, [:pointer, :long, :long, :int32, :int32], :void
       typesig { [OFNOTIFY, ::Java::Int, ::Java::Int] }
+      # @param Destination cast=(PVOID)
+      # @param Source cast=(CONST VOID *)
+      # 
       # long
       def _move_memory(destination, source, length_)
         JNI.__send__("Java_org_eclipse_swt_internal_win32_OS_MoveMemory__L#{OFNOTIFY.jni_name}_2II".to_sym, JNI.env, self.jni_id, destination.jni_id, source.to_int, length_.to_int)
@@ -11902,6 +13184,9 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method "Java_org_eclipse_swt_internal_win32_OS_MoveMemory__L#{OPENFILENAME.jni_name}_2II".to_sym, [:pointer, :long, :long, :int32, :int32], :void
       typesig { [OPENFILENAME, ::Java::Int, ::Java::Int] }
+      # @param Destination cast=(PVOID)
+      # @param Source cast=(CONST VOID *)
+      # 
       # long
       def _move_memory(destination, source, length_)
         JNI.__send__("Java_org_eclipse_swt_internal_win32_OS_MoveMemory__L#{OPENFILENAME.jni_name}_2II".to_sym, JNI.env, self.jni_id, destination.jni_id, source.to_int, length_.to_int)
@@ -11909,6 +13194,9 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method "Java_org_eclipse_swt_internal_win32_OS_MoveMemory__L#{POINT.jni_name}_2II".to_sym, [:pointer, :long, :long, :int32, :int32], :void
       typesig { [POINT, ::Java::Int, ::Java::Int] }
+      # @param Destination cast=(PVOID),flags=no_in
+      # @param Source cast=(CONST VOID *)
+      # 
       # long
       def _move_memory(destination, source, length_)
         JNI.__send__("Java_org_eclipse_swt_internal_win32_OS_MoveMemory__L#{POINT.jni_name}_2II".to_sym, JNI.env, self.jni_id, destination.jni_id, source.to_int, length_.to_int)
@@ -11916,12 +13204,17 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method "Java_org_eclipse_swt_internal_win32_OS_MoveMemory__L#{POINT.jni_name}_2_3JI".to_sym, [:pointer, :long, :long, :long, :int32], :void
       typesig { [POINT, Array.typed(::Java::Long), ::Java::Int] }
+      # @param Destination cast=(PVOID),flags=no_in
+      # @param Source cast=(CONST VOID *),flags=no_out critical
       def _move_memory(destination, source, length_)
         JNI.__send__("Java_org_eclipse_swt_internal_win32_OS_MoveMemory__L#{POINT.jni_name}_2_3JI".to_sym, JNI.env, self.jni_id, destination.jni_id, source.jni_id, length_.to_int)
       end
       
       JNI.native_method "Java_org_eclipse_swt_internal_win32_OS_MoveMemory__L#{NMHDR.jni_name}_2II".to_sym, [:pointer, :long, :long, :int32, :int32], :void
       typesig { [NMHDR, ::Java::Int, ::Java::Int] }
+      # @param Destination cast=(PVOID),flags=no_in
+      # @param Source cast=(CONST VOID *)
+      # 
       # long
       def _move_memory(destination, source, length_)
         JNI.__send__("Java_org_eclipse_swt_internal_win32_OS_MoveMemory__L#{NMHDR.jni_name}_2II".to_sym, JNI.env, self.jni_id, destination.jni_id, source.to_int, length_.to_int)
@@ -11929,6 +13222,9 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method "Java_org_eclipse_swt_internal_win32_OS_MoveMemory__L#{NMRGINFO.jni_name}_2II".to_sym, [:pointer, :long, :long, :int32, :int32], :void
       typesig { [NMRGINFO, ::Java::Int, ::Java::Int] }
+      # @param Destination cast=(PVOID),flags=no_in
+      # @param Source cast=(CONST VOID *)
+      # 
       # long
       def _move_memory(destination, source, length_)
         JNI.__send__("Java_org_eclipse_swt_internal_win32_OS_MoveMemory__L#{NMRGINFO.jni_name}_2II".to_sym, JNI.env, self.jni_id, destination.jni_id, source.to_int, length_.to_int)
@@ -11936,6 +13232,9 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method "Java_org_eclipse_swt_internal_win32_OS_MoveMemory__L#{NMCUSTOMDRAW.jni_name}_2II".to_sym, [:pointer, :long, :long, :int32, :int32], :void
       typesig { [NMCUSTOMDRAW, ::Java::Int, ::Java::Int] }
+      # @param Destination cast=(PVOID),flags=no_in
+      # @param Source cast=(CONST VOID *)
+      # 
       # long
       def _move_memory(destination, source, length_)
         JNI.__send__("Java_org_eclipse_swt_internal_win32_OS_MoveMemory__L#{NMCUSTOMDRAW.jni_name}_2II".to_sym, JNI.env, self.jni_id, destination.jni_id, source.to_int, length_.to_int)
@@ -11943,6 +13242,9 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method "Java_org_eclipse_swt_internal_win32_OS_MoveMemory__L#{NMLVCUSTOMDRAW.jni_name}_2II".to_sym, [:pointer, :long, :long, :int32, :int32], :void
       typesig { [NMLVCUSTOMDRAW, ::Java::Int, ::Java::Int] }
+      # @param Destination cast=(PVOID),flags=no_in
+      # @param Source cast=(CONST VOID *)
+      # 
       # long
       def _move_memory(destination, source, length_)
         JNI.__send__("Java_org_eclipse_swt_internal_win32_OS_MoveMemory__L#{NMLVCUSTOMDRAW.jni_name}_2II".to_sym, JNI.env, self.jni_id, destination.jni_id, source.to_int, length_.to_int)
@@ -11950,6 +13252,9 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method "Java_org_eclipse_swt_internal_win32_OS_MoveMemory__L#{NMTBHOTITEM.jni_name}_2II".to_sym, [:pointer, :long, :long, :int32, :int32], :void
       typesig { [NMTBHOTITEM, ::Java::Int, ::Java::Int] }
+      # @param Destination cast=(PVOID),flags=no_in
+      # @param Source cast=(CONST VOID *)
+      # 
       # long
       def _move_memory(destination, source, length_)
         JNI.__send__("Java_org_eclipse_swt_internal_win32_OS_MoveMemory__L#{NMTBHOTITEM.jni_name}_2II".to_sym, JNI.env, self.jni_id, destination.jni_id, source.to_int, length_.to_int)
@@ -11957,6 +13262,9 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method "Java_org_eclipse_swt_internal_win32_OS_MoveMemory__L#{NMTREEVIEW.jni_name}_2II".to_sym, [:pointer, :long, :long, :int32, :int32], :void
       typesig { [NMTREEVIEW, ::Java::Int, ::Java::Int] }
+      # @param Destination cast=(PVOID),flags=no_in
+      # @param Source cast=(CONST VOID *)
+      # 
       # long
       def _move_memory(destination, source, length_)
         JNI.__send__("Java_org_eclipse_swt_internal_win32_OS_MoveMemory__L#{NMTREEVIEW.jni_name}_2II".to_sym, JNI.env, self.jni_id, destination.jni_id, source.to_int, length_.to_int)
@@ -11964,6 +13272,9 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method "Java_org_eclipse_swt_internal_win32_OS_MoveMemory__L#{NMTVCUSTOMDRAW.jni_name}_2II".to_sym, [:pointer, :long, :long, :int32, :int32], :void
       typesig { [NMTVCUSTOMDRAW, ::Java::Int, ::Java::Int] }
+      # @param Destination cast=(PVOID),flags=no_in
+      # @param Source cast=(CONST VOID *)
+      # 
       # long
       def _move_memory(destination, source, length_)
         JNI.__send__("Java_org_eclipse_swt_internal_win32_OS_MoveMemory__L#{NMTVCUSTOMDRAW.jni_name}_2II".to_sym, JNI.env, self.jni_id, destination.jni_id, source.to_int, length_.to_int)
@@ -11971,6 +13282,9 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method "Java_org_eclipse_swt_internal_win32_OS_MoveMemory__L#{NMTVITEMCHANGE.jni_name}_2II".to_sym, [:pointer, :long, :long, :int32, :int32], :void
       typesig { [NMTVITEMCHANGE, ::Java::Int, ::Java::Int] }
+      # @param Destination cast=(PVOID),flags=no_in
+      # @param Source cast=(CONST VOID *)
+      # 
       # long
       def _move_memory(destination, source, length_)
         JNI.__send__("Java_org_eclipse_swt_internal_win32_OS_MoveMemory__L#{NMTVITEMCHANGE.jni_name}_2II".to_sym, JNI.env, self.jni_id, destination.jni_id, source.to_int, length_.to_int)
@@ -11978,6 +13292,9 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method "Java_org_eclipse_swt_internal_win32_OS_MoveMemory__L#{NMUPDOWN.jni_name}_2II".to_sym, [:pointer, :long, :long, :int32, :int32], :void
       typesig { [NMUPDOWN, ::Java::Int, ::Java::Int] }
+      # @param Destination cast=(PVOID),flags=no_in
+      # @param Source cast=(CONST VOID *)
+      # 
       # long
       def _move_memory(destination, source, length_)
         JNI.__send__("Java_org_eclipse_swt_internal_win32_OS_MoveMemory__L#{NMUPDOWN.jni_name}_2II".to_sym, JNI.env, self.jni_id, destination.jni_id, source.to_int, length_.to_int)
@@ -11985,6 +13302,9 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method "Java_org_eclipse_swt_internal_win32_OS_MoveMemory__IL#{NMLVCUSTOMDRAW.jni_name}_2I".to_sym, [:pointer, :long, :int32, :long, :int32], :void
       typesig { [::Java::Int, NMLVCUSTOMDRAW, ::Java::Int] }
+      # @param Destination cast=(PVOID)
+      # @param Source cast=(CONST VOID *),flags=no_out
+      # 
       # long
       def _move_memory(destination, source, length_)
         JNI.__send__("Java_org_eclipse_swt_internal_win32_OS_MoveMemory__IL#{NMLVCUSTOMDRAW.jni_name}_2I".to_sym, JNI.env, self.jni_id, destination.to_int, source.jni_id, length_.to_int)
@@ -11992,6 +13312,9 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method "Java_org_eclipse_swt_internal_win32_OS_MoveMemory__IL#{NMTVCUSTOMDRAW.jni_name}_2I".to_sym, [:pointer, :long, :int32, :long, :int32], :void
       typesig { [::Java::Int, NMTVCUSTOMDRAW, ::Java::Int] }
+      # @param Destination cast=(PVOID)
+      # @param Source cast=(CONST VOID *),flags=no_out
+      # 
       # long
       def _move_memory(destination, source, length_)
         JNI.__send__("Java_org_eclipse_swt_internal_win32_OS_MoveMemory__IL#{NMTVCUSTOMDRAW.jni_name}_2I".to_sym, JNI.env, self.jni_id, destination.to_int, source.jni_id, length_.to_int)
@@ -11999,6 +13322,9 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method "Java_org_eclipse_swt_internal_win32_OS_MoveMemory__IL#{NMTTCUSTOMDRAW.jni_name}_2I".to_sym, [:pointer, :long, :int32, :long, :int32], :void
       typesig { [::Java::Int, NMTTCUSTOMDRAW, ::Java::Int] }
+      # @param Destination cast=(PVOID)
+      # @param Source cast=(CONST VOID *),flags=no_out
+      # 
       # long
       def _move_memory(destination, source, length_)
         JNI.__send__("Java_org_eclipse_swt_internal_win32_OS_MoveMemory__IL#{NMTTCUSTOMDRAW.jni_name}_2I".to_sym, JNI.env, self.jni_id, destination.to_int, source.jni_id, length_.to_int)
@@ -12006,6 +13332,9 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method "Java_org_eclipse_swt_internal_win32_OS_MoveMemory__IL#{NMLVDISPINFO.jni_name}_2I".to_sym, [:pointer, :long, :int32, :long, :int32], :void
       typesig { [::Java::Int, NMLVDISPINFO, ::Java::Int] }
+      # @param Destination cast=(PVOID)
+      # @param Source cast=(CONST VOID *),flags=no_out
+      # 
       # long
       def _move_memory(destination, source, length_)
         JNI.__send__("Java_org_eclipse_swt_internal_win32_OS_MoveMemory__IL#{NMLVDISPINFO.jni_name}_2I".to_sym, JNI.env, self.jni_id, destination.to_int, source.jni_id, length_.to_int)
@@ -12013,6 +13342,9 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method "Java_org_eclipse_swt_internal_win32_OS_MoveMemory__IL#{NMTVDISPINFO.jni_name}_2I".to_sym, [:pointer, :long, :int32, :long, :int32], :void
       typesig { [::Java::Int, NMTVDISPINFO, ::Java::Int] }
+      # @param Destination cast=(PVOID)
+      # @param Source cast=(CONST VOID *),flags=no_out
+      # 
       # long
       def _move_memory(destination, source, length_)
         JNI.__send__("Java_org_eclipse_swt_internal_win32_OS_MoveMemory__IL#{NMTVDISPINFO.jni_name}_2I".to_sym, JNI.env, self.jni_id, destination.to_int, source.jni_id, length_.to_int)
@@ -12020,6 +13352,9 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method "Java_org_eclipse_swt_internal_win32_OS_MoveMemory__L#{NMLVDISPINFO.jni_name}_2II".to_sym, [:pointer, :long, :long, :int32, :int32], :void
       typesig { [NMLVDISPINFO, ::Java::Int, ::Java::Int] }
+      # @param Destination cast=(PVOID),flags=no_in
+      # @param Source cast=(CONST VOID *)
+      # 
       # long
       def _move_memory(destination, source, length_)
         JNI.__send__("Java_org_eclipse_swt_internal_win32_OS_MoveMemory__L#{NMLVDISPINFO.jni_name}_2II".to_sym, JNI.env, self.jni_id, destination.jni_id, source.to_int, length_.to_int)
@@ -12027,6 +13362,9 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method "Java_org_eclipse_swt_internal_win32_OS_MoveMemory__L#{NMTVDISPINFO.jni_name}_2II".to_sym, [:pointer, :long, :long, :int32, :int32], :void
       typesig { [NMTVDISPINFO, ::Java::Int, ::Java::Int] }
+      # @param Destination cast=(PVOID),flags=no_in
+      # @param Source cast=(CONST VOID *)
+      # 
       # long
       def _move_memory(destination, source, length_)
         JNI.__send__("Java_org_eclipse_swt_internal_win32_OS_MoveMemory__L#{NMTVDISPINFO.jni_name}_2II".to_sym, JNI.env, self.jni_id, destination.jni_id, source.to_int, length_.to_int)
@@ -12034,6 +13372,9 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method "Java_org_eclipse_swt_internal_win32_OS_MoveMemory__L#{NMLVFINDITEM.jni_name}_2II".to_sym, [:pointer, :long, :long, :int32, :int32], :void
       typesig { [NMLVFINDITEM, ::Java::Int, ::Java::Int] }
+      # @param Destination cast=(PVOID),flags=no_in
+      # @param Source cast=(CONST VOID *)
+      # 
       # long
       def _move_memory(destination, source, length_)
         JNI.__send__("Java_org_eclipse_swt_internal_win32_OS_MoveMemory__L#{NMLVFINDITEM.jni_name}_2II".to_sym, JNI.env, self.jni_id, destination.jni_id, source.to_int, length_.to_int)
@@ -12041,6 +13382,9 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method "Java_org_eclipse_swt_internal_win32_OS_MoveMemory__L#{NMLVODSTATECHANGE.jni_name}_2II".to_sym, [:pointer, :long, :long, :int32, :int32], :void
       typesig { [NMLVODSTATECHANGE, ::Java::Int, ::Java::Int] }
+      # @param Destination cast=(PVOID),flags=no_in
+      # @param Source cast=(CONST VOID *)
+      # 
       # long
       def _move_memory(destination, source, length_)
         JNI.__send__("Java_org_eclipse_swt_internal_win32_OS_MoveMemory__L#{NMLVODSTATECHANGE.jni_name}_2II".to_sym, JNI.env, self.jni_id, destination.jni_id, source.to_int, length_.to_int)
@@ -12048,6 +13392,9 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method "Java_org_eclipse_swt_internal_win32_OS_MoveMemory__L#{NMHEADER.jni_name}_2II".to_sym, [:pointer, :long, :long, :int32, :int32], :void
       typesig { [NMHEADER, ::Java::Int, ::Java::Int] }
+      # @param Destination cast=(PVOID),flags=no_in
+      # @param Source cast=(CONST VOID *)
+      # 
       # long
       def _move_memory(destination, source, length_)
         JNI.__send__("Java_org_eclipse_swt_internal_win32_OS_MoveMemory__L#{NMHEADER.jni_name}_2II".to_sym, JNI.env, self.jni_id, destination.jni_id, source.to_int, length_.to_int)
@@ -12055,6 +13402,9 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method "Java_org_eclipse_swt_internal_win32_OS_MoveMemory__L#{NMLINK.jni_name}_2II".to_sym, [:pointer, :long, :long, :int32, :int32], :void
       typesig { [NMLINK, ::Java::Int, ::Java::Int] }
+      # @param Destination cast=(PVOID),flags=no_in
+      # @param Source cast=(CONST VOID *)
+      # 
       # long
       def _move_memory(destination, source, length_)
         JNI.__send__("Java_org_eclipse_swt_internal_win32_OS_MoveMemory__L#{NMLINK.jni_name}_2II".to_sym, JNI.env, self.jni_id, destination.jni_id, source.to_int, length_.to_int)
@@ -12062,6 +13412,9 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method "Java_org_eclipse_swt_internal_win32_OS_MoveMemory__L#{NMLISTVIEW.jni_name}_2II".to_sym, [:pointer, :long, :long, :int32, :int32], :void
       typesig { [NMLISTVIEW, ::Java::Int, ::Java::Int] }
+      # @param Destination cast=(PVOID),flags=no_in
+      # @param Source cast=(CONST VOID *)
+      # 
       # long
       def _move_memory(destination, source, length_)
         JNI.__send__("Java_org_eclipse_swt_internal_win32_OS_MoveMemory__L#{NMLISTVIEW.jni_name}_2II".to_sym, JNI.env, self.jni_id, destination.jni_id, source.to_int, length_.to_int)
@@ -12069,6 +13422,9 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method "Java_org_eclipse_swt_internal_win32_OS_MoveMemory__L#{NMREBARCHILDSIZE.jni_name}_2II".to_sym, [:pointer, :long, :long, :int32, :int32], :void
       typesig { [NMREBARCHILDSIZE, ::Java::Int, ::Java::Int] }
+      # @param Destination cast=(PVOID),flags=no_in
+      # @param Source cast=(CONST VOID *)
+      # 
       # long
       def _move_memory(destination, source, length_)
         JNI.__send__("Java_org_eclipse_swt_internal_win32_OS_MoveMemory__L#{NMREBARCHILDSIZE.jni_name}_2II".to_sym, JNI.env, self.jni_id, destination.jni_id, source.to_int, length_.to_int)
@@ -12076,6 +13432,9 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method "Java_org_eclipse_swt_internal_win32_OS_MoveMemory__L#{NMREBARCHEVRON.jni_name}_2II".to_sym, [:pointer, :long, :long, :int32, :int32], :void
       typesig { [NMREBARCHEVRON, ::Java::Int, ::Java::Int] }
+      # @param Destination cast=(PVOID),flags=no_in
+      # @param Source cast=(CONST VOID *)
+      # 
       # long
       def _move_memory(destination, source, length_)
         JNI.__send__("Java_org_eclipse_swt_internal_win32_OS_MoveMemory__L#{NMREBARCHEVRON.jni_name}_2II".to_sym, JNI.env, self.jni_id, destination.jni_id, source.to_int, length_.to_int)
@@ -12083,6 +13442,9 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method "Java_org_eclipse_swt_internal_win32_OS_MoveMemory__L#{NMTOOLBAR.jni_name}_2II".to_sym, [:pointer, :long, :long, :int32, :int32], :void
       typesig { [NMTOOLBAR, ::Java::Int, ::Java::Int] }
+      # @param Destination cast=(PVOID),flags=no_in
+      # @param Source cast=(CONST VOID *)
+      # 
       # long
       def _move_memory(destination, source, length_)
         JNI.__send__("Java_org_eclipse_swt_internal_win32_OS_MoveMemory__L#{NMTOOLBAR.jni_name}_2II".to_sym, JNI.env, self.jni_id, destination.jni_id, source.to_int, length_.to_int)
@@ -12090,6 +13452,9 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method "Java_org_eclipse_swt_internal_win32_OS_MoveMemory__L#{NMTTCUSTOMDRAW.jni_name}_2II".to_sym, [:pointer, :long, :long, :int32, :int32], :void
       typesig { [NMTTCUSTOMDRAW, ::Java::Int, ::Java::Int] }
+      # @param Destination cast=(PVOID),flags=no_in
+      # @param Source cast=(CONST VOID *)
+      # 
       # long
       def _move_memory(destination, source, length_)
         JNI.__send__("Java_org_eclipse_swt_internal_win32_OS_MoveMemory__L#{NMTTCUSTOMDRAW.jni_name}_2II".to_sym, JNI.env, self.jni_id, destination.jni_id, source.to_int, length_.to_int)
@@ -12097,6 +13462,9 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method "Java_org_eclipse_swt_internal_win32_OS_MoveMemory__L#{NMTTDISPINFOW.jni_name}_2II".to_sym, [:pointer, :long, :long, :int32, :int32], :void
       typesig { [NMTTDISPINFOW, ::Java::Int, ::Java::Int] }
+      # @param Destination cast=(PVOID),flags=no_in
+      # @param Source cast=(CONST VOID *)
+      # 
       # long
       def _move_memory(destination, source, length_)
         JNI.__send__("Java_org_eclipse_swt_internal_win32_OS_MoveMemory__L#{NMTTDISPINFOW.jni_name}_2II".to_sym, JNI.env, self.jni_id, destination.jni_id, source.to_int, length_.to_int)
@@ -12104,6 +13472,9 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method "Java_org_eclipse_swt_internal_win32_OS_MoveMemory__L#{NMTTDISPINFOA.jni_name}_2II".to_sym, [:pointer, :long, :long, :int32, :int32], :void
       typesig { [NMTTDISPINFOA, ::Java::Int, ::Java::Int] }
+      # @param Destination cast=(PVOID),flags=no_in
+      # @param Source cast=(CONST VOID *)
+      # 
       # long
       def _move_memory(destination, source, length_)
         JNI.__send__("Java_org_eclipse_swt_internal_win32_OS_MoveMemory__L#{NMTTDISPINFOA.jni_name}_2II".to_sym, JNI.env, self.jni_id, destination.jni_id, source.to_int, length_.to_int)
@@ -12118,6 +13489,9 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method "Java_org_eclipse_swt_internal_win32_OS_MoveMemory__L#{SHDRAGIMAGE.jni_name}_2II".to_sym, [:pointer, :long, :long, :int32, :int32], :void
       typesig { [SHDRAGIMAGE, ::Java::Int, ::Java::Int] }
+      # @param Destination cast=(PVOID),flags=no_in
+      # @param Source cast=(CONST VOID *)
+      # 
       # long
       def _move_memory(destination, source, length_)
         JNI.__send__("Java_org_eclipse_swt_internal_win32_OS_MoveMemory__L#{SHDRAGIMAGE.jni_name}_2II".to_sym, JNI.env, self.jni_id, destination.jni_id, source.to_int, length_.to_int)
@@ -12125,6 +13499,9 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method "Java_org_eclipse_swt_internal_win32_OS_MoveMemory__L#{EMR.jni_name}_2II".to_sym, [:pointer, :long, :long, :int32, :int32], :void
       typesig { [EMR, ::Java::Int, ::Java::Int] }
+      # @param Destination cast=(PVOID),flags=no_in
+      # @param Source cast=(CONST VOID *)
+      # 
       # long
       def _move_memory(destination, source, length_)
         JNI.__send__("Java_org_eclipse_swt_internal_win32_OS_MoveMemory__L#{EMR.jni_name}_2II".to_sym, JNI.env, self.jni_id, destination.jni_id, source.to_int, length_.to_int)
@@ -12132,6 +13509,9 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method "Java_org_eclipse_swt_internal_win32_OS_MoveMemory__L#{EMREXTCREATEFONTINDIRECTW.jni_name}_2II".to_sym, [:pointer, :long, :long, :int32, :int32], :void
       typesig { [EMREXTCREATEFONTINDIRECTW, ::Java::Int, ::Java::Int] }
+      # @param Destination cast=(PVOID),flags=no_in
+      # @param Source cast=(CONST VOID *)
+      # 
       # long
       def _move_memory(destination, source, length_)
         JNI.__send__("Java_org_eclipse_swt_internal_win32_OS_MoveMemory__L#{EMREXTCREATEFONTINDIRECTW.jni_name}_2II".to_sym, JNI.env, self.jni_id, destination.jni_id, source.to_int, length_.to_int)
@@ -12139,6 +13519,9 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method "Java_org_eclipse_swt_internal_win32_OS_MoveMemory__IL#{SHDRAGIMAGE.jni_name}_2I".to_sym, [:pointer, :long, :int32, :long, :int32], :void
       typesig { [::Java::Int, SHDRAGIMAGE, ::Java::Int] }
+      # @param Destination cast=(PVOID)
+      # @param Source cast=(CONST VOID *),flags=no_out
+      # 
       # long
       def _move_memory(destination, source, length_)
         JNI.__send__("Java_org_eclipse_swt_internal_win32_OS_MoveMemory__IL#{SHDRAGIMAGE.jni_name}_2I".to_sym, JNI.env, self.jni_id, destination.to_int, source.jni_id, length_.to_int)
@@ -12146,6 +13529,9 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method "Java_org_eclipse_swt_internal_win32_OS_MoveMemory__L#{TEXTMETRICW.jni_name}_2II".to_sym, [:pointer, :long, :long, :int32, :int32], :void
       typesig { [TEXTMETRICW, ::Java::Int, ::Java::Int] }
+      # @param Destination cast=(PVOID),flags=no_in
+      # @param Source cast=(CONST VOID *)
+      # 
       # long
       def _move_memory(destination, source, length_)
         JNI.__send__("Java_org_eclipse_swt_internal_win32_OS_MoveMemory__L#{TEXTMETRICW.jni_name}_2II".to_sym, JNI.env, self.jni_id, destination.jni_id, source.to_int, length_.to_int)
@@ -12153,6 +13539,9 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method "Java_org_eclipse_swt_internal_win32_OS_MoveMemory__L#{TEXTMETRICA.jni_name}_2II".to_sym, [:pointer, :long, :long, :int32, :int32], :void
       typesig { [TEXTMETRICA, ::Java::Int, ::Java::Int] }
+      # @param Destination cast=(PVOID),flags=no_in
+      # @param Source cast=(CONST VOID *)
+      # 
       # long
       def _move_memory(destination, source, length_)
         JNI.__send__("Java_org_eclipse_swt_internal_win32_OS_MoveMemory__L#{TEXTMETRICA.jni_name}_2II".to_sym, JNI.env, self.jni_id, destination.jni_id, source.to_int, length_.to_int)
@@ -12160,6 +13549,9 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method "Java_org_eclipse_swt_internal_win32_OS_MoveMemory__L#{TVITEM.jni_name}_2II".to_sym, [:pointer, :long, :long, :int32, :int32], :void
       typesig { [TVITEM, ::Java::Int, ::Java::Int] }
+      # @param Destination cast=(PVOID),flags=no_in
+      # @param Source cast=(CONST VOID *)
+      # 
       # long
       def _move_memory(destination, source, length_)
         JNI.__send__("Java_org_eclipse_swt_internal_win32_OS_MoveMemory__L#{TVITEM.jni_name}_2II".to_sym, JNI.env, self.jni_id, destination.jni_id, source.to_int, length_.to_int)
@@ -12167,6 +13559,9 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method "Java_org_eclipse_swt_internal_win32_OS_MoveMemory__L#{WINDOWPOS.jni_name}_2II".to_sym, [:pointer, :long, :long, :int32, :int32], :void
       typesig { [WINDOWPOS, ::Java::Int, ::Java::Int] }
+      # @param Destination cast=(PVOID),flags=no_in
+      # @param Source cast=(CONST VOID *)
+      # 
       # long
       def _move_memory(destination, source, length_)
         JNI.__send__("Java_org_eclipse_swt_internal_win32_OS_MoveMemory__L#{WINDOWPOS.jni_name}_2II".to_sym, JNI.env, self.jni_id, destination.jni_id, source.to_int, length_.to_int)
@@ -12174,6 +13569,9 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method "Java_org_eclipse_swt_internal_win32_OS_MoveMemory__L#{MSG.jni_name}_2II".to_sym, [:pointer, :long, :long, :int32, :int32], :void
       typesig { [MSG, ::Java::Int, ::Java::Int] }
+      # @param Destination cast=(PVOID),flags=no_in
+      # @param Source cast=(CONST VOID *)
+      # 
       # long
       def _move_memory(destination, source, length_)
         JNI.__send__("Java_org_eclipse_swt_internal_win32_OS_MoveMemory__L#{MSG.jni_name}_2II".to_sym, JNI.env, self.jni_id, destination.jni_id, source.to_int, length_.to_int)
@@ -12181,6 +13579,9 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method "Java_org_eclipse_swt_internal_win32_OS_MoveMemory__L#{UDACCEL.jni_name}_2II".to_sym, [:pointer, :long, :long, :int32, :int32], :void
       typesig { [UDACCEL, ::Java::Int, ::Java::Int] }
+      # @param Destination cast=(PVOID),flags=no_in
+      # @param Source cast=(CONST VOID *)
+      # 
       # long
       def _move_memory(destination, source, length_)
         JNI.__send__("Java_org_eclipse_swt_internal_win32_OS_MoveMemory__L#{UDACCEL.jni_name}_2II".to_sym, JNI.env, self.jni_id, destination.jni_id, source.to_int, length_.to_int)
@@ -12188,6 +13589,9 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method "Java_org_eclipse_swt_internal_win32_OS_MoveMemory__IL#{DROPFILES.jni_name}_2I".to_sym, [:pointer, :long, :int32, :long, :int32], :void
       typesig { [::Java::Int, DROPFILES, ::Java::Int] }
+      # @param Destination cast=(PVOID)
+      # @param Source cast=(CONST VOID *),flags=no_out
+      # 
       # long
       def _move_memory(destination, source, length_)
         JNI.__send__("Java_org_eclipse_swt_internal_win32_OS_MoveMemory__IL#{DROPFILES.jni_name}_2I".to_sym, JNI.env, self.jni_id, destination.to_int, source.jni_id, length_.to_int)
@@ -12195,6 +13599,9 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_MoveMemory__I_3XdoubleXI, [:pointer, :long, :int32, :long, :int32], :void
       typesig { [::Java::Int, Array.typed(::Java::Double), ::Java::Int] }
+      # @param DestinationPtr cast=(PVOID)
+      # @param Source cast=(CONST VOID *),flags=no_out critical
+      # 
       # long
       def _move_memory(destination_ptr, source, length_)
         JNI.__send__(:Java_org_eclipse_swt_internal_win32_OS_MoveMemory__I_3XdoubleXI, JNI.env, self.jni_id, destination_ptr.to_int, source.jni_id, length_.to_int)
@@ -12202,6 +13609,9 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_MoveMemory__I_3XfloatXI, [:pointer, :long, :int32, :long, :int32], :void
       typesig { [::Java::Int, Array.typed(::Java::Float), ::Java::Int] }
+      # @param DestinationPtr cast=(PVOID)
+      # @param Source cast=(CONST VOID *),flags=no_out critical
+      # 
       # long
       def _move_memory(destination_ptr, source, length_)
         JNI.__send__(:Java_org_eclipse_swt_internal_win32_OS_MoveMemory__I_3XfloatXI, JNI.env, self.jni_id, destination_ptr.to_int, source.jni_id, length_.to_int)
@@ -12209,6 +13619,9 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_MoveMemory__I_3JI, [:pointer, :long, :int32, :long, :int32], :void
       typesig { [::Java::Int, Array.typed(::Java::Long), ::Java::Int] }
+      # @param DestinationPtr cast=(PVOID)
+      # @param Source cast=(CONST VOID *),flags=no_out critical
+      # 
       # long
       def _move_memory(destination_ptr, source, length_)
         JNI.__send__(:Java_org_eclipse_swt_internal_win32_OS_MoveMemory__I_3JI, JNI.env, self.jni_id, destination_ptr.to_int, source.jni_id, length_.to_int)
@@ -12216,6 +13629,9 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_MoveMemory__I_3SI, [:pointer, :long, :int32, :long, :int32], :void
       typesig { [::Java::Int, Array.typed(::Java::Short), ::Java::Int] }
+      # @param DestinationPtr cast=(PVOID)
+      # @param Source cast=(CONST VOID *),flags=no_out critical
+      # 
       # long
       def _move_memory(destination_ptr, source, length_)
         JNI.__send__(:Java_org_eclipse_swt_internal_win32_OS_MoveMemory__I_3SI, JNI.env, self.jni_id, destination_ptr.to_int, source.jni_id, length_.to_int)
@@ -12223,6 +13639,9 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method "Java_org_eclipse_swt_internal_win32_OS_MoveMemory__L#{SCRIPT_ITEM.jni_name}_2II".to_sym, [:pointer, :long, :long, :int32, :int32], :void
       typesig { [SCRIPT_ITEM, ::Java::Int, ::Java::Int] }
+      # @param Destination cast=(PVOID),flags=no_in
+      # @param SourcePtr cast=(CONST VOID *)
+      # 
       # long
       def _move_memory(destination, source_ptr, length_)
         JNI.__send__("Java_org_eclipse_swt_internal_win32_OS_MoveMemory__L#{SCRIPT_ITEM.jni_name}_2II".to_sym, JNI.env, self.jni_id, destination.jni_id, source_ptr.to_int, length_.to_int)
@@ -12230,6 +13649,9 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method "Java_org_eclipse_swt_internal_win32_OS_MoveMemory__L#{SCRIPT_LOGATTR.jni_name}_2II".to_sym, [:pointer, :long, :long, :int32, :int32], :void
       typesig { [SCRIPT_LOGATTR, ::Java::Int, ::Java::Int] }
+      # @param Destination cast=(PVOID),flags=no_in
+      # @param SourcePtr cast=(CONST VOID *)
+      # 
       # long
       def _move_memory(destination, source_ptr, length_)
         JNI.__send__("Java_org_eclipse_swt_internal_win32_OS_MoveMemory__L#{SCRIPT_LOGATTR.jni_name}_2II".to_sym, JNI.env, self.jni_id, destination.jni_id, source_ptr.to_int, length_.to_int)
@@ -12237,6 +13659,9 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method "Java_org_eclipse_swt_internal_win32_OS_MoveMemory__L#{SCRIPT_PROPERTIES.jni_name}_2II".to_sym, [:pointer, :long, :long, :int32, :int32], :void
       typesig { [SCRIPT_PROPERTIES, ::Java::Int, ::Java::Int] }
+      # @param Destination cast=(PVOID),flags=no_in
+      # @param SourcePtr cast=(CONST VOID *)
+      # 
       # long
       def _move_memory(destination, source_ptr, length_)
         JNI.__send__("Java_org_eclipse_swt_internal_win32_OS_MoveMemory__L#{SCRIPT_PROPERTIES.jni_name}_2II".to_sym, JNI.env, self.jni_id, destination.jni_id, source_ptr.to_int, length_.to_int)
@@ -12244,6 +13669,9 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method "Java_org_eclipse_swt_internal_win32_OS_MoveMemory__IL#{KEYBDINPUT.jni_name}_2I".to_sym, [:pointer, :long, :int32, :long, :int32], :void
       typesig { [::Java::Int, KEYBDINPUT, ::Java::Int] }
+      # @param Destination cast=(PVOID)
+      # @param Source cast=(CONST VOID *),flags=no_out
+      # 
       # long
       def _move_memory(destination, source, length_)
         JNI.__send__("Java_org_eclipse_swt_internal_win32_OS_MoveMemory__IL#{KEYBDINPUT.jni_name}_2I".to_sym, JNI.env, self.jni_id, destination.to_int, source.jni_id, length_.to_int)
@@ -12251,6 +13679,9 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method "Java_org_eclipse_swt_internal_win32_OS_MoveMemory__IL#{MOUSEINPUT.jni_name}_2I".to_sym, [:pointer, :long, :int32, :long, :int32], :void
       typesig { [::Java::Int, MOUSEINPUT, ::Java::Int] }
+      # @param Destination cast=(PVOID)
+      # @param Source cast=(CONST VOID *),flags=no_out
+      # 
       # long
       def _move_memory(destination, source, length_)
         JNI.__send__("Java_org_eclipse_swt_internal_win32_OS_MoveMemory__IL#{MOUSEINPUT.jni_name}_2I".to_sym, JNI.env, self.jni_id, destination.to_int, source.jni_id, length_.to_int)
@@ -12258,6 +13689,9 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_MoveToEx, [:pointer, :long, :int32, :int32, :int32, :int32], :int8
       typesig { [::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int] }
+      # @param hdc cast=(HDC)
+      # @param lPoint cast=(LPPOINT)
+      # 
       # long
       # long
       def _move_to_ex(hdc, x1, x2, l_point)
@@ -12266,6 +13700,12 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_MsgWaitForMultipleObjectsEx, [:pointer, :long, :int32, :int32, :int32, :int32, :int32], :int32
       typesig { [::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int] }
+      # @param nCount cast=(DWORD)
+      # @param pHandles cast=(LPHANDLE)
+      # @param dwMilliseconds cast=(DWORD)
+      # @param dwWakeMask cast=(DWORD)
+      # @param dwFlags cast=(DWORD)
+      # 
       # long
       def _msg_wait_for_multiple_objects_ex(n_count, p_handles, dw_milliseconds, dw_wake_mask, dw_flags)
         JNI.__send__(:Java_org_eclipse_swt_internal_win32_OS_MsgWaitForMultipleObjectsEx, JNI.env, self.jni_id, n_count.to_int, p_handles.to_int, dw_milliseconds.to_int, dw_wake_mask.to_int, dw_flags.to_int)
@@ -12273,12 +13713,17 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_MultiByteToWideChar__II_3BI_3CI, [:pointer, :long, :int32, :int32, :long, :int32, :long, :int32], :int32
       typesig { [::Java::Int, ::Java::Int, Array.typed(::Java::Byte), ::Java::Int, Array.typed(::Java::Char), ::Java::Int] }
+      # @param lpMultiByteStr cast=(LPCSTR),flags=no_out critical
+      # @param lpWideCharStr cast=(LPWSTR),flags=no_in critical
       def _multi_byte_to_wide_char(code_page, dw_flags, lp_multi_byte_str, cch_multi_byte, lp_wide_char_str, cch_wide_char)
         JNI.__send__(:Java_org_eclipse_swt_internal_win32_OS_MultiByteToWideChar__II_3BI_3CI, JNI.env, self.jni_id, code_page.to_int, dw_flags.to_int, lp_multi_byte_str.jni_id, cch_multi_byte.to_int, lp_wide_char_str.jni_id, cch_wide_char.to_int)
       end
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_MultiByteToWideChar__IIII_3CI, [:pointer, :long, :int32, :int32, :int32, :int32, :long, :int32], :int32
       typesig { [::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, Array.typed(::Java::Char), ::Java::Int] }
+      # @param lpMultiByteStr cast=(LPCSTR)
+      # @param lpWideCharStr cast=(LPWSTR),flags=no_in critical
+      # 
       # long
       def _multi_byte_to_wide_char(code_page, dw_flags, lp_multi_byte_str, cch_multi_byte, lp_wide_char_str, cch_wide_char)
         JNI.__send__(:Java_org_eclipse_swt_internal_win32_OS_MultiByteToWideChar__IIII_3CI, JNI.env, self.jni_id, code_page.to_int, dw_flags.to_int, lp_multi_byte_str.to_int, cch_multi_byte.to_int, lp_wide_char_str.jni_id, cch_wide_char.to_int)
@@ -12286,6 +13731,12 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_NotifyWinEvent, [:pointer, :long, :int32, :int32, :int32, :int32], :void
       typesig { [::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int] }
+      # @method flags=dynamic
+      # @param event cast=(DWORD)
+      # @param hwnd cast=(HWND)
+      # @param idObject cast=(LONG)
+      # @param idChild cast=(LONG)
+      # 
       # long
       def _notify_win_event(event, hwnd, id_object, id_child)
         JNI.__send__(:Java_org_eclipse_swt_internal_win32_OS_NotifyWinEvent, JNI.env, self.jni_id, event.to_int, hwnd.to_int, id_object.to_int, id_child.to_int)
@@ -12299,6 +13750,7 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_OffsetRgn, [:pointer, :long, :int32, :int32, :int32], :int32
       typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
+      # @param hrgn cast=(HRGN)
       # long
       def _offset_rgn(hrgn, n_xoffset, n_yoffset)
         JNI.__send__(:Java_org_eclipse_swt_internal_win32_OS_OffsetRgn, JNI.env, self.jni_id, hrgn.to_int, n_xoffset.to_int, n_yoffset.to_int)
@@ -12306,6 +13758,7 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_OleInitialize, [:pointer, :long, :int32], :int32
       typesig { [::Java::Int] }
+      # @param pvReserved cast=(LPVOID)
       # long
       def _ole_initialize(pv_reserved)
         JNI.__send__(:Java_org_eclipse_swt_internal_win32_OS_OleInitialize, JNI.env, self.jni_id, pv_reserved.to_int)
@@ -12319,6 +13772,7 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_OpenClipboard, [:pointer, :long, :int32], :int8
       typesig { [::Java::Int] }
+      # @param hWndNewOwner cast=(HWND)
       # long
       def _open_clipboard(h_wnd_new_owner)
         JNI.__send__(:Java_org_eclipse_swt_internal_win32_OS_OpenClipboard, JNI.env, self.jni_id, h_wnd_new_owner.to_int) != 0
@@ -12326,6 +13780,10 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_OpenThemeData, [:pointer, :long, :int32, :long], :int32
       typesig { [::Java::Int, Array.typed(::Java::Char)] }
+      # @method flags=dynamic
+      # @param hwnd cast=(HWND)
+      # @param pszClassList cast=(LPCWSTR)
+      # 
       # long
       # long
       def _open_theme_data(hwnd, psz_class_list)
@@ -12334,6 +13792,7 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_PatBlt, [:pointer, :long, :int32, :int32, :int32, :int32, :int32, :int32], :int8
       typesig { [::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int] }
+      # @param hdc cast=(HDC)
       # long
       def _pat_blt(hdc, x1, x2, w, h, rop)
         JNI.__send__(:Java_org_eclipse_swt_internal_win32_OS_PatBlt, JNI.env, self.jni_id, hdc.to_int, x1.to_int, x2.to_int, w.to_int, h.to_int, rop.to_int) != 0
@@ -12341,6 +13800,7 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_PeekMessageW, [:pointer, :long, :long, :int32, :int32, :int32, :int32], :int8
       typesig { [MSG, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int] }
+      # @param hWnd cast=(HWND)
       # long
       def _peek_message_w(lp_msg, h_wnd, w_msg_filter_min, w_msg_filter_max, w_remove_msg)
         JNI.__send__(:Java_org_eclipse_swt_internal_win32_OS_PeekMessageW, JNI.env, self.jni_id, lp_msg.jni_id, h_wnd.to_int, w_msg_filter_min.to_int, w_msg_filter_max.to_int, w_remove_msg.to_int) != 0
@@ -12348,6 +13808,7 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_PeekMessageA, [:pointer, :long, :long, :int32, :int32, :int32, :int32], :int8
       typesig { [MSG, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int] }
+      # @param hWnd cast=(HWND)
       # long
       def _peek_message_a(lp_msg, h_wnd, w_msg_filter_min, w_msg_filter_max, w_remove_msg)
         JNI.__send__(:Java_org_eclipse_swt_internal_win32_OS_PeekMessageA, JNI.env, self.jni_id, lp_msg.jni_id, h_wnd.to_int, w_msg_filter_min.to_int, w_msg_filter_max.to_int, w_remove_msg.to_int) != 0
@@ -12355,6 +13816,7 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_Pie, [:pointer, :long, :int32, :int32, :int32, :int32, :int32, :int32, :int32, :int32, :int32], :int8
       typesig { [::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int] }
+      # @param hdc cast=(HDC)
       # long
       def _pie(hdc, n_left_rect, n_top_rect, n_right_rect, n_bottom_rect, n_xstart_arc, n_ystart_arc, n_xend_arc, n_yend_arc)
         JNI.__send__(:Java_org_eclipse_swt_internal_win32_OS_Pie, JNI.env, self.jni_id, hdc.to_int, n_left_rect.to_int, n_top_rect.to_int, n_right_rect.to_int, n_bottom_rect.to_int, n_xstart_arc.to_int, n_ystart_arc.to_int, n_xend_arc.to_int, n_yend_arc.to_int) != 0
@@ -12362,6 +13824,7 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_POINTSTOPOINT, [:pointer, :long, :long, :int32], :void
       typesig { [POINT, ::Java::Int] }
+      # @param pt flags=struct
       # long
       def _pointstopoint(pt, pts)
         JNI.__send__(:Java_org_eclipse_swt_internal_win32_OS_POINTSTOPOINT, JNI.env, self.jni_id, pt.jni_id, pts.to_int)
@@ -12369,6 +13832,9 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_Polygon, [:pointer, :long, :int32, :long, :int32], :int8
       typesig { [::Java::Int, Array.typed(::Java::Int), ::Java::Int] }
+      # @param hdc cast=(HDC)
+      # @param points cast=(CONST POINT *),flags=no_out critical
+      # 
       # long
       def _polygon(hdc, points, n_points)
         JNI.__send__(:Java_org_eclipse_swt_internal_win32_OS_Polygon, JNI.env, self.jni_id, hdc.to_int, points.jni_id, n_points.to_int) != 0
@@ -12376,6 +13842,9 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_Polyline, [:pointer, :long, :int32, :long, :int32], :int8
       typesig { [::Java::Int, Array.typed(::Java::Int), ::Java::Int] }
+      # @param hdc cast=(HDC)
+      # @param points cast=(CONST POINT *),flags=no_out critical
+      # 
       # long
       def _polyline(hdc, points, n_points)
         JNI.__send__(:Java_org_eclipse_swt_internal_win32_OS_Polyline, JNI.env, self.jni_id, hdc.to_int, points.jni_id, n_points.to_int) != 0
@@ -12383,6 +13852,10 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_PostMessageW, [:pointer, :long, :int32, :int32, :int32, :int32], :int8
       typesig { [::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int] }
+      # @param hWnd cast=(HWND)
+      # @param wParam cast=(WPARAM)
+      # @param lParam cast=(LPARAM)
+      # 
       # long
       # long
       # long
@@ -12392,6 +13865,10 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_PostMessageA, [:pointer, :long, :int32, :int32, :int32, :int32], :int8
       typesig { [::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int] }
+      # @param hWnd cast=(HWND)
+      # @param wParam cast=(WPARAM)
+      # @param lParam cast=(LPARAM)
+      # 
       # long
       # long
       # long
@@ -12401,6 +13878,9 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_PostThreadMessageW, [:pointer, :long, :int32, :int32, :int32, :int32], :int8
       typesig { [::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int] }
+      # @param wParam cast=(WPARAM)
+      # @param lParam cast=(LPARAM)
+      # 
       # long
       # long
       def _post_thread_message_w(id_thread, msg, w_param, l_param)
@@ -12409,6 +13889,9 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_PostThreadMessageA, [:pointer, :long, :int32, :int32, :int32, :int32], :int8
       typesig { [::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int] }
+      # @param wParam cast=(WPARAM)
+      # @param lParam cast=(LPARAM)
+      # 
       # long
       # long
       def _post_thread_message_a(id_thread, msg, w_param, l_param)
@@ -12423,6 +13906,7 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_PrintDlgW, [:pointer, :long, :long], :int8
       typesig { [PRINTDLG] }
+      # @param lppd cast=(LPPRINTDLGW)
       def _print_dlg_w(lppd)
         JNI.__send__(:Java_org_eclipse_swt_internal_win32_OS_PrintDlgW, JNI.env, self.jni_id, lppd.jni_id) != 0
       end
@@ -12435,6 +13919,10 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_PrintWindow, [:pointer, :long, :int32, :int32, :int32], :int8
       typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
+      # @method flags=dynamic
+      # @param hwnd cast=(HWND)
+      # @param hdcBlt cast=(HDC)
+      # 
       # long
       # long
       def _print_window(hwnd, hdc_blt, n_flags)
@@ -12443,12 +13931,15 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_PtInRect, [:pointer, :long, :long, :long], :int8
       typesig { [RECT, POINT] }
+      # @param rect flags=no_out
+      # @param pt flags=no_out struct
       def _pt_in_rect(rect, pt)
         JNI.__send__(:Java_org_eclipse_swt_internal_win32_OS_PtInRect, JNI.env, self.jni_id, rect.jni_id, pt.jni_id) != 0
       end
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_PtInRegion, [:pointer, :long, :int32, :int32, :int32], :int8
       typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
+      # @param hrgn cast=(HRGN)
       # long
       def _pt_in_region(hrgn, x, y)
         JNI.__send__(:Java_org_eclipse_swt_internal_win32_OS_PtInRegion, JNI.env, self.jni_id, hrgn.to_int, x.to_int, y.to_int) != 0
@@ -12456,6 +13947,7 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_RealizePalette, [:pointer, :long, :int32], :int32
       typesig { [::Java::Int] }
+      # @param hDC cast=(HDC)
       # long
       def _realize_palette(h_dc)
         JNI.__send__(:Java_org_eclipse_swt_internal_win32_OS_RealizePalette, JNI.env, self.jni_id, h_dc.to_int)
@@ -12463,6 +13955,7 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_Rectangle, [:pointer, :long, :int32, :int32, :int32, :int32, :int32], :int8
       typesig { [::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int] }
+      # @param hdc cast=(HDC)
       # long
       def _rectangle(hdc, n_left_rect, n_top_rect, n_right_rect, n_bottom_rect)
         JNI.__send__(:Java_org_eclipse_swt_internal_win32_OS_Rectangle, JNI.env, self.jni_id, hdc.to_int, n_left_rect.to_int, n_top_rect.to_int, n_right_rect.to_int, n_bottom_rect.to_int) != 0
@@ -12470,6 +13963,9 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_RectInRegion, [:pointer, :long, :int32, :long], :int8
       typesig { [::Java::Int, RECT] }
+      # @param hrgn cast=(HRGN)
+      # @param lprc flags=no_out
+      # 
       # long
       def _rect_in_region(hrgn, lprc)
         JNI.__send__(:Java_org_eclipse_swt_internal_win32_OS_RectInRegion, JNI.env, self.jni_id, hrgn.to_int, lprc.jni_id) != 0
@@ -12477,6 +13973,9 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_RedrawWindow, [:pointer, :long, :int32, :long, :int32, :int32], :int8
       typesig { [::Java::Int, RECT, ::Java::Int, ::Java::Int] }
+      # @param hWnd cast=(HWND)
+      # @param hrgnUpdate cast=(HRGN)
+      # 
       # long
       # long
       def _redraw_window(h_wnd, lprc_update, hrgn_update, flags)
@@ -12485,6 +13984,7 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_RegCloseKey, [:pointer, :long, :int32], :int32
       typesig { [::Java::Int] }
+      # @param hKey cast=(HKEY)
       # long
       def _reg_close_key(h_key)
         JNI.__send__(:Java_org_eclipse_swt_internal_win32_OS_RegCloseKey, JNI.env, self.jni_id, h_key.to_int)
@@ -12492,6 +13992,13 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_RegEnumKeyExW, [:pointer, :long, :int32, :int32, :long, :long, :long, :long, :long, :long], :int32
       typesig { [::Java::Int, ::Java::Int, Array.typed(::Java::Char), Array.typed(::Java::Int), Array.typed(::Java::Int), Array.typed(::Java::Char), Array.typed(::Java::Int), FILETIME] }
+      # @param hKey cast=(HKEY)
+      # @param lpName cast=(LPWSTR)
+      # @param lpcName cast=(LPDWORD)
+      # @param lpReserved cast=(LPDWORD)
+      # @param lpClass cast=(LPWSTR)
+      # @param lpcClass cast=(LPDWORD)
+      # 
       # long
       def _reg_enum_key_ex_w(h_key, dw_index, lp_name, lpc_name, lp_reserved, lp_class, lpc_class, lpft_last_write_time)
         JNI.__send__(:Java_org_eclipse_swt_internal_win32_OS_RegEnumKeyExW, JNI.env, self.jni_id, h_key.to_int, dw_index.to_int, lp_name.jni_id, lpc_name.jni_id, lp_reserved.jni_id, lp_class.jni_id, lpc_class.jni_id, lpft_last_write_time.jni_id)
@@ -12499,6 +14006,13 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_RegEnumKeyExA, [:pointer, :long, :int32, :int32, :long, :long, :long, :long, :long, :long], :int32
       typesig { [::Java::Int, ::Java::Int, Array.typed(::Java::Byte), Array.typed(::Java::Int), Array.typed(::Java::Int), Array.typed(::Java::Byte), Array.typed(::Java::Int), FILETIME] }
+      # @param hKey cast=(HKEY)
+      # @param lpName cast=(LPSTR)
+      # @param lpcName cast=(LPDWORD)
+      # @param lpReserved cast=(LPDWORD)
+      # @param lpClass cast=(LPSTR)
+      # @param lpcClass cast=(LPDWORD)
+      # 
       # long
       def _reg_enum_key_ex_a(h_key, dw_index, lp_name, lpc_name, lp_reserved, lp_class, lpc_class, lpft_last_write_time)
         JNI.__send__(:Java_org_eclipse_swt_internal_win32_OS_RegEnumKeyExA, JNI.env, self.jni_id, h_key.to_int, dw_index.to_int, lp_name.jni_id, lpc_name.jni_id, lp_reserved.jni_id, lp_class.jni_id, lpc_class.jni_id, lpft_last_write_time.jni_id)
@@ -12506,6 +14020,7 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_RegisterClassW, [:pointer, :long, :long], :int32
       typesig { [WNDCLASS] }
+      # @param lpWndClass cast=(LPWNDCLASSW)
       def _register_class_w(lp_wnd_class)
         JNI.__send__(:Java_org_eclipse_swt_internal_win32_OS_RegisterClassW, JNI.env, self.jni_id, lp_wnd_class.jni_id)
       end
@@ -12518,30 +14033,38 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_RegisterWindowMessageW, [:pointer, :long, :long], :int32
       typesig { [Array.typed(::Java::Char)] }
+      # @param lpString cast=(LPWSTR)
       def _register_window_message_w(lp_string)
         JNI.__send__(:Java_org_eclipse_swt_internal_win32_OS_RegisterWindowMessageW, JNI.env, self.jni_id, lp_string.jni_id)
       end
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_RegisterWindowMessageA, [:pointer, :long, :long], :int32
       typesig { [Array.typed(::Java::Byte)] }
+      # @param lpString cast=(LPTSTR)
       def _register_window_message_a(lp_string)
         JNI.__send__(:Java_org_eclipse_swt_internal_win32_OS_RegisterWindowMessageA, JNI.env, self.jni_id, lp_string.jni_id)
       end
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_RegisterClipboardFormatA, [:pointer, :long, :long], :int32
       typesig { [Array.typed(::Java::Byte)] }
+      # @param lpszFormat cast=(LPTSTR)
       def _register_clipboard_format_a(lpsz_format)
         JNI.__send__(:Java_org_eclipse_swt_internal_win32_OS_RegisterClipboardFormatA, JNI.env, self.jni_id, lpsz_format.jni_id)
       end
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_RegisterClipboardFormatW, [:pointer, :long, :long], :int32
       typesig { [Array.typed(::Java::Char)] }
+      # @param lpszFormat cast=(LPWSTR)
       def _register_clipboard_format_w(lpsz_format)
         JNI.__send__(:Java_org_eclipse_swt_internal_win32_OS_RegisterClipboardFormatW, JNI.env, self.jni_id, lpsz_format.jni_id)
       end
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_RegOpenKeyExW, [:pointer, :long, :int32, :long, :int32, :int32, :long], :int32
       typesig { [::Java::Int, Array.typed(::Java::Char), ::Java::Int, ::Java::Int, Array.typed(::Java::Int)] }
+      # @param hKey cast=(HKEY)
+      # @param lpSubKey cast=(LPWSTR)
+      # @param phkResult cast=(PHKEY)
+      # 
       # long
       # long
       def _reg_open_key_ex_w(h_key, lp_sub_key, ul_options, sam_desired, phk_result)
@@ -12550,6 +14073,10 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_RegOpenKeyExA, [:pointer, :long, :int32, :long, :int32, :int32, :long], :int32
       typesig { [::Java::Int, Array.typed(::Java::Byte), ::Java::Int, ::Java::Int, Array.typed(::Java::Int)] }
+      # @param hKey cast=(HKEY)
+      # @param lpSubKey cast=(LPSTR)
+      # @param phkResult cast=(PHKEY)
+      # 
       # long
       # long
       def _reg_open_key_ex_a(h_key, lp_sub_key, ul_options, sam_desired, phk_result)
@@ -12558,6 +14085,19 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_RegQueryInfoKeyW, [:pointer, :long, :int32, :int32, :long, :int32, :long, :long, :long, :long, :long, :long, :long, :int32], :int32
       typesig { [::Java::Int, ::Java::Int, Array.typed(::Java::Int), ::Java::Int, Array.typed(::Java::Int), Array.typed(::Java::Int), Array.typed(::Java::Int), Array.typed(::Java::Int), Array.typed(::Java::Int), Array.typed(::Java::Int), Array.typed(::Java::Int), ::Java::Int] }
+      # @param hKey cast=(HKEY)
+      # @param lpClass cast=(LPWSTR)
+      # @param lpcbClass cast=(LPDWORD)
+      # @param lpReserved cast=(LPDWORD)
+      # @param lpSubKeys cast=(LPDWORD)
+      # @param lpcbMaxSubKeyLen cast=(LPDWORD)
+      # @param lpcbMaxClassLen cast=(LPDWORD)
+      # @param lpcValues cast=(LPDWORD)
+      # @param lpcbMaxValueNameLen cast=(LPDWORD)
+      # @param lpcbMaxValueLen cast=(LPDWORD)
+      # @param lpcbSecurityDescriptor cast=(LPDWORD)
+      # @param lpftLastWriteTime cast=(PFILETIME)
+      # 
       # long
       # long
       # long
@@ -12568,6 +14108,19 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_RegQueryInfoKeyA, [:pointer, :long, :int32, :int32, :long, :int32, :long, :long, :long, :long, :long, :long, :long, :int32], :int32
       typesig { [::Java::Int, ::Java::Int, Array.typed(::Java::Int), ::Java::Int, Array.typed(::Java::Int), Array.typed(::Java::Int), Array.typed(::Java::Int), Array.typed(::Java::Int), Array.typed(::Java::Int), Array.typed(::Java::Int), Array.typed(::Java::Int), ::Java::Int] }
+      # @param hKey cast=(HKEY)
+      # @param lpClass cast=(LPSTR)
+      # @param lpcbClass cast=(LPDWORD)
+      # @param lpReserved cast=(LPDWORD)
+      # @param lpSubKeys cast=(LPDWORD)
+      # @param lpcbMaxSubKeyLen cast=(LPDWORD)
+      # @param lpcbMaxClassLen cast=(LPDWORD)
+      # @param lpcValues cast=(LPDWORD)
+      # @param lpcbMaxValueNameLen cast=(LPDWORD)
+      # @param lpcbMaxValueLen cast=(LPDWORD)
+      # @param lpcbSecurityDescriptor cast=(LPDWORD)
+      # @param lpftLastWriteTime cast=(PFILETIME)
+      # 
       # long
       # long
       # long
@@ -12578,6 +14131,13 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_RegQueryValueExW__I_3CI_3I_3C_3I, [:pointer, :long, :int32, :long, :int32, :long, :long, :long], :int32
       typesig { [::Java::Int, Array.typed(::Java::Char), ::Java::Int, Array.typed(::Java::Int), Array.typed(::Java::Char), Array.typed(::Java::Int)] }
+      # @param hKey cast=(HKEY)
+      # @param lpValueName cast=(LPWSTR)
+      # @param lpReserved cast=(LPDWORD)
+      # @param lpType cast=(LPDWORD)
+      # @param lpData cast=(LPBYTE)
+      # @param lpcbData cast=(LPDWORD)
+      # 
       # long
       # long
       def _reg_query_value_ex_w(h_key, lp_value_name, lp_reserved, lp_type, lp_data, lpcb_data)
@@ -12586,6 +14146,13 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_RegQueryValueExW__I_3CI_3I_3I_3I, [:pointer, :long, :int32, :long, :int32, :long, :long, :long], :int32
       typesig { [::Java::Int, Array.typed(::Java::Char), ::Java::Int, Array.typed(::Java::Int), Array.typed(::Java::Int), Array.typed(::Java::Int)] }
+      # @param hKey cast=(HKEY)
+      # @param lpValueName cast=(LPWSTR)
+      # @param lpReserved cast=(LPDWORD)
+      # @param lpType cast=(LPDWORD)
+      # @param lpData cast=(LPBYTE)
+      # @param lpcbData cast=(LPDWORD)
+      # 
       # long
       # long
       def _reg_query_value_ex_w(h_key, lp_value_name, lp_reserved, lp_type, lp_data, lpcb_data)
@@ -12594,6 +14161,13 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_RegQueryValueExA__I_3BI_3I_3B_3I, [:pointer, :long, :int32, :long, :int32, :long, :long, :long], :int32
       typesig { [::Java::Int, Array.typed(::Java::Byte), ::Java::Int, Array.typed(::Java::Int), Array.typed(::Java::Byte), Array.typed(::Java::Int)] }
+      # @param hKey cast=(HKEY)
+      # @param lpValueName cast=(LPSTR)
+      # @param lpReserved cast=(LPDWORD)
+      # @param lpType cast=(LPDWORD)
+      # @param lpData cast=(LPBYTE)
+      # @param lpcbData cast=(LPDWORD)
+      # 
       # long
       # long
       def _reg_query_value_ex_a(h_key, lp_value_name, lp_reserved, lp_type, lp_data, lpcb_data)
@@ -12602,6 +14176,13 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_RegQueryValueExA__I_3BI_3I_3I_3I, [:pointer, :long, :int32, :long, :int32, :long, :long, :long], :int32
       typesig { [::Java::Int, Array.typed(::Java::Byte), ::Java::Int, Array.typed(::Java::Int), Array.typed(::Java::Int), Array.typed(::Java::Int)] }
+      # @param hKey cast=(HKEY)
+      # @param lpValueName cast=(LPSTR)
+      # @param lpReserved cast=(LPDWORD)
+      # @param lpType cast=(LPDWORD)
+      # @param lpData cast=(LPBYTE)
+      # @param lpcbData cast=(LPDWORD)
+      # 
       # long
       # long
       def _reg_query_value_ex_a(h_key, lp_value_name, lp_reserved, lp_type, lp_data, lpcb_data)
@@ -12616,6 +14197,9 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_ReleaseDC, [:pointer, :long, :int32, :int32], :int32
       typesig { [::Java::Int, ::Java::Int] }
+      # @param hWnd cast=(HWND)
+      # @param hDC cast=(HDC)
+      # 
       # long
       # long
       def _release_dc(h_wnd, h_dc)
@@ -12624,6 +14208,7 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_RemoveMenu, [:pointer, :long, :int32, :int32, :int32], :int8
       typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
+      # @param hMenu cast=(HMENU)
       # long
       def _remove_menu(h_menu, u_position, u_flags)
         JNI.__send__(:Java_org_eclipse_swt_internal_win32_OS_RemoveMenu, JNI.env, self.jni_id, h_menu.to_int, u_position.to_int, u_flags.to_int) != 0
@@ -12631,6 +14216,9 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_RemovePropA, [:pointer, :long, :int32, :int32], :int32
       typesig { [::Java::Int, ::Java::Int] }
+      # @param hWnd cast=(HWND)
+      # @param lpString cast=(LPCTSTR)
+      # 
       # long
       # long
       # long
@@ -12640,6 +14228,9 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_RemovePropW, [:pointer, :long, :int32, :int32], :int32
       typesig { [::Java::Int, ::Java::Int] }
+      # @param hWnd cast=(HWND)
+      # @param lpString cast=(LPCWSTR)
+      # 
       # long
       # long
       # long
@@ -12656,6 +14247,9 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_RestoreDC, [:pointer, :long, :int32, :int32], :int8
       typesig { [::Java::Int, ::Java::Int] }
+      # @param hdc cast=(HDC)
+      # @param nSavedDC cast=(int)
+      # 
       # long
       def _restore_dc(hdc, n_saved_dc)
         JNI.__send__(:Java_org_eclipse_swt_internal_win32_OS_RestoreDC, JNI.env, self.jni_id, hdc.to_int, n_saved_dc.to_int) != 0
@@ -12663,6 +14257,7 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_RoundRect, [:pointer, :long, :int32, :int32, :int32, :int32, :int32, :int32, :int32], :int8
       typesig { [::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int] }
+      # @param hdc cast=(HDC)
       # long
       def _round_rect(hdc, n_left_rect, n_top_rect, n_right_rect, n_bottom_rect, n_width, n_height)
         JNI.__send__(:Java_org_eclipse_swt_internal_win32_OS_RoundRect, JNI.env, self.jni_id, hdc.to_int, n_left_rect.to_int, n_top_rect.to_int, n_right_rect.to_int, n_bottom_rect.to_int, n_width.to_int, n_height.to_int) != 0
@@ -12670,6 +14265,7 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_SaveDC, [:pointer, :long, :int32], :int32
       typesig { [::Java::Int] }
+      # @param hdc cast=(HDC)
       # long
       def _save_dc(hdc)
         JNI.__send__(:Java_org_eclipse_swt_internal_win32_OS_SaveDC, JNI.env, self.jni_id, hdc.to_int)
@@ -12677,6 +14273,7 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_ScreenToClient, [:pointer, :long, :int32, :long], :int8
       typesig { [::Java::Int, POINT] }
+      # @param hWnd cast=(HWND)
       # long
       def _screen_to_client(h_wnd, lp_point)
         JNI.__send__(:Java_org_eclipse_swt_internal_win32_OS_ScreenToClient, JNI.env, self.jni_id, h_wnd.to_int, lp_point.jni_id) != 0
@@ -12684,12 +14281,19 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_ScriptApplyDigitSubstitution, [:pointer, :long, :long, :long, :long], :int32
       typesig { [SCRIPT_DIGITSUBSTITUTE, SCRIPT_CONTROL, SCRIPT_STATE] }
+      # @param psds cast=(const SCRIPT_DIGITSUBSTITUTE*)
+      # @param psc cast=(SCRIPT_CONTROL*)
+      # @param pss cast=(SCRIPT_STATE*)
       def _script_apply_digit_substitution(psds, psc, pss)
         JNI.__send__(:Java_org_eclipse_swt_internal_win32_OS_ScriptApplyDigitSubstitution, JNI.env, self.jni_id, psds.jni_id, psc.jni_id, pss.jni_id)
       end
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_ScriptBreak, [:pointer, :long, :long, :int32, :long, :int32], :int32
       typesig { [Array.typed(::Java::Char), ::Java::Int, SCRIPT_ANALYSIS, ::Java::Int] }
+      # @param pwcChars cast=(const WCHAR *)
+      # @param psa cast=(const SCRIPT_ANALYSIS *)
+      # @param psla cast=(SCRIPT_LOGATTR *)
+      # 
       # long
       def _script_break(pwc_chars, c_chars, psa, psla)
         JNI.__send__(:Java_org_eclipse_swt_internal_win32_OS_ScriptBreak, JNI.env, self.jni_id, pwc_chars.jni_id, c_chars.to_int, psa.jni_id, psla.to_int)
@@ -12697,6 +14301,9 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_ScriptGetProperties, [:pointer, :long, :long, :long], :int32
       typesig { [Array.typed(::Java::Int), Array.typed(::Java::Int)] }
+      # @param ppSp cast=(const SCRIPT_PROPERTIES ***)
+      # @param piNumScripts cast=(int *)
+      # 
       # long
       def _script_get_properties(pp_sp, pi_num_scripts)
         JNI.__send__(:Java_org_eclipse_swt_internal_win32_OS_ScriptGetProperties, JNI.env, self.jni_id, pp_sp.jni_id, pi_num_scripts.jni_id)
@@ -12704,6 +14311,10 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_ScriptCacheGetHeight, [:pointer, :long, :int32, :int32, :long], :int32
       typesig { [::Java::Int, ::Java::Int, Array.typed(::Java::Int)] }
+      # @param hdc cast=(HDC)
+      # @param psc cast=(SCRIPT_CACHE *)
+      # @param tmHeight cast=(long *)
+      # 
       # long
       # long
       def _script_cache_get_height(hdc, psc, tm_height)
@@ -12712,6 +14323,12 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_ScriptCPtoX, [:pointer, :long, :int32, :int8, :int32, :int32, :int32, :int32, :int32, :long, :long], :int32
       typesig { [::Java::Int, ::Java::Boolean, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, SCRIPT_ANALYSIS, Array.typed(::Java::Int)] }
+      # @param pwLogClust cast=(const WORD *)
+      # @param psva cast=(const SCRIPT_VISATTR *)
+      # @param piAdvance cast=(const int *)
+      # @param psa cast=(const SCRIPT_ANALYSIS *)
+      # @param piX cast=(int *)
+      # 
       # long
       # long
       # long
@@ -12721,6 +14338,7 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_ScriptFreeCache, [:pointer, :long, :int32], :int32
       typesig { [::Java::Int] }
+      # @param psc cast=(SCRIPT_CACHE *)
       # long
       def _script_free_cache(psc)
         JNI.__send__(:Java_org_eclipse_swt_internal_win32_OS_ScriptFreeCache, JNI.env, self.jni_id, psc.to_int)
@@ -12728,6 +14346,10 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_ScriptGetFontProperties, [:pointer, :long, :int32, :int32, :long], :int32
       typesig { [::Java::Int, ::Java::Int, SCRIPT_FONTPROPERTIES] }
+      # @param hdc cast=(HDC)
+      # @param psc cast=(SCRIPT_CACHE *)
+      # @param sfp cast=(SCRIPT_FONTPROPERTIES *)
+      # 
       # long
       # long
       def _script_get_font_properties(hdc, psc, sfp)
@@ -12736,6 +14358,12 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_ScriptGetLogicalWidths, [:pointer, :long, :long, :int32, :int32, :int32, :int32, :int32, :long], :int32
       typesig { [SCRIPT_ANALYSIS, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, Array.typed(::Java::Int)] }
+      # @param psa cast=(const SCRIPT_ANALYSIS *)
+      # @param piGlyphWidth cast=(const int *)
+      # @param pwLogClust cast=(const WORD *)
+      # @param psva cast=(const SCRIPT_VISATTR *)
+      # @param piDx cast=(int *)
+      # 
       # long
       # long
       # long
@@ -12745,6 +14373,12 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_ScriptItemize, [:pointer, :long, :long, :int32, :int32, :long, :long, :int32, :long], :int32
       typesig { [Array.typed(::Java::Char), ::Java::Int, ::Java::Int, SCRIPT_CONTROL, SCRIPT_STATE, ::Java::Int, Array.typed(::Java::Int)] }
+      # @param pwcInChars cast=(const WCHAR *)
+      # @param psControl cast=(const SCRIPT_CONTROL *)
+      # @param psState cast=(const SCRIPT_STATE *)
+      # @param pItems cast=(SCRIPT_ITEM *)
+      # @param pcItems cast=(int *)
+      # 
       # long
       def _script_itemize(pwc_in_chars, c_in_chars, c_max_items, ps_control, ps_state, p_items, pc_items)
         JNI.__send__(:Java_org_eclipse_swt_internal_win32_OS_ScriptItemize, JNI.env, self.jni_id, pwc_in_chars.jni_id, c_in_chars.to_int, c_max_items.to_int, ps_control.jni_id, ps_state.jni_id, p_items.to_int, pc_items.jni_id)
@@ -12752,6 +14386,10 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_ScriptJustify, [:pointer, :long, :int32, :int32, :int32, :int32, :int32, :int32], :int32
       typesig { [::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int] }
+      # @param psva cast=(SCRIPT_VISATTR *)
+      # @param piAdvance cast=(const int *)
+      # @param piJustify cast=(int *)
+      # 
       # long
       # long
       # long
@@ -12761,12 +14399,24 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_ScriptLayout, [:pointer, :long, :int32, :long, :long, :long], :int32
       typesig { [::Java::Int, Array.typed(::Java::Byte), Array.typed(::Java::Int), Array.typed(::Java::Int)] }
+      # @param pbLevel cast=(const BYTE *)
+      # @param piVisualToLogical cast=(int *)
+      # @param piLogicalToVisual cast=(int *)
       def _script_layout(c_runs, pb_level, pi_visual_to_logical, pi_logical_to_visual)
         JNI.__send__(:Java_org_eclipse_swt_internal_win32_OS_ScriptLayout, JNI.env, self.jni_id, c_runs.to_int, pb_level.jni_id, pi_visual_to_logical.jni_id, pi_logical_to_visual.jni_id)
       end
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_ScriptPlace, [:pointer, :long, :int32, :int32, :int32, :int32, :int32, :long, :int32, :int32, :long], :int32
       typesig { [::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, SCRIPT_ANALYSIS, ::Java::Int, ::Java::Int, Array.typed(::Java::Int)] }
+      # @param hdc cast=(HDC)
+      # @param psc cast=(SCRIPT_CACHE *)
+      # @param pwGlyphs cast=(const WORD *)
+      # @param psva cast=(const SCRIPT_VISATTR *)
+      # @param psa cast=(SCRIPT_ANALYSIS *)
+      # @param piAdvance cast=(int *)
+      # @param pGoffset cast=(GOFFSET *)
+      # @param pABC cast=(ABC *)
+      # 
       # long
       # long
       # long
@@ -12779,12 +14429,19 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_ScriptRecordDigitSubstitution, [:pointer, :long, :int32, :long], :int32
       typesig { [::Java::Int, SCRIPT_DIGITSUBSTITUTE] }
+      # @param Locale cast=(LCID)
+      # @param psds cast=(SCRIPT_DIGITSUBSTITUTE*)
       def _script_record_digit_substitution(locale, psds)
         JNI.__send__(:Java_org_eclipse_swt_internal_win32_OS_ScriptRecordDigitSubstitution, JNI.env, self.jni_id, locale.to_int, psds.jni_id)
       end
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_ScriptGetCMap, [:pointer, :long, :int32, :int32, :long, :int32, :int32, :long], :int32
       typesig { [::Java::Int, ::Java::Int, Array.typed(::Java::Char), ::Java::Int, ::Java::Int, Array.typed(::Java::Short)] }
+      # @param hdc cast=(HDC)
+      # @param psc cast=(SCRIPT_CACHE *)
+      # @param pwcChars cast=(const WCHAR *)
+      # @param pwOutGlyphs cast=(WORD*)
+      # 
       # long
       # long
       def _script_get_cmap(hdc, psc, pwc_chars, c_chars, dw_flags, pw_out_glyphs)
@@ -12793,6 +14450,15 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_ScriptShape, [:pointer, :long, :int32, :int32, :long, :int32, :int32, :long, :int32, :int32, :int32, :long], :int32
       typesig { [::Java::Int, ::Java::Int, Array.typed(::Java::Char), ::Java::Int, ::Java::Int, SCRIPT_ANALYSIS, ::Java::Int, ::Java::Int, ::Java::Int, Array.typed(::Java::Int)] }
+      # @param hdc cast=(HDC)
+      # @param psc cast=(SCRIPT_CACHE *)
+      # @param pwcChars cast=(const WCHAR *)
+      # @param psa cast=(SCRIPT_ANALYSIS *)
+      # @param pwOutGlyphs cast=(WORD *)
+      # @param pwLogClust cast=(WORD *)
+      # @param psva cast=(SCRIPT_VISATTR *)
+      # @param pcGlyphs cast=(int *)
+      # 
       # long
       # long
       # long
@@ -12804,6 +14470,13 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_ScriptStringAnalyse, [:pointer, :long, :int32, :long, :int32, :int32, :int32, :int32, :int32, :long, :long, :int32, :int32, :int32, :int32], :int32
       typesig { [::Java::Int, Array.typed(::Java::Char), ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, SCRIPT_CONTROL, SCRIPT_STATE, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int] }
+      # @param hdc cast=(HDC)
+      # @param pString cast=(const void*)
+      # @param piDx cast=(const int*)
+      # @param pTabdef cast=(SCRIPT_TABDEF*)
+      # @param pbInClass cast=(const BYTE*)
+      # @param pssa cast=(SCRIPT_STRING_ANALYSIS*)
+      # 
       # long
       # long
       # long
@@ -12815,6 +14488,7 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_ScriptStringOut, [:pointer, :long, :int32, :int32, :int32, :int32, :long, :int32, :int32, :int8], :int32
       typesig { [::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, RECT, ::Java::Int, ::Java::Int, ::Java::Boolean] }
+      # @param ssa cast=(SCRIPT_STRING_ANALYSIS*),flags=struct
       # long
       def _script_string_out(ssa, i_x, i_y, u_options, prc, i_min_sel, i_max_sel, f_disabled)
         JNI.__send__(:Java_org_eclipse_swt_internal_win32_OS_ScriptStringOut, JNI.env, self.jni_id, ssa.to_int, i_x.to_int, i_y.to_int, u_options.to_int, prc.jni_id, i_min_sel.to_int, i_max_sel.to_int, f_disabled ? 1 : 0)
@@ -12822,6 +14496,7 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_ScriptStringFree, [:pointer, :long, :int32], :int32
       typesig { [::Java::Int] }
+      # @param pssa cast=(SCRIPT_STRING_ANALYSIS*)
       # long
       def _script_string_free(pssa)
         JNI.__send__(:Java_org_eclipse_swt_internal_win32_OS_ScriptStringFree, JNI.env, self.jni_id, pssa.to_int)
@@ -12829,6 +14504,16 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_ScriptTextOut, [:pointer, :long, :int32, :int32, :int32, :int32, :int32, :long, :long, :int32, :int32, :int32, :int32, :int32, :int32, :int32], :int32
       typesig { [::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, RECT, SCRIPT_ANALYSIS, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int] }
+      # @param hdc cast=(const HDC)
+      # @param psc cast=(SCRIPT_CACHE *)
+      # @param lprc cast=(const RECT *)
+      # @param psa cast=(const SCRIPT_ANALYSIS *)
+      # @param pwcReserved cast=(const WCHAR *)
+      # @param pwGlyphs cast=(const WORD *)
+      # @param piAdvance cast=(const int *)
+      # @param piJustify cast=(const int *)
+      # @param pGoffset cast=(const GOFFSET *)
+      # 
       # long
       # long
       # long
@@ -12842,6 +14527,13 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_ScriptXtoCP, [:pointer, :long, :int32, :int32, :int32, :int32, :int32, :int32, :long, :long, :long], :int32
       typesig { [::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, SCRIPT_ANALYSIS, Array.typed(::Java::Int), Array.typed(::Java::Int)] }
+      # @param pwLogClust cast=(const WORD *)
+      # @param psva cast=(const SCRIPT_VISATTR *)
+      # @param piAdvance cast=(const int *)
+      # @param psa cast=(const SCRIPT_ANALYSIS *)
+      # @param piCP cast=(int *)
+      # @param piTrailing cast=(int *)
+      # 
       # long
       # long
       # long
@@ -12851,6 +14543,9 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_ScrollWindowEx, [:pointer, :long, :int32, :int32, :int32, :long, :long, :int32, :long, :int32], :int32
       typesig { [::Java::Int, ::Java::Int, ::Java::Int, RECT, RECT, ::Java::Int, RECT, ::Java::Int] }
+      # @param hWnd cast=(HWND)
+      # @param hrgnUpdate cast=(HRGN)
+      # 
       # long
       # long
       def _scroll_window_ex(h_wnd, dx, dy, prc_scroll, prc_clip, hrgn_update, prc_update, flags)
@@ -12859,6 +14554,9 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_SelectClipRgn, [:pointer, :long, :int32, :int32], :int32
       typesig { [::Java::Int, ::Java::Int] }
+      # @param hdc cast=(HDC)
+      # @param hrgn cast=(HRGN)
+      # 
       # long
       # long
       def _select_clip_rgn(hdc, hrgn)
@@ -12867,6 +14565,9 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_SelectObject, [:pointer, :long, :int32, :int32], :int32
       typesig { [::Java::Int, ::Java::Int] }
+      # @param hDC cast=(HDC)
+      # @param HGDIObj cast=(HGDIOBJ)
+      # 
       # long
       # long
       # long
@@ -12876,6 +14577,9 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_SelectPalette, [:pointer, :long, :int32, :int32, :int8], :int32
       typesig { [::Java::Int, ::Java::Int, ::Java::Boolean] }
+      # @param hDC cast=(HDC)
+      # @param hpal cast=(HPALETTE)
+      # 
       # long
       # long
       # long
@@ -12885,6 +14589,7 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_SendInput, [:pointer, :long, :int32, :int32, :int32], :int32
       typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
+      # @param pInputs cast=(LPINPUT)
       # long
       def _send_input(n_inputs, p_inputs, cb_size)
         JNI.__send__(:Java_org_eclipse_swt_internal_win32_OS_SendInput, JNI.env, self.jni_id, n_inputs.to_int, p_inputs.to_int, cb_size.to_int)
@@ -12892,6 +14597,11 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_SendMessageW__II_3I_3I, [:pointer, :long, :int32, :int32, :long, :long], :int32
       typesig { [::Java::Int, ::Java::Int, Array.typed(::Java::Int), Array.typed(::Java::Int)] }
+      # @method flags=no_gen
+      # @param hWnd cast=(HWND)
+      # @param wParam cast=(WPARAM)
+      # @param lParam cast=(LPARAM)
+      # 
       # long
       # long
       def _send_message_w(h_wnd, msg, w_param, l_param)
@@ -12900,6 +14610,10 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_SendMessageW__II_3II, [:pointer, :long, :int32, :int32, :long, :int32], :int32
       typesig { [::Java::Int, ::Java::Int, Array.typed(::Java::Int), ::Java::Int] }
+      # @param hWnd cast=(HWND)
+      # @param wParam cast=(WPARAM)
+      # @param lParam cast=(LPARAM)
+      # 
       # long
       # long
       # long
@@ -12910,6 +14624,10 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_SendMessageW__III_3C, [:pointer, :long, :int32, :int32, :int32, :long], :int32
       typesig { [::Java::Int, ::Java::Int, ::Java::Int, Array.typed(::Java::Char)] }
+      # @param hWnd cast=(HWND)
+      # @param wParam cast=(WPARAM)
+      # @param lParam cast=(LPARAM)
+      # 
       # long
       # long
       # long
@@ -12919,6 +14637,10 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_SendMessageW__III_3I, [:pointer, :long, :int32, :int32, :int32, :long], :int32
       typesig { [::Java::Int, ::Java::Int, ::Java::Int, Array.typed(::Java::Int)] }
+      # @param hWnd cast=(HWND)
+      # @param wParam cast=(WPARAM)
+      # @param lParam cast=(LPARAM)
+      # 
       # long
       # long
       # long
@@ -12928,6 +14650,10 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_SendMessageW__III_3S, [:pointer, :long, :int32, :int32, :int32, :long], :int32
       typesig { [::Java::Int, ::Java::Int, ::Java::Int, Array.typed(::Java::Short)] }
+      # @param hWnd cast=(HWND)
+      # @param wParam cast=(WPARAM)
+      # @param lParam cast=(LPARAM)
+      # 
       # long
       # long
       # long
@@ -12937,6 +14663,10 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_SendMessageW__IIII, [:pointer, :long, :int32, :int32, :int32, :int32], :int32
       typesig { [::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int] }
+      # @param hWnd cast=(HWND)
+      # @param wParam cast=(WPARAM)
+      # @param lParam cast=(LPARAM)
+      # 
       # long
       # long
       # long
@@ -12947,6 +14677,10 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method "Java_org_eclipse_swt_internal_win32_OS_SendMessageW__IIIL#{LVCOLUMN.jni_name}_2".to_sym, [:pointer, :long, :int32, :int32, :int32, :long], :int32
       typesig { [::Java::Int, ::Java::Int, ::Java::Int, LVCOLUMN] }
+      # @param hWnd cast=(HWND)
+      # @param wParam cast=(WPARAM)
+      # @param lParam cast=(LPARAM)
+      # 
       # long
       # long
       # long
@@ -12956,6 +14690,10 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method "Java_org_eclipse_swt_internal_win32_OS_SendMessageW__IIIL#{LVHITTESTINFO.jni_name}_2".to_sym, [:pointer, :long, :int32, :int32, :int32, :long], :int32
       typesig { [::Java::Int, ::Java::Int, ::Java::Int, LVHITTESTINFO] }
+      # @param hWnd cast=(HWND)
+      # @param wParam cast=(WPARAM)
+      # @param lParam cast=(LPARAM)
+      # 
       # long
       # long
       # long
@@ -12965,6 +14703,10 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method "Java_org_eclipse_swt_internal_win32_OS_SendMessageW__IIIL#{LITEM.jni_name}_2".to_sym, [:pointer, :long, :int32, :int32, :int32, :long], :int32
       typesig { [::Java::Int, ::Java::Int, ::Java::Int, LITEM] }
+      # @param hWnd cast=(HWND)
+      # @param wParam cast=(WPARAM)
+      # @param lParam cast=(LPARAM)
+      # 
       # long
       # long
       # long
@@ -12974,6 +14716,10 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method "Java_org_eclipse_swt_internal_win32_OS_SendMessageW__IIIL#{LVITEM.jni_name}_2".to_sym, [:pointer, :long, :int32, :int32, :int32, :long], :int32
       typesig { [::Java::Int, ::Java::Int, ::Java::Int, LVITEM] }
+      # @param hWnd cast=(HWND)
+      # @param wParam cast=(WPARAM)
+      # @param lParam cast=(LPARAM)
+      # 
       # long
       # long
       # long
@@ -12983,6 +14729,10 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method "Java_org_eclipse_swt_internal_win32_OS_SendMessageW__IIIL#{MARGINS.jni_name}_2".to_sym, [:pointer, :long, :int32, :int32, :int32, :long], :int32
       typesig { [::Java::Int, ::Java::Int, ::Java::Int, MARGINS] }
+      # @param hWnd cast=(HWND)
+      # @param wParam cast=(WPARAM)
+      # @param lParam cast=(LPARAM)
+      # 
       # long
       # long
       # long
@@ -12990,8 +14740,25 @@ module Org::Eclipse::Swt::Internal::Win32
         JNI.__send__("Java_org_eclipse_swt_internal_win32_OS_SendMessageW__IIIL#{MARGINS.jni_name}_2".to_sym, JNI.env, self.jni_id, h_wnd.to_int, msg.to_int, w_param.to_int, l_param.jni_id)
       end
       
+      JNI.native_method "Java_org_eclipse_swt_internal_win32_OS_SendMessageW__IIIL#{MCHITTESTINFO.jni_name}_2".to_sym, [:pointer, :long, :int32, :int32, :int32, :long], :int32
+      typesig { [::Java::Int, ::Java::Int, ::Java::Int, MCHITTESTINFO] }
+      # @param hWnd cast=(HWND)
+      # @param wParam cast=(WPARAM)
+      # @param lParam cast=(LPARAM)
+      # 
+      # long
+      # long
+      # long
+      def _send_message_w(h_wnd, msg, w_param, l_param)
+        JNI.__send__("Java_org_eclipse_swt_internal_win32_OS_SendMessageW__IIIL#{MCHITTESTINFO.jni_name}_2".to_sym, JNI.env, self.jni_id, h_wnd.to_int, msg.to_int, w_param.to_int, l_param.jni_id)
+      end
+      
       JNI.native_method "Java_org_eclipse_swt_internal_win32_OS_SendMessageW__IIIL#{POINT.jni_name}_2".to_sym, [:pointer, :long, :int32, :int32, :int32, :long], :int32
       typesig { [::Java::Int, ::Java::Int, ::Java::Int, POINT] }
+      # @param hWnd cast=(HWND)
+      # @param wParam cast=(WPARAM)
+      # @param lParam cast=(LPARAM)
+      # 
       # long
       # long
       # long
@@ -13001,6 +14768,10 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method "Java_org_eclipse_swt_internal_win32_OS_SendMessageW__IIIL#{REBARBANDINFO.jni_name}_2".to_sym, [:pointer, :long, :int32, :int32, :int32, :long], :int32
       typesig { [::Java::Int, ::Java::Int, ::Java::Int, REBARBANDINFO] }
+      # @param hWnd cast=(HWND)
+      # @param wParam cast=(WPARAM)
+      # @param lParam cast=(LPARAM)
+      # 
       # long
       # long
       # long
@@ -13010,6 +14781,10 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method "Java_org_eclipse_swt_internal_win32_OS_SendMessageW__IIIL#{RECT.jni_name}_2".to_sym, [:pointer, :long, :int32, :int32, :int32, :long], :int32
       typesig { [::Java::Int, ::Java::Int, ::Java::Int, RECT] }
+      # @param hWnd cast=(HWND)
+      # @param wParam cast=(WPARAM)
+      # @param lParam cast=(LPARAM)
+      # 
       # long
       # long
       # long
@@ -13019,6 +14794,10 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method "Java_org_eclipse_swt_internal_win32_OS_SendMessageW__IIIL#{SYSTEMTIME.jni_name}_2".to_sym, [:pointer, :long, :int32, :int32, :int32, :long], :int32
       typesig { [::Java::Int, ::Java::Int, ::Java::Int, SYSTEMTIME] }
+      # @param hWnd cast=(HWND)
+      # @param wParam cast=(WPARAM)
+      # @param lParam cast=(LPARAM)
+      # 
       # long
       # long
       # long
@@ -13028,6 +14807,10 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method "Java_org_eclipse_swt_internal_win32_OS_SendMessageW__IIIL#{SHDRAGIMAGE.jni_name}_2".to_sym, [:pointer, :long, :int32, :int32, :int32, :long], :int32
       typesig { [::Java::Int, ::Java::Int, ::Java::Int, SHDRAGIMAGE] }
+      # @param hWnd cast=(HWND)
+      # @param wParam cast=(WPARAM)
+      # @param lParam cast=(LPARAM)
+      # 
       # long
       # long
       # long
@@ -13037,6 +14820,10 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method "Java_org_eclipse_swt_internal_win32_OS_SendMessageW__IIIL#{TBBUTTON.jni_name}_2".to_sym, [:pointer, :long, :int32, :int32, :int32, :long], :int32
       typesig { [::Java::Int, ::Java::Int, ::Java::Int, TBBUTTON] }
+      # @param hWnd cast=(HWND)
+      # @param wParam cast=(WPARAM)
+      # @param lParam cast=(LPARAM)
+      # 
       # long
       # long
       # long
@@ -13046,6 +14833,10 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method "Java_org_eclipse_swt_internal_win32_OS_SendMessageW__IIIL#{TBBUTTONINFO.jni_name}_2".to_sym, [:pointer, :long, :int32, :int32, :int32, :long], :int32
       typesig { [::Java::Int, ::Java::Int, ::Java::Int, TBBUTTONINFO] }
+      # @param hWnd cast=(HWND)
+      # @param wParam cast=(WPARAM)
+      # @param lParam cast=(LPARAM)
+      # 
       # long
       # long
       # long
@@ -13055,6 +14846,10 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method "Java_org_eclipse_swt_internal_win32_OS_SendMessageW__IIIL#{TCITEM.jni_name}_2".to_sym, [:pointer, :long, :int32, :int32, :int32, :long], :int32
       typesig { [::Java::Int, ::Java::Int, ::Java::Int, TCITEM] }
+      # @param hWnd cast=(HWND)
+      # @param wParam cast=(WPARAM)
+      # @param lParam cast=(LPARAM)
+      # 
       # long
       # long
       # long
@@ -13064,6 +14859,10 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method "Java_org_eclipse_swt_internal_win32_OS_SendMessageW__IIIL#{TCHITTESTINFO.jni_name}_2".to_sym, [:pointer, :long, :int32, :int32, :int32, :long], :int32
       typesig { [::Java::Int, ::Java::Int, ::Java::Int, TCHITTESTINFO] }
+      # @param hWnd cast=(HWND)
+      # @param wParam cast=(WPARAM)
+      # @param lParam cast=(LPARAM)
+      # 
       # long
       # long
       # long
@@ -13073,6 +14872,10 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method "Java_org_eclipse_swt_internal_win32_OS_SendMessageW__IIIL#{TOOLINFO.jni_name}_2".to_sym, [:pointer, :long, :int32, :int32, :int32, :long], :int32
       typesig { [::Java::Int, ::Java::Int, ::Java::Int, TOOLINFO] }
+      # @param hWnd cast=(HWND)
+      # @param wParam cast=(WPARAM)
+      # @param lParam cast=(LPARAM)
+      # 
       # long
       # long
       # long
@@ -13082,6 +14885,10 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method "Java_org_eclipse_swt_internal_win32_OS_SendMessageW__IIIL#{TVHITTESTINFO.jni_name}_2".to_sym, [:pointer, :long, :int32, :int32, :int32, :long], :int32
       typesig { [::Java::Int, ::Java::Int, ::Java::Int, TVHITTESTINFO] }
+      # @param hWnd cast=(HWND)
+      # @param wParam cast=(WPARAM)
+      # @param lParam cast=(LPARAM)
+      # 
       # long
       # long
       # long
@@ -13091,6 +14898,10 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method "Java_org_eclipse_swt_internal_win32_OS_SendMessageW__IIIL#{TVINSERTSTRUCT.jni_name}_2".to_sym, [:pointer, :long, :int32, :int32, :int32, :long], :int32
       typesig { [::Java::Int, ::Java::Int, ::Java::Int, TVINSERTSTRUCT] }
+      # @param hWnd cast=(HWND)
+      # @param wParam cast=(WPARAM)
+      # @param lParam cast=(LPARAM)
+      # 
       # long
       # long
       # long
@@ -13100,6 +14911,10 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method "Java_org_eclipse_swt_internal_win32_OS_SendMessageW__IIIL#{TVITEM.jni_name}_2".to_sym, [:pointer, :long, :int32, :int32, :int32, :long], :int32
       typesig { [::Java::Int, ::Java::Int, ::Java::Int, TVITEM] }
+      # @param hWnd cast=(HWND)
+      # @param wParam cast=(WPARAM)
+      # @param lParam cast=(LPARAM)
+      # 
       # long
       # long
       # long
@@ -13109,6 +14924,10 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method "Java_org_eclipse_swt_internal_win32_OS_SendMessageW__IIIL#{TVSORTCB.jni_name}_2".to_sym, [:pointer, :long, :int32, :int32, :int32, :long], :int32
       typesig { [::Java::Int, ::Java::Int, ::Java::Int, TVSORTCB] }
+      # @param hWnd cast=(HWND)
+      # @param wParam cast=(WPARAM)
+      # @param lParam cast=(LPARAM)
+      # 
       # long
       # long
       # long
@@ -13118,6 +14937,10 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method "Java_org_eclipse_swt_internal_win32_OS_SendMessageW__IIIL#{UDACCEL.jni_name}_2".to_sym, [:pointer, :long, :int32, :int32, :int32, :long], :int32
       typesig { [::Java::Int, ::Java::Int, ::Java::Int, UDACCEL] }
+      # @param hWnd cast=(HWND)
+      # @param wParam cast=(WPARAM)
+      # @param lParam cast=(LPARAM)
+      # 
       # long
       # long
       # long
@@ -13127,6 +14950,10 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method "Java_org_eclipse_swt_internal_win32_OS_SendMessageW__IIIL#{HDHITTESTINFO.jni_name}_2".to_sym, [:pointer, :long, :int32, :int32, :int32, :long], :int32
       typesig { [::Java::Int, ::Java::Int, ::Java::Int, HDHITTESTINFO] }
+      # @param hWnd cast=(HWND)
+      # @param wParam cast=(WPARAM)
+      # @param lParam cast=(LPARAM)
+      # 
       # long
       # long
       # long
@@ -13136,6 +14963,10 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method "Java_org_eclipse_swt_internal_win32_OS_SendMessageW__IIIL#{HDITEM.jni_name}_2".to_sym, [:pointer, :long, :int32, :int32, :int32, :long], :int32
       typesig { [::Java::Int, ::Java::Int, ::Java::Int, HDITEM] }
+      # @param hWnd cast=(HWND)
+      # @param wParam cast=(WPARAM)
+      # @param lParam cast=(LPARAM)
+      # 
       # long
       # long
       # long
@@ -13145,6 +14976,10 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method "Java_org_eclipse_swt_internal_win32_OS_SendMessageW__IIIL#{HDLAYOUT.jni_name}_2".to_sym, [:pointer, :long, :int32, :int32, :int32, :long], :int32
       typesig { [::Java::Int, ::Java::Int, ::Java::Int, HDLAYOUT] }
+      # @param hWnd cast=(HWND)
+      # @param wParam cast=(WPARAM)
+      # @param lParam cast=(LPARAM)
+      # 
       # long
       # long
       # long
@@ -13154,6 +14989,10 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method "Java_org_eclipse_swt_internal_win32_OS_SendMessageW__IIIL#{BUTTON_IMAGELIST.jni_name}_2".to_sym, [:pointer, :long, :int32, :int32, :int32, :long], :int32
       typesig { [::Java::Int, ::Java::Int, ::Java::Int, BUTTON_IMAGELIST] }
+      # @param hWnd cast=(HWND)
+      # @param wParam cast=(WPARAM)
+      # @param lParam cast=(LPARAM)
+      # 
       # long
       # long
       # long
@@ -13163,6 +15002,10 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method "Java_org_eclipse_swt_internal_win32_OS_SendMessageW__IIIL#{SIZE.jni_name}_2".to_sym, [:pointer, :long, :int32, :int32, :int32, :long], :int32
       typesig { [::Java::Int, ::Java::Int, ::Java::Int, SIZE] }
+      # @param hWnd cast=(HWND)
+      # @param wParam cast=(WPARAM)
+      # @param lParam cast=(LPARAM)
+      # 
       # long
       # long
       # long
@@ -13172,6 +15015,10 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_SendMessageA__II_3I_3I, [:pointer, :long, :int32, :int32, :long, :long], :int32
       typesig { [::Java::Int, ::Java::Int, Array.typed(::Java::Int), Array.typed(::Java::Int)] }
+      # @param hWnd cast=(HWND)
+      # @param wParam cast=(WPARAM)
+      # @param lParam cast=(LPARAM)
+      # 
       # long
       # long
       def _send_message_a(h_wnd, msg, w_param, l_param)
@@ -13180,6 +15027,10 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_SendMessageA__II_3II, [:pointer, :long, :int32, :int32, :long, :int32], :int32
       typesig { [::Java::Int, ::Java::Int, Array.typed(::Java::Int), ::Java::Int] }
+      # @param hWnd cast=(HWND)
+      # @param wParam cast=(WPARAM)
+      # @param lParam cast=(LPARAM)
+      # 
       # long
       # long
       # long
@@ -13190,6 +15041,10 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_SendMessageA__III_3B, [:pointer, :long, :int32, :int32, :int32, :long], :int32
       typesig { [::Java::Int, ::Java::Int, ::Java::Int, Array.typed(::Java::Byte)] }
+      # @param hWnd cast=(HWND)
+      # @param wParam cast=(WPARAM)
+      # @param lParam cast=(LPARAM)
+      # 
       # long
       # long
       # long
@@ -13199,6 +15054,10 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_SendMessageA__III_3I, [:pointer, :long, :int32, :int32, :int32, :long], :int32
       typesig { [::Java::Int, ::Java::Int, ::Java::Int, Array.typed(::Java::Int)] }
+      # @param hWnd cast=(HWND)
+      # @param wParam cast=(WPARAM)
+      # @param lParam cast=(LPARAM)
+      # 
       # long
       # long
       # long
@@ -13208,6 +15067,10 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_SendMessageA__III_3S, [:pointer, :long, :int32, :int32, :int32, :long], :int32
       typesig { [::Java::Int, ::Java::Int, ::Java::Int, Array.typed(::Java::Short)] }
+      # @param hWnd cast=(HWND)
+      # @param wParam cast=(WPARAM)
+      # @param lParam cast=(LPARAM)
+      # 
       # long
       # long
       # long
@@ -13217,6 +15080,10 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_SendMessageA__III_3C, [:pointer, :long, :int32, :int32, :int32, :long], :int32
       typesig { [::Java::Int, ::Java::Int, ::Java::Int, Array.typed(::Java::Char)] }
+      # @param hWnd cast=(HWND)
+      # @param wParam cast=(WPARAM)
+      # @param lParam cast=(LPARAM)
+      # 
       # long
       # long
       # long
@@ -13226,6 +15093,10 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_SendMessageA__IIII, [:pointer, :long, :int32, :int32, :int32, :int32], :int32
       typesig { [::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int] }
+      # @param hWnd cast=(HWND)
+      # @param wParam cast=(WPARAM)
+      # @param lParam cast=(LPARAM)
+      # 
       # long
       # long
       # long
@@ -13236,6 +15107,10 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method "Java_org_eclipse_swt_internal_win32_OS_SendMessageA__IIIL#{LVCOLUMN.jni_name}_2".to_sym, [:pointer, :long, :int32, :int32, :int32, :long], :int32
       typesig { [::Java::Int, ::Java::Int, ::Java::Int, LVCOLUMN] }
+      # @param hWnd cast=(HWND)
+      # @param wParam cast=(WPARAM)
+      # @param lParam cast=(LPARAM)
+      # 
       # long
       # long
       # long
@@ -13245,6 +15120,10 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method "Java_org_eclipse_swt_internal_win32_OS_SendMessageA__IIIL#{LVHITTESTINFO.jni_name}_2".to_sym, [:pointer, :long, :int32, :int32, :int32, :long], :int32
       typesig { [::Java::Int, ::Java::Int, ::Java::Int, LVHITTESTINFO] }
+      # @param hWnd cast=(HWND)
+      # @param wParam cast=(WPARAM)
+      # @param lParam cast=(LPARAM)
+      # 
       # long
       # long
       # long
@@ -13254,6 +15133,10 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method "Java_org_eclipse_swt_internal_win32_OS_SendMessageA__IIIL#{LITEM.jni_name}_2".to_sym, [:pointer, :long, :int32, :int32, :int32, :long], :int32
       typesig { [::Java::Int, ::Java::Int, ::Java::Int, LITEM] }
+      # @param hWnd cast=(HWND)
+      # @param wParam cast=(WPARAM)
+      # @param lParam cast=(LPARAM)
+      # 
       # long
       # long
       # long
@@ -13263,6 +15146,10 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method "Java_org_eclipse_swt_internal_win32_OS_SendMessageA__IIIL#{LVITEM.jni_name}_2".to_sym, [:pointer, :long, :int32, :int32, :int32, :long], :int32
       typesig { [::Java::Int, ::Java::Int, ::Java::Int, LVITEM] }
+      # @param hWnd cast=(HWND)
+      # @param wParam cast=(WPARAM)
+      # @param lParam cast=(LPARAM)
+      # 
       # long
       # long
       # long
@@ -13272,6 +15159,10 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method "Java_org_eclipse_swt_internal_win32_OS_SendMessageA__IIIL#{MARGINS.jni_name}_2".to_sym, [:pointer, :long, :int32, :int32, :int32, :long], :int32
       typesig { [::Java::Int, ::Java::Int, ::Java::Int, MARGINS] }
+      # @param hWnd cast=(HWND)
+      # @param wParam cast=(WPARAM)
+      # @param lParam cast=(LPARAM)
+      # 
       # long
       # long
       # long
@@ -13279,8 +15170,25 @@ module Org::Eclipse::Swt::Internal::Win32
         JNI.__send__("Java_org_eclipse_swt_internal_win32_OS_SendMessageA__IIIL#{MARGINS.jni_name}_2".to_sym, JNI.env, self.jni_id, h_wnd.to_int, msg.to_int, w_param.to_int, l_param.jni_id)
       end
       
+      JNI.native_method "Java_org_eclipse_swt_internal_win32_OS_SendMessageA__IIIL#{MCHITTESTINFO.jni_name}_2".to_sym, [:pointer, :long, :int32, :int32, :int32, :long], :int32
+      typesig { [::Java::Int, ::Java::Int, ::Java::Int, MCHITTESTINFO] }
+      # @param hWnd cast=(HWND)
+      # @param wParam cast=(WPARAM)
+      # @param lParam cast=(LPARAM)
+      # 
+      # long
+      # long
+      # long
+      def _send_message_a(h_wnd, msg, w_param, l_param)
+        JNI.__send__("Java_org_eclipse_swt_internal_win32_OS_SendMessageA__IIIL#{MCHITTESTINFO.jni_name}_2".to_sym, JNI.env, self.jni_id, h_wnd.to_int, msg.to_int, w_param.to_int, l_param.jni_id)
+      end
+      
       JNI.native_method "Java_org_eclipse_swt_internal_win32_OS_SendMessageA__IIIL#{POINT.jni_name}_2".to_sym, [:pointer, :long, :int32, :int32, :int32, :long], :int32
       typesig { [::Java::Int, ::Java::Int, ::Java::Int, POINT] }
+      # @param hWnd cast=(HWND)
+      # @param wParam cast=(WPARAM)
+      # @param lParam cast=(LPARAM)
+      # 
       # long
       # long
       # long
@@ -13290,6 +15198,10 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method "Java_org_eclipse_swt_internal_win32_OS_SendMessageA__IIIL#{REBARBANDINFO.jni_name}_2".to_sym, [:pointer, :long, :int32, :int32, :int32, :long], :int32
       typesig { [::Java::Int, ::Java::Int, ::Java::Int, REBARBANDINFO] }
+      # @param hWnd cast=(HWND)
+      # @param wParam cast=(WPARAM)
+      # @param lParam cast=(LPARAM)
+      # 
       # long
       # long
       # long
@@ -13299,6 +15211,10 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method "Java_org_eclipse_swt_internal_win32_OS_SendMessageA__IIIL#{RECT.jni_name}_2".to_sym, [:pointer, :long, :int32, :int32, :int32, :long], :int32
       typesig { [::Java::Int, ::Java::Int, ::Java::Int, RECT] }
+      # @param hWnd cast=(HWND)
+      # @param wParam cast=(WPARAM)
+      # @param lParam cast=(LPARAM)
+      # 
       # long
       # long
       # long
@@ -13308,6 +15224,10 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method "Java_org_eclipse_swt_internal_win32_OS_SendMessageA__IIIL#{SYSTEMTIME.jni_name}_2".to_sym, [:pointer, :long, :int32, :int32, :int32, :long], :int32
       typesig { [::Java::Int, ::Java::Int, ::Java::Int, SYSTEMTIME] }
+      # @param hWnd cast=(HWND)
+      # @param wParam cast=(WPARAM)
+      # @param lParam cast=(LPARAM)
+      # 
       # long
       # long
       # long
@@ -13317,6 +15237,10 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method "Java_org_eclipse_swt_internal_win32_OS_SendMessageA__IIIL#{SHDRAGIMAGE.jni_name}_2".to_sym, [:pointer, :long, :int32, :int32, :int32, :long], :int32
       typesig { [::Java::Int, ::Java::Int, ::Java::Int, SHDRAGIMAGE] }
+      # @param hWnd cast=(HWND)
+      # @param wParam cast=(WPARAM)
+      # @param lParam cast=(LPARAM)
+      # 
       # long
       # long
       # long
@@ -13326,6 +15250,10 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method "Java_org_eclipse_swt_internal_win32_OS_SendMessageA__IIIL#{TBBUTTON.jni_name}_2".to_sym, [:pointer, :long, :int32, :int32, :int32, :long], :int32
       typesig { [::Java::Int, ::Java::Int, ::Java::Int, TBBUTTON] }
+      # @param hWnd cast=(HWND)
+      # @param wParam cast=(WPARAM)
+      # @param lParam cast=(LPARAM)
+      # 
       # long
       # long
       # long
@@ -13335,6 +15263,10 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method "Java_org_eclipse_swt_internal_win32_OS_SendMessageA__IIIL#{TBBUTTONINFO.jni_name}_2".to_sym, [:pointer, :long, :int32, :int32, :int32, :long], :int32
       typesig { [::Java::Int, ::Java::Int, ::Java::Int, TBBUTTONINFO] }
+      # @param hWnd cast=(HWND)
+      # @param wParam cast=(WPARAM)
+      # @param lParam cast=(LPARAM)
+      # 
       # long
       # long
       # long
@@ -13344,6 +15276,10 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method "Java_org_eclipse_swt_internal_win32_OS_SendMessageA__IIIL#{TCITEM.jni_name}_2".to_sym, [:pointer, :long, :int32, :int32, :int32, :long], :int32
       typesig { [::Java::Int, ::Java::Int, ::Java::Int, TCITEM] }
+      # @param hWnd cast=(HWND)
+      # @param wParam cast=(WPARAM)
+      # @param lParam cast=(LPARAM)
+      # 
       # long
       # long
       # long
@@ -13353,6 +15289,10 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method "Java_org_eclipse_swt_internal_win32_OS_SendMessageA__IIIL#{TCHITTESTINFO.jni_name}_2".to_sym, [:pointer, :long, :int32, :int32, :int32, :long], :int32
       typesig { [::Java::Int, ::Java::Int, ::Java::Int, TCHITTESTINFO] }
+      # @param hWnd cast=(HWND)
+      # @param wParam cast=(WPARAM)
+      # @param lParam cast=(LPARAM)
+      # 
       # long
       # long
       # long
@@ -13362,6 +15302,10 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method "Java_org_eclipse_swt_internal_win32_OS_SendMessageA__IIIL#{TOOLINFO.jni_name}_2".to_sym, [:pointer, :long, :int32, :int32, :int32, :long], :int32
       typesig { [::Java::Int, ::Java::Int, ::Java::Int, TOOLINFO] }
+      # @param hWnd cast=(HWND)
+      # @param wParam cast=(WPARAM)
+      # @param lParam cast=(LPARAM)
+      # 
       # long
       # long
       # long
@@ -13371,6 +15315,10 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method "Java_org_eclipse_swt_internal_win32_OS_SendMessageA__IIIL#{TVHITTESTINFO.jni_name}_2".to_sym, [:pointer, :long, :int32, :int32, :int32, :long], :int32
       typesig { [::Java::Int, ::Java::Int, ::Java::Int, TVHITTESTINFO] }
+      # @param hWnd cast=(HWND)
+      # @param wParam cast=(WPARAM)
+      # @param lParam cast=(LPARAM)
+      # 
       # long
       # long
       # long
@@ -13380,6 +15328,10 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method "Java_org_eclipse_swt_internal_win32_OS_SendMessageA__IIIL#{TVINSERTSTRUCT.jni_name}_2".to_sym, [:pointer, :long, :int32, :int32, :int32, :long], :int32
       typesig { [::Java::Int, ::Java::Int, ::Java::Int, TVINSERTSTRUCT] }
+      # @param hWnd cast=(HWND)
+      # @param wParam cast=(WPARAM)
+      # @param lParam cast=(LPARAM)
+      # 
       # long
       # long
       # long
@@ -13389,6 +15341,10 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method "Java_org_eclipse_swt_internal_win32_OS_SendMessageA__IIIL#{TVITEM.jni_name}_2".to_sym, [:pointer, :long, :int32, :int32, :int32, :long], :int32
       typesig { [::Java::Int, ::Java::Int, ::Java::Int, TVITEM] }
+      # @param hWnd cast=(HWND)
+      # @param wParam cast=(WPARAM)
+      # @param lParam cast=(LPARAM)
+      # 
       # long
       # long
       # long
@@ -13398,6 +15354,10 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method "Java_org_eclipse_swt_internal_win32_OS_SendMessageA__IIIL#{TVSORTCB.jni_name}_2".to_sym, [:pointer, :long, :int32, :int32, :int32, :long], :int32
       typesig { [::Java::Int, ::Java::Int, ::Java::Int, TVSORTCB] }
+      # @param hWnd cast=(HWND)
+      # @param wParam cast=(WPARAM)
+      # @param lParam cast=(LPARAM)
+      # 
       # long
       # long
       # long
@@ -13407,6 +15367,10 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method "Java_org_eclipse_swt_internal_win32_OS_SendMessageA__IIIL#{UDACCEL.jni_name}_2".to_sym, [:pointer, :long, :int32, :int32, :int32, :long], :int32
       typesig { [::Java::Int, ::Java::Int, ::Java::Int, UDACCEL] }
+      # @param hWnd cast=(HWND)
+      # @param wParam cast=(WPARAM)
+      # @param lParam cast=(LPARAM)
+      # 
       # long
       # long
       # long
@@ -13416,6 +15380,10 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method "Java_org_eclipse_swt_internal_win32_OS_SendMessageA__IIIL#{HDHITTESTINFO.jni_name}_2".to_sym, [:pointer, :long, :int32, :int32, :int32, :long], :int32
       typesig { [::Java::Int, ::Java::Int, ::Java::Int, HDHITTESTINFO] }
+      # @param hWnd cast=(HWND)
+      # @param wParam cast=(WPARAM)
+      # @param lParam cast=(LPARAM)
+      # 
       # long
       # long
       # long
@@ -13425,6 +15393,10 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method "Java_org_eclipse_swt_internal_win32_OS_SendMessageA__IIIL#{HDITEM.jni_name}_2".to_sym, [:pointer, :long, :int32, :int32, :int32, :long], :int32
       typesig { [::Java::Int, ::Java::Int, ::Java::Int, HDITEM] }
+      # @param hWnd cast=(HWND)
+      # @param wParam cast=(WPARAM)
+      # @param lParam cast=(LPARAM)
+      # 
       # long
       # long
       # long
@@ -13434,6 +15406,10 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method "Java_org_eclipse_swt_internal_win32_OS_SendMessageA__IIIL#{HDLAYOUT.jni_name}_2".to_sym, [:pointer, :long, :int32, :int32, :int32, :long], :int32
       typesig { [::Java::Int, ::Java::Int, ::Java::Int, HDLAYOUT] }
+      # @param hWnd cast=(HWND)
+      # @param wParam cast=(WPARAM)
+      # @param lParam cast=(LPARAM)
+      # 
       # long
       # long
       # long
@@ -13443,6 +15419,10 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method "Java_org_eclipse_swt_internal_win32_OS_SendMessageA__IIIL#{BUTTON_IMAGELIST.jni_name}_2".to_sym, [:pointer, :long, :int32, :int32, :int32, :long], :int32
       typesig { [::Java::Int, ::Java::Int, ::Java::Int, BUTTON_IMAGELIST] }
+      # @param hWnd cast=(HWND)
+      # @param wParam cast=(WPARAM)
+      # @param lParam cast=(LPARAM)
+      # 
       # long
       # long
       # long
@@ -13452,6 +15432,10 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method "Java_org_eclipse_swt_internal_win32_OS_SendMessageA__IIIL#{SIZE.jni_name}_2".to_sym, [:pointer, :long, :int32, :int32, :int32, :long], :int32
       typesig { [::Java::Int, ::Java::Int, ::Java::Int, SIZE] }
+      # @param hWnd cast=(HWND)
+      # @param wParam cast=(WPARAM)
+      # @param lParam cast=(LPARAM)
+      # 
       # long
       # long
       # long
@@ -13461,6 +15445,7 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_SetActiveWindow, [:pointer, :long, :int32], :int32
       typesig { [::Java::Int] }
+      # @param hWnd cast=(HWND)
       # long
       # long
       def _set_active_window(h_wnd)
@@ -13469,6 +15454,9 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_SetBkColor, [:pointer, :long, :int32, :int32], :int32
       typesig { [::Java::Int, ::Java::Int] }
+      # @param hdc cast=(HDC)
+      # @param colorRef cast=(COLORREF)
+      # 
       # long
       def _set_bk_color(hdc, color_ref)
         JNI.__send__(:Java_org_eclipse_swt_internal_win32_OS_SetBkColor, JNI.env, self.jni_id, hdc.to_int, color_ref.to_int)
@@ -13476,6 +15464,7 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_SetBkMode, [:pointer, :long, :int32, :int32], :int32
       typesig { [::Java::Int, ::Java::Int] }
+      # @param hdc cast=(HDC)
       # long
       def _set_bk_mode(hdc, mode)
         JNI.__send__(:Java_org_eclipse_swt_internal_win32_OS_SetBkMode, JNI.env, self.jni_id, hdc.to_int, mode.to_int)
@@ -13483,6 +15472,9 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_SetBrushOrgEx, [:pointer, :long, :int32, :int32, :int32, :long], :int8
       typesig { [::Java::Int, ::Java::Int, ::Java::Int, POINT] }
+      # @param hdc cast=(HDC)
+      # @param lppt cast=(LPPOINT)
+      # 
       # long
       def _set_brush_org_ex(hdc, n_xorg, n_yorg, lppt)
         JNI.__send__(:Java_org_eclipse_swt_internal_win32_OS_SetBrushOrgEx, JNI.env, self.jni_id, hdc.to_int, n_xorg.to_int, n_yorg.to_int, lppt.jni_id) != 0
@@ -13490,6 +15482,7 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_SetCapture, [:pointer, :long, :int32], :int32
       typesig { [::Java::Int] }
+      # @param hWnd cast=(HWND)
       # long
       # long
       def _set_capture(h_wnd)
@@ -13504,6 +15497,7 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_SetClipboardData, [:pointer, :long, :int32, :int32], :int32
       typesig { [::Java::Int, ::Java::Int] }
+      # @param hMem cast=(HANDLE)
       # long
       # long
       def _set_clipboard_data(u_format, h_mem)
@@ -13512,6 +15506,7 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_SetCursor, [:pointer, :long, :int32], :int32
       typesig { [::Java::Int] }
+      # @param hCursor cast=(HCURSOR)
       # long
       # long
       def _set_cursor(h_cursor)
@@ -13526,6 +15521,9 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_SetDIBColorTable, [:pointer, :long, :int32, :int32, :int32, :long], :int32
       typesig { [::Java::Int, ::Java::Int, ::Java::Int, Array.typed(::Java::Byte)] }
+      # @param hdc cast=(HDC)
+      # @param pColors cast=(RGBQUAD *),flags=no_out critical
+      # 
       # long
       def _set_dibcolor_table(hdc, u_start_index, c_entries, p_colors)
         JNI.__send__(:Java_org_eclipse_swt_internal_win32_OS_SetDIBColorTable, JNI.env, self.jni_id, hdc.to_int, u_start_index.to_int, c_entries.to_int, p_colors.jni_id)
@@ -13539,6 +15537,7 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_SetFocus, [:pointer, :long, :int32], :int32
       typesig { [::Java::Int] }
+      # @param hWnd cast=(HWND)
       # long
       # long
       def _set_focus(h_wnd)
@@ -13547,6 +15546,7 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_SetForegroundWindow, [:pointer, :long, :int32], :int8
       typesig { [::Java::Int] }
+      # @param hWnd cast=(HWND)
       # long
       def _set_foreground_window(h_wnd)
         JNI.__send__(:Java_org_eclipse_swt_internal_win32_OS_SetForegroundWindow, JNI.env, self.jni_id, h_wnd.to_int) != 0
@@ -13554,6 +15554,7 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_SetGraphicsMode, [:pointer, :long, :int32, :int32], :int32
       typesig { [::Java::Int, ::Java::Int] }
+      # @param hdc cast=(HDC)
       # long
       def _set_graphics_mode(hdc, i_mode)
         JNI.__send__(:Java_org_eclipse_swt_internal_win32_OS_SetGraphicsMode, JNI.env, self.jni_id, hdc.to_int, i_mode.to_int)
@@ -13561,6 +15562,9 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_SetLayeredWindowAttributes, [:pointer, :long, :int32, :int32, :int8, :int32], :int8
       typesig { [::Java::Int, ::Java::Int, ::Java::Byte, ::Java::Int] }
+      # @method flags=dynamic
+      # @param hwnd cast=(HWND)
+      # 
       # long
       def _set_layered_window_attributes(hwnd, cr_key, b_alpha, dw_flags)
         JNI.__send__(:Java_org_eclipse_swt_internal_win32_OS_SetLayeredWindowAttributes, JNI.env, self.jni_id, hwnd.to_int, cr_key.to_int, b_alpha.to_int, dw_flags.to_int) != 0
@@ -13568,6 +15572,10 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_SetLayout, [:pointer, :long, :int32, :int32], :int32
       typesig { [::Java::Int, ::Java::Int] }
+      # @method flags=dynamic
+      # @param hdc cast=(HDC)
+      # @param dwLayout cast=(DWORD)
+      # 
       # long
       def _set_layout(hdc, dw_layout)
         JNI.__send__(:Java_org_eclipse_swt_internal_win32_OS_SetLayout, JNI.env, self.jni_id, hdc.to_int, dw_layout.to_int)
@@ -13575,6 +15583,7 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_SetMapMode, [:pointer, :long, :int32, :int32], :int32
       typesig { [::Java::Int, ::Java::Int] }
+      # @param hdc cast=(HDC)
       # long
       def _set_map_mode(hdc, fn_map_mode)
         JNI.__send__(:Java_org_eclipse_swt_internal_win32_OS_SetMapMode, JNI.env, self.jni_id, hdc.to_int, fn_map_mode.to_int)
@@ -13582,6 +15591,9 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_SetMapperFlags, [:pointer, :long, :int32, :int32], :int32
       typesig { [::Java::Int, ::Java::Int] }
+      # @param hdc cast=(HDC)
+      # @param dwFlag cast=(DWORD)
+      # 
       # long
       def _set_mapper_flags(hdc, dw_flag)
         JNI.__send__(:Java_org_eclipse_swt_internal_win32_OS_SetMapperFlags, JNI.env, self.jni_id, hdc.to_int, dw_flag.to_int)
@@ -13589,6 +15601,9 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_SetMenu, [:pointer, :long, :int32, :int32], :int8
       typesig { [::Java::Int, ::Java::Int] }
+      # @param hWnd cast=(HWND)
+      # @param hMenu cast=(HMENU)
+      # 
       # long
       # long
       def _set_menu(h_wnd, h_menu)
@@ -13597,6 +15612,7 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_SetMenuDefaultItem, [:pointer, :long, :int32, :int32, :int32], :int8
       typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
+      # @param hMenu cast=(HMENU)
       # long
       def _set_menu_default_item(h_menu, u_item, f_by_pos)
         JNI.__send__(:Java_org_eclipse_swt_internal_win32_OS_SetMenuDefaultItem, JNI.env, self.jni_id, h_menu.to_int, u_item.to_int, f_by_pos.to_int) != 0
@@ -13604,6 +15620,9 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_SetMenuInfo, [:pointer, :long, :int32, :long], :int8
       typesig { [::Java::Int, MENUINFO] }
+      # @method flags=dynamic
+      # @param hmenu cast=(HMENU)
+      # 
       # long
       def _set_menu_info(hmenu, lpcmi)
         JNI.__send__(:Java_org_eclipse_swt_internal_win32_OS_SetMenuInfo, JNI.env, self.jni_id, hmenu.to_int, lpcmi.jni_id) != 0
@@ -13611,6 +15630,9 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_SetMenuItemInfoW, [:pointer, :long, :int32, :int32, :int8, :long], :int8
       typesig { [::Java::Int, ::Java::Int, ::Java::Boolean, MENUITEMINFO] }
+      # @param hMenu cast=(HMENU)
+      # @param lpmii cast=(LPMENUITEMINFOW)
+      # 
       # long
       def _set_menu_item_info_w(h_menu, u_item, f_by_position, lpmii)
         JNI.__send__(:Java_org_eclipse_swt_internal_win32_OS_SetMenuItemInfoW, JNI.env, self.jni_id, h_menu.to_int, u_item.to_int, f_by_position ? 1 : 0, lpmii.jni_id) != 0
@@ -13618,6 +15640,7 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_SetMenuItemInfoA, [:pointer, :long, :int32, :int32, :int8, :long], :int8
       typesig { [::Java::Int, ::Java::Int, ::Java::Boolean, MENUITEMINFO] }
+      # @param hMenu cast=(HMENU)
       # long
       def _set_menu_item_info_a(h_menu, u_item, f_by_position, lpmii)
         JNI.__send__(:Java_org_eclipse_swt_internal_win32_OS_SetMenuItemInfoA, JNI.env, self.jni_id, h_menu.to_int, u_item.to_int, f_by_position ? 1 : 0, lpmii.jni_id) != 0
@@ -13625,6 +15648,7 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_SetMetaRgn, [:pointer, :long, :int32], :int32
       typesig { [::Java::Int] }
+      # @param hdc cast=(HDC)
       # long
       def _set_meta_rgn(hdc)
         JNI.__send__(:Java_org_eclipse_swt_internal_win32_OS_SetMetaRgn, JNI.env, self.jni_id, hdc.to_int)
@@ -13632,6 +15656,9 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_SetPaletteEntries, [:pointer, :long, :int32, :int32, :int32, :long], :int32
       typesig { [::Java::Int, ::Java::Int, ::Java::Int, Array.typed(::Java::Byte)] }
+      # @param hPal cast=(HPALETTE)
+      # @param lppe cast=(PALETTEENTRY *),flags=no_out critical
+      # 
       # long
       def _set_palette_entries(h_pal, i_start, c_entries, lppe)
         JNI.__send__(:Java_org_eclipse_swt_internal_win32_OS_SetPaletteEntries, JNI.env, self.jni_id, h_pal.to_int, i_start.to_int, c_entries.to_int, lppe.jni_id)
@@ -13639,6 +15666,9 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_SetParent, [:pointer, :long, :int32, :int32], :int32
       typesig { [::Java::Int, ::Java::Int] }
+      # @param hWndChild cast=(HWND)
+      # @param hWndNewParent cast=(HWND)
+      # 
       # long
       # long
       # long
@@ -13648,6 +15678,7 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_SetPixel, [:pointer, :long, :int32, :int32, :int32, :int32], :int32
       typesig { [::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int] }
+      # @param hdc cast=(HDC)
       # long
       def _set_pixel(hdc, x, y, cr_color)
         JNI.__send__(:Java_org_eclipse_swt_internal_win32_OS_SetPixel, JNI.env, self.jni_id, hdc.to_int, x.to_int, y.to_int, cr_color.to_int)
@@ -13655,6 +15686,7 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_SetPolyFillMode, [:pointer, :long, :int32, :int32], :int32
       typesig { [::Java::Int, ::Java::Int] }
+      # @param hdc cast=(HDC)
       # long
       def _set_poly_fill_mode(hdc, i_poly_fill_mode)
         JNI.__send__(:Java_org_eclipse_swt_internal_win32_OS_SetPolyFillMode, JNI.env, self.jni_id, hdc.to_int, i_poly_fill_mode.to_int)
@@ -13662,18 +15694,21 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_SetProcessDPIAware, [:pointer, :long], :int8
       typesig { [] }
+      # @method flags=dynamic
       def _set_process_dpiaware
         JNI.__send__(:Java_org_eclipse_swt_internal_win32_OS_SetProcessDPIAware, JNI.env, self.jni_id) != 0
       end
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_SetRect, [:pointer, :long, :long, :int32, :int32, :int32, :int32], :int8
       typesig { [RECT, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int] }
+      # @param lprc flags=no_in
       def _set_rect(lprc, x_left, y_top, x_right, y_bottom)
         JNI.__send__(:Java_org_eclipse_swt_internal_win32_OS_SetRect, JNI.env, self.jni_id, lprc.jni_id, x_left.to_int, y_top.to_int, x_right.to_int, y_bottom.to_int) != 0
       end
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_SetRectRgn, [:pointer, :long, :int32, :int32, :int32, :int32, :int32], :int8
       typesig { [::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int] }
+      # @param hrgn cast=(HRGN)
       # long
       def _set_rect_rgn(hrgn, n_left_rect, n_top_rect, n_right_rect, n_bottom_rect)
         JNI.__send__(:Java_org_eclipse_swt_internal_win32_OS_SetRectRgn, JNI.env, self.jni_id, hrgn.to_int, n_left_rect.to_int, n_top_rect.to_int, n_right_rect.to_int, n_bottom_rect.to_int) != 0
@@ -13681,6 +15716,7 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_SetROP2, [:pointer, :long, :int32, :int32], :int32
       typesig { [::Java::Int, ::Java::Int] }
+      # @param hdc cast=(HDC)
       # long
       def _set_rop2(hdc, fn_draw_mode)
         JNI.__send__(:Java_org_eclipse_swt_internal_win32_OS_SetROP2, JNI.env, self.jni_id, hdc.to_int, fn_draw_mode.to_int)
@@ -13688,6 +15724,7 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_SetScrollInfo, [:pointer, :long, :int32, :int32, :long, :int8], :int8
       typesig { [::Java::Int, ::Java::Int, SCROLLINFO, ::Java::Boolean] }
+      # @param hwnd cast=(HWND)
       # long
       def _set_scroll_info(hwnd, flags, info, f_redraw)
         JNI.__send__(:Java_org_eclipse_swt_internal_win32_OS_SetScrollInfo, JNI.env, self.jni_id, hwnd.to_int, flags.to_int, info.jni_id, f_redraw ? 1 : 0) != 0
@@ -13695,6 +15732,7 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_SetStretchBltMode, [:pointer, :long, :int32, :int32], :int32
       typesig { [::Java::Int, ::Java::Int] }
+      # @param hdc cast=(HDC)
       # long
       def _set_stretch_blt_mode(hdc, i_stretch_mode)
         JNI.__send__(:Java_org_eclipse_swt_internal_win32_OS_SetStretchBltMode, JNI.env, self.jni_id, hdc.to_int, i_stretch_mode.to_int)
@@ -13702,6 +15740,10 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_SetPropW, [:pointer, :long, :int32, :int32, :int32], :int8
       typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
+      # @param hWnd cast=(HWND)
+      # @param lpString cast=(LPCWSTR)
+      # @param hData cast=(HANDLE)
+      # 
       # long
       # long
       # long
@@ -13711,6 +15753,10 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_SetPropA, [:pointer, :long, :int32, :int32, :int32], :int8
       typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
+      # @param hWnd cast=(HWND)
+      # @param lpString cast=(LPCTSTR)
+      # @param hData cast=(HANDLE)
+      # 
       # long
       # long
       # long
@@ -13720,6 +15766,7 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_SetTextAlign, [:pointer, :long, :int32, :int32], :int32
       typesig { [::Java::Int, ::Java::Int] }
+      # @param hdc cast=(HDC)
       # long
       def _set_text_align(hdc, f_mode)
         JNI.__send__(:Java_org_eclipse_swt_internal_win32_OS_SetTextAlign, JNI.env, self.jni_id, hdc.to_int, f_mode.to_int)
@@ -13727,6 +15774,9 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_SetTextColor, [:pointer, :long, :int32, :int32], :int32
       typesig { [::Java::Int, ::Java::Int] }
+      # @param hdc cast=(HDC)
+      # @param colorRef cast=(COLORREF)
+      # 
       # long
       def _set_text_color(hdc, color_ref)
         JNI.__send__(:Java_org_eclipse_swt_internal_win32_OS_SetTextColor, JNI.env, self.jni_id, hdc.to_int, color_ref.to_int)
@@ -13734,6 +15784,9 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_SetTimer, [:pointer, :long, :int32, :int32, :int32, :int32], :int32
       typesig { [::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int] }
+      # @param hWnd cast=(HWND)
+      # @param lpTimerFunc cast=(TIMERPROC)
+      # 
       # long
       # long
       # long
@@ -13744,6 +15797,7 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_SetViewportExtEx, [:pointer, :long, :int32, :int32, :int32, :long], :int8
       typesig { [::Java::Int, ::Java::Int, ::Java::Int, SIZE] }
+      # @param hdc cast=(HDC)
       # long
       def _set_viewport_ext_ex(hdc, n_xextent, n_yextent, lp_size)
         JNI.__send__(:Java_org_eclipse_swt_internal_win32_OS_SetViewportExtEx, JNI.env, self.jni_id, hdc.to_int, n_xextent.to_int, n_yextent.to_int, lp_size.jni_id) != 0
@@ -13751,6 +15805,7 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_SetViewportOrgEx, [:pointer, :long, :int32, :int32, :int32, :long], :int8
       typesig { [::Java::Int, ::Java::Int, ::Java::Int, POINT] }
+      # @param hdc cast=(HDC)
       # long
       def _set_viewport_org_ex(hdc, x, y, lp_point)
         JNI.__send__(:Java_org_eclipse_swt_internal_win32_OS_SetViewportOrgEx, JNI.env, self.jni_id, hdc.to_int, x.to_int, y.to_int, lp_point.jni_id) != 0
@@ -13758,6 +15813,7 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_SetWindowLongW, [:pointer, :long, :int32, :int32, :int32], :int32
       typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
+      # @param hWnd cast=(HWND)
       # long
       def _set_window_long_w(h_wnd, n_index, dw_new_long)
         JNI.__send__(:Java_org_eclipse_swt_internal_win32_OS_SetWindowLongW, JNI.env, self.jni_id, h_wnd.to_int, n_index.to_int, dw_new_long.to_int)
@@ -13765,6 +15821,7 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_SetWindowLongA, [:pointer, :long, :int32, :int32, :int32], :int32
       typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
+      # @param hWnd cast=(HWND)
       # long
       def _set_window_long_a(h_wnd, n_index, dw_new_long)
         JNI.__send__(:Java_org_eclipse_swt_internal_win32_OS_SetWindowLongA, JNI.env, self.jni_id, h_wnd.to_int, n_index.to_int, dw_new_long.to_int)
@@ -13772,6 +15829,9 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_SetWindowLongPtrW, [:pointer, :long, :int32, :int32, :int32], :int32
       typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
+      # @param hWnd cast=(HWND)
+      # @param dwNewLong cast=(LONG_PTR)
+      # 
       # long
       # long
       # long
@@ -13781,6 +15841,9 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_SetWindowLongPtrA, [:pointer, :long, :int32, :int32, :int32], :int32
       typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
+      # @param hWnd cast=(HWND)
+      # @param dwNewLong cast=(LONG_PTR)
+      # 
       # long
       # long
       # long
@@ -13790,6 +15853,7 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_SetWindowExtEx, [:pointer, :long, :int32, :int32, :int32, :long], :int8
       typesig { [::Java::Int, ::Java::Int, ::Java::Int, SIZE] }
+      # @param hdc cast=(HDC)
       # long
       def _set_window_ext_ex(hdc, n_xextent, n_yextent, lp_size)
         JNI.__send__(:Java_org_eclipse_swt_internal_win32_OS_SetWindowExtEx, JNI.env, self.jni_id, hdc.to_int, n_xextent.to_int, n_yextent.to_int, lp_size.jni_id) != 0
@@ -13797,6 +15861,7 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_SetWindowOrgEx, [:pointer, :long, :int32, :int32, :int32, :long], :int8
       typesig { [::Java::Int, ::Java::Int, ::Java::Int, POINT] }
+      # @param hdc cast=(HDC)
       # long
       def _set_window_org_ex(hdc, x, y, lp_point)
         JNI.__send__(:Java_org_eclipse_swt_internal_win32_OS_SetWindowOrgEx, JNI.env, self.jni_id, hdc.to_int, x.to_int, y.to_int, lp_point.jni_id) != 0
@@ -13804,6 +15869,7 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_SetWindowPlacement, [:pointer, :long, :int32, :long], :int8
       typesig { [::Java::Int, WINDOWPLACEMENT] }
+      # @param hWnd cast=(HWND)
       # long
       def _set_window_placement(h_wnd, lpwndpl)
         JNI.__send__(:Java_org_eclipse_swt_internal_win32_OS_SetWindowPlacement, JNI.env, self.jni_id, h_wnd.to_int, lpwndpl.jni_id) != 0
@@ -13811,6 +15877,9 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_SetWindowPos, [:pointer, :long, :int32, :int32, :int32, :int32, :int32, :int32, :int32], :int8
       typesig { [::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int] }
+      # @param hWnd cast=(HWND)
+      # @param hWndInsertAfter cast=(HWND)
+      # 
       # long
       # long
       def _set_window_pos(h_wnd, h_wnd_insert_after, x, y, cx, cy, u_flags)
@@ -13819,6 +15888,9 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_SetWindowRgn, [:pointer, :long, :int32, :int32, :int8], :int32
       typesig { [::Java::Int, ::Java::Int, ::Java::Boolean] }
+      # @param hWnd cast=(HWND)
+      # @param hRgn cast=(HRGN)
+      # 
       # long
       # long
       def _set_window_rgn(h_wnd, h_rgn, b_redraw)
@@ -13827,6 +15899,9 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_SetWindowTextW, [:pointer, :long, :int32, :long], :int8
       typesig { [::Java::Int, Array.typed(::Java::Char)] }
+      # @param hWnd cast=(HWND)
+      # @param lpString cast=(LPWSTR)
+      # 
       # long
       def _set_window_text_w(h_wnd, lp_string)
         JNI.__send__(:Java_org_eclipse_swt_internal_win32_OS_SetWindowTextW, JNI.env, self.jni_id, h_wnd.to_int, lp_string.jni_id) != 0
@@ -13834,6 +15909,9 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_SetWindowTextA, [:pointer, :long, :int32, :long], :int8
       typesig { [::Java::Int, Array.typed(::Java::Byte)] }
+      # @param hWnd cast=(HWND)
+      # @param lpString cast=(LPSTR)
+      # 
       # long
       def _set_window_text_a(h_wnd, lp_string)
         JNI.__send__(:Java_org_eclipse_swt_internal_win32_OS_SetWindowTextA, JNI.env, self.jni_id, h_wnd.to_int, lp_string.jni_id) != 0
@@ -13841,6 +15919,11 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_SetWindowTheme, [:pointer, :long, :int32, :long, :long], :int32
       typesig { [::Java::Int, Array.typed(::Java::Char), Array.typed(::Java::Char)] }
+      # @method flags=dynamic
+      # @param hwnd cast=(HWND)
+      # @param pszSubAppName cast=(LPCWSTR)
+      # @param pszSubIdList cast=(LPCWSTR)
+      # 
       # long
       def _set_window_theme(hwnd, psz_sub_app_name, psz_sub_id_list)
         JNI.__send__(:Java_org_eclipse_swt_internal_win32_OS_SetWindowTheme, JNI.env, self.jni_id, hwnd.to_int, psz_sub_app_name.jni_id, psz_sub_id_list.jni_id)
@@ -13848,6 +15931,9 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_SetWindowsHookExW, [:pointer, :long, :int32, :int32, :int32, :int32], :int32
       typesig { [::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int] }
+      # @param lpfn cast=(HOOKPROC)
+      # @param hMod cast=(HINSTANCE)
+      # 
       # long
       # long
       # long
@@ -13857,6 +15943,9 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_SetWindowsHookExA, [:pointer, :long, :int32, :int32, :int32, :int32], :int32
       typesig { [::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int] }
+      # @param lpfn cast=(HOOKPROC)
+      # @param hMod cast=(HINSTANCE)
+      # 
       # long
       # long
       # long
@@ -13866,6 +15955,9 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_SetWorldTransform, [:pointer, :long, :int32, :long], :int8
       typesig { [::Java::Int, Array.typed(::Java::Float)] }
+      # @param hdc cast=(HDC)
+      # @param lpXform cast=(XFORM *)
+      # 
       # long
       def _set_world_transform(hdc, lp_xform)
         JNI.__send__(:Java_org_eclipse_swt_internal_win32_OS_SetWorldTransform, JNI.env, self.jni_id, hdc.to_int, lp_xform.jni_id) != 0
@@ -13873,6 +15965,7 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_SHBrowseForFolderW, [:pointer, :long, :long], :int32
       typesig { [BROWSEINFO] }
+      # @param lpbi cast=(LPBROWSEINFOW)
       # long
       def _shbrowse_for_folder_w(lpbi)
         JNI.__send__(:Java_org_eclipse_swt_internal_win32_OS_SHBrowseForFolderW, JNI.env, self.jni_id, lpbi.jni_id)
@@ -13887,12 +15980,16 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_SHCreateMenuBar, [:pointer, :long, :long], :int8
       typesig { [SHMENUBARINFO] }
+      # @param pmb cast=(PSHMENUBARINFO)
       def _shcreate_menu_bar(pmb)
         JNI.__send__(:Java_org_eclipse_swt_internal_win32_OS_SHCreateMenuBar, JNI.env, self.jni_id, pmb.jni_id) != 0
       end
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_SHGetFileInfoW, [:pointer, :long, :long, :int32, :long, :int32, :int32], :int32
       typesig { [Array.typed(::Java::Char), ::Java::Int, SHFILEINFOW, ::Java::Int, ::Java::Int] }
+      # @param pszPath cast=(LPCWSTR)
+      # @param psfi cast=(SHFILEINFOW *)
+      # 
       # long
       def _shget_file_info_w(psz_path, dw_file_attributes, psfi, cb_file_info, u_flags)
         JNI.__send__(:Java_org_eclipse_swt_internal_win32_OS_SHGetFileInfoW, JNI.env, self.jni_id, psz_path.jni_id, dw_file_attributes.to_int, psfi.jni_id, cb_file_info.to_int, u_flags.to_int)
@@ -13900,6 +15997,9 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_SHGetFileInfoA, [:pointer, :long, :long, :int32, :long, :int32, :int32], :int32
       typesig { [Array.typed(::Java::Byte), ::Java::Int, SHFILEINFOA, ::Java::Int, ::Java::Int] }
+      # @param pszPath cast=(LPCSTR)
+      # @param psfi cast=(SHFILEINFOA *)
+      # 
       # long
       def _shget_file_info_a(psz_path, dw_file_attributes, psfi, cb_file_info, u_flags)
         JNI.__send__(:Java_org_eclipse_swt_internal_win32_OS_SHGetFileInfoA, JNI.env, self.jni_id, psz_path.jni_id, dw_file_attributes.to_int, psfi.jni_id, cb_file_info.to_int, u_flags.to_int)
@@ -13907,6 +16007,7 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_SHHandleWMSettingChange, [:pointer, :long, :int32, :int32, :int32, :long], :int8
       typesig { [::Java::Int, ::Java::Int, ::Java::Int, SHACTIVATEINFO] }
+      # @param hwnd cast=(HWND)
       # long
       # long
       # long
@@ -13930,6 +16031,7 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_SHSipPreference, [:pointer, :long, :int32, :int32], :int8
       typesig { [::Java::Int, ::Java::Int] }
+      # @param hwnd cast=(HWND)
       # long
       def _shsip_preference(hwnd, st)
         JNI.__send__(:Java_org_eclipse_swt_internal_win32_OS_SHSipPreference, JNI.env, self.jni_id, hwnd.to_int, st.to_int) != 0
@@ -13937,6 +16039,7 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_ShellExecuteExW, [:pointer, :long, :long], :int8
       typesig { [SHELLEXECUTEINFO] }
+      # @param lpExecInfo cast=(LPSHELLEXECUTEINFOW)
       def _shell_execute_ex_w(lp_exec_info)
         JNI.__send__(:Java_org_eclipse_swt_internal_win32_OS_ShellExecuteExW, JNI.env, self.jni_id, lp_exec_info.jni_id) != 0
       end
@@ -13961,6 +16064,7 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_SHGetMalloc, [:pointer, :long, :long], :int32
       typesig { [Array.typed(::Java::Int)] }
+      # @param ppMalloc cast=(LPMALLOC *)
       # long
       def _shget_malloc(pp_malloc)
         JNI.__send__(:Java_org_eclipse_swt_internal_win32_OS_SHGetMalloc, JNI.env, self.jni_id, pp_malloc.jni_id)
@@ -13968,6 +16072,9 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_SHGetPathFromIDListW, [:pointer, :long, :int32, :long], :int8
       typesig { [::Java::Int, Array.typed(::Java::Char)] }
+      # @param pidl cast=(LPCITEMIDLIST)
+      # @param pszPath cast=(LPWSTR)
+      # 
       # long
       def _shget_path_from_idlist_w(pidl, psz_path)
         JNI.__send__(:Java_org_eclipse_swt_internal_win32_OS_SHGetPathFromIDListW, JNI.env, self.jni_id, pidl.to_int, psz_path.jni_id) != 0
@@ -13975,6 +16082,9 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_SHGetPathFromIDListA, [:pointer, :long, :int32, :long], :int8
       typesig { [::Java::Int, Array.typed(::Java::Byte)] }
+      # @param pidl cast=(LPCITEMIDLIST)
+      # @param pszPath cast=(LPSTR)
+      # 
       # long
       def _shget_path_from_idlist_a(pidl, psz_path)
         JNI.__send__(:Java_org_eclipse_swt_internal_win32_OS_SHGetPathFromIDListA, JNI.env, self.jni_id, pidl.to_int, psz_path.jni_id) != 0
@@ -13982,6 +16092,9 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_SHSetAppKeyWndAssoc, [:pointer, :long, :int8, :int32], :int8
       typesig { [::Java::Byte, ::Java::Int] }
+      # @param bVk cast=(BYTE)
+      # @param hwnd cast=(HWND)
+      # 
       # long
       def _shset_app_key_wnd_assoc(b_vk, hwnd)
         JNI.__send__(:Java_org_eclipse_swt_internal_win32_OS_SHSetAppKeyWndAssoc, JNI.env, self.jni_id, b_vk.to_int, hwnd.to_int) != 0
@@ -13989,6 +16102,7 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_ShowCaret, [:pointer, :long, :int32], :int8
       typesig { [::Java::Int] }
+      # @param hWnd cast=(HWND)
       # long
       def _show_caret(h_wnd)
         JNI.__send__(:Java_org_eclipse_swt_internal_win32_OS_ShowCaret, JNI.env, self.jni_id, h_wnd.to_int) != 0
@@ -14002,6 +16116,7 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_ShowOwnedPopups, [:pointer, :long, :int32, :int8], :int8
       typesig { [::Java::Int, ::Java::Boolean] }
+      # @param hWnd cast=(HWND)
       # long
       def _show_owned_popups(h_wnd, f_show)
         JNI.__send__(:Java_org_eclipse_swt_internal_win32_OS_ShowOwnedPopups, JNI.env, self.jni_id, h_wnd.to_int, f_show ? 1 : 0) != 0
@@ -14009,6 +16124,7 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_ShowScrollBar, [:pointer, :long, :int32, :int32, :int8], :int8
       typesig { [::Java::Int, ::Java::Int, ::Java::Boolean] }
+      # @param hWnd cast=(HWND)
       # long
       def _show_scroll_bar(h_wnd, w_bar, b_show)
         JNI.__send__(:Java_org_eclipse_swt_internal_win32_OS_ShowScrollBar, JNI.env, self.jni_id, h_wnd.to_int, w_bar.to_int, b_show ? 1 : 0) != 0
@@ -14016,6 +16132,7 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_ShowWindow, [:pointer, :long, :int32, :int32], :int8
       typesig { [::Java::Int, ::Java::Int] }
+      # @param hWnd cast=(HWND)
       # long
       def _show_window(h_wnd, n_cmd_show)
         JNI.__send__(:Java_org_eclipse_swt_internal_win32_OS_ShowWindow, JNI.env, self.jni_id, h_wnd.to_int, n_cmd_show.to_int) != 0
@@ -14029,6 +16146,9 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_StartDocW, [:pointer, :long, :int32, :long], :int32
       typesig { [::Java::Int, DOCINFO] }
+      # @param hdc cast=(HDC)
+      # @param lpdi cast=(LPDOCINFOW)
+      # 
       # long
       def _start_doc_w(hdc, lpdi)
         JNI.__send__(:Java_org_eclipse_swt_internal_win32_OS_StartDocW, JNI.env, self.jni_id, hdc.to_int, lpdi.jni_id)
@@ -14036,6 +16156,7 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_StartDocA, [:pointer, :long, :int32, :long], :int32
       typesig { [::Java::Int, DOCINFO] }
+      # @param hdc cast=(HDC)
       # long
       def _start_doc_a(hdc, lpdi)
         JNI.__send__(:Java_org_eclipse_swt_internal_win32_OS_StartDocA, JNI.env, self.jni_id, hdc.to_int, lpdi.jni_id)
@@ -14043,6 +16164,7 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_StartPage, [:pointer, :long, :int32], :int32
       typesig { [::Java::Int] }
+      # @param hdc cast=(HDC)
       # long
       def _start_page(hdc)
         JNI.__send__(:Java_org_eclipse_swt_internal_win32_OS_StartPage, JNI.env, self.jni_id, hdc.to_int)
@@ -14050,6 +16172,9 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_StretchBlt, [:pointer, :long, :int32, :int32, :int32, :int32, :int32, :int32, :int32, :int32, :int32, :int32, :int32], :int8
       typesig { [::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int] }
+      # @param hdcDest cast=(HDC)
+      # @param hdcSrc cast=(HDC)
+      # 
       # long
       # long
       def _stretch_blt(hdc_dest, n_xorigin_dest, n_yorigin_dest, n_width_dest, n_height_dest, hdc_src, n_xorigin_src, n_yorigin_src, n_width_src, n_height_src, dw_rop)
@@ -14058,6 +16183,7 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_StrokePath, [:pointer, :long, :int32], :int8
       typesig { [::Java::Int] }
+      # @param hdc cast=(HDC)
       # long
       def _stroke_path(hdc)
         JNI.__send__(:Java_org_eclipse_swt_internal_win32_OS_StrokePath, JNI.env, self.jni_id, hdc.to_int) != 0
@@ -14113,18 +16239,25 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_ToAscii, [:pointer, :long, :int32, :int32, :long, :long, :int32], :int32
       typesig { [::Java::Int, ::Java::Int, Array.typed(::Java::Byte), Array.typed(::Java::Short), ::Java::Int] }
+      # @param lpKeyState cast=(PBYTE)
+      # @param lpChar cast=(LPWORD)
       def _to_ascii(u_virt_key, u_scan_code, lp_key_state, lp_char, u_flags)
         JNI.__send__(:Java_org_eclipse_swt_internal_win32_OS_ToAscii, JNI.env, self.jni_id, u_virt_key.to_int, u_scan_code.to_int, lp_key_state.jni_id, lp_char.jni_id, u_flags.to_int)
       end
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_ToUnicode, [:pointer, :long, :int32, :int32, :long, :long, :int32, :int32], :int32
       typesig { [::Java::Int, ::Java::Int, Array.typed(::Java::Byte), Array.typed(::Java::Char), ::Java::Int, ::Java::Int] }
+      # @param lpKeyState cast=(PBYTE)
+      # @param pwszBuff cast=(LPWSTR)
       def _to_unicode(w_virt_key, w_scan_code, lp_key_state, pwsz_buff, cch_buff, w_flags)
         JNI.__send__(:Java_org_eclipse_swt_internal_win32_OS_ToUnicode, JNI.env, self.jni_id, w_virt_key.to_int, w_scan_code.to_int, lp_key_state.jni_id, pwsz_buff.jni_id, cch_buff.to_int, w_flags.to_int)
       end
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_TreeView_1GetItemRect, [:pointer, :long, :int32, :int32, :long, :int8], :int8
       typesig { [::Java::Int, ::Java::Int, RECT, ::Java::Boolean] }
+      # @param hwndTV cast=(HWND)
+      # @param hitem cast=(HTREEITEM)
+      # 
       # long
       # long
       def _tree_view_get_item_rect(hwnd_tv, hitem, prc, f_item_rect)
@@ -14139,6 +16272,9 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_TrackPopupMenu, [:pointer, :long, :int32, :int32, :int32, :int32, :int32, :int32, :long], :int8
       typesig { [::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, RECT] }
+      # @param hMenu cast=(HMENU)
+      # @param hWnd cast=(HWND)
+      # 
       # long
       # long
       def _track_popup_menu(h_menu, u_flags, x, y, n_reserved, h_wnd, prc_rect)
@@ -14147,6 +16283,9 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_TranslateAcceleratorW, [:pointer, :long, :int32, :int32, :long], :int32
       typesig { [::Java::Int, ::Java::Int, MSG] }
+      # @param hWnd cast=(HWND)
+      # @param hAccTable cast=(HACCEL)
+      # 
       # long
       # long
       def _translate_accelerator_w(h_wnd, h_acc_table, lp_msg)
@@ -14155,6 +16294,9 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_TranslateAcceleratorA, [:pointer, :long, :int32, :int32, :long], :int32
       typesig { [::Java::Int, ::Java::Int, MSG] }
+      # @param hWnd cast=(HWND)
+      # @param hAccTable cast=(HACCEL)
+      # 
       # long
       # long
       def _translate_accelerator_a(h_wnd, h_acc_table, lp_msg)
@@ -14163,6 +16305,9 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_TranslateCharsetInfo, [:pointer, :long, :int32, :long, :int32], :int8
       typesig { [::Java::Int, Array.typed(::Java::Int), ::Java::Int] }
+      # @param lpSrc cast=(DWORD *)
+      # @param lpCs cast=(LPCHARSETINFO)
+      # 
       # long
       def _translate_charset_info(lp_src, lp_cs, dw_flags)
         JNI.__send__(:Java_org_eclipse_swt_internal_win32_OS_TranslateCharsetInfo, JNI.env, self.jni_id, lp_src.to_int, lp_cs.jni_id, dw_flags.to_int) != 0
@@ -14170,6 +16315,9 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_TranslateMDISysAccel, [:pointer, :long, :int32, :long], :int8
       typesig { [::Java::Int, MSG] }
+      # @param hWndClient cast=(HWND)
+      # @param lpMsg cast=(LPMSG)
+      # 
       # long
       def _translate_mdisys_accel(h_wnd_client, lp_msg)
         JNI.__send__(:Java_org_eclipse_swt_internal_win32_OS_TranslateMDISysAccel, JNI.env, self.jni_id, h_wnd_client.to_int, lp_msg.jni_id) != 0
@@ -14183,6 +16331,7 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_TransparentBlt, [:pointer, :long, :int32, :int32, :int32, :int32, :int32, :int32, :int32, :int32, :int32, :int32, :int32], :int8
       typesig { [::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int] }
+      # @method flags=dynamic
       # long
       # long
       def _transparent_blt(hdc_dest, n_xorigin_dest, n_yorigin_dest, n_width_dest, h_height_dest, hdc_src, n_xorigin_src, n_yorigin_src, n_width_src, n_height_src, cr_transparent)
@@ -14191,6 +16340,10 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_TransparentImage, [:pointer, :long, :int32, :int32, :int32, :int32, :int32, :int32, :int32, :int32, :int32, :int32, :int32], :int8
       typesig { [::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int] }
+      # @param hdcDest cast=(HDC)
+      # @param hSrc cast=(HANDLE)
+      # @param TransparentColor cast=(COLORREF)
+      # 
       # long
       # long
       def _transparent_image(hdc_dest, dst_x, dst_y, dst_cx, dst_cy, h_src, src_x, src_y, src_cx, src_cy, transparent_color)
@@ -14199,6 +16352,7 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_UnhookWindowsHookEx, [:pointer, :long, :int32], :int8
       typesig { [::Java::Int] }
+      # @param hhk cast=(HHOOK)
       # long
       def _unhook_windows_hook_ex(hhk)
         JNI.__send__(:Java_org_eclipse_swt_internal_win32_OS_UnhookWindowsHookEx, JNI.env, self.jni_id, hhk.to_int) != 0
@@ -14206,6 +16360,9 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_UnregisterClassW, [:pointer, :long, :long, :int32], :int8
       typesig { [Array.typed(::Java::Char), ::Java::Int] }
+      # @param lpClassName cast=(LPWSTR)
+      # @param hInstance cast=(HINSTANCE)
+      # 
       # long
       def _unregister_class_w(lp_class_name, h_instance)
         JNI.__send__(:Java_org_eclipse_swt_internal_win32_OS_UnregisterClassW, JNI.env, self.jni_id, lp_class_name.jni_id, h_instance.to_int) != 0
@@ -14213,6 +16370,9 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_UnregisterClassA, [:pointer, :long, :long, :int32], :int8
       typesig { [Array.typed(::Java::Byte), ::Java::Int] }
+      # @param lpClassName cast=(LPSTR)
+      # @param hInstance cast=(HINSTANCE)
+      # 
       # long
       def _unregister_class_a(lp_class_name, h_instance)
         JNI.__send__(:Java_org_eclipse_swt_internal_win32_OS_UnregisterClassA, JNI.env, self.jni_id, lp_class_name.jni_id, h_instance.to_int) != 0
@@ -14220,6 +16380,12 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_UpdateLayeredWindow, [:pointer, :long, :int32, :int32, :long, :long, :int32, :long, :int32, :long, :int32], :int8
       typesig { [::Java::Int, ::Java::Int, POINT, SIZE, ::Java::Int, POINT, ::Java::Int, BLENDFUNCTION, ::Java::Int] }
+      # @method flags=dynamic
+      # @param hwnd cast=(HWND)
+      # @param hdcDst cast=(HDC)
+      # @param hdcSrc cast=(HDC)
+      # @param crKey cast=(COLORREF)
+      # 
       # long
       # long
       # long
@@ -14229,6 +16395,7 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_UpdateWindow, [:pointer, :long, :int32], :int8
       typesig { [::Java::Int] }
+      # @param hWnd cast=(HWND)
       # long
       def _update_window(h_wnd)
         JNI.__send__(:Java_org_eclipse_swt_internal_win32_OS_UpdateWindow, JNI.env, self.jni_id, h_wnd.to_int) != 0
@@ -14236,6 +16403,7 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_ValidateRect, [:pointer, :long, :int32, :long], :int8
       typesig { [::Java::Int, RECT] }
+      # @param hWnd cast=(HWND)
       # long
       def _validate_rect(h_wnd, lp_rect)
         JNI.__send__(:Java_org_eclipse_swt_internal_win32_OS_ValidateRect, JNI.env, self.jni_id, h_wnd.to_int, lp_rect.jni_id) != 0
@@ -14243,12 +16411,14 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_VkKeyScanW, [:pointer, :long, :int16], :int16
       typesig { [::Java::Short] }
+      # @param ch cast=(WCHAR)
       def _vk_key_scan_w(ch)
         JNI.__send__(:Java_org_eclipse_swt_internal_win32_OS_VkKeyScanW, JNI.env, self.jni_id, ch.to_int)
       end
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_VkKeyScanA, [:pointer, :long, :int16], :int16
       typesig { [::Java::Short] }
+      # @param ch cast=(TCHAR)
       def _vk_key_scan_a(ch)
         JNI.__send__(:Java_org_eclipse_swt_internal_win32_OS_VkKeyScanA, JNI.env, self.jni_id, ch.to_int)
       end
@@ -14361,12 +16531,21 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_WideCharToMultiByte__II_3CI_3BI_3B_3Z, [:pointer, :long, :int32, :int32, :long, :int32, :long, :int32, :long, :long], :int32
       typesig { [::Java::Int, ::Java::Int, Array.typed(::Java::Char), ::Java::Int, Array.typed(::Java::Byte), ::Java::Int, Array.typed(::Java::Byte), Array.typed(::Java::Boolean)] }
+      # @param lpWideCharStr cast=(LPCWSTR),flags=no_out critical
+      # @param lpMultiByteStr cast=(LPSTR),flags=no_in critical
+      # @param lpDefaultChar cast=(LPCSTR)
+      # @param lpUsedDefaultChar cast=(LPBOOL)
       def _wide_char_to_multi_byte(code_page, dw_flags, lp_wide_char_str, cch_wide_char, lp_multi_byte_str, cch_multi_byte, lp_default_char, lp_used_default_char)
         JNI.__send__(:Java_org_eclipse_swt_internal_win32_OS_WideCharToMultiByte__II_3CI_3BI_3B_3Z, JNI.env, self.jni_id, code_page.to_int, dw_flags.to_int, lp_wide_char_str.jni_id, cch_wide_char.to_int, lp_multi_byte_str.jni_id, cch_multi_byte.to_int, lp_default_char.jni_id, lp_used_default_char.jni_id)
       end
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_WideCharToMultiByte__II_3CIII_3B_3Z, [:pointer, :long, :int32, :int32, :long, :int32, :int32, :int32, :long, :long], :int32
       typesig { [::Java::Int, ::Java::Int, Array.typed(::Java::Char), ::Java::Int, ::Java::Int, ::Java::Int, Array.typed(::Java::Byte), Array.typed(::Java::Boolean)] }
+      # @param lpWideCharStr cast=(LPCWSTR),flags=no_out critical
+      # @param lpMultiByteStr cast=(LPSTR)
+      # @param lpDefaultChar cast=(LPCSTR)
+      # @param lpUsedDefaultChar cast=(LPBOOL)
+      # 
       # long
       def _wide_char_to_multi_byte(code_page, dw_flags, lp_wide_char_str, cch_wide_char, lp_multi_byte_str, cch_multi_byte, lp_default_char, lp_used_default_char)
         JNI.__send__(:Java_org_eclipse_swt_internal_win32_OS_WideCharToMultiByte__II_3CIII_3B_3Z, JNI.env, self.jni_id, code_page.to_int, dw_flags.to_int, lp_wide_char_str.jni_id, cch_wide_char.to_int, lp_multi_byte_str.to_int, cch_multi_byte.to_int, lp_default_char.jni_id, lp_used_default_char.jni_id)
@@ -14374,6 +16553,7 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_WindowFromDC, [:pointer, :long, :int32], :int32
       typesig { [::Java::Int] }
+      # @param hDC cast=(HDC)
       # long
       # long
       def _window_from_dc(h_dc)
@@ -14382,6 +16562,7 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_WindowFromPoint, [:pointer, :long, :long], :int32
       typesig { [POINT] }
+      # @param lpPoint flags=struct
       # long
       def _window_from_point(lp_point)
         JNI.__send__(:Java_org_eclipse_swt_internal_win32_OS_WindowFromPoint, JNI.env, self.jni_id, lp_point.jni_id)
@@ -14389,6 +16570,7 @@ module Org::Eclipse::Swt::Internal::Win32
       
       JNI.native_method :Java_org_eclipse_swt_internal_win32_OS_wcslen, [:pointer, :long, :int32], :int32
       typesig { [::Java::Int] }
+      # @param string cast=(const wchar_t *)
       # long
       def wcslen(string)
         JNI.__send__(:Java_org_eclipse_swt_internal_win32_OS_wcslen, JNI.env, self.jni_id, string.to_int)

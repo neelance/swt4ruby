@@ -1,6 +1,6 @@
 require "rjava"
 
-# Copyright (c) 2007, 2008 IBM Corporation and others.
+# Copyright (c) 2007, 2009 IBM Corporation and others.
 # All rights reserved. This program and the accompanying materials
 # are made available under the terms of the Eclipse Public License v1.0
 # which accompanies this distribution, and is available at
@@ -37,6 +37,7 @@ module Org::Eclipse::Swt::Widgets
   # @see <a href="http://www.eclipse.org/swt/">Sample code and further information</a>
   # 
   # @since 3.4
+  # @noextend This class is not intended to be subclassed by clients.
   class IME < IMEImports.const_get :Widget
     include_class_members IMEImports
     
@@ -423,7 +424,7 @@ module Org::Eclipse::Swt::Widgets
     # above the IME, then the IME must be informed that the composition
     # offset has changed.
     # 
-    # @return the offset of the composition
+    # @param offset the offset of the composition
     # 
     # @exception SWTException <ul>
     # <li>ERROR_WIDGET_DISPOSED - if the receiver has been disposed</li>
@@ -509,17 +510,17 @@ module Org::Eclipse::Swt::Widgets
             end
             clauses = nil
             if (!((l_param & OS::GCS_COMPCLAUSE)).equal?(0))
-              length_ = OS._imm_get_composition_string_w(h_imc, OS::GCS_COMPCLAUSE, nil, 0)
+              length_ = OS._imm_get_composition_string(h_imc, OS::GCS_COMPCLAUSE, nil, 0)
               if (length_ > 0)
                 clauses = Array.typed(::Java::Int).new(length_ / 4) { 0 }
-                OS._imm_get_composition_string_w(h_imc, OS::GCS_COMPCLAUSE, clauses, length_)
+                OS._imm_get_composition_string(h_imc, OS::GCS_COMPCLAUSE, clauses, length_)
               end
             end
             if (!((l_param & OS::GCS_COMPATTR)).equal?(0) && !(clauses).nil?)
-              length_ = OS._imm_get_composition_string_a(h_imc, OS::GCS_COMPATTR, nil, 0)
+              length_ = OS._imm_get_composition_string(h_imc, OS::GCS_COMPATTR, nil, 0)
               if (length_ > 0)
                 attrs = Array.typed(::Java::Byte).new(length_) { 0 }
-                OS._imm_get_composition_string_a(h_imc, OS::GCS_COMPATTR, attrs, length_)
+                OS._imm_get_composition_string(h_imc, OS::GCS_COMPATTR, attrs, length_)
                 length_ = clauses.attr_length - 1
                 @ranges = Array.typed(::Java::Int).new(length_ * 2) { 0 }
                 @styles = Array.typed(TextStyle).new(length_) { nil }
