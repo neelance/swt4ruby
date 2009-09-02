@@ -14,6 +14,8 @@ no_constants:
 - CurrentDevice
 - DEBUG
 - DeviceFinder
+- GTKCLIPBOARD
+- GTKPRIMARYCLIPBOARD
 - PI
 - SWT_RESTORECARET
 - TrimEnabled

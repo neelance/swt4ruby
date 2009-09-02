@@ -157,10 +157,10 @@ module Org::Eclipse::Swt::Dnd
     typesig { [Clipboard, ::Java::Int] }
     def clear(owner, clipboards)
       if (!((clipboards & DND::CLIPBOARD)).equal?(0) && (@active_clipboard).equal?(owner))
-        OS.gtk_clipboard_clear(Clipboard::GTKCLIPBOARD)
+        OS.gtk_clipboard_clear(Clipboard.attr_gtkclipboard)
       end
       if (!((clipboards & DND::SELECTION_CLIPBOARD)).equal?(0) && (@active_primary_clipboard).equal?(owner))
-        OS.gtk_clipboard_clear(Clipboard::GTKPRIMARYCLIPBOARD)
+        OS.gtk_clipboard_clear(Clipboard.attr_gtkprimaryclipboard)
       end
     end
     
@@ -169,12 +169,12 @@ module Org::Eclipse::Swt::Dnd
     # int
     # int
     def clear_func(clipboard, user_data_or_owner)
-      if ((clipboard).equal?(Clipboard::GTKCLIPBOARD))
+      if ((clipboard).equal?(Clipboard.attr_gtkclipboard))
         @active_clipboard = nil
         @clipboard_data = nil
         @clipboard_data_types = nil
       end
-      if ((clipboard).equal?(Clipboard::GTKPRIMARYCLIPBOARD))
+      if ((clipboard).equal?(Clipboard.attr_gtkprimaryclipboard))
         @active_primary_clipboard = nil
         @primary_clipboard_data = nil
         @primary_clipboard_data_types = nil
@@ -188,10 +188,10 @@ module Org::Eclipse::Swt::Dnd
         return
       end
       if (!(@active_clipboard).nil?)
-        OS.gtk_clipboard_clear(Clipboard::GTKCLIPBOARD)
+        OS.gtk_clipboard_clear(Clipboard.attr_gtkclipboard)
       end
       if (!(@active_primary_clipboard).nil?)
-        OS.gtk_clipboard_clear(Clipboard::GTKPRIMARYCLIPBOARD)
+        OS.gtk_clipboard_clear(Clipboard.attr_gtkprimaryclipboard)
       end
       @display = nil
       if (!(@get_func).nil?)
@@ -225,7 +225,7 @@ module Org::Eclipse::Swt::Dnd
       OS.memmove(selection_data_, selection_data, GtkSelectionData.attr_sizeof)
       tdata = TransferData.new
       tdata.attr_type = selection_data_.attr_target
-      types = ((clipboard).equal?(Clipboard::GTKCLIPBOARD)) ? @clipboard_data_types : @primary_clipboard_data_types
+      types = ((clipboard).equal?(Clipboard.attr_gtkclipboard)) ? @clipboard_data_types : @primary_clipboard_data_types
       index = -1
       i = 0
       while i < types.attr_length
@@ -238,7 +238,7 @@ module Org::Eclipse::Swt::Dnd
       if ((index).equal?(-1))
         return 0
       end
-      data = ((clipboard).equal?(Clipboard::GTKCLIPBOARD)) ? @clipboard_data : @primary_clipboard_data
+      data = ((clipboard).equal?(Clipboard.attr_gtkclipboard)) ? @clipboard_data : @primary_clipboard_data
       types[index].java_to_native(data[index], tdata)
       if (tdata.attr_format < 8 || !(tdata.attr_format % 8).equal?(0))
         return 0
@@ -286,7 +286,7 @@ module Org::Eclipse::Swt::Dnd
         end
         if (!((clipboards & DND::CLIPBOARD)).equal?(0))
           if (!(@active_clipboard).nil?)
-            OS.gtk_clipboard_clear(Clipboard::GTKCLIPBOARD)
+            OS.gtk_clipboard_clear(Clipboard.attr_gtkclipboard)
           end
           @clipboard_data = data
           @clipboard_data_types = data_types
@@ -294,14 +294,14 @@ module Org::Eclipse::Swt::Dnd
           get_func_proc = @get_func.get_address
           # int
           clear_func_proc = @clear_func.get_address
-          if (!OS.gtk_clipboard_set_with_data(Clipboard::GTKCLIPBOARD, p_targets_list, entries.attr_length, get_func_proc, clear_func_proc, 0))
+          if (!OS.gtk_clipboard_set_with_data(Clipboard.attr_gtkclipboard, p_targets_list, entries.attr_length, get_func_proc, clear_func_proc, 0))
             return false
           end
           @active_clipboard = owner
         end
         if (!((clipboards & DND::SELECTION_CLIPBOARD)).equal?(0))
           if (!(@active_primary_clipboard).nil?)
-            OS.gtk_clipboard_clear(Clipboard::GTKPRIMARYCLIPBOARD)
+            OS.gtk_clipboard_clear(Clipboard.attr_gtkprimaryclipboard)
           end
           @primary_clipboard_data = data
           @primary_clipboard_data_types = data_types
@@ -309,7 +309,7 @@ module Org::Eclipse::Swt::Dnd
           get_func_proc = @get_func.get_address
           # int
           clear_func_proc = @clear_func.get_address
-          if (!OS.gtk_clipboard_set_with_data(Clipboard::GTKPRIMARYCLIPBOARD, p_targets_list, entries.attr_length, get_func_proc, clear_func_proc, 0))
+          if (!OS.gtk_clipboard_set_with_data(Clipboard.attr_gtkprimaryclipboard, p_targets_list, entries.attr_length, get_func_proc, clear_func_proc, 0))
             return false
           end
           @active_primary_clipboard = owner
