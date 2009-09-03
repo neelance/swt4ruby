@@ -4,6 +4,7 @@ prefix_class_names:
 - Cairo
 - GC
 - GCData
+- Gdip
 - Layout
 - Monitor
 - List
@@ -14,10 +15,12 @@ no_constants:
 - CurrentDevice
 - DEBUG
 - DeviceFinder
+- DI_GETDRAGIMAGE
 - GTKCLIPBOARD
 - GTKPRIMARYCLIPBOARD
 - PI
 - SWT_RESTORECARET
+- SWT_TASKBARCREATED
 - TrimEnabled
 constant_name_mapping:
   lock: PLATFORM_LOCK
