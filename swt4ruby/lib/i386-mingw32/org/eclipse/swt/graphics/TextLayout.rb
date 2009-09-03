@@ -906,10 +906,10 @@ module Org::Eclipse::Swt::Graphics
     def create_gdip_brush(pixel, alpha)
       argb = ((alpha & 0xff) << 24) | ((pixel >> 16) & 0xff) | (pixel & 0xff00) | ((pixel & 0xff) << 16)
       # long
-      gdi_color = Gdip._color_new(argb)
+      gdi_color = SwtGdip._color_new(argb)
       # long
-      brush = Gdip._solid_brush_new(gdi_color)
-      Gdip._color_delete(gdi_color)
+      brush = SwtGdip._solid_brush_new(gdi_color)
+      SwtGdip._color_delete(gdi_color)
       return brush
     end
     
@@ -1086,7 +1086,7 @@ module Org::Eclipse::Swt::Graphics
               width = line_height / 3
             end
             if (gdip)
-              Gdip._graphics_fill_rectangle(gdip_graphics, gdip_sel_background, draw_x + @line_width[line], draw_y, width, line_height)
+              SwtGdip._graphics_fill_rectangle(gdip_graphics, gdip_sel_background, draw_x + @line_width[line], draw_y, width, line_height)
             else
               OS._select_object(hdc, sel_background)
               OS._pat_blt(hdc, draw_x + @line_width[line], draw_y, width, line_height, OS::PATCOPY)
@@ -1162,14 +1162,14 @@ module Org::Eclipse::Swt::Graphics
                 if (!(h_font).equal?(last_hfont))
                   last_hfont = h_font
                   if (!(gdip_font).equal?(0))
-                    Gdip._font_delete(gdip_font)
+                    SwtGdip._font_delete(gdip_font)
                   end
-                  gdip_font = Gdip._font_new(hdc, h_font)
+                  gdip_font = SwtGdip._font_new(hdc, h_font)
                   if ((gdip_font).equal?(0))
                     SWT.error(SWT::ERROR_NO_HANDLES)
                   end
-                  if (!Gdip._font_is_available(gdip_font))
-                    Gdip._font_delete(gdip_font)
+                  if (!SwtGdip._font_is_available(gdip_font))
+                    SwtGdip._font_delete(gdip_font)
                     gdip_font = 0
                   end
                 end
@@ -1205,16 +1205,16 @@ module Org::Eclipse::Swt::Graphics
         line += 1
       end
       if (!(gdip_sel_background).equal?(0))
-        Gdip._solid_brush_delete(gdip_sel_background)
+        SwtGdip._solid_brush_delete(gdip_sel_background)
       end
       if (!(gdip_sel_foreground).equal?(0))
-        Gdip._solid_brush_delete(gdip_sel_foreground)
+        SwtGdip._solid_brush_delete(gdip_sel_foreground)
       end
       if (!(gdip_link_color).equal?(0))
-        Gdip._solid_brush_delete(gdip_link_color)
+        SwtGdip._solid_brush_delete(gdip_link_color)
       end
       if (!(gdip_font).equal?(0))
-        Gdip._font_delete(gdip_font)
+        SwtGdip._font_delete(gdip_font)
       end
       if (!(state).equal?(0))
         OS._restore_dc(hdc, state)
@@ -1352,20 +1352,20 @@ module Org::Eclipse::Swt::Graphics
           end
         end
         line_width = 1
-        line_style = Gdip::DashStyleSolid
+        line_style = SwtGdip::DashStyleSolid
         case (style.attr_border_style)
         when SWT::BORDER_SOLID
         when SWT::BORDER_DASH
-          line_style = Gdip::DashStyleDash
+          line_style = SwtGdip::DashStyleDash
         when SWT::BORDER_DOT
-          line_style = Gdip::DashStyleDot
+          line_style = SwtGdip::DashStyleDot
         end
         # long
-        pen = Gdip._pen_new(brush, line_width)
-        Gdip._pen_set_dash_style(pen, line_style)
-        Gdip._graphics_set_pixel_offset_mode(graphics, Gdip::PixelOffsetModeNone)
+        pen = SwtGdip._pen_new(brush, line_width)
+        SwtGdip._pen_set_dash_style(pen, line_style)
+        SwtGdip._graphics_set_pixel_offset_mode(graphics, SwtGdip::PixelOffsetModeNone)
         if (!(clip_rect).nil?)
-          gstate = Gdip._graphics_save(graphics)
+          gstate = SwtGdip._graphics_save(graphics)
           if ((clip_rect.attr_left).equal?(-1))
             clip_rect.attr_left = 0
           end
@@ -1377,24 +1377,24 @@ module Org::Eclipse::Swt::Graphics
           gdip_rect.attr_y = clip_rect.attr_top
           gdip_rect.attr_width = clip_rect.attr_right - clip_rect.attr_left
           gdip_rect.attr_height = clip_rect.attr_bottom - clip_rect.attr_top
-          Gdip._graphics_set_clip(graphics, gdip_rect, Gdip::CombineModeExclude)
-          Gdip._graphics_draw_rectangle(graphics, pen, x + left, y, run.attr_x + run.attr_width - left - 1, line_height - 1)
-          Gdip._graphics_restore(graphics, gstate)
-          gstate = Gdip._graphics_save(graphics)
-          Gdip._graphics_set_clip(graphics, gdip_rect, Gdip::CombineModeIntersect)
+          SwtGdip._graphics_set_clip(graphics, gdip_rect, SwtGdip::CombineModeExclude)
+          SwtGdip._graphics_draw_rectangle(graphics, pen, x + left, y, run.attr_x + run.attr_width - left - 1, line_height - 1)
+          SwtGdip._graphics_restore(graphics, gstate)
+          gstate = SwtGdip._graphics_save(graphics)
+          SwtGdip._graphics_set_clip(graphics, gdip_rect, SwtGdip::CombineModeIntersect)
           # long
-          sel_pen = Gdip._pen_new(selection_color, line_width)
-          Gdip._pen_set_dash_style(sel_pen, line_style)
-          Gdip._graphics_draw_rectangle(graphics, sel_pen, x + left, y, run.attr_x + run.attr_width - left - 1, line_height - 1)
-          Gdip._pen_delete(sel_pen)
-          Gdip._graphics_restore(graphics, gstate)
+          sel_pen = SwtGdip._pen_new(selection_color, line_width)
+          SwtGdip._pen_set_dash_style(sel_pen, line_style)
+          SwtGdip._graphics_draw_rectangle(graphics, sel_pen, x + left, y, run.attr_x + run.attr_width - left - 1, line_height - 1)
+          SwtGdip._pen_delete(sel_pen)
+          SwtGdip._graphics_restore(graphics, gstate)
         else
-          Gdip._graphics_draw_rectangle(graphics, pen, x + left, y, run.attr_x + run.attr_width - left - 1, line_height - 1)
+          SwtGdip._graphics_draw_rectangle(graphics, pen, x + left, y, run.attr_x + run.attr_width - left - 1, line_height - 1)
         end
-        Gdip._graphics_set_pixel_offset_mode(graphics, Gdip::PixelOffsetModeHalf)
-        Gdip._pen_delete(pen)
+        SwtGdip._graphics_set_pixel_offset_mode(graphics, SwtGdip::PixelOffsetModeHalf)
+        SwtGdip._pen_delete(pen)
         if (!(brush).equal?(selection_color) && !(brush).equal?(color))
-          Gdip._solid_brush_delete(brush)
+          SwtGdip._solid_brush_delete(brush)
         end
         return nil
       end
@@ -1437,13 +1437,13 @@ module Org::Eclipse::Swt::Graphics
       end_ = run.attr_start + run.attr_length - 1
       full_selection = has_selection && selection_start <= run.attr_start && selection_end >= end_
       if (full_selection)
-        Gdip._graphics_fill_rectangle(graphics, sel_brush, rect.attr_left, rect.attr_top, rect.attr_right - rect.attr_left, rect.attr_bottom - rect.attr_top)
+        SwtGdip._graphics_fill_rectangle(graphics, sel_brush, rect.attr_left, rect.attr_top, rect.attr_right - rect.attr_left, rect.attr_bottom - rect.attr_top)
       else
         if (!(run.attr_style).nil? && !(run.attr_style.attr_background).nil?)
           # long
           brush = create_gdip_brush(run.attr_style.attr_background, alpha)
-          Gdip._graphics_fill_rectangle(graphics, brush, rect.attr_left, rect.attr_top, rect.attr_right - rect.attr_left, rect.attr_bottom - rect.attr_top)
-          Gdip._solid_brush_delete(brush)
+          SwtGdip._graphics_fill_rectangle(graphics, brush, rect.attr_left, rect.attr_top, rect.attr_right - rect.attr_left, rect.attr_bottom - rect.attr_top)
+          SwtGdip._solid_brush_delete(brush)
         end
         partial_selection = has_selection && !(selection_start > end_ || run.attr_start > selection_end)
         if (partial_selection)
@@ -1453,7 +1453,7 @@ module Org::Eclipse::Swt::Graphics
             rect.attr_left = rect.attr_right
             rect.attr_right = tmp
           end
-          Gdip._graphics_fill_rectangle(graphics, sel_brush, rect.attr_left, rect.attr_top, rect.attr_right - rect.attr_left, rect.attr_bottom - rect.attr_top)
+          SwtGdip._graphics_fill_rectangle(graphics, sel_brush, rect.attr_left, rect.attr_top, rect.attr_right - rect.attr_left, rect.attr_bottom - rect.attr_top)
         end
       end
     end
@@ -1518,23 +1518,23 @@ module Org::Eclipse::Swt::Graphics
         gdip_rect.attr_y = rect.attr_top
         gdip_rect.attr_width = rect.attr_right - rect.attr_left
         gdip_rect.attr_height = rect.attr_bottom - rect.attr_top
-        gstate = Gdip._graphics_save(graphics)
-        Gdip._graphics_set_clip(graphics, gdip_rect, Gdip::CombineModeExclude)
+        gstate = SwtGdip._graphics_save(graphics)
+        SwtGdip._graphics_set_clip(graphics, gdip_rect, SwtGdip::CombineModeExclude)
       end
       gstate_mirrored = 0
       is_mirrored = !((@orientation & SWT::RIGHT_TO_LEFT)).equal?(0)
       if (is_mirrored)
-        case (Gdip._brush_get_type(brush))
-        when Gdip::BrushTypeLinearGradient
-          Gdip._linear_gradient_brush_scale_transform(brush, -1, 1, Gdip::MatrixOrderPrepend)
-          Gdip._linear_gradient_brush_translate_transform(brush, -2 * draw_x - run.attr_width, 0, Gdip::MatrixOrderPrepend)
-        when Gdip::BrushTypeTextureFill
-          Gdip._texture_brush_scale_transform(brush, -1, 1, Gdip::MatrixOrderPrepend)
-          Gdip._texture_brush_translate_transform(brush, -2 * draw_x - run.attr_width, 0, Gdip::MatrixOrderPrepend)
+        case (SwtGdip._brush_get_type(brush))
+        when SwtGdip::BrushTypeLinearGradient
+          SwtGdip._linear_gradient_brush_scale_transform(brush, -1, 1, SwtGdip::MatrixOrderPrepend)
+          SwtGdip._linear_gradient_brush_translate_transform(brush, -2 * draw_x - run.attr_width, 0, SwtGdip::MatrixOrderPrepend)
+        when SwtGdip::BrushTypeTextureFill
+          SwtGdip._texture_brush_scale_transform(brush, -1, 1, SwtGdip::MatrixOrderPrepend)
+          SwtGdip._texture_brush_translate_transform(brush, -2 * draw_x - run.attr_width, 0, SwtGdip::MatrixOrderPrepend)
         end
-        gstate_mirrored = Gdip._graphics_save(graphics)
-        Gdip._graphics_scale_transform(graphics, -1, 1, Gdip::MatrixOrderPrepend)
-        Gdip._graphics_translate_transform(graphics, -2 * draw_x - run.attr_width, 0, Gdip::MatrixOrderPrepend)
+        gstate_mirrored = SwtGdip._graphics_save(graphics)
+        SwtGdip._graphics_scale_transform(graphics, -1, 1, SwtGdip::MatrixOrderPrepend)
+        SwtGdip._graphics_translate_transform(graphics, -2 * draw_x - run.attr_width, 0, SwtGdip::MatrixOrderPrepend)
       end
       advances = Array.typed(::Java::Int).new(run.attr_glyph_count) { 0 }
       points = Array.typed(::Java::Float).new(run.attr_glyph_count * 2) { 0.0 }
@@ -1548,33 +1548,33 @@ module Org::Eclipse::Swt::Graphics
         glyph_x += advances[h]
         h += 1
       end
-      Gdip._graphics_draw_driver_string(graphics, run.attr_glyphs, run.attr_glyph_count, gdip_font, brush, points, 0, 0)
+      SwtGdip._graphics_draw_driver_string(graphics, run.attr_glyphs, run.attr_glyph_count, gdip_font, brush, points, 0, 0)
       if (partial_selection)
         if (is_mirrored)
-          Gdip._graphics_restore(graphics, gstate_mirrored)
+          SwtGdip._graphics_restore(graphics, gstate_mirrored)
         end
-        Gdip._graphics_restore(graphics, gstate)
-        gstate = Gdip._graphics_save(graphics)
-        Gdip._graphics_set_clip(graphics, gdip_rect, Gdip::CombineModeIntersect)
+        SwtGdip._graphics_restore(graphics, gstate)
+        gstate = SwtGdip._graphics_save(graphics)
+        SwtGdip._graphics_set_clip(graphics, gdip_rect, SwtGdip::CombineModeIntersect)
         if (is_mirrored)
-          gstate_mirrored = Gdip._graphics_save(graphics)
-          Gdip._graphics_scale_transform(graphics, -1, 1, Gdip::MatrixOrderPrepend)
-          Gdip._graphics_translate_transform(graphics, -2 * draw_x - run.attr_width, 0, Gdip::MatrixOrderPrepend)
+          gstate_mirrored = SwtGdip._graphics_save(graphics)
+          SwtGdip._graphics_scale_transform(graphics, -1, 1, SwtGdip::MatrixOrderPrepend)
+          SwtGdip._graphics_translate_transform(graphics, -2 * draw_x - run.attr_width, 0, SwtGdip::MatrixOrderPrepend)
         end
-        Gdip._graphics_draw_driver_string(graphics, run.attr_glyphs, run.attr_glyph_count, gdip_font, selection_color, points, 0, 0)
-        Gdip._graphics_restore(graphics, gstate)
+        SwtGdip._graphics_draw_driver_string(graphics, run.attr_glyphs, run.attr_glyph_count, gdip_font, selection_color, points, 0, 0)
+        SwtGdip._graphics_restore(graphics, gstate)
       end
       if (is_mirrored)
-        case (Gdip._brush_get_type(brush))
-        when Gdip::BrushTypeLinearGradient
-          Gdip._linear_gradient_brush_reset_transform(brush)
-        when Gdip::BrushTypeTextureFill
-          Gdip._texture_brush_reset_transform(brush)
+        case (SwtGdip._brush_get_type(brush))
+        when SwtGdip::BrushTypeLinearGradient
+          SwtGdip._linear_gradient_brush_reset_transform(brush)
+        when SwtGdip::BrushTypeTextureFill
+          SwtGdip._texture_brush_reset_transform(brush)
         end
-        Gdip._graphics_restore(graphics, gstate_mirrored)
+        SwtGdip._graphics_restore(graphics, gstate_mirrored)
       end
       if (!(brush).equal?(selection_color) && !(brush).equal?(color))
-        Gdip._solid_brush_delete(brush)
+        SwtGdip._solid_brush_delete(brush)
       end
       return full_selection || partial_selection ? rect : nil
     end
@@ -1584,32 +1584,32 @@ module Org::Eclipse::Swt::Graphics
     def draw_run_text_gdipraster(graphics, run, rect, baseline, color, selection_color, selection_start, selection_end)
       # long
       clip_rgn = 0
-      Gdip._graphics_set_pixel_offset_mode(graphics, Gdip::PixelOffsetModeNone)
+      SwtGdip._graphics_set_pixel_offset_mode(graphics, SwtGdip::PixelOffsetModeNone)
       # long
-      rgn = Gdip._region_new
+      rgn = SwtGdip._region_new
       if ((rgn).equal?(0))
         SWT.error(SWT::ERROR_NO_HANDLES)
       end
-      Gdip._graphics_get_clip(graphics, rgn)
-      if (!Gdip._region_is_infinite(rgn, graphics))
-        clip_rgn = Gdip._region_get_hrgn(rgn, graphics)
+      SwtGdip._graphics_get_clip(graphics, rgn)
+      if (!SwtGdip._region_is_infinite(rgn, graphics))
+        clip_rgn = SwtGdip._region_get_hrgn(rgn, graphics)
       end
-      Gdip._region_delete(rgn)
-      Gdip._graphics_set_pixel_offset_mode(graphics, Gdip::PixelOffsetModeHalf)
+      SwtGdip._region_delete(rgn)
+      SwtGdip._graphics_set_pixel_offset_mode(graphics, SwtGdip::PixelOffsetModeHalf)
       lp_xform = nil
       # long
-      matrix = Gdip._matrix_new(1, 0, 0, 1, 0, 0)
+      matrix = SwtGdip._matrix_new(1, 0, 0, 1, 0, 0)
       if ((matrix).equal?(0))
         SWT.error(SWT::ERROR_NO_HANDLES)
       end
-      Gdip._graphics_get_transform(graphics, matrix)
-      if (!Gdip._matrix_is_identity(matrix))
+      SwtGdip._graphics_get_transform(graphics, matrix)
+      if (!SwtGdip._matrix_is_identity(matrix))
         lp_xform = Array.typed(::Java::Float).new(6) { 0.0 }
-        Gdip._matrix_get_elements(matrix, lp_xform)
+        SwtGdip._matrix_get_elements(matrix, lp_xform)
       end
-      Gdip._matrix_delete(matrix)
+      SwtGdip._matrix_delete(matrix)
       # long
-      hdc = Gdip._graphics_get_hdc(graphics)
+      hdc = SwtGdip._graphics_get_hdc(graphics)
       state = OS._save_dc(hdc)
       if (!(lp_xform).nil?)
         OS._set_graphics_mode(hdc, OS::GM_ADVANCED)
@@ -1625,7 +1625,7 @@ module Org::Eclipse::Swt::Graphics
       OS._set_bk_mode(hdc, OS::TRANSPARENT)
       p_rect = draw_run_text(hdc, run, rect, baseline, color, selection_color, selection_start, selection_end)
       OS._restore_dc(hdc, state)
-      Gdip._graphics_release_hdc(graphics, hdc)
+      SwtGdip._graphics_release_hdc(graphics, hdc)
       return p_rect
     end
     
@@ -1734,7 +1734,7 @@ module Org::Eclipse::Swt::Graphics
           end
         end
         if (!(clip_rect).nil?)
-          gstate = Gdip._graphics_save(graphics)
+          gstate = SwtGdip._graphics_save(graphics)
           if ((clip_rect.attr_left).equal?(-1))
             clip_rect.attr_left = 0
           end
@@ -1746,18 +1746,18 @@ module Org::Eclipse::Swt::Graphics
           gdip_rect.attr_y = clip_rect.attr_top
           gdip_rect.attr_width = clip_rect.attr_right - clip_rect.attr_left
           gdip_rect.attr_height = clip_rect.attr_bottom - clip_rect.attr_top
-          Gdip._graphics_set_clip(graphics, gdip_rect, Gdip::CombineModeExclude)
-          Gdip._graphics_fill_rectangle(graphics, brush, x + left, baseline - run.attr_strikeout_pos, run.attr_x + run.attr_width - left, run.attr_strikeout_thickness)
-          Gdip._graphics_restore(graphics, gstate)
-          gstate = Gdip._graphics_save(graphics)
-          Gdip._graphics_set_clip(graphics, gdip_rect, Gdip::CombineModeIntersect)
-          Gdip._graphics_fill_rectangle(graphics, selection_color, x + left, baseline - run.attr_strikeout_pos, run.attr_x + run.attr_width - left, run.attr_strikeout_thickness)
-          Gdip._graphics_restore(graphics, gstate)
+          SwtGdip._graphics_set_clip(graphics, gdip_rect, SwtGdip::CombineModeExclude)
+          SwtGdip._graphics_fill_rectangle(graphics, brush, x + left, baseline - run.attr_strikeout_pos, run.attr_x + run.attr_width - left, run.attr_strikeout_thickness)
+          SwtGdip._graphics_restore(graphics, gstate)
+          gstate = SwtGdip._graphics_save(graphics)
+          SwtGdip._graphics_set_clip(graphics, gdip_rect, SwtGdip::CombineModeIntersect)
+          SwtGdip._graphics_fill_rectangle(graphics, selection_color, x + left, baseline - run.attr_strikeout_pos, run.attr_x + run.attr_width - left, run.attr_strikeout_thickness)
+          SwtGdip._graphics_restore(graphics, gstate)
         else
-          Gdip._graphics_fill_rectangle(graphics, brush, x + left, baseline - run.attr_strikeout_pos, run.attr_x + run.attr_width - left, run.attr_strikeout_thickness)
+          SwtGdip._graphics_fill_rectangle(graphics, brush, x + left, baseline - run.attr_strikeout_pos, run.attr_x + run.attr_width - left, run.attr_strikeout_thickness)
         end
         if (!(brush).equal?(selection_color) && !(brush).equal?(color))
-          Gdip._solid_brush_delete(brush)
+          SwtGdip._solid_brush_delete(brush)
         end
         return nil
       end
@@ -1964,7 +1964,7 @@ module Org::Eclipse::Swt::Graphics
           gdip_rect.attr_height = clip_rect.attr_bottom - clip_rect.attr_top
         end
         gstate = 0
-        Gdip._graphics_set_pixel_offset_mode(graphics, Gdip::PixelOffsetModeNone)
+        SwtGdip._graphics_set_pixel_offset_mode(graphics, SwtGdip::PixelOffsetModeNone)
         case (style.attr_underline_style)
         when SWT::UNDERLINE_SQUIGGLE, SWT::UNDERLINE_ERROR
           squiggly_thickness = 1
@@ -1972,32 +1972,32 @@ module Org::Eclipse::Swt::Graphics
           squiggly_y = Math.min(rect.attr_top - squiggly_height / 2, line_bottom - squiggly_height - 1)
           points = compute_polyline(rect.attr_left, squiggly_y, rect.attr_right, squiggly_y + squiggly_height)
           # long
-          pen = Gdip._pen_new(brush, squiggly_thickness)
-          gstate = Gdip._graphics_save(graphics)
+          pen = SwtGdip._pen_new(brush, squiggly_thickness)
+          gstate = SwtGdip._graphics_save(graphics)
           if (!(gdip_rect).nil?)
-            Gdip._graphics_set_clip(graphics, gdip_rect, Gdip::CombineModeExclude)
+            SwtGdip._graphics_set_clip(graphics, gdip_rect, SwtGdip::CombineModeExclude)
           else
             r = Rect.new
             r.attr_x = rect.attr_left
             r.attr_y = squiggly_y
             r.attr_width = rect.attr_right - rect.attr_left
             r.attr_height = squiggly_height + 1
-            Gdip._graphics_set_clip(graphics, r, Gdip::CombineModeIntersect)
+            SwtGdip._graphics_set_clip(graphics, r, SwtGdip::CombineModeIntersect)
           end
-          Gdip._graphics_draw_lines(graphics, pen, points, points.attr_length / 2)
+          SwtGdip._graphics_draw_lines(graphics, pen, points, points.attr_length / 2)
           if (!(gdip_rect).nil?)
             # long
-            sel_pen = Gdip._pen_new(selection_color, squiggly_thickness)
-            Gdip._graphics_restore(graphics, gstate)
-            gstate = Gdip._graphics_save(graphics)
-            Gdip._graphics_set_clip(graphics, gdip_rect, Gdip::CombineModeIntersect)
-            Gdip._graphics_draw_lines(graphics, sel_pen, points, points.attr_length / 2)
-            Gdip._pen_delete(sel_pen)
+            sel_pen = SwtGdip._pen_new(selection_color, squiggly_thickness)
+            SwtGdip._graphics_restore(graphics, gstate)
+            gstate = SwtGdip._graphics_save(graphics)
+            SwtGdip._graphics_set_clip(graphics, gdip_rect, SwtGdip::CombineModeIntersect)
+            SwtGdip._graphics_draw_lines(graphics, sel_pen, points, points.attr_length / 2)
+            SwtGdip._pen_delete(sel_pen)
           end
-          Gdip._graphics_restore(graphics, gstate)
-          Gdip._pen_delete(pen)
+          SwtGdip._graphics_restore(graphics, gstate)
+          SwtGdip._pen_delete(pen)
           if (!(gstate).equal?(0))
-            Gdip._graphics_restore(graphics, gstate)
+            SwtGdip._graphics_restore(graphics, gstate)
           end
         when SWT::UNDERLINE_SINGLE, SWT::UNDERLINE_DOUBLE, SWT::UNDERLINE_LINK, UNDERLINE_IME_THICK
           if ((style.attr_underline_style).equal?(UNDERLINE_IME_THICK))
@@ -2015,50 +2015,50 @@ module Org::Eclipse::Swt::Graphics
             if ((style.attr_underline_style).equal?(SWT::UNDERLINE_DOUBLE))
               gdip_rect.attr_height = run.attr_underline_thickness * 3
             end
-            gstate = Gdip._graphics_save(graphics)
-            Gdip._graphics_set_clip(graphics, gdip_rect, Gdip::CombineModeExclude)
+            gstate = SwtGdip._graphics_save(graphics)
+            SwtGdip._graphics_set_clip(graphics, gdip_rect, SwtGdip::CombineModeExclude)
           end
-          Gdip._graphics_fill_rectangle(graphics, brush, rect.attr_left, rect.attr_top, rect.attr_right - rect.attr_left, rect.attr_bottom - rect.attr_top)
+          SwtGdip._graphics_fill_rectangle(graphics, brush, rect.attr_left, rect.attr_top, rect.attr_right - rect.attr_left, rect.attr_bottom - rect.attr_top)
           if ((style.attr_underline_style).equal?(SWT::UNDERLINE_DOUBLE))
-            Gdip._graphics_fill_rectangle(graphics, brush, rect.attr_left, rect.attr_top + run.attr_underline_thickness * 2, rect.attr_right - rect.attr_left, rect.attr_bottom - rect.attr_top)
+            SwtGdip._graphics_fill_rectangle(graphics, brush, rect.attr_left, rect.attr_top + run.attr_underline_thickness * 2, rect.attr_right - rect.attr_left, rect.attr_bottom - rect.attr_top)
           end
           if (!(gdip_rect).nil?)
-            Gdip._graphics_restore(graphics, gstate)
-            gstate = Gdip._graphics_save(graphics)
-            Gdip._graphics_set_clip(graphics, gdip_rect, Gdip::CombineModeIntersect)
-            Gdip._graphics_fill_rectangle(graphics, selection_color, rect.attr_left, rect.attr_top, rect.attr_right - rect.attr_left, rect.attr_bottom - rect.attr_top)
+            SwtGdip._graphics_restore(graphics, gstate)
+            gstate = SwtGdip._graphics_save(graphics)
+            SwtGdip._graphics_set_clip(graphics, gdip_rect, SwtGdip::CombineModeIntersect)
+            SwtGdip._graphics_fill_rectangle(graphics, selection_color, rect.attr_left, rect.attr_top, rect.attr_right - rect.attr_left, rect.attr_bottom - rect.attr_top)
             if ((style.attr_underline_style).equal?(SWT::UNDERLINE_DOUBLE))
-              Gdip._graphics_fill_rectangle(graphics, selection_color, rect.attr_left, rect.attr_top + run.attr_underline_thickness * 2, rect.attr_right - rect.attr_left, rect.attr_bottom - rect.attr_top)
+              SwtGdip._graphics_fill_rectangle(graphics, selection_color, rect.attr_left, rect.attr_top + run.attr_underline_thickness * 2, rect.attr_right - rect.attr_left, rect.attr_bottom - rect.attr_top)
             end
-            Gdip._graphics_restore(graphics, gstate)
+            SwtGdip._graphics_restore(graphics, gstate)
           end
         when UNDERLINE_IME_DOT, UNDERLINE_IME_DASH
           # long
-          pen = Gdip._pen_new(brush, 1)
-          dash_style = (style.attr_underline_style).equal?(UNDERLINE_IME_DOT) ? Gdip::DashStyleDot : Gdip::DashStyleDash
-          Gdip._pen_set_dash_style(pen, dash_style)
+          pen = SwtGdip._pen_new(brush, 1)
+          dash_style = (style.attr_underline_style).equal?(UNDERLINE_IME_DOT) ? SwtGdip::DashStyleDot : SwtGdip::DashStyleDash
+          SwtGdip._pen_set_dash_style(pen, dash_style)
           if (!(gdip_rect).nil?)
-            gstate = Gdip._graphics_save(graphics)
-            Gdip._graphics_set_clip(graphics, gdip_rect, Gdip::CombineModeExclude)
+            gstate = SwtGdip._graphics_save(graphics)
+            SwtGdip._graphics_set_clip(graphics, gdip_rect, SwtGdip::CombineModeExclude)
           end
-          Gdip._graphics_draw_line(graphics, pen, rect.attr_left, baseline + run.attr_descent, run.attr_width - run.attr_length, baseline + run.attr_descent)
+          SwtGdip._graphics_draw_line(graphics, pen, rect.attr_left, baseline + run.attr_descent, run.attr_width - run.attr_length, baseline + run.attr_descent)
           if (!(gdip_rect).nil?)
-            Gdip._graphics_restore(graphics, gstate)
-            gstate = Gdip._graphics_save(graphics)
-            Gdip._graphics_set_clip(graphics, gdip_rect, Gdip::CombineModeIntersect)
+            SwtGdip._graphics_restore(graphics, gstate)
+            gstate = SwtGdip._graphics_save(graphics)
+            SwtGdip._graphics_set_clip(graphics, gdip_rect, SwtGdip::CombineModeIntersect)
             # long
-            sel_pen = Gdip._pen_new(brush, 1)
-            Gdip._pen_set_dash_style(sel_pen, dash_style)
-            Gdip._graphics_draw_line(graphics, sel_pen, rect.attr_left, baseline + run.attr_descent, run.attr_width - run.attr_length, baseline + run.attr_descent)
-            Gdip._graphics_restore(graphics, gstate)
-            Gdip._pen_delete(sel_pen)
+            sel_pen = SwtGdip._pen_new(brush, 1)
+            SwtGdip._pen_set_dash_style(sel_pen, dash_style)
+            SwtGdip._graphics_draw_line(graphics, sel_pen, rect.attr_left, baseline + run.attr_descent, run.attr_width - run.attr_length, baseline + run.attr_descent)
+            SwtGdip._graphics_restore(graphics, gstate)
+            SwtGdip._pen_delete(sel_pen)
           end
-          Gdip._pen_delete(pen)
+          SwtGdip._pen_delete(pen)
         end
         if (!(brush).equal?(selection_color) && !(brush).equal?(color))
-          Gdip._solid_brush_delete(brush)
+          SwtGdip._solid_brush_delete(brush)
         end
-        Gdip._graphics_set_pixel_offset_mode(graphics, Gdip::PixelOffsetModeHalf)
+        SwtGdip._graphics_set_pixel_offset_mode(graphics, SwtGdip::PixelOffsetModeHalf)
         return nil
       end
       return clip_rect

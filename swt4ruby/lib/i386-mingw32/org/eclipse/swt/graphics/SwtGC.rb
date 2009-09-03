@@ -264,7 +264,7 @@ module Org::Eclipse::Swt::Graphics
         width = @data.attr_line_width
         if (!((state & FOREGROUND)).equal?(0) || ((pen).equal?(0) && !((state & (LINE_WIDTH | LINE_STYLE | LINE_MITERLIMIT | LINE_JOIN | LINE_CAP))).equal?(0)))
           if (!(@data.attr_gdip_fg_brush).equal?(0))
-            Gdip._solid_brush_delete(@data.attr_gdip_fg_brush)
+            SwtGdip._solid_brush_delete(@data.attr_gdip_fg_brush)
           end
           @data.attr_gdip_fg_brush = 0
           # long
@@ -273,13 +273,13 @@ module Org::Eclipse::Swt::Graphics
           if (!(pattern).nil?)
             brush = pattern.attr_handle
             if (!((@data.attr_style & SWT::MIRRORED)).equal?(0))
-              case (Gdip._brush_get_type(brush))
-              when Gdip::BrushTypeTextureFill
-                brush = Gdip._brush_clone(brush)
+              case (SwtGdip._brush_get_type(brush))
+              when SwtGdip::BrushTypeTextureFill
+                brush = SwtGdip._brush_clone(brush)
                 if ((brush).equal?(0))
                   SWT.error(SWT::ERROR_NO_HANDLES)
                 end
-                Gdip._texture_brush_scale_transform(brush, -1, 1, Gdip::MatrixOrderPrepend)
+                SwtGdip._texture_brush_scale_transform(brush, -1, 1, SwtGdip::MatrixOrderPrepend)
                 @data.attr_gdip_fg_brush = brush
               end
             end
@@ -287,25 +287,25 @@ module Org::Eclipse::Swt::Graphics
             foreground = @data.attr_foreground
             rgb = ((foreground >> 16) & 0xff) | (foreground & 0xff00) | ((foreground & 0xff) << 16)
             # long
-            color = Gdip._color_new(@data.attr_alpha << 24 | rgb)
+            color = SwtGdip._color_new(@data.attr_alpha << 24 | rgb)
             if ((color).equal?(0))
               SWT.error(SWT::ERROR_NO_HANDLES)
             end
-            brush = Gdip._solid_brush_new(color)
+            brush = SwtGdip._solid_brush_new(color)
             if ((brush).equal?(0))
               SWT.error(SWT::ERROR_NO_HANDLES)
             end
-            Gdip._color_delete(color)
+            SwtGdip._color_delete(color)
             @data.attr_gdip_fg_brush = brush
           end
           if (!(pen).equal?(0))
-            Gdip._pen_set_brush(pen, brush)
+            SwtGdip._pen_set_brush(pen, brush)
           else
-            pen = @data.attr_gdip_pen = Gdip._pen_new(brush, width)
+            pen = @data.attr_gdip_pen = SwtGdip._pen_new(brush, width)
           end
         end
         if (!((state & LINE_WIDTH)).equal?(0))
-          Gdip._pen_set_width(pen, width)
+          SwtGdip._pen_set_width(pen, width)
           case (@data.attr_line_style)
           when SWT::LINE_CUSTOM
             state |= LINE_STYLE
@@ -314,26 +314,26 @@ module Org::Eclipse::Swt::Graphics
         if (!((state & LINE_STYLE)).equal?(0))
           dashes = nil
           dash_offset = 0
-          dash_style = Gdip::DashStyleSolid
+          dash_style = SwtGdip::DashStyleSolid
           case (@data.attr_line_style)
           when SWT::LINE_SOLID
           when SWT::LINE_DOT
-            dash_style = Gdip::DashStyleDot
+            dash_style = SwtGdip::DashStyleDot
             if ((width).equal?(0))
               dashes = LINE_DOT_ZERO
             end
           when SWT::LINE_DASH
-            dash_style = Gdip::DashStyleDash
+            dash_style = SwtGdip::DashStyleDash
             if ((width).equal?(0))
               dashes = LINE_DASH_ZERO
             end
           when SWT::LINE_DASHDOT
-            dash_style = Gdip::DashStyleDashDot
+            dash_style = SwtGdip::DashStyleDashDot
             if ((width).equal?(0))
               dashes = LINE_DASHDOT_ZERO
             end
           when SWT::LINE_DASHDOTDOT
-            dash_style = Gdip::DashStyleDashDotDot
+            dash_style = SwtGdip::DashStyleDashDotDot
             if ((width).equal?(0))
               dashes = LINE_DASHDOTDOT_ZERO
             end
@@ -351,59 +351,59 @@ module Org::Eclipse::Swt::Graphics
             end
           end
           if (!(dashes).nil?)
-            Gdip._pen_set_dash_pattern(pen, dashes, dashes.attr_length)
-            Gdip._pen_set_dash_style(pen, Gdip::DashStyleCustom)
-            Gdip._pen_set_dash_offset(pen, dash_offset)
+            SwtGdip._pen_set_dash_pattern(pen, dashes, dashes.attr_length)
+            SwtGdip._pen_set_dash_style(pen, SwtGdip::DashStyleCustom)
+            SwtGdip._pen_set_dash_offset(pen, dash_offset)
           else
-            Gdip._pen_set_dash_style(pen, dash_style)
+            SwtGdip._pen_set_dash_style(pen, dash_style)
           end
         end
         if (!((state & LINE_MITERLIMIT)).equal?(0))
-          Gdip._pen_set_miter_limit(pen, @data.attr_line_miter_limit)
+          SwtGdip._pen_set_miter_limit(pen, @data.attr_line_miter_limit)
         end
         if (!((state & LINE_JOIN)).equal?(0))
           join_style = 0
           case (@data.attr_line_join)
           when SWT::JOIN_MITER
-            join_style = Gdip::LineJoinMiter
+            join_style = SwtGdip::LineJoinMiter
           when SWT::JOIN_BEVEL
-            join_style = Gdip::LineJoinBevel
+            join_style = SwtGdip::LineJoinBevel
           when SWT::JOIN_ROUND
-            join_style = Gdip::LineJoinRound
+            join_style = SwtGdip::LineJoinRound
           end
-          Gdip._pen_set_line_join(pen, join_style)
+          SwtGdip._pen_set_line_join(pen, join_style)
         end
         if (!((state & LINE_CAP)).equal?(0))
-          dash_cap = Gdip::DashCapFlat
+          dash_cap = SwtGdip::DashCapFlat
           cap_style = 0
           case (@data.attr_line_cap)
           when SWT::CAP_FLAT
-            cap_style = Gdip::LineCapFlat
+            cap_style = SwtGdip::LineCapFlat
           when SWT::CAP_ROUND
-            cap_style = Gdip::LineCapRound
-            dash_cap = Gdip::DashCapRound
+            cap_style = SwtGdip::LineCapRound
+            dash_cap = SwtGdip::DashCapRound
           when SWT::CAP_SQUARE
-            cap_style = Gdip::LineCapSquare
+            cap_style = SwtGdip::LineCapSquare
           end
-          Gdip._pen_set_line_cap(pen, cap_style, cap_style, dash_cap)
+          SwtGdip._pen_set_line_cap(pen, cap_style, cap_style, dash_cap)
         end
         if (!((state & BACKGROUND)).equal?(0))
           if (!(@data.attr_gdip_bg_brush).equal?(0))
-            Gdip._solid_brush_delete(@data.attr_gdip_bg_brush)
+            SwtGdip._solid_brush_delete(@data.attr_gdip_bg_brush)
           end
           @data.attr_gdip_bg_brush = 0
           pattern = @data.attr_background_pattern
           if (!(pattern).nil?)
             @data.attr_gdip_brush = pattern.attr_handle
             if (!((@data.attr_style & SWT::MIRRORED)).equal?(0))
-              case (Gdip._brush_get_type(@data.attr_gdip_brush))
-              when Gdip::BrushTypeTextureFill
+              case (SwtGdip._brush_get_type(@data.attr_gdip_brush))
+              when SwtGdip::BrushTypeTextureFill
                 # long
-                brush = Gdip._brush_clone(@data.attr_gdip_brush)
+                brush = SwtGdip._brush_clone(@data.attr_gdip_brush)
                 if ((brush).equal?(0))
                   SWT.error(SWT::ERROR_NO_HANDLES)
                 end
-                Gdip._texture_brush_scale_transform(brush, -1, 1, Gdip::MatrixOrderPrepend)
+                SwtGdip._texture_brush_scale_transform(brush, -1, 1, SwtGdip::MatrixOrderPrepend)
                 @data.attr_gdip_brush = @data.attr_gdip_bg_brush = brush
               end
             end
@@ -411,16 +411,16 @@ module Org::Eclipse::Swt::Graphics
             background = @data.attr_background
             rgb = ((background >> 16) & 0xff) | (background & 0xff00) | ((background & 0xff) << 16)
             # long
-            color = Gdip._color_new(@data.attr_alpha << 24 | rgb)
+            color = SwtGdip._color_new(@data.attr_alpha << 24 | rgb)
             if ((color).equal?(0))
               SWT.error(SWT::ERROR_NO_HANDLES)
             end
             # long
-            brush = Gdip._solid_brush_new(color)
+            brush = SwtGdip._solid_brush_new(color)
             if ((brush).equal?(0))
               SWT.error(SWT::ERROR_NO_HANDLES)
             end
-            Gdip._color_delete(color)
+            SwtGdip._color_delete(color)
             @data.attr_gdip_brush = @data.attr_gdip_bg_brush = brush
           end
         end
@@ -440,19 +440,19 @@ module Org::Eclipse::Swt::Graphics
             @data.attr_h_gdifont = h_font[0]
           end
           if (!(@data.attr_gdip_font).equal?(0))
-            Gdip._font_delete(@data.attr_gdip_font)
+            SwtGdip._font_delete(@data.attr_gdip_font)
           end
           @data.attr_gdip_font = gdip_font
         end
         if (!((state & DRAW_OFFSET)).equal?(0))
           @data.attr_gdip_xoffset = @data.attr_gdip_yoffset = 0
           # long
-          matrix = Gdip._matrix_new(1, 0, 0, 1, 0, 0)
+          matrix = SwtGdip._matrix_new(1, 0, 0, 1, 0, 0)
           point = PointF.new
           point.attr_x = point.attr_y = 1
-          Gdip._graphics_get_transform(gdip_graphics, matrix)
-          Gdip._matrix_transform_vectors(matrix, point, 1)
-          Gdip._matrix_delete(matrix)
+          SwtGdip._graphics_get_transform(gdip_graphics, matrix)
+          SwtGdip._matrix_transform_vectors(matrix, point, 1)
+          SwtGdip._matrix_delete(matrix)
           scaling = point.attr_x
           if (scaling < 0)
             scaling = -scaling
@@ -726,23 +726,23 @@ module Org::Eclipse::Swt::Graphics
       # long
       def create_gdip_font(h_dc, h_font, graphics, font_collection, out_family, out_font)
         # long
-        font = Gdip._font_new(h_dc, h_font)
+        font = SwtGdip._font_new(h_dc, h_font)
         if ((font).equal?(0))
           SWT.error(SWT::ERROR_NO_HANDLES)
         end
         # long
         family = 0
-        if (!Gdip._font_is_available(font))
-          Gdip._font_delete(font)
+        if (!SwtGdip._font_is_available(font))
+          SwtGdip._font_delete(font)
           log_font = OS::IsUnicode ? LOGFONTW.new : LOGFONTA.new
           OS._get_object(h_font, LOGFONT.attr_sizeof, log_font)
           size = Math.abs(log_font.attr_lf_height)
-          style = Gdip::FontStyleRegular
+          style = SwtGdip::FontStyleRegular
           if ((log_font.attr_lf_weight).equal?(700))
-            style |= Gdip::FontStyleBold
+            style |= SwtGdip::FontStyleBold
           end
           if (!(log_font.attr_lf_italic).equal?(0))
-            style |= Gdip::FontStyleItalic
+            style |= SwtGdip::FontStyleItalic
           end
           chars = nil
           if (OS::IsUnicode)
@@ -767,40 +767,40 @@ module Org::Eclipse::Swt::Graphics
           buffer = CharArray.new(name.length + 1)
           name.get_chars(0, name.length, buffer, 0)
           if (!(font_collection).equal?(0))
-            family = Gdip._font_family_new(buffer, font_collection)
-            if (!Gdip._font_family_is_available(family))
-              Gdip._font_family_delete(family)
-              family = Gdip._font_family_new(buffer, 0)
-              if (!Gdip._font_family_is_available(family))
-                Gdip._font_family_delete(family)
+            family = SwtGdip._font_family_new(buffer, font_collection)
+            if (!SwtGdip._font_family_is_available(family))
+              SwtGdip._font_family_delete(family)
+              family = SwtGdip._font_family_new(buffer, 0)
+              if (!SwtGdip._font_family_is_available(family))
+                SwtGdip._font_family_delete(family)
                 family = 0
               end
             end
           end
           if (!(family).equal?(0))
-            font = Gdip._font_new(family, size, style, Gdip::UnitPixel)
+            font = SwtGdip._font_new(family, size, style, SwtGdip::UnitPixel)
           else
-            font = Gdip._font_new(buffer, size, style, Gdip::UnitPixel, 0)
+            font = SwtGdip._font_new(buffer, size, style, SwtGdip::UnitPixel, 0)
           end
           if (!(out_font).nil? && !(font).equal?(0))
             # long
             h_heap = OS._get_process_heap
             # long
             p_log_font = OS._heap_alloc(h_heap, OS::HEAP_ZERO_MEMORY, LOGFONTW.attr_sizeof)
-            Gdip._font_get_log_font_w(font, graphics, p_log_font)
+            SwtGdip._font_get_log_font_w(font, graphics, p_log_font)
             out_font[0] = OS._create_font_indirect_w(p_log_font)
             OS._heap_free(h_heap, 0, p_log_font)
           end
         end
         if (!(out_family).nil? && !(font).equal?(0))
           if ((family).equal?(0))
-            family = Gdip._font_family_new
-            Gdip._font_get_family(font, family)
+            family = SwtGdip._font_family_new
+            SwtGdip._font_get_family(font, family)
           end
           out_family[0] = family
         else
           if (!(family).equal?(0))
-            Gdip._font_family_delete(family)
+            SwtGdip._font_family_delete(family)
           end
         end
         if ((font).equal?(0))
@@ -812,16 +812,16 @@ module Org::Eclipse::Swt::Graphics
       typesig { [::Java::Int] }
       # long
       def destroy_gdip_brush(brush)
-        type = Gdip._brush_get_type(brush)
+        type = SwtGdip._brush_get_type(brush)
         case (type)
-        when Gdip::BrushTypeSolidColor
-          Gdip._solid_brush_delete(brush)
-        when Gdip::BrushTypeHatchFill
-          Gdip._hatch_brush_delete(brush)
-        when Gdip::BrushTypeLinearGradient
-          Gdip._linear_gradient_brush_delete(brush)
-        when Gdip::BrushTypeTextureFill
-          Gdip._texture_brush_delete(brush)
+        when SwtGdip::BrushTypeSolidColor
+          SwtGdip._solid_brush_delete(brush)
+        when SwtGdip::BrushTypeHatchFill
+          SwtGdip._hatch_brush_delete(brush)
+        when SwtGdip::BrushTypeLinearGradient
+          SwtGdip._linear_gradient_brush_delete(brush)
+        when SwtGdip::BrushTypeTextureFill
+          SwtGdip._texture_brush_delete(brush)
         end
       end
     }
@@ -879,7 +879,7 @@ module Org::Eclipse::Swt::Graphics
     typesig { [] }
     def dispose_gdip
       if (!(@data.attr_gdip_pen).equal?(0))
-        Gdip._pen_delete(@data.attr_gdip_pen)
+        SwtGdip._pen_delete(@data.attr_gdip_pen)
       end
       if (!(@data.attr_gdip_bg_brush).equal?(0))
         destroy_gdip_brush(@data.attr_gdip_bg_brush)
@@ -888,13 +888,13 @@ module Org::Eclipse::Swt::Graphics
         destroy_gdip_brush(@data.attr_gdip_fg_brush)
       end
       if (!(@data.attr_gdip_font).equal?(0))
-        Gdip._font_delete(@data.attr_gdip_font)
+        SwtGdip._font_delete(@data.attr_gdip_font)
       end
       if (!(@data.attr_h_gdifont).equal?(0))
         OS._delete_object(@data.attr_h_gdifont)
       end
       if (!(@data.attr_gdip_graphics).equal?(0))
-        Gdip._graphics_delete(@data.attr_gdip_graphics)
+        SwtGdip._graphics_delete(@data.attr_gdip_graphics)
       end
       @data.attr_gdip_graphics = @data.attr_gdip_brush = @data.attr_gdip_bg_brush = @data.attr_gdip_fg_brush = @data.attr_gdip_font = @data.attr_gdip_pen = @data.attr_h_gdifont = 0
     end
@@ -946,27 +946,27 @@ module Org::Eclipse::Swt::Graphics
       # long
       gdip_graphics = @data.attr_gdip_graphics
       if (!(gdip_graphics).equal?(0))
-        Gdip._graphics_translate_transform(gdip_graphics, @data.attr_gdip_xoffset, @data.attr_gdip_yoffset, Gdip::MatrixOrderPrepend)
+        SwtGdip._graphics_translate_transform(gdip_graphics, @data.attr_gdip_xoffset, @data.attr_gdip_yoffset, SwtGdip::MatrixOrderPrepend)
         if ((width).equal?(height))
-          Gdip._graphics_draw_arc(gdip_graphics, @data.attr_gdip_pen, x, y, width, height, -start_angle, -arc_angle)
+          SwtGdip._graphics_draw_arc(gdip_graphics, @data.attr_gdip_pen, x, y, width, height, -start_angle, -arc_angle)
         else
           # long
-          path = Gdip._graphics_path_new(Gdip::FillModeAlternate)
+          path = SwtGdip._graphics_path_new(SwtGdip::FillModeAlternate)
           if ((path).equal?(0))
             SWT.error(SWT::ERROR_NO_HANDLES)
           end
           # long
-          matrix = Gdip._matrix_new(width, 0, 0, height, x, y)
+          matrix = SwtGdip._matrix_new(width, 0, 0, height, x, y)
           if ((matrix).equal?(0))
             SWT.error(SWT::ERROR_NO_HANDLES)
           end
-          Gdip._graphics_path_add_arc(path, 0, 0, 1, 1, -start_angle, -arc_angle)
-          Gdip._graphics_path_transform(path, matrix)
-          Gdip._graphics_draw_path(gdip_graphics, @data.attr_gdip_pen, path)
-          Gdip._matrix_delete(matrix)
-          Gdip._graphics_path_delete(path)
+          SwtGdip._graphics_path_add_arc(path, 0, 0, 1, 1, -start_angle, -arc_angle)
+          SwtGdip._graphics_path_transform(path, matrix)
+          SwtGdip._graphics_draw_path(gdip_graphics, @data.attr_gdip_pen, path)
+          SwtGdip._matrix_delete(matrix)
+          SwtGdip._graphics_path_delete(path)
         end
-        Gdip._graphics_translate_transform(gdip_graphics, -@data.attr_gdip_xoffset, -@data.attr_gdip_yoffset, Gdip::MatrixOrderPrepend)
+        SwtGdip._graphics_translate_transform(gdip_graphics, -@data.attr_gdip_xoffset, -@data.attr_gdip_yoffset, SwtGdip::MatrixOrderPrepend)
         return
       end
       if (!((@data.attr_style & SWT::MIRRORED)).equal?(0))
@@ -1057,31 +1057,31 @@ module Org::Eclipse::Swt::Graphics
       if (!(gdip_graphics).equal?(0))
         # long
         clip_rgn = 0
-        Gdip._graphics_set_pixel_offset_mode(gdip_graphics, Gdip::PixelOffsetModeNone)
+        SwtGdip._graphics_set_pixel_offset_mode(gdip_graphics, SwtGdip::PixelOffsetModeNone)
         # long
-        rgn = Gdip._region_new
+        rgn = SwtGdip._region_new
         if ((rgn).equal?(0))
           SWT.error(SWT::ERROR_NO_HANDLES)
         end
-        Gdip._graphics_get_clip(gdip_graphics, rgn)
-        if (!Gdip._region_is_infinite(rgn, gdip_graphics))
-          clip_rgn = Gdip._region_get_hrgn(rgn, gdip_graphics)
+        SwtGdip._graphics_get_clip(gdip_graphics, rgn)
+        if (!SwtGdip._region_is_infinite(rgn, gdip_graphics))
+          clip_rgn = SwtGdip._region_get_hrgn(rgn, gdip_graphics)
         end
-        Gdip._region_delete(rgn)
-        Gdip._graphics_set_pixel_offset_mode(gdip_graphics, Gdip::PixelOffsetModeHalf)
+        SwtGdip._region_delete(rgn)
+        SwtGdip._graphics_set_pixel_offset_mode(gdip_graphics, SwtGdip::PixelOffsetModeHalf)
         lp_xform = nil
         # long
-        matrix = Gdip._matrix_new(1, 0, 0, 1, 0, 0)
+        matrix = SwtGdip._matrix_new(1, 0, 0, 1, 0, 0)
         if ((matrix).equal?(0))
           SWT.error(SWT::ERROR_NO_HANDLES)
         end
-        Gdip._graphics_get_transform(gdip_graphics, matrix)
-        if (!Gdip._matrix_is_identity(matrix))
+        SwtGdip._graphics_get_transform(gdip_graphics, matrix)
+        if (!SwtGdip._matrix_is_identity(matrix))
           lp_xform = Array.typed(::Java::Float).new(6) { 0.0 }
-          Gdip._matrix_get_elements(matrix, lp_xform)
+          SwtGdip._matrix_get_elements(matrix, lp_xform)
         end
-        Gdip._matrix_delete(matrix)
-        hdc = Gdip._graphics_get_hdc(gdip_graphics)
+        SwtGdip._matrix_delete(matrix)
+        hdc = SwtGdip._graphics_get_hdc(gdip_graphics)
         state = OS._save_dc(hdc)
         if (!(lp_xform).nil?)
           OS._set_graphics_mode(hdc, OS::GM_ADVANCED)
@@ -1099,7 +1099,7 @@ module Org::Eclipse::Swt::Graphics
       OS._draw_focus_rect(hdc, rect)
       if (!(gdip_graphics).equal?(0))
         OS._restore_dc(hdc, state)
-        Gdip._graphics_release_hdc(gdip_graphics, hdc)
+        SwtGdip._graphics_release_hdc(gdip_graphics, hdc)
       else
         @data.attr_state &= ~(BACKGROUND_TEXT | FOREGROUND_TEXT)
       end
@@ -1194,8 +1194,8 @@ module Org::Eclipse::Swt::Graphics
         gdip_image = src_image.create_gdip_image
         # long
         img = gdip_image[0]
-        img_width = Gdip._image_get_width(img)
-        img_height = Gdip._image_get_height(img)
+        img_width = SwtGdip._image_get_width(img)
+        img_height = SwtGdip._image_get_height(img)
         if (simple)
           src_width = dest_width = img_width
           src_height = dest_height = img_height
@@ -1214,24 +1214,24 @@ module Org::Eclipse::Swt::Graphics
         # is translucent around the borders.
         # 
         # long
-        attrib = Gdip._image_attributes_new
-        Gdip._image_attributes_set_wrap_mode(attrib, Gdip::WrapModeTileFlipXY)
+        attrib = SwtGdip._image_attributes_new
+        SwtGdip._image_attributes_set_wrap_mode(attrib, SwtGdip::WrapModeTileFlipXY)
         if (!(@data.attr_alpha).equal?(0xff))
           matrix = Array.typed(::Java::Float).new([1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, @data.attr_alpha / (0xff).to_f, 0, 0, 0, 0, 0, 1, ])
-          Gdip._image_attributes_set_color_matrix(attrib, matrix, Gdip::ColorMatrixFlagsDefault, Gdip::ColorAdjustTypeBitmap)
+          SwtGdip._image_attributes_set_color_matrix(attrib, matrix, SwtGdip::ColorMatrixFlagsDefault, SwtGdip::ColorAdjustTypeBitmap)
         end
         gstate = 0
         if (!((@data.attr_style & SWT::MIRRORED)).equal?(0))
-          gstate = Gdip._graphics_save(@data.attr_gdip_graphics)
-          Gdip._graphics_scale_transform(@data.attr_gdip_graphics, -1, 1, Gdip::MatrixOrderPrepend)
-          Gdip._graphics_translate_transform(@data.attr_gdip_graphics, -2 * dest_x - dest_width, 0, Gdip::MatrixOrderPrepend)
+          gstate = SwtGdip._graphics_save(@data.attr_gdip_graphics)
+          SwtGdip._graphics_scale_transform(@data.attr_gdip_graphics, -1, 1, SwtGdip::MatrixOrderPrepend)
+          SwtGdip._graphics_translate_transform(@data.attr_gdip_graphics, -2 * dest_x - dest_width, 0, SwtGdip::MatrixOrderPrepend)
         end
-        Gdip._graphics_draw_image(@data.attr_gdip_graphics, img, rect, src_x, src_y, src_width, src_height, Gdip::UnitPixel, attrib, 0, 0)
+        SwtGdip._graphics_draw_image(@data.attr_gdip_graphics, img, rect, src_x, src_y, src_width, src_height, SwtGdip::UnitPixel, attrib, 0, 0)
         if (!((@data.attr_style & SWT::MIRRORED)).equal?(0))
-          Gdip._graphics_restore(@data.attr_gdip_graphics, gstate)
+          SwtGdip._graphics_restore(@data.attr_gdip_graphics, gstate)
         end
-        Gdip._image_attributes_delete(attrib)
-        Gdip._bitmap_delete(img)
+        SwtGdip._image_attributes_delete(attrib)
+        SwtGdip._bitmap_delete(img)
         if (!(gdip_image[1]).equal?(0))
           # long
           h_heap = OS._get_process_heap
@@ -2010,9 +2010,9 @@ module Org::Eclipse::Swt::Graphics
       # long
       gdip_graphics = @data.attr_gdip_graphics
       if (!(gdip_graphics).equal?(0))
-        Gdip._graphics_translate_transform(gdip_graphics, @data.attr_gdip_xoffset, @data.attr_gdip_yoffset, Gdip::MatrixOrderPrepend)
-        Gdip._graphics_draw_line(gdip_graphics, @data.attr_gdip_pen, x1, y1, x2, y2)
-        Gdip._graphics_translate_transform(gdip_graphics, -@data.attr_gdip_xoffset, -@data.attr_gdip_yoffset, Gdip::MatrixOrderPrepend)
+        SwtGdip._graphics_translate_transform(gdip_graphics, @data.attr_gdip_xoffset, @data.attr_gdip_yoffset, SwtGdip::MatrixOrderPrepend)
+        SwtGdip._graphics_draw_line(gdip_graphics, @data.attr_gdip_pen, x1, y1, x2, y2)
+        SwtGdip._graphics_translate_transform(gdip_graphics, -@data.attr_gdip_xoffset, -@data.attr_gdip_yoffset, SwtGdip::MatrixOrderPrepend)
         return
       end
       if (!((@data.attr_style & SWT::MIRRORED)).equal?(0))
@@ -2061,9 +2061,9 @@ module Org::Eclipse::Swt::Graphics
       # long
       gdip_graphics = @data.attr_gdip_graphics
       if (!(gdip_graphics).equal?(0))
-        Gdip._graphics_translate_transform(gdip_graphics, @data.attr_gdip_xoffset, @data.attr_gdip_yoffset, Gdip::MatrixOrderPrepend)
-        Gdip._graphics_draw_ellipse(gdip_graphics, @data.attr_gdip_pen, x, y, width, height)
-        Gdip._graphics_translate_transform(gdip_graphics, -@data.attr_gdip_xoffset, -@data.attr_gdip_yoffset, Gdip::MatrixOrderPrepend)
+        SwtGdip._graphics_translate_transform(gdip_graphics, @data.attr_gdip_xoffset, @data.attr_gdip_yoffset, SwtGdip::MatrixOrderPrepend)
+        SwtGdip._graphics_draw_ellipse(gdip_graphics, @data.attr_gdip_pen, x, y, width, height)
+        SwtGdip._graphics_translate_transform(gdip_graphics, -@data.attr_gdip_xoffset, -@data.attr_gdip_yoffset, SwtGdip::MatrixOrderPrepend)
         return
       end
       if (!((@data.attr_style & SWT::MIRRORED)).equal?(0))
@@ -2110,9 +2110,9 @@ module Org::Eclipse::Swt::Graphics
       check_gc(DRAW)
       # long
       gdip_graphics = @data.attr_gdip_graphics
-      Gdip._graphics_translate_transform(gdip_graphics, @data.attr_gdip_xoffset, @data.attr_gdip_yoffset, Gdip::MatrixOrderPrepend)
-      Gdip._graphics_draw_path(gdip_graphics, @data.attr_gdip_pen, path.attr_handle)
-      Gdip._graphics_translate_transform(gdip_graphics, -@data.attr_gdip_xoffset, -@data.attr_gdip_yoffset, Gdip::MatrixOrderPrepend)
+      SwtGdip._graphics_translate_transform(gdip_graphics, @data.attr_gdip_xoffset, @data.attr_gdip_yoffset, SwtGdip::MatrixOrderPrepend)
+      SwtGdip._graphics_draw_path(gdip_graphics, @data.attr_gdip_pen, path.attr_handle)
+      SwtGdip._graphics_translate_transform(gdip_graphics, -@data.attr_gdip_xoffset, -@data.attr_gdip_yoffset, SwtGdip::MatrixOrderPrepend)
     end
     
     typesig { [::Java::Int, ::Java::Int] }
@@ -2137,7 +2137,7 @@ module Org::Eclipse::Swt::Graphics
       end
       if (!(@data.attr_gdip_graphics).equal?(0))
         check_gc(DRAW)
-        Gdip._graphics_fill_rectangle(@data.attr_gdip_graphics, get_fg_brush, x, y, 1, 1)
+        SwtGdip._graphics_fill_rectangle(@data.attr_gdip_graphics, get_fg_brush, x, y, 1, 1)
         return
       end
       OS._set_pixel(@handle, x, y, @data.attr_foreground)
@@ -2170,9 +2170,9 @@ module Org::Eclipse::Swt::Graphics
       # long
       gdip_graphics = @data.attr_gdip_graphics
       if (!(gdip_graphics).equal?(0))
-        Gdip._graphics_translate_transform(gdip_graphics, @data.attr_gdip_xoffset, @data.attr_gdip_yoffset, Gdip::MatrixOrderPrepend)
-        Gdip._graphics_draw_polygon(gdip_graphics, @data.attr_gdip_pen, point_array, point_array.attr_length / 2)
-        Gdip._graphics_translate_transform(gdip_graphics, -@data.attr_gdip_xoffset, -@data.attr_gdip_yoffset, Gdip::MatrixOrderPrepend)
+        SwtGdip._graphics_translate_transform(gdip_graphics, @data.attr_gdip_xoffset, @data.attr_gdip_yoffset, SwtGdip::MatrixOrderPrepend)
+        SwtGdip._graphics_draw_polygon(gdip_graphics, @data.attr_gdip_pen, point_array, point_array.attr_length / 2)
+        SwtGdip._graphics_translate_transform(gdip_graphics, -@data.attr_gdip_xoffset, -@data.attr_gdip_yoffset, SwtGdip::MatrixOrderPrepend)
         return
       end
       if (!((@data.attr_style & SWT::MIRRORED)).equal?(0))
@@ -2223,9 +2223,9 @@ module Org::Eclipse::Swt::Graphics
       # long
       gdip_graphics = @data.attr_gdip_graphics
       if (!(gdip_graphics).equal?(0))
-        Gdip._graphics_translate_transform(gdip_graphics, @data.attr_gdip_xoffset, @data.attr_gdip_yoffset, Gdip::MatrixOrderPrepend)
-        Gdip._graphics_draw_lines(gdip_graphics, @data.attr_gdip_pen, point_array, point_array.attr_length / 2)
-        Gdip._graphics_translate_transform(gdip_graphics, -@data.attr_gdip_xoffset, -@data.attr_gdip_yoffset, Gdip::MatrixOrderPrepend)
+        SwtGdip._graphics_translate_transform(gdip_graphics, @data.attr_gdip_xoffset, @data.attr_gdip_yoffset, SwtGdip::MatrixOrderPrepend)
+        SwtGdip._graphics_draw_lines(gdip_graphics, @data.attr_gdip_pen, point_array, point_array.attr_length / 2)
+        SwtGdip._graphics_translate_transform(gdip_graphics, -@data.attr_gdip_xoffset, -@data.attr_gdip_yoffset, SwtGdip::MatrixOrderPrepend)
         return
       end
       if (!((@data.attr_style & SWT::MIRRORED)).equal?(0))
@@ -2285,9 +2285,9 @@ module Org::Eclipse::Swt::Graphics
           y = y + height
           height = -height
         end
-        Gdip._graphics_translate_transform(gdip_graphics, @data.attr_gdip_xoffset, @data.attr_gdip_yoffset, Gdip::MatrixOrderPrepend)
-        Gdip._graphics_draw_rectangle(gdip_graphics, @data.attr_gdip_pen, x, y, width, height)
-        Gdip._graphics_translate_transform(gdip_graphics, -@data.attr_gdip_xoffset, -@data.attr_gdip_yoffset, Gdip::MatrixOrderPrepend)
+        SwtGdip._graphics_translate_transform(gdip_graphics, @data.attr_gdip_xoffset, @data.attr_gdip_yoffset, SwtGdip::MatrixOrderPrepend)
+        SwtGdip._graphics_draw_rectangle(gdip_graphics, @data.attr_gdip_pen, x, y, width, height)
+        SwtGdip._graphics_translate_transform(gdip_graphics, -@data.attr_gdip_xoffset, -@data.attr_gdip_yoffset, SwtGdip::MatrixOrderPrepend)
         return
       end
       if (!((@data.attr_style & SWT::MIRRORED)).equal?(0))
@@ -2436,38 +2436,38 @@ module Org::Eclipse::Swt::Graphics
       if (nah < 0)
         nah = 0 - nah
       end
-      Gdip._graphics_translate_transform(gdip_graphics, @data.attr_gdip_xoffset, @data.attr_gdip_yoffset, Gdip::MatrixOrderPrepend)
+      SwtGdip._graphics_translate_transform(gdip_graphics, @data.attr_gdip_xoffset, @data.attr_gdip_yoffset, SwtGdip::MatrixOrderPrepend)
       if ((naw).equal?(0) || (nah).equal?(0))
-        Gdip._graphics_draw_rectangle(gdip_graphics, @data.attr_gdip_pen, x, y, width, height)
+        SwtGdip._graphics_draw_rectangle(gdip_graphics, @data.attr_gdip_pen, x, y, width, height)
       else
         # long
-        path = Gdip._graphics_path_new(Gdip::FillModeAlternate)
+        path = SwtGdip._graphics_path_new(SwtGdip::FillModeAlternate)
         if ((path).equal?(0))
           SWT.error(SWT::ERROR_NO_HANDLES)
         end
         if (nw > naw)
           if (nh > nah)
-            Gdip._graphics_path_add_arc(path, nx + nw - naw, ny, naw, nah, 0, -90)
-            Gdip._graphics_path_add_arc(path, nx, ny, naw, nah, -90, -90)
-            Gdip._graphics_path_add_arc(path, nx, ny + nh - nah, naw, nah, -180, -90)
-            Gdip._graphics_path_add_arc(path, nx + nw - naw, ny + nh - nah, naw, nah, -270, -90)
+            SwtGdip._graphics_path_add_arc(path, nx + nw - naw, ny, naw, nah, 0, -90)
+            SwtGdip._graphics_path_add_arc(path, nx, ny, naw, nah, -90, -90)
+            SwtGdip._graphics_path_add_arc(path, nx, ny + nh - nah, naw, nah, -180, -90)
+            SwtGdip._graphics_path_add_arc(path, nx + nw - naw, ny + nh - nah, naw, nah, -270, -90)
           else
-            Gdip._graphics_path_add_arc(path, nx + nw - naw, ny, naw, nh, -270, -180)
-            Gdip._graphics_path_add_arc(path, nx, ny, naw, nh, -90, -180)
+            SwtGdip._graphics_path_add_arc(path, nx + nw - naw, ny, naw, nh, -270, -180)
+            SwtGdip._graphics_path_add_arc(path, nx, ny, naw, nh, -90, -180)
           end
         else
           if (nh > nah)
-            Gdip._graphics_path_add_arc(path, nx, ny, nw, nah, 0, -180)
-            Gdip._graphics_path_add_arc(path, nx, ny + nh - nah, nw, nah, -180, -180)
+            SwtGdip._graphics_path_add_arc(path, nx, ny, nw, nah, 0, -180)
+            SwtGdip._graphics_path_add_arc(path, nx, ny + nh - nah, nw, nah, -180, -180)
           else
-            Gdip._graphics_path_add_arc(path, nx, ny, nw, nh, 0, 360)
+            SwtGdip._graphics_path_add_arc(path, nx, ny, nw, nh, 0, 360)
           end
         end
-        Gdip._graphics_path_close_figure(path)
-        Gdip._graphics_draw_path(gdip_graphics, pen, path)
-        Gdip._graphics_path_delete(path)
+        SwtGdip._graphics_path_close_figure(path)
+        SwtGdip._graphics_draw_path(gdip_graphics, pen, path)
+        SwtGdip._graphics_path_delete(path)
       end
-      Gdip._graphics_translate_transform(gdip_graphics, -@data.attr_gdip_xoffset, -@data.attr_gdip_yoffset, Gdip::MatrixOrderPrepend)
+      SwtGdip._graphics_translate_transform(gdip_graphics, -@data.attr_gdip_xoffset, -@data.attr_gdip_yoffset, SwtGdip::MatrixOrderPrepend)
     end
     
     typesig { [String, ::Java::Int, ::Java::Int] }
@@ -2540,7 +2540,7 @@ module Org::Eclipse::Swt::Graphics
         lp_glyphs = result.attr_lp_glyphs = OS._heap_alloc(h_heap, OS::HEAP_ZERO_MEMORY, n_glyphs * 2)
         dw_flags = OS::GCP_GLYPHSHAPE | OS::GCP_REORDER | OS::GCP_LIGATE
         # long
-        hdc = Gdip._graphics_get_hdc(gdip_graphics)
+        hdc = SwtGdip._graphics_get_hdc(gdip_graphics)
         # long
         h_font = @data.attr_h_gdifont
         if ((h_font).equal?(0) && !(@data.attr_font).nil?)
@@ -2563,7 +2563,7 @@ module Org::Eclipse::Swt::Graphics
         if (!(h_font).equal?(0))
           OS._select_object(hdc, old_font)
         end
-        Gdip._graphics_release_hdc(gdip_graphics, hdc)
+        SwtGdip._graphics_release_hdc(gdip_graphics, hdc)
         n_glyphs = result.attr_n_glyphs
         draw_x = x
         draw_y = y + lptm.attr_tm_ascent
@@ -2581,36 +2581,36 @@ module Org::Eclipse::Swt::Graphics
         bounds = nil
         if (!is_transparent || !((@data.attr_style & SWT::MIRRORED)).equal?(0))
           bounds = RectF.new
-          Gdip._graphics_measure_driver_string(gdip_graphics, lp_glyphs, n_glyphs, @data.attr_gdip_font, points, 0, 0, bounds)
+          SwtGdip._graphics_measure_driver_string(gdip_graphics, lp_glyphs, n_glyphs, @data.attr_gdip_font, points, 0, 0, bounds)
           if (!is_transparent)
-            Gdip._graphics_fill_rectangle(gdip_graphics, @data.attr_gdip_brush, x, y, Math.round(bounds.attr_width), Math.round(bounds.attr_height))
+            SwtGdip._graphics_fill_rectangle(gdip_graphics, @data.attr_gdip_brush, x, y, Math.round(bounds.attr_width), Math.round(bounds.attr_height))
           end
         end
         gstate = 0
         # long
         brush = get_fg_brush
         if (!((@data.attr_style & SWT::MIRRORED)).equal?(0))
-          case (Gdip._brush_get_type(brush))
-          when Gdip::BrushTypeLinearGradient
-            Gdip._linear_gradient_brush_scale_transform(brush, -1, 1, Gdip::MatrixOrderPrepend)
-            Gdip._linear_gradient_brush_translate_transform(brush, -2 * x - bounds.attr_width, 0, Gdip::MatrixOrderPrepend)
-          when Gdip::BrushTypeTextureFill
-            Gdip._texture_brush_scale_transform(brush, -1, 1, Gdip::MatrixOrderPrepend)
-            Gdip._texture_brush_translate_transform(brush, -2 * x - bounds.attr_width, 0, Gdip::MatrixOrderPrepend)
+          case (SwtGdip._brush_get_type(brush))
+          when SwtGdip::BrushTypeLinearGradient
+            SwtGdip._linear_gradient_brush_scale_transform(brush, -1, 1, SwtGdip::MatrixOrderPrepend)
+            SwtGdip._linear_gradient_brush_translate_transform(brush, -2 * x - bounds.attr_width, 0, SwtGdip::MatrixOrderPrepend)
+          when SwtGdip::BrushTypeTextureFill
+            SwtGdip._texture_brush_scale_transform(brush, -1, 1, SwtGdip::MatrixOrderPrepend)
+            SwtGdip._texture_brush_translate_transform(brush, -2 * x - bounds.attr_width, 0, SwtGdip::MatrixOrderPrepend)
           end
-          gstate = Gdip._graphics_save(gdip_graphics)
-          Gdip._graphics_scale_transform(gdip_graphics, -1, 1, Gdip::MatrixOrderPrepend)
-          Gdip._graphics_translate_transform(gdip_graphics, -2 * x - bounds.attr_width, 0, Gdip::MatrixOrderPrepend)
+          gstate = SwtGdip._graphics_save(gdip_graphics)
+          SwtGdip._graphics_scale_transform(gdip_graphics, -1, 1, SwtGdip::MatrixOrderPrepend)
+          SwtGdip._graphics_translate_transform(gdip_graphics, -2 * x - bounds.attr_width, 0, SwtGdip::MatrixOrderPrepend)
         end
-        Gdip._graphics_draw_driver_string(gdip_graphics, lp_glyphs, result.attr_n_glyphs, @data.attr_gdip_font, brush, points, 0, 0)
+        SwtGdip._graphics_draw_driver_string(gdip_graphics, lp_glyphs, result.attr_n_glyphs, @data.attr_gdip_font, brush, points, 0, 0)
         if (!((@data.attr_style & SWT::MIRRORED)).equal?(0))
-          case (Gdip._brush_get_type(brush))
-          when Gdip::BrushTypeLinearGradient
-            Gdip._linear_gradient_brush_reset_transform(brush)
-          when Gdip::BrushTypeTextureFill
-            Gdip._texture_brush_reset_transform(brush)
+          case (SwtGdip._brush_get_type(brush))
+          when SwtGdip::BrushTypeLinearGradient
+            SwtGdip._linear_gradient_brush_reset_transform(brush)
+          when SwtGdip::BrushTypeTextureFill
+            SwtGdip._texture_brush_reset_transform(brush)
           end
-          Gdip._graphics_restore(gdip_graphics, gstate)
+          SwtGdip._graphics_restore(gdip_graphics, gstate)
         end
         OS._heap_free(h_heap, 0, lp_glyphs)
         OS._heap_free(h_heap, 0, lp_dx)
@@ -2780,53 +2780,53 @@ module Org::Eclipse::Swt::Graphics
         string.get_chars(0, length_, buffer, 0)
         pt = PointF.new
         # long
-        format = Gdip._string_format_clone(Gdip._string_format_generic_typographic)
-        format_flags = Gdip._string_format_get_format_flags(format) | Gdip::StringFormatFlagsMeasureTrailingSpaces
+        format = SwtGdip._string_format_clone(SwtGdip._string_format_generic_typographic)
+        format_flags = SwtGdip._string_format_get_format_flags(format) | SwtGdip::StringFormatFlagsMeasureTrailingSpaces
         if (!((@data.attr_style & SWT::MIRRORED)).equal?(0))
-          format_flags |= Gdip::StringFormatFlagsDirectionRightToLeft
+          format_flags |= SwtGdip::StringFormatFlagsDirectionRightToLeft
         end
-        Gdip._string_format_set_format_flags(format, format_flags)
+        SwtGdip._string_format_set_format_flags(format, format_flags)
         tabs = !((flags & SWT::DRAW_TAB)).equal?(0) ? Array.typed(::Java::Float).new([measure_space(@data.attr_gdip_font, format) * 8]) : Array.typed(::Java::Float).new(1) { 0.0 }
-        Gdip._string_format_set_tab_stops(format, 0, tabs.attr_length, tabs)
-        hotkey_prefix = !((flags & SWT::DRAW_MNEMONIC)).equal?(0) ? Gdip::HotkeyPrefixShow : Gdip::HotkeyPrefixNone
+        SwtGdip._string_format_set_tab_stops(format, 0, tabs.attr_length, tabs)
+        hotkey_prefix = !((flags & SWT::DRAW_MNEMONIC)).equal?(0) ? SwtGdip::HotkeyPrefixShow : SwtGdip::HotkeyPrefixNone
         if (!((flags & SWT::DRAW_MNEMONIC)).equal?(0) && !((@data.attr_ui_state & OS::UISF_HIDEACCEL)).equal?(0))
-          hotkey_prefix = Gdip::HotkeyPrefixHide
+          hotkey_prefix = SwtGdip::HotkeyPrefixHide
         end
-        Gdip._string_format_set_hotkey_prefix(format, hotkey_prefix)
+        SwtGdip._string_format_set_hotkey_prefix(format, hotkey_prefix)
         if (((flags & SWT::DRAW_TRANSPARENT)).equal?(0))
           bounds = RectF.new
-          Gdip._graphics_measure_string(gdip_graphics, buffer, length_, @data.attr_gdip_font, pt, format, bounds)
-          Gdip._graphics_fill_rectangle(gdip_graphics, @data.attr_gdip_brush, x, y, Math.round(bounds.attr_width), Math.round(bounds.attr_height))
+          SwtGdip._graphics_measure_string(gdip_graphics, buffer, length_, @data.attr_gdip_font, pt, format, bounds)
+          SwtGdip._graphics_fill_rectangle(gdip_graphics, @data.attr_gdip_brush, x, y, Math.round(bounds.attr_width), Math.round(bounds.attr_height))
         end
         gstate = 0
         # long
         brush = get_fg_brush
         if (!((@data.attr_style & SWT::MIRRORED)).equal?(0))
-          case (Gdip._brush_get_type(brush))
-          when Gdip::BrushTypeLinearGradient
-            Gdip._linear_gradient_brush_scale_transform(brush, -1, 1, Gdip::MatrixOrderPrepend)
-            Gdip._linear_gradient_brush_translate_transform(brush, -2 * x, 0, Gdip::MatrixOrderPrepend)
-          when Gdip::BrushTypeTextureFill
-            Gdip._texture_brush_scale_transform(brush, -1, 1, Gdip::MatrixOrderPrepend)
-            Gdip._texture_brush_translate_transform(brush, -2 * x, 0, Gdip::MatrixOrderPrepend)
+          case (SwtGdip._brush_get_type(brush))
+          when SwtGdip::BrushTypeLinearGradient
+            SwtGdip._linear_gradient_brush_scale_transform(brush, -1, 1, SwtGdip::MatrixOrderPrepend)
+            SwtGdip._linear_gradient_brush_translate_transform(brush, -2 * x, 0, SwtGdip::MatrixOrderPrepend)
+          when SwtGdip::BrushTypeTextureFill
+            SwtGdip._texture_brush_scale_transform(brush, -1, 1, SwtGdip::MatrixOrderPrepend)
+            SwtGdip._texture_brush_translate_transform(brush, -2 * x, 0, SwtGdip::MatrixOrderPrepend)
           end
-          gstate = Gdip._graphics_save(gdip_graphics)
-          Gdip._graphics_scale_transform(gdip_graphics, -1, 1, Gdip::MatrixOrderPrepend)
-          Gdip._graphics_translate_transform(gdip_graphics, -2 * x, 0, Gdip::MatrixOrderPrepend)
+          gstate = SwtGdip._graphics_save(gdip_graphics)
+          SwtGdip._graphics_scale_transform(gdip_graphics, -1, 1, SwtGdip::MatrixOrderPrepend)
+          SwtGdip._graphics_translate_transform(gdip_graphics, -2 * x, 0, SwtGdip::MatrixOrderPrepend)
         end
         pt.attr_x = x
         pt.attr_y = y
-        Gdip._graphics_draw_string(gdip_graphics, buffer, length_, @data.attr_gdip_font, pt, format, brush)
+        SwtGdip._graphics_draw_string(gdip_graphics, buffer, length_, @data.attr_gdip_font, pt, format, brush)
         if (!((@data.attr_style & SWT::MIRRORED)).equal?(0))
-          case (Gdip._brush_get_type(brush))
-          when Gdip::BrushTypeLinearGradient
-            Gdip._linear_gradient_brush_reset_transform(brush)
-          when Gdip::BrushTypeTextureFill
-            Gdip._texture_brush_reset_transform(brush)
+          case (SwtGdip._brush_get_type(brush))
+          when SwtGdip::BrushTypeLinearGradient
+            SwtGdip._linear_gradient_brush_reset_transform(brush)
+          when SwtGdip::BrushTypeTextureFill
+            SwtGdip._texture_brush_reset_transform(brush)
           end
-          Gdip._graphics_restore(gdip_graphics, gstate)
+          SwtGdip._graphics_restore(gdip_graphics, gstate)
         end
-        Gdip._string_format_delete(format)
+        SwtGdip._string_format_delete(format)
         return
       end
       buffer = TCHAR.new(get_code_page, string, false)
@@ -2968,13 +2968,13 @@ module Org::Eclipse::Swt::Graphics
       gdip_graphics = @data.attr_gdip_graphics
       if (!(gdip_graphics).equal?(0))
         if ((width).equal?(height))
-          Gdip._graphics_fill_pie(gdip_graphics, @data.attr_gdip_brush, x, y, width, height, -start_angle, -arc_angle)
+          SwtGdip._graphics_fill_pie(gdip_graphics, @data.attr_gdip_brush, x, y, width, height, -start_angle, -arc_angle)
         else
-          state = Gdip._graphics_save(gdip_graphics)
-          Gdip._graphics_translate_transform(gdip_graphics, x, y, Gdip::MatrixOrderPrepend)
-          Gdip._graphics_scale_transform(gdip_graphics, width, height, Gdip::MatrixOrderPrepend)
-          Gdip._graphics_fill_pie(gdip_graphics, @data.attr_gdip_brush, 0, 0, 1, 1, -start_angle, -arc_angle)
-          Gdip._graphics_restore(gdip_graphics, state)
+          state = SwtGdip._graphics_save(gdip_graphics)
+          SwtGdip._graphics_translate_transform(gdip_graphics, x, y, SwtGdip::MatrixOrderPrepend)
+          SwtGdip._graphics_scale_transform(gdip_graphics, width, height, SwtGdip::MatrixOrderPrepend)
+          SwtGdip._graphics_fill_pie(gdip_graphics, @data.attr_gdip_brush, 0, 0, 1, 1, -start_angle, -arc_angle)
+          SwtGdip._graphics_restore(gdip_graphics, state)
         end
         return
       end
@@ -3109,22 +3109,22 @@ module Org::Eclipse::Swt::Graphics
         end
         rgb = ((from_rgb.attr_red & 0xff) << 16) | ((from_rgb.attr_green & 0xff) << 8) | (from_rgb.attr_blue & 0xff)
         # long
-        from_gp_color = Gdip._color_new(@data.attr_alpha << 24 | rgb)
+        from_gp_color = SwtGdip._color_new(@data.attr_alpha << 24 | rgb)
         if ((from_gp_color).equal?(0))
           SWT.error(SWT::ERROR_NO_HANDLES)
         end
         rgb = ((to_rgb.attr_red & 0xff) << 16) | ((to_rgb.attr_green & 0xff) << 8) | (to_rgb.attr_blue & 0xff)
         # long
-        to_gp_color = Gdip._color_new(@data.attr_alpha << 24 | rgb)
+        to_gp_color = SwtGdip._color_new(@data.attr_alpha << 24 | rgb)
         if ((to_gp_color).equal?(0))
           SWT.error(SWT::ERROR_NO_HANDLES)
         end
         # long
-        brush = Gdip._linear_gradient_brush_new(p1, p2, from_gp_color, to_gp_color)
-        Gdip._graphics_fill_rectangle(@data.attr_gdip_graphics, brush, x, y, width, height)
-        Gdip._linear_gradient_brush_delete(brush)
-        Gdip._color_delete(from_gp_color)
-        Gdip._color_delete(to_gp_color)
+        brush = SwtGdip._linear_gradient_brush_new(p1, p2, from_gp_color, to_gp_color)
+        SwtGdip._graphics_fill_rectangle(@data.attr_gdip_graphics, brush, x, y, width, height)
+        SwtGdip._linear_gradient_brush_delete(brush)
+        SwtGdip._color_delete(from_gp_color)
+        SwtGdip._color_delete(to_gp_color)
         return
       end
       # Use GradientFill if supported, only on Windows 98, 2000 and newer.
@@ -3203,7 +3203,7 @@ module Org::Eclipse::Swt::Graphics
       end
       check_gc(FILL)
       if (!(@data.attr_gdip_graphics).equal?(0))
-        Gdip._graphics_fill_ellipse(@data.attr_gdip_graphics, @data.attr_gdip_brush, x, y, width, height)
+        SwtGdip._graphics_fill_ellipse(@data.attr_gdip_graphics, @data.attr_gdip_brush, x, y, width, height)
         return
       end
       if (!((@data.attr_style & SWT::MIRRORED)).equal?(0))
@@ -3246,9 +3246,9 @@ module Org::Eclipse::Swt::Graphics
       end
       init_gdip
       check_gc(FILL)
-      mode = (OS._get_poly_fill_mode(@handle)).equal?(OS::WINDING) ? Gdip::FillModeWinding : Gdip::FillModeAlternate
-      Gdip._graphics_path_set_fill_mode(path.attr_handle, mode)
-      Gdip._graphics_fill_path(@data.attr_gdip_graphics, @data.attr_gdip_brush, path.attr_handle)
+      mode = (OS._get_poly_fill_mode(@handle)).equal?(OS::WINDING) ? SwtGdip::FillModeWinding : SwtGdip::FillModeAlternate
+      SwtGdip._graphics_path_set_fill_mode(path.attr_handle, mode)
+      SwtGdip._graphics_fill_path(@data.attr_gdip_graphics, @data.attr_gdip_brush, path.attr_handle)
     end
     
     typesig { [Array.typed(::Java::Int)] }
@@ -3278,8 +3278,8 @@ module Org::Eclipse::Swt::Graphics
       end
       check_gc(FILL)
       if (!(@data.attr_gdip_graphics).equal?(0))
-        mode = (OS._get_poly_fill_mode(@handle)).equal?(OS::WINDING) ? Gdip::FillModeWinding : Gdip::FillModeAlternate
-        Gdip._graphics_fill_polygon(@data.attr_gdip_graphics, @data.attr_gdip_brush, point_array, point_array.attr_length / 2, mode)
+        mode = (OS._get_poly_fill_mode(@handle)).equal?(OS::WINDING) ? SwtGdip::FillModeWinding : SwtGdip::FillModeAlternate
+        SwtGdip._graphics_fill_polygon(@data.attr_gdip_graphics, @data.attr_gdip_brush, point_array, point_array.attr_length / 2, mode)
         return
       end
       if (!((@data.attr_style & SWT::MIRRORED)).equal?(0))
@@ -3327,7 +3327,7 @@ module Org::Eclipse::Swt::Graphics
           y = y + height
           height = -height
         end
-        Gdip._graphics_fill_rectangle(@data.attr_gdip_graphics, @data.attr_gdip_brush, x, y, width, height)
+        SwtGdip._graphics_fill_rectangle(@data.attr_gdip_graphics, @data.attr_gdip_brush, x, y, width, height)
         return
       end
       rop2 = 0
@@ -3418,48 +3418,48 @@ module Org::Eclipse::Swt::Graphics
         nah = 0 - nah
       end
       if ((naw).equal?(0) || (nah).equal?(0))
-        Gdip._graphics_fill_rectangle(@data.attr_gdip_graphics, @data.attr_gdip_brush, x, y, width, height)
+        SwtGdip._graphics_fill_rectangle(@data.attr_gdip_graphics, @data.attr_gdip_brush, x, y, width, height)
       else
         # long
-        path = Gdip._graphics_path_new(Gdip::FillModeAlternate)
+        path = SwtGdip._graphics_path_new(SwtGdip::FillModeAlternate)
         if ((path).equal?(0))
           SWT.error(SWT::ERROR_NO_HANDLES)
         end
         if (nw > naw)
           if (nh > nah)
-            Gdip._graphics_path_add_arc(path, nx + nw - naw, ny, naw, nah, 0, -90)
-            Gdip._graphics_path_add_arc(path, nx, ny, naw, nah, -90, -90)
-            Gdip._graphics_path_add_arc(path, nx, ny + nh - nah, naw, nah, -180, -90)
-            Gdip._graphics_path_add_arc(path, nx + nw - naw, ny + nh - nah, naw, nah, -270, -90)
+            SwtGdip._graphics_path_add_arc(path, nx + nw - naw, ny, naw, nah, 0, -90)
+            SwtGdip._graphics_path_add_arc(path, nx, ny, naw, nah, -90, -90)
+            SwtGdip._graphics_path_add_arc(path, nx, ny + nh - nah, naw, nah, -180, -90)
+            SwtGdip._graphics_path_add_arc(path, nx + nw - naw, ny + nh - nah, naw, nah, -270, -90)
           else
-            Gdip._graphics_path_add_arc(path, nx + nw - naw, ny, naw, nh, -270, -180)
-            Gdip._graphics_path_add_arc(path, nx, ny, naw, nh, -90, -180)
+            SwtGdip._graphics_path_add_arc(path, nx + nw - naw, ny, naw, nh, -270, -180)
+            SwtGdip._graphics_path_add_arc(path, nx, ny, naw, nh, -90, -180)
           end
         else
           if (nh > nah)
-            Gdip._graphics_path_add_arc(path, nx, ny, nw, nah, 0, -180)
-            Gdip._graphics_path_add_arc(path, nx, ny + nh - nah, nw, nah, -180, -180)
+            SwtGdip._graphics_path_add_arc(path, nx, ny, nw, nah, 0, -180)
+            SwtGdip._graphics_path_add_arc(path, nx, ny + nh - nah, nw, nah, -180, -180)
           else
-            Gdip._graphics_path_add_arc(path, nx, ny, nw, nh, 0, 360)
+            SwtGdip._graphics_path_add_arc(path, nx, ny, nw, nh, 0, 360)
           end
         end
-        Gdip._graphics_path_close_figure(path)
-        Gdip._graphics_fill_path(gdip_graphics, brush, path)
-        Gdip._graphics_path_delete(path)
+        SwtGdip._graphics_path_close_figure(path)
+        SwtGdip._graphics_fill_path(gdip_graphics, brush, path)
+        SwtGdip._graphics_path_delete(path)
       end
     end
     
     typesig { [] }
     def flush
       if (!(@data.attr_gdip_graphics).equal?(0))
-        Gdip._graphics_flush(@data.attr_gdip_graphics, 0)
+        SwtGdip._graphics_flush(@data.attr_gdip_graphics, 0)
         # Note Flush() does not flush the output to the
         # underline HDC. This is done by calling GetHDC()
         # followed by ReleaseHDC().
         # 
         # long
-        hdc = Gdip._graphics_get_hdc(@data.attr_gdip_graphics)
-        Gdip._graphics_release_hdc(@data.attr_gdip_graphics, hdc)
+        hdc = SwtGdip._graphics_get_hdc(@data.attr_gdip_graphics)
+        SwtGdip._graphics_release_hdc(@data.attr_gdip_graphics, hdc)
       end
     end
     
@@ -3568,13 +3568,13 @@ module Org::Eclipse::Swt::Graphics
       if ((@data.attr_gdip_graphics).equal?(0))
         return SWT::DEFAULT
       end
-      mode = Gdip._graphics_get_smoothing_mode(@data.attr_gdip_graphics)
+      mode = SwtGdip._graphics_get_smoothing_mode(@data.attr_gdip_graphics)
       case (mode)
-      when Gdip::SmoothingModeDefault
+      when SwtGdip::SmoothingModeDefault
         return SWT::DEFAULT
-      when Gdip::SmoothingModeHighSpeed, Gdip::SmoothingModeNone
+      when SwtGdip::SmoothingModeHighSpeed, SwtGdip::SmoothingModeNone
         return SWT::OFF
-      when Gdip::SmoothingModeAntiAlias, Gdip::SmoothingModeAntiAlias8x8, Gdip::SmoothingModeHighQuality
+      when SwtGdip::SmoothingModeAntiAlias, SwtGdip::SmoothingModeAntiAlias8x8, SwtGdip::SmoothingModeHighQuality
         return SWT::ON
       end
       return SWT::DEFAULT
@@ -3674,9 +3674,9 @@ module Org::Eclipse::Swt::Graphics
       gdip_graphics = @data.attr_gdip_graphics
       if (!(gdip_graphics).equal?(0))
         rect = Rect.new
-        Gdip._graphics_set_pixel_offset_mode(gdip_graphics, Gdip::PixelOffsetModeNone)
-        Gdip._graphics_get_visible_clip_bounds(gdip_graphics, rect)
-        Gdip._graphics_set_pixel_offset_mode(gdip_graphics, Gdip::PixelOffsetModeHalf)
+        SwtGdip._graphics_set_pixel_offset_mode(gdip_graphics, SwtGdip::PixelOffsetModeNone)
+        SwtGdip._graphics_get_visible_clip_bounds(gdip_graphics, rect)
+        SwtGdip._graphics_set_pixel_offset_mode(gdip_graphics, SwtGdip::PixelOffsetModeHalf)
         return Rectangle.new(rect.attr_x, rect.attr_y, rect.attr_width, rect.attr_height)
       end
       rect = RECT.new
@@ -3711,26 +3711,26 @@ module Org::Eclipse::Swt::Graphics
       gdip_graphics = @data.attr_gdip_graphics
       if (!(gdip_graphics).equal?(0))
         # long
-        rgn = Gdip._region_new
-        Gdip._graphics_get_clip(@data.attr_gdip_graphics, rgn)
-        if (Gdip._region_is_infinite(rgn, gdip_graphics))
+        rgn = SwtGdip._region_new
+        SwtGdip._graphics_get_clip(@data.attr_gdip_graphics, rgn)
+        if (SwtGdip._region_is_infinite(rgn, gdip_graphics))
           rect = Rect.new
-          Gdip._graphics_set_pixel_offset_mode(gdip_graphics, Gdip::PixelOffsetModeNone)
-          Gdip._graphics_get_visible_clip_bounds(gdip_graphics, rect)
-          Gdip._graphics_set_pixel_offset_mode(gdip_graphics, Gdip::PixelOffsetModeHalf)
+          SwtGdip._graphics_set_pixel_offset_mode(gdip_graphics, SwtGdip::PixelOffsetModeNone)
+          SwtGdip._graphics_get_visible_clip_bounds(gdip_graphics, rect)
+          SwtGdip._graphics_set_pixel_offset_mode(gdip_graphics, SwtGdip::PixelOffsetModeHalf)
           OS._set_rect_rgn(region.attr_handle, rect.attr_x, rect.attr_y, rect.attr_x + rect.attr_width, rect.attr_y + rect.attr_height)
         else
           # long
-          matrix = Gdip._matrix_new(1, 0, 0, 1, 0, 0)
+          matrix = SwtGdip._matrix_new(1, 0, 0, 1, 0, 0)
           # long
-          identity = Gdip._matrix_new(1, 0, 0, 1, 0, 0)
-          Gdip._graphics_get_transform(gdip_graphics, matrix)
-          Gdip._graphics_set_transform(gdip_graphics, identity)
+          identity = SwtGdip._matrix_new(1, 0, 0, 1, 0, 0)
+          SwtGdip._graphics_get_transform(gdip_graphics, matrix)
+          SwtGdip._graphics_set_transform(gdip_graphics, identity)
           # long
-          h_rgn = Gdip._region_get_hrgn(rgn, @data.attr_gdip_graphics)
-          Gdip._graphics_set_transform(gdip_graphics, matrix)
-          Gdip._matrix_delete(identity)
-          Gdip._matrix_delete(matrix)
+          h_rgn = SwtGdip._region_get_hrgn(rgn, @data.attr_gdip_graphics)
+          SwtGdip._graphics_set_transform(gdip_graphics, matrix)
+          SwtGdip._matrix_delete(identity)
+          SwtGdip._matrix_delete(matrix)
           if (!OS::IsWinCE)
             pt = POINT.new
             OS._get_window_org_ex(@handle, pt)
@@ -3739,7 +3739,7 @@ module Org::Eclipse::Swt::Graphics
           OS._combine_rgn(region.attr_handle, h_rgn, 0, OS::RGN_COPY)
           OS._delete_object(h_rgn)
         end
-        Gdip._region_delete(rgn)
+        SwtGdip._region_delete(rgn)
         return
       end
       pt = POINT.new
@@ -3945,15 +3945,15 @@ module Org::Eclipse::Swt::Graphics
       if ((@data.attr_gdip_graphics).equal?(0))
         return SWT::DEFAULT
       end
-      mode = Gdip._graphics_get_interpolation_mode(@data.attr_gdip_graphics)
+      mode = SwtGdip._graphics_get_interpolation_mode(@data.attr_gdip_graphics)
       case (mode)
-      when Gdip::InterpolationModeDefault
+      when SwtGdip::InterpolationModeDefault
         return SWT::DEFAULT
-      when Gdip::InterpolationModeNearestNeighbor
+      when SwtGdip::InterpolationModeNearestNeighbor
         return SWT::NONE
-      when Gdip::InterpolationModeBilinear, Gdip::InterpolationModeLowQuality
+      when SwtGdip::InterpolationModeBilinear, SwtGdip::InterpolationModeLowQuality
         return SWT::LOW
-      when Gdip::InterpolationModeBicubic, Gdip::InterpolationModeHighQualityBilinear, Gdip::InterpolationModeHighQualityBicubic, Gdip::InterpolationModeHighQuality
+      when SwtGdip::InterpolationModeBicubic, SwtGdip::InterpolationModeHighQualityBilinear, SwtGdip::InterpolationModeHighQualityBicubic, SwtGdip::InterpolationModeHighQuality
         return SWT::HIGH
       end
       return SWT::DEFAULT
@@ -4128,13 +4128,13 @@ module Org::Eclipse::Swt::Graphics
       if ((@data.attr_gdip_graphics).equal?(0))
         return SWT::DEFAULT
       end
-      mode = Gdip._graphics_get_text_rendering_hint(@data.attr_gdip_graphics)
+      mode = SwtGdip._graphics_get_text_rendering_hint(@data.attr_gdip_graphics)
       case (mode)
-      when Gdip::TextRenderingHintSystemDefault
+      when SwtGdip::TextRenderingHintSystemDefault
         return SWT::DEFAULT
-      when Gdip::TextRenderingHintSingleBitPerPixel, Gdip::TextRenderingHintSingleBitPerPixelGridFit
+      when SwtGdip::TextRenderingHintSingleBitPerPixel, SwtGdip::TextRenderingHintSingleBitPerPixelGridFit
         return SWT::OFF
-      when Gdip::TextRenderingHintAntiAlias, Gdip::TextRenderingHintAntiAliasGridFit, Gdip::TextRenderingHintClearTypeGridFit
+      when SwtGdip::TextRenderingHintAntiAlias, SwtGdip::TextRenderingHintAntiAliasGridFit, SwtGdip::TextRenderingHintClearTypeGridFit
         return SWT::ON
       end
       return SWT::DEFAULT
@@ -4170,12 +4170,12 @@ module Org::Eclipse::Swt::Graphics
       # long
       gdip_graphics = @data.attr_gdip_graphics
       if (!(gdip_graphics).equal?(0))
-        Gdip._graphics_get_transform(gdip_graphics, transform.attr_handle)
+        SwtGdip._graphics_get_transform(gdip_graphics, transform.attr_handle)
         # long
         identity_ = identity
-        Gdip._matrix_invert(identity_)
-        Gdip._matrix_multiply(transform.attr_handle, identity_, Gdip::MatrixOrderAppend)
-        Gdip._matrix_delete(identity_)
+        SwtGdip._matrix_invert(identity_)
+        SwtGdip._matrix_multiply(transform.attr_handle, identity_, SwtGdip::MatrixOrderAppend)
+        SwtGdip._matrix_delete(identity_)
       else
         transform.set_elements(1, 0, 0, 1, 0, 0)
       end
@@ -4239,17 +4239,17 @@ module Org::Eclipse::Swt::Graphics
       if (!((@data.attr_style & SWT::MIRRORED)).equal?(0))
         OS._set_layout(@handle, OS._get_layout(@handle) & ~OS::LAYOUT_RTL)
       end
-      gdip_graphics = @data.attr_gdip_graphics = Gdip._graphics_new(@handle)
+      gdip_graphics = @data.attr_gdip_graphics = SwtGdip._graphics_new(@handle)
       if ((gdip_graphics).equal?(0))
         SWT.error(SWT::ERROR_NO_HANDLES)
       end
-      Gdip._graphics_set_page_unit(gdip_graphics, Gdip::UnitPixel)
-      Gdip._graphics_set_pixel_offset_mode(gdip_graphics, Gdip::PixelOffsetModeHalf)
+      SwtGdip._graphics_set_page_unit(gdip_graphics, SwtGdip::UnitPixel)
+      SwtGdip._graphics_set_pixel_offset_mode(gdip_graphics, SwtGdip::PixelOffsetModeHalf)
       if (!((@data.attr_style & SWT::MIRRORED)).equal?(0))
         # long
         matrix = identity
-        Gdip._graphics_set_transform(gdip_graphics, matrix)
-        Gdip._matrix_delete(matrix)
+        SwtGdip._graphics_set_transform(gdip_graphics, matrix)
+        SwtGdip._matrix_delete(matrix)
       end
       if ((result).equal?(1))
         set_clipping(h_rgn)
@@ -4302,9 +4302,9 @@ module Org::Eclipse::Swt::Graphics
         if (!OS::IsWinCE)
           OS._get_window_org_ex(@handle, pt)
         end
-        return Gdip._matrix_new(-1, 0, 0, 1, width + 2 * pt.attr_x, 0)
+        return SwtGdip._matrix_new(-1, 0, 0, 1, width + 2 * pt.attr_x, 0)
       end
-      return Gdip._matrix_new(1, 0, 0, 1, 0, 0)
+      return SwtGdip._matrix_new(1, 0, 0, 1, 0, 0)
     end
     
     typesig { [Drawable, SwtGCData, ::Java::Int] }
@@ -4397,10 +4397,10 @@ module Org::Eclipse::Swt::Graphics
       gdip_graphics = @data.attr_gdip_graphics
       if (!(gdip_graphics).equal?(0))
         # long
-        rgn = Gdip._region_new
-        Gdip._graphics_get_clip(@data.attr_gdip_graphics, rgn)
-        is_infinite = Gdip._region_is_infinite(rgn, gdip_graphics)
-        Gdip._region_delete(rgn)
+        rgn = SwtGdip._region_new
+        SwtGdip._graphics_get_clip(@data.attr_gdip_graphics, rgn)
+        is_infinite = SwtGdip._region_is_infinite(rgn, gdip_graphics)
+        SwtGdip._region_delete(rgn)
         return !is_infinite
       end
       # long
@@ -4429,7 +4429,7 @@ module Org::Eclipse::Swt::Graphics
     def measure_space(font, format)
       pt = PointF.new
       bounds = RectF.new
-      Gdip._graphics_measure_string(@data.attr_gdip_graphics, Array.typed(::Java::Char).new([Character.new(?\s.ord)]), 1, font, pt, format, bounds)
+      SwtGdip._graphics_measure_string(@data.attr_gdip_graphics, Array.typed(::Java::Char).new([Character.new(?\s.ord)]), 1, font, pt, format, bounds)
       return bounds.attr_width
     end
     
@@ -4535,16 +4535,16 @@ module Org::Eclipse::Swt::Graphics
       mode = 0
       case (antialias)
       when SWT::DEFAULT
-        mode = Gdip::SmoothingModeDefault
+        mode = SwtGdip::SmoothingModeDefault
       when SWT::OFF
-        mode = Gdip::SmoothingModeNone
+        mode = SwtGdip::SmoothingModeNone
       when SWT::ON
-        mode = Gdip::SmoothingModeAntiAlias
+        mode = SwtGdip::SmoothingModeAntiAlias
       else
         SWT.error(SWT::ERROR_INVALID_ARGUMENT)
       end
       init_gdip
-      Gdip._graphics_set_smoothing_mode(@data.attr_gdip_graphics, mode)
+      SwtGdip._graphics_set_smoothing_mode(@data.attr_gdip_graphics, mode)
     end
     
     typesig { [::Java::Int] }
@@ -4661,11 +4661,11 @@ module Org::Eclipse::Swt::Graphics
       if (!(gdip_graphics).equal?(0))
         if (!(h_rgn).equal?(0))
           # long
-          region = Gdip._region_new(h_rgn)
-          Gdip._graphics_set_clip(gdip_graphics, region, Gdip::CombineModeReplace)
-          Gdip._region_delete(region)
+          region = SwtGdip._region_new(h_rgn)
+          SwtGdip._graphics_set_clip(gdip_graphics, region, SwtGdip::CombineModeReplace)
+          SwtGdip._region_delete(region)
         else
-          Gdip._graphics_reset_clip(gdip_graphics)
+          SwtGdip._graphics_reset_clip(gdip_graphics)
         end
       else
         pt = nil
@@ -4742,9 +4742,9 @@ module Org::Eclipse::Swt::Graphics
       set_clipping(0)
       if (!(path).nil?)
         init_gdip
-        mode = (OS._get_poly_fill_mode(@handle)).equal?(OS::WINDING) ? Gdip::FillModeWinding : Gdip::FillModeAlternate
-        Gdip._graphics_path_set_fill_mode(path.attr_handle, mode)
-        Gdip._graphics_set_clip_path(@data.attr_gdip_graphics, path.attr_handle)
+        mode = (OS._get_poly_fill_mode(@handle)).equal?(OS::WINDING) ? SwtGdip::FillModeWinding : SwtGdip::FillModeAlternate
+        SwtGdip._graphics_path_set_fill_mode(path.attr_handle, mode)
+        SwtGdip._graphics_set_clip_path(@data.attr_gdip_graphics, path.attr_handle)
       end
     end
     
@@ -4961,18 +4961,18 @@ module Org::Eclipse::Swt::Graphics
       mode = 0
       case (interpolation)
       when SWT::DEFAULT
-        mode = Gdip::InterpolationModeDefault
+        mode = SwtGdip::InterpolationModeDefault
       when SWT::NONE
-        mode = Gdip::InterpolationModeNearestNeighbor
+        mode = SwtGdip::InterpolationModeNearestNeighbor
       when SWT::LOW
-        mode = Gdip::InterpolationModeLowQuality
+        mode = SwtGdip::InterpolationModeLowQuality
       when SWT::HIGH
-        mode = Gdip::InterpolationModeHighQuality
+        mode = SwtGdip::InterpolationModeHighQuality
       else
         SWT.error(SWT::ERROR_INVALID_ARGUMENT)
       end
       init_gdip
-      Gdip._graphics_set_interpolation_mode(@data.attr_gdip_graphics, mode)
+      SwtGdip._graphics_set_interpolation_mode(@data.attr_gdip_graphics, mode)
     end
     
     typesig { [LineAttributes] }
@@ -5335,22 +5335,22 @@ module Org::Eclipse::Swt::Graphics
       text_mode = 0
       case (antialias)
       when SWT::DEFAULT
-        text_mode = Gdip::TextRenderingHintSystemDefault
+        text_mode = SwtGdip::TextRenderingHintSystemDefault
       when SWT::OFF
-        text_mode = Gdip::TextRenderingHintSingleBitPerPixelGridFit
+        text_mode = SwtGdip::TextRenderingHintSingleBitPerPixelGridFit
       when SWT::ON
         type = Array.typed(::Java::Int).new(1) { 0 }
         OS._system_parameters_info(OS::SPI_GETFONTSMOOTHINGTYPE, 0, type, 0)
         if ((type[0]).equal?(OS::FE_FONTSMOOTHINGCLEARTYPE))
-          text_mode = Gdip::TextRenderingHintClearTypeGridFit
+          text_mode = SwtGdip::TextRenderingHintClearTypeGridFit
         else
-          text_mode = Gdip::TextRenderingHintAntiAliasGridFit
+          text_mode = SwtGdip::TextRenderingHintAntiAliasGridFit
         end
       else
         SWT.error(SWT::ERROR_INVALID_ARGUMENT)
       end
       init_gdip
-      Gdip._graphics_set_text_rendering_hint(@data.attr_gdip_graphics, text_mode)
+      SwtGdip._graphics_set_text_rendering_hint(@data.attr_gdip_graphics, text_mode)
     end
     
     typesig { [Transform] }
@@ -5392,10 +5392,10 @@ module Org::Eclipse::Swt::Graphics
       # long
       identity_ = identity
       if (!(transform).nil?)
-        Gdip._matrix_multiply(identity_, transform.attr_handle, Gdip::MatrixOrderPrepend)
+        SwtGdip._matrix_multiply(identity_, transform.attr_handle, SwtGdip::MatrixOrderPrepend)
       end
-      Gdip._graphics_set_transform(@data.attr_gdip_graphics, identity_)
-      Gdip._matrix_delete(identity_)
+      SwtGdip._graphics_set_transform(@data.attr_gdip_graphics, identity_)
+      SwtGdip._matrix_delete(identity_)
       @data.attr_state &= ~DRAW_OFFSET
     end
     
@@ -5449,7 +5449,7 @@ module Org::Eclipse::Swt::Graphics
         lp_glyphs = result.attr_lp_glyphs = OS._heap_alloc(h_heap, OS::HEAP_ZERO_MEMORY, n_glyphs * 2)
         dw_flags = OS::GCP_GLYPHSHAPE | OS::GCP_REORDER | OS::GCP_LIGATE
         # long
-        hdc = Gdip._graphics_get_hdc(gdip_graphics)
+        hdc = SwtGdip._graphics_get_hdc(gdip_graphics)
         # long
         h_font = @data.attr_h_gdifont
         if ((h_font).equal?(0) && !(@data.attr_font).nil?)
@@ -5470,7 +5470,7 @@ module Org::Eclipse::Swt::Graphics
         if (!(h_font).equal?(0))
           OS._select_object(hdc, old_font)
         end
-        Gdip._graphics_release_hdc(gdip_graphics, hdc)
+        SwtGdip._graphics_release_hdc(gdip_graphics, hdc)
         draw_x = 0
         dx = Array.typed(::Java::Int).new(result.attr_n_glyphs) { 0 }
         OS._move_memory(dx, lp_dx, result.attr_n_glyphs * 4)
@@ -5483,7 +5483,7 @@ module Org::Eclipse::Swt::Graphics
           i += 1
           j += 2
         end
-        Gdip._graphics_measure_driver_string(gdip_graphics, lp_glyphs, result.attr_n_glyphs, @data.attr_gdip_font, points, 0, 0, bounds)
+        SwtGdip._graphics_measure_driver_string(gdip_graphics, lp_glyphs, result.attr_n_glyphs, @data.attr_gdip_font, points, 0, 0, bounds)
         OS._heap_free(h_heap, 0, lp_glyphs)
         OS._heap_free(h_heap, 0, lp_dx)
         return Point.new((length_).equal?(0) ? 0 : Math.round(bounds.attr_width), Math.round(bounds.attr_height))
@@ -5574,17 +5574,17 @@ module Org::Eclipse::Swt::Graphics
           buffer = Array.typed(::Java::Char).new([Character.new(?\s.ord)])
         end
         # long
-        format = Gdip._string_format_clone(Gdip._string_format_generic_typographic)
-        format_flags = Gdip._string_format_get_format_flags(format) | Gdip::StringFormatFlagsMeasureTrailingSpaces
+        format = SwtGdip._string_format_clone(SwtGdip._string_format_generic_typographic)
+        format_flags = SwtGdip._string_format_get_format_flags(format) | SwtGdip::StringFormatFlagsMeasureTrailingSpaces
         if (!((@data.attr_style & SWT::MIRRORED)).equal?(0))
-          format_flags |= Gdip::StringFormatFlagsDirectionRightToLeft
+          format_flags |= SwtGdip::StringFormatFlagsDirectionRightToLeft
         end
-        Gdip._string_format_set_format_flags(format, format_flags)
+        SwtGdip._string_format_set_format_flags(format, format_flags)
         tabs = !((flags & SWT::DRAW_TAB)).equal?(0) ? Array.typed(::Java::Float).new([measure_space(@data.attr_gdip_font, format) * 8]) : Array.typed(::Java::Float).new(1) { 0.0 }
-        Gdip._string_format_set_tab_stops(format, 0, tabs.attr_length, tabs)
-        Gdip._string_format_set_hotkey_prefix(format, !((flags & SWT::DRAW_MNEMONIC)).equal?(0) ? Gdip::HotkeyPrefixShow : Gdip::HotkeyPrefixNone)
-        Gdip._graphics_measure_string(@data.attr_gdip_graphics, buffer, buffer.attr_length, @data.attr_gdip_font, pt, format, bounds)
-        Gdip._string_format_delete(format)
+        SwtGdip._string_format_set_tab_stops(format, 0, tabs.attr_length, tabs)
+        SwtGdip._string_format_set_hotkey_prefix(format, !((flags & SWT::DRAW_MNEMONIC)).equal?(0) ? SwtGdip::HotkeyPrefixShow : SwtGdip::HotkeyPrefixNone)
+        SwtGdip._graphics_measure_string(@data.attr_gdip_graphics, buffer, buffer.attr_length, @data.attr_gdip_font, pt, format, bounds)
+        SwtGdip._string_format_delete(format)
         return Point.new((length_).equal?(0) ? 0 : Math.round(bounds.attr_width), Math.round(bounds.attr_height))
       end
       if ((string.length).equal?(0))

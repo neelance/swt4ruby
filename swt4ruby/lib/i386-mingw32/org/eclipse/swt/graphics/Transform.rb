@@ -138,7 +138,7 @@ module Org::Eclipse::Swt::Graphics
       @handle = 0
       super(device)
       self.attr_device.check_gdip
-      @handle = Gdip._matrix_new(m11, m12, m21, m22, dx, dy)
+      @handle = SwtGdip._matrix_new(m11, m12, m21, m22, dx, dy)
       if ((@handle).equal?(0))
         SWT.error(SWT::ERROR_NO_HANDLES)
       end
@@ -160,7 +160,7 @@ module Org::Eclipse::Swt::Graphics
     
     typesig { [] }
     def destroy
-      Gdip._matrix_delete(@handle)
+      SwtGdip._matrix_delete(@handle)
       @handle = 0
     end
     
@@ -187,7 +187,7 @@ module Org::Eclipse::Swt::Graphics
       if (elements.attr_length < 6)
         SWT.error(SWT::ERROR_INVALID_ARGUMENT)
       end
-      Gdip._matrix_get_elements(@handle, elements)
+      SwtGdip._matrix_get_elements(@handle, elements)
     end
     
     typesig { [] }
@@ -203,7 +203,7 @@ module Org::Eclipse::Swt::Graphics
       if (is_disposed)
         SWT.error(SWT::ERROR_GRAPHIC_DISPOSED)
       end
-      Gdip._matrix_set_elements(@handle, 1, 0, 0, 1, 0, 0)
+      SwtGdip._matrix_set_elements(@handle, 1, 0, 0, 1, 0, 0)
     end
     
     typesig { [] }
@@ -218,7 +218,7 @@ module Org::Eclipse::Swt::Graphics
       if (is_disposed)
         SWT.error(SWT::ERROR_GRAPHIC_DISPOSED)
       end
-      if (!(Gdip._matrix_invert(@handle)).equal?(0))
+      if (!(SwtGdip._matrix_invert(@handle)).equal?(0))
         SWT.error(SWT::ERROR_CANNOT_INVERT_MATRIX)
       end
     end
@@ -245,7 +245,7 @@ module Org::Eclipse::Swt::Graphics
       if (is_disposed)
         SWT.error(SWT::ERROR_GRAPHIC_DISPOSED)
       end
-      return Gdip._matrix_is_identity(@handle)
+      return SwtGdip._matrix_is_identity(@handle)
     end
     
     typesig { [Transform] }
@@ -272,7 +272,7 @@ module Org::Eclipse::Swt::Graphics
       if (matrix.is_disposed)
         SWT.error(SWT::ERROR_INVALID_ARGUMENT)
       end
-      Gdip._matrix_multiply(@handle, matrix.attr_handle, Gdip::MatrixOrderPrepend)
+      SwtGdip._matrix_multiply(@handle, matrix.attr_handle, SwtGdip::MatrixOrderPrepend)
     end
     
     typesig { [::Java::Float] }
@@ -291,7 +291,7 @@ module Org::Eclipse::Swt::Graphics
       if (is_disposed)
         SWT.error(SWT::ERROR_GRAPHIC_DISPOSED)
       end
-      Gdip._matrix_rotate(@handle, angle, Gdip::MatrixOrderPrepend)
+      SwtGdip._matrix_rotate(@handle, angle, SwtGdip::MatrixOrderPrepend)
     end
     
     typesig { [::Java::Float, ::Java::Float] }
@@ -308,7 +308,7 @@ module Org::Eclipse::Swt::Graphics
       if (is_disposed)
         SWT.error(SWT::ERROR_GRAPHIC_DISPOSED)
       end
-      Gdip._matrix_scale(@handle, scale_x, scale_y, Gdip::MatrixOrderPrepend)
+      SwtGdip._matrix_scale(@handle, scale_x, scale_y, SwtGdip::MatrixOrderPrepend)
     end
     
     typesig { [::Java::Float, ::Java::Float, ::Java::Float, ::Java::Float, ::Java::Float, ::Java::Float] }
@@ -329,7 +329,7 @@ module Org::Eclipse::Swt::Graphics
       if (is_disposed)
         SWT.error(SWT::ERROR_GRAPHIC_DISPOSED)
       end
-      Gdip._matrix_set_elements(@handle, m11, m12, m21, m22, dx, dy)
+      SwtGdip._matrix_set_elements(@handle, m11, m12, m21, m22, dx, dy)
     end
     
     typesig { [::Java::Float, ::Java::Float] }
@@ -348,7 +348,7 @@ module Org::Eclipse::Swt::Graphics
       if (is_disposed)
         SWT.error(SWT::ERROR_GRAPHIC_DISPOSED)
       end
-      Gdip._matrix_shear(@handle, shear_x, shear_y, Gdip::MatrixOrderPrepend)
+      SwtGdip._matrix_shear(@handle, shear_x, shear_y, SwtGdip::MatrixOrderPrepend)
     end
     
     typesig { [Array.typed(::Java::Float)] }
@@ -371,7 +371,7 @@ module Org::Eclipse::Swt::Graphics
       if ((point_array).nil?)
         SWT.error(SWT::ERROR_NULL_ARGUMENT)
       end
-      Gdip._matrix_transform_points(@handle, point_array, point_array.attr_length / 2)
+      SwtGdip._matrix_transform_points(@handle, point_array, point_array.attr_length / 2)
     end
     
     typesig { [::Java::Float, ::Java::Float] }
@@ -388,7 +388,7 @@ module Org::Eclipse::Swt::Graphics
       if (is_disposed)
         SWT.error(SWT::ERROR_GRAPHIC_DISPOSED)
       end
-      Gdip._matrix_translate(@handle, offset_x, offset_y, Gdip::MatrixOrderPrepend)
+      SwtGdip._matrix_translate(@handle, offset_x, offset_y, SwtGdip::MatrixOrderPrepend)
     end
     
     typesig { [] }

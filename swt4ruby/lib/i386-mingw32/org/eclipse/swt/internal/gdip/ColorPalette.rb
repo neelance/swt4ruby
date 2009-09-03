@@ -38,7 +38,7 @@ module Org::Eclipse::Swt::Internal::Gdip
     undef_method :entries=
     
     class_module.module_eval {
-      const_set_lazy(:Sizeof) { Gdip._color_palette_sizeof }
+      const_set_lazy(:Sizeof) { SwtGdip._color_palette_sizeof }
       const_attr_reader  :Sizeof
     }
     

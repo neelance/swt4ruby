@@ -18,7 +18,7 @@ module Org::Eclipse::Swt::Internal::Gdip
   end
   
   # @jniclass flags=cpp
-  class Gdip < GdipImports.const_get :Platform
+  class SwtGdip < GdipImports.const_get :Platform
     include_class_members GdipImports
     
     class_module.module_eval {

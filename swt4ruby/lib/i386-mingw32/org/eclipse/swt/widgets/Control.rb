@@ -2297,31 +2297,31 @@ module Org::Eclipse::Swt::Widgets
         if (!(gdip_graphics).equal?(0))
           # long
           clip_rgn = 0
-          Gdip._graphics_set_pixel_offset_mode(gdip_graphics, Gdip::PixelOffsetModeNone)
+          SwtGdip._graphics_set_pixel_offset_mode(gdip_graphics, SwtGdip::PixelOffsetModeNone)
           # long
-          rgn = Gdip._region_new
+          rgn = SwtGdip._region_new
           if ((rgn).equal?(0))
             SWT.error(SWT::ERROR_NO_HANDLES)
           end
-          Gdip._graphics_get_clip(gdip_graphics, rgn)
-          if (!Gdip._region_is_infinite(rgn, gdip_graphics))
-            clip_rgn = Gdip._region_get_hrgn(rgn, gdip_graphics)
+          SwtGdip._graphics_get_clip(gdip_graphics, rgn)
+          if (!SwtGdip._region_is_infinite(rgn, gdip_graphics))
+            clip_rgn = SwtGdip._region_get_hrgn(rgn, gdip_graphics)
           end
-          Gdip._region_delete(rgn)
-          Gdip._graphics_set_pixel_offset_mode(gdip_graphics, Gdip::PixelOffsetModeHalf)
+          SwtGdip._region_delete(rgn)
+          SwtGdip._graphics_set_pixel_offset_mode(gdip_graphics, SwtGdip::PixelOffsetModeHalf)
           lp_xform = nil
           # long
-          matrix = Gdip._matrix_new(1, 0, 0, 1, 0, 0)
+          matrix = SwtGdip._matrix_new(1, 0, 0, 1, 0, 0)
           if ((matrix).equal?(0))
             SWT.error(SWT::ERROR_NO_HANDLES)
           end
-          Gdip._graphics_get_transform(gdip_graphics, matrix)
-          if (!Gdip._matrix_is_identity(matrix))
+          SwtGdip._graphics_get_transform(gdip_graphics, matrix)
+          if (!SwtGdip._matrix_is_identity(matrix))
             lp_xform = Array.typed(::Java::Float).new(6) { 0.0 }
-            Gdip._matrix_get_elements(matrix, lp_xform)
+            SwtGdip._matrix_get_elements(matrix, lp_xform)
           end
-          Gdip._matrix_delete(matrix)
-          hdc = Gdip._graphics_get_hdc(gdip_graphics)
+          SwtGdip._matrix_delete(matrix)
+          hdc = SwtGdip._graphics_get_hdc(gdip_graphics)
           state = OS._save_dc(hdc)
           if (!(lp_xform).nil?)
             OS._set_graphics_mode(hdc, OS::GM_ADVANCED)
@@ -2341,7 +2341,7 @@ module Org::Eclipse::Swt::Widgets
         print_widget(top_handle_, hdc, gc)
         if (!(gdip_graphics).equal?(0))
           OS._restore_dc(hdc, state)
-          Gdip._graphics_release_hdc(gdip_graphics, hdc)
+          SwtGdip._graphics_release_hdc(gdip_graphics, hdc)
         end
         return true
       end

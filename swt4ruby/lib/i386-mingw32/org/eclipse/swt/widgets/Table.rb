@@ -6362,7 +6362,7 @@ module Org::Eclipse::Swt::Widgets
         end
         return call_window_proc(hwnd, msg, w_param, l_param)
       end
-      if ((msg).equal?(Display::DI_GETDRAGIMAGE))
+      if ((msg).equal?(Display.attr_di_getdragimage))
         # Bug in Windows.  On Vista, for some reason, DI_GETDRAGIMAGE
         # returns an image that does not contain strings.
         # 

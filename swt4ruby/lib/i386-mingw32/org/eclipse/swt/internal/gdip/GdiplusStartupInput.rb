@@ -49,7 +49,7 @@ module Org::Eclipse::Swt::Internal::Gdip
     undef_method :suppress_external_codecs=
     
     class_module.module_eval {
-      const_set_lazy(:Sizeof) { Gdip._gdiplus_startup_input_sizeof }
+      const_set_lazy(:Sizeof) { SwtGdip._gdiplus_startup_input_sizeof }
       const_attr_reader  :Sizeof
     }
     

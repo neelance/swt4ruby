@@ -93,10 +93,10 @@ module Org::Eclipse::Swt::Graphics
       gdip_image = image.create_gdip_image
       # long
       img = gdip_image[0]
-      width = Gdip._image_get_width(img)
-      height = Gdip._image_get_height(img)
-      @handle = Gdip._texture_brush_new(img, Gdip::WrapModeTile, 0, 0, width, height)
-      Gdip._bitmap_delete(img)
+      width = SwtGdip._image_get_width(img)
+      height = SwtGdip._image_get_height(img)
+      @handle = SwtGdip._texture_brush_new(img, SwtGdip::WrapModeTile, 0, 0, width, height)
+      SwtGdip._bitmap_delete(img)
       if (!(gdip_image[1]).equal?(0))
         # long
         h_heap = OS._get_process_heap
@@ -197,9 +197,9 @@ module Org::Eclipse::Swt::Graphics
       color_ref1 = color1.attr_handle
       rgb = ((color_ref1 >> 16) & 0xff) | (color_ref1 & 0xff00) | ((color_ref1 & 0xff) << 16)
       # long
-      fore_color = Gdip._color_new((alpha1 & 0xff) << 24 | rgb)
+      fore_color = SwtGdip._color_new((alpha1 & 0xff) << 24 | rgb)
       if ((x1).equal?(x2) && (y1).equal?(y2))
-        @handle = Gdip._solid_brush_new(fore_color)
+        @handle = SwtGdip._solid_brush_new(fore_color)
         if ((@handle).equal?(0))
           SWT.error(SWT::ERROR_NO_HANDLES)
         end
@@ -207,14 +207,14 @@ module Org::Eclipse::Swt::Graphics
         color_ref2 = color2.attr_handle
         rgb = ((color_ref2 >> 16) & 0xff) | (color_ref2 & 0xff00) | ((color_ref2 & 0xff) << 16)
         # long
-        back_color = Gdip._color_new((alpha2 & 0xff) << 24 | rgb)
+        back_color = SwtGdip._color_new((alpha2 & 0xff) << 24 | rgb)
         p1 = PointF.new
         p1.attr_x = x1
         p1.attr_y = y1
         p2 = PointF.new
         p2.attr_x = x2
         p2.attr_y = y2
-        @handle = Gdip._linear_gradient_brush_new(p1, p2, fore_color, back_color)
+        @handle = SwtGdip._linear_gradient_brush_new(p1, p2, fore_color, back_color)
         if ((@handle).equal?(0))
           SWT.error(SWT::ERROR_NO_HANDLES)
         end
@@ -224,29 +224,29 @@ module Org::Eclipse::Swt::Graphics
           g = RJava.cast_to_int((((color_ref1 & 0xff00) >> 8) * 0.5 + ((color_ref2 & 0xff00) >> 8) * 0.5))
           b = RJava.cast_to_int((((color_ref1 & 0xff0000) >> 16) * 0.5 + ((color_ref2 & 0xff0000) >> 16) * 0.5))
           # long
-          mid_color = Gdip._color_new(a << 24 | r << 16 | g << 8 | b)
+          mid_color = SwtGdip._color_new(a << 24 | r << 16 | g << 8 | b)
           # long
-          Gdip._linear_gradient_brush_set_interpolation_colors(@handle, Array.typed(::Java::Int).new([fore_color, mid_color, back_color]), Array.typed(::Java::Float).new([0, 0.5, 1]), 3)
-          Gdip._color_delete(mid_color)
+          SwtGdip._linear_gradient_brush_set_interpolation_colors(@handle, Array.typed(::Java::Int).new([fore_color, mid_color, back_color]), Array.typed(::Java::Float).new([0, 0.5, 1]), 3)
+          SwtGdip._color_delete(mid_color)
         end
-        Gdip._color_delete(back_color)
+        SwtGdip._color_delete(back_color)
       end
-      Gdip._color_delete(fore_color)
+      SwtGdip._color_delete(fore_color)
       init
     end
     
     typesig { [] }
     def destroy
-      type = Gdip._brush_get_type(@handle)
+      type = SwtGdip._brush_get_type(@handle)
       case (type)
-      when Gdip::BrushTypeSolidColor
-        Gdip._solid_brush_delete(@handle)
-      when Gdip::BrushTypeHatchFill
-        Gdip._hatch_brush_delete(@handle)
-      when Gdip::BrushTypeLinearGradient
-        Gdip._linear_gradient_brush_delete(@handle)
-      when Gdip::BrushTypeTextureFill
-        Gdip._texture_brush_delete(@handle)
+      when SwtGdip::BrushTypeSolidColor
+        SwtGdip._solid_brush_delete(@handle)
+      when SwtGdip::BrushTypeHatchFill
+        SwtGdip._hatch_brush_delete(@handle)
+      when SwtGdip::BrushTypeLinearGradient
+        SwtGdip._linear_gradient_brush_delete(@handle)
+      when SwtGdip::BrushTypeTextureFill
+        SwtGdip._texture_brush_delete(@handle)
       end
       @handle = 0
     end

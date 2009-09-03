@@ -340,10 +340,10 @@ module Org::Eclipse::Swt::Graphics
         token = Array.typed(::Java::Int).new(1) { 0 }
         input = GdiplusStartupInput.new
         input.attr_gdiplus_version = 1
-        if ((Gdip._gdiplus_startup(token, input, 0)).equal?(0))
+        if ((SwtGdip._gdiplus_startup(token, input, 0)).equal?(0))
           @gdip_token = token
           if (!(@loaded_fonts).nil?)
-            @font_collection = Gdip._private_font_collection_new
+            @font_collection = SwtGdip._private_font_collection_new
             if ((@font_collection).equal?(0))
               SWT.error(SWT::ERROR_NO_HANDLES)
             end
@@ -356,7 +356,7 @@ module Org::Eclipse::Swt::Graphics
               length_ = path.length
               buffer = CharArray.new(length_ + 1)
               path.get_chars(0, length_, buffer, 0)
-              Gdip._private_font_collection_add_font_file(@font_collection, buffer)
+              SwtGdip._private_font_collection_add_font_file(@font_collection, buffer)
               i += 1
             end
             @loaded_fonts = nil
@@ -1039,7 +1039,7 @@ module Org::Eclipse::Swt::Graphics
         if (loaded)
           if (!(@gdip_token).nil?)
             if ((@font_collection).equal?(0))
-              @font_collection = Gdip._private_font_collection_new
+              @font_collection = SwtGdip._private_font_collection_new
               if ((@font_collection).equal?(0))
                 SWT.error(SWT::ERROR_NO_HANDLES)
               end
@@ -1047,7 +1047,7 @@ module Org::Eclipse::Swt::Graphics
             length_ = path.length
             buffer = CharArray.new(length_ + 1)
             path.get_chars(0, length_, buffer, 0)
-            Gdip._private_font_collection_add_font_file(@font_collection, buffer)
+            SwtGdip._private_font_collection_add_font_file(@font_collection, buffer)
           else
             add_font(path)
           end
@@ -1212,10 +1212,10 @@ module Org::Eclipse::Swt::Graphics
     def release
       if (!(@gdip_token).nil?)
         if (!(@font_collection).equal?(0))
-          Gdip._private_font_collection_delete(@font_collection)
+          SwtGdip._private_font_collection_delete(@font_collection)
         end
         @font_collection = 0
-        Gdip._gdiplus_shutdown(@gdip_token[0])
+        SwtGdip._gdiplus_shutdown(@gdip_token[0])
       end
       @gdip_token = nil
       @scripts = nil

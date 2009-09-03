@@ -775,30 +775,30 @@ module Org::Eclipse::Swt::Graphics
         chars = CharArray.new(length_ + 1)
         filename.get_chars(0, length_, chars, 0)
         # long
-        bitmap = Gdip._bitmap_new(chars, false)
+        bitmap = SwtGdip._bitmap_new(chars, false)
         if (!(bitmap).equal?(0))
           error_ = SWT::ERROR_NO_HANDLES
-          status = Gdip._image_get_last_status(bitmap)
+          status = SwtGdip._image_get_last_status(bitmap)
           if ((status).equal?(0))
             if (filename.to_lower_case.ends_with(".ico"))
               @type = SWT::ICON
               # long
               # long
               hicon = Array.typed(::Java::Int).new(1) { 0 }
-              status = Gdip._bitmap_get_hicon(bitmap, hicon)
+              status = SwtGdip._bitmap_get_hicon(bitmap, hicon)
               @handle = hicon[0]
             else
               @type = SWT::BITMAP
-              width = Gdip._image_get_width(bitmap)
-              height = Gdip._image_get_height(bitmap)
-              pixel_format = Gdip._image_get_pixel_format(bitmap)
+              width = SwtGdip._image_get_width(bitmap)
+              height = SwtGdip._image_get_height(bitmap)
+              pixel_format = SwtGdip._image_get_pixel_format(bitmap)
               case (pixel_format)
               # These will loose either precision or transparency
-              when Gdip::PixelFormat16bppRGB555, Gdip::PixelFormat16bppRGB565
+              when SwtGdip::PixelFormat16bppRGB555, SwtGdip::PixelFormat16bppRGB565
                 @handle = create_dib(width, height, 16)
-              when Gdip::PixelFormat24bppRGB
+              when SwtGdip::PixelFormat24bppRGB
                 @handle = create_dib(width, height, 24)
-              when Gdip::PixelFormat32bppRGB, Gdip::PixelFormat16bppGrayScale, Gdip::PixelFormat48bppRGB, Gdip::PixelFormat32bppPARGB, Gdip::PixelFormat64bppARGB, Gdip::PixelFormat64bppPARGB
+              when SwtGdip::PixelFormat32bppRGB, SwtGdip::PixelFormat16bppGrayScale, SwtGdip::PixelFormat48bppRGB, SwtGdip::PixelFormat32bppPARGB, SwtGdip::PixelFormat64bppARGB, SwtGdip::PixelFormat64bppPARGB
                 @handle = create_dib(width, height, 32)
               end
               if (!(@handle).equal?(0))
@@ -812,30 +812,30 @@ module Org::Eclipse::Swt::Graphics
                 # long
                 old_src_bitmap = OS._select_object(src_hdc, @handle)
                 # long
-                graphics = Gdip._graphics_new(src_hdc)
+                graphics = SwtGdip._graphics_new(src_hdc)
                 if (!(graphics).equal?(0))
                   rect = Rect.new
                   rect.attr_width = width
                   rect.attr_height = height
-                  status = Gdip._graphics_draw_image(graphics, bitmap, rect, 0, 0, width, height, Gdip::UnitPixel, 0, 0, 0)
+                  status = SwtGdip._graphics_draw_image(graphics, bitmap, rect, 0, 0, width, height, SwtGdip::UnitPixel, 0, 0, 0)
                   if (!(status).equal?(0))
                     error_ = SWT::ERROR_INVALID_IMAGE
                     OS._delete_object(@handle)
                     @handle = 0
                   end
-                  Gdip._graphics_delete(graphics)
+                  SwtGdip._graphics_delete(graphics)
                 end
                 OS._select_object(src_hdc, old_src_bitmap)
                 OS._delete_dc(src_hdc)
                 self.attr_device.internal_dispose__gc(h_dc, nil)
               else
                 # long
-                locked_bitmap_data = Gdip._bitmap_data_new
+                locked_bitmap_data = SwtGdip._bitmap_data_new
                 if (!(locked_bitmap_data).equal?(0))
-                  status = Gdip._bitmap_lock_bits(bitmap, 0, 0, pixel_format, locked_bitmap_data)
+                  status = SwtGdip._bitmap_lock_bits(bitmap, 0, 0, pixel_format, locked_bitmap_data)
                   if ((status).equal?(0))
                     bitmap_data = BitmapData.new
-                    Gdip._move_memory(bitmap_data, locked_bitmap_data)
+                    SwtGdip._move_memory(bitmap_data, locked_bitmap_data)
                     stride = bitmap_data.attr_stride
                     # long
                     pixels = bitmap_data.attr_scan0
@@ -843,24 +843,24 @@ module Org::Eclipse::Swt::Graphics
                     scanline_pad = 4
                     transparent_pixel = -1
                     case (bitmap_data.attr_pixel_format)
-                    when Gdip::PixelFormat1bppIndexed
+                    when SwtGdip::PixelFormat1bppIndexed
                       depth = 1
-                    when Gdip::PixelFormat4bppIndexed
+                    when SwtGdip::PixelFormat4bppIndexed
                       depth = 4
-                    when Gdip::PixelFormat8bppIndexed
+                    when SwtGdip::PixelFormat8bppIndexed
                       depth = 8
-                    when Gdip::PixelFormat16bppARGB1555, Gdip::PixelFormat16bppRGB555, Gdip::PixelFormat16bppRGB565
+                    when SwtGdip::PixelFormat16bppARGB1555, SwtGdip::PixelFormat16bppRGB555, SwtGdip::PixelFormat16bppRGB565
                       depth = 16
-                    when Gdip::PixelFormat24bppRGB
+                    when SwtGdip::PixelFormat24bppRGB
                       depth = 24
-                    when Gdip::PixelFormat32bppRGB, Gdip::PixelFormat32bppARGB
+                    when SwtGdip::PixelFormat32bppRGB, SwtGdip::PixelFormat32bppARGB
                       depth = 32
                     end
                     if (!(depth).equal?(0))
                       palette_data = nil
                       case (bitmap_data.attr_pixel_format)
-                      when Gdip::PixelFormat1bppIndexed, Gdip::PixelFormat4bppIndexed, Gdip::PixelFormat8bppIndexed
-                        palette_size = Gdip._image_get_palette_size(bitmap)
+                      when SwtGdip::PixelFormat1bppIndexed, SwtGdip::PixelFormat4bppIndexed, SwtGdip::PixelFormat8bppIndexed
+                        palette_size = SwtGdip._image_get_palette_size(bitmap)
                         # long
                         h_heap = OS._get_process_heap
                         # long
@@ -868,9 +868,9 @@ module Org::Eclipse::Swt::Graphics
                         if ((palette).equal?(0))
                           SWT.error(SWT::ERROR_NO_HANDLES)
                         end
-                        Gdip._image_get_palette(bitmap, palette, palette_size)
+                        SwtGdip._image_get_palette(bitmap, palette, palette_size)
                         color_palette = ColorPalette.new
-                        Gdip._move_memory(color_palette, palette, ColorPalette.attr_sizeof)
+                        SwtGdip._move_memory(color_palette, palette, ColorPalette.attr_sizeof)
                         entries = Array.typed(::Java::Int).new(color_palette.attr_count) { 0 }
                         OS._move_memory(entries, palette + 8, entries.attr_length * 4)
                         OS._heap_free(h_heap, 0, palette)
@@ -878,26 +878,26 @@ module Org::Eclipse::Swt::Graphics
                         palette_data = PaletteData.new(rgbs)
                         i = 0
                         while i < entries.attr_length
-                          if ((((entries[i] >> 24) & 0xff)).equal?(0) && !((color_palette.attr_flags & Gdip::PaletteFlagsHasAlpha)).equal?(0))
+                          if ((((entries[i] >> 24) & 0xff)).equal?(0) && !((color_palette.attr_flags & SwtGdip::PaletteFlagsHasAlpha)).equal?(0))
                             transparent_pixel = i
                           end
                           rgbs[i] = RGB.new(((entries[i] & 0xff0000) >> 16), ((entries[i] & 0xff00) >> 8), ((entries[i] & 0xff) >> 0))
                           i += 1
                         end
-                      when Gdip::PixelFormat16bppARGB1555, Gdip::PixelFormat16bppRGB555
+                      when SwtGdip::PixelFormat16bppARGB1555, SwtGdip::PixelFormat16bppRGB555
                         palette_data = PaletteData.new(0x7c00, 0x3e0, 0x1f)
-                      when Gdip::PixelFormat16bppRGB565
+                      when SwtGdip::PixelFormat16bppRGB565
                         palette_data = PaletteData.new(0xf800, 0x7e0, 0x1f)
-                      when Gdip::PixelFormat24bppRGB
+                      when SwtGdip::PixelFormat24bppRGB
                         palette_data = PaletteData.new(0xff, 0xff00, 0xff0000)
-                      when Gdip::PixelFormat32bppRGB, Gdip::PixelFormat32bppARGB
+                      when SwtGdip::PixelFormat32bppRGB, SwtGdip::PixelFormat32bppARGB
                         palette_data = PaletteData.new(0xff00, 0xff0000, -0x1000000)
                       end
                       data = Array.typed(::Java::Byte).new(stride * height) { 0 }
                       alpha_data = nil
                       OS._move_memory(data, pixels, data.attr_length)
                       case (bitmap_data.attr_pixel_format)
-                      when Gdip::PixelFormat16bppARGB1555
+                      when SwtGdip::PixelFormat16bppARGB1555
                         alpha_data = Array.typed(::Java::Byte).new(width * height) { 0 }
                         i = 1
                         j = 0
@@ -906,7 +906,7 @@ module Org::Eclipse::Swt::Graphics
                           i += 2
                           j += 1
                         end
-                      when Gdip::PixelFormat32bppARGB
+                      when SwtGdip::PixelFormat32bppARGB
                         alpha_data = Array.typed(::Java::Byte).new(width * height) { 0 }
                         i = 3
                         j = 0
@@ -921,16 +921,16 @@ module Org::Eclipse::Swt::Graphics
                       img.attr_alpha_data = alpha_data
                       init(img)
                     end
-                    Gdip._bitmap_unlock_bits(bitmap, locked_bitmap_data)
+                    SwtGdip._bitmap_unlock_bits(bitmap, locked_bitmap_data)
                   else
                     error_ = SWT::ERROR_INVALID_IMAGE
                   end
-                  Gdip._bitmap_data_delete(locked_bitmap_data)
+                  SwtGdip._bitmap_data_delete(locked_bitmap_data)
                 end
               end
             end
           end
-          Gdip._bitmap_delete(bitmap)
+          SwtGdip._bitmap_delete(bitmap)
           if ((status).equal?(0))
             if ((@handle).equal?(0))
               SWT.error(error_)
@@ -1195,10 +1195,10 @@ module Org::Eclipse::Swt::Graphics
           end
           OS._move_memory(pixels, src_data, size_in_bytes)
           # long
-          return Array.typed(::Java::Int).new([Gdip._bitmap_new(img_width, img_height, dib_bm.attr_bm_width_bytes, Gdip::PixelFormat32bppARGB, pixels), pixels])
+          return Array.typed(::Java::Int).new([SwtGdip._bitmap_new(img_width, img_height, dib_bm.attr_bm_width_bytes, SwtGdip::PixelFormat32bppARGB, pixels), pixels])
         end
         # long
-        return Array.typed(::Java::Int).new([Gdip._bitmap_new(@handle, 0), 0])
+        return Array.typed(::Java::Int).new([SwtGdip._bitmap_new(@handle, 0), 0])
       when SWT::ICON
         # Bug in GDI+. Creating a new GDI+ Bitmap from a HICON segment faults
         # when the icon width is bigger than the icon height.  The fix is to
@@ -1278,9 +1278,9 @@ module Org::Eclipse::Swt::Graphics
             SWT.error(SWT::ERROR_NO_HANDLES)
           end
           OS._move_memory(pixels, src_data, src_data.attr_length)
-          img = Gdip._bitmap_new(img_width, img_height, dib_bm.attr_bm_width_bytes, Gdip::PixelFormat32bppARGB, pixels)
+          img = SwtGdip._bitmap_new(img_width, img_height, dib_bm.attr_bm_width_bytes, SwtGdip::PixelFormat32bppARGB, pixels)
         else
-          img = Gdip._bitmap_new(@handle)
+          img = SwtGdip._bitmap_new(@handle)
         end
         if (!(icon_info.attr_hbm_color).equal?(0))
           OS._delete_object(icon_info.attr_hbm_color)

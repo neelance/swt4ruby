@@ -98,7 +98,7 @@ module Org::Eclipse::Swt::Graphics
       @current_point = PointF.new
       @start_point = PointF.new
       self.attr_device.check_gdip
-      @handle = Gdip._graphics_path_new(Gdip::FillModeAlternate)
+      @handle = SwtGdip._graphics_path_new(SwtGdip::FillModeAlternate)
       if ((@handle).equal?(0))
         SWT.error(SWT::ERROR_NO_HANDLES)
       end
@@ -149,9 +149,9 @@ module Org::Eclipse::Swt::Graphics
         SWT.error(SWT::ERROR_INVALID_ARGUMENT)
       end
       flatness = Math.max(0, flatness)
-      @handle = Gdip._graphics_path_clone(path.attr_handle)
+      @handle = SwtGdip._graphics_path_clone(path.attr_handle)
       if (!(flatness).equal?(0))
-        Gdip._graphics_path_flatten(@handle, 0, flatness)
+        SwtGdip._graphics_path_flatten(@handle, 0, flatness)
       end
       if ((@handle).equal?(0))
         SWT.error(SWT::ERROR_NO_HANDLES)
@@ -235,25 +235,25 @@ module Org::Eclipse::Swt::Graphics
         return
       end
       if ((width).equal?(height))
-        Gdip._graphics_path_add_arc(@handle, x, y, width, height, -start_angle, -arc_angle)
+        SwtGdip._graphics_path_add_arc(@handle, x, y, width, height, -start_angle, -arc_angle)
       else
         # long
-        path = Gdip._graphics_path_new(Gdip::FillModeAlternate)
+        path = SwtGdip._graphics_path_new(SwtGdip::FillModeAlternate)
         if ((path).equal?(0))
           SWT.error(SWT::ERROR_NO_HANDLES)
         end
         # long
-        matrix = Gdip._matrix_new(width, 0, 0, height, x, y)
+        matrix = SwtGdip._matrix_new(width, 0, 0, height, x, y)
         if ((matrix).equal?(0))
           SWT.error(SWT::ERROR_NO_HANDLES)
         end
-        Gdip._graphics_path_add_arc(path, 0, 0, 1, 1, -start_angle, -arc_angle)
-        Gdip._graphics_path_transform(path, matrix)
-        Gdip._graphics_path_add_path(@handle, path, true)
-        Gdip._matrix_delete(matrix)
-        Gdip._graphics_path_delete(path)
+        SwtGdip._graphics_path_add_arc(path, 0, 0, 1, 1, -start_angle, -arc_angle)
+        SwtGdip._graphics_path_transform(path, matrix)
+        SwtGdip._graphics_path_add_path(@handle, path, true)
+        SwtGdip._matrix_delete(matrix)
+        SwtGdip._graphics_path_delete(path)
       end
-      Gdip._graphics_path_get_last_point(@handle, @current_point)
+      SwtGdip._graphics_path_get_last_point(@handle, @current_point)
     end
     
     typesig { [Path] }
@@ -279,7 +279,7 @@ module Org::Eclipse::Swt::Graphics
         SWT.error(SWT::ERROR_INVALID_ARGUMENT)
       end
       # TODO - expose connect?
-      Gdip._graphics_path_add_path(@handle, path.attr_handle, false)
+      SwtGdip._graphics_path_add_path(@handle, path.attr_handle, false)
       @current_point.attr_x = path.attr_current_point.attr_x
       @current_point.attr_y = path.attr_current_point.attr_y
     end
@@ -304,7 +304,7 @@ module Org::Eclipse::Swt::Graphics
       rect.attr_y = y
       rect.attr_width = width
       rect.attr_height = height
-      Gdip._graphics_path_add_rectangle(@handle, rect)
+      SwtGdip._graphics_path_add_rectangle(@handle, rect)
       @current_point.attr_x = x
       @current_point.attr_y = y
     end
@@ -346,14 +346,14 @@ module Org::Eclipse::Swt::Graphics
       # long
       gdip_font = SwtGC.create_gdip_font(h_dc, font.attr_handle, 0, self.attr_device.attr_font_collection, family, nil)
       point = PointF.new
-      point.attr_x = x - (Gdip._font_get_size(gdip_font) / 6)
+      point.attr_x = x - (SwtGdip._font_get_size(gdip_font) / 6)
       point.attr_y = y
-      style = Gdip._font_get_style(gdip_font)
-      size = Gdip._font_get_size(gdip_font)
-      Gdip._graphics_path_add_string(@handle, buffer, length_, family[0], style, size, point, 0)
-      Gdip._graphics_path_get_last_point(@handle, @current_point)
-      Gdip._font_family_delete(family[0])
-      Gdip._font_delete(gdip_font)
+      style = SwtGdip._font_get_style(gdip_font)
+      size = SwtGdip._font_get_size(gdip_font)
+      SwtGdip._graphics_path_add_string(@handle, buffer, length_, family[0], style, size, point, 0)
+      SwtGdip._graphics_path_get_last_point(@handle, @current_point)
+      SwtGdip._font_family_delete(family[0])
+      SwtGdip._font_delete(gdip_font)
       self.attr_device.internal_dispose__gc(h_dc, nil)
     end
     
@@ -369,7 +369,7 @@ module Org::Eclipse::Swt::Graphics
       if (is_disposed)
         SWT.error(SWT::ERROR_GRAPHIC_DISPOSED)
       end
-      Gdip._graphics_path_close_figure(@handle)
+      SwtGdip._graphics_path_close_figure(@handle)
       # Feature in GDI+. CloseFigure() does affect the last
       # point, so GetLastPoint() does not return the starting
       # point of the subpath after calling CloseFigure().  The
@@ -414,12 +414,12 @@ module Org::Eclipse::Swt::Graphics
       # TODO - should use GC transformation
       gc.init_gdip
       gc.check_gc(SwtGC::LINE_CAP | SwtGC::LINE_JOIN | SwtGC::LINE_STYLE | SwtGC::LINE_WIDTH)
-      mode = (OS._get_poly_fill_mode(gc.attr_handle)).equal?(OS::WINDING) ? Gdip::FillModeWinding : Gdip::FillModeAlternate
-      Gdip._graphics_path_set_fill_mode(@handle, mode)
+      mode = (OS._get_poly_fill_mode(gc.attr_handle)).equal?(OS::WINDING) ? SwtGdip::FillModeWinding : SwtGdip::FillModeAlternate
+      SwtGdip._graphics_path_set_fill_mode(@handle, mode)
       if (outline)
-        return Gdip._graphics_path_is_outline_visible(@handle, x, y, gc.attr_data.attr_gdip_pen, gc.attr_data.attr_gdip_graphics)
+        return SwtGdip._graphics_path_is_outline_visible(@handle, x, y, gc.attr_data.attr_gdip_pen, gc.attr_data.attr_gdip_graphics)
       else
-        return Gdip._graphics_path_is_visible(@handle, x, y, gc.attr_data.attr_gdip_graphics)
+        return SwtGdip._graphics_path_is_visible(@handle, x, y, gc.attr_data.attr_gdip_graphics)
       end
     end
     
@@ -440,13 +440,13 @@ module Org::Eclipse::Swt::Graphics
       if (is_disposed)
         SWT.error(SWT::ERROR_GRAPHIC_DISPOSED)
       end
-      Gdip._graphics_path_add_bezier(@handle, @current_point.attr_x, @current_point.attr_y, cx1, cy1, cx2, cy2, x, y)
-      Gdip._graphics_path_get_last_point(@handle, @current_point)
+      SwtGdip._graphics_path_add_bezier(@handle, @current_point.attr_x, @current_point.attr_y, cx1, cy1, cx2, cy2, x, y)
+      SwtGdip._graphics_path_get_last_point(@handle, @current_point)
     end
     
     typesig { [] }
     def destroy
-      Gdip._graphics_path_delete(@handle)
+      SwtGdip._graphics_path_delete(@handle)
       @handle = 0
     end
     
@@ -475,7 +475,7 @@ module Org::Eclipse::Swt::Graphics
         SWT.error(SWT::ERROR_INVALID_ARGUMENT)
       end
       rect = RectF.new
-      Gdip._graphics_path_get_bounds(@handle, rect, 0, 0)
+      SwtGdip._graphics_path_get_bounds(@handle, rect, 0, 0)
       bounds[0] = rect.attr_x
       bounds[1] = rect.attr_y
       bounds[2] = rect.attr_width
@@ -523,29 +523,29 @@ module Org::Eclipse::Swt::Graphics
       if (is_disposed)
         SWT.error(SWT::ERROR_GRAPHIC_DISPOSED)
       end
-      count = Gdip._graphics_path_get_point_count(@handle)
+      count = SwtGdip._graphics_path_get_point_count(@handle)
       gdip_types = Array.typed(::Java::Byte).new(count) { 0 }
       points = Array.typed(::Java::Float).new(count * 2) { 0.0 }
-      Gdip._graphics_path_get_path_types(@handle, gdip_types, count)
-      Gdip._graphics_path_get_path_points(@handle, points, count)
+      SwtGdip._graphics_path_get_path_types(@handle, gdip_types, count)
+      SwtGdip._graphics_path_get_path_points(@handle, points, count)
       types = Array.typed(::Java::Byte).new(count * 2) { 0 }
       index = 0
       types_index = 0
       while (index < count)
         type = gdip_types[index]
         close = false
-        case (type & Gdip::PathPointTypePathTypeMask)
-        when Gdip::PathPointTypeStart
+        case (type & SwtGdip::PathPointTypePathTypeMask)
+        when SwtGdip::PathPointTypeStart
           types[((types_index += 1) - 1)] = SWT::PATH_MOVE_TO
-          close = !((type & Gdip::PathPointTypeCloseSubpath)).equal?(0)
+          close = !((type & SwtGdip::PathPointTypeCloseSubpath)).equal?(0)
           index += 1
-        when Gdip::PathPointTypeLine
+        when SwtGdip::PathPointTypeLine
           types[((types_index += 1) - 1)] = SWT::PATH_LINE_TO
-          close = !((type & Gdip::PathPointTypeCloseSubpath)).equal?(0)
+          close = !((type & SwtGdip::PathPointTypeCloseSubpath)).equal?(0)
           index += 1
-        when Gdip::PathPointTypeBezier
+        when SwtGdip::PathPointTypeBezier
           types[((types_index += 1) - 1)] = SWT::PATH_CUBIC_TO
-          close = !((gdip_types[index + 2] & Gdip::PathPointTypeCloseSubpath)).equal?(0)
+          close = !((gdip_types[index + 2] & SwtGdip::PathPointTypeCloseSubpath)).equal?(0)
           index += 3
         else
           index += 1
@@ -579,8 +579,8 @@ module Org::Eclipse::Swt::Graphics
       if (is_disposed)
         SWT.error(SWT::ERROR_GRAPHIC_DISPOSED)
       end
-      Gdip._graphics_path_add_line(@handle, @current_point.attr_x, @current_point.attr_y, x, y)
-      Gdip._graphics_path_get_last_point(@handle, @current_point)
+      SwtGdip._graphics_path_add_line(@handle, @current_point.attr_x, @current_point.attr_y, x, y)
+      SwtGdip._graphics_path_get_last_point(@handle, @current_point)
     end
     
     typesig { [PathData] }
@@ -637,7 +637,7 @@ module Org::Eclipse::Swt::Graphics
       if (is_disposed)
         SWT.error(SWT::ERROR_GRAPHIC_DISPOSED)
       end
-      Gdip._graphics_path_start_figure(@handle)
+      SwtGdip._graphics_path_start_figure(@handle)
       @current_point.attr_x = @start_point.attr_x = x
       @current_point.attr_y = @start_point.attr_y = y
     end
@@ -661,8 +661,8 @@ module Org::Eclipse::Swt::Graphics
       cy1 = @current_point.attr_y + 2 * (cy - @current_point.attr_y) / 3
       cx2 = cx1 + (x - @current_point.attr_x) / 3
       cy2 = cy1 + (y - @current_point.attr_y) / 3
-      Gdip._graphics_path_add_bezier(@handle, @current_point.attr_x, @current_point.attr_y, cx1, cy1, cx2, cy2, x, y)
-      Gdip._graphics_path_get_last_point(@handle, @current_point)
+      SwtGdip._graphics_path_add_bezier(@handle, @current_point.attr_x, @current_point.attr_y, cx1, cy1, cx2, cy2, x, y)
+      SwtGdip._graphics_path_get_last_point(@handle, @current_point)
     end
     
     typesig { [] }

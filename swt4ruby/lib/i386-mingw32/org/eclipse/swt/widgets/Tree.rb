@@ -6782,7 +6782,7 @@ module Org::Eclipse::Swt::Widgets
         end
         return call_window_proc(hwnd, msg, w_param, l_param)
       end
-      if ((msg).equal?(Display::DI_GETDRAGIMAGE))
+      if ((msg).equal?(Display.attr_di_getdragimage))
         # When there is more than one item selected, DI_GETDRAGIMAGE
         # returns the item under the cursor.  This happens because
         # the tree does not have implement multi-select.  The fix
