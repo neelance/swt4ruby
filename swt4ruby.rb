@@ -72,6 +72,10 @@ class Swt4Ruby
   end
 
   module NewGraphicsMethods
+    def new_font(*args, &block)
+      Org::Eclipse::Swt::Graphics::Font.new find_display, *args
+    end
+
     def new_image(*args, &block)
       Org::Eclipse::Swt::Graphics::Image.new find_display, *args
     end
