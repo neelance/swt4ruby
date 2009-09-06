@@ -28,12 +28,17 @@ class Swt4Ruby
   include Org::Eclipse::Swt::Widgets
   include Org::Eclipse::Swt::Layout
 
+  def self.replace_symbols(args)
+    args.map { |arg| arg.is_a?(Symbol) ? Org::Eclipse::Swt::SWT.const_get(arg.to_s.upcase) : arg }
+  end
+
   class Listener
-    def initialize(method_name, &block)
+    def initialize(method_name, *interfaces, &block)
       listener_class = (class << self; self; end)
       listener_class.class_eval do
-        define_method method_name do |e|
-          block.call e
+        interfaces.each { |interface| include interface }
+        define_method method_name do |*args|
+          block.call *args
         end
       end
     end
@@ -43,19 +48,24 @@ class Swt4Ruby
     end
   end
 
-  module SetterAliases
+  module AccessorAliases
     def self.extend_object(cls)
       cls.class_eval do
-        instance_methods(false).each do |method|
-          if method =~ /^set_(.*)$/
-            alias_method "#{$1}=", method
+        methods = instance_methods(false)
+        methods.each do |name|
+          new_name = if name =~ /^get_(.*)$/
+            "#{$1}".to_sym
+          elsif name =~ /^set_(.*)$/
+            "#{$1}=".to_sym
+          else
+            nil
           end
+          alias_method new_name, name unless new_name.nil? or methods.include?(new_name)
         end
 
         def self.inherited(subcls)
-          class_inherited subcls
           subcls.when_class_loaded {
-            subcls.extend SetterAliases
+            subcls.extend AccessorAliases
           }
         end
       end
@@ -64,7 +74,7 @@ class Swt4Ruby
 
   module CreateMethod
     def create(parent, styles, &block)
-      style_mask = styles.inject(0) { |v, style| v | (style.is_a?(Symbol) ? Org::Eclipse::Swt::SWT.const_get(style.to_s.upcase) : style) }
+      style_mask = Swt4Ruby.replace_symbols(styles).inject(0) { |v, style| v | style }
       widget = self.new(parent, style_mask)
       widget.instance_eval &block if block
       widget
@@ -72,6 +82,10 @@ class Swt4Ruby
   end
 
   module NewGraphicsMethods
+    def new_color(*args, &block)
+      Org::Eclipse::Swt::Graphics::Color.new find_display, *args
+    end
+
     def new_font(*args, &block)
       Org::Eclipse::Swt::Graphics::Font.new find_display, *args
     end
@@ -212,4 +226,8 @@ class Swt4Ruby
     display.instance_eval &block if block
     display
   end
+end
+
+Java::Util::EventObject.class_eval do
+  include Swt4Ruby::AccessorAliases
 end

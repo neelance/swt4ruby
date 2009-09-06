@@ -5,7 +5,9 @@ class Org::Eclipse::Swt::Widgets::Control
 
   def apply_grid_data(*flags)
     flag_mask = flags.inject(0) { |v, flag| v | (flag.is_a?(Symbol) ? Org::Eclipse::Swt::Layout::GridData.const_get(flag.to_s.upcase) : flag) }
-    set_layout_data Org::Eclipse::Swt::Layout::GridData.new(flag_mask)
+    data = Org::Eclipse::Swt::Layout::GridData.new(flag_mask)
+    yield data if block_given?
+    set_layout_data data
   end
 
   # Sent when the location (x, y) of a control changes relative to its parent (or relative to the display, for Shells).

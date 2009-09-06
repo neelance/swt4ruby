@@ -1,5 +1,5 @@
 class Org::Eclipse::Swt::Widgets::Widget
-  extend Swt4Ruby::SetterAliases
+  extend Swt4Ruby::AccessorAliases
   extend Swt4Ruby::CreateMethod
   include Swt4Ruby::NewGraphicsMethods
 
@@ -29,6 +29,10 @@ class Org::Eclipse::Swt::Widgets::Widget
 
   def new_shell(*styles, &block)
     Shell.create find_shell, styles, &block
+  end
+
+  def new_tool_tip(*styles, &block)
+    ToolTip.create find_shell, styles, &block
   end
 
   def new_tray_item(*styles, &block)
