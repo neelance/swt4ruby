@@ -3,25 +3,7 @@ require "jre4ruby"
 
 Java::Lang::System.set_property "swt.library.path", File.expand_path("swt4ruby/lib/#{RUBY_PLATFORM}", File.dirname(__FILE__))
 
-lib_path = "#{File.dirname(__FILE__)}/swt4ruby/lib/#{RUBY_PLATFORM}"
-fix_path = "#{File.dirname(__FILE__)}/swt4ruby/fix"
-
-add_class_loader { |package_path|
-  dirs, names = list_paths "#{lib_path}/#{package_path}"
-  
-  dirs.each do |dir|
-    import_package dir, package_path
-  end
-  
-  names.each do |name|
-    file_path = "#{package_path}/#{name}.rb"
-    if File.exist?("#{fix_path}/#{file_path}")
-      import_class name, "swt4ruby/lib/#{RUBY_PLATFORM}/#{file_path}", "swt4ruby/fix/#{file_path}"
-    else
-      import_class name, "swt4ruby/lib/#{RUBY_PLATFORM}/#{file_path}"
-    end
-  end
-}
+add_class_path "swt4ruby/lib/#{RUBY_PLATFORM}", "swt4ruby/fix"
 
 class Swt4Ruby
   include Org::Eclipse::Swt
@@ -36,7 +18,7 @@ class Swt4Ruby
     def initialize(method_name, *interfaces, &block)
       listener_class = (class << self; self; end)
       listener_class.class_eval do
-        interfaces.each { |interface| include interface }
+        #interfaces.each { |interface| include interface }
         define_method method_name do |*args|
           block.call *args
         end
