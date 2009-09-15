@@ -98,7 +98,7 @@ module Org::Eclipse::Swt::Dnd
       if ((p_value).equal?(0))
         return
       end
-      OS.memmove(p_value, chars, byte_count)
+      OS.memmove___org_eclipse_swt_dnd_htmltransfer_1(p_value, chars, byte_count)
       transfer_data.attr_length = byte_count
       transfer_data.attr_format = 8
       transfer_data.attr_p_value = p_value
@@ -124,7 +124,7 @@ module Org::Eclipse::Swt::Dnd
         return nil
       end
       chars = CharArray.new(size / 2)
-      OS.memmove(chars, transfer_data.attr_p_value, size)
+      OS.memmove___org_eclipse_swt_dnd_htmltransfer_3(chars, transfer_data.attr_p_value, size)
       string = String.new(chars)
       end_ = string.index_of(Character.new(?\0.ord))
       return ((end_).equal?(-1)) ? string : string.substring(0, end_)

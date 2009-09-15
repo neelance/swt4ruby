@@ -118,7 +118,7 @@ module Org::Eclipse::Swt::Browser
       picker = FilePicker_1_8.new
       picker._add_ref
       # long
-      XPCOM.memmove(result, Array.typed(::Java::Int).new([picker.get_address]), C::PTR_SIZEOF)
+      XPCOM.memmove___org_eclipse_swt_browser_file_picker_factory_1_8_1(result, Array.typed(::Java::Int).new([picker.get_address]), C::PTR_SIZEOF)
       return XPCOM::NS_OK
     end
     

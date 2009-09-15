@@ -894,13 +894,13 @@ module Org::Eclipse::Swt::Widgets
         end
       end
       if (!(x).equal?(0))
-        OS.memmove(x, Array.typed(::Java::Int).new([reqx]), 4)
+        OS.memmove___org_eclipse_swt_widgets_menu_1(x, Array.typed(::Java::Int).new([reqx]), 4)
       end
       if (!(y).equal?(0))
-        OS.memmove(y, Array.typed(::Java::Int).new([reqy]), 4)
+        OS.memmove___org_eclipse_swt_widgets_menu_3(y, Array.typed(::Java::Int).new([reqy]), 4)
       end
       if (!(push_in).equal?(0))
-        OS.memmove(push_in, Array.typed(::Java::Int).new([1]), 4)
+        OS.memmove___org_eclipse_swt_widgets_menu_5(push_in, Array.typed(::Java::Int).new([1]), 4)
       end
       return 0
     end

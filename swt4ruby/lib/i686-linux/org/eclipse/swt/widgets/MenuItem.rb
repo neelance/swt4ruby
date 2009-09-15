@@ -483,7 +483,7 @@ module Org::Eclipse::Swt::Widgets
       ptr = OS.gtk_get_current_event
       if (!(ptr).equal?(0))
         gdk_event = GdkEvent.new
-        OS.memmove(gdk_event, ptr, GdkEvent.attr_sizeof)
+        OS.memmove___org_eclipse_swt_widgets_menu_item_1(gdk_event, ptr, GdkEvent.attr_sizeof)
         case (gdk_event.attr_type)
         when OS::GDK_KEY_PRESS, OS::GDK_KEY_RELEASE, OS::GDK_BUTTON_PRESS, OS::GDK_2BUTTON_PRESS, OS::GDK_BUTTON_RELEASE
           state = Array.typed(::Java::Int).new(1) { 0 }
@@ -986,7 +986,7 @@ module Org::Eclipse::Swt::Widgets
       buffer = Converter.wcs_to_mbcs(nil, accel_string, true)
       # long
       ptr = OS.g_malloc(buffer.attr_length)
-      OS.memmove(ptr, buffer, buffer.attr_length)
+      OS.memmove___org_eclipse_swt_widgets_menu_item_3(ptr, buffer, buffer.attr_length)
       # long
       old_ptr = OS._gtk_accel_label_get_accel_string(label)
       OS._gtk_accel_label_set_accel_string(label, ptr)

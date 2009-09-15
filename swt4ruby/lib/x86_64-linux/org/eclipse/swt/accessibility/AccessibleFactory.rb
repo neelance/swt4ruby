@@ -152,31 +152,31 @@ module Org::Eclipse::Swt::Accessibility
         interface_info = GInterfaceInfo.new
         interface_info.attr_interface_init = InitActionIfaceCB.get_address
         const_set :ActionIfaceDefinition, OS.g_malloc(GInterfaceInfo.attr_sizeof)
-        OS.memmove(ActionIfaceDefinition, interface_info, GInterfaceInfo.attr_sizeof)
+        OS.memmove___org_eclipse_swt_accessibility_accessible_factory_1(ActionIfaceDefinition, interface_info, GInterfaceInfo.attr_sizeof)
         # Component interface
         const_set :InitComponentIfaceCB, new_callback(AccessibleFactory, "initComponentIfaceCB", 1) # $NON-NLS-1$
         interface_info = GInterfaceInfo.new
         interface_info.attr_interface_init = InitComponentIfaceCB.get_address
         const_set :ComponentIfaceDefinition, OS.g_malloc(GInterfaceInfo.attr_sizeof)
-        OS.memmove(ComponentIfaceDefinition, interface_info, GInterfaceInfo.attr_sizeof)
+        OS.memmove___org_eclipse_swt_accessibility_accessible_factory_3(ComponentIfaceDefinition, interface_info, GInterfaceInfo.attr_sizeof)
         # Hypertext interface
         const_set :InitHypertextIfaceCB, new_callback(AccessibleFactory, "initHypertextIfaceCB", 1) # $NON-NLS-1$
         interface_info = GInterfaceInfo.new
         interface_info.attr_interface_init = InitHypertextIfaceCB.get_address
         const_set :HypertextIfaceDefinition, OS.g_malloc(GInterfaceInfo.attr_sizeof)
-        OS.memmove(HypertextIfaceDefinition, interface_info, GInterfaceInfo.attr_sizeof)
+        OS.memmove___org_eclipse_swt_accessibility_accessible_factory_5(HypertextIfaceDefinition, interface_info, GInterfaceInfo.attr_sizeof)
         # Selection interface
         const_set :InitSelectionIfaceCB, new_callback(AccessibleFactory, "initSelectionIfaceCB", 1) # $NON-NLS-1$
         interface_info = GInterfaceInfo.new
         interface_info.attr_interface_init = InitSelectionIfaceCB.get_address
         const_set :SelectionIfaceDefinition, OS.g_malloc(GInterfaceInfo.attr_sizeof)
-        OS.memmove(SelectionIfaceDefinition, interface_info, GInterfaceInfo.attr_sizeof)
+        OS.memmove___org_eclipse_swt_accessibility_accessible_factory_7(SelectionIfaceDefinition, interface_info, GInterfaceInfo.attr_sizeof)
         # Text interface
         const_set :InitTextIfaceCB, new_callback(AccessibleFactory, "initTextIfaceCB", 1) # $NON-NLS-1$
         interface_info = GInterfaceInfo.new
         interface_info.attr_interface_init = InitTextIfaceCB.get_address
         const_set :TextIfaceDefinition, OS.g_malloc(GInterfaceInfo.attr_sizeof)
-        OS.memmove(TextIfaceDefinition, interface_info, GInterfaceInfo.attr_sizeof)
+        OS.memmove___org_eclipse_swt_accessibility_accessible_factory_9(TextIfaceDefinition, interface_info, GInterfaceInfo.attr_sizeof)
       end
       
       typesig { [Object, String, ::Java::Int] }
@@ -201,7 +201,7 @@ module Org::Eclipse::Swt::Accessibility
       @widget_type_name = OS.g_type_name(widget_type)
       widget_type_name_length = OS.strlen(@widget_type_name) + 1
       buffer = Array.typed(::Java::Byte).new(widget_type_name_length) { 0 }
-      OS.memmove(buffer, @widget_type_name, widget_type_name_length)
+      OS.memmove___org_eclipse_swt_accessibility_accessible_factory_11(buffer, @widget_type_name, widget_type_name_length)
       factory_name = Array.typed(::Java::Byte).new(FACTORY_TYPENAME.attr_length + widget_type_name_length - 1) { 0 }
       System.arraycopy(FACTORY_TYPENAME, 0, factory_name, 0, FACTORY_TYPENAME.attr_length)
       System.arraycopy(buffer, 0, factory_name, FACTORY_TYPENAME.attr_length - 1, widget_type_name_length)
@@ -229,7 +229,7 @@ module Org::Eclipse::Swt::Accessibility
         type_info.attr_instance_size = RJava.cast_to_short(ATK._atk_object_factory_sizeof)
         # int
         info = OS.g_malloc(GTypeInfo.attr_sizeof)
-        OS.memmove(info, type_info, GTypeInfo.attr_sizeof)
+        OS.memmove___org_eclipse_swt_accessibility_accessible_factory_13(info, type_info, GTypeInfo.attr_sizeof)
         # int
         swt_factory_type = OS.g_type_register_static(factory_parent_type, factory_name, info, 0)
         ATK.atk_registry_set_factory_type(registry, widget_type, swt_factory_type)
@@ -265,7 +265,7 @@ module Org::Eclipse::Swt::Accessibility
       end
       type_name_length = OS.strlen(@widget_type_name)
       buffer = Array.typed(::Java::Byte).new(type_name_length) { 0 }
-      OS.memmove(buffer, @widget_type_name, type_name_length)
+      OS.memmove___org_eclipse_swt_accessibility_accessible_factory_15(buffer, @widget_type_name, type_name_length)
       # int
       type = get_type(buffer, accessible, @object_parent_type, ACC::CHILDID_SELF)
       object = AccessibleObject.new(type, widget, accessible, @object_parent_type, false)
@@ -364,14 +364,14 @@ module Org::Eclipse::Swt::Accessibility
           query_ptr = OS.g_malloc(GTypeQuery.attr_sizeof)
           OS.g_type_query(parent_type, query_ptr)
           query = GTypeQuery.new
-          OS.memmove(query, query_ptr, GTypeQuery.attr_sizeof)
+          OS.memmove___org_eclipse_swt_accessibility_accessible_factory_17(query, query_ptr, GTypeQuery.attr_sizeof)
           OS.g_free(query_ptr)
           type_info = GTypeInfo.new
           type_info.attr_base_init = GTypeInfo_base_init_type.get_address
           type_info.attr_class_size = RJava.cast_to_short(query.attr_class_size)
           type_info.attr_instance_size = RJava.cast_to_short(query.attr_instance_size)
           self.attr_object_iface_definition = OS.g_malloc(GTypeInfo.attr_sizeof)
-          OS.memmove(self.attr_object_iface_definition, type_info, GTypeInfo.attr_sizeof)
+          OS.memmove___org_eclipse_swt_accessibility_accessible_factory_19(self.attr_object_iface_definition, type_info, GTypeInfo.attr_sizeof)
           name_bytes = Converter.wcs_to_mbcs(nil, swt_type_name, true)
           type = OS.g_type_register_static(parent_type, name_bytes, self.attr_object_iface_definition, 0)
           OS.g_type_add_interface_static(type, AccessibleObject::ATK_COMPONENT_TYPE, ComponentIfaceDefinition)
@@ -400,7 +400,7 @@ module Org::Eclipse::Swt::Accessibility
       # int
       atk_object_factory_class = ATK._atk_object_factory_class(klass)
       object_factory_class_struct = AtkObjectFactoryClass.new
-      ATK.memmove(object_factory_class_struct, atk_object_factory_class)
+      ATK.memmove___org_eclipse_swt_accessibility_accessible_factory_21(object_factory_class_struct, atk_object_factory_class)
       @atk_object_factory_cb_create_accessible = Callback.new(self, "atkObjectFactory_create_accessible", 1) # $NON-NLS-1$
       # int
       address = @atk_object_factory_cb_create_accessible.get_address
@@ -408,7 +408,7 @@ module Org::Eclipse::Swt::Accessibility
         SWT.error(SWT::ERROR_NO_MORE_CALLBACKS)
       end
       object_factory_class_struct.attr_create_accessible = address
-      ATK.memmove(atk_object_factory_class, object_factory_class_struct)
+      ATK.memmove___org_eclipse_swt_accessibility_accessible_factory_23(atk_object_factory_class, object_factory_class_struct)
       return 0
     end
     
@@ -418,7 +418,7 @@ module Org::Eclipse::Swt::Accessibility
       # int
       def g_type_info_base_init_type(klass)
         object_class = AtkObjectClass.new
-        ATK.memmove(object_class, klass)
+        ATK.memmove___org_eclipse_swt_accessibility_accessible_factory_25(object_class, klass)
         object_class.attr_get_name = AtkObjectCB_get_name.get_address
         object_class.attr_get_description = AtkObjectCB_get_description.get_address
         object_class.attr_get_n_children = AtkObjectCB_get_n_children.get_address
@@ -430,10 +430,10 @@ module Org::Eclipse::Swt::Accessibility
         # int
         g_object_class = OS._g_object_class(klass)
         object_class_struct = GObjectClass.new
-        OS.memmove(object_class_struct, g_object_class)
+        OS.memmove___org_eclipse_swt_accessibility_accessible_factory_27(object_class_struct, g_object_class)
         object_class_struct.attr_finalize = GObjectClass_finalize.get_address
-        OS.memmove(g_object_class, object_class_struct)
-        ATK.memmove(klass, object_class)
+        OS.memmove___org_eclipse_swt_accessibility_accessible_factory_29(g_object_class, object_class_struct)
+        ATK.memmove___org_eclipse_swt_accessibility_accessible_factory_31(klass, object_class)
         return 0
       end
       
@@ -442,10 +442,10 @@ module Org::Eclipse::Swt::Accessibility
       # int
       def init_action_iface_cb(iface)
         action_iface = AtkActionIface.new
-        ATK.memmove(action_iface, iface)
+        ATK.memmove___org_eclipse_swt_accessibility_accessible_factory_33(action_iface, iface)
         action_iface.attr_get_keybinding = AtkActionCB_get_keybinding.get_address
         action_iface.attr_get_name = AtkActionCB_get_name.get_address
-        ATK.memmove(iface, action_iface)
+        ATK.memmove___org_eclipse_swt_accessibility_accessible_factory_35(iface, action_iface)
         return 0
       end
       
@@ -454,12 +454,12 @@ module Org::Eclipse::Swt::Accessibility
       # int
       def init_component_iface_cb(iface)
         component_iface = AtkComponentIface.new
-        ATK.memmove(component_iface, iface)
+        ATK.memmove___org_eclipse_swt_accessibility_accessible_factory_37(component_iface, iface)
         component_iface.attr_get_extents = AtkComponentCB_get_extents.get_address
         component_iface.attr_get_position = AtkComponentCB_get_position.get_address
         component_iface.attr_get_size = AtkComponentCB_get_size.get_address
         component_iface.attr_ref_accessible_at_point = AtkComponentCB_ref_accessible_at_point.get_address
-        ATK.memmove(iface, component_iface)
+        ATK.memmove___org_eclipse_swt_accessibility_accessible_factory_39(iface, component_iface)
         return 0
       end
       
@@ -468,11 +468,11 @@ module Org::Eclipse::Swt::Accessibility
       # int
       def init_hypertext_iface_cb(iface)
         hypertext_iface = AtkHypertextIface.new
-        ATK.memmove(hypertext_iface, iface)
+        ATK.memmove___org_eclipse_swt_accessibility_accessible_factory_41(hypertext_iface, iface)
         hypertext_iface.attr_get_link = AtkHypertextCB_get_link.get_address
         hypertext_iface.attr_get_link_index = AtkHypertextCB_get_link_index.get_address
         hypertext_iface.attr_get_n_links = AtkHypertextCB_get_n_links.get_address
-        ATK.memmove(iface, hypertext_iface)
+        ATK.memmove___org_eclipse_swt_accessibility_accessible_factory_43(iface, hypertext_iface)
         return 0
       end
       
@@ -481,10 +481,10 @@ module Org::Eclipse::Swt::Accessibility
       # int
       def init_selection_iface_cb(iface)
         selection_iface = AtkSelectionIface.new
-        ATK.memmove(selection_iface, iface)
+        ATK.memmove___org_eclipse_swt_accessibility_accessible_factory_45(selection_iface, iface)
         selection_iface.attr_is_child_selected = AtkSelectionCB_is_child_selected.get_address
         selection_iface.attr_ref_selection = AtkSelectionCB_ref_selection.get_address
-        ATK.memmove(iface, selection_iface)
+        ATK.memmove___org_eclipse_swt_accessibility_accessible_factory_47(iface, selection_iface)
         return 0
       end
       
@@ -493,7 +493,7 @@ module Org::Eclipse::Swt::Accessibility
       # int
       def init_text_iface_cb(iface)
         text_interface = AtkTextIface.new
-        ATK.memmove(text_interface, iface)
+        ATK.memmove___org_eclipse_swt_accessibility_accessible_factory_49(text_interface, iface)
         text_interface.attr_get_caret_offset = AtkTextCB_get_caret_offset.get_address
         text_interface.attr_get_character_at_offset = AtkTextCB_get_character_at_offset.get_address
         text_interface.attr_get_character_count = AtkTextCB_get_character_count.get_address
@@ -503,7 +503,7 @@ module Org::Eclipse::Swt::Accessibility
         text_interface.attr_get_text_after_offset = AtkTextCB_get_text_after_offset.get_address
         text_interface.attr_get_text_at_offset = AtkTextCB_get_text_at_offset.get_address
         text_interface.attr_get_text_before_offset = AtkTextCB_get_text_before_offset.get_address
-        ATK.memmove(iface, text_interface)
+        ATK.memmove___org_eclipse_swt_accessibility_accessible_factory_51(iface, text_interface)
         return 0
       end
       

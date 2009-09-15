@@ -447,7 +447,7 @@ module Org::Eclipse::Swt::Printing
               max = 0
               i = 0
               while i < length
-                OS.memmove(page_range, page_ranges + i * page_range.attr_length * 4, page_range.attr_length * 4)
+                OS.memmove___org_eclipse_swt_printing_print_dialog_1(page_range, page_ranges + i * page_range.attr_length * 4, page_range.attr_length * 4)
                 min = Math.min(min, page_range[0] + 1)
                 max = Math.max(max, page_range[1] + 1)
                 i += 1
@@ -466,7 +466,7 @@ module Org::Eclipse::Swt::Printing
               address = OS.gtk_print_settings_get(settings, OS::GTK_PRINT_SETTINGS_OUTPUT_URI)
               length = OS.strlen(address)
               buffer = Array.typed(::Java::Byte).new(length) { 0 }
-              OS.memmove(buffer, address, length)
+              OS.memmove___org_eclipse_swt_printing_print_dialog_3(buffer, address, length)
               data.attr_file_name = String.new(Converter.mbcs_to_wcs(nil, buffer))
             end
             data.attr_copy_count = OS.gtk_print_settings_get_n_copies(settings)
@@ -518,10 +518,10 @@ module Org::Eclipse::Swt::Printing
     def _gtk_print_settings_func(key, value, data)
       length = OS.strlen(key)
       key_buffer = Array.typed(::Java::Byte).new(length) { 0 }
-      OS.memmove(key_buffer, key, length)
+      OS.memmove___org_eclipse_swt_printing_print_dialog_5(key_buffer, key, length)
       length = OS.strlen(value)
       value_buffer = Array.typed(::Java::Byte).new(length) { 0 }
-      OS.memmove(value_buffer, value, length)
+      OS.memmove___org_eclipse_swt_printing_print_dialog_7(value_buffer, value, length)
       store(key_buffer, value_buffer)
       return 0
     end
@@ -546,7 +546,7 @@ module Org::Eclipse::Swt::Printing
     def store_bytes(key, value)
       length = OS.strlen(value)
       value_buffer = Array.typed(::Java::Byte).new(length) { 0 }
-      OS.memmove(value_buffer, value, length)
+      OS.memmove___org_eclipse_swt_printing_print_dialog_9(value_buffer, value, length)
       store(key.get_bytes, value_buffer)
     end
     

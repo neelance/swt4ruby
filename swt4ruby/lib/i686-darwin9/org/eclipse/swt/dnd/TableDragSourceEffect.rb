@@ -94,11 +94,11 @@ module Org::Eclipse::Swt::Dnd
       point = NSPoint.new
       # long
       ptr = OS.malloc(NSPoint.attr_sizeof)
-      OS.memmove(ptr, point, NSPoint.attr_sizeof)
+      OS.memmove___org_eclipse_swt_dnd_table_drag_source_effect_1(ptr, point, NSPoint.attr_sizeof)
       ns_event = NSApplication.shared_application.current_event
       widget = self.attr_control.attr_view
       ns_image = widget.drag_image_for_rows_with_indexes(widget.selected_row_indexes, widget.table_columns, ns_event, ptr)
-      OS.memmove(point, ptr, NSPoint.attr_sizeof)
+      OS.memmove___org_eclipse_swt_dnd_table_drag_source_effect_3(point, ptr, NSPoint.attr_sizeof)
       OS.free(ptr)
       # TODO: Image representation wrong???
       image = Image.cocoa_new(self.attr_control.get_display, SWT::BITMAP, ns_image)

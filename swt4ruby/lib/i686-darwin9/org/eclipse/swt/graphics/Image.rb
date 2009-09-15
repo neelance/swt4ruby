@@ -309,7 +309,7 @@ module Org::Eclipse::Swt::Graphics
         @handle.set_cache_mode(OS::NSImageCacheNever)
         # long
         data = rep.bitmap_data
-        OS.memmove(data, src_rep.bitmap_data, width * height * 4)
+        OS.memmove___org_eclipse_swt_graphics_image_1(data, src_rep.bitmap_data, width * height * 4)
         if (!(flag).equal?(SWT::IMAGE_COPY))
           # Apply transformation
           case (flag)
@@ -328,7 +328,7 @@ module Org::Eclipse::Swt::Graphics
             line = Array.typed(::Java::Byte).new(RJava.cast_to_int(bpr)) { 0 }
             y = 0
             while y < height
-              OS.memmove(line, data + (y * bpr), bpr)
+              OS.memmove___org_eclipse_swt_graphics_image_3(line, data + (y * bpr), bpr)
               offset = 0
               x = 0
               while x < width
@@ -348,7 +348,7 @@ module Org::Eclipse::Swt::Graphics
                 offset += 4
                 x += 1
               end
-              OS.memmove(data + (y * bpr), line, bpr)
+              OS.memmove___org_eclipse_swt_graphics_image_5(data + (y * bpr), line, bpr)
               y += 1
             end
           when SWT::IMAGE_GRAY
@@ -356,7 +356,7 @@ module Org::Eclipse::Swt::Graphics
             line = Array.typed(::Java::Byte).new(RJava.cast_to_int(bpr)) { 0 }
             y = 0
             while y < height
-              OS.memmove(line, data + (y * bpr), bpr)
+              OS.memmove___org_eclipse_swt_graphics_image_7(line, data + (y * bpr), bpr)
               offset = 0
               x = 0
               while x < width
@@ -368,7 +368,7 @@ module Org::Eclipse::Swt::Graphics
                 offset += 4
                 x += 1
               end
-              OS.memmove(data + (y * bpr), line, bpr)
+              OS.memmove___org_eclipse_swt_graphics_image_9(data + (y * bpr), line, bpr)
               y += 1
             end
           end
@@ -704,7 +704,7 @@ module Org::Eclipse::Swt::Graphics
         data_size = height * bpr
         # 64
         src_data = Array.typed(::Java::Byte).new(RJava.cast_to_int(data_size)) { 0 }
-        OS.memmove(src_data, image_rep.bitmap_data, data_size)
+        OS.memmove___org_eclipse_swt_graphics_image_11(src_data, image_rep.bitmap_data, data_size)
         if (!(@transparent_pixel).equal?(-1))
           i = 0
           while i < data_size
@@ -740,7 +740,7 @@ module Org::Eclipse::Swt::Graphics
         end
         # Since we just calculated alpha for the image rep, tell it that it now has an alpha component.
         image_rep.set_alpha(true)
-        OS.memmove(image_rep.bitmap_data, src_data, data_size)
+        OS.memmove___org_eclipse_swt_graphics_image_13(image_rep.bitmap_data, src_data, data_size)
       ensure
         if (!(pool).nil?)
           pool.release
@@ -876,7 +876,7 @@ module Org::Eclipse::Swt::Graphics
         data_size = height * bpr
         # 64
         src_data = Array.typed(::Java::Byte).new(RJava.cast_to_int(data_size)) { 0 }
-        OS.memmove(src_data, image_rep.bitmap_data, data_size)
+        OS.memmove___org_eclipse_swt_graphics_image_15(src_data, image_rep.bitmap_data, data_size)
         palette = PaletteData.new(0xff0000, 0xff00, 0xff)
         # 64
         # 64
@@ -1120,7 +1120,7 @@ module Org::Eclipse::Swt::Graphics
       @handle = @handle.init_with_size(size_)
       rep = NSBitmapImageRep.new.alloc
       rep = rep.init_with_bitmap_data_planes(0, @width, @height, 8, has_alpha ? 4 : 3, has_alpha, false, OS::NSDeviceRGBColorSpace, OS::NSAlphaFirstBitmapFormat | OS::NSAlphaNonpremultipliedBitmapFormat, bpr, 32)
-      OS.memmove(rep.bitmap_data, buffer, data_size)
+      OS.memmove___org_eclipse_swt_graphics_image_17(rep.bitmap_data, buffer, data_size)
       @handle.add_representation(rep)
       rep.release
       @handle.set_cache_mode(OS::NSImageCacheNever)
@@ -1201,12 +1201,12 @@ module Org::Eclipse::Swt::Graphics
           NSGraphicsContext.static_restore_graphics_state
           # 64
           alpha_data = Array.typed(::Java::Byte).new(RJava.cast_to_int(bitmap_byte_count)) { 0 }
-          OS.memmove(alpha_data, alpha_bitmap_data, bitmap_byte_count)
+          OS.memmove___org_eclipse_swt_graphics_image_19(alpha_data, alpha_bitmap_data, bitmap_byte_count)
           OS.free(alpha_bitmap_data)
           OS._cgcontext_release(alpha_bitmap_ctx)
           # Merge the alpha values with the pixels
           src_data = Array.typed(::Java::Byte).new(@height * bpr) { 0 }
-          OS.memmove(src_data, rep.bitmap_data, src_data.attr_length)
+          OS.memmove___org_eclipse_swt_graphics_image_21(src_data, rep.bitmap_data, src_data.attr_length)
           a = 0
           p = 0
           while a < alpha_data.attr_length
@@ -1214,7 +1214,7 @@ module Org::Eclipse::Swt::Graphics
             a += 1
             p += 4
           end
-          OS.memmove(rep.bitmap_data, src_data, src_data.attr_length)
+          OS.memmove___org_eclipse_swt_graphics_image_23(rep.bitmap_data, src_data, src_data.attr_length)
           # If the alpha has only 0 or 255 (-1) for alpha values, compute the transparent pixel color instead
           # of a continuous alpha range.
           transparent_offset = -1
@@ -1432,7 +1432,7 @@ module Org::Eclipse::Swt::Graphics
         i = 0
         offset = 0
         while i < @height
-          OS.memmove(line, data + offset, bpr)
+          OS.memmove___org_eclipse_swt_graphics_image_25(line, data + offset, bpr)
           j = 0
           while j < line.attr_length
             if ((line[j + 1]).equal?(red) && (line[j + 2]).equal?(green) && (line[j + 3]).equal?(blue))
@@ -1442,7 +1442,7 @@ module Org::Eclipse::Swt::Graphics
             end
             j += 4
           end
-          OS.memmove(data + offset, line, bpr)
+          OS.memmove___org_eclipse_swt_graphics_image_27(data + offset, line, bpr)
           i += 1
           offset += bpr
         end

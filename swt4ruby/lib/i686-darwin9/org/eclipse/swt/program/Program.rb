@@ -116,8 +116,8 @@ module Org::Eclipse::Swt::Program
           # long
           # long
           buffer2 = Array.typed(::Java::Int).new(1) { 0 }
-          OS.memmove(buffer, app_name, C::PTR_SIZEOF)
-          OS.memmove(buffer2, type, C::PTR_SIZEOF)
+          OS.memmove___org_eclipse_swt_program_program_1(buffer, app_name, C::PTR_SIZEOF)
+          OS.memmove___org_eclipse_swt_program_program_3(buffer2, type, C::PTR_SIZEOF)
           OS.free(app_name)
           OS.free(type)
           if (!(buffer[0]).equal?(0))
@@ -416,7 +416,7 @@ module Org::Eclipse::Swt::Program
               bpp = RJava.cast_to_int(image_rep.bits_per_pixel)
               data_size = height * bpr
               src_data = Array.typed(::Java::Byte).new(data_size) { 0 }
-              OS.memmove(src_data, image_rep.bitmap_data, data_size)
+              OS.memmove___org_eclipse_swt_program_program_5(src_data, image_rep.bitmap_data, data_size)
               # TODO: Image representation wrong???
               palette = PaletteData.new(-0x1000000, 0xff0000, 0xff00)
               data = ImageData.new(width, height, bpp, palette, 4, src_data)

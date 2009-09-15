@@ -102,10 +102,10 @@ module Org::Eclipse::Swt::Internal::Mozilla
       end
       # int
       p_vtable = C.malloc(C::PTR_SIZEOF * (arg_counts.attr_length + OS_OFFSET))
-      XPCOM.memmove(p_vtable, callback_addresses, C::PTR_SIZEOF * (arg_counts.attr_length + OS_OFFSET))
+      XPCOM.memmove___org_eclipse_swt_internal_mozilla_xpcomobject_1(p_vtable, callback_addresses, C::PTR_SIZEOF * (arg_counts.attr_length + OS_OFFSET))
       @pp_vtable = C.malloc(C::PTR_SIZEOF)
       # int
-      XPCOM.memmove(@pp_vtable, Array.typed(::Java::Long).new([p_vtable]), C::PTR_SIZEOF)
+      XPCOM.memmove___org_eclipse_swt_internal_mozilla_xpcomobject_3(@pp_vtable, Array.typed(::Java::Long).new([p_vtable]), C::PTR_SIZEOF)
       self.attr_object_map.put(SwtLONG.new(@pp_vtable), self)
     end
     
@@ -1557,7 +1557,7 @@ module Org::Eclipse::Swt::Internal::Mozilla
       # int
       # int
       p_vtable = Array.typed(::Java::Long).new(1) { 0 }
-      XPCOM.memmove(p_vtable, @pp_vtable, C::PTR_SIZEOF)
+      XPCOM.memmove___org_eclipse_swt_internal_mozilla_xpcomobject_5(p_vtable, @pp_vtable, C::PTR_SIZEOF)
       C.free(p_vtable[0])
       C.free(@pp_vtable)
       # remove this ppVtable from the list

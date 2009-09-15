@@ -414,7 +414,7 @@ module Org::Eclipse::Swt::Widgets
         ptr = OS.malloc(1)
         found = manager.file_exists_at_path(path, ptr)
         is_directory = Array.typed(::Java::Byte).new(1) { 0 }
-        OS.memmove(is_directory, ptr, 1)
+        OS.memmove___org_eclipse_swt_widgets_file_dialog_1(is_directory, ptr, 1)
         OS.free(ptr)
         if (found)
           if (!(is_directory[0]).equal?(0))

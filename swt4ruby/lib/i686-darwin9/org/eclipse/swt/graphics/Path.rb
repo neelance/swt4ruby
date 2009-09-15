@@ -483,7 +483,7 @@ module Org::Eclipse::Swt::Graphics
             SWT.error(SWT::ERROR_NO_HANDLES)
           end
           buffer = Array.typed(::Java::Int).new([-0x1])
-          OS.memmove(pixel, buffer, 4)
+          OS.memmove___org_eclipse_swt_graphics_path_1(pixel, buffer, 4)
           # long
           colorspace = OS._cgcolor_space_create_device_rgb
           # long
@@ -522,7 +522,7 @@ module Org::Eclipse::Swt::Graphics
           OS._cgpath_release(path)
           OS._cgcontext_stroke_path(context)
           OS._cgcontext_release(context)
-          OS.memmove(buffer, pixel, 4)
+          OS.memmove___org_eclipse_swt_graphics_path_3(buffer, pixel, 4)
           OS.free(pixel)
           return !(buffer[0]).equal?(-0x1)
         else
@@ -706,23 +706,23 @@ module Org::Eclipse::Swt::Graphics
           case (element)
           when OS::NSMoveToBezierPathElement
             types[((type_count += 1) - 1)] = SWT::PATH_MOVE_TO
-            OS.memmove(pt, points, NSPoint.attr_sizeof)
+            OS.memmove___org_eclipse_swt_graphics_path_5(pt, points, NSPoint.attr_sizeof)
             point_array[((point_count += 1) - 1)] = RJava.cast_to_int(pt.attr_x)
             point_array[((point_count += 1) - 1)] = RJava.cast_to_int(pt.attr_y)
           when OS::NSLineToBezierPathElement
             types[((type_count += 1) - 1)] = SWT::PATH_LINE_TO
-            OS.memmove(pt, points, NSPoint.attr_sizeof)
+            OS.memmove___org_eclipse_swt_graphics_path_7(pt, points, NSPoint.attr_sizeof)
             point_array[((point_count += 1) - 1)] = RJava.cast_to_int(pt.attr_x)
             point_array[((point_count += 1) - 1)] = RJava.cast_to_int(pt.attr_y)
           when OS::NSCurveToBezierPathElement
             types[((type_count += 1) - 1)] = SWT::PATH_CUBIC_TO
-            OS.memmove(pt, points, NSPoint.attr_sizeof)
+            OS.memmove___org_eclipse_swt_graphics_path_9(pt, points, NSPoint.attr_sizeof)
             point_array[((point_count += 1) - 1)] = RJava.cast_to_int(pt.attr_x)
             point_array[((point_count += 1) - 1)] = RJava.cast_to_int(pt.attr_y)
-            OS.memmove(pt, points + NSPoint.attr_sizeof, NSPoint.attr_sizeof)
+            OS.memmove___org_eclipse_swt_graphics_path_11(pt, points + NSPoint.attr_sizeof, NSPoint.attr_sizeof)
             point_array[((point_count += 1) - 1)] = RJava.cast_to_int(pt.attr_x)
             point_array[((point_count += 1) - 1)] = RJava.cast_to_int(pt.attr_y)
-            OS.memmove(pt, points + NSPoint.attr_sizeof + NSPoint.attr_sizeof, NSPoint.attr_sizeof)
+            OS.memmove___org_eclipse_swt_graphics_path_13(pt, points + NSPoint.attr_sizeof + NSPoint.attr_sizeof, NSPoint.attr_sizeof)
             point_array[((point_count += 1) - 1)] = RJava.cast_to_int(pt.attr_x)
             point_array[((point_count += 1) - 1)] = RJava.cast_to_int(pt.attr_y)
           when OS::NSClosePathBezierPathElement

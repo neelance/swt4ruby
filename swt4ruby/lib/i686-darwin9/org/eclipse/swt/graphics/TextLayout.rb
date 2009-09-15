@@ -429,7 +429,7 @@ module Org::Eclipse::Swt::Graphics
       index = 0
       while index < number_of_glyphs_
         @layout_manager.line_fragment_used_rect_for_glyph_at_index(index, range_ptr, true)
-        OS.memmove(line_range, range_ptr, NSRange.attr_sizeof)
+        OS.memmove___org_eclipse_swt_graphics_text_layout_1(line_range, range_ptr, NSRange.attr_sizeof)
         index = line_range.attr_location + line_range.attr_length
         number_of_lines += 1
       end
@@ -445,7 +445,7 @@ module Org::Eclipse::Swt::Graphics
         if (number_of_lines < bounds.attr_length - 1)
           bounds[number_of_lines].attr_height -= @spacing
         end
-        OS.memmove(line_range, range_ptr, NSRange.attr_sizeof)
+        OS.memmove___org_eclipse_swt_graphics_text_layout_3(line_range, range_ptr, NSRange.attr_sizeof)
         # 64
         offsets[number_of_lines] = RJava.cast_to_int(line_range.attr_location)
         index = line_range.attr_location + line_range.attr_length
@@ -589,11 +589,11 @@ module Org::Eclipse::Swt::Graphics
             # long
             # long
             rect_count = Array.typed(::Java::Int).new(1) { 0 }
-            OS.memmove(rect_count, p_rect_count, C::PTR_SIZEOF)
+            OS.memmove___org_eclipse_swt_graphics_text_layout_5(rect_count, p_rect_count, C::PTR_SIZEOF)
             OS.free(p_rect_count)
             k = 0
             while k < rect_count[0]
-              OS.memmove(rect, p_array, NSRect.attr_sizeof)
+              OS.memmove___org_eclipse_swt_graphics_text_layout_7(rect, p_array, NSRect.attr_sizeof)
               fix_rect(rect)
               rect.attr_x += pt.attr_x
               rect.attr_y += pt.attr_y
@@ -688,7 +688,7 @@ module Org::Eclipse::Swt::Graphics
                     # long
                     # long
                     rect_count = Array.typed(::Java::Int).new(1) { 0 }
-                    OS.memmove(rect_count, p_rect_count, C::PTR_SIZEOF)
+                    OS.memmove___org_eclipse_swt_graphics_text_layout_9(rect_count, p_rect_count, C::PTR_SIZEOF)
                     OS.free(p_rect_count)
                     rect = NSRect.new
                     gc.attr_handle.save_graphics_state
@@ -707,7 +707,7 @@ module Org::Eclipse::Swt::Graphics
                     end
                     k_ = 0
                     while k_ < rect_count[0]
-                      OS.memmove(rect, p_array, NSRect.attr_sizeof)
+                      OS.memmove___org_eclipse_swt_graphics_text_layout_11(rect, p_array, NSRect.attr_sizeof)
                       fix_rect(rect)
                       # double
                       underline_x = pt.attr_x + rect.attr_x
@@ -777,7 +777,7 @@ module Org::Eclipse::Swt::Graphics
                     # long
                     # long
                     rect_count = Array.typed(::Java::Int).new(1) { 0 }
-                    OS.memmove(rect_count, p_rect_count, C::PTR_SIZEOF)
+                    OS.memmove___org_eclipse_swt_graphics_text_layout_13(rect_count, p_rect_count, C::PTR_SIZEOF)
                     OS.free(p_rect_count)
                     rect = NSRect.new
                     gc.attr_handle.save_graphics_state
@@ -814,7 +814,7 @@ module Org::Eclipse::Swt::Graphics
                     end
                     k_ = 0
                     while k_ < rect_count[0]
-                      OS.memmove(rect, p_array, NSRect.attr_sizeof)
+                      OS.memmove___org_eclipse_swt_graphics_text_layout_15(rect, p_array, NSRect.attr_sizeof)
                       fix_rect(rect)
                       rect.attr_x += pt.attr_x + 0.5
                       rect.attr_y += pt.attr_y + 0.5
@@ -989,7 +989,7 @@ module Org::Eclipse::Swt::Graphics
         # long
         # long
         rect_count = Array.typed(::Java::Int).new(1) { 0 }
-        OS.memmove(rect_count, p_rect_count, C::PTR_SIZEOF)
+        OS.memmove___org_eclipse_swt_graphics_text_layout_17(rect_count, p_rect_count, C::PTR_SIZEOF)
         OS.free(p_rect_count)
         rect = NSRect.new
         left = 0x7fffffff
@@ -998,7 +998,7 @@ module Org::Eclipse::Swt::Graphics
         bottom = 0
         i = 0
         while i < rect_count[0]
-          OS.memmove(rect, p_array, NSRect.attr_sizeof)
+          OS.memmove___org_eclipse_swt_graphics_text_layout_19(rect, p_array, NSRect.attr_sizeof)
           fix_rect(rect)
           left = Math.min(left, RJava.cast_to_int(rect.attr_x))
           right = Math.max(right, RJava.cast_to_int(Math.ceil(rect.attr_x + rect.attr_width)))
@@ -1114,7 +1114,7 @@ module Org::Eclipse::Swt::Graphics
         # long
         result = @layout_manager.get_glyphs_in_range(range, 0, 0, 0, 0, p_bidi_levels)
         if (result > 0)
-          OS.memmove(bidi_levels, p_bidi_levels, 1)
+          OS.memmove___org_eclipse_swt_graphics_text_layout_21(bidi_levels, p_bidi_levels, 1)
         end
         OS.free(p_bidi_levels)
         return bidi_levels[0]
@@ -1346,11 +1346,11 @@ module Org::Eclipse::Swt::Graphics
           # long
           # long
           rect_count = Array.typed(::Java::Int).new(1) { 0 }
-          OS.memmove(rect_count, p_rect_count, C::PTR_SIZEOF)
+          OS.memmove___org_eclipse_swt_graphics_text_layout_23(rect_count, p_rect_count, C::PTR_SIZEOF)
           OS.free(p_rect_count)
           if (rect_count[0] > 0)
             bounds = NSRect.new
-            OS.memmove(bounds, p_array, NSRect.attr_sizeof)
+            OS.memmove___org_eclipse_swt_graphics_text_layout_25(bounds, p_array, NSRect.attr_sizeof)
             fix_rect(bounds)
             point.attr_x += bounds.attr_width
           end

@@ -345,27 +345,27 @@ module Org::Eclipse::Swt::Browser
         return XPCOM::NS_ERROR_NO_INTERFACE
       end
       guid = NsID.new
-      XPCOM.memmove(guid, riid, self.attr_ns_id.attr_sizeof)
+      XPCOM.memmove___org_eclipse_swt_browser_prompt_service2_1(guid, riid, self.attr_ns_id.attr_sizeof)
       if (guid._equals(NsISupports::NS_ISUPPORTS_IID))
         # int
-        XPCOM.memmove(ppv_object, Array.typed(::Java::Long).new([@supports.get_address]), C::PTR_SIZEOF)
+        XPCOM.memmove___org_eclipse_swt_browser_prompt_service2_3(ppv_object, Array.typed(::Java::Long).new([@supports.get_address]), C::PTR_SIZEOF)
         _add_ref
         return XPCOM::NS_OK
       end
       if (guid._equals(NsIPromptService::NS_IPROMPTSERVICE_IID))
         # int
-        XPCOM.memmove(ppv_object, Array.typed(::Java::Long).new([@prompt_service.get_address]), C::PTR_SIZEOF)
+        XPCOM.memmove___org_eclipse_swt_browser_prompt_service2_5(ppv_object, Array.typed(::Java::Long).new([@prompt_service.get_address]), C::PTR_SIZEOF)
         _add_ref
         return XPCOM::NS_OK
       end
       if (guid._equals(NsIPromptService2::NS_IPROMPTSERVICE2_IID))
         # int
-        XPCOM.memmove(ppv_object, Array.typed(::Java::Long).new([@prompt_service2.get_address]), C::PTR_SIZEOF)
+        XPCOM.memmove___org_eclipse_swt_browser_prompt_service2_7(ppv_object, Array.typed(::Java::Long).new([@prompt_service2.get_address]), C::PTR_SIZEOF)
         _add_ref
         return XPCOM::NS_OK
       end
       # int
-      XPCOM.memmove(ppv_object, Array.typed(::Java::Long).new([0]), C::PTR_SIZEOF)
+      XPCOM.memmove___org_eclipse_swt_browser_prompt_service2_9(ppv_object, Array.typed(::Java::Long).new([0]), C::PTR_SIZEOF)
       return XPCOM::NS_ERROR_NO_INTERFACE
     end
     
@@ -412,7 +412,7 @@ module Org::Eclipse::Swt::Browser
       when NsIPromptService::BUTTON_TITLE_IS_STRING
         length = XPCOM.strlen__prunichar(button_title)
         dest = CharArray.new(length)
-        XPCOM.memmove(dest, button_title, length * 2)
+        XPCOM.memmove___org_eclipse_swt_browser_prompt_service2_11(dest, button_title, length * 2)
         label = RJava.cast_to_string(String.new(dest))
       end
       return label
@@ -427,11 +427,11 @@ module Org::Eclipse::Swt::Browser
       browser = get_browser(a_parent)
       length = XPCOM.strlen__prunichar(a_dialog_title)
       dest = CharArray.new(length)
-      XPCOM.memmove(dest, a_dialog_title, length * 2)
+      XPCOM.memmove___org_eclipse_swt_browser_prompt_service2_13(dest, a_dialog_title, length * 2)
       title_label = String.new(dest)
       length = XPCOM.strlen__prunichar(a_text)
       dest = CharArray.new(length)
-      XPCOM.memmove(dest, a_text, length * 2)
+      XPCOM.memmove___org_eclipse_swt_browser_prompt_service2_15(dest, a_text, length * 2)
       text_label = String.new(dest)
       shell = (browser).nil? ? Shell.new : browser.get_shell
       message_box = MessageBox.new(shell, SWT::OK | SWT::ICON_WARNING)
@@ -451,26 +451,26 @@ module Org::Eclipse::Swt::Browser
       browser = get_browser(a_parent)
       length = XPCOM.strlen__prunichar(a_dialog_title)
       dest = CharArray.new(length)
-      XPCOM.memmove(dest, a_dialog_title, length * 2)
+      XPCOM.memmove___org_eclipse_swt_browser_prompt_service2_17(dest, a_dialog_title, length * 2)
       title_label = String.new(dest)
       length = XPCOM.strlen__prunichar(a_text)
       dest = CharArray.new(length)
-      XPCOM.memmove(dest, a_text, length * 2)
+      XPCOM.memmove___org_eclipse_swt_browser_prompt_service2_19(dest, a_text, length * 2)
       text_label = String.new(dest)
       length = XPCOM.strlen__prunichar(a_check_msg)
       dest = CharArray.new(length)
-      XPCOM.memmove(dest, a_check_msg, length * 2)
+      XPCOM.memmove___org_eclipse_swt_browser_prompt_service2_21(dest, a_check_msg, length * 2)
       check_label = String.new(dest)
       shell = (browser).nil? ? Shell.new : browser.get_shell
       dialog = PromptDialog.new(shell)
       check = Array.typed(::Java::Int).new(1) { 0 }
       if (!(a_check_state).equal?(0))
-        XPCOM.memmove(check, a_check_state, 4)
+        XPCOM.memmove___org_eclipse_swt_browser_prompt_service2_23(check, a_check_state, 4)
       end
       # PRBool
       dialog.alert_check(title_label, text_label, check_label, check)
       if (!(a_check_state).equal?(0))
-        XPCOM.memmove(a_check_state, check, 4)
+        XPCOM.memmove___org_eclipse_swt_browser_prompt_service2_25(a_check_state, check, 4)
       end
       # PRBool
       return XPCOM::NS_OK
@@ -498,11 +498,11 @@ module Org::Eclipse::Swt::Browser
       browser = get_browser(a_parent)
       length = XPCOM.strlen__prunichar(a_dialog_title)
       dest = CharArray.new(length)
-      XPCOM.memmove(dest, a_dialog_title, length * 2)
+      XPCOM.memmove___org_eclipse_swt_browser_prompt_service2_27(dest, a_dialog_title, length * 2)
       title_label = String.new(dest)
       length = XPCOM.strlen__prunichar(a_text)
       dest = CharArray.new(length)
-      XPCOM.memmove(dest, a_text, length * 2)
+      XPCOM.memmove___org_eclipse_swt_browser_prompt_service2_29(dest, a_text, length * 2)
       text_label = String.new(dest)
       shell = (browser).nil? ? Shell.new : browser.get_shell
       message_box = MessageBox.new(shell, SWT::OK | SWT::CANCEL | SWT::ICON_QUESTION)
@@ -510,7 +510,7 @@ module Org::Eclipse::Swt::Browser
       message_box.set_message(text_label)
       id = message_box.open
       result = Array.typed(::Java::Int).new([(id).equal?(SWT::OK) ? 1 : 0])
-      XPCOM.memmove(_retval, result, 4)
+      XPCOM.memmove___org_eclipse_swt_browser_prompt_service2_31(_retval, result, 4)
       return XPCOM::NS_OK
     end
     
@@ -539,17 +539,17 @@ module Org::Eclipse::Swt::Browser
       browser = get_browser(a_parent)
       length = XPCOM.strlen__prunichar(a_dialog_title)
       dest = CharArray.new(length)
-      XPCOM.memmove(dest, a_dialog_title, length * 2)
+      XPCOM.memmove___org_eclipse_swt_browser_prompt_service2_33(dest, a_dialog_title, length * 2)
       title_label = String.new(dest)
       length = XPCOM.strlen__prunichar(a_text)
       dest = CharArray.new(length)
-      XPCOM.memmove(dest, a_text, length * 2)
+      XPCOM.memmove___org_eclipse_swt_browser_prompt_service2_35(dest, a_text, length * 2)
       text_label = String.new(dest)
       check_label = nil
       if (!(a_check_msg).equal?(0))
         length = XPCOM.strlen__prunichar(a_check_msg)
         dest = CharArray.new(length)
-        XPCOM.memmove(dest, a_check_msg, length * 2)
+        XPCOM.memmove___org_eclipse_swt_browser_prompt_service2_37(dest, a_check_msg, length * 2)
         check_label = RJava.cast_to_string(String.new(dest))
       end
       button0label = get_label(a_button_flags, NsIPromptService::BUTTON_POS_0, a_button0title)
@@ -568,13 +568,13 @@ module Org::Eclipse::Swt::Browser
       check = Array.typed(::Java::Int).new(1) { 0 }
       result = Array.typed(::Java::Int).new(1) { 0 }
       if (!(a_check_state).equal?(0))
-        XPCOM.memmove(check, a_check_state, 4)
+        XPCOM.memmove___org_eclipse_swt_browser_prompt_service2_39(check, a_check_state, 4)
       end
       dialog.confirm_ex(title_label, text_label, check_label, button0label, button1label, button2label, default_index, check, result)
       if (!(a_check_state).equal?(0))
-        XPCOM.memmove(a_check_state, check, 4)
+        XPCOM.memmove___org_eclipse_swt_browser_prompt_service2_41(a_check_state, check, 4)
       end
-      XPCOM.memmove(_retval, result, 4)
+      XPCOM.memmove___org_eclipse_swt_browser_prompt_service2_43(_retval, result, 4)
       return XPCOM::NS_OK
     end
     
@@ -597,28 +597,28 @@ module Org::Eclipse::Swt::Browser
       if (!(a_dialog_title).equal?(0))
         length = XPCOM.strlen__prunichar(a_dialog_title)
         dest = CharArray.new(length)
-        XPCOM.memmove(dest, a_dialog_title, length * 2)
+        XPCOM.memmove___org_eclipse_swt_browser_prompt_service2_45(dest, a_dialog_title, length * 2)
         title_label = RJava.cast_to_string(String.new(dest))
       end
       length = XPCOM.strlen__prunichar(a_text)
       dest = CharArray.new(length)
-      XPCOM.memmove(dest, a_text, length * 2)
+      XPCOM.memmove___org_eclipse_swt_browser_prompt_service2_47(dest, a_text, length * 2)
       text_label = RJava.cast_to_string(String.new(dest))
       # int
       # int
       value_addr = Array.typed(::Java::Long).new(1) { 0 }
-      XPCOM.memmove(value_addr, a_value, C::PTR_SIZEOF)
+      XPCOM.memmove___org_eclipse_swt_browser_prompt_service2_49(value_addr, a_value, C::PTR_SIZEOF)
       if (!(value_addr[0]).equal?(0))
         length = XPCOM.strlen__prunichar(value_addr[0])
         dest = CharArray.new(length)
-        XPCOM.memmove(dest, value_addr[0], length * 2)
+        XPCOM.memmove___org_eclipse_swt_browser_prompt_service2_51(dest, value_addr[0], length * 2)
         value_label[0] = String.new(dest)
       end
       if (!(a_check_msg).equal?(0))
         length = XPCOM.strlen__prunichar(a_check_msg)
         if (length > 0)
           dest = CharArray.new(length)
-          XPCOM.memmove(dest, a_check_msg, length * 2)
+          XPCOM.memmove___org_eclipse_swt_browser_prompt_service2_53(dest, a_check_msg, length * 2)
           check_label = RJava.cast_to_string(String.new(dest))
         end
       end
@@ -627,10 +627,10 @@ module Org::Eclipse::Swt::Browser
       check = Array.typed(::Java::Int).new(1) { 0 }
       result = Array.typed(::Java::Int).new(1) { 0 }
       if (!(a_check_state).equal?(0))
-        XPCOM.memmove(check, a_check_state, 4)
+        XPCOM.memmove___org_eclipse_swt_browser_prompt_service2_55(check, a_check_state, 4)
       end
       dialog.prompt(title_label, text_label, check_label, value_label, check, result)
-      XPCOM.memmove(_retval, result, 4)
+      XPCOM.memmove___org_eclipse_swt_browser_prompt_service2_57(_retval, result, 4)
       if ((result[0]).equal?(1))
         # User selected OK. User name and password are returned as PRUnichar values. Any default
         # value that we override must be freed using the nsIMemory service.
@@ -664,9 +664,9 @@ module Org::Eclipse::Swt::Browser
           size = buffer.attr_length * 2
           # int
           ptr = memory._alloc(size)
-          XPCOM.memmove(ptr, buffer, size)
+          XPCOM.memmove___org_eclipse_swt_browser_prompt_service2_59(ptr, buffer, size)
           # int
-          XPCOM.memmove(a_value, Array.typed(::Java::Long).new([ptr]), C::PTR_SIZEOF)
+          XPCOM.memmove___org_eclipse_swt_browser_prompt_service2_61(a_value, Array.typed(::Java::Long).new([ptr]), C::PTR_SIZEOF)
           if (!(value_addr[0]).equal?(0))
             memory._free(value_addr[0])
           end
@@ -674,7 +674,7 @@ module Org::Eclipse::Swt::Browser
         end
       end
       if (!(a_check_state).equal?(0))
-        XPCOM.memmove(a_check_state, check, 4)
+        XPCOM.memmove___org_eclipse_swt_browser_prompt_service2_63(a_check_state, check, 4)
       end
       return XPCOM::NS_OK
     end
@@ -701,7 +701,7 @@ module Org::Eclipse::Swt::Browser
             event.attr_location = mozilla.attr_last_navigate_url
             mozilla.attr_authentication_listeners[i].authenticate(event)
             if (!event.attr_doit)
-              XPCOM.memmove(_retval, Array.typed(::Java::Int).new([0]), 4)
+              XPCOM.memmove___org_eclipse_swt_browser_prompt_service2_65(_retval, Array.typed(::Java::Int).new([0]), 4)
               # PRBool
               return XPCOM::NS_OK
             end
@@ -718,7 +718,7 @@ module Org::Eclipse::Swt::Browser
                 SWT.error(rc)
               end
               string.dispose
-              XPCOM.memmove(_retval, Array.typed(::Java::Int).new([1]), 4)
+              XPCOM.memmove___org_eclipse_swt_browser_prompt_service2_67(_retval, Array.typed(::Java::Int).new([1]), 4)
               # PRBool
               return XPCOM::NS_OK
             end
@@ -735,9 +735,9 @@ module Org::Eclipse::Swt::Browser
       if (!(checkbox_label).equal?(0) && !(checkbox_value).equal?(0))
         length = XPCOM.strlen__prunichar(checkbox_label)
         dest = CharArray.new(length)
-        XPCOM.memmove(dest, checkbox_label, length * 2)
+        XPCOM.memmove___org_eclipse_swt_browser_prompt_service2_69(dest, checkbox_label, length * 2)
         check_label = RJava.cast_to_string(String.new(dest))
-        XPCOM.memmove(check_value, checkbox_value, 4)
+        XPCOM.memmove___org_eclipse_swt_browser_prompt_service2_71(check_value, checkbox_value, 4)
         # PRBool
       end
       # get initial username and password values
@@ -751,7 +751,7 @@ module Org::Eclipse::Swt::Browser
       # int
       buffer = XPCOM.ns_embed_string_get(ptr)
       chars = CharArray.new(length)
-      XPCOM.memmove(chars, buffer, length * 2)
+      XPCOM.memmove___org_eclipse_swt_browser_prompt_service2_73(chars, buffer, length * 2)
       user_label[0] = String.new(chars)
       XPCOM.ns_embed_string_delete(ptr)
       ptr = XPCOM.ns_embed_string_new
@@ -762,7 +762,7 @@ module Org::Eclipse::Swt::Browser
       length = XPCOM.ns_embed_string_length(ptr)
       buffer = XPCOM.ns_embed_string_get(ptr)
       chars = CharArray.new(length)
-      XPCOM.memmove(chars, buffer, length * 2)
+      XPCOM.memmove___org_eclipse_swt_browser_prompt_service2_75(chars, buffer, length * 2)
       pass_label[0] = String.new(chars)
       XPCOM.ns_embed_string_delete(ptr)
       # compute the message text
@@ -774,7 +774,7 @@ module Org::Eclipse::Swt::Browser
       length = XPCOM.ns_embed_string_length(ptr)
       buffer = XPCOM.ns_embed_string_get(ptr)
       chars = CharArray.new(length)
-      XPCOM.memmove(chars, buffer, length * 2)
+      XPCOM.memmove___org_eclipse_swt_browser_prompt_service2_77(chars, buffer, length * 2)
       realm = String.new(chars)
       XPCOM.ns_embed_string_delete(ptr)
       channel = NsIChannel.new(a_channel)
@@ -798,7 +798,7 @@ module Org::Eclipse::Swt::Browser
       length = XPCOM.ns_embed_cstring_length(host)
       buffer = XPCOM.ns_embed_cstring_get(host)
       bytes = Array.typed(::Java::Byte).new(length) { 0 }
-      XPCOM.memmove(bytes, buffer, length)
+      XPCOM.memmove___org_eclipse_swt_browser_prompt_service2_79(bytes, buffer, length)
       host_string = String.new(bytes)
       XPCOM.ns_embed_cstring_delete(host)
       ns_uri._release
@@ -813,7 +813,7 @@ module Org::Eclipse::Swt::Browser
       dialog = PromptDialog.new(shell)
       result = Array.typed(::Java::Int).new(1) { 0 }
       dialog.prompt_username_and_password(title, message, check_label, user_label, pass_label, check_value, result)
-      XPCOM.memmove(_retval, result, 4)
+      XPCOM.memmove___org_eclipse_swt_browser_prompt_service2_81(_retval, result, 4)
       # PRBool
       if ((result[0]).equal?(1))
         # User selected OK
@@ -831,7 +831,7 @@ module Org::Eclipse::Swt::Browser
         string.dispose
       end
       if (!(checkbox_value).equal?(0))
-        XPCOM.memmove(checkbox_value, check_value, 4)
+        XPCOM.memmove___org_eclipse_swt_browser_prompt_service2_83(checkbox_value, check_value, 4)
       end
       # PRBool
       return XPCOM::NS_OK
@@ -862,14 +862,14 @@ module Org::Eclipse::Swt::Browser
             event.attr_location = mozilla.attr_last_navigate_url
             mozilla.attr_authentication_listeners[i].authenticate(event)
             if (!event.attr_doit)
-              XPCOM.memmove(_retval, Array.typed(::Java::Int).new([0]), 4)
+              XPCOM.memmove___org_eclipse_swt_browser_prompt_service2_85(_retval, Array.typed(::Java::Int).new([0]), 4)
               # PRBool
               return XPCOM::NS_OK
             end
             if (!(event.attr_user).nil? && !(event.attr_password).nil?)
               user = RJava.cast_to_string(event.attr_user)
               password = RJava.cast_to_string(event.attr_password)
-              XPCOM.memmove(_retval, Array.typed(::Java::Int).new([1]), 4)
+              XPCOM.memmove___org_eclipse_swt_browser_prompt_service2_87(_retval, Array.typed(::Java::Int).new([1]), 4)
               # PRBool
               break
             end
@@ -889,40 +889,40 @@ module Org::Eclipse::Swt::Browser
         if (!(a_dialog_title).equal?(0))
           length_ = XPCOM.strlen__prunichar(a_dialog_title)
           dest = CharArray.new(length_)
-          XPCOM.memmove(dest, a_dialog_title, length_ * 2)
+          XPCOM.memmove___org_eclipse_swt_browser_prompt_service2_89(dest, a_dialog_title, length_ * 2)
           title_label = RJava.cast_to_string(String.new(dest))
         else
           title_label = RJava.cast_to_string(SWT.get_message("SWT_Authentication_Required")) # $NON-NLS-1$
         end
         length_ = XPCOM.strlen__prunichar(a_text)
         dest = CharArray.new(length_)
-        XPCOM.memmove(dest, a_text, length_ * 2)
+        XPCOM.memmove___org_eclipse_swt_browser_prompt_service2_91(dest, a_text, length_ * 2)
         text_label = RJava.cast_to_string(String.new(dest))
         # int
         # int
         user_addr = Array.typed(::Java::Long).new(1) { 0 }
-        XPCOM.memmove(user_addr, a_username, C::PTR_SIZEOF)
+        XPCOM.memmove___org_eclipse_swt_browser_prompt_service2_93(user_addr, a_username, C::PTR_SIZEOF)
         if (!(user_addr[0]).equal?(0))
           length_ = XPCOM.strlen__prunichar(user_addr[0])
           dest = CharArray.new(length_)
-          XPCOM.memmove(dest, user_addr[0], length_ * 2)
+          XPCOM.memmove___org_eclipse_swt_browser_prompt_service2_95(dest, user_addr[0], length_ * 2)
           user_label[0] = String.new(dest)
         end
         # int
         # int
         pass_addr = Array.typed(::Java::Long).new(1) { 0 }
-        XPCOM.memmove(pass_addr, a_password, C::PTR_SIZEOF)
+        XPCOM.memmove___org_eclipse_swt_browser_prompt_service2_97(pass_addr, a_password, C::PTR_SIZEOF)
         if (!(pass_addr[0]).equal?(0))
           length_ = XPCOM.strlen__prunichar(pass_addr[0])
           dest = CharArray.new(length_)
-          XPCOM.memmove(dest, pass_addr[0], length_ * 2)
+          XPCOM.memmove___org_eclipse_swt_browser_prompt_service2_99(dest, pass_addr[0], length_ * 2)
           pass_label[0] = String.new(dest)
         end
         if (!(a_check_msg).equal?(0))
           length_ = XPCOM.strlen__prunichar(a_check_msg)
           if (length_ > 0)
             dest = CharArray.new(length_)
-            XPCOM.memmove(dest, a_check_msg, length_ * 2)
+            XPCOM.memmove___org_eclipse_swt_browser_prompt_service2_101(dest, a_check_msg, length_ * 2)
             check_label = RJava.cast_to_string(String.new(dest))
           end
         end
@@ -931,11 +931,11 @@ module Org::Eclipse::Swt::Browser
         check = Array.typed(::Java::Int).new(1) { 0 }
         result = Array.typed(::Java::Int).new(1) { 0 }
         if (!(a_check_state).equal?(0))
-          XPCOM.memmove(check, a_check_state, 4)
+          XPCOM.memmove___org_eclipse_swt_browser_prompt_service2_103(check, a_check_state, 4)
         end
         # PRBool
         dialog.prompt_username_and_password(title_label, text_label, check_label, user_label, pass_label, check, result)
-        XPCOM.memmove(_retval, result, 4)
+        XPCOM.memmove___org_eclipse_swt_browser_prompt_service2_105(_retval, result, 4)
         # PRBool
         if ((result[0]).equal?(1))
           # User selected OK
@@ -943,7 +943,7 @@ module Org::Eclipse::Swt::Browser
           password = RJava.cast_to_string(pass_label[0])
         end
         if (!(a_check_state).equal?(0))
-          XPCOM.memmove(a_check_state, check, 4)
+          XPCOM.memmove___org_eclipse_swt_browser_prompt_service2_107(a_check_state, check, 4)
         end
         # PRBool
       end
@@ -954,11 +954,11 @@ module Org::Eclipse::Swt::Browser
         # int
         # int
         user_addr = Array.typed(::Java::Long).new(1) { 0 }
-        XPCOM.memmove(user_addr, a_username, C::PTR_SIZEOF)
+        XPCOM.memmove___org_eclipse_swt_browser_prompt_service2_109(user_addr, a_username, C::PTR_SIZEOF)
         # int
         # int
         pass_addr = Array.typed(::Java::Long).new(1) { 0 }
-        XPCOM.memmove(pass_addr, a_password, C::PTR_SIZEOF)
+        XPCOM.memmove___org_eclipse_swt_browser_prompt_service2_111(pass_addr, a_password, C::PTR_SIZEOF)
         # int
         # int
         result = Array.typed(::Java::Long).new(1) { 0 }
@@ -996,17 +996,17 @@ module Org::Eclipse::Swt::Browser
         size = buffer.attr_length * 2
         # int
         ptr = C.malloc(size)
-        XPCOM.memmove(ptr, buffer, size)
+        XPCOM.memmove___org_eclipse_swt_browser_prompt_service2_113(ptr, buffer, size)
         # int
-        XPCOM.memmove(a_username, Array.typed(::Java::Long).new([ptr]), C::PTR_SIZEOF)
+        XPCOM.memmove___org_eclipse_swt_browser_prompt_service2_115(a_username, Array.typed(::Java::Long).new([ptr]), C::PTR_SIZEOF)
         cnt = password.length
         buffer = CharArray.new(cnt + 1)
         password.get_chars(0, cnt, buffer, 0)
         size = buffer.attr_length * 2
         ptr = C.malloc(size)
-        XPCOM.memmove(ptr, buffer, size)
+        XPCOM.memmove___org_eclipse_swt_browser_prompt_service2_117(ptr, buffer, size)
         # int
-        XPCOM.memmove(a_password, Array.typed(::Java::Long).new([ptr]), C::PTR_SIZEOF)
+        XPCOM.memmove___org_eclipse_swt_browser_prompt_service2_119(a_password, Array.typed(::Java::Long).new([ptr]), C::PTR_SIZEOF)
       end
       return XPCOM::NS_OK
     end

@@ -2321,7 +2321,7 @@ module Org::Eclipse::Swt::Widgets
         return
       end
       rect = NSRect.new
-      OS.memmove(rect, arg0, NSRect.attr_sizeof)
+      OS.memmove___org_eclipse_swt_widgets_widget_1(rect, arg0, NSRect.attr_sizeof)
       view = NSView.new(id)
       if (@display.attr_is_painting.contains_object(view))
         needs_display_in_rect = @display.attr_needs_display_in_rect

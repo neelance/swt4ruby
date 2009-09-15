@@ -201,9 +201,9 @@ module Org::Eclipse::Swt::Accessibility
           # long
           super_type = ATK.g_type_interface_peek_parent(ATK._atk_action_get_iface(object.attr_handle))
           action_iface = AtkActionIface.new
-          ATK.memmove(action_iface, super_type)
+          ATK.memmove___org_eclipse_swt_accessibility_accessible_object_1(action_iface, super_type)
           if (!(action_iface.attr_get_keybinding).equal?(0))
-            parent_result = ATK.call(action_iface.attr_get_keybinding, object.attr_handle, index)
+            parent_result = ATK.call___org_eclipse_swt_accessibility_accessible_object_3(action_iface.attr_get_keybinding, object.attr_handle, index)
           end
         end
         listeners = object.get_accessible_listeners
@@ -215,7 +215,7 @@ module Org::Eclipse::Swt::Accessibility
         if (!(parent_result).equal?(0))
           length = OS.strlen(parent_result)
           buffer = Array.typed(::Java::Byte).new(length) { 0 }
-          OS.memmove(buffer, parent_result, length)
+          OS.memmove___org_eclipse_swt_accessibility_accessible_object_5(buffer, parent_result, length)
           event.attr_result = String.new(Converter.mbcs_to_wcs(nil, buffer))
         end
         i = 0
@@ -231,7 +231,7 @@ module Org::Eclipse::Swt::Accessibility
         end
         name = Converter.wcs_to_mbcs(nil, event.attr_result, true)
         self.attr_keybinding_ptr = OS.g_malloc(name.attr_length)
-        OS.memmove(self.attr_keybinding_ptr, name, name.attr_length)
+        OS.memmove___org_eclipse_swt_accessibility_accessible_object_7(self.attr_keybinding_ptr, name, name.attr_length)
         return self.attr_keybinding_ptr
       end
       
@@ -253,9 +253,9 @@ module Org::Eclipse::Swt::Accessibility
           # long
           super_type = ATK.g_type_interface_peek_parent(ATK._atk_action_get_iface(object.attr_handle))
           action_iface = AtkActionIface.new
-          ATK.memmove(action_iface, super_type)
+          ATK.memmove___org_eclipse_swt_accessibility_accessible_object_9(action_iface, super_type)
           if (!(action_iface.attr_get_name).equal?(0))
-            parent_result = ATK.call(action_iface.attr_get_name, object.attr_handle, index)
+            parent_result = ATK.call___org_eclipse_swt_accessibility_accessible_object_11(action_iface.attr_get_name, object.attr_handle, index)
           end
         end
         listeners = object.get_control_listeners
@@ -267,7 +267,7 @@ module Org::Eclipse::Swt::Accessibility
         if (!(parent_result).equal?(0))
           length = OS.strlen(parent_result)
           buffer = Array.typed(::Java::Byte).new(length) { 0 }
-          OS.memmove(buffer, parent_result, length)
+          OS.memmove___org_eclipse_swt_accessibility_accessible_object_13(buffer, parent_result, length)
           event.attr_result = String.new(Converter.mbcs_to_wcs(nil, buffer))
         end
         i = 0
@@ -283,7 +283,7 @@ module Org::Eclipse::Swt::Accessibility
         end
         name = Converter.wcs_to_mbcs(nil, event.attr_result, true)
         self.attr_action_name_ptr = OS.g_malloc(name.attr_length)
-        OS.memmove(self.attr_action_name_ptr, name, name.attr_length)
+        OS.memmove___org_eclipse_swt_accessibility_accessible_object_15(self.attr_action_name_ptr, name, name.attr_length)
         return self.attr_action_name_ptr
       end
       
@@ -303,17 +303,17 @@ module Org::Eclipse::Swt::Accessibility
         if ((object).nil?)
           return 0
         end
-        OS.memmove(x, Array.typed(::Java::Int).new([0]), 4)
-        OS.memmove(y, Array.typed(::Java::Int).new([0]), 4)
-        OS.memmove(width, Array.typed(::Java::Int).new([0]), 4)
-        OS.memmove(height, Array.typed(::Java::Int).new([0]), 4)
+        OS.memmove___org_eclipse_swt_accessibility_accessible_object_17(x, Array.typed(::Java::Int).new([0]), 4)
+        OS.memmove___org_eclipse_swt_accessibility_accessible_object_19(y, Array.typed(::Java::Int).new([0]), 4)
+        OS.memmove___org_eclipse_swt_accessibility_accessible_object_21(width, Array.typed(::Java::Int).new([0]), 4)
+        OS.memmove___org_eclipse_swt_accessibility_accessible_object_23(height, Array.typed(::Java::Int).new([0]), 4)
         if (ATK.g_type_is_a(object.attr_parent_type, ATK_COMPONENT_TYPE))
           # long
           super_type = ATK.g_type_interface_peek_parent(ATK._atk_component_get_iface(object.attr_handle))
           component_iface = AtkComponentIface.new
-          ATK.memmove(component_iface, super_type)
+          ATK.memmove___org_eclipse_swt_accessibility_accessible_object_25(component_iface, super_type)
           if (!(component_iface.attr_get_extents).equal?(0))
-            ATK.call(component_iface.attr_get_extents, object.attr_handle, x, y, width, height, coord_type)
+            ATK.call___org_eclipse_swt_accessibility_accessible_object_27(component_iface.attr_get_extents, object.attr_handle, x, y, width, height, coord_type)
           end
         end
         listeners = object.get_control_listeners
@@ -324,10 +324,10 @@ module Org::Eclipse::Swt::Accessibility
         parent_y = Array.typed(::Java::Int).new(1) { 0 }
         parent_width = Array.typed(::Java::Int).new(1) { 0 }
         parent_height = Array.typed(::Java::Int).new(1) { 0 }
-        OS.memmove(parent_x, x, 4)
-        OS.memmove(parent_y, y, 4)
-        OS.memmove(parent_width, width, 4)
-        OS.memmove(parent_height, height, 4)
+        OS.memmove___org_eclipse_swt_accessibility_accessible_object_29(parent_x, x, 4)
+        OS.memmove___org_eclipse_swt_accessibility_accessible_object_31(parent_y, y, 4)
+        OS.memmove___org_eclipse_swt_accessibility_accessible_object_33(parent_width, width, 4)
+        OS.memmove___org_eclipse_swt_accessibility_accessible_object_35(parent_height, height, 4)
         event = AccessibleControlEvent.new(object.attr_accessible)
         event.attr_child_id = object.attr_id
         event.attr_x = parent_x[0]
@@ -339,7 +339,7 @@ module Org::Eclipse::Swt::Accessibility
           # long
           gtk_accessible_handle = ATK._gtk_accessible(object.attr_handle)
           gtk_accessible = GtkAccessible.new
-          ATK.memmove(gtk_accessible, gtk_accessible_handle)
+          ATK.memmove___org_eclipse_swt_accessibility_accessible_object_37(gtk_accessible, gtk_accessible_handle)
           # long
           top_level = ATK.gtk_widget_get_toplevel(gtk_accessible.attr_widget)
           # long
@@ -360,7 +360,7 @@ module Org::Eclipse::Swt::Accessibility
           # long
           gtk_accessible_handle = ATK._gtk_accessible(object.attr_handle)
           gtk_accessible = GtkAccessible.new
-          ATK.memmove(gtk_accessible, gtk_accessible_handle)
+          ATK.memmove___org_eclipse_swt_accessibility_accessible_object_39(gtk_accessible, gtk_accessible_handle)
           # long
           top_level = ATK.gtk_widget_get_toplevel(gtk_accessible.attr_widget)
           # long
@@ -371,10 +371,10 @@ module Org::Eclipse::Swt::Accessibility
           event.attr_x -= top_window_x[0]
           event.attr_y -= top_window_y[0]
         end
-        OS.memmove(x, Array.typed(::Java::Int).new([event.attr_x]), 4)
-        OS.memmove(y, Array.typed(::Java::Int).new([event.attr_y]), 4)
-        OS.memmove(width, Array.typed(::Java::Int).new([event.attr_width]), 4)
-        OS.memmove(height, Array.typed(::Java::Int).new([event.attr_height]), 4)
+        OS.memmove___org_eclipse_swt_accessibility_accessible_object_41(x, Array.typed(::Java::Int).new([event.attr_x]), 4)
+        OS.memmove___org_eclipse_swt_accessibility_accessible_object_43(y, Array.typed(::Java::Int).new([event.attr_y]), 4)
+        OS.memmove___org_eclipse_swt_accessibility_accessible_object_45(width, Array.typed(::Java::Int).new([event.attr_width]), 4)
+        OS.memmove___org_eclipse_swt_accessibility_accessible_object_47(height, Array.typed(::Java::Int).new([event.attr_height]), 4)
         return 0
       end
       
@@ -392,15 +392,15 @@ module Org::Eclipse::Swt::Accessibility
         if ((object).nil?)
           return 0
         end
-        OS.memmove(x, Array.typed(::Java::Int).new([0]), 4)
-        OS.memmove(y, Array.typed(::Java::Int).new([0]), 4)
+        OS.memmove___org_eclipse_swt_accessibility_accessible_object_49(x, Array.typed(::Java::Int).new([0]), 4)
+        OS.memmove___org_eclipse_swt_accessibility_accessible_object_51(y, Array.typed(::Java::Int).new([0]), 4)
         if (ATK.g_type_is_a(object.attr_parent_type, ATK_COMPONENT_TYPE))
           # long
           super_type = ATK.g_type_interface_peek_parent(ATK._atk_component_get_iface(object.attr_handle))
           component_iface = AtkComponentIface.new
-          ATK.memmove(component_iface, super_type)
+          ATK.memmove___org_eclipse_swt_accessibility_accessible_object_53(component_iface, super_type)
           if (!(component_iface.attr_get_extents).equal?(0))
-            ATK.call(component_iface.attr_get_position, object.attr_handle, x, y, coord_type)
+            ATK.call___org_eclipse_swt_accessibility_accessible_object_55(component_iface.attr_get_position, object.attr_handle, x, y, coord_type)
           end
         end
         listeners = object.get_control_listeners
@@ -409,8 +409,8 @@ module Org::Eclipse::Swt::Accessibility
         end
         parent_x = Array.typed(::Java::Int).new(1) { 0 }
         parent_y = Array.typed(::Java::Int).new(1) { 0 }
-        OS.memmove(parent_x, x, 4)
-        OS.memmove(parent_y, y, 4)
+        OS.memmove___org_eclipse_swt_accessibility_accessible_object_57(parent_x, x, 4)
+        OS.memmove___org_eclipse_swt_accessibility_accessible_object_59(parent_y, y, 4)
         event = AccessibleControlEvent.new(object.attr_accessible)
         event.attr_child_id = object.attr_id
         event.attr_x = parent_x[0]
@@ -420,7 +420,7 @@ module Org::Eclipse::Swt::Accessibility
           # long
           gtk_accessible_handle = ATK._gtk_accessible(object.attr_handle)
           gtk_accessible = GtkAccessible.new
-          ATK.memmove(gtk_accessible, gtk_accessible_handle)
+          ATK.memmove___org_eclipse_swt_accessibility_accessible_object_61(gtk_accessible, gtk_accessible_handle)
           # long
           top_level = ATK.gtk_widget_get_toplevel(gtk_accessible.attr_widget)
           # long
@@ -441,7 +441,7 @@ module Org::Eclipse::Swt::Accessibility
           # long
           gtk_accessible_handle = ATK._gtk_accessible(object.attr_handle)
           gtk_accessible = GtkAccessible.new
-          ATK.memmove(gtk_accessible, gtk_accessible_handle)
+          ATK.memmove___org_eclipse_swt_accessibility_accessible_object_63(gtk_accessible, gtk_accessible_handle)
           # long
           top_level = ATK.gtk_widget_get_toplevel(gtk_accessible.attr_widget)
           # long
@@ -452,8 +452,8 @@ module Org::Eclipse::Swt::Accessibility
           event.attr_x -= top_window_x[0]
           event.attr_y -= top_window_y[0]
         end
-        OS.memmove(x, Array.typed(::Java::Int).new([event.attr_x]), 4)
-        OS.memmove(y, Array.typed(::Java::Int).new([event.attr_y]), 4)
+        OS.memmove___org_eclipse_swt_accessibility_accessible_object_65(x, Array.typed(::Java::Int).new([event.attr_x]), 4)
+        OS.memmove___org_eclipse_swt_accessibility_accessible_object_67(y, Array.typed(::Java::Int).new([event.attr_y]), 4)
         return 0
       end
       
@@ -471,15 +471,15 @@ module Org::Eclipse::Swt::Accessibility
         if ((object).nil?)
           return 0
         end
-        OS.memmove(width, Array.typed(::Java::Int).new([0]), 4)
-        OS.memmove(height, Array.typed(::Java::Int).new([0]), 4)
+        OS.memmove___org_eclipse_swt_accessibility_accessible_object_69(width, Array.typed(::Java::Int).new([0]), 4)
+        OS.memmove___org_eclipse_swt_accessibility_accessible_object_71(height, Array.typed(::Java::Int).new([0]), 4)
         if (ATK.g_type_is_a(object.attr_parent_type, ATK_COMPONENT_TYPE))
           # long
           super_type = ATK.g_type_interface_peek_parent(ATK._atk_component_get_iface(object.attr_handle))
           component_iface = AtkComponentIface.new
-          ATK.memmove(component_iface, super_type)
+          ATK.memmove___org_eclipse_swt_accessibility_accessible_object_73(component_iface, super_type)
           if (!(component_iface.attr_get_extents).equal?(0))
-            ATK.call(component_iface.attr_get_size, object.attr_handle, width, height, coord_type)
+            ATK.call___org_eclipse_swt_accessibility_accessible_object_75(component_iface.attr_get_size, object.attr_handle, width, height, coord_type)
           end
         end
         listeners = object.get_control_listeners
@@ -488,8 +488,8 @@ module Org::Eclipse::Swt::Accessibility
         end
         parent_width = Array.typed(::Java::Int).new(1) { 0 }
         parent_height = Array.typed(::Java::Int).new(1) { 0 }
-        OS.memmove(parent_width, width, 4)
-        OS.memmove(parent_height, height, 4)
+        OS.memmove___org_eclipse_swt_accessibility_accessible_object_77(parent_width, width, 4)
+        OS.memmove___org_eclipse_swt_accessibility_accessible_object_79(parent_height, height, 4)
         event = AccessibleControlEvent.new(object.attr_accessible)
         event.attr_child_id = object.attr_id
         event.attr_width = parent_width[0]
@@ -499,8 +499,8 @@ module Org::Eclipse::Swt::Accessibility
           listeners[i].get_location(event)
           i += 1
         end
-        OS.memmove(width, Array.typed(::Java::Int).new([event.attr_width]), 4)
-        OS.memmove(height, Array.typed(::Java::Int).new([event.attr_height]), 4)
+        OS.memmove___org_eclipse_swt_accessibility_accessible_object_81(width, Array.typed(::Java::Int).new([event.attr_width]), 4)
+        OS.memmove___org_eclipse_swt_accessibility_accessible_object_83(height, Array.typed(::Java::Int).new([event.attr_height]), 4)
         return 0
       end
       
@@ -524,9 +524,9 @@ module Org::Eclipse::Swt::Accessibility
           # long
           super_type = ATK.g_type_interface_peek_parent(ATK._atk_component_get_iface(object.attr_handle))
           component_iface = AtkComponentIface.new
-          ATK.memmove(component_iface, super_type)
+          ATK.memmove___org_eclipse_swt_accessibility_accessible_object_85(component_iface, super_type)
           if (!(component_iface.attr_ref_accessible_at_point).equal?(0))
-            parent_result = ATK.call(component_iface.attr_ref_accessible_at_point, object.attr_handle, x, y, coord_type)
+            parent_result = ATK.call___org_eclipse_swt_accessibility_accessible_object_87(component_iface.attr_ref_accessible_at_point, object.attr_handle, x, y, coord_type)
           end
         end
         listeners = object.get_control_listeners
@@ -544,7 +544,7 @@ module Org::Eclipse::Swt::Accessibility
           # long
           gtk_accessible_handle = ATK._gtk_accessible(object.attr_handle)
           gtk_accessible = GtkAccessible.new
-          ATK.memmove(gtk_accessible, gtk_accessible_handle)
+          ATK.memmove___org_eclipse_swt_accessibility_accessible_object_89(gtk_accessible, gtk_accessible_handle)
           # long
           top_level = ATK.gtk_widget_get_toplevel(gtk_accessible.attr_widget)
           # long
@@ -623,9 +623,9 @@ module Org::Eclipse::Swt::Accessibility
         # long
         super_type = ATK.g_type_class_peek(object.attr_parent_type)
         object_class = AtkObjectClass.new
-        ATK.memmove(object_class, super_type)
+        ATK.memmove___org_eclipse_swt_accessibility_accessible_object_91(object_class, super_type)
         if (!(object_class.attr_get_description).equal?(0))
-          parent_result = ATK.call(object_class.attr_get_description, object.attr_handle)
+          parent_result = ATK.call___org_eclipse_swt_accessibility_accessible_object_93(object_class.attr_get_description, object.attr_handle)
         end
         listeners = object.get_accessible_listeners
         if ((listeners.attr_length).equal?(0))
@@ -636,7 +636,7 @@ module Org::Eclipse::Swt::Accessibility
         if (!(parent_result).equal?(0))
           length = OS.strlen(parent_result)
           buffer = Array.typed(::Java::Byte).new(length) { 0 }
-          OS.memmove(buffer, parent_result, length)
+          OS.memmove___org_eclipse_swt_accessibility_accessible_object_95(buffer, parent_result, length)
           event.attr_result = String.new(Converter.mbcs_to_wcs(nil, buffer))
         end
         i = 0
@@ -652,7 +652,7 @@ module Org::Eclipse::Swt::Accessibility
         end
         name = Converter.wcs_to_mbcs(nil, event.attr_result, true)
         self.attr_description_ptr = OS.g_malloc(name.attr_length)
-        OS.memmove(self.attr_description_ptr, name, name.attr_length)
+        OS.memmove___org_eclipse_swt_accessibility_accessible_object_97(self.attr_description_ptr, name, name.attr_length)
         return self.attr_description_ptr
       end
       
@@ -672,9 +672,9 @@ module Org::Eclipse::Swt::Accessibility
         # long
         super_type = ATK.g_type_class_peek(object.attr_parent_type)
         object_class = AtkObjectClass.new
-        ATK.memmove(object_class, super_type)
+        ATK.memmove___org_eclipse_swt_accessibility_accessible_object_99(object_class, super_type)
         if (!(object_class.attr_get_name).equal?(0))
-          parent_result = ATK.call(object_class.attr_get_name, object.attr_handle)
+          parent_result = ATK.call___org_eclipse_swt_accessibility_accessible_object_101(object_class.attr_get_name, object.attr_handle)
         end
         listeners = object.get_accessible_listeners
         if ((listeners.attr_length).equal?(0))
@@ -685,7 +685,7 @@ module Org::Eclipse::Swt::Accessibility
         if (!(parent_result).equal?(0))
           length = OS.strlen(parent_result)
           buffer = Array.typed(::Java::Byte).new(length) { 0 }
-          OS.memmove(buffer, parent_result, length)
+          OS.memmove___org_eclipse_swt_accessibility_accessible_object_103(buffer, parent_result, length)
           event.attr_result = String.new(Converter.mbcs_to_wcs(nil, buffer))
         end
         i = 0
@@ -701,7 +701,7 @@ module Org::Eclipse::Swt::Accessibility
         end
         name = Converter.wcs_to_mbcs(nil, event.attr_result, true)
         self.attr_name_ptr = OS.g_malloc(name.attr_length)
-        OS.memmove(self.attr_name_ptr, name, name.attr_length)
+        OS.memmove___org_eclipse_swt_accessibility_accessible_object_105(self.attr_name_ptr, name, name.attr_length)
         return self.attr_name_ptr
       end
       
@@ -721,9 +721,9 @@ module Org::Eclipse::Swt::Accessibility
         # long
         super_type = ATK.g_type_class_peek(object.attr_parent_type)
         object_class = AtkObjectClass.new
-        ATK.memmove(object_class, super_type)
+        ATK.memmove___org_eclipse_swt_accessibility_accessible_object_107(object_class, super_type)
         if (!(object_class.attr_get_n_children).equal?(0))
-          parent_result = ATK.call(object_class.attr_get_n_children, object.attr_handle)
+          parent_result = ATK.call___org_eclipse_swt_accessibility_accessible_object_109(object_class.attr_get_n_children, object.attr_handle)
         end
         listeners = object.get_control_listeners
         if ((listeners.attr_length).equal?(0))
@@ -758,11 +758,11 @@ module Org::Eclipse::Swt::Accessibility
         # long
         super_type = ATK.g_type_class_peek(object.attr_parent_type)
         object_class = AtkObjectClass.new
-        ATK.memmove(object_class, super_type)
+        ATK.memmove___org_eclipse_swt_accessibility_accessible_object_111(object_class, super_type)
         if ((object_class.attr_get_index_in_parent).equal?(0))
           return 0
         end
-        return ATK.call(object_class.attr_get_index_in_parent, object.attr_handle)
+        return ATK.call___org_eclipse_swt_accessibility_accessible_object_113(object_class.attr_get_index_in_parent, object.attr_handle)
       end
       
       typesig { [::Java::Int] }
@@ -782,11 +782,11 @@ module Org::Eclipse::Swt::Accessibility
         # long
         super_type = ATK.g_type_class_peek(object.attr_parent_type)
         object_class = AtkObjectClass.new
-        ATK.memmove(object_class, super_type)
+        ATK.memmove___org_eclipse_swt_accessibility_accessible_object_115(object_class, super_type)
         if ((object_class.attr_get_parent).equal?(0))
           return 0
         end
-        return ATK.call(object_class.attr_get_parent, object.attr_handle)
+        return ATK.call___org_eclipse_swt_accessibility_accessible_object_117(object_class.attr_get_parent, object.attr_handle)
       end
       
       typesig { [::Java::Int] }
@@ -879,11 +879,11 @@ module Org::Eclipse::Swt::Accessibility
         # long
         super_type = ATK.g_type_class_peek(object.attr_parent_type)
         object_class = AtkObjectClass.new
-        ATK.memmove(object_class, super_type)
+        ATK.memmove___org_eclipse_swt_accessibility_accessible_object_119(object_class, super_type)
         if ((object_class.attr_get_role).equal?(0))
           return 0
         end
-        return ATK.call(object_class.attr_get_role, object.attr_handle)
+        return ATK.call___org_eclipse_swt_accessibility_accessible_object_121(object_class.attr_get_role, object.attr_handle)
       end
       
       typesig { [::Java::Int, ::Java::Int] }
@@ -908,11 +908,11 @@ module Org::Eclipse::Swt::Accessibility
         # long
         super_type = ATK.g_type_class_peek(object.attr_parent_type)
         object_class = AtkObjectClass.new
-        ATK.memmove(object_class, super_type)
+        ATK.memmove___org_eclipse_swt_accessibility_accessible_object_123(object_class, super_type)
         if ((object_class.attr_ref_child).equal?(0))
           return 0
         end
-        return ATK.call(object_class.attr_ref_child, object.attr_handle, index)
+        return ATK.call___org_eclipse_swt_accessibility_accessible_object_125(object_class.attr_ref_child, object.attr_handle, index)
       end
       
       typesig { [::Java::Int] }
@@ -931,9 +931,9 @@ module Org::Eclipse::Swt::Accessibility
         # long
         super_type = ATK.g_type_class_peek(object.attr_parent_type)
         object_class = AtkObjectClass.new
-        ATK.memmove(object_class, super_type)
+        ATK.memmove___org_eclipse_swt_accessibility_accessible_object_127(object_class, super_type)
         if (!(object_class.attr_ref_state_set).equal?(0))
-          parent_result = ATK.call(object_class.attr_ref_state_set, object.attr_handle)
+          parent_result = ATK.call___org_eclipse_swt_accessibility_accessible_object_129(object_class.attr_ref_state_set, object.attr_handle)
         end
         listeners = object.get_control_listeners
         if ((listeners.attr_length).equal?(0))
@@ -1017,9 +1017,9 @@ module Org::Eclipse::Swt::Accessibility
           # long
           super_type = ATK.g_type_interface_peek_parent(ATK._atk_selection_get_iface(object.attr_handle))
           selection_iface = AtkSelectionIface.new
-          ATK.memmove(selection_iface, super_type)
+          ATK.memmove___org_eclipse_swt_accessibility_accessible_object_131(selection_iface, super_type)
           if (!(selection_iface.attr_is_child_selected).equal?(0))
-            parent_result = ATK.call(selection_iface.attr_is_child_selected, object.attr_handle, index)
+            parent_result = ATK.call___org_eclipse_swt_accessibility_accessible_object_133(selection_iface.attr_is_child_selected, object.attr_handle, index)
           end
         end
         listeners = object.get_control_listeners
@@ -1058,9 +1058,9 @@ module Org::Eclipse::Swt::Accessibility
           # long
           super_type = ATK.g_type_interface_peek_parent(ATK._atk_selection_get_iface(object.attr_handle))
           selection_iface = AtkSelectionIface.new
-          ATK.memmove(selection_iface, super_type)
+          ATK.memmove___org_eclipse_swt_accessibility_accessible_object_135(selection_iface, super_type)
           if (!(selection_iface.attr_ref_selection).equal?(0))
-            parent_result = ATK.call(selection_iface.attr_ref_selection, object.attr_handle, index)
+            parent_result = ATK.call___org_eclipse_swt_accessibility_accessible_object_137(selection_iface.attr_ref_selection, object.attr_handle, index)
           end
         end
         listeners = object.get_control_listeners
@@ -1102,9 +1102,9 @@ module Org::Eclipse::Swt::Accessibility
           # long
           super_type = ATK.g_type_interface_peek_parent(ATK._atk_text_get_iface(object.attr_handle))
           text_iface = AtkTextIface.new
-          ATK.memmove(text_iface, super_type)
+          ATK.memmove___org_eclipse_swt_accessibility_accessible_object_139(text_iface, super_type)
           if (!(text_iface.attr_get_caret_offset).equal?(0))
-            parent_result = ATK.call(text_iface.attr_get_caret_offset, object.attr_handle)
+            parent_result = ATK.call___org_eclipse_swt_accessibility_accessible_object_141(text_iface.attr_get_caret_offset, object.attr_handle)
           end
         end
         listeners = object.get_text_listeners
@@ -1144,9 +1144,9 @@ module Org::Eclipse::Swt::Accessibility
           # long
           super_type = ATK.g_type_class_peek(object.attr_parent_type)
           text_iface = AtkTextIface.new
-          ATK.memmove(text_iface, super_type)
+          ATK.memmove___org_eclipse_swt_accessibility_accessible_object_143(text_iface, super_type)
           if (!(text_iface.attr_get_character_at_offset).equal?(0))
-            return ATK.call(text_iface.attr_get_character_at_offset, object.attr_handle, offset)
+            return ATK.call___org_eclipse_swt_accessibility_accessible_object_145(text_iface.attr_get_character_at_offset, object.attr_handle, offset)
           end
         end
         return 0
@@ -1171,9 +1171,9 @@ module Org::Eclipse::Swt::Accessibility
           # long
           super_type = ATK.g_type_class_peek(object.attr_parent_type)
           text_iface = AtkTextIface.new
-          ATK.memmove(text_iface, super_type)
+          ATK.memmove___org_eclipse_swt_accessibility_accessible_object_147(text_iface, super_type)
           if (!(text_iface.attr_get_character_count).equal?(0))
-            return ATK.call(text_iface.attr_get_character_count, object.attr_handle)
+            return ATK.call___org_eclipse_swt_accessibility_accessible_object_149(text_iface.attr_get_character_count, object.attr_handle)
           end
         end
         return 0
@@ -1196,9 +1196,9 @@ module Org::Eclipse::Swt::Accessibility
           # long
           super_type = ATK.g_type_interface_peek_parent(ATK._atk_text_get_iface(object.attr_handle))
           text_iface = AtkTextIface.new
-          ATK.memmove(text_iface, super_type)
+          ATK.memmove___org_eclipse_swt_accessibility_accessible_object_151(text_iface, super_type)
           if (!(text_iface.attr_get_n_selections).equal?(0))
-            parent_result = ATK.call(text_iface.attr_get_n_selections, object.attr_handle)
+            parent_result = ATK.call___org_eclipse_swt_accessibility_accessible_object_153(text_iface.attr_get_n_selections, object.attr_handle)
           end
         end
         listeners = object.get_text_listeners
@@ -1229,15 +1229,15 @@ module Org::Eclipse::Swt::Accessibility
         if ((object).nil?)
           return 0
         end
-        OS.memmove(start_offset, Array.typed(::Java::Int).new([0]), 4)
-        OS.memmove(end_offset, Array.typed(::Java::Int).new([0]), 4)
+        OS.memmove___org_eclipse_swt_accessibility_accessible_object_155(start_offset, Array.typed(::Java::Int).new([0]), 4)
+        OS.memmove___org_eclipse_swt_accessibility_accessible_object_157(end_offset, Array.typed(::Java::Int).new([0]), 4)
         if (ATK.g_type_is_a(object.attr_parent_type, ATK_TEXT_TYPE))
           # long
           super_type = ATK.g_type_interface_peek_parent(ATK._atk_text_get_iface(object.attr_handle))
           text_iface = AtkTextIface.new
-          ATK.memmove(text_iface, super_type)
+          ATK.memmove___org_eclipse_swt_accessibility_accessible_object_159(text_iface, super_type)
           if (!(text_iface.attr_get_selection).equal?(0))
-            ATK.call(text_iface.attr_get_selection, object.attr_handle, selection_num, start_offset, end_offset)
+            ATK.call___org_eclipse_swt_accessibility_accessible_object_161(text_iface.attr_get_selection, object.attr_handle, selection_num, start_offset, end_offset)
           end
         end
         listeners = object.get_text_listeners
@@ -1248,8 +1248,8 @@ module Org::Eclipse::Swt::Accessibility
         event.attr_child_id = object.attr_id
         parent_start = Array.typed(::Java::Int).new(1) { 0 }
         parent_end = Array.typed(::Java::Int).new(1) { 0 }
-        OS.memmove(parent_start, start_offset, 4)
-        OS.memmove(parent_end, end_offset, 4)
+        OS.memmove___org_eclipse_swt_accessibility_accessible_object_163(parent_start, start_offset, 4)
+        OS.memmove___org_eclipse_swt_accessibility_accessible_object_165(parent_end, end_offset, 4)
         event.attr_offset = parent_start[0]
         event.attr_length = parent_end[0] - parent_start[0]
         i = 0
@@ -1257,8 +1257,8 @@ module Org::Eclipse::Swt::Accessibility
           listeners[i].get_selection_range(event)
           i += 1
         end
-        OS.memmove(start_offset, Array.typed(::Java::Int).new([event.attr_offset]), 4)
-        OS.memmove(end_offset, Array.typed(::Java::Int).new([event.attr_offset + event.attr_length]), 4)
+        OS.memmove___org_eclipse_swt_accessibility_accessible_object_167(start_offset, Array.typed(::Java::Int).new([event.attr_offset]), 4)
+        OS.memmove___org_eclipse_swt_accessibility_accessible_object_169(end_offset, Array.typed(::Java::Int).new([event.attr_offset + event.attr_length]), 4)
         return 0
       end
       
@@ -1289,7 +1289,7 @@ module Org::Eclipse::Swt::Accessibility
           bytes = Converter.wcs_to_mbcs(nil, text, true)
           # long
           result = OS.g_malloc(bytes.attr_length)
-          OS.memmove(result, bytes, bytes.attr_length)
+          OS.memmove___org_eclipse_swt_accessibility_accessible_object_171(result, bytes, bytes.attr_length)
           return result
         end
         return 0
@@ -1461,13 +1461,13 @@ module Org::Eclipse::Swt::Accessibility
               end_bounds = line_end2
             end
           end
-          OS.memmove(start_offset, Array.typed(::Java::Int).new([start_bounds]), 4)
-          OS.memmove(end_offset, Array.typed(::Java::Int).new([end_bounds]), 4)
+          OS.memmove___org_eclipse_swt_accessibility_accessible_object_173(start_offset, Array.typed(::Java::Int).new([start_bounds]), 4)
+          OS.memmove___org_eclipse_swt_accessibility_accessible_object_175(end_offset, Array.typed(::Java::Int).new([end_bounds]), 4)
           text = RJava.cast_to_string(text.substring(start_bounds, end_bounds))
           bytes = Converter.wcs_to_mbcs(nil, text, true)
           # long
           result = OS.g_malloc(bytes.attr_length)
-          OS.memmove(result, bytes, bytes.attr_length)
+          OS.memmove___org_eclipse_swt_accessibility_accessible_object_177(result, bytes, bytes.attr_length)
           return result
         end
         return 0
@@ -1584,13 +1584,13 @@ module Org::Eclipse::Swt::Accessibility
               end_bounds = next_index_of_char(text, "\n", line_end1 + 1)
             end
           end
-          OS.memmove(start_offset, Array.typed(::Java::Int).new([start_bounds]), 4)
-          OS.memmove(end_offset, Array.typed(::Java::Int).new([end_bounds]), 4)
+          OS.memmove___org_eclipse_swt_accessibility_accessible_object_179(start_offset, Array.typed(::Java::Int).new([start_bounds]), 4)
+          OS.memmove___org_eclipse_swt_accessibility_accessible_object_181(end_offset, Array.typed(::Java::Int).new([end_bounds]), 4)
           text = RJava.cast_to_string(text.substring(start_bounds, end_bounds))
           bytes = Converter.wcs_to_mbcs(nil, text, true)
           # long
           result = OS.g_malloc(bytes.attr_length)
-          OS.memmove(result, bytes, bytes.attr_length)
+          OS.memmove___org_eclipse_swt_accessibility_accessible_object_183(result, bytes, bytes.attr_length)
           return result
         end
         return 0
@@ -1711,13 +1711,13 @@ module Org::Eclipse::Swt::Accessibility
               end
             end
           end
-          OS.memmove(start_offset, Array.typed(::Java::Int).new([start_bounds]), 4)
-          OS.memmove(end_offset, Array.typed(::Java::Int).new([end_bounds]), 4)
+          OS.memmove___org_eclipse_swt_accessibility_accessible_object_185(start_offset, Array.typed(::Java::Int).new([start_bounds]), 4)
+          OS.memmove___org_eclipse_swt_accessibility_accessible_object_187(end_offset, Array.typed(::Java::Int).new([end_bounds]), 4)
           text = RJava.cast_to_string(text.substring(start_bounds, end_bounds))
           bytes = Converter.wcs_to_mbcs(nil, text, true)
           # long
           result = OS.g_malloc(bytes.attr_length)
-          OS.memmove(result, bytes, bytes.attr_length)
+          OS.memmove___org_eclipse_swt_accessibility_accessible_object_189(result, bytes, bytes.attr_length)
           return result
         end
         return 0
@@ -1792,18 +1792,18 @@ module Org::Eclipse::Swt::Accessibility
         # long
         super_type = ATK.g_type_interface_peek_parent(ATK._atk_text_get_iface(@handle))
         text_iface = AtkTextIface.new
-        ATK.memmove(text_iface, super_type)
+        ATK.memmove___org_eclipse_swt_accessibility_accessible_object_191(text_iface, super_type)
         # long
         character_count = 0
         if (!(text_iface.attr_get_character_count).equal?(0))
-          character_count = ATK.call(text_iface.attr_get_character_count, @handle)
+          character_count = ATK.call___org_eclipse_swt_accessibility_accessible_object_193(text_iface.attr_get_character_count, @handle)
         end
         if (character_count > 0 && !(text_iface.attr_get_text).equal?(0))
-          parent_result = ATK.call(text_iface.attr_get_text, @handle, 0, character_count)
+          parent_result = ATK.call___org_eclipse_swt_accessibility_accessible_object_195(text_iface.attr_get_text, @handle, 0, character_count)
           if (!(parent_result).equal?(0))
             length_ = OS.strlen(parent_result)
             buffer = Array.typed(::Java::Byte).new(length_) { 0 }
-            OS.memmove(buffer, parent_result, length_)
+            OS.memmove___org_eclipse_swt_accessibility_accessible_object_197(buffer, parent_result, length_)
             parent_text = RJava.cast_to_string(String.new(Converter.mbcs_to_wcs(nil, buffer)))
           end
         end
@@ -1842,8 +1842,8 @@ module Org::Eclipse::Swt::Accessibility
         # long
         g_object_class = ATK._g_object_class(super_type)
         object_class_struct = GObjectClass.new
-        ATK.memmove(object_class_struct, g_object_class)
-        ATK.call(object_class_struct.attr_finalize, atk_object)
+        ATK.memmove___org_eclipse_swt_accessibility_accessible_object_199(object_class_struct, g_object_class)
+        ATK.call___org_eclipse_swt_accessibility_accessible_object_201(object_class_struct.attr_finalize, atk_object)
         object = get_accessible_object(atk_object)
         if (!(object).nil?)
           AccessibleObjects.remove(SwtLONG.new(atk_object))

@@ -321,7 +321,7 @@ module Org::Eclipse::Swt::Widgets
       path = OS.gtk_tree_model_get_path(@model_handle, iter)
       depth = OS.gtk_tree_path_get_depth(path)
       indices = Array.typed(::Java::Int).new(depth) { 0 }
-      OS.memmove(indices, OS.gtk_tree_path_get_indices(path), 4 * depth)
+      OS.memmove___org_eclipse_swt_widgets_tree_1(indices, OS.gtk_tree_path_get_indices(path), 4 * depth)
       # int
       parent_iter = 0
       if (depth > 1)
@@ -2285,7 +2285,7 @@ module Org::Eclipse::Swt::Widgets
     # int
     def gtk_button_press_event(widget, event)
       gdk_event = GdkEventButton.new
-      OS.memmove(gdk_event, event, GdkEventButton.attr_sizeof)
+      OS.memmove___org_eclipse_swt_widgets_tree_3(gdk_event, event, GdkEventButton.attr_sizeof)
       if (!(gdk_event.attr_window).equal?(OS.gtk_tree_view_get_bin_window(self.attr_handle)))
         return 0
       end
@@ -2401,7 +2401,7 @@ module Org::Eclipse::Swt::Widgets
         # the return key, GTK does not issue notification. The fix is
         # to issue this notification when the return key is pressed.
         key_event = GdkEventKey.new
-        OS.memmove(key_event, event_ptr, GdkEventKey.attr_sizeof)
+        OS.memmove___org_eclipse_swt_widgets_tree_5(key_event, event_ptr, GdkEventKey.attr_sizeof)
         key = key_event.attr_keyval
         case (key)
         when OS::GDK_Return, OS::GDK_KP_Enter
@@ -2730,7 +2730,7 @@ module Org::Eclipse::Swt::Widgets
         indices = OS.gtk_tree_path_get_indices(path)
         if (!(indices).equal?(0))
           temp = Array.typed(::Java::Int).new(1) { 0 }
-          OS.memmove(temp, indices, 4)
+          OS.memmove___org_eclipse_swt_widgets_tree_7(temp, indices, 4)
           index = temp[0]
         end
       end
@@ -3060,9 +3060,9 @@ module Org::Eclipse::Swt::Widgets
       # int
       g_class = OS.g_type_class_peek_parent(OS._g_object_get_class(cell))
       klass = GtkCellRendererClass.new
-      OS.memmove(klass, g_class)
+      OS.memmove___org_eclipse_swt_widgets_tree_9(klass, g_class)
       # int
-      result = OS.call(klass.attr_get_size, cell, self.attr_handle, cell_area, x_offset, y_offset, width, height)
+      result = OS.call___org_eclipse_swt_widgets_tree_11(klass.attr_get_size, cell, self.attr_handle, cell_area, x_offset, y_offset, width, height)
       if (!@ignore_size && OS._gtk_is_cell_renderer_text(cell))
         # int
         iter = OS.g_object_get_qdata(cell, Display::SWT_OBJECT_INDEX2)
@@ -3088,10 +3088,10 @@ module Org::Eclipse::Swt::Widgets
             content_width = Array.typed(::Java::Int).new(1) { 0 }
             content_height = Array.typed(::Java::Int).new(1) { 0 }
             if (!(width).equal?(0))
-              OS.memmove(content_width, width, 4)
+              OS.memmove___org_eclipse_swt_widgets_tree_13(content_width, width, 4)
             end
             if (!(height).equal?(0))
-              OS.memmove(content_height, height, 4)
+              OS.memmove___org_eclipse_swt_widgets_tree_15(content_height, height, 4)
             end
             image = item.get_image(column_index)
             image_width = 0
@@ -3115,10 +3115,10 @@ module Org::Eclipse::Swt::Widgets
               content_height[0] = event.attr_height
             end
             if (!(width).equal?(0))
-              OS.memmove(width, content_width, 4)
+              OS.memmove___org_eclipse_swt_widgets_tree_17(width, content_width, 4)
             end
             if (!(height).equal?(0))
-              OS.memmove(height, content_height, 4)
+              OS.memmove___org_eclipse_swt_widgets_tree_19(height, content_height, 4)
             end
           end
         end
@@ -3247,7 +3247,7 @@ module Org::Eclipse::Swt::Widgets
         gc = SwtGC.new(self)
         gc.set_background(item.get_background(column_index))
         rect = GdkRectangle.new
-        OS.memmove(rect, background_area, GdkRectangle.attr_sizeof)
+        OS.memmove___org_eclipse_swt_widgets_tree_21(rect, background_area, GdkRectangle.attr_sizeof)
         gc.fill_rectangle(rect.attr_x, rect.attr_y, rect.attr_width, rect.attr_height)
         gc.dispose
       end
@@ -3255,11 +3255,11 @@ module Org::Eclipse::Swt::Widgets
         # int
         g_class = OS.g_type_class_peek_parent(OS._g_object_get_class(cell))
         klass = GtkCellRendererClass.new
-        OS.memmove(klass, g_class)
+        OS.memmove___org_eclipse_swt_widgets_tree_23(klass, g_class)
         if (!(@draw_foreground).nil? && OS._gtk_is_cell_renderer_text(cell))
           OS.g_object_set(cell, OS.attr_foreground_gdk, @draw_foreground, 0)
         end
-        result = OS.call(klass.attr_render, cell, window, self.attr_handle, background_area, cell_area, expose_area, @draw_flags)
+        result = OS.call___org_eclipse_swt_widgets_tree_25(klass.attr_render, cell, window, self.attr_handle, background_area, cell_area, expose_area, @draw_flags)
       end
       if (!(item).nil?)
         if (OS._gtk_is_cell_renderer_text(cell))
@@ -4015,7 +4015,7 @@ module Org::Eclipse::Swt::Widgets
         indices = Array.typed(::Java::Int).new(depth - 1) { 0 }
         # int
         indices_ptr = OS.gtk_tree_path_get_indices(path)
-        OS.memmove(indices, indices_ptr, indices.attr_length * 4)
+        OS.memmove___org_eclipse_swt_widgets_tree_27(indices, indices_ptr, indices.attr_length * 4)
         # int
         temp_path = OS.gtk_tree_path_new
         i = 0

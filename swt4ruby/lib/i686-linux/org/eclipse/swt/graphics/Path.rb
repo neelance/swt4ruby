@@ -491,7 +491,7 @@ module Org::Eclipse::Swt::Graphics
         SWT.error(SWT::ERROR_NO_HANDLES)
       end
       path = Cairo_path_t.new
-      SwtCairo.memmove(path, copy, self.attr_cairo_path_t.attr_sizeof)
+      SwtCairo.memmove___org_eclipse_swt_graphics_path_1(path, copy, self.attr_cairo_path_t.attr_sizeof)
       min_x = 0
       min_y = 0
       max_x = 0
@@ -505,22 +505,22 @@ module Org::Eclipse::Swt::Graphics
         while (i < path.attr_num_data)
           # long
           offset = path.attr_data + i * self.attr_cairo_path_data_t.attr_sizeof
-          SwtCairo.memmove(data, offset, self.attr_cairo_path_data_t.attr_sizeof)
+          SwtCairo.memmove___org_eclipse_swt_graphics_path_3(data, offset, self.attr_cairo_path_data_t.attr_sizeof)
           case (data.attr_type)
           when SwtCairo::CAIRO_PATH_MOVE_TO
-            SwtCairo.memmove(points, offset + self.attr_cairo_path_data_t.attr_sizeof, self.attr_cairo_path_data_t.attr_sizeof)
+            SwtCairo.memmove___org_eclipse_swt_graphics_path_5(points, offset + self.attr_cairo_path_data_t.attr_sizeof, self.attr_cairo_path_data_t.attr_sizeof)
             min_x = Math.min(min_x, points[0])
             min_y = Math.min(min_y, points[1])
             max_x = Math.max(max_x, points[0])
             max_y = Math.max(max_y, points[1])
           when SwtCairo::CAIRO_PATH_LINE_TO
-            SwtCairo.memmove(points, offset + self.attr_cairo_path_data_t.attr_sizeof, self.attr_cairo_path_data_t.attr_sizeof)
+            SwtCairo.memmove___org_eclipse_swt_graphics_path_7(points, offset + self.attr_cairo_path_data_t.attr_sizeof, self.attr_cairo_path_data_t.attr_sizeof)
             min_x = Math.min(min_x, points[0])
             min_y = Math.min(min_y, points[1])
             max_x = Math.max(max_x, points[0])
             max_y = Math.max(max_y, points[1])
           when SwtCairo::CAIRO_PATH_CURVE_TO
-            SwtCairo.memmove(points, offset + self.attr_cairo_path_data_t.attr_sizeof, self.attr_cairo_path_data_t.attr_sizeof * 3)
+            SwtCairo.memmove___org_eclipse_swt_graphics_path_9(points, offset + self.attr_cairo_path_data_t.attr_sizeof, self.attr_cairo_path_data_t.attr_sizeof * 3)
             min_x = Math.min(min_x, points[0])
             min_y = Math.min(min_y, points[1])
             max_x = Math.max(max_x, points[0])
@@ -595,7 +595,7 @@ module Org::Eclipse::Swt::Graphics
         SWT.error(SWT::ERROR_NO_HANDLES)
       end
       path = Cairo_path_t.new
-      SwtCairo.memmove(path, copy, self.attr_cairo_path_t.attr_sizeof)
+      SwtCairo.memmove___org_eclipse_swt_graphics_path_11(path, copy, self.attr_cairo_path_t.attr_sizeof)
       types = Array.typed(::Java::Byte).new(path.attr_num_data) { 0 }
       pts = Array.typed(::Java::Float).new(path.attr_num_data * 6) { 0.0 }
       type_index = 0
@@ -607,21 +607,21 @@ module Org::Eclipse::Swt::Graphics
         while (i < path.attr_num_data)
           # long
           offset = path.attr_data + i * self.attr_cairo_path_data_t.attr_sizeof
-          SwtCairo.memmove(data, offset, self.attr_cairo_path_data_t.attr_sizeof)
+          SwtCairo.memmove___org_eclipse_swt_graphics_path_13(data, offset, self.attr_cairo_path_data_t.attr_sizeof)
           case (data.attr_type)
           when SwtCairo::CAIRO_PATH_MOVE_TO
             types[((type_index += 1) - 1)] = SWT::PATH_MOVE_TO
-            SwtCairo.memmove(points, offset + self.attr_cairo_path_data_t.attr_sizeof, self.attr_cairo_path_data_t.attr_sizeof)
+            SwtCairo.memmove___org_eclipse_swt_graphics_path_15(points, offset + self.attr_cairo_path_data_t.attr_sizeof, self.attr_cairo_path_data_t.attr_sizeof)
             pts[((pts_index += 1) - 1)] = (points[0]).to_f
             pts[((pts_index += 1) - 1)] = (points[1]).to_f
           when SwtCairo::CAIRO_PATH_LINE_TO
             types[((type_index += 1) - 1)] = SWT::PATH_LINE_TO
-            SwtCairo.memmove(points, offset + self.attr_cairo_path_data_t.attr_sizeof, self.attr_cairo_path_data_t.attr_sizeof)
+            SwtCairo.memmove___org_eclipse_swt_graphics_path_17(points, offset + self.attr_cairo_path_data_t.attr_sizeof, self.attr_cairo_path_data_t.attr_sizeof)
             pts[((pts_index += 1) - 1)] = (points[0]).to_f
             pts[((pts_index += 1) - 1)] = (points[1]).to_f
           when SwtCairo::CAIRO_PATH_CURVE_TO
             types[((type_index += 1) - 1)] = SWT::PATH_CUBIC_TO
-            SwtCairo.memmove(points, offset + self.attr_cairo_path_data_t.attr_sizeof, self.attr_cairo_path_data_t.attr_sizeof * 3)
+            SwtCairo.memmove___org_eclipse_swt_graphics_path_19(points, offset + self.attr_cairo_path_data_t.attr_sizeof, self.attr_cairo_path_data_t.attr_sizeof * 3)
             pts[((pts_index += 1) - 1)] = (points[0]).to_f
             pts[((pts_index += 1) - 1)] = (points[1]).to_f
             pts[((pts_index += 1) - 1)] = (points[2]).to_f

@@ -241,7 +241,7 @@ module Org::Eclipse::Swt::Widgets
               # 64
               clength = RJava.cast_to_int(items_written[0])
               chars = CharArray.new(clength)
-              OS.memmove(chars, utf16ptr, clength * 2)
+              OS.memmove___org_eclipse_swt_widgets_directory_dialog_1(chars, utf16ptr, clength * 2)
               OS.g_free(utf16ptr)
               answer = RJava.cast_to_string(String.new(chars))
               @filter_path = answer
@@ -289,7 +289,7 @@ module Org::Eclipse::Swt::Widgets
         OS.g_free(file_name_ptr)
       end
       selection = GtkFileSelection.new
-      OS.memmove(selection, handle)
+      OS.memmove___org_eclipse_swt_widgets_directory_dialog_3(selection, handle)
       OS.gtk_file_selection_hide_fileop_buttons(handle)
       # long
       file_list_parent = OS.gtk_widget_get_parent(selection.attr_file_list)
@@ -341,7 +341,7 @@ module Org::Eclipse::Swt::Widgets
             # 64
             length_ = RJava.cast_to_int(items_written[0])
             buffer = CharArray.new(length_)
-            OS.memmove(buffer, utf16ptr, length_ * 2)
+            OS.memmove___org_eclipse_swt_widgets_directory_dialog_5(buffer, utf16ptr, length_ * 2)
             os_answer = String.new(buffer)
             if (!(os_answer).nil?)
               # remove trailing separator, unless root directory

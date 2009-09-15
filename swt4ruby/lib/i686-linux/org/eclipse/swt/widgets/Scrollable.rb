@@ -295,7 +295,7 @@ module Org::Eclipse::Swt::Widgets
       if (!((self.attr_state & CANVAS)).equal?(0))
         scroll_bar = nil
         gdk_event = GdkEventScroll.new
-        OS.memmove(gdk_event, event_ptr, GdkEventScroll.attr_sizeof)
+        OS.memmove___org_eclipse_swt_widgets_scrollable_1(gdk_event, event_ptr, GdkEventScroll.attr_sizeof)
         if ((gdk_event.attr_direction).equal?(OS::GDK_SCROLL_UP) || (gdk_event.attr_direction).equal?(OS::GDK_SCROLL_DOWN))
           scroll_bar = @vertical_bar
         else
@@ -303,7 +303,7 @@ module Org::Eclipse::Swt::Widgets
         end
         if (!(scroll_bar).nil? && !OS._gtk_widget_visible(scroll_bar.attr_handle) && scroll_bar.get_enabled)
           adjustment = GtkAdjustment.new
-          OS.memmove(adjustment, scroll_bar.attr_adjustment_handle)
+          OS.memmove___org_eclipse_swt_widgets_scrollable_3(adjustment, scroll_bar.attr_adjustment_handle)
           # Calculate wheel delta to match GTK+ 2.4 and higher
           wheel_delta = RJava.cast_to_int(Math.pow(adjustment.attr_page_size, 2.0 / 3.0))
           if ((gdk_event.attr_direction).equal?(OS::GDK_SCROLL_UP) || (gdk_event.attr_direction).equal?(OS::GDK_SCROLL_LEFT))

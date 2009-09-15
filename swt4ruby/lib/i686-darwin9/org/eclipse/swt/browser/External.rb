@@ -337,33 +337,33 @@ module Org::Eclipse::Swt::Browser
         return XPCOM::NS_ERROR_NO_INTERFACE
       end
       guid = NsID.new
-      XPCOM.memmove(guid, riid, self.attr_ns_id.attr_sizeof)
+      XPCOM.memmove___org_eclipse_swt_browser_external_1(guid, riid, self.attr_ns_id.attr_sizeof)
       if (guid._equals(NsISupports::NS_ISUPPORTS_IID))
         # long
-        XPCOM.memmove(ppv_object, Array.typed(::Java::Int).new([@supports.get_address]), C::PTR_SIZEOF)
+        XPCOM.memmove___org_eclipse_swt_browser_external_3(ppv_object, Array.typed(::Java::Int).new([@supports.get_address]), C::PTR_SIZEOF)
         _add_ref
         return XPCOM::NS_OK
       end
       if (guid._equals(NsIClassInfo::NS_ICLASSINFO_IID))
         # long
-        XPCOM.memmove(ppv_object, Array.typed(::Java::Int).new([@class_info.get_address]), C::PTR_SIZEOF)
+        XPCOM.memmove___org_eclipse_swt_browser_external_5(ppv_object, Array.typed(::Java::Int).new([@class_info.get_address]), C::PTR_SIZEOF)
         _add_ref
         return XPCOM::NS_OK
       end
       if (guid._equals(NsISecurityCheckedComponent::NS_ISECURITYCHECKEDCOMPONENT_IID))
         # long
-        XPCOM.memmove(ppv_object, Array.typed(::Java::Int).new([@security_checked_component.get_address]), C::PTR_SIZEOF)
+        XPCOM.memmove___org_eclipse_swt_browser_external_7(ppv_object, Array.typed(::Java::Int).new([@security_checked_component.get_address]), C::PTR_SIZEOF)
         _add_ref
         return XPCOM::NS_OK
       end
       if (guid._equals(EXTERNAL_IID))
         # long
-        XPCOM.memmove(ppv_object, Array.typed(::Java::Int).new([@external.get_address]), C::PTR_SIZEOF)
+        XPCOM.memmove___org_eclipse_swt_browser_external_9(ppv_object, Array.typed(::Java::Int).new([@external.get_address]), C::PTR_SIZEOF)
         _add_ref
         return XPCOM::NS_OK
       end
       # long
-      XPCOM.memmove(ppv_object, Array.typed(::Java::Int).new([0]), C::PTR_SIZEOF)
+      XPCOM.memmove___org_eclipse_swt_browser_external_11(ppv_object, Array.typed(::Java::Int).new([0]), C::PTR_SIZEOF)
       return XPCOM::NS_ERROR_NO_INTERFACE
     end
     
@@ -406,9 +406,9 @@ module Org::Eclipse::Swt::Browser
       bytes = MozillaDelegate.wcs_to_mbcs(nil, "external", true) # $NON-NLS-1$
       # long
       ptr = memory._alloc(bytes.attr_length)
-      C.memmove(ptr, bytes, bytes.attr_length)
+      C.memmove___org_eclipse_swt_browser_external_13(ptr, bytes, bytes.attr_length)
       # long
-      C.memmove(_ret_value, Array.typed(::Java::Int).new([ptr]), C::PTR_SIZEOF)
+      C.memmove___org_eclipse_swt_browser_external_15(_ret_value, Array.typed(::Java::Int).new([ptr]), C::PTR_SIZEOF)
       memory._release
       return XPCOM::NS_OK
     end
@@ -434,7 +434,7 @@ module Org::Eclipse::Swt::Browser
     typesig { [::Java::Int] }
     # long
     def get_flags(flags)
-      C.memmove(flags, Array.typed(::Java::Int).new([NsIClassInfo::MAIN_THREAD_ONLY]), 4)
+      C.memmove___org_eclipse_swt_browser_external_17(flags, Array.typed(::Java::Int).new([NsIClassInfo::MAIN_THREAD_ONLY]), 4)
       # PRUint32
       return XPCOM::NS_OK
     end
@@ -443,14 +443,14 @@ module Org::Eclipse::Swt::Browser
     # long
     def get_helper_for_language(language, _ret_value)
       # long
-      C.memmove(_ret_value, Array.typed(::Java::Int).new([0]), C::PTR_SIZEOF)
+      C.memmove___org_eclipse_swt_browser_external_19(_ret_value, Array.typed(::Java::Int).new([0]), C::PTR_SIZEOF)
       return XPCOM::NS_OK
     end
     
     typesig { [::Java::Int] }
     # long
     def get_implementation_language(_ret_value)
-      C.memmove(_ret_value, Array.typed(::Java::Int).new([5]), 4)
+      C.memmove___org_eclipse_swt_browser_external_21(_ret_value, Array.typed(::Java::Int).new([5]), 4)
       # nsIProgrammingLanguage.JAVA
       # PRUint
       return XPCOM::NS_OK
@@ -485,20 +485,20 @@ module Org::Eclipse::Swt::Browser
       result[0] = 0
       # long
       security_checked_component_iid = memory._alloc(self.attr_ns_id.attr_sizeof)
-      XPCOM.memmove(security_checked_component_iid, NsISecurityCheckedComponent::NS_ISECURITYCHECKEDCOMPONENT_IID, self.attr_ns_id.attr_sizeof)
+      XPCOM.memmove___org_eclipse_swt_browser_external_23(security_checked_component_iid, NsISecurityCheckedComponent::NS_ISECURITYCHECKEDCOMPONENT_IID, self.attr_ns_id.attr_sizeof)
       # long
       external_iid = memory._alloc(self.attr_ns_id.attr_sizeof)
-      XPCOM.memmove(external_iid, EXTERNAL_IID, self.attr_ns_id.attr_sizeof)
+      XPCOM.memmove___org_eclipse_swt_browser_external_25(external_iid, EXTERNAL_IID, self.attr_ns_id.attr_sizeof)
       # long
       ptr_array = memory._alloc(2 * C::PTR_SIZEOF)
       # long
-      C.memmove(ptr_array, Array.typed(::Java::Int).new([security_checked_component_iid]), C::PTR_SIZEOF)
+      C.memmove___org_eclipse_swt_browser_external_27(ptr_array, Array.typed(::Java::Int).new([security_checked_component_iid]), C::PTR_SIZEOF)
       # long
-      C.memmove(ptr_array + C::PTR_SIZEOF, Array.typed(::Java::Int).new([external_iid]), C::PTR_SIZEOF)
+      C.memmove___org_eclipse_swt_browser_external_29(ptr_array + C::PTR_SIZEOF, Array.typed(::Java::Int).new([external_iid]), C::PTR_SIZEOF)
       # long
-      C.memmove(array, Array.typed(::Java::Int).new([ptr_array]), C::PTR_SIZEOF)
+      C.memmove___org_eclipse_swt_browser_external_31(array, Array.typed(::Java::Int).new([ptr_array]), C::PTR_SIZEOF)
       memory._release
-      C.memmove(count, Array.typed(::Java::Int).new([2]), 4)
+      C.memmove___org_eclipse_swt_browser_external_33(count, Array.typed(::Java::Int).new([2]), 4)
       # PRUint
       return XPCOM::NS_OK
     end
@@ -534,9 +534,9 @@ module Org::Eclipse::Swt::Browser
       bytes = MozillaDelegate.wcs_to_mbcs(nil, "allAccess", true) # $NON-NLS-1$
       # long
       ptr = memory._alloc(bytes.attr_length)
-      C.memmove(ptr, bytes, bytes.attr_length)
+      C.memmove___org_eclipse_swt_browser_external_35(ptr, bytes, bytes.attr_length)
       # long
-      C.memmove(_ret_val, Array.typed(::Java::Int).new([ptr]), C::PTR_SIZEOF)
+      C.memmove___org_eclipse_swt_browser_external_37(_ret_val, Array.typed(::Java::Int).new([ptr]), C::PTR_SIZEOF)
       memory._release
       return XPCOM::NS_OK
     end
@@ -571,7 +571,7 @@ module Org::Eclipse::Swt::Browser
       result[0] = 0
       length = XPCOM.strlen__prunichar(method_name)
       dest = CharArray.new(length)
-      XPCOM.memmove(dest, method_name, length * 2)
+      XPCOM.memmove___org_eclipse_swt_browser_external_39(dest, method_name, length * 2)
       string = String.new(dest)
       bytes = nil
       if ((string == "callJava"))
@@ -582,9 +582,9 @@ module Org::Eclipse::Swt::Browser
       end
       # long
       ptr = memory._alloc(bytes.attr_length)
-      C.memmove(ptr, bytes, bytes.attr_length)
+      C.memmove___org_eclipse_swt_browser_external_41(ptr, bytes, bytes.attr_length)
       # long
-      C.memmove(_ret_val, Array.typed(::Java::Int).new([ptr]), C::PTR_SIZEOF)
+      C.memmove___org_eclipse_swt_browser_external_43(_ret_val, Array.typed(::Java::Int).new([ptr]), C::PTR_SIZEOF)
       memory._release
       return XPCOM::NS_OK
     end
@@ -620,9 +620,9 @@ module Org::Eclipse::Swt::Browser
       bytes = MozillaDelegate.wcs_to_mbcs(nil, "noAccess", true) # $NON-NLS-1$
       # long
       ptr = memory._alloc(bytes.attr_length)
-      C.memmove(ptr, bytes, bytes.attr_length)
+      C.memmove___org_eclipse_swt_browser_external_45(ptr, bytes, bytes.attr_length)
       # long
-      C.memmove(_ret_val, Array.typed(::Java::Int).new([ptr]), C::PTR_SIZEOF)
+      C.memmove___org_eclipse_swt_browser_external_47(_ret_val, Array.typed(::Java::Int).new([ptr]), C::PTR_SIZEOF)
       memory._release
       return XPCOM::NS_OK
     end
@@ -658,9 +658,9 @@ module Org::Eclipse::Swt::Browser
       bytes = MozillaDelegate.wcs_to_mbcs(nil, "noAccess", true) # $NON-NLS-1$
       # long
       ptr = memory._alloc(bytes.attr_length)
-      C.memmove(ptr, bytes, bytes.attr_length)
+      C.memmove___org_eclipse_swt_browser_external_49(ptr, bytes, bytes.attr_length)
       # long
-      C.memmove(_ret_val, Array.typed(::Java::Int).new([ptr]), C::PTR_SIZEOF)
+      C.memmove___org_eclipse_swt_browser_external_51(_ret_val, Array.typed(::Java::Int).new([ptr]), C::PTR_SIZEOF)
       memory._release
       return XPCOM::NS_OK
     end
@@ -697,7 +697,7 @@ module Org::Eclipse::Swt::Browser
           Mozilla.error(self.attr_rc)
         end
         double_result = Array.typed(::Java::Double).new(1) { 0.0 }
-        C.memmove(double_result, double_return, 8)
+        C.memmove___org_eclipse_swt_browser_external_53(double_result, double_return, 8)
         C.free(double_return)
         return Double.new(double_result[0])
       when NsIDataType::VTYPE_WSTRING_SIZE_IS
@@ -711,7 +711,7 @@ module Org::Eclipse::Swt::Browser
           Mozilla.error(self.attr_rc)
         end
         chars = CharArray.new(size[0])
-        C.memmove(chars, w_string[0], size[0] * 2)
+        C.memmove___org_eclipse_swt_browser_external_55(chars, w_string[0], size[0] * 2)
         return String.new(chars)
       when NsIDataType::VTYPE_ARRAY
         array_return = Array.typed(Object).new(0) { nil }
@@ -732,7 +732,7 @@ module Org::Eclipse::Swt::Browser
           Mozilla.error(XPCOM::NS_ERROR_NULL_POINTER)
         end
         id = NsID.new
-        XPCOM.memmove(id, iid, self.attr_ns_id.attr_sizeof)
+        XPCOM.memmove___org_eclipse_swt_browser_external_57(id, iid, self.attr_ns_id.attr_sizeof)
         C.free(iid)
         # long
         # long
@@ -764,7 +764,7 @@ module Org::Eclipse::Swt::Browser
             # long
             # long
             array_ptr = Array.typed(::Java::Int).new(1) { 0 }
-            C.memmove(array_ptr, ptr[0] + i * C::PTR_SIZEOF, C::PTR_SIZEOF)
+            C.memmove___org_eclipse_swt_browser_external_59(array_ptr, ptr[0] + i * C::PTR_SIZEOF, C::PTR_SIZEOF)
             supports = NsISupports.new(array_ptr[0])
             self.attr_rc = supports._query_interface(NsIVariant::NS_IVARIANT_IID, result)
             if (!(self.attr_rc).equal?(XPCOM::NS_OK))
@@ -799,7 +799,7 @@ module Org::Eclipse::Swt::Browser
             i = 0
             while i < count[0]
               double_value = Array.typed(::Java::Double).new(1) { 0.0 }
-              C.memmove(double_value, ptr[0] + i * 8, 8)
+              C.memmove___org_eclipse_swt_browser_external_61(double_value, ptr[0] + i * 8, 8)
               array_return[i] = Double.new(double_value[0])
               i += 1
             end
@@ -809,7 +809,7 @@ module Org::Eclipse::Swt::Browser
             while i < count[0]
               bool_value = Array.typed(::Java::Int).new(1) { 0 }
               # PRUInt32
-              C.memmove(bool_value, ptr[0] + i * 4, 4)
+              C.memmove___org_eclipse_swt_browser_external_63(bool_value, ptr[0] + i * 4, 4)
               array_return[i] = Boolean.new(!(bool_value[0]).equal?(0))
               i += 1
             end
@@ -819,7 +819,7 @@ module Org::Eclipse::Swt::Browser
             while i < count[0]
               int_value = Array.typed(::Java::Int).new(1) { 0 }
               # PRInt32
-              C.memmove(int_value, ptr[0] + i * 4, 4)
+              C.memmove___org_eclipse_swt_browser_external_65(int_value, ptr[0] + i * 4, 4)
               array_return[i] = Double.new(int_value[0])
               i += 1
             end
@@ -832,10 +832,10 @@ module Org::Eclipse::Swt::Browser
               # long
               # long
               string_ptr = Array.typed(::Java::Int).new(1) { 0 }
-              C.memmove(string_ptr, current_ptr, C::PTR_SIZEOF)
+              C.memmove___org_eclipse_swt_browser_external_67(string_ptr, current_ptr, C::PTR_SIZEOF)
               length = XPCOM.strlen__prunichar(string_ptr[0])
               dest = CharArray.new(length)
-              XPCOM.memmove(dest, string_ptr[0], length * 2)
+              XPCOM.memmove___org_eclipse_swt_browser_external_69(dest, string_ptr[0], length * 2)
               array_return[i] = String.new(dest)
               i += 1
             end
@@ -908,7 +908,7 @@ module Org::Eclipse::Swt::Browser
             begin
               current_variant = convert_to_js(current_object, component_manager)
               # long
-              C.memmove(array_ptr + C::PTR_SIZEOF * i, Array.typed(::Java::Int).new([current_variant.get_address]), C::PTR_SIZEOF)
+              C.memmove___org_eclipse_swt_browser_external_71(array_ptr + C::PTR_SIZEOF * i, Array.typed(::Java::Int).new([current_variant.get_address]), C::PTR_SIZEOF)
             rescue SWTException => e
               # invalid return value type
               C.free(array_ptr)
@@ -919,7 +919,7 @@ module Org::Eclipse::Swt::Browser
                 # long
                 # long
                 ptr = Array.typed(::Java::Int).new(1) { 0 }
-                C.memmove(ptr, array_ptr + C::PTR_SIZEOF * j, C::PTR_SIZEOF)
+                C.memmove___org_eclipse_swt_browser_external_73(ptr, array_ptr + C::PTR_SIZEOF * j, C::PTR_SIZEOF)
                 NsISupports.new(ptr[0])._release
                 j += 1
               end
@@ -929,7 +929,7 @@ module Org::Eclipse::Swt::Browser
           end
           # long
           id_ptr = C.malloc(self.attr_ns_id.attr_sizeof)
-          XPCOM.memmove(id_ptr, NsIVariant::NS_IVARIANT_IID, self.attr_ns_id.attr_sizeof)
+          XPCOM.memmove___org_eclipse_swt_browser_external_75(id_ptr, NsIVariant::NS_IVARIANT_IID, self.attr_ns_id.attr_sizeof)
           rc = variant._set_as_array(NsIDataType::VTYPE_INTERFACE_IS, id_ptr, length_, array_ptr)
           C.free(id_ptr)
           C.free(array_ptr)
@@ -1000,7 +1000,7 @@ module Org::Eclipse::Swt::Browser
       end
       component_manager._release
       # long
-      C.memmove(return_ptr, Array.typed(::Java::Int).new([variant.get_address]), C::PTR_SIZEOF)
+      C.memmove___org_eclipse_swt_browser_external_77(return_ptr, Array.typed(::Java::Int).new([variant.get_address]), C::PTR_SIZEOF)
       return XPCOM::NS_OK
     end
     

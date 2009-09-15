@@ -482,7 +482,7 @@ module Org::Eclipse::Swt::Graphics
     def convert_rgn(message, rgn, r, new_rgn)
       if ((message).equal?(OS.attr_k_qdregion_to_rects_msg_parse))
         rect = Array.typed(::Java::Short).new(4) { 0 }
-        OS.memmove(rect, r, rect.attr_length * 2)
+        OS.memmove___org_eclipse_swt_graphics_region_1(rect, r, rect.attr_length * 2)
         i = 0
         point = NSPoint.new
         points = Array.typed(::Java::Int).new(10) { 0 }
@@ -613,7 +613,7 @@ module Org::Eclipse::Swt::Graphics
     # long
     def region_to_rects(message, rgn, r, path)
       if ((message).equal?(OS.attr_k_qdregion_to_rects_msg_parse))
-        OS.memmove(@rect, r, @rect.attr_length * 2)
+        OS.memmove___org_eclipse_swt_graphics_region_3(@rect, r, @rect.attr_length * 2)
         @pt.attr_x = @rect[1]
         @pt.attr_y = @rect[0]
         OS.objc_msg_send(path, OS.attr_sel_move_to_point_, @pt)

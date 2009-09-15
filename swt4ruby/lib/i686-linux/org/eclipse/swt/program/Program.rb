@@ -154,7 +154,7 @@ module Org::Eclipse::Swt::Program
         # long
         property = Array.typed(::Java::Int).new(num_prop[0]) { 0 }
         if (!(prop_list).equal?(0))
-          OS.memmove(property, prop_list, (property.attr_length * OS::PTR_SIZEOF))
+          OS.memmove___org_eclipse_swt_program_program_1(property, prop_list, (property.attr_length * OS::PTR_SIZEOF))
           OS._xfree(prop_list)
         end
         # Feature in Linux Desktop. There is currently no official way to
@@ -249,7 +249,7 @@ module Org::Eclipse::Swt::Program
       file_arg = Converter.wcs_to_mbcs(nil, file_name, true)
       # long
       ptr = OS.g_malloc(file_arg.attr_length)
-      OS.memmove(ptr, file_arg, file_arg.attr_length)
+      OS.memmove___org_eclipse_swt_program_program_3(ptr, file_arg, file_arg.attr_length)
       args = DtActionArg.new
       args.attr_arg_class = CDE::DtACTION_FILE
       args.attr_name = ptr
@@ -288,7 +288,7 @@ module Org::Eclipse::Swt::Program
         end
         length = OS.strlen(attr_value)
         attr_value_buf = Array.typed(::Java::Byte).new(length) { 0 }
-        OS.memmove(attr_value_buf, attr_value, length)
+        OS.memmove___org_eclipse_swt_program_program_5(attr_value_buf, attr_value, length)
         CDE._dt_dts_free_attribute_value(attr_value)
         # Use the character encoding for the default locale
         return String.new(Converter.mbcs_to_wcs(nil, attr_value_buf))
@@ -306,11 +306,11 @@ module Org::Eclipse::Swt::Program
           # long
           # long
           data_type = Array.typed(::Java::Int).new(1) { 0 }
-          OS.memmove(data_type, data_type_list + (((index += 1) - 1) * 4), 4)
+          OS.memmove___org_eclipse_swt_program_program_7(data_type, data_type_list + (((index += 1) - 1) * 4), 4)
           while (!(data_type[0]).equal?(0))
             length = OS.strlen(data_type[0])
             data_type_buf = Array.typed(::Java::Byte).new(length) { 0 }
-            OS.memmove(data_type_buf, data_type[0], length)
+            OS.memmove___org_eclipse_swt_program_program_9(data_type_buf, data_type[0], length)
             # Use the character encoding for the default locale
             data_type_name = String.new(Converter.mbcs_to_wcs(nil, data_type_buf))
             # The data type is valid if it is not an action, and it has an extension and an action.
@@ -320,7 +320,7 @@ module Org::Eclipse::Swt::Program
               exts.add_element(extension)
               data_type_info.put(data_type_name, exts)
             end
-            OS.memmove(data_type, data_type_list + (((index += 1) - 1) * 4), 4)
+            OS.memmove___org_eclipse_swt_program_program_11(data_type, data_type_list + (((index += 1) - 1) * 4), 4)
           end
           CDE._dt_dts_free_data_type_names(data_type_list)
         end
@@ -511,7 +511,7 @@ module Org::Eclipse::Swt::Program
           length_ = OS.strlen(uri)
           if (length_ > 0)
             buffer = Array.typed(::Java::Byte).new(length_) { 0 }
-            OS.memmove(buffer, uri, length_)
+            OS.memmove___org_eclipse_swt_program_program_13(buffer, uri, length_)
             file_name = RJava.cast_to_string(String.new(Converter.mbcs_to_wcs(nil, buffer)))
           end
           GNOME.g_free(uri)
@@ -585,12 +585,12 @@ module Org::Eclipse::Swt::Program
         # long
         mime_element = mime_list
         while (!(mime_element).equal?(0))
-          OS.memmove(mime_data, mime_element, OS::PTR_SIZEOF)
+          OS.memmove___org_eclipse_swt_program_program_15(mime_data, mime_element, OS::PTR_SIZEOF)
           # long
           mime_ptr = mime_data[0]
           mime_length = OS.strlen(mime_ptr)
           mime_type_buffer = Array.typed(::Java::Byte).new(mime_length) { 0 }
-          OS.memmove(mime_type_buffer, mime_ptr, mime_length)
+          OS.memmove___org_eclipse_swt_program_program_17(mime_type_buffer, mime_ptr, mime_length)
           mime_type = String.new(Converter.mbcs_to_wcs(nil, mime_type_buffer))
           # long
           extension_list = GNOME.gnome_vfs_mime_get_extensions_list(mime_ptr)
@@ -599,12 +599,12 @@ module Org::Eclipse::Swt::Program
             # long
             extension_element = extension_list
             while (!(extension_element).equal?(0))
-              OS.memmove(extension_data, extension_element, OS::PTR_SIZEOF)
+              OS.memmove___org_eclipse_swt_program_program_19(extension_data, extension_element, OS::PTR_SIZEOF)
               # long
               extension_ptr = extension_data[0]
               extension_length = OS.strlen(extension_ptr)
               extension_buffer = Array.typed(::Java::Byte).new(extension_length) { 0 }
-              OS.memmove(extension_buffer, extension_ptr, extension_length)
+              OS.memmove___org_eclipse_swt_program_program_21(extension_buffer, extension_ptr, extension_length)
               extension = String.new(Converter.mbcs_to_wcs(nil, extension_buffer))
               extension = RJava.cast_to_string(Character.new(?..ord)) + extension
               extensions.add_element(extension)
@@ -634,7 +634,7 @@ module Org::Eclipse::Swt::Program
           length_ = OS.strlen(type_name)
           if (length_ > 0)
             buffer = Array.typed(::Java::Byte).new(length_) { 0 }
-            OS.memmove(buffer, type_name, length_)
+            OS.memmove___org_eclipse_swt_program_program_23(buffer, type_name, length_)
             mime_type = RJava.cast_to_string(String.new(Converter.mbcs_to_wcs(nil, buffer)))
           end
         end
@@ -652,15 +652,15 @@ module Org::Eclipse::Swt::Program
           program.attr_display = display
           program.attr_name = mime_type
           application = GnomeVFSMimeApplication.new
-          GNOME.memmove(application, ptr, GnomeVFSMimeApplication.attr_sizeof)
+          GNOME.memmove___org_eclipse_swt_program_program_25(application, ptr, GnomeVFSMimeApplication.attr_sizeof)
           length_ = OS.strlen(application.attr_command)
           buffer = Array.typed(::Java::Byte).new(length_) { 0 }
-          OS.memmove(buffer, application.attr_command, length_)
+          OS.memmove___org_eclipse_swt_program_program_27(buffer, application.attr_command, length_)
           program.attr_command = String.new(Converter.mbcs_to_wcs(nil, buffer))
           program.attr_gnome_expect_uri = (application.attr_expects_uris).equal?(GNOME::GNOME_VFS_MIME_APPLICATION_ARGUMENT_TYPE_URIS)
           length_ = OS.strlen(application.attr_id)
           buffer = Array.typed(::Java::Byte).new(length_ + 1) { 0 }
-          OS.memmove(buffer, application.attr_id, length_)
+          OS.memmove___org_eclipse_swt_program_program_29(buffer, application.attr_id, length_)
           gnome_icon_theme = display.get_data(ICON_THEME_DATA)
           # long
           icon_name = GNOME.gnome_icon_lookup(gnome_icon_theme.attr_value, 0, nil, buffer, 0, mime_type_buffer, GNOME::GNOME_ICON_LOOKUP_FLAGS_NONE, nil)
@@ -673,7 +673,7 @@ module Org::Eclipse::Swt::Program
             length_ = OS.strlen(path)
             if (length_ > 0)
               buffer = Array.typed(::Java::Byte).new(length_) { 0 }
-              OS.memmove(buffer, path, length_)
+              OS.memmove___org_eclipse_swt_program_program_31(buffer, path, length_)
               program.attr_icon_path = String.new(Converter.mbcs_to_wcs(nil, buffer))
             end
             GNOME.g_free(path)

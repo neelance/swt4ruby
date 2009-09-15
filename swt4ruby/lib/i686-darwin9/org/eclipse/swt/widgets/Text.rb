@@ -807,11 +807,11 @@ module Org::Eclipse::Swt::Widgets
       # long
       # long
       rect_count = Array.typed(::Java::Int).new(1) { 0 }
-      OS.memmove(rect_count, p_rect_count, C::PTR_SIZEOF)
+      OS.memmove___org_eclipse_swt_widgets_text_1(rect_count, p_rect_count, C::PTR_SIZEOF)
       OS.free(p_rect_count)
       rect = NSRect.new
       if (rect_count[0] > 0)
-        OS.memmove(rect, p_array, NSRect.attr_sizeof)
+        OS.memmove___org_eclipse_swt_widgets_text_3(rect, p_array, NSRect.attr_sizeof)
       end
       return Point.new(RJava.cast_to_int(rect.attr_x), RJava.cast_to_int(rect.attr_y))
     end
@@ -2098,7 +2098,7 @@ module Org::Eclipse::Swt::Widgets
     # long
     def should_change_text_in_range_replacement_string(id, sel, affected_char_range, replacement_string)
       range = NSRange.new
-      OS.memmove(range, affected_char_range, NSRange.attr_sizeof)
+      OS.memmove___org_eclipse_swt_widgets_text_5(range, affected_char_range, NSRange.attr_sizeof)
       result = call_super_boolean(id, sel, range, replacement_string)
       if (!hooks(SWT::Verify) && (@echo_character).equal?(Character.new(?\0.ord)))
         return result
@@ -2204,7 +2204,7 @@ module Org::Eclipse::Swt::Widgets
       end
       # allow the selection change to proceed
       result = NSRange.new
-      OS.memmove(result, new_selected_char_range, NSRange.attr_sizeof)
+      OS.memmove___org_eclipse_swt_widgets_text_7(result, new_selected_char_range, NSRange.attr_sizeof)
       return result
     end
     

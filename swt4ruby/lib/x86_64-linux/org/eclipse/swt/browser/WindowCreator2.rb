@@ -226,27 +226,27 @@ module Org::Eclipse::Swt::Browser
         return XPCOM::NS_ERROR_NO_INTERFACE
       end
       guid = NsID.new
-      XPCOM.memmove(guid, riid, self.attr_ns_id.attr_sizeof)
+      XPCOM.memmove___org_eclipse_swt_browser_window_creator2_1(guid, riid, self.attr_ns_id.attr_sizeof)
       if (guid._equals(NsISupports::NS_ISUPPORTS_IID))
         # int
-        XPCOM.memmove(ppv_object, Array.typed(::Java::Long).new([@supports.get_address]), C::PTR_SIZEOF)
+        XPCOM.memmove___org_eclipse_swt_browser_window_creator2_3(ppv_object, Array.typed(::Java::Long).new([@supports.get_address]), C::PTR_SIZEOF)
         _add_ref
         return XPCOM::NS_OK
       end
       if (guid._equals(NsIWindowCreator::NS_IWINDOWCREATOR_IID))
         # int
-        XPCOM.memmove(ppv_object, Array.typed(::Java::Long).new([@window_creator.get_address]), C::PTR_SIZEOF)
+        XPCOM.memmove___org_eclipse_swt_browser_window_creator2_5(ppv_object, Array.typed(::Java::Long).new([@window_creator.get_address]), C::PTR_SIZEOF)
         _add_ref
         return XPCOM::NS_OK
       end
       if (guid._equals(NsIWindowCreator2::NS_IWINDOWCREATOR2_IID))
         # int
-        XPCOM.memmove(ppv_object, Array.typed(::Java::Long).new([@window_creator2.get_address]), C::PTR_SIZEOF)
+        XPCOM.memmove___org_eclipse_swt_browser_window_creator2_7(ppv_object, Array.typed(::Java::Long).new([@window_creator2.get_address]), C::PTR_SIZEOF)
         _add_ref
         return XPCOM::NS_OK
       end
       # int
-      XPCOM.memmove(ppv_object, Array.typed(::Java::Long).new([0]), C::PTR_SIZEOF)
+      XPCOM.memmove___org_eclipse_swt_browser_window_creator2_9(ppv_object, Array.typed(::Java::Long).new([0]), C::PTR_SIZEOF)
       return XPCOM::NS_ERROR_NO_INTERFACE
     end
     
@@ -387,7 +387,7 @@ module Org::Eclipse::Swt::Browser
               # int
               buffer = XPCOM.ns_embed_cstring_get(a_spec)
               dest = Array.typed(::Java::Byte).new(length) { 0 }
-              XPCOM.memmove(dest, buffer, length)
+              XPCOM.memmove___org_eclipse_swt_browser_window_creator2_11(dest, buffer, length)
               browser.set_url(String.new(dest))
             end
           end
@@ -421,10 +421,10 @@ module Org::Eclipse::Swt::Browser
         web_browser_chrome._set_chrome_flags(chrome_flags)
         web_browser_chrome._add_ref
         # int
-        XPCOM.memmove(_retval, Array.typed(::Java::Long).new([chrome_ptr]), C::PTR_SIZEOF)
+        XPCOM.memmove___org_eclipse_swt_browser_window_creator2_13(_retval, Array.typed(::Java::Long).new([chrome_ptr]), C::PTR_SIZEOF)
       else
         if (!(cancel).equal?(0))
-          C.memmove(cancel, Array.typed(::Java::Int).new([1]), 4)
+          C.memmove___org_eclipse_swt_browser_window_creator2_15(cancel, Array.typed(::Java::Int).new([1]), 4)
           # PRBool
         end
       end

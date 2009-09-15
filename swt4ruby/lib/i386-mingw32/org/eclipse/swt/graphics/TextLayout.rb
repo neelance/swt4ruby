@@ -1538,7 +1538,7 @@ module Org::Eclipse::Swt::Graphics
       end
       advances = Array.typed(::Java::Int).new(run.attr_glyph_count) { 0 }
       points = Array.typed(::Java::Float).new(run.attr_glyph_count * 2) { 0.0 }
-      OS.memmove(advances, !(run.attr_justify).equal?(0) ? run.attr_justify : run.attr_advances, run.attr_glyph_count * 4)
+      OS.memmove___org_eclipse_swt_graphics_text_layout_1(advances, !(run.attr_justify).equal?(0) ? run.attr_justify : run.attr_advances, run.attr_glyph_count * 4)
       glyph_x = draw_x
       h = 0
       j = 0

@@ -646,7 +646,7 @@ module Org::Eclipse::Swt::Widgets
     # long
     # long
     def key_down(id, sel, the_event)
-      if ((self.attr_view.window.first_responder.attr_id).equal?(id))
+      if ((self.attr_view.window___org_eclipse_swt_widgets_composite_1.first_responder.attr_id).equal?(id))
         if (!((self.attr_state & CANVAS)).equal?(0))
           s = self.get_shell
           array = NSArray.array_with_object(NSEvent.new(the_event))

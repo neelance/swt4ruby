@@ -331,7 +331,7 @@ module Org::Eclipse::Swt::Widgets
         length = OS.strlen(text_ptr)
         if (!(length).equal?(0))
           buffer = Array.typed(::Java::Byte).new(length) { 0 }
-          OS.memmove(buffer, text_ptr, length)
+          OS.memmove___org_eclipse_swt_widgets_ime_1(buffer, text_ptr, length)
           chars = Converter.mbcs_to_wcs(nil, buffer)
           event = Event.new
           event.attr_detail = SWT::COMPOSITION_CHANGED
@@ -375,7 +375,7 @@ module Org::Eclipse::Swt::Widgets
       if (!(preedit_string[0]).equal?(0))
         length_ = OS.strlen(preedit_string[0])
         buffer = Array.typed(::Java::Byte).new(length_) { 0 }
-        OS.memmove(buffer, preedit_string[0], length_)
+        OS.memmove___org_eclipse_swt_widgets_ime_3(buffer, preedit_string[0], length_)
         chars = Converter.mbcs_to_wcs(nil, buffer)
         if (!(pango_attrs[0]).equal?(0))
           count = 0
@@ -403,7 +403,7 @@ module Org::Eclipse::Swt::Widgets
             # int
             attr = OS.pango_attr_iterator_get(iterator, OS::PANGO_ATTR_FOREGROUND)
             if (!(attr).equal?(0))
-              OS.memmove(attr_color, attr, PangoAttrColor.attr_sizeof)
+              OS.memmove___org_eclipse_swt_widgets_ime_5(attr_color, attr, PangoAttrColor.attr_sizeof)
               color = GdkColor.new
               color.attr_red = attr_color.attr_color_red
               color.attr_green = attr_color.attr_color_green
@@ -412,7 +412,7 @@ module Org::Eclipse::Swt::Widgets
             end
             attr = OS.pango_attr_iterator_get(iterator, OS::PANGO_ATTR_BACKGROUND)
             if (!(attr).equal?(0))
-              OS.memmove(attr_color, attr, PangoAttrColor.attr_sizeof)
+              OS.memmove___org_eclipse_swt_widgets_ime_7(attr_color, attr, PangoAttrColor.attr_sizeof)
               color = GdkColor.new
               color.attr_red = attr_color.attr_color_red
               color.attr_green = attr_color.attr_color_green
@@ -421,7 +421,7 @@ module Org::Eclipse::Swt::Widgets
             end
             attr = OS.pango_attr_iterator_get(iterator, OS::PANGO_ATTR_UNDERLINE)
             if (!(attr).equal?(0))
-              OS.memmove(attr_int, attr, PangoAttrInt.attr_sizeof)
+              OS.memmove___org_eclipse_swt_widgets_ime_9(attr_int, attr, PangoAttrInt.attr_sizeof)
               @styles[i].attr_underline = !(attr_int.attr_value).equal?(OS::PANGO_UNDERLINE_NONE)
               @styles[i].attr_underline_style = SWT::UNDERLINE_SINGLE
               case (attr_int.attr_value)
@@ -433,7 +433,7 @@ module Org::Eclipse::Swt::Widgets
               if (@styles[i].attr_underline)
                 attr = OS.pango_attr_iterator_get(iterator, OS::PANGO_ATTR_UNDERLINE_COLOR)
                 if (!(attr).equal?(0))
-                  OS.memmove(attr_color, attr, PangoAttrColor.attr_sizeof)
+                  OS.memmove___org_eclipse_swt_widgets_ime_11(attr_color, attr, PangoAttrColor.attr_sizeof)
                   color = GdkColor.new
                   color.attr_red = attr_color.attr_color_red
                   color.attr_green = attr_color.attr_color_green

@@ -2067,7 +2067,7 @@ module Org::Eclipse::Swt::Widgets
     # long
     def view_string_for_tool_tip_point_user_data(id, sel, view, tag, point, user_data)
       pt = NSPoint.new
-      OS.memmove(pt, point, NSPoint.attr_sizeof)
+      OS.memmove___org_eclipse_swt_widgets_shell_1(pt, point, NSPoint.attr_sizeof)
       control = self.attr_display.find_control(false)
       if ((control).nil?)
         return 0

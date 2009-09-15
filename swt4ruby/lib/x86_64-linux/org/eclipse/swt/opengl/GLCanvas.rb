@@ -154,7 +154,7 @@ module Org::Eclipse::Swt::Opengl
         SWT.error(SWT::ERROR_UNSUPPORTED_DEPTH)
       end
       @vinfo = XVisualInfo.new
-      GLX.memmove(@vinfo, info_ptr, XVisualInfo.attr_sizeof)
+      GLX.memmove___org_eclipse_swt_opengl_glcanvas_1(@vinfo, info_ptr, XVisualInfo.attr_sizeof)
       OS._xfree(info_ptr)
       # int
       screen = OS.gdk_screen_get_default

@@ -164,7 +164,7 @@ module Org::Eclipse::Swt::Dnd
         indices = OS.gtk_tree_path_get_indices(path[0])
         if (!(indices).equal?(0))
           temp = Array.typed(::Java::Int).new(1) { 0 }
-          OS.memmove(temp, indices, 4)
+          OS.memmove___org_eclipse_swt_dnd_table_drop_target_effect_1(temp, indices, 4)
           index = temp[0]
         end
       end

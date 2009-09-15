@@ -466,7 +466,7 @@ module Org::Eclipse::Swt::Dnd
       operation = DND::DROP_NONE
       if (!(context).equal?(0))
         gdk_drag_context = GdkDragContext.new
-        OS.memmove(gdk_drag_context, context, GdkDragContext.attr_sizeof)
+        OS.memmove___org_eclipse_swt_dnd_drag_source_1(gdk_drag_context, context, GdkDragContext.attr_sizeof)
         if (!(gdk_drag_context.attr_dest_window).equal?(0))
           # NOTE: if dest_window is 0, drag was aborted
           if (@move_data)
@@ -497,7 +497,7 @@ module Org::Eclipse::Swt::Dnd
         return
       end
       gtk_selection_data = GtkSelectionData.new
-      OS.memmove(gtk_selection_data, selection_data, GtkSelectionData.attr_sizeof)
+      OS.memmove___org_eclipse_swt_dnd_drag_source_3(gtk_selection_data, selection_data, GtkSelectionData.attr_sizeof)
       if ((gtk_selection_data.attr_target).equal?(0))
         return
       end
@@ -726,7 +726,7 @@ module Org::Eclipse::Swt::Dnd
             entry = GtkTargetEntry.new
             buffer = Converter.wcs_to_mbcs(nil, type_names[j], true)
             entry.attr_target = OS.g_malloc(buffer.attr_length)
-            OS.memmove(entry.attr_target, buffer, buffer.attr_length)
+            OS.memmove___org_eclipse_swt_dnd_drag_source_5(entry.attr_target, buffer, buffer.attr_length)
             entry.attr_info = type_ids[j]
             new_targets = Array.typed(GtkTargetEntry).new(targets.attr_length + 1) { nil }
             System.arraycopy(targets, 0, new_targets, 0, targets.attr_length)
@@ -741,7 +741,7 @@ module Org::Eclipse::Swt::Dnd
       p_targets = OS.g_malloc(targets.attr_length * GtkTargetEntry.attr_sizeof)
       i_ = 0
       while i_ < targets.attr_length
-        OS.memmove(p_targets + i_ * GtkTargetEntry.attr_sizeof, targets[i_], GtkTargetEntry.attr_sizeof)
+        OS.memmove___org_eclipse_swt_dnd_drag_source_7(p_targets + i_ * GtkTargetEntry.attr_sizeof, targets[i_], GtkTargetEntry.attr_sizeof)
         i_ += 1
       end
       @target_list = OS.gtk_target_list_new(p_targets, targets.attr_length)
@@ -788,10 +788,10 @@ module Org::Eclipse::Swt::Dnd
           while y < h[0]
             # long
             offset = pixels + (y * stride)
-            OS.memmove(line, offset, stride)
+            OS.memmove___org_eclipse_swt_dnd_drag_source_9(line, offset, stride)
             # long
             mask_offset = mask_pixels + (y * mask_stride)
-            OS.memmove(mask_line, mask_offset, mask_stride)
+            OS.memmove___org_eclipse_swt_dnd_drag_source_11(mask_line, mask_offset, mask_stride)
             x = 0
             while x < w[0]
               if ((mask_line[x * 3]).equal?(0))
@@ -799,7 +799,7 @@ module Org::Eclipse::Swt::Dnd
               end
               x += 1
             end
-            OS.memmove(offset, line, stride)
+            OS.memmove___org_eclipse_swt_dnd_drag_source_13(offset, line, stride)
             y += 1
           end
           OS.g_object_unref(mask_pixbuf)
@@ -821,13 +821,13 @@ module Org::Eclipse::Swt::Dnd
             while y < h[0]
               # long
               offset = pixels + (y * stride)
-              OS.memmove(line, offset, stride)
+              OS.memmove___org_eclipse_swt_dnd_drag_source_15(line, offset, stride)
               x = 0
               while x < w[0]
                 line[x * 4 + 3] = alpha[y * w[0] + x]
                 x += 1
               end
-              OS.memmove(offset, line, stride)
+              OS.memmove___org_eclipse_swt_dnd_drag_source_17(offset, line, stride)
               y += 1
             end
           end

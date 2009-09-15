@@ -222,7 +222,7 @@ module Org::Eclipse::Swt::Dnd
         return 0
       end
       selection_data_ = GtkSelectionData.new
-      OS.memmove(selection_data_, selection_data, GtkSelectionData.attr_sizeof)
+      OS.memmove___org_eclipse_swt_dnd_clipboard_proxy_1(selection_data_, selection_data, GtkSelectionData.attr_sizeof)
       tdata = TransferData.new
       tdata.attr_type = selection_data_.attr_target
       types = ((clipboard).equal?(Clipboard.attr_gtkclipboard)) ? @clipboard_data_types : @primary_clipboard_data_types
@@ -266,7 +266,7 @@ module Org::Eclipse::Swt::Dnd
             buffer = Converter.wcs_to_mbcs(nil, type_names[j], true)
             # long
             p_name = OS.g_malloc(buffer.attr_length)
-            OS.memmove(p_name, buffer, buffer.attr_length)
+            OS.memmove___org_eclipse_swt_dnd_clipboard_proxy_3(p_name, buffer, buffer.attr_length)
             entry.attr_target = p_name
             tmp = Array.typed(GtkTargetEntry).new(entries.attr_length + 1) { nil }
             System.arraycopy(entries, 0, tmp, 0, entries.attr_length)
@@ -280,7 +280,7 @@ module Org::Eclipse::Swt::Dnd
         offset = 0
         i_ = 0
         while i_ < entries.attr_length
-          OS.memmove(p_targets_list + offset, entries[i_], GtkTargetEntry.attr_sizeof)
+          OS.memmove___org_eclipse_swt_dnd_clipboard_proxy_5(p_targets_list + offset, entries[i_], GtkTargetEntry.attr_sizeof)
           offset += GtkTargetEntry.attr_sizeof
           i_ += 1
         end

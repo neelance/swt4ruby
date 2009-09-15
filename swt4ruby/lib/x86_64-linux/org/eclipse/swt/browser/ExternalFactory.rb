@@ -167,21 +167,21 @@ module Org::Eclipse::Swt::Browser
         return XPCOM::NS_ERROR_NO_INTERFACE
       end
       guid = NsID.new
-      XPCOM.memmove(guid, riid, self.attr_ns_id.attr_sizeof)
+      XPCOM.memmove___org_eclipse_swt_browser_external_factory_1(guid, riid, self.attr_ns_id.attr_sizeof)
       if (guid._equals(NsISupports::NS_ISUPPORTS_IID))
         # int
-        XPCOM.memmove(ppv_object, Array.typed(::Java::Long).new([@supports.get_address]), C::PTR_SIZEOF)
+        XPCOM.memmove___org_eclipse_swt_browser_external_factory_3(ppv_object, Array.typed(::Java::Long).new([@supports.get_address]), C::PTR_SIZEOF)
         _add_ref
         return XPCOM::NS_OK
       end
       if (guid._equals(NsIFactory::NS_IFACTORY_IID))
         # int
-        XPCOM.memmove(ppv_object, Array.typed(::Java::Long).new([@factory.get_address]), C::PTR_SIZEOF)
+        XPCOM.memmove___org_eclipse_swt_browser_external_factory_5(ppv_object, Array.typed(::Java::Long).new([@factory.get_address]), C::PTR_SIZEOF)
         _add_ref
         return XPCOM::NS_OK
       end
       # int
-      XPCOM.memmove(ppv_object, Array.typed(::Java::Long).new([0]), C::PTR_SIZEOF)
+      XPCOM.memmove___org_eclipse_swt_browser_external_factory_7(ppv_object, Array.typed(::Java::Long).new([0]), C::PTR_SIZEOF)
       return XPCOM::NS_ERROR_NO_INTERFACE
     end
     
@@ -203,7 +203,7 @@ module Org::Eclipse::Swt::Browser
       external = External.new
       external._add_ref
       # int
-      XPCOM.memmove(result, Array.typed(::Java::Long).new([external.get_address]), C::PTR_SIZEOF)
+      XPCOM.memmove___org_eclipse_swt_browser_external_factory_9(result, Array.typed(::Java::Long).new([external.get_address]), C::PTR_SIZEOF)
       return XPCOM::NS_OK
     end
     

@@ -185,7 +185,7 @@ module Org::Eclipse::Swt::Widgets
       # int
       h_adjustment = OS.gtk_range_get_adjustment(self.attr_handle)
       adjustment = GtkAdjustment.new
-      OS.memmove(adjustment, h_adjustment)
+      OS.memmove___org_eclipse_swt_widgets_scale_1(adjustment, h_adjustment)
       return RJava.cast_to_int(adjustment.attr_step_increment)
     end
     
@@ -203,7 +203,7 @@ module Org::Eclipse::Swt::Widgets
       # int
       h_adjustment = OS.gtk_range_get_adjustment(self.attr_handle)
       adjustment = GtkAdjustment.new
-      OS.memmove(adjustment, h_adjustment)
+      OS.memmove___org_eclipse_swt_widgets_scale_3(adjustment, h_adjustment)
       return RJava.cast_to_int(adjustment.attr_upper)
     end
     
@@ -221,7 +221,7 @@ module Org::Eclipse::Swt::Widgets
       # int
       h_adjustment = OS.gtk_range_get_adjustment(self.attr_handle)
       adjustment = GtkAdjustment.new
-      OS.memmove(adjustment, h_adjustment)
+      OS.memmove___org_eclipse_swt_widgets_scale_5(adjustment, h_adjustment)
       return RJava.cast_to_int(adjustment.attr_lower)
     end
     
@@ -241,7 +241,7 @@ module Org::Eclipse::Swt::Widgets
       # int
       h_adjustment = OS.gtk_range_get_adjustment(self.attr_handle)
       adjustment = GtkAdjustment.new
-      OS.memmove(adjustment, h_adjustment)
+      OS.memmove___org_eclipse_swt_widgets_scale_7(adjustment, h_adjustment)
       return RJava.cast_to_int(adjustment.attr_page_increment)
     end
     
@@ -259,7 +259,7 @@ module Org::Eclipse::Swt::Widgets
       # int
       h_adjustment = OS.gtk_range_get_adjustment(self.attr_handle)
       adjustment = GtkAdjustment.new
-      OS.memmove(adjustment, h_adjustment)
+      OS.memmove___org_eclipse_swt_widgets_scale_9(adjustment, h_adjustment)
       return RJava.cast_to_int(adjustment.attr_value)
     end
     

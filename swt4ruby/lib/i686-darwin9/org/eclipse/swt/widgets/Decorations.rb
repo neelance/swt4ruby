@@ -573,7 +573,7 @@ module Org::Eclipse::Swt::Widgets
       if (!(@default_button).nil? && !((@default_button.attr_style & SWT::PUSH)).equal?(0))
         cell = NSButtonCell.new((@default_button.attr_view).cell)
       end
-      self.attr_view.window.set_default_button_cell(cell)
+      self.attr_view.window___org_eclipse_swt_widgets_decorations_1.set_default_button_cell(cell)
       self.attr_display.update_default_button
     end
     

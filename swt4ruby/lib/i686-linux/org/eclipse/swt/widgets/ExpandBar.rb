@@ -469,7 +469,7 @@ module Org::Eclipse::Swt::Widgets
     def gtk_button_press_event(widget, event)
       if (OS::GTK_VERSION < OS._version(2, 4, 0))
         gdk_event = GdkEventButton.new
-        OS.memmove(gdk_event, event, GdkEventButton.attr_sizeof)
+        OS.memmove___org_eclipse_swt_widgets_expand_bar_1(gdk_event, event, GdkEventButton.attr_sizeof)
         x = RJava.cast_to_int(gdk_event.attr_x)
         y = RJava.cast_to_int(gdk_event.attr_y)
         i = 0
@@ -497,7 +497,7 @@ module Org::Eclipse::Swt::Widgets
       if (OS::GTK_VERSION < OS._version(2, 4, 0))
         if (!(@last_focus).nil?)
           gdk_event = GdkEventButton.new
-          OS.memmove(gdk_event, event, GdkEventButton.attr_sizeof)
+          OS.memmove___org_eclipse_swt_widgets_expand_bar_3(gdk_event, event, GdkEventButton.attr_sizeof)
           x = RJava.cast_to_int(gdk_event.attr_x)
           y = RJava.cast_to_int(gdk_event.attr_y)
           hover = @last_focus.attr_x <= x && x < (@last_focus.attr_x + @last_focus.attr_width) && @last_focus.attr_y <= y && y < (@last_focus.attr_y + get_band_height)
@@ -520,7 +520,7 @@ module Org::Eclipse::Swt::Widgets
     def gtk_expose_event(widget, event_ptr)
       if (OS::GTK_VERSION < OS._version(2, 4, 0))
         gdk_event = GdkEventExpose.new
-        OS.memmove(gdk_event, event_ptr, GdkEventExpose.attr_sizeof)
+        OS.memmove___org_eclipse_swt_widgets_expand_bar_5(gdk_event, event_ptr, GdkEventExpose.attr_sizeof)
         data = SwtGCData.new
         data.attr_damage_rgn = gdk_event.attr_region
         gc = SwtGC.gtk_new(self, data)
@@ -585,7 +585,7 @@ module Org::Eclipse::Swt::Widgets
           index += 1
         end
         gdk_event = GdkEventKey.new
-        OS.memmove(gdk_event, event, GdkEventKey.attr_sizeof)
+        OS.memmove___org_eclipse_swt_widgets_expand_bar_7(gdk_event, event, GdkEventKey.attr_sizeof)
         next_ = false
         case (gdk_event.attr_keyval)
         when OS::GDK_Up, OS::GDK_Left
@@ -607,7 +607,7 @@ module Org::Eclipse::Swt::Widgets
       else
         if (!(@last_focus).nil?)
           key_event = GdkEventKey.new
-          OS.memmove(key_event, event, GdkEventKey.attr_sizeof)
+          OS.memmove___org_eclipse_swt_widgets_expand_bar_9(key_event, event, GdkEventKey.attr_sizeof)
           case (key_event.attr_keyval)
           when OS::GDK_Return, OS::GDK_space
             ev = Event.new
@@ -831,7 +831,7 @@ module Org::Eclipse::Swt::Widgets
       # long
       adjustment_handle = OS.gtk_scrolled_window_get_vadjustment(self.attr_scrolled_handle)
       adjustment = GtkAdjustment.new
-      OS.memmove(adjustment, adjustment_handle)
+      OS.memmove___org_eclipse_swt_widgets_expand_bar_11(adjustment, adjustment_handle)
       @y_current_scroll = RJava.cast_to_int(adjustment.attr_value)
       # claim bottom free space
       if (@y_current_scroll > 0 && height > max_height)
@@ -842,7 +842,7 @@ module Org::Eclipse::Swt::Widgets
       adjustment.attr_value = Math.min(@y_current_scroll, max_height)
       adjustment.attr_upper = max_height
       adjustment.attr_page_size = height
-      OS.memmove(adjustment_handle, adjustment)
+      OS.memmove___org_eclipse_swt_widgets_expand_bar_13(adjustment_handle, adjustment)
       OS.gtk_adjustment_changed(adjustment_handle)
       policy = max_height > height ? OS::GTK_POLICY_ALWAYS : OS::GTK_POLICY_NEVER
       OS.gtk_scrolled_window_set_policy(self.attr_scrolled_handle, OS::GTK_POLICY_NEVER, policy)

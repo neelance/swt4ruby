@@ -247,7 +247,7 @@ module Org::Eclipse::Swt::Widgets
           border = GtkBorder.new
           OS.gtk_widget_style_get(self.attr_handle, OS.attr_default_border, buffer, 0)
           if (!(buffer[0]).equal?(0))
-            OS.memmove(border, buffer[0], GtkBorder.attr_sizeof)
+            OS.memmove___org_eclipse_swt_widgets_button_1(border, buffer[0], GtkBorder.attr_sizeof)
           else
             # Use the GTK+ default value of 1 for each.
             border.attr_left = border.attr_right = border.attr_top = border.attr_bottom = 1

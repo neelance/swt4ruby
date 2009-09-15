@@ -316,12 +316,12 @@ module Org::Eclipse::Swt::Printing
         address = OS._g_object_type_name(backend)
         length = OS.strlen(address)
         buffer = Array.typed(::Java::Byte).new(length) { 0 }
-        OS.memmove(buffer, address, length)
+        OS.memmove___org_eclipse_swt_printing_printer_1(buffer, address, length)
         backend_type = String.new(Converter.mbcs_to_wcs(nil, buffer))
         address = OS.gtk_printer_get_name(printer)
         length = OS.strlen(address)
         buffer = Array.typed(::Java::Byte).new(length) { 0 }
-        OS.memmove(buffer, address, length)
+        OS.memmove___org_eclipse_swt_printing_printer_3(buffer, address, length)
         name = String.new(Converter.mbcs_to_wcs(nil, buffer))
         return PrinterData.new(backend_type, name)
       end
@@ -543,7 +543,7 @@ module Org::Eclipse::Swt::Printing
     # int
     def internal_new__gc(data)
       visual = GdkVisual.new
-      OS.memmove(visual, OS.gdk_visual_get_system)
+      OS.memmove___org_eclipse_swt_printing_printer_5(visual, OS.gdk_visual_get_system)
       # int
       drawable = OS.gdk_pixmap_new(OS._gdk_root_parent, 1, 1, visual.attr_depth)
       # int

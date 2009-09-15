@@ -178,7 +178,7 @@ module Org::Eclipse::Swt::Graphics
           size.attr_height = height
           ns_image = ns_image.init_with_size(size)
           ns_image_rep = ns_image_rep.init_with_bitmap_data_planes(0, width, height, 8, 4, true, false, OS::NSDeviceRGBColorSpace, OS::NSAlphaFirstBitmapFormat | OS::NSAlphaNonpremultipliedBitmapFormat, width * 4, 32)
-          OS.memmove(ns_image_rep.bitmap_data, WAIT_SOURCE, WAIT_SOURCE.attr_length)
+          OS.memmove___org_eclipse_swt_graphics_cursor_1(ns_image_rep.bitmap_data, WAIT_SOURCE, WAIT_SOURCE.attr_length)
           ns_image.add_representation(ns_image_rep)
           point = NSPoint.new
           point.attr_x = 0
@@ -304,7 +304,7 @@ module Org::Eclipse::Swt::Graphics
       size.attr_height = height
       ns_image = ns_image.init_with_size(size)
       ns_image_rep = ns_image_rep.init_with_bitmap_data_planes(0, width, height, 8, 4, true, false, NSString.new(OS._nsdevice_rgbcolor_space), OS::NSAlphaFirstBitmapFormat | OS::NSAlphaNonpremultipliedBitmapFormat, width * 4, 32)
-      OS.memmove(ns_image_rep.bitmap_data, buffer, buffer.attr_length)
+      OS.memmove___org_eclipse_swt_graphics_cursor_3(ns_image_rep.bitmap_data, buffer, buffer.attr_length)
       ns_image.add_representation(ns_image_rep)
       point = NSPoint.new
       point.attr_x = hotspot_x

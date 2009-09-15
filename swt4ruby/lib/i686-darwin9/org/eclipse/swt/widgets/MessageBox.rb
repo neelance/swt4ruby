@@ -226,7 +226,7 @@ module Org::Eclipse::Swt::Widgets
         alert.add_button_with_title(title)
       end
       title = NSString.string_with(!(self.attr_title).nil? ? self.attr_title : "")
-      alert.window.set_title(title)
+      alert.window___org_eclipse_swt_widgets_message_box_1.set_title(title)
       message = NSString.string_with(!(@message).nil? ? @message : "")
       alert.set_message_text(message)
       response = 0
@@ -246,9 +246,9 @@ module Org::Eclipse::Swt::Widgets
           response = RJava.cast_to_int(alert.run_modal)
         else
           @return_code = 0
-          window_ = alert.window
+          window = alert.window___org_eclipse_swt_widgets_message_box_3
           application = NSApplication.shared_application
-          while (window_.is_visible)
+          while (window.is_visible)
             application.run
           end
           response = @return_code
@@ -338,7 +338,7 @@ module Org::Eclipse::Swt::Widgets
       # 64
       @return_code = RJava.cast_to_int(return_code)
       application = NSApplication.shared_application
-      application.end_sheet(NSAlert.new(alert).window, return_code)
+      application.end_sheet(NSAlert.new(alert).window___org_eclipse_swt_widgets_message_box_4, return_code)
       if (!((self.attr_style & SWT::PRIMARY_MODAL)).equal?(0))
         application.stop(nil)
       end

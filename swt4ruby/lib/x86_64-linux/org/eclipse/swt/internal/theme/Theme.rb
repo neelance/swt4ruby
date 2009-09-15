@@ -211,10 +211,10 @@ module Org::Eclipse::Swt::Internal::Theme
           while y < h[0]
             # int
             offset = pixels + (y * stride)
-            OS.memmove(line, offset, stride)
+            OS.memmove___org_eclipse_swt_internal_theme_theme_1(line, offset, stride)
             # int
             mask_offset = mask_pixels + (y * mask_stride)
-            OS.memmove(mask_line, mask_offset, mask_stride)
+            OS.memmove___org_eclipse_swt_internal_theme_theme_3(mask_line, mask_offset, mask_stride)
             x = 0
             while x < w[0]
               if ((mask_line[x * 3]).equal?(0))
@@ -222,7 +222,7 @@ module Org::Eclipse::Swt::Internal::Theme
               end
               x += 1
             end
-            OS.memmove(offset, line, stride)
+            OS.memmove___org_eclipse_swt_internal_theme_theme_5(offset, line, stride)
             y += 1
           end
           OS.g_object_unref(mask_pixbuf)
@@ -244,13 +244,13 @@ module Org::Eclipse::Swt::Internal::Theme
             while y < h[0]
               # int
               offset = pixels + (y * stride)
-              OS.memmove(line, offset, stride)
+              OS.memmove___org_eclipse_swt_internal_theme_theme_7(line, offset, stride)
               x = 0
               while x < w[0]
                 line[x * 4 + 3] = alpha[y * w[0] + x]
                 x += 1
               end
-              OS.memmove(offset, line, stride)
+              OS.memmove___org_eclipse_swt_internal_theme_theme_9(offset, line, stride)
               y += 1
             end
           end

@@ -194,21 +194,21 @@ module Org::Eclipse::Swt::Browser
         return XPCOM::NS_ERROR_NO_INTERFACE
       end
       guid = NsID.new
-      XPCOM.memmove(guid, riid, self.attr_ns_id.attr_sizeof)
+      XPCOM.memmove___org_eclipse_swt_browser_simple_enumerator_1(guid, riid, self.attr_ns_id.attr_sizeof)
       if (guid._equals(NsISupports::NS_ISUPPORTS_IID))
         # long
-        XPCOM.memmove(ppv_object, Array.typed(::Java::Int).new([@supports.get_address]), C::PTR_SIZEOF)
+        XPCOM.memmove___org_eclipse_swt_browser_simple_enumerator_3(ppv_object, Array.typed(::Java::Int).new([@supports.get_address]), C::PTR_SIZEOF)
         _add_ref
         return XPCOM::NS_OK
       end
       if (guid._equals(NsISimpleEnumerator::NS_ISIMPLEENUMERATOR_IID))
         # long
-        XPCOM.memmove(ppv_object, Array.typed(::Java::Int).new([@simple_enumerator.get_address]), C::PTR_SIZEOF)
+        XPCOM.memmove___org_eclipse_swt_browser_simple_enumerator_5(ppv_object, Array.typed(::Java::Int).new([@simple_enumerator.get_address]), C::PTR_SIZEOF)
         _add_ref
         return XPCOM::NS_OK
       end
       # long
-      XPCOM.memmove(ppv_object, Array.typed(::Java::Int).new([0]), C::PTR_SIZEOF)
+      XPCOM.memmove___org_eclipse_swt_browser_simple_enumerator_7(ppv_object, Array.typed(::Java::Int).new([0]), C::PTR_SIZEOF)
       return XPCOM::NS_ERROR_NO_INTERFACE
     end
     
@@ -225,7 +225,7 @@ module Org::Eclipse::Swt::Browser
     # long
     def _has_more_elements(_retval)
       more = !(@values).nil? && @index < @values.attr_length
-      XPCOM.memmove(_retval, Array.typed(::Java::Int).new([more ? 1 : 0]), 4)
+      XPCOM.memmove___org_eclipse_swt_browser_simple_enumerator_9(_retval, Array.typed(::Java::Int).new([more ? 1 : 0]), 4)
       # PRBool
       return XPCOM::NS_OK
     end
@@ -239,7 +239,7 @@ module Org::Eclipse::Swt::Browser
       value = @values[((@index += 1) - 1)]
       value._add_ref
       # long
-      XPCOM.memmove(_retval, Array.typed(::Java::Int).new([value.get_address]), C::PTR_SIZEOF)
+      XPCOM.memmove___org_eclipse_swt_browser_simple_enumerator_11(_retval, Array.typed(::Java::Int).new([value.get_address]), C::PTR_SIZEOF)
       return XPCOM::NS_OK
     end
     

@@ -206,7 +206,7 @@ module Org::Eclipse::Swt::Browser
     # int
     def gtk_event(handle, gdk_event, pointer)
       event = GdkEvent.new
-      OS.memmove(event, gdk_event, GdkEvent.attr_sizeof)
+      OS.memmove___org_eclipse_swt_browser_mozilla_delegate_1(event, gdk_event, GdkEvent.attr_sizeof)
       if ((event.attr_type).equal?(OS::GDK_BUTTON_PRESS))
         if (!@has_focus)
           @browser.set_focus

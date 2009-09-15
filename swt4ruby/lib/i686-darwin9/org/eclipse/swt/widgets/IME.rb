@@ -150,7 +150,7 @@ module Org::Eclipse::Swt::Widgets
       event.attr_detail = SWT::COMPOSITION_SELECTION
       send_event(SWT::ImeComposition, event)
       range = NSRange.new
-      OS.memmove(range, range_ptr, NSRange.attr_sizeof)
+      OS.memmove___org_eclipse_swt_widgets_ime_1(range, range_ptr, NSRange.attr_sizeof)
       # 64
       start = RJava.cast_to_int(range.attr_location)
       # 64
@@ -174,9 +174,9 @@ module Org::Eclipse::Swt::Widgets
         return OS::NSNotFound
       end
       pt = NSPoint.new
-      OS.memmove(pt, point, NSPoint.attr_sizeof)
+      OS.memmove___org_eclipse_swt_widgets_ime_3(pt, point, NSPoint.attr_sizeof)
       view = @parent.attr_view
-      pt = view.window.convert_screen_to_base(pt)
+      pt = view.window___org_eclipse_swt_widgets_ime_5.convert_screen_to_base(pt)
       pt = view.convert_point_from_view_(pt, nil)
       event = Event.new
       event.attr_detail = SWT::COMPOSITION_OFFSET
@@ -209,7 +209,7 @@ module Org::Eclipse::Swt::Widgets
         pt.attr_x = caret.attr_x
         pt.attr_y = caret.attr_y + caret.attr_height
         pt = view.convert_point_to_view_(pt, nil)
-        pt = view.window.convert_base_to_screen(pt)
+        pt = view.window___org_eclipse_swt_widgets_ime_7.convert_base_to_screen(pt)
         rect.attr_x = pt.attr_x
         rect.attr_y = pt.attr_y
         rect.attr_width = caret.attr_width
@@ -594,7 +594,7 @@ module Org::Eclipse::Swt::Widgets
         i = 0
         while i < length_
           attribs = attrib_str.attributes_at_index(i, ptr, range_limit)
-          OS.memmove(effective_range, ptr, NSRange.attr_sizeof)
+          OS.memmove___org_eclipse_swt_widgets_ime_9(effective_range, ptr, NSRange.attr_sizeof)
           # 64
           i = RJava.cast_to_int((effective_range.attr_location + effective_range.attr_length))
           # 64
@@ -620,7 +620,7 @@ module Org::Eclipse::Swt::Widgets
         @ranges = Array.typed(::Java::Int).new([0, length_ - 1])
       end
       range = NSRange.new
-      OS.memmove(range, sel_range, NSRange.attr_sizeof)
+      OS.memmove___org_eclipse_swt_widgets_ime_11(range, sel_range, NSRange.attr_sizeof)
       # 64
       @caret_offset = RJava.cast_to_int(range.attr_location)
       event = Event.new

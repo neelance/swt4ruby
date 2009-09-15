@@ -480,7 +480,7 @@ module Org::Eclipse::Swt::Widgets
         index += 1
       end
       gdk_event = GdkEventKey.new
-      OS.memmove(gdk_event, event_ptr, GdkEventKey.attr_sizeof)
+      OS.memmove___org_eclipse_swt_widgets_tool_bar_1(gdk_event, event_ptr, GdkEventKey.attr_sizeof)
       next_ = false
       case (gdk_event.attr_keyval)
       when OS::GDK_Up, OS::GDK_Left

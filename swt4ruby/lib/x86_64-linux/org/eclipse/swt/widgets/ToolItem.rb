@@ -627,17 +627,17 @@ module Org::Eclipse::Swt::Widgets
     # int
     def gtk_button_press_event(widget, event)
       gdk_event = GdkEventButton.new
-      OS.memmove(gdk_event, event, GdkEventButton.attr_sizeof)
+      OS.memmove___org_eclipse_swt_widgets_tool_item_1(gdk_event, event, GdkEventButton.attr_sizeof)
       x = gdk_event.attr_x
       gdk_event.attr_x += OS._gtk_widget_x(self.attr_handle)
       y = gdk_event.attr_y
       gdk_event.attr_y += OS._gtk_widget_y(self.attr_handle)
-      OS.memmove(event, gdk_event, GdkEventButton.attr_sizeof)
+      OS.memmove___org_eclipse_swt_widgets_tool_item_3(event, gdk_event, GdkEventButton.attr_sizeof)
       # int
       result = @parent.gtk_button_press_event(widget, event)
       gdk_event.attr_x = x
       gdk_event.attr_y = y
-      OS.memmove(event, gdk_event, GdkEventButton.attr_sizeof)
+      OS.memmove___org_eclipse_swt_widgets_tool_item_5(event, gdk_event, GdkEventButton.attr_sizeof)
       return result
     end
     
@@ -647,17 +647,17 @@ module Org::Eclipse::Swt::Widgets
     # int
     def gtk_button_release_event(widget, event)
       gdk_event = GdkEventButton.new
-      OS.memmove(gdk_event, event, GdkEventButton.attr_sizeof)
+      OS.memmove___org_eclipse_swt_widgets_tool_item_7(gdk_event, event, GdkEventButton.attr_sizeof)
       x = gdk_event.attr_x
       gdk_event.attr_x += OS._gtk_widget_x(self.attr_handle)
       y = gdk_event.attr_y
       gdk_event.attr_y += OS._gtk_widget_y(self.attr_handle)
-      OS.memmove(event, gdk_event, GdkEventButton.attr_sizeof)
+      OS.memmove___org_eclipse_swt_widgets_tool_item_9(event, gdk_event, GdkEventButton.attr_sizeof)
       # int
       result = @parent.gtk_button_release_event(widget, event)
       gdk_event.attr_x = x
       gdk_event.attr_y = y
-      OS.memmove(event, gdk_event, GdkEventButton.attr_sizeof)
+      OS.memmove___org_eclipse_swt_widgets_tool_item_11(event, gdk_event, GdkEventButton.attr_sizeof)
       return result
     end
     
@@ -671,7 +671,7 @@ module Org::Eclipse::Swt::Widgets
         event_ptr = OS.gtk_get_current_event
         if (!(event_ptr).equal?(0))
           gdk_event = GdkEvent.new
-          OS.memmove(gdk_event, event_ptr, GdkEvent.attr_sizeof)
+          OS.memmove___org_eclipse_swt_widgets_tool_item_13(gdk_event, event_ptr, GdkEvent.attr_sizeof)
           case (gdk_event.attr_type)
           when OS::GDK_BUTTON_PRESS, OS::GDK_2BUTTON_PRESS, OS::GDK_BUTTON_RELEASE
             x_win = Array.typed(::Java::Double).new(1) { 0.0 }
@@ -729,11 +729,11 @@ module Org::Eclipse::Swt::Widgets
     # int
     def gtk_event_after(widget, gdk_event)
       event = GdkEvent.new
-      OS.memmove(event, gdk_event, GdkEvent.attr_sizeof)
+      OS.memmove___org_eclipse_swt_widgets_tool_item_15(event, gdk_event, GdkEvent.attr_sizeof)
       case (event.attr_type)
       when OS::GDK_BUTTON_PRESS
         gdk_event_button = GdkEventButton.new
-        OS.memmove(gdk_event_button, gdk_event, GdkEventButton.attr_sizeof)
+        OS.memmove___org_eclipse_swt_widgets_tool_item_17(gdk_event_button, gdk_event, GdkEventButton.attr_sizeof)
         if ((gdk_event_button.attr_button).equal?(3))
           @parent.show_menu(RJava.cast_to_int(gdk_event_button.attr_x_root), RJava.cast_to_int(gdk_event_button.attr_y_root))
         end

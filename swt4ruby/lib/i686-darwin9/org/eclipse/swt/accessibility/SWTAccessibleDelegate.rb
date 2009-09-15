@@ -347,7 +347,7 @@ module Org::Eclipse::Swt::Accessibility
         else
           if ((sel).equal?(OS.attr_sel_accessibility_hit_test_))
             point = NSPoint.new
-            OS.memmove(point, arg0, NSPoint.attr_sizeof)
+            OS.memmove___org_eclipse_swt_accessibility_swtaccessible_delegate_1(point, arg0, NSPoint.attr_sizeof)
             ret_object = swt_acc.accessibility_hit_test(point)
             return ((ret_object).nil? ? 0 : ret_object.attr_id)
           else

@@ -214,7 +214,7 @@ module Org::Eclipse::Swt::Browser
       # int
       buffer = XPCOM.ns_embed_string_get(string)
       chars = CharArray.new(length)
-      XPCOM.memmove(chars, buffer, length * 2)
+      XPCOM.memmove___org_eclipse_swt_browser_file_picker_1_8_1(chars, buffer, length * 2)
       return String.new(chars)
     end
     

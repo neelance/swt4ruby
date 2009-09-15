@@ -103,7 +103,7 @@ module Org::Eclipse::Swt::Dnd
       if ((p_value).equal?(0))
         return
       end
-      OS.memmove(p_value, buffer, buffer.attr_length)
+      OS.memmove___org_eclipse_swt_dnd_rtftransfer_1(p_value, buffer, buffer.attr_length)
       transfer_data.attr_length = buffer.attr_length - 1
       transfer_data.attr_format = 8
       transfer_data.attr_p_value = p_value
@@ -128,7 +128,7 @@ module Org::Eclipse::Swt::Dnd
         return nil
       end
       buffer = Array.typed(::Java::Byte).new(size) { 0 }
-      OS.memmove(buffer, transfer_data.attr_p_value, size)
+      OS.memmove___org_eclipse_swt_dnd_rtftransfer_3(buffer, transfer_data.attr_p_value, size)
       chars = Converter.mbcs_to_wcs(nil, buffer)
       string = String.new(chars)
       end_ = string.index_of(Character.new(?\0.ord))

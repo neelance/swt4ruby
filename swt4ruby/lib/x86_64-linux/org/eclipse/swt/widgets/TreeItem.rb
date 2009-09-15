@@ -271,7 +271,7 @@ module Org::Eclipse::Swt::Widgets
         return @parent.get_background
       end
       gdk_color = GdkColor.new
-      OS.memmove(gdk_color, ptr[0], GdkColor.attr_sizeof)
+      OS.memmove___org_eclipse_swt_widgets_tree_item_1(gdk_color, ptr[0], GdkColor.attr_sizeof)
       return Color.gtk_new(self.attr_display, gdk_color)
     end
     
@@ -290,7 +290,7 @@ module Org::Eclipse::Swt::Widgets
         return __get_background
       end
       gdk_color = GdkColor.new
-      OS.memmove(gdk_color, ptr[0], GdkColor.attr_sizeof)
+      OS.memmove___org_eclipse_swt_widgets_tree_item_3(gdk_color, ptr[0], GdkColor.attr_sizeof)
       return Color.gtk_new(self.attr_display, gdk_color)
     end
     
@@ -313,7 +313,7 @@ module Org::Eclipse::Swt::Widgets
         return @parent.get_foreground
       end
       gdk_color = GdkColor.new
-      OS.memmove(gdk_color, ptr[0], GdkColor.attr_sizeof)
+      OS.memmove___org_eclipse_swt_widgets_tree_item_5(gdk_color, ptr[0], GdkColor.attr_sizeof)
       return Color.gtk_new(self.attr_display, gdk_color)
     end
     
@@ -332,7 +332,7 @@ module Org::Eclipse::Swt::Widgets
         return __get_foreground
       end
       gdk_color = GdkColor.new
-      OS.memmove(gdk_color, ptr[0], GdkColor.attr_sizeof)
+      OS.memmove___org_eclipse_swt_widgets_tree_item_7(gdk_color, ptr[0], GdkColor.attr_sizeof)
       return Color.gtk_new(self.attr_display, gdk_color)
     end
     
@@ -374,7 +374,7 @@ module Org::Eclipse::Swt::Widgets
       end # $NON-NLS-1$
       length = OS.strlen(ptr[0])
       buffer = Array.typed(::Java::Byte).new(length) { 0 }
-      OS.memmove(buffer, ptr[0], length)
+      OS.memmove___org_eclipse_swt_widgets_tree_item_9(buffer, ptr[0], length)
       OS.g_free(ptr[0])
       return String.new(Converter.mbcs_to_wcs(nil, buffer))
     end
@@ -1241,7 +1241,7 @@ module Org::Eclipse::Swt::Widgets
         indices = OS.gtk_tree_path_get_indices(path)
         if (!(indices).equal?(0))
           temp = Array.typed(::Java::Int).new(depth) { 0 }
-          OS.memmove(temp, indices, 4 * temp.attr_length)
+          OS.memmove___org_eclipse_swt_widgets_tree_item_11(temp, indices, 4 * temp.attr_length)
           index = temp[temp.attr_length - 1]
         end
       end

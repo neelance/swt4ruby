@@ -171,7 +171,7 @@ module Org::Eclipse::Swt::Widgets
         font_name = OS.pango_font_description_to_string(font.attr_handle)
         length = OS.strlen(font_name)
         buffer = Array.typed(::Java::Byte).new(length + 1) { 0 }
-        OS.memmove(buffer, font_name, length)
+        OS.memmove___org_eclipse_swt_widgets_font_dialog_1(buffer, font_name, length)
         font.dispose
         OS.g_free(font_name)
         OS.gtk_font_selection_dialog_set_font_name(handle, buffer)
@@ -202,7 +202,7 @@ module Org::Eclipse::Swt::Widgets
         font_name = OS.gtk_font_selection_dialog_get_font_name(handle)
         length = OS.strlen(font_name)
         buffer = Array.typed(::Java::Byte).new(length + 1) { 0 }
-        OS.memmove(buffer, font_name, length)
+        OS.memmove___org_eclipse_swt_widgets_font_dialog_3(buffer, font_name, length)
         OS.g_free(font_name)
         # int
         font_desc = OS.pango_font_description_from_string(buffer)

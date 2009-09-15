@@ -249,7 +249,7 @@ module Org::Eclipse::Swt::Widgets
         return result
       end
       gdk_event = GdkEventButton.new
-      OS.memmove(gdk_event, event_ptr, GdkEventButton.attr_sizeof)
+      OS.memmove___org_eclipse_swt_widgets_sash_1(gdk_event, event_ptr, GdkEventButton.attr_sizeof)
       button = gdk_event.attr_button
       if (!(button).equal?(1))
         return 0
@@ -317,7 +317,7 @@ module Org::Eclipse::Swt::Widgets
         return result
       end
       gdk_event = GdkEventButton.new
-      OS.memmove(gdk_event, event_ptr, GdkEventButton.attr_sizeof)
+      OS.memmove___org_eclipse_swt_widgets_sash_3(gdk_event, event_ptr, GdkEventButton.attr_sizeof)
       button = gdk_event.attr_button
       if (!(button).equal?(1))
         return 0
@@ -380,7 +380,7 @@ module Org::Eclipse::Swt::Widgets
         return result
       end
       gdk_event = GdkEventKey.new
-      OS.memmove(gdk_event, event_ptr, GdkEventKey.attr_sizeof)
+      OS.memmove___org_eclipse_swt_widgets_sash_5(gdk_event, event_ptr, GdkEventKey.attr_sizeof)
       keyval = gdk_event.attr_keyval
       catch(:break_case) do
         case (keyval)
@@ -481,7 +481,7 @@ module Org::Eclipse::Swt::Widgets
         return 0
       end
       gdk_event = GdkEventMotion.new
-      OS.memmove(gdk_event, event_ptr, GdkEventButton.attr_sizeof)
+      OS.memmove___org_eclipse_swt_widgets_sash_7(gdk_event, event_ptr, GdkEventButton.attr_sizeof)
       event_x = 0
       event_y = 0
       event_state = 0

@@ -370,7 +370,7 @@ module Org::Eclipse::Swt::Graphics
             end
           end
         end
-        OS.memmove(data, buffer, stride * height)
+        OS.memmove___org_eclipse_swt_graphics_cursor_1(data, buffer, stride * height)
         @handle = OS.gdk_cursor_new_from_pixbuf(display, pixbuf, hotspot_x, hotspot_y)
         OS.g_object_unref(pixbuf)
       else

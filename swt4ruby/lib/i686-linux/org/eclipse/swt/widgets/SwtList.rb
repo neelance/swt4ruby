@@ -489,7 +489,7 @@ module Org::Eclipse::Swt::Widgets
       indices = OS.gtk_tree_path_get_indices(path[0])
       index = Array.typed(::Java::Int).new([-1])
       if (!(indices).equal?(0))
-        OS.memmove(index, indices, 4)
+        OS.memmove___org_eclipse_swt_widgets_list_1(index, indices, 4)
       end
       OS.gtk_tree_path_free(path[0])
       return index[0]
@@ -532,7 +532,7 @@ module Org::Eclipse::Swt::Widgets
       end
       length = OS.strlen(ptr[0])
       buffer2 = Array.typed(::Java::Byte).new(length) { 0 }
-      OS.memmove(buffer2, ptr[0], length)
+      OS.memmove___org_eclipse_swt_widgets_list_3(buffer2, ptr[0], length)
       OS.g_free(ptr[0])
       return String.new(Converter.mbcs_to_wcs(nil, buffer2))
     end
@@ -615,7 +615,7 @@ module Org::Eclipse::Swt::Widgets
         if (!(ptr[0]).equal?(0))
           length = OS.strlen(ptr[0])
           buffer = Array.typed(::Java::Byte).new(length) { 0 }
-          OS.memmove(buffer, ptr[0], length)
+          OS.memmove___org_eclipse_swt_widgets_list_5(buffer, ptr[0], length)
           OS.g_free(ptr[0])
           result[index] = String.new(Converter.mbcs_to_wcs(nil, buffer))
         end
@@ -717,7 +717,7 @@ module Org::Eclipse::Swt::Widgets
           # long
           indices = OS.gtk_tree_path_get_indices(data)
           if (!(indices).equal?(0))
-            OS.memmove(index, indices, 4)
+            OS.memmove___org_eclipse_swt_widgets_list_7(index, indices, 4)
             break
           end
           i += 1
@@ -780,7 +780,7 @@ module Org::Eclipse::Swt::Widgets
           indices = OS.gtk_tree_path_get_indices(data)
           if (!(indices).equal?(0))
             index = Array.typed(::Java::Int).new(1) { 0 }
-            OS.memmove(index, indices, 4)
+            OS.memmove___org_eclipse_swt_widgets_list_9(index, indices, 4)
             tree_selection[length] = index[0]
             length += 1
           end
@@ -821,7 +821,7 @@ module Org::Eclipse::Swt::Widgets
       indices = OS.gtk_tree_path_get_indices(path[0])
       index = Array.typed(::Java::Int).new(1) { 0 }
       if (!(indices).equal?(0))
-        OS.memmove(index, indices, 4)
+        OS.memmove___org_eclipse_swt_widgets_list_11(index, indices, 4)
       end
       OS.gtk_tree_path_free(path[0])
       return index[0]
@@ -852,7 +852,7 @@ module Org::Eclipse::Swt::Widgets
       # an unwanted selection event. The workaround is to detect that case and not
       # run the default handler when the item is already part of the current selection.
       gdk_event = GdkEventButton.new
-      OS.memmove(gdk_event, event, GdkEventButton.attr_sizeof)
+      OS.memmove___org_eclipse_swt_widgets_list_13(gdk_event, event, GdkEventButton.attr_sizeof)
       button = gdk_event.attr_button
       if ((button).equal?(3) && (gdk_event.attr_type).equal?(OS::GDK_BUTTON_PRESS))
         # long
@@ -914,7 +914,7 @@ module Org::Eclipse::Swt::Widgets
         # the return key, GTK does not issue notification. The fix is
         # to issue this notification when the return key is pressed.
         key_event = GdkEventKey.new
-        OS.memmove(key_event, event, GdkEventKey.attr_sizeof)
+        OS.memmove___org_eclipse_swt_widgets_list_15(key_event, event, GdkEventKey.attr_sizeof)
         key = key_event.attr_keyval
         case (key)
         when OS::GDK_Return, OS::GDK_KP_Enter
@@ -1809,7 +1809,7 @@ module Org::Eclipse::Swt::Widgets
         indices = OS.gtk_tree_path_get_indices(path)
         if (!(indices).equal?(0))
           index = Array.typed(::Java::Int).new(1) { 0 }
-          OS.memmove(index, indices, 4)
+          OS.memmove___org_eclipse_swt_widgets_list_17(index, indices, 4)
           selection[length] = index[0]
         end
       end

@@ -209,7 +209,7 @@ module Org::Eclipse::Swt::Printing
         OS.object_set_instance_variable(delegate.attr_id, SWT_OBJECT, jni_ref)
         @return_code = -1
         parent = get_parent
-        panel.begin_sheet_with_print_info(print_info, parent.attr_view.window, delegate, OS.attr_sel_panel_did_end_return_code_context_info_, 0)
+        panel.begin_sheet_with_print_info(print_info, parent.attr_view.window___org_eclipse_swt_printing_print_dialog_1, delegate, OS.attr_sel_panel_did_end_return_code_context_info_, 0)
         application = NSApplication.shared_application
         while ((@return_code).equal?(-1))
           application.run
@@ -247,7 +247,7 @@ module Org::Eclipse::Swt::Printing
         ns_data = NSKeyedArchiver.archived_data_with_root_object(print_info)
         # 64
         data.attr_other_data = Array.typed(::Java::Byte).new(RJava.cast_to_int(ns_data.length)) { 0 }
-        OS.memmove(data.attr_other_data, ns_data.bytes, data.attr_other_data.attr_length)
+        OS.memmove___org_eclipse_swt_printing_print_dialog_3(data.attr_other_data, ns_data.bytes, data.attr_other_data.attr_length)
         @printer_data = data
       end
       print_info.release

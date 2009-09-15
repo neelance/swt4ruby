@@ -1145,15 +1145,15 @@ module Org::Eclipse::Swt::Widgets
       alias_method :attr_fixed_size_allocate_proc_address=, :fixed_size_allocate_proc_address=
       
       
-      def old_fixed_size_allocate_proc
-        defined?(@@old_fixed_size_allocate_proc) ? @@old_fixed_size_allocate_proc : @@old_fixed_size_allocate_proc= 0
+      def old_fixed_size_allocate_proc_address
+        defined?(@@old_fixed_size_allocate_proc_address) ? @@old_fixed_size_allocate_proc_address : @@old_fixed_size_allocate_proc_address= 0
       end
-      alias_method :attr_old_fixed_size_allocate_proc, :old_fixed_size_allocate_proc
+      alias_method :attr_old_fixed_size_allocate_proc_address, :old_fixed_size_allocate_proc_address
       
-      def old_fixed_size_allocate_proc=(value)
-        @@old_fixed_size_allocate_proc = value
+      def old_fixed_size_allocate_proc_address=(value)
+        @@old_fixed_size_allocate_proc_address = value
       end
-      alias_method :attr_old_fixed_size_allocate_proc=, :old_fixed_size_allocate_proc=
+      alias_method :attr_old_fixed_size_allocate_proc_address=, :old_fixed_size_allocate_proc_address=
       
       # Renderer Subclass
       # long
@@ -1259,37 +1259,37 @@ module Org::Eclipse::Swt::Widgets
       
       # long
       
-      def renderer_class_init_proc
-        defined?(@@renderer_class_init_proc) ? @@renderer_class_init_proc : @@renderer_class_init_proc= 0
+      def renderer_class_init_proc_address
+        defined?(@@renderer_class_init_proc_address) ? @@renderer_class_init_proc_address : @@renderer_class_init_proc_address= 0
       end
-      alias_method :attr_renderer_class_init_proc, :renderer_class_init_proc
+      alias_method :attr_renderer_class_init_proc_address, :renderer_class_init_proc_address
       
-      def renderer_class_init_proc=(value)
-        @@renderer_class_init_proc = value
+      def renderer_class_init_proc_address=(value)
+        @@renderer_class_init_proc_address = value
       end
-      alias_method :attr_renderer_class_init_proc=, :renderer_class_init_proc=
+      alias_method :attr_renderer_class_init_proc_address=, :renderer_class_init_proc_address=
       
       
-      def renderer_render_proc
-        defined?(@@renderer_render_proc) ? @@renderer_render_proc : @@renderer_render_proc= 0
+      def renderer_render_proc_address
+        defined?(@@renderer_render_proc_address) ? @@renderer_render_proc_address : @@renderer_render_proc_address= 0
       end
-      alias_method :attr_renderer_render_proc, :renderer_render_proc
+      alias_method :attr_renderer_render_proc_address, :renderer_render_proc_address
       
-      def renderer_render_proc=(value)
-        @@renderer_render_proc = value
+      def renderer_render_proc_address=(value)
+        @@renderer_render_proc_address = value
       end
-      alias_method :attr_renderer_render_proc=, :renderer_render_proc=
+      alias_method :attr_renderer_render_proc_address=, :renderer_render_proc_address=
       
       
-      def renderer_get_size_proc
-        defined?(@@renderer_get_size_proc) ? @@renderer_get_size_proc : @@renderer_get_size_proc= 0
+      def renderer_get_size_proc_address
+        defined?(@@renderer_get_size_proc_address) ? @@renderer_get_size_proc_address : @@renderer_get_size_proc_address= 0
       end
-      alias_method :attr_renderer_get_size_proc, :renderer_get_size_proc
+      alias_method :attr_renderer_get_size_proc_address, :renderer_get_size_proc_address
       
-      def renderer_get_size_proc=(value)
-        @@renderer_get_size_proc = value
+      def renderer_get_size_proc_address=(value)
+        @@renderer_get_size_proc_address = value
       end
-      alias_method :attr_renderer_get_size_proc=, :renderer_get_size_proc=
+      alias_method :attr_renderer_get_size_proc_address=, :renderer_get_size_proc_address=
       
       # Key Mappings
       # Keyboard and Mouse Masks
@@ -2025,7 +2025,7 @@ module Org::Eclipse::Swt::Widgets
           end
         end
       end
-      OS.memmove(@expose_event, x_event, XExposeEvent.attr_sizeof)
+      OS.memmove___org_eclipse_swt_widgets_display_1(@expose_event, x_event, XExposeEvent.attr_sizeof)
       case (type)
       when OS::Expose, OS::GraphicsExpose
         @flush_rect.attr_x = @expose_event.attr_x
@@ -2034,9 +2034,9 @@ module Org::Eclipse::Swt::Widgets
         @flush_rect.attr_height = @expose_event.attr_height
         OS.gdk_window_invalidate_rect(window, @flush_rect, true)
         @expose_event.attr_type = -1
-        OS.memmove(x_event, @expose_event, XExposeEvent.attr_sizeof)
+        OS.memmove___org_eclipse_swt_widgets_display_3(x_event, @expose_event, XExposeEvent.attr_sizeof)
       when OS::VisibilityNotify
-        OS.memmove(@visibility_event, x_event, XVisibilityEvent.attr_sizeof)
+        OS.memmove___org_eclipse_swt_widgets_display_5(@visibility_event, x_event, XVisibilityEvent.attr_sizeof)
         OS.gdk_window_get_user_data(window, @flush_data)
         # long
         handle = @flush_data[0]
@@ -2165,7 +2165,7 @@ module Org::Eclipse::Swt::Widgets
       if (!(ptr).equal?(0))
         length = OS.strlen(ptr)
         buffer = Array.typed(::Java::Byte).new(length) { 0 }
-        OS.memmove(buffer, ptr, length)
+        OS.memmove___org_eclipse_swt_widgets_display_7(buffer, ptr, length)
         System.out.println("***WARNING: " + RJava.cast_to_string(String.new(Converter.mbcs_to_wcs(nil, buffer)))) # $NON-NLS-1$
         System.out.println("***WARNING: SWT requires GTK " + RJava.cast_to_string(MAJOR) + "." + RJava.cast_to_string(MINOR) + "." + RJava.cast_to_string(MICRO)) # $NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
         major = OS.gtk_major_version
@@ -2195,57 +2195,57 @@ module Org::Eclipse::Swt::Widgets
         fixed_info.attr_class_init = self.attr_fixed_class_init_proc_address
         fixed_info.attr_instance_size = RJava.cast_to_short(OS._gtk_fixed_sizeof)
         self.attr_fixed_info_ptr = OS.g_malloc(GTypeInfo.attr_sizeof)
-        OS.memmove(self.attr_fixed_info_ptr, fixed_info, GTypeInfo.attr_sizeof)
+        OS.memmove___org_eclipse_swt_widgets_display_9(self.attr_fixed_info_ptr, fixed_info, GTypeInfo.attr_sizeof)
         self.attr_fixed_type = OS.g_type_register_static(OS._gtk_type_fixed, type_name, self.attr_fixed_info_ptr, 0)
       end
-      if ((self.attr_renderer_class_init_proc).equal?(0))
+      if ((self.attr_renderer_class_init_proc_address).equal?(0))
         self.attr_renderer_class_init_callback = Callback.new(get_class, "rendererClassInitProc", 2) # $NON-NLS-1$
-        self.attr_renderer_class_init_proc = self.attr_renderer_class_init_callback.get_address
-        if ((self.attr_renderer_class_init_proc).equal?(0))
+        self.attr_renderer_class_init_proc_address = self.attr_renderer_class_init_callback.get_address
+        if ((self.attr_renderer_class_init_proc_address).equal?(0))
           SWT.error(SWT::ERROR_NO_MORE_CALLBACKS)
         end
       end
-      if ((self.attr_renderer_render_proc).equal?(0))
+      if ((self.attr_renderer_render_proc_address).equal?(0))
         self.attr_renderer_render_callback = Callback.new(get_class, "rendererRenderProc", 7) # $NON-NLS-1$
-        self.attr_renderer_render_proc = self.attr_renderer_render_callback.get_address
-        if ((self.attr_renderer_render_proc).equal?(0))
+        self.attr_renderer_render_proc_address = self.attr_renderer_render_callback.get_address
+        if ((self.attr_renderer_render_proc_address).equal?(0))
           SWT.error(SWT::ERROR_NO_MORE_CALLBACKS)
         end
       end
-      if ((self.attr_renderer_get_size_proc).equal?(0))
+      if ((self.attr_renderer_get_size_proc_address).equal?(0))
         self.attr_renderer_get_size_callback = Callback.new(get_class, "rendererGetSizeProc", 7) # $NON-NLS-1$
-        self.attr_renderer_get_size_proc = self.attr_renderer_get_size_callback.get_address
-        if ((self.attr_renderer_get_size_proc).equal?(0))
+        self.attr_renderer_get_size_proc_address = self.attr_renderer_get_size_callback.get_address
+        if ((self.attr_renderer_get_size_proc_address).equal?(0))
           SWT.error(SWT::ERROR_NO_MORE_CALLBACKS)
         end
       end
       if ((self.attr_text_renderer_type).equal?(0))
         renderer_info = GTypeInfo.new
         renderer_info.attr_class_size = RJava.cast_to_short(OS._gtk_cell_renderer_text_class_sizeof)
-        renderer_info.attr_class_init = self.attr_renderer_class_init_proc
+        renderer_info.attr_class_init = self.attr_renderer_class_init_proc_address
         renderer_info.attr_instance_size = RJava.cast_to_short(OS._gtk_cell_renderer_text_sizeof)
         self.attr_text_renderer_info_ptr = OS.g_malloc(GTypeInfo.attr_sizeof)
-        OS.memmove(self.attr_text_renderer_info_ptr, renderer_info, GTypeInfo.attr_sizeof)
+        OS.memmove___org_eclipse_swt_widgets_display_11(self.attr_text_renderer_info_ptr, renderer_info, GTypeInfo.attr_sizeof)
         type_name = Converter.wcs_to_mbcs(nil, "SwtTextRenderer", true) # $NON-NLS-1$
         self.attr_text_renderer_type = OS.g_type_register_static(OS._gtk_type_cell_renderer_text, type_name, self.attr_text_renderer_info_ptr, 0)
       end
       if ((self.attr_pixbuf_renderer_type).equal?(0))
         renderer_info = GTypeInfo.new
         renderer_info.attr_class_size = RJava.cast_to_short(OS._gtk_cell_renderer_pixbuf_class_sizeof)
-        renderer_info.attr_class_init = self.attr_renderer_class_init_proc
+        renderer_info.attr_class_init = self.attr_renderer_class_init_proc_address
         renderer_info.attr_instance_size = RJava.cast_to_short(OS._gtk_cell_renderer_pixbuf_sizeof)
         self.attr_pixbuf_renderer_info_ptr = OS.g_malloc(GTypeInfo.attr_sizeof)
-        OS.memmove(self.attr_pixbuf_renderer_info_ptr, renderer_info, GTypeInfo.attr_sizeof)
+        OS.memmove___org_eclipse_swt_widgets_display_13(self.attr_pixbuf_renderer_info_ptr, renderer_info, GTypeInfo.attr_sizeof)
         type_name = Converter.wcs_to_mbcs(nil, "SwtPixbufRenderer", true) # $NON-NLS-1$
         self.attr_pixbuf_renderer_type = OS.g_type_register_static(OS._gtk_type_cell_renderer_pixbuf, type_name, self.attr_pixbuf_renderer_info_ptr, 0)
       end
       if ((self.attr_toggle_renderer_type).equal?(0))
         renderer_info = GTypeInfo.new
         renderer_info.attr_class_size = RJava.cast_to_short(OS._gtk_cell_renderer_toggle_class_sizeof)
-        renderer_info.attr_class_init = self.attr_renderer_class_init_proc
+        renderer_info.attr_class_init = self.attr_renderer_class_init_proc_address
         renderer_info.attr_instance_size = RJava.cast_to_short(OS._gtk_cell_renderer_toggle_sizeof)
         self.attr_toggle_renderer_info_ptr = OS.g_malloc(GTypeInfo.attr_sizeof)
-        OS.memmove(self.attr_toggle_renderer_info_ptr, renderer_info, GTypeInfo.attr_sizeof)
+        OS.memmove___org_eclipse_swt_widgets_display_15(self.attr_toggle_renderer_info_ptr, renderer_info, GTypeInfo.attr_sizeof)
         type_name = Converter.wcs_to_mbcs(nil, "SwtToggleRenderer", true) # $NON-NLS-1$
         self.attr_toggle_renderer_type = OS.g_type_register_static(OS._gtk_type_cell_renderer_toggle, type_name, self.attr_toggle_renderer_info_ptr, 0)
       end
@@ -2294,7 +2294,7 @@ module Org::Eclipse::Swt::Widgets
       # long
       pixels = OS.gdk_pixbuf_get_pixels(pixbuf)
       data = Array.typed(::Java::Byte).new(stride * height) { 0 }
-      OS.memmove(data, pixels, data.attr_length)
+      OS.memmove___org_eclipse_swt_widgets_display_17(data, pixels, data.attr_length)
       OS.g_object_unref(pixbuf)
       image_data = nil
       if (has_alpha)
@@ -2357,10 +2357,10 @@ module Org::Eclipse::Swt::Widgets
           while y < h[0]
             # long
             offset = pixels + (y * stride)
-            OS.memmove(line, offset, stride)
+            OS.memmove___org_eclipse_swt_widgets_display_19(line, offset, stride)
             # long
             mask_offset = mask_pixels + (y * mask_stride)
-            OS.memmove(mask_line, mask_offset, mask_stride)
+            OS.memmove___org_eclipse_swt_widgets_display_21(mask_line, mask_offset, mask_stride)
             x = 0
             while x < w[0]
               if ((mask_line[x * 3]).equal?(0))
@@ -2368,7 +2368,7 @@ module Org::Eclipse::Swt::Widgets
               end
               x += 1
             end
-            OS.memmove(offset, line, stride)
+            OS.memmove___org_eclipse_swt_widgets_display_23(offset, line, stride)
             y += 1
           end
           OS.g_object_unref(mask_pixbuf)
@@ -2390,13 +2390,13 @@ module Org::Eclipse::Swt::Widgets
             while y < h[0]
               # long
               offset = pixels + (y * stride)
-              OS.memmove(line, offset, stride)
+              OS.memmove___org_eclipse_swt_widgets_display_25(line, offset, stride)
               x = 0
               while x < w[0]
                 line[x * 4 + 3] = alpha[y * w[0] + x]
                 x += 1
               end
-              OS.memmove(offset, line, stride)
+              OS.memmove___org_eclipse_swt_widgets_display_27(offset, line, stride)
               y += 1
             end
           end
@@ -2645,11 +2645,11 @@ module Org::Eclipse::Swt::Widgets
       # long
       def fixed_class_init_proc(g_class, class_data)
         klass = GtkWidgetClass.new
-        OS.memmove(klass, g_class)
+        OS.memmove___org_eclipse_swt_widgets_display_29(klass, g_class)
         klass.attr_map = self.attr_fixed_map_proc_address
-        self.attr_old_fixed_size_allocate_proc = klass.attr_size_allocate
+        self.attr_old_fixed_size_allocate_proc_address = klass.attr_size_allocate
         klass.attr_size_allocate = self.attr_fixed_size_allocate_proc_address
-        OS.memmove(g_class, klass)
+        OS.memmove___org_eclipse_swt_widgets_display_31(g_class, klass)
         return 0
       end
       
@@ -2675,7 +2675,7 @@ module Org::Eclipse::Swt::Widgets
         if (!(widget).nil?)
           return widget.fixed_size_allocate_proc(handle, allocation)
         end
-        return OS._call(self.attr_old_fixed_size_allocate_proc, handle, allocation)
+        return OS._call(self.attr_old_fixed_size_allocate_proc_address, handle, allocation)
       end
       
       typesig { [::Java::Int, ::Java::Int] }
@@ -2684,10 +2684,10 @@ module Org::Eclipse::Swt::Widgets
       # long
       def renderer_class_init_proc(g_class, class_data)
         klass = GtkCellRendererClass.new
-        OS.memmove(klass, g_class)
-        klass.attr_render = self.attr_renderer_render_proc
-        klass.attr_get_size = self.attr_renderer_get_size_proc
-        OS.memmove(g_class, klass)
+        OS.memmove___org_eclipse_swt_widgets_display_33(klass, g_class)
+        klass.attr_render = self.attr_renderer_render_proc_address
+        klass.attr_get_size = self.attr_renderer_get_size_proc_address
+        OS.memmove___org_eclipse_swt_widgets_display_35(g_class, klass)
         return 0
       end
       
@@ -2897,7 +2897,7 @@ module Org::Eclipse::Swt::Widgets
           # long
           border = OS.gtk_entry_get_inner_border(handle)
           if (!(border).equal?(0))
-            OS.memmove(gtk_border, border, GtkBorder.attr_sizeof)
+            OS.memmove___org_eclipse_swt_widgets_display_37(gtk_border, border, GtkBorder.attr_sizeof)
             return gtk_border
           end
           # long
@@ -2905,7 +2905,7 @@ module Org::Eclipse::Swt::Widgets
           border_ptr = Array.typed(::Java::Int).new(1) { 0 }
           OS.gtk_widget_style_get(handle, OS.attr_inner_border, border_ptr, 0)
           if (!(border_ptr[0]).equal?(0))
-            OS.memmove(gtk_border, border_ptr[0], GtkBorder.attr_sizeof)
+            OS.memmove___org_eclipse_swt_widgets_display_39(gtk_border, border_ptr[0], GtkBorder.attr_sizeof)
             OS.gtk_border_free(border_ptr[0])
             return gtk_border
           end
@@ -2948,13 +2948,13 @@ module Org::Eclipse::Swt::Widgets
         # it gets dispatched by GTK.  SWT has been modified to look
         # for negative button numbers.
         mouse_event = XButtonEvent.new
-        OS.memmove(mouse_event, x_event, 4)
+        OS.memmove___org_eclipse_swt_widgets_display_41(mouse_event, x_event, 4)
         if ((mouse_event.attr_type).equal?(OS::ButtonRelease))
-          OS.memmove(mouse_event, x_event, XButtonEvent.attr_sizeof)
+          OS.memmove___org_eclipse_swt_widgets_display_43(mouse_event, x_event, XButtonEvent.attr_sizeof)
           case (mouse_event.attr_button)
           when 6, 7
             mouse_event.attr_button = -mouse_event.attr_button
-            OS.memmove(x_event, mouse_event, XButtonEvent.attr_sizeof)
+            OS.memmove___org_eclipse_swt_widgets_display_45(x_event, mouse_event, XButtonEvent.attr_sizeof)
           end
         end
       end
@@ -3255,7 +3255,7 @@ module Org::Eclipse::Swt::Widgets
     def get_depth
       check_device
       visual = GdkVisual.new
-      OS.memmove(visual, OS.gdk_visual_get_system)
+      OS.memmove___org_eclipse_swt_widgets_display_47(visual, OS.gdk_visual_get_system)
       return visual.attr_depth
     end
     
@@ -3335,12 +3335,12 @@ module Org::Eclipse::Swt::Widgets
       if (!(data[0]).equal?(0))
         if ((actual_length[0]).equal?(16))
           values = Array.typed(::Java::Int).new(4) { 0 }
-          OS.memmove(values, data[0], 16)
+          OS.memmove___org_eclipse_swt_widgets_display_49(values, data[0], 16)
           result = Rectangle.new(values[0], values[1], values[2], values[3])
         else
           if ((actual_length[0]).equal?(32))
             values = Array.typed(::Java::Long).new(4) { 0 }
-            OS.memmove(values, data[0], 32)
+            OS.memmove___org_eclipse_swt_widgets_display_51(values, data[0], 32)
             result = Rectangle.new(RJava.cast_to_int(values[0]), RJava.cast_to_int(values[1]), RJava.cast_to_int(values[2]), RJava.cast_to_int(values[3]))
           end
         end
@@ -4161,7 +4161,7 @@ module Org::Eclipse::Swt::Widgets
             length = OS.strlen(ptr2)
             if (length > 0)
               buffer2 = Array.typed(::Java::Byte).new(length) { 0 }
-              OS.memmove(buffer2, ptr2, length)
+              OS.memmove___org_eclipse_swt_widgets_display_53(buffer2, ptr2, length)
               @window_manager = RJava.cast_to_string(String.new(Converter.mbcs_to_wcs(nil, buffer2)))
             end
           end

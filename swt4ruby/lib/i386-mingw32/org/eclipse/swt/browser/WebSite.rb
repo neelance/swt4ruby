@@ -1259,18 +1259,18 @@ module Org::Eclipse::Swt::Browser
           password_ptr = COM._co_task_mem_alloc(size)
           OS._move_memory(password_ptr, password, size)
           # long
-          C.memmove(hwnd, Array.typed(::Java::Int).new([0]), C::PTR_SIZEOF)
+          C.memmove___org_eclipse_swt_browser_web_site_1(hwnd, Array.typed(::Java::Int).new([0]), C::PTR_SIZEOF)
           # long
-          C.memmove(sz_username, Array.typed(::Java::Int).new([user_ptr]), C::PTR_SIZEOF)
+          C.memmove___org_eclipse_swt_browser_web_site_3(sz_username, Array.typed(::Java::Int).new([user_ptr]), C::PTR_SIZEOF)
           # long
-          C.memmove(sz_password, Array.typed(::Java::Int).new([password_ptr]), C::PTR_SIZEOF)
+          C.memmove___org_eclipse_swt_browser_web_site_5(sz_password, Array.typed(::Java::Int).new([password_ptr]), C::PTR_SIZEOF)
           return COM::S_OK
         end
         i += 1
       end
       # no listener handled the challenge, so defer to the native dialog
       # long
-      C.memmove(hwnd, Array.typed(::Java::Int).new([get_shell.attr_handle]), C::PTR_SIZEOF)
+      C.memmove___org_eclipse_swt_browser_web_site_7(hwnd, Array.typed(::Java::Int).new([get_shell.attr_handle]), C::PTR_SIZEOF)
       return COM::S_OK
     end
     
@@ -1278,7 +1278,7 @@ module Org::Eclipse::Swt::Browser
     # IDispatch
     # long
     def _get_type_info_count(pctinfo)
-      C.memmove(pctinfo, Array.typed(::Java::Int).new([0]), 4)
+      C.memmove___org_eclipse_swt_browser_web_site_9(pctinfo, Array.typed(::Java::Int).new([0]), 4)
       return COM::S_OK
     end
     

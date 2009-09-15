@@ -538,33 +538,33 @@ module Org::Eclipse::Swt::Browser
         return XPCOM::NS_ERROR_NO_INTERFACE
       end
       guid = NsID.new
-      XPCOM.memmove(guid, riid, self.attr_ns_id.attr_sizeof)
+      XPCOM.memmove___org_eclipse_swt_browser_download_1(guid, riid, self.attr_ns_id.attr_sizeof)
       if (guid._equals(NsISupports::NS_ISUPPORTS_IID))
         # long
-        XPCOM.memmove(ppv_object, Array.typed(::Java::Int).new([@supports.get_address]), C::PTR_SIZEOF)
+        XPCOM.memmove___org_eclipse_swt_browser_download_3(ppv_object, Array.typed(::Java::Int).new([@supports.get_address]), C::PTR_SIZEOF)
         _add_ref
         return XPCOM::NS_OK
       end
       if (guid._equals(NsIDownload::NS_IDOWNLOAD_IID))
         # long
-        XPCOM.memmove(ppv_object, Array.typed(::Java::Int).new([@download.get_address]), C::PTR_SIZEOF)
+        XPCOM.memmove___org_eclipse_swt_browser_download_5(ppv_object, Array.typed(::Java::Int).new([@download.get_address]), C::PTR_SIZEOF)
         _add_ref
         return XPCOM::NS_OK
       end
       if (guid._equals(NsIProgressDialog::NS_IPROGRESSDIALOG_IID))
         # long
-        XPCOM.memmove(ppv_object, Array.typed(::Java::Int).new([@progress_dialog.get_address]), C::PTR_SIZEOF)
+        XPCOM.memmove___org_eclipse_swt_browser_download_7(ppv_object, Array.typed(::Java::Int).new([@progress_dialog.get_address]), C::PTR_SIZEOF)
         _add_ref
         return XPCOM::NS_OK
       end
       if (guid._equals(NsIWebProgressListener::NS_IWEBPROGRESSLISTENER_IID))
         # long
-        XPCOM.memmove(ppv_object, Array.typed(::Java::Int).new([@web_progress_listener.get_address]), C::PTR_SIZEOF)
+        XPCOM.memmove___org_eclipse_swt_browser_download_9(ppv_object, Array.typed(::Java::Int).new([@web_progress_listener.get_address]), C::PTR_SIZEOF)
         _add_ref
         return XPCOM::NS_OK
       end
       # long
-      XPCOM.memmove(ppv_object, Array.typed(::Java::Int).new([0]), C::PTR_SIZEOF)
+      XPCOM.memmove___org_eclipse_swt_browser_download_11(ppv_object, Array.typed(::Java::Int).new([0]), C::PTR_SIZEOF)
       return XPCOM::NS_ERROR_NO_INTERFACE
     end
     
@@ -599,7 +599,7 @@ module Org::Eclipse::Swt::Browser
       # long
       buffer = XPCOM.ns_embed_cstring_get(a_spec)
       dest = Array.typed(::Java::Byte).new(length) { 0 }
-      XPCOM.memmove(dest, buffer, length)
+      XPCOM.memmove___org_eclipse_swt_browser_download_13(dest, buffer, length)
       XPCOM.ns_embed_cstring_delete(a_spec)
       url = String.new(dest)
       # As of mozilla 1.7 the second argument of the nsIDownload interface's
@@ -624,7 +624,7 @@ module Org::Eclipse::Swt::Browser
         length = XPCOM.ns_embed_cstring_length(a_path)
         buffer = XPCOM.ns_embed_cstring_get(a_path)
         dest = Array.typed(::Java::Byte).new(length) { 0 }
-        XPCOM.memmove(dest, buffer, length)
+        XPCOM.memmove___org_eclipse_swt_browser_download_15(dest, buffer, length)
         XPCOM.ns_embed_cstring_delete(a_path)
         filename = RJava.cast_to_string(String.new(dest))
         separator = filename.last_index_of(System.get_property("file.separator")) # $NON-NLS-1$
@@ -642,7 +642,7 @@ module Org::Eclipse::Swt::Browser
         length = XPCOM.ns_embed_cstring_length(a_native_target)
         buffer = XPCOM.ns_embed_cstring_get(a_native_target)
         dest = Array.typed(::Java::Byte).new(length) { 0 }
-        XPCOM.memmove(dest, buffer, length)
+        XPCOM.memmove___org_eclipse_swt_browser_download_17(dest, buffer, length)
         XPCOM.ns_embed_cstring_delete(a_native_target)
         filename = RJava.cast_to_string(String.new(dest))
       end

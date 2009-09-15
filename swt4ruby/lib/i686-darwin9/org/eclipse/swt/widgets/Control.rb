@@ -796,8 +796,8 @@ module Org::Eclipse::Swt::Widgets
       if (!view.is_hidden_or_has_hidden_ancestor && is_drawing)
         # long
         child_rgn = OS._new_rgn
-        window_ = view.window
-        content_view_ = window_.content_view
+        window = view.window___org_eclipse_swt_widgets_control_1
+        content_view_ = window.content_view
         frame_view = content_view_.superview
         bounds = content_view_.visible_rect
         bounds = content_view_.convert_rect_to_view_(bounds, view)
@@ -1113,7 +1113,7 @@ module Org::Eclipse::Swt::Widgets
     # long
     # long
     def do_command_by_selector(id, sel, selector)
-      if ((@view.window.first_responder.attr_id).equal?(id))
+      if ((@view.window___org_eclipse_swt_widgets_control_3.first_responder.attr_id).equal?(id))
         if (ime_in_composition)
           return
         end
@@ -1381,7 +1381,7 @@ module Org::Eclipse::Swt::Widgets
         phase = NSPoint.new
         control_view = control.attr_view
         if ((img_height).equal?(-1))
-          content_view_ = control_view.window.content_view
+          content_view_ = control_view.window___org_eclipse_swt_widgets_control_5.content_view
           phase = control_view.convert_point_to_view_(phase, content_view_)
           phase.attr_y = content_view_.bounds.attr_height - phase.attr_y
         else
@@ -1463,7 +1463,7 @@ module Org::Eclipse::Swt::Widgets
     # long
     # long
     def flags_changed(id, sel, the_event)
-      if ((@view.window.first_responder.attr_id).equal?(id))
+      if ((@view.window___org_eclipse_swt_widgets_control_7.first_responder.attr_id).equal?(id))
         if (((self.attr_state & SAFARI_EVENTS_FIX)).equal?(0))
           s = self.get_shell
           s.attr_key_input_happened = false
@@ -1542,7 +1542,7 @@ module Org::Eclipse::Swt::Widgets
       if (!focus_view_.can_become_key_view)
         return false
       end
-      result = @view.window.make_first_responder(focus_view_)
+      result = @view.window___org_eclipse_swt_widgets_control_9.make_first_responder(focus_view_)
       if (is_disposed)
         return false
       end
@@ -2068,7 +2068,7 @@ module Org::Eclipse::Swt::Widgets
     # long
     # long
     def insert_text(id, sel, string)
-      if ((@view.window.first_responder.attr_id).equal?(id))
+      if ((@view.window___org_eclipse_swt_widgets_control_11.first_responder.attr_id).equal?(id))
         s = self.get_shell
         ns_event = NSApplication.shared_application.current_event
         if (!(ns_event).nil?)
@@ -2131,7 +2131,7 @@ module Org::Eclipse::Swt::Widgets
           data.attr_state &= ~VISIBLE_REGION
         end
       else
-        graphics_context = NSGraphicsContext.graphics_context_with_window(view.window)
+        graphics_context = NSGraphicsContext.graphics_context_with_window(view.window___org_eclipse_swt_widgets_control_13)
         flipped_context = NSGraphicsContext.graphics_context_with_graphics_port(graphics_context.graphics_port, true)
         graphics_context = flipped_context
         context = graphics_context.attr_id
@@ -2392,7 +2392,7 @@ module Org::Eclipse::Swt::Widgets
     # long
     # long
     def key_down(id, sel, the_event)
-      if ((@view.window.first_responder.attr_id).equal?(id))
+      if ((@view.window___org_eclipse_swt_widgets_control_15.first_responder.attr_id).equal?(id))
         s = self.get_shell
         s.attr_key_input_happened = false
         text_input = !(OS.objc_msg_send(id, OS.attr_sel_conforms_to_protocol_, OS.objc_get_protocol("NSTextInput"))).equal?(0)
@@ -2446,7 +2446,7 @@ module Org::Eclipse::Swt::Widgets
     # long
     # long
     def key_up(id, sel, the_event)
-      if ((@view.window.first_responder.attr_id).equal?(id))
+      if ((@view.window___org_eclipse_swt_widgets_control_17.first_responder.attr_id).equal?(id))
         ns_event = NSEvent.new(the_event)
         if (!send_key_event(ns_event, SWT::KeyUp))
           return
@@ -2915,7 +2915,7 @@ module Org::Eclipse::Swt::Widgets
       pt = NSPoint.new
       rect = Array.typed(::Java::Short).new(4) { 0 }
       if ((message).equal?(OS.attr_k_qdregion_to_rects_msg_parse))
-        OS.memmove(rect, r, rect.attr_length * 2)
+        OS.memmove___org_eclipse_swt_widgets_control_19(rect, r, rect.attr_length * 2)
         pt.attr_x = rect[1]
         pt.attr_y = rect[0]
         OS.objc_msg_send(path, OS.attr_sel_move_to_point_, pt)
@@ -3498,8 +3498,8 @@ module Org::Eclipse::Swt::Widgets
       window_point = nil
       view = event_view
       if ((ns_event).nil? || (ns_event.type).equal?(OS::NSMouseMoved))
-        window_ = view.window
-        window_point = window_.convert_screen_to_base(NSEvent.mouse_location)
+        window = view.window___org_eclipse_swt_widgets_control_21
+        window_point = window.convert_screen_to_base(NSEvent.mouse_location)
       else
         window_point = ns_event.location_in_window
       end
@@ -3743,7 +3743,7 @@ module Org::Eclipse::Swt::Widgets
       if (!is_enabled)
         return
       end
-      if (!@view.window.are_cursor_rects_enabled)
+      if (!@view.window___org_eclipse_swt_widgets_control_23.are_cursor_rects_enabled)
         return
       end
       self.attr_display.set_cursor(self.attr_display.attr_current_control)

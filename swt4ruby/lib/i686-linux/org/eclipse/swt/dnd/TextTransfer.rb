@@ -123,7 +123,7 @@ module Org::Eclipse::Swt::Dnd
         if ((p_value).equal?(0))
           return
         end
-        OS.memmove(p_value, utf8, utf8.attr_length)
+        OS.memmove___org_eclipse_swt_dnd_text_transfer_1(p_value, utf8, utf8.attr_length)
         transfer_data.attr_type = UTF8_STRING_ID
         transfer_data.attr_format = 8
         transfer_data.attr_length = utf8.attr_length - 1
@@ -166,10 +166,10 @@ module Org::Eclipse::Swt::Dnd
       # long
       # long
       ptr = Array.typed(::Java::Int).new(1) { 0 }
-      OS.memmove(ptr, list[0], OS::PTR_SIZEOF)
+      OS.memmove___org_eclipse_swt_dnd_text_transfer_3(ptr, list[0], OS::PTR_SIZEOF)
       length = OS.strlen(ptr[0])
       utf8 = Array.typed(::Java::Byte).new(length) { 0 }
-      OS.memmove(utf8, ptr[0], length)
+      OS.memmove___org_eclipse_swt_dnd_text_transfer_5(utf8, ptr[0], length)
       OS.g_strfreev(list[0])
       # convert utf8 byte array to a unicode string
       unicode = Converter.mbcs_to_wcs(nil, utf8)

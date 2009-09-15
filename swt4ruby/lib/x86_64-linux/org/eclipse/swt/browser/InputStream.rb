@@ -160,21 +160,21 @@ module Org::Eclipse::Swt::Browser
         return XPCOM::NS_ERROR_NO_INTERFACE
       end
       guid = NsID.new
-      XPCOM.memmove(guid, riid, self.attr_ns_id.attr_sizeof)
+      XPCOM.memmove___org_eclipse_swt_browser_input_stream_1(guid, riid, self.attr_ns_id.attr_sizeof)
       if (guid._equals(NsISupports::NS_ISUPPORTS_IID))
         # int
-        XPCOM.memmove(ppv_object, Array.typed(::Java::Long).new([@input_stream.get_address]), C::PTR_SIZEOF)
+        XPCOM.memmove___org_eclipse_swt_browser_input_stream_3(ppv_object, Array.typed(::Java::Long).new([@input_stream.get_address]), C::PTR_SIZEOF)
         _add_ref
         return XPCOM::NS_OK
       end
       if (guid._equals(NsIInputStream::NS_IINPUTSTREAM_IID))
         # int
-        XPCOM.memmove(ppv_object, Array.typed(::Java::Long).new([@input_stream.get_address]), C::PTR_SIZEOF)
+        XPCOM.memmove___org_eclipse_swt_browser_input_stream_5(ppv_object, Array.typed(::Java::Long).new([@input_stream.get_address]), C::PTR_SIZEOF)
         _add_ref
         return XPCOM::NS_OK
       end
       # int
-      XPCOM.memmove(ppv_object, Array.typed(::Java::Long).new([0]), C::PTR_SIZEOF)
+      XPCOM.memmove___org_eclipse_swt_browser_input_stream_7(ppv_object, Array.typed(::Java::Long).new([0]), C::PTR_SIZEOF)
       return XPCOM::NS_ERROR_NO_INTERFACE
     end
     
@@ -199,7 +199,7 @@ module Org::Eclipse::Swt::Browser
     # int
     def _available(_retval)
       available = (@buffer).nil? ? 0 : @buffer.attr_length - @index
-      XPCOM.memmove(_retval, Array.typed(::Java::Int).new([available]), 4)
+      XPCOM.memmove___org_eclipse_swt_browser_input_stream_9(_retval, Array.typed(::Java::Int).new([available]), 4)
       return XPCOM::NS_OK
     end
     
@@ -211,10 +211,10 @@ module Org::Eclipse::Swt::Browser
       if (max > 0)
         src = Array.typed(::Java::Byte).new(max) { 0 }
         System.arraycopy(@buffer, @index, src, 0, max)
-        XPCOM.memmove(a_buf, src, max)
+        XPCOM.memmove___org_eclipse_swt_browser_input_stream_11(a_buf, src, max)
         @index += max
       end
-      XPCOM.memmove(_retval, Array.typed(::Java::Int).new([max]), 4)
+      XPCOM.memmove___org_eclipse_swt_browser_input_stream_13(_retval, Array.typed(::Java::Int).new([max]), 4)
       return XPCOM::NS_OK
     end
     
@@ -235,7 +235,7 @@ module Org::Eclipse::Swt::Browser
         @index += a_write_count[0]
         cnt -= a_write_count[0]
       end
-      XPCOM.memmove(_retval, Array.typed(::Java::Int).new([max - cnt]), 4)
+      XPCOM.memmove___org_eclipse_swt_browser_input_stream_15(_retval, Array.typed(::Java::Int).new([max - cnt]), 4)
       return XPCOM::NS_OK
     end
     
@@ -243,7 +243,7 @@ module Org::Eclipse::Swt::Browser
     # int
     def _is_non_blocking(_retval)
       # blocking
-      XPCOM.memmove(_retval, Array.typed(::Java::Int).new([0]), 4)
+      XPCOM.memmove___org_eclipse_swt_browser_input_stream_17(_retval, Array.typed(::Java::Int).new([0]), 4)
       return XPCOM::NS_OK
     end
     

@@ -186,7 +186,7 @@ module Org::Eclipse::Swt::Widgets
           return NSNumber.number_with_bool(is_enabled).attr_id
         else
           if (ns_attribute_name.is_equal_to_string(OS::NSAccessibilityFocusedAttribute))
-            focused = ((self.attr_view.attr_id).equal?(self.attr_view.window.first_responder.attr_id))
+            focused = ((self.attr_view.attr_id).equal?(self.attr_view.window___org_eclipse_swt_widgets_tool_bar_1.first_responder.attr_id))
             return NSNumber.number_with_bool(focused).attr_id
           end
         end

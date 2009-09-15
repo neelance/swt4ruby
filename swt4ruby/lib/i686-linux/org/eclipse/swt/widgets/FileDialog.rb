@@ -216,7 +216,7 @@ module Org::Eclipse::Swt::Widgets
               # 64
               clength = RJava.cast_to_int(items_written[0])
               chars = CharArray.new(clength)
-              OS.memmove(chars, utf16ptr, clength * 2)
+              OS.memmove___org_eclipse_swt_widgets_file_dialog_1(chars, utf16ptr, clength * 2)
               OS.g_free(utf16ptr)
               @full_path = RJava.cast_to_string(String.new(chars))
               @file_names[((write_pos += 1) - 1)] = @full_path.substring(@full_path.last_index_of(SEPARATOR) + 1)
@@ -255,7 +255,7 @@ module Org::Eclipse::Swt::Widgets
             # 64
             clength = RJava.cast_to_int(items_written[0])
             chars = CharArray.new(clength)
-            OS.memmove(chars, utf16ptr, clength * 2)
+            OS.memmove___org_eclipse_swt_widgets_file_dialog_3(chars, utf16ptr, clength * 2)
             OS.g_free(utf16ptr)
             @full_path = RJava.cast_to_string(String.new(chars))
             @file_names = Array.typed(String).new(1) { nil }
@@ -272,7 +272,7 @@ module Org::Eclipse::Swt::Widgets
         if (!(filter_name_ptr).equal?(0))
           length = OS.strlen(filter_name_ptr)
           buffer = Array.typed(::Java::Byte).new(length) { 0 }
-          OS.memmove(buffer, filter_name_ptr, length)
+          OS.memmove___org_eclipse_swt_widgets_file_dialog_5(buffer, filter_name_ptr, length)
           # OS.g_free (filterNamePtr); //GTK owns this pointer - do not free
           filter_name = String.new(Converter.mbcs_to_wcs(nil, buffer))
           i = 0
@@ -304,7 +304,7 @@ module Org::Eclipse::Swt::Widgets
     def compute_result_classic_dialog
       @filter_index = -1
       selection = GtkFileSelection.new
-      OS.memmove(selection, @handle)
+      OS.memmove___org_eclipse_swt_widgets_file_dialog_7(selection, @handle)
       # long
       entry = selection.attr_selection_entry
       # long
@@ -350,7 +350,7 @@ module Org::Eclipse::Swt::Widgets
         end
         length = OS.strlen(ptr[0])
         buffer = Array.typed(::Java::Byte).new(length) { 0 }
-        OS.memmove(buffer, ptr[0], length)
+        OS.memmove___org_eclipse_swt_widgets_file_dialog_9(buffer, ptr[0], length)
         OS.g_free(ptr[0])
         OS.gtk_entry_set_text(entry, buffer)
       end
@@ -366,7 +366,7 @@ module Org::Eclipse::Swt::Widgets
       # 64
       entry_length = RJava.cast_to_int(items_written[0])
       buffer = CharArray.new(entry_length)
-      OS.memmove(buffer, utf16ptr, entry_length * 2)
+      OS.memmove___org_eclipse_swt_widgets_file_dialog_11(buffer, utf16ptr, entry_length * 2)
       os_answer = String.new(buffer)
       OS.g_free(utf16ptr)
       OS.g_free(utf8ptr)
@@ -390,17 +390,17 @@ module Org::Eclipse::Swt::Widgets
         # long
         # long
         name_ptr = Array.typed(::Java::Int).new(1) { 0 }
-        OS.memmove(name_ptr, names_ptr1, OS::PTR_SIZEOF)
+        OS.memmove___org_eclipse_swt_widgets_file_dialog_13(name_ptr, names_ptr1, OS::PTR_SIZEOF)
         length_ = 0
         while (!(name_ptr[0]).equal?(0))
           length_ += 1
           names_ptr1 += OS::PTR_SIZEOF
-          OS.memmove(name_ptr, names_ptr1, OS::PTR_SIZEOF)
+          OS.memmove___org_eclipse_swt_widgets_file_dialog_15(name_ptr, names_ptr1, OS::PTR_SIZEOF)
         end
         @file_names = Array.typed(String).new(length_) { nil }
         # long
         name_ptr = Array.typed(::Java::Int).new(length_) { 0 }
-        OS.memmove(name_ptr, names_ptr, length_ * OS::PTR_SIZEOF)
+        OS.memmove___org_eclipse_swt_widgets_file_dialog_17(name_ptr, names_ptr, length_ * OS::PTR_SIZEOF)
         i = 0
         while i < length_
           utf8ptr = OS.g_filename_to_utf8(name_ptr[i], -1, nil, nil, nil)
@@ -409,7 +409,7 @@ module Org::Eclipse::Swt::Widgets
           utf16ptr = OS.g_utf8_to_utf16(utf8ptr, -1, nil, items_written, nil)
           # 64
           buffer = CharArray.new(RJava.cast_to_int(items_written[0]))
-          OS.memmove(buffer, utf16ptr, items_written[0] * 2)
+          OS.memmove___org_eclipse_swt_widgets_file_dialog_19(buffer, utf16ptr, items_written[0] * 2)
           name = String.new(buffer)
           @file_names[i] = name.substring(name.last_index_of(SEPARATOR) + 1)
           OS.g_free(utf16ptr)

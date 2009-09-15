@@ -589,7 +589,7 @@ module Org::Eclipse::Swt::Dnd
       object = nil
       transfer_data = TransferData.new
       selection_data = GtkSelectionData.new
-      OS.memmove(selection_data, data, GtkSelectionData.attr_sizeof)
+      OS.memmove___org_eclipse_swt_dnd_drop_target_1(selection_data, data, GtkSelectionData.attr_sizeof)
       if (!(selection_data.attr_data).equal?(0))
         transfer_data.attr_type = selection_data.attr_type
         transfer_data.attr_length = selection_data.attr_length
@@ -949,7 +949,7 @@ module Org::Eclipse::Swt::Dnd
             entry = GtkTargetEntry.new
             buffer = Converter.wcs_to_mbcs(nil, type_names[j], true)
             entry.attr_target = OS.g_malloc(buffer.attr_length)
-            OS.memmove(entry.attr_target, buffer, buffer.attr_length)
+            OS.memmove___org_eclipse_swt_dnd_drop_target_3(entry.attr_target, buffer, buffer.attr_length)
             entry.attr_info = type_ids[j]
             new_targets = Array.typed(GtkTargetEntry).new(targets.attr_length + 1) { nil }
             System.arraycopy(targets, 0, new_targets, 0, targets.attr_length)
@@ -964,7 +964,7 @@ module Org::Eclipse::Swt::Dnd
       p_targets = OS.g_malloc(targets.attr_length * GtkTargetEntry.attr_sizeof)
       i_ = 0
       while i_ < targets.attr_length
-        OS.memmove(p_targets + i_ * GtkTargetEntry.attr_sizeof, targets[i_], GtkTargetEntry.attr_sizeof)
+        OS.memmove___org_eclipse_swt_dnd_drop_target_5(p_targets + i_ * GtkTargetEntry.attr_sizeof, targets[i_], GtkTargetEntry.attr_sizeof)
         i_ += 1
       end
       actions = op_to_os_op(get_style)
@@ -1004,7 +1004,7 @@ module Org::Eclipse::Swt::Dnd
         return false
       end
       drag_context = GdkDragContext.new
-      OS.memmove(drag_context, context, GdkDragContext.attr_sizeof)
+      OS.memmove___org_eclipse_swt_dnd_drop_target_7(drag_context, context, GdkDragContext.attr_sizeof)
       if ((drag_context.attr_targets).equal?(0))
         return false
       end
@@ -1034,7 +1034,7 @@ module Org::Eclipse::Swt::Dnd
         # int
         p_data = OS.g_list_nth(drag_context.attr_targets, i)
         gtk_target_pair = GtkTargetPair.new
-        OS.memmove(gtk_target_pair, p_data, GtkTargetPair.attr_sizeof)
+        OS.memmove___org_eclipse_swt_dnd_drop_target_9(gtk_target_pair, p_data, GtkTargetPair.attr_sizeof)
         data = TransferData.new
         data.attr_type = gtk_target_pair.attr_target
         j = 0

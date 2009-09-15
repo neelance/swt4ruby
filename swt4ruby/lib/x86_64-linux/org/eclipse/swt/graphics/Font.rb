@@ -209,7 +209,7 @@ module Org::Eclipse::Swt::Graphics
       family = OS.pango_font_description_get_family(@handle)
       length = OS.strlen(family)
       buffer = Array.typed(::Java::Byte).new(length) { 0 }
-      OS.memmove(buffer, family, length)
+      OS.memmove___org_eclipse_swt_graphics_font_1(buffer, family, length)
       name = String.new(Converter.mbcs_to_wcs(nil, buffer))
       height = (OS.pango_font_description_get_size(@handle)).to_f / OS::PANGO_SCALE
       pango_style = OS.pango_font_description_get_style(@handle)
@@ -228,7 +228,7 @@ module Org::Eclipse::Swt::Graphics
       font_string = OS.pango_font_description_to_string(@handle)
       length = OS.strlen(font_string)
       buffer = Array.typed(::Java::Byte).new(length + 1) { 0 }
-      OS.memmove(buffer, font_string, length)
+      OS.memmove___org_eclipse_swt_graphics_font_3(buffer, font_string, length)
       OS.g_free(font_string)
       data = FontData.new(name, height, style)
       data.attr_string = buffer

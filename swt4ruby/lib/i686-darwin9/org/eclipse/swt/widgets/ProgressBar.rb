@@ -341,7 +341,7 @@ module Org::Eclipse::Swt::Widgets
       # Bug in Cocoa. An indeterminate progress indicator doesn't start animating until it is in
       # a visible window.  Workaround is to catch when the bar has been added to a window and start
       # the animation there.
-      if (!(self.attr_view.window).nil?)
+      if (!(self.attr_view.window___org_eclipse_swt_widgets_progress_bar_1).nil?)
         if (!((self.attr_style & SWT::INDETERMINATE)).equal?(0))
           (self.attr_view).start_animation(nil)
         end

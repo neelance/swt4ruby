@@ -355,7 +355,7 @@ module Org::Eclipse::Swt::Dnd
         return nil
       end
       gtk_selection_data = GtkSelectionData.new
-      OS.memmove(gtk_selection_data, selection_data, GtkSelectionData.attr_sizeof)
+      OS.memmove___org_eclipse_swt_dnd_clipboard_1(gtk_selection_data, selection_data, GtkSelectionData.attr_sizeof)
       tdata = TransferData.new
       tdata.attr_type = gtk_selection_data.attr_type
       tdata.attr_p_value = gtk_selection_data.attr_data
@@ -612,7 +612,7 @@ module Org::Eclipse::Swt::Dnd
           next
         end
         buffer = Array.typed(::Java::Byte).new(OS.strlen(p_name)) { 0 }
-        OS.memmove(buffer, p_name, buffer.attr_length)
+        OS.memmove___org_eclipse_swt_dnd_clipboard_3(buffer, p_name, buffer.attr_length)
         OS.g_free(p_name)
         result[((count += 1) - 1)] = "GTKCLIPBOARD " + RJava.cast_to_string(String.new(Converter.mbcs_to_wcs(nil, buffer)))
         i += 1
@@ -626,7 +626,7 @@ module Org::Eclipse::Swt::Dnd
           next
         end
         buffer = Array.typed(::Java::Byte).new(OS.strlen(p_name)) { 0 }
-        OS.memmove(buffer, p_name, buffer.attr_length)
+        OS.memmove___org_eclipse_swt_dnd_clipboard_5(buffer, p_name, buffer.attr_length)
         OS.g_free(p_name)
         result[((count += 1) - 1)] = "GTKPRIMARYCLIPBOARD " + RJava.cast_to_string(String.new(Converter.mbcs_to_wcs(nil, buffer)))
         i_ += 1
@@ -647,10 +647,10 @@ module Org::Eclipse::Swt::Dnd
       if (!(selection_data).equal?(0))
         begin
           gtk_selection_data = GtkSelectionData.new
-          OS.memmove(gtk_selection_data, selection_data, GtkSelectionData.attr_sizeof)
+          OS.memmove___org_eclipse_swt_dnd_clipboard_7(gtk_selection_data, selection_data, GtkSelectionData.attr_sizeof)
           if (!(gtk_selection_data.attr_length).equal?(0))
             types = Array.typed(::Java::Int).new(gtk_selection_data.attr_length * 8 / gtk_selection_data.attr_format) { 0 }
-            OS.memmove(types, gtk_selection_data.attr_data, gtk_selection_data.attr_length)
+            OS.memmove___org_eclipse_swt_dnd_clipboard_9(types, gtk_selection_data.attr_data, gtk_selection_data.attr_length)
           end
         ensure
           OS.gtk_selection_data_free(selection_data)
@@ -667,10 +667,10 @@ module Org::Eclipse::Swt::Dnd
       if (!(selection_data).equal?(0))
         begin
           gtk_selection_data = GtkSelectionData.new
-          OS.memmove(gtk_selection_data, selection_data, GtkSelectionData.attr_sizeof)
+          OS.memmove___org_eclipse_swt_dnd_clipboard_11(gtk_selection_data, selection_data, GtkSelectionData.attr_sizeof)
           if (!(gtk_selection_data.attr_length).equal?(0))
             types = Array.typed(::Java::Int).new(gtk_selection_data.attr_length * 8 / gtk_selection_data.attr_format) { 0 }
-            OS.memmove(types, gtk_selection_data.attr_data, gtk_selection_data.attr_length)
+            OS.memmove___org_eclipse_swt_dnd_clipboard_13(types, gtk_selection_data.attr_data, gtk_selection_data.attr_length)
           end
         ensure
           OS.gtk_selection_data_free(selection_data)

@@ -146,7 +146,7 @@ module Org::Eclipse::Swt::Dnd
         end
         length_ = OS.strlen(uri_ptr)
         temp = Array.typed(::Java::Byte).new(length_) { 0 }
-        OS.memmove(temp, uri_ptr, length_)
+        OS.memmove___org_eclipse_swt_dnd_file_transfer_1(temp, uri_ptr, length_)
         OS.g_free(uri_ptr)
         new_length = (buffer.attr_length > 0) ? buffer.attr_length + separator.attr_length + temp.attr_length : temp.attr_length
         new_buffer = Array.typed(::Java::Byte).new(new_length) { 0 }
@@ -167,7 +167,7 @@ module Org::Eclipse::Swt::Dnd
       # int
       ptr = OS.g_malloc(buffer.attr_length + 1)
       OS.memset(ptr, Character.new(?\0.ord), buffer.attr_length + 1)
-      OS.memmove(ptr, buffer, buffer.attr_length)
+      OS.memmove___org_eclipse_swt_dnd_file_transfer_3(ptr, buffer, buffer.attr_length)
       transfer_data.attr_p_value = ptr
       transfer_data.attr_length = buffer.attr_length
       transfer_data.attr_format = 8
@@ -190,7 +190,7 @@ module Org::Eclipse::Swt::Dnd
       end
       length_ = transfer_data.attr_length
       temp = Array.typed(::Java::Byte).new(length_) { 0 }
-      OS.memmove(temp, transfer_data.attr_p_value, length_)
+      OS.memmove___org_eclipse_swt_dnd_file_transfer_5(temp, transfer_data.attr_p_value, length_)
       gnome_list = (transfer_data.attr_type).equal?(GNOME_LIST_ID)
       sep_length = gnome_list ? 1 : 2
       # int
@@ -208,7 +208,7 @@ module Org::Eclipse::Swt::Dnd
             file = OS.g_malloc(size + 1)
             file_buffer = Array.typed(::Java::Byte).new(size + 1) { 0 }
             System.arraycopy(temp, offset, file_buffer, 0, size)
-            OS.memmove(file, file_buffer, size + 1)
+            OS.memmove___org_eclipse_swt_dnd_file_transfer_7(file, file_buffer, size + 1)
             # int
             # int
             new_files = Array.typed(::Java::Long).new(files.attr_length + 1) { 0 }
@@ -226,7 +226,7 @@ module Org::Eclipse::Swt::Dnd
         file = OS.g_malloc(size + 1)
         file_buffer = Array.typed(::Java::Byte).new(size + 1) { 0 }
         System.arraycopy(temp, offset, file_buffer, 0, size)
-        OS.memmove(file, file_buffer, size + 1)
+        OS.memmove___org_eclipse_swt_dnd_file_transfer_9(file, file_buffer, size + 1)
         # int
         # int
         new_files = Array.typed(::Java::Long).new(files.attr_length + 1) { 0 }
@@ -263,7 +263,7 @@ module Org::Eclipse::Swt::Dnd
         # 64
         length_ = RJava.cast_to_int(items_written[0])
         buffer = CharArray.new(length_)
-        OS.memmove(buffer, utf16ptr, length_ * 2)
+        OS.memmove___org_eclipse_swt_dnd_file_transfer_11(buffer, utf16ptr, length_ * 2)
         OS.g_free(utf16ptr)
         name = String.new(buffer)
         new_file_names = Array.typed(String).new(file_names.attr_length + 1) { nil }

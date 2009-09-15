@@ -292,7 +292,7 @@ module Org::Eclipse::Swt::Widgets
       # int
       temp = pixbufs
       while (!(temp).equal?(0))
-        OS.memmove(data, temp, OS::PTR_SIZEOF)
+        OS.memmove___org_eclipse_swt_widgets_decorations_1(data, temp, OS::PTR_SIZEOF)
         OS.g_object_unref(data[0])
         temp = OS.g_list_next(temp)
       end

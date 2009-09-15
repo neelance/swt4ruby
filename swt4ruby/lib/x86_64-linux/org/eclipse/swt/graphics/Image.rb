@@ -396,7 +396,7 @@ module Org::Eclipse::Swt::Graphics
           line = Array.typed(::Java::Byte).new(stride) { 0 }
           y = 0
           while y < height
-            OS.memmove(line, pixels + (y * stride), stride)
+            OS.memmove___org_eclipse_swt_graphics_image_1(line, pixels + (y * stride), stride)
             x = 0
             while x < width
               offset = x * 3
@@ -415,14 +415,14 @@ module Org::Eclipse::Swt::Graphics
               end
               x += 1
             end
-            OS.memmove(pixels + (y * stride), line, stride)
+            OS.memmove___org_eclipse_swt_graphics_image_3(pixels + (y * stride), line, stride)
             y += 1
           end
         when SWT::IMAGE_GRAY
           line = Array.typed(::Java::Byte).new(stride) { 0 }
           y = 0
           while y < height
-            OS.memmove(line, pixels + (y * stride), stride)
+            OS.memmove___org_eclipse_swt_graphics_image_5(line, pixels + (y * stride), stride)
             x = 0
             while x < width
               offset = x * 3
@@ -433,7 +433,7 @@ module Org::Eclipse::Swt::Graphics
               line[offset] = line[offset + 1] = line[offset + 2] = intensity
               x += 1
             end
-            OS.memmove(pixels + (y * stride), line, stride)
+            OS.memmove___org_eclipse_swt_graphics_image_7(pixels + (y * stride), line, stride)
             y += 1
           end
         end
@@ -742,14 +742,14 @@ module Org::Eclipse::Swt::Graphics
             @alpha_data = Array.typed(::Java::Byte).new(width * height) { 0 }
             y = 0
             while y < height
-              OS.memmove(line, pixels + (y * stride), stride)
+              OS.memmove___org_eclipse_swt_graphics_image_9(line, pixels + (y * stride), stride)
               x = 0
               while x < width
                 @alpha_data[y * width + x] = line[x * 4 + 3]
                 line[x * 4 + 3] = 0xff
                 x += 1
               end
-              OS.memmove(pixels + (y * stride), line, stride)
+              OS.memmove___org_eclipse_swt_graphics_image_11(pixels + (y * stride), line, stride)
               y += 1
             end
             create_alpha_mask(width, height)
@@ -790,15 +790,15 @@ module Org::Eclipse::Swt::Graphics
             SWT.error(SWT::ERROR_NO_HANDLES)
           end
           gdk_image = GdkImage.new
-          OS.memmove(gdk_image, image_ptr)
+          OS.memmove___org_eclipse_swt_graphics_image_13(gdk_image, image_ptr)
           if ((gdk_image.attr_bpl).equal?(width))
-            OS.memmove(gdk_image.attr_mem, @alpha_data, @alpha_data.attr_length)
+            OS.memmove___org_eclipse_swt_graphics_image_15(gdk_image.attr_mem, @alpha_data, @alpha_data.attr_length)
           else
             line = Array.typed(::Java::Byte).new(gdk_image.attr_bpl) { 0 }
             y = 0
             while y < height
               System.arraycopy(@alpha_data, width * y, line, 0, width)
-              OS.memmove(gdk_image.attr_mem + (gdk_image.attr_bpl * y), line, gdk_image.attr_bpl)
+              OS.memmove___org_eclipse_swt_graphics_image_17(gdk_image.attr_mem + (gdk_image.attr_bpl * y), line, gdk_image.attr_bpl)
               y += 1
             end
           end
@@ -880,8 +880,8 @@ module Org::Eclipse::Swt::Graphics
           mask_offset = mask_pixels
           y = 0
           while y < height
-            OS.memmove(line, offset, stride)
-            OS.memmove(mask_line, mask_offset, mask_stride)
+            OS.memmove___org_eclipse_swt_graphics_image_19(line, offset, stride)
+            OS.memmove___org_eclipse_swt_graphics_image_21(mask_line, mask_offset, mask_stride)
             x = 0
             offset1 = 0
             while x < width
@@ -894,7 +894,7 @@ module Org::Eclipse::Swt::Graphics
               x += 1
               offset1 += 4
             end
-            OS.memmove(offset, line, stride)
+            OS.memmove___org_eclipse_swt_graphics_image_23(offset, line, stride)
             offset += stride
             mask_offset += mask_stride
             y += 1
@@ -906,7 +906,7 @@ module Org::Eclipse::Swt::Graphics
             offset = pixels
             y = 0
             while y < height
-              OS.memmove(line, offset, stride)
+              OS.memmove___org_eclipse_swt_graphics_image_25(line, offset, stride)
               x = 0
               offset1 = 0
               while x < width
@@ -924,7 +924,7 @@ module Org::Eclipse::Swt::Graphics
                 x += 1
                 offset1 += 4
               end
-              OS.memmove(offset, line, stride)
+              OS.memmove___org_eclipse_swt_graphics_image_27(offset, line, stride)
               offset += stride
               y += 1
             end
@@ -934,7 +934,7 @@ module Org::Eclipse::Swt::Graphics
               offset = pixels
               y = 0
               while y < h[0]
-                OS.memmove(line, offset, stride)
+                OS.memmove___org_eclipse_swt_graphics_image_29(line, offset, stride)
                 x = 0
                 offset1 = 0
                 while x < width
@@ -953,7 +953,7 @@ module Org::Eclipse::Swt::Graphics
                   x += 1
                   offset1 += 4
                 end
-                OS.memmove(offset, line, stride)
+                OS.memmove___org_eclipse_swt_graphics_image_31(offset, line, stride)
                 offset += stride
                 y += 1
               end
@@ -962,7 +962,7 @@ module Org::Eclipse::Swt::Graphics
               offset = pixels
               y = 0
               while y < h[0]
-                OS.memmove(line, offset, stride)
+                OS.memmove___org_eclipse_swt_graphics_image_33(line, offset, stride)
                 x = 0
                 offset1 = 0
                 while x < width
@@ -973,7 +973,7 @@ module Org::Eclipse::Swt::Graphics
                   x += 1
                   offset1 += 4
                 end
-                OS.memmove(offset, line, stride)
+                OS.memmove___org_eclipse_swt_graphics_image_35(offset, line, stride)
                 offset += stride
                 y += 1
               end
@@ -981,7 +981,7 @@ module Org::Eclipse::Swt::Graphics
           end
         end
         @surface_data = OS.g_malloc(stride * height)
-        OS.memmove(@surface_data, pixels, stride * height)
+        OS.memmove___org_eclipse_swt_graphics_image_37(@surface_data, pixels, stride * height)
         @surface = SwtCairo.cairo_image_surface_create_for_data(@surface_data, SwtCairo::CAIRO_FORMAT_ARGB32, width, height, stride)
         OS.g_object_unref(pixbuf)
       else
@@ -1136,7 +1136,7 @@ module Org::Eclipse::Swt::Graphics
       # int
       pixels = OS.gdk_pixbuf_get_pixels(pixbuf)
       src_data = Array.typed(::Java::Byte).new(stride * height) { 0 }
-      OS.memmove(src_data, pixels, src_data.attr_length)
+      OS.memmove___org_eclipse_swt_graphics_image_39(src_data, pixels, src_data.attr_length)
       OS.g_object_unref(pixbuf)
       palette = PaletteData.new(0xff0000, 0xff00, 0xff)
       data = ImageData.new(width, height, 24, palette, 4, src_data)
@@ -1149,9 +1149,9 @@ module Org::Eclipse::Swt::Graphics
           SWT.error(SWT::ERROR_NO_HANDLES)
         end
         gdk_image = GdkImage.new
-        OS.memmove(gdk_image, gdk_image_ptr)
+        OS.memmove___org_eclipse_swt_graphics_image_41(gdk_image, gdk_image_ptr)
         mask_data = Array.typed(::Java::Byte).new(gdk_image.attr_bpl * gdk_image.attr_height) { 0 }
-        OS.memmove(mask_data, gdk_image.attr_mem, mask_data.attr_length)
+        OS.memmove___org_eclipse_swt_graphics_image_43(mask_data, gdk_image.attr_mem, mask_data.attr_length)
         OS.g_object_unref(gdk_image_ptr)
         mask_pad = 0
         mask_pad = 1
@@ -1300,7 +1300,7 @@ module Org::Eclipse::Swt::Graphics
           ImageData.blit(ImageData::BLIT_SRC, image.attr_data, image.attr_depth, image.attr_bytes_per_line, image.get_byte_order, 0, 0, width, height, src_reds, src_greens, src_blues, ImageData::ALPHA_OPAQUE, nil, 0, 0, 0, buffer, 24, stride, ImageData::MSB_FIRST, 0, 0, width, height, 0xff0000, 0xff00, 0xff, false, false)
         end
       end
-      OS.memmove(data, buffer, stride * height)
+      OS.memmove___org_eclipse_swt_graphics_image_45(data, buffer, stride * height)
       # int
       pixmap = OS.gdk_pixmap_new(OS._gdk_root_parent, width, height, -1)
       if ((pixmap).equal?(0))

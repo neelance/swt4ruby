@@ -234,7 +234,7 @@ module Org::Eclipse::Swt::Widgets
     typesig { [] }
     def get_location
       rect = @view.frame
-      window_rect = @view.window.frame
+      window_rect = @view.window___org_eclipse_swt_widgets_tray_item_1.frame
       pt = NSPoint.new
       pt.attr_x = rect.attr_width / 2
       pt = @view.convert_point_from_view_(pt, nil)

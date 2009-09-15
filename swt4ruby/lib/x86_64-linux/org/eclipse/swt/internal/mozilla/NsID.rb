@@ -89,10 +89,10 @@ module Org::Eclipse::Swt::Internal::Mozilla
     def _equals(other)
       # int
       ptr = XPCOM.ns_id_new
-      XPCOM.memmove(ptr, self, self.attr_ns_id.attr_sizeof)
+      XPCOM.memmove___org_eclipse_swt_internal_mozilla_ns_id_1(ptr, self, self.attr_ns_id.attr_sizeof)
       # int
       other_ptr = XPCOM.ns_id_new
-      XPCOM.memmove(other_ptr, other, self.attr_ns_id.attr_sizeof)
+      XPCOM.memmove___org_eclipse_swt_internal_mozilla_ns_id_3(other_ptr, other, self.attr_ns_id.attr_sizeof)
       result = !(XPCOM.ns_id_equals(ptr, other_ptr)).equal?(0)
       XPCOM.ns_id_delete(ptr)
       XPCOM.ns_id_delete(other_ptr)

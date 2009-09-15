@@ -550,7 +550,7 @@ module Org::Eclipse::Swt::Widgets
         return result
       end
       key_event = GdkEventKey.new
-      OS.memmove(key_event, event_ptr, GdkEventKey.attr_sizeof)
+      OS.memmove___org_eclipse_swt_widgets_tracker_1(key_event, event_ptr, GdkEventKey.attr_sizeof)
       step_size = (!((key_event.attr_state & OS::GDK_CONTROL_MASK)).equal?(0)) ? STEPSIZE_SMALL : STEPSIZE_LARGE
       x_change = 0
       y_change = 0
@@ -914,7 +914,7 @@ module Org::Eclipse::Swt::Widgets
             end
           end
         end
-        OS.memmove(gdk_event, event_ptr, GdkEvent.attr_sizeof)
+        OS.memmove___org_eclipse_swt_widgets_tracker_3(gdk_event, event_ptr, GdkEvent.attr_sizeof)
         # int
         widget = OS.gtk_get_event_widget(event_ptr)
         case (gdk_event.attr_type)

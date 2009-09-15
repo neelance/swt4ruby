@@ -921,7 +921,7 @@ module Org::Eclipse::Swt::Widgets
         return 0
       end
       x_focus_event = XFocusChangeEvent.new
-      OS.memmove(x_focus_event, x_event, XFocusChangeEvent.attr_sizeof)
+      OS.memmove___org_eclipse_swt_widgets_shell_1(x_focus_event, x_event, XFocusChangeEvent.attr_sizeof)
       case (event_type)
       when OS::FocusIn
         if ((x_focus_event.attr_mode).equal?(OS::NotifyNormal) || (x_focus_event.attr_mode).equal?(OS::NotifyWhileGrabbed))
@@ -1484,7 +1484,7 @@ module Org::Eclipse::Swt::Widgets
     # int
     def gtk_window_state_event(widget, event)
       gdk_event = GdkEventWindowState.new
-      OS.memmove(gdk_event, event, GdkEventWindowState.attr_sizeof)
+      OS.memmove___org_eclipse_swt_widgets_shell_3(gdk_event, event, GdkEventWindowState.attr_sizeof)
       self.attr_minimized = !((gdk_event.attr_new_window_state & OS::GDK_WINDOW_STATE_ICONIFIED)).equal?(0)
       self.attr_maximized = !((gdk_event.attr_new_window_state & OS::GDK_WINDOW_STATE_MAXIMIZED)).equal?(0)
       @full_screen = !((gdk_event.attr_new_window_state & OS::GDK_WINDOW_STATE_FULLSCREEN)).equal?(0)
@@ -2600,7 +2600,7 @@ module Org::Eclipse::Swt::Widgets
             OS.gdk_window_get_origin(window, x, y)
             event.attr_x_root = event.attr_x + x[0]
             event.attr_y_root = event.attr_y + y[0]
-            OS.memmove(event_ptr, event, GdkEventMotion.attr_sizeof)
+            OS.memmove___org_eclipse_swt_widgets_shell_5(event_ptr, event, GdkEventMotion.attr_sizeof)
             OS.gtk_main_do_event(event_ptr)
           end
         end

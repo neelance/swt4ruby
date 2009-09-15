@@ -176,10 +176,10 @@ module Org::Eclipse::Swt::Widgets
         size_value = OS.objc_msg_send(@ns_item.attr_id, OS.attr_sel_accessibility_attribute_value_, OS._nsaccessibility_size_attribute)
         val = NSValue.new(pos_value)
         pt = val.point_value
-        window_ = @parent.attr_view.window
+        window = @parent.attr_view.window___org_eclipse_swt_widgets_tab_item_1
         pt.attr_y = self.attr_display.get_primary_frame.attr_height - pt.attr_y
         pt = @parent.attr_view.convert_point_from_view_(pt, nil)
-        pt = window_.convert_screen_to_base(pt)
+        pt = window.convert_screen_to_base(pt)
         result.attr_x = RJava.cast_to_int(pt.attr_x)
         result.attr_y = RJava.cast_to_int(pt.attr_y)
         val = NSValue.new(size_value)

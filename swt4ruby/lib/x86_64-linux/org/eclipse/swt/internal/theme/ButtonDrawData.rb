@@ -144,14 +144,14 @@ module Org::Eclipse::Swt::Internal::Theme
         default_border = GtkBorder.new
         default_border_ptr = theme.get_widget_property(button_handle, "default-border")
         if (!(default_border_ptr).equal?(0))
-          OS.memmove(default_border, default_border_ptr, GdkRectangle.attr_sizeof)
+          OS.memmove___org_eclipse_swt_internal_theme_button_draw_data_1(default_border, default_border_ptr, GdkRectangle.attr_sizeof)
         else
           default_border.attr_left = default_border.attr_right = default_border.attr_top = default_border.attr_bottom = 1
         end
         default_outside_border = GtkBorder.new
         default_outside_border_ptr = theme.get_widget_property(button_handle, "default-outside-border")
         if (!(default_outside_border_ptr).equal?(0))
-          OS.memmove(default_outside_border, default_outside_border_ptr, GdkRectangle.attr_sizeof)
+          OS.memmove___org_eclipse_swt_internal_theme_button_draw_data_3(default_outside_border, default_outside_border_ptr, GdkRectangle.attr_sizeof)
         else
           default_outside_border.attr_left = default_outside_border.attr_right = default_outside_border.attr_top = default_outside_border.attr_bottom = 0
         end

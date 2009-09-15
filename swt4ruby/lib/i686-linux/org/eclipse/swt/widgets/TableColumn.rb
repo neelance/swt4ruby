@@ -449,7 +449,7 @@ module Org::Eclipse::Swt::Widgets
       event_ptr = OS.gtk_get_current_event
       if (!(event_ptr).equal?(0))
         gdk_event = GdkEventButton.new
-        OS.memmove(gdk_event, event_ptr, GdkEventButton.attr_sizeof)
+        OS.memmove___org_eclipse_swt_widgets_table_column_1(gdk_event, event_ptr, GdkEventButton.attr_sizeof)
         OS.gdk_event_free(event_ptr)
         case (gdk_event.attr_type)
         when OS::GDK_BUTTON_RELEASE
@@ -483,11 +483,11 @@ module Org::Eclipse::Swt::Widgets
     # long
     def gtk_event_after(widget, gdk_event)
       event = GdkEvent.new
-      OS.memmove(event, gdk_event, GdkEvent.attr_sizeof)
+      OS.memmove___org_eclipse_swt_widgets_table_column_3(event, gdk_event, GdkEvent.attr_sizeof)
       case (event.attr_type)
       when OS::GDK_BUTTON_PRESS
         gdk_event_button = GdkEventButton.new
-        OS.memmove(gdk_event_button, gdk_event, GdkEventButton.attr_sizeof)
+        OS.memmove___org_eclipse_swt_widgets_table_column_5(gdk_event_button, gdk_event, GdkEventButton.attr_sizeof)
         if ((gdk_event_button.attr_button).equal?(3))
           @parent.show_menu(RJava.cast_to_int(gdk_event_button.attr_x_root), RJava.cast_to_int(gdk_event_button.attr_y_root))
         end

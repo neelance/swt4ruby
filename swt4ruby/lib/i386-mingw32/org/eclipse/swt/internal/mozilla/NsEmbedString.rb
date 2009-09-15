@@ -76,7 +76,7 @@ module Org::Eclipse::Swt::Internal::Mozilla
       # long
       buffer = XPCOM.ns_embed_string_get(@handle)
       dest = CharArray.new(length_)
-      XPCOM.memmove(dest, buffer, length_ * 2)
+      XPCOM.memmove___org_eclipse_swt_internal_mozilla_ns_embed_string_1(dest, buffer, length_ * 2)
       return String.new(dest)
     end
     

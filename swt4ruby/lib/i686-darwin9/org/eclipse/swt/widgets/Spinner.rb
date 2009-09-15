@@ -1121,7 +1121,7 @@ module Org::Eclipse::Swt::Widgets
     # long
     def should_change_text_in_range_replacement_string(id, sel, affected_char_range, replacement_string)
       range = NSRange.new
-      OS.memmove(range, affected_char_range, NSRange.attr_sizeof)
+      OS.memmove___org_eclipse_swt_widgets_spinner_1(range, affected_char_range, NSRange.attr_sizeof)
       result = call_super_boolean(id, sel, range, replacement_string)
       if (hooks(SWT::Verify))
         text = NSString.new(replacement_string).get_string
@@ -1190,7 +1190,7 @@ module Org::Eclipse::Swt::Widgets
     def text_view_will_change_selection_from_character_range_to_character_range(id, sel, a_text_view, old_selected_char_range, new_selected_char_range)
       # allow the selection change to proceed
       result = NSRange.new
-      OS.memmove(result, new_selected_char_range, NSRange.attr_sizeof)
+      OS.memmove___org_eclipse_swt_widgets_spinner_3(result, new_selected_char_range, NSRange.attr_sizeof)
       return result
     end
     

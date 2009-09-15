@@ -58,7 +58,7 @@ module Org::Eclipse::Swt::Internal
         # 64
         length = RJava.cast_to_int(items_written[0])
         chars = CharArray.new(length)
-        OS.memmove(chars, ptr, length * 2)
+        OS.memmove___org_eclipse_swt_internal_converter_1(chars, ptr, length * 2)
         OS.g_free(ptr)
         return chars
       end
@@ -89,7 +89,7 @@ module Org::Eclipse::Swt::Internal
         # 64
         written = RJava.cast_to_int(items_written[0])
         bytes = Array.typed(::Java::Byte).new(written + (terminate ? 1 : 0)) { 0 }
-        OS.memmove(bytes, ptr, written)
+        OS.memmove___org_eclipse_swt_internal_converter_3(bytes, ptr, written)
         OS.g_free(ptr)
         return bytes
       end

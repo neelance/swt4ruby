@@ -193,7 +193,7 @@ module Org::Eclipse::Swt::Dnd
         if (!(indices).equal?(0))
           depth = OS.gtk_tree_path_get_depth(path[0])
           temp = Array.typed(::Java::Int).new(depth) { 0 }
-          OS.memmove(temp, indices, temp.attr_length * 4)
+          OS.memmove___org_eclipse_swt_dnd_tree_drop_target_effect_1(temp, indices, temp.attr_length * 4)
           index = temp[temp.attr_length - 1]
         end
       end

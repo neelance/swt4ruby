@@ -424,7 +424,7 @@ module Org::Eclipse::Swt::Widgets
         return result
       end
       gdk_event = GdkEventButton.new
-      OS.memmove(gdk_event, event, GdkEventButton.attr_sizeof)
+      OS.memmove___org_eclipse_swt_widgets_link_1(gdk_event, event, GdkEventButton.attr_sizeof)
       if ((gdk_event.attr_button).equal?(1) && (gdk_event.attr_type).equal?(OS::GDK_BUTTON_PRESS))
         if (!(@focus_index).equal?(-1))
           set_focus
@@ -481,7 +481,7 @@ module Org::Eclipse::Swt::Widgets
         return result
       end
       gdk_event = GdkEventButton.new
-      OS.memmove(gdk_event, event, GdkEventButton.attr_sizeof)
+      OS.memmove___org_eclipse_swt_widgets_link_3(gdk_event, event, GdkEventButton.attr_sizeof)
       if ((gdk_event.attr_button).equal?(1))
         x = RJava.cast_to_int(gdk_event.attr_x)
         y = RJava.cast_to_int(gdk_event.attr_y)
@@ -512,7 +512,7 @@ module Org::Eclipse::Swt::Widgets
       # long
       result = super(widget, gdk_event)
       event = GdkEvent.new
-      OS.memmove(event, gdk_event, GdkEvent.attr_sizeof)
+      OS.memmove___org_eclipse_swt_widgets_link_5(event, gdk_event, GdkEvent.attr_sizeof)
       case (event.attr_type)
       when OS::GDK_FOCUS_CHANGE
         redraw
@@ -529,7 +529,7 @@ module Org::Eclipse::Swt::Widgets
         return 0
       end
       gdk_event = GdkEventExpose.new
-      OS.memmove(gdk_event, event_ptr, GdkEventExpose.attr_sizeof)
+      OS.memmove___org_eclipse_swt_widgets_link_7(gdk_event, event_ptr, GdkEventExpose.attr_sizeof)
       data = SwtGCData.new
       data.attr_damage_rgn = gdk_event.attr_region
       gc = SwtGC.gtk_new(self, data)
@@ -587,7 +587,7 @@ module Org::Eclipse::Swt::Widgets
         return result
       end
       gdk_event = GdkEventKey.new
-      OS.memmove(gdk_event, event_ptr, GdkEventKey.attr_sizeof)
+      OS.memmove___org_eclipse_swt_widgets_link_9(gdk_event, event_ptr, GdkEventKey.attr_sizeof)
       case (gdk_event.attr_keyval)
       when OS::GDK_Return, OS::GDK_KP_Enter, OS::GDK_space
         event = Event.new
@@ -618,7 +618,7 @@ module Org::Eclipse::Swt::Widgets
         return result
       end
       gdk_event = GdkEventMotion.new
-      OS.memmove(gdk_event, event, GdkEventMotion.attr_sizeof)
+      OS.memmove___org_eclipse_swt_widgets_link_11(gdk_event, event, GdkEventMotion.attr_sizeof)
       x = RJava.cast_to_int(gdk_event.attr_x)
       y = RJava.cast_to_int(gdk_event.attr_y)
       if (!((self.attr_style & SWT::MIRRORED)).equal?(0))

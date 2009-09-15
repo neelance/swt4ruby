@@ -264,11 +264,11 @@ module Org::Eclipse::Swt::Widgets
     # long
     def gtk_event_after(widget, gdk_event)
       gtk_event = GdkEvent.new
-      OS.memmove(gtk_event, gdk_event, GdkEvent.attr_sizeof)
+      OS.memmove___org_eclipse_swt_widgets_slider_1(gtk_event, gdk_event, GdkEvent.attr_sizeof)
       case (gtk_event.attr_type)
       when OS::GDK_BUTTON_RELEASE
         gdk_event_button = GdkEventButton.new
-        OS.memmove(gdk_event_button, gdk_event, GdkEventButton.attr_sizeof)
+        OS.memmove___org_eclipse_swt_widgets_slider_3(gdk_event_button, gdk_event, GdkEventButton.attr_sizeof)
         if ((gdk_event_button.attr_button).equal?(1) && (@detail).equal?(SWT::DRAG))
           if (!@drag_sent)
             event = Event.new
@@ -346,7 +346,7 @@ module Org::Eclipse::Swt::Widgets
       # long
       h_adjustment = OS.gtk_range_get_adjustment(self.attr_handle)
       adjustment = GtkAdjustment.new
-      OS.memmove(adjustment, h_adjustment)
+      OS.memmove___org_eclipse_swt_widgets_slider_5(adjustment, h_adjustment)
       return RJava.cast_to_int(adjustment.attr_step_increment)
     end
     
@@ -364,7 +364,7 @@ module Org::Eclipse::Swt::Widgets
       # long
       h_adjustment = OS.gtk_range_get_adjustment(self.attr_handle)
       adjustment = GtkAdjustment.new
-      OS.memmove(adjustment, h_adjustment)
+      OS.memmove___org_eclipse_swt_widgets_slider_7(adjustment, h_adjustment)
       return RJava.cast_to_int(adjustment.attr_upper)
     end
     
@@ -382,7 +382,7 @@ module Org::Eclipse::Swt::Widgets
       # long
       h_adjustment = OS.gtk_range_get_adjustment(self.attr_handle)
       adjustment = GtkAdjustment.new
-      OS.memmove(adjustment, h_adjustment)
+      OS.memmove___org_eclipse_swt_widgets_slider_9(adjustment, h_adjustment)
       return RJava.cast_to_int(adjustment.attr_lower)
     end
     
@@ -402,7 +402,7 @@ module Org::Eclipse::Swt::Widgets
       # long
       h_adjustment = OS.gtk_range_get_adjustment(self.attr_handle)
       adjustment = GtkAdjustment.new
-      OS.memmove(adjustment, h_adjustment)
+      OS.memmove___org_eclipse_swt_widgets_slider_11(adjustment, h_adjustment)
       return RJava.cast_to_int(adjustment.attr_page_increment)
     end
     
@@ -420,7 +420,7 @@ module Org::Eclipse::Swt::Widgets
       # long
       h_adjustment = OS.gtk_range_get_adjustment(self.attr_handle)
       adjustment = GtkAdjustment.new
-      OS.memmove(adjustment, h_adjustment)
+      OS.memmove___org_eclipse_swt_widgets_slider_13(adjustment, h_adjustment)
       return RJava.cast_to_int(adjustment.attr_value)
     end
     
@@ -439,7 +439,7 @@ module Org::Eclipse::Swt::Widgets
       # long
       h_adjustment = OS.gtk_range_get_adjustment(self.attr_handle)
       adjustment = GtkAdjustment.new
-      OS.memmove(adjustment, h_adjustment)
+      OS.memmove___org_eclipse_swt_widgets_slider_15(adjustment, h_adjustment)
       return RJava.cast_to_int(adjustment.attr_page_size)
     end
     
@@ -510,7 +510,7 @@ module Org::Eclipse::Swt::Widgets
       # long
       h_adjustment = OS.gtk_range_get_adjustment(self.attr_handle)
       adjustment = GtkAdjustment.new
-      OS.memmove(adjustment, h_adjustment)
+      OS.memmove___org_eclipse_swt_widgets_slider_17(adjustment, h_adjustment)
       minimum = RJava.cast_to_int(adjustment.attr_lower)
       if (value <= minimum)
         return
@@ -518,7 +518,7 @@ module Org::Eclipse::Swt::Widgets
       adjustment.attr_upper = value
       adjustment.attr_page_size = Math.min(RJava.cast_to_int(adjustment.attr_page_size), value - minimum)
       adjustment.attr_value = Math.min(RJava.cast_to_int(adjustment.attr_value), RJava.cast_to_int((value - adjustment.attr_page_size)))
-      OS.memmove(h_adjustment, adjustment)
+      OS.memmove___org_eclipse_swt_widgets_slider_19(h_adjustment, adjustment)
       OS.g_signal_handlers_block_matched(self.attr_handle, OS::G_SIGNAL_MATCH_DATA, 0, 0, 0, 0, VALUE_CHANGED)
       OS.gtk_adjustment_changed(h_adjustment)
       OS.g_signal_handlers_unblock_matched(self.attr_handle, OS::G_SIGNAL_MATCH_DATA, 0, 0, 0, 0, VALUE_CHANGED)
@@ -544,7 +544,7 @@ module Org::Eclipse::Swt::Widgets
       # long
       h_adjustment = OS.gtk_range_get_adjustment(self.attr_handle)
       adjustment = GtkAdjustment.new
-      OS.memmove(adjustment, h_adjustment)
+      OS.memmove___org_eclipse_swt_widgets_slider_21(adjustment, h_adjustment)
       maximum = RJava.cast_to_int(adjustment.attr_upper)
       if (value >= maximum)
         return
@@ -552,7 +552,7 @@ module Org::Eclipse::Swt::Widgets
       adjustment.attr_lower = value
       adjustment.attr_page_size = Math.min(RJava.cast_to_int(adjustment.attr_page_size), maximum - value)
       adjustment.attr_value = Math.max(RJava.cast_to_int(adjustment.attr_value), value)
-      OS.memmove(h_adjustment, adjustment)
+      OS.memmove___org_eclipse_swt_widgets_slider_23(h_adjustment, adjustment)
       OS.g_signal_handlers_block_matched(self.attr_handle, OS::G_SIGNAL_MATCH_DATA, 0, 0, 0, 0, VALUE_CHANGED)
       OS.gtk_adjustment_changed(h_adjustment)
       OS.g_signal_handlers_unblock_matched(self.attr_handle, OS::G_SIGNAL_MATCH_DATA, 0, 0, 0, 0, VALUE_CHANGED)
@@ -629,11 +629,11 @@ module Org::Eclipse::Swt::Widgets
       # long
       h_adjustment = OS.gtk_range_get_adjustment(self.attr_handle)
       adjustment = GtkAdjustment.new
-      OS.memmove(adjustment, h_adjustment)
+      OS.memmove___org_eclipse_swt_widgets_slider_25(adjustment, h_adjustment)
       value = RJava.cast_to_int(Math.min(value, RJava.cast_to_int((adjustment.attr_upper - adjustment.attr_lower))))
       adjustment.attr_page_size = (value).to_f
       adjustment.attr_value = Math.min(RJava.cast_to_int(adjustment.attr_value), RJava.cast_to_int((adjustment.attr_upper - value)))
-      OS.memmove(h_adjustment, adjustment)
+      OS.memmove___org_eclipse_swt_widgets_slider_27(h_adjustment, adjustment)
       OS.g_signal_handlers_block_matched(self.attr_handle, OS::G_SIGNAL_MATCH_DATA, 0, 0, 0, 0, VALUE_CHANGED)
       OS.gtk_adjustment_changed(h_adjustment)
       OS.g_signal_handlers_unblock_matched(self.attr_handle, OS::G_SIGNAL_MATCH_DATA, 0, 0, 0, 0, VALUE_CHANGED)
@@ -680,14 +680,14 @@ module Org::Eclipse::Swt::Widgets
       # long
       h_adjustment = OS.gtk_range_get_adjustment(self.attr_handle)
       adjustment = GtkAdjustment.new
-      OS.memmove(adjustment, h_adjustment)
+      OS.memmove___org_eclipse_swt_widgets_slider_29(adjustment, h_adjustment)
       adjustment.attr_value = Math.min(Math.max(selection, minimum), maximum - thumb)
       adjustment.attr_lower = (minimum).to_f
       adjustment.attr_upper = (maximum).to_f
       adjustment.attr_page_size = (thumb).to_f
       adjustment.attr_step_increment = (increment).to_f
       adjustment.attr_page_increment = (page_increment).to_f
-      OS.memmove(h_adjustment, adjustment)
+      OS.memmove___org_eclipse_swt_widgets_slider_31(h_adjustment, adjustment)
       OS.g_signal_handlers_block_matched(self.attr_handle, OS::G_SIGNAL_MATCH_DATA, 0, 0, 0, 0, VALUE_CHANGED)
       OS.gtk_adjustment_changed(h_adjustment)
       OS.gtk_adjustment_value_changed(h_adjustment)

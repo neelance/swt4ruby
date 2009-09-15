@@ -384,7 +384,7 @@ module Org::Eclipse::Swt::Widgets
     # long
     def can_drag_rows_with_indexes_at_point(id, sel, arg0, arg1)
       click_point = NSPoint.new
-      OS.memmove(click_point, arg1, NSPoint.attr_sizeof)
+      OS.memmove___org_eclipse_swt_widgets_table_1(click_point, arg1, NSPoint.attr_sizeof)
       table = self.attr_view
       # If the current row is not selected and the user is not attempting to modify the selection, select the row first.
       # long
@@ -2022,7 +2022,7 @@ module Org::Eclipse::Swt::Widgets
         return
       end
       clip_rect = NSRect.new
-      OS.memmove(clip_rect, rect, NSRect.attr_sizeof)
+      OS.memmove___org_eclipse_swt_widgets_table_3(clip_rect, rect, NSRect.attr_sizeof)
       call_super(id, sel, clip_rect)
     end
     

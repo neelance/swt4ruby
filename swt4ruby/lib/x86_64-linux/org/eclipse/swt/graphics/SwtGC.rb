@@ -525,7 +525,7 @@ module Org::Eclipse::Swt::Graphics
       y = Array.typed(::Java::Double).new(1) { 0.0 }
       i = 0
       while i < n_rects[0]
-        OS.memmove(rect, rects[0] + (i * GdkRectangle.attr_sizeof), GdkRectangle.attr_sizeof)
+        OS.memmove___org_eclipse_swt_graphics_gc_1(rect, rects[0] + (i * GdkRectangle.attr_sizeof), GdkRectangle.attr_sizeof)
         x[0] = rect.attr_x
         y[0] = rect.attr_y
         SwtCairo.cairo_matrix_transform_point(matrix, x, y)
@@ -1134,13 +1134,13 @@ module Org::Eclipse::Swt::Graphics
       y = 0
       while y < src_height
         alpha_index = (y + src_y) * img_width + src_x
-        OS.memmove(line, pixels + (y * stride), stride)
+        OS.memmove___org_eclipse_swt_graphics_gc_3(line, pixels + (y * stride), stride)
         x = 3
         while x < stride
           line[x] = (alpha_data).nil? ? alpha : alpha_data[((alpha_index += 1) - 1)]
           x += 4
         end
-        OS.memmove(pixels + (y * stride), line, stride)
+        OS.memmove___org_eclipse_swt_graphics_gc_5(pixels + (y * stride), line, stride)
         y += 1
       end
       if (!(src_width).equal?(dest_width) || !(src_height).equal?(dest_height))
@@ -1200,10 +1200,10 @@ module Org::Eclipse::Swt::Graphics
               while y < src_height
                 # int
                 offset = pixels + (y * stride)
-                OS.memmove(line, offset, stride)
+                OS.memmove___org_eclipse_swt_graphics_gc_7(line, offset, stride)
                 # int
                 mask_offset = mask_pixels + (y * mask_stride)
-                OS.memmove(mask_line, mask_offset, mask_stride)
+                OS.memmove___org_eclipse_swt_graphics_gc_9(mask_line, mask_offset, mask_stride)
                 x = 0
                 while x < src_width
                   if ((mask_line[x * 3]).equal?(0))
@@ -1211,7 +1211,7 @@ module Org::Eclipse::Swt::Graphics
                   end
                   x += 1
                 end
-                OS.memmove(offset, line, stride)
+                OS.memmove___org_eclipse_swt_graphics_gc_11(offset, line, stride)
                 y += 1
               end
               OS.g_object_unref(mask_pixbuf)
@@ -1366,7 +1366,7 @@ module Org::Eclipse::Swt::Graphics
         i = 0
         j = 0
         while i < n_rects[0]
-          OS.memmove(rect, rects[0] + (i * GdkRectangle.attr_sizeof), GdkRectangle.attr_sizeof)
+          OS.memmove___org_eclipse_swt_graphics_gc_13(rect, rects[0] + (i * GdkRectangle.attr_sizeof), GdkRectangle.attr_sizeof)
           x_rects[j] = RJava.cast_to_short(rect.attr_x)
           x_rects[j + 1] = RJava.cast_to_short(rect.attr_y)
           x_rects[j + 2] = RJava.cast_to_short(rect.attr_width)
@@ -3666,7 +3666,7 @@ module Org::Eclipse::Swt::Graphics
         family = OS.pango_font_description_get_family(font)
         length_ = OS.strlen(family)
         buffer = Array.typed(::Java::Byte).new(length_ + 1) { 0 }
-        OS.memmove(buffer, family, length_)
+        OS.memmove___org_eclipse_swt_graphics_gc_15(buffer, family, length_)
         # TODO - convert font height from pango to cairo
         height = OS._pango_pixels(OS.pango_font_description_get_size(font)) * 96 / 72
         pango_style = OS.pango_font_description_get_style(font)
@@ -3701,7 +3701,7 @@ module Org::Eclipse::Swt::Graphics
           rect = GdkRectangle.new
           i = 0
           while i < n_rects[0]
-            OS.memmove(rect, rects[0] + (i * GdkRectangle.attr_sizeof), GdkRectangle.attr_sizeof)
+            OS.memmove___org_eclipse_swt_graphics_gc_17(rect, rects[0] + (i * GdkRectangle.attr_sizeof), GdkRectangle.attr_sizeof)
             SwtCairo.cairo_rectangle(cairo, rect.attr_x, rect.attr_y, rect.attr_width, rect.attr_height)
             i += 1
           end
@@ -4423,10 +4423,10 @@ module Org::Eclipse::Swt::Graphics
         # int
         attr = OS.pango_attr_underline_new(OS::PANGO_UNDERLINE_LOW)
         attribute = PangoAttribute.new
-        OS.memmove(attribute, attr, PangoAttribute.attr_sizeof)
+        OS.memmove___org_eclipse_swt_graphics_gc_19(attribute, attr, PangoAttribute.attr_sizeof)
         attribute.attr_start_index = buffer1.attr_length
         attribute.attr_end_index = buffer1.attr_length + 1
-        OS.memmove(attr, attribute, PangoAttribute.attr_sizeof)
+        OS.memmove___org_eclipse_swt_graphics_gc_21(attr, attribute, PangoAttribute.attr_sizeof)
         OS.pango_attr_list_insert(attr_list, attr)
         OS.pango_layout_set_attributes(layout, attr_list)
         OS.pango_attr_list_unref(attr_list)

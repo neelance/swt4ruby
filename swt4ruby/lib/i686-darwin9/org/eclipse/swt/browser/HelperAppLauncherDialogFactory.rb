@@ -167,21 +167,21 @@ module Org::Eclipse::Swt::Browser
         return XPCOM::NS_ERROR_NO_INTERFACE
       end
       guid = NsID.new
-      XPCOM.memmove(guid, riid, self.attr_ns_id.attr_sizeof)
+      XPCOM.memmove___org_eclipse_swt_browser_helper_app_launcher_dialog_factory_1(guid, riid, self.attr_ns_id.attr_sizeof)
       if (guid._equals(NsISupports::NS_ISUPPORTS_IID))
         # long
-        XPCOM.memmove(ppv_object, Array.typed(::Java::Int).new([@supports.get_address]), C::PTR_SIZEOF)
+        XPCOM.memmove___org_eclipse_swt_browser_helper_app_launcher_dialog_factory_3(ppv_object, Array.typed(::Java::Int).new([@supports.get_address]), C::PTR_SIZEOF)
         _add_ref
         return XPCOM::NS_OK
       end
       if (guid._equals(NsIFactory::NS_IFACTORY_IID))
         # long
-        XPCOM.memmove(ppv_object, Array.typed(::Java::Int).new([@factory.get_address]), C::PTR_SIZEOF)
+        XPCOM.memmove___org_eclipse_swt_browser_helper_app_launcher_dialog_factory_5(ppv_object, Array.typed(::Java::Int).new([@factory.get_address]), C::PTR_SIZEOF)
         _add_ref
         return XPCOM::NS_OK
       end
       # long
-      XPCOM.memmove(ppv_object, Array.typed(::Java::Int).new([0]), C::PTR_SIZEOF)
+      XPCOM.memmove___org_eclipse_swt_browser_helper_app_launcher_dialog_factory_7(ppv_object, Array.typed(::Java::Int).new([0]), C::PTR_SIZEOF)
       return XPCOM::NS_ERROR_NO_INTERFACE
     end
     
@@ -204,12 +204,12 @@ module Org::Eclipse::Swt::Browser
         helper_app_launcher_dialog = HelperAppLauncherDialog.new
         helper_app_launcher_dialog._add_ref
         # long
-        XPCOM.memmove(result, Array.typed(::Java::Int).new([helper_app_launcher_dialog.get_address]), C::PTR_SIZEOF)
+        XPCOM.memmove___org_eclipse_swt_browser_helper_app_launcher_dialog_factory_9(result, Array.typed(::Java::Int).new([helper_app_launcher_dialog.get_address]), C::PTR_SIZEOF)
       else
         helper_app_launcher_dialog = HelperAppLauncherDialog_1_9.new
         helper_app_launcher_dialog._add_ref
         # long
-        XPCOM.memmove(result, Array.typed(::Java::Int).new([helper_app_launcher_dialog.get_address]), C::PTR_SIZEOF)
+        XPCOM.memmove___org_eclipse_swt_browser_helper_app_launcher_dialog_factory_11(result, Array.typed(::Java::Int).new([helper_app_launcher_dialog.get_address]), C::PTR_SIZEOF)
       end
       return XPCOM::NS_OK
     end

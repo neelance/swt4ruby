@@ -872,10 +872,10 @@ module Org::Eclipse::Swt::Widgets
         # long
         bold_attr = OS.pango_attr_weight_new(OS::PANGO_WEIGHT_BOLD)
         attribute = PangoAttribute.new
-        OS.memmove(attribute, bold_attr, PangoAttribute.attr_sizeof)
+        OS.memmove___org_eclipse_swt_widgets_tool_tip_1(attribute, bold_attr, PangoAttribute.attr_sizeof)
         attribute.attr_start_index = 0
         attribute.attr_end_index = buffer.attr_length
-        OS.memmove(bold_attr, attribute, PangoAttribute.attr_sizeof)
+        OS.memmove___org_eclipse_swt_widgets_tool_tip_3(bold_attr, attribute, PangoAttribute.attr_sizeof)
         # long
         attr_list = OS.pango_attr_list_new
         OS.pango_attr_list_insert(attr_list, bold_attr)

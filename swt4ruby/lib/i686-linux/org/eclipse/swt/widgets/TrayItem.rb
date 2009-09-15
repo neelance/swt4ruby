@@ -250,7 +250,7 @@ module Org::Eclipse::Swt::Widgets
         event.attr_data[2] = id
         # long
         client_event = OS.g_malloc(XClientMessageEvent.attr_sizeof)
-        OS.memmove(client_event, event, XClientMessageEvent.attr_sizeof)
+        OS.memmove___org_eclipse_swt_widgets_tray_item_1(client_event, event, XClientMessageEvent.attr_sizeof)
         OS._xsend_event(x_display, tray_window, false, OS::NoEventMask, client_event)
         OS.g_free(client_event)
       end
@@ -351,7 +351,7 @@ module Org::Eclipse::Swt::Widgets
     # long
     def gtk_button_press_event(widget, event_ptr)
       gdk_event = GdkEventButton.new
-      OS.memmove(gdk_event, event_ptr, GdkEventButton.attr_sizeof)
+      OS.memmove___org_eclipse_swt_widgets_tray_item_3(gdk_event, event_ptr, GdkEventButton.attr_sizeof)
       if ((gdk_event.attr_type).equal?(OS::GDK_3BUTTON_PRESS))
         return 0
       end
@@ -383,9 +383,9 @@ module Org::Eclipse::Swt::Widgets
             SWT.error(SWT::ERROR_NO_HANDLES)
           end
           gdk_image = GdkImage.new
-          OS.memmove(gdk_image, gdk_image_ptr)
+          OS.memmove___org_eclipse_swt_widgets_tray_item_5(gdk_image, gdk_image_ptr)
           mask_data = Array.typed(::Java::Byte).new(gdk_image.attr_bpl * gdk_image.attr_height) { 0 }
-          OS.memmove(mask_data, gdk_image.attr_mem, mask_data.attr_length)
+          OS.memmove___org_eclipse_swt_widgets_tray_item_7(mask_data, gdk_image.attr_mem, mask_data.attr_length)
           OS.g_object_unref(gdk_image_ptr)
           region = Region.new(self.attr_display)
           y = 0

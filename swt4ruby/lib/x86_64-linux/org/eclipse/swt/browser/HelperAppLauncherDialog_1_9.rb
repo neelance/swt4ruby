@@ -174,21 +174,21 @@ module Org::Eclipse::Swt::Browser
         return XPCOM::NS_ERROR_NO_INTERFACE
       end
       guid = NsID.new
-      XPCOM.memmove(guid, riid, self.attr_ns_id.attr_sizeof)
+      XPCOM.memmove___org_eclipse_swt_browser_helper_app_launcher_dialog_1_9_1(guid, riid, self.attr_ns_id.attr_sizeof)
       if (guid._equals(NsISupports::NS_ISUPPORTS_IID))
         # int
-        XPCOM.memmove(ppv_object, Array.typed(::Java::Long).new([@supports.get_address]), C::PTR_SIZEOF)
+        XPCOM.memmove___org_eclipse_swt_browser_helper_app_launcher_dialog_1_9_3(ppv_object, Array.typed(::Java::Long).new([@supports.get_address]), C::PTR_SIZEOF)
         _add_ref
         return XPCOM::NS_OK
       end
       if (guid._equals(NsIHelperAppLauncherDialog_1_9::NS_IHELPERAPPLAUNCHERDIALOG_IID))
         # int
-        XPCOM.memmove(ppv_object, Array.typed(::Java::Long).new([@helper_app_launcher_dialog.get_address]), C::PTR_SIZEOF)
+        XPCOM.memmove___org_eclipse_swt_browser_helper_app_launcher_dialog_1_9_5(ppv_object, Array.typed(::Java::Long).new([@helper_app_launcher_dialog.get_address]), C::PTR_SIZEOF)
         _add_ref
         return XPCOM::NS_OK
       end
       # int
-      XPCOM.memmove(ppv_object, Array.typed(::Java::Long).new([0]), C::PTR_SIZEOF)
+      XPCOM.memmove___org_eclipse_swt_browser_helper_app_launcher_dialog_1_9_7(ppv_object, Array.typed(::Java::Long).new([0]), C::PTR_SIZEOF)
       return XPCOM::NS_ERROR_NO_INTERFACE
     end
     
@@ -224,11 +224,11 @@ module Org::Eclipse::Swt::Browser
     def _prompt_for_save_to_file(a_launcher, a_window_context, a_default_file_name, a_suggested_file_extension, a_force_prompt, _retval)
       length = XPCOM.strlen__prunichar(a_default_file_name)
       dest = CharArray.new(length)
-      XPCOM.memmove(dest, a_default_file_name, length * 2)
+      XPCOM.memmove___org_eclipse_swt_browser_helper_app_launcher_dialog_1_9_9(dest, a_default_file_name, length * 2)
       default_file = String.new(dest)
       length = XPCOM.strlen__prunichar(a_suggested_file_extension)
       dest = CharArray.new(length)
-      XPCOM.memmove(dest, a_suggested_file_extension, length * 2)
+      XPCOM.memmove___org_eclipse_swt_browser_helper_app_launcher_dialog_1_9_11(dest, a_suggested_file_extension, length * 2)
       suggested_file_extension = String.new(dest)
       shell = Shell.new
       file_dialog = FileDialog.new(shell, SWT::SAVE)
@@ -257,7 +257,7 @@ module Org::Eclipse::Swt::Browser
         Mozilla.error(XPCOM::NS_ERROR_NULL_POINTER)
       end
       # Our own nsIDownload has been registered during the Browser initialization. It will be invoked by Mozilla.
-      XPCOM.memmove(_retval, result, C::PTR_SIZEOF)
+      XPCOM.memmove___org_eclipse_swt_browser_helper_app_launcher_dialog_1_9_13(_retval, result, C::PTR_SIZEOF)
       return XPCOM::NS_OK
     end
     

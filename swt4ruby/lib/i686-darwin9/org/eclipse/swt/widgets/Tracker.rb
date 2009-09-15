@@ -574,7 +574,7 @@ module Org::Eclipse::Swt::Widgets
         location = NSEvent.mouse_location
       else
         location = ns_event.location_in_window
-        location = ns_event.window.convert_base_to_screen(location)
+        location = ns_event.window___org_eclipse_swt_widgets_tracker_1.convert_base_to_screen(location)
       end
       location.attr_y = self.attr_display.get_primary_frame.attr_height - location.attr_y
       new_x = RJava.cast_to_int(location.attr_x)
@@ -978,7 +978,7 @@ module Org::Eclipse::Swt::Widgets
           case (type_)
           # case OS.NSKeyUp:
           when OS::NSLeftMouseUp, OS::NSRightMouseUp, OS::NSOtherMouseUp, OS::NSMouseMoved, OS::NSLeftMouseDragged, OS::NSRightMouseDragged, OS::NSOtherMouseDragged
-            mouse(event)
+            mouse___org_eclipse_swt_widgets_tracker_3(event)
           when OS::NSKeyDown, OS::NSFlagsChanged
             key(event)
           end

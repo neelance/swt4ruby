@@ -623,7 +623,7 @@ module Org::Eclipse::Swt::Widgets
         end
         OS.gtk_container_add(self.attr_fixed_handle, self.attr_handle)
         combo = GtkCombo.new
-        OS.memmove(combo, self.attr_handle)
+        OS.memmove___org_eclipse_swt_widgets_combo_1(combo, self.attr_handle)
         @entry_handle = combo.attr_entry
         @list_handle = combo.attr_list
         if (OS::GTK_VERSION < OS._version(2, 4, 0))
@@ -1226,7 +1226,7 @@ module Org::Eclipse::Swt::Widgets
         end
         length = OS.strlen(str)
         buffer = Array.typed(::Java::Byte).new(length) { 0 }
-        OS.memmove(buffer, str, length)
+        OS.memmove___org_eclipse_swt_widgets_combo_3(buffer, str, length)
         return String.new(Converter.mbcs_to_wcs(nil, buffer))
       else
         index = OS.gtk_combo_box_get_active(self.attr_handle)
@@ -1317,7 +1317,7 @@ module Org::Eclipse::Swt::Widgets
       # send the mouse event from the event_after handler.
       if (OS::GTK_VERSION >= OS._version(2, 4, 0))
         gdk_event = GdkEventButton.new
-        OS.memmove(gdk_event, event, GdkEventButton.attr_sizeof)
+        OS.memmove___org_eclipse_swt_widgets_combo_5(gdk_event, event, GdkEventButton.attr_sizeof)
         if ((gdk_event.attr_type).equal?(OS::GDK_BUTTON_PRESS) && (gdk_event.attr_button).equal?(1) && !((self.attr_style & SWT::READ_ONLY)).equal?(0))
           return gtk_button_press_event(widget, event, false)
         end
@@ -1358,7 +1358,7 @@ module Org::Eclipse::Swt::Widgets
           ptr = OS.gtk_entry_get_text(@entry_handle)
           length = OS.strlen(ptr)
           buffer = Array.typed(::Java::Byte).new(length) { 0 }
-          OS.memmove(buffer, ptr, length)
+          OS.memmove___org_eclipse_swt_widgets_combo_7(buffer, ptr, length)
           text = String.new(Converter.mbcs_to_wcs(nil, buffer))
           i = 0
           while i < @items.attr_length
@@ -1380,7 +1380,7 @@ module Org::Eclipse::Swt::Widgets
       event_ptr = OS.gtk_get_current_event
       if (!(event_ptr).equal?(0))
         gdk_event = GdkEventKey.new
-        OS.memmove(gdk_event, event_ptr, GdkEventKey.attr_sizeof)
+        OS.memmove___org_eclipse_swt_widgets_combo_9(gdk_event, event_ptr, GdkEventKey.attr_sizeof)
         case (gdk_event.attr_type)
         when OS::GDK_KEY_PRESS
           key_press = true
@@ -1411,7 +1411,7 @@ module Org::Eclipse::Swt::Widgets
         return 0
       end
       buffer = Array.typed(::Java::Byte).new(length) { 0 }
-      OS.memmove(buffer, text, length)
+      OS.memmove___org_eclipse_swt_widgets_combo_11(buffer, text, length)
       chars = Converter.mbcs_to_wcs(nil, buffer)
       new_chars = send_imkey_event(SWT::KeyDown, nil, chars)
       if ((new_chars).nil?)
@@ -1497,11 +1497,11 @@ module Org::Eclipse::Swt::Widgets
       # field.
       if (OS::GTK_VERSION >= OS._version(2, 4, 0))
         event = GdkEvent.new
-        OS.memmove(event, gdk_event, GdkEvent.attr_sizeof)
+        OS.memmove___org_eclipse_swt_widgets_combo_13(event, gdk_event, GdkEvent.attr_sizeof)
         case (event.attr_type)
         when OS::GDK_BUTTON_PRESS
           gdk_event_button = GdkEventButton.new
-          OS.memmove(gdk_event_button, gdk_event, GdkEventButton.attr_sizeof)
+          OS.memmove___org_eclipse_swt_widgets_combo_15(gdk_event_button, gdk_event, GdkEventButton.attr_sizeof)
           if ((gdk_event_button.attr_button).equal?(1))
             if (!((self.attr_style & SWT::READ_ONLY)).equal?(0) && !send_mouse_event(SWT::MouseDown, gdk_event_button.attr_button, self.attr_display.attr_click_count, 0, false, gdk_event_button.attr_time, gdk_event_button.attr_x_root, gdk_event_button.attr_y_root, false, gdk_event_button.attr_state))
               return 1
@@ -1516,7 +1516,7 @@ module Org::Eclipse::Swt::Widgets
           if (OS::GTK_VERSION >= OS._version(2, 6, 0))
             if (((self.attr_style & SWT::READ_ONLY)).equal?(0))
               gdk_event_focus = GdkEventFocus.new
-              OS.memmove(gdk_event_focus, gdk_event, GdkEventFocus.attr_sizeof)
+              OS.memmove___org_eclipse_swt_widgets_combo_17(gdk_event_focus, gdk_event, GdkEventFocus.attr_sizeof)
               if (!(gdk_event_focus.attr_in).equal?(0))
                 OS.gtk_combo_box_set_focus_on_click(self.attr_handle, false)
               else
@@ -1558,10 +1558,10 @@ module Org::Eclipse::Swt::Widgets
       end
       # 64
       buffer = Array.typed(::Java::Byte).new(RJava.cast_to_int(new_text_length)) { 0 }
-      OS.memmove(buffer, new_text, buffer.attr_length)
+      OS.memmove___org_eclipse_swt_widgets_combo_19(buffer, new_text, buffer.attr_length)
       old_text = String.new(Converter.mbcs_to_wcs(nil, buffer))
       pos = Array.typed(::Java::Int).new(1) { 0 }
-      OS.memmove(pos, position, 4)
+      OS.memmove___org_eclipse_swt_widgets_combo_21(pos, position, 4)
       if ((pos[0]).equal?(-1))
         # long
         ptr = OS.gtk_entry_get_text(@entry_handle)
@@ -1592,7 +1592,7 @@ module Org::Eclipse::Swt::Widgets
           @fix_start = new_start[0]
           @fix_end = new_end[0]
         end
-        OS.memmove(position, pos, 4)
+        OS.memmove___org_eclipse_swt_widgets_combo_23(position, pos, 4)
         OS.g_signal_stop_emission_by_name(@entry_handle, OS.attr_insert_text)
       end
       return 0
@@ -1614,7 +1614,7 @@ module Org::Eclipse::Swt::Widgets
       @gdk_event_key = 0
       if (OS::GTK_VERSION >= OS._version(2, 4, 0) && ((self.attr_style & SWT::READ_ONLY)).equal?(0))
         key_event = GdkEventKey.new
-        OS.memmove(key_event, event, GdkEventKey.attr_sizeof)
+        OS.memmove___org_eclipse_swt_widgets_combo_25(key_event, event, GdkEventKey.attr_sizeof)
         old_index = OS.gtk_combo_box_get_active(self.attr_handle)
         new_index = old_index
         key = key_event.attr_keyval
@@ -2603,7 +2603,7 @@ module Org::Eclipse::Swt::Widgets
       event_ptr = OS.gtk_get_current_event
       if (!(event_ptr).equal?(0))
         gdk_event = GdkEventKey.new
-        OS.memmove(gdk_event, event_ptr, GdkEventKey.attr_sizeof)
+        OS.memmove___org_eclipse_swt_widgets_combo_27(gdk_event, event_ptr, GdkEventKey.attr_sizeof)
         case (gdk_event.attr_type)
         when OS::GDK_KEY_PRESS
           set_key_state(event, gdk_event)

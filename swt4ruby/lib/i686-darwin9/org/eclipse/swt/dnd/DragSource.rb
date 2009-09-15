@@ -704,7 +704,7 @@ module Org::Eclipse::Swt::Dnd
         point = NSPoint.new
         point.attr_x = @drag_offset.attr_x
         point.attr_y = @drag_offset.attr_y
-        OS.memmove(arg3, point, NSPoint.attr_sizeof)
+        OS.memmove___org_eclipse_swt_dnd_drag_source_1(arg3, point, NSPoint.attr_sizeof)
         return @drag_image_from_listener.attr_handle.attr_id
       else
         return call_super_object(id, sel, arg0, arg1, arg2, arg3)
@@ -842,7 +842,7 @@ module Org::Eclipse::Swt::Dnd
         end
         if ((sel).equal?(OS.attr_sel_dragged_image_ended_at_operation_))
           point = NSPoint.new
-          OS.memmove(point, arg1, NSPoint.attr_sizeof)
+          OS.memmove___org_eclipse_swt_dnd_drag_source_3(point, arg1, NSPoint.attr_sizeof)
           ds.dragged_image_ended_at_operation(id, sel, arg0, point, arg2)
         end
         return 0

@@ -1757,7 +1757,7 @@ module Org::Eclipse::Swt::Widgets
           end
         end
       end
-      OS.call(@old_cursor_set_proc, id, sel)
+      OS.call___org_eclipse_swt_widgets_display_1(@old_cursor_set_proc, id, sel)
       return 0
     end
     
@@ -3953,8 +3953,8 @@ module Org::Eclipse::Swt::Widgets
       pt = NSPoint.new
       pt.attr_x = x
       pt.attr_y = y
-      from_window = !(from).nil? ? from.attr_view.window : nil
-      to_window = !(to).nil? ? to.attr_view.window : nil
+      from_window = !(from).nil? ? from.attr_view.window___org_eclipse_swt_widgets_display_3 : nil
+      to_window = !(to).nil? ? to.attr_view.window___org_eclipse_swt_widgets_display_5 : nil
       if (!(to_window).nil? && !(from_window).nil? && (to_window.attr_id).equal?(from_window.attr_id))
         if (!from.attr_view.is_flipped)
           pt.attr_y = from.attr_view.bounds.attr_height - pt.attr_y
@@ -4084,8 +4084,8 @@ module Org::Eclipse::Swt::Widgets
       pt = NSPoint.new
       pt.attr_x = x
       pt.attr_y = y
-      from_window = !(from).nil? ? from.attr_view.window : nil
-      to_window = !(to).nil? ? to.attr_view.window : nil
+      from_window = !(from).nil? ? from.attr_view.window___org_eclipse_swt_widgets_display_7 : nil
+      to_window = !(to).nil? ? to.attr_view.window___org_eclipse_swt_widgets_display_9 : nil
       if (!(to_window).nil? && !(from_window).nil? && (to_window.attr_id).equal?(from_window.attr_id))
         if (!from.attr_view.is_flipped)
           pt.attr_y = from.attr_view.bounds.attr_height - pt.attr_y
@@ -4833,11 +4833,11 @@ module Org::Eclipse::Swt::Widgets
         cursor = control.find_cursor
       end
       if ((cursor).nil?)
-        window_ = @application.key_window
-        if (!(window_).nil?)
-          if (window_.are_cursor_rects_enabled)
-            window_.disable_cursor_rects
-            window_.enable_cursor_rects
+        window = @application.key_window
+        if (!(window).nil?)
+          if (window.are_cursor_rects_enabled)
+            window.disable_cursor_rects
+            window.enable_cursor_rects
           end
           return
         end
@@ -5394,10 +5394,10 @@ module Org::Eclipse::Swt::Widgets
       # 64
       count_ = RJava.cast_to_int(windows_.count)
       while i < count_ && (view).nil?
-        window_ = NSWindow.new(windows_.object_at_index(i))
-        content_view_ = window_.content_view
-        if (!(content_view_).nil? && OS._nspoint_in_rect(screen_location, window_.frame))
-          location = window_.convert_screen_to_base(screen_location)
+        window = NSWindow.new(windows_.object_at_index(i))
+        content_view_ = window.content_view
+        if (!(content_view_).nil? && OS._nspoint_in_rect(screen_location, window.frame))
+          location = window.convert_screen_to_base(screen_location)
           view = content_view_.hit_test(location)
           if ((view).nil? && !check_trim)
             view = content_view_
@@ -5517,15 +5517,15 @@ module Org::Eclipse::Swt::Widgets
     # long
     def application_send_event(id, sel, event)
       ns_event = NSEvent.new(event)
-      window_ = ns_event.window
+      window = ns_event.window___org_eclipse_swt_widgets_display_11
       # 64
       type_ = RJava.cast_to_int(ns_event.type)
       down = false
       case (type_)
       when OS::NSLeftMouseDown, OS::NSRightMouseDown, OS::NSOtherMouseDown
         down = true
-        if (!(window_).nil?)
-          shell = get_widget(window_.attr_id)
+        if (!(window).nil?)
+          shell = get_widget(window.attr_id)
           if (!(shell).nil?)
             modal_shell = shell.get_modal_shell
             if (!(modal_shell).nil?)
@@ -5533,8 +5533,8 @@ module Org::Eclipse::Swt::Widgets
                 if (!@application.is_active)
                   @application.activate_ignoring_other_apps(true)
                 end
-                rect = window_.content_rect_for_frame_rect(window_.frame)
-                pt = window_.convert_base_to_screen(ns_event.location_in_window)
+                rect = window.content_rect_for_frame_rect(window.frame)
+                pt = window.convert_base_to_screen(ns_event.location_in_window)
                 if (OS._nspoint_in_rect(pt, rect))
                   beep
                 end
@@ -5544,8 +5544,8 @@ module Org::Eclipse::Swt::Widgets
           end
         end
       when OS::NSLeftMouseUp, OS::NSRightMouseUp, OS::NSOtherMouseUp, OS::NSLeftMouseDragged, OS::NSRightMouseDragged, OS::NSOtherMouseDragged, OS::NSMouseMoved, OS::NSMouseEntered, OS::NSMouseExited, OS::NSKeyDown, OS::NSKeyUp, OS::NSScrollWheel
-        if (!(window_).nil?)
-          shell = get_widget(window_.attr_id)
+        if (!(window).nil?)
+          shell = get_widget(window.attr_id)
           if (!(shell).nil?)
             modal_shell = shell.get_modal_shell
             if (!(modal_shell).nil?)
@@ -5553,8 +5553,8 @@ module Org::Eclipse::Swt::Widgets
                 if (!@application.is_active)
                   @application.activate_ignoring_other_apps(true)
                 end
-                rect = window_.content_rect_for_frame_rect(window_.frame)
-                pt = window_.convert_base_to_screen(ns_event.location_in_window)
+                rect = window.content_rect_for_frame_rect(window.frame)
+                pt = window.convert_base_to_screen(ns_event.location_in_window)
                 if (OS._nspoint_in_rect(pt, rect))
                   beep
                 end
@@ -5567,13 +5567,13 @@ module Org::Eclipse::Swt::Widgets
       @send_event = true
       # Feature in Cocoa. The help key triggers context-sensitive help but doesn't get forwarded to the window as a key event.
       # If the event is destined for the key window, is the help key, and is an NSKeyDown, send it directly to the window first.
-      if (!(window_).nil? && window_.is_key_window && (ns_event.type).equal?(OS::NSKeyDown) && !((ns_event.modifier_flags & OS::NSHelpKeyMask)).equal?(0))
-        window_.send_event(ns_event)
+      if (!(window).nil? && window.is_key_window && (ns_event.type).equal?(OS::NSKeyDown) && !((ns_event.modifier_flags & OS::NSHelpKeyMask)).equal?(0))
+        window.send_event(ns_event)
       end
       # Feature in Cocoa. NSKeyUp events are not delivered to the window if the command key is down.
       # If the event is destined for the key window, and it's a key up and the command key is down, send it directly to the window.
-      if (!(window_).nil? && window_.is_key_window && (ns_event.type).equal?(OS::NSKeyUp) && !((ns_event.modifier_flags & OS::NSCommandKeyMask)).equal?(0))
-        window_.send_event(ns_event)
+      if (!(window).nil? && window.is_key_window && (ns_event.type).equal?(OS::NSKeyUp) && !((ns_event.modifier_flags & OS::NSCommandKeyMask)).equal?(0))
+        window.send_event(ns_event)
       else
         super_struct = Objc_super.new
         super_struct.attr_receiver = id
@@ -6021,7 +6021,7 @@ module Org::Eclipse::Swt::Widgets
                                         # NOTE that this is freed in C
                                         # long
                                         result = OS.malloc(NSRange.attr_sizeof)
-                                        OS.memmove(result, range, NSRange.attr_sizeof)
+                                        OS.memmove___org_eclipse_swt_widgets_display_13(result, range, NSRange.attr_sizeof)
                                         return result
                                       else
                                         if ((sel).equal?(OS.attr_sel_selected_range))
@@ -6029,7 +6029,7 @@ module Org::Eclipse::Swt::Widgets
                                           # NOTE that this is freed in C
                                           # long
                                           result = OS.malloc(NSRange.attr_sizeof)
-                                          OS.memmove(result, range, NSRange.attr_sizeof)
+                                          OS.memmove___org_eclipse_swt_widgets_display_15(result, range, NSRange.attr_sizeof)
                                           return result
                                         else
                                           if ((sel).equal?(OS.attr_sel_cell_size))
@@ -6037,7 +6037,7 @@ module Org::Eclipse::Swt::Widgets
                                             # NOTE that this is freed in C
                                             # long
                                             result = OS.malloc(NSSize.attr_sizeof)
-                                            OS.memmove(result, size_, NSSize.attr_sizeof)
+                                            OS.memmove___org_eclipse_swt_widgets_display_17(result, size_, NSSize.attr_sizeof)
                                             return result
                                           else
                                             if ((sel).equal?(OS.attr_sel_has_marked_text))
@@ -6152,7 +6152,7 @@ module Org::Eclipse::Swt::Widgets
         else
           if ((sel).equal?(OS.attr_sel_draw_rect_))
             rect = NSRect.new
-            OS.memmove(rect, arg0, NSRect.attr_sizeof)
+            OS.memmove___org_eclipse_swt_widgets_display_19(rect, arg0, NSRect.attr_sizeof)
             widget.draw_rect(id, sel, rect)
           else
             if ((sel).equal?(OS.attr_sel__draw_theme_progress_area_))
@@ -6160,17 +6160,17 @@ module Org::Eclipse::Swt::Widgets
             else
               if ((sel).equal?(OS.attr_sel_set_frame_origin_))
                 point = NSPoint.new
-                OS.memmove(point, arg0, NSPoint.attr_sizeof)
+                OS.memmove___org_eclipse_swt_widgets_display_21(point, arg0, NSPoint.attr_sizeof)
                 widget.set_frame_origin(id, sel, point)
               else
                 if ((sel).equal?(OS.attr_sel_set_frame_size_))
                   size_ = NSSize.new
-                  OS.memmove(size_, arg0, NSSize.attr_sizeof)
+                  OS.memmove___org_eclipse_swt_widgets_display_23(size_, arg0, NSSize.attr_sizeof)
                   widget.set_frame_size(id, sel, size_)
                 else
                   if ((sel).equal?(OS.attr_sel_hit_test_))
                     point = NSPoint.new
-                    OS.memmove(point, arg0, NSPoint.attr_sizeof)
+                    OS.memmove___org_eclipse_swt_widgets_display_25(point, arg0, NSPoint.attr_sizeof)
                     return widget.hit_test(id, sel, point)
                   else
                     if ((sel).equal?(OS.attr_sel_window_should_close_))
@@ -6301,7 +6301,7 @@ module Org::Eclipse::Swt::Widgets
                                                                                                         # NOTE that this is freed in C
                                                                                                         # long
                                                                                                         result = OS.malloc(NSRect.attr_sizeof)
-                                                                                                        OS.memmove(result, rect, NSRect.attr_sizeof)
+                                                                                                        OS.memmove___org_eclipse_swt_widgets_display_27(result, rect, NSRect.attr_sizeof)
                                                                                                         return result
                                                                                                       else
                                                                                                         if ((sel).equal?(OS.attr_sel_insert_text_))
@@ -6318,7 +6318,7 @@ module Org::Eclipse::Swt::Widgets
                                                                                                               else
                                                                                                                 if ((sel).equal?(OS.attr_sel_accessibility_hit_test_))
                                                                                                                   point = NSPoint.new
-                                                                                                                  OS.memmove(point, arg0, NSPoint.attr_sizeof)
+                                                                                                                  OS.memmove___org_eclipse_swt_widgets_display_29(point, arg0, NSPoint.attr_sizeof)
                                                                                                                   return widget.accessibility_hit_test(id, sel, point)
                                                                                                                 else
                                                                                                                   if ((sel).equal?(OS.attr_sel_accessibility_attribute_value_))
@@ -6356,22 +6356,22 @@ module Org::Eclipse::Swt::Widgets
                                                                                                                                       else
                                                                                                                                         if ((sel).equal?(OS.attr_sel_image_rect_for_bounds_))
                                                                                                                                           rect = NSRect.new
-                                                                                                                                          OS.memmove(rect, arg0, NSRect.attr_sizeof)
+                                                                                                                                          OS.memmove___org_eclipse_swt_widgets_display_31(rect, arg0, NSRect.attr_sizeof)
                                                                                                                                           rect = widget.image_rect_for_bounds(id, sel, rect)
                                                                                                                                           # NOTE that this is freed in C
                                                                                                                                           # long
                                                                                                                                           result = OS.malloc(NSRect.attr_sizeof)
-                                                                                                                                          OS.memmove(result, rect, NSRect.attr_sizeof)
+                                                                                                                                          OS.memmove___org_eclipse_swt_widgets_display_33(result, rect, NSRect.attr_sizeof)
                                                                                                                                           return result
                                                                                                                                         else
                                                                                                                                           if ((sel).equal?(OS.attr_sel_title_rect_for_bounds_))
                                                                                                                                             rect = NSRect.new
-                                                                                                                                            OS.memmove(rect, arg0, NSRect.attr_sizeof)
+                                                                                                                                            OS.memmove___org_eclipse_swt_widgets_display_35(rect, arg0, NSRect.attr_sizeof)
                                                                                                                                             rect = widget.title_rect_for_bounds(id, sel, rect)
                                                                                                                                             # NOTE that this is freed in C
                                                                                                                                             # long
                                                                                                                                             result = OS.malloc(NSRect.attr_sizeof)
-                                                                                                                                            OS.memmove(result, rect, NSRect.attr_sizeof)
+                                                                                                                                            OS.memmove___org_eclipse_swt_widgets_display_37(result, rect, NSRect.attr_sizeof)
                                                                                                                                             return result
                                                                                                                                           else
                                                                                                                                             if ((sel).equal?(OS.attr_sel_set_object_value_))
@@ -6481,12 +6481,12 @@ module Org::Eclipse::Swt::Widgets
                   else
                     if ((sel).equal?(OS.attr_sel_draw_interior_with_frame_in_view_))
                       rect = NSRect.new
-                      OS.memmove(rect, arg0, NSRect.attr_sizeof)
+                      OS.memmove___org_eclipse_swt_widgets_display_39(rect, arg0, NSRect.attr_sizeof)
                       widget.draw_interior_with_frame_in_view(id, sel, rect, arg1)
                     else
                       if ((sel).equal?(OS.attr_sel_draw_with_expansion_frame_in_view_))
                         rect = NSRect.new
-                        OS.memmove(rect, arg0, NSRect.attr_sizeof)
+                        OS.memmove___org_eclipse_swt_widgets_display_41(rect, arg0, NSRect.attr_sizeof)
                         widget.draw_with_expansion_frame_in_view(id, sel, rect, arg1)
                       else
                         if ((sel).equal?(OS.attr_sel_accessibility_attribute_value_for_parameter_))
@@ -6512,12 +6512,12 @@ module Org::Eclipse::Swt::Widgets
                                     else
                                       if ((sel).equal?(OS.attr_sel_expansion_frame_with_frame_in_view_))
                                         rect = NSRect.new
-                                        OS.memmove(rect, arg0, NSRect.attr_sizeof)
+                                        OS.memmove___org_eclipse_swt_widgets_display_43(rect, arg0, NSRect.attr_sizeof)
                                         rect = widget.expansion_frame_with_frame_in_view(id, sel, rect, arg1)
                                         # NOTE that this is freed in C
                                         # long
                                         result = OS.malloc(NSRect.attr_sizeof)
-                                        OS.memmove(result, rect, NSRect.attr_sizeof)
+                                        OS.memmove___org_eclipse_swt_widgets_display_45(result, rect, NSRect.attr_sizeof)
                                         return result
                                       end
                                     end
@@ -6570,22 +6570,22 @@ module Org::Eclipse::Swt::Widgets
                     # NOTE that this is freed in C
                     # long
                     result = OS.malloc(NSRange.attr_sizeof)
-                    OS.memmove(result, range, NSRange.attr_sizeof)
+                    OS.memmove___org_eclipse_swt_widgets_display_47(result, range, NSRange.attr_sizeof)
                     return result
                   else
                     if ((sel).equal?(OS.attr_sel_drag_selection_with_event_offset_slide_back_))
                       offset = NSSize.new
-                      OS.memmove(offset, arg0, NSSize.attr_sizeof)
+                      OS.memmove___org_eclipse_swt_widgets_display_49(offset, arg0, NSSize.attr_sizeof)
                       return (widget.drag_selection_with_event(id, sel, arg0, arg1, arg2) ? 1 : 0)
                     else
                       if ((sel).equal?(OS.attr_sel_draw_image_with_frame_in_view_))
                         rect = NSRect.new
-                        OS.memmove(rect, arg1, NSRect.attr_sizeof)
+                        OS.memmove___org_eclipse_swt_widgets_display_51(rect, arg1, NSRect.attr_sizeof)
                         widget.draw_image_with_frame_in_view(id, sel, arg0, rect, arg2)
                       else
                         if ((sel).equal?(OS.attr_sel_hit_test_for_event_in_rect_of_view_))
                           rect = NSRect.new
-                          OS.memmove(rect, arg1, NSRect.attr_sizeof)
+                          OS.memmove___org_eclipse_swt_widgets_display_53(rect, arg1, NSRect.attr_sizeof)
                           return widget.hit_test_for_event(id, sel, arg0, rect, arg2)
                         else
                           if ((sel).equal?(OS.attr_sel_table_view_write_rows_with_indexes_to_pasteboard_))

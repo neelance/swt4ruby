@@ -243,22 +243,22 @@ module Org::Eclipse::Swt::Graphics
         while (line_index < line_count)
           # long
           line_ptr = OS.pango_layout_get_line(@layout, line_index)
-          OS.memmove(line, line_ptr, PangoLayoutLine.attr_sizeof)
+          OS.memmove___org_eclipse_swt_graphics_text_layout_1(line, line_ptr, PangoLayoutLine.attr_sizeof)
           byte_pos = line.attr_start_index
           # Note: The length in bytes of ZWS and ZWNBS are both equals to 3
           offset = line_index * 6
           # long
           attr = OS.pango_attr_shape_new(rect, rect)
-          OS.memmove(attribute, attr, PangoAttribute.attr_sizeof)
+          OS.memmove___org_eclipse_swt_graphics_text_layout_3(attribute, attr, PangoAttribute.attr_sizeof)
           attribute.attr_start_index = byte_pos + offset
           attribute.attr_end_index = byte_pos + offset + 3
-          OS.memmove(attr, attribute, PangoAttribute.attr_sizeof)
+          OS.memmove___org_eclipse_swt_graphics_text_layout_5(attr, attribute, PangoAttribute.attr_sizeof)
           OS.pango_attr_list_insert(@attr_list, attr)
           attr = OS.pango_attr_shape_new(rect, rect)
-          OS.memmove(attribute, attr, PangoAttribute.attr_sizeof)
+          OS.memmove___org_eclipse_swt_graphics_text_layout_7(attribute, attr, PangoAttribute.attr_sizeof)
           attribute.attr_start_index = byte_pos + offset + 3
           attribute.attr_end_index = byte_pos + offset + 6
-          OS.memmove(attr, attribute, PangoAttribute.attr_sizeof)
+          OS.memmove___org_eclipse_swt_graphics_text_layout_9(attr, attribute, PangoAttribute.attr_sizeof)
           OS.pango_attr_list_insert(@attr_list, attr)
           # 64
           pos = RJava.cast_to_int(OS.g_utf8_pointer_to_offset(ptr, ptr + byte_pos))
@@ -317,10 +317,10 @@ module Org::Eclipse::Swt::Graphics
         if (!(font).nil? && !font.is_disposed && !(default_font == font))
           # long
           attr = OS.pango_attr_font_desc_new(font.attr_handle)
-          OS.memmove(attribute, attr, PangoAttribute.attr_sizeof)
+          OS.memmove___org_eclipse_swt_graphics_text_layout_11(attribute, attr, PangoAttribute.attr_sizeof)
           attribute.attr_start_index = byte_start
           attribute.attr_end_index = byte_end
-          OS.memmove(attr, attribute, PangoAttribute.attr_sizeof)
+          OS.memmove___org_eclipse_swt_graphics_text_layout_13(attr, attribute, PangoAttribute.attr_sizeof)
           OS.pango_attr_list_insert(@attr_list, attr)
         end
         if (style.attr_underline)
@@ -338,10 +338,10 @@ module Org::Eclipse::Swt::Graphics
             if ((style.attr_foreground).nil?)
               # long
               attr = OS.pango_attr_foreground_new(RJava.cast_to_short(0), RJava.cast_to_short(0x3333), RJava.cast_to_short(0x9999))
-              OS.memmove(attribute, attr, PangoAttribute.attr_sizeof)
+              OS.memmove___org_eclipse_swt_graphics_text_layout_15(attribute, attr, PangoAttribute.attr_sizeof)
               attribute.attr_start_index = byte_start
               attribute.attr_end_index = byte_end
-              OS.memmove(attr, attribute, PangoAttribute.attr_sizeof)
+              OS.memmove___org_eclipse_swt_graphics_text_layout_17(attr, attribute, PangoAttribute.attr_sizeof)
               OS.pango_attr_list_insert(@attr_list, attr)
             end
             if ((style.attr_underline_color).nil?)
@@ -351,20 +351,20 @@ module Org::Eclipse::Swt::Graphics
           if (!(underline_style).equal?(OS::PANGO_UNDERLINE_NONE) && (style.attr_underline_color).nil?)
             # long
             attr = OS.pango_attr_underline_new(underline_style)
-            OS.memmove(attribute, attr, PangoAttribute.attr_sizeof)
+            OS.memmove___org_eclipse_swt_graphics_text_layout_19(attribute, attr, PangoAttribute.attr_sizeof)
             attribute.attr_start_index = byte_start
             attribute.attr_end_index = byte_end
-            OS.memmove(attr, attribute, PangoAttribute.attr_sizeof)
+            OS.memmove___org_eclipse_swt_graphics_text_layout_21(attr, attribute, PangoAttribute.attr_sizeof)
             OS.pango_attr_list_insert(@attr_list, attr)
           end
         end
         if (style.attr_strikeout && (style.attr_strikeout_color).nil?)
           # long
           attr = OS.pango_attr_strikethrough_new(true)
-          OS.memmove(attribute, attr, PangoAttribute.attr_sizeof)
+          OS.memmove___org_eclipse_swt_graphics_text_layout_23(attribute, attr, PangoAttribute.attr_sizeof)
           attribute.attr_start_index = byte_start
           attribute.attr_end_index = byte_end
-          OS.memmove(attr, attribute, PangoAttribute.attr_sizeof)
+          OS.memmove___org_eclipse_swt_graphics_text_layout_25(attr, attribute, PangoAttribute.attr_sizeof)
           OS.pango_attr_list_insert(@attr_list, attr)
         end
         foreground = style.attr_foreground
@@ -372,10 +372,10 @@ module Org::Eclipse::Swt::Graphics
           fg = foreground.attr_handle
           # long
           attr = OS.pango_attr_foreground_new(fg.attr_red, fg.attr_green, fg.attr_blue)
-          OS.memmove(attribute, attr, PangoAttribute.attr_sizeof)
+          OS.memmove___org_eclipse_swt_graphics_text_layout_27(attribute, attr, PangoAttribute.attr_sizeof)
           attribute.attr_start_index = byte_start
           attribute.attr_end_index = byte_end
-          OS.memmove(attr, attribute, PangoAttribute.attr_sizeof)
+          OS.memmove___org_eclipse_swt_graphics_text_layout_29(attr, attribute, PangoAttribute.attr_sizeof)
           OS.pango_attr_list_insert(@attr_list, attr)
         end
         background = style.attr_background
@@ -383,10 +383,10 @@ module Org::Eclipse::Swt::Graphics
           bg = background.attr_handle
           # long
           attr = OS.pango_attr_background_new(bg.attr_red, bg.attr_green, bg.attr_blue)
-          OS.memmove(attribute, attr, PangoAttribute.attr_sizeof)
+          OS.memmove___org_eclipse_swt_graphics_text_layout_31(attribute, attr, PangoAttribute.attr_sizeof)
           attribute.attr_start_index = byte_start
           attribute.attr_end_index = byte_end
-          OS.memmove(attr, attribute, PangoAttribute.attr_sizeof)
+          OS.memmove___org_eclipse_swt_graphics_text_layout_33(attr, attribute, PangoAttribute.attr_sizeof)
           OS.pango_attr_list_insert(@attr_list, attr)
         end
         metrics = style.attr_metrics
@@ -397,20 +397,20 @@ module Org::Eclipse::Swt::Graphics
           rect.attr_width = metrics.attr_width * OS::PANGO_SCALE
           # long
           attr = OS.pango_attr_shape_new(rect, rect)
-          OS.memmove(attribute, attr, PangoAttribute.attr_sizeof)
+          OS.memmove___org_eclipse_swt_graphics_text_layout_35(attribute, attr, PangoAttribute.attr_sizeof)
           attribute.attr_start_index = byte_start
           attribute.attr_end_index = byte_end
-          OS.memmove(attr, attribute, PangoAttribute.attr_sizeof)
+          OS.memmove___org_eclipse_swt_graphics_text_layout_37(attr, attribute, PangoAttribute.attr_sizeof)
           OS.pango_attr_list_insert(@attr_list, attr)
         end
         rise = style.attr_rise
         if (!(rise).equal?(0))
           # long
           attr = OS.pango_attr_rise_new(rise * OS::PANGO_SCALE)
-          OS.memmove(attribute, attr, PangoAttribute.attr_sizeof)
+          OS.memmove___org_eclipse_swt_graphics_text_layout_39(attribute, attr, PangoAttribute.attr_sizeof)
           attribute.attr_start_index = byte_start
           attribute.attr_end_index = byte_end
-          OS.memmove(attr, attribute, PangoAttribute.attr_sizeof)
+          OS.memmove___org_eclipse_swt_graphics_text_layout_41(attr, attribute, PangoAttribute.attr_sizeof)
           OS.pango_attr_list_insert(@attr_list, attr)
         end
         i__ += 1
@@ -589,7 +589,7 @@ module Org::Eclipse::Swt::Graphics
             if ((attrs[0]).equal?(0))
               OS.pango_layout_get_log_attrs(@layout, attrs, n_attrs)
             end
-            OS.memmove(log_attr, attrs[0] + line_end * PangoLogAttr.attr_sizeof, PangoLogAttr.attr_sizeof)
+            OS.memmove___org_eclipse_swt_graphics_text_layout_43(log_attr, attrs[0] + line_end * PangoLogAttr.attr_sizeof, PangoLogAttr.attr_sizeof)
             if (!log_attr.attr_is_line_break)
               if (selection_start <= line_end && line_end <= selection_end)
                 extent = true
@@ -829,7 +829,7 @@ module Org::Eclipse::Swt::Graphics
               end
               j_ = 0
               while j_ < n_rects[0]
-                OS.memmove(rect, rects[0] + (j_ * GdkRectangle.attr_sizeof), GdkRectangle.attr_sizeof)
+                OS.memmove___org_eclipse_swt_graphics_text_layout_45(rect, rects[0] + (j_ * GdkRectangle.attr_sizeof), GdkRectangle.attr_sizeof)
                 SwtCairo.cairo_rectangle(cairo, rect.attr_x + 0.5, rect.attr_y + 0.5, rect.attr_width - 1, rect.attr_height - 1)
                 j_ += 1
               end
@@ -858,7 +858,7 @@ module Org::Eclipse::Swt::Graphics
               OS.gdk_gc_set_line_attributes(gdk_gc, width_, line_style, cap_style, join_style)
               j_ = 0
               while j_ < n_rects[0]
-                OS.memmove(rect, rects[0] + (j_ * GdkRectangle.attr_sizeof), GdkRectangle.attr_sizeof)
+                OS.memmove___org_eclipse_swt_graphics_text_layout_47(rect, rects[0] + (j_ * GdkRectangle.attr_sizeof), GdkRectangle.attr_sizeof)
                 OS.gdk_draw_rectangle(data.attr_drawable, gdk_gc, 0, rect.attr_x, rect.attr_y, rect.attr_width - 1, rect.attr_height - 1)
                 j_ += 1
               end
@@ -941,7 +941,7 @@ module Org::Eclipse::Swt::Graphics
             end
             j_ = 0
             while j_ < n_rects[0]
-              OS.memmove(rect, rects[0] + (j_ * GdkRectangle.attr_sizeof), GdkRectangle.attr_sizeof)
+              OS.memmove___org_eclipse_swt_graphics_text_layout_49(rect, rects[0] + (j_ * GdkRectangle.attr_sizeof), GdkRectangle.attr_sizeof)
               offset = get_offset(rect.attr_x - x, rect.attr_y - y, nil)
               line_index = get_line_index(offset)
               metrics = get_line_metrics(line_index)
@@ -1070,7 +1070,7 @@ module Org::Eclipse::Swt::Graphics
             end
             j_ = 0
             while j_ < n_rects[0]
-              OS.memmove(rect, rects[0] + (j_ * GdkRectangle.attr_sizeof), GdkRectangle.attr_sizeof)
+              OS.memmove___org_eclipse_swt_graphics_text_layout_51(rect, rects[0] + (j_ * GdkRectangle.attr_sizeof), GdkRectangle.attr_sizeof)
               strikeout_y = rect.attr_y + rect.attr_height / 2 - style.attr_rise
               if (OS::GTK_VERSION >= OS._version(2, 6, 0))
                 offset = get_offset(rect.attr_x - x, rect.attr_y - y, nil)
@@ -1372,8 +1372,8 @@ module Org::Eclipse::Swt::Graphics
         # long
         run_ptr = OS.pango_layout_iter_get_run(iter)
         if (!(run_ptr).equal?(0))
-          OS.memmove(run, run_ptr, PangoLayoutRun.attr_sizeof)
-          OS.memmove(item, run.attr_item, PangoItem.attr_sizeof)
+          OS.memmove___org_eclipse_swt_graphics_text_layout_53(run, run_ptr, PangoLayoutRun.attr_sizeof)
+          OS.memmove___org_eclipse_swt_graphics_text_layout_55(item, run.attr_item, PangoItem.attr_sizeof)
           if (item.attr_offset <= byte_offset && byte_offset < item.attr_offset + item.attr_length)
             level = item.attr_analysis_level
             break
@@ -1509,7 +1509,7 @@ module Org::Eclipse::Swt::Graphics
       ascent = 0
       descent = 0
       line = PangoLayoutLine.new
-      OS.memmove(line, OS.pango_layout_get_line(@layout, line_index), PangoLayoutLine.attr_sizeof)
+      OS.memmove___org_eclipse_swt_graphics_text_layout_57(line, OS.pango_layout_get_line(@layout, line_index), PangoLayoutLine.attr_sizeof)
       if ((line.attr_runs).equal?(0))
         # long
         font = !(@font).nil? ? @font.attr_handle : self.attr_device.attr_system_font.attr_handle
@@ -1553,7 +1553,7 @@ module Org::Eclipse::Swt::Graphics
       while i < line_count
         # long
         line_ptr = OS.pango_layout_get_line(@layout, i)
-        OS.memmove(line, line_ptr, PangoLayoutLine.attr_sizeof)
+        OS.memmove___org_eclipse_swt_graphics_text_layout_59(line, line_ptr, PangoLayoutLine.attr_sizeof)
         # 64
         pos = RJava.cast_to_int(OS.g_utf8_pointer_to_offset(ptr, ptr + line.attr_start_index))
         offsets[i] = untranslate_offset(pos)
@@ -1660,7 +1660,7 @@ module Org::Eclipse::Swt::Graphics
       log_attr = PangoLogAttr.new
       offset = validate_offset(offset, step)
       while (0 < offset && offset < length_)
-        OS.memmove(log_attr, attrs[0] + offset * PangoLogAttr.attr_sizeof, PangoLogAttr.attr_sizeof)
+        OS.memmove___org_eclipse_swt_graphics_text_layout_61(log_attr, attrs[0] + offset * PangoLogAttr.attr_sizeof, PangoLogAttr.attr_sizeof)
         if ((!((movement & SWT::MOVEMENT_CLUSTER)).equal?(0)) && log_attr.attr_is_cursor_position)
           break
         end

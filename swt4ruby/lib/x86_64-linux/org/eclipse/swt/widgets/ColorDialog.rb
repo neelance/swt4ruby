@@ -138,7 +138,7 @@ module Org::Eclipse::Swt::Widgets
       end
       OS.gtk_window_set_modal(handle, true)
       dialog = GtkColorSelectionDialog.new
-      OS.memmove(dialog, handle)
+      OS.memmove___org_eclipse_swt_widgets_color_dialog_1(dialog, handle)
       color = GdkColor.new
       if (!(@rgb).nil?)
         color.attr_red = RJava.cast_to_short(((@rgb.attr_red & 0xff) | ((@rgb.attr_red & 0xff) << 8)))

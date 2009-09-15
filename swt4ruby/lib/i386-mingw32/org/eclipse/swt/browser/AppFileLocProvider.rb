@@ -293,27 +293,27 @@ module Org::Eclipse::Swt::Browser
         return XPCOM::NS_ERROR_NO_INTERFACE
       end
       guid = NsID.new
-      XPCOM.memmove(guid, riid, self.attr_ns_id.attr_sizeof)
+      XPCOM.memmove___org_eclipse_swt_browser_app_file_loc_provider_1(guid, riid, self.attr_ns_id.attr_sizeof)
       if (guid._equals(NsISupports::NS_ISUPPORTS_IID))
         # long
-        XPCOM.memmove(ppv_object, Array.typed(::Java::Int).new([@supports.get_address]), C::PTR_SIZEOF)
+        XPCOM.memmove___org_eclipse_swt_browser_app_file_loc_provider_3(ppv_object, Array.typed(::Java::Int).new([@supports.get_address]), C::PTR_SIZEOF)
         _add_ref
         return XPCOM::NS_OK
       end
       if (guid._equals(NsIDirectoryServiceProvider::NS_IDIRECTORYSERVICEPROVIDER_IID))
         # long
-        XPCOM.memmove(ppv_object, Array.typed(::Java::Int).new([@directory_service_provider.get_address]), C::PTR_SIZEOF)
+        XPCOM.memmove___org_eclipse_swt_browser_app_file_loc_provider_5(ppv_object, Array.typed(::Java::Int).new([@directory_service_provider.get_address]), C::PTR_SIZEOF)
         _add_ref
         return XPCOM::NS_OK
       end
       if (guid._equals(NsIDirectoryServiceProvider2::NS_IDIRECTORYSERVICEPROVIDER2_IID))
         # long
-        XPCOM.memmove(ppv_object, Array.typed(::Java::Int).new([@directory_service_provider2.get_address]), C::PTR_SIZEOF)
+        XPCOM.memmove___org_eclipse_swt_browser_app_file_loc_provider_7(ppv_object, Array.typed(::Java::Int).new([@directory_service_provider2.get_address]), C::PTR_SIZEOF)
         _add_ref
         return XPCOM::NS_OK
       end
       # long
-      XPCOM.memmove(ppv_object, Array.typed(::Java::Int).new([0]), C::PTR_SIZEOF)
+      XPCOM.memmove___org_eclipse_swt_browser_app_file_loc_provider_9(ppv_object, Array.typed(::Java::Int).new([0]), C::PTR_SIZEOF)
       return XPCOM::NS_ERROR_NO_INTERFACE
     end
     
@@ -364,7 +364,7 @@ module Org::Eclipse::Swt::Browser
     def get_files(prop, _retval)
       size = XPCOM.strlen(prop)
       bytes = Array.typed(::Java::Byte).new(size) { 0 }
-      XPCOM.memmove(bytes, prop, size)
+      XPCOM.memmove___org_eclipse_swt_browser_app_file_loc_provider_11(bytes, prop, size)
       property_name = String.new(MozillaDelegate.mbcs_to_wcs(nil, bytes))
       property_values = nil
       if ((property_name == XPCOM::NS_APP_PLUGINS_DIR_LIST))
@@ -376,7 +376,7 @@ module Org::Eclipse::Swt::Browser
           if (!(ptr).equal?(0))
             length = C.strlen(ptr)
             buffer = Array.typed(::Java::Byte).new(length) { 0 }
-            C.memmove(buffer, ptr, length)
+            C.memmove___org_eclipse_swt_browser_app_file_loc_provider_13(buffer, ptr, length)
             value = String.new(MozillaDelegate.mbcs_to_wcs(nil, buffer))
             if (value.length > 0)
               separator = System.get_property("path.separator") # $NON-NLS-1$
@@ -416,7 +416,7 @@ module Org::Eclipse::Swt::Browser
         property_values = @plugin_dirs
       end
       # long
-      XPCOM.memmove(_retval, Array.typed(::Java::Int).new([0]), C::PTR_SIZEOF)
+      XPCOM.memmove___org_eclipse_swt_browser_app_file_loc_provider_15(_retval, Array.typed(::Java::Int).new([0]), C::PTR_SIZEOF)
       if (!(property_values).nil?)
         # long
         # long
@@ -461,7 +461,7 @@ module Org::Eclipse::Swt::Browser
         enumerator = SimpleEnumerator.new(files)
         enumerator._add_ref
         # long
-        XPCOM.memmove(_retval, Array.typed(::Java::Int).new([enumerator.get_address]), C::PTR_SIZEOF)
+        XPCOM.memmove___org_eclipse_swt_browser_app_file_loc_provider_17(_retval, Array.typed(::Java::Int).new([enumerator.get_address]), C::PTR_SIZEOF)
         return XPCOM::NS_OK
       end
       return XPCOM::NS_ERROR_FAILURE
@@ -475,7 +475,7 @@ module Org::Eclipse::Swt::Browser
     def get_file(prop, persistent, _retval)
       size_ = XPCOM.strlen(prop)
       bytes = Array.typed(::Java::Byte).new(size_) { 0 }
-      XPCOM.memmove(bytes, prop, size_)
+      XPCOM.memmove___org_eclipse_swt_browser_app_file_loc_provider_19(bytes, prop, size_)
       property_name = String.new(MozillaDelegate.mbcs_to_wcs(nil, bytes))
       property_value = nil
       if ((property_name == XPCOM::NS_APP_HISTORY_50_FILE))
@@ -555,10 +555,10 @@ module Org::Eclipse::Swt::Browser
           end
         end
       end
-      XPCOM.memmove(persistent, Array.typed(::Java::Int).new([1]), 4)
+      XPCOM.memmove___org_eclipse_swt_browser_app_file_loc_provider_21(persistent, Array.typed(::Java::Int).new([1]), 4)
       # PRBool
       # long
-      XPCOM.memmove(_retval, Array.typed(::Java::Int).new([0]), C::PTR_SIZEOF)
+      XPCOM.memmove___org_eclipse_swt_browser_app_file_loc_provider_23(_retval, Array.typed(::Java::Int).new([0]), C::PTR_SIZEOF)
       if (!(property_value).nil? && property_value.length > 0)
         # long
         # long
@@ -582,7 +582,7 @@ module Org::Eclipse::Swt::Browser
           Mozilla.error(XPCOM::NS_ERROR_NO_INTERFACE)
         end
         # long
-        XPCOM.memmove(_retval, Array.typed(::Java::Int).new([result[0]]), C::PTR_SIZEOF)
+        XPCOM.memmove___org_eclipse_swt_browser_app_file_loc_provider_25(_retval, Array.typed(::Java::Int).new([result[0]]), C::PTR_SIZEOF)
         local_file._release
         return XPCOM::NS_OK
       end
