@@ -1228,7 +1228,7 @@ module Org::Eclipse::Swt::Widgets
     typesig { [] }
     def send_double_selection
       if (!((self.attr_view).clicked_row).equal?(-1))
-        post_event(SWT::DefaultSelection)
+        post_event___org_eclipse_swt_widgets_list_1(SWT::DefaultSelection)
       end
     end
     
@@ -1246,7 +1246,7 @@ module Org::Eclipse::Swt::Widgets
       # KP Enter
       when 76, 36
         # Return
-        post_event(SWT::DefaultSelection)
+        post_event___org_eclipse_swt_widgets_list_3(SWT::DefaultSelection)
       end
       return result
     end
@@ -1614,7 +1614,7 @@ module Org::Eclipse::Swt::Widgets
       if (@ignore_select)
         return
       end
-      post_event(SWT::Selection)
+      post_event___org_eclipse_swt_widgets_list_5(SWT::Selection)
     end
     
     typesig { [::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int] }

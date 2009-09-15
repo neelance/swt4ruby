@@ -989,7 +989,7 @@ module Org::Eclipse::Swt::Widgets
           delta = ns_event.delta_y
           if (!(delta).equal?(0))
             if (hooks(SWT::MouseWheel) || filters(SWT::MouseWheel))
-              if (!send_mouse_event(ns_event, SWT::MouseWheel, true))
+              if (!send_mouse_event___org_eclipse_swt_widgets_composite_3(ns_event, SWT::MouseWheel, true))
                 return
               end
             end

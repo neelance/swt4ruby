@@ -267,7 +267,7 @@ module Org::Eclipse::Swt::Widgets
     # int
     # int
     def gtk_value_changed(adjustment)
-      post_event(SWT::Selection)
+      post_event___org_eclipse_swt_widgets_scale_11(SWT::Selection)
       return 0
     end
     

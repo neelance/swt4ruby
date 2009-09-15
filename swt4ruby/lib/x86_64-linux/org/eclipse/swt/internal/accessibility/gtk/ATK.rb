@@ -636,7 +636,7 @@ module Org::Eclipse::Swt::Internal::Accessibility::Gtk
       def call(function, arg0)
         PLATFORM_LOCK.lock
         begin
-          return __call___org_eclipse_swt_internal_accessibility_gtk_atk_1(function, arg0)
+          return __call(function, arg0)
         ensure
           PLATFORM_LOCK.unlock
         end
@@ -660,7 +660,7 @@ module Org::Eclipse::Swt::Internal::Accessibility::Gtk
       def call(function, arg0, arg1)
         PLATFORM_LOCK.lock
         begin
-          return __call___org_eclipse_swt_internal_accessibility_gtk_atk_3(function, arg0, arg1)
+          return __call(function, arg0, arg1)
         ensure
           PLATFORM_LOCK.unlock
         end
@@ -686,7 +686,7 @@ module Org::Eclipse::Swt::Internal::Accessibility::Gtk
       def call(function, arg0, arg1, arg2)
         PLATFORM_LOCK.lock
         begin
-          return __call___org_eclipse_swt_internal_accessibility_gtk_atk_5(function, arg0, arg1, arg2)
+          return __call(function, arg0, arg1, arg2)
         ensure
           PLATFORM_LOCK.unlock
         end
@@ -714,7 +714,7 @@ module Org::Eclipse::Swt::Internal::Accessibility::Gtk
       def call(function, arg0, arg1, arg2, arg3)
         PLATFORM_LOCK.lock
         begin
-          return __call___org_eclipse_swt_internal_accessibility_gtk_atk_7(function, arg0, arg1, arg2, arg3)
+          return __call(function, arg0, arg1, arg2, arg3)
         ensure
           PLATFORM_LOCK.unlock
         end
@@ -744,7 +744,7 @@ module Org::Eclipse::Swt::Internal::Accessibility::Gtk
       def call(function, arg0, arg1, arg2, arg3, arg4)
         PLATFORM_LOCK.lock
         begin
-          return __call___org_eclipse_swt_internal_accessibility_gtk_atk_9(function, arg0, arg1, arg2, arg3, arg4)
+          return __call(function, arg0, arg1, arg2, arg3, arg4)
         ensure
           PLATFORM_LOCK.unlock
         end
@@ -776,7 +776,7 @@ module Org::Eclipse::Swt::Internal::Accessibility::Gtk
       def call(function, arg0, arg1, arg2, arg3, arg4, arg5)
         PLATFORM_LOCK.lock
         begin
-          return __call___org_eclipse_swt_internal_accessibility_gtk_atk_11(function, arg0, arg1, arg2, arg3, arg4, arg5)
+          return __call(function, arg0, arg1, arg2, arg3, arg4, arg5)
         ensure
           PLATFORM_LOCK.unlock
         end

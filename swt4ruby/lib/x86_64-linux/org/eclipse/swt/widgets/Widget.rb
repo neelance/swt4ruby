@@ -1430,7 +1430,7 @@ module Org::Eclipse::Swt::Widgets
     # int
     # int
     def fixed_size_allocate_proc(widget, allocation_ptr)
-      return OS._call(Display.attr_old_fixed_size_allocate_proc_address, widget, allocation_ptr)
+      return OS._call___org_eclipse_swt_widgets_widget_5(Display.attr_old_fixed_size_allocate_proc_address, widget, allocation_ptr)
     end
     
     typesig { [String] }
@@ -1830,7 +1830,7 @@ module Org::Eclipse::Swt::Widgets
       if (send)
         send_event(event)
       else
-        @display.post_event(event)
+        @display.post_event___org_eclipse_swt_widgets_widget_7(event)
       end
     end
     
@@ -1856,7 +1856,7 @@ module Org::Eclipse::Swt::Widgets
         return event.attr_doit
       end
       buffer = Array.typed(::Java::Byte).new(length_) { 0 }
-      OS.memmove___org_eclipse_swt_widgets_widget_5(buffer, key_event.attr_string, length_)
+      OS.memmove___org_eclipse_swt_widgets_widget_9(buffer, key_event.attr_string, length_)
       chars = Converter.mbcs_to_wcs(nil, buffer)
       return !(send_imkey_event(type, key_event, chars)).nil?
     end
@@ -1872,7 +1872,7 @@ module Org::Eclipse::Swt::Widgets
         ptr = OS.gtk_get_current_event
         if (!(ptr).equal?(0))
           key_event = GdkEventKey.new
-          OS.memmove___org_eclipse_swt_widgets_widget_7(key_event, ptr, GdkEventKey.attr_sizeof)
+          OS.memmove___org_eclipse_swt_widgets_widget_11(key_event, ptr, GdkEventKey.attr_sizeof)
           case (key_event.attr_type)
           when OS::GDK_KEY_PRESS, OS::GDK_KEY_RELEASE
             state = key_event.attr_state
@@ -2275,7 +2275,7 @@ module Org::Eclipse::Swt::Widgets
       case (RJava.cast_to_int(user_data))
       when EXPOSE_EVENT_INVERSE
         gdk_event = GdkEventExpose.new
-        OS.memmove___org_eclipse_swt_widgets_widget_9(gdk_event, arg0, GdkEventExpose.attr_sizeof)
+        OS.memmove___org_eclipse_swt_widgets_widget_13(gdk_event, arg0, GdkEventExpose.attr_sizeof)
         # int
         paint_window_ = paint_window
         # int

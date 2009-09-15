@@ -474,7 +474,7 @@ module Org::Eclipse::Swt::Widgets
         end
       end
       if (post_event)
-        post_event(double_click ? SWT::DefaultSelection : SWT::Selection)
+        post_event___org_eclipse_swt_widgets_tree_column_3(double_click ? SWT::DefaultSelection : SWT::Selection)
       end
       return 0
     end
@@ -485,11 +485,11 @@ module Org::Eclipse::Swt::Widgets
     # long
     def gtk_event_after(widget, gdk_event)
       event = GdkEvent.new
-      OS.memmove___org_eclipse_swt_widgets_tree_column_3(event, gdk_event, GdkEvent.attr_sizeof)
+      OS.memmove___org_eclipse_swt_widgets_tree_column_5(event, gdk_event, GdkEvent.attr_sizeof)
       case (event.attr_type)
       when OS::GDK_BUTTON_PRESS
         gdk_event_button = GdkEventButton.new
-        OS.memmove___org_eclipse_swt_widgets_tree_column_5(gdk_event_button, gdk_event, GdkEventButton.attr_sizeof)
+        OS.memmove___org_eclipse_swt_widgets_tree_column_7(gdk_event_button, gdk_event, GdkEventButton.attr_sizeof)
         if ((gdk_event_button.attr_button).equal?(3))
           @parent.show_menu(RJava.cast_to_int(gdk_event_button.attr_x_root), RJava.cast_to_int(gdk_event_button.attr_y_root))
         end

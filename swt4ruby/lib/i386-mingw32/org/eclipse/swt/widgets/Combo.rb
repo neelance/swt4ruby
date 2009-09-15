@@ -2787,7 +2787,7 @@ module Org::Eclipse::Swt::Widgets
         return LRESULT::ZERO
       when SWT::CR
         if (!@ignore_default_selection)
-          post_event(SWT::DefaultSelection)
+          post_event___org_eclipse_swt_widgets_combo_1(SWT::DefaultSelection)
         end
         @ignore_default_selection = false
         if (!((self.attr_style & SWT::DROP_DOWN)).equal?(0))
@@ -2935,7 +2935,7 @@ module Org::Eclipse::Swt::Widgets
           if (is_disposed)
             return LRESULT::ZERO
           end
-          post_event(SWT::Selection)
+          post_event___org_eclipse_swt_widgets_combo_3(SWT::Selection)
         when OS::CBN_SETFOCUS
           send_focus_event(SWT::FocusIn)
           if (is_disposed)

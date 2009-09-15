@@ -1790,7 +1790,7 @@ module Org::Eclipse::Swt::Widgets
             OS._send_message(self.attr_handle, OS::TB_GETITEMRECT, index, rect)
             event.attr_x = rect.attr_left
             event.attr_y = rect.attr_bottom
-            child.post_event(SWT::Selection, event)
+            child.post_event___org_eclipse_swt_widgets_tool_bar_1(SWT::Selection, event)
           end
         when OS::NM_CUSTOMDRAW
           if (OS::COMCTL32_MAJOR < 6)

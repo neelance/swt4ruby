@@ -1324,7 +1324,7 @@ module Org::Eclipse::Swt::Widgets
               event.attr_x = lpnm.attr_left
               event.attr_y = lpnm.attr_bottom
             end
-            item.post_event(SWT::Selection, event)
+            item.post_event___org_eclipse_swt_widgets_cool_bar_1(SWT::Selection, event)
           end
         when OS::NM_CUSTOMDRAW
           # Bug in Windows.  On versions of Windows prior to XP,

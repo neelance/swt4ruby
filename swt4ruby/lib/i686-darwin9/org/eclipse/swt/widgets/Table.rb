@@ -3384,7 +3384,7 @@ module Org::Eclipse::Swt::Widgets
         end
         event = Event.new
         event.attr_item = __get_item(row_index)
-        post_event(SWT::DefaultSelection, event)
+        post_event___org_eclipse_swt_widgets_table_5(SWT::DefaultSelection, event)
       end
     end
     
@@ -3402,7 +3402,7 @@ module Org::Eclipse::Swt::Widgets
       # KP Enter
       when 76, 36
         # Return
-        post_event(SWT::DefaultSelection)
+        post_event___org_eclipse_swt_widgets_table_7(SWT::DefaultSelection)
       end
       return result
     end
@@ -3523,13 +3523,13 @@ module Org::Eclipse::Swt::Widgets
       # 64
       row = RJava.cast_to_int(widget.selected_row)
       if ((row).equal?(-1))
-        post_event(SWT::Selection)
+        post_event___org_eclipse_swt_widgets_table_9(SWT::Selection)
       else
         item = __get_item(row)
         event = Event.new
         event.attr_item = item
         event.attr_index = row
-        post_event(SWT::Selection, event)
+        post_event___org_eclipse_swt_widgets_table_11(SWT::Selection, event)
       end
     end
     
@@ -3544,7 +3544,7 @@ module Org::Eclipse::Swt::Widgets
         return
       end
       # either CHECK column or firstColumn in 0-column Table
-      column.post_event(SWT::Selection)
+      column.post_event___org_eclipse_swt_widgets_table_13(SWT::Selection)
     end
     
     typesig { [::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int] }
@@ -3595,7 +3595,7 @@ module Org::Eclipse::Swt::Widgets
         event.attr_item = item
         # 64
         event.attr_index = RJava.cast_to_int(row_index)
-        post_event(SWT::Selection, event)
+        post_event___org_eclipse_swt_widgets_table_15(SWT::Selection, event)
         item.redraw(-1)
       end
     end
@@ -3703,7 +3703,7 @@ module Org::Eclipse::Swt::Widgets
     # long
     # long
     def table_view_write_rows_with_indexes_to_pasteboard(id, sel, arg0, arg1, arg2)
-      return send_mouse_event(NSApplication.shared_application.current_event, SWT::DragDetect, true)
+      return send_mouse_event___org_eclipse_swt_widgets_table_17(NSApplication.shared_application.current_event, SWT::DragDetect, true)
     end
     
     typesig { [::Java::Int, ::Java::Int, NSRect] }

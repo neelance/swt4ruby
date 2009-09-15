@@ -1187,7 +1187,7 @@ module Org::Eclipse::Swt::Widgets
         end
       end
       if (notify)
-        post_event(SWT::Selection)
+        post_event___org_eclipse_swt_widgets_spinner_1(SWT::Selection)
       end
     end
     
@@ -1496,7 +1496,7 @@ module Org::Eclipse::Swt::Widgets
       case (RJava.cast_to_int(w_param))
       # FALL THROUGH
       when SWT::CR
-        post_event(SWT::DefaultSelection)
+        post_event___org_eclipse_swt_widgets_spinner_3(SWT::DefaultSelection)
         return LRESULT::ZERO
       when SWT::TAB, SWT::ESC
         return LRESULT::ZERO
@@ -1734,7 +1734,7 @@ module Org::Eclipse::Swt::Widgets
       code = OS._loword(w_param)
       case (code)
       when OS::SB_THUMBPOSITION
-        post_event(SWT::Selection)
+        post_event___org_eclipse_swt_widgets_spinner_5(SWT::Selection)
       end
       return super(w_param, l_param)
     end

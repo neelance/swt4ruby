@@ -312,7 +312,7 @@ module Org::Eclipse::Swt::Widgets
       if ((self.attr_handle).equal?(0))
         return 0
       end
-      return OS._call_window_proc(window_proc, hwnd, msg, w_param, l_param)
+      return OS._call_window_proc(window_proc___org_eclipse_swt_widgets_date_time_1, hwnd, msg, w_param, l_param)
     end
     
     class_module.module_eval {
@@ -1126,12 +1126,12 @@ module Org::Eclipse::Swt::Widgets
           end
           systime = SYSTEMTIME.new
           OS._send_message(self.attr_handle, OS::MCM_GETCURSEL, 0, systime)
-          post_event(SWT::Selection)
+          post_event___org_eclipse_swt_widgets_date_time_3(SWT::Selection)
         when OS::DTN_DATETIMECHANGE
           systime = SYSTEMTIME.new
           OS._send_message(self.attr_handle, OS::DTM_GETSYSTEMTIME, 0, systime)
           if ((@last_system_time).nil? || !(systime.attr_w_day).equal?(@last_system_time.attr_w_day) || !(systime.attr_w_month).equal?(@last_system_time.attr_w_month) || !(systime.attr_w_year).equal?(@last_system_time.attr_w_year))
-            post_event(SWT::Selection)
+            post_event___org_eclipse_swt_widgets_date_time_5(SWT::Selection)
             if (((self.attr_style & SWT::TIME)).equal?(0))
               @last_system_time = systime
             end
@@ -1158,7 +1158,7 @@ module Org::Eclipse::Swt::Widgets
       case (RJava.cast_to_int(w_param))
       # FALL THROUGH
       when SWT::CR
-        post_event(SWT::DefaultSelection)
+        post_event___org_eclipse_swt_widgets_date_time_7(SWT::DefaultSelection)
         return LRESULT::ZERO
       when SWT::TAB, SWT::ESC
         return LRESULT::ZERO
@@ -1219,7 +1219,7 @@ module Org::Eclipse::Swt::Widgets
         return LRESULT::ZERO
       end
       if (@double_click)
-        post_event(SWT::DefaultSelection)
+        post_event___org_eclipse_swt_widgets_date_time_9(SWT::DefaultSelection)
       end
       @double_click = false
       return result

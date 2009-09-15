@@ -1330,7 +1330,7 @@ module Org::Eclipse::Swt::Widgets
     def send_selection
       send_event(SWT::Modify)
       if (!@ignore_selection)
-        post_event(SWT::Selection)
+        post_event___org_eclipse_swt_widgets_combo_1(SWT::Selection)
       end
     end
     
@@ -1385,7 +1385,7 @@ module Org::Eclipse::Swt::Widgets
       # KP Enter
       when 76, 36
         # Return
-        post_event(SWT::DefaultSelection)
+        post_event___org_eclipse_swt_widgets_combo_3(SWT::DefaultSelection)
       end
       return result
     end
@@ -1727,7 +1727,7 @@ module Org::Eclipse::Swt::Widgets
     # long
     def should_change_text_in_range_replacement_string(id, sel, affected_char_range, replacement_string)
       range = NSRange.new
-      OS.memmove___org_eclipse_swt_widgets_combo_1(range, affected_char_range, NSRange.attr_sizeof)
+      OS.memmove___org_eclipse_swt_widgets_combo_5(range, affected_char_range, NSRange.attr_sizeof)
       result = call_super_boolean(id, sel, range, replacement_string)
       if (hooks(SWT::Verify))
         text = NSString.new(replacement_string).get_string
@@ -1770,7 +1770,7 @@ module Org::Eclipse::Swt::Widgets
     # long
     def text_did_change(id, sel, a_notification)
       super(id, sel, a_notification)
-      post_event(SWT::Modify)
+      post_event___org_eclipse_swt_widgets_combo_7(SWT::Modify)
     end
     
     typesig { [::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int] }
@@ -1788,7 +1788,7 @@ module Org::Eclipse::Swt::Widgets
       end
       # allow the selection change to proceed
       result = NSRange.new
-      OS.memmove___org_eclipse_swt_widgets_combo_3(result, new_selected_char_range, NSRange.attr_sizeof)
+      OS.memmove___org_eclipse_swt_widgets_combo_9(result, new_selected_char_range, NSRange.attr_sizeof)
       return result
     end
     

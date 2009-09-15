@@ -658,7 +658,7 @@ module Org::Eclipse::Swt::Widgets
     # long
     # long
     def gtk_activate(widget)
-      post_event(SWT::DefaultSelection)
+      post_event___org_eclipse_swt_widgets_spinner_19(SWT::DefaultSelection)
       return 0
     end
     
@@ -678,7 +678,7 @@ module Org::Eclipse::Swt::Widgets
           # long
           h_adjustment = OS.gtk_spin_button_get_adjustment(self.attr_handle)
           adjustment = GtkAdjustment.new
-          OS.memmove___org_eclipse_swt_widgets_spinner_19(adjustment, h_adjustment)
+          OS.memmove___org_eclipse_swt_widgets_spinner_21(adjustment, h_adjustment)
           if (!(value).equal?(adjustment.attr_value) && adjustment.attr_lower <= value && value <= adjustment.attr_upper)
             OS.gtk_spin_button_update(self.attr_handle)
           end
@@ -694,7 +694,7 @@ module Org::Eclipse::Swt::Widgets
       event_ptr = OS.gtk_get_current_event
       if (!(event_ptr).equal?(0))
         gdk_event = GdkEventKey.new
-        OS.memmove___org_eclipse_swt_widgets_spinner_21(gdk_event, event_ptr, GdkEventKey.attr_sizeof)
+        OS.memmove___org_eclipse_swt_widgets_spinner_23(gdk_event, event_ptr, GdkEventKey.attr_sizeof)
         case (gdk_event.attr_type)
         when OS::GDK_KEY_PRESS
           key_press = true
@@ -702,7 +702,7 @@ module Org::Eclipse::Swt::Widgets
         OS.gdk_event_free(event_ptr)
       end
       if (key_press)
-        post_event(SWT::Modify)
+        post_event___org_eclipse_swt_widgets_spinner_25(SWT::Modify)
       else
         send_event(SWT::Modify)
       end
@@ -725,7 +725,7 @@ module Org::Eclipse::Swt::Widgets
         return 0
       end
       buffer = Array.typed(::Java::Byte).new(length_) { 0 }
-      OS.memmove___org_eclipse_swt_widgets_spinner_23(buffer, text, length_)
+      OS.memmove___org_eclipse_swt_widgets_spinner_27(buffer, text, length_)
       chars = Converter.mbcs_to_wcs(nil, buffer)
       new_chars = send_imkey_event(SWT::KeyDown, nil, chars)
       if ((new_chars).nil?)
@@ -821,10 +821,10 @@ module Org::Eclipse::Swt::Widgets
       end
       # 64
       buffer = Array.typed(::Java::Byte).new(RJava.cast_to_int(new_text_length)) { 0 }
-      OS.memmove___org_eclipse_swt_widgets_spinner_25(buffer, new_text, buffer.attr_length)
+      OS.memmove___org_eclipse_swt_widgets_spinner_29(buffer, new_text, buffer.attr_length)
       old_text = String.new(Converter.mbcs_to_wcs(nil, buffer))
       pos = Array.typed(::Java::Int).new(1) { 0 }
-      OS.memmove___org_eclipse_swt_widgets_spinner_27(pos, position, 4)
+      OS.memmove___org_eclipse_swt_widgets_spinner_31(pos, position, 4)
       if ((pos[0]).equal?(-1))
         # long
         ptr = OS.gtk_entry_get_text(self.attr_handle)
@@ -855,7 +855,7 @@ module Org::Eclipse::Swt::Widgets
           @fix_start = new_start[0]
           @fix_end = new_end[0]
         end
-        OS.memmove___org_eclipse_swt_widgets_spinner_29(position, pos, 4)
+        OS.memmove___org_eclipse_swt_widgets_spinner_33(position, pos, 4)
         OS.g_signal_stop_emission_by_name(self.attr_handle, OS.attr_insert_text)
       end
       return 0
@@ -894,7 +894,7 @@ module Org::Eclipse::Swt::Widgets
     # long
     # long
     def gtk_value_changed(widget)
-      post_event(SWT::Selection)
+      post_event___org_eclipse_swt_widgets_spinner_35(SWT::Selection)
       return 0
     end
     
@@ -1096,7 +1096,7 @@ module Org::Eclipse::Swt::Widgets
       # long
       h_adjustment = OS.gtk_spin_button_get_adjustment(self.attr_handle)
       adjustment = GtkAdjustment.new
-      OS.memmove___org_eclipse_swt_widgets_spinner_31(adjustment, h_adjustment)
+      OS.memmove___org_eclipse_swt_widgets_spinner_37(adjustment, h_adjustment)
       new_value = value
       digits = OS.gtk_spin_button_get_digits(self.attr_handle)
       i = 0
@@ -1126,7 +1126,7 @@ module Org::Eclipse::Swt::Widgets
       # long
       h_adjustment = OS.gtk_spin_button_get_adjustment(self.attr_handle)
       adjustment = GtkAdjustment.new
-      OS.memmove___org_eclipse_swt_widgets_spinner_33(adjustment, h_adjustment)
+      OS.memmove___org_eclipse_swt_widgets_spinner_39(adjustment, h_adjustment)
       new_value = value
       digits = OS.gtk_spin_button_get_digits(self.attr_handle)
       i = 0
@@ -1159,7 +1159,7 @@ module Org::Eclipse::Swt::Widgets
       # long
       h_adjustment = OS.gtk_spin_button_get_adjustment(self.attr_handle)
       adjustment = GtkAdjustment.new
-      OS.memmove___org_eclipse_swt_widgets_spinner_35(adjustment, h_adjustment)
+      OS.memmove___org_eclipse_swt_widgets_spinner_41(adjustment, h_adjustment)
       new_value = value
       digits = OS.gtk_spin_button_get_digits(self.attr_handle)
       i = 0
@@ -1194,7 +1194,7 @@ module Org::Eclipse::Swt::Widgets
       # long
       h_adjustment = OS.gtk_spin_button_get_adjustment(self.attr_handle)
       adjustment = GtkAdjustment.new
-      OS.memmove___org_eclipse_swt_widgets_spinner_37(adjustment, h_adjustment)
+      OS.memmove___org_eclipse_swt_widgets_spinner_43(adjustment, h_adjustment)
       new_value = value
       digits = OS.gtk_spin_button_get_digits(self.attr_handle)
       i = 0
@@ -1293,7 +1293,7 @@ module Org::Eclipse::Swt::Widgets
       # long
       h_adjustment = OS.gtk_spin_button_get_adjustment(self.attr_handle)
       adjustment = GtkAdjustment.new
-      OS.memmove___org_eclipse_swt_widgets_spinner_39(adjustment, h_adjustment)
+      OS.memmove___org_eclipse_swt_widgets_spinner_45(adjustment, h_adjustment)
       diff = Math.abs(value - digits)
       factor = 1
       i = 0
@@ -1314,7 +1314,7 @@ module Org::Eclipse::Swt::Widgets
         adjustment.attr_step_increment /= factor
         adjustment.attr_page_increment /= factor
       end
-      OS.memmove___org_eclipse_swt_widgets_spinner_41(h_adjustment, adjustment)
+      OS.memmove___org_eclipse_swt_widgets_spinner_47(h_adjustment, adjustment)
       OS.gtk_spin_button_set_digits(self.attr_handle, value)
     end
     
@@ -1411,7 +1411,7 @@ module Org::Eclipse::Swt::Widgets
       event_ptr = OS.gtk_get_current_event
       if (!(event_ptr).equal?(0))
         gdk_event = GdkEventKey.new
-        OS.memmove___org_eclipse_swt_widgets_spinner_43(gdk_event, event_ptr, GdkEventKey.attr_sizeof)
+        OS.memmove___org_eclipse_swt_widgets_spinner_49(gdk_event, event_ptr, GdkEventKey.attr_sizeof)
         case (gdk_event.attr_type)
         when OS::GDK_KEY_PRESS
           set_key_state(event, gdk_event)
@@ -1431,7 +1431,7 @@ module Org::Eclipse::Swt::Widgets
         # long
         h_adjustment = OS.gtk_spin_button_get_adjustment(self.attr_handle)
         adjustment = GtkAdjustment.new
-        OS.memmove___org_eclipse_swt_widgets_spinner_45(adjustment, h_adjustment)
+        OS.memmove___org_eclipse_swt_widgets_spinner_51(adjustment, h_adjustment)
         if (adjustment.attr_lower < 0 && (string.char_at(0)).equal?(Character.new(?-.ord)))
           index += 1
         end

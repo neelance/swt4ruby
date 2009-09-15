@@ -3861,7 +3861,7 @@ module Org::Eclipse::Swt::Widgets
     typesig { [] }
     def subclass
       # long
-      old_proc = window_proc
+      old_proc = window_proc___org_eclipse_swt_widgets_control_1
       # long
       new_proc = self.attr_display.attr_window_proc
       if ((old_proc).equal?(new_proc))
@@ -4304,7 +4304,7 @@ module Org::Eclipse::Swt::Widgets
     typesig { [] }
     def unsubclass
       # long
-      new_proc = window_proc
+      new_proc = window_proc___org_eclipse_swt_widgets_control_3
       # long
       old_proc = self.attr_display.attr_window_proc
       if ((old_proc).equal?(new_proc))
@@ -4929,14 +4929,14 @@ module Org::Eclipse::Swt::Widgets
             # long
             hwnd_shell = shell.attr_handle
             OS._send_message(hwnd_shell, OS::WM_CANCELMODE, 0, 0)
-            widget.post_event(SWT::Help)
+            widget.post_event___org_eclipse_swt_widgets_control_5(SWT::Help)
             return LRESULT::ONE
           end
         end
         return nil
       end
       if (hooks(SWT::Help))
-        post_event(SWT::Help)
+        post_event___org_eclipse_swt_widgets_control_7(SWT::Help)
         return LRESULT::ONE
       end
       return nil

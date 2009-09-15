@@ -749,7 +749,7 @@ module Org::Eclipse::Swt::Widgets
           if (!@ignore_select)
             event = Event.new
             event.attr_item = item
-            post_event(SWT::Selection, event)
+            post_event___org_eclipse_swt_widgets_tab_folder_1(SWT::Selection, event)
           end
         end
         i += 1

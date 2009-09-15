@@ -6960,12 +6960,12 @@ module Org::Eclipse::Swt::Widgets
           item = __get_item(h_item, RJava.cast_to_int(tv_item.attr_l_param))
           event = Event.new
           event.attr_item = item
-          post_event(SWT::Selection, event)
+          post_event___org_eclipse_swt_widgets_tree_1(SWT::Selection, event)
           if (!((self.attr_style & SWT::CHECK)).equal?(0))
             event = Event.new
             event.attr_item = item
             event.attr_detail = SWT::CHECK
-            post_event(SWT::Selection, event)
+            post_event___org_eclipse_swt_widgets_tree_3(SWT::Selection, event)
           end
         end
         return LRESULT::ZERO
@@ -6982,7 +6982,7 @@ module Org::Eclipse::Swt::Widgets
         if (!(h_item).equal?(0))
           event.attr_item = __get_item(h_item)
         end
-        post_event(SWT::DefaultSelection, event)
+        post_event___org_eclipse_swt_widgets_tree_5(SWT::DefaultSelection, event)
         return LRESULT::ZERO
       when SWT::ESC
         return LRESULT::ZERO
@@ -7137,7 +7137,7 @@ module Org::Eclipse::Swt::Widgets
               event = Event.new
               # 64
               event.attr_item = __get_item(h_new_item, RJava.cast_to_int(tv_item.attr_l_param))
-              post_event(SWT::Selection, event)
+              post_event___org_eclipse_swt_widgets_tree_7(SWT::Selection, event)
               return LRESULT.new(code)
             end
           end
@@ -7292,8 +7292,8 @@ module Org::Eclipse::Swt::Widgets
           if (!((lpht.attr_flags & OS::TVHT_ONITEMSTATEICON)).equal?(0))
             display = self.attr_display
             display.attr_capture_changed = false
-            send_mouse_event(SWT::MouseDown, 1, self.attr_handle, OS::WM_LBUTTONDOWN, w_param, l_param)
-            if (!send_mouse_event(SWT::MouseDoubleClick, 1, self.attr_handle, OS::WM_LBUTTONDBLCLK, w_param, l_param))
+            send_mouse_event___org_eclipse_swt_widgets_tree_9(SWT::MouseDown, 1, self.attr_handle, OS::WM_LBUTTONDOWN, w_param, l_param)
+            if (!send_mouse_event___org_eclipse_swt_widgets_tree_11(SWT::MouseDoubleClick, 1, self.attr_handle, OS::WM_LBUTTONDBLCLK, w_param, l_param))
               if (!display.attr_capture_changed && !is_disposed)
                 if (!(OS._get_capture).equal?(self.attr_handle))
                   OS._set_capture(self.attr_handle)
@@ -7333,7 +7333,7 @@ module Org::Eclipse::Swt::Widgets
             # 64
             event.attr_item = __get_item(tv_item.attr_h_item, RJava.cast_to_int(tv_item.attr_l_param))
             event.attr_detail = SWT::CHECK
-            post_event(SWT::Selection, event)
+            post_event___org_eclipse_swt_widgets_tree_13(SWT::Selection, event)
             return LRESULT::ZERO
           end
         end
@@ -7357,7 +7357,7 @@ module Org::Eclipse::Swt::Widgets
         if (!((lpht.attr_flags & flags)).equal?(0))
           event = Event.new
           event.attr_item = __get_item(lpht.attr_h_item)
-          post_event(SWT::DefaultSelection, event)
+          post_event___org_eclipse_swt_widgets_tree_15(SWT::DefaultSelection, event)
         end
       end
       return result
@@ -7379,7 +7379,7 @@ module Org::Eclipse::Swt::Widgets
       if ((lpht.attr_h_item).equal?(0) || !((lpht.attr_flags & OS::TVHT_ONITEMBUTTON)).equal?(0))
         display = self.attr_display
         display.attr_capture_changed = false
-        if (!send_mouse_event(SWT::MouseDown, 1, self.attr_handle, OS::WM_LBUTTONDOWN, w_param, l_param))
+        if (!send_mouse_event___org_eclipse_swt_widgets_tree_17(SWT::MouseDown, 1, self.attr_handle, OS::WM_LBUTTONDOWN, w_param, l_param))
           if (!display.attr_capture_changed && !is_disposed)
             if (!(OS._get_capture).equal?(self.attr_handle))
               OS._set_capture(self.attr_handle)
@@ -7477,7 +7477,7 @@ module Org::Eclipse::Swt::Widgets
         if (deselected)
           event = Event.new
           event.attr_item = __get_item(lpht.attr_h_item)
-          post_event(SWT::Selection, event)
+          post_event___org_eclipse_swt_widgets_tree_19(SWT::Selection, event)
         end
         return LRESULT.new(code)
       end
@@ -7486,7 +7486,7 @@ module Org::Eclipse::Swt::Widgets
         if (!((lpht.attr_flags & OS::TVHT_ONITEMSTATEICON)).equal?(0))
           display = self.attr_display
           display.attr_capture_changed = false
-          if (!send_mouse_event(SWT::MouseDown, 1, self.attr_handle, OS::WM_LBUTTONDOWN, w_param, l_param))
+          if (!send_mouse_event___org_eclipse_swt_widgets_tree_21(SWT::MouseDown, 1, self.attr_handle, OS::WM_LBUTTONDOWN, w_param, l_param))
             if (!display.attr_capture_changed && !is_disposed)
               if (!(OS._get_capture).equal?(self.attr_handle))
                 OS._set_capture(self.attr_handle)
@@ -7526,7 +7526,7 @@ module Org::Eclipse::Swt::Widgets
           # 64
           event.attr_item = __get_item(tv_item.attr_h_item, RJava.cast_to_int(tv_item.attr_l_param))
           event.attr_detail = SWT::CHECK
-          post_event(SWT::Selection, event)
+          post_event___org_eclipse_swt_widgets_tree_23(SWT::Selection, event)
           return LRESULT::ZERO
         end
       end
@@ -7559,7 +7559,7 @@ module Org::Eclipse::Swt::Widgets
         if (((lpht.attr_flags & OS::TVHT_ONITEM)).equal?(0))
           display = self.attr_display
           display.attr_capture_changed = false
-          if (!send_mouse_event(SWT::MouseDown, 1, self.attr_handle, OS::WM_LBUTTONDOWN, w_param, l_param))
+          if (!send_mouse_event___org_eclipse_swt_widgets_tree_25(SWT::MouseDown, 1, self.attr_handle, OS::WM_LBUTTONDOWN, w_param, l_param))
             if (!display.attr_capture_changed && !is_disposed)
               if (!(OS._get_capture).equal?(self.attr_handle))
                 OS._set_capture(self.attr_handle)
@@ -7636,7 +7636,7 @@ module Org::Eclipse::Swt::Widgets
       # Do the selection
       display = self.attr_display
       display.attr_capture_changed = false
-      if (!send_mouse_event(SWT::MouseDown, 1, self.attr_handle, OS::WM_LBUTTONDOWN, w_param, l_param))
+      if (!send_mouse_event___org_eclipse_swt_widgets_tree_27(SWT::MouseDown, 1, self.attr_handle, OS::WM_LBUTTONDOWN, w_param, l_param))
         if (!display.attr_capture_changed && !is_disposed)
           if (!(OS._get_capture).equal?(self.attr_handle))
             OS._set_capture(self.attr_handle)
@@ -7791,7 +7791,7 @@ module Org::Eclipse::Swt::Widgets
         event = Event.new
         # 64
         event.attr_item = __get_item(tv_item.attr_h_item, RJava.cast_to_int(tv_item.attr_l_param))
-        post_event(SWT::Selection, event)
+        post_event___org_eclipse_swt_widgets_tree_29(SWT::Selection, event)
       end
       @gesture_completed = false
       # Feature in Windows.  Inside WM_LBUTTONDOWN and WM_RBUTTONDOWN,
@@ -7805,7 +7805,7 @@ module Org::Eclipse::Swt::Widgets
       else
         bits = OS._get_window_long(self.attr_handle, OS::GWL_STYLE)
         if (((bits & OS::TVS_DISABLEDRAGDROP)).equal?(0))
-          send_mouse_event(SWT::MouseUp, 1, self.attr_handle, OS::WM_LBUTTONUP, w_param, l_param)
+          send_mouse_event___org_eclipse_swt_widgets_tree_31(SWT::MouseUp, 1, self.attr_handle, OS::WM_LBUTTONUP, w_param, l_param)
         end
       end
       @drag_started = false
@@ -7901,7 +7901,7 @@ module Org::Eclipse::Swt::Widgets
       # the tree.
       display = self.attr_display
       display.attr_capture_changed = false
-      if (!send_mouse_event(SWT::MouseDown, 3, self.attr_handle, OS::WM_RBUTTONDOWN, w_param, l_param))
+      if (!send_mouse_event___org_eclipse_swt_widgets_tree_33(SWT::MouseDown, 3, self.attr_handle, OS::WM_RBUTTONDOWN, w_param, l_param))
         if (!display.attr_capture_changed && !is_disposed)
           if (!(OS._get_capture).equal?(self.attr_handle))
             OS._set_capture(self.attr_handle)
@@ -8565,7 +8565,7 @@ module Org::Eclipse::Swt::Widgets
             event = Event.new
             # 64
             event.attr_item = __get_item(tv_item.attr_h_item, RJava.cast_to_int(tv_item.attr_l_param))
-            post_event(SWT::Selection, event)
+            post_event___org_eclipse_swt_widgets_tree_35(SWT::Selection, event)
           end
           update_scroll_bar
         when OS::TVN_ITEMEXPANDINGA, OS::TVN_ITEMEXPANDINGW
@@ -8821,7 +8821,7 @@ module Org::Eclipse::Swt::Widgets
               while i <= end_
                 column = @columns[order[i]]
                 if (!column.is_disposed)
-                  column.post_event(SWT::Move)
+                  column.post_event___org_eclipse_swt_widgets_tree_37(SWT::Move)
                 end
                 i += 1
               end
@@ -8916,14 +8916,14 @@ module Org::Eclipse::Swt::Widgets
           OS._move_memory(phdn, l_param, NMHEADER.attr_sizeof)
           column = @columns[phdn.attr_i_item]
           if (!(column).nil?)
-            column.post_event(SWT::Selection)
+            column.post_event___org_eclipse_swt_widgets_tree_39(SWT::Selection)
           end
         when OS::HDN_ITEMDBLCLICKW, OS::HDN_ITEMDBLCLICKA
           phdn = NMHEADER.new
           OS._move_memory(phdn, l_param, NMHEADER.attr_sizeof)
           column = @columns[phdn.attr_i_item]
           if (!(column).nil?)
-            column.post_event(SWT::DefaultSelection)
+            column.post_event___org_eclipse_swt_widgets_tree_41(SWT::DefaultSelection)
           end
         end
       end

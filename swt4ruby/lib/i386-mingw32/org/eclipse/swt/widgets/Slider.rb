@@ -755,7 +755,7 @@ module Org::Eclipse::Swt::Widgets
         if ((OS._get_capture).equal?(self.attr_handle))
           OS._release_capture
         end
-        if (!send_mouse_event(SWT::MouseUp, 1, self.attr_handle, OS::WM_LBUTTONUP, w_param, l_param))
+        if (!send_mouse_event___org_eclipse_swt_widgets_slider_1(SWT::MouseUp, 1, self.attr_handle, OS::WM_LBUTTONUP, w_param, l_param))
           return LRESULT::ZERO
         end
       end
@@ -792,7 +792,7 @@ module Org::Eclipse::Swt::Widgets
         if ((OS._get_capture).equal?(self.attr_handle))
           OS._release_capture
         end
-        if (!send_mouse_event(SWT::MouseUp, 1, self.attr_handle, OS::WM_LBUTTONUP, w_param, l_param))
+        if (!send_mouse_event___org_eclipse_swt_widgets_slider_3(SWT::MouseUp, 1, self.attr_handle, OS::WM_LBUTTONUP, w_param, l_param))
           return LRESULT::ONE
         end
       end

@@ -1199,7 +1199,7 @@ module Org::Eclipse::Swt::Widgets
       control = self.attr_display.get_focus_control
       while (!(control).nil?)
         if (control.hooks(SWT::Help))
-          control.post_event(SWT::Help)
+          control.post_event___org_eclipse_swt_widgets_shell_1(SWT::Help)
           break
         end
         control = control.attr_parent
@@ -2067,7 +2067,7 @@ module Org::Eclipse::Swt::Widgets
     # long
     def view_string_for_tool_tip_point_user_data(id, sel, view, tag, point, user_data)
       pt = NSPoint.new
-      OS.memmove___org_eclipse_swt_widgets_shell_1(pt, point, NSPoint.attr_sizeof)
+      OS.memmove___org_eclipse_swt_widgets_shell_3(pt, point, NSPoint.attr_sizeof)
       control = self.attr_display.find_control(false)
       if ((control).nil?)
         return 0
@@ -2174,7 +2174,7 @@ module Org::Eclipse::Swt::Widgets
           end
           self.attr_display.check_enter_exit(trim_control, ns_event, false)
           if (!(trim_control).nil?)
-            trim_control.send_mouse_event(ns_event, type_, false)
+            trim_control.send_mouse_event___org_eclipse_swt_widgets_shell_5(ns_event, type_, false)
           end
         end
         target = nil

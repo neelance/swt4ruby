@@ -1064,7 +1064,7 @@ module Org::Eclipse::Swt::Widgets
       end
       if (!(get_selection).equal?(value))
         set_selection(value)
-        post_event(SWT::Selection)
+        post_event___org_eclipse_swt_widgets_menu_item_1(SWT::Selection)
       end
       return true
     end
@@ -1286,7 +1286,7 @@ module Org::Eclipse::Swt::Widgets
       end
       event = Event.new
       set_input_state(event, SWT::Selection)
-      post_event(SWT::Selection, event)
+      post_event___org_eclipse_swt_widgets_menu_item_3(SWT::Selection, event)
       return nil
     end
     

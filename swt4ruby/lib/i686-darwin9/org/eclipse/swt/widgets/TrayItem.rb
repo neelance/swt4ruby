@@ -619,7 +619,7 @@ module Org::Eclipse::Swt::Widgets
       if (@highlight)
         ns_event = NSEvent.new(the_event)
         if ((ns_event.type).equal?(OS::NSLeftMouseUp))
-          post_event((ns_event.click_count).equal?(2) ? SWT::DefaultSelection : SWT::Selection)
+          post_event___org_eclipse_swt_widgets_tray_item_3((ns_event.click_count).equal?(2) ? SWT::DefaultSelection : SWT::Selection)
         end
       end
       @highlight = false

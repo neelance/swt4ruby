@@ -831,7 +831,7 @@ module Org::Eclipse::Swt::Widgets
     # long
     # long
     def gtk_changed(widget)
-      post_event(SWT::Selection)
+      post_event___org_eclipse_swt_widgets_list_13(SWT::Selection)
       return 0
     end
     
@@ -852,7 +852,7 @@ module Org::Eclipse::Swt::Widgets
       # an unwanted selection event. The workaround is to detect that case and not
       # run the default handler when the item is already part of the current selection.
       gdk_event = GdkEventButton.new
-      OS.memmove___org_eclipse_swt_widgets_list_13(gdk_event, event, GdkEventButton.attr_sizeof)
+      OS.memmove___org_eclipse_swt_widgets_list_15(gdk_event, event, GdkEventButton.attr_sizeof)
       button = gdk_event.attr_button
       if ((button).equal?(3) && (gdk_event.attr_type).equal?(OS::GDK_BUTTON_PRESS))
         # long
@@ -914,11 +914,11 @@ module Org::Eclipse::Swt::Widgets
         # the return key, GTK does not issue notification. The fix is
         # to issue this notification when the return key is pressed.
         key_event = GdkEventKey.new
-        OS.memmove___org_eclipse_swt_widgets_list_15(key_event, event, GdkEventKey.attr_sizeof)
+        OS.memmove___org_eclipse_swt_widgets_list_17(key_event, event, GdkEventKey.attr_sizeof)
         key = key_event.attr_keyval
         case (key)
         when OS::GDK_Return, OS::GDK_KP_Enter
-          post_event(SWT::DefaultSelection)
+          post_event___org_eclipse_swt_widgets_list_19(SWT::DefaultSelection)
         end
       end
       return result
@@ -946,7 +946,7 @@ module Org::Eclipse::Swt::Widgets
     # long
     # long
     def gtk_row_activated(tree, path, column)
-      post_event(SWT::DefaultSelection)
+      post_event___org_eclipse_swt_widgets_list_21(SWT::DefaultSelection)
       return 0
     end
     
@@ -1809,7 +1809,7 @@ module Org::Eclipse::Swt::Widgets
         indices = OS.gtk_tree_path_get_indices(path)
         if (!(indices).equal?(0))
           index = Array.typed(::Java::Int).new(1) { 0 }
-          OS.memmove___org_eclipse_swt_widgets_list_17(index, indices, 4)
+          OS.memmove___org_eclipse_swt_widgets_list_23(index, indices, 4)
           selection[length] = index[0]
         end
       end

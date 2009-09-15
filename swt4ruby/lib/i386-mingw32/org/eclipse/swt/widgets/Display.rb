@@ -6040,7 +6040,7 @@ module Org::Eclipse::Swt::Widgets
       end
       if (!(@last_control).nil? && (@last_hwnd).equal?(hwnd))
         # 64
-        return @last_control.window_proc(hwnd, RJava.cast_to_int(msg), w_param, l_param)
+        return @last_control.window_proc___org_eclipse_swt_widgets_display_1(hwnd, RJava.cast_to_int(msg), w_param, l_param)
       end
       index = 0
       if (USE_PROPERTY)
@@ -6056,7 +6056,7 @@ module Org::Eclipse::Swt::Widgets
           @last_hwnd = hwnd
           @last_control = control
           # 64
-          return control.window_proc(hwnd, RJava.cast_to_int(msg), w_param, l_param)
+          return control.window_proc___org_eclipse_swt_widgets_display_3(hwnd, RJava.cast_to_int(msg), w_param, l_param)
         end
       end
       # 64

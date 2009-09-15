@@ -289,7 +289,7 @@ module Org::Eclipse::Swt::Widgets
     def send_selection
       curr_event = NSApplication.shared_application.current_event
       if (!(curr_event.type).equal?(OS::NSLeftMouseUp))
-        post_event(SWT::Selection)
+        post_event___org_eclipse_swt_widgets_scale_1(SWT::Selection)
       end
     end
     

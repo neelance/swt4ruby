@@ -748,7 +748,7 @@ module Org::Eclipse::Swt::Widgets
         # was disposed within gtk_hide.  The
         # workaroud is to post the event instead
         # of send it on these platforms
-        post_event(SWT::Hide)
+        post_event___org_eclipse_swt_widgets_menu_1(SWT::Hide)
       end
       return 0
     end
@@ -894,13 +894,13 @@ module Org::Eclipse::Swt::Widgets
         end
       end
       if (!(x).equal?(0))
-        OS.memmove___org_eclipse_swt_widgets_menu_1(x, Array.typed(::Java::Int).new([reqx]), 4)
+        OS.memmove___org_eclipse_swt_widgets_menu_3(x, Array.typed(::Java::Int).new([reqx]), 4)
       end
       if (!(y).equal?(0))
-        OS.memmove___org_eclipse_swt_widgets_menu_3(y, Array.typed(::Java::Int).new([reqy]), 4)
+        OS.memmove___org_eclipse_swt_widgets_menu_5(y, Array.typed(::Java::Int).new([reqy]), 4)
       end
       if (!(push_in).equal?(0))
-        OS.memmove___org_eclipse_swt_widgets_menu_5(push_in, Array.typed(::Java::Int).new([1]), 4)
+        OS.memmove___org_eclipse_swt_widgets_menu_7(push_in, Array.typed(::Java::Int).new([1]), 4)
       end
       return 0
     end
@@ -1021,12 +1021,12 @@ module Org::Eclipse::Swt::Widgets
     def send_help_event(help_type)
       if (!(@selected_item).nil? && !@selected_item.is_disposed)
         if (@selected_item.hooks(SWT::Help))
-          @selected_item.post_event(SWT::Help)
+          @selected_item.post_event___org_eclipse_swt_widgets_menu_9(SWT::Help)
           return true
         end
       end
       if (hooks(SWT::Help))
-        post_event(SWT::Help)
+        post_event___org_eclipse_swt_widgets_menu_11(SWT::Help)
         return true
       end
       return @parent.send_help_event(help_type)

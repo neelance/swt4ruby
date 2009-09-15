@@ -2414,7 +2414,7 @@ module Org::Eclipse::Swt::Widgets
             tip = get_current_tool_tip(hwnd)
             if (!(tip).nil?)
               tip.set_visible(false)
-              tip.post_event(SWT::Selection)
+              tip.post_event___org_eclipse_swt_widgets_shell_1(SWT::Selection)
             end
           end
         end

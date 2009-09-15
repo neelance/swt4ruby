@@ -730,7 +730,7 @@ module Org::Eclipse::Swt::Widgets
     # int
     # int
     def gtk_day_selected_double_click(widget)
-      post_event(SWT::DefaultSelection)
+      post_event___org_eclipse_swt_widgets_date_time_1(SWT::DefaultSelection)
       return 0
     end
     
@@ -820,7 +820,7 @@ module Org::Eclipse::Swt::Widgets
         field_name = @field_names[@current_field]
         set_text_field(field_name, @calendar.get_actual_maximum(field_name), true, true)
       when SWT::CR
-        post_event(SWT::DefaultSelection)
+        post_event___org_eclipse_swt_widgets_date_time_3(SWT::DefaultSelection)
       else
         case (event.attr_character)
         when Character.new(?/.ord), Character.new(?:.ord), Character.new(?-.ord), Character.new(?..ord)
@@ -1019,7 +1019,7 @@ module Org::Eclipse::Swt::Widgets
         @year = y[0]
         @month = m[0]
         @day = d[0]
-        post_event(SWT::Selection)
+        post_event___org_eclipse_swt_widgets_date_time_5(SWT::Selection)
       end
     end
     
@@ -1098,7 +1098,7 @@ module Org::Eclipse::Swt::Widgets
         @calendar.roll(Calendar::HOUR_OF_DAY, 12) # TODO: needs more work for setFormat and locale
       end
       @calendar.set(field_name, value)
-      post_event(SWT::Selection)
+      post_event___org_eclipse_swt_widgets_date_time_7(SWT::Selection)
     end
     
     typesig { [::Java::Int, ::Java::Int, ::Java::Boolean, ::Java::Boolean] }

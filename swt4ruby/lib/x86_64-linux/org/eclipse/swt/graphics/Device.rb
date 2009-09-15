@@ -1346,13 +1346,13 @@ module Org::Eclipse::Swt::Graphics
             if (self.attr_debug || device.attr_debug)
               SWTError.new.print_stack_trace
             end
-            OS._call(self.attr_xerror_proc, x_display, x_error_event)
+            OS._call___org_eclipse_swt_graphics_device_7(self.attr_xerror_proc, x_display, x_error_event)
           end
         else
           if (self.attr_debug)
             SWTError.new.print_stack_trace
           end
-          OS._call(self.attr_xerror_proc, x_display, x_error_event)
+          OS._call___org_eclipse_swt_graphics_device_9(self.attr_xerror_proc, x_display, x_error_event)
         end
         return 0
       end
@@ -1371,7 +1371,7 @@ module Org::Eclipse::Swt::Graphics
             SWTError.new.print_stack_trace
           end
         end
-        OS._call(self.attr_xioerror_proc, x_display, 0)
+        OS._call___org_eclipse_swt_graphics_device_11(self.attr_xioerror_proc, x_display, 0)
         return 0
       end
     }

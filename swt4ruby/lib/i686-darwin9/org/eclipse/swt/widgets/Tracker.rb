@@ -978,7 +978,7 @@ module Org::Eclipse::Swt::Widgets
           case (type_)
           # case OS.NSKeyUp:
           when OS::NSLeftMouseUp, OS::NSRightMouseUp, OS::NSOtherMouseUp, OS::NSMouseMoved, OS::NSLeftMouseDragged, OS::NSRightMouseDragged, OS::NSOtherMouseDragged
-            mouse___org_eclipse_swt_widgets_tracker_3(event)
+            mouse(event)
           when OS::NSKeyDown, OS::NSFlagsChanged
             key(event)
           end

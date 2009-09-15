@@ -222,7 +222,7 @@ module Org::Eclipse::Swt::Widgets
     
     typesig { [] }
     def click
-      post_event(SWT::Selection)
+      post_event___org_eclipse_swt_widgets_button_1(SWT::Selection)
     end
     
     typesig { [::Java::Int, ::Java::Int, ::Java::Boolean] }
@@ -669,7 +669,7 @@ module Org::Eclipse::Swt::Widgets
           (self.attr_view).set_state(OS::NSOnState)
         end
       end
-      post_event(SWT::Selection)
+      post_event___org_eclipse_swt_widgets_button_3(SWT::Selection)
     end
     
     typesig { [::Java::Int] }
@@ -851,7 +851,7 @@ module Org::Eclipse::Swt::Widgets
       end
       if (!(get_selection).equal?(value))
         set_selection(value)
-        post_event(SWT::Selection)
+        post_event___org_eclipse_swt_widgets_button_5(SWT::Selection)
       end
       return true
     end

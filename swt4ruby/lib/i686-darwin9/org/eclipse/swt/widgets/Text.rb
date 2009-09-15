@@ -1626,7 +1626,7 @@ module Org::Eclipse::Swt::Widgets
         # KP Enter
         when 76, 36
           # Return
-          post_event(SWT::DefaultSelection)
+          post_event___org_eclipse_swt_widgets_text_5(SWT::DefaultSelection)
         end
       end
       return result
@@ -1639,7 +1639,7 @@ module Org::Eclipse::Swt::Widgets
       end
       event = Event.new
       event.attr_detail = SWT::ICON_SEARCH
-      post_event(SWT::DefaultSelection, event)
+      post_event___org_eclipse_swt_widgets_text_7(SWT::DefaultSelection, event)
     end
     
     typesig { [] }
@@ -1649,7 +1649,7 @@ module Org::Eclipse::Swt::Widgets
       end
       event = Event.new
       event.attr_detail = SWT::ICON_CANCEL
-      post_event(SWT::DefaultSelection, event)
+      post_event___org_eclipse_swt_widgets_text_9(SWT::DefaultSelection, event)
     end
     
     typesig { [] }
@@ -2098,7 +2098,7 @@ module Org::Eclipse::Swt::Widgets
     # long
     def should_change_text_in_range_replacement_string(id, sel, affected_char_range, replacement_string)
       range = NSRange.new
-      OS.memmove___org_eclipse_swt_widgets_text_5(range, affected_char_range, NSRange.attr_sizeof)
+      OS.memmove___org_eclipse_swt_widgets_text_11(range, affected_char_range, NSRange.attr_sizeof)
       result = call_super_boolean(id, sel, range, replacement_string)
       if (!hooks(SWT::Verify) && (@echo_character).equal?(Character.new(?\0.ord)))
         return result
@@ -2186,7 +2186,7 @@ module Org::Eclipse::Swt::Widgets
       if (!((self.attr_style & SWT::SINGLE)).equal?(0))
         super(id, sel, a_notification)
       end
-      post_event(SWT::Modify)
+      post_event___org_eclipse_swt_widgets_text_13(SWT::Modify)
     end
     
     typesig { [::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int] }
@@ -2204,7 +2204,7 @@ module Org::Eclipse::Swt::Widgets
       end
       # allow the selection change to proceed
       result = NSRange.new
-      OS.memmove___org_eclipse_swt_widgets_text_7(result, new_selected_char_range, NSRange.attr_sizeof)
+      OS.memmove___org_eclipse_swt_widgets_text_15(result, new_selected_char_range, NSRange.attr_sizeof)
       return result
     end
     

@@ -698,7 +698,7 @@ module Org::Eclipse::Swt::Widgets
           select_radio
         end
       end
-      post_event(SWT::Selection, event)
+      post_event___org_eclipse_swt_widgets_tool_item_15(SWT::Selection, event)
       return 0
     end
     
@@ -729,11 +729,11 @@ module Org::Eclipse::Swt::Widgets
     # long
     def gtk_event_after(widget, gdk_event)
       event = GdkEvent.new
-      OS.memmove___org_eclipse_swt_widgets_tool_item_15(event, gdk_event, GdkEvent.attr_sizeof)
+      OS.memmove___org_eclipse_swt_widgets_tool_item_17(event, gdk_event, GdkEvent.attr_sizeof)
       case (event.attr_type)
       when OS::GDK_BUTTON_PRESS
         gdk_event_button = GdkEventButton.new
-        OS.memmove___org_eclipse_swt_widgets_tool_item_17(gdk_event_button, gdk_event, GdkEventButton.attr_sizeof)
+        OS.memmove___org_eclipse_swt_widgets_tool_item_19(gdk_event_button, gdk_event, GdkEventButton.attr_sizeof)
         if ((gdk_event_button.attr_button).equal?(3))
           @parent.show_menu(RJava.cast_to_int(gdk_event_button.attr_x_root), RJava.cast_to_int(gdk_event_button.attr_y_root))
         end
@@ -1199,7 +1199,7 @@ module Org::Eclipse::Swt::Widgets
       end
       if (!(get_selection).equal?(value))
         set_selection(value)
-        post_event(SWT::Selection)
+        post_event___org_eclipse_swt_widgets_tool_item_21(SWT::Selection)
       end
       return true
     end

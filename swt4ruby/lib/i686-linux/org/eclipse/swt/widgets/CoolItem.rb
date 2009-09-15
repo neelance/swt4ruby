@@ -538,7 +538,7 @@ module Org::Eclipse::Swt::Widgets
         event.attr_x = bounds.attr_x
         event.attr_y = bounds.attr_y + bounds.attr_height
       end
-      post_event(SWT::Selection, event)
+      post_event___org_eclipse_swt_widgets_cool_item_1(SWT::Selection, event)
     end
     
     typesig { [SelectionListener] }

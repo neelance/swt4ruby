@@ -1169,7 +1169,7 @@ module Org::Eclipse::Swt::Widgets
         if ((code).equal?(OS::TCN_SELCHANGE))
           event = Event.new
           event.attr_item = item
-          post_event(SWT::Selection, event)
+          post_event___org_eclipse_swt_widgets_tab_folder_1(SWT::Selection, event)
         end
       end
       return super(hdr, w_param, l_param)

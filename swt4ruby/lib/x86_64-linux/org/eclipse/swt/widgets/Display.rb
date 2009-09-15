@@ -2675,7 +2675,7 @@ module Org::Eclipse::Swt::Widgets
         if (!(widget).nil?)
           return widget.fixed_size_allocate_proc(handle, allocation)
         end
-        return OS._call(self.attr_old_fixed_size_allocate_proc_address, handle, allocation)
+        return OS._call___org_eclipse_swt_widgets_display_33(self.attr_old_fixed_size_allocate_proc_address, handle, allocation)
       end
       
       typesig { [::Java::Long, ::Java::Long] }
@@ -2684,10 +2684,10 @@ module Org::Eclipse::Swt::Widgets
       # int
       def renderer_class_init_proc(g_class, class_data)
         klass = GtkCellRendererClass.new
-        OS.memmove___org_eclipse_swt_widgets_display_33(klass, g_class)
+        OS.memmove___org_eclipse_swt_widgets_display_35(klass, g_class)
         klass.attr_render = self.attr_renderer_render_proc_address
         klass.attr_get_size = self.attr_renderer_get_size_proc_address
-        OS.memmove___org_eclipse_swt_widgets_display_35(g_class, klass)
+        OS.memmove___org_eclipse_swt_widgets_display_37(g_class, klass)
         return 0
       end
       
@@ -2897,7 +2897,7 @@ module Org::Eclipse::Swt::Widgets
           # int
           border = OS.gtk_entry_get_inner_border(handle)
           if (!(border).equal?(0))
-            OS.memmove___org_eclipse_swt_widgets_display_37(gtk_border, border, GtkBorder.attr_sizeof)
+            OS.memmove___org_eclipse_swt_widgets_display_39(gtk_border, border, GtkBorder.attr_sizeof)
             return gtk_border
           end
           # int
@@ -2905,7 +2905,7 @@ module Org::Eclipse::Swt::Widgets
           border_ptr = Array.typed(::Java::Long).new(1) { 0 }
           OS.gtk_widget_style_get(handle, OS.attr_inner_border, border_ptr, 0)
           if (!(border_ptr[0]).equal?(0))
-            OS.memmove___org_eclipse_swt_widgets_display_39(gtk_border, border_ptr[0], GtkBorder.attr_sizeof)
+            OS.memmove___org_eclipse_swt_widgets_display_41(gtk_border, border_ptr[0], GtkBorder.attr_sizeof)
             OS.gtk_border_free(border_ptr[0])
             return gtk_border
           end
@@ -2948,13 +2948,13 @@ module Org::Eclipse::Swt::Widgets
         # it gets dispatched by GTK.  SWT has been modified to look
         # for negative button numbers.
         mouse_event = XButtonEvent.new
-        OS.memmove___org_eclipse_swt_widgets_display_41(mouse_event, x_event, 4)
+        OS.memmove___org_eclipse_swt_widgets_display_43(mouse_event, x_event, 4)
         if ((mouse_event.attr_type).equal?(OS::ButtonRelease))
-          OS.memmove___org_eclipse_swt_widgets_display_43(mouse_event, x_event, XButtonEvent.attr_sizeof)
+          OS.memmove___org_eclipse_swt_widgets_display_45(mouse_event, x_event, XButtonEvent.attr_sizeof)
           case (mouse_event.attr_button)
           when 6, 7
             mouse_event.attr_button = -mouse_event.attr_button
-            OS.memmove___org_eclipse_swt_widgets_display_45(x_event, mouse_event, XButtonEvent.attr_sizeof)
+            OS.memmove___org_eclipse_swt_widgets_display_47(x_event, mouse_event, XButtonEvent.attr_sizeof)
           end
         end
       end
@@ -3255,7 +3255,7 @@ module Org::Eclipse::Swt::Widgets
     def get_depth
       check_device
       visual = GdkVisual.new
-      OS.memmove___org_eclipse_swt_widgets_display_47(visual, OS.gdk_visual_get_system)
+      OS.memmove___org_eclipse_swt_widgets_display_49(visual, OS.gdk_visual_get_system)
       return visual.attr_depth
     end
     
@@ -3335,12 +3335,12 @@ module Org::Eclipse::Swt::Widgets
       if (!(data[0]).equal?(0))
         if ((actual_length[0]).equal?(16))
           values = Array.typed(::Java::Int).new(4) { 0 }
-          OS.memmove___org_eclipse_swt_widgets_display_49(values, data[0], 16)
+          OS.memmove___org_eclipse_swt_widgets_display_51(values, data[0], 16)
           result = Rectangle.new(values[0], values[1], values[2], values[3])
         else
           if ((actual_length[0]).equal?(32))
             values = Array.typed(::Java::Long).new(4) { 0 }
-            OS.memmove___org_eclipse_swt_widgets_display_51(values, data[0], 32)
+            OS.memmove___org_eclipse_swt_widgets_display_53(values, data[0], 32)
             result = Rectangle.new(RJava.cast_to_int(values[0]), RJava.cast_to_int(values[1]), RJava.cast_to_int(values[2]), RJava.cast_to_int(values[3]))
           end
         end
@@ -4161,7 +4161,7 @@ module Org::Eclipse::Swt::Widgets
             length = OS.strlen(ptr2)
             if (length > 0)
               buffer2 = Array.typed(::Java::Byte).new(length) { 0 }
-              OS.memmove___org_eclipse_swt_widgets_display_53(buffer2, ptr2, length)
+              OS.memmove___org_eclipse_swt_widgets_display_55(buffer2, ptr2, length)
               @window_manager = RJava.cast_to_string(String.new(Converter.mbcs_to_wcs(nil, buffer2)))
             end
           end
@@ -4538,7 +4538,7 @@ module Org::Eclipse::Swt::Widgets
     def pango_layout_new_proc(type, n_construct_properties, construct_properties)
       # int
       # 64
-      layout = OS._call(@pango_layout_new_default_proc, type, RJava.cast_to_int(n_construct_properties), construct_properties)
+      layout = OS._call___org_eclipse_swt_widgets_display_57(@pango_layout_new_default_proc, type, RJava.cast_to_int(n_construct_properties), construct_properties)
       OS.pango_layout_set_auto_dir(layout, false)
       return layout
     end
@@ -5690,7 +5690,7 @@ module Org::Eclipse::Swt::Widgets
               end
               begin
                 @wake = false
-                OS._call(poll, @fds, nfds, @timeout[0])
+                OS._call___org_eclipse_swt_widgets_display_59(poll, @fds, nfds, @timeout[0])
               ensure
                 i_ = 0
                 while i_ < count
@@ -6100,7 +6100,7 @@ module Org::Eclipse::Swt::Widgets
       if ((widget).nil?)
         return 0
       end
-      return widget.window_proc(handle, user_data)
+      return widget.window_proc___org_eclipse_swt_widgets_display_61(handle, user_data)
     end
     
     typesig { [::Java::Long, ::Java::Long, ::Java::Long] }
@@ -6113,7 +6113,7 @@ module Org::Eclipse::Swt::Widgets
       if ((widget).nil?)
         return 0
       end
-      return widget.window_proc(handle, arg0, user_data)
+      return widget.window_proc___org_eclipse_swt_widgets_display_63(handle, arg0, user_data)
     end
     
     typesig { [::Java::Long, ::Java::Long, ::Java::Long, ::Java::Long] }
@@ -6127,7 +6127,7 @@ module Org::Eclipse::Swt::Widgets
       if ((widget).nil?)
         return 0
       end
-      return widget.window_proc(handle, arg0, arg1, user_data)
+      return widget.window_proc___org_eclipse_swt_widgets_display_65(handle, arg0, arg1, user_data)
     end
     
     typesig { [::Java::Long, ::Java::Long, ::Java::Long, ::Java::Long, ::Java::Long] }
@@ -6142,7 +6142,7 @@ module Org::Eclipse::Swt::Widgets
       if ((widget).nil?)
         return 0
       end
-      return widget.window_proc(handle, arg0, arg1, arg2, user_data)
+      return widget.window_proc___org_eclipse_swt_widgets_display_67(handle, arg0, arg1, arg2, user_data)
     end
     
     typesig { [::Java::Long] }

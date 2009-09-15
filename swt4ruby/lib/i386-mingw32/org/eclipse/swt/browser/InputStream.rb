@@ -228,14 +228,14 @@ module Org::Eclipse::Swt::Browser
       while (cnt > 0)
         a_write_count = Array.typed(::Java::Int).new(1) { 0 }
         # long
-        rc = XPCOM._call(a_writer, get_address, a_closure, @buffer, @index, cnt, a_write_count)
+        rc = XPCOM._call___org_eclipse_swt_browser_input_stream_15(a_writer, get_address, a_closure, @buffer, @index, cnt, a_write_count)
         if (!(rc).equal?(XPCOM::NS_OK))
           break
         end
         @index += a_write_count[0]
         cnt -= a_write_count[0]
       end
-      XPCOM.memmove___org_eclipse_swt_browser_input_stream_15(_retval, Array.typed(::Java::Int).new([max - cnt]), 4)
+      XPCOM.memmove___org_eclipse_swt_browser_input_stream_17(_retval, Array.typed(::Java::Int).new([max - cnt]), 4)
       return XPCOM::NS_OK
     end
     
@@ -243,7 +243,7 @@ module Org::Eclipse::Swt::Browser
     # long
     def _is_non_blocking(_retval)
       # blocking
-      XPCOM.memmove___org_eclipse_swt_browser_input_stream_17(_retval, Array.typed(::Java::Int).new([0]), 4)
+      XPCOM.memmove___org_eclipse_swt_browser_input_stream_19(_retval, Array.typed(::Java::Int).new([0]), 4)
       return XPCOM::NS_OK
     end
     

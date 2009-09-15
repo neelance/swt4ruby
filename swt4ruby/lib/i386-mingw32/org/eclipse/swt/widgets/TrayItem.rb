@@ -290,12 +290,12 @@ module Org::Eclipse::Swt::Widgets
       when OS::WM_LBUTTONDOWN
         if (hooks(SWT::Selection))
           OS._set_foreground_window(hwnd)
-          post_event(SWT::Selection)
+          post_event___org_eclipse_swt_widgets_tray_item_1(SWT::Selection)
         end
       when OS::WM_LBUTTONDBLCLK, OS::WM_RBUTTONDBLCLK
         if (hooks(SWT::DefaultSelection))
           OS._set_foreground_window(hwnd)
-          post_event(SWT::DefaultSelection)
+          post_event___org_eclipse_swt_widgets_tray_item_3(SWT::DefaultSelection)
         end
       when OS::WM_RBUTTONUP
         if (hooks(SWT::MenuDetect))
@@ -334,7 +334,7 @@ module Org::Eclipse::Swt::Widgets
           if ((l_param).equal?(OS::NIN_BALLOONUSERCLICK))
             if (@tool_tip.hooks(SWT::Selection))
               OS._set_foreground_window(hwnd)
-              @tool_tip.post_event(SWT::Selection)
+              @tool_tip.post_event___org_eclipse_swt_widgets_tray_item_5(SWT::Selection)
               # widget could be disposed at this point
               if (is_disposed)
                 return 0

@@ -320,7 +320,7 @@ module Org::Eclipse::Swt::Widgets
     # int
     # int
     def gtk_activate(widget)
-      post_event(SWT::Selection)
+      post_event___org_eclipse_swt_widgets_tray_item_3(SWT::Selection)
       # Feature in GTK. GTK will generate a single-click event before sending
       # a double-click event. To know when to send a DefaultSelection, look for
       # the single-click as the current event and for the double-click in the
@@ -339,7 +339,7 @@ module Org::Eclipse::Swt::Widgets
         end
         OS.gdk_event_free(next_event)
         if ((curr_event_type).equal?(OS::GDK_BUTTON_PRESS) && (next_event_type).equal?(OS::GDK_2BUTTON_PRESS))
-          post_event(SWT::DefaultSelection)
+          post_event___org_eclipse_swt_widgets_tray_item_5(SWT::DefaultSelection)
         end
       end
       return 0
@@ -351,7 +351,7 @@ module Org::Eclipse::Swt::Widgets
     # int
     def gtk_button_press_event(widget, event_ptr)
       gdk_event = GdkEventButton.new
-      OS.memmove___org_eclipse_swt_widgets_tray_item_3(gdk_event, event_ptr, GdkEventButton.attr_sizeof)
+      OS.memmove___org_eclipse_swt_widgets_tray_item_7(gdk_event, event_ptr, GdkEventButton.attr_sizeof)
       if ((gdk_event.attr_type).equal?(OS::GDK_3BUTTON_PRESS))
         return 0
       end
@@ -360,9 +360,9 @@ module Org::Eclipse::Swt::Widgets
         return 0
       end
       if ((gdk_event.attr_type).equal?(OS::GDK_2BUTTON_PRESS))
-        post_event(SWT::DefaultSelection)
+        post_event___org_eclipse_swt_widgets_tray_item_9(SWT::DefaultSelection)
       else
-        post_event(SWT::Selection)
+        post_event___org_eclipse_swt_widgets_tray_item_11(SWT::Selection)
       end
       return 0
     end
@@ -383,9 +383,9 @@ module Org::Eclipse::Swt::Widgets
             SWT.error(SWT::ERROR_NO_HANDLES)
           end
           gdk_image = GdkImage.new
-          OS.memmove___org_eclipse_swt_widgets_tray_item_5(gdk_image, gdk_image_ptr)
+          OS.memmove___org_eclipse_swt_widgets_tray_item_13(gdk_image, gdk_image_ptr)
           mask_data = Array.typed(::Java::Byte).new(gdk_image.attr_bpl * gdk_image.attr_height) { 0 }
-          OS.memmove___org_eclipse_swt_widgets_tray_item_7(mask_data, gdk_image.attr_mem, mask_data.attr_length)
+          OS.memmove___org_eclipse_swt_widgets_tray_item_15(mask_data, gdk_image.attr_mem, mask_data.attr_length)
           OS.g_object_unref(gdk_image_ptr)
           region = Region.new(self.attr_display)
           y = 0

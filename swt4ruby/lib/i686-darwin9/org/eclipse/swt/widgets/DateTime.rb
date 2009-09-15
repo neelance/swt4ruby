@@ -387,7 +387,7 @@ module Org::Eclipse::Swt::Widgets
         # KP Enter
         when 76, 36
           # Return
-          post_event(SWT::DefaultSelection)
+          post_event___org_eclipse_swt_widgets_date_time_1(SWT::DefaultSelection)
         end
       end
       return result
@@ -398,15 +398,15 @@ module Org::Eclipse::Swt::Widgets
       event = NSApplication.shared_application.current_event
       if (!(event).nil? && !((self.attr_style & SWT::CALENDAR)).equal?(0))
         if ((event.click_count).equal?(2))
-          post_event(SWT::DefaultSelection)
+          post_event___org_eclipse_swt_widgets_date_time_3(SWT::DefaultSelection)
         else
           if ((event.type).equal?(OS::NSLeftMouseUp))
-            post_event(SWT::Selection)
+            post_event___org_eclipse_swt_widgets_date_time_5(SWT::Selection)
           end
         end
       else
         # SWT.DATE or SWT.TIME
-        post_event(SWT::Selection)
+        post_event___org_eclipse_swt_widgets_date_time_7(SWT::Selection)
       end
     end
     

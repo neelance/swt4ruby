@@ -1872,7 +1872,7 @@ module Org::Eclipse::Swt::Widgets
               end
               OS._send_message(self.attr_handle, OS::LB_SETSEL, !(code).equal?(0) ? 0 : 1, index)
               OS._send_message(self.attr_handle, OS::LB_SETANCHORINDEX, index, 0)
-              post_event(SWT::Selection)
+              post_event___org_eclipse_swt_widgets_list_1(SWT::Selection)
               return LRESULT::ZERO
             end
           end
@@ -2049,9 +2049,9 @@ module Org::Eclipse::Swt::Widgets
       code = OS._hiword(w_param)
       case (code)
       when OS::LBN_SELCHANGE
-        post_event(SWT::Selection)
+        post_event___org_eclipse_swt_widgets_list_3(SWT::Selection)
       when OS::LBN_DBLCLK
-        post_event(SWT::DefaultSelection)
+        post_event___org_eclipse_swt_widgets_list_5(SWT::DefaultSelection)
       end
       return super(w_param, l_param)
     end

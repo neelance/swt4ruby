@@ -563,7 +563,7 @@ module Org::Eclipse::Swt::Widgets
           end
         end
       end
-      post_event(SWT::Selection)
+      post_event___org_eclipse_swt_widgets_button_3(SWT::Selection)
       return 0
     end
     
@@ -886,7 +886,7 @@ module Org::Eclipse::Swt::Widgets
       end
       if (!(get_selection).equal?(value))
         set_selection(value)
-        post_event(SWT::Selection)
+        post_event___org_eclipse_swt_widgets_button_5(SWT::Selection)
       end
       return true
     end

@@ -669,7 +669,7 @@ module Org::Eclipse::Swt::Widgets
           if (!(index).equal?(-1))
             event.attr_item = __get_item(index)
           end
-          post_event(SWT::Selection, event)
+          post_event___org_eclipse_swt_widgets_table_1(SWT::Selection, event)
         end
         @was_selected = old_selected
       end
@@ -4242,7 +4242,7 @@ module Org::Eclipse::Swt::Widgets
     def send_mouse_down_event(type, button, msg, w_param, l_param)
       display = self.attr_display
       display.attr_capture_changed = false
-      if (!send_mouse_event(type, button, self.attr_handle, msg, w_param, l_param))
+      if (!send_mouse_event___org_eclipse_swt_widgets_table_3(type, button, self.attr_handle, msg, w_param, l_param))
         if (!display.attr_capture_changed && !is_disposed)
           if (!(OS._get_capture).equal?(self.attr_handle))
             OS._set_capture(self.attr_handle)
@@ -4407,7 +4407,7 @@ module Org::Eclipse::Swt::Widgets
           fake_mouse_up = ((pinfo.attr_flags & OS::LVHT_ONITEMSTATEICON)).equal?(0)
         end
         if (fake_mouse_up)
-          send_mouse_event(SWT::MouseUp, button, self.attr_handle, msg, w_param, l_param)
+          send_mouse_event___org_eclipse_swt_widgets_table_5(SWT::MouseUp, button, self.attr_handle, msg, w_param, l_param)
         end
       end
       return LRESULT.new(code)
@@ -6508,7 +6508,7 @@ module Org::Eclipse::Swt::Widgets
         if (!(index).equal?(-1))
           event = Event.new
           event.attr_item = __get_item(index)
-          post_event(SWT::DefaultSelection, event)
+          post_event___org_eclipse_swt_widgets_table_7(SWT::DefaultSelection, event)
         end
         return LRESULT::ZERO
       end
@@ -6675,8 +6675,8 @@ module Org::Eclipse::Swt::Widgets
       index = RJava.cast_to_int(OS._send_message(self.attr_handle, OS::LVM_HITTEST, 0, pinfo))
       display = self.attr_display
       display.attr_capture_changed = false
-      send_mouse_event(SWT::MouseDown, 1, self.attr_handle, OS::WM_LBUTTONDOWN, w_param, l_param)
-      if (!send_mouse_event(SWT::MouseDoubleClick, 1, self.attr_handle, OS::WM_LBUTTONDBLCLK, w_param, l_param))
+      send_mouse_event___org_eclipse_swt_widgets_table_9(SWT::MouseDown, 1, self.attr_handle, OS::WM_LBUTTONDOWN, w_param, l_param)
+      if (!send_mouse_event___org_eclipse_swt_widgets_table_11(SWT::MouseDoubleClick, 1, self.attr_handle, OS::WM_LBUTTONDBLCLK, w_param, l_param))
         if (!display.attr_capture_changed && !is_disposed)
           if (!(OS._get_capture).equal?(self.attr_handle))
             OS._set_capture(self.attr_handle)
@@ -6870,8 +6870,8 @@ module Org::Eclipse::Swt::Widgets
       OS._send_message(self.attr_handle, OS::LVM_HITTEST, 0, pinfo)
       display = self.attr_display
       display.attr_capture_changed = false
-      send_mouse_event(SWT::MouseDown, 3, self.attr_handle, OS::WM_RBUTTONDOWN, w_param, l_param)
-      if (send_mouse_event(SWT::MouseDoubleClick, 3, self.attr_handle, OS::WM_RBUTTONDBLCLK, w_param, l_param))
+      send_mouse_event___org_eclipse_swt_widgets_table_13(SWT::MouseDown, 3, self.attr_handle, OS::WM_RBUTTONDOWN, w_param, l_param)
+      if (send_mouse_event___org_eclipse_swt_widgets_table_15(SWT::MouseDoubleClick, 3, self.attr_handle, OS::WM_RBUTTONDBLCLK, w_param, l_param))
         if (!(pinfo.attr_i_item).equal?(-1))
           call_window_proc(self.attr_handle, OS::WM_RBUTTONDBLCLK, w_param, l_param)
         end
@@ -7533,7 +7533,7 @@ module Org::Eclipse::Swt::Widgets
           OS._move_memory(pnmlv, l_param, NMLISTVIEW.attr_sizeof)
           column = @columns[pnmlv.attr_i_sub_item]
           if (!(column).nil?)
-            column.post_event(SWT::Selection)
+            column.post_event___org_eclipse_swt_widgets_table_17(SWT::Selection)
           end
         when OS::LVN_ITEMACTIVATE
           if (@ignore_activate)
@@ -7544,7 +7544,7 @@ module Org::Eclipse::Swt::Widgets
           if (!(pnmlv.attr_i_item).equal?(-1))
             event = Event.new
             event.attr_item = __get_item(pnmlv.attr_i_item)
-            post_event(SWT::DefaultSelection, event)
+            post_event___org_eclipse_swt_widgets_table_19(SWT::DefaultSelection, event)
           end
         when OS::LVN_ITEMCHANGED
           if (@full_row_select)
@@ -7740,7 +7740,7 @@ module Org::Eclipse::Swt::Widgets
               while i <= end_
                 column = @columns[order[i]]
                 if (!column.is_disposed)
-                  column.post_event(SWT::Move)
+                  column.post_event___org_eclipse_swt_widgets_table_21(SWT::Move)
                 end
                 i += 1
               end
@@ -7811,7 +7811,7 @@ module Org::Eclipse::Swt::Widgets
           OS._move_memory(phdn, l_param, NMHEADER.attr_sizeof)
           column = @columns[phdn.attr_i_item]
           if (!(column).nil?)
-            column.post_event(SWT::DefaultSelection)
+            column.post_event___org_eclipse_swt_widgets_table_23(SWT::DefaultSelection)
           end
         end
       end

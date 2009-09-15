@@ -2311,7 +2311,7 @@ module Org::Eclipse::Swt::Widgets
         return
       end
       # either CHECK column or firstColumn in 0-column Tree
-      column.post_event(SWT::Selection)
+      column.post_event___org_eclipse_swt_widgets_tree_5(SWT::Selection)
     end
     
     typesig { [::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int] }
@@ -2534,14 +2534,14 @@ module Org::Eclipse::Swt::Widgets
       # 64
       row = RJava.cast_to_int(widget.selected_row)
       if ((row).equal?(-1))
-        post_event(SWT::Selection)
+        post_event___org_eclipse_swt_widgets_tree_7(SWT::Selection)
       else
         _id = widget.item_at_row(row)
         item = self.attr_display.get_widget(_id.attr_id)
         event = Event.new
         event.attr_item = item
         event.attr_index = row
-        post_event(SWT::Selection, event)
+        post_event___org_eclipse_swt_widgets_tree_9(SWT::Selection, event)
       end
     end
     
@@ -2559,7 +2559,7 @@ module Org::Eclipse::Swt::Widgets
         event = Event.new
         event.attr_detail = SWT::CHECK
         event.attr_item = item
-        post_event(SWT::Selection, event)
+        post_event___org_eclipse_swt_widgets_tree_11(SWT::Selection, event)
         item.redraw(-1)
       end
     end
@@ -2571,7 +2571,7 @@ module Org::Eclipse::Swt::Widgets
     # long
     # long
     def outline_view_write_items_to_pasteboard(id, sel, arg0, arg1, arg2)
-      return send_mouse_event(NSApplication.shared_application.current_event, SWT::DragDetect, true)
+      return send_mouse_event___org_eclipse_swt_widgets_tree_13(NSApplication.shared_application.current_event, SWT::DragDetect, true)
     end
     
     typesig { [] }
@@ -2850,7 +2850,7 @@ module Org::Eclipse::Swt::Widgets
         item = self.attr_display.get_widget(outline_view.item_at_row(row_index).attr_id)
         event = Event.new
         event.attr_item = item
-        post_event(SWT::DefaultSelection, event)
+        post_event___org_eclipse_swt_widgets_tree_15(SWT::DefaultSelection, event)
       end
     end
     
@@ -2868,7 +2868,7 @@ module Org::Eclipse::Swt::Widgets
       # KP Enter
       when 76, 36
         # Return
-        post_event(SWT::DefaultSelection)
+        post_event___org_eclipse_swt_widgets_tree_17(SWT::DefaultSelection)
       end
       return result
     end

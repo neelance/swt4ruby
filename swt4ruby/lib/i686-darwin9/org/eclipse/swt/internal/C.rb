@@ -294,7 +294,7 @@ module Org::Eclipse::Swt::Internal
     end
     
     private
-    alias_method :initialize__c, :initialize
+    alias_method :initialize__c___org_eclipse_swt_internal_c_0, :initialize
   end
   
 end

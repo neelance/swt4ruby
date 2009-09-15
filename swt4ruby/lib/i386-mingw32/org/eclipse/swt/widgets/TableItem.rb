@@ -1053,7 +1053,7 @@ module Org::Eclipse::Swt::Widgets
         event = Event.new
         event.attr_item = self
         event.attr_detail = SWT::CHECK
-        @parent.post_event(SWT::Selection, event)
+        @parent.post_event___org_eclipse_swt_widgets_table_item_1(SWT::Selection, event)
       end
       redraw
     end

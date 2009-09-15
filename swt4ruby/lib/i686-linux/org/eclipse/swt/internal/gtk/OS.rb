@@ -2237,7 +2237,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       def call(function, arg0, arg1, arg2, arg3, arg4, arg5, arg6)
         PLATFORM_LOCK.lock
         begin
-          return __call___org_eclipse_swt_internal_gtk_os_1(function, arg0, arg1, arg2, arg3, arg4, arg5, arg6)
+          return __call(function, arg0, arg1, arg2, arg3, arg4, arg5, arg6)
         ensure
           PLATFORM_LOCK.unlock
         end

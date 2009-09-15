@@ -498,7 +498,7 @@ module Org::Eclipse::Swt::Widgets
             if (!((self.attr_style & SWT::MIRRORED)).equal?(0))
               event.attr_x = get_client_width - OS._gtk_widget_width(top_handle_) - event.attr_x
             end
-            item.post_event(SWT::Selection, event)
+            item.post_event___org_eclipse_swt_widgets_tool_bar_3(SWT::Selection, event)
             return result
           end
         end

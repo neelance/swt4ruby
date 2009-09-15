@@ -183,7 +183,7 @@ module Org::Eclipse::Swt::Internal::Win32
           # long
           dll_get_version = OS._get_proc_address(h_module, lp_proc_name)
           if (!(dll_get_version).equal?(0))
-            OS._call(dll_get_version, dvi)
+            OS._call___org_eclipse_swt_internal_win32_os_1(dll_get_version, dvi)
           end
           OS._free_library(h_module)
         end
@@ -211,7 +211,7 @@ module Org::Eclipse::Swt::Internal::Win32
           # long
           dll_get_version = OS._get_proc_address(h_module, lp_proc_name)
           if (!(dll_get_version).equal?(0))
-            OS._call(dll_get_version, dvi)
+            OS._call___org_eclipse_swt_internal_win32_os_3(dll_get_version, dvi)
           end
           OS._free_library(h_module)
         end

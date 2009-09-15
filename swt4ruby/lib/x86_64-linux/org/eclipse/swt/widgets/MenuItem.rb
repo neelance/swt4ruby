@@ -497,7 +497,7 @@ module Org::Eclipse::Swt::Widgets
           select_radio
         end
       end
-      post_event(SWT::Selection, event)
+      post_event___org_eclipse_swt_widgets_menu_item_3(SWT::Selection, event)
       return 0
     end
     
@@ -517,7 +517,7 @@ module Org::Eclipse::Swt::Widgets
     def gtk_show_help(widget, help_type)
       handled = hooks(SWT::Help)
       if (handled)
-        post_event(SWT::Help)
+        post_event___org_eclipse_swt_widgets_menu_item_5(SWT::Help)
       else
         handled = @parent.send_help_event(help_type)
       end
@@ -893,7 +893,7 @@ module Org::Eclipse::Swt::Widgets
       end
       if (!(get_selection).equal?(value))
         set_selection(value)
-        post_event(SWT::Selection)
+        post_event___org_eclipse_swt_widgets_menu_item_7(SWT::Selection)
       end
       return true
     end
@@ -986,7 +986,7 @@ module Org::Eclipse::Swt::Widgets
       buffer = Converter.wcs_to_mbcs(nil, accel_string, true)
       # int
       ptr = OS.g_malloc(buffer.attr_length)
-      OS.memmove___org_eclipse_swt_widgets_menu_item_3(ptr, buffer, buffer.attr_length)
+      OS.memmove___org_eclipse_swt_widgets_menu_item_9(ptr, buffer, buffer.attr_length)
       # int
       old_ptr = OS._gtk_accel_label_get_accel_string(label)
       OS._gtk_accel_label_set_accel_string(label, ptr)

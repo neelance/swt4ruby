@@ -675,7 +675,7 @@ module Org::Eclipse::Swt::Widgets
         event.attr_detail = SWT::ARROW
         event.attr_x = RJava.cast_to_int(frame_.attr_x)
         event.attr_y = RJava.cast_to_int((frame_.attr_y + frame_.attr_height))
-        post_event(SWT::Selection, event)
+        post_event___org_eclipse_swt_widgets_tool_item_1(SWT::Selection, event)
       end
     end
     
@@ -860,7 +860,7 @@ module Org::Eclipse::Swt::Widgets
       if (!((self.attr_style & SWT::CHECK)).equal?(0))
         set_selection(!get_selection)
       end
-      post_event(SWT::Selection)
+      post_event___org_eclipse_swt_widgets_tool_item_3(SWT::Selection)
     end
     
     typesig { [::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int] }
@@ -1031,7 +1031,7 @@ module Org::Eclipse::Swt::Widgets
       end
       if (!(get_selection).equal?(value))
         set_selection(value)
-        post_event(SWT::Selection)
+        post_event___org_eclipse_swt_widgets_tool_item_5(SWT::Selection)
       end
       return true
     end
