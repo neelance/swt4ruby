@@ -29,7 +29,14 @@ field_name_mapping:
   fixedClassInitProc: fixed_class_init_proc_address
   fixedMapProc: fixed_map_proc_address
   fixedSizeAllocateProc: fixed_size_allocate_proc_address
-  oldFixedSizeAllocateProc: old_fixed_size_allocate_proc
-  rendererClassInitProc: renderer_class_init_proc
-  rendererRenderProc: renderer_render_proc
-  rendererGetSizeProc: renderer_get_size_proc
+  oldFixedSizeAllocateProc: old_fixed_size_allocate_proc_address
+  rendererClassInitProc: renderer_class_init_proc_address
+  rendererRenderProc: renderer_render_proc_address
+  rendererGetSizeProc: renderer_get_size_proc_address
+explicit_calls:
+  _call
+  memmove
+  post_event
+  send_event
+  send_mouse_event
+  window_proc
