@@ -538,7 +538,7 @@ module Org::Eclipse::Swt::Widgets
         # Send the event because WM_HSCROLL and WM_VSCROLL
         # are sent from a modal message loop in windows that
         # is active when the user is scrolling.
-        send_event(SWT::Selection)
+        send_event___org_eclipse_swt_widgets_scale_1(SWT::Selection)
         # widget could be disposed at this point
       end
       return LRESULT.new(code)
@@ -617,7 +617,7 @@ module Org::Eclipse::Swt::Widgets
         # Send the event because WM_HSCROLL and WM_VSCROLL
         # are sent from a modal message loop in windows that
         # is active when the user is scrolling.
-        send_event(SWT::Selection, event)
+        send_event___org_eclipse_swt_widgets_scale_3(SWT::Selection, event)
         # widget could be disposed at this point
       end
       return nil

@@ -1007,7 +1007,7 @@ module Org::Eclipse::Swt::Widgets
             bar.set_selection(selection)
             event = Event.new
             event.attr_detail = delta > 0 ? SWT::PAGE_UP : SWT::PAGE_DOWN
-            bar.send_event(SWT::Selection, event)
+            bar.send_event___org_eclipse_swt_widgets_composite_5(SWT::Selection, event)
             handled = true
           end
           bar = self.attr_horizontal_bar
@@ -1017,7 +1017,7 @@ module Org::Eclipse::Swt::Widgets
             bar.set_selection(selection)
             event = Event.new
             event.attr_detail = delta > 0 ? SWT::PAGE_UP : SWT::PAGE_DOWN
-            bar.send_event(SWT::Selection, event)
+            bar.send_event___org_eclipse_swt_widgets_composite_7(SWT::Selection, event)
             handled = true
           end
           if (!handled)

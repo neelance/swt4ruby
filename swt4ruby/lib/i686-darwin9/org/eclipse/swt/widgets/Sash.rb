@@ -440,7 +440,7 @@ module Org::Eclipse::Swt::Widgets
             event.attr_y = new_y
             event.attr_width = width
             event.attr_height = height
-            send_event(SWT::Selection, event)
+            send_event___org_eclipse_swt_widgets_sash_1(SWT::Selection, event)
             if (is_disposed)
               throw :break_case, :thrown
             end
@@ -493,7 +493,7 @@ module Org::Eclipse::Swt::Widgets
       event.attr_y = RJava.cast_to_int(frame_.attr_y)
       event.attr_width = RJava.cast_to_int(frame_.attr_width)
       event.attr_height = RJava.cast_to_int(frame_.attr_height)
-      send_event(SWT::Selection, event)
+      send_event___org_eclipse_swt_widgets_sash_3(SWT::Selection, event)
       if (is_disposed)
         return
       end
@@ -547,7 +547,7 @@ module Org::Eclipse::Swt::Widgets
       event.attr_y = new_y
       event.attr_width = RJava.cast_to_int(frame_.attr_width)
       event.attr_height = RJava.cast_to_int(frame_.attr_height)
-      send_event(SWT::Selection, event)
+      send_event___org_eclipse_swt_widgets_sash_5(SWT::Selection, event)
       if (is_disposed)
         return
       end
@@ -578,7 +578,7 @@ module Org::Eclipse::Swt::Widgets
       event.attr_y = @last_y
       event.attr_width = RJava.cast_to_int(frame_.attr_width)
       event.attr_height = RJava.cast_to_int(frame_.attr_height)
-      send_event(SWT::Selection, event)
+      send_event___org_eclipse_swt_widgets_sash_7(SWT::Selection, event)
       if (is_disposed)
         return
       end

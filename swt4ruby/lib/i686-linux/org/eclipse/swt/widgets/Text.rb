@@ -1299,7 +1299,7 @@ module Org::Eclipse::Swt::Widgets
       if (key_press)
         post_event___org_eclipse_swt_widgets_text_11(SWT::Modify)
       else
-        send_event(SWT::Modify)
+        send_event___org_eclipse_swt_widgets_text_13(SWT::Modify)
       end
       return 0
     end
@@ -1322,7 +1322,7 @@ module Org::Eclipse::Swt::Widgets
         return 0
       end
       buffer = Array.typed(::Java::Byte).new(length_) { 0 }
-      OS.memmove___org_eclipse_swt_widgets_text_13(buffer, text, length_)
+      OS.memmove___org_eclipse_swt_widgets_text_15(buffer, text, length_)
       chars = Converter.mbcs_to_wcs(nil, buffer)
       new_chars = send_imkey_event(SWT::KeyDown, nil, chars)
       if ((new_chars).nil?)
@@ -1367,8 +1367,8 @@ module Org::Eclipse::Swt::Widgets
       end
       start_iter = Array.typed(::Java::Byte).new(ITER_SIZEOF) { 0 }
       end_iter = Array.typed(::Java::Byte).new(ITER_SIZEOF) { 0 }
-      OS.memmove___org_eclipse_swt_widgets_text_15(start_iter, iter1, start_iter.attr_length)
-      OS.memmove___org_eclipse_swt_widgets_text_17(end_iter, iter2, end_iter.attr_length)
+      OS.memmove___org_eclipse_swt_widgets_text_17(start_iter, iter1, start_iter.attr_length)
+      OS.memmove___org_eclipse_swt_widgets_text_19(end_iter, iter2, end_iter.attr_length)
       start = OS.gtk_text_iter_get_offset(start_iter)
       end_ = OS.gtk_text_iter_get_offset(end_iter)
       new_text = verify_text("", start, end_)
@@ -1452,11 +1452,11 @@ module Org::Eclipse::Swt::Widgets
       # use the correct value.
       if (!((self.attr_style & SWT::SINGLE)).equal?(0) && self.attr_display.attr_entry_select_on_focus)
         event = GdkEvent.new
-        OS.memmove___org_eclipse_swt_widgets_text_19(event, gdk_event, GdkEvent.attr_sizeof)
+        OS.memmove___org_eclipse_swt_widgets_text_21(event, gdk_event, GdkEvent.attr_sizeof)
         case (event.attr_type)
         when OS::GDK_FOCUS_CHANGE
           gdk_event_focus = GdkEventFocus.new
-          OS.memmove___org_eclipse_swt_widgets_text_21(gdk_event_focus, gdk_event, GdkEventFocus.attr_sizeof)
+          OS.memmove___org_eclipse_swt_widgets_text_23(gdk_event_focus, gdk_event, GdkEventFocus.attr_sizeof)
           if ((gdk_event_focus.attr_in).equal?(0))
             # long
             settings = OS.gtk_settings_get_default
@@ -1482,7 +1482,7 @@ module Org::Eclipse::Swt::Widgets
         str = OS.gtk_entry_get_text(self.attr_handle)
         if (!OS._gtk_widget_has_focus(self.attr_handle) && (OS.strlen(str)).equal?(0))
           gdk_event = GdkEventExpose.new
-          OS.memmove___org_eclipse_swt_widgets_text_23(gdk_event, event, GdkEventExpose.attr_sizeof)
+          OS.memmove___org_eclipse_swt_widgets_text_25(gdk_event, event, GdkEventExpose.attr_sizeof)
           # long
           window = paint_window
           w = Array.typed(::Java::Int).new(1) { 0 }
@@ -1593,10 +1593,10 @@ module Org::Eclipse::Swt::Widgets
       end
       # 64
       buffer = Array.typed(::Java::Byte).new(RJava.cast_to_int(new_text_length)) { 0 }
-      OS.memmove___org_eclipse_swt_widgets_text_25(buffer, new_text, buffer.attr_length)
+      OS.memmove___org_eclipse_swt_widgets_text_27(buffer, new_text, buffer.attr_length)
       old_text = String.new(Converter.mbcs_to_wcs(nil, buffer))
       pos = Array.typed(::Java::Int).new(1) { 0 }
-      OS.memmove___org_eclipse_swt_widgets_text_27(pos, position, 4)
+      OS.memmove___org_eclipse_swt_widgets_text_29(pos, position, 4)
       if ((pos[0]).equal?(-1))
         # long
         ptr = OS.gtk_entry_get_text(self.attr_handle)
@@ -1635,7 +1635,7 @@ module Org::Eclipse::Swt::Widgets
           @fix_start = new_start[0]
           @fix_end = new_end[0]
         end
-        OS.memmove___org_eclipse_swt_widgets_text_29(position, pos, 4)
+        OS.memmove___org_eclipse_swt_widgets_text_31(position, pos, 4)
         OS.g_signal_stop_emission_by_name(self.attr_handle, OS.attr_insert_text)
       end
       return 0
@@ -1681,7 +1681,7 @@ module Org::Eclipse::Swt::Widgets
         return 0
       end
       position = Array.typed(::Java::Byte).new(ITER_SIZEOF) { 0 }
-      OS.memmove___org_eclipse_swt_widgets_text_31(position, iter, position.attr_length)
+      OS.memmove___org_eclipse_swt_widgets_text_33(position, iter, position.attr_length)
       # Use the selection when the text was deleted
       start = OS.gtk_text_iter_get_offset(position)
       end_ = start
@@ -1692,7 +1692,7 @@ module Org::Eclipse::Swt::Widgets
       end
       # 64
       buffer = Array.typed(::Java::Byte).new(RJava.cast_to_int(length_)) { 0 }
-      OS.memmove___org_eclipse_swt_widgets_text_33(buffer, text, buffer.attr_length)
+      OS.memmove___org_eclipse_swt_widgets_text_35(buffer, text, buffer.attr_length)
       old_text = String.new(Converter.mbcs_to_wcs(nil, buffer))
       new_text = verify_text(old_text, start, end_)
       if ((new_text).nil?)
@@ -2314,7 +2314,7 @@ module Org::Eclipse::Swt::Widgets
         mark = OS.gtk_text_buffer_get_insert(@buffer_handle)
         OS.gtk_text_view_scroll_mark_onscreen(self.attr_handle, mark)
       end
-      send_event(SWT::Modify)
+      send_event___org_eclipse_swt_widgets_text_37(SWT::Modify)
     end
     
     typesig { [::Java::Int] }
@@ -2450,7 +2450,7 @@ module Org::Eclipse::Swt::Widgets
       event_ptr = OS.gtk_get_current_event
       if (!(event_ptr).equal?(0))
         gdk_event = GdkEventKey.new
-        OS.memmove___org_eclipse_swt_widgets_text_35(gdk_event, event_ptr, GdkEventKey.attr_sizeof)
+        OS.memmove___org_eclipse_swt_widgets_text_39(gdk_event, event_ptr, GdkEventKey.attr_sizeof)
         case (gdk_event.attr_type)
         when OS::GDK_KEY_PRESS
           set_key_state(event, gdk_event)
@@ -2461,7 +2461,7 @@ module Org::Eclipse::Swt::Widgets
       # code could have disposed the widget in the verify
       # event.  If this happens, answer null to cancel
       # the operation.
-      send_event(SWT::Verify, event)
+      send_event___org_eclipse_swt_widgets_text_41(SWT::Verify, event)
       if (!event.attr_doit || is_disposed)
         return nil
       end

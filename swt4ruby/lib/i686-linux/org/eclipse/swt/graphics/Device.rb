@@ -403,7 +403,7 @@ module Org::Eclipse::Swt::Graphics
       def get_device
         synchronized(self) do
           if (!(self.attr_device_finder).nil?)
-            self.attr_device_finder.run
+            self.attr_device_finder.run___org_eclipse_swt_graphics_device_1
           end
           device = self.attr_current_device
           self.attr_current_device = nil
@@ -793,14 +793,14 @@ module Org::Eclipse::Swt::Graphics
       fds = Array.typed(FontData).new(!(face_name).nil? ? 4 : n_families[0]) { nil }
       i = 0
       while i < n_families[0]
-        OS.memmove___org_eclipse_swt_graphics_device_1(family, families[0] + i * OS::PTR_SIZEOF, OS::PTR_SIZEOF)
+        OS.memmove___org_eclipse_swt_graphics_device_3(family, families[0] + i * OS::PTR_SIZEOF, OS::PTR_SIZEOF)
         match = true
         if (!(face_name).nil?)
           # long
           family_name = OS.pango_font_family_get_name(family[0])
           length = OS.strlen(family_name)
           buffer = Array.typed(::Java::Byte).new(length) { 0 }
-          OS.memmove___org_eclipse_swt_graphics_device_3(buffer, family_name, length)
+          OS.memmove___org_eclipse_swt_graphics_device_5(buffer, family_name, length)
           name = String.new(Converter.mbcs_to_wcs(nil, buffer))
           match = Compatibility.equals_ignore_case(face_name, name)
         end
@@ -808,7 +808,7 @@ module Org::Eclipse::Swt::Graphics
           OS.pango_font_family_list_faces(family[0], faces, n_faces)
           j = 0
           while j < n_faces[0]
-            OS.memmove___org_eclipse_swt_graphics_device_5(face, faces[0] + j * OS::PTR_SIZEOF, OS::PTR_SIZEOF)
+            OS.memmove___org_eclipse_swt_graphics_device_7(face, faces[0] + j * OS::PTR_SIZEOF, OS::PTR_SIZEOF)
             # long
             font_desc = OS.pango_font_face_describe(face[0])
             font = Font.gtk_new(self, font_desc)
@@ -1346,13 +1346,13 @@ module Org::Eclipse::Swt::Graphics
             if (self.attr_debug || device.attr_debug)
               SWTError.new.print_stack_trace
             end
-            OS._call___org_eclipse_swt_graphics_device_7(self.attr_xerror_proc, x_display, x_error_event)
+            OS._call___org_eclipse_swt_graphics_device_9(self.attr_xerror_proc, x_display, x_error_event)
           end
         else
           if (self.attr_debug)
             SWTError.new.print_stack_trace
           end
-          OS._call___org_eclipse_swt_graphics_device_9(self.attr_xerror_proc, x_display, x_error_event)
+          OS._call___org_eclipse_swt_graphics_device_11(self.attr_xerror_proc, x_display, x_error_event)
         end
         return 0
       end
@@ -1371,7 +1371,7 @@ module Org::Eclipse::Swt::Graphics
             SWTError.new.print_stack_trace
           end
         end
-        OS._call___org_eclipse_swt_graphics_device_11(self.attr_xioerror_proc, x_display, 0)
+        OS._call___org_eclipse_swt_graphics_device_13(self.attr_xioerror_proc, x_display, 0)
         return 0
       end
     }

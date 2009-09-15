@@ -1606,17 +1606,17 @@ module Org::Eclipse::Swt::Widgets
       if ((event).nil?)
         event = Event.new
       end
-      send_event(event_type, event)
+      send_event___org_eclipse_swt_widgets_widget_7(event_type, event)
     end
     
     typesig { [::Java::Int] }
     def post_event(event_type)
-      send_event(event_type, nil, false)
+      send_event___org_eclipse_swt_widgets_widget_9(event_type, nil, false)
     end
     
     typesig { [::Java::Int, Event] }
     def post_event(event_type, event)
-      send_event(event_type, event, false)
+      send_event___org_eclipse_swt_widgets_widget_11(event_type, event, false)
     end
     
     typesig { [] }
@@ -1633,7 +1633,7 @@ module Org::Eclipse::Swt::Widgets
     def release(destroy)
       if (((@state & DISPOSE_SENT)).equal?(0))
         @state |= DISPOSE_SENT
-        send_event(SWT::Dispose)
+        send_event___org_eclipse_swt_widgets_widget_13(SWT::Dispose)
       end
       if (((@state & DISPOSED)).equal?(0))
         release_children(destroy)
@@ -1798,19 +1798,19 @@ module Org::Eclipse::Swt::Widgets
       display = event.attr_display
       if (!display.filter_event(event))
         if (!(@event_table).nil?)
-          @event_table.send_event(event)
+          @event_table.send_event___org_eclipse_swt_widgets_widget_15(event)
         end
       end
     end
     
     typesig { [::Java::Int] }
     def send_event(event_type)
-      send_event(event_type, nil, true)
+      send_event___org_eclipse_swt_widgets_widget_17(event_type, nil, true)
     end
     
     typesig { [::Java::Int, Event] }
     def send_event(event_type, event)
-      send_event(event_type, event, true)
+      send_event___org_eclipse_swt_widgets_widget_19(event_type, event, true)
     end
     
     typesig { [::Java::Int, Event, ::Java::Boolean] }
@@ -1828,9 +1828,9 @@ module Org::Eclipse::Swt::Widgets
         event.attr_time = @display.get_last_event_time
       end
       if (send)
-        send_event(event)
+        send_event___org_eclipse_swt_widgets_widget_21(event)
       else
-        @display.post_event___org_eclipse_swt_widgets_widget_7(event)
+        @display.post_event___org_eclipse_swt_widgets_widget_23(event)
       end
     end
     
@@ -1843,7 +1843,7 @@ module Org::Eclipse::Swt::Widgets
         if (!set_key_state(event, key_event))
           return true
         end
-        send_event(type, event)
+        send_event___org_eclipse_swt_widgets_widget_25(type, event)
         # widget could be disposed at this point
         # 
         # It is possible (but unlikely), that application
@@ -1856,7 +1856,7 @@ module Org::Eclipse::Swt::Widgets
         return event.attr_doit
       end
       buffer = Array.typed(::Java::Byte).new(length_) { 0 }
-      OS.memmove___org_eclipse_swt_widgets_widget_9(buffer, key_event.attr_string, length_)
+      OS.memmove___org_eclipse_swt_widgets_widget_27(buffer, key_event.attr_string, length_)
       chars = Converter.mbcs_to_wcs(nil, buffer)
       return !(send_imkey_event(type, key_event, chars)).nil?
     end
@@ -1872,7 +1872,7 @@ module Org::Eclipse::Swt::Widgets
         ptr = OS.gtk_get_current_event
         if (!(ptr).equal?(0))
           key_event = GdkEventKey.new
-          OS.memmove___org_eclipse_swt_widgets_widget_11(key_event, ptr, GdkEventKey.attr_sizeof)
+          OS.memmove___org_eclipse_swt_widgets_widget_29(key_event, ptr, GdkEventKey.attr_sizeof)
           case (key_event.attr_type)
           when OS::GDK_KEY_PRESS, OS::GDK_KEY_RELEASE
             state = key_event.attr_state
@@ -1894,7 +1894,7 @@ module Org::Eclipse::Swt::Widgets
           set_input_state(event, state)
         end
         event.attr_character = chars[index]
-        send_event(type, event)
+        send_event___org_eclipse_swt_widgets_widget_31(type, event)
         # It is possible (but unlikely), that application
         # code could have disposed the widget in the key
         # events.  If this happens, end the processing of
@@ -2275,7 +2275,7 @@ module Org::Eclipse::Swt::Widgets
       case (RJava.cast_to_int(user_data))
       when EXPOSE_EVENT_INVERSE
         gdk_event = GdkEventExpose.new
-        OS.memmove___org_eclipse_swt_widgets_widget_13(gdk_event, arg0, GdkEventExpose.attr_sizeof)
+        OS.memmove___org_eclipse_swt_widgets_widget_33(gdk_event, arg0, GdkEventExpose.attr_sizeof)
         # int
         paint_window_ = paint_window
         # int

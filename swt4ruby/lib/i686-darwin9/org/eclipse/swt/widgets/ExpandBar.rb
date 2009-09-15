@@ -646,7 +646,7 @@ module Org::Eclipse::Swt::Widgets
         # Space
         ev = Event.new
         ev.attr_item = @focus_item
-        send_event(@focus_item.attr_expanded ? SWT::Collapse : SWT::Expand, ev)
+        send_event___org_eclipse_swt_widgets_expand_bar_1(@focus_item.attr_expanded ? SWT::Collapse : SWT::Expand, ev)
         @focus_item.attr_expanded = !@focus_item.attr_expanded
         show_item(@focus_item)
       when SWT::ARROW_UP

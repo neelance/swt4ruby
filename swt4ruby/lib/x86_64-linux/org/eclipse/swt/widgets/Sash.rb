@@ -285,7 +285,7 @@ module Org::Eclipse::Swt::Widgets
       if (!((self.attr_parent.attr_style & SWT::MIRRORED)).equal?(0))
         event.attr_x = self.attr_parent.get_client_width - width - event.attr_x
       end
-      send_event(SWT::Selection, event)
+      send_event___org_eclipse_swt_widgets_sash_3(SWT::Selection, event)
       if (is_disposed)
         return 0
       end
@@ -317,7 +317,7 @@ module Org::Eclipse::Swt::Widgets
         return result
       end
       gdk_event = GdkEventButton.new
-      OS.memmove___org_eclipse_swt_widgets_sash_3(gdk_event, event_ptr, GdkEventButton.attr_sizeof)
+      OS.memmove___org_eclipse_swt_widgets_sash_5(gdk_event, event_ptr, GdkEventButton.attr_sizeof)
       button = gdk_event.attr_button
       if (!(button).equal?(1))
         return 0
@@ -338,7 +338,7 @@ module Org::Eclipse::Swt::Widgets
       if (!((self.attr_parent.attr_style & SWT::MIRRORED)).equal?(0))
         event.attr_x = self.attr_parent.get_client_width - width - event.attr_x
       end
-      send_event(SWT::Selection, event)
+      send_event___org_eclipse_swt_widgets_sash_7(SWT::Selection, event)
       if (is_disposed)
         return result
       end
@@ -380,7 +380,7 @@ module Org::Eclipse::Swt::Widgets
         return result
       end
       gdk_event = GdkEventKey.new
-      OS.memmove___org_eclipse_swt_widgets_sash_5(gdk_event, event_ptr, GdkEventKey.attr_sizeof)
+      OS.memmove___org_eclipse_swt_widgets_sash_9(gdk_event, event_ptr, GdkEventKey.attr_sizeof)
       keyval = gdk_event.attr_keyval
       catch(:break_case) do
         case (keyval)
@@ -434,7 +434,7 @@ module Org::Eclipse::Swt::Widgets
           if (!((self.attr_parent.attr_style & SWT::MIRRORED)).equal?(0))
             event.attr_x = self.attr_parent.get_client_width - width - event.attr_x
           end
-          send_event(SWT::Selection, event)
+          send_event___org_eclipse_swt_widgets_sash_11(SWT::Selection, event)
           if ((ptr_grab_result).equal?(OS::GDK_GRAB_SUCCESS))
             OS.gdk_pointer_ungrab(OS::GDK_CURRENT_TIME)
           end
@@ -481,7 +481,7 @@ module Org::Eclipse::Swt::Widgets
         return 0
       end
       gdk_event = GdkEventMotion.new
-      OS.memmove___org_eclipse_swt_widgets_sash_7(gdk_event, event_ptr, GdkEventButton.attr_sizeof)
+      OS.memmove___org_eclipse_swt_widgets_sash_13(gdk_event, event_ptr, GdkEventButton.attr_sizeof)
       event_x = 0
       event_y = 0
       event_state = 0
@@ -534,7 +534,7 @@ module Org::Eclipse::Swt::Widgets
       if (!((self.attr_parent.attr_style & SWT::MIRRORED)).equal?(0))
         event.attr_x = self.attr_parent.get_client_width - width - event.attr_x
       end
-      send_event(SWT::Selection, event)
+      send_event___org_eclipse_swt_widgets_sash_15(SWT::Selection, event)
       if (is_disposed)
         return 0
       end

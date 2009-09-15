@@ -774,7 +774,7 @@ module Org::Eclipse::Swt::Widgets
       widget = self.attr_display.get_widget(item_id)
       if (widget.is_a?(MenuItem))
         item = widget
-        item.send_event(SWT::Arm)
+        item.send_event___org_eclipse_swt_widgets_menu_1(SWT::Arm)
       end
     end
     
@@ -793,7 +793,7 @@ module Org::Eclipse::Swt::Widgets
     # long
     def menu_will_open(id, sel, menu)
       @visible = true
-      send_event(SWT::Show)
+      send_event___org_eclipse_swt_widgets_menu_3(SWT::Show)
       i = 0
       while i < @items.attr_length
         item = @items[i]
@@ -809,7 +809,7 @@ module Org::Eclipse::Swt::Widgets
     # long
     # long
     def menu_did_close(id, sel, menu)
-      send_event(SWT::Hide)
+      send_event___org_eclipse_swt_widgets_menu_5(SWT::Hide)
       @visible = false
       i = 0
       while i < @items.attr_length

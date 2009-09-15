@@ -337,7 +337,7 @@ module Org::Eclipse::Swt::Widgets
           event.attr_y = new_y
           event.attr_width = width
           event.attr_height = height
-          send_event(SWT::Selection, event)
+          send_event___org_eclipse_swt_widgets_sash_1(SWT::Selection, event)
           if (is_disposed)
             return LRESULT::ZERO
           end
@@ -391,7 +391,7 @@ module Org::Eclipse::Swt::Widgets
       if (((self.attr_style & SWT::SMOOTH)).equal?(0))
         event.attr_detail = SWT::DRAG
       end
-      send_event(SWT::Selection, event)
+      send_event___org_eclipse_swt_widgets_sash_3(SWT::Selection, event)
       if (is_disposed)
         return LRESULT::ZERO
       end
@@ -443,7 +443,7 @@ module Org::Eclipse::Swt::Widgets
       event.attr_width = width
       event.attr_height = height
       draw_band(event.attr_x, event.attr_y, width, height)
-      send_event(SWT::Selection, event)
+      send_event___org_eclipse_swt_widgets_sash_5(SWT::Selection, event)
       if (is_disposed)
         return result
       end
@@ -501,7 +501,7 @@ module Org::Eclipse::Swt::Widgets
       if (((self.attr_style & SWT::SMOOTH)).equal?(0))
         event.attr_detail = SWT::DRAG
       end
-      send_event(SWT::Selection, event)
+      send_event___org_eclipse_swt_widgets_sash_7(SWT::Selection, event)
       if (is_disposed)
         return LRESULT::ZERO
       end

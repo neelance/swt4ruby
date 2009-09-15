@@ -958,7 +958,7 @@ module Org::Eclipse::Swt::Widgets
             OS._enable_scroll_bar(hwnd, type, OS::ESB_ENABLE_BOTH)
           end
         end
-        send_event(visible ? SWT::Show : SWT::Hide)
+        send_event___org_eclipse_swt_widgets_scroll_bar_1(visible ? SWT::Show : SWT::Hide)
         # widget could be disposed at this point
       end
     end
@@ -995,7 +995,7 @@ module Org::Eclipse::Swt::Widgets
       when OS::SB_PAGEUP
         event.attr_detail = SWT::PAGE_UP
       end
-      send_event(SWT::Selection, event)
+      send_event___org_eclipse_swt_widgets_scroll_bar_3(SWT::Selection, event)
       # the widget could be destroyed at this point
       return nil
     end

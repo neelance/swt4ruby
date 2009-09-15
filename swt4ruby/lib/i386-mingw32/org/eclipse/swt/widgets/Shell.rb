@@ -1710,14 +1710,14 @@ module Org::Eclipse::Swt::Widgets
       i = deactivate.attr_length - 1
       while i >= index
         if (!deactivate[i].is_disposed)
-          deactivate[i].send_event(SWT::Deactivate)
+          deactivate[i].send_event___org_eclipse_swt_widgets_shell_0(SWT::Deactivate)
         end
         (i -= 1)
       end
       i_ = activate.attr_length - 1
       while i_ >= index
         if (!activate[i_].is_disposed)
-          activate[i_].send_event(SWT::Activate)
+          activate[i_].send_event___org_eclipse_swt_widgets_shell_1(SWT::Activate)
         end
         (i_ -= 1)
       end
@@ -2414,7 +2414,7 @@ module Org::Eclipse::Swt::Widgets
             tip = get_current_tool_tip(hwnd)
             if (!(tip).nil?)
               tip.set_visible(false)
-              tip.post_event___org_eclipse_swt_widgets_shell_1(SWT::Selection)
+              tip.post_event___org_eclipse_swt_widgets_shell_3(SWT::Selection)
             end
           end
         end
@@ -2596,7 +2596,7 @@ module Org::Eclipse::Swt::Widgets
         return result
       end
       if (self.attr_display.attr_run_messages)
-        if (self.attr_display.run_async_messages(false))
+        if (self.attr_display.run_async_messages___org_eclipse_swt_widgets_shell_5(false))
           self.attr_display.wake_thread
         end
       end

@@ -37,6 +37,7 @@ explicit_calls:
   Call
   memmove
   postEvent
-  sendEevent
+  runAsyncMessages
+  sendEvent
   sendMouseEvent
   windowProc

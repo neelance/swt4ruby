@@ -378,8 +378,8 @@ module Org::Eclipse::Swt::Widgets
       else
         @scroll_view.set_has_vertical_scroller(visible)
       end
-      bar.send_event(visible ? SWT::Show : SWT::Hide)
-      send_event(SWT::Resize)
+      bar.send_event___org_eclipse_swt_widgets_scrollable_1(visible ? SWT::Show : SWT::Hide)
+      send_event___org_eclipse_swt_widgets_scrollable_3(SWT::Resize)
       return true
     end
     

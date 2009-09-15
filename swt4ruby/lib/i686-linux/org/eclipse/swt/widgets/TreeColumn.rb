@@ -515,11 +515,11 @@ module Org::Eclipse::Swt::Widgets
       width = OS._gtk_widget_width(widget)
       if (!(x).equal?(@last_x))
         @last_x = x
-        send_event(SWT::Move)
+        send_event___org_eclipse_swt_widgets_tree_column_9(SWT::Move)
       end
       if (!(width).equal?(@last_width))
         @last_width = width
-        send_event(SWT::Resize)
+        send_event___org_eclipse_swt_widgets_tree_column_11(SWT::Resize)
       end
       return 0
     end
@@ -841,7 +841,7 @@ module Org::Eclipse::Swt::Widgets
       end
       OS.gtk_tree_view_column_set_visible(self.attr_handle, !(width).equal?(0))
       @last_width = width
-      send_event(SWT::Resize)
+      send_event___org_eclipse_swt_widgets_tree_column_13(SWT::Resize)
     end
     
     private

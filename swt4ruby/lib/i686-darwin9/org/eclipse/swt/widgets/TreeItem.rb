@@ -405,7 +405,7 @@ module Org::Eclipse::Swt::Widgets
         height = RJava.cast_to_int(widget.row_height)
         event.attr_width = width
         event.attr_height = height
-        @parent.send_event(SWT::MeasureItem, event)
+        @parent.send_event___org_eclipse_swt_widgets_tree_item_1(SWT::MeasureItem, event)
         if (height < event.attr_height)
           widget.set_row_height(event.attr_height)
           widget.set_needs_display(true)
@@ -1211,7 +1211,7 @@ module Org::Eclipse::Swt::Widgets
       if (!(@expanded).equal?(expand))
         event = Event.new
         event.attr_item = self
-        @parent.send_event(expand ? SWT::Expand : SWT::Collapse, event)
+        @parent.send_event___org_eclipse_swt_widgets_tree_item_3(expand ? SWT::Expand : SWT::Collapse, event)
         if (is_disposed)
           return
         end

@@ -172,7 +172,7 @@ module Org::Eclipse::Swt::Widgets
     
     typesig { [] }
     def run_async_messages
-      return run_async_messages(false)
+      return run_async_messages___org_eclipse_swt_widgets_synchronizer_1(false)
     end
     
     typesig { [::Java::Boolean] }
@@ -187,7 +187,7 @@ module Org::Eclipse::Swt::Widgets
         synchronized((lock)) do
           @sync_thread = lock.attr_thread
           begin
-            lock.run
+            lock.run___org_eclipse_swt_widgets_synchronizer_3
           rescue JavaThrowable => t
             lock.attr_throwable = t
             SWT.error(SWT::ERROR_FAILED_EXEC, t)
@@ -232,7 +232,7 @@ module Org::Eclipse::Swt::Widgets
       end
       if ((lock).nil?)
         if (!(runnable).nil?)
-          runnable.run
+          runnable.run___org_eclipse_swt_widgets_synchronizer_5
         end
         return
       end

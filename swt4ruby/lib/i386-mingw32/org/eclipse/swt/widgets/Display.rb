@@ -1666,7 +1666,7 @@ module Org::Eclipse::Swt::Widgets
     def close
       check_device
       event = Event.new
-      send_event(SWT::Close, event)
+      send_event___org_eclipse_swt_widgets_display_1(SWT::Close, event)
       if (event.attr_doit)
         dispose
       end
@@ -2233,7 +2233,7 @@ module Org::Eclipse::Swt::Widgets
     typesig { [Event] }
     def filter_event(event)
       if (!(@filter_table).nil?)
-        @filter_table.send_event(event)
+        @filter_table.send_event___org_eclipse_swt_widgets_display_3(event)
       end
       return false
     end
@@ -2375,7 +2375,7 @@ module Org::Eclipse::Swt::Widgets
             if (@run_messages_in_message_proc)
               OS._post_message(@hwnd_message, SWT_RUNASYNC, 0, 0)
             else
-              run_async_messages(false)
+              run_async_messages___org_eclipse_swt_widgets_display_5(false)
             end
           end
           msg = MSG.new
@@ -4111,7 +4111,7 @@ module Org::Eclipse::Swt::Widgets
         case (RJava.cast_to_int(msg))
         when SWT_RUNASYNC
           if (@run_messages_in_idle)
-            run_async_messages(false)
+            run_async_messages___org_eclipse_swt_widgets_display_7(false)
           end
         when SWT_KEYMSG
           consumed = false
@@ -4268,7 +4268,7 @@ module Org::Eclipse::Swt::Widgets
           end
         when OS::WM_QUERYENDSESSION
           event = Event.new
-          send_event(SWT::Close, event)
+          send_event___org_eclipse_swt_widgets_display_9(SWT::Close, event)
           if (!event.attr_doit)
             return 0
           end
@@ -4428,7 +4428,7 @@ module Org::Eclipse::Swt::Widgets
             msg = MSG.new
             flags = OS::PM_NOREMOVE | OS::PM_NOYIELD | OS::PM_QS_INPUT | OS::PM_QS_POSTMESSAGE
             if (!OS._peek_message(msg, 0, 0, 0, flags))
-              if (run_async_messages(false))
+              if (run_async_messages___org_eclipse_swt_widgets_display_11(false))
                 wake_thread
               end
             end
@@ -4729,7 +4729,7 @@ module Org::Eclipse::Swt::Widgets
         run_deferred_events
         return true
       end
-      return is_disposed || (@run_messages && run_async_messages(false))
+      return is_disposed || (@run_messages && run_async_messages___org_eclipse_swt_widgets_display_13(false))
     end
     
     class_module.module_eval {
@@ -4776,7 +4776,7 @@ module Org::Eclipse::Swt::Widgets
     # @see Device#dispose
     # @see #destroy
     def release
-      send_event(SWT::Dispose, Event.new)
+      send_event___org_eclipse_swt_widgets_display_15(SWT::Dispose, Event.new)
       shells = get_shells
       i = 0
       while i < shells.attr_length
@@ -4796,7 +4796,7 @@ module Org::Eclipse::Swt::Widgets
         i_ = 0
         while i_ < @dispose_list.attr_length
           if (!(@dispose_list[i_]).nil?)
-            @dispose_list[i_].run
+            @dispose_list[i_].run___org_eclipse_swt_widgets_display_16
           end
           i_ += 1
         end
@@ -5208,7 +5208,7 @@ module Org::Eclipse::Swt::Widgets
     
     typesig { [::Java::Boolean] }
     def run_async_messages(all)
-      return @synchronizer.run_async_messages(all)
+      return @synchronizer.run_async_messages___org_eclipse_swt_widgets_display_18(all)
     end
     
     typesig { [] }
@@ -5232,7 +5232,7 @@ module Org::Eclipse::Swt::Widgets
           item = event.attr_item
           if ((item).nil? || !item.is_disposed)
             run = true
-            widget.send_event(event)
+            widget.send_event___org_eclipse_swt_widgets_display_20(event)
           end
         end
       end
@@ -5270,7 +5270,7 @@ module Org::Eclipse::Swt::Widgets
       old_font = get_system_font
       save_resources
       update_images
-      send_event(SWT::Settings, nil)
+      send_event___org_eclipse_swt_widgets_display_22(SWT::Settings, nil)
       new_font = get_system_font
       same_font = (old_font == new_font)
       shells = get_shells
@@ -5301,7 +5301,7 @@ module Org::Eclipse::Swt::Widgets
             runnable = @timer_list[index]
             @timer_list[index] = nil
             if (!(runnable).nil?)
-              runnable.run
+              runnable.run___org_eclipse_swt_widgets_display_24
             end
             return true
           end
@@ -5379,7 +5379,7 @@ module Org::Eclipse::Swt::Widgets
       end
       if (!filter_event(event))
         if (!(@event_table).nil?)
-          @event_table.send_event(event)
+          @event_table.send_event___org_eclipse_swt_widgets_display_26(event)
         end
       end
     end
@@ -5629,7 +5629,7 @@ module Org::Eclipse::Swt::Widgets
         @synchronizer = synchronizer
       end
       if (!(old_synchronizer).nil?)
-        old_synchronizer.run_async_messages(true)
+        old_synchronizer.run_async_messages___org_eclipse_swt_widgets_display_28(true)
       end
     end
     
@@ -6040,7 +6040,7 @@ module Org::Eclipse::Swt::Widgets
       end
       if (!(@last_control).nil? && (@last_hwnd).equal?(hwnd))
         # 64
-        return @last_control.window_proc___org_eclipse_swt_widgets_display_1(hwnd, RJava.cast_to_int(msg), w_param, l_param)
+        return @last_control.window_proc___org_eclipse_swt_widgets_display_30(hwnd, RJava.cast_to_int(msg), w_param, l_param)
       end
       index = 0
       if (USE_PROPERTY)
@@ -6056,7 +6056,7 @@ module Org::Eclipse::Swt::Widgets
           @last_hwnd = hwnd
           @last_control = control
           # 64
-          return control.window_proc___org_eclipse_swt_widgets_display_3(hwnd, RJava.cast_to_int(msg), w_param, l_param)
+          return control.window_proc___org_eclipse_swt_widgets_display_32(hwnd, RJava.cast_to_int(msg), w_param, l_param)
         end
       end
       # 64

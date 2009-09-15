@@ -847,8 +847,8 @@ module Org::Eclipse::Swt::Widgets
     def set_visible(visible)
       check_widget
       if (@parent.set_scroll_bar_visible(self, visible))
-        send_event(visible ? SWT::Show : SWT::Hide)
-        @parent.send_event(SWT::Resize)
+        send_event___org_eclipse_swt_widgets_scroll_bar_47(visible ? SWT::Show : SWT::Hide)
+        @parent.send_event___org_eclipse_swt_widgets_scroll_bar_49(SWT::Resize)
       end
     end
     

@@ -822,7 +822,7 @@ module Org::Eclipse::Swt::Internal
         when 0x51
           runnable = self.attr_language_map.get(key)
           if (!(runnable).nil?)
-            runnable.run
+            runnable.run___org_eclipse_swt_internal_bidi_util_1
           end
         end
         old_proc = self.attr_old_proc_map.get(key)

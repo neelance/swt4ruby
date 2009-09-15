@@ -275,7 +275,7 @@ module Org::Eclipse::Swt::Widgets
         return
       end
       if (visible)
-        send_event(SWT::Show)
+        send_event___org_eclipse_swt_widgets_menu_1(SWT::Show)
         if (!(get_item_count).equal?(0))
           if ((OS::GTK_VERSION >= OS._version(2, 8, 0)))
             # Feature in GTK. ON_TOP shells will send out
@@ -294,7 +294,7 @@ module Org::Eclipse::Swt::Widgets
           # event processed is used.
           OS.gtk_menu_popup(self.attr_handle, 0, 0, address, 0, 0, self.attr_display.get_last_event_time)
         else
-          send_event(SWT::Hide)
+          send_event___org_eclipse_swt_widgets_menu_3(SWT::Hide)
         end
       else
         OS.gtk_menu_popdown(self.attr_handle)
@@ -741,14 +741,14 @@ module Org::Eclipse::Swt::Widgets
         end
       end
       if (OS::GTK_VERSION >= OS._version(2, 6, 0))
-        send_event(SWT::Hide)
+        send_event___org_eclipse_swt_widgets_menu_5(SWT::Hide)
       else
         # Bug in GTK.  In GTK 2.4 and earlier
         # a crash could occur if a menu item
         # was disposed within gtk_hide.  The
         # workaroud is to post the event instead
         # of send it on these platforms
-        post_event___org_eclipse_swt_widgets_menu_1(SWT::Hide)
+        post_event___org_eclipse_swt_widgets_menu_7(SWT::Hide)
       end
       return 0
     end
@@ -763,7 +763,7 @@ module Org::Eclipse::Swt::Widgets
         end
         return 0
       end
-      send_event(SWT::Show)
+      send_event___org_eclipse_swt_widgets_menu_9(SWT::Show)
       return 0
     end
     
@@ -894,13 +894,13 @@ module Org::Eclipse::Swt::Widgets
         end
       end
       if (!(x).equal?(0))
-        OS.memmove___org_eclipse_swt_widgets_menu_3(x, Array.typed(::Java::Int).new([reqx]), 4)
+        OS.memmove___org_eclipse_swt_widgets_menu_11(x, Array.typed(::Java::Int).new([reqx]), 4)
       end
       if (!(y).equal?(0))
-        OS.memmove___org_eclipse_swt_widgets_menu_5(y, Array.typed(::Java::Int).new([reqy]), 4)
+        OS.memmove___org_eclipse_swt_widgets_menu_13(y, Array.typed(::Java::Int).new([reqy]), 4)
       end
       if (!(push_in).equal?(0))
-        OS.memmove___org_eclipse_swt_widgets_menu_7(push_in, Array.typed(::Java::Int).new([1]), 4)
+        OS.memmove___org_eclipse_swt_widgets_menu_15(push_in, Array.typed(::Java::Int).new([1]), 4)
       end
       return 0
     end
@@ -1021,12 +1021,12 @@ module Org::Eclipse::Swt::Widgets
     def send_help_event(help_type)
       if (!(@selected_item).nil? && !@selected_item.is_disposed)
         if (@selected_item.hooks(SWT::Help))
-          @selected_item.post_event___org_eclipse_swt_widgets_menu_9(SWT::Help)
+          @selected_item.post_event___org_eclipse_swt_widgets_menu_17(SWT::Help)
           return true
         end
       end
       if (hooks(SWT::Help))
-        post_event___org_eclipse_swt_widgets_menu_11(SWT::Help)
+        post_event___org_eclipse_swt_widgets_menu_19(SWT::Help)
         return true
       end
       return @parent.send_help_event(help_type)

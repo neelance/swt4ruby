@@ -2119,7 +2119,7 @@ module Org::Eclipse::Swt::Widgets
     def close
       check_device
       event = Event.new
-      send_event(SWT::Close, event)
+      send_event___org_eclipse_swt_widgets_display_7(SWT::Close, event)
       if (event.attr_doit)
         dispose
       end
@@ -2165,7 +2165,7 @@ module Org::Eclipse::Swt::Widgets
       if (!(ptr).equal?(0))
         length = OS.strlen(ptr)
         buffer = Array.typed(::Java::Byte).new(length) { 0 }
-        OS.memmove___org_eclipse_swt_widgets_display_7(buffer, ptr, length)
+        OS.memmove___org_eclipse_swt_widgets_display_9(buffer, ptr, length)
         System.out.println("***WARNING: " + RJava.cast_to_string(String.new(Converter.mbcs_to_wcs(nil, buffer)))) # $NON-NLS-1$
         System.out.println("***WARNING: SWT requires GTK " + RJava.cast_to_string(MAJOR) + "." + RJava.cast_to_string(MINOR) + "." + RJava.cast_to_string(MICRO)) # $NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
         major = OS.gtk_major_version
@@ -2195,7 +2195,7 @@ module Org::Eclipse::Swt::Widgets
         fixed_info.attr_class_init = self.attr_fixed_class_init_proc_address
         fixed_info.attr_instance_size = RJava.cast_to_short(OS._gtk_fixed_sizeof)
         self.attr_fixed_info_ptr = OS.g_malloc(GTypeInfo.attr_sizeof)
-        OS.memmove___org_eclipse_swt_widgets_display_9(self.attr_fixed_info_ptr, fixed_info, GTypeInfo.attr_sizeof)
+        OS.memmove___org_eclipse_swt_widgets_display_11(self.attr_fixed_info_ptr, fixed_info, GTypeInfo.attr_sizeof)
         self.attr_fixed_type = OS.g_type_register_static(OS._gtk_type_fixed, type_name, self.attr_fixed_info_ptr, 0)
       end
       if ((self.attr_renderer_class_init_proc_address).equal?(0))
@@ -2225,7 +2225,7 @@ module Org::Eclipse::Swt::Widgets
         renderer_info.attr_class_init = self.attr_renderer_class_init_proc_address
         renderer_info.attr_instance_size = RJava.cast_to_short(OS._gtk_cell_renderer_text_sizeof)
         self.attr_text_renderer_info_ptr = OS.g_malloc(GTypeInfo.attr_sizeof)
-        OS.memmove___org_eclipse_swt_widgets_display_11(self.attr_text_renderer_info_ptr, renderer_info, GTypeInfo.attr_sizeof)
+        OS.memmove___org_eclipse_swt_widgets_display_13(self.attr_text_renderer_info_ptr, renderer_info, GTypeInfo.attr_sizeof)
         type_name = Converter.wcs_to_mbcs(nil, "SwtTextRenderer", true) # $NON-NLS-1$
         self.attr_text_renderer_type = OS.g_type_register_static(OS._gtk_type_cell_renderer_text, type_name, self.attr_text_renderer_info_ptr, 0)
       end
@@ -2235,7 +2235,7 @@ module Org::Eclipse::Swt::Widgets
         renderer_info.attr_class_init = self.attr_renderer_class_init_proc_address
         renderer_info.attr_instance_size = RJava.cast_to_short(OS._gtk_cell_renderer_pixbuf_sizeof)
         self.attr_pixbuf_renderer_info_ptr = OS.g_malloc(GTypeInfo.attr_sizeof)
-        OS.memmove___org_eclipse_swt_widgets_display_13(self.attr_pixbuf_renderer_info_ptr, renderer_info, GTypeInfo.attr_sizeof)
+        OS.memmove___org_eclipse_swt_widgets_display_15(self.attr_pixbuf_renderer_info_ptr, renderer_info, GTypeInfo.attr_sizeof)
         type_name = Converter.wcs_to_mbcs(nil, "SwtPixbufRenderer", true) # $NON-NLS-1$
         self.attr_pixbuf_renderer_type = OS.g_type_register_static(OS._gtk_type_cell_renderer_pixbuf, type_name, self.attr_pixbuf_renderer_info_ptr, 0)
       end
@@ -2245,7 +2245,7 @@ module Org::Eclipse::Swt::Widgets
         renderer_info.attr_class_init = self.attr_renderer_class_init_proc_address
         renderer_info.attr_instance_size = RJava.cast_to_short(OS._gtk_cell_renderer_toggle_sizeof)
         self.attr_toggle_renderer_info_ptr = OS.g_malloc(GTypeInfo.attr_sizeof)
-        OS.memmove___org_eclipse_swt_widgets_display_15(self.attr_toggle_renderer_info_ptr, renderer_info, GTypeInfo.attr_sizeof)
+        OS.memmove___org_eclipse_swt_widgets_display_17(self.attr_toggle_renderer_info_ptr, renderer_info, GTypeInfo.attr_sizeof)
         type_name = Converter.wcs_to_mbcs(nil, "SwtToggleRenderer", true) # $NON-NLS-1$
         self.attr_toggle_renderer_type = OS.g_type_register_static(OS._gtk_type_cell_renderer_toggle, type_name, self.attr_toggle_renderer_info_ptr, 0)
       end
@@ -2294,7 +2294,7 @@ module Org::Eclipse::Swt::Widgets
       # long
       pixels = OS.gdk_pixbuf_get_pixels(pixbuf)
       data = Array.typed(::Java::Byte).new(stride * height) { 0 }
-      OS.memmove___org_eclipse_swt_widgets_display_17(data, pixels, data.attr_length)
+      OS.memmove___org_eclipse_swt_widgets_display_19(data, pixels, data.attr_length)
       OS.g_object_unref(pixbuf)
       image_data = nil
       if (has_alpha)
@@ -2357,10 +2357,10 @@ module Org::Eclipse::Swt::Widgets
           while y < h[0]
             # long
             offset = pixels + (y * stride)
-            OS.memmove___org_eclipse_swt_widgets_display_19(line, offset, stride)
+            OS.memmove___org_eclipse_swt_widgets_display_21(line, offset, stride)
             # long
             mask_offset = mask_pixels + (y * mask_stride)
-            OS.memmove___org_eclipse_swt_widgets_display_21(mask_line, mask_offset, mask_stride)
+            OS.memmove___org_eclipse_swt_widgets_display_23(mask_line, mask_offset, mask_stride)
             x = 0
             while x < w[0]
               if ((mask_line[x * 3]).equal?(0))
@@ -2368,7 +2368,7 @@ module Org::Eclipse::Swt::Widgets
               end
               x += 1
             end
-            OS.memmove___org_eclipse_swt_widgets_display_23(offset, line, stride)
+            OS.memmove___org_eclipse_swt_widgets_display_25(offset, line, stride)
             y += 1
           end
           OS.g_object_unref(mask_pixbuf)
@@ -2390,13 +2390,13 @@ module Org::Eclipse::Swt::Widgets
             while y < h[0]
               # long
               offset = pixels + (y * stride)
-              OS.memmove___org_eclipse_swt_widgets_display_25(line, offset, stride)
+              OS.memmove___org_eclipse_swt_widgets_display_27(line, offset, stride)
               x = 0
               while x < w[0]
                 line[x * 4 + 3] = alpha[y * w[0] + x]
                 x += 1
               end
-              OS.memmove___org_eclipse_swt_widgets_display_27(offset, line, stride)
+              OS.memmove___org_eclipse_swt_widgets_display_29(offset, line, stride)
               y += 1
             end
           end
@@ -2645,11 +2645,11 @@ module Org::Eclipse::Swt::Widgets
       # long
       def fixed_class_init_proc(g_class, class_data)
         klass = GtkWidgetClass.new
-        OS.memmove___org_eclipse_swt_widgets_display_29(klass, g_class)
+        OS.memmove___org_eclipse_swt_widgets_display_31(klass, g_class)
         klass.attr_map = self.attr_fixed_map_proc_address
         self.attr_old_fixed_size_allocate_proc_address = klass.attr_size_allocate
         klass.attr_size_allocate = self.attr_fixed_size_allocate_proc_address
-        OS.memmove___org_eclipse_swt_widgets_display_31(g_class, klass)
+        OS.memmove___org_eclipse_swt_widgets_display_33(g_class, klass)
         return 0
       end
       
@@ -2675,7 +2675,7 @@ module Org::Eclipse::Swt::Widgets
         if (!(widget).nil?)
           return widget.fixed_size_allocate_proc(handle, allocation)
         end
-        return OS._call___org_eclipse_swt_widgets_display_33(self.attr_old_fixed_size_allocate_proc_address, handle, allocation)
+        return OS._call___org_eclipse_swt_widgets_display_35(self.attr_old_fixed_size_allocate_proc_address, handle, allocation)
       end
       
       typesig { [::Java::Int, ::Java::Int] }
@@ -2684,10 +2684,10 @@ module Org::Eclipse::Swt::Widgets
       # long
       def renderer_class_init_proc(g_class, class_data)
         klass = GtkCellRendererClass.new
-        OS.memmove___org_eclipse_swt_widgets_display_35(klass, g_class)
+        OS.memmove___org_eclipse_swt_widgets_display_37(klass, g_class)
         klass.attr_render = self.attr_renderer_render_proc_address
         klass.attr_get_size = self.attr_renderer_get_size_proc_address
-        OS.memmove___org_eclipse_swt_widgets_display_37(g_class, klass)
+        OS.memmove___org_eclipse_swt_widgets_display_39(g_class, klass)
         return 0
       end
       
@@ -2897,7 +2897,7 @@ module Org::Eclipse::Swt::Widgets
           # long
           border = OS.gtk_entry_get_inner_border(handle)
           if (!(border).equal?(0))
-            OS.memmove___org_eclipse_swt_widgets_display_39(gtk_border, border, GtkBorder.attr_sizeof)
+            OS.memmove___org_eclipse_swt_widgets_display_41(gtk_border, border, GtkBorder.attr_sizeof)
             return gtk_border
           end
           # long
@@ -2905,7 +2905,7 @@ module Org::Eclipse::Swt::Widgets
           border_ptr = Array.typed(::Java::Int).new(1) { 0 }
           OS.gtk_widget_style_get(handle, OS.attr_inner_border, border_ptr, 0)
           if (!(border_ptr[0]).equal?(0))
-            OS.memmove___org_eclipse_swt_widgets_display_41(gtk_border, border_ptr[0], GtkBorder.attr_sizeof)
+            OS.memmove___org_eclipse_swt_widgets_display_43(gtk_border, border_ptr[0], GtkBorder.attr_sizeof)
             OS.gtk_border_free(border_ptr[0])
             return gtk_border
           end
@@ -2921,7 +2921,7 @@ module Org::Eclipse::Swt::Widgets
     typesig { [Event] }
     def filter_event(event)
       if (!(@filter_table).nil?)
-        @filter_table.send_event(event)
+        @filter_table.send_event___org_eclipse_swt_widgets_display_45(event)
       end
       return false
     end
@@ -2948,13 +2948,13 @@ module Org::Eclipse::Swt::Widgets
         # it gets dispatched by GTK.  SWT has been modified to look
         # for negative button numbers.
         mouse_event = XButtonEvent.new
-        OS.memmove___org_eclipse_swt_widgets_display_43(mouse_event, x_event, 4)
+        OS.memmove___org_eclipse_swt_widgets_display_47(mouse_event, x_event, 4)
         if ((mouse_event.attr_type).equal?(OS::ButtonRelease))
-          OS.memmove___org_eclipse_swt_widgets_display_45(mouse_event, x_event, XButtonEvent.attr_sizeof)
+          OS.memmove___org_eclipse_swt_widgets_display_49(mouse_event, x_event, XButtonEvent.attr_sizeof)
           case (mouse_event.attr_button)
           when 6, 7
             mouse_event.attr_button = -mouse_event.attr_button
-            OS.memmove___org_eclipse_swt_widgets_display_47(x_event, mouse_event, XButtonEvent.attr_sizeof)
+            OS.memmove___org_eclipse_swt_widgets_display_51(x_event, mouse_event, XButtonEvent.attr_sizeof)
           end
         end
       end
@@ -3255,7 +3255,7 @@ module Org::Eclipse::Swt::Widgets
     def get_depth
       check_device
       visual = GdkVisual.new
-      OS.memmove___org_eclipse_swt_widgets_display_49(visual, OS.gdk_visual_get_system)
+      OS.memmove___org_eclipse_swt_widgets_display_53(visual, OS.gdk_visual_get_system)
       return visual.attr_depth
     end
     
@@ -3335,12 +3335,12 @@ module Org::Eclipse::Swt::Widgets
       if (!(data[0]).equal?(0))
         if ((actual_length[0]).equal?(16))
           values = Array.typed(::Java::Int).new(4) { 0 }
-          OS.memmove___org_eclipse_swt_widgets_display_51(values, data[0], 16)
+          OS.memmove___org_eclipse_swt_widgets_display_55(values, data[0], 16)
           result = Rectangle.new(values[0], values[1], values[2], values[3])
         else
           if ((actual_length[0]).equal?(32))
             values = Array.typed(::Java::Long).new(4) { 0 }
-            OS.memmove___org_eclipse_swt_widgets_display_53(values, data[0], 32)
+            OS.memmove___org_eclipse_swt_widgets_display_57(values, data[0], 32)
             result = Rectangle.new(RJava.cast_to_int(values[0]), RJava.cast_to_int(values[1]), RJava.cast_to_int(values[2]), RJava.cast_to_int(values[3]))
           end
         end
@@ -3854,7 +3854,7 @@ module Org::Eclipse::Swt::Widgets
     # long
     # long
     def idle_proc(data)
-      result = run_async_messages(false)
+      result = run_async_messages___org_eclipse_swt_widgets_display_59(false)
       if (!result)
         synchronized((@idle_lock)) do
           @idle_handle = 0
@@ -4161,7 +4161,7 @@ module Org::Eclipse::Swt::Widgets
             length = OS.strlen(ptr2)
             if (length > 0)
               buffer2 = Array.typed(::Java::Byte).new(length) { 0 }
-              OS.memmove___org_eclipse_swt_widgets_display_55(buffer2, ptr2, length)
+              OS.memmove___org_eclipse_swt_widgets_display_61(buffer2, ptr2, length)
               @window_manager = RJava.cast_to_string(String.new(Converter.mbcs_to_wcs(nil, buffer2)))
             end
           end
@@ -4538,7 +4538,7 @@ module Org::Eclipse::Swt::Widgets
     def pango_layout_new_proc(type, n_construct_properties, construct_properties)
       # long
       # 64
-      layout = OS._call___org_eclipse_swt_widgets_display_57(@pango_layout_new_default_proc, type, RJava.cast_to_int(n_construct_properties), construct_properties)
+      layout = OS._call___org_eclipse_swt_widgets_display_63(@pango_layout_new_default_proc, type, RJava.cast_to_int(n_construct_properties), construct_properties)
       OS.pango_layout_set_auto_dir(layout, false)
       return layout
     end
@@ -4767,7 +4767,7 @@ module Org::Eclipse::Swt::Widgets
         run_deferred_events
         return true
       end
-      return is_disposed || run_async_messages(false)
+      return is_disposed || run_async_messages___org_eclipse_swt_widgets_display_65(false)
     end
     
     class_module.module_eval {
@@ -4814,7 +4814,7 @@ module Org::Eclipse::Swt::Widgets
     # @see Device#dispose
     # @see #destroy
     def release
-      send_event(SWT::Dispose, Event.new)
+      send_event___org_eclipse_swt_widgets_display_67(SWT::Dispose, Event.new)
       shells = get_shells
       i = 0
       while i < shells.attr_length
@@ -4834,7 +4834,7 @@ module Org::Eclipse::Swt::Widgets
         i_ = 0
         while i_ < @dispose_list.attr_length
           if (!(@dispose_list[i_]).nil?)
-            @dispose_list[i_].run
+            @dispose_list[i_].run___org_eclipse_swt_widgets_display_68
           end
           i_ += 1
         end
@@ -5199,7 +5199,7 @@ module Org::Eclipse::Swt::Widgets
     
     typesig { [::Java::Boolean] }
     def run_async_messages(all)
-      return @synchronizer.run_async_messages(all)
+      return @synchronizer.run_async_messages___org_eclipse_swt_widgets_display_70(all)
     end
     
     typesig { [] }
@@ -5223,7 +5223,7 @@ module Org::Eclipse::Swt::Widgets
           item = event.attr_item
           if ((item).nil? || !item.is_disposed)
             run = true
-            widget.send_event(event)
+            widget.send_event___org_eclipse_swt_widgets_display_72(event)
           end
         end
       end
@@ -5264,7 +5264,7 @@ module Org::Eclipse::Swt::Widgets
       @run_settings = false
       save_resources
       initialize_system_colors
-      send_event(SWT::Settings, nil)
+      send_event___org_eclipse_swt_widgets_display_74(SWT::Settings, nil)
       shells = get_shells
       i = 0
       while i < shells.attr_length
@@ -5569,7 +5569,7 @@ module Org::Eclipse::Swt::Widgets
         @synchronizer = synchronizer
       end
       if (!(old_synchronizer).nil?)
-        old_synchronizer.run_async_messages(true)
+        old_synchronizer.run_async_messages___org_eclipse_swt_widgets_display_76(true)
       end
     end
     
@@ -5690,7 +5690,7 @@ module Org::Eclipse::Swt::Widgets
               end
               begin
                 @wake = false
-                OS._call___org_eclipse_swt_widgets_display_59(poll, @fds, nfds, @timeout[0])
+                OS._call___org_eclipse_swt_widgets_display_78(poll, @fds, nfds, @timeout[0])
               ensure
                 i_ = 0
                 while i_ < count
@@ -5799,7 +5799,7 @@ module Org::Eclipse::Swt::Widgets
         @timer_list[index] = nil
         @timer_ids[index] = 0
         if (!(runnable).nil?)
-          runnable.run
+          runnable.run___org_eclipse_swt_widgets_display_80
         end
       end
       return 0
@@ -5923,7 +5923,7 @@ module Org::Eclipse::Swt::Widgets
       end
       if (!filter_event(event))
         if (!(@event_table).nil?)
-          @event_table.send_event(event)
+          @event_table.send_event___org_eclipse_swt_widgets_display_82(event)
         end
       end
     end
@@ -6100,7 +6100,7 @@ module Org::Eclipse::Swt::Widgets
       if ((widget).nil?)
         return 0
       end
-      return widget.window_proc___org_eclipse_swt_widgets_display_61(handle, user_data)
+      return widget.window_proc___org_eclipse_swt_widgets_display_84(handle, user_data)
     end
     
     typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
@@ -6113,7 +6113,7 @@ module Org::Eclipse::Swt::Widgets
       if ((widget).nil?)
         return 0
       end
-      return widget.window_proc___org_eclipse_swt_widgets_display_63(handle, arg0, user_data)
+      return widget.window_proc___org_eclipse_swt_widgets_display_86(handle, arg0, user_data)
     end
     
     typesig { [::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int] }
@@ -6127,7 +6127,7 @@ module Org::Eclipse::Swt::Widgets
       if ((widget).nil?)
         return 0
       end
-      return widget.window_proc___org_eclipse_swt_widgets_display_65(handle, arg0, arg1, user_data)
+      return widget.window_proc___org_eclipse_swt_widgets_display_88(handle, arg0, arg1, user_data)
     end
     
     typesig { [::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int] }
@@ -6142,7 +6142,7 @@ module Org::Eclipse::Swt::Widgets
       if ((widget).nil?)
         return 0
       end
-      return widget.window_proc___org_eclipse_swt_widgets_display_67(handle, arg0, arg1, arg2, user_data)
+      return widget.window_proc___org_eclipse_swt_widgets_display_90(handle, arg0, arg1, arg2, user_data)
     end
     
     typesig { [::Java::Int] }

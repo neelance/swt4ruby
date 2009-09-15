@@ -489,7 +489,7 @@ module Org::Eclipse::Swt::Widgets
     typesig { [] }
     def close_widget
       event = Event.new
-      send_event(SWT::Close, event)
+      send_event___org_eclipse_swt_widgets_decorations_1(SWT::Close, event)
       if (event.attr_doit && !is_disposed)
         dispose
       end
@@ -1429,7 +1429,7 @@ module Org::Eclipse::Swt::Widgets
             OS._command_bar_show(@menu_bar.attr_hwnd_cb, true)
           end
           if (resize)
-            send_event(SWT::Resize)
+            send_event___org_eclipse_swt_widgets_decorations_3(SWT::Resize)
             if (is_disposed)
               return
             end
@@ -1564,7 +1564,7 @@ module Org::Eclipse::Swt::Widgets
           location = get_location
           @old_x = location.attr_x
           @old_y = location.attr_y
-          send_event(SWT::Move)
+          send_event___org_eclipse_swt_widgets_decorations_5(SWT::Move)
           if (is_disposed)
             return
           end
@@ -1574,7 +1574,7 @@ module Org::Eclipse::Swt::Widgets
           rect = get_client_area
           @old_width = rect.attr_width
           @old_height = rect.attr_height
-          send_event(SWT::Resize)
+          send_event___org_eclipse_swt_widgets_decorations_7(SWT::Resize)
           if (is_disposed)
             return
           end
@@ -1692,7 +1692,7 @@ module Org::Eclipse::Swt::Widgets
         # It is possible (but unlikely), that application
         # code could have disposed the widget in the show
         # event.  If this happens, just return.
-        send_event(SWT::Show)
+        send_event___org_eclipse_swt_widgets_decorations_9(SWT::Show)
         if (is_disposed)
           return
         end
@@ -1769,7 +1769,7 @@ module Org::Eclipse::Swt::Widgets
         if (is_disposed)
           return
         end
-        send_event(SWT::Hide)
+        send_event___org_eclipse_swt_widgets_decorations_11(SWT::Hide)
       end
     end
     
@@ -2037,7 +2037,7 @@ module Org::Eclipse::Swt::Widgets
         control = self.attr_display.find_control(l_param)
         if ((control).nil? || control.is_a?(Shell))
           if (self.is_a?(Shell))
-            send_event(SWT::Activate)
+            send_event___org_eclipse_swt_widgets_decorations_13(SWT::Activate)
             if (is_disposed)
               return LRESULT::ZERO
             end
@@ -2055,7 +2055,7 @@ module Org::Eclipse::Swt::Widgets
         control = display.find_control(l_param)
         if ((control).nil? || control.is_a?(Shell))
           if (self.is_a?(Shell))
-            send_event(SWT::Deactivate)
+            send_event___org_eclipse_swt_widgets_decorations_15(SWT::Deactivate)
             if (!is_disposed)
               shell = get_shell
               shell.set_active_control(nil)
@@ -2185,7 +2185,7 @@ module Org::Eclipse::Swt::Widgets
       if (!(result).nil?)
         return result
       end
-      send_event(SWT::Deiconify)
+      send_event___org_eclipse_swt_widgets_decorations_17(SWT::Deiconify)
       # widget could be disposed at this point
       return result
     end
@@ -2233,7 +2233,7 @@ module Org::Eclipse::Swt::Widgets
         end
       end
       if ((w_param).equal?(OS::SIZE_MINIMIZED))
-        send_event(SWT::Iconify)
+        send_event___org_eclipse_swt_widgets_decorations_19(SWT::Iconify)
         # widget could be disposed at this point
       end
       return result

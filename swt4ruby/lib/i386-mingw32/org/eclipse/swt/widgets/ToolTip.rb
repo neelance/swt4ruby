@@ -654,7 +654,7 @@ module Org::Eclipse::Swt::Widgets
           if (!((self.attr_style & SWT::ICON_ERROR)).equal?(0))
             icon_data.attr_dw_info_flags = OS::NIIF_ERROR
           end
-          send_event(SWT::Show)
+          send_event___org_eclipse_swt_widgets_tool_tip_1(SWT::Show)
           @visible = OS._shell_notify_icon(OS::NIM_MODIFY, icon_data)
         else
           # TODO - hide the tray item

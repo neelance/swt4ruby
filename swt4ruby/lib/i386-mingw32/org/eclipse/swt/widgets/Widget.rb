@@ -905,17 +905,17 @@ module Org::Eclipse::Swt::Widgets
       if ((event).nil?)
         event = Event.new
       end
-      send_event(event_type, event)
+      send_event___org_eclipse_swt_widgets_widget_1(event_type, event)
     end
     
     typesig { [::Java::Int] }
     def post_event(event_type)
-      send_event(event_type, nil, false)
+      send_event___org_eclipse_swt_widgets_widget_3(event_type, nil, false)
     end
     
     typesig { [::Java::Int, Event] }
     def post_event(event_type, event)
-      send_event(event_type, event, false)
+      send_event___org_eclipse_swt_widgets_widget_5(event_type, event, false)
     end
     
     typesig { [::Java::Boolean] }
@@ -940,7 +940,7 @@ module Org::Eclipse::Swt::Widgets
     def release(destroy)
       if (((@state & DISPOSE_SENT)).equal?(0))
         @state |= DISPOSE_SENT
-        send_event(SWT::Dispose)
+        send_event___org_eclipse_swt_widgets_widget_7(SWT::Dispose)
       end
       if (((@state & DISPOSED)).equal?(0))
         release_children(destroy)
@@ -1128,7 +1128,7 @@ module Org::Eclipse::Swt::Widgets
       event.attr_x = x
       event.attr_y = y
       set_input_state(event, SWT::DragDetect)
-      post_event___org_eclipse_swt_widgets_widget_1(SWT::DragDetect, event)
+      post_event___org_eclipse_swt_widgets_widget_9(SWT::DragDetect, event)
       if (is_disposed)
         return false
       end
@@ -1142,7 +1142,7 @@ module Org::Eclipse::Swt::Widgets
       event.attr_x = x
       event.attr_y = y
       event.attr_state_mask = state_mask
-      post_event___org_eclipse_swt_widgets_widget_3(SWT::DragDetect, event)
+      post_event___org_eclipse_swt_widgets_widget_11(SWT::DragDetect, event)
       if (is_disposed)
         return false
       end
@@ -1154,19 +1154,19 @@ module Org::Eclipse::Swt::Widgets
       display = event.attr_display
       if (!display.filter_event(event))
         if (!(@event_table).nil?)
-          @event_table.send_event(event)
+          @event_table.send_event___org_eclipse_swt_widgets_widget_13(event)
         end
       end
     end
     
     typesig { [::Java::Int] }
     def send_event(event_type)
-      send_event(event_type, nil, true)
+      send_event___org_eclipse_swt_widgets_widget_15(event_type, nil, true)
     end
     
     typesig { [::Java::Int, Event] }
     def send_event(event_type, event)
-      send_event(event_type, event, true)
+      send_event___org_eclipse_swt_widgets_widget_17(event_type, event, true)
     end
     
     typesig { [::Java::Int, Event, ::Java::Boolean] }
@@ -1184,9 +1184,9 @@ module Org::Eclipse::Swt::Widgets
         event.attr_time = @display.get_last_event_time
       end
       if (send)
-        send_event(event)
+        send_event___org_eclipse_swt_widgets_widget_19(event)
       else
-        @display.post_event___org_eclipse_swt_widgets_widget_5(event)
+        @display.post_event___org_eclipse_swt_widgets_widget_21(event)
       end
     end
     
@@ -1205,7 +1205,7 @@ module Org::Eclipse::Swt::Widgets
     # long
     # long
     def send_key_event(type, msg, w_param, l_param, event)
-      send_event(type, event)
+      send_event___org_eclipse_swt_widgets_widget_23(type, event)
       if (is_disposed)
         return false
       end
@@ -1217,7 +1217,7 @@ module Org::Eclipse::Swt::Widgets
     # long
     # long
     def send_mouse_event(type, button, hwnd, msg, w_param, l_param)
-      return send_mouse_event___org_eclipse_swt_widgets_widget_7(type, button, @display.get_click_count(type, button, hwnd, l_param), 0, false, hwnd, msg, w_param, l_param)
+      return send_mouse_event___org_eclipse_swt_widgets_widget_25(type, button, @display.get_click_count(type, button, hwnd, l_param), 0, false, hwnd, msg, w_param, l_param)
     end
     
     typesig { [::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Boolean, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int] }
@@ -1237,12 +1237,12 @@ module Org::Eclipse::Swt::Widgets
       set_input_state(event, type)
       map_event(hwnd, event)
       if (send)
-        send_event(type, event)
+        send_event___org_eclipse_swt_widgets_widget_27(type, event)
         if (is_disposed)
           return false
         end
       else
-        post_event___org_eclipse_swt_widgets_widget_9(type, event)
+        post_event___org_eclipse_swt_widgets_widget_29(type, event)
       end
       return event.attr_doit
     end
@@ -1351,7 +1351,7 @@ module Org::Eclipse::Swt::Widgets
     
     typesig { [::Java::Int] }
     def send_focus_event(type)
-      send_event(type)
+      send_event___org_eclipse_swt_widgets_widget_31(type)
       # widget could be disposed at this point
       return true
     end
@@ -1548,7 +1548,7 @@ module Org::Eclipse::Swt::Widgets
       event = Event.new
       event.attr_x = x
       event.attr_y = y
-      send_event(SWT::MenuDetect, event)
+      send_event___org_eclipse_swt_widgets_widget_33(SWT::MenuDetect, event)
       # widget could be disposed at this point
       if (is_disposed)
         return false
@@ -1944,7 +1944,7 @@ module Org::Eclipse::Swt::Widgets
           # Check the bit 30 to get the key state
           type = !((l_param & 0x40000000)).equal?(0) ? SWT::HardKeyUp : SWT::HardKeyDown
           if (set_input_state(event, type))
-            send_event(type, event)
+            send_event___org_eclipse_swt_widgets_widget_35(type, event)
           end
           # widget could be disposed at this point
           return nil
@@ -2084,8 +2084,8 @@ module Org::Eclipse::Swt::Widgets
       result = nil
       display = @display
       display.attr_capture_changed = false
-      send_mouse_event___org_eclipse_swt_widgets_widget_11(SWT::MouseDown, 1, hwnd, OS::WM_LBUTTONDOWN, w_param, l_param)
-      if (send_mouse_event___org_eclipse_swt_widgets_widget_13(SWT::MouseDoubleClick, 1, hwnd, OS::WM_LBUTTONDBLCLK, w_param, l_param))
+      send_mouse_event___org_eclipse_swt_widgets_widget_37(SWT::MouseDown, 1, hwnd, OS::WM_LBUTTONDOWN, w_param, l_param)
+      if (send_mouse_event___org_eclipse_swt_widgets_widget_39(SWT::MouseDoubleClick, 1, hwnd, OS::WM_LBUTTONDBLCLK, w_param, l_param))
         result = LRESULT.new(call_window_proc(hwnd, OS::WM_LBUTTONDBLCLK, w_param, l_param))
       else
         result = LRESULT::ZERO
@@ -2130,7 +2130,7 @@ module Org::Eclipse::Swt::Widgets
         end
       end
       display.attr_capture_changed = false
-      dispatch = send_mouse_event___org_eclipse_swt_widgets_widget_15(SWT::MouseDown, 1, count, 0, false, hwnd, OS::WM_LBUTTONDOWN, w_param, l_param)
+      dispatch = send_mouse_event___org_eclipse_swt_widgets_widget_41(SWT::MouseDown, 1, count, 0, false, hwnd, OS::WM_LBUTTONDOWN, w_param, l_param)
       if (dispatch && ((consume).nil? || !consume[0]))
         result = LRESULT.new(call_window_proc(hwnd, OS::WM_LBUTTONDOWN, w_param, l_param))
       else
@@ -2199,7 +2199,7 @@ module Org::Eclipse::Swt::Widgets
     def wm_lbutton_up(hwnd, w_param, l_param)
       display = @display
       result = nil
-      if (send_mouse_event___org_eclipse_swt_widgets_widget_17(SWT::MouseUp, 1, hwnd, OS::WM_LBUTTONUP, w_param, l_param))
+      if (send_mouse_event___org_eclipse_swt_widgets_widget_43(SWT::MouseUp, 1, hwnd, OS::WM_LBUTTONUP, w_param, l_param))
         result = LRESULT.new(call_window_proc(hwnd, OS::WM_LBUTTONUP, w_param, l_param))
       else
         result = LRESULT::ZERO
@@ -2239,8 +2239,8 @@ module Org::Eclipse::Swt::Widgets
       result = nil
       display = @display
       display.attr_capture_changed = false
-      send_mouse_event___org_eclipse_swt_widgets_widget_19(SWT::MouseDown, 2, hwnd, OS::WM_MBUTTONDOWN, w_param, l_param)
-      if (send_mouse_event___org_eclipse_swt_widgets_widget_21(SWT::MouseDoubleClick, 2, hwnd, OS::WM_MBUTTONDBLCLK, w_param, l_param))
+      send_mouse_event___org_eclipse_swt_widgets_widget_45(SWT::MouseDown, 2, hwnd, OS::WM_MBUTTONDOWN, w_param, l_param)
+      if (send_mouse_event___org_eclipse_swt_widgets_widget_47(SWT::MouseDoubleClick, 2, hwnd, OS::WM_MBUTTONDBLCLK, w_param, l_param))
         result = LRESULT.new(call_window_proc(hwnd, OS::WM_MBUTTONDBLCLK, w_param, l_param))
       else
         result = LRESULT::ZERO
@@ -2261,7 +2261,7 @@ module Org::Eclipse::Swt::Widgets
       result = nil
       display = @display
       display.attr_capture_changed = false
-      if (send_mouse_event___org_eclipse_swt_widgets_widget_23(SWT::MouseDown, 2, hwnd, OS::WM_MBUTTONDOWN, w_param, l_param))
+      if (send_mouse_event___org_eclipse_swt_widgets_widget_49(SWT::MouseDown, 2, hwnd, OS::WM_MBUTTONDOWN, w_param, l_param))
         result = LRESULT.new(call_window_proc(hwnd, OS::WM_MBUTTONDOWN, w_param, l_param))
       else
         result = LRESULT::ZERO
@@ -2281,7 +2281,7 @@ module Org::Eclipse::Swt::Widgets
     def wm_mbutton_up(hwnd, w_param, l_param)
       display = @display
       result = nil
-      if (send_mouse_event___org_eclipse_swt_widgets_widget_25(SWT::MouseUp, 2, hwnd, OS::WM_MBUTTONUP, w_param, l_param))
+      if (send_mouse_event___org_eclipse_swt_widgets_widget_51(SWT::MouseUp, 2, hwnd, OS::WM_MBUTTONUP, w_param, l_param))
         result = LRESULT.new(call_window_proc(hwnd, OS::WM_MBUTTONUP, w_param, l_param))
       else
         result = LRESULT::ZERO
@@ -2307,7 +2307,7 @@ module Org::Eclipse::Swt::Widgets
     # long
     # long
     def wm_mouse_hover(hwnd, w_param, l_param)
-      if (!send_mouse_event___org_eclipse_swt_widgets_widget_27(SWT::MouseHover, 0, hwnd, OS::WM_MOUSEHOVER, w_param, l_param))
+      if (!send_mouse_event___org_eclipse_swt_widgets_widget_53(SWT::MouseHover, 0, hwnd, OS::WM_MOUSEHOVER, w_param, l_param))
         return LRESULT::ZERO
       end
       return nil
@@ -2326,7 +2326,7 @@ module Org::Eclipse::Swt::Widgets
       OS._pointstopoint(pt, pos)
       OS._screen_to_client(hwnd, pt)
       l_param = OS._makelparam(pt.attr_x, pt.attr_y)
-      if (!send_mouse_event___org_eclipse_swt_widgets_widget_29(SWT::MouseExit, 0, hwnd, OS::WM_MOUSELEAVE, w_param, l_param))
+      if (!send_mouse_event___org_eclipse_swt_widgets_widget_55(SWT::MouseExit, 0, hwnd, OS::WM_MOUSELEAVE, w_param, l_param))
         return LRESULT::ZERO
       end
       return nil
@@ -2367,7 +2367,7 @@ module Org::Eclipse::Swt::Widgets
                   OS._translate_message(msg)
                   OS._dispatch_message(msg)
                 end
-                send_mouse_event___org_eclipse_swt_widgets_widget_31(SWT::MouseEnter, 0, hwnd, OS::WM_MOUSEMOVE, w_param, l_param)
+                send_mouse_event___org_eclipse_swt_widgets_widget_57(SWT::MouseEnter, 0, hwnd, OS::WM_MOUSEMOVE, w_param, l_param)
               end
             else
               lp_event_track.attr_dw_flags = OS::TME_HOVER
@@ -2377,7 +2377,7 @@ module Org::Eclipse::Swt::Widgets
         end
         if (!(pos).equal?(display.attr_last_mouse))
           display.attr_last_mouse = pos
-          if (!send_mouse_event___org_eclipse_swt_widgets_widget_33(SWT::MouseMove, 0, hwnd, OS::WM_MOUSEMOVE, w_param, l_param))
+          if (!send_mouse_event___org_eclipse_swt_widgets_widget_59(SWT::MouseMove, 0, hwnd, OS::WM_MOUSEMOVE, w_param, l_param))
             result = LRESULT::ZERO
           end
         end
@@ -2414,7 +2414,7 @@ module Org::Eclipse::Swt::Widgets
       OS._pointstopoint(pt, l_param)
       OS._screen_to_client(hwnd, pt)
       l_param = OS._makelparam(pt.attr_x, pt.attr_y)
-      if (!send_mouse_event___org_eclipse_swt_widgets_widget_35(SWT::MouseWheel, 0, count, detail, true, hwnd, OS::WM_MOUSEWHEEL, w_param, l_param))
+      if (!send_mouse_event___org_eclipse_swt_widgets_widget_61(SWT::MouseWheel, 0, count, detail, true, hwnd, OS::WM_MOUSEWHEEL, w_param, l_param))
         return LRESULT::ZERO
       end
       return nil
@@ -2468,7 +2468,7 @@ module Org::Eclipse::Swt::Widgets
             event.attr_y = ps.attr_top
             event.attr_width = width
             event.attr_height = height
-            send_event(SWT::Paint, event)
+            send_event___org_eclipse_swt_widgets_widget_63(SWT::Paint, event)
             # widget could be disposed at this point
             event.attr_gc = nil
           end
@@ -2499,7 +2499,7 @@ module Org::Eclipse::Swt::Widgets
             event.attr_y = rect.attr_top
             event.attr_width = width
             event.attr_height = height
-            send_event(SWT::Paint, event)
+            send_event___org_eclipse_swt_widgets_widget_65(SWT::Paint, event)
             # widget could be disposed at this point
             event.attr_gc = nil
           end
@@ -2563,8 +2563,8 @@ module Org::Eclipse::Swt::Widgets
       result = nil
       display = @display
       display.attr_capture_changed = false
-      send_mouse_event___org_eclipse_swt_widgets_widget_37(SWT::MouseDown, 3, hwnd, OS::WM_RBUTTONDOWN, w_param, l_param)
-      if (send_mouse_event___org_eclipse_swt_widgets_widget_39(SWT::MouseDoubleClick, 3, hwnd, OS::WM_RBUTTONDBLCLK, w_param, l_param))
+      send_mouse_event___org_eclipse_swt_widgets_widget_67(SWT::MouseDown, 3, hwnd, OS::WM_RBUTTONDOWN, w_param, l_param)
+      if (send_mouse_event___org_eclipse_swt_widgets_widget_69(SWT::MouseDoubleClick, 3, hwnd, OS::WM_RBUTTONDBLCLK, w_param, l_param))
         result = LRESULT.new(call_window_proc(hwnd, OS::WM_RBUTTONDBLCLK, w_param, l_param))
       else
         result = LRESULT::ZERO
@@ -2585,7 +2585,7 @@ module Org::Eclipse::Swt::Widgets
       result = nil
       display = @display
       display.attr_capture_changed = false
-      if (send_mouse_event___org_eclipse_swt_widgets_widget_41(SWT::MouseDown, 3, hwnd, OS::WM_RBUTTONDOWN, w_param, l_param))
+      if (send_mouse_event___org_eclipse_swt_widgets_widget_71(SWT::MouseDown, 3, hwnd, OS::WM_RBUTTONDOWN, w_param, l_param))
         result = LRESULT.new(call_window_proc(hwnd, OS::WM_RBUTTONDOWN, w_param, l_param))
       else
         result = LRESULT::ZERO
@@ -2605,7 +2605,7 @@ module Org::Eclipse::Swt::Widgets
     def wm_rbutton_up(hwnd, w_param, l_param)
       display = @display
       result = nil
-      if (send_mouse_event___org_eclipse_swt_widgets_widget_43(SWT::MouseUp, 3, hwnd, OS::WM_RBUTTONUP, w_param, l_param))
+      if (send_mouse_event___org_eclipse_swt_widgets_widget_73(SWT::MouseUp, 3, hwnd, OS::WM_RBUTTONUP, w_param, l_param))
         result = LRESULT.new(call_window_proc(hwnd, OS::WM_RBUTTONUP, w_param, l_param))
       else
         # Call the DefWindowProc() to support WM_CONTEXTMENU
@@ -2836,8 +2836,8 @@ module Org::Eclipse::Swt::Widgets
       display = @display
       display.attr_capture_changed = false
       button = (OS._hiword(w_param)).equal?(OS::XBUTTON1) ? 4 : 5
-      send_mouse_event___org_eclipse_swt_widgets_widget_45(SWT::MouseDown, button, hwnd, OS::WM_XBUTTONDOWN, w_param, l_param)
-      if (send_mouse_event___org_eclipse_swt_widgets_widget_47(SWT::MouseDoubleClick, button, hwnd, OS::WM_XBUTTONDBLCLK, w_param, l_param))
+      send_mouse_event___org_eclipse_swt_widgets_widget_75(SWT::MouseDown, button, hwnd, OS::WM_XBUTTONDOWN, w_param, l_param)
+      if (send_mouse_event___org_eclipse_swt_widgets_widget_77(SWT::MouseDoubleClick, button, hwnd, OS::WM_XBUTTONDBLCLK, w_param, l_param))
         result = LRESULT.new(call_window_proc(hwnd, OS::WM_XBUTTONDBLCLK, w_param, l_param))
       else
         result = LRESULT::ZERO
@@ -2860,7 +2860,7 @@ module Org::Eclipse::Swt::Widgets
       display.attr_capture_changed = false
       display.attr_x_mouse = true
       button = (OS._hiword(w_param)).equal?(OS::XBUTTON1) ? 4 : 5
-      if (send_mouse_event___org_eclipse_swt_widgets_widget_49(SWT::MouseDown, button, hwnd, OS::WM_XBUTTONDOWN, w_param, l_param))
+      if (send_mouse_event___org_eclipse_swt_widgets_widget_79(SWT::MouseDown, button, hwnd, OS::WM_XBUTTONDOWN, w_param, l_param))
         result = LRESULT.new(call_window_proc(hwnd, OS::WM_XBUTTONDOWN, w_param, l_param))
       else
         result = LRESULT::ZERO
@@ -2881,7 +2881,7 @@ module Org::Eclipse::Swt::Widgets
       display = @display
       result = nil
       button = (OS._hiword(w_param)).equal?(OS::XBUTTON1) ? 4 : 5
-      if (send_mouse_event___org_eclipse_swt_widgets_widget_51(SWT::MouseUp, button, hwnd, OS::WM_XBUTTONUP, w_param, l_param))
+      if (send_mouse_event___org_eclipse_swt_widgets_widget_81(SWT::MouseUp, button, hwnd, OS::WM_XBUTTONUP, w_param, l_param))
         result = LRESULT.new(call_window_proc(hwnd, OS::WM_XBUTTONUP, w_param, l_param))
       else
         result = LRESULT::ZERO

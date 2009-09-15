@@ -258,7 +258,7 @@ module Org::Eclipse::Swt::Ole::Win32
       end
       event.attr_type = event_type
       event.attr_widget = @widget
-      @event_table.send_event(event)
+      @event_table.send_event___org_eclipse_swt_ole_win32_ole_event_sink_1(event)
     end
     
     typesig { [::Java::Int, ::Java::Int] }

@@ -362,7 +362,7 @@ module Org::Eclipse::Swt::Widgets
         widget.set_selected_range(range)
       end
       if (!(string.length).equal?(0))
-        send_event(SWT::Modify)
+        send_event___org_eclipse_swt_widgets_text_1(SWT::Modify)
       end
     end
     
@@ -693,7 +693,7 @@ module Org::Eclipse::Swt::Widgets
       end
       new_selection = get_selection
       if (!cut || !(old_selection == new_selection))
-        send_event(SWT::Modify)
+        send_event___org_eclipse_swt_widgets_text_3(SWT::Modify)
       end
     end
     
@@ -807,11 +807,11 @@ module Org::Eclipse::Swt::Widgets
       # long
       # long
       rect_count = Array.typed(::Java::Int).new(1) { 0 }
-      OS.memmove___org_eclipse_swt_widgets_text_1(rect_count, p_rect_count, C::PTR_SIZEOF)
+      OS.memmove___org_eclipse_swt_widgets_text_5(rect_count, p_rect_count, C::PTR_SIZEOF)
       OS.free(p_rect_count)
       rect = NSRect.new
       if (rect_count[0] > 0)
-        OS.memmove___org_eclipse_swt_widgets_text_3(rect, p_array, NSRect.attr_sizeof)
+        OS.memmove___org_eclipse_swt_widgets_text_7(rect, p_array, NSRect.attr_sizeof)
       end
       return Point.new(RJava.cast_to_int(rect.attr_x), RJava.cast_to_int(rect.attr_y))
     end
@@ -1363,7 +1363,7 @@ module Org::Eclipse::Swt::Widgets
         widget.text_storage.replace_characters_in_range(range, str)
       end
       if (!(string_.length).equal?(0))
-        send_event(SWT::Modify)
+        send_event___org_eclipse_swt_widgets_text_9(SWT::Modify)
       end
     end
     
@@ -1460,7 +1460,7 @@ module Org::Eclipse::Swt::Widgets
           (self.attr_view).paste(nil)
         end
       end
-      send_event(SWT::Modify)
+      send_event___org_eclipse_swt_widgets_text_11(SWT::Modify)
     end
     
     typesig { [] }
@@ -1626,7 +1626,7 @@ module Org::Eclipse::Swt::Widgets
         # KP Enter
         when 76, 36
           # Return
-          post_event___org_eclipse_swt_widgets_text_5(SWT::DefaultSelection)
+          post_event___org_eclipse_swt_widgets_text_13(SWT::DefaultSelection)
         end
       end
       return result
@@ -1639,7 +1639,7 @@ module Org::Eclipse::Swt::Widgets
       end
       event = Event.new
       event.attr_detail = SWT::ICON_SEARCH
-      post_event___org_eclipse_swt_widgets_text_7(SWT::DefaultSelection, event)
+      post_event___org_eclipse_swt_widgets_text_15(SWT::DefaultSelection, event)
     end
     
     typesig { [] }
@@ -1649,7 +1649,7 @@ module Org::Eclipse::Swt::Widgets
       end
       event = Event.new
       event.attr_detail = SWT::ICON_CANCEL
-      post_event___org_eclipse_swt_widgets_text_9(SWT::DefaultSelection, event)
+      post_event___org_eclipse_swt_widgets_text_17(SWT::DefaultSelection, event)
     end
     
     typesig { [] }
@@ -2034,7 +2034,7 @@ module Org::Eclipse::Swt::Widgets
         widget.set_string(str)
         widget.set_selected_range(NSRange.new)
       end
-      send_event(SWT::Modify)
+      send_event___org_eclipse_swt_widgets_text_19(SWT::Modify)
     end
     
     typesig { [::Java::Int] }
@@ -2098,7 +2098,7 @@ module Org::Eclipse::Swt::Widgets
     # long
     def should_change_text_in_range_replacement_string(id, sel, affected_char_range, replacement_string)
       range = NSRange.new
-      OS.memmove___org_eclipse_swt_widgets_text_11(range, affected_char_range, NSRange.attr_sizeof)
+      OS.memmove___org_eclipse_swt_widgets_text_21(range, affected_char_range, NSRange.attr_sizeof)
       result = call_super_boolean(id, sel, range, replacement_string)
       if (!hooks(SWT::Verify) && (@echo_character).equal?(Character.new(?\0.ord)))
         return result
@@ -2141,7 +2141,7 @@ module Org::Eclipse::Swt::Widgets
         end
       end
       if (!result)
-        send_event(SWT::Modify)
+        send_event___org_eclipse_swt_widgets_text_23(SWT::Modify)
       end
       return result
     end
@@ -2186,7 +2186,7 @@ module Org::Eclipse::Swt::Widgets
       if (!((self.attr_style & SWT::SINGLE)).equal?(0))
         super(id, sel, a_notification)
       end
-      post_event___org_eclipse_swt_widgets_text_13(SWT::Modify)
+      post_event___org_eclipse_swt_widgets_text_25(SWT::Modify)
     end
     
     typesig { [::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int] }
@@ -2204,7 +2204,7 @@ module Org::Eclipse::Swt::Widgets
       end
       # allow the selection change to proceed
       result = NSRange.new
-      OS.memmove___org_eclipse_swt_widgets_text_15(result, new_selected_char_range, NSRange.attr_sizeof)
+      OS.memmove___org_eclipse_swt_widgets_text_27(result, new_selected_char_range, NSRange.attr_sizeof)
       return result
     end
     
@@ -2252,7 +2252,7 @@ module Org::Eclipse::Swt::Widgets
       # code could have disposed the widget in the verify
       # event.  If this happens, answer null to cancel
       # the operation.
-      send_event(SWT::Verify, event)
+      send_event___org_eclipse_swt_widgets_text_29(SWT::Verify, event)
       if (!event.attr_doit || is_disposed)
         return nil
       end

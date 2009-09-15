@@ -303,7 +303,7 @@ module Org::Eclipse::Swt::Widgets
         OS.g_signal_handlers_unblock_matched(self.attr_handle, OS::G_SIGNAL_MATCH_DATA, 0, 0, 0, 0, SWITCH_PAGE)
         event = Event.new
         event.attr_item = @items[0]
-        send_event(SWT::Selection, event)
+        send_event___org_eclipse_swt_widgets_tab_folder_1(SWT::Selection, event)
         # the widget could be destroyed at this point
       end
     end
@@ -337,7 +337,7 @@ module Org::Eclipse::Swt::Widgets
           end
           event = Event.new
           event.attr_item = @items[new_index]
-          send_event(SWT::Selection, event)
+          send_event___org_eclipse_swt_widgets_tab_folder_3(SWT::Selection, event)
           # the widget could be destroyed at this point
         end
       end
@@ -535,7 +535,7 @@ module Org::Eclipse::Swt::Widgets
       end
       event = Event.new
       event.attr_item = item
-      post_event___org_eclipse_swt_widgets_tab_folder_1(SWT::Selection, event)
+      post_event___org_eclipse_swt_widgets_tab_folder_5(SWT::Selection, event)
       return 0
     end
     
@@ -809,7 +809,7 @@ module Org::Eclipse::Swt::Widgets
         if (notify)
           event = Event.new
           event.attr_item = item
-          send_event(SWT::Selection, event)
+          send_event___org_eclipse_swt_widgets_tab_folder_7(SWT::Selection, event)
         end
       end
     end

@@ -594,7 +594,7 @@ module Org::Eclipse::Swt::Widgets
         if (!((self.attr_style & SWT::RESIZE)).equal?(0))
           orientation_init = resize_rectangles(new_x - @old_x, new_y - @old_y)
           @in_event = true
-          send_event(SWT::Resize, event)
+          send_event___org_eclipse_swt_widgets_tracker_3(SWT::Resize, event)
           @in_event = false
           # It is possible (but unlikely), that application
           # code could have disposed the widget in the move
@@ -638,7 +638,7 @@ module Org::Eclipse::Swt::Widgets
         else
           move_rectangles(new_x - @old_x, new_y - @old_y)
           @in_event = true
-          send_event(SWT::Move, event)
+          send_event___org_eclipse_swt_widgets_tracker_5(SWT::Move, event)
           @in_event = false
           # It is possible (but unlikely), that application
           # code could have disposed the widget in the move
@@ -734,7 +734,7 @@ module Org::Eclipse::Swt::Widgets
         if (!((self.attr_style & SWT::RESIZE)).equal?(0))
           resize_rectangles(x_change, y_change)
           @in_event = true
-          send_event(SWT::Resize, event)
+          send_event___org_eclipse_swt_widgets_tracker_7(SWT::Resize, event)
           @in_event = false
           # It is possible (but unlikely) that application
           # code could have disposed the widget in the move
@@ -774,7 +774,7 @@ module Org::Eclipse::Swt::Widgets
         else
           move_rectangles(x_change, y_change)
           @in_event = true
-          send_event(SWT::Move, event)
+          send_event___org_eclipse_swt_widgets_tracker_9(SWT::Move, event)
           @in_event = false
           # It is possible (but unlikely) that application
           # code could have disposed the widget in the move
@@ -988,7 +988,7 @@ module Org::Eclipse::Swt::Widgets
             dispatch = false
           end
           if (dispatch)
-            application.send_event(event)
+            application.send_event___org_eclipse_swt_widgets_tracker_11(event)
           end
           if (!(@client_cursor).nil? && (@resize_cursor).nil?)
             display.attr_lock_cursor = false

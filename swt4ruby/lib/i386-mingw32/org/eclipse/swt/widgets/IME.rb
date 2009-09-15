@@ -465,7 +465,7 @@ module Org::Eclipse::Swt::Widgets
             if ((@start_offset).equal?(-1))
               event = Event.new
               event.attr_detail = SWT::COMPOSITION_SELECTION
-              send_event(SWT::ImeComposition, event)
+              send_event___org_eclipse_swt_widgets_ime_1(SWT::ImeComposition, event)
               @start_offset = event.attr_start
             end
             event = Event.new
@@ -474,7 +474,7 @@ module Org::Eclipse::Swt::Widgets
             event.attr_end = @start_offset + @text.length
             event.attr_text = @text = RJava.cast_to_string(!(buffer).nil? ? buffer.to_s : "") # $NON-NLS-1$
             @commit_count = @text.length
-            send_event(SWT::ImeComposition, event)
+            send_event___org_eclipse_swt_widgets_ime_3(SWT::ImeComposition, event)
             chars = @text
             @text = "" # $NON-NLS-1$
             @start_offset = -1
@@ -490,7 +490,7 @@ module Org::Eclipse::Swt::Widgets
                 display.attr_last_ascii = c
                 event = Event.new
                 event.attr_character = c
-                @parent.send_event(SWT::KeyDown, event)
+                @parent.send_event___org_eclipse_swt_widgets_ime_5(SWT::KeyDown, event)
                 i += 1
               end
             end
@@ -580,7 +580,7 @@ module Org::Eclipse::Swt::Widgets
         if ((@start_offset).equal?(-1))
           event = Event.new
           event.attr_detail = SWT::COMPOSITION_SELECTION
-          send_event(SWT::ImeComposition, event)
+          send_event___org_eclipse_swt_widgets_ime_7(SWT::ImeComposition, event)
           @start_offset = event.attr_start
           end_ = event.attr_end
         end
@@ -589,7 +589,7 @@ module Org::Eclipse::Swt::Widgets
         event.attr_start = @start_offset
         event.attr_end = end_
         event.attr_text = @text = RJava.cast_to_string(!(buffer).nil? ? buffer.to_s : "") # $NON-NLS-1$
-        send_event(SWT::ImeComposition, event)
+        send_event___org_eclipse_swt_widgets_ime_9(SWT::ImeComposition, event)
         if ((@text.length).equal?(0))
           @start_offset = -1
           @ranges = nil
@@ -651,7 +651,7 @@ module Org::Eclipse::Swt::Widgets
             event.attr_detail = SWT::COMPOSITION_OFFSET
             event.attr_x = OS._get_x_lparam(l_param)
             event.attr_y = OS._get_y_lparam(l_param)
-            send_event(SWT::ImeComposition, event)
+            send_event___org_eclipse_swt_widgets_ime_11(SWT::ImeComposition, event)
             offset = event.attr_index
             length_ = @text.length
             if (!(offset).equal?(-1) && !(@start_offset).equal?(-1) && @start_offset <= offset && offset < @start_offset + length_)

@@ -506,7 +506,7 @@ module Org::Eclipse::Swt::Widgets
         if (!(position).equal?(v_position))
           event = Event.new
           event.attr_detail = position < v_position ? SWT::PAGE_UP : SWT::PAGE_DOWN
-          @vertical_bar.send_event(SWT::Selection, event)
+          @vertical_bar.send_event___org_eclipse_swt_widgets_scrollable_1(SWT::Selection, event)
         end
       end
       if (!(@horizontal_bar).nil?)
@@ -514,7 +514,7 @@ module Org::Eclipse::Swt::Widgets
         if (!(position).equal?(h_position))
           event = Event.new
           event.attr_detail = position < h_position ? SWT::PAGE_UP : SWT::PAGE_DOWN
-          @horizontal_bar.send_event(SWT::Selection, event)
+          @horizontal_bar.send_event___org_eclipse_swt_widgets_scrollable_3(SWT::Selection, event)
         end
       end
       return LRESULT.new(code)

@@ -1184,7 +1184,7 @@ module Org::Eclipse::Swt::Widgets
         if (!((self.attr_style & SWT::RESIZE)).equal?(0))
           resize_rectangles(x_change, y_change)
           @in_event = true
-          send_event(SWT::Resize, event)
+          send_event___org_eclipse_swt_widgets_tracker_1(SWT::Resize, event)
           @in_event = false
           # It is possible (but unlikely) that application
           # code could have disposed the widget in the resize
@@ -1225,7 +1225,7 @@ module Org::Eclipse::Swt::Widgets
         else
           move_rectangles(x_change, y_change)
           @in_event = true
-          send_event(SWT::Move, event)
+          send_event___org_eclipse_swt_widgets_tracker_3(SWT::Move, event)
           @in_event = false
           # It is possible (but unlikely) that application
           # code could have disposed the widget in the move
@@ -1314,7 +1314,7 @@ module Org::Eclipse::Swt::Widgets
             resize_rectangles(new_x - @old_x, new_y - @old_y)
           end
           @in_event = true
-          send_event(SWT::Resize, event)
+          send_event___org_eclipse_swt_widgets_tracker_5(SWT::Resize, event)
           @in_event = false
           # It is possible (but unlikely), that application
           # code could have disposed the widget in the resize
@@ -1363,7 +1363,7 @@ module Org::Eclipse::Swt::Widgets
             move_rectangles(new_x - @old_x, new_y - @old_y)
           end
           @in_event = true
-          send_event(SWT::Move, event)
+          send_event___org_eclipse_swt_widgets_tracker_7(SWT::Move, event)
           @in_event = false
           # It is possible (but unlikely), that application
           # code could have disposed the widget in the move

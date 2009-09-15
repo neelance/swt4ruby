@@ -519,7 +519,7 @@ module Org::Eclipse::Swt::Widgets
           set_selection(value)
         end
       end
-      send_event(SWT::Selection, event)
+      send_event___org_eclipse_swt_widgets_scroll_bar_1(SWT::Selection, event)
     end
     
     typesig { [::Java::Int] }

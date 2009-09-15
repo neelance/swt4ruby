@@ -1638,7 +1638,7 @@ module Org::Eclipse::Swt::Widgets
           event.attr_item = @parent.__get_item(h_new_item)
           @parent.attr_h_anchor = h_new_item
         end
-        @parent.send_event(SWT::Selection, event)
+        @parent.send_event___org_eclipse_swt_widgets_tree_item_1(SWT::Selection, event)
       end
     end
     

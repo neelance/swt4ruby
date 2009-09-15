@@ -249,7 +249,7 @@ module Org::Eclipse::Swt::Widgets
           window = alert.window___org_eclipse_swt_widgets_message_box_3
           application = NSApplication.shared_application
           while (window.is_visible)
-            application.run
+            application.run___org_eclipse_swt_widgets_message_box_5
           end
           response = @return_code
         end
@@ -338,7 +338,7 @@ module Org::Eclipse::Swt::Widgets
       # 64
       @return_code = RJava.cast_to_int(return_code)
       application = NSApplication.shared_application
-      application.end_sheet(NSAlert.new(alert).window___org_eclipse_swt_widgets_message_box_4, return_code)
+      application.end_sheet(NSAlert.new(alert).window___org_eclipse_swt_widgets_message_box_6, return_code)
       if (!((self.attr_style & SWT::PRIMARY_MODAL)).equal?(0))
         application.stop(nil)
       end

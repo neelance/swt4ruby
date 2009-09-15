@@ -389,7 +389,7 @@ module Org::Eclipse::Swt::Widgets
         event.attr_y = rect.attr_top
         event.attr_width = rect.attr_right - rect.attr_left
         event.attr_height = rect.attr_bottom - rect.attr_top
-        send_event(SWT::Paint, event)
+        send_event___org_eclipse_swt_widgets_link_1(SWT::Paint, event)
         event.attr_gc = nil
       end
     end
@@ -874,7 +874,7 @@ module Org::Eclipse::Swt::Widgets
         when Character.new(?\s.ord), SWT::CR
           event = Event.new
           event.attr_text = @ids[@focus_index]
-          send_event(SWT::Selection, event)
+          send_event___org_eclipse_swt_widgets_link_3(SWT::Selection, event)
         when SWT::TAB
           next_ = OS._get_key_state(OS::VK_SHIFT) >= 0
           if (next_)
@@ -1070,7 +1070,7 @@ module Org::Eclipse::Swt::Widgets
           if (rect.contains(x, y))
             event = Event.new
             event.attr_text = @ids[@mouse_down_index]
-            send_event(SWT::Selection, event)
+            send_event___org_eclipse_swt_widgets_link_5(SWT::Selection, event)
             break
           end
           i += 1
@@ -1254,7 +1254,7 @@ module Org::Eclipse::Swt::Widgets
           OS._move_memory(item, l_param, NMLINK.attr_sizeof)
           event = Event.new
           event.attr_text = @ids[item.attr_i_link]
-          send_event(SWT::Selection, event)
+          send_event___org_eclipse_swt_widgets_link_7(SWT::Selection, event)
         end
       end
       return super(hdr, w_param, l_param)

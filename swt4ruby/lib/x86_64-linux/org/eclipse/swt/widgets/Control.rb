@@ -1113,12 +1113,12 @@ module Org::Eclipse::Swt::Widgets
           end
         end
         if (send_move)
-          send_event(SWT::Move)
+          send_event___org_eclipse_swt_widgets_control_5(SWT::Move)
         end
         result |= MOVED
       end
       if (resize && !same_extent)
-        send_event(SWT::Resize)
+        send_event___org_eclipse_swt_widgets_control_7(SWT::Resize)
         result |= RESIZED
       end
       return result
@@ -2398,7 +2398,7 @@ module Org::Eclipse::Swt::Widgets
         case (OS._gdk_event_type(event_ptr))
         when OS::GDK_MOTION_NOTIFY
           gdk_motion_event = GdkEventMotion.new
-          OS.memmove___org_eclipse_swt_widgets_control_5(gdk_motion_event, event_ptr, GdkEventMotion.attr_sizeof)
+          OS.memmove___org_eclipse_swt_widgets_control_9(gdk_motion_event, event_ptr, GdkEventMotion.attr_sizeof)
           if (!((gdk_motion_event.attr_state & OS::GDK_BUTTON1_MASK)).equal?(0))
             if (OS.gtk_drag_check_threshold(self.attr_handle, x, y, RJava.cast_to_int(gdk_motion_event.attr_x), RJava.cast_to_int(gdk_motion_event.attr_y)))
               dragging = true
@@ -2412,7 +2412,7 @@ module Org::Eclipse::Swt::Widgets
           OS.gdk_window_get_pointer(gdk_motion_event.attr_window, new_x, new_y, nil)
         when OS::GDK_KEY_PRESS, OS::GDK_KEY_RELEASE
           gdk_event = GdkEventKey.new
-          OS.memmove___org_eclipse_swt_widgets_control_7(gdk_event, event_ptr, GdkEventKey.attr_sizeof)
+          OS.memmove___org_eclipse_swt_widgets_control_11(gdk_event, event_ptr, GdkEventKey.attr_sizeof)
           if ((gdk_event.attr_keyval).equal?(OS::GDK_Escape))
             quit = true
           end
@@ -2964,7 +2964,7 @@ module Org::Eclipse::Swt::Widgets
     # int
     def gtk_button_press_event(widget, event, send_mouse_down)
       gdk_event = GdkEventButton.new
-      OS.memmove___org_eclipse_swt_widgets_control_9(gdk_event, event, GdkEventButton.attr_sizeof)
+      OS.memmove___org_eclipse_swt_widgets_control_13(gdk_event, event, GdkEventButton.attr_sizeof)
       if ((gdk_event.attr_type).equal?(OS::GDK_3BUTTON_PRESS))
         return 0
       end
@@ -3007,7 +3007,7 @@ module Org::Eclipse::Swt::Widgets
             end
           end
         end
-        if (send_mouse_down && !send_mouse_event___org_eclipse_swt_widgets_control_11(SWT::MouseDown, gdk_event.attr_button, self.attr_display.attr_click_count, 0, false, gdk_event.attr_time, gdk_event.attr_x_root, gdk_event.attr_y_root, false, gdk_event.attr_state))
+        if (send_mouse_down && !send_mouse_event___org_eclipse_swt_widgets_control_15(SWT::MouseDown, gdk_event.attr_button, self.attr_display.attr_click_count, 0, false, gdk_event.attr_time, gdk_event.attr_x_root, gdk_event.attr_y_root, false, gdk_event.attr_state))
           result = 1
         end
         if (is_disposed)
@@ -3031,7 +3031,7 @@ module Org::Eclipse::Swt::Widgets
         end
       else
         self.attr_display.attr_click_count = 2
-        result = send_mouse_event___org_eclipse_swt_widgets_control_13(SWT::MouseDoubleClick, gdk_event.attr_button, self.attr_display.attr_click_count, 0, false, gdk_event.attr_time, gdk_event.attr_x_root, gdk_event.attr_y_root, false, gdk_event.attr_state) ? 0 : 1
+        result = send_mouse_event___org_eclipse_swt_widgets_control_17(SWT::MouseDoubleClick, gdk_event.attr_button, self.attr_display.attr_click_count, 0, false, gdk_event.attr_time, gdk_event.attr_x_root, gdk_event.attr_y_root, false, gdk_event.attr_state) ? 0 : 1
         if (is_disposed)
           return 1
         end
@@ -3048,7 +3048,7 @@ module Org::Eclipse::Swt::Widgets
     # int
     def gtk_button_release_event(widget, event)
       gdk_event = GdkEventButton.new
-      OS.memmove___org_eclipse_swt_widgets_control_15(gdk_event, event, GdkEventButton.attr_sizeof)
+      OS.memmove___org_eclipse_swt_widgets_control_19(gdk_event, event, GdkEventButton.attr_sizeof)
       # Feature in GTK.  When button 4, 5, 6, or 7 is released, GTK
       # does not deliver a corresponding GTK event.  Button 6 and 7
       # are mapped to buttons 4 and 5 in SWT.  The fix is to change
@@ -3062,7 +3062,7 @@ module Org::Eclipse::Swt::Widgets
       when -7
         button = 5
       end
-      return send_mouse_event___org_eclipse_swt_widgets_control_17(SWT::MouseUp, button, self.attr_display.attr_click_count, 0, false, gdk_event.attr_time, gdk_event.attr_x_root, gdk_event.attr_y_root, false, gdk_event.attr_state) ? 0 : 1
+      return send_mouse_event___org_eclipse_swt_widgets_control_21(SWT::MouseUp, button, self.attr_display.attr_click_count, 0, false, gdk_event.attr_time, gdk_event.attr_x_root, gdk_event.attr_y_root, false, gdk_event.attr_state) ? 0 : 1
     end
     
     typesig { [::Java::Long, ::Java::Long] }
@@ -3078,7 +3078,7 @@ module Org::Eclipse::Swt::Widgets
         return 0
       end
       buffer = Array.typed(::Java::Byte).new(length) { 0 }
-      OS.memmove___org_eclipse_swt_widgets_control_19(buffer, text, length)
+      OS.memmove___org_eclipse_swt_widgets_control_23(buffer, text, length)
       chars = Converter.mbcs_to_wcs(nil, buffer)
       send_imkey_event(SWT::KeyDown, nil, chars)
       return 0
@@ -3107,7 +3107,7 @@ module Org::Eclipse::Swt::Widgets
         return 0
       end
       gdk_event = GdkEventCrossing.new
-      OS.memmove___org_eclipse_swt_widgets_control_21(gdk_event, event, GdkEventCrossing.attr_sizeof)
+      OS.memmove___org_eclipse_swt_widgets_control_25(gdk_event, event, GdkEventCrossing.attr_sizeof)
       # It is possible to send out too many enter/exit events if entering a
       # control through a subwindow. The fix is to return without sending any
       # events if the GdkEventCrossing subwindow field is set and the control
@@ -3123,11 +3123,11 @@ module Org::Eclipse::Swt::Widgets
       end
       if (!(self.attr_display.attr_current_control).nil? && !self.attr_display.attr_current_control.is_disposed)
         self.attr_display.remove_mouse_hover_timeout(self.attr_display.attr_current_control.attr_handle)
-        self.attr_display.attr_current_control.send_mouse_event___org_eclipse_swt_widgets_control_23(SWT::MouseExit, 0, gdk_event.attr_time, gdk_event.attr_x_root, gdk_event.attr_y_root, false, gdk_event.attr_state)
+        self.attr_display.attr_current_control.send_mouse_event___org_eclipse_swt_widgets_control_27(SWT::MouseExit, 0, gdk_event.attr_time, gdk_event.attr_x_root, gdk_event.attr_y_root, false, gdk_event.attr_state)
       end
       if (!is_disposed)
         self.attr_display.attr_current_control = self
-        return send_mouse_event___org_eclipse_swt_widgets_control_25(SWT::MouseEnter, 0, gdk_event.attr_time, gdk_event.attr_x_root, gdk_event.attr_y_root, false, gdk_event.attr_state) ? 0 : 1
+        return send_mouse_event___org_eclipse_swt_widgets_control_29(SWT::MouseEnter, 0, gdk_event.attr_time, gdk_event.attr_x_root, gdk_event.attr_y_root, false, gdk_event.attr_state) ? 0 : 1
       end
       return 0
     end
@@ -3143,7 +3143,7 @@ module Org::Eclipse::Swt::Widgets
     # int
     def gtk_event_after(widget, gdk_event)
       event = GdkEvent.new
-      OS.memmove___org_eclipse_swt_widgets_control_27(event, gdk_event, GdkEvent.attr_sizeof)
+      OS.memmove___org_eclipse_swt_widgets_control_31(event, gdk_event, GdkEvent.attr_sizeof)
       catch(:break_case) do
         case (event.attr_type)
         when OS::GDK_BUTTON_PRESS
@@ -3155,7 +3155,7 @@ module Org::Eclipse::Swt::Widgets
           # such as GtkTreeView to select items before a menu is shown.
           if (((self.attr_state & MENU)).equal?(0))
             gdk_event_button = GdkEventButton.new
-            OS.memmove___org_eclipse_swt_widgets_control_29(gdk_event_button, gdk_event, GdkEventButton.attr_sizeof)
+            OS.memmove___org_eclipse_swt_widgets_control_33(gdk_event_button, gdk_event, GdkEventButton.attr_sizeof)
             if ((gdk_event_button.attr_button).equal?(3))
               show_menu(RJava.cast_to_int(gdk_event_button.attr_x_root), RJava.cast_to_int(gdk_event_button.attr_y_root))
             end
@@ -3165,7 +3165,7 @@ module Org::Eclipse::Swt::Widgets
             throw :break_case, :thrown
           end
           gdk_event_focus = GdkEventFocus.new
-          OS.memmove___org_eclipse_swt_widgets_control_31(gdk_event_focus, gdk_event, GdkEventFocus.attr_sizeof)
+          OS.memmove___org_eclipse_swt_widgets_control_35(gdk_event_focus, gdk_event, GdkEventFocus.attr_sizeof)
           # Feature in GTK. The GTK combo box popup under some window managers
           # is implemented as a GTK_MENU.  When it pops up, it causes the combo
           # box to lose focus when focus is received for the menu.  The
@@ -3208,7 +3208,7 @@ module Org::Eclipse::Swt::Widgets
         return 0
       end
       gdk_event = GdkEventExpose.new
-      OS.memmove___org_eclipse_swt_widgets_control_33(gdk_event, event_ptr, GdkEventExpose.attr_sizeof)
+      OS.memmove___org_eclipse_swt_widgets_control_37(gdk_event, event_ptr, GdkEventExpose.attr_sizeof)
       event = Event.new
       event.attr_count = gdk_event.attr_count
       event.attr_x = gdk_event.attr_area_x
@@ -3222,7 +3222,7 @@ module Org::Eclipse::Swt::Widgets
       data.attr_damage_rgn = gdk_event.attr_region
       gc = event.attr_gc = SwtGC.gtk_new(self, data)
       OS.gdk_gc_set_clip_region(gc.attr_handle, gdk_event.attr_region)
-      send_event(SWT::Paint, event)
+      send_event___org_eclipse_swt_widgets_control_39(SWT::Paint, event)
       gc.dispose
       event.attr_gc = nil
       return 0
@@ -3292,7 +3292,7 @@ module Org::Eclipse::Swt::Widgets
         return 0
       end
       gdk_event = GdkEventKey.new
-      OS.memmove___org_eclipse_swt_widgets_control_35(gdk_event, event, GdkEventKey.attr_sizeof)
+      OS.memmove___org_eclipse_swt_widgets_control_41(gdk_event, event, GdkEventKey.attr_sizeof)
       if (translate_mnemonic(gdk_event.attr_keyval, gdk_event))
         return 1
       end
@@ -3347,14 +3347,14 @@ module Org::Eclipse::Swt::Widgets
       result = 0
       if (send_leave_notify || (self.attr_display.get_cursor_control).nil?)
         gdk_event = GdkEventCrossing.new
-        OS.memmove___org_eclipse_swt_widgets_control_37(gdk_event, event, GdkEventCrossing.attr_sizeof)
+        OS.memmove___org_eclipse_swt_widgets_control_43(gdk_event, event, GdkEventCrossing.attr_sizeof)
         if (!(gdk_event.attr_mode).equal?(OS::GDK_CROSSING_NORMAL) && !(gdk_event.attr_mode).equal?(OS::GDK_CROSSING_UNGRAB))
           return 0
         end
         if (!((gdk_event.attr_state & (OS::GDK_BUTTON1_MASK | OS::GDK_BUTTON2_MASK | OS::GDK_BUTTON3_MASK))).equal?(0))
           return 0
         end
-        result = send_mouse_event___org_eclipse_swt_widgets_control_39(SWT::MouseExit, 0, gdk_event.attr_time, gdk_event.attr_x_root, gdk_event.attr_y_root, false, gdk_event.attr_state) ? 0 : 1
+        result = send_mouse_event___org_eclipse_swt_widgets_control_45(SWT::MouseExit, 0, gdk_event.attr_time, gdk_event.attr_x_root, gdk_event.attr_y_root, false, gdk_event.attr_state) ? 0 : 1
         self.attr_display.attr_current_control = nil
       end
       return result
@@ -3370,7 +3370,7 @@ module Org::Eclipse::Swt::Widgets
       event_ptr = OS.gtk_get_current_event
       if (!(event_ptr).equal?(0))
         key_event = GdkEventKey.new
-        OS.memmove___org_eclipse_swt_widgets_control_41(key_event, event_ptr, GdkEventKey.attr_sizeof)
+        OS.memmove___org_eclipse_swt_widgets_control_47(key_event, event_ptr, GdkEventKey.attr_sizeof)
         if ((key_event.attr_type).equal?(OS::GDK_KEY_PRESS))
           focus_control = self.attr_display.get_focus_control
           # int
@@ -3393,7 +3393,7 @@ module Org::Eclipse::Swt::Widgets
     # int
     def gtk_motion_notify_event(widget, event)
       gdk_event = GdkEventMotion.new
-      OS.memmove___org_eclipse_swt_widgets_control_43(gdk_event, event, GdkEventMotion.attr_sizeof)
+      OS.memmove___org_eclipse_swt_widgets_control_49(gdk_event, event, GdkEventMotion.attr_sizeof)
       if ((self).equal?(self.attr_display.attr_current_control) && (hooks(SWT::MouseHover) || filters(SWT::MouseHover)))
         self.attr_display.add_mouse_hover_timeout(self.attr_handle)
       end
@@ -3411,7 +3411,7 @@ module Org::Eclipse::Swt::Widgets
         y = pointer_y[0]
         state = mask[0]
       end
-      result = send_mouse_event___org_eclipse_swt_widgets_control_45(SWT::MouseMove, 0, gdk_event.attr_time, x, y, !(gdk_event.attr_is_hint).equal?(0), state) ? 0 : 1
+      result = send_mouse_event___org_eclipse_swt_widgets_control_51(SWT::MouseMove, 0, gdk_event.attr_time, x, y, !(gdk_event.attr_is_hint).equal?(0), state) ? 0 : 1
       return result
     end
     
@@ -3463,16 +3463,16 @@ module Org::Eclipse::Swt::Widgets
     # int
     def gtk_scroll_event(widget, event_ptr)
       gdk_event = GdkEventScroll.new
-      OS.memmove___org_eclipse_swt_widgets_control_47(gdk_event, event_ptr, GdkEventScroll.attr_sizeof)
+      OS.memmove___org_eclipse_swt_widgets_control_53(gdk_event, event_ptr, GdkEventScroll.attr_sizeof)
       case (gdk_event.attr_direction)
       when OS::GDK_SCROLL_UP
-        return send_mouse_event___org_eclipse_swt_widgets_control_49(SWT::MouseWheel, 0, 3, SWT::SCROLL_LINE, true, gdk_event.attr_time, gdk_event.attr_x_root, gdk_event.attr_y_root, false, gdk_event.attr_state) ? 0 : 1
+        return send_mouse_event___org_eclipse_swt_widgets_control_55(SWT::MouseWheel, 0, 3, SWT::SCROLL_LINE, true, gdk_event.attr_time, gdk_event.attr_x_root, gdk_event.attr_y_root, false, gdk_event.attr_state) ? 0 : 1
       when OS::GDK_SCROLL_DOWN
-        return send_mouse_event___org_eclipse_swt_widgets_control_51(SWT::MouseWheel, 0, -3, SWT::SCROLL_LINE, true, gdk_event.attr_time, gdk_event.attr_x_root, gdk_event.attr_y_root, false, gdk_event.attr_state) ? 0 : 1
+        return send_mouse_event___org_eclipse_swt_widgets_control_57(SWT::MouseWheel, 0, -3, SWT::SCROLL_LINE, true, gdk_event.attr_time, gdk_event.attr_x_root, gdk_event.attr_y_root, false, gdk_event.attr_state) ? 0 : 1
       when OS::GDK_SCROLL_LEFT
-        return send_mouse_event___org_eclipse_swt_widgets_control_53(SWT::MouseDown, 4, gdk_event.attr_time, gdk_event.attr_x_root, gdk_event.attr_y_root, false, gdk_event.attr_state) ? 0 : 1
+        return send_mouse_event___org_eclipse_swt_widgets_control_59(SWT::MouseDown, 4, gdk_event.attr_time, gdk_event.attr_x_root, gdk_event.attr_y_root, false, gdk_event.attr_state) ? 0 : 1
       when OS::GDK_SCROLL_RIGHT
-        return send_mouse_event___org_eclipse_swt_widgets_control_55(SWT::MouseDown, 5, gdk_event.attr_time, gdk_event.attr_x_root, gdk_event.attr_y_root, false, gdk_event.attr_state) ? 0 : 1
+        return send_mouse_event___org_eclipse_swt_widgets_control_61(SWT::MouseDown, 5, gdk_event.attr_time, gdk_event.attr_x_root, gdk_event.attr_y_root, false, gdk_event.attr_state) ? 0 : 1
       end
       return 0
     end
@@ -3517,7 +3517,7 @@ module Org::Eclipse::Swt::Widgets
     # int
     def gtk_visibility_notify_event(widget, event)
       gdk_event = GdkEventVisibility.new
-      OS.memmove___org_eclipse_swt_widgets_control_57(gdk_event, event, GdkEventVisibility.attr_sizeof)
+      OS.memmove___org_eclipse_swt_widgets_control_63(gdk_event, event, GdkEventVisibility.attr_sizeof)
       # int
       paint_window_ = paint_window
       # int
@@ -3962,7 +3962,7 @@ module Org::Eclipse::Swt::Widgets
       else
         set_input_state(event, state_mask)
       end
-      post_event___org_eclipse_swt_widgets_control_59(SWT::DragDetect, event)
+      post_event___org_eclipse_swt_widgets_control_65(SWT::DragDetect, event)
       if (is_disposed)
         return false
       end
@@ -3975,7 +3975,7 @@ module Org::Eclipse::Swt::Widgets
       display = self.attr_display
       display.attr_focus_control = self
       display.attr_focus_event = type
-      send_event(type)
+      send_event___org_eclipse_swt_widgets_control_67(type)
       display.attr_focus_control = nil
       display.attr_focus_event = SWT::None
       # It is possible that the shell may be
@@ -4000,7 +4000,7 @@ module Org::Eclipse::Swt::Widgets
       control = self
       while (!(control).nil?)
         if (control.hooks(SWT::Help))
-          control.post_event___org_eclipse_swt_widgets_control_61(SWT::Help)
+          control.post_event___org_eclipse_swt_widgets_control_69(SWT::Help)
           return true
         end
         control = control.attr_parent
@@ -4015,7 +4015,7 @@ module Org::Eclipse::Swt::Widgets
     
     typesig { [::Java::Int, ::Java::Int, ::Java::Int, ::Java::Double, ::Java::Double, ::Java::Boolean, ::Java::Int] }
     def send_mouse_event(type, button, time, x, y, is_hint, state)
-      return send_mouse_event___org_eclipse_swt_widgets_control_63(type, button, 0, 0, false, time, x, y, is_hint, state)
+      return send_mouse_event___org_eclipse_swt_widgets_control_71(type, button, 0, 0, false, time, x, y, is_hint, state)
     end
     
     typesig { [::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Boolean, ::Java::Int, ::Java::Double, ::Java::Double, ::Java::Boolean, ::Java::Int] }
@@ -4045,12 +4045,12 @@ module Org::Eclipse::Swt::Widgets
       end
       set_input_state(event, state)
       if (send)
-        send_event(type, event)
+        send_event___org_eclipse_swt_widgets_control_73(type, event)
         if (is_disposed)
           return false
         end
       else
-        post_event___org_eclipse_swt_widgets_control_65(type, event)
+        post_event___org_eclipse_swt_widgets_control_75(type, event)
       end
       return event.attr_doit
     end
@@ -4128,7 +4128,7 @@ module Org::Eclipse::Swt::Widgets
       name = (color).nil? ? "<parent>" : "<none>"
       buffer = Converter.wcs_to_mbcs(nil, name, true)
       ptr = OS.g_malloc(buffer.attr_length)
-      OS.memmove___org_eclipse_swt_widgets_control_67(ptr, buffer, buffer.attr_length)
+      OS.memmove___org_eclipse_swt_widgets_control_77(ptr, buffer, buffer.attr_length)
       OS.gtk_rc_style_set_bg_pixmap_name(style, index, ptr)
       OS.gtk_rc_style_set_bg(style, index, color)
       flags = OS.gtk_rc_style_get_color_flags(style, index)
@@ -4771,7 +4771,7 @@ module Org::Eclipse::Swt::Widgets
         # It is possible (but unlikely), that application
         # code could have disposed the widget in the show
         # event.  If this happens, just return.
-        send_event(SWT::Show)
+        send_event___org_eclipse_swt_widgets_control_79(SWT::Show)
         if (is_disposed)
           return
         end
@@ -4812,7 +4812,7 @@ module Org::Eclipse::Swt::Widgets
         if (!(@enable_window).equal?(0))
           OS.gdk_window_hide(@enable_window)
         end
-        send_event(SWT::Hide)
+        send_event___org_eclipse_swt_widgets_control_81(SWT::Hide)
       end
     end
     
@@ -4985,7 +4985,7 @@ module Org::Eclipse::Swt::Widgets
       event = Event.new
       event.attr_x = x
       event.attr_y = y
-      send_event(SWT::MenuDetect, event)
+      send_event___org_eclipse_swt_widgets_control_83(SWT::MenuDetect, event)
       # widget could be disposed at this point
       if (is_disposed)
         return false
@@ -5186,7 +5186,7 @@ module Org::Eclipse::Swt::Widgets
       # code could have disposed the widget in the traverse
       # event.  If this happens, return true to stop further
       # event processing.
-      send_event(SWT::Traverse, event)
+      send_event___org_eclipse_swt_widgets_control_85(SWT::Traverse, event)
       if (is_disposed)
         return true
       end
@@ -5372,7 +5372,7 @@ module Org::Eclipse::Swt::Widgets
             control = find_background_control
             if (!(control).nil? && !(control.attr_background_image).nil?)
               gdk_event = GdkEventExpose.new
-              OS.memmove___org_eclipse_swt_widgets_control_69(gdk_event, arg0, GdkEventExpose.attr_sizeof)
+              OS.memmove___org_eclipse_swt_widgets_control_87(gdk_event, arg0, GdkEventExpose.attr_sizeof)
               # int
               paint_window_ = paint_window
               # int

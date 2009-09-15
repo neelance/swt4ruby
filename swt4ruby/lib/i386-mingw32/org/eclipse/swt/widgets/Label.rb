@@ -723,7 +723,7 @@ module Org::Eclipse::Swt::Widgets
               event.attr_y = ps.attr_top
               event.attr_width = width
               event.attr_height = height
-              send_event(SWT::Paint, event)
+              send_event___org_eclipse_swt_widgets_label_1(SWT::Paint, event)
               # widget could be disposed at this point
               event.attr_gc = nil
             end

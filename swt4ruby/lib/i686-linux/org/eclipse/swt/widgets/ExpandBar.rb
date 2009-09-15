@@ -612,7 +612,7 @@ module Org::Eclipse::Swt::Widgets
           when OS::GDK_Return, OS::GDK_space
             ev = Event.new
             ev.attr_item = @last_focus
-            send_event(@last_focus.attr_expanded ? SWT::Collapse : SWT::Expand, ev)
+            send_event___org_eclipse_swt_widgets_expand_bar_11(@last_focus.attr_expanded ? SWT::Collapse : SWT::Expand, ev)
             @last_focus.attr_expanded = !@last_focus.attr_expanded
             show_item(@last_focus)
           when OS::GDK_Up, OS::GDK_KP_Up
@@ -831,7 +831,7 @@ module Org::Eclipse::Swt::Widgets
       # long
       adjustment_handle = OS.gtk_scrolled_window_get_vadjustment(self.attr_scrolled_handle)
       adjustment = GtkAdjustment.new
-      OS.memmove___org_eclipse_swt_widgets_expand_bar_11(adjustment, adjustment_handle)
+      OS.memmove___org_eclipse_swt_widgets_expand_bar_13(adjustment, adjustment_handle)
       @y_current_scroll = RJava.cast_to_int(adjustment.attr_value)
       # claim bottom free space
       if (@y_current_scroll > 0 && height > max_height)
@@ -842,7 +842,7 @@ module Org::Eclipse::Swt::Widgets
       adjustment.attr_value = Math.min(@y_current_scroll, max_height)
       adjustment.attr_upper = max_height
       adjustment.attr_page_size = height
-      OS.memmove___org_eclipse_swt_widgets_expand_bar_13(adjustment_handle, adjustment)
+      OS.memmove___org_eclipse_swt_widgets_expand_bar_15(adjustment_handle, adjustment)
       OS.gtk_adjustment_changed(adjustment_handle)
       policy = max_height > height ? OS::GTK_POLICY_ALWAYS : OS::GTK_POLICY_NEVER
       OS.gtk_scrolled_window_set_policy(self.attr_scrolled_handle, OS::GTK_POLICY_NEVER, policy)

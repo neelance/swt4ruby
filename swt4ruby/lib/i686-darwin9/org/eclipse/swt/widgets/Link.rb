@@ -182,7 +182,7 @@ module Org::Eclipse::Swt::Widgets
       str = NSString.new(link)
       event = Event.new
       event.attr_text = str.get_string
-      send_event(SWT::Selection, event)
+      send_event___org_eclipse_swt_widgets_link_1(SWT::Selection, event)
       return true
     end
     

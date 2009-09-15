@@ -284,7 +284,7 @@ module Org::Eclipse::Swt::Widgets
       if ((count).equal?(0))
         event = Event.new
         event.attr_item = @items[0]
-        send_event(SWT::Selection, event)
+        send_event___org_eclipse_swt_widgets_tab_folder_1(SWT::Selection, event)
         # the widget could be destroyed at this point
       end
     end
@@ -837,7 +837,7 @@ module Org::Eclipse::Swt::Widgets
         if (notify)
           event = Event.new
           event.attr_item = item
-          send_event(SWT::Selection, event)
+          send_event___org_eclipse_swt_widgets_tab_folder_3(SWT::Selection, event)
         end
       end
     end
@@ -1169,7 +1169,7 @@ module Org::Eclipse::Swt::Widgets
         if ((code).equal?(OS::TCN_SELCHANGE))
           event = Event.new
           event.attr_item = item
-          post_event___org_eclipse_swt_widgets_tab_folder_1(SWT::Selection, event)
+          post_event___org_eclipse_swt_widgets_tab_folder_5(SWT::Selection, event)
         end
       end
       return super(hdr, w_param, l_param)

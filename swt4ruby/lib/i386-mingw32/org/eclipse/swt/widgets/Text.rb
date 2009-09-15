@@ -2172,7 +2172,7 @@ module Org::Eclipse::Swt::Widgets
       # The fix is to send the event.
       bits = OS._get_window_long(self.attr_handle, OS::GWL_STYLE)
       if (!((bits & OS::ES_MULTILINE)).equal?(0))
-        send_event(SWT::Modify)
+        send_event___org_eclipse_swt_widgets_text_1(SWT::Modify)
         # widget could be disposed at this point
       end
     end
@@ -2271,7 +2271,7 @@ module Org::Eclipse::Swt::Widgets
       # code could have disposed the widget in the verify
       # event.  If this happens, answer null to cancel
       # the operation.
-      send_event(SWT::Verify, event)
+      send_event___org_eclipse_swt_widgets_text_3(SWT::Verify, event)
       if (!event.attr_doit || is_disposed)
         return nil
       end
@@ -2449,7 +2449,7 @@ module Org::Eclipse::Swt::Widgets
         case (RJava.cast_to_int(w_param))
         # FALL THROUGH
         when SWT::CR
-          post_event___org_eclipse_swt_widgets_text_1(SWT::DefaultSelection)
+          post_event___org_eclipse_swt_widgets_text_5(SWT::DefaultSelection)
           return LRESULT::ZERO
         when SWT::TAB, SWT::ESC
           return LRESULT::ZERO
@@ -2584,8 +2584,8 @@ module Org::Eclipse::Swt::Widgets
       # when double clicking behavior is disabled by not
       # calling the window proc.
       result = nil
-      send_mouse_event___org_eclipse_swt_widgets_text_3(SWT::MouseDown, 1, self.attr_handle, OS::WM_LBUTTONDOWN, w_param, l_param)
-      if (!send_mouse_event___org_eclipse_swt_widgets_text_5(SWT::MouseDoubleClick, 1, self.attr_handle, OS::WM_LBUTTONDBLCLK, w_param, l_param))
+      send_mouse_event___org_eclipse_swt_widgets_text_7(SWT::MouseDown, 1, self.attr_handle, OS::WM_LBUTTONDOWN, w_param, l_param)
+      if (!send_mouse_event___org_eclipse_swt_widgets_text_9(SWT::MouseDoubleClick, 1, self.attr_handle, OS::WM_LBUTTONDBLCLK, w_param, l_param))
         result = LRESULT::ZERO
       end
       if (!self.attr_display.attr_capture_changed && !is_disposed)
@@ -2628,7 +2628,7 @@ module Org::Eclipse::Swt::Widgets
         result = nil
         display = self.attr_display
         display.attr_capture_changed = false
-        dispatch = send_mouse_event___org_eclipse_swt_widgets_text_7(SWT::MouseDown, 1, self.attr_handle, OS::WM_LBUTTONDOWN, w_param, l_param)
+        dispatch = send_mouse_event___org_eclipse_swt_widgets_text_11(SWT::MouseDown, 1, self.attr_handle, OS::WM_LBUTTONDOWN, w_param, l_param)
         # Note: On WinCE PPC, only attempt to recognize the gesture for
         # a context menu when the control contains a valid menu or there
         # are listeners for the MenuDetect event.
@@ -2816,7 +2816,7 @@ module Org::Eclipse::Swt::Widgets
           # event.  If this happens, end the processing of the
           # Windows message by returning zero as the result of
           # the window proc.
-          send_event(SWT::Modify)
+          send_event___org_eclipse_swt_widgets_text_13(SWT::Modify)
           if (is_disposed)
             return LRESULT::ZERO
           end

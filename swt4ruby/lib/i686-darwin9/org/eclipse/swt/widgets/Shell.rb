@@ -691,7 +691,7 @@ module Org::Eclipse::Swt::Widgets
     typesig { [] }
     def close_widget
       event = Event.new
-      send_event(SWT::Close, event)
+      send_event___org_eclipse_swt_widgets_shell_1(SWT::Close, event)
       if (event.attr_doit && !is_disposed)
         dispose
       end
@@ -1199,7 +1199,7 @@ module Org::Eclipse::Swt::Widgets
       control = self.attr_display.get_focus_control
       while (!(control).nil?)
         if (control.hooks(SWT::Help))
-          control.post_event___org_eclipse_swt_widgets_shell_1(SWT::Help)
+          control.post_event___org_eclipse_swt_widgets_shell_3(SWT::Help)
           break
         end
         control = control.attr_parent
@@ -1511,14 +1511,14 @@ module Org::Eclipse::Swt::Widgets
       i = deactivate.attr_length - 1
       while i >= index
         if (!deactivate[i].is_disposed)
-          deactivate[i].send_event(SWT::Deactivate)
+          deactivate[i].send_event___org_eclipse_swt_widgets_shell_4(SWT::Deactivate)
         end
         (i -= 1)
       end
       i_ = activate.attr_length - 1
       while i_ >= index
         if (!activate[i_].is_disposed)
-          activate[i_].send_event(SWT::Activate)
+          activate[i_].send_event___org_eclipse_swt_widgets_shell_5(SWT::Activate)
         end
         (i_ -= 1)
       end
@@ -1909,7 +1909,7 @@ module Org::Eclipse::Swt::Widgets
           end
           center
         end
-        send_event(SWT::Show)
+        send_event___org_eclipse_swt_widgets_shell_7(SWT::Show)
         if (is_disposed)
           return
         end
@@ -1937,14 +1937,14 @@ module Org::Eclipse::Swt::Widgets
         @opened = true
         if (!@moved)
           @moved = true
-          send_event(SWT::Move)
+          send_event___org_eclipse_swt_widgets_shell_9(SWT::Move)
           if (is_disposed)
             return
           end
         end
         if (!@resized)
           @resized = true
-          send_event(SWT::Resize)
+          send_event___org_eclipse_swt_widgets_shell_11(SWT::Resize)
           if (is_disposed)
             return
           end
@@ -1962,7 +1962,7 @@ module Org::Eclipse::Swt::Widgets
         @window.order_out(nil)
         top_view.set_hidden(true)
         invalidate_visible_region
-        send_event(SWT::Hide)
+        send_event___org_eclipse_swt_widgets_shell_13(SWT::Hide)
       end
       self.attr_display.update_quit_menu
     end
@@ -2067,7 +2067,7 @@ module Org::Eclipse::Swt::Widgets
     # long
     def view_string_for_tool_tip_point_user_data(id, sel, view, tag, point, user_data)
       pt = NSPoint.new
-      OS.memmove___org_eclipse_swt_widgets_shell_3(pt, point, NSPoint.attr_sizeof)
+      OS.memmove___org_eclipse_swt_widgets_shell_15(pt, point, NSPoint.attr_sizeof)
       control = self.attr_display.find_control(false)
       if ((control).nil?)
         return 0
@@ -2091,7 +2091,7 @@ module Org::Eclipse::Swt::Widgets
       super(id, sel, notification)
       display_ = self.attr_display
       display_.set_menu_bar(self.attr_menu_bar)
-      send_event(SWT::Activate)
+      send_event___org_eclipse_swt_widgets_shell_17(SWT::Activate)
       if (is_disposed)
         return
       end
@@ -2115,7 +2115,7 @@ module Org::Eclipse::Swt::Widgets
     # long
     def window_did_move(id, sel, notification)
       @moved = true
-      send_event(SWT::Move)
+      send_event___org_eclipse_swt_widgets_shell_19(SWT::Move)
     end
     
     typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
@@ -2133,7 +2133,7 @@ module Org::Eclipse::Swt::Widgets
         @window.content_view.set_frame(rect)
       end
       @resized = true
-      send_event(SWT::Resize)
+      send_event___org_eclipse_swt_widgets_shell_21(SWT::Resize)
       if (is_disposed)
         return
       end
@@ -2149,7 +2149,7 @@ module Org::Eclipse::Swt::Widgets
     # long
     def window_did_resign_key(id, sel, notification)
       super(id, sel, notification)
-      send_event(SWT::Deactivate)
+      send_event___org_eclipse_swt_widgets_shell_23(SWT::Deactivate)
     end
     
     typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
@@ -2174,7 +2174,7 @@ module Org::Eclipse::Swt::Widgets
           end
           self.attr_display.check_enter_exit(trim_control, ns_event, false)
           if (!(trim_control).nil?)
-            trim_control.send_mouse_event___org_eclipse_swt_widgets_shell_5(ns_event, type_, false)
+            trim_control.send_mouse_event___org_eclipse_swt_widgets_shell_25(ns_event, type_, false)
           end
         end
         target = nil

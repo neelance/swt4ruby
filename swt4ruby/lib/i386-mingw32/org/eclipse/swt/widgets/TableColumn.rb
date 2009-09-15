@@ -541,7 +541,7 @@ module Org::Eclipse::Swt::Widgets
       new_width = RJava.cast_to_int(OS._send_message(hwnd, OS::LVM_GETCOLUMNWIDTH, index, 0))
       if (!(old_width).equal?(new_width))
         update_tool_tip(index)
-        send_event(SWT::Resize)
+        send_event___org_eclipse_swt_widgets_table_column_1(SWT::Resize)
         if (is_disposed)
           return
         end
@@ -553,7 +553,7 @@ module Org::Eclipse::Swt::Widgets
           column = columns[order[i]]
           if (moved && !column.is_disposed)
             column.update_tool_tip(order[i])
-            column.send_event(SWT::Move)
+            column.send_event___org_eclipse_swt_widgets_table_column_3(SWT::Move)
           end
           if ((column).equal?(self))
             moved = true

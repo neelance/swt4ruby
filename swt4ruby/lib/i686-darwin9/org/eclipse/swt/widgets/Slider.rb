@@ -391,7 +391,7 @@ module Org::Eclipse::Swt::Widgets
       if (!(event.attr_detail).equal?(SWT::DRAG))
         set_selection(value)
       end
-      send_event(SWT::Selection, event)
+      send_event___org_eclipse_swt_widgets_slider_1(SWT::Selection, event)
     end
     
     typesig { [::Java::Int] }

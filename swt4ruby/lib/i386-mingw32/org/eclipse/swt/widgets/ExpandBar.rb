@@ -785,7 +785,7 @@ module Org::Eclipse::Swt::Widgets
       when OS::VK_SPACE, OS::VK_RETURN
         event = Event.new
         event.attr_item = @focus_item
-        send_event(@focus_item.attr_expanded ? SWT::Collapse : SWT::Expand, event)
+        send_event___org_eclipse_swt_widgets_expand_bar_1(@focus_item.attr_expanded ? SWT::Collapse : SWT::Expand, event)
         @focus_item.attr_expanded = !@focus_item.attr_expanded
         show_item(@focus_item)
         return LRESULT::ZERO
@@ -865,7 +865,7 @@ module Org::Eclipse::Swt::Widgets
       if (hover)
         event = Event.new
         event.attr_item = @focus_item
-        send_event(@focus_item.attr_expanded ? SWT::Collapse : SWT::Expand, event)
+        send_event___org_eclipse_swt_widgets_expand_bar_3(@focus_item.attr_expanded ? SWT::Collapse : SWT::Expand, event)
         @focus_item.attr_expanded = !@focus_item.attr_expanded
         show_item(@focus_item)
       end
@@ -946,7 +946,7 @@ module Org::Eclipse::Swt::Widgets
             event.attr_y = rect.attr_top
             event.attr_width = width
             event.attr_height = height
-            send_event(SWT::Paint, event)
+            send_event___org_eclipse_swt_widgets_expand_bar_5(SWT::Paint, event)
             event.attr_gc = nil
           end
         end

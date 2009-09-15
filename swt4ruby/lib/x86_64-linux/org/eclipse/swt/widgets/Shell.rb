@@ -801,7 +801,7 @@ module Org::Eclipse::Swt::Widgets
     typesig { [] }
     def close_widget
       event = Event.new
-      send_event(SWT::Close, event)
+      send_event___org_eclipse_swt_widgets_shell_1(SWT::Close, event)
       if (event.attr_doit && !is_disposed)
         dispose
       end
@@ -921,7 +921,7 @@ module Org::Eclipse::Swt::Widgets
         return 0
       end
       x_focus_event = XFocusChangeEvent.new
-      OS.memmove___org_eclipse_swt_widgets_shell_1(x_focus_event, x_event, XFocusChangeEvent.attr_sizeof)
+      OS.memmove___org_eclipse_swt_widgets_shell_3(x_focus_event, x_event, XFocusChangeEvent.attr_sizeof)
       case (event_type)
       when OS::FocusIn
         if ((x_focus_event.attr_mode).equal?(OS::NotifyNormal) || (x_focus_event.attr_mode).equal?(OS::NotifyWhileGrabbed))
@@ -932,7 +932,7 @@ module Org::Eclipse::Swt::Widgets
             end
             self.attr_display.attr_active_shell = self
             self.attr_display.attr_active_pending = false
-            send_event(SWT::Activate)
+            send_event___org_eclipse_swt_widgets_shell_5(SWT::Activate)
           end
         end
       when OS::FocusOut
@@ -943,7 +943,7 @@ module Org::Eclipse::Swt::Widgets
               OS.gtk_tooltips_disable(@tooltips_handle)
             end
             display = self.attr_display
-            send_event(SWT::Deactivate)
+            send_event___org_eclipse_swt_widgets_shell_7(SWT::Deactivate)
             set_active_control(nil)
             if ((display.attr_active_shell).equal?(self))
               display.attr_active_shell = nil
@@ -1342,7 +1342,7 @@ module Org::Eclipse::Swt::Widgets
         @moved = true
         @old_x = x[0]
         @old_y = y[0]
-        send_event(SWT::Move)
+        send_event___org_eclipse_swt_widgets_shell_9(SWT::Move)
         # widget could be disposed at this point
       end
       return 0
@@ -1484,15 +1484,15 @@ module Org::Eclipse::Swt::Widgets
     # int
     def gtk_window_state_event(widget, event)
       gdk_event = GdkEventWindowState.new
-      OS.memmove___org_eclipse_swt_widgets_shell_3(gdk_event, event, GdkEventWindowState.attr_sizeof)
+      OS.memmove___org_eclipse_swt_widgets_shell_11(gdk_event, event, GdkEventWindowState.attr_sizeof)
       self.attr_minimized = !((gdk_event.attr_new_window_state & OS::GDK_WINDOW_STATE_ICONIFIED)).equal?(0)
       self.attr_maximized = !((gdk_event.attr_new_window_state & OS::GDK_WINDOW_STATE_MAXIMIZED)).equal?(0)
       @full_screen = !((gdk_event.attr_new_window_state & OS::GDK_WINDOW_STATE_FULLSCREEN)).equal?(0)
       if (!((gdk_event.attr_changed_mask & OS::GDK_WINDOW_STATE_ICONIFIED)).equal?(0))
         if (self.attr_minimized)
-          send_event(SWT::Iconify)
+          send_event___org_eclipse_swt_widgets_shell_13(SWT::Iconify)
         else
-          send_event(SWT::Deiconify)
+          send_event___org_eclipse_swt_widgets_shell_15(SWT::Deiconify)
         end
         update_minimized(self.attr_minimized)
       end
@@ -1646,14 +1646,14 @@ module Org::Eclipse::Swt::Widgets
       i = deactivate.attr_length - 1
       while i >= index
         if (!deactivate[i].is_disposed)
-          deactivate[i].send_event(SWT::Deactivate)
+          deactivate[i].send_event___org_eclipse_swt_widgets_shell_16(SWT::Deactivate)
         end
         (i -= 1)
       end
       i_ = activate.attr_length - 1
       while i_ >= index
         if (!activate[i_].is_disposed)
-          activate[i_].send_event(SWT::Activate)
+          activate[i_].send_event___org_eclipse_swt_widgets_shell_17(SWT::Activate)
         end
         (i_ -= 1)
       end
@@ -1700,7 +1700,7 @@ module Org::Eclipse::Swt::Widgets
       force_resize(box_width, box_height)
       if (notify)
         @resized = true
-        send_event(SWT::Resize)
+        send_event___org_eclipse_swt_widgets_shell_19(SWT::Resize)
         if (is_disposed)
           return
         end
@@ -1740,7 +1740,7 @@ module Org::Eclipse::Swt::Widgets
           @moved = true
           @old_x = x
           @old_y = y
-          send_event(SWT::Move)
+          send_event___org_eclipse_swt_widgets_shell_21(SWT::Move)
           if (is_disposed)
             return 0
           end
@@ -2127,7 +2127,7 @@ module Org::Eclipse::Swt::Widgets
             return
           end
         end
-        send_event(SWT::Show)
+        send_event___org_eclipse_swt_widgets_shell_23(SWT::Show)
         if (is_disposed)
           return
         end
@@ -2183,7 +2183,7 @@ module Org::Eclipse::Swt::Widgets
           location = get_location
           @old_x = location.attr_x
           @old_y = location.attr_y
-          send_event(SWT::Move)
+          send_event___org_eclipse_swt_widgets_shell_25(SWT::Move)
           if (is_disposed)
             return
           end
@@ -2193,7 +2193,7 @@ module Org::Eclipse::Swt::Widgets
           size = get_size
           @old_width = size.attr_x - trim_width
           @old_height = size.attr_y - trim_height
-          send_event(SWT::Resize)
+          send_event___org_eclipse_swt_widgets_shell_27(SWT::Resize)
           if (is_disposed)
             return
           end
@@ -2205,7 +2205,7 @@ module Org::Eclipse::Swt::Widgets
       else
         fix_active_shell
         OS.gtk_widget_hide(@shell_handle)
-        send_event(SWT::Hide)
+        send_event___org_eclipse_swt_widgets_shell_29(SWT::Hide)
       end
     end
     
@@ -2600,7 +2600,7 @@ module Org::Eclipse::Swt::Widgets
             OS.gdk_window_get_origin(window, x, y)
             event.attr_x_root = event.attr_x + x[0]
             event.attr_y_root = event.attr_y + y[0]
-            OS.memmove___org_eclipse_swt_widgets_shell_5(event_ptr, event, GdkEventMotion.attr_sizeof)
+            OS.memmove___org_eclipse_swt_widgets_shell_31(event_ptr, event, GdkEventMotion.attr_sizeof)
             OS.gtk_main_do_event(event_ptr)
           end
         end

@@ -420,7 +420,7 @@ module Org::Eclipse::Swt::Widgets
         event.attr_item = item
         event.attr_index = index_of(item)
         @current_item = item
-        send_event(SWT::SetData, event)
+        send_event___org_eclipse_swt_widgets_table_3(SWT::SetData, event)
         # widget could be disposed at this point
         @current_item = nil
         if (is_disposed || item.is_disposed)
@@ -1073,7 +1073,7 @@ module Org::Eclipse::Swt::Widgets
         j = 0
         while j < @column_count
           if ((@columns[j].attr_ns_column.attr_id).equal?(column_id))
-            @columns[j].send_event(SWT::Move)
+            @columns[j].send_event___org_eclipse_swt_widgets_table_4(SWT::Move)
             break
           end
           j += 1
@@ -1223,7 +1223,7 @@ module Org::Eclipse::Swt::Widgets
         event.attr_y = RJava.cast_to_int(cell_rect.attr_y)
         event.attr_width = RJava.cast_to_int(cell_rect.attr_width)
         event.attr_height = RJava.cast_to_int(cell_rect.attr_height)
-        send_event(SWT::EraseItem, event)
+        send_event___org_eclipse_swt_widgets_table_6(SWT::EraseItem, event)
         if (!event.attr_doit)
           draw_foreground = draw_background = draw_selection = false
         else
@@ -1360,7 +1360,7 @@ module Org::Eclipse::Swt::Widgets
         event.attr_y = item_y
         event.attr_width = content_width
         event.attr_height = item_height
-        send_event(SWT::PaintItem, event)
+        send_event___org_eclipse_swt_widgets_table_8(SWT::PaintItem, event)
         gc.dispose
         context.restore_graphics_state
       end
@@ -2022,7 +2022,7 @@ module Org::Eclipse::Swt::Widgets
         return
       end
       clip_rect = NSRect.new
-      OS.memmove___org_eclipse_swt_widgets_table_3(clip_rect, rect, NSRect.attr_sizeof)
+      OS.memmove___org_eclipse_swt_widgets_table_10(clip_rect, rect, NSRect.attr_sizeof)
       call_super(id, sel, clip_rect)
     end
     
@@ -2759,7 +2759,7 @@ module Org::Eclipse::Swt::Widgets
           column = new_columns[i___]
           if (!column.is_disposed)
             if (!(new_x[i___]).equal?(old_x[i___]))
-              column.send_event(SWT::Move)
+              column.send_event___org_eclipse_swt_widgets_table_12(SWT::Move)
             end
           end
           i___ += 1
@@ -3384,7 +3384,7 @@ module Org::Eclipse::Swt::Widgets
         end
         event = Event.new
         event.attr_item = __get_item(row_index)
-        post_event___org_eclipse_swt_widgets_table_5(SWT::DefaultSelection, event)
+        post_event___org_eclipse_swt_widgets_table_14(SWT::DefaultSelection, event)
       end
     end
     
@@ -3402,7 +3402,7 @@ module Org::Eclipse::Swt::Widgets
       # KP Enter
       when 76, 36
         # Return
-        post_event___org_eclipse_swt_widgets_table_7(SWT::DefaultSelection)
+        post_event___org_eclipse_swt_widgets_table_16(SWT::DefaultSelection)
       end
       return result
     end
@@ -3423,7 +3423,7 @@ module Org::Eclipse::Swt::Widgets
       event.attr_index = column_index
       event.attr_width = content_width
       event.attr_height = item_height
-      send_event(SWT::MeasureItem, event)
+      send_event___org_eclipse_swt_widgets_table_18(SWT::MeasureItem, event)
       gc.dispose
       if (!is_disposed && !item.is_disposed)
         size_.attr_width = event.attr_width
@@ -3462,7 +3462,7 @@ module Org::Eclipse::Swt::Widgets
         column_id = ns_columns.object_at_index(i)
         column = get_column(column_id)
         if (!(column).nil?)
-          column.send_event(SWT::Move)
+          column.send_event___org_eclipse_swt_widgets_table_20(SWT::Move)
           if (is_disposed)
             return
           end
@@ -3484,7 +3484,7 @@ module Org::Eclipse::Swt::Widgets
         return
       end
       # either CHECK column or firstColumn in 0-column Table
-      column.send_event(SWT::Resize)
+      column.send_event___org_eclipse_swt_widgets_table_22(SWT::Resize)
       if (is_disposed)
         return
       end
@@ -3502,7 +3502,7 @@ module Org::Eclipse::Swt::Widgets
         column_id = ns_columns.object_at_index(i)
         column = get_column(column_id)
         if (!(column).nil?)
-          column.send_event(SWT::Move)
+          column.send_event___org_eclipse_swt_widgets_table_24(SWT::Move)
           if (is_disposed)
             return
           end
@@ -3523,13 +3523,13 @@ module Org::Eclipse::Swt::Widgets
       # 64
       row = RJava.cast_to_int(widget.selected_row)
       if ((row).equal?(-1))
-        post_event___org_eclipse_swt_widgets_table_9(SWT::Selection)
+        post_event___org_eclipse_swt_widgets_table_26(SWT::Selection)
       else
         item = __get_item(row)
         event = Event.new
         event.attr_item = item
         event.attr_index = row
-        post_event___org_eclipse_swt_widgets_table_11(SWT::Selection, event)
+        post_event___org_eclipse_swt_widgets_table_28(SWT::Selection, event)
       end
     end
     
@@ -3544,7 +3544,7 @@ module Org::Eclipse::Swt::Widgets
         return
       end
       # either CHECK column or firstColumn in 0-column Table
-      column.post_event___org_eclipse_swt_widgets_table_13(SWT::Selection)
+      column.post_event___org_eclipse_swt_widgets_table_30(SWT::Selection)
     end
     
     typesig { [::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int] }
@@ -3595,7 +3595,7 @@ module Org::Eclipse::Swt::Widgets
         event.attr_item = item
         # 64
         event.attr_index = RJava.cast_to_int(row_index)
-        post_event___org_eclipse_swt_widgets_table_15(SWT::Selection, event)
+        post_event___org_eclipse_swt_widgets_table_32(SWT::Selection, event)
         item.redraw(-1)
       end
     end
@@ -3703,7 +3703,7 @@ module Org::Eclipse::Swt::Widgets
     # long
     # long
     def table_view_write_rows_with_indexes_to_pasteboard(id, sel, arg0, arg1, arg2)
-      return send_mouse_event___org_eclipse_swt_widgets_table_17(NSApplication.shared_application.current_event, SWT::DragDetect, true)
+      return send_mouse_event___org_eclipse_swt_widgets_table_34(NSApplication.shared_application.current_event, SWT::DragDetect, true)
     end
     
     typesig { [::Java::Int, ::Java::Int, NSRect] }

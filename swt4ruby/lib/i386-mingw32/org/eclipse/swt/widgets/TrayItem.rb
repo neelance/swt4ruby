@@ -300,7 +300,7 @@ module Org::Eclipse::Swt::Widgets
       when OS::WM_RBUTTONUP
         if (hooks(SWT::MenuDetect))
           OS._set_foreground_window(hwnd)
-          send_event(SWT::MenuDetect)
+          send_event___org_eclipse_swt_widgets_tray_item_5(SWT::MenuDetect)
           # widget could be disposed at this point
           if (is_disposed)
             return 0
@@ -311,7 +311,7 @@ module Org::Eclipse::Swt::Widgets
           @tool_tip.attr_visible = true
           if (@tool_tip.hooks(SWT::Show))
             OS._set_foreground_window(hwnd)
-            @tool_tip.send_event(SWT::Show)
+            @tool_tip.send_event___org_eclipse_swt_widgets_tray_item_7(SWT::Show)
             # widget could be disposed at this point
             if (is_disposed)
               return 0
@@ -324,7 +324,7 @@ module Org::Eclipse::Swt::Widgets
             @tool_tip.attr_visible = false
             if (@tool_tip.hooks(SWT::Hide))
               OS._set_foreground_window(hwnd)
-              @tool_tip.send_event(SWT::Hide)
+              @tool_tip.send_event___org_eclipse_swt_widgets_tray_item_9(SWT::Hide)
               # widget could be disposed at this point
               if (is_disposed)
                 return 0
@@ -334,7 +334,7 @@ module Org::Eclipse::Swt::Widgets
           if ((l_param).equal?(OS::NIN_BALLOONUSERCLICK))
             if (@tool_tip.hooks(SWT::Selection))
               OS._set_foreground_window(hwnd)
-              @tool_tip.post_event___org_eclipse_swt_widgets_tray_item_5(SWT::Selection)
+              @tool_tip.post_event___org_eclipse_swt_widgets_tray_item_11(SWT::Selection)
               # widget could be disposed at this point
               if (is_disposed)
                 return 0
@@ -576,7 +576,7 @@ module Org::Eclipse::Swt::Widgets
         # It is possible (but unlikely), that application
         # code could have disposed the widget in the show
         # event.  If this happens, just return.
-        send_event(SWT::Show)
+        send_event___org_eclipse_swt_widgets_tray_item_13(SWT::Show)
         if (is_disposed)
           return
         end
@@ -603,7 +603,7 @@ module Org::Eclipse::Swt::Widgets
         OS._shell_notify_icon(OS::NIM_MODIFY, icon_data)
       end
       if (!visible)
-        send_event(SWT::Hide)
+        send_event___org_eclipse_swt_widgets_tray_item_15(SWT::Hide)
       end
     end
     

@@ -930,7 +930,7 @@ module Org::Eclipse::Swt::Widgets
         data.attr_damage_rgn = damage_rgn
         gc = event.attr_gc = SwtGC.gtk_new(self, data)
         OS.gdk_gc_set_clip_region(gc.attr_handle, damage_rgn)
-        send_event(SWT::Paint, event)
+        send_event___org_eclipse_swt_widgets_composite_7(SWT::Paint, event)
         gc.dispose
         OS.gdk_region_destroy(damage_rgn)
         event.attr_gc = nil
@@ -956,7 +956,7 @@ module Org::Eclipse::Swt::Widgets
       # fix is to avoid calling the default handler.
       if (!((self.attr_state & CANVAS)).equal?(0) && (@socket_handle).equal?(0))
         key_event = GdkEventKey.new
-        OS.memmove___org_eclipse_swt_widgets_composite_7(key_event, event, GdkEventKey.attr_sizeof)
+        OS.memmove___org_eclipse_swt_widgets_composite_9(key_event, event, GdkEventKey.attr_sizeof)
         key = key_event.attr_keyval
         case (key)
         when OS::GDK_Return, OS::GDK_KP_Enter
@@ -1326,7 +1326,7 @@ module Org::Eclipse::Swt::Widgets
       # int
       parent_handle = parenting_handle
       fixed = GtkFixed.new
-      OS.memmove___org_eclipse_swt_widgets_composite_9(fixed, parent_handle)
+      OS.memmove___org_eclipse_swt_widgets_composite_11(fixed, parent_handle)
       # int
       children = fixed.attr_children
       if ((children).equal?(0))
@@ -1344,8 +1344,8 @@ module Org::Eclipse::Swt::Widgets
       sibling_link = 0
       temp = children
       while (!(temp).equal?(0))
-        OS.memmove___org_eclipse_swt_widgets_composite_11(data, temp, OS::PTR_SIZEOF)
-        OS.memmove___org_eclipse_swt_widgets_composite_13(widget, data[0], OS::PTR_SIZEOF)
+        OS.memmove___org_eclipse_swt_widgets_composite_13(data, temp, OS::PTR_SIZEOF)
+        OS.memmove___org_eclipse_swt_widgets_composite_15(widget, data[0], OS::PTR_SIZEOF)
         if ((child).equal?(widget[0]))
           child_link = temp
           child_data = data[0]
@@ -1371,7 +1371,7 @@ module Org::Eclipse::Swt::Widgets
         OS.g_list_set_previous(sibling_link, child_link)
       end
       fixed.attr_children = children
-      OS.memmove___org_eclipse_swt_widgets_composite_15(parent_handle, fixed)
+      OS.memmove___org_eclipse_swt_widgets_composite_17(parent_handle, fixed)
     end
     
     typesig { [::Java::Long, ::Java::Long] }
@@ -1388,7 +1388,7 @@ module Org::Eclipse::Swt::Widgets
         return
       end
       fixed = GtkFixed.new
-      OS.memmove___org_eclipse_swt_widgets_composite_17(fixed, parent_handle)
+      OS.memmove___org_eclipse_swt_widgets_composite_19(fixed, parent_handle)
       # int
       children = fixed.attr_children
       if ((children).equal?(0))
@@ -1406,8 +1406,8 @@ module Org::Eclipse::Swt::Widgets
       sibling_link = 0
       temp = children
       while (!(temp).equal?(0))
-        OS.memmove___org_eclipse_swt_widgets_composite_19(data, temp, OS::PTR_SIZEOF)
-        OS.memmove___org_eclipse_swt_widgets_composite_21(widget, data[0], OS::PTR_SIZEOF)
+        OS.memmove___org_eclipse_swt_widgets_composite_21(data, temp, OS::PTR_SIZEOF)
+        OS.memmove___org_eclipse_swt_widgets_composite_23(widget, data[0], OS::PTR_SIZEOF)
         if ((child).equal?(widget[0]))
           child_link = temp
           child_data = data[0]
@@ -1433,7 +1433,7 @@ module Org::Eclipse::Swt::Widgets
         OS.g_list_set_next(sibling_link, child_link)
       end
       fixed.attr_children = children
-      OS.memmove___org_eclipse_swt_widgets_composite_23(parent_handle, fixed)
+      OS.memmove___org_eclipse_swt_widgets_composite_25(parent_handle, fixed)
     end
     
     typesig { [::Java::Int] }

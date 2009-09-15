@@ -587,7 +587,7 @@ module Org::Eclipse::Swt::Widgets
         end
         if (!((self.attr_style & SWT::RESIZE)).equal?(0))
           resize_rectangles(x_change, y_change)
-          send_event(SWT::Resize, event)
+          send_event___org_eclipse_swt_widgets_tracker_3(SWT::Resize, event)
           # It is possible (but unlikely) that application
           # code could have disposed the widget in the resize
           # event.  If this happens return false to indicate
@@ -630,7 +630,7 @@ module Org::Eclipse::Swt::Widgets
           end
         else
           move_rectangles(x_change, y_change)
-          send_event(SWT::Move, event)
+          send_event___org_eclipse_swt_widgets_tracker_5(SWT::Move, event)
           # It is possible (but unlikely) that application
           # code could have disposed the widget in the move
           # event.  If this happens return false to indicate
@@ -719,7 +719,7 @@ module Org::Eclipse::Swt::Widgets
         end
         if (!((self.attr_style & SWT::RESIZE)).equal?(0))
           resize_rectangles(new_x[0] - @old_x, new_y[0] - @old_y)
-          send_event(SWT::Resize, event)
+          send_event___org_eclipse_swt_widgets_tracker_7(SWT::Resize, event)
           # It is possible (but unlikely), that application
           # code could have disposed the widget in the resize
           # event.  If this happens, return false to indicate
@@ -762,7 +762,7 @@ module Org::Eclipse::Swt::Widgets
           end
         else
           move_rectangles(new_x[0] - @old_x, new_y[0] - @old_y)
-          send_event(SWT::Move, event)
+          send_event___org_eclipse_swt_widgets_tracker_9(SWT::Move, event)
           # It is possible (but unlikely), that application
           # code could have disposed the widget in the move
           # event.  If this happens, return false to indicate
@@ -914,7 +914,7 @@ module Org::Eclipse::Swt::Widgets
             end
           end
         end
-        OS.memmove___org_eclipse_swt_widgets_tracker_3(gdk_event, event_ptr, GdkEvent.attr_sizeof)
+        OS.memmove___org_eclipse_swt_widgets_tracker_11(gdk_event, event_ptr, GdkEvent.attr_sizeof)
         # long
         widget = OS.gtk_get_event_widget(event_ptr)
         case (gdk_event.attr_type)

@@ -1324,7 +1324,7 @@ module Org::Eclipse::Swt::Widgets
         event.attr_start = mbcs_to_wcs_pos(start)
         event.attr_end = mbcs_to_wcs_pos(end_)
       end
-      send_event(SWT::Verify, event)
+      send_event___org_eclipse_swt_widgets_spinner_3(SWT::Verify, event)
       if (!event.attr_doit || is_disposed)
         return nil
       end
@@ -1496,7 +1496,7 @@ module Org::Eclipse::Swt::Widgets
       case (RJava.cast_to_int(w_param))
       # FALL THROUGH
       when SWT::CR
-        post_event___org_eclipse_swt_widgets_spinner_3(SWT::DefaultSelection)
+        post_event___org_eclipse_swt_widgets_spinner_5(SWT::DefaultSelection)
         return LRESULT::ZERO
       when SWT::TAB, SWT::ESC
         return LRESULT::ZERO
@@ -1603,7 +1603,7 @@ module Org::Eclipse::Swt::Widgets
               set_selection(value, true, false, true)
             end
           end
-          send_event(SWT::Modify)
+          send_event___org_eclipse_swt_widgets_spinner_7(SWT::Modify)
           if (is_disposed)
             return LRESULT::ZERO
           end
@@ -1734,7 +1734,7 @@ module Org::Eclipse::Swt::Widgets
       code = OS._loword(w_param)
       case (code)
       when OS::SB_THUMBPOSITION
-        post_event___org_eclipse_swt_widgets_spinner_5(SWT::Selection)
+        post_event___org_eclipse_swt_widgets_spinner_9(SWT::Selection)
       end
       return super(w_param, l_param)
     end

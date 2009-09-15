@@ -447,7 +447,7 @@ module Org::Eclipse::Swt::Widgets
       event = Event.new
       event.attr_item = self
       type = OS.gtk_expander_get_expanded(self.attr_handle) ? SWT::Collapse : SWT::Expand
-      @parent.send_event(type, event)
+      @parent.send_event___org_eclipse_swt_widgets_expand_item_1(type, event)
       return 0
     end
     

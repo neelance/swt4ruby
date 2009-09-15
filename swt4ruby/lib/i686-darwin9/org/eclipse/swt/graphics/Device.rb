@@ -245,7 +245,7 @@ module Org::Eclipse::Swt::Graphics
       def get_device
         synchronized(self) do
           if (!(self.attr_device_finder).nil?)
-            self.attr_device_finder.run
+            self.attr_device_finder.run___org_eclipse_swt_graphics_device_1
           end
           device = self.attr_current_device
           self.attr_current_device = nil

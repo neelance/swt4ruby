@@ -272,7 +272,7 @@ module Org::Eclipse::Swt::Awt
           alias_method :initialize_anonymous, :initialize
         end.new_local(self)
         if (EventQueue.is_dispatch_thread || !(parent.get_display.get_sync_thread).nil?)
-          runnable.run
+          runnable.run___org_eclipse_swt_awt_swt_awt_1
         else
           EventQueue.invoke_later(runnable)
           OS._reply_message(0)

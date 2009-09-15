@@ -857,7 +857,7 @@ module Org::Eclipse::Swt::Widgets
       # that selection event must be sent because WM_HSCROLL
       # and WM_VSCROLL are sent from the modal message loop
       # so that they are delivered during inside the loop.
-      send_event(SWT::Selection, event)
+      send_event___org_eclipse_swt_widgets_slider_5(SWT::Selection, event)
       # the widget could be destroyed at this point
       return nil
     end

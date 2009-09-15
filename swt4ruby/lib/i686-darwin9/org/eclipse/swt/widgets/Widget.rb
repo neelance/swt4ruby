@@ -1642,7 +1642,7 @@ module Org::Eclipse::Swt::Widgets
       if ((event).nil?)
         event = Event.new
       end
-      send_event(event_type, event)
+      send_event___org_eclipse_swt_widgets_widget_1(event_type, event)
     end
     
     typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
@@ -1663,12 +1663,12 @@ module Org::Eclipse::Swt::Widgets
     
     typesig { [::Java::Int] }
     def post_event(event_type)
-      send_event(event_type, nil, false)
+      send_event___org_eclipse_swt_widgets_widget_3(event_type, nil, false)
     end
     
     typesig { [::Java::Int, Event] }
     def post_event(event_type, event)
-      send_event(event_type, event, false)
+      send_event___org_eclipse_swt_widgets_widget_5(event_type, event, false)
     end
     
     typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
@@ -1687,7 +1687,7 @@ module Org::Eclipse::Swt::Widgets
     def release(destroy)
       if (((@state & DISPOSE_SENT)).equal?(0))
         @state |= DISPOSE_SENT
-        send_event(SWT::Dispose)
+        send_event___org_eclipse_swt_widgets_widget_7(SWT::Dispose)
       end
       if (((@state & DISPOSED)).equal?(0))
         release_children(destroy)
@@ -1861,17 +1861,17 @@ module Org::Eclipse::Swt::Widgets
     
     typesig { [Event] }
     def send_event(event)
-      @display.send_event(@event_table, event)
+      @display.send_event___org_eclipse_swt_widgets_widget_9(@event_table, event)
     end
     
     typesig { [::Java::Int] }
     def send_event(event_type)
-      send_event(event_type, nil, true)
+      send_event___org_eclipse_swt_widgets_widget_11(event_type, nil, true)
     end
     
     typesig { [::Java::Int, Event] }
     def send_event(event_type, event)
-      send_event(event_type, event, true)
+      send_event___org_eclipse_swt_widgets_widget_13(event_type, event, true)
     end
     
     typesig { [::Java::Int, Event, ::Java::Boolean] }
@@ -1889,9 +1889,9 @@ module Org::Eclipse::Swt::Widgets
         event.attr_time = @display.get_last_event_time
       end
       if (send)
-        send_event(event)
+        send_event___org_eclipse_swt_widgets_widget_15(event)
       else
-        @display.post_event___org_eclipse_swt_widgets_widget_1(event)
+        @display.post_event___org_eclipse_swt_widgets_widget_17(event)
       end
     end
     
@@ -1909,7 +1909,7 @@ module Org::Eclipse::Swt::Widgets
     
     typesig { [::Java::Int, Event] }
     def send_key_event(type, event)
-      send_event(type, event)
+      send_event___org_eclipse_swt_widgets_widget_19(type, event)
       # widget could be disposed at this point
       # 
       # It is possible (but unlikely), that application
@@ -2321,7 +2321,7 @@ module Org::Eclipse::Swt::Widgets
         return
       end
       rect = NSRect.new
-      OS.memmove___org_eclipse_swt_widgets_widget_3(rect, arg0, NSRect.attr_sizeof)
+      OS.memmove___org_eclipse_swt_widgets_widget_21(rect, arg0, NSRect.attr_sizeof)
       view = NSView.new(id)
       if (@display.attr_is_painting.contains_object(view))
         needs_display_in_rect = @display.attr_needs_display_in_rect

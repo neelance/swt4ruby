@@ -495,7 +495,7 @@ module Org::Eclipse::Swt::Widgets
           if (rect.contains(x, y))
             ev = Event.new
             ev.attr_text = @ids[@focus_index]
-            send_event(SWT::Selection, ev)
+            send_event___org_eclipse_swt_widgets_link_5(SWT::Selection, ev)
             return result
           end
           i += 1
@@ -512,7 +512,7 @@ module Org::Eclipse::Swt::Widgets
       # int
       result = super(widget, gdk_event)
       event = GdkEvent.new
-      OS.memmove___org_eclipse_swt_widgets_link_5(event, gdk_event, GdkEvent.attr_sizeof)
+      OS.memmove___org_eclipse_swt_widgets_link_7(event, gdk_event, GdkEvent.attr_sizeof)
       case (event.attr_type)
       when OS::GDK_FOCUS_CHANGE
         redraw
@@ -529,7 +529,7 @@ module Org::Eclipse::Swt::Widgets
         return 0
       end
       gdk_event = GdkEventExpose.new
-      OS.memmove___org_eclipse_swt_widgets_link_7(gdk_event, event_ptr, GdkEventExpose.attr_sizeof)
+      OS.memmove___org_eclipse_swt_widgets_link_9(gdk_event, event_ptr, GdkEventExpose.attr_sizeof)
       data = SwtGCData.new
       data.attr_damage_rgn = gdk_event.attr_region
       gc = SwtGC.gtk_new(self, data)
@@ -566,7 +566,7 @@ module Org::Eclipse::Swt::Widgets
           event.attr_x = get_client_width - event.attr_width - event.attr_x
         end
         event.attr_gc = gc
-        send_event(SWT::Paint, event)
+        send_event___org_eclipse_swt_widgets_link_11(SWT::Paint, event)
         event.attr_gc = nil
       end
       gc.dispose
@@ -587,12 +587,12 @@ module Org::Eclipse::Swt::Widgets
         return result
       end
       gdk_event = GdkEventKey.new
-      OS.memmove___org_eclipse_swt_widgets_link_9(gdk_event, event_ptr, GdkEventKey.attr_sizeof)
+      OS.memmove___org_eclipse_swt_widgets_link_13(gdk_event, event_ptr, GdkEventKey.attr_sizeof)
       case (gdk_event.attr_keyval)
       when OS::GDK_Return, OS::GDK_KP_Enter, OS::GDK_space
         event = Event.new
         event.attr_text = @ids[@focus_index]
-        send_event(SWT::Selection, event)
+        send_event___org_eclipse_swt_widgets_link_15(SWT::Selection, event)
       when OS::GDK_Tab
         if (@focus_index < @offsets.attr_length - 1)
           @focus_index += 1
@@ -618,7 +618,7 @@ module Org::Eclipse::Swt::Widgets
         return result
       end
       gdk_event = GdkEventMotion.new
-      OS.memmove___org_eclipse_swt_widgets_link_11(gdk_event, event, GdkEventMotion.attr_sizeof)
+      OS.memmove___org_eclipse_swt_widgets_link_17(gdk_event, event, GdkEventMotion.attr_sizeof)
       x = RJava.cast_to_int(gdk_event.attr_x)
       y = RJava.cast_to_int(gdk_event.attr_y)
       if (!((self.attr_style & SWT::MIRRORED)).equal?(0))

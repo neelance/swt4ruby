@@ -1624,7 +1624,7 @@ module Org::Eclipse::Swt::Widgets
             event.attr_y = ps.attr_top
             event.attr_width = width
             event.attr_height = height
-            send_event(SWT::Paint, event)
+            send_event___org_eclipse_swt_widgets_composite_1(SWT::Paint, event)
             if (data.attr_focus_drawn && !is_disposed)
               update_uistate
             end
@@ -1715,7 +1715,7 @@ module Org::Eclipse::Swt::Widgets
                 event.attr_width = rect.attr_right - rect.attr_left
                 event.attr_height = rect.attr_bottom - rect.attr_top
                 event.attr_count = count - 1 - i
-                send_event(SWT::Paint, event)
+                send_event___org_eclipse_swt_widgets_composite_3(SWT::Paint, event)
                 i += 1
               end
             else
@@ -1730,7 +1730,7 @@ module Org::Eclipse::Swt::Widgets
               event.attr_y = ps.attr_top
               event.attr_width = width
               event.attr_height = height
-              send_event(SWT::Paint, event)
+              send_event___org_eclipse_swt_widgets_composite_5(SWT::Paint, event)
             end
             # widget could be disposed at this point
             event.attr_gc = nil
@@ -1818,7 +1818,7 @@ module Org::Eclipse::Swt::Widgets
           event.attr_y = rect.attr_top
           event.attr_width = rect.attr_right - rect.attr_left
           event.attr_height = rect.attr_bottom - rect.attr_top
-          send_event(SWT::Paint, event)
+          send_event___org_eclipse_swt_widgets_composite_7(SWT::Paint, event)
           event.attr_gc = nil
           gc.dispose
         end

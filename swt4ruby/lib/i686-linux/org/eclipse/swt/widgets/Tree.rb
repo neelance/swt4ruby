@@ -523,7 +523,7 @@ module Org::Eclipse::Swt::Widgets
         signal_id = OS.g_signal_lookup(OS.attr_row_changed, OS.gtk_tree_model_get_type)
         OS.g_signal_handlers_block_matched(@model_handle, mask, signal_id, 0, 0, 0, self.attr_handle)
         @current_item = item
-        send_event(SWT::SetData, event)
+        send_event___org_eclipse_swt_widgets_tree_3(SWT::SetData, event)
         @current_item = nil
         # widget could be disposed at this point
         if (is_disposed)
@@ -2285,7 +2285,7 @@ module Org::Eclipse::Swt::Widgets
     # long
     def gtk_button_press_event(widget, event)
       gdk_event = GdkEventButton.new
-      OS.memmove___org_eclipse_swt_widgets_tree_3(gdk_event, event, GdkEventButton.attr_sizeof)
+      OS.memmove___org_eclipse_swt_widgets_tree_5(gdk_event, event, GdkEventButton.attr_sizeof)
       if (!(gdk_event.attr_window).equal?(OS.gtk_tree_view_get_bin_window(self.attr_handle)))
         return 0
       end
@@ -2367,7 +2367,7 @@ module Org::Eclipse::Swt::Widgets
       if (!(item).nil?)
         event = Event.new
         event.attr_item = item
-        post_event___org_eclipse_swt_widgets_tree_5(SWT::Selection, event)
+        post_event___org_eclipse_swt_widgets_tree_7(SWT::Selection, event)
       end
       return 0
     end
@@ -2401,13 +2401,13 @@ module Org::Eclipse::Swt::Widgets
         # the return key, GTK does not issue notification. The fix is
         # to issue this notification when the return key is pressed.
         key_event = GdkEventKey.new
-        OS.memmove___org_eclipse_swt_widgets_tree_7(key_event, event_ptr, GdkEventKey.attr_sizeof)
+        OS.memmove___org_eclipse_swt_widgets_tree_9(key_event, event_ptr, GdkEventKey.attr_sizeof)
         key = key_event.attr_keyval
         case (key)
         when OS::GDK_Return, OS::GDK_KP_Enter
           event = Event.new
           event.attr_item = get_focus_item
-          post_event___org_eclipse_swt_widgets_tree_9(SWT::DefaultSelection, event)
+          post_event___org_eclipse_swt_widgets_tree_11(SWT::DefaultSelection, event)
         end
       end
       return result
@@ -2462,7 +2462,7 @@ module Org::Eclipse::Swt::Widgets
       OS.g_free(iter)
       event = Event.new
       event.attr_item = item
-      post_event___org_eclipse_swt_widgets_tree_11(SWT::DefaultSelection, event)
+      post_event___org_eclipse_swt_widgets_tree_13(SWT::DefaultSelection, event)
       return 0
     end
     
@@ -2495,7 +2495,7 @@ module Org::Eclipse::Swt::Widgets
       event.attr_item = item
       old_model_changed = @model_changed
       @model_changed = false
-      send_event(SWT::Collapse, event)
+      send_event___org_eclipse_swt_widgets_tree_15(SWT::Collapse, event)
       # Bug in GTK.  Collapsing the target row during the test_collapse_row
       # handler will cause a segmentation fault if the animation code is allowed
       # to run.  The fix is to block the animation if the row is already
@@ -2536,7 +2536,7 @@ module Org::Eclipse::Swt::Widgets
       event.attr_item = item
       old_model_changed = @model_changed
       @model_changed = false
-      send_event(SWT::Expand, event)
+      send_event___org_eclipse_swt_widgets_tree_17(SWT::Expand, event)
       # Bug in GTK.  Expanding the target row during the test_expand_row
       # handler will cause a segmentation fault if the animation code is allowed
       # to run.  The fix is to block the animation if the row is already
@@ -2591,7 +2591,7 @@ module Org::Eclipse::Swt::Widgets
         event = Event.new
         event.attr_detail = SWT::CHECK
         event.attr_item = item
-        post_event___org_eclipse_swt_widgets_tree_13(SWT::Selection, event)
+        post_event___org_eclipse_swt_widgets_tree_19(SWT::Selection, event)
       end
       return 0
     end
@@ -2730,7 +2730,7 @@ module Org::Eclipse::Swt::Widgets
         indices = OS.gtk_tree_path_get_indices(path)
         if (!(indices).equal?(0))
           temp = Array.typed(::Java::Int).new(1) { 0 }
-          OS.memmove___org_eclipse_swt_widgets_tree_15(temp, indices, 4)
+          OS.memmove___org_eclipse_swt_widgets_tree_21(temp, indices, 4)
           index = temp[0]
         end
       end
@@ -3060,7 +3060,7 @@ module Org::Eclipse::Swt::Widgets
       # long
       g_class = OS.g_type_class_peek_parent(OS._g_object_get_class(cell))
       klass = GtkCellRendererClass.new
-      OS.memmove___org_eclipse_swt_widgets_tree_17(klass, g_class)
+      OS.memmove___org_eclipse_swt_widgets_tree_23(klass, g_class)
       # long
       result = OS.call(klass.attr_get_size, cell, self.attr_handle, cell_area, x_offset, y_offset, width, height)
       if (!@ignore_size && OS._gtk_is_cell_renderer_text(cell))
@@ -3088,10 +3088,10 @@ module Org::Eclipse::Swt::Widgets
             content_width = Array.typed(::Java::Int).new(1) { 0 }
             content_height = Array.typed(::Java::Int).new(1) { 0 }
             if (!(width).equal?(0))
-              OS.memmove___org_eclipse_swt_widgets_tree_19(content_width, width, 4)
+              OS.memmove___org_eclipse_swt_widgets_tree_25(content_width, width, 4)
             end
             if (!(height).equal?(0))
-              OS.memmove___org_eclipse_swt_widgets_tree_21(content_height, height, 4)
+              OS.memmove___org_eclipse_swt_widgets_tree_27(content_height, height, 4)
             end
             image = item.get_image(column_index)
             image_width = 0
@@ -3108,17 +3108,17 @@ module Org::Eclipse::Swt::Widgets
             event.attr_gc = gc
             event.attr_width = content_width[0]
             event.attr_height = content_height[0]
-            send_event(SWT::MeasureItem, event)
+            send_event___org_eclipse_swt_widgets_tree_29(SWT::MeasureItem, event)
             gc.dispose
             content_width[0] = event.attr_width - image_width
             if (content_height[0] < event.attr_height)
               content_height[0] = event.attr_height
             end
             if (!(width).equal?(0))
-              OS.memmove___org_eclipse_swt_widgets_tree_23(width, content_width, 4)
+              OS.memmove___org_eclipse_swt_widgets_tree_31(width, content_width, 4)
             end
             if (!(height).equal?(0))
-              OS.memmove___org_eclipse_swt_widgets_tree_25(height, content_height, 4)
+              OS.memmove___org_eclipse_swt_widgets_tree_33(height, content_height, 4)
             end
           end
         end
@@ -3216,7 +3216,7 @@ module Org::Eclipse::Swt::Widgets
             event.attr_width = rect.attr_width
             event.attr_height = rect.attr_height
             event.attr_detail = @draw_state
-            send_event(SWT::EraseItem, event)
+            send_event___org_eclipse_swt_widgets_tree_35(SWT::EraseItem, event)
             @draw_foreground = nil
             @draw_state = event.attr_doit ? event.attr_detail : 0
             @draw_flags &= ~(OS::GTK_CELL_RENDERER_FOCUSED | OS::GTK_CELL_RENDERER_SELECTED)
@@ -3247,7 +3247,7 @@ module Org::Eclipse::Swt::Widgets
         gc = SwtGC.new(self)
         gc.set_background(item.get_background(column_index))
         rect = GdkRectangle.new
-        OS.memmove___org_eclipse_swt_widgets_tree_27(rect, background_area, GdkRectangle.attr_sizeof)
+        OS.memmove___org_eclipse_swt_widgets_tree_37(rect, background_area, GdkRectangle.attr_sizeof)
         gc.fill_rectangle(rect.attr_x, rect.attr_y, rect.attr_width, rect.attr_height)
         gc.dispose
       end
@@ -3255,7 +3255,7 @@ module Org::Eclipse::Swt::Widgets
         # long
         g_class = OS.g_type_class_peek_parent(OS._g_object_get_class(cell))
         klass = GtkCellRendererClass.new
-        OS.memmove___org_eclipse_swt_widgets_tree_29(klass, g_class)
+        OS.memmove___org_eclipse_swt_widgets_tree_39(klass, g_class)
         if (!(@draw_foreground).nil? && OS._gtk_is_cell_renderer_text(cell))
           OS.g_object_set(cell, OS.attr_foreground_gdk, @draw_foreground, 0)
         end
@@ -3318,7 +3318,7 @@ module Org::Eclipse::Swt::Widgets
             event.attr_width = content_width[0]
             event.attr_height = rect.attr_height
             event.attr_detail = @draw_state
-            send_event(SWT::PaintItem, event)
+            send_event___org_eclipse_swt_widgets_tree_41(SWT::PaintItem, event)
             gc.dispose
           end
         end
@@ -4015,7 +4015,7 @@ module Org::Eclipse::Swt::Widgets
         indices = Array.typed(::Java::Int).new(depth - 1) { 0 }
         # long
         indices_ptr = OS.gtk_tree_path_get_indices(path)
-        OS.memmove___org_eclipse_swt_widgets_tree_31(indices, indices_ptr, indices.attr_length * 4)
+        OS.memmove___org_eclipse_swt_widgets_tree_43(indices, indices_ptr, indices.attr_length * 4)
         # long
         temp_path = OS.gtk_tree_path_new
         i = 0

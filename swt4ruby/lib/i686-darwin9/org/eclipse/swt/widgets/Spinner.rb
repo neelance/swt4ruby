@@ -1027,10 +1027,10 @@ module Org::Eclipse::Swt::Widgets
         if (!(field_editor).nil?)
           field_editor.set_selected_range(selection)
         end
-        send_event(SWT::Modify)
+        send_event___org_eclipse_swt_widgets_spinner_3(SWT::Modify)
       end
       if (notify)
-        post_event___org_eclipse_swt_widgets_spinner_3(SWT::Selection)
+        post_event___org_eclipse_swt_widgets_spinner_5(SWT::Selection)
       end
     end
     
@@ -1121,7 +1121,7 @@ module Org::Eclipse::Swt::Widgets
     # long
     def should_change_text_in_range_replacement_string(id, sel, affected_char_range, replacement_string)
       range = NSRange.new
-      OS.memmove___org_eclipse_swt_widgets_spinner_5(range, affected_char_range, NSRange.attr_sizeof)
+      OS.memmove___org_eclipse_swt_widgets_spinner_7(range, affected_char_range, NSRange.attr_sizeof)
       result = call_super_boolean(id, sel, range, replacement_string)
       if (hooks(SWT::Verify))
         text = NSString.new(replacement_string).get_string
@@ -1158,7 +1158,7 @@ module Org::Eclipse::Swt::Widgets
           end
         end
         if (!result)
-          send_event(SWT::Modify)
+          send_event___org_eclipse_swt_widgets_spinner_9(SWT::Modify)
         end
       end
       return result
@@ -1178,7 +1178,7 @@ module Org::Eclipse::Swt::Widgets
           set_selection(value, true, false, true)
         end
       end
-      post_event___org_eclipse_swt_widgets_spinner_7(SWT::Modify)
+      post_event___org_eclipse_swt_widgets_spinner_11(SWT::Modify)
     end
     
     typesig { [::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int] }
@@ -1190,7 +1190,7 @@ module Org::Eclipse::Swt::Widgets
     def text_view_will_change_selection_from_character_range_to_character_range(id, sel, a_text_view, old_selected_char_range, new_selected_char_range)
       # allow the selection change to proceed
       result = NSRange.new
-      OS.memmove___org_eclipse_swt_widgets_spinner_9(result, new_selected_char_range, NSRange.attr_sizeof)
+      OS.memmove___org_eclipse_swt_widgets_spinner_13(result, new_selected_char_range, NSRange.attr_sizeof)
       return result
     end
     
@@ -1244,7 +1244,7 @@ module Org::Eclipse::Swt::Widgets
       # code could have disposed the widget in the verify
       # event.  If this happens, answer null to cancel
       # the operation.
-      send_event(SWT::Verify, event)
+      send_event___org_eclipse_swt_widgets_spinner_15(SWT::Verify, event)
       if (!event.attr_doit || is_disposed)
         return nil
       end

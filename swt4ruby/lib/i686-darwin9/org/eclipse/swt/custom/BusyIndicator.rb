@@ -68,7 +68,7 @@ module Org::Eclipse::Swt::Custom
         if ((display).nil?)
           display = Display.get_current
           if ((display).nil?)
-            runnable.run
+            runnable.run___org_eclipse_swt_custom_busy_indicator_1
             return
           end
         end
@@ -86,7 +86,7 @@ module Org::Eclipse::Swt::Custom
           i += 1
         end
         begin
-          runnable.run
+          runnable.run___org_eclipse_swt_custom_busy_indicator_3
         ensure
           shells = display.get_shells
           i_ = 0

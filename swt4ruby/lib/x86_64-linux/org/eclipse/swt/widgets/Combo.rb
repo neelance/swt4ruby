@@ -1332,7 +1332,7 @@ module Org::Eclipse::Swt::Widgets
       if (OS::GTK_VERSION >= OS._version(2, 4, 0))
         if ((widget).equal?(self.attr_handle))
           if ((@entry_handle).equal?(0))
-            send_event(SWT::Modify)
+            send_event___org_eclipse_swt_widgets_combo_11(SWT::Modify)
             if (is_disposed)
               return 0
             end
@@ -1348,7 +1348,7 @@ module Org::Eclipse::Swt::Widgets
           # item and not matching the item as the user types.
           index = OS.gtk_combo_box_get_active(self.attr_handle)
           if (!(index).equal?(-1))
-            post_event___org_eclipse_swt_widgets_combo_11(SWT::Selection)
+            post_event___org_eclipse_swt_widgets_combo_13(SWT::Selection)
           end
           return 0
         end
@@ -1358,12 +1358,12 @@ module Org::Eclipse::Swt::Widgets
           ptr = OS.gtk_entry_get_text(@entry_handle)
           length = OS.strlen(ptr)
           buffer = Array.typed(::Java::Byte).new(length) { 0 }
-          OS.memmove___org_eclipse_swt_widgets_combo_13(buffer, ptr, length)
+          OS.memmove___org_eclipse_swt_widgets_combo_15(buffer, ptr, length)
           text = String.new(Converter.mbcs_to_wcs(nil, buffer))
           i = 0
           while i < @items.attr_length
             if ((@items[i] == text))
-              post_event___org_eclipse_swt_widgets_combo_15(SWT::Selection)
+              post_event___org_eclipse_swt_widgets_combo_17(SWT::Selection)
               break
             end
             i += 1
@@ -1380,7 +1380,7 @@ module Org::Eclipse::Swt::Widgets
       event_ptr = OS.gtk_get_current_event
       if (!(event_ptr).equal?(0))
         gdk_event = GdkEventKey.new
-        OS.memmove___org_eclipse_swt_widgets_combo_17(gdk_event, event_ptr, GdkEventKey.attr_sizeof)
+        OS.memmove___org_eclipse_swt_widgets_combo_19(gdk_event, event_ptr, GdkEventKey.attr_sizeof)
         case (gdk_event.attr_type)
         when OS::GDK_KEY_PRESS
           key_press = true
@@ -1388,9 +1388,9 @@ module Org::Eclipse::Swt::Widgets
         OS.gdk_event_free(event_ptr)
       end
       if (key_press)
-        post_event___org_eclipse_swt_widgets_combo_19(SWT::Modify)
+        post_event___org_eclipse_swt_widgets_combo_21(SWT::Modify)
       else
-        send_event(SWT::Modify)
+        send_event___org_eclipse_swt_widgets_combo_23(SWT::Modify)
       end
       return 0
     end
@@ -1411,7 +1411,7 @@ module Org::Eclipse::Swt::Widgets
         return 0
       end
       buffer = Array.typed(::Java::Byte).new(length) { 0 }
-      OS.memmove___org_eclipse_swt_widgets_combo_21(buffer, text, length)
+      OS.memmove___org_eclipse_swt_widgets_combo_25(buffer, text, length)
       chars = Converter.mbcs_to_wcs(nil, buffer)
       new_chars = send_imkey_event(SWT::KeyDown, nil, chars)
       if ((new_chars).nil?)
@@ -1497,13 +1497,13 @@ module Org::Eclipse::Swt::Widgets
       # field.
       if (OS::GTK_VERSION >= OS._version(2, 4, 0))
         event = GdkEvent.new
-        OS.memmove___org_eclipse_swt_widgets_combo_23(event, gdk_event, GdkEvent.attr_sizeof)
+        OS.memmove___org_eclipse_swt_widgets_combo_27(event, gdk_event, GdkEvent.attr_sizeof)
         case (event.attr_type)
         when OS::GDK_BUTTON_PRESS
           gdk_event_button = GdkEventButton.new
-          OS.memmove___org_eclipse_swt_widgets_combo_25(gdk_event_button, gdk_event, GdkEventButton.attr_sizeof)
+          OS.memmove___org_eclipse_swt_widgets_combo_29(gdk_event_button, gdk_event, GdkEventButton.attr_sizeof)
           if ((gdk_event_button.attr_button).equal?(1))
-            if (!((self.attr_style & SWT::READ_ONLY)).equal?(0) && !send_mouse_event___org_eclipse_swt_widgets_combo_27(SWT::MouseDown, gdk_event_button.attr_button, self.attr_display.attr_click_count, 0, false, gdk_event_button.attr_time, gdk_event_button.attr_x_root, gdk_event_button.attr_y_root, false, gdk_event_button.attr_state))
+            if (!((self.attr_style & SWT::READ_ONLY)).equal?(0) && !send_mouse_event___org_eclipse_swt_widgets_combo_31(SWT::MouseDown, gdk_event_button.attr_button, self.attr_display.attr_click_count, 0, false, gdk_event_button.attr_time, gdk_event_button.attr_x_root, gdk_event_button.attr_y_root, false, gdk_event_button.attr_state))
               return 1
             end
             if (OS::GTK_VERSION >= OS._version(2, 6, 0))
@@ -1516,7 +1516,7 @@ module Org::Eclipse::Swt::Widgets
           if (OS::GTK_VERSION >= OS._version(2, 6, 0))
             if (((self.attr_style & SWT::READ_ONLY)).equal?(0))
               gdk_event_focus = GdkEventFocus.new
-              OS.memmove___org_eclipse_swt_widgets_combo_29(gdk_event_focus, gdk_event, GdkEventFocus.attr_sizeof)
+              OS.memmove___org_eclipse_swt_widgets_combo_33(gdk_event_focus, gdk_event, GdkEventFocus.attr_sizeof)
               if (!(gdk_event_focus.attr_in).equal?(0))
                 OS.gtk_combo_box_set_focus_on_click(self.attr_handle, false)
               else
@@ -1558,10 +1558,10 @@ module Org::Eclipse::Swt::Widgets
       end
       # 64
       buffer = Array.typed(::Java::Byte).new(RJava.cast_to_int(new_text_length)) { 0 }
-      OS.memmove___org_eclipse_swt_widgets_combo_31(buffer, new_text, buffer.attr_length)
+      OS.memmove___org_eclipse_swt_widgets_combo_35(buffer, new_text, buffer.attr_length)
       old_text = String.new(Converter.mbcs_to_wcs(nil, buffer))
       pos = Array.typed(::Java::Int).new(1) { 0 }
-      OS.memmove___org_eclipse_swt_widgets_combo_33(pos, position, 4)
+      OS.memmove___org_eclipse_swt_widgets_combo_37(pos, position, 4)
       if ((pos[0]).equal?(-1))
         # int
         ptr = OS.gtk_entry_get_text(@entry_handle)
@@ -1592,7 +1592,7 @@ module Org::Eclipse::Swt::Widgets
           @fix_start = new_start[0]
           @fix_end = new_end[0]
         end
-        OS.memmove___org_eclipse_swt_widgets_combo_35(position, pos, 4)
+        OS.memmove___org_eclipse_swt_widgets_combo_39(position, pos, 4)
         OS.g_signal_stop_emission_by_name(@entry_handle, OS.attr_insert_text)
       end
       return 0
@@ -1614,7 +1614,7 @@ module Org::Eclipse::Swt::Widgets
       @gdk_event_key = 0
       if (OS::GTK_VERSION >= OS._version(2, 4, 0) && ((self.attr_style & SWT::READ_ONLY)).equal?(0))
         key_event = GdkEventKey.new
-        OS.memmove___org_eclipse_swt_widgets_combo_37(key_event, event, GdkEventKey.attr_sizeof)
+        OS.memmove___org_eclipse_swt_widgets_combo_41(key_event, event, GdkEventKey.attr_sizeof)
         old_index = OS.gtk_combo_box_get_active(self.attr_handle)
         new_index = old_index
         key = key_event.attr_keyval
@@ -2078,7 +2078,7 @@ module Org::Eclipse::Swt::Widgets
           # Feature in GTK. Read Only combo boxes do not get a chance to send out a
           # Modify event in the gtk_changed callback. The fix is to send a Modify event
           # here.
-          send_event(SWT::Modify)
+          send_event___org_eclipse_swt_widgets_combo_43(SWT::Modify)
         end
       else
         @ignore_select = true
@@ -2465,7 +2465,7 @@ module Org::Eclipse::Swt::Widgets
           # Feature in GTK. Read Only combo boxes do not get a chance to send out a
           # Modify event in the gtk_changed callback. The fix is to send a Modify event
           # here.
-          send_event(SWT::Modify)
+          send_event___org_eclipse_swt_widgets_combo_45(SWT::Modify)
           return
         end
       end
@@ -2495,7 +2495,7 @@ module Org::Eclipse::Swt::Widgets
       OS.g_signal_handlers_unblock_matched(@entry_handle, OS::G_SIGNAL_MATCH_DATA, 0, 0, 0, 0, CHANGED)
       OS.g_signal_handlers_unblock_matched(@entry_handle, OS::G_SIGNAL_MATCH_DATA, 0, 0, 0, 0, DELETE_TEXT)
       OS.g_signal_handlers_unblock_matched(@entry_handle, OS::G_SIGNAL_MATCH_DATA, 0, 0, 0, 0, INSERT_TEXT)
-      send_event(SWT::Modify)
+      send_event___org_eclipse_swt_widgets_combo_47(SWT::Modify)
     end
     
     typesig { [::Java::Int] }
@@ -2603,7 +2603,7 @@ module Org::Eclipse::Swt::Widgets
       event_ptr = OS.gtk_get_current_event
       if (!(event_ptr).equal?(0))
         gdk_event = GdkEventKey.new
-        OS.memmove___org_eclipse_swt_widgets_combo_39(gdk_event, event_ptr, GdkEventKey.attr_sizeof)
+        OS.memmove___org_eclipse_swt_widgets_combo_49(gdk_event, event_ptr, GdkEventKey.attr_sizeof)
         case (gdk_event.attr_type)
         when OS::GDK_KEY_PRESS
           set_key_state(event, gdk_event)
@@ -2614,7 +2614,7 @@ module Org::Eclipse::Swt::Widgets
       # code could have disposed the widget in the verify
       # event.  If this happens, answer null to cancel
       # the operation.
-      send_event(SWT::Verify, event)
+      send_event___org_eclipse_swt_widgets_combo_51(SWT::Verify, event)
       if (!event.attr_doit || is_disposed)
         return nil
       end

@@ -735,7 +735,7 @@ module Org::Eclipse::Swt::Widgets
         return
       end
       OS._send_message(self.attr_handle, OS::CB_SETCURSEL, -1, 0)
-      send_event(SWT::Modify)
+      send_event___org_eclipse_swt_widgets_combo_1(SWT::Modify)
       # widget could be disposed at this point
     end
     
@@ -755,7 +755,7 @@ module Org::Eclipse::Swt::Widgets
     def deselect_all
       check_widget
       OS._send_message(self.attr_handle, OS::CB_SETCURSEL, -1, 0)
-      send_event(SWT::Modify)
+      send_event___org_eclipse_swt_widgets_combo_3(SWT::Modify)
       # widget could be disposed at this point
     end
     
@@ -1323,7 +1323,7 @@ module Org::Eclipse::Swt::Widgets
         set_scroll_width(buffer, true)
       end
       if (notify && !(length_).equal?(OS._get_window_text_length(self.attr_handle)))
-        send_event(SWT::Modify)
+        send_event___org_eclipse_swt_widgets_combo_5(SWT::Modify)
         if (is_disposed)
           return
         end
@@ -1419,7 +1419,7 @@ module Org::Eclipse::Swt::Widgets
         set_scroll_width(new_width, false)
       end
       if (!(text_length).equal?(OS._get_window_text_length(self.attr_handle)))
-        send_event(SWT::Modify)
+        send_event___org_eclipse_swt_widgets_combo_7(SWT::Modify)
         if (is_disposed)
           return
         end
@@ -1476,7 +1476,7 @@ module Org::Eclipse::Swt::Widgets
     def remove_all
       check_widget
       OS._send_message(self.attr_handle, OS::CB_RESETCONTENT, 0, 0)
-      send_event(SWT::Modify)
+      send_event___org_eclipse_swt_widgets_combo_9(SWT::Modify)
       if (is_disposed)
         return
       end
@@ -1702,7 +1702,7 @@ module Org::Eclipse::Swt::Widgets
         # 64
         code = RJava.cast_to_int(OS._send_message(self.attr_handle, OS::CB_SETCURSEL, index, 0))
         if (!(code).equal?(OS::CB_ERR) && !(code).equal?(selection))
-          send_event(SWT::Modify)
+          send_event___org_eclipse_swt_widgets_combo_11(SWT::Modify)
           # widget could be disposed at this point
         end
       end
@@ -1909,7 +1909,7 @@ module Org::Eclipse::Swt::Widgets
         OS._release_dc(self.attr_handle, h_dc)
         set_scroll_width(new_width + 3)
       end
-      send_event(SWT::Modify)
+      send_event___org_eclipse_swt_widgets_combo_13(SWT::Modify)
       # widget could be disposed at this point
     end
     
@@ -2202,7 +2202,7 @@ module Org::Eclipse::Swt::Widgets
       end
       buffer = TCHAR.new(get_code_page, string, true)
       if (OS._set_window_text(self.attr_handle, buffer))
-        send_event(SWT::Modify)
+        send_event___org_eclipse_swt_widgets_combo_15(SWT::Modify)
         # widget could be disposed at this point
       end
     end
@@ -2371,7 +2371,7 @@ module Org::Eclipse::Swt::Widgets
       # code could have disposed the widget in the verify
       # event.  If this happens, answer null to cancel
       # the operation.
-      send_event(SWT::Verify, event)
+      send_event___org_eclipse_swt_widgets_combo_17(SWT::Verify, event)
       if (!event.attr_doit || is_disposed)
         return nil
       end
@@ -2610,11 +2610,11 @@ module Org::Eclipse::Swt::Widgets
         # 64
         new_selection = RJava.cast_to_int(OS._send_message(self.attr_handle, OS::CB_GETCURSEL, 0, 0))
         if (!(old_selection).equal?(new_selection))
-          send_event(SWT::Modify)
+          send_event___org_eclipse_swt_widgets_combo_19(SWT::Modify)
           if (is_disposed)
             return LRESULT::ZERO
           end
-          send_event(SWT::Selection)
+          send_event___org_eclipse_swt_widgets_combo_21(SWT::Selection)
           if (is_disposed)
             return LRESULT::ZERO
           end
@@ -2787,7 +2787,7 @@ module Org::Eclipse::Swt::Widgets
         return LRESULT::ZERO
       when SWT::CR
         if (!@ignore_default_selection)
-          post_event___org_eclipse_swt_widgets_combo_1(SWT::DefaultSelection)
+          post_event___org_eclipse_swt_widgets_combo_23(SWT::DefaultSelection)
         end
         @ignore_default_selection = false
         if (!((self.attr_style & SWT::DROP_DOWN)).equal?(0))
@@ -2907,7 +2907,7 @@ module Org::Eclipse::Swt::Widgets
           # match the entry field.  The fix is remember that no selection
           # in the list should exist in this case.
           @no_selection = true
-          send_event(SWT::Modify)
+          send_event___org_eclipse_swt_widgets_combo_25(SWT::Modify)
           if (is_disposed)
             return LRESULT::ZERO
           end
@@ -2931,11 +2931,11 @@ module Org::Eclipse::Swt::Widgets
           # event.  If this happens, end the processing of the
           # Windows message by returning zero as the result of
           # the window proc.
-          send_event(SWT::Modify)
+          send_event___org_eclipse_swt_widgets_combo_27(SWT::Modify)
           if (is_disposed)
             return LRESULT::ZERO
           end
-          post_event___org_eclipse_swt_widgets_combo_3(SWT::Selection)
+          post_event___org_eclipse_swt_widgets_combo_29(SWT::Selection)
         when OS::CBN_SETFOCUS
           send_focus_event(SWT::FocusIn)
           if (is_disposed)
@@ -3042,11 +3042,11 @@ module Org::Eclipse::Swt::Widgets
           # 64
           new_selection = RJava.cast_to_int(OS._send_message(self.attr_handle, OS::CB_GETCURSEL, 0, 0))
           if (!(old_selection).equal?(new_selection))
-            send_event(SWT::Modify)
+            send_event___org_eclipse_swt_widgets_combo_31(SWT::Modify)
             if (is_disposed)
               return LRESULT::ZERO
             end
-            send_event(SWT::Selection)
+            send_event___org_eclipse_swt_widgets_combo_33(SWT::Selection)
             if (is_disposed)
               return LRESULT::ZERO
             end

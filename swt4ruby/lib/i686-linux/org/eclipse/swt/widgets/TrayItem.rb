@@ -356,13 +356,13 @@ module Org::Eclipse::Swt::Widgets
         return 0
       end
       if ((gdk_event.attr_button).equal?(3) && (gdk_event.attr_type).equal?(OS::GDK_BUTTON_PRESS))
-        send_event(SWT::MenuDetect)
+        send_event___org_eclipse_swt_widgets_tray_item_9(SWT::MenuDetect)
         return 0
       end
       if ((gdk_event.attr_type).equal?(OS::GDK_2BUTTON_PRESS))
-        post_event___org_eclipse_swt_widgets_tray_item_9(SWT::DefaultSelection)
+        post_event___org_eclipse_swt_widgets_tray_item_11(SWT::DefaultSelection)
       else
-        post_event___org_eclipse_swt_widgets_tray_item_11(SWT::Selection)
+        post_event___org_eclipse_swt_widgets_tray_item_13(SWT::Selection)
       end
       return 0
     end
@@ -383,9 +383,9 @@ module Org::Eclipse::Swt::Widgets
             SWT.error(SWT::ERROR_NO_HANDLES)
           end
           gdk_image = GdkImage.new
-          OS.memmove___org_eclipse_swt_widgets_tray_item_13(gdk_image, gdk_image_ptr)
+          OS.memmove___org_eclipse_swt_widgets_tray_item_15(gdk_image, gdk_image_ptr)
           mask_data = Array.typed(::Java::Byte).new(gdk_image.attr_bpl * gdk_image.attr_height) { 0 }
-          OS.memmove___org_eclipse_swt_widgets_tray_item_15(mask_data, gdk_image.attr_mem, mask_data.attr_length)
+          OS.memmove___org_eclipse_swt_widgets_tray_item_17(mask_data, gdk_image.attr_mem, mask_data.attr_length)
           OS.g_object_unref(gdk_image_ptr)
           region = Region.new(self.attr_display)
           y = 0
@@ -418,7 +418,7 @@ module Org::Eclipse::Swt::Widgets
     # long
     # long
     def gtk_status_icon_popup_menu(widget, button, activate_time)
-      send_event(SWT::MenuDetect)
+      send_event___org_eclipse_swt_widgets_tray_item_19(SWT::MenuDetect)
       return 0
     end
     
@@ -687,7 +687,7 @@ module Org::Eclipse::Swt::Widgets
         # It is possible (but unlikely), that application
         # code could have disposed the widget in the show
         # event.  If this happens, just return.
-        send_event(SWT::Show)
+        send_event___org_eclipse_swt_widgets_tray_item_21(SWT::Show)
         if (is_disposed)
           return
         end
@@ -702,7 +702,7 @@ module Org::Eclipse::Swt::Widgets
         else
           OS.gtk_widget_hide(self.attr_handle)
         end
-        send_event(SWT::Hide)
+        send_event___org_eclipse_swt_widgets_tray_item_23(SWT::Hide)
       end
     end
     

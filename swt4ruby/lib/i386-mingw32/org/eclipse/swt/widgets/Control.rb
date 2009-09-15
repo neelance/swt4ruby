@@ -2975,7 +2975,7 @@ module Org::Eclipse::Swt::Widgets
       display = self.attr_display
       display.attr_focus_event = type
       display.attr_focus_control = self
-      send_event(type)
+      send_event___org_eclipse_swt_widgets_control_1(type)
       # widget could be disposed at this point
       display.attr_focus_event = SWT::None
       display.attr_focus_control = nil
@@ -2998,12 +2998,12 @@ module Org::Eclipse::Swt::Widgets
     
     typesig { [] }
     def send_move
-      send_event(SWT::Move)
+      send_event___org_eclipse_swt_widgets_control_3(SWT::Move)
     end
     
     typesig { [] }
     def send_resize
-      send_event(SWT::Resize)
+      send_event___org_eclipse_swt_widgets_control_5(SWT::Resize)
     end
     
     typesig { [] }
@@ -3798,7 +3798,7 @@ module Org::Eclipse::Swt::Widgets
         end
       end
       if (visible)
-        send_event(SWT::Show)
+        send_event___org_eclipse_swt_widgets_control_7(SWT::Show)
         if (is_disposed)
           return
         end
@@ -3825,7 +3825,7 @@ module Org::Eclipse::Swt::Widgets
         end
       end
       if (!visible)
-        send_event(SWT::Hide)
+        send_event___org_eclipse_swt_widgets_control_9(SWT::Hide)
         if (is_disposed)
           return
         end
@@ -3861,7 +3861,7 @@ module Org::Eclipse::Swt::Widgets
     typesig { [] }
     def subclass
       # long
-      old_proc = window_proc___org_eclipse_swt_widgets_control_1
+      old_proc = window_proc___org_eclipse_swt_widgets_control_11
       # long
       new_proc = self.attr_display.attr_window_proc
       if ((old_proc).equal?(new_proc))
@@ -4158,7 +4158,7 @@ module Org::Eclipse::Swt::Widgets
       # code could have disposed the widget in the traverse
       # event.  If this happens, return true to stop further
       # event processing.
-      send_event(SWT::Traverse, event)
+      send_event___org_eclipse_swt_widgets_control_13(SWT::Traverse, event)
       if (is_disposed)
         return true
       end
@@ -4304,7 +4304,7 @@ module Org::Eclipse::Swt::Widgets
     typesig { [] }
     def unsubclass
       # long
-      new_proc = window_proc___org_eclipse_swt_widgets_control_3
+      new_proc = window_proc___org_eclipse_swt_widgets_control_15
       # long
       old_proc = self.attr_display.attr_window_proc
       if ((old_proc).equal?(new_proc))
@@ -4929,14 +4929,14 @@ module Org::Eclipse::Swt::Widgets
             # long
             hwnd_shell = shell.attr_handle
             OS._send_message(hwnd_shell, OS::WM_CANCELMODE, 0, 0)
-            widget.post_event___org_eclipse_swt_widgets_control_5(SWT::Help)
+            widget.post_event___org_eclipse_swt_widgets_control_17(SWT::Help)
             return LRESULT::ONE
           end
         end
         return nil
       end
       if (hooks(SWT::Help))
-        post_event___org_eclipse_swt_widgets_control_7(SWT::Help)
+        post_event___org_eclipse_swt_widgets_control_19(SWT::Help)
         return LRESULT::ONE
       end
       return nil
@@ -5013,7 +5013,7 @@ module Org::Eclipse::Swt::Widgets
           # event.  If this happens, stop searching up the
           # ancestor list because there is no longer a link
           # to follow.
-          menu.send_event(SWT::Hide)
+          menu.send_event___org_eclipse_swt_widgets_control_21(SWT::Hide)
           if (menu.is_disposed)
             break
           end
@@ -5036,7 +5036,7 @@ module Org::Eclipse::Swt::Widgets
       shell.attr_active_menu = new_menu
       # Send the show event
       if (!(new_menu).nil? && !(new_menu).equal?(old_menu))
-        new_menu.send_event(SWT::Show)
+        new_menu.send_event___org_eclipse_swt_widgets_control_23(SWT::Show)
         # widget could be disposed at this point
       end
       return nil
@@ -5174,7 +5174,7 @@ module Org::Eclipse::Swt::Widgets
           # event.  If this happens, stop searching up the
           # parent list because there is no longer a link
           # to follow.
-          menu.send_event(SWT::Hide)
+          menu.send_event___org_eclipse_swt_widgets_control_25(SWT::Hide)
           if (menu.is_disposed)
             break
           end
@@ -5223,7 +5223,7 @@ module Org::Eclipse::Swt::Widgets
                 # event or the item about to be armed.  If this
                 # happens, stop searching up the ancestor list
                 # because there is no longer a link to follow.
-                ancestor.send_event(SWT::Hide)
+                ancestor.send_event___org_eclipse_swt_widgets_control_27(SWT::Hide)
                 if (ancestor.is_disposed)
                   break
                 end
@@ -5249,7 +5249,7 @@ module Org::Eclipse::Swt::Widgets
           end
         end
         if (!(item).nil?)
-          item.send_event(SWT::Arm)
+          item.send_event___org_eclipse_swt_widgets_control_29(SWT::Arm)
         end
       end
       return nil
@@ -5314,7 +5314,7 @@ module Org::Eclipse::Swt::Widgets
         end
       end
       if (((self.attr_state & MOVE_DEFERRED)).equal?(0))
-        send_event(SWT::Move)
+        send_event___org_eclipse_swt_widgets_control_31(SWT::Move)
       end
       # widget could be disposed at this point
       return nil
@@ -5514,7 +5514,7 @@ module Org::Eclipse::Swt::Widgets
     def _wm_size(w_param, l_param)
       self.attr_state |= RESIZE_OCCURRED
       if (((self.attr_state & RESIZE_DEFERRED)).equal?(0))
-        send_event(SWT::Resize)
+        send_event___org_eclipse_swt_widgets_control_33(SWT::Resize)
       end
       # widget could be disposed at this point
       return nil
