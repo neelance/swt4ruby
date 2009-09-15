@@ -114,7 +114,7 @@ module Org::Eclipse::Swt::Events
     end
     
     private
-    alias_method :initialize__mouse_event___org_eclipse_swt_events_mouse_event_0, :initialize
+    alias_method :initialize__mouse_event, :initialize
   end
   
 end

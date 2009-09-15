@@ -7906,7 +7906,7 @@ module Org::Eclipse::Swt::Custom
       options.attr_print_text_background = true
       options.attr_print_text_font_style = true
       options.attr_print_line_background = true
-      Printing.new(self, printer, options).run___org_eclipse_swt_custom_styled_text_0
+      Printing.new(self, printer, options).run
       printer.dispose
     end
     

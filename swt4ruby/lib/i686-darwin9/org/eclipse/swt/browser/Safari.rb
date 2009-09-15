@@ -489,7 +489,7 @@ module Org::Eclipse::Swt::Browser
           catch(:break_case) do
             case (e.attr_type)
             when SWT::FocusIn
-              @local_class_parent.attr_web_view.window___org_eclipse_swt_browser_safari_0.make_first_responder(@local_class_parent.attr_web_view)
+              @local_class_parent.attr_web_view.window.make_first_responder(@local_class_parent.attr_web_view)
             when SWT::Dispose
               # make this handler run after other dispose listeners
               if (self.attr_ignore_dispose)
@@ -1353,7 +1353,7 @@ module Org::Eclipse::Swt::Browser
           # long
           handler = OS.objc_msg_send(cls, OS.attr_sel_shared_handler)
           if (!(handler).equal?(0))
-            OS.objc_msg_send(handler, OS.attr_sel_start_authentication, challenge, @web_view.window___org_eclipse_swt_browser_safari_2.attr_id)
+            OS.objc_msg_send(handler, OS.attr_sel_start_authentication, challenge, @web_view.window.attr_id)
             return
           end
         end
@@ -1623,7 +1623,7 @@ module Org::Eclipse::Swt::Browser
     # long
     def web_view_set_frame(sender_, frame_)
       rect = NSRect.new
-      OS.memmove___org_eclipse_swt_browser_safari_4(rect, frame_, NSRect.attr_sizeof)
+      OS.memmove___org_eclipse_swt_browser_safari_1(rect, frame_, NSRect.attr_sizeof)
       # convert to SWT system coordinates
       bounds = self.attr_browser.get_display.get_bounds
       @location = Point.new(RJava.cast_to_int(rect.attr_x), bounds.attr_height - RJava.cast_to_int(rect.attr_y) - RJava.cast_to_int(rect.attr_height))
@@ -1852,7 +1852,7 @@ module Org::Eclipse::Swt::Browser
       can_show = WebView.can_show_mimetype(NSString.new(type))
       listener = WebPolicyDecisionListener.new(listener_id)
       if (can_show)
-        listener.use___org_eclipse_swt_browser_safari_6
+        listener.use
       else
         listener.download
       end
@@ -1902,7 +1902,7 @@ module Org::Eclipse::Swt::Browser
           end
           @preferences.set_java_script_enabled(self.attr_js_enabled)
         end
-        listener.use___org_eclipse_swt_browser_safari_8
+        listener.use
         @last_navigate_url = url2
       else
         listener.ignore
@@ -1922,7 +1922,7 @@ module Org::Eclipse::Swt::Browser
     # long
     def web_view_decide_policy_for_new_window_action_request_new_frame_name_decision_listener(sender_, action_information, request_, frame_name, listener_id)
       listener = WebPolicyDecisionListener.new(listener_id)
-      listener.use___org_eclipse_swt_browser_safari_10
+      listener.use
     end
     
     typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
@@ -2095,7 +2095,7 @@ module Org::Eclipse::Swt::Browser
         # long
         ptr = number.obj_ctype
         type = Array.typed(::Java::Byte).new(1) { 0 }
-        OS.memmove___org_eclipse_swt_browser_safari_12(type, ptr, 1)
+        OS.memmove___org_eclipse_swt_browser_safari_3(type, ptr, 1)
         if ((type[0]).equal?(Character.new(?c.ord)) || (type[0]).equal?(Character.new(?B.ord)))
           return Boolean.new(number.bool_value)
         end

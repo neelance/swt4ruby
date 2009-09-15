@@ -876,7 +876,7 @@ module Org::Eclipse::Swt::Accessibility
       end
       # Invalid childID at this point means the application did not implement getFocus, so
       # let the default handler return the native focus.
-      has_focus = ((@control.attr_view.window___org_eclipse_swt_accessibility_accessible_1.first_responder).equal?(@control.attr_view))
+      has_focus = ((@control.attr_view.window.first_responder).equal?(@control.attr_view))
       return NSNumber.number_with_bool(has_focus)
     end
     
@@ -999,12 +999,12 @@ module Org::Eclipse::Swt::Accessibility
     
     typesig { [::Java::Int] }
     def get_window_attribute(child_id)
-      return @control.attr_view.window___org_eclipse_swt_accessibility_accessible_3
+      return @control.attr_view.window
     end
     
     typesig { [::Java::Int] }
     def get_top_level_uielement_attribute(child_id)
-      return @control.attr_view.window___org_eclipse_swt_accessibility_accessible_5
+      return @control.attr_view.window
     end
     
     typesig { [::Java::Int] }

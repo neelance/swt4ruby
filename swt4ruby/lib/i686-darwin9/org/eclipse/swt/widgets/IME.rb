@@ -176,13 +176,13 @@ module Org::Eclipse::Swt::Widgets
       pt = NSPoint.new
       OS.memmove___org_eclipse_swt_widgets_ime_5(pt, point, NSPoint.attr_sizeof)
       view = @parent.attr_view
-      pt = view.window___org_eclipse_swt_widgets_ime_7.convert_screen_to_base(pt)
+      pt = view.window.convert_screen_to_base(pt)
       pt = view.convert_point_from_view_(pt, nil)
       event = Event.new
       event.attr_detail = SWT::COMPOSITION_OFFSET
       event.attr_x = RJava.cast_to_int(pt.attr_x)
       event.attr_y = RJava.cast_to_int(pt.attr_y)
-      send_event___org_eclipse_swt_widgets_ime_9(SWT::ImeComposition, event)
+      send_event___org_eclipse_swt_widgets_ime_7(SWT::ImeComposition, event)
       offset = event.attr_index + event.attr_count
       return !(offset).equal?(-1) ? offset : OS::NSNotFound
     end
@@ -209,7 +209,7 @@ module Org::Eclipse::Swt::Widgets
         pt.attr_x = caret.attr_x
         pt.attr_y = caret.attr_y + caret.attr_height
         pt = view.convert_point_to_view_(pt, nil)
-        pt = view.window___org_eclipse_swt_widgets_ime_11.convert_base_to_screen(pt)
+        pt = view.window.convert_base_to_screen(pt)
         rect.attr_x = pt.attr_x
         rect.attr_y = pt.attr_y
         rect.attr_width = caret.attr_width
@@ -461,7 +461,7 @@ module Org::Eclipse::Swt::Widgets
       event.attr_start = @start_offset
       event.attr_end = end_
       event.attr_text = @text = RJava.cast_to_string(str.get_string)
-      send_event___org_eclipse_swt_widgets_ime_13(SWT::ImeComposition, event)
+      send_event___org_eclipse_swt_widgets_ime_9(SWT::ImeComposition, event)
       @text = ""
       @caret_offset = @commit_count = 0
       @start_offset = -1
@@ -526,7 +526,7 @@ module Org::Eclipse::Swt::Widgets
     def selected_range(id, sel)
       event = Event.new
       event.attr_detail = SWT::COMPOSITION_SELECTION
-      send_event___org_eclipse_swt_widgets_ime_15(SWT::ImeComposition, event)
+      send_event___org_eclipse_swt_widgets_ime_11(SWT::ImeComposition, event)
       range = NSRange.new
       range.attr_location = event.attr_start
       range.attr_length = event.attr_text.length
@@ -573,7 +573,7 @@ module Org::Eclipse::Swt::Widgets
       if ((@start_offset).equal?(-1))
         event = Event.new
         event.attr_detail = SWT::COMPOSITION_SELECTION
-        send_event___org_eclipse_swt_widgets_ime_17(SWT::ImeComposition, event)
+        send_event___org_eclipse_swt_widgets_ime_13(SWT::ImeComposition, event)
         @start_offset = event.attr_start
         end_ = event.attr_end
       end
@@ -594,7 +594,7 @@ module Org::Eclipse::Swt::Widgets
         i = 0
         while i < length_
           attribs = attrib_str.attributes_at_index(i, ptr, range_limit)
-          OS.memmove___org_eclipse_swt_widgets_ime_19(effective_range, ptr, NSRange.attr_sizeof)
+          OS.memmove___org_eclipse_swt_widgets_ime_15(effective_range, ptr, NSRange.attr_sizeof)
           # 64
           i = RJava.cast_to_int((effective_range.attr_location + effective_range.attr_length))
           # 64
@@ -620,7 +620,7 @@ module Org::Eclipse::Swt::Widgets
         @ranges = Array.typed(::Java::Int).new([0, length_ - 1])
       end
       range = NSRange.new
-      OS.memmove___org_eclipse_swt_widgets_ime_21(range, sel_range, NSRange.attr_sizeof)
+      OS.memmove___org_eclipse_swt_widgets_ime_17(range, sel_range, NSRange.attr_sizeof)
       # 64
       @caret_offset = RJava.cast_to_int(range.attr_location)
       event = Event.new
@@ -628,7 +628,7 @@ module Org::Eclipse::Swt::Widgets
       event.attr_start = @start_offset
       event.attr_end = end_
       event.attr_text = @text = RJava.cast_to_string(str.get_string)
-      send_event___org_eclipse_swt_widgets_ime_23(SWT::ImeComposition, event)
+      send_event___org_eclipse_swt_widgets_ime_19(SWT::ImeComposition, event)
       if (is_disposed)
         return false
       end

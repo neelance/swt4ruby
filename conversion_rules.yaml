@@ -34,10 +34,10 @@ field_name_mapping:
   rendererRenderProc: renderer_render_proc_address
   rendererGetSizeProc: renderer_get_size_proc_address
 explicit_calls:
-  Call
-  memmove
-  postEvent
-  runAsyncMessages
-  sendEvent
-  sendMouseEvent
-  windowProc
+- Call
+- memmove
+- postEvent
+- runAsyncMessages
+- sendEvent
+- sendMouseEvent
+- windowProc

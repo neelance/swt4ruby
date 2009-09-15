@@ -646,7 +646,7 @@ module Org::Eclipse::Swt::Widgets
     # long
     # long
     def key_down(id, sel, the_event)
-      if ((self.attr_view.window___org_eclipse_swt_widgets_composite_1.first_responder.attr_id).equal?(id))
+      if ((self.attr_view.window.first_responder.attr_id).equal?(id))
         if (!((self.attr_state & CANVAS)).equal?(0))
           s = self.get_shell
           array = NSArray.array_with_object(NSEvent.new(the_event))
@@ -989,7 +989,7 @@ module Org::Eclipse::Swt::Widgets
           delta = ns_event.delta_y
           if (!(delta).equal?(0))
             if (hooks(SWT::MouseWheel) || filters(SWT::MouseWheel))
-              if (!send_mouse_event___org_eclipse_swt_widgets_composite_3(ns_event, SWT::MouseWheel, true))
+              if (!send_mouse_event___org_eclipse_swt_widgets_composite_1(ns_event, SWT::MouseWheel, true))
                 return
               end
             end
@@ -1007,7 +1007,7 @@ module Org::Eclipse::Swt::Widgets
             bar.set_selection(selection)
             event = Event.new
             event.attr_detail = delta > 0 ? SWT::PAGE_UP : SWT::PAGE_DOWN
-            bar.send_event___org_eclipse_swt_widgets_composite_5(SWT::Selection, event)
+            bar.send_event___org_eclipse_swt_widgets_composite_3(SWT::Selection, event)
             handled = true
           end
           bar = self.attr_horizontal_bar
@@ -1017,7 +1017,7 @@ module Org::Eclipse::Swt::Widgets
             bar.set_selection(selection)
             event = Event.new
             event.attr_detail = delta > 0 ? SWT::PAGE_UP : SWT::PAGE_DOWN
-            bar.send_event___org_eclipse_swt_widgets_composite_7(SWT::Selection, event)
+            bar.send_event___org_eclipse_swt_widgets_composite_5(SWT::Selection, event)
             handled = true
           end
           if (!handled)

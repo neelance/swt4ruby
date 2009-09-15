@@ -187,7 +187,7 @@ module Org::Eclipse::Swt::Widgets
         synchronized((lock)) do
           @sync_thread = lock.attr_thread
           begin
-            lock.run___org_eclipse_swt_widgets_synchronizer_3
+            lock.run
           rescue JavaThrowable => t
             lock.attr_throwable = t
             SWT.error(SWT::ERROR_FAILED_EXEC, t)
@@ -232,7 +232,7 @@ module Org::Eclipse::Swt::Widgets
       end
       if ((lock).nil?)
         if (!(runnable).nil?)
-          runnable.run___org_eclipse_swt_widgets_synchronizer_5
+          runnable.run
         end
         return
       end

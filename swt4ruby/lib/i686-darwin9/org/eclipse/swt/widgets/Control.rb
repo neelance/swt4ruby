@@ -796,8 +796,8 @@ module Org::Eclipse::Swt::Widgets
       if (!view.is_hidden_or_has_hidden_ancestor && is_drawing)
         # long
         child_rgn = OS._new_rgn
-        window = view.window___org_eclipse_swt_widgets_control_1
-        content_view_ = window.content_view
+        window_ = view.window
+        content_view_ = window_.content_view
         frame_view = content_view_.superview
         bounds = content_view_.visible_rect
         bounds = content_view_.convert_rect_to_view_(bounds, view)
@@ -1113,7 +1113,7 @@ module Org::Eclipse::Swt::Widgets
     # long
     # long
     def do_command_by_selector(id, sel, selector)
-      if ((@view.window___org_eclipse_swt_widgets_control_3.first_responder.attr_id).equal?(id))
+      if ((@view.window.first_responder.attr_id).equal?(id))
         if (ime_in_composition)
           return
         end
@@ -1291,13 +1291,13 @@ module Org::Eclipse::Swt::Widgets
       end
       # Push back any events we took out of the queue so the control can receive them.
       if (!(mouse_up_event).nil?)
-        application.post_event___org_eclipse_swt_widgets_control_5(mouse_up_event, true)
+        application.post_event___org_eclipse_swt_widgets_control_1(mouse_up_event, true)
       end
       if (drag_events.count > 0)
         while (drag_events.count > 0)
           curr_event = NSEvent.new(drag_events.object_at_index(drag_events.count - 1).attr_id)
           drag_events.remove_last_object
-          application.post_event___org_eclipse_swt_widgets_control_7(curr_event, true)
+          application.post_event___org_eclipse_swt_widgets_control_3(curr_event, true)
         end
       end
       return dragging
@@ -1327,7 +1327,7 @@ module Org::Eclipse::Swt::Widgets
       event.attr_y = RJava.cast_to_int(rect.attr_y)
       event.attr_width = RJava.cast_to_int(rect.attr_width)
       event.attr_height = RJava.cast_to_int(rect.attr_height)
-      send_event___org_eclipse_swt_widgets_control_9(SWT::Paint, event)
+      send_event___org_eclipse_swt_widgets_control_5(SWT::Paint, event)
       event.attr_gc = nil
       gc.dispose
     end
@@ -1381,7 +1381,7 @@ module Org::Eclipse::Swt::Widgets
         phase = NSPoint.new
         control_view = control.attr_view
         if ((img_height).equal?(-1))
-          content_view_ = control_view.window___org_eclipse_swt_widgets_control_11.content_view
+          content_view_ = control_view.window.content_view
           phase = control_view.convert_point_to_view_(phase, content_view_)
           phase.attr_y = content_view_.bounds.attr_height - phase.attr_y
         else
@@ -1463,7 +1463,7 @@ module Org::Eclipse::Swt::Widgets
     # long
     # long
     def flags_changed(id, sel, the_event)
-      if ((@view.window___org_eclipse_swt_widgets_control_13.first_responder.attr_id).equal?(id))
+      if ((@view.window.first_responder.attr_id).equal?(id))
         if (((self.attr_state & SAFARI_EVENTS_FIX)).equal?(0))
           s = self.get_shell
           s.attr_key_input_happened = false
@@ -1542,7 +1542,7 @@ module Org::Eclipse::Swt::Widgets
       if (!focus_view_.can_become_key_view)
         return false
       end
-      result = @view.window___org_eclipse_swt_widgets_control_15.make_first_responder(focus_view_)
+      result = @view.window.make_first_responder(focus_view_)
       if (is_disposed)
         return false
       end
@@ -2068,7 +2068,7 @@ module Org::Eclipse::Swt::Widgets
     # long
     # long
     def insert_text(id, sel, string)
-      if ((@view.window___org_eclipse_swt_widgets_control_17.first_responder.attr_id).equal?(id))
+      if ((@view.window.first_responder.attr_id).equal?(id))
         s = self.get_shell
         ns_event = NSApplication.shared_application.current_event
         if (!(ns_event).nil?)
@@ -2131,7 +2131,7 @@ module Org::Eclipse::Swt::Widgets
           data.attr_state &= ~VISIBLE_REGION
         end
       else
-        graphics_context = NSGraphicsContext.graphics_context_with_window(view.window___org_eclipse_swt_widgets_control_19)
+        graphics_context = NSGraphicsContext.graphics_context_with_window(view.window)
         flipped_context = NSGraphicsContext.graphics_context_with_graphics_port(graphics_context.graphics_port, true)
         graphics_context = flipped_context
         context = graphics_context.attr_id
@@ -2392,7 +2392,7 @@ module Org::Eclipse::Swt::Widgets
     # long
     # long
     def key_down(id, sel, the_event)
-      if ((@view.window___org_eclipse_swt_widgets_control_21.first_responder.attr_id).equal?(id))
+      if ((@view.window.first_responder.attr_id).equal?(id))
         s = self.get_shell
         s.attr_key_input_happened = false
         text_input = !(OS.objc_msg_send(id, OS.attr_sel_conforms_to_protocol_, OS.objc_get_protocol("NSTextInput"))).equal?(0)
@@ -2446,7 +2446,7 @@ module Org::Eclipse::Swt::Widgets
     # long
     # long
     def key_up(id, sel, the_event)
-      if ((@view.window___org_eclipse_swt_widgets_control_23.first_responder.attr_id).equal?(id))
+      if ((@view.window.first_responder.attr_id).equal?(id))
         ns_event = NSEvent.new(the_event)
         if (!send_key_event(ns_event, SWT::KeyUp))
           return
@@ -2476,7 +2476,7 @@ module Org::Eclipse::Swt::Widgets
       event = Event.new
       event.attr_x = x
       event.attr_y = y
-      send_event___org_eclipse_swt_widgets_control_25(SWT::MenuDetect, event)
+      send_event___org_eclipse_swt_widgets_control_7(SWT::MenuDetect, event)
       # widget could be disposed at this point
       if (is_disposed)
         return 0
@@ -2509,7 +2509,7 @@ module Org::Eclipse::Swt::Widgets
         if (hooks(SWT::MouseWheel) || filters(SWT::MouseWheel))
           ns_event = NSEvent.new(the_event)
           if (!(ns_event.delta_y).equal?(0))
-            if (!send_mouse_event___org_eclipse_swt_widgets_control_27(ns_event, SWT::MouseWheel, true))
+            if (!send_mouse_event___org_eclipse_swt_widgets_control_9(ns_event, SWT::MouseWheel, true))
               return
             end
           end
@@ -2562,12 +2562,12 @@ module Org::Eclipse::Swt::Widgets
       when OS::NSLeftMouseUp, OS::NSRightMouseUp, OS::NSOtherMouseUp
         self.attr_display.check_enter_exit(self.attr_display.find_control(true), ns_event, false)
       end
-      send_mouse_event___org_eclipse_swt_widgets_control_29(ns_event, type_, false)
+      send_mouse_event___org_eclipse_swt_widgets_control_11(ns_event, type_, false)
       if ((type_).equal?(SWT::MouseDown) && (ns_event.click_count).equal?(2))
-        send_mouse_event___org_eclipse_swt_widgets_control_31(ns_event, SWT::MouseDoubleClick, false)
+        send_mouse_event___org_eclipse_swt_widgets_control_13(ns_event, SWT::MouseDoubleClick, false)
       end
       if (dragging)
-        send_mouse_event___org_eclipse_swt_widgets_control_33(ns_event, SWT::DragDetect, false)
+        send_mouse_event___org_eclipse_swt_widgets_control_15(ns_event, SWT::DragDetect, false)
       end
       if (!(consume).nil? && consume[0])
         return false
@@ -2684,7 +2684,7 @@ module Org::Eclipse::Swt::Widgets
     
     typesig { [] }
     def moved
-      send_event___org_eclipse_swt_widgets_control_35(SWT::Move)
+      send_event___org_eclipse_swt_widgets_control_17(SWT::Move)
     end
     
     typesig { [Control] }
@@ -2915,7 +2915,7 @@ module Org::Eclipse::Swt::Widgets
       pt = NSPoint.new
       rect = Array.typed(::Java::Short).new(4) { 0 }
       if ((message).equal?(OS.attr_k_qdregion_to_rects_msg_parse))
-        OS.memmove___org_eclipse_swt_widgets_control_37(rect, r, rect.attr_length * 2)
+        OS.memmove___org_eclipse_swt_widgets_control_19(rect, r, rect.attr_length * 2)
         pt.attr_x = rect[1]
         pt.attr_y = rect[0]
         OS.objc_msg_send(path, OS.attr_sel_move_to_point_, pt)
@@ -3398,7 +3398,7 @@ module Org::Eclipse::Swt::Widgets
     
     typesig { [] }
     def resized
-      send_event___org_eclipse_swt_widgets_control_39(SWT::Resize)
+      send_event___org_eclipse_swt_widgets_control_21(SWT::Resize)
     end
     
     typesig { [::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int] }
@@ -3408,7 +3408,7 @@ module Org::Eclipse::Swt::Widgets
       event.attr_x = x
       event.attr_y = y
       event.attr_state_mask = state_mask
-      post_event___org_eclipse_swt_widgets_control_41(SWT::DragDetect, event)
+      post_event___org_eclipse_swt_widgets_control_23(SWT::DragDetect, event)
       return event.attr_doit
     end
     
@@ -3418,7 +3418,7 @@ module Org::Eclipse::Swt::Widgets
       shell = get_shell
       display.attr_focus_event = type_
       display.attr_focus_control = self
-      send_event___org_eclipse_swt_widgets_control_43(type_)
+      send_event___org_eclipse_swt_widgets_control_25(type_)
       # widget could be disposed at this point
       display.attr_focus_event = SWT::None
       display.attr_focus_control = nil
@@ -3498,8 +3498,8 @@ module Org::Eclipse::Swt::Widgets
       window_point = nil
       view = event_view
       if ((ns_event).nil? || (ns_event.type).equal?(OS::NSMouseMoved))
-        window = view.window___org_eclipse_swt_widgets_control_45
-        window_point = window.convert_screen_to_base(NSEvent.mouse_location)
+        window_ = view.window
+        window_point = window_.convert_screen_to_base(NSEvent.mouse_location)
       else
         window_point = ns_event.location_in_window
       end
@@ -3511,12 +3511,12 @@ module Org::Eclipse::Swt::Widgets
       event.attr_y = RJava.cast_to_int(point.attr_y)
       set_input_state(event, ns_event, type_)
       if (send)
-        send_event___org_eclipse_swt_widgets_control_47(type_, event)
+        send_event___org_eclipse_swt_widgets_control_27(type_, event)
         if (is_disposed)
           return false
         end
       else
-        post_event___org_eclipse_swt_widgets_control_49(type_, event)
+        post_event___org_eclipse_swt_widgets_control_29(type_, event)
       end
       if (!(shell).nil?)
         shell.set_active_control(self)
@@ -3743,7 +3743,7 @@ module Org::Eclipse::Swt::Widgets
       if (!is_enabled)
         return
       end
-      if (!@view.window___org_eclipse_swt_widgets_control_51.are_cursor_rects_enabled)
+      if (!@view.window.are_cursor_rects_enabled)
         return
       end
       self.attr_display.set_cursor(self.attr_display.attr_current_control)
@@ -4290,7 +4290,7 @@ module Org::Eclipse::Swt::Widgets
         # It is possible (but unlikely), that application
         # code could have disposed the widget in the show
         # event.  If this happens, just return.
-        send_event___org_eclipse_swt_widgets_control_53(SWT::Show)
+        send_event___org_eclipse_swt_widgets_control_31(SWT::Show)
         if (is_disposed)
           return
         end
@@ -4315,7 +4315,7 @@ module Org::Eclipse::Swt::Widgets
         # It is possible (but unlikely), that application
         # code could have disposed the widget in the show
         # event.  If this happens, just return.
-        send_event___org_eclipse_swt_widgets_control_55(SWT::Hide)
+        send_event___org_eclipse_swt_widgets_control_33(SWT::Hide)
         if (is_disposed)
           return
         end
@@ -4652,7 +4652,7 @@ module Org::Eclipse::Swt::Widgets
     
     typesig { [Event] }
     def traverse(event)
-      send_event___org_eclipse_swt_widgets_control_57(SWT::Traverse, event)
+      send_event___org_eclipse_swt_widgets_control_35(SWT::Traverse, event)
       if (is_disposed)
         return true
       end

@@ -639,9 +639,9 @@ module Org::Eclipse::Swt::Graphics
           pt = NSPoint.new
           pt.attr_x = x
           pt.attr_y = y
-          window = @data.attr_view.window___org_eclipse_swt_graphics_gc_5
-          pt = @data.attr_view.convert_point_to_view_(pt, window.content_view.superview)
-          frame_ = window.frame
+          window_ = @data.attr_view.window
+          pt = @data.attr_view.convert_point_to_view_(pt, window_.content_view.superview)
+          frame_ = window_.frame
           pt.attr_y = frame_.attr_height - pt.attr_y
           size_ = image.attr_handle.size
           dest_rect = CGRect.new
@@ -658,7 +658,7 @@ module Org::Eclipse::Swt::Graphics
           NSGraphicsContext.set_current_context(context)
           # long
           context_id = OS.objc_msg_send(NSApplication.shared_application.attr_id, OS.attr_sel_context_id)
-          OS._cgcontext_copy_window_contents_to_rect(context.graphics_port, dest_rect, context_id, window.window_number, src_rect)
+          OS._cgcontext_copy_window_contents_to_rect(context.graphics_port, dest_rect, context_id, window_.window_number, src_rect)
           NSGraphicsContext.static_restore_graphics_state
           return
         end
@@ -679,10 +679,10 @@ module Org::Eclipse::Swt::Graphics
           end
           count = Array.typed(::Java::Int).new(1) { 0 }
           display = Array.typed(::Java::Int).new(1) { 0 }
-          OS.memmove___org_eclipse_swt_graphics_gc_7(count, count_ptr, OS::PTR_SIZEOF)
+          OS.memmove___org_eclipse_swt_graphics_gc_5(count, count_ptr, OS::PTR_SIZEOF)
           i = 0
           while i < count[0]
-            OS.memmove___org_eclipse_swt_graphics_gc_9(display, displays + (i * 4), 4)
+            OS.memmove___org_eclipse_swt_graphics_gc_7(display, displays + (i * 4), 4)
             OS._cgdisplay_bounds(display[0], rect)
             # long
             address = OS._cgdisplay_base_address(display[0])
@@ -958,13 +958,13 @@ module Org::Eclipse::Swt::Graphics
             element = RJava.cast_to_int(ns_path.element_at_index(i, points))
             case (element)
             when OS::NSMoveToBezierPathElement
-              OS.memmove___org_eclipse_swt_graphics_gc_11(pt, points, NSPoint.attr_sizeof)
+              OS.memmove___org_eclipse_swt_graphics_gc_9(pt, points, NSPoint.attr_sizeof)
               OS._cgpath_move_to_point(cg_path, 0, pt[0], pt[1])
             when OS::NSLineToBezierPathElement
-              OS.memmove___org_eclipse_swt_graphics_gc_13(pt, points, NSPoint.attr_sizeof)
+              OS.memmove___org_eclipse_swt_graphics_gc_11(pt, points, NSPoint.attr_sizeof)
               OS._cgpath_add_line_to_point(cg_path, 0, pt[0], pt[1])
             when OS::NSCurveToBezierPathElement
-              OS.memmove___org_eclipse_swt_graphics_gc_15(pt, points, NSPoint.attr_sizeof * 3)
+              OS.memmove___org_eclipse_swt_graphics_gc_13(pt, points, NSPoint.attr_sizeof * 3)
               OS._cgpath_add_curve_to_point(cg_path, 0, pt[0], pt[1], pt[2], pt[3], pt[4], pt[5])
             when OS::NSClosePathBezierPathElement
               OS._cgpath_close_subpath(cg_path)
@@ -2850,11 +2850,11 @@ module Org::Eclipse::Swt::Graphics
                 clip_rgn.add(point_array, point_count)
               end
               point_count = 0
-              OS.memmove___org_eclipse_swt_graphics_gc_17(pt, points, NSPoint.attr_sizeof)
+              OS.memmove___org_eclipse_swt_graphics_gc_15(pt, points, NSPoint.attr_sizeof)
               point_array[((point_count += 1) - 1)] = RJava.cast_to_int(pt.attr_x)
               point_array[((point_count += 1) - 1)] = RJava.cast_to_int(pt.attr_y)
             when OS::NSLineToBezierPathElement
-              OS.memmove___org_eclipse_swt_graphics_gc_19(pt, points, NSPoint.attr_sizeof)
+              OS.memmove___org_eclipse_swt_graphics_gc_17(pt, points, NSPoint.attr_sizeof)
               point_array[((point_count += 1) - 1)] = RJava.cast_to_int(pt.attr_x)
               point_array[((point_count += 1) - 1)] = RJava.cast_to_int(pt.attr_y)
             when OS::NSClosePathBezierPathElement

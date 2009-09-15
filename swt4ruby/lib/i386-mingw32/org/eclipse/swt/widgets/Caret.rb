@@ -428,7 +428,7 @@ module Org::Eclipse::Swt::Widgets
       OS._create_caret(hwnd, h_bitmap, width, @height)
       OS._set_caret_pos(@x, @y)
       OS._show_caret(hwnd)
-      move___org_eclipse_swt_widgets_caret_1
+      move
     end
     
     typesig { [] }
@@ -477,7 +477,7 @@ module Org::Eclipse::Swt::Widgets
       if (same_extent)
         @moved = true
         if (@is_visible && has_focus)
-          move___org_eclipse_swt_widgets_caret_3
+          move
         end
       else
         @resized = true
@@ -523,7 +523,7 @@ module Org::Eclipse::Swt::Widgets
         end
       end
       OS._create_caret(hwnd, h_bitmap, width, @height)
-      move___org_eclipse_swt_widgets_caret_5
+      move
       set_imefont
       if (@is_visible)
         OS._show_caret(hwnd)
@@ -633,7 +633,7 @@ module Org::Eclipse::Swt::Widgets
       @y = y
       @moved = true
       if (@is_visible && has_focus)
-        move___org_eclipse_swt_widgets_caret_7
+        move
       end
     end
     
@@ -732,7 +732,7 @@ module Org::Eclipse::Swt::Widgets
           resize
         else
           if (@moved)
-            move___org_eclipse_swt_widgets_caret_9
+            move
           end
         end
         OS._show_caret(hwnd)

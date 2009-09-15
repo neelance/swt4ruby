@@ -885,7 +885,7 @@ module Org::Eclipse::Swt::Browser
                   self.attr_delay_set_text = false
                   self.attr_browser.get_display.async_exec(runnable)
                 else
-                  runnable.run___org_eclipse_swt_browser_ie_1
+                  runnable.run
                 end
               else
                 variant = self.class::Variant.new(self.attr_auto)

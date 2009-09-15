@@ -342,10 +342,10 @@ module Org::Eclipse::Swt::Browser
       typesig { [] }
       def clear_sessions
         if (!(self.attr_native_clear_sessions).nil?)
-          self.attr_native_clear_sessions.run___org_eclipse_swt_browser_web_browser_1
+          self.attr_native_clear_sessions.run
         end
         if (!(self.attr_mozilla_clear_sessions).nil?)
-          self.attr_mozilla_clear_sessions.run___org_eclipse_swt_browser_web_browser_3
+          self.attr_mozilla_clear_sessions.run
         end
       end
       
@@ -354,10 +354,10 @@ module Org::Eclipse::Swt::Browser
         self.attr_cookie_name = name
         self.attr_cookie_url = url
         if (!(self.attr_native_get_cookie).nil?)
-          self.attr_native_get_cookie.run___org_eclipse_swt_browser_web_browser_5
+          self.attr_native_get_cookie.run
         end
         if (!(self.attr_mozilla_get_cookie).nil?)
-          self.attr_mozilla_get_cookie.run___org_eclipse_swt_browser_web_browser_7
+          self.attr_mozilla_get_cookie.run
         end
         result = self.attr_cookie_value
         self.attr_cookie_name = RJava.cast_to_string(self.attr_cookie_value = RJava.cast_to_string(self.attr_cookie_url = RJava.cast_to_string(nil)))
@@ -370,10 +370,10 @@ module Org::Eclipse::Swt::Browser
         self.attr_cookie_url = url
         self.attr_cookie_result = false
         if (!(self.attr_native_set_cookie).nil?)
-          self.attr_native_set_cookie.run___org_eclipse_swt_browser_web_browser_9
+          self.attr_native_set_cookie.run
         end
         if (!(self.attr_mozilla_set_cookie).nil?)
-          self.attr_mozilla_set_cookie.run___org_eclipse_swt_browser_web_browser_11
+          self.attr_mozilla_set_cookie.run
         end
         self.attr_cookie_value = RJava.cast_to_string(self.attr_cookie_url = RJava.cast_to_string(nil))
         return self.attr_cookie_result

@@ -4834,7 +4834,7 @@ module Org::Eclipse::Swt::Widgets
         i_ = 0
         while i_ < @dispose_list.attr_length
           if (!(@dispose_list[i_]).nil?)
-            @dispose_list[i_].run___org_eclipse_swt_widgets_display_68
+            @dispose_list[i_].run
           end
           i_ += 1
         end
@@ -5199,7 +5199,7 @@ module Org::Eclipse::Swt::Widgets
     
     typesig { [::Java::Boolean] }
     def run_async_messages(all)
-      return @synchronizer.run_async_messages___org_eclipse_swt_widgets_display_70(all)
+      return @synchronizer.run_async_messages___org_eclipse_swt_widgets_display_69(all)
     end
     
     typesig { [] }
@@ -5223,7 +5223,7 @@ module Org::Eclipse::Swt::Widgets
           item = event.attr_item
           if ((item).nil? || !item.is_disposed)
             run = true
-            widget.send_event___org_eclipse_swt_widgets_display_72(event)
+            widget.send_event___org_eclipse_swt_widgets_display_71(event)
           end
         end
       end
@@ -5264,7 +5264,7 @@ module Org::Eclipse::Swt::Widgets
       @run_settings = false
       save_resources
       initialize_system_colors
-      send_event___org_eclipse_swt_widgets_display_74(SWT::Settings, nil)
+      send_event___org_eclipse_swt_widgets_display_73(SWT::Settings, nil)
       shells = get_shells
       i = 0
       while i < shells.attr_length
@@ -5569,7 +5569,7 @@ module Org::Eclipse::Swt::Widgets
         @synchronizer = synchronizer
       end
       if (!(old_synchronizer).nil?)
-        old_synchronizer.run_async_messages___org_eclipse_swt_widgets_display_76(true)
+        old_synchronizer.run_async_messages___org_eclipse_swt_widgets_display_75(true)
       end
     end
     
@@ -5690,7 +5690,7 @@ module Org::Eclipse::Swt::Widgets
               end
               begin
                 @wake = false
-                OS._call___org_eclipse_swt_widgets_display_78(poll, @fds, nfds, @timeout[0])
+                OS._call___org_eclipse_swt_widgets_display_77(poll, @fds, nfds, @timeout[0])
               ensure
                 i_ = 0
                 while i_ < count
@@ -5799,7 +5799,7 @@ module Org::Eclipse::Swt::Widgets
         @timer_list[index] = nil
         @timer_ids[index] = 0
         if (!(runnable).nil?)
-          runnable.run___org_eclipse_swt_widgets_display_80
+          runnable.run
         end
       end
       return 0
@@ -5923,7 +5923,7 @@ module Org::Eclipse::Swt::Widgets
       end
       if (!filter_event(event))
         if (!(@event_table).nil?)
-          @event_table.send_event___org_eclipse_swt_widgets_display_82(event)
+          @event_table.send_event___org_eclipse_swt_widgets_display_79(event)
         end
       end
     end
@@ -6100,7 +6100,7 @@ module Org::Eclipse::Swt::Widgets
       if ((widget).nil?)
         return 0
       end
-      return widget.window_proc___org_eclipse_swt_widgets_display_84(handle, user_data)
+      return widget.window_proc___org_eclipse_swt_widgets_display_81(handle, user_data)
     end
     
     typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
@@ -6113,7 +6113,7 @@ module Org::Eclipse::Swt::Widgets
       if ((widget).nil?)
         return 0
       end
-      return widget.window_proc___org_eclipse_swt_widgets_display_86(handle, arg0, user_data)
+      return widget.window_proc___org_eclipse_swt_widgets_display_83(handle, arg0, user_data)
     end
     
     typesig { [::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int] }
@@ -6127,7 +6127,7 @@ module Org::Eclipse::Swt::Widgets
       if ((widget).nil?)
         return 0
       end
-      return widget.window_proc___org_eclipse_swt_widgets_display_88(handle, arg0, arg1, user_data)
+      return widget.window_proc___org_eclipse_swt_widgets_display_85(handle, arg0, arg1, user_data)
     end
     
     typesig { [::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int] }
@@ -6142,7 +6142,7 @@ module Org::Eclipse::Swt::Widgets
       if ((widget).nil?)
         return 0
       end
-      return widget.window_proc___org_eclipse_swt_widgets_display_90(handle, arg0, arg1, arg2, user_data)
+      return widget.window_proc___org_eclipse_swt_widgets_display_87(handle, arg0, arg1, arg2, user_data)
     end
     
     typesig { [::Java::Int] }

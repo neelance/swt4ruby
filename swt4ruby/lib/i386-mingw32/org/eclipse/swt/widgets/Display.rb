@@ -4796,7 +4796,7 @@ module Org::Eclipse::Swt::Widgets
         i_ = 0
         while i_ < @dispose_list.attr_length
           if (!(@dispose_list[i_]).nil?)
-            @dispose_list[i_].run___org_eclipse_swt_widgets_display_16
+            @dispose_list[i_].run
           end
           i_ += 1
         end
@@ -5208,7 +5208,7 @@ module Org::Eclipse::Swt::Widgets
     
     typesig { [::Java::Boolean] }
     def run_async_messages(all)
-      return @synchronizer.run_async_messages___org_eclipse_swt_widgets_display_18(all)
+      return @synchronizer.run_async_messages___org_eclipse_swt_widgets_display_17(all)
     end
     
     typesig { [] }
@@ -5232,7 +5232,7 @@ module Org::Eclipse::Swt::Widgets
           item = event.attr_item
           if ((item).nil? || !item.is_disposed)
             run = true
-            widget.send_event___org_eclipse_swt_widgets_display_20(event)
+            widget.send_event___org_eclipse_swt_widgets_display_19(event)
           end
         end
       end
@@ -5270,7 +5270,7 @@ module Org::Eclipse::Swt::Widgets
       old_font = get_system_font
       save_resources
       update_images
-      send_event___org_eclipse_swt_widgets_display_22(SWT::Settings, nil)
+      send_event___org_eclipse_swt_widgets_display_21(SWT::Settings, nil)
       new_font = get_system_font
       same_font = (old_font == new_font)
       shells = get_shells
@@ -5301,7 +5301,7 @@ module Org::Eclipse::Swt::Widgets
             runnable = @timer_list[index]
             @timer_list[index] = nil
             if (!(runnable).nil?)
-              runnable.run___org_eclipse_swt_widgets_display_24
+              runnable.run
             end
             return true
           end
@@ -5379,7 +5379,7 @@ module Org::Eclipse::Swt::Widgets
       end
       if (!filter_event(event))
         if (!(@event_table).nil?)
-          @event_table.send_event___org_eclipse_swt_widgets_display_26(event)
+          @event_table.send_event___org_eclipse_swt_widgets_display_23(event)
         end
       end
     end
@@ -5629,7 +5629,7 @@ module Org::Eclipse::Swt::Widgets
         @synchronizer = synchronizer
       end
       if (!(old_synchronizer).nil?)
-        old_synchronizer.run_async_messages___org_eclipse_swt_widgets_display_28(true)
+        old_synchronizer.run_async_messages___org_eclipse_swt_widgets_display_25(true)
       end
     end
     
@@ -6040,7 +6040,7 @@ module Org::Eclipse::Swt::Widgets
       end
       if (!(@last_control).nil? && (@last_hwnd).equal?(hwnd))
         # 64
-        return @last_control.window_proc___org_eclipse_swt_widgets_display_30(hwnd, RJava.cast_to_int(msg), w_param, l_param)
+        return @last_control.window_proc___org_eclipse_swt_widgets_display_27(hwnd, RJava.cast_to_int(msg), w_param, l_param)
       end
       index = 0
       if (USE_PROPERTY)
@@ -6056,7 +6056,7 @@ module Org::Eclipse::Swt::Widgets
           @last_hwnd = hwnd
           @last_control = control
           # 64
-          return control.window_proc___org_eclipse_swt_widgets_display_32(hwnd, RJava.cast_to_int(msg), w_param, l_param)
+          return control.window_proc___org_eclipse_swt_widgets_display_29(hwnd, RJava.cast_to_int(msg), w_param, l_param)
         end
       end
       # 64

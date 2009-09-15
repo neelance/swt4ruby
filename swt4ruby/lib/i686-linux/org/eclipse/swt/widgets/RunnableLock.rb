@@ -57,7 +57,7 @@ module Org::Eclipse::Swt::Widgets
     typesig { [] }
     def run
       if (!(@runnable).nil?)
-        @runnable.run___org_eclipse_swt_widgets_runnable_lock_1
+        @runnable.run
       end
       @runnable = nil
     end

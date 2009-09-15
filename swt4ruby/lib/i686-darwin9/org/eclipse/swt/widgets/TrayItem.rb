@@ -234,7 +234,7 @@ module Org::Eclipse::Swt::Widgets
     typesig { [] }
     def get_location
       rect = @view.frame
-      window_rect = @view.window___org_eclipse_swt_widgets_tray_item_1.frame
+      window_rect = @view.window.frame
       pt = NSPoint.new
       pt.attr_x = rect.attr_width / 2
       pt = @view.convert_point_from_view_(pt, nil)
@@ -511,7 +511,7 @@ module Org::Eclipse::Swt::Widgets
         return
       end
       if (visible)
-        send_event___org_eclipse_swt_widgets_tray_item_3(SWT::Show)
+        send_event___org_eclipse_swt_widgets_tray_item_1(SWT::Show)
         if (is_disposed)
           return
         end
@@ -521,7 +521,7 @@ module Org::Eclipse::Swt::Widgets
       width = !(self.attr_image).nil? && visible ? self.attr_image.attr_handle.size.attr_width + BORDER : 0
       @item.set_length(width)
       if (!visible)
-        send_event___org_eclipse_swt_widgets_tray_item_5(SWT::Hide)
+        send_event___org_eclipse_swt_widgets_tray_item_3(SWT::Hide)
       end
     end
     
@@ -536,7 +536,7 @@ module Org::Eclipse::Swt::Widgets
       __set_tool_tip_text(nil)
       display = self.attr_display
       display.attr_current_tray_item = self
-      send_event___org_eclipse_swt_widgets_tray_item_7(SWT::MenuDetect)
+      send_event___org_eclipse_swt_widgets_tray_item_5(SWT::MenuDetect)
       if (!is_disposed)
         display.run_popups
       end
@@ -619,7 +619,7 @@ module Org::Eclipse::Swt::Widgets
       if (@highlight)
         ns_event = NSEvent.new(the_event)
         if ((ns_event.type).equal?(OS::NSLeftMouseUp))
-          post_event___org_eclipse_swt_widgets_tray_item_9((ns_event.click_count).equal?(2) ? SWT::DefaultSelection : SWT::Selection)
+          post_event___org_eclipse_swt_widgets_tray_item_7((ns_event.click_count).equal?(2) ? SWT::DefaultSelection : SWT::Selection)
         end
       end
       @highlight = false

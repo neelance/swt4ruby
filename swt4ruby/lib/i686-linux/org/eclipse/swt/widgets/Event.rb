@@ -294,7 +294,7 @@ module Org::Eclipse::Swt::Widgets
     end
     
     private
-    alias_method :initialize__event___org_eclipse_swt_widgets_event_0, :initialize
+    alias_method :initialize__event, :initialize
   end
   
 end
