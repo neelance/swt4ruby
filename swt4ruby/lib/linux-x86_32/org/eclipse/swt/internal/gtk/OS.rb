@@ -27297,6 +27297,8 @@ module Org::Eclipse::Swt::Internal::Gtk
           PLATFORM_LOCK.unlock
         end
       end
+
+#Tracing.trace_calls self
     }
     
     typesig { [] }

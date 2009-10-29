@@ -1,9 +1,9 @@
 require "rjava"
 require "jre4ruby"
 
-Java::Lang::System.set_property "swt.library.path", File.expand_path("swt4ruby/lib/#{RUBY_PLATFORM}", File.dirname(__FILE__))
+Java::Lang::System.set_property "swt.library.path", File.expand_path("swt4ruby/lib/#{RJava::PLATFORM}", File.dirname(__FILE__))
 
-add_class_path "swt4ruby/lib/#{RUBY_PLATFORM}", "swt4ruby/fix"
+add_class_path "swt4ruby/lib/#{RJava::PLATFORM}", "swt4ruby/fix"
 
 class Swt4Ruby
   include Org::Eclipse::Swt
@@ -35,6 +35,7 @@ class Swt4Ruby
       cls.class_eval do
         methods = instance_methods(false)
         methods.each do |name|
+          name = name.to_s
           new_name = if name =~ /^get_(.*)$/
             "#{$1}".to_sym
           elsif name =~ /^set_(.*)$/
