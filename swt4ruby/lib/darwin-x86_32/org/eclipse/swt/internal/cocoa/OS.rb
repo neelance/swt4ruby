@@ -165,108 +165,108 @@ module Org::Eclipse::Swt::Internal::Cocoa
       const_set_lazy(:Sel_webScriptNameForSelector_) { sel_register_name("webScriptNameForSelector:") }
       const_attr_reader  :Sel_webScriptNameForSelector_
       
-      JNI.native_method :Java_org_eclipse_swt_internal_cocoa_OS_NewGlobalRef, [:pointer, :long, :long], :int32
+      JNI.load_native_method :Java_org_eclipse_swt_internal_cocoa_OS_NewGlobalRef, [:pointer, :long, :long], :int32
       typesig { [Object] }
       # JNI natives
       # @method flags=jni
       # long
       def _new_global_ref(object)
-        JNI.__send__(:Java_org_eclipse_swt_internal_cocoa_OS_NewGlobalRef, JNI.env, self.jni_id, object.jni_id)
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_cocoa_OS_NewGlobalRef, JNI.env, self.jni_id, object.jni_id)
       end
       
-      JNI.native_method :Java_org_eclipse_swt_internal_cocoa_OS_DeleteGlobalRef, [:pointer, :long, :int32], :void
+      JNI.load_native_method :Java_org_eclipse_swt_internal_cocoa_OS_DeleteGlobalRef, [:pointer, :long, :int32], :void
       typesig { [::Java::Int] }
       # @method flags=jni
       # @param globalRef cast=(jobject)
       # 
       # long
       def _delete_global_ref(global_ref)
-        JNI.__send__(:Java_org_eclipse_swt_internal_cocoa_OS_DeleteGlobalRef, JNI.env, self.jni_id, global_ref.to_int)
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_cocoa_OS_DeleteGlobalRef, JNI.env, self.jni_id, global_ref.to_int)
       end
       
-      JNI.native_method :Java_org_eclipse_swt_internal_cocoa_OS_JNIGetObject, [:pointer, :long, :int32], :long
+      JNI.load_native_method :Java_org_eclipse_swt_internal_cocoa_OS_JNIGetObject, [:pointer, :long, :int32], :long
       typesig { [::Java::Int] }
       # @method flags=no_gen
       # long
       def _jniget_object(global_ref)
-        JNI.__send__(:Java_org_eclipse_swt_internal_cocoa_OS_JNIGetObject, JNI.env, self.jni_id, global_ref.to_int)
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_cocoa_OS_JNIGetObject, JNI.env, self.jni_id, global_ref.to_int)
       end
       
-      JNI.native_method :Java_org_eclipse_swt_internal_cocoa_OS_Gestalt, [:pointer, :long, :int32, :long], :int32
+      JNI.load_native_method :Java_org_eclipse_swt_internal_cocoa_OS_Gestalt, [:pointer, :long, :int32, :long], :int32
       typesig { [::Java::Int, Array.typed(::Java::Int)] }
       # Carbon calls
       def _gestalt(selector, response)
-        JNI.__send__(:Java_org_eclipse_swt_internal_cocoa_OS_Gestalt, JNI.env, self.jni_id, selector.to_int, response.jni_id)
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_cocoa_OS_Gestalt, JNI.env, self.jni_id, selector.to_int, response.jni_id)
       end
       
-      JNI.native_method :Java_org_eclipse_swt_internal_cocoa_OS_GetCurrentProcess, [:pointer, :long, :long], :int32
+      JNI.load_native_method :Java_org_eclipse_swt_internal_cocoa_OS_GetCurrentProcess, [:pointer, :long, :long], :int32
       typesig { [Array.typed(::Java::Int)] }
       # @param psn cast=(ProcessSerialNumber *)
       def _get_current_process(psn)
-        JNI.__send__(:Java_org_eclipse_swt_internal_cocoa_OS_GetCurrentProcess, JNI.env, self.jni_id, psn.jni_id)
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_cocoa_OS_GetCurrentProcess, JNI.env, self.jni_id, psn.jni_id)
       end
       
-      JNI.native_method :Java_org_eclipse_swt_internal_cocoa_OS_SetFrontProcess, [:pointer, :long, :long], :int32
+      JNI.load_native_method :Java_org_eclipse_swt_internal_cocoa_OS_SetFrontProcess, [:pointer, :long, :long], :int32
       typesig { [Array.typed(::Java::Int)] }
       # @param psn cast=(ProcessSerialNumber *)
       def _set_front_process(psn)
-        JNI.__send__(:Java_org_eclipse_swt_internal_cocoa_OS_SetFrontProcess, JNI.env, self.jni_id, psn.jni_id)
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_cocoa_OS_SetFrontProcess, JNI.env, self.jni_id, psn.jni_id)
       end
       
-      JNI.native_method :Java_org_eclipse_swt_internal_cocoa_OS_TransformProcessType, [:pointer, :long, :long, :int32], :int32
+      JNI.load_native_method :Java_org_eclipse_swt_internal_cocoa_OS_TransformProcessType, [:pointer, :long, :long, :int32], :int32
       typesig { [Array.typed(::Java::Int), ::Java::Int] }
       # @param psn cast=(ProcessSerialNumber *)
       def _transform_process_type(psn, transform_state)
-        JNI.__send__(:Java_org_eclipse_swt_internal_cocoa_OS_TransformProcessType, JNI.env, self.jni_id, psn.jni_id, transform_state.to_int)
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_cocoa_OS_TransformProcessType, JNI.env, self.jni_id, psn.jni_id, transform_state.to_int)
       end
       
-      JNI.native_method :Java_org_eclipse_swt_internal_cocoa_OS_CPSSetProcessName, [:pointer, :long, :long, :int32], :int32
+      JNI.load_native_method :Java_org_eclipse_swt_internal_cocoa_OS_CPSSetProcessName, [:pointer, :long, :long, :int32], :int32
       typesig { [Array.typed(::Java::Int), ::Java::Int] }
       # long
       def _cpsset_process_name(psn, name)
-        JNI.__send__(:Java_org_eclipse_swt_internal_cocoa_OS_CPSSetProcessName, JNI.env, self.jni_id, psn.jni_id, name.to_int)
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_cocoa_OS_CPSSetProcessName, JNI.env, self.jni_id, psn.jni_id, name.to_int)
       end
       
-      JNI.native_method :Java_org_eclipse_swt_internal_cocoa_OS_SetThemeCursor, [:pointer, :long, :int32], :int32
+      JNI.load_native_method :Java_org_eclipse_swt_internal_cocoa_OS_SetThemeCursor, [:pointer, :long, :int32], :int32
       typesig { [::Java::Int] }
       # @method flags=dynamic
       def _set_theme_cursor(theme_cursor)
-        JNI.__send__(:Java_org_eclipse_swt_internal_cocoa_OS_SetThemeCursor, JNI.env, self.jni_id, theme_cursor.to_int)
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_cocoa_OS_SetThemeCursor, JNI.env, self.jni_id, theme_cursor.to_int)
       end
       
-      JNI.native_method :Java_org_eclipse_swt_internal_cocoa_OS_GetCurrentButtonState, [:pointer, :long], :int32
+      JNI.load_native_method :Java_org_eclipse_swt_internal_cocoa_OS_GetCurrentButtonState, [:pointer, :long], :int32
       typesig { [] }
       # @method flags=dynamic
       def _get_current_button_state
-        JNI.__send__(:Java_org_eclipse_swt_internal_cocoa_OS_GetCurrentButtonState, JNI.env, self.jni_id)
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_cocoa_OS_GetCurrentButtonState, JNI.env, self.jni_id)
       end
       
-      JNI.native_method :Java_org_eclipse_swt_internal_cocoa_OS_GetDblTime, [:pointer, :long], :int32
+      JNI.load_native_method :Java_org_eclipse_swt_internal_cocoa_OS_GetDblTime, [:pointer, :long], :int32
       typesig { [] }
       # @method flags=dynamic
       def _get_dbl_time
-        JNI.__send__(:Java_org_eclipse_swt_internal_cocoa_OS_GetDblTime, JNI.env, self.jni_id)
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_cocoa_OS_GetDblTime, JNI.env, self.jni_id)
       end
       
-      JNI.native_method :Java_org_eclipse_swt_internal_cocoa_OS_CGContextCopyPath, [:pointer, :long, :int32], :int32
+      JNI.load_native_method :Java_org_eclipse_swt_internal_cocoa_OS_CGContextCopyPath, [:pointer, :long, :int32], :int32
       typesig { [::Java::Int] }
       # @method flags=dynamic
       # @param  cast=(CGContextRef)
       # long
       # long
       def _cgcontext_copy_path(context)
-        JNI.__send__(:Java_org_eclipse_swt_internal_cocoa_OS_CGContextCopyPath, JNI.env, self.jni_id, context.to_int)
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_cocoa_OS_CGContextCopyPath, JNI.env, self.jni_id, context.to_int)
       end
       
-      JNI.native_method :Java_org_eclipse_swt_internal_cocoa_OS_TISCopyCurrentKeyboardInputSource, [:pointer, :long], :int32
+      JNI.load_native_method :Java_org_eclipse_swt_internal_cocoa_OS_TISCopyCurrentKeyboardInputSource, [:pointer, :long], :int32
       typesig { [] }
       # @method flags=dynamic
       # long
       def _tiscopy_current_keyboard_input_source
-        JNI.__send__(:Java_org_eclipse_swt_internal_cocoa_OS_TISCopyCurrentKeyboardInputSource, JNI.env, self.jni_id)
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_cocoa_OS_TISCopyCurrentKeyboardInputSource, JNI.env, self.jni_id)
       end
       
-      JNI.native_method :Java_org_eclipse_swt_internal_cocoa_OS_TISGetInputSourceProperty, [:pointer, :long, :int32, :int32], :int32
+      JNI.load_native_method :Java_org_eclipse_swt_internal_cocoa_OS_TISGetInputSourceProperty, [:pointer, :long, :int32, :int32], :int32
       typesig { [::Java::Int, ::Java::Int] }
       # @method flags=dynamic
       # @param  cast=(TISInputSourceRef)
@@ -275,27 +275,27 @@ module Org::Eclipse::Swt::Internal::Cocoa
       # long
       # long
       def _tisget_input_source_property(input_source, property_key)
-        JNI.__send__(:Java_org_eclipse_swt_internal_cocoa_OS_TISGetInputSourceProperty, JNI.env, self.jni_id, input_source.to_int, property_key.to_int)
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_cocoa_OS_TISGetInputSourceProperty, JNI.env, self.jni_id, input_source.to_int, property_key.to_int)
       end
       
-      JNI.native_method :Java_org_eclipse_swt_internal_cocoa_OS_kTISPropertyUnicodeKeyLayoutData, [:pointer, :long], :int32
+      JNI.load_native_method :Java_org_eclipse_swt_internal_cocoa_OS_kTISPropertyUnicodeKeyLayoutData, [:pointer, :long], :int32
       typesig { [] }
       # @method flags=no_gen
       # long
       def k_tisproperty_unicode_key_layout_data
-        JNI.__send__(:Java_org_eclipse_swt_internal_cocoa_OS_kTISPropertyUnicodeKeyLayoutData, JNI.env, self.jni_id)
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_cocoa_OS_kTISPropertyUnicodeKeyLayoutData, JNI.env, self.jni_id)
       end
       
-      JNI.native_method :Java_org_eclipse_swt_internal_cocoa_OS_SetSystemUIMode, [:pointer, :long, :int32, :int32], :int32
+      JNI.load_native_method :Java_org_eclipse_swt_internal_cocoa_OS_SetSystemUIMode, [:pointer, :long, :int32, :int32], :int32
       typesig { [::Java::Int, ::Java::Int] }
       # @method flags=dynamic
       # @param inMode cast=(UInt32)
       # @param inOptions cast=(UInt32)
       def _set_system_uimode(in_mode, in_options)
-        JNI.__send__(:Java_org_eclipse_swt_internal_cocoa_OS_SetSystemUIMode, JNI.env, self.jni_id, in_mode.to_int, in_options.to_int)
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_cocoa_OS_SetSystemUIMode, JNI.env, self.jni_id, in_mode.to_int, in_options.to_int)
       end
       
-      JNI.native_method :Java_org_eclipse_swt_internal_cocoa_OS_UCKeyTranslate, [:pointer, :long, :int32, :int16, :int16, :int32, :int32, :int32, :long, :int32, :long, :long], :int32
+      JNI.load_native_method :Java_org_eclipse_swt_internal_cocoa_OS_UCKeyTranslate, [:pointer, :long, :int32, :int16, :int16, :int32, :int32, :int32, :long, :int32, :long, :long], :int32
       typesig { [::Java::Int, ::Java::Short, ::Java::Short, ::Java::Int, ::Java::Int, ::Java::Int, Array.typed(::Java::Int), ::Java::Int, Array.typed(::Java::Int), Array.typed(::Java::Char)] }
       # @method flags=dynamic
       # @param keyLayoutPtr cast=(const UCKeyboardLayout *)
@@ -311,25 +311,25 @@ module Org::Eclipse::Swt::Internal::Cocoa
       # 
       # long
       def _uckey_translate(key_layout_ptr, virtual_key_code, key_action, modifier_key_state, keyboard_type, key_translate_options, dead_key_state, max_string_length, actual_string_length, unicode_string)
-        JNI.__send__(:Java_org_eclipse_swt_internal_cocoa_OS_UCKeyTranslate, JNI.env, self.jni_id, key_layout_ptr.to_int, virtual_key_code.to_int, key_action.to_int, modifier_key_state.to_int, keyboard_type.to_int, key_translate_options.to_int, dead_key_state.jni_id, max_string_length.to_int, actual_string_length.jni_id, unicode_string.jni_id)
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_cocoa_OS_UCKeyTranslate, JNI.env, self.jni_id, key_layout_ptr.to_int, virtual_key_code.to_int, key_action.to_int, modifier_key_state.to_int, keyboard_type.to_int, key_translate_options.to_int, dead_key_state.jni_id, max_string_length.to_int, actual_string_length.jni_id, unicode_string.jni_id)
       end
       
-      JNI.native_method :Java_org_eclipse_swt_internal_cocoa_OS_GetThemeMetric, [:pointer, :long, :int32, :long], :void
+      JNI.load_native_method :Java_org_eclipse_swt_internal_cocoa_OS_GetThemeMetric, [:pointer, :long, :int32, :long], :void
       typesig { [::Java::Int, Array.typed(::Java::Int)] }
       # @method flags=dynamic
       # @param metric cast=(SInt32 *)
       def _get_theme_metric(theme_constant, metric)
-        JNI.__send__(:Java_org_eclipse_swt_internal_cocoa_OS_GetThemeMetric, JNI.env, self.jni_id, theme_constant.to_int, metric.jni_id)
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_cocoa_OS_GetThemeMetric, JNI.env, self.jni_id, theme_constant.to_int, metric.jni_id)
       end
       
-      JNI.native_method :Java_org_eclipse_swt_internal_cocoa_OS_HIThemeDrawFocusRect, [:pointer, :long, :long, :int8, :int32, :int32], :int32
+      JNI.load_native_method :Java_org_eclipse_swt_internal_cocoa_OS_HIThemeDrawFocusRect, [:pointer, :long, :long, :int8, :int32, :int32], :int32
       typesig { [CGRect, ::Java::Boolean, ::Java::Int, ::Java::Int] }
       # @method flags=dynamic
       # @param inContext cast=(CGContextRef)
       # 
       # long
       def _hitheme_draw_focus_rect(in_rect, in_has_focus, in_context, in_orientation)
-        JNI.__send__(:Java_org_eclipse_swt_internal_cocoa_OS_HIThemeDrawFocusRect, JNI.env, self.jni_id, in_rect.jni_id, in_has_focus ? 1 : 0, in_context.to_int, in_orientation.to_int)
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_cocoa_OS_HIThemeDrawFocusRect, JNI.env, self.jni_id, in_rect.jni_id, in_has_focus ? 1 : 0, in_context.to_int, in_orientation.to_int)
       end
       
       const_set_lazy(:K_UCKeyActionDown) { 0 }
@@ -347,7 +347,7 @@ module Org::Eclipse::Swt::Internal::Cocoa
       const_set_lazy(:K_ThemeAliasArrowCursor) { 2 }
       const_attr_reader  :K_ThemeAliasArrowCursor
       
-      JNI.native_method :Java_org_eclipse_swt_internal_cocoa_OS_ATSFontActivateFromFileReference, [:pointer, :long, :long, :int32, :int32, :int32, :int32, :long], :int32
+      JNI.load_native_method :Java_org_eclipse_swt_internal_cocoa_OS_ATSFontActivateFromFileReference, [:pointer, :long, :long, :int32, :int32, :int32, :int32, :long], :int32
       typesig { [Array.typed(::Java::Byte), ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, Array.typed(::Java::Int)] }
       # @method flags=dynamic
       # @param iFile cast=(const FSRef *)
@@ -360,7 +360,7 @@ module Org::Eclipse::Swt::Internal::Cocoa
       # long
       # long
       def _atsfont_activate_from_file_reference(i_file, i_context, i_format, i_reserved, i_options, o_container)
-        JNI.__send__(:Java_org_eclipse_swt_internal_cocoa_OS_ATSFontActivateFromFileReference, JNI.env, self.jni_id, i_file.jni_id, i_context.to_int, i_format.to_int, i_reserved.to_int, i_options.to_int, o_container.jni_id)
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_cocoa_OS_ATSFontActivateFromFileReference, JNI.env, self.jni_id, i_file.jni_id, i_context.to_int, i_format.to_int, i_reserved.to_int, i_options.to_int, o_container.jni_id)
       end
       
       const_set_lazy(:K_ATSFontContextLocal) { 2 }
@@ -372,7 +372,7 @@ module Org::Eclipse::Swt::Internal::Cocoa
       const_set_lazy(:K_ATSFontFormatUnspecified) { 0 }
       const_attr_reader  :K_ATSFontFormatUnspecified
       
-      JNI.native_method :Java_org_eclipse_swt_internal_cocoa_OS_FSPathMakeRef, [:pointer, :long, :int32, :long, :long], :int32
+      JNI.load_native_method :Java_org_eclipse_swt_internal_cocoa_OS_FSPathMakeRef, [:pointer, :long, :int32, :long, :long], :int32
       typesig { [::Java::Int, Array.typed(::Java::Byte), Array.typed(::Java::Boolean)] }
       # @method flags=dynamic
       # @param path cast=(const UInt8 *)
@@ -381,53 +381,53 @@ module Org::Eclipse::Swt::Internal::Cocoa
       # 
       # long
       def _fspath_make_ref(path, ref, is_directory)
-        JNI.__send__(:Java_org_eclipse_swt_internal_cocoa_OS_FSPathMakeRef, JNI.env, self.jni_id, path.to_int, ref.jni_id, is_directory.jni_id)
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_cocoa_OS_FSPathMakeRef, JNI.env, self.jni_id, path.to_int, ref.jni_id, is_directory.jni_id)
       end
       
-      JNI.native_method :Java_org_eclipse_swt_internal_cocoa_OS_LMGetKbdType, [:pointer, :long], :int8
+      JNI.load_native_method :Java_org_eclipse_swt_internal_cocoa_OS_LMGetKbdType, [:pointer, :long], :int8
       typesig { [] }
       # @method flags=dynamic
       def _lmget_kbd_type
-        JNI.__send__(:Java_org_eclipse_swt_internal_cocoa_OS_LMGetKbdType, JNI.env, self.jni_id)
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_cocoa_OS_LMGetKbdType, JNI.env, self.jni_id)
       end
       
-      JNI.native_method :Java_org_eclipse_swt_internal_cocoa_OS_AcquireRootMenu, [:pointer, :long], :int32
+      JNI.load_native_method :Java_org_eclipse_swt_internal_cocoa_OS_AcquireRootMenu, [:pointer, :long], :int32
       typesig { [] }
       # @method flags=dynamic
       # long
       def _acquire_root_menu
-        JNI.__send__(:Java_org_eclipse_swt_internal_cocoa_OS_AcquireRootMenu, JNI.env, self.jni_id)
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_cocoa_OS_AcquireRootMenu, JNI.env, self.jni_id)
       end
       
-      JNI.native_method :Java_org_eclipse_swt_internal_cocoa_OS_CancelMenuTracking, [:pointer, :long, :int32, :int8, :int32], :int32
+      JNI.load_native_method :Java_org_eclipse_swt_internal_cocoa_OS_CancelMenuTracking, [:pointer, :long, :int32, :int8, :int32], :int32
       typesig { [::Java::Int, ::Java::Boolean, ::Java::Int] }
       # @method flags=dynamic
       # long
       def _cancel_menu_tracking(in_root_menu, in_immediate, in_dismissal_reason)
-        JNI.__send__(:Java_org_eclipse_swt_internal_cocoa_OS_CancelMenuTracking, JNI.env, self.jni_id, in_root_menu.to_int, in_immediate ? 1 : 0, in_dismissal_reason.to_int)
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_cocoa_OS_CancelMenuTracking, JNI.env, self.jni_id, in_root_menu.to_int, in_immediate ? 1 : 0, in_dismissal_reason.to_int)
       end
       
-      JNI.native_method :Java_org_eclipse_swt_internal_cocoa_OS_getpid, [:pointer, :long], :int32
+      JNI.load_native_method :Java_org_eclipse_swt_internal_cocoa_OS_getpid, [:pointer, :long], :int32
       typesig { [] }
       # C calls
       def getpid
-        JNI.__send__(:Java_org_eclipse_swt_internal_cocoa_OS_getpid, JNI.env, self.jni_id)
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_cocoa_OS_getpid, JNI.env, self.jni_id)
       end
       
-      JNI.native_method :Java_org_eclipse_swt_internal_cocoa_OS_call, [:pointer, :long, :int32, :int32, :int32], :void
+      JNI.load_native_method :Java_org_eclipse_swt_internal_cocoa_OS_call, [:pointer, :long, :int32, :int32, :int32], :void
       typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
       # long
       # long
       # long
       def call(proc, id, sel)
-        JNI.__send__(:Java_org_eclipse_swt_internal_cocoa_OS_call, JNI.env, self.jni_id, proc.to_int, id.to_int, sel.to_int)
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_cocoa_OS_call, JNI.env, self.jni_id, proc.to_int, id.to_int, sel.to_int)
       end
       
-      JNI.native_method :Java_org_eclipse_swt_internal_cocoa_OS__1_1BIG_1ENDIAN_1_1, [:pointer, :long], :int8
+      JNI.load_native_method :Java_org_eclipse_swt_internal_cocoa_OS__1_1BIG_1ENDIAN_1_1, [:pointer, :long], :int8
       typesig { [] }
       # @method flags=no_gen
       def ____big_endian__
-        JNI.__send__(:Java_org_eclipse_swt_internal_cocoa_OS__1_1BIG_1ENDIAN_1_1, JNI.env, self.jni_id) != 0
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_cocoa_OS__1_1BIG_1ENDIAN_1_1, JNI.env, self.jni_id) != 0
       end
       
       const_set_lazy(:K_CGBitmapByteOrderDefault) { 0 << 12 }
@@ -451,7 +451,7 @@ module Org::Eclipse::Swt::Internal::Cocoa
       const_set_lazy(:K_CGBitmapByteOrder32Host) { ____big_endian__ ? K_CGBitmapByteOrder32Big : K_CGBitmapByteOrder32Little }
       const_attr_reader  :K_CGBitmapByteOrder32Host
       
-      JNI.native_method :Java_org_eclipse_swt_internal_cocoa_OS_CGContextCopyWindowContentsToRect, [:pointer, :long, :int32, :long, :int32, :int32, :long], :void
+      JNI.load_native_method :Java_org_eclipse_swt_internal_cocoa_OS_CGContextCopyWindowContentsToRect, [:pointer, :long, :int32, :long, :int32, :int32, :long], :void
       typesig { [::Java::Int, CGRect, ::Java::Int, ::Java::Int, CGRect] }
       # @method flags=dynamic
       # @param destRect flags=struct
@@ -461,159 +461,159 @@ module Org::Eclipse::Swt::Internal::Cocoa
       # long
       # long
       def _cgcontext_copy_window_contents_to_rect(context, dest_rect, context_id, window_number, src_rect)
-        JNI.__send__(:Java_org_eclipse_swt_internal_cocoa_OS_CGContextCopyWindowContentsToRect, JNI.env, self.jni_id, context.to_int, dest_rect.jni_id, context_id.to_int, window_number.to_int, src_rect.jni_id)
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_cocoa_OS_CGContextCopyWindowContentsToRect, JNI.env, self.jni_id, context.to_int, dest_rect.jni_id, context_id.to_int, window_number.to_int, src_rect.jni_id)
       end
       
-      JNI.native_method :Java_org_eclipse_swt_internal_cocoa_OS_NewRgn, [:pointer, :long], :int32
+      JNI.load_native_method :Java_org_eclipse_swt_internal_cocoa_OS_NewRgn, [:pointer, :long], :int32
       typesig { [] }
       # QuickDraw calls
       # @method flags=dynamic
       # long
       def _new_rgn
-        JNI.__send__(:Java_org_eclipse_swt_internal_cocoa_OS_NewRgn, JNI.env, self.jni_id)
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_cocoa_OS_NewRgn, JNI.env, self.jni_id)
       end
       
-      JNI.native_method :Java_org_eclipse_swt_internal_cocoa_OS_RectRgn, [:pointer, :long, :int32, :long], :void
+      JNI.load_native_method :Java_org_eclipse_swt_internal_cocoa_OS_RectRgn, [:pointer, :long, :int32, :long], :void
       typesig { [::Java::Int, Array.typed(::Java::Short)] }
       # @method flags=dynamic
       # long
       def _rect_rgn(rgn_handle, rect)
-        JNI.__send__(:Java_org_eclipse_swt_internal_cocoa_OS_RectRgn, JNI.env, self.jni_id, rgn_handle.to_int, rect.jni_id)
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_cocoa_OS_RectRgn, JNI.env, self.jni_id, rgn_handle.to_int, rect.jni_id)
       end
       
-      JNI.native_method :Java_org_eclipse_swt_internal_cocoa_OS_OpenRgn, [:pointer, :long], :void
+      JNI.load_native_method :Java_org_eclipse_swt_internal_cocoa_OS_OpenRgn, [:pointer, :long], :void
       typesig { [] }
       # @method flags=dynamic
       def _open_rgn
-        JNI.__send__(:Java_org_eclipse_swt_internal_cocoa_OS_OpenRgn, JNI.env, self.jni_id)
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_cocoa_OS_OpenRgn, JNI.env, self.jni_id)
       end
       
-      JNI.native_method :Java_org_eclipse_swt_internal_cocoa_OS_OffsetRgn, [:pointer, :long, :int32, :int16, :int16], :void
+      JNI.load_native_method :Java_org_eclipse_swt_internal_cocoa_OS_OffsetRgn, [:pointer, :long, :int32, :int16, :int16], :void
       typesig { [::Java::Int, ::Java::Short, ::Java::Short] }
       # @method flags=dynamic
       # long
       def _offset_rgn(rgn_handle, dh, dv)
-        JNI.__send__(:Java_org_eclipse_swt_internal_cocoa_OS_OffsetRgn, JNI.env, self.jni_id, rgn_handle.to_int, dh.to_int, dv.to_int)
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_cocoa_OS_OffsetRgn, JNI.env, self.jni_id, rgn_handle.to_int, dh.to_int, dv.to_int)
       end
       
-      JNI.native_method :Java_org_eclipse_swt_internal_cocoa_OS_MoveTo, [:pointer, :long, :int16, :int16], :void
+      JNI.load_native_method :Java_org_eclipse_swt_internal_cocoa_OS_MoveTo, [:pointer, :long, :int16, :int16], :void
       typesig { [::Java::Short, ::Java::Short] }
       # @method flags=dynamic
       def _move_to(h, v)
-        JNI.__send__(:Java_org_eclipse_swt_internal_cocoa_OS_MoveTo, JNI.env, self.jni_id, h.to_int, v.to_int)
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_cocoa_OS_MoveTo, JNI.env, self.jni_id, h.to_int, v.to_int)
       end
       
-      JNI.native_method :Java_org_eclipse_swt_internal_cocoa_OS_LineTo, [:pointer, :long, :int16, :int16], :void
+      JNI.load_native_method :Java_org_eclipse_swt_internal_cocoa_OS_LineTo, [:pointer, :long, :int16, :int16], :void
       typesig { [::Java::Short, ::Java::Short] }
       # @method flags=dynamic
       def _line_to(h, v)
-        JNI.__send__(:Java_org_eclipse_swt_internal_cocoa_OS_LineTo, JNI.env, self.jni_id, h.to_int, v.to_int)
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_cocoa_OS_LineTo, JNI.env, self.jni_id, h.to_int, v.to_int)
       end
       
-      JNI.native_method :Java_org_eclipse_swt_internal_cocoa_OS_UnionRgn, [:pointer, :long, :int32, :int32, :int32], :void
+      JNI.load_native_method :Java_org_eclipse_swt_internal_cocoa_OS_UnionRgn, [:pointer, :long, :int32, :int32, :int32], :void
       typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
       # @method flags=dynamic
       # long
       # long
       # long
       def _union_rgn(src_rgn_a, src_rgn_b, dst_rgn)
-        JNI.__send__(:Java_org_eclipse_swt_internal_cocoa_OS_UnionRgn, JNI.env, self.jni_id, src_rgn_a.to_int, src_rgn_b.to_int, dst_rgn.to_int)
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_cocoa_OS_UnionRgn, JNI.env, self.jni_id, src_rgn_a.to_int, src_rgn_b.to_int, dst_rgn.to_int)
       end
       
-      JNI.native_method :Java_org_eclipse_swt_internal_cocoa_OS_CloseRgn, [:pointer, :long, :int32], :void
+      JNI.load_native_method :Java_org_eclipse_swt_internal_cocoa_OS_CloseRgn, [:pointer, :long, :int32], :void
       typesig { [::Java::Int] }
       # @method flags=dynamic
       # long
       def _close_rgn(dst_rgn)
-        JNI.__send__(:Java_org_eclipse_swt_internal_cocoa_OS_CloseRgn, JNI.env, self.jni_id, dst_rgn.to_int)
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_cocoa_OS_CloseRgn, JNI.env, self.jni_id, dst_rgn.to_int)
       end
       
-      JNI.native_method :Java_org_eclipse_swt_internal_cocoa_OS_DisposeRgn, [:pointer, :long, :int32], :void
+      JNI.load_native_method :Java_org_eclipse_swt_internal_cocoa_OS_DisposeRgn, [:pointer, :long, :int32], :void
       typesig { [::Java::Int] }
       # @method flags=dynamic
       # long
       def _dispose_rgn(rgn_handle)
-        JNI.__send__(:Java_org_eclipse_swt_internal_cocoa_OS_DisposeRgn, JNI.env, self.jni_id, rgn_handle.to_int)
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_cocoa_OS_DisposeRgn, JNI.env, self.jni_id, rgn_handle.to_int)
       end
       
-      JNI.native_method :Java_org_eclipse_swt_internal_cocoa_OS_PtInRgn, [:pointer, :long, :long, :int32], :int8
+      JNI.load_native_method :Java_org_eclipse_swt_internal_cocoa_OS_PtInRgn, [:pointer, :long, :long, :int32], :int8
       typesig { [Array.typed(::Java::Short), ::Java::Int] }
       # @method flags=dynamic
       # @param pt flags=struct,cast=(Point *)
       # 
       # long
       def _pt_in_rgn(pt, rgn_handle)
-        JNI.__send__(:Java_org_eclipse_swt_internal_cocoa_OS_PtInRgn, JNI.env, self.jni_id, pt.jni_id, rgn_handle.to_int) != 0
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_cocoa_OS_PtInRgn, JNI.env, self.jni_id, pt.jni_id, rgn_handle.to_int) != 0
       end
       
-      JNI.native_method :Java_org_eclipse_swt_internal_cocoa_OS_GetRegionBounds, [:pointer, :long, :int32, :long], :void
+      JNI.load_native_method :Java_org_eclipse_swt_internal_cocoa_OS_GetRegionBounds, [:pointer, :long, :int32, :long], :void
       typesig { [::Java::Int, Array.typed(::Java::Short)] }
       # @method flags=dynamic
       # long
       def _get_region_bounds(rgn_handle, bounds)
-        JNI.__send__(:Java_org_eclipse_swt_internal_cocoa_OS_GetRegionBounds, JNI.env, self.jni_id, rgn_handle.to_int, bounds.jni_id)
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_cocoa_OS_GetRegionBounds, JNI.env, self.jni_id, rgn_handle.to_int, bounds.jni_id)
       end
       
-      JNI.native_method :Java_org_eclipse_swt_internal_cocoa_OS_SectRgn, [:pointer, :long, :int32, :int32, :int32], :void
+      JNI.load_native_method :Java_org_eclipse_swt_internal_cocoa_OS_SectRgn, [:pointer, :long, :int32, :int32, :int32], :void
       typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
       # @method flags=dynamic
       # long
       # long
       # long
       def _sect_rgn(src_rgn_a, src_rgn_b, dst_rgn)
-        JNI.__send__(:Java_org_eclipse_swt_internal_cocoa_OS_SectRgn, JNI.env, self.jni_id, src_rgn_a.to_int, src_rgn_b.to_int, dst_rgn.to_int)
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_cocoa_OS_SectRgn, JNI.env, self.jni_id, src_rgn_a.to_int, src_rgn_b.to_int, dst_rgn.to_int)
       end
       
-      JNI.native_method :Java_org_eclipse_swt_internal_cocoa_OS_EmptyRgn, [:pointer, :long, :int32], :int8
+      JNI.load_native_method :Java_org_eclipse_swt_internal_cocoa_OS_EmptyRgn, [:pointer, :long, :int32], :int8
       typesig { [::Java::Int] }
       # @method flags=dynamic
       # long
       def _empty_rgn(rgn_handle)
-        JNI.__send__(:Java_org_eclipse_swt_internal_cocoa_OS_EmptyRgn, JNI.env, self.jni_id, rgn_handle.to_int) != 0
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_cocoa_OS_EmptyRgn, JNI.env, self.jni_id, rgn_handle.to_int) != 0
       end
       
-      JNI.native_method :Java_org_eclipse_swt_internal_cocoa_OS_DiffRgn, [:pointer, :long, :int32, :int32, :int32], :void
+      JNI.load_native_method :Java_org_eclipse_swt_internal_cocoa_OS_DiffRgn, [:pointer, :long, :int32, :int32, :int32], :void
       typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
       # @method flags=dynamic
       # long
       # long
       # long
       def _diff_rgn(src_rgn_a, src_rgn_b, dst_rgn)
-        JNI.__send__(:Java_org_eclipse_swt_internal_cocoa_OS_DiffRgn, JNI.env, self.jni_id, src_rgn_a.to_int, src_rgn_b.to_int, dst_rgn.to_int)
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_cocoa_OS_DiffRgn, JNI.env, self.jni_id, src_rgn_a.to_int, src_rgn_b.to_int, dst_rgn.to_int)
       end
       
-      JNI.native_method :Java_org_eclipse_swt_internal_cocoa_OS_RectInRgn, [:pointer, :long, :long, :int32], :int8
+      JNI.load_native_method :Java_org_eclipse_swt_internal_cocoa_OS_RectInRgn, [:pointer, :long, :long, :int32], :int8
       typesig { [Array.typed(::Java::Short), ::Java::Int] }
       # @method flags=dynamic
       # long
       def _rect_in_rgn(rect, rgn_handle)
-        JNI.__send__(:Java_org_eclipse_swt_internal_cocoa_OS_RectInRgn, JNI.env, self.jni_id, rect.jni_id, rgn_handle.to_int) != 0
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_cocoa_OS_RectInRgn, JNI.env, self.jni_id, rect.jni_id, rgn_handle.to_int) != 0
       end
       
-      JNI.native_method :Java_org_eclipse_swt_internal_cocoa_OS_QDRegionToRects, [:pointer, :long, :int32, :int32, :int32, :int32], :int32
+      JNI.load_native_method :Java_org_eclipse_swt_internal_cocoa_OS_QDRegionToRects, [:pointer, :long, :int32, :int32, :int32, :int32], :int32
       typesig { [::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int] }
       # @method flags=dynamic
       # long
       # long
       # long
       def _qdregion_to_rects(rgn, dir, proc, user_data)
-        JNI.__send__(:Java_org_eclipse_swt_internal_cocoa_OS_QDRegionToRects, JNI.env, self.jni_id, rgn.to_int, dir.to_int, proc.to_int, user_data.to_int)
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_cocoa_OS_QDRegionToRects, JNI.env, self.jni_id, rgn.to_int, dir.to_int, proc.to_int, user_data.to_int)
       end
       
-      JNI.native_method :Java_org_eclipse_swt_internal_cocoa_OS_CopyRgn, [:pointer, :long, :int32, :int32], :void
+      JNI.load_native_method :Java_org_eclipse_swt_internal_cocoa_OS_CopyRgn, [:pointer, :long, :int32, :int32], :void
       typesig { [::Java::Int, ::Java::Int] }
       # @method flags=dynamic
       # long
       # long
       def _copy_rgn(src_rgn_handle, dst_rgn_handle)
-        JNI.__send__(:Java_org_eclipse_swt_internal_cocoa_OS_CopyRgn, JNI.env, self.jni_id, src_rgn_handle.to_int, dst_rgn_handle.to_int)
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_cocoa_OS_CopyRgn, JNI.env, self.jni_id, src_rgn_handle.to_int, dst_rgn_handle.to_int)
       end
       
-      JNI.native_method :Java_org_eclipse_swt_internal_cocoa_OS_SetRect, [:pointer, :long, :long, :int16, :int16, :int16, :int16], :void
+      JNI.load_native_method :Java_org_eclipse_swt_internal_cocoa_OS_SetRect, [:pointer, :long, :long, :int16, :int16, :int16, :int16], :void
       typesig { [Array.typed(::Java::Short), ::Java::Short, ::Java::Short, ::Java::Short, ::Java::Short] }
       # @method flags=dynamic
       def _set_rect(r, left, top, right, bottom)
-        JNI.__send__(:Java_org_eclipse_swt_internal_cocoa_OS_SetRect, JNI.env, self.jni_id, r.jni_id, left.to_int, top.to_int, right.to_int, bottom.to_int)
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_cocoa_OS_SetRect, JNI.env, self.jni_id, r.jni_id, left.to_int, top.to_int, right.to_int, bottom.to_int)
       end
       
       const_set_lazy(:K_QDParseRegionFromTop) { (1 << 0) }
@@ -634,32 +634,32 @@ module Org::Eclipse::Swt::Internal::Cocoa
       const_set_lazy(:K_QDRegionToRectsMsgParse) { 2 }
       const_attr_reader  :K_QDRegionToRectsMsgParse
       
-      JNI.native_method :Java_org_eclipse_swt_internal_cocoa_OS_isFlipped_1CALLBACK, [:pointer, :long], :int32
+      JNI.load_native_method :Java_org_eclipse_swt_internal_cocoa_OS_isFlipped_1CALLBACK, [:pointer, :long], :int32
       typesig { [] }
       # Custom callbacks
       # @method flags=no_gen
       # long
       def is_flipped_callback
-        JNI.__send__(:Java_org_eclipse_swt_internal_cocoa_OS_isFlipped_1CALLBACK, JNI.env, self.jni_id)
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_cocoa_OS_isFlipped_1CALLBACK, JNI.env, self.jni_id)
       end
       
-      JNI.native_method :Java_org_eclipse_swt_internal_cocoa_OS_NSIntersectionRect, [:pointer, :long, :long, :long, :long], :void
+      JNI.load_native_method :Java_org_eclipse_swt_internal_cocoa_OS_NSIntersectionRect, [:pointer, :long, :long, :long, :long], :void
       typesig { [NSRect, NSRect, NSRect] }
       # Custom structure return
       # @method flags=no_gen
       def _nsintersection_rect(result, a_rect, b_rect)
-        JNI.__send__(:Java_org_eclipse_swt_internal_cocoa_OS_NSIntersectionRect, JNI.env, self.jni_id, result.jni_id, a_rect.jni_id, b_rect.jni_id)
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_cocoa_OS_NSIntersectionRect, JNI.env, self.jni_id, result.jni_id, a_rect.jni_id, b_rect.jni_id)
       end
       
-      JNI.native_method :Java_org_eclipse_swt_internal_cocoa_OS_CGDisplayBounds, [:pointer, :long, :int32, :long], :void
+      JNI.load_native_method :Java_org_eclipse_swt_internal_cocoa_OS_CGDisplayBounds, [:pointer, :long, :int32, :long], :void
       typesig { [::Java::Int, CGRect] }
       # @method flags=no_gen
       # @param display cast=(CGDirectDisplayID)
       def _cgdisplay_bounds(display, rect)
-        JNI.__send__(:Java_org_eclipse_swt_internal_cocoa_OS_CGDisplayBounds, JNI.env, self.jni_id, display.to_int, rect.jni_id)
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_cocoa_OS_CGDisplayBounds, JNI.env, self.jni_id, display.to_int, rect.jni_id)
       end
       
-      JNI.native_method :Java_org_eclipse_swt_internal_cocoa_OS_class_1addIvar, [:pointer, :long, :int32, :long, :int32, :int8, :long], :int8
+      JNI.load_native_method :Java_org_eclipse_swt_internal_cocoa_OS_class_1addIvar, [:pointer, :long, :int32, :long, :int32, :int8, :long], :int8
       typesig { [::Java::Int, Array.typed(::Java::Byte), ::Java::Int, ::Java::Byte, Array.typed(::Java::Byte)] }
       # Objective-C runtime
       # 
@@ -670,10 +670,10 @@ module Org::Eclipse::Swt::Internal::Cocoa
       # long
       # long
       def class_add_ivar(cls, name, size, alignment, types)
-        JNI.__send__(:Java_org_eclipse_swt_internal_cocoa_OS_class_1addIvar, JNI.env, self.jni_id, cls.to_int, name.jni_id, size.to_int, alignment.to_int, types.jni_id) != 0
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_cocoa_OS_class_1addIvar, JNI.env, self.jni_id, cls.to_int, name.jni_id, size.to_int, alignment.to_int, types.jni_id) != 0
       end
       
-      JNI.native_method :Java_org_eclipse_swt_internal_cocoa_OS_class_1addMethod, [:pointer, :long, :int32, :int32, :int32, :long], :int8
+      JNI.load_native_method :Java_org_eclipse_swt_internal_cocoa_OS_class_1addMethod, [:pointer, :long, :int32, :int32, :int32, :long], :int8
       typesig { [::Java::Int, ::Java::Int, ::Java::Int, String] }
       # @param cls cast=(Class)
       # @param name cast=(SEL)
@@ -683,10 +683,10 @@ module Org::Eclipse::Swt::Internal::Cocoa
       # long
       # long
       def class_add_method(cls, name, imp, types)
-        JNI.__send__(:Java_org_eclipse_swt_internal_cocoa_OS_class_1addMethod, JNI.env, self.jni_id, cls.to_int, name.to_int, imp.to_int, types.jni_id) != 0
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_cocoa_OS_class_1addMethod, JNI.env, self.jni_id, cls.to_int, name.to_int, imp.to_int, types.jni_id) != 0
       end
       
-      JNI.native_method :Java_org_eclipse_swt_internal_cocoa_OS_class_1addProtocol, [:pointer, :long, :int32, :int32], :int8
+      JNI.load_native_method :Java_org_eclipse_swt_internal_cocoa_OS_class_1addProtocol, [:pointer, :long, :int32, :int32], :int8
       typesig { [::Java::Int, ::Java::Int] }
       # @param cls cast=(Class)
       # @param protocol cast=(Protocol *)
@@ -694,10 +694,10 @@ module Org::Eclipse::Swt::Internal::Cocoa
       # long
       # long
       def class_add_protocol(cls, protocol)
-        JNI.__send__(:Java_org_eclipse_swt_internal_cocoa_OS_class_1addProtocol, JNI.env, self.jni_id, cls.to_int, protocol.to_int) != 0
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_cocoa_OS_class_1addProtocol, JNI.env, self.jni_id, cls.to_int, protocol.to_int) != 0
       end
       
-      JNI.native_method :Java_org_eclipse_swt_internal_cocoa_OS_class_1getClassMethod, [:pointer, :long, :int32, :int32], :int32
+      JNI.load_native_method :Java_org_eclipse_swt_internal_cocoa_OS_class_1getClassMethod, [:pointer, :long, :int32, :int32], :int32
       typesig { [::Java::Int, ::Java::Int] }
       # @param method cast=(Method)
       # @param aClass cast=(Class)
@@ -707,10 +707,10 @@ module Org::Eclipse::Swt::Internal::Cocoa
       # long
       # long
       def class_get_class_method(a_class, a_selector)
-        JNI.__send__(:Java_org_eclipse_swt_internal_cocoa_OS_class_1getClassMethod, JNI.env, self.jni_id, a_class.to_int, a_selector.to_int)
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_cocoa_OS_class_1getClassMethod, JNI.env, self.jni_id, a_class.to_int, a_selector.to_int)
       end
       
-      JNI.native_method :Java_org_eclipse_swt_internal_cocoa_OS_class_1getMethodImplementation, [:pointer, :long, :int32, :int32], :int32
+      JNI.load_native_method :Java_org_eclipse_swt_internal_cocoa_OS_class_1getMethodImplementation, [:pointer, :long, :int32, :int32], :int32
       typesig { [::Java::Int, ::Java::Int] }
       # @param cls cast=(Class)
       # @param name cast=(SEL)
@@ -719,10 +719,10 @@ module Org::Eclipse::Swt::Internal::Cocoa
       # long
       # long
       def class_get_method_implementation(cls, name)
-        JNI.__send__(:Java_org_eclipse_swt_internal_cocoa_OS_class_1getMethodImplementation, JNI.env, self.jni_id, cls.to_int, name.to_int)
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_cocoa_OS_class_1getMethodImplementation, JNI.env, self.jni_id, cls.to_int, name.to_int)
       end
       
-      JNI.native_method :Java_org_eclipse_swt_internal_cocoa_OS_class_1getInstanceMethod, [:pointer, :long, :int32, :int32], :int32
+      JNI.load_native_method :Java_org_eclipse_swt_internal_cocoa_OS_class_1getInstanceMethod, [:pointer, :long, :int32, :int32], :int32
       typesig { [::Java::Int, ::Java::Int] }
       # @param cls cast=(Class)
       # @param name cast=(SEL)
@@ -731,19 +731,19 @@ module Org::Eclipse::Swt::Internal::Cocoa
       # long
       # long
       def class_get_instance_method(cls, name)
-        JNI.__send__(:Java_org_eclipse_swt_internal_cocoa_OS_class_1getInstanceMethod, JNI.env, self.jni_id, cls.to_int, name.to_int)
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_cocoa_OS_class_1getInstanceMethod, JNI.env, self.jni_id, cls.to_int, name.to_int)
       end
       
-      JNI.native_method :Java_org_eclipse_swt_internal_cocoa_OS_class_1getSuperclass, [:pointer, :long, :int32], :int32
+      JNI.load_native_method :Java_org_eclipse_swt_internal_cocoa_OS_class_1getSuperclass, [:pointer, :long, :int32], :int32
       typesig { [::Java::Int] }
       # @param cls cast=(Class)
       # long
       # long
       def class_get_superclass(cls)
-        JNI.__send__(:Java_org_eclipse_swt_internal_cocoa_OS_class_1getSuperclass, JNI.env, self.jni_id, cls.to_int)
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_cocoa_OS_class_1getSuperclass, JNI.env, self.jni_id, cls.to_int)
       end
       
-      JNI.native_method :Java_org_eclipse_swt_internal_cocoa_OS_method_1setImplementation, [:pointer, :long, :int32, :int32], :int32
+      JNI.load_native_method :Java_org_eclipse_swt_internal_cocoa_OS_method_1setImplementation, [:pointer, :long, :int32, :int32], :int32
       typesig { [::Java::Int, ::Java::Int] }
       # @param method cast=(Method)
       # @param imp cast=(IMP)
@@ -752,10 +752,10 @@ module Org::Eclipse::Swt::Internal::Cocoa
       # long
       # long
       def method_set_implementation(method, imp)
-        JNI.__send__(:Java_org_eclipse_swt_internal_cocoa_OS_method_1setImplementation, JNI.env, self.jni_id, method.to_int, imp.to_int)
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_cocoa_OS_method_1setImplementation, JNI.env, self.jni_id, method.to_int, imp.to_int)
       end
       
-      JNI.native_method :Java_org_eclipse_swt_internal_cocoa_OS_class_1createInstance, [:pointer, :long, :int32, :int32], :int32
+      JNI.load_native_method :Java_org_eclipse_swt_internal_cocoa_OS_class_1createInstance, [:pointer, :long, :int32, :int32], :int32
       typesig { [::Java::Int, ::Java::Int] }
       # @param cls cast=(Class)
       # @param extraBytes cast=(size_t)
@@ -764,89 +764,89 @@ module Org::Eclipse::Swt::Internal::Cocoa
       # long
       # long
       def class_create_instance(cls, extra_bytes)
-        JNI.__send__(:Java_org_eclipse_swt_internal_cocoa_OS_class_1createInstance, JNI.env, self.jni_id, cls.to_int, extra_bytes.to_int)
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_cocoa_OS_class_1createInstance, JNI.env, self.jni_id, cls.to_int, extra_bytes.to_int)
       end
       
-      JNI.native_method :Java_org_eclipse_swt_internal_cocoa_OS_class_1getName, [:pointer, :long, :int32], :long
+      JNI.load_native_method :Java_org_eclipse_swt_internal_cocoa_OS_class_1getName, [:pointer, :long, :int32], :long
       typesig { [::Java::Int] }
       # @method flags=no_gen
       # long
       def class_get_name(cls)
-        JNI.__send__(:Java_org_eclipse_swt_internal_cocoa_OS_class_1getName, JNI.env, self.jni_id, cls.to_int)
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_cocoa_OS_class_1getName, JNI.env, self.jni_id, cls.to_int)
       end
       
-      JNI.native_method :Java_org_eclipse_swt_internal_cocoa_OS_instrumentObjcMessageSends, [:pointer, :long, :int8], :void
+      JNI.load_native_method :Java_org_eclipse_swt_internal_cocoa_OS_instrumentObjcMessageSends, [:pointer, :long, :int8], :void
       typesig { [::Java::Boolean] }
       # @method flags=dynamic
       def instrument_objc_message_sends(val)
-        JNI.__send__(:Java_org_eclipse_swt_internal_cocoa_OS_instrumentObjcMessageSends, JNI.env, self.jni_id, val ? 1 : 0)
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_cocoa_OS_instrumentObjcMessageSends, JNI.env, self.jni_id, val ? 1 : 0)
       end
       
-      JNI.native_method :Java_org_eclipse_swt_internal_cocoa_OS_objc_1allocateClassPair, [:pointer, :long, :int32, :long, :int32], :int32
+      JNI.load_native_method :Java_org_eclipse_swt_internal_cocoa_OS_objc_1allocateClassPair, [:pointer, :long, :int32, :long, :int32], :int32
       typesig { [::Java::Int, String, ::Java::Int] }
       # @param superclass cast=(Class)
       # long
       # long
       # long
       def objc_allocate_class_pair(superclass, name, extra_bytes)
-        JNI.__send__(:Java_org_eclipse_swt_internal_cocoa_OS_objc_1allocateClassPair, JNI.env, self.jni_id, superclass.to_int, name.jni_id, extra_bytes.to_int)
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_cocoa_OS_objc_1allocateClassPair, JNI.env, self.jni_id, superclass.to_int, name.jni_id, extra_bytes.to_int)
       end
       
-      JNI.native_method :Java_org_eclipse_swt_internal_cocoa_OS_objc_1getClass, [:pointer, :long, :long], :int32
+      JNI.load_native_method :Java_org_eclipse_swt_internal_cocoa_OS_objc_1getClass, [:pointer, :long, :long], :int32
       typesig { [String] }
       # long
       def objc_get_class(class_name)
-        JNI.__send__(:Java_org_eclipse_swt_internal_cocoa_OS_objc_1getClass, JNI.env, self.jni_id, class_name.jni_id)
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_cocoa_OS_objc_1getClass, JNI.env, self.jni_id, class_name.jni_id)
       end
       
-      JNI.native_method :Java_org_eclipse_swt_internal_cocoa_OS_objc_1getMetaClass, [:pointer, :long, :long], :int32
+      JNI.load_native_method :Java_org_eclipse_swt_internal_cocoa_OS_objc_1getMetaClass, [:pointer, :long, :long], :int32
       typesig { [String] }
       # long
       def objc_get_meta_class(name)
-        JNI.__send__(:Java_org_eclipse_swt_internal_cocoa_OS_objc_1getMetaClass, JNI.env, self.jni_id, name.jni_id)
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_cocoa_OS_objc_1getMetaClass, JNI.env, self.jni_id, name.jni_id)
       end
       
-      JNI.native_method :Java_org_eclipse_swt_internal_cocoa_OS_objc_1getProtocol, [:pointer, :long, :long], :int32
+      JNI.load_native_method :Java_org_eclipse_swt_internal_cocoa_OS_objc_1getProtocol, [:pointer, :long, :long], :int32
       typesig { [String] }
       # long
       def objc_get_protocol(name)
-        JNI.__send__(:Java_org_eclipse_swt_internal_cocoa_OS_objc_1getProtocol, JNI.env, self.jni_id, name.jni_id)
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_cocoa_OS_objc_1getProtocol, JNI.env, self.jni_id, name.jni_id)
       end
       
-      JNI.native_method :Java_org_eclipse_swt_internal_cocoa_OS_objc_1lookUpClass, [:pointer, :long, :long], :int32
+      JNI.load_native_method :Java_org_eclipse_swt_internal_cocoa_OS_objc_1lookUpClass, [:pointer, :long, :long], :int32
       typesig { [String] }
       # long
       def objc_look_up_class(class_name)
-        JNI.__send__(:Java_org_eclipse_swt_internal_cocoa_OS_objc_1lookUpClass, JNI.env, self.jni_id, class_name.jni_id)
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_cocoa_OS_objc_1lookUpClass, JNI.env, self.jni_id, class_name.jni_id)
       end
       
-      JNI.native_method :Java_org_eclipse_swt_internal_cocoa_OS_objc_1registerClassPair, [:pointer, :long, :int32], :void
+      JNI.load_native_method :Java_org_eclipse_swt_internal_cocoa_OS_objc_1registerClassPair, [:pointer, :long, :int32], :void
       typesig { [::Java::Int] }
       # @param cls cast=(Class)
       # long
       def objc_register_class_pair(cls)
-        JNI.__send__(:Java_org_eclipse_swt_internal_cocoa_OS_objc_1registerClassPair, JNI.env, self.jni_id, cls.to_int)
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_cocoa_OS_objc_1registerClassPair, JNI.env, self.jni_id, cls.to_int)
       end
       
-      JNI.native_method :Java_org_eclipse_swt_internal_cocoa_OS_object_1getClassName, [:pointer, :long, :int32], :int32
+      JNI.load_native_method :Java_org_eclipse_swt_internal_cocoa_OS_object_1getClassName, [:pointer, :long, :int32], :int32
       typesig { [::Java::Int] }
       # @param obj cast=(id)
       # long
       # long
       def object_get_class_name(obj)
-        JNI.__send__(:Java_org_eclipse_swt_internal_cocoa_OS_object_1getClassName, JNI.env, self.jni_id, obj.to_int)
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_cocoa_OS_object_1getClassName, JNI.env, self.jni_id, obj.to_int)
       end
       
-      JNI.native_method :Java_org_eclipse_swt_internal_cocoa_OS_object_1getClass, [:pointer, :long, :int32], :int32
+      JNI.load_native_method :Java_org_eclipse_swt_internal_cocoa_OS_object_1getClass, [:pointer, :long, :int32], :int32
       typesig { [::Java::Int] }
       # @param obj cast=(id)
       # long
       # long
       def object_get_class(obj)
-        JNI.__send__(:Java_org_eclipse_swt_internal_cocoa_OS_object_1getClass, JNI.env, self.jni_id, obj.to_int)
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_cocoa_OS_object_1getClass, JNI.env, self.jni_id, obj.to_int)
       end
       
-      JNI.native_method :Java_org_eclipse_swt_internal_cocoa_OS_object_1getInstanceVariable, [:pointer, :long, :int32, :long, :long], :int32
+      JNI.load_native_method :Java_org_eclipse_swt_internal_cocoa_OS_object_1getInstanceVariable, [:pointer, :long, :int32, :long, :long], :int32
       typesig { [::Java::Int, Array.typed(::Java::Byte), Array.typed(::Java::Int)] }
       # @param obj cast=(id)
       # @param name cast=(const char*),flags=critical
@@ -856,10 +856,10 @@ module Org::Eclipse::Swt::Internal::Cocoa
       # long
       # long
       def object_get_instance_variable(obj, name, out_value)
-        JNI.__send__(:Java_org_eclipse_swt_internal_cocoa_OS_object_1getInstanceVariable, JNI.env, self.jni_id, obj.to_int, name.jni_id, out_value.jni_id)
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_cocoa_OS_object_1getInstanceVariable, JNI.env, self.jni_id, obj.to_int, name.jni_id, out_value.jni_id)
       end
       
-      JNI.native_method :Java_org_eclipse_swt_internal_cocoa_OS_object_1setInstanceVariable, [:pointer, :long, :int32, :long, :int32], :int32
+      JNI.load_native_method :Java_org_eclipse_swt_internal_cocoa_OS_object_1setInstanceVariable, [:pointer, :long, :int32, :long, :int32], :int32
       typesig { [::Java::Int, Array.typed(::Java::Byte), ::Java::Int] }
       # @param obj cast=(id)
       # @param name cast=(const char*),flags=critical
@@ -869,10 +869,10 @@ module Org::Eclipse::Swt::Internal::Cocoa
       # long
       # long
       def object_set_instance_variable(obj, name, value)
-        JNI.__send__(:Java_org_eclipse_swt_internal_cocoa_OS_object_1setInstanceVariable, JNI.env, self.jni_id, obj.to_int, name.jni_id, value.to_int)
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_cocoa_OS_object_1setInstanceVariable, JNI.env, self.jni_id, obj.to_int, name.jni_id, value.to_int)
       end
       
-      JNI.native_method :Java_org_eclipse_swt_internal_cocoa_OS_object_1setClass, [:pointer, :long, :int32, :int32], :int32
+      JNI.load_native_method :Java_org_eclipse_swt_internal_cocoa_OS_object_1setClass, [:pointer, :long, :int32, :int32], :int32
       typesig { [::Java::Int, ::Java::Int] }
       # @param obj cast=(id)
       # @param clazz cast=(Class)
@@ -881,23 +881,23 @@ module Org::Eclipse::Swt::Internal::Cocoa
       # long
       # long
       def object_set_class(obj, clazz)
-        JNI.__send__(:Java_org_eclipse_swt_internal_cocoa_OS_object_1setClass, JNI.env, self.jni_id, obj.to_int, clazz.to_int)
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_cocoa_OS_object_1setClass, JNI.env, self.jni_id, obj.to_int, clazz.to_int)
       end
       
-      JNI.native_method :Java_org_eclipse_swt_internal_cocoa_OS_sel_1registerName, [:pointer, :long, :long], :int32
+      JNI.load_native_method :Java_org_eclipse_swt_internal_cocoa_OS_sel_1registerName, [:pointer, :long, :long], :int32
       typesig { [String] }
       # long
       def sel_register_name(selector_name)
-        JNI.__send__(:Java_org_eclipse_swt_internal_cocoa_OS_sel_1registerName, JNI.env, self.jni_id, selector_name.jni_id)
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_cocoa_OS_sel_1registerName, JNI.env, self.jni_id, selector_name.jni_id)
       end
       
-      JNI.native_method :Java_org_eclipse_swt_internal_cocoa_OS_objc_1super_1sizeof, [:pointer, :long], :int32
+      JNI.load_native_method :Java_org_eclipse_swt_internal_cocoa_OS_objc_1super_1sizeof, [:pointer, :long], :int32
       typesig { [] }
       def objc_super_sizeof
-        JNI.__send__(:Java_org_eclipse_swt_internal_cocoa_OS_objc_1super_1sizeof, JNI.env, self.jni_id)
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_cocoa_OS_objc_1super_1sizeof, JNI.env, self.jni_id)
       end
       
-      JNI.native_method :Java_org_eclipse_swt_internal_cocoa_OS_CALLBACK_1accessibilityHitTest_1, [:pointer, :long, :int32], :int32
+      JNI.load_native_method :Java_org_eclipse_swt_internal_cocoa_OS_CALLBACK_1accessibilityHitTest_1, [:pointer, :long, :int32], :int32
       typesig { [::Java::Int] }
       # This section is auto generated
       # Custom callbacks
@@ -905,268 +905,268 @@ module Org::Eclipse::Swt::Internal::Cocoa
       # long
       # long
       def _callback_accessibility_hit_test_(func)
-        JNI.__send__(:Java_org_eclipse_swt_internal_cocoa_OS_CALLBACK_1accessibilityHitTest_1, JNI.env, self.jni_id, func.to_int)
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_cocoa_OS_CALLBACK_1accessibilityHitTest_1, JNI.env, self.jni_id, func.to_int)
       end
       
-      JNI.native_method :Java_org_eclipse_swt_internal_cocoa_OS_CALLBACK_1attributedSubstringFromRange_1, [:pointer, :long, :int32], :int32
+      JNI.load_native_method :Java_org_eclipse_swt_internal_cocoa_OS_CALLBACK_1attributedSubstringFromRange_1, [:pointer, :long, :int32], :int32
       typesig { [::Java::Int] }
       # @method callback_types=NSAttributedString*;id;SEL;NSRange;,callback_flags=none;none;none;struct;
       # long
       # long
       def _callback_attributed_substring_from_range_(func)
-        JNI.__send__(:Java_org_eclipse_swt_internal_cocoa_OS_CALLBACK_1attributedSubstringFromRange_1, JNI.env, self.jni_id, func.to_int)
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_cocoa_OS_CALLBACK_1attributedSubstringFromRange_1, JNI.env, self.jni_id, func.to_int)
       end
       
-      JNI.native_method :Java_org_eclipse_swt_internal_cocoa_OS_CALLBACK_1canDragRowsWithIndexes_1atPoint_1, [:pointer, :long, :int32], :int32
+      JNI.load_native_method :Java_org_eclipse_swt_internal_cocoa_OS_CALLBACK_1canDragRowsWithIndexes_1atPoint_1, [:pointer, :long, :int32], :int32
       typesig { [::Java::Int] }
       # @method callback_types=BOOL;id;SEL;NSIndexSet*;NSPoint;,callback_flags=none;none;none;none;struct;
       # long
       # long
       def _callback_can_drag_rows_with_indexes_at_point_(func)
-        JNI.__send__(:Java_org_eclipse_swt_internal_cocoa_OS_CALLBACK_1canDragRowsWithIndexes_1atPoint_1, JNI.env, self.jni_id, func.to_int)
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_cocoa_OS_CALLBACK_1canDragRowsWithIndexes_1atPoint_1, JNI.env, self.jni_id, func.to_int)
       end
       
-      JNI.native_method :Java_org_eclipse_swt_internal_cocoa_OS_CALLBACK_1cellSize, [:pointer, :long, :int32], :int32
+      JNI.load_native_method :Java_org_eclipse_swt_internal_cocoa_OS_CALLBACK_1cellSize, [:pointer, :long, :int32], :int32
       typesig { [::Java::Int] }
       # @method callback_types=NSSize;id;SEL;,callback_flags=struct;none;none;
       # long
       # long
       def _callback_cell_size(func)
-        JNI.__send__(:Java_org_eclipse_swt_internal_cocoa_OS_CALLBACK_1cellSize, JNI.env, self.jni_id, func.to_int)
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_cocoa_OS_CALLBACK_1cellSize, JNI.env, self.jni_id, func.to_int)
       end
       
-      JNI.native_method :Java_org_eclipse_swt_internal_cocoa_OS_CALLBACK_1characterIndexForPoint_1, [:pointer, :long, :int32], :int32
+      JNI.load_native_method :Java_org_eclipse_swt_internal_cocoa_OS_CALLBACK_1characterIndexForPoint_1, [:pointer, :long, :int32], :int32
       typesig { [::Java::Int] }
       # @method callback_types=NSUInteger;id;SEL;NSPoint;,callback_flags=none;none;none;struct;
       # long
       # long
       def _callback_character_index_for_point_(func)
-        JNI.__send__(:Java_org_eclipse_swt_internal_cocoa_OS_CALLBACK_1characterIndexForPoint_1, JNI.env, self.jni_id, func.to_int)
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_cocoa_OS_CALLBACK_1characterIndexForPoint_1, JNI.env, self.jni_id, func.to_int)
       end
       
-      JNI.native_method :Java_org_eclipse_swt_internal_cocoa_OS_CALLBACK_1dragSelectionWithEvent_1offset_1slideBack_1, [:pointer, :long, :int32], :int32
+      JNI.load_native_method :Java_org_eclipse_swt_internal_cocoa_OS_CALLBACK_1dragSelectionWithEvent_1offset_1slideBack_1, [:pointer, :long, :int32], :int32
       typesig { [::Java::Int] }
       # @method callback_types=BOOL;id;SEL;NSEvent*;NSSize;BOOL;,callback_flags=none;none;none;none;struct;none;
       # long
       # long
       def _callback_drag_selection_with_event_offset_slide_back_(func)
-        JNI.__send__(:Java_org_eclipse_swt_internal_cocoa_OS_CALLBACK_1dragSelectionWithEvent_1offset_1slideBack_1, JNI.env, self.jni_id, func.to_int)
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_cocoa_OS_CALLBACK_1dragSelectionWithEvent_1offset_1slideBack_1, JNI.env, self.jni_id, func.to_int)
       end
       
-      JNI.native_method :Java_org_eclipse_swt_internal_cocoa_OS_CALLBACK_1draggedImage_1beganAt_1, [:pointer, :long, :int32], :int32
+      JNI.load_native_method :Java_org_eclipse_swt_internal_cocoa_OS_CALLBACK_1draggedImage_1beganAt_1, [:pointer, :long, :int32], :int32
       typesig { [::Java::Int] }
       # @method callback_types=void;id;SEL;NSImage*;NSPoint;,callback_flags=none;none;none;none;struct;
       # long
       # long
       def _callback_dragged_image_began_at_(func)
-        JNI.__send__(:Java_org_eclipse_swt_internal_cocoa_OS_CALLBACK_1draggedImage_1beganAt_1, JNI.env, self.jni_id, func.to_int)
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_cocoa_OS_CALLBACK_1draggedImage_1beganAt_1, JNI.env, self.jni_id, func.to_int)
       end
       
-      JNI.native_method :Java_org_eclipse_swt_internal_cocoa_OS_CALLBACK_1draggedImage_1endedAt_1operation_1, [:pointer, :long, :int32], :int32
+      JNI.load_native_method :Java_org_eclipse_swt_internal_cocoa_OS_CALLBACK_1draggedImage_1endedAt_1operation_1, [:pointer, :long, :int32], :int32
       typesig { [::Java::Int] }
       # @method callback_types=void;id;SEL;NSImage*;NSPoint;NSDragOperation;,callback_flags=none;none;none;none;struct;none;
       # long
       # long
       def _callback_dragged_image_ended_at_operation_(func)
-        JNI.__send__(:Java_org_eclipse_swt_internal_cocoa_OS_CALLBACK_1draggedImage_1endedAt_1operation_1, JNI.env, self.jni_id, func.to_int)
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_cocoa_OS_CALLBACK_1draggedImage_1endedAt_1operation_1, JNI.env, self.jni_id, func.to_int)
       end
       
-      JNI.native_method :Java_org_eclipse_swt_internal_cocoa_OS_CALLBACK_1drawImage_1withFrame_1inView_1, [:pointer, :long, :int32], :int32
+      JNI.load_native_method :Java_org_eclipse_swt_internal_cocoa_OS_CALLBACK_1drawImage_1withFrame_1inView_1, [:pointer, :long, :int32], :int32
       typesig { [::Java::Int] }
       # @method callback_types=void;id;SEL;NSImage*;NSRect;NSView*;,callback_flags=none;none;none;none;struct;none;
       # long
       # long
       def _callback_draw_image_with_frame_in_view_(func)
-        JNI.__send__(:Java_org_eclipse_swt_internal_cocoa_OS_CALLBACK_1drawImage_1withFrame_1inView_1, JNI.env, self.jni_id, func.to_int)
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_cocoa_OS_CALLBACK_1drawImage_1withFrame_1inView_1, JNI.env, self.jni_id, func.to_int)
       end
       
-      JNI.native_method :Java_org_eclipse_swt_internal_cocoa_OS_CALLBACK_1drawInteriorWithFrame_1inView_1, [:pointer, :long, :int32], :int32
+      JNI.load_native_method :Java_org_eclipse_swt_internal_cocoa_OS_CALLBACK_1drawInteriorWithFrame_1inView_1, [:pointer, :long, :int32], :int32
       typesig { [::Java::Int] }
       # @method callback_types=void;id;SEL;NSRect;NSView*;,callback_flags=none;none;none;struct;none;
       # long
       # long
       def _callback_draw_interior_with_frame_in_view_(func)
-        JNI.__send__(:Java_org_eclipse_swt_internal_cocoa_OS_CALLBACK_1drawInteriorWithFrame_1inView_1, JNI.env, self.jni_id, func.to_int)
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_cocoa_OS_CALLBACK_1drawInteriorWithFrame_1inView_1, JNI.env, self.jni_id, func.to_int)
       end
       
-      JNI.native_method :Java_org_eclipse_swt_internal_cocoa_OS_CALLBACK_1drawRect_1, [:pointer, :long, :int32], :int32
+      JNI.load_native_method :Java_org_eclipse_swt_internal_cocoa_OS_CALLBACK_1drawRect_1, [:pointer, :long, :int32], :int32
       typesig { [::Java::Int] }
       # @method callback_types=void;id;SEL;NSRect;,callback_flags=none;none;none;struct;
       # long
       # long
       def _callback_draw_rect_(func)
-        JNI.__send__(:Java_org_eclipse_swt_internal_cocoa_OS_CALLBACK_1drawRect_1, JNI.env, self.jni_id, func.to_int)
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_cocoa_OS_CALLBACK_1drawRect_1, JNI.env, self.jni_id, func.to_int)
       end
       
-      JNI.native_method :Java_org_eclipse_swt_internal_cocoa_OS_CALLBACK_1drawWithExpansionFrame_1inView_1, [:pointer, :long, :int32], :int32
+      JNI.load_native_method :Java_org_eclipse_swt_internal_cocoa_OS_CALLBACK_1drawWithExpansionFrame_1inView_1, [:pointer, :long, :int32], :int32
       typesig { [::Java::Int] }
       # @method callback_types=void;id;SEL;NSRect;NSView*;,callback_flags=none;none;none;struct;none;
       # long
       # long
       def _callback_draw_with_expansion_frame_in_view_(func)
-        JNI.__send__(:Java_org_eclipse_swt_internal_cocoa_OS_CALLBACK_1drawWithExpansionFrame_1inView_1, JNI.env, self.jni_id, func.to_int)
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_cocoa_OS_CALLBACK_1drawWithExpansionFrame_1inView_1, JNI.env, self.jni_id, func.to_int)
       end
       
-      JNI.native_method :Java_org_eclipse_swt_internal_cocoa_OS_CALLBACK_1expansionFrameWithFrame_1inView_1, [:pointer, :long, :int32], :int32
+      JNI.load_native_method :Java_org_eclipse_swt_internal_cocoa_OS_CALLBACK_1expansionFrameWithFrame_1inView_1, [:pointer, :long, :int32], :int32
       typesig { [::Java::Int] }
       # @method callback_types=NSRect;id;SEL;NSRect;NSView*;,callback_flags=struct;none;none;struct;none;
       # long
       # long
       def _callback_expansion_frame_with_frame_in_view_(func)
-        JNI.__send__(:Java_org_eclipse_swt_internal_cocoa_OS_CALLBACK_1expansionFrameWithFrame_1inView_1, JNI.env, self.jni_id, func.to_int)
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_cocoa_OS_CALLBACK_1expansionFrameWithFrame_1inView_1, JNI.env, self.jni_id, func.to_int)
       end
       
-      JNI.native_method :Java_org_eclipse_swt_internal_cocoa_OS_CALLBACK_1firstRectForCharacterRange_1, [:pointer, :long, :int32], :int32
+      JNI.load_native_method :Java_org_eclipse_swt_internal_cocoa_OS_CALLBACK_1firstRectForCharacterRange_1, [:pointer, :long, :int32], :int32
       typesig { [::Java::Int] }
       # @method callback_types=NSRect;id;SEL;NSRange;,callback_flags=struct;none;none;struct;
       # long
       # long
       def _callback_first_rect_for_character_range_(func)
-        JNI.__send__(:Java_org_eclipse_swt_internal_cocoa_OS_CALLBACK_1firstRectForCharacterRange_1, JNI.env, self.jni_id, func.to_int)
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_cocoa_OS_CALLBACK_1firstRectForCharacterRange_1, JNI.env, self.jni_id, func.to_int)
       end
       
-      JNI.native_method :Java_org_eclipse_swt_internal_cocoa_OS_CALLBACK_1highlightSelectionInClipRect_1, [:pointer, :long, :int32], :int32
+      JNI.load_native_method :Java_org_eclipse_swt_internal_cocoa_OS_CALLBACK_1highlightSelectionInClipRect_1, [:pointer, :long, :int32], :int32
       typesig { [::Java::Int] }
       # @method callback_types=void;id;SEL;NSRect;,callback_flags=none;none;none;struct;
       # long
       # long
       def _callback_highlight_selection_in_clip_rect_(func)
-        JNI.__send__(:Java_org_eclipse_swt_internal_cocoa_OS_CALLBACK_1highlightSelectionInClipRect_1, JNI.env, self.jni_id, func.to_int)
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_cocoa_OS_CALLBACK_1highlightSelectionInClipRect_1, JNI.env, self.jni_id, func.to_int)
       end
       
-      JNI.native_method :Java_org_eclipse_swt_internal_cocoa_OS_CALLBACK_1hitTest_1, [:pointer, :long, :int32], :int32
+      JNI.load_native_method :Java_org_eclipse_swt_internal_cocoa_OS_CALLBACK_1hitTest_1, [:pointer, :long, :int32], :int32
       typesig { [::Java::Int] }
       # @method callback_types=NSView*;id;SEL;NSPoint;,callback_flags=none;none;none;struct;
       # long
       # long
       def _callback_hit_test_(func)
-        JNI.__send__(:Java_org_eclipse_swt_internal_cocoa_OS_CALLBACK_1hitTest_1, JNI.env, self.jni_id, func.to_int)
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_cocoa_OS_CALLBACK_1hitTest_1, JNI.env, self.jni_id, func.to_int)
       end
       
-      JNI.native_method :Java_org_eclipse_swt_internal_cocoa_OS_CALLBACK_1hitTestForEvent_1inRect_1ofView_1, [:pointer, :long, :int32], :int32
+      JNI.load_native_method :Java_org_eclipse_swt_internal_cocoa_OS_CALLBACK_1hitTestForEvent_1inRect_1ofView_1, [:pointer, :long, :int32], :int32
       typesig { [::Java::Int] }
       # @method callback_types=NSUInteger;id;SEL;NSEvent*;NSRect;NSView*;,callback_flags=none;none;none;none;struct;none;
       # long
       # long
       def _callback_hit_test_for_event_in_rect_of_view_(func)
-        JNI.__send__(:Java_org_eclipse_swt_internal_cocoa_OS_CALLBACK_1hitTestForEvent_1inRect_1ofView_1, JNI.env, self.jni_id, func.to_int)
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_cocoa_OS_CALLBACK_1hitTestForEvent_1inRect_1ofView_1, JNI.env, self.jni_id, func.to_int)
       end
       
-      JNI.native_method :Java_org_eclipse_swt_internal_cocoa_OS_CALLBACK_1imageRectForBounds_1, [:pointer, :long, :int32], :int32
+      JNI.load_native_method :Java_org_eclipse_swt_internal_cocoa_OS_CALLBACK_1imageRectForBounds_1, [:pointer, :long, :int32], :int32
       typesig { [::Java::Int] }
       # @method callback_types=NSRect;id;SEL;NSRect;,callback_flags=struct;none;none;struct;
       # long
       # long
       def _callback_image_rect_for_bounds_(func)
-        JNI.__send__(:Java_org_eclipse_swt_internal_cocoa_OS_CALLBACK_1imageRectForBounds_1, JNI.env, self.jni_id, func.to_int)
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_cocoa_OS_CALLBACK_1imageRectForBounds_1, JNI.env, self.jni_id, func.to_int)
       end
       
-      JNI.native_method :Java_org_eclipse_swt_internal_cocoa_OS_CALLBACK_1markedRange, [:pointer, :long, :int32], :int32
+      JNI.load_native_method :Java_org_eclipse_swt_internal_cocoa_OS_CALLBACK_1markedRange, [:pointer, :long, :int32], :int32
       typesig { [::Java::Int] }
       # @method callback_types=NSRange;id;SEL;,callback_flags=struct;none;none;
       # long
       # long
       def _callback_marked_range(func)
-        JNI.__send__(:Java_org_eclipse_swt_internal_cocoa_OS_CALLBACK_1markedRange, JNI.env, self.jni_id, func.to_int)
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_cocoa_OS_CALLBACK_1markedRange, JNI.env, self.jni_id, func.to_int)
       end
       
-      JNI.native_method :Java_org_eclipse_swt_internal_cocoa_OS_CALLBACK_1selectedRange, [:pointer, :long, :int32], :int32
+      JNI.load_native_method :Java_org_eclipse_swt_internal_cocoa_OS_CALLBACK_1selectedRange, [:pointer, :long, :int32], :int32
       typesig { [::Java::Int] }
       # @method callback_types=NSRange;id;SEL;,callback_flags=struct;none;none;
       # long
       # long
       def _callback_selected_range(func)
-        JNI.__send__(:Java_org_eclipse_swt_internal_cocoa_OS_CALLBACK_1selectedRange, JNI.env, self.jni_id, func.to_int)
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_cocoa_OS_CALLBACK_1selectedRange, JNI.env, self.jni_id, func.to_int)
       end
       
-      JNI.native_method :Java_org_eclipse_swt_internal_cocoa_OS_CALLBACK_1setFrame_1, [:pointer, :long, :int32], :int32
+      JNI.load_native_method :Java_org_eclipse_swt_internal_cocoa_OS_CALLBACK_1setFrame_1, [:pointer, :long, :int32], :int32
       typesig { [::Java::Int] }
       # @method callback_types=void;id;SEL;NSRect;,callback_flags=none;none;none;struct;
       # long
       # long
       def _callback_set_frame_(func)
-        JNI.__send__(:Java_org_eclipse_swt_internal_cocoa_OS_CALLBACK_1setFrame_1, JNI.env, self.jni_id, func.to_int)
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_cocoa_OS_CALLBACK_1setFrame_1, JNI.env, self.jni_id, func.to_int)
       end
       
-      JNI.native_method :Java_org_eclipse_swt_internal_cocoa_OS_CALLBACK_1setFrameOrigin_1, [:pointer, :long, :int32], :int32
+      JNI.load_native_method :Java_org_eclipse_swt_internal_cocoa_OS_CALLBACK_1setFrameOrigin_1, [:pointer, :long, :int32], :int32
       typesig { [::Java::Int] }
       # @method callback_types=void;id;SEL;NSPoint;,callback_flags=none;none;none;struct;
       # long
       # long
       def _callback_set_frame_origin_(func)
-        JNI.__send__(:Java_org_eclipse_swt_internal_cocoa_OS_CALLBACK_1setFrameOrigin_1, JNI.env, self.jni_id, func.to_int)
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_cocoa_OS_CALLBACK_1setFrameOrigin_1, JNI.env, self.jni_id, func.to_int)
       end
       
-      JNI.native_method :Java_org_eclipse_swt_internal_cocoa_OS_CALLBACK_1setFrameSize_1, [:pointer, :long, :int32], :int32
+      JNI.load_native_method :Java_org_eclipse_swt_internal_cocoa_OS_CALLBACK_1setFrameSize_1, [:pointer, :long, :int32], :int32
       typesig { [::Java::Int] }
       # @method callback_types=void;id;SEL;NSSize;,callback_flags=none;none;none;struct;
       # long
       # long
       def _callback_set_frame_size_(func)
-        JNI.__send__(:Java_org_eclipse_swt_internal_cocoa_OS_CALLBACK_1setFrameSize_1, JNI.env, self.jni_id, func.to_int)
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_cocoa_OS_CALLBACK_1setFrameSize_1, JNI.env, self.jni_id, func.to_int)
       end
       
-      JNI.native_method :Java_org_eclipse_swt_internal_cocoa_OS_CALLBACK_1setMarkedText_1selectedRange_1, [:pointer, :long, :int32], :int32
+      JNI.load_native_method :Java_org_eclipse_swt_internal_cocoa_OS_CALLBACK_1setMarkedText_1selectedRange_1, [:pointer, :long, :int32], :int32
       typesig { [::Java::Int] }
       # @method callback_types=void;id;SEL;id;NSRange;,callback_flags=none;none;none;none;struct;
       # long
       # long
       def _callback_set_marked_text_selected_range_(func)
-        JNI.__send__(:Java_org_eclipse_swt_internal_cocoa_OS_CALLBACK_1setMarkedText_1selectedRange_1, JNI.env, self.jni_id, func.to_int)
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_cocoa_OS_CALLBACK_1setMarkedText_1selectedRange_1, JNI.env, self.jni_id, func.to_int)
       end
       
-      JNI.native_method :Java_org_eclipse_swt_internal_cocoa_OS_CALLBACK_1setNeedsDisplayInRect_1, [:pointer, :long, :int32], :int32
+      JNI.load_native_method :Java_org_eclipse_swt_internal_cocoa_OS_CALLBACK_1setNeedsDisplayInRect_1, [:pointer, :long, :int32], :int32
       typesig { [::Java::Int] }
       # @method callback_types=void;id;SEL;NSRect;,callback_flags=none;none;none;struct;
       # long
       # long
       def _callback_set_needs_display_in_rect_(func)
-        JNI.__send__(:Java_org_eclipse_swt_internal_cocoa_OS_CALLBACK_1setNeedsDisplayInRect_1, JNI.env, self.jni_id, func.to_int)
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_cocoa_OS_CALLBACK_1setNeedsDisplayInRect_1, JNI.env, self.jni_id, func.to_int)
       end
       
-      JNI.native_method :Java_org_eclipse_swt_internal_cocoa_OS_CALLBACK_1shouldChangeTextInRange_1replacementString_1, [:pointer, :long, :int32], :int32
+      JNI.load_native_method :Java_org_eclipse_swt_internal_cocoa_OS_CALLBACK_1shouldChangeTextInRange_1replacementString_1, [:pointer, :long, :int32], :int32
       typesig { [::Java::Int] }
       # @method callback_types=BOOL;id;SEL;NSRange;NSString*;,callback_flags=none;none;none;struct;none;
       # long
       # long
       def _callback_should_change_text_in_range_replacement_string_(func)
-        JNI.__send__(:Java_org_eclipse_swt_internal_cocoa_OS_CALLBACK_1shouldChangeTextInRange_1replacementString_1, JNI.env, self.jni_id, func.to_int)
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_cocoa_OS_CALLBACK_1shouldChangeTextInRange_1replacementString_1, JNI.env, self.jni_id, func.to_int)
       end
       
-      JNI.native_method :Java_org_eclipse_swt_internal_cocoa_OS_CALLBACK_1textView_1willChangeSelectionFromCharacterRange_1toCharacterRange_1, [:pointer, :long, :int32], :int32
+      JNI.load_native_method :Java_org_eclipse_swt_internal_cocoa_OS_CALLBACK_1textView_1willChangeSelectionFromCharacterRange_1toCharacterRange_1, [:pointer, :long, :int32], :int32
       typesig { [::Java::Int] }
       # @method callback_types=NSRange;id;SEL;NSTextView*;NSRange;NSRange;,callback_flags=struct;none;none;none;struct;struct;
       # long
       # long
       def _callback_text_view_will_change_selection_from_character_range_to_character_range_(func)
-        JNI.__send__(:Java_org_eclipse_swt_internal_cocoa_OS_CALLBACK_1textView_1willChangeSelectionFromCharacterRange_1toCharacterRange_1, JNI.env, self.jni_id, func.to_int)
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_cocoa_OS_CALLBACK_1textView_1willChangeSelectionFromCharacterRange_1toCharacterRange_1, JNI.env, self.jni_id, func.to_int)
       end
       
-      JNI.native_method :Java_org_eclipse_swt_internal_cocoa_OS_CALLBACK_1titleRectForBounds_1, [:pointer, :long, :int32], :int32
+      JNI.load_native_method :Java_org_eclipse_swt_internal_cocoa_OS_CALLBACK_1titleRectForBounds_1, [:pointer, :long, :int32], :int32
       typesig { [::Java::Int] }
       # @method callback_types=NSRect;id;SEL;NSRect;,callback_flags=struct;none;none;struct;
       # long
       # long
       def _callback_title_rect_for_bounds_(func)
-        JNI.__send__(:Java_org_eclipse_swt_internal_cocoa_OS_CALLBACK_1titleRectForBounds_1, JNI.env, self.jni_id, func.to_int)
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_cocoa_OS_CALLBACK_1titleRectForBounds_1, JNI.env, self.jni_id, func.to_int)
       end
       
-      JNI.native_method :Java_org_eclipse_swt_internal_cocoa_OS_CALLBACK_1view_1stringForToolTip_1point_1userData_1, [:pointer, :long, :int32], :int32
+      JNI.load_native_method :Java_org_eclipse_swt_internal_cocoa_OS_CALLBACK_1view_1stringForToolTip_1point_1userData_1, [:pointer, :long, :int32], :int32
       typesig { [::Java::Int] }
       # @method callback_types=NSString*;id;SEL;NSView*;NSToolTipTag;NSPoint;void*;,callback_flags=none;none;none;none;none;struct;none;
       # long
       # long
       def _callback_view_string_for_tool_tip_point_user_data_(func)
-        JNI.__send__(:Java_org_eclipse_swt_internal_cocoa_OS_CALLBACK_1view_1stringForToolTip_1point_1userData_1, JNI.env, self.jni_id, func.to_int)
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_cocoa_OS_CALLBACK_1view_1stringForToolTip_1point_1userData_1, JNI.env, self.jni_id, func.to_int)
       end
       
-      JNI.native_method :Java_org_eclipse_swt_internal_cocoa_OS_CALLBACK_1webView_1setFrame_1, [:pointer, :long, :int32], :int32
+      JNI.load_native_method :Java_org_eclipse_swt_internal_cocoa_OS_CALLBACK_1webView_1setFrame_1, [:pointer, :long, :int32], :int32
       typesig { [::Java::Int] }
       # @method callback_types=void;id;SEL;WebView*;NSRect;,callback_flags=none;none;none;none;struct;
       # long
       # long
       def _callback_web_view_set_frame_(func)
-        JNI.__send__(:Java_org_eclipse_swt_internal_cocoa_OS_CALLBACK_1webView_1setFrame_1, JNI.env, self.jni_id, func.to_int)
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_cocoa_OS_CALLBACK_1webView_1setFrame_1, JNI.env, self.jni_id, func.to_int)
       end
       
       # Classes
@@ -7281,1611 +7281,1611 @@ module Org::Eclipse::Swt::Internal::Cocoa
       const_set_lazy(:NSUTF8StringEncoding) { 4 }
       const_attr_reader  :NSUTF8StringEncoding
       
-      JNI.native_method :Java_org_eclipse_swt_internal_cocoa_OS_NSAccessibilityButtonRole, [:pointer, :long], :int32
+      JNI.load_native_method :Java_org_eclipse_swt_internal_cocoa_OS_NSAccessibilityButtonRole, [:pointer, :long], :int32
       typesig { [] }
       # Globals
       # @method flags=const
       # long
       def _nsaccessibility_button_role
-        JNI.__send__(:Java_org_eclipse_swt_internal_cocoa_OS_NSAccessibilityButtonRole, JNI.env, self.jni_id)
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_cocoa_OS_NSAccessibilityButtonRole, JNI.env, self.jni_id)
       end
       
       const_set_lazy(:NSAccessibilityButtonRole) { NSString.new(_nsaccessibility_button_role) }
       const_attr_reader  :NSAccessibilityButtonRole
       
-      JNI.native_method :Java_org_eclipse_swt_internal_cocoa_OS_NSAccessibilityCheckBoxRole, [:pointer, :long], :int32
+      JNI.load_native_method :Java_org_eclipse_swt_internal_cocoa_OS_NSAccessibilityCheckBoxRole, [:pointer, :long], :int32
       typesig { [] }
       # @method flags=const
       # long
       def _nsaccessibility_check_box_role
-        JNI.__send__(:Java_org_eclipse_swt_internal_cocoa_OS_NSAccessibilityCheckBoxRole, JNI.env, self.jni_id)
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_cocoa_OS_NSAccessibilityCheckBoxRole, JNI.env, self.jni_id)
       end
       
       const_set_lazy(:NSAccessibilityCheckBoxRole) { NSString.new(_nsaccessibility_check_box_role) }
       const_attr_reader  :NSAccessibilityCheckBoxRole
       
-      JNI.native_method :Java_org_eclipse_swt_internal_cocoa_OS_NSAccessibilityChildrenAttribute, [:pointer, :long], :int32
+      JNI.load_native_method :Java_org_eclipse_swt_internal_cocoa_OS_NSAccessibilityChildrenAttribute, [:pointer, :long], :int32
       typesig { [] }
       # @method flags=const
       # long
       def _nsaccessibility_children_attribute
-        JNI.__send__(:Java_org_eclipse_swt_internal_cocoa_OS_NSAccessibilityChildrenAttribute, JNI.env, self.jni_id)
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_cocoa_OS_NSAccessibilityChildrenAttribute, JNI.env, self.jni_id)
       end
       
       const_set_lazy(:NSAccessibilityChildrenAttribute) { NSString.new(_nsaccessibility_children_attribute) }
       const_attr_reader  :NSAccessibilityChildrenAttribute
       
-      JNI.native_method :Java_org_eclipse_swt_internal_cocoa_OS_NSAccessibilityColumnRole, [:pointer, :long], :int32
+      JNI.load_native_method :Java_org_eclipse_swt_internal_cocoa_OS_NSAccessibilityColumnRole, [:pointer, :long], :int32
       typesig { [] }
       # @method flags=const
       # long
       def _nsaccessibility_column_role
-        JNI.__send__(:Java_org_eclipse_swt_internal_cocoa_OS_NSAccessibilityColumnRole, JNI.env, self.jni_id)
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_cocoa_OS_NSAccessibilityColumnRole, JNI.env, self.jni_id)
       end
       
       const_set_lazy(:NSAccessibilityColumnRole) { NSString.new(_nsaccessibility_column_role) }
       const_attr_reader  :NSAccessibilityColumnRole
       
-      JNI.native_method :Java_org_eclipse_swt_internal_cocoa_OS_NSAccessibilityComboBoxRole, [:pointer, :long], :int32
+      JNI.load_native_method :Java_org_eclipse_swt_internal_cocoa_OS_NSAccessibilityComboBoxRole, [:pointer, :long], :int32
       typesig { [] }
       # @method flags=const
       # long
       def _nsaccessibility_combo_box_role
-        JNI.__send__(:Java_org_eclipse_swt_internal_cocoa_OS_NSAccessibilityComboBoxRole, JNI.env, self.jni_id)
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_cocoa_OS_NSAccessibilityComboBoxRole, JNI.env, self.jni_id)
       end
       
       const_set_lazy(:NSAccessibilityComboBoxRole) { NSString.new(_nsaccessibility_combo_box_role) }
       const_attr_reader  :NSAccessibilityComboBoxRole
       
-      JNI.native_method :Java_org_eclipse_swt_internal_cocoa_OS_NSAccessibilityConfirmAction, [:pointer, :long], :int32
+      JNI.load_native_method :Java_org_eclipse_swt_internal_cocoa_OS_NSAccessibilityConfirmAction, [:pointer, :long], :int32
       typesig { [] }
       # @method flags=const
       # long
       def _nsaccessibility_confirm_action
-        JNI.__send__(:Java_org_eclipse_swt_internal_cocoa_OS_NSAccessibilityConfirmAction, JNI.env, self.jni_id)
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_cocoa_OS_NSAccessibilityConfirmAction, JNI.env, self.jni_id)
       end
       
       const_set_lazy(:NSAccessibilityConfirmAction) { NSString.new(_nsaccessibility_confirm_action) }
       const_attr_reader  :NSAccessibilityConfirmAction
       
-      JNI.native_method :Java_org_eclipse_swt_internal_cocoa_OS_NSAccessibilityContentsAttribute, [:pointer, :long], :int32
+      JNI.load_native_method :Java_org_eclipse_swt_internal_cocoa_OS_NSAccessibilityContentsAttribute, [:pointer, :long], :int32
       typesig { [] }
       # @method flags=const
       # long
       def _nsaccessibility_contents_attribute
-        JNI.__send__(:Java_org_eclipse_swt_internal_cocoa_OS_NSAccessibilityContentsAttribute, JNI.env, self.jni_id)
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_cocoa_OS_NSAccessibilityContentsAttribute, JNI.env, self.jni_id)
       end
       
       const_set_lazy(:NSAccessibilityContentsAttribute) { NSString.new(_nsaccessibility_contents_attribute) }
       const_attr_reader  :NSAccessibilityContentsAttribute
       
-      JNI.native_method :Java_org_eclipse_swt_internal_cocoa_OS_NSAccessibilityDescriptionAttribute, [:pointer, :long], :int32
+      JNI.load_native_method :Java_org_eclipse_swt_internal_cocoa_OS_NSAccessibilityDescriptionAttribute, [:pointer, :long], :int32
       typesig { [] }
       # @method flags=const
       # long
       def _nsaccessibility_description_attribute
-        JNI.__send__(:Java_org_eclipse_swt_internal_cocoa_OS_NSAccessibilityDescriptionAttribute, JNI.env, self.jni_id)
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_cocoa_OS_NSAccessibilityDescriptionAttribute, JNI.env, self.jni_id)
       end
       
       const_set_lazy(:NSAccessibilityDescriptionAttribute) { NSString.new(_nsaccessibility_description_attribute) }
       const_attr_reader  :NSAccessibilityDescriptionAttribute
       
-      JNI.native_method :Java_org_eclipse_swt_internal_cocoa_OS_NSAccessibilityDialogSubrole, [:pointer, :long], :int32
+      JNI.load_native_method :Java_org_eclipse_swt_internal_cocoa_OS_NSAccessibilityDialogSubrole, [:pointer, :long], :int32
       typesig { [] }
       # @method flags=const
       # long
       def _nsaccessibility_dialog_subrole
-        JNI.__send__(:Java_org_eclipse_swt_internal_cocoa_OS_NSAccessibilityDialogSubrole, JNI.env, self.jni_id)
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_cocoa_OS_NSAccessibilityDialogSubrole, JNI.env, self.jni_id)
       end
       
       const_set_lazy(:NSAccessibilityDialogSubrole) { NSString.new(_nsaccessibility_dialog_subrole) }
       const_attr_reader  :NSAccessibilityDialogSubrole
       
-      JNI.native_method :Java_org_eclipse_swt_internal_cocoa_OS_NSAccessibilityEnabledAttribute, [:pointer, :long], :int32
+      JNI.load_native_method :Java_org_eclipse_swt_internal_cocoa_OS_NSAccessibilityEnabledAttribute, [:pointer, :long], :int32
       typesig { [] }
       # @method flags=const
       # long
       def _nsaccessibility_enabled_attribute
-        JNI.__send__(:Java_org_eclipse_swt_internal_cocoa_OS_NSAccessibilityEnabledAttribute, JNI.env, self.jni_id)
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_cocoa_OS_NSAccessibilityEnabledAttribute, JNI.env, self.jni_id)
       end
       
       const_set_lazy(:NSAccessibilityEnabledAttribute) { NSString.new(_nsaccessibility_enabled_attribute) }
       const_attr_reader  :NSAccessibilityEnabledAttribute
       
-      JNI.native_method :Java_org_eclipse_swt_internal_cocoa_OS_NSAccessibilityExpandedAttribute, [:pointer, :long], :int32
+      JNI.load_native_method :Java_org_eclipse_swt_internal_cocoa_OS_NSAccessibilityExpandedAttribute, [:pointer, :long], :int32
       typesig { [] }
       # @method flags=const
       # long
       def _nsaccessibility_expanded_attribute
-        JNI.__send__(:Java_org_eclipse_swt_internal_cocoa_OS_NSAccessibilityExpandedAttribute, JNI.env, self.jni_id)
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_cocoa_OS_NSAccessibilityExpandedAttribute, JNI.env, self.jni_id)
       end
       
       const_set_lazy(:NSAccessibilityExpandedAttribute) { NSString.new(_nsaccessibility_expanded_attribute) }
       const_attr_reader  :NSAccessibilityExpandedAttribute
       
-      JNI.native_method :Java_org_eclipse_swt_internal_cocoa_OS_NSAccessibilityFloatingWindowSubrole, [:pointer, :long], :int32
+      JNI.load_native_method :Java_org_eclipse_swt_internal_cocoa_OS_NSAccessibilityFloatingWindowSubrole, [:pointer, :long], :int32
       typesig { [] }
       # @method flags=const
       # long
       def _nsaccessibility_floating_window_subrole
-        JNI.__send__(:Java_org_eclipse_swt_internal_cocoa_OS_NSAccessibilityFloatingWindowSubrole, JNI.env, self.jni_id)
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_cocoa_OS_NSAccessibilityFloatingWindowSubrole, JNI.env, self.jni_id)
       end
       
       const_set_lazy(:NSAccessibilityFloatingWindowSubrole) { NSString.new(_nsaccessibility_floating_window_subrole) }
       const_attr_reader  :NSAccessibilityFloatingWindowSubrole
       
-      JNI.native_method :Java_org_eclipse_swt_internal_cocoa_OS_NSAccessibilityFocusedAttribute, [:pointer, :long], :int32
+      JNI.load_native_method :Java_org_eclipse_swt_internal_cocoa_OS_NSAccessibilityFocusedAttribute, [:pointer, :long], :int32
       typesig { [] }
       # @method flags=const
       # long
       def _nsaccessibility_focused_attribute
-        JNI.__send__(:Java_org_eclipse_swt_internal_cocoa_OS_NSAccessibilityFocusedAttribute, JNI.env, self.jni_id)
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_cocoa_OS_NSAccessibilityFocusedAttribute, JNI.env, self.jni_id)
       end
       
       const_set_lazy(:NSAccessibilityFocusedAttribute) { NSString.new(_nsaccessibility_focused_attribute) }
       const_attr_reader  :NSAccessibilityFocusedAttribute
       
-      JNI.native_method :Java_org_eclipse_swt_internal_cocoa_OS_NSAccessibilityFocusedUIElementChangedNotification, [:pointer, :long], :int32
+      JNI.load_native_method :Java_org_eclipse_swt_internal_cocoa_OS_NSAccessibilityFocusedUIElementChangedNotification, [:pointer, :long], :int32
       typesig { [] }
       # @method flags=const
       # long
       def _nsaccessibility_focused_uielement_changed_notification
-        JNI.__send__(:Java_org_eclipse_swt_internal_cocoa_OS_NSAccessibilityFocusedUIElementChangedNotification, JNI.env, self.jni_id)
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_cocoa_OS_NSAccessibilityFocusedUIElementChangedNotification, JNI.env, self.jni_id)
       end
       
       const_set_lazy(:NSAccessibilityFocusedUIElementChangedNotification) { NSString.new(_nsaccessibility_focused_uielement_changed_notification) }
       const_attr_reader  :NSAccessibilityFocusedUIElementChangedNotification
       
-      JNI.native_method :Java_org_eclipse_swt_internal_cocoa_OS_NSAccessibilityGridRole, [:pointer, :long], :int32
+      JNI.load_native_method :Java_org_eclipse_swt_internal_cocoa_OS_NSAccessibilityGridRole, [:pointer, :long], :int32
       typesig { [] }
       # @method flags=const
       # long
       def _nsaccessibility_grid_role
-        JNI.__send__(:Java_org_eclipse_swt_internal_cocoa_OS_NSAccessibilityGridRole, JNI.env, self.jni_id)
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_cocoa_OS_NSAccessibilityGridRole, JNI.env, self.jni_id)
       end
       
       const_set_lazy(:NSAccessibilityGridRole) { NSString.new(_nsaccessibility_grid_role) }
       const_attr_reader  :NSAccessibilityGridRole
       
-      JNI.native_method :Java_org_eclipse_swt_internal_cocoa_OS_NSAccessibilityGroupRole, [:pointer, :long], :int32
+      JNI.load_native_method :Java_org_eclipse_swt_internal_cocoa_OS_NSAccessibilityGroupRole, [:pointer, :long], :int32
       typesig { [] }
       # @method flags=const
       # long
       def _nsaccessibility_group_role
-        JNI.__send__(:Java_org_eclipse_swt_internal_cocoa_OS_NSAccessibilityGroupRole, JNI.env, self.jni_id)
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_cocoa_OS_NSAccessibilityGroupRole, JNI.env, self.jni_id)
       end
       
       const_set_lazy(:NSAccessibilityGroupRole) { NSString.new(_nsaccessibility_group_role) }
       const_attr_reader  :NSAccessibilityGroupRole
       
-      JNI.native_method :Java_org_eclipse_swt_internal_cocoa_OS_NSAccessibilityHelpAttribute, [:pointer, :long], :int32
+      JNI.load_native_method :Java_org_eclipse_swt_internal_cocoa_OS_NSAccessibilityHelpAttribute, [:pointer, :long], :int32
       typesig { [] }
       # @method flags=const
       # long
       def _nsaccessibility_help_attribute
-        JNI.__send__(:Java_org_eclipse_swt_internal_cocoa_OS_NSAccessibilityHelpAttribute, JNI.env, self.jni_id)
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_cocoa_OS_NSAccessibilityHelpAttribute, JNI.env, self.jni_id)
       end
       
       const_set_lazy(:NSAccessibilityHelpAttribute) { NSString.new(_nsaccessibility_help_attribute) }
       const_attr_reader  :NSAccessibilityHelpAttribute
       
-      JNI.native_method :Java_org_eclipse_swt_internal_cocoa_OS_NSAccessibilityHelpTagRole, [:pointer, :long], :int32
+      JNI.load_native_method :Java_org_eclipse_swt_internal_cocoa_OS_NSAccessibilityHelpTagRole, [:pointer, :long], :int32
       typesig { [] }
       # @method flags=const
       # long
       def _nsaccessibility_help_tag_role
-        JNI.__send__(:Java_org_eclipse_swt_internal_cocoa_OS_NSAccessibilityHelpTagRole, JNI.env, self.jni_id)
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_cocoa_OS_NSAccessibilityHelpTagRole, JNI.env, self.jni_id)
       end
       
       const_set_lazy(:NSAccessibilityHelpTagRole) { NSString.new(_nsaccessibility_help_tag_role) }
       const_attr_reader  :NSAccessibilityHelpTagRole
       
-      JNI.native_method :Java_org_eclipse_swt_internal_cocoa_OS_NSAccessibilityHorizontalOrientationValue, [:pointer, :long], :int32
+      JNI.load_native_method :Java_org_eclipse_swt_internal_cocoa_OS_NSAccessibilityHorizontalOrientationValue, [:pointer, :long], :int32
       typesig { [] }
       # @method flags=const
       # long
       def _nsaccessibility_horizontal_orientation_value
-        JNI.__send__(:Java_org_eclipse_swt_internal_cocoa_OS_NSAccessibilityHorizontalOrientationValue, JNI.env, self.jni_id)
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_cocoa_OS_NSAccessibilityHorizontalOrientationValue, JNI.env, self.jni_id)
       end
       
       const_set_lazy(:NSAccessibilityHorizontalOrientationValue) { NSString.new(_nsaccessibility_horizontal_orientation_value) }
       const_attr_reader  :NSAccessibilityHorizontalOrientationValue
       
-      JNI.native_method :Java_org_eclipse_swt_internal_cocoa_OS_NSAccessibilityHorizontalScrollBarAttribute, [:pointer, :long], :int32
+      JNI.load_native_method :Java_org_eclipse_swt_internal_cocoa_OS_NSAccessibilityHorizontalScrollBarAttribute, [:pointer, :long], :int32
       typesig { [] }
       # @method flags=const
       # long
       def _nsaccessibility_horizontal_scroll_bar_attribute
-        JNI.__send__(:Java_org_eclipse_swt_internal_cocoa_OS_NSAccessibilityHorizontalScrollBarAttribute, JNI.env, self.jni_id)
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_cocoa_OS_NSAccessibilityHorizontalScrollBarAttribute, JNI.env, self.jni_id)
       end
       
       const_set_lazy(:NSAccessibilityHorizontalScrollBarAttribute) { NSString.new(_nsaccessibility_horizontal_scroll_bar_attribute) }
       const_attr_reader  :NSAccessibilityHorizontalScrollBarAttribute
       
-      JNI.native_method :Java_org_eclipse_swt_internal_cocoa_OS_NSAccessibilityImageRole, [:pointer, :long], :int32
+      JNI.load_native_method :Java_org_eclipse_swt_internal_cocoa_OS_NSAccessibilityImageRole, [:pointer, :long], :int32
       typesig { [] }
       # @method flags=const
       # long
       def _nsaccessibility_image_role
-        JNI.__send__(:Java_org_eclipse_swt_internal_cocoa_OS_NSAccessibilityImageRole, JNI.env, self.jni_id)
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_cocoa_OS_NSAccessibilityImageRole, JNI.env, self.jni_id)
       end
       
       const_set_lazy(:NSAccessibilityImageRole) { NSString.new(_nsaccessibility_image_role) }
       const_attr_reader  :NSAccessibilityImageRole
       
-      JNI.native_method :Java_org_eclipse_swt_internal_cocoa_OS_NSAccessibilityIncrementorRole, [:pointer, :long], :int32
+      JNI.load_native_method :Java_org_eclipse_swt_internal_cocoa_OS_NSAccessibilityIncrementorRole, [:pointer, :long], :int32
       typesig { [] }
       # @method flags=const
       # long
       def _nsaccessibility_incrementor_role
-        JNI.__send__(:Java_org_eclipse_swt_internal_cocoa_OS_NSAccessibilityIncrementorRole, JNI.env, self.jni_id)
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_cocoa_OS_NSAccessibilityIncrementorRole, JNI.env, self.jni_id)
       end
       
       const_set_lazy(:NSAccessibilityIncrementorRole) { NSString.new(_nsaccessibility_incrementor_role) }
       const_attr_reader  :NSAccessibilityIncrementorRole
       
-      JNI.native_method :Java_org_eclipse_swt_internal_cocoa_OS_NSAccessibilityInsertionPointLineNumberAttribute, [:pointer, :long], :int32
+      JNI.load_native_method :Java_org_eclipse_swt_internal_cocoa_OS_NSAccessibilityInsertionPointLineNumberAttribute, [:pointer, :long], :int32
       typesig { [] }
       # @method flags=const
       # long
       def _nsaccessibility_insertion_point_line_number_attribute
-        JNI.__send__(:Java_org_eclipse_swt_internal_cocoa_OS_NSAccessibilityInsertionPointLineNumberAttribute, JNI.env, self.jni_id)
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_cocoa_OS_NSAccessibilityInsertionPointLineNumberAttribute, JNI.env, self.jni_id)
       end
       
       const_set_lazy(:NSAccessibilityInsertionPointLineNumberAttribute) { NSString.new(_nsaccessibility_insertion_point_line_number_attribute) }
       const_attr_reader  :NSAccessibilityInsertionPointLineNumberAttribute
       
-      JNI.native_method :Java_org_eclipse_swt_internal_cocoa_OS_NSAccessibilityLabelValueAttribute, [:pointer, :long], :int32
+      JNI.load_native_method :Java_org_eclipse_swt_internal_cocoa_OS_NSAccessibilityLabelValueAttribute, [:pointer, :long], :int32
       typesig { [] }
       # @method flags=const
       # long
       def _nsaccessibility_label_value_attribute
-        JNI.__send__(:Java_org_eclipse_swt_internal_cocoa_OS_NSAccessibilityLabelValueAttribute, JNI.env, self.jni_id)
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_cocoa_OS_NSAccessibilityLabelValueAttribute, JNI.env, self.jni_id)
       end
       
       const_set_lazy(:NSAccessibilityLabelValueAttribute) { NSString.new(_nsaccessibility_label_value_attribute) }
       const_attr_reader  :NSAccessibilityLabelValueAttribute
       
-      JNI.native_method :Java_org_eclipse_swt_internal_cocoa_OS_NSAccessibilityLineForIndexParameterizedAttribute, [:pointer, :long], :int32
+      JNI.load_native_method :Java_org_eclipse_swt_internal_cocoa_OS_NSAccessibilityLineForIndexParameterizedAttribute, [:pointer, :long], :int32
       typesig { [] }
       # @method flags=const
       # long
       def _nsaccessibility_line_for_index_parameterized_attribute
-        JNI.__send__(:Java_org_eclipse_swt_internal_cocoa_OS_NSAccessibilityLineForIndexParameterizedAttribute, JNI.env, self.jni_id)
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_cocoa_OS_NSAccessibilityLineForIndexParameterizedAttribute, JNI.env, self.jni_id)
       end
       
       const_set_lazy(:NSAccessibilityLineForIndexParameterizedAttribute) { NSString.new(_nsaccessibility_line_for_index_parameterized_attribute) }
       const_attr_reader  :NSAccessibilityLineForIndexParameterizedAttribute
       
-      JNI.native_method :Java_org_eclipse_swt_internal_cocoa_OS_NSAccessibilityLinkRole, [:pointer, :long], :int32
+      JNI.load_native_method :Java_org_eclipse_swt_internal_cocoa_OS_NSAccessibilityLinkRole, [:pointer, :long], :int32
       typesig { [] }
       # @method flags=const
       # long
       def _nsaccessibility_link_role
-        JNI.__send__(:Java_org_eclipse_swt_internal_cocoa_OS_NSAccessibilityLinkRole, JNI.env, self.jni_id)
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_cocoa_OS_NSAccessibilityLinkRole, JNI.env, self.jni_id)
       end
       
       const_set_lazy(:NSAccessibilityLinkRole) { NSString.new(_nsaccessibility_link_role) }
       const_attr_reader  :NSAccessibilityLinkRole
       
-      JNI.native_method :Java_org_eclipse_swt_internal_cocoa_OS_NSAccessibilityLinkTextAttribute, [:pointer, :long], :int32
+      JNI.load_native_method :Java_org_eclipse_swt_internal_cocoa_OS_NSAccessibilityLinkTextAttribute, [:pointer, :long], :int32
       typesig { [] }
       # @method flags=const
       # long
       def _nsaccessibility_link_text_attribute
-        JNI.__send__(:Java_org_eclipse_swt_internal_cocoa_OS_NSAccessibilityLinkTextAttribute, JNI.env, self.jni_id)
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_cocoa_OS_NSAccessibilityLinkTextAttribute, JNI.env, self.jni_id)
       end
       
       const_set_lazy(:NSAccessibilityLinkTextAttribute) { NSString.new(_nsaccessibility_link_text_attribute) }
       const_attr_reader  :NSAccessibilityLinkTextAttribute
       
-      JNI.native_method :Java_org_eclipse_swt_internal_cocoa_OS_NSAccessibilityListRole, [:pointer, :long], :int32
+      JNI.load_native_method :Java_org_eclipse_swt_internal_cocoa_OS_NSAccessibilityListRole, [:pointer, :long], :int32
       typesig { [] }
       # @method flags=const
       # long
       def _nsaccessibility_list_role
-        JNI.__send__(:Java_org_eclipse_swt_internal_cocoa_OS_NSAccessibilityListRole, JNI.env, self.jni_id)
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_cocoa_OS_NSAccessibilityListRole, JNI.env, self.jni_id)
       end
       
       const_set_lazy(:NSAccessibilityListRole) { NSString.new(_nsaccessibility_list_role) }
       const_attr_reader  :NSAccessibilityListRole
       
-      JNI.native_method :Java_org_eclipse_swt_internal_cocoa_OS_NSAccessibilityMaxValueAttribute, [:pointer, :long], :int32
+      JNI.load_native_method :Java_org_eclipse_swt_internal_cocoa_OS_NSAccessibilityMaxValueAttribute, [:pointer, :long], :int32
       typesig { [] }
       # @method flags=const
       # long
       def _nsaccessibility_max_value_attribute
-        JNI.__send__(:Java_org_eclipse_swt_internal_cocoa_OS_NSAccessibilityMaxValueAttribute, JNI.env, self.jni_id)
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_cocoa_OS_NSAccessibilityMaxValueAttribute, JNI.env, self.jni_id)
       end
       
       const_set_lazy(:NSAccessibilityMaxValueAttribute) { NSString.new(_nsaccessibility_max_value_attribute) }
       const_attr_reader  :NSAccessibilityMaxValueAttribute
       
-      JNI.native_method :Java_org_eclipse_swt_internal_cocoa_OS_NSAccessibilityMenuBarRole, [:pointer, :long], :int32
+      JNI.load_native_method :Java_org_eclipse_swt_internal_cocoa_OS_NSAccessibilityMenuBarRole, [:pointer, :long], :int32
       typesig { [] }
       # @method flags=const
       # long
       def _nsaccessibility_menu_bar_role
-        JNI.__send__(:Java_org_eclipse_swt_internal_cocoa_OS_NSAccessibilityMenuBarRole, JNI.env, self.jni_id)
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_cocoa_OS_NSAccessibilityMenuBarRole, JNI.env, self.jni_id)
       end
       
       const_set_lazy(:NSAccessibilityMenuBarRole) { NSString.new(_nsaccessibility_menu_bar_role) }
       const_attr_reader  :NSAccessibilityMenuBarRole
       
-      JNI.native_method :Java_org_eclipse_swt_internal_cocoa_OS_NSAccessibilityMenuButtonRole, [:pointer, :long], :int32
+      JNI.load_native_method :Java_org_eclipse_swt_internal_cocoa_OS_NSAccessibilityMenuButtonRole, [:pointer, :long], :int32
       typesig { [] }
       # @method flags=const
       # long
       def _nsaccessibility_menu_button_role
-        JNI.__send__(:Java_org_eclipse_swt_internal_cocoa_OS_NSAccessibilityMenuButtonRole, JNI.env, self.jni_id)
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_cocoa_OS_NSAccessibilityMenuButtonRole, JNI.env, self.jni_id)
       end
       
       const_set_lazy(:NSAccessibilityMenuButtonRole) { NSString.new(_nsaccessibility_menu_button_role) }
       const_attr_reader  :NSAccessibilityMenuButtonRole
       
-      JNI.native_method :Java_org_eclipse_swt_internal_cocoa_OS_NSAccessibilityMenuItemRole, [:pointer, :long], :int32
+      JNI.load_native_method :Java_org_eclipse_swt_internal_cocoa_OS_NSAccessibilityMenuItemRole, [:pointer, :long], :int32
       typesig { [] }
       # @method flags=const
       # long
       def _nsaccessibility_menu_item_role
-        JNI.__send__(:Java_org_eclipse_swt_internal_cocoa_OS_NSAccessibilityMenuItemRole, JNI.env, self.jni_id)
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_cocoa_OS_NSAccessibilityMenuItemRole, JNI.env, self.jni_id)
       end
       
       const_set_lazy(:NSAccessibilityMenuItemRole) { NSString.new(_nsaccessibility_menu_item_role) }
       const_attr_reader  :NSAccessibilityMenuItemRole
       
-      JNI.native_method :Java_org_eclipse_swt_internal_cocoa_OS_NSAccessibilityMenuRole, [:pointer, :long], :int32
+      JNI.load_native_method :Java_org_eclipse_swt_internal_cocoa_OS_NSAccessibilityMenuRole, [:pointer, :long], :int32
       typesig { [] }
       # @method flags=const
       # long
       def _nsaccessibility_menu_role
-        JNI.__send__(:Java_org_eclipse_swt_internal_cocoa_OS_NSAccessibilityMenuRole, JNI.env, self.jni_id)
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_cocoa_OS_NSAccessibilityMenuRole, JNI.env, self.jni_id)
       end
       
       const_set_lazy(:NSAccessibilityMenuRole) { NSString.new(_nsaccessibility_menu_role) }
       const_attr_reader  :NSAccessibilityMenuRole
       
-      JNI.native_method :Java_org_eclipse_swt_internal_cocoa_OS_NSAccessibilityMinValueAttribute, [:pointer, :long], :int32
+      JNI.load_native_method :Java_org_eclipse_swt_internal_cocoa_OS_NSAccessibilityMinValueAttribute, [:pointer, :long], :int32
       typesig { [] }
       # @method flags=const
       # long
       def _nsaccessibility_min_value_attribute
-        JNI.__send__(:Java_org_eclipse_swt_internal_cocoa_OS_NSAccessibilityMinValueAttribute, JNI.env, self.jni_id)
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_cocoa_OS_NSAccessibilityMinValueAttribute, JNI.env, self.jni_id)
       end
       
       const_set_lazy(:NSAccessibilityMinValueAttribute) { NSString.new(_nsaccessibility_min_value_attribute) }
       const_attr_reader  :NSAccessibilityMinValueAttribute
       
-      JNI.native_method :Java_org_eclipse_swt_internal_cocoa_OS_NSAccessibilityNextContentsAttribute, [:pointer, :long], :int32
+      JNI.load_native_method :Java_org_eclipse_swt_internal_cocoa_OS_NSAccessibilityNextContentsAttribute, [:pointer, :long], :int32
       typesig { [] }
       # @method flags=const
       # long
       def _nsaccessibility_next_contents_attribute
-        JNI.__send__(:Java_org_eclipse_swt_internal_cocoa_OS_NSAccessibilityNextContentsAttribute, JNI.env, self.jni_id)
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_cocoa_OS_NSAccessibilityNextContentsAttribute, JNI.env, self.jni_id)
       end
       
       const_set_lazy(:NSAccessibilityNextContentsAttribute) { NSString.new(_nsaccessibility_next_contents_attribute) }
       const_attr_reader  :NSAccessibilityNextContentsAttribute
       
-      JNI.native_method :Java_org_eclipse_swt_internal_cocoa_OS_NSAccessibilityNumberOfCharactersAttribute, [:pointer, :long], :int32
+      JNI.load_native_method :Java_org_eclipse_swt_internal_cocoa_OS_NSAccessibilityNumberOfCharactersAttribute, [:pointer, :long], :int32
       typesig { [] }
       # @method flags=const
       # long
       def _nsaccessibility_number_of_characters_attribute
-        JNI.__send__(:Java_org_eclipse_swt_internal_cocoa_OS_NSAccessibilityNumberOfCharactersAttribute, JNI.env, self.jni_id)
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_cocoa_OS_NSAccessibilityNumberOfCharactersAttribute, JNI.env, self.jni_id)
       end
       
       const_set_lazy(:NSAccessibilityNumberOfCharactersAttribute) { NSString.new(_nsaccessibility_number_of_characters_attribute) }
       const_attr_reader  :NSAccessibilityNumberOfCharactersAttribute
       
-      JNI.native_method :Java_org_eclipse_swt_internal_cocoa_OS_NSAccessibilityOrientationAttribute, [:pointer, :long], :int32
+      JNI.load_native_method :Java_org_eclipse_swt_internal_cocoa_OS_NSAccessibilityOrientationAttribute, [:pointer, :long], :int32
       typesig { [] }
       # @method flags=const
       # long
       def _nsaccessibility_orientation_attribute
-        JNI.__send__(:Java_org_eclipse_swt_internal_cocoa_OS_NSAccessibilityOrientationAttribute, JNI.env, self.jni_id)
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_cocoa_OS_NSAccessibilityOrientationAttribute, JNI.env, self.jni_id)
       end
       
       const_set_lazy(:NSAccessibilityOrientationAttribute) { NSString.new(_nsaccessibility_orientation_attribute) }
       const_attr_reader  :NSAccessibilityOrientationAttribute
       
-      JNI.native_method :Java_org_eclipse_swt_internal_cocoa_OS_NSAccessibilityOutlineRole, [:pointer, :long], :int32
+      JNI.load_native_method :Java_org_eclipse_swt_internal_cocoa_OS_NSAccessibilityOutlineRole, [:pointer, :long], :int32
       typesig { [] }
       # @method flags=const
       # long
       def _nsaccessibility_outline_role
-        JNI.__send__(:Java_org_eclipse_swt_internal_cocoa_OS_NSAccessibilityOutlineRole, JNI.env, self.jni_id)
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_cocoa_OS_NSAccessibilityOutlineRole, JNI.env, self.jni_id)
       end
       
       const_set_lazy(:NSAccessibilityOutlineRole) { NSString.new(_nsaccessibility_outline_role) }
       const_attr_reader  :NSAccessibilityOutlineRole
       
-      JNI.native_method :Java_org_eclipse_swt_internal_cocoa_OS_NSAccessibilityOutlineRowSubrole, [:pointer, :long], :int32
+      JNI.load_native_method :Java_org_eclipse_swt_internal_cocoa_OS_NSAccessibilityOutlineRowSubrole, [:pointer, :long], :int32
       typesig { [] }
       # @method flags=const
       # long
       def _nsaccessibility_outline_row_subrole
-        JNI.__send__(:Java_org_eclipse_swt_internal_cocoa_OS_NSAccessibilityOutlineRowSubrole, JNI.env, self.jni_id)
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_cocoa_OS_NSAccessibilityOutlineRowSubrole, JNI.env, self.jni_id)
       end
       
       const_set_lazy(:NSAccessibilityOutlineRowSubrole) { NSString.new(_nsaccessibility_outline_row_subrole) }
       const_attr_reader  :NSAccessibilityOutlineRowSubrole
       
-      JNI.native_method :Java_org_eclipse_swt_internal_cocoa_OS_NSAccessibilityParentAttribute, [:pointer, :long], :int32
+      JNI.load_native_method :Java_org_eclipse_swt_internal_cocoa_OS_NSAccessibilityParentAttribute, [:pointer, :long], :int32
       typesig { [] }
       # @method flags=const
       # long
       def _nsaccessibility_parent_attribute
-        JNI.__send__(:Java_org_eclipse_swt_internal_cocoa_OS_NSAccessibilityParentAttribute, JNI.env, self.jni_id)
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_cocoa_OS_NSAccessibilityParentAttribute, JNI.env, self.jni_id)
       end
       
       const_set_lazy(:NSAccessibilityParentAttribute) { NSString.new(_nsaccessibility_parent_attribute) }
       const_attr_reader  :NSAccessibilityParentAttribute
       
-      JNI.native_method :Java_org_eclipse_swt_internal_cocoa_OS_NSAccessibilityPopUpButtonRole, [:pointer, :long], :int32
+      JNI.load_native_method :Java_org_eclipse_swt_internal_cocoa_OS_NSAccessibilityPopUpButtonRole, [:pointer, :long], :int32
       typesig { [] }
       # @method flags=const
       # long
       def _nsaccessibility_pop_up_button_role
-        JNI.__send__(:Java_org_eclipse_swt_internal_cocoa_OS_NSAccessibilityPopUpButtonRole, JNI.env, self.jni_id)
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_cocoa_OS_NSAccessibilityPopUpButtonRole, JNI.env, self.jni_id)
       end
       
       const_set_lazy(:NSAccessibilityPopUpButtonRole) { NSString.new(_nsaccessibility_pop_up_button_role) }
       const_attr_reader  :NSAccessibilityPopUpButtonRole
       
-      JNI.native_method :Java_org_eclipse_swt_internal_cocoa_OS_NSAccessibilityPositionAttribute, [:pointer, :long], :int32
+      JNI.load_native_method :Java_org_eclipse_swt_internal_cocoa_OS_NSAccessibilityPositionAttribute, [:pointer, :long], :int32
       typesig { [] }
       # @method flags=const
       # long
       def _nsaccessibility_position_attribute
-        JNI.__send__(:Java_org_eclipse_swt_internal_cocoa_OS_NSAccessibilityPositionAttribute, JNI.env, self.jni_id)
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_cocoa_OS_NSAccessibilityPositionAttribute, JNI.env, self.jni_id)
       end
       
       const_set_lazy(:NSAccessibilityPositionAttribute) { NSString.new(_nsaccessibility_position_attribute) }
       const_attr_reader  :NSAccessibilityPositionAttribute
       
-      JNI.native_method :Java_org_eclipse_swt_internal_cocoa_OS_NSAccessibilityPressAction, [:pointer, :long], :int32
+      JNI.load_native_method :Java_org_eclipse_swt_internal_cocoa_OS_NSAccessibilityPressAction, [:pointer, :long], :int32
       typesig { [] }
       # @method flags=const
       # long
       def _nsaccessibility_press_action
-        JNI.__send__(:Java_org_eclipse_swt_internal_cocoa_OS_NSAccessibilityPressAction, JNI.env, self.jni_id)
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_cocoa_OS_NSAccessibilityPressAction, JNI.env, self.jni_id)
       end
       
       const_set_lazy(:NSAccessibilityPressAction) { NSString.new(_nsaccessibility_press_action) }
       const_attr_reader  :NSAccessibilityPressAction
       
-      JNI.native_method :Java_org_eclipse_swt_internal_cocoa_OS_NSAccessibilityPreviousContentsAttribute, [:pointer, :long], :int32
+      JNI.load_native_method :Java_org_eclipse_swt_internal_cocoa_OS_NSAccessibilityPreviousContentsAttribute, [:pointer, :long], :int32
       typesig { [] }
       # @method flags=const
       # long
       def _nsaccessibility_previous_contents_attribute
-        JNI.__send__(:Java_org_eclipse_swt_internal_cocoa_OS_NSAccessibilityPreviousContentsAttribute, JNI.env, self.jni_id)
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_cocoa_OS_NSAccessibilityPreviousContentsAttribute, JNI.env, self.jni_id)
       end
       
       const_set_lazy(:NSAccessibilityPreviousContentsAttribute) { NSString.new(_nsaccessibility_previous_contents_attribute) }
       const_attr_reader  :NSAccessibilityPreviousContentsAttribute
       
-      JNI.native_method :Java_org_eclipse_swt_internal_cocoa_OS_NSAccessibilityProgressIndicatorRole, [:pointer, :long], :int32
+      JNI.load_native_method :Java_org_eclipse_swt_internal_cocoa_OS_NSAccessibilityProgressIndicatorRole, [:pointer, :long], :int32
       typesig { [] }
       # @method flags=const
       # long
       def _nsaccessibility_progress_indicator_role
-        JNI.__send__(:Java_org_eclipse_swt_internal_cocoa_OS_NSAccessibilityProgressIndicatorRole, JNI.env, self.jni_id)
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_cocoa_OS_NSAccessibilityProgressIndicatorRole, JNI.env, self.jni_id)
       end
       
       const_set_lazy(:NSAccessibilityProgressIndicatorRole) { NSString.new(_nsaccessibility_progress_indicator_role) }
       const_attr_reader  :NSAccessibilityProgressIndicatorRole
       
-      JNI.native_method :Java_org_eclipse_swt_internal_cocoa_OS_NSAccessibilityRTFForRangeParameterizedAttribute, [:pointer, :long], :int32
+      JNI.load_native_method :Java_org_eclipse_swt_internal_cocoa_OS_NSAccessibilityRTFForRangeParameterizedAttribute, [:pointer, :long], :int32
       typesig { [] }
       # @method flags=const
       # long
       def _nsaccessibility_rtffor_range_parameterized_attribute
-        JNI.__send__(:Java_org_eclipse_swt_internal_cocoa_OS_NSAccessibilityRTFForRangeParameterizedAttribute, JNI.env, self.jni_id)
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_cocoa_OS_NSAccessibilityRTFForRangeParameterizedAttribute, JNI.env, self.jni_id)
       end
       
       const_set_lazy(:NSAccessibilityRTFForRangeParameterizedAttribute) { NSString.new(_nsaccessibility_rtffor_range_parameterized_attribute) }
       const_attr_reader  :NSAccessibilityRTFForRangeParameterizedAttribute
       
-      JNI.native_method :Java_org_eclipse_swt_internal_cocoa_OS_NSAccessibilityRadioButtonRole, [:pointer, :long], :int32
+      JNI.load_native_method :Java_org_eclipse_swt_internal_cocoa_OS_NSAccessibilityRadioButtonRole, [:pointer, :long], :int32
       typesig { [] }
       # @method flags=const
       # long
       def _nsaccessibility_radio_button_role
-        JNI.__send__(:Java_org_eclipse_swt_internal_cocoa_OS_NSAccessibilityRadioButtonRole, JNI.env, self.jni_id)
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_cocoa_OS_NSAccessibilityRadioButtonRole, JNI.env, self.jni_id)
       end
       
       const_set_lazy(:NSAccessibilityRadioButtonRole) { NSString.new(_nsaccessibility_radio_button_role) }
       const_attr_reader  :NSAccessibilityRadioButtonRole
       
-      JNI.native_method :Java_org_eclipse_swt_internal_cocoa_OS_NSAccessibilityRadioGroupRole, [:pointer, :long], :int32
+      JNI.load_native_method :Java_org_eclipse_swt_internal_cocoa_OS_NSAccessibilityRadioGroupRole, [:pointer, :long], :int32
       typesig { [] }
       # @method flags=const
       # long
       def _nsaccessibility_radio_group_role
-        JNI.__send__(:Java_org_eclipse_swt_internal_cocoa_OS_NSAccessibilityRadioGroupRole, JNI.env, self.jni_id)
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_cocoa_OS_NSAccessibilityRadioGroupRole, JNI.env, self.jni_id)
       end
       
       const_set_lazy(:NSAccessibilityRadioGroupRole) { NSString.new(_nsaccessibility_radio_group_role) }
       const_attr_reader  :NSAccessibilityRadioGroupRole
       
-      JNI.native_method :Java_org_eclipse_swt_internal_cocoa_OS_NSAccessibilityRangeForIndexParameterizedAttribute, [:pointer, :long], :int32
+      JNI.load_native_method :Java_org_eclipse_swt_internal_cocoa_OS_NSAccessibilityRangeForIndexParameterizedAttribute, [:pointer, :long], :int32
       typesig { [] }
       # @method flags=const
       # long
       def _nsaccessibility_range_for_index_parameterized_attribute
-        JNI.__send__(:Java_org_eclipse_swt_internal_cocoa_OS_NSAccessibilityRangeForIndexParameterizedAttribute, JNI.env, self.jni_id)
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_cocoa_OS_NSAccessibilityRangeForIndexParameterizedAttribute, JNI.env, self.jni_id)
       end
       
       const_set_lazy(:NSAccessibilityRangeForIndexParameterizedAttribute) { NSString.new(_nsaccessibility_range_for_index_parameterized_attribute) }
       const_attr_reader  :NSAccessibilityRangeForIndexParameterizedAttribute
       
-      JNI.native_method :Java_org_eclipse_swt_internal_cocoa_OS_NSAccessibilityRangeForLineParameterizedAttribute, [:pointer, :long], :int32
+      JNI.load_native_method :Java_org_eclipse_swt_internal_cocoa_OS_NSAccessibilityRangeForLineParameterizedAttribute, [:pointer, :long], :int32
       typesig { [] }
       # @method flags=const
       # long
       def _nsaccessibility_range_for_line_parameterized_attribute
-        JNI.__send__(:Java_org_eclipse_swt_internal_cocoa_OS_NSAccessibilityRangeForLineParameterizedAttribute, JNI.env, self.jni_id)
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_cocoa_OS_NSAccessibilityRangeForLineParameterizedAttribute, JNI.env, self.jni_id)
       end
       
       const_set_lazy(:NSAccessibilityRangeForLineParameterizedAttribute) { NSString.new(_nsaccessibility_range_for_line_parameterized_attribute) }
       const_attr_reader  :NSAccessibilityRangeForLineParameterizedAttribute
       
-      JNI.native_method :Java_org_eclipse_swt_internal_cocoa_OS_NSAccessibilityRangeForPositionParameterizedAttribute, [:pointer, :long], :int32
+      JNI.load_native_method :Java_org_eclipse_swt_internal_cocoa_OS_NSAccessibilityRangeForPositionParameterizedAttribute, [:pointer, :long], :int32
       typesig { [] }
       # @method flags=const
       # long
       def _nsaccessibility_range_for_position_parameterized_attribute
-        JNI.__send__(:Java_org_eclipse_swt_internal_cocoa_OS_NSAccessibilityRangeForPositionParameterizedAttribute, JNI.env, self.jni_id)
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_cocoa_OS_NSAccessibilityRangeForPositionParameterizedAttribute, JNI.env, self.jni_id)
       end
       
       const_set_lazy(:NSAccessibilityRangeForPositionParameterizedAttribute) { NSString.new(_nsaccessibility_range_for_position_parameterized_attribute) }
       const_attr_reader  :NSAccessibilityRangeForPositionParameterizedAttribute
       
-      JNI.native_method :Java_org_eclipse_swt_internal_cocoa_OS_NSAccessibilityRoleAttribute, [:pointer, :long], :int32
+      JNI.load_native_method :Java_org_eclipse_swt_internal_cocoa_OS_NSAccessibilityRoleAttribute, [:pointer, :long], :int32
       typesig { [] }
       # @method flags=const
       # long
       def _nsaccessibility_role_attribute
-        JNI.__send__(:Java_org_eclipse_swt_internal_cocoa_OS_NSAccessibilityRoleAttribute, JNI.env, self.jni_id)
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_cocoa_OS_NSAccessibilityRoleAttribute, JNI.env, self.jni_id)
       end
       
       const_set_lazy(:NSAccessibilityRoleAttribute) { NSString.new(_nsaccessibility_role_attribute) }
       const_attr_reader  :NSAccessibilityRoleAttribute
       
-      JNI.native_method :Java_org_eclipse_swt_internal_cocoa_OS_NSAccessibilityRoleDescriptionAttribute, [:pointer, :long], :int32
+      JNI.load_native_method :Java_org_eclipse_swt_internal_cocoa_OS_NSAccessibilityRoleDescriptionAttribute, [:pointer, :long], :int32
       typesig { [] }
       # @method flags=const
       # long
       def _nsaccessibility_role_description_attribute
-        JNI.__send__(:Java_org_eclipse_swt_internal_cocoa_OS_NSAccessibilityRoleDescriptionAttribute, JNI.env, self.jni_id)
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_cocoa_OS_NSAccessibilityRoleDescriptionAttribute, JNI.env, self.jni_id)
       end
       
       const_set_lazy(:NSAccessibilityRoleDescriptionAttribute) { NSString.new(_nsaccessibility_role_description_attribute) }
       const_attr_reader  :NSAccessibilityRoleDescriptionAttribute
       
-      JNI.native_method :Java_org_eclipse_swt_internal_cocoa_OS_NSAccessibilityRowRole, [:pointer, :long], :int32
+      JNI.load_native_method :Java_org_eclipse_swt_internal_cocoa_OS_NSAccessibilityRowRole, [:pointer, :long], :int32
       typesig { [] }
       # @method flags=const
       # long
       def _nsaccessibility_row_role
-        JNI.__send__(:Java_org_eclipse_swt_internal_cocoa_OS_NSAccessibilityRowRole, JNI.env, self.jni_id)
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_cocoa_OS_NSAccessibilityRowRole, JNI.env, self.jni_id)
       end
       
       const_set_lazy(:NSAccessibilityRowRole) { NSString.new(_nsaccessibility_row_role) }
       const_attr_reader  :NSAccessibilityRowRole
       
-      JNI.native_method :Java_org_eclipse_swt_internal_cocoa_OS_NSAccessibilityScrollAreaRole, [:pointer, :long], :int32
+      JNI.load_native_method :Java_org_eclipse_swt_internal_cocoa_OS_NSAccessibilityScrollAreaRole, [:pointer, :long], :int32
       typesig { [] }
       # @method flags=const
       # long
       def _nsaccessibility_scroll_area_role
-        JNI.__send__(:Java_org_eclipse_swt_internal_cocoa_OS_NSAccessibilityScrollAreaRole, JNI.env, self.jni_id)
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_cocoa_OS_NSAccessibilityScrollAreaRole, JNI.env, self.jni_id)
       end
       
       const_set_lazy(:NSAccessibilityScrollAreaRole) { NSString.new(_nsaccessibility_scroll_area_role) }
       const_attr_reader  :NSAccessibilityScrollAreaRole
       
-      JNI.native_method :Java_org_eclipse_swt_internal_cocoa_OS_NSAccessibilityScrollBarRole, [:pointer, :long], :int32
+      JNI.load_native_method :Java_org_eclipse_swt_internal_cocoa_OS_NSAccessibilityScrollBarRole, [:pointer, :long], :int32
       typesig { [] }
       # @method flags=const
       # long
       def _nsaccessibility_scroll_bar_role
-        JNI.__send__(:Java_org_eclipse_swt_internal_cocoa_OS_NSAccessibilityScrollBarRole, JNI.env, self.jni_id)
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_cocoa_OS_NSAccessibilityScrollBarRole, JNI.env, self.jni_id)
       end
       
       const_set_lazy(:NSAccessibilityScrollBarRole) { NSString.new(_nsaccessibility_scroll_bar_role) }
       const_attr_reader  :NSAccessibilityScrollBarRole
       
-      JNI.native_method :Java_org_eclipse_swt_internal_cocoa_OS_NSAccessibilitySelectedAttribute, [:pointer, :long], :int32
+      JNI.load_native_method :Java_org_eclipse_swt_internal_cocoa_OS_NSAccessibilitySelectedAttribute, [:pointer, :long], :int32
       typesig { [] }
       # @method flags=const
       # long
       def _nsaccessibility_selected_attribute
-        JNI.__send__(:Java_org_eclipse_swt_internal_cocoa_OS_NSAccessibilitySelectedAttribute, JNI.env, self.jni_id)
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_cocoa_OS_NSAccessibilitySelectedAttribute, JNI.env, self.jni_id)
       end
       
       const_set_lazy(:NSAccessibilitySelectedAttribute) { NSString.new(_nsaccessibility_selected_attribute) }
       const_attr_reader  :NSAccessibilitySelectedAttribute
       
-      JNI.native_method :Java_org_eclipse_swt_internal_cocoa_OS_NSAccessibilitySelectedChildrenAttribute, [:pointer, :long], :int32
+      JNI.load_native_method :Java_org_eclipse_swt_internal_cocoa_OS_NSAccessibilitySelectedChildrenAttribute, [:pointer, :long], :int32
       typesig { [] }
       # @method flags=const
       # long
       def _nsaccessibility_selected_children_attribute
-        JNI.__send__(:Java_org_eclipse_swt_internal_cocoa_OS_NSAccessibilitySelectedChildrenAttribute, JNI.env, self.jni_id)
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_cocoa_OS_NSAccessibilitySelectedChildrenAttribute, JNI.env, self.jni_id)
       end
       
       const_set_lazy(:NSAccessibilitySelectedChildrenAttribute) { NSString.new(_nsaccessibility_selected_children_attribute) }
       const_attr_reader  :NSAccessibilitySelectedChildrenAttribute
       
-      JNI.native_method :Java_org_eclipse_swt_internal_cocoa_OS_NSAccessibilitySelectedChildrenChangedNotification, [:pointer, :long], :int32
+      JNI.load_native_method :Java_org_eclipse_swt_internal_cocoa_OS_NSAccessibilitySelectedChildrenChangedNotification, [:pointer, :long], :int32
       typesig { [] }
       # @method flags=const
       # long
       def _nsaccessibility_selected_children_changed_notification
-        JNI.__send__(:Java_org_eclipse_swt_internal_cocoa_OS_NSAccessibilitySelectedChildrenChangedNotification, JNI.env, self.jni_id)
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_cocoa_OS_NSAccessibilitySelectedChildrenChangedNotification, JNI.env, self.jni_id)
       end
       
       const_set_lazy(:NSAccessibilitySelectedChildrenChangedNotification) { NSString.new(_nsaccessibility_selected_children_changed_notification) }
       const_attr_reader  :NSAccessibilitySelectedChildrenChangedNotification
       
-      JNI.native_method :Java_org_eclipse_swt_internal_cocoa_OS_NSAccessibilitySelectedTextAttribute, [:pointer, :long], :int32
+      JNI.load_native_method :Java_org_eclipse_swt_internal_cocoa_OS_NSAccessibilitySelectedTextAttribute, [:pointer, :long], :int32
       typesig { [] }
       # @method flags=const
       # long
       def _nsaccessibility_selected_text_attribute
-        JNI.__send__(:Java_org_eclipse_swt_internal_cocoa_OS_NSAccessibilitySelectedTextAttribute, JNI.env, self.jni_id)
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_cocoa_OS_NSAccessibilitySelectedTextAttribute, JNI.env, self.jni_id)
       end
       
       const_set_lazy(:NSAccessibilitySelectedTextAttribute) { NSString.new(_nsaccessibility_selected_text_attribute) }
       const_attr_reader  :NSAccessibilitySelectedTextAttribute
       
-      JNI.native_method :Java_org_eclipse_swt_internal_cocoa_OS_NSAccessibilitySelectedTextChangedNotification, [:pointer, :long], :int32
+      JNI.load_native_method :Java_org_eclipse_swt_internal_cocoa_OS_NSAccessibilitySelectedTextChangedNotification, [:pointer, :long], :int32
       typesig { [] }
       # @method flags=const
       # long
       def _nsaccessibility_selected_text_changed_notification
-        JNI.__send__(:Java_org_eclipse_swt_internal_cocoa_OS_NSAccessibilitySelectedTextChangedNotification, JNI.env, self.jni_id)
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_cocoa_OS_NSAccessibilitySelectedTextChangedNotification, JNI.env, self.jni_id)
       end
       
       const_set_lazy(:NSAccessibilitySelectedTextChangedNotification) { NSString.new(_nsaccessibility_selected_text_changed_notification) }
       const_attr_reader  :NSAccessibilitySelectedTextChangedNotification
       
-      JNI.native_method :Java_org_eclipse_swt_internal_cocoa_OS_NSAccessibilitySelectedTextRangeAttribute, [:pointer, :long], :int32
+      JNI.load_native_method :Java_org_eclipse_swt_internal_cocoa_OS_NSAccessibilitySelectedTextRangeAttribute, [:pointer, :long], :int32
       typesig { [] }
       # @method flags=const
       # long
       def _nsaccessibility_selected_text_range_attribute
-        JNI.__send__(:Java_org_eclipse_swt_internal_cocoa_OS_NSAccessibilitySelectedTextRangeAttribute, JNI.env, self.jni_id)
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_cocoa_OS_NSAccessibilitySelectedTextRangeAttribute, JNI.env, self.jni_id)
       end
       
       const_set_lazy(:NSAccessibilitySelectedTextRangeAttribute) { NSString.new(_nsaccessibility_selected_text_range_attribute) }
       const_attr_reader  :NSAccessibilitySelectedTextRangeAttribute
       
-      JNI.native_method :Java_org_eclipse_swt_internal_cocoa_OS_NSAccessibilitySelectedTextRangesAttribute, [:pointer, :long], :int32
+      JNI.load_native_method :Java_org_eclipse_swt_internal_cocoa_OS_NSAccessibilitySelectedTextRangesAttribute, [:pointer, :long], :int32
       typesig { [] }
       # @method flags=const
       # long
       def _nsaccessibility_selected_text_ranges_attribute
-        JNI.__send__(:Java_org_eclipse_swt_internal_cocoa_OS_NSAccessibilitySelectedTextRangesAttribute, JNI.env, self.jni_id)
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_cocoa_OS_NSAccessibilitySelectedTextRangesAttribute, JNI.env, self.jni_id)
       end
       
       const_set_lazy(:NSAccessibilitySelectedTextRangesAttribute) { NSString.new(_nsaccessibility_selected_text_ranges_attribute) }
       const_attr_reader  :NSAccessibilitySelectedTextRangesAttribute
       
-      JNI.native_method :Java_org_eclipse_swt_internal_cocoa_OS_NSAccessibilityServesAsTitleForUIElementsAttribute, [:pointer, :long], :int32
+      JNI.load_native_method :Java_org_eclipse_swt_internal_cocoa_OS_NSAccessibilityServesAsTitleForUIElementsAttribute, [:pointer, :long], :int32
       typesig { [] }
       # @method flags=const
       # long
       def _nsaccessibility_serves_as_title_for_uielements_attribute
-        JNI.__send__(:Java_org_eclipse_swt_internal_cocoa_OS_NSAccessibilityServesAsTitleForUIElementsAttribute, JNI.env, self.jni_id)
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_cocoa_OS_NSAccessibilityServesAsTitleForUIElementsAttribute, JNI.env, self.jni_id)
       end
       
       const_set_lazy(:NSAccessibilityServesAsTitleForUIElementsAttribute) { NSString.new(_nsaccessibility_serves_as_title_for_uielements_attribute) }
       const_attr_reader  :NSAccessibilityServesAsTitleForUIElementsAttribute
       
-      JNI.native_method :Java_org_eclipse_swt_internal_cocoa_OS_NSAccessibilitySizeAttribute, [:pointer, :long], :int32
+      JNI.load_native_method :Java_org_eclipse_swt_internal_cocoa_OS_NSAccessibilitySizeAttribute, [:pointer, :long], :int32
       typesig { [] }
       # @method flags=const
       # long
       def _nsaccessibility_size_attribute
-        JNI.__send__(:Java_org_eclipse_swt_internal_cocoa_OS_NSAccessibilitySizeAttribute, JNI.env, self.jni_id)
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_cocoa_OS_NSAccessibilitySizeAttribute, JNI.env, self.jni_id)
       end
       
       const_set_lazy(:NSAccessibilitySizeAttribute) { NSString.new(_nsaccessibility_size_attribute) }
       const_attr_reader  :NSAccessibilitySizeAttribute
       
-      JNI.native_method :Java_org_eclipse_swt_internal_cocoa_OS_NSAccessibilitySliderRole, [:pointer, :long], :int32
+      JNI.load_native_method :Java_org_eclipse_swt_internal_cocoa_OS_NSAccessibilitySliderRole, [:pointer, :long], :int32
       typesig { [] }
       # @method flags=const
       # long
       def _nsaccessibility_slider_role
-        JNI.__send__(:Java_org_eclipse_swt_internal_cocoa_OS_NSAccessibilitySliderRole, JNI.env, self.jni_id)
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_cocoa_OS_NSAccessibilitySliderRole, JNI.env, self.jni_id)
       end
       
       const_set_lazy(:NSAccessibilitySliderRole) { NSString.new(_nsaccessibility_slider_role) }
       const_attr_reader  :NSAccessibilitySliderRole
       
-      JNI.native_method :Java_org_eclipse_swt_internal_cocoa_OS_NSAccessibilitySortButtonRole, [:pointer, :long], :int32
+      JNI.load_native_method :Java_org_eclipse_swt_internal_cocoa_OS_NSAccessibilitySortButtonRole, [:pointer, :long], :int32
       typesig { [] }
       # @method flags=const
       # long
       def _nsaccessibility_sort_button_role
-        JNI.__send__(:Java_org_eclipse_swt_internal_cocoa_OS_NSAccessibilitySortButtonRole, JNI.env, self.jni_id)
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_cocoa_OS_NSAccessibilitySortButtonRole, JNI.env, self.jni_id)
       end
       
       const_set_lazy(:NSAccessibilitySortButtonRole) { NSString.new(_nsaccessibility_sort_button_role) }
       const_attr_reader  :NSAccessibilitySortButtonRole
       
-      JNI.native_method :Java_org_eclipse_swt_internal_cocoa_OS_NSAccessibilitySplitterRole, [:pointer, :long], :int32
+      JNI.load_native_method :Java_org_eclipse_swt_internal_cocoa_OS_NSAccessibilitySplitterRole, [:pointer, :long], :int32
       typesig { [] }
       # @method flags=const
       # long
       def _nsaccessibility_splitter_role
-        JNI.__send__(:Java_org_eclipse_swt_internal_cocoa_OS_NSAccessibilitySplitterRole, JNI.env, self.jni_id)
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_cocoa_OS_NSAccessibilitySplitterRole, JNI.env, self.jni_id)
       end
       
       const_set_lazy(:NSAccessibilitySplitterRole) { NSString.new(_nsaccessibility_splitter_role) }
       const_attr_reader  :NSAccessibilitySplitterRole
       
-      JNI.native_method :Java_org_eclipse_swt_internal_cocoa_OS_NSAccessibilityStandardWindowSubrole, [:pointer, :long], :int32
+      JNI.load_native_method :Java_org_eclipse_swt_internal_cocoa_OS_NSAccessibilityStandardWindowSubrole, [:pointer, :long], :int32
       typesig { [] }
       # @method flags=const
       # long
       def _nsaccessibility_standard_window_subrole
-        JNI.__send__(:Java_org_eclipse_swt_internal_cocoa_OS_NSAccessibilityStandardWindowSubrole, JNI.env, self.jni_id)
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_cocoa_OS_NSAccessibilityStandardWindowSubrole, JNI.env, self.jni_id)
       end
       
       const_set_lazy(:NSAccessibilityStandardWindowSubrole) { NSString.new(_nsaccessibility_standard_window_subrole) }
       const_attr_reader  :NSAccessibilityStandardWindowSubrole
       
-      JNI.native_method :Java_org_eclipse_swt_internal_cocoa_OS_NSAccessibilityStaticTextRole, [:pointer, :long], :int32
+      JNI.load_native_method :Java_org_eclipse_swt_internal_cocoa_OS_NSAccessibilityStaticTextRole, [:pointer, :long], :int32
       typesig { [] }
       # @method flags=const
       # long
       def _nsaccessibility_static_text_role
-        JNI.__send__(:Java_org_eclipse_swt_internal_cocoa_OS_NSAccessibilityStaticTextRole, JNI.env, self.jni_id)
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_cocoa_OS_NSAccessibilityStaticTextRole, JNI.env, self.jni_id)
       end
       
       const_set_lazy(:NSAccessibilityStaticTextRole) { NSString.new(_nsaccessibility_static_text_role) }
       const_attr_reader  :NSAccessibilityStaticTextRole
       
-      JNI.native_method :Java_org_eclipse_swt_internal_cocoa_OS_NSAccessibilityStringForRangeParameterizedAttribute, [:pointer, :long], :int32
+      JNI.load_native_method :Java_org_eclipse_swt_internal_cocoa_OS_NSAccessibilityStringForRangeParameterizedAttribute, [:pointer, :long], :int32
       typesig { [] }
       # @method flags=const
       # long
       def _nsaccessibility_string_for_range_parameterized_attribute
-        JNI.__send__(:Java_org_eclipse_swt_internal_cocoa_OS_NSAccessibilityStringForRangeParameterizedAttribute, JNI.env, self.jni_id)
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_cocoa_OS_NSAccessibilityStringForRangeParameterizedAttribute, JNI.env, self.jni_id)
       end
       
       const_set_lazy(:NSAccessibilityStringForRangeParameterizedAttribute) { NSString.new(_nsaccessibility_string_for_range_parameterized_attribute) }
       const_attr_reader  :NSAccessibilityStringForRangeParameterizedAttribute
       
-      JNI.native_method :Java_org_eclipse_swt_internal_cocoa_OS_NSAccessibilityStyleRangeForIndexParameterizedAttribute, [:pointer, :long], :int32
+      JNI.load_native_method :Java_org_eclipse_swt_internal_cocoa_OS_NSAccessibilityStyleRangeForIndexParameterizedAttribute, [:pointer, :long], :int32
       typesig { [] }
       # @method flags=const
       # long
       def _nsaccessibility_style_range_for_index_parameterized_attribute
-        JNI.__send__(:Java_org_eclipse_swt_internal_cocoa_OS_NSAccessibilityStyleRangeForIndexParameterizedAttribute, JNI.env, self.jni_id)
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_cocoa_OS_NSAccessibilityStyleRangeForIndexParameterizedAttribute, JNI.env, self.jni_id)
       end
       
       const_set_lazy(:NSAccessibilityStyleRangeForIndexParameterizedAttribute) { NSString.new(_nsaccessibility_style_range_for_index_parameterized_attribute) }
       const_attr_reader  :NSAccessibilityStyleRangeForIndexParameterizedAttribute
       
-      JNI.native_method :Java_org_eclipse_swt_internal_cocoa_OS_NSAccessibilitySubroleAttribute, [:pointer, :long], :int32
+      JNI.load_native_method :Java_org_eclipse_swt_internal_cocoa_OS_NSAccessibilitySubroleAttribute, [:pointer, :long], :int32
       typesig { [] }
       # @method flags=const
       # long
       def _nsaccessibility_subrole_attribute
-        JNI.__send__(:Java_org_eclipse_swt_internal_cocoa_OS_NSAccessibilitySubroleAttribute, JNI.env, self.jni_id)
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_cocoa_OS_NSAccessibilitySubroleAttribute, JNI.env, self.jni_id)
       end
       
       const_set_lazy(:NSAccessibilitySubroleAttribute) { NSString.new(_nsaccessibility_subrole_attribute) }
       const_attr_reader  :NSAccessibilitySubroleAttribute
       
-      JNI.native_method :Java_org_eclipse_swt_internal_cocoa_OS_NSAccessibilitySystemDialogSubrole, [:pointer, :long], :int32
+      JNI.load_native_method :Java_org_eclipse_swt_internal_cocoa_OS_NSAccessibilitySystemDialogSubrole, [:pointer, :long], :int32
       typesig { [] }
       # @method flags=const
       # long
       def _nsaccessibility_system_dialog_subrole
-        JNI.__send__(:Java_org_eclipse_swt_internal_cocoa_OS_NSAccessibilitySystemDialogSubrole, JNI.env, self.jni_id)
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_cocoa_OS_NSAccessibilitySystemDialogSubrole, JNI.env, self.jni_id)
       end
       
       const_set_lazy(:NSAccessibilitySystemDialogSubrole) { NSString.new(_nsaccessibility_system_dialog_subrole) }
       const_attr_reader  :NSAccessibilitySystemDialogSubrole
       
-      JNI.native_method :Java_org_eclipse_swt_internal_cocoa_OS_NSAccessibilityTabGroupRole, [:pointer, :long], :int32
+      JNI.load_native_method :Java_org_eclipse_swt_internal_cocoa_OS_NSAccessibilityTabGroupRole, [:pointer, :long], :int32
       typesig { [] }
       # @method flags=const
       # long
       def _nsaccessibility_tab_group_role
-        JNI.__send__(:Java_org_eclipse_swt_internal_cocoa_OS_NSAccessibilityTabGroupRole, JNI.env, self.jni_id)
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_cocoa_OS_NSAccessibilityTabGroupRole, JNI.env, self.jni_id)
       end
       
       const_set_lazy(:NSAccessibilityTabGroupRole) { NSString.new(_nsaccessibility_tab_group_role) }
       const_attr_reader  :NSAccessibilityTabGroupRole
       
-      JNI.native_method :Java_org_eclipse_swt_internal_cocoa_OS_NSAccessibilityTableRole, [:pointer, :long], :int32
+      JNI.load_native_method :Java_org_eclipse_swt_internal_cocoa_OS_NSAccessibilityTableRole, [:pointer, :long], :int32
       typesig { [] }
       # @method flags=const
       # long
       def _nsaccessibility_table_role
-        JNI.__send__(:Java_org_eclipse_swt_internal_cocoa_OS_NSAccessibilityTableRole, JNI.env, self.jni_id)
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_cocoa_OS_NSAccessibilityTableRole, JNI.env, self.jni_id)
       end
       
       const_set_lazy(:NSAccessibilityTableRole) { NSString.new(_nsaccessibility_table_role) }
       const_attr_reader  :NSAccessibilityTableRole
       
-      JNI.native_method :Java_org_eclipse_swt_internal_cocoa_OS_NSAccessibilityTableRowSubrole, [:pointer, :long], :int32
+      JNI.load_native_method :Java_org_eclipse_swt_internal_cocoa_OS_NSAccessibilityTableRowSubrole, [:pointer, :long], :int32
       typesig { [] }
       # @method flags=const
       # long
       def _nsaccessibility_table_row_subrole
-        JNI.__send__(:Java_org_eclipse_swt_internal_cocoa_OS_NSAccessibilityTableRowSubrole, JNI.env, self.jni_id)
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_cocoa_OS_NSAccessibilityTableRowSubrole, JNI.env, self.jni_id)
       end
       
       const_set_lazy(:NSAccessibilityTableRowSubrole) { NSString.new(_nsaccessibility_table_row_subrole) }
       const_attr_reader  :NSAccessibilityTableRowSubrole
       
-      JNI.native_method :Java_org_eclipse_swt_internal_cocoa_OS_NSAccessibilityTabsAttribute, [:pointer, :long], :int32
+      JNI.load_native_method :Java_org_eclipse_swt_internal_cocoa_OS_NSAccessibilityTabsAttribute, [:pointer, :long], :int32
       typesig { [] }
       # @method flags=const
       # long
       def _nsaccessibility_tabs_attribute
-        JNI.__send__(:Java_org_eclipse_swt_internal_cocoa_OS_NSAccessibilityTabsAttribute, JNI.env, self.jni_id)
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_cocoa_OS_NSAccessibilityTabsAttribute, JNI.env, self.jni_id)
       end
       
       const_set_lazy(:NSAccessibilityTabsAttribute) { NSString.new(_nsaccessibility_tabs_attribute) }
       const_attr_reader  :NSAccessibilityTabsAttribute
       
-      JNI.native_method :Java_org_eclipse_swt_internal_cocoa_OS_NSAccessibilityTextAreaRole, [:pointer, :long], :int32
+      JNI.load_native_method :Java_org_eclipse_swt_internal_cocoa_OS_NSAccessibilityTextAreaRole, [:pointer, :long], :int32
       typesig { [] }
       # @method flags=const
       # long
       def _nsaccessibility_text_area_role
-        JNI.__send__(:Java_org_eclipse_swt_internal_cocoa_OS_NSAccessibilityTextAreaRole, JNI.env, self.jni_id)
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_cocoa_OS_NSAccessibilityTextAreaRole, JNI.env, self.jni_id)
       end
       
       const_set_lazy(:NSAccessibilityTextAreaRole) { NSString.new(_nsaccessibility_text_area_role) }
       const_attr_reader  :NSAccessibilityTextAreaRole
       
-      JNI.native_method :Java_org_eclipse_swt_internal_cocoa_OS_NSAccessibilityTextFieldRole, [:pointer, :long], :int32
+      JNI.load_native_method :Java_org_eclipse_swt_internal_cocoa_OS_NSAccessibilityTextFieldRole, [:pointer, :long], :int32
       typesig { [] }
       # @method flags=const
       # long
       def _nsaccessibility_text_field_role
-        JNI.__send__(:Java_org_eclipse_swt_internal_cocoa_OS_NSAccessibilityTextFieldRole, JNI.env, self.jni_id)
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_cocoa_OS_NSAccessibilityTextFieldRole, JNI.env, self.jni_id)
       end
       
       const_set_lazy(:NSAccessibilityTextFieldRole) { NSString.new(_nsaccessibility_text_field_role) }
       const_attr_reader  :NSAccessibilityTextFieldRole
       
-      JNI.native_method :Java_org_eclipse_swt_internal_cocoa_OS_NSAccessibilityTextLinkSubrole, [:pointer, :long], :int32
+      JNI.load_native_method :Java_org_eclipse_swt_internal_cocoa_OS_NSAccessibilityTextLinkSubrole, [:pointer, :long], :int32
       typesig { [] }
       # @method flags=const
       # long
       def _nsaccessibility_text_link_subrole
-        JNI.__send__(:Java_org_eclipse_swt_internal_cocoa_OS_NSAccessibilityTextLinkSubrole, JNI.env, self.jni_id)
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_cocoa_OS_NSAccessibilityTextLinkSubrole, JNI.env, self.jni_id)
       end
       
       const_set_lazy(:NSAccessibilityTextLinkSubrole) { NSString.new(_nsaccessibility_text_link_subrole) }
       const_attr_reader  :NSAccessibilityTextLinkSubrole
       
-      JNI.native_method :Java_org_eclipse_swt_internal_cocoa_OS_NSAccessibilityTitleAttribute, [:pointer, :long], :int32
+      JNI.load_native_method :Java_org_eclipse_swt_internal_cocoa_OS_NSAccessibilityTitleAttribute, [:pointer, :long], :int32
       typesig { [] }
       # @method flags=const
       # long
       def _nsaccessibility_title_attribute
-        JNI.__send__(:Java_org_eclipse_swt_internal_cocoa_OS_NSAccessibilityTitleAttribute, JNI.env, self.jni_id)
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_cocoa_OS_NSAccessibilityTitleAttribute, JNI.env, self.jni_id)
       end
       
       const_set_lazy(:NSAccessibilityTitleAttribute) { NSString.new(_nsaccessibility_title_attribute) }
       const_attr_reader  :NSAccessibilityTitleAttribute
       
-      JNI.native_method :Java_org_eclipse_swt_internal_cocoa_OS_NSAccessibilityTitleUIElementAttribute, [:pointer, :long], :int32
+      JNI.load_native_method :Java_org_eclipse_swt_internal_cocoa_OS_NSAccessibilityTitleUIElementAttribute, [:pointer, :long], :int32
       typesig { [] }
       # @method flags=const
       # long
       def _nsaccessibility_title_uielement_attribute
-        JNI.__send__(:Java_org_eclipse_swt_internal_cocoa_OS_NSAccessibilityTitleUIElementAttribute, JNI.env, self.jni_id)
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_cocoa_OS_NSAccessibilityTitleUIElementAttribute, JNI.env, self.jni_id)
       end
       
       const_set_lazy(:NSAccessibilityTitleUIElementAttribute) { NSString.new(_nsaccessibility_title_uielement_attribute) }
       const_attr_reader  :NSAccessibilityTitleUIElementAttribute
       
-      JNI.native_method :Java_org_eclipse_swt_internal_cocoa_OS_NSAccessibilityToolbarRole, [:pointer, :long], :int32
+      JNI.load_native_method :Java_org_eclipse_swt_internal_cocoa_OS_NSAccessibilityToolbarRole, [:pointer, :long], :int32
       typesig { [] }
       # @method flags=const
       # long
       def _nsaccessibility_toolbar_role
-        JNI.__send__(:Java_org_eclipse_swt_internal_cocoa_OS_NSAccessibilityToolbarRole, JNI.env, self.jni_id)
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_cocoa_OS_NSAccessibilityToolbarRole, JNI.env, self.jni_id)
       end
       
       const_set_lazy(:NSAccessibilityToolbarRole) { NSString.new(_nsaccessibility_toolbar_role) }
       const_attr_reader  :NSAccessibilityToolbarRole
       
-      JNI.native_method :Java_org_eclipse_swt_internal_cocoa_OS_NSAccessibilityTopLevelUIElementAttribute, [:pointer, :long], :int32
+      JNI.load_native_method :Java_org_eclipse_swt_internal_cocoa_OS_NSAccessibilityTopLevelUIElementAttribute, [:pointer, :long], :int32
       typesig { [] }
       # @method flags=const
       # long
       def _nsaccessibility_top_level_uielement_attribute
-        JNI.__send__(:Java_org_eclipse_swt_internal_cocoa_OS_NSAccessibilityTopLevelUIElementAttribute, JNI.env, self.jni_id)
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_cocoa_OS_NSAccessibilityTopLevelUIElementAttribute, JNI.env, self.jni_id)
       end
       
       const_set_lazy(:NSAccessibilityTopLevelUIElementAttribute) { NSString.new(_nsaccessibility_top_level_uielement_attribute) }
       const_attr_reader  :NSAccessibilityTopLevelUIElementAttribute
       
-      JNI.native_method :Java_org_eclipse_swt_internal_cocoa_OS_NSAccessibilityUnknownRole, [:pointer, :long], :int32
+      JNI.load_native_method :Java_org_eclipse_swt_internal_cocoa_OS_NSAccessibilityUnknownRole, [:pointer, :long], :int32
       typesig { [] }
       # @method flags=const
       # long
       def _nsaccessibility_unknown_role
-        JNI.__send__(:Java_org_eclipse_swt_internal_cocoa_OS_NSAccessibilityUnknownRole, JNI.env, self.jni_id)
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_cocoa_OS_NSAccessibilityUnknownRole, JNI.env, self.jni_id)
       end
       
       const_set_lazy(:NSAccessibilityUnknownRole) { NSString.new(_nsaccessibility_unknown_role) }
       const_attr_reader  :NSAccessibilityUnknownRole
       
-      JNI.native_method :Java_org_eclipse_swt_internal_cocoa_OS_NSAccessibilityUnknownSubrole, [:pointer, :long], :int32
+      JNI.load_native_method :Java_org_eclipse_swt_internal_cocoa_OS_NSAccessibilityUnknownSubrole, [:pointer, :long], :int32
       typesig { [] }
       # @method flags=const
       # long
       def _nsaccessibility_unknown_subrole
-        JNI.__send__(:Java_org_eclipse_swt_internal_cocoa_OS_NSAccessibilityUnknownSubrole, JNI.env, self.jni_id)
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_cocoa_OS_NSAccessibilityUnknownSubrole, JNI.env, self.jni_id)
       end
       
       const_set_lazy(:NSAccessibilityUnknownSubrole) { NSString.new(_nsaccessibility_unknown_subrole) }
       const_attr_reader  :NSAccessibilityUnknownSubrole
       
-      JNI.native_method :Java_org_eclipse_swt_internal_cocoa_OS_NSAccessibilityValueAttribute, [:pointer, :long], :int32
+      JNI.load_native_method :Java_org_eclipse_swt_internal_cocoa_OS_NSAccessibilityValueAttribute, [:pointer, :long], :int32
       typesig { [] }
       # @method flags=const
       # long
       def _nsaccessibility_value_attribute
-        JNI.__send__(:Java_org_eclipse_swt_internal_cocoa_OS_NSAccessibilityValueAttribute, JNI.env, self.jni_id)
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_cocoa_OS_NSAccessibilityValueAttribute, JNI.env, self.jni_id)
       end
       
       const_set_lazy(:NSAccessibilityValueAttribute) { NSString.new(_nsaccessibility_value_attribute) }
       const_attr_reader  :NSAccessibilityValueAttribute
       
-      JNI.native_method :Java_org_eclipse_swt_internal_cocoa_OS_NSAccessibilityValueChangedNotification, [:pointer, :long], :int32
+      JNI.load_native_method :Java_org_eclipse_swt_internal_cocoa_OS_NSAccessibilityValueChangedNotification, [:pointer, :long], :int32
       typesig { [] }
       # @method flags=const
       # long
       def _nsaccessibility_value_changed_notification
-        JNI.__send__(:Java_org_eclipse_swt_internal_cocoa_OS_NSAccessibilityValueChangedNotification, JNI.env, self.jni_id)
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_cocoa_OS_NSAccessibilityValueChangedNotification, JNI.env, self.jni_id)
       end
       
       const_set_lazy(:NSAccessibilityValueChangedNotification) { NSString.new(_nsaccessibility_value_changed_notification) }
       const_attr_reader  :NSAccessibilityValueChangedNotification
       
-      JNI.native_method :Java_org_eclipse_swt_internal_cocoa_OS_NSAccessibilityValueDescriptionAttribute, [:pointer, :long], :int32
+      JNI.load_native_method :Java_org_eclipse_swt_internal_cocoa_OS_NSAccessibilityValueDescriptionAttribute, [:pointer, :long], :int32
       typesig { [] }
       # @method flags=const
       # long
       def _nsaccessibility_value_description_attribute
-        JNI.__send__(:Java_org_eclipse_swt_internal_cocoa_OS_NSAccessibilityValueDescriptionAttribute, JNI.env, self.jni_id)
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_cocoa_OS_NSAccessibilityValueDescriptionAttribute, JNI.env, self.jni_id)
       end
       
       const_set_lazy(:NSAccessibilityValueDescriptionAttribute) { NSString.new(_nsaccessibility_value_description_attribute) }
       const_attr_reader  :NSAccessibilityValueDescriptionAttribute
       
-      JNI.native_method :Java_org_eclipse_swt_internal_cocoa_OS_NSAccessibilityValueIndicatorRole, [:pointer, :long], :int32
+      JNI.load_native_method :Java_org_eclipse_swt_internal_cocoa_OS_NSAccessibilityValueIndicatorRole, [:pointer, :long], :int32
       typesig { [] }
       # @method flags=const
       # long
       def _nsaccessibility_value_indicator_role
-        JNI.__send__(:Java_org_eclipse_swt_internal_cocoa_OS_NSAccessibilityValueIndicatorRole, JNI.env, self.jni_id)
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_cocoa_OS_NSAccessibilityValueIndicatorRole, JNI.env, self.jni_id)
       end
       
       const_set_lazy(:NSAccessibilityValueIndicatorRole) { NSString.new(_nsaccessibility_value_indicator_role) }
       const_attr_reader  :NSAccessibilityValueIndicatorRole
       
-      JNI.native_method :Java_org_eclipse_swt_internal_cocoa_OS_NSAccessibilityVerticalOrientationValue, [:pointer, :long], :int32
+      JNI.load_native_method :Java_org_eclipse_swt_internal_cocoa_OS_NSAccessibilityVerticalOrientationValue, [:pointer, :long], :int32
       typesig { [] }
       # @method flags=const
       # long
       def _nsaccessibility_vertical_orientation_value
-        JNI.__send__(:Java_org_eclipse_swt_internal_cocoa_OS_NSAccessibilityVerticalOrientationValue, JNI.env, self.jni_id)
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_cocoa_OS_NSAccessibilityVerticalOrientationValue, JNI.env, self.jni_id)
       end
       
       const_set_lazy(:NSAccessibilityVerticalOrientationValue) { NSString.new(_nsaccessibility_vertical_orientation_value) }
       const_attr_reader  :NSAccessibilityVerticalOrientationValue
       
-      JNI.native_method :Java_org_eclipse_swt_internal_cocoa_OS_NSAccessibilityVerticalScrollBarAttribute, [:pointer, :long], :int32
+      JNI.load_native_method :Java_org_eclipse_swt_internal_cocoa_OS_NSAccessibilityVerticalScrollBarAttribute, [:pointer, :long], :int32
       typesig { [] }
       # @method flags=const
       # long
       def _nsaccessibility_vertical_scroll_bar_attribute
-        JNI.__send__(:Java_org_eclipse_swt_internal_cocoa_OS_NSAccessibilityVerticalScrollBarAttribute, JNI.env, self.jni_id)
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_cocoa_OS_NSAccessibilityVerticalScrollBarAttribute, JNI.env, self.jni_id)
       end
       
       const_set_lazy(:NSAccessibilityVerticalScrollBarAttribute) { NSString.new(_nsaccessibility_vertical_scroll_bar_attribute) }
       const_attr_reader  :NSAccessibilityVerticalScrollBarAttribute
       
-      JNI.native_method :Java_org_eclipse_swt_internal_cocoa_OS_NSAccessibilityVisibleCharacterRangeAttribute, [:pointer, :long], :int32
+      JNI.load_native_method :Java_org_eclipse_swt_internal_cocoa_OS_NSAccessibilityVisibleCharacterRangeAttribute, [:pointer, :long], :int32
       typesig { [] }
       # @method flags=const
       # long
       def _nsaccessibility_visible_character_range_attribute
-        JNI.__send__(:Java_org_eclipse_swt_internal_cocoa_OS_NSAccessibilityVisibleCharacterRangeAttribute, JNI.env, self.jni_id)
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_cocoa_OS_NSAccessibilityVisibleCharacterRangeAttribute, JNI.env, self.jni_id)
       end
       
       const_set_lazy(:NSAccessibilityVisibleCharacterRangeAttribute) { NSString.new(_nsaccessibility_visible_character_range_attribute) }
       const_attr_reader  :NSAccessibilityVisibleCharacterRangeAttribute
       
-      JNI.native_method :Java_org_eclipse_swt_internal_cocoa_OS_NSAccessibilityVisibleChildrenAttribute, [:pointer, :long], :int32
+      JNI.load_native_method :Java_org_eclipse_swt_internal_cocoa_OS_NSAccessibilityVisibleChildrenAttribute, [:pointer, :long], :int32
       typesig { [] }
       # @method flags=const
       # long
       def _nsaccessibility_visible_children_attribute
-        JNI.__send__(:Java_org_eclipse_swt_internal_cocoa_OS_NSAccessibilityVisibleChildrenAttribute, JNI.env, self.jni_id)
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_cocoa_OS_NSAccessibilityVisibleChildrenAttribute, JNI.env, self.jni_id)
       end
       
       const_set_lazy(:NSAccessibilityVisibleChildrenAttribute) { NSString.new(_nsaccessibility_visible_children_attribute) }
       const_attr_reader  :NSAccessibilityVisibleChildrenAttribute
       
-      JNI.native_method :Java_org_eclipse_swt_internal_cocoa_OS_NSAccessibilityWindowAttribute, [:pointer, :long], :int32
+      JNI.load_native_method :Java_org_eclipse_swt_internal_cocoa_OS_NSAccessibilityWindowAttribute, [:pointer, :long], :int32
       typesig { [] }
       # @method flags=const
       # long
       def _nsaccessibility_window_attribute
-        JNI.__send__(:Java_org_eclipse_swt_internal_cocoa_OS_NSAccessibilityWindowAttribute, JNI.env, self.jni_id)
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_cocoa_OS_NSAccessibilityWindowAttribute, JNI.env, self.jni_id)
       end
       
       const_set_lazy(:NSAccessibilityWindowAttribute) { NSString.new(_nsaccessibility_window_attribute) }
       const_attr_reader  :NSAccessibilityWindowAttribute
       
-      JNI.native_method :Java_org_eclipse_swt_internal_cocoa_OS_NSAccessibilityWindowRole, [:pointer, :long], :int32
+      JNI.load_native_method :Java_org_eclipse_swt_internal_cocoa_OS_NSAccessibilityWindowRole, [:pointer, :long], :int32
       typesig { [] }
       # @method flags=const
       # long
       def _nsaccessibility_window_role
-        JNI.__send__(:Java_org_eclipse_swt_internal_cocoa_OS_NSAccessibilityWindowRole, JNI.env, self.jni_id)
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_cocoa_OS_NSAccessibilityWindowRole, JNI.env, self.jni_id)
       end
       
       const_set_lazy(:NSAccessibilityWindowRole) { NSString.new(_nsaccessibility_window_role) }
       const_attr_reader  :NSAccessibilityWindowRole
       
-      JNI.native_method :Java_org_eclipse_swt_internal_cocoa_OS_NSApplicationDidChangeScreenParametersNotification, [:pointer, :long], :int32
+      JNI.load_native_method :Java_org_eclipse_swt_internal_cocoa_OS_NSApplicationDidChangeScreenParametersNotification, [:pointer, :long], :int32
       typesig { [] }
       # @method flags=const
       # long
       def _nsapplication_did_change_screen_parameters_notification
-        JNI.__send__(:Java_org_eclipse_swt_internal_cocoa_OS_NSApplicationDidChangeScreenParametersNotification, JNI.env, self.jni_id)
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_cocoa_OS_NSApplicationDidChangeScreenParametersNotification, JNI.env, self.jni_id)
       end
       
       const_set_lazy(:NSApplicationDidChangeScreenParametersNotification) { NSString.new(_nsapplication_did_change_screen_parameters_notification) }
       const_attr_reader  :NSApplicationDidChangeScreenParametersNotification
       
-      JNI.native_method :Java_org_eclipse_swt_internal_cocoa_OS_NSBackgroundColorAttributeName, [:pointer, :long], :int32
+      JNI.load_native_method :Java_org_eclipse_swt_internal_cocoa_OS_NSBackgroundColorAttributeName, [:pointer, :long], :int32
       typesig { [] }
       # @method flags=const
       # long
       def _nsbackground_color_attribute_name
-        JNI.__send__(:Java_org_eclipse_swt_internal_cocoa_OS_NSBackgroundColorAttributeName, JNI.env, self.jni_id)
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_cocoa_OS_NSBackgroundColorAttributeName, JNI.env, self.jni_id)
       end
       
       const_set_lazy(:NSBackgroundColorAttributeName) { NSString.new(_nsbackground_color_attribute_name) }
       const_attr_reader  :NSBackgroundColorAttributeName
       
-      JNI.native_method :Java_org_eclipse_swt_internal_cocoa_OS_NSBaselineOffsetAttributeName, [:pointer, :long], :int32
+      JNI.load_native_method :Java_org_eclipse_swt_internal_cocoa_OS_NSBaselineOffsetAttributeName, [:pointer, :long], :int32
       typesig { [] }
       # @method flags=const
       # long
       def _nsbaseline_offset_attribute_name
-        JNI.__send__(:Java_org_eclipse_swt_internal_cocoa_OS_NSBaselineOffsetAttributeName, JNI.env, self.jni_id)
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_cocoa_OS_NSBaselineOffsetAttributeName, JNI.env, self.jni_id)
       end
       
       const_set_lazy(:NSBaselineOffsetAttributeName) { NSString.new(_nsbaseline_offset_attribute_name) }
       const_attr_reader  :NSBaselineOffsetAttributeName
       
-      JNI.native_method :Java_org_eclipse_swt_internal_cocoa_OS_NSCalibratedRGBColorSpace, [:pointer, :long], :int32
+      JNI.load_native_method :Java_org_eclipse_swt_internal_cocoa_OS_NSCalibratedRGBColorSpace, [:pointer, :long], :int32
       typesig { [] }
       # @method flags=const
       # long
       def _nscalibrated_rgbcolor_space
-        JNI.__send__(:Java_org_eclipse_swt_internal_cocoa_OS_NSCalibratedRGBColorSpace, JNI.env, self.jni_id)
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_cocoa_OS_NSCalibratedRGBColorSpace, JNI.env, self.jni_id)
       end
       
       const_set_lazy(:NSCalibratedRGBColorSpace) { NSString.new(_nscalibrated_rgbcolor_space) }
       const_attr_reader  :NSCalibratedRGBColorSpace
       
-      JNI.native_method :Java_org_eclipse_swt_internal_cocoa_OS_NSDeviceRGBColorSpace, [:pointer, :long], :int32
+      JNI.load_native_method :Java_org_eclipse_swt_internal_cocoa_OS_NSDeviceRGBColorSpace, [:pointer, :long], :int32
       typesig { [] }
       # @method flags=const
       # long
       def _nsdevice_rgbcolor_space
-        JNI.__send__(:Java_org_eclipse_swt_internal_cocoa_OS_NSDeviceRGBColorSpace, JNI.env, self.jni_id)
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_cocoa_OS_NSDeviceRGBColorSpace, JNI.env, self.jni_id)
       end
       
       const_set_lazy(:NSDeviceRGBColorSpace) { NSString.new(_nsdevice_rgbcolor_space) }
       const_attr_reader  :NSDeviceRGBColorSpace
       
-      JNI.native_method :Java_org_eclipse_swt_internal_cocoa_OS_NSDeviceResolution, [:pointer, :long], :int32
+      JNI.load_native_method :Java_org_eclipse_swt_internal_cocoa_OS_NSDeviceResolution, [:pointer, :long], :int32
       typesig { [] }
       # @method flags=const
       # long
       def _nsdevice_resolution
-        JNI.__send__(:Java_org_eclipse_swt_internal_cocoa_OS_NSDeviceResolution, JNI.env, self.jni_id)
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_cocoa_OS_NSDeviceResolution, JNI.env, self.jni_id)
       end
       
       const_set_lazy(:NSDeviceResolution) { NSString.new(_nsdevice_resolution) }
       const_attr_reader  :NSDeviceResolution
       
-      JNI.native_method :Java_org_eclipse_swt_internal_cocoa_OS_NSDragPboard, [:pointer, :long], :int32
+      JNI.load_native_method :Java_org_eclipse_swt_internal_cocoa_OS_NSDragPboard, [:pointer, :long], :int32
       typesig { [] }
       # @method flags=const
       # long
       def _nsdrag_pboard
-        JNI.__send__(:Java_org_eclipse_swt_internal_cocoa_OS_NSDragPboard, JNI.env, self.jni_id)
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_cocoa_OS_NSDragPboard, JNI.env, self.jni_id)
       end
       
       const_set_lazy(:NSDragPboard) { NSString.new(_nsdrag_pboard) }
       const_attr_reader  :NSDragPboard
       
-      JNI.native_method :Java_org_eclipse_swt_internal_cocoa_OS_NSEventTrackingRunLoopMode, [:pointer, :long], :int32
+      JNI.load_native_method :Java_org_eclipse_swt_internal_cocoa_OS_NSEventTrackingRunLoopMode, [:pointer, :long], :int32
       typesig { [] }
       # @method flags=const
       # long
       def _nsevent_tracking_run_loop_mode
-        JNI.__send__(:Java_org_eclipse_swt_internal_cocoa_OS_NSEventTrackingRunLoopMode, JNI.env, self.jni_id)
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_cocoa_OS_NSEventTrackingRunLoopMode, JNI.env, self.jni_id)
       end
       
       const_set_lazy(:NSEventTrackingRunLoopMode) { NSString.new(_nsevent_tracking_run_loop_mode) }
       const_attr_reader  :NSEventTrackingRunLoopMode
       
-      JNI.native_method :Java_org_eclipse_swt_internal_cocoa_OS_NSFilenamesPboardType, [:pointer, :long], :int32
+      JNI.load_native_method :Java_org_eclipse_swt_internal_cocoa_OS_NSFilenamesPboardType, [:pointer, :long], :int32
       typesig { [] }
       # @method flags=const
       # long
       def _nsfilenames_pboard_type
-        JNI.__send__(:Java_org_eclipse_swt_internal_cocoa_OS_NSFilenamesPboardType, JNI.env, self.jni_id)
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_cocoa_OS_NSFilenamesPboardType, JNI.env, self.jni_id)
       end
       
       const_set_lazy(:NSFilenamesPboardType) { NSString.new(_nsfilenames_pboard_type) }
       const_attr_reader  :NSFilenamesPboardType
       
-      JNI.native_method :Java_org_eclipse_swt_internal_cocoa_OS_NSFontAttributeName, [:pointer, :long], :int32
+      JNI.load_native_method :Java_org_eclipse_swt_internal_cocoa_OS_NSFontAttributeName, [:pointer, :long], :int32
       typesig { [] }
       # @method flags=const
       # long
       def _nsfont_attribute_name
-        JNI.__send__(:Java_org_eclipse_swt_internal_cocoa_OS_NSFontAttributeName, JNI.env, self.jni_id)
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_cocoa_OS_NSFontAttributeName, JNI.env, self.jni_id)
       end
       
       const_set_lazy(:NSFontAttributeName) { NSString.new(_nsfont_attribute_name) }
       const_attr_reader  :NSFontAttributeName
       
-      JNI.native_method :Java_org_eclipse_swt_internal_cocoa_OS_NSForegroundColorAttributeName, [:pointer, :long], :int32
+      JNI.load_native_method :Java_org_eclipse_swt_internal_cocoa_OS_NSForegroundColorAttributeName, [:pointer, :long], :int32
       typesig { [] }
       # @method flags=const
       # long
       def _nsforeground_color_attribute_name
-        JNI.__send__(:Java_org_eclipse_swt_internal_cocoa_OS_NSForegroundColorAttributeName, JNI.env, self.jni_id)
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_cocoa_OS_NSForegroundColorAttributeName, JNI.env, self.jni_id)
       end
       
       const_set_lazy(:NSForegroundColorAttributeName) { NSString.new(_nsforeground_color_attribute_name) }
       const_attr_reader  :NSForegroundColorAttributeName
       
-      JNI.native_method :Java_org_eclipse_swt_internal_cocoa_OS_NSHTMLPboardType, [:pointer, :long], :int32
+      JNI.load_native_method :Java_org_eclipse_swt_internal_cocoa_OS_NSHTMLPboardType, [:pointer, :long], :int32
       typesig { [] }
       # @method flags=const
       # long
       def _nshtmlpboard_type
-        JNI.__send__(:Java_org_eclipse_swt_internal_cocoa_OS_NSHTMLPboardType, JNI.env, self.jni_id)
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_cocoa_OS_NSHTMLPboardType, JNI.env, self.jni_id)
       end
       
       const_set_lazy(:NSHTMLPboardType) { NSString.new(_nshtmlpboard_type) }
       const_attr_reader  :NSHTMLPboardType
       
-      JNI.native_method :Java_org_eclipse_swt_internal_cocoa_OS_NSLinkAttributeName, [:pointer, :long], :int32
+      JNI.load_native_method :Java_org_eclipse_swt_internal_cocoa_OS_NSLinkAttributeName, [:pointer, :long], :int32
       typesig { [] }
       # @method flags=const
       # long
       def _nslink_attribute_name
-        JNI.__send__(:Java_org_eclipse_swt_internal_cocoa_OS_NSLinkAttributeName, JNI.env, self.jni_id)
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_cocoa_OS_NSLinkAttributeName, JNI.env, self.jni_id)
       end
       
       const_set_lazy(:NSLinkAttributeName) { NSString.new(_nslink_attribute_name) }
       const_attr_reader  :NSLinkAttributeName
       
-      JNI.native_method :Java_org_eclipse_swt_internal_cocoa_OS_NSObliquenessAttributeName, [:pointer, :long], :int32
+      JNI.load_native_method :Java_org_eclipse_swt_internal_cocoa_OS_NSObliquenessAttributeName, [:pointer, :long], :int32
       typesig { [] }
       # @method flags=const
       # long
       def _nsobliqueness_attribute_name
-        JNI.__send__(:Java_org_eclipse_swt_internal_cocoa_OS_NSObliquenessAttributeName, JNI.env, self.jni_id)
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_cocoa_OS_NSObliquenessAttributeName, JNI.env, self.jni_id)
       end
       
       const_set_lazy(:NSObliquenessAttributeName) { NSString.new(_nsobliqueness_attribute_name) }
       const_attr_reader  :NSObliquenessAttributeName
       
-      JNI.native_method :Java_org_eclipse_swt_internal_cocoa_OS_NSParagraphStyleAttributeName, [:pointer, :long], :int32
+      JNI.load_native_method :Java_org_eclipse_swt_internal_cocoa_OS_NSParagraphStyleAttributeName, [:pointer, :long], :int32
       typesig { [] }
       # @method flags=const
       # long
       def _nsparagraph_style_attribute_name
-        JNI.__send__(:Java_org_eclipse_swt_internal_cocoa_OS_NSParagraphStyleAttributeName, JNI.env, self.jni_id)
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_cocoa_OS_NSParagraphStyleAttributeName, JNI.env, self.jni_id)
       end
       
       const_set_lazy(:NSParagraphStyleAttributeName) { NSString.new(_nsparagraph_style_attribute_name) }
       const_attr_reader  :NSParagraphStyleAttributeName
       
-      JNI.native_method :Java_org_eclipse_swt_internal_cocoa_OS_NSPrintAllPages, [:pointer, :long], :int32
+      JNI.load_native_method :Java_org_eclipse_swt_internal_cocoa_OS_NSPrintAllPages, [:pointer, :long], :int32
       typesig { [] }
       # @method flags=const
       # long
       def _nsprint_all_pages
-        JNI.__send__(:Java_org_eclipse_swt_internal_cocoa_OS_NSPrintAllPages, JNI.env, self.jni_id)
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_cocoa_OS_NSPrintAllPages, JNI.env, self.jni_id)
       end
       
       const_set_lazy(:NSPrintAllPages) { NSString.new(_nsprint_all_pages) }
       const_attr_reader  :NSPrintAllPages
       
-      JNI.native_method :Java_org_eclipse_swt_internal_cocoa_OS_NSPrintCopies, [:pointer, :long], :int32
+      JNI.load_native_method :Java_org_eclipse_swt_internal_cocoa_OS_NSPrintCopies, [:pointer, :long], :int32
       typesig { [] }
       # @method flags=const
       # long
       def _nsprint_copies
-        JNI.__send__(:Java_org_eclipse_swt_internal_cocoa_OS_NSPrintCopies, JNI.env, self.jni_id)
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_cocoa_OS_NSPrintCopies, JNI.env, self.jni_id)
       end
       
       const_set_lazy(:NSPrintCopies) { NSString.new(_nsprint_copies) }
       const_attr_reader  :NSPrintCopies
       
-      JNI.native_method :Java_org_eclipse_swt_internal_cocoa_OS_NSPrintFirstPage, [:pointer, :long], :int32
+      JNI.load_native_method :Java_org_eclipse_swt_internal_cocoa_OS_NSPrintFirstPage, [:pointer, :long], :int32
       typesig { [] }
       # @method flags=const
       # long
       def _nsprint_first_page
-        JNI.__send__(:Java_org_eclipse_swt_internal_cocoa_OS_NSPrintFirstPage, JNI.env, self.jni_id)
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_cocoa_OS_NSPrintFirstPage, JNI.env, self.jni_id)
       end
       
       const_set_lazy(:NSPrintFirstPage) { NSString.new(_nsprint_first_page) }
       const_attr_reader  :NSPrintFirstPage
       
-      JNI.native_method :Java_org_eclipse_swt_internal_cocoa_OS_NSPrintJobDisposition, [:pointer, :long], :int32
+      JNI.load_native_method :Java_org_eclipse_swt_internal_cocoa_OS_NSPrintJobDisposition, [:pointer, :long], :int32
       typesig { [] }
       # @method flags=const
       # long
       def _nsprint_job_disposition
-        JNI.__send__(:Java_org_eclipse_swt_internal_cocoa_OS_NSPrintJobDisposition, JNI.env, self.jni_id)
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_cocoa_OS_NSPrintJobDisposition, JNI.env, self.jni_id)
       end
       
       const_set_lazy(:NSPrintJobDisposition) { NSString.new(_nsprint_job_disposition) }
       const_attr_reader  :NSPrintJobDisposition
       
-      JNI.native_method :Java_org_eclipse_swt_internal_cocoa_OS_NSPrintLastPage, [:pointer, :long], :int32
+      JNI.load_native_method :Java_org_eclipse_swt_internal_cocoa_OS_NSPrintLastPage, [:pointer, :long], :int32
       typesig { [] }
       # @method flags=const
       # long
       def _nsprint_last_page
-        JNI.__send__(:Java_org_eclipse_swt_internal_cocoa_OS_NSPrintLastPage, JNI.env, self.jni_id)
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_cocoa_OS_NSPrintLastPage, JNI.env, self.jni_id)
       end
       
       const_set_lazy(:NSPrintLastPage) { NSString.new(_nsprint_last_page) }
       const_attr_reader  :NSPrintLastPage
       
-      JNI.native_method :Java_org_eclipse_swt_internal_cocoa_OS_NSPrintMustCollate, [:pointer, :long], :int32
+      JNI.load_native_method :Java_org_eclipse_swt_internal_cocoa_OS_NSPrintMustCollate, [:pointer, :long], :int32
       typesig { [] }
       # @method flags=const
       # long
       def _nsprint_must_collate
-        JNI.__send__(:Java_org_eclipse_swt_internal_cocoa_OS_NSPrintMustCollate, JNI.env, self.jni_id)
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_cocoa_OS_NSPrintMustCollate, JNI.env, self.jni_id)
       end
       
       const_set_lazy(:NSPrintMustCollate) { NSString.new(_nsprint_must_collate) }
       const_attr_reader  :NSPrintMustCollate
       
-      JNI.native_method :Java_org_eclipse_swt_internal_cocoa_OS_NSPrintPreviewJob, [:pointer, :long], :int32
+      JNI.load_native_method :Java_org_eclipse_swt_internal_cocoa_OS_NSPrintPreviewJob, [:pointer, :long], :int32
       typesig { [] }
       # @method flags=const
       # long
       def _nsprint_preview_job
-        JNI.__send__(:Java_org_eclipse_swt_internal_cocoa_OS_NSPrintPreviewJob, JNI.env, self.jni_id)
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_cocoa_OS_NSPrintPreviewJob, JNI.env, self.jni_id)
       end
       
       const_set_lazy(:NSPrintPreviewJob) { NSString.new(_nsprint_preview_job) }
       const_attr_reader  :NSPrintPreviewJob
       
-      JNI.native_method :Java_org_eclipse_swt_internal_cocoa_OS_NSPrintSaveJob, [:pointer, :long], :int32
+      JNI.load_native_method :Java_org_eclipse_swt_internal_cocoa_OS_NSPrintSaveJob, [:pointer, :long], :int32
       typesig { [] }
       # @method flags=const
       # long
       def _nsprint_save_job
-        JNI.__send__(:Java_org_eclipse_swt_internal_cocoa_OS_NSPrintSaveJob, JNI.env, self.jni_id)
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_cocoa_OS_NSPrintSaveJob, JNI.env, self.jni_id)
       end
       
       const_set_lazy(:NSPrintSaveJob) { NSString.new(_nsprint_save_job) }
       const_attr_reader  :NSPrintSaveJob
       
-      JNI.native_method :Java_org_eclipse_swt_internal_cocoa_OS_NSPrintSavePath, [:pointer, :long], :int32
+      JNI.load_native_method :Java_org_eclipse_swt_internal_cocoa_OS_NSPrintSavePath, [:pointer, :long], :int32
       typesig { [] }
       # @method flags=const
       # long
       def _nsprint_save_path
-        JNI.__send__(:Java_org_eclipse_swt_internal_cocoa_OS_NSPrintSavePath, JNI.env, self.jni_id)
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_cocoa_OS_NSPrintSavePath, JNI.env, self.jni_id)
       end
       
       const_set_lazy(:NSPrintSavePath) { NSString.new(_nsprint_save_path) }
       const_attr_reader  :NSPrintSavePath
       
-      JNI.native_method :Java_org_eclipse_swt_internal_cocoa_OS_NSPrintScalingFactor, [:pointer, :long], :int32
+      JNI.load_native_method :Java_org_eclipse_swt_internal_cocoa_OS_NSPrintScalingFactor, [:pointer, :long], :int32
       typesig { [] }
       # @method flags=const
       # long
       def _nsprint_scaling_factor
-        JNI.__send__(:Java_org_eclipse_swt_internal_cocoa_OS_NSPrintScalingFactor, JNI.env, self.jni_id)
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_cocoa_OS_NSPrintScalingFactor, JNI.env, self.jni_id)
       end
       
       const_set_lazy(:NSPrintScalingFactor) { NSString.new(_nsprint_scaling_factor) }
       const_attr_reader  :NSPrintScalingFactor
       
-      JNI.native_method :Java_org_eclipse_swt_internal_cocoa_OS_NSPrintSpoolJob, [:pointer, :long], :int32
+      JNI.load_native_method :Java_org_eclipse_swt_internal_cocoa_OS_NSPrintSpoolJob, [:pointer, :long], :int32
       typesig { [] }
       # @method flags=const
       # long
       def _nsprint_spool_job
-        JNI.__send__(:Java_org_eclipse_swt_internal_cocoa_OS_NSPrintSpoolJob, JNI.env, self.jni_id)
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_cocoa_OS_NSPrintSpoolJob, JNI.env, self.jni_id)
       end
       
       const_set_lazy(:NSPrintSpoolJob) { NSString.new(_nsprint_spool_job) }
       const_attr_reader  :NSPrintSpoolJob
       
-      JNI.native_method :Java_org_eclipse_swt_internal_cocoa_OS_NSRTFPboardType, [:pointer, :long], :int32
+      JNI.load_native_method :Java_org_eclipse_swt_internal_cocoa_OS_NSRTFPboardType, [:pointer, :long], :int32
       typesig { [] }
       # @method flags=const
       # long
       def _nsrtfpboard_type
-        JNI.__send__(:Java_org_eclipse_swt_internal_cocoa_OS_NSRTFPboardType, JNI.env, self.jni_id)
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_cocoa_OS_NSRTFPboardType, JNI.env, self.jni_id)
       end
       
       const_set_lazy(:NSRTFPboardType) { NSString.new(_nsrtfpboard_type) }
       const_attr_reader  :NSRTFPboardType
       
-      JNI.native_method :Java_org_eclipse_swt_internal_cocoa_OS_NSStrikethroughColorAttributeName, [:pointer, :long], :int32
+      JNI.load_native_method :Java_org_eclipse_swt_internal_cocoa_OS_NSStrikethroughColorAttributeName, [:pointer, :long], :int32
       typesig { [] }
       # @method flags=const
       # long
       def _nsstrikethrough_color_attribute_name
-        JNI.__send__(:Java_org_eclipse_swt_internal_cocoa_OS_NSStrikethroughColorAttributeName, JNI.env, self.jni_id)
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_cocoa_OS_NSStrikethroughColorAttributeName, JNI.env, self.jni_id)
       end
       
       const_set_lazy(:NSStrikethroughColorAttributeName) { NSString.new(_nsstrikethrough_color_attribute_name) }
       const_attr_reader  :NSStrikethroughColorAttributeName
       
-      JNI.native_method :Java_org_eclipse_swt_internal_cocoa_OS_NSStrikethroughStyleAttributeName, [:pointer, :long], :int32
+      JNI.load_native_method :Java_org_eclipse_swt_internal_cocoa_OS_NSStrikethroughStyleAttributeName, [:pointer, :long], :int32
       typesig { [] }
       # @method flags=const
       # long
       def _nsstrikethrough_style_attribute_name
-        JNI.__send__(:Java_org_eclipse_swt_internal_cocoa_OS_NSStrikethroughStyleAttributeName, JNI.env, self.jni_id)
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_cocoa_OS_NSStrikethroughStyleAttributeName, JNI.env, self.jni_id)
       end
       
       const_set_lazy(:NSStrikethroughStyleAttributeName) { NSString.new(_nsstrikethrough_style_attribute_name) }
       const_attr_reader  :NSStrikethroughStyleAttributeName
       
-      JNI.native_method :Java_org_eclipse_swt_internal_cocoa_OS_NSStringPboardType, [:pointer, :long], :int32
+      JNI.load_native_method :Java_org_eclipse_swt_internal_cocoa_OS_NSStringPboardType, [:pointer, :long], :int32
       typesig { [] }
       # @method flags=const
       # long
       def _nsstring_pboard_type
-        JNI.__send__(:Java_org_eclipse_swt_internal_cocoa_OS_NSStringPboardType, JNI.env, self.jni_id)
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_cocoa_OS_NSStringPboardType, JNI.env, self.jni_id)
       end
       
       const_set_lazy(:NSStringPboardType) { NSString.new(_nsstring_pboard_type) }
       const_attr_reader  :NSStringPboardType
       
-      JNI.native_method :Java_org_eclipse_swt_internal_cocoa_OS_NSStrokeWidthAttributeName, [:pointer, :long], :int32
+      JNI.load_native_method :Java_org_eclipse_swt_internal_cocoa_OS_NSStrokeWidthAttributeName, [:pointer, :long], :int32
       typesig { [] }
       # @method flags=const
       # long
       def _nsstroke_width_attribute_name
-        JNI.__send__(:Java_org_eclipse_swt_internal_cocoa_OS_NSStrokeWidthAttributeName, JNI.env, self.jni_id)
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_cocoa_OS_NSStrokeWidthAttributeName, JNI.env, self.jni_id)
       end
       
       const_set_lazy(:NSStrokeWidthAttributeName) { NSString.new(_nsstroke_width_attribute_name) }
       const_attr_reader  :NSStrokeWidthAttributeName
       
-      JNI.native_method :Java_org_eclipse_swt_internal_cocoa_OS_NSSystemColorsDidChangeNotification, [:pointer, :long], :int32
+      JNI.load_native_method :Java_org_eclipse_swt_internal_cocoa_OS_NSSystemColorsDidChangeNotification, [:pointer, :long], :int32
       typesig { [] }
       # @method flags=const
       # long
       def _nssystem_colors_did_change_notification
-        JNI.__send__(:Java_org_eclipse_swt_internal_cocoa_OS_NSSystemColorsDidChangeNotification, JNI.env, self.jni_id)
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_cocoa_OS_NSSystemColorsDidChangeNotification, JNI.env, self.jni_id)
       end
       
       const_set_lazy(:NSSystemColorsDidChangeNotification) { NSString.new(_nssystem_colors_did_change_notification) }
       const_attr_reader  :NSSystemColorsDidChangeNotification
       
-      JNI.native_method :Java_org_eclipse_swt_internal_cocoa_OS_NSTIFFPboardType, [:pointer, :long], :int32
+      JNI.load_native_method :Java_org_eclipse_swt_internal_cocoa_OS_NSTIFFPboardType, [:pointer, :long], :int32
       typesig { [] }
       # @method flags=const
       # long
       def _nstiffpboard_type
-        JNI.__send__(:Java_org_eclipse_swt_internal_cocoa_OS_NSTIFFPboardType, JNI.env, self.jni_id)
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_cocoa_OS_NSTIFFPboardType, JNI.env, self.jni_id)
       end
       
       const_set_lazy(:NSTIFFPboardType) { NSString.new(_nstiffpboard_type) }
       const_attr_reader  :NSTIFFPboardType
       
-      JNI.native_method :Java_org_eclipse_swt_internal_cocoa_OS_NSToolbarCustomizeToolbarItemIdentifier, [:pointer, :long], :int32
+      JNI.load_native_method :Java_org_eclipse_swt_internal_cocoa_OS_NSToolbarCustomizeToolbarItemIdentifier, [:pointer, :long], :int32
       typesig { [] }
       # @method flags=const
       # long
       def _nstoolbar_customize_toolbar_item_identifier
-        JNI.__send__(:Java_org_eclipse_swt_internal_cocoa_OS_NSToolbarCustomizeToolbarItemIdentifier, JNI.env, self.jni_id)
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_cocoa_OS_NSToolbarCustomizeToolbarItemIdentifier, JNI.env, self.jni_id)
       end
       
       const_set_lazy(:NSToolbarCustomizeToolbarItemIdentifier) { NSString.new(_nstoolbar_customize_toolbar_item_identifier) }
       const_attr_reader  :NSToolbarCustomizeToolbarItemIdentifier
       
-      JNI.native_method :Java_org_eclipse_swt_internal_cocoa_OS_NSToolbarDidRemoveItemNotification, [:pointer, :long], :int32
+      JNI.load_native_method :Java_org_eclipse_swt_internal_cocoa_OS_NSToolbarDidRemoveItemNotification, [:pointer, :long], :int32
       typesig { [] }
       # @method flags=const
       # long
       def _nstoolbar_did_remove_item_notification
-        JNI.__send__(:Java_org_eclipse_swt_internal_cocoa_OS_NSToolbarDidRemoveItemNotification, JNI.env, self.jni_id)
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_cocoa_OS_NSToolbarDidRemoveItemNotification, JNI.env, self.jni_id)
       end
       
       const_set_lazy(:NSToolbarDidRemoveItemNotification) { NSString.new(_nstoolbar_did_remove_item_notification) }
       const_attr_reader  :NSToolbarDidRemoveItemNotification
       
-      JNI.native_method :Java_org_eclipse_swt_internal_cocoa_OS_NSToolbarFlexibleSpaceItemIdentifier, [:pointer, :long], :int32
+      JNI.load_native_method :Java_org_eclipse_swt_internal_cocoa_OS_NSToolbarFlexibleSpaceItemIdentifier, [:pointer, :long], :int32
       typesig { [] }
       # @method flags=const
       # long
       def _nstoolbar_flexible_space_item_identifier
-        JNI.__send__(:Java_org_eclipse_swt_internal_cocoa_OS_NSToolbarFlexibleSpaceItemIdentifier, JNI.env, self.jni_id)
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_cocoa_OS_NSToolbarFlexibleSpaceItemIdentifier, JNI.env, self.jni_id)
       end
       
       const_set_lazy(:NSToolbarFlexibleSpaceItemIdentifier) { NSString.new(_nstoolbar_flexible_space_item_identifier) }
       const_attr_reader  :NSToolbarFlexibleSpaceItemIdentifier
       
-      JNI.native_method :Java_org_eclipse_swt_internal_cocoa_OS_NSToolbarPrintItemIdentifier, [:pointer, :long], :int32
+      JNI.load_native_method :Java_org_eclipse_swt_internal_cocoa_OS_NSToolbarPrintItemIdentifier, [:pointer, :long], :int32
       typesig { [] }
       # @method flags=const
       # long
       def _nstoolbar_print_item_identifier
-        JNI.__send__(:Java_org_eclipse_swt_internal_cocoa_OS_NSToolbarPrintItemIdentifier, JNI.env, self.jni_id)
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_cocoa_OS_NSToolbarPrintItemIdentifier, JNI.env, self.jni_id)
       end
       
       const_set_lazy(:NSToolbarPrintItemIdentifier) { NSString.new(_nstoolbar_print_item_identifier) }
       const_attr_reader  :NSToolbarPrintItemIdentifier
       
-      JNI.native_method :Java_org_eclipse_swt_internal_cocoa_OS_NSToolbarSeparatorItemIdentifier, [:pointer, :long], :int32
+      JNI.load_native_method :Java_org_eclipse_swt_internal_cocoa_OS_NSToolbarSeparatorItemIdentifier, [:pointer, :long], :int32
       typesig { [] }
       # @method flags=const
       # long
       def _nstoolbar_separator_item_identifier
-        JNI.__send__(:Java_org_eclipse_swt_internal_cocoa_OS_NSToolbarSeparatorItemIdentifier, JNI.env, self.jni_id)
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_cocoa_OS_NSToolbarSeparatorItemIdentifier, JNI.env, self.jni_id)
       end
       
       const_set_lazy(:NSToolbarSeparatorItemIdentifier) { NSString.new(_nstoolbar_separator_item_identifier) }
       const_attr_reader  :NSToolbarSeparatorItemIdentifier
       
-      JNI.native_method :Java_org_eclipse_swt_internal_cocoa_OS_NSToolbarShowColorsItemIdentifier, [:pointer, :long], :int32
+      JNI.load_native_method :Java_org_eclipse_swt_internal_cocoa_OS_NSToolbarShowColorsItemIdentifier, [:pointer, :long], :int32
       typesig { [] }
       # @method flags=const
       # long
       def _nstoolbar_show_colors_item_identifier
-        JNI.__send__(:Java_org_eclipse_swt_internal_cocoa_OS_NSToolbarShowColorsItemIdentifier, JNI.env, self.jni_id)
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_cocoa_OS_NSToolbarShowColorsItemIdentifier, JNI.env, self.jni_id)
       end
       
       const_set_lazy(:NSToolbarShowColorsItemIdentifier) { NSString.new(_nstoolbar_show_colors_item_identifier) }
       const_attr_reader  :NSToolbarShowColorsItemIdentifier
       
-      JNI.native_method :Java_org_eclipse_swt_internal_cocoa_OS_NSToolbarShowFontsItemIdentifier, [:pointer, :long], :int32
+      JNI.load_native_method :Java_org_eclipse_swt_internal_cocoa_OS_NSToolbarShowFontsItemIdentifier, [:pointer, :long], :int32
       typesig { [] }
       # @method flags=const
       # long
       def _nstoolbar_show_fonts_item_identifier
-        JNI.__send__(:Java_org_eclipse_swt_internal_cocoa_OS_NSToolbarShowFontsItemIdentifier, JNI.env, self.jni_id)
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_cocoa_OS_NSToolbarShowFontsItemIdentifier, JNI.env, self.jni_id)
       end
       
       const_set_lazy(:NSToolbarShowFontsItemIdentifier) { NSString.new(_nstoolbar_show_fonts_item_identifier) }
       const_attr_reader  :NSToolbarShowFontsItemIdentifier
       
-      JNI.native_method :Java_org_eclipse_swt_internal_cocoa_OS_NSToolbarSpaceItemIdentifier, [:pointer, :long], :int32
+      JNI.load_native_method :Java_org_eclipse_swt_internal_cocoa_OS_NSToolbarSpaceItemIdentifier, [:pointer, :long], :int32
       typesig { [] }
       # @method flags=const
       # long
       def _nstoolbar_space_item_identifier
-        JNI.__send__(:Java_org_eclipse_swt_internal_cocoa_OS_NSToolbarSpaceItemIdentifier, JNI.env, self.jni_id)
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_cocoa_OS_NSToolbarSpaceItemIdentifier, JNI.env, self.jni_id)
       end
       
       const_set_lazy(:NSToolbarSpaceItemIdentifier) { NSString.new(_nstoolbar_space_item_identifier) }
       const_attr_reader  :NSToolbarSpaceItemIdentifier
       
-      JNI.native_method :Java_org_eclipse_swt_internal_cocoa_OS_NSToolbarWillAddItemNotification, [:pointer, :long], :int32
+      JNI.load_native_method :Java_org_eclipse_swt_internal_cocoa_OS_NSToolbarWillAddItemNotification, [:pointer, :long], :int32
       typesig { [] }
       # @method flags=const
       # long
       def _nstoolbar_will_add_item_notification
-        JNI.__send__(:Java_org_eclipse_swt_internal_cocoa_OS_NSToolbarWillAddItemNotification, JNI.env, self.jni_id)
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_cocoa_OS_NSToolbarWillAddItemNotification, JNI.env, self.jni_id)
       end
       
       const_set_lazy(:NSToolbarWillAddItemNotification) { NSString.new(_nstoolbar_will_add_item_notification) }
       const_attr_reader  :NSToolbarWillAddItemNotification
       
-      JNI.native_method :Java_org_eclipse_swt_internal_cocoa_OS_NSURLPboardType, [:pointer, :long], :int32
+      JNI.load_native_method :Java_org_eclipse_swt_internal_cocoa_OS_NSURLPboardType, [:pointer, :long], :int32
       typesig { [] }
       # @method flags=const
       # long
       def _nsurlpboard_type
-        JNI.__send__(:Java_org_eclipse_swt_internal_cocoa_OS_NSURLPboardType, JNI.env, self.jni_id)
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_cocoa_OS_NSURLPboardType, JNI.env, self.jni_id)
       end
       
       const_set_lazy(:NSURLPboardType) { NSString.new(_nsurlpboard_type) }
       const_attr_reader  :NSURLPboardType
       
-      JNI.native_method :Java_org_eclipse_swt_internal_cocoa_OS_NSUnderlineColorAttributeName, [:pointer, :long], :int32
+      JNI.load_native_method :Java_org_eclipse_swt_internal_cocoa_OS_NSUnderlineColorAttributeName, [:pointer, :long], :int32
       typesig { [] }
       # @method flags=const
       # long
       def _nsunderline_color_attribute_name
-        JNI.__send__(:Java_org_eclipse_swt_internal_cocoa_OS_NSUnderlineColorAttributeName, JNI.env, self.jni_id)
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_cocoa_OS_NSUnderlineColorAttributeName, JNI.env, self.jni_id)
       end
       
       const_set_lazy(:NSUnderlineColorAttributeName) { NSString.new(_nsunderline_color_attribute_name) }
       const_attr_reader  :NSUnderlineColorAttributeName
       
-      JNI.native_method :Java_org_eclipse_swt_internal_cocoa_OS_NSUnderlineStyleAttributeName, [:pointer, :long], :int32
+      JNI.load_native_method :Java_org_eclipse_swt_internal_cocoa_OS_NSUnderlineStyleAttributeName, [:pointer, :long], :int32
       typesig { [] }
       # @method flags=const
       # long
       def _nsunderline_style_attribute_name
-        JNI.__send__(:Java_org_eclipse_swt_internal_cocoa_OS_NSUnderlineStyleAttributeName, JNI.env, self.jni_id)
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_cocoa_OS_NSUnderlineStyleAttributeName, JNI.env, self.jni_id)
       end
       
       const_set_lazy(:NSUnderlineStyleAttributeName) { NSString.new(_nsunderline_style_attribute_name) }
       const_attr_reader  :NSUnderlineStyleAttributeName
       
-      JNI.native_method :Java_org_eclipse_swt_internal_cocoa_OS_NSViewGlobalFrameDidChangeNotification, [:pointer, :long], :int32
+      JNI.load_native_method :Java_org_eclipse_swt_internal_cocoa_OS_NSViewGlobalFrameDidChangeNotification, [:pointer, :long], :int32
       typesig { [] }
       # @method flags=const
       # long
       def _nsview_global_frame_did_change_notification
-        JNI.__send__(:Java_org_eclipse_swt_internal_cocoa_OS_NSViewGlobalFrameDidChangeNotification, JNI.env, self.jni_id)
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_cocoa_OS_NSViewGlobalFrameDidChangeNotification, JNI.env, self.jni_id)
       end
       
       const_set_lazy(:NSViewGlobalFrameDidChangeNotification) { NSString.new(_nsview_global_frame_did_change_notification) }
       const_attr_reader  :NSViewGlobalFrameDidChangeNotification
       
-      JNI.native_method :Java_org_eclipse_swt_internal_cocoa_OS_kCFRunLoopCommonModes, [:pointer, :long], :int32
+      JNI.load_native_method :Java_org_eclipse_swt_internal_cocoa_OS_kCFRunLoopCommonModes, [:pointer, :long], :int32
       typesig { [] }
       # @method flags=const
       # long
       def k_cfrun_loop_common_modes
-        JNI.__send__(:Java_org_eclipse_swt_internal_cocoa_OS_kCFRunLoopCommonModes, JNI.env, self.jni_id)
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_cocoa_OS_kCFRunLoopCommonModes, JNI.env, self.jni_id)
       end
       
-      JNI.native_method :Java_org_eclipse_swt_internal_cocoa_OS_NSDefaultRunLoopMode, [:pointer, :long], :int32
+      JNI.load_native_method :Java_org_eclipse_swt_internal_cocoa_OS_NSDefaultRunLoopMode, [:pointer, :long], :int32
       typesig { [] }
       # @method flags=const
       # long
       def _nsdefault_run_loop_mode
-        JNI.__send__(:Java_org_eclipse_swt_internal_cocoa_OS_NSDefaultRunLoopMode, JNI.env, self.jni_id)
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_cocoa_OS_NSDefaultRunLoopMode, JNI.env, self.jni_id)
       end
       
       const_set_lazy(:NSDefaultRunLoopMode) { NSString.new(_nsdefault_run_loop_mode) }
       const_attr_reader  :NSDefaultRunLoopMode
       
-      JNI.native_method :Java_org_eclipse_swt_internal_cocoa_OS_NSErrorFailingURLStringKey, [:pointer, :long], :int32
+      JNI.load_native_method :Java_org_eclipse_swt_internal_cocoa_OS_NSErrorFailingURLStringKey, [:pointer, :long], :int32
       typesig { [] }
       # @method flags=const
       # long
       def _nserror_failing_urlstring_key
-        JNI.__send__(:Java_org_eclipse_swt_internal_cocoa_OS_NSErrorFailingURLStringKey, JNI.env, self.jni_id)
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_cocoa_OS_NSErrorFailingURLStringKey, JNI.env, self.jni_id)
       end
       
       const_set_lazy(:NSErrorFailingURLStringKey) { NSString.new(_nserror_failing_urlstring_key) }
       const_attr_reader  :NSErrorFailingURLStringKey
       
-      JNI.native_method :Java_org_eclipse_swt_internal_cocoa_OS_NSAccessibilityActionDescription, [:pointer, :long, :int32], :int32
+      JNI.load_native_method :Java_org_eclipse_swt_internal_cocoa_OS_NSAccessibilityActionDescription, [:pointer, :long, :int32], :int32
       typesig { [::Java::Int] }
       # Functions
       # 
@@ -8894,10 +8894,10 @@ module Org::Eclipse::Swt::Internal::Cocoa
       # long
       # long
       def _nsaccessibility_action_description(action)
-        JNI.__send__(:Java_org_eclipse_swt_internal_cocoa_OS_NSAccessibilityActionDescription, JNI.env, self.jni_id, action.to_int)
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_cocoa_OS_NSAccessibilityActionDescription, JNI.env, self.jni_id, action.to_int)
       end
       
-      JNI.native_method :Java_org_eclipse_swt_internal_cocoa_OS_NSAccessibilityPostNotification, [:pointer, :long, :int32, :int32], :void
+      JNI.load_native_method :Java_org_eclipse_swt_internal_cocoa_OS_NSAccessibilityPostNotification, [:pointer, :long, :int32, :int32], :void
       typesig { [::Java::Int, ::Java::Int] }
       # @param element cast=(id)
       # @param notification cast=(NSString*)
@@ -8905,10 +8905,10 @@ module Org::Eclipse::Swt::Internal::Cocoa
       # long
       # long
       def _nsaccessibility_post_notification(element, notification)
-        JNI.__send__(:Java_org_eclipse_swt_internal_cocoa_OS_NSAccessibilityPostNotification, JNI.env, self.jni_id, element.to_int, notification.to_int)
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_cocoa_OS_NSAccessibilityPostNotification, JNI.env, self.jni_id, element.to_int, notification.to_int)
       end
       
-      JNI.native_method :Java_org_eclipse_swt_internal_cocoa_OS_NSAccessibilityRaiseBadArgumentException, [:pointer, :long, :int32, :int32, :int32], :void
+      JNI.load_native_method :Java_org_eclipse_swt_internal_cocoa_OS_NSAccessibilityRaiseBadArgumentException, [:pointer, :long, :int32, :int32, :int32], :void
       typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
       # @param element cast=(id)
       # @param attribute cast=(NSString*)
@@ -8918,10 +8918,10 @@ module Org::Eclipse::Swt::Internal::Cocoa
       # long
       # long
       def _nsaccessibility_raise_bad_argument_exception(element, attribute, value)
-        JNI.__send__(:Java_org_eclipse_swt_internal_cocoa_OS_NSAccessibilityRaiseBadArgumentException, JNI.env, self.jni_id, element.to_int, attribute.to_int, value.to_int)
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_cocoa_OS_NSAccessibilityRaiseBadArgumentException, JNI.env, self.jni_id, element.to_int, attribute.to_int, value.to_int)
       end
       
-      JNI.native_method :Java_org_eclipse_swt_internal_cocoa_OS_NSAccessibilityRoleDescription, [:pointer, :long, :int32, :int32], :int32
+      JNI.load_native_method :Java_org_eclipse_swt_internal_cocoa_OS_NSAccessibilityRoleDescription, [:pointer, :long, :int32, :int32], :int32
       typesig { [::Java::Int, ::Java::Int] }
       # @param role cast=(NSString*)
       # @param subrole cast=(NSString*)
@@ -8930,75 +8930,75 @@ module Org::Eclipse::Swt::Internal::Cocoa
       # long
       # long
       def _nsaccessibility_role_description(role, subrole)
-        JNI.__send__(:Java_org_eclipse_swt_internal_cocoa_OS_NSAccessibilityRoleDescription, JNI.env, self.jni_id, role.to_int, subrole.to_int)
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_cocoa_OS_NSAccessibilityRoleDescription, JNI.env, self.jni_id, role.to_int, subrole.to_int)
       end
       
-      JNI.native_method :Java_org_eclipse_swt_internal_cocoa_OS_NSAccessibilityRoleDescriptionForUIElement, [:pointer, :long, :int32], :int32
+      JNI.load_native_method :Java_org_eclipse_swt_internal_cocoa_OS_NSAccessibilityRoleDescriptionForUIElement, [:pointer, :long, :int32], :int32
       typesig { [::Java::Int] }
       # @param element cast=(id)
       # 
       # long
       # long
       def _nsaccessibility_role_description_for_uielement(element)
-        JNI.__send__(:Java_org_eclipse_swt_internal_cocoa_OS_NSAccessibilityRoleDescriptionForUIElement, JNI.env, self.jni_id, element.to_int)
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_cocoa_OS_NSAccessibilityRoleDescriptionForUIElement, JNI.env, self.jni_id, element.to_int)
       end
       
-      JNI.native_method :Java_org_eclipse_swt_internal_cocoa_OS_NSAccessibilityUnignoredAncestor, [:pointer, :long, :int32], :int32
+      JNI.load_native_method :Java_org_eclipse_swt_internal_cocoa_OS_NSAccessibilityUnignoredAncestor, [:pointer, :long, :int32], :int32
       typesig { [::Java::Int] }
       # @param element cast=(id)
       # 
       # long
       # long
       def _nsaccessibility_unignored_ancestor(element)
-        JNI.__send__(:Java_org_eclipse_swt_internal_cocoa_OS_NSAccessibilityUnignoredAncestor, JNI.env, self.jni_id, element.to_int)
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_cocoa_OS_NSAccessibilityUnignoredAncestor, JNI.env, self.jni_id, element.to_int)
       end
       
-      JNI.native_method :Java_org_eclipse_swt_internal_cocoa_OS_NSAccessibilityUnignoredChildren, [:pointer, :long, :int32], :int32
+      JNI.load_native_method :Java_org_eclipse_swt_internal_cocoa_OS_NSAccessibilityUnignoredChildren, [:pointer, :long, :int32], :int32
       typesig { [::Java::Int] }
       # @param originalChildren cast=(NSArray*)
       # 
       # long
       # long
       def _nsaccessibility_unignored_children(original_children)
-        JNI.__send__(:Java_org_eclipse_swt_internal_cocoa_OS_NSAccessibilityUnignoredChildren, JNI.env, self.jni_id, original_children.to_int)
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_cocoa_OS_NSAccessibilityUnignoredChildren, JNI.env, self.jni_id, original_children.to_int)
       end
       
-      JNI.native_method :Java_org_eclipse_swt_internal_cocoa_OS_NSAccessibilityUnignoredChildrenForOnlyChild, [:pointer, :long, :int32], :int32
+      JNI.load_native_method :Java_org_eclipse_swt_internal_cocoa_OS_NSAccessibilityUnignoredChildrenForOnlyChild, [:pointer, :long, :int32], :int32
       typesig { [::Java::Int] }
       # @param originalChild cast=(id)
       # 
       # long
       # long
       def _nsaccessibility_unignored_children_for_only_child(original_child)
-        JNI.__send__(:Java_org_eclipse_swt_internal_cocoa_OS_NSAccessibilityUnignoredChildrenForOnlyChild, JNI.env, self.jni_id, original_child.to_int)
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_cocoa_OS_NSAccessibilityUnignoredChildrenForOnlyChild, JNI.env, self.jni_id, original_child.to_int)
       end
       
-      JNI.native_method :Java_org_eclipse_swt_internal_cocoa_OS_NSAccessibilityUnignoredDescendant, [:pointer, :long, :int32], :int32
+      JNI.load_native_method :Java_org_eclipse_swt_internal_cocoa_OS_NSAccessibilityUnignoredDescendant, [:pointer, :long, :int32], :int32
       typesig { [::Java::Int] }
       # @param element cast=(id)
       # 
       # long
       # long
       def _nsaccessibility_unignored_descendant(element)
-        JNI.__send__(:Java_org_eclipse_swt_internal_cocoa_OS_NSAccessibilityUnignoredDescendant, JNI.env, self.jni_id, element.to_int)
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_cocoa_OS_NSAccessibilityUnignoredDescendant, JNI.env, self.jni_id, element.to_int)
       end
       
-      JNI.native_method :Java_org_eclipse_swt_internal_cocoa_OS_NSBeep, [:pointer, :long], :void
+      JNI.load_native_method :Java_org_eclipse_swt_internal_cocoa_OS_NSBeep, [:pointer, :long], :void
       typesig { [] }
       def _nsbeep
-        JNI.__send__(:Java_org_eclipse_swt_internal_cocoa_OS_NSBeep, JNI.env, self.jni_id)
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_cocoa_OS_NSBeep, JNI.env, self.jni_id)
       end
       
-      JNI.native_method :Java_org_eclipse_swt_internal_cocoa_OS_NSBitsPerPixelFromDepth, [:pointer, :long, :int32], :int32
+      JNI.load_native_method :Java_org_eclipse_swt_internal_cocoa_OS_NSBitsPerPixelFromDepth, [:pointer, :long, :int32], :int32
       typesig { [::Java::Int] }
       # @param depth cast=(NSWindowDepth)
       # 
       # long
       def _nsbits_per_pixel_from_depth(depth)
-        JNI.__send__(:Java_org_eclipse_swt_internal_cocoa_OS_NSBitsPerPixelFromDepth, JNI.env, self.jni_id, depth.to_int)
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_cocoa_OS_NSBitsPerPixelFromDepth, JNI.env, self.jni_id, depth.to_int)
       end
       
-      JNI.native_method :Java_org_eclipse_swt_internal_cocoa_OS_NSCopyBits, [:pointer, :long, :int32, :long, :long], :void
+      JNI.load_native_method :Java_org_eclipse_swt_internal_cocoa_OS_NSCopyBits, [:pointer, :long, :int32, :long, :long], :void
       typesig { [::Java::Int, NSRect, NSPoint] }
       # @param srcGState cast=(NSInteger)
       # @param srcRect flags=struct
@@ -9006,49 +9006,49 @@ module Org::Eclipse::Swt::Internal::Cocoa
       # 
       # long
       def _nscopy_bits(src_gstate, src_rect, dest_point)
-        JNI.__send__(:Java_org_eclipse_swt_internal_cocoa_OS_NSCopyBits, JNI.env, self.jni_id, src_gstate.to_int, src_rect.jni_id, dest_point.jni_id)
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_cocoa_OS_NSCopyBits, JNI.env, self.jni_id, src_gstate.to_int, src_rect.jni_id, dest_point.jni_id)
       end
       
-      JNI.native_method :Java_org_eclipse_swt_internal_cocoa_OS_NSNumberOfColorComponents, [:pointer, :long, :int32], :int32
+      JNI.load_native_method :Java_org_eclipse_swt_internal_cocoa_OS_NSNumberOfColorComponents, [:pointer, :long, :int32], :int32
       typesig { [::Java::Int] }
       # @param colorSpaceName cast=(NSString*)
       # 
       # long
       # long
       def _nsnumber_of_color_components(color_space_name)
-        JNI.__send__(:Java_org_eclipse_swt_internal_cocoa_OS_NSNumberOfColorComponents, JNI.env, self.jni_id, color_space_name.to_int)
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_cocoa_OS_NSNumberOfColorComponents, JNI.env, self.jni_id, color_space_name.to_int)
       end
       
-      JNI.native_method :Java_org_eclipse_swt_internal_cocoa_OS_CFDataGetBytePtr, [:pointer, :long, :int32], :int32
+      JNI.load_native_method :Java_org_eclipse_swt_internal_cocoa_OS_CFDataGetBytePtr, [:pointer, :long, :int32], :int32
       typesig { [::Java::Int] }
       # @param theData cast=(CFDataRef)
       # 
       # long
       # long
       def _cfdata_get_byte_ptr(the_data)
-        JNI.__send__(:Java_org_eclipse_swt_internal_cocoa_OS_CFDataGetBytePtr, JNI.env, self.jni_id, the_data.to_int)
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_cocoa_OS_CFDataGetBytePtr, JNI.env, self.jni_id, the_data.to_int)
       end
       
-      JNI.native_method :Java_org_eclipse_swt_internal_cocoa_OS_CFDataGetLength, [:pointer, :long, :int32], :int32
+      JNI.load_native_method :Java_org_eclipse_swt_internal_cocoa_OS_CFDataGetLength, [:pointer, :long, :int32], :int32
       typesig { [::Java::Int] }
       # @param theData cast=(CFDataRef)
       # 
       # long
       # long
       def _cfdata_get_length(the_data)
-        JNI.__send__(:Java_org_eclipse_swt_internal_cocoa_OS_CFDataGetLength, JNI.env, self.jni_id, the_data.to_int)
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_cocoa_OS_CFDataGetLength, JNI.env, self.jni_id, the_data.to_int)
       end
       
-      JNI.native_method :Java_org_eclipse_swt_internal_cocoa_OS_CFRelease, [:pointer, :long, :int32], :void
+      JNI.load_native_method :Java_org_eclipse_swt_internal_cocoa_OS_CFRelease, [:pointer, :long, :int32], :void
       typesig { [::Java::Int] }
       # @param cf cast=(CFTypeRef)
       # 
       # long
       def _cfrelease(cf)
-        JNI.__send__(:Java_org_eclipse_swt_internal_cocoa_OS_CFRelease, JNI.env, self.jni_id, cf.to_int)
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_cocoa_OS_CFRelease, JNI.env, self.jni_id, cf.to_int)
       end
       
-      JNI.native_method :Java_org_eclipse_swt_internal_cocoa_OS_CFRunLoopAddObserver, [:pointer, :long, :int32, :int32, :int32], :void
+      JNI.load_native_method :Java_org_eclipse_swt_internal_cocoa_OS_CFRunLoopAddObserver, [:pointer, :long, :int32, :int32, :int32], :void
       typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
       # @param rl cast=(CFRunLoopRef)
       # @param observer cast=(CFRunLoopObserverRef)
@@ -9058,17 +9058,17 @@ module Org::Eclipse::Swt::Internal::Cocoa
       # long
       # long
       def _cfrun_loop_add_observer(rl, observer, mode)
-        JNI.__send__(:Java_org_eclipse_swt_internal_cocoa_OS_CFRunLoopAddObserver, JNI.env, self.jni_id, rl.to_int, observer.to_int, mode.to_int)
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_cocoa_OS_CFRunLoopAddObserver, JNI.env, self.jni_id, rl.to_int, observer.to_int, mode.to_int)
       end
       
-      JNI.native_method :Java_org_eclipse_swt_internal_cocoa_OS_CFRunLoopGetCurrent, [:pointer, :long], :int32
+      JNI.load_native_method :Java_org_eclipse_swt_internal_cocoa_OS_CFRunLoopGetCurrent, [:pointer, :long], :int32
       typesig { [] }
       # long
       def _cfrun_loop_get_current
-        JNI.__send__(:Java_org_eclipse_swt_internal_cocoa_OS_CFRunLoopGetCurrent, JNI.env, self.jni_id)
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_cocoa_OS_CFRunLoopGetCurrent, JNI.env, self.jni_id)
       end
       
-      JNI.native_method :Java_org_eclipse_swt_internal_cocoa_OS_CFRunLoopObserverCreate, [:pointer, :long, :int32, :int32, :int8, :int32, :int32, :int32], :int32
+      JNI.load_native_method :Java_org_eclipse_swt_internal_cocoa_OS_CFRunLoopObserverCreate, [:pointer, :long, :int32, :int32, :int8, :int32, :int32, :int32], :int32
       typesig { [::Java::Int, ::Java::Int, ::Java::Boolean, ::Java::Int, ::Java::Int, ::Java::Int] }
       # @param allocator cast=(CFAllocatorRef)
       # @param activities cast=(CFOptionFlags)
@@ -9084,19 +9084,19 @@ module Org::Eclipse::Swt::Internal::Cocoa
       # long
       # long
       def _cfrun_loop_observer_create(allocator, activities, repeats, order, callout, context)
-        JNI.__send__(:Java_org_eclipse_swt_internal_cocoa_OS_CFRunLoopObserverCreate, JNI.env, self.jni_id, allocator.to_int, activities.to_int, repeats ? 1 : 0, order.to_int, callout.to_int, context.to_int)
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_cocoa_OS_CFRunLoopObserverCreate, JNI.env, self.jni_id, allocator.to_int, activities.to_int, repeats ? 1 : 0, order.to_int, callout.to_int, context.to_int)
       end
       
-      JNI.native_method :Java_org_eclipse_swt_internal_cocoa_OS_CFRunLoopObserverInvalidate, [:pointer, :long, :int32], :void
+      JNI.load_native_method :Java_org_eclipse_swt_internal_cocoa_OS_CFRunLoopObserverInvalidate, [:pointer, :long, :int32], :void
       typesig { [::Java::Int] }
       # @param observer cast=(CFRunLoopObserverRef)
       # 
       # long
       def _cfrun_loop_observer_invalidate(observer)
-        JNI.__send__(:Java_org_eclipse_swt_internal_cocoa_OS_CFRunLoopObserverInvalidate, JNI.env, self.jni_id, observer.to_int)
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_cocoa_OS_CFRunLoopObserverInvalidate, JNI.env, self.jni_id, observer.to_int)
       end
       
-      JNI.native_method :Java_org_eclipse_swt_internal_cocoa_OS_CFURLCreateStringByAddingPercentEscapes, [:pointer, :long, :int32, :int32, :int32, :int32, :int32], :int32
+      JNI.load_native_method :Java_org_eclipse_swt_internal_cocoa_OS_CFURLCreateStringByAddingPercentEscapes, [:pointer, :long, :int32, :int32, :int32, :int32, :int32], :int32
       typesig { [::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int] }
       # @param allocator cast=(CFAllocatorRef)
       # @param originalString cast=(CFStringRef)
@@ -9110,10 +9110,10 @@ module Org::Eclipse::Swt::Internal::Cocoa
       # long
       # long
       def _cfurlcreate_string_by_adding_percent_escapes(allocator, original_string, characters_to_leave_unescaped, legal_urlcharacters_to_be_escaped, encoding)
-        JNI.__send__(:Java_org_eclipse_swt_internal_cocoa_OS_CFURLCreateStringByAddingPercentEscapes, JNI.env, self.jni_id, allocator.to_int, original_string.to_int, characters_to_leave_unescaped.to_int, legal_urlcharacters_to_be_escaped.to_int, encoding.to_int)
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_cocoa_OS_CFURLCreateStringByAddingPercentEscapes, JNI.env, self.jni_id, allocator.to_int, original_string.to_int, characters_to_leave_unescaped.to_int, legal_urlcharacters_to_be_escaped.to_int, encoding.to_int)
       end
       
-      JNI.native_method :Java_org_eclipse_swt_internal_cocoa_OS_CGBitmapContextCreate, [:pointer, :long, :int32, :int32, :int32, :int32, :int32, :int32, :int32], :int32
+      JNI.load_native_method :Java_org_eclipse_swt_internal_cocoa_OS_CGBitmapContextCreate, [:pointer, :long, :int32, :int32, :int32, :int32, :int32, :int32, :int32], :int32
       typesig { [::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int] }
       # @param data cast=(void*)
       # @param width cast=(size_t)
@@ -9131,46 +9131,46 @@ module Org::Eclipse::Swt::Internal::Cocoa
       # long
       # long
       def _cgbitmap_context_create(data, width, height, bits_per_component, bytes_per_row, colorspace, bitmap_info)
-        JNI.__send__(:Java_org_eclipse_swt_internal_cocoa_OS_CGBitmapContextCreate, JNI.env, self.jni_id, data.to_int, width.to_int, height.to_int, bits_per_component.to_int, bytes_per_row.to_int, colorspace.to_int, bitmap_info.to_int)
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_cocoa_OS_CGBitmapContextCreate, JNI.env, self.jni_id, data.to_int, width.to_int, height.to_int, bits_per_component.to_int, bytes_per_row.to_int, colorspace.to_int, bitmap_info.to_int)
       end
       
-      JNI.native_method :Java_org_eclipse_swt_internal_cocoa_OS_CGBitmapContextCreateImage, [:pointer, :long, :int32], :int32
+      JNI.load_native_method :Java_org_eclipse_swt_internal_cocoa_OS_CGBitmapContextCreateImage, [:pointer, :long, :int32], :int32
       typesig { [::Java::Int] }
       # @param c cast=(CGContextRef)
       # 
       # long
       # long
       def _cgbitmap_context_create_image(c)
-        JNI.__send__(:Java_org_eclipse_swt_internal_cocoa_OS_CGBitmapContextCreateImage, JNI.env, self.jni_id, c.to_int)
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_cocoa_OS_CGBitmapContextCreateImage, JNI.env, self.jni_id, c.to_int)
       end
       
-      JNI.native_method :Java_org_eclipse_swt_internal_cocoa_OS_CGBitmapContextGetData, [:pointer, :long, :int32], :int32
+      JNI.load_native_method :Java_org_eclipse_swt_internal_cocoa_OS_CGBitmapContextGetData, [:pointer, :long, :int32], :int32
       typesig { [::Java::Int] }
       # @param c cast=(CGContextRef)
       # 
       # long
       # long
       def _cgbitmap_context_get_data(c)
-        JNI.__send__(:Java_org_eclipse_swt_internal_cocoa_OS_CGBitmapContextGetData, JNI.env, self.jni_id, c.to_int)
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_cocoa_OS_CGBitmapContextGetData, JNI.env, self.jni_id, c.to_int)
       end
       
-      JNI.native_method :Java_org_eclipse_swt_internal_cocoa_OS_CGColorSpaceCreateDeviceRGB, [:pointer, :long], :int32
+      JNI.load_native_method :Java_org_eclipse_swt_internal_cocoa_OS_CGColorSpaceCreateDeviceRGB, [:pointer, :long], :int32
       typesig { [] }
       # long
       def _cgcolor_space_create_device_rgb
-        JNI.__send__(:Java_org_eclipse_swt_internal_cocoa_OS_CGColorSpaceCreateDeviceRGB, JNI.env, self.jni_id)
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_cocoa_OS_CGColorSpaceCreateDeviceRGB, JNI.env, self.jni_id)
       end
       
-      JNI.native_method :Java_org_eclipse_swt_internal_cocoa_OS_CGColorSpaceRelease, [:pointer, :long, :int32], :void
+      JNI.load_native_method :Java_org_eclipse_swt_internal_cocoa_OS_CGColorSpaceRelease, [:pointer, :long, :int32], :void
       typesig { [::Java::Int] }
       # @param space cast=(CGColorSpaceRef)
       # 
       # long
       def _cgcolor_space_release(space)
-        JNI.__send__(:Java_org_eclipse_swt_internal_cocoa_OS_CGColorSpaceRelease, JNI.env, self.jni_id, space.to_int)
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_cocoa_OS_CGColorSpaceRelease, JNI.env, self.jni_id, space.to_int)
       end
       
-      JNI.native_method :Java_org_eclipse_swt_internal_cocoa_OS_CGContextAddPath, [:pointer, :long, :int32, :int32], :void
+      JNI.load_native_method :Java_org_eclipse_swt_internal_cocoa_OS_CGContextAddPath, [:pointer, :long, :int32, :int32], :void
       typesig { [::Java::Int, ::Java::Int] }
       # @param context cast=(CGContextRef)
       # @param path cast=(CGPathRef)
@@ -9178,10 +9178,10 @@ module Org::Eclipse::Swt::Internal::Cocoa
       # long
       # long
       def _cgcontext_add_path(context, path)
-        JNI.__send__(:Java_org_eclipse_swt_internal_cocoa_OS_CGContextAddPath, JNI.env, self.jni_id, context.to_int, path.to_int)
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_cocoa_OS_CGContextAddPath, JNI.env, self.jni_id, context.to_int, path.to_int)
       end
       
-      JNI.native_method :Java_org_eclipse_swt_internal_cocoa_OS_CGContextDrawImage, [:pointer, :long, :int32, :long, :int32], :void
+      JNI.load_native_method :Java_org_eclipse_swt_internal_cocoa_OS_CGContextDrawImage, [:pointer, :long, :int32, :long, :int32], :void
       typesig { [::Java::Int, CGRect, ::Java::Int] }
       # @param c cast=(CGContextRef)
       # @param rect flags=struct
@@ -9190,46 +9190,46 @@ module Org::Eclipse::Swt::Internal::Cocoa
       # long
       # long
       def _cgcontext_draw_image(c, rect, image)
-        JNI.__send__(:Java_org_eclipse_swt_internal_cocoa_OS_CGContextDrawImage, JNI.env, self.jni_id, c.to_int, rect.jni_id, image.to_int)
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_cocoa_OS_CGContextDrawImage, JNI.env, self.jni_id, c.to_int, rect.jni_id, image.to_int)
       end
       
-      JNI.native_method :Java_org_eclipse_swt_internal_cocoa_OS_CGContextRelease, [:pointer, :long, :int32], :void
+      JNI.load_native_method :Java_org_eclipse_swt_internal_cocoa_OS_CGContextRelease, [:pointer, :long, :int32], :void
       typesig { [::Java::Int] }
       # @param c cast=(CGContextRef)
       # 
       # long
       def _cgcontext_release(c)
-        JNI.__send__(:Java_org_eclipse_swt_internal_cocoa_OS_CGContextRelease, JNI.env, self.jni_id, c.to_int)
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_cocoa_OS_CGContextRelease, JNI.env, self.jni_id, c.to_int)
       end
       
-      JNI.native_method :Java_org_eclipse_swt_internal_cocoa_OS_CGContextReplacePathWithStrokedPath, [:pointer, :long, :int32], :void
+      JNI.load_native_method :Java_org_eclipse_swt_internal_cocoa_OS_CGContextReplacePathWithStrokedPath, [:pointer, :long, :int32], :void
       typesig { [::Java::Int] }
       # @param c cast=(CGContextRef)
       # 
       # long
       def _cgcontext_replace_path_with_stroked_path(c)
-        JNI.__send__(:Java_org_eclipse_swt_internal_cocoa_OS_CGContextReplacePathWithStrokedPath, JNI.env, self.jni_id, c.to_int)
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_cocoa_OS_CGContextReplacePathWithStrokedPath, JNI.env, self.jni_id, c.to_int)
       end
       
-      JNI.native_method :Java_org_eclipse_swt_internal_cocoa_OS_CGContextRestoreGState, [:pointer, :long, :int32], :void
+      JNI.load_native_method :Java_org_eclipse_swt_internal_cocoa_OS_CGContextRestoreGState, [:pointer, :long, :int32], :void
       typesig { [::Java::Int] }
       # @param c cast=(CGContextRef)
       # 
       # long
       def _cgcontext_restore_gstate(c)
-        JNI.__send__(:Java_org_eclipse_swt_internal_cocoa_OS_CGContextRestoreGState, JNI.env, self.jni_id, c.to_int)
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_cocoa_OS_CGContextRestoreGState, JNI.env, self.jni_id, c.to_int)
       end
       
-      JNI.native_method :Java_org_eclipse_swt_internal_cocoa_OS_CGContextSaveGState, [:pointer, :long, :int32], :void
+      JNI.load_native_method :Java_org_eclipse_swt_internal_cocoa_OS_CGContextSaveGState, [:pointer, :long, :int32], :void
       typesig { [::Java::Int] }
       # @param c cast=(CGContextRef)
       # 
       # long
       def _cgcontext_save_gstate(c)
-        JNI.__send__(:Java_org_eclipse_swt_internal_cocoa_OS_CGContextSaveGState, JNI.env, self.jni_id, c.to_int)
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_cocoa_OS_CGContextSaveGState, JNI.env, self.jni_id, c.to_int)
       end
       
-      JNI.native_method :Java_org_eclipse_swt_internal_cocoa_OS_CGContextScaleCTM, [:pointer, :long, :int32, :float, :float], :void
+      JNI.load_native_method :Java_org_eclipse_swt_internal_cocoa_OS_CGContextScaleCTM, [:pointer, :long, :int32, :float, :float], :void
       typesig { [::Java::Int, ::Java::Float, ::Java::Float] }
       # @param c cast=(CGContextRef)
       # @param sx cast=(CGFloat)
@@ -9239,30 +9239,30 @@ module Org::Eclipse::Swt::Internal::Cocoa
       # double
       # double
       def _cgcontext_scale_ctm(c, sx, sy)
-        JNI.__send__(:Java_org_eclipse_swt_internal_cocoa_OS_CGContextScaleCTM, JNI.env, self.jni_id, c.to_int, sx, sy)
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_cocoa_OS_CGContextScaleCTM, JNI.env, self.jni_id, c.to_int, sx, sy)
       end
       
-      JNI.native_method :Java_org_eclipse_swt_internal_cocoa_OS_CGContextSetBlendMode, [:pointer, :long, :int32, :int32], :void
+      JNI.load_native_method :Java_org_eclipse_swt_internal_cocoa_OS_CGContextSetBlendMode, [:pointer, :long, :int32, :int32], :void
       typesig { [::Java::Int, ::Java::Int] }
       # @param context cast=(CGContextRef)
       # @param mode cast=(CGBlendMode)
       # 
       # long
       def _cgcontext_set_blend_mode(context, mode)
-        JNI.__send__(:Java_org_eclipse_swt_internal_cocoa_OS_CGContextSetBlendMode, JNI.env, self.jni_id, context.to_int, mode.to_int)
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_cocoa_OS_CGContextSetBlendMode, JNI.env, self.jni_id, context.to_int, mode.to_int)
       end
       
-      JNI.native_method :Java_org_eclipse_swt_internal_cocoa_OS_CGContextSetLineCap, [:pointer, :long, :int32, :int32], :void
+      JNI.load_native_method :Java_org_eclipse_swt_internal_cocoa_OS_CGContextSetLineCap, [:pointer, :long, :int32, :int32], :void
       typesig { [::Java::Int, ::Java::Int] }
       # @param c cast=(CGContextRef)
       # @param cap cast=(CGLineCap)
       # 
       # long
       def _cgcontext_set_line_cap(c, cap)
-        JNI.__send__(:Java_org_eclipse_swt_internal_cocoa_OS_CGContextSetLineCap, JNI.env, self.jni_id, c.to_int, cap.to_int)
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_cocoa_OS_CGContextSetLineCap, JNI.env, self.jni_id, c.to_int, cap.to_int)
       end
       
-      JNI.native_method :Java_org_eclipse_swt_internal_cocoa_OS_CGContextSetLineDash, [:pointer, :long, :int32, :float, :long, :int32], :void
+      JNI.load_native_method :Java_org_eclipse_swt_internal_cocoa_OS_CGContextSetLineDash, [:pointer, :long, :int32, :float, :long, :int32], :void
       typesig { [::Java::Int, ::Java::Float, Array.typed(::Java::Float), ::Java::Int] }
       # @param c cast=(CGContextRef)
       # @param phase cast=(CGFloat)
@@ -9273,20 +9273,20 @@ module Org::Eclipse::Swt::Internal::Cocoa
       # double
       # long
       def _cgcontext_set_line_dash(c, phase, lengths, count)
-        JNI.__send__(:Java_org_eclipse_swt_internal_cocoa_OS_CGContextSetLineDash, JNI.env, self.jni_id, c.to_int, phase, lengths.jni_id, count.to_int)
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_cocoa_OS_CGContextSetLineDash, JNI.env, self.jni_id, c.to_int, phase, lengths.jni_id, count.to_int)
       end
       
-      JNI.native_method :Java_org_eclipse_swt_internal_cocoa_OS_CGContextSetLineJoin, [:pointer, :long, :int32, :int32], :void
+      JNI.load_native_method :Java_org_eclipse_swt_internal_cocoa_OS_CGContextSetLineJoin, [:pointer, :long, :int32, :int32], :void
       typesig { [::Java::Int, ::Java::Int] }
       # @param c cast=(CGContextRef)
       # @param join cast=(CGLineJoin)
       # 
       # long
       def _cgcontext_set_line_join(c, join)
-        JNI.__send__(:Java_org_eclipse_swt_internal_cocoa_OS_CGContextSetLineJoin, JNI.env, self.jni_id, c.to_int, join.to_int)
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_cocoa_OS_CGContextSetLineJoin, JNI.env, self.jni_id, c.to_int, join.to_int)
       end
       
-      JNI.native_method :Java_org_eclipse_swt_internal_cocoa_OS_CGContextSetLineWidth, [:pointer, :long, :int32, :float], :void
+      JNI.load_native_method :Java_org_eclipse_swt_internal_cocoa_OS_CGContextSetLineWidth, [:pointer, :long, :int32, :float], :void
       typesig { [::Java::Int, ::Java::Float] }
       # @param c cast=(CGContextRef)
       # @param width cast=(CGFloat)
@@ -9294,10 +9294,10 @@ module Org::Eclipse::Swt::Internal::Cocoa
       # long
       # double
       def _cgcontext_set_line_width(c, width)
-        JNI.__send__(:Java_org_eclipse_swt_internal_cocoa_OS_CGContextSetLineWidth, JNI.env, self.jni_id, c.to_int, width)
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_cocoa_OS_CGContextSetLineWidth, JNI.env, self.jni_id, c.to_int, width)
       end
       
-      JNI.native_method :Java_org_eclipse_swt_internal_cocoa_OS_CGContextSetMiterLimit, [:pointer, :long, :int32, :float], :void
+      JNI.load_native_method :Java_org_eclipse_swt_internal_cocoa_OS_CGContextSetMiterLimit, [:pointer, :long, :int32, :float], :void
       typesig { [::Java::Int, ::Java::Float] }
       # @param c cast=(CGContextRef)
       # @param limit cast=(CGFloat)
@@ -9305,19 +9305,19 @@ module Org::Eclipse::Swt::Internal::Cocoa
       # long
       # double
       def _cgcontext_set_miter_limit(c, limit)
-        JNI.__send__(:Java_org_eclipse_swt_internal_cocoa_OS_CGContextSetMiterLimit, JNI.env, self.jni_id, c.to_int, limit)
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_cocoa_OS_CGContextSetMiterLimit, JNI.env, self.jni_id, c.to_int, limit)
       end
       
-      JNI.native_method :Java_org_eclipse_swt_internal_cocoa_OS_CGContextStrokePath, [:pointer, :long, :int32], :void
+      JNI.load_native_method :Java_org_eclipse_swt_internal_cocoa_OS_CGContextStrokePath, [:pointer, :long, :int32], :void
       typesig { [::Java::Int] }
       # @param c cast=(CGContextRef)
       # 
       # long
       def _cgcontext_stroke_path(c)
-        JNI.__send__(:Java_org_eclipse_swt_internal_cocoa_OS_CGContextStrokePath, JNI.env, self.jni_id, c.to_int)
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_cocoa_OS_CGContextStrokePath, JNI.env, self.jni_id, c.to_int)
       end
       
-      JNI.native_method :Java_org_eclipse_swt_internal_cocoa_OS_CGContextTranslateCTM, [:pointer, :long, :int32, :float, :float], :void
+      JNI.load_native_method :Java_org_eclipse_swt_internal_cocoa_OS_CGContextTranslateCTM, [:pointer, :long, :int32, :float, :float], :void
       typesig { [::Java::Int, ::Java::Float, ::Java::Float] }
       # @param c cast=(CGContextRef)
       # @param tx cast=(CGFloat)
@@ -9327,10 +9327,10 @@ module Org::Eclipse::Swt::Internal::Cocoa
       # double
       # double
       def _cgcontext_translate_ctm(c, tx, ty)
-        JNI.__send__(:Java_org_eclipse_swt_internal_cocoa_OS_CGContextTranslateCTM, JNI.env, self.jni_id, c.to_int, tx, ty)
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_cocoa_OS_CGContextTranslateCTM, JNI.env, self.jni_id, c.to_int, tx, ty)
       end
       
-      JNI.native_method :Java_org_eclipse_swt_internal_cocoa_OS_CGDataProviderCreateWithData, [:pointer, :long, :int32, :int32, :int32, :int32], :int32
+      JNI.load_native_method :Java_org_eclipse_swt_internal_cocoa_OS_CGDataProviderCreateWithData, [:pointer, :long, :int32, :int32, :int32, :int32], :int32
       typesig { [::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int] }
       # @param info cast=(void*)
       # @param data cast=(void*)
@@ -9343,80 +9343,80 @@ module Org::Eclipse::Swt::Internal::Cocoa
       # long
       # long
       def _cgdata_provider_create_with_data(info, data, size, release_data)
-        JNI.__send__(:Java_org_eclipse_swt_internal_cocoa_OS_CGDataProviderCreateWithData, JNI.env, self.jni_id, info.to_int, data.to_int, size.to_int, release_data.to_int)
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_cocoa_OS_CGDataProviderCreateWithData, JNI.env, self.jni_id, info.to_int, data.to_int, size.to_int, release_data.to_int)
       end
       
-      JNI.native_method :Java_org_eclipse_swt_internal_cocoa_OS_CGDataProviderRelease, [:pointer, :long, :int32], :void
+      JNI.load_native_method :Java_org_eclipse_swt_internal_cocoa_OS_CGDataProviderRelease, [:pointer, :long, :int32], :void
       typesig { [::Java::Int] }
       # @param provider cast=(CGDataProviderRef)
       # 
       # long
       def _cgdata_provider_release(provider)
-        JNI.__send__(:Java_org_eclipse_swt_internal_cocoa_OS_CGDataProviderRelease, JNI.env, self.jni_id, provider.to_int)
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_cocoa_OS_CGDataProviderRelease, JNI.env, self.jni_id, provider.to_int)
       end
       
-      JNI.native_method :Java_org_eclipse_swt_internal_cocoa_OS_CGDisplayBaseAddress, [:pointer, :long, :int32], :int32
+      JNI.load_native_method :Java_org_eclipse_swt_internal_cocoa_OS_CGDisplayBaseAddress, [:pointer, :long, :int32], :int32
       typesig { [::Java::Int] }
       # @param display cast=(CGDirectDisplayID)
       # 
       # long
       def _cgdisplay_base_address(display)
-        JNI.__send__(:Java_org_eclipse_swt_internal_cocoa_OS_CGDisplayBaseAddress, JNI.env, self.jni_id, display.to_int)
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_cocoa_OS_CGDisplayBaseAddress, JNI.env, self.jni_id, display.to_int)
       end
       
-      JNI.native_method :Java_org_eclipse_swt_internal_cocoa_OS_CGDisplayBitsPerPixel, [:pointer, :long, :int32], :int32
+      JNI.load_native_method :Java_org_eclipse_swt_internal_cocoa_OS_CGDisplayBitsPerPixel, [:pointer, :long, :int32], :int32
       typesig { [::Java::Int] }
       # @param display cast=(CGDirectDisplayID)
       # 
       # long
       def _cgdisplay_bits_per_pixel(display)
-        JNI.__send__(:Java_org_eclipse_swt_internal_cocoa_OS_CGDisplayBitsPerPixel, JNI.env, self.jni_id, display.to_int)
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_cocoa_OS_CGDisplayBitsPerPixel, JNI.env, self.jni_id, display.to_int)
       end
       
-      JNI.native_method :Java_org_eclipse_swt_internal_cocoa_OS_CGDisplayBitsPerSample, [:pointer, :long, :int32], :int32
+      JNI.load_native_method :Java_org_eclipse_swt_internal_cocoa_OS_CGDisplayBitsPerSample, [:pointer, :long, :int32], :int32
       typesig { [::Java::Int] }
       # @param display cast=(CGDirectDisplayID)
       # 
       # long
       def _cgdisplay_bits_per_sample(display)
-        JNI.__send__(:Java_org_eclipse_swt_internal_cocoa_OS_CGDisplayBitsPerSample, JNI.env, self.jni_id, display.to_int)
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_cocoa_OS_CGDisplayBitsPerSample, JNI.env, self.jni_id, display.to_int)
       end
       
-      JNI.native_method :Java_org_eclipse_swt_internal_cocoa_OS_CGDisplayBytesPerRow, [:pointer, :long, :int32], :int32
+      JNI.load_native_method :Java_org_eclipse_swt_internal_cocoa_OS_CGDisplayBytesPerRow, [:pointer, :long, :int32], :int32
       typesig { [::Java::Int] }
       # @param display cast=(CGDirectDisplayID)
       # 
       # long
       def _cgdisplay_bytes_per_row(display)
-        JNI.__send__(:Java_org_eclipse_swt_internal_cocoa_OS_CGDisplayBytesPerRow, JNI.env, self.jni_id, display.to_int)
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_cocoa_OS_CGDisplayBytesPerRow, JNI.env, self.jni_id, display.to_int)
       end
       
-      JNI.native_method :Java_org_eclipse_swt_internal_cocoa_OS_CGDisplayPixelsHigh, [:pointer, :long, :int32], :int32
+      JNI.load_native_method :Java_org_eclipse_swt_internal_cocoa_OS_CGDisplayPixelsHigh, [:pointer, :long, :int32], :int32
       typesig { [::Java::Int] }
       # @param display cast=(CGDirectDisplayID)
       # 
       # long
       def _cgdisplay_pixels_high(display)
-        JNI.__send__(:Java_org_eclipse_swt_internal_cocoa_OS_CGDisplayPixelsHigh, JNI.env, self.jni_id, display.to_int)
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_cocoa_OS_CGDisplayPixelsHigh, JNI.env, self.jni_id, display.to_int)
       end
       
-      JNI.native_method :Java_org_eclipse_swt_internal_cocoa_OS_CGDisplayPixelsWide, [:pointer, :long, :int32], :int32
+      JNI.load_native_method :Java_org_eclipse_swt_internal_cocoa_OS_CGDisplayPixelsWide, [:pointer, :long, :int32], :int32
       typesig { [::Java::Int] }
       # @param display cast=(CGDirectDisplayID)
       # 
       # long
       def _cgdisplay_pixels_wide(display)
-        JNI.__send__(:Java_org_eclipse_swt_internal_cocoa_OS_CGDisplayPixelsWide, JNI.env, self.jni_id, display.to_int)
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_cocoa_OS_CGDisplayPixelsWide, JNI.env, self.jni_id, display.to_int)
       end
       
-      JNI.native_method :Java_org_eclipse_swt_internal_cocoa_OS_CGEnableEventStateCombining, [:pointer, :long, :int32], :int32
+      JNI.load_native_method :Java_org_eclipse_swt_internal_cocoa_OS_CGEnableEventStateCombining, [:pointer, :long, :int32], :int32
       typesig { [::Java::Int] }
       # @param doCombineState cast=(boolean_t)
       def _cgenable_event_state_combining(do_combine_state)
-        JNI.__send__(:Java_org_eclipse_swt_internal_cocoa_OS_CGEnableEventStateCombining, JNI.env, self.jni_id, do_combine_state.to_int)
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_cocoa_OS_CGEnableEventStateCombining, JNI.env, self.jni_id, do_combine_state.to_int)
       end
       
-      JNI.native_method :Java_org_eclipse_swt_internal_cocoa_OS_CGEventCreateKeyboardEvent, [:pointer, :long, :int32, :int16, :int8], :int32
+      JNI.load_native_method :Java_org_eclipse_swt_internal_cocoa_OS_CGEventCreateKeyboardEvent, [:pointer, :long, :int32, :int16, :int8], :int32
       typesig { [::Java::Int, ::Java::Short, ::Java::Boolean] }
       # @param source cast=(CGEventSourceRef)
       # @param virtualKey cast=(CGKeyCode)
@@ -9425,20 +9425,20 @@ module Org::Eclipse::Swt::Internal::Cocoa
       # long
       # long
       def _cgevent_create_keyboard_event(source, virtual_key, key_down)
-        JNI.__send__(:Java_org_eclipse_swt_internal_cocoa_OS_CGEventCreateKeyboardEvent, JNI.env, self.jni_id, source.to_int, virtual_key.to_int, key_down ? 1 : 0)
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_cocoa_OS_CGEventCreateKeyboardEvent, JNI.env, self.jni_id, source.to_int, virtual_key.to_int, key_down ? 1 : 0)
       end
       
-      JNI.native_method :Java_org_eclipse_swt_internal_cocoa_OS_CGEventGetIntegerValueField, [:pointer, :long, :int32, :int32], :int64
+      JNI.load_native_method :Java_org_eclipse_swt_internal_cocoa_OS_CGEventGetIntegerValueField, [:pointer, :long, :int32, :int32], :int64
       typesig { [::Java::Int, ::Java::Int] }
       # @param event cast=(CGEventRef)
       # @param field cast=(CGEventField)
       # 
       # long
       def _cgevent_get_integer_value_field(event, field)
-        JNI.__send__(:Java_org_eclipse_swt_internal_cocoa_OS_CGEventGetIntegerValueField, JNI.env, self.jni_id, event.to_int, field.to_int)
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_cocoa_OS_CGEventGetIntegerValueField, JNI.env, self.jni_id, event.to_int, field.to_int)
       end
       
-      JNI.native_method :Java_org_eclipse_swt_internal_cocoa_OS_CGEventKeyboardSetUnicodeString, [:pointer, :long, :int32, :int32, :long], :void
+      JNI.load_native_method :Java_org_eclipse_swt_internal_cocoa_OS_CGEventKeyboardSetUnicodeString, [:pointer, :long, :int32, :int32, :long], :void
       typesig { [::Java::Int, ::Java::Int, Array.typed(::Java::Char)] }
       # @param event cast=(CGEventRef)
       # @param stringLength cast=(UniCharCount)
@@ -9447,20 +9447,20 @@ module Org::Eclipse::Swt::Internal::Cocoa
       # long
       # long
       def _cgevent_keyboard_set_unicode_string(event, string_length, unicode_string)
-        JNI.__send__(:Java_org_eclipse_swt_internal_cocoa_OS_CGEventKeyboardSetUnicodeString, JNI.env, self.jni_id, event.to_int, string_length.to_int, unicode_string.jni_id)
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_cocoa_OS_CGEventKeyboardSetUnicodeString, JNI.env, self.jni_id, event.to_int, string_length.to_int, unicode_string.jni_id)
       end
       
-      JNI.native_method :Java_org_eclipse_swt_internal_cocoa_OS_CGEventPost, [:pointer, :long, :int32, :int32], :void
+      JNI.load_native_method :Java_org_eclipse_swt_internal_cocoa_OS_CGEventPost, [:pointer, :long, :int32, :int32], :void
       typesig { [::Java::Int, ::Java::Int] }
       # @param tap cast=(CGEventTapLocation)
       # @param event cast=(CGEventRef)
       # 
       # long
       def _cgevent_post(tap, event)
-        JNI.__send__(:Java_org_eclipse_swt_internal_cocoa_OS_CGEventPost, JNI.env, self.jni_id, tap.to_int, event.to_int)
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_cocoa_OS_CGEventPost, JNI.env, self.jni_id, tap.to_int, event.to_int)
       end
       
-      JNI.native_method :Java_org_eclipse_swt_internal_cocoa_OS_CGGetDisplaysWithRect, [:pointer, :long, :long, :int32, :int32, :int32], :int32
+      JNI.load_native_method :Java_org_eclipse_swt_internal_cocoa_OS_CGGetDisplaysWithRect, [:pointer, :long, :long, :int32, :int32, :int32], :int32
       typesig { [CGRect, ::Java::Int, ::Java::Int, ::Java::Int] }
       # @param rect flags=struct
       # @param maxDisplays cast=(CGDisplayCount)
@@ -9470,10 +9470,10 @@ module Org::Eclipse::Swt::Internal::Cocoa
       # long
       # long
       def _cgget_displays_with_rect(rect, max_displays, dspys, dspy_cnt)
-        JNI.__send__(:Java_org_eclipse_swt_internal_cocoa_OS_CGGetDisplaysWithRect, JNI.env, self.jni_id, rect.jni_id, max_displays.to_int, dspys.to_int, dspy_cnt.to_int)
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_cocoa_OS_CGGetDisplaysWithRect, JNI.env, self.jni_id, rect.jni_id, max_displays.to_int, dspys.to_int, dspy_cnt.to_int)
       end
       
-      JNI.native_method :Java_org_eclipse_swt_internal_cocoa_OS_CGImageCreate, [:pointer, :long, :int32, :int32, :int32, :int32, :int32, :int32, :int32, :int32, :int32, :int8, :int32], :int32
+      JNI.load_native_method :Java_org_eclipse_swt_internal_cocoa_OS_CGImageCreate, [:pointer, :long, :int32, :int32, :int32, :int32, :int32, :int32, :int32, :int32, :int32, :int8, :int32], :int32
       typesig { [::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Boolean, ::Java::Int] }
       # @param width cast=(size_t)
       # @param height cast=(size_t)
@@ -9497,39 +9497,39 @@ module Org::Eclipse::Swt::Internal::Cocoa
       # long
       # long
       def _cgimage_create(width, height, bits_per_component, bits_per_pixel, bytes_per_row, colorspace, bitmap_info, provider, decode, should_interpolate, intent)
-        JNI.__send__(:Java_org_eclipse_swt_internal_cocoa_OS_CGImageCreate, JNI.env, self.jni_id, width.to_int, height.to_int, bits_per_component.to_int, bits_per_pixel.to_int, bytes_per_row.to_int, colorspace.to_int, bitmap_info.to_int, provider.to_int, decode.to_int, should_interpolate ? 1 : 0, intent.to_int)
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_cocoa_OS_CGImageCreate, JNI.env, self.jni_id, width.to_int, height.to_int, bits_per_component.to_int, bits_per_pixel.to_int, bytes_per_row.to_int, colorspace.to_int, bitmap_info.to_int, provider.to_int, decode.to_int, should_interpolate ? 1 : 0, intent.to_int)
       end
       
-      JNI.native_method :Java_org_eclipse_swt_internal_cocoa_OS_CGImageGetHeight, [:pointer, :long, :int32], :int32
+      JNI.load_native_method :Java_org_eclipse_swt_internal_cocoa_OS_CGImageGetHeight, [:pointer, :long, :int32], :int32
       typesig { [::Java::Int] }
       # @param image cast=(CGImageRef)
       # 
       # long
       # long
       def _cgimage_get_height(image)
-        JNI.__send__(:Java_org_eclipse_swt_internal_cocoa_OS_CGImageGetHeight, JNI.env, self.jni_id, image.to_int)
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_cocoa_OS_CGImageGetHeight, JNI.env, self.jni_id, image.to_int)
       end
       
-      JNI.native_method :Java_org_eclipse_swt_internal_cocoa_OS_CGImageGetWidth, [:pointer, :long, :int32], :int32
+      JNI.load_native_method :Java_org_eclipse_swt_internal_cocoa_OS_CGImageGetWidth, [:pointer, :long, :int32], :int32
       typesig { [::Java::Int] }
       # @param image cast=(CGImageRef)
       # 
       # long
       # long
       def _cgimage_get_width(image)
-        JNI.__send__(:Java_org_eclipse_swt_internal_cocoa_OS_CGImageGetWidth, JNI.env, self.jni_id, image.to_int)
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_cocoa_OS_CGImageGetWidth, JNI.env, self.jni_id, image.to_int)
       end
       
-      JNI.native_method :Java_org_eclipse_swt_internal_cocoa_OS_CGImageRelease, [:pointer, :long, :int32], :void
+      JNI.load_native_method :Java_org_eclipse_swt_internal_cocoa_OS_CGImageRelease, [:pointer, :long, :int32], :void
       typesig { [::Java::Int] }
       # @param image cast=(CGImageRef)
       # 
       # long
       def _cgimage_release(image)
-        JNI.__send__(:Java_org_eclipse_swt_internal_cocoa_OS_CGImageRelease, JNI.env, self.jni_id, image.to_int)
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_cocoa_OS_CGImageRelease, JNI.env, self.jni_id, image.to_int)
       end
       
-      JNI.native_method :Java_org_eclipse_swt_internal_cocoa_OS_CGPathAddCurveToPoint, [:pointer, :long, :int32, :int32, :float, :float, :float, :float, :float, :float], :void
+      JNI.load_native_method :Java_org_eclipse_swt_internal_cocoa_OS_CGPathAddCurveToPoint, [:pointer, :long, :int32, :int32, :float, :float, :float, :float, :float, :float], :void
       typesig { [::Java::Int, ::Java::Int, ::Java::Float, ::Java::Float, ::Java::Float, ::Java::Float, ::Java::Float, ::Java::Float] }
       # @param path cast=(CGMutablePathRef)
       # @param m cast=(CGAffineTransform*)
@@ -9549,10 +9549,10 @@ module Org::Eclipse::Swt::Internal::Cocoa
       # double
       # double
       def _cgpath_add_curve_to_point(path, m, cp1x, cp1y, cp2x, cp2y, x, y)
-        JNI.__send__(:Java_org_eclipse_swt_internal_cocoa_OS_CGPathAddCurveToPoint, JNI.env, self.jni_id, path.to_int, m.to_int, cp1x, cp1y, cp2x, cp2y, x, y)
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_cocoa_OS_CGPathAddCurveToPoint, JNI.env, self.jni_id, path.to_int, m.to_int, cp1x, cp1y, cp2x, cp2y, x, y)
       end
       
-      JNI.native_method :Java_org_eclipse_swt_internal_cocoa_OS_CGPathAddLineToPoint, [:pointer, :long, :int32, :int32, :float, :float], :void
+      JNI.load_native_method :Java_org_eclipse_swt_internal_cocoa_OS_CGPathAddLineToPoint, [:pointer, :long, :int32, :int32, :float, :float], :void
       typesig { [::Java::Int, ::Java::Int, ::Java::Float, ::Java::Float] }
       # @param path cast=(CGMutablePathRef)
       # @param m cast=(CGAffineTransform*)
@@ -9564,10 +9564,10 @@ module Org::Eclipse::Swt::Internal::Cocoa
       # double
       # double
       def _cgpath_add_line_to_point(path, m, x, y)
-        JNI.__send__(:Java_org_eclipse_swt_internal_cocoa_OS_CGPathAddLineToPoint, JNI.env, self.jni_id, path.to_int, m.to_int, x, y)
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_cocoa_OS_CGPathAddLineToPoint, JNI.env, self.jni_id, path.to_int, m.to_int, x, y)
       end
       
-      JNI.native_method :Java_org_eclipse_swt_internal_cocoa_OS_CGPathApply, [:pointer, :long, :int32, :int32, :int32], :void
+      JNI.load_native_method :Java_org_eclipse_swt_internal_cocoa_OS_CGPathApply, [:pointer, :long, :int32, :int32, :int32], :void
       typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
       # @param path cast=(CGPathRef)
       # @param info cast=(void*)
@@ -9577,36 +9577,36 @@ module Org::Eclipse::Swt::Internal::Cocoa
       # long
       # long
       def _cgpath_apply(path, info, function)
-        JNI.__send__(:Java_org_eclipse_swt_internal_cocoa_OS_CGPathApply, JNI.env, self.jni_id, path.to_int, info.to_int, function.to_int)
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_cocoa_OS_CGPathApply, JNI.env, self.jni_id, path.to_int, info.to_int, function.to_int)
       end
       
-      JNI.native_method :Java_org_eclipse_swt_internal_cocoa_OS_CGPathCloseSubpath, [:pointer, :long, :int32], :void
+      JNI.load_native_method :Java_org_eclipse_swt_internal_cocoa_OS_CGPathCloseSubpath, [:pointer, :long, :int32], :void
       typesig { [::Java::Int] }
       # @param path cast=(CGMutablePathRef)
       # 
       # long
       def _cgpath_close_subpath(path)
-        JNI.__send__(:Java_org_eclipse_swt_internal_cocoa_OS_CGPathCloseSubpath, JNI.env, self.jni_id, path.to_int)
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_cocoa_OS_CGPathCloseSubpath, JNI.env, self.jni_id, path.to_int)
       end
       
-      JNI.native_method :Java_org_eclipse_swt_internal_cocoa_OS_CGPathCreateCopy, [:pointer, :long, :int32], :int32
+      JNI.load_native_method :Java_org_eclipse_swt_internal_cocoa_OS_CGPathCreateCopy, [:pointer, :long, :int32], :int32
       typesig { [::Java::Int] }
       # @param path cast=(CGPathRef)
       # 
       # long
       # long
       def _cgpath_create_copy(path)
-        JNI.__send__(:Java_org_eclipse_swt_internal_cocoa_OS_CGPathCreateCopy, JNI.env, self.jni_id, path.to_int)
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_cocoa_OS_CGPathCreateCopy, JNI.env, self.jni_id, path.to_int)
       end
       
-      JNI.native_method :Java_org_eclipse_swt_internal_cocoa_OS_CGPathCreateMutable, [:pointer, :long], :int32
+      JNI.load_native_method :Java_org_eclipse_swt_internal_cocoa_OS_CGPathCreateMutable, [:pointer, :long], :int32
       typesig { [] }
       # long
       def _cgpath_create_mutable
-        JNI.__send__(:Java_org_eclipse_swt_internal_cocoa_OS_CGPathCreateMutable, JNI.env, self.jni_id)
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_cocoa_OS_CGPathCreateMutable, JNI.env, self.jni_id)
       end
       
-      JNI.native_method :Java_org_eclipse_swt_internal_cocoa_OS_CGPathMoveToPoint, [:pointer, :long, :int32, :int32, :float, :float], :void
+      JNI.load_native_method :Java_org_eclipse_swt_internal_cocoa_OS_CGPathMoveToPoint, [:pointer, :long, :int32, :int32, :float, :float], :void
       typesig { [::Java::Int, ::Java::Int, ::Java::Float, ::Java::Float] }
       # @param path cast=(CGMutablePathRef)
       # @param m cast=(CGAffineTransform*)
@@ -9618,85 +9618,85 @@ module Org::Eclipse::Swt::Internal::Cocoa
       # double
       # double
       def _cgpath_move_to_point(path, m, x, y)
-        JNI.__send__(:Java_org_eclipse_swt_internal_cocoa_OS_CGPathMoveToPoint, JNI.env, self.jni_id, path.to_int, m.to_int, x, y)
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_cocoa_OS_CGPathMoveToPoint, JNI.env, self.jni_id, path.to_int, m.to_int, x, y)
       end
       
-      JNI.native_method :Java_org_eclipse_swt_internal_cocoa_OS_CGPathRelease, [:pointer, :long, :int32], :void
+      JNI.load_native_method :Java_org_eclipse_swt_internal_cocoa_OS_CGPathRelease, [:pointer, :long, :int32], :void
       typesig { [::Java::Int] }
       # @param path cast=(CGPathRef)
       # 
       # long
       def _cgpath_release(path)
-        JNI.__send__(:Java_org_eclipse_swt_internal_cocoa_OS_CGPathRelease, JNI.env, self.jni_id, path.to_int)
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_cocoa_OS_CGPathRelease, JNI.env, self.jni_id, path.to_int)
       end
       
-      JNI.native_method :Java_org_eclipse_swt_internal_cocoa_OS_CGPostKeyboardEvent, [:pointer, :long, :int16, :int16, :int8], :int32
+      JNI.load_native_method :Java_org_eclipse_swt_internal_cocoa_OS_CGPostKeyboardEvent, [:pointer, :long, :int16, :int16, :int8], :int32
       typesig { [::Java::Short, ::Java::Short, ::Java::Boolean] }
       # @param keyChar cast=(CGCharCode)
       # @param virtualKey cast=(CGKeyCode)
       # @param keyDown cast=(boolean_t)
       def _cgpost_keyboard_event(key_char, virtual_key, key_down)
-        JNI.__send__(:Java_org_eclipse_swt_internal_cocoa_OS_CGPostKeyboardEvent, JNI.env, self.jni_id, key_char.to_int, virtual_key.to_int, key_down ? 1 : 0)
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_cocoa_OS_CGPostKeyboardEvent, JNI.env, self.jni_id, key_char.to_int, virtual_key.to_int, key_down ? 1 : 0)
       end
       
-      JNI.native_method :Java_org_eclipse_swt_internal_cocoa_OS_CGPostMouseEvent, [:pointer, :long, :long, :int8, :int32, :int8, :int8, :int8, :int8, :int8], :int32
+      JNI.load_native_method :Java_org_eclipse_swt_internal_cocoa_OS_CGPostMouseEvent, [:pointer, :long, :long, :int8, :int32, :int8, :int8, :int8, :int8, :int8], :int32
       typesig { [CGPoint, ::Java::Boolean, ::Java::Int, ::Java::Boolean, ::Java::Boolean, ::Java::Boolean, ::Java::Boolean, ::Java::Boolean] }
       # @param mouseCursorPosition flags=struct
       # @param updateMouseCursorPosition cast=(boolean_t)
       # @param buttonCount cast=(CGButtonCount)
       # @param mouseButtonDown cast=(boolean_t)
       def _cgpost_mouse_event(mouse_cursor_position, update_mouse_cursor_position, button_count, mouse_button_down, var_arg0, var_arg1, var_arg2, var_arg3)
-        JNI.__send__(:Java_org_eclipse_swt_internal_cocoa_OS_CGPostMouseEvent, JNI.env, self.jni_id, mouse_cursor_position.jni_id, update_mouse_cursor_position ? 1 : 0, button_count.to_int, mouse_button_down ? 1 : 0, var_arg0 ? 1 : 0, var_arg1 ? 1 : 0, var_arg2 ? 1 : 0, var_arg3 ? 1 : 0)
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_cocoa_OS_CGPostMouseEvent, JNI.env, self.jni_id, mouse_cursor_position.jni_id, update_mouse_cursor_position ? 1 : 0, button_count.to_int, mouse_button_down ? 1 : 0, var_arg0 ? 1 : 0, var_arg1 ? 1 : 0, var_arg2 ? 1 : 0, var_arg3 ? 1 : 0)
       end
       
-      JNI.native_method :Java_org_eclipse_swt_internal_cocoa_OS_CGPostScrollWheelEvent, [:pointer, :long, :int32, :int32], :int32
+      JNI.load_native_method :Java_org_eclipse_swt_internal_cocoa_OS_CGPostScrollWheelEvent, [:pointer, :long, :int32, :int32], :int32
       typesig { [::Java::Int, ::Java::Int] }
       # @param wheelCount cast=(CGWheelCount)
       # @param wheel1 cast=(int32_t)
       def _cgpost_scroll_wheel_event(wheel_count, wheel1)
-        JNI.__send__(:Java_org_eclipse_swt_internal_cocoa_OS_CGPostScrollWheelEvent, JNI.env, self.jni_id, wheel_count.to_int, wheel1.to_int)
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_cocoa_OS_CGPostScrollWheelEvent, JNI.env, self.jni_id, wheel_count.to_int, wheel1.to_int)
       end
       
-      JNI.native_method :Java_org_eclipse_swt_internal_cocoa_OS_CGSetLocalEventsFilterDuringSuppressionState, [:pointer, :long, :int32, :int32], :int32
+      JNI.load_native_method :Java_org_eclipse_swt_internal_cocoa_OS_CGSetLocalEventsFilterDuringSuppressionState, [:pointer, :long, :int32, :int32], :int32
       typesig { [::Java::Int, ::Java::Int] }
       # @param filter cast=(CGEventFilterMask)
       # @param state cast=(CGEventSuppressionState)
       def _cgset_local_events_filter_during_suppression_state(filter, state)
-        JNI.__send__(:Java_org_eclipse_swt_internal_cocoa_OS_CGSetLocalEventsFilterDuringSuppressionState, JNI.env, self.jni_id, filter.to_int, state.to_int)
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_cocoa_OS_CGSetLocalEventsFilterDuringSuppressionState, JNI.env, self.jni_id, filter.to_int, state.to_int)
       end
       
-      JNI.native_method :Java_org_eclipse_swt_internal_cocoa_OS_CGSetLocalEventsSuppressionInterval, [:pointer, :long, :double], :int32
+      JNI.load_native_method :Java_org_eclipse_swt_internal_cocoa_OS_CGSetLocalEventsSuppressionInterval, [:pointer, :long, :double], :int32
       typesig { [::Java::Double] }
       # @param seconds cast=(CFTimeInterval)
       def _cgset_local_events_suppression_interval(seconds)
-        JNI.__send__(:Java_org_eclipse_swt_internal_cocoa_OS_CGSetLocalEventsSuppressionInterval, JNI.env, self.jni_id, seconds)
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_cocoa_OS_CGSetLocalEventsSuppressionInterval, JNI.env, self.jni_id, seconds)
       end
       
-      JNI.native_method :Java_org_eclipse_swt_internal_cocoa_OS_CGWarpMouseCursorPosition, [:pointer, :long, :long], :int32
+      JNI.load_native_method :Java_org_eclipse_swt_internal_cocoa_OS_CGWarpMouseCursorPosition, [:pointer, :long, :long], :int32
       typesig { [CGPoint] }
       # @param newCursorPosition flags=struct
       def _cgwarp_mouse_cursor_position(new_cursor_position)
-        JNI.__send__(:Java_org_eclipse_swt_internal_cocoa_OS_CGWarpMouseCursorPosition, JNI.env, self.jni_id, new_cursor_position.jni_id)
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_cocoa_OS_CGWarpMouseCursorPosition, JNI.env, self.jni_id, new_cursor_position.jni_id)
       end
       
-      JNI.native_method :Java_org_eclipse_swt_internal_cocoa_OS_NSEqualRects, [:pointer, :long, :long, :long], :int8
+      JNI.load_native_method :Java_org_eclipse_swt_internal_cocoa_OS_NSEqualRects, [:pointer, :long, :long, :long], :int8
       typesig { [NSRect, NSRect] }
       # @param aRect flags=struct
       # @param bRect flags=struct
       def _nsequal_rects(a_rect, b_rect)
-        JNI.__send__(:Java_org_eclipse_swt_internal_cocoa_OS_NSEqualRects, JNI.env, self.jni_id, a_rect.jni_id, b_rect.jni_id) != 0
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_cocoa_OS_NSEqualRects, JNI.env, self.jni_id, a_rect.jni_id, b_rect.jni_id) != 0
       end
       
-      JNI.native_method :Java_org_eclipse_swt_internal_cocoa_OS_NSFileTypeForHFSTypeCode, [:pointer, :long, :int32], :int32
+      JNI.load_native_method :Java_org_eclipse_swt_internal_cocoa_OS_NSFileTypeForHFSTypeCode, [:pointer, :long, :int32], :int32
       typesig { [::Java::Int] }
       # @param hfsFileTypeCode cast=(OSType)
       # 
       # long
       def _nsfile_type_for_hfstype_code(hfs_file_type_code)
-        JNI.__send__(:Java_org_eclipse_swt_internal_cocoa_OS_NSFileTypeForHFSTypeCode, JNI.env, self.jni_id, hfs_file_type_code.to_int)
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_cocoa_OS_NSFileTypeForHFSTypeCode, JNI.env, self.jni_id, hfs_file_type_code.to_int)
       end
       
-      JNI.native_method :Java_org_eclipse_swt_internal_cocoa_OS_NSGetSizeAndAlignment, [:pointer, :long, :int32, :long, :long], :int32
+      JNI.load_native_method :Java_org_eclipse_swt_internal_cocoa_OS_NSGetSizeAndAlignment, [:pointer, :long, :int32, :long, :long], :int32
       typesig { [::Java::Int, Array.typed(::Java::Int), Array.typed(::Java::Int)] }
       # @param typePtr cast=(char*)
       # @param sizep cast=(NSUInteger*)
@@ -9707,18 +9707,18 @@ module Org::Eclipse::Swt::Internal::Cocoa
       # long[]
       # long[]
       def _nsget_size_and_alignment(type_ptr, sizep, alignp)
-        JNI.__send__(:Java_org_eclipse_swt_internal_cocoa_OS_NSGetSizeAndAlignment, JNI.env, self.jni_id, type_ptr.to_int, sizep.jni_id, alignp.jni_id)
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_cocoa_OS_NSGetSizeAndAlignment, JNI.env, self.jni_id, type_ptr.to_int, sizep.jni_id, alignp.jni_id)
       end
       
-      JNI.native_method :Java_org_eclipse_swt_internal_cocoa_OS_NSPointInRect, [:pointer, :long, :long, :long], :int8
+      JNI.load_native_method :Java_org_eclipse_swt_internal_cocoa_OS_NSPointInRect, [:pointer, :long, :long, :long], :int8
       typesig { [NSPoint, NSRect] }
       # @param aPoint flags=struct
       # @param aRect flags=struct
       def _nspoint_in_rect(a_point, a_rect)
-        JNI.__send__(:Java_org_eclipse_swt_internal_cocoa_OS_NSPointInRect, JNI.env, self.jni_id, a_point.jni_id, a_rect.jni_id) != 0
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_cocoa_OS_NSPointInRect, JNI.env, self.jni_id, a_point.jni_id, a_rect.jni_id) != 0
       end
       
-      JNI.native_method :Java_org_eclipse_swt_internal_cocoa_OS_NSSearchPathForDirectoriesInDomains, [:pointer, :long, :int32, :int32, :int8], :int32
+      JNI.load_native_method :Java_org_eclipse_swt_internal_cocoa_OS_NSSearchPathForDirectoriesInDomains, [:pointer, :long, :int32, :int32, :int8], :int32
       typesig { [::Java::Int, ::Java::Int, ::Java::Boolean] }
       # @param directory cast=(NSSearchPathDirectory)
       # @param domainMask cast=(NSSearchPathDomainMask)
@@ -9728,17 +9728,17 @@ module Org::Eclipse::Swt::Internal::Cocoa
       # long
       # long
       def _nssearch_path_for_directories_in_domains(directory, domain_mask, expand_tilde)
-        JNI.__send__(:Java_org_eclipse_swt_internal_cocoa_OS_NSSearchPathForDirectoriesInDomains, JNI.env, self.jni_id, directory.to_int, domain_mask.to_int, expand_tilde ? 1 : 0)
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_cocoa_OS_NSSearchPathForDirectoriesInDomains, JNI.env, self.jni_id, directory.to_int, domain_mask.to_int, expand_tilde ? 1 : 0)
       end
       
-      JNI.native_method :Java_org_eclipse_swt_internal_cocoa_OS_NSTemporaryDirectory, [:pointer, :long], :int32
+      JNI.load_native_method :Java_org_eclipse_swt_internal_cocoa_OS_NSTemporaryDirectory, [:pointer, :long], :int32
       typesig { [] }
       # long
       def _nstemporary_directory
-        JNI.__send__(:Java_org_eclipse_swt_internal_cocoa_OS_NSTemporaryDirectory, JNI.env, self.jni_id)
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_cocoa_OS_NSTemporaryDirectory, JNI.env, self.jni_id)
       end
       
-      JNI.native_method :Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSendSuper_1bool, [:pointer, :long, :long, :int32, :long, :int32], :int8
+      JNI.load_native_method :Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSendSuper_1bool, [:pointer, :long, :long, :int32, :long, :int32], :int8
       typesig { [Objc_super, ::Java::Int, NSRange, ::Java::Int] }
       # Super Sends
       # 
@@ -9748,19 +9748,19 @@ module Org::Eclipse::Swt::Internal::Cocoa
       # long
       # long
       def objc_msg_send_super_bool(super_id, sel, arg0, arg1)
-        JNI.__send__(:Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSendSuper_1bool, JNI.env, self.jni_id, super_id.jni_id, sel.to_int, arg0.jni_id, arg1.to_int) != 0
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSendSuper_1bool, JNI.env, self.jni_id, super_id.jni_id, sel.to_int, arg0.jni_id, arg1.to_int) != 0
       end
       
-      JNI.native_method "Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSendSuper__L#{Objc_super.jni_name}_2I".to_sym, [:pointer, :long, :long, :int32], :int32
+      JNI.load_native_method "Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSendSuper__L#{Objc_super.jni_name}_2I".to_sym, [:pointer, :long, :long, :int32], :int32
       typesig { [Objc_super, ::Java::Int] }
       # @method flags=cast
       # long
       # long
       def objc_msg_send_super(super_id, sel)
-        JNI.__send__("Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSendSuper__L#{Objc_super.jni_name}_2I".to_sym, JNI.env, self.jni_id, super_id.jni_id, sel.to_int)
+        JNI.call_native_method("Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSendSuper__L#{Objc_super.jni_name}_2I".to_sym, JNI.env, self.jni_id, super_id.jni_id, sel.to_int)
       end
       
-      JNI.native_method "Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSendSuper__L#{Objc_super.jni_name}_2IL#{NSPoint.jni_name}_2".to_sym, [:pointer, :long, :long, :int32, :long], :int32
+      JNI.load_native_method "Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSendSuper__L#{Objc_super.jni_name}_2IL#{NSPoint.jni_name}_2".to_sym, [:pointer, :long, :long, :int32, :long], :int32
       typesig { [Objc_super, ::Java::Int, NSPoint] }
       # @method flags=cast
       # @param arg0 flags=struct
@@ -9768,10 +9768,10 @@ module Org::Eclipse::Swt::Internal::Cocoa
       # long
       # long
       def objc_msg_send_super(super_id, sel, arg0)
-        JNI.__send__("Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSendSuper__L#{Objc_super.jni_name}_2IL#{NSPoint.jni_name}_2".to_sym, JNI.env, self.jni_id, super_id.jni_id, sel.to_int, arg0.jni_id)
+        JNI.call_native_method("Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSendSuper__L#{Objc_super.jni_name}_2IL#{NSPoint.jni_name}_2".to_sym, JNI.env, self.jni_id, super_id.jni_id, sel.to_int, arg0.jni_id)
       end
       
-      JNI.native_method "Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSendSuper__L#{Objc_super.jni_name}_2IL#{NSRect.jni_name}_2".to_sym, [:pointer, :long, :long, :int32, :long], :int32
+      JNI.load_native_method "Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSendSuper__L#{Objc_super.jni_name}_2IL#{NSRect.jni_name}_2".to_sym, [:pointer, :long, :long, :int32, :long], :int32
       typesig { [Objc_super, ::Java::Int, NSRect] }
       # @method flags=cast
       # @param arg0 flags=struct
@@ -9779,10 +9779,10 @@ module Org::Eclipse::Swt::Internal::Cocoa
       # long
       # long
       def objc_msg_send_super(super_id, sel, arg0)
-        JNI.__send__("Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSendSuper__L#{Objc_super.jni_name}_2IL#{NSRect.jni_name}_2".to_sym, JNI.env, self.jni_id, super_id.jni_id, sel.to_int, arg0.jni_id)
+        JNI.call_native_method("Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSendSuper__L#{Objc_super.jni_name}_2IL#{NSRect.jni_name}_2".to_sym, JNI.env, self.jni_id, super_id.jni_id, sel.to_int, arg0.jni_id)
       end
       
-      JNI.native_method "Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSendSuper__L#{Objc_super.jni_name}_2IL#{NSRect.jni_name}_2I".to_sym, [:pointer, :long, :long, :int32, :long, :int32], :int32
+      JNI.load_native_method "Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSendSuper__L#{Objc_super.jni_name}_2IL#{NSRect.jni_name}_2I".to_sym, [:pointer, :long, :long, :int32, :long, :int32], :int32
       typesig { [Objc_super, ::Java::Int, NSRect, ::Java::Int] }
       # @method flags=cast
       # @param arg0 flags=struct
@@ -9791,10 +9791,10 @@ module Org::Eclipse::Swt::Internal::Cocoa
       # long
       # long
       def objc_msg_send_super(super_id, sel, arg0, arg1)
-        JNI.__send__("Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSendSuper__L#{Objc_super.jni_name}_2IL#{NSRect.jni_name}_2I".to_sym, JNI.env, self.jni_id, super_id.jni_id, sel.to_int, arg0.jni_id, arg1.to_int)
+        JNI.call_native_method("Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSendSuper__L#{Objc_super.jni_name}_2IL#{NSRect.jni_name}_2I".to_sym, JNI.env, self.jni_id, super_id.jni_id, sel.to_int, arg0.jni_id, arg1.to_int)
       end
       
-      JNI.native_method "Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSendSuper__L#{Objc_super.jni_name}_2IL#{NSSize.jni_name}_2".to_sym, [:pointer, :long, :long, :int32, :long], :int32
+      JNI.load_native_method "Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSendSuper__L#{Objc_super.jni_name}_2IL#{NSSize.jni_name}_2".to_sym, [:pointer, :long, :long, :int32, :long], :int32
       typesig { [Objc_super, ::Java::Int, NSSize] }
       # @method flags=cast
       # @param arg0 flags=struct
@@ -9802,29 +9802,29 @@ module Org::Eclipse::Swt::Internal::Cocoa
       # long
       # long
       def objc_msg_send_super(super_id, sel, arg0)
-        JNI.__send__("Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSendSuper__L#{Objc_super.jni_name}_2IL#{NSSize.jni_name}_2".to_sym, JNI.env, self.jni_id, super_id.jni_id, sel.to_int, arg0.jni_id)
+        JNI.call_native_method("Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSendSuper__L#{Objc_super.jni_name}_2IL#{NSSize.jni_name}_2".to_sym, JNI.env, self.jni_id, super_id.jni_id, sel.to_int, arg0.jni_id)
       end
       
-      JNI.native_method "Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSendSuper__L#{Objc_super.jni_name}_2IZ".to_sym, [:pointer, :long, :long, :int32, :int8], :int32
+      JNI.load_native_method "Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSendSuper__L#{Objc_super.jni_name}_2IZ".to_sym, [:pointer, :long, :long, :int32, :int8], :int32
       typesig { [Objc_super, ::Java::Int, ::Java::Boolean] }
       # @method flags=cast
       # long
       # long
       def objc_msg_send_super(super_id, sel, arg0)
-        JNI.__send__("Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSendSuper__L#{Objc_super.jni_name}_2IZ".to_sym, JNI.env, self.jni_id, super_id.jni_id, sel.to_int, arg0 ? 1 : 0)
+        JNI.call_native_method("Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSendSuper__L#{Objc_super.jni_name}_2IZ".to_sym, JNI.env, self.jni_id, super_id.jni_id, sel.to_int, arg0 ? 1 : 0)
       end
       
-      JNI.native_method "Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSendSuper__L#{Objc_super.jni_name}_2II".to_sym, [:pointer, :long, :long, :int32, :int32], :int32
+      JNI.load_native_method "Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSendSuper__L#{Objc_super.jni_name}_2II".to_sym, [:pointer, :long, :long, :int32, :int32], :int32
       typesig { [Objc_super, ::Java::Int, ::Java::Int] }
       # @method flags=cast
       # long
       # long
       # long
       def objc_msg_send_super(super_id, sel, arg0)
-        JNI.__send__("Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSendSuper__L#{Objc_super.jni_name}_2II".to_sym, JNI.env, self.jni_id, super_id.jni_id, sel.to_int, arg0.to_int)
+        JNI.call_native_method("Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSendSuper__L#{Objc_super.jni_name}_2II".to_sym, JNI.env, self.jni_id, super_id.jni_id, sel.to_int, arg0.to_int)
       end
       
-      JNI.native_method "Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSendSuper__L#{Objc_super.jni_name}_2IIL#{NSPoint.jni_name}_2I".to_sym, [:pointer, :long, :long, :int32, :int32, :long, :int32], :int32
+      JNI.load_native_method "Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSendSuper__L#{Objc_super.jni_name}_2IIL#{NSPoint.jni_name}_2I".to_sym, [:pointer, :long, :long, :int32, :int32, :long, :int32], :int32
       typesig { [Objc_super, ::Java::Int, ::Java::Int, NSPoint, ::Java::Int] }
       # @method flags=cast
       # @param arg1 flags=struct
@@ -9834,10 +9834,10 @@ module Org::Eclipse::Swt::Internal::Cocoa
       # long
       # long
       def objc_msg_send_super(super_id, sel, arg0, arg1, arg2)
-        JNI.__send__("Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSendSuper__L#{Objc_super.jni_name}_2IIL#{NSPoint.jni_name}_2I".to_sym, JNI.env, self.jni_id, super_id.jni_id, sel.to_int, arg0.to_int, arg1.jni_id, arg2.to_int)
+        JNI.call_native_method("Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSendSuper__L#{Objc_super.jni_name}_2IIL#{NSPoint.jni_name}_2I".to_sym, JNI.env, self.jni_id, super_id.jni_id, sel.to_int, arg0.to_int, arg1.jni_id, arg2.to_int)
       end
       
-      JNI.native_method "Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSendSuper__L#{Objc_super.jni_name}_2IIL#{NSRect.jni_name}_2I".to_sym, [:pointer, :long, :long, :int32, :int32, :long, :int32], :int32
+      JNI.load_native_method "Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSendSuper__L#{Objc_super.jni_name}_2IIL#{NSRect.jni_name}_2I".to_sym, [:pointer, :long, :long, :int32, :int32, :long, :int32], :int32
       typesig { [Objc_super, ::Java::Int, ::Java::Int, NSRect, ::Java::Int] }
       # @method flags=cast
       # @param arg1 flags=struct
@@ -9847,20 +9847,20 @@ module Org::Eclipse::Swt::Internal::Cocoa
       # long
       # long
       def objc_msg_send_super(super_id, sel, arg0, arg1, arg2)
-        JNI.__send__("Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSendSuper__L#{Objc_super.jni_name}_2IIL#{NSRect.jni_name}_2I".to_sym, JNI.env, self.jni_id, super_id.jni_id, sel.to_int, arg0.to_int, arg1.jni_id, arg2.to_int)
+        JNI.call_native_method("Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSendSuper__L#{Objc_super.jni_name}_2IIL#{NSRect.jni_name}_2I".to_sym, JNI.env, self.jni_id, super_id.jni_id, sel.to_int, arg0.to_int, arg1.jni_id, arg2.to_int)
       end
       
-      JNI.native_method "Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSendSuper__L#{Objc_super.jni_name}_2IIZ".to_sym, [:pointer, :long, :long, :int32, :int32, :int8], :int32
+      JNI.load_native_method "Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSendSuper__L#{Objc_super.jni_name}_2IIZ".to_sym, [:pointer, :long, :long, :int32, :int32, :int8], :int32
       typesig { [Objc_super, ::Java::Int, ::Java::Int, ::Java::Boolean] }
       # @method flags=cast
       # long
       # long
       # long
       def objc_msg_send_super(super_id, sel, arg0, arg1)
-        JNI.__send__("Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSendSuper__L#{Objc_super.jni_name}_2IIZ".to_sym, JNI.env, self.jni_id, super_id.jni_id, sel.to_int, arg0.to_int, arg1 ? 1 : 0)
+        JNI.call_native_method("Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSendSuper__L#{Objc_super.jni_name}_2IIZ".to_sym, JNI.env, self.jni_id, super_id.jni_id, sel.to_int, arg0.to_int, arg1 ? 1 : 0)
       end
       
-      JNI.native_method "Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSendSuper__L#{Objc_super.jni_name}_2III".to_sym, [:pointer, :long, :long, :int32, :int32, :int32], :int32
+      JNI.load_native_method "Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSendSuper__L#{Objc_super.jni_name}_2III".to_sym, [:pointer, :long, :long, :int32, :int32, :int32], :int32
       typesig { [Objc_super, ::Java::Int, ::Java::Int, ::Java::Int] }
       # @method flags=cast
       # long
@@ -9868,10 +9868,10 @@ module Org::Eclipse::Swt::Internal::Cocoa
       # long
       # long
       def objc_msg_send_super(super_id, sel, arg0, arg1)
-        JNI.__send__("Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSendSuper__L#{Objc_super.jni_name}_2III".to_sym, JNI.env, self.jni_id, super_id.jni_id, sel.to_int, arg0.to_int, arg1.to_int)
+        JNI.call_native_method("Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSendSuper__L#{Objc_super.jni_name}_2III".to_sym, JNI.env, self.jni_id, super_id.jni_id, sel.to_int, arg0.to_int, arg1.to_int)
       end
       
-      JNI.native_method "Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSendSuper__L#{Objc_super.jni_name}_2IIIIZ".to_sym, [:pointer, :long, :long, :int32, :int32, :int32, :int32, :int8], :int32
+      JNI.load_native_method "Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSendSuper__L#{Objc_super.jni_name}_2IIIIZ".to_sym, [:pointer, :long, :long, :int32, :int32, :int32, :int32, :int8], :int32
       typesig { [Objc_super, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Boolean] }
       # @method flags=cast
       # long
@@ -9880,10 +9880,10 @@ module Org::Eclipse::Swt::Internal::Cocoa
       # long
       # long
       def objc_msg_send_super(super_id, sel, arg0, arg1, arg2, arg3)
-        JNI.__send__("Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSendSuper__L#{Objc_super.jni_name}_2IIIIZ".to_sym, JNI.env, self.jni_id, super_id.jni_id, sel.to_int, arg0.to_int, arg1.to_int, arg2.to_int, arg3 ? 1 : 0)
+        JNI.call_native_method("Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSendSuper__L#{Objc_super.jni_name}_2IIIIZ".to_sym, JNI.env, self.jni_id, super_id.jni_id, sel.to_int, arg0.to_int, arg1.to_int, arg2.to_int, arg3 ? 1 : 0)
       end
       
-      JNI.native_method "Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSendSuper__L#{Objc_super.jni_name}_2IIIII".to_sym, [:pointer, :long, :long, :int32, :int32, :int32, :int32, :int32], :int32
+      JNI.load_native_method "Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSendSuper__L#{Objc_super.jni_name}_2IIIII".to_sym, [:pointer, :long, :long, :int32, :int32, :int32, :int32, :int32], :int32
       typesig { [Objc_super, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int] }
       # @method flags=cast
       # long
@@ -9893,20 +9893,20 @@ module Org::Eclipse::Swt::Internal::Cocoa
       # long
       # long
       def objc_msg_send_super(super_id, sel, arg0, arg1, arg2, arg3)
-        JNI.__send__("Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSendSuper__L#{Objc_super.jni_name}_2IIIII".to_sym, JNI.env, self.jni_id, super_id.jni_id, sel.to_int, arg0.to_int, arg1.to_int, arg2.to_int, arg3.to_int)
+        JNI.call_native_method("Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSendSuper__L#{Objc_super.jni_name}_2IIIII".to_sym, JNI.env, self.jni_id, super_id.jni_id, sel.to_int, arg0.to_int, arg1.to_int, arg2.to_int, arg3.to_int)
       end
       
-      JNI.native_method "Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSendSuper_1stret__L#{NSRect.jni_name}_2L#{Objc_super.jni_name}_2IL#{NSRect.jni_name}_2".to_sym, [:pointer, :long, :long, :long, :int32, :long], :void
+      JNI.load_native_method "Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSendSuper_1stret__L#{NSRect.jni_name}_2L#{Objc_super.jni_name}_2IL#{NSRect.jni_name}_2".to_sym, [:pointer, :long, :long, :long, :int32, :long], :void
       typesig { [NSRect, Objc_super, ::Java::Int, NSRect] }
       # @method flags=cast
       # @param arg0 flags=struct
       # 
       # long
       def objc_msg_send_super_stret(result, super_id, sel, arg0)
-        JNI.__send__("Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSendSuper_1stret__L#{NSRect.jni_name}_2L#{Objc_super.jni_name}_2IL#{NSRect.jni_name}_2".to_sym, JNI.env, self.jni_id, result.jni_id, super_id.jni_id, sel.to_int, arg0.jni_id)
+        JNI.call_native_method("Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSendSuper_1stret__L#{NSRect.jni_name}_2L#{Objc_super.jni_name}_2IL#{NSRect.jni_name}_2".to_sym, JNI.env, self.jni_id, result.jni_id, super_id.jni_id, sel.to_int, arg0.jni_id)
       end
       
-      JNI.native_method "Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSendSuper_1stret__L#{NSRect.jni_name}_2L#{Objc_super.jni_name}_2IL#{NSRect.jni_name}_2I".to_sym, [:pointer, :long, :long, :long, :int32, :long, :int32], :void
+      JNI.load_native_method "Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSendSuper_1stret__L#{NSRect.jni_name}_2L#{Objc_super.jni_name}_2IL#{NSRect.jni_name}_2I".to_sym, [:pointer, :long, :long, :long, :int32, :long, :int32], :void
       typesig { [NSRect, Objc_super, ::Java::Int, NSRect, ::Java::Int] }
       # @method flags=cast
       # @param arg0 flags=struct
@@ -9914,28 +9914,28 @@ module Org::Eclipse::Swt::Internal::Cocoa
       # long
       # long
       def objc_msg_send_super_stret(result, super_id, sel, arg0, arg1)
-        JNI.__send__("Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSendSuper_1stret__L#{NSRect.jni_name}_2L#{Objc_super.jni_name}_2IL#{NSRect.jni_name}_2I".to_sym, JNI.env, self.jni_id, result.jni_id, super_id.jni_id, sel.to_int, arg0.jni_id, arg1.to_int)
+        JNI.call_native_method("Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSendSuper_1stret__L#{NSRect.jni_name}_2L#{Objc_super.jni_name}_2IL#{NSRect.jni_name}_2I".to_sym, JNI.env, self.jni_id, result.jni_id, super_id.jni_id, sel.to_int, arg0.jni_id, arg1.to_int)
       end
       
-      JNI.native_method "Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSendSuper_1stret__L#{NSSize.jni_name}_2L#{Objc_super.jni_name}_2I".to_sym, [:pointer, :long, :long, :long, :int32], :void
+      JNI.load_native_method "Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSendSuper_1stret__L#{NSSize.jni_name}_2L#{Objc_super.jni_name}_2I".to_sym, [:pointer, :long, :long, :long, :int32], :void
       typesig { [NSSize, Objc_super, ::Java::Int] }
       # @method flags=cast
       # long
       def objc_msg_send_super_stret(result, super_id, sel)
-        JNI.__send__("Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSendSuper_1stret__L#{NSSize.jni_name}_2L#{Objc_super.jni_name}_2I".to_sym, JNI.env, self.jni_id, result.jni_id, super_id.jni_id, sel.to_int)
+        JNI.call_native_method("Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSendSuper_1stret__L#{NSSize.jni_name}_2L#{Objc_super.jni_name}_2I".to_sym, JNI.env, self.jni_id, result.jni_id, super_id.jni_id, sel.to_int)
       end
       
-      JNI.native_method :Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSend_1bool__II, [:pointer, :long, :int32, :int32], :int8
+      JNI.load_native_method :Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSend_1bool__II, [:pointer, :long, :int32, :int32], :int8
       typesig { [::Java::Int, ::Java::Int] }
       # Sends
       # @method flags=cast
       # long
       # long
       def objc_msg_send_bool(id, sel)
-        JNI.__send__(:Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSend_1bool__II, JNI.env, self.jni_id, id.to_int, sel.to_int) != 0
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSend_1bool__II, JNI.env, self.jni_id, id.to_int, sel.to_int) != 0
       end
       
-      JNI.native_method "Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSend_1bool__IIL#{NSPoint.jni_name}_2".to_sym, [:pointer, :long, :int32, :int32, :long], :int8
+      JNI.load_native_method "Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSend_1bool__IIL#{NSPoint.jni_name}_2".to_sym, [:pointer, :long, :int32, :int32, :long], :int8
       typesig { [::Java::Int, ::Java::Int, NSPoint] }
       # @method flags=cast
       # @param arg0 flags=struct
@@ -9943,10 +9943,10 @@ module Org::Eclipse::Swt::Internal::Cocoa
       # long
       # long
       def objc_msg_send_bool(id, sel, arg0)
-        JNI.__send__("Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSend_1bool__IIL#{NSPoint.jni_name}_2".to_sym, JNI.env, self.jni_id, id.to_int, sel.to_int, arg0.jni_id) != 0
+        JNI.call_native_method("Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSend_1bool__IIL#{NSPoint.jni_name}_2".to_sym, JNI.env, self.jni_id, id.to_int, sel.to_int, arg0.jni_id) != 0
       end
       
-      JNI.native_method "Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSend_1bool__IIL#{NSRange.jni_name}_2I".to_sym, [:pointer, :long, :int32, :int32, :long, :int32], :int8
+      JNI.load_native_method "Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSend_1bool__IIL#{NSRange.jni_name}_2I".to_sym, [:pointer, :long, :int32, :int32, :long, :int32], :int8
       typesig { [::Java::Int, ::Java::Int, NSRange, ::Java::Int] }
       # @method flags=cast
       # @param arg0 flags=struct
@@ -9955,10 +9955,10 @@ module Org::Eclipse::Swt::Internal::Cocoa
       # long
       # long
       def objc_msg_send_bool(id, sel, arg0, arg1)
-        JNI.__send__("Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSend_1bool__IIL#{NSRange.jni_name}_2I".to_sym, JNI.env, self.jni_id, id.to_int, sel.to_int, arg0.jni_id, arg1.to_int) != 0
+        JNI.call_native_method("Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSend_1bool__IIL#{NSRange.jni_name}_2I".to_sym, JNI.env, self.jni_id, id.to_int, sel.to_int, arg0.jni_id, arg1.to_int) != 0
       end
       
-      JNI.native_method "Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSend_1bool__IIL#{NSRect.jni_name}_2".to_sym, [:pointer, :long, :int32, :int32, :long], :int8
+      JNI.load_native_method "Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSend_1bool__IIL#{NSRect.jni_name}_2".to_sym, [:pointer, :long, :int32, :int32, :long], :int8
       typesig { [::Java::Int, ::Java::Int, NSRect] }
       # @method flags=cast
       # @param arg0 flags=struct
@@ -9966,20 +9966,20 @@ module Org::Eclipse::Swt::Internal::Cocoa
       # long
       # long
       def objc_msg_send_bool(id, sel, arg0)
-        JNI.__send__("Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSend_1bool__IIL#{NSRect.jni_name}_2".to_sym, JNI.env, self.jni_id, id.to_int, sel.to_int, arg0.jni_id) != 0
+        JNI.call_native_method("Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSend_1bool__IIL#{NSRect.jni_name}_2".to_sym, JNI.env, self.jni_id, id.to_int, sel.to_int, arg0.jni_id) != 0
       end
       
-      JNI.native_method :Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSend_1bool__III, [:pointer, :long, :int32, :int32, :int32], :int8
+      JNI.load_native_method :Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSend_1bool__III, [:pointer, :long, :int32, :int32, :int32], :int8
       typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
       # @method flags=cast
       # long
       # long
       # long
       def objc_msg_send_bool(id, sel, arg0)
-        JNI.__send__(:Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSend_1bool__III, JNI.env, self.jni_id, id.to_int, sel.to_int, arg0.to_int) != 0
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSend_1bool__III, JNI.env, self.jni_id, id.to_int, sel.to_int, arg0.to_int) != 0
       end
       
-      JNI.native_method "Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSend_1bool__IIIL#{NSPoint.jni_name}_2".to_sym, [:pointer, :long, :int32, :int32, :int32, :long], :int8
+      JNI.load_native_method "Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSend_1bool__IIIL#{NSPoint.jni_name}_2".to_sym, [:pointer, :long, :int32, :int32, :int32, :long], :int8
       typesig { [::Java::Int, ::Java::Int, ::Java::Int, NSPoint] }
       # @method flags=cast
       # @param arg1 flags=struct
@@ -9988,10 +9988,10 @@ module Org::Eclipse::Swt::Internal::Cocoa
       # long
       # long
       def objc_msg_send_bool(id, sel, arg0, arg1)
-        JNI.__send__("Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSend_1bool__IIIL#{NSPoint.jni_name}_2".to_sym, JNI.env, self.jni_id, id.to_int, sel.to_int, arg0.to_int, arg1.jni_id) != 0
+        JNI.call_native_method("Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSend_1bool__IIIL#{NSPoint.jni_name}_2".to_sym, JNI.env, self.jni_id, id.to_int, sel.to_int, arg0.to_int, arg1.jni_id) != 0
       end
       
-      JNI.native_method "Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSend_1bool__IIIL#{NSSize.jni_name}_2Z".to_sym, [:pointer, :long, :int32, :int32, :int32, :long, :int8], :int8
+      JNI.load_native_method "Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSend_1bool__IIIL#{NSSize.jni_name}_2Z".to_sym, [:pointer, :long, :int32, :int32, :int32, :long, :int8], :int8
       typesig { [::Java::Int, ::Java::Int, ::Java::Int, NSSize, ::Java::Boolean] }
       # @method flags=cast
       # @param arg1 flags=struct
@@ -10000,10 +10000,10 @@ module Org::Eclipse::Swt::Internal::Cocoa
       # long
       # long
       def objc_msg_send_bool(id, sel, arg0, arg1, arg2)
-        JNI.__send__("Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSend_1bool__IIIL#{NSSize.jni_name}_2Z".to_sym, JNI.env, self.jni_id, id.to_int, sel.to_int, arg0.to_int, arg1.jni_id, arg2 ? 1 : 0) != 0
+        JNI.call_native_method("Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSend_1bool__IIIL#{NSSize.jni_name}_2Z".to_sym, JNI.env, self.jni_id, id.to_int, sel.to_int, arg0.to_int, arg1.jni_id, arg2 ? 1 : 0) != 0
       end
       
-      JNI.native_method :Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSend_1bool__IIII, [:pointer, :long, :int32, :int32, :int32, :int32], :int8
+      JNI.load_native_method :Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSend_1bool__IIII, [:pointer, :long, :int32, :int32, :int32, :int32], :int8
       typesig { [::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int] }
       # @method flags=cast
       # long
@@ -10011,10 +10011,10 @@ module Org::Eclipse::Swt::Internal::Cocoa
       # long
       # long
       def objc_msg_send_bool(id, sel, arg0, arg1)
-        JNI.__send__(:Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSend_1bool__IIII, JNI.env, self.jni_id, id.to_int, sel.to_int, arg0.to_int, arg1.to_int) != 0
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSend_1bool__IIII, JNI.env, self.jni_id, id.to_int, sel.to_int, arg0.to_int, arg1.to_int) != 0
       end
       
-      JNI.native_method :Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSend_1bool__IIIII, [:pointer, :long, :int32, :int32, :int32, :int32, :int32], :int8
+      JNI.load_native_method :Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSend_1bool__IIIII, [:pointer, :long, :int32, :int32, :int32, :int32, :int32], :int8
       typesig { [::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int] }
       # @method flags=cast
       # long
@@ -10023,10 +10023,10 @@ module Org::Eclipse::Swt::Internal::Cocoa
       # long
       # long
       def objc_msg_send_bool(id, sel, arg0, arg1, arg2)
-        JNI.__send__(:Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSend_1bool__IIIII, JNI.env, self.jni_id, id.to_int, sel.to_int, arg0.to_int, arg1.to_int, arg2.to_int) != 0
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSend_1bool__IIIII, JNI.env, self.jni_id, id.to_int, sel.to_int, arg0.to_int, arg1.to_int, arg2.to_int) != 0
       end
       
-      JNI.native_method :Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSend_1bool__IIIIIII, [:pointer, :long, :int32, :int32, :int32, :int32, :int32, :int32, :int32], :int8
+      JNI.load_native_method :Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSend_1bool__IIIIIII, [:pointer, :long, :int32, :int32, :int32, :int32, :int32, :int32, :int32], :int8
       typesig { [::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int] }
       # @method flags=cast
       # long
@@ -10037,38 +10037,38 @@ module Org::Eclipse::Swt::Internal::Cocoa
       # long
       # long
       def objc_msg_send_bool(id, sel, arg0, arg1, arg2, arg3, arg4)
-        JNI.__send__(:Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSend_1bool__IIIIIII, JNI.env, self.jni_id, id.to_int, sel.to_int, arg0.to_int, arg1.to_int, arg2.to_int, arg3.to_int, arg4.to_int) != 0
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSend_1bool__IIIIIII, JNI.env, self.jni_id, id.to_int, sel.to_int, arg0.to_int, arg1.to_int, arg2.to_int, arg3.to_int, arg4.to_int) != 0
       end
       
-      JNI.native_method :Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSend_1bool__IIS, [:pointer, :long, :int32, :int32, :int16], :int8
+      JNI.load_native_method :Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSend_1bool__IIS, [:pointer, :long, :int32, :int32, :int16], :int8
       typesig { [::Java::Int, ::Java::Int, ::Java::Short] }
       # @method flags=cast
       # long
       # long
       def objc_msg_send_bool(id, sel, arg0)
-        JNI.__send__(:Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSend_1bool__IIS, JNI.env, self.jni_id, id.to_int, sel.to_int, arg0.to_int) != 0
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSend_1bool__IIS, JNI.env, self.jni_id, id.to_int, sel.to_int, arg0.to_int) != 0
       end
       
-      JNI.native_method :Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSend_1fpret__II, [:pointer, :long, :int32, :int32], :double
+      JNI.load_native_method :Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSend_1fpret__II, [:pointer, :long, :int32, :int32], :double
       typesig { [::Java::Int, ::Java::Int] }
       # @method flags=cast
       # long
       # long
       def objc_msg_send_fpret(id, sel)
-        JNI.__send__(:Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSend_1fpret__II, JNI.env, self.jni_id, id.to_int, sel.to_int)
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSend_1fpret__II, JNI.env, self.jni_id, id.to_int, sel.to_int)
       end
       
-      JNI.native_method :Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSend_1fpret__III, [:pointer, :long, :int32, :int32, :int32], :double
+      JNI.load_native_method :Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSend_1fpret__III, [:pointer, :long, :int32, :int32, :int32], :double
       typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
       # @method flags=cast
       # long
       # long
       # long
       def objc_msg_send_fpret(id, sel, arg0)
-        JNI.__send__(:Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSend_1fpret__III, JNI.env, self.jni_id, id.to_int, sel.to_int, arg0.to_int)
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSend_1fpret__III, JNI.env, self.jni_id, id.to_int, sel.to_int, arg0.to_int)
       end
       
-      JNI.native_method :Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSend_1fpret__IIII, [:pointer, :long, :int32, :int32, :int32, :int32], :double
+      JNI.load_native_method :Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSend_1fpret__IIII, [:pointer, :long, :int32, :int32, :int32, :int32], :double
       typesig { [::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int] }
       # @method flags=cast
       # long
@@ -10076,20 +10076,20 @@ module Org::Eclipse::Swt::Internal::Cocoa
       # long
       # long
       def objc_msg_send_fpret(id, sel, arg0, arg1)
-        JNI.__send__(:Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSend_1fpret__IIII, JNI.env, self.jni_id, id.to_int, sel.to_int, arg0.to_int, arg1.to_int)
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSend_1fpret__IIII, JNI.env, self.jni_id, id.to_int, sel.to_int, arg0.to_int, arg1.to_int)
       end
       
-      JNI.native_method :Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSend__II, [:pointer, :long, :int32, :int32], :int32
+      JNI.load_native_method :Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSend__II, [:pointer, :long, :int32, :int32], :int32
       typesig { [::Java::Int, ::Java::Int] }
       # @method flags=cast
       # long
       # long
       # long
       def objc_msg_send(id, sel)
-        JNI.__send__(:Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSend__II, JNI.env, self.jni_id, id.to_int, sel.to_int)
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSend__II, JNI.env, self.jni_id, id.to_int, sel.to_int)
       end
       
-      JNI.native_method "Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSend__IIL#{NSAffineTransformStruct.jni_name}_2".to_sym, [:pointer, :long, :int32, :int32, :long], :int32
+      JNI.load_native_method "Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSend__IIL#{NSAffineTransformStruct.jni_name}_2".to_sym, [:pointer, :long, :int32, :int32, :long], :int32
       typesig { [::Java::Int, ::Java::Int, NSAffineTransformStruct] }
       # @method flags=cast
       # @param arg0 flags=struct
@@ -10098,10 +10098,10 @@ module Org::Eclipse::Swt::Internal::Cocoa
       # long
       # long
       def objc_msg_send(id, sel, arg0)
-        JNI.__send__("Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSend__IIL#{NSAffineTransformStruct.jni_name}_2".to_sym, JNI.env, self.jni_id, id.to_int, sel.to_int, arg0.jni_id)
+        JNI.call_native_method("Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSend__IIL#{NSAffineTransformStruct.jni_name}_2".to_sym, JNI.env, self.jni_id, id.to_int, sel.to_int, arg0.jni_id)
       end
       
-      JNI.native_method "Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSend__IIL#{NSPoint.jni_name}_2".to_sym, [:pointer, :long, :int32, :int32, :long], :int32
+      JNI.load_native_method "Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSend__IIL#{NSPoint.jni_name}_2".to_sym, [:pointer, :long, :int32, :int32, :long], :int32
       typesig { [::Java::Int, ::Java::Int, NSPoint] }
       # @method flags=cast
       # @param arg0 flags=struct
@@ -10110,10 +10110,10 @@ module Org::Eclipse::Swt::Internal::Cocoa
       # long
       # long
       def objc_msg_send(id, sel, arg0)
-        JNI.__send__("Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSend__IIL#{NSPoint.jni_name}_2".to_sym, JNI.env, self.jni_id, id.to_int, sel.to_int, arg0.jni_id)
+        JNI.call_native_method("Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSend__IIL#{NSPoint.jni_name}_2".to_sym, JNI.env, self.jni_id, id.to_int, sel.to_int, arg0.jni_id)
       end
       
-      JNI.native_method "Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSend__IIL#{NSPoint.jni_name}_2L#{NSPoint.jni_name}_2L#{NSPoint.jni_name}_2".to_sym, [:pointer, :long, :int32, :int32, :long, :long, :long], :int32
+      JNI.load_native_method "Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSend__IIL#{NSPoint.jni_name}_2L#{NSPoint.jni_name}_2L#{NSPoint.jni_name}_2".to_sym, [:pointer, :long, :int32, :int32, :long, :long, :long], :int32
       typesig { [::Java::Int, ::Java::Int, NSPoint, NSPoint, NSPoint] }
       # @method flags=cast
       # @param arg0 flags=struct
@@ -10124,10 +10124,10 @@ module Org::Eclipse::Swt::Internal::Cocoa
       # long
       # long
       def objc_msg_send(id, sel, arg0, arg1, arg2)
-        JNI.__send__("Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSend__IIL#{NSPoint.jni_name}_2L#{NSPoint.jni_name}_2L#{NSPoint.jni_name}_2".to_sym, JNI.env, self.jni_id, id.to_int, sel.to_int, arg0.jni_id, arg1.jni_id, arg2.jni_id)
+        JNI.call_native_method("Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSend__IIL#{NSPoint.jni_name}_2L#{NSPoint.jni_name}_2L#{NSPoint.jni_name}_2".to_sym, JNI.env, self.jni_id, id.to_int, sel.to_int, arg0.jni_id, arg1.jni_id, arg2.jni_id)
       end
       
-      JNI.native_method "Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSend__IIL#{NSPoint.jni_name}_2L#{NSPoint.jni_name}_2I".to_sym, [:pointer, :long, :int32, :int32, :long, :long, :int32], :int32
+      JNI.load_native_method "Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSend__IIL#{NSPoint.jni_name}_2L#{NSPoint.jni_name}_2I".to_sym, [:pointer, :long, :int32, :int32, :long, :long, :int32], :int32
       typesig { [::Java::Int, ::Java::Int, NSPoint, NSPoint, ::Java::Int] }
       # @method flags=cast
       # @param arg0 flags=struct
@@ -10138,10 +10138,10 @@ module Org::Eclipse::Swt::Internal::Cocoa
       # long
       # long
       def objc_msg_send(id, sel, arg0, arg1, arg2)
-        JNI.__send__("Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSend__IIL#{NSPoint.jni_name}_2L#{NSPoint.jni_name}_2I".to_sym, JNI.env, self.jni_id, id.to_int, sel.to_int, arg0.jni_id, arg1.jni_id, arg2.to_int)
+        JNI.call_native_method("Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSend__IIL#{NSPoint.jni_name}_2L#{NSPoint.jni_name}_2I".to_sym, JNI.env, self.jni_id, id.to_int, sel.to_int, arg0.jni_id, arg1.jni_id, arg2.to_int)
       end
       
-      JNI.native_method "Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSend__IIL#{NSPoint.jni_name}_2L#{NSRect.jni_name}_2IXfloatX".to_sym, [:pointer, :long, :int32, :int32, :long, :long, :int32, :float], :int32
+      JNI.load_native_method "Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSend__IIL#{NSPoint.jni_name}_2L#{NSRect.jni_name}_2IXfloatX".to_sym, [:pointer, :long, :int32, :int32, :long, :long, :int32, :float], :int32
       typesig { [::Java::Int, ::Java::Int, NSPoint, NSRect, ::Java::Int, ::Java::Float] }
       # @method flags=cast
       # @param arg0 flags=struct
@@ -10153,10 +10153,10 @@ module Org::Eclipse::Swt::Internal::Cocoa
       # long
       # double
       def objc_msg_send(id, sel, arg0, arg1, arg2, arg3)
-        JNI.__send__("Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSend__IIL#{NSPoint.jni_name}_2L#{NSRect.jni_name}_2IXfloatX".to_sym, JNI.env, self.jni_id, id.to_int, sel.to_int, arg0.jni_id, arg1.jni_id, arg2.to_int, arg3)
+        JNI.call_native_method("Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSend__IIL#{NSPoint.jni_name}_2L#{NSRect.jni_name}_2IXfloatX".to_sym, JNI.env, self.jni_id, id.to_int, sel.to_int, arg0.jni_id, arg1.jni_id, arg2.to_int, arg3)
       end
       
-      JNI.native_method "Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSend__IIL#{NSPoint.jni_name}_2XfloatXXfloatXXfloatX".to_sym, [:pointer, :long, :int32, :int32, :long, :float, :float, :float], :int32
+      JNI.load_native_method "Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSend__IIL#{NSPoint.jni_name}_2XfloatXXfloatXXfloatX".to_sym, [:pointer, :long, :int32, :int32, :long, :float, :float, :float], :int32
       typesig { [::Java::Int, ::Java::Int, NSPoint, ::Java::Float, ::Java::Float, ::Java::Float] }
       # @method flags=cast
       # @param arg0 flags=struct
@@ -10168,10 +10168,10 @@ module Org::Eclipse::Swt::Internal::Cocoa
       # double
       # double
       def objc_msg_send(id, sel, arg0, arg1, arg2, arg3)
-        JNI.__send__("Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSend__IIL#{NSPoint.jni_name}_2XfloatXXfloatXXfloatX".to_sym, JNI.env, self.jni_id, id.to_int, sel.to_int, arg0.jni_id, arg1, arg2, arg3)
+        JNI.call_native_method("Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSend__IIL#{NSPoint.jni_name}_2XfloatXXfloatXXfloatX".to_sym, JNI.env, self.jni_id, id.to_int, sel.to_int, arg0.jni_id, arg1, arg2, arg3)
       end
       
-      JNI.native_method "Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSend__IIL#{NSPoint.jni_name}_2XfloatXXfloatXXfloatXZ".to_sym, [:pointer, :long, :int32, :int32, :long, :float, :float, :float, :int8], :int32
+      JNI.load_native_method "Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSend__IIL#{NSPoint.jni_name}_2XfloatXXfloatXXfloatXZ".to_sym, [:pointer, :long, :int32, :int32, :long, :float, :float, :float, :int8], :int32
       typesig { [::Java::Int, ::Java::Int, NSPoint, ::Java::Float, ::Java::Float, ::Java::Float, ::Java::Boolean] }
       # @method flags=cast
       # @param arg0 flags=struct
@@ -10183,10 +10183,10 @@ module Org::Eclipse::Swt::Internal::Cocoa
       # double
       # double
       def objc_msg_send(id, sel, arg0, arg1, arg2, arg3, arg4)
-        JNI.__send__("Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSend__IIL#{NSPoint.jni_name}_2XfloatXXfloatXXfloatXZ".to_sym, JNI.env, self.jni_id, id.to_int, sel.to_int, arg0.jni_id, arg1, arg2, arg3, arg4 ? 1 : 0)
+        JNI.call_native_method("Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSend__IIL#{NSPoint.jni_name}_2XfloatXXfloatXXfloatXZ".to_sym, JNI.env, self.jni_id, id.to_int, sel.to_int, arg0.jni_id, arg1, arg2, arg3, arg4 ? 1 : 0)
       end
       
-      JNI.native_method "Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSend__IIL#{NSPoint.jni_name}_2I_3XfloatX".to_sym, [:pointer, :long, :int32, :int32, :long, :int32, :long], :int32
+      JNI.load_native_method "Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSend__IIL#{NSPoint.jni_name}_2I_3XfloatX".to_sym, [:pointer, :long, :int32, :int32, :long, :int32, :long], :int32
       typesig { [::Java::Int, ::Java::Int, NSPoint, ::Java::Int, Array.typed(::Java::Float)] }
       # @method flags=cast
       # @param arg0 flags=struct
@@ -10197,10 +10197,10 @@ module Org::Eclipse::Swt::Internal::Cocoa
       # long
       # double[]
       def objc_msg_send(id, sel, arg0, arg1, arg2)
-        JNI.__send__("Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSend__IIL#{NSPoint.jni_name}_2I_3XfloatX".to_sym, JNI.env, self.jni_id, id.to_int, sel.to_int, arg0.jni_id, arg1.to_int, arg2.jni_id)
+        JNI.call_native_method("Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSend__IIL#{NSPoint.jni_name}_2I_3XfloatX".to_sym, JNI.env, self.jni_id, id.to_int, sel.to_int, arg0.jni_id, arg1.to_int, arg2.jni_id)
       end
       
-      JNI.native_method "Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSend__IIL#{NSRange.jni_name}_2".to_sym, [:pointer, :long, :int32, :int32, :long], :int32
+      JNI.load_native_method "Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSend__IIL#{NSRange.jni_name}_2".to_sym, [:pointer, :long, :int32, :int32, :long], :int32
       typesig { [::Java::Int, ::Java::Int, NSRange] }
       # @method flags=cast
       # @param arg0 flags=struct
@@ -10209,10 +10209,10 @@ module Org::Eclipse::Swt::Internal::Cocoa
       # long
       # long
       def objc_msg_send(id, sel, arg0)
-        JNI.__send__("Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSend__IIL#{NSRange.jni_name}_2".to_sym, JNI.env, self.jni_id, id.to_int, sel.to_int, arg0.jni_id)
+        JNI.call_native_method("Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSend__IIL#{NSRange.jni_name}_2".to_sym, JNI.env, self.jni_id, id.to_int, sel.to_int, arg0.jni_id)
       end
       
-      JNI.native_method "Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSend__IIL#{NSRange.jni_name}_2L#{NSPoint.jni_name}_2".to_sym, [:pointer, :long, :int32, :int32, :long, :long], :int32
+      JNI.load_native_method "Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSend__IIL#{NSRange.jni_name}_2L#{NSPoint.jni_name}_2".to_sym, [:pointer, :long, :int32, :int32, :long, :long], :int32
       typesig { [::Java::Int, ::Java::Int, NSRange, NSPoint] }
       # @method flags=cast
       # @param arg0 flags=struct
@@ -10222,10 +10222,10 @@ module Org::Eclipse::Swt::Internal::Cocoa
       # long
       # long
       def objc_msg_send(id, sel, arg0, arg1)
-        JNI.__send__("Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSend__IIL#{NSRange.jni_name}_2L#{NSPoint.jni_name}_2".to_sym, JNI.env, self.jni_id, id.to_int, sel.to_int, arg0.jni_id, arg1.jni_id)
+        JNI.call_native_method("Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSend__IIL#{NSRange.jni_name}_2L#{NSPoint.jni_name}_2".to_sym, JNI.env, self.jni_id, id.to_int, sel.to_int, arg0.jni_id, arg1.jni_id)
       end
       
-      JNI.native_method "Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSend__IIL#{NSRange.jni_name}_2L#{NSRange.jni_name}_2II".to_sym, [:pointer, :long, :int32, :int32, :long, :long, :int32, :int32], :int32
+      JNI.load_native_method "Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSend__IIL#{NSRange.jni_name}_2L#{NSRange.jni_name}_2II".to_sym, [:pointer, :long, :int32, :int32, :long, :long, :int32, :int32], :int32
       typesig { [::Java::Int, ::Java::Int, NSRange, NSRange, ::Java::Int, ::Java::Int] }
       # @method flags=cast
       # @param arg0 flags=struct
@@ -10237,10 +10237,10 @@ module Org::Eclipse::Swt::Internal::Cocoa
       # long
       # long
       def objc_msg_send(id, sel, arg0, arg1, arg2, arg3)
-        JNI.__send__("Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSend__IIL#{NSRange.jni_name}_2L#{NSRange.jni_name}_2II".to_sym, JNI.env, self.jni_id, id.to_int, sel.to_int, arg0.jni_id, arg1.jni_id, arg2.to_int, arg3.to_int)
+        JNI.call_native_method("Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSend__IIL#{NSRange.jni_name}_2L#{NSRange.jni_name}_2II".to_sym, JNI.env, self.jni_id, id.to_int, sel.to_int, arg0.jni_id, arg1.jni_id, arg2.to_int, arg3.to_int)
       end
       
-      JNI.native_method "Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSend__IIL#{NSRange.jni_name}_2I".to_sym, [:pointer, :long, :int32, :int32, :long, :int32], :int32
+      JNI.load_native_method "Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSend__IIL#{NSRange.jni_name}_2I".to_sym, [:pointer, :long, :int32, :int32, :long, :int32], :int32
       typesig { [::Java::Int, ::Java::Int, NSRange, ::Java::Int] }
       # @method flags=cast
       # @param arg0 flags=struct
@@ -10250,10 +10250,10 @@ module Org::Eclipse::Swt::Internal::Cocoa
       # long
       # long
       def objc_msg_send(id, sel, arg0, arg1)
-        JNI.__send__("Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSend__IIL#{NSRange.jni_name}_2I".to_sym, JNI.env, self.jni_id, id.to_int, sel.to_int, arg0.jni_id, arg1.to_int)
+        JNI.call_native_method("Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSend__IIL#{NSRange.jni_name}_2I".to_sym, JNI.env, self.jni_id, id.to_int, sel.to_int, arg0.jni_id, arg1.to_int)
       end
       
-      JNI.native_method "Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSend__IIL#{NSRange.jni_name}_2IIIII".to_sym, [:pointer, :long, :int32, :int32, :long, :int32, :int32, :int32, :int32, :int32], :int32
+      JNI.load_native_method "Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSend__IIL#{NSRange.jni_name}_2IIIII".to_sym, [:pointer, :long, :int32, :int32, :long, :int32, :int32, :int32, :int32, :int32], :int32
       typesig { [::Java::Int, ::Java::Int, NSRange, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int] }
       # @method flags=cast
       # @param arg0 flags=struct
@@ -10267,10 +10267,10 @@ module Org::Eclipse::Swt::Internal::Cocoa
       # long
       # long
       def objc_msg_send(id, sel, arg0, arg1, arg2, arg3, arg4, arg5)
-        JNI.__send__("Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSend__IIL#{NSRange.jni_name}_2IIIII".to_sym, JNI.env, self.jni_id, id.to_int, sel.to_int, arg0.jni_id, arg1.to_int, arg2.to_int, arg3.to_int, arg4.to_int, arg5.to_int)
+        JNI.call_native_method("Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSend__IIL#{NSRange.jni_name}_2IIIII".to_sym, JNI.env, self.jni_id, id.to_int, sel.to_int, arg0.jni_id, arg1.to_int, arg2.to_int, arg3.to_int, arg4.to_int, arg5.to_int)
       end
       
-      JNI.native_method "Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSend__IIL#{NSRect.jni_name}_2".to_sym, [:pointer, :long, :int32, :int32, :long], :int32
+      JNI.load_native_method "Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSend__IIL#{NSRect.jni_name}_2".to_sym, [:pointer, :long, :int32, :int32, :long], :int32
       typesig { [::Java::Int, ::Java::Int, NSRect] }
       # @method flags=cast
       # @param arg0 flags=struct
@@ -10279,10 +10279,10 @@ module Org::Eclipse::Swt::Internal::Cocoa
       # long
       # long
       def objc_msg_send(id, sel, arg0)
-        JNI.__send__("Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSend__IIL#{NSRect.jni_name}_2".to_sym, JNI.env, self.jni_id, id.to_int, sel.to_int, arg0.jni_id)
+        JNI.call_native_method("Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSend__IIL#{NSRect.jni_name}_2".to_sym, JNI.env, self.jni_id, id.to_int, sel.to_int, arg0.jni_id)
       end
       
-      JNI.native_method "Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSend__IIL#{NSRect.jni_name}_2L#{NSPoint.jni_name}_2".to_sym, [:pointer, :long, :int32, :int32, :long, :long], :int32
+      JNI.load_native_method "Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSend__IIL#{NSRect.jni_name}_2L#{NSPoint.jni_name}_2".to_sym, [:pointer, :long, :int32, :int32, :long, :long], :int32
       typesig { [::Java::Int, ::Java::Int, NSRect, NSPoint] }
       # @method flags=cast
       # @param arg0 flags=struct
@@ -10292,10 +10292,10 @@ module Org::Eclipse::Swt::Internal::Cocoa
       # long
       # long
       def objc_msg_send(id, sel, arg0, arg1)
-        JNI.__send__("Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSend__IIL#{NSRect.jni_name}_2L#{NSPoint.jni_name}_2".to_sym, JNI.env, self.jni_id, id.to_int, sel.to_int, arg0.jni_id, arg1.jni_id)
+        JNI.call_native_method("Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSend__IIL#{NSRect.jni_name}_2L#{NSPoint.jni_name}_2".to_sym, JNI.env, self.jni_id, id.to_int, sel.to_int, arg0.jni_id, arg1.jni_id)
       end
       
-      JNI.native_method "Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSend__IIL#{NSRect.jni_name}_2L#{NSRange.jni_name}_2L#{NSRect.jni_name}_2".to_sym, [:pointer, :long, :int32, :int32, :long, :long, :long], :int32
+      JNI.load_native_method "Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSend__IIL#{NSRect.jni_name}_2L#{NSRange.jni_name}_2L#{NSRect.jni_name}_2".to_sym, [:pointer, :long, :int32, :int32, :long, :long, :long], :int32
       typesig { [::Java::Int, ::Java::Int, NSRect, NSRange, NSRect] }
       # @method flags=cast
       # @param arg0 flags=struct
@@ -10306,10 +10306,10 @@ module Org::Eclipse::Swt::Internal::Cocoa
       # long
       # long
       def objc_msg_send(id, sel, arg0, arg1, arg2)
-        JNI.__send__("Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSend__IIL#{NSRect.jni_name}_2L#{NSRange.jni_name}_2L#{NSRect.jni_name}_2".to_sym, JNI.env, self.jni_id, id.to_int, sel.to_int, arg0.jni_id, arg1.jni_id, arg2.jni_id)
+        JNI.call_native_method("Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSend__IIL#{NSRect.jni_name}_2L#{NSRange.jni_name}_2L#{NSRect.jni_name}_2".to_sym, JNI.env, self.jni_id, id.to_int, sel.to_int, arg0.jni_id, arg1.jni_id, arg2.jni_id)
       end
       
-      JNI.native_method "Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSend__IIL#{NSRect.jni_name}_2L#{NSRect.jni_name}_2IXfloatX".to_sym, [:pointer, :long, :int32, :int32, :long, :long, :int32, :float], :int32
+      JNI.load_native_method "Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSend__IIL#{NSRect.jni_name}_2L#{NSRect.jni_name}_2IXfloatX".to_sym, [:pointer, :long, :int32, :int32, :long, :long, :int32, :float], :int32
       typesig { [::Java::Int, ::Java::Int, NSRect, NSRect, ::Java::Int, ::Java::Float] }
       # @method flags=cast
       # @param arg0 flags=struct
@@ -10321,10 +10321,10 @@ module Org::Eclipse::Swt::Internal::Cocoa
       # long
       # double
       def objc_msg_send(id, sel, arg0, arg1, arg2, arg3)
-        JNI.__send__("Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSend__IIL#{NSRect.jni_name}_2L#{NSRect.jni_name}_2IXfloatX".to_sym, JNI.env, self.jni_id, id.to_int, sel.to_int, arg0.jni_id, arg1.jni_id, arg2.to_int, arg3)
+        JNI.call_native_method("Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSend__IIL#{NSRect.jni_name}_2L#{NSRect.jni_name}_2IXfloatX".to_sym, JNI.env, self.jni_id, id.to_int, sel.to_int, arg0.jni_id, arg1.jni_id, arg2.to_int, arg3)
       end
       
-      JNI.native_method "Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSend__IIL#{NSRect.jni_name}_2Z".to_sym, [:pointer, :long, :int32, :int32, :long, :int8], :int32
+      JNI.load_native_method "Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSend__IIL#{NSRect.jni_name}_2Z".to_sym, [:pointer, :long, :int32, :int32, :long, :int8], :int32
       typesig { [::Java::Int, ::Java::Int, NSRect, ::Java::Boolean] }
       # @method flags=cast
       # @param arg0 flags=struct
@@ -10333,10 +10333,10 @@ module Org::Eclipse::Swt::Internal::Cocoa
       # long
       # long
       def objc_msg_send(id, sel, arg0, arg1)
-        JNI.__send__("Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSend__IIL#{NSRect.jni_name}_2Z".to_sym, JNI.env, self.jni_id, id.to_int, sel.to_int, arg0.jni_id, arg1 ? 1 : 0)
+        JNI.call_native_method("Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSend__IIL#{NSRect.jni_name}_2Z".to_sym, JNI.env, self.jni_id, id.to_int, sel.to_int, arg0.jni_id, arg1 ? 1 : 0)
       end
       
-      JNI.native_method "Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSend__IIL#{NSRect.jni_name}_2ZZ".to_sym, [:pointer, :long, :int32, :int32, :long, :int8, :int8], :int32
+      JNI.load_native_method "Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSend__IIL#{NSRect.jni_name}_2ZZ".to_sym, [:pointer, :long, :int32, :int32, :long, :int8, :int8], :int32
       typesig { [::Java::Int, ::Java::Int, NSRect, ::Java::Boolean, ::Java::Boolean] }
       # @method flags=cast
       # @param arg0 flags=struct
@@ -10345,10 +10345,10 @@ module Org::Eclipse::Swt::Internal::Cocoa
       # long
       # long
       def objc_msg_send(id, sel, arg0, arg1, arg2)
-        JNI.__send__("Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSend__IIL#{NSRect.jni_name}_2ZZ".to_sym, JNI.env, self.jni_id, id.to_int, sel.to_int, arg0.jni_id, arg1 ? 1 : 0, arg2 ? 1 : 0)
+        JNI.call_native_method("Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSend__IIL#{NSRect.jni_name}_2ZZ".to_sym, JNI.env, self.jni_id, id.to_int, sel.to_int, arg0.jni_id, arg1 ? 1 : 0, arg2 ? 1 : 0)
       end
       
-      JNI.native_method "Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSend__IIL#{NSRect.jni_name}_2XfloatX".to_sym, [:pointer, :long, :int32, :int32, :long, :float], :int32
+      JNI.load_native_method "Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSend__IIL#{NSRect.jni_name}_2XfloatX".to_sym, [:pointer, :long, :int32, :int32, :long, :float], :int32
       typesig { [::Java::Int, ::Java::Int, NSRect, ::Java::Float] }
       # @method flags=cast
       # @param arg0 flags=struct
@@ -10358,10 +10358,10 @@ module Org::Eclipse::Swt::Internal::Cocoa
       # long
       # double
       def objc_msg_send(id, sel, arg0, arg1)
-        JNI.__send__("Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSend__IIL#{NSRect.jni_name}_2XfloatX".to_sym, JNI.env, self.jni_id, id.to_int, sel.to_int, arg0.jni_id, arg1)
+        JNI.call_native_method("Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSend__IIL#{NSRect.jni_name}_2XfloatX".to_sym, JNI.env, self.jni_id, id.to_int, sel.to_int, arg0.jni_id, arg1)
       end
       
-      JNI.native_method "Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSend__IIL#{NSRect.jni_name}_2XfloatXXfloatX".to_sym, [:pointer, :long, :int32, :int32, :long, :float, :float], :int32
+      JNI.load_native_method "Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSend__IIL#{NSRect.jni_name}_2XfloatXXfloatX".to_sym, [:pointer, :long, :int32, :int32, :long, :float, :float], :int32
       typesig { [::Java::Int, ::Java::Int, NSRect, ::Java::Float, ::Java::Float] }
       # @method flags=cast
       # @param arg0 flags=struct
@@ -10372,10 +10372,10 @@ module Org::Eclipse::Swt::Internal::Cocoa
       # double
       # double
       def objc_msg_send(id, sel, arg0, arg1, arg2)
-        JNI.__send__("Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSend__IIL#{NSRect.jni_name}_2XfloatXXfloatX".to_sym, JNI.env, self.jni_id, id.to_int, sel.to_int, arg0.jni_id, arg1, arg2)
+        JNI.call_native_method("Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSend__IIL#{NSRect.jni_name}_2XfloatXXfloatX".to_sym, JNI.env, self.jni_id, id.to_int, sel.to_int, arg0.jni_id, arg1, arg2)
       end
       
-      JNI.native_method "Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSend__IIL#{NSRect.jni_name}_2I".to_sym, [:pointer, :long, :int32, :int32, :long, :int32], :int32
+      JNI.load_native_method "Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSend__IIL#{NSRect.jni_name}_2I".to_sym, [:pointer, :long, :int32, :int32, :long, :int32], :int32
       typesig { [::Java::Int, ::Java::Int, NSRect, ::Java::Int] }
       # @method flags=cast
       # @param arg0 flags=struct
@@ -10385,10 +10385,10 @@ module Org::Eclipse::Swt::Internal::Cocoa
       # long
       # long
       def objc_msg_send(id, sel, arg0, arg1)
-        JNI.__send__("Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSend__IIL#{NSRect.jni_name}_2I".to_sym, JNI.env, self.jni_id, id.to_int, sel.to_int, arg0.jni_id, arg1.to_int)
+        JNI.call_native_method("Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSend__IIL#{NSRect.jni_name}_2I".to_sym, JNI.env, self.jni_id, id.to_int, sel.to_int, arg0.jni_id, arg1.to_int)
       end
       
-      JNI.native_method "Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSend__IIL#{NSRect.jni_name}_2IZI".to_sym, [:pointer, :long, :int32, :int32, :long, :int32, :int8, :int32], :int32
+      JNI.load_native_method "Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSend__IIL#{NSRect.jni_name}_2IZI".to_sym, [:pointer, :long, :int32, :int32, :long, :int32, :int8, :int32], :int32
       typesig { [::Java::Int, ::Java::Int, NSRect, ::Java::Int, ::Java::Boolean, ::Java::Int] }
       # @method flags=cast
       # @param arg0 flags=struct
@@ -10399,10 +10399,10 @@ module Org::Eclipse::Swt::Internal::Cocoa
       # long
       # long
       def objc_msg_send(id, sel, arg0, arg1, arg2, arg3)
-        JNI.__send__("Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSend__IIL#{NSRect.jni_name}_2IZI".to_sym, JNI.env, self.jni_id, id.to_int, sel.to_int, arg0.jni_id, arg1.to_int, arg2 ? 1 : 0, arg3.to_int)
+        JNI.call_native_method("Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSend__IIL#{NSRect.jni_name}_2IZI".to_sym, JNI.env, self.jni_id, id.to_int, sel.to_int, arg0.jni_id, arg1.to_int, arg2 ? 1 : 0, arg3.to_int)
       end
       
-      JNI.native_method "Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSend__IIL#{NSRect.jni_name}_2II".to_sym, [:pointer, :long, :int32, :int32, :long, :int32, :int32], :int32
+      JNI.load_native_method "Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSend__IIL#{NSRect.jni_name}_2II".to_sym, [:pointer, :long, :int32, :int32, :long, :int32, :int32], :int32
       typesig { [::Java::Int, ::Java::Int, NSRect, ::Java::Int, ::Java::Int] }
       # @method flags=cast
       # @param arg0 flags=struct
@@ -10413,10 +10413,10 @@ module Org::Eclipse::Swt::Internal::Cocoa
       # long
       # long
       def objc_msg_send(id, sel, arg0, arg1, arg2)
-        JNI.__send__("Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSend__IIL#{NSRect.jni_name}_2II".to_sym, JNI.env, self.jni_id, id.to_int, sel.to_int, arg0.jni_id, arg1.to_int, arg2.to_int)
+        JNI.call_native_method("Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSend__IIL#{NSRect.jni_name}_2II".to_sym, JNI.env, self.jni_id, id.to_int, sel.to_int, arg0.jni_id, arg1.to_int, arg2.to_int)
       end
       
-      JNI.native_method "Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSend__IIL#{NSRect.jni_name}_2IIZ".to_sym, [:pointer, :long, :int32, :int32, :long, :int32, :int32, :int8], :int32
+      JNI.load_native_method "Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSend__IIL#{NSRect.jni_name}_2IIZ".to_sym, [:pointer, :long, :int32, :int32, :long, :int32, :int32, :int8], :int32
       typesig { [::Java::Int, ::Java::Int, NSRect, ::Java::Int, ::Java::Int, ::Java::Boolean] }
       # @method flags=cast
       # @param arg0 flags=struct
@@ -10427,10 +10427,10 @@ module Org::Eclipse::Swt::Internal::Cocoa
       # long
       # long
       def objc_msg_send(id, sel, arg0, arg1, arg2, arg3)
-        JNI.__send__("Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSend__IIL#{NSRect.jni_name}_2IIZ".to_sym, JNI.env, self.jni_id, id.to_int, sel.to_int, arg0.jni_id, arg1.to_int, arg2.to_int, arg3 ? 1 : 0)
+        JNI.call_native_method("Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSend__IIL#{NSRect.jni_name}_2IIZ".to_sym, JNI.env, self.jni_id, id.to_int, sel.to_int, arg0.jni_id, arg1.to_int, arg2.to_int, arg3 ? 1 : 0)
       end
       
-      JNI.native_method "Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSend__IIL#{NSRect.jni_name}_2IIZI".to_sym, [:pointer, :long, :int32, :int32, :long, :int32, :int32, :int8, :int32], :int32
+      JNI.load_native_method "Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSend__IIL#{NSRect.jni_name}_2IIZI".to_sym, [:pointer, :long, :int32, :int32, :long, :int32, :int32, :int8, :int32], :int32
       typesig { [::Java::Int, ::Java::Int, NSRect, ::Java::Int, ::Java::Int, ::Java::Boolean, ::Java::Int] }
       # @method flags=cast
       # @param arg0 flags=struct
@@ -10442,10 +10442,10 @@ module Org::Eclipse::Swt::Internal::Cocoa
       # long
       # long
       def objc_msg_send(id, sel, arg0, arg1, arg2, arg3, arg4)
-        JNI.__send__("Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSend__IIL#{NSRect.jni_name}_2IIZI".to_sym, JNI.env, self.jni_id, id.to_int, sel.to_int, arg0.jni_id, arg1.to_int, arg2.to_int, arg3 ? 1 : 0, arg4.to_int)
+        JNI.call_native_method("Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSend__IIL#{NSRect.jni_name}_2IIZI".to_sym, JNI.env, self.jni_id, id.to_int, sel.to_int, arg0.jni_id, arg1.to_int, arg2.to_int, arg3 ? 1 : 0, arg4.to_int)
       end
       
-      JNI.native_method "Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSend__IIL#{NSRect.jni_name}_2III".to_sym, [:pointer, :long, :int32, :int32, :long, :int32, :int32, :int32], :int32
+      JNI.load_native_method "Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSend__IIL#{NSRect.jni_name}_2III".to_sym, [:pointer, :long, :int32, :int32, :long, :int32, :int32, :int32], :int32
       typesig { [::Java::Int, ::Java::Int, NSRect, ::Java::Int, ::Java::Int, ::Java::Int] }
       # @method flags=cast
       # @param arg0 flags=struct
@@ -10457,10 +10457,10 @@ module Org::Eclipse::Swt::Internal::Cocoa
       # long
       # long
       def objc_msg_send(id, sel, arg0, arg1, arg2, arg3)
-        JNI.__send__("Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSend__IIL#{NSRect.jni_name}_2III".to_sym, JNI.env, self.jni_id, id.to_int, sel.to_int, arg0.jni_id, arg1.to_int, arg2.to_int, arg3.to_int)
+        JNI.call_native_method("Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSend__IIL#{NSRect.jni_name}_2III".to_sym, JNI.env, self.jni_id, id.to_int, sel.to_int, arg0.jni_id, arg1.to_int, arg2.to_int, arg3.to_int)
       end
       
-      JNI.native_method "Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSend__IIL#{NSSize.jni_name}_2".to_sym, [:pointer, :long, :int32, :int32, :long], :int32
+      JNI.load_native_method "Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSend__IIL#{NSSize.jni_name}_2".to_sym, [:pointer, :long, :int32, :int32, :long], :int32
       typesig { [::Java::Int, ::Java::Int, NSSize] }
       # @method flags=cast
       # @param arg0 flags=struct
@@ -10469,20 +10469,20 @@ module Org::Eclipse::Swt::Internal::Cocoa
       # long
       # long
       def objc_msg_send(id, sel, arg0)
-        JNI.__send__("Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSend__IIL#{NSSize.jni_name}_2".to_sym, JNI.env, self.jni_id, id.to_int, sel.to_int, arg0.jni_id)
+        JNI.call_native_method("Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSend__IIL#{NSSize.jni_name}_2".to_sym, JNI.env, self.jni_id, id.to_int, sel.to_int, arg0.jni_id)
       end
       
-      JNI.native_method :Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSend__IIZ, [:pointer, :long, :int32, :int32, :int8], :int32
+      JNI.load_native_method :Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSend__IIZ, [:pointer, :long, :int32, :int32, :int8], :int32
       typesig { [::Java::Int, ::Java::Int, ::Java::Boolean] }
       # @method flags=cast
       # long
       # long
       # long
       def objc_msg_send(id, sel, arg0)
-        JNI.__send__(:Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSend__IIZ, JNI.env, self.jni_id, id.to_int, sel.to_int, arg0 ? 1 : 0)
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSend__IIZ, JNI.env, self.jni_id, id.to_int, sel.to_int, arg0 ? 1 : 0)
       end
       
-      JNI.native_method :Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSend__IIZI, [:pointer, :long, :int32, :int32, :int8, :int32], :int32
+      JNI.load_native_method :Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSend__IIZI, [:pointer, :long, :int32, :int32, :int8, :int32], :int32
       typesig { [::Java::Int, ::Java::Int, ::Java::Boolean, ::Java::Int] }
       # @method flags=cast
       # long
@@ -10490,20 +10490,20 @@ module Org::Eclipse::Swt::Internal::Cocoa
       # long
       # long
       def objc_msg_send(id, sel, arg0, arg1)
-        JNI.__send__(:Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSend__IIZI, JNI.env, self.jni_id, id.to_int, sel.to_int, arg0 ? 1 : 0, arg1.to_int)
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSend__IIZI, JNI.env, self.jni_id, id.to_int, sel.to_int, arg0 ? 1 : 0, arg1.to_int)
       end
       
-      JNI.native_method :Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSend__II_3B, [:pointer, :long, :int32, :int32, :long], :int32
+      JNI.load_native_method :Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSend__II_3B, [:pointer, :long, :int32, :int32, :long], :int32
       typesig { [::Java::Int, ::Java::Int, Array.typed(::Java::Byte)] }
       # @method flags=cast
       # long
       # long
       # long
       def objc_msg_send(id, sel, arg0)
-        JNI.__send__(:Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSend__II_3B, JNI.env, self.jni_id, id.to_int, sel.to_int, arg0.jni_id)
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSend__II_3B, JNI.env, self.jni_id, id.to_int, sel.to_int, arg0.jni_id)
       end
       
-      JNI.native_method :Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSend__II_3BI, [:pointer, :long, :int32, :int32, :long, :int32], :int32
+      JNI.load_native_method :Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSend__II_3BI, [:pointer, :long, :int32, :int32, :long, :int32], :int32
       typesig { [::Java::Int, ::Java::Int, Array.typed(::Java::Byte), ::Java::Int] }
       # @method flags=cast
       # long
@@ -10511,20 +10511,20 @@ module Org::Eclipse::Swt::Internal::Cocoa
       # long
       # long
       def objc_msg_send(id, sel, arg0, arg1)
-        JNI.__send__(:Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSend__II_3BI, JNI.env, self.jni_id, id.to_int, sel.to_int, arg0.jni_id, arg1.to_int)
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSend__II_3BI, JNI.env, self.jni_id, id.to_int, sel.to_int, arg0.jni_id, arg1.to_int)
       end
       
-      JNI.native_method :Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSend__II_3C, [:pointer, :long, :int32, :int32, :long], :int32
+      JNI.load_native_method :Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSend__II_3C, [:pointer, :long, :int32, :int32, :long], :int32
       typesig { [::Java::Int, ::Java::Int, Array.typed(::Java::Char)] }
       # @method flags=cast
       # long
       # long
       # long
       def objc_msg_send(id, sel, arg0)
-        JNI.__send__(:Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSend__II_3C, JNI.env, self.jni_id, id.to_int, sel.to_int, arg0.jni_id)
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSend__II_3C, JNI.env, self.jni_id, id.to_int, sel.to_int, arg0.jni_id)
       end
       
-      JNI.native_method "Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSend__II_3CL#{NSRange.jni_name}_2".to_sym, [:pointer, :long, :int32, :int32, :long, :long], :int32
+      JNI.load_native_method "Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSend__II_3CL#{NSRange.jni_name}_2".to_sym, [:pointer, :long, :int32, :int32, :long, :long], :int32
       typesig { [::Java::Int, ::Java::Int, Array.typed(::Java::Char), NSRange] }
       # @method flags=cast
       # @param arg1 flags=struct
@@ -10533,10 +10533,10 @@ module Org::Eclipse::Swt::Internal::Cocoa
       # long
       # long
       def objc_msg_send(id, sel, arg0, arg1)
-        JNI.__send__("Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSend__II_3CL#{NSRange.jni_name}_2".to_sym, JNI.env, self.jni_id, id.to_int, sel.to_int, arg0.jni_id, arg1.jni_id)
+        JNI.call_native_method("Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSend__II_3CL#{NSRange.jni_name}_2".to_sym, JNI.env, self.jni_id, id.to_int, sel.to_int, arg0.jni_id, arg1.jni_id)
       end
       
-      JNI.native_method :Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSend__II_3CI, [:pointer, :long, :int32, :int32, :long, :int32], :int32
+      JNI.load_native_method :Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSend__II_3CI, [:pointer, :long, :int32, :int32, :long, :int32], :int32
       typesig { [::Java::Int, ::Java::Int, Array.typed(::Java::Char), ::Java::Int] }
       # @method flags=cast
       # long
@@ -10544,20 +10544,20 @@ module Org::Eclipse::Swt::Internal::Cocoa
       # long
       # long
       def objc_msg_send(id, sel, arg0, arg1)
-        JNI.__send__(:Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSend__II_3CI, JNI.env, self.jni_id, id.to_int, sel.to_int, arg0.jni_id, arg1.to_int)
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSend__II_3CI, JNI.env, self.jni_id, id.to_int, sel.to_int, arg0.jni_id, arg1.to_int)
       end
       
-      JNI.native_method :Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSend__IIXdoubleX, [:pointer, :long, :int32, :int32, :double], :int32
+      JNI.load_native_method :Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSend__IIXdoubleX, [:pointer, :long, :int32, :int32, :double], :int32
       typesig { [::Java::Int, ::Java::Int, ::Java::Double] }
       # @method flags=cast
       # long
       # long
       # long
       def objc_msg_send(id, sel, arg0)
-        JNI.__send__(:Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSend__IIXdoubleX, JNI.env, self.jni_id, id.to_int, sel.to_int, arg0)
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSend__IIXdoubleX, JNI.env, self.jni_id, id.to_int, sel.to_int, arg0)
       end
       
-      JNI.native_method :Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSend__IIXdoubleXIIIZ, [:pointer, :long, :int32, :int32, :double, :int32, :int32, :int32, :int8], :int32
+      JNI.load_native_method :Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSend__IIXdoubleXIIIZ, [:pointer, :long, :int32, :int32, :double, :int32, :int32, :int32, :int8], :int32
       typesig { [::Java::Int, ::Java::Int, ::Java::Double, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Boolean] }
       # @method flags=cast
       # long
@@ -10567,10 +10567,10 @@ module Org::Eclipse::Swt::Internal::Cocoa
       # long
       # long
       def objc_msg_send(id, sel, arg0, arg1, arg2, arg3, arg4)
-        JNI.__send__(:Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSend__IIXdoubleXIIIZ, JNI.env, self.jni_id, id.to_int, sel.to_int, arg0, arg1.to_int, arg2.to_int, arg3.to_int, arg4 ? 1 : 0)
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSend__IIXdoubleXIIIZ, JNI.env, self.jni_id, id.to_int, sel.to_int, arg0, arg1.to_int, arg2.to_int, arg3.to_int, arg4 ? 1 : 0)
       end
       
-      JNI.native_method :Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSend__IIXfloatXXfloatX, [:pointer, :long, :int32, :int32, :float, :float], :int32
+      JNI.load_native_method :Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSend__IIXfloatXXfloatX, [:pointer, :long, :int32, :int32, :float, :float], :int32
       typesig { [::Java::Int, ::Java::Int, ::Java::Float, ::Java::Float] }
       # @method flags=cast
       # long
@@ -10579,10 +10579,10 @@ module Org::Eclipse::Swt::Internal::Cocoa
       # double
       # double
       def objc_msg_send(id, sel, arg0, arg1)
-        JNI.__send__(:Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSend__IIXfloatXXfloatX, JNI.env, self.jni_id, id.to_int, sel.to_int, arg0, arg1)
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSend__IIXfloatXXfloatX, JNI.env, self.jni_id, id.to_int, sel.to_int, arg0, arg1)
       end
       
-      JNI.native_method :Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSend__IIXfloatXXfloatXXfloatXXfloatX, [:pointer, :long, :int32, :int32, :float, :float, :float, :float], :int32
+      JNI.load_native_method :Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSend__IIXfloatXXfloatXXfloatXXfloatX, [:pointer, :long, :int32, :int32, :float, :float, :float, :float], :int32
       typesig { [::Java::Int, ::Java::Int, ::Java::Float, ::Java::Float, ::Java::Float, ::Java::Float] }
       # @method flags=cast
       # long
@@ -10593,10 +10593,10 @@ module Org::Eclipse::Swt::Internal::Cocoa
       # double
       # double
       def objc_msg_send(id, sel, arg0, arg1, arg2, arg3)
-        JNI.__send__(:Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSend__IIXfloatXXfloatXXfloatXXfloatX, JNI.env, self.jni_id, id.to_int, sel.to_int, arg0, arg1, arg2, arg3)
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSend__IIXfloatXXfloatXXfloatXXfloatX, JNI.env, self.jni_id, id.to_int, sel.to_int, arg0, arg1, arg2, arg3)
       end
       
-      JNI.native_method :Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSend__IIXfloatXI, [:pointer, :long, :int32, :int32, :float, :int32], :int32
+      JNI.load_native_method :Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSend__IIXfloatXI, [:pointer, :long, :int32, :int32, :float, :int32], :int32
       typesig { [::Java::Int, ::Java::Int, ::Java::Float, ::Java::Int] }
       # @method flags=cast
       # long
@@ -10605,10 +10605,10 @@ module Org::Eclipse::Swt::Internal::Cocoa
       # double
       # long
       def objc_msg_send(id, sel, arg0, arg1)
-        JNI.__send__(:Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSend__IIXfloatXI, JNI.env, self.jni_id, id.to_int, sel.to_int, arg0, arg1.to_int)
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSend__IIXfloatXI, JNI.env, self.jni_id, id.to_int, sel.to_int, arg0, arg1.to_int)
       end
       
-      JNI.native_method :Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSend__II_3XfloatX, [:pointer, :long, :int32, :int32, :long], :int32
+      JNI.load_native_method :Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSend__II_3XfloatX, [:pointer, :long, :int32, :int32, :long], :int32
       typesig { [::Java::Int, ::Java::Int, Array.typed(::Java::Float)] }
       # @method flags=cast
       # long
@@ -10616,10 +10616,10 @@ module Org::Eclipse::Swt::Internal::Cocoa
       # long
       # double[]
       def objc_msg_send(id, sel, arg0)
-        JNI.__send__(:Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSend__II_3XfloatX, JNI.env, self.jni_id, id.to_int, sel.to_int, arg0.jni_id)
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSend__II_3XfloatX, JNI.env, self.jni_id, id.to_int, sel.to_int, arg0.jni_id)
       end
       
-      JNI.native_method :Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSend__II_3XfloatXIXfloatX, [:pointer, :long, :int32, :int32, :long, :int32, :float], :int32
+      JNI.load_native_method :Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSend__II_3XfloatXIXfloatX, [:pointer, :long, :int32, :int32, :long, :int32, :float], :int32
       typesig { [::Java::Int, ::Java::Int, Array.typed(::Java::Float), ::Java::Int, ::Java::Float] }
       # @method flags=cast
       # long
@@ -10629,10 +10629,10 @@ module Org::Eclipse::Swt::Internal::Cocoa
       # long
       # double
       def objc_msg_send(id, sel, arg0, arg1, arg2)
-        JNI.__send__(:Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSend__II_3XfloatXIXfloatX, JNI.env, self.jni_id, id.to_int, sel.to_int, arg0.jni_id, arg1.to_int, arg2)
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSend__II_3XfloatXIXfloatX, JNI.env, self.jni_id, id.to_int, sel.to_int, arg0.jni_id, arg1.to_int, arg2)
       end
       
-      JNI.native_method :Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSend__III, [:pointer, :long, :int32, :int32, :int32], :int32
+      JNI.load_native_method :Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSend__III, [:pointer, :long, :int32, :int32, :int32], :int32
       typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
       # @method flags=cast
       # long
@@ -10640,10 +10640,10 @@ module Org::Eclipse::Swt::Internal::Cocoa
       # long
       # long
       def objc_msg_send(id, sel, arg0)
-        JNI.__send__(:Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSend__III, JNI.env, self.jni_id, id.to_int, sel.to_int, arg0.to_int)
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSend__III, JNI.env, self.jni_id, id.to_int, sel.to_int, arg0.to_int)
       end
       
-      JNI.native_method "Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSend__IIIL#{NSPoint.jni_name}_2".to_sym, [:pointer, :long, :int32, :int32, :int32, :long], :int32
+      JNI.load_native_method "Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSend__IIIL#{NSPoint.jni_name}_2".to_sym, [:pointer, :long, :int32, :int32, :int32, :long], :int32
       typesig { [::Java::Int, ::Java::Int, ::Java::Int, NSPoint] }
       # @method flags=cast
       # @param arg1 flags=struct
@@ -10653,10 +10653,10 @@ module Org::Eclipse::Swt::Internal::Cocoa
       # long
       # long
       def objc_msg_send(id, sel, arg0, arg1)
-        JNI.__send__("Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSend__IIIL#{NSPoint.jni_name}_2".to_sym, JNI.env, self.jni_id, id.to_int, sel.to_int, arg0.to_int, arg1.jni_id)
+        JNI.call_native_method("Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSend__IIIL#{NSPoint.jni_name}_2".to_sym, JNI.env, self.jni_id, id.to_int, sel.to_int, arg0.to_int, arg1.jni_id)
       end
       
-      JNI.native_method "Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSend__IIIL#{NSPoint.jni_name}_2L#{NSSize.jni_name}_2IIIZ".to_sym, [:pointer, :long, :int32, :int32, :int32, :long, :long, :int32, :int32, :int32, :int8], :int32
+      JNI.load_native_method "Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSend__IIIL#{NSPoint.jni_name}_2L#{NSSize.jni_name}_2IIIZ".to_sym, [:pointer, :long, :int32, :int32, :int32, :long, :long, :int32, :int32, :int32, :int8], :int32
       typesig { [::Java::Int, ::Java::Int, ::Java::Int, NSPoint, NSSize, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Boolean] }
       # @method flags=cast
       # @param arg1 flags=struct
@@ -10670,10 +10670,10 @@ module Org::Eclipse::Swt::Internal::Cocoa
       # long
       # long
       def objc_msg_send(id, sel, arg0, arg1, arg2, arg3, arg4, arg5, arg6)
-        JNI.__send__("Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSend__IIIL#{NSPoint.jni_name}_2L#{NSSize.jni_name}_2IIIZ".to_sym, JNI.env, self.jni_id, id.to_int, sel.to_int, arg0.to_int, arg1.jni_id, arg2.jni_id, arg3.to_int, arg4.to_int, arg5.to_int, arg6 ? 1 : 0)
+        JNI.call_native_method("Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSend__IIIL#{NSPoint.jni_name}_2L#{NSSize.jni_name}_2IIIZ".to_sym, JNI.env, self.jni_id, id.to_int, sel.to_int, arg0.to_int, arg1.jni_id, arg2.jni_id, arg3.to_int, arg4.to_int, arg5.to_int, arg6 ? 1 : 0)
       end
       
-      JNI.native_method "Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSend__IIIL#{NSPoint.jni_name}_2I".to_sym, [:pointer, :long, :int32, :int32, :int32, :long, :int32], :int32
+      JNI.load_native_method "Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSend__IIIL#{NSPoint.jni_name}_2I".to_sym, [:pointer, :long, :int32, :int32, :int32, :long, :int32], :int32
       typesig { [::Java::Int, ::Java::Int, ::Java::Int, NSPoint, ::Java::Int] }
       # @method flags=cast
       # @param arg1 flags=struct
@@ -10684,10 +10684,10 @@ module Org::Eclipse::Swt::Internal::Cocoa
       # long
       # long
       def objc_msg_send(id, sel, arg0, arg1, arg2)
-        JNI.__send__("Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSend__IIIL#{NSPoint.jni_name}_2I".to_sym, JNI.env, self.jni_id, id.to_int, sel.to_int, arg0.to_int, arg1.jni_id, arg2.to_int)
+        JNI.call_native_method("Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSend__IIIL#{NSPoint.jni_name}_2I".to_sym, JNI.env, self.jni_id, id.to_int, sel.to_int, arg0.to_int, arg1.jni_id, arg2.to_int)
       end
       
-      JNI.native_method "Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSend__IIIL#{NSPoint.jni_name}_2IXdoubleXIIIII".to_sym, [:pointer, :long, :int32, :int32, :int32, :long, :int32, :double, :int32, :int32, :int32, :int32, :int32], :int32
+      JNI.load_native_method "Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSend__IIIL#{NSPoint.jni_name}_2IXdoubleXIIIII".to_sym, [:pointer, :long, :int32, :int32, :int32, :long, :int32, :double, :int32, :int32, :int32, :int32, :int32], :int32
       typesig { [::Java::Int, ::Java::Int, ::Java::Int, NSPoint, ::Java::Int, ::Java::Double, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int] }
       # @method flags=cast
       # @param arg1 flags=struct
@@ -10703,10 +10703,10 @@ module Org::Eclipse::Swt::Internal::Cocoa
       # long
       # long
       def objc_msg_send(id, sel, arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8)
-        JNI.__send__("Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSend__IIIL#{NSPoint.jni_name}_2IXdoubleXIIIII".to_sym, JNI.env, self.jni_id, id.to_int, sel.to_int, arg0.to_int, arg1.jni_id, arg2.to_int, arg3, arg4.to_int, arg5.to_int, arg6.to_int, arg7.to_int, arg8.to_int)
+        JNI.call_native_method("Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSend__IIIL#{NSPoint.jni_name}_2IXdoubleXIIIII".to_sym, JNI.env, self.jni_id, id.to_int, sel.to_int, arg0.to_int, arg1.jni_id, arg2.to_int, arg3, arg4.to_int, arg5.to_int, arg6.to_int, arg7.to_int, arg8.to_int)
       end
       
-      JNI.native_method "Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSend__IIIL#{NSPoint.jni_name}_2IXdoubleXIISII".to_sym, [:pointer, :long, :int32, :int32, :int32, :long, :int32, :double, :int32, :int32, :int16, :int32, :int32], :int32
+      JNI.load_native_method "Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSend__IIIL#{NSPoint.jni_name}_2IXdoubleXIISII".to_sym, [:pointer, :long, :int32, :int32, :int32, :long, :int32, :double, :int32, :int32, :int16, :int32, :int32], :int32
       typesig { [::Java::Int, ::Java::Int, ::Java::Int, NSPoint, ::Java::Int, ::Java::Double, ::Java::Int, ::Java::Int, ::Java::Short, ::Java::Int, ::Java::Int] }
       # @method flags=cast
       # @param arg1 flags=struct
@@ -10721,10 +10721,10 @@ module Org::Eclipse::Swt::Internal::Cocoa
       # long
       # long
       def objc_msg_send(id, sel, arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8)
-        JNI.__send__("Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSend__IIIL#{NSPoint.jni_name}_2IXdoubleXIISII".to_sym, JNI.env, self.jni_id, id.to_int, sel.to_int, arg0.to_int, arg1.jni_id, arg2.to_int, arg3, arg4.to_int, arg5.to_int, arg6.to_int, arg7.to_int, arg8.to_int)
+        JNI.call_native_method("Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSend__IIIL#{NSPoint.jni_name}_2IXdoubleXIISII".to_sym, JNI.env, self.jni_id, id.to_int, sel.to_int, arg0.to_int, arg1.jni_id, arg2.to_int, arg3, arg4.to_int, arg5.to_int, arg6.to_int, arg7.to_int, arg8.to_int)
       end
       
-      JNI.native_method "Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSend__IIIL#{NSRange.jni_name}_2".to_sym, [:pointer, :long, :int32, :int32, :int32, :long], :int32
+      JNI.load_native_method "Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSend__IIIL#{NSRange.jni_name}_2".to_sym, [:pointer, :long, :int32, :int32, :int32, :long], :int32
       typesig { [::Java::Int, ::Java::Int, ::Java::Int, NSRange] }
       # @method flags=cast
       # @param arg1 flags=struct
@@ -10734,10 +10734,10 @@ module Org::Eclipse::Swt::Internal::Cocoa
       # long
       # long
       def objc_msg_send(id, sel, arg0, arg1)
-        JNI.__send__("Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSend__IIIL#{NSRange.jni_name}_2".to_sym, JNI.env, self.jni_id, id.to_int, sel.to_int, arg0.to_int, arg1.jni_id)
+        JNI.call_native_method("Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSend__IIIL#{NSRange.jni_name}_2".to_sym, JNI.env, self.jni_id, id.to_int, sel.to_int, arg0.to_int, arg1.jni_id)
       end
       
-      JNI.native_method "Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSend__IIIL#{NSRect.jni_name}_2I".to_sym, [:pointer, :long, :int32, :int32, :int32, :long, :int32], :int32
+      JNI.load_native_method "Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSend__IIIL#{NSRect.jni_name}_2I".to_sym, [:pointer, :long, :int32, :int32, :int32, :long, :int32], :int32
       typesig { [::Java::Int, ::Java::Int, ::Java::Int, NSRect, ::Java::Int] }
       # @method flags=cast
       # @param arg1 flags=struct
@@ -10748,10 +10748,10 @@ module Org::Eclipse::Swt::Internal::Cocoa
       # long
       # long
       def objc_msg_send(id, sel, arg0, arg1, arg2)
-        JNI.__send__("Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSend__IIIL#{NSRect.jni_name}_2I".to_sym, JNI.env, self.jni_id, id.to_int, sel.to_int, arg0.to_int, arg1.jni_id, arg2.to_int)
+        JNI.call_native_method("Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSend__IIIL#{NSRect.jni_name}_2I".to_sym, JNI.env, self.jni_id, id.to_int, sel.to_int, arg0.to_int, arg1.jni_id, arg2.to_int)
       end
       
-      JNI.native_method :Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSend__IIIZ, [:pointer, :long, :int32, :int32, :int32, :int8], :int32
+      JNI.load_native_method :Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSend__IIIZ, [:pointer, :long, :int32, :int32, :int32, :int8], :int32
       typesig { [::Java::Int, ::Java::Int, ::Java::Int, ::Java::Boolean] }
       # @method flags=cast
       # long
@@ -10759,10 +10759,10 @@ module Org::Eclipse::Swt::Internal::Cocoa
       # long
       # long
       def objc_msg_send(id, sel, arg0, arg1)
-        JNI.__send__(:Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSend__IIIZ, JNI.env, self.jni_id, id.to_int, sel.to_int, arg0.to_int, arg1 ? 1 : 0)
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSend__IIIZ, JNI.env, self.jni_id, id.to_int, sel.to_int, arg0.to_int, arg1 ? 1 : 0)
       end
       
-      JNI.native_method :Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSend__IIIXfloatX, [:pointer, :long, :int32, :int32, :int32, :float], :int32
+      JNI.load_native_method :Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSend__IIIXfloatX, [:pointer, :long, :int32, :int32, :int32, :float], :int32
       typesig { [::Java::Int, ::Java::Int, ::Java::Int, ::Java::Float] }
       # @method flags=cast
       # long
@@ -10771,10 +10771,10 @@ module Org::Eclipse::Swt::Internal::Cocoa
       # long
       # double
       def objc_msg_send(id, sel, arg0, arg1)
-        JNI.__send__(:Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSend__IIIXfloatX, JNI.env, self.jni_id, id.to_int, sel.to_int, arg0.to_int, arg1)
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSend__IIIXfloatX, JNI.env, self.jni_id, id.to_int, sel.to_int, arg0.to_int, arg1)
       end
       
-      JNI.native_method :Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSend__IIII, [:pointer, :long, :int32, :int32, :int32, :int32], :int32
+      JNI.load_native_method :Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSend__IIII, [:pointer, :long, :int32, :int32, :int32, :int32], :int32
       typesig { [::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int] }
       # @method flags=cast
       # long
@@ -10783,10 +10783,10 @@ module Org::Eclipse::Swt::Internal::Cocoa
       # long
       # long
       def objc_msg_send(id, sel, arg0, arg1)
-        JNI.__send__(:Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSend__IIII, JNI.env, self.jni_id, id.to_int, sel.to_int, arg0.to_int, arg1.to_int)
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSend__IIII, JNI.env, self.jni_id, id.to_int, sel.to_int, arg0.to_int, arg1.to_int)
       end
       
-      JNI.native_method "Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSend__IIIIL#{NSRange.jni_name}_2".to_sym, [:pointer, :long, :int32, :int32, :int32, :int32, :long], :int32
+      JNI.load_native_method "Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSend__IIIIL#{NSRange.jni_name}_2".to_sym, [:pointer, :long, :int32, :int32, :int32, :int32, :long], :int32
       typesig { [::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, NSRange] }
       # @method flags=cast
       # @param arg2 flags=struct
@@ -10797,10 +10797,10 @@ module Org::Eclipse::Swt::Internal::Cocoa
       # long
       # long
       def objc_msg_send(id, sel, arg0, arg1, arg2)
-        JNI.__send__("Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSend__IIIIL#{NSRange.jni_name}_2".to_sym, JNI.env, self.jni_id, id.to_int, sel.to_int, arg0.to_int, arg1.to_int, arg2.jni_id)
+        JNI.call_native_method("Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSend__IIIIL#{NSRange.jni_name}_2".to_sym, JNI.env, self.jni_id, id.to_int, sel.to_int, arg0.to_int, arg1.to_int, arg2.jni_id)
       end
       
-      JNI.native_method :Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSend__IIIIZ, [:pointer, :long, :int32, :int32, :int32, :int32, :int8], :int32
+      JNI.load_native_method :Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSend__IIIIZ, [:pointer, :long, :int32, :int32, :int32, :int32, :int8], :int32
       typesig { [::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Boolean] }
       # @method flags=cast
       # long
@@ -10809,10 +10809,10 @@ module Org::Eclipse::Swt::Internal::Cocoa
       # long
       # long
       def objc_msg_send(id, sel, arg0, arg1, arg2)
-        JNI.__send__(:Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSend__IIIIZ, JNI.env, self.jni_id, id.to_int, sel.to_int, arg0.to_int, arg1.to_int, arg2 ? 1 : 0)
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSend__IIIIZ, JNI.env, self.jni_id, id.to_int, sel.to_int, arg0.to_int, arg1.to_int, arg2 ? 1 : 0)
       end
       
-      JNI.native_method :Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSend__IIIII, [:pointer, :long, :int32, :int32, :int32, :int32, :int32], :int32
+      JNI.load_native_method :Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSend__IIIII, [:pointer, :long, :int32, :int32, :int32, :int32, :int32], :int32
       typesig { [::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int] }
       # @method flags=cast
       # long
@@ -10822,10 +10822,10 @@ module Org::Eclipse::Swt::Internal::Cocoa
       # long
       # long
       def objc_msg_send(id, sel, arg0, arg1, arg2)
-        JNI.__send__(:Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSend__IIIII, JNI.env, self.jni_id, id.to_int, sel.to_int, arg0.to_int, arg1.to_int, arg2.to_int)
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSend__IIIII, JNI.env, self.jni_id, id.to_int, sel.to_int, arg0.to_int, arg1.to_int, arg2.to_int)
       end
       
-      JNI.native_method :Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSend__IIIIIZ, [:pointer, :long, :int32, :int32, :int32, :int32, :int32, :int8], :int32
+      JNI.load_native_method :Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSend__IIIIIZ, [:pointer, :long, :int32, :int32, :int32, :int32, :int32, :int8], :int32
       typesig { [::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Boolean] }
       # @method flags=cast
       # long
@@ -10835,10 +10835,10 @@ module Org::Eclipse::Swt::Internal::Cocoa
       # long
       # long
       def objc_msg_send(id, sel, arg0, arg1, arg2, arg3)
-        JNI.__send__(:Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSend__IIIIIZ, JNI.env, self.jni_id, id.to_int, sel.to_int, arg0.to_int, arg1.to_int, arg2.to_int, arg3 ? 1 : 0)
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSend__IIIIIZ, JNI.env, self.jni_id, id.to_int, sel.to_int, arg0.to_int, arg1.to_int, arg2.to_int, arg3 ? 1 : 0)
       end
       
-      JNI.native_method :Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSend__IIIIIXfloatX, [:pointer, :long, :int32, :int32, :int32, :int32, :int32, :float], :int32
+      JNI.load_native_method :Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSend__IIIIIXfloatX, [:pointer, :long, :int32, :int32, :int32, :int32, :int32, :float], :int32
       typesig { [::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Float] }
       # @method flags=cast
       # long
@@ -10849,10 +10849,10 @@ module Org::Eclipse::Swt::Internal::Cocoa
       # long
       # double
       def objc_msg_send(id, sel, arg0, arg1, arg2, arg3)
-        JNI.__send__(:Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSend__IIIIIXfloatX, JNI.env, self.jni_id, id.to_int, sel.to_int, arg0.to_int, arg1.to_int, arg2.to_int, arg3)
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSend__IIIIIXfloatX, JNI.env, self.jni_id, id.to_int, sel.to_int, arg0.to_int, arg1.to_int, arg2.to_int, arg3)
       end
       
-      JNI.native_method :Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSend__IIIIII, [:pointer, :long, :int32, :int32, :int32, :int32, :int32, :int32], :int32
+      JNI.load_native_method :Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSend__IIIIII, [:pointer, :long, :int32, :int32, :int32, :int32, :int32, :int32], :int32
       typesig { [::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int] }
       # @method flags=cast
       # long
@@ -10863,10 +10863,10 @@ module Org::Eclipse::Swt::Internal::Cocoa
       # long
       # long
       def objc_msg_send(id, sel, arg0, arg1, arg2, arg3)
-        JNI.__send__(:Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSend__IIIIII, JNI.env, self.jni_id, id.to_int, sel.to_int, arg0.to_int, arg1.to_int, arg2.to_int, arg3.to_int)
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSend__IIIIII, JNI.env, self.jni_id, id.to_int, sel.to_int, arg0.to_int, arg1.to_int, arg2.to_int, arg3.to_int)
       end
       
-      JNI.native_method :Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSend__IIIIIII, [:pointer, :long, :int32, :int32, :int32, :int32, :int32, :int32, :int32], :int32
+      JNI.load_native_method :Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSend__IIIIIII, [:pointer, :long, :int32, :int32, :int32, :int32, :int32, :int32, :int32], :int32
       typesig { [::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int] }
       # @method flags=cast
       # long
@@ -10878,10 +10878,10 @@ module Org::Eclipse::Swt::Internal::Cocoa
       # long
       # long
       def objc_msg_send(id, sel, arg0, arg1, arg2, arg3, arg4)
-        JNI.__send__(:Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSend__IIIIIII, JNI.env, self.jni_id, id.to_int, sel.to_int, arg0.to_int, arg1.to_int, arg2.to_int, arg3.to_int, arg4.to_int)
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSend__IIIIIII, JNI.env, self.jni_id, id.to_int, sel.to_int, arg0.to_int, arg1.to_int, arg2.to_int, arg3.to_int, arg4.to_int)
       end
       
-      JNI.native_method :Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSend__IIIIIIIZZIII, [:pointer, :long, :int32, :int32, :int32, :int32, :int32, :int32, :int32, :int8, :int8, :int32, :int32, :int32], :int32
+      JNI.load_native_method :Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSend__IIIIIIIZZIII, [:pointer, :long, :int32, :int32, :int32, :int32, :int32, :int32, :int32, :int8, :int8, :int32, :int32, :int32], :int32
       typesig { [::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Boolean, ::Java::Boolean, ::Java::Int, ::Java::Int, ::Java::Int] }
       # @method flags=cast
       # long
@@ -10896,10 +10896,10 @@ module Org::Eclipse::Swt::Internal::Cocoa
       # long
       # long
       def objc_msg_send(id, sel, arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9)
-        JNI.__send__(:Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSend__IIIIIIIZZIII, JNI.env, self.jni_id, id.to_int, sel.to_int, arg0.to_int, arg1.to_int, arg2.to_int, arg3.to_int, arg4.to_int, arg5 ? 1 : 0, arg6 ? 1 : 0, arg7.to_int, arg8.to_int, arg9.to_int)
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSend__IIIIIIIZZIII, JNI.env, self.jni_id, id.to_int, sel.to_int, arg0.to_int, arg1.to_int, arg2.to_int, arg3.to_int, arg4.to_int, arg5 ? 1 : 0, arg6 ? 1 : 0, arg7.to_int, arg8.to_int, arg9.to_int)
       end
       
-      JNI.native_method :Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSend__IIIIIIIZZIIII, [:pointer, :long, :int32, :int32, :int32, :int32, :int32, :int32, :int32, :int8, :int8, :int32, :int32, :int32, :int32], :int32
+      JNI.load_native_method :Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSend__IIIIIIIZZIIII, [:pointer, :long, :int32, :int32, :int32, :int32, :int32, :int32, :int32, :int8, :int8, :int32, :int32, :int32, :int32], :int32
       typesig { [::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Boolean, ::Java::Boolean, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int] }
       # @method flags=cast
       # long
@@ -10915,10 +10915,10 @@ module Org::Eclipse::Swt::Internal::Cocoa
       # long
       # long
       def objc_msg_send(id, sel, arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10)
-        JNI.__send__(:Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSend__IIIIIIIZZIIII, JNI.env, self.jni_id, id.to_int, sel.to_int, arg0.to_int, arg1.to_int, arg2.to_int, arg3.to_int, arg4.to_int, arg5 ? 1 : 0, arg6 ? 1 : 0, arg7.to_int, arg8.to_int, arg9.to_int, arg10.to_int)
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSend__IIIIIIIZZIIII, JNI.env, self.jni_id, id.to_int, sel.to_int, arg0.to_int, arg1.to_int, arg2.to_int, arg3.to_int, arg4.to_int, arg5 ? 1 : 0, arg6 ? 1 : 0, arg7.to_int, arg8.to_int, arg9.to_int, arg10.to_int)
       end
       
-      JNI.native_method :Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSend__IIIIIIIII, [:pointer, :long, :int32, :int32, :int32, :int32, :int32, :int32, :int32, :int32, :int32], :int32
+      JNI.load_native_method :Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSend__IIIIIIIII, [:pointer, :long, :int32, :int32, :int32, :int32, :int32, :int32, :int32, :int32, :int32], :int32
       typesig { [::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int] }
       # @method flags=cast
       # long
@@ -10932,10 +10932,10 @@ module Org::Eclipse::Swt::Internal::Cocoa
       # long
       # long
       def objc_msg_send(id, sel, arg0, arg1, arg2, arg3, arg4, arg5, arg6)
-        JNI.__send__(:Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSend__IIIIIIIII, JNI.env, self.jni_id, id.to_int, sel.to_int, arg0.to_int, arg1.to_int, arg2.to_int, arg3.to_int, arg4.to_int, arg5.to_int, arg6.to_int)
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSend__IIIIIIIII, JNI.env, self.jni_id, id.to_int, sel.to_int, arg0.to_int, arg1.to_int, arg2.to_int, arg3.to_int, arg4.to_int, arg5.to_int, arg6.to_int)
       end
       
-      JNI.native_method :Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSend__II_3I, [:pointer, :long, :int32, :int32, :long], :int32
+      JNI.load_native_method :Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSend__II_3I, [:pointer, :long, :int32, :int32, :long], :int32
       typesig { [::Java::Int, ::Java::Int, Array.typed(::Java::Int)] }
       # @method flags=cast
       # long
@@ -10943,10 +10943,10 @@ module Org::Eclipse::Swt::Internal::Cocoa
       # long
       # long[]
       def objc_msg_send(id, sel, arg0)
-        JNI.__send__(:Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSend__II_3I, JNI.env, self.jni_id, id.to_int, sel.to_int, arg0.jni_id)
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSend__II_3I, JNI.env, self.jni_id, id.to_int, sel.to_int, arg0.jni_id)
       end
       
-      JNI.native_method :Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSend__II_3III, [:pointer, :long, :int32, :int32, :long, :int32, :int32], :int32
+      JNI.load_native_method :Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSend__II_3III, [:pointer, :long, :int32, :int32, :long, :int32, :int32], :int32
       typesig { [::Java::Int, ::Java::Int, Array.typed(::Java::Int), ::Java::Int, ::Java::Int] }
       # @method flags=cast
       # long
@@ -10954,63 +10954,63 @@ module Org::Eclipse::Swt::Internal::Cocoa
       # long
       # long[]
       def objc_msg_send(id, sel, arg0, arg1, arg2)
-        JNI.__send__(:Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSend__II_3III, JNI.env, self.jni_id, id.to_int, sel.to_int, arg0.jni_id, arg1.to_int, arg2.to_int)
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSend__II_3III, JNI.env, self.jni_id, id.to_int, sel.to_int, arg0.jni_id, arg1.to_int, arg2.to_int)
       end
       
-      JNI.native_method :Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSend__IIXfloatX, [:pointer, :long, :int32, :int32, :float], :int32
+      JNI.load_native_method :Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSend__IIXfloatX, [:pointer, :long, :int32, :int32, :float], :int32
       typesig { [::Java::Int, ::Java::Int, ::Java::Float] }
       # @method flags=cast
       def objc_msg_send(id, sel, arg0)
-        JNI.__send__(:Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSend__IIXfloatX, JNI.env, self.jni_id, id.to_int, sel.to_int, arg0)
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSend__IIXfloatX, JNI.env, self.jni_id, id.to_int, sel.to_int, arg0)
       end
       
-      JNI.native_method :Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSend__JJXfloatXXdoubleX, [:pointer, :long, :int64, :int64, :float, :double], :int64
+      JNI.load_native_method :Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSend__JJXfloatXXdoubleX, [:pointer, :long, :int64, :int64, :float, :double], :int64
       typesig { [::Java::Long, ::Java::Long, ::Java::Float, ::Java::Double] }
       # @method flags=cast
       def objc_msg_send(id, sel, arg0, arg1)
-        JNI.__send__(:Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSend__JJXfloatXXdoubleX, JNI.env, self.jni_id, id.to_int, sel.to_int, arg0, arg1)
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSend__JJXfloatXXdoubleX, JNI.env, self.jni_id, id.to_int, sel.to_int, arg0, arg1)
       end
       
-      JNI.native_method :Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSend__JJI, [:pointer, :long, :int64, :int64, :int32], :int64
+      JNI.load_native_method :Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSend__JJI, [:pointer, :long, :int64, :int64, :int32], :int64
       typesig { [::Java::Long, ::Java::Long, ::Java::Int] }
       # @method flags=cast
       def objc_msg_send(id, sel, arg0)
-        JNI.__send__(:Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSend__JJI, JNI.env, self.jni_id, id.to_int, sel.to_int, arg0.to_int)
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSend__JJI, JNI.env, self.jni_id, id.to_int, sel.to_int, arg0.to_int)
       end
       
-      JNI.native_method :Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSend__JJ_3I, [:pointer, :long, :int64, :int64, :long], :int64
+      JNI.load_native_method :Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSend__JJ_3I, [:pointer, :long, :int64, :int64, :long], :int64
       typesig { [::Java::Long, ::Java::Long, Array.typed(::Java::Int)] }
       # @method flags=cast
       def objc_msg_send(id, sel, arg0)
-        JNI.__send__(:Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSend__JJ_3I, JNI.env, self.jni_id, id.to_int, sel.to_int, arg0.jni_id)
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSend__JJ_3I, JNI.env, self.jni_id, id.to_int, sel.to_int, arg0.jni_id)
       end
       
-      JNI.native_method :Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSend__JJ_3JJJ, [:pointer, :long, :int64, :int64, :long, :int64, :int64], :int64
+      JNI.load_native_method :Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSend__JJ_3JJJ, [:pointer, :long, :int64, :int64, :long, :int64, :int64], :int64
       typesig { [::Java::Long, ::Java::Long, Array.typed(::Java::Long), ::Java::Long, ::Java::Long] }
       # @method flags=cast
       def objc_msg_send(id, sel, arg0, arg1, arg2)
-        JNI.__send__(:Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSend__JJ_3JJJ, JNI.env, self.jni_id, id.to_int, sel.to_int, arg0.jni_id, arg1.to_int, arg2.to_int)
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSend__JJ_3JJJ, JNI.env, self.jni_id, id.to_int, sel.to_int, arg0.jni_id, arg1.to_int, arg2.to_int)
       end
       
-      JNI.native_method "Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSend_1stret__L#{NSAffineTransformStruct.jni_name}_2II".to_sym, [:pointer, :long, :long, :int32, :int32], :void
+      JNI.load_native_method "Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSend_1stret__L#{NSAffineTransformStruct.jni_name}_2II".to_sym, [:pointer, :long, :long, :int32, :int32], :void
       typesig { [NSAffineTransformStruct, ::Java::Int, ::Java::Int] }
       # @method flags=cast
       # long
       # long
       def objc_msg_send_stret(result, id, sel)
-        JNI.__send__("Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSend_1stret__L#{NSAffineTransformStruct.jni_name}_2II".to_sym, JNI.env, self.jni_id, result.jni_id, id.to_int, sel.to_int)
+        JNI.call_native_method("Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSend_1stret__L#{NSAffineTransformStruct.jni_name}_2II".to_sym, JNI.env, self.jni_id, result.jni_id, id.to_int, sel.to_int)
       end
       
-      JNI.native_method "Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSend_1stret__L#{NSPoint.jni_name}_2II".to_sym, [:pointer, :long, :long, :int32, :int32], :void
+      JNI.load_native_method "Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSend_1stret__L#{NSPoint.jni_name}_2II".to_sym, [:pointer, :long, :long, :int32, :int32], :void
       typesig { [NSPoint, ::Java::Int, ::Java::Int] }
       # @method flags=cast
       # long
       # long
       def objc_msg_send_stret(result, id, sel)
-        JNI.__send__("Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSend_1stret__L#{NSPoint.jni_name}_2II".to_sym, JNI.env, self.jni_id, result.jni_id, id.to_int, sel.to_int)
+        JNI.call_native_method("Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSend_1stret__L#{NSPoint.jni_name}_2II".to_sym, JNI.env, self.jni_id, result.jni_id, id.to_int, sel.to_int)
       end
       
-      JNI.native_method "Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSend_1stret__L#{NSPoint.jni_name}_2IIL#{NSPoint.jni_name}_2".to_sym, [:pointer, :long, :long, :int32, :int32, :long], :void
+      JNI.load_native_method "Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSend_1stret__L#{NSPoint.jni_name}_2IIL#{NSPoint.jni_name}_2".to_sym, [:pointer, :long, :long, :int32, :int32, :long], :void
       typesig { [NSPoint, ::Java::Int, ::Java::Int, NSPoint] }
       # @method flags=cast
       # @param arg0 flags=struct
@@ -11018,10 +11018,10 @@ module Org::Eclipse::Swt::Internal::Cocoa
       # long
       # long
       def objc_msg_send_stret(result, id, sel, arg0)
-        JNI.__send__("Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSend_1stret__L#{NSPoint.jni_name}_2IIL#{NSPoint.jni_name}_2".to_sym, JNI.env, self.jni_id, result.jni_id, id.to_int, sel.to_int, arg0.jni_id)
+        JNI.call_native_method("Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSend_1stret__L#{NSPoint.jni_name}_2IIL#{NSPoint.jni_name}_2".to_sym, JNI.env, self.jni_id, result.jni_id, id.to_int, sel.to_int, arg0.jni_id)
       end
       
-      JNI.native_method "Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSend_1stret__L#{NSPoint.jni_name}_2IIL#{NSPoint.jni_name}_2I".to_sym, [:pointer, :long, :long, :int32, :int32, :long, :int32], :void
+      JNI.load_native_method "Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSend_1stret__L#{NSPoint.jni_name}_2IIL#{NSPoint.jni_name}_2I".to_sym, [:pointer, :long, :long, :int32, :int32, :long, :int32], :void
       typesig { [NSPoint, ::Java::Int, ::Java::Int, NSPoint, ::Java::Int] }
       # @method flags=cast
       # @param arg0 flags=struct
@@ -11030,29 +11030,29 @@ module Org::Eclipse::Swt::Internal::Cocoa
       # long
       # long
       def objc_msg_send_stret(result, id, sel, arg0, arg1)
-        JNI.__send__("Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSend_1stret__L#{NSPoint.jni_name}_2IIL#{NSPoint.jni_name}_2I".to_sym, JNI.env, self.jni_id, result.jni_id, id.to_int, sel.to_int, arg0.jni_id, arg1.to_int)
+        JNI.call_native_method("Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSend_1stret__L#{NSPoint.jni_name}_2IIL#{NSPoint.jni_name}_2I".to_sym, JNI.env, self.jni_id, result.jni_id, id.to_int, sel.to_int, arg0.jni_id, arg1.to_int)
       end
       
-      JNI.native_method "Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSend_1stret__L#{NSPoint.jni_name}_2III".to_sym, [:pointer, :long, :long, :int32, :int32, :int32], :void
+      JNI.load_native_method "Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSend_1stret__L#{NSPoint.jni_name}_2III".to_sym, [:pointer, :long, :long, :int32, :int32, :int32], :void
       typesig { [NSPoint, ::Java::Int, ::Java::Int, ::Java::Int] }
       # @method flags=cast
       # long
       # long
       # long
       def objc_msg_send_stret(result, id, sel, arg0)
-        JNI.__send__("Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSend_1stret__L#{NSPoint.jni_name}_2III".to_sym, JNI.env, self.jni_id, result.jni_id, id.to_int, sel.to_int, arg0.to_int)
+        JNI.call_native_method("Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSend_1stret__L#{NSPoint.jni_name}_2III".to_sym, JNI.env, self.jni_id, result.jni_id, id.to_int, sel.to_int, arg0.to_int)
       end
       
-      JNI.native_method "Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSend_1stret__L#{NSRange.jni_name}_2II".to_sym, [:pointer, :long, :long, :int32, :int32], :void
+      JNI.load_native_method "Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSend_1stret__L#{NSRange.jni_name}_2II".to_sym, [:pointer, :long, :long, :int32, :int32], :void
       typesig { [NSRange, ::Java::Int, ::Java::Int] }
       # @method flags=cast
       # long
       # long
       def objc_msg_send_stret(result, id, sel)
-        JNI.__send__("Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSend_1stret__L#{NSRange.jni_name}_2II".to_sym, JNI.env, self.jni_id, result.jni_id, id.to_int, sel.to_int)
+        JNI.call_native_method("Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSend_1stret__L#{NSRange.jni_name}_2II".to_sym, JNI.env, self.jni_id, result.jni_id, id.to_int, sel.to_int)
       end
       
-      JNI.native_method "Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSend_1stret__L#{NSRange.jni_name}_2IIL#{NSRange.jni_name}_2I".to_sym, [:pointer, :long, :long, :int32, :int32, :long, :int32], :void
+      JNI.load_native_method "Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSend_1stret__L#{NSRange.jni_name}_2IIL#{NSRange.jni_name}_2I".to_sym, [:pointer, :long, :long, :int32, :int32, :long, :int32], :void
       typesig { [NSRange, ::Java::Int, ::Java::Int, NSRange, ::Java::Int] }
       # @method flags=cast
       # @param arg0 flags=struct
@@ -11061,10 +11061,10 @@ module Org::Eclipse::Swt::Internal::Cocoa
       # long
       # long
       def objc_msg_send_stret(result, id, sel, arg0, arg1)
-        JNI.__send__("Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSend_1stret__L#{NSRange.jni_name}_2IIL#{NSRange.jni_name}_2I".to_sym, JNI.env, self.jni_id, result.jni_id, id.to_int, sel.to_int, arg0.jni_id, arg1.to_int)
+        JNI.call_native_method("Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSend_1stret__L#{NSRange.jni_name}_2IIL#{NSRange.jni_name}_2I".to_sym, JNI.env, self.jni_id, result.jni_id, id.to_int, sel.to_int, arg0.jni_id, arg1.to_int)
       end
       
-      JNI.native_method "Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSend_1stret__L#{NSRange.jni_name}_2IIL#{NSRect.jni_name}_2".to_sym, [:pointer, :long, :long, :int32, :int32, :long], :void
+      JNI.load_native_method "Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSend_1stret__L#{NSRange.jni_name}_2IIL#{NSRect.jni_name}_2".to_sym, [:pointer, :long, :long, :int32, :int32, :long], :void
       typesig { [NSRange, ::Java::Int, ::Java::Int, NSRect] }
       # @method flags=cast
       # @param arg0 flags=struct
@@ -11072,29 +11072,29 @@ module Org::Eclipse::Swt::Internal::Cocoa
       # long
       # long
       def objc_msg_send_stret(result, id, sel, arg0)
-        JNI.__send__("Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSend_1stret__L#{NSRange.jni_name}_2IIL#{NSRect.jni_name}_2".to_sym, JNI.env, self.jni_id, result.jni_id, id.to_int, sel.to_int, arg0.jni_id)
+        JNI.call_native_method("Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSend_1stret__L#{NSRange.jni_name}_2IIL#{NSRect.jni_name}_2".to_sym, JNI.env, self.jni_id, result.jni_id, id.to_int, sel.to_int, arg0.jni_id)
       end
       
-      JNI.native_method "Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSend_1stret__L#{NSRange.jni_name}_2III".to_sym, [:pointer, :long, :long, :int32, :int32, :int32], :void
+      JNI.load_native_method "Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSend_1stret__L#{NSRange.jni_name}_2III".to_sym, [:pointer, :long, :long, :int32, :int32, :int32], :void
       typesig { [NSRange, ::Java::Int, ::Java::Int, ::Java::Int] }
       # @method flags=cast
       # long
       # long
       # long
       def objc_msg_send_stret(result, id, sel, arg0)
-        JNI.__send__("Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSend_1stret__L#{NSRange.jni_name}_2III".to_sym, JNI.env, self.jni_id, result.jni_id, id.to_int, sel.to_int, arg0.to_int)
+        JNI.call_native_method("Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSend_1stret__L#{NSRange.jni_name}_2III".to_sym, JNI.env, self.jni_id, result.jni_id, id.to_int, sel.to_int, arg0.to_int)
       end
       
-      JNI.native_method "Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSend_1stret__L#{NSRect.jni_name}_2II".to_sym, [:pointer, :long, :long, :int32, :int32], :void
+      JNI.load_native_method "Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSend_1stret__L#{NSRect.jni_name}_2II".to_sym, [:pointer, :long, :long, :int32, :int32], :void
       typesig { [NSRect, ::Java::Int, ::Java::Int] }
       # @method flags=cast
       # long
       # long
       def objc_msg_send_stret(result, id, sel)
-        JNI.__send__("Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSend_1stret__L#{NSRect.jni_name}_2II".to_sym, JNI.env, self.jni_id, result.jni_id, id.to_int, sel.to_int)
+        JNI.call_native_method("Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSend_1stret__L#{NSRect.jni_name}_2II".to_sym, JNI.env, self.jni_id, result.jni_id, id.to_int, sel.to_int)
       end
       
-      JNI.native_method "Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSend_1stret__L#{NSRect.jni_name}_2IIL#{NSRange.jni_name}_2I".to_sym, [:pointer, :long, :long, :int32, :int32, :long, :int32], :void
+      JNI.load_native_method "Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSend_1stret__L#{NSRect.jni_name}_2IIL#{NSRange.jni_name}_2I".to_sym, [:pointer, :long, :long, :int32, :int32, :long, :int32], :void
       typesig { [NSRect, ::Java::Int, ::Java::Int, NSRange, ::Java::Int] }
       # @method flags=cast
       # @param arg0 flags=struct
@@ -11103,10 +11103,10 @@ module Org::Eclipse::Swt::Internal::Cocoa
       # long
       # long
       def objc_msg_send_stret(result, id, sel, arg0, arg1)
-        JNI.__send__("Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSend_1stret__L#{NSRect.jni_name}_2IIL#{NSRange.jni_name}_2I".to_sym, JNI.env, self.jni_id, result.jni_id, id.to_int, sel.to_int, arg0.jni_id, arg1.to_int)
+        JNI.call_native_method("Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSend_1stret__L#{NSRect.jni_name}_2IIL#{NSRange.jni_name}_2I".to_sym, JNI.env, self.jni_id, result.jni_id, id.to_int, sel.to_int, arg0.jni_id, arg1.to_int)
       end
       
-      JNI.native_method "Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSend_1stret__L#{NSRect.jni_name}_2IIL#{NSRect.jni_name}_2".to_sym, [:pointer, :long, :long, :int32, :int32, :long], :void
+      JNI.load_native_method "Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSend_1stret__L#{NSRect.jni_name}_2IIL#{NSRect.jni_name}_2".to_sym, [:pointer, :long, :long, :int32, :int32, :long], :void
       typesig { [NSRect, ::Java::Int, ::Java::Int, NSRect] }
       # @method flags=cast
       # @param arg0 flags=struct
@@ -11114,10 +11114,10 @@ module Org::Eclipse::Swt::Internal::Cocoa
       # long
       # long
       def objc_msg_send_stret(result, id, sel, arg0)
-        JNI.__send__("Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSend_1stret__L#{NSRect.jni_name}_2IIL#{NSRect.jni_name}_2".to_sym, JNI.env, self.jni_id, result.jni_id, id.to_int, sel.to_int, arg0.jni_id)
+        JNI.call_native_method("Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSend_1stret__L#{NSRect.jni_name}_2IIL#{NSRect.jni_name}_2".to_sym, JNI.env, self.jni_id, result.jni_id, id.to_int, sel.to_int, arg0.jni_id)
       end
       
-      JNI.native_method "Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSend_1stret__L#{NSRect.jni_name}_2IIL#{NSRect.jni_name}_2I".to_sym, [:pointer, :long, :long, :int32, :int32, :long, :int32], :void
+      JNI.load_native_method "Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSend_1stret__L#{NSRect.jni_name}_2IIL#{NSRect.jni_name}_2I".to_sym, [:pointer, :long, :long, :int32, :int32, :long, :int32], :void
       typesig { [NSRect, ::Java::Int, ::Java::Int, NSRect, ::Java::Int] }
       # @method flags=cast
       # @param arg0 flags=struct
@@ -11126,20 +11126,20 @@ module Org::Eclipse::Swt::Internal::Cocoa
       # long
       # long
       def objc_msg_send_stret(result, id, sel, arg0, arg1)
-        JNI.__send__("Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSend_1stret__L#{NSRect.jni_name}_2IIL#{NSRect.jni_name}_2I".to_sym, JNI.env, self.jni_id, result.jni_id, id.to_int, sel.to_int, arg0.jni_id, arg1.to_int)
+        JNI.call_native_method("Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSend_1stret__L#{NSRect.jni_name}_2IIL#{NSRect.jni_name}_2I".to_sym, JNI.env, self.jni_id, result.jni_id, id.to_int, sel.to_int, arg0.jni_id, arg1.to_int)
       end
       
-      JNI.native_method "Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSend_1stret__L#{NSRect.jni_name}_2III".to_sym, [:pointer, :long, :long, :int32, :int32, :int32], :void
+      JNI.load_native_method "Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSend_1stret__L#{NSRect.jni_name}_2III".to_sym, [:pointer, :long, :long, :int32, :int32, :int32], :void
       typesig { [NSRect, ::Java::Int, ::Java::Int, ::Java::Int] }
       # @method flags=cast
       # long
       # long
       # long
       def objc_msg_send_stret(result, id, sel, arg0)
-        JNI.__send__("Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSend_1stret__L#{NSRect.jni_name}_2III".to_sym, JNI.env, self.jni_id, result.jni_id, id.to_int, sel.to_int, arg0.to_int)
+        JNI.call_native_method("Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSend_1stret__L#{NSRect.jni_name}_2III".to_sym, JNI.env, self.jni_id, result.jni_id, id.to_int, sel.to_int, arg0.to_int)
       end
       
-      JNI.native_method "Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSend_1stret__L#{NSRect.jni_name}_2IIII".to_sym, [:pointer, :long, :long, :int32, :int32, :int32, :int32], :void
+      JNI.load_native_method "Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSend_1stret__L#{NSRect.jni_name}_2IIII".to_sym, [:pointer, :long, :long, :int32, :int32, :int32, :int32], :void
       typesig { [NSRect, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int] }
       # @method flags=cast
       # long
@@ -11147,10 +11147,10 @@ module Org::Eclipse::Swt::Internal::Cocoa
       # long
       # long
       def objc_msg_send_stret(result, id, sel, arg0, arg1)
-        JNI.__send__("Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSend_1stret__L#{NSRect.jni_name}_2IIII".to_sym, JNI.env, self.jni_id, result.jni_id, id.to_int, sel.to_int, arg0.to_int, arg1.to_int)
+        JNI.call_native_method("Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSend_1stret__L#{NSRect.jni_name}_2IIII".to_sym, JNI.env, self.jni_id, result.jni_id, id.to_int, sel.to_int, arg0.to_int, arg1.to_int)
       end
       
-      JNI.native_method "Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSend_1stret__L#{NSRect.jni_name}_2IIIIZ".to_sym, [:pointer, :long, :long, :int32, :int32, :int32, :int32, :int8], :void
+      JNI.load_native_method "Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSend_1stret__L#{NSRect.jni_name}_2IIIIZ".to_sym, [:pointer, :long, :long, :int32, :int32, :int32, :int32, :int8], :void
       typesig { [NSRect, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Boolean] }
       # @method flags=cast
       # long
@@ -11158,19 +11158,19 @@ module Org::Eclipse::Swt::Internal::Cocoa
       # long
       # long
       def objc_msg_send_stret(result, id, sel, arg0, arg1, arg2)
-        JNI.__send__("Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSend_1stret__L#{NSRect.jni_name}_2IIIIZ".to_sym, JNI.env, self.jni_id, result.jni_id, id.to_int, sel.to_int, arg0.to_int, arg1.to_int, arg2 ? 1 : 0)
+        JNI.call_native_method("Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSend_1stret__L#{NSRect.jni_name}_2IIIIZ".to_sym, JNI.env, self.jni_id, result.jni_id, id.to_int, sel.to_int, arg0.to_int, arg1.to_int, arg2 ? 1 : 0)
       end
       
-      JNI.native_method "Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSend_1stret__L#{NSSize.jni_name}_2II".to_sym, [:pointer, :long, :long, :int32, :int32], :void
+      JNI.load_native_method "Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSend_1stret__L#{NSSize.jni_name}_2II".to_sym, [:pointer, :long, :long, :int32, :int32], :void
       typesig { [NSSize, ::Java::Int, ::Java::Int] }
       # @method flags=cast
       # long
       # long
       def objc_msg_send_stret(result, id, sel)
-        JNI.__send__("Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSend_1stret__L#{NSSize.jni_name}_2II".to_sym, JNI.env, self.jni_id, result.jni_id, id.to_int, sel.to_int)
+        JNI.call_native_method("Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSend_1stret__L#{NSSize.jni_name}_2II".to_sym, JNI.env, self.jni_id, result.jni_id, id.to_int, sel.to_int)
       end
       
-      JNI.native_method "Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSend_1stret__L#{NSSize.jni_name}_2IIL#{NSRect.jni_name}_2".to_sym, [:pointer, :long, :long, :int32, :int32, :long], :void
+      JNI.load_native_method "Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSend_1stret__L#{NSSize.jni_name}_2IIL#{NSRect.jni_name}_2".to_sym, [:pointer, :long, :long, :int32, :int32, :long], :void
       typesig { [NSSize, ::Java::Int, ::Java::Int, NSRect] }
       # @method flags=cast
       # @param arg0 flags=struct
@@ -11178,10 +11178,10 @@ module Org::Eclipse::Swt::Internal::Cocoa
       # long
       # long
       def objc_msg_send_stret(result, id, sel, arg0)
-        JNI.__send__("Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSend_1stret__L#{NSSize.jni_name}_2IIL#{NSRect.jni_name}_2".to_sym, JNI.env, self.jni_id, result.jni_id, id.to_int, sel.to_int, arg0.jni_id)
+        JNI.call_native_method("Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSend_1stret__L#{NSSize.jni_name}_2IIL#{NSRect.jni_name}_2".to_sym, JNI.env, self.jni_id, result.jni_id, id.to_int, sel.to_int, arg0.jni_id)
       end
       
-      JNI.native_method "Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSend_1stret__L#{NSSize.jni_name}_2IIL#{NSSize.jni_name}_2".to_sym, [:pointer, :long, :long, :int32, :int32, :long], :void
+      JNI.load_native_method "Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSend_1stret__L#{NSSize.jni_name}_2IIL#{NSSize.jni_name}_2".to_sym, [:pointer, :long, :long, :int32, :int32, :long], :void
       typesig { [NSSize, ::Java::Int, ::Java::Int, NSSize] }
       # @method flags=cast
       # @param arg0 flags=struct
@@ -11189,10 +11189,10 @@ module Org::Eclipse::Swt::Internal::Cocoa
       # long
       # long
       def objc_msg_send_stret(result, id, sel, arg0)
-        JNI.__send__("Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSend_1stret__L#{NSSize.jni_name}_2IIL#{NSSize.jni_name}_2".to_sym, JNI.env, self.jni_id, result.jni_id, id.to_int, sel.to_int, arg0.jni_id)
+        JNI.call_native_method("Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSend_1stret__L#{NSSize.jni_name}_2IIL#{NSSize.jni_name}_2".to_sym, JNI.env, self.jni_id, result.jni_id, id.to_int, sel.to_int, arg0.jni_id)
       end
       
-      JNI.native_method "Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSend_1stret__L#{NSSize.jni_name}_2IIL#{NSSize.jni_name}_2ZZI".to_sym, [:pointer, :long, :long, :int32, :int32, :long, :int8, :int8, :int32], :void
+      JNI.load_native_method "Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSend_1stret__L#{NSSize.jni_name}_2IIL#{NSSize.jni_name}_2ZZI".to_sym, [:pointer, :long, :long, :int32, :int32, :long, :int8, :int8, :int32], :void
       typesig { [NSSize, ::Java::Int, ::Java::Int, NSSize, ::Java::Boolean, ::Java::Boolean, ::Java::Int] }
       # @method flags=cast
       # @param arg0 flags=struct
@@ -11201,10 +11201,10 @@ module Org::Eclipse::Swt::Internal::Cocoa
       # long
       # long
       def objc_msg_send_stret(result, id, sel, arg0, arg1, arg2, arg3)
-        JNI.__send__("Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSend_1stret__L#{NSSize.jni_name}_2IIL#{NSSize.jni_name}_2ZZI".to_sym, JNI.env, self.jni_id, result.jni_id, id.to_int, sel.to_int, arg0.jni_id, arg1 ? 1 : 0, arg2 ? 1 : 0, arg3.to_int)
+        JNI.call_native_method("Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSend_1stret__L#{NSSize.jni_name}_2IIL#{NSSize.jni_name}_2ZZI".to_sym, JNI.env, self.jni_id, result.jni_id, id.to_int, sel.to_int, arg0.jni_id, arg1 ? 1 : 0, arg2 ? 1 : 0, arg3.to_int)
       end
       
-      JNI.native_method "Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSend_1stret__L#{NSSize.jni_name}_2IIL#{NSSize.jni_name}_2I".to_sym, [:pointer, :long, :long, :int32, :int32, :long, :int32], :void
+      JNI.load_native_method "Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSend_1stret__L#{NSSize.jni_name}_2IIL#{NSSize.jni_name}_2I".to_sym, [:pointer, :long, :long, :int32, :int32, :long, :int32], :void
       typesig { [NSSize, ::Java::Int, ::Java::Int, NSSize, ::Java::Int] }
       # @method flags=cast
       # @param arg0 flags=struct
@@ -11213,65 +11213,65 @@ module Org::Eclipse::Swt::Internal::Cocoa
       # long
       # long
       def objc_msg_send_stret(result, id, sel, arg0, arg1)
-        JNI.__send__("Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSend_1stret__L#{NSSize.jni_name}_2IIL#{NSSize.jni_name}_2I".to_sym, JNI.env, self.jni_id, result.jni_id, id.to_int, sel.to_int, arg0.jni_id, arg1.to_int)
+        JNI.call_native_method("Java_org_eclipse_swt_internal_cocoa_OS_objc_1msgSend_1stret__L#{NSSize.jni_name}_2IIL#{NSSize.jni_name}_2I".to_sym, JNI.env, self.jni_id, result.jni_id, id.to_int, sel.to_int, arg0.jni_id, arg1.to_int)
       end
       
-      JNI.native_method :Java_org_eclipse_swt_internal_cocoa_OS_CGPathElement_1sizeof, [:pointer, :long], :int32
+      JNI.load_native_method :Java_org_eclipse_swt_internal_cocoa_OS_CGPathElement_1sizeof, [:pointer, :long], :int32
       typesig { [] }
       # Sizeof natives
       def _cgpath_element_sizeof
-        JNI.__send__(:Java_org_eclipse_swt_internal_cocoa_OS_CGPathElement_1sizeof, JNI.env, self.jni_id)
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_cocoa_OS_CGPathElement_1sizeof, JNI.env, self.jni_id)
       end
       
-      JNI.native_method :Java_org_eclipse_swt_internal_cocoa_OS_CGPoint_1sizeof, [:pointer, :long], :int32
+      JNI.load_native_method :Java_org_eclipse_swt_internal_cocoa_OS_CGPoint_1sizeof, [:pointer, :long], :int32
       typesig { [] }
       def _cgpoint_sizeof
-        JNI.__send__(:Java_org_eclipse_swt_internal_cocoa_OS_CGPoint_1sizeof, JNI.env, self.jni_id)
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_cocoa_OS_CGPoint_1sizeof, JNI.env, self.jni_id)
       end
       
-      JNI.native_method :Java_org_eclipse_swt_internal_cocoa_OS_CGRect_1sizeof, [:pointer, :long], :int32
+      JNI.load_native_method :Java_org_eclipse_swt_internal_cocoa_OS_CGRect_1sizeof, [:pointer, :long], :int32
       typesig { [] }
       def _cgrect_sizeof
-        JNI.__send__(:Java_org_eclipse_swt_internal_cocoa_OS_CGRect_1sizeof, JNI.env, self.jni_id)
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_cocoa_OS_CGRect_1sizeof, JNI.env, self.jni_id)
       end
       
-      JNI.native_method :Java_org_eclipse_swt_internal_cocoa_OS_CGSize_1sizeof, [:pointer, :long], :int32
+      JNI.load_native_method :Java_org_eclipse_swt_internal_cocoa_OS_CGSize_1sizeof, [:pointer, :long], :int32
       typesig { [] }
       def _cgsize_sizeof
-        JNI.__send__(:Java_org_eclipse_swt_internal_cocoa_OS_CGSize_1sizeof, JNI.env, self.jni_id)
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_cocoa_OS_CGSize_1sizeof, JNI.env, self.jni_id)
       end
       
-      JNI.native_method :Java_org_eclipse_swt_internal_cocoa_OS_NSAffineTransformStruct_1sizeof, [:pointer, :long], :int32
+      JNI.load_native_method :Java_org_eclipse_swt_internal_cocoa_OS_NSAffineTransformStruct_1sizeof, [:pointer, :long], :int32
       typesig { [] }
       def _nsaffine_transform_struct_sizeof
-        JNI.__send__(:Java_org_eclipse_swt_internal_cocoa_OS_NSAffineTransformStruct_1sizeof, JNI.env, self.jni_id)
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_cocoa_OS_NSAffineTransformStruct_1sizeof, JNI.env, self.jni_id)
       end
       
-      JNI.native_method :Java_org_eclipse_swt_internal_cocoa_OS_NSPoint_1sizeof, [:pointer, :long], :int32
+      JNI.load_native_method :Java_org_eclipse_swt_internal_cocoa_OS_NSPoint_1sizeof, [:pointer, :long], :int32
       typesig { [] }
       def _nspoint_sizeof
-        JNI.__send__(:Java_org_eclipse_swt_internal_cocoa_OS_NSPoint_1sizeof, JNI.env, self.jni_id)
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_cocoa_OS_NSPoint_1sizeof, JNI.env, self.jni_id)
       end
       
-      JNI.native_method :Java_org_eclipse_swt_internal_cocoa_OS_NSRange_1sizeof, [:pointer, :long], :int32
+      JNI.load_native_method :Java_org_eclipse_swt_internal_cocoa_OS_NSRange_1sizeof, [:pointer, :long], :int32
       typesig { [] }
       def _nsrange_sizeof
-        JNI.__send__(:Java_org_eclipse_swt_internal_cocoa_OS_NSRange_1sizeof, JNI.env, self.jni_id)
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_cocoa_OS_NSRange_1sizeof, JNI.env, self.jni_id)
       end
       
-      JNI.native_method :Java_org_eclipse_swt_internal_cocoa_OS_NSRect_1sizeof, [:pointer, :long], :int32
+      JNI.load_native_method :Java_org_eclipse_swt_internal_cocoa_OS_NSRect_1sizeof, [:pointer, :long], :int32
       typesig { [] }
       def _nsrect_sizeof
-        JNI.__send__(:Java_org_eclipse_swt_internal_cocoa_OS_NSRect_1sizeof, JNI.env, self.jni_id)
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_cocoa_OS_NSRect_1sizeof, JNI.env, self.jni_id)
       end
       
-      JNI.native_method :Java_org_eclipse_swt_internal_cocoa_OS_NSSize_1sizeof, [:pointer, :long], :int32
+      JNI.load_native_method :Java_org_eclipse_swt_internal_cocoa_OS_NSSize_1sizeof, [:pointer, :long], :int32
       typesig { [] }
       def _nssize_sizeof
-        JNI.__send__(:Java_org_eclipse_swt_internal_cocoa_OS_NSSize_1sizeof, JNI.env, self.jni_id)
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_cocoa_OS_NSSize_1sizeof, JNI.env, self.jni_id)
       end
       
-      JNI.native_method "Java_org_eclipse_swt_internal_cocoa_OS_memmove__IL#{CGPathElement.jni_name}_2I".to_sym, [:pointer, :long, :int32, :long, :int32], :void
+      JNI.load_native_method "Java_org_eclipse_swt_internal_cocoa_OS_memmove__IL#{CGPathElement.jni_name}_2I".to_sym, [:pointer, :long, :int32, :long, :int32], :void
       typesig { [::Java::Int, CGPathElement, ::Java::Int] }
       # Memmove natives
       # 
@@ -11281,10 +11281,10 @@ module Org::Eclipse::Swt::Internal::Cocoa
       # long
       # long
       def memmove(dest, src, size)
-        JNI.__send__("Java_org_eclipse_swt_internal_cocoa_OS_memmove__IL#{CGPathElement.jni_name}_2I".to_sym, JNI.env, self.jni_id, dest.to_int, src.jni_id, size.to_int)
+        JNI.call_native_method("Java_org_eclipse_swt_internal_cocoa_OS_memmove__IL#{CGPathElement.jni_name}_2I".to_sym, JNI.env, self.jni_id, dest.to_int, src.jni_id, size.to_int)
       end
       
-      JNI.native_method "Java_org_eclipse_swt_internal_cocoa_OS_memmove__L#{CGPathElement.jni_name}_2II".to_sym, [:pointer, :long, :long, :int32, :int32], :void
+      JNI.load_native_method "Java_org_eclipse_swt_internal_cocoa_OS_memmove__L#{CGPathElement.jni_name}_2II".to_sym, [:pointer, :long, :long, :int32, :int32], :void
       typesig { [CGPathElement, ::Java::Int, ::Java::Int] }
       # @param dest cast=(void *),flags=no_in critical
       # @param src cast=(void *),flags=critical
@@ -11292,10 +11292,10 @@ module Org::Eclipse::Swt::Internal::Cocoa
       # long
       # long
       def memmove(dest, src, size)
-        JNI.__send__("Java_org_eclipse_swt_internal_cocoa_OS_memmove__L#{CGPathElement.jni_name}_2II".to_sym, JNI.env, self.jni_id, dest.jni_id, src.to_int, size.to_int)
+        JNI.call_native_method("Java_org_eclipse_swt_internal_cocoa_OS_memmove__L#{CGPathElement.jni_name}_2II".to_sym, JNI.env, self.jni_id, dest.jni_id, src.to_int, size.to_int)
       end
       
-      JNI.native_method "Java_org_eclipse_swt_internal_cocoa_OS_memmove__IL#{CGPoint.jni_name}_2I".to_sym, [:pointer, :long, :int32, :long, :int32], :void
+      JNI.load_native_method "Java_org_eclipse_swt_internal_cocoa_OS_memmove__IL#{CGPoint.jni_name}_2I".to_sym, [:pointer, :long, :int32, :long, :int32], :void
       typesig { [::Java::Int, CGPoint, ::Java::Int] }
       # @param dest cast=(void *),flags=no_in critical
       # @param src cast=(void *),flags=critical
@@ -11303,10 +11303,10 @@ module Org::Eclipse::Swt::Internal::Cocoa
       # long
       # long
       def memmove(dest, src, size)
-        JNI.__send__("Java_org_eclipse_swt_internal_cocoa_OS_memmove__IL#{CGPoint.jni_name}_2I".to_sym, JNI.env, self.jni_id, dest.to_int, src.jni_id, size.to_int)
+        JNI.call_native_method("Java_org_eclipse_swt_internal_cocoa_OS_memmove__IL#{CGPoint.jni_name}_2I".to_sym, JNI.env, self.jni_id, dest.to_int, src.jni_id, size.to_int)
       end
       
-      JNI.native_method "Java_org_eclipse_swt_internal_cocoa_OS_memmove__L#{CGPoint.jni_name}_2II".to_sym, [:pointer, :long, :long, :int32, :int32], :void
+      JNI.load_native_method "Java_org_eclipse_swt_internal_cocoa_OS_memmove__L#{CGPoint.jni_name}_2II".to_sym, [:pointer, :long, :long, :int32, :int32], :void
       typesig { [CGPoint, ::Java::Int, ::Java::Int] }
       # @param dest cast=(void *),flags=no_in critical
       # @param src cast=(void *),flags=critical
@@ -11314,10 +11314,10 @@ module Org::Eclipse::Swt::Internal::Cocoa
       # long
       # long
       def memmove(dest, src, size)
-        JNI.__send__("Java_org_eclipse_swt_internal_cocoa_OS_memmove__L#{CGPoint.jni_name}_2II".to_sym, JNI.env, self.jni_id, dest.jni_id, src.to_int, size.to_int)
+        JNI.call_native_method("Java_org_eclipse_swt_internal_cocoa_OS_memmove__L#{CGPoint.jni_name}_2II".to_sym, JNI.env, self.jni_id, dest.jni_id, src.to_int, size.to_int)
       end
       
-      JNI.native_method "Java_org_eclipse_swt_internal_cocoa_OS_memmove__IL#{CGRect.jni_name}_2I".to_sym, [:pointer, :long, :int32, :long, :int32], :void
+      JNI.load_native_method "Java_org_eclipse_swt_internal_cocoa_OS_memmove__IL#{CGRect.jni_name}_2I".to_sym, [:pointer, :long, :int32, :long, :int32], :void
       typesig { [::Java::Int, CGRect, ::Java::Int] }
       # @param dest cast=(void *),flags=no_in critical
       # @param src cast=(void *),flags=critical
@@ -11325,10 +11325,10 @@ module Org::Eclipse::Swt::Internal::Cocoa
       # long
       # long
       def memmove(dest, src, size)
-        JNI.__send__("Java_org_eclipse_swt_internal_cocoa_OS_memmove__IL#{CGRect.jni_name}_2I".to_sym, JNI.env, self.jni_id, dest.to_int, src.jni_id, size.to_int)
+        JNI.call_native_method("Java_org_eclipse_swt_internal_cocoa_OS_memmove__IL#{CGRect.jni_name}_2I".to_sym, JNI.env, self.jni_id, dest.to_int, src.jni_id, size.to_int)
       end
       
-      JNI.native_method "Java_org_eclipse_swt_internal_cocoa_OS_memmove__L#{CGRect.jni_name}_2II".to_sym, [:pointer, :long, :long, :int32, :int32], :void
+      JNI.load_native_method "Java_org_eclipse_swt_internal_cocoa_OS_memmove__L#{CGRect.jni_name}_2II".to_sym, [:pointer, :long, :long, :int32, :int32], :void
       typesig { [CGRect, ::Java::Int, ::Java::Int] }
       # @param dest cast=(void *),flags=no_in critical
       # @param src cast=(void *),flags=critical
@@ -11336,10 +11336,10 @@ module Org::Eclipse::Swt::Internal::Cocoa
       # long
       # long
       def memmove(dest, src, size)
-        JNI.__send__("Java_org_eclipse_swt_internal_cocoa_OS_memmove__L#{CGRect.jni_name}_2II".to_sym, JNI.env, self.jni_id, dest.jni_id, src.to_int, size.to_int)
+        JNI.call_native_method("Java_org_eclipse_swt_internal_cocoa_OS_memmove__L#{CGRect.jni_name}_2II".to_sym, JNI.env, self.jni_id, dest.jni_id, src.to_int, size.to_int)
       end
       
-      JNI.native_method "Java_org_eclipse_swt_internal_cocoa_OS_memmove__IL#{CGSize.jni_name}_2I".to_sym, [:pointer, :long, :int32, :long, :int32], :void
+      JNI.load_native_method "Java_org_eclipse_swt_internal_cocoa_OS_memmove__IL#{CGSize.jni_name}_2I".to_sym, [:pointer, :long, :int32, :long, :int32], :void
       typesig { [::Java::Int, CGSize, ::Java::Int] }
       # @param dest cast=(void *),flags=no_in critical
       # @param src cast=(void *),flags=critical
@@ -11347,10 +11347,10 @@ module Org::Eclipse::Swt::Internal::Cocoa
       # long
       # long
       def memmove(dest, src, size)
-        JNI.__send__("Java_org_eclipse_swt_internal_cocoa_OS_memmove__IL#{CGSize.jni_name}_2I".to_sym, JNI.env, self.jni_id, dest.to_int, src.jni_id, size.to_int)
+        JNI.call_native_method("Java_org_eclipse_swt_internal_cocoa_OS_memmove__IL#{CGSize.jni_name}_2I".to_sym, JNI.env, self.jni_id, dest.to_int, src.jni_id, size.to_int)
       end
       
-      JNI.native_method "Java_org_eclipse_swt_internal_cocoa_OS_memmove__L#{CGSize.jni_name}_2II".to_sym, [:pointer, :long, :long, :int32, :int32], :void
+      JNI.load_native_method "Java_org_eclipse_swt_internal_cocoa_OS_memmove__L#{CGSize.jni_name}_2II".to_sym, [:pointer, :long, :long, :int32, :int32], :void
       typesig { [CGSize, ::Java::Int, ::Java::Int] }
       # @param dest cast=(void *),flags=no_in critical
       # @param src cast=(void *),flags=critical
@@ -11358,10 +11358,10 @@ module Org::Eclipse::Swt::Internal::Cocoa
       # long
       # long
       def memmove(dest, src, size)
-        JNI.__send__("Java_org_eclipse_swt_internal_cocoa_OS_memmove__L#{CGSize.jni_name}_2II".to_sym, JNI.env, self.jni_id, dest.jni_id, src.to_int, size.to_int)
+        JNI.call_native_method("Java_org_eclipse_swt_internal_cocoa_OS_memmove__L#{CGSize.jni_name}_2II".to_sym, JNI.env, self.jni_id, dest.jni_id, src.to_int, size.to_int)
       end
       
-      JNI.native_method "Java_org_eclipse_swt_internal_cocoa_OS_memmove__IL#{NSAffineTransformStruct.jni_name}_2I".to_sym, [:pointer, :long, :int32, :long, :int32], :void
+      JNI.load_native_method "Java_org_eclipse_swt_internal_cocoa_OS_memmove__IL#{NSAffineTransformStruct.jni_name}_2I".to_sym, [:pointer, :long, :int32, :long, :int32], :void
       typesig { [::Java::Int, NSAffineTransformStruct, ::Java::Int] }
       # @param dest cast=(void *),flags=no_in critical
       # @param src cast=(void *),flags=critical
@@ -11369,10 +11369,10 @@ module Org::Eclipse::Swt::Internal::Cocoa
       # long
       # long
       def memmove(dest, src, size)
-        JNI.__send__("Java_org_eclipse_swt_internal_cocoa_OS_memmove__IL#{NSAffineTransformStruct.jni_name}_2I".to_sym, JNI.env, self.jni_id, dest.to_int, src.jni_id, size.to_int)
+        JNI.call_native_method("Java_org_eclipse_swt_internal_cocoa_OS_memmove__IL#{NSAffineTransformStruct.jni_name}_2I".to_sym, JNI.env, self.jni_id, dest.to_int, src.jni_id, size.to_int)
       end
       
-      JNI.native_method "Java_org_eclipse_swt_internal_cocoa_OS_memmove__L#{NSAffineTransformStruct.jni_name}_2II".to_sym, [:pointer, :long, :long, :int32, :int32], :void
+      JNI.load_native_method "Java_org_eclipse_swt_internal_cocoa_OS_memmove__L#{NSAffineTransformStruct.jni_name}_2II".to_sym, [:pointer, :long, :long, :int32, :int32], :void
       typesig { [NSAffineTransformStruct, ::Java::Int, ::Java::Int] }
       # @param dest cast=(void *),flags=no_in critical
       # @param src cast=(void *),flags=critical
@@ -11380,10 +11380,10 @@ module Org::Eclipse::Swt::Internal::Cocoa
       # long
       # long
       def memmove(dest, src, size)
-        JNI.__send__("Java_org_eclipse_swt_internal_cocoa_OS_memmove__L#{NSAffineTransformStruct.jni_name}_2II".to_sym, JNI.env, self.jni_id, dest.jni_id, src.to_int, size.to_int)
+        JNI.call_native_method("Java_org_eclipse_swt_internal_cocoa_OS_memmove__L#{NSAffineTransformStruct.jni_name}_2II".to_sym, JNI.env, self.jni_id, dest.jni_id, src.to_int, size.to_int)
       end
       
-      JNI.native_method "Java_org_eclipse_swt_internal_cocoa_OS_memmove__IL#{NSPoint.jni_name}_2I".to_sym, [:pointer, :long, :int32, :long, :int32], :void
+      JNI.load_native_method "Java_org_eclipse_swt_internal_cocoa_OS_memmove__IL#{NSPoint.jni_name}_2I".to_sym, [:pointer, :long, :int32, :long, :int32], :void
       typesig { [::Java::Int, NSPoint, ::Java::Int] }
       # @param dest cast=(void *),flags=no_in critical
       # @param src cast=(void *),flags=critical
@@ -11391,10 +11391,10 @@ module Org::Eclipse::Swt::Internal::Cocoa
       # long
       # long
       def memmove(dest, src, size)
-        JNI.__send__("Java_org_eclipse_swt_internal_cocoa_OS_memmove__IL#{NSPoint.jni_name}_2I".to_sym, JNI.env, self.jni_id, dest.to_int, src.jni_id, size.to_int)
+        JNI.call_native_method("Java_org_eclipse_swt_internal_cocoa_OS_memmove__IL#{NSPoint.jni_name}_2I".to_sym, JNI.env, self.jni_id, dest.to_int, src.jni_id, size.to_int)
       end
       
-      JNI.native_method "Java_org_eclipse_swt_internal_cocoa_OS_memmove__L#{NSPoint.jni_name}_2II".to_sym, [:pointer, :long, :long, :int32, :int32], :void
+      JNI.load_native_method "Java_org_eclipse_swt_internal_cocoa_OS_memmove__L#{NSPoint.jni_name}_2II".to_sym, [:pointer, :long, :long, :int32, :int32], :void
       typesig { [NSPoint, ::Java::Int, ::Java::Int] }
       # @param dest cast=(void *),flags=no_in critical
       # @param src cast=(void *),flags=critical
@@ -11402,10 +11402,10 @@ module Org::Eclipse::Swt::Internal::Cocoa
       # long
       # long
       def memmove(dest, src, size)
-        JNI.__send__("Java_org_eclipse_swt_internal_cocoa_OS_memmove__L#{NSPoint.jni_name}_2II".to_sym, JNI.env, self.jni_id, dest.jni_id, src.to_int, size.to_int)
+        JNI.call_native_method("Java_org_eclipse_swt_internal_cocoa_OS_memmove__L#{NSPoint.jni_name}_2II".to_sym, JNI.env, self.jni_id, dest.jni_id, src.to_int, size.to_int)
       end
       
-      JNI.native_method "Java_org_eclipse_swt_internal_cocoa_OS_memmove__IL#{NSRange.jni_name}_2I".to_sym, [:pointer, :long, :int32, :long, :int32], :void
+      JNI.load_native_method "Java_org_eclipse_swt_internal_cocoa_OS_memmove__IL#{NSRange.jni_name}_2I".to_sym, [:pointer, :long, :int32, :long, :int32], :void
       typesig { [::Java::Int, NSRange, ::Java::Int] }
       # @param dest cast=(void *),flags=no_in critical
       # @param src cast=(void *),flags=critical
@@ -11413,10 +11413,10 @@ module Org::Eclipse::Swt::Internal::Cocoa
       # long
       # long
       def memmove(dest, src, size)
-        JNI.__send__("Java_org_eclipse_swt_internal_cocoa_OS_memmove__IL#{NSRange.jni_name}_2I".to_sym, JNI.env, self.jni_id, dest.to_int, src.jni_id, size.to_int)
+        JNI.call_native_method("Java_org_eclipse_swt_internal_cocoa_OS_memmove__IL#{NSRange.jni_name}_2I".to_sym, JNI.env, self.jni_id, dest.to_int, src.jni_id, size.to_int)
       end
       
-      JNI.native_method "Java_org_eclipse_swt_internal_cocoa_OS_memmove__L#{NSRange.jni_name}_2II".to_sym, [:pointer, :long, :long, :int32, :int32], :void
+      JNI.load_native_method "Java_org_eclipse_swt_internal_cocoa_OS_memmove__L#{NSRange.jni_name}_2II".to_sym, [:pointer, :long, :long, :int32, :int32], :void
       typesig { [NSRange, ::Java::Int, ::Java::Int] }
       # @param dest cast=(void *),flags=no_in critical
       # @param src cast=(void *),flags=critical
@@ -11424,10 +11424,10 @@ module Org::Eclipse::Swt::Internal::Cocoa
       # long
       # long
       def memmove(dest, src, size)
-        JNI.__send__("Java_org_eclipse_swt_internal_cocoa_OS_memmove__L#{NSRange.jni_name}_2II".to_sym, JNI.env, self.jni_id, dest.jni_id, src.to_int, size.to_int)
+        JNI.call_native_method("Java_org_eclipse_swt_internal_cocoa_OS_memmove__L#{NSRange.jni_name}_2II".to_sym, JNI.env, self.jni_id, dest.jni_id, src.to_int, size.to_int)
       end
       
-      JNI.native_method "Java_org_eclipse_swt_internal_cocoa_OS_memmove__IL#{NSRect.jni_name}_2I".to_sym, [:pointer, :long, :int32, :long, :int32], :void
+      JNI.load_native_method "Java_org_eclipse_swt_internal_cocoa_OS_memmove__IL#{NSRect.jni_name}_2I".to_sym, [:pointer, :long, :int32, :long, :int32], :void
       typesig { [::Java::Int, NSRect, ::Java::Int] }
       # @param dest cast=(void *),flags=no_in critical
       # @param src cast=(void *),flags=critical
@@ -11435,10 +11435,10 @@ module Org::Eclipse::Swt::Internal::Cocoa
       # long
       # long
       def memmove(dest, src, size)
-        JNI.__send__("Java_org_eclipse_swt_internal_cocoa_OS_memmove__IL#{NSRect.jni_name}_2I".to_sym, JNI.env, self.jni_id, dest.to_int, src.jni_id, size.to_int)
+        JNI.call_native_method("Java_org_eclipse_swt_internal_cocoa_OS_memmove__IL#{NSRect.jni_name}_2I".to_sym, JNI.env, self.jni_id, dest.to_int, src.jni_id, size.to_int)
       end
       
-      JNI.native_method "Java_org_eclipse_swt_internal_cocoa_OS_memmove__L#{NSRect.jni_name}_2II".to_sym, [:pointer, :long, :long, :int32, :int32], :void
+      JNI.load_native_method "Java_org_eclipse_swt_internal_cocoa_OS_memmove__L#{NSRect.jni_name}_2II".to_sym, [:pointer, :long, :long, :int32, :int32], :void
       typesig { [NSRect, ::Java::Int, ::Java::Int] }
       # @param dest cast=(void *),flags=no_in critical
       # @param src cast=(void *),flags=critical
@@ -11446,10 +11446,10 @@ module Org::Eclipse::Swt::Internal::Cocoa
       # long
       # long
       def memmove(dest, src, size)
-        JNI.__send__("Java_org_eclipse_swt_internal_cocoa_OS_memmove__L#{NSRect.jni_name}_2II".to_sym, JNI.env, self.jni_id, dest.jni_id, src.to_int, size.to_int)
+        JNI.call_native_method("Java_org_eclipse_swt_internal_cocoa_OS_memmove__L#{NSRect.jni_name}_2II".to_sym, JNI.env, self.jni_id, dest.jni_id, src.to_int, size.to_int)
       end
       
-      JNI.native_method "Java_org_eclipse_swt_internal_cocoa_OS_memmove__IL#{NSSize.jni_name}_2I".to_sym, [:pointer, :long, :int32, :long, :int32], :void
+      JNI.load_native_method "Java_org_eclipse_swt_internal_cocoa_OS_memmove__IL#{NSSize.jni_name}_2I".to_sym, [:pointer, :long, :int32, :long, :int32], :void
       typesig { [::Java::Int, NSSize, ::Java::Int] }
       # @param dest cast=(void *),flags=no_in critical
       # @param src cast=(void *),flags=critical
@@ -11457,10 +11457,10 @@ module Org::Eclipse::Swt::Internal::Cocoa
       # long
       # long
       def memmove(dest, src, size)
-        JNI.__send__("Java_org_eclipse_swt_internal_cocoa_OS_memmove__IL#{NSSize.jni_name}_2I".to_sym, JNI.env, self.jni_id, dest.to_int, src.jni_id, size.to_int)
+        JNI.call_native_method("Java_org_eclipse_swt_internal_cocoa_OS_memmove__IL#{NSSize.jni_name}_2I".to_sym, JNI.env, self.jni_id, dest.to_int, src.jni_id, size.to_int)
       end
       
-      JNI.native_method "Java_org_eclipse_swt_internal_cocoa_OS_memmove__L#{NSSize.jni_name}_2II".to_sym, [:pointer, :long, :long, :int32, :int32], :void
+      JNI.load_native_method "Java_org_eclipse_swt_internal_cocoa_OS_memmove__L#{NSSize.jni_name}_2II".to_sym, [:pointer, :long, :long, :int32, :int32], :void
       typesig { [NSSize, ::Java::Int, ::Java::Int] }
       # @param dest cast=(void *),flags=no_in critical
       # @param src cast=(void *),flags=critical
@@ -11468,7 +11468,7 @@ module Org::Eclipse::Swt::Internal::Cocoa
       # long
       # long
       def memmove(dest, src, size)
-        JNI.__send__("Java_org_eclipse_swt_internal_cocoa_OS_memmove__L#{NSSize.jni_name}_2II".to_sym, JNI.env, self.jni_id, dest.jni_id, src.to_int, size.to_int)
+        JNI.call_native_method("Java_org_eclipse_swt_internal_cocoa_OS_memmove__L#{NSSize.jni_name}_2II".to_sym, JNI.env, self.jni_id, dest.jni_id, src.to_int, size.to_int)
       end
     }
     

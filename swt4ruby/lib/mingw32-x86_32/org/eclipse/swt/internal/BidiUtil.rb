@@ -15,7 +15,7 @@ module Org::Eclipse::Swt::Internal
       include ::Org::Eclipse::Swt::Internal
       include_const ::Java::Util, :Hashtable
       include_const ::Org::Eclipse::Swt, :SWT
-      include_const ::Org::Eclipse::Swt::Graphics, :GC
+      include_const ::Org::Eclipse::Swt::Graphics, :SwtGC
       include ::Org::Eclipse::Swt::Internal::Win32
       include ::Org::Eclipse::Swt::Widgets
     }

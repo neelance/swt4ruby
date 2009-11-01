@@ -44,13 +44,13 @@ module Org::Eclipse::Swt::Internal::Mozilla::Init
       const_set_lazy(:PATH_MAX) { 4096 }
       const_attr_reader  :PATH_MAX
       
-      JNI.native_method :Java_org_eclipse_swt_internal_mozilla_init_XPCOMInit_GREVersionRange_1sizeof, [:pointer, :long], :int32
+      JNI.load_native_method :Java_org_eclipse_swt_internal_mozilla_init_XPCOMInit_GREVersionRange_1sizeof, [:pointer, :long], :int32
       typesig { [] }
       def _greversion_range_sizeof
-        JNI.__send__(:Java_org_eclipse_swt_internal_mozilla_init_XPCOMInit_GREVersionRange_1sizeof, JNI.env, self.jni_id)
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_mozilla_init_XPCOMInit_GREVersionRange_1sizeof, JNI.env, self.jni_id)
       end
       
-      JNI.native_method :Java_org_eclipse_swt_internal_mozilla_init_XPCOMInit__1GRE_1GetGREPathWithProperties, [:pointer, :long, :long, :int32, :int32, :int32, :int32, :int32], :int32
+      JNI.load_native_method :Java_org_eclipse_swt_internal_mozilla_init_XPCOMInit__1GRE_1GetGREPathWithProperties, [:pointer, :long, :long, :int32, :int32, :int32, :int32, :int32], :int32
       typesig { [GREVersionRange, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int] }
       # @param versions cast=(const GREVersionRange *)
       # @param properties cast=(const GREProperty *)
@@ -59,7 +59,7 @@ module Org::Eclipse::Swt::Internal::Mozilla::Init
       # long
       # long
       def ___gre_get_grepath_with_properties(versions, versions_length, properties, properties_length, buffer, buflen)
-        JNI.__send__(:Java_org_eclipse_swt_internal_mozilla_init_XPCOMInit__1GRE_1GetGREPathWithProperties, JNI.env, self.jni_id, versions.jni_id, versions_length.to_int, properties.to_int, properties_length.to_int, buffer.to_int, buflen.to_int)
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_mozilla_init_XPCOMInit__1GRE_1GetGREPathWithProperties, JNI.env, self.jni_id, versions.jni_id, versions_length.to_int, properties.to_int, properties_length.to_int, buffer.to_int, buflen.to_int)
       end
       
       typesig { [GREVersionRange, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int] }
@@ -74,11 +74,11 @@ module Org::Eclipse::Swt::Internal::Mozilla::Init
         end
       end
       
-      JNI.native_method :Java_org_eclipse_swt_internal_mozilla_init_XPCOMInit__1XPCOMGlueStartup, [:pointer, :long, :long], :int32
+      JNI.load_native_method :Java_org_eclipse_swt_internal_mozilla_init_XPCOMInit__1XPCOMGlueStartup, [:pointer, :long, :long], :int32
       typesig { [Array.typed(::Java::Byte)] }
       # @param place cast=(const char *)
       def ___xpcomglue_startup(place)
-        JNI.__send__(:Java_org_eclipse_swt_internal_mozilla_init_XPCOMInit__1XPCOMGlueStartup, JNI.env, self.jni_id, place.jni_id)
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_mozilla_init_XPCOMInit__1XPCOMGlueStartup, JNI.env, self.jni_id, place.jni_id)
       end
       
       typesig { [Array.typed(::Java::Byte)] }
@@ -91,10 +91,10 @@ module Org::Eclipse::Swt::Internal::Mozilla::Init
         end
       end
       
-      JNI.native_method :Java_org_eclipse_swt_internal_mozilla_init_XPCOMInit__1XPCOMGlueShutdown, [:pointer, :long], :int32
+      JNI.load_native_method :Java_org_eclipse_swt_internal_mozilla_init_XPCOMInit__1XPCOMGlueShutdown, [:pointer, :long], :int32
       typesig { [] }
       def ___xpcomglue_shutdown
-        JNI.__send__(:Java_org_eclipse_swt_internal_mozilla_init_XPCOMInit__1XPCOMGlueShutdown, JNI.env, self.jni_id)
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_mozilla_init_XPCOMInit__1XPCOMGlueShutdown, JNI.env, self.jni_id)
       end
       
       typesig { [] }

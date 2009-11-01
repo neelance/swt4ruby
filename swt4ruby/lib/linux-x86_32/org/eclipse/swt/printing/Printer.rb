@@ -19,7 +19,7 @@ module Org::Eclipse::Swt::Printing
       include_const ::Org::Eclipse::Swt::Internal, :Converter
       include_const ::Org::Eclipse::Swt::Internal::Gtk, :GdkVisual
       include_const ::Org::Eclipse::Swt::Internal::Gtk, :OS
-      include_const ::Org::Eclipse::Swt::Internal::Cairo, :Cairo
+      include_const ::Org::Eclipse::Swt::Internal::Cairo, :SwtCairo
       include_const ::Org::Eclipse::Swt::Printing, :PrinterData
     }
   end

@@ -34,31 +34,31 @@ module Org::Eclipse::Swt::Internal
       const_set_lazy(:PTR_SIZEOF) { _ptr_sizeof }
       const_attr_reader  :PTR_SIZEOF
       
-      JNI.native_method :Java_org_eclipse_swt_internal_C_free, [:pointer, :long, :int64], :void
+      JNI.load_native_method :Java_org_eclipse_swt_internal_C_free, [:pointer, :long, :int64], :void
       typesig { [::Java::Long] }
       # @param ptr cast=(void *)
       # int
       def free(ptr)
-        JNI.__send__(:Java_org_eclipse_swt_internal_C_free, JNI.env, self.jni_id, ptr.to_int)
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_C_free, JNI.env, self.jni_id, ptr.to_int)
       end
       
-      JNI.native_method :Java_org_eclipse_swt_internal_C_getenv, [:pointer, :long, :long], :int64
+      JNI.load_native_method :Java_org_eclipse_swt_internal_C_getenv, [:pointer, :long, :long], :int64
       typesig { [Array.typed(::Java::Byte)] }
       # @param env cast=(const char *)
       # int
       def getenv(env)
-        JNI.__send__(:Java_org_eclipse_swt_internal_C_getenv, JNI.env, self.jni_id, env.jni_id)
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_C_getenv, JNI.env, self.jni_id, env.jni_id)
       end
       
-      JNI.native_method :Java_org_eclipse_swt_internal_C_malloc, [:pointer, :long, :int64], :int64
+      JNI.load_native_method :Java_org_eclipse_swt_internal_C_malloc, [:pointer, :long, :int64], :int64
       typesig { [::Java::Long] }
       # int
       # int
       def malloc(size)
-        JNI.__send__(:Java_org_eclipse_swt_internal_C_malloc, JNI.env, self.jni_id, size.to_int)
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_C_malloc, JNI.env, self.jni_id, size.to_int)
       end
       
-      JNI.native_method :Java_org_eclipse_swt_internal_C_memmove__J_3BJ, [:pointer, :long, :int64, :long, :int64], :void
+      JNI.load_native_method :Java_org_eclipse_swt_internal_C_memmove__J_3BJ, [:pointer, :long, :int64, :long, :int64], :void
       typesig { [::Java::Long, Array.typed(::Java::Byte), ::Java::Long] }
       # @param dest cast=(void *)
       # @param src cast=(const void *),flags=no_out critical
@@ -67,10 +67,10 @@ module Org::Eclipse::Swt::Internal
       # int
       # int
       def memmove(dest, src, size)
-        JNI.__send__(:Java_org_eclipse_swt_internal_C_memmove__J_3BJ, JNI.env, self.jni_id, dest.to_int, src.jni_id, size.to_int)
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_C_memmove__J_3BJ, JNI.env, self.jni_id, dest.to_int, src.jni_id, size.to_int)
       end
       
-      JNI.native_method :Java_org_eclipse_swt_internal_C_memmove__J_3CJ, [:pointer, :long, :int64, :long, :int64], :void
+      JNI.load_native_method :Java_org_eclipse_swt_internal_C_memmove__J_3CJ, [:pointer, :long, :int64, :long, :int64], :void
       typesig { [::Java::Long, Array.typed(::Java::Char), ::Java::Long] }
       # @param dest cast=(void *)
       # @param src cast=(const void *),flags=no_out critical
@@ -79,10 +79,10 @@ module Org::Eclipse::Swt::Internal
       # int
       # int
       def memmove(dest, src, size)
-        JNI.__send__(:Java_org_eclipse_swt_internal_C_memmove__J_3CJ, JNI.env, self.jni_id, dest.to_int, src.jni_id, size.to_int)
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_C_memmove__J_3CJ, JNI.env, self.jni_id, dest.to_int, src.jni_id, size.to_int)
       end
       
-      JNI.native_method :Java_org_eclipse_swt_internal_C_memmove__J_3XdoubleXJ, [:pointer, :long, :int64, :long, :int64], :void
+      JNI.load_native_method :Java_org_eclipse_swt_internal_C_memmove__J_3XdoubleXJ, [:pointer, :long, :int64, :long, :int64], :void
       typesig { [::Java::Long, Array.typed(::Java::Double), ::Java::Long] }
       # @param dest cast=(void *)
       # @param src cast=(const void *),flags=no_out critical
@@ -91,10 +91,10 @@ module Org::Eclipse::Swt::Internal
       # int
       # int
       def memmove(dest, src, size)
-        JNI.__send__(:Java_org_eclipse_swt_internal_C_memmove__J_3XdoubleXJ, JNI.env, self.jni_id, dest.to_int, src.jni_id, size.to_int)
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_C_memmove__J_3XdoubleXJ, JNI.env, self.jni_id, dest.to_int, src.jni_id, size.to_int)
       end
       
-      JNI.native_method :Java_org_eclipse_swt_internal_C_memmove__J_3XfloatXJ, [:pointer, :long, :int64, :long, :int64], :void
+      JNI.load_native_method :Java_org_eclipse_swt_internal_C_memmove__J_3XfloatXJ, [:pointer, :long, :int64, :long, :int64], :void
       typesig { [::Java::Long, Array.typed(::Java::Float), ::Java::Long] }
       # @param dest cast=(void *)
       # @param src cast=(const void *),flags=no_out critical
@@ -103,10 +103,10 @@ module Org::Eclipse::Swt::Internal
       # int
       # int
       def memmove(dest, src, size)
-        JNI.__send__(:Java_org_eclipse_swt_internal_C_memmove__J_3XfloatXJ, JNI.env, self.jni_id, dest.to_int, src.jni_id, size.to_int)
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_C_memmove__J_3XfloatXJ, JNI.env, self.jni_id, dest.to_int, src.jni_id, size.to_int)
       end
       
-      JNI.native_method :Java_org_eclipse_swt_internal_C_memmove__J_3IJ, [:pointer, :long, :int64, :long, :int64], :void
+      JNI.load_native_method :Java_org_eclipse_swt_internal_C_memmove__J_3IJ, [:pointer, :long, :int64, :long, :int64], :void
       typesig { [::Java::Long, Array.typed(::Java::Int), ::Java::Long] }
       # @param dest cast=(void *)
       # @param src cast=(const void *),flags=no_out critical
@@ -115,10 +115,10 @@ module Org::Eclipse::Swt::Internal
       # int
       # int
       def memmove(dest, src, size)
-        JNI.__send__(:Java_org_eclipse_swt_internal_C_memmove__J_3IJ, JNI.env, self.jni_id, dest.to_int, src.jni_id, size.to_int)
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_C_memmove__J_3IJ, JNI.env, self.jni_id, dest.to_int, src.jni_id, size.to_int)
       end
       
-      JNI.native_method :Java_org_eclipse_swt_internal_C_memmove__J_3JJ, [:pointer, :long, :int64, :long, :int64], :void
+      JNI.load_native_method :Java_org_eclipse_swt_internal_C_memmove__J_3JJ, [:pointer, :long, :int64, :long, :int64], :void
       typesig { [::Java::Long, Array.typed(::Java::Long), ::Java::Long] }
       # @param dest cast=(void *)
       # @param src cast=(const void *),flags=no_out critical
@@ -127,10 +127,10 @@ module Org::Eclipse::Swt::Internal
       # int
       # int
       def memmove(dest, src, size)
-        JNI.__send__(:Java_org_eclipse_swt_internal_C_memmove__J_3JJ, JNI.env, self.jni_id, dest.to_int, src.jni_id, size.to_int)
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_C_memmove__J_3JJ, JNI.env, self.jni_id, dest.to_int, src.jni_id, size.to_int)
       end
       
-      JNI.native_method :Java_org_eclipse_swt_internal_C_memmove__J_3SJ, [:pointer, :long, :int64, :long, :int64], :void
+      JNI.load_native_method :Java_org_eclipse_swt_internal_C_memmove__J_3SJ, [:pointer, :long, :int64, :long, :int64], :void
       typesig { [::Java::Long, Array.typed(::Java::Short), ::Java::Long] }
       # @param dest cast=(void *)
       # @param src cast=(const void *),flags=no_out critical
@@ -139,10 +139,10 @@ module Org::Eclipse::Swt::Internal
       # int
       # int
       def memmove(dest, src, size)
-        JNI.__send__(:Java_org_eclipse_swt_internal_C_memmove__J_3SJ, JNI.env, self.jni_id, dest.to_int, src.jni_id, size.to_int)
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_C_memmove__J_3SJ, JNI.env, self.jni_id, dest.to_int, src.jni_id, size.to_int)
       end
       
-      JNI.native_method :Java_org_eclipse_swt_internal_C_memmove___3B_3CJ, [:pointer, :long, :long, :long, :int64], :void
+      JNI.load_native_method :Java_org_eclipse_swt_internal_C_memmove___3B_3CJ, [:pointer, :long, :long, :long, :int64], :void
       typesig { [Array.typed(::Java::Byte), Array.typed(::Java::Char), ::Java::Long] }
       # @param dest cast=(void *),flags=no_in critical
       # @param src cast=(const void *),flags=no_out critical
@@ -150,10 +150,10 @@ module Org::Eclipse::Swt::Internal
       # 
       # int
       def memmove(dest, src, size)
-        JNI.__send__(:Java_org_eclipse_swt_internal_C_memmove___3B_3CJ, JNI.env, self.jni_id, dest.jni_id, src.jni_id, size.to_int)
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_C_memmove___3B_3CJ, JNI.env, self.jni_id, dest.jni_id, src.jni_id, size.to_int)
       end
       
-      JNI.native_method :Java_org_eclipse_swt_internal_C_memmove___3BJJ, [:pointer, :long, :long, :int64, :int64], :void
+      JNI.load_native_method :Java_org_eclipse_swt_internal_C_memmove___3BJJ, [:pointer, :long, :long, :int64, :int64], :void
       typesig { [Array.typed(::Java::Byte), ::Java::Long, ::Java::Long] }
       # @param dest cast=(void *),flags=no_in critical
       # @param src cast=(const void *)
@@ -162,10 +162,10 @@ module Org::Eclipse::Swt::Internal
       # int
       # int
       def memmove(dest, src, size)
-        JNI.__send__(:Java_org_eclipse_swt_internal_C_memmove___3BJJ, JNI.env, self.jni_id, dest.jni_id, src.to_int, size.to_int)
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_C_memmove___3BJJ, JNI.env, self.jni_id, dest.jni_id, src.to_int, size.to_int)
       end
       
-      JNI.native_method :Java_org_eclipse_swt_internal_C_memmove__JJJ, [:pointer, :long, :int64, :int64, :int64], :void
+      JNI.load_native_method :Java_org_eclipse_swt_internal_C_memmove__JJJ, [:pointer, :long, :int64, :int64, :int64], :void
       typesig { [::Java::Long, ::Java::Long, ::Java::Long] }
       # @param dest cast=(void *)
       # @param src cast=(const void *)
@@ -175,10 +175,10 @@ module Org::Eclipse::Swt::Internal
       # int
       # int
       def memmove(dest, src, size)
-        JNI.__send__(:Java_org_eclipse_swt_internal_C_memmove__JJJ, JNI.env, self.jni_id, dest.to_int, src.to_int, size.to_int)
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_C_memmove__JJJ, JNI.env, self.jni_id, dest.to_int, src.to_int, size.to_int)
       end
       
-      JNI.native_method :Java_org_eclipse_swt_internal_C_memmove___3CJJ, [:pointer, :long, :long, :int64, :int64], :void
+      JNI.load_native_method :Java_org_eclipse_swt_internal_C_memmove___3CJJ, [:pointer, :long, :long, :int64, :int64], :void
       typesig { [Array.typed(::Java::Char), ::Java::Long, ::Java::Long] }
       # @param dest cast=(void *),flags=no_in critical
       # @param src cast=(const void *)
@@ -187,10 +187,10 @@ module Org::Eclipse::Swt::Internal
       # int
       # int
       def memmove(dest, src, size)
-        JNI.__send__(:Java_org_eclipse_swt_internal_C_memmove___3CJJ, JNI.env, self.jni_id, dest.jni_id, src.to_int, size.to_int)
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_C_memmove___3CJJ, JNI.env, self.jni_id, dest.jni_id, src.to_int, size.to_int)
       end
       
-      JNI.native_method :Java_org_eclipse_swt_internal_C_memmove___3XdoubleXJJ, [:pointer, :long, :long, :int64, :int64], :void
+      JNI.load_native_method :Java_org_eclipse_swt_internal_C_memmove___3XdoubleXJJ, [:pointer, :long, :long, :int64, :int64], :void
       typesig { [Array.typed(::Java::Double), ::Java::Long, ::Java::Long] }
       # @param dest cast=(void *),flags=no_in critical
       # @param src cast=(const void *)
@@ -199,10 +199,10 @@ module Org::Eclipse::Swt::Internal
       # int
       # int
       def memmove(dest, src, size)
-        JNI.__send__(:Java_org_eclipse_swt_internal_C_memmove___3XdoubleXJJ, JNI.env, self.jni_id, dest.jni_id, src.to_int, size.to_int)
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_C_memmove___3XdoubleXJJ, JNI.env, self.jni_id, dest.jni_id, src.to_int, size.to_int)
       end
       
-      JNI.native_method :Java_org_eclipse_swt_internal_C_memmove___3XfloatXJJ, [:pointer, :long, :long, :int64, :int64], :void
+      JNI.load_native_method :Java_org_eclipse_swt_internal_C_memmove___3XfloatXJJ, [:pointer, :long, :long, :int64, :int64], :void
       typesig { [Array.typed(::Java::Float), ::Java::Long, ::Java::Long] }
       # @param dest cast=(void *),flags=no_in critical
       # @param src cast=(const void *)
@@ -211,10 +211,10 @@ module Org::Eclipse::Swt::Internal
       # int
       # int
       def memmove(dest, src, size)
-        JNI.__send__(:Java_org_eclipse_swt_internal_C_memmove___3XfloatXJJ, JNI.env, self.jni_id, dest.jni_id, src.to_int, size.to_int)
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_C_memmove___3XfloatXJJ, JNI.env, self.jni_id, dest.jni_id, src.to_int, size.to_int)
       end
       
-      JNI.native_method :Java_org_eclipse_swt_internal_C_memmove___3I_3BJ, [:pointer, :long, :long, :long, :int64], :void
+      JNI.load_native_method :Java_org_eclipse_swt_internal_C_memmove___3I_3BJ, [:pointer, :long, :long, :long, :int64], :void
       typesig { [Array.typed(::Java::Int), Array.typed(::Java::Byte), ::Java::Long] }
       # @param dest cast=(void *),flags=no_in critical
       # @param src cast=(const void *)
@@ -222,10 +222,10 @@ module Org::Eclipse::Swt::Internal
       # 
       # int
       def memmove(dest, src, size)
-        JNI.__send__(:Java_org_eclipse_swt_internal_C_memmove___3I_3BJ, JNI.env, self.jni_id, dest.jni_id, src.jni_id, size.to_int)
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_C_memmove___3I_3BJ, JNI.env, self.jni_id, dest.jni_id, src.jni_id, size.to_int)
       end
       
-      JNI.native_method :Java_org_eclipse_swt_internal_C_memmove___3SJJ, [:pointer, :long, :long, :int64, :int64], :void
+      JNI.load_native_method :Java_org_eclipse_swt_internal_C_memmove___3SJJ, [:pointer, :long, :long, :int64, :int64], :void
       typesig { [Array.typed(::Java::Short), ::Java::Long, ::Java::Long] }
       # @param dest cast=(void *),flags=no_in critical
       # @param src cast=(const void *)
@@ -234,10 +234,10 @@ module Org::Eclipse::Swt::Internal
       # int
       # int
       def memmove(dest, src, size)
-        JNI.__send__(:Java_org_eclipse_swt_internal_C_memmove___3SJJ, JNI.env, self.jni_id, dest.jni_id, src.to_int, size.to_int)
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_C_memmove___3SJJ, JNI.env, self.jni_id, dest.jni_id, src.to_int, size.to_int)
       end
       
-      JNI.native_method :Java_org_eclipse_swt_internal_C_memmove___3IJJ, [:pointer, :long, :long, :int64, :int64], :void
+      JNI.load_native_method :Java_org_eclipse_swt_internal_C_memmove___3IJJ, [:pointer, :long, :long, :int64, :int64], :void
       typesig { [Array.typed(::Java::Int), ::Java::Long, ::Java::Long] }
       # @param dest cast=(void *),flags=no_in critical
       # @param src cast=(const void *)
@@ -246,10 +246,10 @@ module Org::Eclipse::Swt::Internal
       # int
       # int
       def memmove(dest, src, size)
-        JNI.__send__(:Java_org_eclipse_swt_internal_C_memmove___3IJJ, JNI.env, self.jni_id, dest.jni_id, src.to_int, size.to_int)
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_C_memmove___3IJJ, JNI.env, self.jni_id, dest.jni_id, src.to_int, size.to_int)
       end
       
-      JNI.native_method :Java_org_eclipse_swt_internal_C_memmove___3JJJ, [:pointer, :long, :long, :int64, :int64], :void
+      JNI.load_native_method :Java_org_eclipse_swt_internal_C_memmove___3JJJ, [:pointer, :long, :long, :int64, :int64], :void
       typesig { [Array.typed(::Java::Long), ::Java::Long, ::Java::Long] }
       # @param dest cast=(void *),flags=no_in critical
       # @param src cast=(const void *)
@@ -258,10 +258,10 @@ module Org::Eclipse::Swt::Internal
       # int
       # int
       def memmove(dest, src, size)
-        JNI.__send__(:Java_org_eclipse_swt_internal_C_memmove___3JJJ, JNI.env, self.jni_id, dest.jni_id, src.to_int, size.to_int)
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_C_memmove___3JJJ, JNI.env, self.jni_id, dest.jni_id, src.to_int, size.to_int)
       end
       
-      JNI.native_method :Java_org_eclipse_swt_internal_C_memset, [:pointer, :long, :int64, :int32, :int64], :int64
+      JNI.load_native_method :Java_org_eclipse_swt_internal_C_memset, [:pointer, :long, :int64, :int32, :int64], :int64
       typesig { [::Java::Long, ::Java::Int, ::Java::Long] }
       # @param buffer cast=(void *),flags=critical
       # @param num cast=(size_t)
@@ -270,21 +270,21 @@ module Org::Eclipse::Swt::Internal
       # int
       # int
       def memset(buffer, c, num)
-        JNI.__send__(:Java_org_eclipse_swt_internal_C_memset, JNI.env, self.jni_id, buffer.to_int, c.to_int, num.to_int)
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_C_memset, JNI.env, self.jni_id, buffer.to_int, c.to_int, num.to_int)
       end
       
-      JNI.native_method :Java_org_eclipse_swt_internal_C_PTR_1sizeof, [:pointer, :long], :int32
+      JNI.load_native_method :Java_org_eclipse_swt_internal_C_PTR_1sizeof, [:pointer, :long], :int32
       typesig { [] }
       def _ptr_sizeof
-        JNI.__send__(:Java_org_eclipse_swt_internal_C_PTR_1sizeof, JNI.env, self.jni_id)
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_C_PTR_1sizeof, JNI.env, self.jni_id)
       end
       
-      JNI.native_method :Java_org_eclipse_swt_internal_C_strlen, [:pointer, :long, :int64], :int32
+      JNI.load_native_method :Java_org_eclipse_swt_internal_C_strlen, [:pointer, :long, :int64], :int32
       typesig { [::Java::Long] }
       # @param s cast=(char *)
       # int
       def strlen(s)
-        JNI.__send__(:Java_org_eclipse_swt_internal_C_strlen, JNI.env, self.jni_id, s.to_int)
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_C_strlen, JNI.env, self.jni_id, s.to_int)
       end
     }
     

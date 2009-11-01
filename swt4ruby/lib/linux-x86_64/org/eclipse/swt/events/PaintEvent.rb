@@ -14,7 +14,7 @@ module Org::Eclipse::Swt::Events
       include ::Java::Lang
       include ::Org::Eclipse::Swt::Events
       include_const ::Org::Eclipse::Swt::Widgets, :Event
-      include_const ::Org::Eclipse::Swt::Graphics, :GC
+      include_const ::Org::Eclipse::Swt::Graphics, :SwtGC
     }
   end
   

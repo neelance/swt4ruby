@@ -206,26 +206,26 @@ module Org::Eclipse::Swt::Internal::Accessibility::Gtk
       const_set_lazy(:Text_selection_changed) { OS.ascii("text_selection_changed") }
       const_attr_reader  :Text_selection_changed
       
-      JNI.native_method :Java_org_eclipse_swt_internal_accessibility_gtk_ATK_AtkObjectFactory_1sizeof, [:pointer, :long], :int32
+      JNI.load_native_method :Java_org_eclipse_swt_internal_accessibility_gtk_ATK_AtkObjectFactory_1sizeof, [:pointer, :long], :int32
       typesig { [] }
       # 64 bit
       def _atk_object_factory_sizeof
-        JNI.__send__(:Java_org_eclipse_swt_internal_accessibility_gtk_ATK_AtkObjectFactory_1sizeof, JNI.env, self.jni_id)
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_accessibility_gtk_ATK_AtkObjectFactory_1sizeof, JNI.env, self.jni_id)
       end
       
-      JNI.native_method :Java_org_eclipse_swt_internal_accessibility_gtk_ATK_AtkObjectFactoryClass_1sizeof, [:pointer, :long], :int32
+      JNI.load_native_method :Java_org_eclipse_swt_internal_accessibility_gtk_ATK_AtkObjectFactoryClass_1sizeof, [:pointer, :long], :int32
       typesig { [] }
       def _atk_object_factory_class_sizeof
-        JNI.__send__(:Java_org_eclipse_swt_internal_accessibility_gtk_ATK_AtkObjectFactoryClass_1sizeof, JNI.env, self.jni_id)
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_accessibility_gtk_ATK_AtkObjectFactoryClass_1sizeof, JNI.env, self.jni_id)
       end
       
-      JNI.native_method :Java_org_eclipse_swt_internal_accessibility_gtk_ATK__1ATK_1ACTION_1GET_1IFACE, [:pointer, :long, :int32], :int32
+      JNI.load_native_method :Java_org_eclipse_swt_internal_accessibility_gtk_ATK__1ATK_1ACTION_1GET_1IFACE, [:pointer, :long, :int32], :int32
       typesig { [::Java::Int] }
       # Natives
       # long
       # long
       def ___atk_action_get_iface(obj)
-        JNI.__send__(:Java_org_eclipse_swt_internal_accessibility_gtk_ATK__1ATK_1ACTION_1GET_1IFACE, JNI.env, self.jni_id, obj.to_int)
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_accessibility_gtk_ATK__1ATK_1ACTION_1GET_1IFACE, JNI.env, self.jni_id, obj.to_int)
       end
       
       typesig { [::Java::Int] }
@@ -240,12 +240,12 @@ module Org::Eclipse::Swt::Internal::Accessibility::Gtk
         end
       end
       
-      JNI.native_method :Java_org_eclipse_swt_internal_accessibility_gtk_ATK__1ATK_1COMPONENT_1GET_1IFACE, [:pointer, :long, :int32], :int32
+      JNI.load_native_method :Java_org_eclipse_swt_internal_accessibility_gtk_ATK__1ATK_1COMPONENT_1GET_1IFACE, [:pointer, :long, :int32], :int32
       typesig { [::Java::Int] }
       # long
       # long
       def ___atk_component_get_iface(atk_handle)
-        JNI.__send__(:Java_org_eclipse_swt_internal_accessibility_gtk_ATK__1ATK_1COMPONENT_1GET_1IFACE, JNI.env, self.jni_id, atk_handle.to_int)
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_accessibility_gtk_ATK__1ATK_1COMPONENT_1GET_1IFACE, JNI.env, self.jni_id, atk_handle.to_int)
       end
       
       typesig { [::Java::Int] }
@@ -260,12 +260,12 @@ module Org::Eclipse::Swt::Internal::Accessibility::Gtk
         end
       end
       
-      JNI.native_method :Java_org_eclipse_swt_internal_accessibility_gtk_ATK__1ATK_1OBJECT_1FACTORY_1CLASS, [:pointer, :long, :int32], :int32
+      JNI.load_native_method :Java_org_eclipse_swt_internal_accessibility_gtk_ATK__1ATK_1OBJECT_1FACTORY_1CLASS, [:pointer, :long, :int32], :int32
       typesig { [::Java::Int] }
       # long
       # long
       def ___atk_object_factory_class(klass)
-        JNI.__send__(:Java_org_eclipse_swt_internal_accessibility_gtk_ATK__1ATK_1OBJECT_1FACTORY_1CLASS, JNI.env, self.jni_id, klass.to_int)
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_accessibility_gtk_ATK__1ATK_1OBJECT_1FACTORY_1CLASS, JNI.env, self.jni_id, klass.to_int)
       end
       
       typesig { [::Java::Int] }
@@ -280,12 +280,12 @@ module Org::Eclipse::Swt::Internal::Accessibility::Gtk
         end
       end
       
-      JNI.native_method :Java_org_eclipse_swt_internal_accessibility_gtk_ATK__1ATK_1SELECTION_1GET_1IFACE, [:pointer, :long, :int32], :int32
+      JNI.load_native_method :Java_org_eclipse_swt_internal_accessibility_gtk_ATK__1ATK_1SELECTION_1GET_1IFACE, [:pointer, :long, :int32], :int32
       typesig { [::Java::Int] }
       # long
       # long
       def ___atk_selection_get_iface(obj)
-        JNI.__send__(:Java_org_eclipse_swt_internal_accessibility_gtk_ATK__1ATK_1SELECTION_1GET_1IFACE, JNI.env, self.jni_id, obj.to_int)
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_accessibility_gtk_ATK__1ATK_1SELECTION_1GET_1IFACE, JNI.env, self.jni_id, obj.to_int)
       end
       
       typesig { [::Java::Int] }
@@ -300,12 +300,12 @@ module Org::Eclipse::Swt::Internal::Accessibility::Gtk
         end
       end
       
-      JNI.native_method :Java_org_eclipse_swt_internal_accessibility_gtk_ATK__1ATK_1TEXT_1GET_1IFACE, [:pointer, :long, :int32], :int32
+      JNI.load_native_method :Java_org_eclipse_swt_internal_accessibility_gtk_ATK__1ATK_1TEXT_1GET_1IFACE, [:pointer, :long, :int32], :int32
       typesig { [::Java::Int] }
       # long
       # long
       def ___atk_text_get_iface(handle)
-        JNI.__send__(:Java_org_eclipse_swt_internal_accessibility_gtk_ATK__1ATK_1TEXT_1GET_1IFACE, JNI.env, self.jni_id, handle.to_int)
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_accessibility_gtk_ATK__1ATK_1TEXT_1GET_1IFACE, JNI.env, self.jni_id, handle.to_int)
       end
       
       typesig { [::Java::Int] }
@@ -320,12 +320,12 @@ module Org::Eclipse::Swt::Internal::Accessibility::Gtk
         end
       end
       
-      JNI.native_method :Java_org_eclipse_swt_internal_accessibility_gtk_ATK__1GTK_1ACCESSIBLE, [:pointer, :long, :int32], :int32
+      JNI.load_native_method :Java_org_eclipse_swt_internal_accessibility_gtk_ATK__1GTK_1ACCESSIBLE, [:pointer, :long, :int32], :int32
       typesig { [::Java::Int] }
       # long
       # long
       def ___gtk_accessible(handle)
-        JNI.__send__(:Java_org_eclipse_swt_internal_accessibility_gtk_ATK__1GTK_1ACCESSIBLE, JNI.env, self.jni_id, handle.to_int)
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_accessibility_gtk_ATK__1GTK_1ACCESSIBLE, JNI.env, self.jni_id, handle.to_int)
       end
       
       typesig { [::Java::Int] }
@@ -340,12 +340,12 @@ module Org::Eclipse::Swt::Internal::Accessibility::Gtk
         end
       end
       
-      JNI.native_method :Java_org_eclipse_swt_internal_accessibility_gtk_ATK__1atk_1focus_1tracker_1notify, [:pointer, :long, :int32], :void
+      JNI.load_native_method :Java_org_eclipse_swt_internal_accessibility_gtk_ATK__1atk_1focus_1tracker_1notify, [:pointer, :long, :int32], :void
       typesig { [::Java::Int] }
       # @param object cast=(AtkObject *)
       # long
       def __atk_focus_tracker_notify(object)
-        JNI.__send__(:Java_org_eclipse_swt_internal_accessibility_gtk_ATK__1atk_1focus_1tracker_1notify, JNI.env, self.jni_id, object.to_int)
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_accessibility_gtk_ATK__1atk_1focus_1tracker_1notify, JNI.env, self.jni_id, object.to_int)
       end
       
       typesig { [::Java::Int] }
@@ -359,11 +359,11 @@ module Org::Eclipse::Swt::Internal::Accessibility::Gtk
         end
       end
       
-      JNI.native_method :Java_org_eclipse_swt_internal_accessibility_gtk_ATK__1atk_1get_1default_1registry, [:pointer, :long], :int32
+      JNI.load_native_method :Java_org_eclipse_swt_internal_accessibility_gtk_ATK__1atk_1get_1default_1registry, [:pointer, :long], :int32
       typesig { [] }
       # long
       def __atk_get_default_registry
-        JNI.__send__(:Java_org_eclipse_swt_internal_accessibility_gtk_ATK__1atk_1get_1default_1registry, JNI.env, self.jni_id)
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_accessibility_gtk_ATK__1atk_1get_1default_1registry, JNI.env, self.jni_id)
       end
       
       typesig { [] }
@@ -377,7 +377,7 @@ module Org::Eclipse::Swt::Internal::Accessibility::Gtk
         end
       end
       
-      JNI.native_method :Java_org_eclipse_swt_internal_accessibility_gtk_ATK__1atk_1object_1factory_1create_1accessible, [:pointer, :long, :int32, :int32], :int32
+      JNI.load_native_method :Java_org_eclipse_swt_internal_accessibility_gtk_ATK__1atk_1object_1factory_1create_1accessible, [:pointer, :long, :int32, :int32], :int32
       typesig { [::Java::Int, ::Java::Int] }
       # @param factory cast=(AtkObjectFactory *)
       # @param obj cast=(GObject *)
@@ -386,7 +386,7 @@ module Org::Eclipse::Swt::Internal::Accessibility::Gtk
       # long
       # long
       def __atk_object_factory_create_accessible(factory, obj)
-        JNI.__send__(:Java_org_eclipse_swt_internal_accessibility_gtk_ATK__1atk_1object_1factory_1create_1accessible, JNI.env, self.jni_id, factory.to_int, obj.to_int)
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_accessibility_gtk_ATK__1atk_1object_1factory_1create_1accessible, JNI.env, self.jni_id, factory.to_int, obj.to_int)
       end
       
       typesig { [::Java::Int, ::Java::Int] }
@@ -402,13 +402,13 @@ module Org::Eclipse::Swt::Internal::Accessibility::Gtk
         end
       end
       
-      JNI.native_method :Java_org_eclipse_swt_internal_accessibility_gtk_ATK__1atk_1object_1factory_1get_1accessible_1type, [:pointer, :long, :int32], :int32
+      JNI.load_native_method :Java_org_eclipse_swt_internal_accessibility_gtk_ATK__1atk_1object_1factory_1get_1accessible_1type, [:pointer, :long, :int32], :int32
       typesig { [::Java::Int] }
       # @param factory cast=(AtkObjectFactory *)
       # long
       # long
       def __atk_object_factory_get_accessible_type(factory)
-        JNI.__send__(:Java_org_eclipse_swt_internal_accessibility_gtk_ATK__1atk_1object_1factory_1get_1accessible_1type, JNI.env, self.jni_id, factory.to_int)
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_accessibility_gtk_ATK__1atk_1object_1factory_1get_1accessible_1type, JNI.env, self.jni_id, factory.to_int)
       end
       
       typesig { [::Java::Int] }
@@ -423,7 +423,7 @@ module Org::Eclipse::Swt::Internal::Accessibility::Gtk
         end
       end
       
-      JNI.native_method :Java_org_eclipse_swt_internal_accessibility_gtk_ATK__1atk_1object_1initialize, [:pointer, :long, :int32, :int32], :void
+      JNI.load_native_method :Java_org_eclipse_swt_internal_accessibility_gtk_ATK__1atk_1object_1initialize, [:pointer, :long, :int32, :int32], :void
       typesig { [::Java::Int, ::Java::Int] }
       # @param accessible cast=(AtkObject *)
       # @param data cast=(gpointer)
@@ -431,7 +431,7 @@ module Org::Eclipse::Swt::Internal::Accessibility::Gtk
       # long
       # long
       def __atk_object_initialize(accessible, data)
-        JNI.__send__(:Java_org_eclipse_swt_internal_accessibility_gtk_ATK__1atk_1object_1initialize, JNI.env, self.jni_id, accessible.to_int, data.to_int)
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_accessibility_gtk_ATK__1atk_1object_1initialize, JNI.env, self.jni_id, accessible.to_int, data.to_int)
       end
       
       typesig { [::Java::Int, ::Java::Int] }
@@ -446,13 +446,13 @@ module Org::Eclipse::Swt::Internal::Accessibility::Gtk
         end
       end
       
-      JNI.native_method :Java_org_eclipse_swt_internal_accessibility_gtk_ATK__1atk_1object_1ref_1relation_1set, [:pointer, :long, :int32], :int32
+      JNI.load_native_method :Java_org_eclipse_swt_internal_accessibility_gtk_ATK__1atk_1object_1ref_1relation_1set, [:pointer, :long, :int32], :int32
       typesig { [::Java::Int] }
       # @param accessible cast=(AtkObject *)
       # long
       # long
       def __atk_object_ref_relation_set(accessible)
-        JNI.__send__(:Java_org_eclipse_swt_internal_accessibility_gtk_ATK__1atk_1object_1ref_1relation_1set, JNI.env, self.jni_id, accessible.to_int)
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_accessibility_gtk_ATK__1atk_1object_1ref_1relation_1set, JNI.env, self.jni_id, accessible.to_int)
       end
       
       typesig { [::Java::Int] }
@@ -467,7 +467,7 @@ module Org::Eclipse::Swt::Internal::Accessibility::Gtk
         end
       end
       
-      JNI.native_method :Java_org_eclipse_swt_internal_accessibility_gtk_ATK__1atk_1registry_1get_1factory, [:pointer, :long, :int32, :int32], :int32
+      JNI.load_native_method :Java_org_eclipse_swt_internal_accessibility_gtk_ATK__1atk_1registry_1get_1factory, [:pointer, :long, :int32, :int32], :int32
       typesig { [::Java::Int, ::Java::Int] }
       # @param registry cast=(AtkRegistry *)
       # @param type cast=(GType)
@@ -476,7 +476,7 @@ module Org::Eclipse::Swt::Internal::Accessibility::Gtk
       # long
       # long
       def __atk_registry_get_factory(registry, type)
-        JNI.__send__(:Java_org_eclipse_swt_internal_accessibility_gtk_ATK__1atk_1registry_1get_1factory, JNI.env, self.jni_id, registry.to_int, type.to_int)
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_accessibility_gtk_ATK__1atk_1registry_1get_1factory, JNI.env, self.jni_id, registry.to_int, type.to_int)
       end
       
       typesig { [::Java::Int, ::Java::Int] }
@@ -492,7 +492,7 @@ module Org::Eclipse::Swt::Internal::Accessibility::Gtk
         end
       end
       
-      JNI.native_method :Java_org_eclipse_swt_internal_accessibility_gtk_ATK__1atk_1registry_1set_1factory_1type, [:pointer, :long, :int32, :int32, :int32], :void
+      JNI.load_native_method :Java_org_eclipse_swt_internal_accessibility_gtk_ATK__1atk_1registry_1set_1factory_1type, [:pointer, :long, :int32, :int32, :int32], :void
       typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
       # @param registry cast=(AtkRegistry *)
       # @param type cast=(GType)
@@ -502,7 +502,7 @@ module Org::Eclipse::Swt::Internal::Accessibility::Gtk
       # long
       # long
       def __atk_registry_set_factory_type(registry, type, factory_type)
-        JNI.__send__(:Java_org_eclipse_swt_internal_accessibility_gtk_ATK__1atk_1registry_1set_1factory_1type, JNI.env, self.jni_id, registry.to_int, type.to_int, factory_type.to_int)
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_accessibility_gtk_ATK__1atk_1registry_1set_1factory_1type, JNI.env, self.jni_id, registry.to_int, type.to_int, factory_type.to_int)
       end
       
       typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
@@ -518,12 +518,12 @@ module Org::Eclipse::Swt::Internal::Accessibility::Gtk
         end
       end
       
-      JNI.native_method :Java_org_eclipse_swt_internal_accessibility_gtk_ATK__1atk_1relation_1set_1get_1n_1relations, [:pointer, :long, :int32], :int32
+      JNI.load_native_method :Java_org_eclipse_swt_internal_accessibility_gtk_ATK__1atk_1relation_1set_1get_1n_1relations, [:pointer, :long, :int32], :int32
       typesig { [::Java::Int] }
       # @param set cast=(AtkRelationSet *)
       # long
       def __atk_relation_set_get_n_relations(set)
-        JNI.__send__(:Java_org_eclipse_swt_internal_accessibility_gtk_ATK__1atk_1relation_1set_1get_1n_1relations, JNI.env, self.jni_id, set.to_int)
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_accessibility_gtk_ATK__1atk_1relation_1set_1get_1n_1relations, JNI.env, self.jni_id, set.to_int)
       end
       
       typesig { [::Java::Int] }
@@ -537,13 +537,13 @@ module Org::Eclipse::Swt::Internal::Accessibility::Gtk
         end
       end
       
-      JNI.native_method :Java_org_eclipse_swt_internal_accessibility_gtk_ATK__1atk_1relation_1set_1get_1relation, [:pointer, :long, :int32, :int32], :int32
+      JNI.load_native_method :Java_org_eclipse_swt_internal_accessibility_gtk_ATK__1atk_1relation_1set_1get_1relation, [:pointer, :long, :int32, :int32], :int32
       typesig { [::Java::Int, ::Java::Int] }
       # @param set cast=(AtkRelationSet *)
       # long
       # long
       def __atk_relation_set_get_relation(set, i)
-        JNI.__send__(:Java_org_eclipse_swt_internal_accessibility_gtk_ATK__1atk_1relation_1set_1get_1relation, JNI.env, self.jni_id, set.to_int, i.to_int)
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_accessibility_gtk_ATK__1atk_1relation_1set_1get_1relation, JNI.env, self.jni_id, set.to_int, i.to_int)
       end
       
       typesig { [::Java::Int, ::Java::Int] }
@@ -558,7 +558,7 @@ module Org::Eclipse::Swt::Internal::Accessibility::Gtk
         end
       end
       
-      JNI.native_method :Java_org_eclipse_swt_internal_accessibility_gtk_ATK__1atk_1relation_1set_1remove, [:pointer, :long, :int32, :int32], :void
+      JNI.load_native_method :Java_org_eclipse_swt_internal_accessibility_gtk_ATK__1atk_1relation_1set_1remove, [:pointer, :long, :int32, :int32], :void
       typesig { [::Java::Int, ::Java::Int] }
       # @param set cast=(AtkRelationSet *)
       # @param relation cast=(AtkRelation *)
@@ -566,7 +566,7 @@ module Org::Eclipse::Swt::Internal::Accessibility::Gtk
       # long
       # long
       def __atk_relation_set_remove(set, relation)
-        JNI.__send__(:Java_org_eclipse_swt_internal_accessibility_gtk_ATK__1atk_1relation_1set_1remove, JNI.env, self.jni_id, set.to_int, relation.to_int)
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_accessibility_gtk_ATK__1atk_1relation_1set_1remove, JNI.env, self.jni_id, set.to_int, relation.to_int)
       end
       
       typesig { [::Java::Int, ::Java::Int] }
@@ -581,14 +581,14 @@ module Org::Eclipse::Swt::Internal::Accessibility::Gtk
         end
       end
       
-      JNI.native_method :Java_org_eclipse_swt_internal_accessibility_gtk_ATK__1atk_1state_1set_1add_1state, [:pointer, :long, :int32, :int32], :int8
+      JNI.load_native_method :Java_org_eclipse_swt_internal_accessibility_gtk_ATK__1atk_1state_1set_1add_1state, [:pointer, :long, :int32, :int32], :int8
       typesig { [::Java::Int, ::Java::Int] }
       # @param set cast=(AtkStateSet *)
       # @param type cast=(AtkStateType)
       # 
       # long
       def __atk_state_set_add_state(set, type)
-        JNI.__send__(:Java_org_eclipse_swt_internal_accessibility_gtk_ATK__1atk_1state_1set_1add_1state, JNI.env, self.jni_id, set.to_int, type.to_int) != 0
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_accessibility_gtk_ATK__1atk_1state_1set_1add_1state, JNI.env, self.jni_id, set.to_int, type.to_int) != 0
       end
       
       typesig { [::Java::Int, ::Java::Int] }
@@ -602,11 +602,11 @@ module Org::Eclipse::Swt::Internal::Accessibility::Gtk
         end
       end
       
-      JNI.native_method :Java_org_eclipse_swt_internal_accessibility_gtk_ATK__1atk_1state_1set_1new, [:pointer, :long], :int32
+      JNI.load_native_method :Java_org_eclipse_swt_internal_accessibility_gtk_ATK__1atk_1state_1set_1new, [:pointer, :long], :int32
       typesig { [] }
       # long
       def __atk_state_set_new
-        JNI.__send__(:Java_org_eclipse_swt_internal_accessibility_gtk_ATK__1atk_1state_1set_1new, JNI.env, self.jni_id)
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_accessibility_gtk_ATK__1atk_1state_1set_1new, JNI.env, self.jni_id)
       end
       
       typesig { [] }
@@ -620,13 +620,13 @@ module Org::Eclipse::Swt::Internal::Accessibility::Gtk
         end
       end
       
-      JNI.native_method :Java_org_eclipse_swt_internal_accessibility_gtk_ATK__1call__II, [:pointer, :long, :int32, :int32], :int32
+      JNI.load_native_method :Java_org_eclipse_swt_internal_accessibility_gtk_ATK__1call__II, [:pointer, :long, :int32, :int32], :int32
       typesig { [::Java::Int, ::Java::Int] }
       # long
       # long
       # long
       def __call(function, arg0)
-        JNI.__send__(:Java_org_eclipse_swt_internal_accessibility_gtk_ATK__1call__II, JNI.env, self.jni_id, function.to_int, arg0.to_int)
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_accessibility_gtk_ATK__1call__II, JNI.env, self.jni_id, function.to_int, arg0.to_int)
       end
       
       typesig { [::Java::Int, ::Java::Int] }
@@ -642,14 +642,14 @@ module Org::Eclipse::Swt::Internal::Accessibility::Gtk
         end
       end
       
-      JNI.native_method :Java_org_eclipse_swt_internal_accessibility_gtk_ATK__1call__III, [:pointer, :long, :int32, :int32, :int32], :int32
+      JNI.load_native_method :Java_org_eclipse_swt_internal_accessibility_gtk_ATK__1call__III, [:pointer, :long, :int32, :int32, :int32], :int32
       typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
       # long
       # long
       # long
       # long
       def __call(function, arg0, arg1)
-        JNI.__send__(:Java_org_eclipse_swt_internal_accessibility_gtk_ATK__1call__III, JNI.env, self.jni_id, function.to_int, arg0.to_int, arg1.to_int)
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_accessibility_gtk_ATK__1call__III, JNI.env, self.jni_id, function.to_int, arg0.to_int, arg1.to_int)
       end
       
       typesig { [::Java::Int, ::Java::Int, ::Java::Int] }
@@ -666,7 +666,7 @@ module Org::Eclipse::Swt::Internal::Accessibility::Gtk
         end
       end
       
-      JNI.native_method :Java_org_eclipse_swt_internal_accessibility_gtk_ATK__1call__IIII, [:pointer, :long, :int32, :int32, :int32, :int32], :int32
+      JNI.load_native_method :Java_org_eclipse_swt_internal_accessibility_gtk_ATK__1call__IIII, [:pointer, :long, :int32, :int32, :int32, :int32], :int32
       typesig { [::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int] }
       # long
       # long
@@ -674,7 +674,7 @@ module Org::Eclipse::Swt::Internal::Accessibility::Gtk
       # long
       # long
       def __call(function, arg0, arg1, arg2)
-        JNI.__send__(:Java_org_eclipse_swt_internal_accessibility_gtk_ATK__1call__IIII, JNI.env, self.jni_id, function.to_int, arg0.to_int, arg1.to_int, arg2.to_int)
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_accessibility_gtk_ATK__1call__IIII, JNI.env, self.jni_id, function.to_int, arg0.to_int, arg1.to_int, arg2.to_int)
       end
       
       typesig { [::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int] }
@@ -692,7 +692,7 @@ module Org::Eclipse::Swt::Internal::Accessibility::Gtk
         end
       end
       
-      JNI.native_method :Java_org_eclipse_swt_internal_accessibility_gtk_ATK__1call__IIIII, [:pointer, :long, :int32, :int32, :int32, :int32, :int32], :int32
+      JNI.load_native_method :Java_org_eclipse_swt_internal_accessibility_gtk_ATK__1call__IIIII, [:pointer, :long, :int32, :int32, :int32, :int32, :int32], :int32
       typesig { [::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int] }
       # long
       # long
@@ -701,7 +701,7 @@ module Org::Eclipse::Swt::Internal::Accessibility::Gtk
       # long
       # long
       def __call(function, arg0, arg1, arg2, arg3)
-        JNI.__send__(:Java_org_eclipse_swt_internal_accessibility_gtk_ATK__1call__IIIII, JNI.env, self.jni_id, function.to_int, arg0.to_int, arg1.to_int, arg2.to_int, arg3.to_int)
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_accessibility_gtk_ATK__1call__IIIII, JNI.env, self.jni_id, function.to_int, arg0.to_int, arg1.to_int, arg2.to_int, arg3.to_int)
       end
       
       typesig { [::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int] }
@@ -720,7 +720,7 @@ module Org::Eclipse::Swt::Internal::Accessibility::Gtk
         end
       end
       
-      JNI.native_method :Java_org_eclipse_swt_internal_accessibility_gtk_ATK__1call__IIIIII, [:pointer, :long, :int32, :int32, :int32, :int32, :int32, :int32], :int32
+      JNI.load_native_method :Java_org_eclipse_swt_internal_accessibility_gtk_ATK__1call__IIIIII, [:pointer, :long, :int32, :int32, :int32, :int32, :int32, :int32], :int32
       typesig { [::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int] }
       # long
       # long
@@ -730,7 +730,7 @@ module Org::Eclipse::Swt::Internal::Accessibility::Gtk
       # long
       # long
       def __call(function, arg0, arg1, arg2, arg3, arg4)
-        JNI.__send__(:Java_org_eclipse_swt_internal_accessibility_gtk_ATK__1call__IIIIII, JNI.env, self.jni_id, function.to_int, arg0.to_int, arg1.to_int, arg2.to_int, arg3.to_int, arg4.to_int)
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_accessibility_gtk_ATK__1call__IIIIII, JNI.env, self.jni_id, function.to_int, arg0.to_int, arg1.to_int, arg2.to_int, arg3.to_int, arg4.to_int)
       end
       
       typesig { [::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int] }
@@ -750,7 +750,7 @@ module Org::Eclipse::Swt::Internal::Accessibility::Gtk
         end
       end
       
-      JNI.native_method :Java_org_eclipse_swt_internal_accessibility_gtk_ATK__1call__IIIIIII, [:pointer, :long, :int32, :int32, :int32, :int32, :int32, :int32, :int32], :int32
+      JNI.load_native_method :Java_org_eclipse_swt_internal_accessibility_gtk_ATK__1call__IIIIIII, [:pointer, :long, :int32, :int32, :int32, :int32, :int32, :int32, :int32], :int32
       typesig { [::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int] }
       # long
       # long
@@ -761,7 +761,7 @@ module Org::Eclipse::Swt::Internal::Accessibility::Gtk
       # long
       # long
       def __call(function, arg0, arg1, arg2, arg3, arg4, arg5)
-        JNI.__send__(:Java_org_eclipse_swt_internal_accessibility_gtk_ATK__1call__IIIIIII, JNI.env, self.jni_id, function.to_int, arg0.to_int, arg1.to_int, arg2.to_int, arg3.to_int, arg4.to_int, arg5.to_int)
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_accessibility_gtk_ATK__1call__IIIIIII, JNI.env, self.jni_id, function.to_int, arg0.to_int, arg1.to_int, arg2.to_int, arg3.to_int, arg4.to_int, arg5.to_int)
       end
       
       typesig { [::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int] }
@@ -782,109 +782,109 @@ module Org::Eclipse::Swt::Internal::Accessibility::Gtk
         end
       end
       
-      JNI.native_method "Java_org_eclipse_swt_internal_accessibility_gtk_ATK_memmove__L#{AtkActionIface.jni_name}_2I".to_sym, [:pointer, :long, :long, :int32], :void
+      JNI.load_native_method "Java_org_eclipse_swt_internal_accessibility_gtk_ATK_memmove__L#{AtkActionIface.jni_name}_2I".to_sym, [:pointer, :long, :long, :int32], :void
       typesig { [AtkActionIface, ::Java::Int] }
       # long
       def memmove(dest, src)
-        JNI.__send__("Java_org_eclipse_swt_internal_accessibility_gtk_ATK_memmove__L#{AtkActionIface.jni_name}_2I".to_sym, JNI.env, self.jni_id, dest.jni_id, src.to_int)
+        JNI.call_native_method("Java_org_eclipse_swt_internal_accessibility_gtk_ATK_memmove__L#{AtkActionIface.jni_name}_2I".to_sym, JNI.env, self.jni_id, dest.jni_id, src.to_int)
       end
       
-      JNI.native_method "Java_org_eclipse_swt_internal_accessibility_gtk_ATK_memmove__L#{AtkComponentIface.jni_name}_2I".to_sym, [:pointer, :long, :long, :int32], :void
+      JNI.load_native_method "Java_org_eclipse_swt_internal_accessibility_gtk_ATK_memmove__L#{AtkComponentIface.jni_name}_2I".to_sym, [:pointer, :long, :long, :int32], :void
       typesig { [AtkComponentIface, ::Java::Int] }
       # long
       def memmove(dest, src)
-        JNI.__send__("Java_org_eclipse_swt_internal_accessibility_gtk_ATK_memmove__L#{AtkComponentIface.jni_name}_2I".to_sym, JNI.env, self.jni_id, dest.jni_id, src.to_int)
+        JNI.call_native_method("Java_org_eclipse_swt_internal_accessibility_gtk_ATK_memmove__L#{AtkComponentIface.jni_name}_2I".to_sym, JNI.env, self.jni_id, dest.jni_id, src.to_int)
       end
       
-      JNI.native_method "Java_org_eclipse_swt_internal_accessibility_gtk_ATK_memmove__L#{AtkHypertextIface.jni_name}_2I".to_sym, [:pointer, :long, :long, :int32], :void
+      JNI.load_native_method "Java_org_eclipse_swt_internal_accessibility_gtk_ATK_memmove__L#{AtkHypertextIface.jni_name}_2I".to_sym, [:pointer, :long, :long, :int32], :void
       typesig { [AtkHypertextIface, ::Java::Int] }
       # long
       def memmove(dest, src)
-        JNI.__send__("Java_org_eclipse_swt_internal_accessibility_gtk_ATK_memmove__L#{AtkHypertextIface.jni_name}_2I".to_sym, JNI.env, self.jni_id, dest.jni_id, src.to_int)
+        JNI.call_native_method("Java_org_eclipse_swt_internal_accessibility_gtk_ATK_memmove__L#{AtkHypertextIface.jni_name}_2I".to_sym, JNI.env, self.jni_id, dest.jni_id, src.to_int)
       end
       
-      JNI.native_method "Java_org_eclipse_swt_internal_accessibility_gtk_ATK_memmove__L#{AtkObjectClass.jni_name}_2I".to_sym, [:pointer, :long, :long, :int32], :void
+      JNI.load_native_method "Java_org_eclipse_swt_internal_accessibility_gtk_ATK_memmove__L#{AtkObjectClass.jni_name}_2I".to_sym, [:pointer, :long, :long, :int32], :void
       typesig { [AtkObjectClass, ::Java::Int] }
       # long
       def memmove(dest, src)
-        JNI.__send__("Java_org_eclipse_swt_internal_accessibility_gtk_ATK_memmove__L#{AtkObjectClass.jni_name}_2I".to_sym, JNI.env, self.jni_id, dest.jni_id, src.to_int)
+        JNI.call_native_method("Java_org_eclipse_swt_internal_accessibility_gtk_ATK_memmove__L#{AtkObjectClass.jni_name}_2I".to_sym, JNI.env, self.jni_id, dest.jni_id, src.to_int)
       end
       
-      JNI.native_method "Java_org_eclipse_swt_internal_accessibility_gtk_ATK_memmove__L#{AtkObjectFactoryClass.jni_name}_2I".to_sym, [:pointer, :long, :long, :int32], :void
+      JNI.load_native_method "Java_org_eclipse_swt_internal_accessibility_gtk_ATK_memmove__L#{AtkObjectFactoryClass.jni_name}_2I".to_sym, [:pointer, :long, :long, :int32], :void
       typesig { [AtkObjectFactoryClass, ::Java::Int] }
       # long
       def memmove(dest, src)
-        JNI.__send__("Java_org_eclipse_swt_internal_accessibility_gtk_ATK_memmove__L#{AtkObjectFactoryClass.jni_name}_2I".to_sym, JNI.env, self.jni_id, dest.jni_id, src.to_int)
+        JNI.call_native_method("Java_org_eclipse_swt_internal_accessibility_gtk_ATK_memmove__L#{AtkObjectFactoryClass.jni_name}_2I".to_sym, JNI.env, self.jni_id, dest.jni_id, src.to_int)
       end
       
-      JNI.native_method "Java_org_eclipse_swt_internal_accessibility_gtk_ATK_memmove__L#{AtkSelectionIface.jni_name}_2I".to_sym, [:pointer, :long, :long, :int32], :void
+      JNI.load_native_method "Java_org_eclipse_swt_internal_accessibility_gtk_ATK_memmove__L#{AtkSelectionIface.jni_name}_2I".to_sym, [:pointer, :long, :long, :int32], :void
       typesig { [AtkSelectionIface, ::Java::Int] }
       # long
       def memmove(dest, src)
-        JNI.__send__("Java_org_eclipse_swt_internal_accessibility_gtk_ATK_memmove__L#{AtkSelectionIface.jni_name}_2I".to_sym, JNI.env, self.jni_id, dest.jni_id, src.to_int)
+        JNI.call_native_method("Java_org_eclipse_swt_internal_accessibility_gtk_ATK_memmove__L#{AtkSelectionIface.jni_name}_2I".to_sym, JNI.env, self.jni_id, dest.jni_id, src.to_int)
       end
       
-      JNI.native_method "Java_org_eclipse_swt_internal_accessibility_gtk_ATK_memmove__L#{AtkTextIface.jni_name}_2I".to_sym, [:pointer, :long, :long, :int32], :void
+      JNI.load_native_method "Java_org_eclipse_swt_internal_accessibility_gtk_ATK_memmove__L#{AtkTextIface.jni_name}_2I".to_sym, [:pointer, :long, :long, :int32], :void
       typesig { [AtkTextIface, ::Java::Int] }
       # long
       def memmove(dest, src)
-        JNI.__send__("Java_org_eclipse_swt_internal_accessibility_gtk_ATK_memmove__L#{AtkTextIface.jni_name}_2I".to_sym, JNI.env, self.jni_id, dest.jni_id, src.to_int)
+        JNI.call_native_method("Java_org_eclipse_swt_internal_accessibility_gtk_ATK_memmove__L#{AtkTextIface.jni_name}_2I".to_sym, JNI.env, self.jni_id, dest.jni_id, src.to_int)
       end
       
-      JNI.native_method "Java_org_eclipse_swt_internal_accessibility_gtk_ATK_memmove__L#{GtkAccessible.jni_name}_2I".to_sym, [:pointer, :long, :long, :int32], :void
+      JNI.load_native_method "Java_org_eclipse_swt_internal_accessibility_gtk_ATK_memmove__L#{GtkAccessible.jni_name}_2I".to_sym, [:pointer, :long, :long, :int32], :void
       typesig { [GtkAccessible, ::Java::Int] }
       # long
       def memmove(dest, src)
-        JNI.__send__("Java_org_eclipse_swt_internal_accessibility_gtk_ATK_memmove__L#{GtkAccessible.jni_name}_2I".to_sym, JNI.env, self.jni_id, dest.jni_id, src.to_int)
+        JNI.call_native_method("Java_org_eclipse_swt_internal_accessibility_gtk_ATK_memmove__L#{GtkAccessible.jni_name}_2I".to_sym, JNI.env, self.jni_id, dest.jni_id, src.to_int)
       end
       
-      JNI.native_method "Java_org_eclipse_swt_internal_accessibility_gtk_ATK_memmove__IL#{AtkActionIface.jni_name}_2".to_sym, [:pointer, :long, :int32, :long], :void
+      JNI.load_native_method "Java_org_eclipse_swt_internal_accessibility_gtk_ATK_memmove__IL#{AtkActionIface.jni_name}_2".to_sym, [:pointer, :long, :int32, :long], :void
       typesig { [::Java::Int, AtkActionIface] }
       # long
       def memmove(dest, src)
-        JNI.__send__("Java_org_eclipse_swt_internal_accessibility_gtk_ATK_memmove__IL#{AtkActionIface.jni_name}_2".to_sym, JNI.env, self.jni_id, dest.to_int, src.jni_id)
+        JNI.call_native_method("Java_org_eclipse_swt_internal_accessibility_gtk_ATK_memmove__IL#{AtkActionIface.jni_name}_2".to_sym, JNI.env, self.jni_id, dest.to_int, src.jni_id)
       end
       
-      JNI.native_method "Java_org_eclipse_swt_internal_accessibility_gtk_ATK_memmove__IL#{AtkComponentIface.jni_name}_2".to_sym, [:pointer, :long, :int32, :long], :void
+      JNI.load_native_method "Java_org_eclipse_swt_internal_accessibility_gtk_ATK_memmove__IL#{AtkComponentIface.jni_name}_2".to_sym, [:pointer, :long, :int32, :long], :void
       typesig { [::Java::Int, AtkComponentIface] }
       # long
       def memmove(dest, src)
-        JNI.__send__("Java_org_eclipse_swt_internal_accessibility_gtk_ATK_memmove__IL#{AtkComponentIface.jni_name}_2".to_sym, JNI.env, self.jni_id, dest.to_int, src.jni_id)
+        JNI.call_native_method("Java_org_eclipse_swt_internal_accessibility_gtk_ATK_memmove__IL#{AtkComponentIface.jni_name}_2".to_sym, JNI.env, self.jni_id, dest.to_int, src.jni_id)
       end
       
-      JNI.native_method "Java_org_eclipse_swt_internal_accessibility_gtk_ATK_memmove__IL#{AtkHypertextIface.jni_name}_2".to_sym, [:pointer, :long, :int32, :long], :void
+      JNI.load_native_method "Java_org_eclipse_swt_internal_accessibility_gtk_ATK_memmove__IL#{AtkHypertextIface.jni_name}_2".to_sym, [:pointer, :long, :int32, :long], :void
       typesig { [::Java::Int, AtkHypertextIface] }
       # long
       def memmove(dest, src)
-        JNI.__send__("Java_org_eclipse_swt_internal_accessibility_gtk_ATK_memmove__IL#{AtkHypertextIface.jni_name}_2".to_sym, JNI.env, self.jni_id, dest.to_int, src.jni_id)
+        JNI.call_native_method("Java_org_eclipse_swt_internal_accessibility_gtk_ATK_memmove__IL#{AtkHypertextIface.jni_name}_2".to_sym, JNI.env, self.jni_id, dest.to_int, src.jni_id)
       end
       
-      JNI.native_method "Java_org_eclipse_swt_internal_accessibility_gtk_ATK_memmove__IL#{AtkObjectClass.jni_name}_2".to_sym, [:pointer, :long, :int32, :long], :void
+      JNI.load_native_method "Java_org_eclipse_swt_internal_accessibility_gtk_ATK_memmove__IL#{AtkObjectClass.jni_name}_2".to_sym, [:pointer, :long, :int32, :long], :void
       typesig { [::Java::Int, AtkObjectClass] }
       # long
       def memmove(dest, src)
-        JNI.__send__("Java_org_eclipse_swt_internal_accessibility_gtk_ATK_memmove__IL#{AtkObjectClass.jni_name}_2".to_sym, JNI.env, self.jni_id, dest.to_int, src.jni_id)
+        JNI.call_native_method("Java_org_eclipse_swt_internal_accessibility_gtk_ATK_memmove__IL#{AtkObjectClass.jni_name}_2".to_sym, JNI.env, self.jni_id, dest.to_int, src.jni_id)
       end
       
-      JNI.native_method "Java_org_eclipse_swt_internal_accessibility_gtk_ATK_memmove__IL#{AtkObjectFactoryClass.jni_name}_2".to_sym, [:pointer, :long, :int32, :long], :void
+      JNI.load_native_method "Java_org_eclipse_swt_internal_accessibility_gtk_ATK_memmove__IL#{AtkObjectFactoryClass.jni_name}_2".to_sym, [:pointer, :long, :int32, :long], :void
       typesig { [::Java::Int, AtkObjectFactoryClass] }
       # long
       def memmove(dest, src)
-        JNI.__send__("Java_org_eclipse_swt_internal_accessibility_gtk_ATK_memmove__IL#{AtkObjectFactoryClass.jni_name}_2".to_sym, JNI.env, self.jni_id, dest.to_int, src.jni_id)
+        JNI.call_native_method("Java_org_eclipse_swt_internal_accessibility_gtk_ATK_memmove__IL#{AtkObjectFactoryClass.jni_name}_2".to_sym, JNI.env, self.jni_id, dest.to_int, src.jni_id)
       end
       
-      JNI.native_method "Java_org_eclipse_swt_internal_accessibility_gtk_ATK_memmove__IL#{AtkSelectionIface.jni_name}_2".to_sym, [:pointer, :long, :int32, :long], :void
+      JNI.load_native_method "Java_org_eclipse_swt_internal_accessibility_gtk_ATK_memmove__IL#{AtkSelectionIface.jni_name}_2".to_sym, [:pointer, :long, :int32, :long], :void
       typesig { [::Java::Int, AtkSelectionIface] }
       # long
       def memmove(dest, src)
-        JNI.__send__("Java_org_eclipse_swt_internal_accessibility_gtk_ATK_memmove__IL#{AtkSelectionIface.jni_name}_2".to_sym, JNI.env, self.jni_id, dest.to_int, src.jni_id)
+        JNI.call_native_method("Java_org_eclipse_swt_internal_accessibility_gtk_ATK_memmove__IL#{AtkSelectionIface.jni_name}_2".to_sym, JNI.env, self.jni_id, dest.to_int, src.jni_id)
       end
       
-      JNI.native_method "Java_org_eclipse_swt_internal_accessibility_gtk_ATK_memmove__IL#{AtkTextIface.jni_name}_2".to_sym, [:pointer, :long, :int32, :long], :void
+      JNI.load_native_method "Java_org_eclipse_swt_internal_accessibility_gtk_ATK_memmove__IL#{AtkTextIface.jni_name}_2".to_sym, [:pointer, :long, :int32, :long], :void
       typesig { [::Java::Int, AtkTextIface] }
       # long
       def memmove(dest, src)
-        JNI.__send__("Java_org_eclipse_swt_internal_accessibility_gtk_ATK_memmove__IL#{AtkTextIface.jni_name}_2".to_sym, JNI.env, self.jni_id, dest.to_int, src.jni_id)
+        JNI.call_native_method("Java_org_eclipse_swt_internal_accessibility_gtk_ATK_memmove__IL#{AtkTextIface.jni_name}_2".to_sym, JNI.env, self.jni_id, dest.to_int, src.jni_id)
       end
     }
     

@@ -53,20 +53,20 @@ module Org::Eclipse::Swt::Internal::Gnome
       const_set_lazy(:GNOME_VFS_MAKE_URI_DIR_CURRENT) { 1 << 1 }
       const_attr_reader  :GNOME_VFS_MAKE_URI_DIR_CURRENT
       
-      JNI.native_method :Java_org_eclipse_swt_internal_gnome_GNOME_GnomeVFSMimeApplication_1sizeof, [:pointer, :long], :int32
+      JNI.load_native_method :Java_org_eclipse_swt_internal_gnome_GNOME_GnomeVFSMimeApplication_1sizeof, [:pointer, :long], :int32
       typesig { [] }
       # 64 bit
       def _gnome_vfsmime_application_sizeof
-        JNI.__send__(:Java_org_eclipse_swt_internal_gnome_GNOME_GnomeVFSMimeApplication_1sizeof, JNI.env, self.jni_id)
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_gnome_GNOME_GnomeVFSMimeApplication_1sizeof, JNI.env, self.jni_id)
       end
       
-      JNI.native_method :Java_org_eclipse_swt_internal_gnome_GNOME__1g_1free, [:pointer, :long, :int32], :void
+      JNI.load_native_method :Java_org_eclipse_swt_internal_gnome_GNOME__1g_1free, [:pointer, :long, :int32], :void
       typesig { [::Java::Int] }
       # Natives
       # @param mem cast=(gpointer)
       # long
       def __g_free(mem)
-        JNI.__send__(:Java_org_eclipse_swt_internal_gnome_GNOME__1g_1free, JNI.env, self.jni_id, mem.to_int)
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_gnome_GNOME__1g_1free, JNI.env, self.jni_id, mem.to_int)
       end
       
       typesig { [::Java::Int] }
@@ -80,7 +80,7 @@ module Org::Eclipse::Swt::Internal::Gnome
         end
       end
       
-      JNI.native_method :Java_org_eclipse_swt_internal_gnome_GNOME__1g_1list_1append, [:pointer, :long, :int32, :int32], :int32
+      JNI.load_native_method :Java_org_eclipse_swt_internal_gnome_GNOME__1g_1list_1append, [:pointer, :long, :int32, :int32], :int32
       typesig { [::Java::Int, ::Java::Int] }
       # @param list cast=(GList *)
       # @param data cast=(gpointer)
@@ -89,7 +89,7 @@ module Org::Eclipse::Swt::Internal::Gnome
       # long
       # long
       def __g_list_append(list, data)
-        JNI.__send__(:Java_org_eclipse_swt_internal_gnome_GNOME__1g_1list_1append, JNI.env, self.jni_id, list.to_int, data.to_int)
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_gnome_GNOME__1g_1list_1append, JNI.env, self.jni_id, list.to_int, data.to_int)
       end
       
       typesig { [::Java::Int, ::Java::Int] }
@@ -105,12 +105,12 @@ module Org::Eclipse::Swt::Internal::Gnome
         end
       end
       
-      JNI.native_method :Java_org_eclipse_swt_internal_gnome_GNOME__1g_1list_1free, [:pointer, :long, :int32], :void
+      JNI.load_native_method :Java_org_eclipse_swt_internal_gnome_GNOME__1g_1list_1free, [:pointer, :long, :int32], :void
       typesig { [::Java::Int] }
       # @param list cast=(GList *)
       # long
       def __g_list_free(list)
-        JNI.__send__(:Java_org_eclipse_swt_internal_gnome_GNOME__1g_1list_1free, JNI.env, self.jni_id, list.to_int)
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_gnome_GNOME__1g_1list_1free, JNI.env, self.jni_id, list.to_int)
       end
       
       typesig { [::Java::Int] }
@@ -124,12 +124,12 @@ module Org::Eclipse::Swt::Internal::Gnome
         end
       end
       
-      JNI.native_method :Java_org_eclipse_swt_internal_gnome_GNOME__1g_1list_1next, [:pointer, :long, :int32], :int32
+      JNI.load_native_method :Java_org_eclipse_swt_internal_gnome_GNOME__1g_1list_1next, [:pointer, :long, :int32], :int32
       typesig { [::Java::Int] }
       # long
       # long
       def __g_list_next(list)
-        JNI.__send__(:Java_org_eclipse_swt_internal_gnome_GNOME__1g_1list_1next, JNI.env, self.jni_id, list.to_int)
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_gnome_GNOME__1g_1list_1next, JNI.env, self.jni_id, list.to_int)
       end
       
       typesig { [::Java::Int] }
@@ -144,12 +144,12 @@ module Org::Eclipse::Swt::Internal::Gnome
         end
       end
       
-      JNI.native_method :Java_org_eclipse_swt_internal_gnome_GNOME__1g_1object_1unref, [:pointer, :long, :int32], :void
+      JNI.load_native_method :Java_org_eclipse_swt_internal_gnome_GNOME__1g_1object_1unref, [:pointer, :long, :int32], :void
       typesig { [::Java::Int] }
       # @param object cast=(gpointer)
       # long
       def __g_object_unref(object)
-        JNI.__send__(:Java_org_eclipse_swt_internal_gnome_GNOME__1g_1object_1unref, JNI.env, self.jni_id, object.to_int)
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_gnome_GNOME__1g_1object_1unref, JNI.env, self.jni_id, object.to_int)
       end
       
       typesig { [::Java::Int] }
@@ -163,7 +163,7 @@ module Org::Eclipse::Swt::Internal::Gnome
         end
       end
       
-      JNI.native_method :Java_org_eclipse_swt_internal_gnome_GNOME__1gnome_1icon_1lookup, [:pointer, :long, :int32, :int32, :long, :long, :int32, :long, :int32, :long], :int32
+      JNI.load_native_method :Java_org_eclipse_swt_internal_gnome_GNOME__1gnome_1icon_1lookup, [:pointer, :long, :int32, :int32, :long, :long, :int32, :long, :int32, :long], :int32
       typesig { [::Java::Int, ::Java::Int, Array.typed(::Java::Byte), Array.typed(::Java::Byte), ::Java::Int, Array.typed(::Java::Byte), ::Java::Int, Array.typed(::Java::Int)] }
       # @param icon_theme cast=(GnomeIconTheme *)
       # @param thumbnail_factory cast=(GnomeThumbnailFactory *)
@@ -179,7 +179,7 @@ module Org::Eclipse::Swt::Internal::Gnome
       # long
       # long
       def __gnome_icon_lookup(icon_theme, thumbnail_factory, file_uri, custom_icon, file_info, mime_type, flags, result)
-        JNI.__send__(:Java_org_eclipse_swt_internal_gnome_GNOME__1gnome_1icon_1lookup, JNI.env, self.jni_id, icon_theme.to_int, thumbnail_factory.to_int, file_uri.jni_id, custom_icon.jni_id, file_info.to_int, mime_type.jni_id, flags.to_int, result.jni_id)
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_gnome_GNOME__1gnome_1icon_1lookup, JNI.env, self.jni_id, icon_theme.to_int, thumbnail_factory.to_int, file_uri.jni_id, custom_icon.jni_id, file_info.to_int, mime_type.jni_id, flags.to_int, result.jni_id)
       end
       
       typesig { [::Java::Int, ::Java::Int, Array.typed(::Java::Byte), Array.typed(::Java::Byte), ::Java::Int, Array.typed(::Java::Byte), ::Java::Int, Array.typed(::Java::Int)] }
@@ -196,7 +196,7 @@ module Org::Eclipse::Swt::Internal::Gnome
         end
       end
       
-      JNI.native_method :Java_org_eclipse_swt_internal_gnome_GNOME__1gnome_1icon_1theme_1lookup_1icon, [:pointer, :long, :int32, :int32, :int32, :long, :long], :int32
+      JNI.load_native_method :Java_org_eclipse_swt_internal_gnome_GNOME__1gnome_1icon_1theme_1lookup_1icon, [:pointer, :long, :int32, :int32, :int32, :long, :long], :int32
       typesig { [::Java::Int, ::Java::Int, ::Java::Int, Array.typed(::Java::Int), Array.typed(::Java::Int)] }
       # @param theme cast=(GnomeIconTheme *)
       # @param icon_name cast=(const char *)
@@ -207,7 +207,7 @@ module Org::Eclipse::Swt::Internal::Gnome
       # long
       # long
       def __gnome_icon_theme_lookup_icon(theme, icon_name, size, icon_data, base_size)
-        JNI.__send__(:Java_org_eclipse_swt_internal_gnome_GNOME__1gnome_1icon_1theme_1lookup_1icon, JNI.env, self.jni_id, theme.to_int, icon_name.to_int, size.to_int, icon_data.jni_id, base_size.jni_id)
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_gnome_GNOME__1gnome_1icon_1theme_1lookup_1icon, JNI.env, self.jni_id, theme.to_int, icon_name.to_int, size.to_int, icon_data.jni_id, base_size.jni_id)
       end
       
       typesig { [::Java::Int, ::Java::Int, ::Java::Int, Array.typed(::Java::Int), Array.typed(::Java::Int)] }
@@ -224,11 +224,11 @@ module Org::Eclipse::Swt::Internal::Gnome
         end
       end
       
-      JNI.native_method :Java_org_eclipse_swt_internal_gnome_GNOME__1gnome_1icon_1theme_1new, [:pointer, :long], :int32
+      JNI.load_native_method :Java_org_eclipse_swt_internal_gnome_GNOME__1gnome_1icon_1theme_1new, [:pointer, :long], :int32
       typesig { [] }
       # long
       def __gnome_icon_theme_new
-        JNI.__send__(:Java_org_eclipse_swt_internal_gnome_GNOME__1gnome_1icon_1theme_1new, JNI.env, self.jni_id)
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_gnome_GNOME__1gnome_1icon_1theme_1new, JNI.env, self.jni_id)
       end
       
       typesig { [] }
@@ -242,11 +242,11 @@ module Org::Eclipse::Swt::Internal::Gnome
         end
       end
       
-      JNI.native_method :Java_org_eclipse_swt_internal_gnome_GNOME__1gnome_1vfs_1get_1registered_1mime_1types, [:pointer, :long], :int32
+      JNI.load_native_method :Java_org_eclipse_swt_internal_gnome_GNOME__1gnome_1vfs_1get_1registered_1mime_1types, [:pointer, :long], :int32
       typesig { [] }
       # long
       def __gnome_vfs_get_registered_mime_types
-        JNI.__send__(:Java_org_eclipse_swt_internal_gnome_GNOME__1gnome_1vfs_1get_1registered_1mime_1types, JNI.env, self.jni_id)
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_gnome_GNOME__1gnome_1vfs_1get_1registered_1mime_1types, JNI.env, self.jni_id)
       end
       
       typesig { [] }
@@ -260,10 +260,10 @@ module Org::Eclipse::Swt::Internal::Gnome
         end
       end
       
-      JNI.native_method :Java_org_eclipse_swt_internal_gnome_GNOME__1gnome_1vfs_1init, [:pointer, :long], :int8
+      JNI.load_native_method :Java_org_eclipse_swt_internal_gnome_GNOME__1gnome_1vfs_1init, [:pointer, :long], :int8
       typesig { [] }
       def __gnome_vfs_init
-        JNI.__send__(:Java_org_eclipse_swt_internal_gnome_GNOME__1gnome_1vfs_1init, JNI.env, self.jni_id) != 0
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_gnome_GNOME__1gnome_1vfs_1init, JNI.env, self.jni_id) != 0
       end
       
       typesig { [] }
@@ -276,12 +276,12 @@ module Org::Eclipse::Swt::Internal::Gnome
         end
       end
       
-      JNI.native_method :Java_org_eclipse_swt_internal_gnome_GNOME__1gnome_1vfs_1make_1uri_1from_1input, [:pointer, :long, :long], :int32
+      JNI.load_native_method :Java_org_eclipse_swt_internal_gnome_GNOME__1gnome_1vfs_1make_1uri_1from_1input, [:pointer, :long, :long], :int32
       typesig { [Array.typed(::Java::Byte)] }
       # @param uri cast=(const char *)
       # long
       def __gnome_vfs_make_uri_from_input(uri)
-        JNI.__send__(:Java_org_eclipse_swt_internal_gnome_GNOME__1gnome_1vfs_1make_1uri_1from_1input, JNI.env, self.jni_id, uri.jni_id)
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_gnome_GNOME__1gnome_1vfs_1make_1uri_1from_1input, JNI.env, self.jni_id, uri.jni_id)
       end
       
       typesig { [Array.typed(::Java::Byte)] }
@@ -295,14 +295,14 @@ module Org::Eclipse::Swt::Internal::Gnome
         end
       end
       
-      JNI.native_method :Java_org_eclipse_swt_internal_gnome_GNOME__1gnome_1vfs_1make_1uri_1from_1input_1with_1dirs, [:pointer, :long, :long, :int32], :int32
+      JNI.load_native_method :Java_org_eclipse_swt_internal_gnome_GNOME__1gnome_1vfs_1make_1uri_1from_1input_1with_1dirs, [:pointer, :long, :long, :int32], :int32
       typesig { [Array.typed(::Java::Byte), ::Java::Int] }
       # @method flags=dynamic
       # @param uri cast=(const char *)
       # 
       # long
       def __gnome_vfs_make_uri_from_input_with_dirs(uri, dirs)
-        JNI.__send__(:Java_org_eclipse_swt_internal_gnome_GNOME__1gnome_1vfs_1make_1uri_1from_1input_1with_1dirs, JNI.env, self.jni_id, uri.jni_id, dirs.to_int)
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_gnome_GNOME__1gnome_1vfs_1make_1uri_1from_1input_1with_1dirs, JNI.env, self.jni_id, uri.jni_id, dirs.to_int)
       end
       
       typesig { [Array.typed(::Java::Byte), ::Java::Int] }
@@ -316,12 +316,12 @@ module Org::Eclipse::Swt::Internal::Gnome
         end
       end
       
-      JNI.native_method :Java_org_eclipse_swt_internal_gnome_GNOME__1gnome_1vfs_1mime_1application_1free, [:pointer, :long, :int32], :void
+      JNI.load_native_method :Java_org_eclipse_swt_internal_gnome_GNOME__1gnome_1vfs_1mime_1application_1free, [:pointer, :long, :int32], :void
       typesig { [::Java::Int] }
       # @param application cast=(GnomeVFSMimeApplication *)
       # long
       def __gnome_vfs_mime_application_free(application)
-        JNI.__send__(:Java_org_eclipse_swt_internal_gnome_GNOME__1gnome_1vfs_1mime_1application_1free, JNI.env, self.jni_id, application.to_int)
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_gnome_GNOME__1gnome_1vfs_1mime_1application_1free, JNI.env, self.jni_id, application.to_int)
       end
       
       typesig { [::Java::Int] }
@@ -335,7 +335,7 @@ module Org::Eclipse::Swt::Internal::Gnome
         end
       end
       
-      JNI.native_method :Java_org_eclipse_swt_internal_gnome_GNOME__1gnome_1vfs_1mime_1application_1launch, [:pointer, :long, :int32, :int32], :int32
+      JNI.load_native_method :Java_org_eclipse_swt_internal_gnome_GNOME__1gnome_1vfs_1mime_1application_1launch, [:pointer, :long, :int32, :int32], :int32
       typesig { [::Java::Int, ::Java::Int] }
       # @method flags=dynamic
       # @param application cast=(GnomeVFSMimeApplication *)
@@ -344,7 +344,7 @@ module Org::Eclipse::Swt::Internal::Gnome
       # long
       # long
       def __gnome_vfs_mime_application_launch(application, uris)
-        JNI.__send__(:Java_org_eclipse_swt_internal_gnome_GNOME__1gnome_1vfs_1mime_1application_1launch, JNI.env, self.jni_id, application.to_int, uris.to_int)
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_gnome_GNOME__1gnome_1vfs_1mime_1application_1launch, JNI.env, self.jni_id, application.to_int, uris.to_int)
       end
       
       typesig { [::Java::Int, ::Java::Int] }
@@ -359,12 +359,12 @@ module Org::Eclipse::Swt::Internal::Gnome
         end
       end
       
-      JNI.native_method :Java_org_eclipse_swt_internal_gnome_GNOME__1gnome_1vfs_1mime_1extensions_1list_1free, [:pointer, :long, :int32], :void
+      JNI.load_native_method :Java_org_eclipse_swt_internal_gnome_GNOME__1gnome_1vfs_1mime_1extensions_1list_1free, [:pointer, :long, :int32], :void
       typesig { [::Java::Int] }
       # @param list cast=(GList *)
       # long
       def __gnome_vfs_mime_extensions_list_free(list)
-        JNI.__send__(:Java_org_eclipse_swt_internal_gnome_GNOME__1gnome_1vfs_1mime_1extensions_1list_1free, JNI.env, self.jni_id, list.to_int)
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_gnome_GNOME__1gnome_1vfs_1mime_1extensions_1list_1free, JNI.env, self.jni_id, list.to_int)
       end
       
       typesig { [::Java::Int] }
@@ -378,12 +378,12 @@ module Org::Eclipse::Swt::Internal::Gnome
         end
       end
       
-      JNI.native_method :Java_org_eclipse_swt_internal_gnome_GNOME__1gnome_1vfs_1mime_1get_1default_1application, [:pointer, :long, :long], :int32
+      JNI.load_native_method :Java_org_eclipse_swt_internal_gnome_GNOME__1gnome_1vfs_1mime_1get_1default_1application, [:pointer, :long, :long], :int32
       typesig { [Array.typed(::Java::Byte)] }
       # @param mimeType cast=(const char *)
       # long
       def __gnome_vfs_mime_get_default_application(mime_type)
-        JNI.__send__(:Java_org_eclipse_swt_internal_gnome_GNOME__1gnome_1vfs_1mime_1get_1default_1application, JNI.env, self.jni_id, mime_type.jni_id)
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_gnome_GNOME__1gnome_1vfs_1mime_1get_1default_1application, JNI.env, self.jni_id, mime_type.jni_id)
       end
       
       typesig { [Array.typed(::Java::Byte)] }
@@ -397,13 +397,13 @@ module Org::Eclipse::Swt::Internal::Gnome
         end
       end
       
-      JNI.native_method :Java_org_eclipse_swt_internal_gnome_GNOME__1gnome_1vfs_1mime_1get_1extensions_1list, [:pointer, :long, :int32], :int32
+      JNI.load_native_method :Java_org_eclipse_swt_internal_gnome_GNOME__1gnome_1vfs_1mime_1get_1extensions_1list, [:pointer, :long, :int32], :int32
       typesig { [::Java::Int] }
       # @param mime_type cast=(const char *)
       # long
       # long
       def __gnome_vfs_mime_get_extensions_list(mime_type)
-        JNI.__send__(:Java_org_eclipse_swt_internal_gnome_GNOME__1gnome_1vfs_1mime_1get_1extensions_1list, JNI.env, self.jni_id, mime_type.to_int)
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_gnome_GNOME__1gnome_1vfs_1mime_1get_1extensions_1list, JNI.env, self.jni_id, mime_type.to_int)
       end
       
       typesig { [::Java::Int] }
@@ -418,12 +418,12 @@ module Org::Eclipse::Swt::Internal::Gnome
         end
       end
       
-      JNI.native_method :Java_org_eclipse_swt_internal_gnome_GNOME__1gnome_1vfs_1mime_1registered_1mime_1type_1list_1free, [:pointer, :long, :int32], :void
+      JNI.load_native_method :Java_org_eclipse_swt_internal_gnome_GNOME__1gnome_1vfs_1mime_1registered_1mime_1type_1list_1free, [:pointer, :long, :int32], :void
       typesig { [::Java::Int] }
       # @param list cast=(GList *)
       # long
       def __gnome_vfs_mime_registered_mime_type_list_free(list)
-        JNI.__send__(:Java_org_eclipse_swt_internal_gnome_GNOME__1gnome_1vfs_1mime_1registered_1mime_1type_1list_1free, JNI.env, self.jni_id, list.to_int)
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_gnome_GNOME__1gnome_1vfs_1mime_1registered_1mime_1type_1list_1free, JNI.env, self.jni_id, list.to_int)
       end
       
       typesig { [::Java::Int] }
@@ -437,12 +437,12 @@ module Org::Eclipse::Swt::Internal::Gnome
         end
       end
       
-      JNI.native_method :Java_org_eclipse_swt_internal_gnome_GNOME__1gnome_1vfs_1mime_1type_1from_1name, [:pointer, :long, :long], :int32
+      JNI.load_native_method :Java_org_eclipse_swt_internal_gnome_GNOME__1gnome_1vfs_1mime_1type_1from_1name, [:pointer, :long, :long], :int32
       typesig { [Array.typed(::Java::Byte)] }
       # @param file cast=(const char *)
       # long
       def __gnome_vfs_mime_type_from_name(file)
-        JNI.__send__(:Java_org_eclipse_swt_internal_gnome_GNOME__1gnome_1vfs_1mime_1type_1from_1name, JNI.env, self.jni_id, file.jni_id)
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_gnome_GNOME__1gnome_1vfs_1mime_1type_1from_1name, JNI.env, self.jni_id, file.jni_id)
       end
       
       typesig { [Array.typed(::Java::Byte)] }
@@ -456,14 +456,14 @@ module Org::Eclipse::Swt::Internal::Gnome
         end
       end
       
-      JNI.native_method :Java_org_eclipse_swt_internal_gnome_GNOME__1gnome_1vfs_1url_1show, [:pointer, :long, :int32], :int32
+      JNI.load_native_method :Java_org_eclipse_swt_internal_gnome_GNOME__1gnome_1vfs_1url_1show, [:pointer, :long, :int32], :int32
       typesig { [::Java::Int] }
       # @method flags=dynamic
       # @param url cast=(const char *)
       # 
       # long
       def __gnome_vfs_url_show(url)
-        JNI.__send__(:Java_org_eclipse_swt_internal_gnome_GNOME__1gnome_1vfs_1url_1show, JNI.env, self.jni_id, url.to_int)
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_gnome_GNOME__1gnome_1vfs_1url_1show, JNI.env, self.jni_id, url.to_int)
       end
       
       typesig { [::Java::Int] }
@@ -477,7 +477,7 @@ module Org::Eclipse::Swt::Internal::Gnome
         end
       end
       
-      JNI.native_method :Java_org_eclipse_swt_internal_gnome_GNOME_memmove, [:pointer, :long, :long, :int32, :int32], :void
+      JNI.load_native_method :Java_org_eclipse_swt_internal_gnome_GNOME_memmove, [:pointer, :long, :long, :int32, :int32], :void
       typesig { [GnomeVFSMimeApplication, ::Java::Int, ::Java::Int] }
       # @param dest cast=(void *),flags=no_in
       # @param src cast=(const void *)
@@ -486,7 +486,7 @@ module Org::Eclipse::Swt::Internal::Gnome
       # long
       # long
       def memmove(dest, src, count)
-        JNI.__send__(:Java_org_eclipse_swt_internal_gnome_GNOME_memmove, JNI.env, self.jni_id, dest.jni_id, src.to_int, count.to_int)
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_gnome_GNOME_memmove, JNI.env, self.jni_id, dest.jni_id, src.to_int, count.to_int)
       end
     }
     

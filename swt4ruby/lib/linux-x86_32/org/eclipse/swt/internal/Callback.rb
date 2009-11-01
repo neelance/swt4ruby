@@ -196,7 +196,7 @@ module Org::Eclipse::Swt::Internal
     end
     
     class_module.module_eval {
-      JNI.native_method :Java_org_eclipse_swt_internal_Callback_bind, [:pointer, :long, :long, :long, :long, :long, :int32, :int8, :int8, :int32], :int32
+      JNI.load_native_method :Java_org_eclipse_swt_internal_Callback_bind, [:pointer, :long, :long, :long, :long, :long, :int32, :int8, :int8, :int32], :int32
       typesig { [Callback, Object, String, String, ::Java::Int, ::Java::Boolean, ::Java::Boolean, ::Java::Int] }
       # Allocates the native level resources associated with the
       # callback. This method is only invoked from within the
@@ -214,7 +214,7 @@ module Org::Eclipse::Swt::Internal
       # long
       # long
       def bind(callback, object, method, signature, arg_count, is_static, is_array_based, error_result)
-        JNI.__send__(:Java_org_eclipse_swt_internal_Callback_bind, JNI.env, self.jni_id, callback.jni_id, object.jni_id, method.jni_id, signature.jni_id, arg_count.to_int, is_static ? 1 : 0, is_array_based ? 1 : 0, error_result.to_int)
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_Callback_bind, JNI.env, self.jni_id, callback.jni_id, object.jni_id, method.jni_id, signature.jni_id, arg_count.to_int, is_static ? 1 : 0, is_array_based ? 1 : 0, error_result.to_int)
       end
     }
     
@@ -244,16 +244,16 @@ module Org::Eclipse::Swt::Internal
     end
     
     class_module.module_eval {
-      JNI.native_method :Java_org_eclipse_swt_internal_Callback_getPlatform, [:pointer, :long], :long
+      JNI.load_native_method :Java_org_eclipse_swt_internal_Callback_getPlatform, [:pointer, :long], :long
       typesig { [] }
       # Returns the SWT platform name.
       # 
       # @return the platform name of the currently running SWT
       def get_platform
-        JNI.__send__(:Java_org_eclipse_swt_internal_Callback_getPlatform, JNI.env, self.jni_id)
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_Callback_getPlatform, JNI.env, self.jni_id)
       end
       
-      JNI.native_method :Java_org_eclipse_swt_internal_Callback_getEntryCount, [:pointer, :long], :int32
+      JNI.load_native_method :Java_org_eclipse_swt_internal_Callback_getEntryCount, [:pointer, :long], :int32
       typesig { [] }
       # Returns the number of times the system has been recursively entered
       # through a callback.
@@ -265,7 +265,7 @@ module Org::Eclipse::Swt::Internal
       # 
       # @since 2.1
       def get_entry_count
-        JNI.__send__(:Java_org_eclipse_swt_internal_Callback_getEntryCount, JNI.env, self.jni_id)
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_Callback_getEntryCount, JNI.env, self.jni_id)
       end
       
       typesig { [::Java::Int] }
@@ -280,7 +280,7 @@ module Org::Eclipse::Swt::Internal
         return signature
       end
       
-      JNI.native_method :Java_org_eclipse_swt_internal_Callback_setEnabled, [:pointer, :long, :int8], :void
+      JNI.load_native_method :Java_org_eclipse_swt_internal_Callback_setEnabled, [:pointer, :long, :int8], :void
       typesig { [::Java::Boolean] }
       # Indicates whether or not callbacks which are triggered at the
       # native level should cause the messages described by the matching
@@ -293,10 +293,10 @@ module Org::Eclipse::Swt::Internal
       # 
       # @param enable true if callbacks should be invoked
       def set_enabled(enable)
-        JNI.__send__(:Java_org_eclipse_swt_internal_Callback_setEnabled, JNI.env, self.jni_id, enable ? 1 : 0)
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_Callback_setEnabled, JNI.env, self.jni_id, enable ? 1 : 0)
       end
       
-      JNI.native_method :Java_org_eclipse_swt_internal_Callback_getEnabled, [:pointer, :long], :int8
+      JNI.load_native_method :Java_org_eclipse_swt_internal_Callback_getEnabled, [:pointer, :long], :int8
       typesig { [] }
       # Returns whether or not callbacks which are triggered at the
       # native level should cause the messages described by the matching
@@ -309,7 +309,7 @@ module Org::Eclipse::Swt::Internal
       # 
       # @return true if callbacks should not be invoked
       def get_enabled
-        JNI.__send__(:Java_org_eclipse_swt_internal_Callback_getEnabled, JNI.env, self.jni_id) != 0
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_Callback_getEnabled, JNI.env, self.jni_id) != 0
       end
       
       typesig { [::Java::Boolean] }
@@ -323,7 +323,7 @@ module Org::Eclipse::Swt::Internal
         set_enabled(!ignore)
       end
       
-      JNI.native_method :Java_org_eclipse_swt_internal_Callback_reset, [:pointer, :long], :void
+      JNI.load_native_method :Java_org_eclipse_swt_internal_Callback_reset, [:pointer, :long], :void
       typesig { [] }
       # Immediately wipes out all native level state associated
       # with <em>all</em> callbacks.
@@ -332,16 +332,16 @@ module Org::Eclipse::Swt::Internal
       # and should never be performed by application code.
       # </p>
       def reset
-        JNI.__send__(:Java_org_eclipse_swt_internal_Callback_reset, JNI.env, self.jni_id)
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_Callback_reset, JNI.env, self.jni_id)
       end
       
-      JNI.native_method :Java_org_eclipse_swt_internal_Callback_unbind, [:pointer, :long, :long], :void
+      JNI.load_native_method :Java_org_eclipse_swt_internal_Callback_unbind, [:pointer, :long, :long], :void
       typesig { [Callback] }
       # Releases the native level resources associated with the callback.
       # 
       # @see #dispose
       def unbind(callback)
-        JNI.__send__(:Java_org_eclipse_swt_internal_Callback_unbind, JNI.env, self.jni_id, callback.jni_id)
+        JNI.call_native_method(:Java_org_eclipse_swt_internal_Callback_unbind, JNI.env, self.jni_id, callback.jni_id)
       end
     }
     

@@ -13,7 +13,7 @@ module Org::Eclipse::Swt::Internal
     class_module.module_eval {
       include ::Java::Lang
       include ::Org::Eclipse::Swt::Internal
-      include_const ::Org::Eclipse::Swt::Graphics, :GC
+      include_const ::Org::Eclipse::Swt::Graphics, :SwtGC
       include_const ::Org::Eclipse::Swt::Widgets, :Control
     }
   end

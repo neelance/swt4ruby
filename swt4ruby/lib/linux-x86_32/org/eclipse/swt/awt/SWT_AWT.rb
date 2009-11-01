@@ -101,17 +101,17 @@ module Org::Eclipse::Swt::Awt
       end
       alias_method :attr_swing_initialized=, :swing_initialized=
       
-      JNI.native_method :Java_org_eclipse_swt_awt_SWT_AWT_getAWTHandle, [:pointer, :long, :long], :int32
+      JNI.load_native_method :Java_org_eclipse_swt_awt_SWT_AWT_getAWTHandle, [:pointer, :long, :long], :int32
       typesig { [Object] }
       # long
       def get_awthandle(canvas)
-        JNI.__send__(:Java_org_eclipse_swt_awt_SWT_AWT_getAWTHandle, JNI.env, self.jni_id, canvas.jni_id)
+        JNI.call_native_method(:Java_org_eclipse_swt_awt_SWT_AWT_getAWTHandle, JNI.env, self.jni_id, canvas.jni_id)
       end
       
-      JNI.native_method :Java_org_eclipse_swt_awt_SWT_AWT_setDebug, [:pointer, :long, :long, :int8], :void
+      JNI.load_native_method :Java_org_eclipse_swt_awt_SWT_AWT_setDebug, [:pointer, :long, :long, :int8], :void
       typesig { [Frame, ::Java::Boolean] }
       def set_debug(canvas, debug)
-        JNI.__send__(:Java_org_eclipse_swt_awt_SWT_AWT_setDebug, JNI.env, self.jni_id, canvas.jni_id, debug ? 1 : 0)
+        JNI.call_native_method(:Java_org_eclipse_swt_awt_SWT_AWT_setDebug, JNI.env, self.jni_id, canvas.jni_id, debug ? 1 : 0)
       end
       
       typesig { [] }
