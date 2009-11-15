@@ -387,7 +387,7 @@ module Org::Eclipse::Swt::Internal::Mozilla
         JNI.call_native_method(:Java_org_eclipse_swt_internal_mozilla_XPCOM_nsDynamicFunctionLoad_1sizeof, JNI.env, self.jni_id)
       end
       
-      JNI.load_native_method "Java_org_eclipse_swt_internal_mozilla_XPCOM_memmove__IL#{NsDynamicFunctionLoad.jni_name}_2I".to_sym, [:pointer, :long, :int32, :long, :int32], :void
+      JNI.load_native_method "Java_org_eclipse_swt_internal_mozilla_XPCOM_memmove__IL#{NsDynamicFunctionLoad.jni_package_name}__2I".to_sym, [:pointer, :long, :int32, :long, :int32], :void
       typesig { [::Java::Int, NsDynamicFunctionLoad, ::Java::Int] }
       # @param dest cast=(void *)
       # @param src cast=(const void *),flags=no_out critical
@@ -396,10 +396,10 @@ module Org::Eclipse::Swt::Internal::Mozilla
       # long
       # long
       def memmove(dest, src, size)
-        JNI.call_native_method("Java_org_eclipse_swt_internal_mozilla_XPCOM_memmove__IL#{NsDynamicFunctionLoad.jni_name}_2I".to_sym, JNI.env, self.jni_id, dest.to_int, src.jni_id, size.to_int)
+        JNI.call_native_method("Java_org_eclipse_swt_internal_mozilla_XPCOM_memmove__IL#{NsDynamicFunctionLoad.jni_package_name}__2I".to_sym, JNI.env, self.jni_id, dest.to_int, src.jni_id, size.to_int)
       end
       
-      JNI.load_native_method "Java_org_eclipse_swt_internal_mozilla_XPCOM_memmove__L#{NsID.jni_name}_2II".to_sym, [:pointer, :long, :long, :int32, :int32], :void
+      JNI.load_native_method "Java_org_eclipse_swt_internal_mozilla_XPCOM_memmove__L#{NsID.jni_package_name}__2II".to_sym, [:pointer, :long, :long, :int32, :int32], :void
       typesig { [NsID, ::Java::Int, ::Java::Int] }
       # @param dest cast=(void *)
       # @param src cast=(const void *)
@@ -407,10 +407,10 @@ module Org::Eclipse::Swt::Internal::Mozilla
       # 
       # long
       def memmove(dest, src, nbytes)
-        JNI.call_native_method("Java_org_eclipse_swt_internal_mozilla_XPCOM_memmove__L#{NsID.jni_name}_2II".to_sym, JNI.env, self.jni_id, dest.jni_id, src.to_int, nbytes.to_int)
+        JNI.call_native_method("Java_org_eclipse_swt_internal_mozilla_XPCOM_memmove__L#{NsID.jni_package_name}__2II".to_sym, JNI.env, self.jni_id, dest.jni_id, src.to_int, nbytes.to_int)
       end
       
-      JNI.load_native_method "Java_org_eclipse_swt_internal_mozilla_XPCOM_memmove__IL#{NsID.jni_name}_2I".to_sym, [:pointer, :long, :int32, :long, :int32], :void
+      JNI.load_native_method "Java_org_eclipse_swt_internal_mozilla_XPCOM_memmove__IL#{NsID.jni_package_name}__2I".to_sym, [:pointer, :long, :int32, :long, :int32], :void
       typesig { [::Java::Int, NsID, ::Java::Int] }
       # @param dest cast=(void *)
       # @param src cast=(const void *)
@@ -418,7 +418,7 @@ module Org::Eclipse::Swt::Internal::Mozilla
       # 
       # long
       def memmove(dest, src, nbytes)
-        JNI.call_native_method("Java_org_eclipse_swt_internal_mozilla_XPCOM_memmove__IL#{NsID.jni_name}_2I".to_sym, JNI.env, self.jni_id, dest.to_int, src.jni_id, nbytes.to_int)
+        JNI.call_native_method("Java_org_eclipse_swt_internal_mozilla_XPCOM_memmove__IL#{NsID.jni_package_name}__2I".to_sym, JNI.env, self.jni_id, dest.to_int, src.jni_id, nbytes.to_int)
       end
       
       JNI.load_native_method :Java_org_eclipse_swt_internal_mozilla_XPCOM_strlen_1PRUnichar, [:pointer, :long, :int32], :int32
@@ -1489,11 +1489,11 @@ module Org::Eclipse::Swt::Internal::Mozilla
         end
       end
       
-      JNI.load_native_method "Java_org_eclipse_swt_internal_mozilla_XPCOM__1VtblCall__IIIL#{NsID.jni_name}_2".to_sym, [:pointer, :long, :int32, :int32, :int32, :long], :int32
+      JNI.load_native_method "Java_org_eclipse_swt_internal_mozilla_XPCOM__1VtblCall__IIIL#{NsID.jni_package_name}__2".to_sym, [:pointer, :long, :int32, :int32, :int32, :long], :int32
       typesig { [::Java::Int, ::Java::Int, ::Java::Int, NsID] }
       # long
       def ___vtbl_call(fn_number, pp_vtbl, arg0, arg1)
-        JNI.call_native_method("Java_org_eclipse_swt_internal_mozilla_XPCOM__1VtblCall__IIIL#{NsID.jni_name}_2".to_sym, JNI.env, self.jni_id, fn_number.to_int, pp_vtbl.to_int, arg0.to_int, arg1.jni_id)
+        JNI.call_native_method("Java_org_eclipse_swt_internal_mozilla_XPCOM__1VtblCall__IIIL#{NsID.jni_package_name}__2".to_sym, JNI.env, self.jni_id, fn_number.to_int, pp_vtbl.to_int, arg0.to_int, arg1.jni_id)
       end
       
       typesig { [::Java::Int, ::Java::Int, ::Java::Int, NsID] }
@@ -1507,11 +1507,11 @@ module Org::Eclipse::Swt::Internal::Mozilla
         end
       end
       
-      JNI.load_native_method "Java_org_eclipse_swt_internal_mozilla_XPCOM__1VtblCall__IIJL#{NsID.jni_name}_2".to_sym, [:pointer, :long, :int32, :int32, :int64, :long], :int32
+      JNI.load_native_method "Java_org_eclipse_swt_internal_mozilla_XPCOM__1VtblCall__IIJL#{NsID.jni_package_name}__2".to_sym, [:pointer, :long, :int32, :int32, :int64, :long], :int32
       typesig { [::Java::Int, ::Java::Int, ::Java::Long, NsID] }
       # long
       def ___vtbl_call(fn_number, pp_vtbl, arg0, arg1)
-        JNI.call_native_method("Java_org_eclipse_swt_internal_mozilla_XPCOM__1VtblCall__IIJL#{NsID.jni_name}_2".to_sym, JNI.env, self.jni_id, fn_number.to_int, pp_vtbl.to_int, arg0.to_int, arg1.jni_id)
+        JNI.call_native_method("Java_org_eclipse_swt_internal_mozilla_XPCOM__1VtblCall__IIJL#{NsID.jni_package_name}__2".to_sym, JNI.env, self.jni_id, fn_number.to_int, pp_vtbl.to_int, arg0.to_int, arg1.jni_id)
       end
       
       typesig { [::Java::Int, ::Java::Int, ::Java::Long, NsID] }
@@ -1579,11 +1579,11 @@ module Org::Eclipse::Swt::Internal::Mozilla
         end
       end
       
-      JNI.load_native_method "Java_org_eclipse_swt_internal_mozilla_XPCOM__1VtblCall__IIL#{NsID.jni_name}_2I".to_sym, [:pointer, :long, :int32, :int32, :long, :int32], :int32
+      JNI.load_native_method "Java_org_eclipse_swt_internal_mozilla_XPCOM__1VtblCall__IIL#{NsID.jni_package_name}__2I".to_sym, [:pointer, :long, :int32, :int32, :long, :int32], :int32
       typesig { [::Java::Int, ::Java::Int, NsID, ::Java::Int] }
       # long
       def ___vtbl_call(fn_number, pp_vtbl, arg0, arg1)
-        JNI.call_native_method("Java_org_eclipse_swt_internal_mozilla_XPCOM__1VtblCall__IIL#{NsID.jni_name}_2I".to_sym, JNI.env, self.jni_id, fn_number.to_int, pp_vtbl.to_int, arg0.jni_id, arg1.to_int)
+        JNI.call_native_method("Java_org_eclipse_swt_internal_mozilla_XPCOM__1VtblCall__IIL#{NsID.jni_package_name}__2I".to_sym, JNI.env, self.jni_id, fn_number.to_int, pp_vtbl.to_int, arg0.jni_id, arg1.to_int)
       end
       
       typesig { [::Java::Int, ::Java::Int, NsID, ::Java::Int] }
@@ -1597,11 +1597,11 @@ module Org::Eclipse::Swt::Internal::Mozilla
         end
       end
       
-      JNI.load_native_method "Java_org_eclipse_swt_internal_mozilla_XPCOM__1VtblCall__IIL#{NsID.jni_name}_2J".to_sym, [:pointer, :long, :int32, :int32, :long, :int64], :int32
+      JNI.load_native_method "Java_org_eclipse_swt_internal_mozilla_XPCOM__1VtblCall__IIL#{NsID.jni_package_name}__2J".to_sym, [:pointer, :long, :int32, :int32, :long, :int64], :int32
       typesig { [::Java::Int, ::Java::Int, NsID, ::Java::Long] }
       # long
       def ___vtbl_call(fn_number, pp_vtbl, arg0, arg1)
-        JNI.call_native_method("Java_org_eclipse_swt_internal_mozilla_XPCOM__1VtblCall__IIL#{NsID.jni_name}_2J".to_sym, JNI.env, self.jni_id, fn_number.to_int, pp_vtbl.to_int, arg0.jni_id, arg1.to_int)
+        JNI.call_native_method("Java_org_eclipse_swt_internal_mozilla_XPCOM__1VtblCall__IIL#{NsID.jni_package_name}__2J".to_sym, JNI.env, self.jni_id, fn_number.to_int, pp_vtbl.to_int, arg0.jni_id, arg1.to_int)
       end
       
       typesig { [::Java::Int, ::Java::Int, NsID, ::Java::Long] }
@@ -1615,11 +1615,11 @@ module Org::Eclipse::Swt::Internal::Mozilla
         end
       end
       
-      JNI.load_native_method "Java_org_eclipse_swt_internal_mozilla_XPCOM__1VtblCall__IIL#{NsID.jni_name}_2_3I".to_sym, [:pointer, :long, :int32, :int32, :long, :long], :int32
+      JNI.load_native_method "Java_org_eclipse_swt_internal_mozilla_XPCOM__1VtblCall__IIL#{NsID.jni_package_name}__2_3I".to_sym, [:pointer, :long, :int32, :int32, :long, :long], :int32
       typesig { [::Java::Int, ::Java::Int, NsID, Array.typed(::Java::Int)] }
       # long
       def ___vtbl_call(fn_number, pp_vtbl, arg0, arg1)
-        JNI.call_native_method("Java_org_eclipse_swt_internal_mozilla_XPCOM__1VtblCall__IIL#{NsID.jni_name}_2_3I".to_sym, JNI.env, self.jni_id, fn_number.to_int, pp_vtbl.to_int, arg0.jni_id, arg1.jni_id)
+        JNI.call_native_method("Java_org_eclipse_swt_internal_mozilla_XPCOM__1VtblCall__IIL#{NsID.jni_package_name}__2_3I".to_sym, JNI.env, self.jni_id, fn_number.to_int, pp_vtbl.to_int, arg0.jni_id, arg1.jni_id)
       end
       
       typesig { [::Java::Int, ::Java::Int, NsID, Array.typed(::Java::Int)] }
@@ -1633,11 +1633,11 @@ module Org::Eclipse::Swt::Internal::Mozilla
         end
       end
       
-      JNI.load_native_method "Java_org_eclipse_swt_internal_mozilla_XPCOM__1VtblCall__IIL#{NsID.jni_name}_2_3J".to_sym, [:pointer, :long, :int32, :int32, :long, :long], :int32
+      JNI.load_native_method "Java_org_eclipse_swt_internal_mozilla_XPCOM__1VtblCall__IIL#{NsID.jni_package_name}__2_3J".to_sym, [:pointer, :long, :int32, :int32, :long, :long], :int32
       typesig { [::Java::Int, ::Java::Int, NsID, Array.typed(::Java::Long)] }
       # long
       def ___vtbl_call(fn_number, pp_vtbl, arg0, arg1)
-        JNI.call_native_method("Java_org_eclipse_swt_internal_mozilla_XPCOM__1VtblCall__IIL#{NsID.jni_name}_2_3J".to_sym, JNI.env, self.jni_id, fn_number.to_int, pp_vtbl.to_int, arg0.jni_id, arg1.jni_id)
+        JNI.call_native_method("Java_org_eclipse_swt_internal_mozilla_XPCOM__1VtblCall__IIL#{NsID.jni_package_name}__2_3J".to_sym, JNI.env, self.jni_id, fn_number.to_int, pp_vtbl.to_int, arg0.jni_id, arg1.jni_id)
       end
       
       typesig { [::Java::Int, ::Java::Int, NsID, Array.typed(::Java::Long)] }
@@ -1957,11 +1957,11 @@ module Org::Eclipse::Swt::Internal::Mozilla
         end
       end
       
-      JNI.load_native_method "Java_org_eclipse_swt_internal_mozilla_XPCOM__1VtblCall__II_3BL#{NsID.jni_name}_2_3J".to_sym, [:pointer, :long, :int32, :int32, :long, :long, :long], :int32
+      JNI.load_native_method "Java_org_eclipse_swt_internal_mozilla_XPCOM__1VtblCall__II_3BL#{NsID.jni_package_name}__2_3J".to_sym, [:pointer, :long, :int32, :int32, :long, :long, :long], :int32
       typesig { [::Java::Int, ::Java::Int, Array.typed(::Java::Byte), NsID, Array.typed(::Java::Long)] }
       # long
       def ___vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2)
-        JNI.call_native_method("Java_org_eclipse_swt_internal_mozilla_XPCOM__1VtblCall__II_3BL#{NsID.jni_name}_2_3J".to_sym, JNI.env, self.jni_id, fn_number.to_int, pp_vtbl.to_int, arg0.jni_id, arg1.jni_id, arg2.jni_id)
+        JNI.call_native_method("Java_org_eclipse_swt_internal_mozilla_XPCOM__1VtblCall__II_3BL#{NsID.jni_package_name}__2_3J".to_sym, JNI.env, self.jni_id, fn_number.to_int, pp_vtbl.to_int, arg0.jni_id, arg1.jni_id, arg2.jni_id)
       end
       
       typesig { [::Java::Int, ::Java::Int, Array.typed(::Java::Byte), NsID, Array.typed(::Java::Long)] }
@@ -1975,11 +1975,11 @@ module Org::Eclipse::Swt::Internal::Mozilla
         end
       end
       
-      JNI.load_native_method "Java_org_eclipse_swt_internal_mozilla_XPCOM__1VtblCall__II_3BL#{NsID.jni_name}_2_3I".to_sym, [:pointer, :long, :int32, :int32, :long, :long, :long], :int32
+      JNI.load_native_method "Java_org_eclipse_swt_internal_mozilla_XPCOM__1VtblCall__II_3BL#{NsID.jni_package_name}__2_3I".to_sym, [:pointer, :long, :int32, :int32, :long, :long, :long], :int32
       typesig { [::Java::Int, ::Java::Int, Array.typed(::Java::Byte), NsID, Array.typed(::Java::Int)] }
       # long
       def ___vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2)
-        JNI.call_native_method("Java_org_eclipse_swt_internal_mozilla_XPCOM__1VtblCall__II_3BL#{NsID.jni_name}_2_3I".to_sym, JNI.env, self.jni_id, fn_number.to_int, pp_vtbl.to_int, arg0.jni_id, arg1.jni_id, arg2.jni_id)
+        JNI.call_native_method("Java_org_eclipse_swt_internal_mozilla_XPCOM__1VtblCall__II_3BL#{NsID.jni_package_name}__2_3I".to_sym, JNI.env, self.jni_id, fn_number.to_int, pp_vtbl.to_int, arg0.jni_id, arg1.jni_id, arg2.jni_id)
       end
       
       typesig { [::Java::Int, ::Java::Int, Array.typed(::Java::Byte), NsID, Array.typed(::Java::Int)] }
@@ -2227,11 +2227,11 @@ module Org::Eclipse::Swt::Internal::Mozilla
         end
       end
       
-      JNI.load_native_method "Java_org_eclipse_swt_internal_mozilla_XPCOM__1VtblCall__IIIL#{NsID.jni_name}_2_3I".to_sym, [:pointer, :long, :int32, :int32, :int32, :long, :long], :int32
+      JNI.load_native_method "Java_org_eclipse_swt_internal_mozilla_XPCOM__1VtblCall__IIIL#{NsID.jni_package_name}__2_3I".to_sym, [:pointer, :long, :int32, :int32, :int32, :long, :long], :int32
       typesig { [::Java::Int, ::Java::Int, ::Java::Int, NsID, Array.typed(::Java::Int)] }
       # long
       def ___vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2)
-        JNI.call_native_method("Java_org_eclipse_swt_internal_mozilla_XPCOM__1VtblCall__IIIL#{NsID.jni_name}_2_3I".to_sym, JNI.env, self.jni_id, fn_number.to_int, pp_vtbl.to_int, arg0.to_int, arg1.jni_id, arg2.jni_id)
+        JNI.call_native_method("Java_org_eclipse_swt_internal_mozilla_XPCOM__1VtblCall__IIIL#{NsID.jni_package_name}__2_3I".to_sym, JNI.env, self.jni_id, fn_number.to_int, pp_vtbl.to_int, arg0.to_int, arg1.jni_id, arg2.jni_id)
       end
       
       typesig { [::Java::Int, ::Java::Int, ::Java::Int, NsID, Array.typed(::Java::Int)] }
@@ -2245,11 +2245,11 @@ module Org::Eclipse::Swt::Internal::Mozilla
         end
       end
       
-      JNI.load_native_method "Java_org_eclipse_swt_internal_mozilla_XPCOM__1VtblCall__IIJL#{NsID.jni_name}_2_3J".to_sym, [:pointer, :long, :int32, :int32, :int64, :long, :long], :int32
+      JNI.load_native_method "Java_org_eclipse_swt_internal_mozilla_XPCOM__1VtblCall__IIJL#{NsID.jni_package_name}__2_3J".to_sym, [:pointer, :long, :int32, :int32, :int64, :long, :long], :int32
       typesig { [::Java::Int, ::Java::Int, ::Java::Long, NsID, Array.typed(::Java::Long)] }
       # long
       def ___vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2)
-        JNI.call_native_method("Java_org_eclipse_swt_internal_mozilla_XPCOM__1VtblCall__IIJL#{NsID.jni_name}_2_3J".to_sym, JNI.env, self.jni_id, fn_number.to_int, pp_vtbl.to_int, arg0.to_int, arg1.jni_id, arg2.jni_id)
+        JNI.call_native_method("Java_org_eclipse_swt_internal_mozilla_XPCOM__1VtblCall__IIJL#{NsID.jni_package_name}__2_3J".to_sym, JNI.env, self.jni_id, fn_number.to_int, pp_vtbl.to_int, arg0.to_int, arg1.jni_id, arg2.jni_id)
       end
       
       typesig { [::Java::Int, ::Java::Int, ::Java::Long, NsID, Array.typed(::Java::Long)] }
@@ -2281,11 +2281,11 @@ module Org::Eclipse::Swt::Internal::Mozilla
         end
       end
       
-      JNI.load_native_method "Java_org_eclipse_swt_internal_mozilla_XPCOM__1VtblCall__IIL#{NsID.jni_name}_2L#{NsID.jni_name}_2_3J".to_sym, [:pointer, :long, :int32, :int32, :long, :long, :long], :int32
+      JNI.load_native_method "Java_org_eclipse_swt_internal_mozilla_XPCOM__1VtblCall__IIL#{NsID.jni_package_name}__2L#{NsID.jni_package_name}__2_3J".to_sym, [:pointer, :long, :int32, :int32, :long, :long, :long], :int32
       typesig { [::Java::Int, ::Java::Int, NsID, NsID, Array.typed(::Java::Long)] }
       # long
       def ___vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2)
-        JNI.call_native_method("Java_org_eclipse_swt_internal_mozilla_XPCOM__1VtblCall__IIL#{NsID.jni_name}_2L#{NsID.jni_name}_2_3J".to_sym, JNI.env, self.jni_id, fn_number.to_int, pp_vtbl.to_int, arg0.jni_id, arg1.jni_id, arg2.jni_id)
+        JNI.call_native_method("Java_org_eclipse_swt_internal_mozilla_XPCOM__1VtblCall__IIL#{NsID.jni_package_name}__2L#{NsID.jni_package_name}__2_3J".to_sym, JNI.env, self.jni_id, fn_number.to_int, pp_vtbl.to_int, arg0.jni_id, arg1.jni_id, arg2.jni_id)
       end
       
       typesig { [::Java::Int, ::Java::Int, NsID, NsID, Array.typed(::Java::Long)] }
@@ -2299,11 +2299,11 @@ module Org::Eclipse::Swt::Internal::Mozilla
         end
       end
       
-      JNI.load_native_method "Java_org_eclipse_swt_internal_mozilla_XPCOM__1VtblCall__IIL#{NsID.jni_name}_2L#{NsID.jni_name}_2_3I".to_sym, [:pointer, :long, :int32, :int32, :long, :long, :long], :int32
+      JNI.load_native_method "Java_org_eclipse_swt_internal_mozilla_XPCOM__1VtblCall__IIL#{NsID.jni_package_name}__2L#{NsID.jni_package_name}__2_3I".to_sym, [:pointer, :long, :int32, :int32, :long, :long, :long], :int32
       typesig { [::Java::Int, ::Java::Int, NsID, NsID, Array.typed(::Java::Int)] }
       # long
       def ___vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2)
-        JNI.call_native_method("Java_org_eclipse_swt_internal_mozilla_XPCOM__1VtblCall__IIL#{NsID.jni_name}_2L#{NsID.jni_name}_2_3I".to_sym, JNI.env, self.jni_id, fn_number.to_int, pp_vtbl.to_int, arg0.jni_id, arg1.jni_id, arg2.jni_id)
+        JNI.call_native_method("Java_org_eclipse_swt_internal_mozilla_XPCOM__1VtblCall__IIL#{NsID.jni_package_name}__2L#{NsID.jni_package_name}__2_3I".to_sym, JNI.env, self.jni_id, fn_number.to_int, pp_vtbl.to_int, arg0.jni_id, arg1.jni_id, arg2.jni_id)
       end
       
       typesig { [::Java::Int, ::Java::Int, NsID, NsID, Array.typed(::Java::Int)] }
@@ -2407,11 +2407,11 @@ module Org::Eclipse::Swt::Internal::Mozilla
         end
       end
       
-      JNI.load_native_method "Java_org_eclipse_swt_internal_mozilla_XPCOM__1VtblCall__II_3BL#{NsID.jni_name}_2I".to_sym, [:pointer, :long, :int32, :int32, :long, :long, :int32], :int32
+      JNI.load_native_method "Java_org_eclipse_swt_internal_mozilla_XPCOM__1VtblCall__II_3BL#{NsID.jni_package_name}__2I".to_sym, [:pointer, :long, :int32, :int32, :long, :long, :int32], :int32
       typesig { [::Java::Int, ::Java::Int, Array.typed(::Java::Byte), NsID, ::Java::Int] }
       # long
       def ___vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2)
-        JNI.call_native_method("Java_org_eclipse_swt_internal_mozilla_XPCOM__1VtblCall__II_3BL#{NsID.jni_name}_2I".to_sym, JNI.env, self.jni_id, fn_number.to_int, pp_vtbl.to_int, arg0.jni_id, arg1.jni_id, arg2.to_int)
+        JNI.call_native_method("Java_org_eclipse_swt_internal_mozilla_XPCOM__1VtblCall__II_3BL#{NsID.jni_package_name}__2I".to_sym, JNI.env, self.jni_id, fn_number.to_int, pp_vtbl.to_int, arg0.jni_id, arg1.jni_id, arg2.to_int)
       end
       
       typesig { [::Java::Int, ::Java::Int, Array.typed(::Java::Byte), NsID, ::Java::Int] }
@@ -2425,11 +2425,11 @@ module Org::Eclipse::Swt::Internal::Mozilla
         end
       end
       
-      JNI.load_native_method "Java_org_eclipse_swt_internal_mozilla_XPCOM__1VtblCall__II_3BL#{NsID.jni_name}_2J".to_sym, [:pointer, :long, :int32, :int32, :long, :long, :int64], :int32
+      JNI.load_native_method "Java_org_eclipse_swt_internal_mozilla_XPCOM__1VtblCall__II_3BL#{NsID.jni_package_name}__2J".to_sym, [:pointer, :long, :int32, :int32, :long, :long, :int64], :int32
       typesig { [::Java::Int, ::Java::Int, Array.typed(::Java::Byte), NsID, ::Java::Long] }
       # long
       def ___vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2)
-        JNI.call_native_method("Java_org_eclipse_swt_internal_mozilla_XPCOM__1VtblCall__II_3BL#{NsID.jni_name}_2J".to_sym, JNI.env, self.jni_id, fn_number.to_int, pp_vtbl.to_int, arg0.jni_id, arg1.jni_id, arg2.to_int)
+        JNI.call_native_method("Java_org_eclipse_swt_internal_mozilla_XPCOM__1VtblCall__II_3BL#{NsID.jni_package_name}__2J".to_sym, JNI.env, self.jni_id, fn_number.to_int, pp_vtbl.to_int, arg0.jni_id, arg1.jni_id, arg2.to_int)
       end
       
       typesig { [::Java::Int, ::Java::Int, Array.typed(::Java::Byte), NsID, ::Java::Long] }
@@ -2641,11 +2641,11 @@ module Org::Eclipse::Swt::Internal::Mozilla
         end
       end
       
-      JNI.load_native_method "Java_org_eclipse_swt_internal_mozilla_XPCOM__1VtblCall__II_3BIL#{NsID.jni_name}_2_3I".to_sym, [:pointer, :long, :int32, :int32, :long, :int32, :long, :long], :int32
+      JNI.load_native_method "Java_org_eclipse_swt_internal_mozilla_XPCOM__1VtblCall__II_3BIL#{NsID.jni_package_name}__2_3I".to_sym, [:pointer, :long, :int32, :int32, :long, :int32, :long, :long], :int32
       typesig { [::Java::Int, ::Java::Int, Array.typed(::Java::Byte), ::Java::Int, NsID, Array.typed(::Java::Int)] }
       # long
       def ___vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2, arg3)
-        JNI.call_native_method("Java_org_eclipse_swt_internal_mozilla_XPCOM__1VtblCall__II_3BIL#{NsID.jni_name}_2_3I".to_sym, JNI.env, self.jni_id, fn_number.to_int, pp_vtbl.to_int, arg0.jni_id, arg1.to_int, arg2.jni_id, arg3.jni_id)
+        JNI.call_native_method("Java_org_eclipse_swt_internal_mozilla_XPCOM__1VtblCall__II_3BIL#{NsID.jni_package_name}__2_3I".to_sym, JNI.env, self.jni_id, fn_number.to_int, pp_vtbl.to_int, arg0.jni_id, arg1.to_int, arg2.jni_id, arg3.jni_id)
       end
       
       typesig { [::Java::Int, ::Java::Int, Array.typed(::Java::Byte), ::Java::Int, NsID, Array.typed(::Java::Int)] }
@@ -2659,11 +2659,11 @@ module Org::Eclipse::Swt::Internal::Mozilla
         end
       end
       
-      JNI.load_native_method "Java_org_eclipse_swt_internal_mozilla_XPCOM__1VtblCall__II_3BJL#{NsID.jni_name}_2_3J".to_sym, [:pointer, :long, :int32, :int32, :long, :int64, :long, :long], :int32
+      JNI.load_native_method "Java_org_eclipse_swt_internal_mozilla_XPCOM__1VtblCall__II_3BJL#{NsID.jni_package_name}__2_3J".to_sym, [:pointer, :long, :int32, :int32, :long, :int64, :long, :long], :int32
       typesig { [::Java::Int, ::Java::Int, Array.typed(::Java::Byte), ::Java::Long, NsID, Array.typed(::Java::Long)] }
       # long
       def ___vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2, arg3)
-        JNI.call_native_method("Java_org_eclipse_swt_internal_mozilla_XPCOM__1VtblCall__II_3BJL#{NsID.jni_name}_2_3J".to_sym, JNI.env, self.jni_id, fn_number.to_int, pp_vtbl.to_int, arg0.jni_id, arg1.to_int, arg2.jni_id, arg3.jni_id)
+        JNI.call_native_method("Java_org_eclipse_swt_internal_mozilla_XPCOM__1VtblCall__II_3BJL#{NsID.jni_package_name}__2_3J".to_sym, JNI.env, self.jni_id, fn_number.to_int, pp_vtbl.to_int, arg0.jni_id, arg1.to_int, arg2.jni_id, arg3.jni_id)
       end
       
       typesig { [::Java::Int, ::Java::Int, Array.typed(::Java::Byte), ::Java::Long, NsID, Array.typed(::Java::Long)] }
@@ -2929,11 +2929,11 @@ module Org::Eclipse::Swt::Internal::Mozilla
         end
       end
       
-      JNI.load_native_method "Java_org_eclipse_swt_internal_mozilla_XPCOM__1VtblCall__IIL#{NsID.jni_name}_2_3B_3BI".to_sym, [:pointer, :long, :int32, :int32, :long, :long, :long, :int32], :int32
+      JNI.load_native_method "Java_org_eclipse_swt_internal_mozilla_XPCOM__1VtblCall__IIL#{NsID.jni_package_name}__2_3B_3BI".to_sym, [:pointer, :long, :int32, :int32, :long, :long, :long, :int32], :int32
       typesig { [::Java::Int, ::Java::Int, NsID, Array.typed(::Java::Byte), Array.typed(::Java::Byte), ::Java::Int] }
       # long
       def ___vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2, arg3)
-        JNI.call_native_method("Java_org_eclipse_swt_internal_mozilla_XPCOM__1VtblCall__IIL#{NsID.jni_name}_2_3B_3BI".to_sym, JNI.env, self.jni_id, fn_number.to_int, pp_vtbl.to_int, arg0.jni_id, arg1.jni_id, arg2.jni_id, arg3.to_int)
+        JNI.call_native_method("Java_org_eclipse_swt_internal_mozilla_XPCOM__1VtblCall__IIL#{NsID.jni_package_name}__2_3B_3BI".to_sym, JNI.env, self.jni_id, fn_number.to_int, pp_vtbl.to_int, arg0.jni_id, arg1.jni_id, arg2.jni_id, arg3.to_int)
       end
       
       typesig { [::Java::Int, ::Java::Int, NsID, Array.typed(::Java::Byte), Array.typed(::Java::Byte), ::Java::Int] }
@@ -2947,11 +2947,11 @@ module Org::Eclipse::Swt::Internal::Mozilla
         end
       end
       
-      JNI.load_native_method "Java_org_eclipse_swt_internal_mozilla_XPCOM__1VtblCall__IIL#{NsID.jni_name}_2_3B_3BJ".to_sym, [:pointer, :long, :int32, :int32, :long, :long, :long, :int64], :int32
+      JNI.load_native_method "Java_org_eclipse_swt_internal_mozilla_XPCOM__1VtblCall__IIL#{NsID.jni_package_name}__2_3B_3BJ".to_sym, [:pointer, :long, :int32, :int32, :long, :long, :long, :int64], :int32
       typesig { [::Java::Int, ::Java::Int, NsID, Array.typed(::Java::Byte), Array.typed(::Java::Byte), ::Java::Long] }
       # long
       def ___vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2, arg3)
-        JNI.call_native_method("Java_org_eclipse_swt_internal_mozilla_XPCOM__1VtblCall__IIL#{NsID.jni_name}_2_3B_3BJ".to_sym, JNI.env, self.jni_id, fn_number.to_int, pp_vtbl.to_int, arg0.jni_id, arg1.jni_id, arg2.jni_id, arg3.to_int)
+        JNI.call_native_method("Java_org_eclipse_swt_internal_mozilla_XPCOM__1VtblCall__IIL#{NsID.jni_package_name}__2_3B_3BJ".to_sym, JNI.env, self.jni_id, fn_number.to_int, pp_vtbl.to_int, arg0.jni_id, arg1.jni_id, arg2.jni_id, arg3.to_int)
       end
       
       typesig { [::Java::Int, ::Java::Int, NsID, Array.typed(::Java::Byte), Array.typed(::Java::Byte), ::Java::Long] }
@@ -2965,11 +2965,11 @@ module Org::Eclipse::Swt::Internal::Mozilla
         end
       end
       
-      JNI.load_native_method "Java_org_eclipse_swt_internal_mozilla_XPCOM__1VtblCall__IIL#{NsID.jni_name}_2IL#{NsID.jni_name}_2_3I".to_sym, [:pointer, :long, :int32, :int32, :long, :int32, :long, :long], :int32
+      JNI.load_native_method "Java_org_eclipse_swt_internal_mozilla_XPCOM__1VtblCall__IIL#{NsID.jni_package_name}__2IL#{NsID.jni_package_name}__2_3I".to_sym, [:pointer, :long, :int32, :int32, :long, :int32, :long, :long], :int32
       typesig { [::Java::Int, ::Java::Int, NsID, ::Java::Int, NsID, Array.typed(::Java::Int)] }
       # long
       def ___vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2, arg3)
-        JNI.call_native_method("Java_org_eclipse_swt_internal_mozilla_XPCOM__1VtblCall__IIL#{NsID.jni_name}_2IL#{NsID.jni_name}_2_3I".to_sym, JNI.env, self.jni_id, fn_number.to_int, pp_vtbl.to_int, arg0.jni_id, arg1.to_int, arg2.jni_id, arg3.jni_id)
+        JNI.call_native_method("Java_org_eclipse_swt_internal_mozilla_XPCOM__1VtblCall__IIL#{NsID.jni_package_name}__2IL#{NsID.jni_package_name}__2_3I".to_sym, JNI.env, self.jni_id, fn_number.to_int, pp_vtbl.to_int, arg0.jni_id, arg1.to_int, arg2.jni_id, arg3.jni_id)
       end
       
       typesig { [::Java::Int, ::Java::Int, NsID, ::Java::Int, NsID, Array.typed(::Java::Int)] }
@@ -2983,11 +2983,11 @@ module Org::Eclipse::Swt::Internal::Mozilla
         end
       end
       
-      JNI.load_native_method "Java_org_eclipse_swt_internal_mozilla_XPCOM__1VtblCall__IIL#{NsID.jni_name}_2JL#{NsID.jni_name}_2_3J".to_sym, [:pointer, :long, :int32, :int32, :long, :int64, :long, :long], :int32
+      JNI.load_native_method "Java_org_eclipse_swt_internal_mozilla_XPCOM__1VtblCall__IIL#{NsID.jni_package_name}__2JL#{NsID.jni_package_name}__2_3J".to_sym, [:pointer, :long, :int32, :int32, :long, :int64, :long, :long], :int32
       typesig { [::Java::Int, ::Java::Int, NsID, ::Java::Long, NsID, Array.typed(::Java::Long)] }
       # long
       def ___vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2, arg3)
-        JNI.call_native_method("Java_org_eclipse_swt_internal_mozilla_XPCOM__1VtblCall__IIL#{NsID.jni_name}_2JL#{NsID.jni_name}_2_3J".to_sym, JNI.env, self.jni_id, fn_number.to_int, pp_vtbl.to_int, arg0.jni_id, arg1.to_int, arg2.jni_id, arg3.jni_id)
+        JNI.call_native_method("Java_org_eclipse_swt_internal_mozilla_XPCOM__1VtblCall__IIL#{NsID.jni_package_name}__2JL#{NsID.jni_package_name}__2_3J".to_sym, JNI.env, self.jni_id, fn_number.to_int, pp_vtbl.to_int, arg0.jni_id, arg1.to_int, arg2.jni_id, arg3.jni_id)
       end
       
       typesig { [::Java::Int, ::Java::Int, NsID, ::Java::Long, NsID, Array.typed(::Java::Long)] }
@@ -3343,11 +3343,11 @@ module Org::Eclipse::Swt::Internal::Mozilla
         end
       end
       
-      JNI.load_native_method "Java_org_eclipse_swt_internal_mozilla_XPCOM__1VtblCall__IIIL#{NsID.jni_name}_2II_3I".to_sym, [:pointer, :long, :int32, :int32, :int32, :long, :int32, :int32, :long], :int32
+      JNI.load_native_method "Java_org_eclipse_swt_internal_mozilla_XPCOM__1VtblCall__IIIL#{NsID.jni_package_name}__2II_3I".to_sym, [:pointer, :long, :int32, :int32, :int32, :long, :int32, :int32, :long], :int32
       typesig { [::Java::Int, ::Java::Int, ::Java::Int, NsID, ::Java::Int, ::Java::Int, Array.typed(::Java::Int)] }
       # long
       def ___vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2, arg3, arg4)
-        JNI.call_native_method("Java_org_eclipse_swt_internal_mozilla_XPCOM__1VtblCall__IIIL#{NsID.jni_name}_2II_3I".to_sym, JNI.env, self.jni_id, fn_number.to_int, pp_vtbl.to_int, arg0.to_int, arg1.jni_id, arg2.to_int, arg3.to_int, arg4.jni_id)
+        JNI.call_native_method("Java_org_eclipse_swt_internal_mozilla_XPCOM__1VtblCall__IIIL#{NsID.jni_package_name}__2II_3I".to_sym, JNI.env, self.jni_id, fn_number.to_int, pp_vtbl.to_int, arg0.to_int, arg1.jni_id, arg2.to_int, arg3.to_int, arg4.jni_id)
       end
       
       typesig { [::Java::Int, ::Java::Int, ::Java::Int, NsID, ::Java::Int, ::Java::Int, Array.typed(::Java::Int)] }
@@ -3361,11 +3361,11 @@ module Org::Eclipse::Swt::Internal::Mozilla
         end
       end
       
-      JNI.load_native_method "Java_org_eclipse_swt_internal_mozilla_XPCOM__1VtblCall__IIJL#{NsID.jni_name}_2JJ_3J".to_sym, [:pointer, :long, :int32, :int32, :int64, :long, :int64, :int64, :long], :int32
+      JNI.load_native_method "Java_org_eclipse_swt_internal_mozilla_XPCOM__1VtblCall__IIJL#{NsID.jni_package_name}__2JJ_3J".to_sym, [:pointer, :long, :int32, :int32, :int64, :long, :int64, :int64, :long], :int32
       typesig { [::Java::Int, ::Java::Int, ::Java::Long, NsID, ::Java::Long, ::Java::Long, Array.typed(::Java::Long)] }
       # long
       def ___vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2, arg3, arg4)
-        JNI.call_native_method("Java_org_eclipse_swt_internal_mozilla_XPCOM__1VtblCall__IIJL#{NsID.jni_name}_2JJ_3J".to_sym, JNI.env, self.jni_id, fn_number.to_int, pp_vtbl.to_int, arg0.to_int, arg1.jni_id, arg2.to_int, arg3.to_int, arg4.jni_id)
+        JNI.call_native_method("Java_org_eclipse_swt_internal_mozilla_XPCOM__1VtblCall__IIJL#{NsID.jni_package_name}__2JJ_3J".to_sym, JNI.env, self.jni_id, fn_number.to_int, pp_vtbl.to_int, arg0.to_int, arg1.jni_id, arg2.to_int, arg3.to_int, arg4.jni_id)
       end
       
       typesig { [::Java::Int, ::Java::Int, ::Java::Long, NsID, ::Java::Long, ::Java::Long, Array.typed(::Java::Long)] }
@@ -3595,11 +3595,11 @@ module Org::Eclipse::Swt::Internal::Mozilla
         end
       end
       
-      JNI.load_native_method "Java_org_eclipse_swt_internal_mozilla_XPCOM__1VtblCall__IIL#{NsID.jni_name}_2_3B_3BI_3B_3B".to_sym, [:pointer, :long, :int32, :int32, :long, :long, :long, :int32, :long, :long], :int32
+      JNI.load_native_method "Java_org_eclipse_swt_internal_mozilla_XPCOM__1VtblCall__IIL#{NsID.jni_package_name}__2_3B_3BI_3B_3B".to_sym, [:pointer, :long, :int32, :int32, :long, :long, :long, :int32, :long, :long], :int32
       typesig { [::Java::Int, ::Java::Int, NsID, Array.typed(::Java::Byte), Array.typed(::Java::Byte), ::Java::Int, Array.typed(::Java::Byte), Array.typed(::Java::Byte)] }
       # long
       def ___vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2, arg3, arg4, arg5)
-        JNI.call_native_method("Java_org_eclipse_swt_internal_mozilla_XPCOM__1VtblCall__IIL#{NsID.jni_name}_2_3B_3BI_3B_3B".to_sym, JNI.env, self.jni_id, fn_number.to_int, pp_vtbl.to_int, arg0.jni_id, arg1.jni_id, arg2.jni_id, arg3.to_int, arg4.jni_id, arg5.jni_id)
+        JNI.call_native_method("Java_org_eclipse_swt_internal_mozilla_XPCOM__1VtblCall__IIL#{NsID.jni_package_name}__2_3B_3BI_3B_3B".to_sym, JNI.env, self.jni_id, fn_number.to_int, pp_vtbl.to_int, arg0.jni_id, arg1.jni_id, arg2.jni_id, arg3.to_int, arg4.jni_id, arg5.jni_id)
       end
       
       typesig { [::Java::Int, ::Java::Int, NsID, Array.typed(::Java::Byte), Array.typed(::Java::Byte), ::Java::Int, Array.typed(::Java::Byte), Array.typed(::Java::Byte)] }
@@ -3613,11 +3613,11 @@ module Org::Eclipse::Swt::Internal::Mozilla
         end
       end
       
-      JNI.load_native_method "Java_org_eclipse_swt_internal_mozilla_XPCOM__1VtblCall__IIL#{NsID.jni_name}_2_3B_3BJ_3B_3B".to_sym, [:pointer, :long, :int32, :int32, :long, :long, :long, :int64, :long, :long], :int32
+      JNI.load_native_method "Java_org_eclipse_swt_internal_mozilla_XPCOM__1VtblCall__IIL#{NsID.jni_package_name}__2_3B_3BJ_3B_3B".to_sym, [:pointer, :long, :int32, :int32, :long, :long, :long, :int64, :long, :long], :int32
       typesig { [::Java::Int, ::Java::Int, NsID, Array.typed(::Java::Byte), Array.typed(::Java::Byte), ::Java::Long, Array.typed(::Java::Byte), Array.typed(::Java::Byte)] }
       # long
       def ___vtbl_call(fn_number, pp_vtbl, arg0, arg1, arg2, arg3, arg4, arg5)
-        JNI.call_native_method("Java_org_eclipse_swt_internal_mozilla_XPCOM__1VtblCall__IIL#{NsID.jni_name}_2_3B_3BJ_3B_3B".to_sym, JNI.env, self.jni_id, fn_number.to_int, pp_vtbl.to_int, arg0.jni_id, arg1.jni_id, arg2.jni_id, arg3.to_int, arg4.jni_id, arg5.jni_id)
+        JNI.call_native_method("Java_org_eclipse_swt_internal_mozilla_XPCOM__1VtblCall__IIL#{NsID.jni_package_name}__2_3B_3BJ_3B_3B".to_sym, JNI.env, self.jni_id, fn_number.to_int, pp_vtbl.to_int, arg0.jni_id, arg1.jni_id, arg2.jni_id, arg3.to_int, arg4.jni_id, arg5.jni_id)
       end
       
       typesig { [::Java::Int, ::Java::Int, NsID, Array.typed(::Java::Byte), Array.typed(::Java::Byte), ::Java::Long, Array.typed(::Java::Byte), Array.typed(::Java::Byte)] }

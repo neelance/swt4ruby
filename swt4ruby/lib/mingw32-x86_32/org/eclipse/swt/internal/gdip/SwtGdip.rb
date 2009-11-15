@@ -786,7 +786,7 @@ module Org::Eclipse::Swt::Internal::Gdip
         JNI.call_native_method(:Java_org_eclipse_swt_internal_gdip_Gdip_Graphics_1DrawArc, JNI.env, self.jni_id, graphics.to_int, pen.to_int, x.to_int, y.to_int, width.to_int, height.to_int, start_angle, sweep_angle)
       end
       
-      JNI.load_native_method "Java_org_eclipse_swt_internal_gdip_Gdip_Graphics_1DrawDriverString__IIIIIL#{PointF.jni_name}_2II".to_sym, [:pointer, :long, :int32, :int32, :int32, :int32, :int32, :long, :int32, :int32], :int32
+      JNI.load_native_method "Java_org_eclipse_swt_internal_gdip_Gdip_Graphics_1DrawDriverString__IIIIIL#{PointF.jni_package_name}_PointF_2II".to_sym, [:pointer, :long, :int32, :int32, :int32, :int32, :int32, :long, :int32, :int32], :int32
       typesig { [::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, PointF, ::Java::Int, ::Java::Int] }
       # @method flags=cpp
       # @param graphics cast=(Graphics *)
@@ -803,7 +803,7 @@ module Org::Eclipse::Swt::Internal::Gdip
       # long
       # long
       def _graphics_draw_driver_string(graphics, text, length, font, brush, positions, flags, matrix)
-        JNI.call_native_method("Java_org_eclipse_swt_internal_gdip_Gdip_Graphics_1DrawDriverString__IIIIIL#{PointF.jni_name}_2II".to_sym, JNI.env, self.jni_id, graphics.to_int, text.to_int, length.to_int, font.to_int, brush.to_int, positions.jni_id, flags.to_int, matrix.to_int)
+        JNI.call_native_method("Java_org_eclipse_swt_internal_gdip_Gdip_Graphics_1DrawDriverString__IIIIIL#{PointF.jni_package_name}_PointF_2II".to_sym, JNI.env, self.jni_id, graphics.to_int, text.to_int, length.to_int, font.to_int, brush.to_int, positions.jni_id, flags.to_int, matrix.to_int)
       end
       
       JNI.load_native_method :Java_org_eclipse_swt_internal_gdip_Gdip_Graphics_1DrawDriverString__IIIII_3XfloatXII, [:pointer, :long, :int32, :int32, :int32, :int32, :int32, :long, :int32, :int32], :int32
@@ -851,7 +851,7 @@ module Org::Eclipse::Swt::Internal::Gdip
         JNI.call_native_method(:Java_org_eclipse_swt_internal_gdip_Gdip_Graphics_1DrawImage__IIII, JNI.env, self.jni_id, graphics.to_int, image.to_int, x.to_int, y.to_int)
       end
       
-      JNI.load_native_method "Java_org_eclipse_swt_internal_gdip_Gdip_Graphics_1DrawImage__IIL#{Rect.jni_name}_2IIIIIIII".to_sym, [:pointer, :long, :int32, :int32, :long, :int32, :int32, :int32, :int32, :int32, :int32, :int32, :int32], :int32
+      JNI.load_native_method "Java_org_eclipse_swt_internal_gdip_Gdip_Graphics_1DrawImage__IIL#{Rect.jni_package_name}_Rect_2IIIIIIII".to_sym, [:pointer, :long, :int32, :int32, :long, :int32, :int32, :int32, :int32, :int32, :int32, :int32, :int32], :int32
       typesig { [::Java::Int, ::Java::Int, Rect, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int] }
       # @method flags=cpp
       # @param graphics cast=(Graphics *)
@@ -872,7 +872,7 @@ module Org::Eclipse::Swt::Internal::Gdip
       # long
       # long
       def _graphics_draw_image(graphics, image, dest_rect, srcx, srcy, srcwidth, srcheight, src_unit, image_attributes, callback, callback_data)
-        JNI.call_native_method("Java_org_eclipse_swt_internal_gdip_Gdip_Graphics_1DrawImage__IIL#{Rect.jni_name}_2IIIIIIII".to_sym, JNI.env, self.jni_id, graphics.to_int, image.to_int, dest_rect.jni_id, srcx.to_int, srcy.to_int, srcwidth.to_int, srcheight.to_int, src_unit.to_int, image_attributes.to_int, callback.to_int, callback_data.to_int)
+        JNI.call_native_method("Java_org_eclipse_swt_internal_gdip_Gdip_Graphics_1DrawImage__IIL#{Rect.jni_package_name}_Rect_2IIIIIIII".to_sym, JNI.env, self.jni_id, graphics.to_int, image.to_int, dest_rect.jni_id, srcx.to_int, srcy.to_int, srcwidth.to_int, srcheight.to_int, src_unit.to_int, image_attributes.to_int, callback.to_int, callback_data.to_int)
       end
       
       JNI.load_native_method :Java_org_eclipse_swt_internal_gdip_Gdip_Graphics_1DrawLine, [:pointer, :long, :int32, :int32, :int32, :int32, :int32, :int32], :int32
@@ -939,7 +939,7 @@ module Org::Eclipse::Swt::Internal::Gdip
         JNI.call_native_method(:Java_org_eclipse_swt_internal_gdip_Gdip_Graphics_1DrawRectangle, JNI.env, self.jni_id, graphics.to_int, pen.to_int, x.to_int, y.to_int, width.to_int, height.to_int)
       end
       
-      JNI.load_native_method "Java_org_eclipse_swt_internal_gdip_Gdip_Graphics_1DrawString__I_3CIIL#{PointF.jni_name}_2I".to_sym, [:pointer, :long, :int32, :long, :int32, :int32, :long, :int32], :int32
+      JNI.load_native_method "Java_org_eclipse_swt_internal_gdip_Gdip_Graphics_1DrawString__I_3CIIL#{PointF.jni_package_name}_PointF_2I".to_sym, [:pointer, :long, :int32, :long, :int32, :int32, :long, :int32], :int32
       typesig { [::Java::Int, Array.typed(::Java::Char), ::Java::Int, ::Java::Int, PointF, ::Java::Int] }
       # @method flags=cpp
       # @param graphics cast=(Graphics *)
@@ -953,10 +953,10 @@ module Org::Eclipse::Swt::Internal::Gdip
       # long
       # long
       def _graphics_draw_string(graphics, string, length, font, origin, brush)
-        JNI.call_native_method("Java_org_eclipse_swt_internal_gdip_Gdip_Graphics_1DrawString__I_3CIIL#{PointF.jni_name}_2I".to_sym, JNI.env, self.jni_id, graphics.to_int, string.jni_id, length.to_int, font.to_int, origin.jni_id, brush.to_int)
+        JNI.call_native_method("Java_org_eclipse_swt_internal_gdip_Gdip_Graphics_1DrawString__I_3CIIL#{PointF.jni_package_name}_PointF_2I".to_sym, JNI.env, self.jni_id, graphics.to_int, string.jni_id, length.to_int, font.to_int, origin.jni_id, brush.to_int)
       end
       
-      JNI.load_native_method "Java_org_eclipse_swt_internal_gdip_Gdip_Graphics_1DrawString__I_3CIIL#{PointF.jni_name}_2II".to_sym, [:pointer, :long, :int32, :long, :int32, :int32, :long, :int32, :int32], :int32
+      JNI.load_native_method "Java_org_eclipse_swt_internal_gdip_Gdip_Graphics_1DrawString__I_3CIIL#{PointF.jni_package_name}_PointF_2II".to_sym, [:pointer, :long, :int32, :long, :int32, :int32, :long, :int32, :int32], :int32
       typesig { [::Java::Int, Array.typed(::Java::Char), ::Java::Int, ::Java::Int, PointF, ::Java::Int, ::Java::Int] }
       # @method flags=cpp
       # @param graphics cast=(Graphics *)
@@ -972,7 +972,7 @@ module Org::Eclipse::Swt::Internal::Gdip
       # long
       # long
       def _graphics_draw_string(graphics, string, length, font, origin, format, brush)
-        JNI.call_native_method("Java_org_eclipse_swt_internal_gdip_Gdip_Graphics_1DrawString__I_3CIIL#{PointF.jni_name}_2II".to_sym, JNI.env, self.jni_id, graphics.to_int, string.jni_id, length.to_int, font.to_int, origin.jni_id, format.to_int, brush.to_int)
+        JNI.call_native_method("Java_org_eclipse_swt_internal_gdip_Gdip_Graphics_1DrawString__I_3CIIL#{PointF.jni_package_name}_PointF_2II".to_sym, JNI.env, self.jni_id, graphics.to_int, string.jni_id, length.to_int, font.to_int, origin.jni_id, format.to_int, brush.to_int)
       end
       
       JNI.load_native_method :Java_org_eclipse_swt_internal_gdip_Gdip_Graphics_1FillEllipse, [:pointer, :long, :int32, :int32, :int32, :int32, :int32, :int32], :int32
@@ -1065,24 +1065,24 @@ module Org::Eclipse::Swt::Internal::Gdip
         JNI.call_native_method(:Java_org_eclipse_swt_internal_gdip_Gdip_Graphics_1FillRectangle, JNI.env, self.jni_id, graphics.to_int, brush.to_int, x.to_int, y.to_int, width.to_int, height.to_int)
       end
       
-      JNI.load_native_method "Java_org_eclipse_swt_internal_gdip_Gdip_Graphics_1GetClipBounds__IL#{RectF.jni_name}_2".to_sym, [:pointer, :long, :int32, :long], :int32
+      JNI.load_native_method "Java_org_eclipse_swt_internal_gdip_Gdip_Graphics_1GetClipBounds__IL#{RectF.jni_package_name}_RectF_2".to_sym, [:pointer, :long, :int32, :long], :int32
       typesig { [::Java::Int, RectF] }
       # @method flags=cpp
       # @param graphics cast=(Graphics *)
       # 
       # long
       def _graphics_get_clip_bounds(graphics, rect)
-        JNI.call_native_method("Java_org_eclipse_swt_internal_gdip_Gdip_Graphics_1GetClipBounds__IL#{RectF.jni_name}_2".to_sym, JNI.env, self.jni_id, graphics.to_int, rect.jni_id)
+        JNI.call_native_method("Java_org_eclipse_swt_internal_gdip_Gdip_Graphics_1GetClipBounds__IL#{RectF.jni_package_name}_RectF_2".to_sym, JNI.env, self.jni_id, graphics.to_int, rect.jni_id)
       end
       
-      JNI.load_native_method "Java_org_eclipse_swt_internal_gdip_Gdip_Graphics_1GetClipBounds__IL#{Rect.jni_name}_2".to_sym, [:pointer, :long, :int32, :long], :int32
+      JNI.load_native_method "Java_org_eclipse_swt_internal_gdip_Gdip_Graphics_1GetClipBounds__IL#{Rect.jni_package_name}_Rect_2".to_sym, [:pointer, :long, :int32, :long], :int32
       typesig { [::Java::Int, Rect] }
       # @method flags=cpp
       # @param graphics cast=(Graphics *)
       # 
       # long
       def _graphics_get_clip_bounds(graphics, rect)
-        JNI.call_native_method("Java_org_eclipse_swt_internal_gdip_Gdip_Graphics_1GetClipBounds__IL#{Rect.jni_name}_2".to_sym, JNI.env, self.jni_id, graphics.to_int, rect.jni_id)
+        JNI.call_native_method("Java_org_eclipse_swt_internal_gdip_Gdip_Graphics_1GetClipBounds__IL#{Rect.jni_package_name}_Rect_2".to_sym, JNI.env, self.jni_id, graphics.to_int, rect.jni_id)
       end
       
       JNI.load_native_method :Java_org_eclipse_swt_internal_gdip_Gdip_Graphics_1GetClip, [:pointer, :long, :int32, :int32], :int32
@@ -1183,7 +1183,7 @@ module Org::Eclipse::Swt::Internal::Gdip
         JNI.call_native_method(:Java_org_eclipse_swt_internal_gdip_Gdip_Graphics_1MeasureDriverString, JNI.env, self.jni_id, graphics.to_int, text.to_int, length.to_int, font.to_int, positions.jni_id, flags.to_int, matrix.to_int, bounding_box.jni_id)
       end
       
-      JNI.load_native_method "Java_org_eclipse_swt_internal_gdip_Gdip_Graphics_1MeasureString__I_3CIIL#{PointF.jni_name}_2L#{RectF.jni_name}_2".to_sym, [:pointer, :long, :int32, :long, :int32, :int32, :long, :long], :int32
+      JNI.load_native_method "Java_org_eclipse_swt_internal_gdip_Gdip_Graphics_1MeasureString__I_3CIIL#{PointF.jni_package_name}_PointF_2L#{RectF.jni_package_name}_RectF_2".to_sym, [:pointer, :long, :int32, :long, :int32, :int32, :long, :long], :int32
       typesig { [::Java::Int, Array.typed(::Java::Char), ::Java::Int, ::Java::Int, PointF, RectF] }
       # @method flags=cpp
       # @param graphics cast=(Graphics *)
@@ -1196,10 +1196,10 @@ module Org::Eclipse::Swt::Internal::Gdip
       # long
       # long
       def _graphics_measure_string(graphics, string, length, font, origin, bounding_box)
-        JNI.call_native_method("Java_org_eclipse_swt_internal_gdip_Gdip_Graphics_1MeasureString__I_3CIIL#{PointF.jni_name}_2L#{RectF.jni_name}_2".to_sym, JNI.env, self.jni_id, graphics.to_int, string.jni_id, length.to_int, font.to_int, origin.jni_id, bounding_box.jni_id)
+        JNI.call_native_method("Java_org_eclipse_swt_internal_gdip_Gdip_Graphics_1MeasureString__I_3CIIL#{PointF.jni_package_name}_PointF_2L#{RectF.jni_package_name}_RectF_2".to_sym, JNI.env, self.jni_id, graphics.to_int, string.jni_id, length.to_int, font.to_int, origin.jni_id, bounding_box.jni_id)
       end
       
-      JNI.load_native_method "Java_org_eclipse_swt_internal_gdip_Gdip_Graphics_1MeasureString__I_3CIIL#{PointF.jni_name}_2IL#{RectF.jni_name}_2".to_sym, [:pointer, :long, :int32, :long, :int32, :int32, :long, :int32, :long], :int32
+      JNI.load_native_method "Java_org_eclipse_swt_internal_gdip_Gdip_Graphics_1MeasureString__I_3CIIL#{PointF.jni_package_name}_PointF_2IL#{RectF.jni_package_name}_RectF_2".to_sym, [:pointer, :long, :int32, :long, :int32, :int32, :long, :int32, :long], :int32
       typesig { [::Java::Int, Array.typed(::Java::Char), ::Java::Int, ::Java::Int, PointF, ::Java::Int, RectF] }
       # @method flags=cpp
       # @param graphics cast=(Graphics *)
@@ -1213,7 +1213,7 @@ module Org::Eclipse::Swt::Internal::Gdip
       # long
       # long
       def _graphics_measure_string(graphics, string, length, font, origin, format, bounding_box)
-        JNI.call_native_method("Java_org_eclipse_swt_internal_gdip_Gdip_Graphics_1MeasureString__I_3CIIL#{PointF.jni_name}_2IL#{RectF.jni_name}_2".to_sym, JNI.env, self.jni_id, graphics.to_int, string.jni_id, length.to_int, font.to_int, origin.jni_id, format.to_int, bounding_box.jni_id)
+        JNI.call_native_method("Java_org_eclipse_swt_internal_gdip_Gdip_Graphics_1MeasureString__I_3CIIL#{PointF.jni_package_name}_PointF_2IL#{RectF.jni_package_name}_RectF_2".to_sym, JNI.env, self.jni_id, graphics.to_int, string.jni_id, length.to_int, font.to_int, origin.jni_id, format.to_int, bounding_box.jni_id)
       end
       
       JNI.load_native_method :Java_org_eclipse_swt_internal_gdip_Gdip_Graphics_1ResetClip, [:pointer, :long, :int32], :int32
@@ -1271,7 +1271,7 @@ module Org::Eclipse::Swt::Internal::Gdip
         JNI.call_native_method(:Java_org_eclipse_swt_internal_gdip_Gdip_Graphics_1SetClip__III, JNI.env, self.jni_id, graphics.to_int, hrgn.to_int, combine_mode.to_int)
       end
       
-      JNI.load_native_method "Java_org_eclipse_swt_internal_gdip_Gdip_Graphics_1SetClip__IL#{Rect.jni_name}_2I".to_sym, [:pointer, :long, :int32, :long, :int32], :int32
+      JNI.load_native_method "Java_org_eclipse_swt_internal_gdip_Gdip_Graphics_1SetClip__IL#{Rect.jni_package_name}_Rect_2I".to_sym, [:pointer, :long, :int32, :long, :int32], :int32
       typesig { [::Java::Int, Rect, ::Java::Int] }
       # @method flags=cpp
       # @param graphics cast=(Graphics *)
@@ -1280,7 +1280,7 @@ module Org::Eclipse::Swt::Internal::Gdip
       # 
       # long
       def _graphics_set_clip(graphics, rect, combine_mode)
-        JNI.call_native_method("Java_org_eclipse_swt_internal_gdip_Gdip_Graphics_1SetClip__IL#{Rect.jni_name}_2I".to_sym, JNI.env, self.jni_id, graphics.to_int, rect.jni_id, combine_mode.to_int)
+        JNI.call_native_method("Java_org_eclipse_swt_internal_gdip_Gdip_Graphics_1SetClip__IL#{Rect.jni_package_name}_Rect_2I".to_sym, JNI.env, self.jni_id, graphics.to_int, rect.jni_id, combine_mode.to_int)
       end
       
       JNI.load_native_method :Java_org_eclipse_swt_internal_gdip_Gdip_Graphics_1SetClipPath__II, [:pointer, :long, :int32, :int32], :int32
@@ -1973,14 +1973,14 @@ module Org::Eclipse::Swt::Internal::Gdip
         JNI.call_native_method(:Java_org_eclipse_swt_internal_gdip_Gdip_Matrix_1Shear, JNI.env, self.jni_id, matrix.to_int, shear_x, shear_y, order.to_int)
       end
       
-      JNI.load_native_method "Java_org_eclipse_swt_internal_gdip_Gdip_Matrix_1TransformPoints__IL#{PointF.jni_name}_2I".to_sym, [:pointer, :long, :int32, :long, :int32], :int32
+      JNI.load_native_method "Java_org_eclipse_swt_internal_gdip_Gdip_Matrix_1TransformPoints__IL#{PointF.jni_package_name}_PointF_2I".to_sym, [:pointer, :long, :int32, :long, :int32], :int32
       typesig { [::Java::Int, PointF, ::Java::Int] }
       # @method flags=cpp
       # @param matrix cast=(Matrix *)
       # 
       # long
       def _matrix_transform_points(matrix, pts, count)
-        JNI.call_native_method("Java_org_eclipse_swt_internal_gdip_Gdip_Matrix_1TransformPoints__IL#{PointF.jni_name}_2I".to_sym, JNI.env, self.jni_id, matrix.to_int, pts.jni_id, count.to_int)
+        JNI.call_native_method("Java_org_eclipse_swt_internal_gdip_Gdip_Matrix_1TransformPoints__IL#{PointF.jni_package_name}_PointF_2I".to_sym, JNI.env, self.jni_id, matrix.to_int, pts.jni_id, count.to_int)
       end
       
       JNI.load_native_method :Java_org_eclipse_swt_internal_gdip_Gdip_Matrix_1TransformPoints__I_3XfloatXI, [:pointer, :long, :int32, :long, :int32], :int32
@@ -2030,24 +2030,24 @@ module Org::Eclipse::Swt::Internal::Gdip
         JNI.call_native_method(:Java_org_eclipse_swt_internal_gdip_Gdip_Matrix_1SetElements, JNI.env, self.jni_id, matrix.to_int, m11, m12, m21, m22, dx, dy)
       end
       
-      JNI.load_native_method "Java_org_eclipse_swt_internal_gdip_Gdip_MoveMemory__L#{ColorPalette.jni_name}_2II".to_sym, [:pointer, :long, :long, :int32, :int32], :void
+      JNI.load_native_method "Java_org_eclipse_swt_internal_gdip_Gdip_MoveMemory__L#{ColorPalette.jni_package_name}_ColorPalette_2II".to_sym, [:pointer, :long, :long, :int32, :int32], :void
       typesig { [ColorPalette, ::Java::Int, ::Java::Int] }
       # @param Destination cast=(PVOID)
       # @param SourcePtr cast=(CONST VOID*)
       # 
       # long
       def _move_memory(destination, source_ptr, length)
-        JNI.call_native_method("Java_org_eclipse_swt_internal_gdip_Gdip_MoveMemory__L#{ColorPalette.jni_name}_2II".to_sym, JNI.env, self.jni_id, destination.jni_id, source_ptr.to_int, length.to_int)
+        JNI.call_native_method("Java_org_eclipse_swt_internal_gdip_Gdip_MoveMemory__L#{ColorPalette.jni_package_name}_ColorPalette_2II".to_sym, JNI.env, self.jni_id, destination.jni_id, source_ptr.to_int, length.to_int)
       end
       
-      JNI.load_native_method "Java_org_eclipse_swt_internal_gdip_Gdip_MoveMemory__L#{BitmapData.jni_name}_2I".to_sym, [:pointer, :long, :long, :int32], :void
+      JNI.load_native_method "Java_org_eclipse_swt_internal_gdip_Gdip_MoveMemory__L#{BitmapData.jni_package_name}_BitmapData_2I".to_sym, [:pointer, :long, :long, :int32], :void
       typesig { [BitmapData, ::Java::Int] }
       # @param Destination cast=(PVOID)
       # @param SourcePtr cast=(CONST VOID*)
       # 
       # long
       def _move_memory(destination, source_ptr)
-        JNI.call_native_method("Java_org_eclipse_swt_internal_gdip_Gdip_MoveMemory__L#{BitmapData.jni_name}_2I".to_sym, JNI.env, self.jni_id, destination.jni_id, source_ptr.to_int)
+        JNI.call_native_method("Java_org_eclipse_swt_internal_gdip_Gdip_MoveMemory__L#{BitmapData.jni_package_name}_BitmapData_2I".to_sym, JNI.env, self.jni_id, destination.jni_id, source_ptr.to_int)
       end
       
       JNI.load_native_method :Java_org_eclipse_swt_internal_gdip_Gdip_PathGradientBrush_1new, [:pointer, :long, :int32], :int32

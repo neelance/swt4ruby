@@ -3103,7 +3103,7 @@ module Org::Eclipse::Swt::Internal::Gtk
         end
       end
       
-      JNI.load_native_method "Java_org_eclipse_swt_internal_gtk_OS_memmove__JL#{XButtonEvent.jni_name}_2J".to_sym, [:pointer, :long, :int64, :long, :int64], :void
+      JNI.load_native_method "Java_org_eclipse_swt_internal_gtk_OS_memmove__JL#{XButtonEvent.jni_package_name}_XButtonEvent_2J".to_sym, [:pointer, :long, :int64, :long, :int64], :void
       typesig { [::Java::Long, XButtonEvent, ::Java::Long] }
       # @param dest cast=(void *)
       # @param src cast=(const void *),flags=no_out
@@ -3112,10 +3112,10 @@ module Org::Eclipse::Swt::Internal::Gtk
       # int
       # int
       def memmove(dest, src, size)
-        JNI.call_native_method("Java_org_eclipse_swt_internal_gtk_OS_memmove__JL#{XButtonEvent.jni_name}_2J".to_sym, JNI.env, self.jni_id, dest.to_int, src.jni_id, size.to_int)
+        JNI.call_native_method("Java_org_eclipse_swt_internal_gtk_OS_memmove__JL#{XButtonEvent.jni_package_name}_XButtonEvent_2J".to_sym, JNI.env, self.jni_id, dest.to_int, src.jni_id, size.to_int)
       end
       
-      JNI.load_native_method "Java_org_eclipse_swt_internal_gtk_OS_memmove__JL#{XClientMessageEvent.jni_name}_2J".to_sym, [:pointer, :long, :int64, :long, :int64], :void
+      JNI.load_native_method "Java_org_eclipse_swt_internal_gtk_OS_memmove__JL#{XClientMessageEvent.jni_package_name}_XClientMessageEvent_2J".to_sym, [:pointer, :long, :int64, :long, :int64], :void
       typesig { [::Java::Long, XClientMessageEvent, ::Java::Long] }
       # @param dest cast=(void *)
       # @param src cast=(const void *),flags=no_out
@@ -3124,10 +3124,10 @@ module Org::Eclipse::Swt::Internal::Gtk
       # int
       # int
       def memmove(dest, src, size)
-        JNI.call_native_method("Java_org_eclipse_swt_internal_gtk_OS_memmove__JL#{XClientMessageEvent.jni_name}_2J".to_sym, JNI.env, self.jni_id, dest.to_int, src.jni_id, size.to_int)
+        JNI.call_native_method("Java_org_eclipse_swt_internal_gtk_OS_memmove__JL#{XClientMessageEvent.jni_package_name}_XClientMessageEvent_2J".to_sym, JNI.env, self.jni_id, dest.to_int, src.jni_id, size.to_int)
       end
       
-      JNI.load_native_method "Java_org_eclipse_swt_internal_gtk_OS_memmove__JL#{XCrossingEvent.jni_name}_2J".to_sym, [:pointer, :long, :int64, :long, :int64], :void
+      JNI.load_native_method "Java_org_eclipse_swt_internal_gtk_OS_memmove__JL#{XCrossingEvent.jni_package_name}_XCrossingEvent_2J".to_sym, [:pointer, :long, :int64, :long, :int64], :void
       typesig { [::Java::Long, XCrossingEvent, ::Java::Long] }
       # @param dest cast=(void *)
       # @param src cast=(const void *),flags=no_out
@@ -3136,10 +3136,10 @@ module Org::Eclipse::Swt::Internal::Gtk
       # int
       # int
       def memmove(dest, src, size)
-        JNI.call_native_method("Java_org_eclipse_swt_internal_gtk_OS_memmove__JL#{XCrossingEvent.jni_name}_2J".to_sym, JNI.env, self.jni_id, dest.to_int, src.jni_id, size.to_int)
+        JNI.call_native_method("Java_org_eclipse_swt_internal_gtk_OS_memmove__JL#{XCrossingEvent.jni_package_name}_XCrossingEvent_2J".to_sym, JNI.env, self.jni_id, dest.to_int, src.jni_id, size.to_int)
       end
       
-      JNI.load_native_method "Java_org_eclipse_swt_internal_gtk_OS_memmove__JL#{XExposeEvent.jni_name}_2J".to_sym, [:pointer, :long, :int64, :long, :int64], :void
+      JNI.load_native_method "Java_org_eclipse_swt_internal_gtk_OS_memmove__JL#{XExposeEvent.jni_package_name}_XExposeEvent_2J".to_sym, [:pointer, :long, :int64, :long, :int64], :void
       typesig { [::Java::Long, XExposeEvent, ::Java::Long] }
       # @param dest cast=(void *)
       # @param src cast=(const void *),flags=no_out
@@ -3148,10 +3148,10 @@ module Org::Eclipse::Swt::Internal::Gtk
       # int
       # int
       def memmove(dest, src, size)
-        JNI.call_native_method("Java_org_eclipse_swt_internal_gtk_OS_memmove__JL#{XExposeEvent.jni_name}_2J".to_sym, JNI.env, self.jni_id, dest.to_int, src.jni_id, size.to_int)
+        JNI.call_native_method("Java_org_eclipse_swt_internal_gtk_OS_memmove__JL#{XExposeEvent.jni_package_name}_XExposeEvent_2J".to_sym, JNI.env, self.jni_id, dest.to_int, src.jni_id, size.to_int)
       end
       
-      JNI.load_native_method "Java_org_eclipse_swt_internal_gtk_OS_memmove__JL#{XFocusChangeEvent.jni_name}_2J".to_sym, [:pointer, :long, :int64, :long, :int64], :void
+      JNI.load_native_method "Java_org_eclipse_swt_internal_gtk_OS_memmove__JL#{XFocusChangeEvent.jni_package_name}_XFocusChangeEvent_2J".to_sym, [:pointer, :long, :int64, :long, :int64], :void
       typesig { [::Java::Long, XFocusChangeEvent, ::Java::Long] }
       # @param dest cast=(void *)
       # @param src cast=(const void *),flags=no_out
@@ -3160,10 +3160,10 @@ module Org::Eclipse::Swt::Internal::Gtk
       # int
       # int
       def memmove(dest, src, size)
-        JNI.call_native_method("Java_org_eclipse_swt_internal_gtk_OS_memmove__JL#{XFocusChangeEvent.jni_name}_2J".to_sym, JNI.env, self.jni_id, dest.to_int, src.jni_id, size.to_int)
+        JNI.call_native_method("Java_org_eclipse_swt_internal_gtk_OS_memmove__JL#{XFocusChangeEvent.jni_package_name}_XFocusChangeEvent_2J".to_sym, JNI.env, self.jni_id, dest.to_int, src.jni_id, size.to_int)
       end
       
-      JNI.load_native_method "Java_org_eclipse_swt_internal_gtk_OS_memmove__L#{XButtonEvent.jni_name}_2JJ".to_sym, [:pointer, :long, :long, :int64, :int64], :void
+      JNI.load_native_method "Java_org_eclipse_swt_internal_gtk_OS_memmove__L#{XButtonEvent.jni_package_name}_XButtonEvent_2JJ".to_sym, [:pointer, :long, :long, :int64, :int64], :void
       typesig { [XButtonEvent, ::Java::Long, ::Java::Long] }
       # @param dest cast=(void *),flags=no_in
       # @param src cast=(const void *)
@@ -3172,10 +3172,10 @@ module Org::Eclipse::Swt::Internal::Gtk
       # int
       # int
       def memmove(dest, src, size)
-        JNI.call_native_method("Java_org_eclipse_swt_internal_gtk_OS_memmove__L#{XButtonEvent.jni_name}_2JJ".to_sym, JNI.env, self.jni_id, dest.jni_id, src.to_int, size.to_int)
+        JNI.call_native_method("Java_org_eclipse_swt_internal_gtk_OS_memmove__L#{XButtonEvent.jni_package_name}_XButtonEvent_2JJ".to_sym, JNI.env, self.jni_id, dest.jni_id, src.to_int, size.to_int)
       end
       
-      JNI.load_native_method "Java_org_eclipse_swt_internal_gtk_OS_memmove__L#{XCrossingEvent.jni_name}_2JJ".to_sym, [:pointer, :long, :long, :int64, :int64], :void
+      JNI.load_native_method "Java_org_eclipse_swt_internal_gtk_OS_memmove__L#{XCrossingEvent.jni_package_name}_XCrossingEvent_2JJ".to_sym, [:pointer, :long, :long, :int64, :int64], :void
       typesig { [XCrossingEvent, ::Java::Long, ::Java::Long] }
       # @param dest cast=(void *),flags=no_in
       # @param src cast=(const void *)
@@ -3184,10 +3184,10 @@ module Org::Eclipse::Swt::Internal::Gtk
       # int
       # int
       def memmove(dest, src, size)
-        JNI.call_native_method("Java_org_eclipse_swt_internal_gtk_OS_memmove__L#{XCrossingEvent.jni_name}_2JJ".to_sym, JNI.env, self.jni_id, dest.jni_id, src.to_int, size.to_int)
+        JNI.call_native_method("Java_org_eclipse_swt_internal_gtk_OS_memmove__L#{XCrossingEvent.jni_package_name}_XCrossingEvent_2JJ".to_sym, JNI.env, self.jni_id, dest.jni_id, src.to_int, size.to_int)
       end
       
-      JNI.load_native_method "Java_org_eclipse_swt_internal_gtk_OS_memmove__L#{XExposeEvent.jni_name}_2JJ".to_sym, [:pointer, :long, :long, :int64, :int64], :void
+      JNI.load_native_method "Java_org_eclipse_swt_internal_gtk_OS_memmove__L#{XExposeEvent.jni_package_name}_XExposeEvent_2JJ".to_sym, [:pointer, :long, :long, :int64, :int64], :void
       typesig { [XExposeEvent, ::Java::Long, ::Java::Long] }
       # @param dest cast=(void *),flags=no_in
       # @param src cast=(const void *)
@@ -3196,10 +3196,10 @@ module Org::Eclipse::Swt::Internal::Gtk
       # int
       # int
       def memmove(dest, src, size)
-        JNI.call_native_method("Java_org_eclipse_swt_internal_gtk_OS_memmove__L#{XExposeEvent.jni_name}_2JJ".to_sym, JNI.env, self.jni_id, dest.jni_id, src.to_int, size.to_int)
+        JNI.call_native_method("Java_org_eclipse_swt_internal_gtk_OS_memmove__L#{XExposeEvent.jni_package_name}_XExposeEvent_2JJ".to_sym, JNI.env, self.jni_id, dest.jni_id, src.to_int, size.to_int)
       end
       
-      JNI.load_native_method "Java_org_eclipse_swt_internal_gtk_OS_memmove__L#{XFocusChangeEvent.jni_name}_2JJ".to_sym, [:pointer, :long, :long, :int64, :int64], :void
+      JNI.load_native_method "Java_org_eclipse_swt_internal_gtk_OS_memmove__L#{XFocusChangeEvent.jni_package_name}_XFocusChangeEvent_2JJ".to_sym, [:pointer, :long, :long, :int64, :int64], :void
       typesig { [XFocusChangeEvent, ::Java::Long, ::Java::Long] }
       # @param dest cast=(void *),flags=no_in
       # @param src cast=(const void *)
@@ -3208,10 +3208,10 @@ module Org::Eclipse::Swt::Internal::Gtk
       # int
       # int
       def memmove(dest, src, size)
-        JNI.call_native_method("Java_org_eclipse_swt_internal_gtk_OS_memmove__L#{XFocusChangeEvent.jni_name}_2JJ".to_sym, JNI.env, self.jni_id, dest.jni_id, src.to_int, size.to_int)
+        JNI.call_native_method("Java_org_eclipse_swt_internal_gtk_OS_memmove__L#{XFocusChangeEvent.jni_package_name}_XFocusChangeEvent_2JJ".to_sym, JNI.env, self.jni_id, dest.jni_id, src.to_int, size.to_int)
       end
       
-      JNI.load_native_method "Java_org_eclipse_swt_internal_gtk_OS_memmove__L#{XVisibilityEvent.jni_name}_2JJ".to_sym, [:pointer, :long, :long, :int64, :int64], :void
+      JNI.load_native_method "Java_org_eclipse_swt_internal_gtk_OS_memmove__L#{XVisibilityEvent.jni_package_name}_XVisibilityEvent_2JJ".to_sym, [:pointer, :long, :long, :int64, :int64], :void
       typesig { [XVisibilityEvent, ::Java::Long, ::Java::Long] }
       # @param dest cast=(void *),flags=no_in
       # @param src cast=(const void *)
@@ -3220,7 +3220,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       # int
       # int
       def memmove(dest, src, size)
-        JNI.call_native_method("Java_org_eclipse_swt_internal_gtk_OS_memmove__L#{XVisibilityEvent.jni_name}_2JJ".to_sym, JNI.env, self.jni_id, dest.jni_id, src.to_int, size.to_int)
+        JNI.call_native_method("Java_org_eclipse_swt_internal_gtk_OS_memmove__L#{XVisibilityEvent.jni_package_name}_XVisibilityEvent_2JJ".to_sym, JNI.env, self.jni_id, dest.jni_id, src.to_int, size.to_int)
       end
       
       # X render natives and constants
@@ -5381,7 +5381,7 @@ module Org::Eclipse::Swt::Internal::Gtk
         end
       end
       
-      JNI.load_native_method "Java_org_eclipse_swt_internal_gtk_OS__1g_1object_1set__J_3BL#{GdkColor.jni_name}_2J".to_sym, [:pointer, :long, :int64, :long, :long, :int64], :void
+      JNI.load_native_method "Java_org_eclipse_swt_internal_gtk_OS__1g_1object_1set__J_3BL#{GdkColor.jni_package_name}_GdkColor_2J".to_sym, [:pointer, :long, :int64, :long, :long, :int64], :void
       typesig { [::Java::Long, Array.typed(::Java::Byte), GdkColor, ::Java::Long] }
       # @param object cast=(gpointer)
       # @param first_property_name cast=(const gchar *)
@@ -5390,7 +5390,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       # int
       # int
       def __g_object_set(object, first_property_name, data, terminator)
-        JNI.call_native_method("Java_org_eclipse_swt_internal_gtk_OS__1g_1object_1set__J_3BL#{GdkColor.jni_name}_2J".to_sym, JNI.env, self.jni_id, object.to_int, first_property_name.jni_id, data.jni_id, terminator.to_int)
+        JNI.call_native_method("Java_org_eclipse_swt_internal_gtk_OS__1g_1object_1set__J_3BL#{GdkColor.jni_package_name}_GdkColor_2J".to_sym, JNI.env, self.jni_id, object.to_int, first_property_name.jni_id, data.jni_id, terminator.to_int)
       end
       
       typesig { [::Java::Long, Array.typed(::Java::Byte), GdkColor, ::Java::Long] }
@@ -14748,7 +14748,7 @@ module Org::Eclipse::Swt::Internal::Gtk
         end
       end
       
-      JNI.load_native_method "Java_org_eclipse_swt_internal_gtk_OS__1gtk_1list_1store_1set__JJIL#{GdkColor.jni_name}_2J".to_sym, [:pointer, :long, :int64, :int64, :int32, :long, :int64], :void
+      JNI.load_native_method "Java_org_eclipse_swt_internal_gtk_OS__1gtk_1list_1store_1set__JJIL#{GdkColor.jni_package_name}_GdkColor_2J".to_sym, [:pointer, :long, :int64, :int64, :int32, :long, :int64], :void
       typesig { [::Java::Long, ::Java::Long, ::Java::Int, GdkColor, ::Java::Long] }
       # @param store cast=(GtkListStore *)
       # @param iter cast=(GtkTreeIter *)
@@ -14758,7 +14758,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       # int
       # int
       def __gtk_list_store_set(store, iter, column, value, terminator)
-        JNI.call_native_method("Java_org_eclipse_swt_internal_gtk_OS__1gtk_1list_1store_1set__JJIL#{GdkColor.jni_name}_2J".to_sym, JNI.env, self.jni_id, store.to_int, iter.to_int, column.to_int, value.jni_id, terminator.to_int)
+        JNI.call_native_method("Java_org_eclipse_swt_internal_gtk_OS__1gtk_1list_1store_1set__JJIL#{GdkColor.jni_package_name}_GdkColor_2J".to_sym, JNI.env, self.jni_id, store.to_int, iter.to_int, column.to_int, value.jni_id, terminator.to_int)
       end
       
       typesig { [::Java::Long, ::Java::Long, ::Java::Int, GdkColor, ::Java::Long] }
@@ -21048,7 +21048,7 @@ module Org::Eclipse::Swt::Internal::Gtk
         end
       end
       
-      JNI.load_native_method "Java_org_eclipse_swt_internal_gtk_OS__1gtk_1tree_1store_1set__JJIL#{GdkColor.jni_name}_2J".to_sym, [:pointer, :long, :int64, :int64, :int32, :long, :int64], :void
+      JNI.load_native_method "Java_org_eclipse_swt_internal_gtk_OS__1gtk_1tree_1store_1set__JJIL#{GdkColor.jni_package_name}_GdkColor_2J".to_sym, [:pointer, :long, :int64, :int64, :int32, :long, :int64], :void
       typesig { [::Java::Long, ::Java::Long, ::Java::Int, GdkColor, ::Java::Long] }
       # @param store cast=(GtkTreeStore *)
       # @param iter cast=(GtkTreeIter *)
@@ -21058,7 +21058,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       # int
       # int
       def __gtk_tree_store_set(store, iter, column, value, terminator)
-        JNI.call_native_method("Java_org_eclipse_swt_internal_gtk_OS__1gtk_1tree_1store_1set__JJIL#{GdkColor.jni_name}_2J".to_sym, JNI.env, self.jni_id, store.to_int, iter.to_int, column.to_int, value.jni_id, terminator.to_int)
+        JNI.call_native_method("Java_org_eclipse_swt_internal_gtk_OS__1gtk_1tree_1store_1set__JJIL#{GdkColor.jni_package_name}_GdkColor_2J".to_sym, JNI.env, self.jni_id, store.to_int, iter.to_int, column.to_int, value.jni_id, terminator.to_int)
       end
       
       typesig { [::Java::Long, ::Java::Long, ::Java::Int, GdkColor, ::Java::Long] }
@@ -24607,7 +24607,7 @@ module Org::Eclipse::Swt::Internal::Gtk
         end
       end
       
-      JNI.load_native_method "Java_org_eclipse_swt_internal_gtk_OS_memmove__JL#{GInterfaceInfo.jni_name}_2I".to_sym, [:pointer, :long, :int64, :long, :int32], :void
+      JNI.load_native_method "Java_org_eclipse_swt_internal_gtk_OS_memmove__JL#{GInterfaceInfo.jni_package_name}_GInterfaceInfo_2I".to_sym, [:pointer, :long, :int64, :long, :int32], :void
       typesig { [::Java::Long, GInterfaceInfo, ::Java::Int] }
       # @param dest cast=(void *)
       # @param src cast=(const void *),flags=no_out
@@ -24615,20 +24615,20 @@ module Org::Eclipse::Swt::Internal::Gtk
       # 
       # int
       def memmove(dest, src, size)
-        JNI.call_native_method("Java_org_eclipse_swt_internal_gtk_OS_memmove__JL#{GInterfaceInfo.jni_name}_2I".to_sym, JNI.env, self.jni_id, dest.to_int, src.jni_id, size.to_int)
+        JNI.call_native_method("Java_org_eclipse_swt_internal_gtk_OS_memmove__JL#{GInterfaceInfo.jni_package_name}_GInterfaceInfo_2I".to_sym, JNI.env, self.jni_id, dest.to_int, src.jni_id, size.to_int)
       end
       
-      JNI.load_native_method "Java_org_eclipse_swt_internal_gtk_OS_memmove__JL#{GObjectClass.jni_name}_2".to_sym, [:pointer, :long, :int64, :long], :void
+      JNI.load_native_method "Java_org_eclipse_swt_internal_gtk_OS_memmove__JL#{GObjectClass.jni_package_name}_GObjectClass_2".to_sym, [:pointer, :long, :int64, :long], :void
       typesig { [::Java::Long, GObjectClass] }
       # @param dest cast=(void *),flags=no_in
       # @param src cast=(const void *),flags=no_out
       # 
       # int
       def memmove(dest, src)
-        JNI.call_native_method("Java_org_eclipse_swt_internal_gtk_OS_memmove__JL#{GObjectClass.jni_name}_2".to_sym, JNI.env, self.jni_id, dest.to_int, src.jni_id)
+        JNI.call_native_method("Java_org_eclipse_swt_internal_gtk_OS_memmove__JL#{GObjectClass.jni_package_name}_GObjectClass_2".to_sym, JNI.env, self.jni_id, dest.to_int, src.jni_id)
       end
       
-      JNI.load_native_method "Java_org_eclipse_swt_internal_gtk_OS_memmove__JL#{GTypeInfo.jni_name}_2I".to_sym, [:pointer, :long, :int64, :long, :int32], :void
+      JNI.load_native_method "Java_org_eclipse_swt_internal_gtk_OS_memmove__JL#{GTypeInfo.jni_package_name}_GTypeInfo_2I".to_sym, [:pointer, :long, :int64, :long, :int32], :void
       typesig { [::Java::Long, GTypeInfo, ::Java::Int] }
       # @param dest cast=(void *)
       # @param src cast=(const void *),flags=no_out
@@ -24636,10 +24636,10 @@ module Org::Eclipse::Swt::Internal::Gtk
       # 
       # int
       def memmove(dest, src, size)
-        JNI.call_native_method("Java_org_eclipse_swt_internal_gtk_OS_memmove__JL#{GTypeInfo.jni_name}_2I".to_sym, JNI.env, self.jni_id, dest.to_int, src.jni_id, size.to_int)
+        JNI.call_native_method("Java_org_eclipse_swt_internal_gtk_OS_memmove__JL#{GTypeInfo.jni_package_name}_GTypeInfo_2I".to_sym, JNI.env, self.jni_id, dest.to_int, src.jni_id, size.to_int)
       end
       
-      JNI.load_native_method "Java_org_eclipse_swt_internal_gtk_OS_memmove__JL#{GtkTargetEntry.jni_name}_2J".to_sym, [:pointer, :long, :int64, :long, :int64], :void
+      JNI.load_native_method "Java_org_eclipse_swt_internal_gtk_OS_memmove__JL#{GtkTargetEntry.jni_package_name}_GtkTargetEntry_2J".to_sym, [:pointer, :long, :int64, :long, :int64], :void
       typesig { [::Java::Long, GtkTargetEntry, ::Java::Long] }
       # @param dest cast=(void *)
       # @param src cast=(const void *),flags=no_out
@@ -24648,20 +24648,20 @@ module Org::Eclipse::Swt::Internal::Gtk
       # int
       # int
       def memmove(dest, src, size)
-        JNI.call_native_method("Java_org_eclipse_swt_internal_gtk_OS_memmove__JL#{GtkTargetEntry.jni_name}_2J".to_sym, JNI.env, self.jni_id, dest.to_int, src.jni_id, size.to_int)
+        JNI.call_native_method("Java_org_eclipse_swt_internal_gtk_OS_memmove__JL#{GtkTargetEntry.jni_package_name}_GtkTargetEntry_2J".to_sym, JNI.env, self.jni_id, dest.to_int, src.jni_id, size.to_int)
       end
       
-      JNI.load_native_method "Java_org_eclipse_swt_internal_gtk_OS_memmove__JL#{GtkAdjustment.jni_name}_2".to_sym, [:pointer, :long, :int64, :long], :void
+      JNI.load_native_method "Java_org_eclipse_swt_internal_gtk_OS_memmove__JL#{GtkAdjustment.jni_package_name}_GtkAdjustment_2".to_sym, [:pointer, :long, :int64, :long], :void
       typesig { [::Java::Long, GtkAdjustment] }
       # @param dest cast=(void *)
       # @param src cast=(const void *),flags=no_out
       # 
       # int
       def memmove(dest, src)
-        JNI.call_native_method("Java_org_eclipse_swt_internal_gtk_OS_memmove__JL#{GtkAdjustment.jni_name}_2".to_sym, JNI.env, self.jni_id, dest.to_int, src.jni_id)
+        JNI.call_native_method("Java_org_eclipse_swt_internal_gtk_OS_memmove__JL#{GtkAdjustment.jni_package_name}_GtkAdjustment_2".to_sym, JNI.env, self.jni_id, dest.to_int, src.jni_id)
       end
       
-      JNI.load_native_method "Java_org_eclipse_swt_internal_gtk_OS_memmove__JL#{GdkEventButton.jni_name}_2J".to_sym, [:pointer, :long, :int64, :long, :int64], :void
+      JNI.load_native_method "Java_org_eclipse_swt_internal_gtk_OS_memmove__JL#{GdkEventButton.jni_package_name}_GdkEventButton_2J".to_sym, [:pointer, :long, :int64, :long, :int64], :void
       typesig { [::Java::Long, GdkEventButton, ::Java::Long] }
       # @param dest cast=(void *)
       # @param src cast=(const void *),flags=no_out
@@ -24670,10 +24670,10 @@ module Org::Eclipse::Swt::Internal::Gtk
       # int
       # int
       def memmove(dest, src, size)
-        JNI.call_native_method("Java_org_eclipse_swt_internal_gtk_OS_memmove__JL#{GdkEventButton.jni_name}_2J".to_sym, JNI.env, self.jni_id, dest.to_int, src.jni_id, size.to_int)
+        JNI.call_native_method("Java_org_eclipse_swt_internal_gtk_OS_memmove__JL#{GdkEventButton.jni_package_name}_GdkEventButton_2J".to_sym, JNI.env, self.jni_id, dest.to_int, src.jni_id, size.to_int)
       end
       
-      JNI.load_native_method "Java_org_eclipse_swt_internal_gtk_OS_memmove__JL#{GdkEventExpose.jni_name}_2J".to_sym, [:pointer, :long, :int64, :long, :int64], :void
+      JNI.load_native_method "Java_org_eclipse_swt_internal_gtk_OS_memmove__JL#{GdkEventExpose.jni_package_name}_GdkEventExpose_2J".to_sym, [:pointer, :long, :int64, :long, :int64], :void
       typesig { [::Java::Long, GdkEventExpose, ::Java::Long] }
       # @param dest cast=(void *)
       # @param src cast=(const void *),flags=no_out
@@ -24682,10 +24682,10 @@ module Org::Eclipse::Swt::Internal::Gtk
       # int
       # int
       def memmove(dest, src, size)
-        JNI.call_native_method("Java_org_eclipse_swt_internal_gtk_OS_memmove__JL#{GdkEventExpose.jni_name}_2J".to_sym, JNI.env, self.jni_id, dest.to_int, src.jni_id, size.to_int)
+        JNI.call_native_method("Java_org_eclipse_swt_internal_gtk_OS_memmove__JL#{GdkEventExpose.jni_package_name}_GdkEventExpose_2J".to_sym, JNI.env, self.jni_id, dest.to_int, src.jni_id, size.to_int)
       end
       
-      JNI.load_native_method "Java_org_eclipse_swt_internal_gtk_OS_memmove__JL#{GdkEventMotion.jni_name}_2J".to_sym, [:pointer, :long, :int64, :long, :int64], :void
+      JNI.load_native_method "Java_org_eclipse_swt_internal_gtk_OS_memmove__JL#{GdkEventMotion.jni_package_name}_GdkEventMotion_2J".to_sym, [:pointer, :long, :int64, :long, :int64], :void
       typesig { [::Java::Long, GdkEventMotion, ::Java::Long] }
       # @param dest cast=(void *)
       # @param src cast=(const void *),flags=no_out
@@ -24694,18 +24694,18 @@ module Org::Eclipse::Swt::Internal::Gtk
       # int
       # int
       def memmove(dest, src, size)
-        JNI.call_native_method("Java_org_eclipse_swt_internal_gtk_OS_memmove__JL#{GdkEventMotion.jni_name}_2J".to_sym, JNI.env, self.jni_id, dest.to_int, src.jni_id, size.to_int)
+        JNI.call_native_method("Java_org_eclipse_swt_internal_gtk_OS_memmove__JL#{GdkEventMotion.jni_package_name}_GdkEventMotion_2J".to_sym, JNI.env, self.jni_id, dest.to_int, src.jni_id, size.to_int)
       end
       
-      JNI.load_native_method "Java_org_eclipse_swt_internal_gtk_OS_memmove__JL#{GtkWidgetClass.jni_name}_2".to_sym, [:pointer, :long, :int64, :long], :void
+      JNI.load_native_method "Java_org_eclipse_swt_internal_gtk_OS_memmove__JL#{GtkWidgetClass.jni_package_name}_GtkWidgetClass_2".to_sym, [:pointer, :long, :int64, :long], :void
       typesig { [::Java::Long, GtkWidgetClass] }
       # @param src flags=no_out
       # int
       def memmove(dest, src)
-        JNI.call_native_method("Java_org_eclipse_swt_internal_gtk_OS_memmove__JL#{GtkWidgetClass.jni_name}_2".to_sym, JNI.env, self.jni_id, dest.to_int, src.jni_id)
+        JNI.call_native_method("Java_org_eclipse_swt_internal_gtk_OS_memmove__JL#{GtkWidgetClass.jni_package_name}_GtkWidgetClass_2".to_sym, JNI.env, self.jni_id, dest.to_int, src.jni_id)
       end
       
-      JNI.load_native_method "Java_org_eclipse_swt_internal_gtk_OS_memmove__JL#{PangoAttribute.jni_name}_2J".to_sym, [:pointer, :long, :int64, :long, :int64], :void
+      JNI.load_native_method "Java_org_eclipse_swt_internal_gtk_OS_memmove__JL#{PangoAttribute.jni_package_name}_PangoAttribute_2J".to_sym, [:pointer, :long, :int64, :long, :int64], :void
       typesig { [::Java::Long, PangoAttribute, ::Java::Long] }
       # @param dest cast=(void *)
       # @param src cast=(const void *),flags=no_out
@@ -24714,20 +24714,20 @@ module Org::Eclipse::Swt::Internal::Gtk
       # int
       # int
       def memmove(dest, src, size)
-        JNI.call_native_method("Java_org_eclipse_swt_internal_gtk_OS_memmove__JL#{PangoAttribute.jni_name}_2J".to_sym, JNI.env, self.jni_id, dest.to_int, src.jni_id, size.to_int)
+        JNI.call_native_method("Java_org_eclipse_swt_internal_gtk_OS_memmove__JL#{PangoAttribute.jni_package_name}_PangoAttribute_2J".to_sym, JNI.env, self.jni_id, dest.to_int, src.jni_id, size.to_int)
       end
       
-      JNI.load_native_method "Java_org_eclipse_swt_internal_gtk_OS_memmove__L#{GObjectClass.jni_name}_2J".to_sym, [:pointer, :long, :long, :int64], :void
+      JNI.load_native_method "Java_org_eclipse_swt_internal_gtk_OS_memmove__L#{GObjectClass.jni_package_name}_GObjectClass_2J".to_sym, [:pointer, :long, :long, :int64], :void
       typesig { [GObjectClass, ::Java::Long] }
       # @param dest cast=(void *),flags=no_in
       # @param src cast=(const void *)
       # 
       # int
       def memmove(dest, src)
-        JNI.call_native_method("Java_org_eclipse_swt_internal_gtk_OS_memmove__L#{GObjectClass.jni_name}_2J".to_sym, JNI.env, self.jni_id, dest.jni_id, src.to_int)
+        JNI.call_native_method("Java_org_eclipse_swt_internal_gtk_OS_memmove__L#{GObjectClass.jni_package_name}_GObjectClass_2J".to_sym, JNI.env, self.jni_id, dest.jni_id, src.to_int)
       end
       
-      JNI.load_native_method "Java_org_eclipse_swt_internal_gtk_OS_memmove__L#{GTypeQuery.jni_name}_2JJ".to_sym, [:pointer, :long, :long, :int64, :int64], :void
+      JNI.load_native_method "Java_org_eclipse_swt_internal_gtk_OS_memmove__L#{GTypeQuery.jni_package_name}_GTypeQuery_2JJ".to_sym, [:pointer, :long, :long, :int64, :int64], :void
       typesig { [GTypeQuery, ::Java::Long, ::Java::Long] }
       # @param dest cast=(void *),flags=no_in
       # @param src cast=(const void *)
@@ -24736,30 +24736,30 @@ module Org::Eclipse::Swt::Internal::Gtk
       # int
       # int
       def memmove(dest, src, size)
-        JNI.call_native_method("Java_org_eclipse_swt_internal_gtk_OS_memmove__L#{GTypeQuery.jni_name}_2JJ".to_sym, JNI.env, self.jni_id, dest.jni_id, src.to_int, size.to_int)
+        JNI.call_native_method("Java_org_eclipse_swt_internal_gtk_OS_memmove__L#{GTypeQuery.jni_package_name}_GTypeQuery_2JJ".to_sym, JNI.env, self.jni_id, dest.jni_id, src.to_int, size.to_int)
       end
       
-      JNI.load_native_method "Java_org_eclipse_swt_internal_gtk_OS_memmove__L#{GtkColorSelectionDialog.jni_name}_2J".to_sym, [:pointer, :long, :long, :int64], :void
+      JNI.load_native_method "Java_org_eclipse_swt_internal_gtk_OS_memmove__L#{GtkColorSelectionDialog.jni_package_name}_GtkColorSelectionDialog_2J".to_sym, [:pointer, :long, :long, :int64], :void
       typesig { [GtkColorSelectionDialog, ::Java::Long] }
       # @param dest cast=(void *),flags=no_in
       # @param src cast=(const void *)
       # 
       # int
       def memmove(dest, src)
-        JNI.call_native_method("Java_org_eclipse_swt_internal_gtk_OS_memmove__L#{GtkColorSelectionDialog.jni_name}_2J".to_sym, JNI.env, self.jni_id, dest.jni_id, src.to_int)
+        JNI.call_native_method("Java_org_eclipse_swt_internal_gtk_OS_memmove__L#{GtkColorSelectionDialog.jni_package_name}_GtkColorSelectionDialog_2J".to_sym, JNI.env, self.jni_id, dest.jni_id, src.to_int)
       end
       
-      JNI.load_native_method "Java_org_eclipse_swt_internal_gtk_OS_memmove__L#{GtkFileSelection.jni_name}_2J".to_sym, [:pointer, :long, :long, :int64], :void
+      JNI.load_native_method "Java_org_eclipse_swt_internal_gtk_OS_memmove__L#{GtkFileSelection.jni_package_name}_GtkFileSelection_2J".to_sym, [:pointer, :long, :long, :int64], :void
       typesig { [GtkFileSelection, ::Java::Long] }
       # @param dest cast=(void *),flags=no_in
       # @param src cast=(const void *)
       # 
       # int
       def memmove(dest, src)
-        JNI.call_native_method("Java_org_eclipse_swt_internal_gtk_OS_memmove__L#{GtkFileSelection.jni_name}_2J".to_sym, JNI.env, self.jni_id, dest.jni_id, src.to_int)
+        JNI.call_native_method("Java_org_eclipse_swt_internal_gtk_OS_memmove__L#{GtkFileSelection.jni_package_name}_GtkFileSelection_2J".to_sym, JNI.env, self.jni_id, dest.jni_id, src.to_int)
       end
       
-      JNI.load_native_method "Java_org_eclipse_swt_internal_gtk_OS_memmove__L#{GdkDragContext.jni_name}_2JJ".to_sym, [:pointer, :long, :long, :int64, :int64], :void
+      JNI.load_native_method "Java_org_eclipse_swt_internal_gtk_OS_memmove__L#{GdkDragContext.jni_package_name}_GdkDragContext_2JJ".to_sym, [:pointer, :long, :long, :int64, :int64], :void
       typesig { [GdkDragContext, ::Java::Long, ::Java::Long] }
       # @param dest cast=(void *),flags=no_in
       # @param src cast=(const void *)
@@ -24768,10 +24768,10 @@ module Org::Eclipse::Swt::Internal::Gtk
       # int
       # int
       def memmove(dest, src, size)
-        JNI.call_native_method("Java_org_eclipse_swt_internal_gtk_OS_memmove__L#{GdkDragContext.jni_name}_2JJ".to_sym, JNI.env, self.jni_id, dest.jni_id, src.to_int, size.to_int)
+        JNI.call_native_method("Java_org_eclipse_swt_internal_gtk_OS_memmove__L#{GdkDragContext.jni_package_name}_GdkDragContext_2JJ".to_sym, JNI.env, self.jni_id, dest.jni_id, src.to_int, size.to_int)
       end
       
-      JNI.load_native_method "Java_org_eclipse_swt_internal_gtk_OS_memmove__L#{GtkSelectionData.jni_name}_2JJ".to_sym, [:pointer, :long, :long, :int64, :int64], :void
+      JNI.load_native_method "Java_org_eclipse_swt_internal_gtk_OS_memmove__L#{GtkSelectionData.jni_package_name}_GtkSelectionData_2JJ".to_sym, [:pointer, :long, :long, :int64, :int64], :void
       typesig { [GtkSelectionData, ::Java::Long, ::Java::Long] }
       # @param dest cast=(void *),flags=no_in
       # @param src cast=(const void *)
@@ -24780,18 +24780,18 @@ module Org::Eclipse::Swt::Internal::Gtk
       # int
       # int
       def memmove(dest, src, size)
-        JNI.call_native_method("Java_org_eclipse_swt_internal_gtk_OS_memmove__L#{GtkSelectionData.jni_name}_2JJ".to_sym, JNI.env, self.jni_id, dest.jni_id, src.to_int, size.to_int)
+        JNI.call_native_method("Java_org_eclipse_swt_internal_gtk_OS_memmove__L#{GtkSelectionData.jni_package_name}_GtkSelectionData_2JJ".to_sym, JNI.env, self.jni_id, dest.jni_id, src.to_int, size.to_int)
       end
       
-      JNI.load_native_method "Java_org_eclipse_swt_internal_gtk_OS_memmove__L#{GtkWidgetClass.jni_name}_2J".to_sym, [:pointer, :long, :long, :int64], :void
+      JNI.load_native_method "Java_org_eclipse_swt_internal_gtk_OS_memmove__L#{GtkWidgetClass.jni_package_name}_GtkWidgetClass_2J".to_sym, [:pointer, :long, :long, :int64], :void
       typesig { [GtkWidgetClass, ::Java::Long] }
       # @param dest flags=no_in
       # int
       def memmove(dest, src)
-        JNI.call_native_method("Java_org_eclipse_swt_internal_gtk_OS_memmove__L#{GtkWidgetClass.jni_name}_2J".to_sym, JNI.env, self.jni_id, dest.jni_id, src.to_int)
+        JNI.call_native_method("Java_org_eclipse_swt_internal_gtk_OS_memmove__L#{GtkWidgetClass.jni_package_name}_GtkWidgetClass_2J".to_sym, JNI.env, self.jni_id, dest.jni_id, src.to_int)
       end
       
-      JNI.load_native_method "Java_org_eclipse_swt_internal_gtk_OS_memmove__L#{GtkTargetPair.jni_name}_2JJ".to_sym, [:pointer, :long, :long, :int64, :int64], :void
+      JNI.load_native_method "Java_org_eclipse_swt_internal_gtk_OS_memmove__L#{GtkTargetPair.jni_package_name}_GtkTargetPair_2JJ".to_sym, [:pointer, :long, :long, :int64, :int64], :void
       typesig { [GtkTargetPair, ::Java::Long, ::Java::Long] }
       # @param dest cast=(void *),flags=no_in
       # @param src cast=(const void *)
@@ -24800,30 +24800,30 @@ module Org::Eclipse::Swt::Internal::Gtk
       # int
       # int
       def memmove(dest, src, size)
-        JNI.call_native_method("Java_org_eclipse_swt_internal_gtk_OS_memmove__L#{GtkTargetPair.jni_name}_2JJ".to_sym, JNI.env, self.jni_id, dest.jni_id, src.to_int, size.to_int)
+        JNI.call_native_method("Java_org_eclipse_swt_internal_gtk_OS_memmove__L#{GtkTargetPair.jni_package_name}_GtkTargetPair_2JJ".to_sym, JNI.env, self.jni_id, dest.jni_id, src.to_int, size.to_int)
       end
       
-      JNI.load_native_method "Java_org_eclipse_swt_internal_gtk_OS_memmove__L#{GtkCombo.jni_name}_2J".to_sym, [:pointer, :long, :long, :int64], :void
+      JNI.load_native_method "Java_org_eclipse_swt_internal_gtk_OS_memmove__L#{GtkCombo.jni_package_name}_GtkCombo_2J".to_sym, [:pointer, :long, :long, :int64], :void
       typesig { [GtkCombo, ::Java::Long] }
       # @param dest cast=(void *),flags=no_in
       # @param src cast=(const void *)
       # 
       # int
       def memmove(dest, src)
-        JNI.call_native_method("Java_org_eclipse_swt_internal_gtk_OS_memmove__L#{GtkCombo.jni_name}_2J".to_sym, JNI.env, self.jni_id, dest.jni_id, src.to_int)
+        JNI.call_native_method("Java_org_eclipse_swt_internal_gtk_OS_memmove__L#{GtkCombo.jni_package_name}_GtkCombo_2J".to_sym, JNI.env, self.jni_id, dest.jni_id, src.to_int)
       end
       
-      JNI.load_native_method "Java_org_eclipse_swt_internal_gtk_OS_memmove__L#{GtkAdjustment.jni_name}_2J".to_sym, [:pointer, :long, :long, :int64], :void
+      JNI.load_native_method "Java_org_eclipse_swt_internal_gtk_OS_memmove__L#{GtkAdjustment.jni_package_name}_GtkAdjustment_2J".to_sym, [:pointer, :long, :long, :int64], :void
       typesig { [GtkAdjustment, ::Java::Long] }
       # @param dest cast=(void *),flags=no_in
       # @param src cast=(const void *)
       # 
       # int
       def memmove(dest, src)
-        JNI.call_native_method("Java_org_eclipse_swt_internal_gtk_OS_memmove__L#{GtkAdjustment.jni_name}_2J".to_sym, JNI.env, self.jni_id, dest.jni_id, src.to_int)
+        JNI.call_native_method("Java_org_eclipse_swt_internal_gtk_OS_memmove__L#{GtkAdjustment.jni_package_name}_GtkAdjustment_2J".to_sym, JNI.env, self.jni_id, dest.jni_id, src.to_int)
       end
       
-      JNI.load_native_method "Java_org_eclipse_swt_internal_gtk_OS_memmove__L#{GtkBorder.jni_name}_2JJ".to_sym, [:pointer, :long, :long, :int64, :int64], :void
+      JNI.load_native_method "Java_org_eclipse_swt_internal_gtk_OS_memmove__L#{GtkBorder.jni_package_name}_GtkBorder_2JJ".to_sym, [:pointer, :long, :long, :int64, :int64], :void
       typesig { [GtkBorder, ::Java::Long, ::Java::Long] }
       # @param dest cast=(void *),flags=no_in
       # @param src cast=(const void *)
@@ -24832,10 +24832,10 @@ module Org::Eclipse::Swt::Internal::Gtk
       # int
       # int
       def memmove(dest, src, size)
-        JNI.call_native_method("Java_org_eclipse_swt_internal_gtk_OS_memmove__L#{GtkBorder.jni_name}_2JJ".to_sym, JNI.env, self.jni_id, dest.jni_id, src.to_int, size.to_int)
+        JNI.call_native_method("Java_org_eclipse_swt_internal_gtk_OS_memmove__L#{GtkBorder.jni_package_name}_GtkBorder_2JJ".to_sym, JNI.env, self.jni_id, dest.jni_id, src.to_int, size.to_int)
       end
       
-      JNI.load_native_method "Java_org_eclipse_swt_internal_gtk_OS_memmove__L#{GdkColor.jni_name}_2JJ".to_sym, [:pointer, :long, :long, :int64, :int64], :void
+      JNI.load_native_method "Java_org_eclipse_swt_internal_gtk_OS_memmove__L#{GdkColor.jni_package_name}_GdkColor_2JJ".to_sym, [:pointer, :long, :long, :int64, :int64], :void
       typesig { [GdkColor, ::Java::Long, ::Java::Long] }
       # @param dest cast=(void *),flags=no_in
       # @param src cast=(const void *)
@@ -24844,10 +24844,10 @@ module Org::Eclipse::Swt::Internal::Gtk
       # int
       # int
       def memmove(dest, src, size)
-        JNI.call_native_method("Java_org_eclipse_swt_internal_gtk_OS_memmove__L#{GdkColor.jni_name}_2JJ".to_sym, JNI.env, self.jni_id, dest.jni_id, src.to_int, size.to_int)
+        JNI.call_native_method("Java_org_eclipse_swt_internal_gtk_OS_memmove__L#{GdkColor.jni_package_name}_GdkColor_2JJ".to_sym, JNI.env, self.jni_id, dest.jni_id, src.to_int, size.to_int)
       end
       
-      JNI.load_native_method "Java_org_eclipse_swt_internal_gtk_OS_memmove__L#{GdkEvent.jni_name}_2JJ".to_sym, [:pointer, :long, :long, :int64, :int64], :void
+      JNI.load_native_method "Java_org_eclipse_swt_internal_gtk_OS_memmove__L#{GdkEvent.jni_package_name}_GdkEvent_2JJ".to_sym, [:pointer, :long, :long, :int64, :int64], :void
       typesig { [GdkEvent, ::Java::Long, ::Java::Long] }
       # @param dest cast=(void *),flags=no_in
       # @param src cast=(const void *)
@@ -24856,10 +24856,10 @@ module Org::Eclipse::Swt::Internal::Gtk
       # int
       # int
       def memmove(dest, src, size)
-        JNI.call_native_method("Java_org_eclipse_swt_internal_gtk_OS_memmove__L#{GdkEvent.jni_name}_2JJ".to_sym, JNI.env, self.jni_id, dest.jni_id, src.to_int, size.to_int)
+        JNI.call_native_method("Java_org_eclipse_swt_internal_gtk_OS_memmove__L#{GdkEvent.jni_package_name}_GdkEvent_2JJ".to_sym, JNI.env, self.jni_id, dest.jni_id, src.to_int, size.to_int)
       end
       
-      JNI.load_native_method "Java_org_eclipse_swt_internal_gtk_OS_memmove__L#{GdkEventAny.jni_name}_2JJ".to_sym, [:pointer, :long, :long, :int64, :int64], :void
+      JNI.load_native_method "Java_org_eclipse_swt_internal_gtk_OS_memmove__L#{GdkEventAny.jni_package_name}_GdkEventAny_2JJ".to_sym, [:pointer, :long, :long, :int64, :int64], :void
       typesig { [GdkEventAny, ::Java::Long, ::Java::Long] }
       # @param dest cast=(void *),flags=no_in
       # @param src cast=(const void *)
@@ -24868,10 +24868,10 @@ module Org::Eclipse::Swt::Internal::Gtk
       # int
       # int
       def memmove(dest, src, size)
-        JNI.call_native_method("Java_org_eclipse_swt_internal_gtk_OS_memmove__L#{GdkEventAny.jni_name}_2JJ".to_sym, JNI.env, self.jni_id, dest.jni_id, src.to_int, size.to_int)
+        JNI.call_native_method("Java_org_eclipse_swt_internal_gtk_OS_memmove__L#{GdkEventAny.jni_package_name}_GdkEventAny_2JJ".to_sym, JNI.env, self.jni_id, dest.jni_id, src.to_int, size.to_int)
       end
       
-      JNI.load_native_method "Java_org_eclipse_swt_internal_gtk_OS_memmove__L#{GdkEventButton.jni_name}_2JJ".to_sym, [:pointer, :long, :long, :int64, :int64], :void
+      JNI.load_native_method "Java_org_eclipse_swt_internal_gtk_OS_memmove__L#{GdkEventButton.jni_package_name}_GdkEventButton_2JJ".to_sym, [:pointer, :long, :long, :int64, :int64], :void
       typesig { [GdkEventButton, ::Java::Long, ::Java::Long] }
       # @param dest cast=(void *),flags=no_in
       # @param src cast=(const void *)
@@ -24880,10 +24880,10 @@ module Org::Eclipse::Swt::Internal::Gtk
       # int
       # int
       def memmove(dest, src, size)
-        JNI.call_native_method("Java_org_eclipse_swt_internal_gtk_OS_memmove__L#{GdkEventButton.jni_name}_2JJ".to_sym, JNI.env, self.jni_id, dest.jni_id, src.to_int, size.to_int)
+        JNI.call_native_method("Java_org_eclipse_swt_internal_gtk_OS_memmove__L#{GdkEventButton.jni_package_name}_GdkEventButton_2JJ".to_sym, JNI.env, self.jni_id, dest.jni_id, src.to_int, size.to_int)
       end
       
-      JNI.load_native_method "Java_org_eclipse_swt_internal_gtk_OS_memmove__L#{GdkEventCrossing.jni_name}_2JJ".to_sym, [:pointer, :long, :long, :int64, :int64], :void
+      JNI.load_native_method "Java_org_eclipse_swt_internal_gtk_OS_memmove__L#{GdkEventCrossing.jni_package_name}_GdkEventCrossing_2JJ".to_sym, [:pointer, :long, :long, :int64, :int64], :void
       typesig { [GdkEventCrossing, ::Java::Long, ::Java::Long] }
       # @param dest cast=(void *),flags=no_in
       # @param src cast=(const void *)
@@ -24892,10 +24892,10 @@ module Org::Eclipse::Swt::Internal::Gtk
       # int
       # int
       def memmove(dest, src, size)
-        JNI.call_native_method("Java_org_eclipse_swt_internal_gtk_OS_memmove__L#{GdkEventCrossing.jni_name}_2JJ".to_sym, JNI.env, self.jni_id, dest.jni_id, src.to_int, size.to_int)
+        JNI.call_native_method("Java_org_eclipse_swt_internal_gtk_OS_memmove__L#{GdkEventCrossing.jni_package_name}_GdkEventCrossing_2JJ".to_sym, JNI.env, self.jni_id, dest.jni_id, src.to_int, size.to_int)
       end
       
-      JNI.load_native_method "Java_org_eclipse_swt_internal_gtk_OS_memmove__L#{GdkEventExpose.jni_name}_2JJ".to_sym, [:pointer, :long, :long, :int64, :int64], :void
+      JNI.load_native_method "Java_org_eclipse_swt_internal_gtk_OS_memmove__L#{GdkEventExpose.jni_package_name}_GdkEventExpose_2JJ".to_sym, [:pointer, :long, :long, :int64, :int64], :void
       typesig { [GdkEventExpose, ::Java::Long, ::Java::Long] }
       # @param dest cast=(void *),flags=no_in
       # @param src cast=(const void *)
@@ -24904,10 +24904,10 @@ module Org::Eclipse::Swt::Internal::Gtk
       # int
       # int
       def memmove(dest, src, size)
-        JNI.call_native_method("Java_org_eclipse_swt_internal_gtk_OS_memmove__L#{GdkEventExpose.jni_name}_2JJ".to_sym, JNI.env, self.jni_id, dest.jni_id, src.to_int, size.to_int)
+        JNI.call_native_method("Java_org_eclipse_swt_internal_gtk_OS_memmove__L#{GdkEventExpose.jni_package_name}_GdkEventExpose_2JJ".to_sym, JNI.env, self.jni_id, dest.jni_id, src.to_int, size.to_int)
       end
       
-      JNI.load_native_method "Java_org_eclipse_swt_internal_gtk_OS_memmove__L#{GdkEventFocus.jni_name}_2JJ".to_sym, [:pointer, :long, :long, :int64, :int64], :void
+      JNI.load_native_method "Java_org_eclipse_swt_internal_gtk_OS_memmove__L#{GdkEventFocus.jni_package_name}_GdkEventFocus_2JJ".to_sym, [:pointer, :long, :long, :int64, :int64], :void
       typesig { [GdkEventFocus, ::Java::Long, ::Java::Long] }
       # @param dest cast=(void *),flags=no_in
       # @param src cast=(const void *)
@@ -24916,10 +24916,10 @@ module Org::Eclipse::Swt::Internal::Gtk
       # int
       # int
       def memmove(dest, src, size)
-        JNI.call_native_method("Java_org_eclipse_swt_internal_gtk_OS_memmove__L#{GdkEventFocus.jni_name}_2JJ".to_sym, JNI.env, self.jni_id, dest.jni_id, src.to_int, size.to_int)
+        JNI.call_native_method("Java_org_eclipse_swt_internal_gtk_OS_memmove__L#{GdkEventFocus.jni_package_name}_GdkEventFocus_2JJ".to_sym, JNI.env, self.jni_id, dest.jni_id, src.to_int, size.to_int)
       end
       
-      JNI.load_native_method "Java_org_eclipse_swt_internal_gtk_OS_memmove__L#{GdkEventKey.jni_name}_2JJ".to_sym, [:pointer, :long, :long, :int64, :int64], :void
+      JNI.load_native_method "Java_org_eclipse_swt_internal_gtk_OS_memmove__L#{GdkEventKey.jni_package_name}_GdkEventKey_2JJ".to_sym, [:pointer, :long, :long, :int64, :int64], :void
       typesig { [GdkEventKey, ::Java::Long, ::Java::Long] }
       # @param dest cast=(void *),flags=no_in
       # @param src cast=(const void *)
@@ -24928,10 +24928,10 @@ module Org::Eclipse::Swt::Internal::Gtk
       # int
       # int
       def memmove(dest, src, size)
-        JNI.call_native_method("Java_org_eclipse_swt_internal_gtk_OS_memmove__L#{GdkEventKey.jni_name}_2JJ".to_sym, JNI.env, self.jni_id, dest.jni_id, src.to_int, size.to_int)
+        JNI.call_native_method("Java_org_eclipse_swt_internal_gtk_OS_memmove__L#{GdkEventKey.jni_package_name}_GdkEventKey_2JJ".to_sym, JNI.env, self.jni_id, dest.jni_id, src.to_int, size.to_int)
       end
       
-      JNI.load_native_method "Java_org_eclipse_swt_internal_gtk_OS_memmove__L#{GdkEventMotion.jni_name}_2JJ".to_sym, [:pointer, :long, :long, :int64, :int64], :void
+      JNI.load_native_method "Java_org_eclipse_swt_internal_gtk_OS_memmove__L#{GdkEventMotion.jni_package_name}_GdkEventMotion_2JJ".to_sym, [:pointer, :long, :long, :int64, :int64], :void
       typesig { [GdkEventMotion, ::Java::Long, ::Java::Long] }
       # @param dest cast=(void *),flags=no_in
       # @param src cast=(const void *)
@@ -24940,10 +24940,10 @@ module Org::Eclipse::Swt::Internal::Gtk
       # int
       # int
       def memmove(dest, src, size)
-        JNI.call_native_method("Java_org_eclipse_swt_internal_gtk_OS_memmove__L#{GdkEventMotion.jni_name}_2JJ".to_sym, JNI.env, self.jni_id, dest.jni_id, src.to_int, size.to_int)
+        JNI.call_native_method("Java_org_eclipse_swt_internal_gtk_OS_memmove__L#{GdkEventMotion.jni_package_name}_GdkEventMotion_2JJ".to_sym, JNI.env, self.jni_id, dest.jni_id, src.to_int, size.to_int)
       end
       
-      JNI.load_native_method "Java_org_eclipse_swt_internal_gtk_OS_memmove__L#{GdkEventScroll.jni_name}_2JJ".to_sym, [:pointer, :long, :long, :int64, :int64], :void
+      JNI.load_native_method "Java_org_eclipse_swt_internal_gtk_OS_memmove__L#{GdkEventScroll.jni_package_name}_GdkEventScroll_2JJ".to_sym, [:pointer, :long, :long, :int64, :int64], :void
       typesig { [GdkEventScroll, ::Java::Long, ::Java::Long] }
       # @param dest cast=(void *),flags=no_in
       # @param src cast=(const void *)
@@ -24952,10 +24952,10 @@ module Org::Eclipse::Swt::Internal::Gtk
       # int
       # int
       def memmove(dest, src, size)
-        JNI.call_native_method("Java_org_eclipse_swt_internal_gtk_OS_memmove__L#{GdkEventScroll.jni_name}_2JJ".to_sym, JNI.env, self.jni_id, dest.jni_id, src.to_int, size.to_int)
+        JNI.call_native_method("Java_org_eclipse_swt_internal_gtk_OS_memmove__L#{GdkEventScroll.jni_package_name}_GdkEventScroll_2JJ".to_sym, JNI.env, self.jni_id, dest.jni_id, src.to_int, size.to_int)
       end
       
-      JNI.load_native_method "Java_org_eclipse_swt_internal_gtk_OS_memmove__L#{GdkEventVisibility.jni_name}_2JJ".to_sym, [:pointer, :long, :long, :int64, :int64], :void
+      JNI.load_native_method "Java_org_eclipse_swt_internal_gtk_OS_memmove__L#{GdkEventVisibility.jni_package_name}_GdkEventVisibility_2JJ".to_sym, [:pointer, :long, :long, :int64, :int64], :void
       typesig { [GdkEventVisibility, ::Java::Long, ::Java::Long] }
       # @param dest cast=(void *),flags=no_in
       # @param src cast=(const void *)
@@ -24964,10 +24964,10 @@ module Org::Eclipse::Swt::Internal::Gtk
       # int
       # int
       def memmove(dest, src, size)
-        JNI.call_native_method("Java_org_eclipse_swt_internal_gtk_OS_memmove__L#{GdkEventVisibility.jni_name}_2JJ".to_sym, JNI.env, self.jni_id, dest.jni_id, src.to_int, size.to_int)
+        JNI.call_native_method("Java_org_eclipse_swt_internal_gtk_OS_memmove__L#{GdkEventVisibility.jni_package_name}_GdkEventVisibility_2JJ".to_sym, JNI.env, self.jni_id, dest.jni_id, src.to_int, size.to_int)
       end
       
-      JNI.load_native_method "Java_org_eclipse_swt_internal_gtk_OS_memmove__L#{GdkEventWindowState.jni_name}_2JJ".to_sym, [:pointer, :long, :long, :int64, :int64], :void
+      JNI.load_native_method "Java_org_eclipse_swt_internal_gtk_OS_memmove__L#{GdkEventWindowState.jni_package_name}_GdkEventWindowState_2JJ".to_sym, [:pointer, :long, :long, :int64, :int64], :void
       typesig { [GdkEventWindowState, ::Java::Long, ::Java::Long] }
       # @param dest cast=(void *),flags=no_in
       # @param src cast=(const void *)
@@ -24976,64 +24976,64 @@ module Org::Eclipse::Swt::Internal::Gtk
       # int
       # int
       def memmove(dest, src, size)
-        JNI.call_native_method("Java_org_eclipse_swt_internal_gtk_OS_memmove__L#{GdkEventWindowState.jni_name}_2JJ".to_sym, JNI.env, self.jni_id, dest.jni_id, src.to_int, size.to_int)
+        JNI.call_native_method("Java_org_eclipse_swt_internal_gtk_OS_memmove__L#{GdkEventWindowState.jni_package_name}_GdkEventWindowState_2JJ".to_sym, JNI.env, self.jni_id, dest.jni_id, src.to_int, size.to_int)
       end
       
-      JNI.load_native_method "Java_org_eclipse_swt_internal_gtk_OS_memmove__JL#{GtkCellRendererClass.jni_name}_2".to_sym, [:pointer, :long, :int64, :long], :void
+      JNI.load_native_method "Java_org_eclipse_swt_internal_gtk_OS_memmove__JL#{GtkCellRendererClass.jni_package_name}_GtkCellRendererClass_2".to_sym, [:pointer, :long, :int64, :long], :void
       typesig { [::Java::Long, GtkCellRendererClass] }
       # int
       def memmove(dest, src)
-        JNI.call_native_method("Java_org_eclipse_swt_internal_gtk_OS_memmove__JL#{GtkCellRendererClass.jni_name}_2".to_sym, JNI.env, self.jni_id, dest.to_int, src.jni_id)
+        JNI.call_native_method("Java_org_eclipse_swt_internal_gtk_OS_memmove__JL#{GtkCellRendererClass.jni_package_name}_GtkCellRendererClass_2".to_sym, JNI.env, self.jni_id, dest.to_int, src.jni_id)
       end
       
-      JNI.load_native_method "Java_org_eclipse_swt_internal_gtk_OS_memmove__L#{GtkCellRendererClass.jni_name}_2J".to_sym, [:pointer, :long, :long, :int64], :void
+      JNI.load_native_method "Java_org_eclipse_swt_internal_gtk_OS_memmove__L#{GtkCellRendererClass.jni_package_name}_GtkCellRendererClass_2J".to_sym, [:pointer, :long, :long, :int64], :void
       typesig { [GtkCellRendererClass, ::Java::Long] }
       # int
       def memmove(dest, src)
-        JNI.call_native_method("Java_org_eclipse_swt_internal_gtk_OS_memmove__L#{GtkCellRendererClass.jni_name}_2J".to_sym, JNI.env, self.jni_id, dest.jni_id, src.to_int)
+        JNI.call_native_method("Java_org_eclipse_swt_internal_gtk_OS_memmove__L#{GtkCellRendererClass.jni_package_name}_GtkCellRendererClass_2J".to_sym, JNI.env, self.jni_id, dest.jni_id, src.to_int)
       end
       
-      JNI.load_native_method "Java_org_eclipse_swt_internal_gtk_OS_memmove__L#{GtkFixed.jni_name}_2J".to_sym, [:pointer, :long, :long, :int64], :void
+      JNI.load_native_method "Java_org_eclipse_swt_internal_gtk_OS_memmove__L#{GtkFixed.jni_package_name}_GtkFixed_2J".to_sym, [:pointer, :long, :long, :int64], :void
       typesig { [GtkFixed, ::Java::Long] }
       # @param dest cast=(void *),flags=no_in
       # @param src cast=(const void *)
       # 
       # int
       def memmove(dest, src)
-        JNI.call_native_method("Java_org_eclipse_swt_internal_gtk_OS_memmove__L#{GtkFixed.jni_name}_2J".to_sym, JNI.env, self.jni_id, dest.jni_id, src.to_int)
+        JNI.call_native_method("Java_org_eclipse_swt_internal_gtk_OS_memmove__L#{GtkFixed.jni_package_name}_GtkFixed_2J".to_sym, JNI.env, self.jni_id, dest.jni_id, src.to_int)
       end
       
-      JNI.load_native_method "Java_org_eclipse_swt_internal_gtk_OS_memmove__JL#{GtkFixed.jni_name}_2".to_sym, [:pointer, :long, :int64, :long], :void
+      JNI.load_native_method "Java_org_eclipse_swt_internal_gtk_OS_memmove__JL#{GtkFixed.jni_package_name}_GtkFixed_2".to_sym, [:pointer, :long, :int64, :long], :void
       typesig { [::Java::Long, GtkFixed] }
       # @param dest cast=(void *),flags=no_in
       # @param src cast=(const void *),flags=no_out
       # 
       # int
       def memmove(dest, src)
-        JNI.call_native_method("Java_org_eclipse_swt_internal_gtk_OS_memmove__JL#{GtkFixed.jni_name}_2".to_sym, JNI.env, self.jni_id, dest.to_int, src.jni_id)
+        JNI.call_native_method("Java_org_eclipse_swt_internal_gtk_OS_memmove__JL#{GtkFixed.jni_package_name}_GtkFixed_2".to_sym, JNI.env, self.jni_id, dest.to_int, src.jni_id)
       end
       
-      JNI.load_native_method "Java_org_eclipse_swt_internal_gtk_OS_memmove__L#{GdkVisual.jni_name}_2J".to_sym, [:pointer, :long, :long, :int64], :void
+      JNI.load_native_method "Java_org_eclipse_swt_internal_gtk_OS_memmove__L#{GdkVisual.jni_package_name}_GdkVisual_2J".to_sym, [:pointer, :long, :long, :int64], :void
       typesig { [GdkVisual, ::Java::Long] }
       # @param dest cast=(void *),flags=no_in
       # @param src cast=(const void *)
       # 
       # int
       def memmove(dest, src)
-        JNI.call_native_method("Java_org_eclipse_swt_internal_gtk_OS_memmove__L#{GdkVisual.jni_name}_2J".to_sym, JNI.env, self.jni_id, dest.jni_id, src.to_int)
+        JNI.call_native_method("Java_org_eclipse_swt_internal_gtk_OS_memmove__L#{GdkVisual.jni_package_name}_GdkVisual_2J".to_sym, JNI.env, self.jni_id, dest.jni_id, src.to_int)
       end
       
-      JNI.load_native_method "Java_org_eclipse_swt_internal_gtk_OS_memmove__L#{GdkImage.jni_name}_2J".to_sym, [:pointer, :long, :long, :int64], :void
+      JNI.load_native_method "Java_org_eclipse_swt_internal_gtk_OS_memmove__L#{GdkImage.jni_package_name}_GdkImage_2J".to_sym, [:pointer, :long, :long, :int64], :void
       typesig { [GdkImage, ::Java::Long] }
       # @param dest cast=(void *),flags=no_in
       # @param src cast=(const void *)
       # 
       # int
       def memmove(dest, src)
-        JNI.call_native_method("Java_org_eclipse_swt_internal_gtk_OS_memmove__L#{GdkImage.jni_name}_2J".to_sym, JNI.env, self.jni_id, dest.jni_id, src.to_int)
+        JNI.call_native_method("Java_org_eclipse_swt_internal_gtk_OS_memmove__L#{GdkImage.jni_package_name}_GdkImage_2J".to_sym, JNI.env, self.jni_id, dest.jni_id, src.to_int)
       end
       
-      JNI.load_native_method "Java_org_eclipse_swt_internal_gtk_OS_memmove__L#{GdkRectangle.jni_name}_2JJ".to_sym, [:pointer, :long, :long, :int64, :int64], :void
+      JNI.load_native_method "Java_org_eclipse_swt_internal_gtk_OS_memmove__L#{GdkRectangle.jni_package_name}_GdkRectangle_2JJ".to_sym, [:pointer, :long, :long, :int64, :int64], :void
       typesig { [GdkRectangle, ::Java::Long, ::Java::Long] }
       # @param dest cast=(void *),flags=no_in
       # @param src cast=(const void *)
@@ -25042,10 +25042,10 @@ module Org::Eclipse::Swt::Internal::Gtk
       # int
       # int
       def memmove(dest, src, size)
-        JNI.call_native_method("Java_org_eclipse_swt_internal_gtk_OS_memmove__L#{GdkRectangle.jni_name}_2JJ".to_sym, JNI.env, self.jni_id, dest.jni_id, src.to_int, size.to_int)
+        JNI.call_native_method("Java_org_eclipse_swt_internal_gtk_OS_memmove__L#{GdkRectangle.jni_package_name}_GdkRectangle_2JJ".to_sym, JNI.env, self.jni_id, dest.jni_id, src.to_int, size.to_int)
       end
       
-      JNI.load_native_method "Java_org_eclipse_swt_internal_gtk_OS_memmove__L#{PangoAttribute.jni_name}_2JJ".to_sym, [:pointer, :long, :long, :int64, :int64], :void
+      JNI.load_native_method "Java_org_eclipse_swt_internal_gtk_OS_memmove__L#{PangoAttribute.jni_package_name}_PangoAttribute_2JJ".to_sym, [:pointer, :long, :long, :int64, :int64], :void
       typesig { [PangoAttribute, ::Java::Long, ::Java::Long] }
       # @param dest cast=(void *),flags=no_in
       # @param src cast=(const void *)
@@ -25054,10 +25054,10 @@ module Org::Eclipse::Swt::Internal::Gtk
       # int
       # int
       def memmove(dest, src, size)
-        JNI.call_native_method("Java_org_eclipse_swt_internal_gtk_OS_memmove__L#{PangoAttribute.jni_name}_2JJ".to_sym, JNI.env, self.jni_id, dest.jni_id, src.to_int, size.to_int)
+        JNI.call_native_method("Java_org_eclipse_swt_internal_gtk_OS_memmove__L#{PangoAttribute.jni_package_name}_PangoAttribute_2JJ".to_sym, JNI.env, self.jni_id, dest.jni_id, src.to_int, size.to_int)
       end
       
-      JNI.load_native_method "Java_org_eclipse_swt_internal_gtk_OS_memmove__L#{PangoAttrColor.jni_name}_2JJ".to_sym, [:pointer, :long, :long, :int64, :int64], :void
+      JNI.load_native_method "Java_org_eclipse_swt_internal_gtk_OS_memmove__L#{PangoAttrColor.jni_package_name}_PangoAttrColor_2JJ".to_sym, [:pointer, :long, :long, :int64, :int64], :void
       typesig { [PangoAttrColor, ::Java::Long, ::Java::Long] }
       # @param dest cast=(void *),flags=no_in
       # @param src cast=(const void *)
@@ -25066,10 +25066,10 @@ module Org::Eclipse::Swt::Internal::Gtk
       # int
       # int
       def memmove(dest, src, size)
-        JNI.call_native_method("Java_org_eclipse_swt_internal_gtk_OS_memmove__L#{PangoAttrColor.jni_name}_2JJ".to_sym, JNI.env, self.jni_id, dest.jni_id, src.to_int, size.to_int)
+        JNI.call_native_method("Java_org_eclipse_swt_internal_gtk_OS_memmove__L#{PangoAttrColor.jni_package_name}_PangoAttrColor_2JJ".to_sym, JNI.env, self.jni_id, dest.jni_id, src.to_int, size.to_int)
       end
       
-      JNI.load_native_method "Java_org_eclipse_swt_internal_gtk_OS_memmove__L#{PangoAttrInt.jni_name}_2JJ".to_sym, [:pointer, :long, :long, :int64, :int64], :void
+      JNI.load_native_method "Java_org_eclipse_swt_internal_gtk_OS_memmove__L#{PangoAttrInt.jni_package_name}_PangoAttrInt_2JJ".to_sym, [:pointer, :long, :long, :int64, :int64], :void
       typesig { [PangoAttrInt, ::Java::Long, ::Java::Long] }
       # @param dest cast=(void *),flags=no_in
       # @param src cast=(const void *)
@@ -25078,10 +25078,10 @@ module Org::Eclipse::Swt::Internal::Gtk
       # int
       # int
       def memmove(dest, src, size)
-        JNI.call_native_method("Java_org_eclipse_swt_internal_gtk_OS_memmove__L#{PangoAttrInt.jni_name}_2JJ".to_sym, JNI.env, self.jni_id, dest.jni_id, src.to_int, size.to_int)
+        JNI.call_native_method("Java_org_eclipse_swt_internal_gtk_OS_memmove__L#{PangoAttrInt.jni_package_name}_PangoAttrInt_2JJ".to_sym, JNI.env, self.jni_id, dest.jni_id, src.to_int, size.to_int)
       end
       
-      JNI.load_native_method "Java_org_eclipse_swt_internal_gtk_OS_memmove__L#{PangoItem.jni_name}_2JJ".to_sym, [:pointer, :long, :long, :int64, :int64], :void
+      JNI.load_native_method "Java_org_eclipse_swt_internal_gtk_OS_memmove__L#{PangoItem.jni_package_name}_PangoItem_2JJ".to_sym, [:pointer, :long, :long, :int64, :int64], :void
       typesig { [PangoItem, ::Java::Long, ::Java::Long] }
       # @param dest cast=(void *),flags=no_in
       # @param src cast=(const void *)
@@ -25090,10 +25090,10 @@ module Org::Eclipse::Swt::Internal::Gtk
       # int
       # int
       def memmove(dest, src, size)
-        JNI.call_native_method("Java_org_eclipse_swt_internal_gtk_OS_memmove__L#{PangoItem.jni_name}_2JJ".to_sym, JNI.env, self.jni_id, dest.jni_id, src.to_int, size.to_int)
+        JNI.call_native_method("Java_org_eclipse_swt_internal_gtk_OS_memmove__L#{PangoItem.jni_package_name}_PangoItem_2JJ".to_sym, JNI.env, self.jni_id, dest.jni_id, src.to_int, size.to_int)
       end
       
-      JNI.load_native_method "Java_org_eclipse_swt_internal_gtk_OS_memmove__L#{PangoLayoutLine.jni_name}_2JJ".to_sym, [:pointer, :long, :long, :int64, :int64], :void
+      JNI.load_native_method "Java_org_eclipse_swt_internal_gtk_OS_memmove__L#{PangoLayoutLine.jni_package_name}_PangoLayoutLine_2JJ".to_sym, [:pointer, :long, :long, :int64, :int64], :void
       typesig { [PangoLayoutLine, ::Java::Long, ::Java::Long] }
       # @param dest cast=(void *),flags=no_in
       # @param src cast=(const void *)
@@ -25102,10 +25102,10 @@ module Org::Eclipse::Swt::Internal::Gtk
       # int
       # int
       def memmove(dest, src, size)
-        JNI.call_native_method("Java_org_eclipse_swt_internal_gtk_OS_memmove__L#{PangoLayoutLine.jni_name}_2JJ".to_sym, JNI.env, self.jni_id, dest.jni_id, src.to_int, size.to_int)
+        JNI.call_native_method("Java_org_eclipse_swt_internal_gtk_OS_memmove__L#{PangoLayoutLine.jni_package_name}_PangoLayoutLine_2JJ".to_sym, JNI.env, self.jni_id, dest.jni_id, src.to_int, size.to_int)
       end
       
-      JNI.load_native_method "Java_org_eclipse_swt_internal_gtk_OS_memmove__L#{PangoLayoutRun.jni_name}_2JJ".to_sym, [:pointer, :long, :long, :int64, :int64], :void
+      JNI.load_native_method "Java_org_eclipse_swt_internal_gtk_OS_memmove__L#{PangoLayoutRun.jni_package_name}_PangoLayoutRun_2JJ".to_sym, [:pointer, :long, :long, :int64, :int64], :void
       typesig { [PangoLayoutRun, ::Java::Long, ::Java::Long] }
       # @param dest cast=(void *),flags=no_in
       # @param src cast=(const void *)
@@ -25114,10 +25114,10 @@ module Org::Eclipse::Swt::Internal::Gtk
       # int
       # int
       def memmove(dest, src, size)
-        JNI.call_native_method("Java_org_eclipse_swt_internal_gtk_OS_memmove__L#{PangoLayoutRun.jni_name}_2JJ".to_sym, JNI.env, self.jni_id, dest.jni_id, src.to_int, size.to_int)
+        JNI.call_native_method("Java_org_eclipse_swt_internal_gtk_OS_memmove__L#{PangoLayoutRun.jni_package_name}_PangoLayoutRun_2JJ".to_sym, JNI.env, self.jni_id, dest.jni_id, src.to_int, size.to_int)
       end
       
-      JNI.load_native_method "Java_org_eclipse_swt_internal_gtk_OS_memmove__L#{PangoLogAttr.jni_name}_2JJ".to_sym, [:pointer, :long, :long, :int64, :int64], :void
+      JNI.load_native_method "Java_org_eclipse_swt_internal_gtk_OS_memmove__L#{PangoLogAttr.jni_package_name}_PangoLogAttr_2JJ".to_sym, [:pointer, :long, :long, :int64, :int64], :void
       typesig { [PangoLogAttr, ::Java::Long, ::Java::Long] }
       # @param dest cast=(void *),flags=no_in
       # @param src cast=(const void *)
@@ -25126,7 +25126,7 @@ module Org::Eclipse::Swt::Internal::Gtk
       # int
       # int
       def memmove(dest, src, size)
-        JNI.call_native_method("Java_org_eclipse_swt_internal_gtk_OS_memmove__L#{PangoLogAttr.jni_name}_2JJ".to_sym, JNI.env, self.jni_id, dest.jni_id, src.to_int, size.to_int)
+        JNI.call_native_method("Java_org_eclipse_swt_internal_gtk_OS_memmove__L#{PangoLogAttr.jni_package_name}_PangoLogAttr_2JJ".to_sym, JNI.env, self.jni_id, dest.jni_id, src.to_int, size.to_int)
       end
       
       JNI.load_native_method :Java_org_eclipse_swt_internal_gtk_OS__1pango_1attr_1background_1new, [:pointer, :long, :int16, :int16, :int16], :int64
