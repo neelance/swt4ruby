@@ -35,7 +35,7 @@ module Org::Eclipse::Swt::Internal::Mozilla
     }
   end
   
-  class NsIChannel < NsIRequest
+  class NsIChannel < NsIChannelImports.const_get :NsIRequest
     include_class_members NsIChannelImports
     
     class_module.module_eval {

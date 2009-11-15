@@ -35,7 +35,7 @@ module Org::Eclipse::Swt::Internal::Mozilla
     }
   end
   
-  class NsIComponentRegistrar < NsISupports
+  class NsIComponentRegistrar < NsIComponentRegistrarImports.const_get :NsISupports
     include_class_members NsIComponentRegistrarImports
     
     class_module.module_eval {

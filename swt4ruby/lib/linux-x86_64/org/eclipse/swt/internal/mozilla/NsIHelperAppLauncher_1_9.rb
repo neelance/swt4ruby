@@ -35,7 +35,7 @@ module Org::Eclipse::Swt::Internal::Mozilla
     }
   end
   
-  class NsIHelperAppLauncher_1_9 < NsICancelable
+  class NsIHelperAppLauncher_1_9 < NsIHelperAppLauncher_1_9Imports.const_get :NsICancelable
     include_class_members NsIHelperAppLauncher_1_9Imports
     
     class_module.module_eval {

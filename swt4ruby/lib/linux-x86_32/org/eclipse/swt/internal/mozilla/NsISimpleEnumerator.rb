@@ -35,7 +35,7 @@ module Org::Eclipse::Swt::Internal::Mozilla
     }
   end
   
-  class NsISimpleEnumerator < NsISupports
+  class NsISimpleEnumerator < NsISimpleEnumeratorImports.const_get :NsISupports
     include_class_members NsISimpleEnumeratorImports
     
     class_module.module_eval {

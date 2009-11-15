@@ -35,7 +35,7 @@ module Org::Eclipse::Swt::Internal::Mozilla
     }
   end
   
-  class NsICancelable < NsISupports
+  class NsICancelable < NsICancelableImports.const_get :NsISupports
     include_class_members NsICancelableImports
     
     class_module.module_eval {

@@ -35,7 +35,7 @@ module Org::Eclipse::Swt::Internal::Mozilla
     }
   end
   
-  class NsIPrefBranch < NsISupports
+  class NsIPrefBranch < NsIPrefBranchImports.const_get :NsISupports
     include_class_members NsIPrefBranchImports
     
     class_module.module_eval {

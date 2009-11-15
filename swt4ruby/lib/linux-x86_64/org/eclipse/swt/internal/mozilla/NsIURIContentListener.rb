@@ -35,7 +35,7 @@ module Org::Eclipse::Swt::Internal::Mozilla
     }
   end
   
-  class NsIURIContentListener < NsISupports
+  class NsIURIContentListener < NsIURIContentListenerImports.const_get :NsISupports
     include_class_members NsIURIContentListenerImports
     
     class_module.module_eval {

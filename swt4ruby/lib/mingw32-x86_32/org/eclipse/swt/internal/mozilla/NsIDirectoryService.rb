@@ -35,7 +35,7 @@ module Org::Eclipse::Swt::Internal::Mozilla
     }
   end
   
-  class NsIDirectoryService < NsISupports
+  class NsIDirectoryService < NsIDirectoryServiceImports.const_get :NsISupports
     include_class_members NsIDirectoryServiceImports
     
     class_module.module_eval {

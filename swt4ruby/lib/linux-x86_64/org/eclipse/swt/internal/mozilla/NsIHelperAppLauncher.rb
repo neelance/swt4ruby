@@ -35,7 +35,7 @@ module Org::Eclipse::Swt::Internal::Mozilla
     }
   end
   
-  class NsIHelperAppLauncher < NsISupports
+  class NsIHelperAppLauncher < NsIHelperAppLauncherImports.const_get :NsISupports
     include_class_members NsIHelperAppLauncherImports
     
     class_module.module_eval {

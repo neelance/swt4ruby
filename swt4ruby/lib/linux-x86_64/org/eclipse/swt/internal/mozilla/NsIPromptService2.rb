@@ -35,7 +35,7 @@ module Org::Eclipse::Swt::Internal::Mozilla
     }
   end
   
-  class NsIPromptService2 < NsIPromptService
+  class NsIPromptService2 < NsIPromptService2Imports.const_get :NsIPromptService
     include_class_members NsIPromptService2Imports
     
     class_module.module_eval {

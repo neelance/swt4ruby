@@ -35,7 +35,7 @@ module Org::Eclipse::Swt::Internal::Mozilla
     }
   end
   
-  class NsIBaseWindow < NsISupports
+  class NsIBaseWindow < NsIBaseWindowImports.const_get :NsISupports
     include_class_members NsIBaseWindowImports
     
     class_module.module_eval {

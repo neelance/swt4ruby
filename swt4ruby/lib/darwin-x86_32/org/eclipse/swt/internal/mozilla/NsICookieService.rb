@@ -35,7 +35,7 @@ module Org::Eclipse::Swt::Internal::Mozilla
   # -  Copyright (C) 2003, 2008 IBM Corp.  All Rights Reserved.
   # 
   # ***** END LICENSE BLOCK *****
-  class NsICookieService < NsISupports
+  class NsICookieService < NsICookieServiceImports.const_get :NsISupports
     include_class_members NsICookieServiceImports
     
     class_module.module_eval {

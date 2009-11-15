@@ -16,7 +16,7 @@ module Org::Eclipse::Swt::Internal::Cocoa
     }
   end
   
-  class Protocol < Id
+  class Protocol < ProtocolImports.const_get :Id
     include_class_members ProtocolImports
     
     typesig { [] }

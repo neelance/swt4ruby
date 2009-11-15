@@ -35,7 +35,7 @@ module Org::Eclipse::Swt::Internal::Mozilla
     }
   end
   
-  class NsIServiceManager < NsISupports
+  class NsIServiceManager < NsIServiceManagerImports.const_get :NsISupports
     include_class_members NsIServiceManagerImports
     
     class_module.module_eval {

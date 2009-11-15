@@ -8,7 +8,7 @@ module Org::Eclipse::Swt::Internal::Mozilla
     }
   end
   
-  class NsISecurityCheckedComponent < NsISupports
+  class NsISecurityCheckedComponent < NsISecurityCheckedComponentImports.const_get :NsISupports
     include_class_members NsISecurityCheckedComponentImports
     
     class_module.module_eval {

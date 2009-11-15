@@ -44,7 +44,7 @@ module Org::Eclipse::Swt::Internal::Mozilla
   # public int IsSystemPrincipal(long /*int*/ aPrincipal, int[] _retval NS_OUTPARAM) {
   # return XPCOM.VtblCall(nsIXPCSecurityManager.LAST_METHOD_ID + 26, getAddress(), aPrincipal, _retval NS_OUTPARAM);
   # }
-  class NsIScriptSecurityManager_1_9_1 < NsIXPCSecurityManager
+  class NsIScriptSecurityManager_1_9_1 < NsIScriptSecurityManager_1_9_1Imports.const_get :NsIXPCSecurityManager
     include_class_members NsIScriptSecurityManager_1_9_1Imports
     
     class_module.module_eval {

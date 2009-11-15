@@ -35,7 +35,7 @@ module Org::Eclipse::Swt::Internal::Mozilla
     }
   end
   
-  class NsIJSContextStack < NsISupports
+  class NsIJSContextStack < NsIJSContextStackImports.const_get :NsISupports
     include_class_members NsIJSContextStackImports
     
     class_module.module_eval {

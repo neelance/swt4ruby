@@ -35,7 +35,7 @@ module Org::Eclipse::Swt::Internal::Mozilla
     }
   end
   
-  class NsIDownload_1_8 < NsITransfer
+  class NsIDownload_1_8 < NsIDownload_1_8Imports.const_get :NsITransfer
     include_class_members NsIDownload_1_8Imports
     
     class_module.module_eval {

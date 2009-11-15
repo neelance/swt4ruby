@@ -35,7 +35,7 @@ module Org::Eclipse::Swt::Internal::Mozilla
     }
   end
   
-  class NsIAuthInformation < NsISupports
+  class NsIAuthInformation < NsIAuthInformationImports.const_get :NsISupports
     include_class_members NsIAuthInformationImports
     
     class_module.module_eval {

@@ -513,7 +513,7 @@ module Org::Eclipse::Swt::Browser
             if ((result[0]).equal?(0))
               error(XPCOM::NS_NOINTERFACE)
             end
-            service_manager = NsIServiceManager.new(result[0])
+            service_manager = self.class::NsIServiceManager.new(result[0])
             result[0] = 0
             a_contract_id = MozillaDelegate.wcs_to_mbcs(nil, XPCOM::NS_COOKIEMANAGER_CONTRACTID, true)
             rc = service_manager._get_service_by_contract_id(a_contract_id, NsICookieManager::NS_ICOOKIEMANAGER_IID, result)
@@ -524,13 +524,13 @@ module Org::Eclipse::Swt::Browser
               error(XPCOM::NS_NOINTERFACE)
             end
             service_manager._release
-            manager = NsICookieManager.new(result[0])
+            manager = self.class::NsICookieManager.new(result[0])
             result[0] = 0
             rc = manager._get_enumerator(result)
             if (!(rc).equal?(XPCOM::NS_OK))
               error(rc)
             end
-            enumerator = NsISimpleEnumerator.new(result[0])
+            enumerator = self.class::NsISimpleEnumerator.new(result[0])
             more_elements = Array.typed(::Java::Int).new(1) { 0 }
             # PRBool
             rc = enumerator._has_more_elements(more_elements)
@@ -543,7 +543,7 @@ module Org::Eclipse::Swt::Browser
               if (!(rc).equal?(XPCOM::NS_OK))
                 error(rc)
               end
-              cookie = NsICookie.new(result[0])
+              cookie = self.class::NsICookie.new(result[0])
               expires = Array.typed(::Java::Long).new(1) { 0 }
               rc = cookie._get_expires(expires)
               if ((expires[0]).equal?(0))
@@ -603,7 +603,7 @@ module Org::Eclipse::Swt::Browser
             if ((result[0]).equal?(0))
               error(XPCOM::NS_NOINTERFACE)
             end
-            service_manager = NsIServiceManager.new(result[0])
+            service_manager = self.class::NsIServiceManager.new(result[0])
             result[0] = 0
             rc = service_manager._get_service(XPCOM::NS_IOSERVICE_CID, NsIIOService::NS_IIOSERVICE_IID, result)
             if (!(rc).equal?(XPCOM::NS_OK))
@@ -612,7 +612,7 @@ module Org::Eclipse::Swt::Browser
             if ((result[0]).equal?(0))
               error(XPCOM::NS_NOINTERFACE)
             end
-            io_service = NsIIOService.new(result[0])
+            io_service = self.class::NsIIOService.new(result[0])
             result[0] = 0
             bytes = MozillaDelegate.wcs_to_mbcs(nil, CookieUrl, false)
             # int
@@ -627,14 +627,14 @@ module Org::Eclipse::Swt::Browser
             if ((result[0]).equal?(0))
               error(XPCOM::NS_ERROR_NULL_POINTER)
             end
-            a_uri = NsIURI.new(result[0])
+            a_uri = self.class::NsIURI.new(result[0])
             result[0] = 0
             a_contract_id = MozillaDelegate.wcs_to_mbcs(nil, XPCOM::NS_COOKIESERVICE_CONTRACTID, true)
             rc = service_manager._get_service_by_contract_id(a_contract_id, NsICookieService::NS_ICOOKIESERVICE_IID, result)
             # int
             cookie_string = 0
             if ((rc).equal?(XPCOM::NS_OK) && !(result[0]).equal?(0))
-              cookie_service = NsICookieService.new(result[0])
+              cookie_service = self.class::NsICookieService.new(result[0])
               result[0] = 0
               rc = cookie_service._get_cookie_string(a_uri.get_address, 0, result)
               cookie_service._release
@@ -656,7 +656,7 @@ module Org::Eclipse::Swt::Browser
               if ((result[0]).equal?(0))
                 error(XPCOM::NS_NOINTERFACE)
               end
-              cookie_service = NsICookieService_1_9.new(result[0])
+              cookie_service = self.class::NsICookieService_1_9.new(result[0])
               result[0] = 0
               rc = cookie_service._get_cookie_string(a_uri.get_address, 0, result)
               cookie_service._release
@@ -720,7 +720,7 @@ module Org::Eclipse::Swt::Browser
             if ((result[0]).equal?(0))
               error(XPCOM::NS_NOINTERFACE)
             end
-            service_manager = NsIServiceManager.new(result[0])
+            service_manager = self.class::NsIServiceManager.new(result[0])
             result[0] = 0
             rc = service_manager._get_service(XPCOM::NS_IOSERVICE_CID, NsIIOService::NS_IIOSERVICE_IID, result)
             if (!(rc).equal?(XPCOM::NS_OK))
@@ -729,7 +729,7 @@ module Org::Eclipse::Swt::Browser
             if ((result[0]).equal?(0))
               error(XPCOM::NS_NOINTERFACE)
             end
-            io_service = NsIIOService.new(result[0])
+            io_service = self.class::NsIIOService.new(result[0])
             result[0] = 0
             bytes = MozillaDelegate.wcs_to_mbcs(nil, CookieUrl, false)
             # int
@@ -744,13 +744,13 @@ module Org::Eclipse::Swt::Browser
             if ((result[0]).equal?(0))
               error(XPCOM::NS_ERROR_NULL_POINTER)
             end
-            a_uri = NsIURI.new(result[0])
+            a_uri = self.class::NsIURI.new(result[0])
             result[0] = 0
             a_cookie = MozillaDelegate.wcs_to_mbcs(nil, CookieValue, true)
             a_contract_id = MozillaDelegate.wcs_to_mbcs(nil, XPCOM::NS_COOKIESERVICE_CONTRACTID, true)
             rc = service_manager._get_service_by_contract_id(a_contract_id, NsICookieService::NS_ICOOKIESERVICE_IID, result)
             if ((rc).equal?(XPCOM::NS_OK) && !(result[0]).equal?(0))
-              cookie_service = NsICookieService.new(result[0])
+              cookie_service = self.class::NsICookieService.new(result[0])
               rc = cookie_service._set_cookie_string(a_uri.get_address, 0, a_cookie, 0)
               cookie_service._release
             else
@@ -762,7 +762,7 @@ module Org::Eclipse::Swt::Browser
               if ((result[0]).equal?(0))
                 error(XPCOM::NS_NOINTERFACE)
               end
-              cookie_service = NsICookieService_1_9.new(result[0])
+              cookie_service = self.class::NsICookieService_1_9.new(result[0])
               rc = cookie_service._set_cookie_string(a_uri.get_address, 0, a_cookie, 0)
               cookie_service._release
             end
@@ -1621,7 +1621,7 @@ module Org::Eclipse::Swt::Browser
             if ((result_[0]).equal?(0))
               error(XPCOM::NS_NOINTERFACE)
             end
-            service_manager = NsIServiceManager.new(result_[0])
+            service_manager = self.class::NsIServiceManager.new(result_[0])
             result_[0] = 0
             buffer = MozillaDelegate.wcs_to_mbcs(nil, XPCOM::NS_OBSERVER_CONTRACTID, true)
             rc = service_manager._get_service_by_contract_id(buffer, NsIObserverService::NS_IOBSERVERSERVICE_IID, result_)
@@ -1631,7 +1631,7 @@ module Org::Eclipse::Swt::Browser
             if ((result_[0]).equal?(0))
               error(XPCOM::NS_NOINTERFACE)
             end
-            observer_service = NsIObserverService.new(result_[0])
+            observer_service = self.class::NsIObserverService.new(result_[0])
             result_[0] = 0
             buffer = MozillaDelegate.wcs_to_mbcs(nil, PROFILE_BEFORE_CHANGE, true)
             length_ = SHUTDOWN_PERSIST.length
@@ -1644,7 +1644,7 @@ module Org::Eclipse::Swt::Browser
             observer_service._release
             if (!(self.attr_location_provider).nil?)
               prefs_location = self.attr_location_provider.attr_profile_path + AppFileLocProvider::PREFERENCES_FILE
-              path_string = NsEmbedString.new(prefs_location)
+              path_string = self.class::NsEmbedString.new(prefs_location)
               rc = XPCOM._ns_new_local_file(path_string.get_address, 1, result_)
               if (!(rc).equal?(XPCOM::NS_OK))
                 Mozilla.error(rc)
@@ -1653,7 +1653,7 @@ module Org::Eclipse::Swt::Browser
                 Mozilla.error(XPCOM::NS_ERROR_NULL_POINTER)
               end
               path_string.dispose
-              local_file = NsILocalFile.new(result_[0])
+              local_file = self.class::NsILocalFile.new(result_[0])
               result_[0] = 0
               rc = local_file._query_interface(NsIFile::NS_IFILE_IID, result_)
               if (!(rc).equal?(XPCOM::NS_OK))
@@ -1663,7 +1663,7 @@ module Org::Eclipse::Swt::Browser
                 Mozilla.error(XPCOM::NS_ERROR_NO_INTERFACE)
               end
               local_file._release
-              pref_file = NsIFile.new(result_[0])
+              pref_file = self.class::NsIFile.new(result_[0])
               result_[0] = 0
               buffer = MozillaDelegate.wcs_to_mbcs(nil, XPCOM::NS_PREFSERVICE_CONTRACTID, true)
               rc = service_manager._get_service_by_contract_id(buffer, NsIPrefService::NS_IPREFSERVICE_IID, result_)
@@ -1673,7 +1673,7 @@ module Org::Eclipse::Swt::Browser
               if ((result_[0]).equal?(0))
                 error(XPCOM::NS_NOINTERFACE)
               end
-              pref_service = NsIPrefService.new(result_[0])
+              pref_service = self.class::NsIPrefService.new(result_[0])
               result_[0] = 0
               rc = pref_service._save_pref_file(pref_file.get_address)
               pref_service._release

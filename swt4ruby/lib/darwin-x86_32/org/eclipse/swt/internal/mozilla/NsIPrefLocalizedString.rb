@@ -35,7 +35,7 @@ module Org::Eclipse::Swt::Internal::Mozilla
     }
   end
   
-  class NsIPrefLocalizedString < NsISupports
+  class NsIPrefLocalizedString < NsIPrefLocalizedStringImports.const_get :NsISupports
     include_class_members NsIPrefLocalizedStringImports
     
     class_module.module_eval {

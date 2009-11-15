@@ -35,7 +35,7 @@ module Org::Eclipse::Swt::Internal::Mozilla
     }
   end
   
-  class NsITransfer < NsIWebProgressListener2
+  class NsITransfer < NsITransferImports.const_get :NsIWebProgressListener2
     include_class_members NsITransferImports
     
     class_module.module_eval {

@@ -35,7 +35,7 @@ module Org::Eclipse::Swt::Internal::Mozilla
     }
   end
   
-  class NsIXPCSecurityManager < NsISupports
+  class NsIXPCSecurityManager < NsIXPCSecurityManagerImports.const_get :NsISupports
     include_class_members NsIXPCSecurityManagerImports
     
     class_module.module_eval {

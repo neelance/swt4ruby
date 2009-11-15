@@ -35,7 +35,7 @@ module Org::Eclipse::Swt::Internal::Mozilla
     }
   end
   
-  class NsIURI < NsISupports
+  class NsIURI < NsIURIImports.const_get :NsISupports
     include_class_members NsIURIImports
     
     class_module.module_eval {

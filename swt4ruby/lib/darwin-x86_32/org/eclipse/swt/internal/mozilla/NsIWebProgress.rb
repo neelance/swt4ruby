@@ -35,7 +35,7 @@ module Org::Eclipse::Swt::Internal::Mozilla
     }
   end
   
-  class NsIWebProgress < NsISupports
+  class NsIWebProgress < NsIWebProgressImports.const_get :NsISupports
     include_class_members NsIWebProgressImports
     
     class_module.module_eval {

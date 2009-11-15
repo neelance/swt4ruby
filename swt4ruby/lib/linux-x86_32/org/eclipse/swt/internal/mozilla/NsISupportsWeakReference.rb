@@ -35,7 +35,7 @@ module Org::Eclipse::Swt::Internal::Mozilla
     }
   end
   
-  class NsISupportsWeakReference < NsISupports
+  class NsISupportsWeakReference < NsISupportsWeakReferenceImports.const_get :NsISupports
     include_class_members NsISupportsWeakReferenceImports
     
     class_module.module_eval {

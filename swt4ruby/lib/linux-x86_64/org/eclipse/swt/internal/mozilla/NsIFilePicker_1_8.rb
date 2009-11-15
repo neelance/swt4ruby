@@ -35,7 +35,7 @@ module Org::Eclipse::Swt::Internal::Mozilla
     }
   end
   
-  class NsIFilePicker_1_8 < NsISupports
+  class NsIFilePicker_1_8 < NsIFilePicker_1_8Imports.const_get :NsISupports
     include_class_members NsIFilePicker_1_8Imports
     
     class_module.module_eval {

@@ -35,7 +35,7 @@ module Org::Eclipse::Swt::Internal::Mozilla
     }
   end
   
-  class NsIDownload < NsISupports
+  class NsIDownload < NsIDownloadImports.const_get :NsISupports
     include_class_members NsIDownloadImports
     
     class_module.module_eval {

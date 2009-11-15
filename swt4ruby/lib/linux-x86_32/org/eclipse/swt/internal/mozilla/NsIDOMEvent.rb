@@ -35,7 +35,7 @@ module Org::Eclipse::Swt::Internal::Mozilla
     }
   end
   
-  class NsIDOMEvent < NsISupports
+  class NsIDOMEvent < NsIDOMEventImports.const_get :NsISupports
     include_class_members NsIDOMEventImports
     
     class_module.module_eval {

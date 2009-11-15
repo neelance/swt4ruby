@@ -35,7 +35,7 @@ module Org::Eclipse::Swt::Internal::Mozilla
     }
   end
   
-  class NsIInputStream < NsISupports
+  class NsIInputStream < NsIInputStreamImports.const_get :NsISupports
     include_class_members NsIInputStreamImports
     
     class_module.module_eval {

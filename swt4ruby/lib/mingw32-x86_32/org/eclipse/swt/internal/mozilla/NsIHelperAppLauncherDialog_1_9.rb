@@ -35,7 +35,7 @@ module Org::Eclipse::Swt::Internal::Mozilla
     }
   end
   
-  class NsIHelperAppLauncherDialog_1_9 < NsISupports
+  class NsIHelperAppLauncherDialog_1_9 < NsIHelperAppLauncherDialog_1_9Imports.const_get :NsISupports
     include_class_members NsIHelperAppLauncherDialog_1_9Imports
     
     class_module.module_eval {

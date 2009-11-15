@@ -35,7 +35,7 @@ module Org::Eclipse::Swt::Internal::Mozilla
     }
   end
   
-  class NsIFactory < NsISupports
+  class NsIFactory < NsIFactoryImports.const_get :NsISupports
     include_class_members NsIFactoryImports
     
     class_module.module_eval {

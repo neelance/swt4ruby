@@ -35,7 +35,7 @@ module Org::Eclipse::Swt::Internal::Mozilla
     }
   end
   
-  class NsIEmbeddingSiteWindow < NsISupports
+  class NsIEmbeddingSiteWindow < NsIEmbeddingSiteWindowImports.const_get :NsISupports
     include_class_members NsIEmbeddingSiteWindowImports
     
     class_module.module_eval {

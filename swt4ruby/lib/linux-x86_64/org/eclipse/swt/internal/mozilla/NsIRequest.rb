@@ -35,7 +35,7 @@ module Org::Eclipse::Swt::Internal::Mozilla
     }
   end
   
-  class NsIRequest < NsISupports
+  class NsIRequest < NsIRequestImports.const_get :NsISupports
     include_class_members NsIRequestImports
     
     class_module.module_eval {

@@ -35,7 +35,7 @@ module Org::Eclipse::Swt::Internal::Mozilla
     }
   end
   
-  class NsIWebProgressListener2 < NsIWebProgressListener
+  class NsIWebProgressListener2 < NsIWebProgressListener2Imports.const_get :NsIWebProgressListener
     include_class_members NsIWebProgressListener2Imports
     
     class_module.module_eval {

@@ -35,7 +35,7 @@ module Org::Eclipse::Swt::Internal::Mozilla
     }
   end
   
-  class NsIProperties < NsISupports
+  class NsIProperties < NsIPropertiesImports.const_get :NsISupports
     include_class_members NsIPropertiesImports
     
     class_module.module_eval {

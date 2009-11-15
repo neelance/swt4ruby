@@ -35,7 +35,7 @@ module Org::Eclipse::Swt::Internal::Mozilla
     }
   end
   
-  class NsIAppShell < NsISupports
+  class NsIAppShell < NsIAppShellImports.const_get :NsISupports
     include_class_members NsIAppShellImports
     
     class_module.module_eval {

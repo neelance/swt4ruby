@@ -35,7 +35,7 @@ module Org::Eclipse::Swt::Internal::Mozilla
     }
   end
   
-  class NsICookie < NsISupports
+  class NsICookie < NsICookieImports.const_get :NsISupports
     include_class_members NsICookieImports
     
     class_module.module_eval {

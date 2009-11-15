@@ -35,7 +35,7 @@ module Org::Eclipse::Swt::Internal::Mozilla
     }
   end
   
-  class NsIWindowWatcher < NsISupports
+  class NsIWindowWatcher < NsIWindowWatcherImports.const_get :NsISupports
     include_class_members NsIWindowWatcherImports
     
     class_module.module_eval {

@@ -8,7 +8,7 @@ module Org::Eclipse::Swt::Internal::Mozilla
     }
   end
   
-  class NsIWritableVariant < NsIVariant
+  class NsIWritableVariant < NsIWritableVariantImports.const_get :NsIVariant
     include_class_members NsIWritableVariantImports
     
     class_module.module_eval {

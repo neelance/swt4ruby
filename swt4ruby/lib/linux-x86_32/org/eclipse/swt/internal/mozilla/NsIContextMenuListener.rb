@@ -35,7 +35,7 @@ module Org::Eclipse::Swt::Internal::Mozilla
     }
   end
   
-  class NsIContextMenuListener < NsISupports
+  class NsIContextMenuListener < NsIContextMenuListenerImports.const_get :NsISupports
     include_class_members NsIContextMenuListenerImports
     
     class_module.module_eval {

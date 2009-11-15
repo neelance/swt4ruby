@@ -35,7 +35,7 @@ module Org::Eclipse::Swt::Internal::Mozilla
     }
   end
   
-  class NsIDOMKeyEvent < NsIDOMUIEvent
+  class NsIDOMKeyEvent < NsIDOMKeyEventImports.const_get :NsIDOMUIEvent
     include_class_members NsIDOMKeyEventImports
     
     class_module.module_eval {

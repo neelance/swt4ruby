@@ -35,7 +35,7 @@ module Org::Eclipse::Swt::Internal::Mozilla
     }
   end
   
-  class NsIInterfaceRequestor < NsISupports
+  class NsIInterfaceRequestor < NsIInterfaceRequestorImports.const_get :NsISupports
     include_class_members NsIInterfaceRequestorImports
     
     class_module.module_eval {

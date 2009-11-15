@@ -35,7 +35,7 @@ module Org::Eclipse::Swt::Internal::Mozilla
     }
   end
   
-  class NsIDOMSerializer < NsISupports
+  class NsIDOMSerializer < NsIDOMSerializerImports.const_get :NsISupports
     include_class_members NsIDOMSerializerImports
     
     class_module.module_eval {

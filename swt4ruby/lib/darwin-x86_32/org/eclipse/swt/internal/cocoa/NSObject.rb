@@ -16,7 +16,7 @@ module Org::Eclipse::Swt::Internal::Cocoa
     }
   end
   
-  class NSObject < Id
+  class NSObject < NSObjectImports.const_get :Id
     include_class_members NSObjectImports
     
     typesig { [] }

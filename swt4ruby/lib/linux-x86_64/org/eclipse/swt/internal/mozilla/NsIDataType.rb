@@ -8,7 +8,7 @@ module Org::Eclipse::Swt::Internal::Mozilla
     }
   end
   
-  class NsIDataType < NsISupports
+  class NsIDataType < NsIDataTypeImports.const_get :NsISupports
     include_class_members NsIDataTypeImports
     
     class_module.module_eval {

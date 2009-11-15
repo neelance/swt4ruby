@@ -35,7 +35,7 @@ module Org::Eclipse::Swt::Internal::Mozilla
     }
   end
   
-  class NsIProgressDialog_1_8 < NsIDownload_1_8
+  class NsIProgressDialog_1_8 < NsIProgressDialog_1_8Imports.const_get :NsIDownload_1_8
     include_class_members NsIProgressDialog_1_8Imports
     
     class_module.module_eval {

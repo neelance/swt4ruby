@@ -35,7 +35,7 @@ module Org::Eclipse::Swt::Internal::Mozilla
     }
   end
   
-  class NsIPrincipal < NsISerializable
+  class NsIPrincipal < NsIPrincipalImports.const_get :NsISerializable
     include_class_members NsIPrincipalImports
     
     class_module.module_eval {

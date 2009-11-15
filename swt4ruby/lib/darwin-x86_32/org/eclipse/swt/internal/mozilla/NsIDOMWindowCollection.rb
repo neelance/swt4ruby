@@ -35,7 +35,7 @@ module Org::Eclipse::Swt::Internal::Mozilla
     }
   end
   
-  class NsIDOMWindowCollection < NsISupports
+  class NsIDOMWindowCollection < NsIDOMWindowCollectionImports.const_get :NsISupports
     include_class_members NsIDOMWindowCollectionImports
     
     class_module.module_eval {

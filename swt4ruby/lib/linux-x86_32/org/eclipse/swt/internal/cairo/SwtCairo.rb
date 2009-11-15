@@ -2967,7 +2967,7 @@ module Org::Eclipse::Swt::Internal::Cairo
         end
       end
       
-      JNI.load_native_method "Java_org_eclipse_swt_internal_cairo_Cairo_memmove__L#{Cairo_path_t.jni_package_name}__2II".to_sym, [:pointer, :long, :long, :int32, :int32], :void
+      JNI.load_native_method "Java_org_eclipse_swt_internal_cairo_Cairo_memmove__L#{Cairo_path_t.jni_package_name}_cairo_path_t_2II".to_sym, [:pointer, :long, :long, :int32, :int32], :void
       typesig { [Cairo_path_t, ::Java::Int, ::Java::Int] }
       # @param dest cast=(void *)
       # @param src cast=(const void *)
@@ -2976,10 +2976,10 @@ module Org::Eclipse::Swt::Internal::Cairo
       # long
       # long
       def memmove(dest, src, size)
-        JNI.call_native_method("Java_org_eclipse_swt_internal_cairo_Cairo_memmove__L#{Cairo_path_t.jni_package_name}__2II".to_sym, JNI.env, self.jni_id, dest.jni_id, src.to_int, size.to_int)
+        JNI.call_native_method("Java_org_eclipse_swt_internal_cairo_Cairo_memmove__L#{Cairo_path_t.jni_package_name}_cairo_path_t_2II".to_sym, JNI.env, self.jni_id, dest.jni_id, src.to_int, size.to_int)
       end
       
-      JNI.load_native_method "Java_org_eclipse_swt_internal_cairo_Cairo_memmove__L#{Cairo_path_data_t.jni_package_name}__2II".to_sym, [:pointer, :long, :long, :int32, :int32], :void
+      JNI.load_native_method "Java_org_eclipse_swt_internal_cairo_Cairo_memmove__L#{Cairo_path_data_t.jni_package_name}_cairo_path_data_t_2II".to_sym, [:pointer, :long, :long, :int32, :int32], :void
       typesig { [Cairo_path_data_t, ::Java::Int, ::Java::Int] }
       # @param dest cast=(void *)
       # @param src cast=(const void *)
@@ -2988,7 +2988,7 @@ module Org::Eclipse::Swt::Internal::Cairo
       # long
       # long
       def memmove(dest, src, size)
-        JNI.call_native_method("Java_org_eclipse_swt_internal_cairo_Cairo_memmove__L#{Cairo_path_data_t.jni_package_name}__2II".to_sym, JNI.env, self.jni_id, dest.jni_id, src.to_int, size.to_int)
+        JNI.call_native_method("Java_org_eclipse_swt_internal_cairo_Cairo_memmove__L#{Cairo_path_data_t.jni_package_name}_cairo_path_data_t_2II".to_sym, JNI.env, self.jni_id, dest.jni_id, src.to_int, size.to_int)
       end
       
       JNI.load_native_method :Java_org_eclipse_swt_internal_cairo_Cairo_memmove___3XdoubleXII, [:pointer, :long, :long, :int32, :int32], :void

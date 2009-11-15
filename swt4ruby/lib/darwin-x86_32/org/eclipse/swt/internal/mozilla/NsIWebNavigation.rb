@@ -35,7 +35,7 @@ module Org::Eclipse::Swt::Internal::Mozilla
     }
   end
   
-  class NsIWebNavigation < NsISupports
+  class NsIWebNavigation < NsIWebNavigationImports.const_get :NsISupports
     include_class_members NsIWebNavigationImports
     
     class_module.module_eval {

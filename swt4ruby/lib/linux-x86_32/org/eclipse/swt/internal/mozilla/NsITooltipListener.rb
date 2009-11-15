@@ -35,7 +35,7 @@ module Org::Eclipse::Swt::Internal::Mozilla
     }
   end
   
-  class NsITooltipListener < NsISupports
+  class NsITooltipListener < NsITooltipListenerImports.const_get :NsISupports
     include_class_members NsITooltipListenerImports
     
     class_module.module_eval {

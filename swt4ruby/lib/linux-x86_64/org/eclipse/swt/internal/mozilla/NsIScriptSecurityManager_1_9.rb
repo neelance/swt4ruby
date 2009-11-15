@@ -35,7 +35,7 @@ module Org::Eclipse::Swt::Internal::Mozilla
     }
   end
   
-  class NsIScriptSecurityManager_1_9 < NsIXPCSecurityManager
+  class NsIScriptSecurityManager_1_9 < NsIScriptSecurityManager_1_9Imports.const_get :NsIXPCSecurityManager
     include_class_members NsIScriptSecurityManager_1_9Imports
     
     class_module.module_eval {

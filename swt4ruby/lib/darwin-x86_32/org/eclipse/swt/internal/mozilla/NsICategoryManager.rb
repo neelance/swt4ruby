@@ -35,7 +35,7 @@ module Org::Eclipse::Swt::Internal::Mozilla
     }
   end
   
-  class NsICategoryManager < NsISupports
+  class NsICategoryManager < NsICategoryManagerImports.const_get :NsISupports
     include_class_members NsICategoryManagerImports
     
     class_module.module_eval {

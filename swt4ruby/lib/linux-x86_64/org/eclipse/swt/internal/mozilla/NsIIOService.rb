@@ -35,7 +35,7 @@ module Org::Eclipse::Swt::Internal::Mozilla
     }
   end
   
-  class NsIIOService < NsISupports
+  class NsIIOService < NsIIOServiceImports.const_get :NsISupports
     include_class_members NsIIOServiceImports
     
     class_module.module_eval {

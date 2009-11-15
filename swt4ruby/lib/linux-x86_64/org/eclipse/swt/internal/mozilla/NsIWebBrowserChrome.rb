@@ -35,7 +35,7 @@ module Org::Eclipse::Swt::Internal::Mozilla
     }
   end
   
-  class NsIWebBrowserChrome < NsISupports
+  class NsIWebBrowserChrome < NsIWebBrowserChromeImports.const_get :NsISupports
     include_class_members NsIWebBrowserChromeImports
     
     class_module.module_eval {

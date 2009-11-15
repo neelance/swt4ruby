@@ -35,7 +35,7 @@ module Org::Eclipse::Swt::Internal::Mozilla
     }
   end
   
-  class NsIWebBrowserChromeFocus < NsISupports
+  class NsIWebBrowserChromeFocus < NsIWebBrowserChromeFocusImports.const_get :NsISupports
     include_class_members NsIWebBrowserChromeFocusImports
     
     class_module.module_eval {

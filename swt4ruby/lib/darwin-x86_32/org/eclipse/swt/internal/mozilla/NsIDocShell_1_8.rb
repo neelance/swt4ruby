@@ -35,7 +35,7 @@ module Org::Eclipse::Swt::Internal::Mozilla
     }
   end
   
-  class NsIDocShell_1_8 < NsISupports
+  class NsIDocShell_1_8 < NsIDocShell_1_8Imports.const_get :NsISupports
     include_class_members NsIDocShell_1_8Imports
     
     class_module.module_eval {

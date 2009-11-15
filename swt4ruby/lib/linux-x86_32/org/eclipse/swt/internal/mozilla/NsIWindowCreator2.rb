@@ -35,7 +35,7 @@ module Org::Eclipse::Swt::Internal::Mozilla
     }
   end
   
-  class NsIWindowCreator2 < NsIWindowCreator
+  class NsIWindowCreator2 < NsIWindowCreator2Imports.const_get :NsIWindowCreator
     include_class_members NsIWindowCreator2Imports
     
     class_module.module_eval {
