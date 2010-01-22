@@ -45,12 +45,14 @@ module Org::Eclipse::Swt::Internal
       obj = object
       return (obj.attr_value).equal?(@value)
     end
+    alias_method :eql?, :==
     
     typesig { [] }
     def hash_code
       # 64
       return RJava.cast_to_int(@value)
     end
+    alias_method :hash, :hash_code
     
     private
     alias_method :initialize__long, :initialize

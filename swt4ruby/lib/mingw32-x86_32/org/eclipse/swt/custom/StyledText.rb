@@ -1903,8 +1903,8 @@ module Org::Eclipse::Swt::Custom
       @overwrite = false
       @text_limit = 0
       @key_action_map = nil
-      @background = nil
-      @foreground = nil
+      @styled_text_background = nil
+      @styled_text_foreground = nil
       @clipboard = nil
       @click_count = 0
       @auto_scroll_direction = 0
@@ -1952,8 +1952,8 @@ module Org::Eclipse::Swt::Custom
       @overwrite = false
       @text_limit = -1
       @key_action_map = Hashtable.new
-      @background = nil
-      @foreground = nil
+      @styled_text_background = nil
+      @styled_text_foreground = nil
       @auto_scroll_direction = SWT::NULL
       @auto_scroll_distance = 0
       @last_char_count = 0
@@ -4356,10 +4356,10 @@ module Org::Eclipse::Swt::Custom
     typesig { [] }
     def get_background
       check_widget
-      if ((@background).nil?)
+      if ((@styled_text_background).nil?)
         return get_display.get_system_color(SWT::COLOR_LIST_BACKGROUND)
       end
-      return @background
+      return @styled_text_background
     end
     
     typesig { [] }
@@ -4706,10 +4706,10 @@ module Org::Eclipse::Swt::Custom
     typesig { [] }
     def get_foreground
       check_widget
-      if ((@foreground).nil?)
+      if ((@styled_text_foreground).nil?)
         return get_display.get_system_color(SWT::COLOR_LIST_FOREGROUND)
       end
-      return @foreground
+      return @styled_text_foreground
     end
     
     typesig { [] }
@@ -6918,8 +6918,8 @@ module Org::Eclipse::Swt::Custom
       @selection = nil
       @double_click_selection = nil
       @key_action_map = nil
-      @background = nil
-      @foreground = nil
+      @styled_text_background = nil
+      @styled_text_foreground = nil
       @clipboard = nil
     end
     
@@ -8877,7 +8877,7 @@ module Org::Eclipse::Swt::Custom
     # @see Control#setBackground(Color)
     def set_background(color)
       check_widget
-      @background = color
+      @styled_text_background = color
       super(color)
       reset_cache(0, @content.get_line_count)
       set_caret_location
@@ -9360,7 +9360,7 @@ module Org::Eclipse::Swt::Custom
     typesig { [Color] }
     def set_foreground(color)
       check_widget
-      @foreground = color
+      @styled_text_foreground = color
       super(get_foreground)
       reset_cache(0, @content.get_line_count)
       set_caret_location

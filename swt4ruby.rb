@@ -214,3 +214,7 @@ end
 Java::Util::EventObject.class_eval do
   include Swt4Ruby::AccessorAliases
 end
+
+class Proc
+  alias_method :run, :call
+end

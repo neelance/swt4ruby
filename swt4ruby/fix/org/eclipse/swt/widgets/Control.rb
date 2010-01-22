@@ -3,11 +3,29 @@ class Org::Eclipse::Swt::Widgets::Control
     get_shell
   end
 
-  def apply_grid_data(*flags)
-    flag_mask = flags.inject(0) { |v, flag| v | (flag.is_a?(Symbol) ? Org::Eclipse::Swt::Layout::GridData.const_get(flag.to_s.upcase) : flag) }
-    data = Org::Eclipse::Swt::Layout::GridData.new(flag_mask)
+  def apply_grid_data(*args)
+    data = Org::Eclipse::Swt::Layout::GridData.new(*args.map { |arg| arg.is_a?(Symbol) ? Org::Eclipse::Swt::Layout::GridData.const_get(arg.to_s.upcase) : arg })
     yield data if block_given?
     set_layout_data data
+  end
+
+  def apply_form_data(width = nil, height = nil)
+    data = width ? Org::Eclipse::Swt::Layout::FormData.new(width, height) : Org::Eclipse::Swt::Layout::FormData.new
+    yield data if block_given?
+    set_layout_data data
+  end
+
+  def apply_row_data(*args)
+    data = Org::Eclipse::Swt::Layout::RowData.new(*args.map { |arg| arg.is_a?(Symbol) ? Org::Eclipse::Swt::SWT.const_get(arg.to_s.upcase) : arg })
+    yield data if block_given?
+    set_layout_data data
+  end
+
+  def new_drop_target(*operations, &block)
+    operation_mask = operations.inject(0) { |mask, op| mask | (op.is_a?(Symbol) ? Org::Eclipse::Swt::Dnd::DND.const_get(op.to_s.upcase) : op) }
+    target = Org::Eclipse::Swt::Dnd::DropTarget.new(self, operation_mask)
+    target.instance_eval &block if block
+    target
   end
 
   # Sent when the location (x, y) of a control changes relative to its parent (or relative to the display, for Shells).
