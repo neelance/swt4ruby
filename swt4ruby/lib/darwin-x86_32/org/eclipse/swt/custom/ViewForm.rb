@@ -301,7 +301,7 @@ module Org::Eclipse::Swt::Custom
       Composite.instance_method(:set_layout).bind(self).call(ViewFormLayout.new)
       set_border_visible(!((style & SWT::BORDER)).equal?(0))
       @listener = Class.new(Listener.class == Class ? Listener : Object) do
-        extend LocalClass
+        local_class_in ViewForm
         include_class_members ViewForm
         include Listener if Listener.class == Module
         

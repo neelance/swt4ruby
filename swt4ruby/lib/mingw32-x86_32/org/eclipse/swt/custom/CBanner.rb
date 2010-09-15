@@ -233,7 +233,7 @@ module Org::Eclipse::Swt::Custom
       Composite.instance_method(:set_layout).bind(self).call(CBannerLayout.new)
       @resize_cursor = Cursor.new(get_display, SWT::CURSOR_SIZEWE)
       @listener = Class.new(Listener.class == Class ? Listener : Object) do
-        extend LocalClass
+        local_class_in CBanner
         include_class_members CBanner
         include Listener if Listener.class == Module
         

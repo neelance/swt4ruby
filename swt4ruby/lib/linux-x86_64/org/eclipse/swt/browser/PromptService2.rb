@@ -66,7 +66,7 @@ module Org::Eclipse::Swt::Browser
     def create_cominterfaces
       @supports = # Create each of the interfaces that this object implements
       Class.new(XPCOMObject.class == Class ? XPCOMObject : Object) do
-        extend LocalClass
+        local_class_in PromptService2
         include_class_members PromptService2
         include XPCOMObject if XPCOMObject.class == Module
         
@@ -100,7 +100,7 @@ module Org::Eclipse::Swt::Browser
         alias_method :initialize_anonymous, :initialize
       end.new_local(self, Array.typed(::Java::Int).new([2, 0, 0]))
       @prompt_service = Class.new(XPCOMObject.class == Class ? XPCOMObject : Object) do
-        extend LocalClass
+        local_class_in PromptService2
         include_class_members PromptService2
         include XPCOMObject if XPCOMObject.class == Module
         
@@ -199,7 +199,7 @@ module Org::Eclipse::Swt::Browser
         alias_method :initialize_anonymous, :initialize
       end.new_local(self, Array.typed(::Java::Int).new([2, 0, 0, 3, 5, 4, 6, 10, 7, 8, 7, 7]))
       @prompt_service2 = Class.new(XPCOMObject.class == Class ? XPCOMObject : Object) do
-        extend LocalClass
+        local_class_in PromptService2
         include_class_members PromptService2
         include XPCOMObject if XPCOMObject.class == Module
         

@@ -577,7 +577,7 @@ module Org::Eclipse::Swt::Dnd
       # method11 EnumDAdvise - not implemented
       @i_data_object = # register each of the interfaces that this object implements
       Class.new(COMObject.class == Class ? COMObject : Object) do
-        extend LocalClass
+        local_class_in Clipboard
         include_class_members Clipboard
         include COMObject if COMObject.class == Module
         

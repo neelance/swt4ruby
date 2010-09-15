@@ -208,7 +208,7 @@ module Org::Eclipse::Swt::Dnd
         DND.error(DND::ERROR_CANNOT_INIT_DROP)
       end
       @control_listener = Class.new(Listener.class == Class ? Listener : Object) do
-        extend LocalClass
+        local_class_in DropTarget
         include_class_members DropTarget
         include Listener if Listener.class == Module
         
@@ -229,7 +229,7 @@ module Org::Eclipse::Swt::Dnd
       end.new_local(self)
       control.add_listener(SWT::Dispose, @control_listener)
       self.add_listener(SWT::Dispose, Class.new(Listener.class == Class ? Listener : Object) do
-        extend LocalClass
+        local_class_in DropTarget
         include_class_members DropTarget
         include Listener if Listener.class == Module
         
@@ -336,7 +336,7 @@ module Org::Eclipse::Swt::Dnd
       # register each of the interfaces that this object implements
       is32 = (C::PTR_SIZEOF).equal?(4)
       @i_drop_target = Class.new(COMObject.class == Class ? COMObject : Object) do
-        extend LocalClass
+        local_class_in DropTarget
         include_class_members DropTarget
         include COMObject if COMObject.class == Module
         

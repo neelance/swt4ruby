@@ -120,7 +120,7 @@ module Org::Eclipse::Swt::Opengl
         WGL.wgl_share_lists(data.attr_share_context.attr_context, @context)
       end
       listener = Class.new(Listener.class == Class ? Listener : Object) do
-        extend LocalClass
+        local_class_in GLCanvas
         include_class_members GLCanvas
         include Listener if Listener.class == Module
         

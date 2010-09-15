@@ -501,7 +501,7 @@ module Org::Eclipse::Swt::Custom
         return
       end
       runnable = Class.new(Runnable.class == Class ? Runnable : Object) do
-        extend LocalClass
+        local_class_in StyledTextRenderer
         include_class_members StyledTextRenderer
         include Runnable if Runnable.class == Module
         
@@ -658,7 +658,7 @@ module Org::Eclipse::Swt::Custom
         end
         if ((color).nil?)
           display = @styled_text.get_display
-          color = display.get_system_color(SWT::COLOR_BLACK)
+          color = display.get_system_color(SWT.attr_color_black)
         end
         gc.set_background(color)
         x = paint_x + Math.max(0, metrics.attr_width - size - BULLET_MARGIN)

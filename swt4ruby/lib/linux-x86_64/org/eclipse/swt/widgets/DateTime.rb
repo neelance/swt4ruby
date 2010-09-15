@@ -261,7 +261,7 @@ module Org::Eclipse::Swt::Widgets
         end
         @text.set_text(get_formatted_string(self.attr_style))
         listener = Class.new(Listener.class == Class ? Listener : Object) do
-          extend LocalClass
+          local_class_in DateTime
           include_class_members DateTime
           include Listener if Listener.class == Module
           
@@ -302,7 +302,7 @@ module Org::Eclipse::Swt::Widgets
         @down = Button.new(self, SWT::ARROW | SWT::DOWN)
         @up.add_listener(SWT::Selection, # down.setToolTipText(SWT.getMessage ("SWT_Down")); //$NON-NLS-1$
         Class.new(Listener.class == Class ? Listener : Object) do
-          extend LocalClass
+          local_class_in DateTime
           include_class_members DateTime
           include Listener if Listener.class == Module
           
@@ -321,7 +321,7 @@ module Org::Eclipse::Swt::Widgets
           alias_method :initialize_anonymous, :initialize
         end.new_local(self))
         @down.add_listener(SWT::Selection, Class.new(Listener.class == Class ? Listener : Object) do
-          extend LocalClass
+          local_class_in DateTime
           include_class_members DateTime
           include Listener if Listener.class == Module
           
@@ -340,7 +340,7 @@ module Org::Eclipse::Swt::Widgets
           alias_method :initialize_anonymous, :initialize
         end.new_local(self))
         add_listener(SWT::Resize, Class.new(Listener.class == Class ? Listener : Object) do
-          extend LocalClass
+          local_class_in DateTime
           include_class_members DateTime
           include Listener if Listener.class == Module
           
@@ -980,7 +980,7 @@ module Org::Eclipse::Swt::Widgets
       end
       @current_field = index
       self.attr_display.async_exec(Class.new(Runnable.class == Class ? Runnable : Object) do
-        extend LocalClass
+        local_class_in DateTime
         include_class_members DateTime
         include Runnable if Runnable.class == Module
         

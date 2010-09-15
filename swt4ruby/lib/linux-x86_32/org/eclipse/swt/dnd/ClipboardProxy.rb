@@ -106,7 +106,7 @@ module Org::Eclipse::Swt::Dnd
         proxy = ClipboardProxy.new(display)
         display.set_data(self.attr_id, proxy)
         display.add_listener(SWT::Dispose, Class.new(Listener.class == Class ? Listener : Object) do
-          extend LocalClass
+          local_class_in ClipboardProxy
           include_class_members ClipboardProxy
           include Listener if Listener.class == Module
           

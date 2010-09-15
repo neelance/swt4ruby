@@ -556,7 +556,7 @@ module Org::Eclipse::Swt::Ole::Win32
       # method9 ShowPropertyFrame - not implemented
       @i_ole_control_site = # register each of the interfaces that this object implements
       Class.new(COMObject.class == Class ? COMObject : Object) do
-        extend LocalClass
+        local_class_in OleControlSite
         include_class_members OleControlSite
         include COMObject if COMObject.class == Module
         
@@ -609,7 +609,7 @@ module Org::Eclipse::Swt::Ole::Win32
         alias_method :initialize_anonymous, :initialize
       end.new_local(self, Array.typed(::Java::Int).new([2, 0, 0, 0, 1, 1, 3, 2, 1, 0]))
       @i_dispatch = Class.new(COMObject.class == Class ? COMObject : Object) do
-        extend LocalClass
+        local_class_in OleControlSite
         include_class_members OleControlSite
         include COMObject if COMObject.class == Module
         

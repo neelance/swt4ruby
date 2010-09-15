@@ -180,7 +180,7 @@ module Org::Eclipse::Swt::Opengl
       @x_window = OS.gdk_x11_drawable_get_xid(@gl_window)
       OS.gdk_window_show(@gl_window)
       listener = Class.new(Listener.class == Class ? Listener : Object) do
-        extend LocalClass
+        local_class_in GLCanvas
         include_class_members GLCanvas
         include Listener if Listener.class == Module
         

@@ -65,7 +65,7 @@ module Org::Eclipse::Swt::Browser
       data.attr_horizontal_alignment = GridData::CENTER
       ok_button.set_layout_data(data)
       ok_button.add_listener(SWT::Selection, Class.new(Listener.class == Class ? Listener : Object) do
-        extend LocalClass
+        local_class_in PromptDialog
         include_class_members PromptDialog
         include Listener if Listener.class == Module
         
@@ -114,7 +114,7 @@ module Org::Eclipse::Swt::Browser
       label.set_layout_data(data)
       buttons = Array.typed(Button).new(4) { nil }
       listener = Class.new(Listener.class == Class ? Listener : Object) do
-        extend LocalClass
+        local_class_in PromptDialog
         include_class_members PromptDialog
         include Listener if Listener.class == Module
         
@@ -228,7 +228,7 @@ module Org::Eclipse::Swt::Browser
       value_text.set_layout_data(data)
       buttons = Array.typed(Button).new(3) { nil }
       listener = Class.new(Listener.class == Class ? Listener : Object) do
-        extend LocalClass
+        local_class_in PromptDialog
         include_class_members PromptDialog
         include Listener if Listener.class == Module
         
@@ -320,7 +320,7 @@ module Org::Eclipse::Swt::Browser
       password_text.set_layout_data(data)
       buttons = Array.typed(Button).new(3) { nil }
       listener = Class.new(Listener.class == Class ? Listener : Object) do
-        extend LocalClass
+        local_class_in PromptDialog
         include_class_members PromptDialog
         include Listener if Listener.class == Module
         

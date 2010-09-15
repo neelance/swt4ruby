@@ -145,15 +145,15 @@ module Org::Eclipse::Swt::Printing
       alias_method :attr_start=, :start=
       
       
-      def end
+      def end_
         defined?(@@end) ? @@end : @@end= 0
       end
-      alias_method :attr_end, :end
+      alias_method :attr_end, :end_
       
-      def end=(value)
+      def end_=(value)
         @@end = value
       end
-      alias_method :attr_end=, :end=
+      alias_method :attr_end=, :end_=
       
       const_set_lazy(:GTK_LPR_BACKEND) { "GtkPrintBackendLpr" }
       const_attr_reader  :GTK_LPR_BACKEND
@@ -561,8 +561,8 @@ module Org::Eclipse::Swt::Printing
         end
         data.attr_device = self
         data.attr_drawable = drawable
-        data.attr_background = get_system_color(SWT::COLOR_WHITE).attr_handle
-        data.attr_foreground = get_system_color(SWT::COLOR_BLACK).attr_handle
+        data.attr_background = get_system_color(SWT.attr_color_white).attr_handle
+        data.attr_foreground = get_system_color(SWT.attr_color_black).attr_handle
         data.attr_font = get_system_font
         # TODO: We are supposed to return this in pixels, but GTK_UNIT_PIXELS is currently not implemented (gtk bug 346245)
         data.attr_width = RJava.cast_to_int(OS.gtk_page_setup_get_paper_width(@page_setup, OS::GTK_UNIT_POINTS))

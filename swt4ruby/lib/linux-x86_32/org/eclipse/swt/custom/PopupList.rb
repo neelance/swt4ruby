@@ -73,7 +73,7 @@ module Org::Eclipse::Swt::Custom
       @list = SwtList.new(@shell, SWT::SINGLE | SWT::V_SCROLL)
       @shell.add_listener(SWT::Deactivate, # close dialog if user selects outside of the shell
       Class.new(Listener.class == Class ? Listener : Object) do
-        extend LocalClass
+        local_class_in PopupList
         include_class_members PopupList
         include Listener if Listener.class == Module
         
@@ -92,7 +92,7 @@ module Org::Eclipse::Swt::Custom
       end.new_local(self))
       @shell.add_control_listener(# resize shell when list resizes
       Class.new(ControlListener.class == Class ? ControlListener : Object) do
-        extend LocalClass
+        local_class_in PopupList
         include_class_members PopupList
         include ControlListener if ControlListener.class == Module
         
@@ -116,7 +116,7 @@ module Org::Eclipse::Swt::Custom
       end.new_local(self))
       @list.add_mouse_listener(# return list selection on Mouse Up or Carriage Return
       Class.new(MouseListener.class == Class ? MouseListener : Object) do
-        extend LocalClass
+        local_class_in PopupList
         include_class_members PopupList
         include MouseListener if MouseListener.class == Module
         
@@ -142,7 +142,7 @@ module Org::Eclipse::Swt::Custom
         alias_method :initialize_anonymous, :initialize
       end.new_local(self))
       @list.add_key_listener(Class.new(KeyListener.class == Class ? KeyListener : Object) do
-        extend LocalClass
+        local_class_in PopupList
         include_class_members PopupList
         include KeyListener if KeyListener.class == Module
         

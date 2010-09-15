@@ -112,7 +112,7 @@ module Org::Eclipse::Swt::Ole::Win32
     def create_cominterfaces
       @i_unknown = # register each of the interfaces that this object implements
       Class.new(COMObject.class == Class ? COMObject : Object) do
-        extend LocalClass
+        local_class_in OlePropertyChangeSink
         include_class_members OlePropertyChangeSink
         include COMObject if COMObject.class == Module
         
@@ -146,7 +146,7 @@ module Org::Eclipse::Swt::Ole::Win32
         alias_method :initialize_anonymous, :initialize
       end.new_local(self, Array.typed(::Java::Int).new([2, 0, 0]))
       @i_property_notify_sink = Class.new(COMObject.class == Class ? COMObject : Object) do
-        extend LocalClass
+        local_class_in OlePropertyChangeSink
         include_class_members OlePropertyChangeSink
         include COMObject if COMObject.class == Module
         

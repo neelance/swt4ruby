@@ -146,7 +146,7 @@ module Org::Eclipse::Swt::Custom
         @sash_style |= SWT::SMOOTH
       end
       @sash_listener = Class.new(Listener.class == Class ? Listener : Object) do
-        extend LocalClass
+        local_class_in SashForm
         include_class_members SashForm
         include Listener if Listener.class == Module
         

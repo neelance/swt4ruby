@@ -161,11 +161,11 @@ module Org::Eclipse::Swt::Internal::Accessibility::Gtk
     
     # @field cast=(void (*)())
     # long
-    attr_accessor :initialize_
-    alias_method :attr_initialize_, :initialize_
-    undef_method :initialize_
-    alias_method :attr_initialize_=, :initialize_=
-    undef_method :initialize_=
+    attr_accessor :initialize
+    alias_method :attr_initialize, :initialize
+    undef_method :initialize
+    alias_method :attr_initialize=, :initialize=
+    undef_method :initialize=
     
     # @field cast=(void (*)())
     # long
@@ -226,7 +226,7 @@ module Org::Eclipse::Swt::Internal::Accessibility::Gtk
       @set_role = 0
       @connect_property_change_handler = 0
       @remove_property_change_handler = 0
-      @initialize_ = 0
+      @initialize = 0
       @children_changed = 0
       @focus_event = 0
       @property_change = 0

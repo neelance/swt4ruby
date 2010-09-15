@@ -130,7 +130,7 @@ module Org::Eclipse::Swt::Opengl
       set_data(GLCONTEXT_KEY, @context)
       NSNotificationCenter.default_center.add_observer(self.attr_view, OS.attr_sel_update_open_glcontext_, OS::NSViewGlobalFrameDidChangeNotification, self.attr_view)
       listener = Class.new(Listener.class == Class ? Listener : Object) do
-        extend LocalClass
+        local_class_in GLCanvas
         include_class_members GLCanvas
         include Listener if Listener.class == Module
         

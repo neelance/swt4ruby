@@ -494,7 +494,7 @@ module Org::Eclipse::Swt::Browser
       # $NON-NLS-1$
       when_class_loaded do
         MozillaClearSessions = Class.new(Runnable.class == Class ? Runnable : Object) do
-          extend LocalClass
+          local_class_in Mozilla
           include_class_members Mozilla
           include Runnable if Runnable.class == Module
           
@@ -584,7 +584,7 @@ module Org::Eclipse::Swt::Browser
           alias_method :initialize_anonymous, :initialize
         end.new_local(self)
         MozillaGetCookie = Class.new(Runnable.class == Class ? Runnable : Object) do
-          extend LocalClass
+          local_class_in Mozilla
           include_class_members Mozilla
           include Runnable if Runnable.class == Module
           
@@ -701,7 +701,7 @@ module Org::Eclipse::Swt::Browser
           alias_method :initialize_anonymous, :initialize
         end.new_local(self)
         MozillaSetCookie = Class.new(Runnable.class == Class ? Runnable : Object) do
-          extend LocalClass
+          local_class_in Mozilla
           include_class_members Mozilla
           include Runnable if Runnable.class == Module
           
@@ -1601,7 +1601,7 @@ module Org::Eclipse::Swt::Browser
       if ((display.get_data(DISPOSE_LISTENER_HOOKED)).nil?)
         display.set_data(DISPOSE_LISTENER_HOOKED, DISPOSE_LISTENER_HOOKED)
         display.add_listener(SWT::Dispose, Class.new(Listener.class == Class ? Listener : Object) do
-          extend LocalClass
+          local_class_in Mozilla
           include_class_members Mozilla
           include Listener if Listener.class == Module
           
@@ -1687,7 +1687,7 @@ module Org::Eclipse::Swt::Browser
               # so that its symbols are still available once this callback returns.
               listener_class = self.class
               display.async_exec(Class.new(self.class::Runnable.class == Class ? self.class::Runnable : Object) do
-                extend LocalClass
+                local_class_in listener_class
                 include_class_members listener_class
                 include class_self::Runnable if class_self::Runnable.class == Module
                 
@@ -1904,7 +1904,7 @@ module Org::Eclipse::Swt::Browser
       end
       @delegate.init
       @listener = Class.new(Listener.class == Class ? Listener : Object) do
-        extend LocalClass
+        local_class_in Mozilla
         include_class_members Mozilla
         include Listener if Listener.class == Module
         
@@ -1941,7 +1941,7 @@ module Org::Eclipse::Swt::Browser
               display_ = event.attr_display
               listener_class = self.class
               display_.async_exec(Class.new(self.class::Runnable.class == Class ? self.class::Runnable : Object) do
-                extend LocalClass
+                local_class_in listener_class
                 include_class_members listener_class
                 include class_self::Runnable if class_self::Runnable.class == Module
                 
@@ -2005,7 +2005,7 @@ module Org::Eclipse::Swt::Browser
     def create_cominterfaces
       @supports = # Create each of the interfaces that this object implements
       Class.new(XPCOMObject.class == Class ? XPCOMObject : Object) do
-        extend LocalClass
+        local_class_in Mozilla
         include_class_members Mozilla
         include XPCOMObject if XPCOMObject.class == Module
         
@@ -2039,7 +2039,7 @@ module Org::Eclipse::Swt::Browser
         alias_method :initialize_anonymous, :initialize
       end.new_local(self, Array.typed(::Java::Int).new([2, 0, 0]))
       @weak_reference = Class.new(XPCOMObject.class == Class ? XPCOMObject : Object) do
-        extend LocalClass
+        local_class_in Mozilla
         include_class_members Mozilla
         include XPCOMObject if XPCOMObject.class == Module
         
@@ -2080,7 +2080,7 @@ module Org::Eclipse::Swt::Browser
         alias_method :initialize_anonymous, :initialize
       end.new_local(self, Array.typed(::Java::Int).new([2, 0, 0, 2]))
       @web_progress_listener = Class.new(XPCOMObject.class == Class ? XPCOMObject : Object) do
-        extend LocalClass
+        local_class_in Mozilla
         include_class_members Mozilla
         include XPCOMObject if XPCOMObject.class == Module
         
@@ -2157,7 +2157,7 @@ module Org::Eclipse::Swt::Browser
         alias_method :initialize_anonymous, :initialize
       end.new_local(self, Array.typed(::Java::Int).new([2, 0, 0, 4, 6, 3, 4, 3]))
       @web_browser_chrome = Class.new(XPCOMObject.class == Class ? XPCOMObject : Object) do
-        extend LocalClass
+        local_class_in Mozilla
         include_class_members Mozilla
         include XPCOMObject if XPCOMObject.class == Module
         
@@ -2266,7 +2266,7 @@ module Org::Eclipse::Swt::Browser
         alias_method :initialize_anonymous, :initialize
       end.new_local(self, Array.typed(::Java::Int).new([2, 0, 0, 2, 1, 1, 1, 1, 0, 2, 0, 1, 1]))
       @web_browser_chrome_focus = Class.new(XPCOMObject.class == Class ? XPCOMObject : Object) do
-        extend LocalClass
+        local_class_in Mozilla
         include_class_members Mozilla
         include XPCOMObject if XPCOMObject.class == Module
         
@@ -2314,7 +2314,7 @@ module Org::Eclipse::Swt::Browser
         alias_method :initialize_anonymous, :initialize
       end.new_local(self, Array.typed(::Java::Int).new([2, 0, 0, 0, 0]))
       @embedding_site_window = Class.new(XPCOMObject.class == Class ? XPCOMObject : Object) do
-        extend LocalClass
+        local_class_in Mozilla
         include_class_members Mozilla
         include XPCOMObject if XPCOMObject.class == Module
         
@@ -2411,7 +2411,7 @@ module Org::Eclipse::Swt::Browser
         alias_method :initialize_anonymous, :initialize
       end.new_local(self, Array.typed(::Java::Int).new([2, 0, 0, 5, 5, 0, 1, 1, 1, 1, 1]))
       @interface_requestor = Class.new(XPCOMObject.class == Class ? XPCOMObject : Object) do
-        extend LocalClass
+        local_class_in Mozilla
         include_class_members Mozilla
         include XPCOMObject if XPCOMObject.class == Module
         
@@ -2452,7 +2452,7 @@ module Org::Eclipse::Swt::Browser
         alias_method :initialize_anonymous, :initialize
       end.new_local(self, Array.typed(::Java::Int).new([2, 0, 0, 2]))
       @supports_weak_reference = Class.new(XPCOMObject.class == Class ? XPCOMObject : Object) do
-        extend LocalClass
+        local_class_in Mozilla
         include_class_members Mozilla
         include XPCOMObject if XPCOMObject.class == Module
         
@@ -2493,7 +2493,7 @@ module Org::Eclipse::Swt::Browser
         alias_method :initialize_anonymous, :initialize
       end.new_local(self, Array.typed(::Java::Int).new([2, 0, 0, 1]))
       @context_menu_listener = Class.new(XPCOMObject.class == Class ? XPCOMObject : Object) do
-        extend LocalClass
+        local_class_in Mozilla
         include_class_members Mozilla
         include XPCOMObject if XPCOMObject.class == Module
         
@@ -2535,7 +2535,7 @@ module Org::Eclipse::Swt::Browser
         alias_method :initialize_anonymous, :initialize
       end.new_local(self, Array.typed(::Java::Int).new([2, 0, 0, 3]))
       @uri_content_listener = Class.new(XPCOMObject.class == Class ? XPCOMObject : Object) do
-        extend LocalClass
+        local_class_in Mozilla
         include_class_members Mozilla
         include XPCOMObject if XPCOMObject.class == Module
         
@@ -2627,7 +2627,7 @@ module Org::Eclipse::Swt::Browser
         alias_method :initialize_anonymous, :initialize
       end.new_local(self, Array.typed(::Java::Int).new([2, 0, 0, 2, 5, 3, 4, 1, 1, 1, 1]))
       @tooltip_listener = Class.new(XPCOMObject.class == Class ? XPCOMObject : Object) do
-        extend LocalClass
+        local_class_in Mozilla
         include_class_members Mozilla
         include XPCOMObject if XPCOMObject.class == Module
         
@@ -2677,7 +2677,7 @@ module Org::Eclipse::Swt::Browser
         alias_method :initialize_anonymous, :initialize
       end.new_local(self, Array.typed(::Java::Int).new([2, 0, 0, 3, 0]))
       @dom_event_listener = Class.new(XPCOMObject.class == Class ? XPCOMObject : Object) do
-        extend LocalClass
+        local_class_in Mozilla
         include_class_members Mozilla
         include XPCOMObject if XPCOMObject.class == Module
         
@@ -4654,7 +4654,7 @@ module Org::Eclipse::Swt::Browser
       # with the Mozilla application TestGtkEmbed.  The workaround is to
       # send the traversal notification after this callback returns.
       Class.new(Runnable.class == Class ? Runnable : Object) do
-        extend LocalClass
+        local_class_in Mozilla
         include_class_members Mozilla
         include Runnable if Runnable.class == Module
         
@@ -4684,7 +4684,7 @@ module Org::Eclipse::Swt::Browser
       # with the Mozilla application TestGtkEmbed.  The workaround is to
       # send the traversal notification after this callback returns.
       Class.new(Runnable.class == Class ? Runnable : Object) do
-        extend LocalClass
+        local_class_in Mozilla
         include_class_members Mozilla
         include Runnable if Runnable.class == Module
         

@@ -116,7 +116,7 @@ module Org::Eclipse::Swt::Custom
       end
       @show_border = !((style & SWT::BORDER)).equal?(0)
       add_control_listener(Class.new(ControlAdapter.class == Class ? ControlAdapter : Object) do
-        extend LocalClass
+        local_class_in AnimatedProgress
         include_class_members AnimatedProgress
         include ControlAdapter if ControlAdapter.class == Module
         
@@ -134,7 +134,7 @@ module Org::Eclipse::Swt::Custom
         alias_method :initialize_anonymous, :initialize
       end.new_local(self))
       add_paint_listener(Class.new(PaintListener.class == Class ? PaintListener : Object) do
-        extend LocalClass
+        local_class_in AnimatedProgress
         include_class_members AnimatedProgress
         include PaintListener if PaintListener.class == Module
         
@@ -152,7 +152,7 @@ module Org::Eclipse::Swt::Custom
         alias_method :initialize_anonymous, :initialize
       end.new_local(self))
       add_dispose_listener(Class.new(DisposeListener.class == Class ? DisposeListener : Object) do
-        extend LocalClass
+        local_class_in AnimatedProgress
         include_class_members AnimatedProgress
         include DisposeListener if DisposeListener.class == Module
         
@@ -298,7 +298,7 @@ module Org::Eclipse::Swt::Custom
         display = get_display
         timer = Array.typed(Runnable).new(1) { nil }
         timer[0] = Class.new(Runnable.class == Class ? Runnable : Object) do
-          extend LocalClass
+          local_class_in AnimatedProgress
           include_class_members AnimatedProgress
           include Runnable if Runnable.class == Module
           

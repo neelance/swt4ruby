@@ -209,7 +209,7 @@ module Org::Eclipse::Swt::Custom
       if (!(h_bar).nil?)
         h_bar.set_visible(false)
         h_bar.add_listener(SWT::Selection, Class.new(Listener.class == Class ? Listener : Object) do
-          extend LocalClass
+          local_class_in ScrolledComposite
           include_class_members ScrolledComposite
           include Listener if Listener.class == Module
           
@@ -231,7 +231,7 @@ module Org::Eclipse::Swt::Custom
       if (!(v_bar).nil?)
         v_bar.set_visible(false)
         v_bar.add_listener(SWT::Selection, Class.new(Listener.class == Class ? Listener : Object) do
-          extend LocalClass
+          local_class_in ScrolledComposite
           include_class_members ScrolledComposite
           include Listener if Listener.class == Module
           
@@ -250,7 +250,7 @@ module Org::Eclipse::Swt::Custom
         end.new_local(self))
       end
       @content_listener = Class.new(Listener.class == Class ? Listener : Object) do
-        extend LocalClass
+        local_class_in ScrolledComposite
         include_class_members ScrolledComposite
         include Listener if Listener.class == Module
         
@@ -271,7 +271,7 @@ module Org::Eclipse::Swt::Custom
         alias_method :initialize_anonymous, :initialize
       end.new_local(self)
       @filter = Class.new(Listener.class == Class ? Listener : Object) do
-        extend LocalClass
+        local_class_in ScrolledComposite
         include_class_members ScrolledComposite
         include Listener if Listener.class == Module
         
@@ -294,7 +294,7 @@ module Org::Eclipse::Swt::Custom
         alias_method :initialize_anonymous, :initialize
       end.new_local(self)
       add_dispose_listener(Class.new(DisposeListener.class == Class ? DisposeListener : Object) do
-        extend LocalClass
+        local_class_in ScrolledComposite
         include_class_members ScrolledComposite
         include DisposeListener if DisposeListener.class == Module
         

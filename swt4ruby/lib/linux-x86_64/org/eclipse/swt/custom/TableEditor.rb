@@ -126,7 +126,7 @@ module Org::Eclipse::Swt::Custom
       @column = -1
       @table = table
       @column_listener = Class.new(ControlListener.class == Class ? ControlListener : Object) do
-        extend LocalClass
+        local_class_in TableEditor
         include_class_members TableEditor
         include ControlListener if ControlListener.class == Module
         
@@ -149,7 +149,7 @@ module Org::Eclipse::Swt::Custom
         alias_method :initialize_anonymous, :initialize
       end.new_local(self)
       @timer = Class.new(Runnable.class == Class ? Runnable : Object) do
-        extend LocalClass
+        local_class_in TableEditor
         include_class_members TableEditor
         include Runnable if Runnable.class == Module
         

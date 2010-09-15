@@ -77,7 +77,7 @@ module Org::Eclipse::Swt::Browser
     def create_cominterfaces
       @supports = # Create each of the interfaces that this object implements
       Class.new(XPCOMObject.class == Class ? XPCOMObject : Object) do
-        extend LocalClass
+        local_class_in SimpleEnumerator
         include_class_members SimpleEnumerator
         include XPCOMObject if XPCOMObject.class == Module
         
@@ -111,7 +111,7 @@ module Org::Eclipse::Swt::Browser
         alias_method :initialize_anonymous, :initialize
       end.new_local(self, Array.typed(::Java::Int).new([2, 0, 0]))
       @simple_enumerator = Class.new(XPCOMObject.class == Class ? XPCOMObject : Object) do
-        extend LocalClass
+        local_class_in SimpleEnumerator
         include_class_members SimpleEnumerator
         include XPCOMObject if XPCOMObject.class == Module
         

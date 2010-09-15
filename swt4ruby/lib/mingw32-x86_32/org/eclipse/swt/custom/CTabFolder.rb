@@ -815,7 +815,7 @@ module Org::Eclipse::Swt::Custom
       init_accessible
       @listener = # Add all listeners
       Class.new(Listener.class == Class ? Listener : Object) do
-        extend LocalClass
+        local_class_in CTabFolder
         include_class_members CTabFolder
         include Listener if Listener.class == Module
         
@@ -2268,7 +2268,7 @@ module Org::Eclipse::Swt::Custom
     def init_accessible
       accessible = get_accessible
       accessible.add_accessible_listener(Class.new(AccessibleAdapter.class == Class ? AccessibleAdapter : Object) do
-        extend LocalClass
+        local_class_in CTabFolder
         include_class_members CTabFolder
         include AccessibleAdapter if AccessibleAdapter.class == Module
         
@@ -2333,7 +2333,7 @@ module Org::Eclipse::Swt::Custom
         alias_method :initialize_anonymous, :initialize
       end.new_local(self))
       accessible.add_accessible_control_listener(Class.new(AccessibleControlAdapter.class == Class ? AccessibleControlAdapter : Object) do
-        extend LocalClass
+        local_class_in CTabFolder
         include_class_members CTabFolder
         include AccessibleControlAdapter if AccessibleControlAdapter.class == Module
         
@@ -2517,7 +2517,7 @@ module Org::Eclipse::Swt::Custom
         alias_method :initialize_anonymous, :initialize
       end.new_local(self))
       add_listener(SWT::Selection, Class.new(Listener.class == Class ? Listener : Object) do
-        extend LocalClass
+        local_class_in CTabFolder
         include_class_members CTabFolder
         include Listener if Listener.class == Module
         
@@ -2541,7 +2541,7 @@ module Org::Eclipse::Swt::Custom
         alias_method :initialize_anonymous, :initialize
       end.new_local(self))
       add_listener(SWT::FocusIn, Class.new(Listener.class == Class ? Listener : Object) do
-        extend LocalClass
+        local_class_in CTabFolder
         include_class_members CTabFolder
         include Listener if Listener.class == Module
         
@@ -4843,7 +4843,7 @@ module Org::Eclipse::Swt::Custom
         item.set_image(tab.get_image)
         item.set_data(id, tab)
         item.add_selection_listener(Class.new(SelectionAdapter.class == Class ? SelectionAdapter : Object) do
-          extend LocalClass
+          local_class_in CTabFolder
           include_class_members CTabFolder
           include SelectionAdapter if SelectionAdapter.class == Module
           

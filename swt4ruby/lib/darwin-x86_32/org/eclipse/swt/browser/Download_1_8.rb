@@ -111,7 +111,7 @@ module Org::Eclipse::Swt::Browser
     def create_cominterfaces
       @supports = # Create each of the interfaces that this object implements
       Class.new(XPCOMObject.class == Class ? XPCOMObject : Object) do
-        extend LocalClass
+        local_class_in Download_1_8
         include_class_members Download_1_8
         include XPCOMObject if XPCOMObject.class == Module
         
@@ -145,7 +145,7 @@ module Org::Eclipse::Swt::Browser
         alias_method :initialize_anonymous, :initialize
       end.new_local(self, Array.typed(::Java::Int).new([2, 0, 0]))
       @download = Class.new(XPCOMObject.class == Class ? XPCOMObject : Object) do
-        extend LocalClass
+        local_class_in Download_1_8
         include_class_members Download_1_8
         include XPCOMObject if XPCOMObject.class == Module
         
@@ -314,7 +314,7 @@ module Org::Eclipse::Swt::Browser
         alias_method :initialize_anonymous, :initialize
       end.new_local(self, Array.typed(::Java::Int).new([2, 0, 0, 4, 6, 3, 4, 3, Is32 ? 10 : 6, Is32 ? 8 : 7, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]))
       @progress_dialog = Class.new(XPCOMObject.class == Class ? XPCOMObject : Object) do
-        extend LocalClass
+        local_class_in Download_1_8
         include_class_members Download_1_8
         include XPCOMObject if XPCOMObject.class == Module
         
@@ -533,7 +533,7 @@ module Org::Eclipse::Swt::Browser
         alias_method :initialize_anonymous, :initialize
       end.new_local(self, Array.typed(::Java::Int).new([2, 0, 0, 4, 6, 3, 4, 3, Is32 ? 10 : 6, Is32 ? 8 : 7, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]))
       @web_progress_listener = Class.new(XPCOMObject.class == Class ? XPCOMObject : Object) do
-        extend LocalClass
+        local_class_in Download_1_8
         include_class_members Download_1_8
         include XPCOMObject if XPCOMObject.class == Module
         
@@ -739,7 +739,7 @@ module Org::Eclipse::Swt::Browser
       separator = filename.last_index_of(System.get_property("file.separator")) # $NON-NLS-1$
       filename = RJava.cast_to_string(filename.substring(separator + 1))
       listener = Class.new(Listener.class == Class ? Listener : Object) do
-        extend LocalClass
+        local_class_in Download_1_8
         include_class_members Download_1_8
         include Listener if Listener.class == Module
         

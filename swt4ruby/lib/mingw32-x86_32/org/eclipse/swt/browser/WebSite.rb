@@ -109,7 +109,7 @@ module Org::Eclipse::Swt::Browser
     def create_cominterfaces
       super
       @i_doc_host_uihandler = Class.new(COMObject.class == Class ? COMObject : Object) do
-        extend LocalClass
+        local_class_in WebSite
         include_class_members WebSite
         include COMObject if COMObject.class == Module
         
@@ -257,7 +257,7 @@ module Org::Eclipse::Swt::Browser
         alias_method :initialize_anonymous, :initialize
       end.new_local(self, Array.typed(::Java::Int).new([2, 0, 0, 4, 1, 5, 0, 0, 1, 1, 1, 3, 3, 2, 2, 1, 3, 2]))
       @i_doc_host_show_ui = Class.new(COMObject.class == Class ? COMObject : Object) do
-        extend LocalClass
+        local_class_in WebSite
         include_class_members WebSite
         include COMObject if COMObject.class == Module
         
@@ -317,7 +317,7 @@ module Org::Eclipse::Swt::Browser
         alias_method :initialize_anonymous, :initialize
       end.new_local(self, Array.typed(::Java::Int).new([2, 0, 0, 7, (C::PTR_SIZEOF).equal?(4) ? 7 : 6]))
       @i_service_provider = Class.new(COMObject.class == Class ? COMObject : Object) do
-        extend LocalClass
+        local_class_in WebSite
         include_class_members WebSite
         include COMObject if COMObject.class == Module
         
@@ -358,7 +358,7 @@ module Org::Eclipse::Swt::Browser
         alias_method :initialize_anonymous, :initialize
       end.new_local(self, Array.typed(::Java::Int).new([2, 0, 0, 3]))
       @i_internet_security_manager = Class.new(COMObject.class == Class ? COMObject : Object) do
-        extend LocalClass
+        local_class_in WebSite
         include_class_members WebSite
         include COMObject if COMObject.class == Module
         
@@ -460,7 +460,7 @@ module Org::Eclipse::Swt::Browser
         alias_method :initialize_anonymous, :initialize
       end.new_local(self, Array.typed(::Java::Int).new([2, 0, 0, 1, 1, 3, 4, 8, 7, 3, 3]))
       @i_ole_command_target = Class.new(COMObject.class == Class ? COMObject : Object) do
-        extend LocalClass
+        local_class_in WebSite
         include_class_members WebSite
         include COMObject if COMObject.class == Module
         
@@ -511,7 +511,7 @@ module Org::Eclipse::Swt::Browser
         alias_method :initialize_anonymous, :initialize
       end.new_local(self, Array.typed(::Java::Int).new([2, 0, 0, 4, 5]))
       @i_authenticate = Class.new(COMObject.class == Class ? COMObject : Object) do
-        extend LocalClass
+        local_class_in WebSite
         include_class_members WebSite
         include COMObject if COMObject.class == Module
         
@@ -552,7 +552,7 @@ module Org::Eclipse::Swt::Browser
         alias_method :initialize_anonymous, :initialize
       end.new_local(self, Array.typed(::Java::Int).new([2, 0, 0, 3]))
       @i_dispatch = Class.new(COMObject.class == Class ? COMObject : Object) do
-        extend LocalClass
+        local_class_in WebSite
         include_class_members WebSite
         include COMObject if COMObject.class == Module
         

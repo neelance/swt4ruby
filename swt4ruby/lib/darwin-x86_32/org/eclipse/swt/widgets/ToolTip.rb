@@ -210,7 +210,7 @@ module Org::Eclipse::Swt::Widgets
       background = display.get_system_color(SWT::COLOR_INFO_BACKGROUND)
       @tip.set_background(background)
       @listener = Class.new(Listener.class == Class ? Listener : Object) do
-        extend LocalClass
+        local_class_in ToolTip
         include_class_members ToolTip
         include Listener if Listener.class == Module
         
@@ -238,7 +238,7 @@ module Org::Eclipse::Swt::Widgets
       @tip.add_listener(SWT::Paint, @listener)
       @tip.add_listener(SWT::MouseDown, @listener)
       @parent_listener = Class.new(Listener.class == Class ? Listener : Object) do
-        extend LocalClass
+        local_class_in ToolTip
         include_class_members ToolTip
         include Listener if Listener.class == Module
         
@@ -764,7 +764,7 @@ module Org::Eclipse::Swt::Widgets
       @runnable = nil
       if (@autohide && visible)
         @runnable = Class.new(Runnable.class == Class ? Runnable : Object) do
-          extend LocalClass
+          local_class_in ToolTip
           include_class_members ToolTip
           include Runnable if Runnable.class == Module
           

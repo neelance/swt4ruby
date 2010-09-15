@@ -153,7 +153,7 @@ module Org::Eclipse::Swt::Browser
       (@browser.attr_web_browser)._activate
       @browser.set_focus
       @listener = Class.new(Listener.class == Class ? Listener : Object) do
-        extend LocalClass
+        local_class_in MozillaDelegate
         include_class_members MozillaDelegate
         include Listener if Listener.class == Module
         

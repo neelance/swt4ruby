@@ -245,7 +245,7 @@ module Org::Eclipse::Swt::Dnd
       OS.g_signal_connect(control.attr_handle, OS.attr_drag_end, self.attr_drag_end.get_address, 0)
       OS.g_signal_connect(control.attr_handle, OS.attr_drag_data_delete, self.attr_drag_data_delete.get_address, 0)
       @control_listener = Class.new(Listener.class == Class ? Listener : Object) do
-        extend LocalClass
+        local_class_in DragSource
         include_class_members DragSource
         include Listener if Listener.class == Module
         
@@ -286,7 +286,7 @@ module Org::Eclipse::Swt::Dnd
         end
       end
       self.add_listener(SWT::Dispose, Class.new(Listener.class == Class ? Listener : Object) do
-        extend LocalClass
+        local_class_in DragSource
         include_class_members DragSource
         include Listener if Listener.class == Module
         

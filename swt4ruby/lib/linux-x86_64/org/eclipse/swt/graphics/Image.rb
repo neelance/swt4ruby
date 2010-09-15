@@ -1387,8 +1387,8 @@ module Org::Eclipse::Swt::Graphics
         end
         data.attr_device = self.attr_device
         data.attr_drawable = @pixmap
-        data.attr_background = Device::COLOR_WHITE.attr_handle
-        data.attr_foreground = Device::COLOR_BLACK.attr_handle
+        data.attr_background = self.attr_device.attr_color_white.attr_handle
+        data.attr_foreground = self.attr_device.attr_color_black.attr_handle
         data.attr_font = self.attr_device.attr_system_font
         data.attr_image = self
       end

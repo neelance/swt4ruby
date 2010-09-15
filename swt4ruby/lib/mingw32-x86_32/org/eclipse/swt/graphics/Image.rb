@@ -344,7 +344,7 @@ module Org::Eclipse::Swt::Graphics
         data = src_image.get_image_data
         palette = data.attr_palette
         rgbs = Array.typed(RGB).new(3) { nil }
-        rgbs[0] = device.get_system_color(SWT::COLOR_BLACK).get_rgb
+        rgbs[0] = device.get_system_color(SWT.attr_color_black).get_rgb
         rgbs[1] = device.get_system_color(SWT::COLOR_WIDGET_NORMAL_SHADOW).get_rgb
         rgbs[2] = device.get_system_color(SWT::COLOR_WIDGET_BACKGROUND).get_rgb
         new_data = ImageData.new(rect.attr_width, rect.attr_height, 8, PaletteData.new(rgbs))

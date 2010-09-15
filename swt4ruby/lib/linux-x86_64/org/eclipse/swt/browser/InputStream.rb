@@ -66,7 +66,7 @@ module Org::Eclipse::Swt::Browser
     def create_cominterfaces
       @input_stream = # Create each of the interfaces that this object implements
       Class.new(XPCOMObject.class == Class ? XPCOMObject : Object) do
-        extend LocalClass
+        local_class_in InputStream
         include_class_members InputStream
         include XPCOMObject if XPCOMObject.class == Module
         

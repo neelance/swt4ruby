@@ -131,7 +131,7 @@ module Org::Eclipse::Swt::Custom
       @column = 0
       @tree = tree
       @column_listener = Class.new(ControlListener.class == Class ? ControlListener : Object) do
-        extend LocalClass
+        local_class_in TreeEditor
         include_class_members TreeEditor
         include ControlListener if ControlListener.class == Module
         
@@ -154,7 +154,7 @@ module Org::Eclipse::Swt::Custom
         alias_method :initialize_anonymous, :initialize
       end.new_local(self)
       @timer = Class.new(Runnable.class == Class ? Runnable : Object) do
-        extend LocalClass
+        local_class_in TreeEditor
         include_class_members TreeEditor
         include Runnable if Runnable.class == Module
         
@@ -172,7 +172,7 @@ module Org::Eclipse::Swt::Custom
         alias_method :initialize_anonymous, :initialize
       end.new_local(self)
       @tree_listener = Class.new(TreeListener.class == Class ? TreeListener : Object) do
-        extend LocalClass
+        local_class_in TreeEditor
         include_class_members TreeEditor
         include TreeListener if TreeListener.class == Module
         
@@ -206,7 +206,7 @@ module Org::Eclipse::Swt::Custom
           super(*args)
           tree_listener_class = self.class
           @runnable = Class.new(self.class::Runnable.class == Class ? self.class::Runnable : Object) do
-            extend LocalClass
+            local_class_in tree_listener_class
             include_class_members tree_listener_class
             include class_self::Runnable if class_self::Runnable.class == Module
             

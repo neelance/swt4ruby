@@ -166,7 +166,7 @@ module Org::Eclipse::Swt::Accessibility
       end
       @iaccessible = IAccessible.new(ppv_object[0])
       @obj_iaccessible = Class.new(COMObject.class == Class ? COMObject : Object) do
-        extend LocalClass
+        local_class_in Accessible
         include_class_members Accessible
         include COMObject if COMObject.class == Module
         
@@ -386,7 +386,7 @@ module Org::Eclipse::Swt::Accessibility
       funcs[27] = COM.put_acc_value_callback(funcs[27])
       COM._move_memory(p_vtable[0], funcs, OS::PTR_SIZEOF * funcs.attr_length)
       @obj_ienum_variant = Class.new(COMObject.class == Class ? COMObject : Object) do
-        extend LocalClass
+        local_class_in Accessible
         include_class_members Accessible
         include COMObject if COMObject.class == Module
         

@@ -238,7 +238,7 @@ module Org::Eclipse::Swt::Browser
       const_attr_reader  :KeyTable
       
       const_set_lazy(:EvaluateFunction) { Class.new(BrowserFunction) do
-        extend LocalClass
+        local_class_in WebBrowser
         include_class_members WebBrowser
         
         typesig { [class_self::Browser, String] }

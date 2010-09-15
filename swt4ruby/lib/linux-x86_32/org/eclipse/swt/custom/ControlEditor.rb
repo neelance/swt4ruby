@@ -171,7 +171,7 @@ module Org::Eclipse::Swt::Custom
       @scrollbar_listener = nil
       @parent = parent
       @control_listener = Class.new(Listener.class == Class ? Listener : Object) do
-        extend LocalClass
+        local_class_in ControlEditor
         include_class_members ControlEditor
         include Listener if Listener.class == Module
         
@@ -194,7 +194,7 @@ module Org::Eclipse::Swt::Custom
         i += 1
       end
       @scrollbar_listener = Class.new(Listener.class == Class ? Listener : Object) do
-        extend LocalClass
+        local_class_in ControlEditor
         include_class_members ControlEditor
         include Listener if Listener.class == Module
         

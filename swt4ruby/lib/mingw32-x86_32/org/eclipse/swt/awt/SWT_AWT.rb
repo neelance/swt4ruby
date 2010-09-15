@@ -204,7 +204,7 @@ module Org::Eclipse::Swt::Awt
         result = Array.typed(Frame).new(1) { nil }
         exception = Array.typed(JavaThrowable).new(1) { nil }
         runnable = Class.new(Runnable.class == Class ? Runnable : Object) do
-          extend LocalClass
+          local_class_in SWT_AWT
           include_class_members SWT_AWT
           include Runnable if Runnable.class == Module
           
@@ -300,7 +300,7 @@ module Org::Eclipse::Swt::Awt
         parent.set_data(self.attr_embedded_frame_key, frame)
         shell_listener = # Forward the iconify and deiconify events
         Class.new(Listener.class == Class ? Listener : Object) do
-          extend LocalClass
+          local_class_in SWT_AWT
           include_class_members SWT_AWT
           include Listener if Listener.class == Module
           
@@ -310,7 +310,7 @@ module Org::Eclipse::Swt::Awt
             when SWT::Deiconify
               listener_class = self.class
               EventQueue.invoke_later(Class.new(self.class::Runnable.class == Class ? self.class::Runnable : Object) do
-                extend LocalClass
+                local_class_in listener_class
                 include_class_members listener_class
                 include class_self::Runnable if class_self::Runnable.class == Module
                 
@@ -330,7 +330,7 @@ module Org::Eclipse::Swt::Awt
             when SWT::Iconify
               listener_class = self.class
               EventQueue.invoke_later(Class.new(self.class::Runnable.class == Class ? self.class::Runnable : Object) do
-                extend LocalClass
+                local_class_in listener_class
                 include_class_members listener_class
                 include class_self::Runnable if class_self::Runnable.class == Module
                 
@@ -365,7 +365,7 @@ module Org::Eclipse::Swt::Awt
         # the embedded frame. This is needed in order to make keyboard
         # focus work properly for lightweights.
         Class.new(Listener.class == Class ? Listener : Object) do
-          extend LocalClass
+          local_class_in SWT_AWT
           include_class_members SWT_AWT
           include Listener if Listener.class == Module
           
@@ -379,7 +379,7 @@ module Org::Eclipse::Swt::Awt
               parent.set_visible(false)
               listener_class = self.class
               EventQueue.invoke_later(Class.new(self.class::Runnable.class == Class ? self.class::Runnable : Object) do
-                extend LocalClass
+                local_class_in listener_class
                 include_class_members listener_class
                 include class_self::Runnable if class_self::Runnable.class == Module
                 
@@ -402,7 +402,7 @@ module Org::Eclipse::Swt::Awt
             when SWT::FocusIn, SWT::Activate
               listener_class = self.class
               EventQueue.invoke_later(Class.new(self.class::Runnable.class == Class ? self.class::Runnable : Object) do
-                extend LocalClass
+                local_class_in listener_class
                 include_class_members listener_class
                 include class_self::Runnable if class_self::Runnable.class == Module
                 
@@ -443,7 +443,7 @@ module Org::Eclipse::Swt::Awt
             when SWT::Deactivate
               listener_class = self.class
               EventQueue.invoke_later(Class.new(self.class::Runnable.class == Class ? self.class::Runnable : Object) do
-                extend LocalClass
+                local_class_in listener_class
                 include_class_members listener_class
                 include class_self::Runnable if class_self::Runnable.class == Module
                 
@@ -500,7 +500,7 @@ module Org::Eclipse::Swt::Awt
         parent.add_listener(SWT::Deactivate, listener)
         parent.add_listener(SWT::Dispose, listener)
         parent.get_display.async_exec(Class.new(Runnable.class == Class ? Runnable : Object) do
-          extend LocalClass
+          local_class_in SWT_AWT
           include_class_members SWT_AWT
           include Runnable if Runnable.class == Module
           
@@ -512,7 +512,7 @@ module Org::Eclipse::Swt::Awt
             client_area = parent.get_client_area
             runnable_class = self.class
             EventQueue.invoke_later(Class.new(self.class::Runnable.class == Class ? self.class::Runnable : Object) do
-              extend LocalClass
+              local_class_in runnable_class
               include_class_members runnable_class
               include class_self::Runnable if class_self::Runnable.class == Module
               
@@ -578,7 +578,7 @@ module Org::Eclipse::Swt::Awt
         end
         shell = Shell.win32_new(display, handle)
         listener = Class.new(ComponentAdapter.class == Class ? ComponentAdapter : Object) do
-          extend LocalClass
+          local_class_in SWT_AWT
           include_class_members SWT_AWT
           include ComponentAdapter if ComponentAdapter.class == Module
           
@@ -586,7 +586,7 @@ module Org::Eclipse::Swt::Awt
           define_method :component_resized do |e|
             component_adapter_class = self.class
             display.sync_exec(Class.new(self.class::Runnable.class == Class ? self.class::Runnable : Object) do
-              extend LocalClass
+              local_class_in component_adapter_class
               include_class_members component_adapter_class
               include class_self::Runnable if class_self::Runnable.class == Module
               
@@ -619,7 +619,7 @@ module Org::Eclipse::Swt::Awt
         end.new_local(self)
         parent.add_component_listener(listener)
         shell.add_listener(SWT::Dispose, Class.new(Listener.class == Class ? Listener : Object) do
-          extend LocalClass
+          local_class_in SWT_AWT
           include_class_members SWT_AWT
           include Listener if Listener.class == Module
           

@@ -646,37 +646,37 @@ module Org::Eclipse::Swt::Graphics
     def get_system_color(id)
       check_device
       case (id)
-      when SWT::COLOR_BLACK
+      when SWT.attr_color_black
         return @color_black
-      when SWT::COLOR_DARK_RED
+      when SWT.attr_color_dark_red
         return @color_dark_red
-      when SWT::COLOR_DARK_GREEN
+      when SWT.attr_color_dark_green
         return @color_dark_green
-      when SWT::COLOR_DARK_YELLOW
+      when SWT.attr_color_dark_yellow
         return @color_dark_yellow
-      when SWT::COLOR_DARK_BLUE
+      when SWT.attr_color_dark_blue
         return @color_dark_blue
-      when SWT::COLOR_DARK_MAGENTA
+      when SWT.attr_color_dark_magenta
         return @color_dark_magenta
-      when SWT::COLOR_DARK_CYAN
+      when SWT.attr_color_dark_cyan
         return @color_dark_cyan
-      when SWT::COLOR_GRAY
+      when SWT.attr_color_gray
         return @color_gray
-      when SWT::COLOR_DARK_GRAY
+      when SWT.attr_color_dark_gray
         return @color_dark_gray
-      when SWT::COLOR_RED
+      when SWT.attr_color_red
         return @color_red
-      when SWT::COLOR_GREEN
+      when SWT.attr_color_green
         return @color_green
-      when SWT::COLOR_YELLOW
+      when SWT.attr_color_yellow
         return @color_yellow
-      when SWT::COLOR_BLUE
+      when SWT.attr_color_blue
         return @color_blue
-      when SWT::COLOR_MAGENTA
+      when SWT.attr_color_magenta
         return @color_magenta
-      when SWT::COLOR_CYAN
+      when SWT.attr_color_cyan
         return @color_cyan
-      when SWT::COLOR_WHITE
+      when SWT.attr_color_white
         return @color_white
       end
       return @color_black

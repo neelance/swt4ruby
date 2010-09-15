@@ -284,7 +284,7 @@ module Org::Eclipse::Swt::Browser
       # $NON-NLS-1$
       when_class_loaded do
         NativeClearSessions = Class.new(Runnable.class == Class ? Runnable : Object) do
-          extend LocalClass
+          local_class_in Safari
           include_class_members Safari
           include Runnable if Runnable.class == Module
           
@@ -313,7 +313,7 @@ module Org::Eclipse::Swt::Browser
           alias_method :initialize_anonymous, :initialize
         end.new_local(self)
         NativeGetCookie = Class.new(Runnable.class == Class ? Runnable : Object) do
-          extend LocalClass
+          local_class_in Safari
           include_class_members Safari
           include Runnable if Runnable.class == Module
           
@@ -348,7 +348,7 @@ module Org::Eclipse::Swt::Browser
           alias_method :initialize_anonymous, :initialize
         end.new_local(self)
         NativeSetCookie = Class.new(Runnable.class == Class ? Runnable : Object) do
-          extend LocalClass
+          local_class_in Safari
           include_class_members Safari
           include Runnable if Runnable.class == Module
           
@@ -480,7 +480,7 @@ module Org::Eclipse::Swt::Browser
       @web_view = web_view
       self.attr_browser.attr_view.add_subview(web_view)
       listener = Class.new(Listener.class == Class ? Listener : Object) do
-        extend LocalClass
+        local_class_in Safari
         include_class_members Safari
         include Listener if Listener.class == Module
         
@@ -1025,7 +1025,7 @@ module Org::Eclipse::Swt::Browser
               # crash).  The workaround is to invoke Display.asyncExec()
               # so that the Browser does not crash if this is attempted.
               Class.new(Runnable.class == Class ? Runnable : Object) do
-                extend LocalClass
+                local_class_in Safari
                 include_class_members Safari
                 include Runnable if Runnable.class == Module
                 
@@ -1064,7 +1064,7 @@ module Org::Eclipse::Swt::Browser
           # the Browser does not crash when the user updates the
           # selection of the ProgressBar.
           Class.new(Runnable.class == Class ? Runnable : Object) do
-            extend LocalClass
+            local_class_in Safari
             include_class_members Safari
             include Runnable if Runnable.class == Module
             
@@ -1215,7 +1215,7 @@ module Org::Eclipse::Swt::Browser
           # the Browser does not crash when the user updates the
           # selection of the ProgressBar.
           Class.new(Runnable.class == Class ? Runnable : Object) do
-            extend LocalClass
+            local_class_in Safari
             include_class_members Safari
             include Runnable if Runnable.class == Module
             
@@ -1423,7 +1423,7 @@ module Org::Eclipse::Swt::Browser
       result = Array.typed(::Java::Boolean).new(1) { false }
       buttons = Array.typed(Button).new(2) { nil }
       listener = Class.new(Listener.class == Class ? Listener : Object) do
-        extend LocalClass
+        local_class_in Safari
         include_class_members Safari
         include Listener if Listener.class == Module
         
@@ -1491,7 +1491,7 @@ module Org::Eclipse::Swt::Browser
         # the Browser does not crash when the user updates the
         # selection of the ProgressBar.
         Class.new(Runnable.class == Class ? Runnable : Object) do
-          extend LocalClass
+          local_class_in Safari
           include_class_members Safari
           include Runnable if Runnable.class == Module
           

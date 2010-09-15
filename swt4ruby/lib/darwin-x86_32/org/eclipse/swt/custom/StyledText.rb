@@ -1241,7 +1241,7 @@ module Org::Eclipse::Swt::Custom
       # widget font name and size is used for the whole text.
       # </p>
       const_set_lazy(:RTFWriter) { Class.new(TextWriter) do
-        extend LocalClass
+        local_class_in StyledText
         include_class_members StyledText
         
         class_module.module_eval {
@@ -1670,7 +1670,7 @@ module Org::Eclipse::Swt::Custom
       # has been called.
       # </p>
       const_set_lazy(:TextWriter) { Class.new do
-        extend LocalClass
+        local_class_in StyledText
         include_class_members StyledText
         
         attr_accessor :buffer
@@ -2000,7 +2000,7 @@ module Org::Eclipse::Swt::Custom
       if (is_bidi_caret)
         create_caret_bitmaps
         runnable = Class.new(Runnable.class == Class ? Runnable : Object) do
-          extend LocalClass
+          local_class_in StyledText
           include_class_members StyledText
           include Runnable if Runnable.class == Module
           
@@ -2886,9 +2886,9 @@ module Org::Eclipse::Swt::Custom
       line_height = @renderer.get_line_height
       @left_caret_bitmap = Image.new(display, caret_width, line_height)
       gc = SwtGC.new(@left_caret_bitmap)
-      gc.set_background(display.get_system_color(SWT::COLOR_BLACK))
+      gc.set_background(display.get_system_color(SWT.attr_color_black))
       gc.fill_rectangle(0, 0, caret_width, line_height)
-      gc.set_foreground(display.get_system_color(SWT::COLOR_WHITE))
+      gc.set_foreground(display.get_system_color(SWT.attr_color_white))
       gc.draw_line(0, 0, 0, line_height)
       gc.draw_line(0, 0, caret_width - 1, 0)
       gc.draw_line(0, 1, 1, 1)
@@ -2901,9 +2901,9 @@ module Org::Eclipse::Swt::Custom
       end
       @right_caret_bitmap = Image.new(display, caret_width, line_height)
       gc = SwtGC.new(@right_caret_bitmap)
-      gc.set_background(display.get_system_color(SWT::COLOR_BLACK))
+      gc.set_background(display.get_system_color(SWT.attr_color_black))
       gc.fill_rectangle(0, 0, caret_width, line_height)
-      gc.set_foreground(display.get_system_color(SWT::COLOR_WHITE))
+      gc.set_foreground(display.get_system_color(SWT.attr_color_white))
       gc.draw_line(caret_width - 1, 0, caret_width - 1, line_height)
       gc.draw_line(0, 0, caret_width - 1, 0)
       gc.draw_line(caret_width - 1, 1, 1, 1)
@@ -2972,7 +2972,7 @@ module Org::Eclipse::Swt::Custom
       # down a cursor key (i.e., arrowUp, arrowDown).
       if ((direction).equal?(SWT::UP))
         timer = Class.new(Runnable.class == Class ? Runnable : Object) do
-          extend LocalClass
+          local_class_in StyledText
           include_class_members StyledText
           include Runnable if Runnable.class == Module
           
@@ -3007,7 +3007,7 @@ module Org::Eclipse::Swt::Custom
       else
         if ((direction).equal?(SWT::DOWN))
           timer = Class.new(Runnable.class == Class ? Runnable : Object) do
-            extend LocalClass
+            local_class_in StyledText
             include_class_members StyledText
             include Runnable if Runnable.class == Module
             
@@ -3043,7 +3043,7 @@ module Org::Eclipse::Swt::Custom
         else
           if ((direction).equal?(ST::COLUMN_NEXT))
             timer = Class.new(Runnable.class == Class ? Runnable : Object) do
-              extend LocalClass
+              local_class_in StyledText
               include_class_members StyledText
               include Runnable if Runnable.class == Module
               
@@ -3080,7 +3080,7 @@ module Org::Eclipse::Swt::Custom
           else
             if ((direction).equal?(ST::COLUMN_PREVIOUS))
               timer = Class.new(Runnable.class == Class ? Runnable : Object) do
-                extend LocalClass
+                local_class_in StyledText
                 include_class_members StyledText
                 include Runnable if Runnable.class == Module
                 
@@ -6605,7 +6605,7 @@ module Org::Eclipse::Swt::Custom
     # Creates content change listeners and set the default content model.
     def install_default_content
       @text_change_listener = Class.new(TextChangeListener.class == Class ? TextChangeListener : Object) do
-        extend LocalClass
+        local_class_in StyledText
         include_class_members StyledText
         include TextChangeListener if TextChangeListener.class == Module
         
@@ -6642,7 +6642,7 @@ module Org::Eclipse::Swt::Custom
       vertical_bar = get_vertical_bar
       horizontal_bar = get_horizontal_bar
       @listener = Class.new(Listener.class == Class ? Listener : Object) do
-        extend LocalClass
+        local_class_in StyledText
         include_class_members StyledText
         include Listener if Listener.class == Module
         
@@ -6688,7 +6688,7 @@ module Org::Eclipse::Swt::Custom
       add_listener(SWT::Resize, @listener)
       add_listener(SWT::Traverse, @listener)
       @ime.add_listener(SWT::ImeComposition, Class.new(Listener.class == Class ? Listener : Object) do
-        extend LocalClass
+        local_class_in StyledText
         include_class_members StyledText
         include Listener if Listener.class == Module
         
@@ -6714,7 +6714,7 @@ module Org::Eclipse::Swt::Custom
       end.new_local(self))
       if (!(vertical_bar).nil?)
         vertical_bar.add_listener(SWT::Selection, Class.new(Listener.class == Class ? Listener : Object) do
-          extend LocalClass
+          local_class_in StyledText
           include_class_members StyledText
           include Listener if Listener.class == Module
           
@@ -6734,7 +6734,7 @@ module Org::Eclipse::Swt::Custom
       end
       if (!(horizontal_bar).nil?)
         horizontal_bar.add_listener(SWT::Selection, Class.new(Listener.class == Class ? Listener : Object) do
-          extend LocalClass
+          local_class_in StyledText
           include_class_members StyledText
           include Listener if Listener.class == Module
           
@@ -7368,7 +7368,7 @@ module Org::Eclipse::Swt::Custom
     def initialize_accessible
       accessible = get_accessible
       accessible.add_accessible_listener(Class.new(AccessibleAdapter.class == Class ? AccessibleAdapter : Object) do
-        extend LocalClass
+        local_class_in StyledText
         include_class_members StyledText
         include AccessibleAdapter if AccessibleAdapter.class == Module
         
@@ -7412,7 +7412,7 @@ module Org::Eclipse::Swt::Custom
         alias_method :initialize_anonymous, :initialize
       end.new_local(self))
       accessible.add_accessible_text_listener(Class.new(AccessibleTextAdapter.class == Class ? AccessibleTextAdapter : Object) do
-        extend LocalClass
+        local_class_in StyledText
         include_class_members StyledText
         include AccessibleTextAdapter if AccessibleTextAdapter.class == Module
         
@@ -7437,7 +7437,7 @@ module Org::Eclipse::Swt::Custom
         alias_method :initialize_anonymous, :initialize
       end.new_local(self))
       accessible.add_accessible_control_listener(Class.new(AccessibleControlAdapter.class == Class ? AccessibleControlAdapter : Object) do
-        extend LocalClass
+        local_class_in StyledText
         include_class_members StyledText
         include AccessibleControlAdapter if AccessibleControlAdapter.class == Module
         
@@ -7478,7 +7478,7 @@ module Org::Eclipse::Swt::Custom
         alias_method :initialize_anonymous, :initialize
       end.new_local(self))
       add_listener(SWT::FocusIn, Class.new(Listener.class == Class ? Listener : Object) do
-        extend LocalClass
+        local_class_in StyledText
         include_class_members StyledText
         include Listener if Listener.class == Module
         

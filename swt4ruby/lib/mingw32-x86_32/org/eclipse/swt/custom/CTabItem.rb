@@ -528,8 +528,8 @@ module Org::Eclipse::Swt::Custom
         if (@parent.is_focus_control)
           display = get_display
           if (@parent.attr_simple || @parent.attr_single)
-            gc.set_background(display.get_system_color(SWT::COLOR_BLACK))
-            gc.set_foreground(display.get_system_color(SWT::COLOR_WHITE))
+            gc.set_background(display.get_system_color(SWT.attr_color_black))
+            gc.set_foreground(display.get_system_color(SWT.attr_color_white))
             gc.draw_focus(x_draw - 1, text_y - 1, extent.attr_x + 2, extent.attr_y + 2)
           else
             gc.set_foreground(display.get_system_color(CTabFolder::BUTTON_BORDER))

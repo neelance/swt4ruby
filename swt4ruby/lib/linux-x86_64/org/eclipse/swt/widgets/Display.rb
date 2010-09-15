@@ -1449,7 +1449,7 @@ module Org::Eclipse::Swt::Widgets
       # be removed in the future.
       when_class_loaded do
         self.attr_device_finder = Class.new(Runnable.class == Class ? Runnable : Object) do
-          extend LocalClass
+          local_class_in Display
           include_class_members Display
           include Runnable if Runnable.class == Module
           
@@ -3574,7 +3574,7 @@ module Org::Eclipse::Swt::Widgets
         return super(id)
       end
       if ((gdk_color).nil?)
-        return super(SWT::COLOR_BLACK)
+        return super(SWT.attr_color_black)
       end
       return Color.gtk_new(self, gdk_color)
     end
@@ -4227,8 +4227,8 @@ module Org::Eclipse::Swt::Widgets
         end
         data.attr_device = self
         data.attr_drawable = root
-        data.attr_background = get_system_color(SWT::COLOR_WHITE).attr_handle
-        data.attr_foreground = get_system_color(SWT::COLOR_BLACK).attr_handle
+        data.attr_background = get_system_color(SWT.attr_color_white).attr_handle
+        data.attr_foreground = get_system_color(SWT.attr_color_black).attr_handle
         data.attr_font = get_system_font
       end
       return gdk_gc

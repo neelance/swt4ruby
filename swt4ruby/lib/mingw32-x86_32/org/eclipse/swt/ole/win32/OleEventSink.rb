@@ -122,7 +122,7 @@ module Org::Eclipse::Swt::Ole::Win32
     typesig { [] }
     def create_cominterfaces
       @i_dispatch = Class.new(COMObject.class == Class ? COMObject : Object) do
-        extend LocalClass
+        local_class_in OleEventSink
         include_class_members OleEventSink
         include COMObject if COMObject.class == Module
         

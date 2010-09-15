@@ -81,7 +81,7 @@ module Org::Eclipse::Swt::Browser
     def create_cominterfaces
       @supports = # Create each of the interfaces that this object implements
       Class.new(XPCOMObject.class == Class ? XPCOMObject : Object) do
-        extend LocalClass
+        local_class_in External
         include_class_members External
         include XPCOMObject if XPCOMObject.class == Module
         
@@ -115,7 +115,7 @@ module Org::Eclipse::Swt::Browser
         alias_method :initialize_anonymous, :initialize
       end.new_local(self, Array.typed(::Java::Int).new([2, 0, 0]))
       @class_info = Class.new(XPCOMObject.class == Class ? XPCOMObject : Object) do
-        extend LocalClass
+        local_class_in External
         include_class_members External
         include XPCOMObject if XPCOMObject.class == Module
         
@@ -206,7 +206,7 @@ module Org::Eclipse::Swt::Browser
         alias_method :initialize_anonymous, :initialize
       end.new_local(self, Array.typed(::Java::Int).new([2, 0, 0, 2, 2, 1, 1, 1, 1, 1, 1]))
       @security_checked_component = Class.new(XPCOMObject.class == Class ? XPCOMObject : Object) do
-        extend LocalClass
+        local_class_in External
         include_class_members External
         include XPCOMObject if XPCOMObject.class == Module
         
@@ -268,7 +268,7 @@ module Org::Eclipse::Swt::Browser
         alias_method :initialize_anonymous, :initialize
       end.new_local(self, Array.typed(::Java::Int).new([2, 0, 0, 2, 3, 3, 3]))
       @external = Class.new(XPCOMObject.class == Class ? XPCOMObject : Object) do
-        extend LocalClass
+        local_class_in External
         include_class_members External
         include XPCOMObject if XPCOMObject.class == Module
         

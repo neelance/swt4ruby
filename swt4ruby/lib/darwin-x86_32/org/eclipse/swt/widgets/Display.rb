@@ -877,7 +877,7 @@ module Org::Eclipse::Swt::Widgets
       # be removed in the future.
       when_class_loaded do
         self.attr_device_finder = Class.new(Runnable.class == Class ? Runnable : Object) do
-          extend LocalClass
+          local_class_in Display
           include_class_members Display
           include Runnable if Runnable.class == Module
           
@@ -1366,7 +1366,7 @@ module Org::Eclipse::Swt::Widgets
       @lock_cursor = true
       @cursors = Array.typed(Cursor).new(SWT::CURSOR_HAND + 1) { nil }
       @hover_timer = Class.new(Runnable.class == Class ? Runnable : Object) do
-        extend LocalClass
+        local_class_in Display
         include_class_members Display
         include Runnable if Runnable.class == Module
         
@@ -1386,7 +1386,7 @@ module Org::Eclipse::Swt::Widgets
         alias_method :initialize_anonymous, :initialize
       end.new_local(self)
       @caret_timer = Class.new(Runnable.class == Class ? Runnable : Object) do
-        extend LocalClass
+        local_class_in Display
         include_class_members Display
         include Runnable if Runnable.class == Module
         
@@ -1416,7 +1416,7 @@ module Org::Eclipse::Swt::Widgets
         alias_method :initialize_anonymous, :initialize
       end.new_local(self)
       @default_button_timer = Class.new(Runnable.class == Class ? Runnable : Object) do
-        extend LocalClass
+        local_class_in Display
         include_class_members Display
         include Runnable if Runnable.class == Module
         
@@ -2860,7 +2860,7 @@ module Org::Eclipse::Swt::Widgets
           self.attr_launched = true
           Runtime.get_runtime.add_shutdown_hook(# only add the shutdown hook once
           Class.new(JavaThread.class == Class ? JavaThread : Object) do
-            extend LocalClass
+            local_class_in Display
             include_class_members Display
             include JavaThread if JavaThread.class == Module
             
@@ -3602,8 +3602,8 @@ module Org::Eclipse::Swt::Widgets
           data.attr_style |= SWT::LEFT_TO_RIGHT
         end
         data.attr_device = self
-        data.attr_background = get_system_color(SWT::COLOR_WHITE).attr_handle
-        data.attr_foreground = get_system_color(SWT::COLOR_BLACK).attr_handle
+        data.attr_background = get_system_color(SWT.attr_color_white).attr_handle
+        data.attr_foreground = get_system_color(SWT.attr_color_black).attr_handle
         data.attr_font = get_system_font
       end
       return context.attr_id

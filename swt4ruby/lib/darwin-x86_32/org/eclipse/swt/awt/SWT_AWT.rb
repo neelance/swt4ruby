@@ -218,7 +218,7 @@ module Org::Eclipse::Swt::Awt
         frame = value
         parent.set_data(self.attr_embedded_frame_key, frame)
         listener = Class.new(Listener.class == Class ? Listener : Object) do
-          extend LocalClass
+          local_class_in SWT_AWT
           include_class_members SWT_AWT
           include Listener if Listener.class == Module
           
@@ -229,7 +229,7 @@ module Org::Eclipse::Swt::Awt
               parent.set_visible(false)
               listener_class = self.class
               EventQueue.invoke_later(Class.new(self.class::Runnable.class == Class ? self.class::Runnable : Object) do
-                extend LocalClass
+                local_class_in listener_class
                 include_class_members listener_class
                 include class_self::Runnable if class_self::Runnable.class == Module
                 

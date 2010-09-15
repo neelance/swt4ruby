@@ -68,7 +68,7 @@ module Org::Eclipse::Swt::Browser
     def create_cominterfaces
       @supports = # Create each of the interfaces that this object implements
       Class.new(XPCOMObject.class == Class ? XPCOMObject : Object) do
-        extend LocalClass
+        local_class_in WindowCreator2
         include_class_members WindowCreator2
         include XPCOMObject if XPCOMObject.class == Module
         
@@ -102,7 +102,7 @@ module Org::Eclipse::Swt::Browser
         alias_method :initialize_anonymous, :initialize
       end.new_local(self, Array.typed(::Java::Int).new([2, 0, 0]))
       @window_creator = Class.new(XPCOMObject.class == Class ? XPCOMObject : Object) do
-        extend LocalClass
+        local_class_in WindowCreator2
         include_class_members WindowCreator2
         include XPCOMObject if XPCOMObject.class == Module
         
@@ -144,7 +144,7 @@ module Org::Eclipse::Swt::Browser
         alias_method :initialize_anonymous, :initialize
       end.new_local(self, Array.typed(::Java::Int).new([2, 0, 0, 3]))
       @window_creator2 = Class.new(XPCOMObject.class == Class ? XPCOMObject : Object) do
-        extend LocalClass
+        local_class_in WindowCreator2
         include_class_members WindowCreator2
         include XPCOMObject if XPCOMObject.class == Module
         
@@ -331,7 +331,7 @@ module Org::Eclipse::Swt::Browser
         shell.set_layout(FillLayout.new)
         browser = Browser.new(shell, (src).nil? ? SWT::MOZILLA : src.get_style & SWT::MOZILLA)
         browser.add_visibility_window_listener(Class.new(VisibilityWindowListener.class == Class ? VisibilityWindowListener : Object) do
-          extend LocalClass
+          local_class_in WindowCreator2
           include_class_members WindowCreator2
           include VisibilityWindowListener if VisibilityWindowListener.class == Module
           
@@ -360,7 +360,7 @@ module Org::Eclipse::Swt::Browser
           alias_method :initialize_anonymous, :initialize
         end.new_local(self))
         browser.add_close_window_listener(Class.new(CloseWindowListener.class == Class ? CloseWindowListener : Object) do
-          extend LocalClass
+          local_class_in WindowCreator2
           include_class_members WindowCreator2
           include CloseWindowListener if CloseWindowListener.class == Module
           

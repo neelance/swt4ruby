@@ -153,7 +153,7 @@ module Org::Eclipse::Swt::Custom
       @in_dispose = false
       @table = Table.new(self, style)
       table_listener = Class.new(Listener.class == Class ? Listener : Object) do
-        extend LocalClass
+        local_class_in TableTree
         include_class_members TableTree
         include Listener if Listener.class == Module
         
@@ -186,7 +186,7 @@ module Org::Eclipse::Swt::Custom
         i += 1
       end
       @listener = Class.new(Listener.class == Class ? Listener : Object) do
-        extend LocalClass
+        local_class_in TableTree
         include_class_members TableTree
         include Listener if Listener.class == Module
         

@@ -176,7 +176,7 @@ module Org::Eclipse::Swt::Program
             icon_theme = GNOME.gnome_icon_theme_new
             display.set_data(ICON_THEME_DATA, SwtLONG.new(icon_theme))
             display.add_listener(SWT::Dispose, Class.new(Listener.class == Class ? Listener : Object) do
-              extend LocalClass
+              local_class_in Program
               include_class_members Program
               include Listener if Listener.class == Module
               

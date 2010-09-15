@@ -71,7 +71,7 @@ module Org::Eclipse::Swt::Dnd
     def create_cominterfaces
       @i_unknown = # register each of the interfaces that this object implements
       Class.new(COMObject.class == Class ? COMObject : Object) do
-        extend LocalClass
+        local_class_in OleEnumFORMATETC
         include_class_members OleEnumFORMATETC
         include COMObject if COMObject.class == Module
         
@@ -106,7 +106,7 @@ module Org::Eclipse::Swt::Dnd
       end.new_local(self, Array.typed(::Java::Int).new([2, 0, 0]))
       # method6 Clone - not implemented
       @i_enum_formatetc = Class.new(COMObject.class == Class ? COMObject : Object) do
-        extend LocalClass
+        local_class_in OleEnumFORMATETC
         include_class_members OleEnumFORMATETC
         include COMObject if COMObject.class == Module
         

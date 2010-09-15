@@ -184,7 +184,7 @@ module Org::Eclipse::Swt::Ole::Win32
       create_cominterfaces
       @listener = # setup cleanup proc
       Class.new(Listener.class == Class ? Listener : Object) do
-        extend LocalClass
+        local_class_in OleFrame
         include_class_members OleFrame
         include Listener if Listener.class == Module
         
@@ -240,7 +240,7 @@ module Org::Eclipse::Swt::Ole::Win32
         timer = Array.typed(Runnable).new(1) { nil }
         last_focus = Array.typed(Control).new(1) { nil }
         timer[0] = Class.new(Runnable.class == Class ? Runnable : Object) do
-          extend LocalClass
+          local_class_in OleFrame
           include_class_members OleFrame
           include Runnable if Runnable.class == Module
           
@@ -312,7 +312,7 @@ module Org::Eclipse::Swt::Ole::Win32
         display.set_data(self.attr_hhook, SwtLONG.new(h_hook))
         display.set_data(self.attr_hhookmsg, MSG.new)
         display.dispose_exec(Class.new(Runnable.class == Class ? Runnable : Object) do
-          extend LocalClass
+          local_class_in OleFrame
           include_class_members OleFrame
           include Runnable if Runnable.class == Module
           
@@ -477,7 +477,7 @@ module Org::Eclipse::Swt::Ole::Win32
     def create_cominterfaces
       @i_unknown = # Create each of the interfaces that this object implements
       Class.new(COMObject.class == Class ? COMObject : Object) do
-        extend LocalClass
+        local_class_in OleFrame
         include_class_members OleFrame
         include COMObject if COMObject.class == Module
         
@@ -511,7 +511,7 @@ module Org::Eclipse::Swt::Ole::Win32
         alias_method :initialize_anonymous, :initialize
       end.new_local(self, Array.typed(::Java::Int).new([2, 0, 0]))
       @i_ole_in_place_frame = Class.new(COMObject.class == Class ? COMObject : Object) do
-        extend LocalClass
+        local_class_in OleFrame
         include_class_members OleFrame
         include COMObject if COMObject.class == Module
         

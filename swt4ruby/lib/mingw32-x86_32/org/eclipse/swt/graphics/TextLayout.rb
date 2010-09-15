@@ -208,7 +208,7 @@ module Org::Eclipse::Swt::Graphics
       const_attr_reader  :UNDERLINE_IME_THICK
       
       const_set_lazy(:StyleItem) { Class.new do
-        extend LocalClass
+        local_class_in TextLayout
         include_class_members TextLayout
         
         attr_accessor :style
@@ -3882,7 +3882,7 @@ module Org::Eclipse::Swt::Graphics
           meta_file = OS._close_enh_meta_file(meta_file_dc)
           emr = EMREXTCREATEFONTINDIRECTW.new
           meta_file_enum_proc_class = Class.new do
-            extend LocalClass
+            local_class_in TextLayout
             include_class_members TextLayout
             
             typesig { [::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int, ::Java::Int] }

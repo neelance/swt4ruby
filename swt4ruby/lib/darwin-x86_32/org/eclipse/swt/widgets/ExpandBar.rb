@@ -142,7 +142,7 @@ module Org::Eclipse::Swt::Widgets
       super(parent, check_style(style))
       @items = Array.typed(ExpandItem).new(4) { nil }
       @listener = Class.new(Listener.class == Class ? Listener : Object) do
-        extend LocalClass
+        local_class_in ExpandBar
         include_class_members ExpandBar
         include Listener if Listener.class == Module
         
@@ -190,7 +190,7 @@ module Org::Eclipse::Swt::Widgets
       vertical_bar = get_vertical_bar
       if (!(vertical_bar).nil?)
         vertical_bar.add_listener(SWT::Selection, Class.new(Listener.class == Class ? Listener : Object) do
-          extend LocalClass
+          local_class_in ExpandBar
           include_class_members ExpandBar
           include Listener if Listener.class == Module
           

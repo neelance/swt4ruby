@@ -302,7 +302,7 @@ module Org::Eclipse::Swt::Dnd
       @drag_drop_handler = OS.g_signal_connect(control.attr_handle, OS.attr_drag_drop, self.attr_drag_drop.get_address, 0)
       @control_listener = # Dispose listeners
       Class.new(Listener.class == Class ? Listener : Object) do
-        extend LocalClass
+        local_class_in DropTarget
         include_class_members DropTarget
         include Listener if Listener.class == Module
         
@@ -323,7 +323,7 @@ module Org::Eclipse::Swt::Dnd
       end.new_local(self)
       control.add_listener(SWT::Dispose, @control_listener)
       self.add_listener(SWT::Dispose, Class.new(Listener.class == Class ? Listener : Object) do
-        extend LocalClass
+        local_class_in DropTarget
         include_class_members DropTarget
         include Listener if Listener.class == Module
         
@@ -353,7 +353,7 @@ module Org::Eclipse::Swt::Dnd
         end
       end
       @drag_over_heartbeat = Class.new(Runnable.class == Class ? Runnable : Object) do
-        extend LocalClass
+        local_class_in DropTarget
         include_class_members DropTarget
         include Runnable if Runnable.class == Module
         

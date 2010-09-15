@@ -255,7 +255,7 @@ module Org::Eclipse::Swt::Awt
         rescue JavaThrowable => e
         end
         awt_listener = Class.new(AWTEventListener.class == Class ? AWTEventListener : Object) do
-          extend LocalClass
+          local_class_in SWT_AWT
           include_class_members SWT_AWT
           include AWTEventListener if AWTEventListener.class == Module
           
@@ -266,7 +266,7 @@ module Org::Eclipse::Swt::Awt
               if ((window.get_parent).equal?(frame))
                 awtevent_listener_class = self.class
                 parent.get_display.async_exec(Class.new(self.class::Runnable.class == Class ? self.class::Runnable : Object) do
-                  extend LocalClass
+                  local_class_in awtevent_listener_class
                   include_class_members awtevent_listener_class
                   include class_self::Runnable if class_self::Runnable.class == Module
                   
@@ -309,7 +309,7 @@ module Org::Eclipse::Swt::Awt
         end.new_local(self)
         frame.get_toolkit.add_awtevent_listener(awt_listener, AWTEvent::WINDOW_EVENT_MASK)
         shell_listener = Class.new(Listener.class == Class ? Listener : Object) do
-          extend LocalClass
+          local_class_in SWT_AWT
           include_class_members SWT_AWT
           include Listener if Listener.class == Module
           
@@ -319,7 +319,7 @@ module Org::Eclipse::Swt::Awt
             when SWT::Deiconify
               listener_class = self.class
               EventQueue.invoke_later(Class.new(self.class::Runnable.class == Class ? self.class::Runnable : Object) do
-                extend LocalClass
+                local_class_in listener_class
                 include_class_members listener_class
                 include class_self::Runnable if class_self::Runnable.class == Module
                 
@@ -339,7 +339,7 @@ module Org::Eclipse::Swt::Awt
             when SWT::Iconify
               listener_class = self.class
               EventQueue.invoke_later(Class.new(self.class::Runnable.class == Class ? self.class::Runnable : Object) do
-                extend LocalClass
+                local_class_in listener_class
                 include_class_members listener_class
                 include class_self::Runnable if class_self::Runnable.class == Module
                 
@@ -371,7 +371,7 @@ module Org::Eclipse::Swt::Awt
         shell.add_listener(SWT::Deiconify, shell_listener)
         shell.add_listener(SWT::Iconify, shell_listener)
         listener = Class.new(Listener.class == Class ? Listener : Object) do
-          extend LocalClass
+          local_class_in SWT_AWT
           include_class_members SWT_AWT
           include Listener if Listener.class == Module
           
@@ -385,7 +385,7 @@ module Org::Eclipse::Swt::Awt
               parent.set_visible(false)
               listener_class = self.class
               EventQueue.invoke_later(Class.new(self.class::Runnable.class == Class ? self.class::Runnable : Object) do
-                extend LocalClass
+                local_class_in listener_class
                 include_class_members listener_class
                 include class_self::Runnable if class_self::Runnable.class == Module
                 
@@ -408,7 +408,7 @@ module Org::Eclipse::Swt::Awt
                 client_area = parent.get_client_area
                 listener_class = self.class
                 EventQueue.invoke_later(Class.new(self.class::Runnable.class == Class ? self.class::Runnable : Object) do
-                  extend LocalClass
+                  local_class_in listener_class
                   include_class_members listener_class
                   include class_self::Runnable if class_self::Runnable.class == Module
                   
@@ -440,7 +440,7 @@ module Org::Eclipse::Swt::Awt
         parent.add_listener(SWT::Dispose, listener)
         parent.add_listener(SWT::Resize, listener)
         parent.get_display.async_exec(Class.new(Runnable.class == Class ? Runnable : Object) do
-          extend LocalClass
+          local_class_in SWT_AWT
           include_class_members SWT_AWT
           include Runnable if Runnable.class == Module
           
@@ -452,7 +452,7 @@ module Org::Eclipse::Swt::Awt
             client_area = parent.get_client_area
             runnable_class = self.class
             EventQueue.invoke_later(Class.new(self.class::Runnable.class == Class ? self.class::Runnable : Object) do
-              extend LocalClass
+              local_class_in runnable_class
               include_class_members runnable_class
               include class_self::Runnable if class_self::Runnable.class == Module
               
@@ -518,7 +518,7 @@ module Org::Eclipse::Swt::Awt
         end
         shell = Shell.gtk_new(display, handle)
         listener = Class.new(ComponentAdapter.class == Class ? ComponentAdapter : Object) do
-          extend LocalClass
+          local_class_in SWT_AWT
           include_class_members SWT_AWT
           include ComponentAdapter if ComponentAdapter.class == Module
           
@@ -526,7 +526,7 @@ module Org::Eclipse::Swt::Awt
           define_method :component_resized do |e|
             component_adapter_class = self.class
             display.sync_exec(Class.new(self.class::Runnable.class == Class ? self.class::Runnable : Object) do
-              extend LocalClass
+              local_class_in component_adapter_class
               include_class_members component_adapter_class
               include class_self::Runnable if class_self::Runnable.class == Module
               
@@ -559,7 +559,7 @@ module Org::Eclipse::Swt::Awt
         end.new_local(self)
         parent.add_component_listener(listener)
         shell.add_listener(SWT::Dispose, Class.new(Listener.class == Class ? Listener : Object) do
-          extend LocalClass
+          local_class_in SWT_AWT
           include_class_members SWT_AWT
           include Listener if Listener.class == Module
           

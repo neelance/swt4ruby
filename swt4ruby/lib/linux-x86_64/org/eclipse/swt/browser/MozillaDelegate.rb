@@ -227,7 +227,7 @@ module Org::Eclipse::Swt::Browser
       end
       @has_focus = true
       @listener = Class.new(Listener.class == Class ? Listener : Object) do
-        extend LocalClass
+        local_class_in MozillaDelegate
         include_class_members MozillaDelegate
         include Listener if Listener.class == Module
         
@@ -260,7 +260,7 @@ module Org::Eclipse::Swt::Browser
       shell_style = @browser.get_shell.get_style
       if (!((shell_style & SWT::ON_TOP)).equal?(0) && ((((shell_style & SWT::NO_FOCUS)).equal?(0)) || (((@browser.get_style & SWT::NO_FOCUS)).equal?(0))))
         @browser.get_display.async_exec(Class.new(Runnable.class == Class ? Runnable : Object) do
-          extend LocalClass
+          local_class_in MozillaDelegate
           include_class_members MozillaDelegate
           include Runnable if Runnable.class == Module
           

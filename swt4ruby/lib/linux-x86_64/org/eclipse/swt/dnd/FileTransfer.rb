@@ -40,15 +40,15 @@ module Org::Eclipse::Swt::Dnd
     
     class_module.module_eval {
       
-      def _instance
+      def __instance
         defined?(@@_instance) ? @@_instance : @@_instance= FileTransfer.new
       end
-      alias_method :attr__instance, :_instance
+      alias_method :attr__instance, :__instance
       
-      def _instance=(value)
+      def __instance=(value)
         @@_instance = value
       end
-      alias_method :attr__instance=, :_instance=
+      alias_method :attr__instance=, :__instance=
       
       const_set_lazy(:URI_LIST) { "text/uri-list" }
       const_attr_reader  :URI_LIST

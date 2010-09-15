@@ -403,7 +403,7 @@ module Org::Eclipse::Swt::Dnd
       end
       control.set_data(DND::DRAG_SOURCE_KEY, self)
       @control_listener = Class.new(Listener.class == Class ? Listener : Object) do
-        extend LocalClass
+        local_class_in DragSource
         include_class_members DragSource
         include Listener if Listener.class == Module
         
@@ -436,7 +436,7 @@ module Org::Eclipse::Swt::Dnd
       control.add_listener(SWT::Dispose, @control_listener)
       control.add_listener(SWT::DragDetect, @control_listener)
       self.add_listener(SWT::Dispose, Class.new(Listener.class == Class ? Listener : Object) do
-        extend LocalClass
+        local_class_in DragSource
         include_class_members DragSource
         include Listener if Listener.class == Module
         

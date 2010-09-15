@@ -217,7 +217,7 @@ module Org::Eclipse::Swt::Custom
         @align = SWT::LEFT
       end
       add_paint_listener(Class.new(PaintListener.class == Class ? PaintListener : Object) do
-        extend LocalClass
+        local_class_in CLabel
         include_class_members CLabel
         include PaintListener if PaintListener.class == Module
         
@@ -235,7 +235,7 @@ module Org::Eclipse::Swt::Custom
         alias_method :initialize_anonymous, :initialize
       end.new_local(self))
       add_traverse_listener(Class.new(TraverseListener.class == Class ? TraverseListener : Object) do
-        extend LocalClass
+        local_class_in CLabel
         include_class_members CLabel
         include TraverseListener if TraverseListener.class == Module
         
@@ -255,7 +255,7 @@ module Org::Eclipse::Swt::Custom
         alias_method :initialize_anonymous, :initialize
       end.new_local(self))
       @dispose_listener = Class.new(Listener.class == Class ? Listener : Object) do
-        extend LocalClass
+        local_class_in CLabel
         include_class_members CLabel
         include Listener if Listener.class == Module
         
@@ -424,7 +424,7 @@ module Org::Eclipse::Swt::Custom
     def init_accessible
       accessible = get_accessible
       accessible.add_accessible_listener(Class.new(AccessibleAdapter.class == Class ? AccessibleAdapter : Object) do
-        extend LocalClass
+        local_class_in CLabel
         include_class_members CLabel
         include AccessibleAdapter if AccessibleAdapter.class == Module
         
@@ -455,7 +455,7 @@ module Org::Eclipse::Swt::Custom
         alias_method :initialize_anonymous, :initialize
       end.new_local(self))
       accessible.add_accessible_control_listener(Class.new(AccessibleControlAdapter.class == Class ? AccessibleControlAdapter : Object) do
-        extend LocalClass
+        local_class_in CLabel
         include_class_members CLabel
         include AccessibleControlAdapter if AccessibleControlAdapter.class == Module
         

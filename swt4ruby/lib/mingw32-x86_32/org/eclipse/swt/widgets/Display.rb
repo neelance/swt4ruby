@@ -1090,7 +1090,7 @@ module Org::Eclipse::Swt::Widgets
       # be removed in the future.
       when_class_loaded do
         self.attr_device_finder = Class.new(Runnable.class == Class ? Runnable : Object) do
-          extend LocalClass
+          local_class_in Display
           include_class_members Display
           include Runnable if Runnable.class == Module
           

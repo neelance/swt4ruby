@@ -106,7 +106,7 @@ module Org::Eclipse::Swt::Browser
     def create_cominterfaces
       @supports = # Create each of the interfaces that this object implements
       Class.new(XPCOMObject.class == Class ? XPCOMObject : Object) do
-        extend LocalClass
+        local_class_in Download
         include_class_members Download
         include XPCOMObject if XPCOMObject.class == Module
         
@@ -140,7 +140,7 @@ module Org::Eclipse::Swt::Browser
         alias_method :initialize_anonymous, :initialize
       end.new_local(self, Array.typed(::Java::Int).new([2, 0, 0]))
       @download = Class.new(XPCOMObject.class == Class ? XPCOMObject : Object) do
-        extend LocalClass
+        local_class_in Download
         include_class_members Download
         include XPCOMObject if XPCOMObject.class == Module
         
@@ -265,7 +265,7 @@ module Org::Eclipse::Swt::Browser
         alias_method :initialize_anonymous, :initialize
       end.new_local(self, Array.typed(::Java::Int).new([2, 0, 0, 7, 1, 1, 1, 1, 1, 1, 2, 1, 1, 1, 1, 1]))
       @progress_dialog = Class.new(XPCOMObject.class == Class ? XPCOMObject : Object) do
-        extend LocalClass
+        local_class_in Download
         include_class_members Download
         include XPCOMObject if XPCOMObject.class == Module
         
@@ -426,7 +426,7 @@ module Org::Eclipse::Swt::Browser
         alias_method :initialize_anonymous, :initialize
       end.new_local(self, Array.typed(::Java::Int).new([2, 0, 0, 7, 1, 1, 1, 1, 1, 1, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]))
       @web_progress_listener = Class.new(XPCOMObject.class == Class ? XPCOMObject : Object) do
-        extend LocalClass
+        local_class_in Download
         include_class_members Download
         include XPCOMObject if XPCOMObject.class == Module
         
@@ -647,7 +647,7 @@ module Org::Eclipse::Swt::Browser
         filename = RJava.cast_to_string(String.new(dest))
       end
       listener = Class.new(Listener.class == Class ? Listener : Object) do
-        extend LocalClass
+        local_class_in Download
         include_class_members Download
         include Listener if Listener.class == Module
         

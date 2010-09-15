@@ -177,7 +177,7 @@ module Org::Eclipse::Swt::Widgets
       end
       @drag_cursor = Cursor.new(self.attr_display, SWT::CURSOR_SIZEALL)
       listener = Class.new(Listener.class == Class ? Listener : Object) do
-        extend LocalClass
+        local_class_in CoolBar
         include_class_members CoolBar
         include Listener if Listener.class == Module
         

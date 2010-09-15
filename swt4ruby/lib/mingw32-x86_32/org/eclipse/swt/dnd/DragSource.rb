@@ -230,7 +230,7 @@ module Org::Eclipse::Swt::Dnd
       create_cominterfaces
       self._add_ref
       @control_listener = Class.new(Listener.class == Class ? Listener : Object) do
-        extend LocalClass
+        local_class_in DragSource
         include_class_members DragSource
         include Listener if Listener.class == Module
         
@@ -259,7 +259,7 @@ module Org::Eclipse::Swt::Dnd
       control.add_listener(SWT::Dispose, @control_listener)
       control.add_listener(SWT::DragDetect, @control_listener)
       self.add_listener(SWT::Dispose, Class.new(Listener.class == Class ? Listener : Object) do
-        extend LocalClass
+        local_class_in DragSource
         include_class_members DragSource
         include Listener if Listener.class == Module
         
@@ -350,7 +350,7 @@ module Org::Eclipse::Swt::Dnd
     def create_cominterfaces
       @i_drop_source = # register each of the interfaces that this object implements
       Class.new(COMObject.class == Class ? COMObject : Object) do
-        extend LocalClass
+        local_class_in DragSource
         include_class_members DragSource
         include COMObject if COMObject.class == Module
         
@@ -404,7 +404,7 @@ module Org::Eclipse::Swt::Dnd
       # method10 DUnadvise - not implemented
       # method11 EnumDAdvise - not implemented
       @i_data_object = Class.new(COMObject.class == Class ? COMObject : Object) do
-        extend LocalClass
+        local_class_in DragSource
         include_class_members DragSource
         include COMObject if COMObject.class == Module
         

@@ -128,7 +128,7 @@ module Org::Eclipse::Swt::Custom
       @column = -1
       @table_tree = table_tree
       @tree_listener = Class.new(TreeListener.class == Class ? TreeListener : Object) do
-        extend LocalClass
+        local_class_in TableTreeEditor
         include_class_members TableTreeEditor
         include TreeListener if TreeListener.class == Module
         
@@ -162,7 +162,7 @@ module Org::Eclipse::Swt::Custom
           super(*args)
           tree_listener_class = self.class
           @runnable = Class.new(self.class::Runnable.class == Class ? self.class::Runnable : Object) do
-            extend LocalClass
+            local_class_in tree_listener_class
             include_class_members tree_listener_class
             include class_self::Runnable if class_self::Runnable.class == Module
             
@@ -193,7 +193,7 @@ module Org::Eclipse::Swt::Custom
       end.new_local(self)
       table_tree.add_tree_listener(@tree_listener)
       @column_listener = Class.new(ControlListener.class == Class ? ControlListener : Object) do
-        extend LocalClass
+        local_class_in TableTreeEditor
         include_class_members TableTreeEditor
         include ControlListener if ControlListener.class == Module
         

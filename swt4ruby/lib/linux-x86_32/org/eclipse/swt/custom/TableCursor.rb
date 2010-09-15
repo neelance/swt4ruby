@@ -257,7 +257,7 @@ module Org::Eclipse::Swt::Custom
       set_background(nil)
       set_foreground(nil)
       @listener = Class.new(Listener.class == Class ? Listener : Object) do
-        extend LocalClass
+        local_class_in TableCursor
         include_class_members TableCursor
         include Listener if Listener.class == Module
         
@@ -296,7 +296,7 @@ module Org::Eclipse::Swt::Custom
         i += 1
       end
       @table_listener = Class.new(Listener.class == Class ? Listener : Object) do
-        extend LocalClass
+        local_class_in TableCursor
         include_class_members TableCursor
         include Listener if Listener.class == Module
         
@@ -321,7 +321,7 @@ module Org::Eclipse::Swt::Custom
       @table.add_listener(SWT::FocusIn, @table_listener)
       @table.add_listener(SWT::MouseDown, @table_listener)
       @dispose_item_listener = Class.new(Listener.class == Class ? Listener : Object) do
-        extend LocalClass
+        local_class_in TableCursor
         include_class_members TableCursor
         include Listener if Listener.class == Module
         
@@ -342,7 +342,7 @@ module Org::Eclipse::Swt::Custom
         alias_method :initialize_anonymous, :initialize
       end.new_local(self)
       @dispose_column_listener = Class.new(Listener.class == Class ? Listener : Object) do
-        extend LocalClass
+        local_class_in TableCursor
         include_class_members TableCursor
         include Listener if Listener.class == Module
         
@@ -363,7 +363,7 @@ module Org::Eclipse::Swt::Custom
         alias_method :initialize_anonymous, :initialize
       end.new_local(self)
       @resize_listener = Class.new(Listener.class == Class ? Listener : Object) do
-        extend LocalClass
+        local_class_in TableCursor
         include_class_members TableCursor
         include Listener if Listener.class == Module
         
@@ -389,7 +389,7 @@ module Org::Eclipse::Swt::Custom
         v_bar.add_listener(SWT::Selection, @resize_listener)
       end
       get_accessible.add_accessible_control_listener(Class.new(AccessibleControlAdapter.class == Class ? AccessibleControlAdapter : Object) do
-        extend LocalClass
+        local_class_in TableCursor
         include_class_members TableCursor
         include AccessibleControlAdapter if AccessibleControlAdapter.class == Module
         
@@ -407,7 +407,7 @@ module Org::Eclipse::Swt::Custom
         alias_method :initialize_anonymous, :initialize
       end.new_local(self))
       get_accessible.add_accessible_listener(Class.new(AccessibleAdapter.class == Class ? AccessibleAdapter : Object) do
-        extend LocalClass
+        local_class_in TableCursor
         include_class_members TableCursor
         include AccessibleAdapter if AccessibleAdapter.class == Module
         
@@ -618,8 +618,8 @@ module Org::Eclipse::Swt::Custom
         gc.draw_string(text, x, text_y)
       end
       if (is_focus_control)
-        gc.set_background(display.get_system_color(SWT::COLOR_BLACK))
-        gc.set_foreground(display.get_system_color(SWT::COLOR_WHITE))
+        gc.set_background(display.get_system_color(SWT.attr_color_black))
+        gc.set_foreground(display.get_system_color(SWT.attr_color_white))
         gc.draw_focus(0, 0, size.attr_x, size.attr_y)
       end
     end

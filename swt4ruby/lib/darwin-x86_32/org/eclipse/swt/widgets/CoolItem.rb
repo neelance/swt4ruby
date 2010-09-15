@@ -387,7 +387,7 @@ module Org::Eclipse::Swt::Widgets
       width = point.attr_x
       height = point.attr_y
       foreground = @parent.get_foreground
-      black = self.attr_display.get_system_color(SWT::COLOR_BLACK)
+      black = self.attr_display.get_system_color(SWT.attr_color_black)
       background = @parent.get_background
       palette = PaletteData.new(Array.typed(RGB).new([foreground.get_rgb, background.get_rgb, black.get_rgb]))
       image_data = ImageData.new(width, height, 4, palette)
@@ -777,7 +777,7 @@ module Org::Eclipse::Swt::Widgets
             @chevron = ToolBar.new(@parent, SWT::FLAT | SWT::NO_FOCUS)
             tool_item = ToolItem.new(@chevron, SWT::PUSH)
             tool_item.add_listener(SWT::Selection, Class.new(Listener.class == Class ? Listener : Object) do
-              extend LocalClass
+              local_class_in CoolItem
               include_class_members CoolItem
               include Listener if Listener.class == Module
               

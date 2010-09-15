@@ -111,7 +111,7 @@ module Org::Eclipse::Swt::Custom
       @scroll_x = -1
       @scroll_y = -1
       @paint_listener = Class.new(Listener.class == Class ? Listener : Object) do
-        extend LocalClass
+        local_class_in StyledTextDropTargetEffect
         include_class_members StyledTextDropTargetEffect
         include Listener if Listener.class == Module
         
@@ -121,7 +121,7 @@ module Org::Eclipse::Swt::Custom
             text = get_control
             position = text.get_location_at_offset(self.attr_current_offset)
             height = text.get_line_height(self.attr_current_offset)
-            event.attr_gc.set_background(event.attr_display.get_system_color(SWT::COLOR_BLACK))
+            event.attr_gc.set_background(event.attr_display.get_system_color(SWT.attr_color_black))
             event.attr_gc.fill_rectangle(position.attr_x, position.attr_y, CARET_WIDTH, height)
           end
         end

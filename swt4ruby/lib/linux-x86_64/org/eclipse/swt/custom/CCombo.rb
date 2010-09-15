@@ -186,7 +186,7 @@ module Org::Eclipse::Swt::Custom
       end
       @arrow = Button.new(self, arrow_style)
       @listener = Class.new(Listener.class == Class ? Listener : Object) do
-        extend LocalClass
+        local_class_in CCombo
         include_class_members CCombo
         include Listener if Listener.class == Module
         
@@ -218,7 +218,7 @@ module Org::Eclipse::Swt::Custom
           if ((get_shell).equal?(event.attr_widget))
             listener_class = self.class
             get_display.async_exec(Class.new(self.class::Runnable.class == Class ? self.class::Runnable : Object) do
-              extend LocalClass
+              local_class_in listener_class
               include_class_members listener_class
               include class_self::Runnable if class_self::Runnable.class == Module
               
@@ -250,7 +250,7 @@ module Org::Eclipse::Swt::Custom
         alias_method :initialize_anonymous, :initialize
       end.new_local(self)
       @filter = Class.new(Listener.class == Class ? Listener : Object) do
-        extend LocalClass
+        local_class_in CCombo
         include_class_members CCombo
         include Listener if Listener.class == Module
         
@@ -1117,7 +1117,7 @@ module Org::Eclipse::Swt::Custom
     typesig { [] }
     def init_accessible
       accessible_adapter = Class.new(AccessibleAdapter.class == Class ? AccessibleAdapter : Object) do
-        extend LocalClass
+        local_class_in CCombo
         include_class_members CCombo
         include AccessibleAdapter if AccessibleAdapter.class == Module
         
@@ -1164,7 +1164,7 @@ module Org::Eclipse::Swt::Custom
       @text.get_accessible.add_accessible_listener(accessible_adapter)
       @list.get_accessible.add_accessible_listener(accessible_adapter)
       @arrow.get_accessible.add_accessible_listener(Class.new(AccessibleAdapter.class == Class ? AccessibleAdapter : Object) do
-        extend LocalClass
+        local_class_in CCombo
         include_class_members CCombo
         include AccessibleAdapter if AccessibleAdapter.class == Module
         
@@ -1192,7 +1192,7 @@ module Org::Eclipse::Swt::Custom
         alias_method :initialize_anonymous, :initialize
       end.new_local(self))
       get_accessible.add_accessible_text_listener(Class.new(AccessibleTextAdapter.class == Class ? AccessibleTextAdapter : Object) do
-        extend LocalClass
+        local_class_in CCombo
         include_class_members CCombo
         include AccessibleTextAdapter if AccessibleTextAdapter.class == Module
         
@@ -1217,7 +1217,7 @@ module Org::Eclipse::Swt::Custom
         alias_method :initialize_anonymous, :initialize
       end.new_local(self))
       get_accessible.add_accessible_control_listener(Class.new(AccessibleControlAdapter.class == Class ? AccessibleControlAdapter : Object) do
-        extend LocalClass
+        local_class_in CCombo
         include_class_members CCombo
         include AccessibleControlAdapter if AccessibleControlAdapter.class == Module
         
@@ -1268,7 +1268,7 @@ module Org::Eclipse::Swt::Custom
         alias_method :initialize_anonymous, :initialize
       end.new_local(self))
       @text.get_accessible.add_accessible_control_listener(Class.new(AccessibleControlAdapter.class == Class ? AccessibleControlAdapter : Object) do
-        extend LocalClass
+        local_class_in CCombo
         include_class_members CCombo
         include AccessibleControlAdapter if AccessibleControlAdapter.class == Module
         
@@ -1286,7 +1286,7 @@ module Org::Eclipse::Swt::Custom
         alias_method :initialize_anonymous, :initialize
       end.new_local(self))
       @arrow.get_accessible.add_accessible_control_listener(Class.new(AccessibleControlAdapter.class == Class ? AccessibleControlAdapter : Object) do
-        extend LocalClass
+        local_class_in CCombo
         include_class_members CCombo
         include AccessibleControlAdapter if AccessibleControlAdapter.class == Module
         
@@ -1448,7 +1448,7 @@ module Org::Eclipse::Swt::Custom
       when SWT::Paint
         # draw black rectangle around list
         list_rect = @list.get_bounds
-        black = get_display.get_system_color(SWT::COLOR_BLACK)
+        black = get_display.get_system_color(SWT.attr_color_black)
         event.attr_gc.set_foreground(black)
         event.attr_gc.draw_rectangle(0, 0, list_rect.attr_width + 1, list_rect.attr_height + 1)
       when SWT::Close

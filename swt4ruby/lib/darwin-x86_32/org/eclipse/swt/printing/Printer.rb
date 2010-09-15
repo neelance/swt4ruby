@@ -382,8 +382,8 @@ module Org::Eclipse::Swt::Printing
             SWT.error(SWT::ERROR_INVALID_ARGUMENT)
           end
           data.attr_device = self
-          data.attr_background = get_system_color(SWT::COLOR_WHITE).attr_handle
-          data.attr_foreground = get_system_color(SWT::COLOR_BLACK).attr_handle
+          data.attr_background = get_system_color(SWT.attr_color_white).attr_handle
+          data.attr_foreground = get_system_color(SWT.attr_color_black).attr_handle
           data.attr_font = get_system_font
           scaling = scaling_factor
           dpi = get_dpi

@@ -468,7 +468,7 @@ module Org::Eclipse::Swt::Browser
       # $NON-NLS-1$
       when_class_loaded do
         NativeClearSessions = Class.new(Runnable.class == Class ? Runnable : Object) do
-          extend LocalClass
+          local_class_in IE
           include_class_members IE
           include Runnable if Runnable.class == Module
           
@@ -489,7 +489,7 @@ module Org::Eclipse::Swt::Browser
           alias_method :initialize_anonymous, :initialize
         end.new_local(self)
         NativeGetCookie = Class.new(Runnable.class == Class ? Runnable : Object) do
-          extend LocalClass
+          local_class_in IE
           include_class_members IE
           include Runnable if Runnable.class == Module
           
@@ -533,7 +533,7 @@ module Org::Eclipse::Swt::Browser
           alias_method :initialize_anonymous, :initialize
         end.new_local(self)
         NativeSetCookie = Class.new(Runnable.class == Class ? Runnable : Object) do
-          extend LocalClass
+          local_class_in IE
           include_class_members IE
           include Runnable if Runnable.class == Module
           
@@ -638,7 +638,7 @@ module Org::Eclipse::Swt::Browser
       @site.do_verb(OLE::OLEIVERB_INPLACEACTIVATE)
       @auto = OleAutomation.new(@site)
       @dom_listener = Class.new(OleListener.class == Class ? OleListener : Object) do
-        extend LocalClass
+        local_class_in IE
         include_class_members IE
         include OleListener if OleListener.class == Module
         
@@ -656,7 +656,7 @@ module Org::Eclipse::Swt::Browser
         alias_method :initialize_anonymous, :initialize
       end.new_local(self)
       listener = Class.new(Listener.class == Class ? Listener : Object) do
-        extend LocalClass
+        local_class_in IE
         include_class_members IE
         include Listener if Listener.class == Module
         
@@ -730,7 +730,7 @@ module Org::Eclipse::Swt::Browser
       @site.add_listener(SWT::MouseWheel, listener)
       @site.add_listener(SWT::Traverse, listener)
       ole_listener = Class.new(OleListener.class == Class ? OleListener : Object) do
-        extend LocalClass
+        local_class_in IE
         include_class_members IE
         include OleListener if OleListener.class == Module
         
@@ -813,7 +813,7 @@ module Org::Eclipse::Swt::Browser
               if (!(self.attr_html).nil? && (url == ABOUT_BLANK))
                 ole_listener_class = self.class
                 runnable = Class.new(self.class::Runnable.class == Class ? self.class::Runnable : Object) do
-                  extend LocalClass
+                  local_class_in ole_listener_class
                   include_class_members ole_listener_class
                   include class_self::Runnable if class_self::Runnable.class == Module
                   
@@ -1101,7 +1101,7 @@ module Org::Eclipse::Swt::Browser
               # the Close event and dispose the Browser in an async block.
               ole_listener_class = self.class
               self.attr_browser.get_display.async_exec(Class.new(self.class::Runnable.class == Class ? self.class::Runnable : Object) do
-                extend LocalClass
+                local_class_in ole_listener_class
                 include_class_members ole_listener_class
                 include class_self::Runnable if class_self::Runnable.class == Module
                 

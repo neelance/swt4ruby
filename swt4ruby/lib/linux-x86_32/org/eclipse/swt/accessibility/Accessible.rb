@@ -94,7 +94,7 @@ module Org::Eclipse::Swt::Accessibility
       @control = control
       AccessibleFactory.register_accessible(self)
       control.add_dispose_listener(Class.new(DisposeListener.class == Class ? DisposeListener : Object) do
-        extend LocalClass
+        local_class_in Accessible
         include_class_members Accessible
         include DisposeListener if DisposeListener.class == Module
         

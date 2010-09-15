@@ -296,7 +296,7 @@ module Org::Eclipse::Swt::Ole::Win32
       @type = COM::OLEEMBEDDED
       @is_static = false
       @listener = Class.new(Listener.class == Class ? Listener : Object) do
-        extend LocalClass
+        local_class_in OleClientSite
         include_class_members OleClientSite
         include Listener if Listener.class == Module
         
@@ -706,7 +706,7 @@ module Org::Eclipse::Swt::Ole::Win32
     typesig { [] }
     def create_cominterfaces
       @i_unknown = Class.new(COMObject.class == Class ? COMObject : Object) do
-        extend LocalClass
+        local_class_in OleClientSite
         include_class_members OleClientSite
         include COMObject if COMObject.class == Module
         
@@ -741,7 +741,7 @@ module Org::Eclipse::Swt::Ole::Win32
       end.new_local(self, Array.typed(::Java::Int).new([2, 0, 0]))
       # method8 RequestNewObjectLayout - not implemented
       @i_ole_client_site = Class.new(COMObject.class == Class ? COMObject : Object) do
-        extend LocalClass
+        local_class_in OleClientSite
         include_class_members OleClientSite
         include COMObject if COMObject.class == Module
         
@@ -805,7 +805,7 @@ module Org::Eclipse::Swt::Ole::Win32
         alias_method :initialize_anonymous, :initialize
       end.new_local(self, Array.typed(::Java::Int).new([2, 0, 0, 0, 3, 1, 0, 1, 0]))
       @i_advise_sink = Class.new(COMObject.class == Class ? COMObject : Object) do
-        extend LocalClass
+        local_class_in OleClientSite
         include_class_members OleClientSite
         include COMObject if COMObject.class == Module
         
@@ -871,7 +871,7 @@ module Org::Eclipse::Swt::Ole::Win32
         alias_method :initialize_anonymous, :initialize
       end.new_local(self, Array.typed(::Java::Int).new([2, 0, 0, 2, 2, 1, 0, 0]))
       @i_ole_in_place_site = Class.new(COMObject.class == Class ? COMObject : Object) do
-        extend LocalClass
+        local_class_in OleClientSite
         include_class_members OleClientSite
         include COMObject if COMObject.class == Module
         
@@ -985,7 +985,7 @@ module Org::Eclipse::Swt::Ole::Win32
         alias_method :initialize_anonymous, :initialize
       end.new_local(self, Array.typed(::Java::Int).new([2, 0, 0, 1, 1, 0, 0, 0, 5, (C::PTR_SIZEOF).equal?(4) ? 2 : 1, 1, 0, 0, 0, 1]))
       @i_ole_document_site = Class.new(COMObject.class == Class ? COMObject : Object) do
-        extend LocalClass
+        local_class_in OleClientSite
         include_class_members OleClientSite
         include COMObject if COMObject.class == Module
         

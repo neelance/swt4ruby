@@ -427,7 +427,7 @@ module Org::Eclipse::Swt::Widgets
     def init_accessible
       accessible = get_accessible
       accessible.add_accessible_listener(Class.new(AccessibleAdapter.class == Class ? AccessibleAdapter : Object) do
-        extend LocalClass
+        local_class_in Link
         include_class_members Link
         include AccessibleAdapter if AccessibleAdapter.class == Module
         
@@ -445,7 +445,7 @@ module Org::Eclipse::Swt::Widgets
         alias_method :initialize_anonymous, :initialize
       end.new_local(self))
       accessible.add_accessible_control_listener(Class.new(AccessibleControlAdapter.class == Class ? AccessibleControlAdapter : Object) do
-        extend LocalClass
+        local_class_in Link
         include_class_members Link
         include AccessibleControlAdapter if AccessibleControlAdapter.class == Module
         

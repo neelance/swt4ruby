@@ -515,7 +515,7 @@ module Org::Eclipse::Swt::Dnd
       end
       control.set_data(DND::DROP_TARGET_KEY, self)
       @control_listener = Class.new(Listener.class == Class ? Listener : Object) do
-        extend LocalClass
+        local_class_in DropTarget
         include_class_members DropTarget
         include Listener if Listener.class == Module
         
@@ -536,7 +536,7 @@ module Org::Eclipse::Swt::Dnd
       end.new_local(self)
       control.add_listener(SWT::Dispose, @control_listener)
       self.add_listener(SWT::Dispose, Class.new(Listener.class == Class ? Listener : Object) do
-        extend LocalClass
+        local_class_in DropTarget
         include_class_members DropTarget
         include Listener if Listener.class == Module
         
