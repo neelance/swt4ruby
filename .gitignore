@@ -3,4 +3,5 @@
 .project
 .DS_Store
 .classpath
+*.rbc
 *~
